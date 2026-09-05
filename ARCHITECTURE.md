@@ -45,7 +45,9 @@ saídas/fronteiras/contexto → validação derivada → resultado imutável.
 
 Controle local não é apenas grafo de adjacência: o contrato exige retornos pareados
 ou aproximação declarada. A API não deve prometer que todo successor é incondicional.
-O MVP pode não suportar `control.local@1`, mas não pode apagar essa capability.
+O MVP-CFG-01 termina em fluxo linear + IF/ELSE; `invoke` e capacidades avançadas
+entram em slices posteriores. O MVP pode não suportar `control.local@1`, mas não
+pode apagar essa capability.
 
 Detalhes: [fronteiras](docs/architecture/boundaries.md), [portas e adapters](docs/architecture/ports-and-adapters.md),
 [extensibilidade](docs/architecture/extensibility.md), [pipeline](docs/architecture/pipeline.md).
