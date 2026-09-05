@@ -7,12 +7,7 @@
       "phase": "discovery",
       "status": "ready_for_authorization",
       "dependencies": [],
-      "evals": [
-        "EVAL-CFG-007",
-        "EVAL-CFG-008",
-        "EVAL-CFG-009",
-        "EVAL-CFG-020"
-      ],
+      "evals": ["EVAL-CFG-007", "EVAL-CFG-008", "EVAL-CFG-009", "EVAL-CFG-020"],
       "path": "docs/work/backlog/BACKLOG-CFG-001.md",
       "work_item": "WORK-CFG-001"
     },
@@ -21,15 +16,8 @@
       "title": "Bootstrap Java/Maven e modelo IR mínimo compartilhável",
       "phase": "foundation",
       "status": "planned",
-      "dependencies": [
-        "BACKLOG-CFG-001"
-      ],
-      "evals": [
-        "EVAL-CFG-001",
-        "EVAL-CFG-007",
-        "EVAL-CFG-013",
-        "EVAL-CFG-020"
-      ],
+      "dependencies": ["BACKLOG-CFG-001"],
+      "evals": ["EVAL-CFG-001", "EVAL-CFG-007", "EVAL-CFG-013", "EVAL-CFG-020"],
       "path": "docs/work/backlog/BACKLOG-CFG-002.md",
       "work_item": null
     },
@@ -38,14 +26,8 @@
       "title": "Fronteiras Clean e seam semântico de extensões",
       "phase": "foundation",
       "status": "planned",
-      "dependencies": [
-        "BACKLOG-CFG-002"
-      ],
-      "evals": [
-        "EVAL-CFG-007",
-        "EVAL-CFG-008",
-        "EVAL-CFG-009"
-      ],
+      "dependencies": ["BACKLOG-CFG-002"],
+      "evals": ["EVAL-CFG-007", "EVAL-CFG-008", "EVAL-CFG-009"],
       "path": "docs/work/backlog/BACKLOG-CFG-003.md",
       "work_item": null
     },
@@ -54,16 +36,8 @@
       "title": "Fixtures independentes e adapter de transporte",
       "phase": "mvp",
       "status": "planned",
-      "dependencies": [
-        "BACKLOG-CFG-002",
-        "BACKLOG-CFG-003"
-      ],
-      "evals": [
-        "EVAL-CFG-001",
-        "EVAL-CFG-008",
-        "EVAL-CFG-013",
-        "EVAL-CFG-014"
-      ],
+      "dependencies": ["BACKLOG-CFG-002", "BACKLOG-CFG-003"],
+      "evals": ["EVAL-CFG-001", "EVAL-CFG-008", "EVAL-CFG-013", "EVAL-CFG-014"],
       "path": "docs/work/backlog/BACKLOG-CFG-004.md",
       "work_item": null
     },
@@ -72,18 +46,8 @@
       "title": "Núcleo CFG: projeção linear e saídas",
       "phase": "mvp",
       "status": "planned",
-      "dependencies": [
-        "BACKLOG-CFG-002",
-        "BACKLOG-CFG-003"
-      ],
-      "evals": [
-        "EVAL-CFG-001",
-        "EVAL-CFG-002",
-        "EVAL-CFG-005",
-        "EVAL-CFG-007",
-        "EVAL-CFG-013",
-        "EVAL-CFG-014"
-      ],
+      "dependencies": ["BACKLOG-CFG-002", "BACKLOG-CFG-003"],
+      "evals": ["EVAL-CFG-001", "EVAL-CFG-002", "EVAL-CFG-005", "EVAL-CFG-007", "EVAL-CFG-013", "EVAL-CFG-014"],
       "path": "docs/work/backlog/BACKLOG-CFG-005.md",
       "work_item": null
     },
@@ -92,31 +56,18 @@
       "title": "Bifurcação e IF/ELSE estrutural",
       "phase": "mvp",
       "status": "planned",
-      "dependencies": [
-        "BACKLOG-CFG-005"
-      ],
-      "evals": [
-        "EVAL-CFG-003",
-        "EVAL-CFG-004",
-        "EVAL-CFG-005",
-        "EVAL-CFG-014"
-      ],
+      "dependencies": ["BACKLOG-CFG-005"],
+      "evals": ["EVAL-CFG-003", "EVAL-CFG-004", "EVAL-CFG-005", "EVAL-CFG-014"],
       "path": "docs/work/backlog/BACKLOG-CFG-006.md",
       "work_item": null
     },
     {
       "id": "BACKLOG-CFG-007",
       "title": "Invoke e resultados de controle delimitados",
-      "phase": "mvp",
+      "phase": "structure",
       "status": "planned",
-      "dependencies": [
-        "BACKLOG-CFG-005"
-      ],
-      "evals": [
-        "EVAL-CFG-005",
-        "EVAL-CFG-006",
-        "EVAL-CFG-013"
-      ],
+      "dependencies": ["BACKLOG-CFG-008"],
+      "evals": ["EVAL-CFG-005", "EVAL-CFG-006", "EVAL-CFG-013"],
       "path": "docs/work/backlog/BACKLOG-CFG-007.md",
       "work_item": null
     },
@@ -125,20 +76,8 @@
       "title": "CLI mínima e fechamento MVP arquivo/memória",
       "phase": "mvp",
       "status": "planned",
-      "dependencies": [
-        "BACKLOG-CFG-004",
-        "BACKLOG-CFG-006",
-        "BACKLOG-CFG-007"
-      ],
-      "evals": [
-        "EVAL-CFG-001",
-        "EVAL-CFG-003",
-        "EVAL-CFG-006",
-        "EVAL-CFG-007",
-        "EVAL-CFG-008",
-        "EVAL-CFG-013",
-        "EVAL-CFG-014"
-      ],
+      "dependencies": ["BACKLOG-CFG-004", "BACKLOG-CFG-006"],
+      "evals": ["EVAL-CFG-001", "EVAL-CFG-003", "EVAL-CFG-007", "EVAL-CFG-008", "EVAL-CFG-013", "EVAL-CFG-014"],
       "path": "docs/work/backlog/BACKLOG-CFG-008.md",
       "work_item": null
     },
@@ -147,15 +86,8 @@
       "title": "Dispatch, ciclos e múltiplas entradas",
       "phase": "structure",
       "status": "planned",
-      "dependencies": [
-        "BACKLOG-CFG-008"
-      ],
-      "evals": [
-        "EVAL-CFG-010",
-        "EVAL-CFG-011",
-        "EVAL-CFG-014",
-        "EVAL-CFG-015"
-      ],
+      "dependencies": ["BACKLOG-CFG-008"],
+      "evals": ["EVAL-CFG-010", "EVAL-CFG-011", "EVAL-CFG-014", "EVAL-CFG-015"],
       "path": "docs/work/backlog/BACKLOG-CFG-009.md",
       "work_item": null
     },
@@ -164,15 +96,8 @@
       "title": "Envelopes abertos e compatibilidade de extensões",
       "phase": "structure",
       "status": "planned",
-      "dependencies": [
-        "BACKLOG-CFG-008"
-      ],
-      "evals": [
-        "EVAL-CFG-006",
-        "EVAL-CFG-009",
-        "EVAL-CFG-012",
-        "EVAL-CFG-013"
-      ],
+      "dependencies": ["BACKLOG-CFG-007", "BACKLOG-CFG-008"],
+      "evals": ["EVAL-CFG-006", "EVAL-CFG-009", "EVAL-CFG-012", "EVAL-CFG-013"],
       "path": "docs/work/backlog/BACKLOG-CFG-010.md",
       "work_item": null
     },
@@ -181,24 +106,8 @@
       "title": "Qualificação AIR-STRUCTURE e hardening de regressão",
       "phase": "structure",
       "status": "planned",
-      "dependencies": [
-        "BACKLOG-CFG-009",
-        "BACKLOG-CFG-010"
-      ],
-      "evals": [
-        "EVAL-CFG-001",
-        "EVAL-CFG-002",
-        "EVAL-CFG-003",
-        "EVAL-CFG-004",
-        "EVAL-CFG-005",
-        "EVAL-CFG-006",
-        "EVAL-CFG-009",
-        "EVAL-CFG-010",
-        "EVAL-CFG-011",
-        "EVAL-CFG-012",
-        "EVAL-CFG-013",
-        "EVAL-CFG-014"
-      ],
+      "dependencies": ["BACKLOG-CFG-007", "BACKLOG-CFG-009", "BACKLOG-CFG-010"],
+      "evals": ["EVAL-CFG-001", "EVAL-CFG-002", "EVAL-CFG-003", "EVAL-CFG-004", "EVAL-CFG-005", "EVAL-CFG-006", "EVAL-CFG-009", "EVAL-CFG-010", "EVAL-CFG-011", "EVAL-CFG-012", "EVAL-CFG-013", "EVAL-CFG-014"],
       "path": "docs/work/backlog/BACKLOG-CFG-011.md",
       "work_item": null
     },
@@ -207,15 +116,8 @@
       "title": "Escala, performance e gates de qualidade",
       "phase": "quality",
       "status": "planned",
-      "dependencies": [
-        "BACKLOG-CFG-008"
-      ],
-      "evals": [
-        "EVAL-CFG-007",
-        "EVAL-CFG-013",
-        "EVAL-CFG-014",
-        "EVAL-CFG-015"
-      ],
+      "dependencies": ["BACKLOG-CFG-008"],
+      "evals": ["EVAL-CFG-007", "EVAL-CFG-013", "EVAL-CFG-014", "EVAL-CFG-015"],
       "path": "docs/work/backlog/BACKLOG-CFG-012.md",
       "work_item": null
     },
@@ -224,15 +126,8 @@
       "title": "Discovery de representação e matching local",
       "phase": "local-discovery",
       "status": "planned",
-      "dependencies": [
-        "BACKLOG-CFG-009",
-        "BACKLOG-CFG-010"
-      ],
-      "evals": [
-        "EVAL-CFG-016",
-        "EVAL-CFG-017",
-        "EVAL-CFG-018"
-      ],
+      "dependencies": ["BACKLOG-CFG-009", "BACKLOG-CFG-010"],
+      "evals": ["EVAL-CFG-016", "EVAL-CFG-017", "EVAL-CFG-018"],
       "path": "docs/work/backlog/BACKLOG-CFG-013.md",
       "work_item": null
     },
@@ -241,16 +136,8 @@
       "title": "Semântica local: frames e portas de conclusão",
       "phase": "local",
       "status": "planned",
-      "dependencies": [
-        "BACKLOG-CFG-011",
-        "BACKLOG-CFG-013"
-      ],
-      "evals": [
-        "EVAL-CFG-016",
-        "EVAL-CFG-017",
-        "EVAL-CFG-018",
-        "EVAL-CFG-009"
-      ],
+      "dependencies": ["BACKLOG-CFG-011", "BACKLOG-CFG-013"],
+      "evals": ["EVAL-CFG-016", "EVAL-CFG-017", "EVAL-CFG-018", "EVAL-CFG-009"],
       "path": "docs/work/backlog/BACKLOG-CFG-014.md",
       "work_item": null
     },
@@ -259,16 +146,8 @@
       "title": "Consultas pareadas e conformidade de controle local",
       "phase": "local",
       "status": "planned",
-      "dependencies": [
-        "BACKLOG-CFG-014",
-        "BACKLOG-CFG-012"
-      ],
-      "evals": [
-        "EVAL-CFG-016",
-        "EVAL-CFG-017",
-        "EVAL-CFG-018",
-        "EVAL-CFG-015"
-      ],
+      "dependencies": ["BACKLOG-CFG-014", "BACKLOG-CFG-012"],
+      "evals": ["EVAL-CFG-016", "EVAL-CFG-017", "EVAL-CFG-018", "EVAL-CFG-015"],
       "path": "docs/work/backlog/BACKLOG-CFG-015.md",
       "work_item": null
     },
@@ -277,13 +156,8 @@
       "title": "Controle indireto com universo fechado",
       "phase": "indirect",
       "status": "planned",
-      "dependencies": [
-        "BACKLOG-CFG-011"
-      ],
-      "evals": [
-        "EVAL-CFG-019",
-        "EVAL-CFG-012"
-      ],
+      "dependencies": ["BACKLOG-CFG-011"],
+      "evals": ["EVAL-CFG-019", "EVAL-CFG-012"],
       "path": "docs/work/backlog/BACKLOG-CFG-016.md",
       "work_item": null
     },
@@ -292,14 +166,8 @@
       "title": "Aceitação bilateral com CobolLower",
       "phase": "integration",
       "status": "planned",
-      "dependencies": [
-        "BACKLOG-CFG-008"
-      ],
-      "evals": [
-        "EVAL-CFG-008",
-        "EVAL-CFG-013",
-        "EVAL-CFG-020"
-      ],
+      "dependencies": ["BACKLOG-CFG-008"],
+      "evals": ["EVAL-CFG-008", "EVAL-CFG-013", "EVAL-CFG-020"],
       "path": "docs/work/backlog/BACKLOG-CFG-017.md",
       "work_item": null
     },
@@ -308,14 +176,8 @@
       "title": "Integração em monólito modular Maven",
       "phase": "integration",
       "status": "planned",
-      "dependencies": [
-        "BACKLOG-CFG-008"
-      ],
-      "evals": [
-        "EVAL-CFG-007",
-        "EVAL-CFG-008",
-        "EVAL-CFG-020"
-      ],
+      "dependencies": ["BACKLOG-CFG-008"],
+      "evals": ["EVAL-CFG-007", "EVAL-CFG-008", "EVAL-CFG-020"],
       "path": "docs/work/backlog/BACKLOG-CFG-018.md",
       "work_item": null
     },
@@ -324,14 +186,8 @@
       "title": "Evolução de contrato e otimizações opcionais",
       "phase": "deferred",
       "status": "deferred",
-      "dependencies": [
-        "BACKLOG-CFG-011"
-      ],
-      "evals": [
-        "EVAL-CFG-014",
-        "EVAL-CFG-020",
-        "EVAL-CFG-015"
-      ],
+      "dependencies": ["BACKLOG-CFG-011"],
+      "evals": ["EVAL-CFG-014", "EVAL-CFG-020", "EVAL-CFG-015"],
       "path": "docs/work/backlog/BACKLOG-CFG-019.md",
       "work_item": null
     },
@@ -340,12 +196,8 @@
       "title": "Análises posteriores — fronteira reservada",
       "phase": "deferred",
       "status": "deferred",
-      "dependencies": [
-        "BACKLOG-CFG-011"
-      ],
-      "evals": [
-        "EVAL-CFG-020"
-      ],
+      "dependencies": ["BACKLOG-CFG-011"],
+      "evals": ["EVAL-CFG-020"],
       "path": "docs/work/backlog/BACKLOG-CFG-020.md",
       "work_item": null
     },
@@ -354,12 +206,8 @@
       "title": "CI dos gates e higiene do harness",
       "phase": "quality",
       "status": "planned",
-      "dependencies": [
-        "BACKLOG-CFG-001"
-      ],
-      "evals": [
-        "EVAL-CFG-007"
-      ],
+      "dependencies": ["BACKLOG-CFG-001"],
+      "evals": ["EVAL-CFG-007"],
       "path": "docs/work/backlog/BACKLOG-CFG-021.md",
       "work_item": null
     }
