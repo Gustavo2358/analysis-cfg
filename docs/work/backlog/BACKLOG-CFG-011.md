@@ -1,7 +1,7 @@
 # BACKLOG-CFG-011 — Qualificação AIR-STRUCTURE e hardening de regressão
 
 **Estado:** `planned`. **Fase:** `structure`. **Autorização:** backlog não autoriza execução.
-Dependências: BACKLOG-CFG-009, BACKLOG-CFG-010.
+Dependências: BACKLOG-CFG-007, BACKLOG-CFG-009, BACKLOG-CFG-010.
 
 ## Problema e objetivo observável
 
