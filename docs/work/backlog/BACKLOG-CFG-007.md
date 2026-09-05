@@ -1,7 +1,7 @@
 # BACKLOG-CFG-007 — Invoke e resultados de controle delimitados
 
-**Estado:** `planned`. **Fase:** `mvp`. **Autorização:** backlog não autoriza execução.
-Dependências: BACKLOG-CFG-005.
+**Estado:** `planned`. **Fase:** `structure`. **Autorização:** backlog não autoriza execução.
+Dependências: BACKLOG-CFG-008.
 
 ## Problema e objetivo observável
 
