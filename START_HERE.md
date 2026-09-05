@@ -1,13 +1,11 @@
-# Primeira sessão
+# Primeira sessão no repositório
 
-## 1. Instalar o harness
+## 1. Validar a baseline
 
-Extraia o ZIP e use o conteúdo desta pasta como raiz do novo repositório.
-Arquivos ocultos também pertencem à entrega. Se já existir conteúdo, compare o diff
-antes de copiar; não sobrescreva código ou instruções existentes automaticamente.
-O nome `analysis-cfg` é provisório, sem acoplamento semântico.
+O repositório já contém o harness revisado. Antes de qualquer trabalho, confirme que
+a cópia local está íntegra e que nenhum Java/POM apareceu sem autorização.
 
-## 2. Validar o pacote
+## 2. Validar o harness
 
 ```bash
 bash scripts/harness/check-fast.sh
