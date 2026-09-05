@@ -1,7 +1,7 @@
 # BACKLOG-CFG-008 — CLI mínima e fechamento MVP arquivo/memória
 
 **Estado:** `planned`. **Fase:** `mvp`. **Autorização:** backlog não autoriza execução.
-Dependências: BACKLOG-CFG-004, BACKLOG-CFG-006, BACKLOG-CFG-007.
+Dependências: BACKLOG-CFG-004, BACKLOG-CFG-006.
 
 ## Problema e objetivo observável
 
@@ -17,7 +17,7 @@ Arquivo→Publication→BuildCfg→resultado funciona; kernel testado sem adapte
 
 ## Evals e invariantes
 
-EVAL-CFG-001, EVAL-CFG-003, EVAL-CFG-006, EVAL-CFG-007, EVAL-CFG-008, EVAL-CFG-013, EVAL-CFG-014. Vincular invariantes específicos na promoção para work
+EVAL-CFG-001, EVAL-CFG-003, EVAL-CFG-007, EVAL-CFG-008, EVAL-CFG-013, EVAL-CFG-014. Vincular invariantes específicos na promoção para work
 item. Ver [catálogo](../../evals/catalog.md) e [invariantes](../../architecture/invariants.md).
 Antes de código, transformar expected em testes RED independentes; documentar o
 resultado observado, não apenas intenção de TDD.
