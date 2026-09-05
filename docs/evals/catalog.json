@@ -1,0 +1,330 @@
+{
+  "schema_version": 1,
+  "role": "Consumer/CFG",
+  "evals": [
+    {
+      "id": "EVAL-CFG-001",
+      "title": "Integridade da Publication",
+      "status": "planned",
+      "expectation": "Rejeitar ID duplicado, target interno pendente, terminador ausente/duplo e mistura de revisões. Distinguir inventário zero de indisponível.",
+      "upstream_oracles": [
+        "O-29",
+        "O-30",
+        "O-31",
+        "O-32"
+      ],
+      "invariants": [
+        "INV-CFG-003",
+        "INV-CFG-004",
+        "INV-CFG-005",
+        "INV-CFG-023"
+      ],
+      "implementation_evidence": null
+    },
+    {
+      "id": "EVAL-CFG-002",
+      "title": "Fluxo linear",
+      "status": "planned",
+      "expectation": "Uma sequência com operações comuns e jump/return explícitos; preservar ordem e todas as ocorrências.",
+      "upstream_oracles": [
+        "O-01",
+        "O-09",
+        "O-10",
+        "O-18"
+      ],
+      "invariants": [
+        "INV-CFG-005",
+        "INV-CFG-006",
+        "INV-CFG-008"
+      ],
+      "implementation_evidence": null
+    },
+    {
+      "id": "EVAL-CFG-003",
+      "title": "Diamond",
+      "status": "planned",
+      "expectation": "Dois ramos e continuação comum; nenhuma aresta entre irmãos nem avaliação de predicado necessária.",
+      "upstream_oracles": [
+        "O-02"
+      ],
+      "invariants": [
+        "INV-CFG-005",
+        "INV-CFG-007",
+        "INV-CFG-010"
+      ],
+      "implementation_evidence": null
+    },
+    {
+      "id": "EVAL-CFG-004",
+      "title": "Ramos vazios, nested e destino igual",
+      "status": "planned",
+      "expectation": "False pode ir diretamente ao join; nested com terminações próprias; TRUE/FALSE preservados mesmo com target igual.",
+      "upstream_oracles": [
+        "O-03",
+        "O-27"
+      ],
+      "invariants": [
+        "INV-CFG-007",
+        "INV-CFG-008",
+        "INV-CFG-012"
+      ],
+      "implementation_evidence": null
+    },
+    {
+      "id": "EVAL-CFG-005",
+      "title": "Saídas distintas",
+      "status": "planned",
+      "expectation": "Return e halt não têm fallthrough; raise preserva tag; nenhum ramo terminante reconverge por ordem textual.",
+      "upstream_oracles": [
+        "O-04",
+        "O-18",
+        "O-19"
+      ],
+      "invariants": [
+        "INV-CFG-008",
+        "INV-CFG-019"
+      ],
+      "implementation_evidence": null
+    },
+    {
+      "id": "EVAL-CFG-006",
+      "title": "Invoke por outcomes",
+      "status": "planned",
+      "expectation": "Normal é possível; exceções, halt, diverge e restante não somem; resultados normais não contaminam outros outcomes.",
+      "upstream_oracles": [
+        "O-20",
+        "O-21",
+        "O-22"
+      ],
+      "invariants": [
+        "INV-CFG-009",
+        "INV-CFG-010",
+        "INV-CFG-012"
+      ],
+      "implementation_evidence": null
+    },
+    {
+      "id": "EVAL-CFG-007",
+      "title": "Isolamento Clean Architecture",
+      "status": "planned",
+      "expectation": "Kernel compila/executa sem adapters, filesystem, serialização ou frontend; dependência proibida é detectada.",
+      "upstream_oracles": [],
+      "invariants": [
+        "INV-CFG-001",
+        "INV-CFG-002",
+        "INV-CFG-026"
+      ],
+      "implementation_evidence": null
+    },
+    {
+      "id": "EVAL-CFG-008",
+      "title": "Mesmo caso de uso por arquivo e memória",
+      "status": "planned",
+      "expectation": "Duas vias de ingresso produzem grafo e metadados semanticamente equivalentes sob mesmas opções.",
+      "upstream_oracles": [
+        "O-66"
+      ],
+      "invariants": [
+        "INV-CFG-002",
+        "INV-CFG-003",
+        "INV-CFG-023",
+        "INV-CFG-026"
+      ],
+      "implementation_evidence": null
+    },
+    {
+      "id": "EVAL-CFG-009",
+      "title": "Extensão sem editar orquestrador",
+      "status": "planned",
+      "expectation": "Registro de capability sintética por seam; duplicata rejeitada; fallback uma vez; não suportado não vira vazio.",
+      "upstream_oracles": [
+        "O-47",
+        "O-48"
+      ],
+      "invariants": [
+        "INV-CFG-014",
+        "INV-CFG-022"
+      ],
+      "implementation_evidence": null
+    },
+    {
+      "id": "EVAL-CFG-010",
+      "title": "Dispatch",
+      "status": "planned",
+      "expectation": "Cases e default, targets repetidos com condições próprias, duplicatas semânticas inválidas e seletor fora da tabela.",
+      "upstream_oracles": [
+        "O-05"
+      ],
+      "invariants": [
+        "INV-CFG-007"
+      ],
+      "implementation_evidence": null
+    },
+    {
+      "id": "EVAL-CFG-011",
+      "title": "Ciclos e múltiplas entradas",
+      "status": "planned",
+      "expectation": "Pré/pós-teste, back-edge, self-loop, ciclo irreducível e conteúdo acessível por outra Entry; sem topological sort obrigatório.",
+      "upstream_oracles": [
+        "O-06",
+        "O-07"
+      ],
+      "invariants": [
+        "INV-CFG-005",
+        "INV-CFG-006",
+        "INV-CFG-019"
+      ],
+      "implementation_evidence": null
+    },
+    {
+      "id": "EVAL-CFG-012",
+      "title": "Controle aberto",
+      "status": "planned",
+      "expectation": "Scope com label interior, known+remainder, nenhuma falsa prova de unreachable ou completude.",
+      "upstream_oracles": [
+        "O-33",
+        "O-34"
+      ],
+      "invariants": [
+        "INV-CFG-012",
+        "INV-CFG-013",
+        "INV-CFG-020"
+      ],
+      "implementation_evidence": null
+    },
+    {
+      "id": "EVAL-CFG-013",
+      "title": "Provenance e cardinalidade",
+      "status": "planned",
+      "expectation": "IDs namespaced, origin derivada, clones distintos, inventário sem predecessor e operação não suportada mantida.",
+      "upstream_oracles": [
+        "O-41",
+        "O-42",
+        "O-43",
+        "O-45",
+        "O-46",
+        "O-49"
+      ],
+      "invariants": [
+        "INV-CFG-004",
+        "INV-CFG-006",
+        "INV-CFG-011"
+      ],
+      "implementation_evidence": null
+    },
+    {
+      "id": "EVAL-CFG-014",
+      "title": "Determinismo e metamorfismo",
+      "status": "planned",
+      "expectation": "Permutation de sequences, alpha-renaming de IDs, split com jump e mudança só de display não alteram observações correlacionadas.",
+      "upstream_oracles": [
+        "O-09",
+        "O-10",
+        "O-44",
+        "O-66"
+      ],
+      "invariants": [
+        "INV-CFG-005",
+        "INV-CFG-021",
+        "INV-CFG-023"
+      ],
+      "implementation_evidence": null
+    },
+    {
+      "id": "EVAL-CFG-015",
+      "title": "Escala estrutural",
+      "status": "planned",
+      "expectation": "Chains/diamonds/cycles/dispatch crescentes; índices únicos e custo proporcional a input+output; sem truncamento.",
+      "upstream_oracles": [
+        "O-49",
+        "O-50"
+      ],
+      "invariants": [
+        "INV-CFG-006",
+        "INV-CFG-020",
+        "INV-CFG-022"
+      ],
+      "implementation_evidence": null
+    },
+    {
+      "id": "EVAL-CFG-016",
+      "title": "Retorno ao callsite correto",
+      "status": "planned",
+      "expectation": "Duas local.invoke da mesma entry com resume distintos; nenhuma continuação de C2 durante contexto C1.",
+      "upstream_oracles": [
+        "O-56"
+      ],
+      "invariants": [
+        "INV-CFG-015"
+      ],
+      "implementation_evidence": null
+    },
+    {
+      "id": "EVAL-CFG-017",
+      "title": "Portas e topo",
+      "status": "planned",
+      "expectation": "Trecho curto/longo compartilhado; default com pilha vazia; mismatch do topo não busca frame externo.",
+      "upstream_oracles": [
+        "O-57",
+        "O-58"
+      ],
+      "invariants": [
+        "INV-CFG-015",
+        "INV-CFG-016"
+      ],
+      "implementation_evidence": null
+    },
+    {
+      "id": "EVAL-CFG-018",
+      "title": "Resume, unwind e recursão",
+      "status": "planned",
+      "expectation": "Underflow é exceção; jump não desempilha; unwind remove n exatos; recursão não causa enumeração infinita silenciosa.",
+      "upstream_oracles": [
+        "O-59",
+        "O-60"
+      ],
+      "invariants": [
+        "INV-CFG-015",
+        "INV-CFG-017",
+        "INV-CFG-020"
+      ],
+      "implementation_evidence": null
+    },
+    {
+      "id": "EVAL-CFG-019",
+      "title": "Controle indireto inicial",
+      "status": "planned",
+      "expectation": "Todos os labels de S sem RD; label fora de S inválido; refinamento opcional com revisão, sem mutar IR.",
+      "upstream_oracles": [
+        "O-61",
+        "O-62",
+        "O-63"
+      ],
+      "invariants": [
+        "INV-CFG-018",
+        "INV-CFG-023"
+      ],
+      "implementation_evidence": null
+    },
+    {
+      "id": "EVAL-CFG-020",
+      "title": "Integração modular e atualização de contrato",
+      "status": "planned",
+      "expectation": "Mesmo modelo IR e porta, sem serialização intermediária; capabilities/revisões incompatíveis diagnosticadas.",
+      "upstream_oracles": [
+        "O-31",
+        "O-66",
+        "O-67",
+        "O-68"
+      ],
+      "invariants": [
+        "INV-CFG-001",
+        "INV-CFG-002",
+        "INV-CFG-023",
+        "INV-CFG-024",
+        "INV-CFG-026"
+      ],
+      "implementation_evidence": null
+    }
+  ]
+}

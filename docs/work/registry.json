@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "active": [
+    {
+      "id": "WORK-CFG-001",
+      "path": "docs/work/active/WORK-CFG-001",
+      "status": "blocked",
+      "authorization": "none"
+    }
+  ],
+  "history": []
+}

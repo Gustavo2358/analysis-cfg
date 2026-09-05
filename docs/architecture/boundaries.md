@@ -1,0 +1,48 @@
+# Clean Architecture: fronteiras verificáveis
+
+## Regra de dependência
+
+Domínio conhece apenas semântica de controle e tipos IR aprovados. Aplicação conhece
+domínio e suas portas. Adapters dependem das portas. O launcher conhece os concretos
+para compô-los. Nenhuma dependência aponta de dentro para fora.
+A inspiração é a regra de dependência de Clean Architecture e o isolamento de
+Ports & Adapters; referências em [fontes](../sources/index.md).
+
+`cfg-kernel/domain` não importa `application`, `adapters` nem `launcher`.
+`cfg-kernel/application` não importa adapters/launcher. O modelo IR compartilhado
+não depende de CFG ou COBOL. Testes arquiteturais devem inspecionar dependências
+reais de bytecode, inclusive assinaturas, annotations e generic types; regex de
+imports pode complementar, nunca ser única evidência de isolamento.
+
+## Proibições no core e na aplicação
+
+Sem `java.io`, `java.nio.file`, APIs de rede/HTTP, `System.exit`, console, variáveis
+de ambiente, current working directory, reflection para descobrir plugins, Jackson,
+Gson, Picocli, Spring, clientes AWS, banco ou tipos de biblioteca gráfica.
+Não exigir annotations de serialização nos objetos de domínio.
+Sem callbacks preguiçosos para consultar frontend/arquivo enquanto o CFG é construído.
+JDK não é passe livre: filesystem do JDK continua infraestrutura.
+
+Diagnostics tipados e contadores determinísticos são resultados de domínio.
+Relógios, cronômetros, logging operacional, métricas exportadas e retries pertencem
+à aplicação externa/adapters conforme necessidade; não alteram o grafo silenciosamente.
+Limites de análise são opções explícitas e produzem status/razão, não truncamento.
+
+## O que não é infraestrutura
+
+A regra de `branch`, o matching de `local.boundary`, a interpretação de ControlScope
+e os limites de precisão são **semântica de domínio**, não adapters intercambiáveis
+com comportamento arbitrário. Bibliotecas de grafo podem apoiar armazenamento ou
+algoritmos, mas seus tipos não atravessam a API pública sem decisão explícita.
+
+## Gate que torna isso real
+
+BACKLOG-CFG-003 implementará os limites de dependência antes do builder.
+Um teste negativo injeta temporariamente dependência proibida e deve falhar.
+Um teste de isolamento executa o caso de uso sem adapters no classpath de teste,
+sem rede e sem leitura de fixture em disco.
+Mudança de localização de Maven modules não dispensa as mesmas provas.
+
+Interfaces por hábito não garantem Clean Architecture. Evitar repositories vazios,
+factories em cascata e camada DTO duplicada sem conversão real necessária.
+A composição deve ser pequena, explícita e testável.

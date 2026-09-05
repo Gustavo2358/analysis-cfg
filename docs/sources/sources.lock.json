@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "observed_on": "2026-09-05",
+  "analysis_ir": {
+    "repository": "Gustavo2358/analysis-ir",
+    "commit": "fe38d30db9e95ce85d039600d543644c7f563014",
+    "semantic_version": "1.0.0",
+    "role": "normative",
+    "files": [
+      {
+        "path": "README.md",
+        "git_blob_sha1": "32ebdb4e3585cf52673fd58dc8c823aeb3c94260"
+      },
+      {
+        "path": "REFERENCIAS.md",
+        "git_blob_sha1": "1da1486a3b825308cf4a4523d5d37fd54b87e137"
+      },
+      {
+        "path": "conformidade/01-invariantes.md",
+        "git_blob_sha1": "075eb8334be5ed3fb1f31b3d72adbb32dd0525a6"
+      },
+      {
+        "path": "conformidade/02-oraculos.md",
+        "git_blob_sha1": "057cbc08327b8f385cffb33f8371c0f6c1cfea87"
+      },
+      {
+        "path": "especificacao/00-escopo-e-convencoes.md",
+        "git_blob_sha1": "e2ff2b57a2e976e9ed3638af50352ed9f6e803ce"
+      },
+      {
+        "path": "especificacao/01-modelo-e-identidades.md",
+        "git_blob_sha1": "8e29bbc39c21ff2ba2353bcfb282cf60b9e34a4d"
+      },
+      {
+        "path": "especificacao/02-tipos-valores-e-operandos.md",
+        "git_blob_sha1": "e4daaa60edc3d2e10e2a52e76d6c57f2a8b50e4d"
+      },
+      {
+        "path": "especificacao/03-memoria-e-aliases.md",
+        "git_blob_sha1": "d4959a43465ad909640a1b625990f29e37ca27e4"
+      },
+      {
+        "path": "especificacao/04-operacoes.md",
+        "git_blob_sha1": "c10f46299ba8384990e50a54e1728af0117a99d3"
+      },
+      {
+        "path": "especificacao/05-controle-e-invocacoes.md",
+        "git_blob_sha1": "8b673e952182073b643fea788472c6d08688468e"
+      },
+      {
+        "path": "especificacao/06-incompletude-e-proveniencia.md",
+        "git_blob_sha1": "97d21e89805493dd57bdb96a32b4bc0dc552e07d"
+      },
+      {
+        "path": "especificacao/07-contrato-de-produtores.md",
+        "git_blob_sha1": "5396e9271bbe0b778161ab6c90b45bfb856b90ad"
+      },
+      {
+        "path": "especificacao/08-contrato-de-consumidores.md",
+        "git_blob_sha1": "6ecb244eeb9c2d662651267c8345a2e7d20cb5db"
+      },
+      {
+        "path": "especificacao/09-extensibilidade-e-compatibilidade.md",
+        "git_blob_sha1": "fece39dd6bf199c8ce452ef8511f5d9782dd8a47"
+      },
+      {
+        "path": "especificacao/10-perfis-de-conformidade.md",
+        "git_blob_sha1": "68fe6c8e61cbc27b922f50f4bb77a5a5f1c37a36"
+      },
+      {
+        "path": "especificacao/11-rastreabilidade-bilateral.md",
+        "git_blob_sha1": "25ae32a0fc6b7e0607e3113e787de1d2ef668014"
+      },
+      {
+        "path": "exemplos/00-notacao.md",
+        "git_blob_sha1": "39492586d380b261ecdbbe9152e71f926ef2f3b7"
+      },
+      {
+        "path": "exemplos/01-fluxo-e-valores.md",
+        "git_blob_sha1": "0d3312063fd3f3f10b823fdcb36287170c8a2e12"
+      },
+      {
+        "path": "exemplos/02-memoria-e-chamadas.md",
+        "git_blob_sha1": "53d73295386d7776ef47a2f7a4b15fd74f28b2c3"
+      },
+      {
+        "path": "exemplos/03-extensoes-e-parcialidade.md",
+        "git_blob_sha1": "b6b4dc1ba5131140daecd2ccc3831e06c344a2cb"
+      }
+    ]
+  },
+  "proleap_poc": {
+    "repository": "Gustavo2358/proleap-poc",
+    "main_commit": "3972c669fe187004769becbd6bff00af90d6c9dd",
+    "pr": 27,
+    "pr_head_commit": "9c53948089a6040d1666a5df812ba993ea3ca50b",
+    "pr_state_observed": "open",
+    "role": "inspiration_and_upstream_context",
+    "read_paths": [
+      "AGENTS.md",
+      "pom.xml",
+      "docs/engineering/work-item-protocol.md",
+      "docs/engineering/semantic-analysis-policy.md",
+      "docs/engineering/semantic-testing.md",
+      "docs/engineering/gates.md",
+      "docs/engineering/performance-policy.md"
+    ],
+    "pr_read_paths": [
+      "docs/work/active/WORK-SEMANTIC-PRODUCT-002/state.md"
+    ]
+  },
+  "external": [
+    {
+      "id": "REF-CLEAN",
+      "url": "https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html",
+      "role": "dependency_rule"
+    },
+    {
+      "id": "REF-HEX",
+      "url": "https://alistair.cockburn.us/hexagonal-architecture",
+      "role": "ports_adapters"
+    },
+    {
+      "id": "REF-LLVM",
+      "url": "https://www.llvm.org/docs/LangRef.html",
+      "role": "terminator_reference_not_IR_authority"
+    },
+    {
+      "id": "REF-MAVEN",
+      "url": "https://maven.apache.org/guides/mini/guide-multiple-modules.html",
+      "role": "reactor"
+    },
+    {
+      "id": "REF-RHS",
+      "url": "https://research.cs.wisc.edu/wpis/abstracts/popl95.abs.html",
+      "role": "reading_lead_abstract_not_algorithm_adoption"
+    }
+  ]
+}

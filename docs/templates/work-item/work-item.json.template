@@ -1,0 +1,24 @@
+{
+  "id": "<WORK-ID>",
+  "backlog_id": "<BACKLOG-ID>",
+  "title": "<título>",
+  "status": "blocked",
+  "risk": "high",
+  "goal": "<resultado observável>",
+  "authorization": "none",
+  "authorization_evidence": "<referência à autorização>",
+  "checkpoint": "<checkpoint>",
+  "must_read": [
+    "AGENTS.md"
+  ],
+  "related_decisions": [],
+  "related_invariants": [],
+  "evals": [],
+  "source_scope": [],
+  "test_scope": [],
+  "must_not_change": [],
+  "gates": [
+    "fast"
+  ],
+  "stop_condition": "<ponto de parada>"
+}

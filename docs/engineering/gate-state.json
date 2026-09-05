@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "phase": "docs_only",
+  "runtime_authorization": null,
+  "product_gates": {
+    "architecture": {
+      "status": "unavailable",
+      "hook": null
+    },
+    "semantic": {
+      "status": "unavailable",
+      "hook": null
+    },
+    "performance": {
+      "status": "unavailable",
+      "hook": null
+    },
+    "integration": {
+      "status": "unavailable",
+      "hook": null
+    }
+  }
+}

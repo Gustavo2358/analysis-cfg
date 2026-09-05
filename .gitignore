@@ -1,0 +1,9 @@
+# Artefatos locais e build futuro
+.cache/
+.harness-results/
+__pycache__/
+*.pyc
+target/
+.idea/
+*.iml
+.DS_Store

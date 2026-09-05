@@ -1,0 +1,69 @@
+{
+  "id": "WORK-CFG-001",
+  "backlog_id": "BACKLOG-CFG-001",
+  "title": "Discovery de contrato concreto, fronteiras e MVP",
+  "status": "blocked",
+  "risk": "high",
+  "goal": "Preparar plano executivo revisável antes de qualquer Java/POM.",
+  "authorization": "none",
+  "authorization_evidence": "A entrega autorizada foi somente este harness; discovery aguarda comando explícito.",
+  "checkpoint": "CP1-DISCOVERY-DOCUMENTAL",
+  "must_read": [
+    "AGENTS.md",
+    "ARCHITECTURE.md",
+    "docs/product/mission-and-slices.md",
+    "docs/sources/upstream-state.md",
+    "docs/sources/index.md",
+    "docs/domain/ir-boundary.md",
+    "docs/architecture/ports-and-adapters.md",
+    "docs/architecture/extensibility.md",
+    "docs/evals/mvp-scenarios.md",
+    "docs/evals/profile-matrix.md"
+  ],
+  "related_decisions": [
+    "ADR-0001",
+    "ADR-0002",
+    "ADR-0003",
+    "ADR-0004",
+    "ADR-0005",
+    "ADR-0006",
+    "ADR-0007",
+    "ADR-0008"
+  ],
+  "related_invariants": [
+    "INV-CFG-001",
+    "INV-CFG-002",
+    "INV-CFG-014",
+    "INV-CFG-015",
+    "INV-CFG-024",
+    "INV-CFG-025",
+    "INV-CFG-026"
+  ],
+  "evals": [
+    "EVAL-CFG-001",
+    "EVAL-CFG-007",
+    "EVAL-CFG-008",
+    "EVAL-CFG-009",
+    "EVAL-CFG-020"
+  ],
+  "source_scope": [
+    "docs/architecture/",
+    "docs/domain/",
+    "docs/work/",
+    "docs/evals/",
+    "docs/engineering/"
+  ],
+  "test_scope": [
+    "docs/evals/"
+  ],
+  "must_not_change": [
+    "**/*.java",
+    "**/pom.xml",
+    "docs/sources/sources.lock.json",
+    "scripts/harness/"
+  ],
+  "gates": [
+    "fast"
+  ],
+  "stop_condition": "Publicar discovery, opções/ADRs, plano/aceitação e gates documentais; parar antes de implementação."
+}

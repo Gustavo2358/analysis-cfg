@@ -1,0 +1,55 @@
+# TDD e evidência de corretude
+
+## Ciclo de um slice
+
+Regra normativa → classes semânticas → adversariais contra o atalho óbvio → esperado
+independente → teste RED observado → implementação mínima geral → GREEN →
+refatoração → challenge independente → gates e handoff.
+Planejar testes não é RED executado. Os evals deste pacote ainda são `planned`.
+Não usar mocks do próprio algoritmo para provar o algoritmo.
+
+## Camadas
+
+**Domínio:** Publication em memória, sem filesystem. Casos pequenos com successors,
+outcomes, correlação de IDs e incerteza definidos à mão a partir do contrato.
+**Aplicação:** porta pública, negociação, opções, erros e resultado imutável.
+**Adapters:** decoding/encoding, dados inválidos e equivalência com entrada em memória.
+**Integração:** arquivo real → CLI/driver → porta → CFG; exportação sem governar regra.
+**Arquitetura:** dependências reais e execução sem adapters disponíveis.
+
+Tabelas de esperado não devem ser regeneradas pelo builder. Um interpreter de
+referência independente, exato em casos pequenos/limitados e escrito só nos testes,
+pode apoiar falsificação. Ele não certifica recursão ilimitada nem toda a linguagem.
+Golden files só sob regras/correlações explícitas; contagens de corpus são telemetria.
+
+## O que comparar
+
+Relações rotuladas, outcomes, entries/saídas, operações/pontos, origem, precisão e
+gaps. Igualdade de IDs locais não substitui correlação de identidade. Sequence split
+pode mudar topologia e IDs mantendo comportamento nos pontos originais; não exigir
+mesma quantidade de nós em representações equivalentes.
+
+Metamorfismo atua na IR de entrada. Mutação atua na implementação Java e avalia
+força dos testes. Não confundir os dois. Ver [metamorfismo](../evals/metamorphic.md).
+PIT ou biblioteca equivalente é opcional/futuro, com domínio focalizado e versões
+verificadas. Não adotar score global de vaidade.
+
+## Oráculos de controle, não de dataflow
+
+AIR-STRUCTURE referencia cenários que também falam de RD/PV. Neste projeto,
+implementar primeiro **a projeção estrutural** desses cenários: caminhos,
+saídas e pontos. Os asserts RD/PV ficam explicitamente fora do papel Consumer/CFG,
+não simulados com valores hardcoded. [Matriz de perfis](../evals/profile-matrix.md).
+
+## Regressão adversarial mínima
+
+Permutar sequences; label destino anterior; duas alternativas mesmo destino;
+ramo terminante; unit/entry homônimas; invoke sem normal; opaco com reentrada;
+frames com portas diferentes; retorno no callsite incorreto; gate sem testes.
+Não esconder unsupported no setup de fixtures para manter o pipeline verde.
+
+## Registro de evidência
+
+Comando exato, revisão, conjunto de casos, exit status, falhas, limites e esperado.
+CI ou relatório produzido por terceiros é evidência relatada; não dizer que foi
+executada nesta sessão. Contador de testes zero deve falhar no gate de produto.

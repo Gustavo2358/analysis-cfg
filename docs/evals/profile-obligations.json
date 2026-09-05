@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "ir_commit": "fe38d30db9e95ce85d039600d543644c7f563014",
+  "consumer_role": "CFG",
+  "implemented_profiles": [],
+  "profiles": [
+    {
+      "id": "AIR-STRUCTURE@1",
+      "requires": [],
+      "oracles": [
+        "O-01",
+        "O-02",
+        "O-03",
+        "O-04",
+        "O-05",
+        "O-06",
+        "O-07",
+        "O-08",
+        "O-09",
+        "O-10",
+        "O-18",
+        "O-19",
+        "O-20",
+        "O-21",
+        "O-22",
+        "O-29",
+        "O-30",
+        "O-31",
+        "O-32",
+        "O-33",
+        "O-34",
+        "O-41",
+        "O-42",
+        "O-43",
+        "O-44",
+        "O-45",
+        "O-46",
+        "O-47",
+        "O-48"
+      ],
+      "scope": "structural_projection_only",
+      "status": "not_implemented"
+    },
+    {
+      "id": "AIR-LOCAL-CONTROL@1",
+      "requires": [
+        "AIR-STRUCTURE@1"
+      ],
+      "oracles": [
+        "O-56",
+        "O-57",
+        "O-58",
+        "O-59",
+        "O-60"
+      ],
+      "scope": "matching_local_control",
+      "status": "not_implemented"
+    },
+    {
+      "id": "AIR-INDIRECT-CONTROL@1",
+      "requires": [
+        "AIR-STRUCTURE@1"
+      ],
+      "oracles": [
+        "O-61",
+        "O-62",
+        "O-63"
+      ],
+      "scope": "bounded_indirect_control",
+      "status": "not_implemented"
+    }
+  ]
+}

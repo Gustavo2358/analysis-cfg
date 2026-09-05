@@ -1,0 +1,109 @@
+# Invariantes do CFG
+
+Regras de projeto derivadas da direção aprovada e da IR fixada. Não substituem os invariantes I-01–I-48 upstream. Cada alteração liga regra a eval e work item.
+
+## INV-CFG-001 — Fronteira IR
+
+O consumidor deriva controle apenas de fatos IR tipados; não consulta frontend, COBOL ou texto de exibição.
+
+## INV-CFG-002 — Infraestrutura externa
+
+Domínio/aplicação não conhecem I/O, transporte ou forma de execução; adapters usam a mesma porta.
+
+## INV-CFG-003 — Publicação imutável
+
+Não modificar Publication nem completar semântica por callback ao produtor.
+
+## INV-CFG-004 — Identidades fechadas
+
+Usar namespace completo e domínio correto; referência interna pendente é INVALID_IR.
+
+## INV-CFG-005 — Sequence explícita
+
+Uma Sequence tem um único terminador final; nenhuma execução é inferida pela ordem física das sequences.
+
+## INV-CFG-006 — Inventário íntegro
+
+Preservar toda ocorrência coberta e pontos correlacionados; capability não limita cardinalidade.
+
+## INV-CFG-007 — Alternativas rotuladas
+
+Manter TRUE/FALSE, cases e outcomes mesmo com destinos iguais; default de dispatch é explícito.
+
+## INV-CFG-008 — Sem reconvergência artificial
+
+Return, raise, halt ou divergência não ganham fallthrough/join por proximidade.
+
+## INV-CFG-009 — Invocações honestas
+
+Normal significa retorno possível; preservar outcomes declarados e não fabricar pureza ou retorno obrigatório.
+
+## INV-CFG-010 — Separação de análise
+
+Construir CFG não executa RD/PV, storage inference ou target resolution.
+
+## INV-CFG-011 — Origem preservada
+
+Mapear operações/pontos/origins; nós sintéticos são derivados, sem span escrito inventado.
+
+## INV-CFG-012 — Precisão dimensional
+
+Validade, inventário, controle, valores, efeitos e capacidades suportadas permanecem distinguíveis.
+
+## INV-CFG-013 — Controle aberto
+
+Restante aberto influencia todo o ControlScope, inclusive reentrada; não é apenas sink terminal.
+
+## INV-CFG-014 — Extensão única
+
+Interpretar extensão, redução ou fallback uma única vez; sem intérprete/envelope, incompatibilidade explícita.
+
+## INV-CFG-015 — Retorno contextual
+
+Retorno preciso exige contexto correspondente; projeção plana não prova caminho realizável.
+
+## INV-CFG-016 — Local boundary
+
+Casar somente a porta do frame do topo; default não altera pilha; IDs de porta não são ocorrência.
+
+## INV-CFG-017 — Sem unwind implícito
+
+Jump não remove frames; resume/unwind inválidos preservam suas saídas excepcionais.
+
+## INV-CFG-018 — Indireção limitada
+
+CFG inicial usa todo o universo de labels contratual sem depender de valores propagados.
+
+## INV-CFG-019 — Entradas e saídas
+
+Não fundir entries, inicializações, saída normal, excepcional e término silenciosamente.
+
+## INV-CFG-020 — Limites explícitos
+
+Corte de recursos/contextos exige ANALYSIS_LIMIT e precisão reduzida, nunca truncamento invisível.
+
+## INV-CFG-021 — Oracle independente
+
+Esperado deriva do contrato antes da implementação; o builder não gera seu próprio golden.
+
+## INV-CFG-022 — Algoritmo geral
+
+Regra de produção não depende de corpus, nomes, primeiro/último match ou profundidade incidental.
+
+## INV-CFG-023 — Revisões consistentes
+
+Resultado identifica Publication/revisão, opções e premissas; não misturar IDs entre revisões.
+
+## INV-CFG-024 — Conformidade não inflada
+
+Só declarar perfil inteiro quando suas obrigações no papel alegado forem verificadas.
+
+## INV-CFG-025 — Autorização e evidência
+
+Backlog não autoriza; gate indisponível/não executado nunca recebe PASS de produto.
+
+## INV-CFG-026 — Modelo compartilhável
+
+Não duplicar classes IR privadas incompatíveis; transporte não invade modelo compartilhado.
+
+Fonte: [Analysis IR e inspirações](../sources/index.md). Evidência: [evals](../evals/index.md).
