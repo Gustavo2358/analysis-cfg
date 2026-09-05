@@ -1,11 +1,12 @@
 # Analysis CFG — harness de desenvolvimento
 
 **Entrega:** harness documental e operacional, sem implementação Java. **Data:** 05/09/2026.
-**Nome de trabalho:** `analysis-cfg`; não implica repositório remoto criado.
+**Repositório:** `Gustavo2358/analysis-cfg`. O harness é a primeira baseline do projeto; ainda não há implementação Java de CFG.
 
 Este projeto construirá CFGs a partir da **Analysis IR 1.0.0**, sem conhecer COBOL,
 Semantic Product, parser, filesystem, CLI ou cloud no núcleo. Primeiro fecha um
-MVP de fluxo linear e bifurcação; depois amplia capacidades de controle, preservando
+MVP deliberadamente estreito de fluxo linear, `jump`, `branch`/IF-ELSE e saídas;
+depois amplia `invoke`, seleção, ciclos e capacidades de controle, preservando
 incompletude e preparando controle local contextual.
 
 ## Começar
@@ -52,4 +53,4 @@ contém um mapa de leitura e síntese, **não uma cópia integral da especifica�
 O utilitário opcional [cache_ir.py](scripts/harness/cache_ir.py) pode importar uma
 cópia local verificada ou obter os arquivos públicos fixados; nunca troca por `main`.
 
-Não foram criados PRs, commits ou alterações nos repositórios remotos.
+Este repositório foi inicializado com o harness após revisão contra os objetivos de arquitetura, extensibilidade, TDD e isolamento definidos para o CFG. O work item de discovery continua bloqueado: publicar o harness não autoriza Java nem implementação de CFG.
