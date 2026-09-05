@@ -42,7 +42,7 @@ seguido fisicamente de outro label: esse label não ganha predecessor implícito
 Uma relação topológica pode ser compartilhada, mas TRUE e FALSE permanecem
 alternativas semânticas observáveis. Não apagar avaliação/operandos do predicate.
 
-## M6 — Chamada no ponto de reconvergência
+## Pós-MVP P1 — Chamada no ponto de reconvergência
 
 `join` termina em invoke com `normal(after)`, `exception(E,handler)`, `halt` e
 `diverge` declarados. `after` retorna; `handler` termina excepcionalmente.
@@ -65,4 +65,5 @@ arquivo. Executar mesma porta com mesmas opções; comparar transições, opera�
 entries/saídas, IDs correlacionados, gaps e precisão. Rodar teste isolado do kernel
 sem classes de adapter no classpath de teste. Esse é o teste antecipado da migração Maven.
 
-Catálogo: EVAL-CFG-001 a EVAL-CFG-009 e EVAL-CFG-013/014.
+M1–M5, M7 e M8 delimitam o MVP-CFG-01. P1 entra no slice seguinte de `invoke`.
+Catálogo relacionado: EVAL-CFG-001 a EVAL-CFG-009 e EVAL-CFG-013/014; cada work item seleciona apenas os evals do seu slice.
