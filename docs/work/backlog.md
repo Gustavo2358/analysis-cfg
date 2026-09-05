@@ -4,11 +4,11 @@
 
 ## Caminho para o MVP
 
-001 discovery → 002 modelo/build → 003 fronteiras/seam → 004 fixtures/codec + 005 linear → 006 branch + 007 invoke → 008 demonstração arquivo/memória. Isso entrega MVP-CFG-01, não AIR-STRUCTURE completo. Testes de domínio nascem em memória mesmo antes do adapter.
+001 discovery → 002 modelo/build → 003 fronteiras/seam → 004 fixtures/codec + 005 linear → 006 branch → 008 demonstração arquivo/memória. Isso entrega **MVP-CFG-01 até IF/ELSE**, não AIR-STRUCTURE completo. `invoke` entra depois em 007. Testes de domínio nascem em memória mesmo antes do adapter.
 
 ## Ampliação
 
-009 e 010 completam capabilities estruturais → 011 qualifica perfil. 012 endurece escala. 013 é discovery de controle local, seguido por 014/015. 016 é indireção limitada. 017/018 integram sem mudar a porta. 019/020 ficam adiados. 021 leva gates a CI e não bloqueia desenho semântico.
+007, 009 e 010 ampliam/completam capabilities estruturais → 011 qualifica perfil. 012 endurece escala. 013 é discovery de controle local, seguido por 014/015. 016 é indireção limitada. 017/018 integram sem mudar a porta. 019/020 ficam adiados. 021 leva gates a CI e não bloqueia desenho semântico.
 
 | Item | Entrega | Dependências | Estado |
 | --- | --- | --- | --- |
@@ -18,11 +18,11 @@
 | [BACKLOG-CFG-004](backlog/BACKLOG-CFG-004.md) | Fixtures independentes e adapter de transporte | BACKLOG-CFG-002, BACKLOG-CFG-003 | planned |
 | [BACKLOG-CFG-005](backlog/BACKLOG-CFG-005.md) | Núcleo CFG: projeção linear e saídas | BACKLOG-CFG-002, BACKLOG-CFG-003 | planned |
 | [BACKLOG-CFG-006](backlog/BACKLOG-CFG-006.md) | Bifurcação e IF/ELSE estrutural | BACKLOG-CFG-005 | planned |
-| [BACKLOG-CFG-007](backlog/BACKLOG-CFG-007.md) | Invoke e resultados de controle delimitados | BACKLOG-CFG-005 | planned |
-| [BACKLOG-CFG-008](backlog/BACKLOG-CFG-008.md) | CLI mínima e fechamento MVP arquivo/memória | BACKLOG-CFG-004, BACKLOG-CFG-006, BACKLOG-CFG-007 | planned |
+| [BACKLOG-CFG-007](backlog/BACKLOG-CFG-007.md) | Invoke e resultados de controle delimitados | BACKLOG-CFG-008 | planned |
+| [BACKLOG-CFG-008](backlog/BACKLOG-CFG-008.md) | CLI mínima e fechamento MVP arquivo/memória até IF/ELSE | BACKLOG-CFG-004, BACKLOG-CFG-006 | planned |
 | [BACKLOG-CFG-009](backlog/BACKLOG-CFG-009.md) | Dispatch, ciclos e múltiplas entradas | BACKLOG-CFG-008 | planned |
-| [BACKLOG-CFG-010](backlog/BACKLOG-CFG-010.md) | Envelopes abertos e compatibilidade de extensões | BACKLOG-CFG-008 | planned |
-| [BACKLOG-CFG-011](backlog/BACKLOG-CFG-011.md) | Qualificação AIR-STRUCTURE e hardening de regressão | BACKLOG-CFG-009, BACKLOG-CFG-010 | planned |
+| [BACKLOG-CFG-010](backlog/BACKLOG-CFG-010.md) | Envelopes abertos e compatibilidade de extensões | BACKLOG-CFG-007, BACKLOG-CFG-008 | planned |
+| [BACKLOG-CFG-011](backlog/BACKLOG-CFG-011.md) | Qualificação AIR-STRUCTURE e hardening de regressão | BACKLOG-CFG-007, BACKLOG-CFG-009, BACKLOG-CFG-010 | planned |
 | [BACKLOG-CFG-012](backlog/BACKLOG-CFG-012.md) | Escala, performance e gates de qualidade | BACKLOG-CFG-008 | planned |
 | [BACKLOG-CFG-013](backlog/BACKLOG-CFG-013.md) | Discovery de representação e matching local | BACKLOG-CFG-009, BACKLOG-CFG-010 | planned |
 | [BACKLOG-CFG-014](backlog/BACKLOG-CFG-014.md) | Semântica local: frames e portas de conclusão | BACKLOG-CFG-011, BACKLOG-CFG-013 | planned |
