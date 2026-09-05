@@ -64,3 +64,15 @@ framework genérica, duplicar a IR ou ensinar semântica COBOL ao consumer.
 **Harness pronto para o discovery `WORK-CFG-001`; Java ainda não autorizado.**
 O próximo passo correto é fechar ownership do modelo IR, módulos, porta concreta e
 fixture técnica; depois promover um único slice de implementação por vez.
+
+## Validação pós-review
+
+Após os ajustes, a baseline revisada foi validada novamente em cópia local equivalente:
+
+- `bash scripts/harness/check-fast.sh` → PASS, exit 0;
+- `python3 scripts/harness/test_harness.py` → 28 testes, todos PASS;
+- nenhum `.java` ou `pom.xml` foi introduzido;
+- gates de produto continuam indisponíveis até os work items correspondentes.
+
+Essa validação prova coerência do harness e de seu grafo documental; não prova ainda
+corretude de uma implementação CFG nem conformidade `AIR-STRUCTURE@1`.
