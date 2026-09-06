@@ -150,6 +150,20 @@ class HarnessGuardTests(unittest.TestCase):
         self.edit_json('docs/sources/sources.lock.json', lambda x: x['analysis_ir'].update(semantic_version='1.0.0'))
         self.assert_guard('Analysis IR 2.0.0')
 
+    def test_31_nonexistent_oracle_projection_rejected(self):
+        invalid_oracles = ('O-01-SCALAR', 'O-56-STRUCT', 'O-85-REGION')
+        for oracle in invalid_oracles:
+            with self.subTest(oracle=oracle):
+                self.edit_json('docs/evals/catalog.json', lambda x: x['evals'][0]['upstream_oracles'].append(oracle))
+                self.assert_guard('Invalid upstream oracle: ' + oracle)
+                self.edit_json('docs/evals/catalog.json', lambda x: x['evals'][0]['upstream_oracles'].pop())
+
+    def test_32_normative_oracle_projections_accepted(self):
+        valid_oracles = ('O-69-SCALAR', 'O-81-REGION', 'O-85-STRUCT')
+        self.edit_json('docs/evals/catalog.json', lambda x: x['evals'][0]['upstream_oracles'].extend(valid_oracles))
+        self.assertEqual([], validate(self.root))
+
+
 class PinnedCacheTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory(prefix='cfg-ir-cache-test-')

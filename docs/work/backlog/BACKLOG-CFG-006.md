@@ -20,7 +20,7 @@ dois destinos e `unknown_type` não satisfaz predicate bool, produzindo `INVALID
 
 ## Evals e invariantes
 
-EVAL-CFG-003, EVAL-CFG-004, EVAL-CFG-005, EVAL-CFG-014, EVAL-CFG-021.
+EVAL-CFG-003, EVAL-CFG-004, EVAL-CFG-005, EVAL-CFG-014.
 Vincular invariantes específicos na promoção para work
 item. Ver [catálogo](../../evals/catalog.md) e [invariantes](../../architecture/invariants.md).
 Antes de código, transformar expected em testes RED independentes; documentar o

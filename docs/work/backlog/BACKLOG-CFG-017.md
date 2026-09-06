@@ -21,7 +21,7 @@ rodando sem repos vizinhos.
 
 ## Evals e invariantes
 
-EVAL-CFG-008, EVAL-CFG-013, EVAL-CFG-020, EVAL-CFG-021, EVAL-CFG-022.
+EVAL-CFG-008, EVAL-CFG-013, EVAL-CFG-020.
 Vincular invariantes específicos na promoção para work
 item. Ver [catálogo](../../evals/catalog.md) e [invariantes](../../architecture/invariants.md).
 Antes de código, transformar expected em testes RED independentes; documentar o

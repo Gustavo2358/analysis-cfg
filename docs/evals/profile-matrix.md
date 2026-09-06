@@ -6,7 +6,7 @@ implementado agora. Registro verificável: [profile-obligations.json](profile-ob
 | Marco/perfil | Exigência | Estado |
 | --- | --- | --- |
 | MVP-CFG-01 (local) | linear, jump, branch, return/halt; arquivo e memória; unsupported honesto | planejado |
-| AIR-STRUCTURE@2 | transferências, cycles, entries, invoke/outcomes, saídas, opaque/open, `TypeRef` e provas de domínio preservadas | não implementado |
+| AIR-STRUCTURE@2 | transferências, cycles, entries, invoke/outcomes, `return`/`raise`/`halt`, opaque/open, `TypeRef` e provas de domínio preservadas | não implementado |
 | AIR-LOCAL-CONTROL@2 | STRUCTURE@2 + `control.local@1`, matching, ports, resume/unwind | não implementado |
 | AIR-INDIRECT-CONTROL@2 | STRUCTURE@2 + `control.indirect@1`, universo de labels e transferência conservadora | não implementado |
 

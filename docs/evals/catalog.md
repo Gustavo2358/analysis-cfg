@@ -115,7 +115,9 @@ Oráculos upstream: O-59, O-60. Invariantes: INV-CFG-015, INV-CFG-017, INV-CFG-0
 
 ## EVAL-CFG-019 — Controle indireto inicial
 
-Todos os labels de S sem RD; label fora de S inválido; refinamento opcional com revisão, sem mutar IR.
+Todos os labels de S sem RD; `unknown(known(label(S)))` conserva esse universo;
+`unknown_type` e label fora de S são inválidos. Refinamento opcional exige revisão e
+não muta a IR.
 
 Oráculos upstream: O-61, O-62, O-63. Invariantes: INV-CFG-018, INV-CFG-023. Estado: `planned`.
 
@@ -142,3 +144,25 @@ reachability, CFG ou ativações dinâmicas.
 
 Oráculos upstream: O-77-STRUCT, O-82-STRUCT a O-85-STRUCT. Invariantes:
 INV-CFG-004, INV-CFG-023, INV-CFG-027, INV-CFG-028. Estado: `planned`.
+
+## EVAL-CFG-023 — Raise e saída excepcional
+
+`raise(tag, values)` avalia e preserva tag, valores, identidade e origem, encerra a
+ativação por saída excepcional e não possui fallthrough local nem saída normal. O
+destino vem da interação invocadora ou é a saída excepcional raiz.
+
+Oráculos upstream: requisito direto de `AIR-STRUCTURE@2`, sem ID de oráculo
+enumerado específico. Invariantes: INV-CFG-004, INV-CFG-008, INV-CFG-011,
+INV-CFG-019. Estado: `planned`.
+
+## EVAL-CFG-024 — Fundação mínima da Analysis IR V2
+
+O modelo em memória distingue `Known(Type)` de `UnknownType(UncertaintyId)` e
+representa `Premise`, `sameDomain`, sujeitos, autoridade, origem e
+`DomainProofScope` como conceitos fechados. Não usa `Optional<Type>` nem exige
+signatures, choices, regiões, invokes/envelopes, regras contextuais completas de
+aplicabilidade/interseção ou qualquer cálculo de CFG/dataflow.
+
+Oráculos upstream: foundation local de representabilidade; a bateria normativa
+O-69-STRUCT–O-85-STRUCT pertence ao EVAL-CFG-021/EVAL-CFG-022. Invariantes:
+INV-CFG-003, INV-CFG-004, INV-CFG-026, INV-CFG-027, INV-CFG-028. Estado: `planned`.

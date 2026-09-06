@@ -32,8 +32,9 @@ units; duas alternativas para o mesmo destino; `unknown(known(bool))` versus
 ## Casos de regressão
 
 Gates do harness continuam validando links/IDs/manifestos, lock V2, perfis @2 e
-O-69-STRUCT–O-85-STRUCT; a matriz permanece sem claims implementados e a fase
-global continua docs-only.
+o conjunto fechado de sub-requisitos `STRUCT`/`SCALAR`/`REGION`; projeções
+inexistentes como `O-56-STRUCT` falham. A matriz permanece sem claims implementados
+e a fase global continua docs-only.
 
 ## Propriedades/relações metamórficas
 

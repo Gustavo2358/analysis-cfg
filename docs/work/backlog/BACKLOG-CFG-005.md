@@ -21,7 +21,7 @@ pendente falha; saída não gera fallthrough; inventário sem predecessor perman
 ## Evals e invariantes
 
 EVAL-CFG-001, EVAL-CFG-002, EVAL-CFG-005, EVAL-CFG-007, EVAL-CFG-013,
-EVAL-CFG-014, EVAL-CFG-021. Vincular invariantes específicos na promoção para work
+EVAL-CFG-014. Vincular invariantes específicos na promoção para work
 item. Ver [catálogo](../../evals/catalog.md) e [invariantes](../../architecture/invariants.md).
 Antes de código, transformar expected em testes RED independentes; documentar o
 resultado observado, não apenas intenção de TDD.

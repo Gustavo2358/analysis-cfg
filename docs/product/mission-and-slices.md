@@ -14,21 +14,24 @@ explicitadas; sequences com operações comuns; `jump`, `branch` e saídas
 `return`/`halt`. `unknown(known(bool))` como predicado puro conserva os dois destinos;
 `unknown_type` não satisfaz a assinatura booleana. IFs aninhados
 são combinações das mesmas primitives, sem limite artificial de cardinalidade.
-O primeiro MVP **não precisa de `invoke`, `dispatch`, controle aberto, local ou
-indireto** para provar a arquitetura. Não inventar estado de dados para desenhar o
-grafo.
+O primeiro MVP **não precisa de `invoke`, `raise`, `dispatch`, controle aberto,
+local ou indireto** para provar a arquitetura. Não inventar estado de dados para
+desenhar o grafo.
 
 Aceitação: fixture em arquivo → decode → mesma porta usada por fixture em memória →
 CFG com nós, transições rotuladas, pontos/origens e relatório de suporte. O diamond
 reconverge só onde o terminador diz; ramo que termina não ganha join artificial.
 Isso prova a fronteira IR→CFG e a troca de adapter antes de aumentar a semântica.
 
-## Slice seguinte: invocações e outcomes
+## Slice seguinte: invocações, raise e outcomes
 
 Depois do primeiro MVP, `invoke` entra como terminador com outcomes materializados
 (normal, excepcional, halt, diverge e restante aberto quando sustentado). Esse slice
-não resolve programa chamado nem afirma ausência de efeitos; ele amplia a projeção
-de controle sem reabrir o produtor ou alterar a porta.
+também projeta `raise(tag, values)` como saída excepcional da ativação, sem
+fallthrough local; seu destino vem da interação invocadora ou é uma saída
+excepcional raiz. O slice não resolve programa chamado nem afirma ausência de
+efeitos; ele amplia a projeção de controle sem reabrir o produtor ou alterar a
+porta.
 
 Antes de anunciar o MVP, falhas de integridade e capabilities fora do slice têm
 resposta explícita. Rejeitar o escopo não suportado é aceitável; ignorá-lo não.

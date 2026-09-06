@@ -18,6 +18,18 @@ FIELDS = {'id', 'backlog_id', 'title', 'status', 'risk', 'goal', 'authorization'
           'authorization_evidence', 'checkpoint', 'must_read', 'related_decisions',
           'related_invariants', 'evals', 'source_scope', 'test_scope', 'must_not_change',
           'gates', 'stop_condition'}
+STRUCT_UPSTREAM_ORACLE_NUMBERS = (tuple(range(1, 11)) + tuple(range(18, 23)) +
+                                   tuple(range(29, 35)) + tuple(range(41, 49)) +
+                                   tuple(range(69, 86)))
+SCALAR_UPSTREAM_ORACLE_NUMBERS = (tuple(range(69, 71)) + tuple(range(72, 81)) +
+                                   tuple(range(82, 85)))
+REGION_UPSTREAM_ORACLE_NUMBERS = (81,)
+VALID_UPSTREAM_ORACLES = (
+    {'O-%02d' % n for n in range(1, 86)} |
+    {'O-%02d-STRUCT' % n for n in STRUCT_UPSTREAM_ORACLE_NUMBERS} |
+    {'O-%02d-SCALAR' % n for n in SCALAR_UPSTREAM_ORACLE_NUMBERS} |
+    {'O-%02d-REGION' % n for n in REGION_UPSTREAM_ORACLE_NUMBERS}
+)
 
 
 def no_duplicate_keys(pairs):
@@ -193,8 +205,7 @@ def validate(root: Path) -> list[str]:
         if not set(e.get('invariants', [])) <= inv_ids:
             error('Unknown invariant in eval: ' + e.get('id', '?'))
         for o in e.get('upstream_oracles', []):
-            match = re.fullmatch(r'O-(\d{2})(?:-(STRUCT|SCALAR|REGION))?', o)
-            if not match or not (1 <= int(match.group(1)) <= 85):
+            if o not in VALID_UPSTREAM_ORACLES:
                 error('Invalid upstream oracle: ' + str(o))
         if e.get('status') == 'implemented' and not e.get('implementation_evidence'):
             error('Implemented eval without evidence: ' + e.get('id', '?'))
@@ -313,12 +324,10 @@ def validate(root: Path) -> list[str]:
             error('Unsafe IR source path: ' + p)
         if not re.fullmatch('[0-9a-f]{40}', f.get('git_blob_sha1', '')):
             error('Invalid IR blob hash: ' + p)
-    structure = (list(range(1, 11)) + list(range(18, 23)) +
-                 list(range(29, 35)) + list(range(41, 49)) + list(range(69, 86)))
     expected = {
         'AIR-STRUCTURE@2': {
             'requires': [],
-            'oracles': ['O-%02d-STRUCT' % n for n in structure]
+            'oracles': ['O-%02d-STRUCT' % n for n in STRUCT_UPSTREAM_ORACLE_NUMBERS]
         },
         'AIR-LOCAL-CONTROL@2': {
             'requires': ['AIR-STRUCTURE@2'],

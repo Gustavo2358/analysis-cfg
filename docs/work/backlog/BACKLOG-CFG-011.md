@@ -23,7 +23,7 @@ efeitos escalares e storage ficam fora do papel; gap restante impede claim indev
 
 EVAL-CFG-001, EVAL-CFG-002, EVAL-CFG-003, EVAL-CFG-004, EVAL-CFG-005,
 EVAL-CFG-006, EVAL-CFG-009, EVAL-CFG-010, EVAL-CFG-011, EVAL-CFG-012,
-EVAL-CFG-013, EVAL-CFG-014, EVAL-CFG-021, EVAL-CFG-022. Vincular invariantes
+EVAL-CFG-013, EVAL-CFG-014, EVAL-CFG-021, EVAL-CFG-022, EVAL-CFG-023. Vincular invariantes
 específicos na promoção para work
 item. Ver [catálogo](../../evals/catalog.md) e [invariantes](../../architecture/invariants.md).
 Antes de código, transformar expected em testes RED independentes; documentar o

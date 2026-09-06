@@ -52,7 +52,9 @@
     "EVAL-CFG-009",
     "EVAL-CFG-020",
     "EVAL-CFG-021",
-    "EVAL-CFG-022"
+    "EVAL-CFG-022",
+    "EVAL-CFG-023",
+    "EVAL-CFG-024"
   ],
   "source_scope": [
     "docs/architecture/",

@@ -23,9 +23,10 @@ passa a ser suportada por concluir este discovery.
 
 ## Classes semânticas
 
-Primeiro MVP: linear, `jump`, branch/diamond, `return` e `halt`. `invoke`,
+Primeiro MVP: linear, `jump`, branch/diamond, `return` e `halt`. `invoke`, `raise`,
 `dispatch`, ciclos, controle aberto, `control.local@1` e `control.indirect@1`
-permanecem em slices posteriores.
+permanecem em slices posteriores; `raise` entra explicitamente no slice de outcomes
+excepcionais antes da qualificação estrutural.
 
 ## Premissas
 

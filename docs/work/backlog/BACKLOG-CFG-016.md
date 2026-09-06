@@ -21,7 +21,7 @@ target `unknown_type` inválidos; sem inferir targets pela primeira atribuição
 
 ## Evals e invariantes
 
-EVAL-CFG-019, EVAL-CFG-012, EVAL-CFG-021. Vincular invariantes específicos na promoção para work
+EVAL-CFG-019, EVAL-CFG-012. Vincular invariantes específicos na promoção para work
 item. Ver [catálogo](../../evals/catalog.md) e [invariantes](../../architecture/invariants.md).
 Antes de código, transformar expected em testes RED independentes; documentar o
 resultado observado, não apenas intenção de TDD.

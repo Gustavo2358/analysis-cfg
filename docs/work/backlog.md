@@ -4,7 +4,7 @@
 
 ## Caminho para o MVP
 
-001 discovery → 002 modelo/build → 003 fronteiras/seam → 004 fixtures/codec + 005 linear → 006 branch → 008 demonstração arquivo/memória. Isso entrega **MVP-CFG-01 até IF/ELSE**, não AIR-STRUCTURE completo. `invoke` entra depois em 007. Testes de domínio nascem em memória mesmo antes do adapter.
+001 discovery → 002 modelo/build → 003 fronteiras/seam → 004 fixtures/codec + 005 linear → 006 branch → 008 demonstração arquivo/memória. Isso entrega **MVP-CFG-01 até IF/ELSE**, não AIR-STRUCTURE completo. `invoke` e `raise` entram depois em 007. Testes de domínio nascem em memória mesmo antes do adapter.
 
 ## Ampliação
 
@@ -18,7 +18,7 @@
 | [BACKLOG-CFG-004](backlog/BACKLOG-CFG-004.md) | Fixtures independentes e adapter de transporte | BACKLOG-CFG-002, BACKLOG-CFG-003 | planned |
 | [BACKLOG-CFG-005](backlog/BACKLOG-CFG-005.md) | Núcleo CFG: projeção linear e saídas | BACKLOG-CFG-002, BACKLOG-CFG-003 | planned |
 | [BACKLOG-CFG-006](backlog/BACKLOG-CFG-006.md) | Bifurcação e IF/ELSE estrutural | BACKLOG-CFG-005 | planned |
-| [BACKLOG-CFG-007](backlog/BACKLOG-CFG-007.md) | Invoke e resultados de controle delimitados | BACKLOG-CFG-008 | planned |
+| [BACKLOG-CFG-007](backlog/BACKLOG-CFG-007.md) | Invoke, raise e resultados de controle delimitados | BACKLOG-CFG-008 | planned |
 | [BACKLOG-CFG-008](backlog/BACKLOG-CFG-008.md) | CLI mínima e fechamento MVP arquivo/memória até IF/ELSE | BACKLOG-CFG-004, BACKLOG-CFG-006 | planned |
 | [BACKLOG-CFG-009](backlog/BACKLOG-CFG-009.md) | Dispatch, ciclos e múltiplas entradas | BACKLOG-CFG-008 | planned |
 | [BACKLOG-CFG-010](backlog/BACKLOG-CFG-010.md) | Envelopes abertos e compatibilidade de extensões | BACKLOG-CFG-007, BACKLOG-CFG-008 | planned |

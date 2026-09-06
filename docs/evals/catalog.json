@@ -296,7 +296,7 @@
       "id": "EVAL-CFG-019",
       "title": "Controle indireto inicial",
       "status": "planned",
-      "expectation": "Todos os labels de S sem RD; label fora de S inválido; refinamento opcional com revisão, sem mutar IR.",
+      "expectation": "Todos os labels de S sem RD; unknown(known(label(S))) conserva esse universo; unknown_type e label fora de S são inválidos. Refinamento opcional exige revisão e não muta a IR.",
       "upstream_oracles": [
         "O-61",
         "O-62",
@@ -371,6 +371,35 @@
       "invariants": [
         "INV-CFG-004",
         "INV-CFG-023",
+        "INV-CFG-027",
+        "INV-CFG-028"
+      ],
+      "implementation_evidence": null
+    },
+    {
+      "id": "EVAL-CFG-023",
+      "title": "Raise e saída excepcional",
+      "status": "planned",
+      "expectation": "raise(tag, values) avalia e preserva tag, valores, identidade e origem, encerra a ativação por saída excepcional e não possui fallthrough local nem saída normal. O destino vem da interação invocadora ou é a saída excepcional raiz.",
+      "upstream_oracles": [],
+      "invariants": [
+        "INV-CFG-004",
+        "INV-CFG-008",
+        "INV-CFG-011",
+        "INV-CFG-019"
+      ],
+      "implementation_evidence": null
+    },
+    {
+      "id": "EVAL-CFG-024",
+      "title": "Fundação mínima da Analysis IR V2",
+      "status": "planned",
+      "expectation": "O modelo em memória distingue Known(Type) de UnknownType(UncertaintyId) e representa Premise, sameDomain, sujeitos, autoridade, origem e DomainProofScope como conceitos fechados. Não usa Optional<Type> nem exige signatures, choices, regiões, invokes/envelopes, regras contextuais completas de aplicabilidade/interseção ou cálculo de CFG/dataflow.",
+      "upstream_oracles": [],
+      "invariants": [
+        "INV-CFG-003",
+        "INV-CFG-004",
+        "INV-CFG-026",
         "INV-CFG-027",
         "INV-CFG-028"
       ],
