@@ -22,11 +22,14 @@ Contracasos obrigatórios:
 4. Permutar fisicamente as Sequences não altera as transições correlacionadas.
 5. Sequence sem predecessor continua inventariada e não recebe predecessor
    artificial.
-6. Controle futuro com `Halt` mantém uma saída distinta: `Return != Halt`.
 
 Quando houver mais de uma Entry/escopo de consulta, normal exits não são fundidos.
 O expected não vem do builder nem de DOT/JSON. Este cenário é EVAL-CFG-025 e não
 depende de branch, jump, codec ou CLI.
+
+`CFG-FIRST` não implementa `Halt`. A distinção `Return != Halt` permanece como
+contracaso posterior em BACKLOG-CFG-022/EVAL-CFG-005 (`O-19-STRUCT`), não como
+critério obrigatório de CF1.
 
 ## M1 — Linear + jump
 

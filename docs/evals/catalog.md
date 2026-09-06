@@ -172,19 +172,20 @@ Uma `air-java Publication` válida em memória projeta Entry/initialLabel para o
 da Sequence terminada por `Return` e para normal exit correlacionado por Publication,
 Unit e Entry scope. Missing label ou terminador ausente não são reparados; `Return`
 não cai na Sequence fisicamente seguinte; permutação não muda transições; Sequence
-sem predecessor permanece inventariada; `Return` não é `Halt`. O oracle é escrito
-independentemente do builder.
+sem predecessor permanece inventariada. O oracle é escrito independentemente do
+builder. `CFG-FIRST` não implementa `Halt`.
 
-Oráculos upstream: O-18-STRUCT, O-19-STRUCT, O-30-STRUCT. Invariantes:
+Oráculos upstream: O-18-STRUCT, O-30-STRUCT. Invariantes:
 INV-CFG-003, INV-CFG-004, INV-CFG-005, INV-CFG-006, INV-CFG-008, INV-CFG-019,
 INV-CFG-021, INV-CFG-023, INV-CFG-026. Estado: `planned`.
 
 ## EVAL-CFG-026 — E2E mínimo Semantic Product → AIR → CFG
 
-Um `cobol-lower` externo e conforme traduz o Semantic Product mínimo para a
-`air-java Publication` de CFG-FIRST. As boundaries Semantic Product→AIR e AIR
-`Return`→normal exit são verificadas separadamente. O kernel CFG não recebe,
-reconhece nem testa GOBACK, JSON ou tipos do frontend.
+Um `cobol-lower` externo e conforme consome `cobol-semantic-product.json`, sem
+importar tipos Java do frontend, e produz a `air-java Publication` de CFG-FIRST. As
+boundaries JSON→AIR e `Publication`/AIR `Return`→normal exit são verificadas
+separadamente. O kernel CFG recebe somente `Publication`; não recebe, reconhece nem
+testa GOBACK ou JSON.
 
 Oráculos upstream: O-18-STRUCT, O-66. Invariantes: INV-CFG-001, INV-CFG-002,
 INV-CFG-003, INV-CFG-019, INV-CFG-023, INV-CFG-026. Estado: `planned`.

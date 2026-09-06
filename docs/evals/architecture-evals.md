@@ -37,6 +37,7 @@ Somente especificação desses testes. O gate architecture retorna UNAVAILABLE.
 O validador documental não é um substitute de ArchUnit/bytecode ou de prova de
 isolamento Java. Sua única verificação preventiva é ausência de Java/POM na fase docs-only.
 
-EVAL-CFG-026 reserva o micro-E2E externo Semantic Product → `cobol-lower` →
-`air-java Publication` → CFG-FIRST. O trecho CFG recebe somente `Return`; o mapeamento
+EVAL-CFG-026 reserva o micro-E2E externo `cobol-semantic-product.json` →
+`cobol-lower` → `air-java Publication` → CFG-FIRST. O lowerer não importa o port
+Java do frontend. O trecho CFG recebe somente `Publication`/`Return`; o mapeamento
 de GOBACK pertence ao frontend/lowerer e é verificado separadamente.

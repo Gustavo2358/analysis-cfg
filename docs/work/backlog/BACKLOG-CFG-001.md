@@ -10,7 +10,10 @@ antes de Java.
 
 ## Escopo e estratégia
 
-Ler capítulos normativos mínimos, baseline upstream e ADRs; decidir assinatura semântica da porta, versão técnica do codec e matriz de suporte inicial.
+Ler capítulos normativos mínimos, baseline upstream e ADRs; decidir assinatura
+semântica da porta, ownership/política de versionamento da boundary de transporte e
+sua relação com adapters, sem definir codec/schema local; delimitar a matriz de
+suporte inicial.
 
 ## Critérios de aceitação
 
