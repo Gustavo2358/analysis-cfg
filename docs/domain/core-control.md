@@ -20,7 +20,10 @@ terminador legítimo em erro de source nem autoriza pular a operação.
 
 ## Branch e seleção
 
-Não é necessário resolver o predicado para construir os dois destinos.
+`branch` exige predicate com `TypeRef=known(bool)`. Não é necessário resolver seu
+valor para construir os dois destinos: `unknown(known(bool),...)` preserva TRUE e
+FALSE. `unknown_type(...)` não pode ser presumido booleano e torna esse uso
+`INVALID_IR`; não há default, coerção ou inferência a partir do terminador.
 `EXACT` na regra local de controle não significa que todos os caminhos combinados
 são concretamente viáveis. O MVP não poda branches por propagação de constantes.
 Cases duplicados são inválidos; case order não estabelece prioridade. Dispatch

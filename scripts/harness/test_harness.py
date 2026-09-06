@@ -59,7 +59,7 @@ class HarnessGuardTests(unittest.TestCase):
         self.assert_guard('Missing backlog dependency')
 
     def test_07_registry_drift(self):
-        self.edit_json('docs/work/registry.json', lambda x: x['active'][0].update(status='active'))
+        self.edit_json('docs/work/registry.json', lambda x: x['active'][0].update(status='blocked'))
         self.assert_guard('Work registry mismatch')
 
     def test_08_completed_item_left_active(self):
@@ -85,7 +85,7 @@ class HarnessGuardTests(unittest.TestCase):
         self.assert_guard('Implemented product gate in docs_only')
 
     def test_13_false_profile_claim(self):
-        self.edit_json('docs/evals/profile-obligations.json', lambda x: x['implemented_profiles'].append('AIR-STRUCTURE@1'))
+        self.edit_json('docs/evals/profile-obligations.json', lambda x: x['implemented_profiles'].append('AIR-STRUCTURE@2'))
         self.assert_guard('Implemented profile claimed')
 
     def test_14_profile_obligation_removed(self):
@@ -141,6 +141,28 @@ class HarnessGuardTests(unittest.TestCase):
     def test_28_unknown_work_link(self):
         self.edit_json('docs/work/backlog.json', lambda x: x['items'][0].update(work_item='WORK-CFG-999'))
         self.assert_guard('Backlog points to unknown work item')
+
+    def test_29_legacy_ir_profile_rejected(self):
+        self.edit_json('docs/evals/profile-obligations.json', lambda x: x['profiles'][0].update(id='AIR-STRUCTURE@1'))
+        self.assert_guard('Profile obligations drift')
+
+    def test_30_legacy_ir_version_rejected(self):
+        self.edit_json('docs/sources/sources.lock.json', lambda x: x['analysis_ir'].update(semantic_version='1.0.0'))
+        self.assert_guard('Analysis IR 2.0.0')
+
+    def test_31_nonexistent_oracle_projection_rejected(self):
+        invalid_oracles = ('O-01-SCALAR', 'O-56-STRUCT', 'O-85-REGION')
+        for oracle in invalid_oracles:
+            with self.subTest(oracle=oracle):
+                self.edit_json('docs/evals/catalog.json', lambda x: x['evals'][0]['upstream_oracles'].append(oracle))
+                self.assert_guard('Invalid upstream oracle: ' + oracle)
+                self.edit_json('docs/evals/catalog.json', lambda x: x['evals'][0]['upstream_oracles'].pop())
+
+    def test_32_normative_oracle_projections_accepted(self):
+        valid_oracles = ('O-69-SCALAR', 'O-81-REGION', 'O-85-STRUCT')
+        self.edit_json('docs/evals/catalog.json', lambda x: x['evals'][0]['upstream_oracles'].extend(valid_oracles))
+        self.assertEqual([], validate(self.root))
+
 
 class PinnedCacheTests(unittest.TestCase):
     def setUp(self):

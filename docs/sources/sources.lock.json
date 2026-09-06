@@ -3,13 +3,21 @@
   "observed_on": "2026-09-05",
   "analysis_ir": {
     "repository": "Gustavo2358/analysis-ir",
-    "commit": "fe38d30db9e95ce85d039600d543644c7f563014",
-    "semantic_version": "1.0.0",
+    "commit": "0b2fbce7046010b22b32efa8cbc3e75ccba09442",
+    "semantic_version": "2.0.0",
     "role": "normative",
+    "canonical_ref": "main",
+    "upstream_review": {
+      "pull_request": 1,
+      "state": "merged",
+      "head_commit": "500766e8901e3ca8e5adc987254ab2bf646751e5",
+      "merge_commit": "0b2fbce7046010b22b32efa8cbc3e75ccba09442",
+      "merged_at": "2026-09-06T01:41:24Z"
+    },
     "files": [
       {
         "path": "README.md",
-        "git_blob_sha1": "32ebdb4e3585cf52673fd58dc8c823aeb3c94260"
+        "git_blob_sha1": "0f5a4d737a21b40443f6eb9681fcedec6621c868"
       },
       {
         "path": "REFERENCIAS.md",
@@ -17,63 +25,63 @@
       },
       {
         "path": "conformidade/01-invariantes.md",
-        "git_blob_sha1": "075eb8334be5ed3fb1f31b3d72adbb32dd0525a6"
+        "git_blob_sha1": "039ee1fe82f3628976e7fced9e3d5210ea4e1b80"
       },
       {
         "path": "conformidade/02-oraculos.md",
-        "git_blob_sha1": "057cbc08327b8f385cffb33f8371c0f6c1cfea87"
+        "git_blob_sha1": "b6fd4854af14909a844ac8dd544b032c34b5cad1"
       },
       {
         "path": "especificacao/00-escopo-e-convencoes.md",
-        "git_blob_sha1": "e2ff2b57a2e976e9ed3638af50352ed9f6e803ce"
+        "git_blob_sha1": "931ef7c8e748e9ba23eb4a31c6f5158911773995"
       },
       {
         "path": "especificacao/01-modelo-e-identidades.md",
-        "git_blob_sha1": "8e29bbc39c21ff2ba2353bcfb282cf60b9e34a4d"
+        "git_blob_sha1": "779d2d023e34ef2b6acd6e3bc8cca68a9c65d744"
       },
       {
         "path": "especificacao/02-tipos-valores-e-operandos.md",
-        "git_blob_sha1": "e4daaa60edc3d2e10e2a52e76d6c57f2a8b50e4d"
+        "git_blob_sha1": "86c7e7c06fe68a60ae09c65442d1b5968bf54555"
       },
       {
         "path": "especificacao/03-memoria-e-aliases.md",
-        "git_blob_sha1": "d4959a43465ad909640a1b625990f29e37ca27e4"
+        "git_blob_sha1": "d71b052102fc89a955e1031eea435fc6dd37f2e2"
       },
       {
         "path": "especificacao/04-operacoes.md",
-        "git_blob_sha1": "c10f46299ba8384990e50a54e1728af0117a99d3"
+        "git_blob_sha1": "742ca48c15b18f4a3d2321d8e7c729f24bf2988e"
       },
       {
         "path": "especificacao/05-controle-e-invocacoes.md",
-        "git_blob_sha1": "8b673e952182073b643fea788472c6d08688468e"
+        "git_blob_sha1": "ba4d7ad00e60bfe8a2f307a3eb58ae58d3ac9338"
       },
       {
         "path": "especificacao/06-incompletude-e-proveniencia.md",
-        "git_blob_sha1": "97d21e89805493dd57bdb96a32b4bc0dc552e07d"
+        "git_blob_sha1": "af63467cfe852cffbf6eaceb628db77c34db8d11"
       },
       {
         "path": "especificacao/07-contrato-de-produtores.md",
-        "git_blob_sha1": "5396e9271bbe0b778161ab6c90b45bfb856b90ad"
+        "git_blob_sha1": "388e144269daf284a5541716d71b4d168150ba40"
       },
       {
         "path": "especificacao/08-contrato-de-consumidores.md",
-        "git_blob_sha1": "6ecb244eeb9c2d662651267c8345a2e7d20cb5db"
+        "git_blob_sha1": "5d6487fdd00cbd37c9928410ee8a3f09df518641"
       },
       {
         "path": "especificacao/09-extensibilidade-e-compatibilidade.md",
-        "git_blob_sha1": "fece39dd6bf199c8ce452ef8511f5d9782dd8a47"
+        "git_blob_sha1": "a7e2dc243a5f77e62110a9f3e393f2bfc6ffc54d"
       },
       {
         "path": "especificacao/10-perfis-de-conformidade.md",
-        "git_blob_sha1": "68fe6c8e61cbc27b922f50f4bb77a5a5f1c37a36"
+        "git_blob_sha1": "582d0cad9a48be65b19537ff19fd072a925c8ff0"
       },
       {
         "path": "especificacao/11-rastreabilidade-bilateral.md",
-        "git_blob_sha1": "25ae32a0fc6b7e0607e3113e787de1d2ef668014"
+        "git_blob_sha1": "6c9d4a96f6412a71279dd06040400b53bd943e9b"
       },
       {
         "path": "exemplos/00-notacao.md",
-        "git_blob_sha1": "39492586d380b261ecdbbe9152e71f926ef2f3b7"
+        "git_blob_sha1": "6d58373d2272b07389732e908b27131437aac507"
       },
       {
         "path": "exemplos/01-fluxo-e-valores.md",
@@ -81,11 +89,15 @@
       },
       {
         "path": "exemplos/02-memoria-e-chamadas.md",
-        "git_blob_sha1": "53d73295386d7776ef47a2f7a4b15fd74f28b2c3"
+        "git_blob_sha1": "91c32fba5b0dd6c944f3774b2a9ae5cf25c935e7"
       },
       {
         "path": "exemplos/03-extensoes-e-parcialidade.md",
-        "git_blob_sha1": "b6b4dc1ba5131140daecd2ccc3831e06c344a2cb"
+        "git_blob_sha1": "dccab11fdd53e24c716307a6616ff5326a004c8e"
+      },
+      {
+        "path": "exemplos/04-conhecimento-de-tipo.md",
+        "git_blob_sha1": "569c528c95a966af262fc697d0c790fe2d9751be"
       }
     ]
   },

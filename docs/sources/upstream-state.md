@@ -4,12 +4,39 @@ Observada em 05/09/2026. Este documento é contexto de integração, não contra
 
 ## Analysis IR
 
-Commit `fe38d30db9e95ce85d039600d543644c7f563014`, versão semântica 1.0.0. Repositório de especificação, exemplos,
-invariantes e oráculos; não uma biblioteca Java já disponível. Define Sequence,
-terminadores, local frames, controle indireto e precisão/envelopes.
-Esta preparação verificou por conector o commit e os capítulos de controle/perfis;
-a revisão anterior desta conversa também leu modelo, operações, consumidores,
-extensões, exemplos e oráculos. Não foi executada implementação IR/CFG upstream.
+O [PR #1](https://github.com/Gustavo2358/analysis-ir/pull/1),
+`spec!: modelar tipos desconhecidos e domínio comum (2.0.0)`, foi
+verificado no GitHub e está **mergeado** desde `2026-09-06T01:41:24Z`. Seu head era
+`500766e8901e3ca8e5adc987254ab2bf646751e5`; o merge commit e head canônico de
+`main` observado é `0b2fbce7046010b22b32efa8cbc3e75ccba09442`. O harness adota
+esse merge commit imutável como Analysis IR **2.0.0**, com hashes de blobs no
+[lock](sources.lock.json). O repositório continua sendo especificação, exemplos,
+invariantes e oráculos, não uma biblioteca Java disponível.
+
+A revisão confirmou os perfis `AIR-STRUCTURE@2`, `AIR-SCALAR-FLOW@2`,
+`AIR-REGION-FLOW@2`, `AIR-LOCAL-CONTROL@2` e `AIR-INDIRECT-CONTROL@2`. As
+capacidades padronizadas preservam suas versões próprias: `memory.regions@1`,
+`control.local@1` e `control.indirect@1`.
+
+### Impacto semântico revisado para o CFG
+
+| Conceito | Delta 1.0.0 → 2.0.0 relevante ao consumer |
+| --- | --- |
+| `Publication` | `premises` agora materializa fatos tipados `sameDomain`, sujeitos, autoridade e `DomainProofScope`; `TypeRef` aparece transversalmente. |
+| `Unit` / `Entry` | Posições de parâmetros/resultados usam `TypeRef`; assinatura parcial não apaga aridade, modo ou objetos conhecidos. |
+| `Sequence` / `ProgramPoint` | Nenhuma mudança material na topologia: terminador único, ordem intrassequência e pontos antes/depois continuam normativos. |
+| `jump` | Sem mudança material; transferência incondicional ao label explícito. |
+| `branch` | Exige `known(bool)`: `unknown(known(bool))` preserva ambos os destinos; `unknown_type` é inválido como predicate. |
+| `dispatch` | A topologia cases/default não mudou; seletor e literais exigem domínio conhecido. |
+| `return` / `halt` | Continuam sem fallthrough; compatibilidade dos valores de `return` passa pelas provas de domínio aplicáveis, enquanto `halt` permanece distinto de retorno. |
+| `invoke` | Controle/outcomes não mudaram; assinaturas, argumentos e resultados passam a preservar `TypeRef` e provas `sameDomain` nos sites estáticos corretos. |
+| `ControlEnvelope` | Sem mudança topológica; tipo desconhecido não abre controle automaticamente nem permite perder alternatives/remainder. |
+| `control.local@1` | Sem mudança de versão ou regra de frames/ports; o perfil consumidor correspondente é `AIR-LOCAL-CONTROL@2`. |
+| `control.indirect@1` | Mantém universo fechado `label(S)`; a assinatura exige `known(label(S))`, e `unknown_type` não estabelece `S`. O perfil consumidor é `AIR-INDIRECT-CONTROL@2`. |
+
+Logo, o algoritmo estrutural permanece `Publication → Unit/Entry → Sequence →
+terminator → successors → CFG`. A major exige modelo/validator/evals novos, não
+leader detection, fallthrough intersequence, dataflow ou semântica COBOL no core.
 
 ## Proleap POC — main e PR são baselines distintas
 
@@ -40,5 +67,9 @@ COBOL real nem eliminam trabalho do lowerer. Integração posterior confrontará
 matriz de capabilities; gaps não serão “corrigidos” pelo CFG.
 O suporte a PERFORM/THRU na IR é condicionado à disciplina de frames/ports declarada;
 não é certificado universal para todos os casos e dialetos COBOL.
+
+O checkpoint apenas sincroniza o contrato. Ownership físico do modelo Java,
+coordenadas Maven, binding versionado das fixtures e forma física da porta continuam
+decisões do discovery; nenhum perfil ou algoritmo CFG foi implementado.
 
 Fontes e permalinks: [índice](index.md).

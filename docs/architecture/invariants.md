@@ -1,6 +1,7 @@
 # Invariantes do CFG
 
-Regras de projeto derivadas da direção aprovada e da IR fixada. Não substituem os invariantes I-01–I-48 upstream. Cada alteração liga regra a eval e work item.
+Regras de projeto derivadas da direção aprovada e da IR fixada. Não substituem os
+invariantes I-01–I-54 upstream. Cada alteração liga regra a eval e work item.
 
 ## INV-CFG-001 — Fronteira IR
 
@@ -105,5 +106,23 @@ Backlog não autoriza; gate indisponível/não executado nunca recebe PASS de pr
 ## INV-CFG-026 — Modelo compartilhável
 
 Não duplicar classes IR privadas incompatíveis; transporte não invade modelo compartilhado.
+
+## INV-CFG-027 — Conhecimento de tipo preservado
+
+Representar e preservar `TypeRef` como `known(Type)` ou
+`unknown_type(UncertaintyId)`. Tipo desconhecido não apaga entidade, ocorrência,
+storage, controle ou dependência e não satisfaz precondição de domínio concreto.
+
+## INV-CFG-028 — Prova de domínio não é dataflow
+
+Preservar `Premise`, sujeitos, autoridade, origem, `sameDomain` e
+`DomainProofScope`; validar fechamento e aplicabilidade pelos sites estáticos. A
+prova não unifica lacunas, não iguala valores e não depende de CFG, reachability ou
+ativação dinâmica.
+
+## INV-CFG-029 — Predicate booleano explícito
+
+`branch` aceita valor desconhecido somente com `known(bool)` e conserva TRUE/FALSE.
+`unknown_type` não é booleano e não recebe default, coerção ou inferência do uso.
 
 Fonte: [Analysis IR e inspirações](../sources/index.md). Evidência: [evals](../evals/index.md).

@@ -8,10 +8,10 @@
       "status": "planned",
       "expectation": "Rejeitar ID duplicado, target interno pendente, terminador ausente/duplo e mistura de revisões. Distinguir inventário zero de indisponível.",
       "upstream_oracles": [
-        "O-29",
-        "O-30",
-        "O-31",
-        "O-32"
+        "O-29-STRUCT",
+        "O-30-STRUCT",
+        "O-31-STRUCT",
+        "O-32-STRUCT"
       ],
       "invariants": [
         "INV-CFG-003",
@@ -27,10 +27,10 @@
       "status": "planned",
       "expectation": "Uma sequência com operações comuns e jump/return explícitos; preservar ordem e todas as ocorrências.",
       "upstream_oracles": [
-        "O-01",
-        "O-09",
-        "O-10",
-        "O-18"
+        "O-01-STRUCT",
+        "O-09-STRUCT",
+        "O-10-STRUCT",
+        "O-18-STRUCT"
       ],
       "invariants": [
         "INV-CFG-005",
@@ -43,14 +43,16 @@
       "id": "EVAL-CFG-003",
       "title": "Diamond",
       "status": "planned",
-      "expectation": "Dois ramos e continuação comum; nenhuma aresta entre irmãos nem avaliação de predicado necessária.",
+      "expectation": "Dois ramos e continuação comum; predicate conhecido como bool sem exigir seu valor. unknown(known(bool)) preserva ambos; unknown_type é inválido.",
       "upstream_oracles": [
-        "O-02"
+        "O-02-STRUCT",
+        "O-74-STRUCT"
       ],
       "invariants": [
         "INV-CFG-005",
         "INV-CFG-007",
-        "INV-CFG-010"
+        "INV-CFG-010",
+        "INV-CFG-029"
       ],
       "implementation_evidence": null
     },
@@ -60,7 +62,7 @@
       "status": "planned",
       "expectation": "False pode ir diretamente ao join; nested com terminações próprias; TRUE/FALSE preservados mesmo com target igual.",
       "upstream_oracles": [
-        "O-03",
+        "O-03-STRUCT",
         "O-27"
       ],
       "invariants": [
@@ -74,11 +76,11 @@
       "id": "EVAL-CFG-005",
       "title": "Saídas distintas",
       "status": "planned",
-      "expectation": "Return e halt não têm fallthrough; raise preserva tag; nenhum ramo terminante reconverge por ordem textual.",
+      "expectation": "Return e halt não têm fallthrough; nenhum ramo terminante reconverge por ordem textual.",
       "upstream_oracles": [
-        "O-04",
-        "O-18",
-        "O-19"
+        "O-04-STRUCT",
+        "O-18-STRUCT",
+        "O-19-STRUCT"
       ],
       "invariants": [
         "INV-CFG-008",
@@ -92,9 +94,9 @@
       "status": "planned",
       "expectation": "Normal é possível; exceções, halt, diverge e restante não somem; resultados normais não contaminam outros outcomes.",
       "upstream_oracles": [
-        "O-20",
-        "O-21",
-        "O-22"
+        "O-20-STRUCT",
+        "O-21-STRUCT",
+        "O-22-STRUCT"
       ],
       "invariants": [
         "INV-CFG-009",
@@ -138,8 +140,8 @@
       "status": "planned",
       "expectation": "Registro de capability sintética por seam; duplicata rejeitada; fallback uma vez; não suportado não vira vazio.",
       "upstream_oracles": [
-        "O-47",
-        "O-48"
+        "O-47-STRUCT",
+        "O-48-STRUCT"
       ],
       "invariants": [
         "INV-CFG-014",
@@ -153,7 +155,7 @@
       "status": "planned",
       "expectation": "Cases e default, targets repetidos com condições próprias, duplicatas semânticas inválidas e seletor fora da tabela.",
       "upstream_oracles": [
-        "O-05"
+        "O-05-STRUCT"
       ],
       "invariants": [
         "INV-CFG-007"
@@ -166,8 +168,8 @@
       "status": "planned",
       "expectation": "Pré/pós-teste, back-edge, self-loop, ciclo irreducível e conteúdo acessível por outra Entry; sem topological sort obrigatório.",
       "upstream_oracles": [
-        "O-06",
-        "O-07"
+        "O-06-STRUCT",
+        "O-07-STRUCT"
       ],
       "invariants": [
         "INV-CFG-005",
@@ -182,8 +184,8 @@
       "status": "planned",
       "expectation": "Scope com label interior, known+remainder, nenhuma falsa prova de unreachable ou completude.",
       "upstream_oracles": [
-        "O-33",
-        "O-34"
+        "O-33-STRUCT",
+        "O-34-STRUCT"
       ],
       "invariants": [
         "INV-CFG-012",
@@ -198,11 +200,11 @@
       "status": "planned",
       "expectation": "IDs namespaced, origin derivada, clones distintos, inventário sem predecessor e operação não suportada mantida.",
       "upstream_oracles": [
-        "O-41",
-        "O-42",
-        "O-43",
-        "O-45",
-        "O-46",
+        "O-41-STRUCT",
+        "O-42-STRUCT",
+        "O-43-STRUCT",
+        "O-45-STRUCT",
+        "O-46-STRUCT",
         "O-49"
       ],
       "invariants": [
@@ -218,9 +220,9 @@
       "status": "planned",
       "expectation": "Permutation de sequences, alpha-renaming de IDs, split com jump e mudança só de display não alteram observações correlacionadas.",
       "upstream_oracles": [
-        "O-09",
-        "O-10",
-        "O-44",
+        "O-09-STRUCT",
+        "O-10-STRUCT",
+        "O-44-STRUCT",
         "O-66"
       ],
       "invariants": [
@@ -294,7 +296,7 @@
       "id": "EVAL-CFG-019",
       "title": "Controle indireto inicial",
       "status": "planned",
-      "expectation": "Todos os labels de S sem RD; label fora de S inválido; refinamento opcional com revisão, sem mutar IR.",
+      "expectation": "Todos os labels de S sem RD; unknown(known(label(S))) conserva esse universo; unknown_type e label fora de S são inválidos. Refinamento opcional exige revisão e não muta a IR.",
       "upstream_oracles": [
         "O-61",
         "O-62",
@@ -312,7 +314,7 @@
       "status": "planned",
       "expectation": "Mesmo modelo IR e porta, sem serialização intermediária; capabilities/revisões incompatíveis diagnosticadas.",
       "upstream_oracles": [
-        "O-31",
+        "O-31-STRUCT",
         "O-66",
         "O-67",
         "O-68"
@@ -323,6 +325,83 @@
         "INV-CFG-023",
         "INV-CFG-024",
         "INV-CFG-026"
+      ],
+      "implementation_evidence": null
+    },
+    {
+      "id": "EVAL-CFG-021",
+      "title": "TypeRef e predicate booleano",
+      "status": "planned",
+      "expectation": "Preservar known(Type) e unknown_type(UncertaintyId) em entidades, usos, assinaturas e envelopes. Aceitar branch unknown(known(bool)) com TRUE/FALSE e rejeitar predicate unknown_type sem coerção ou consulta ao frontend.",
+      "upstream_oracles": [
+        "O-69-STRUCT",
+        "O-70-STRUCT",
+        "O-71-STRUCT",
+        "O-72-STRUCT",
+        "O-73-STRUCT",
+        "O-74-STRUCT",
+        "O-75-STRUCT",
+        "O-76-STRUCT",
+        "O-77-STRUCT",
+        "O-78-STRUCT",
+        "O-79-STRUCT",
+        "O-80-STRUCT",
+        "O-81-STRUCT"
+      ],
+      "invariants": [
+        "INV-CFG-003",
+        "INV-CFG-004",
+        "INV-CFG-027",
+        "INV-CFG-029"
+      ],
+      "implementation_evidence": null
+    },
+    {
+      "id": "EVAL-CFG-022",
+      "title": "sameDomain e DomainProofScope",
+      "status": "planned",
+      "expectation": "Preservar Premise, sujeitos, autoridade, origem e escopo; validar fechamento, sites estáticos e interseções sem unificar lacunas, igualar valores nem depender de CFG ou ativações dinâmicas.",
+      "upstream_oracles": [
+        "O-77-STRUCT",
+        "O-82-STRUCT",
+        "O-83-STRUCT",
+        "O-84-STRUCT",
+        "O-85-STRUCT"
+      ],
+      "invariants": [
+        "INV-CFG-004",
+        "INV-CFG-023",
+        "INV-CFG-027",
+        "INV-CFG-028"
+      ],
+      "implementation_evidence": null
+    },
+    {
+      "id": "EVAL-CFG-023",
+      "title": "Raise e saída excepcional",
+      "status": "planned",
+      "expectation": "raise(tag, values) avalia e preserva tag, valores, identidade e origem, encerra a ativação por saída excepcional e não possui fallthrough local nem saída normal. O destino vem da interação invocadora ou é a saída excepcional raiz.",
+      "upstream_oracles": [],
+      "invariants": [
+        "INV-CFG-004",
+        "INV-CFG-008",
+        "INV-CFG-011",
+        "INV-CFG-019"
+      ],
+      "implementation_evidence": null
+    },
+    {
+      "id": "EVAL-CFG-024",
+      "title": "Fundação mínima da Analysis IR V2",
+      "status": "planned",
+      "expectation": "O modelo em memória distingue Known(Type) de UnknownType(UncertaintyId) e representa Premise, sameDomain, sujeitos, autoridade, origem e DomainProofScope como conceitos fechados. Não usa Optional<Type> nem exige signatures, choices, regiões, invokes/envelopes, regras contextuais completas de aplicabilidade/interseção ou cálculo de CFG/dataflow.",
+      "upstream_oracles": [],
+      "invariants": [
+        "INV-CFG-003",
+        "INV-CFG-004",
+        "INV-CFG-026",
+        "INV-CFG-027",
+        "INV-CFG-028"
       ],
       "implementation_evidence": null
     }

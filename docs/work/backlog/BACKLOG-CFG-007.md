@@ -1,23 +1,30 @@
-# BACKLOG-CFG-007 — Invoke e resultados de controle delimitados
+# BACKLOG-CFG-007 — Invoke, raise e resultados de controle delimitados
 
 **Estado:** `planned`. **Fase:** `structure`. **Autorização:** backlog não autoriza execução.
 Dependências: BACKLOG-CFG-008.
 
 ## Problema e objetivo observável
 
-Preservar sites de chamada e outcomes sem resolver targets ou efeitos.
+Preservar sites de chamada, outcomes e saídas excepcionais sem resolver targets ou
+efeitos.
 
 ## Escopo e estratégia
 
-Implementar projeção local de invoke terminador com normal, tags/propagate, halt/diverge e resultado unsupported quando open scope ainda não implementado.
+Implementar projeção local de `invoke` terminador com normal, tags/propagate,
+halt/diverge e resultado unsupported quando open scope ainda não implementado.
+Implementar `raise(tag, values)` como encerramento excepcional da ativação, com
+destino derivado da interação invocadora ou saída excepcional raiz.
 
 ## Critérios de aceitação
 
-Normal significa possibilidade; ausência de normal não vira fallthrough; before/after(outcome) distinguíveis; metadata e operandos preservados; contrato ausente não vira pureza.
+Normal significa possibilidade; ausência de normal não vira fallthrough;
+before/after(outcome) distinguíveis; metadata e operandos preservados; contrato
+ausente não vira pureza. `raise` preserva tag/valores/origem, não produz saída normal
+e nunca ganha fallthrough local.
 
 ## Evals e invariantes
 
-EVAL-CFG-005, EVAL-CFG-006, EVAL-CFG-013. Vincular invariantes específicos na promoção para work
+EVAL-CFG-005, EVAL-CFG-006, EVAL-CFG-013, EVAL-CFG-023. Vincular invariantes específicos na promoção para work
 item. Ver [catálogo](../../evals/catalog.md) e [invariantes](../../architecture/invariants.md).
 Antes de código, transformar expected em testes RED independentes; documentar o
 resultado observado, não apenas intenção de TDD.

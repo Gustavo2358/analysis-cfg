@@ -9,15 +9,19 @@ Fechar diamond e composição de branches sem criar modelo IF COBOL.
 
 ## Escopo e estratégia
 
-Implementar branch com alternativas rotuladas, join explícito, ramo vazio, destinos iguais e branches nested.
+Implementar `branch` com predicate `known(bool)`, alternativas rotuladas, join
+explícito, ramo vazio, destinos iguais e branches nested. Não avaliar valores.
 
 ## Critérios de aceitação
 
-M2–M5 dos vetores MVP corretos; nenhuma aresta entre irmãos; ramo terminante não retorna ao join; número de branches não limitado; unknown bool conserva dois destinos.
+M2–M5 dos vetores MVP corretos; nenhuma aresta entre irmãos; ramo terminante não
+retorna ao join; número de branches não limitado; `unknown(known(bool))` conserva
+dois destinos e `unknown_type` não satisfaz predicate bool, produzindo `INVALID_IR`.
 
 ## Evals e invariantes
 
-EVAL-CFG-003, EVAL-CFG-004, EVAL-CFG-005, EVAL-CFG-014. Vincular invariantes específicos na promoção para work
+EVAL-CFG-003, EVAL-CFG-004, EVAL-CFG-005, EVAL-CFG-014.
+Vincular invariantes específicos na promoção para work
 item. Ver [catálogo](../../evals/catalog.md) e [invariantes](../../architecture/invariants.md).
 Antes de código, transformar expected em testes RED independentes; documentar o
 resultado observado, não apenas intenção de TDD.
@@ -39,7 +43,8 @@ item porque ficou verde. Sem duplicar este plano em tasklist permanente.
 
 ## Fora de escopo
 
-Não avaliar predicados por dataflow nem procurar END-IF/ELSE na fonte.
+Não avaliar predicados por dataflow, presumir tipo pela posição nem procurar
+END-IF/ELSE na fonte.
 
 ## Evidência de conclusão
 

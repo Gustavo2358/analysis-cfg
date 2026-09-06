@@ -13,8 +13,17 @@ escopo de entries, capacidades/modos de precisão e limites. Resultado é tipado
 imutável. Não contém handles de arquivo, conexões ou callbacks para completar fatos.
 IDs inteiros/strings não viram chaves globais sem namespace.
 
+Na V2, `Publication` inclui `TypeRef`, `Premise`, `sameDomain` e
+`DomainProofScope`. Esses fatos chegam pelas duas vias e atravessam a mesma porta;
+não são propriedades inventadas pelo codec nem opções de transporte.
+
 A implementação recebe dependências por construção; não escolhe adapter consultando
 ambiente. O caller pode ser um teste, CLI ou módulo de um monólito. A porta é a mesma.
+
+Core e aplicação não conhecem `Path`, filesystem, JSON, REST, CLI, Docker, cloud,
+COBOL, Semantic Product, ProLeap ou ANTLR. Trocar transporte substitui/adiciona um
+adapter; ampliar significado requer capability IR e seus oráculos. Os dois eixos
+não são intercambiáveis.
 
 ## Arquivos agora
 
@@ -49,6 +58,7 @@ Não introduzir storage obrigatório só para desenhar um hexágono.
 
 Uma Publication deve chegar por fixture decodificada e por construção em memória.
 Com mesmas opções/identidades, os resultados semânticos devem ser equivalentes.
-Compare nós, outcomes, gaps, origens e precisão; não comparar texto de console.
+Compare nós, outcomes, gaps, origens, precisão, `TypeRef`, premises e escopos de
+prova correlacionados; não comparar texto de console.
 A mesma prova será reutilizada no monólito modular. Mudam adapters e wiring,
 **não a porta nem o algoritmo** (INV-CFG-002; EVAL-CFG-008).

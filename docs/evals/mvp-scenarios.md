@@ -14,7 +14,8 @@ ordenados. Permutar a posição física de entry e tail não muda a relação.
 ## M2 — Diamond
 
 ```text
-entry: branch pure-unknown then yes else no
+entry: branch unknown(known(bool), dependencies=..., remainingReads=..., reason=...)
+       then yes else no
 yes:   opY; jump join
 no:    opN; jump join
 join:  return
@@ -23,6 +24,12 @@ join:  return
 Esperado: entry→yes TRUE; entry→no FALSE; yes→join JUMP; no→join JUMP;
 join→saída normal RETURN. Não existe yes→no, no→yes ou entry→join direta.
 Predicado desconhecido não impede grafo estrutural com destinos fechados.
+
+Contracaso obrigatório: substituir o predicate por uma expressão cujo `TypeRef`
+seja `unknown_type(u)`. A publicação é `INVALID_IR`, pois o uso não satisfaz
+`known(bool)`; o consumer não pode escolher bool por default, coerção, nome ou pelo
+fato de a expressão aparecer em `branch`. A lacuna e as dependências conhecidas
+continuam preservadas no diagnóstico.
 
 ## M3 — Ramo ausente e nested
 
@@ -38,7 +45,7 @@ seguido fisicamente de outro label: esse label não ganha predecessor implícito
 
 ## M5 — Duas alternativas, um destino
 
-`entry: branch pure-unknown then join else join`.
+`entry: branch unknown(known(bool)) then join else join`.
 Uma relação topológica pode ser compartilhada, mas TRUE e FALSE permanecem
 alternativas semânticas observáveis. Não apagar avaliação/operandos do predicate.
 
@@ -53,7 +60,7 @@ universal sobre CALL COBOL real.
 
 ## M7 — Falhas e limites
 
-Label pendente/ID duplicado/terminador faltante → INVALID_IR.
+Label pendente/ID duplicado/terminador faltante/predicate `unknown_type` → INVALID_IR.
 Input-file ausente/JSON malformado → INPUT_ERROR do adapter.
 Capability fora do subset → UNSUPPORTED_CAPABILITY ou fallback sustentado;
 nenhum desses resultados equivale a grafo vazio completo.

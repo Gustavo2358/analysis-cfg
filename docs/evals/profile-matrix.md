@@ -5,18 +5,27 @@ implementado agora. Registro verificável: [profile-obligations.json](profile-ob
 
 | Marco/perfil | Exigência | Estado |
 | --- | --- | --- |
-| MVP-CFG-01 (local) | linear/branch/saídas/invoke delimitado; arquivo e memória; unsupported honesto | planejado |
-| AIR-STRUCTURE@1 | transferências, cycles, entries, invoke/outcomes, saídas, opaque/open e estrutura preservada | não implementado |
-| AIR-LOCAL-CONTROL@1 | STRUCTURE + control.local@1, matching, ports, resume/unwind | não implementado |
-| AIR-INDIRECT-CONTROL@1 | STRUCTURE + universo de labels e transferência indireta conservadora | não implementado |
+| MVP-CFG-01 (local) | linear, jump, branch, return/halt; arquivo e memória; unsupported honesto | planejado |
+| AIR-STRUCTURE@2 | transferências, cycles, entries, invoke/outcomes, `return`/`raise`/`halt`, opaque/open, `TypeRef` e provas de domínio preservadas | não implementado |
+| AIR-LOCAL-CONTROL@2 | STRUCTURE@2 + `control.local@1`, matching, ports, resume/unwind | não implementado |
+| AIR-INDIRECT-CONTROL@2 | STRUCTURE@2 + `control.indirect@1`, universo de labels e transferência conservadora | não implementado |
 
-AIR-STRUCTURE exige O-01–O-10, O-18–O-22, O-29–O-34 e O-41–O-48, **no escopo
-estrutural de cada cenário**. O-01/O-08, por exemplo, não autorizam implementar PV
+AIR-STRUCTURE@2 exige O-01-STRUCT–O-10-STRUCT, O-18-STRUCT–O-22-STRUCT,
+O-29-STRUCT–O-34-STRUCT, O-41-STRUCT–O-48-STRUCT e
+O-69-STRUCT–O-85-STRUCT. O-01/O-08, por exemplo, não autorizam implementar PV
 neste projeto: testar ordem e pontos necessários; a conclusão de valor pertence
 àquele futuro consumer. Justificar explicitamente subasserts fora do papel CFG.
 Não marcar o cenário inteiro “não aplicável” para evitar sua obrigação estrutural.
 
-Controle local acrescenta O-56–O-60. Controle indireto acrescenta O-61–O-63;
+O bloco O-69-STRUCT–O-85-STRUCT exige preservar/validar `TypeRef`, tipo versus
+valor desconhecido, `Premise`, `sameDomain` e `DomainProofScope`. Não exige os
+sub-requisitos `SCALAR`/`REGION`: não calcular values, reaching definitions,
+efeitos escalares ou storage. `sameDomain` não é igualdade de valores e o escopo de
+prova é estático, não um produto do CFG.
+
+`AIR-SCALAR-FLOW@2` e `AIR-REGION-FLOW@2` continuam perfis upstream, mas não são
+claims planejados para o papel Consumer/CFG. Controle local acrescenta O-56–O-60.
+Controle indireto acrescenta O-61–O-63;
 O-62 trata refinamento opcional: se não houver refinamento, registrar não suportado,
 não fabricar RD ou claim de execução desse teste. O CFG inicial admite todo S.
 

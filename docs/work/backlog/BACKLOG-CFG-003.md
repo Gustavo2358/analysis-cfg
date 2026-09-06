@@ -9,7 +9,9 @@ Proteger a arquitetura antes do primeiro builder, com composição pequena e ext
 
 ## Escopo e estratégia
 
-Definir porta de caso de uso e contratos de transição tipados; manter potencial de contexto/open scope; criar provas de dependência bytecode e registro de extensão sintética.
+Definir porta de caso de uso e contratos de transição tipados; preservar fatos V2
+sem misturá-los ao transporte; manter potencial de contexto/open scope; criar provas
+de dependência bytecode e registro de extensão sintética por capability e versão.
 
 ## Critérios de aceitação
 
@@ -39,7 +41,8 @@ item porque ficou verde. Sem duplicar este plano em tasklist permanente.
 
 ## Fora de escopo
 
-Não implementar local frames de produção, framework genérico de plugins, DI por reflection nem factories por conveniência.
+Não implementar local frames de produção, framework genérico de plugins, DI por
+reflection nem factories por conveniência. Perfis `@2` não renomeiam extensões `@1`.
 
 ## Evidência de conclusão
 

@@ -3,7 +3,7 @@
 **Entrega:** harness documental e operacional, sem implementação Java. **Data:** 05/09/2026.
 **Repositório:** `Gustavo2358/analysis-cfg`. O harness é a primeira baseline do projeto; ainda não há implementação Java de CFG.
 
-Este projeto construirá CFGs a partir da **Analysis IR 1.0.0**, sem conhecer COBOL,
+Este projeto construirá CFGs a partir da **Analysis IR 2.0.0**, sem conhecer COBOL,
 Semantic Product, parser, filesystem, CLI ou cloud no núcleo. Primeiro fecha um
 MVP deliberadamente estreito de fluxo linear, `jump`, `branch`/IF-ELSE e saídas;
 depois amplia `invoke`, seleção, ciclos e capacidades de controle, preservando
@@ -36,9 +36,9 @@ Java nesta entrega. Bibliotecas e versões serão fixadas no bootstrap autorizad
 | TDD e oráculos | [evals](docs/evals/index.md) |
 | Verificação do próprio harness | [gates](docs/engineering/gates.md) |
 
-O backlog é plano, não autorização. O primeiro work item está **bloqueado aguardando
-autorização de discovery**. Mesmo após autorizar esse discovery, Java continua fora
-do escopo. Implementação exige novo checkpoint autorizado.
+O backlog é plano, não autorização. O primeiro work item está em discovery
+documental autorizado; este checkpoint sincroniza a IR V2 e para antes de Java.
+Implementação exige novo checkpoint autorizado após as decisões físicas restantes.
 
 ## O que os gates significam hoje
 
@@ -53,4 +53,6 @@ contém um mapa de leitura e síntese, **não uma cópia integral da especifica�
 O utilitário opcional [cache_ir.py](scripts/harness/cache_ir.py) pode importar uma
 cópia local verificada ou obter os arquivos públicos fixados; nunca troca por `main`.
 
-Este repositório foi inicializado com o harness após revisão contra os objetivos de arquitetura, extensibilidade, TDD e isolamento definidos para o CFG. O work item de discovery continua bloqueado: publicar o harness não autoriza Java nem implementação de CFG.
+Este repositório foi inicializado com o harness após revisão contra os objetivos de
+arquitetura, extensibilidade, TDD e isolamento definidos para o CFG. A sincronização
+do contrato não autoriza Java, Maven ou implementação de CFG.

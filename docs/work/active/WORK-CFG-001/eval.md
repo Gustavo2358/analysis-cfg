@@ -2,17 +2,21 @@
 
 ## O que prova corretude
 
-Toda decisão se sustenta no requisito, contrato IR ou literatura aplicável; arquitetura
-permite executar porta com Publication sem I/O. Não existe Java/POM após o checkpoint.
+Lock e perfis correspondem ao merge canônico V2; toda decisão se sustenta no
+requisito ou contrato IR; arquitetura permite executar porta com Publication sem
+I/O. Não existe Java/POM após o checkpoint.
 
 ## Classes positivas
 
-MVP linear/diamond/invoke delimitado; read de fixture e chamada direta compartilham porta.
+MVP linear/diamond/return/halt; `unknown(known(bool))` alimenta branch com os dois
+destinos; read de fixture e chamada direta compartilham porta.
 
 ## Classes negativas
 
-Path na porta; JSON/AST no core; List<LabelId> como semântica universal de retorno;
-modelo IR duplicado; gate sem testes; AIR-STRUCTURE completo declarado pelo MVP.
+Path na porta; JSON/AST no core; `unknown_type` usado como bool;
+`Optional<Type>` no lugar de `TypeRef`; `sameDomain` tratado como igualdade de
+valores; `DomainProofScope` dinâmico; modelo IR duplicado; gate sem testes;
+AIR-STRUCTURE@2 completo declarado pelo MVP.
 
 ## Classes ambíguas
 
@@ -22,12 +26,15 @@ de decisão. Nenhuma é resolvida por copiar snippets da conversa.
 ## Casos adversariais
 
 Dois callsites no mesmo trecho; unknown scope com reentrada; mesmo local ID em duas
-units; duas alternativas para o mesmo destino; falta de source normativa.
+units; duas alternativas para o mesmo destino; `unknown(known(bool))` versus
+`unknown_type`; interseção vazia de provas; falta de source normativa.
 
 ## Casos de regressão
 
-Gates do harness continuam validando links/IDs/manifestos; a matriz permanece sem
-claims implementados e a fase global continua docs-only.
+Gates do harness continuam validando links/IDs/manifestos, lock V2, perfis @2 e
+o conjunto fechado de sub-requisitos `STRUCT`/`SCALAR`/`REGION`; projeções
+inexistentes como `O-56-STRUCT` falham. A matriz permanece sem claims implementados
+e a fase global continua docs-only.
 
 ## Propriedades/relações metamórficas
 

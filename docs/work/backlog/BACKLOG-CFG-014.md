@@ -5,7 +5,8 @@ Dependências: BACKLOG-CFG-011, BACKLOG-CFG-013.
 
 ## Problema e objetivo observável
 
-Implementar regras control.local no seam já preparado, preservando memória compartilhada.
+Implementar regras `control.local@1` no seam já preparado sob Analysis IR 2.0.0,
+preservando memória compartilhada e fatos `TypeRef`/premises.
 
 ## Escopo e estratégia
 

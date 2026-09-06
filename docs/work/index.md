@@ -1,10 +1,11 @@
 # Trabalho
 
-## Item preparado
+## Item ativo
 
-[WORK-CFG-001](active/WORK-CFG-001/spec.md) — `blocked`, autorização `none`.
+[WORK-CFG-001](active/WORK-CFG-001/spec.md) — `active`, autorização `discovery`.
 Começar por [manifesto](active/WORK-CFG-001/work-item.json) e
-[state](active/WORK-CFG-001/state.md). O discovery precisa de autorização explícita.
+[state](active/WORK-CFG-001/state.md). A autorização cobre somente a sincronização
+docs/harness com Analysis IR 2.0.0; implementação permanece sem autorização.
 
 ## Roteamento
 

@@ -2,7 +2,7 @@
 
 ## Autoridade
 
-Versionamento inicial: Analysis IR 1.0.0 no commit fixado em
+Versionamento adotado: Analysis IR 2.0.0 no commit fixado em
 [sources.lock.json](../sources/sources.lock.json). O [mapa de fontes](../sources/index.md)
 indica os capítulos normativos. Este documento é orientação do consumidor,
 não uma nova versão da IR.
@@ -20,6 +20,18 @@ pode morar inicialmente em módulo isolado e ser movida depois, sem duplicar cla
 no lowerer/CFG. O domínio pode depender desse contrato semântico puro; não pode
 herdar classes AST/ProLeap ou DTOs de transporte.
 
+A primeira implementação do modelo compartilhável deve representar, sem usar
+`Optional<Type>` como atalho, a soma fechada:
+
+```text
+TypeRef = Known(Type) | UnknownType(UncertaintyId)
+```
+
+Também deve materializar/preservar `Premise`, fatos `sameDomain`, seus sujeitos,
+autoridade, origem e `DomainProofScope`. O escopo da prova é estrutural e estático;
+não depende de alcançar um nó, executar o CFG ou escolher uma ativação. A obrigação
+não antecipa uma API ampla nem exige calcular igualdade de valores.
+
 O MVP não precisa interpretar storage/values. Deve preservar operandos/metadata
 sem adulteração e validar as precondições estruturais do subset declarado.
 Uma publicação com capability fora do subset não vira silenciosamente publicação
@@ -29,14 +41,17 @@ menor. O resultado declara o escopo aceito, incompatível ou conservador.
 
 Namespaces completos, unicidade por domínio, referências internas fechadas,
 Entry apontando para label da Unit, terminador único, ausência de operação posterior,
-assinatura dos control operands, destinos/casos válidos e discriminadores versionados.
+assinatura dos control operands, destinos/casos válidos, `TypeRef` bem formado,
+lacuna `TYPE_UNKNOWN` referenciada e provas de domínio fechadas/aplicáveis, além de
+discriminadores versionados.
 Recurso externo é representação legítima própria, não referência interna pendente.
 Tipo/semântica não verificável não recebe selo de validação completa.
 
 ## Preservação
 
 Manter operações, ordenação intrassequência, program points before/after(outcome),
-origens/derivações, identidade da publicação, capacidades, premissas e incertezas.
+origens/derivações, identidade da publicação, capacidades, `TypeRef`, premissas,
+provas `sameDomain`, escopos e incertezas.
 Valores, storage e efeitos abertos não obrigam apagar um controle já fechado.
 `UNKNOWN` do target de chamada não autoriza remover o invoke.
 
