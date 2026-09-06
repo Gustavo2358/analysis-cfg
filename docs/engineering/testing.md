@@ -6,7 +6,8 @@ Regra normativa → classes semânticas → adversariais contra o atalho óbvio 
 independente → teste RED observado → implementação mínima geral → GREEN →
 refatoração → challenge independente → gates e handoff.
 Planejar testes não é RED executado. Os evals semânticos de CFG continuam
-`planned`; somente EVAL-CFG-007 e EVAL-CFG-024 têm implementação de fundação.
+`planned`; EVAL-CFG-007 e EVAL-CFG-024 têm implementação de boundary, e
+EVAL-CFG-009 implementa somente a prova arquitetural do seam.
 Não usar mocks do próprio algoritmo para provar o algoritmo.
 
 ## Camadas
@@ -28,6 +29,11 @@ Tabelas de esperado não devem ser regeneradas pelo builder. Um interpreter de
 referência independente, exato em casos pequenos/limitados e escrito só nos testes,
 pode apoiar falsificação. Ele não certifica recursão ilimitada nem toda a linguagem.
 Golden files só sob regras/correlações explícitas; contagens de corpus são telemetria.
+
+Na foundation da porta/seam, o oracle compila a assinatura exata, exige que o
+resultado não contenha grafo/sucesso e registra uma capability sintética pelo mesmo
+coordinator. O RED foi a ausência das classes produtivas. Mutantes de unsupported,
+filesystem, AIR paralela e discovery reflexiva devem falhar antes de GREEN.
 
 ## O que comparar
 

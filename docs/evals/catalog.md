@@ -1,7 +1,8 @@
 # Catálogo de evals
 
-**A fundação implementa EVAL-CFG-007 e EVAL-CFG-024; os evals semânticos do CFG
-continuam planejados.** Metadados verificáveis em [catalog.json](catalog.json).
+**A fundação implementa EVAL-CFG-007, EVAL-CFG-009 apenas para o seam, e
+EVAL-CFG-024; os evals semânticos do CFG continuam planejados.** Metadados
+verificáveis em [catalog.json](catalog.json).
 
 ## EVAL-CFG-001 — Integridade da Publication
 
@@ -59,7 +60,10 @@ Oráculos upstream: O-66. Invariantes: INV-CFG-002, INV-CFG-003, INV-CFG-023, IN
 
 Registro de capability sintética por seam; duplicata rejeitada; fallback uma vez; não suportado não vira vazio.
 
-Oráculos upstream: O-47-STRUCT, O-48-STRUCT. Invariantes: INV-CFG-014, INV-CFG-022. Estado: `planned`.
+Oráculos upstream: O-47-STRUCT, O-48-STRUCT. A foundation prova composição,
+duplicata e ausência de suporte, sem alegar interpretação dos oráculos de controle.
+Invariantes: INV-CFG-014, INV-CFG-022. Estado: `implemented` para o seam, com
+evidência em [WORK-CFG-003](../work/history/WORK-CFG-003.md).
 
 ## EVAL-CFG-010 — Dispatch
 

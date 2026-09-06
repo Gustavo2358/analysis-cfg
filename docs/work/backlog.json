@@ -38,7 +38,7 @@
       "id": "BACKLOG-CFG-003",
       "title": "Fronteiras Clean e seam semântico de extensões",
       "phase": "foundation",
-      "status": "planned",
+      "status": "completed",
       "dependencies": [
         "BACKLOG-CFG-002"
       ],
@@ -48,7 +48,8 @@
         "EVAL-CFG-024"
       ],
       "path": "docs/work/backlog/BACKLOG-CFG-003.md",
-      "work_item": null
+      "work_item": "WORK-CFG-003",
+      "completion_evidence": "docs/work/history/WORK-CFG-003.md"
     },
     {
       "id": "BACKLOG-CFG-004",

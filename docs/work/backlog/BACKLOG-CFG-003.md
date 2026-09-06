@@ -1,6 +1,8 @@
 # BACKLOG-CFG-003 — Fronteiras Clean e seam semântico de extensões
 
-**Estado:** `planned`. **Fase:** `foundation`. **Autorização:** backlog não autoriza execução.
+**Estado:** `completed` em [WORK-CFG-003](../history/WORK-CFG-003.md). **Fase:**
+`foundation`. **Autorização executada:** implementação explicitamente autorizada em
+06/09/2026 somente para este checkpoint, até PR aberto sem merge.
 Dependências: BACKLOG-CFG-002.
 
 ## Problema e objetivo observável
@@ -49,6 +51,7 @@ reflection nem factories por conveniência. Perfis `@2` não renomeiam extensõe
 
 ## Evidência de conclusão
 
-Revisão/commit, diff explicado, testes/gates com exit codes, falsificação adversarial,
-capabilities/precisão realmente entregues e limitações. Até existir essa evidência,
-o estado permanece planejado e nenhum perfil recebe claim por antecipação.
+[WORK-CFG-003](../history/WORK-CFG-003.md) registra contrato compilado, 18 testes,
+gate arquitetural ampliado, RED → GREEN, falsificações e validação em Maven repo
+isolado. EVAL-CFG-009 foi implementado somente para o seam; nenhum CFG, capability
+de controle real ou perfil AIR foi declarado implementado.

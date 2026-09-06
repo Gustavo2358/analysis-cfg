@@ -2,6 +2,7 @@ package io.github.gustavo2358.analysis.cfg.application;
 
 import io.github.gustavo2358.air.model.Publication;
 import io.github.gustavo2358.air.validation.AirValidator;
+import io.github.gustavo2358.air.validation.ValidationOptions;
 import io.github.gustavo2358.air.validation.ValidationResult;
 
 /**
@@ -16,6 +17,12 @@ public final class CfgPreflight {
 
     public static ValidationResult validate(Publication publication) {
         return AirValidator.validate(publication);
+    }
+
+    public static ValidationResult validate(
+            Publication publication,
+            ValidationOptions options) {
+        return AirValidator.validate(publication, options);
     }
 
 }

@@ -27,19 +27,29 @@ AIR paralela dentro do CFG para contornar o fechamento.
 
 ## Seam antes dos handlers avançados
 
-BACKLOG-CFG-003 deve provar o seam sem implementar controle local real. O builder
-coordena; a interpretação de um terminador produz alternativas de controle tipadas:
-destino local, saída, fronteira aberta e, quando aplicável, ação/condição contextual.
-Não congelar o resultado de todo terminador como `List<LabelId>` incondicional.
+BACKLOG-CFG-003 implementa `SemanticInterpreter` como a identidade mínima de um
+intérprete por `Capabilities.Capability` e `SemanticInterpreterRegistry` como
+composição explícita, imutável e determinística. O coordinator consulta esse
+registry para capabilities requeridas e para antes de qualquer interpretação. A
+interface ainda não possui operação semântica: adicionar uma agora exigiria tipos
+de transição ou um callback genérico prematuros.
 
-Composition root injeta intérpretes compatíveis. Registro duplicado/conflitante é
-erro, não prioridade por ordem de inserção. Falta de intérprete usa envelope válido
-ou retorna incompatibilidade explícita; nunca `nop` nem lista vazia.
-Não carregar classes por texto vindo da fixture. Sem ServiceLoader dentro do core.
+Quando um slice semântico for autorizado, a interpretação de terminador produzirá
+alternativas tipadas como destino local, saída, fronteira aberta e, quando
+aplicável, ação/condição contextual. O contrato não está congelado como
+`List<LabelId>` incondicional.
 
-A forma concreta da interface CFG aguarda o work item de foundation: o teste arquitetural exigido é
-adicionar uma capability sintética de teste por extensão/registro sem modificar o
-orquestrador nem regras antigas. A sintética não vira capability normativa upstream.
+Composition root injeta intérpretes compatíveis. Registro duplicado/conflitante da
+mesma capability/version lança erro; versões distintas coexistem e a ordem de
+inserção não cria prioridade. Falta de intérprete retorna
+`UNSUPPORTED_CAPABILITY`; nenhum fallback está implementado neste checkpoint.
+Capability registrada não apaga diagnostics do `AirValidator`. Nunca `nop` nem
+lista vazia. Não carregar classes por texto vindo da fixture. Sem ServiceLoader
+dentro do core.
+
+EVAL-CFG-009 registra uma capability sintética somente em teste, injeta o registry
+no mesmo coordinator e prova duplicata e ausência de suporte. A sintética não vira
+constante de produção nem capability normativa upstream.
 
 ## Evolução conservadora
 

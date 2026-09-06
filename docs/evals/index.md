@@ -2,7 +2,8 @@
 
 [Catálogo](catalog.md) descreve intenção e estado; [metadados](catalog.json) permitem
 verificar referências. EVAL-CFG-007 e EVAL-CFG-024 possuem prova executável da
-fundação; os evals semânticos do CFG continuam planejados.
+boundary; EVAL-CFG-009 prova somente o seam de composição. Os evals semânticos do
+CFG continuam planejados.
 
 Rotas: [MVP](mvp-scenarios.md), [controle local](local-control.md),
 [metamorfismo](metamorphic.md), [perfis](profile-matrix.md),

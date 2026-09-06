@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build and inspect the narrow Java foundation with standard JDK/Maven evidence."""
+"""Build and inspect the exact Java foundation with standard JDK/Maven evidence."""
 
 from __future__ import annotations
 
@@ -26,28 +26,145 @@ AIR_REPOSITORY = "Gustavo2358/air-java"
 KERNEL_ARTIFACT = "cfg-kernel"
 PREFLIGHT_CLASS = "io.github.gustavo2358.analysis.cfg.application.CfgPreflight"
 PREFLIGHT_PATH = PREFLIGHT_CLASS.replace(".", "/")
+BUILD_CFG_CLASS = "io.github.gustavo2358.analysis.cfg.application.BuildCfg"
+BUILD_CFG_PATH = BUILD_CFG_CLASS.replace(".", "/")
+BUILD_OPTIONS_CLASS = "io.github.gustavo2358.analysis.cfg.application.BuildOptions"
+BUILD_OPTIONS_PATH = BUILD_OPTIONS_CLASS.replace(".", "/")
+BUILD_RESULT_CLASS = "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult"
+BUILD_RESULT_PATH = BUILD_RESULT_CLASS.replace(".", "/")
+COORDINATOR_CLASS = "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator"
+COORDINATOR_PATH = COORDINATOR_CLASS.replace(".", "/")
+INTERPRETER_CLASS = "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreter"
+INTERPRETER_PATH = INTERPRETER_CLASS.replace(".", "/")
+REGISTRY_CLASS = "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry"
+REGISTRY_PATH = REGISTRY_CLASS.replace(".", "/")
 PUBLICATION = "io.github.gustavo2358.air.model.Publication"
 VALIDATION_RESULT = "io.github.gustavo2358.air.validation.ValidationResult"
+VALIDATION_OPTIONS = "io.github.gustavo2358.air.validation.ValidationOptions"
 AIR_VALIDATOR = "io.github.gustavo2358.air.validation.AirValidator"
 PREFLIGHT_DESCRIPTOR = (
     "(Lio/github/gustavo2358/air/model/Publication;)"
     "Lio/github/gustavo2358/air/validation/ValidationResult;"
 )
-DEPENDENCY_PLUGIN = "org.apache.maven.plugins:maven-dependency-plugin:3.8.1"
-EXPECTED_PRODUCTION_SOURCE = (
-    "cfg-kernel/src/main/java/"
-    "io/github/gustavo2358/analysis/cfg/application/CfgPreflight.java"
+PREFLIGHT_OPTIONS_DESCRIPTOR = (
+    "(Lio/github/gustavo2358/air/model/Publication;"
+    "Lio/github/gustavo2358/air/validation/ValidationOptions;)"
+    "Lio/github/gustavo2358/air/validation/ValidationResult;"
 )
-EXPECTED_JDEPS_TARGETS = {
+BUILD_DESCRIPTOR = (
+    "(Lio/github/gustavo2358/air/model/Publication;"
+    "Lio/github/gustavo2358/analysis/cfg/application/BuildOptions;)"
+    "Lio/github/gustavo2358/analysis/cfg/application/CfgBuildResult;"
+)
+DEPENDENCY_PLUGIN = "org.apache.maven.plugins:maven-dependency-plugin:3.8.1"
+SOURCE_ROOT = "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/"
+EXPECTED_PRODUCTION_IMPORTS = {
+    SOURCE_ROOT + "application/BuildCfg.java": {PUBLICATION},
+    SOURCE_ROOT + "application/BuildOptions.java": {
+        VALIDATION_OPTIONS,
+        "java.util.Objects",
+    },
+    SOURCE_ROOT + "application/CfgBuildCoordinator.java": {
+        "io.github.gustavo2358.air.model.Capabilities",
+        PUBLICATION,
+        "io.github.gustavo2358.air.validation.ValidationIssue",
+        VALIDATION_RESULT,
+        REGISTRY_CLASS,
+        "java.util.Comparator",
+        "java.util.List",
+        "java.util.Objects",
+    },
+    SOURCE_ROOT + "application/CfgBuildResult.java": {
+        "io.github.gustavo2358.air.model.Capabilities",
+        "io.github.gustavo2358.air.model.Ids.PublicationId",
+        "io.github.gustavo2358.air.model.SemanticVersion",
+        VALIDATION_RESULT,
+        "java.util.List",
+        "java.util.Objects",
+    },
+    SOURCE_ROOT + "application/CfgPreflight.java": {
+        PUBLICATION,
+        AIR_VALIDATOR,
+        VALIDATION_OPTIONS,
+        VALIDATION_RESULT,
+    },
+    SOURCE_ROOT + "extension/SemanticInterpreter.java": {
+        "io.github.gustavo2358.air.model.Capabilities",
+    },
+    SOURCE_ROOT + "extension/SemanticInterpreterRegistry.java": {
+        "io.github.gustavo2358.air.model.Capabilities",
+        "java.util.Collection",
+        "java.util.Collections",
+        "java.util.Comparator",
+        "java.util.List",
+        "java.util.Map",
+        "java.util.Objects",
+        "java.util.Optional",
+        "java.util.TreeMap",
+    },
+}
+EXPECTED_CLASSFILES = {
+    BUILD_CFG_PATH + ".class",
+    BUILD_OPTIONS_PATH + ".class",
+    COORDINATOR_PATH + ".class",
+    BUILD_RESULT_PATH + ".class",
+    BUILD_RESULT_PATH + "$Status.class",
+    PREFLIGHT_PATH + ".class",
+    INTERPRETER_PATH + ".class",
+    REGISTRY_PATH + ".class",
+}
+EXPECTED_TEST_CASES = {
+    "io.github.gustavo2358.analysis.cfg.application.BuildCfgContractTest": 4,
+    "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinatorTest": 6,
+    "io.github.gustavo2358.analysis.cfg.application.CfgPreflightTest": 4,
+    "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistryTest": 4,
+}
+EXPECTED_PREFLIGHT_JDEPS_TARGETS = {
     PUBLICATION,
     VALIDATION_RESULT,
+    VALIDATION_OPTIONS,
     AIR_VALIDATOR,
     "java.lang.Object",
 }
-EXPECTED_PRODUCTION_IMPORTS = {PUBLICATION, VALIDATION_RESULT, AIR_VALIDATOR}
+ALLOWED_BYTECODE_PREFIXES = (
+    "io.github.gustavo2358.air.model.",
+    "io.github.gustavo2358.air.validation.",
+    "io.github.gustavo2358.analysis.cfg.application.",
+    "io.github.gustavo2358.analysis.cfg.extension.",
+    "java.lang.",
+    "java.util.",
+)
+FORBIDDEN_BYTECODE_PREFIXES = (
+    "java.io.",
+    "java.net.",
+    "java.nio.",
+    "java.lang.reflect.",
+    "java.util.ServiceLoader",
+)
+FORBIDDEN_BYTECODE_TYPES = {
+    "java.lang.ClassLoader",
+    "java.lang.System",
+}
+FORBIDDEN_AIR_PROJECTION_TYPES = {
+    "io.github.gustavo2358.air.model.Entries",
+    "io.github.gustavo2358.air.model.Instruction",
+    "io.github.gustavo2358.air.model.Operation",
+    "io.github.gustavo2358.air.model.Operations",
+    "io.github.gustavo2358.air.model.Operations$Return",
+    "io.github.gustavo2358.air.model.Sequence",
+    "io.github.gustavo2358.air.model.Terminator",
+    "io.github.gustavo2358.air.model.Unit",
+}
 IMPORT_PATTERN = re.compile(
     r"(?m)^\s*import\s+(?:static\s+)?([A-Za-z_$][\w$]*(?:\.[\w$*]+)+)\s*;"
 )
+FORBIDDEN_SOURCE_PATTERNS = {
+    "reflection/discovery": re.compile(
+        r"\b(?:Class\.forName|ServiceLoader|java\.lang\.reflect|"
+        r"getDeclaredConstructor|getDeclaredMethod|getDeclaredMethods)\b"
+    ),
+    "process/environment": re.compile(r"\bSystem\.(?:exit|getenv|getProperties|getProperty)\b"),
+}
 
 
 class GateFailure(RuntimeError):
@@ -72,6 +189,8 @@ def detector_self_test() -> None:
         "java.io.File",
         "java.net.URI",
         "java.nio.file.Path",
+        "java.lang.reflect.Method",
+        "java.util.ServiceLoader",
         "com.fasterxml.jackson.databind.JsonNode",
         "com.google.gson.JsonObject",
         "io.proleap.cobol.CobolParser",
@@ -79,29 +198,47 @@ def detector_self_test() -> None:
         "org.springframework.context.ApplicationContext",
         "picocli.CommandLine",
         "example.SemanticProductInput",
+        "local.BuildCfgInput",
     }
     for dependency in forbidden_dependencies:
         try:
-            exact(EXPECTED_JDEPS_TARGETS | {dependency}, EXPECTED_JDEPS_TARGETS,
-                  "synthetic dependency")
+            verify_bytecode_dependencies({BUILD_CFG_CLASS: {PUBLICATION, dependency}})
         except GateFailure:
             pass
         else:
             raise GateConfigurationError(f"bytecode detector self-test accepted {dependency}")
-        try:
-            exact(EXPECTED_PRODUCTION_IMPORTS | {dependency}, EXPECTED_PRODUCTION_IMPORTS,
-                  "synthetic production import")
-        except GateFailure:
-            pass
-        else:
-            raise GateConfigurationError(f"source detector self-test accepted {dependency}")
     try:
-        exact({PREFLIGHT_PATH + ".class", "local/Publication.class"},
-              {PREFLIGHT_PATH + ".class"}, "synthetic class inventory")
+        exact(EXPECTED_CLASSFILES | {"local/Publication.class"},
+              EXPECTED_CLASSFILES, "synthetic class inventory")
     except GateFailure:
         pass
     else:
         raise GateConfigurationError("detector self-test accepted a parallel model class")
+    try:
+        require_descriptor(
+            "descriptor: (Llocal/BuildCfgInput;)L" + BUILD_RESULT_PATH + ";",
+            BUILD_DESCRIPTOR,
+            "synthetic BuildCfg port",
+        )
+    except GateFailure:
+        pass
+    else:
+        raise GateConfigurationError("detector self-test accepted a local BuildCfg DTO")
+
+
+def require_descriptor(output: str, descriptor: str, label: str) -> None:
+    if "descriptor: " + descriptor not in output:
+        raise GateFailure(f"{label} descriptor mismatch; expected {descriptor}")
+
+
+def verify_bytecode_dependencies(observed: dict[str, set[str]]) -> None:
+    for source, targets in observed.items():
+        for target in targets:
+            if (target in FORBIDDEN_AIR_PROJECTION_TYPES
+                    or target in FORBIDDEN_BYTECODE_TYPES
+                    or target.startswith(FORBIDDEN_BYTECODE_PREFIXES)
+                    or not target.startswith(ALLOWED_BYTECODE_PREFIXES)):
+                raise GateFailure(f"forbidden bytecode dependency {source} -> {target}")
 
 def command_path(name: str) -> str:
     candidate = shutil.which(name)
@@ -198,18 +335,21 @@ def verify_project_shape(root: Path) -> None:
         if "target" not in path.relative_to(root).parts
         and "/src/main/java/" in "/" + path.relative_to(root).as_posix()
     )
-    production_sources = [path.relative_to(root).as_posix() for path in production_paths]
-    if production_sources != [EXPECTED_PRODUCTION_SOURCE]:
+    production_sources = {path.relative_to(root).as_posix() for path in production_paths}
+    if production_sources != set(EXPECTED_PRODUCTION_IMPORTS):
         raise GateFailure(
-            "foundation production source inventory must contain only CfgPreflight; observed "
-            + repr(production_sources)
+            "production source inventory mismatch; expected "
+            + repr(sorted(EXPECTED_PRODUCTION_IMPORTS))
+            + ", observed " + repr(sorted(production_sources))
         )
-    imports = {
-        imported
-        for path in production_paths
-        for imported in IMPORT_PATTERN.findall(path.read_text(encoding="utf-8"))
-    }
-    exact(imports, EXPECTED_PRODUCTION_IMPORTS, "foundation production imports")
+    for path in production_paths:
+        relative = path.relative_to(root).as_posix()
+        source = path.read_text(encoding="utf-8")
+        imports = IMPORT_PATTERN.findall(source)
+        exact(imports, EXPECTED_PRODUCTION_IMPORTS[relative], relative + " imports")
+        for label, pattern in FORBIDDEN_SOURCE_PATTERNS.items():
+            if pattern.search(source):
+                raise GateFailure(f"{relative} contains forbidden {label}")
 
     preview_files = list(root.glob("**/pom.xml")) + [
         root / ".mvn/jvm.config",
@@ -280,19 +420,31 @@ def count_tests(kernel: Path) -> tuple[int, int]:
     if not reports:
         raise GateFailure("no Surefire XML reports were produced")
     total = skipped = 0
+    observed: dict[str, int] = {}
     for report in reports:
         suite, _ = xml_root(report)
         try:
-            total += int(suite.attrib.get("tests", "0"))
-            skipped += int(suite.attrib.get("skipped", "0"))
+            suite_total = int(suite.attrib.get("tests", "0"))
+            suite_skipped = int(suite.attrib.get("skipped", "0"))
+            total += suite_total
+            skipped += suite_skipped
             failures = int(suite.attrib.get("failures", "0"))
             errors = int(suite.attrib.get("errors", "0"))
         except ValueError as exc:
             raise GateConfigurationError(f"invalid Surefire counts in {report}") from exc
         if failures or errors:
             raise GateFailure(f"Surefire report contains failures/errors: {report}")
+        suite_name = suite.attrib.get("name", "")
+        if not suite_name or suite_name in observed:
+            raise GateFailure(f"invalid/duplicate Surefire suite: {suite_name!r}")
+        observed[suite_name] = suite_total
     if total - skipped <= 0:
         raise GateFailure("Maven completed with no non-skipped tests executed")
+    if skipped:
+        raise GateFailure(f"required architecture tests cannot be skipped; observed {skipped}")
+    if observed != EXPECTED_TEST_CASES:
+        raise GateFailure(
+            f"required test inventory mismatch; expected {EXPECTED_TEST_CASES}, observed {observed}")
     return total, skipped
 
 
@@ -340,58 +492,94 @@ def read_air_classpath(path: Path) -> Path:
 
 def verify_class_inventory(kernel: Path) -> Path:
     classes = kernel / "target/classes"
-    relative_classes = sorted(path.relative_to(classes).as_posix() for path in classes.rglob("*.class"))
-    expected = PREFLIGHT_PATH + ".class"
-    if relative_classes != [expected]:
+    relative_classes = {path.relative_to(classes).as_posix() for path in classes.rglob("*.class")}
+    if relative_classes != EXPECTED_CLASSFILES:
         raise GateFailure(
-            "foundation production class inventory must contain only CfgPreflight; observed "
-            + repr(relative_classes)
+            "production class inventory mismatch; expected "
+            + repr(sorted(EXPECTED_CLASSFILES))
+            + ", observed " + repr(sorted(relative_classes))
         )
     shadows_root = kernel / "target/test-classes/io/github/gustavo2358/air"
     shadows = sorted(path.name for path in shadows_root.rglob("*.class")) if shadows_root.exists() else []
     if shadows:
         raise GateFailure("test classes shadow the shared air-java package: " + ", ".join(shadows))
-    classfile = classes / expected
-    try:
-        header = classfile.read_bytes()[:8]
-        magic, minor, major = struct.unpack(">IHH", header)
-    except (OSError, struct.error) as exc:
-        raise GateConfigurationError(f"cannot read classfile header: {exc}") from exc
-    if magic != 0xCAFEBABE or major != 65 or minor != 0:
-        raise GateFailure(f"CfgPreflight bytecode must be Java 21/no preview; observed major={major}, minor={minor}")
+    for relative in sorted(relative_classes):
+        try:
+            header = (classes / relative).read_bytes()[:8]
+            magic, minor, major = struct.unpack(">IHH", header)
+        except (OSError, struct.error) as exc:
+            raise GateConfigurationError(f"cannot read classfile header: {relative}: {exc}") from exc
+        if magic != 0xCAFEBABE or major != 65 or minor != 0:
+            raise GateFailure(
+                f"{relative} must be Java 21/no preview; observed major={major}, minor={minor}")
     return classes
 
 
 def verify_javap(javap: str, root: Path, classes: Path, air_jar: Path) -> None:
     classpath = os.pathsep.join((str(classes), str(air_jar)))
-    output = run(
+    port = run(
+        [javap, "-classpath", classpath, "-verbose", "-p", "-s", BUILD_CFG_CLASS],
+        root,
+        capture=True,
+    ).stdout or ""
+    if "minor version: 0" not in port or "major version: 65" not in port:
+        raise GateFailure("javap did not confirm BuildCfg Java 21 bytecode without preview")
+    if "public interface " + BUILD_CFG_CLASS not in port or "interfaces: 0, fields: 0, methods: 1" not in port:
+        raise GateFailure("BuildCfg must be a single-method public input port")
+    require_descriptor(port, BUILD_DESCRIPTOR, "BuildCfg")
+
+    coordinator = run(
+        [javap, "-classpath", classpath, "-p", "-s", COORDINATOR_CLASS],
+        root,
+        capture=True,
+    ).stdout or ""
+    if "implements " + BUILD_CFG_CLASS not in coordinator:
+        raise GateFailure("CfgBuildCoordinator must implement BuildCfg")
+    require_descriptor(coordinator, BUILD_DESCRIPTOR, "CfgBuildCoordinator.build")
+
+    interpreter = run(
+        [javap, "-classpath", classpath, "-p", "-s", INTERPRETER_CLASS],
+        root,
+        capture=True,
+    ).stdout or ""
+    if "public interface " + INTERPRETER_CLASS not in interpreter:
+        raise GateFailure("SemanticInterpreter must remain an explicit interface")
+    require_descriptor(
+        interpreter,
+        "()Lio/github/gustavo2358/air/model/Capabilities$Capability;",
+        "SemanticInterpreter.capability",
+    )
+
+    registry = run(
+        [javap, "-classpath", classpath, "-p", "-s", REGISTRY_CLASS],
+        root,
+        capture=True,
+    ).stdout or ""
+    require_descriptor(
+        registry,
+        "(Lio/github/gustavo2358/air/model/Capabilities$Capability;)Ljava/util/Optional;",
+        "SemanticInterpreterRegistry.find",
+    )
+
+    result = run(
+        [javap, "-classpath", classpath, "-p", "-s", BUILD_RESULT_CLASS],
+        root,
+        capture=True,
+    ).stdout or ""
+    for forbidden_member in (" graph(", " nodes(", " edges(", " isSuccess("):
+        if forbidden_member in result:
+            raise GateFailure("CfgBuildResult cannot expose a fabricated CFG product: " + forbidden_member.strip())
+
+    preflight = run(
         [javap, "-classpath", classpath, "-verbose", "-c", "-p", "-s", PREFLIGHT_CLASS],
         root,
         capture=True,
     ).stdout or ""
-    if "minor version: 0" not in output or "major version: 65" not in output:
-        raise GateFailure("javap did not confirm Java 21 bytecode without preview")
-    if "interfaces: 0, fields: 0, methods: 2" not in output:
-        raise GateFailure("CfgPreflight must contain zero fields and exactly two methods")
-    members = [line.strip() for line in re.findall(
-        r"(?m)^  (?:public|protected|private).+;$", output
-    )]
-    expected_members = [
-        f"private {PREFLIGHT_CLASS}();",
-        f"public static {VALIDATION_RESULT} validate({PUBLICATION});",
-    ]
-    if members != expected_members:
-        raise GateFailure(f"CfgPreflight member inventory drifted: {members}")
-    direct = re.compile(
-        r"public static .*? validate\(.*?Publication\);.*?"
-        + r"descriptor:\s+" + re.escape(PREFLIGHT_DESCRIPTOR) + r".*?"
-        + r"0:\s+aload_0\s+1:\s+invokestatic\s+#\d+\s+// Method "
-        + re.escape(AIR_VALIDATOR.replace(".", "/") + ".validate:" + PREFLIGHT_DESCRIPTOR)
-        + r"\s+4:\s+areturn",
-        re.DOTALL,
-    )
-    if not direct.search(output):
-        raise GateFailure("CfgPreflight is not an exact direct AirValidator delegation")
+    for descriptor in (PREFLIGHT_DESCRIPTOR, PREFLIGHT_OPTIONS_DESCRIPTOR):
+        require_descriptor(preflight, descriptor, "CfgPreflight.validate")
+        invocation = AIR_VALIDATOR.replace(".", "/") + ".validate:" + descriptor
+        if invocation not in preflight:
+            raise GateFailure("CfgPreflight is not a direct AirValidator delegation for " + descriptor)
 
 
 def verify_jdeps(jdeps: str, root: Path, classes: Path, air_jar: Path) -> None:
@@ -409,11 +597,31 @@ def verify_jdeps(jdeps: str, root: Path, classes: Path, air_jar: Path) -> None:
         root,
         capture=True,
     ).stdout or ""
-    targets = set(re.findall(
-        rf"(?m)^\s+{re.escape(PREFLIGHT_CLASS)}\s+->\s+(\S+)",
-        verbose,
-    ))
-    exact(targets, EXPECTED_JDEPS_TARGETS, "CfgPreflight bytecode dependencies")
+    dependencies: dict[str, set[str]] = {}
+    for source, target in re.findall(
+            r"(?m)^\s+(io\.github\.gustavo2358\.analysis\.cfg\.\S+)\s+->\s+(\S+)",
+            verbose):
+        dependencies.setdefault(source, set()).add(target)
+    expected_sources = {
+        BUILD_CFG_CLASS,
+        BUILD_OPTIONS_CLASS,
+        COORDINATOR_CLASS,
+        BUILD_RESULT_CLASS,
+        BUILD_RESULT_CLASS + "$Status",
+        PREFLIGHT_CLASS,
+        INTERPRETER_CLASS,
+        REGISTRY_CLASS,
+    }
+    if set(dependencies) != expected_sources:
+        raise GateFailure(
+            f"jdeps production class inventory mismatch; expected {sorted(expected_sources)}, "
+            f"observed {sorted(dependencies)}")
+    verify_bytecode_dependencies(dependencies)
+    exact(
+        dependencies[PREFLIGHT_CLASS],
+        EXPECTED_PREFLIGHT_JDEPS_TARGETS,
+        "CfgPreflight bytecode dependencies",
+    )
 
 
 def architecture_gate(root: Path) -> None:
@@ -444,13 +652,16 @@ def architecture_gate(root: Path) -> None:
         verify_javap(javap, root, classes, air_jar)
         verify_jdeps(jdeps, root, classes, air_jar)
 
-    print(f"[architecture] PASS: {total} tests ({skipped} skipped), 1 production classfile, "
+    print(f"[architecture] PASS: {total} tests ({skipped} skipped), "
+          f"{len(EXPECTED_CLASSFILES)} production classfiles, "
           f"Java class major 65/no preview (Maven runtime {runtime})", flush=True)
     print(f"[architecture] PASS: compile dependency {AIR_GROUP}:{AIR_ARTIFACT}:{AIR_VERSION} "
           "and JDK module java.base only", flush=True)
     print(f"[architecture] PASS: CI source pin {AIR_REPOSITORY}@{air_sha}", flush=True)
-    print("[architecture] PASS: shared Publication/ValidationResult boundary delegates to AirValidator",
-          flush=True)
+    print("[architecture] PASS: BuildCfg(Publication, BuildOptions) -> CfgBuildResult and direct "
+          "AirValidator preflight", flush=True)
+    print("[architecture] PASS: explicit capability/version registry; no transport, reflection, "
+          "frontend, AIR shadow, or CFG projection types", flush=True)
 
 
 def main() -> int:
