@@ -30,14 +30,16 @@ AIR paralela dentro do CFG para contornar o fechamento.
 BACKLOG-CFG-003 implementa `SemanticInterpreter` como a identidade mínima de um
 intérprete por `Capabilities.Capability` e `SemanticInterpreterRegistry` como
 composição explícita, imutável e determinística. O coordinator consulta esse
-registry para capabilities requeridas e para antes de qualquer interpretação. A
-interface ainda não possui operação semântica: adicionar uma agora exigiria tipos
-de transição ou um callback genérico prematuros.
+registry para capabilities requeridas antes da projeção core. A
+interface ainda não possui operação semântica: seu contrato de interpretação
+depende de um slice concreto de extensão, ainda posterior.
 
-Quando um slice semântico for autorizado, a interpretação de terminador produzirá
-alternativas tipadas como destino local, saída, fronteira aberta e, quando
-aplicável, ação/condição contextual. O contrato não está congelado como
-`List<LabelId>` incondicional.
+CFG-FIRST interpreta Return diretamente no core e usa transições tipadas
+ENTRY/RETURN; Return não é capability nem handler do registry. Registro identifica
+presença, não implementa interpretação: mesmo uma capability reconhecida pelo
+validator e registrada é recusada por UNSUPPORTED_INPUT se exigir semântica fora
+do slice. Destino local, fronteira aberta e ações contextuais de extensões continuam
+posteriores; o contrato não está congelado como `List<LabelId>` incondicional.
 
 Composition root injeta intérpretes compatíveis. Registro duplicado/conflitante da
 mesma capability/version lança erro; versões distintas coexistem e a ordem de

@@ -22,19 +22,21 @@ class CfgBuildCoordinatorTest {
             new Capabilities.Capability("test.synthetic-control", "7");
 
     @Test
-    void validBoundaryCanBePreparedWithoutReturnOrAnyCfgProduct() {
+    void completeZeroUnitInventoryProducesAnActuallyEmptyCfg() {
         Publication publication = AirPublications.valid();
         BuildOptions options = BuildOptions.defaults();
         BuildCfg buildCfg = new CfgBuildCoordinator(SemanticInterpreterRegistry.empty());
 
         CfgBuildResult result = buildCfg.build(publication, options);
 
-        assertEquals(CfgBuildResult.Status.READY_FOR_CFG_PROJECTION, result.status());
+        assertEquals(CfgBuildResult.Status.CFG_BUILT, result.status());
         assertEquals(publication.id(), result.publicationId());
         assertEquals(publication.airVersion(), result.airVersion());
         assertSame(options, result.options());
         assertEquals(AirValidator.validate(publication), result.preflight());
         assertEquals(List.of(), result.unsupportedCapabilities());
+        assertTrue(result.graph().orElseThrow().nodes().isEmpty());
+        assertSame(publication, result.graph().orElseThrow().publication());
     }
 
     @Test
@@ -47,6 +49,7 @@ class CfgBuildCoordinatorTest {
         CfgBuildResult result = buildCfg.build(publication, BuildOptions.defaults());
 
         assertEquals(CfgBuildResult.Status.INCOMPLETE_VALIDATION, result.status());
+        assertTrue(result.graph().isEmpty());
         assertEquals(List.of(), result.unsupportedCapabilities());
         assertTrue(result.preflight().issues().stream().anyMatch(
                 issue -> issue.kind() == ValidationIssue.Kind.UNSUPPORTED_CAPABILITY));
@@ -61,6 +64,7 @@ class CfgBuildCoordinatorTest {
         CfgBuildResult result = buildCfg.build(publication, BuildOptions.defaults());
 
         assertEquals(CfgBuildResult.Status.UNSUPPORTED_CAPABILITY, result.status());
+        assertTrue(result.graph().isEmpty());
         assertEquals(List.of(SYNTHETIC), result.unsupportedCapabilities());
         assertThrows(
                 UnsupportedOperationException.class,
@@ -77,6 +81,7 @@ class CfgBuildCoordinatorTest {
                 .build(publication, BuildOptions.defaults());
 
         assertEquals(CfgBuildResult.Status.INVALID_IR, result.status());
+        assertTrue(result.graph().isEmpty());
         assertEquals(AirValidator.validate(publication), result.preflight());
         assertTrue(result.preflight().issues().stream().anyMatch(
                 issue -> issue.kind() == ValidationIssue.Kind.INVALID_IR));
@@ -91,6 +96,7 @@ class CfgBuildCoordinatorTest {
                 .build(publication, options);
 
         assertEquals(CfgBuildResult.Status.VALIDATION_LIMIT, result.status());
+        assertTrue(result.graph().isEmpty());
         assertTrue(result.preflight().issues().stream().anyMatch(
                 issue -> issue.kind() == ValidationIssue.Kind.VALIDATION_LIMIT));
         assertEquals(
@@ -106,7 +112,7 @@ class CfgBuildCoordinatorTest {
         CfgBuildResult result = new CfgBuildCoordinator(SemanticInterpreterRegistry.empty())
                 .build(publication, BuildOptions.defaults());
 
-        assertEquals(CfgBuildResult.Status.READY_FOR_CFG_PROJECTION, result.status());
+        assertEquals(CfgBuildResult.Status.CFG_BUILT, result.status());
         assertTrue(result.preflight().issues().stream().anyMatch(
                 issue -> issue.kind() == ValidationIssue.Kind.SEMANTIC_OBLIGATION));
         assertEquals(AirValidator.validate(publication), result.preflight());

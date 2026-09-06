@@ -18,7 +18,12 @@ Mudança de literal de dados não é invariância universal: pode mudar um predi
 controle indireto. Aplicar só onde controle independe comprovadamente desse valor e
 a consulta é estrutural sem refinamento. Mutação Java não é relação metamórfica.
 
-Mutantes prioritários: remover FALSE, remover default, adicionar fallthrough após
+MR-CFG-01 está executável no domínio CFG-FIRST por EVAL-CFG-025, junto com
+permutação de Units/Entries e teste de inventário órfão. Isso não implementa o
+EVAL-CFG-014 inteiro. O mutante Return → próxima Sequence física foi morto pelo
+oracle independente.
+
+Mutantes prioritários posteriores: remover FALSE, remover default, adicionar fallthrough após
 halt, unir IDs de units, pular opaco, criar C1→resume direto, buscar porta abaixo do
 topo, ignorar underflow, descartar remaining ControlScope. A suíte deve matar cada
 mutante focalizado ou registrar uma lacuna, não maquiar score.

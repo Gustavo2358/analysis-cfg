@@ -3,7 +3,8 @@
 ## 1. Validar a baseline
 
 O repositório contém um harness revisado, a fundação Java/Maven de WORK-CFG-002 e a
-porta/seam de WORK-CFG-003. Antes de qualquer trabalho, confirme que a cópia local está íntegra
+porta/seam de WORK-CFG-003 e o CFG-FIRST de WORK-CFG-005. Antes de qualquer
+trabalho, confirme que a cópia local está íntegra
 e siga o work item ativo ou o próximo backlog explicitamente autorizado.
 
 ## 2. Validar o harness
@@ -18,9 +19,12 @@ próprio caminho. Resultado esperado: `PASS` em docs e harness. Depois de instal
 
 ```bash
 bash scripts/harness/check-architecture.sh
+bash scripts/harness/check-semantic.sh
 ```
 
-Esse gate deve executar 18 testes Java e verificar bytecode/dependências reais.
+Architecture executa 37 testes Java e verifica bytecode/dependências reais.
+Semantic seleciona os 19 testes obrigatórios de EVAL-CFG-025 e verifica seus nomes
+e resultados, falhando com ausência ou skip.
 
 ## 3. Abrir a rota de conhecimento
 
@@ -42,8 +46,9 @@ A criação desse cache não autoriza mudança da versão IR.
 
 `BuildCfg` recebe diretamente `io.github.gustavo2358.air.model.Publication` e
 `BuildOptions`; o coordinator delega o preflight a
-`io.github.gustavo2358.air.validation.AirValidator` e retorna `CfgBuildResult` sem
-fabricar um CFG. Consulte a
+`io.github.gustavo2358.air.validation.AirValidator` e retorna `CfgBuildResult`.
+No slice suportado, `CFG_BUILT` contém Entry/Sequence/NormalExit e transições
+ENTRY/RETURN; falhas não contêm grafo. Consulte a
 [estratégia do SNAPSHOT](docs/engineering/toolchain-and-modules.md) antes de rodar
 Maven em um checkout limpo.
 
@@ -53,6 +58,5 @@ Entradas de teste do CFG são **`air-java Publication`**, não
 memória.
 A diferença está no [estado upstream](docs/sources/upstream-state.md).
 
-Depois do review deste checkpoint, CFG-FIRST continua apenas planejado em
-`BACKLOG-CFG-005` e exige autorização própria. Não reutilize a autorização de
-WORK-CFG-003 nem avance automaticamente.
+CFG-FIRST implementa apenas Entry/Return. BACKLOG-CFG-022 (linear/jump/halt)
+continua planejado e exige autorização própria; não avance automaticamente.

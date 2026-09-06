@@ -162,7 +162,10 @@ class HarnessGuardTests(unittest.TestCase):
     def test_19_unavailable_never_passes(self):
         # `full` invokes `fast`, which contains this harness suite; exercise it at
         # the shell level instead of recursively from its own test process.
-        for gate in ('semantic', 'performance', 'integration'):
+        for gate in ('architecture', 'semantic', 'performance', 'integration'):
+            # Materialize the unavailable condition instead of assuming today's project state.
+            self.edit_json('docs/engineering/gate-state.json',
+                           lambda state: state['product_gates'][gate].update(status='unavailable', hook=None))
             with self.subTest(gate=gate), contextlib.redirect_stdout(io.StringIO()) as out:
                 self.assertEqual(3, run(gate, self.root))
                 self.assertIn('UNAVAILABLE', out.getvalue())

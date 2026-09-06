@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build and inspect the exact Java foundation with standard JDK/Maven evidence."""
+"""Build and inspect the exact Java CFG-FIRST surface with standard JDK/Maven evidence."""
 
 from __future__ import annotations
 
@@ -57,6 +57,7 @@ BUILD_DESCRIPTOR = (
     "Lio/github/gustavo2358/analysis/cfg/application/CfgBuildResult;"
 )
 DEPENDENCY_PLUGIN = "org.apache.maven.plugins:maven-dependency-plugin:3.8.1"
+DOMAIN_CLASS = "io.github.gustavo2358.analysis.cfg.domain."
 SOURCE_ROOT = "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/"
 EXPECTED_PRODUCTION_IMPORTS = {
     SOURCE_ROOT + "application/BuildCfg.java": {PUBLICATION},
@@ -103,6 +104,45 @@ EXPECTED_PRODUCTION_IMPORTS = {
         "java.util.TreeMap",
     },
 }
+# Deliberately enumerated CFG-FIRST additions; never discover/allow arbitrary sources.
+EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "application/CfgBuildCoordinator.java"].update({
+    DOMAIN_CLASS + "CfgFirstProjection", DOMAIN_CLASS + "CfgGraph", DOMAIN_CLASS + "CfgProjectionIssue",
+    "java.util.Optional",
+})
+EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "application/CfgBuildResult.java"].update({
+    DOMAIN_CLASS + "CfgGraph", DOMAIN_CLASS + "CfgProjectionIssue", "java.util.Optional",
+})
+EXPECTED_PRODUCTION_IMPORTS.update({
+    SOURCE_ROOT + "domain/CfgNodeId.java": {
+        "io.github.gustavo2358.air.model.Ids.PublicationId", "java.util.Objects",
+    },
+    SOURCE_ROOT + "domain/CfgNode.java": {
+        "io.github.gustavo2358.air.model.Entries", "io.github.gustavo2358.air.model.Ids.EntryId",
+        "io.github.gustavo2358.air.model.Ids.PublicationId", "io.github.gustavo2358.air.model.Ids.UnitId",
+        "io.github.gustavo2358.air.model.Sequence", "java.util.Objects",
+    },
+    SOURCE_ROOT + "domain/CfgTransition.java": {
+        "io.github.gustavo2358.air.model.Ids.EntryId", "java.util.Objects",
+    },
+    SOURCE_ROOT + "domain/CfgGraph.java": {
+        "io.github.gustavo2358.air.model.Operations", PUBLICATION, "java.util.HashMap",
+        "java.util.HashSet", "java.util.List", "java.util.Map", "java.util.Objects",
+    },
+    SOURCE_ROOT + "domain/CfgProjectionIssue.java": {
+        "io.github.gustavo2358.air.model.Ids.Id", "java.util.Objects",
+    },
+    SOURCE_ROOT + "domain/CfgFirstProjection.java": {
+        "io.github.gustavo2358.air.model.Entries", "io.github.gustavo2358.air.model.Evidence",
+        "io.github.gustavo2358.air.model.Ids.LabelId", "io.github.gustavo2358.air.model.Operations",
+        PUBLICATION, "io.github.gustavo2358.air.model.Sequence", "io.github.gustavo2358.air.model.Unit",
+        "java.util.ArrayList", "java.util.Comparator", "java.util.HashMap", "java.util.List", "java.util.Map",
+    },
+})
+CFG_CLASS_NAMES = {
+    "CfgNodeId", "CfgNode", "CfgNode$EntryNode", "CfgNode$SequenceNode", "CfgNode$NormalExit",
+    "CfgTransition", "CfgTransition$Kind", "CfgGraph", "CfgGraph$1",
+    "CfgProjectionIssue", "CfgProjectionIssue$Code", "CfgFirstProjection",
+}
 EXPECTED_CLASSFILES = {
     BUILD_CFG_PATH + ".class",
     BUILD_OPTIONS_PATH + ".class",
@@ -113,11 +153,13 @@ EXPECTED_CLASSFILES = {
     INTERPRETER_PATH + ".class",
     REGISTRY_PATH + ".class",
 }
+EXPECTED_CLASSFILES.update((DOMAIN_CLASS + name).replace(".", "/") + ".class" for name in CFG_CLASS_NAMES)
 EXPECTED_TEST_CASES = {
     "io.github.gustavo2358.analysis.cfg.application.BuildCfgContractTest": 4,
     "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinatorTest": 6,
     "io.github.gustavo2358.analysis.cfg.application.CfgPreflightTest": 4,
     "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistryTest": 4,
+    DOMAIN_CLASS + "EvalCfg025Test": 19,
 }
 EXPECTED_PREFLIGHT_JDEPS_TARGETS = {
     PUBLICATION,
@@ -131,6 +173,7 @@ ALLOWED_BYTECODE_PREFIXES = (
     "io.github.gustavo2358.air.validation.",
     "io.github.gustavo2358.analysis.cfg.application.",
     "io.github.gustavo2358.analysis.cfg.extension.",
+    DOMAIN_CLASS,
     "java.lang.",
     "java.util.",
 )
@@ -145,15 +188,10 @@ FORBIDDEN_BYTECODE_TYPES = {
     "java.lang.ClassLoader",
     "java.lang.System",
 }
-FORBIDDEN_AIR_PROJECTION_TYPES = {
-    "io.github.gustavo2358.air.model.Entries",
-    "io.github.gustavo2358.air.model.Instruction",
-    "io.github.gustavo2358.air.model.Operation",
-    "io.github.gustavo2358.air.model.Operations",
+# Return is the only concrete operation interpreted in CFG-FIRST.
+ALLOWED_OPERATION_TYPES = {
     "io.github.gustavo2358.air.model.Operations$Return",
-    "io.github.gustavo2358.air.model.Sequence",
-    "io.github.gustavo2358.air.model.Terminator",
-    "io.github.gustavo2358.air.model.Unit",
+    "io.github.gustavo2358.air.model.Operations$Header",
 }
 IMPORT_PATTERN = re.compile(
     r"(?m)^\s*import\s+(?:static\s+)?([A-Za-z_$][\w$]*(?:\.[\w$*]+)+)\s*;"
@@ -199,6 +237,8 @@ def detector_self_test() -> None:
         "picocli.CommandLine",
         "example.SemanticProductInput",
         "local.BuildCfgInput",
+        "io.github.gustavo2358.air.model.Operations$Jump",
+        "io.github.gustavo2358.air.model.Operations$Halt",
     }
     for dependency in forbidden_dependencies:
         try:
@@ -207,6 +247,12 @@ def detector_self_test() -> None:
             pass
         else:
             raise GateConfigurationError(f"bytecode detector self-test accepted {dependency}")
+    try:
+        verify_bytecode_dependencies({DOMAIN_CLASS + "CfgGraph": {BUILD_CFG_CLASS}})
+    except GateFailure:
+        pass
+    else:
+        raise GateConfigurationError("detector accepted domain -> application")
     try:
         exact(EXPECTED_CLASSFILES | {"local/Publication.class"},
               EXPECTED_CLASSFILES, "synthetic class inventory")
@@ -234,7 +280,11 @@ def require_descriptor(output: str, descriptor: str, label: str) -> None:
 def verify_bytecode_dependencies(observed: dict[str, set[str]]) -> None:
     for source, targets in observed.items():
         for target in targets:
-            if (target in FORBIDDEN_AIR_PROJECTION_TYPES
+            if ((target.startswith("io.github.gustavo2358.air.model.Operations$")
+                     and target not in ALLOWED_OPERATION_TYPES)
+                    or (source.startswith(DOMAIN_CLASS) and target.startswith((
+                        "io.github.gustavo2358.analysis.cfg.application.",
+                        "io.github.gustavo2358.analysis.cfg.extension.")))
                     or target in FORBIDDEN_BYTECODE_TYPES
                     or target.startswith(FORBIDDEN_BYTECODE_PREFIXES)
                     or not target.startswith(ALLOWED_BYTECODE_PREFIXES)):
@@ -393,8 +443,13 @@ def verify_snapshot_pin(root: Path) -> str:
         raise GateFailure("CI must not resolve air-java from a mutable branch")
     if f'test "$(git rev-parse HEAD)" = "{sha}"' not in workflow:
         raise GateFailure("CI must verify air-java HEAD before installation")
-    if workflow.count("MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2") != 2:
+    if workflow.count("MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2") != 3:
         raise GateFailure("CI must share one isolated Maven repository across upstream and consumer")
+    if 'distribution: temurin' not in workflow or 'java-version: "21"' not in workflow:
+        raise GateFailure("CI must use Temurin 21")
+    for gate in ("fast", "architecture", "semantic"):
+        if f"bash scripts/harness/check-{gate}.sh" not in workflow:
+            raise GateFailure("CI must execute " + gate)
     return sha
 
 
@@ -566,9 +621,9 @@ def verify_javap(javap: str, root: Path, classes: Path, air_jar: Path) -> None:
         root,
         capture=True,
     ).stdout or ""
-    for forbidden_member in (" graph(", " nodes(", " edges(", " isSuccess("):
-        if forbidden_member in result:
-            raise GateFailure("CfgBuildResult cannot expose a fabricated CFG product: " + forbidden_member.strip())
+    require_descriptor(result, "()Ljava/util/Optional;", "CfgBuildResult.graph")
+    if "java.util.Optional<" + DOMAIN_CLASS + "CfgGraph> graph()" not in result:
+        raise GateFailure("CfgBuildResult must expose the real typed optional CFG product")
 
     preflight = run(
         [javap, "-classpath", classpath, "-verbose", "-c", "-p", "-s", PREFLIGHT_CLASS],
@@ -612,6 +667,7 @@ def verify_jdeps(jdeps: str, root: Path, classes: Path, air_jar: Path) -> None:
         INTERPRETER_CLASS,
         REGISTRY_CLASS,
     }
+    expected_sources.update(DOMAIN_CLASS + name for name in CFG_CLASS_NAMES)
     if set(dependencies) != expected_sources:
         raise GateFailure(
             f"jdeps production class inventory mismatch; expected {sorted(expected_sources)}, "
@@ -661,7 +717,7 @@ def architecture_gate(root: Path) -> None:
     print("[architecture] PASS: BuildCfg(Publication, BuildOptions) -> CfgBuildResult and direct "
           "AirValidator preflight", flush=True)
     print("[architecture] PASS: explicit capability/version registry; no transport, reflection, "
-          "frontend, AIR shadow, or CFG projection types", flush=True)
+          "frontend, AIR shadow, or control primitives beyond Return", flush=True)
 
 
 def main() -> int:

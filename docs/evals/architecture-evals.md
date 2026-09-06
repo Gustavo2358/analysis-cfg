@@ -2,9 +2,9 @@
 
 ## Dependências
 
-Na fundação atual, EVAL-CFG-007 prova que as sete fontes produtivas autorizadas
+Na superfície atual, EVAL-CFG-007 prova que as 13 fontes produtivas autorizadas
 dependem apenas de `air-java`/`java.base`, sem modelo ou validator AIR duplicado,
-transporte, frontend ou discovery reflexiva. O inventário exato de oito classfiles
+transporte, frontend ou discovery reflexiva. O inventário exato de 20 classfiles
 rejeita expansão silenciosa. O build usa Java 21 sem preview; `BuildCfg` recebe a
 `Publication` do `air-java`, e o preflight continua delegando ao `AirValidator`.
 
@@ -37,13 +37,15 @@ não rastreada para fingir independência.
 
 ## O que existe hoje
 
-O gate `architecture` executa build e 18 testes obrigatórios, exige inventário
+O gate `architecture` executa build e 37 testes obrigatórios, exige inventário
 Surefire exato, inspeciona classfiles/dependency tree/classpath e confirma as
 assinaturas e chamadas com `javap`/`jdeps`. Fixtures e mutações reais exercitam
 filesystem, AIR paralela, DTO local, reflection/`ServiceLoader`, frontend e falso
 sucesso para unsupported. Isso preserva EVAL-CFG-007/EVAL-CFG-024 e implementa
-EVAL-CFG-027 como prova arquitetural local. EVAL-CFG-008/009/020 e todas as provas
-semânticas do builder permanecem planejadas.
+EVAL-CFG-027 como prova arquitetural local. O gate passou a enumerar os tipos CFG
+e a proibir dependências domain → application/extension e primitives além de
+Return. EVAL-CFG-025 executa 19 testes semânticos; EVAL-CFG-008/009/020 permanecem
+planejados.
 
 EVAL-CFG-026 reserva o micro-E2E externo `cobol-semantic-product.json` →
 `cobol-lower` → `air-java Publication` → CFG-FIRST. O lowerer não importa o port

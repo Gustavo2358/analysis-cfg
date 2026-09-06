@@ -12,7 +12,7 @@ BuildCfg.build(air-java Publication, BuildOptions) → CfgBuildResult
 `Publication` é exatamente `io.github.gustavo2358.air.model.Publication`, do
 artefato `io.github.gustavo2358:air-java`. A porta não define DTO/modelo semântico
 concorrente e não aceita `Path`, `InputStream`, bytes, JSON, COBOL Semantic Product,
-AST ou source code. No checkpoint de foundation, `BuildOptions` contém apenas
+AST ou source code. `BuildOptions` continua contendo apenas
 `ValidationOptions`, política operacional já executada pelo preflight; não possui
 flags de dialeto, inferência, fallthrough ou suporte presumido. A Publication
 inteira cruza a porta, sem pressupor Entry única. Seleção de entries só será
@@ -20,11 +20,19 @@ adicionada quando um caso de uso concreto exigir. O resultado é tipado, imutáv
 não contém callback para completar fatos.
 
 `CfgBuildResult` registra `PublicationId`, versão AIR, options, o
-`ValidationResult` integral e capabilities requeridas sem intérprete. Seus estados
-são `READY_FOR_CFG_PROJECTION`, `INVALID_IR`, `UNSUPPORTED_CAPABILITY`,
-`VALIDATION_LIMIT` e `INCOMPLETE_VALIDATION`. O primeiro significa somente que um
-slice futuro pode iniciar projeção: não existe campo CFG, nó, aresta ou booleano de
-sucesso. `CfgBuildCoordinator` implementa a porta e para nessa boundary.
+`ValidationResult` integral, capabilities requeridas sem intérprete, issues tipados
+da projeção e `Optional<CfgGraph>`. `CFG_BUILT` exige produto presente;
+`INVALID_IR`, `UNSUPPORTED_CAPABILITY`, `UNSUPPORTED_INPUT`, `VALIDATION_LIMIT` e
+`INCOMPLETE_VALIDATION` exigem ausência de grafo. O antigo
+`READY_FOR_CFG_PROJECTION` foi removido. O construtor rejeita envelope com produto
+em falha ou com metadata/preflight incompatíveis. `CfgBuildCoordinator` delega a
+regra mínima ao domínio após preflight.
+
+`UNSUPPORTED_INPUT` identifica terminador diferente de Return, instructions, body
+indisponível, inventário parcial/indisponível ou necessidade de semântica de extensão
+ainda ausente. Seus subjects são IDs AIR; não opcodes textuais. Uma publicação
+com inventário completo e zero Units produz um inventário CFG realmente vazio,
+sem servir como placeholder para publicação desconhecida ou recusada.
 
 O caller pode ser teste, módulo de integração, CLI ou adapter. Todos entregam o
 mesmo objeto semântico à mesma porta.
@@ -88,8 +96,10 @@ disfarçar falha. A ausência do binding não bloqueia o core em memória.
 `Publication` é snapshot imutável compartilhado. O CFG não faz deep copy O(N) por
 padrão; pode reter referências/IDs AIR e manter índices derivados próprios.
 `CfgBuildResult` já registra `PublicationId`, versão/revisão, opções e preflight.
-Correlações de Unit/Entry/Sequence/Operation/Origin surgirão somente com produto
-CFG pertinente. Nenhum índice muda a AIR. Não há consulta lazy ao produtor nem
+`CfgGraph` retém exatamente a Publication original; EntryNode/SequenceNode
+retêm os objetos AIR originais, incluindo IDs, operands, origins e metadata.
+NormalExit sintético registra PublicationId/UnitId/EntryId sem fabricar origem.
+Nenhum índice muda a AIR. Não há consulta lazy ao produtor nem
 dependência de um arquivo continuar aberto.
 
 ## Portas de saída

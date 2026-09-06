@@ -408,7 +408,7 @@
     {
       "id": "EVAL-CFG-025",
       "title": "CFG-FIRST — Entry, Return e normal exit",
-      "status": "planned",
+      "status": "implemented",
       "expectation": "Uma air-java Publication válida em memória projeta Entry/initialLabel para um nó da Sequence terminada por Return e para normal exit correlacionado por Publication, Unit e Entry scope. Missing label ou terminador ausente não são reparados; Return não cai na Sequence fisicamente seguinte; permutação não muda transições; Sequence sem predecessor permanece inventariada. CFG-FIRST não implementa Halt.",
       "upstream_oracles": [
         "O-18-STRUCT",
@@ -425,7 +425,7 @@
         "INV-CFG-023",
         "INV-CFG-026"
       ],
-      "implementation_evidence": null
+      "implementation_evidence": "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg025Test.java"
     },
     {
       "id": "EVAL-CFG-026",

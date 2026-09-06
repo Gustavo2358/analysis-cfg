@@ -1,7 +1,7 @@
 # Catálogo de evals
 
 **A fundação implementa EVAL-CFG-007, EVAL-CFG-024 e o eval local
-EVAL-CFG-027; os evals semânticos do CFG continuam planejados.** Metadados
+EVAL-CFG-027; EVAL-CFG-025 implementa CFG-FIRST, sem outros terminadores.** Metadados
 verificáveis em [catalog.json](catalog.json).
 
 ## EVAL-CFG-001 — Integridade da Publication
@@ -186,7 +186,9 @@ builder. `CFG-FIRST` não implementa `Halt`.
 
 Oráculos upstream: O-18-STRUCT, O-30-STRUCT. Invariantes:
 INV-CFG-003, INV-CFG-004, INV-CFG-005, INV-CFG-006, INV-CFG-008, INV-CFG-019,
-INV-CFG-021, INV-CFG-023, INV-CFG-026. Estado: `planned`.
+INV-CFG-021, INV-CFG-023, INV-CFG-026. Estado: `implemented`, com 19 testes em
+[EvalCfg025Test](../../cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg025Test.java)
+e seleção obrigatória no semantic gate.
 
 ## EVAL-CFG-026 — E2E mínimo Semantic Product → AIR → CFG
 

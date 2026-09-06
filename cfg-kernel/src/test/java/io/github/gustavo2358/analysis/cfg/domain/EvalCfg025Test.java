@@ -300,6 +300,70 @@ class EvalCfg025Test {
         assertEquals(minimalExpected(), observe(graph));
     }
 
+    @Test
+    void entryCollectionOrderCannotChooseTheActivationOrItsInitialLabel() {
+        EntryId second = new EntryId(U, "A-second");
+        LabelId other = new LabelId(U, "other");
+        var entries = List.of(entry(E, L), entry(second, other));
+        var sequences = List.of(returning(L), returning(other));
+        CfgGraph first = graph(publication(List.of(unit(U, entries, sequences))));
+        CfgGraph reversed = graph(publication(List.of(unit(U, entries.reversed(), sequences))));
+        assertEquals(first.nodes(), reversed.nodes());
+        assertEquals(first.transitions(), reversed.transitions());
+        assertEquals(Set.of(entering(E, L), entering(second, other)),
+                observe(first).transitions().stream().filter(edge -> edge.kind() == CfgTransition.Kind.ENTRY)
+                        .collect(java.util.stream.Collectors.toSet()));
+    }
+
+    @Test
+    void unavailableInventoryIsNotACompleteEmptyGraph() {
+        UncertaintyId gap = new UncertaintyId(P, "inventory-gap");
+        Scopes.PublicationScope scope = new Scopes.PublicationScope(P);
+        Publication base = publication(List.of());
+        for (Evidence.InventoryStatus inventory : List.of(Evidence.InventoryStatus.PARTIAL,
+                Evidence.InventoryStatus.UNAVAILABLE)) {
+            Publication publication = new Publication(P, base.airVersion(), base.capabilities(), base.artifacts(),
+                    base.units(), base.storage(), base.resources(), base.artifactRelations(), base.origins(),
+                    new Evidence.Coverage(inventory, scope, List.of(), List.of(gap)),
+                    List.of(new Evidence.Uncertainty(gap, "INPUT_MISSING", List.of(Evidence.Dimension.CONTROL),
+                            scope, "inventory not available", ORIGIN)), List.of());
+            assertUnsupported(publication, CfgProjectionIssue.Code.INCOMPLETE_INVENTORY, P);
+        }
+    }
+
+    @Test
+    void unavailableUnitBodyIsNotInvented() {
+        UncertaintyId gap = new UncertaintyId(P, "body-gap");
+        Unit unit = new Unit(U, Optional.empty(), List.of(), List.of(),
+                List.of(new Entries.Entry(E, Optional.empty(), entry(E, L).signature(),
+                        entry(E, L).state(), ORIGIN)), List.of(), List.of(), Unit.BodyAvailability.UNAVAILABLE,
+                Optional.of(gap), coverage(new Scopes.UnitScope(U)), ORIGIN);
+        Publication base = publication(List.of(unit));
+        Publication publication = new Publication(P, base.airVersion(), base.capabilities(), base.artifacts(),
+                base.units(), base.storage(), base.resources(), base.artifactRelations(), base.origins(),
+                base.coverage(), List.of(new Evidence.Uncertainty(gap, "INPUT_MISSING",
+                        List.of(Evidence.Dimension.CONTROL), new Scopes.UnitScope(U), "body unavailable", ORIGIN)),
+                List.of());
+        assertUnsupported(publication, CfgProjectionIssue.Code.BODY_UNAVAILABLE, U);
+    }
+
+    @Test
+    void registeredCapabilityIdentityAloneDoesNotImplementItsSemantics() {
+        Publication base = minimal();
+        var capability = Capabilities.LOCAL_CONTROL;
+        Publication publication = new Publication(P, base.airVersion(),
+                new Capabilities.Manifest(List.of(capability), List.of(capability)), base.artifacts(), base.units(),
+                base.storage(), base.resources(), base.artifactRelations(), base.origins(),
+                base.coverage(), base.uncertainties(), base.premises());
+        assertEquals(ValidationResult.Status.STRUCTURALLY_VALID, AirValidator.validate(publication).status());
+        CfgBuildResult result = new CfgBuildCoordinator(SemanticInterpreterRegistry.of(List.of(() -> capability)))
+                .build(publication, BuildOptions.defaults());
+        assertEquals(CfgBuildResult.Status.UNSUPPORTED_INPUT, result.status());
+        assertTrue(result.graph().isEmpty());
+        assertEquals(List.of(new CfgProjectionIssue(CfgProjectionIssue.Code.EXTENSION_SEMANTICS_OUTSIDE_SLICE, P)),
+                result.projectionIssues());
+    }
+
     private static void assertUnsupported(Publication publication, CfgProjectionIssue.Code code, Id subject) {
         assertEquals(ValidationResult.Status.STRUCTURALLY_VALID, AirValidator.validate(publication).status());
         CfgBuildResult result = build(publication);

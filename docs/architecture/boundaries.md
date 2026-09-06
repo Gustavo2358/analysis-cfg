@@ -50,7 +50,9 @@ Mudança de localização de Maven modules não dispensa as mesmas provas.
 O gate atual verifica `--release 21`, dependência do kernel em `air-java`,
 inventário exato de todas as classes produtivas, ausência de tipos AIR locais, uso
 de `AirValidator`, assinatura bytecode da porta e ausência de filesystem, frontend,
-reflection/`ServiceLoader` e tipos de projeção CFG. Mutabilidade ou deep copy da AIR
+reflection/`ServiceLoader`; a superfície domain CFG é enumerada explicitamente,
+inclusive tipos aninhados, e não pode depender de application/extension.
+Mutabilidade ou deep copy da AIR
 é testada semanticamente; não se infere apenas da estrutura de packages.
 
 Interfaces por hábito não garantem Clean Architecture. Evitar repositories vazios,

@@ -7,16 +7,16 @@
 | `check-docs.sh` | executável | links locais, IDs, manifestos, lifecycle, DAG do backlog, source lock e fase |
 | `check-harness.sh` | executável | testes adversariais do próprio validador e runner |
 | `check-fast.sh` | executável | docs + harness |
-| `check-architecture.sh` | executável | Maven/testes, dependências, bytecode Java 21 e boundary `air-java` |
-| `check-semantic.sh` | UNAVAILABLE | futuros oráculos do CFG |
+| `check-architecture.sh` | executável | Maven/testes, inventários exatos, dependências, bytecode Java 21 e boundary `air-java` |
+| `check-semantic.sh` | executável | 19 testes obrigatórios de EVAL-CFG-025, por suíte e nomes exatos |
 | `check-performance.sh` | UNAVAILABLE | futuras propriedades algorítmicas/escala |
 | `check-integration.sh` | UNAVAILABLE | futuro arquivo→porta e equivalência em memória |
-| `check-full.sh` | UNAVAILABLE | roda os gates em ordem e para no primeiro gate de produto ainda indisponível |
+| `check-full.sh` | UNAVAILABLE | executa fast, architecture e semantic; para em performance com exit 3 |
 
 Todos estão em `scripts/harness/`; usar `bash scripts/harness/check-fast.sh` funciona
-mesmo se a extração não conservar permissões. O gate de arquitetura também requer
-Maven e JDK 21+ e que o SNAPSHOT pinado de `air-java` esteja no repositório Maven.
-O CI usa exatamente JDK 21.
+mesmo se a extração não conservar permissões. Architecture e semantic requerem
+Maven, JDK 21+ e `air-java` instalado do SHA fixado em repo Maven isolado.
+O CI usa Temurin 21 e o mesmo repo isolado para upstream, architecture e semantic.
 `PYTHON_BIN` seleciona um executável alternativo, sem permitir shell command arbitrário.
 
 Exit codes: `0=PASS`, `1=FAIL`, `2=erro de uso/configuração`, `3=UNAVAILABLE`.
@@ -26,50 +26,61 @@ Qualquer não zero impede anunciar o gate como verde. Skip de gate obrigatório 
 ## Estado explícito
 
 [gate-state.json](gate-state.json) declara fase `implementation`, autorização
-`WORK-CFG-003` e hook real para `architecture`. Semantic, performance e integration
-continuam sem hook. O checker prova consistência local, não a veracidade de
-autorização humana.
+`WORK-CFG-005` e hooks reais para architecture/semantic em `scripts/project/`.
+Performance e integration continuam sem hook. O checker prova consistência local,
+não a veracidade de autorização humana.
 
-Gates de produto só se tornam disponíveis quando o slice correspondente cria hook
-real em `scripts/project/`. Hooks têm caminho exato,
-sem `eval` de comando vindo de metadados. Versões Maven/JUnit ficam fixadas; ausência
-de testes, perfil inexistente ou suite excluída deve falhar. Não habilitar gate com
-script que imprime PASS ou faz `exit 0` sem executar a verificação.
+Hooks têm caminho exato, sem `eval` de comando vindo de metadados. Versões
+Maven/JUnit ficam fixadas; ausência de testes, perfil inexistente ou suíte excluída
+falha. Não habilitar gate com script que imprime PASS sem executar verificação.
 
-O gate de arquitetura prova no build/bytecode real deste checkpoint:
+## Arquitetura
 
-- Java target 21, sem preview;
-- nenhum package/classe AIR duplicado em `analysis-cfg`;
-- kernel depende exclusivamente de `air-java` em compile e `BuildCfg` recebe sua
-  `Publication` com `BuildOptions`, retornando `CfgBuildResult`;
-- kernel sem Jackson, filesystem, CLI, ProLeap, ANTLR ou COBOL Semantic Product;
-- AIR JSON reader fora do kernel;
-- produto CFG não muta a AIR;
-- `AirValidator` usado no preflight, sem validator AIR local divergente;
-- registry explícito usa `Capabilities.Capability`, rejeita duplicata e não descobre
-  plugins por reflection/`ServiceLoader`;
-- nenhuma classe produtiva depende de `Entry`, `Sequence`, `Operation`,
-  `Instruction`, `Terminator` ou `Return` neste checkpoint;
-- suíte falha quando executa zero casos.
+O hook executa Maven com clean/test, exige cinco suítes e 37 testes sem skip,
+inspeciona inventários exatos de 13 fontes e 20 classfiles (incluindo tipos
+aninhados/sintéticos), major 65/minor 0, árvore de dependências, classpath,
+`javap` e `jdeps`. Guardas de imports complementam a inspeção de bytecode.
+Continua provando:
 
-O hook executa Maven, exige exatamente as quatro suites e 18 testes obrigatórios
-sem skip, lê o inventário exato de oito classfiles, confere major 65/minor sem
-preview, inspeciona árvore/classpath, executa `javap` e `jdeps`, valida descritores
-da porta/preflight/registry, aplica guarda complementar aos imports produtivos e
-roda fixtures internas negativas do detector. O gate não afirma semântica CFG.
+- Java 21 sem preview; dependência externa compile somente `air-java`;
+- `BuildCfg(Publication, BuildOptions) → CfgBuildResult`, com Publication compartilhada;
+- `CfgPreflight` delega diretamente a `AirValidator`, sem validator/modelo AIR local;
+- nenhuma dependência de filesystem, JSON, CLI, rede, frontend, reflection ou ServiceLoader;
+- tipos CFG no namespace próprio e domain sem dependência de application/extension;
+- registry por capability/version preservado e Return tratado diretamente como core;
+- nenhuma primitive concreta além de Return em produção;
+- CI fixa/verifica o SHA e executa fast, architecture e semantic em Temurin 21.
 
-## Escalonamento
+Fixtures internas negativas incluem I/O, frontend, DTO local, AIR paralela,
+reflection/ServiceLoader, domain → application, Jump e Halt. Classes adicionadas ou
+removidas exigem evolução deliberada do inventário. Retenção/imutabilidade são
+provadas também nos testes semânticos, não inferidas apenas de packages.
 
-Documentação/harness: fast. Fundação da boundary: architecture. Código futuro de
-modelo/domínio CFG: architecture + semantic.
-Adapters/composição: acrescentar integration. Mudança algorítmica/escala: performance.
-Encerramento de marco implementado: full, com todas suites realmente disponíveis.
-Enquanto um gate requerido não existe, criar evidência/gate adequado no checkpoint;
-não promover status fictício para concluir o trabalho.
+## Semântica
 
-## Limites dos gates atuais
+`check_semantic.py` executa `clean test` selecionando exatamente
+`io.github.gustavo2358.analysis.cfg.domain.EvalCfg025Test`. Confere o único relatório
+Surefire, os 19 nomes obrigatórios, contagens e ausência de failure/error/skip,
+inclusive em cada testcase. Não é um alias para `mvn test` inteiro.
+O detector rejeita 25 relatórios adversariais, incluindo zero casos, cada obrigação
+ausente, duplicata, suíte errada e skip/failure/error.
 
-O gate documental não valida semântica IR. O gate arquitetural valida a boundary
-compilada, mas não soundness, algoritmo CFG, mutação semântica, direitos de acesso,
-URLs remotas, merge de PR ou completude real do backlog. São guardas
-complementares ao review e aos futuros testes semânticos.
+A suíte prova Entry/initialLabel, Sequence, Return/normal exit por Unit/Entry,
+referência inválida rejeitada, terminador ausente não construível, ausência de
+fallthrough, invariância por permutação, órfãs, IDs próprios e imutabilidade.
+Prova também recusa de Jump/Halt/instructions, capability sem suporte e formas
+indisponíveis, sem implementar sua semântica.
+
+O gate semântico declara somente CFG-FIRST. EVAL-CFG-001 e EVAL-CFG-009 continuam
+planned; nenhum perfil AIR completo é reivindicado.
+
+## Escalonamento e limites
+
+Documentação/harness: fast. Código do kernel: architecture + semantic.
+Adapters/composição acrescentarão integration; propriedades de escala exigirão
+performance. Full deve ser executado e seu primeiro gate indisponível reportado,
+sem promover status fictício para concluir um slice.
+
+Gates offline não provam merge, CI remota, completude de backlog ou conformidade
+bilateral de produtores. Os resultados são complementares ao review humano e
+restritos às obrigações realmente executadas.
