@@ -2,13 +2,12 @@
 
 ## Dependências
 
-EVAL-CFG-007 prova no bytecode disponível que domain não depende de
-application/adapters, application não depende de adapters/launcher e kernel depende
-do artefato `air-java`, sem modelo/validator AIR duplicado. Testes detectam tipos de
-infraestrutura, ProLeap/ANTLR/Semantic Product, JSON/filesystem/CLI em assinaturas,
-annotations e generics. JDK I/O continua proibido no núcleo. O build usa Java 21 sem
-preview e o preflight recebe a `Publication` do `air-java`. As regras já abrangem
-packages futuros, embora o único production class atual seja `CfgPreflight`.
+Na fundação atual, EVAL-CFG-007 prova que a única classe produtiva,
+`CfgPreflight`, depende apenas de `air-java`/`java.base`, sem modelo ou validator AIR
+duplicado e sem transporte ou frontend. O inventário exato rejeita qualquer segunda
+fonte/classe produtiva; packages futuros exigirão evolução deliberada do gate para
+provar as relações entre camadas quando elas existirem. O build usa Java 21 sem
+preview e o preflight recebe a `Publication` do `air-java`.
 
 ## Substituição
 
@@ -36,10 +35,12 @@ não rastreada para fingir independência.
 
 O gate `architecture` executa build e quatro testes, exige Surefire não vazio,
 inspeciona classfiles/dependency tree/classpath e confirma a chamada exata a
-`AirValidator` com `javap` e `jdeps`. Seus fixtures negativos exercitam todas as
-classes de proibição; uma mutação real com filesystem também foi observada RED no
-WORK-CFG-002. Isso implementa EVAL-CFG-007 e EVAL-CFG-024 somente para a fundação.
-EVAL-CFG-008/009/020 e as provas do builder permanecem planejadas.
+`AirValidator` com `javap` e `jdeps`. Fixtures negativas exercitam representantes de
+filesystem, Jackson, Gson, ProLeap, ANTLR, Semantic Product e classe extra; o
+inventário exato complementa essa amostra rejeitando expansão produtiva. Uma mutação
+real com filesystem também foi observada RED no WORK-CFG-002. Isso implementa
+EVAL-CFG-007 e EVAL-CFG-024 somente para a fundação. EVAL-CFG-008/009/020 e as
+provas do builder permanecem planejadas.
 
 EVAL-CFG-026 reserva o micro-E2E externo `cobol-semantic-product.json` →
 `cobol-lower` → `air-java Publication` → CFG-FIRST. O lowerer não importa o port

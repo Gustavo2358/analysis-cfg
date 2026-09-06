@@ -58,8 +58,8 @@ Evidência RED → GREEN:
   falhar com dependência bytecode inesperada; removida a mutação, o gate passou;
 - `-Dtest=NoSuchBoundaryTest` falhou com exit 1 e “No tests matching pattern”,
   provando que suíte obrigatória vazia não produz falso verde;
-- fixtures internas do gate rejeitam dependências proibidas e modelo paralelo sem
-  persistir fontes artificiais.
+- fixtures internas do gate rejeitam representantes das dependências proibidas e
+  uma classe paralela, sem persistir fontes artificiais.
 
 ## Validação de encerramento
 
