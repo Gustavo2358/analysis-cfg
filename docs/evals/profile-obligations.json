@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "ir_commit": "0b2fbce7046010b22b32efa8cbc3e75ccba09442",
+  "ir_commit": "122ce54e1b9ef9b00646f93ece409ca8b63bc933",
   "consumer_role": "CFG",
   "implemented_profiles": [],
   "profiles": [
@@ -53,7 +53,13 @@
         "O-82-STRUCT",
         "O-83-STRUCT",
         "O-84-STRUCT",
-        "O-85-STRUCT"
+        "O-85-STRUCT",
+        "O-86-STRUCT",
+        "O-87-STRUCT",
+        "O-88-STRUCT",
+        "O-89-STRUCT",
+        "O-90-STRUCT",
+        "O-91-STRUCT"
       ],
       "scope": "structural_projection_only",
       "status": "not_implemented"

@@ -5,8 +5,9 @@
 Construir um consumidor Java da Analysis IR que publique CFGs rastreáveis,
 determinísticos e honestos sobre cobertura e precisão. O núcleo recebe uma
 publicação IR em memória; não sabe quem a produziu nem de onde veio.
-Esta entrega é **docs-only**. Não criar Java, POM ou implementação de CFG antes do
-checkpoint de implementação explicitamente autorizado.
+A fundação Java 21/Maven e o preflight com `air-java` já existem. Não criar ou
+ampliar algoritmo/tipos CFG, `BuildCfg`, adapters ou CLI sem checkpoint de
+implementação explicitamente autorizado.
 
 ## Regras universais
 
@@ -59,5 +60,6 @@ padrão. Não manter cópias de regras em tasklists transitórias.
 
 Informe escopo concluído, regras preservadas, testes executados e não executados,
 resultados, lacunas e checkpoint seguinte. Atualize `state.md` quando mudar estado
-material. Rode os gates exigidos; para esta entrega, `check-fast.sh`.
+material. Rode os gates exigidos; para código atual do kernel, `check-fast.sh` e
+`check-architecture.sh`.
 Não faça merge, push ou publicação de pacote sem autorização aplicável.

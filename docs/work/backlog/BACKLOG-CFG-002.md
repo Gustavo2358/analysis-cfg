@@ -1,6 +1,7 @@
 # BACKLOG-CFG-002 — Bootstrap Java 21/Maven e boundary air-java
 
-**Estado:** `ready_for_authorization`. **Fase:** `foundation`. **Autorização:** backlog não autoriza execução.
+**Estado:** `completed` em [WORK-CFG-002](../history/WORK-CFG-002.md). **Fase:** `foundation`.
+**Autorização executada:** implementação explicitamente autorizada em 06/09/2026 somente para este checkpoint.
 Dependências: BACKLOG-CFG-001.
 
 ## Problema e objetivo observável
@@ -52,6 +53,7 @@ publicação de pacote upstream. Não alterar `air-java`, `analysis-ir` ou
 
 ## Evidência de conclusão
 
-Commit/review, comandos e exit codes, árvore de dependências, bytecode verificado,
-contador de testes e falsificações. Até lá o item está apenas pronto para
-autorização; nenhum perfil AIR recebe claim.
+[WORK-CFG-002](../history/WORK-CFG-002.md) registra comandos, exit codes, árvore de
+dependências, bytecode, quatro testes e falsificações RED → GREEN. EVAL-CFG-007 e
+EVAL-CFG-024 estão implementados somente para a fundação; EVAL-CFG-001 e todos os
+perfis AIR continuam sem claim completo.

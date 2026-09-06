@@ -1,0 +1,50 @@
+name: Java boundary checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  boundary:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out analysis-cfg
+        uses: actions/checkout@v4
+        with:
+          path: analysis-cfg
+
+      - name: Check out pinned air-java source
+        uses: actions/checkout@v4
+        with:
+          repository: Gustavo2358/air-java
+          ref: 6a4091e5394fc22b3d2ada9abbdb530eb3572a58
+          path: air-java
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Verify pinned air-java checkout
+        working-directory: air-java
+        run: test "$(git rev-parse HEAD)" = "6a4091e5394fc22b3d2ada9abbdb530eb3572a58"
+
+      - name: Install pinned air-java SNAPSHOT
+        working-directory: air-java
+        env:
+          MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2
+        run: mvn -B -ntp clean install
+
+      - name: Check documentation and harness
+        working-directory: analysis-cfg
+        run: bash scripts/harness/check-fast.sh
+
+      - name: Check Java architecture boundary
+        working-directory: analysis-cfg
+        env:
+          MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2
+        run: bash scripts/harness/check-architecture.sh

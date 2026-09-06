@@ -13,13 +13,14 @@ implementado agora. Registro verificável: [profile-obligations.json](profile-ob
 
 AIR-STRUCTURE@2 exige O-01-STRUCT–O-10-STRUCT, O-18-STRUCT–O-22-STRUCT,
 O-29-STRUCT–O-34-STRUCT, O-41-STRUCT–O-48-STRUCT e
-O-69-STRUCT–O-85-STRUCT. O-01/O-08, por exemplo, não autorizam implementar PV
+O-69-STRUCT–O-91-STRUCT. O-01/O-08, por exemplo, não autorizam implementar PV
 neste projeto: testar ordem e pontos necessários; a conclusão de valor pertence
 àquele futuro consumer. Justificar explicitamente subasserts fora do papel CFG.
 Não marcar o cenário inteiro “não aplicável” para evitar sua obrigação estrutural.
 
-O bloco O-69-STRUCT–O-85-STRUCT exige preservar/validar `TypeRef`, tipo versus
-valor desconhecido, `Premise`, `sameDomain` e `DomainProofScope`. Não exige os
+O bloco O-69-STRUCT–O-91-STRUCT exige preservar/validar `TypeRef`, tipo versus
+valor desconhecido, `Premise`, `sameDomain`, `DomainProofScope`, contrato
+materializado no `invoke`, targets, disjunção, envelopes e limites do validator. Não exige os
 sub-requisitos `SCALAR`/`REGION`: não calcular values, reaching definitions,
 efeitos escalares ou storage. `sameDomain` não é igualdade de valores e o escopo de
 prova é estático, não um produto do CFG.

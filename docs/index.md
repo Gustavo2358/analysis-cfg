@@ -15,7 +15,7 @@ Esta página roteia leitura; não exige carregar todos os documentos.
 | Sessão e higiene | [work items](engineering/work-item-protocol.md), [documentação](engineering/documentation-policy.md), [impacto](engineering/downstream-impact.md) |
 | Operação | [gates](engineering/gates.md), [segurança/observabilidade](engineering/security-and-observability.md) |
 | Review do harness | [parecer de 05/09/2026](engineering/harness-review-2026-09-05.md) |
-| Evidência | [evals](evals/index.md), [validação desta entrega](harness-validation.md) |
+| Evidência | [evals](evals/index.md), [baseline documental histórica](harness-validation.md) |
 | Fontes | [índice e autoridade](sources/index.md), [baseline upstream](sources/upstream-state.md), [adaptação do harness](sources/harness-adaptation.md) |
 | Iniciar agente | [discovery](prompts/start-discovery.md), [checkpoint](prompts/implement-checkpoint.md) |
 | Modelos documentais | [templates](templates/README.md) |

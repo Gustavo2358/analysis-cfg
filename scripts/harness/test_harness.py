@@ -114,19 +114,25 @@ class HarnessGuardTests(unittest.TestCase):
         self.assert_guard('exactly five files')
 
     def test_10_java_forbidden(self):
-        # A filename-only sentinel tests packaging policy; no Java code is created.
+        self.edit_json('docs/engineering/gate-state.json',
+                       lambda x: x.update(phase='docs_only', runtime_authorization=None))
+        # A filename-only sentinel tests the former docs-only packaging policy.
         (self.root / 'Sentinel.java').write_bytes(b'')
         self.assert_guard('Java/POM forbidden')
 
     def test_11_pom_forbidden(self):
+        self.edit_json('docs/engineering/gate-state.json',
+                       lambda x: x.update(phase='docs_only', runtime_authorization=None))
         (self.root / 'pom.xml').write_bytes(b'')
         self.assert_guard('Java/POM forbidden')
 
     def test_12_false_product_gate(self):
         self.edit_json('docs/engineering/gate-state.json', lambda x: x['product_gates']['semantic'].update(status='implemented', hook='scripts/project/absent.sh'))
-        self.assert_guard('Implemented product gate in docs_only')
+        self.assert_guard('Invalid/missing product gate hook: semantic')
 
     def test_13_false_profile_claim(self):
+        self.edit_json('docs/engineering/gate-state.json',
+                       lambda x: x.update(phase='docs_only', runtime_authorization=None))
         self.edit_json('docs/evals/profile-obligations.json', lambda x: x['implemented_profiles'].append('AIR-STRUCTURE@2'))
         self.assert_guard('Implemented profile claimed')
 
@@ -154,7 +160,9 @@ class HarnessGuardTests(unittest.TestCase):
         self.assert_guard('Missing/invalid work path')
 
     def test_19_unavailable_never_passes(self):
-        for gate in ('architecture', 'semantic', 'performance', 'integration', 'full'):
+        # `full` invokes `fast`, which contains this harness suite; exercise it at
+        # the shell level instead of recursively from its own test process.
+        for gate in ('semantic', 'performance', 'integration'):
             with self.subTest(gate=gate), contextlib.redirect_stdout(io.StringIO()) as out:
                 self.assertEqual(3, run(gate, self.root))
                 self.assertIn('UNAVAILABLE', out.getvalue())
@@ -171,9 +179,10 @@ class HarnessGuardTests(unittest.TestCase):
 
     def test_26_product_gate_cannot_bypass_authorization_preflight(self):
         hook = self.root / 'scripts/project/check-semantic.sh'
-        hook.parent.mkdir(parents=True)
+        hook.parent.mkdir(parents=True, exist_ok=True)
         hook.write_text('#!/usr/bin/env bash\nexit 0\n')
-        self.edit_json('docs/engineering/gate-state.json', lambda x: x.update(phase='implementation'))
+        self.edit_json('docs/engineering/gate-state.json',
+                       lambda x: x.update(phase='implementation', runtime_authorization='WORK-CFG-001'))
         self.edit_json('docs/engineering/gate-state.json', lambda x: x['product_gates']['semantic'].update(status='implemented', hook='scripts/project/check-semantic.sh'))
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
             self.assertEqual(1, run('semantic', self.root))
@@ -196,7 +205,7 @@ class HarnessGuardTests(unittest.TestCase):
         self.assert_guard('Analysis IR 2.0.0')
 
     def test_31_nonexistent_oracle_projection_rejected(self):
-        invalid_oracles = ('O-01-SCALAR', 'O-56-STRUCT', 'O-85-REGION')
+        invalid_oracles = ('O-01-SCALAR', 'O-56-STRUCT', 'O-87-SCALAR', 'O-91-REGION')
         for oracle in invalid_oracles:
             with self.subTest(oracle=oracle):
                 self.edit_json('docs/evals/catalog.json', lambda x: x['evals'][0]['upstream_oracles'].append(oracle))
@@ -204,7 +213,7 @@ class HarnessGuardTests(unittest.TestCase):
                 self.edit_json('docs/evals/catalog.json', lambda x: x['evals'][0]['upstream_oracles'].pop())
 
     def test_32_normative_oracle_projections_accepted(self):
-        valid_oracles = ('O-69-SCALAR', 'O-81-REGION', 'O-85-STRUCT')
+        valid_oracles = ('O-86', 'O-69-SCALAR', 'O-81-REGION', 'O-88-REGION', 'O-91-STRUCT')
         self.edit_json('docs/evals/catalog.json', lambda x: x['evals'][0]['upstream_oracles'].extend(valid_oracles))
         self.assertEqual([], validate(self.root))
 
@@ -227,6 +236,21 @@ class HarnessGuardTests(unittest.TestCase):
         self.edit_json('docs/sources/sources.lock.json',
                        lambda x: x['analysis_ir']['json_binding'].update(owner='air-java'))
         self.assert_guard('JSON binding must be owned by analysis-ir')
+
+    def test_39_json_binding_cannot_be_promoted_locally(self):
+        self.edit_json('docs/sources/sources.lock.json',
+                       lambda x: x['analysis_ir']['json_binding'].update(maturity='ACCEPTED'))
+        self.assert_guard('JSON binding must remain DRAFT 1.0.0')
+
+    def test_40_json_binding_version_cannot_drift(self):
+        self.edit_json('docs/sources/sources.lock.json',
+                       lambda x: x['analysis_ir']['json_binding'].update(version='2.0.0'))
+        self.assert_guard('JSON binding must remain DRAFT 1.0.0')
+
+    def test_41_json_binding_stays_out_of_consumer_code(self):
+        self.edit_json('docs/sources/sources.lock.json',
+                       lambda x: x['analysis_ir']['json_binding'].update(implemented_in_analysis_cfg=True))
+        self.assert_guard('JSON binding must remain outside analysis-cfg code')
 
     def test_37_planned_lowerer_cannot_claim_api(self):
         self.edit_json('docs/sources/sources.lock.json',

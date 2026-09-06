@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "phase": "docs_only",
-  "runtime_authorization": null,
+  "phase": "implementation",
+  "runtime_authorization": "WORK-CFG-002",
   "product_gates": {
     "architecture": {
-      "status": "unavailable",
-      "hook": null
+      "status": "implemented",
+      "hook": "scripts/project/check-architecture.sh"
     },
     "semantic": {
       "status": "unavailable",

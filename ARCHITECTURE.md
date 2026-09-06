@@ -1,6 +1,7 @@
 # Arquitetura — mapa curto
 
-**Decidido para este projeto; ainda não implementado.** [ADRs](docs/architecture/decisions/index.md).
+**A fundação Java/Maven e a boundary física pertencem a este checkpoint; o
+algoritmo CFG continua não implementado.** [ADRs](docs/architecture/decisions/index.md).
 
 ```text
 proleap-poc
@@ -33,23 +34,23 @@ CfgBuildResult`. A porta não recebe `Path`, `InputStream`, JSON, COBOL ou Seman
 Product. O caso de uso executa `AirValidator`, preflight de versão/capabilities e só
 então a semântica CFG. Trocar transporte não muda a porta nem o algoritmo.
 
-O binding JSON normativo pertence ao `analysis-ir`; ainda não existe no commit
-fixado. Um futuro reader fica em infraestrutura. `air-java` permanece sem
-transporte, e a ausência de codec não bloqueia testes com `Publication` construída
-diretamente em memória.
+O Analysis IR JSON Binding 1.0.0 pertence ao `analysis-ir`, targets AIR 2.0.0 e
+permanece DRAFT no commit fixado. Ele não é implementado neste checkpoint. Um
+futuro reader fica em infraestrutura; `air-java` permanece sem transporte e a
+ausência de codec não bloqueia testes com `Publication` construída em memória.
 
 ## Dependências físicas decididas
 
-| Unidade futura | Dependências permitidas |
+| Unidade | Dependências permitidas |
 | --- | --- |
 | `air-java` | JDK; modelo/validator AIR, sem produtor, transporte ou CFG |
 | `cfg-kernel` (domínio + aplicação/porta) | JDK 21 e `air-java` |
 | `cfg-adapters` | kernel, `air-java` e bibliotecas de infraestrutura |
 | `cfg-launcher` | adapters e kernel, somente composição/execução |
 
-`analysis-cfg` não contém um segundo modelo AIR. Não existem módulos/POMs nesta
-entrega; Java 21/Maven serão criados somente após autorização de
-`BACKLOG-CFG-002`.
+`analysis-cfg` não contém um segundo modelo AIR. O bootstrap Java 21/Maven prova
+somente `Publication → AirValidator → boundary`; a porta `BuildCfg` e o algoritmo
+permanecem para checkpoints posteriores.
 
 ## Primeiros marcos
 

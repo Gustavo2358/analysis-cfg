@@ -20,12 +20,12 @@ FIELDS = {'id', 'backlog_id', 'title', 'status', 'risk', 'goal', 'authorization'
           'gates', 'stop_condition'}
 STRUCT_UPSTREAM_ORACLE_NUMBERS = (tuple(range(1, 11)) + tuple(range(18, 23)) +
                                    tuple(range(29, 35)) + tuple(range(41, 49)) +
-                                   tuple(range(69, 86)))
+                                   tuple(range(69, 92)))
 SCALAR_UPSTREAM_ORACLE_NUMBERS = (tuple(range(69, 71)) + tuple(range(72, 81)) +
-                                   tuple(range(82, 85)))
-REGION_UPSTREAM_ORACLE_NUMBERS = (81,)
+                                   tuple(range(82, 85)) + (88,))
+REGION_UPSTREAM_ORACLE_NUMBERS = (81, 88)
 VALID_UPSTREAM_ORACLES = (
-    {'O-%02d' % n for n in range(1, 86)} |
+    {'O-%02d' % n for n in range(1, 92)} |
     {'O-%02d-STRUCT' % n for n in STRUCT_UPSTREAM_ORACLE_NUMBERS} |
     {'O-%02d-SCALAR' % n for n in SCALAR_UPSTREAM_ORACLE_NUMBERS} |
     {'O-%02d-REGION' % n for n in REGION_UPSTREAM_ORACLE_NUMBERS}
@@ -329,8 +329,15 @@ def validate(root: Path) -> list[str]:
     binding = air.get('json_binding', {})
     if binding.get('owner') != air.get('repository'):
         error('Analysis IR JSON binding must be owned by analysis-ir')
-    if binding.get('status') not in ('not_present_in_verified_commit', 'present'):
-        error('Invalid Analysis IR JSON binding status')
+    if binding.get('status') != 'present':
+        error('Pinned Analysis IR JSON binding must be present')
+    if (binding.get('version') != '1.0.0' or binding.get('maturity') != 'DRAFT'
+            or binding.get('targets_air_version') != air.get('semantic_version')):
+        error('Analysis IR JSON binding must remain DRAFT 1.0.0 targeting AIR 2.0.0')
+    if binding.get('path') not in paths or binding.get('review_path') not in paths:
+        error('Analysis IR JSON binding documents must be pinned by blob hash')
+    if binding.get('implemented_in_analysis_cfg') is not False:
+        error('Analysis IR JSON binding must remain outside analysis-cfg code')
     if binding.get('checked_commit') != air.get('commit'):
         error('Analysis IR JSON binding check must use normative commit')
 
