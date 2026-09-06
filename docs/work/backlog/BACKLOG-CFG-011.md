@@ -16,7 +16,7 @@ domínio e inconsistência de revisões.
 ## Critérios de aceitação
 
 As 46 obrigações de `AIR-STRUCTURE@2` estão mapeadas: 29 projeções anteriores e
-`O-69-STRUCT` a `O-85-STRUCT`. Todos os asserts estruturais exigidos passam; RD/PV,
+`O-69-STRUCT` a `O-91-STRUCT`. Todos os asserts estruturais exigidos passam; RD/PV,
 efeitos escalares e storage ficam fora do papel; gap restante impede claim indevido.
 
 ## Evals e invariantes

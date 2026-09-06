@@ -12,35 +12,37 @@ O owner físico do modelo/validator Java compartilhado é `Gustavo2358/air-java`
 também fixado por SHA. Ele implementa a AIR; não substitui a autoridade semântica do
 `analysis-ir`. Versão da biblioteca e versão semântica da IR são eixos distintos.
 
-## IR normativa — commit 0b2fbce7046010b22b32efa8cbc3e75ccba09442
+## IR normativa — commit 122ce54e1b9ef9b00646f93ece409ca8b63bc933
 
-O commit é o merge canônico do PR upstream #1. Não usar o antigo head do PR nem
+O commit é o merge canônico do PR upstream #2. Não usar o antigo head do PR nem
 `main` flutuante como autoridade; hashes de blobs estão no lock.
 
-- [README.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/README.md)
-- [REFERENCIAS.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/REFERENCIAS.md)
-- [conformidade/01-invariantes.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/conformidade/01-invariantes.md)
-- [conformidade/02-oraculos.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/conformidade/02-oraculos.md)
-- [especificacao/00-escopo-e-convencoes.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/especificacao/00-escopo-e-convencoes.md)
-- [especificacao/01-modelo-e-identidades.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/especificacao/01-modelo-e-identidades.md)
-- [especificacao/02-tipos-valores-e-operandos.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/especificacao/02-tipos-valores-e-operandos.md)
-- [especificacao/03-memoria-e-aliases.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/especificacao/03-memoria-e-aliases.md)
-- [especificacao/04-operacoes.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/especificacao/04-operacoes.md)
-- [especificacao/05-controle-e-invocacoes.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/especificacao/05-controle-e-invocacoes.md)
-- [especificacao/06-incompletude-e-proveniencia.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/especificacao/06-incompletude-e-proveniencia.md)
-- [especificacao/07-contrato-de-produtores.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/especificacao/07-contrato-de-produtores.md)
-- [especificacao/08-contrato-de-consumidores.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/especificacao/08-contrato-de-consumidores.md)
-- [especificacao/09-extensibilidade-e-compatibilidade.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/especificacao/09-extensibilidade-e-compatibilidade.md)
-- [especificacao/10-perfis-de-conformidade.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/especificacao/10-perfis-de-conformidade.md)
-- [especificacao/11-rastreabilidade-bilateral.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/especificacao/11-rastreabilidade-bilateral.md)
-- [exemplos/00-notacao.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/exemplos/00-notacao.md)
-- [exemplos/01-fluxo-e-valores.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/exemplos/01-fluxo-e-valores.md)
-- [exemplos/02-memoria-e-chamadas.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/exemplos/02-memoria-e-chamadas.md)
-- [exemplos/03-extensoes-e-parcialidade.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/exemplos/03-extensoes-e-parcialidade.md)
-- [exemplos/04-conhecimento-de-tipo.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/exemplos/04-conhecimento-de-tipo.md)
+- [README.md](https://github.com/Gustavo2358/analysis-ir/blob/122ce54e1b9ef9b00646f93ece409ca8b63bc933/README.md)
+- [REFERENCIAS.md](https://github.com/Gustavo2358/analysis-ir/blob/122ce54e1b9ef9b00646f93ece409ca8b63bc933/REFERENCIAS.md)
+- [bindings/json-v1.md](https://github.com/Gustavo2358/analysis-ir/blob/122ce54e1b9ef9b00646f93ece409ca8b63bc933/bindings/json-v1.md)
+- [bindings/revisao-json-v1.md](https://github.com/Gustavo2358/analysis-ir/blob/122ce54e1b9ef9b00646f93ece409ca8b63bc933/bindings/revisao-json-v1.md)
+- [conformidade/01-invariantes.md](https://github.com/Gustavo2358/analysis-ir/blob/122ce54e1b9ef9b00646f93ece409ca8b63bc933/conformidade/01-invariantes.md)
+- [conformidade/02-oraculos.md](https://github.com/Gustavo2358/analysis-ir/blob/122ce54e1b9ef9b00646f93ece409ca8b63bc933/conformidade/02-oraculos.md)
+- [especificacao/00-escopo-e-convencoes.md](https://github.com/Gustavo2358/analysis-ir/blob/122ce54e1b9ef9b00646f93ece409ca8b63bc933/especificacao/00-escopo-e-convencoes.md)
+- [especificacao/01-modelo-e-identidades.md](https://github.com/Gustavo2358/analysis-ir/blob/122ce54e1b9ef9b00646f93ece409ca8b63bc933/especificacao/01-modelo-e-identidades.md)
+- [especificacao/02-tipos-valores-e-operandos.md](https://github.com/Gustavo2358/analysis-ir/blob/122ce54e1b9ef9b00646f93ece409ca8b63bc933/especificacao/02-tipos-valores-e-operandos.md)
+- [especificacao/03-memoria-e-aliases.md](https://github.com/Gustavo2358/analysis-ir/blob/122ce54e1b9ef9b00646f93ece409ca8b63bc933/especificacao/03-memoria-e-aliases.md)
+- [especificacao/04-operacoes.md](https://github.com/Gustavo2358/analysis-ir/blob/122ce54e1b9ef9b00646f93ece409ca8b63bc933/especificacao/04-operacoes.md)
+- [especificacao/05-controle-e-invocacoes.md](https://github.com/Gustavo2358/analysis-ir/blob/122ce54e1b9ef9b00646f93ece409ca8b63bc933/especificacao/05-controle-e-invocacoes.md)
+- [especificacao/06-incompletude-e-proveniencia.md](https://github.com/Gustavo2358/analysis-ir/blob/122ce54e1b9ef9b00646f93ece409ca8b63bc933/especificacao/06-incompletude-e-proveniencia.md)
+- [especificacao/07-contrato-de-produtores.md](https://github.com/Gustavo2358/analysis-ir/blob/122ce54e1b9ef9b00646f93ece409ca8b63bc933/especificacao/07-contrato-de-produtores.md)
+- [especificacao/08-contrato-de-consumidores.md](https://github.com/Gustavo2358/analysis-ir/blob/122ce54e1b9ef9b00646f93ece409ca8b63bc933/especificacao/08-contrato-de-consumidores.md)
+- [especificacao/09-extensibilidade-e-compatibilidade.md](https://github.com/Gustavo2358/analysis-ir/blob/122ce54e1b9ef9b00646f93ece409ca8b63bc933/especificacao/09-extensibilidade-e-compatibilidade.md)
+- [especificacao/10-perfis-de-conformidade.md](https://github.com/Gustavo2358/analysis-ir/blob/122ce54e1b9ef9b00646f93ece409ca8b63bc933/especificacao/10-perfis-de-conformidade.md)
+- [especificacao/11-rastreabilidade-bilateral.md](https://github.com/Gustavo2358/analysis-ir/blob/122ce54e1b9ef9b00646f93ece409ca8b63bc933/especificacao/11-rastreabilidade-bilateral.md)
+- [exemplos/00-notacao.md](https://github.com/Gustavo2358/analysis-ir/blob/122ce54e1b9ef9b00646f93ece409ca8b63bc933/exemplos/00-notacao.md)
+- [exemplos/01-fluxo-e-valores.md](https://github.com/Gustavo2358/analysis-ir/blob/122ce54e1b9ef9b00646f93ece409ca8b63bc933/exemplos/01-fluxo-e-valores.md)
+- [exemplos/02-memoria-e-chamadas.md](https://github.com/Gustavo2358/analysis-ir/blob/122ce54e1b9ef9b00646f93ece409ca8b63bc933/exemplos/02-memoria-e-chamadas.md)
+- [exemplos/03-extensoes-e-parcialidade.md](https://github.com/Gustavo2358/analysis-ir/blob/122ce54e1b9ef9b00646f93ece409ca8b63bc933/exemplos/03-extensoes-e-parcialidade.md)
+- [exemplos/04-conhecimento-de-tipo.md](https://github.com/Gustavo2358/analysis-ir/blob/122ce54e1b9ef9b00646f93ece409ca8b63bc933/exemplos/04-conhecimento-de-tipo.md)
 
 `§01/04/05/06/08/09/10` designam capítulos pelo prefixo do arquivo.
-O-01–O-85 são oráculos upstream; X-01–X-40 são exemplos informativos.
+O-01–O-91 são oráculos upstream; X-01–X-41 são exemplos informativos.
 A sintaxe desses exemplos **não é schema de arquivo**.
 
 Leitura para MVP: §01; `TypeRef`, `sameDomain` e `DomainProofScope` pertinentes de
@@ -48,25 +50,40 @@ Leitura para MVP: §01; `TypeRef`, `sameDomain` e `DomainProofScope` pertinentes
 X-33/X-34 e oráculos correlatos. Controle local acrescenta §05.7, X-23/X-24 e
 O-56–O-60. Não carregar capítulos de memória inteira para implementar um jump.
 
-Nenhum binding JSON normativo existe nesse commit. Seu owner conceitual é o próprio
-`analysis-ir`; `json-v1` ou equivalente será evolução upstream independente de
-linguagem, não serialização automática dos records de `air-java`.
+O merge acrescentou I-55–I-61 e O-86–O-91. Para esta boundary, as regras centrais
+são: contrato materializado no `invoke` sem inventário `Publication.contracts`,
+targets executáveis somente internal/literal/computed, `ArtifactRelationId`,
+`disjoint_storage` universal, assinatura e outcomes com formas próprias, owners de
+operandos completos, naturais sem teto de runtime e proveniência sem fabricar
+linha/coluna quando há somente offsets.
 
-## Modelo Java compartilhado — commit 2108294d9dfeb89d0019ce75fab27172b15a75b9
+O **Analysis IR JSON Binding 1.0.0** existe nesse commit, **targets AIR 2.0.0** e
+permanece **DRAFT**. É contrato de transporte separado da versão semântica e ainda
+não é implementado pelo `analysis-cfg`; não autoriza gerar codec a partir dos
+records de `air-java` neste checkpoint.
 
-- [README](https://github.com/Gustavo2358/air-java/blob/2108294d9dfeb89d0019ce75fab27172b15a75b9/README.md)
-- [POM](https://github.com/Gustavo2358/air-java/blob/2108294d9dfeb89d0019ce75fab27172b15a75b9/pom.xml)
-- [Publication](https://github.com/Gustavo2358/air-java/blob/2108294d9dfeb89d0019ce75fab27172b15a75b9/src/main/java/io/github/gustavo2358/air/model/Publication.java)
-- [Sequence](https://github.com/Gustavo2358/air-java/blob/2108294d9dfeb89d0019ce75fab27172b15a75b9/src/main/java/io/github/gustavo2358/air/model/Sequence.java)
-- [Terminator](https://github.com/Gustavo2358/air-java/blob/2108294d9dfeb89d0019ce75fab27172b15a75b9/src/main/java/io/github/gustavo2358/air/model/Terminator.java)
-- [Operations](https://github.com/Gustavo2358/air-java/blob/2108294d9dfeb89d0019ce75fab27172b15a75b9/src/main/java/io/github/gustavo2358/air/model/Operations.java)
-- [AirValidator](https://github.com/Gustavo2358/air-java/blob/2108294d9dfeb89d0019ce75fab27172b15a75b9/src/main/java/io/github/gustavo2358/air/validation/AirValidator.java)
-- [Cobertura e limites](https://github.com/Gustavo2358/air-java/blob/2108294d9dfeb89d0019ce75fab27172b15a75b9/docs/implementation-status.md)
-- [CI verificado](https://github.com/Gustavo2358/air-java/actions/runs/34009259923/job/101422062768)
+## Modelo Java compartilhado — commit 6a4091e5394fc22b3d2ada9abbdb530eb3572a58
+
+- [README](https://github.com/Gustavo2358/air-java/blob/6a4091e5394fc22b3d2ada9abbdb530eb3572a58/README.md)
+- [POM](https://github.com/Gustavo2358/air-java/blob/6a4091e5394fc22b3d2ada9abbdb530eb3572a58/pom.xml)
+- [Publication](https://github.com/Gustavo2358/air-java/blob/6a4091e5394fc22b3d2ada9abbdb530eb3572a58/src/main/java/io/github/gustavo2358/air/model/Publication.java)
+- [Sequence](https://github.com/Gustavo2358/air-java/blob/6a4091e5394fc22b3d2ada9abbdb530eb3572a58/src/main/java/io/github/gustavo2358/air/model/Sequence.java)
+- [Terminator](https://github.com/Gustavo2358/air-java/blob/6a4091e5394fc22b3d2ada9abbdb530eb3572a58/src/main/java/io/github/gustavo2358/air/model/Terminator.java)
+- [Operations](https://github.com/Gustavo2358/air-java/blob/6a4091e5394fc22b3d2ada9abbdb530eb3572a58/src/main/java/io/github/gustavo2358/air/model/Operations.java)
+- [Interactions](https://github.com/Gustavo2358/air-java/blob/6a4091e5394fc22b3d2ada9abbdb530eb3572a58/src/main/java/io/github/gustavo2358/air/model/Interactions.java)
+- [Control](https://github.com/Gustavo2358/air-java/blob/6a4091e5394fc22b3d2ada9abbdb530eb3572a58/src/main/java/io/github/gustavo2358/air/model/Control.java)
+- [Origins](https://github.com/Gustavo2358/air-java/blob/6a4091e5394fc22b3d2ada9abbdb530eb3572a58/src/main/java/io/github/gustavo2358/air/model/Origins.java)
+- [Proofs](https://github.com/Gustavo2358/air-java/blob/6a4091e5394fc22b3d2ada9abbdb530eb3572a58/src/main/java/io/github/gustavo2358/air/model/Proofs.java)
+- [AirValidator](https://github.com/Gustavo2358/air-java/blob/6a4091e5394fc22b3d2ada9abbdb530eb3572a58/src/main/java/io/github/gustavo2358/air/validation/AirValidator.java)
+- [Reconciliação AIR 2.0](https://github.com/Gustavo2358/air-java/blob/6a4091e5394fc22b3d2ada9abbdb530eb3572a58/docs/reconciliation-air-2.md)
+- [Cobertura e limites](https://github.com/Gustavo2358/air-java/blob/6a4091e5394fc22b3d2ada9abbdb530eb3572a58/docs/implementation-status.md)
+- [CI verificado](https://github.com/Gustavo2358/air-java/actions/runs/34049102909/job/101529376601)
 
 Coordenadas declaradas: `io.github.gustavo2358:air-java:0.1.0-SNAPSHOT`, Java 21.
-Não foi observada tag/release; o futuro bootstrap deve tornar a resolução desse SHA
-reprodutível sem copiar classes para este repo.
+Não foi observada tag/release. O modelo reconciliado não possui `contracts[]`; usa
+`ContractRef` como valor e materializa assinatura externa, effects e outcomes no
+`invoke`. O check remoto `contracts` do SHA fixado terminou com `success`; isso é
+evidência upstream, não resultado dos gates do `analysis-cfg`.
 
 ## Frontend COBOL e contexto
 
@@ -96,7 +113,7 @@ Não houve revisão exaustiva de toda literatura nem benchmark nesta preparaçã
 ## Atualização e cache
 
 [sources.lock.json](sources.lock.json) é o registro de revisões e hashes.
-O repositório não contém os 21 documentos IR integrais. O [cache opcional](../../scripts/harness/cache_ir.py)
+O repositório não contém os 23 documentos IR integrais. O [cache opcional](../../scripts/harness/cache_ir.py)
 importa uma cópia local ou baixa o snapshot verificando os hashes Git; falha em
 qualquer divergência. Nunca usa a branch móvel como fallback. Documentação e gates
 básicos são offline; sem fonte normativa disponível, não implementar semântica

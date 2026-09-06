@@ -3,39 +3,53 @@
   "observed_on": "2026-09-06",
   "analysis_ir": {
     "repository": "Gustavo2358/analysis-ir",
-    "commit": "0b2fbce7046010b22b32efa8cbc3e75ccba09442",
+    "commit": "122ce54e1b9ef9b00646f93ece409ca8b63bc933",
     "semantic_version": "2.0.0",
     "role": "normative",
     "canonical_ref": "main",
     "upstream_review": {
-      "pull_request": 1,
+      "pull_request": 2,
       "state": "merged",
-      "head_commit": "500766e8901e3ca8e5adc987254ab2bf646751e5",
-      "merge_commit": "0b2fbce7046010b22b32efa8cbc3e75ccba09442",
-      "merged_at": "2026-09-06T01:41:24Z"
+      "head_commit": "a6b771e03d143e1171cfc74448d51c2eabd8478c",
+      "merge_commit": "122ce54e1b9ef9b00646f93ece409ca8b63bc933",
+      "merged_at": "2026-09-06T14:29:50Z"
     },
     "json_binding": {
       "owner": "Gustavo2358/analysis-ir",
-      "status": "not_present_in_verified_commit",
-      "checked_commit": "0b2fbce7046010b22b32efa8cbc3e75ccba09442",
-      "planned_identifier": "json-v1"
+      "identifier": "Analysis IR JSON Binding",
+      "version": "1.0.0",
+      "status": "present",
+      "maturity": "DRAFT",
+      "targets_air_version": "2.0.0",
+      "path": "bindings/json-v1.md",
+      "review_path": "bindings/revisao-json-v1.md",
+      "checked_commit": "122ce54e1b9ef9b00646f93ece409ca8b63bc933",
+      "implemented_in_analysis_cfg": false
     },
     "files": [
       {
         "path": "README.md",
-        "git_blob_sha1": "0f5a4d737a21b40443f6eb9681fcedec6621c868"
+        "git_blob_sha1": "8a3363bea3d3b37d00adb5320e82df3264ccede8"
       },
       {
         "path": "REFERENCIAS.md",
         "git_blob_sha1": "1da1486a3b825308cf4a4523d5d37fd54b87e137"
       },
       {
+        "path": "bindings/json-v1.md",
+        "git_blob_sha1": "13340318813b3e3f83649ec2c2ee01b978215d0f"
+      },
+      {
+        "path": "bindings/revisao-json-v1.md",
+        "git_blob_sha1": "059207365a3bab6b14c6e6b980a60ea961c44eea"
+      },
+      {
         "path": "conformidade/01-invariantes.md",
-        "git_blob_sha1": "039ee1fe82f3628976e7fced9e3d5210ea4e1b80"
+        "git_blob_sha1": "fa1309ff20fe5e2f49fb22c58aa824d606d65053"
       },
       {
         "path": "conformidade/02-oraculos.md",
-        "git_blob_sha1": "b6fd4854af14909a844ac8dd544b032c34b5cad1"
+        "git_blob_sha1": "2d74c72336be02f9645749d427b54fbff4940ced"
       },
       {
         "path": "especificacao/00-escopo-e-convencoes.md",
@@ -43,51 +57,51 @@
       },
       {
         "path": "especificacao/01-modelo-e-identidades.md",
-        "git_blob_sha1": "779d2d023e34ef2b6acd6e3bc8cca68a9c65d744"
+        "git_blob_sha1": "4802a29f7be3f976becbad3881399c77aa254874"
       },
       {
         "path": "especificacao/02-tipos-valores-e-operandos.md",
-        "git_blob_sha1": "86c7e7c06fe68a60ae09c65442d1b5968bf54555"
+        "git_blob_sha1": "bab3f66ff0f40c428195cb734bff7a7629f33b4e"
       },
       {
         "path": "especificacao/03-memoria-e-aliases.md",
-        "git_blob_sha1": "d71b052102fc89a955e1031eea435fc6dd37f2e2"
+        "git_blob_sha1": "36ae796ab84967a3673fdf817b2b723a3cde1de3"
       },
       {
         "path": "especificacao/04-operacoes.md",
-        "git_blob_sha1": "742ca48c15b18f4a3d2321d8e7c729f24bf2988e"
+        "git_blob_sha1": "5ff3486d056a6483e6c71e1003f8599b506c0464"
       },
       {
         "path": "especificacao/05-controle-e-invocacoes.md",
-        "git_blob_sha1": "ba4d7ad00e60bfe8a2f307a3eb58ae58d3ac9338"
+        "git_blob_sha1": "3b585d0fdbae7c722497d9f64e6fe239333de7fc"
       },
       {
         "path": "especificacao/06-incompletude-e-proveniencia.md",
-        "git_blob_sha1": "af63467cfe852cffbf6eaceb628db77c34db8d11"
+        "git_blob_sha1": "79263e59a6bbb6d3189d63869a79c395947568a5"
       },
       {
         "path": "especificacao/07-contrato-de-produtores.md",
-        "git_blob_sha1": "388e144269daf284a5541716d71b4d168150ba40"
+        "git_blob_sha1": "3b4d013adbe460b5f5257ec206ab41c29c62b47f"
       },
       {
         "path": "especificacao/08-contrato-de-consumidores.md",
-        "git_blob_sha1": "5d6487fdd00cbd37c9928410ee8a3f09df518641"
+        "git_blob_sha1": "dfc1658fe4d9f88f1190edc70e0e208c4da12288"
       },
       {
         "path": "especificacao/09-extensibilidade-e-compatibilidade.md",
-        "git_blob_sha1": "a7e2dc243a5f77e62110a9f3e393f2bfc6ffc54d"
+        "git_blob_sha1": "4e5c9a72920f4f148ff14f98681b86027c9e73ca"
       },
       {
         "path": "especificacao/10-perfis-de-conformidade.md",
-        "git_blob_sha1": "582d0cad9a48be65b19537ff19fd072a925c8ff0"
+        "git_blob_sha1": "82479565846393cfbe27328f856622dc52afbb79"
       },
       {
         "path": "especificacao/11-rastreabilidade-bilateral.md",
-        "git_blob_sha1": "6c9d4a96f6412a71279dd06040400b53bd943e9b"
+        "git_blob_sha1": "1b00a33a241268a3e83d93552a2d3d48d32c583a"
       },
       {
         "path": "exemplos/00-notacao.md",
-        "git_blob_sha1": "6d58373d2272b07389732e908b27131437aac507"
+        "git_blob_sha1": "8705f0ea2d2e61f20ab4ece8982d18ca4f913fc2"
       },
       {
         "path": "exemplos/01-fluxo-e-valores.md",
@@ -95,7 +109,7 @@
       },
       {
         "path": "exemplos/02-memoria-e-chamadas.md",
-        "git_blob_sha1": "91c32fba5b0dd6c944f3774b2a9ae5cf25c935e7"
+        "git_blob_sha1": "5d224e45a4b1189c9a861dd451abdf30fb1dac04"
       },
       {
         "path": "exemplos/03-extensoes-e-parcialidade.md",
@@ -103,19 +117,26 @@
       },
       {
         "path": "exemplos/04-conhecimento-de-tipo.md",
-        "git_blob_sha1": "569c528c95a966af262fc697d0c790fe2d9751be"
+        "git_blob_sha1": "e4e029f49d73822fb2e9a1ef2411df1f651f7d57"
       }
     ]
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "2108294d9dfeb89d0019ce75fab27172b15a75b9",
+    "commit": "6a4091e5394fc22b3d2ada9abbdb530eb3572a58",
     "canonical_ref": "main",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
+    "upstream_review": {
+      "pull_request": 1,
+      "state": "merged",
+      "head_commit": "82cf1b86c30f50b4140743aedbd0f20cb4b19b3a",
+      "merge_commit": "6a4091e5394fc22b3d2ada9abbdb530eb3572a58",
+      "merged_at": "2026-09-06T17:35:46Z"
+    },
     "analysis_ir": {
       "semantic_version": "2.0.0",
-      "commit": "0b2fbce7046010b22b32efa8cbc3e75ccba09442"
+      "commit": "122ce54e1b9ef9b00646f93ece409ca8b63bc933"
     },
     "maven": {
       "group_id": "io.github.gustavo2358",
@@ -132,8 +153,8 @@
       "check_name": "contracts",
       "status": "completed",
       "conclusion": "success",
-      "checked_commit": "2108294d9dfeb89d0019ce75fab27172b15a75b9",
-      "url": "https://github.com/Gustavo2358/air-java/actions/runs/34009259923/job/101422062768"
+      "checked_commit": "6a4091e5394fc22b3d2ada9abbdb530eb3572a58",
+      "url": "https://github.com/Gustavo2358/air-java/actions/runs/34049102909/job/101529376601"
     },
     "read_paths": [
       "README.md",
@@ -141,12 +162,17 @@
       "ARCHITECTURE.md",
       "docs/implementation-status.md",
       "docs/model-catalog.md",
+      "docs/reconciliation-air-2.md",
       "docs/sources.lock.json",
       "docs/validation-evidence.md",
       "src/main/java/io/github/gustavo2358/air/model/Publication.java",
       "src/main/java/io/github/gustavo2358/air/model/Sequence.java",
       "src/main/java/io/github/gustavo2358/air/model/Terminator.java",
       "src/main/java/io/github/gustavo2358/air/model/Operations.java",
+      "src/main/java/io/github/gustavo2358/air/model/Interactions.java",
+      "src/main/java/io/github/gustavo2358/air/model/Control.java",
+      "src/main/java/io/github/gustavo2358/air/model/Origins.java",
+      "src/main/java/io/github/gustavo2358/air/model/Proofs.java",
       "src/main/java/io/github/gustavo2358/air/validation/AirValidator.java"
     ]
   },
