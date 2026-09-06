@@ -44,6 +44,10 @@ EXPECTED_JDEPS_TARGETS = {
     AIR_VALIDATOR,
     "java.lang.Object",
 }
+EXPECTED_PRODUCTION_IMPORTS = {PUBLICATION, VALIDATION_RESULT, AIR_VALIDATOR}
+IMPORT_PATTERN = re.compile(
+    r"(?m)^\s*import\s+(?:static\s+)?([A-Za-z_$][\w$]*(?:\.[\w$*]+)+)\s*;"
+)
 
 
 class GateFailure(RuntimeError):
@@ -65,11 +69,15 @@ def exact(observed: Iterable[str], expected: Iterable[str], label: str) -> None:
 
 def detector_self_test() -> None:
     forbidden_dependencies = {
+        "java.io.File",
+        "java.net.URI",
         "java.nio.file.Path",
         "com.fasterxml.jackson.databind.JsonNode",
         "com.google.gson.JsonObject",
         "io.proleap.cobol.CobolParser",
         "org.antlr.v4.runtime.Parser",
+        "org.springframework.context.ApplicationContext",
+        "picocli.CommandLine",
         "example.SemanticProductInput",
     }
     for dependency in forbidden_dependencies:
@@ -77,15 +85,23 @@ def detector_self_test() -> None:
             exact(EXPECTED_JDEPS_TARGETS | {dependency}, EXPECTED_JDEPS_TARGETS,
                   "synthetic dependency")
         except GateFailure:
-            continue
-        raise GateConfigurationError(f"detector self-test accepted {dependency}")
+            pass
+        else:
+            raise GateConfigurationError(f"bytecode detector self-test accepted {dependency}")
+        try:
+            exact(EXPECTED_PRODUCTION_IMPORTS | {dependency}, EXPECTED_PRODUCTION_IMPORTS,
+                  "synthetic production import")
+        except GateFailure:
+            pass
+        else:
+            raise GateConfigurationError(f"source detector self-test accepted {dependency}")
     try:
         exact({PREFLIGHT_PATH + ".class", "local/Publication.class"},
               {PREFLIGHT_PATH + ".class"}, "synthetic class inventory")
     except GateFailure:
-        return
-    raise GateConfigurationError("detector self-test accepted a parallel model class")
-
+        pass
+    else:
+        raise GateConfigurationError("detector self-test accepted a parallel model class")
 
 def command_path(name: str) -> str:
     candidate = shutil.which(name)
@@ -176,17 +192,24 @@ def verify_project_shape(root: Path) -> None:
     if declared != expected:
         raise GateFailure("cfg-kernel dependencies must be exactly compile air-java and test JUnit")
 
-    production_sources = sorted(
-        path.relative_to(root).as_posix()
+    production_paths = sorted(
+        path
         for path in root.rglob("*.java")
         if "target" not in path.relative_to(root).parts
         and "/src/main/java/" in "/" + path.relative_to(root).as_posix()
     )
+    production_sources = [path.relative_to(root).as_posix() for path in production_paths]
     if production_sources != [EXPECTED_PRODUCTION_SOURCE]:
         raise GateFailure(
             "foundation production source inventory must contain only CfgPreflight; observed "
             + repr(production_sources)
         )
+    imports = {
+        imported
+        for path in production_paths
+        for imported in IMPORT_PATTERN.findall(path.read_text(encoding="utf-8"))
+    }
+    exact(imports, EXPECTED_PRODUCTION_IMPORTS, "foundation production imports")
 
     preview_files = list(root.glob("**/pom.xml")) + [
         root / ".mvn/jvm.config",

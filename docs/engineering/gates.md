@@ -50,8 +50,9 @@ O gate de arquitetura prova no build/bytecode real deste checkpoint:
 
 O hook executa Maven, exige relatórios Surefire com contagem não zero, lê classfiles,
 confere major 65/minor sem preview, inspeciona a árvore/classpath, executa `javap` e
-`jdeps`, e roda fixtures internas negativas do detector. `BuildCfg` ainda não
-existe e não é exigido por este gate.
+`jdeps`, aplica uma guarda complementar aos imports produtivos e roda fixtures
+internas negativas do detector. `BuildCfg` ainda não existe e não é exigido por
+este gate.
 
 ## Escalonamento
 

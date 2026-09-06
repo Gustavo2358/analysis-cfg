@@ -56,6 +56,8 @@ Evidência RED → GREEN:
   erros de compilação nos packages/símbolos AIR; a restauração passou 4/4;
 - referência temporária a `java.nio.file.Path` em `CfgPreflight` fez o gate final
   falhar com dependência bytecode inesperada; removida a mutação, o gate passou;
+- após o hardening final, um `import java.nio.file.Path` não usado também falhou
+  com exit 1 na guarda complementar; removido, o gate voltou a passar;
 - `-Dtest=NoSuchBoundaryTest` falhou com exit 1 e “No tests matching pattern”,
   provando que suíte obrigatória vazia não produz falso verde;
 - fixtures internas do gate rejeitam representantes das dependências proibidas e
