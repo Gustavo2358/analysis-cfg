@@ -2,8 +2,8 @@
 
 ## 1. Validar a baseline
 
-O repositório contém um harness revisado e a fundação Java/Maven autorizada em
-`WORK-CFG-002`. Antes de qualquer trabalho, confirme que a cópia local está íntegra
+O repositório contém um harness revisado, a fundação Java/Maven de WORK-CFG-002 e a
+porta/seam de WORK-CFG-003. Antes de qualquer trabalho, confirme que a cópia local está íntegra
 e siga o work item ativo ou o próximo backlog explicitamente autorizado.
 
 ## 2. Validar o harness
@@ -20,7 +20,7 @@ próprio caminho. Resultado esperado: `PASS` em docs e harness. Depois de instal
 bash scripts/harness/check-architecture.sh
 ```
 
-Esse gate deve executar quatro testes Java e verificar bytecode/dependências reais.
+Esse gate deve executar 18 testes Java e verificar bytecode/dependências reais.
 
 ## 3. Abrir a rota de conhecimento
 
@@ -38,11 +38,12 @@ Ou, com acesso à rede, `python3 scripts/harness/cache_ir.py --download`.
 Os arquivos são verificados pelo hash Git do blob, não apenas pelo nome.
 A criação desse cache não autoriza mudança da versão IR.
 
-## 4. Boundary disponível e próxima autorização
+## 4. Porta disponível e próxima autorização
 
-O bootstrap recebe diretamente
-`io.github.gustavo2358.air.model.Publication` e delega o preflight a
-`io.github.gustavo2358.air.validation.AirValidator`. Consulte a
+`BuildCfg` recebe diretamente `io.github.gustavo2358.air.model.Publication` e
+`BuildOptions`; o coordinator delega o preflight a
+`io.github.gustavo2358.air.validation.AirValidator` e retorna `CfgBuildResult` sem
+fabricar um CFG. Consulte a
 [estratégia do SNAPSHOT](docs/engineering/toolchain-and-modules.md) antes de rodar
 Maven em um checkout limpo.
 
@@ -52,6 +53,6 @@ Entradas de teste do CFG são **`air-java Publication`**, não
 memória.
 A diferença está no [estado upstream](docs/sources/upstream-state.md).
 
-Depois do review deste checkpoint, `BACKLOG-CFG-003` é apenas o próximo candidato.
-Ele permanece não iniciado e exige autorização própria. Não reutilize a autorização
-de `WORK-CFG-002` nem avance para CFG-FIRST.
+Depois do review deste checkpoint, CFG-FIRST continua apenas planejado em
+`BACKLOG-CFG-005` e exige autorização própria. Não reutilize a autorização de
+WORK-CFG-003 nem avance automaticamente.

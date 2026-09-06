@@ -1,7 +1,7 @@
 # Analysis CFG — fundação do consumer AIR
 
-**Entrega atual:** Java 21/Maven e boundary física com `air-java`, ainda sem
-algoritmo CFG. **Data:** 06/09/2026. **Repositório:**
+**Entrega atual:** Java 21/Maven, porta física com `air-java` e seam explícito de
+capabilities, ainda sem algoritmo CFG. **Data:** 06/09/2026. **Repositório:**
 `Gustavo2358/analysis-cfg`.
 
 Este projeto construirá CFGs a partir da **Analysis IR 2.0.0**, recebendo exatamente
@@ -40,10 +40,11 @@ Nenhum JAR ou modelo AIR é copiado para este repositório.
 | TDD e oráculos | [evals](docs/evals/index.md) |
 | Verificação do próprio harness | [gates](docs/engineering/gates.md) |
 
-O backlog é plano, não autorização. `WORK-CFG-001` concluiu as decisões pré-Java e
-`WORK-CFG-002` materializa somente a fundação `Publication → AirValidator →
-CfgPreflight`. `BuildCfg`, nós, arestas e interpretação de controle continuam fora
-deste checkpoint.
+O backlog é plano, não autorização. `WORK-CFG-001` concluiu as decisões pré-Java,
+`WORK-CFG-002` materializou `Publication → AirValidator → CfgPreflight`, e
+`WORK-CFG-003` fechou `BuildCfg(Publication, BuildOptions) → CfgBuildResult` mais o
+registry por capability/version. Nós, arestas e interpretação de controle continuam
+fora deste checkpoint.
 
 ## O que os gates significam hoje
 

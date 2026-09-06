@@ -2,18 +2,18 @@
 
 ## Item ativo
 
-Nenhum. O fechamento de WORK-CFG-002 não autoriza o próximo backlog.
+Nenhum. A conclusão de WORK-CFG-003 não autoriza CFG-FIRST.
 
 ## Último item concluído
 
-[WORK-CFG-002](history/WORK-CFG-002.md) — `completed`, fundação Java 21/Maven,
-boundary `Publication → AirValidator → CfgPreflight`, testes e gate arquitetural;
-nenhum algoritmo CFG.
+[WORK-CFG-003](history/WORK-CFG-003.md) — `completed`, porta
+`BuildCfg(Publication, BuildOptions) → CfgBuildResult`, seam explícito por
+capability/version e gate arquitetural ampliado; nenhum algoritmo CFG.
 
-## Próximo candidato
+## Próximos candidatos
 
-BACKLOG-CFG-003 permanece `planned`, não iniciado e sem autorização. Ele é apenas o
-próximo candidato após review humano do PR de WORK-CFG-002.
+BACKLOG-CFG-004 e BACKLOG-CFG-005 permanecem `planned`, sem work item e sem
+autorização. BACKLOG-CFG-005 é CFG-FIRST e não foi iniciado.
 
 ## Roteamento
 

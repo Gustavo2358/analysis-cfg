@@ -2,18 +2,29 @@
 
 ## Porta de entrada
 
-Contrato conceitual, sem congelar detalhes Java além da boundary:
+Contrato Java implementado no package
+`io.github.gustavo2358.analysis.cfg.application`:
 
 ```text
-BuildCfg(air-java Publication, BuildOptions) → CfgBuildResult
+BuildCfg.build(air-java Publication, BuildOptions) → CfgBuildResult
 ```
 
 `Publication` é exatamente `io.github.gustavo2358.air.model.Publication`, do
 artefato `io.github.gustavo2358:air-java`. A porta não define DTO/modelo semântico
 concorrente e não aceita `Path`, `InputStream`, bytes, JSON, COBOL Semantic Product,
-AST ou source code. `BuildOptions` declara escopo de entries, capabilities/modos de
-precisão e limites. O resultado é tipado, imutável e não contém callback para
-completar fatos.
+AST ou source code. No checkpoint de foundation, `BuildOptions` contém apenas
+`ValidationOptions`, política operacional já executada pelo preflight; não possui
+flags de dialeto, inferência, fallthrough ou suporte presumido. A Publication
+inteira cruza a porta, sem pressupor Entry única. Seleção de entries só será
+adicionada quando um caso de uso concreto exigir. O resultado é tipado, imutável e
+não contém callback para completar fatos.
+
+`CfgBuildResult` registra `PublicationId`, versão AIR, options, o
+`ValidationResult` integral e capabilities requeridas sem intérprete. Seus estados
+são `READY_FOR_CFG_PROJECTION`, `INVALID_IR`, `UNSUPPORTED_CAPABILITY`,
+`VALIDATION_LIMIT` e `INCOMPLETE_VALIDATION`. O primeiro significa somente que um
+slice futuro pode iniciar projeção: não existe campo CFG, nó, aresta ou booleano de
+sucesso. `CfgBuildCoordinator` implementa a porta e para nessa boundary.
 
 O caller pode ser teste, módulo de integração, CLI ou adapter. Todos entregam o
 mesmo objeto semântico à mesma porta.
@@ -36,7 +47,9 @@ validação incompleta/capability incompatível é tratado de forma explícita a
 builder. O consumer não reimplementa um validator AIR divergente.
 
 `INCOMPLETE_VALIDATION`, `VALIDATION_LIMIT` e `UNSUPPORTED_CAPABILITY` não são
-convertidos em sucesso por conveniência. `SEMANTIC_OBLIGATION` preserva uma
+convertidos em sucesso por conveniência. Uma extensão requerida conhecida pelo
+registry ainda preserva o `INCOMPLETE_VALIDATION` que o validator upstream emitiu;
+o seam não certifica a semântica da extensão. `SEMANTIC_OBLIGATION` preserva uma
 obrigação cuja verdade externa não foi provada; o CFG não a promove a fato.
 
 `AirValidator` verifica a estrutura que sua versão suporta. Ele não substitui evals
@@ -74,10 +87,10 @@ disfarçar falha. A ausência do binding não bloqueia o core em memória.
 
 `Publication` é snapshot imutável compartilhado. O CFG não faz deep copy O(N) por
 padrão; pode reter referências/IDs AIR e manter índices derivados próprios.
-`CfgBuildResult` sempre registra `PublicationId`, versão/revisão, opções e
-correlações de Unit/Entry/Sequence/Operation/Origin pertinentes. Nenhum índice muda
-a AIR. Não há consulta lazy ao produtor nem dependência de um arquivo continuar
-aberto.
+`CfgBuildResult` já registra `PublicationId`, versão/revisão, opções e preflight.
+Correlações de Unit/Entry/Sequence/Operation/Origin surgirão somente com produto
+CFG pertinente. Nenhum índice muda a AIR. Não há consulta lazy ao produtor nem
+dependência de um arquivo continuar aberto.
 
 ## Portas de saída
 

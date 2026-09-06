@@ -26,7 +26,7 @@ Qualquer não zero impede anunciar o gate como verde. Skip de gate obrigatório 
 ## Estado explícito
 
 [gate-state.json](gate-state.json) declara fase `implementation`, autorização
-`WORK-CFG-002` e hook real para `architecture`. Semantic, performance e integration
+`WORK-CFG-003` e hook real para `architecture`. Semantic, performance e integration
 continuam sem hook. O checker prova consistência local, não a veracidade de
 autorização humana.
 
@@ -40,19 +40,23 @@ O gate de arquitetura prova no build/bytecode real deste checkpoint:
 
 - Java target 21, sem preview;
 - nenhum package/classe AIR duplicado em `analysis-cfg`;
-- kernel depende exclusivamente de `air-java` em compile e `CfgPreflight` recebe
-  sua `Publication`;
+- kernel depende exclusivamente de `air-java` em compile e `BuildCfg` recebe sua
+  `Publication` com `BuildOptions`, retornando `CfgBuildResult`;
 - kernel sem Jackson, filesystem, CLI, ProLeap, ANTLR ou COBOL Semantic Product;
 - AIR JSON reader fora do kernel;
 - produto CFG não muta a AIR;
 - `AirValidator` usado no preflight, sem validator AIR local divergente;
+- registry explícito usa `Capabilities.Capability`, rejeita duplicata e não descobre
+  plugins por reflection/`ServiceLoader`;
+- nenhuma classe produtiva depende de `Entry`, `Sequence`, `Operation`,
+  `Instruction`, `Terminator` ou `Return` neste checkpoint;
 - suíte falha quando executa zero casos.
 
-O hook executa Maven, exige relatórios Surefire com contagem não zero, lê classfiles,
-confere major 65/minor sem preview, inspeciona a árvore/classpath, executa `javap` e
-`jdeps`, aplica uma guarda complementar aos imports produtivos e roda fixtures
-internas negativas do detector. `BuildCfg` ainda não existe e não é exigido por
-este gate.
+O hook executa Maven, exige exatamente as quatro suites e 18 testes obrigatórios
+sem skip, lê o inventário exato de oito classfiles, confere major 65/minor sem
+preview, inspeciona árvore/classpath, executa `javap` e `jdeps`, valida descritores
+da porta/preflight/registry, aplica guarda complementar aos imports produtivos e
+roda fixtures internas negativas do detector. O gate não afirma semântica CFG.
 
 ## Escalonamento
 

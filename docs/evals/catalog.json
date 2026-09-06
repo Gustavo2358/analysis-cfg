@@ -445,6 +445,18 @@
         "INV-CFG-026"
       ],
       "implementation_evidence": null
+    },
+    {
+      "id": "EVAL-CFG-027",
+      "title": "Registry explícito de capability/version",
+      "status": "implemented",
+      "expectation": "Composição registra intérpretes explicitamente por capability/version; duplicata ou conflito falha; ordem não cria prioridade; versões distintas coexistem; ausência produz incompatibilidade explícita, sem executar interpretação ou fallback.",
+      "upstream_oracles": [],
+      "invariants": [
+        "INV-CFG-014",
+        "INV-CFG-022"
+      ],
+      "implementation_evidence": "docs/work/history/WORK-CFG-003.md"
     }
   ]
 }

@@ -1,7 +1,8 @@
 # Arquitetura — mapa curto
 
-**A fundação Java/Maven e a boundary física pertencem a este checkpoint; o
-algoritmo CFG continua não implementado.** [ADRs](docs/architecture/decisions/index.md).
+**A fundação Java/Maven, a porta física e o seam explícito de capabilities estão
+implementados; o algoritmo CFG continua não implementado.**
+[ADRs](docs/architecture/decisions/index.md).
 
 ```text
 proleap-poc
@@ -29,10 +30,11 @@ file / AIR JSON adapter ─┐
 memory caller ───────────┘
 ```
 
-Contrato conceitual: `BuildCfg(air-java Publication, BuildOptions) →
-CfgBuildResult`. A porta não recebe `Path`, `InputStream`, JSON, COBOL ou Semantic
-Product. O caso de uso executa `AirValidator`, preflight de versão/capabilities e só
-então a semântica CFG. Trocar transporte não muda a porta nem o algoritmo.
+Contrato físico: `BuildCfg.build(air-java Publication, BuildOptions) →
+CfgBuildResult`, implementado pelo `CfgBuildCoordinator`. A porta não recebe `Path`,
+`InputStream`, JSON, COBOL ou Semantic Product. O caso de uso executa
+`AirValidator`, preflight de versão/capabilities e para antes da semântica CFG.
+Trocar transporte não muda a porta nem o algoritmo futuro.
 
 O Analysis IR JSON Binding 1.0.0 pertence ao `analysis-ir`, targets AIR 2.0.0 e
 permanece DRAFT no commit fixado. Ele não é implementado neste checkpoint. Um
@@ -48,9 +50,10 @@ ausência de codec não bloqueia testes com `Publication` construída em memóri
 | `cfg-adapters` | kernel, `air-java` e bibliotecas de infraestrutura |
 | `cfg-launcher` | adapters e kernel, somente composição/execução |
 
-`analysis-cfg` não contém um segundo modelo AIR. O bootstrap Java 21/Maven prova
-somente `Publication → AirValidator → boundary`; a porta `BuildCfg` e o algoritmo
-permanecem para checkpoints posteriores.
+`analysis-cfg` não contém um segundo modelo AIR. A foundation prova
+`Publication → BuildCfg + BuildOptions → CfgBuildResult`, reutiliza `AirValidator`
+e negocia intérpretes compostos explicitamente por capability/version. O resultado
+`READY_FOR_CFG_PROJECTION` não contém grafo e não representa sucesso CFG.
 
 ## Primeiros marcos
 
