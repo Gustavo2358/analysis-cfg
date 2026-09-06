@@ -148,6 +148,34 @@ Os passos de instalação do air-java pinado, fast, architecture e semantic pass
 em Temurin 21, usando o mesmo Maven repo isolado. A autorização de encerramento
 não se baseou apenas no ambiente local. O PR também executa a CI no seu HEAD final.
 
+## Correção solicitada no review do PR #5
+
+O usuário autorizou uma correção focal: entries()/normalExits() percorriam todos
+os nós e alocavam listas em cada consulta, contrariando graph-product.md. A
+correção permanece no mesmo WORK-CFG-005/PR, sem promover outro backlog.
+
+Regressão `navigationReusesMaterializedImmutableInventories` escrita antes da
+correção: RED observado com exit 1, falhando nas duas assertivas de identidade das
+listas. Comando: `mvn -B -ntp -pl :cfg-kernel
+-Dtest=EvalCfg025Test#navigationReusesMaterializedImmutableInventories test`, no
+mesmo Maven repo isolado acima. O teste também verifica conteúdo e imutabilidade.
+
+CfgGraph passou de record a classe final para guardar as duas listas em campos
+final privados. Elas são preenchidas na passagem de validação dos nós e congeladas
+com List.copyOf; accessors retornam diretamente os campos, sem lazy cache. O
+construtor e accessors públicos, igualdade por valor, invariantes e retenção da AIR
+foram preservados. A regressão de cópia defensiva também verifica equals/hashCode.
+Javap confirmou que ambas as consultas contêm apenas aload_0/getfield/areturn.
+
+GREEN focal: 20 testes EVAL-CFG-025, zero skips, exit 0. Os inventários dos gates
+passam a exigir 20 testes semânticos/38 totais e continuam enumerando exatamente
+as mesmas 13 fontes e 20 classfiles. Performance gate/benchmarks não foram ativados.
+Validação da correção no Maven repo isolado: fast, architecture, semantic,
+`mvn -B -ntp clean verify` (38 testes) e `git diff --check` passaram com exit 0.
+Performance/integration/full não foram reexecutados nesta correção focal.
+A CI Temurin 21 do commit da correção será conferida no PR antes do handoff;
+a evidência do HEAD revisado fica registrada no próprio PR.
+
 ## Handoff
 
 WORK-CFG-005 e BACKLOG-CFG-005 completed; registry.active vazio. Novo PR contra

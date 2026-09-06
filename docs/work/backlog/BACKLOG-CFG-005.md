@@ -49,8 +49,8 @@ lowerer, dataflow, leader detection ou coalescing.
 
 ## Evidência de conclusão
 
-EVAL-CFG-025 implemented: 19 testes semânticos, oracle independente anterior ao
+EVAL-CFG-025 implemented: 20 testes semânticos, oracle independente anterior ao
 builder, mutante de fallthrough morto e metamorfismos. Architecture/semantic/fast
-PASS, clean test/verify com 37 testes; CI Temurin 21 verde. Histórico registra
+PASS, clean test/verify com 38 testes; CI Temurin 21 verde. Histórico registra
 comandos/exit codes, limites e challenge. CFG-FIRST implementado, nenhum perfil AIR
 completo. Entrega em novo PR para review humano, sem merge nem próximo backlog.

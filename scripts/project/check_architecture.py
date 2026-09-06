@@ -126,7 +126,7 @@ EXPECTED_PRODUCTION_IMPORTS.update({
     },
     SOURCE_ROOT + "domain/CfgGraph.java": {
         "io.github.gustavo2358.air.model.Operations", PUBLICATION, "java.util.HashMap",
-        "java.util.HashSet", "java.util.List", "java.util.Map", "java.util.Objects",
+        "java.util.HashSet", "java.util.List", "java.util.Map", "java.util.Objects", "java.util.ArrayList",
     },
     SOURCE_ROOT + "domain/CfgProjectionIssue.java": {
         "io.github.gustavo2358.air.model.Ids.Id", "java.util.Objects",
@@ -159,7 +159,7 @@ EXPECTED_TEST_CASES = {
     "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinatorTest": 6,
     "io.github.gustavo2358.analysis.cfg.application.CfgPreflightTest": 4,
     "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistryTest": 4,
-    DOMAIN_CLASS + "EvalCfg025Test": 19,
+    DOMAIN_CLASS + "EvalCfg025Test": 20,
 }
 EXPECTED_PREFLIGHT_JDEPS_TARGETS = {
     PUBLICATION,

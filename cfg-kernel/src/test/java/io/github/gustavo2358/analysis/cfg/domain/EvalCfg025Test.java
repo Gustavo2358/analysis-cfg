@@ -235,6 +235,25 @@ class EvalCfg025Test {
         CfgGraph copiedContainers = new CfgGraph(publication, nodes, edges);
         nodes.clear(); edges.clear();
         assertEquals(minimalExpected(), observe(copiedContainers));
+        assertEquals(graph, copiedContainers);
+        assertEquals(graph.hashCode(), copiedContainers.hashCode());
+    }
+
+    @Test
+    void navigationReusesMaterializedImmutableInventories() {
+        EntryId second = new EntryId(U, "second");
+        CfgGraph graph = graph(publication(List.of(unit(U,
+                List.of(entry(E, L), entry(second, L)), List.of(returning(L))))));
+        List<CfgNode.EntryNode> entries = graph.entries();
+        List<CfgNode.NormalExit> exits = graph.normalExits();
+
+        assertEquals(List.of(E, second), entries.stream().map(node -> node.source().id()).toList());
+        assertEquals(List.of(E, second), exits.stream().map(CfgNode.NormalExit::entryId).toList());
+        assertAll(
+                () -> assertSame(entries, graph.entries(), "entries must reuse its materialized list"),
+                () -> assertSame(exits, graph.normalExits(), "normalExits must reuse its materialized list"),
+                () -> assertThrows(UnsupportedOperationException.class, () -> entries.clear()),
+                () -> assertThrows(UnsupportedOperationException.class, () -> exits.clear()));
     }
 
     @Test

@@ -37,14 +37,14 @@ não rastreada para fingir independência.
 
 ## O que existe hoje
 
-O gate `architecture` executa build e 37 testes obrigatórios, exige inventário
+O gate `architecture` executa build e 38 testes obrigatórios, exige inventário
 Surefire exato, inspeciona classfiles/dependency tree/classpath e confirma as
 assinaturas e chamadas com `javap`/`jdeps`. Fixtures e mutações reais exercitam
 filesystem, AIR paralela, DTO local, reflection/`ServiceLoader`, frontend e falso
 sucesso para unsupported. Isso preserva EVAL-CFG-007/EVAL-CFG-024 e implementa
 EVAL-CFG-027 como prova arquitetural local. O gate passou a enumerar os tipos CFG
 e a proibir dependências domain → application/extension e primitives além de
-Return. EVAL-CFG-025 executa 19 testes semânticos; EVAL-CFG-008/009/020 permanecem
+Return. EVAL-CFG-025 executa 20 testes semânticos; EVAL-CFG-008/009/020 permanecem
 planejados.
 
 EVAL-CFG-026 reserva o micro-E2E externo `cobol-semantic-product.json` →

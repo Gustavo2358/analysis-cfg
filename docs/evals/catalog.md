@@ -186,7 +186,7 @@ builder. `CFG-FIRST` não implementa `Halt`.
 
 Oráculos upstream: O-18-STRUCT, O-30-STRUCT. Invariantes:
 INV-CFG-003, INV-CFG-004, INV-CFG-005, INV-CFG-006, INV-CFG-008, INV-CFG-019,
-INV-CFG-021, INV-CFG-023, INV-CFG-026. Estado: `implemented`, com 19 testes em
+INV-CFG-021, INV-CFG-023, INV-CFG-026. Estado: `implemented`, com 20 testes em
 [EvalCfg025Test](../../cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg025Test.java)
 e seleção obrigatória no semantic gate.
 

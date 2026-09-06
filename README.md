@@ -55,7 +55,7 @@ Jump, Halt, branch, invoke, JSON, CLI e dataflow permanecem posteriores.
 `docs`, `harness` e `fast` verificam arquivos, referências, IDs, dependências de
 backlog, work items e os próprios validadores documentais. `architecture` executa
 Maven/testes e inspeciona dependências e bytecode do kernel. `semantic` executa
-explicitamente os 19 testes de EVAL-CFG-025 e rejeita testes ausentes ou pulados.
+explicitamente os 20 testes de EVAL-CFG-025 e rejeita testes ausentes ou pulados.
 `performance`, `integration` e, por consequência, `full` permanecem
 **UNAVAILABLE / exit 3**; full executa fast, architecture e semantic antes de parar
 em performance. CFG-FIRST não implica conformidade com um perfil AIR completo.

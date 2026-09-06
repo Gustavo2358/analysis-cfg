@@ -18,8 +18,10 @@ Conceitos do produto completo (somente Entry/Return implementados agora):
 
 No package `io.github.gustavo2358.analysis.cfg.domain`:
 
-- `CfgGraph`: referência à Publication original, inventário de nós e transições em
-  listas imutáveis; `entries()` e `normalExits()` expõem as respectivas listas;
+- `CfgGraph`: classe final com referência à Publication original e inventário de
+  nós/transições imutáveis. Materializa as listas de entries e normal exits uma vez
+  durante a construção; `entries()` e `normalExits()` retornam essas mesmas listas
+  em O(1), sem percorrer nós ou alocar novamente;
 - `CfgNodeId(PublicationId, ordinal)`: identidade do CFG, distinta de qualquer ID
   AIR. Ordinais são atribuídos deterministicamente por namespace/ID e papel; não
   têm estabilidade prometida entre publicações/revisões diferentes;

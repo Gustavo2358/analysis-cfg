@@ -25,6 +25,7 @@ EXPECTED_METHODS = {
     "unitsWithSameLocalIdsRemainDistinctAndOrderIndependent",
     "cfgIdsHaveTheirOwnDomainEvenWhenAirLocalIdsCollide",
     "graphIsImmutableAndRetainsTheOriginalAirObjectsWithoutDeepCopy",
+    "navigationReusesMaterializedImmutableInventories",
     "haltIsOutsideTheSliceIncludingInAnOrphan",
     "jumpIsOutsideTheSliceEvenWithAValidExplicitTarget",
     "instructionsAreExplicitlyOutsideThisSlice",

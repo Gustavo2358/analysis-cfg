@@ -8,7 +8,7 @@
 | `check-harness.sh` | executável | testes adversariais do próprio validador e runner |
 | `check-fast.sh` | executável | docs + harness |
 | `check-architecture.sh` | executável | Maven/testes, inventários exatos, dependências, bytecode Java 21 e boundary `air-java` |
-| `check-semantic.sh` | executável | 19 testes obrigatórios de EVAL-CFG-025, por suíte e nomes exatos |
+| `check-semantic.sh` | executável | 20 testes obrigatórios de EVAL-CFG-025, por suíte e nomes exatos |
 | `check-performance.sh` | UNAVAILABLE | futuras propriedades algorítmicas/escala |
 | `check-integration.sh` | UNAVAILABLE | futuro arquivo→porta e equivalência em memória |
 | `check-full.sh` | UNAVAILABLE | executa fast, architecture e semantic; para em performance com exit 3 |
@@ -36,7 +36,7 @@ falha. Não habilitar gate com script que imprime PASS sem executar verificaçã
 
 ## Arquitetura
 
-O hook executa Maven com clean/test, exige cinco suítes e 37 testes sem skip,
+O hook executa Maven com clean/test, exige cinco suítes e 38 testes sem skip,
 inspeciona inventários exatos de 13 fontes e 20 classfiles (incluindo tipos
 aninhados/sintéticos), major 65/minor 0, árvore de dependências, classpath,
 `javap` e `jdeps`. Guardas de imports complementam a inspeção de bytecode.
@@ -60,9 +60,9 @@ provadas também nos testes semânticos, não inferidas apenas de packages.
 
 `check_semantic.py` executa `clean test` selecionando exatamente
 `io.github.gustavo2358.analysis.cfg.domain.EvalCfg025Test`. Confere o único relatório
-Surefire, os 19 nomes obrigatórios, contagens e ausência de failure/error/skip,
+Surefire, os 20 nomes obrigatórios, contagens e ausência de failure/error/skip,
 inclusive em cada testcase. Não é um alias para `mvn test` inteiro.
-O detector rejeita 25 relatórios adversariais, incluindo zero casos, cada obrigação
+O detector rejeita 26 relatórios adversariais, incluindo zero casos, cada obrigação
 ausente, duplicata, suíte errada e skip/failure/error.
 
 A suíte prova Entry/initialLabel, Sequence, Return/normal exit por Unit/Entry,
