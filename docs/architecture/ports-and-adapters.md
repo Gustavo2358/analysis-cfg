@@ -35,6 +35,10 @@ em memória também passa por `AirValidator`. `INVALID_IR` não é reparada. Sta
 validação incompleta/capability incompatível é tratado de forma explícita antes do
 builder. O consumer não reimplementa um validator AIR divergente.
 
+`INCOMPLETE_VALIDATION`, `VALIDATION_LIMIT` e `UNSUPPORTED_CAPABILITY` não são
+convertidos em sucesso por conveniência. `SEMANTIC_OBLIGATION` preserva uma
+obrigação cuja verdade externa não foi provada; o CFG não a promove a fato.
+
 `AirValidator` verifica a estrutura que sua versão suporta. Ele não substitui evals
 de conformidade do consumer: os evals CFG provam que `Return`, branches, outcomes e
 outros fatos são interpretados corretamente.
@@ -54,10 +58,12 @@ memory caller ──────────────────────
 ```
 
 O binding JSON normativo pertence e é versionado pelo `analysis-ir`, de modo
-independente da linguagem. Ele ainda não existe no commit fixado. Quando existir,
-o `analysis-cfg` poderá implementar um reader em `cfg-adapters`; `air-java` continua
-sem Jackson/Gson/JSON. Não derivar o binding automaticamente da organização de
-records Java e não usar a notação `.air` ou `cobol-semantic-product.json` como schema.
+independente da linguagem. O Analysis IR JSON Binding 1.0.0 existe no commit
+fixado, targets AIR 2.0.0 e permanece DRAFT; este checkpoint não implementa seu
+reader. Uma autorização posterior poderá criar o adapter em `cfg-adapters` sem
+alterar a porta; `air-java` continua sem Jackson/Gson/JSON. Não derivar o binding
+automaticamente da organização de records Java e não usar a notação `.air` ou
+`cobol-semantic-product.json` como schema.
 
 Erro de arquivo/encoding/JSON é `INPUT_ERROR` do adapter; AIR com referência
 pendente é `INVALID_IR`; capability legítima fora do slice é

@@ -26,6 +26,19 @@ Operações/terminadores são sealed. Uma extensão precisa nova pode exigir nov
 da biblioteca; o consumer desconhecedor usa reduction, envelope ou incompatibilidade
 conforme o contrato, nunca `Map<String,Object>` nem tipos AIR paralelos.
 
+A revisão reconciliada não possui `Publication.contracts[]`: `ContractRef` é valor
+e cada `invoke` materializa a assinatura externa, effects e outcomes aplicáveis.
+Targets executáveis são exatamente internal, literal ou computed; `ResourceId`
+continua declarativo. Relações usam `ArtifactRelationId`; `OperandId` conserva seu
+owner completo de operação ou entry. `Signature` mantém inventários/restantes de
+parâmetros e resultados independentes, enquanto `InvocationOutcomes` permanece
+distinto de `ControlEnvelope`.
+
+`DisjointStorage` representa a premissa normativa universal entre bases, não um
+certificado privado nem fato com escopo seletivo. Naturais sem teto AIR são
+`BigInteger`. Proveniência escrita pode usar linha/coluna ou offsets com unidade
+explícita; o consumer não fabrica coordenadas ausentes.
+
 O CFG inicial não interpreta storage/values. Preserva operandos e metadata
 pertinentes sem adulteração e aceita apenas o subset declarado. Capability fora do
 subset não vira silenciosamente publicação menor. A quantidade de ocorrências não é
@@ -46,6 +59,10 @@ provas aplicáveis, entre outras regras. `INVALID_IR` encerra o build; validaç�
 incompleta permanece diagnóstico explícito. O CFG não recupera label por nome,
 posição, frontend ou JSON.
 
+`SEMANTIC_OBLIGATION` continua obrigação não comprovada, e
+`INCOMPLETE_VALIDATION`/unsupported continua limitação explícita. O preflight não
+reinterpreta nenhuma dessas classes para fazer a boundary passar.
+
 `AirValidator` não prova que o lowerer preservou COBOL nem que o consumer projetou
 controle corretamente. Evals CFG independentes continuam necessários e não geram
 seus expected a partir do builder.
@@ -64,8 +81,9 @@ para lifetime nem consulta o produtor de forma lazy.
 ## Publicação não é arquivo
 
 O core não conhece encoding, schema JSON, bytes, diretório ou URL. O binding JSON
-normativo pertence ao `analysis-ir` e ainda não existe no commit fixado. O futuro
-reader é adapter do `analysis-cfg` que materializa `air-java Publication`; o modelo
+pertence ao `analysis-ir`: sua versão 1.0.0 targets AIR 2.0.0, mas permanece DRAFT
+no commit fixado e não é implementada neste checkpoint. Um futuro reader autorizado
+será adapter do `analysis-cfg` que materializa `air-java Publication`; o modelo
 compartilhado continua transport-independent. A notação dos exemplos e
 `cobol-semantic-product.json` não são AIR JSON. Consultar
 [portas](../architecture/ports-and-adapters.md) antes de criar adapter.

@@ -2,7 +2,7 @@
 
 ## Baseline decidida
 
-Os novos módulos de `analysis-cfg` usarão **Java 21, sem preview**, e Maven. O POM
+Os módulos de `analysis-cfg` usam **Java 21, sem preview**, e Maven. O POM
 do `proleap-poc` continua compilando com `--release 17`; bytecode 17 é consumível
 numa JVM 21 e não exige rebaixar o consumer nem alterar o frontend neste projeto.
 
@@ -10,18 +10,43 @@ O modelo compartilhado vem de:
 
 ```text
 repository: Gustavo2358/air-java
-commit:     2108294d9dfeb89d0019ce75fab27172b15a75b9
+commit:     6a4091e5394fc22b3d2ada9abbdb530eb3572a58
 Maven:      io.github.gustavo2358:air-java:0.1.0-SNAPSHOT
-AIR:        2.0.0 @ 0b2fbce7046010b22b32efa8cbc3e75ccba09442
+AIR:        2.0.0 @ 122ce54e1b9ef9b00646f93ece409ca8b63bc933
 JDK:        21, sem preview
 ```
 
 `0.1.0-SNAPSHOT` é versão da biblioteca, não da AIR. Nenhuma tag/release foi
-observada. O bootstrap autorizado deve provar uma resolução Maven reprodutível do
-SHA fixado — publicação em repositório ou instalação controlada do checkout exato —
-sem aceitar conteúdo SNAPSHOT flutuante e sem copiar fontes para `analysis-cfg`.
+observada.
 
-A implementação será Java/Maven; Python/Bash neste repo validam somente o harness.
+## Resolução temporária e reproduzível do SNAPSHOT
+
+O CI faz checkout de `analysis-cfg` e `air-java` como diretórios irmãos. O ref do
+upstream é o SHA completo acima e o workflow confirma `git rev-parse HEAD` antes de
+instalar. Com JDK 21, ambos os builds compartilham um repositório Maven inicialmente
+vazio e isolado, selecionado por
+`MAVEN_OPTS=-Dmaven.repo.local=${runner.temp}/analysis-cfg-m2`.
+
+A instalação é executada **com o working directory no checkout de `air-java`**:
+
+```text
+mvn -B -ntp clean install
+```
+
+Depois, o build e os gates do consumer rodam com working directory em
+`analysis-cfg`, usando o mesmo repositório Maven isolado. Invocar apenas
+`mvn -f air-java/pom.xml` a partir do diretório pai não é equivalente no upstream
+atual, pois sua suíte resolve fontes relativamente ao working directory.
+
+A reprodução local usa a mesma sequência: clone de `air-java`, checkout detached
+do SHA fixado, confirmação de `HEAD`, diretório Maven temporário vazio, instalação
+a partir da raiz upstream e então build do consumer com o mesmo diretório Maven.
+Nenhum JAR é vendorizado ou publicado por este trabalho, e o core não depende do
+path do checkout irmão. A estratégia é temporária: um artefato versionado ou um
+reactor Maven futuro poderá substituir a preparação sem alterar a boundary.
+
+A fundação é Java/Maven; Python/Bash neste repo validam somente o harness e a
+arquitetura compilada.
 Não há geração de Java ou solver alternativo em Python. Dependências de teste e
 plugins serão versionadas no bootstrap; ANTLR e bibliotecas do frontend são
 proibidos no kernel.
@@ -34,20 +59,21 @@ módulo/modelo AIR local. O core pode criar apenas seus próprios tipos CFG, op�
 diagnósticos de consumer e índices derivados.
 
 Planejamento enxuto: `cfg-kernel` com domínio/aplicação separados por packages;
-`cfg-adapters` com reader AIR JSON/arquivos/exportadores quando o binding existir;
+`cfg-adapters` com reader AIR JSON/arquivos/exportadores somente após promoção do
+binding DRAFT e autorização de checkpoint;
 `cfg-launcher` com composition root/CLI quando necessário. Separar application em
 artefato próprio somente se uma dependência concreta justificar. Não criar dezenas
 de módulos antes de `CFG-FIRST`.
 
 ## Gates do bootstrap
 
-O futuro gate de arquitetura inspeciona bytecode e build real para provar:
+O gate de arquitetura deste checkpoint inspeciona bytecode e build real para provar:
 
 - target Java 21 e ausência de preview;
-- kernel depende de `air-java` e `BuildCfg` recebe sua `Publication`;
+- kernel depende de `air-java` e o preflight recebe sua `Publication`;
 - nenhum package/classe AIR duplicado neste repo;
 - kernel sem Jackson, filesystem, CLI, ProLeap, ANTLR ou COBOL Semantic Product;
-- reader JSON fora do kernel;
+- nenhuma boundary de entrada JSON no kernel;
 - preflight reutiliza `AirValidator`, sem validator AIR local divergente;
 - testes falham quando não executam nenhum caso.
 

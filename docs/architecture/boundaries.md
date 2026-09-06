@@ -40,13 +40,14 @@ algoritmos, mas seus tipos não atravessam a API pública sem decisão explícit
 
 ## Gate que torna isso real
 
-BACKLOG-CFG-002/003 implementarão os limites de dependência antes do builder.
-Um teste negativo injeta temporariamente dependência proibida e deve falhar.
+BACKLOG-CFG-002 implementa o primeiro limite físico no preflight; BACKLOG-CFG-003
+fechará a porta do builder e o seam semântico. Um teste negativo injeta
+temporariamente dependência proibida e deve falhar.
 Um teste de isolamento executa o caso de uso sem adapters no classpath de teste,
 sem rede e sem leitura de fixture em disco.
 Mudança de localização de Maven modules não dispensa as mesmas provas.
 
-O gate futuro também verifica `--release 21`, dependência do kernel em `air-java`,
+O gate atual verifica `--release 21`, dependência do kernel em `air-java`,
 ausência de `Publication`/`Sequence`/demais tipos AIR locais, uso de `AirValidator`
 no preflight e ausência de validator paralelo. Mutabilidade ou deep copy da AIR é
 testada semanticamente; não se infere apenas da estrutura de packages.

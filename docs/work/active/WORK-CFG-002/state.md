@@ -2,24 +2,26 @@
 
 ## Onde estamos
 
-Item promovido com autorização de implementação. `main` local estava limpa e
-sincronizada com `origin/main`; trabalho isolado em
-`codex/feat/cfg-java-air-boundary`.
+Boundary mínima implementada em `codex/feat/cfg-java-air-boundary`: parent Maven,
+`cfg-kernel`, `CfgPreflight`, quatro testes, CI pinado e gate arquitetural real. Não
+há tipos nem algoritmo CFG.
 
 ## Verde conhecido
 
-Antes das mudanças, `bash scripts/harness/check-fast.sh` passou com 38 testes do
-harness. O gate architecture retornou `UNAVAILABLE` com exit 3, como esperado na
-fase docs-only. Os dois refs `main` upstream foram confirmados diretamente.
+Refs remotos e blobs foram confirmados. O `air-java` exato instalou com 172 checks;
+Maven do consumer passa quatro testes. `fast` passa 41 testes do harness e
+`architecture` confirma major 65/sem preview, `java.base`, dependência exclusiva em
+`air-java`, source pin e delegação a `AirValidator`.
 
 ## Restante
 
-Atualizar fontes/harness, criar build/preflight/testes/CI, observar RED, obter
-GREEN, revisar diff, arquivar este item e abrir um único PR.
+Executar o rehearsal final de checkout limpo, revisar o diff, arquivar este item e
+abrir um único PR para review humano.
 
 ## Descobertas que afetam o plano
 
 O JSON Binding 1.0.0 agora existe no `analysis-ir`, mas permanece explicitamente
 DRAFT e fora do código. O `air-java` reconciliado removeu `contracts[]` de
 `Publication`; assinatura, outcomes e `ContractRef` são fatos materializados no
-site de invoke.
+site de invoke. A instalação upstream deve rodar na raiz de seu checkout. A máquina
+local tem JDK 25 e compila com `--release 21`; o workflow prova execução em JDK 21.
