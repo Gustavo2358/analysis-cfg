@@ -6,6 +6,8 @@ Dependências: BACKLOG-CFG-008.
 ## Problema e objetivo observável
 
 Confrontar fixtures sintéticas com publicação real sem relaxar o contrato.
+Este é o marco bilateral maduro; o micro-E2E de entrada/Return está separado em
+BACKLOG-CFG-023 e não redefine este item.
 
 ## Escopo e estratégia
 

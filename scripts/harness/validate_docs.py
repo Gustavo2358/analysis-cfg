@@ -213,7 +213,9 @@ def validate(root: Path) -> list[str]:
     active = registry.get('active', [])
     history = registry.get('history', [])
     work_ids = unique_ids(active + history, 'work registry')
-    actual_dirs = {p.name for p in (root / 'docs/work/active').iterdir() if p.is_dir()}
+    active_root = root / 'docs/work/active'
+    actual_dirs = ({p.name for p in active_root.iterdir() if p.is_dir()}
+                   if active_root.exists() else set())
     if actual_dirs != {a['id'] for a in active}:
         error('Active directories differ from registry')
     for item in backlog:
@@ -324,6 +326,54 @@ def validate(root: Path) -> list[str]:
             error('Unsafe IR source path: ' + p)
         if not re.fullmatch('[0-9a-f]{40}', f.get('git_blob_sha1', '')):
             error('Invalid IR blob hash: ' + p)
+    binding = air.get('json_binding', {})
+    if binding.get('owner') != air.get('repository'):
+        error('Analysis IR JSON binding must be owned by analysis-ir')
+    if binding.get('status') not in ('not_present_in_verified_commit', 'present'):
+        error('Invalid Analysis IR JSON binding status')
+    if binding.get('checked_commit') != air.get('commit'):
+        error('Analysis IR JSON binding check must use normative commit')
+
+    air_java = sources.get('air_java', {})
+    if not re.fullmatch('[0-9a-f]{40}', air_java.get('commit', '')):
+        error('air-java commit must be immutable 40-character SHA')
+    if air_java.get('role') != 'shared_java_model_and_validator':
+        error('air-java role must own shared model and validator')
+    coordinates = air_java.get('maven', {})
+    expected_coordinates = {
+        'group_id': 'io.github.gustavo2358',
+        'artifact_id': 'air-java',
+        'version': air_java.get('library_version')
+    }
+    if coordinates != expected_coordinates or not air_java.get('library_version'):
+        error('air-java Maven coordinates/version mismatch')
+    air_java_ir = air_java.get('analysis_ir', {})
+    if (air_java_ir.get('semantic_version') != air.get('semantic_version') or
+            air_java_ir.get('commit') != air.get('commit')):
+        error('air-java and normative Analysis IR baseline disagree')
+    java = air_java.get('java', {})
+    if java.get('release') != 21 or java.get('preview') is not False:
+        error('analysis-cfg/air-java baseline must use Java 21 without preview')
+    if air_java.get('ci', {}).get('checked_commit') != air_java.get('commit'):
+        error('air-java CI evidence must match pinned commit')
+
+    proleap = sources.get('proleap_poc', {})
+    if not re.fullmatch('[0-9a-f]{40}', proleap.get('main_commit', '')):
+        error('proleap-poc main commit must be immutable 40-character SHA')
+    if (proleap.get('public_boundary') != 'cobol_semantic_product' or
+            proleap.get('json_product') != 'cobol-semantic-product'):
+        error('proleap-poc boundary must remain COBOL Semantic Product')
+    merged_reviews = proleap.get('merged_reviews', [])
+    if (not isinstance(merged_reviews, list) or not merged_reviews or
+            merged_reviews[-1].get('merge_commit') != proleap.get('main_commit')):
+        error('proleap-poc main evidence must match latest merged review')
+
+    lower = sources.get('cobol_lower', {})
+    if lower.get('status') == 'planned_upstream_component':
+        if lower.get('commit') is not None or lower.get('api') is not None:
+            error('planned cobol-lower cannot claim commit or API')
+    elif lower.get('status') != 'verified':
+        error('Invalid cobol-lower status')
     expected = {
         'AIR-STRUCTURE@2': {
             'requires': [],

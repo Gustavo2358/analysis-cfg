@@ -4,6 +4,9 @@
 descrevem a baseline examinada naquele parecer, não a autoridade corrente. A
 baseline normativa atual está no [lock](../sources/sources.lock.json) e no
 [estado upstream](../sources/upstream-state.md).
+As decisões então abertas e o “primeiro marco” largo também foram superados pelo
+fechamento de WORK-CFG-001: consultar ADR-0007/ADR-0009 e CFG-FIRST no
+[mapa atual](../../ARCHITECTURE.md).
 
 ## Escopo
 

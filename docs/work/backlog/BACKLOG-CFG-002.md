@@ -1,60 +1,57 @@
-# BACKLOG-CFG-002 — Bootstrap Java/Maven e modelo IR mínimo compartilhável
+# BACKLOG-CFG-002 — Bootstrap Java 21/Maven e boundary air-java
 
-**Estado:** `planned`. **Fase:** `foundation`. **Autorização:** backlog não autoriza execução.
+**Estado:** `ready_for_authorization`. **Fase:** `foundation`. **Autorização:** backlog não autoriza execução.
 Dependências: BACKLOG-CFG-001.
 
 ## Problema e objetivo observável
 
-Criar a fundação tipada da Analysis IR 2.0.0 e build reprodutível, sem algoritmo CFG.
+Criar o build Java 21/Maven reproduzível do consumer e provar a boundary física com
+`air-java`, sem algoritmo CFG e sem modelo AIR local.
 
 ## Escopo e estratégia
 
-Implementar apenas o modelo aprovado suficiente ao MVP com evolução/unsupported
-explícitos; `TypeRef = Known(Type) | UnknownType(UncertaintyId)`, `Premise`,
-`sameDomain` e `DomainProofScope` pertencem à fundação desde o primeiro modelo.
-O slice prova somente representação fechada e preservação mínima desses conceitos;
-regras através de signatures, choices, regiões, invokes/envelopes e todos os sites
-contextuais ficam para os slices que os consomem e para a qualificação. Java 17,
-separação de módulos, construtores/validações e testes TDD.
+Introduzir somente a fundação de módulos/packages, dependência no
+`io.github.gustavo2358:air-java:0.1.0-SNAPSHOT` correspondente ao SHA fixado,
+preflight com `AirValidator` e gates arquiteturais reais. Fechar como resolver de
+forma reprodutível o SNAPSHOT ainda sem release/tag. O kernel usa Java 21 sem preview
+e compila contra a `Publication` compartilhada.
 
 ## Critérios de aceitação
 
-Não há classes IR privadas duplicadas nem `Optional<Type>` substituindo `TypeRef`;
-kernel depende só do contrato; namespaces, imutabilidade, terminador único, escopos
-de prova e lacunas `TYPE_UNKNOWN` são representáveis sem API horizontal da V2;
-build não passa com zero testes.
+Build não passa com zero testes; um smoke de boundary compila contra a `Publication`
+do `air-java`; `AirValidator` é reutilizado; nenhuma classe/package AIR ou validator
+paralelo existe neste repo; kernel não depende de Jackson, filesystem, CLI, ProLeap,
+ANTLR ou COBOL Semantic Product; gate negativo detecta violações. A porta `BuildCfg`
+é fechada no BACKLOG-CFG-003.
 
 ## Evals e invariantes
 
-EVAL-CFG-001, EVAL-CFG-007, EVAL-CFG-013, EVAL-CFG-020, EVAL-CFG-024. Vincular
-invariantes específicos na promoção para work
-item. Ver [catálogo](../../evals/catalog.md) e [invariantes](../../architecture/invariants.md).
-Antes de código, transformar expected em testes RED independentes; documentar o
-resultado observado, não apenas intenção de TDD.
+EVAL-CFG-001, EVAL-CFG-007 e EVAL-CFG-024. Vincular invariantes
+específicos ao promover. Ver [catálogo](../../evals/catalog.md) e
+[invariantes](../../architecture/invariants.md). Expected arquitetural nasce antes
+da configuração que deve satisfazê-lo.
 
 ## Fronteiras e extensibilidade
 
-Preservar Publication/CFG separados, porta em memória e dependências para dentro.
-Nenhum nome COBOL entra na decisão do builder. Nova semântica usa capability IR
-ou proposta upstream; novo transporte usa adapter. Mudança em regra central exige
-ADR e avaliação de impacto sobre consumidores/fixtures/perfis.
+`air-java` possui `Publication`, `Unit`, `Entry`, `Sequence`, `Operation`,
+`Instruction`, `Terminator`, `TypeRef`, IDs, `Premise`, `DomainProofScope` e demais
+tipos AIR. Este item não os implementa. JSON continua fora do modelo/kernel; novas
+variantes sealed exigem versão compatível ou fallback contratual, não payload livre.
 
 ## Discovery, checkpoints e handoff
 
-Promover apenas este item para work item com paths concretos, must_read mínimo,
-domínio, riscos, checkpoints e gates. Nas decisões não triviais, pesquisar fonte
-primária e registrar candidatos/precondições antes de implementar. Ao atingir o
-checkpoint autorizado, atualizar estado e parar para review; não avançar ao próximo
-item porque ficou verde. Sem duplicar este plano em tasklist permanente.
+Promover somente após autorização explícita, com paths concretos, resolução da
+dependência, testes RED e gates. Ao concluir o checkpoint autorizado, parar para
+review; não avançar automaticamente a BACKLOG-CFG-003/005.
 
 ## Fora de escopo
 
-Sem frontend/ANTLR, solver CFG, dataflow, CLI ou APIs cloud. Modelo não acoplado ao
-JSON e sem API antecipada além da foundation exigida pelo primeiro slice. A bateria
-completa O-69-STRUCT–O-85-STRUCT permanece em BACKLOG-CFG-011.
+Sem builder CFG, nodes/edges, adapter JSON, CLI, frontend, lowerer, dataflow ou
+publicação de pacote upstream. Não alterar `air-java`, `analysis-ir` ou
+`proleap-poc` como efeito lateral.
 
 ## Evidência de conclusão
 
-Revisão/commit, diff explicado, testes/gates com exit codes, falsificação adversarial,
-capabilities/precisão realmente entregues e limitações. Até existir essa evidência,
-o estado permanece planejado e nenhum perfil recebe claim por antecipação.
+Commit/review, comandos e exit codes, árvore de dependências, bytecode verificado,
+contador de testes e falsificações. Até lá o item está apenas pronto para
+autorização; nenhum perfil AIR recebe claim.

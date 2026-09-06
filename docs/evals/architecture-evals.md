@@ -3,15 +3,19 @@
 ## Dependências
 
 EVAL-CFG-007 deve provar no bytecode que domain não depende de application/adapters,
-application não depende de adapters/launcher, e modelo IR não depende de CFG ou
-frontend. Testes também devem detectar tipos de infraestrutura em assinaturas,
-annotations e generics. JDK I/O continua proibido no núcleo.
+application não depende de adapters/launcher e kernel depende do artefato
+`air-java`, sem modelo/validator AIR duplicado. Testes detectam tipos de
+infraestrutura, ProLeap/ANTLR/Semantic Product, JSON/filesystem/CLI em assinaturas,
+annotations e generics. JDK I/O continua proibido no núcleo. O build usa Java 21 sem
+preview e a porta recebe a `Publication` do `air-java`.
 
 ## Substituição
 
 EVAL-CFG-008 usa o mesmo BuildCfg em memória e pelo adapter de arquivo. O teste do
 kernel roda sem adapters no classpath de teste e sem filesystem/rede. Depois,
 launcher de teste injeta outro caller sem modificar core.
+Essa prova ocorre depois de `CFG-FIRST`; a ausência atual do binding JSON normativo
+não bloqueia a via em memória.
 
 ## Extensão
 
@@ -32,3 +36,8 @@ não rastreada para fingir independência.
 Somente especificação desses testes. O gate architecture retorna UNAVAILABLE.
 O validador documental não é um substitute de ArchUnit/bytecode ou de prova de
 isolamento Java. Sua única verificação preventiva é ausência de Java/POM na fase docs-only.
+
+EVAL-CFG-026 reserva o micro-E2E externo `cobol-semantic-product.json` →
+`cobol-lower` → `air-java Publication` → CFG-FIRST. O lowerer não importa o port
+Java do frontend. O trecho CFG recebe somente `Publication`/`Return`; o mapeamento
+de GOBACK pertence ao frontend/lowerer e é verificado separadamente.

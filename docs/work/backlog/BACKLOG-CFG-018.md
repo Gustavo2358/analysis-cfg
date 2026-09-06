@@ -1,17 +1,18 @@
 # BACKLOG-CFG-018 — Integração em monólito modular Maven
 
 **Estado:** `planned`. **Fase:** `integration`. **Autorização:** backlog não autoriza execução.
-Dependências: BACKLOG-CFG-008.
+Dependências: BACKLOG-CFG-023.
 
 ## Problema e objetivo observável
 
-Trocar o driving adapter de arquivo por chamada em memória sem modificar algoritmo.
+Integrar lowerer e CFG no reactor Maven por chamada em memória, sem modificar o
+algoritmo nem exigir que o caminho por arquivo exista.
 
 ## Escopo e estratégia
 
-Agregar módulos e dependências no reactor; ligar lowerer/producer sintético e CFG ao
-mesmo artefato Analysis IR 2.0.0, incluindo `TypeRef`/premises; manter CLI opcional
-e boundaries.
+Agregar módulos e dependências no reactor; ligar lowerer e CFG ao mesmo artefato
+`air-java` fixado, que implementa Analysis IR 2.0.0 incluindo `TypeRef`/premises;
+manter CLI/arquivo opcionais e boundaries.
 
 ## Critérios de aceitação
 
@@ -20,7 +21,7 @@ módulos; tipos, provas, contratos e resultados continuam correlacionados por re
 
 ## Evals e invariantes
 
-EVAL-CFG-007, EVAL-CFG-008, EVAL-CFG-020.
+EVAL-CFG-007 e EVAL-CFG-020.
 Vincular invariantes específicos na promoção para work
 item. Ver [catálogo](../../evals/catalog.md) e [invariantes](../../architecture/invariants.md).
 Antes de código, transformar expected em testes RED independentes; documentar o

@@ -14,6 +14,12 @@ Conceitos necessários, ainda sem classes Java congeladas:
 - entradas distintas, saídas normais/excepcionais, halt/diverge e fronteiras abertas;
 - correlação para IR/provenance, gaps, capabilities e limites da alegação.
 
+No `CFG-FIRST`, `Return` produz saída normal da ativação da `Unit`, não uma
+continuação para a próxima Sequence. O resultado preserva `UnitId` e, quando o
+build/consulta é scoped a uma Entry, o `EntryId` relevante. Um nó/objeto sintético
+de saída pode pertencer ao CFG, mas sua identidade/correlação não funde entradas
+silenciosamente nem cria um único exit global da Publication.
+
 Divergência é comportamento sem próximo estado observável: sua representação não
 cria caminho artificial até uma saída normal. Uma saída sintética é convenção do
 produto, não statement-fonte. Não fabricar linhas para nós sintéticos.
@@ -31,10 +37,12 @@ permitido só preservando a escolha de Entry e seu escopo, sem fundir inicializa
 
 ## Retenção e ciclo de vida
 
-O resultado pode referenciar o modelo IR imutável ou copiar fatos mínimos suficientes.
-A escolha de ownership/lifetime será documentada; nunca manter acesso preguiçoso a
-um serviço/produtor para completar semântica. Publicação grande exige medir memória.
-A API de navegação não deve forçar cópia O(N) a cada chamada.
+O resultado pode reter referências ao modelo `air-java` imutável e copiar somente
+fatos próprios/mínimos. Não deep-copiar toda a Publication por padrão nem manter
+acesso preguiçoso a serviço/produtor para completar semântica. Registrar sempre
+PublicationId, revisão/versão e correlações utilizadas. Índices derivados pertencem
+ao CFG e não alteram a AIR. Publicação grande exige medir memória; a API de navegação
+não força cópia O(N) a cada chamada.
 
 ## Saídas humanas e máquina
 

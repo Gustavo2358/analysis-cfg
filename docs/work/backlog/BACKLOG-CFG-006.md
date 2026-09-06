@@ -1,11 +1,12 @@
 # BACKLOG-CFG-006 — Bifurcação e IF/ELSE estrutural
 
 **Estado:** `planned`. **Fase:** `mvp`. **Autorização:** backlog não autoriza execução.
-Dependências: BACKLOG-CFG-005.
+Dependências: BACKLOG-CFG-022.
 
 ## Problema e objetivo observável
 
-Fechar diamond e composição de branches sem criar modelo IF COBOL.
+Completar o `MVP-CFG-01` com diamond e composição de branches, sem criar modelo IF
+COBOL.
 
 ## Escopo e estratégia
 
@@ -43,8 +44,8 @@ item porque ficou verde. Sem duplicar este plano em tasklist permanente.
 
 ## Fora de escopo
 
-Não avaliar predicados por dataflow, presumir tipo pela posição nem procurar
-END-IF/ELSE na fonte.
+Não avaliar predicados por dataflow, presumir tipo pela posição, procurar
+END-IF/ELSE na fonte, exigir JSON ou CLI.
 
 ## Evidência de conclusão
 

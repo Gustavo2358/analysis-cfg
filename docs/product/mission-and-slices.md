@@ -2,60 +2,78 @@
 
 ## Objetivo
 
-Entregar uma aplicação independente que consome **Analysis IR** e produz um CFG
-utilizável por análises futuras. Não criar analisador COBOL, lowerer, dataflow ou
-visualizador como núcleo. Java 17/Maven permite futura integração como monólito
-modular; a definição física dos módulos precede Java.
+Entregar uma aplicação Java 21/Maven independente que recebe a `Publication`
+imutável do `air-java` e produz um CFG utilizável por análises futuras. Não criar
+analisador COBOL, lowerer, modelo AIR paralelo, dataflow ou visualizador como núcleo.
+Arquivo e memória convergem para a mesma porta sem serialização obrigatória.
 
-## MVP-CFG-01: fluxo linear e IF/ELSE
+## CFG-FIRST: Entry → Return → normal exit
 
-Domínio positivo deliberadamente estreito: uma publicação válida, units/entries
-explicitadas; sequences com operações comuns; `jump`, `branch` e saídas
-`return`/`halt`. `unknown(known(bool))` como predicado puro conserva os dois destinos;
-`unknown_type` não satisfaz a assinatura booleana. IFs aninhados
-são combinações das mesmas primitives, sem limite artificial de cardinalidade.
-O primeiro MVP **não precisa de `invoke`, `raise`, `dispatch`, controle aberto,
-local ou indireto** para provar a arquitetura. Não inventar estado de dados para
-desenhar o grafo.
+Primeira prova executável deliberadamente mínima:
 
-Aceitação: fixture em arquivo → decode → mesma porta usada por fixture em memória →
-CFG com nós, transições rotuladas, pontos/origens e relatório de suporte. O diamond
-reconverge só onde o terminador diz; ramo que termina não ganha join artificial.
-Isso prova a fronteira IR→CFG e a troca de adapter antes de aumentar a semântica.
+```text
+Publication
+└── Unit
+    └── Entry
+        └── initialLabel → Sequence
+                           └── Return
+```
 
-## Slice seguinte: invocações, raise e outcomes
+Resultado: `entry(E) → node(sequence L) → normal exit`. A saída preserva
+`PublicationId`, `UnitId` e o `EntryId`/entry scope da análise. Entradas não são
+fundidas num exit global. `Return` encerra a ativação da Unit e não tem fallthrough,
+mesmo quando outra Sequence aparece depois na coleção.
 
-Depois do primeiro MVP, `invoke` entra como terminador com outcomes materializados
-(normal, excepcional, halt, diverge e restante aberto quando sustentado). Esse slice
-também projeta `raise(tag, values)` como saída excepcional da ativação, sem
-fallthrough local; seu destino vem da interação invocadora ou é uma saída
-excepcional raiz. O slice não resolve programa chamado nem afirma ausência de
-efeitos; ele amplia a projeção de controle sem reabrir o produtor ou alterar a
-porta.
+O caso é construído diretamente em memória com `air-java`. `AirValidator` executa
+antes do preflight do slice; referência pendente é rejeitada, terminador ausente não
+é reparado e conteúdo sem predecessor permanece inventariado. Sem jump, halt,
+branch, IF, múltiplas instructions, JSON ou CLI neste marco.
 
-Antes de anunciar o MVP, falhas de integridade e capabilities fora do slice têm
-resposta explícita. Rejeitar o escopo não suportado é aceitável; ignorá-lo não.
-A fixture fechada tem premissas de controle escritas, não contratos inventados com
-base em CALL supostamente “normal”.
+## MVP-CFG-01: subset estrutural útil
 
-**MVP-CFG-01 não é um perfil normativo IR.** É um marco local de implementação.
-Não declarar `AIR-STRUCTURE@2/PRECISE_FOR_PROFILE` até cumprir todas as obrigações
-estruturais dos oráculos daquele perfil.
+Marco posterior: operações lineares, `jump`, `branch`, saídas `return`/`halt` e
+IF/ELSE estrutural. `unknown(known(bool))` como predicado puro conserva os dois
+destinos; `unknown_type` não satisfaz a assinatura booleana. IFs aninhados são
+combinações das mesmas primitives, sem limite artificial de cardinalidade.
 
-## Evolução planejada
+O diamond reconverge somente onde os terminadores dizem; ramo que termina não ganha
+join artificial. A permutação física de sequences não altera transições. `Return`
+e `Halt` continuam saídas semanticamente distintas.
 
-Depois do MVP: `dispatch`, ciclos e múltiplas entradas; envelopes abertos e extensões;
-controle local com frames/ports/retornos; controle indireto limitado; integração
-Maven em memória. Cada etapa tem evidência independente de COBOL.
+CLI, adapter AIR JSON e a equivalência arquivo/memória continuam importantes, mas
+são milestones de infraestrutura posteriores e não condição para provar
+`Publication → CFG`.
 
-Motivadores upstream: EVALUATE pode virar dispatch ou branches ordenados; GO TO e
-NEXT SENTENCE viram jump quando seus destinos forem estabelecidos pelo produtor;
-PERFORM/THRU usam controle local se a disciplina de conclusão for compatível.
-Esses nomes orientam testes de aceitação bilateral, não classes do CFG.
+## Slices seguintes
 
-Dataflow, reaching definitions, storage analysis, dependências calculadas, dominância
-e coalescing ficam adiados. Preservar seus insumos não significa implementá-los.
-O objetivo é fechar produto observável cedo; não terminar horizontalmente a V2 inteira.
-Não há promessa de data de conclusão ou estimativa inferida da contagem de classes.
+Depois do MVP, `invoke` entra com outcomes materializados (normal, excepcional,
+halt, diverge e restante aberto quando sustentado). `raise(tag, values)` é saída
+excepcional sem fallthrough. O slice não resolve programa chamado nem afirma
+ausência de efeitos.
 
-Fontes: [contrato e estado upstream](../sources/index.md); execução: [backlog](../work/backlog.md).
+Depois vêm `dispatch`, ciclos e múltiplas entradas; envelopes abertos; controle
+local com frames/ports/retornos; controle indireto limitado; integração Maven em
+memória. Cada etapa tem evidência independente de COBOL.
+
+Motivadores upstream podem baixar para primitives AIR: EVALUATE para dispatch ou
+branches, GO TO/NEXT SENTENCE para jump e PERFORM/THRU para controle local quando
+seu contrato permitir. Esses nomes pertencem ao frontend/lowerer e a testes
+bilaterais, não a classes nem regras do CFG. O primeiro motivador E2E é GOBACK no
+frontend, mas a expectativa do consumer começa somente em `AIR Return → normal
+exit`.
+
+Antes de anunciar qualquer marco, integridade inválida e capabilities fora do slice
+têm resposta explícita. Rejeitar escopo não suportado é aceitável; ignorá-lo não.
+`AirValidator` prova validade estrutural implementada do input, enquanto evals CFG
+provam a interpretação do consumer.
+
+**CFG-FIRST e MVP-CFG-01 não são perfis normativos AIR.** Não declarar
+`AIR-STRUCTURE@2/PRECISE_FOR_PROFILE` até cumprir todas as obrigações estruturais
+daquele perfil.
+
+Dataflow, reaching definitions, possible values, storage analysis, targets
+dinâmicos, dominância e coalescing ficam adiados. Preservar insumos não significa
+implementá-los.
+
+Fontes: [contrato e estado upstream](../sources/index.md); execução:
+[backlog](../work/backlog.md).

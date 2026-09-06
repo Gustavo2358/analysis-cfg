@@ -17,6 +17,11 @@ Reconhecer que Sequence já fixa fronteiras de transferência; sem leader detect
 necessário. Distinguir projeção plana e matching contextual. Incorporar equivalência
 arquivo/memória e congelamento de revisão no catálogo de testes.
 
+Após o primeiro discovery, o modelo/validator compartilhado é o `air-java` fixado,
+o consumer usa Java 21 e o primeiro slice é CFG-FIRST em memória. O frontend
+continua Java 17 e termina no COBOL Semantic Product; `cobol-lower` é boundary
+upstream planejada. Binding JSON pertence ao `analysis-ir`, não ao layout Java.
+
 Os cinco arquivos de work item são mantidos conceitualmente, mas o manifesto usa
 `work-item.json` em vez de YAML. Isso permite validar estritamente o formato com a
 biblioteca padrão Python sem instalar parser e sem implementar YAML parcial.

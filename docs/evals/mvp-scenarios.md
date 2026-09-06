@@ -1,11 +1,37 @@
-# Vetores de aceitação do MVP
+# Vetores de aceitação por milestone
 
 Notação **conceitual**, sem parser `.air` previsto. O work item de transporte deve
 materializar Publications completas e válidas com IDs, origens, entries, tipos,
 coverage e contratos. As tabelas abaixo são esperados independentes do builder.
-Omitir boilerplate aqui não autoriza omitir semântica no arquivo de teste.
+Omitir boilerplate aqui não autoriza omitir semântica no objeto de teste.
 
-## M1 — Sequência linear
+## CF1 — CFG-FIRST: Entry → Return → normal exit
+
+Publication válida construída diretamente com `air-java`: uma Unit, uma Entry cujo
+`initialLabel` aponta para `L`, e `Sequence L` sem instructions, terminada por
+`Return`. Expected independente: `entry(E) → node(L) → normal exit`, preservando
+PublicationId, UnitId, EntryId/entry scope, Sequence/terminator/origin e sem aresta
+para qualquer outra Sequence.
+
+Contracasos obrigatórios:
+
+1. `initialLabel` inexistente: `AirValidator`/preflight rejeita; CFG não repara.
+2. Sequence sem terminador: o modelo não a constrói ou o input é inválido; nenhum
+   fallthrough é inventado.
+3. Outra Sequence aparece fisicamente depois de `Return`: não há aresta implícita.
+4. Permutar fisicamente as Sequences não altera as transições correlacionadas.
+5. Sequence sem predecessor continua inventariada e não recebe predecessor
+   artificial.
+
+Quando houver mais de uma Entry/escopo de consulta, normal exits não são fundidos.
+O expected não vem do builder nem de DOT/JSON. Este cenário é EVAL-CFG-025 e não
+depende de branch, jump, codec ou CLI.
+
+`CFG-FIRST` não implementa `Halt`. A distinção `Return != Halt` permanece como
+contracaso posterior em BACKLOG-CFG-022/EVAL-CFG-005 (`O-19-STRUCT`), não como
+critério obrigatório de CF1.
+
+## M1 — Linear + jump
 
 `entry: op1; op2; jump tail` e `tail: return`.
 Dois nós de Sequence, entry→tail por jump, tail→saída normal. op1/op2 preservados e
@@ -40,7 +66,7 @@ No nested, cada terminador define a sua continuação. Não escolher join pelo
 ## M4 — Ramo que termina
 
 Trocar `yes` por `opY; halt normal`. Não há yes→join. O branch falso ainda alcança
-join. O halt é distinto da saída normal da ativação. Include unidade com return
+join. O halt é distinto da saída normal da ativação. Incluir unidade com return
 seguido fisicamente de outro label: esse label não ganha predecessor implícito.
 
 ## M5 — Duas alternativas, um destino
@@ -65,12 +91,16 @@ Input-file ausente/JSON malformado → INPUT_ERROR do adapter.
 Capability fora do subset → UNSUPPORTED_CAPABILITY ou fallback sustentado;
 nenhum desses resultados equivale a grafo vazio completo.
 
-## M8 — Equivalência de adapters
+## Infraestrutura posterior M8 — Equivalência de adapters
 
 Construir a Publication de M2 em memória e decodificar a mesma Publication de um
 arquivo. Executar mesma porta com mesmas opções; comparar transições, operações,
 entries/saídas, IDs correlacionados, gaps e precisão. Rodar teste isolado do kernel
 sem classes de adapter no classpath de teste. Esse é o teste antecipado da migração Maven.
 
-M1–M5, M7 e M8 delimitam o MVP-CFG-01. P1 entra no slice seguinte de `invoke`.
-Catálogo relacionado: EVAL-CFG-001 a EVAL-CFG-009 e EVAL-CFG-013/014; cada work item seleciona apenas os evals do seu slice.
+CF1 delimita `CFG-FIRST`. M1–M5 e os limites estruturais pertinentes de M7
+delimitam `MVP-CFG-01`. M8 prova transporte posteriormente e não é prerequisite de
+nenhum desses dois marcos. P1 entra no slice de `invoke`.
+
+Catálogo relacionado: EVAL-CFG-001 a EVAL-CFG-009, EVAL-CFG-013/014 e
+EVAL-CFG-025/026; cada work item seleciona apenas os evals do seu slice.

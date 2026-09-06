@@ -32,6 +32,42 @@ class HarnessGuardTests(unittest.TestCase):
         errors = validate(self.root)
         self.assertTrue(any(expected in e for e in errors), '\n'.join(errors))
 
+    def ensure_active_work(self):
+        registry_path = self.root / 'docs/work/registry.json'
+        registry = load_json(registry_path)
+        if registry['active']:
+            return registry['active'][0]['id']
+        ident = 'WORK-CFG-999'
+        folder = self.root / 'docs/work/active' / ident
+        folder.mkdir(parents=True)
+        manifest = {
+            'id': ident, 'backlog_id': 'BACKLOG-CFG-002', 'title': 'Synthetic active work',
+            'status': 'active', 'risk': 'low', 'goal': 'Exercise active-work guards',
+            'authorization': 'discovery', 'authorization_evidence': 'synthetic harness test',
+            'checkpoint': 'TEST', 'must_read': ['AGENTS.md'], 'related_decisions': [],
+            'related_invariants': [], 'evals': [], 'source_scope': [], 'test_scope': [],
+            'must_not_change': [], 'gates': ['fast'], 'stop_condition': 'end of test'
+        }
+        (folder / 'work-item.json').write_text(
+            json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+        documents = {
+            'spec.md': '# spec\n\n## Problema\n\ntest\n\n## Objetivo\n\ntest\n\n## Fora de escopo\n\ntest\n',
+            'plan.md': '# plan\n\n## Fatiamento\n\ntest\n\n## Dependências\n\ntest\n',
+            'eval.md': '# eval\n\n## O que prova corretude\n\ntest\n\n## Casos adversariais\n\ntest\n',
+            'state.md': '# state\n\n## Onde estamos\n\ntest\n\n## Verde conhecido\n\ntest\n\n## Restante\n\ntest\n\n## Descobertas que afetam o plano\n\ntest\n'
+        }
+        for name, content in documents.items():
+            (folder / name).write_text(content, encoding='utf-8')
+        registry['active'].append({
+            'id': ident, 'path': 'docs/work/active/' + ident,
+            'status': 'active', 'authorization': 'discovery'
+        })
+        registry_path.write_text(
+            json.dumps(registry, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+        with (self.root / 'docs/work/index.md').open('a') as index:
+            index.write('\n' + ident + '\n')
+        return ident
+
     def test_01_valid_package(self):
         self.assertEqual([], validate(self.root))
 
@@ -59,16 +95,22 @@ class HarnessGuardTests(unittest.TestCase):
         self.assert_guard('Missing backlog dependency')
 
     def test_07_registry_drift(self):
-        self.edit_json('docs/work/registry.json', lambda x: x['active'][0].update(status='blocked'))
+        ident = self.ensure_active_work()
+        self.edit_json('docs/work/registry.json', lambda x: next(
+            item for item in x['active'] if item['id'] == ident).update(status='blocked'))
         self.assert_guard('Work registry mismatch')
 
     def test_08_completed_item_left_active(self):
-        self.edit_json('docs/work/registry.json', lambda x: x['active'][0].update(status='completed'))
-        self.edit_json('docs/work/active/WORK-CFG-001/work-item.json', lambda x: x.update(status='completed'))
+        ident = self.ensure_active_work()
+        self.edit_json('docs/work/registry.json', lambda x: next(
+            item for item in x['active'] if item['id'] == ident).update(status='completed'))
+        self.edit_json('docs/work/active/' + ident + '/work-item.json',
+                       lambda x: x.update(status='completed'))
         self.assert_guard('Completed/invalid work in active')
 
     def test_09_extra_work_file(self):
-        (self.root / 'docs/work/active/WORK-CFG-001/duplicate-plan.md').write_text('# Duplicate\n')
+        ident = self.ensure_active_work()
+        (self.root / 'docs/work/active' / ident / 'duplicate-plan.md').write_text('# Duplicate\n')
         self.assert_guard('exactly five files')
 
     def test_10_java_forbidden(self):
@@ -106,7 +148,9 @@ class HarnessGuardTests(unittest.TestCase):
         self.assert_guard('lacks linked implementation authorization')
 
     def test_18_missing_work_context(self):
-        self.edit_json('docs/work/active/WORK-CFG-001/work-item.json', lambda x: x['must_read'].append('missing-rule.md'))
+        ident = self.ensure_active_work()
+        self.edit_json('docs/work/active/' + ident + '/work-item.json',
+                       lambda x: x['must_read'].append('missing-rule.md'))
         self.assert_guard('Missing/invalid work path')
 
     def test_19_unavailable_never_passes(self):
@@ -135,7 +179,8 @@ class HarnessGuardTests(unittest.TestCase):
             self.assertEqual(1, run('semantic', self.root))
 
     def test_27_completed_backlog_requires_evidence(self):
-        self.edit_json('docs/work/backlog.json', lambda x: x['items'][0].update(status='completed'))
+        self.edit_json('docs/work/backlog.json', lambda x: next(
+            item for item in x['items'] if item['status'] != 'completed').update(status='completed'))
         self.assert_guard('Completed backlog without evidence')
 
     def test_28_unknown_work_link(self):
@@ -162,6 +207,36 @@ class HarnessGuardTests(unittest.TestCase):
         valid_oracles = ('O-69-SCALAR', 'O-81-REGION', 'O-85-STRUCT')
         self.edit_json('docs/evals/catalog.json', lambda x: x['evals'][0]['upstream_oracles'].extend(valid_oracles))
         self.assertEqual([], validate(self.root))
+
+    def test_33_mutable_air_java_reference_rejected(self):
+        self.edit_json('docs/sources/sources.lock.json',
+                       lambda x: x['air_java'].update(commit='main'))
+        self.assert_guard('air-java commit must be immutable')
+
+    def test_34_air_java_ir_drift_rejected(self):
+        self.edit_json('docs/sources/sources.lock.json',
+                       lambda x: x['air_java']['analysis_ir'].update(commit='f' * 40))
+        self.assert_guard('air-java and normative Analysis IR baseline disagree')
+
+    def test_35_java_21_without_preview_required(self):
+        self.edit_json('docs/sources/sources.lock.json',
+                       lambda x: x['air_java']['java'].update(release=17))
+        self.assert_guard('Java 21 without preview')
+
+    def test_36_json_binding_owner_guarded(self):
+        self.edit_json('docs/sources/sources.lock.json',
+                       lambda x: x['analysis_ir']['json_binding'].update(owner='air-java'))
+        self.assert_guard('JSON binding must be owned by analysis-ir')
+
+    def test_37_planned_lowerer_cannot_claim_api(self):
+        self.edit_json('docs/sources/sources.lock.json',
+                       lambda x: x['cobol_lower'].update(api='invented'))
+        self.assert_guard('planned cobol-lower cannot claim commit or API')
+
+    def test_38_proleap_main_evidence_cannot_drift(self):
+        self.edit_json('docs/sources/sources.lock.json',
+                       lambda x: x['proleap_poc'].update(main_commit='f' * 40))
+        self.assert_guard('proleap-poc main evidence must match latest merged review')
 
 
 class PinnedCacheTests(unittest.TestCase):

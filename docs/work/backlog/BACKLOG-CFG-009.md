@@ -1,7 +1,7 @@
 # BACKLOG-CFG-009 — Dispatch, ciclos e múltiplas entradas
 
 **Estado:** `planned`. **Fase:** `structure`. **Autorização:** backlog não autoriza execução.
-Dependências: BACKLOG-CFG-008.
+Dependências: BACKLOG-CFG-006.
 
 ## Problema e objetivo observável
 

@@ -1,11 +1,12 @@
-# BACKLOG-CFG-008 — CLI mínima e fechamento MVP arquivo/memória
+# BACKLOG-CFG-008 — CLI e prova posterior arquivo/memória
 
 **Estado:** `planned`. **Fase:** `mvp`. **Autorização:** backlog não autoriza execução.
 Dependências: BACKLOG-CFG-004, BACKLOG-CFG-006.
 
 ## Problema e objetivo observável
 
-Demonstrar o pipeline de arquivo à porta e ao CFG sem acoplamento de infraestrutura.
+Demonstrar, depois do core estrutural, o pipeline de arquivo à mesma porta e ao CFG
+sem acoplamento de infraestrutura.
 
 ## Escopo e estratégia
 
@@ -13,7 +14,9 @@ Composition root explícito, driver/CLI mínimo, exportador estruturado simples;
 
 ## Critérios de aceitação
 
-Arquivo→Publication→BuildCfg→resultado funciona; kernel testado sem adapters; nenhuma serialização no caminho direto; MVP-CFG-01 documentado sem claim AIR-STRUCTURE completo.
+Arquivo→Publication→BuildCfg→resultado funciona; kernel continua testado sem
+adapters; nenhuma serialização no caminho direto. Este item não é a primeira prova
+de `Publication → CFG` nem prerequisite de CFG-FIRST.
 
 ## Evals e invariantes
 

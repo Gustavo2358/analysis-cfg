@@ -2,28 +2,33 @@
 
 ## Entrada e pré-condições
 
-O adapter entrega uma Publication imutável e fechada no modelo IR. A leitura de
-bytes não faz parte deste pipeline. Dados semântico-estruturais são validados pelo
-contrato IR; transporte inválido é tratado antes. Modelo compartilhado não implica
+O caller entrega uma `air-java Publication` imutável. A leitura de bytes não faz
+parte deste pipeline. O preflight chama `AirValidator` também para objetos recebidos
+em memória; transporte inválido é tratado antes. Modelo compartilhado não implica
 confiar cegamente em uma instância criada pelo caller.
 
 ## Passes propostos
 
-1. Validar versionamento, namespaces, referências, units/entries, Sequence e
-   terminador único; classificar capabilities/precisão. Distinguir publicação
-   parcial válida de integridade inválida. Não reconstruir nomes.
-2. Indexar labels, operations e entries uma vez por namespace. Não ordenar para
+1. Executar `AirValidator` sem mutar a Publication; propagar invalidade e validação
+   incompleta com seus diagnósticos. Não duplicar as regras AIR localmente.
+2. Verificar versão, capabilities, opções e escopo aceitos pelo consumer. Distinguir
+   publicação parcial válida de integridade inválida. Não reconstruir nomes.
+3. Indexar labels, operations e entries uma vez por namespace. Não ordenar para
    inferir execução. Manter inventário completo, inclusive conteúdo sem predecessor.
-3. Projetar inicialmente uma Sequence por nó CFG próprio, com correlação explícita.
+4. Projetar inicialmente uma Sequence por nó CFG próprio, com correlação explícita.
    Preservar ordem de operações e pontos before/after(outcome).
-4. Interpretar terminadores e materializar transições conhecidas com labels de
+5. Interpretar terminadores e materializar transições conhecidas com labels de
    branch/case/outcome. Não avaliar memória, inferir reachability por valores ou
    juntar alternativas distintas apenas porque têm o mesmo destino.
-5. Publicar saídas tipadas e fronteiras abertas. Quando houver suporte contextual,
+6. Publicar saídas tipadas e fronteiras abertas. Quando houver suporte contextual,
    preservar regras de invocação/retorno e escopo; caso contrário usar fallback ou
    incompatibilidade honesta. Divergência não vira saída normal alcançável.
-6. Validar produto derivado; publicar grafo, índices de navegação, mapeamentos,
+7. Validar produto derivado; publicar grafo, índices de navegação, mapeamentos,
    capabilities utilizadas, premissas, gaps e precisão.
+
+`CFG-FIRST` executa somente os passos necessários para Entry/Sequence/Return e
+normal exit, mas continua inventariando todas as sequences e recusando capability
+fora do slice de modo explícito. Não cria fallthrough para completar o grafo.
 
 Leaders não precisam ser redescobertos: cada label já inicia Sequence e não pode
 entrar em seu interior. Blocos máximos, remoção de nós e coalescing ficam adiados.

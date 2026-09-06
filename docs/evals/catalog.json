@@ -392,9 +392,9 @@
     },
     {
       "id": "EVAL-CFG-024",
-      "title": "Fundação mínima da Analysis IR V2",
+      "title": "Boundary compartilhada do air-java",
       "status": "planned",
-      "expectation": "O modelo em memória distingue Known(Type) de UnknownType(UncertaintyId) e representa Premise, sameDomain, sujeitos, autoridade, origem e DomainProofScope como conceitos fechados. Não usa Optional<Type> nem exige signatures, choices, regiões, invokes/envelopes, regras contextuais completas de aplicabilidade/interseção ou cálculo de CFG/dataflow.",
+      "expectation": "O kernel compila contra a Publication e o AirValidator do air-java fixado, sem declarar cópias locais de tipos AIR. O preflight preserva os diagnósticos estruturais e distingue a versão 0.1.0-SNAPSHOT da biblioteca da AIR 2.0.0; não transforma validação AIR em claim de conformidade CFG.",
       "upstream_oracles": [],
       "invariants": [
         "INV-CFG-003",
@@ -402,6 +402,47 @@
         "INV-CFG-026",
         "INV-CFG-027",
         "INV-CFG-028"
+      ],
+      "implementation_evidence": null
+    },
+    {
+      "id": "EVAL-CFG-025",
+      "title": "CFG-FIRST — Entry, Return e normal exit",
+      "status": "planned",
+      "expectation": "Uma air-java Publication válida em memória projeta Entry/initialLabel para um nó da Sequence terminada por Return e para normal exit correlacionado por Publication, Unit e Entry scope. Missing label ou terminador ausente não são reparados; Return não cai na Sequence fisicamente seguinte; permutação não muda transições; Sequence sem predecessor permanece inventariada. CFG-FIRST não implementa Halt.",
+      "upstream_oracles": [
+        "O-18-STRUCT",
+        "O-30-STRUCT"
+      ],
+      "invariants": [
+        "INV-CFG-003",
+        "INV-CFG-004",
+        "INV-CFG-005",
+        "INV-CFG-006",
+        "INV-CFG-008",
+        "INV-CFG-019",
+        "INV-CFG-021",
+        "INV-CFG-023",
+        "INV-CFG-026"
+      ],
+      "implementation_evidence": null
+    },
+    {
+      "id": "EVAL-CFG-026",
+      "title": "E2E mínimo Semantic Product → AIR → CFG",
+      "status": "planned",
+      "expectation": "Um componente cobol-lower externo e conforme consome cobol-semantic-product.json sem importar tipos Java do frontend e produz a air-java Publication do CFG-FIRST; as fronteiras JSON→AIR e Publication/AIR Return→normal exit são verificadas separadamente. O kernel CFG recebe somente Publication; não recebe, reconhece nem testa GOBACK ou JSON.",
+      "upstream_oracles": [
+        "O-18-STRUCT",
+        "O-66"
+      ],
+      "invariants": [
+        "INV-CFG-001",
+        "INV-CFG-002",
+        "INV-CFG-003",
+        "INV-CFG-019",
+        "INV-CFG-023",
+        "INV-CFG-026"
       ],
       "implementation_evidence": null
     }

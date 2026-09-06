@@ -34,6 +34,20 @@ sem `eval` de comando vindo de metadados. Versões Maven/JUnit ficam fixadas; au
 de testes, perfil inexistente ou suite excluída deve falhar. Não habilitar gate com
 script que imprime PASS ou faz `exit 0` sem executar a verificação.
 
+O contrato planejado do gate de arquitetura deve provar no build/bytecode real:
+
+- Java target 21, sem preview;
+- nenhum package/classe AIR duplicado em `analysis-cfg`;
+- kernel depende de `air-java` e `BuildCfg` usa sua `Publication`;
+- kernel sem Jackson, filesystem, CLI, ProLeap, ANTLR ou COBOL Semantic Product;
+- AIR JSON reader fora do kernel;
+- produto CFG não muta a AIR;
+- `AirValidator` usado no preflight, sem validator AIR local divergente;
+- suíte falha quando executa zero casos.
+
+Este checkpoint registra essas obrigações, mas não implementa inspeção de bytecode:
+`check-architecture.sh` continua `UNAVAILABLE`.
+
 ## Escalonamento
 
 Documentação/harness: fast. Código de modelo/domínio: architecture + semantic.

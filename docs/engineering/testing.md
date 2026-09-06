@@ -10,12 +10,18 @@ Não usar mocks do próprio algoritmo para provar o algoritmo.
 
 ## Camadas
 
-**Domínio:** Publication em memória, sem filesystem. Casos pequenos com successors,
+**Domínio:** `air-java Publication` em memória, sem filesystem. Casos pequenos com successors,
 outcomes, correlação de IDs e incerteza definidos à mão a partir do contrato.
 **Aplicação:** porta pública, negociação, opções, erros e resultado imutável.
 **Adapters:** decoding/encoding, dados inválidos e equivalência com entrada em memória.
 **Integração:** arquivo real → CLI/driver → porta → CFG; exportação sem governar regra.
 **Arquitetura:** dependências reais e execução sem adapters disponíveis.
+
+`CFG-FIRST` nasce nessa camada de domínio: Entry/initialLabel, uma Sequence com
+`Return` e normal exit escoped por Unit/Entry. O expected é escrito antes do builder.
+Missing label é rejeitado por `AirValidator`; terminador ausente é não construível
+ou inválido; sequences posteriores e permutações físicas não criam transições;
+sequence sem predecessor permanece no inventário. JSON e CLI não entram nesse RED.
 
 Tabelas de esperado não devem ser regeneradas pelo builder. Um interpreter de
 referência independente, exato em casos pequenos/limitados e escrito só nos testes,
@@ -35,6 +41,11 @@ PIT ou biblioteca equivalente é opcional/futuro, com domínio focalizado e vers
 verificadas. Não adotar score global de vaidade.
 
 ## Oráculos de controle, não de dataflow
+
+`AirValidator` e evals CFG têm papéis distintos. O primeiro verifica validade
+estrutural da Publication no preflight; os segundos falsificam a interpretação do
+consumer. Reutilizar o validator não autoriza omitir oráculo próprio nem copiar seus
+diagnósticos como expected do grafo.
 
 AIR-STRUCTURE@2 referencia cenários que também falam de RD/PV. Neste projeto,
 implementar primeiro **a projeção estrutural** desses cenários: caminhos,

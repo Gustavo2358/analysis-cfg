@@ -5,7 +5,7 @@
       "id": "BACKLOG-CFG-001",
       "title": "Discovery de fronteiras e plano executivo",
       "phase": "discovery",
-      "status": "active",
+      "status": "completed",
       "dependencies": [],
       "evals": [
         "EVAL-CFG-007",
@@ -14,21 +14,20 @@
         "EVAL-CFG-020"
       ],
       "path": "docs/work/backlog/BACKLOG-CFG-001.md",
-      "work_item": "WORK-CFG-001"
+      "work_item": "WORK-CFG-001",
+      "completion_evidence": "docs/work/history/WORK-CFG-001.md"
     },
     {
       "id": "BACKLOG-CFG-002",
-      "title": "Bootstrap Java/Maven e modelo IR mínimo compartilhável",
+      "title": "Bootstrap Java 21/Maven e boundary air-java",
       "phase": "foundation",
-      "status": "planned",
+      "status": "ready_for_authorization",
       "dependencies": [
         "BACKLOG-CFG-001"
       ],
       "evals": [
         "EVAL-CFG-001",
         "EVAL-CFG-007",
-        "EVAL-CFG-013",
-        "EVAL-CFG-020",
         "EVAL-CFG-024"
       ],
       "path": "docs/work/backlog/BACKLOG-CFG-002.md",
@@ -44,15 +43,15 @@
       ],
       "evals": [
         "EVAL-CFG-007",
-        "EVAL-CFG-008",
-        "EVAL-CFG-009"
+        "EVAL-CFG-009",
+        "EVAL-CFG-024"
       ],
       "path": "docs/work/backlog/BACKLOG-CFG-003.md",
       "work_item": null
     },
     {
       "id": "BACKLOG-CFG-004",
-      "title": "Fixtures independentes e adapter de transporte",
+      "title": "Fixtures AIR JSON e adapter de transporte",
       "phase": "mvp",
       "status": "planned",
       "dependencies": [
@@ -70,7 +69,7 @@
     },
     {
       "id": "BACKLOG-CFG-005",
-      "title": "Núcleo CFG: projeção linear e saídas",
+      "title": "CFG-FIRST: Entry, Return e normal exit",
       "phase": "mvp",
       "status": "planned",
       "dependencies": [
@@ -79,11 +78,9 @@
       ],
       "evals": [
         "EVAL-CFG-001",
-        "EVAL-CFG-002",
-        "EVAL-CFG-005",
         "EVAL-CFG-007",
-        "EVAL-CFG-013",
-        "EVAL-CFG-014"
+        "EVAL-CFG-024",
+        "EVAL-CFG-025"
       ],
       "path": "docs/work/backlog/BACKLOG-CFG-005.md",
       "work_item": null
@@ -94,7 +91,7 @@
       "phase": "mvp",
       "status": "planned",
       "dependencies": [
-        "BACKLOG-CFG-005"
+        "BACKLOG-CFG-022"
       ],
       "evals": [
         "EVAL-CFG-003",
@@ -111,7 +108,7 @@
       "phase": "structure",
       "status": "planned",
       "dependencies": [
-        "BACKLOG-CFG-008"
+        "BACKLOG-CFG-006"
       ],
       "evals": [
         "EVAL-CFG-005",
@@ -124,7 +121,7 @@
     },
     {
       "id": "BACKLOG-CFG-008",
-      "title": "CLI mínima e fechamento MVP arquivo/memória",
+      "title": "CLI e prova posterior arquivo/memória",
       "phase": "mvp",
       "status": "planned",
       "dependencies": [
@@ -148,7 +145,7 @@
       "phase": "structure",
       "status": "planned",
       "dependencies": [
-        "BACKLOG-CFG-008"
+        "BACKLOG-CFG-006"
       ],
       "evals": [
         "EVAL-CFG-010",
@@ -166,7 +163,7 @@
       "status": "planned",
       "dependencies": [
         "BACKLOG-CFG-007",
-        "BACKLOG-CFG-008"
+        "BACKLOG-CFG-009"
       ],
       "evals": [
         "EVAL-CFG-006",
@@ -314,11 +311,10 @@
       "phase": "integration",
       "status": "planned",
       "dependencies": [
-        "BACKLOG-CFG-008"
+        "BACKLOG-CFG-023"
       ],
       "evals": [
         "EVAL-CFG-007",
-        "EVAL-CFG-008",
         "EVAL-CFG-020"
       ],
       "path": "docs/work/backlog/BACKLOG-CFG-018.md",
@@ -366,6 +362,40 @@
         "EVAL-CFG-007"
       ],
       "path": "docs/work/backlog/BACKLOG-CFG-021.md",
+      "work_item": null
+    },
+    {
+      "id": "BACKLOG-CFG-022",
+      "title": "Fluxo linear, jump e halt",
+      "phase": "mvp",
+      "status": "planned",
+      "dependencies": [
+        "BACKLOG-CFG-005"
+      ],
+      "evals": [
+        "EVAL-CFG-001",
+        "EVAL-CFG-002",
+        "EVAL-CFG-005",
+        "EVAL-CFG-013",
+        "EVAL-CFG-014"
+      ],
+      "path": "docs/work/backlog/BACKLOG-CFG-022.md",
+      "work_item": null
+    },
+    {
+      "id": "BACKLOG-CFG-023",
+      "title": "E2E mínimo Semantic Product → AIR → CFG",
+      "phase": "integration",
+      "status": "planned",
+      "dependencies": [
+        "BACKLOG-CFG-005"
+      ],
+      "evals": [
+        "EVAL-CFG-020",
+        "EVAL-CFG-025",
+        "EVAL-CFG-026"
+      ],
+      "path": "docs/work/backlog/BACKLOG-CFG-023.md",
       "work_item": null
     }
   ]
