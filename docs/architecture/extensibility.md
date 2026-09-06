@@ -7,6 +7,10 @@ sem alterar significado de Publication ou BuildCfg.
 **Semântica:** operações/capabilities da IR. Varia por extensão versionada,
 contrato de controle e novos oráculos. Não é resolvida adicionando um decoder JSON.
 
+Os perfis do consumidor sob o core V2 usam `@2`; isso não renomeia as extensões
+`memory.regions@1`, `control.local@1` ou `control.indirect@1`. Versão de perfil e
+versão de capability são eixos distintos.
+
 ## Primitives existentes
 
 Um novo construct COBOL que baixa para `jump`, `branch` ou `dispatch` já suportados

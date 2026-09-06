@@ -9,15 +9,19 @@ Produzir primeiro grafo de Publication em memória com fluxo explícito.
 
 ## Escopo e estratégia
 
-Testes RED antes do código; índices namespaced, Sequence→nó próprio, operações preservadas, jump, return/raise/halt e produto imutável com evidência.
+Testes RED antes do código; índices namespaced, Sequence→nó próprio, operações e
+fatos V2 preservados, `jump`, `return`/`halt` e produto imutável com evidência.
 
 ## Critérios de aceitação
 
-Permutação física não muda relação; target anterior funciona; unidade com label pendente falha; saída não gera fallthrough; inventário sem predecessor permanece.
+Permutação física não muda relação; target anterior funciona; unidade com label
+pendente falha; saída não gera fallthrough; inventário sem predecessor permanece;
+`TypeRef`/premises não são apagados nem transformados em análise de valores.
 
 ## Evals e invariantes
 
-EVAL-CFG-001, EVAL-CFG-002, EVAL-CFG-005, EVAL-CFG-007, EVAL-CFG-013, EVAL-CFG-014. Vincular invariantes específicos na promoção para work
+EVAL-CFG-001, EVAL-CFG-002, EVAL-CFG-005, EVAL-CFG-007, EVAL-CFG-013,
+EVAL-CFG-014, EVAL-CFG-021. Vincular invariantes específicos na promoção para work
 item. Ver [catálogo](../../evals/catalog.md) e [invariantes](../../architecture/invariants.md).
 Antes de código, transformar expected em testes RED independentes; documentar o
 resultado observado, não apenas intenção de TDD.

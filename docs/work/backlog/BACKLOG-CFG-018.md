@@ -9,15 +9,19 @@ Trocar o driving adapter de arquivo por chamada em memória sem modificar algori
 
 ## Escopo e estratégia
 
-Agregar módulos e dependências no reactor; ligar lowerer/producer sintético e CFG ao mesmo artefato IR; manter CLI opcional e boundaries.
+Agregar módulos e dependências no reactor; ligar lowerer/producer sintético e CFG ao
+mesmo artefato Analysis IR 2.0.0, incluindo `TypeRef`/premises; manter CLI opcional
+e boundaries.
 
 ## Critérios de aceitação
 
-Mesma porta/modelo/capability; sem JSON intermediário, temp file ou cycles entre módulos; contratos e resultados continuam correlacionados por revisão.
+Mesma porta/modelo/capability; sem JSON intermediário, temp file ou cycles entre
+módulos; tipos, provas, contratos e resultados continuam correlacionados por revisão.
 
 ## Evals e invariantes
 
-EVAL-CFG-007, EVAL-CFG-008, EVAL-CFG-020. Vincular invariantes específicos na promoção para work
+EVAL-CFG-007, EVAL-CFG-008, EVAL-CFG-020, EVAL-CFG-021, EVAL-CFG-022.
+Vincular invariantes específicos na promoção para work
 item. Ver [catálogo](../../evals/catalog.md) e [invariantes](../../architecture/invariants.md).
 Antes de código, transformar expected em testes RED independentes; documentar o
 resultado observado, não apenas intenção de TDD.

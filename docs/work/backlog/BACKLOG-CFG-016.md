@@ -1,23 +1,27 @@
-# BACKLOG-CFG-016 — Controle indireto com universo fechado
+# BACKLOG-CFG-016 — Controle indireto e AIR-INDIRECT-CONTROL@2
 
 **Estado:** `planned`. **Fase:** `indirect`. **Autorização:** backlog não autoriza execução.
 Dependências: BACKLOG-CFG-011.
 
 ## Problema e objetivo observável
 
-Construir CFG conservador de indirect.jump sem dependência circular de RD.
+Construir CFG conservador de `control.indirect@1`/`indirect.jump` para futura
+qualificação `AIR-INDIRECT-CONTROL@2`, sem dependência circular de RD.
 
 ## Escopo e estratégia
 
-Interpretar label(S), validar membership e projetar todos targets de S; guardar informação para refinamento futuro versionado.
+Interpretar `known(label(S))`, validar membership e projetar todos targets de S;
+`unknown(known(label(S)))` mantém o universo, enquanto `unknown_type` não permite a
+operação precisa. Guardar informação para refinamento futuro versionado.
 
 ## Critérios de aceitação
 
-O-61/O-63; O-62 registrado opcional sem fingir execução; universo fora do tipo inválido; sem inferir targets pela primeira atribuição.
+O-61/O-63; O-62 registrado opcional sem fingir execução; universo fora do tipo e
+target `unknown_type` inválidos; sem inferir targets pela primeira atribuição.
 
 ## Evals e invariantes
 
-EVAL-CFG-019, EVAL-CFG-012. Vincular invariantes específicos na promoção para work
+EVAL-CFG-019, EVAL-CFG-012, EVAL-CFG-021. Vincular invariantes específicos na promoção para work
 item. Ver [catálogo](../../evals/catalog.md) e [invariantes](../../architecture/invariants.md).
 Antes de código, transformar expected em testes RED independentes; documentar o
 resultado observado, não apenas intenção de TDD.

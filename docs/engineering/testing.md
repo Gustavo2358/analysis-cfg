@@ -36,10 +36,15 @@ verificadas. Não adotar score global de vaidade.
 
 ## Oráculos de controle, não de dataflow
 
-AIR-STRUCTURE referencia cenários que também falam de RD/PV. Neste projeto,
+AIR-STRUCTURE@2 referencia cenários que também falam de RD/PV. Neste projeto,
 implementar primeiro **a projeção estrutural** desses cenários: caminhos,
 saídas e pontos. Os asserts RD/PV ficam explicitamente fora do papel Consumer/CFG,
 não simulados com valores hardcoded. [Matriz de perfis](../evals/profile-matrix.md).
+
+Os sub-requisitos `O-69-STRUCT` a `O-85-STRUCT` verificam preservação e validade
+de `TypeRef`, `sameDomain` e `DomainProofScope`; não autorizam calcular valores,
+reaching definitions, efeitos escalares ou storage. O adversarial inicial de branch
+contrasta `unknown(known(bool))` válido com `unknown_type` inválido.
 
 ## Regressão adversarial mínima
 

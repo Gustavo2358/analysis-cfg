@@ -2,18 +2,22 @@
 
 ## Fatiamento
 
-CP1. Verificar fontes fixadas e estado real do novo repo; classificar desvios.
-CP2. Definir ownership do modelo IR, porta e limites de módulos, sem gerar Java.
-CP3. Especificar schema de fixture e provas de equivalência/isolamento.
-CP4. Vincular vetores/evals ao MVP e decompor implementação em pequenos checkpoints.
-CP5. Challenge das decisões, gate fast, handoff e parada para review.
+CP1a. Checkpoint autorizado: verificar PR/head canônico da Analysis IR 2.0.0,
+confirmar a hipótese arquitetural, atualizar lock/hashes, perfis, evals, invariantes,
+backlog e harness; challenge, gate fast, PR e parada para review.
+CP1b. Após review/autorização aplicável, definir ownership do modelo IR, porta e
+limites de módulos, sem gerar Java.
+CP2. Especificar schema de fixture e provas de equivalência/isolamento.
+CP3. Vincular vetores/evals ao MVP e decompor implementação em pequenos checkpoints.
+CP4. Challenge das decisões, gate fast, handoff e parada para review.
 
-Esses passos só serão executados após autorização do discovery. Não são uma
-permissão prévia para todos os trabalhos posteriores.
+Somente CP1a está autorizado por este checkpoint. Não é permissão para resolver as
+decisões físicas restantes nem para executar trabalhos posteriores.
 
 ## Dependências
 
-Contrato IR fixado e acesso aos trechos necessários. Não exige CobolLower pronto.
+Contrato Analysis IR 2.0.0 fixado por SHA e acesso aos trechos necessários. Não
+exige CobolLower pronto.
 
 ## Superfície arquitetural provável
 
@@ -22,8 +26,9 @@ Definir nomes/coordenadas na decisão; não criar pastas Java/POM antes da autor
 
 ## Migrações requeridas
 
-Nenhuma nesta fase. Futuramente módulo/adapter de arquivo → caller em memória,
-preservando mesma porta e evitando serialização intermediária.
+Neste checkpoint, migração documental de IR 1.0.0/@1 para 2.0.0/perfis @2,
+preservando versões `@1` das extensões. Futuramente módulo/adapter de arquivo →
+caller em memória, preservando mesma porta e evitando serialização intermediária.
 
 ## Artefatos esperados
 

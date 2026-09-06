@@ -1,4 +1,4 @@
-# BACKLOG-CFG-015 — Consultas pareadas e conformidade de controle local
+# BACKLOG-CFG-015 — Consultas pareadas e conformidade AIR-LOCAL-CONTROL@2
 
 **Estado:** `planned`. **Fase:** `local`. **Autorização:** backlog não autoriza execução.
 Dependências: BACKLOG-CFG-014, BACKLOG-CFG-012.
@@ -9,7 +9,9 @@ Provar que a representação realmente impede retornos ao callsite errado.
 
 ## Escopo e estratégia
 
-Implementar consultas/semântica contextual aprovadas; tratar recursão e limites; distinguir projeção conservadora de modo preciso; qualificar AIR-LOCAL-CONTROL.
+Implementar consultas/semântica contextual aprovadas; tratar recursão e limites;
+distinguir projeção conservadora de modo preciso; qualificar
+`AIR-LOCAL-CONTROL@2` usando a extensão `control.local@1`.
 
 ## Critérios de aceitação
 

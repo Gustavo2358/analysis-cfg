@@ -1,6 +1,6 @@
 # BACKLOG-CFG-001 — Discovery de fronteiras e plano executivo
 
-**Estado:** `ready_for_authorization`. **Fase:** `discovery`. **Autorização:** backlog não autoriza execução.
+**Estado:** `active`. **Fase:** `discovery`. **Autorização:** somente o work item delimita o checkpoint.
 Dependências: nenhuma.
 
 ## Problema e objetivo observável

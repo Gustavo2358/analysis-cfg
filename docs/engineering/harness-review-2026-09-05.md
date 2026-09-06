@@ -1,5 +1,10 @@
 # Review do harness — 05/09/2026
 
+**Registro histórico.** As referências a Analysis IR 1.0.0 e perfis `@1` abaixo
+descrevem a baseline examinada naquele parecer, não a autoridade corrente. A
+baseline normativa atual está no [lock](../sources/sources.lock.json) e no
+[estado upstream](../sources/upstream-state.md).
+
 ## Escopo
 
 Revisão realizada antes da primeira implementação Java, confrontando o harness com:

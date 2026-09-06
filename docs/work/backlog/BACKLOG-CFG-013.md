@@ -5,11 +5,14 @@ Dependências: BACKLOG-CFG-009, BACKLOG-CFG-010.
 
 ## Problema e objetivo observável
 
-Escolher algoritmo/representação de controle local sem contaminar core com COBOL.
+Escolher algoritmo/representação de `control.local@1` sob o contrato V2, sem
+contaminar core com COBOL.
 
 ## Escopo e estratégia
 
-Ler IR §05.7, X-23/24 e O-56–60; estudar literatura de caminhos realizáveis, pushdown/representação contextual; comparar custo, recursão, soundness e fallback.
+Ler IR §05.7, X-23/24 e O-56–60; estudar literatura de caminhos realizáveis,
+pushdown/representação contextual; comparar custo, recursão, soundness e fallback
+para futura qualificação `AIR-LOCAL-CONTROL@2`.
 
 ## Critérios de aceitação
 

@@ -25,6 +25,11 @@ sequences, operations, program points e origins por identidades próprias/correl
 Preservar uma Sequence por nó é a política inicial, não afirmar que SequenceId é
 BlockId ou que o bloco é máximo. Coalescing fica adiado.
 
+A Analysis IR 2.0.0 acrescenta `TypeRef`, premissas `sameDomain` e
+`DomainProofScope` ao contrato compartilhado. O kernel preserva e valida esses fatos
+estruturais quando aplicáveis, sem transformá-los em dataflow ou alterar a projeção
+`Sequence → terminator → successors`.
+
 ## Unidades de dependência pretendidas
 
 | Unidade | Dependências permitidas |
@@ -45,9 +50,10 @@ saídas/fronteiras/contexto → validação derivada → resultado imutável.
 
 Controle local não é apenas grafo de adjacência: o contrato exige retornos pareados
 ou aproximação declarada. A API não deve prometer que todo successor é incondicional.
-O MVP-CFG-01 termina em fluxo linear + IF/ELSE; `invoke` e capacidades avançadas
-entram em slices posteriores. O MVP pode não suportar `control.local@1`, mas não
-pode apagar essa capability.
+O MVP-CFG-01 termina em fluxo linear, `jump`, IF/ELSE, `return` e `halt`; `invoke`,
+`dispatch`, ciclos, controle aberto, `control.local@1` e `control.indirect@1` entram
+em slices posteriores. O MVP pode não interpretar essas capacidades, mas não pode
+apagá-las ou alegar o perfil completo.
 
 Detalhes: [fronteiras](docs/architecture/boundaries.md), [portas e adapters](docs/architecture/ports-and-adapters.md),
 [extensibilidade](docs/architecture/extensibility.md), [pipeline](docs/architecture/pipeline.md).

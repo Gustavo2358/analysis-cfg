@@ -9,15 +9,20 @@ Confrontar fixtures sintéticas com publicação real sem relaxar o contrato.
 
 ## Escopo e estratégia
 
-Quando houver lowerer conforme, comparar suas publicações com capabilities esperadas; criar regressões IR isoladas e registrar gaps upstream sem ensinar COBOL ao CFG.
+Quando houver lowerer conforme à Analysis IR 2.0.0, comparar suas publicações com
+capabilities, `TypeRef`, premises e escopos esperados; criar regressões IR isoladas
+e registrar gaps upstream sem ensinar COBOL ao CFG.
 
 ## Critérios de aceitação
 
-Controle de exemplos equivalentes preservado; fonte→IR e IR→CFG validados separadamente; readiness parcial não é promovida; testes continuam rodando sem repos vizinhos.
+Controle de exemplos equivalentes e fatos V2 preservados; fonte→IR e IR→CFG
+validados separadamente; readiness parcial não é promovida; testes continuam
+rodando sem repos vizinhos.
 
 ## Evals e invariantes
 
-EVAL-CFG-008, EVAL-CFG-013, EVAL-CFG-020. Vincular invariantes específicos na promoção para work
+EVAL-CFG-008, EVAL-CFG-013, EVAL-CFG-020, EVAL-CFG-021, EVAL-CFG-022.
+Vincular invariantes específicos na promoção para work
 item. Ver [catálogo](../../evals/catalog.md) e [invariantes](../../architecture/invariants.md).
 Antes de código, transformar expected em testes RED independentes; documentar o
 resultado observado, não apenas intenção de TDD.

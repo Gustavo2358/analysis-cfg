@@ -193,7 +193,8 @@ def validate(root: Path) -> list[str]:
         if not set(e.get('invariants', [])) <= inv_ids:
             error('Unknown invariant in eval: ' + e.get('id', '?'))
         for o in e.get('upstream_oracles', []):
-            if not re.fullmatch(r'O-\d{2}', o) or not (1 <= int(o[2:]) <= 68):
+            match = re.fullmatch(r'O-(\d{2})(?:-(STRUCT|SCALAR|REGION))?', o)
+            if not match or not (1 <= int(match.group(1)) <= 85):
                 error('Invalid upstream oracle: ' + str(o))
         if e.get('status') == 'implemented' and not e.get('implementation_evidence'):
             error('Implemented eval without evidence: ' + e.get('id', '?'))
@@ -297,22 +298,41 @@ def validate(root: Path) -> list[str]:
     air = sources.get('analysis_ir', {})
     if not re.fullmatch('[0-9a-f]{40}', air.get('commit', '')):
         error('IR commit must be immutable 40-character SHA')
+    if air.get('semantic_version') != '2.0.0':
+        error('Harness must target Analysis IR 2.0.0')
     if profiles.get('ir_commit') != air.get('commit'):
         error('Profile matrix and IR lock disagree')
     paths = [x.get('path') for x in air.get('files', [])]
     if not paths or len(paths) != len(set(paths)):
         error('Empty/duplicate IR source paths')
+    if 'exemplos/04-conhecimento-de-tipo.md' not in paths:
+        error('Analysis IR V2 type-knowledge example missing from lock')
     for f in air.get('files', []):
         p = f.get('path', '')
         if Path(p).is_absolute() or '..' in Path(p).parts or not p.endswith('.md'):
             error('Unsafe IR source path: ' + p)
         if not re.fullmatch('[0-9a-f]{40}', f.get('git_blob_sha1', '')):
             error('Invalid IR blob hash: ' + p)
-    expected = {'AIR-STRUCTURE@1': list(range(1,11))+list(range(18,23))+list(range(29,35))+list(range(41,49)),
-                'AIR-LOCAL-CONTROL@1': list(range(56,61)), 'AIR-INDIRECT-CONTROL@1': list(range(61,64))}
+    structure = (list(range(1, 11)) + list(range(18, 23)) +
+                 list(range(29, 35)) + list(range(41, 49)) + list(range(69, 86)))
+    expected = {
+        'AIR-STRUCTURE@2': {
+            'requires': [],
+            'oracles': ['O-%02d-STRUCT' % n for n in structure]
+        },
+        'AIR-LOCAL-CONTROL@2': {
+            'requires': ['AIR-STRUCTURE@2'],
+            'oracles': ['O-%02d' % n for n in range(56, 61)]
+        },
+        'AIR-INDIRECT-CONTROL@2': {
+            'requires': ['AIR-STRUCTURE@2'],
+            'oracles': ['O-%02d' % n for n in range(61, 64)]
+        }
+    }
     for profile in profiles.get('profiles', []):
         ident = profile.get('id')
-        if ident not in expected or profile.get('oracles') != ['O-%02d' % n for n in expected[ident]]:
+        if (ident not in expected or profile.get('requires') != expected[ident]['requires'] or
+                profile.get('oracles') != expected[ident]['oracles']):
             error('Profile obligations drift: ' + str(ident))
     if {p.get('id') for p in profiles.get('profiles', [])} != set(expected):
         error('Profile inventory incomplete')

@@ -39,7 +39,8 @@ item porque ficou verde. Sem duplicar este plano em tasklist permanente.
 
 ## Fora de escopo
 
-Sem backlog genérico virar autorização para implementar todos recursos futuros ou modificar V1 unilateralmente.
+Sem backlog genérico virar autorização para implementar todos recursos futuros ou
+modificar unilateralmente o contrato Analysis IR fixado.
 
 ## Evidência de conclusão
 

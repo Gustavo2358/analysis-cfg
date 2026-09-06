@@ -5,7 +5,8 @@ Identifique o work item, a autorização e o limite deste checkpoint.
 ## Regra e impacto
 
 IR/ADR/invariantes/evals relacionados. Distinguir mudança de consumidor, transporte,
-contrato e premissa upstream. Informar capability/precisão alcançada, não apenas “V1”.
+contrato e premissa upstream. Informar capability/precisão alcançada, não apenas a
+versão major da IR.
 
 ## Evidência
 

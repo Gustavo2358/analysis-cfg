@@ -2,23 +2,26 @@
   "id": "WORK-CFG-001",
   "backlog_id": "BACKLOG-CFG-001",
   "title": "Discovery de contrato concreto, fronteiras e MVP",
-  "status": "blocked",
+  "status": "active",
   "risk": "high",
   "goal": "Preparar plano executivo revisável antes de qualquer Java/POM.",
-  "authorization": "none",
-  "authorization_evidence": "A entrega autorizada foi somente este harness; discovery aguarda comando explícito.",
-  "checkpoint": "CP1-DISCOVERY-DOCUMENTAL",
+  "authorization": "discovery",
+  "authorization_evidence": "Prompt explícito de 05/09/2026 autoriza somente o checkpoint docs/harness de sincronização com Analysis IR 2.0.0; Java, Maven e CFG permanecem proibidos.",
+  "checkpoint": "CP1-ANALYSIS-IR-V2-CONTRACT-SYNC",
   "must_read": [
     "AGENTS.md",
     "ARCHITECTURE.md",
     "docs/product/mission-and-slices.md",
     "docs/sources/upstream-state.md",
     "docs/sources/index.md",
+    "docs/sources/sources.lock.json",
     "docs/domain/ir-boundary.md",
+    "docs/domain/core-control.md",
     "docs/architecture/ports-and-adapters.md",
     "docs/architecture/extensibility.md",
     "docs/evals/mvp-scenarios.md",
-    "docs/evals/profile-matrix.md"
+    "docs/evals/profile-matrix.md",
+    "docs/evals/profile-obligations.json"
   ],
   "related_decisions": [
     "ADR-0001",
@@ -37,33 +40,39 @@
     "INV-CFG-015",
     "INV-CFG-024",
     "INV-CFG-025",
-    "INV-CFG-026"
+    "INV-CFG-026",
+    "INV-CFG-027",
+    "INV-CFG-028",
+    "INV-CFG-029"
   ],
   "evals": [
     "EVAL-CFG-001",
     "EVAL-CFG-007",
     "EVAL-CFG-008",
     "EVAL-CFG-009",
-    "EVAL-CFG-020"
+    "EVAL-CFG-020",
+    "EVAL-CFG-021",
+    "EVAL-CFG-022"
   ],
   "source_scope": [
     "docs/architecture/",
     "docs/domain/",
     "docs/work/",
     "docs/evals/",
-    "docs/engineering/"
+    "docs/engineering/",
+    "docs/sources/",
+    "scripts/harness/"
   ],
   "test_scope": [
-    "docs/evals/"
+    "docs/evals/",
+    "scripts/harness/"
   ],
   "must_not_change": [
     "**/*.java",
-    "**/pom.xml",
-    "docs/sources/sources.lock.json",
-    "scripts/harness/"
+    "**/pom.xml"
   ],
   "gates": [
     "fast"
   ],
-  "stop_condition": "Publicar discovery, opções/ADRs, plano/aceitação e gates documentais; parar antes de implementação."
+  "stop_condition": "Sincronizar contrato, hashes, perfis, evals e backlog com Analysis IR 2.0.0; validar gates documentais, abrir PR e parar para human review antes de Java/Maven/BACKLOG-CFG-002."
 }

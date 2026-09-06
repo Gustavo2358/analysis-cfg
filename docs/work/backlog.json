@@ -5,7 +5,7 @@
       "id": "BACKLOG-CFG-001",
       "title": "Discovery de fronteiras e plano executivo",
       "phase": "discovery",
-      "status": "ready_for_authorization",
+      "status": "active",
       "dependencies": [],
       "evals": [
         "EVAL-CFG-007",
@@ -28,7 +28,9 @@
         "EVAL-CFG-001",
         "EVAL-CFG-007",
         "EVAL-CFG-013",
-        "EVAL-CFG-020"
+        "EVAL-CFG-020",
+        "EVAL-CFG-021",
+        "EVAL-CFG-022"
       ],
       "path": "docs/work/backlog/BACKLOG-CFG-002.md",
       "work_item": null
@@ -82,7 +84,8 @@
         "EVAL-CFG-005",
         "EVAL-CFG-007",
         "EVAL-CFG-013",
-        "EVAL-CFG-014"
+        "EVAL-CFG-014",
+        "EVAL-CFG-021"
       ],
       "path": "docs/work/backlog/BACKLOG-CFG-005.md",
       "work_item": null
@@ -99,7 +102,8 @@
         "EVAL-CFG-003",
         "EVAL-CFG-004",
         "EVAL-CFG-005",
-        "EVAL-CFG-014"
+        "EVAL-CFG-014",
+        "EVAL-CFG-021"
       ],
       "path": "docs/work/backlog/BACKLOG-CFG-006.md",
       "work_item": null
@@ -177,7 +181,7 @@
     },
     {
       "id": "BACKLOG-CFG-011",
-      "title": "Qualificação AIR-STRUCTURE e hardening de regressão",
+      "title": "Qualificação AIR-STRUCTURE@2 e hardening de regressão",
       "phase": "structure",
       "status": "planned",
       "dependencies": [
@@ -197,7 +201,9 @@
         "EVAL-CFG-011",
         "EVAL-CFG-012",
         "EVAL-CFG-013",
-        "EVAL-CFG-014"
+        "EVAL-CFG-014",
+        "EVAL-CFG-021",
+        "EVAL-CFG-022"
       ],
       "path": "docs/work/backlog/BACKLOG-CFG-011.md",
       "work_item": null
@@ -256,7 +262,7 @@
     },
     {
       "id": "BACKLOG-CFG-015",
-      "title": "Consultas pareadas e conformidade de controle local",
+      "title": "Consultas pareadas e conformidade AIR-LOCAL-CONTROL@2",
       "phase": "local",
       "status": "planned",
       "dependencies": [
@@ -274,7 +280,7 @@
     },
     {
       "id": "BACKLOG-CFG-016",
-      "title": "Controle indireto com universo fechado",
+      "title": "Controle indireto e AIR-INDIRECT-CONTROL@2",
       "phase": "indirect",
       "status": "planned",
       "dependencies": [
@@ -282,7 +288,8 @@
       ],
       "evals": [
         "EVAL-CFG-019",
-        "EVAL-CFG-012"
+        "EVAL-CFG-012",
+        "EVAL-CFG-021"
       ],
       "path": "docs/work/backlog/BACKLOG-CFG-016.md",
       "work_item": null
@@ -298,7 +305,9 @@
       "evals": [
         "EVAL-CFG-008",
         "EVAL-CFG-013",
-        "EVAL-CFG-020"
+        "EVAL-CFG-020",
+        "EVAL-CFG-021",
+        "EVAL-CFG-022"
       ],
       "path": "docs/work/backlog/BACKLOG-CFG-017.md",
       "work_item": null
@@ -314,7 +323,9 @@
       "evals": [
         "EVAL-CFG-007",
         "EVAL-CFG-008",
-        "EVAL-CFG-020"
+        "EVAL-CFG-020",
+        "EVAL-CFG-021",
+        "EVAL-CFG-022"
       ],
       "path": "docs/work/backlog/BACKLOG-CFG-018.md",
       "work_item": null

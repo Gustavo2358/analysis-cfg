@@ -11,7 +11,8 @@ modular; a definição física dos módulos precede Java.
 
 Domínio positivo deliberadamente estreito: uma publicação válida, units/entries
 explicitadas; sequences com operações comuns; `jump`, `branch` e saídas
-`return`/`halt`. Predicado puro desconhecido conserva os dois destinos. IFs aninhados
+`return`/`halt`. `unknown(known(bool))` como predicado puro conserva os dois destinos;
+`unknown_type` não satisfaz a assinatura booleana. IFs aninhados
 são combinações das mesmas primitives, sem limite artificial de cardinalidade.
 O primeiro MVP **não precisa de `invoke`, `dispatch`, controle aberto, local ou
 indireto** para provar a arquitetura. Não inventar estado de dados para desenhar o
@@ -35,7 +36,7 @@ A fixture fechada tem premissas de controle escritas, não contratos inventados 
 base em CALL supostamente “normal”.
 
 **MVP-CFG-01 não é um perfil normativo IR.** É um marco local de implementação.
-Não declarar `AIR-STRUCTURE@1/PRECISE_FOR_PROFILE` até cumprir todas as obrigações
+Não declarar `AIR-STRUCTURE@2/PRECISE_FOR_PROFILE` até cumprir todas as obrigações
 estruturais dos oráculos daquele perfil.
 
 ## Evolução planejada
@@ -51,7 +52,7 @@ Esses nomes orientam testes de aceitação bilateral, não classes do CFG.
 
 Dataflow, reaching definitions, storage analysis, dependências calculadas, dominância
 e coalescing ficam adiados. Preservar seus insumos não significa implementá-los.
-O objetivo é fechar produto observável cedo; não terminar horizontalmente a V1 inteira.
+O objetivo é fechar produto observável cedo; não terminar horizontalmente a V2 inteira.
 Não há promessa de data de conclusão ou estimativa inferida da contagem de classes.
 
 Fontes: [contrato e estado upstream](../sources/index.md); execução: [backlog](../work/backlog.md).

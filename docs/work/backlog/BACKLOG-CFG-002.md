@@ -5,19 +5,25 @@ Dependências: BACKLOG-CFG-001.
 
 ## Problema e objetivo observável
 
-Criar a fundação tipada de contrato e build reprodutível, sem algoritmo CFG.
+Criar a fundação tipada da Analysis IR 2.0.0 e build reprodutível, sem algoritmo CFG.
 
 ## Escopo e estratégia
 
-Implementar apenas o modelo aprovado suficiente ao MVP com evolução/unsupported explícitos; Java 17, separação de módulos, construtores/validações e testes TDD.
+Implementar apenas o modelo aprovado suficiente ao MVP com evolução/unsupported
+explícitos; `TypeRef = Known(Type) | UnknownType(UncertaintyId)`, `Premise`,
+`sameDomain` e `DomainProofScope` pertencem à fundação desde o primeiro modelo.
+Java 17, separação de módulos, construtores/validações e testes TDD.
 
 ## Critérios de aceitação
 
-Não há classes IR privadas duplicadas; kernel pode depender só do contrato; namespaces, imutabilidade e terminador único testados; build não passa com zero testes.
+Não há classes IR privadas duplicadas nem `Optional<Type>` substituindo `TypeRef`;
+kernel depende só do contrato; namespaces, imutabilidade, terminador único, escopos
+de prova e lacunas `TYPE_UNKNOWN` são testados; build não passa com zero testes.
 
 ## Evals e invariantes
 
-EVAL-CFG-001, EVAL-CFG-007, EVAL-CFG-013, EVAL-CFG-020. Vincular invariantes específicos na promoção para work
+EVAL-CFG-001, EVAL-CFG-007, EVAL-CFG-013, EVAL-CFG-020, EVAL-CFG-021,
+EVAL-CFG-022. Vincular invariantes específicos na promoção para work
 item. Ver [catálogo](../../evals/catalog.md) e [invariantes](../../architecture/invariants.md).
 Antes de código, transformar expected em testes RED independentes; documentar o
 resultado observado, não apenas intenção de TDD.
@@ -39,7 +45,8 @@ item porque ficou verde. Sem duplicar este plano em tasklist permanente.
 
 ## Fora de escopo
 
-Sem frontend/ANTLR, solver CFG, dataflow, CLI ou APIs cloud. Modelo não acoplado ao JSON.
+Sem frontend/ANTLR, solver CFG, dataflow, CLI ou APIs cloud. Modelo não acoplado ao
+JSON e sem API antecipada além das formas exigidas pela V2.
 
 ## Evidência de conclusão
 

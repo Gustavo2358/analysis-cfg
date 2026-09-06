@@ -3,41 +3,46 @@
 ## Autoridade
 
 Requisito explícito do usuário governa produto/arquitetura. Semântica de operação é
-a **Analysis IR 1.0.0 fixada**. Se uma solicitação exige comportamento incompatível,
+a **Analysis IR 2.0.0 fixada**. Se uma solicitação exige comportamento incompatível,
 registrar conflito e propor evolução; não reinterpretar a operação silenciosamente.
 ADRs/contratos locais refinam desenho sem contrariar IR. Código e testes são evidência,
 não autoridade normativa isolada. História/conversa anterior não vence contrato.
 
-## IR normativa — commit fe38d30db9e95ce85d039600d543644c7f563014
+## IR normativa — commit 0b2fbce7046010b22b32efa8cbc3e75ccba09442
 
-- [README.md](https://github.com/Gustavo2358/analysis-ir/blob/fe38d30db9e95ce85d039600d543644c7f563014/README.md)
-- [REFERENCIAS.md](https://github.com/Gustavo2358/analysis-ir/blob/fe38d30db9e95ce85d039600d543644c7f563014/REFERENCIAS.md)
-- [conformidade/01-invariantes.md](https://github.com/Gustavo2358/analysis-ir/blob/fe38d30db9e95ce85d039600d543644c7f563014/conformidade/01-invariantes.md)
-- [conformidade/02-oraculos.md](https://github.com/Gustavo2358/analysis-ir/blob/fe38d30db9e95ce85d039600d543644c7f563014/conformidade/02-oraculos.md)
-- [especificacao/00-escopo-e-convencoes.md](https://github.com/Gustavo2358/analysis-ir/blob/fe38d30db9e95ce85d039600d543644c7f563014/especificacao/00-escopo-e-convencoes.md)
-- [especificacao/01-modelo-e-identidades.md](https://github.com/Gustavo2358/analysis-ir/blob/fe38d30db9e95ce85d039600d543644c7f563014/especificacao/01-modelo-e-identidades.md)
-- [especificacao/02-tipos-valores-e-operandos.md](https://github.com/Gustavo2358/analysis-ir/blob/fe38d30db9e95ce85d039600d543644c7f563014/especificacao/02-tipos-valores-e-operandos.md)
-- [especificacao/03-memoria-e-aliases.md](https://github.com/Gustavo2358/analysis-ir/blob/fe38d30db9e95ce85d039600d543644c7f563014/especificacao/03-memoria-e-aliases.md)
-- [especificacao/04-operacoes.md](https://github.com/Gustavo2358/analysis-ir/blob/fe38d30db9e95ce85d039600d543644c7f563014/especificacao/04-operacoes.md)
-- [especificacao/05-controle-e-invocacoes.md](https://github.com/Gustavo2358/analysis-ir/blob/fe38d30db9e95ce85d039600d543644c7f563014/especificacao/05-controle-e-invocacoes.md)
-- [especificacao/06-incompletude-e-proveniencia.md](https://github.com/Gustavo2358/analysis-ir/blob/fe38d30db9e95ce85d039600d543644c7f563014/especificacao/06-incompletude-e-proveniencia.md)
-- [especificacao/07-contrato-de-produtores.md](https://github.com/Gustavo2358/analysis-ir/blob/fe38d30db9e95ce85d039600d543644c7f563014/especificacao/07-contrato-de-produtores.md)
-- [especificacao/08-contrato-de-consumidores.md](https://github.com/Gustavo2358/analysis-ir/blob/fe38d30db9e95ce85d039600d543644c7f563014/especificacao/08-contrato-de-consumidores.md)
-- [especificacao/09-extensibilidade-e-compatibilidade.md](https://github.com/Gustavo2358/analysis-ir/blob/fe38d30db9e95ce85d039600d543644c7f563014/especificacao/09-extensibilidade-e-compatibilidade.md)
-- [especificacao/10-perfis-de-conformidade.md](https://github.com/Gustavo2358/analysis-ir/blob/fe38d30db9e95ce85d039600d543644c7f563014/especificacao/10-perfis-de-conformidade.md)
-- [especificacao/11-rastreabilidade-bilateral.md](https://github.com/Gustavo2358/analysis-ir/blob/fe38d30db9e95ce85d039600d543644c7f563014/especificacao/11-rastreabilidade-bilateral.md)
-- [exemplos/00-notacao.md](https://github.com/Gustavo2358/analysis-ir/blob/fe38d30db9e95ce85d039600d543644c7f563014/exemplos/00-notacao.md)
-- [exemplos/01-fluxo-e-valores.md](https://github.com/Gustavo2358/analysis-ir/blob/fe38d30db9e95ce85d039600d543644c7f563014/exemplos/01-fluxo-e-valores.md)
-- [exemplos/02-memoria-e-chamadas.md](https://github.com/Gustavo2358/analysis-ir/blob/fe38d30db9e95ce85d039600d543644c7f563014/exemplos/02-memoria-e-chamadas.md)
-- [exemplos/03-extensoes-e-parcialidade.md](https://github.com/Gustavo2358/analysis-ir/blob/fe38d30db9e95ce85d039600d543644c7f563014/exemplos/03-extensoes-e-parcialidade.md)
+O commit é o merge canônico do PR upstream #1. Não usar o antigo head do PR nem
+`main` flutuante como autoridade; hashes de blobs estão no lock.
+
+- [README.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/README.md)
+- [REFERENCIAS.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/REFERENCIAS.md)
+- [conformidade/01-invariantes.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/conformidade/01-invariantes.md)
+- [conformidade/02-oraculos.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/conformidade/02-oraculos.md)
+- [especificacao/00-escopo-e-convencoes.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/especificacao/00-escopo-e-convencoes.md)
+- [especificacao/01-modelo-e-identidades.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/especificacao/01-modelo-e-identidades.md)
+- [especificacao/02-tipos-valores-e-operandos.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/especificacao/02-tipos-valores-e-operandos.md)
+- [especificacao/03-memoria-e-aliases.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/especificacao/03-memoria-e-aliases.md)
+- [especificacao/04-operacoes.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/especificacao/04-operacoes.md)
+- [especificacao/05-controle-e-invocacoes.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/especificacao/05-controle-e-invocacoes.md)
+- [especificacao/06-incompletude-e-proveniencia.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/especificacao/06-incompletude-e-proveniencia.md)
+- [especificacao/07-contrato-de-produtores.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/especificacao/07-contrato-de-produtores.md)
+- [especificacao/08-contrato-de-consumidores.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/especificacao/08-contrato-de-consumidores.md)
+- [especificacao/09-extensibilidade-e-compatibilidade.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/especificacao/09-extensibilidade-e-compatibilidade.md)
+- [especificacao/10-perfis-de-conformidade.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/especificacao/10-perfis-de-conformidade.md)
+- [especificacao/11-rastreabilidade-bilateral.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/especificacao/11-rastreabilidade-bilateral.md)
+- [exemplos/00-notacao.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/exemplos/00-notacao.md)
+- [exemplos/01-fluxo-e-valores.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/exemplos/01-fluxo-e-valores.md)
+- [exemplos/02-memoria-e-chamadas.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/exemplos/02-memoria-e-chamadas.md)
+- [exemplos/03-extensoes-e-parcialidade.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/exemplos/03-extensoes-e-parcialidade.md)
+- [exemplos/04-conhecimento-de-tipo.md](https://github.com/Gustavo2358/analysis-ir/blob/0b2fbce7046010b22b32efa8cbc3e75ccba09442/exemplos/04-conhecimento-de-tipo.md)
 
 `§01/04/05/06/08/09/10` designam capítulos pelo prefixo do arquivo.
-O-01–O-68 são oráculos upstream; X-01–X-30 são exemplos informativos.
+O-01–O-85 são oráculos upstream; X-01–X-40 são exemplos informativos.
 A sintaxe desses exemplos **não é schema de arquivo**.
 
-Leitura para MVP: §01, operações pertinentes de §04, §05.1–6, §06, §08.1–2 e §10;
-exemplos X-01–X-04 e oráculos correlatos. Controle local acrescenta §05.7, X-23/X-24
-e O-56–O-60. Não carregar capítulos de memória inteira para implementar um jump.
+Leitura para MVP: §01; `TypeRef`, `sameDomain` e `DomainProofScope` pertinentes de
+§02; operações do subset em §04; §05.1–6, §06, §08.1–2 e §10; exemplos X-01–X-04,
+X-33/X-34 e oráculos correlatos. Controle local acrescenta §05.7, X-23/X-24 e
+O-56–O-60. Não carregar capítulos de memória inteira para implementar um jump.
 
 ## Inspiração e contexto
 

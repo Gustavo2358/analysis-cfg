@@ -2,21 +2,22 @@
 
 ## Onde estamos
 
-Harness preparado. Manifesto `blocked`, authorization `none`. Aguardando autorização
-explícita para iniciar discovery documental; Java/POM não autorizado.
+CP1a de sincronização contratual executado; work item segue `active`, autorização
+`discovery`. Branch para review; Java/POM/BACKLOG-CFG-002 não autorizados.
 
 ## Verde conhecido
 
-A evidência de validação desta entrega está em docs/harness-validation.md.
-Nenhuma suíte Java, algoritmo CFG ou perfil AIR foi implementado/executado.
+Analysis IR 2.0.0 pinada no merge `0b2fbce7046010b22b32efa8cbc3e75ccba09442`;
+blobs verificados. `check-fast` e 30 testes do harness passam. Gates de produto
+permanecem `UNAVAILABLE`; nenhum perfil AIR foi implementado.
 
 ## Restante
 
-Autorizar discovery; verificar fontes; fechar decisões; produzir próximo work item
-após review. Não iniciar BACKLOG-CFG-002 automaticamente.
+Human review do PR; fechar ownership do modelo IR, coordenadas Maven, binding das
+fixtures e contrato físico da porta. Não iniciar BACKLOG-CFG-002 automaticamente.
 
 ## Descobertas que afetam o plano
 
-Sequence já traz terminador; não precisamos de leader finder no MVP.
-local.control exige contexto; o adapter de arquivo não pode congelar o modelo.
-Semantic Product do PR #27 já tem writer JSON, mas não é Analysis IR.
+V2 preserva a topologia Sequence/terminador e exige `TypeRef`, `sameDomain` e
+`DomainProofScope`. `unknown(known(bool))` admite branch; `unknown_type` não.
+Perfis passam a `@2`; extensões local/indirect permanecem `@1`.
