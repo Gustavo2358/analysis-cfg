@@ -27,7 +27,7 @@ adiados. 021 leva gates a CI e não bloqueia desenho semântico.
 | [BACKLOG-CFG-002](backlog/BACKLOG-CFG-002.md) | Bootstrap Java 21/Maven e boundary air-java | BACKLOG-CFG-001 | completed |
 | [BACKLOG-CFG-003](backlog/BACKLOG-CFG-003.md) | Fronteiras Clean e seam semântico de extensões | BACKLOG-CFG-002 | completed |
 | [BACKLOG-CFG-004](backlog/BACKLOG-CFG-004.md) | Fixtures AIR JSON e adapter de transporte | BACKLOG-CFG-002, BACKLOG-CFG-003 | planned |
-| [BACKLOG-CFG-005](backlog/BACKLOG-CFG-005.md) | CFG-FIRST: Entry, Return e normal exit | BACKLOG-CFG-002, BACKLOG-CFG-003 | active |
+| [BACKLOG-CFG-005](backlog/BACKLOG-CFG-005.md) | CFG-FIRST: Entry, Return e normal exit | BACKLOG-CFG-002, BACKLOG-CFG-003 | completed |
 | [BACKLOG-CFG-006](backlog/BACKLOG-CFG-006.md) | Bifurcação e IF/ELSE estrutural | BACKLOG-CFG-022 | planned |
 | [BACKLOG-CFG-007](backlog/BACKLOG-CFG-007.md) | Invoke, raise e resultados de controle delimitados | BACKLOG-CFG-006 | planned |
 | [BACKLOG-CFG-008](backlog/BACKLOG-CFG-008.md) | CLI e prova posterior arquivo/memória | BACKLOG-CFG-004, BACKLOG-CFG-006 | planned |

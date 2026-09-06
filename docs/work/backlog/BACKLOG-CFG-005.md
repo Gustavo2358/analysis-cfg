@@ -1,6 +1,6 @@
 # BACKLOG-CFG-005 — CFG-FIRST: Entry, Return e normal exit
 
-**Estado:** `active` em [WORK-CFG-005](../active/WORK-CFG-005/state.md). **Fase:** `mvp`.
+**Estado:** `completed` em [WORK-CFG-005](../history/WORK-CFG-005.md). **Fase:** `mvp`.
 **Autorização:** implementação explícita no pedido de 06/09/2026, apenas CFG-FIRST
 e novo PR para review humano sem merge.
 Dependências: BACKLOG-CFG-002, BACKLOG-CFG-003.
@@ -49,5 +49,8 @@ lowerer, dataflow, leader detection ou coalescing.
 
 ## Evidência de conclusão
 
-Testes/contracasos de EVAL-CFG-025, mutante focalizado, comandos/exit codes, gates e
-review. Até existir, nenhum CFG ou perfil está implementado.
+EVAL-CFG-025 implemented: 19 testes semânticos, oracle independente anterior ao
+builder, mutante de fallthrough morto e metamorfismos. Architecture/semantic/fast
+PASS, clean test/verify com 37 testes; CI Temurin 21 verde. Histórico registra
+comandos/exit codes, limites e challenge. CFG-FIRST implementado, nenhum perfil AIR
+completo. Entrega em novo PR para review humano, sem merge nem próximo backlog.
