@@ -47,9 +47,12 @@ Capability registrada não apaga diagnostics do `AirValidator`. Nunca `nop` nem
 lista vazia. Não carregar classes por texto vindo da fixture. Sem ServiceLoader
 dentro do core.
 
-EVAL-CFG-009 registra uma capability sintética somente em teste, injeta o registry
+EVAL-CFG-027 registra uma capability sintética somente em teste, injeta o registry
 no mesmo coordinator e prova duplicata e ausência de suporte. A sintética não vira
 constante de produção nem capability normativa upstream.
+
+EVAL-CFG-009 permanece planejado para o slice que puder provar interpretação ou
+fallback único e uma representação executável sob seus oráculos upstream.
 
 ## Evolução conservadora
 

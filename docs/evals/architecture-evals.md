@@ -18,11 +18,15 @@ não bloqueia a via em memória e não foi implementado.
 
 ## Extensão
 
-EVAL-CFG-009 adiciona uma capability sintética versionada em código de teste pelo
+EVAL-CFG-027 adiciona uma capability sintética versionada em código de teste pelo
 registry injetado no mesmo coordinator. Registro duplicado falha; versões distintas
 não competem por ordem; falta de intérprete retorna `UNSUPPORTED_CAPABILITY`. O
 `INCOMPLETE_VALIDATION` upstream continua visível mesmo quando o intérprete está
 registrado. Nenhum fallback ou comportamento de operação foi implementado.
+
+EVAL-CFG-009 permanece `planned`: ele exige interpretação/fallback único e
+representação executável sob O-47-STRUCT/O-48-STRUCT, que esta foundation não
+produz.
 
 ## Integração Maven
 
@@ -38,8 +42,8 @@ Surefire exato, inspeciona classfiles/dependency tree/classpath e confirma as
 assinaturas e chamadas com `javap`/`jdeps`. Fixtures e mutações reais exercitam
 filesystem, AIR paralela, DTO local, reflection/`ServiceLoader`, frontend e falso
 sucesso para unsupported. Isso preserva EVAL-CFG-007/EVAL-CFG-024 e implementa
-EVAL-CFG-009 somente para o seam. EVAL-CFG-008/020 e todas as provas semânticas do
-builder permanecem planejadas.
+EVAL-CFG-027 como prova arquitetural local. EVAL-CFG-008/009/020 e todas as provas
+semânticas do builder permanecem planejadas.
 
 EVAL-CFG-026 reserva o micro-E2E externo `cobol-semantic-product.json` →
 `cobol-lower` → `air-java Publication` → CFG-FIRST. O lowerer não importa o port

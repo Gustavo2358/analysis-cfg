@@ -12,9 +12,16 @@ composição pequena e extensão controlada.
 
 ## Escopo e estratégia
 
-Definir `BuildCfg(air-java Publication, BuildOptions) → CfgBuildResult` e contratos de transição tipados; preservar fatos V2
-sem misturá-los ao transporte; manter potencial de contexto/open scope; criar provas
-de dependência bytecode e registro de extensão sintética por capability e versão.
+Definir `BuildCfg(air-java Publication, BuildOptions) → CfgBuildResult`, suas opções
+e seu envelope de boundary; preservar fatos V2 sem misturá-los ao transporte; criar
+registry explícito por capability/version, negociação de presença/incompatibilidade
+e provas de dependência bytecode com uma extensão sintética.
+
+O desenvolvimento refinou a frase inicial que incluía contratos de transição
+tipados: destino local, saída, open control e ação contextual foram deliberadamente
+adiados até o primeiro slice semântico concreto. Esses tipos exigem uma operação de
+interpretação e não são necessários para fechar esta foundation; criá-los aqui seria
+abstração especulativa.
 
 ## Critérios de aceitação
 
@@ -24,8 +31,10 @@ são rejeitados; gate architecture se torna real com casos negativos.
 
 ## Evals e invariantes
 
-EVAL-CFG-007, EVAL-CFG-009 e EVAL-CFG-024. Vincular invariantes específicos na promoção para work
-item. Ver [catálogo](../../evals/catalog.md) e [invariantes](../../architecture/invariants.md).
+EVAL-CFG-007, EVAL-CFG-024 e EVAL-CFG-027. EVAL-CFG-009 permanece `planned` para
+interpretação/fallback sob seus oráculos upstream. Vincular invariantes específicos
+na promoção para work item. Ver [catálogo](../../evals/catalog.md) e
+[invariantes](../../architecture/invariants.md).
 Antes de código, transformar expected em testes RED independentes; documentar o
 resultado observado, não apenas intenção de TDD.
 
@@ -53,5 +62,6 @@ reflection nem factories por conveniência. Perfis `@2` não renomeiam extensõe
 
 [WORK-CFG-003](../history/WORK-CFG-003.md) registra contrato compilado, 18 testes,
 gate arquitetural ampliado, RED → GREEN, falsificações e validação em Maven repo
-isolado. EVAL-CFG-009 foi implementado somente para o seam; nenhum CFG, capability
-de controle real ou perfil AIR foi declarado implementado.
+isolado. EVAL-CFG-027 foi implementado para o registry local; EVAL-CFG-009 permanece
+`planned`. Nenhum contrato de alternativa de controle, CFG, capability de controle
+real ou perfil AIR foi declarado implementado.

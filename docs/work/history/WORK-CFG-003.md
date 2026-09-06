@@ -51,6 +51,16 @@ alteração; o `INCOMPLETE_VALIDATION` emitido pelo `AirValidator` para a extens
 desconhecida continua preservado. O seam não executa semântica, não apaga diagnostics
 e não afirma que capability AIR real de controle foi implementada.
 
+## Refinamento de escopo
+
+O backlog originalmente reunia a porta/registry e contratos tipados de alternativas
+de controle. Durante a implementação ficou comprovado que esses contratos exigem a
+primeira operação semântica concreta para evitar abstrações especulativas. O escopo
+foi refinado para concluir a porta, o envelope, o registry e a negociação explícita
+de presença/incompatibilidade. Destino local, saída, open control e ação contextual
+foram deliberadamente adiados; não foram implementados nem necessários para fechar
+a foundation.
+
 ## TDD, testes e falsificações
 
 O RED inicial foi observado com `mvn -B -ntp -pl :cfg-kernel test`, exit 1 e erros
@@ -90,9 +100,10 @@ Usando `/tmp/analysis-cfg-work-cfg-003-m2`, preparado a partir do upstream pinad
 
 O gate arquitetural mantém compile dependency externa somente em `air-java`, Java
 21 sem preview, inventários exatos, bytecode/descriptors da porta e preflight,
-imports produtivos e `jdeps`. EVAL-CFG-009 está implementado somente para o seam;
-EVAL-CFG-007 e EVAL-CFG-024 permanecem verdes. EVAL-CFG-025 continua `planned` e
-nenhum perfil AIR foi declarado implementado.
+imports produtivos e `jdeps`. EVAL-CFG-027 implementa a prova local do registry;
+EVAL-CFG-009 permanece `planned`, com O-47-STRUCT/O-48-STRUCT ainda não
+reivindicados. EVAL-CFG-007 e EVAL-CFG-024 permanecem verdes. EVAL-CFG-025 continua
+`planned` e nenhum perfil AIR foi declarado implementado.
 
 ## Escopo negativo e handoff
 

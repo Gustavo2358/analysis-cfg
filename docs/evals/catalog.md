@@ -1,7 +1,7 @@
 # Catálogo de evals
 
-**A fundação implementa EVAL-CFG-007, EVAL-CFG-009 apenas para o seam, e
-EVAL-CFG-024; os evals semânticos do CFG continuam planejados.** Metadados
+**A fundação implementa EVAL-CFG-007, EVAL-CFG-024 e o eval local
+EVAL-CFG-027; os evals semânticos do CFG continuam planejados.** Metadados
 verificáveis em [catalog.json](catalog.json).
 
 ## EVAL-CFG-001 — Integridade da Publication
@@ -60,10 +60,10 @@ Oráculos upstream: O-66. Invariantes: INV-CFG-002, INV-CFG-003, INV-CFG-023, IN
 
 Registro de capability sintética por seam; duplicata rejeitada; fallback uma vez; não suportado não vira vazio.
 
-Oráculos upstream: O-47-STRUCT, O-48-STRUCT. A foundation prova composição,
-duplicata e ausência de suporte, sem alegar interpretação dos oráculos de controle.
-Invariantes: INV-CFG-014, INV-CFG-022. Estado: `implemented` para o seam, com
-evidência em [WORK-CFG-003](../work/history/WORK-CFG-003.md).
+Oráculos upstream: O-47-STRUCT, O-48-STRUCT. Interpretação/fallback e representação
+executável exigem slice semântico posterior. Invariantes: INV-CFG-014,
+INV-CFG-022. Estado: `planned`; O-47-STRUCT e O-48-STRUCT não foram reivindicados
+pela foundation.
 
 ## EVAL-CFG-010 — Dispatch
 
@@ -198,3 +198,15 @@ testa GOBACK ou JSON.
 
 Oráculos upstream: O-18-STRUCT, O-66. Invariantes: INV-CFG-001, INV-CFG-002,
 INV-CFG-003, INV-CFG-019, INV-CFG-023, INV-CFG-026. Estado: `planned`.
+
+## EVAL-CFG-027 — Registry explícito de capability/version
+
+A composição registra intérpretes explicitamente por capability/version;
+duplicata ou conflito falha, ordem não cria prioridade, versões distintas coexistem
+e ausência produz incompatibilidade explícita. O eval não executa interpretação,
+redução ou fallback.
+
+Oráculos upstream: nenhum; prova arquitetural local. Invariantes: INV-CFG-014 e
+INV-CFG-022, limitadas à composição e à incompatibilidade explícita. Estado:
+`implemented`, com evidência em
+[WORK-CFG-003](../work/history/WORK-CFG-003.md).

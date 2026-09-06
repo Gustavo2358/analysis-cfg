@@ -44,8 +44,8 @@
       ],
       "evals": [
         "EVAL-CFG-007",
-        "EVAL-CFG-009",
-        "EVAL-CFG-024"
+        "EVAL-CFG-024",
+        "EVAL-CFG-027"
       ],
       "path": "docs/work/backlog/BACKLOG-CFG-003.md",
       "work_item": "WORK-CFG-003",

@@ -7,7 +7,7 @@ independente → teste RED observado → implementação mínima geral → GREEN
 refatoração → challenge independente → gates e handoff.
 Planejar testes não é RED executado. Os evals semânticos de CFG continuam
 `planned`; EVAL-CFG-007 e EVAL-CFG-024 têm implementação de boundary, e
-EVAL-CFG-009 implementa somente a prova arquitetural do seam.
+EVAL-CFG-027 implementa somente a prova arquitetural local do registry.
 Não usar mocks do próprio algoritmo para provar o algoritmo.
 
 ## Camadas
