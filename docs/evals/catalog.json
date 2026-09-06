@@ -108,7 +108,7 @@
     {
       "id": "EVAL-CFG-007",
       "title": "Isolamento Clean Architecture",
-      "status": "planned",
+      "status": "implemented",
       "expectation": "Kernel compila/executa sem adapters, filesystem, serialização ou frontend; dependência proibida é detectada.",
       "upstream_oracles": [],
       "invariants": [
@@ -116,7 +116,7 @@
         "INV-CFG-002",
         "INV-CFG-026"
       ],
-      "implementation_evidence": null
+      "implementation_evidence": "docs/work/history/WORK-CFG-002.md"
     },
     {
       "id": "EVAL-CFG-008",
@@ -393,7 +393,7 @@
     {
       "id": "EVAL-CFG-024",
       "title": "Boundary compartilhada do air-java",
-      "status": "planned",
+      "status": "implemented",
       "expectation": "O kernel compila contra a Publication e o AirValidator do air-java fixado, sem declarar cópias locais de tipos AIR. O preflight preserva os diagnósticos estruturais e distingue a versão 0.1.0-SNAPSHOT da biblioteca da AIR 2.0.0; não transforma validação AIR em claim de conformidade CFG.",
       "upstream_oracles": [],
       "invariants": [
@@ -403,7 +403,7 @@
         "INV-CFG-027",
         "INV-CFG-028"
       ],
-      "implementation_evidence": null
+      "implementation_evidence": "docs/work/history/WORK-CFG-002.md"
     },
     {
       "id": "EVAL-CFG-025",

@@ -5,7 +5,8 @@
 Regra normativa → classes semânticas → adversariais contra o atalho óbvio → esperado
 independente → teste RED observado → implementação mínima geral → GREEN →
 refatoração → challenge independente → gates e handoff.
-Planejar testes não é RED executado. Os evals deste pacote ainda são `planned`.
+Planejar testes não é RED executado. Os evals semânticos de CFG continuam
+`planned`; somente EVAL-CFG-007 e EVAL-CFG-024 têm implementação de fundação.
 Não usar mocks do próprio algoritmo para provar o algoritmo.
 
 ## Camadas
@@ -52,7 +53,7 @@ implementar primeiro **a projeção estrutural** desses cenários: caminhos,
 saídas e pontos. Os asserts RD/PV ficam explicitamente fora do papel Consumer/CFG,
 não simulados com valores hardcoded. [Matriz de perfis](../evals/profile-matrix.md).
 
-Os sub-requisitos `O-69-STRUCT` a `O-85-STRUCT` verificam preservação e validade
+Os sub-requisitos `O-69-STRUCT` a `O-91-STRUCT` verificam preservação e validade
 de `TypeRef`, `sameDomain` e `DomainProofScope`; não autorizam calcular valores,
 reaching definitions, efeitos escalares ou storage. O adversarial inicial de branch
 contrasta `unknown(known(bool))` válido com `unknown_type` inválido.

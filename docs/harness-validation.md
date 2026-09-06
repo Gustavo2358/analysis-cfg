@@ -1,4 +1,8 @@
-# Validação desta entrega
+# Validação histórica do harness documental
+
+> Registro do fechamento de WORK-CFG-001, antes da fundação Java. Para o estado
+> executável atual, consulte [gates](engineering/gates.md) e o histórico do work
+> mais recente.
 
 Executada em 06/09/2026, no repositório local. Esta é evidência do **harness**, não de
 uma implementação Java, da IR ou do CFG.

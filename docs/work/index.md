@@ -2,19 +2,18 @@
 
 ## Item ativo
 
-[WORK-CFG-002](active/WORK-CFG-002/spec.md) — `active`, implementação autorizada
-do bootstrap Java 21/Maven e boundary física com `air-java`. O checkpoint para em
-PR aberto para review; não autoriza BACKLOG-CFG-003 nem algoritmo CFG.
+Nenhum. O fechamento de WORK-CFG-002 não autoriza o próximo backlog.
 
 ## Último item concluído
 
-[WORK-CFG-001](history/WORK-CFG-001.md) — `completed`, discovery docs/harness-only.
-Fechou `air-java`/Java 21, porta/lifetime/binding e CFG-FIRST sem criar Java/POM.
+[WORK-CFG-002](history/WORK-CFG-002.md) — `completed`, fundação Java 21/Maven,
+boundary `Publication → AirValidator → CfgPreflight`, testes e gate arquitetural;
+nenhum algoritmo CFG.
 
 ## Próximo candidato
 
-Nenhum enquanto WORK-CFG-002 estiver ativo. BACKLOG-CFG-003 permanece `planned` e
-fora deste checkpoint.
+BACKLOG-CFG-003 permanece `planned`, não iniciado e sem autorização. Ele é apenas o
+próximo candidato após review humano do PR de WORK-CFG-002.
 
 ## Roteamento
 

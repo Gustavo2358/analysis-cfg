@@ -1,6 +1,7 @@
 # Catálogo de evals
 
-**Todos planejados; nenhum teste Java implementado ou executado neste ZIP.** Metadados verificáveis em [catalog.json](catalog.json).
+**A fundação implementa EVAL-CFG-007 e EVAL-CFG-024; os evals semânticos do CFG
+continuam planejados.** Metadados verificáveis em [catalog.json](catalog.json).
 
 ## EVAL-CFG-001 — Integridade da Publication
 
@@ -44,7 +45,9 @@ Oráculos upstream: O-20-STRUCT, O-21-STRUCT, O-22-STRUCT. Invariantes: INV-CFG-
 
 Kernel compila/executa sem adapters, filesystem, serialização ou frontend; dependência proibida é detectada.
 
-Oráculos upstream: propriedade arquitetural local. Invariantes: INV-CFG-001, INV-CFG-002, INV-CFG-026. Estado: `planned`.
+Oráculos upstream: propriedade arquitetural local. Invariantes: INV-CFG-001,
+INV-CFG-002, INV-CFG-026. Estado: `implemented` na fundação, com evidência em
+[WORK-CFG-002](../work/history/WORK-CFG-002.md).
 
 ## EVAL-CFG-008 — Mesmo caso de uso por arquivo e memória
 
@@ -162,9 +165,11 @@ sem declarar cópias locais de tipos AIR. O preflight preserva diagnósticos
 estruturais e distingue a versão `0.1.0-SNAPSHOT` da biblioteca da AIR 2.0.0; não
 transforma validação AIR em claim de conformidade CFG.
 
-Oráculos upstream: boundary física local; a bateria normativa O-69-STRUCT–O-85-STRUCT
-permanece no EVAL-CFG-021/EVAL-CFG-022. Invariantes:
-INV-CFG-003, INV-CFG-004, INV-CFG-026, INV-CFG-027, INV-CFG-028. Estado: `planned`.
+Oráculos upstream: boundary física local. A bateria normativa
+O-69-STRUCT–O-91-STRUCT permanece obrigação futura do perfil; este smoke não
+reivindica nenhum desses oráculos. Invariantes: INV-CFG-003, INV-CFG-004,
+INV-CFG-026, INV-CFG-027, INV-CFG-028. Estado: `implemented` na fundação, com
+evidência em [WORK-CFG-002](../work/history/WORK-CFG-002.md).
 
 ## EVAL-CFG-025 — CFG-FIRST: Entry, Return e normal exit
 
