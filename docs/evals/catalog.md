@@ -155,14 +155,36 @@ Oráculos upstream: requisito direto de `AIR-STRUCTURE@2`, sem ID de oráculo
 enumerado específico. Invariantes: INV-CFG-004, INV-CFG-008, INV-CFG-011,
 INV-CFG-019. Estado: `planned`.
 
-## EVAL-CFG-024 — Fundação mínima da Analysis IR V2
+## EVAL-CFG-024 — Boundary compartilhada do air-java
 
-O modelo em memória distingue `Known(Type)` de `UnknownType(UncertaintyId)` e
-representa `Premise`, `sameDomain`, sujeitos, autoridade, origem e
-`DomainProofScope` como conceitos fechados. Não usa `Optional<Type>` nem exige
-signatures, choices, regiões, invokes/envelopes, regras contextuais completas de
-aplicabilidade/interseção ou qualquer cálculo de CFG/dataflow.
+O kernel compila contra a `Publication` e o `AirValidator` do `air-java` fixado,
+sem declarar cópias locais de tipos AIR. O preflight preserva diagnósticos
+estruturais e distingue a versão `0.1.0-SNAPSHOT` da biblioteca da AIR 2.0.0; não
+transforma validação AIR em claim de conformidade CFG.
 
-Oráculos upstream: foundation local de representabilidade; a bateria normativa
-O-69-STRUCT–O-85-STRUCT pertence ao EVAL-CFG-021/EVAL-CFG-022. Invariantes:
+Oráculos upstream: boundary física local; a bateria normativa O-69-STRUCT–O-85-STRUCT
+permanece no EVAL-CFG-021/EVAL-CFG-022. Invariantes:
 INV-CFG-003, INV-CFG-004, INV-CFG-026, INV-CFG-027, INV-CFG-028. Estado: `planned`.
+
+## EVAL-CFG-025 — CFG-FIRST: Entry, Return e normal exit
+
+Uma `air-java Publication` válida em memória projeta Entry/initialLabel para o nó
+da Sequence terminada por `Return` e para normal exit correlacionado por Publication,
+Unit e Entry scope. Missing label ou terminador ausente não são reparados; `Return`
+não cai na Sequence fisicamente seguinte; permutação não muda transições; Sequence
+sem predecessor permanece inventariada; `Return` não é `Halt`. O oracle é escrito
+independentemente do builder.
+
+Oráculos upstream: O-18-STRUCT, O-19-STRUCT, O-30-STRUCT. Invariantes:
+INV-CFG-003, INV-CFG-004, INV-CFG-005, INV-CFG-006, INV-CFG-008, INV-CFG-019,
+INV-CFG-021, INV-CFG-023, INV-CFG-026. Estado: `planned`.
+
+## EVAL-CFG-026 — E2E mínimo Semantic Product → AIR → CFG
+
+Um `cobol-lower` externo e conforme traduz o Semantic Product mínimo para a
+`air-java Publication` de CFG-FIRST. As boundaries Semantic Product→AIR e AIR
+`Return`→normal exit são verificadas separadamente. O kernel CFG não recebe,
+reconhece nem testa GOBACK, JSON ou tipos do frontend.
+
+Oráculos upstream: O-18-STRUCT, O-66. Invariantes: INV-CFG-001, INV-CFG-002,
+INV-CFG-003, INV-CFG-019, INV-CFG-023, INV-CFG-026. Estado: `planned`.

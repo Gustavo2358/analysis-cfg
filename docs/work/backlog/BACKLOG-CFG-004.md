@@ -1,48 +1,53 @@
-# BACKLOG-CFG-004 — Fixtures independentes e adapter de transporte
+# BACKLOG-CFG-004 — Fixtures AIR JSON e adapter de transporte
 
 **Estado:** `planned`. **Fase:** `mvp`. **Autorização:** backlog não autoriza execução.
-Dependências: BACKLOG-CFG-002, BACKLOG-CFG-003.
+Dependências: BACKLOG-CFG-002, BACKLOG-CFG-003. Não bloqueia BACKLOG-CFG-005.
 
 ## Problema e objetivo observável
 
-Permitir leitura de fixtures de arquivo sem contaminar o modelo ou core.
+Permitir leitura de fixtures AIR em arquivo sem contaminar `air-java`, porta ou
+kernel, depois que existir binding normativo upstream.
 
 ## Escopo e estratégia
 
-Definir schema técnico versionado conforme decisão anterior; criar fixtures fechadas mínimas, malformed/invalid/unsupported; codec separado e builders de teste em memória.
+Consumir o binding JSON versionado pelo `analysis-ir`; implementar reader/codec em
+infraestrutura e fixtures closed/malformed/invalid/unsupported; manter builders de
+teste em memória. Se o binding ainda não existir, registrar dependência upstream em
+vez de inventar schema local ou serializar records automaticamente.
 
 ## Critérios de aceitação
 
-Arquivo e objeto equivalente produzem a mesma Publication; todos campos semânticos exigidos materializados; erro de I/O não é INVALID_IR; exemplos .air não tratados como gramática oficial.
+Arquivo e objeto equivalente materializam a mesma `air-java Publication`; todos os
+campos do binding são tratados explicitamente; erro de I/O não é `INVALID_IR`;
+exemplos `.air` e `cobol-semantic-product.json` não são tratados como AIR JSON;
+kernel compila/testa sem classes de adapter.
 
 ## Evals e invariantes
 
-EVAL-CFG-001, EVAL-CFG-008, EVAL-CFG-013, EVAL-CFG-014. Vincular invariantes específicos na promoção para work
-item. Ver [catálogo](../../evals/catalog.md) e [invariantes](../../architecture/invariants.md).
-Antes de código, transformar expected em testes RED independentes; documentar o
-resultado observado, não apenas intenção de TDD.
+EVAL-CFG-001, EVAL-CFG-008, EVAL-CFG-013 e EVAL-CFG-014. Vincular invariantes
+específicos na promoção. Ver [catálogo](../../evals/catalog.md) e
+[invariantes](../../architecture/invariants.md). Nenhum expected CFG é gerado pelo
+builder ou pelo codec.
 
 ## Fronteiras e extensibilidade
 
-Preservar Publication/CFG separados, porta em memória e dependências para dentro.
-Nenhum nome COBOL entra na decisão do builder. Nova semântica usa capability IR
-ou proposta upstream; novo transporte usa adapter. Mudança em regra central exige
-ADR e avaliação de impacto sobre consumidores/fixtures/perfis.
+`analysis-ir` possui/versiona o binding; `air-java` permanece transport-independent;
+o reader depende da porta/modelo, nunca o contrário. Novo formato substitui adapter
+sem alterar `BuildCfg`.
 
 ## Discovery, checkpoints e handoff
 
-Promover apenas este item para work item com paths concretos, must_read mínimo,
-domínio, riscos, checkpoints e gates. Nas decisões não triviais, pesquisar fonte
-primária e registrar candidatos/precondições antes de implementar. Ao atingir o
-checkpoint autorizado, atualizar estado e parar para review; não avançar ao próximo
-item porque ficou verde. Sem duplicar este plano em tasklist permanente.
+Promover somente após autorização e confirmação do binding upstream, com paths,
+schema/revisão e testes negativos concretos. Parar para review antes de CLI ou
+integração ampla.
 
 ## Fora de escopo
 
-Não consumir semantic-product.json nem inferir controle no codec; nenhum esperado CFG gerado pelo builder.
+Não definir binding AIR unilateralmente neste repo, modificar `analysis-ir`,
+consumir Semantic Product, inferir controle no codec ou tornar arquivo prerequisite
+de CFG-FIRST/MVP-CFG-01.
 
 ## Evidência de conclusão
 
-Revisão/commit, diff explicado, testes/gates com exit codes, falsificação adversarial,
-capabilities/precisão realmente entregues e limitações. Até existir essa evidência,
-o estado permanece planejado e nenhum perfil recebe claim por antecipação.
+Binding pinado, testes de round-trip/equivalência e erros, gates de arquitetura e
+integração, comandos/exit codes e review. Até lá permanece planejado.

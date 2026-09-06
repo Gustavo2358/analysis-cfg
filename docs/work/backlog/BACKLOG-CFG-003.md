@@ -5,21 +5,24 @@ Dependências: BACKLOG-CFG-002.
 
 ## Problema e objetivo observável
 
-Proteger a arquitetura antes do primeiro builder, com composição pequena e extensão controlada.
+Fechar a porta `BuildCfg` e proteger a arquitetura antes do primeiro builder, com
+composição pequena e extensão controlada.
 
 ## Escopo e estratégia
 
-Definir porta de caso de uso e contratos de transição tipados; preservar fatos V2
+Definir `BuildCfg(air-java Publication, BuildOptions) → CfgBuildResult` e contratos de transição tipados; preservar fatos V2
 sem misturá-los ao transporte; manter potencial de contexto/open scope; criar provas
 de dependência bytecode e registro de extensão sintética por capability e versão.
 
 ## Critérios de aceitação
 
-Adicionar intérprete de teste não exige editar orquestrador; registro ambíguo falha; I/O em core e imports frontend são rejeitados; gate architecture se torna real com casos negativos.
+Não existe segundo modelo semântico de entrada. Adicionar intérprete de teste não
+exige editar orquestrador; registro ambíguo falha; I/O em core e imports frontend
+são rejeitados; gate architecture se torna real com casos negativos.
 
 ## Evals e invariantes
 
-EVAL-CFG-007, EVAL-CFG-008, EVAL-CFG-009. Vincular invariantes específicos na promoção para work
+EVAL-CFG-007, EVAL-CFG-009 e EVAL-CFG-024. Vincular invariantes específicos na promoção para work
 item. Ver [catálogo](../../evals/catalog.md) e [invariantes](../../architecture/invariants.md).
 Antes de código, transformar expected em testes RED independentes; documentar o
 resultado observado, não apenas intenção de TDD.

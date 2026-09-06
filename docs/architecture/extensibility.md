@@ -19,6 +19,12 @@ ou testes de prefixos no core. Evoluir por `(capability, versão)` da IR.
 O switch tipado do núcleo fechado pode ser simples; OCP não exige eliminar todos os
 switches. O registro de extensões semânticas é separado e explícito.
 
+O modelo de `air-java` usa sealed types. Uma variante AIR precisa nova pode exigir
+nova versão da biblioteca compartilhada e migração explícita do consumer. Um
+consumer que ainda não conhece a variante segue o contrato de reduction, envelope
+ou incompatibilidade; não cria `Map<String,Object>`, opcode textual ou hierarquia
+AIR paralela dentro do CFG para contornar o fechamento.
+
 ## Seam antes dos handlers avançados
 
 BACKLOG-CFG-003 deve provar o seam sem implementar controle local real. O builder
@@ -31,7 +37,7 @@ erro, não prioridade por ordem de inserção. Falta de intérprete usa envelope
 ou retorna incompatibilidade explícita; nunca `nop` nem lista vazia.
 Não carregar classes por texto vindo da fixture. Sem ServiceLoader dentro do core.
 
-A forma concreta da interface aguarda discovery: o teste arquitetural exigido é
+A forma concreta da interface CFG aguarda o work item de foundation: o teste arquitetural exigido é
 adicionar uma capability sintética de teste por extensão/registro sem modificar o
 orquestrador nem regras antigas. A sintética não vira capability normativa upstream.
 

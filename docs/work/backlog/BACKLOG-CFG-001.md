@@ -1,11 +1,12 @@
 # BACKLOG-CFG-001 — Discovery de fronteiras e plano executivo
 
-**Estado:** `active`. **Fase:** `discovery`. **Autorização:** somente o work item delimita o checkpoint.
+**Estado:** `completed`. **Fase:** `discovery`. **Autorização:** somente o work item delimitou o checkpoint.
 Dependências: nenhuma.
 
 ## Problema e objetivo observável
 
-Fechar ownership do modelo IR, módulos e transporte de fixture antes de Java.
+Fechar ownership do modelo IR, toolchain, porta, lifetime e ownership de transporte
+antes de Java.
 
 ## Escopo e estratégia
 
@@ -13,7 +14,8 @@ Ler capítulos normativos mínimos, baseline upstream e ADRs; decidir assinatura
 
 ## Critérios de aceitação
 
-ADRs propostos aceitos/substituídos; regra de controle local não achatada na API; plano com paths e testes executáveis para o próximo checkpoint; revisão humana separada.
+ADRs propostos aceitos/substituídos; `air-java` e Java 21 fixados; CFG-FIRST e seus
+oráculos delimitados; regra de controle local não achatada; revisão humana separada.
 
 ## Evals e invariantes
 
@@ -43,6 +45,6 @@ Nenhum Java, POM, decoder, grafo ou dependência instalada. Não mudar a especif
 
 ## Evidência de conclusão
 
-Revisão/commit, diff explicado, testes/gates com exit codes, falsificação adversarial,
-capabilities/precisão realmente entregues e limitações. Até existir essa evidência,
-o estado permanece planejado e nenhum perfil recebe claim por antecipação.
+[WORK-CFG-001 concluído](../history/WORK-CFG-001.md), com fontes verificadas,
+challenge, comandos/exit codes e escopo negativo. Nenhum perfil recebeu claim e
+nenhum item de implementação foi iniciado.

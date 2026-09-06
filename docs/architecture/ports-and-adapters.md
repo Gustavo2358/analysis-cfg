@@ -2,63 +2,88 @@
 
 ## Porta de entrada
 
-Contrato conceitual, não código Java nem API congelada:
+Contrato conceitual, sem congelar detalhes Java além da boundary:
 
 ```text
-BuildCfg(Publication, BuildOptions) → CfgBuildResult
+BuildCfg(air-java Publication, BuildOptions) → CfgBuildResult
 ```
 
-Publication pertence ao modelo semântico IR compartilhado. BuildOptions declara
-escopo de entries, capacidades/modos de precisão e limites. Resultado é tipado e
-imutável. Não contém handles de arquivo, conexões ou callbacks para completar fatos.
-IDs inteiros/strings não viram chaves globais sem namespace.
+`Publication` é exatamente `io.github.gustavo2358.air.model.Publication`, do
+artefato `io.github.gustavo2358:air-java`. A porta não define DTO/modelo semântico
+concorrente e não aceita `Path`, `InputStream`, bytes, JSON, COBOL Semantic Product,
+AST ou source code. `BuildOptions` declara escopo de entries, capabilities/modos de
+precisão e limites. O resultado é tipado, imutável e não contém callback para
+completar fatos.
 
-Na V2, `Publication` inclui `TypeRef`, `Premise`, `sameDomain` e
-`DomainProofScope`. Esses fatos chegam pelas duas vias e atravessam a mesma porta;
-não são propriedades inventadas pelo codec nem opções de transporte.
+O caller pode ser teste, módulo de integração, CLI ou adapter. Todos entregam o
+mesmo objeto semântico à mesma porta.
 
-A implementação recebe dependências por construção; não escolhe adapter consultando
-ambiente. O caller pode ser um teste, CLI ou módulo de um monólito. A porta é a mesma.
+## Preflight do caso de uso
 
-Core e aplicação não conhecem `Path`, filesystem, JSON, REST, CLI, Docker, cloud,
-COBOL, Semantic Product, ProLeap ou ANTLR. Trocar transporte substitui/adiciona um
-adapter; ampliar significado requer capability IR e seus oráculos. Os dois eixos
-não são intercambiáveis.
+```text
+Publication
+    ↓
+air-java AirValidator
+    ↓
+version/capability/options preflight
+    ↓
+Build CFG semantics
+```
 
-## Arquivos agora
+A validação não fica exclusivamente no adapter de arquivo: uma instância recebida
+em memória também passa por `AirValidator`. `INVALID_IR` não é reparada. Status de
+validação incompleta/capability incompatível é tratado de forma explícita antes do
+builder. O consumer não reimplementa um validator AIR divergente.
 
-CLI/driver recebe path → adapter lê bytes → codec valida representação de fixture →
-materializa Publication → caso de uso valida fechamento/semântica estrutural → CFG →
-adapter exporta resultado. Erro de arquivo/encoding/JSON é `INPUT_ERROR` no adapter;
-IR com label pendente é `INVALID_IR`; capability legítima não implementada é
-`UNSUPPORTED_CAPABILITY`. Não trocar essas classes para disfarçar falha.
+`AirValidator` verifica a estrutura que sua versão suporta. Ele não substitui evals
+de conformidade do consumer: os evals CFG provam que `Return`, branches, outcomes e
+outros fatos são interpretados corretamente.
 
-O formato de fixture será um contrato técnico versionado e pequeno, decidido antes
-do Java. A notação `.air` dos exemplos upstream é informativa, **não parser/esquema
-oficial**. Não implementar parser ad hoc de exemplos. Não presumir que
-`semantic-product.json` é Analysis IR.
+## Memória primeiro
 
-## Memória depois — e nos testes desde o início
+`CFG-FIRST` constrói uma `Publication` diretamente com `air-java` e invoca a porta,
+sem filesystem, codec ou lowerer. Na integração futura, `cobol-lower` devolve o
+mesmo tipo por chamada Java. Não criar `MemoryReader` ou repository para transportar
+um objeto pronto e não serializar para JSON só para restabelecer lifetime.
 
-CobolLower fornece Publication diretamente à mesma porta. A chamada é Java normal,
-sem escrever temporários, abrir rede ou converter para JSON e voltar.
-Testes de domínio já seguem esse caminho desde a primeira implementação.
-O adapter em memória pode ser simplesmente o caller: não inventar `MemoryReader`
-ou repository para passar um objeto pronto.
+## Arquivo e binding JSON depois
+
+```text
+AIR JSON/file → infrastructure reader → air-java Publication → BuildCfg
+memory caller ────────────────────────────────────────────────┘
+```
+
+O binding JSON normativo pertence e é versionado pelo `analysis-ir`, de modo
+independente da linguagem. Ele ainda não existe no commit fixado. Quando existir,
+o `analysis-cfg` poderá implementar um reader em `cfg-adapters`; `air-java` continua
+sem Jackson/Gson/JSON. Não derivar o binding automaticamente da organização de
+records Java e não usar a notação `.air` ou `cobol-semantic-product.json` como schema.
+
+Erro de arquivo/encoding/JSON é `INPUT_ERROR` do adapter; AIR com referência
+pendente é `INVALID_IR`; capability legítima fora do slice é
+`UNSUPPORTED_CAPABILITY` ou fallback sustentado. Essas classes não são trocadas para
+disfarçar falha. A ausência do binding não bloqueia o core em memória.
+
+## Lifetime e retenção
+
+`Publication` é snapshot imutável compartilhado. O CFG não faz deep copy O(N) por
+padrão; pode reter referências/IDs AIR e manter índices derivados próprios.
+`CfgBuildResult` sempre registra `PublicationId`, versão/revisão, opções e
+correlações de Unit/Entry/Sequence/Operation/Origin pertinentes. Nenhum índice muda
+a AIR. Não há consulta lazy ao produtor nem dependência de um arquivo continuar
+aberto.
 
 ## Portas de saída
 
-Construir CFG não exige persistência: devolver CfgBuildResult basta. Exportador de
-JSON/DOT é adapter que consome esse resultado fora do core. Se futuramente um caso
-de uso exigir publicar/armazenar resultados, definir uma porta de saída **orientada
-à necessidade** (`PublishCfg`, por exemplo), implementada pela infraestrutura.
-Não introduzir storage obrigatório só para desenhar um hexágono.
+Construir CFG não exige persistência: devolver `CfgBuildResult` basta. Exportadores
+JSON/DOT são adapters que consomem esse resultado fora do core. Uma futura porta de
+publicação/armazenamento só nasce de necessidade real, não para completar um desenho
+hexagonal abstrato.
 
-## Prova de substituição obrigatória
+## Prova de substituição posterior
 
-Uma Publication deve chegar por fixture decodificada e por construção em memória.
-Com mesmas opções/identidades, os resultados semânticos devem ser equivalentes.
-Compare nós, outcomes, gaps, origens, precisão, `TypeRef`, premises e escopos de
-prova correlacionados; não comparar texto de console.
-A mesma prova será reutilizada no monólito modular. Mudam adapters e wiring,
-**não a porta nem o algoritmo** (INV-CFG-002; EVAL-CFG-008).
+Depois do binding/adapter, a mesma `Publication` deve chegar por arquivo e por
+construção em memória. Com mesmas opções e correlações, os resultados semânticos são
+equivalentes: nós, outcomes, gaps, origins, precisão, `TypeRef`, premises e escopos.
+Essa prova é posterior a `CFG-FIRST`; não compara texto de console e não altera a
+porta nem o algoritmo (INV-CFG-002; EVAL-CFG-008).

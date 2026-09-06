@@ -8,6 +8,10 @@ registrar conflito e propor evolução; não reinterpretar a operação silencio
 ADRs/contratos locais refinam desenho sem contrariar IR. Código e testes são evidência,
 não autoridade normativa isolada. História/conversa anterior não vence contrato.
 
+O owner físico do modelo/validator Java compartilhado é `Gustavo2358/air-java`,
+também fixado por SHA. Ele implementa a AIR; não substitui a autoridade semântica do
+`analysis-ir`. Versão da biblioteca e versão semântica da IR são eixos distintos.
+
 ## IR normativa — commit 0b2fbce7046010b22b32efa8cbc3e75ccba09442
 
 O commit é o merge canônico do PR upstream #1. Não usar o antigo head do PR nem
@@ -44,17 +48,38 @@ Leitura para MVP: §01; `TypeRef`, `sameDomain` e `DomainProofScope` pertinentes
 X-33/X-34 e oráculos correlatos. Controle local acrescenta §05.7, X-23/X-24 e
 O-56–O-60. Não carregar capítulos de memória inteira para implementar um jump.
 
-## Inspiração e contexto
+Nenhum binding JSON normativo existe nesse commit. Seu owner conceitual é o próprio
+`analysis-ir`; `json-v1` ou equivalente será evolução upstream independente de
+linguagem, não serialização automática dos records de `air-java`.
 
-[AGENTS.md upstream](https://github.com/Gustavo2358/proleap-poc/blob/3972c669fe187004769becbd6bff00af90d6c9dd/AGENTS.md),
-[protocolo](https://github.com/Gustavo2358/proleap-poc/blob/3972c669fe187004769becbd6bff00af90d6c9dd/docs/engineering/work-item-protocol.md),
-[política semântica](https://github.com/Gustavo2358/proleap-poc/blob/3972c669fe187004769becbd6bff00af90d6c9dd/docs/engineering/semantic-analysis-policy.md),
-[testes](https://github.com/Gustavo2358/proleap-poc/blob/3972c669fe187004769becbd6bff00af90d6c9dd/docs/engineering/semantic-testing.md),
-[gates](https://github.com/Gustavo2358/proleap-poc/blob/3972c669fe187004769becbd6bff00af90d6c9dd/docs/engineering/gates.md),
-[performance](https://github.com/Gustavo2358/proleap-poc/blob/3972c669fe187004769becbd6bff00af90d6c9dd/docs/engineering/performance-policy.md).
+## Modelo Java compartilhado — commit 2108294d9dfeb89d0019ce75fab27172b15a75b9
 
-O PR #27 foi lido no head `9c53948089a6040d1666a5df812ba993ea3ca50b`, **aberto**, não presumido mergeado.
-[Estado do Semantic Product](https://github.com/Gustavo2358/proleap-poc/blob/9c53948089a6040d1666a5df812ba993ea3ca50b/docs/work/active/WORK-SEMANTIC-PRODUCT-002/state.md).
+- [README](https://github.com/Gustavo2358/air-java/blob/2108294d9dfeb89d0019ce75fab27172b15a75b9/README.md)
+- [POM](https://github.com/Gustavo2358/air-java/blob/2108294d9dfeb89d0019ce75fab27172b15a75b9/pom.xml)
+- [Publication](https://github.com/Gustavo2358/air-java/blob/2108294d9dfeb89d0019ce75fab27172b15a75b9/src/main/java/io/github/gustavo2358/air/model/Publication.java)
+- [Sequence](https://github.com/Gustavo2358/air-java/blob/2108294d9dfeb89d0019ce75fab27172b15a75b9/src/main/java/io/github/gustavo2358/air/model/Sequence.java)
+- [Terminator](https://github.com/Gustavo2358/air-java/blob/2108294d9dfeb89d0019ce75fab27172b15a75b9/src/main/java/io/github/gustavo2358/air/model/Terminator.java)
+- [Operations](https://github.com/Gustavo2358/air-java/blob/2108294d9dfeb89d0019ce75fab27172b15a75b9/src/main/java/io/github/gustavo2358/air/model/Operations.java)
+- [AirValidator](https://github.com/Gustavo2358/air-java/blob/2108294d9dfeb89d0019ce75fab27172b15a75b9/src/main/java/io/github/gustavo2358/air/validation/AirValidator.java)
+- [Cobertura e limites](https://github.com/Gustavo2358/air-java/blob/2108294d9dfeb89d0019ce75fab27172b15a75b9/docs/implementation-status.md)
+- [CI verificado](https://github.com/Gustavo2358/air-java/actions/runs/34009259923/job/101422062768)
+
+Coordenadas declaradas: `io.github.gustavo2358:air-java:0.1.0-SNAPSHOT`, Java 21.
+Não foi observada tag/release; o futuro bootstrap deve tornar a resolução desse SHA
+reprodutível sem copiar classes para este repo.
+
+## Frontend COBOL e contexto
+
+[AGENTS.md upstream](https://github.com/Gustavo2358/proleap-poc/blob/7a376f33f55127f53c63b86d3228671b9c6a348d/AGENTS.md),
+[arquitetura](https://github.com/Gustavo2358/proleap-poc/blob/7a376f33f55127f53c63b86d3228671b9c6a348d/ARCHITECTURE.md),
+[ADR da boundary](https://github.com/Gustavo2358/proleap-poc/blob/7a376f33f55127f53c63b86d3228671b9c6a348d/docs/architecture/decisions/0013-cobol-semantic-product-precedes-language-neutral-lowering.md),
+[audit AIR V2](https://github.com/Gustavo2358/proleap-poc/blob/7a376f33f55127f53c63b86d3228671b9c6a348d/docs/architecture/semantic-product-air-v2-audit.md) e
+[encerramento do audit](https://github.com/Gustavo2358/proleap-poc/blob/7a376f33f55127f53c63b86d3228671b9c6a348d/docs/work/history/WORK-SEMANTIC-PRODUCT-003.md).
+
+Os PRs #27, #29 e #30 foram verificados como mergeados; `main` está em
+`7a376f33f55127f53c63b86d3228671b9c6a348d`. O repo continua Java 17 e produz
+`cobol-semantic-product`, não AIR. O PR #30 reforçou a ownership cross-repo;
+`cobol-lower` permanece componente planejado e sem repositório/API observável.
 [Resumo aplicado](upstream-state.md) e [o que foi adaptado](harness-adaptation.md).
 
 ## Bibliografia de engenharia
@@ -65,13 +90,13 @@ O PR #27 foi lido no head `9c53948089a6040d1666a5df812ba993ea3ca50b`, **aberto**
 [Maven — Multiple Modules](https://maven.apache.org/guides/mini/guide-multiple-modules.html): reactor ordena dependências entre módulos; não dita desenho do domínio.
 [Reps, Horwitz, Sagiv — POPL 1995](https://research.cs.wisc.edu/wpis/abstracts/popl95.abs.html): referência para caminhos realizáveis e análise interprocedural; o abstract foi consultado, não uma validação de aplicabilidade de IFDS ao domínio inteiro. O discovery deve ler trabalho completo e precondições antes de selecionar algoritmo.
 
-Essas fontes públicas foram verificadas em 05/09/2026. Não são dependências de runtime.
+Essas fontes públicas foram verificadas em 06/09/2026. Não são dependências de runtime.
 Não houve revisão exaustiva de toda literatura nem benchmark nesta preparação.
 
 ## Atualização e cache
 
 [sources.lock.json](sources.lock.json) é o registro de revisões e hashes.
-O ZIP não contém os 20 documentos IR integrais. O [cache opcional](../../scripts/harness/cache_ir.py)
+O repositório não contém os 21 documentos IR integrais. O [cache opcional](../../scripts/harness/cache_ir.py)
 importa uma cópia local ou baixa o snapshot verificando os hashes Git; falha em
 qualquer divergência. Nunca usa a branch móvel como fallback. Documentação e gates
 básicos são offline; sem fonte normativa disponível, não implementar semântica

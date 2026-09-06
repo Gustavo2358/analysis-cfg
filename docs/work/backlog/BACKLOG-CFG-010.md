@@ -1,7 +1,7 @@
 # BACKLOG-CFG-010 — Envelopes abertos e compatibilidade de extensões
 
 **Estado:** `planned`. **Fase:** `structure`. **Autorização:** backlog não autoriza execução.
-Dependências: BACKLOG-CFG-007, BACKLOG-CFG-008.
+Dependências: BACKLOG-CFG-007, BACKLOG-CFG-009.
 
 ## Problema e objetivo observável
 

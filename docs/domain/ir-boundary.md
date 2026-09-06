@@ -1,63 +1,71 @@
 # Fronteira de consumo da Analysis IR
 
-## Autoridade
+## Autoridade e representação física
 
-Versionamento adotado: Analysis IR 2.0.0 no commit fixado em
+A semântica adotada é Analysis IR 2.0.0 no commit fixado em
 [sources.lock.json](../sources/sources.lock.json). O [mapa de fontes](../sources/index.md)
-indica os capítulos normativos. Este documento é orientação do consumidor,
-não uma nova versão da IR.
+indica os capítulos normativos. `air-java` é a implementação Java compartilhada
+dessa revisão, não uma segunda autoridade.
 
-Publication é fechada, imutável e independente do produtor. Unit admite múltiplas
-Entry; cada Sequence tem LabelId, operações comuns ordenadas e um terminador.
-Operações e operandos têm identidades próprias. Nome de exibição, linha e posição
-na coleção não são chaves de junção nem semântica.
+O tipo recebido pelo consumer é exatamente
+`io.github.gustavo2358.air.model.Publication`, do `air-java` no SHA fixado. Este
+repo não redefine `Publication`, `Unit`, `Entry`, `Sequence`, `Operation`,
+`Instruction`, `Terminator`, `TypeRef`, IDs, `Premise`, `DomainProofScope` ou outro
+tipo pertencente à AIR.
 
-## Modelo concreto compartilhado
+`Publication` é fechada, imutável e independente do produtor. `Unit` admite
+múltiplas Entry; cada `Sequence` tem `LabelId`, instructions ordenadas e exatamente
+um `Terminator`. Nomes de display, linhas e posição na coleção não são chaves de
+junção nem semântica.
 
-Ainda não existe biblioteca de modelo neste pacote. Antes do código, escolher
-ownership/coordenadas Maven do modelo IR e separar seu codec. Uma biblioteca comum
-pode morar inicialmente em módulo isolado e ser movida depois, sem duplicar classes
-no lowerer/CFG. O domínio pode depender desse contrato semântico puro; não pode
-herdar classes AST/ProLeap ou DTOs de transporte.
+## Modelo compartilhado observado
 
-A primeira implementação do modelo compartilhável deve representar, sem usar
-`Optional<Type>` como atalho, a soma fechada:
+`air-java` materializa `TypeRef = Known(Type) | UnknownType(UncertaintyId)`,
+premissas `sameDomain`, seus sujeitos, autoridade, origem e `DomainProofScope`.
+Operações/terminadores são sealed. Uma extensão precisa nova pode exigir nova versão
+da biblioteca; o consumer desconhecedor usa reduction, envelope ou incompatibilidade
+conforme o contrato, nunca `Map<String,Object>` nem tipos AIR paralelos.
+
+O CFG inicial não interpreta storage/values. Preserva operandos e metadata
+pertinentes sem adulteração e aceita apenas o subset declarado. Capability fora do
+subset não vira silenciosamente publicação menor. A quantidade de ocorrências não é
+limitada pelo nome do capability.
+
+## Validação e preflight
+
+Toda via de entrada passa por `io.github.gustavo2358.air.validation.AirValidator`
+no início do caso de uso. O consumer não duplica esse validator. O fluxo é:
 
 ```text
-TypeRef = Known(Type) | UnknownType(UncertaintyId)
+Publication → AirValidator → capability/version/options preflight → CFG
 ```
 
-Também deve materializar/preservar `Premise`, fatos `sameDomain`, seus sujeitos,
-autoridade, origem e `DomainProofScope`. O escopo da prova é estrutural e estático;
-não depende de alcançar um nó, executar o CFG ou escolher uma ativação. A obrigação
-não antecipa uma API ampla nem exige calcular igualdade de valores.
+O validator cobre validade estrutural implementada: namespaces/identidades,
+referências internas, Entry/initialLabel, terminador materializável, tipos, gaps e
+provas aplicáveis, entre outras regras. `INVALID_IR` encerra o build; validação
+incompleta permanece diagnóstico explícito. O CFG não recupera label por nome,
+posição, frontend ou JSON.
 
-O MVP não precisa interpretar storage/values. Deve preservar operandos/metadata
-sem adulteração e validar as precondições estruturais do subset declarado.
-Uma publicação com capability fora do subset não vira silenciosamente publicação
-menor. O resultado declara o escopo aceito, incompatível ou conservador.
+`AirValidator` não prova que o lowerer preservou COBOL nem que o consumer projetou
+controle corretamente. Evals CFG independentes continuam necessários e não geram
+seus expected a partir do builder.
 
-## Validações mínimas
+## Preservação e lifetime
 
-Namespaces completos, unicidade por domínio, referências internas fechadas,
-Entry apontando para label da Unit, terminador único, ausência de operação posterior,
-assinatura dos control operands, destinos/casos válidos, `TypeRef` bem formado,
-lacuna `TYPE_UNKNOWN` referenciada e provas de domínio fechadas/aplicáveis, além de
-discriminadores versionados.
-Recurso externo é representação legítima própria, não referência interna pendente.
-Tipo/semântica não verificável não recebe selo de validação completa.
+Manter operações, ordem intrassequência, program points, origins/derivações,
+identidade/revisão da publicação, capabilities, `TypeRef`, premises, escopos e
+incertezas. Valores/storage abertos não autorizam apagar controle fechado.
 
-## Preservação
-
-Manter operações, ordenação intrassequência, program points before/after(outcome),
-origens/derivações, identidade da publicação, capacidades, `TypeRef`, premissas,
-provas `sameDomain`, escopos e incertezas.
-Valores, storage e efeitos abertos não obrigam apagar um controle já fechado.
-`UNKNOWN` do target de chamada não autoriza remover o invoke.
+O CFG não deep-copia a AIR inteira por padrão. Pode reter referências imutáveis e
+IDs, mais índices derivados próprios, sempre registrando `PublicationId`, versão,
+`UnitId`, entry scope e correlações necessárias. Não muta a publicação, exige JSON
+para lifetime nem consulta o produtor de forma lazy.
 
 ## Publicação não é arquivo
 
-O core não conhece encoding, schema JSON, bytes, diretório, URL ou objeto GitHub.
-O codec de fixtures tem versão própria e testes de round-trip/equivalência.
-A notação dos exemplos IR não é um formato de transporte contratado. Consultar
+O core não conhece encoding, schema JSON, bytes, diretório ou URL. O binding JSON
+normativo pertence ao `analysis-ir` e ainda não existe no commit fixado. O futuro
+reader é adapter do `analysis-cfg` que materializa `air-java Publication`; o modelo
+compartilhado continua transport-independent. A notação dos exemplos e
+`cobol-semantic-product.json` não são AIR JSON. Consultar
 [portas](../architecture/ports-and-adapters.md) antes de criar adapter.

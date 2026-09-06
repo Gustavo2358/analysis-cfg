@@ -1,75 +1,107 @@
 # Baseline factual dos repositórios
 
-Observada em 05/09/2026. Este documento é contexto de integração, não contrato CFG.
+Observada em 06/09/2026. Este documento é contexto de integração, não contrato CFG.
+Revisões, coordenadas e estado verificável estão no [lock](sources.lock.json).
 
 ## Analysis IR
 
-O [PR #1](https://github.com/Gustavo2358/analysis-ir/pull/1),
-`spec!: modelar tipos desconhecidos e domínio comum (2.0.0)`, foi
-verificado no GitHub e está **mergeado** desde `2026-09-06T01:41:24Z`. Seu head era
-`500766e8901e3ca8e5adc987254ab2bf646751e5`; o merge commit e head canônico de
-`main` observado é `0b2fbce7046010b22b32efa8cbc3e75ccba09442`. O harness adota
-esse merge commit imutável como Analysis IR **2.0.0**, com hashes de blobs no
-[lock](sources.lock.json). O repositório continua sendo especificação, exemplos,
-invariantes e oráculos, não uma biblioteca Java disponível.
+`Gustavo2358/analysis-ir/main` continua no merge canônico
+`0b2fbce7046010b22b32efa8cbc3e75ccba09442`, Analysis IR **2.0.0**. Essa revisão
+permanece a autoridade normativa deste projeto; nenhum `main` móvel a substitui.
+Os blobs normativos continuam fixados individualmente no lock.
 
-A revisão confirmou os perfis `AIR-STRUCTURE@2`, `AIR-SCALAR-FLOW@2`,
-`AIR-REGION-FLOW@2`, `AIR-LOCAL-CONTROL@2` e `AIR-INDIRECT-CONTROL@2`. As
-capacidades padronizadas preservam suas versões próprias: `memory.regions@1`,
-`control.local@1` e `control.indirect@1`.
+A busca no snapshot completo não encontrou diretório `bindings/`, schema nem binding
+JSON oficial. Portanto, `json-v1` é trabalho upstream futuro do `analysis-ir`.
+Exemplos `.air` não constituem esse binding, e sua ausência não bloqueia uma
+`Publication` construída em memória.
 
-### Impacto semântico revisado para o CFG
+## air-java
 
-| Conceito | Delta 1.0.0 → 2.0.0 relevante ao consumer |
+`Gustavo2358/air-java/main` foi verificado no commit
+`2108294d9dfeb89d0019ce75fab27172b15a75b9`. O snapshot referencia exatamente a
+AIR 2.0.0 normativa em `0b2fbce7046010b22b32efa8cbc3e75ccba09442`.
+
+| Propriedade | Evidência observada |
 | --- | --- |
-| `Publication` | `premises` agora materializa fatos tipados `sameDomain`, sujeitos, autoridade e `DomainProofScope`; `TypeRef` aparece transversalmente. |
-| `Unit` / `Entry` | Posições de parâmetros/resultados usam `TypeRef`; assinatura parcial não apaga aridade, modo ou objetos conhecidos. |
-| `Sequence` / `ProgramPoint` | Nenhuma mudança material na topologia: terminador único, ordem intrassequência e pontos antes/depois continuam normativos. |
-| `jump` | Sem mudança material; transferência incondicional ao label explícito. |
-| `branch` | Exige `known(bool)`: `unknown(known(bool))` preserva ambos os destinos; `unknown_type` é inválido como predicate. |
-| `dispatch` | A topologia cases/default não mudou; seletor e literais exigem domínio conhecido. |
-| `return` / `halt` | Continuam sem fallthrough; compatibilidade dos valores de `return` passa pelas provas de domínio aplicáveis, enquanto `halt` permanece distinto de retorno. |
-| `invoke` | Controle/outcomes não mudaram; assinaturas, argumentos e resultados passam a preservar `TypeRef` e provas `sameDomain` nos sites estáticos corretos. |
-| `ControlEnvelope` | Sem mudança topológica; tipo desconhecido não abre controle automaticamente nem permite perder alternatives/remainder. |
-| `control.local@1` | Sem mudança de versão ou regra de frames/ports; o perfil consumidor correspondente é `AIR-LOCAL-CONTROL@2`. |
-| `control.indirect@1` | Mantém universo fechado `label(S)`; a assinatura exige `known(label(S))`, e `unknown_type` não estabelece `S`. O perfil consumidor é `AIR-INDIRECT-CONTROL@2`. |
+| Maven | `io.github.gustavo2358:air-java:0.1.0-SNAPSHOT` no POM |
+| Java | `maven.compiler.release=21`, sem preview |
+| `Publication` | record público imutável em `io.github.gustavo2358.air.model`, com `id`, `airVersion`, capabilities, artifacts, units, storage, resources, relações, origins, coverage, uncertainties, premises e contracts |
+| `Sequence` | `Sequence(LabelId, List<Instruction>, Terminator, OriginId)` |
+| `Return` | `Operations.Return(Header, List<Expression>, List<EntryId> entryScope)` implementa `Terminator` |
+| Validação | `AirValidator.validate(Publication)` e `validate(Publication, ValidationOptions)` retornam `ValidationResult` |
+| Fronteira | `model` e `validation`; nenhum codec, filesystem, frontend ou CFG de produção |
 
-Logo, o algoritmo estrutural permanece `Publication → Unit/Entry → Sequence →
-terminator → successors → CFG`. A major exige modelo/validator/evals novos, não
-leader detection, fallthrough intersequence, dataflow ou semântica COBOL no core.
+Assinatura pública observada de `Publication`: `Publication(Ids.PublicationId id,
+SemanticVersion airVersion, Capabilities.Manifest capabilities,
+List<Origins.Artifact> artifacts, List<Unit> units, List<Memory.Storage> storage,
+List<Interactions.Resource> resources, List<Artifacts.Relation> artifactRelations,
+List<Origins.Origin> origins, Evidence.Coverage coverage,
+List<Evidence.Uncertainty> uncertainties, List<Proofs.Premise> premises,
+List<Interactions.Contract> contracts)`.
 
-## Proleap POC — main e PR são baselines distintas
+`Publication` e suas listas são snapshots imutáveis. `Operation`, `Instruction`,
+`Terminator` e vários vocabulários são sealed; `Sequence` exige um terminador não
+nulo e não oferece fallthrough intersequence. O validator verifica, entre outros
+fatos, fechamento do `initialLabel` de uma Entry e referências internas.
 
-Main consultado: `3972c669fe187004769becbd6bff00af90d6c9dd`. Java release 17 no POM; o harness usa contexto roteado,
-work items, política semântica, testes adversariais e gates estáveis.
-PR #27, head `9c53948089a6040d1666a5df812ba993ea3ca50b`, estava aberto. Não interpretar título/descrição inicial
-“somente documentação” como estado atual: o `state.md` registra CP1–CP7 executados,
-integração de publicação no composition root e `SemanticProductJsonWriter` no CP7.
-Os resultados de testes lá citados são **relatados pelo projeto**, não reexecutados
-na elaboração deste ZIP.
+O código de `src/main` não importa Jackson/Gson, `java.io`, `java.nio`, ProLeap,
+ANTLR, Semantic Product, COBOL ou tipos CFG. O gate do próprio repositório confirmou
+94 checks determinísticos e `jdeps` limitado a `java.base`; `mvn verify` também
+passou nesta inspeção. O check remoto `contracts` do mesmo SHA terminou com
+`success`. Esses resultados validam o modelo/validator do `air-java`, não a
+interpretação futura do consumer CFG.
 
-O produto publica coleção imutável de facts DATA/MOVE/CALL/IF e ObservedStatement,
-identidades, provenance, binding nominal, containment e readiness. IF preserva
-estrutura/referências; ConditionSemantics ainda falta. Literal kind pode permanecer
-UNKNOWN por falta do fato tipado upstream. CALL variável mantém target de runtime
-UNKNOWN; argumentos/RETURNING/exception flow têm lacunas. Sob estruturas como
-PERFORM ainda não modeladas, containment pode ser UNKNOWN.
+Limites documentados pelo próprio repositório permanecem explícitos: API inicial
+`0.1.0-SNAPSHOT` ainda revisável, sem tag/release observada; nenhum binding/codec
+JSON; validação incompleta para algumas precondições de memória/conversão,
+extensões arbitrárias, verdade de premissas, cobertura do produtor e claims globais;
+nenhuma certificação integral de perfil AIR. Nada disso impede o caso mínimo
+estrutural `Entry → Sequence(Return)`; o preflight deve inspecionar o status e os
+diagnósticos de `AirValidator`, não tratá-lo como selo de conformidade CFG.
 
-O JSON emitido é `cobol-semantic-product`, **não Analysis IR**. CobolLower e CFG
-continuam trabalho futuro. A fixture relatada tem observações parciais que bloqueiam
-claims agregadas; não inferir que o frontend já produz controle inteiro exato.
+## proleap-poc
 
-## Consequência para o novo projeto
+`Gustavo2358/proleap-poc/main` foi observado em
+`7a376f33f55127f53c63b86d3228671b9c6a348d`, merge do PR #30. O PR #27
+materializou o Semantic Product, o PR #29 o auditou contra AIR 2.0.0 e o PR #30
+arquivou esse discovery e explicitou a ownership cross-repo. O POM continua em
+Java 17; isso não restringe consumers em JVM 21.
 
-Construir consumidor com fixtures IR próprias é correto e independente. Premissas
-de fixtures sintéticas fechadas devem ser explícitas; elas não provam cobertura
-COBOL real nem eliminam trabalho do lowerer. Integração posterior confrontará a
-matriz de capabilities; gaps não serão “corrigidos” pelo CFG.
-O suporte a PERFORM/THRU na IR é condicionado à disciplina de frames/ports declarada;
-não é certificado universal para todos os casos e dialetos COBOL.
+A boundary pública termina no **COBOL Semantic Product**. O frontend conhece COBOL,
+produz fatos, coverage, gaps, provenance e binding nominal, e possui writer
+determinístico de `cobol-semantic-product`. Esse JSON não é Analysis IR. Não há
+dependência de `air-java` no POM nem produção de `Publication`/CFG no pipeline.
 
-O checkpoint apenas sincroniza o contrato. Ownership físico do modelo Java,
-coordenadas Maven, binding versionado das fixtures e forma física da porta continuam
-decisões do discovery; nenhum perfil ou algoritmo CFG foi implementado.
+O audit atual também é claro sobre readiness: entrada executável e terminal
+semantics ainda são trabalho de frontend; `GOBACK` permanece uma observação genérica,
+não um `Return` AIR pronto. Essa lacuna pertence ao enriquecimento do Semantic
+Product e ao lowerer, nunca ao `analysis-cfg`.
+
+## cobol-lower
+
+Não existe repositório `Gustavo2358/cobol-lower` no inventário atual do owner, nem
+foi encontrado nome equivalente. O componente aparece somente como boundary/backlog
+planejado no `proleap-poc`: deve consumir exclusivamente o COBOL Semantic Product,
+depender de `air-java`, produzir `Publication` e não reabrir AST, símbolos,
+resolvers, texto ou apresentação. Não há commit, API, gate ou readiness de
+implementação a registrar.
+
+## Pipeline e consequência para este projeto
+
+```text
+proleap-poc
+    → COBOL Semantic Product
+    → cobol-semantic-product.json
+    → cobol-lower (planejado)
+    → air-java Publication
+    → analysis-cfg
+    → CFG
+```
+
+O `analysis-cfg` pode implementar e testar `CFG-FIRST` antes do lowerer, construindo
+uma `air-java Publication` diretamente em memória. A integração bilateral posterior
+trata a disponibilidade do `cobol-lower` como dependência externa. Gaps upstream
+não são reparados por nomes COBOL, JSON bruto, ordem física ou consultas ao
+frontend.
 
 Fontes e permalinks: [índice](index.md).

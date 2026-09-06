@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "observed_on": "2026-09-05",
+  "observed_on": "2026-09-06",
   "analysis_ir": {
     "repository": "Gustavo2358/analysis-ir",
     "commit": "0b2fbce7046010b22b32efa8cbc3e75ccba09442",
@@ -13,6 +13,12 @@
       "head_commit": "500766e8901e3ca8e5adc987254ab2bf646751e5",
       "merge_commit": "0b2fbce7046010b22b32efa8cbc3e75ccba09442",
       "merged_at": "2026-09-06T01:41:24Z"
+    },
+    "json_binding": {
+      "owner": "Gustavo2358/analysis-ir",
+      "status": "not_present_in_verified_commit",
+      "checked_commit": "0b2fbce7046010b22b32efa8cbc3e75ccba09442",
+      "planned_identifier": "json-v1"
     },
     "files": [
       {
@@ -101,25 +107,93 @@
       }
     ]
   },
+  "air_java": {
+    "repository": "Gustavo2358/air-java",
+    "commit": "2108294d9dfeb89d0019ce75fab27172b15a75b9",
+    "canonical_ref": "main",
+    "role": "shared_java_model_and_validator",
+    "library_version": "0.1.0-SNAPSHOT",
+    "analysis_ir": {
+      "semantic_version": "2.0.0",
+      "commit": "0b2fbce7046010b22b32efa8cbc3e75ccba09442"
+    },
+    "maven": {
+      "group_id": "io.github.gustavo2358",
+      "artifact_id": "air-java",
+      "version": "0.1.0-SNAPSHOT"
+    },
+    "java": {
+      "release": 21,
+      "preview": false
+    },
+    "release_status": "no_tag_or_release_observed",
+    "ci": {
+      "workflow": ".github/workflows/ci.yml",
+      "check_name": "contracts",
+      "status": "completed",
+      "conclusion": "success",
+      "checked_commit": "2108294d9dfeb89d0019ce75fab27172b15a75b9",
+      "url": "https://github.com/Gustavo2358/air-java/actions/runs/34009259923/job/101422062768"
+    },
+    "read_paths": [
+      "README.md",
+      "pom.xml",
+      "ARCHITECTURE.md",
+      "docs/implementation-status.md",
+      "docs/model-catalog.md",
+      "docs/sources.lock.json",
+      "docs/validation-evidence.md",
+      "src/main/java/io/github/gustavo2358/air/model/Publication.java",
+      "src/main/java/io/github/gustavo2358/air/model/Sequence.java",
+      "src/main/java/io/github/gustavo2358/air/model/Terminator.java",
+      "src/main/java/io/github/gustavo2358/air/model/Operations.java",
+      "src/main/java/io/github/gustavo2358/air/validation/AirValidator.java"
+    ]
+  },
   "proleap_poc": {
     "repository": "Gustavo2358/proleap-poc",
-    "main_commit": "3972c669fe187004769becbd6bff00af90d6c9dd",
-    "pr": 27,
-    "pr_head_commit": "9c53948089a6040d1666a5df812ba993ea3ca50b",
-    "pr_state_observed": "open",
-    "role": "inspiration_and_upstream_context",
+    "main_commit": "7a376f33f55127f53c63b86d3228671b9c6a348d",
+    "role": "cobol_frontend_and_semantic_product_producer",
+    "java_release": 17,
+    "public_boundary": "cobol_semantic_product",
+    "json_product": "cobol-semantic-product",
+    "merged_reviews": [
+      {
+        "pull_request": 27,
+        "head_commit": "c9f1da3798f26535896a45f8da3efb97a9e58e5a",
+        "merge_commit": "107ce08a6d73a6a328f6d81e1ed859e9d92e86e5",
+        "merged_at": "2026-09-05T22:32:54Z"
+      },
+      {
+        "pull_request": 29,
+        "head_commit": "d0aa543f8ca1921d41ea79b4b8af1a214a576714",
+        "merge_commit": "001547f35cb9c658af2832e490d719194401ad45",
+        "merged_at": "2026-09-06T10:17:03Z"
+      },
+      {
+        "pull_request": 30,
+        "head_commit": "a8f7596391b63723d43fc58627abf0d2cf429a64",
+        "merge_commit": "7a376f33f55127f53c63b86d3228671b9c6a348d",
+        "merged_at": "2026-09-06T12:01:07Z"
+      }
+    ],
     "read_paths": [
       "AGENTS.md",
       "pom.xml",
-      "docs/engineering/work-item-protocol.md",
-      "docs/engineering/semantic-analysis-policy.md",
-      "docs/engineering/semantic-testing.md",
-      "docs/engineering/gates.md",
-      "docs/engineering/performance-policy.md"
-    ],
-    "pr_read_paths": [
-      "docs/work/active/WORK-SEMANTIC-PRODUCT-002/state.md"
+      "ARCHITECTURE.md",
+      "docs/architecture/decisions/0013-cobol-semantic-product-precedes-language-neutral-lowering.md",
+      "docs/architecture/semantic-product-air-v2-audit.md",
+      "docs/domain/cobol-semantic-product.md",
+      "docs/work/history/WORK-SEMANTIC-PRODUCT-003.md"
     ]
+  },
+  "cobol_lower": {
+    "repository": "Gustavo2358/cobol-lower",
+    "status": "planned_upstream_component",
+    "commit": null,
+    "api": null,
+    "role": "semantic_product_to_air_publication",
+    "evidence": "repository absent from owner repository inventory; boundary planned in proleap-poc"
   },
   "external": [
     {

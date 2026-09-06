@@ -18,6 +18,15 @@ Não importar semântica LLVM ou COBOL apenas por semelhança de nomes.
 A ausência de terminador é INVALID_IR. A ausência de um intérprete não transforma
 terminador legítimo em erro de source nem autoriza pular a operação.
 
+## Primeiro slice
+
+`CFG-FIRST` interpreta apenas uma Entry cujo `initialLabel` referencia uma Sequence
+terminada por `return`. Emite entrada, nó correlacionado e saída normal escoped por
+Unit/Entry. Outras sequences permanecem inventariadas; nenhuma posição física cria
+aresta. Label pendente é rejeitado no preflight, e terminador ausente não recebe
+fallthrough reparador. `halt` permanece diferente de `return` e só entra em slice
+posterior.
+
 ## Branch e seleção
 
 `branch` exige predicate com `TypeRef=known(bool)`. Não é necessário resolver seu

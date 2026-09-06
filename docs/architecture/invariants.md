@@ -13,7 +13,9 @@ Domínio/aplicação não conhecem I/O, transporte ou forma de execução; adapt
 
 ## INV-CFG-003 — Publicação imutável
 
-Não modificar Publication nem completar semântica por callback ao produtor.
+Não modificar Publication nem completar semântica por callback ao produtor. O CFG
+pode reter referências imutáveis e índices próprios, mas não deep-copia toda a AIR
+por padrão nem exige JSON para lifetime.
 
 ## INV-CFG-004 — Identidades fechadas
 
@@ -77,7 +79,9 @@ CFG inicial usa todo o universo de labels contratual sem depender de valores pro
 
 ## INV-CFG-019 — Entradas e saídas
 
-Não fundir entries, inicializações, saída normal, excepcional e término silenciosamente.
+Não fundir entries, inicializações, saída normal, excepcional e término
+silenciosamente. Normal exit preserva `UnitId` e o `EntryId`/entry scope pertinente;
+não existe exit global único implícito para a Publication.
 
 ## INV-CFG-020 — Limites explícitos
 
@@ -105,7 +109,9 @@ Backlog não autoriza; gate indisponível/não executado nunca recebe PASS de pr
 
 ## INV-CFG-026 — Modelo compartilhável
 
-Não duplicar classes IR privadas incompatíveis; transporte não invade modelo compartilhado.
+Tipos AIR e `AirValidator` vêm do `air-java` fixado; não duplicar classes/validator
+nem criar payload paralelo. Transporte não invade o modelo compartilhado nem a
+porta `BuildCfg`.
 
 ## INV-CFG-027 — Conhecimento de tipo preservado
 

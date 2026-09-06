@@ -1,52 +1,51 @@
-# BACKLOG-CFG-005 — Núcleo CFG: projeção linear e saídas
+# BACKLOG-CFG-005 — CFG-FIRST: Entry, Return e normal exit
 
 **Estado:** `planned`. **Fase:** `mvp`. **Autorização:** backlog não autoriza execução.
 Dependências: BACKLOG-CFG-002, BACKLOG-CFG-003.
 
 ## Problema e objetivo observável
 
-Produzir primeiro grafo de Publication em memória com fluxo explícito.
+Produzir o primeiro CFG de uma `air-java Publication` em memória com a menor
+semântica executável: Entry → Sequence(`Return`) → normal exit.
 
 ## Escopo e estratégia
 
-Testes RED antes do código; índices namespaced, Sequence→nó próprio, operações e
-fatos V2 preservados, `jump`, `return`/`halt` e produto imutável com evidência.
+TDD a partir de EVAL-CFG-025. Executar `AirValidator`, preflight do slice, índice
+namespaced de Unit/Entry/Sequence, uma Sequence por nó e saída normal correlacionada
+por PublicationId, UnitId e EntryId/entry scope. Inventariar todas as Sequences,
+inclusive sem predecessor, sem usar posição física para criar edges.
 
 ## Critérios de aceitação
 
-Permutação física não muda relação; target anterior funciona; unidade com label
-pendente falha; saída não gera fallthrough; inventário sem predecessor permanece;
-`TypeRef`/premises não são apagados nem transformados em análise de valores.
+Entry/initialLabel válido alcança seu nó; `Return` deriva normal exit e nunca
+fallthrough; outra Sequence posterior não recebe aresta; permutação física não muda
+transições; label pendente é `INVALID_IR`; Sequence sem terminador não é reparada;
+entries/exits não são fundidos; AIR permanece imutável e correlacionada.
 
 ## Evals e invariantes
 
-EVAL-CFG-001, EVAL-CFG-002, EVAL-CFG-005, EVAL-CFG-007, EVAL-CFG-013,
-EVAL-CFG-014. Vincular invariantes específicos na promoção para work
-item. Ver [catálogo](../../evals/catalog.md) e [invariantes](../../architecture/invariants.md).
-Antes de código, transformar expected em testes RED independentes; documentar o
-resultado observado, não apenas intenção de TDD.
+EVAL-CFG-001, EVAL-CFG-007, EVAL-CFG-024 e EVAL-CFG-025. Vincular invariantes
+específicos na promoção. Expected manual/independente precede builder; um mutante que
+adiciona fallthrough após `Return` deve falhar.
 
 ## Fronteiras e extensibilidade
 
-Preservar Publication/CFG separados, porta em memória e dependências para dentro.
-Nenhum nome COBOL entra na decisão do builder. Nova semântica usa capability IR
-ou proposta upstream; novo transporte usa adapter. Mudança em regra central exige
-ADR e avaliação de impacto sobre consumidores/fixtures/perfis.
+`BuildCfg` recebe a `Publication` do `air-java`. Nenhum nome COBOL, transporte ou
+callback entra no kernel. Índices derivados pertencem ao CFG e não alteram a AIR.
+Capability fora do slice é recusada/fallback explícito, nunca ignorada.
 
 ## Discovery, checkpoints e handoff
 
-Promover apenas este item para work item com paths concretos, must_read mínimo,
-domínio, riscos, checkpoints e gates. Nas decisões não triviais, pesquisar fonte
-primária e registrar candidatos/precondições antes de implementar. Ao atingir o
-checkpoint autorizado, atualizar estado e parar para review; não avançar ao próximo
-item porque ficou verde. Sem duplicar este plano em tasklist permanente.
+Promover somente após os itens de foundation concluídos e autorização explícita.
+Observar RED, implementar o caso mínimo, GREEN, refatorar, challenge e parar para
+review. Não consumir automaticamente o slice linear seguinte.
 
 ## Fora de escopo
 
-Sem leader finder, coalescing, constant propagation, novas expressões COBOL ou file access.
+Sem `jump`, `halt`, branch, IF, múltiplas instructions lineares, JSON, arquivo, CLI,
+lowerer, dataflow, leader detection ou coalescing.
 
 ## Evidência de conclusão
 
-Revisão/commit, diff explicado, testes/gates com exit codes, falsificação adversarial,
-capabilities/precisão realmente entregues e limitações. Até existir essa evidência,
-o estado permanece planejado e nenhum perfil recebe claim por antecipação.
+Testes/contracasos de EVAL-CFG-025, mutante focalizado, comandos/exit codes, gates e
+review. Até existir, nenhum CFG ou perfil está implementado.
