@@ -2,7 +2,8 @@
 
 ## Item ativo
 
-Nenhum. A conclusão de WORK-CFG-003 não autoriza CFG-FIRST.
+[WORK-CFG-005](active/WORK-CFG-005/work-item.json) — `active`, implementação
+CFG-FIRST explicitamente autorizada. [Estado](active/WORK-CFG-005/state.md).
 
 ## Último item concluído
 
@@ -12,8 +13,8 @@ capability/version e gate arquitetural ampliado; nenhum algoritmo CFG.
 
 ## Próximos candidatos
 
-BACKLOG-CFG-004 e BACKLOG-CFG-005 permanecem `planned`, sem work item e sem
-autorização. BACKLOG-CFG-005 é CFG-FIRST e não foi iniciado.
+BACKLOG-CFG-004, BACKLOG-CFG-022 e BACKLOG-CFG-006 permanecem `planned`, sem
+work item e sem autorização de execução neste checkpoint.
 
 ## Roteamento
 

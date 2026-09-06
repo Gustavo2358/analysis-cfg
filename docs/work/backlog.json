@@ -73,7 +73,7 @@
       "id": "BACKLOG-CFG-005",
       "title": "CFG-FIRST: Entry, Return e normal exit",
       "phase": "mvp",
-      "status": "planned",
+      "status": "active",
       "dependencies": [
         "BACKLOG-CFG-002",
         "BACKLOG-CFG-003"
@@ -85,7 +85,7 @@
         "EVAL-CFG-025"
       ],
       "path": "docs/work/backlog/BACKLOG-CFG-005.md",
-      "work_item": null
+      "work_item": "WORK-CFG-005"
     },
     {
       "id": "BACKLOG-CFG-006",

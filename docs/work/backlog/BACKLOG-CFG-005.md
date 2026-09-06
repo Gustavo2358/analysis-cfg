@@ -1,6 +1,8 @@
 # BACKLOG-CFG-005 — CFG-FIRST: Entry, Return e normal exit
 
-**Estado:** `planned`. **Fase:** `mvp`. **Autorização:** backlog não autoriza execução.
+**Estado:** `active` em [WORK-CFG-005](../active/WORK-CFG-005/state.md). **Fase:** `mvp`.
+**Autorização:** implementação explícita no pedido de 06/09/2026, apenas CFG-FIRST
+e novo PR para review humano sem merge.
 Dependências: BACKLOG-CFG-002, BACKLOG-CFG-003.
 
 ## Problema e objetivo observável
