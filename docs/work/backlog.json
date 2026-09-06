@@ -21,7 +21,7 @@
       "id": "BACKLOG-CFG-002",
       "title": "Bootstrap Java 21/Maven e boundary air-java",
       "phase": "foundation",
-      "status": "ready_for_authorization",
+      "status": "active",
       "dependencies": [
         "BACKLOG-CFG-001"
       ],
@@ -31,7 +31,7 @@
         "EVAL-CFG-024"
       ],
       "path": "docs/work/backlog/BACKLOG-CFG-002.md",
-      "work_item": null
+      "work_item": "WORK-CFG-002"
     },
     {
       "id": "BACKLOG-CFG-003",

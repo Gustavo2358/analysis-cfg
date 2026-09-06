@@ -1,0 +1,94 @@
+{
+  "id": "WORK-CFG-002",
+  "backlog_id": "BACKLOG-CFG-002",
+  "title": "Bootstrap Java 21/Maven e boundary air-java",
+  "status": "active",
+  "risk": "high",
+  "goal": "Provar em build Java 21/Maven reproduzível que o consumer recebe Publication e reutiliza AirValidator do air-java fixado, sem implementar CFG",
+  "authorization": "implementation",
+  "authorization_evidence": "Prompt explícito do responsável em 2026-09-06 autorizando somente BACKLOG-CFG-002",
+  "checkpoint": "Fundação Java e boundary física air-java",
+  "must_read": [
+    "AGENTS.md",
+    "ARCHITECTURE.md",
+    "docs/work/index.md",
+    "docs/work/backlog/BACKLOG-CFG-002.md",
+    "docs/engineering/work-item-protocol.md",
+    "docs/product/mission-and-slices.md",
+    "docs/sources/sources.lock.json",
+    "docs/sources/index.md",
+    "docs/sources/upstream-state.md",
+    "docs/architecture/ports-and-adapters.md",
+    "docs/architecture/boundaries.md",
+    "docs/architecture/invariants.md",
+    "docs/architecture/decisions/ADR-0001.md",
+    "docs/architecture/decisions/ADR-0002.md",
+    "docs/architecture/decisions/ADR-0007.md",
+    "docs/architecture/decisions/ADR-0008.md",
+    "docs/architecture/decisions/ADR-0009.md",
+    "docs/engineering/testing.md",
+    "docs/engineering/gates.md",
+    "docs/engineering/toolchain-and-modules.md",
+    "docs/evals/index.md",
+    "docs/evals/catalog.md",
+    "docs/evals/catalog.json",
+    "docs/evals/architecture-evals.md"
+  ],
+  "related_decisions": [
+    "ADR-0001",
+    "ADR-0002",
+    "ADR-0007",
+    "ADR-0008",
+    "ADR-0009"
+  ],
+  "related_invariants": [
+    "INV-CFG-001",
+    "INV-CFG-002",
+    "INV-CFG-003",
+    "INV-CFG-004",
+    "INV-CFG-005",
+    "INV-CFG-023",
+    "INV-CFG-025",
+    "INV-CFG-026",
+    "INV-CFG-027",
+    "INV-CFG-028"
+  ],
+  "evals": [
+    "EVAL-CFG-001",
+    "EVAL-CFG-007",
+    "EVAL-CFG-024"
+  ],
+  "source_scope": [
+    "planned:pom.xml",
+    "planned:cfg-kernel/pom.xml",
+    "planned:cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/CfgPreflight.java",
+    "planned:scripts/project/check-architecture.sh",
+    "planned:.github/workflows/ci.yml",
+    "docs/engineering/gate-state.json",
+    "docs/engineering/gates.md",
+    "docs/engineering/toolchain-and-modules.md",
+    "docs/sources/sources.lock.json",
+    "docs/sources/index.md",
+    "docs/sources/upstream-state.md"
+  ],
+  "test_scope": [
+    "planned:cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/application/CfgPreflightTest.java",
+    "planned:cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/testing/AirPublications.java",
+    "planned:scripts/project/check-architecture.sh",
+    "scripts/harness/test_harness.py",
+    "scripts/harness/validate_docs.py"
+  ],
+  "must_not_change": [
+    "analysis-ir",
+    "air-java",
+    "proleap-poc",
+    "semântica normativa AIR",
+    "algoritmos e tipos de CFG",
+    "adapters JSON/arquivo e CLI"
+  ],
+  "gates": [
+    "fast",
+    "architecture"
+  ],
+  "stop_condition": "BACKLOG-CFG-002 concluído em PR aberto para review humano; BACKLOG-CFG-003 não iniciado"
+}

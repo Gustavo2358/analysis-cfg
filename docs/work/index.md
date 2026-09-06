@@ -2,7 +2,9 @@
 
 ## Item ativo
 
-Nenhum work item ativo. Backlog não é autorização.
+[WORK-CFG-002](active/WORK-CFG-002/spec.md) — `active`, implementação autorizada
+do bootstrap Java 21/Maven e boundary física com `air-java`. O checkpoint para em
+PR aberto para review; não autoriza BACKLOG-CFG-003 nem algoritmo CFG.
 
 ## Último item concluído
 
@@ -11,9 +13,8 @@ Fechou `air-java`/Java 21, porta/lifetime/binding e CFG-FIRST sem criar Java/POM
 
 ## Próximo candidato
 
-[BACKLOG-CFG-002](backlog/BACKLOG-CFG-002.md) está
-`ready_for_authorization`: bootstrap Java 21/Maven, dependência `air-java` e
-validação da boundary. Não foi iniciado e exige novo work item/autorização explícita.
+Nenhum enquanto WORK-CFG-002 estiver ativo. BACKLOG-CFG-003 permanece `planned` e
+fora deste checkpoint.
 
 ## Roteamento
 

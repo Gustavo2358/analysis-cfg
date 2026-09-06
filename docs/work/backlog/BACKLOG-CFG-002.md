@@ -1,6 +1,7 @@
 # BACKLOG-CFG-002 — Bootstrap Java 21/Maven e boundary air-java
 
-**Estado:** `ready_for_authorization`. **Fase:** `foundation`. **Autorização:** backlog não autoriza execução.
+**Estado:** `active` em [WORK-CFG-002](../active/WORK-CFG-002/spec.md). **Fase:** `foundation`.
+**Autorização:** implementação explicitamente autorizada em 06/09/2026 somente para este checkpoint.
 Dependências: BACKLOG-CFG-001.
 
 ## Problema e objetivo observável
