@@ -62,7 +62,7 @@ O código de `air-model/src/main` não importa Jackson/Gson, `java.io`, `java.ni
 ANTLR, Semantic Product, COBOL ou tipos CFG. A instalação antiga e seus 172 checks
 pertencem à evidência histórica do bootstrap.
 O merge 1A possui CI `contracts` e `harness` em success no SHA autorizado,
-com [recibo de proveniência](../work/active/WORK-CFG-025/state.md) e
+com [recibo de proveniência](../work/history/WORK-CFG-025.md) e
 [URL do job contracts](https://github.com/Gustavo2358/air-java/actions/runs/34163367232/job/101869534574).
 Esses resultados não certificam o consumer CFG. O codec `AirJson` existe em
 `air-json/src/main/java/io/github/gustavo2358/air/json/AirJson.java`; a cobertura

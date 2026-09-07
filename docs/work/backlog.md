@@ -52,4 +52,6 @@ adiados. 021 leva gates a CI e não bloqueia desenho semântico.
 
 ## Proveniência autorizada
 
-[BACKLOG-CFG-025](backlog/BACKLOG-CFG-025.md): active em WORK-CFG-025; pin do merge 1A, sem iniciar 2A/2B.
+[BACKLOG-CFG-025](backlog/BACKLOG-CFG-025.md): completed em WORK-CFG-025; merge PR #9 confirmado.
+
+[BACKLOG-CFG-026](backlog/BACKLOG-CFG-026.md): active; implementação autorizada somente do checkpoint 2B.

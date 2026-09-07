@@ -290,3 +290,7 @@ activationEntry múltipla, Return, Halt, self-loop e determinismo. Seleção exa
 EVAL-CFG-025 conserva seus 17 métodos: recusa antiga de PARTIAL agora seleciona STRICT;
 UNAVAILABLE nos dois modos é provado pelo 030. Oráculos 028/029 permanecem intactos.
 Nenhum claim de perfil nem de independência das lacunas para dataflow/reachability.
+
+## EVAL-CFG-031 — Arquivo AIR → CFG JSON e CLI
+
+Planejado em WORK-CFG-026: fluxo real pelo shared AirJson e BuildCfg, golden manual independente, falhas sem publicar output, determinismo e coverage honesta.
