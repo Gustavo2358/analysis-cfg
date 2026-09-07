@@ -1,6 +1,7 @@
 # BACKLOG-CFG-006 — Bifurcação e IF/ELSE estrutural
 
-**Estado:** `planned`. **Fase:** `mvp`. **Autorização:** backlog não autoriza execução.
+**Estado:** `active`. **Fase:** `mvp`. **Autorização:** `implementation` em
+[WORK-CFG-006](../active/WORK-CFG-006/work-item.json), pelo prompt explícito do usuário.
 Dependências: BACKLOG-CFG-022.
 
 ## Problema e objetivo observável

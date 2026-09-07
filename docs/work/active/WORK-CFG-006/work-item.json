@@ -1,0 +1,103 @@
+{
+  "id": "WORK-CFG-006",
+  "backlog_id": "BACKLOG-CFG-006",
+  "title": "Bifurcação e IF/ELSE estrutural",
+  "status": "active",
+  "risk": "high",
+  "goal": "Projetar Branch por destinos explícitos e provar M2–M5; concluir MVP local somente com gates e CI verdes.",
+  "authorization": "implementation",
+  "authorization_evidence": "Prompt explícito do usuário nesta sessão: promover/implementar BACKLOG-CFG-006, push e PR novo, sem merge.",
+  "checkpoint": "Branch estrutural, challenge e CI Temurin 21; parar para human review",
+  "must_read": [
+    "AGENTS.md",
+    "ARCHITECTURE.md",
+    "docs/architecture/invariants.md",
+    "docs/architecture/pipeline.md",
+    "docs/architecture/boundaries.md",
+    "docs/architecture/ports-and-adapters.md",
+    "docs/architecture/decisions/ADR-0001.md",
+    "docs/architecture/decisions/ADR-0002.md",
+    "docs/architecture/decisions/ADR-0003.md",
+    "docs/architecture/decisions/ADR-0004.md",
+    "docs/architecture/decisions/ADR-0007.md",
+    "docs/architecture/decisions/ADR-0008.md",
+    "docs/domain/core-control.md",
+    "docs/domain/graph-product.md",
+    "docs/domain/ir-boundary.md",
+    "docs/evals/catalog.md",
+    "docs/evals/catalog.json",
+    "docs/evals/mvp-scenarios.md",
+    "docs/evals/metamorphic.md",
+    "docs/evals/profile-matrix.md",
+    "docs/evals/profile-obligations.json",
+    "docs/engineering/testing.md",
+    "docs/engineering/gates.md",
+    "docs/engineering/semantic-policy.md",
+    "docs/engineering/work-item-protocol.md",
+    "docs/product/mission-and-slices.md",
+    "docs/work/backlog/BACKLOG-CFG-006.md",
+    "docs/sources/sources.lock.json"
+  ],
+  "related_decisions": [
+    "ADR-0001",
+    "ADR-0002",
+    "ADR-0003",
+    "ADR-0004",
+    "ADR-0007",
+    "ADR-0008"
+  ],
+  "related_invariants": [
+    "INV-CFG-001",
+    "INV-CFG-003",
+    "INV-CFG-004",
+    "INV-CFG-005",
+    "INV-CFG-006",
+    "INV-CFG-007",
+    "INV-CFG-008",
+    "INV-CFG-010",
+    "INV-CFG-011",
+    "INV-CFG-015",
+    "INV-CFG-019",
+    "INV-CFG-021",
+    "INV-CFG-022",
+    "INV-CFG-024",
+    "INV-CFG-025",
+    "INV-CFG-026",
+    "INV-CFG-027",
+    "INV-CFG-029"
+  ],
+  "evals": [
+    "EVAL-CFG-003",
+    "EVAL-CFG-004",
+    "EVAL-CFG-005",
+    "EVAL-CFG-014",
+    "EVAL-CFG-025",
+    "EVAL-CFG-028"
+  ],
+  "source_scope": [
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CoreCfgProjection.java",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CfgGraph.java",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CfgTransition.java",
+    "scripts/project/check_architecture.py",
+    "scripts/project/check_semantic.py",
+    ".github/workflows/ci.yml"
+  ],
+  "test_scope": [
+    "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg029Test.java",
+    "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/testing/BranchPublications.java"
+  ],
+  "must_not_change": [
+    "upstreams/pins; BuildCfg/preflight/registry; nenhum adapter, CLI ou modelo AIR paralelo",
+    "025: 17 métodos congelados; 028: 22 métodos; adaptação estrita de recusa Branch/switch aguarda resposta",
+    "outros backlogs; perfis AIR; performance/integration"
+  ],
+  "gates": [
+    "fast",
+    "architecture",
+    "semantic",
+    "performance",
+    "integration",
+    "full"
+  ],
+  "stop_condition": "M2–M5 e limites demonstrados; gates disponíveis e CI final verdes; PR contra main para review, sem merge/auto-merge nem BACKLOG-CFG-007."
+}

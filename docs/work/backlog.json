@@ -92,7 +92,7 @@
       "id": "BACKLOG-CFG-006",
       "title": "Bifurcação e IF/ELSE estrutural",
       "phase": "mvp",
-      "status": "planned",
+      "status": "active",
       "dependencies": [
         "BACKLOG-CFG-022"
       ],
@@ -103,7 +103,7 @@
         "EVAL-CFG-014"
       ],
       "path": "docs/work/backlog/BACKLOG-CFG-006.md",
-      "work_item": null
+      "work_item": "WORK-CFG-006"
     },
     {
       "id": "BACKLOG-CFG-007",
