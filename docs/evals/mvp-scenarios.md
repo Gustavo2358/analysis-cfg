@@ -110,3 +110,14 @@ nenhum desses dois marcos. P1 entra no slice de `invoke`.
 
 Catálogo relacionado: EVAL-CFG-001 a EVAL-CFG-009, EVAL-CFG-013/014 e
 EVAL-CFG-025/026; cada work item seleciona apenas os evals do seu slice.
+
+## Evidência estrutural de WORK-CFG-006
+
+M2–M5 são executáveis em EVAL-CFG-029: diamond por Jumps explícitos; FALSE direto
+à continuação sem nó vazio; nested com destinos próprios; Halt e Return terminantes
+sem reconvergência; dois braços distintos para o mesmo LabelId. Literal true/false
+não poda alternativas. Predicate, leituras, TypeRef, reason e origens ficam na AIR
+original. Invalidade de targets, role e unknown_type encerra o preflight sem produto.
+Duas Entries conservam activationEntry em todas as regras, inclusive órfãs.
+CF1/025 e M1/028 permanecem regressões obrigatórias. O conjunto concluiu
+MVP-CFG-01 local com gates disponíveis e CI Temurin 21 verdes, sem perfil AIR.

@@ -168,6 +168,7 @@ EXPECTED_TEST_CASES = {
     "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistryTest": 4,
     DOMAIN_CLASS + "EvalCfg025Test": 17,
     DOMAIN_CLASS + "EvalCfg028Test": 22,
+    DOMAIN_CLASS + "EvalCfg029Test": 25,
 }
 EXPECTED_PREFLIGHT_JDEPS_TARGETS = {
     PUBLICATION,
@@ -196,10 +197,11 @@ FORBIDDEN_BYTECODE_TYPES = {
     "java.lang.ClassLoader",
     "java.lang.System",
 }
-# Exact inventory for the authorized linear slice; no wildcard operation support.
+# Exact inventory for the authorized structural slice; no wildcard operation support.
 ALLOWED_OPERATION_TYPES = {
     "io.github.gustavo2358.air.model.Operations$Return",
     "io.github.gustavo2358.air.model.Operations$Jump",
+    "io.github.gustavo2358.air.model.Operations$Branch",
     "io.github.gustavo2358.air.model.Operations$Halt",
     "io.github.gustavo2358.air.model.Operations$HaltKind",
     "io.github.gustavo2358.air.model.Operations$Assign",
@@ -253,7 +255,6 @@ def detector_self_test() -> None:
         "picocli.CommandLine",
         "example.SemanticProductInput",
         "local.BuildCfgInput",
-        "io.github.gustavo2358.air.model.Operations$Branch",
         "io.github.gustavo2358.air.model.Operations$Dispatch",
         "io.github.gustavo2358.air.model.Operations$Invoke",
         "io.github.gustavo2358.air.model.Operations$Raise",
@@ -264,6 +265,8 @@ def detector_self_test() -> None:
         "io.github.gustavo2358.air.model.Operations$LocalUnwind",
         "io.github.gustavo2358.air.model.Operations$IndirectJump",
     }
+    verify_bytecode_dependencies({DOMAIN_CLASS + "CoreCfgProjection": {
+        "io.github.gustavo2358.air.model.Operations$Branch"}})
     for dependency in forbidden_dependencies:
         try:
             verify_bytecode_dependencies({BUILD_CFG_CLASS: {PUBLICATION, dependency}})
@@ -757,7 +760,7 @@ def architecture_gate(root: Path) -> None:
     print("[architecture] PASS: BuildCfg(Publication, BuildOptions) -> CfgBuildResult and direct "
           "AirValidator preflight", flush=True)
     print("[architecture] PASS: explicit capability/version registry; no transport, reflection, "
-          "frontend, AIR shadow, or control primitives beyond Jump/Return/Halt", flush=True)
+          "frontend, AIR shadow, or control primitives beyond Jump/Branch/Return/Halt", flush=True)
 
 
 def main() -> int:

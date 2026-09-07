@@ -39,10 +39,12 @@ EVAL-CFG-025 continua verde. Não há ProgramPoint especulativo nem dataflow.
 
 ## MVP-CFG-01: subset estrutural útil
 
-Marco ainda incompleto: inclui operações lineares, `jump`, `branch`, saídas `return`/`halt` e
+Marco local implementado em WORK-CFG-006: inclui operações lineares, `jump`, `branch`, saídas `return`/`halt` e
 IF/ELSE estrutural. `unknown(known(bool))` como predicado puro conserva os dois
 destinos; `unknown_type` não satisfaz a assinatura booleana. IFs aninhados são
 combinações das mesmas primitives, sem limite artificial de cardinalidade.
+EVAL-CFG-029 prova M2–M5, 258 branches, órfãs, duas Entries e metamorfismos;
+BRANCH_TRUE/BRANCH_FALSE mantêm as alternativas mesmo com destino igual.
 
 O diamond reconverge somente onde os terminadores dizem; ramo que termina não ganha
 join artificial. A permutação física de sequences não altera transições. `Return`

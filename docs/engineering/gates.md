@@ -8,7 +8,7 @@
 | check-harness.sh | executável | 41 testes adversariais do harness |
 | check-fast.sh | executável | docs + harness |
 | check-architecture.sh | executável | Maven/testes, inventários exatos, dependências, bytecode 21 e boundary air-java |
-| check-semantic.sh | executável | 17 testes do EVAL-CFG-025 + 22 do EVAL-CFG-028, métodos/suítes exatos |
+| check-semantic.sh | executável | 17 do EVAL-CFG-025 + 22 do EVAL-CFG-028 + 25 do EVAL-CFG-029, métodos/suítes exatos |
 | check-performance.sh | UNAVAILABLE | futuras propriedades de escala |
 | check-integration.sh | UNAVAILABLE | futuro arquivo→porta e equivalência em memória |
 | check-full.sh | UNAVAILABLE | fast/architecture/semantic; para em performance, exit 3 |
@@ -22,13 +22,13 @@ Exit codes: 0=PASS, 1=FAIL, 2=erro de uso/configuração, 3=UNAVAILABLE.
 ## Estado explícito
 
 [gate-state.json](gate-state.json) registra fase implementation e autorização
-WORK-CFG-022. Hooks reais de architecture/semantic em scripts/project; performance
+WORK-CFG-006. Hooks reais de architecture/semantic em scripts/project; performance
 e integration permanecem sem hook. O checker verifica consistência local, não
 comprova autorização humana nem estado GitHub.
 
 ## Arquitetura
 
-O hook executa clean/test e exige seis suítes, 57 testes e zero skips. Verifica
+O hook executa clean/test e exige sete suítes, 82 testes e zero skips. Verifica
 13 fontes e 21 classfiles exatos, incluindo tipos aninhados/sintéticos. Inspeciona
 major 65/minor 0, dependências/classpath, javap e jdeps. Imports complementam bytecode.
 
@@ -38,8 +38,8 @@ major 65/minor 0, dependências/classpath, javap e jdeps. Imports complementam b
 - sem filesystem, JSON, CLI, rede, frontend, reflection ou ServiceLoader;
 - domain não conhece application/extension; registry explícito preservado;
 - CoreCfgProjection substitui CfgFirstProjection, sem projectors concorrentes;
-- inventário de operações permite explicitamente Jump/Return/Halt, HaltKind,
-  Header e os cinco tipos Instruction; Branch/Dispatch/Invoke/Raise/Opaque,
+- inventário de operações permite explicitamente Jump/Branch/Return/Halt, HaltKind,
+  Header e os cinco tipos Instruction; Dispatch/Invoke/Raise/Opaque,
   LocalInvoke/Boundary/Resume/Unwind e IndirectJump continuam proibidos;
 - descriptors da porta, resultado, HaltExit.source e listas tipadas do produto;
 - CI fixa/verifica air-java SHA e roda fast, architecture e semantic em Temurin 21.
@@ -50,10 +50,10 @@ deliberada do inventário. Navegação materializada/imutabilidade também têm 
 
 ## Semântica
 
-check_semantic.py seleciona exatamente EvalCfg025Test e EvalCfg028Test em clean/test.
-Exige cada um dos 39 métodos manualmente enumerados, dois relatórios exatos e zero
+check_semantic.py seleciona exatamente EvalCfg025Test, EvalCfg028Test e EvalCfg029Test
+em clean/test. Exige cada um dos 64 métodos manualmente enumerados, três relatórios exatos e zero
 missing/duplicate/foreign/skip/failure/error. Não é alias para mvn test inteiro.
-O detector rejeita 58 fixtures adversariais, inclusive cada método ausente, suíte
+O detector rejeita 95 fixtures adversariais, inclusive cada método ausente, suíte
 ausente/extra, duplicata, foreign testcase e skip/failure/error.
 
 O 025 mantém somente as 17 regressões estáveis de CFG-FIRST. As antigas recusas
@@ -61,7 +61,12 @@ de Jump/Halt/instructions não permanecem executáveis após a expansão do prod
 a cobertura positiva dessas formas pertence ao 028. O 028 exige M1,
 operandos/ordem/origins/gaps, Jump por label forward/backward/self-loop, Halt distinto,
 contextos múltiplos, órfãs/unsupported, metamorfismos e negociação memory.regions@1
-restrita ao papel de controle. Nenhum perfil AIR completo é reivindicado.
+restrita ao papel de controle. O 029 prova M2–M5, predicate conhecido/desconhecido,
+invalidade de tipo/role/targets, contexto, órfãs, 258 branches, invariantes e quatro
+metamorfismos. O 028 conserva 22 métodos: a fixture mista mantém Branch, mas ele
+não é mais diagnosticado como unsupported; o observer rejeita os kinds de Branch
+fora do domínio do 028. Toda prova positiva de Branch pertence ao 029.
+Nenhum perfil AIR completo é reivindicado.
 
 ## Escalonamento e limites
 

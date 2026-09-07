@@ -89,6 +89,7 @@ class EvalCfg028Test {
                 case JUMP -> EdgeKind.JUMP;
                 case RETURN -> EdgeKind.RETURN;
                 case HALT -> EdgeKind.HALT;
+                case BRANCH_TRUE, BRANCH_FALSE -> throw new AssertionError("Branch belongs to EVAL-CFG-029");
             };
             assertTrue(edges.add(new Edge(nodes.get(t.from()), nodes.get(t.to()), kind, t.activationEntry())));
         }
@@ -381,7 +382,7 @@ class EvalCfg028Test {
         var result = build(input);
         assertEquals(CfgBuildResult.Status.UNSUPPORTED_INPUT, result.status());
         assertTrue(result.graph().isEmpty());
-        assertEquals(List.of(branchId, dispatchId, raiseId, invokeId, opaqueId), result.projectionIssues().stream().map(CfgProjectionIssue::subject).toList());
+        assertEquals(List.of(dispatchId, raiseId, invokeId, opaqueId), result.projectionIssues().stream().map(CfgProjectionIssue::subject).toList());
         assertTrue(result.projectionIssues().stream().allMatch(i -> i.code() == CfgProjectionIssue.Code.UNSUPPORTED_TERMINATOR));
     }
 

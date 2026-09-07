@@ -28,7 +28,7 @@ da projeção e `Optional<CfgGraph>`. `CFG_BUILT` exige produto presente;
 em falha ou com metadata/preflight incompatíveis. `CfgBuildCoordinator` delega a
 regra mínima ao domínio após preflight.
 
-`UNSUPPORTED_INPUT` identifica terminador diferente de Jump/Return/Halt, body
+`UNSUPPORTED_INPUT` identifica terminador diferente de Jump/Branch/Return/Halt, body
 indisponível, inventário parcial/indisponível ou necessidade de semântica de extensão
 ainda ausente. Seus subjects são IDs AIR; não opcodes textuais. Uma publicação
 com inventário completo e zero Units produz um inventário CFG realmente vazio,

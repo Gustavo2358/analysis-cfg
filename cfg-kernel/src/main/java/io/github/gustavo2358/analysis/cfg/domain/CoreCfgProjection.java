@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/** Exact Entry/Jump/Return/Halt rules for preflight-validated AIR, without reachability or physical fallthrough. */
+/** Exact Entry/Jump/Branch/Return/Halt rules for preflight-validated AIR, without reachability or physical fallthrough. */
 public final class CoreCfgProjection {
     private CoreCfgProjection() { }
 
@@ -46,6 +46,7 @@ public final class CoreCfgProjection {
                 // Retaining the original Sequence preserves every occurrence and its explicit order.
                 if (!(sequence.terminator() instanceof Operations.Return)
                         && !(sequence.terminator() instanceof Operations.Jump)
+                        && !(sequence.terminator() instanceof Operations.Branch)
                         && !(sequence.terminator() instanceof Operations.Halt)) {
                     issues.add(new CfgProjectionIssue(CfgProjectionIssue.Code.UNSUPPORTED_TERMINATOR,
                             sequence.terminator().header().id()));
@@ -98,6 +99,12 @@ public final class CoreCfgProjection {
                     } else if (sequence.terminator() instanceof Operations.Halt) {
                         transitions.add(new CfgTransition(from, halts.get(sequence.label()).id(),
                                 CfgTransition.Kind.HALT, entry.id()));
+                    } else if (sequence.terminator() instanceof Operations.Branch branch) {
+                        // Structural alternatives remain distinct, including equal targets and literal predicates.
+                        transitions.add(new CfgTransition(from, sequences.get(branch.trueDestination()).id(),
+                                CfgTransition.Kind.BRANCH_TRUE, entry.id()));
+                        transitions.add(new CfgTransition(from, sequences.get(branch.falseDestination()).id(),
+                                CfgTransition.Kind.BRANCH_FALSE, entry.id()));
                     } else {
                         throw new IllegalArgumentException("projection requires a supported terminator");
                     }

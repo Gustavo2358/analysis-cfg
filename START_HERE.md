@@ -4,7 +4,7 @@
 
 O repositório contém um harness revisado, a fundação Java/Maven de WORK-CFG-002 e a
 porta/seam de WORK-CFG-003, CFG-FIRST de WORK-CFG-005 e fluxo linear/Jump/Halt
-de WORK-CFG-022. Antes de qualquer
+de WORK-CFG-022, mais Branch estrutural de WORK-CFG-006. Antes de qualquer
 trabalho, confirme que a cópia local está íntegra
 e siga o work item ativo ou o próximo backlog explicitamente autorizado.
 
@@ -23,8 +23,9 @@ bash scripts/harness/check-architecture.sh
 bash scripts/harness/check-semantic.sh
 ```
 
-Architecture executa 57 testes Java e verifica bytecode/dependências reais.
-Semantic seleciona 17 testes do EVAL-CFG-025 e 22 do EVAL-CFG-028, verificando nomes
+Architecture executa 82 testes Java e verifica bytecode/dependências reais.
+Semantic seleciona 17 testes do EVAL-CFG-025, 22 do EVAL-CFG-028 e 25 do
+EVAL-CFG-029, verificando nomes
 e resultados, falhando com ausência ou skip.
 
 ## 3. Abrir a rota de conhecimento
@@ -49,7 +50,7 @@ A criação desse cache não autoriza mudança da versão IR.
 `BuildOptions`; o coordinator delega o preflight a
 `io.github.gustavo2358.air.validation.AirValidator` e retorna `CfgBuildResult`.
 No slice suportado, CFG_BUILT contém Entry/Sequence/NormalExit/HaltExit e transições
-ENTRY/JUMP/RETURN/HALT. Instructions ficam ordenadas na Sequence original;
+ENTRY/JUMP/BRANCH_TRUE/BRANCH_FALSE/RETURN/HALT. Instructions ficam ordenadas na Sequence original;
 activationEntry distingue contextos. Falhas não contêm grafo. Consulte a
 [estratégia do SNAPSHOT](docs/engineering/toolchain-and-modules.md) antes de rodar
 Maven em um checkout limpo.
@@ -60,6 +61,7 @@ Entradas de teste do CFG são **`air-java Publication`**, não
 memória.
 A diferença está no [estado upstream](docs/sources/upstream-state.md).
 
-CFG-FIRST e o slice linear/Jump/Halt estão implementados. Branch/IF e transportes
-continuam posteriores; BACKLOG-CFG-004/006 não foram iniciados. Siga o estado do
-work autorizado; não avance automaticamente após o PR do 022.
+CFG-FIRST, linear/Jump/Halt e Branch estrutural estão implementados em memória.
+MVP-CFG-01 local foi concluído no WORK-CFG-006, sem perfil AIR normativo. Transportes permanecem
+posteriores; BACKLOG-CFG-004/007 não foram iniciados. Siga o estado do work
+autorizado; não avance automaticamente após o PR do 006.
