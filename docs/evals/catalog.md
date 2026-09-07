@@ -187,7 +187,7 @@ builder. `CFG-FIRST` não implementa `Halt`.
 
 Oráculos upstream: O-18-STRUCT, O-30-STRUCT. Invariantes:
 INV-CFG-003, INV-CFG-004, INV-CFG-005, INV-CFG-006, INV-CFG-008, INV-CFG-019,
-INV-CFG-021, INV-CFG-023, INV-CFG-026. Estado: `implemented`, com 20 testes em
+INV-CFG-021, INV-CFG-023, INV-CFG-026. Estado: `implemented`, com 17 testes em
 [EvalCfg025Test](../../cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg025Test.java)
 e seleção obrigatória no semantic gate.
 
@@ -224,7 +224,7 @@ Oráculos upstream: nenhum; eval local estreito, sem certificar invoke/branch.
 Invariantes: INV-CFG-003, INV-CFG-004, INV-CFG-005, INV-CFG-006, INV-CFG-008,
 INV-CFG-011, INV-CFG-015, INV-CFG-019, INV-CFG-021. Estado: `implemented`,
 22 testes em [EvalCfg028Test](../../cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg028Test.java),
-obrigatórios junto aos 20 do 025 no semantic gate.
+obrigatórios junto aos 17 do 025 no semantic gate.
 
 ## Evidência parcial de WORK-CFG-022
 
@@ -238,6 +238,8 @@ provenance, órfãs, permutação, alpha rename, display e split. Isso não conc
 - 013: todas as observações de interação/inventário parcial exigidas;
 - 014: O-66 inclui equivalência de ingressos/transportes ainda não implementada.
 
-O 025 permanece implemented; suas 17 regressões CF1 são preservadas, e as três
-recusas históricas de Jump/Halt/instructions evoluem para provas positivas do 022.
+EVAL-CFG-025 permanece o oracle estável do CFG-FIRST, com 17 regressões.
+As antigas recusas de Jump/Halt/instructions descreviam o limite da implementação
+naquele checkpoint e não permanecem executáveis após a expansão legítima do produto.
+A cobertura positiva dessas formas pertence exclusivamente ao EVAL-CFG-028, com 22 testes.
 Nenhum perfil AIR, performance ou integration foi promovido.

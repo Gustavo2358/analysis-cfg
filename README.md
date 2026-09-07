@@ -61,7 +61,7 @@ dataflow permanecem posteriores. BACKLOG-CFG-004/006 não foram iniciados.
 `docs`, `harness` e `fast` verificam arquivos, referências, IDs, dependências de
 backlog, work items e os próprios validadores documentais. `architecture` executa
 Maven/testes e inspeciona dependências e bytecode do kernel. `semantic` executa
-explicitamente os 20 testes de EVAL-CFG-025 e os 22 de EVAL-CFG-028; rejeita
+explicitamente os 17 testes de EVAL-CFG-025 e os 22 de EVAL-CFG-028; rejeita
 suítes/métodos ausentes, extras, duplicados ou pulados.
 `performance`, `integration` e, por consequência, `full` permanecem
 **UNAVAILABLE / exit 3**; full executa fast, architecture e semantic antes de parar

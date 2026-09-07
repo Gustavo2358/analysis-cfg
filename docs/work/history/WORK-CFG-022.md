@@ -102,9 +102,11 @@ RED executado:
 -Dtest=EvalCfg028Test test`, exit 1 por ausência de HaltExit, JUMP/HALT, haltExits e
 preciseControlCapabilities. Falhas de download anteriores não contaram como RED.
 
-GREEN: 22 testes do 028 + 20 do 025, zero skips. As três recusas históricas de
-Jump/Halt/instructions do 025 evoluíram para asserts positivos sob autorização
-explícita do 022; os outros 17 métodos e todas as obrigações CF1 foram preservados.
+GREEN após correção de review: 22 testes do 028 + 17 do 025, zero skips.
+EVAL-CFG-025 permanece o oracle estável do CFG-FIRST, com 17 regressões.
+As antigas recusas de Jump/Halt/instructions descreviam o limite da implementação
+naquele checkpoint e não permanecem executáveis após a expansão legítima do produto.
+A cobertura positiva dessas formas pertence exclusivamente ao EVAL-CFG-028, com 22 testes.
 O commit `9a9cfbe` contém implementação, regressões, gates e conhecimento durável.
 
 Contracasos: todos cinco tipos Instruction, 258 occurrences sem teto heurístico;
@@ -169,10 +171,10 @@ Maven 3.9.16, runtime local Temurin 25.0.4 e bytecode 21 sem preview:
 | bash scripts/harness/check-docs.sh | 0 | PASS |
 | bash scripts/harness/check-harness.sh | 0 | 41 testes |
 | bash scripts/harness/check-fast.sh | 0 | PASS |
-| bash scripts/harness/check-architecture.sh | 0 | 60 testes, 13 fontes, 21 classfiles |
-| bash scripts/harness/check-semantic.sh | 0 | 42 métodos 025/028, zero skip |
-| mvn -B -ntp clean test | 0 | 60 testes |
-| mvn -B -ntp clean verify | 0 | 60 testes |
+| bash scripts/harness/check-architecture.sh | 0 | 57 testes, 13 fontes, 21 classfiles |
+| bash scripts/harness/check-semantic.sh | 0 | 39 métodos 025/028, zero skip |
+| mvn -B -ntp clean test | 0 | 57 testes |
+| mvn -B -ntp clean verify | 0 | 57 testes |
 | git diff --check | 0 | sem erro |
 | bash scripts/harness/check-performance.sh | 3 | UNAVAILABLE |
 | bash scripts/harness/check-integration.sh | 3 | UNAVAILABLE |
@@ -187,7 +189,7 @@ os nomes para o core crescente. A CI do HEAD documental final será conferida no
 antes do handoff; sua evidência fica vinculada ao commit/check do próprio PR.
 
 Após arquivar o work, fast e diff --check passaram novamente (exit 0), validando lifecycle.
-A tabela acima documenta a bateria final local do código, executada nesta sessão.
+A tabela acima reflete a bateria local reexecutada no follow-up de review abaixo.
 Todos os comandos exigidos foram executados; performance/integration não têm
 verificação de produto implementada, e full reporta esse limite com exit 3.
 
@@ -197,3 +199,31 @@ WORK-CFG-022/BACKLOG-CFG-022 completed; registry.active vazio. Novo PR contra ma
 para human review, sem merge/auto-merge. BACKLOG-CFG-004/006 permanecem planned e
 sem work item; não foram iniciados. O próximo checkpoint é exclusivamente review
 humano deste PR. Nenhuma autorização para consumir outro backlog foi inferida.
+
+## Review follow-up — freeze EVAL-CFG-025
+
+Correção de review do PR #6, na mesma branch, a partir de
+`7ef3fc5288b786d403266108a1c2e036d937a09f`; sem novo work/checkpoint.
+Finding confirmado: o contrato dizia “CFG-FIRST não implementa Halt”, enquanto
+EvalCfg025Test havia absorvido três provas positivas de Halt/Jump/instructions do 028.
+025 congelado em 17 regressões estáveis CFG-FIRST; 028 permanece intacto com 22
+provas do slice linear/Jump/Halt. Ambos continuam implemented. Nenhuma fonte
+produtiva, pin, regra arquitetural ou status de backlog foi alterado.
+
+RED: apenas retirando as três obrigações do inventário manual, semantic executou
+os testes e falhou com exit 1 por method inventory mismatch. GREEN após remover
+somente os três métodos da suíte: 17 + 22 = 39, zero skips. O inventário permanece
+manual; não há descoberta automática de source.
+
+Challenge sobre relatórios reais, usando cópias temporárias e restaurando o inventário:
+reintroduzir haltIsNowSupportedIncludingInAnOrphan nas obrigações do 025 falhou por
+method inventory mismatch; remover um método real de cada suíte também falhou;
+adicionar suíte estrangeira falhou. As quatro rejeições esperadas passaram, e o
+self-test preservado rejeitou 58 fixtures inválidas (antes eram 61, pois havia três
+obrigações adicionais). Nenhum detector foi relaxado.
+
+Air-java no SHA pinado reinstalado com clean install (exit 0) no mesmo repo isolado
+`/tmp/analysis-cfg-work-cfg-022-m2`. Gates e contagens atuais constam da tabela acima;
+CI do commit deste follow-up será vinculada ao próprio PR antes do handoff.
+WORK-CFG-022/BACKLOG-CFG-022 continuam completed, registry.active=[];
+BACKLOG-CFG-006 não iniciado. Próximo checkpoint: review humano do PR #6, sem merge.

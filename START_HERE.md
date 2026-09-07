@@ -23,8 +23,8 @@ bash scripts/harness/check-architecture.sh
 bash scripts/harness/check-semantic.sh
 ```
 
-Architecture executa 60 testes Java e verifica bytecode/dependências reais.
-Semantic seleciona 20 testes do EVAL-CFG-025 e 22 do EVAL-CFG-028, verificando nomes
+Architecture executa 57 testes Java e verifica bytecode/dependências reais.
+Semantic seleciona 17 testes do EVAL-CFG-025 e 22 do EVAL-CFG-028, verificando nomes
 e resultados, falhando com ausência ou skip.
 
 ## 3. Abrir a rota de conhecimento

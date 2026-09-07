@@ -166,7 +166,7 @@ EXPECTED_TEST_CASES = {
     "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinatorTest": 6,
     "io.github.gustavo2358.analysis.cfg.application.CfgPreflightTest": 4,
     "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistryTest": 4,
-    DOMAIN_CLASS + "EvalCfg025Test": 20,
+    DOMAIN_CLASS + "EvalCfg025Test": 17,
     DOMAIN_CLASS + "EvalCfg028Test": 22,
 }
 EXPECTED_PREFLIGHT_JDEPS_TARGETS = {

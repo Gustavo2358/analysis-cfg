@@ -88,10 +88,11 @@ OperationId e termination kind. Expected manual de M1 precede produção;
 observação do produto é separada da construção do esperado. Os testes retêm os
 mesmos objetos AIR para provar operands, headers, precision, gaps e origins inteiros.
 
-O RED por API ausente está no commit 6908ff9. Os 22 testes novos e os 20 do 025
-passaram juntos. As três recusas históricas de Jump/Halt/instructions do 025 foram
-explicitamente convertidas em asserts positivos pela autorização do 022; os outros
-17 métodos e todas as obrigações CF1 permanecem. Não é exclusão de regressão.
+O RED por API ausente está no commit 6908ff9.
+EVAL-CFG-025 permanece o oracle estável do CFG-FIRST, com 17 regressões.
+As antigas recusas de Jump/Halt/instructions descreviam o limite da implementação
+naquele checkpoint e não permanecem executáveis após a expansão legítima do produto.
+A cobertura positiva dessas formas pertence exclusivamente ao EVAL-CFG-028, com 22 testes.
 
 Mutantes Jump→vizinho físico, Return→vizinho, Halt→NormalExit, Halt→vizinho,
 reordenação e perda de instruction falharam no oracle com exit 1 e assertion failure,

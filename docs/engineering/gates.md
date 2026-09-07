@@ -8,7 +8,7 @@
 | check-harness.sh | executável | 41 testes adversariais do harness |
 | check-fast.sh | executável | docs + harness |
 | check-architecture.sh | executável | Maven/testes, inventários exatos, dependências, bytecode 21 e boundary air-java |
-| check-semantic.sh | executável | 20 testes do EVAL-CFG-025 + 22 do EVAL-CFG-028, métodos/suítes exatos |
+| check-semantic.sh | executável | 17 testes do EVAL-CFG-025 + 22 do EVAL-CFG-028, métodos/suítes exatos |
 | check-performance.sh | UNAVAILABLE | futuras propriedades de escala |
 | check-integration.sh | UNAVAILABLE | futuro arquivo→porta e equivalência em memória |
 | check-full.sh | UNAVAILABLE | fast/architecture/semantic; para em performance, exit 3 |
@@ -28,7 +28,7 @@ comprova autorização humana nem estado GitHub.
 
 ## Arquitetura
 
-O hook executa clean/test e exige seis suítes, 60 testes e zero skips. Verifica
+O hook executa clean/test e exige seis suítes, 57 testes e zero skips. Verifica
 13 fontes e 21 classfiles exatos, incluindo tipos aninhados/sintéticos. Inspeciona
 major 65/minor 0, dependências/classpath, javap e jdeps. Imports complementam bytecode.
 
@@ -51,9 +51,9 @@ deliberada do inventário. Navegação materializada/imutabilidade também têm 
 ## Semântica
 
 check_semantic.py seleciona exatamente EvalCfg025Test e EvalCfg028Test em clean/test.
-Exige cada um dos 42 métodos manualmente enumerados, dois relatórios exatos e zero
+Exige cada um dos 39 métodos manualmente enumerados, dois relatórios exatos e zero
 missing/duplicate/foreign/skip/failure/error. Não é alias para mvn test inteiro.
-O detector rejeita 61 fixtures adversariais, inclusive cada método ausente, suíte
+O detector rejeita 58 fixtures adversariais, inclusive cada método ausente, suíte
 ausente/extra, duplicata, foreign testcase e skip/failure/error.
 
 O 025 preserva CF1 integral; suas três antigas recusas de escopo agora provam
