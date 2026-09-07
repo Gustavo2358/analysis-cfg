@@ -1,13 +1,6 @@
 {
   "schema_version": 1,
-  "active": [
-    {
-      "id": "WORK-CFG-006",
-      "path": "docs/work/active/WORK-CFG-006",
-      "status": "active",
-      "authorization": "implementation"
-    }
-  ],
+  "active": [],
   "history": [
     {
       "id": "WORK-CFG-001",
@@ -45,6 +38,14 @@
       "id": "WORK-CFG-022",
       "backlog_id": "BACKLOG-CFG-022",
       "path": "docs/work/history/WORK-CFG-022.md",
+      "status": "completed",
+      "authorization": "implementation",
+      "completed_on": "2026-09-06"
+    },
+    {
+      "id": "WORK-CFG-006",
+      "backlog_id": "BACKLOG-CFG-006",
+      "path": "docs/work/history/WORK-CFG-006.md",
       "status": "completed",
       "authorization": "implementation",
       "completed_on": "2026-09-06"

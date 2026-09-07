@@ -8,7 +8,7 @@
 005 **CFG-FIRST** em memória. Esse primeiro produto é Entry → Sequence(`Return`) →
 normal exit e não depende de branch, codec ou CLI.
 
-022 concluiu linear/jump/halt; 006 está active para completar **MVP-CFG-01** com
+022 concluiu linear/jump/halt; 006 concluiu **MVP-CFG-01** local com
 branch/IF-ELSE. 004 cria transporte quando o binding upstream existir; 008 prova
 arquivo/memória e CLI posteriormente. `invoke`/`raise` entram em 007. Nenhum desses
 subsets equivale a AIR-STRUCTURE completo.
@@ -28,7 +28,7 @@ adiados. 021 leva gates a CI e não bloqueia desenho semântico.
 | [BACKLOG-CFG-003](backlog/BACKLOG-CFG-003.md) | Fronteiras Clean e seam semântico de extensões | BACKLOG-CFG-002 | completed |
 | [BACKLOG-CFG-004](backlog/BACKLOG-CFG-004.md) | Fixtures AIR JSON e adapter de transporte | BACKLOG-CFG-002, BACKLOG-CFG-003 | planned |
 | [BACKLOG-CFG-005](backlog/BACKLOG-CFG-005.md) | CFG-FIRST: Entry, Return e normal exit | BACKLOG-CFG-002, BACKLOG-CFG-003 | completed |
-| [BACKLOG-CFG-006](backlog/BACKLOG-CFG-006.md) | Bifurcação e IF/ELSE estrutural | BACKLOG-CFG-022 | active |
+| [BACKLOG-CFG-006](backlog/BACKLOG-CFG-006.md) | Bifurcação e IF/ELSE estrutural | BACKLOG-CFG-022 | completed |
 | [BACKLOG-CFG-007](backlog/BACKLOG-CFG-007.md) | Invoke, raise e resultados de controle delimitados | BACKLOG-CFG-006 | planned |
 | [BACKLOG-CFG-008](backlog/BACKLOG-CFG-008.md) | CLI e prova posterior arquivo/memória | BACKLOG-CFG-004, BACKLOG-CFG-006 | planned |
 | [BACKLOG-CFG-009](backlog/BACKLOG-CFG-009.md) | Dispatch, ciclos e múltiplas entradas | BACKLOG-CFG-006 | planned |

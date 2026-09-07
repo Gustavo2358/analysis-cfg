@@ -62,6 +62,6 @@ memória.
 A diferença está no [estado upstream](docs/sources/upstream-state.md).
 
 CFG-FIRST, linear/Jump/Halt e Branch estrutural estão implementados em memória.
-O MVP local está em validação final no WORK-CFG-006. Transportes permanecem
+MVP-CFG-01 local foi concluído no WORK-CFG-006, sem perfil AIR normativo. Transportes permanecem
 posteriores; BACKLOG-CFG-004/007 não foram iniciados. Siga o estado do work
 autorizado; não avance automaticamente após o PR do 006.

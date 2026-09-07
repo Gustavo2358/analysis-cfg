@@ -119,4 +119,5 @@ sem reconvergência; dois braços distintos para o mesmo LabelId. Literal true/f
 não poda alternativas. Predicate, leituras, TypeRef, reason e origens ficam na AIR
 original. Invalidade de targets, role e unknown_type encerra o preflight sem produto.
 Duas Entries conservam activationEntry em todas as regras, inclusive órfãs.
-CF1/025 e M1/028 permanecem regressões obrigatórias para concluir o MVP local.
+CF1/025 e M1/028 permanecem regressões obrigatórias. O conjunto concluiu
+MVP-CFG-01 local com gates disponíveis e CI Temurin 21 verdes, sem perfil AIR.

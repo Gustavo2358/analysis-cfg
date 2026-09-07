@@ -1,6 +1,6 @@
 # Arquitetura — mapa curto
 
-**CFG-FIRST e fluxo linear estão implementados em memória: instructions ordenadas,
+**O core estrutural está implementado em memória: instructions ordenadas,
 Jump e Branch explícitos, Return para normal exit por Unit/Entry e Halt para término próprio,
 com produto imutável e correlações AIR.**
 [ADRs](docs/architecture/decisions/index.md).
@@ -81,7 +81,7 @@ como NormalExit. Self-loops explícitos são aceitos sem análise de alcance.
 WORK-CFG-006 acrescenta `branch`: BRANCH_TRUE/BRANCH_FALSE conservam as duas
 alternativas explícitas e activationEntry, mesmo com destinos iguais. Predicate é
 validado pelo preflight e retido pela Sequence, sem avaliar valores nem detectar joins.
-`MVP-CFG-01` está em validação final local de M2–M5. CLI/arquivo são
+`MVP-CFG-01` local está implementado, com CF1 e M1–M5 provados. CLI/arquivo são
 outro milestone posterior. `invoke`, `raise`, `dispatch`, demais cenários cíclicos,
 controle aberto, `control.local@1` e
 `control.indirect@1` entram em slices próprios. Nenhum subset recebe claim

@@ -7,7 +7,7 @@ implementado agora. Registro verificável: [profile-obligations.json](profile-ob
 | --- | --- | --- |
 | CFG-FIRST (local) | Entry → Sequence(Return) → normal exit; memória; sem fallthrough | implementado |
 | WORK-CFG-022 (local) | instructions ordenadas, Jump explícito e Halt distinto/contextual | implementado |
-| MVP-CFG-01 (local) | linear, jump, branch, return/halt e IF/ELSE estrutural; unsupported honesto | planejado |
+| MVP-CFG-01 (local) | linear, jump, branch, return/halt e IF/ELSE estrutural; unsupported honesto | implementado |
 | AIR-STRUCTURE@2 | transferências, cycles, entries, invoke/outcomes, `return`/`raise`/`halt`, opaque/open, `TypeRef` e provas de domínio preservadas | não implementado |
 | AIR-LOCAL-CONTROL@2 | STRUCTURE@2 + `control.local@1`, matching, ports, resume/unwind | não implementado |
 | AIR-INDIRECT-CONTROL@2 | STRUCTURE@2 + `control.indirect@1`, universo de labels e transferência conservadora | não implementado |
@@ -41,3 +41,8 @@ Matriz futura de evidência deve registrar por obrigação: teste concreto, exec
 asserts estruturais, subasserts adiados, resultado e razão. Essa evidência, mais
 invariantes aplicáveis, autoriza o claim — não o nome de uma classe ou a existência
 de um arquivo de teste.
+
+MVP-CFG-01 local concluído em [WORK-CFG-006](../work/history/WORK-CFG-006.md):
+CF1/025, M1/028, M2–M5/029 e limites estruturais de M7, com gates disponíveis e
+CI Temurin 21 verdes. Perfis AIR acima continuam não implementados; evals amplos
+003/005/014 mantêm lacunas explicitadas no catálogo. Transporte é marco posterior.

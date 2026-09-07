@@ -1,7 +1,7 @@
 # BACKLOG-CFG-006 — Bifurcação e IF/ELSE estrutural
 
-**Estado:** `active`. **Fase:** `mvp`. **Autorização:** `implementation` em
-[WORK-CFG-006](../active/WORK-CFG-006/work-item.json), pelo prompt explícito do usuário.
+**Estado:** `completed`. **Fase:** `mvp`. **Autorização:** `implementation` em
+[WORK-CFG-006](../history/WORK-CFG-006.md), pelo prompt explícito do usuário.
 Dependências: BACKLOG-CFG-022.
 
 ## Problema e objetivo observável
@@ -53,3 +53,11 @@ END-IF/ELSE na fonte, exigir JSON ou CLI.
 Revisão/commit, diff explicado, testes/gates com exit codes, falsificação adversarial,
 capabilities/precisão realmente entregues e limitações. Até existir essa evidência,
 o estado permanece planejado e nenhum perfil recebe claim por antecipação.
+
+## Conclusão em WORK-CFG-006
+
+Branch estrutural implementado, EVAL-CFG-029=25 testes, EVAL-CFG-004 integral.
+025=17/028=22 preservados; mutantes A–G mortos, quatro metamorfismos e gates/CI verdes.
+MVP-CFG-01 local implemented. 003/005/014 permanecem planned com evidência parcial;
+nenhum perfil AIR, transporte, performance/integration ou próximo backlog promovido.
+PR #7 para human review, sem merge/auto-merge. Evidência no histórico vinculado acima.

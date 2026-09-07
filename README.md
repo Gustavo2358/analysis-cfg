@@ -10,7 +10,8 @@ Este projeto constrói CFGs a partir da **Analysis IR 2.0.0**, recebendo exatame
 a `Publication` do `air-java`, sem conhecer COBOL, Semantic Product, parser,
 filesystem, CLI ou cloud no núcleo. `CFG-FIRST` prova Entry → Sequence(`Return`) →
 normal exit em memória. WORK-CFG-022 acrescenta instructions, Jump e Halt;
-WORK-CFG-006 acrescenta Branch estrutural e valida M2–M5 para o MVP local.
+WORK-CFG-006 acrescenta Branch e conclui **MVP-CFG-01 local**, com M2–M5 provados.
+Nenhum perfil AIR normativo é reivindicado.
 
 ## Começar
 

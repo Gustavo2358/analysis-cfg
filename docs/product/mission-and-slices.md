@@ -39,7 +39,7 @@ EVAL-CFG-025 continua verde. Não há ProgramPoint especulativo nem dataflow.
 
 ## MVP-CFG-01: subset estrutural útil
 
-Marco em validação final local no WORK-CFG-006: inclui operações lineares, `jump`, `branch`, saídas `return`/`halt` e
+Marco local implementado em WORK-CFG-006: inclui operações lineares, `jump`, `branch`, saídas `return`/`halt` e
 IF/ELSE estrutural. `unknown(known(bool))` como predicado puro conserva os dois
 destinos; `unknown_type` não satisfaz a assinatura booleana. IFs aninhados são
 combinações das mesmas primitives, sem limite artificial de cardinalidade.
