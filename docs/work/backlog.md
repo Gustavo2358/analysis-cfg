@@ -49,3 +49,7 @@ adiados. 021 leva gates a CI e não bloqueia desenho semântico.
 | [BACKLOG-CFG-024](backlog/BACKLOG-CFG-024.md) | 0A: KNOWN_SUBSET default / STRICT opt-in | BACKLOG-CFG-006 | completed |
 
 **As construções COBOL são motivadores, não unidade de extensão do CFG.** IF→branch; GO TO/NEXT SENTENCE→jump; EVALUATE→dispatch/branches; loops→controle explícito; PERFORM/THRU→capability local quando compatível. O lowerer estabelece essa equivalência. Nenhum item autoriza assumir suporte de dialeto não provado.
+
+## Proveniência autorizada
+
+[BACKLOG-CFG-025](backlog/BACKLOG-CFG-025.md): active em WORK-CFG-025; pin do merge 1A, sem iniciar 2A/2B.

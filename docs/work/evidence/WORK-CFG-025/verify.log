@@ -1,0 +1,16 @@
+Verified command exit: 0
+Selected result lines; full local log SHA-256: b3f07cfbfe80f17f2830f9f52bbe5c63cb09a11e40b801dbbbb484c88c875daa
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.038 s -- in io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistryTest
+[INFO] Tests run: 20, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.124 s -- in io.github.gustavo2358.analysis.cfg.domain.EvalCfg030Test
+[INFO] Tests run: 25, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.109 s -- in io.github.gustavo2358.analysis.cfg.domain.EvalCfg029Test
+[INFO] Tests run: 22, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.051 s -- in io.github.gustavo2358.analysis.cfg.domain.EvalCfg028Test
+[INFO] Tests run: 17, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.023 s -- in io.github.gustavo2358.analysis.cfg.domain.EvalCfg025Test
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.006 s -- in io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinatorTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.007 s -- in io.github.gustavo2358.analysis.cfg.application.BuildCfgContractTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 s -- in io.github.gustavo2358.analysis.cfg.application.CfgPreflightTest
+[INFO] Tests run: 102, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Reactor Summary for Analysis CFG 0.1.0-SNAPSHOT:
+[INFO] Analysis CFG ....................................... SUCCESS [  0.093 s]
+[INFO] Analysis CFG Kernel ................................ SUCCESS [  2.673 s]
+[INFO] BUILD SUCCESS
+[INFO] Total time:  2.838 s

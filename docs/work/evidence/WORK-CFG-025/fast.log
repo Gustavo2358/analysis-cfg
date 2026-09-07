@@ -1,0 +1,6 @@
+Verified command exit: 0
+Selected result lines; full local log SHA-256: 32d7435943fd5a28ae4f05b7744bc0759423a4e565d5c289aa72efd85222abee
+[docs] PASS: local harness structure; NOT Java/IR/CFG semantic validation
+Ran 41 tests in 2.146s
+OK
+[fast] PASS: documentation and harness tests only

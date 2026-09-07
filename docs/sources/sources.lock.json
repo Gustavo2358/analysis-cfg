@@ -123,16 +123,16 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "6a4091e5394fc22b3d2ada9abbdb530eb3572a58",
+    "commit": "b78f4068d8a479f48eb048b8d76fa60a0997dc4a",
     "canonical_ref": "main",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
     "upstream_review": {
-      "pull_request": 1,
+      "pull_request": 5,
       "state": "merged",
-      "head_commit": "82cf1b86c30f50b4140743aedbd0f20cb4b19b3a",
-      "merge_commit": "6a4091e5394fc22b3d2ada9abbdb530eb3572a58",
-      "merged_at": "2026-09-06T17:35:46Z"
+      "head_commit": "b8d0d953024dceb37782944886ac02d5ec6d16f6",
+      "merge_commit": "b78f4068d8a479f48eb048b8d76fa60a0997dc4a",
+      "merged_at": "2026-09-07T21:30:12Z"
     },
     "analysis_ir": {
       "semantic_version": "2.0.0",
@@ -153,8 +153,8 @@
       "check_name": "contracts",
       "status": "completed",
       "conclusion": "success",
-      "checked_commit": "6a4091e5394fc22b3d2ada9abbdb530eb3572a58",
-      "url": "https://github.com/Gustavo2358/air-java/actions/runs/34049102909/job/101529376601"
+      "checked_commit": "b78f4068d8a479f48eb048b8d76fa60a0997dc4a",
+      "url": "https://github.com/Gustavo2358/air-java/actions/runs/34163367232/job/101869534574"
     },
     "read_paths": [
       "README.md",
@@ -165,16 +165,37 @@
       "docs/reconciliation-air-2.md",
       "docs/sources.lock.json",
       "docs/validation-evidence.md",
-      "src/main/java/io/github/gustavo2358/air/model/Publication.java",
-      "src/main/java/io/github/gustavo2358/air/model/Sequence.java",
-      "src/main/java/io/github/gustavo2358/air/model/Terminator.java",
-      "src/main/java/io/github/gustavo2358/air/model/Operations.java",
-      "src/main/java/io/github/gustavo2358/air/model/Interactions.java",
-      "src/main/java/io/github/gustavo2358/air/model/Control.java",
-      "src/main/java/io/github/gustavo2358/air/model/Origins.java",
-      "src/main/java/io/github/gustavo2358/air/model/Proofs.java",
-      "src/main/java/io/github/gustavo2358/air/validation/AirValidator.java"
-    ]
+      "air-model/src/main/java/io/github/gustavo2358/air/model/Publication.java",
+      "air-model/src/main/java/io/github/gustavo2358/air/model/Sequence.java",
+      "air-model/src/main/java/io/github/gustavo2358/air/model/Terminator.java",
+      "air-model/src/main/java/io/github/gustavo2358/air/model/Operations.java",
+      "air-model/src/main/java/io/github/gustavo2358/air/model/Interactions.java",
+      "air-model/src/main/java/io/github/gustavo2358/air/model/Control.java",
+      "air-model/src/main/java/io/github/gustavo2358/air/model/Origins.java",
+      "air-model/src/main/java/io/github/gustavo2358/air/model/Proofs.java",
+      "air-model/src/main/java/io/github/gustavo2358/air/validation/AirValidator.java",
+      "air-model/pom.xml",
+      "air-json/pom.xml",
+      "air-json/src/main/java/io/github/gustavo2358/air/json/AirJson.java",
+      "docs/engineering/air-json.md"
+    ],
+    "observed_on": "2026-09-07",
+    "modules": {
+      "parent": {
+        "path": "pom.xml",
+        "artifact_id": "air-java-parent"
+      },
+      "model": {
+        "path": "air-model/pom.xml",
+        "artifact_id": "air-java",
+        "role": "shared_model_and_validator"
+      },
+      "codec": {
+        "path": "air-json/pom.xml",
+        "artifact_id": "air-json",
+        "role": "shared_codec_1A_not_a_cfg_dependency"
+      }
+    }
   },
   "proleap_poc": {
     "repository": "Gustavo2358/proleap-poc",

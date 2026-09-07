@@ -1,0 +1,26 @@
+Verified command exit: 0
+Selected result lines; full local log SHA-256: cd1a7a75e832431ca6929f78e4730abe931e7180fa184b253f779036fa5efc60
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.034 s -- in io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistryTest
+[INFO] Tests run: 20, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.124 s -- in io.github.gustavo2358.analysis.cfg.domain.EvalCfg030Test
+[INFO] Tests run: 25, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.101 s -- in io.github.gustavo2358.analysis.cfg.domain.EvalCfg029Test
+[INFO] Tests run: 22, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.047 s -- in io.github.gustavo2358.analysis.cfg.domain.EvalCfg028Test
+[INFO] Tests run: 17, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.022 s -- in io.github.gustavo2358.analysis.cfg.domain.EvalCfg025Test
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.005 s -- in io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinatorTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.005 s -- in io.github.gustavo2358.analysis.cfg.application.BuildCfgContractTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 s -- in io.github.gustavo2358.analysis.cfg.application.CfgPreflightTest
+[INFO] Tests run: 102, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Reactor Summary for Analysis CFG 0.1.0-SNAPSHOT:
+[INFO] Analysis CFG ....................................... SUCCESS [  0.095 s]
+[INFO] Analysis CFG Kernel ................................ SUCCESS [  5.577 s]
+[INFO] BUILD SUCCESS
+[INFO] Total time:  5.739 s
+[INFO] BUILD SUCCESS
+[INFO] Total time:  0.598 s
+[INFO] BUILD SUCCESS
+[INFO] Total time:  0.610 s
+[architecture] PASS: 102 tests (0 skipped), 22 production classfiles, Java class major 65/no preview (Maven runtime 21.0.12.1)
+[architecture] PASS: compile dependency io.github.gustavo2358:air-java:0.1.0-SNAPSHOT and JDK module java.base only
+[architecture] PASS: CI source pin Gustavo2358/air-java@b78f4068d8a479f48eb048b8d76fa60a0997dc4a
+[architecture] PASS: BuildCfg(Publication, BuildOptions) -> CfgBuildResult and direct AirValidator preflight
+[architecture] PASS: explicit capability/version registry; no transport, reflection, frontend, AIR shadow, or control primitives beyond Jump/Branch/Return/Halt
+[architecture] PASS (exit 0)
