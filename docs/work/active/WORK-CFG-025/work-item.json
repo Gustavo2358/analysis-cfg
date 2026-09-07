@@ -6,7 +6,7 @@
   "risk": "low",
   "goal": "Adotar proveniência b78f4068d8a479f48eb048b8d76fa60a0997dc4a; sem implementação de produto.",
   "authorization": "discovery",
-  "authorization_evidence": "Pedido explícito do usuário em 2026-09-07: preparar somente proveniência/pinning para 2A/2B, com commit, push, CI e PR próprios; parar para review humano, sem merge.",
+  "authorization_evidence": "Pedido explícito do usuário em 2026-09-07: preparar somente proveniência/pinning para 2A/2B, com commit, push, CI e PR próprios; parar para review humano, sem merge. Review do PR #9 autorizou corrigir somente o setup explícito de Python 3.12 na CI e documentar Python 3.10+ para o build upstream, no mesmo CP0/PR.",
   "checkpoint": "CP0 provenance/pinning",
   "must_read": [
     "AGENTS.md",

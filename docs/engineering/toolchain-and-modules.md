@@ -14,6 +14,8 @@ commit:     b78f4068d8a479f48eb048b8d76fa60a0997dc4a
 Maven:      io.github.gustavo2358:air-java:0.1.0-SNAPSHOT
 AIR:        2.0.0 @ 122ce54e1b9ef9b00646f93ece409ca8b63bc933
 JDK:        21, sem preview
+Python:     >= 3.10, disponível como python3
+Python CI:  3.12
 ```
 
 `0.1.0-SNAPSHOT` é versão da biblioteca, não da AIR. Nenhuma tag/release foi
@@ -23,8 +25,11 @@ observada.
 
 O CI faz checkout de `analysis-cfg` e `air-java` como diretórios irmãos. O ref do
 upstream é o SHA completo acima e o workflow confirma `git rev-parse HEAD` antes de
-instalar. Com JDK 21, ambos os builds compartilham um repositório Maven inicialmente
-vazio e isolado, selecionado por
+instalar. Antes do build upstream, o workflow configura Temurin 21 e Python 3.12
+com `actions/setup-python@v5`. O POM raiz do upstream executa `python3` já na fase
+`validate`; Python 3.10+ é pré-requisito do build Maven, inclusive na reprodução
+local. Ambos os builds compartilham um repositório Maven inicialmente vazio e
+isolado, selecionado por
 `MAVEN_OPTS=-Dmaven.repo.local=${runner.temp}/analysis-cfg-m2`.
 
 A instalação é executada **com o working directory no checkout de `air-java`**:
@@ -39,7 +44,8 @@ O build da raiz instala `air-java-parent`, `air-model` (artefato `air-java`) e
 `air-json` (artefato `air-json`). Os paths de fontes são relativos a cada módulo;
 o consumer continua resolvendo apenas `io.github.gustavo2358:air-java`.
 
-A reprodução local usa a mesma sequência: clone de `air-java`, checkout detached
+A reprodução local exige JDK 21 e Python 3.10+ disponível como `python3` e usa a
+mesma sequência: clone de `air-java`, checkout detached
 do SHA fixado, confirmação de `HEAD`, diretório Maven temporário vazio, instalação
 a partir da raiz upstream e então build do consumer com o mesmo diretório Maven.
 Nenhum JAR é vendorizado ou publicado por este trabalho, e o core não depende do

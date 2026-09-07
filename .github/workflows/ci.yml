@@ -29,6 +29,11 @@ jobs:
           distribution: temurin
           java-version: "21"
 
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
       - name: Verify pinned air-java checkout
         working-directory: air-java
         run: test "$(git rev-parse HEAD)" = "b78f4068d8a479f48eb048b8d76fa60a0997dc4a"
