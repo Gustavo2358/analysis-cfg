@@ -277,3 +277,16 @@ Invariantes: INV-CFG-003/004/005/006/007/008/010/011/015/019/021/022/027/029.
 AIR-STRUCTURE@2, performance ou integration. 025 permanece byte a byte intacto;
 028 mantém 22 métodos e a fixture mista, com adaptação exclusiva do switch e da
 recusa obsoleta de Branch, sem absorver testes positivos do 029.
+
+## EVAL-CFG-030 — Política de projeção KNOWN_SUBSET/STRICT
+
+Implementado em WORK-CFG-024 (0A), com 20 métodos em
+[EvalCfg030Test](../../cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg030Test.java).
+Matriz COMPLETE/PARTIAL/UNAVAILABLE pela porta, subjects tipados de STRICT, grafo Return
+manual, coverage items/premises/evidence por identidade, zero inventado e metadados
+sem poder semântico. Recusas de terminador órfão, body, capabilities, validação incompleta,
+limites e AIR inválida permanecem. Caso parcial misto prova TRUE/FALSE no mesmo destino,
+activationEntry múltipla, Return, Halt, self-loop e determinismo. Seleção exata pelo semantic gate.
+EVAL-CFG-025 conserva seus 17 métodos: recusa antiga de PARTIAL agora seleciona STRICT;
+UNAVAILABLE nos dois modos é provado pelo 030. Oráculos 028/029 permanecem intactos.
+Nenhum claim de perfil nem de independência das lacunas para dataflow/reachability.

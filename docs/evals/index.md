@@ -5,6 +5,8 @@ verificar referências. EVAL-CFG-007 e EVAL-CFG-024 possuem prova executável da
 boundary; EVAL-CFG-027 prova localmente o registry de capability/version.
 EVAL-CFG-025 prova CFG-FIRST; EVAL-CFG-028 prova instructions lineares, Jump e
 Halt. EVAL-CFG-029 prova Branch estrutural/M2–M5 e satisfaz EVAL-CFG-004.
+EVAL-CFG-030 prova somente a política KNOWN_SUBSET/STRICT e preservação de evidence,
+sem completar os demais evals sobre interações/parcialidade ou perfis AIR.
 EVAL-CFG-001/002/003/005/013/014 continuam planned, com evidência parcial; os
 outros evals semânticos sem prova integral permanecem planejados. Nenhum perfil AIR completo foi implementado.
 

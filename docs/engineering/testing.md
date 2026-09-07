@@ -105,6 +105,15 @@ cujo k é invoke, fora deste slice. EVAL-CFG-005 recebe prova de ramo terminante
 invocador de O-19-STRUCT; 013 inclui dependências/inventário parcial; 014 inclui O-66/transportes.
 Esses evals recebem evidência parcial, nunca completion por linkage do backlog.
 
+## Evidência da política de inventário (0A)
+
+EVAL-CFG-030 adiciona 20 métodos pela porta real. O RED inicial foi comportamental:
+AIR válida, duas coverages PARTIAL, expected CFG_BUILT e actual UNSUPPORTED_INPUT.
+O oracle Return tem três nós e duas transições manuais; o caso misto parcial mantém
+contextos, braços e órfãs. Evidence/premises são comparadas por identidade.
+A recusa antiga no 025 passa a selecionar STRICT mantendo ambos os casos;
+028/029 e seus expected não mudam. O gate exige todos os métodos do 030 além das regressões.
+
 ## Evidência do slice Branch
 
 EVAL-CFG-029 mantém 25 métodos e expected manual em records/enums próprios. RED

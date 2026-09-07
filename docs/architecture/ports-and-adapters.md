@@ -12,9 +12,10 @@ BuildCfg.build(air-java Publication, BuildOptions) → CfgBuildResult
 `Publication` é exatamente `io.github.gustavo2358.air.model.Publication`, do
 artefato `io.github.gustavo2358:air-java`. A porta não define DTO/modelo semântico
 concorrente e não aceita `Path`, `InputStream`, bytes, JSON, COBOL Semantic Product,
-AST ou source code. `BuildOptions` continua contendo apenas
-`ValidationOptions`, política operacional já executada pelo preflight; não possui
-flags de dialeto, inferência, fallthrough ou suporte presumido. A Publication
+AST ou source code. `BuildOptions(ValidationOptions, ProjectionPolicy)` separa limites
+de validação da admissão de inventário. `BuildOptions.defaults()` e o construtor
+anterior de um argumento escolhem `KNOWN_SUBSET`; `STRICT` é opt-in. Não há flags
+de dialeto, inferência, fallthrough ou suporte presumido. A Publication
 inteira cruza a porta, sem pressupor Entry única. Seleção de entries só será
 adicionada quando um caso de uso concreto exigir. O resultado é tipado, imutável e
 não contém callback para completar fatos.
@@ -29,10 +30,45 @@ em falha ou com metadata/preflight incompatíveis. `CfgBuildCoordinator` delega 
 regra mínima ao domínio após preflight.
 
 `UNSUPPORTED_INPUT` identifica terminador diferente de Jump/Branch/Return/Halt, body
-indisponível, inventário parcial/indisponível ou necessidade de semântica de extensão
-ainda ausente. Seus subjects são IDs AIR; não opcodes textuais. Uma publicação
-com inventário completo e zero Units produz um inventário CFG realmente vazio,
-sem servir como placeholder para publicação desconhecida ou recusada.
+indisponível, inventário recusado pela policy ou necessidade de semântica de extensão
+ainda ausente. Seus subjects são IDs AIR; não opcodes textuais.
+
+## Política de projeção
+
+| Inventário de Publication e de cada Unit | KNOWN_SUBSET (default) | STRICT (opt-in) |
+| --- | --- | --- |
+| COMPLETE | admite | admite |
+| PARTIAL com AIR válida e fatos suportados | admite fatos conhecidos | INCOMPLETE_INVENTORY |
+| UNAVAILABLE | INCOMPLETE_INVENTORY | INCOMPLETE_INVENTORY |
+
+`ProjectionPolicy` pertence ao domínio; BuildOptions transporta a opção ao
+coordinator e ao único `CoreCfgProjection.unsupported`. A policy decide somente
+admissão de inventário, após preflight/capabilities. Nenhuma decisão lê código de
+gap, mensagem, nome de arquivo ou produtor. Nenhum caminho pula o preflight.
+
+KNOWN_SUBSET projeta todo o controle publicado suportado, inclusive órfãs, usando
+apenas Entry.initialLabel e terminadores AIR. Não inventa nós/arestas para lacunas,
+não infere ausência de fato não publicado nem afirma todo o controle possível.
+STRICT exige inventário COMPLETE nos escopos concretos da Publication e de todas
+as Units recebidas. Não exige cobertura de toda uma linguagem e não converte uma
+obrigação semântica externa em prova. Seleção de escopo menor não existe nesta API.
+
+`CFG_BUILT` afirma que há produto. A parcialidade é observável em
+`result.graph().orElseThrow().publication().coverage()` e na coverage de cada Unit.
+O mesmo snapshot preserva coverage items, uncertainties, premises e origins;
+headers mantêm precision/gaps por dimensão. Não há cópia/resumo que promova PARTIAL
+para COMPLETE, nem status redundante CFG_BUILT_PARTIAL. As opções efetivas ficam
+em `result.options()`.
+
+Inventário PARTIAL sem Units pode produzir zero nós em KNOWN_SUBSET, mantendo PARTIAL:
+isso enumera zero fatos publicados, sem provar que não existem Units/controle.
+UNAVAILABLE continua recusado. O grafo não calcula reachability, fechamento global
+ou independência causal das lacunas para análises futuras.
+
+AIR inválida/referências quebradas, validation limits/incomplete validation,
+capability sem intérprete, extensão ainda sem semântica, body indisponível e qualquer
+terminador não suportado continuam bloqueando o build. Não se publica grafo que
+omita silenciosamente uma operação AIR conhecida não suportada.
 
 O caller pode ser teste, módulo de integração, CLI ou adapter. Todos entregam o
 mesmo objeto semântico à mesma porta.
@@ -46,7 +82,9 @@ air-java AirValidator
     ↓
 version/capability/options preflight
     ↓
-Build CFG semantics
+ProjectionPolicy + supported core slice admission
+    ↓
+CoreCfgProjection
 ```
 
 A validação não fica exclusivamente no adapter de arquivo: uma instância recebida

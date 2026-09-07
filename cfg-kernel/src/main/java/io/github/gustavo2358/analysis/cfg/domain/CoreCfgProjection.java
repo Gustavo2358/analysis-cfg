@@ -2,7 +2,6 @@ package io.github.gustavo2358.analysis.cfg.domain;
 
 import io.github.gustavo2358.air.model.Capabilities;
 import io.github.gustavo2358.air.model.Entries;
-import io.github.gustavo2358.air.model.Evidence;
 import io.github.gustavo2358.air.model.Ids.LabelId;
 import io.github.gustavo2358.air.model.Operations;
 import io.github.gustavo2358.air.model.Publication;
@@ -14,6 +13,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /** Exact Entry/Jump/Branch/Return/Halt rules for preflight-validated AIR, without reachability or physical fallthrough. */
 public final class CoreCfgProjection {
@@ -24,21 +24,27 @@ public final class CoreCfgProjection {
         return Capabilities.MEMORY_REGIONS.equals(capability);
     }
 
-    /** Enumerates every unsupported occurrence. Capability registration alone supplies no interpretation. */
+    /** Default admission of the known subset; requires the same preflight as explicit policy admission. */
     public static List<CfgProjectionIssue> unsupported(Publication publication) {
+        return unsupported(publication, ProjectionPolicy.KNOWN_SUBSET);
+    }
+
+    /** Enumerates every rejection; inventory policy never supplies missing semantic interpretation. */
+    public static List<CfgProjectionIssue> unsupported(Publication publication, ProjectionPolicy policy) {
+        Objects.requireNonNull(policy, "policy");
         List<CfgProjectionIssue> issues = new ArrayList<>();
         if (publication.capabilities().required().stream().anyMatch(c -> !supportsControlCapability(c))) {
             issues.add(new CfgProjectionIssue(CfgProjectionIssue.Code.EXTENSION_SEMANTICS_OUTSIDE_SLICE,
                     publication.id()));
         }
-        if (publication.coverage().inventory() != Evidence.InventoryStatus.COMPLETE) {
+        if (!policy.acceptsInventory(publication.coverage().inventory())) {
             issues.add(new CfgProjectionIssue(CfgProjectionIssue.Code.INCOMPLETE_INVENTORY, publication.id()));
         }
         for (Unit unit : orderedUnits(publication)) {
             if (unit.body() != Unit.BodyAvailability.AVAILABLE) {
                 issues.add(new CfgProjectionIssue(CfgProjectionIssue.Code.BODY_UNAVAILABLE, unit.id()));
             }
-            if (unit.coverage().inventory() != Evidence.InventoryStatus.COMPLETE) {
+            if (!policy.acceptsInventory(unit.coverage().inventory())) {
                 issues.add(new CfgProjectionIssue(CfgProjectionIssue.Code.INCOMPLETE_INVENTORY, unit.id()));
             }
             for (Sequence sequence : orderedSequences(unit)) {

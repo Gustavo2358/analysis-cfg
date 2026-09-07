@@ -34,7 +34,8 @@ memory caller ───────────┘
 Contrato físico: `BuildCfg.build(air-java Publication, BuildOptions) →
 CfgBuildResult`, implementado pelo `CfgBuildCoordinator`. A porta não recebe `Path`,
 `InputStream`, JSON, COBOL ou Semantic Product. O caso de uso executa
-`AirValidator`, preflight de versão/capabilities e suporte ao slice; somente depois
+`AirValidator`, preflight de versão/capabilities, policy de inventário e suporte ao slice;
+somente depois
 projeta Entry/Jump/Branch/Return/Halt, preservando instructions. Trocar transporte preserva a porta.
 
 O Analysis IR JSON Binding 1.0.0 pertence ao `analysis-ir`, targets AIR 2.0.0 e
@@ -57,6 +58,10 @@ e negocia intérpretes compostos explicitamente por capability/version. O result
 `CFG_BUILT` contém `CfgGraph`; estados de falha têm `Optional.empty()` e conservam
 diagnostics. `UNSUPPORTED_INPUT` recusa primitives/forma fora do slice.
 O estado transitório `READY_FOR_CFG_PROJECTION` foi removido, sem significado duplo.
+WORK-CFG-024 (0A) torna a admissão explícita: KNOWN_SUBSET default aceita fatos suportados
+de inventário PARTIAL; STRICT exige COMPLETE na Publication e em cada Unit.
+CFG_BUILT não afirma completude; coverage/evidence permanecem na Publication original.
+[Contrato da policy](docs/architecture/ports-and-adapters.md#política-de-projeção).
 
 ## Primeiros marcos
 

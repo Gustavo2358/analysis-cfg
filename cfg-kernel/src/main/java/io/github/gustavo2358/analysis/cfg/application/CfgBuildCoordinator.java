@@ -51,7 +51,7 @@ public final class CfgBuildCoordinator implements BuildCfg {
         } else if (preflight.status() == ValidationResult.Status.INCOMPLETE_VALIDATION) {
             status = CfgBuildResult.Status.INCOMPLETE_VALIDATION;
         } else {
-            issues = CoreCfgProjection.unsupported(publication);
+            issues = CoreCfgProjection.unsupported(publication, options.projectionPolicy());
             if (issues.isEmpty()) {
                 graph = Optional.of(CoreCfgProjection.project(publication));
                 status = CfgBuildResult.Status.CFG_BUILT;

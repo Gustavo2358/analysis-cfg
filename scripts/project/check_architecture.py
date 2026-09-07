@@ -63,6 +63,7 @@ EXPECTED_PRODUCTION_IMPORTS = {
     SOURCE_ROOT + "application/BuildCfg.java": {PUBLICATION},
     SOURCE_ROOT + "application/BuildOptions.java": {
         VALIDATION_OPTIONS,
+        DOMAIN_CLASS + "ProjectionPolicy",
         "java.util.Objects",
     },
     SOURCE_ROOT + "application/CfgBuildCoordinator.java": {
@@ -131,11 +132,13 @@ EXPECTED_PRODUCTION_IMPORTS.update({
     SOURCE_ROOT + "domain/CfgProjectionIssue.java": {
         "io.github.gustavo2358.air.model.Ids.Id", "java.util.Objects",
     },
+    SOURCE_ROOT + "domain/ProjectionPolicy.java": {"io.github.gustavo2358.air.model.Evidence"},
     SOURCE_ROOT + "domain/CoreCfgProjection.java": {
-        "io.github.gustavo2358.air.model.Entries", "io.github.gustavo2358.air.model.Evidence",
+        "io.github.gustavo2358.air.model.Entries",
         "io.github.gustavo2358.air.model.Ids.LabelId", "io.github.gustavo2358.air.model.Operations",
         PUBLICATION, "io.github.gustavo2358.air.model.Sequence", "io.github.gustavo2358.air.model.Unit",
         "java.util.ArrayList", "java.util.Comparator", "java.util.HashMap", "java.util.List", "java.util.Map",
+        "java.util.Objects",
     },
 })
 EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CfgNode.java"].add(
@@ -148,7 +151,7 @@ EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CoreCfgProjection.java"].add(
 CFG_CLASS_NAMES = {
     "CfgNodeId", "CfgNode", "CfgNode$EntryNode", "CfgNode$SequenceNode", "CfgNode$NormalExit", "CfgNode$HaltExit",
     "CfgTransition", "CfgTransition$Kind", "CfgGraph", "CfgGraph$1",
-    "CfgProjectionIssue", "CfgProjectionIssue$Code", "CoreCfgProjection",
+    "CfgProjectionIssue", "CfgProjectionIssue$Code", "CoreCfgProjection", "ProjectionPolicy",
 }
 EXPECTED_CLASSFILES = {
     BUILD_CFG_PATH + ".class",
@@ -169,6 +172,7 @@ EXPECTED_TEST_CASES = {
     DOMAIN_CLASS + "EvalCfg025Test": 17,
     DOMAIN_CLASS + "EvalCfg028Test": 22,
     DOMAIN_CLASS + "EvalCfg029Test": 25,
+    DOMAIN_CLASS + "EvalCfg030Test": 20,
 }
 EXPECTED_PREFLIGHT_JDEPS_TARGETS = {
     PUBLICATION,

@@ -4,7 +4,7 @@ import io.github.gustavo2358.air.model.Ids.Id;
 
 import java.util.Objects;
 
-/** A valid AIR shape outside the implemented core slice, correlated without textual opcode dispatch. */
+/** A valid AIR shape rejected by the supported slice or inventory policy, correlated by AIR identity. */
 public record CfgProjectionIssue(Code code, Id subject) {
     public CfgProjectionIssue {
         Objects.requireNonNull(code, "code");

@@ -404,6 +404,21 @@
       ],
       "path": "docs/work/backlog/BACKLOG-CFG-023.md",
       "work_item": null
+    },
+    {
+      "id": "BACKLOG-CFG-024",
+      "title": "Checkpoint 0A — política KNOWN_SUBSET/STRICT",
+      "phase": "integration",
+      "status": "completed",
+      "dependencies": [
+        "BACKLOG-CFG-006"
+      ],
+      "evals": [
+        "EVAL-CFG-030"
+      ],
+      "path": "docs/work/backlog/BACKLOG-CFG-024.md",
+      "work_item": "WORK-CFG-024",
+      "completion_evidence": "docs/work/history/WORK-CFG-024.md"
     }
   ]
 }
