@@ -4,13 +4,17 @@ import io.github.gustavo2358.air.model.Capabilities;
 import io.github.gustavo2358.air.model.Publication;
 import io.github.gustavo2358.air.validation.ValidationIssue;
 import io.github.gustavo2358.air.validation.ValidationResult;
+import io.github.gustavo2358.analysis.cfg.domain.CfgFirstProjection;
+import io.github.gustavo2358.analysis.cfg.domain.CfgGraph;
+import io.github.gustavo2358.analysis.cfg.domain.CfgProjectionIssue;
 import io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
-/** Coordinates preflight and declared semantic support, stopping before CFG projection. */
+/** Coordinates preflight, capability negotiation and the CFG-FIRST domain projection. */
 public final class CfgBuildCoordinator implements BuildCfg {
     private static final Comparator<Capabilities.Capability> CAPABILITY_ORDER =
             Comparator.comparing(Capabilities.Capability::name)
@@ -34,31 +38,28 @@ public final class CfgBuildCoordinator implements BuildCfg {
                 .sorted(CAPABILITY_ORDER)
                 .toList();
 
-        return new CfgBuildResult(
-                status(preflight, unsupported),
-                publication.id(),
-                publication.airVersion(),
-                options,
-                preflight,
-                unsupported);
-    }
-
-    private static CfgBuildResult.Status status(
-            ValidationResult preflight,
-            List<Capabilities.Capability> unsupported) {
+        CfgBuildResult.Status status;
+        List<CfgProjectionIssue> issues = List.of();
+        Optional<CfgGraph> graph = Optional.empty();
         if (has(preflight, ValidationIssue.Kind.INVALID_IR)) {
-            return CfgBuildResult.Status.INVALID_IR;
+            status = CfgBuildResult.Status.INVALID_IR;
+        } else if (has(preflight, ValidationIssue.Kind.VALIDATION_LIMIT)) {
+            status = CfgBuildResult.Status.VALIDATION_LIMIT;
+        } else if (!unsupported.isEmpty()) {
+            status = CfgBuildResult.Status.UNSUPPORTED_CAPABILITY;
+        } else if (preflight.status() == ValidationResult.Status.INCOMPLETE_VALIDATION) {
+            status = CfgBuildResult.Status.INCOMPLETE_VALIDATION;
+        } else {
+            issues = CfgFirstProjection.unsupported(publication);
+            if (issues.isEmpty()) {
+                graph = Optional.of(CfgFirstProjection.project(publication));
+                status = CfgBuildResult.Status.CFG_BUILT;
+            } else {
+                status = CfgBuildResult.Status.UNSUPPORTED_INPUT;
+            }
         }
-        if (has(preflight, ValidationIssue.Kind.VALIDATION_LIMIT)) {
-            return CfgBuildResult.Status.VALIDATION_LIMIT;
-        }
-        if (!unsupported.isEmpty()) {
-            return CfgBuildResult.Status.UNSUPPORTED_CAPABILITY;
-        }
-        if (preflight.status() == ValidationResult.Status.INCOMPLETE_VALIDATION) {
-            return CfgBuildResult.Status.INCOMPLETE_VALIDATION;
-        }
-        return CfgBuildResult.Status.READY_FOR_CFG_PROJECTION;
+        return new CfgBuildResult(status, publication.id(), publication.airVersion(),
+                options, preflight, unsupported, issues, graph);
     }
 
     private static boolean has(ValidationResult result, ValidationIssue.Kind kind) {

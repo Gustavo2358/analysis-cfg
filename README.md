@@ -1,10 +1,11 @@
-# Analysis CFG — fundação do consumer AIR
+# Analysis CFG — consumer AIR
 
-**Entrega atual:** Java 21/Maven, porta física com `air-java` e seam explícito de
-capabilities, ainda sem algoritmo CFG. **Data:** 06/09/2026. **Repositório:**
+**Entrega atual:** CFG-FIRST em memória: Entry → Sequence(`Return`) → normal exit,
+com Java 21/Maven, `air-java` e seam explícito de capabilities.
+**Data:** 06/09/2026. **Repositório:**
 `Gustavo2358/analysis-cfg`.
 
-Este projeto construirá CFGs a partir da **Analysis IR 2.0.0**, recebendo exatamente
+Este projeto constrói CFGs a partir da **Analysis IR 2.0.0**, recebendo exatamente
 a `Publication` do `air-java`, sem conhecer COBOL, Semantic Product, parser,
 filesystem, CLI ou cloud no núcleo. `CFG-FIRST` prova Entry → Sequence(`Return`) →
 normal exit em memória; `MVP-CFG-01` acrescenta linear/jump/halt e branch/IF-ELSE.
@@ -17,11 +18,12 @@ depois pelo [índice de trabalho](docs/work/index.md). Não carregue o harness i
 ```bash
 bash scripts/harness/check-fast.sh
 bash scripts/harness/check-architecture.sh
+bash scripts/harness/check-semantic.sh
 ```
 
 Requisitos: Bash, Python 3.9+, Maven e JDK 21 ou mais novo. O bytecode é sempre
 compilado com `--release 21`, sem preview; o CI executa com JDK 21. Python valida
-somente o harness e o gate arquitetural, não implementa CFG.
+o harness e inspeciona a execução dos testes Java; o CFG é implementado em Java.
 
 O SNAPSHOT `io.github.gustavo2358:air-java:0.1.0-SNAPSHOT` precisa ser instalado
 antes do build a partir do source SHA fixado. A sequência reproduzível local e de
@@ -43,17 +45,20 @@ Nenhum JAR ou modelo AIR é copiado para este repositório.
 O backlog é plano, não autorização. `WORK-CFG-001` concluiu as decisões pré-Java,
 `WORK-CFG-002` materializou `Publication → AirValidator → CfgPreflight`, e
 `WORK-CFG-003` fechou `BuildCfg(Publication, BuildOptions) → CfgBuildResult` mais o
-registry por capability/version. Nós, arestas e interpretação de controle continuam
-fora deste checkpoint.
+registry por capability/version. WORK-CFG-005 implementa o primeiro produto:
+`CfgGraph` imutável, nós e IDs próprios, correlação AIR, transições ENTRY/RETURN e
+saídas por Unit/Entry. `CfgBuildResult.CFG_BUILT` contém o CFG; falhas não têm grafo.
+Jump, Halt, branch, invoke, JSON, CLI e dataflow permanecem posteriores.
 
 ## O que os gates significam hoje
 
 `docs`, `harness` e `fast` verificam arquivos, referências, IDs, dependências de
 backlog, work items e os próprios validadores documentais. `architecture` executa
-Maven/testes e inspeciona dependências e bytecode do kernel. `semantic`,
+Maven/testes e inspeciona dependências e bytecode do kernel. `semantic` executa
+explicitamente os 20 testes de EVAL-CFG-025 e rejeita testes ausentes ou pulados.
 `performance`, `integration` e, por consequência, `full` permanecem
-**UNAVAILABLE / exit 3**. Nenhum verde deste checkpoint significa CFG pronto nem
-conformidade com um perfil AIR.
+**UNAVAILABLE / exit 3**; full executa fast, architecture e semantic antes de parar
+em performance. CFG-FIRST não implica conformidade com um perfil AIR completo.
 
 A especificação upstream é referenciada por commit e hashes de blobs. O pacote
 contém um mapa de leitura e síntese, **não uma cópia integral da especificação**.

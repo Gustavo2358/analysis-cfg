@@ -2,18 +2,20 @@
 
 ## Item ativo
 
-Nenhum. A conclusão de WORK-CFG-003 não autoriza CFG-FIRST.
+Nenhum. WORK-CFG-005 foi concluído; o checkpoint para em review humano do PR,
+sem merge nem autorização para outro backlog.
 
 ## Último item concluído
 
-[WORK-CFG-003](history/WORK-CFG-003.md) — `completed`, porta
-`BuildCfg(Publication, BuildOptions) → CfgBuildResult`, seam explícito por
-capability/version e gate arquitetural ampliado; nenhum algoritmo CFG.
+[WORK-CFG-005](history/WORK-CFG-005.md) — `completed`, CFG-FIRST em memória:
+Entry → Sequence(Return) → normal exit por Unit/Entry; oracle independente,
+mutante de fallthrough morto, semantic gate real e CI Temurin 21 verde.
 
 ## Próximos candidatos
 
-BACKLOG-CFG-004 e BACKLOG-CFG-005 permanecem `planned`, sem work item e sem
-autorização. BACKLOG-CFG-005 é CFG-FIRST e não foi iniciado.
+BACKLOG-CFG-004, BACKLOG-CFG-022 e BACKLOG-CFG-006 permanecem `planned`, sem
+work item e sem autorização de execução neste checkpoint. BACKLOG-CFG-022 não
+foi iniciado.
 
 ## Roteamento
 

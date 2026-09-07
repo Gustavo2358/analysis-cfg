@@ -25,6 +25,14 @@
       "status": "completed",
       "authorization": "implementation",
       "completed_on": "2026-09-06"
+    },
+    {
+      "id": "WORK-CFG-005",
+      "backlog_id": "BACKLOG-CFG-005",
+      "path": "docs/work/history/WORK-CFG-005.md",
+      "status": "completed",
+      "authorization": "implementation",
+      "completed_on": "2026-09-06"
     }
   ]
 }

@@ -5,8 +5,8 @@
 Regra normativa → classes semânticas → adversariais contra o atalho óbvio → esperado
 independente → teste RED observado → implementação mínima geral → GREEN →
 refatoração → challenge independente → gates e handoff.
-Planejar testes não é RED executado. Os evals semânticos de CFG continuam
-`planned`; EVAL-CFG-007 e EVAL-CFG-024 têm implementação de boundary, e
+Planejar testes não é RED executado. EVAL-CFG-025 implementa CFG-FIRST; os demais
+evals semânticos continuam `planned`. EVAL-CFG-007 e EVAL-CFG-024 têm boundary, e
 EVAL-CFG-027 implementa somente a prova arquitetural local do registry.
 Não usar mocks do próprio algoritmo para provar o algoritmo.
 
@@ -30,10 +30,13 @@ referência independente, exato em casos pequenos/limitados e escrito só nos te
 pode apoiar falsificação. Ele não certifica recursão ilimitada nem toda a linguagem.
 Golden files só sob regras/correlações explícitas; contagens de corpus são telemetria.
 
-Na foundation da porta/seam, o oracle compila a assinatura exata, exige que o
-resultado não contenha grafo/sucesso e registra uma capability sintética pelo mesmo
-coordinator. O RED foi a ausência das classes produtivas. Mutantes de unsupported,
-filesystem, AIR paralela e discovery reflexiva devem falhar antes de GREEN.
+Na foundation da porta/seam, o oracle exigia ausência de grafo porque ainda não
+havia projeção. CFG-FIRST evolui explicitamente essa obrigação: sucesso exige
+produto real; cada falha exige ausência. A assinatura e o teste sintético do seam
+são preservados. O oracle de EVAL-CFG-025 foi commitado antes do builder com RED
+por símbolos/API ausentes. O mutante de fallthrough após Return falhou tanto na
+guarda do produto quanto no expected independente quando essa guarda foi
+temporariamente desativada; ambas as mutações foram revertidas antes do GREEN.
 
 ## O que comparar
 

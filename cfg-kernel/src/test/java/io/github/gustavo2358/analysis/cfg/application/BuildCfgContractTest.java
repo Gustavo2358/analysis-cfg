@@ -2,17 +2,22 @@ package io.github.gustavo2358.analysis.cfg.application;
 
 import io.github.gustavo2358.air.model.Publication;
 import io.github.gustavo2358.air.validation.ValidationOptions;
+import io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry;
+import io.github.gustavo2358.analysis.cfg.testing.CfgFirstPublications;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Set;
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class BuildCfgContractTest {
     @Test
@@ -65,18 +70,24 @@ class BuildCfgContractTest {
     }
 
     @Test
-    void resultEnvelopeCannotPretendThatAConfigGraphExists() {
+    void resultEnvelopeRequiresARealProductExactlyOnSuccess() {
         assertTrue(CfgBuildResult.class.isRecord());
         assertTrue(Modifier.isFinal(CfgBuildResult.class.getModifiers()));
-        Set<String> componentNames = Arrays.stream(CfgBuildResult.class.getRecordComponents())
-                .map(component -> component.getName().toLowerCase(java.util.Locale.ROOT))
-                .collect(java.util.stream.Collectors.toSet());
-
-        assertFalse(componentNames.contains("graph"));
-        assertFalse(componentNames.contains("nodes"));
-        assertFalse(componentNames.contains("edges"));
-        assertFalse(componentNames.contains("success"));
-        assertTrue(Arrays.stream(CfgBuildResult.class.getDeclaredMethods())
-                .noneMatch(method -> method.getName().equals("isSuccess")));
+        Publication publication = CfgFirstPublications.minimal();
+        CfgBuildResult result = new CfgBuildCoordinator(SemanticInterpreterRegistry.empty())
+                .build(publication, BuildOptions.defaults());
+        assertEquals(CfgBuildResult.Status.CFG_BUILT, result.status());
+        assertThrows(IllegalArgumentException.class,
+                () -> new CfgBuildResult(CfgBuildResult.Status.CFG_BUILT, result.publicationId(),
+                        result.airVersion(), result.options(), result.preflight(), List.of(),
+                        List.of(), Optional.empty()));
+        for (CfgBuildResult.Status failure : CfgBuildResult.Status.values()) {
+            if (failure != CfgBuildResult.Status.CFG_BUILT) {
+                assertThrows(IllegalArgumentException.class,
+                        () -> new CfgBuildResult(failure, result.publicationId(), result.airVersion(),
+                                result.options(), result.preflight(), List.of(),
+                                List.of(), result.graph()));
+            }
+        }
     }
 }

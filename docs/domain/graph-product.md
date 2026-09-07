@@ -7,18 +7,48 @@ capabilities, premissas e política de precisão usadas. Não gravar successors,
 alcançabilidade ou caches mutáveis na IR. IDs CFG são próprios, correlacionados com
 identidades IR; não reutilizar source span como identidade de nó.
 
-Conceitos necessários, ainda sem classes Java congeladas:
+Conceitos do produto completo (somente Entry/Return implementados agora):
 
 - inventário de nós/sequences e seus operations/program points;
 - transições conhecidas com outcome, predicado/case/tag quando aplicáveis;
 - entradas distintas, saídas normais/excepcionais, halt/diverge e fronteiras abertas;
 - correlação para IR/provenance, gaps, capabilities e limites da alegação.
 
-No `CFG-FIRST`, `Return` produz saída normal da ativação da `Unit`, não uma
-continuação para a próxima Sequence. O resultado preserva `UnitId` e, quando o
-build/consulta é scoped a uma Entry, o `EntryId` relevante. Um nó/objeto sintético
-de saída pode pertencer ao CFG, mas sua identidade/correlação não funde entradas
-silenciosamente nem cria um único exit global da Publication.
+## Modelo Java CFG-FIRST implementado
+
+No package `io.github.gustavo2358.analysis.cfg.domain`:
+
+- `CfgGraph`: classe final com referência à Publication original e inventário de
+  nós/transições imutáveis. Materializa as listas de entries e normal exits uma vez
+  durante a construção; `entries()` e `normalExits()` retornam essas mesmas listas
+  em O(1), sem percorrer nós ou alocar novamente;
+- `CfgNodeId(PublicationId, ordinal)`: identidade do CFG, distinta de qualquer ID
+  AIR. Ordinais são atribuídos deterministicamente por namespace/ID e papel; não
+  têm estabilidade prometida entre publicações/revisões diferentes;
+- `CfgNode.EntryNode`: ID CFG e referência à `Entries.Entry` original;
+- `CfgNode.SequenceNode`: ID CFG e referência à `Sequence` original, preservando
+  Return/header/values/origin. Uma Sequence origina exatamente um nó;
+- `CfgNode.NormalExit`: ID CFG, PublicationId, UnitId e EntryId. É sintético e
+  não tem source span/origin inventado;
+- `CfgTransition(from, to, kind, activationEntry)`: `ENTRY` estabelece a Entry
+  corrente, e `RETURN` vale apenas sob essa Entry, terminando no seu NormalExit.
+
+A regra segue AIR §04.8: não existe `return.entryScope` na entrada. Um Return
+compartilhado tem uma transição condicionada por Entry da Unit, sem duplicar o nó
+Sequence nem inventar um exit global. As transições não são arestas incondicionais:
+um consumidor deve conservar `activationEntry` ao compor um caminho. Isso não
+implementa frames locais nem consulta de reachability.
+
+Órfãs permanecem no inventário, sem predecessor artificial. Suas regras Return
+continuam materializadas, sem afirmar alcançabilidade. O grafo verifica unicidade
+de IDs, fechamento e compatibilidade tipada das transições; seus containers são
+copiados, mas nenhuma Publication, Unit, Entry, Sequence ou lista AIR é deep-copiada.
+A referência à Publication mantém coverage, precisão, gaps, premises e todas as
+origens resolvíveis, sem cache mutável ou callback.
+
+`CfgProjectionIssue` identifica recusa de formas fora do slice; falhas não têm
+produto parcial/fake. Branch predicates, invoke outcomes, open control, frames e
+indirect targets não têm tipos antecipados neste checkpoint.
 
 Divergência é comportamento sem próximo estado observável: sua representação não
 cria caminho artificial até uma saída normal. Uma saída sintética é convenção do

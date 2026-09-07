@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "phase": "implementation",
-  "runtime_authorization": "WORK-CFG-003",
+  "runtime_authorization": "WORK-CFG-005",
   "product_gates": {
     "architecture": {
       "status": "implemented",
       "hook": "scripts/project/check-architecture.sh"
     },
     "semantic": {
-      "status": "unavailable",
-      "hook": null
+      "status": "implemented",
+      "hook": "scripts/project/check-semantic.sh"
     },
     "performance": {
       "status": "unavailable",

@@ -7,7 +7,7 @@ parte deste pipeline. O preflight chama `AirValidator` também para objetos rece
 em memória; transporte inválido é tratado antes. Modelo compartilhado não implica
 confiar cegamente em uma instância criada pelo caller.
 
-## Passes propostos
+## Pipeline e fronteira implementada
 
 1. Executar `AirValidator` sem mutar a Publication; propagar invalidade e validação
    incompleta com seus diagnósticos. Não duplicar as regras AIR localmente.
@@ -26,9 +26,14 @@ confiar cegamente em uma instância criada pelo caller.
 7. Validar produto derivado; publicar grafo, índices de navegação, mapeamentos,
    capabilities utilizadas, premissas, gaps e precisão.
 
-`CFG-FIRST` executa somente os passos necessários para Entry/Sequence/Return e
-normal exit, mas continua inventariando todas as sequences e recusando capability
+`CFG-FIRST` está implementado e executa os passos necessários para
+Entry/Sequence/Return e normal exit, inventariando todas as sequences e recusando capability
 fora do slice de modo explícito. Não cria fallthrough para completar o grafo.
+`CfgFirstProjection` indexa labels namespaced uma vez por Unit e retém fatos AIR
+imutáveis. Entries usam somente initialLabel; Return emite transições condicionadas
+por Entry da ativação. Instructions, outros terminadores e inventário/corpo
+indisponível são recusados antes de publicar produto. Os demais passes acima
+continuam direção futura, sem claim de implementação.
 
 Leaders não precisam ser redescobertos: cada label já inicia Sequence e não pode
 entrar em seu interior. Blocos máximos, remoção de nós e coalescing ficam adiados.
@@ -42,6 +47,12 @@ O(quantidade de fatos lidos + transições emitidas), sob lookup indexado. Não 
 isso de O(N) omitindo dispatch com muitos cases ou expansão de fronteira aberta.
 Preservar escopos abertos simbolicamente evita cross-product obrigatório.
 Controle contextual tem custo próprio, a justificar no respectivo discovery.
+
+CFG-FIRST ordena Units, Entries e Sequences por IDs apenas para determinismo da
+representação: O(N log N + T), com T incluindo uma regra Return por Sequence/Entry
+da Unit. Memória derivada O(N + T), sem deep copy da AIR. Essa expansão é explícita
+no tamanho de saída, não enumeração de ativações dinâmicas; performance permanece
+sem gate implementado.
 
 ## Invariantes entre passes
 

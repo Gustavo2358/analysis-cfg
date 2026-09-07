@@ -20,12 +20,23 @@ terminador legítimo em erro de source nem autoriza pular a operação.
 
 ## Primeiro slice
 
-`CFG-FIRST` interpreta apenas uma Entry cujo `initialLabel` referencia uma Sequence
-terminada por `return`. Emite entrada, nó correlacionado e saída normal escoped por
-Unit/Entry. Outras sequences permanecem inventariadas; nenhuma posição física cria
+`CFG-FIRST` implementado interpreta todas as Entries e Sequences de Units com
+corpo disponível, inventário completo e sem instructions. Cada Entry usa seu
+`initialLabel`; somente `return` é suportado como terminador. Emite entrada, um
+nó por Sequence e saída normal por Unit/Entry. Outras sequences permanecem
+inventariadas; nenhuma posição física cria
 aresta. Label pendente é rejeitado no preflight, e terminador ausente não recebe
 fallthrough reparador. `halt` permanece diferente de `return` e só entra em slice
-posterior.
+posterior. Primitives diferentes de Return, inclusive em órfãs, produzem
+`UNSUPPORTED_INPUT` sem grafo; não são ignoradas. A tabela acima descreve o destino
+do projeto, não features já implementadas.
+
+AIR §04.8 e `Operations.Return(Header, List<Expression>)` não possuem seletor
+`entryScope`. O retorno segue a Entry da ativação. Por isso a transição RETURN
+carrega a condição `activationEntry` e alcança apenas o NormalExit dessa Entry.
+Todos os retornos são inventariados para cada Entry da Unit, inclusive órfãos; isso
+não afirma que todas essas regras são alcançáveis. Operandos retornados são
+preservados pelo mesmo objeto AIR, sem avaliar seus valores.
 
 ## Branch e seleção
 

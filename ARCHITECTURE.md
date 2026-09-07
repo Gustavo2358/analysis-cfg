@@ -1,7 +1,7 @@
 # Arquitetura — mapa curto
 
-**A fundação Java/Maven, a porta física e o seam explícito de capabilities estão
-implementados; o algoritmo CFG continua não implementado.**
+**CFG-FIRST está implementado: Entry → Sequence(Return) → normal exit por
+Unit/Entry, em memória, com produto imutável e correlações AIR.**
 [ADRs](docs/architecture/decisions/index.md).
 
 ```text
@@ -33,8 +33,8 @@ memory caller ───────────┘
 Contrato físico: `BuildCfg.build(air-java Publication, BuildOptions) →
 CfgBuildResult`, implementado pelo `CfgBuildCoordinator`. A porta não recebe `Path`,
 `InputStream`, JSON, COBOL ou Semantic Product. O caso de uso executa
-`AirValidator`, preflight de versão/capabilities e para antes da semântica CFG.
-Trocar transporte não muda a porta nem o algoritmo futuro.
+`AirValidator`, preflight de versão/capabilities e suporte ao slice; somente depois
+projeta Entry/Return. Trocar transporte preserva a porta.
 
 O Analysis IR JSON Binding 1.0.0 pertence ao `analysis-ir`, targets AIR 2.0.0 e
 permanece DRAFT no commit fixado. Ele não é implementado neste checkpoint. Um
@@ -53,11 +53,13 @@ ausência de codec não bloqueia testes com `Publication` construída em memóri
 `analysis-cfg` não contém um segundo modelo AIR. A foundation prova
 `Publication → BuildCfg + BuildOptions → CfgBuildResult`, reutiliza `AirValidator`
 e negocia intérpretes compostos explicitamente por capability/version. O resultado
-`READY_FOR_CFG_PROJECTION` não contém grafo e não representa sucesso CFG.
+`CFG_BUILT` contém `CfgGraph`; estados de falha têm `Optional.empty()` e conservam
+diagnostics. `UNSUPPORTED_INPUT` recusa primitives/forma fora do slice.
+O estado transitório `READY_FOR_CFG_PROJECTION` foi removido, sem significado duplo.
 
 ## Primeiros marcos
 
-`CFG-FIRST` é a prova executável mínima:
+`CFG-FIRST` é a prova executável mínima implementada em WORK-CFG-005:
 
 ```text
 entry(E) → node(sequence L, terminator Return) → normal exit(UnitId, EntryId)
@@ -65,7 +67,10 @@ entry(E) → node(sequence L, terminator Return) → normal exit(UnitId, EntryId
 
 A saída deriva de `Return`, nunca da posição física da Sequence. Uma Sequence
 posterior não recebe fallthrough. Cada Sequence origina um nó CFG próprio; não há
-leader detection nem coalescing obrigatório.
+leader detection nem coalescing obrigatório. `Return` não possui `entryScope` na
+AIR fixada (§04.8): segue a Entry da ativação corrente. Transições RETURN do CFG
+carregam `activationEntry`, condição que impede cruzar saídas de Entries distintas.
+Não são arestas incondicionais; inventário não é prova de reachability.
 
 `MVP-CFG-01` permanece posterior e acrescenta operações lineares, `jump`, `halt`,
 `branch` e IF/ELSE estrutural. CLI/arquivo são outro milestone posterior. `invoke`,

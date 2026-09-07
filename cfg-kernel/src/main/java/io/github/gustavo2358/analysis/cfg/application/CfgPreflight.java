@@ -6,7 +6,7 @@ import io.github.gustavo2358.air.validation.ValidationOptions;
 import io.github.gustavo2358.air.validation.ValidationResult;
 
 /**
- * Structural preflight for the future CFG use case.
+ * Structural preflight for the CFG use case.
  *
  * <p>The complete upstream validation result crosses this boundary unchanged so
  * callers cannot lose unsupported capabilities, limits, or semantic obligations.
