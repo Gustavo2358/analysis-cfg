@@ -103,6 +103,22 @@ escrita deste trabalho em repo irmão, branch 2A ou roadmap externo.
 Scope e MANIFEST.sha256 são conferidos por `python3 scripts/project/check_scope.py`;
 regeneração explícita somente depois de revisar diff: `--update-manifest`.
 
+## PR e vínculo remoto factual
+
+[PR #10](https://github.com/Gustavo2358/analysis-cfg/pull/10) aberto em 2026-09-07,
+base main, branch feat/air-json-cfg-cli. Commit de implementação
+`a3ff7c4e0408998ec6ca76a35c51436a16492e3a` publicado por push normal; `git ls-remote`
+confirmou exatamente o mesmo SHA. Contrato/RED no commit anterior `7d22315`.
+Consulta GitHub confirmou OPEN e autoMergeRequest null; nenhuma aprovação humana
+foi inferida. O [CI push desse commit](https://github.com/Gustavo2358/analysis-cfg/actions/runs/34171200323)
+concluiu SUCCESS. Isso é evidência remota distinta do segundo GREEN local acima.
+
+Este vínculo documental exige novo commit e push. Fast, scope/manifest e diff check
+são reexecutados; os hashes produtivos do recibo local permanecem iguais. A conclusão
+dos checks no **head final** será registrada no corpo do PR com o SHA exato e links
+aos runs. Não se usa o CI do commit anterior para declarar o head final verde.
+Aguardar review humano; WORK-CFG-026 permanece ativo até encerramento autorizado.
+
 ## Limitações e checkpoint seguinte
 
 Input limitado à cobertura 1A do codec pinado (16 MiB/depth 128); writer cobre os

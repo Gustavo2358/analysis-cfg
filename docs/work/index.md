@@ -2,7 +2,7 @@
 
 ## Item ativo
 
-[WORK-CFG-026](active/WORK-CFG-026/work-item.json): implementation autorizada, 2B — AIR JSON reader + CFG JSON output + CLI. [Estado](active/WORK-CFG-026/state.md). Parada em PR/CI para review humano, sem merge.
+[WORK-CFG-026](active/WORK-CFG-026/work-item.json): implementation autorizada, 2B — AIR JSON reader + CFG JSON output + CLI. [Estado](active/WORK-CFG-026/state.md). [PR #10](https://github.com/Gustavo2358/analysis-cfg/pull/10) aberto; parada após CI no head final para review humano, sem merge.
 
 ## Último item concluído
 

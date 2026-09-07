@@ -108,10 +108,10 @@ b3e3beaf977f8ffbb4671191b51f8a114582345fd70cb615e582c68669ea5a02  docs/templates
 ceded1bdce024c018ad5aedbc39bf0d242fa5e5223f66f02aa2e415b1f051f21  docs/templates/work-item/spec.md.template
 f5e5e02a909f312521a229013e720ac5b727706d38cf398eceb033fb0d319242  docs/templates/work-item/state.md.template
 3aa71ab2b5cb6d60d6877079559858460024a3a4427b96d9f20259a294d8ea69  docs/templates/work-item/work-item.json.template
-10ba6c69eb10f8689fb0db54ebbc6cab95f52c22a8e2a768c0495f35bd5ba4ce  docs/work/active/WORK-CFG-026/eval.md
+ef468f99f74065d6d7c7bf0e5ad00bfd41eda87ccc40ab36c66e7d137bf3f29e  docs/work/active/WORK-CFG-026/eval.md
 805f3f942a9eb61ceeed9873bc5b77e627c517a65aa07cef1bb8a29d764d4f01  docs/work/active/WORK-CFG-026/plan.md
 9f59e008e68dbe9287619dca27fc3c82dc92f8c1dd1716a3142b8c6e9c34324b  docs/work/active/WORK-CFG-026/spec.md
-a4189c6ef05b45d5e4259f234d0cc190df0d719b909dbbde09aa5017cf76d94f  docs/work/active/WORK-CFG-026/state.md
+b3896916057e392b4956606b6181f4b9df8552b9ef3ff5f9b3118f1053fd545c  docs/work/active/WORK-CFG-026/state.md
 7496d64244be65b0f778c5035d7e948bd9cacc154738dd5a52adb6bba324aef8  docs/work/active/WORK-CFG-026/work-item.json
 34bfce56e4c295092576f04bfeab8a4963a4cf3345a605820949a2ac47c8961c  docs/work/backlog.json
 79eb108c5fbce5180815cd8d446ea37c69de873946a5e67fedceb5a97ccea0ef  docs/work/backlog.md
@@ -153,7 +153,7 @@ ffa9da72876e5c6361fc2950e4c9020458c0207a3c6e51be750fd38c959cf584  docs/work/evid
 af4429e4f71ef570b5e833dd8f3687047cf3c6f5add54065c9210343ae34fa71  docs/work/evidence/WORK-CFG-026-red.md
 5a4bbe2767cdfa6421f38c53d71c375debc370096d54a5931e3d5a2b129bb06e  docs/work/evidence/WORK-CFG-026/challenges.json
 123d448c03061a0416604751781fbcadd73cee0c41065ba0a9510c6079c402a6  docs/work/evidence/WORK-CFG-026/local-validation.json
-7592783d1522bb102fcdd6e780dc5abe8f117452b4196f70c6aeac825fc45723  docs/work/evidence/WORK-CFG-026/validation.md
+e2fa12e3ac0b7eb85c49ac201da7d80071aeff5ff1bc7eac765c9e29b75dff6c  docs/work/evidence/WORK-CFG-026/validation.md
 5ae799cd6cd620667033886ff3a081a0512b61002280dae3c7ec33947f89e5bf  docs/work/history/README.md
 6b0467f904f4044c48575c6a4e87ded68bfcfe6476d9fddb4d60d6b8f65137cf  docs/work/history/WORK-CFG-001.md
 63cfa0f914f840cebc9ec6db73a6d26c3f601f7ed223f7471533e6e0eeefeb36  docs/work/history/WORK-CFG-002.md
@@ -163,7 +163,7 @@ a6232562780b2bc9a14382a328d34b2a45232c4969769aab213e4a552dd2402f  docs/work/hist
 359c96fbbcd14f5dd9df0c5ab1e76f77f2d9619acc96fe8b8040099382245a05  docs/work/history/WORK-CFG-022.md
 43ee4185a6822bea2be457e332ea30f7494c0ca235271f58bc66031267234fec  docs/work/history/WORK-CFG-024.md
 e6a9e5ab5d0443c8f69042c03888cd734e0354b2373eb5018819e1a3971bb503  docs/work/history/WORK-CFG-025.md
-888faa4e7ac87cec1f809b496b4dbeb0ccc32ef8b1e433562d19e7cc48a8de60  docs/work/index.md
+1f90852952315947697e64fc5f0438ee505c72ffad51fab8ae0d554de7897b19  docs/work/index.md
 483461074369102ddf6224b13b5841c3f0e303be3e17b49734ad3f6d3703abb8  docs/work/registry.json
 c69bd9f835e7a77fa4010b2f0b184d9450d44a5d6df55d93b104c0e298119687  pom.xml
 e7fd4166052b98e47583b091dbeab18bed04d869bdcaace1b6350480578e781d  scripts/analysis-cfg
