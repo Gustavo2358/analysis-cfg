@@ -26,10 +26,11 @@ confiar cegamente em uma instância criada pelo caller.
 7. Validar produto derivado; publicar grafo, índices de navegação, mapeamentos,
    capabilities utilizadas, premissas, gaps e precisão.
 
-CFG-FIRST e WORK-CFG-022 executam os passos necessários para Entry, instructions,
-Jump, Return e Halt. CoreCfgProjection substitui CfgFirstProjection como único
+CFG-FIRST, WORK-CFG-022 e WORK-CFG-006 executam os passos necessários para Entry, instructions,
+Jump, Branch, Return e Halt. CoreCfgProjection substitui CfgFirstProjection como único
 caminho de produção; indexa labels namespaced uma vez por Unit e retém AIR imutável.
-Entries usam initialLabel; Jump usa destination; Return/Halt produzem resultados
+Entries usam initialLabel; Jump usa destination; Branch usa trueDestination e
+falseDestination, sem acessar valores do predicate; Return/Halt produzem resultados
 distintos. Regras de terminador conservam activationEntry, inclusive em órfãs.
 Instructions permanecem na Sequence original, com ordem explícita e correlação dos
 pontos. Não há classe adicional de ProgramPoint, reachability ou fallthrough físico.
@@ -51,8 +52,8 @@ Preservar escopos abertos simbolicamente evita cross-product obrigatório.
 Controle contextual tem custo próprio, a justificar no respectivo discovery.
 
 O core ordena Units, Entries e Sequences por IDs apenas para determinismo da
-representação: O(N log N + T), com T incluindo uma regra de terminador por
-Sequence × Entry da Unit e uma regra de entrada por Entry. HaltExit é materializado
+representação: O(N log N + T), com T incluindo duas regras por Branch × Entry, uma por outro terminador × Entry
+da Unit e uma regra de entrada por Entry. HaltExit é materializado
 uma vez por ocorrência. Memória derivada O(N + T), sem deep copy da AIR.
 Esse custo é da projeção e validação do produto, não uma promessa sobre o custo
 interno do AirValidator upstream. Essa expansão é explícita

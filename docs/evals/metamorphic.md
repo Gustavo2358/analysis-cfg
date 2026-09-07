@@ -30,6 +30,23 @@ Os mutantes Jump→vizinho, Return→vizinho, Halt→NormalExit, Halt→vizinho 
 reordenação de instructions foram mortos por expected independente, sem a guarda
 tipada de endpoints. As mutações foram restauradas antes dos gates.
 
-Mutantes prioritários posteriores: remover FALSE, remover default, unir IDs de units, pular opaco, criar C1→resume direto, buscar porta abaixo do
+Mutantes prioritários posteriores: remover default, unir IDs de units, pular opaco, criar C1→resume direto, buscar porta abaixo do
 topo, ignorar underflow, descartar remaining ControlScope. A suíte deve matar cada
 mutante focalizado ou registrar uma lacuna, não maquiar score.
+
+## Branch — EVAL-CFG-029
+
+MR-BRANCH-1 (MR-CFG-01): permutation física adversarial do diamond mantém nós,
+IDs CFG e transições. MR-BRANCH-2 (MR-CFG-02): alpha rename de Unit/Entry/Label/
+Operation/Operand usa correlação explícita, conservando origem e valor publicado.
+MR-BRANCH-3 (MR-CFG-03): display/origin presentation enganosos não selecionam target;
+referências de provenance e operações continuam observáveis.
+MR-BRANCH-4 (MR-CFG-04): split da Sequence que termina em Branch insere Jump e
+conserva as mesmas ocorrências/pontos originais na continuação, sem exigir
+isomorfismo literal nem apagar IDs/origins.
+
+Mutantes A–G foram mortos em WORK-CFG-006: TRUE/FALSE invertidos, unknown sem
+FALSE, target físico, destinos iguais colapsados, Halt reconvergente, literal true
+com pruning e nested usando join externo. Cada execução teve exit 1, uma assertion
+failure e zero errors; o expected independente detectou o defeito com a guarda de
+endpoints temporariamente desativada. Fontes/guardas restauradas antes dos gates.

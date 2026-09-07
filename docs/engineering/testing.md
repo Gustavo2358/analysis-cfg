@@ -6,8 +6,9 @@ Regra normativa → classes semânticas → adversariais contra o atalho óbvio 
 independente → teste RED observado → implementação mínima geral → GREEN →
 refatoração → challenge independente → gates e handoff.
 Planejar testes não é RED executado. EVAL-CFG-025 implementa CFG-FIRST e
-EVAL-CFG-028 implementa o slice linear/Jump/Halt; os demais evals semânticos
-continuam `planned`. EVAL-CFG-007 e EVAL-CFG-024 têm boundary, e
+EVAL-CFG-028 implementa o slice linear/Jump/Halt; EVAL-CFG-029 prova Branch
+estrutural. O 004 tem suas obrigações completas provadas no 029; os demais evals
+semânticos sem evidência integral continuam `planned`. EVAL-CFG-007 e EVAL-CFG-024 têm boundary, e
 EVAL-CFG-027 implementa somente a prova arquitetural local do registry.
 Não usar mocks do próprio algoritmo para provar o algoritmo.
 
@@ -100,6 +101,15 @@ mesmo desativando temporariamente a guarda tipada de endpoints. Produção e gua
 foram restauradas; semantic passou novamente com zero skip.
 
 EVAL-CFG-002 permanece planned: O-01-STRUCT conserva a,b,k do cenário X-01,
-cujo k é invoke, fora deste slice. EVAL-CFG-005 exige ramo terminante e cenário
-invocador; 013 inclui dependências/inventário parcial; 014 inclui O-66/transportes.
+cujo k é invoke, fora deste slice. EVAL-CFG-005 recebe prova de ramo terminante no 029, mas ainda exige cenário
+invocador de O-19-STRUCT; 013 inclui dependências/inventário parcial; 014 inclui O-66/transportes.
 Esses evals recebem evidência parcial, nunca completion por linkage do backlog.
+
+## Evidência do slice Branch
+
+EVAL-CFG-029 mantém 25 métodos e expected manual em records/enums próprios. RED
+por BRANCH_TRUE/BRANCH_FALSE ausentes foi commitado em 93dff9b antes de produção.
+GREEN e mutantes A–G executados; quatro metamorfismos preservam correlações/origens.
+025 fica byte a byte intacto. No 028, somente a recusa obsoleta de Branch e o switch
+exaustivo foram reconciliados; seus 22 métodos e a fixture mista são preservados.
+Pureza de unknown continua obrigação upstream no preflight; CFG não a descarrega.

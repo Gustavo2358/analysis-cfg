@@ -2,7 +2,7 @@
 
 **A fundação implementa EVAL-CFG-007, EVAL-CFG-024 e o eval local
 EVAL-CFG-027; EVAL-CFG-025 implementa CFG-FIRST e EVAL-CFG-028 prova o slice
-linear/Jump/Halt.** Metadados
+linear/Jump/Halt; EVAL-CFG-029 prova Branch e satisfaz EVAL-CFG-004.** Metadados
 verificáveis em [catalog.json](catalog.json).
 
 ## EVAL-CFG-001 — Integridade da Publication
@@ -29,7 +29,11 @@ INV-CFG-007, INV-CFG-010, INV-CFG-029. Estado: `planned`.
 
 False pode ir diretamente ao join; nested com terminações próprias; TRUE/FALSE preservados mesmo com target igual.
 
-Oráculos upstream: O-03-STRUCT, O-27. Invariantes: INV-CFG-007, INV-CFG-008, INV-CFG-012. Estado: `planned`.
+Oráculos upstream: O-03-STRUCT, O-27. Invariantes: INV-CFG-007, INV-CFG-008, INV-CFG-012. Estado: `implemented`.
+Provas no 029: emptyFalseArmUsesExplicitJoinWithoutSyntheticNodesOrOperations
+(O-03-STRUCT), unknownBooleanRetainsPredicateDependenciesReasonTypeAndOriginByIdentity
+(O-27: leitura explícita, dois destinos, nenhuma escrita/chamada implícita),
+nestedBranchesUseTheirOwnExplicitDestinations e sameDestinationPreservesTwoAlternativesAndThePredicate.
 
 ## EVAL-CFG-005 — Saídas distintas
 
@@ -243,3 +247,33 @@ As antigas recusas de Jump/Halt/instructions descreviam o limite da implementaç
 naquele checkpoint e não permanecem executáveis após a expansão legítima do produto.
 A cobertura positiva dessas formas pertence exclusivamente ao EVAL-CFG-028, com 22 testes.
 Nenhum perfil AIR, performance ou integration foi promovido.
+
+## EVAL-CFG-029 — Branch estrutural e conclusão do MVP-CFG-01
+
+Estado: `implemented`, 25 testes em
+[EvalCfg029Test](../../cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg029Test.java).
+Eval local sem oráculo upstream amplo atribuído; obrigatório no semantic gate com
+025=17 e 028=22. Expected manual de M2–M5, contexto e inventário, enums/records
+próprios. Prova TRUE/FALSE, literal true/false sem pruning, unknown(known(bool))
+com read preservado, unknown_type/role/targets inválidos, ramo vazio/nested,
+Halt/Return terminantes, mesmo destino, permutation, alpha rename, display/origin,
+split, duas Entries, órfã e 258 branches; validação interna de endpoints/contexto.
+Invariantes: INV-CFG-003/004/005/006/007/008/010/011/015/019/021/022/027/029.
+
+## Reavaliação integral em WORK-CFG-006
+
+- 003 permanece planned: diamond satisfaz O-02-STRUCT; o contracaso predicate
+  unknown_type e a variante booleana cobrem apenas parte de O-74-STRUCT. Esse
+  oráculo também exige concat/not/read com tipo desconhecido, inclusive provas
+  sameDomain, e dependência de tipo desconhecido na variante válida X-33.
+- 004 implemented: expectativa completa e O-03-STRUCT/O-27 demonstrados no 029.
+- 005 permanece planned: M4 e 025/028/029 provam saídas sem fallthrough e O-04-STRUCT
+  no controle suportado. O-19-STRUCT exige chamador/callee com continuação normal;
+  Invoke não é implementado e esse cenário não recebe claim por inferência.
+- 014 permanece planned: Branch acrescenta permutation/alpha rename/display/split
+  correlacionados; O-66/equivalência de ingressos continua sem transporte.
+
+029 é owner do checkpoint local; concluir M1–M5 não conclui esses evals amplos,
+AIR-STRUCTURE@2, performance ou integration. 025 permanece byte a byte intacto;
+028 mantém 22 métodos e a fixture mista, com adaptação exclusiva do switch e da
+recusa obsoleta de Branch, sem absorver testes positivos do 029.

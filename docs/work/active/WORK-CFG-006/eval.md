@@ -30,3 +30,14 @@ Nenhum gate foi executado no momento da promoção; CI e gates são obrigações
 `mvn -B -ntp -Dmaven.repo.local=/tmp/analysis-cfg-work-cfg-006-m2 -pl :cfg-kernel
 -Dtest=EvalCfg029Test test`: exit 1 por BRANCH_TRUE/BRANCH_FALSE ausentes, antes
 de modificar produção. Expected manual de M2–M5 e 25 métodos já escritos.
+
+## GREEN e mutantes
+
+Maven normal 029: exit 0, 25 testes/zero skip. Semantic 025/028/029: exit 0,
+64 métodos, 95 relatórios inválidos rejeitados. Produção restaurada antes do GREEN.
+Mutantes A–G executados com -Dtest=EvalCfg029Test#<método>; cada um exit 1,
+1 assertion failure, 0 errors/skip, com guarda tipada de endpoints desativada:
+A diamond; B unknownBooleanRetainsPredicateDependenciesReasonTypeAndOriginByIdentity;
+C physicalPermutationPreservesCorrelatedControlAndCfgIds; D sameDestination;
+E terminatingHaltArm; F literalTrue; G nestedBranches. Evidência detalhada será
+promovida ao history com gates finais/CI, sem inflar evals amplos.

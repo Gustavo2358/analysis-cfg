@@ -72,7 +72,8 @@
     "EVAL-CFG-005",
     "EVAL-CFG-014",
     "EVAL-CFG-025",
-    "EVAL-CFG-028"
+    "EVAL-CFG-028",
+    "EVAL-CFG-029"
   ],
   "source_scope": [
     "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CoreCfgProjection.java",
@@ -84,11 +85,12 @@
   ],
   "test_scope": [
     "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg029Test.java",
-    "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/testing/BranchPublications.java"
+    "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/testing/BranchPublications.java",
+    "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg028Test.java"
   ],
   "must_not_change": [
     "upstreams/pins; BuildCfg/preflight/registry; nenhum adapter, CLI ou modelo AIR paralelo",
-    "025: 17 métodos congelados; 028: 22 métodos; adaptação estrita de recusa Branch/switch aguarda resposta",
+    "025: 17 métodos e arquivo intactos; 028: 22 métodos/fixtures, apenas switch e recusa obsoleta de Branch reconciliados",
     "outros backlogs; perfis AIR; performance/integration"
   ],
   "gates": [

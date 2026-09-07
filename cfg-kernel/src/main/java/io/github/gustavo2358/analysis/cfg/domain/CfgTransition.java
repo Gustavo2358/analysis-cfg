@@ -5,7 +5,7 @@ import io.github.gustavo2358.air.model.Ids.EntryId;
 import java.util.Objects;
 
 /**
- * ENTRY establishes activationEntry; JUMP preserves it; RETURN and HALT apply under that context.
+ * ENTRY establishes activationEntry; JUMP and Branch preserve it; RETURN and HALT apply under that context.
  * These are scoped control rules, not unconditionally composable unlabelled edges.
  */
 public record CfgTransition(CfgNodeId from, CfgNodeId to, Kind kind, EntryId activationEntry) {
@@ -20,5 +20,5 @@ public record CfgTransition(CfgNodeId from, CfgNodeId to, Kind kind, EntryId act
         }
     }
 
-    public enum Kind { ENTRY, RETURN, JUMP, HALT }
+    public enum Kind { ENTRY, RETURN, JUMP, HALT, BRANCH_TRUE, BRANCH_FALSE }
 }

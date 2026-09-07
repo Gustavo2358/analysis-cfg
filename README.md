@@ -1,7 +1,7 @@
 # Analysis CFG — consumer AIR
 
-**Entrega atual:** fluxo linear em memória: Entry → Sequence(instructions, Jump) →
-Sequence(Return | Halt) → normal exit ou término por Halt,
+**Entrega atual:** CFG estrutural em memória: Entry, instructions, Jump,
+Branch TRUE/FALSE, Return/NormalExit e Halt/HaltExit,
 com Java 21/Maven, `air-java` e seam explícito de capabilities.
 **Data:** 06/09/2026. **Repositório:**
 `Gustavo2358/analysis-cfg`.
@@ -10,7 +10,7 @@ Este projeto constrói CFGs a partir da **Analysis IR 2.0.0**, recebendo exatame
 a `Publication` do `air-java`, sem conhecer COBOL, Semantic Product, parser,
 filesystem, CLI ou cloud no núcleo. `CFG-FIRST` prova Entry → Sequence(`Return`) →
 normal exit em memória. WORK-CFG-022 acrescenta instructions, Jump e Halt;
-`MVP-CFG-01` ainda depende de branch/IF-ELSE.
+WORK-CFG-006 acrescenta Branch estrutural e valida M2–M5 para o MVP local.
 
 ## Começar
 
@@ -53,15 +53,19 @@ saídas por Unit/Entry. `CfgBuildResult.CFG_BUILT` contém o CFG; falhas não t�
 WORK-CFG-022 amplia o único projector para `CoreCfgProjection`: instructions
 originais ordenadas, JUMP contextual por LabelId e HALT para HaltExit por ocorrência.
 `entries()`, `normalExits()` e `haltExits()` retornam inventários imutáveis em O(1).
-Branch/IF, dispatch, invoke/raise, controle aberto/local/indireto, JSON, CLI e
-dataflow permanecem posteriores. BACKLOG-CFG-004/006 não foram iniciados.
+Branch usa exclusivamente trueDestination/falseDestination, com BRANCH_TRUE e
+BRANCH_FALSE distintos mesmo quando os destinos são iguais. O predicate original
+é preservado; literal bool e unknown(known(bool)) mantêm ambos os braços.
+unknown_type é INVALID_IR no preflight, sem grafo parcial. Não há avaliação de
+valores nem detecção de join. Dispatch, invoke/raise, controle aberto/local/indireto,
+JSON, CLI e dataflow permanecem posteriores. BACKLOG-CFG-004/007 não foram iniciados.
 
 ## O que os gates significam hoje
 
 `docs`, `harness` e `fast` verificam arquivos, referências, IDs, dependências de
 backlog, work items e os próprios validadores documentais. `architecture` executa
 Maven/testes e inspeciona dependências e bytecode do kernel. `semantic` executa
-explicitamente os 17 testes de EVAL-CFG-025 e os 22 de EVAL-CFG-028; rejeita
+explicitamente os 17 testes de EVAL-CFG-025, 22 de EVAL-CFG-028 e 25 de EVAL-CFG-029; rejeita
 suítes/métodos ausentes, extras, duplicados ou pulados.
 `performance`, `integration` e, por consequência, `full` permanecem
 **UNAVAILABLE / exit 3**; full executa fast, architecture e semantic antes de parar

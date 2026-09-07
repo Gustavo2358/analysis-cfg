@@ -1,7 +1,7 @@
 # Arquitetura — mapa curto
 
 **CFG-FIRST e fluxo linear estão implementados em memória: instructions ordenadas,
-Jump explícito, Return para normal exit por Unit/Entry e Halt para término próprio,
+Jump e Branch explícitos, Return para normal exit por Unit/Entry e Halt para término próprio,
 com produto imutável e correlações AIR.**
 [ADRs](docs/architecture/decisions/index.md).
 
@@ -35,7 +35,7 @@ Contrato físico: `BuildCfg.build(air-java Publication, BuildOptions) →
 CfgBuildResult`, implementado pelo `CfgBuildCoordinator`. A porta não recebe `Path`,
 `InputStream`, JSON, COBOL ou Semantic Product. O caso de uso executa
 `AirValidator`, preflight de versão/capabilities e suporte ao slice; somente depois
-projeta Entry/Jump/Return/Halt, preservando instructions. Trocar transporte preserva a porta.
+projeta Entry/Jump/Branch/Return/Halt, preservando instructions. Trocar transporte preserva a porta.
 
 O Analysis IR JSON Binding 1.0.0 pertence ao `analysis-ir`, targets AIR 2.0.0 e
 permanece DRAFT no commit fixado. Ele não é implementado neste checkpoint. Um
@@ -78,7 +78,10 @@ WORK-CFG-022 implementa instructions lineares, `jump` e `halt` no único
 JUMP/HALT preservam activationEntry. HaltExit retém a ocorrência AIR, sem funcionar
 como NormalExit. Self-loops explícitos são aceitos sem análise de alcance.
 
-`MVP-CFG-01` ainda depende de `branch` e IF/ELSE estrutural. CLI/arquivo são
+WORK-CFG-006 acrescenta `branch`: BRANCH_TRUE/BRANCH_FALSE conservam as duas
+alternativas explícitas e activationEntry, mesmo com destinos iguais. Predicate é
+validado pelo preflight e retido pela Sequence, sem avaliar valores nem detectar joins.
+`MVP-CFG-01` está em validação final local de M2–M5. CLI/arquivo são
 outro milestone posterior. `invoke`, `raise`, `dispatch`, demais cenários cíclicos,
 controle aberto, `control.local@1` e
 `control.indirect@1` entram em slices próprios. Nenhum subset recebe claim

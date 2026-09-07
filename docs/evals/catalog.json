@@ -59,7 +59,7 @@
     {
       "id": "EVAL-CFG-004",
       "title": "Ramos vazios, nested e destino igual",
-      "status": "planned",
+      "status": "implemented",
       "expectation": "False pode ir diretamente ao join; nested com terminações próprias; TRUE/FALSE preservados mesmo com target igual.",
       "upstream_oracles": [
         "O-03-STRUCT",
@@ -70,7 +70,7 @@
         "INV-CFG-008",
         "INV-CFG-012"
       ],
-      "implementation_evidence": null
+      "implementation_evidence": "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg029Test.java"
     },
     {
       "id": "EVAL-CFG-005",
@@ -476,6 +476,30 @@
         "INV-CFG-021"
       ],
       "implementation_evidence": "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg028Test.java"
+    },
+    {
+      "id": "EVAL-CFG-029",
+      "title": "Branch estrutural e conclusão do MVP-CFG-01",
+      "status": "implemented",
+      "expectation": "Diamond TRUE/FALSE; unknown(known(bool)) conserva ambos e predicate/origins/dependencies; unknown_type e targets/role inválidos falham no preflight; ramo vazio, nested, terminante, mesmo destino, ordem física irrelevante, múltiplas Entries/órfãs, cardinalidade sem teto incidental e metamorfismos correlacionados.",
+      "upstream_oracles": [],
+      "invariants": [
+        "INV-CFG-003",
+        "INV-CFG-004",
+        "INV-CFG-005",
+        "INV-CFG-006",
+        "INV-CFG-007",
+        "INV-CFG-008",
+        "INV-CFG-010",
+        "INV-CFG-011",
+        "INV-CFG-015",
+        "INV-CFG-019",
+        "INV-CFG-021",
+        "INV-CFG-022",
+        "INV-CFG-027",
+        "INV-CFG-029"
+      ],
+      "implementation_evidence": "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg029Test.java"
     }
   ]
 }

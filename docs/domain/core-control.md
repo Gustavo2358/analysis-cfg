@@ -21,8 +21,9 @@ terminador legítimo em erro de source nem autoriza pular a operação.
 ## Slices implementados
 
 CFG-FIRST (WORK-CFG-005) implementou Entry/Return. WORK-CFG-022 amplia o core
-para instructions lineares, Jump e Halt, em Units com corpo disponível e inventário
-completo. Cada Entry usa initialLabel; cada Sequence permanece um único nó, inclusive
+para instructions lineares, Jump e Halt; WORK-CFG-006 acrescenta Branch.
+O slice requer Units com corpo disponível e inventário completo. Cada Entry usa
+initialLabel; cada Sequence permanece um único nó, inclusive
 órfãs. Label pendente é INVALID_IR no preflight; falta de terminador não é reparada.
 
 Assign, HavocMust, HavocMay, Nop e CopyBytes permanecem na Sequence original:
@@ -38,7 +39,7 @@ Uma ocorrência pode ser compartilhada por Entries: o contexto fica na transiç�
 HALT. O destino não tem transições de saída. NormalExits continuam inventariados
 por Entry mesmo quando nenhum Return os utiliza; isso não afirma alcançabilidade.
 
-Branch/IF, Dispatch, Invoke, Raise, Opaque e Local*/IndirectJump permanecem fora
+Dispatch, Invoke, Raise, Opaque e Local*/IndirectJump permanecem fora
 do slice, inclusive em órfãs. Recusa é explícita e correlacionada, sem grafo parcial.
 As demais linhas da tabela são direção futura.
 
@@ -51,13 +52,20 @@ preservados pelo mesmo objeto AIR, sem avaliar seus valores.
 
 ## Branch e seleção
 
+Implementado no único CoreCfgProjection por duas regras tipadas: BRANCH_TRUE usa
+somente trueDestination e BRANCH_FALSE usa somente falseDestination. Ambas preservam
+activationEntry, inclusive em órfãs e com destino igual; não há filtro de reachability.
+Diamond, vazio, nested e ramo terminante compõem essas mesmas primitives. Join é
+Sequence com target explícito, sem nó próprio, fallthrough ou detecção por proximidade.
+CfgGraph verifica source Branch, target Sequence/LabelId e contexto na mesma Unit.
+
 `branch` exige predicate com `TypeRef=known(bool)`. Não é necessário resolver seu
 valor para construir os dois destinos: `unknown(known(bool),...)` preserva TRUE e
 FALSE. `unknown_type(...)` não pode ser presumido booleano e torna esse uso
 `INVALID_IR`; não há default, coerção ou inferência a partir do terminador.
 `EXACT` na regra local de controle não significa que todos os caminhos combinados
 são concretamente viáveis. O MVP não poda branches por propagação de constantes.
-Cases duplicados são inválidos; case order não estabelece prioridade. Dispatch
+Dispatch permanece planejado. Cases duplicados são inválidos; case order não estabelece prioridade. Dispatch
 mantém default inclusive para seletor fora dos valores listados.
 
 ## Chamadas

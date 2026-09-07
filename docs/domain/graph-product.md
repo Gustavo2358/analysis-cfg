@@ -7,7 +7,7 @@ capabilities, premissas e política de precisão usadas. Não gravar successors,
 alcançabilidade ou caches mutáveis na IR. IDs CFG são próprios, correlacionados com
 identidades IR; não reutilizar source span como identidade de nó.
 
-Conceitos do produto completo (Entry, instructions lineares, Jump, Return e Halt implementados):
+Conceitos do produto completo (Entry, instructions lineares, Jump, Branch, Return e Halt implementados):
 
 - inventário de nós/sequences e seus operations/program points;
 - transições conhecidas com outcome, predicado/case/tag quando aplicáveis;
@@ -36,7 +36,9 @@ No package `io.github.gustavo2358.analysis.cfg.domain`:
 - `CfgNode.HaltExit`: ID CFG e Operations.Halt original. Uma saída por ocorrência,
   sem singleton global e sem fabricar source span. HaltKind NORMAL/ABNORMAL é retido;
 - `CfgTransition(from, to, kind, activationEntry)`: ENTRY estabelece a Entry;
-  JUMP a conserva e usa somente LabelId explícito; RETURN termina no NormalExit
+  JUMP a conserva e usa somente LabelId explícito; BRANCH_TRUE/BRANCH_FALSE
+  usam respectivamente os targets explícitos e conservam contexto e alternativa;
+  RETURN termina no NormalExit
   dessa Entry; HALT termina em HaltExit sob esse contexto, sem successor do exit.
 
 A regra segue AIR §04.8: não existe `return.entryScope` na entrada. Um Return
@@ -46,7 +48,7 @@ um consumidor deve conservar `activationEntry` ao compor um caminho. Isso não
 implementa frames locais nem consulta de reachability.
 
 Órfãs permanecem no inventário, sem predecessor artificial. Suas regras Jump,
-Return e Halt continuam materializadas por Entry, sem afirmar alcançabilidade.
+Branch, Return e Halt continuam materializadas por Entry, sem afirmar alcançabilidade.
 HaltExit é compartilhado por ocorrência; as transições preservam cada activationEntry.
 NormalExits são inventário por Entry, inclusive quando nenhum Return os utiliza. O grafo verifica unicidade
 de IDs, fechamento e compatibilidade tipada das transições; seus containers são
@@ -55,8 +57,13 @@ A referência à Publication mantém coverage, precisão, gaps, premises e todas
 origens resolvíveis, sem cache mutável ou callback.
 
 `CfgProjectionIssue` identifica recusa de formas fora do slice; falhas não têm
-produto parcial/fake. Branch predicates, invoke outcomes, open control, frames e
-indirect targets não têm tipos antecipados neste checkpoint.
+produto parcial/fake. O predicate de Branch permanece integralmente em
+SequenceNode.source().terminator(), pelo mesmo objeto AIR, incluindo TypeRef,
+dependencies, remainingReads, reason, operand owner e origin. Não há storage
+adicional nem string de condição. Literal true/false não elimina alternativa.
+CfgGraph valida endpoints de Branch e distingue os braços no equals/hash de
+CfgTransition; destinos iguais são válidos, duplicata exata não. Invoke outcomes,
+open control, frames e indirect targets permanecem futuros.
 
 Divergência é comportamento sem próximo estado observável: sua representação não
 cria caminho artificial até uma saída normal. Uma saída sintética é convenção do

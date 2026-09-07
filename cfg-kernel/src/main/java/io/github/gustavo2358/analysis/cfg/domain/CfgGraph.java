@@ -72,6 +72,13 @@ public final class CfgGraph {
                         && jump.destination().equals(target.source().label())
                         && sequence.source().label().unit().equals(transition.activationEntry().unit())
                         && target.source().label().unit().equals(transition.activationEntry().unit());
+                case BRANCH_TRUE, BRANCH_FALSE -> from instanceof CfgNode.SequenceNode sequence
+                        && sequence.source().terminator() instanceof Operations.Branch branch
+                        && to instanceof CfgNode.SequenceNode target
+                        && (transition.kind() == CfgTransition.Kind.BRANCH_TRUE
+                            ? branch.trueDestination() : branch.falseDestination()).equals(target.source().label())
+                        && sequence.source().label().unit().equals(transition.activationEntry().unit())
+                        && target.source().label().unit().equals(transition.activationEntry().unit());
                 case HALT -> from instanceof CfgNode.SequenceNode sequence
                         && sequence.source().terminator() instanceof Operations.Halt halt
                         && to instanceof CfgNode.HaltExit exit
