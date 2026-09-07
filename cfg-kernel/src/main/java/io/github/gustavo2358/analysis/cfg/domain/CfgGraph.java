@@ -12,7 +12,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-/** Immutable core CFG inventory. The original AIR snapshot retains all provenance, operands and gaps. */
+/**
+ * Immutable inventory of projected known control. The original AIR snapshot retains coverage, premises,
+ * provenance, operands and gaps. Missing nodes/edges do not prove absence when that inventory is partial.
+ */
 public final class CfgGraph {
     private final Publication publication;
     private final List<CfgNode> nodes;

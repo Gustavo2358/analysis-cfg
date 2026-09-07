@@ -504,7 +504,7 @@
     {
       "id": "EVAL-CFG-030",
       "title": "Política de projeção KNOWN_SUBSET/STRICT",
-      "status": "planned",
+      "status": "implemented",
       "expectation": "Matriz COMPLETE/PARTIAL/UNAVAILABLE, evidence original, recusas independentes da policy e regressões estruturais pela porta oficial. Sem completude global inferida.",
       "upstream_oracles": [],
       "invariants": [
@@ -517,7 +517,7 @@
         "INV-CFG-023",
         "INV-CFG-026"
       ],
-      "implementation_evidence": null
+      "implementation_evidence": "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg030Test.java"
     }
   ]
 }

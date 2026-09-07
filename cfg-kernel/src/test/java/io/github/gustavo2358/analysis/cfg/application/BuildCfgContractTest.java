@@ -2,6 +2,7 @@ package io.github.gustavo2358.analysis.cfg.application;
 
 import io.github.gustavo2358.air.model.Publication;
 import io.github.gustavo2358.air.validation.ValidationOptions;
+import io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy;
 import io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry;
 import io.github.gustavo2358.analysis.cfg.testing.CfgFirstPublications;
 import org.junit.jupiter.api.Test;
@@ -65,8 +66,11 @@ class BuildCfgContractTest {
 
         assertTrue(BuildOptions.class.isRecord());
         assertTrue(Modifier.isFinal(BuildOptions.class.getModifiers()));
-        assertEquals(1, BuildOptions.class.getRecordComponents().length);
+        assertArrayEquals(new Class<?>[]{ValidationOptions.class, ProjectionPolicy.class},
+                Arrays.stream(BuildOptions.class.getRecordComponents()).map(java.lang.reflect.RecordComponent::getType)
+                        .toArray(Class<?>[]::new));
         assertEquals(ValidationOptions.defaults(), options.validation());
+        assertEquals(ProjectionPolicy.KNOWN_SUBSET, options.projectionPolicy());
     }
 
     @Test

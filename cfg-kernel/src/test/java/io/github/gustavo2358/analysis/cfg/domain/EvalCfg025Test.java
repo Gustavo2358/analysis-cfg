@@ -322,7 +322,14 @@ class EvalCfg025Test {
                     new Evidence.Coverage(inventory, scope, List.of(), List.of(gap)),
                     List.of(new Evidence.Uncertainty(gap, "INPUT_MISSING", List.of(Evidence.Dimension.CONTROL),
                             scope, "inventory not available", ORIGIN)), List.of());
-            assertUnsupported(publication, CfgProjectionIssue.Code.INCOMPLETE_INVENTORY, P);
+            // Completeness is now an explicit opt-in gate; both original rejection cases remain covered.
+            CfgBuildResult result = new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).build(publication,
+                    new BuildOptions(io.github.gustavo2358.air.validation.ValidationOptions.defaults(), ProjectionPolicy.STRICT));
+            assertEquals(ValidationResult.Status.STRUCTURALLY_VALID, result.preflight().status());
+            assertEquals(CfgBuildResult.Status.UNSUPPORTED_INPUT, result.status());
+            assertTrue(result.graph().isEmpty());
+            assertEquals(List.of(new CfgProjectionIssue(CfgProjectionIssue.Code.INCOMPLETE_INVENTORY, P)),
+                    result.projectionIssues());
         }
     }
 

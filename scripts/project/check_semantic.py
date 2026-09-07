@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Execute the explicitly inventoried EVAL-CFG-025, EVAL-CFG-028 and EVAL-CFG-029 oracles; absent/skipped tests fail."""
+"""Execute the explicitly inventoried EVAL-CFG-025, EVAL-CFG-028, EVAL-CFG-029 and EVAL-CFG-030 oracles; absent/skipped tests fail."""
 
 from __future__ import annotations
 
@@ -16,6 +16,7 @@ from check_architecture import GateConfigurationError, GateFailure, command_path
 SUITE_025 = "io.github.gustavo2358.analysis.cfg.domain.EvalCfg025Test"
 SUITE_028 = "io.github.gustavo2358.analysis.cfg.domain.EvalCfg028Test"
 SUITE_029 = "io.github.gustavo2358.analysis.cfg.domain.EvalCfg029Test"
+SUITE_030 = "io.github.gustavo2358.analysis.cfg.domain.EvalCfg030Test"
 # Manual obligations: do not infer this inventory from production code, test source, or reports.
 EXPECTED_METHODS_025 = {
     "entryReturnAndNormalExitMatchIndependentOracle",
@@ -89,10 +90,33 @@ EXPECTED_METHODS_029 = {
     "graphRejectsForeignOrMissingBranchActivationEntries",
     "sameDestinationTransitionEqualityKeepsArmsAndRejectsExactDuplicates",
 }
+EXPECTED_METHODS_030 = {
+    "defaultProjectsBothPartialInventoriesWithExactReturnOracle",
+    "allPublicDefaultsSelectKnownSubsetAndNullPolicyIsRejected",
+    "knownSubsetCompleteBuildsManualReturnGraph",
+    "strictCompleteBuildsManualReturnGraph",
+    "knownSubsetAllowsPartialAtEitherScopeIndependently",
+    "strictRejectsPartialPublicationWithTypedSubject",
+    "strictRejectsPartialUnitWithTypedSubject",
+    "strictReportsBothIncompleteScopesInStableOrder",
+    "unavailableInventoryIsRejectedAtEitherScopeUnderBothPolicies",
+    "emptyPartialInventoryRemainsPartialWithoutInventedNodes",
+    "unsupportedOrphanTerminatorIsNeverSilentlyOmitted",
+    "unsupportedCapabilityStillBlocksBeforeProjectionPolicy",
+    "registeredKnownCapabilityStillRequiresImplementedSemantics",
+    "incompleteValidationCannotBeOverriddenByInventoryPolicy",
+    "invalidReferencesAndUnexplainedPartialRemainInvalidAir",
+    "unavailableBodyStillBlocksKnownControlProjection",
+    "validationLimitsStillBlockBeforeProjection",
+    "partialCoverageItemsPremisesAndDimensionalEvidenceRemainOriginal",
+    "gapCodesReasonsAndOriginTextCannotDecideAdmissionOrControl",
+    "partialMixedControlKeepsAllArmsContextsOrphansAndOrdering",
+}
 EXPECTED_SUITES = {
     SUITE_025: EXPECTED_METHODS_025,
     SUITE_028: EXPECTED_METHODS_028,
     SUITE_029: EXPECTED_METHODS_029,
+    SUITE_030: EXPECTED_METHODS_030,
 }
 
 
@@ -120,7 +144,7 @@ def verify_reports(directory: Path) -> None:
     reports = list(directory.glob("TEST-*.xml"))
     expected = {"TEST-" + name + ".xml" for name in EXPECTED_SUITES}
     if {p.name for p in reports} != expected:
-        raise GateFailure("semantic gate must produce exactly the selected EVAL-CFG-025/028/029 reports")
+        raise GateFailure("semantic gate must produce exactly the selected EVAL-CFG-025/028/029/030 reports")
     try:
         for name in EXPECTED_SUITES:
             verify_suite(ET.parse(directory / ("TEST-" + name + ".xml")).getroot(), name)
@@ -223,8 +247,8 @@ def main() -> int:
         if result.returncode:
             raise GateFailure(f"selected semantic suite exited {result.returncode}")
         verify_reports(args.root / "cfg-kernel/target/surefire-reports")
-        print(f"[semantic] PASS: EVAL-CFG-025/028/029, {sum(map(len, EXPECTED_SUITES.values()))} required tests, "
-              "zero skipped; CFG-FIRST + linear/Jump/Branch/Halt, no complete AIR profile claim", flush=True)
+        print(f"[semantic] PASS: EVAL-CFG-025/028/029/030, {sum(map(len, EXPECTED_SUITES.values()))} required tests, "
+              "zero skipped; CFG-FIRST + linear/Jump/Branch/Halt + inventory policy, no complete AIR profile claim", flush=True)
         return 0
     except GateFailure as exc:
         print(f"[semantic] FAIL: {exc}", file=sys.stderr, flush=True)

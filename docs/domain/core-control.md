@@ -22,7 +22,11 @@ terminador legítimo em erro de source nem autoriza pular a operação.
 
 CFG-FIRST (WORK-CFG-005) implementou Entry/Return. WORK-CFG-022 amplia o core
 para instructions lineares, Jump e Halt; WORK-CFG-006 acrescenta Branch.
-O slice requer Units com corpo disponível e inventário completo. Cada Entry usa
+O slice requer Units com corpo disponível e inventário admitido pela
+[ProjectionPolicy](../architecture/ports-and-adapters.md#política-de-projeção):
+KNOWN_SUBSET default aceita COMPLETE/PARTIAL; STRICT exige COMPLETE. UNAVAILABLE
+permanece recusado. A parcialidade original não é elevada e nenhum fato desconhecido
+recebe nó/aresta sintético. Cada Entry usa
 initialLabel; cada Sequence permanece um único nó, inclusive
 órfãs. Label pendente é INVALID_IR no preflight; falta de terminador não é reparada.
 
@@ -40,7 +44,8 @@ HALT. O destino não tem transições de saída. NormalExits continuam inventari
 por Entry mesmo quando nenhum Return os utiliza; isso não afirma alcançabilidade.
 
 Dispatch, Invoke, Raise, Opaque e Local*/IndirectJump permanecem fora
-do slice, inclusive em órfãs. Recusa é explícita e correlacionada, sem grafo parcial.
+do slice, inclusive em órfãs. Recusa é explícita e correlacionada, sem produto que omita
+essas ocorrências. Isso é distinto de projetar fatos suportados de inventário PARTIAL.
 As demais linhas da tabela são direção futura.
 
 AIR §04.8 e `Operations.Return(Header, List<Expression>)` não possuem seletor

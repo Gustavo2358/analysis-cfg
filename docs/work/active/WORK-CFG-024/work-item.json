@@ -55,12 +55,12 @@
     "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CoreCfgProjection.java",
     "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CfgGraph.java",
     "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CfgProjectionIssue.java",
-    "planned:cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/ProjectionPolicy.java"
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/ProjectionPolicy.java"
   ],
   "test_scope": [
     "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/application/BuildCfgContractTest.java",
     "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg025Test.java",
-    "planned:cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg030Test.java",
+    "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg030Test.java",
     "scripts/project/check_architecture.py",
     "scripts/project/check_semantic.py"
   ],

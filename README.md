@@ -3,7 +3,7 @@
 **Entrega atual:** CFG estrutural em memória: Entry, instructions, Jump,
 Branch TRUE/FALSE, Return/NormalExit e Halt/HaltExit,
 com Java 21/Maven, `air-java` e seam explícito de capabilities.
-**Data:** 06/09/2026. **Repositório:**
+**Data:** 07/09/2026. **Repositório:**
 `Gustavo2358/analysis-cfg`.
 
 Este projeto constrói CFGs a partir da **Analysis IR 2.0.0**, recebendo exatamente
@@ -12,6 +12,22 @@ filesystem, CLI ou cloud no núcleo. `CFG-FIRST` prova Entry → Sequence(`Retur
 normal exit em memória. WORK-CFG-022 acrescenta instructions, Jump e Halt;
 WORK-CFG-006 acrescenta Branch e conclui **MVP-CFG-01 local**, com M2–M5 provados.
 Nenhum perfil AIR normativo é reivindicado.
+
+A projeção usa `KNOWN_SUBSET` por default: inventário `PARTIAL` válido pode gerar
+CFG dos fatos conhecidos, preservando coverage, gaps e evidence na Publication original.
+Para exigir `COMPLETE` na Publication e em todas as Units, selecione `STRICT`:
+
+```java
+BuildCfg builder = new CfgBuildCoordinator(SemanticInterpreterRegistry.empty());
+CfgBuildResult known = builder.build(publication, BuildOptions.defaults());
+BuildOptions strict = new BuildOptions(ValidationOptions.defaults(), ProjectionPolicy.STRICT);
+CfgBuildResult gated = builder.build(publication, strict);
+```
+
+`ProjectionPolicy` está no package `domain`; BuildCfg, BuildOptions, CfgBuildCoordinator
+e CfgBuildResult estão em `application`. `CFG_BUILT` não afirma completude global.
+AIR inválida, semântica não suportada e validação incompleta continuam bloqueando o build.
+[Semântica e limites da policy](docs/architecture/ports-and-adapters.md#política-de-projeção).
 
 ## Começar
 
@@ -66,7 +82,8 @@ JSON, CLI e dataflow permanecem posteriores. BACKLOG-CFG-004/007 não foram inic
 `docs`, `harness` e `fast` verificam arquivos, referências, IDs, dependências de
 backlog, work items e os próprios validadores documentais. `architecture` executa
 Maven/testes e inspeciona dependências e bytecode do kernel. `semantic` executa
-explicitamente os 17 testes de EVAL-CFG-025, 22 de EVAL-CFG-028 e 25 de EVAL-CFG-029; rejeita
+explicitamente os 17 testes de EVAL-CFG-025, 22 de EVAL-CFG-028, 25 de EVAL-CFG-029
+e 20 de EVAL-CFG-030; rejeita
 suítes/métodos ausentes, extras, duplicados ou pulados.
 `performance`, `integration` e, por consequência, `full` permanecem
 **UNAVAILABLE / exit 3**; full executa fast, architecture e semantic antes de parar

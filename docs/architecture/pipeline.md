@@ -11,10 +11,11 @@ confiar cegamente em uma instância criada pelo caller.
 
 1. Executar `AirValidator` sem mutar a Publication; propagar invalidade e validação
    incompleta com seus diagnósticos. Não duplicar as regras AIR localmente.
-2. Verificar versão, capabilities, opções e escopo aceitos pelo consumer. Distinguir
-   publicação parcial válida de integridade inválida. Não reconstruir nomes.
+2. Verificar versão e capabilities; aplicar ProjectionPolicy das opções e suporte
+   ao slice. KNOWN_SUBSET default admite COMPLETE/PARTIAL; STRICT exige COMPLETE.
+   Publicação parcial válida é distinta de integridade inválida. Não reconstruir nomes.
 3. Indexar labels, operations e entries uma vez por namespace. Não ordenar para
-   inferir execução. Manter inventário completo, inclusive conteúdo sem predecessor.
+   inferir execução. Preservar todo o inventário publicado, inclusive conteúdo sem predecessor.
 4. Projetar inicialmente uma Sequence por nó CFG próprio, com correlação explícita.
    Preservar ordem de operações e pontos before/after(outcome).
 5. Interpretar terminadores e materializar transições conhecidas com labels de
@@ -35,6 +36,8 @@ distintos. Regras de terminador conservam activationEntry, inclusive em órfãs.
 Instructions permanecem na Sequence original, com ordem explícita e correlação dos
 pontos. Não há classe adicional de ProgramPoint, reachability ou fallthrough físico.
 Outros terminadores e inventário/corpo indisponível são recusados antes do produto.
+PARTIAL é admitido somente em KNOWN_SUBSET, conservando o snapshot e suas lacunas;
+nenhuma consulta sobre ausência/reachability é autorizada por essa admissão.
 A negociação reconhece memory.regions@1 precisamente só para controle, registrando
 esse modo no grafo e preservando fatos de memória. Os demais passes acima são futuros.
 
