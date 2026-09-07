@@ -56,8 +56,9 @@ missing/duplicate/foreign/skip/failure/error. Não é alias para mvn test inteir
 O detector rejeita 58 fixtures adversariais, inclusive cada método ausente, suíte
 ausente/extra, duplicata, foreign testcase e skip/failure/error.
 
-O 025 preserva CF1 integral; suas três antigas recusas de escopo agora provam
-suporte a Jump/Halt/instructions, conforme autorização do 022. O 028 exige M1,
+O 025 mantém somente as 17 regressões estáveis de CFG-FIRST. As antigas recusas
+de Jump/Halt/instructions não permanecem executáveis após a expansão do produto;
+a cobertura positiva dessas formas pertence ao 028. O 028 exige M1,
 operandos/ordem/origins/gaps, Jump por label forward/backward/self-loop, Halt distinto,
 contextos múltiplos, órfãs/unsupported, metamorfismos e negociação memory.regions@1
 restrita ao papel de controle. Nenhum perfil AIR completo é reivindicado.
