@@ -1,6 +1,6 @@
 # BACKLOG-CFG-022 — Fluxo linear, jump e halt
 
-**Estado:** `active` em [WORK-CFG-022](../active/WORK-CFG-022/state.md).
+**Estado:** `completed` em [WORK-CFG-022](../history/WORK-CFG-022.md).
 **Fase:** `mvp`. **Autorização:** implementação explícita pelo usuário em 06/09/2026.
 Dependências: BACKLOG-CFG-005.
 
@@ -45,3 +45,11 @@ coalescing.
 
 Evals/mutantes focalizados, comandos e exit codes, gates e review. Nenhum perfil AIR
 é alegado por concluir este subset.
+
+
+Conclusão em WORK-CFG-022: EVAL-CFG-028 implemented, CFG-FIRST/025 integral verde,
+mutantes A–E mortos, gates locais executados e CI Temurin 21 verde. 001/002/005/013/014
+continuam planned com evidência parcial; 002/O-01-STRUCT ainda envolve invoke.
+Instructions e posições preservadas pela Sequence original; Jump contextual por
+LabelId; HaltExit por ocorrência com activationEntry nas transições. Sem branch,
+transporte, dataflow, perfil AIR ou promoção de BACKLOG-CFG-004/006.
