@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": "implementation",
-  "runtime_authorization": "WORK-CFG-024",
+  "runtime_authorization": "WORK-CFG-026",
   "product_gates": {
     "architecture": {
       "status": "implemented",
@@ -16,8 +16,8 @@
       "hook": null
     },
     "integration": {
-      "status": "unavailable",
-      "hook": null
+      "status": "implemented",
+      "hook": "scripts/project/check-integration.sh"
     }
   }
 }

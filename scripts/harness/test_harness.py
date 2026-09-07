@@ -5,6 +5,7 @@ import contextlib
 import io
 import json
 import shutil
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -264,6 +265,54 @@ class HarnessGuardTests(unittest.TestCase):
         self.edit_json('docs/sources/sources.lock.json',
                        lambda x: x['proleap_poc'].update(main_commit='f' * 40))
         self.assert_guard('proleap-poc main evidence must match latest merged review')
+
+
+    def test_42_integration_hook_is_required_when_implemented(self):
+        (self.root / 'scripts/project/check-integration.sh').unlink()
+        self.assert_guard('Invalid/missing product gate hook: integration')
+
+    def test_43_integration_report_detector_rejects_missing_duplicate_and_skip(self):
+        sys.path.insert(0, str(ROOT / 'scripts/project'))
+        from check_integration import detector_self_test
+        with contextlib.redirect_stdout(io.StringIO()):
+            detector_self_test()
+
+    def test_44_outer_bytecode_rejects_frontend_and_reverse_dependencies(self):
+        sys.path.insert(0, str(ROOT / 'scripts/project'))
+        from check_transport_architecture import inventory, verify_dependencies
+        from check_architecture import GateFailure
+        for module, entry in inventory(self.root).items():
+            for forbidden in ('io.proleap.CobolParser', 'org.antlr.Parser', 'com.fasterxml.jackson.databind.ObjectMapper',
+                              'io.github.gustavo2358.analysis.cfg.launcher.Unapproved', 'local.AirParser'):
+                expected = entry['bytecode_dependencies']
+                actual = {key: set(value) for key, value in expected.items()}
+                actual[next(iter(actual))].add(forbidden)
+                with self.subTest(module=module, forbidden=forbidden), self.assertRaises(GateFailure):
+                    verify_dependencies(module, actual, expected)
+
+    def test_45_outer_direct_dependencies_are_exact(self):
+        sys.path.insert(0, str(ROOT / 'scripts/project'))
+        from check_transport_architecture import verify_transport_shape
+        from check_architecture import GateFailure
+        path = self.root / 'cfg-adapters/pom.xml'
+        path.write_text(path.read_text().replace('<artifactId>air-json</artifactId>', '<artifactId>frontend</artifactId>'))
+        with self.assertRaises(GateFailure): verify_transport_shape(self.root)
+
+    def test_46_reader_cannot_replace_shared_decode_with_local_parser(self):
+        sys.path.insert(0, str(ROOT / 'scripts/project'))
+        from check_transport_architecture import verify_transport_shape
+        from check_architecture import GateFailure
+        path = self.root / 'cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirJsonFileReader.java'
+        path.write_text(path.read_text().replace('return codec.decode(bytes);', 'return localParser(bytes);'))
+        with self.assertRaises(GateFailure): verify_transport_shape(self.root)
+
+    def test_47_enum_name_cannot_define_wire(self):
+        sys.path.insert(0, str(ROOT / 'scripts/project'))
+        from check_transport_architecture import verify_transport_shape
+        from check_architecture import GateFailure
+        path = self.root / 'cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter.java'
+        path.write_text(path.read_text().replace('out.string(transitionKind(transition.kind()))', 'out.string(transition.kind().name())'))
+        with self.assertRaises(GateFailure): verify_transport_shape(self.root)
 
 
 class PinnedCacheTests(unittest.TestCase):

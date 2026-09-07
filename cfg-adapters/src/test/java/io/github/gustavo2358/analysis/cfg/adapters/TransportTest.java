@@ -115,4 +115,27 @@ class TransportTest {
         assertThrows(CfgJsonException.class, () -> new CfgJsonWriter().write(result, output));
         assertFalse(Files.exists(output));
     }
+    @Test void incompleteValidationPreservesTypedCodecIssues() throws Exception {
+        var options = new ValidationOptions(128, 1, 100);
+        var limits = AirJson.Limits.defaults();
+        var direct = assertThrows(AirJsonException.class, () -> new AirJson(limits, options).decode(Files.readAllBytes(fixture())));
+        var actual = assertThrows(AirJsonException.class, () -> new AirJsonFileReader(limits, options).read(fixture()));
+        assertEquals(AirJsonException.Code.INCOMPLETE_VALIDATION, actual.code());
+        assertEquals(direct.path(), actual.path());
+        assertEquals(direct.issues(), actual.issues());
+        assertFalse(actual.issues().isEmpty());
+    }
+    @Test void unsupportedCapabilityRemainsACodecFailure() throws Exception {
+        Path source = temporary.resolve("capability.json");
+        String original = Files.readString(fixture());
+        String modified = original.replace("\"required\":[]", "\"required\":[{\"name\":\"unimplemented.capability\",\"version\":\"1\"}]");
+        assertNotEquals(original, modified);
+        Files.writeString(source, modified);
+        var direct = assertThrows(AirJsonException.class, () -> new AirJson().decode(Files.readAllBytes(source)));
+        var actual = assertThrows(AirJsonException.class, () -> new AirJsonFileReader().read(source));
+        assertEquals(AirJsonException.Code.UNSUPPORTED_CAPABILITY, actual.code());
+        assertEquals(direct.path(), actual.path());
+        assertEquals(direct.issues(), actual.issues());
+    }
+
 }

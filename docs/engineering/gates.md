@@ -5,12 +5,12 @@
 | Gate | Estado | Verifica |
 | --- | --- | --- |
 | check-docs.sh | executável | links, IDs, manifestos, lifecycle, DAG, source lock e fase |
-| check-harness.sh | executável | 41 testes adversariais do harness |
+| check-harness.sh | executável | 47 testes adversariais do harness |
 | check-fast.sh | executável | docs + harness |
 | check-architecture.sh | executável | Maven/testes, inventários exatos, dependências, bytecode 21 e boundary air-java |
 | check-semantic.sh | executável | 17 do EVAL-CFG-025 + 22 do EVAL-CFG-028 + 25 do EVAL-CFG-029 + 20 do EVAL-CFG-030, métodos/suítes exatos |
 | check-performance.sh | UNAVAILABLE | futuras propriedades de escala |
-| check-integration.sh | UNAVAILABLE | futuro arquivo→porta e equivalência em memória |
+| check-integration.sh | executável | AIR file → shared AirJson → Publication → BuildCfg → CFG JSON file, CLI/process e equivalência de controle/coverage em memória |
 | check-full.sh | UNAVAILABLE | fast/architecture/semantic; para em performance, exit 3 |
 
 Todos ficam em scripts/harness. Architecture e semantic exigem Maven, JDK 21+ e
@@ -22,20 +22,21 @@ Exit codes: 0=PASS, 1=FAIL, 2=erro de uso/configuração, 3=UNAVAILABLE.
 ## Estado explícito
 
 [gate-state.json](gate-state.json) registra fase implementation e autorização
-WORK-CFG-024. Hooks reais de architecture/semantic em scripts/project; performance
-e integration permanecem sem hook. O checker verifica consistência local, não
+WORK-CFG-026. Hooks reais de architecture/semantic/integration em scripts/project;
+performance permanece sem hook. O checker verifica consistência local, não
 comprova autorização humana nem estado GitHub.
 
 ## Arquitetura
 
-O hook executa clean/test e exige oito suítes, 102 testes e zero skips. Verifica
-14 fontes e 22 classfiles exatos, incluindo tipos aninhados/sintéticos. Inspeciona
+O hook executa clean/test: oito suítes/102 testes no kernel e três suítes/31 métodos
+nominais de transporte, zero skips. Verifica 14 fontes/22 classfiles exatos do kernel
+e 6 fontes/8 classfiles dos adapters/launcher, incluindo tipos aninhados/sintéticos. Inspeciona
 major 65/minor 0, dependências/classpath, javap e jdeps. Imports complementam bytecode.
 
-- Java 21 sem preview, dependência externa compile somente air-java;
+- Java 21 sem preview; kernel compile somente air-java + java.base;
 - porta exata BuildCfg(Publication, BuildOptions) → CfgBuildResult;
 - CfgPreflight delega diretamente a AirValidator, sem AIR/validator paralelo;
-- sem filesystem, JSON, CLI, rede, frontend, reflection ou ServiceLoader;
+- kernel sem filesystem, JSON, CLI, rede, frontend, reflection ou ServiceLoader;
 - domain não conhece application/extension; registry explícito preservado;
 - CoreCfgProjection substitui CfgFirstProjection, sem projectors concorrentes;
 - ProjectionPolicy no domínio; BuildOptions carrega KNOWN_SUBSET default ou STRICT;
@@ -43,7 +44,14 @@ major 65/minor 0, dependências/classpath, javap e jdeps. Imports complementam b
   Header e os cinco tipos Instruction; Dispatch/Invoke/Raise/Opaque,
   LocalInvoke/Boundary/Resume/Unwind e IndirectJump continuam proibidos;
 - descriptors da porta, resultado, HaltExit.source e listas tipadas do produto;
-- CI fixa/verifica air-java SHA e roda fast, architecture e semantic em Temurin 21.
+- adapters depende de kernel/air-java/air-json; launcher de adapters/kernel;
+- inventário explícito em scripts/project/transport-inventory.json contém cada fonte,
+  import, classfile e dependência bytecode dos módulos externos; Maven DAG efetivo
+  também é exato, sem frontend ou ciclo; modelo air-java não aponta para CFG/codec;
+- reader compilado deve chamar AirJson.decode(byte[]), com bound físico e sem parser AIR local;
+- mappings do writer não podem usar enum.name()/toString()/reflection como wire authority;
+- CI fixa/verifica air-java SHA e roda fast, architecture, semantic e integration
+  em Temurin 21 com Python 3.12 e repositório Maven isolado.
 
 Fixtures negativas testam todas essas primitives excluídas, I/O, frontend, modelo
 paralelo, reflection/ServiceLoader e domain→application. Classes novas exigem evolução
@@ -73,7 +81,29 @@ Nenhum perfil AIR completo é reivindicado.
 
 ## Escalonamento e limites
 
-Docs/harness: fast. Kernel: architecture + semantic. Adapters futuros acrescentam
-integration; escala exige performance. Full deve reportar honestamente o primeiro
+Docs/harness: fast. Kernel: architecture + semantic. Adapters/launcher exigem
+integration separadamente; escala exige performance. Full deve reportar honestamente o primeiro
 gate indisponível. Gates offline não provam merge, CI remota, conclusão de backlog
 ou conformidade bilateral. Skip/UNAVAILABLE não é PASS.
+
+
+## Integração executável 2B
+
+check_integration.py executa clean/test real do reactor. Além das regressões do kernel,
+exige exatamente TransportTest (9), WriterDomainTest (6) e EvalCfg031Test (16), com
+cada método enumerado manualmente e zero missing/duplicate/foreign/skip/failure/error.
+Reports de execuções anteriores são eliminados pelo clean; nenhum report é sintetizado
+como evidência de produto. O detector se testa contra reports negativos antes de Maven.
+O harness tem contracasos de hook ausente, detector de reports, dependências externas,
+parser AIR local e enum.name como wire authority. Contagens e método nominal são
+checados após execução; simples saída exit 0 de Maven não basta.
+
+O fluxo usa fixture AIR canônica estática do pin b78f4068, compara bytes com golden CFG
+manual e observa Entry→Sequence(Return)→NormalExit, ENTRY/RETURN/activationEntry,
+PARTIAL/KNOWN_SUBSET. Testa input físico/codec, recusa real do kernel, todos os status
+não-CFG_BUILT, output I/O/limite, CLI/usage e processo Java. Os demais tipos atuais do
+writer são exercitados por Publications em memória e topologia manual contextual.
+
+Performance não foi implementado. Full continua executando fast/architecture/semantic
+e parando honestamente em performance com UNAVAILABLE/exit 3. A CI executa integration
+como passo obrigatório independente, portanto full não o oculta.

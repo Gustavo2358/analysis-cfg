@@ -16,7 +16,8 @@ Rotas: [MVP](mvp-scenarios.md), [controle local](local-control.md),
 
 O primeiro eval de produto é EVAL-CFG-025, CFG-FIRST em memória. EVAL-CFG-026
 reserva o micro-E2E externo; EVAL-CFG-027 é uma prova arquitetural local, sem claim
-de produto. Arquivo/memória continua prova posterior; Branch tem oracle próprio no 029.
+de produto. EVAL-CFG-031 prova o arquivo AIR → CFG JSON do GOBACK e equivalência
+de controle/coverage com memória; Branch tem oracle próprio no 029.
 
 Asserções estruturais dos oráculos upstream não exigem implementar RD/PV agora.
 A força dos testes será comprovada com falsificações/mutantes focalizados; contagem

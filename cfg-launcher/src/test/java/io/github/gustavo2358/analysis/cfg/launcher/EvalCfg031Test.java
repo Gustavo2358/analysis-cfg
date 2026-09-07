@@ -144,4 +144,33 @@ class EvalCfg031Test {
                 new String[]{source.toString(), output().toString()}, err, new AirJsonFileReader(),
                 (p, o) -> { throw bug; }, new CfgJsonWriter())));
     }
+    @Test void mainProcessUsesRealExitCodesAndFilePipeline() throws Exception {
+        Path source = input();
+        String javaExecutable = Path.of(System.getProperty("java.home"), "bin", "java").toString();
+        String classpath = System.getProperty("java.class.path");
+        Path log = temporary.resolve("process.log");
+        var process = new ProcessBuilder(javaExecutable, "-cp", classpath, AnalysisCfg.class.getName(),
+                source.toString(), output().toString()).redirectErrorStream(true).redirectOutput(log.toFile()).start();
+        assertTrue(process.waitFor(20, java.util.concurrent.TimeUnit.SECONDS));
+        assertEquals(0, process.exitValue(), Files.readString(log));
+        try (var golden = getClass().getResourceAsStream("/cfg/goback.manual.json")) {
+            assertArrayEquals(golden.readAllBytes(), Files.readAllBytes(output()));
+        }
+        assertEquals("", Files.readString(log));
+        var invalid = new ProcessBuilder(javaExecutable, "-cp", classpath, AnalysisCfg.class.getName(),
+                temporary.resolve("missing").toString(), output().toString()).redirectErrorStream(true).redirectOutput(log.toFile()).start();
+        assertTrue(invalid.waitFor(20, java.util.concurrent.TimeUnit.SECONDS));
+        assertEquals(3, invalid.exitValue());
+        assertTrue(Files.readString(log).contains("INPUT_IO"));
+    }
+
+    @Test void oversizedPhysicalInputReturnsThreeBeforeCodec() throws Exception {
+        Path source = temporary.resolve("oversized.json");
+        try (var file = new java.io.RandomAccessFile(source.toFile(), "rw")) {
+            file.setLength((long) AirJson.Limits.defaults().maximumDocumentBytes() + 1);
+        }
+        failsWithoutPublishing(source, "IMPLEMENTATION_LIMIT");
+        assertTrue(diagnostic().contains("maximumDocumentBytes="));
+    }
+
 }

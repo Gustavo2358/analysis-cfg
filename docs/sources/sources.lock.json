@@ -193,7 +193,7 @@
       "codec": {
         "path": "air-json/pom.xml",
         "artifact_id": "air-json",
-        "role": "shared_codec_1A_not_a_cfg_dependency"
+        "role": "shared_codec_1A_consumed_by_cfg_adapters"
       }
     }
   },

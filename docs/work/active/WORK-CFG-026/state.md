@@ -1,13 +1,27 @@
 # WORK-CFG-026 — Estado
 
 ## Onde estamos
-Implementação autorizada somente 2B; contrato/oracles antes de produção. PR #9 reconciliado e 025 encerrado. Baseline b614712fda55fef12639cbe18fd90793faa1fb3b, branch feat/air-json-cfg-cli.
+
+2B implementado, revisado e validado localmente; preparando commit/push/PR. PR #9 reconciliado e 025 encerrado.
+Baseline b614712fda55fef12639cbe18fd90793faa1fb3b, branch feat/air-json-cfg-cli.
+Contrato e RED por API ausente commitados em 7d22315 antes da produção.
 
 ## Verde conhecido
-Git limpo e atualizado no baseline; merge real confirmado via gh e ancestralidade local. Nenhum gate de produto 2B executado ainda.
+
+Segundo GREEN em Temurin 21: docs/fast (47), architecture (102 kernel + 31 transporte),
+semantic (84), integration (31), Maven clean verify (133) e execução CLI/golden passaram.
+17 challenges RED, restauração byte a byte. Performance/full executados com exit 3
+UNAVAILABLE. Scope/manifest/diff check passaram. [Evidência](../../evidence/WORK-CFG-026/validation.md).
 
 ## Restante
-RED, implementação, GREEN, gates/challenges, revisão, commits/push/PR, CI no head e parada humana.
+
+Commit/push/PR, confirmar CI no head exato e parar para review humano. Não fazer
+merge/auto-merge. E2E cross-repo não iniciado.
 
 ## Descobertas que afetam o plano
-Roadmap tem snapshot antigo; autorização atual do usuário define 2B e libera DRAFT pinado. Upstream irmão não tem o commit de merge; cópia isolada /tmp evita modificá-lo. Erro de limite físico será tipado próprio, pois construtores de AirJsonException não são públicos; exceções reais do codec atravessam intactas.
+
+Upstream obtido em cópia isolada /tmp, sem alterar repo irmão. Exceções AirJson
+atravessam intactas; limite físico tem tipo próprio porque construtores do upstream
+não são públicos. O modelo pinado já recusa surrogate isolado nos IDs; o writer
+também protege sua primitiva UTF-8. Fallback de move é testado sem alegar atomicidade.
+Memória/arquivo provam observações de controle/coverage do v1; não duplicam toda a AIR.

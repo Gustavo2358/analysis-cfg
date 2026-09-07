@@ -109,7 +109,7 @@ sem filesystem, codec ou lowerer. Na integração futura, `cobol-lower` devolve 
 mesmo tipo por chamada Java. Não criar `MemoryReader` ou repository para transportar
 um objeto pronto e não serializar para JSON só para restabelecer lifetime.
 
-## Arquivo e binding JSON depois
+## Arquivo e binding JSON no 2B
 
 ```text
 AIR JSON/file → infrastructure reader → air-java Publication → BuildCfg
@@ -118,16 +118,15 @@ memory caller ──────────────────────
 
 O binding JSON normativo pertence e é versionado pelo `analysis-ir`, de modo
 independente da linguagem. O Analysis IR JSON Binding 1.0.0 existe no commit
-fixado, targets AIR 2.0.0 e permanece DRAFT; este checkpoint não implementa seu
-reader. Uma autorização posterior poderá criar o adapter em `cfg-adapters` sem
-alterar a porta; `air-java` continua sem Jackson/Gson/JSON. Não derivar o binding
-automaticamente da organização de records Java e não usar a notação `.air` ou
-`cobol-semantic-product.json` como schema.
+fixado, targets AIR 2.0.0 e permanece DRAFT. A decisão humana do WORK-CFG-026 autoriza
+consumir esse snapshot experimental sem promoção. `cfg-adapters::AirJsonFileReader`
+usa um único AirJson.Limits para leitura física limitada e shared AirJson.decode.
+Não há parser AIR/DTO concorrente. `air-java` modelo continua sem JSON/filesystem.
 
-Erro de arquivo/encoding/JSON é `INPUT_ERROR` do adapter; AIR com referência
-pendente é `INVALID_IR`; capability legítima fora do slice é
-`UNSUPPORTED_CAPABILITY` ou fallback sustentado. Essas classes não são trocadas para
-disfarçar falha. A ausência do binding não bloqueia o core em memória.
+Falhas AirJsonException mantêm code/path/issues intactos; limite físico próprio
+antes do codec é IMPLEMENTATION_LIMIT com maximumDocumentBytes. INPUT_IO distingue
+filesystem. Nenhuma falha anterior à Publication vira UNSUPPORTED_INPUT do kernel.
+[Contrato e limites CFG JSON](cfg-json-v1.md), [CLI/exit codes](../../README.md).
 
 ## Lifetime e retenção
 
@@ -146,15 +145,23 @@ dependência de um arquivo continuar aberto.
 
 ## Portas de saída
 
-Construir CFG não exige persistência: devolver `CfgBuildResult` basta. Exportadores
-JSON/DOT são adapters que consomem esse resultado fora do core. Uma futura porta de
+Construir CFG não exige persistência: devolver `CfgBuildResult` basta. O writer
+JSON é implementado em cfg-adapters; DOT permanece futuro. Exportadores consomem
+esse resultado fora do core. Uma futura porta de
 publicação/armazenamento só nasce de necessidade real, não para completar um desenho
 hexagonal abstrato.
 
-## Prova de substituição posterior
+## Prova de substituição
 
 Depois do binding/adapter, a mesma `Publication` deve chegar por arquivo e por
 construção em memória. Com mesmas opções e correlações, os resultados semânticos são
 equivalentes: nós, outcomes, gaps, origins, precisão, `TypeRef`, premises e escopos.
 Essa prova é posterior a `CFG-FIRST`; não compara texto de console e não altera a
 porta nem o algoritmo (INV-CFG-002; EVAL-CFG-008).
+
+
+EVAL-CFG-031 executa o reader/porta/writer e compara bytes com o golden CFG manual.
+Uma Publication construída independentemente em memória mantém as mesmas correlações,
+topologia e inventários e gera os mesmos bytes CFG. Seus fatos AIR não transportados
+(origins/precision) diferem deliberadamente: essa prova não substitui todo o escopo
+futuro de EVAL-CFG-008 nem a qualificação de perfil AIR.

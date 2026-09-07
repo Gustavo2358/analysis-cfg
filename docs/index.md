@@ -7,7 +7,7 @@ Esta página roteia leitura; não exige carregar todos os documentos.
 | --- | --- |
 | Missão/MVP | [missão](product/mission-and-slices.md) |
 | Arquitetura | [mapa curto](../ARCHITECTURE.md), [pipeline](architecture/pipeline.md), [fronteiras](architecture/boundaries.md) |
-| I/O e integração | [portas/adapters](architecture/ports-and-adapters.md), [Java/Maven](engineering/toolchain-and-modules.md) |
+| I/O e integração | [portas/adapters](architecture/ports-and-adapters.md), [CFG JSON v1](architecture/cfg-json-v1.md), [Java/Maven](engineering/toolchain-and-modules.md) |
 | Evolução | [extensibilidade](architecture/extensibility.md), [ADRs](architecture/decisions/index.md), [invariantes](architecture/invariants.md) |
 | Contrato | [fronteira IR](domain/ir-boundary.md), [controle](domain/core-control.md), [produto](domain/graph-product.md) |
 | Casos avançados | [local](domain/local-control.md), [aberto](domain/open-control.md) |

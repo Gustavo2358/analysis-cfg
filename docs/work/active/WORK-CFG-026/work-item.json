@@ -36,7 +36,10 @@
     ".github/workflows/ci.yml",
     "README.md",
     "ARCHITECTURE.md",
-    "docs"
+    "docs",
+    "scripts/analysis-cfg",
+    "START_HERE.md",
+    "MANIFEST.sha256"
   ],
   "test_scope": [
     "cfg-adapters",

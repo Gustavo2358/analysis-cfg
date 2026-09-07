@@ -293,4 +293,4 @@ Nenhum claim de perfil nem de independência das lacunas para dataflow/reachabil
 
 ## EVAL-CFG-031 — Arquivo AIR → CFG JSON e CLI
 
-Planejado em WORK-CFG-026: fluxo real pelo shared AirJson e BuildCfg, golden manual independente, falhas sem publicar output, determinismo e coverage honesta.
+Implementado em WORK-CFG-026: 31 métodos / três suítes no integration gate, fluxo real pelo shared AirJson e BuildCfg, golden manual independente, falhas sem publicar output, determinismo e coverage honesta. Inclui CLI em processo separado e mapping de todos os tipos CFG atuais, sem completar EVAL-CFG-008 nem E2E externo.

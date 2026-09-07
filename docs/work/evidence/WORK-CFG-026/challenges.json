@@ -1,0 +1,195 @@
+[
+  {
+    "challenge": "01-local-air-parser",
+    "command": [
+      "/usr/bin/python3",
+      "-c",
+      "import sys;from pathlib import Path;sys.path.insert(0,'scripts/project');from check_architecture import verify_project_shape;verify_project_shape(Path.cwd())"
+    ],
+    "exit": 1,
+    "detected": true,
+    "restored_sha256": "0d9f54d26a728aad17163be2cf28e7ce458fe775554a37f0d7ba7d27dd73c393"
+  },
+  {
+    "challenge": "02-kernel-air-json",
+    "command": [
+      "/usr/bin/python3",
+      "-c",
+      "import sys;from pathlib import Path;sys.path.insert(0,'scripts/project');from check_architecture import verify_project_shape;verify_project_shape(Path.cwd())"
+    ],
+    "exit": 1,
+    "detected": true,
+    "restored_sha256": "0ee54d83103d2fe70f67e3e370273f6cd929613ba933bf917f3f15ecdb71aed2"
+  },
+  {
+    "challenge": "03a-kernel-filesystem-bytecode",
+    "command": [
+      "bash",
+      "scripts/harness/check-architecture.sh"
+    ],
+    "exit": 1,
+    "detected": true,
+    "restored_sha256": "cb73a48c8d7b916bee2aee8f6faf9727a0d4ac2db33bc231d4977ce2707a1a0f"
+  },
+  {
+    "challenge": "03b-kernel-json-import",
+    "command": [
+      "/usr/bin/python3",
+      "-c",
+      "import sys;from pathlib import Path;sys.path.insert(0,'scripts/project');from check_architecture import verify_project_shape;verify_project_shape(Path.cwd())"
+    ],
+    "exit": 1,
+    "detected": true,
+    "restored_sha256": "81e332367e61d46df7d982a6b29958efba10bfdba5047a908bce5699c9debebe"
+  },
+  {
+    "challenge": "04-non-built-publishes",
+    "command": [
+      "mvn",
+      "-B",
+      "-ntp",
+      "test"
+    ],
+    "exit": 1,
+    "detected": true,
+    "restored_sha256": "210bd8bac22014f2a72f3f1ef9cfcadf7235eb74539a5a885c8ddea2c6dada1d"
+  },
+  {
+    "challenge": "05-partial-promoted",
+    "command": [
+      "mvn",
+      "-B",
+      "-ntp",
+      "test"
+    ],
+    "exit": 1,
+    "detected": true,
+    "restored_sha256": "ce11d494154f40302d17f266f86ce2dde604ddd9739cc291fb81949663e6db3a"
+  },
+  {
+    "challenge": "06a-drop-entry",
+    "command": [
+      "mvn",
+      "-B",
+      "-ntp",
+      "test"
+    ],
+    "exit": 1,
+    "detected": true,
+    "restored_sha256": "ce11d494154f40302d17f266f86ce2dde604ddd9739cc291fb81949663e6db3a"
+  },
+  {
+    "challenge": "06b-drop-return",
+    "command": [
+      "mvn",
+      "-B",
+      "-ntp",
+      "test"
+    ],
+    "exit": 1,
+    "detected": true,
+    "restored_sha256": "ce11d494154f40302d17f266f86ce2dde604ddd9739cc291fb81949663e6db3a"
+  },
+  {
+    "challenge": "07-activation-swapped",
+    "command": [
+      "mvn",
+      "-B",
+      "-ntp",
+      "test"
+    ],
+    "exit": 1,
+    "detected": true,
+    "restored_sha256": "ce11d494154f40302d17f266f86ce2dde604ddd9739cc291fb81949663e6db3a"
+  },
+  {
+    "challenge": "08a-enum-name-wire",
+    "command": [
+      "/usr/bin/python3",
+      "-c",
+      "import sys;from pathlib import Path;sys.path.insert(0,'scripts/project');from check_architecture import verify_project_shape;verify_project_shape(Path.cwd())"
+    ],
+    "exit": 1,
+    "detected": true,
+    "restored_sha256": "ce11d494154f40302d17f266f86ce2dde604ddd9739cc291fb81949663e6db3a"
+  },
+  {
+    "challenge": "08b-enum-to-string-wire",
+    "command": [
+      "/usr/bin/python3",
+      "-c",
+      "import sys;from pathlib import Path;sys.path.insert(0,'scripts/project');from check_architecture import verify_project_shape;verify_project_shape(Path.cwd())"
+    ],
+    "exit": 1,
+    "detected": true,
+    "restored_sha256": "ce11d494154f40302d17f266f86ce2dde604ddd9739cc291fb81949663e6db3a"
+  },
+  {
+    "challenge": "09-machine-metadata",
+    "command": [
+      "mvn",
+      "-B",
+      "-ntp",
+      "test"
+    ],
+    "exit": 1,
+    "detected": true,
+    "restored_sha256": "ce11d494154f40302d17f266f86ce2dde604ddd9739cc291fb81949663e6db3a"
+  },
+  {
+    "challenge": "10a-suite-removed",
+    "command": [
+      "bash",
+      "scripts/harness/check-integration.sh"
+    ],
+    "exit": 1,
+    "detected": true,
+    "restored_sha256": "3b81776bffe0009c12bf0e1468123f295c1bba6053edcf058f713c104195bf37"
+  },
+  {
+    "challenge": "10b-suite-skipped",
+    "command": [
+      "bash",
+      "scripts/harness/check-integration.sh"
+    ],
+    "exit": 1,
+    "detected": true,
+    "restored_sha256": "3b81776bffe0009c12bf0e1468123f295c1bba6053edcf058f713c104195bf37"
+  },
+  {
+    "challenge": "11-air-failure-exit-zero",
+    "command": [
+      "mvn",
+      "-B",
+      "-ntp",
+      "test"
+    ],
+    "exit": 1,
+    "detected": true,
+    "restored_sha256": "210bd8bac22014f2a72f3f1ef9cfcadf7235eb74539a5a885c8ddea2c6dada1d"
+  },
+  {
+    "challenge": "12-build-failure-exit-zero",
+    "command": [
+      "mvn",
+      "-B",
+      "-ntp",
+      "test"
+    ],
+    "exit": 1,
+    "detected": true,
+    "restored_sha256": "210bd8bac22014f2a72f3f1ef9cfcadf7235eb74539a5a885c8ddea2c6dada1d"
+  },
+  {
+    "challenge": "13-publish-before-complete-bytes",
+    "command": [
+      "mvn",
+      "-B",
+      "-ntp",
+      "test"
+    ],
+    "exit": 1,
+    "detected": true,
+    "restored_sha256": "ce11d494154f40302d17f266f86ce2dde604ddd9739cc291fb81949663e6db3a"
+  }
+]

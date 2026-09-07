@@ -3,6 +3,8 @@
 **Entrega atual:** CFG estrutural em memória: Entry, instructions, Jump,
 Branch TRUE/FALSE, Return/NormalExit e Halt/HaltExit,
 com Java 21/Maven, `air-java` e seam explícito de capabilities.
+O checkpoint 2B acrescenta AIR JSON file → shared AirJson → Publication → BuildCfg
+→ CFG JSON file, em `cfg-adapters`/`cfg-launcher`, sem modificar o kernel.
 **Data:** 07/09/2026. **Repositório:**
 `Gustavo2358/analysis-cfg`.
 
@@ -38,6 +40,7 @@ depois pelo [índice de trabalho](docs/work/index.md). Não carregue o harness i
 bash scripts/harness/check-fast.sh
 bash scripts/harness/check-architecture.sh
 bash scripts/harness/check-semantic.sh
+bash scripts/harness/check-integration.sh
 ```
 
 Requisitos: Bash, Python 3.9+, Maven e JDK 21 ou mais novo. O bytecode é sempre
@@ -74,8 +77,9 @@ Branch usa exclusivamente trueDestination/falseDestination, com BRANCH_TRUE e
 BRANCH_FALSE distintos mesmo quando os destinos são iguais. O predicate original
 é preservado; literal bool e unknown(known(bool)) mantêm ambos os braços.
 unknown_type é INVALID_IR no preflight, sem grafo parcial. Não há avaliação de
-valores nem detecção de join. Dispatch, invoke/raise, controle aberto/local/indireto,
-JSON, CLI e dataflow permanecem posteriores. BACKLOG-CFG-004/007 não foram iniciados.
+valores nem detecção de join. Dispatch, invoke/raise, controle aberto/local/indireto e dataflow permanecem posteriores. Transporte/CLI
+GOBACK estão em WORK-CFG-026; não promovem integralmente os backlogs históricos
+004/008 nem iniciam o E2E externo com cobol-lower.
 
 ## O que os gates significam hoje
 
@@ -85,7 +89,9 @@ Maven/testes e inspeciona dependências e bytecode do kernel. `semantic` executa
 explicitamente os 17 testes de EVAL-CFG-025, 22 de EVAL-CFG-028, 25 de EVAL-CFG-029
 e 20 de EVAL-CFG-030; rejeita
 suítes/métodos ausentes, extras, duplicados ou pulados.
-`performance`, `integration` e, por consequência, `full` permanecem
+`integration` executa 31 métodos nominais em três suítes: arquivos reais, codec,
+porta, golden, equivalência de controle/coverage em memória e processo CLI.
+`performance` e, por consequência, `full` permanecem
 **UNAVAILABLE / exit 3**; full executa fast, architecture e semantic antes de parar
 em performance. CFG-FIRST não implica conformidade com um perfil AIR completo.
 
@@ -95,5 +101,54 @@ O utilitário opcional [cache_ir.py](scripts/harness/cache_ir.py) pode importar 
 cópia local verificada ou obter os arquivos públicos fixados; nunca troca por `main`.
 
 `analysis-ir` contém o Analysis IR JSON Binding 1.0.0, ainda **DRAFT** no commit
-fixado. Este projeto não o implementa neste checkpoint; um reader futuro será
-adapter externo e não alterará a boundary em memória.
+fixado. 2B usa esse snapshot experimental por decisão humana explícita,
+exclusivamente via shared `air-json`; sem codec AIR local, promoção normativa ou
+claim de interoperabilidade universal. O [CFG JSON v1](docs/architecture/cfg-json-v1.md)
+é contrato próprio do produto analysis-cfg.
+
+## Executar AIR JSON → CFG JSON
+
+Após instalar o upstream pinado no repositório Maven isolado conforme a
+[preparação](docs/engineering/toolchain-and-modules.md), use o mesmo MAVEN_OPTS:
+
+```bash
+mvn -B -ntp package dependency:copy-dependencies -DincludeScope=runtime
+bash scripts/analysis-cfg \
+  cfg-adapters/src/test/resources/air/goback.canonical.json \
+  /tmp/goback.cfg.json
+```
+
+A preparação copia as dependências runtime para target/dependency, sem fat JAR.
+O script pode ser chamado por path absoluto de qualquer diretório; argumentos de
+arquivo relativos são relativos ao caller. Java deve estar no PATH. Equivalente:
+
+```bash
+java -cp 'cfg-launcher/target/classes:cfg-launcher/target/dependency/*' \
+  io.github.gustavo2358.analysis.cfg.launcher.AnalysisCfg input.air.json output.cfg.json
+```
+
+Dois argumentos posicionais, sem flags de policy. `run` é testável sem sair da JVM;
+`main` propaga seu exit code. Sucesso não escreve stdout/stderr. Erros esperados têm
+stderr conciso, com code/path/issues do AirJson ou status/issues/capabilities do kernel,
+sem stack trace normal. Bugs inesperados propagam.
+
+| Exit | Significado |
+| --- | --- |
+| 0 | CFG_BUILT e arquivo escrito |
+| 2 | uso/paths posicionais inválidos |
+| 3 | input físico ou falha AirJson; IMPLEMENTATION_LIMIT físico é explícito |
+| 4 | build não CFG_BUILT, sem publicação |
+| 5 | limite/forma/encoding de serialização CFG |
+| 6 | filesystem de saída |
+
+A [fixture AIR](cfg-adapters/src/test/resources/air/PROVENANCE.md) vem do golden
+estático upstream b78f4068, independente de 2A. O
+[golden CFG manual](cfg-adapters/src/test/resources/cfg/goback.manual.json) tem
+Entry → ENTRY → Sequence(Return) → RETURN → NormalExit, correlations e activationEntry,
+com source inventories PARTIAL e policy KNOWN_SUBSET. UTF-8 sem BOM/newline final,
+ordem estável e nenhum metadado de máquina. Limites default: input 16 MiB/depth 128,
+output 64 MiB. Bytes completos precedem temp/move; fallback sem ATOMIC_MOVE não
+reivindica atomicidade. Input/build/serialização falhos preservam destino existente.
+
+Ainda não implementados: E2E cross-repo com cobol-lower, orquestrador, dataflow,
+possible values, fact projection e CFG JSON reader. O próximo E2E não foi iniciado.

@@ -24,7 +24,7 @@ Não exigir annotations de serialização nos objetos de domínio.
 Sem callbacks preguiçosos para consultar frontend/arquivo enquanto o CFG é construído.
 JDK não é passe livre: filesystem do JDK continua infraestrutura.
 Sem imports de ProLeap, ANTLR ou COBOL Semantic Product. A assinatura de `BuildCfg`
-usa a `Publication` do `air-java`; um reader AIR JSON futuro vive em adapters.
+usa a `Publication` do `air-java`; o reader AIR JSON vive em cfg-adapters e delega ao shared AirJson.
 
 Diagnostics tipados e contadores determinísticos são resultados de domínio.
 Relógios, cronômetros, logging operacional, métricas exportadas e retries pertencem

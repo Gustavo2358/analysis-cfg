@@ -1,0 +1,137 @@
+{
+  "baseline": "b614712fda55fef12639cbe18fd90793faa1fb3b",
+  "branch": "feat/air-json-cfg-cli",
+  "java": "Temurin 21.0.12.1+1",
+  "maven": "3.9.16",
+  "maven_repository": "isolated /tmp/cfg-2b/m2, initialized from authorized upstream",
+  "source_sha256": {
+    "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirInputLimitException.java": "c0c2798b172fd98892f72d338de9583d5e44f1285d5d5e75fa05a6b06938e377",
+    "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirJsonFileReader.java": "0d9f54d26a728aad17163be2cf28e7ce458fe775554a37f0d7ba7d27dd73c393",
+    "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonBytes.java": "579254467d367c6a067845c16f2a1c1b82558fcc707830bf7adc16e49997f7c6",
+    "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonException.java": "f0be54101b6d29f3e17a7f6972e20621c7e81c837cb16f77ab387d032a85bfdf",
+    "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter.java": "ce11d494154f40302d17f266f86ce2dde604ddd9739cc291fb81949663e6db3a",
+    "cfg-launcher/src/main/java/io/github/gustavo2358/analysis/cfg/launcher/AnalysisCfg.java": "210bd8bac22014f2a72f3f1ef9cfcadf7235eb74539a5a885c8ddea2c6dada1d"
+  },
+  "gates": [
+    {
+      "check": "docs",
+      "command": [
+        "bash",
+        "scripts/harness/check-docs.sh"
+      ],
+      "exit": 0,
+      "expected": 0
+    },
+    {
+      "check": "fast",
+      "command": [
+        "bash",
+        "scripts/harness/check-fast.sh"
+      ],
+      "exit": 0,
+      "expected": 0
+    },
+    {
+      "check": "architecture",
+      "command": [
+        "bash",
+        "scripts/harness/check-architecture.sh"
+      ],
+      "exit": 0,
+      "expected": 0
+    },
+    {
+      "check": "semantic",
+      "command": [
+        "bash",
+        "scripts/harness/check-semantic.sh"
+      ],
+      "exit": 0,
+      "expected": 0
+    },
+    {
+      "check": "integration",
+      "command": [
+        "bash",
+        "scripts/harness/check-integration.sh"
+      ],
+      "exit": 0,
+      "expected": 0
+    },
+    {
+      "check": "maven-verify",
+      "command": [
+        "mvn",
+        "-B",
+        "-ntp",
+        "clean",
+        "verify"
+      ],
+      "exit": 0,
+      "expected": 0
+    },
+    {
+      "check": "performance",
+      "command": [
+        "bash",
+        "scripts/harness/check-performance.sh"
+      ],
+      "exit": 3,
+      "expected": 3
+    },
+    {
+      "check": "full",
+      "command": [
+        "bash",
+        "scripts/harness/check-full.sh"
+      ],
+      "exit": 3,
+      "expected": 3
+    },
+    {
+      "check": "cli-package",
+      "command": [
+        "mvn",
+        "-B",
+        "-ntp",
+        "package",
+        "dependency:copy-dependencies",
+        "-DincludeScope=runtime"
+      ],
+      "exit": 0,
+      "expected": 0
+    },
+    {
+      "check": "cli",
+      "command": [
+        "bash",
+        "scripts/analysis-cfg",
+        "cfg-adapters/src/test/resources/air/goback.canonical.json",
+        "/tmp/cfg-2b/goback.cfg.json"
+      ],
+      "exit": 0,
+      "expected": 0
+    },
+    {
+      "check": "cli-golden",
+      "command": [
+        "cmp",
+        "cfg-adapters/src/test/resources/cfg/goback.manual.json",
+        "/tmp/cfg-2b/goback.cfg.json"
+      ],
+      "exit": 0,
+      "expected": 0
+    },
+    {
+      "check": "diff-check",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "expected": 0
+    }
+  ],
+  "claim": "local 2B only; performance and full UNAVAILABLE, cross-repo E2E not executed"
+}

@@ -122,3 +122,18 @@ GREEN e mutantes A–G executados; quatro metamorfismos preservam correlações/
 025 fica byte a byte intacto. No 028, somente a recusa obsoleta de Branch e o switch
 exaustivo foram reconciliados; seus 22 métodos e a fixture mista são preservados.
 Pureza de unknown continua obrigação upstream no preflight; CFG não a descarrega.
+
+## Evidência de transporte 2B
+
+EVAL-CFG-031 executa três suítes com 31 métodos nominais. AIR estática do upstream
+pinado não é regenerada pelo encoder; expected CFG manual antecedeu produção.
+RED por APIs ausentes registrado no commit 7d22315. O golden exige os três nós,
+as duas transições e cada correlation/contexto, PARTIAL e KNOWN_SUBSET.
+O writer também recebe domínio completo atual (Branch/Jump/Halt/Return) por memória,
+com expected contextual independente, escaping UTF-8 e fallback de move injetado.
+Falhas de input/codec/build/output/usage e bugs inesperados têm testes separados.
+
+Memória/arquivo geram as mesmas observações CFG de controle/coverage para o GOBACK;
+os fatos AIR não transportados no v1 não são certificados por essa equivalência.
+O kernel conserva seus 102 testes, inclusive os 84 métodos semânticos anteriores.
+O harness possui 47 testes, incluindo contracasos do novo executor/inventário.

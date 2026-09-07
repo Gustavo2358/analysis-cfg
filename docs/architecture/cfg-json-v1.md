@@ -95,3 +95,9 @@ A entrada usa exclusivamente shared air-json 0.1.0-SNAPSHOT em air-java
 b78f4068d8a479f48eb048b8d76fa60a0997dc4a: `analysis-ir-json` bindingVersion 1.0.0,
 airVersion 2.0.0, DRAFT em analysis-ir 122ce54e1b9ef9b00646f93ece409ca8b63bc933.
 Autorização humana explícita libera esse snapshot experimental sem promoção normativa.
+
+
+No v1 também ficam fora do wire os índices de navegação (deriváveis das arrays),
+preflight detalhado, limites ValidationOptions e preciseControlCapabilities do
+objeto em memória. A policy efetiva é transportada, mas nenhuma qualificação de
+capabilities/precisão de extensões é reivindicada pelo JSON v1.

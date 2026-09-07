@@ -50,9 +50,11 @@ O diamond reconverge somente onde os terminadores dizem; ramo que termina não g
 join artificial. A permutação física de sequences não altera transições. `Return`
 e `Halt` continuam saídas semanticamente distintas.
 
-CLI, adapter AIR JSON e a equivalência arquivo/memória continuam importantes, mas
-são milestones de infraestrutura posteriores e não condição para provar
-`Publication → CFG`.
+WORK-CFG-026 implementa CLI mínima, adapter AIR JSON via shared AirJson e
+output CFG JSON v1. EVAL-CFG-031 prova arquivo/porta, golden independente e
+equivalência de observações de controle/coverage com memória no GOBACK.
+O E2E externo com cobol-lower, orquestrador, dataflow, possible values e fact projection
+continuam fora do produto entregue.
 
 ## Slices seguintes
 
