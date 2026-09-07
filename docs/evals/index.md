@@ -3,8 +3,9 @@
 [Catálogo](catalog.md) descreve intenção e estado; [metadados](catalog.json) permitem
 verificar referências. EVAL-CFG-007 e EVAL-CFG-024 possuem prova executável da
 boundary; EVAL-CFG-027 prova localmente o registry de capability/version.
-EVAL-CFG-025 prova CFG-FIRST; EVAL-CFG-009 e os demais evals semânticos continuam
-planejados. Nenhum perfil AIR completo foi implementado.
+EVAL-CFG-025 prova CFG-FIRST; EVAL-CFG-028 prova instructions lineares, Jump e
+Halt. EVAL-CFG-001/002/005/013/014 continuam planned, com evidência parcial; os
+outros evals semânticos permanecem planejados. Nenhum perfil AIR completo foi implementado.
 
 Rotas: [MVP](mvp-scenarios.md), [controle local](local-control.md),
 [metamorfismo](metamorphic.md), [perfis](profile-matrix.md),

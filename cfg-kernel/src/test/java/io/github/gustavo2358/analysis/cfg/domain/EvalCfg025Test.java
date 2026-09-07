@@ -68,6 +68,7 @@ class EvalCfg025Test {
                 case CfgNode.SequenceNode sequence -> sequenceNode(sequence.source().label());
                 case CfgNode.NormalExit exit -> new NodeObservation(Role.NORMAL_EXIT,
                         exit.publicationId(), exit.unitId(), exit.entryId());
+                case CfgNode.HaltExit ignored -> throw new AssertionError("CF1 observation contains a Halt exit");
             };
             assertNull(nodes.put(node.id(), observation), "CFG IDs must be unique");
         }
@@ -257,28 +258,42 @@ class EvalCfg025Test {
     }
 
     @Test
-    void haltIsOutsideTheSliceIncludingInAnOrphan() {
+    void haltIsNowSupportedIncludingInAnOrphan() {
         LabelId other = new LabelId(U, "other");
         Operations.Halt halt = new Operations.Halt(header(new OperationId(U, "halt")), Operations.HaltKind.NORMAL);
         Publication publication = publication(List.of(unit(U, List.of(entry(E, L)),
                 List.of(returning(L), new Sequence(other, List.of(), halt, ORIGIN)))));
-        assertUnsupported(publication, CfgProjectionIssue.Code.UNSUPPORTED_TERMINATOR, halt.header().id());
+        CfgGraph graph = graph(publication);
+        assertSame(halt, graph.haltExits().getFirst().source());
+        CfgNode.SequenceNode orphan = graph.nodes().stream().filter(CfgNode.SequenceNode.class::isInstance)
+                .map(CfgNode.SequenceNode.class::cast).filter(n -> n.source().label().equals(other)).findFirst().orElseThrow();
+        assertTrue(graph.transitions().stream().noneMatch(t -> t.to().equals(orphan.id())));
+        assertTrue(graph.transitions().stream().anyMatch(t -> t.from().equals(orphan.id())
+                && t.to().equals(graph.haltExits().getFirst().id()) && t.kind() == CfgTransition.Kind.HALT
+                && t.activationEntry().equals(E)));
     }
 
     @Test
-    void jumpIsOutsideTheSliceEvenWithAValidExplicitTarget() {
+    void jumpIsNowSupportedWithItsValidExplicitTarget() {
         Operations.Jump jump = new Operations.Jump(header(new OperationId(U, "jump")), L);
         Publication publication = publication(List.of(unit(U, List.of(entry(E, L)),
                 List.of(new Sequence(L, List.of(), jump, ORIGIN)))));
-        assertUnsupported(publication, CfgProjectionIssue.Code.UNSUPPORTED_TERMINATOR, jump.header().id());
+        CfgGraph graph = graph(publication);
+        assertEquals(new Observation(Set.of(entryNode(E), sequenceNode(L), exitNode(E)),
+                Set.of(entering(E, L), new EdgeObservation(sequenceNode(L), sequenceNode(L),
+                        CfgTransition.Kind.JUMP, E))), observe(graph));
     }
 
     @Test
-    void instructionsAreExplicitlyOutsideThisSlice() {
+    void instructionsAreNowPreservedWithinTheSequence() {
         Operations.Nop nop = new Operations.Nop(header(new OperationId(U, "nop")));
         Publication publication = publication(List.of(unit(U, List.of(entry(E, L)),
                 List.of(new Sequence(L, List.of(nop), returning(L).terminator(), ORIGIN)))));
-        assertUnsupported(publication, CfgProjectionIssue.Code.INSTRUCTIONS_OUTSIDE_SLICE, L);
+        CfgGraph graph = graph(publication);
+        assertEquals(minimalExpected(), observe(graph));
+        CfgNode.SequenceNode node = graph.nodes().stream().filter(CfgNode.SequenceNode.class::isInstance)
+                .map(CfgNode.SequenceNode.class::cast).findFirst().orElseThrow();
+        assertSame(nop, node.source().instructions().getFirst());
     }
 
     @Test

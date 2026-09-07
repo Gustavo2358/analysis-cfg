@@ -5,7 +5,8 @@ implementado agora. Registro verificável: [profile-obligations.json](profile-ob
 
 | Marco/perfil | Exigência | Estado |
 | --- | --- | --- |
-| CFG-FIRST (local) | Entry → Sequence(Return) → normal exit; memória; sem fallthrough | planejado |
+| CFG-FIRST (local) | Entry → Sequence(Return) → normal exit; memória; sem fallthrough | implementado |
+| WORK-CFG-022 (local) | instructions ordenadas, Jump explícito e Halt distinto/contextual | implementado |
 | MVP-CFG-01 (local) | linear, jump, branch, return/halt e IF/ELSE estrutural; unsupported honesto | planejado |
 | AIR-STRUCTURE@2 | transferências, cycles, entries, invoke/outcomes, `return`/`raise`/`halt`, opaque/open, `TypeRef` e provas de domínio preservadas | não implementado |
 | AIR-LOCAL-CONTROL@2 | STRUCTURE@2 + `control.local@1`, matching, ports, resume/unwind | não implementado |

@@ -23,7 +23,13 @@ permutação de Units/Entries e teste de inventário órfão. Isso não implemen
 EVAL-CFG-014 inteiro. O mutante Return → próxima Sequence física foi morto pelo
 oracle independente.
 
-Mutantes prioritários posteriores: remover FALSE, remover default, adicionar fallthrough após
-halt, unir IDs de units, pular opaco, criar C1→resume direto, buscar porta abaixo do
+WORK-CFG-022/EVAL-CFG-028 executa MR-CFG-01/02/03/04 no slice linear: IDs
+correlacionados, display/origin presentation preservados e split com Jump, sem
+exigir isomorfismo literal. EVAL-CFG-014 continua planned por obrigações além do slice.
+Os mutantes Jump→vizinho, Return→vizinho, Halt→NormalExit, Halt→vizinho e perda/
+reordenação de instructions foram mortos por expected independente, sem a guarda
+tipada de endpoints. As mutações foram restauradas antes dos gates.
+
+Mutantes prioritários posteriores: remover FALSE, remover default, unir IDs de units, pular opaco, criar C1→resume direto, buscar porta abaixo do
 topo, ignorar underflow, descartar remaining ControlScope. A suíte deve matar cada
 mutante focalizado ou registrar uma lacuna, não maquiar score.

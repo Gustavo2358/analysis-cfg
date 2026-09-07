@@ -4,7 +4,7 @@ import io.github.gustavo2358.air.model.Ids.Id;
 
 import java.util.Objects;
 
-/** A valid AIR shape outside CFG-FIRST, correlated without textual opcode dispatch. */
+/** A valid AIR shape outside the implemented core slice, correlated without textual opcode dispatch. */
 public record CfgProjectionIssue(Code code, Id subject) {
     public CfgProjectionIssue {
         Objects.requireNonNull(code, "code");
@@ -13,7 +13,6 @@ public record CfgProjectionIssue(Code code, Id subject) {
 
     public enum Code {
         UNSUPPORTED_TERMINATOR,
-        INSTRUCTIONS_OUTSIDE_SLICE,
         BODY_UNAVAILABLE,
         INCOMPLETE_INVENTORY,
         EXTENSION_SEMANTICS_OUTSIDE_SLICE

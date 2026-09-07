@@ -4,7 +4,7 @@ import io.github.gustavo2358.air.model.Capabilities;
 import io.github.gustavo2358.air.model.Publication;
 import io.github.gustavo2358.air.validation.ValidationIssue;
 import io.github.gustavo2358.air.validation.ValidationResult;
-import io.github.gustavo2358.analysis.cfg.domain.CfgFirstProjection;
+import io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection;
 import io.github.gustavo2358.analysis.cfg.domain.CfgGraph;
 import io.github.gustavo2358.analysis.cfg.domain.CfgProjectionIssue;
 import io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-/** Coordinates preflight, capability negotiation and the CFG-FIRST domain projection. */
+/** Coordinates preflight, capability negotiation and the core domain projection. */
 public final class CfgBuildCoordinator implements BuildCfg {
     private static final Comparator<Capabilities.Capability> CAPABILITY_ORDER =
             Comparator.comparing(Capabilities.Capability::name)
@@ -33,7 +33,8 @@ public final class CfgBuildCoordinator implements BuildCfg {
 
         ValidationResult preflight = CfgPreflight.validate(publication, options.validation());
         List<Capabilities.Capability> unsupported = publication.capabilities().required().stream()
-                .filter(capability -> interpreters.find(capability).isEmpty())
+                .filter(capability -> !CoreCfgProjection.supportsControlCapability(capability)
+                        && interpreters.find(capability).isEmpty())
                 .distinct()
                 .sorted(CAPABILITY_ORDER)
                 .toList();
@@ -50,9 +51,9 @@ public final class CfgBuildCoordinator implements BuildCfg {
         } else if (preflight.status() == ValidationResult.Status.INCOMPLETE_VALIDATION) {
             status = CfgBuildResult.Status.INCOMPLETE_VALIDATION;
         } else {
-            issues = CfgFirstProjection.unsupported(publication);
+            issues = CoreCfgProjection.unsupported(publication);
             if (issues.isEmpty()) {
-                graph = Optional.of(CfgFirstProjection.project(publication));
+                graph = Optional.of(CoreCfgProjection.project(publication));
                 status = CfgBuildResult.Status.CFG_BUILT;
             } else {
                 status = CfgBuildResult.Status.UNSUPPORTED_INPUT;

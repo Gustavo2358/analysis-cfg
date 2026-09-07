@@ -1,7 +1,8 @@
 # Arquitetura — mapa curto
 
-**CFG-FIRST está implementado: Entry → Sequence(Return) → normal exit por
-Unit/Entry, em memória, com produto imutável e correlações AIR.**
+**CFG-FIRST e fluxo linear estão implementados em memória: instructions ordenadas,
+Jump explícito, Return para normal exit por Unit/Entry e Halt para término próprio,
+com produto imutável e correlações AIR.**
 [ADRs](docs/architecture/decisions/index.md).
 
 ```text
@@ -34,7 +35,7 @@ Contrato físico: `BuildCfg.build(air-java Publication, BuildOptions) →
 CfgBuildResult`, implementado pelo `CfgBuildCoordinator`. A porta não recebe `Path`,
 `InputStream`, JSON, COBOL ou Semantic Product. O caso de uso executa
 `AirValidator`, preflight de versão/capabilities e suporte ao slice; somente depois
-projeta Entry/Return. Trocar transporte preserva a porta.
+projeta Entry/Jump/Return/Halt, preservando instructions. Trocar transporte preserva a porta.
 
 O Analysis IR JSON Binding 1.0.0 pertence ao `analysis-ir`, targets AIR 2.0.0 e
 permanece DRAFT no commit fixado. Ele não é implementado neste checkpoint. Um
@@ -72,9 +73,14 @@ AIR fixada (§04.8): segue a Entry da ativação corrente. Transições RETURN d
 carregam `activationEntry`, condição que impede cruzar saídas de Entries distintas.
 Não são arestas incondicionais; inventário não é prova de reachability.
 
-`MVP-CFG-01` permanece posterior e acrescenta operações lineares, `jump`, `halt`,
-`branch` e IF/ELSE estrutural. CLI/arquivo são outro milestone posterior. `invoke`,
-`raise`, `dispatch`, ciclos, controle aberto, `control.local@1` e
+WORK-CFG-022 implementa instructions lineares, `jump` e `halt` no único
+`CoreCfgProjection` (antes `CfgFirstProjection`). Jump usa somente destination;
+JUMP/HALT preservam activationEntry. HaltExit retém a ocorrência AIR, sem funcionar
+como NormalExit. Self-loops explícitos são aceitos sem análise de alcance.
+
+`MVP-CFG-01` ainda depende de `branch` e IF/ELSE estrutural. CLI/arquivo são
+outro milestone posterior. `invoke`, `raise`, `dispatch`, demais cenários cíclicos,
+controle aberto, `control.local@1` e
 `control.indirect@1` entram em slices próprios. Nenhum subset recebe claim
 `AIR-STRUCTURE@2/PRECISE_FOR_PROFILE` antes de todos os seus oráculos.
 

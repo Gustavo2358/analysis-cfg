@@ -27,15 +27,21 @@ Quando houver mais de uma Entry/escopo de consulta, normal exits não são fundi
 O expected não vem do builder nem de DOT/JSON. Este cenário é EVAL-CFG-025 e não
 depende de branch, jump, codec ou CLI.
 
-`CFG-FIRST` não implementa `Halt`. A distinção `Return != Halt` permanece como
-contracaso posterior em BACKLOG-CFG-022/EVAL-CFG-005 (`O-19-STRUCT`), não como
-critério obrigatório de CF1.
+CFG-FIRST é o marco histórico de Entry/Return. A distinção Return != Halt é
+executável em WORK-CFG-022/EVAL-CFG-028; não amplia retroativamente CF1 nem
+conclui EVAL-CFG-005, que também exige cenários de ramo/invocador.
 
 ## M1 — Linear + jump
 
 `entry: op1; op2; jump tail` e `tail: return`.
 Dois nós de Sequence, entry→tail por jump, tail→saída normal. op1/op2 preservados e
 ordenados. Permutar a posição física de entry e tail não muda a relação.
+
+Implementado por EVAL-CFG-028, com expected manual de ENTRY/JUMP/RETURN,
+activationEntry, inventário e ordem. Halt tem HaltExit por ocorrência e transição
+HALT contextual; nunca ganha saída normal nem próxima Sequence. Self-loop,
+backward, órfãs e split explícito são contracasos executáveis. EVAL-CFG-002 continua
+planned porque seu O-01-STRUCT inclui o invoke de X-01.
 
 ## M2 — Diamond
 

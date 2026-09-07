@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-/** CFG_BUILT contains an actual CFG-FIRST product; every failure has no graph. No AIR profile claim. */
+/** CFG_BUILT contains an actual core CFG product; every failure has no graph. No AIR profile claim. */
 public record CfgBuildResult(
         Status status,
         PublicationId publicationId,

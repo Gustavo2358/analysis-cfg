@@ -176,16 +176,19 @@ class EvalCfg028Test {
 
     @Test
     void alphaRenamePreservesControlUnderExplicitDomainCorrelation() {
-        var original = graph(withSequences(List.of(jump(L, TAIL, List.of()), returning(TAIL))));
+        OperationId originalOp = new OperationId(U, "original-op");
+        var original = graph(withSequences(List.of(jump(L, TAIL,
+                List.of(new Operations.Nop(header(originalOp)))), returning(TAIL))));
         UnitId v = new UnitId(P, "renamed-unit");
         EntryId f = new EntryId(v, "renamed-entry");
         LabelId a = new LabelId(v, "z-source");
         LabelId b = new LabelId(v, "a-target");
+        OperationId renamedOp = new OperationId(v, "renamed-op");
         var renamed = graph(publication(List.of(unit(v, List.of(entry(f, a)),
-                List.of(returning(b), jump(a, b, List.of()))))));
+                List.of(returning(b), jump(a, b, List.of(new Operations.Nop(header(renamedOp)))))))));
         Map<Id, Id> correlation = Map.of(f, E, a, L, b, TAIL,
                 new OperationId(v, "jump-z-source"), new OperationId(U, "jump-L"),
-                new OperationId(v, "return-a-target"), new OperationId(U, "return-tail"));
+                new OperationId(v, "return-a-target"), new OperationId(U, "return-tail"), renamedOp, originalOp);
         Set<Edge> mapped = new HashSet<>();
         for (Edge edge : observe(renamed).edges()) {
             mapped.add(new Edge(new Node(edge.from().role(), correlation.get(edge.from().correlation())),
@@ -193,6 +196,11 @@ class EvalCfg028Test {
                     (EntryId) correlation.get(edge.activation())));
         }
         assertEquals(observe(original).edges(), mapped);
+        assertEquals(List.of(originalOp), sequence(renamed, a).source().instructions().stream()
+                .map(i -> correlation.get(i.header().id())).toList());
+        assertEquals(Set.of(en(E), seq(L), seq(TAIL), normal(E)), observe(renamed).nodes().stream()
+                .map(n -> new Node(n.role(), correlation.get(n.correlation())))
+                .collect(java.util.stream.Collectors.toSet()));
         assertEquals(correlation.get(sequence(renamed, a).source().terminator().header().id()),
                 sequence(original, L).source().terminator().header().id());
         assertEquals(correlation.get(sequence(renamed, b).source().terminator().header().id()),
@@ -344,20 +352,36 @@ class EvalCfg028Test {
         var branchId = new OperationId(U, "branch");
         var dispatchId = new OperationId(U, "dispatch");
         var raiseId = new OperationId(U, "raise");
+        var invokeId = new OperationId(U, "invoke");
+        var opaqueId = new OperationId(U, "opaque");
         var branch = new Operations.Branch(header(branchId), new Expressions.Literal(
                 operand(branchId, "predicate", Operand.Role.PREDICATE), new Values.BoolValue(true)), L, L);
         var dispatch = new Operations.Dispatch(header(dispatchId), new Expressions.Literal(
                 operand(dispatchId, "selector", Operand.Role.CONTROL_TARGET), new Values.TextValue("X")), List.of(), L);
         var raise = new Operations.Raise(header(raiseId), "failure", List.of());
-        Publication input = withSequences(List.of(returning(L),
+        var invoke = new Operations.Invoke(header(invokeId), "call", new Interactions.InternalTarget(E),
+                List.of(), List.of(), new Interactions.EntrySignature(E), List.of(),
+                new Interactions.EffectBound(new Interactions.ForeignEffects(Scopes.NoMemory.INSTANCE,
+                        Scopes.NoMemory.INSTANCE, List.of()), List.of()),
+                new Control.InvocationOutcomes(List.of(new Control.Normal(L)), Scopes.NoControl.INSTANCE),
+                new Interactions.KnownContract(new Interactions.ContractRef("test-contract", "1", List.of(ORIGIN))));
+        var opaque = new Operations.Opaque(new Operations.Header(opaqueId, ORIGIN, Evidence.CoverageStatus.ABSTRACTED,
+                header(opaqueId).precision(), List.of(GAP)), "jump display is not semantics", List.of(), List.of(),
+                new Envelopes.Envelope(new Envelopes.MemoryEnvelope(List.of(), Scopes.NoMemory.INSTANCE,
+                        List.of(), Scopes.NoMemory.INSTANCE, List.of()),
+                        new Control.ControlEnvelope(List.of(new Control.JumpAlternative(L)), Scopes.NoControl.INSTANCE),
+                        new Envelopes.DependencyEnvelope(List.of(), Scopes.NoResources.INSTANCE)));
+        Publication input = withData(List.of(returning(L),
                 new Sequence(new LabelId(U, "orphan-1"), List.of(), branch, ORIGIN),
                 new Sequence(new LabelId(U, "orphan-2"), List.of(), dispatch, ORIGIN),
-                new Sequence(new LabelId(U, "orphan-3"), List.of(), raise, ORIGIN)));
+                new Sequence(new LabelId(U, "orphan-3"), List.of(), raise, ORIGIN),
+                new Sequence(new LabelId(U, "orphan-4"), List.of(), invoke, ORIGIN),
+                new Sequence(new LabelId(U, "orphan-5"), List.of(), opaque, ORIGIN)), false);
         assertEquals(ValidationResult.Status.STRUCTURALLY_VALID, AirValidator.validate(input).status());
         var result = build(input);
         assertEquals(CfgBuildResult.Status.UNSUPPORTED_INPUT, result.status());
         assertTrue(result.graph().isEmpty());
-        assertEquals(List.of(branchId, dispatchId, raiseId), result.projectionIssues().stream().map(CfgProjectionIssue::subject).toList());
+        assertEquals(List.of(branchId, dispatchId, raiseId, invokeId, opaqueId), result.projectionIssues().stream().map(CfgProjectionIssue::subject).toList());
         assertTrue(result.projectionIssues().stream().allMatch(i -> i.code() == CfgProjectionIssue.Code.UNSUPPORTED_TERMINATOR));
     }
 

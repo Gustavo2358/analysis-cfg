@@ -29,9 +29,17 @@ antes do preflight do slice; referência pendente é rejeitada, terminador ausen
 é reparado e conteúdo sem predecessor permanece inventariado. Sem jump, halt,
 branch, IF, múltiplas instructions, JSON ou CLI neste marco.
 
+## Slice linear implementado — WORK-CFG-022
+
+Entre CFG-FIRST e o MVP, instructions não terminantes são preservadas na Sequence
+original e Jump transfere somente ao LabelId explícito. Halt produz término próprio,
+distinto de NormalExit. As regras conservam activationEntry para múltiplas Entries,
+inclusive em órfãs, sem afirmar reachability. EVAL-CFG-028 prova esse slice;
+EVAL-CFG-025 continua verde. Não há ProgramPoint especulativo nem dataflow.
+
 ## MVP-CFG-01: subset estrutural útil
 
-Marco posterior: operações lineares, `jump`, `branch`, saídas `return`/`halt` e
+Marco ainda incompleto: inclui operações lineares, `jump`, `branch`, saídas `return`/`halt` e
 IF/ELSE estrutural. `unknown(known(bool))` como predicado puro conserva os dois
 destinos; `unknown_type` não satisfaz a assinatura booleana. IFs aninhados são
 combinações das mesmas primitives, sem limite artificial de cardinalidade.

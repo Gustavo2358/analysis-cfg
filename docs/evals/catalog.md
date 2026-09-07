@@ -1,7 +1,8 @@
 # Catálogo de evals
 
 **A fundação implementa EVAL-CFG-007, EVAL-CFG-024 e o eval local
-EVAL-CFG-027; EVAL-CFG-025 implementa CFG-FIRST, sem outros terminadores.** Metadados
+EVAL-CFG-027; EVAL-CFG-025 implementa CFG-FIRST e EVAL-CFG-028 prova o slice
+linear/Jump/Halt.** Metadados
 verificáveis em [catalog.json](catalog.json).
 
 ## EVAL-CFG-001 — Integridade da Publication
@@ -221,4 +222,22 @@ ordem física irrelevante; activationEntry preservado, inclusive Halt compartilh
 
 Oráculos upstream: nenhum; eval local estreito, sem certificar invoke/branch.
 Invariantes: INV-CFG-003, INV-CFG-004, INV-CFG-005, INV-CFG-006, INV-CFG-008,
-INV-CFG-011, INV-CFG-015, INV-CFG-019, INV-CFG-021. Estado: `planned`.
+INV-CFG-011, INV-CFG-015, INV-CFG-019, INV-CFG-021. Estado: `implemented`,
+22 testes em [EvalCfg028Test](../../cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg028Test.java),
+obrigatórios junto aos 20 do 025 no semantic gate.
+
+## Evidência parcial de WORK-CFG-022
+
+EVAL-CFG-001/002/005/013/014 permanecem planned. O 022 prova no seu domínio
+instructions ordenadas, Jump/Return/Halt, referências pendentes, namespaces,
+provenance, órfãs, permutação, alpha rename, display e split. Isso não conclui:
+
+- 001: todas as formas inválidas e composição de revisões;
+- 002: O-01-STRUCT inclui a,b,k do X-01; k é invoke, fora deste slice;
+- 005: ramo terminante e continuação de invocador dos cenários upstream;
+- 013: todas as observações de interação/inventário parcial exigidas;
+- 014: O-66 inclui equivalência de ingressos/transportes ainda não implementada.
+
+O 025 permanece implemented; suas 17 regressões CF1 são preservadas, e as três
+recusas históricas de Jump/Halt/instructions evoluem para provas positivas do 022.
+Nenhum perfil AIR, performance ou integration foi promovido.

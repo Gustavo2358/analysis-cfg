@@ -28,7 +28,7 @@ da projeção e `Optional<CfgGraph>`. `CFG_BUILT` exige produto presente;
 em falha ou com metadata/preflight incompatíveis. `CfgBuildCoordinator` delega a
 regra mínima ao domínio após preflight.
 
-`UNSUPPORTED_INPUT` identifica terminador diferente de Return, instructions, body
+`UNSUPPORTED_INPUT` identifica terminador diferente de Jump/Return/Halt, body
 indisponível, inventário parcial/indisponível ou necessidade de semântica de extensão
 ainda ausente. Seus subjects são IDs AIR; não opcodes textuais. Uma publicação
 com inventário completo e zero Units produz um inventário CFG realmente vazio,
@@ -99,6 +99,10 @@ padrão; pode reter referências/IDs AIR e manter índices derivados próprios.
 `CfgGraph` retém exatamente a Publication original; EntryNode/SequenceNode
 retêm os objetos AIR originais, incluindo IDs, operands, origins e metadata.
 NormalExit sintético registra PublicationId/UnitId/EntryId sem fabricar origem.
+HaltExit retém Operations.Halt original por ocorrência; activationEntry fica na
+transição. Instructions e ordem pertencem à Sequence original, sem deep copy.
+`preciseControlCapabilities()` registra o consumo de memory.regions@1 apenas para
+controle; registry/preflight de extensões continuam explícitos.
 Nenhum índice muda a AIR. Não há consulta lazy ao produtor nem
 dependência de um arquivo continuar aberto.
 

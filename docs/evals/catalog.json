@@ -461,7 +461,7 @@
     {
       "id": "EVAL-CFG-028",
       "title": "Fluxo linear, Jump e Halt",
-      "status": "planned",
+      "status": "implemented",
       "expectation": "Instructions ordenadas preservadas; Jump usa LabelId explícito anterior/posterior/self-loop; Return e Halt sem fallthrough e distintos; órfãs inventariadas; ordem física irrelevante; activationEntry preservado, inclusive Halt compartilhado.",
       "upstream_oracles": [],
       "invariants": [
@@ -475,7 +475,7 @@
         "INV-CFG-019",
         "INV-CFG-021"
       ],
-      "implementation_evidence": null
+      "implementation_evidence": "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg028Test.java"
     }
   ]
 }

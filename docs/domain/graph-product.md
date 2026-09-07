@@ -7,31 +7,37 @@ capabilities, premissas e política de precisão usadas. Não gravar successors,
 alcançabilidade ou caches mutáveis na IR. IDs CFG são próprios, correlacionados com
 identidades IR; não reutilizar source span como identidade de nó.
 
-Conceitos do produto completo (somente Entry/Return implementados agora):
+Conceitos do produto completo (Entry, instructions lineares, Jump, Return e Halt implementados):
 
 - inventário de nós/sequences e seus operations/program points;
 - transições conhecidas com outcome, predicado/case/tag quando aplicáveis;
 - entradas distintas, saídas normais/excepcionais, halt/diverge e fronteiras abertas;
 - correlação para IR/provenance, gaps, capabilities e limites da alegação.
 
-## Modelo Java CFG-FIRST implementado
+## Modelo Java implementado
 
 No package `io.github.gustavo2358.analysis.cfg.domain`:
 
 - `CfgGraph`: classe final com referência à Publication original e inventário de
-  nós/transições imutáveis. Materializa as listas de entries e normal exits uma vez
-  durante a construção; `entries()` e `normalExits()` retornam essas mesmas listas
-  em O(1), sem percorrer nós ou alocar novamente;
+  nós/transições imutáveis. Materializa entries, normal exits e halt exits uma vez;
+  `entries()`, `normalExits()` e `haltExits()` retornam as mesmas listas em O(1),
+  sem percorrer nós ou alocar novamente. `preciseControlCapabilities()` também
+  é materializada: registra consumo preciso apenas de controle, atualmente
+  memory.regions@1, sem alegação de efeitos/storage;
 - `CfgNodeId(PublicationId, ordinal)`: identidade do CFG, distinta de qualquer ID
   AIR. Ordinais são atribuídos deterministicamente por namespace/ID e papel; não
   têm estabilidade prometida entre publicações/revisões diferentes;
 - `CfgNode.EntryNode`: ID CFG e referência à `Entries.Entry` original;
 - `CfgNode.SequenceNode`: ID CFG e referência à `Sequence` original, preservando
-  Return/header/values/origin. Uma Sequence origina exatamente um nó;
+  instructions na ordem original, terminador, headers/operandos/origins e gaps.
+  Uma Sequence origina exatamente um nó;
 - `CfgNode.NormalExit`: ID CFG, PublicationId, UnitId e EntryId. É sintético e
   não tem source span/origin inventado;
-- `CfgTransition(from, to, kind, activationEntry)`: `ENTRY` estabelece a Entry
-  corrente, e `RETURN` vale apenas sob essa Entry, terminando no seu NormalExit.
+- `CfgNode.HaltExit`: ID CFG e Operations.Halt original. Uma saída por ocorrência,
+  sem singleton global e sem fabricar source span. HaltKind NORMAL/ABNORMAL é retido;
+- `CfgTransition(from, to, kind, activationEntry)`: ENTRY estabelece a Entry;
+  JUMP a conserva e usa somente LabelId explícito; RETURN termina no NormalExit
+  dessa Entry; HALT termina em HaltExit sob esse contexto, sem successor do exit.
 
 A regra segue AIR §04.8: não existe `return.entryScope` na entrada. Um Return
 compartilhado tem uma transição condicionada por Entry da Unit, sem duplicar o nó
@@ -39,8 +45,10 @@ Sequence nem inventar um exit global. As transições não são arestas incondic
 um consumidor deve conservar `activationEntry` ao compor um caminho. Isso não
 implementa frames locais nem consulta de reachability.
 
-Órfãs permanecem no inventário, sem predecessor artificial. Suas regras Return
-continuam materializadas, sem afirmar alcançabilidade. O grafo verifica unicidade
+Órfãs permanecem no inventário, sem predecessor artificial. Suas regras Jump,
+Return e Halt continuam materializadas por Entry, sem afirmar alcançabilidade.
+HaltExit é compartilhado por ocorrência; as transições preservam cada activationEntry.
+NormalExits são inventário por Entry, inclusive quando nenhum Return os utiliza. O grafo verifica unicidade
 de IDs, fechamento e compatibilidade tipada das transições; seus containers são
 copiados, mas nenhuma Publication, Unit, Entry, Sequence ou lista AIR é deep-copiada.
 A referência à Publication mantém coverage, precisão, gaps, premises e todas as
@@ -80,3 +88,17 @@ DOT/HTML são apresentação, não oracle de semântica. Exportar JSON é adapte
 com schema próprio se necessário. Testes comparam o produto estruturado, não strings
 de console nem layout de renderização. Relatórios sempre distinguem `INVALID_IR`,
 `UNSUPPORTED_CAPABILITY`, resultado parcial e resultado conforme ao escopo declarado.
+
+## Pontos correlacionados no slice linear
+
+SequenceNode.source e o índice explícito na lista imutável instructions bastam
+para identificar as posições antes/depois de cada ocorrência e antes do terminador.
+Por exemplo, a segunda instruction é source.instructions().get(1), com OperationId
+próprio e operandos/origins intactos. O nó CFG é a Sequence, não a instruction.
+Não existe uma classe ProgramPoint adicional neste slice nem identidade CFG disfarçada
+de OperationId. AIR §08.2 exige correlação observável, não uma API física específica.
+
+O metamorfismo split registra explicitamente a correspondência entre posições
+originais e as duas Sequences ligadas por Jump; o passo auxiliar não perde operações.
+Pontos before/after(outcome) tipados poderão ser necessários em slices com outcomes;
+nenhuma API de dataflow é antecipada agora.
