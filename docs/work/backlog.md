@@ -47,4 +47,6 @@ adiados. 021 leva gates a CI e não bloqueia desenho semântico.
 | [BACKLOG-CFG-022](backlog/BACKLOG-CFG-022.md) | Fluxo linear, jump e halt | BACKLOG-CFG-005 | completed |
 | [BACKLOG-CFG-023](backlog/BACKLOG-CFG-023.md) | E2E mínimo Semantic Product → AIR → CFG | BACKLOG-CFG-005 + cobol-lower externo | planned |
 
+| [BACKLOG-CFG-024](backlog/BACKLOG-CFG-024.md) | 0A: KNOWN_SUBSET default / STRICT opt-in | BACKLOG-CFG-006 | active |
+
 **As construções COBOL são motivadores, não unidade de extensão do CFG.** IF→branch; GO TO/NEXT SENTENCE→jump; EVALUATE→dispatch/branches; loops→controle explícito; PERFORM/THRU→capability local quando compatível. O lowerer estabelece essa equivalência. Nenhum item autoriza assumir suporte de dialeto não provado.

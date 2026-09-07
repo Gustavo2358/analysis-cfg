@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": "implementation",
-  "runtime_authorization": "WORK-CFG-006",
+  "runtime_authorization": "WORK-CFG-024",
   "product_gates": {
     "architecture": {
       "status": "implemented",

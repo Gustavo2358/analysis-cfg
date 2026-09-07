@@ -1,0 +1,76 @@
+{
+  "id": "WORK-CFG-024",
+  "backlog_id": "BACKLOG-CFG-024",
+  "title": "Checkpoint 0A — política de projeção explícita",
+  "status": "active",
+  "risk": "medium",
+  "goal": "KNOWN_SUBSET default admite PARTIAL projetável; STRICT opt-in exige COMPLETE sem mascarar evidence.",
+  "authorization": "implementation",
+  "authorization_evidence": "Pedido explícito do usuário em 07/09/2026 para executar discovery e implementação do checkpoint 0A do roadmap do workspace (roadmap.md §5), commits, push e PR sem merge. Discovery integra o mesmo item; não é checkpoint separado de autorização.",
+  "checkpoint": "0A — discovery registrado antes de produção; TDD, challenge, gates e PR para review humano",
+  "must_read": [
+    "AGENTS.md",
+    "docs/engineering/work-item-protocol.md",
+    "docs/engineering/gates.md",
+    "docs/engineering/testing.md",
+    "docs/engineering/semantic-policy.md",
+    "docs/engineering/documentation-policy.md",
+    "ARCHITECTURE.md",
+    "docs/architecture/boundaries.md",
+    "docs/architecture/pipeline.md",
+    "docs/architecture/ports-and-adapters.md",
+    "docs/architecture/invariants.md",
+    "docs/domain/core-control.md",
+    "docs/evals/index.md",
+    "docs/evals/catalog.json",
+    "docs/sources/sources.lock.json",
+    "docs/work/backlog/BACKLOG-CFG-024.md"
+  ],
+  "related_decisions": [
+    "ADR-0003",
+    "ADR-0004",
+    "ADR-0007",
+    "ADR-0008"
+  ],
+  "related_invariants": [
+    "INV-CFG-001",
+    "INV-CFG-003",
+    "INV-CFG-004",
+    "INV-CFG-006",
+    "INV-CFG-012",
+    "INV-CFG-021",
+    "INV-CFG-023",
+    "INV-CFG-026"
+  ],
+  "evals": [
+    "EVAL-CFG-025",
+    "EVAL-CFG-028",
+    "EVAL-CFG-029",
+    "EVAL-CFG-030"
+  ],
+  "source_scope": [
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/BuildOptions.java",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/CfgBuildCoordinator.java",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/CfgBuildResult.java",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CoreCfgProjection.java",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CfgGraph.java",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CfgProjectionIssue.java",
+    "planned:cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/ProjectionPolicy.java"
+  ],
+  "test_scope": [
+    "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/application/BuildCfgContractTest.java",
+    "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg025Test.java",
+    "planned:cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg030Test.java",
+    "scripts/project/check_architecture.py",
+    "scripts/project/check_semantic.py"
+  ],
+  "must_not_change": [
+    "Outros repositórios; pins AIR/air-java; porta BuildCfg; CfgPreflight; algoritmo de nodes/edges; oráculos 028/029; profiles; transporte/CLI/codec; dataflow/reachability."
+  ],
+  "gates": [
+    "fast",
+    "architecture",
+    "semantic"
+  ],
+  "stop_condition": "PR contra main aberto e pronto para review humano; sem merge/auto-merge e sem iniciar outro checkpoint."
+}

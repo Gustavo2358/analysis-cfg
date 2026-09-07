@@ -277,3 +277,7 @@ Invariantes: INV-CFG-003/004/005/006/007/008/010/011/015/019/021/022/027/029.
 AIR-STRUCTURE@2, performance ou integration. 025 permanece byte a byte intacto;
 028 mantém 22 métodos e a fixture mista, com adaptação exclusiva do switch e da
 recusa obsoleta de Branch, sem absorver testes positivos do 029.
+
+## EVAL-CFG-030 — Política de projeção KNOWN_SUBSET/STRICT
+
+Planned no WORK-CFG-024: matriz de admissão e preservação de evidence; sem claim de perfil.
