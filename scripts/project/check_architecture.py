@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build and inspect the exact Java CFG-FIRST surface with standard JDK/Maven evidence."""
+"""Build and inspect the exact Java core CFG surface with standard JDK/Maven evidence."""
 
 from __future__ import annotations
 
@@ -104,9 +104,9 @@ EXPECTED_PRODUCTION_IMPORTS = {
         "java.util.TreeMap",
     },
 }
-# Deliberately enumerated CFG-FIRST additions; never discover/allow arbitrary sources.
+# Deliberately enumerated core CFG additions; never discover/allow arbitrary sources.
 EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "application/CfgBuildCoordinator.java"].update({
-    DOMAIN_CLASS + "CfgFirstProjection", DOMAIN_CLASS + "CfgGraph", DOMAIN_CLASS + "CfgProjectionIssue",
+    DOMAIN_CLASS + "CoreCfgProjection", DOMAIN_CLASS + "CfgGraph", DOMAIN_CLASS + "CfgProjectionIssue",
     "java.util.Optional",
 })
 EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "application/CfgBuildResult.java"].update({
@@ -131,17 +131,24 @@ EXPECTED_PRODUCTION_IMPORTS.update({
     SOURCE_ROOT + "domain/CfgProjectionIssue.java": {
         "io.github.gustavo2358.air.model.Ids.Id", "java.util.Objects",
     },
-    SOURCE_ROOT + "domain/CfgFirstProjection.java": {
+    SOURCE_ROOT + "domain/CoreCfgProjection.java": {
         "io.github.gustavo2358.air.model.Entries", "io.github.gustavo2358.air.model.Evidence",
         "io.github.gustavo2358.air.model.Ids.LabelId", "io.github.gustavo2358.air.model.Operations",
         PUBLICATION, "io.github.gustavo2358.air.model.Sequence", "io.github.gustavo2358.air.model.Unit",
         "java.util.ArrayList", "java.util.Comparator", "java.util.HashMap", "java.util.List", "java.util.Map",
     },
 })
+EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CfgNode.java"].add(
+    "io.github.gustavo2358.air.model.Operations")
+EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CfgGraph.java"].update({
+    "io.github.gustavo2358.air.model.Capabilities", "io.github.gustavo2358.air.model.Ids.EntryId",
+})
+EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CoreCfgProjection.java"].add(
+    "io.github.gustavo2358.air.model.Capabilities")
 CFG_CLASS_NAMES = {
-    "CfgNodeId", "CfgNode", "CfgNode$EntryNode", "CfgNode$SequenceNode", "CfgNode$NormalExit",
+    "CfgNodeId", "CfgNode", "CfgNode$EntryNode", "CfgNode$SequenceNode", "CfgNode$NormalExit", "CfgNode$HaltExit",
     "CfgTransition", "CfgTransition$Kind", "CfgGraph", "CfgGraph$1",
-    "CfgProjectionIssue", "CfgProjectionIssue$Code", "CfgFirstProjection",
+    "CfgProjectionIssue", "CfgProjectionIssue$Code", "CoreCfgProjection",
 }
 EXPECTED_CLASSFILES = {
     BUILD_CFG_PATH + ".class",
@@ -159,7 +166,8 @@ EXPECTED_TEST_CASES = {
     "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinatorTest": 6,
     "io.github.gustavo2358.analysis.cfg.application.CfgPreflightTest": 4,
     "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistryTest": 4,
-    DOMAIN_CLASS + "EvalCfg025Test": 20,
+    DOMAIN_CLASS + "EvalCfg025Test": 17,
+    DOMAIN_CLASS + "EvalCfg028Test": 22,
 }
 EXPECTED_PREFLIGHT_JDEPS_TARGETS = {
     PUBLICATION,
@@ -188,9 +196,17 @@ FORBIDDEN_BYTECODE_TYPES = {
     "java.lang.ClassLoader",
     "java.lang.System",
 }
-# Return is the only concrete operation interpreted in CFG-FIRST.
+# Exact inventory for the authorized linear slice; no wildcard operation support.
 ALLOWED_OPERATION_TYPES = {
     "io.github.gustavo2358.air.model.Operations$Return",
+    "io.github.gustavo2358.air.model.Operations$Jump",
+    "io.github.gustavo2358.air.model.Operations$Halt",
+    "io.github.gustavo2358.air.model.Operations$HaltKind",
+    "io.github.gustavo2358.air.model.Operations$Assign",
+    "io.github.gustavo2358.air.model.Operations$HavocMust",
+    "io.github.gustavo2358.air.model.Operations$HavocMay",
+    "io.github.gustavo2358.air.model.Operations$Nop",
+    "io.github.gustavo2358.air.model.Operations$CopyBytes",
     "io.github.gustavo2358.air.model.Operations$Header",
 }
 IMPORT_PATTERN = re.compile(
@@ -237,8 +253,16 @@ def detector_self_test() -> None:
         "picocli.CommandLine",
         "example.SemanticProductInput",
         "local.BuildCfgInput",
-        "io.github.gustavo2358.air.model.Operations$Jump",
-        "io.github.gustavo2358.air.model.Operations$Halt",
+        "io.github.gustavo2358.air.model.Operations$Branch",
+        "io.github.gustavo2358.air.model.Operations$Dispatch",
+        "io.github.gustavo2358.air.model.Operations$Invoke",
+        "io.github.gustavo2358.air.model.Operations$Raise",
+        "io.github.gustavo2358.air.model.Operations$Opaque",
+        "io.github.gustavo2358.air.model.Operations$LocalInvoke",
+        "io.github.gustavo2358.air.model.Operations$LocalBoundary",
+        "io.github.gustavo2358.air.model.Operations$LocalResume",
+        "io.github.gustavo2358.air.model.Operations$LocalUnwind",
+        "io.github.gustavo2358.air.model.Operations$IndirectJump",
     }
     for dependency in forbidden_dependencies:
         try:
@@ -625,6 +649,22 @@ def verify_javap(javap: str, root: Path, classes: Path, air_jar: Path) -> None:
     if "java.util.Optional<" + DOMAIN_CLASS + "CfgGraph> graph()" not in result:
         raise GateFailure("CfgBuildResult must expose the real typed optional CFG product")
 
+    halt = run(
+        [javap, "-classpath", classpath, "-p", "-s", DOMAIN_CLASS + "CfgNode$HaltExit"],
+        root, capture=True,
+    ).stdout or ""
+    require_descriptor(halt, "()Lio/github/gustavo2358/air/model/Operations$Halt;", "HaltExit.source")
+
+    graph = run(
+        [javap, "-classpath", classpath, "-p", "-s", DOMAIN_CLASS + "CfgGraph"],
+        root, capture=True,
+    ).stdout or ""
+    for role, method in (("EntryNode", "entries"), ("NormalExit", "normalExits"), ("HaltExit", "haltExits")):
+        if "java.util.List<" + DOMAIN_CLASS + "CfgNode$" + role + "> " + method + "()" not in graph:
+            raise GateFailure("CfgGraph must expose its typed " + method + " inventory")
+    if "java.util.List<io.github.gustavo2358.air.model.Capabilities$Capability> preciseControlCapabilities()" not in graph:
+        raise GateFailure("CfgGraph must declare capability consumption scoped to precise control")
+
     preflight = run(
         [javap, "-classpath", classpath, "-verbose", "-c", "-p", "-s", PREFLIGHT_CLASS],
         root,
@@ -717,7 +757,7 @@ def architecture_gate(root: Path) -> None:
     print("[architecture] PASS: BuildCfg(Publication, BuildOptions) -> CfgBuildResult and direct "
           "AirValidator preflight", flush=True)
     print("[architecture] PASS: explicit capability/version registry; no transport, reflection, "
-          "frontend, AIR shadow, or control primitives beyond Return", flush=True)
+          "frontend, AIR shadow, or control primitives beyond Jump/Return/Halt", flush=True)
 
 
 def main() -> int:

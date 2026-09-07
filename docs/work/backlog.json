@@ -371,7 +371,7 @@
       "id": "BACKLOG-CFG-022",
       "title": "Fluxo linear, jump e halt",
       "phase": "mvp",
-      "status": "planned",
+      "status": "completed",
       "dependencies": [
         "BACKLOG-CFG-005"
       ],
@@ -380,10 +380,12 @@
         "EVAL-CFG-002",
         "EVAL-CFG-005",
         "EVAL-CFG-013",
-        "EVAL-CFG-014"
+        "EVAL-CFG-014",
+        "EVAL-CFG-028"
       ],
       "path": "docs/work/backlog/BACKLOG-CFG-022.md",
-      "work_item": null
+      "work_item": "WORK-CFG-022",
+      "completion_evidence": "docs/work/history/WORK-CFG-022.md"
     },
     {
       "id": "BACKLOG-CFG-023",

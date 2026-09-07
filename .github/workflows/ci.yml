@@ -1,4 +1,4 @@
-name: CFG-FIRST checks
+name: Core CFG checks
 
 on:
   push:
@@ -49,7 +49,7 @@ jobs:
           MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2
         run: bash scripts/harness/check-architecture.sh
 
-      - name: Check CFG-FIRST semantic oracle
+      - name: Check CFG-FIRST and linear flow semantic oracles
         working-directory: analysis-cfg
         env:
           MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2

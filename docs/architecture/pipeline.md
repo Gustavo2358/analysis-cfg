@@ -26,14 +26,16 @@ confiar cegamente em uma instância criada pelo caller.
 7. Validar produto derivado; publicar grafo, índices de navegação, mapeamentos,
    capabilities utilizadas, premissas, gaps e precisão.
 
-`CFG-FIRST` está implementado e executa os passos necessários para
-Entry/Sequence/Return e normal exit, inventariando todas as sequences e recusando capability
-fora do slice de modo explícito. Não cria fallthrough para completar o grafo.
-`CfgFirstProjection` indexa labels namespaced uma vez por Unit e retém fatos AIR
-imutáveis. Entries usam somente initialLabel; Return emite transições condicionadas
-por Entry da ativação. Instructions, outros terminadores e inventário/corpo
-indisponível são recusados antes de publicar produto. Os demais passes acima
-continuam direção futura, sem claim de implementação.
+CFG-FIRST e WORK-CFG-022 executam os passos necessários para Entry, instructions,
+Jump, Return e Halt. CoreCfgProjection substitui CfgFirstProjection como único
+caminho de produção; indexa labels namespaced uma vez por Unit e retém AIR imutável.
+Entries usam initialLabel; Jump usa destination; Return/Halt produzem resultados
+distintos. Regras de terminador conservam activationEntry, inclusive em órfãs.
+Instructions permanecem na Sequence original, com ordem explícita e correlação dos
+pontos. Não há classe adicional de ProgramPoint, reachability ou fallthrough físico.
+Outros terminadores e inventário/corpo indisponível são recusados antes do produto.
+A negociação reconhece memory.regions@1 precisamente só para controle, registrando
+esse modo no grafo e preservando fatos de memória. Os demais passes acima são futuros.
 
 Leaders não precisam ser redescobertos: cada label já inicia Sequence e não pode
 entrar em seu interior. Blocos máximos, remoção de nós e coalescing ficam adiados.
@@ -48,9 +50,12 @@ isso de O(N) omitindo dispatch com muitos cases ou expansão de fronteira aberta
 Preservar escopos abertos simbolicamente evita cross-product obrigatório.
 Controle contextual tem custo próprio, a justificar no respectivo discovery.
 
-CFG-FIRST ordena Units, Entries e Sequences por IDs apenas para determinismo da
-representação: O(N log N + T), com T incluindo uma regra Return por Sequence/Entry
-da Unit. Memória derivada O(N + T), sem deep copy da AIR. Essa expansão é explícita
+O core ordena Units, Entries e Sequences por IDs apenas para determinismo da
+representação: O(N log N + T), com T incluindo uma regra de terminador por
+Sequence × Entry da Unit e uma regra de entrada por Entry. HaltExit é materializado
+uma vez por ocorrência. Memória derivada O(N + T), sem deep copy da AIR.
+Esse custo é da projeção e validação do produto, não uma promessa sobre o custo
+interno do AirValidator upstream. Essa expansão é explícita
 no tamanho de saída, não enumeração de ativações dinâmicas; performance permanece
 sem gate implementado.
 

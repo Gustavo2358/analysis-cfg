@@ -68,6 +68,7 @@ class EvalCfg025Test {
                 case CfgNode.SequenceNode sequence -> sequenceNode(sequence.source().label());
                 case CfgNode.NormalExit exit -> new NodeObservation(Role.NORMAL_EXIT,
                         exit.publicationId(), exit.unitId(), exit.entryId());
+                case CfgNode.HaltExit ignored -> throw new AssertionError("CF1 observation contains a Halt exit");
             };
             assertNull(nodes.put(node.id(), observation), "CFG IDs must be unique");
         }
@@ -254,31 +255,6 @@ class EvalCfg025Test {
                 () -> assertSame(exits, graph.normalExits(), "normalExits must reuse its materialized list"),
                 () -> assertThrows(UnsupportedOperationException.class, () -> entries.clear()),
                 () -> assertThrows(UnsupportedOperationException.class, () -> exits.clear()));
-    }
-
-    @Test
-    void haltIsOutsideTheSliceIncludingInAnOrphan() {
-        LabelId other = new LabelId(U, "other");
-        Operations.Halt halt = new Operations.Halt(header(new OperationId(U, "halt")), Operations.HaltKind.NORMAL);
-        Publication publication = publication(List.of(unit(U, List.of(entry(E, L)),
-                List.of(returning(L), new Sequence(other, List.of(), halt, ORIGIN)))));
-        assertUnsupported(publication, CfgProjectionIssue.Code.UNSUPPORTED_TERMINATOR, halt.header().id());
-    }
-
-    @Test
-    void jumpIsOutsideTheSliceEvenWithAValidExplicitTarget() {
-        Operations.Jump jump = new Operations.Jump(header(new OperationId(U, "jump")), L);
-        Publication publication = publication(List.of(unit(U, List.of(entry(E, L)),
-                List.of(new Sequence(L, List.of(), jump, ORIGIN)))));
-        assertUnsupported(publication, CfgProjectionIssue.Code.UNSUPPORTED_TERMINATOR, jump.header().id());
-    }
-
-    @Test
-    void instructionsAreExplicitlyOutsideThisSlice() {
-        Operations.Nop nop = new Operations.Nop(header(new OperationId(U, "nop")));
-        Publication publication = publication(List.of(unit(U, List.of(entry(E, L)),
-                List.of(new Sequence(L, List.of(nop), returning(L).terminator(), ORIGIN)))));
-        assertUnsupported(publication, CfgProjectionIssue.Code.INSTRUCTIONS_OUTSIDE_SLICE, L);
     }
 
     @Test

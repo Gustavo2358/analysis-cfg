@@ -4,6 +4,7 @@ import io.github.gustavo2358.air.model.Entries;
 import io.github.gustavo2358.air.model.Ids.EntryId;
 import io.github.gustavo2358.air.model.Ids.PublicationId;
 import io.github.gustavo2358.air.model.Ids.UnitId;
+import io.github.gustavo2358.air.model.Operations;
 import io.github.gustavo2358.air.model.Sequence;
 
 import java.util.Objects;
@@ -28,6 +29,17 @@ public sealed interface CfgNode {
             Objects.requireNonNull(source, "source");
             if (!id.publicationId().equals(source.label().publication())) {
                 throw new IllegalArgumentException("sequence publication differs from CFG node");
+            }
+        }
+    }
+
+    /** Termination per AIR Halt occurrence. Context stays on HALT transitions, not a global exit. */
+    record HaltExit(CfgNodeId id, Operations.Halt source) implements CfgNode {
+        public HaltExit {
+            Objects.requireNonNull(id, "id");
+            Objects.requireNonNull(source, "source");
+            if (!id.publicationId().equals(source.header().id().publication())) {
+                throw new IllegalArgumentException("halt publication differs from CFG node");
             }
         }
     }

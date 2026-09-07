@@ -457,6 +457,25 @@
         "INV-CFG-022"
       ],
       "implementation_evidence": "docs/work/history/WORK-CFG-003.md"
+    },
+    {
+      "id": "EVAL-CFG-028",
+      "title": "Fluxo linear, Jump e Halt",
+      "status": "implemented",
+      "expectation": "Instructions ordenadas preservadas; Jump usa LabelId explícito anterior/posterior/self-loop; Return e Halt sem fallthrough e distintos; órfãs inventariadas; ordem física irrelevante; activationEntry preservado, inclusive Halt compartilhado.",
+      "upstream_oracles": [],
+      "invariants": [
+        "INV-CFG-003",
+        "INV-CFG-004",
+        "INV-CFG-005",
+        "INV-CFG-006",
+        "INV-CFG-008",
+        "INV-CFG-011",
+        "INV-CFG-015",
+        "INV-CFG-019",
+        "INV-CFG-021"
+      ],
+      "implementation_evidence": "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg028Test.java"
     }
   ]
 }

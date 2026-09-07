@@ -5,8 +5,9 @@
 Regra normativa → classes semânticas → adversariais contra o atalho óbvio → esperado
 independente → teste RED observado → implementação mínima geral → GREEN →
 refatoração → challenge independente → gates e handoff.
-Planejar testes não é RED executado. EVAL-CFG-025 implementa CFG-FIRST; os demais
-evals semânticos continuam `planned`. EVAL-CFG-007 e EVAL-CFG-024 têm boundary, e
+Planejar testes não é RED executado. EVAL-CFG-025 implementa CFG-FIRST e
+EVAL-CFG-028 implementa o slice linear/Jump/Halt; os demais evals semânticos
+continuam `planned`. EVAL-CFG-007 e EVAL-CFG-024 têm boundary, e
 EVAL-CFG-027 implementa somente a prova arquitetural local do registry.
 Não usar mocks do próprio algoritmo para provar o algoritmo.
 
@@ -79,3 +80,26 @@ Não esconder unsupported no setup de fixtures para manter o pipeline verde.
 Comando exato, revisão, conjunto de casos, exit status, falhas, limites e esperado.
 CI ou relatório produzido por terceiros é evidência relatada; não dizer que foi
 executada nesta sessão. Contador de testes zero deve falhar no gate de produto.
+
+## Evidência do slice linear
+
+EVAL-CFG-028 usa enums/records próprios para nós, papéis, contexto, ordem de
+OperationId e termination kind. Expected manual de M1 precede produção;
+observação do produto é separada da construção do esperado. Os testes retêm os
+mesmos objetos AIR para provar operands, headers, precision, gaps e origins inteiros.
+
+O RED por API ausente está no commit 6908ff9.
+EVAL-CFG-025 permanece o oracle estável do CFG-FIRST, com 17 regressões.
+As antigas recusas de Jump/Halt/instructions descreviam o limite da implementação
+naquele checkpoint e não permanecem executáveis após a expansão legítima do produto.
+A cobertura positiva dessas formas pertence exclusivamente ao EVAL-CFG-028, com 22 testes.
+
+Mutantes Jump→vizinho físico, Return→vizinho, Halt→NormalExit, Halt→vizinho,
+reordenação e perda de instruction falharam no oracle com exit 1 e assertion failure,
+mesmo desativando temporariamente a guarda tipada de endpoints. Produção e guardas
+foram restauradas; semantic passou novamente com zero skip.
+
+EVAL-CFG-002 permanece planned: O-01-STRUCT conserva a,b,k do cenário X-01,
+cujo k é invoke, fora deste slice. EVAL-CFG-005 exige ramo terminante e cenário
+invocador; 013 inclui dependências/inventário parcial; 014 inclui O-66/transportes.
+Esses evals recebem evidência parcial, nunca completion por linkage do backlog.

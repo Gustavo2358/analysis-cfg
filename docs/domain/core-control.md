@@ -18,18 +18,29 @@ Não importar semântica LLVM ou COBOL apenas por semelhança de nomes.
 A ausência de terminador é INVALID_IR. A ausência de um intérprete não transforma
 terminador legítimo em erro de source nem autoriza pular a operação.
 
-## Primeiro slice
+## Slices implementados
 
-`CFG-FIRST` implementado interpreta todas as Entries e Sequences de Units com
-corpo disponível, inventário completo e sem instructions. Cada Entry usa seu
-`initialLabel`; somente `return` é suportado como terminador. Emite entrada, um
-nó por Sequence e saída normal por Unit/Entry. Outras sequences permanecem
-inventariadas; nenhuma posição física cria
-aresta. Label pendente é rejeitado no preflight, e terminador ausente não recebe
-fallthrough reparador. `halt` permanece diferente de `return` e só entra em slice
-posterior. Primitives diferentes de Return, inclusive em órfãs, produzem
-`UNSUPPORTED_INPUT` sem grafo; não são ignoradas. A tabela acima descreve o destino
-do projeto, não features já implementadas.
+CFG-FIRST (WORK-CFG-005) implementou Entry/Return. WORK-CFG-022 amplia o core
+para instructions lineares, Jump e Halt, em Units com corpo disponível e inventário
+completo. Cada Entry usa initialLabel; cada Sequence permanece um único nó, inclusive
+órfãs. Label pendente é INVALID_IR no preflight; falta de terminador não é reparada.
+
+Assign, HavocMust, HavocMay, Nop e CopyBytes permanecem na Sequence original:
+todas as ocorrências, ordem, operandos, headers, origins, precisão e gaps são retidos.
+Nenhum efeito de memória é executado ou usado para escolher controle.
+JUMP usa somente Jump.destination/LabelId, inclusive backward e self-loop; conserva
+activationEntry. Nenhuma posição física, nome ou texto cria successor.
+
+HALT alcança HaltExit próprio por ocorrência AIR, distinto de NormalExit. Tanto
+NORMAL quanto ABNORMAL são termination, nunca normal completion da ativação.
+O objeto Operations.Halt original é retido; não há origem sintética fabricada.
+Uma ocorrência pode ser compartilhada por Entries: o contexto fica na transição
+HALT. O destino não tem transições de saída. NormalExits continuam inventariados
+por Entry mesmo quando nenhum Return os utiliza; isso não afirma alcançabilidade.
+
+Branch/IF, Dispatch, Invoke, Raise, Opaque e Local*/IndirectJump permanecem fora
+do slice, inclusive em órfãs. Recusa é explícita e correlacionada, sem grafo parcial.
+As demais linhas da tabela são direção futura.
 
 AIR §04.8 e `Operations.Return(Header, List<Expression>)` não possuem seletor
 `entryScope`. O retorno segue a Entry da ativação. Por isso a transição RETURN
@@ -70,3 +81,14 @@ Duas alternativas podem ligar os mesmos nós com labels diferentes. Manter
 multiarestas semânticas ou agrupar condições explicitamente sem perder distinções.
 Um `Set<(from,to)>` que elimina TRUE/FALSE, cases ou exception tags é insuficiente.
 `SequenceId`, `CfgNodeId` e `ProgramPoint` não são intercambiáveis.
+
+## memory.regions@1 no papel CFG
+
+AIR §04.5, §08.2/3 e §09.3/6 separam controle de storage/efeitos. Após validação
+integral, o core interpreta precisamente a continuação intrassequence de CopyBytes
+e conserva todos os seus intervalos, operandos, length e fallback sem executá-lo.
+Isso não afirma semântica de memória implementada. O produto declara a capability
+exata em `preciseControlCapabilities()`; nenhuma outra versão é presumida.
+A regra é core, sem intérprete fictício no SemanticInterpreterRegistry. Capability
+local/indireta/desconhecida continua dependendo da negociação existente; registrar
+identidade não implementa semântica. O manifesto obrigatório nunca é dispensado.

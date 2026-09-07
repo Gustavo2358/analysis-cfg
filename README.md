@@ -1,6 +1,7 @@
 # Analysis CFG — consumer AIR
 
-**Entrega atual:** CFG-FIRST em memória: Entry → Sequence(`Return`) → normal exit,
+**Entrega atual:** fluxo linear em memória: Entry → Sequence(instructions, Jump) →
+Sequence(Return | Halt) → normal exit ou término por Halt,
 com Java 21/Maven, `air-java` e seam explícito de capabilities.
 **Data:** 06/09/2026. **Repositório:**
 `Gustavo2358/analysis-cfg`.
@@ -8,7 +9,8 @@ com Java 21/Maven, `air-java` e seam explícito de capabilities.
 Este projeto constrói CFGs a partir da **Analysis IR 2.0.0**, recebendo exatamente
 a `Publication` do `air-java`, sem conhecer COBOL, Semantic Product, parser,
 filesystem, CLI ou cloud no núcleo. `CFG-FIRST` prova Entry → Sequence(`Return`) →
-normal exit em memória; `MVP-CFG-01` acrescenta linear/jump/halt e branch/IF-ELSE.
+normal exit em memória. WORK-CFG-022 acrescenta instructions, Jump e Halt;
+`MVP-CFG-01` ainda depende de branch/IF-ELSE.
 
 ## Começar
 
@@ -48,14 +50,19 @@ O backlog é plano, não autorização. `WORK-CFG-001` concluiu as decisões pr�
 registry por capability/version. WORK-CFG-005 implementa o primeiro produto:
 `CfgGraph` imutável, nós e IDs próprios, correlação AIR, transições ENTRY/RETURN e
 saídas por Unit/Entry. `CfgBuildResult.CFG_BUILT` contém o CFG; falhas não têm grafo.
-Jump, Halt, branch, invoke, JSON, CLI e dataflow permanecem posteriores.
+WORK-CFG-022 amplia o único projector para `CoreCfgProjection`: instructions
+originais ordenadas, JUMP contextual por LabelId e HALT para HaltExit por ocorrência.
+`entries()`, `normalExits()` e `haltExits()` retornam inventários imutáveis em O(1).
+Branch/IF, dispatch, invoke/raise, controle aberto/local/indireto, JSON, CLI e
+dataflow permanecem posteriores. BACKLOG-CFG-004/006 não foram iniciados.
 
 ## O que os gates significam hoje
 
 `docs`, `harness` e `fast` verificam arquivos, referências, IDs, dependências de
 backlog, work items e os próprios validadores documentais. `architecture` executa
 Maven/testes e inspeciona dependências e bytecode do kernel. `semantic` executa
-explicitamente os 20 testes de EVAL-CFG-025 e rejeita testes ausentes ou pulados.
+explicitamente os 17 testes de EVAL-CFG-025 e os 22 de EVAL-CFG-028; rejeita
+suítes/métodos ausentes, extras, duplicados ou pulados.
 `performance`, `integration` e, por consequência, `full` permanecem
 **UNAVAILABLE / exit 3**; full executa fast, architecture e semantic antes de parar
 em performance. CFG-FIRST não implica conformidade com um perfil AIR completo.
