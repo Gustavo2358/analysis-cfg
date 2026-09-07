@@ -212,3 +212,13 @@ Oráculos upstream: nenhum; prova arquitetural local. Invariantes: INV-CFG-014 e
 INV-CFG-022, limitadas à composição e à incompatibilidade explícita. Estado:
 `implemented`, com evidência em
 [WORK-CFG-003](../work/history/WORK-CFG-003.md).
+
+## EVAL-CFG-028 — Fluxo linear, Jump e Halt
+
+Instructions ordenadas preservadas; Jump usa LabelId explícito anterior/posterior
+e self-loop; Return e Halt sem fallthrough e distintos; órfãs inventariadas;
+ordem física irrelevante; activationEntry preservado, inclusive Halt compartilhado.
+
+Oráculos upstream: nenhum; eval local estreito, sem certificar invoke/branch.
+Invariantes: INV-CFG-003, INV-CFG-004, INV-CFG-005, INV-CFG-006, INV-CFG-008,
+INV-CFG-011, INV-CFG-015, INV-CFG-019, INV-CFG-021. Estado: `planned`.

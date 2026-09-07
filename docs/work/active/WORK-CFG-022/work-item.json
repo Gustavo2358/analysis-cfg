@@ -1,0 +1,98 @@
+{
+  "id": "WORK-CFG-022",
+  "backlog_id": "BACKLOG-CFG-022",
+  "title": "Fluxo linear, Jump e Halt",
+  "status": "active",
+  "risk": "high",
+  "goal": "Preservar instructions ordenadas e projetar Jump explícito e Halt distinto, com activationEntry e regressão CFG-FIRST.",
+  "authorization": "implementation",
+  "authorization_evidence": "Pedido explícito do usuário em 06/09/2026: promover/implementar BACKLOG-CFG-022, push normal, PR novo e parar para human review sem merge.",
+  "checkpoint": "oracle manual → RED → implementação → GREEN → mutantes/challenge → gates/CI → review humano",
+  "must_read": [
+    "AGENTS.md",
+    "ARCHITECTURE.md",
+    "docs/architecture/decisions/ADR-0001.md",
+    "docs/architecture/decisions/ADR-0002.md",
+    "docs/architecture/decisions/ADR-0003.md",
+    "docs/architecture/decisions/ADR-0004.md",
+    "docs/architecture/decisions/ADR-0007.md",
+    "docs/architecture/decisions/ADR-0008.md",
+    "docs/architecture/invariants.md",
+    "docs/architecture/pipeline.md",
+    "docs/architecture/boundaries.md",
+    "docs/architecture/ports-and-adapters.md",
+    "docs/domain/core-control.md",
+    "docs/domain/graph-product.md",
+    "docs/domain/ir-boundary.md",
+    "docs/engineering/testing.md",
+    "docs/engineering/gates.md",
+    "docs/engineering/semantic-policy.md",
+    "docs/evals/catalog.md",
+    "docs/evals/mvp-scenarios.md",
+    "docs/evals/metamorphic.md",
+    "docs/work/backlog/BACKLOG-CFG-022.md",
+    "docs/sources/sources.lock.json"
+  ],
+  "related_decisions": [
+    "ADR-0001",
+    "ADR-0002",
+    "ADR-0003",
+    "ADR-0004",
+    "ADR-0007",
+    "ADR-0008"
+  ],
+  "related_invariants": [
+    "INV-CFG-001",
+    "INV-CFG-002",
+    "INV-CFG-003",
+    "INV-CFG-004",
+    "INV-CFG-005",
+    "INV-CFG-006",
+    "INV-CFG-008",
+    "INV-CFG-010",
+    "INV-CFG-011",
+    "INV-CFG-012",
+    "INV-CFG-015",
+    "INV-CFG-019",
+    "INV-CFG-021",
+    "INV-CFG-022",
+    "INV-CFG-023",
+    "INV-CFG-024",
+    "INV-CFG-025",
+    "INV-CFG-026"
+  ],
+  "evals": [
+    "EVAL-CFG-001",
+    "EVAL-CFG-002",
+    "EVAL-CFG-005",
+    "EVAL-CFG-013",
+    "EVAL-CFG-014",
+    "EVAL-CFG-025",
+    "EVAL-CFG-028"
+  ],
+  "source_scope": [
+    "cfg-kernel/src/main/java",
+    "scripts/project/check_architecture.py",
+    "scripts/project/check_semantic.py",
+    ".github/workflows/ci.yml"
+  ],
+  "test_scope": [
+    "cfg-kernel/src/test/java"
+  ],
+  "must_not_change": [
+    "docs/sources/sources.lock.json",
+    "upstreams",
+    "BACKLOG-CFG-004/006 planned sem work",
+    "porta BuildCfg",
+    "sem branch/dispatch/invoke/raise/open/local/indirect, transporte ou dataflow"
+  ],
+  "gates": [
+    "fast",
+    "architecture",
+    "semantic",
+    "performance",
+    "integration",
+    "full"
+  ],
+  "stop_condition": "WORK completed somente após critérios e CI; PR novo aberto para human review; sem merge/auto-merge e sem iniciar 004/006."
+}

@@ -1,6 +1,7 @@
 # BACKLOG-CFG-022 — Fluxo linear, jump e halt
 
-**Estado:** `planned`. **Fase:** `mvp`. **Autorização:** backlog não autoriza execução.
+**Estado:** `active` em [WORK-CFG-022](../active/WORK-CFG-022/state.md).
+**Fase:** `mvp`. **Autorização:** implementação explícita pelo usuário em 06/09/2026.
 Dependências: BACKLOG-CFG-005.
 
 ## Problema e objetivo observável
@@ -22,7 +23,7 @@ muda edges; jump usa somente LabelId explícito; conteúdo sem predecessor perma
 
 ## Evals e invariantes
 
-EVAL-CFG-001, EVAL-CFG-002, EVAL-CFG-005, EVAL-CFG-013 e EVAL-CFG-014. Expected
+EVAL-CFG-001, EVAL-CFG-002, EVAL-CFG-005, EVAL-CFG-013, EVAL-CFG-014 e EVAL-CFG-028. Expected
 independente e mutantes de fallthrough/ordem precedem produção.
 
 ## Fronteiras e extensibilidade
