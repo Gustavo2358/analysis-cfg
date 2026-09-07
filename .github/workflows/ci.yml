@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: Gustavo2358/air-java
-          ref: 6a4091e5394fc22b3d2ada9abbdb530eb3572a58
+          ref: b78f4068d8a479f48eb048b8d76fa60a0997dc4a
           path: air-java
 
       - name: Set up Java 21
@@ -29,9 +29,14 @@ jobs:
           distribution: temurin
           java-version: "21"
 
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
       - name: Verify pinned air-java checkout
         working-directory: air-java
-        run: test "$(git rev-parse HEAD)" = "6a4091e5394fc22b3d2ada9abbdb530eb3572a58"
+        run: test "$(git rev-parse HEAD)" = "b78f4068d8a479f48eb048b8d76fa60a0997dc4a"
 
       - name: Install pinned air-java SNAPSHOT
         working-directory: air-java

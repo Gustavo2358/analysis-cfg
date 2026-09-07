@@ -1,6 +1,14 @@
 {
   "schema_version": 1,
-  "active": [],
+  "active": [
+    {
+      "id": "WORK-CFG-025",
+      "backlog_id": "BACKLOG-CFG-025",
+      "path": "docs/work/active/WORK-CFG-025",
+      "status": "active",
+      "authorization": "discovery"
+    }
+  ],
   "history": [
     {
       "id": "WORK-CFG-001",

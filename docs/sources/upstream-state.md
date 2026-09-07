@@ -1,6 +1,6 @@
 # Baseline factual dos repositórios
 
-Observada em 06/09/2026. Este documento é contexto de integração, não contrato CFG.
+Observada em 06/09/2026; apenas air-java revalidado em 07/09/2026. Este documento é contexto de integração, não contrato CFG.
 Revisões, coordenadas e estado verificável estão no [lock](sources.lock.json).
 
 ## Analysis IR
@@ -24,9 +24,9 @@ não licença para duplicar seu modelo no consumer.
 
 ## air-java
 
-`Gustavo2358/air-java/main` foi verificado no commit
-`6a4091e5394fc22b3d2ada9abbdb530eb3572a58`, merge do PR #1 de
-reconciliação. O snapshot referencia exatamente a AIR 2.0.0 normativa em
+O upstream air-java autorizado para os próximos checkpoints é
+`b78f4068d8a479f48eb048b8d76fa60a0997dc4a`, merge real do PR #5 / 1A.
+O snapshot referencia exatamente a AIR 2.0.0 normativa em
 `122ce54e1b9ef9b00646f93ece409ca8b63bc933`.
 
 | Propriedade | Evidência observada |
@@ -44,7 +44,7 @@ reconciliação. O snapshot referencia exatamente a AIR 2.0.0 normativa em
 | Premissa | `DisjointStorage` é a forma normativa universal entre pelo menos duas bases distintas, sem escopo seletivo |
 | Proveniência | localização por linha/coluna ou por offsets com unidade explícita, sem fabricar uma forma a partir da outra |
 | Validação | `AirValidator.validate(Publication)` e `validate(Publication, ValidationOptions)` retornam `ValidationResult` |
-| Fronteira | `model` e `validation`; nenhum codec, filesystem, frontend ou CFG de produção |
+| Fronteira | `air-model/`: model/validator no artefato `air-java`; `air-json/`: codec compartilhado 1A; parent `air-java-parent` |
 
 Assinatura pública observada de `Publication`: `Publication(Ids.PublicationId id,
 SemanticVersion airVersion, Capabilities.Manifest capabilities,
@@ -58,12 +58,15 @@ List<Evidence.Uncertainty> uncertainties, List<Proofs.Premise> premises)`.
 nulo e não oferece fallthrough intersequence. O validator verifica, entre outros
 fatos, fechamento do `initialLabel` de uma Entry e referências internas.
 
-O código de `src/main` não importa Jackson/Gson, `java.io`, `java.nio`, ProLeap,
-ANTLR, Semantic Product, COBOL ou tipos CFG. A instalação local do checkout exato,
-em repositório Maven isolado, terminou com `BUILD SUCCESS` e 172 checks
-determinísticos. O job remoto `contracts` do mesmo SHA terminou com `success` e
-incluiu a inspeção de bytecode limitada a `java.base`. Esses resultados validam o
-modelo/validator do `air-java`, não a interpretação futura do consumer CFG.
+O código de `air-model/src/main` não importa Jackson/Gson, `java.io`, `java.nio`, ProLeap,
+ANTLR, Semantic Product, COBOL ou tipos CFG. A instalação antiga e seus 172 checks
+pertencem à evidência histórica do bootstrap.
+O merge 1A possui CI `contracts` e `harness` em success no SHA autorizado,
+com [recibo de proveniência](../work/active/WORK-CFG-025/state.md) e
+[URL do job contracts](https://github.com/Gustavo2358/air-java/actions/runs/34163367232/job/101869534574).
+Esses resultados não certificam o consumer CFG. O codec `AirJson` existe em
+`air-json/src/main/java/io/github/gustavo2358/air/json/AirJson.java`; a cobertura
+é a 1A declarada upstream, sem habilitar reader, dependência air-json ou 2B aqui.
 
 Limites documentados pelo próprio repositório permanecem explícitos: API inicial
 `0.1.0-SNAPSHOT` ainda revisável, sem tag/release observada; nenhum codec ou

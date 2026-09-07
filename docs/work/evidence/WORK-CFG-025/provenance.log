@@ -1,0 +1,31 @@
+Verified command exit: 0
+Complete output
+PASS exact merge pin, pinned blobs, URL inventory and module ownership
+PASS normative analysis-ir block and other source pins identical to baseline
+PASS 17 active blob URLs; 8 historical files unchanged; product/POM/gate-checker scope preserved
+EXPECTED_RED pin exit=1
+EXPECTED_RED topology exit=1
+EXPECTED_RED missing exit=1
+PASS restoration/second GREEN digest=8d920cf5932a048d25491731d4a85ae730eee1760fe784996d2d664d268a9717
+PATH_EVIDENCE path | git_blob_sha1 | sha256
+README.md | 88dbc4d604bab2880cb128adab68e901001fb6ef | 9b06c7aa78c1c7b1e61f0c8e93c572f66bed00c637955ea808a52a2eef16e71f
+pom.xml | ad19afda650fb60fdde1280987f248b1e5a987fb | 353569e5eaefc36a5a852a0f7d77fcb6d867e486057cbba1d17a82db876cf4f5
+ARCHITECTURE.md | 229ceb33a87bd7e899fb84f43065807ab0fcc4b0 | a9e398d4f4170adaa7dcc902e18422ddcacc005a4de97517eb3c5f637f075861
+docs/implementation-status.md | bfb4c507484530afba38524741bf06852641e4bb | 334ad682bf6f4558e02f8ea6877115ff906c4f93b89d2630c7aab694674efe3c
+docs/model-catalog.md | f41e00eb122c3a8dfbd66081e1ce301125354fcf | 6cef24624deb081248253fe81df61037de6debd3d4c24b1ff0e1163c4976df3a
+docs/reconciliation-air-2.md | 9c4f753382fc310cec8691718231b5be787a90ce | ce0e63a009e43ef735b2723f886b24b2c1b50cd5766100fedd5e2c665055f286
+docs/sources.lock.json | b09350ff76056a7ca68867f15257bbf0a149f7a3 | a1c168c52eae5ca26f4d3148de8012e589062ccc7a808c66f98bafd0911329f1
+docs/validation-evidence.md | 1f2b3e3ef56a687e65c10a2bc0bee5947b3349c3 | 273e08252a86940bb60a246a0fbcfc270d9ff1ea3419cc7068dc7f5315a621bd
+air-model/src/main/java/io/github/gustavo2358/air/model/Publication.java | 8296062112a473f28932a221f093715a570137c0 | 1c6222a862c1251bb9f0fe14e9c0bc0ab3c06232c3c1b776b3fb2d0816512d03
+air-model/src/main/java/io/github/gustavo2358/air/model/Sequence.java | a75fd86f08424cd60e7e695209a0d6b12f032acb | 4880b0da9c44d78b275f9161097b7d0caab7b9dac22d844aac81dea683afb295
+air-model/src/main/java/io/github/gustavo2358/air/model/Terminator.java | 2046dae16dc7960db087ac16a98277b7aa55d26c | c409da297e1553dc2bf7636ca83d6206b9c5854a1902100db9396616b0e9981d
+air-model/src/main/java/io/github/gustavo2358/air/model/Operations.java | fcdcade8ab3b2823c2610cc4487cb2d8427b8408 | b6dc81c3bb12a4ec3492576180354a9d1247bae0f4689e2dade993a2c308756a
+air-model/src/main/java/io/github/gustavo2358/air/model/Interactions.java | 7b2a9f665a0ec6328cf15ef075a0cf80501f2bd9 | 01b110f75f35db8c06fb25e5a8c0d618bff7a06cacba489e3aece94d9a5c3536
+air-model/src/main/java/io/github/gustavo2358/air/model/Control.java | 0a98141f2e47af0a2690c27dc5fe6c64bc6802a2 | 9142023adfb3cfbd89781fa128833157edaa69225651646bbd05c0695740baf2
+air-model/src/main/java/io/github/gustavo2358/air/model/Origins.java | f1fdb87dc974a3b33e05521dcf660afdd15d9ffa | a2f42cec832def92760e33eb187333257361eb0ec447195b504ef706695cf719
+air-model/src/main/java/io/github/gustavo2358/air/model/Proofs.java | 673115f35e32826a24604b34109caf507a69b475 | 8493bda69f66f799e9529f5afc68c27c31d49b0abbcde8c14672ab0db528f73c
+air-model/src/main/java/io/github/gustavo2358/air/validation/AirValidator.java | c3cc25a2248c7249c71423fa4b4bded899bfdee4 | b8b93e5dd44e4386865265c0a5b37602962f86d2a4e950890c565a98750996eb
+air-model/pom.xml | 882d5f5368bb8dd33bb002db158044d8f47d37c1 | 9c6d6eb84493c66cdd707dfe799e7894602fdb11a1750cd5a0131f7760cfdc5e
+air-json/pom.xml | af5294224a8efaee61235765d089fd16e3e40f65 | b958329c3372fcee638c06569bebfd23ee2f564882bb6169493794e504ed7e21
+air-json/src/main/java/io/github/gustavo2358/air/json/AirJson.java | 795bccbc199e18bd4c2e8a4369d5e0768bb8f1c6 | 901692688282ef4e7a0e19f04f818289c690a6efeda230702450848be6a264c8
+docs/engineering/air-json.md | 8720ddc26accdbe436af1d47d69b9e89c2afb945 | 8335fab9f2625fc7688ca700f081a84fff0bf2b99b42376a72bc568c9b8964ee

@@ -1,0 +1,46 @@
+{
+  "id": "WORK-CFG-025",
+  "backlog_id": "BACKLOG-CFG-025",
+  "title": "Pin de proveniência air-java PR #5 / 1A",
+  "status": "active",
+  "risk": "low",
+  "goal": "Adotar proveniência b78f4068d8a479f48eb048b8d76fa60a0997dc4a; sem implementação de produto.",
+  "authorization": "discovery",
+  "authorization_evidence": "Pedido explícito do usuário em 2026-09-07: preparar somente proveniência/pinning para 2A/2B, com commit, push, CI e PR próprios; parar para review humano, sem merge. Review do PR #9 autorizou corrigir somente o setup explícito de Python 3.12 na CI e documentar Python 3.10+ para o build upstream, no mesmo CP0/PR.",
+  "checkpoint": "CP0 provenance/pinning",
+  "must_read": [
+    "AGENTS.md",
+    "docs/work/index.md",
+    "docs/engineering/work-item-protocol.md",
+    "docs/engineering/gates.md",
+    "docs/engineering/toolchain-and-modules.md",
+    "docs/sources/sources.lock.json"
+  ],
+  "related_decisions": [],
+  "related_invariants": [],
+  "evals": [],
+  "source_scope": [
+    ".github/workflows/ci.yml",
+    "docs/sources/sources.lock.json",
+    "docs/sources/index.md",
+    "docs/sources/upstream-state.md",
+    "docs/engineering/toolchain-and-modules.md",
+    "docs/architecture/decisions/ADR-0007.md",
+    "docs/work"
+  ],
+  "test_scope": [],
+  "must_not_change": [
+    "pom.xml",
+    "cfg-kernel",
+    "scripts",
+    "analysis-ir normative pin",
+    "existing historical evidence",
+    "other repositories"
+  ],
+  "gates": [
+    "fast",
+    "architecture",
+    "semantic"
+  ],
+  "stop_condition": "Após commit/push e CI verde do head, parar para review humano do PR próprio. Sem merge/auto-merge, 2A/2B ou outro checkpoint."
+}

@@ -1,0 +1,11 @@
+Verified command exit: 0
+Selected result lines; full local log SHA-256: 1b0ef1771c8e145835e89d51e6bc36ecd4d6486f7f57e5161cb5d83a30911811
+[INFO] Tests run: 20, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.151 s -- in io.github.gustavo2358.analysis.cfg.domain.EvalCfg030Test
+[INFO] Tests run: 25, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.111 s -- in io.github.gustavo2358.analysis.cfg.domain.EvalCfg029Test
+[INFO] Tests run: 22, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.053 s -- in io.github.gustavo2358.analysis.cfg.domain.EvalCfg028Test
+[INFO] Tests run: 17, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.023 s -- in io.github.gustavo2358.analysis.cfg.domain.EvalCfg025Test
+[INFO] Tests run: 84, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+[INFO] Total time:  2.594 s
+[semantic] PASS: EVAL-CFG-025/028/029/030, 84 required tests, zero skipped; CFG-FIRST + linear/Jump/Branch/Halt + inventory policy, no complete AIR profile claim
+[semantic] PASS (exit 0)

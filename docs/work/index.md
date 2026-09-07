@@ -2,9 +2,7 @@
 
 ## Item ativo
 
-Nenhum. WORK-CFG-024/BACKLOG-CFG-024 completed; registry.active=[].
-[PR #8](https://github.com/Gustavo2358/analysis-cfg/pull/8) aberto para review humano,
-sem merge/auto-merge e sem iniciar outro checkpoint.
+[WORK-CFG-025](active/WORK-CFG-025/work-item.json): CP0 de proveniência autorizado em 2026-09-07. [Estado](active/WORK-CFG-025/state.md). Sem implementação 2A/2B; parar para review humano após CI do head.
 
 ## Último item concluído
 
