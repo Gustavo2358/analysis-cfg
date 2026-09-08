@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: Gustavo2358/air-java
-          ref: b78f4068d8a479f48eb048b8d76fa60a0997dc4a
+          ref: ce530a7e17ab12b23c48f29425f503ff920b09fb
           path: air-java
 
       - name: Set up Java 21
@@ -36,7 +36,7 @@ jobs:
 
       - name: Verify pinned air-java checkout
         working-directory: air-java
-        run: test "$(git rev-parse HEAD)" = "b78f4068d8a479f48eb048b8d76fa60a0997dc4a"
+        run: test "$(git rev-parse HEAD)" = "ce530a7e17ab12b23c48f29425f503ff920b09fb"
 
       - name: Install pinned air-java SNAPSHOT
         working-directory: air-java

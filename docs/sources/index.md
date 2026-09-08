@@ -63,32 +63,32 @@ implementado exclusivamente pelo shared air-json e consumido por cfg-adapters em
 WORK-CFG-026. A decisão humana libera o experimento sem promoção; não autoriza
 gerar codec a partir dos records de air-java.
 
-## Implementação Java e codec compartilhado — commit b78f4068d8a479f48eb048b8d76fa60a0997dc4a
+## Implementação Java e codec compartilhado — commit ce530a7e17ab12b23c48f29425f503ff920b09fb
 
-- [README](https://github.com/Gustavo2358/air-java/blob/b78f4068d8a479f48eb048b8d76fa60a0997dc4a/README.md)
-- [POM](https://github.com/Gustavo2358/air-java/blob/b78f4068d8a479f48eb048b8d76fa60a0997dc4a/pom.xml)
-- [Publication](https://github.com/Gustavo2358/air-java/blob/b78f4068d8a479f48eb048b8d76fa60a0997dc4a/air-model/src/main/java/io/github/gustavo2358/air/model/Publication.java)
-- [Sequence](https://github.com/Gustavo2358/air-java/blob/b78f4068d8a479f48eb048b8d76fa60a0997dc4a/air-model/src/main/java/io/github/gustavo2358/air/model/Sequence.java)
-- [Terminator](https://github.com/Gustavo2358/air-java/blob/b78f4068d8a479f48eb048b8d76fa60a0997dc4a/air-model/src/main/java/io/github/gustavo2358/air/model/Terminator.java)
-- [Operations](https://github.com/Gustavo2358/air-java/blob/b78f4068d8a479f48eb048b8d76fa60a0997dc4a/air-model/src/main/java/io/github/gustavo2358/air/model/Operations.java)
-- [Interactions](https://github.com/Gustavo2358/air-java/blob/b78f4068d8a479f48eb048b8d76fa60a0997dc4a/air-model/src/main/java/io/github/gustavo2358/air/model/Interactions.java)
-- [Control](https://github.com/Gustavo2358/air-java/blob/b78f4068d8a479f48eb048b8d76fa60a0997dc4a/air-model/src/main/java/io/github/gustavo2358/air/model/Control.java)
-- [Origins](https://github.com/Gustavo2358/air-java/blob/b78f4068d8a479f48eb048b8d76fa60a0997dc4a/air-model/src/main/java/io/github/gustavo2358/air/model/Origins.java)
-- [Proofs](https://github.com/Gustavo2358/air-java/blob/b78f4068d8a479f48eb048b8d76fa60a0997dc4a/air-model/src/main/java/io/github/gustavo2358/air/model/Proofs.java)
-- [AirValidator](https://github.com/Gustavo2358/air-java/blob/b78f4068d8a479f48eb048b8d76fa60a0997dc4a/air-model/src/main/java/io/github/gustavo2358/air/validation/AirValidator.java)
-- [Reconciliação AIR 2.0](https://github.com/Gustavo2358/air-java/blob/b78f4068d8a479f48eb048b8d76fa60a0997dc4a/docs/reconciliation-air-2.md)
-- [Cobertura e limites](https://github.com/Gustavo2358/air-java/blob/b78f4068d8a479f48eb048b8d76fa60a0997dc4a/docs/implementation-status.md)
-- [CI verificado](https://github.com/Gustavo2358/air-java/actions/runs/34163367232/job/101869534574)
+- [README](https://github.com/Gustavo2358/air-java/blob/ce530a7e17ab12b23c48f29425f503ff920b09fb/README.md)
+- [POM](https://github.com/Gustavo2358/air-java/blob/ce530a7e17ab12b23c48f29425f503ff920b09fb/pom.xml)
+- [Publication](https://github.com/Gustavo2358/air-java/blob/ce530a7e17ab12b23c48f29425f503ff920b09fb/air-model/src/main/java/io/github/gustavo2358/air/model/Publication.java)
+- [Sequence](https://github.com/Gustavo2358/air-java/blob/ce530a7e17ab12b23c48f29425f503ff920b09fb/air-model/src/main/java/io/github/gustavo2358/air/model/Sequence.java)
+- [Terminator](https://github.com/Gustavo2358/air-java/blob/ce530a7e17ab12b23c48f29425f503ff920b09fb/air-model/src/main/java/io/github/gustavo2358/air/model/Terminator.java)
+- [Operations](https://github.com/Gustavo2358/air-java/blob/ce530a7e17ab12b23c48f29425f503ff920b09fb/air-model/src/main/java/io/github/gustavo2358/air/model/Operations.java)
+- [Interactions](https://github.com/Gustavo2358/air-java/blob/ce530a7e17ab12b23c48f29425f503ff920b09fb/air-model/src/main/java/io/github/gustavo2358/air/model/Interactions.java)
+- [Control](https://github.com/Gustavo2358/air-java/blob/ce530a7e17ab12b23c48f29425f503ff920b09fb/air-model/src/main/java/io/github/gustavo2358/air/model/Control.java)
+- [Origins](https://github.com/Gustavo2358/air-java/blob/ce530a7e17ab12b23c48f29425f503ff920b09fb/air-model/src/main/java/io/github/gustavo2358/air/model/Origins.java)
+- [Proofs](https://github.com/Gustavo2358/air-java/blob/ce530a7e17ab12b23c48f29425f503ff920b09fb/air-model/src/main/java/io/github/gustavo2358/air/model/Proofs.java)
+- [AirValidator](https://github.com/Gustavo2358/air-java/blob/ce530a7e17ab12b23c48f29425f503ff920b09fb/air-model/src/main/java/io/github/gustavo2358/air/validation/AirValidator.java)
+- [Reconciliação AIR 2.0](https://github.com/Gustavo2358/air-java/blob/ce530a7e17ab12b23c48f29425f503ff920b09fb/docs/reconciliation-air-2.md)
+- [Cobertura e limites](https://github.com/Gustavo2358/air-java/blob/ce530a7e17ab12b23c48f29425f503ff920b09fb/docs/implementation-status.md)
+- [CI verificado](https://github.com/Gustavo2358/air-java/actions/runs/34248728661)
 
 Coordenadas declaradas: `io.github.gustavo2358:air-java:0.1.0-SNAPSHOT`, Java 21.
 O parent é `air-java-parent`; `air-model/` publica o artefato `air-java` e
-`air-json/` publica o codec compartilhado de cobertura 1A. O kernel continua dependendo
+`air-json/` publica o codec compartilhado de cobertura 1A + 4B text. O kernel continua dependendo
 somente do modelo; WORK-CFG-026 acrescenta air-json apenas em cfg-adapters.
 
-- [POM do modelo](https://github.com/Gustavo2358/air-java/blob/b78f4068d8a479f48eb048b8d76fa60a0997dc4a/air-model/pom.xml)
-- [POM do codec](https://github.com/Gustavo2358/air-java/blob/b78f4068d8a479f48eb048b8d76fa60a0997dc4a/air-json/pom.xml)
-- [AirJson](https://github.com/Gustavo2358/air-java/blob/b78f4068d8a479f48eb048b8d76fa60a0997dc4a/air-json/src/main/java/io/github/gustavo2358/air/json/AirJson.java)
-- [Cobertura 1A](https://github.com/Gustavo2358/air-java/blob/b78f4068d8a479f48eb048b8d76fa60a0997dc4a/docs/engineering/air-json.md)
+- [POM do modelo](https://github.com/Gustavo2358/air-java/blob/ce530a7e17ab12b23c48f29425f503ff920b09fb/air-model/pom.xml)
+- [POM do codec](https://github.com/Gustavo2358/air-java/blob/ce530a7e17ab12b23c48f29425f503ff920b09fb/air-json/pom.xml)
+- [AirJson](https://github.com/Gustavo2358/air-java/blob/ce530a7e17ab12b23c48f29425f503ff920b09fb/air-json/src/main/java/io/github/gustavo2358/air/json/AirJson.java)
+- [Cobertura do codec 4B](https://github.com/Gustavo2358/air-java/blob/ce530a7e17ab12b23c48f29425f503ff920b09fb/docs/engineering/air-json.md)
 
 Não foi observada tag/release. O modelo reconciliado não possui `contracts[]`; usa
 `ContractRef` como valor e materializa assinatura externa, effects e outcomes no

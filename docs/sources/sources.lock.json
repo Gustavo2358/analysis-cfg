@@ -123,16 +123,16 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "b78f4068d8a479f48eb048b8d76fa60a0997dc4a",
+    "commit": "ce530a7e17ab12b23c48f29425f503ff920b09fb",
     "canonical_ref": "main",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
     "upstream_review": {
-      "pull_request": 5,
+      "pull_request": 6,
       "state": "merged",
-      "head_commit": "b8d0d953024dceb37782944886ac02d5ec6d16f6",
-      "merge_commit": "b78f4068d8a479f48eb048b8d76fa60a0997dc4a",
-      "merged_at": "2026-09-07T21:30:12Z"
+      "head_commit": "f3698a78b2fe8d989247bfdeaf9fd667e5db1368",
+      "merge_commit": "ce530a7e17ab12b23c48f29425f503ff920b09fb",
+      "merged_at": "2026-09-08T16:03:41Z"
     },
     "analysis_ir": {
       "semantic_version": "2.0.0",
@@ -153,8 +153,9 @@
       "check_name": "contracts",
       "status": "completed",
       "conclusion": "success",
-      "checked_commit": "b78f4068d8a479f48eb048b8d76fa60a0997dc4a",
-      "url": "https://github.com/Gustavo2358/air-java/actions/runs/34163367232/job/101869534574"
+      "checked_commit": "ce530a7e17ab12b23c48f29425f503ff920b09fb",
+      "url": "https://github.com/Gustavo2358/air-java/actions/runs/34248728661",
+      "harness_url": "https://github.com/Gustavo2358/air-java/actions/runs/34248728645"
     },
     "read_paths": [
       "README.md",
@@ -177,9 +178,14 @@
       "air-model/pom.xml",
       "air-json/pom.xml",
       "air-json/src/main/java/io/github/gustavo2358/air/json/AirJson.java",
-      "docs/engineering/air-json.md"
+      "docs/engineering/air-json.md",
+      "air-model/src/main/java/io/github/gustavo2358/air/model/Memory.java",
+      "air-model/src/main/java/io/github/gustavo2358/air/model/Places.java",
+      "air-model/src/main/java/io/github/gustavo2358/air/model/Expressions.java",
+      "air-model/src/main/java/io/github/gustavo2358/air/model/Values.java",
+      "air-json/src/test/resources/scalar-assign.canonical.json"
     ],
-    "observed_on": "2026-09-07",
+    "observed_on": "2026-09-08",
     "modules": {
       "parent": {
         "path": "pom.xml",
@@ -193,7 +199,8 @@
       "codec": {
         "path": "air-json/pom.xml",
         "artifact_id": "air-json",
-        "role": "shared_codec_1A_consumed_by_cfg_adapters"
+        "role": "shared_codec_4B_scalar_assign_consumed_by_cfg_adapters",
+        "coverage": "1A GOBACK plus Object/Cell/Assign text, ObjectPlace, Literal TextValue and known(text); not full AIR binding"
       }
     }
   },

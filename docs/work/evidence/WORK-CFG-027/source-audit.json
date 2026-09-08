@@ -1,0 +1,26 @@
+{
+  "baseline": "2b4df46d53ce5b21a5c315d3f691b183cb6bd124",
+  "normative_analysis_ir_entire_section_unchanged": true,
+  "production_delta": "",
+  "goback": {
+    "cfg-adapters/src/test/resources/air/goback.canonical.json": {
+      "bytes": 10383,
+      "sha256": "fa299c2e5f3fae75afe365363b9f16925f0cfea591f631768ace82f0fb9a1075",
+      "baseline_byte_identical": true
+    },
+    "cfg-adapters/src/test/resources/cfg/goback.manual.json": {
+      "bytes": 1429,
+      "sha256": "9ea8b230c99dd59cde758f91ae6a70885eb2b41a3a8d37346d6d955dd0e22640",
+      "baseline_byte_identical": true
+    }
+  },
+  "maven_jars_sha256": {
+    "/tmp/cfg-4d/m2-old/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar": "1765d3ade2882f92dca9f588143b71928e7852c4ee39ecf922b8e846e21904dd",
+    "/tmp/cfg-4d/m2-old/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar": "1bc8e67a94fb113d3ac959d61911a31502d13a27d79825bf201949c08231ad46",
+    "/tmp/cfg-4d/m2-4b/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar": "1765d3ade2882f92dca9f588143b71928e7852c4ee39ecf922b8e846e21904dd",
+    "/tmp/cfg-4d/m2-4b/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar": "3816358bbe1052e3dfc5674461ae998082323be38e48bc13567b2052a753e539"
+  },
+  "jdk": "Eclipse Adoptium Temurin 21.0.12.1+1",
+  "upstream_4b": "ce530a7e17ab12b23c48f29425f503ff920b09fb",
+  "sibling_source_edits_by_this_work": []
+}

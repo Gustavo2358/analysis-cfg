@@ -1,0 +1,53 @@
+[
+  {
+    "gate": "architecture",
+    "command": [
+      "bash",
+      "scripts/harness/check-architecture.sh"
+    ],
+    "exit": 0
+  },
+  {
+    "gate": "semantic",
+    "command": [
+      "bash",
+      "scripts/harness/check-semantic.sh"
+    ],
+    "exit": 0
+  },
+  {
+    "gate": "integration",
+    "command": [
+      "bash",
+      "scripts/harness/check-integration.sh"
+    ],
+    "exit": 0
+  },
+  {
+    "gate": "verify",
+    "command": [
+      "mvn",
+      "-B",
+      "-ntp",
+      "clean",
+      "verify"
+    ],
+    "exit": 0
+  },
+  {
+    "gate": "performance",
+    "command": [
+      "bash",
+      "scripts/harness/check-performance.sh"
+    ],
+    "exit": 3
+  },
+  {
+    "gate": "fast",
+    "command": [
+      "bash",
+      "scripts/harness/check-fast.sh"
+    ],
+    "exit": 0
+  }
+]

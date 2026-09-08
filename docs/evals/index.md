@@ -22,3 +22,5 @@ de controle/coverage com memória; Branch tem oracle próprio no 029.
 Asserções estruturais dos oráculos upstream não exigem implementar RD/PV agora.
 A força dos testes será comprovada com falsificações/mutantes focalizados; contagem
 de testes e porcentagem de linhas cobertas não bastam.
+
+EVAL-CFG-032 acrescenta a prova 4D: seis métodos, golden escalar 4B, payload por identidade, limites default e smoke com 4096 Assigns. Não executa 4C/4E.

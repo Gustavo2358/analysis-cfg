@@ -1,0 +1,239 @@
+{
+  "challenges": [
+    {
+      "challenge": "01-ci-old",
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "scripts/project/check_scalar_contract.py"
+      ],
+      "exit": 1,
+      "compile_exit": null,
+      "expected_detector": "source-lock SHA",
+      "detected": true,
+      "log_sha256": "60b1690ea3cb156474ca76665abba61dd225afbd936b94b2852b4c57798f6e0b"
+    },
+    {
+      "challenge": "02-lock-ci-drift",
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "scripts/project/check_scalar_contract.py"
+      ],
+      "exit": 1,
+      "compile_exit": null,
+      "expected_detector": "source-lock SHA",
+      "detected": true,
+      "log_sha256": "60b1690ea3cb156474ca76665abba61dd225afbd936b94b2852b4c57798f6e0b"
+    },
+    {
+      "challenge": "03-fixture-drift",
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "scripts/project/check_scalar_contract.py"
+      ],
+      "exit": 1,
+      "compile_exit": null,
+      "expected_detector": "not byte-identical",
+      "detected": true,
+      "log_sha256": "57ce752f03904e40a6073b5c6bcfc6056227a538ef81e5a6808330002efba529"
+    },
+    {
+      "challenge": "04-integration-ignores-payload",
+      "command": [
+        "bash",
+        "scripts/harness/check-integration.sh"
+      ],
+      "exit": 1,
+      "compile_exit": null,
+      "expected_detector": "method inventory missing",
+      "detected": true,
+      "log_sha256": "588c2a1976215393795bf526a6e3dbb4509ed0ef63bca5e212df310305d17452"
+    },
+    {
+      "challenge": "05-sequence-loses-assign",
+      "command": [
+        "mvn",
+        "-B",
+        "-ntp",
+        "-pl",
+        "cfg-adapters",
+        "-am",
+        "-Dtest=ScalarAssignTest,TransportTest,SemanticInterpreterRegistryTest",
+        "clean",
+        "test"
+      ],
+      "exit": 1,
+      "compile_exit": null,
+      "expected_detector": "Failures:",
+      "detected": true,
+      "log_sha256": "e9b49e095e5f46411ecff87cb39dff3d1f4733c31f92753eb442ab3e48832df1"
+    },
+    {
+      "challenge": "06-node-per-assign",
+      "command": [
+        "mvn",
+        "-B",
+        "-ntp",
+        "-pl",
+        "cfg-adapters",
+        "-am",
+        "-Dtest=ScalarAssignTest,TransportTest,SemanticInterpreterRegistryTest",
+        "clean",
+        "test"
+      ],
+      "exit": 1,
+      "compile_exit": null,
+      "expected_detector": "Failures:",
+      "detected": true,
+      "log_sha256": "0e0f14a65fd47815a476737dc173a325ca8d19c3e6401c9f1307d7ce11ecce75"
+    },
+    {
+      "challenge": "07-edge-depends-on-assign",
+      "command": [
+        "mvn",
+        "-B",
+        "-ntp",
+        "-pl",
+        "cfg-adapters",
+        "-am",
+        "-Dtest=ScalarAssignTest,TransportTest,SemanticInterpreterRegistryTest",
+        "clean",
+        "test"
+      ],
+      "exit": 1,
+      "compile_exit": null,
+      "expected_detector": "Failures:",
+      "detected": true,
+      "log_sha256": "2b60bf3bedaf77a4e57accc248b7e32f2ab2475637a0fc682451c5444925e916"
+    },
+    {
+      "challenge": "08-no-return-edge",
+      "command": [
+        "mvn",
+        "-B",
+        "-ntp",
+        "-pl",
+        "cfg-adapters",
+        "-am",
+        "-Dtest=ScalarAssignTest,TransportTest,SemanticInterpreterRegistryTest",
+        "clean",
+        "test"
+      ],
+      "exit": 1,
+      "compile_exit": null,
+      "expected_detector": "Failures:",
+      "detected": true,
+      "log_sha256": "87a27a452b9f87c9fdb6d94a5a86062f4068b421985641df9b84ae84dce42864"
+    },
+    {
+      "challenge": "09-default-strict",
+      "command": [
+        "mvn",
+        "-B",
+        "-ntp",
+        "-pl",
+        "cfg-adapters",
+        "-am",
+        "-Dtest=ScalarAssignTest,TransportTest,SemanticInterpreterRegistryTest",
+        "clean",
+        "test"
+      ],
+      "exit": 1,
+      "compile_exit": null,
+      "expected_detector": "Failures:",
+      "detected": true,
+      "log_sha256": "736b019ba95da6c19f75f9d811548886d070c2834ec881968984a55f9a1d65cb"
+    },
+    {
+      "challenge": "10-partial-promoted",
+      "command": [
+        "mvn",
+        "-B",
+        "-ntp",
+        "-pl",
+        "cfg-adapters",
+        "-am",
+        "-Dtest=ScalarAssignTest,TransportTest,SemanticInterpreterRegistryTest",
+        "clean",
+        "test"
+      ],
+      "exit": 1,
+      "compile_exit": null,
+      "expected_detector": "Failures:",
+      "detected": true,
+      "log_sha256": "1cfc0192924b87a550e40b42e537dcb644ba6fac99b0083f9e15dc1f108a3b46"
+    },
+    {
+      "challenge": "11-local-reader",
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "-c",
+        "import sys;from pathlib import Path;sys.path.insert(0,'scripts/project');from check_architecture import verify_project_shape;verify_project_shape(Path.cwd())"
+      ],
+      "exit": 1,
+      "compile_exit": 0,
+      "expected_detector": "shared AirJson.decode",
+      "detected": true,
+      "log_sha256": "9aca4fcac1a31706b67a006bf7e37430323c08b0ef2109556b844083ba4aed81"
+    },
+    {
+      "challenge": "12-wire-duplicates-air",
+      "command": [
+        "mvn",
+        "-B",
+        "-ntp",
+        "-pl",
+        "cfg-adapters",
+        "-am",
+        "-Dtest=ScalarAssignTest,TransportTest,SemanticInterpreterRegistryTest",
+        "clean",
+        "test"
+      ],
+      "exit": 1,
+      "compile_exit": null,
+      "expected_detector": "Failures:",
+      "detected": true,
+      "log_sha256": "893786d58ce7b04dfb8d3773de654b2f1a932dc3167dd93fd661d64877337f7f"
+    },
+    {
+      "challenge": "13-goback-suite-removed",
+      "command": [
+        "bash",
+        "scripts/harness/check-integration.sh"
+      ],
+      "exit": 1,
+      "compile_exit": null,
+      "expected_detector": "integration reports missing",
+      "detected": true,
+      "log_sha256": "8b8f684a7987739f781c0739c5192135c1c3e29fd571892315e577ae227ff800"
+    },
+    {
+      "challenge": "14-coordinated-old-pin",
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "scripts/project/check_scalar_contract.py"
+      ],
+      "exit": 1,
+      "compile_exit": null,
+      "expected_detector": "approved 4B merge",
+      "detected": true,
+      "log_sha256": "35f74a76be26aa0430e0af5e3d0d95e6b3ec81802e0fbff31a2514d69f2e42c2"
+    }
+  ],
+  "restored_sha256": {
+    ".github/workflows/ci.yml": "6ca5250e774ae3c9d88af4754d896f79e6bbf851a86af01ad535bd1a5309e2ae",
+    "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirJsonFileReader.java": "0d9f54d26a728aad17163be2cf28e7ce458fe775554a37f0d7ba7d27dd73c393",
+    "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter.java": "ce11d494154f40302d17f266f86ce2dde604ddd9739cc291fb81949663e6db3a",
+    "cfg-adapters/src/test/java/io/github/gustavo2358/analysis/cfg/adapters/ScalarAssignTest.java": "795e23a9356ca99fa209e63e415dfe9fe2812a390853a3598c8438b0d9abb70c",
+    "cfg-adapters/src/test/java/io/github/gustavo2358/analysis/cfg/adapters/TransportTest.java": "ea52c5f63bdceb5b301da88e4965f6867698ed5615005ee5839d82e8b58b68ad",
+    "cfg-adapters/src/test/resources/air/scalar-assign.canonical.json": "40b9cec1bcc1c1e40cf3b9e3c48e834835e478e1d84bccafa575d63497ef3b60",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/BuildOptions.java": "5fc1925688f9527592eee73b3e92de258206ec81d67198a7b65e554d0d174417",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CoreCfgProjection.java": "f9233544a2d2a71caef274edd7bb3f7c41018910c2d829b7d55c9914acfe34bb",
+    "docs/sources/sources.lock.json": "e68fd901f8022c82b13d7bc8119000aba40f6141d5059f9898014d8ee1743a88"
+  },
+  "restored_byte_identical": true
+}

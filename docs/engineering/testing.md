@@ -137,3 +137,17 @@ Memória/arquivo geram as mesmas observações CFG de controle/coverage para o G
 os fatos AIR não transportados no v1 não são certificados por essa equivalência.
 O kernel conserva seus 102 testes, inclusive os 84 métodos semânticos anteriores.
 O harness possui 47 testes, incluindo contracasos do novo executor/inventário.
+
+## Evidência escalar 4D
+
+EVAL-CFG-032 parte dos bytes do golden mergeado do 4B e usa AirJsonFileReader e
+BuildCfg defaults de produção. A Sequence do grafo é a mesma instância recebida;
+Assign/ObjectPlace/Literal/TextValue e ObjectDeclaration/Cell permanecem na AIR.
+ObjectPlace transporta ObjectId: o oracle relaciona o ID completo à declaração e
+seu CellBinding ao StorageId real, sem criar AIR paralela no CFG.
+
+O expected CFG é manual, com Entry→Sequence(Return)→NormalExit, ENTRY e RETURN.
+Ele não serializa Assign, portanto o oracle in-memory é obrigatório. O smoke cria
+4096 ocorrências AIR válidas com IDs de operações/operandos distintos, uma Sequence
+e Return; três nós e duas transições constantes, payload por identidade e sem
+threshold temporal. Não é prova geral de complexidade do validator nem benchmark.

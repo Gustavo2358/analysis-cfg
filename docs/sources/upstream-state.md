@@ -1,6 +1,6 @@
 # Baseline factual dos repositórios
 
-Observada em 06/09/2026; apenas air-java revalidado em 07/09/2026. Este documento é contexto de integração, não contrato CFG.
+Observada em 06/09/2026; apenas air-java revalidado em 08/09/2026. Este documento é contexto de integração, não contrato CFG.
 Revisões, coordenadas e estado verificável estão no [lock](sources.lock.json).
 
 ## Analysis IR
@@ -26,7 +26,7 @@ não licença para duplicar seu modelo no consumer.
 ## air-java
 
 O upstream air-java autorizado para os próximos checkpoints é
-`b78f4068d8a479f48eb048b8d76fa60a0997dc4a`, merge real do PR #5 / 1A.
+`ce530a7e17ab12b23c48f29425f503ff920b09fb`, merge real do PR #6 / 4B.
 O snapshot referencia exatamente a AIR 2.0.0 normativa em
 `122ce54e1b9ef9b00646f93ece409ca8b63bc933`.
 
@@ -45,7 +45,7 @@ O snapshot referencia exatamente a AIR 2.0.0 normativa em
 | Premissa | `DisjointStorage` é a forma normativa universal entre pelo menos duas bases distintas, sem escopo seletivo |
 | Proveniência | localização por linha/coluna ou por offsets com unidade explícita, sem fabricar uma forma a partir da outra |
 | Validação | `AirValidator.validate(Publication)` e `validate(Publication, ValidationOptions)` retornam `ValidationResult` |
-| Fronteira | `air-model/`: model/validator no artefato `air-java`; `air-json/`: codec compartilhado 1A; parent `air-java-parent` |
+| Fronteira | `air-model/`: model/validator no artefato `air-java`; `air-json/`: codec compartilhado 4B; parent `air-java-parent` |
 
 Assinatura pública observada de `Publication`: `Publication(Ids.PublicationId id,
 SemanticVersion airVersion, Capabilities.Manifest capabilities,
@@ -62,13 +62,16 @@ fatos, fechamento do `initialLabel` de uma Entry e referências internas.
 O código de `air-model/src/main` não importa Jackson/Gson, `java.io`, `java.nio`, ProLeap,
 ANTLR, Semantic Product, COBOL ou tipos CFG. A instalação antiga e seus 172 checks
 pertencem à evidência histórica do bootstrap.
-O merge 1A possui CI `contracts` e `harness` em success no SHA autorizado,
-com [recibo de proveniência](../work/history/WORK-CFG-025.md) e
-[URL do job contracts](https://github.com/Gustavo2358/air-java/actions/runs/34163367232/job/101869534574).
-Esses resultados não certificam o consumer CFG. O codec `AirJson` existe em
-`air-json/src/main/java/io/github/gustavo2358/air/json/AirJson.java`; a cobertura
-é a 1A declarada upstream. WORK-CFG-026 habilita o reader via essa dependência
-somente em cfg-adapters; não amplia as formas implementadas upstream.
+O merge 4B possui CI `contracts` e `harness` em success no SHA autorizado,
+verificada via GitHub em 08/09/2026: [contracts](https://github.com/Gustavo2358/air-java/actions/runs/34248728661)
+e [harness](https://github.com/Gustavo2358/air-java/actions/runs/34248728645).
+Head aprovado f3698a78b2fe8d989247bfdeaf9fd667e5db1368, merge em 2026-09-08T16:03:41Z.
+Main local/remote no merge autorizado, sem avanço observado. O pin downstream é o merge.
+O codec adiciona Object + Cell + Assign, ObjectPlace e Literal TextValue/known(text) à cobertura
+1A; não implementa todo binding. O golden GOBACK continua idêntico.
+WORK-CFG-027 prova o golden escalar pelo reader e BuildCfg existentes; não usa 4C.
+O limite default continua 16 MiB e profundidade 128, inclusive na leitura física:
+fixture escalar pequeno passa; AIR maior que 16 MiB permanece dívida operacional.
 
 Limites documentados pelo próprio repositório permanecem explícitos: API inicial
 `0.1.0-SNAPSHOT` ainda revisável, sem tag/release observada; nenhum codec ou

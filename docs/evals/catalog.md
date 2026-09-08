@@ -297,4 +297,4 @@ Implementado em WORK-CFG-026: 31 métodos / três suítes no integration gate, f
 
 ## EVAL-CFG-032 — 4D escalar
 
-Planejado em WORK-CFG-027: Object + Cell + Assign + Return pelo codec 4B, payload por identidade, topologia constante e CLI/golden manual. RED de transporte observado antes do repin.
+Implementado em WORK-CFG-027: cinco métodos ScalarAssignTest e um ScalarAssignCliTest, obrigatórios no integration gate além dos 31 métodos anteriores. Object + Cell + Assign + Return pelo reader/shared codec 4B e BuildCfg defaults, payload por identidade, inventários PARTIAL e três nós/duas transições. Smoke de 4096 Assigns mantém uma SequenceNode. CLI real em dois processos compara golden CFG manual sem instructions/AIR duplicadas. RED de transporte com codec antigo precedeu o repin.
