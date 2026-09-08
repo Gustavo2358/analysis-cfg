@@ -294,3 +294,7 @@ Nenhum claim de perfil nem de independência das lacunas para dataflow/reachabil
 ## EVAL-CFG-031 — Arquivo AIR → CFG JSON e CLI
 
 Implementado em WORK-CFG-026: 31 métodos / três suítes no integration gate, fluxo real pelo shared AirJson e BuildCfg, golden manual independente, falhas sem publicar output, determinismo e coverage honesta. Inclui CLI em processo separado e mapping de todos os tipos CFG atuais, sem completar EVAL-CFG-008 nem E2E externo.
+
+## EVAL-CFG-032 — 4D escalar
+
+Implementado em WORK-CFG-027: cinco métodos ScalarAssignTest e um ScalarAssignCliTest, obrigatórios no integration gate além dos 31 métodos anteriores. Object + Cell + Assign + Return pelo reader/shared codec 4B e BuildCfg defaults, payload por identidade, inventários PARTIAL e três nós/duas transições. Smoke de 4096 Assigns mantém uma SequenceNode. CLI real em dois processos compara golden CFG manual sem instructions/AIR duplicadas. RED de transporte com codec antigo precedeu o repin.

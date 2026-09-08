@@ -92,7 +92,7 @@ silenciosa. Não há CFG JSON reader neste checkpoint nem promessa de interopera
 universal. Novos consumers devem selecionar versão suportada explicitamente.
 
 A entrada usa exclusivamente shared air-json 0.1.0-SNAPSHOT em air-java
-b78f4068d8a479f48eb048b8d76fa60a0997dc4a: `analysis-ir-json` bindingVersion 1.0.0,
+ce530a7e17ab12b23c48f29425f503ff920b09fb: `analysis-ir-json` bindingVersion 1.0.0,
 airVersion 2.0.0, DRAFT em analysis-ir 122ce54e1b9ef9b00646f93ece409ca8b63bc933.
 Autorização humana explícita libera esse snapshot experimental sem promoção normativa.
 

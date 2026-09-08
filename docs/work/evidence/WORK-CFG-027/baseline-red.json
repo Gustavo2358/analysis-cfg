@@ -1,0 +1,23 @@
+[
+  {
+    "command": [
+      "/tmp/cfg-2b/jdk21/bin/javac",
+      "-cp",
+      "/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/tmp/cfg-4d/m2-old/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar:/tmp/cfg-4d/m2-old/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar",
+      "/tmp/cfg-4d/ScalarBaselineOracle.java"
+    ],
+    "exit": 0,
+    "output": ""
+  },
+  {
+    "command": [
+      "/tmp/cfg-2b/jdk21/bin/java",
+      "-cp",
+      "/tmp/cfg-4d:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/tmp/cfg-4d/m2-old/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar:/tmp/cfg-4d/m2-old/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar",
+      "ScalarBaselineOracle",
+      "/tmp/cfg-4d/scalar-assign.canonical.json"
+    ],
+    "exit": 1,
+    "output": "expected=CFG_BUILT actual=IMPLEMENTATION_LIMIT path=$.publication.storage\nException in thread \"main\" java.lang.AssertionError: Scalar transport boundary rejected by baseline shared codec\n\tat ScalarBaselineOracle.main(ScalarBaselineOracle.java:18)\nCaused by: io.github.gustavo2358.air.json.AirJsonException: Nonempty inventory outside implemented 1A coverage\n\tat io.github.gustavo2358.air.json.Json.limit(Json.java:26)\n\tat io.github.gustavo2358.air.json.BindingReader$At.unsupported(BindingReader.java:57)\n\tat io.github.gustavo2358.air.json.BindingReader$At.empty(BindingReader.java:54)\n\tat io.github.gustavo2358.air.json.BindingReader.envelope(BindingReader.java:87)\n\tat io.github.gustavo2358.air.json.AirJson.decode(AirJson.java:47)\n\tat io.github.gustavo2358.analysis.cfg.adapters.AirJsonFileReader.read(AirJsonFileReader.java:31)\n\tat ScalarBaselineOracle.main(ScalarBaselineOracle.java:11)\n"
+  }
+]

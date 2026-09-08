@@ -22,13 +22,13 @@ Exit codes: 0=PASS, 1=FAIL, 2=erro de uso/configuração, 3=UNAVAILABLE.
 ## Estado explícito
 
 [gate-state.json](gate-state.json) registra fase implementation e autorização
-WORK-CFG-026. Hooks reais de architecture/semantic/integration em scripts/project;
+WORK-CFG-027. Hooks reais de architecture/semantic/integration em scripts/project;
 performance permanece sem hook. O checker verifica consistência local, não
 comprova autorização humana nem estado GitHub.
 
 ## Arquitetura
 
-O hook executa clean/test: oito suítes/102 testes no kernel e três suítes/31 métodos
+O hook executa clean/test: oito suítes/102 testes no kernel e cinco suítes/37 métodos
 nominais de transporte, zero skips. Verifica 14 fontes/22 classfiles exatos do kernel
 e 6 fontes/8 classfiles dos adapters/launcher, incluindo tipos aninhados/sintéticos. Inspeciona
 major 65/minor 0, dependências/classpath, javap e jdeps. Imports complementam bytecode.
@@ -107,3 +107,19 @@ writer são exercitados por Publications em memória e topologia manual contextu
 Performance não foi implementado. Full continua executando fast/architecture/semantic
 e parando honestamente em performance com UNAVAILABLE/exit 3. A CI executa integration
 como passo obrigatório independente, portanto full não o oculta.
+
+## Integração escalar 4D
+
+O gate preserva todos os 31 métodos nominais do 2B e exige ScalarAssignTest (5)
+e ScalarAssignCliTest (1): cinco suítes/37 métodos no transporte, mais 102 testes
+inalterados do kernel no reactor. A lista nominal não deriva do source nem dos reports.
+O self-test também falsifica suites de um método (foreign name e duplicação).
+Antes de Maven, check_scalar_contract.py verifica o merge 4B aprovado, lock/CI,
+SHA-256, bytes e Git blob das fixtures. Com checkout upstream disponível, compara
+os bytes locais com git show do merge exato; sem checkout, verifica hashes offline.
+O source lock normativo da AIR e binding DRAFT permanecem fixos.
+
+check_scope.py agora governa o diff 4D desde 2b4df46d53ce5b21a5c315d3f691b183cb6bd124,
+exigindo zero delta de produção no kernel/adapters/launcher. Evidência antiga do 2B
+permanece histórica. Performance/full continuam UNAVAILABLE: o smoke estrutural
+não cria benchmark nem implementa o gate performance.

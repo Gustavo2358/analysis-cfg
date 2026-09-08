@@ -1,0 +1,53 @@
+[
+  {
+    "command": [
+      "/tmp/cfg-2b/jdk21/bin/java",
+      "-cp",
+      "/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-launcher/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/tmp/cfg-4d/m2-4b/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/tmp/cfg-4d/m2-4b/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar",
+      "io.github.gustavo2358.analysis.cfg.launcher.AnalysisCfg",
+      "/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-adapters/src/test/resources/air/scalar-assign.canonical.json",
+      "/home/gustavo/workspace/teste-e2e/analysis-cfg/docs/work/evidence/WORK-CFG-027/cli/scalar-a.cfg.json"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "output": "scalar-a.cfg.json",
+    "bytes": 1432,
+    "sha256": "bbb7f3198acc81eb32a520214a7e7dbeabcfea69a8b1801e499a4dd7be6b01f0",
+    "manual_golden_equal": true
+  },
+  {
+    "command": [
+      "/tmp/cfg-2b/jdk21/bin/java",
+      "-cp",
+      "/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-launcher/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/tmp/cfg-4d/m2-4b/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/tmp/cfg-4d/m2-4b/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar",
+      "io.github.gustavo2358.analysis.cfg.launcher.AnalysisCfg",
+      "/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-adapters/src/test/resources/air/scalar-assign.canonical.json",
+      "/home/gustavo/workspace/teste-e2e/analysis-cfg/docs/work/evidence/WORK-CFG-027/cli/scalar-b.cfg.json"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "output": "scalar-b.cfg.json",
+    "bytes": 1432,
+    "sha256": "bbb7f3198acc81eb32a520214a7e7dbeabcfea69a8b1801e499a4dd7be6b01f0",
+    "manual_golden_equal": true
+  },
+  {
+    "command": [
+      "/tmp/cfg-2b/jdk21/bin/java",
+      "-cp",
+      "/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-launcher/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/tmp/cfg-4d/m2-4b/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/tmp/cfg-4d/m2-4b/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar",
+      "io.github.gustavo2358.analysis.cfg.launcher.AnalysisCfg",
+      "/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-adapters/src/test/resources/air/goback.canonical.json",
+      "/home/gustavo/workspace/teste-e2e/analysis-cfg/docs/work/evidence/WORK-CFG-027/cli/goback.cfg.json"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "output": "goback.cfg.json",
+    "bytes": 1429,
+    "sha256": "9ea8b230c99dd59cde758f91ae6a70885eb2b41a3a8d37346d6d955dd0e22640",
+    "manual_golden_equal": true
+  }
+]

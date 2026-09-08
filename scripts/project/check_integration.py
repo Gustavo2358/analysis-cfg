@@ -13,6 +13,13 @@ from check_architecture import GateFailure, GateConfigurationError, command_path
 # Reviewed nominal obligations. Never derive this inventory from reports or Java source at runtime.
 SUITES = {
     "cfg-adapters": {
+        "io.github.gustavo2358.analysis.cfg.adapters.ScalarAssignTest": {
+            "sequencePayloadAndObjectCellIdentitySurviveRealReaderAndBuild",
+            "topologyIsExactlyEntrySequenceReturnAndPartialKnowledgeIsPreserved",
+            "manualCfgGoldenRemainsTopologyOnlyAndDeterministic",
+            "defaultPhysicalAndCodecLimitsRemainSixteenMiBAndDepth128",
+            "manyAssignsRemainOneSequenceNodeWithoutCopyingPayload",
+        },
         "io.github.gustavo2358.analysis.cfg.adapters.TransportTest": {
             "fileDecodePreservesExpectedAirFacts", "realBuildHasExactManualTopologyAndCorrelations",
             "writerMatchesIndependentGoldenBytesAndIsDeterministic", "readerPhysicalBoundAcceptsExactSizeAndRejectsOneExtra",
@@ -27,6 +34,9 @@ SUITES = {
         },
     },
     "cfg-launcher": {
+        "io.github.gustavo2358.analysis.cfg.launcher.ScalarAssignCliTest": {
+            "twoRealCliProcessesMatchScalarManualGoldenByteForByte",
+        },
         "io.github.gustavo2358.analysis.cfg.launcher.EvalCfg031Test": {
             "fileThroughRealCliMatchesManualGolden", "twoIndependentExecutionsProduceIdenticalBytes",
             "missingAirFileCannotPublish", "bomIsTypedAirFailureWithoutOutput", "malformedUtf8IsTypedAirFailureWithoutOutput",
@@ -89,7 +99,9 @@ def detector_self_test() -> None:
                     mutant = copy.deepcopy(good); ET.SubElement(mutant[0], tag); mutants.append(mutant)
                 for attr, value in (("tests", "0"), ("skipped", "1"), ("errors", "1"), ("failures", "1"), ("tests", "bad"), ("name", "Foreign")):
                     mutant = copy.deepcopy(good); mutant.set(attr, value); mutants.append(mutant)
-                mutant = copy.deepcopy(good); mutant[0].set("name", mutant[1].get("name")); mutants.append(mutant)
+                mutant = copy.deepcopy(good)
+                mutant[0].set("name", mutant[1].get("name") if len(mutant) > 1 else "foreignMethod")
+                mutants.append(mutant)
                 mutant = copy.deepcopy(good); mutant[0].set("classname", "Foreign"); mutants.append(mutant)
                 mutant = copy.deepcopy(good); mutant.append(copy.deepcopy(mutant[0])); mutants.append(mutant)
                 for mutant in mutants: rejected(lambda: verify_suite(mutant, name, required))
@@ -111,6 +123,8 @@ def main() -> int:
     try:
         detector_self_test()
         if args.self_test: return 0
+        from check_scalar_contract import verify_scalar_contract
+        verify_scalar_contract(args.root)
         # Full clean reactor retains kernel regression execution and prevents stale reports/classes.
         command = [command_path("mvn"), *local_repository_argument(), "-B", "-ntp", "clean", "test"]
         print("[integration] RUN: " + " ".join(command), flush=True)
@@ -118,7 +132,7 @@ def main() -> int:
             raise GateFailure("real integration execution failed")
         verify_reports(args.root)
         total = sum(len(methods) for suites in SUITES.values() for methods in suites.values())
-        print(f"[integration] PASS: EVAL-CFG-031, 3 nominal suites / {total} methods; real files, shared AirJson, BuildCfg, CLI/process, golden and memory equivalence", flush=True)
+        print(f"[integration] PASS: EVAL-CFG-031/032, 5 nominal suites / {total} methods; real files, shared AirJson, BuildCfg, CLI/process, golden and memory equivalence", flush=True)
         return 0
     except GateFailure as exc:
         print("[integration] FAIL: " + str(exc), file=sys.stderr); return 1

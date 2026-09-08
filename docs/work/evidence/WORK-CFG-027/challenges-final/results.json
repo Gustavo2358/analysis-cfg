@@ -1,0 +1,124 @@
+{
+  "challenges": [
+    {
+      "challenge": "01-ci-old",
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "scripts/project/check_scalar_contract.py"
+      ],
+      "exit": 1,
+      "compile_exit": null,
+      "expected_detector": "source-lock SHA",
+      "detected": true,
+      "log_sha256": "60b1690ea3cb156474ca76665abba61dd225afbd936b94b2852b4c57798f6e0b"
+    },
+    {
+      "challenge": "02-lock-ci-drift",
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "scripts/project/check_scalar_contract.py"
+      ],
+      "exit": 1,
+      "compile_exit": null,
+      "expected_detector": "source-lock SHA",
+      "detected": true,
+      "log_sha256": "60b1690ea3cb156474ca76665abba61dd225afbd936b94b2852b4c57798f6e0b"
+    },
+    {
+      "challenge": "03-fixture-drift",
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "scripts/project/check_scalar_contract.py"
+      ],
+      "exit": 1,
+      "compile_exit": null,
+      "expected_detector": "not byte-identical",
+      "detected": true,
+      "log_sha256": "57ce752f03904e40a6073b5c6bcfc6056227a538ef81e5a6808330002efba529"
+    },
+    {
+      "challenge": "04-integration-ignores-payload",
+      "command": [
+        "bash",
+        "scripts/harness/check-integration.sh"
+      ],
+      "exit": 1,
+      "compile_exit": null,
+      "expected_detector": "method inventory missing",
+      "detected": true,
+      "log_sha256": "dc6b982b967bdeb3e8f5480436cd42abf83d5801d0cce64f9ab4d0458e988096"
+    },
+    {
+      "challenge": "05-sequence-loses-assign",
+      "command": [
+        "mvn",
+        "-B",
+        "-ntp",
+        "-pl",
+        "cfg-adapters",
+        "-am",
+        "-Dtest=ScalarAssignTest,TransportTest,SemanticInterpreterRegistryTest",
+        "clean",
+        "test"
+      ],
+      "exit": 1,
+      "compile_exit": null,
+      "expected_detector": "Failures:",
+      "detected": true,
+      "log_sha256": "476a00369828f8eeb05732e4a55e6033c6f9b94e57944f138840642e515a7282"
+    },
+    {
+      "challenge": "06-node-per-assign",
+      "command": [
+        "mvn",
+        "-B",
+        "-ntp",
+        "-pl",
+        "cfg-adapters",
+        "-am",
+        "-Dtest=ScalarAssignTest,TransportTest,SemanticInterpreterRegistryTest",
+        "clean",
+        "test"
+      ],
+      "exit": 1,
+      "compile_exit": null,
+      "expected_detector": "Failures:",
+      "detected": true,
+      "log_sha256": "e183490f0fd32109ee28fdb0ead02e64c1c39d16e4ddb5fdf1d0469efffe3609"
+    },
+    {
+      "challenge": "07-edge-depends-on-assign",
+      "command": [
+        "mvn",
+        "-B",
+        "-ntp",
+        "-pl",
+        "cfg-adapters",
+        "-am",
+        "-Dtest=ScalarAssignTest,TransportTest,SemanticInterpreterRegistryTest",
+        "clean",
+        "test"
+      ],
+      "exit": 1,
+      "compile_exit": null,
+      "expected_detector": "Failures:",
+      "detected": false,
+      "log_sha256": "33a980a957c1012defb9e09d73ce564c34a9ba0b98f67ce6a1abe84766cd718c"
+    }
+  ],
+  "restored_sha256": {
+    ".github/workflows/ci.yml": "6ca5250e774ae3c9d88af4754d896f79e6bbf851a86af01ad535bd1a5309e2ae",
+    "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirJsonFileReader.java": "0d9f54d26a728aad17163be2cf28e7ce458fe775554a37f0d7ba7d27dd73c393",
+    "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter.java": "ce11d494154f40302d17f266f86ce2dde604ddd9739cc291fb81949663e6db3a",
+    "cfg-adapters/src/test/java/io/github/gustavo2358/analysis/cfg/adapters/ScalarAssignTest.java": "795e23a9356ca99fa209e63e415dfe9fe2812a390853a3598c8438b0d9abb70c",
+    "cfg-adapters/src/test/java/io/github/gustavo2358/analysis/cfg/adapters/TransportTest.java": "ea52c5f63bdceb5b301da88e4965f6867698ed5615005ee5839d82e8b58b68ad",
+    "cfg-adapters/src/test/resources/air/scalar-assign.canonical.json": "40b9cec1bcc1c1e40cf3b9e3c48e834835e478e1d84bccafa575d63497ef3b60",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/BuildOptions.java": "5fc1925688f9527592eee73b3e92de258206ec81d67198a7b65e554d0d174417",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CoreCfgProjection.java": "f9233544a2d2a71caef274edd7bb3f7c41018910c2d829b7d55c9914acfe34bb",
+    "docs/sources/sources.lock.json": "423c3b68205ed679fa542fc1a58ccaf64cef563dc9e54ad8da7ea54906735927"
+  },
+  "restored_byte_identical": true
+}

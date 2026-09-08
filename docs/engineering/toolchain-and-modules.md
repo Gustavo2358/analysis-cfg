@@ -10,7 +10,7 @@ O modelo compartilhado vem de:
 
 ```text
 repository: Gustavo2358/air-java
-commit:     b78f4068d8a479f48eb048b8d76fa60a0997dc4a
+commit:     ce530a7e17ab12b23c48f29425f503ff920b09fb
 Maven:      io.github.gustavo2358:air-java:0.1.0-SNAPSHOT
 AIR:        2.0.0 @ 122ce54e1b9ef9b00646f93ece409ca8b63bc933
 JDK:        21, sem preview
@@ -64,7 +64,7 @@ proibidos no kernel.
 `air-java` possui `Publication`, `Unit`, `Entries.Entry`, `Sequence`, operações,
 terminadores, tipos, IDs, premissas e `AirValidator`. `analysis-cfg` não cria um
 módulo/modelo AIR local. O repositório upstream também contém o codec compartilhado
-`AirJson` em `air-json/`; WORK-CFG-026 consome esse mesmo pin somente em cfg-adapters.
+`AirJson` em `air-json/`; WORK-CFG-026 introduziu o consumo em cfg-adapters e WORK-CFG-027 atualiza o pin para 4B.
 O core pode criar apenas seus próprios tipos CFG, opções,
 diagnósticos de consumer e índices derivados.
 
@@ -100,3 +100,12 @@ O reactor atual agrega exatamente kernel/adapters/launcher mantendo DAG. O kerne
 continua compilável/testável isoladamente. O integration gate executa arquivos e CLI
 e verifica três suítes nominais; não é o E2E com o lowerer. Container, REST/cloud e scheduler
 continuam embalagens externas. A documentação Maven está nas [fontes](../sources/index.md).
+
+## Pin 4D
+
+O merge 4B acima substitui o pin 1A ativo. O teste escalar usa somente o golden
+mergeado, cuja proveniência está em
+[scalar-assign.provenance.json](../../cfg-adapters/src/test/resources/air/scalar-assign.provenance.json).
+Resolução local deve manter repositórios Maven separados para o RED antigo e o
+GREEN 4B, pois ambos usam coordenadas SNAPSHOT iguais. Instalar sempre a raiz do
+upstream no SHA exato; não reutilizar artefato de origem desconhecida.

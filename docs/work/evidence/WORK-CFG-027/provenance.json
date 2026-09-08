@@ -1,0 +1,9 @@
+{
+  "repository": "Gustavo2358/air-java",
+  "merge_commit": "ce530a7e17ab12b23c48f29425f503ff920b09fb",
+  "upstream_path": "air-json/src/test/resources/scalar-assign.canonical.json",
+  "upstream_blob_sha1": "b37ff744819132cd0bfe115ce9a4382b19a29060",
+  "sha256": "40b9cec1bcc1c1e40cf3b9e3c48e834835e478e1d84bccafa575d63497ef3b60",
+  "bytes": 14554,
+  "local_path": "cfg-adapters/src/test/resources/air/scalar-assign.canonical.json"
+}

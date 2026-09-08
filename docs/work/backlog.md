@@ -54,4 +54,6 @@ adiados. 021 leva gates a CI e não bloqueia desenho semântico.
 
 [BACKLOG-CFG-025](backlog/BACKLOG-CFG-025.md): completed em WORK-CFG-025; merge PR #9 confirmado.
 
-[BACKLOG-CFG-026](backlog/BACKLOG-CFG-026.md): active; implementação autorizada somente do checkpoint 2B.
+[BACKLOG-CFG-026](backlog/BACKLOG-CFG-026.md): completed; PR #10 merge confirmado.
+
+[BACKLOG-CFG-027](backlog/BACKLOG-CFG-027.md): active; somente checkpoint 4D.

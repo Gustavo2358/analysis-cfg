@@ -2,14 +2,12 @@
 
 ## Item ativo
 
-[WORK-CFG-026](active/WORK-CFG-026/work-item.json): implementation autorizada, 2B — AIR JSON reader + CFG JSON output + CLI. [Estado](active/WORK-CFG-026/state.md). [PR #10](https://github.com/Gustavo2358/analysis-cfg/pull/10) aberto; parada após CI no head final para review humano, sem merge.
+[WORK-CFG-027](active/WORK-CFG-027/work-item.json): implementation autorizada, 4D — pin 4B e payload escalar no CFG. [Estado](active/WORK-CFG-027/state.md). [PR #11](https://github.com/Gustavo2358/analysis-cfg/pull/11) aberto; CI do head final registrada no PR, parada para review humano sem merge.
 
 ## Último item concluído
 
-[WORK-CFG-025](history/WORK-CFG-025.md): pinning, PR #9 MERGED em b614712fda55fef12639cbe18fd90793faa1fb3b.
-[WORK-CFG-024](history/WORK-CFG-024.md): política KNOWN_SUBSET/STRICT.
+[WORK-CFG-026](history/WORK-CFG-026.md): 2B, PR #10 MERGED em 2b4df46d53ce5b21a5c315d3f691b183cb6bd124.
 
 ## Roteamento
 
-[Backlog](backlog.md), [registry](registry.json), [protocolo](../engineering/work-item-protocol.md).
-Gates offline não inferem merge ou review humano.
+[Backlog](backlog.md), [registry](registry.json), [protocolo](../engineering/work-item-protocol.md). Gates offline não inferem merge/review.
