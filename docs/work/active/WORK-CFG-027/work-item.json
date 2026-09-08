@@ -1,0 +1,60 @@
+{
+  "id": "WORK-CFG-027",
+  "backlog_id": "BACKLOG-CFG-027",
+  "title": "4D — pin 4B e payload escalar no CFG",
+  "status": "active",
+  "risk": "medium",
+  "goal": "Consumir o golden Object + Cell + Assign + Return do merge 4B pelo reader compartilhado e kernel CFG existente, reproduzivelmente.",
+  "authorization": "implementation",
+  "authorization_evidence": "Pedido explícito do usuário em 2026-09-08 autoriza somente 4D no analysis-cfg, RED real, pin ce530a7e17ab12b23c48f29425f503ff920b09fb, fixture byte-identical, gates/challenges, commits, push e PR/CI; sem merge, sem 4C/4E.",
+  "checkpoint": "4D",
+  "must_read": [
+    "AGENTS.md",
+    "docs/work/index.md",
+    "docs/engineering/work-item-protocol.md",
+    "docs/engineering/gates.md",
+    "docs/engineering/testing.md",
+    "ARCHITECTURE.md",
+    "docs/architecture/ports-and-adapters.md",
+    "docs/architecture/cfg-json-v1.md",
+    "docs/domain/core-control.md",
+    "docs/engineering/toolchain-and-modules.md",
+    "docs/sources/sources.lock.json",
+    "docs/sources/upstream-state.md"
+  ],
+  "related_decisions": [],
+  "related_invariants": [
+    "INV-CFG-002"
+  ],
+  "evals": [
+    "EVAL-CFG-032",
+    "EVAL-CFG-031"
+  ],
+  "source_scope": [
+    ".github/workflows/ci.yml",
+    "docs",
+    "scripts/project",
+    "MANIFEST.sha256"
+  ],
+  "test_scope": [
+    "cfg-adapters/src/test",
+    "cfg-launcher/src/test"
+  ],
+  "must_not_change": [
+    "cfg-kernel",
+    "cfg-adapters/src/main",
+    "cfg-launcher/src/main",
+    "analysis_ir authority including binding version and DRAFT",
+    "historical evidence (lifecycle/link repair only)",
+    "sibling repositories",
+    "CFG JSON schema/algorithm",
+    "4C and 4E"
+  ],
+  "gates": [
+    "fast",
+    "architecture",
+    "semantic",
+    "integration"
+  ],
+  "stop_condition": "Commits/push/PR e CI verde no head exato; parar para review humano sem merge/auto-merge."
+}

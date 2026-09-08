@@ -529,6 +529,16 @@
         "INV-CFG-002"
       ],
       "implementation_evidence": "scripts/project/check_integration.py"
+    },
+    {
+      "id": "EVAL-CFG-032",
+      "title": "4D — Object Cell Assign Return no transporte CFG",
+      "status": "planned",
+      "expectation": "Payload AIR preservado por identidade, topologia constante, golden manual/CLI e proveniência 4B; GOBACK preservado.",
+      "upstream_oracles": [],
+      "invariants": [
+        "INV-CFG-002"
+      ]
     }
   ]
 }

@@ -435,7 +435,7 @@
       "id": "BACKLOG-CFG-026",
       "title": "2B — AIR JSON reader + CFG JSON output + CLI",
       "phase": "transport",
-      "status": "active",
+      "status": "completed",
       "dependencies": [
         "BACKLOG-CFG-025",
         "BACKLOG-CFG-024"
@@ -444,7 +444,22 @@
         "EVAL-CFG-031"
       ],
       "path": "docs/work/backlog/BACKLOG-CFG-026.md",
-      "work_item": "WORK-CFG-026"
+      "work_item": "WORK-CFG-026",
+      "completion_evidence": "docs/work/history/WORK-CFG-026.md"
+    },
+    {
+      "id": "BACKLOG-CFG-027",
+      "title": "4D — pin 4B e payload escalar no CFG",
+      "phase": "transport",
+      "status": "active",
+      "dependencies": [
+        "BACKLOG-CFG-026"
+      ],
+      "evals": [
+        "EVAL-CFG-032"
+      ],
+      "path": "docs/work/backlog/BACKLOG-CFG-027.md",
+      "work_item": "WORK-CFG-027"
     }
   ]
 }
