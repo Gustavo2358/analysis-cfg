@@ -2,7 +2,7 @@
 
 ## Onde estamos
 
-Implementation 4D autorizada. Baseline limpo/atualizado 2b4df46d53ce5b21a5c315d3f691b183cb6bd124, branch chore/pin-air-json-scalar-assign. Merge 4B e PR #10 confirmados por GitHub.
+[PR #11](https://github.com/Gustavo2358/analysis-cfg/pull/11) aberto para review humano. Implementação e evidência em 97b8884e123b3cea5369966f32f21e5f7c22cebf, RED em c48a898; branch publicada. Baseline limpo/atualizado 2b4df46d53ce5b21a5c315d3f691b183cb6bd124, branch chore/pin-air-json-scalar-assign. Merge 4B e PR #10 confirmados por GitHub.
 
 ## Verde conhecido
 
@@ -10,7 +10,7 @@ RED baseline em c48a898: IMPLEMENTATION_LIMIT em $.publication.storage. Segundo 
 
 ## Restante
 
-Commits/push/PR e CI no head exato; depois apenas review humano. Sem merge/auto-merge. Recibo remoto final no PR evita autorreferência do SHA no próprio commit. 4C/4E não iniciados.
+Confirmar CI no head exato após este vínculo documental; depois apenas review humano. Sem merge/auto-merge. Recibo remoto final no PR evita autorreferência do SHA no próprio commit. 4C/4E não iniciados.
 
 ## Descobertas que afetam o plano
 

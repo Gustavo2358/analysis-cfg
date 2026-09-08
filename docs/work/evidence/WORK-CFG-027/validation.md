@@ -91,7 +91,7 @@ As duas tentativas exploratórias foram preservadas em [challenges](challenges/r
 | python3 -B scripts/project/check_scope.py | PASS após manifest final; zero delta de produção |
 | git diff --check | PASS |
 
-[Logs brutos comprimidos e hashes](logs.json) preservam os bytes originais. Full não executado, pois o gate performance permanece indisponível. CI remota do head exato será registrada no PR; gates locais não inferem resultado remoto nem review humano.
+[Logs brutos comprimidos e hashes](logs.json) preservam os bytes originais. Full não executado, pois o gate performance permanece indisponível. CI remota do head exato será registrada no [PR #11](https://github.com/Gustavo2358/analysis-cfg/pull/11); gates locais não inferem resultado remoto nem review humano.
 
 ## Limites e input contract for Checkpoint 4E
 
