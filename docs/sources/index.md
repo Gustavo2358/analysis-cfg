@@ -58,9 +58,10 @@ operandos completos, naturais sem teto de runtime e proveniência sem fabricar
 linha/coluna quando há somente offsets.
 
 O **Analysis IR JSON Binding 1.0.0** existe nesse commit, **targets AIR 2.0.0** e
-permanece **DRAFT**. É contrato de transporte separado da versão semântica e ainda
-não é implementado pelo `analysis-cfg`; não autoriza gerar codec a partir dos
-records de `air-java` neste checkpoint.
+permanece **DRAFT**. É contrato de transporte separado da versão semântica,
+implementado exclusivamente pelo shared air-json e consumido por cfg-adapters em
+WORK-CFG-026. A decisão humana libera o experimento sem promoção; não autoriza
+gerar codec a partir dos records de air-java.
 
 ## Implementação Java e codec compartilhado — commit b78f4068d8a479f48eb048b8d76fa60a0997dc4a
 
@@ -81,8 +82,8 @@ records de `air-java` neste checkpoint.
 
 Coordenadas declaradas: `io.github.gustavo2358:air-java:0.1.0-SNAPSHOT`, Java 21.
 O parent é `air-java-parent`; `air-model/` publica o artefato `air-java` e
-`air-json/` publica o codec compartilhado de cobertura 1A. O CFG continua dependendo
-somente do modelo; este pin não inicia o reader nem 2B.
+`air-json/` publica o codec compartilhado de cobertura 1A. O kernel continua dependendo
+somente do modelo; WORK-CFG-026 acrescenta air-json apenas em cfg-adapters.
 
 - [POM do modelo](https://github.com/Gustavo2358/air-java/blob/b78f4068d8a479f48eb048b8d76fa60a0997dc4a/air-model/pom.xml)
 - [POM do codec](https://github.com/Gustavo2358/air-java/blob/b78f4068d8a479f48eb048b8d76fa60a0997dc4a/air-json/pom.xml)

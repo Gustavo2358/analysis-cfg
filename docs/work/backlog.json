@@ -424,11 +424,27 @@
       "id": "BACKLOG-CFG-025",
       "title": "Pin de proveniência air-java PR #5 / 1A",
       "phase": "provenance",
-      "status": "active",
+      "status": "completed",
       "dependencies": [],
       "evals": [],
       "path": "docs/work/backlog/BACKLOG-CFG-025.md",
-      "work_item": "WORK-CFG-025"
+      "work_item": "WORK-CFG-025",
+      "completion_evidence": "docs/work/history/WORK-CFG-025.md"
+    },
+    {
+      "id": "BACKLOG-CFG-026",
+      "title": "2B — AIR JSON reader + CFG JSON output + CLI",
+      "phase": "transport",
+      "status": "active",
+      "dependencies": [
+        "BACKLOG-CFG-025",
+        "BACKLOG-CFG-024"
+      ],
+      "evals": [
+        "EVAL-CFG-031"
+      ],
+      "path": "docs/work/backlog/BACKLOG-CFG-026.md",
+      "work_item": "WORK-CFG-026"
     }
   ]
 }

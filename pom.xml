@@ -14,6 +14,8 @@
 
   <modules>
     <module>cfg-kernel</module>
+    <module>cfg-adapters</module>
+    <module>cfg-launcher</module>
   </modules>
 
   <properties>

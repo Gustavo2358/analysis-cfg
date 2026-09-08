@@ -57,11 +57,12 @@ Maven em um checkout limpo.
 
 Não é necessário terminar frontend ou lowering para começar testes do consumidor.
 Entradas de teste do CFG são **`air-java Publication`**, não
-`semantic-product.json`. JSON/arquivo é adapter posterior; `CFG-FIRST` começa em
-memória.
+`semantic-product.json`. CFG-FIRST começou em memória; 2B acrescenta o reader
+de arquivos AIR via shared AirJson, mantendo a mesma porta.
 A diferença está no [estado upstream](docs/sources/upstream-state.md).
 
 CFG-FIRST, linear/Jump/Halt e Branch estrutural estão implementados em memória.
-MVP-CFG-01 local foi concluído no WORK-CFG-006, sem perfil AIR normativo. Transportes permanecem
-posteriores; BACKLOG-CFG-004/007 não foram iniciados. Siga o estado do work
-autorizado; não avance automaticamente após o PR do 006.
+MVP-CFG-01 local foi concluído no WORK-CFG-006, sem perfil AIR normativo.
+WORK-CFG-026 implementa reader AIR JSON, writer CFG JSON e CLI mínima com integration
+gate executável. [Execução](README.md#executar-air-json--cfg-json).
+Não iniciar o E2E cross-repo ou outro slice sem autorização própria.

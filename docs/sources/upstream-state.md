@@ -13,8 +13,9 @@ Os 23 blobs observados estão fixados individualmente no lock.
 O snapshot contém o **Analysis IR JSON Binding 1.0.0** em
 `bindings/json-v1.md`. Seu próprio cabeçalho diz **Status: DRAFT** e
 **targets AIR 2.0.0**: o merge do PR #2 não o tornou `NORMATIVE`/`ACCEPTED`.
-Versão de transporte e versão semântica continuam distintas. Este checkpoint não
-implementa reader, writer, schema ou adapter JSON no `analysis-cfg`.
+Versão de transporte e versão semântica continuam distintas. WORK-CFG-026 usa o
+snapshot DRAFT por decisão humana explícita via shared air-json e implementa
+reader físico/CLI e writer do contrato local analysis-cfg-json v1.
 
 A reconciliação normativa acrescentou I-55–I-61 e O-86–O-91. Entre as regras que
 afetam a boundary estão contrato materializado por site de `invoke`, targets
@@ -62,11 +63,12 @@ O código de `air-model/src/main` não importa Jackson/Gson, `java.io`, `java.ni
 ANTLR, Semantic Product, COBOL ou tipos CFG. A instalação antiga e seus 172 checks
 pertencem à evidência histórica do bootstrap.
 O merge 1A possui CI `contracts` e `harness` em success no SHA autorizado,
-com [recibo de proveniência](../work/active/WORK-CFG-025/state.md) e
+com [recibo de proveniência](../work/history/WORK-CFG-025.md) e
 [URL do job contracts](https://github.com/Gustavo2358/air-java/actions/runs/34163367232/job/101869534574).
 Esses resultados não certificam o consumer CFG. O codec `AirJson` existe em
 `air-json/src/main/java/io/github/gustavo2358/air/json/AirJson.java`; a cobertura
-é a 1A declarada upstream, sem habilitar reader, dependência air-json ou 2B aqui.
+é a 1A declarada upstream. WORK-CFG-026 habilita o reader via essa dependência
+somente em cfg-adapters; não amplia as formas implementadas upstream.
 
 Limites documentados pelo próprio repositório permanecem explícitos: API inicial
 `0.1.0-SNAPSHOT` ainda revisável, sem tag/release observada; nenhum codec ou

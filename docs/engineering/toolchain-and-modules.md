@@ -1,4 +1,4 @@
-# Java, Maven e integração futura
+# Java, Maven e módulos
 
 ## Baseline decidida
 
@@ -42,7 +42,8 @@ Depois, o build e os gates do consumer rodam com working directory em
 `analysis-cfg`, usando o mesmo repositório Maven isolado.
 O build da raiz instala `air-java-parent`, `air-model` (artefato `air-java`) e
 `air-json` (artefato `air-json`). Os paths de fontes são relativos a cada módulo;
-o consumer continua resolvendo apenas `io.github.gustavo2358:air-java`.
+o kernel resolve apenas `io.github.gustavo2358:air-java`; cfg-adapters também
+resolve `io.github.gustavo2358:air-json:0.1.0-SNAPSHOT`.
 
 A reprodução local exige JDK 21 e Python 3.10+ disponível como `python3` e usa a
 mesma sequência: clone de `air-java`, checkout detached
@@ -63,16 +64,15 @@ proibidos no kernel.
 `air-java` possui `Publication`, `Unit`, `Entries.Entry`, `Sequence`, operações,
 terminadores, tipos, IDs, premissas e `AirValidator`. `analysis-cfg` não cria um
 módulo/modelo AIR local. O repositório upstream também contém o codec compartilhado
-`AirJson` em `air-json/`; sua adoção Maven no CFG e o reader não fazem parte deste pin.
+`AirJson` em `air-json/`; WORK-CFG-026 consome esse mesmo pin somente em cfg-adapters.
 O core pode criar apenas seus próprios tipos CFG, opções,
 diagnósticos de consumer e índices derivados.
 
-Planejamento enxuto: `cfg-kernel` com domínio/aplicação separados por packages;
-`cfg-adapters` com reader AIR JSON/arquivos/exportadores somente após promoção do
-binding DRAFT e autorização de checkpoint;
-`cfg-launcher` com composition root/CLI quando necessário. Separar application em
-artefato próprio somente se uma dependência concreta justificar. Não criar dezenas
-de módulos antes de `CFG-FIRST`.
+Reactor físico: `cfg-kernel` com domínio/aplicação separados por packages;
+`cfg-adapters` com reader AIR via shared AirJson e writer CFG JSON explícito;
+`cfg-launcher` com composition root/CLI. A decisão humana do 2B libera o binding
+DRAFT pinado para experimento sem esperar promoção. Não há outras bibliotecas JSON
+ou módulos novos. [Execução e exit codes](../../README.md#executar-air-json--cfg-json).
 
 ## Gates do bootstrap
 
@@ -96,6 +96,7 @@ semânticos; um grafo de dependências sozinho não prova essas propriedades.
 intermediário. O lowerer ainda não existe; sua readiness é dependência externa dos
 itens E2E, não justificativa para adiar o kernel em memória.
 
-Parent/reactor futuro agrega módulos e centraliza versões mantendo DAG. O perfil de
-integração compila/testa kernel sem launcher. Container, REST/cloud e scheduler
+O reactor atual agrega exatamente kernel/adapters/launcher mantendo DAG. O kernel
+continua compilável/testável isoladamente. O integration gate executa arquivos e CLI
+e verifica três suítes nominais; não é o E2E com o lowerer. Container, REST/cloud e scheduler
 continuam embalagens externas. A documentação Maven está nas [fontes](../sources/index.md).

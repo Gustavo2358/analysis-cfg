@@ -1,7 +1,7 @@
 # WORK-CFG-025 — Proveniência e validação
 
 Baseline main limpa após `git pull --ff-only`: `141b8270f54558a24ee561281598e53c48a0ff6b`.
-Branch própria: `chore/pin-air-java-1a`. Autorização e escopo no [manifesto](../../active/WORK-CFG-025/work-item.json).
+Branch própria: `chore/pin-air-java-1a`. Autorização e escopo no [manifesto](../../history/WORK-CFG-025.md).
 
 O upstream autorizado para os próximos checkpoints é `air-java@b78f4068d8a479f48eb048b8d76fa60a0997dc4a`.
 [PR upstream #5](https://github.com/Gustavo2358/air-java/pull/5): MERGED em 2026-09-07T21:30:12Z;

@@ -518,6 +518,17 @@
         "INV-CFG-026"
       ],
       "implementation_evidence": "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg030Test.java"
+    },
+    {
+      "id": "EVAL-CFG-031",
+      "title": "2B arquivo AIR → CFG JSON e CLI",
+      "status": "implemented",
+      "expectation": "Golden manual, correlações, PARTIAL, determinismo, falhas tipadas e publicação segura; integração real e memória equivalente.",
+      "upstream_oracles": [],
+      "invariants": [
+        "INV-CFG-002"
+      ],
+      "implementation_evidence": "scripts/project/check_integration.py"
     }
   ]
 }

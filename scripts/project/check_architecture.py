@@ -246,6 +246,8 @@ def exact(observed: Iterable[str], expected: Iterable[str], label: str) -> None:
 
 def detector_self_test() -> None:
     forbidden_dependencies = {
+        "io.github.gustavo2358.air.json.AirJson",
+        "io.github.gustavo2358.analysis.cfg.adapters.AirJsonFileReader",
         "java.io.File",
         "java.net.URI",
         "java.nio.file.Path",
@@ -385,8 +387,8 @@ def verify_project_shape(root: Path) -> None:
         for item in modules_element.findall(namespace + "module")
         if item.text and item.text.strip()
     ]
-    if modules != [KERNEL_ARTIFACT]:
-        raise GateFailure("foundation reactor must contain exactly cfg-kernel")
+    if modules != [KERNEL_ARTIFACT, "cfg-adapters", "cfg-launcher"]:
+        raise GateFailure("2B reactor must contain exactly cfg-kernel, cfg-adapters, cfg-launcher")
 
     properties = project.find(namespace + "properties")
     release = None if properties is None else properties.find(namespace + "maven.compiler.release")
@@ -417,7 +419,10 @@ def verify_project_shape(root: Path) -> None:
         and "/src/main/java/" in "/" + path.relative_to(root).as_posix()
     )
     production_sources = {path.relative_to(root).as_posix() for path in production_paths}
-    if production_sources != set(EXPECTED_PRODUCTION_IMPORTS):
+    from check_transport_architecture import transport_source_inventory, verify_transport_shape
+    transport_sources = transport_source_inventory(root)
+    verify_transport_shape(root)
+    if production_sources != set(EXPECTED_PRODUCTION_IMPORTS) | transport_sources:
         raise GateFailure(
             "production source inventory mismatch; expected "
             + repr(sorted(EXPECTED_PRODUCTION_IMPORTS))
@@ -425,6 +430,8 @@ def verify_project_shape(root: Path) -> None:
         )
     for path in production_paths:
         relative = path.relative_to(root).as_posix()
+        if relative in transport_sources:
+            continue  # separately inventoried and verified at the permitted outer boundary
         source = path.read_text(encoding="utf-8")
         imports = IMPORT_PATTERN.findall(source)
         exact(imports, EXPECTED_PRODUCTION_IMPORTS[relative], relative + " imports")
@@ -474,11 +481,11 @@ def verify_snapshot_pin(root: Path) -> str:
         raise GateFailure("CI must not resolve air-java from a mutable branch")
     if f'test "$(git rev-parse HEAD)" = "{sha}"' not in workflow:
         raise GateFailure("CI must verify air-java HEAD before installation")
-    if workflow.count("MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2") != 3:
+    if workflow.count("MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2") != 4:
         raise GateFailure("CI must share one isolated Maven repository across upstream and consumer")
     if 'distribution: temurin' not in workflow or 'java-version: "21"' not in workflow:
         raise GateFailure("CI must use Temurin 21")
-    for gate in ("fast", "architecture", "semantic"):
+    for gate in ("fast", "architecture", "semantic", "integration"):
         if f"bash scripts/harness/check-{gate}.sh" not in workflow:
             raise GateFailure("CI must execute " + gate)
     return sha
@@ -755,7 +762,10 @@ def architecture_gate(root: Path) -> None:
         verify_javap(javap, root, classes, air_jar)
         verify_jdeps(jdeps, root, classes, air_jar)
 
-    print(f"[architecture] PASS: {total} tests ({skipped} skipped), "
+    from check_transport_architecture import transport_gate
+    transport_gate(root, maven, repository, javap, jdeps, air_jar)
+
+    print(f"[architecture] PASS: {total} kernel tests ({skipped} skipped), "
           f"{len(EXPECTED_CLASSFILES)} production classfiles, "
           f"Java class major 65/no preview (Maven runtime {runtime})", flush=True)
     print(f"[architecture] PASS: compile dependency {AIR_GROUP}:{AIR_ARTIFACT}:{AIR_VERSION} "
