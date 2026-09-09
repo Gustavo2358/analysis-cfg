@@ -1,7 +1,7 @@
 # CP5 — fronteiras da análise
 
-Arquitetura `accepted`; W1 APPROVED no HEAD b84389b6. W2 implementada para review humano.
-W3–W5 permanecem ausentes. H1–H7/R1/R2 foram aprovados
+Arquitetura `accepted`; W1/W2 APPROVED. W3 autorizada e em validação.
+W4/W5 permanecem ausentes. H1–H7/R1/R2 foram aprovados
 pelo pedido humano de 09/09/2026 que autoriza somente esta preparação.
 [Proveniência e hashes](../work/evidence/WORK-CFG-028/baseline.json) identificam o
 handoff 1.0 e o discovery revisado, lidos integralmente em `artefatos-e2e/cp5/`.
@@ -30,7 +30,7 @@ CFG construction (BuildCfg)
 
 DAG lógico: `cfg-kernel → analysis-kernel → analysis-values` em ordem de consumo.
 A direção das dependências Maven é a inversa: `analysis-kernel → {cfg-kernel,
-air-java}`; `analysis-values → {analysis-kernel, air-java}`. Todo módulo com imports
+air-java}`; `analysis-values → {analysis-kernel, air-java, cfg-kernel}`. Todo módulo com imports
 AIR declara `air-java` diretamente; transitividade não basta. Os gates de packages
 continuam obrigatórios mesmo com a dependência Maven permitida.
 
@@ -128,3 +128,10 @@ sem interpretação de nomes. Nenhuma interface de solver/state nasceu nesta Wav
 
 [Ledger e fronteira exata de referências](../engineering/cp5-w1-index-ledger.md),
 [oracles e evidência](../work/evidence/WORK-CFG-028/wave-1/validation.md).
+
+## W3 — domínio e observação
+
+[Ledger W3](../engineering/cp5-w3-values-ledger.md): analysis-values implementa a SPI
+W2, com estado por Cell e subjects ObjectId. analysis-kernel/query implementa replay
+genérico por direção; W1/W2 Java intactos. A dependência direta cfg-kernel em values
+é exigida pelas assinaturas CfgTransition/CfgNode existentes, sem inversão do DAG.

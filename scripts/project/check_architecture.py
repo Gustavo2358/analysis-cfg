@@ -388,7 +388,7 @@ def verify_project_shape(root: Path) -> None:
         if item.text and item.text.strip()
     ]
     if modules != [KERNEL_ARTIFACT, "analysis-kernel", "analysis-values", "cfg-adapters", "cfg-launcher"]:
-        raise GateFailure("W1 reactor must contain exactly cfg-kernel, analysis-kernel, cfg-adapters, cfg-launcher")
+        raise GateFailure("W3 reactor must contain exactly cfg-kernel, analysis-kernel, analysis-values, cfg-adapters, cfg-launcher")
 
     properties = project.find(namespace + "properties")
     release = None if properties is None else properties.find(namespace + "maven.compiler.release")
@@ -422,7 +422,9 @@ def verify_project_shape(root: Path) -> None:
     from check_transport_architecture import transport_source_inventory, verify_transport_shape
     from check_w1 import source_inventory, verify_sources
     from check_w2 import SOURCES as SOLVER_SOURCES, verify_sources as verify_solver_sources
-    analysis_sources = source_inventory(root) | SOLVER_SOURCES
+    from check_w3 import QUERY_SOURCES, VALUE_SOURCES, verify_sources as verify_value_sources
+    analysis_sources = source_inventory(root) | SOLVER_SOURCES | QUERY_SOURCES | VALUE_SOURCES
+    verify_value_sources(root)
     verify_solver_sources(root)
     verify_sources(root)
     transport_sources = transport_source_inventory(root)

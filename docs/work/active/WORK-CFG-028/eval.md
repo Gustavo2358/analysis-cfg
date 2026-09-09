@@ -82,3 +82,10 @@ registrada antes de produção. Implementar analysis-values scalar-text-direct@1
 Cell/disjunção, domínio sparse sem cap, strong Assign e queries batch por direção.
 Preservar fontes W1/W2 e pins; oracles reais/concretos, escala, retenção, mutantes,
 gates locais e CI do último HEAD. W4/W5 NOT_STARTED / NOT_AUTHORIZED.
+
+
+### Evidência W3 executada
+
+W3 IMPLEMENTED / AWAITING_HUMAN_REVIEW. [Validação e limites](../../evidence/WORK-CFG-028/wave-3/validation.md).
+Gates locais e 28 mutantes compiláveis distintos; CI final no mesmo PR draft #12.
+W1/W2 aprovadas, W4/W5 indisponíveis e não autorizadas.

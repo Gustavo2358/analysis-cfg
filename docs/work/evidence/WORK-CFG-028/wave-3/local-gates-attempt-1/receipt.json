@@ -1,0 +1,29 @@
+{
+  "source_head": "327737be23ab619ae212f46689a5043884f50da4",
+  "gates": [
+    {
+      "gate": "fast",
+      "command": [
+        "bash",
+        "scripts/harness/check-fast.sh"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "elapsed_seconds": 50.72058239499893,
+      "sha256": "c33a84ed7dd9a7a8e6d5b8698dfb0f3c558df93004fd1a4dfb8e4cf927250bfd",
+      "log": "fast.log.gz"
+    },
+    {
+      "gate": "architecture",
+      "command": [
+        "bash",
+        "scripts/harness/check-architecture.sh"
+      ],
+      "exit": 1,
+      "expected_exit": 0,
+      "elapsed_seconds": 0.7096483849963988,
+      "sha256": "8f9eda8bd35edb3c4505673407d313d821e4867f4686064cce340de51aad431b",
+      "log": "architecture.log.gz"
+    }
+  ]
+}

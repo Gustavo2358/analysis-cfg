@@ -1,0 +1,29 @@
+[
+  {
+    "N": 1000,
+    "bindings": 8,
+    "deliveries": 1000,
+    "joinTransfers": 1001,
+    "joinEntriesVisited": 31968,
+    "predecessorContributionReads": 0,
+    "elapsedNanos": 13911134
+  },
+  {
+    "N": 2000,
+    "bindings": 16,
+    "deliveries": 2000,
+    "joinTransfers": 2001,
+    "joinEntriesVisited": 127936,
+    "predecessorContributionReads": 0,
+    "elapsedNanos": 20251407
+  },
+  {
+    "N": 4000,
+    "bindings": 32,
+    "deliveries": 4000,
+    "joinTransfers": 4001,
+    "joinEntriesVisited": 511872,
+    "predecessorContributionReads": 0,
+    "elapsedNanos": 53013685
+  }
+]

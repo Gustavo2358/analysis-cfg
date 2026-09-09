@@ -109,3 +109,13 @@ Effects semantics alimenta o transfer antes do fixpoint e não pode ser substitu
 por reparo de consumers. Invoke depende de slice futuro de controle/effects; Entry
 não é frame de retorno local. W3 agrega oracle concreto finito e métricas de
 qualidade ao custo, sem domains relacionais, regions ou Liveness de produto.
+
+
+## Implementação W3 autorizada
+
+O profile efetivo `scalar-text-direct@1`, AVL persistente, sets finitos sem cap e
+replay contextual estão detalhados no [ledger W3](../engineering/cp5-w3-values-ledger.md).
+O texto conceitual acima não amplia as formas admitidas: storage direto textual,
+premissa única cobrindo bases distintas e effects explicitamente enumerados.
+Outcomes de query reutilizam Control.OutcomeKey da AIR fixada; after terminator e
+outcomes não materializáveis produzem UNSUPPORTED_POINT. A camada wire continua W5.

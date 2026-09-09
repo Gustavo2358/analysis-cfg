@@ -73,11 +73,11 @@
     {
       "wave": 3,
       "title": "PossibleValues/state/queries",
-      "status": "STARTED",
+      "status": "IMPLEMENTED",
       "authorization": "AUTHORIZED",
       "requires_review_of": "WAVE_2",
       "approval_evidence": "docs/work/evidence/WORK-CFG-028/wave-3/authorization.json",
-      "completion_evidence": null,
+      "completion_evidence": "docs/work/evidence/WORK-CFG-028/wave-3/validation.md",
       "eval": "EVAL-CFG-036"
     },
     {
@@ -275,7 +275,9 @@
   },
   "wave_3": {
     "authorization": "docs/work/evidence/WORK-CFG-028/wave-3/authorization.json",
-    "review": "NOT_REQUESTED",
-    "evidence": "docs/work/evidence/WORK-CFG-028/wave-3/"
+    "review": "AWAITING_HUMAN_REVIEW",
+    "evidence": "docs/work/evidence/WORK-CFG-028/wave-3/",
+    "validated_implementation_head": "327737be23ab619ae212f46689a5043884f50da4",
+    "final_remote_ci": "Same draft PR #12 final receipt; .harness-results/WORK-CFG-028/wave-3/remote-ci.json"
   }
 }

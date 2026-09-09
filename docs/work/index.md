@@ -3,7 +3,7 @@
 ## Item ativo
 
 [WORK-CFG-028](active/WORK-CFG-028/work-item.json): CP5 umbrella,
-**WAVE_3 STARTED / AUTHORIZED**. W1/W2 APPROVED pelo humano.
+**WAVE_3 IMPLEMENTED / AWAITING_HUMAN_REVIEW**. W1/W2 APPROVED pelo humano.
 W2 reviewed head: 0202c7424db04a1d83fb5e35fce055ea81f5b8fa.
 [Estado](active/WORK-CFG-028/state.md), [lifecycle](cp5-lifecycle.json),
 [autorização W3](evidence/WORK-CFG-028/wave-3/authorization.json).

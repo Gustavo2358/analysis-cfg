@@ -1,0 +1,22 @@
+{
+  "air-java": {
+    "observed_head": "17029898fd0ee8fabcaaae89f7260148633d4b12",
+    "status_porcelain": "",
+    "role": "READ_ONLY; observed head is not the pinned authority"
+  },
+  "analysis-ir": {
+    "observed_head": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+    "status_porcelain": "",
+    "role": "READ_ONLY; observed head is not the pinned authority"
+  },
+  "cobol-lower": {
+    "observed_head": "2329993ce61b33fd7105759e211a1861ca6cb217",
+    "status_porcelain": "",
+    "role": "READ_ONLY; observed head is not the pinned authority"
+  },
+  "proleap-poc": {
+    "observed_head": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+    "status_porcelain": "",
+    "role": "READ_ONLY; observed head is not the pinned authority"
+  }
+}

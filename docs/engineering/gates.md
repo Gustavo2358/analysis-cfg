@@ -8,8 +8,8 @@
 | check-harness.sh | executável | 47 testes existentes + suíte adversarial CP5 do harness |
 | check-fast.sh | executável | docs + harness |
 | check-architecture.sh | executável | Maven/testes, inventários exatos, dependências, bytecode 21 e boundary air-java |
-| check-semantic.sh | executável | 17 do EVAL-CFG-025 + 22 do EVAL-CFG-028 + 25 do EVAL-CFG-029 + 20 do EVAL-CFG-030, métodos/suítes exatos |
-| check-performance.sh | UNAVAILABLE | futuras propriedades de escala |
+| check-semantic.sh | executável | oracles CFG/W1/W2/W3, métodos/suítes exatos |
+| check-performance.sh | W1–W3 executáveis; global UNAVAILABLE/3 | escala real de W1/W2/W3; W4/W5 indisponíveis |
 | check-integration.sh | executável | AIR file → shared AirJson → Publication → BuildCfg → CFG JSON file, CLI/process e equivalência de controle/coverage em memória |
 | check-full.sh | UNAVAILABLE | fast/architecture/semantic; para em performance, exit 3 |
 
@@ -22,8 +22,9 @@ Exit codes: 0=PASS, 1=FAIL, 2=erro de uso/configuração, 3=UNAVAILABLE.
 ## Estado explícito
 
 [gate-state.json](gate-state.json) registra fase implementation e autorização
-WORK-CFG-028 (somente checkpoint de preparação; produto CFG existente preservado). Hooks reais de architecture/semantic/integration em scripts/project;
-performance permanece sem hook. O checker verifica consistência local, não
+WORK-CFG-028 (WAVE_3; produto CFG existente preservado). Hooks reais de
+architecture/semantic/integration em scripts/project; performance invoca os hooks
+W1/W2/W3 e mantém o status global UNAVAILABLE por W4/W5. O checker verifica consistência local, não
 comprova autorização humana nem estado GitHub.
 
 ## Arquitetura
@@ -167,3 +168,15 @@ gerado, oracles concretos, S4b/escala e retenção lógica. Inventário W1 perma
 byte-exact; inventário W2 amplia o módulo com fronteiras javap/jdeps próprias.
 Performance e full executam W1/W2, conservando UNAVAILABLE/3 para W3–W5.
 A CI executa W2 separadamente, além dos gates/regressões existentes.
+
+
+## WAVE_3 produtiva
+
+Estado vigente: W1/W2 aprovadas; W3 autorizada. Os parágrafos das Waves anteriores
+registram seus checkpoints históricos. O reactor acrescenta analysis-values e query
+infra genérica. check_w3.py exige 15 métodos semânticos e 22 no perfil de performance,
+com 48 grafos/213 pontos confrontados por dois oráculos independentes.
+O inventário javap/jdeps/Maven é exato; W1/W2 Java ficam byte-exact.
+Performance/full executam W1/W2/W3 e retornam UNAVAILABLE/3 somente por W4/W5.
+CI executa os três hooks de performance separadamente, além de integration.
+[Ledger W3](cp5-w3-values-ledger.md) explicita admission, custos, ownership e limites.

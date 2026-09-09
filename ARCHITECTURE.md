@@ -129,3 +129,9 @@ W1 APPROVED no HEAD b84389b6. W2 IMPLEMENTED / AWAITING_HUMAN_REVIEW no mesmo PR
 draft. PossibleValues, analysis-values, queries por operação, consumers e CLI de
 dataflow pertencem a W3–W5, ainda NOT_STARTED / NOT_AUTHORIZED.
 [Waves e review](docs/product/cp5-roadmap.md), [lifecycle](docs/work/cp5-lifecycle.json).
+
+## CP5 W3
+
+analysis-values acrescenta scalar-text-direct@1, estado sparse por Cell, pool de
+textos e observações; analysis-kernel/query acrescenta replay genérico por direção.
+[Contrato e ledger](docs/engineering/cp5-w3-values-ledger.md). Sem consumers/CLI.
