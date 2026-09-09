@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "W1_W2_IMPLEMENTED_LATER_WAVES_UNAVAILABLE",
+  "status": "W1_W2_W3_IMPLEMENTED_LATER_WAVES_UNAVAILABLE",
   "overflow": "Checked arithmetic; overflow is an implementation defect to correct, never a supported-size ceiling or semantic result.",
   "metrics": [
     {
@@ -580,5 +580,10 @@
       "duplicateEnqueueSuppressions": "duplicatePushesSuppressed"
     },
     "domain_observations": "operationsTransferred/joinEntriesVisited/stateCompareEntries reported by actual synthetic callbacks; opaque production domain internals cannot be inferred"
+  },
+  "wave_3": {
+    "status": "IMPLEMENTED",
+    "hook": "scripts/project/check_w3.py",
+    "mapping": "docs/engineering/cp5-w3-values-ledger.md"
   }
 }

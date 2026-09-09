@@ -17,7 +17,7 @@ def run(root: Path, category: str, wave: int) -> int:
         return 1
     plan = load_json(root / 'docs/evals/cp5/gate-plan.json')
     gate = plan['waves'][wave-1]['gates'].get(category)
-    if wave in (1,2) and gate is not None:
+    if wave in (1,2,3) and gate is not None:
         return subprocess.run([sys.executable,str(root/f'scripts/project/check_w{wave}.py'),category,'--root',str(root)],cwd=root).returncode
     if gate is None:
         print(f'[cp5-{category}] NOT_APPLICABLE_YET: category not due in Wave {wave} (exit 3)')

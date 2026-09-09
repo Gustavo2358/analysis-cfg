@@ -42,6 +42,10 @@
         "2": {
           "status": "IMPLEMENTED",
           "hook": "scripts/project/check_w2.py"
+        },
+        "3": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w3.py"
         }
       }
     },
@@ -60,7 +64,13 @@
       ],
       "documentation": "docs/architecture/cp5-post-audit.md#c",
       "runtime_status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "runtime_hook": null
+      "runtime_hook": null,
+      "wave_hooks": {
+        "3": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w3.py"
+        }
+      }
     },
     "D": {
       "obligations": [
@@ -75,7 +85,13 @@
       ],
       "documentation": "docs/architecture/cp5-post-audit.md#d",
       "runtime_status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "runtime_hook": null
+      "runtime_hook": null,
+      "wave_hooks": {
+        "3": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w3.py"
+        }
+      }
     },
     "E": {
       "obligations": [
@@ -99,6 +115,10 @@
         "2": {
           "status": "IMPLEMENTED",
           "hook": "scripts/project/check_w2.py"
+        },
+        "3": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w3.py"
         }
       }
     },
@@ -132,6 +152,10 @@
         "2": {
           "status": "IMPLEMENTED",
           "hook": "scripts/project/check_w2.py"
+        },
+        "3": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w3.py"
         }
       }
     },
@@ -156,6 +180,10 @@
         "2": {
           "status": "IMPLEMENTED",
           "hook": "scripts/project/check_w2.py"
+        },
+        "3": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w3.py"
         }
       }
     },
@@ -184,6 +212,10 @@
         "2": {
           "status": "IMPLEMENTED",
           "hook": "scripts/project/check_w2.py"
+        },
+        "3": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w3.py"
         }
       }
     },

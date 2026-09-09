@@ -253,6 +253,8 @@ def main() -> int:
         from check_w2 import run as solver_semantics
         structural_semantics(args.root, 'semantic')
         solver_semantics(args.root, 'semantic')
+        from check_w3 import run as values_semantics
+        values_semantics(args.root, 'semantic')
         return 0
     except GateFailure as exc:
         print(f"[semantic] FAIL: {exc}", file=sys.stderr, flush=True)

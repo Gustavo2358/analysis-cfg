@@ -50,15 +50,15 @@
       "wave": 3,
       "probe": "S3",
       "oracle": "allocation/retention and bounded update ledger",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesState.java",
+      "hook": "scripts/project/challenge_w3.py"
     },
     {
       "id": "scan-objects-per-assign",
       "wave": 1,
       "probe": "S2",
-      "oracle": "referencesResolved/structuralVisits follows R, not I\u00d7D",
+      "oracle": "referencesResolved/structuralVisits follows R, not I×D",
       "status": "IMPLEMENTED",
       "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexBuilder.java",
       "hook": "scripts/project/challenge_w1.py"
@@ -95,36 +95,36 @@
       "wave": 3,
       "probe": "S7",
       "oracle": "literal plus reached missing key retains open remainder",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesState.java",
+      "hook": "scripts/project/challenge_w3.py"
     },
     {
       "id": "non-convergent-semantic-domain",
       "wave": 3,
       "probe": "S7",
       "oracle": "A finite program-literal domain converges without truncation; a genuinely infinite ascending domain needs a semantic convergence contract, never a machine-size cap.",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/Candidates.java",
+      "hook": "scripts/project/challenge_w3.py"
     },
     {
       "id": "silent-truncation",
       "wave": 3,
       "probe": "S7",
       "oracle": "Preserve every semantically supported candidate independent of count and agenda; no silent truncation or artificial remainder.",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/Candidates.java",
+      "hook": "scripts/project/challenge_w3.py"
     },
     {
       "id": "unknown-effect-as-nop",
       "wave": 3,
       "probe": "S7",
       "oracle": "HavocMust/May CopyBytes and unsupported expressions refused",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/TextProfile.java",
+      "hook": "scripts/project/challenge_w3.py"
     },
     {
       "id": "consumer-starts-solver",
@@ -158,9 +158,9 @@
       "wave": 3,
       "probe": "S6",
       "oracle": "operationsReplayed is directional prefix/suffix union, not sum per site",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/query/BatchReplayer.java",
+      "hook": "scripts/project/challenge_w3.py"
     },
     {
       "id": "emit-provisional-facts",
@@ -176,18 +176,18 @@
       "wave": 3,
       "probe": "S7",
       "oracle": "known model singleton still has open source/effective remainder",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesAnalysis.java",
+      "hook": "scripts/project/challenge_w3.py"
     },
     {
       "id": "mutate-shared-root",
       "wave": 3,
       "probe": "S3",
       "oracle": "retained roots/branches/queries isolated byte/semantic snapshots",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PersistentBindings.java",
+      "hook": "scripts/project/challenge_w3.py"
     },
     {
       "id": "reapply-entry-seed",
@@ -221,9 +221,9 @@
       "wave": 3,
       "probe": "S7",
       "oracle": "two bases without covering premise refused; same Cell unified",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/TextProfile.java",
+      "hook": "scripts/project/challenge_w3.py"
     },
     {
       "id": "solver-concrete-domain-dependency",
@@ -266,18 +266,18 @@
       "wave": 3,
       "probe": "S6",
       "oracle": "Stable run, same subject: before(Return) retains {PROGA}; after(Return) yields UNSUPPORTED_POINT with reason and null value; rejecting the entire batch must fail",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/query/BatchReplayer.java",
+      "hook": "scripts/project/challenge_w3.py"
     },
     {
       "id": "unsupported-query-disappears",
       "wave": 3,
       "probe": "S6",
       "oracle": "Compare independent request plan with outcomes by full point/subject: one per unique query, including after(Return) UNSUPPORTED_POINT; omission or substitution must fail",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/query/BatchReplayer.java",
+      "hook": "scripts/project/challenge_w3.py"
     },
     {
       "id": "missing-required-edge",
@@ -367,9 +367,9 @@
       "wave": 3,
       "probe": "S14",
       "oracle": "STABLE solver + controlled observation failure => INCOMPLETE preparation with empty atomic batch; solver unchanged.",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/query/BatchReplayer.java",
+      "hook": "scripts/project/challenge_w3.py"
     },
     {
       "id": "consumer-failure-reported-as-complete-output",
@@ -385,18 +385,18 @@
       "wave": 3,
       "probe": "S15",
       "oracle": "Fixed corpus/profile: compare all candidates and manual quality counts; loss of candidates changes expected outcomes.",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/Candidates.java",
+      "hook": "scripts/project/challenge_w3.py"
     },
     {
       "id": "performance-optimization-by-unsupported-everything",
       "wave": 3,
       "probe": "S15",
       "oracle": "Fixed admitted queries: answered/unsupported counts and expected outcomes expose refusal replacing work.",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/query/BatchReplayer.java",
+      "hook": "scripts/project/challenge_w3.py"
     },
     {
       "id": "shared-wrong-transfer-agreement",
@@ -493,9 +493,9 @@
       "wave": 3,
       "probe": "S16",
       "oracle": "All finite candidates survive N+1 including 9, 100 and 10000, without new remainder.",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/Candidates.java",
+      "hook": "scripts/project/challenge_w3.py"
     },
     {
       "id": "max-queries-admission",

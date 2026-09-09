@@ -82,9 +82,38 @@ class ValuesTest {
         var changed=new Sequence(seq.label(),List.of(new Operations.Assign(assign.header(),assign.destination(),read)),seq.terminator(),seq.origin());
         var q=replace(p,List.of(unit(u.id(),u.entries(),List.of(changed),u.objects())),p.coverage(),p.uncertainties(),p.premises());
         var refused=PossibleValuesAnalysis.prepare(session(q));assertEquals(PossibleValuesAnalysis.Status.UNSUPPORTED,refused.status(),"unmodeled write cannot be identity");assertEquals(1,refused.unsupportedEffectProfiles());
+        var gap=new UncertaintyId(p.id(),"effects");
+        var uncertainty=new Evidence.Uncertainty(gap,"UNKNOWN_WRITE",List.of(Evidence.Dimension.EFFECTS,Evidence.Dimension.VALUES),new Scopes.UnitScope(u.id()),"unmodeled write",origin(p.id()));
+        var exact=header(u.id(),"metadata").precision().control();
+        var open=new Evidence.Claim(new Scopes.UnitScope(u.id()),Evidence.PrecisionStatus.OPEN,List.of(gap));
+        var precision=new Evidence.Precision(exact,exact,open,open,exact);
+        var mustHeader=new Operations.Header(new OperationId(u.id(),"must"),origin(p.id()),Evidence.CoverageStatus.ABSTRACTED,precision,List.of(gap));
+        var mayHeader=new Operations.Header(new OperationId(u.id(),"may"),origin(p.id()),Evidence.CoverageStatus.ABSTRACTED,precision,List.of(gap));
+        for(Instruction effect:List.of(
+                new Operations.HavocMust(mustHeader,new Places.ObjectPlace(operand(mustHeader.id(),"destination",Operand.Role.VALUE_WRITE),u.objects().getFirst().id()),gap),
+                new Operations.HavocMay(mayHeader,new Scopes.ObjectsMemory(List.of(u.objects().getFirst().id())),gap))) {
+            var effects=new Sequence(seq.label(),List.of(assign,effect),seq.terminator(),seq.origin());
+            var effectPublication=replace(p,List.of(unit(u.id(),u.entries(),List.of(effects),u.objects())),p.coverage(),List.of(uncertainty),p.premises());
+            assertEquals(PossibleValuesAnalysis.Status.UNSUPPORTED,PossibleValuesAnalysis.prepare(session(effectPublication)).status(),"unmodeled write cannot be identity");
+        }
+        var regionId=new StorageId(p.id(),"region");
+        var region=new Memory.Region(new Memory.StorageHeader(regionId,Optional.of(u.id()),Memory.Lifetime.ACTIVATION,Memory.Visibility.PRIVATE,origin(p.id())),Optional.of(java.math.BigInteger.TEN),Optional.empty());
+        var copyHeader=header(u.id(),"copy");
+        var bound=new Scopes.WithinMemory(new Scopes.StorageMemory(List.of(regionId)));
+        var fallback=new Envelopes.Envelope(new Envelopes.MemoryEnvelope(List.of(),bound,List.of(),bound,List.of()),new Control.ControlEnvelope(List.of(Control.ContinueAlternative.INSTANCE),Scopes.NoControl.INSTANCE),new Envelopes.DependencyEnvelope(List.of(),Scopes.NoResources.INSTANCE));
+        var copy=new Operations.CopyBytes(copyHeader,
+            new Memory.ByteRange(regionId,integer(copyHeader.id(),"dst-offset",1),integer(copyHeader.id(),"dst-size",2)),
+            new Memory.ByteRange(regionId,integer(copyHeader.id(),"src-offset",0),integer(copyHeader.id(),"src-size",2)),java.math.BigInteger.TWO,fallback);
+        var storage=new ArrayList<Memory.Storage>(p.storage());storage.add(region);
+        var copyPublication=new Publication(p.id(),p.airVersion(),new Capabilities.Manifest(List.of(Capabilities.MEMORY_REGIONS),List.of()),p.artifacts(),
+            List.of(unit(u.id(),u.entries(),List.of(new Sequence(seq.label(),List.of(assign,copy),seq.terminator(),seq.origin())),u.objects())),storage,p.resources(),p.artifactRelations(),p.origins(),p.coverage(),p.uncertainties(),p.premises());
+        assertEquals(PossibleValuesAnalysis.Status.UNSUPPORTED,PossibleValuesAnalysis.prepare(session(copyPublication)).status(),"unmodeled write cannot be identity");
         var original=u.objects().getFirst();var alias=new Memory.ObjectDeclaration(new ObjectId(u.id(),"alias"),Optional.of("WS-PGM"),original.typeRef(),new Memory.AliasBinding(original.id()),original.visibility(),original.origin(),original.coverage(),original.precision());
         q=replace(p,List.of(unit(u.id(),u.entries(),u.sequences(),List.of(original,alias))),p.coverage(),p.uncertainties(),p.premises());
         assertEquals(PossibleValuesAnalysis.Status.UNSUPPORTED,PossibleValuesAnalysis.prepare(session(q)).status());
+    }
+    private static Expressions.Literal integer(OperationId op,String id,int value) {
+        return new Expressions.Literal(operand(op,id,Operand.Role.VALUE_READ),new Values.IntValue(java.math.BigInteger.valueOf(value)));
     }
     @Test void entrySeedsContextsUnreachableAndUnicodeKeepTheirIdentity() {
         var p=graph(new String[]{null,"orphan"},new int[][]{{},{}},1,false,false);var u=p.units().getFirst();var object=u.objects().getFirst().id();

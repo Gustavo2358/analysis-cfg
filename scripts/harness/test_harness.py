@@ -174,7 +174,7 @@ class HarnessGuardTests(unittest.TestCase):
                     patch('run_gate.subprocess.run', return_value=CompletedProcess([], 0)) as hooks:
                 self.assertEqual(3, run(gate, self.root))
                 self.assertIn('UNAVAILABLE', out.getvalue())
-                self.assertEqual(2 if gate == 'performance' else 0, hooks.call_count)
+                self.assertEqual(3 if gate == 'performance' else 0, hooks.call_count)
 
     def test_20_unresolved_eval(self):
         self.edit_json('docs/work/backlog.json', lambda x: x['items'][0]['evals'].append('EVAL-CFG-999'))

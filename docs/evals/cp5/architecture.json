@@ -33,7 +33,8 @@
       "wave": 3,
       "direct": [
         "analysis-kernel",
-        "air-java"
+        "air-java",
+        "cfg-kernel"
       ],
       "forbidden": [
         "cfg-adapters",
@@ -97,12 +98,12 @@
       "effective_maven": "docs/evals/cp5/w1-inventory.json"
     },
     "analysis-values": {
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "sources": null,
-      "classfiles": null,
-      "javap_descriptors": null,
-      "jdeps_edges": null,
-      "effective_maven": null
+      "status": "IMPLEMENTED",
+      "sources": "docs/evals/cp5/w3-inventory.json",
+      "classfiles": "docs/evals/cp5/w3-inventory.json",
+      "javap_descriptors": "docs/evals/cp5/w3-inventory.json",
+      "jdeps_edges": "docs/evals/cp5/w3-inventory.json",
+      "effective_maven": "docs/evals/cp5/w3-inventory.json"
     }
   },
   "rule_note": "Package selectors and public API descriptors must be concretized in each Wave, including generics and method refs; no nominal container/policy rule.",
@@ -119,5 +120,6 @@
   ],
   "core_size_contract": "docs/evals/cp5/core-size-contract.json",
   "resource_failure_semantic_mappings": {},
-  "solver_inventory": "docs/evals/cp5/w2-inventory.json"
+  "solver_inventory": "docs/evals/cp5/w2-inventory.json",
+  "query_inventory": "docs/evals/cp5/w3-inventory.json"
 }

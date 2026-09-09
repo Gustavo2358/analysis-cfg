@@ -387,7 +387,7 @@ def verify_project_shape(root: Path) -> None:
         for item in modules_element.findall(namespace + "module")
         if item.text and item.text.strip()
     ]
-    if modules != [KERNEL_ARTIFACT, "analysis-kernel", "cfg-adapters", "cfg-launcher"]:
+    if modules != [KERNEL_ARTIFACT, "analysis-kernel", "analysis-values", "cfg-adapters", "cfg-launcher"]:
         raise GateFailure("W1 reactor must contain exactly cfg-kernel, analysis-kernel, cfg-adapters, cfg-launcher")
 
     properties = project.find(namespace + "properties")
@@ -486,7 +486,7 @@ def verify_snapshot_pin(root: Path) -> str:
         raise GateFailure("CI must not resolve air-java from a mutable branch")
     if f'test "$(git rev-parse HEAD)" = "{sha}"' not in workflow:
         raise GateFailure("CI must verify air-java HEAD before installation")
-    if workflow.count("MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2") != 6:
+    if workflow.count("MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2") != 7:
         raise GateFailure("CI must share one isolated Maven repository across upstream and consumer")
     for wave in (1, 2):
         if f"scripts/project/check_cp5_gate.py performance --wave {wave}" not in workflow:
@@ -776,6 +776,8 @@ def architecture_gate(root: Path) -> None:
     architecture(root)
     from check_w2 import architecture as solver_architecture
     solver_architecture(root)
+    from check_w3 import architecture as values_architecture
+    values_architecture(root)
 
     print(f"[architecture] PASS: {total} kernel tests ({skipped} skipped), "
           f"{len(EXPECTED_CLASSFILES)} production classfiles, "

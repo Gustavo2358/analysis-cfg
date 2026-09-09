@@ -26,6 +26,10 @@
         "1": {
           "status": "IMPLEMENTED",
           "hook": "scripts/project/check_w1.py"
+        },
+        "3": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w3.py"
         }
       }
     },
@@ -52,6 +56,10 @@
         "1": {
           "status": "IMPLEMENTED",
           "hook": "scripts/project/check_w1.py"
+        },
+        "3": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w3.py"
         }
       }
     },
@@ -75,7 +83,13 @@
       "kills": "full state clone, dense matrix, historical roots or leaked pool",
       "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
       "hook": null,
-      "quality_companion": "S15"
+      "quality_companion": "S15",
+      "wave_hooks": {
+        "3": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w3.py"
+        }
+      }
     },
     {
       "id": "S4",
@@ -134,6 +148,10 @@
         "2": {
           "status": "IMPLEMENTED",
           "hook": "scripts/project/check_w2.py"
+        },
+        "3": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w3.py"
         }
       }
     },
@@ -178,7 +196,13 @@
       "kills": "replay per query/site, implicit late replay, full state per query",
       "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
       "hook": null,
-      "quality_companion": "S15"
+      "quality_companion": "S15",
+      "wave_hooks": {
+        "3": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w3.py"
+        }
+      }
     },
     {
       "id": "S7",
@@ -198,7 +222,13 @@
       "oracle": "All supported finite candidates preserved without count-induced remainder; U source-proportional; sharing, convergence and pool release.",
       "kills": "candidate truncation, count-induced TOP, nonconvergent domain, global/historical pool",
       "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "hook": null
+      "hook": null,
+      "wave_hooks": {
+        "3": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w3.py"
+        }
+      }
     },
     {
       "id": "S8",
@@ -250,7 +280,13 @@
       "kills": "rehash/duplicate strings per iteration/join",
       "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
       "hook": null,
-      "quality_companion": "S15"
+      "quality_companion": "S15",
+      "wave_hooks": {
+        "3": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w3.py"
+        }
+      }
     },
     {
       "id": "S10",
@@ -321,6 +357,10 @@
         "2": {
           "status": "IMPLEMENTED",
           "hook": "scripts/project/check_w2.py"
+        },
+        "3": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w3.py"
         }
       }
     },
@@ -345,6 +385,10 @@
         "2": {
           "status": "IMPLEMENTED",
           "hook": "scripts/project/check_w2.py"
+        },
+        "3": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w3.py"
         }
       }
     },
@@ -369,7 +413,13 @@
         "observation-failure-blocks-independent-consumer"
       ],
       "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "hook": null
+      "hook": null,
+      "wave_hooks": {
+        "3": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w3.py"
+        }
+      }
     },
     {
       "id": "S15",
@@ -402,7 +452,13 @@
         "performance-optimization-by-unsupported-everything"
       ],
       "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "hook": null
+      "hook": null,
+      "wave_hooks": {
+        "3": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w3.py"
+        }
+      }
     },
     {
       "id": "S16",
@@ -451,6 +507,10 @@
         "2": {
           "status": "IMPLEMENTED",
           "hook": "scripts/project/check_w2.py"
+        },
+        "3": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w3.py"
         }
       }
     }

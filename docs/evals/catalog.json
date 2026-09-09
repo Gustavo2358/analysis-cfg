@@ -589,7 +589,7 @@
     {
       "id": "EVAL-CFG-036",
       "title": "PossibleValues/state/queries",
-      "status": "planned",
+      "status": "implemented",
       "expectation": "Wave obligations in docs/product/cp5-roadmap.md and docs/evals/cp5 manifests; runtime not available",
       "upstream_oracles": [],
       "invariants": [
@@ -598,7 +598,8 @@
         "INV-CFG-032",
         "INV-CFG-033",
         "INV-CFG-034"
-      ]
+      ],
+      "implementation_evidence": "analysis-values/src/test/java/io/github/gustavo2358/analysis/values/ValuesTest.java"
     },
     {
       "id": "EVAL-CFG-037",
