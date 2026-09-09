@@ -1,0 +1,10 @@
+{
+  "kind": "design-source-reference-audit-not-dataflow",
+  "air_sha256": "dd3bb4819282e609a97937ea01b7e202786e2c2d9ba9c8a1821a8b982eeb8788",
+  "example_sha256": "698c9d768dd5d03cbcdf566c5b96ae81199a96820a7cdda6170591811725f339",
+  "reference_occurrences_including_request_plan": 23,
+  "all_references_resolve_to_fixture_definitions": true,
+  "missing": [],
+  "queried_operation_kind": "return",
+  "limits": "Reference ownership/presence and Return kind only; PROGA and mixed outcomes remain manual design expectations, not execution evidence. Previous audit is preserved for its original snapshot hash."
+}

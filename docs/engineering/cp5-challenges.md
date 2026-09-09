@@ -30,6 +30,15 @@ S4b deve matar recomposição semanticamente correta com agenda adversa; S3 conf
 contadores com alocação/retention externa; S5/S6 usam solver/domínio reais em W4.
 Não criar Java de mutantes contra APIs futuras só para preencher inventário.
 
+B1 acrescenta dois challenges W3/S6 de queries: `unsupported-query-aborts-batch`
+e `unsupported-query-disappears`. O oracle independente solicita before(Return)
+e after(Return) sobre o mesmo subject: run STABLE, primeira query VALUE {PROGA},
+segunda UNSUPPORTED_POINT com motivo e value=null. Comparar o plano completo às
+respostas para matar omissão/substituição; checar só as respostas presentes não basta.
+Na preparação, contracasos alteram o snapshot em cópias temporárias e exigem RED
+do validator com restauração byte-exact/segundo GREEN. Hooks/alvos produtivos seguem
+unavailable: isso não é campanha de mutantes compiláveis da engine.
+
 Recibo de campanha: source HEAD e hash da árvore, baseline command/exit/log/hash,
 mutant ID/diff, compile command/exit/log, gate/diagnostic/exit/log, hashes before/after,
 restore byte-exact, second GREEN command/exit/log. Report completo e falhas são

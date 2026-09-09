@@ -20,6 +20,8 @@
   "required_observation_fields": [
     "point",
     "subject",
+    "queryStatus",
+    "queryReason",
     "reachability",
     "value",
     "sourceUnknownRemainder",
@@ -45,6 +47,19 @@
   ],
   "model_scope": "KNOWN_GRAPH_ENTRY",
   "effective_remainder": "modelValueRemainder OR sourceUnknownRemainder",
-  "limit_behavior": "non-STABLE publishes no provisional observations",
-  "unreachable_behavior": "value=null; source reachability not inferred"
+  "limit_behavior": "non-STABLE run publishes no provisional observations; query refusal alone does not make a stable run non-STABLE",
+  "unreachable_behavior": "value=null; source reachability not inferred",
+  "query_statuses": [
+    "VALUE",
+    "UNSUPPORTED_POINT"
+  ],
+  "unsupported_point_null_fields": [
+    "reachability",
+    "value",
+    "sourceUnknownRemainder",
+    "effectiveUnknownRemainder",
+    "precision"
+  ],
+  "query_behavior": "VALUE: supported query, queryReason=null; UNSUPPORTED_POINT: nonempty queryReason, null semantic fields, preserves requested point/subject; does not change run status",
+  "batch_behavior": "STABLE returns exactly one observation per unique requested (point, subject), including unsupported queries; validate coverage against the independent request plan"
 }

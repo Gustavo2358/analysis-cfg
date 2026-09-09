@@ -100,5 +100,20 @@
     }
   ],
   "evidence": "docs/work/evidence/WORK-CFG-028/validation.md",
-  "exact_head_policy": "final committed HEAD and CI receipt recorded on the same PR after last push; avoids self-referential commit SHA"
+  "exact_head_policy": "final committed HEAD and CI receipt recorded on the same PR after last push; avoids self-referential commit SHA",
+  "last_human_review": {
+    "date": "2026-09-09",
+    "source": "explicit user review of PR #12",
+    "reviewed_head": "6675b1f9ff9d11e8f405f6dcf49c5acb0096346a",
+    "decision": "REQUEST_CHANGES",
+    "blockers": [
+      "B1"
+    ],
+    "scope": "Per-query outcome and mixed-batch result contract only; other preparation architecture approved.",
+    "nonblocking_findings": [
+      "CP5-F01"
+    ],
+    "does_not_authorize_waves": true,
+    "correction_evidence": "docs/work/evidence/WORK-CFG-028/review-b1/validation.md"
+  }
 }

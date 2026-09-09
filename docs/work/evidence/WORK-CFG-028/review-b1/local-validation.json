@@ -1,0 +1,153 @@
+{
+  "kind": "B1-harness-only-validation",
+  "reviewed_head": "6675b1f9ff9d11e8f405f6dcf49c5acb0096346a",
+  "base_main": "ec525cbbad96d70c9663faa88e2672148fa8ee71",
+  "runtime": {
+    "java": "Temurin 21.0.12.1+1",
+    "maven": "3.9.16",
+    "maven_local_repository": "/tmp/cp5-harness-validation/m2",
+    "air_java_pin": "ce530a7e17ab12b23c48f29425f503ff920b09fb"
+  },
+  "tdd": {
+    "red": {
+      "exit": 1,
+      "methods": 39,
+      "failures": 2,
+      "log": "logs/tdd-red.log.gz",
+      "reason": "existing validator rejects mixed response and accepts abort-batch mutation"
+    },
+    "green": {
+      "exit": 0,
+      "methods": 47,
+      "log": "logs/tdd-green.log.gz"
+    }
+  },
+  "gates": [
+    {
+      "name": "full",
+      "command": [
+        "bash",
+        "scripts/harness/check-full.sh"
+      ],
+      "exit": 3,
+      "expected_exit": 3,
+      "elapsed_seconds": 30.658,
+      "log": "/tmp/cp5-b1-validation/full.log",
+      "sha256": "543350c678ebac8bb461a11eeecdd9cc956c6f11a3d330646865598a13a30bd7"
+    },
+    {
+      "name": "integration",
+      "command": [
+        "bash",
+        "scripts/harness/check-integration.sh"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "elapsed_seconds": 6.247,
+      "log": "/tmp/cp5-b1-validation/integration.log",
+      "sha256": "d15987aea0c1eed90ec35ac937f70d8f10a8ae65205f1abc5bad8db7a5e96761"
+    },
+    {
+      "name": "maven-verify",
+      "command": [
+        "mvn",
+        "-B",
+        "-ntp",
+        "clean",
+        "verify"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "elapsed_seconds": 6.087,
+      "log": "/tmp/cp5-b1-validation/maven-verify.log",
+      "sha256": "2d75a48c4a3375b6868a5c7fe6768fa2fcebc7d2057fe0998192105806f824bd"
+    }
+  ],
+  "validated_inputs": {
+    "scripts/harness/validate_cp5.py": "6c63bfce143b6239662b478fadc26717b0709de77089abaf7b0002e1ae313d68",
+    "scripts/harness/test_cp5_harness.py": "36852068efb1061777a330ce4622632a3589b37325002d5ef83c6b69f70877f9",
+    "docs/evals/cp5/result-contract.json": "901a9814a5b45aaceb7ebfcd05071a9d71c52908504ece2c328f9498cf1012ae",
+    "docs/evals/cp5/result-review.json": "698c9d768dd5d03cbcdf566c5b96ae81199a96820a7cdda6170591811725f339",
+    "docs/evals/cp5/challenges.json": "3c84843fc082c89d14f830665428db8cd31e7b722d171ab11147197d9f7f2060"
+  },
+  "logs": [
+    {
+      "path": "logs/full.log.gz",
+      "raw_bytes": 734533,
+      "raw_sha256": "543350c678ebac8bb461a11eeecdd9cc956c6f11a3d330646865598a13a30bd7",
+      "gzip_sha256": "d925c39a471411d12daf7b88d1b83ba8d139b16f3de477f79c3abfb181e7b0f5",
+      "lossless_verified": true
+    },
+    {
+      "path": "logs/integration.log.gz",
+      "raw_bytes": 10371,
+      "raw_sha256": "d15987aea0c1eed90ec35ac937f70d8f10a8ae65205f1abc5bad8db7a5e96761",
+      "gzip_sha256": "5777af7a6def096bb61b369231e84d6cc28f9e144549525b103f73da9214f42b",
+      "lossless_verified": true
+    },
+    {
+      "path": "logs/maven-verify.log.gz",
+      "raw_bytes": 10319,
+      "raw_sha256": "2d75a48c4a3375b6868a5c7fe6768fa2fcebc7d2057fe0998192105806f824bd",
+      "gzip_sha256": "10287fd2ca9af0120924e43ad321f690adc954c99d2d6ace6928c7705bd3a952",
+      "lossless_verified": true
+    },
+    {
+      "path": "logs/tdd-green.log.gz",
+      "raw_bytes": 146,
+      "raw_sha256": "d6afd7e835444f7600607fbe98b3bdec4c492e39f06b6a8ae6be0e89077100a1",
+      "gzip_sha256": "ca69d4a6bf0c2276373240a262c18dfe2663cc500236b2208e51b32acabe8026",
+      "lossless_verified": true
+    },
+    {
+      "path": "logs/tdd-red.log.gz",
+      "raw_bytes": 2172,
+      "raw_sha256": "367bab3a839a7e9f00dddf5db892a4d1955f6198be32b749ae3821acf9145e9c",
+      "gzip_sha256": "fb4c0b6ccaa4137c2e5863a26f0ac0a160b4dcbd323542f0420f3795d0b90e4d",
+      "lossless_verified": true
+    },
+    {
+      "path": "logs/unsupported-query-aborts-batch-baseline-green.log.gz",
+      "raw_bytes": 93,
+      "raw_sha256": "b1190d62427fcf1221bf6427463786b008a198da5f39f8bbd0f9fad65e25b610",
+      "gzip_sha256": "373c1d65c500edc0a7f768b1660760a8477cc4d2dcf31bb176c14f0c66114a86",
+      "lossless_verified": true
+    },
+    {
+      "path": "logs/unsupported-query-aborts-batch-expected-red.log.gz",
+      "raw_bytes": 160,
+      "raw_sha256": "13f5a421a1507e165356b4cc696319ae50c59df6f419ab9679e1c14457b7ddf0",
+      "gzip_sha256": "88d08eaac6514d95b88b50fdd11610f79a7a4ca396bdd2724adbbc55a6908f37",
+      "lossless_verified": true
+    },
+    {
+      "path": "logs/unsupported-query-aborts-batch-second-green.log.gz",
+      "raw_bytes": 93,
+      "raw_sha256": "b1190d62427fcf1221bf6427463786b008a198da5f39f8bbd0f9fad65e25b610",
+      "gzip_sha256": "373c1d65c500edc0a7f768b1660760a8477cc4d2dcf31bb176c14f0c66114a86",
+      "lossless_verified": true
+    },
+    {
+      "path": "logs/unsupported-query-disappears-baseline-green.log.gz",
+      "raw_bytes": 93,
+      "raw_sha256": "b1190d62427fcf1221bf6427463786b008a198da5f39f8bbd0f9fad65e25b610",
+      "gzip_sha256": "373c1d65c500edc0a7f768b1660760a8477cc4d2dcf31bb176c14f0c66114a86",
+      "lossless_verified": true
+    },
+    {
+      "path": "logs/unsupported-query-disappears-expected-red.log.gz",
+      "raw_bytes": 109,
+      "raw_sha256": "2bdaface916422e4f471549d821fdff94ed3127e784030390360df3fd17f7596",
+      "gzip_sha256": "a79e5462bbd5defd2158f1346a23cc389d399709f47d3cb54fbbb45878b9b58a",
+      "lossless_verified": true
+    },
+    {
+      "path": "logs/unsupported-query-disappears-second-green.log.gz",
+      "raw_bytes": 93,
+      "raw_sha256": "b1190d62427fcf1221bf6427463786b008a198da5f39f8bbd0f9fad65e25b610",
+      "gzip_sha256": "373c1d65c500edc0a7f768b1660760a8477cc4d2dcf31bb176c14f0c66114a86",
+      "lossless_verified": true
+    }
+  ],
+  "scope_and_exact_head": "Final scope/manifest and exact-head CI receipts recorded on PR #12 after final evidence and commit; no self-referential SHA."
+}

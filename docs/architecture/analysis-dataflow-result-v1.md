@@ -16,13 +16,14 @@ STABLE como execução real. Statistics ficam unavailable/null, sem counters inv
 | schema/version | analysis-dataflow-result / 1.0.0, evolução local explícita |
 | analysisKey | implementação/versão, profile, direção, precisão, options, Entry; cache pertence à sessão/snapshot |
 | publicationId/unitId/entryId | identidade completa, sem ordinais internos exportados |
-| executionStatus | STABLE, ANALYSIS_LIMIT, UNSUPPORTED ou INVALID_INPUT; não é coverage |
+| executionStatus | STABLE, ANALYSIS_LIMIT, UNSUPPORTED ou INVALID_INPUT do solver/run; recusa isolada de query não altera esse status |
 | modelScope/sourceScope | KNOWN_GRAPH_ENTRY separado da abertura CONTROL/Unit da fonte |
-| observations | ponto, subject/location e valor; ausente por recusa não equivale a lista de candidatos vazia |
-| point | OperationId, Entry, before/after e outcome; after fronteira não admitida é UNSUPPORTED_POINT |
+| observations | um resultado por query única (point, subject) do plano em run STABLE, inclusive queries recusadas |
+| queryStatus/queryReason | VALUE com motivo null, ou UNSUPPORTED_POINT com motivo explícito não vazio; status por query separado de executionStatus |
+| point | OperationId, Entry, before/after e outcome solicitado; after fronteira não admitida é UNSUPPORTED_POINT; outcome pode ser null nesse caso |
 | subject/place/storage | ObjectPlace/ObjectId consultado e Cell/Storage base; Object não é memória exclusiva |
-| reachability | REACHABLE/UNREACHABLE_IN_MODEL; não prova fonte inalcançável sob controle aberto |
-| value | known(text), Candidates/Saturated, enumerated e modelValueRemainder |
+| reachability | REACHABLE/UNREACHABLE_IN_MODEL para VALUE; null em UNSUPPORTED_POINT, que não afirma inalcançabilidade |
+| value | known(text), Candidates/Saturated, enumerated e modelValueRemainder; null se inalcançável no modelo ou query recusada, distinguidos por queryStatus/reachability |
 | sourceUnknownRemainder/effectiveUnknownRemainder | abertura pertinente de fonte e OR com remainder de modelo |
 | saturationReason/limitReason | cardinalidade local diferente de budget interrompido; causa/fase explícitas |
 | precision | exatidão somente no modelo declarado; sem claim de testemunho de caminho ou fonte completa |
@@ -36,9 +37,42 @@ CP4E só entram em fixtures/evidências, nunca constantes de produção.
 
 O exemplo before(Return) conserva modelValue {PROGA} fechado, fonte CONTROL aberta,
 restante efetivo true e precisão condicionada ao modelo. Nenhum gap text fecha scope.
+O mesmo lote contém after(Return) recusado, preservando o primeiro resultado:
+
+| executionStatus | point | queryStatus | value | queryReason |
+| --- | --- | --- | --- | --- |
+| STABLE | before(Return) | VALUE | {PROGA}, fechado no modelo | null |
+| STABLE | after(Return) | UNSUPPORTED_POINT | null | estado de memória posterior não admitido |
+
+`VALUE` identifica uma query admitida, inclusive um ponto UNREACHABLE_IN_MODEL,
+cujo value é null conforme o contrato de alcance. Em `UNSUPPORTED_POINT`, value,
+reachability, sourceUnknownRemainder, effectiveUnknownRemainder e precision são
+null: a recusa não calcula valor, alcance ou precisão nesse ponto. O sourceScope
+global continua declarado. Refs permanecem listas de identidades completas e só
+podem justificar a recusa; não constituem evidência de valor. queryReason é texto
+explicativo, não inferência de semântica a partir do nome de operação ou de gaps.
+
+BEFORE usa outcome=null. AFTER admitido exige outcome explícito; after(Return/Halt)
+sem estado posterior usa outcome=null e UNSUPPORTED_POINT, sem inventar aresta.
+point e subject reproduzem a query solicitada, mesmo quando recusada. No run STABLE,
+o plano externo de queries deve ser comparado com os resultados: exatamente um por
+par único de (point completo, subject completo), sem omissões, duplicações ou
+substituições. Requests repetidos compartilham o resultado e a ordem da resposta
+não é semântica. O snapshot guarda esse plano em `design.requestedQueries`, separado
+das observations; ele é oracle manual de review, não campo adicional do transporte.
+`validate_result(result, requested_queries)` verifica a cobertura quando recebe o
+plano; validar só a forma de um resultado não demonstra cobertura do lote.
+
 Não enumerado por saturação mantém restante e motivo; não alcançado no modelo usa
-value=null, nunca Candidates({},false). Run limitado/recusado não publica observações
-provisórias como facts finais; limitReason não pode coexistir com STABLE.
+value=null, nunca Candidates({},false). Run limitado/recusado como um todo continua
+com observations=[] e não publica facts provisórios; limitReason não pode coexistir
+com STABLE. A recusa de after(Return/Halt) sozinha não é falha do solver/run e não
+pode promover executionStatus a UNSUPPORTED nem apagar outras queries válidas.
+
+O harness exige o lote misto do snapshot e rejeita aborto global e desaparecimento
+da query recusada. Os challenges `unsupported-query-aborts-batch` e
+`unsupported-query-disappears` ativam em W3/S6 contra implementação real; nesta
+preparação a prova é apenas do contrato/validator, sem execução de engine.
 
 W5 deve congelar por review o wire definitivo, budgets/defaults, parser nominal de
 reports e falhas antes do writer. A CLI separada usará AIR file → reader → BuildCfg

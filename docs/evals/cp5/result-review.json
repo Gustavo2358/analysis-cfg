@@ -4,7 +4,75 @@
     "execution": "NOT_EXECUTED",
     "fixture": "CP4E oracle only; fixture identifiers are not production constants",
     "airSha256": "dd3bb4819282e609a97937ea01b7e202786e2c2d9ba9c8a1821a8b982eeb8788",
-    "optionsNote": "maxCandidates=2 illustrates configurability, not an approved default"
+    "optionsNote": "maxCandidates=2 illustrates configurability, not an approved default",
+    "requestedQueries": [
+      {
+        "point": {
+          "position": "BEFORE",
+          "operationId": {
+            "domain": "operation",
+            "localId": "5ed7c27833651ab320a3b56d90ed923c",
+            "publication": "77ae4cc3ed75332c64011efce81c431b",
+            "unit": "unit"
+          },
+          "entryId": {
+            "domain": "entry",
+            "localId": "c4de8a797697cb8ddf3012f2248da01f",
+            "publication": "77ae4cc3ed75332c64011efce81c431b",
+            "unit": "unit"
+          },
+          "outcome": null
+        },
+        "subject": {
+          "place": "ObjectPlace",
+          "objectId": {
+            "domain": "object",
+            "localId": "d277a147621da9e9d6d7e52986bbb8ee",
+            "publication": "77ae4cc3ed75332c64011efce81c431b",
+            "unit": "unit"
+          },
+          "storageId": {
+            "domain": "storage",
+            "localId": "2eee2eced5889f75096c488505d6ba70",
+            "publication": "77ae4cc3ed75332c64011efce81c431b"
+          },
+          "locationKind": "WHOLE_CELL"
+        }
+      },
+      {
+        "point": {
+          "position": "AFTER",
+          "operationId": {
+            "domain": "operation",
+            "localId": "5ed7c27833651ab320a3b56d90ed923c",
+            "publication": "77ae4cc3ed75332c64011efce81c431b",
+            "unit": "unit"
+          },
+          "entryId": {
+            "domain": "entry",
+            "localId": "c4de8a797697cb8ddf3012f2248da01f",
+            "publication": "77ae4cc3ed75332c64011efce81c431b",
+            "unit": "unit"
+          },
+          "outcome": null
+        },
+        "subject": {
+          "place": "ObjectPlace",
+          "objectId": {
+            "domain": "object",
+            "localId": "d277a147621da9e9d6d7e52986bbb8ee",
+            "publication": "77ae4cc3ed75332c64011efce81c431b",
+            "unit": "unit"
+          },
+          "storageId": {
+            "domain": "storage",
+            "localId": "2eee2eced5889f75096c488505d6ba70",
+            "publication": "77ae4cc3ed75332c64011efce81c431b"
+          },
+          "locationKind": "WHOLE_CELL"
+        }
+      }
+    ]
   },
   "result": {
     "schema": "analysis-dataflow-result",
@@ -119,7 +187,52 @@
             "localId": "6e3b8590805b3e79519781a3f9a725c6",
             "publication": "77ae4cc3ed75332c64011efce81c431b"
           }
-        ]
+        ],
+        "queryStatus": "VALUE",
+        "queryReason": null
+      },
+      {
+        "point": {
+          "position": "AFTER",
+          "operationId": {
+            "domain": "operation",
+            "localId": "5ed7c27833651ab320a3b56d90ed923c",
+            "publication": "77ae4cc3ed75332c64011efce81c431b",
+            "unit": "unit"
+          },
+          "entryId": {
+            "domain": "entry",
+            "localId": "c4de8a797697cb8ddf3012f2248da01f",
+            "publication": "77ae4cc3ed75332c64011efce81c431b",
+            "unit": "unit"
+          },
+          "outcome": null
+        },
+        "subject": {
+          "place": "ObjectPlace",
+          "objectId": {
+            "domain": "object",
+            "localId": "d277a147621da9e9d6d7e52986bbb8ee",
+            "publication": "77ae4cc3ed75332c64011efce81c431b",
+            "unit": "unit"
+          },
+          "storageId": {
+            "domain": "storage",
+            "localId": "2eee2eced5889f75096c488505d6ba70",
+            "publication": "77ae4cc3ed75332c64011efce81c431b"
+          },
+          "locationKind": "WHOLE_CELL"
+        },
+        "reachability": null,
+        "value": null,
+        "sourceUnknownRemainder": null,
+        "effectiveUnknownRemainder": null,
+        "precision": null,
+        "premiseRefs": [],
+        "evidenceRefs": [],
+        "provenanceRefs": [],
+        "queryStatus": "UNSUPPORTED_POINT",
+        "queryReason": "No post-memory state is admitted after Return; no supported outcome exists at this point."
       }
     ],
     "statistics": {

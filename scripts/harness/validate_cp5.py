@@ -2,6 +2,7 @@
 """CP5 preparation contract checks. Does not execute or certify a dataflow engine."""
 from __future__ import annotations
 import hashlib
+import json
 import re
 from pathlib import Path
 from validate_docs import existing, files_under, load_json
@@ -27,6 +28,7 @@ CHALLENGES = {
     'storage-id-implies-disjoint': 3, 'solver-concrete-domain-dependency': 2,
     'transitive-air-only': 1, 'cache-ignores-options-entry': 4,
     'fixture-specific-production-route': 5,
+    'unsupported-query-aborts-batch': 3, 'unsupported-query-disappears': 3,
 }
 METRICS = set('''nodesIndexed edgesIndexed operationsIndexed referencesResolved objectsIndexed
 locationsIndexed structuralVisits firstPublications nodesPopped nodesTransferred
@@ -39,12 +41,15 @@ bytesHashed saturations candidateSites siteMatches consumerInvocations factsEmit
 uniqueQueries sequencesReplayed operationsReplayed analysisRuns analysisCacheHits'''.split())
 RESULT_FIELDS = set('''schema version analysisKey publicationId unitId entryId executionStatus
 modelScope sourceScope limitReason observations statistics'''.split())
-OBS_FIELDS = set('''point subject reachability value sourceUnknownRemainder effectiveUnknownRemainder
+OBS_FIELDS = set('''point subject queryStatus queryReason reachability value sourceUnknownRemainder effectiveUnknownRemainder
 precision premiseRefs evidenceRefs provenanceRefs'''.split())
+QUERY_STATUSES = {'VALUE', 'UNSUPPORTED_POINT'}
+UNSUPPORTED_NULL_FIELDS = {'reachability', 'value', 'sourceUnknownRemainder',
+                           'effectiveUnknownRemainder', 'precision'}
 
 
-def validate_result(result: dict) -> list[str]:
-    """Review shape + semantic consistency only; no decoding AIR or computing values."""
+def validate_result(result: dict, requested_queries: list[dict] | None = None) -> list[str]:
+    """Review shape/consistency and optional external batch coverage; no AIR execution."""
     errors = []
     def require(ok, reason):
         if not ok: errors.append('CP5 result: ' + reason)
@@ -80,18 +85,40 @@ def validate_result(result: dict) -> list[str]:
         require(source['inventory'] == 'COMPLETE' or source['open'], 'PARTIAL/UNAVAILABLE cannot close source')
         require(isinstance(result['observations'], list), 'observations array')
         if status != 'STABLE': require(result['observations'] == [], 'non-stable cannot emit provisional facts')
+        if status == 'STABLE' and requested_queries is not None:
+            # The caller supplies the plan independently of the response. Repeated
+            # requests share one outcome for the same complete point + subject.
+            require(isinstance(requested_queries, list) and
+                    all(set(q) == {'point', 'subject'} for q in requested_queries), 'requested query fields')
+            def query_key(query):
+                return json.dumps({k: query[k] for k in ('point', 'subject')}, sort_keys=True)
+            expected = {query_key(q) for q in requested_queries}
+            actual = [query_key(o) for o in result['observations']]
+            require(len(actual) == len(expected) and set(actual) == expected, 'requested query coverage')
         require((status == 'ANALYSIS_LIMIT') == (result['limitReason'] is not None), 'budget limit distinct from stable/saturation')
         for obs in result['observations']:
             require(set(obs) == OBS_FIELDS, 'required observation fields')
+            query_status = obs['queryStatus']
+            require(query_status in QUERY_STATUSES, 'query status')
             point, subject = obs['point'], obs['subject']
             require(set(point) == {'position','operationId','entryId','outcome'}, 'program point fields')
             check_id(point['operationId'], 'operation', True)
             require(point['entryId'] == result['entryId'] and point['position'] in {'BEFORE','AFTER'}, 'program point/context')
             require((point['position'] == 'BEFORE' and point['outcome'] is None) or
-                    (point['position'] == 'AFTER' and isinstance(point['outcome'], str) and bool(point['outcome'])), 'point outcome')
+                    (point['position'] == 'AFTER' and (
+                        (isinstance(point['outcome'], str) and bool(point['outcome'])) or
+                        (query_status == 'UNSUPPORTED_POINT' and point['outcome'] is None))), 'point outcome')
             require(set(subject) == {'place','objectId','storageId','locationKind'}, 'subject/place/storage fields')
             check_id(subject['objectId'], 'object', True); check_id(subject['storageId'], 'storage')
             require(subject['place'] == 'ObjectPlace' and subject['locationKind'] == 'WHOLE_CELL', 'location profile')
+            for name, domain in [('premiseRefs','premise'),('evidenceRefs','operation'),('provenanceRefs','origin')]:
+                require(isinstance(obs[name], list), name + ' array')
+                for ref in obs[name]: check_id(ref, domain, domain == 'operation')
+            if query_status == 'UNSUPPORTED_POINT':
+                require(isinstance(obs['queryReason'], str) and bool(obs['queryReason'].strip()), 'unsupported point requires query reason')
+                require(all(obs[field] is None for field in UNSUPPORTED_NULL_FIELDS), 'unsupported point cannot claim value/reachability/precision/remainders')
+                continue
+            require(obs['queryReason'] is None, 'VALUE has no query refusal reason')
             require(type(obs['sourceUnknownRemainder']) is bool and type(obs['effectiveUnknownRemainder']) is bool, 'boolean remainders')
             require(obs['sourceUnknownRemainder'] == source['open'], 'source remainder cannot be hidden')
             value = obs['value']
@@ -120,9 +147,6 @@ def validate_result(result: dict) -> list[str]:
             if value is not None:
                 require(precision['model'] == ('OPEN_IN_ADMITTED_MODEL' if value['modelValueRemainder'] else 'CLOSED_IN_ADMITTED_MODEL'), 'model precision/remainder consistency')
             else: require(precision['model'] == 'UNREACHABLE_IN_MODEL', 'unreachable precision')
-            for name, domain in [('premiseRefs','premise'),('evidenceRefs','operation'),('provenanceRefs','origin')]:
-                require(isinstance(obs[name], list), name + ' array')
-                for ref in obs[name]: check_id(ref, domain, domain == 'operation')
         require(result['statistics'] == {'status':'NOT_AVAILABLE_UNTIL_IMPLEMENTED','measurements':None}, 'design must not invent measurements')
     except (KeyError, TypeError, ValueError) as exc:
         errors.append('CP5 result: malformed shape: ' + str(exc))
@@ -224,9 +248,22 @@ def validate_cp5(root: Path) -> list[str]:
         contract = load_json(root / PLAN / 'result-contract.json')
         require(contract['schema_version'] == 1 and contract['status'] == 'REVIEW_SNAPSHOT_NOT_CODEC' and contract['schema'] == 'analysis-dataflow-result' and contract['version'] == '1.0.0' and set(contract['execution_statuses']) == {'STABLE','ANALYSIS_LIMIT','UNSUPPORTED','INVALID_INPUT'} and set(contract['value_kinds']) == {'Candidates','Saturated'} and set(contract['reachability']) == {'REACHABLE','UNREACHABLE_IN_MODEL'}, 'result contract status/schema')
         require(set(contract['required_result_fields']) == RESULT_FIELDS and set(contract['required_observation_fields']) == OBS_FIELDS, 'result contract minimum fields')
+        require(set(contract['query_statuses']) == QUERY_STATUSES and
+                set(contract['unsupported_point_null_fields']) == UNSUPPORTED_NULL_FIELDS, 'result contract query outcomes')
         snapshot = load_json(root / PLAN / 'result-review.json')
         require(snapshot['design']['kind'] == 'REVIEW_SNAPSHOT' and snapshot['design']['execution'] == 'NOT_EXECUTED', 'result example is design only')
-        errors += validate_result(snapshot['result'])
+        requests = snapshot['design']['requestedQueries']
+        require(len(requests) == 2, 'mixed batch requires two requested queries')
+        if len(requests) == 2:
+            before, after = requests
+            require(before['point']['position'] == 'BEFORE' and before['point']['outcome'] is None and
+                    after == {'point': dict(before['point'], position='AFTER'), 'subject': before['subject']}, 'mixed batch before/after same point and subject')
+        errors += validate_result(snapshot['result'], requests)
+        require(snapshot['result']['executionStatus'] == 'STABLE', 'mixed batch must remain STABLE')
+        for request, expected_status in zip(requests, ('VALUE', 'UNSUPPORTED_POINT')):
+            matches = [o for o in snapshot['result']['observations']
+                       if o['point'] == request['point'] and o['subject'] == request['subject']]
+            require(len(matches) == 1 and matches[0]['queryStatus'] == expected_status, 'mixed batch query outcomes')
         require(snapshot['result']['sourceScope']['open'] is True, 'CP4E source remains open')
         baseline = load_json(root / 'docs/work/evidence/WORK-CFG-028/baseline.json')
         require(len(baseline['authorities']) == 2 and all(x['read'] == 'integral' and re.fullmatch('[0-9a-f]{64}',x['sha256']) for x in baseline['authorities'].values()), 'integral authority hashes')

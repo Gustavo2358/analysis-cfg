@@ -260,6 +260,24 @@
       "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
       "target": null,
       "hook": null
+    },
+    {
+      "id": "unsupported-query-aborts-batch",
+      "wave": 3,
+      "probe": "S6",
+      "oracle": "Stable run, same subject: before(Return) retains {PROGA}; after(Return) yields UNSUPPORTED_POINT with reason and null value; rejecting the entire batch must fail",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "unsupported-query-disappears",
+      "wave": 3,
+      "probe": "S6",
+      "oracle": "Compare independent request plan with outcomes by full point/subject: one per unique query, including after(Return) UNSUPPORTED_POINT; omission or substitution must fail",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
     }
   ]
 }

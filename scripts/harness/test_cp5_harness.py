@@ -227,10 +227,128 @@ class Cp5HarnessTests(unittest.TestCase):
         self.edit(PLAN+'result-review.json',lambda x:x['result']['statistics'].update(measurements={'nodesPopped':3}))
         self.guard('design must not invent measurements')
 
+    def test_mixed_snapshot_cannot_abort_batch_or_drop_unsupported_query(self):
+        path = PLAN + 'result-review.json'
+        original = (self.root/path).read_bytes()
+        self.assertEqual([], validate_cp5(self.root))
+        mutations = [
+            ('abort', lambda x:x['result'].update(executionStatus='UNSUPPORTED', observations=[]), 'mixed batch must remain STABLE'),
+            ('drop', lambda x:x['result'].update(observations=x['result']['observations'][:1]), 'requested query coverage'),
+        ]
+        for name, change, diagnostic in mutations:
+            with self.subTest(mutant=name):
+                try:
+                    self.edit(path, change)
+                    self.guard(diagnostic)
+                finally:
+                    (self.root/path).write_bytes(original)
+        self.assertEqual(original, (self.root/path).read_bytes())
+        self.assertEqual([], validate_cp5(self.root))
+
+    def test_result_contract_cannot_drop_query_outcome_rules(self):
+        self.edit(PLAN+'result-contract.json', lambda x:x.update(query_statuses=['VALUE']))
+        self.guard('result contract query outcomes')
+
+    def test_mixed_request_plan_cannot_be_removed_with_unsupported_response(self):
+        self.edit(PLAN+'result-review.json', lambda x:x['design']['requestedQueries'].pop())
+        self.edit(PLAN+'result-review.json', lambda x:x['result']['observations'].pop())
+        self.guard('mixed batch requires two requested queries')
+
 
 class ResultContractTests(unittest.TestCase):
     def setUp(self):
         self.example=load_json(ROOT/PLAN/'result-review.json')['result']
+
+    def mixed_batch(self):
+        # Manual response oracle: no solver or expected-value regeneration.
+        result = copy.deepcopy(self.example)
+        before = copy.deepcopy(result['observations'][0])
+        before.update(queryStatus='VALUE', queryReason=None)
+        after = copy.deepcopy(before)
+        after['point'].update(position='AFTER', outcome=None)
+        after.update(queryStatus='UNSUPPORTED_POINT',
+                     queryReason='No post-memory state is admitted after Return.',
+                     reachability=None, value=None, sourceUnknownRemainder=None,
+                     effectiveUnknownRemainder=None, precision=None,
+                     premiseRefs=[], evidenceRefs=[], provenanceRefs=[])
+        result['observations'] = [before, after]
+        return result
+
+    def test_mixed_query_outcomes_are_representable(self):
+        result = self.mixed_batch()
+        self.assertEqual('STABLE', result['executionStatus'])
+        self.assertEqual(['PROGA'], result['observations'][0]['value']['enumerated'])
+        self.assertEqual([], validate_result(result))
+
+    def test_review_snapshot_preserves_supported_value_and_explicit_refusal(self):
+        self.assertEqual('STABLE', self.example['executionStatus'])
+        before, after = self.example['observations']
+        self.assertEqual(['VALUE', 'UNSUPPORTED_POINT'], [before['queryStatus'], after['queryStatus']])
+        self.assertEqual(['PROGA'], before['value']['enumerated'])
+        self.assertEqual('BEFORE', before['point']['position'])
+        self.assertEqual(dict(before['point'], position='AFTER'), after['point'])
+        self.assertEqual(before['subject'], after['subject'])
+        self.assertIsNone(after['value'])
+        self.assertTrue(after['queryReason'])
+
+    def test_batch_coverage_uses_independent_plan_and_full_query_identity(self):
+        result = self.mixed_batch()
+        requests = copy.deepcopy([{k:o[k] for k in ('point','subject')} for o in result['observations']])
+        self.assertEqual([], validate_result(result, requests))
+        # Deduplication and response order do not alter the set of queries.
+        result['observations'].reverse()
+        self.assertEqual([], validate_result(result, requests + requests))
+        for kind in ['drop', 'duplicate', 'replace-point', 'replace-subject']:
+            mutant = copy.deepcopy(result)
+            if kind == 'drop': mutant['observations'].pop(0)
+            elif kind == 'duplicate': mutant['observations'][0] = copy.deepcopy(mutant['observations'][1])
+            elif kind == 'replace-point': mutant['observations'][0]['point']['operationId']['localId'] = 'other-op'
+            else: mutant['observations'][0]['subject']['objectId']['localId'] = 'other-object'
+            with self.subTest(kind=kind):
+                self.assertIn('CP5 result: requested query coverage', validate_result(mutant, requests))
+
+    def test_unsupported_query_requires_reason_and_cannot_claim_semantic_value(self):
+        result = self.mixed_batch()
+        mutations = {'queryReason':[None, '', '  '], 'reachability':['UNREACHABLE_IN_MODEL'],
+                     'value':[result['observations'][0]['value']], 'sourceUnknownRemainder':[False, True],
+                     'effectiveUnknownRemainder':[False, True], 'precision':[result['observations'][0]['precision']]}
+        for field, values in mutations.items():
+            for value in values:
+                mutant = copy.deepcopy(result)
+                mutant['observations'][1][field] = value
+                with self.subTest(field=field, value=value):
+                    self.assertTrue(any('unsupported point' in e for e in validate_result(mutant)))
+
+    def test_query_status_and_reason_are_required_and_distinct_from_run_status(self):
+        for field, value in [('queryStatus', 'STABLE'), ('queryStatus', 'UNSUPPORTED'), ('queryReason', 'refused')]:
+            mutant = self.mixed_batch()
+            mutant['observations'][0][field] = value
+            self.assertTrue(validate_result(mutant), (field, value))
+        for field in ['queryStatus', 'queryReason']:
+            mutant = self.mixed_batch()
+            del mutant['observations'][1][field]
+            self.assertTrue(validate_result(mutant), field)
+
+    def test_unsupported_query_still_checks_context_subject_and_refs(self):
+        for path in ['point', 'subject', 'evidenceRefs']:
+            mutant = self.mixed_batch()
+            after = mutant['observations'][1]
+            if path == 'point': after['point']['entryId']['unit'] = 'other'
+            elif path == 'subject': after['subject']['objectId']['unit'] = 'other'
+            else: after['evidenceRefs'] = [dict(after['point']['operationId'], unit='other')]
+            with self.subTest(path=path): self.assertTrue(validate_result(mutant))
+
+    def test_supported_after_requires_an_outcome_and_run_failures_remain_separate(self):
+        result = self.mixed_batch()
+        result['observations'] = result['observations'][:1]
+        result['observations'][0]['point']['position'] = 'AFTER'
+        self.assertIn('CP5 result: point outcome', validate_result(result))
+        result['observations'][0]['point']['outcome'] = 'NORMAL'
+        self.assertEqual([], validate_result(result))
+        requests = [{'point': result['observations'][0]['point'], 'subject': result['observations'][0]['subject']}]
+        for status in ['ANALYSIS_LIMIT', 'UNSUPPORTED', 'INVALID_INPUT']:
+            result.update(executionStatus=status, observations=[], limitReason='WORK_BUDGET' if status == 'ANALYSIS_LIMIT' else None)
+            self.assertEqual([], validate_result(result, requests))
 
     def test_example_and_honest_unknown_unreachable_saturation_limit(self):
         self.assertEqual([],validate_result(self.example))
