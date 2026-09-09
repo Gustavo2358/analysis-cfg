@@ -1,4 +1,4 @@
-# CP5 WAVE_1 — implementação validada localmente
+# CP5 WAVE_1 — IMPLEMENTED / AWAITING_HUMAN_REVIEW
 
 Baseline humano e remoto: `4aeb4c0ad086ec4fc8911879b13139d84ca57bc9`.
 [Autorização anterior à implementação](authorization.json), [baseline/pins](baseline.json),
@@ -86,9 +86,27 @@ legadas permanecem: não se afirma que a pipeline completa é size-unbounded.
 
 ## CI e checkpoint
 
-Validação remota do HEAD publicado ainda pendente nesta revisão documental.
-Após os workflows, registrar recibo do HEAD/base/checkout/árvores/run/event/conclusion.
-A última evidência de CI fica no mesmo PR #12 e na cópia local ignorada
+[Recibo remoto versionado](initial-remote-ci/receipt.json), acompanhado dos artifacts,
+respostas da API e logs brutos: HEAD de implementação
+`318181c072710f89ac58c2bd387c1645de434cd6`; base
+`ec525cbbad96d70c9663faa88e2672148fa8ee71`.
+
+| Evento | Run | Conclusão | Checkout real | Classificação |
+| --- | --- | --- | --- | --- |
+| push | [34403317341](https://github.com/Gustavo2358/analysis-cfg/actions/runs/34403317341) | SUCCESS | 318181c072710f89ac58c2bd387c1645de434cd6 | EXACT_COMMIT_CHECKOUT |
+| pull_request | [34403320170](https://github.com/Gustavo2358/analysis-cfg/actions/runs/34403320170) | SUCCESS | 5af110dbe70915ba5d588b9ed58f29744d59626a | SYNTHETIC_MERGE_IDENTICAL_TREE |
+
+Head tree e as duas checkout trees:
+`1012f3741b747b51cc5f5dbb2d30a580b10d8969`. SHA/árvore/pais conferidos contra
+artifacts do collector canônico, Git local e API GitHub. Cada workflow executou
+fast, scope, arquitetura, semântica, integração e performance W1, sem steps de
+produto omitidos. Esta evidência permite registrar o estado IMPLEMENTED; não é
+review humano e não valida automaticamente o commit documental seguinte.
+
+O recibo do **último HEAD publicado**, após este registro, fica no mesmo
+[PR #12](https://github.com/Gustavo2358/analysis-cfg/pull/12) e na cópia local ignorada
 `.harness-results/WORK-CFG-028/wave-1/remote-ci.json`, evitando hash autorreferente.
-W1 permanece STARTED/AUTHORIZED até a primeira validação remota. W2–W5
-NOT_STARTED/NOT_AUTHORIZED. Sem merge/auto-merge/ready ou início automático de W2.
+Esse último push exige novas execuções de push e pull_request e confronto com o
+HEAD final, incluindo checkout e árvores; o encerramento reporta somente esse recibo.
+W1 = IMPLEMENTED / AWAITING_HUMAN_REVIEW; authorized_wave=1. W2–W5 =
+NOT_STARTED / NOT_AUTHORIZED. Sem merge/auto-merge/ready ou início automático de W2.

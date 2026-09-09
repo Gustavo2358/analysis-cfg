@@ -3,7 +3,7 @@
 ## Item ativo
 
 [WORK-CFG-028](active/WORK-CFG-028/work-item.json): CP5 umbrella,
-**WAVE_1 STARTED / AUTHORIZED**. CORE-SIZE-001/ADR-0014 e preparação anterior
+**WAVE_1 IMPLEMENTED / AWAITING_HUMAN_REVIEW**. CORE-SIZE-001/ADR-0014 e preparação anterior
 aprovados pelo humano no HEAD 4aeb4c0ad086ec4fc8911879b13139d84ca57bc9.
 [Estado](active/WORK-CFG-028/state.md), [lifecycle](cp5-lifecycle.json),
 [autorização W1](evidence/WORK-CFG-028/wave-1/authorization.json),

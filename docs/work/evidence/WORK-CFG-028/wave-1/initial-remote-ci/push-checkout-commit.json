@@ -1,0 +1,35 @@
+{
+  "sha": "318181c072710f89ac58c2bd387c1645de434cd6",
+  "node_id": "C_kwDOUPqjU9oAKDMxODE4MWMwNzI3MTBmODlhYzU4YzJiZDM4N2MxNjQ1ZGU0MzRjZDY",
+  "url": "https://api.github.com/repos/Gustavo2358/analysis-cfg/git/commits/318181c072710f89ac58c2bd387c1645de434cd6",
+  "html_url": "https://github.com/Gustavo2358/analysis-cfg/commit/318181c072710f89ac58c2bd387c1645de434cd6",
+  "author": {
+    "name": "Gustavo Oliveira",
+    "email": "gustavo28064212@gmail.com",
+    "date": "2026-09-09T20:48:58Z"
+  },
+  "committer": {
+    "name": "Gustavo Oliveira",
+    "email": "gustavo28064212@gmail.com",
+    "date": "2026-09-09T20:48:58Z"
+  },
+  "tree": {
+    "sha": "1012f3741b747b51cc5f5dbb2d30a580b10d8969",
+    "url": "https://api.github.com/repos/Gustavo2358/analysis-cfg/git/trees/1012f3741b747b51cc5f5dbb2d30a580b10d8969"
+  },
+  "message": "docs: preserve raw JVM flags as lossless compressed evidence",
+  "parents": [
+    {
+      "sha": "e8df5760f0ec5740d324980ddbe551a43d0bf2cc",
+      "url": "https://api.github.com/repos/Gustavo2358/analysis-cfg/git/commits/e8df5760f0ec5740d324980ddbe551a43d0bf2cc",
+      "html_url": "https://github.com/Gustavo2358/analysis-cfg/commit/e8df5760f0ec5740d324980ddbe551a43d0bf2cc"
+    }
+  ],
+  "verification": {
+    "verified": false,
+    "reason": "unsigned",
+    "signature": null,
+    "payload": null,
+    "verified_at": null
+  }
+}

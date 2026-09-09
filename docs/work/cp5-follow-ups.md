@@ -47,7 +47,9 @@ permanece preservado. CORE-SIZE-001 mantém as dívidas de runtime abaixo.
 
 A norma nova governa o desenho; não afirma que os binários legados ou a pipeline
 inteira já a implementem. Nenhuma dívida abaixo é propriedade aceita do CP5.
-Nenhum sibling ou Java/POM foi alterado nesta remediação.
+O inventário abaixo foi registrado na remediação de harness CORE-SIZE-001, sem
+alteração produtiva naquela fase. A W1 acrescenta o índice e corrige CP5-F01;
+as dívidas de capacidade abaixo continuam abertas e nenhum sibling foi alterado.
 
 | Dívida / classificação | Evidência no snapshot | Encaminhamento |
 | --- | --- | --- |

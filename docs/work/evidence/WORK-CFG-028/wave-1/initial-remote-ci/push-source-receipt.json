@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "event": "push",
+  "workflow_run_id": "34403317341",
+  "source_head_sha": "318181c072710f89ac58c2bd387c1645de434cd6",
+  "pr_head_sha": null,
+  "pr_base_sha": null,
+  "event_checkout_sha": "318181c072710f89ac58c2bd387c1645de434cd6",
+  "actual_checkout_sha": "318181c072710f89ac58c2bd387c1645de434cd6",
+  "head_tree_sha": "1012f3741b747b51cc5f5dbb2d30a580b10d8969",
+  "checkout_tree_sha": "1012f3741b747b51cc5f5dbb2d30a580b10d8969",
+  "checkout_parent_shas": [
+    "e8df5760f0ec5740d324980ddbe551a43d0bf2cc"
+  ],
+  "classification": "EXACT_COMMIT_CHECKOUT"
+}

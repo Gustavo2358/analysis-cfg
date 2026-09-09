@@ -1,0 +1,73 @@
+{
+  "method": "read-only git HEAD/branch/status snapshots; no sibling source, checkout, build or pin mutation commands executed. Concurrent changes remain external and are not absorbed. This does not claim retrospective hashes of unrelated untracked files.",
+  "repositories": {
+    "air-java": {
+      "before": {
+        "head": "ce530a7e17ab12b23c48f29425f503ff920b09fb",
+        "branch": "main",
+        "status": ""
+      },
+      "after": {
+        "head": "ce530a7e17ab12b23c48f29425f503ff920b09fb",
+        "branch": "main",
+        "status": ""
+      },
+      "same_head_branch_status": true
+    },
+    "analysis-ir": {
+      "before": {
+        "head": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+        "branch": "main",
+        "status": ""
+      },
+      "after": {
+        "head": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+        "branch": "main",
+        "status": ""
+      },
+      "same_head_branch_status": true
+    },
+    "cobol-lower": {
+      "before": {
+        "head": "2329993ce61b33fd7105759e211a1861ca6cb217",
+        "branch": "feat/lower-scalar-move",
+        "status": ""
+      },
+      "after": {
+        "head": "2329993ce61b33fd7105759e211a1861ca6cb217",
+        "branch": "feat/lower-scalar-move",
+        "status": ""
+      },
+      "same_head_branch_status": true
+    },
+    "proleap-poc": {
+      "before": {
+        "head": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+        "branch": "main",
+        "status": ""
+      },
+      "after": {
+        "head": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+        "branch": "main",
+        "status": ""
+      },
+      "same_head_branch_status": true
+    },
+    "artefatos-e2e": {
+      "before": {
+        "head": "2484b76f9174a79ea702f17453f04955cd46a755",
+        "branch": "main",
+        "status": "?? checkpoint-4e/\n?? cp5/"
+      },
+      "after": {
+        "head": "2484b76f9174a79ea702f17453f04955cd46a755",
+        "branch": "main",
+        "status": "?? checkpoint-4e/\n?? cp5/"
+      },
+      "same_head_branch_status": true
+    }
+  },
+  "source_lock_sha256": "e68fd901f8022c82b13d7bc8119000aba40f6141d5059f9898014d8ee1743a88",
+  "pins_byte_exact": true,
+  "recorded_at": "2026-09-09T20:54:12.879701+00:00"
+}

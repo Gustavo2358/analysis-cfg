@@ -1,0 +1,240 @@
+{
+  "recorded_at": "2026-09-09T20:52:42.337948+00:00",
+  "pr_number": 12,
+  "pr_url": "https://github.com/Gustavo2358/analysis-cfg/pull/12",
+  "pr_head_sha": "318181c072710f89ac58c2bd387c1645de434cd6",
+  "pr_base_sha": "ec525cbbad96d70c9663faa88e2672148fa8ee71",
+  "head_tree_sha": "1012f3741b747b51cc5f5dbb2d30a580b10d8969",
+  "pr_state": "open",
+  "pr_draft": true,
+  "auto_merge": null,
+  "runs": [
+    {
+      "run_id": 34403320170,
+      "url": "https://github.com/Gustavo2358/analysis-cfg/actions/runs/34403320170",
+      "event": "pull_request",
+      "conclusion": "success",
+      "source_receipt": {
+        "schema_version": 1,
+        "event": "pull_request",
+        "workflow_run_id": "34403320170",
+        "source_head_sha": "318181c072710f89ac58c2bd387c1645de434cd6",
+        "pr_head_sha": "318181c072710f89ac58c2bd387c1645de434cd6",
+        "pr_base_sha": "ec525cbbad96d70c9663faa88e2672148fa8ee71",
+        "event_checkout_sha": "5af110dbe70915ba5d588b9ed58f29744d59626a",
+        "actual_checkout_sha": "5af110dbe70915ba5d588b9ed58f29744d59626a",
+        "head_tree_sha": "1012f3741b747b51cc5f5dbb2d30a580b10d8969",
+        "checkout_tree_sha": "1012f3741b747b51cc5f5dbb2d30a580b10d8969",
+        "checkout_parent_shas": [
+          "ec525cbbad96d70c9663faa88e2672148fa8ee71",
+          "318181c072710f89ac58c2bd387c1645de434cd6"
+        ],
+        "classification": "SYNTHETIC_MERGE_IDENTICAL_TREE"
+      },
+      "artifact_id": 10124315286,
+      "artifact_sha256": "f54f85edb85f71e53a78b29228725f67aebe9a46b4ef8d9a732c663782c135b3",
+      "logs_sha256": "a34367438d02aa1d464c6a249d970c1bf2b9a336d28d2cdab635d9192374610a",
+      "jobs": [
+        {
+          "name": "boundary",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "conclusion": "success"
+            },
+            {
+              "name": "Check out analysis-cfg",
+              "conclusion": "success"
+            },
+            {
+              "name": "Check out pinned air-java source",
+              "conclusion": "success"
+            },
+            {
+              "name": "Set up Java 21",
+              "conclusion": "success"
+            },
+            {
+              "name": "Set up Python 3.12",
+              "conclusion": "success"
+            },
+            {
+              "name": "Record actual CI source checkout",
+              "conclusion": "success"
+            },
+            {
+              "name": "Preserve CI source receipt",
+              "conclusion": "success"
+            },
+            {
+              "name": "Verify pinned air-java checkout",
+              "conclusion": "success"
+            },
+            {
+              "name": "Install pinned air-java SNAPSHOT",
+              "conclusion": "success"
+            },
+            {
+              "name": "Check documentation and harness",
+              "conclusion": "success"
+            },
+            {
+              "name": "Check CP5 W1 scope and exact manifest",
+              "conclusion": "success"
+            },
+            {
+              "name": "Check Java architecture boundary",
+              "conclusion": "success"
+            },
+            {
+              "name": "Check CFG-FIRST, linear, Branch and projection policy oracles",
+              "conclusion": "success"
+            },
+            {
+              "name": "Check real AIR file to CFG JSON integration",
+              "conclusion": "success"
+            },
+            {
+              "name": "Check CP5 W1 structural semantics and performance",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Set up Python 3.12",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Set up Java 21",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Check out pinned air-java source",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Check out analysis-cfg",
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "conclusion": "success"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "run_id": 34403317341,
+      "url": "https://github.com/Gustavo2358/analysis-cfg/actions/runs/34403317341",
+      "event": "push",
+      "conclusion": "success",
+      "source_receipt": {
+        "schema_version": 1,
+        "event": "push",
+        "workflow_run_id": "34403317341",
+        "source_head_sha": "318181c072710f89ac58c2bd387c1645de434cd6",
+        "pr_head_sha": null,
+        "pr_base_sha": null,
+        "event_checkout_sha": "318181c072710f89ac58c2bd387c1645de434cd6",
+        "actual_checkout_sha": "318181c072710f89ac58c2bd387c1645de434cd6",
+        "head_tree_sha": "1012f3741b747b51cc5f5dbb2d30a580b10d8969",
+        "checkout_tree_sha": "1012f3741b747b51cc5f5dbb2d30a580b10d8969",
+        "checkout_parent_shas": [
+          "e8df5760f0ec5740d324980ddbe551a43d0bf2cc"
+        ],
+        "classification": "EXACT_COMMIT_CHECKOUT"
+      },
+      "artifact_id": 10124313720,
+      "artifact_sha256": "24ce7793e177766f6b7dcfd82f81fa6c7b717928dcb38b0f8f72e7d400c556ca",
+      "logs_sha256": "66f2b16f15e80f32d447a5beb8122c701246d7c353d313a795eed79eacc3a7e5",
+      "jobs": [
+        {
+          "name": "boundary",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "conclusion": "success"
+            },
+            {
+              "name": "Check out analysis-cfg",
+              "conclusion": "success"
+            },
+            {
+              "name": "Check out pinned air-java source",
+              "conclusion": "success"
+            },
+            {
+              "name": "Set up Java 21",
+              "conclusion": "success"
+            },
+            {
+              "name": "Set up Python 3.12",
+              "conclusion": "success"
+            },
+            {
+              "name": "Record actual CI source checkout",
+              "conclusion": "success"
+            },
+            {
+              "name": "Preserve CI source receipt",
+              "conclusion": "success"
+            },
+            {
+              "name": "Verify pinned air-java checkout",
+              "conclusion": "success"
+            },
+            {
+              "name": "Install pinned air-java SNAPSHOT",
+              "conclusion": "success"
+            },
+            {
+              "name": "Check documentation and harness",
+              "conclusion": "success"
+            },
+            {
+              "name": "Check CP5 W1 scope and exact manifest",
+              "conclusion": "success"
+            },
+            {
+              "name": "Check Java architecture boundary",
+              "conclusion": "success"
+            },
+            {
+              "name": "Check CFG-FIRST, linear, Branch and projection policy oracles",
+              "conclusion": "success"
+            },
+            {
+              "name": "Check real AIR file to CFG JSON integration",
+              "conclusion": "success"
+            },
+            {
+              "name": "Check CP5 W1 structural semantics and performance",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Set up Python 3.12",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Set up Java 21",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Check out pinned air-java source",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Check out analysis-cfg",
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "conclusion": "success"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

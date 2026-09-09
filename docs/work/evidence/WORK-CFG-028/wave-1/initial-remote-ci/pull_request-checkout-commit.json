@@ -1,0 +1,40 @@
+{
+  "sha": "5af110dbe70915ba5d588b9ed58f29744d59626a",
+  "node_id": "C_kwDOUPqjU9oAKDVhZjExMGRiZTcwOTE1YmE1ZDU4OGI5ZWQ1OGYyOTc0NGQ1OTYyNmE",
+  "url": "https://api.github.com/repos/Gustavo2358/analysis-cfg/git/commits/5af110dbe70915ba5d588b9ed58f29744d59626a",
+  "html_url": "https://github.com/Gustavo2358/analysis-cfg/commit/5af110dbe70915ba5d588b9ed58f29744d59626a",
+  "author": {
+    "name": "Gustavo Oliveira",
+    "email": "48843621+Gustavo2358@users.noreply.github.com",
+    "date": "2026-09-09T20:49:07Z"
+  },
+  "committer": {
+    "name": "GitHub",
+    "email": "noreply@github.com",
+    "date": "2026-09-09T20:49:07Z"
+  },
+  "tree": {
+    "sha": "1012f3741b747b51cc5f5dbb2d30a580b10d8969",
+    "url": "https://api.github.com/repos/Gustavo2358/analysis-cfg/git/trees/1012f3741b747b51cc5f5dbb2d30a580b10d8969"
+  },
+  "message": "Merge 318181c072710f89ac58c2bd387c1645de434cd6 into ec525cbbad96d70c9663faa88e2672148fa8ee71",
+  "parents": [
+    {
+      "sha": "ec525cbbad96d70c9663faa88e2672148fa8ee71",
+      "url": "https://api.github.com/repos/Gustavo2358/analysis-cfg/git/commits/ec525cbbad96d70c9663faa88e2672148fa8ee71",
+      "html_url": "https://github.com/Gustavo2358/analysis-cfg/commit/ec525cbbad96d70c9663faa88e2672148fa8ee71"
+    },
+    {
+      "sha": "318181c072710f89ac58c2bd387c1645de434cd6",
+      "url": "https://api.github.com/repos/Gustavo2358/analysis-cfg/git/commits/318181c072710f89ac58c2bd387c1645de434cd6",
+      "html_url": "https://github.com/Gustavo2358/analysis-cfg/commit/318181c072710f89ac58c2bd387c1645de434cd6"
+    }
+  ],
+  "verification": {
+    "verified": true,
+    "reason": "valid",
+    "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqocZDCRC1aQ7uu5UhlAAAtq4QAAf5eC930VRzX3MKF2sl91z6\n0B/d/xRJDHWo0sdGsskcLysfJ+Vg4Z/FS9j8e/qrx+6uYwjNh/Ac9JsKm/StMRQh\nWZs2tRz0qvC8f+sZ/Js9LLEu0ZPvqkch3zBsuknI9HJWCQEfRjKJyAosOwj69KHL\n4jtirpztUVE5cCntPDCk9L9mK95cqtnqYfVNn6pACCT3YKO0ym8odbbsN5qKjC0+\n7Vgxton6iFf0g/gX6DTbJTw2OWf3HH3mn9hR5g+6bbEv/ciT6Um/joX1XLiilsdf\nWVyCx7phOKiWN5Mg1YGx+/5Og/Cy3PyknDT3qri+BVqh4zrAVtPfkbiOjuq9/0XO\n/DVp4jjht+kxkRM9eGIJoempzFfYcPsngqGSdwJjksX+cwiP9LtSsG1/Mpgjcns6\nUxLZUYR1WV7X9CYrulqalmaF7agyeCJ+NG6tRY8UIn9NwZctFZr+ZVOTvMg12D63\nlFV5rN7bR/75lP96NY3l/tz2zxMWve88U/5UeglL8G5ZENclzI/0LeCjCbOPFvBU\n0EQyXEaV/dosqIXNnlXE1tnYFznkPp9qIMi6s4BYBdVLJBRjdAxH+Ihmrr+oOjed\nnHzs7EYicxu4DlJhtLYo8jgyEtLrGGZIbfcHkiBu1QuQTzxysLJMfVEGfXcQlUYB\nIKxlPi/dqTuqZRArzIn1\n=m096\n-----END PGP SIGNATURE-----\n",
+    "payload": "tree 1012f3741b747b51cc5f5dbb2d30a580b10d8969\nparent ec525cbbad96d70c9663faa88e2672148fa8ee71\nparent 318181c072710f89ac58c2bd387c1645de434cd6\nauthor Gustavo Oliveira <48843621+Gustavo2358@users.noreply.github.com> 1788986947 +0000\ncommitter GitHub <noreply@github.com> 1788986947 +0000\n\nMerge 318181c072710f89ac58c2bd387c1645de434cd6 into ec525cbbad96d70c9663faa88e2672148fa8ee71\n",
+    "verified_at": "2026-09-09T20:49:08Z"
+  }
+}

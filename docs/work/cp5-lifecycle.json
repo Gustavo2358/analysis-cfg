@@ -51,11 +51,11 @@
     {
       "wave": 1,
       "title": "structural index/session",
-      "status": "STARTED",
+      "status": "IMPLEMENTED",
       "authorization": "AUTHORIZED",
       "requires_review_of": "CORE_SIZE_UNBOUNDED_REMEDIATION",
       "approval_evidence": "docs/work/evidence/WORK-CFG-028/wave-1/authorization.json",
-      "completion_evidence": null,
+      "completion_evidence": "docs/work/evidence/WORK-CFG-028/wave-1/validation.md",
       "eval": "EVAL-CFG-034"
     },
     {
@@ -226,7 +226,9 @@
   },
   "wave_1": {
     "authorization": "docs/work/evidence/WORK-CFG-028/wave-1/authorization.json",
-    "review": "NOT_SUBMITTED",
-    "evidence": "docs/work/evidence/WORK-CFG-028/wave-1/"
+    "review": "AWAITING_HUMAN_REVIEW",
+    "evidence": "docs/work/evidence/WORK-CFG-028/wave-1/",
+    "validated_implementation_head": "318181c072710f89ac58c2bd387c1645de434cd6",
+    "initial_remote_ci": "docs/work/evidence/WORK-CFG-028/wave-1/initial-remote-ci/receipt.json"
   }
 }
