@@ -18,7 +18,7 @@ STABLE como execução real. Statistics ficam unavailable/null, sem counters inv
 | publicationId/unitId/entryId | identidade completa, sem ordinais internos exportados |
 | executionStatus | STABLE, ANALYSIS_LIMIT, UNSUPPORTED ou INVALID_INPUT do solver/run; recusa isolada de query não altera esse status |
 | modelScope/sourceScope | KNOWN_GRAPH_ENTRY separado da abertura CONTROL/Unit da fonte |
-| observations | um resultado por query única (point, subject) do plano em run STABLE, inclusive queries recusadas |
+| observations | um resultado por query única (point, subject) do plano em run STABLE e observation COMPLETE, inclusive queries recusadas |
 | queryStatus/queryReason | VALUE com motivo null, ou UNSUPPORTED_POINT com motivo explícito não vazio; status por query separado de executionStatus |
 | point | OperationId, Entry, before/after e outcome solicitado; after fronteira não admitida é UNSUPPORTED_POINT; outcome pode ser null nesse caso |
 | subject/place/storage | ObjectPlace/ObjectId consultado e Cell/Storage base; Object não é memória exclusiva |
@@ -54,7 +54,7 @@ explicativo, não inferência de semântica a partir do nome de operação ou de
 
 BEFORE usa outcome=null. AFTER admitido exige outcome explícito; after(Return/Halt)
 sem estado posterior usa outcome=null e UNSUPPORTED_POINT, sem inventar aresta.
-point e subject reproduzem a query solicitada, mesmo quando recusada. No run STABLE,
+point e subject reproduzem a query solicitada, mesmo quando recusada. No run STABLE com observation COMPLETE,
 o plano externo de queries deve ser comparado com os resultados: exatamente um por
 par único de (point completo, subject completo), sem omissões, duplicações ou
 substituições. Requests repetidos compartilham o resultado e a ordem da resposta
@@ -79,3 +79,42 @@ reports e falhas antes do writer. A CLI separada usará AIR file → reader → 
 → sessão → PossibleValues → plano padrão → writer. Plano padrão observa destinos
 escritos por Sequence em before(terminator), sem selecionar primeiro Object/WS-PGM/
 PROGA ou varrer todos Objects por Sequence. CLI CFG existente mantém contrato próprio.
+
+## Envelope de completion por fase
+
+`completion` é obrigatório, com `pipelineStatus`, `publicationPolicy`, `admission`,
+`analysis`, `observation`, `consumers` e `publication`. Cada fase contém status/reason;
+cada consumer também tem id estável e único no plano independente solicitado.
+
+| Fase | Status | Motivo |
+| --- | --- | --- |
+| admission | COMPLETE / REJECTED | REJECTED exige motivo, inclusive profile/integridade/budget de admissão |
+| analysis | STABLE / LIMIT / NOT_STARTED | LIMIT exige motivo igual a limitReason global |
+| observation | COMPLETE / LIMIT / FAILED / NOT_STARTED | LIMIT/FAILED exigem motivo local |
+| cada consumer | COMPLETE / LIMIT / FAILED / NOT_STARTED | LIMIT/FAILED exigem motivo local |
+| publication | COMPLETE / LIMIT / FAILED / NOT_STARTED | COMPLETE representa confirmação externa; falha exige motivo |
+
+Demais motivos são null. Admission REJECTED corresponde a UNSUPPORTED/INVALID_INPUT,
+analysis NOT_STARTED e observation NOT_STARTED. ANALYSIS_LIMIT corresponde a analysis
+LIMIT com observation NOT_STARTED. Observation só inicia após STABLE; consumers deste
+produto dependem do lote materializado completo. Sem consumer solicitado, lista vazia.
+
+Política EXPLICIT_PARTIAL_BY_PHASE: observations é lote atômico. Se observation não
+completa, observations=[] e consumers solicitados ficam NOT_STARTED. STABLE com replay
+LIMIT continua STABLE, limitReason=null, pipelineStatus INCOMPLETE. Não inventar
+UNSUPPORTED_POINT para queries não materializadas. Se a materialização completa,
+preservar B1 e conferir exatamente todos os pontos/subjects do plano.
+
+Cada consumer é atômico e tem status próprio: A COMPLETE/B FAILED admite resultados
+concluídos de A e observations sob envelope INCOMPLETE explícito; nenhum fato parcial
+de B é sucesso. Conferir também cobertura do plano independente de consumers. O
+snapshot não define wire de fatos de consumers; esse contrato será vinculado em W4/W5.
+Publication FAILED/LIMIT não apaga a estabilidade nem confirma entrega; a confirmação
+é recibo externo do chamador, não um campo autodeclarado pelo writer em stream truncado.
+O envelope de review representa payload preparado e recibo de forma conceitual.
+
+pipelineStatus COMPLETE se e somente se analysis STABLE, observation COMPLETE, todos
+consumers solicitados COMPLETE e publication COMPLETE. Em todos os demais casos,
+INCOMPLETE. Completion operacional não promete precisão fechada: UNSUPPORTED_POINT,
+source open e saturação continuam explícitos mesmo em pipeline concluída.
+[Decisão F e fases de ativação](cp5-post-audit.md#f). Nenhum runtime/writer implementado.

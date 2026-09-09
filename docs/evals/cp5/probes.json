@@ -62,7 +62,8 @@
       "oracle": "representation-specific bounded update/sharing ledger; compare writes/roots, measured heap and release",
       "kills": "full state clone, dense matrix, historical roots or leaked pool",
       "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "hook": null
+      "hook": null,
+      "quality_companion": "S15"
     },
     {
       "id": "S4",
@@ -145,10 +146,11 @@
         "operationsReplayed",
         "stateBytesRetained"
       ],
-      "oracle": "one union prefix per analysis/Entry/Sequence/epoch; selected facts O(Q), not Q×F",
+      "oracle": "one directional prefix/suffix union per analysis/Entry/Sequence/epoch; selected facts O(Q), not Q×F; stable IN forward or stable OUT backward.",
       "kills": "replay per query/site, implicit late replay, full state per query",
       "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "hook": null
+      "hook": null,
+      "quality_companion": "S15"
     },
     {
       "id": "S7",
@@ -209,7 +211,8 @@
       "oracle": "text processing at boundary once with declared cost; AIR baseline separated",
       "kills": "rehash/duplicate strings per iteration/join",
       "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "hook": null
+      "hook": null,
+      "quality_companion": "S15"
     },
     {
       "id": "S10",
@@ -226,6 +229,121 @@
       ],
       "oracle": "real stages, same defaults, hashes/JARs/pins, memory/file equivalence, PARTIAL preserved",
       "kills": "fixture-specific shortcut, golden substituted for stage, result promotes source precision",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "hook": null,
+      "quality_companion": "S15"
+    },
+    {
+      "id": "S11",
+      "waves": [
+        1
+      ],
+      "dimension": "CFG projection integrity",
+      "oracle": "Manual node/edge role inventory from AIR fixture and corruptions; supported boundary result admitted, each mutilation rejected.",
+      "metrics": [
+        "nodesIndexed",
+        "edgesIndexed",
+        "structuralVisits"
+      ],
+      "kills": [
+        "missing-required-edge",
+        "missing-required-sequence",
+        "foreign-sequence-source",
+        "foreign-publication-entry",
+        "duplicated-wrong-contextual-edge"
+      ],
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "hook": null
+    },
+    {
+      "id": "S12",
+      "waves": [
+        2,
+        3
+      ],
+      "dimension": "Direction-aware replay",
+      "oracle": "Manual def X; use X and distinct-anchor use Y; def X; use X witnesses plus independent gen/kill round solver; verify BEFORE/AFTER values and stable OUT reverse suffix replay.",
+      "metrics": [
+        "sequencesReplayed",
+        "operationsReplayed"
+      ],
+      "kills": [
+        "backward-replay-from-wrong-anchor",
+        "backward-replay-forward-order"
+      ],
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "hook": null
+    },
+    {
+      "id": "S13",
+      "waves": [
+        2,
+        3
+      ],
+      "dimension": "Independent finite concrete semantics",
+      "oracle": "Enumerate finite synthetic executions/states independently of product transfer/join/worklist; every concrete value/point is covered by delivered abstraction; include deliberately wrong transfer.",
+      "metrics": [
+        "nodesTransferred",
+        "operationsTransferred"
+      ],
+      "kills": [
+        "shared-wrong-transfer-agreement"
+      ],
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "hook": null
+    },
+    {
+      "id": "S14",
+      "waves": [
+        3,
+        4,
+        5
+      ],
+      "dimension": "Completion by phase",
+      "oracle": "Inject observation budget, one consumer failure alongside a successful consumer, and publication failure; solver STABLE retained, pipeline INCOMPLETE explicit.",
+      "metrics": [
+        "observationLimits",
+        "consumerFailures",
+        "publicationFailures"
+      ],
+      "kills": [
+        "stable-analysis-observation-limit-reported-as-full-success",
+        "consumer-failure-reported-as-complete-output"
+      ],
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "hook": null
+    },
+    {
+      "id": "S15",
+      "waves": [
+        3,
+        4,
+        5
+      ],
+      "dimension": "Quality alongside cost",
+      "oracle": "Fixed finite corpus/profile/k/budget and independent expected outcomes; report refusals, open/closed outcomes, saturation and phase failures alongside time/memory; no aggregate percent threshold.",
+      "metrics": [
+        "queryRequests",
+        "uniqueQueries",
+        "saturations",
+        "queriesAnswered",
+        "unsupportedQueries",
+        "queriesNotMaterialized",
+        "unsupportedStorageProfiles",
+        "unsupportedEffectProfiles",
+        "modelOpenResults",
+        "sourceOpenResults",
+        "effectiveOpenResults",
+        "closedInModelResults",
+        "analysisLimits",
+        "observationLimits",
+        "consumerFailures",
+        "publicationFailures"
+      ],
+      "kills": [
+        "performance-optimization-by-early-saturation",
+        "performance-optimization-by-unsupported-everything"
+      ],
       "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
       "hook": null
     }

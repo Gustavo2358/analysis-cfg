@@ -1,0 +1,233 @@
+{
+  "schema_version": 1,
+  "requirements": {
+    "A": {
+      "obligations": [
+        "SUPPORTED_BUILDCFG_BOUNDARY",
+        "STATUS_IS_NOT_CERTIFICATE",
+        "CANONICAL_SOURCE_IDENTITY",
+        "PROFILE_MEMBERSHIP_CORRELATION_COMPLETENESS",
+        "LINEAR_INDEX_ADMISSION",
+        "REJECT_MUTILATED_GRAPH",
+        "NO_REBUILD_OR_SECOND_VALIDATOR"
+      ],
+      "waves": [
+        1
+      ],
+      "documentation": "docs/architecture/cp5-post-audit.md#a",
+      "runtime_status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "runtime_hook": null
+    },
+    "B": {
+      "obligations": [
+        "FORWARD_STABLE_IN_FIRST_TO_LAST",
+        "BACKWARD_STABLE_OUT_LAST_TO_FIRST",
+        "PROGRAM_POINTS_DIRECTION_INVARIANT",
+        "BATCH_PREFIX_OR_SUFFIX_UNION"
+      ],
+      "waves": [
+        2,
+        3
+      ],
+      "documentation": "docs/architecture/cp5-post-audit.md#b",
+      "runtime_status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "runtime_hook": null
+    },
+    "C": {
+      "obligations": [
+        "STORAGE_EFFECTS_BEFORE_FIXPOINT",
+        "DOMAIN_TRANSFERS_USE_EFFECTS",
+        "CONSUMERS_AFTER_STABLE_FACTS",
+        "NO_CONSUMER_STATE_REPAIR",
+        "UNKNOWN_EFFECT_IS_NOT_IDENTITY",
+        "INVOKE_REQUIRES_PIPELINE_SUPPORT"
+      ],
+      "waves": [
+        3,
+        4
+      ],
+      "documentation": "docs/architecture/cp5-post-audit.md#c",
+      "runtime_status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "runtime_hook": null
+    },
+    "D": {
+      "obligations": [
+        "LOGICAL_VALUE_IS_NOT_BYTE_LAYOUT",
+        "BYTE_SLICE_REQUIRES_REGION_VIEW_CODEC_OR_PROVEN_REDUCTION",
+        "MARGINAL_CANDIDATES_ARE_NOT_PATH_PAIRS",
+        "NO_GENERAL_RELATIONAL_DOMAIN_IN_CP5"
+      ],
+      "waves": [
+        3,
+        4
+      ],
+      "documentation": "docs/architecture/cp5-post-audit.md#d",
+      "runtime_status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "runtime_hook": null
+    },
+    "E": {
+      "obligations": [
+        "ACTIVATION_ENTRY_IS_NOT_LOCAL_FRAME",
+        "RETURN_PAIRING_REQUIRES_CONTROL_SEMANTICS",
+        "CONTEXT_INSENSITIVE_APPROXIMATION_MUST_BE_DECLARED"
+      ],
+      "waves": [
+        1,
+        2,
+        3
+      ],
+      "documentation": "docs/architecture/cp5-post-audit.md#e",
+      "runtime_status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "runtime_hook": null
+    },
+    "F": {
+      "obligations": [
+        "STABLE_ANALYSIS_SURVIVES_LATER_FAILURE",
+        "INCOMPLETE_PIPELINE_IS_EXPLICIT",
+        "OBSERVATION_BATCH_ATOMIC",
+        "CONSUMER_COMPLETION_IS_INDEPENDENT",
+        "EXPLICIT_PARTIAL_BY_PHASE",
+        "OUTPUT_SUCCESS_REQUIRES_PUBLICATION_ACK"
+      ],
+      "waves": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "documentation": "docs/architecture/cp5-post-audit.md#f",
+      "runtime_status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "runtime_hook": null
+    },
+    "G": {
+      "obligations": [
+        "MANUAL_EXPECTED",
+        "INDEPENDENT_RECOMPUTATION_SOLVER",
+        "FINITE_CONCRETE_SEMANTIC_ORACLE",
+        "TEST_ONLY_SYNTHETIC_FINITE_ENUMERATION",
+        "NO_PRODUCTION_TRANSFER_JOIN_WORKLIST_REUSE",
+        "CONCRETE_BEHAVIORS_INCLUDED_IN_ABSTRACT_RESULT",
+        "NO_SECOND_FRAMEWORK"
+      ],
+      "waves": [
+        2,
+        3
+      ],
+      "documentation": "docs/architecture/cp5-post-audit.md#g",
+      "runtime_status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "runtime_hook": null
+    },
+    "H": {
+      "obligations": [
+        "QUALITY_WITH_COST",
+        "RAW_COUNTS_AND_DENOMINATORS",
+        "SAME_CORPUS_PROFILE_BUDGETS",
+        "NO_UNJUSTIFIED_QUALITY_THRESHOLD"
+      ],
+      "waves": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "documentation": "docs/architecture/cp5-post-audit.md#h",
+      "runtime_status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "runtime_hook": null
+    },
+    "I": {
+      "obligations": [
+        "HEAD_AND_BASE_AND_CHECKOUT_SHA",
+        "HEAD_AND_CHECKOUT_TREE_SHA",
+        "RUN_ID_AND_EVENT",
+        "EXACT_COMMIT_IS_NOT_TREE_EQUIVALENCE",
+        "NO_REMOTE_CALL_IN_HARNESS"
+      ],
+      "waves": [
+        5
+      ],
+      "documentation": "docs/architecture/cp5-post-audit.md#i",
+      "runtime_status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "runtime_hook": null
+    }
+  },
+  "backward_witness": {
+    "language": "TEST_ONLY_GEN_KILL",
+    "operations": [
+      "def X",
+      "use X"
+    ],
+    "OUT": [],
+    "after_use": [],
+    "before_use": [
+      "X"
+    ],
+    "after_def": [
+      "X"
+    ],
+    "before_def": [],
+    "execution": "NOT_EXECUTED",
+    "waves": [
+      2,
+      3
+    ]
+  },
+  "quality": {
+    "metrics": [
+      "queryRequests",
+      "uniqueQueries",
+      "saturations",
+      "queriesAnswered",
+      "unsupportedQueries",
+      "queriesNotMaterialized",
+      "unsupportedStorageProfiles",
+      "unsupportedEffectProfiles",
+      "modelOpenResults",
+      "sourceOpenResults",
+      "effectiveOpenResults",
+      "closedInModelResults",
+      "analysisLimits",
+      "observationLimits",
+      "consumerFailures",
+      "publicationFailures"
+    ],
+    "thresholds": null,
+    "measurements": null,
+    "coverage_equation": "uniqueQueries = queriesAnswered + unsupportedQueries + queriesNotMaterialized"
+  },
+  "future_invoke_hook": {
+    "slice": "POST_CP5_INVOKE_EFFECTS",
+    "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+    "hook": null
+  },
+  "backward_anchor_witness": {
+    "language": "TEST_ONLY_GEN_KILL",
+    "operations": [
+      "use Y",
+      "def X",
+      "use X"
+    ],
+    "IN": [
+      "Y"
+    ],
+    "OUT": [],
+    "after_last": [],
+    "before_last": [
+      "X"
+    ],
+    "after_def": [
+      "X"
+    ],
+    "before_def": [],
+    "after_first": [],
+    "before_first": [
+      "Y"
+    ],
+    "execution": "NOT_EXECUTED",
+    "waves": [
+      2,
+      3
+    ]
+  }
+}

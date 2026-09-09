@@ -88,7 +88,8 @@ refinam sites já selecionados. Callbacks seguem matches M, inclusive sobreposi�
 nunca broadcast I×K ou uma travessia completa por consumidor.
 
 ObservationPlan une `(AnalysisKey, Entry, Sequence, point, subject, projection)`.
-Deduplicar e ordenar offsets; replay uma vez do IN estável até o último ponto do lote,
+Deduplicar e ordenar offsets; replay FORWARD do IN estável em ordem primeira → última,
+ou BACKWARD do OUT estável em ordem última → primeira, até o ponto extremo do lote,
 capturando apenas facts solicitados. Não copiar estado completo por ponto. Queries
 repetidas compartilham facts imutáveis. Lookup não planejado retorna NOT_REQUESTED;
 registro tardio exige novo batch/observation epoch explícito e medido. Consumidores
@@ -105,3 +106,10 @@ incompleta apresentada como sucesso. Ordenação/encoding ficam fora do fixpoint
 [performance/métricas](../engineering/cp5-performance.md),
 [challenges](../engineering/cp5-challenges.md) e
 [evals/manifests](../evals/cp5/index.md). A aprovação arquitetural não autoriza Wave.
+
+## Reforços pós-auditoria
+
+O [contrato pós-auditoria](cp5-post-audit.md) exige integridade da projeção em W1,
+replay por direção e completion por fase. Storage/effect semantics participa de
+preparation/transfer antes do fixpoint; consumers interpretam fatos estáveis depois
+e não corrigem estado obsoleto. Entry context não fornece local invocation frames.

@@ -15,7 +15,8 @@
     "sourceScope",
     "limitReason",
     "observations",
-    "statistics"
+    "statistics",
+    "completion"
   ],
   "required_observation_fields": [
     "point",
@@ -61,5 +62,21 @@
     "precision"
   ],
   "query_behavior": "VALUE: supported query, queryReason=null; UNSUPPORTED_POINT: nonempty queryReason, null semantic fields, preserves requested point/subject; does not change run status",
-  "batch_behavior": "STABLE returns exactly one observation per unique requested (point, subject), including unsupported queries; validate coverage against the independent request plan"
+  "batch_behavior": "STABLE with observation COMPLETE returns exactly one observation per unique requested (point, subject), including unsupported queries; incomplete observation phase returns an empty atomic batch with explicit INCOMPLETE pipeline",
+  "completion": {
+    "required_fields": [
+      "pipelineStatus",
+      "publicationPolicy",
+      "admission",
+      "analysis",
+      "observation",
+      "consumers",
+      "publication"
+    ],
+    "publication_policy": "EXPLICIT_PARTIAL_BY_PHASE",
+    "observation_batch": "ATOMIC",
+    "consumer_identity": "one status per requested consumer; completed consumers retained independently",
+    "pipeline_success": "all requested phases complete, analysis STABLE, publication acknowledged",
+    "phase_limit": "observation/consumer/output LIMIT never rewrites stable analysis to ANALYSIS_LIMIT"
+  }
 }

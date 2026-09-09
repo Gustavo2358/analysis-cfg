@@ -60,3 +60,20 @@ contracaso do harness usa POM/source sintéticos em diretório temporário e nã
 compilação de engine. A prova Maven compilável será ativada em W1; o detector estrito
 já detecta a dívida existente, cuja exceção de preparação exige bytes do baseline.
 [Detalhe e parada para review](../work/cp5-follow-ups.md#cp5-f01--launcher-com-dependência-air-transitiva-no-baseline).
+
+## Remediação pós-auditoria
+
+S11/W1 cobre missing required edge/Sequence, fonte substituída/estrangeira e contexto
+incorreto/duplicado. S12/W2–W3 cobre replay backward com IN ou ordem forward; witness
+manual def X; use X. S13/W2–W3 exige oracle concreto finito independente para matar
+transfer errado compartilhado pelos dois solvers abstratos. S14/W3–W5 distingue
+fixpoint, replay, consumers e confirmação de output; S15/W3–W5 detecta ganho aparente
+por early saturation/unsupported-everything. Invoke desconhecido e reparo de state
+por consumer permanecem POST_CP5_INVOKE_EFFECTS, sem target/hook ou Wave fictícia.
+[Obrigações A–I](../evals/cp5/post-audit-contracts.json) e detalhes em
+[contrato pós-auditoria](../architecture/cp5-post-audit.md).
+
+Self-validation atual remove cada obrigação separadamente em cópia descartável,
+exige RED nominal, restaura bytes e exige segundo GREEN. Também altera snapshot de
+completion e o recibo de CI, inclusive merge sintético com árvore idêntica e claim
+falso de checkout literal. São challenges de harness, não mutantes de engine.

@@ -24,3 +24,6 @@ Métricas por probe incluem as fases posteriores; em uma ativação estrutural W
 somente as métricas cujo available_by_wave já chegou são devidas. Isso não anuncia
 as demais como medidas ou fecha o probe W3. S4b em W2 usa estado finito constante;
 W3 acrescenta dimensão de bindings/J/alocações, sem congelar container.
+
+[Obrigações pós-auditoria A–I](post-audit-contracts.json): S11–S15 e desafios futuros
+Invoke/effects, com hooks indisponíveis até a implementação autorizada.

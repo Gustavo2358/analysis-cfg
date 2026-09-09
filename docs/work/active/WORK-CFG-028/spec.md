@@ -17,3 +17,12 @@ no mesmo manifesto/branch/PR. [Estado canônico](../../cp5-lifecycle.json).
 Qualquer Java/POM novo ou alterado, módulo analysis-kernel/analysis-values, engine,
 CLI/writer, mutantes produtivos e implementações W1–W5. Siblings read-only.
 Sem solver Python alternativo. Performance ausente não é PASS ou falha de preparação.
+
+## Remediação focal A–I autorizada
+
+Esta rodada incorpora os findings da auditoria em contratos/gates/oracles, conforme
+[decisões pós-auditoria](../../../architecture/cp5-post-audit.md). O histórico B1 é
+preservado e APPROVED. A autorização atual é só de harness/docs/scripts/CI/evidência,
+na mesma branch e PR #12 draft; não autoriza W1. Sem segundo builder/AirValidator,
+sem solver Python alternativo; oracle concreto finito requerido para W2/W3, hook
+NOT_AVAILABLE_UNTIL_IMPLEMENTED agora. CP5-F01 é NONBLOCKING e continua para W1.

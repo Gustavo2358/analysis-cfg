@@ -13,13 +13,14 @@ Roadmap dos siblings permanece inalterado.
 
 | Checkpoint | Estado | Review necessário antes de iniciar |
 | --- | --- | --- |
-| Harness preparation | implemented / awaiting human review | entrega presente |
-| W1 — index/session | NOT STARTED / NOT AUTHORIZED | preparação + autorização explícita W1 |
+| Harness preparation + B1 | APPROVED | review humano registrado |
+| Post-audit remediation | implemented / awaiting human review | entrega presente A–I |
+| W1 — index/session | NOT STARTED / NOT AUTHORIZED | remediação pós-auditoria aprovada + autorização explícita W1 |
 | W2 — generic incremental solver | NOT STARTED / NOT AUTHORIZED | W1 + autorização explícita W2 |
 | W3 — PossibleValues/state/query | NOT STARTED / NOT AUTHORIZED | W2 + autorização explícita W3 |
 | W4 — shared planner/consumers | NOT STARTED / NOT AUTHORIZED | W3 + autorização explícita W4 |
 | W5 — production/E2E | NOT STARTED / NOT AUTHORIZED | W4 + autorização explícita W5 |
-| CP6 — CALL consumer | futuro, fora CP5 | review final CP5 e tarefa própria |
+| CP6 — CALL dependency slice | futuro, fora CP5 | review final CP5 e tarefa própria |
 
 ## Continuidade entre agentes/sessões
 
@@ -52,7 +53,9 @@ com homônimos, órfãs, múltiplas Entries e membership inválido. S1/S2/S4/S8 
 ledger por coluna/pass e heap do índice. Hook performance real deve nascer com
 contracasos, sem PASS documental. Maven direto air-java e inventory/javap/jdeps do
 módulo. DoD: regressões CFG, RED/restore/segundo GREEN, custo auditado e review.
-Handoff: view/cursor contextual e ownership aceitos para W2.
+W1/S11 deve verificar membership canônico e completude do profile no índice, sem
+reconstruir CFG ou repetir AirValidator. Corrigir CP5-F01 quando W1 for autorizada.
+Handoff: view/cursor contextual e ownership aceitos para W2, sem alegar frames locais.
 
 ## W2 — solver incremental e extensão (EVAL-CFG-035)
 
@@ -62,7 +65,8 @@ PossibleValues/CLI. Provar chain/diamond/cycle/self-loop, seeds, SCC sem saída,
 primeira publicação bottom backward, edges paralelas e não identidade. Segunda
 análise finita test-only com outro tipo de state e solver byte-idêntico; duas agendas
 justas e oracle independente por recomposição concordam em todos IN/OUT. S4/S4b/S8,
-Aprop e fila auditados. DoD: S4b mata recomposição ~N² mesmo semanticamente correta;
+Aprop e fila auditados. S12 prova replay backward a partir de OUT, em ordem reversa;
+S13 acrescenta oracle concreto finito independente de transfer/join/worklist. DoD: S4b mata recomposição ~N² mesmo semanticamente correta;
 OUT igual não propaga, join unchanged não enfileira, zero facts provisórios;
 RED compilável/restore/segundo GREEN. Handoff: SPI/context/result e custo revisados.
 
@@ -75,8 +79,10 @@ de mesma Cell, recusa multibase sem premissa, diamond desconhecido, k/k+1, Unico
 PARTIAL/modelScope e before/after/unsupported point. S1/S2/S3/S6/S7/S9 e S4b largo.
 Calibrar container/default k e budgets com ledger, retention, GC/JFR e liberação;
 Patricia e 8 são candidatos, sem obrigação nominal. DoD inclui snapshot isolation,
-missing-key correto, nenhuma coleção histórica e replay ≤ prefixos unidos. Handoff:
-PossibleValues real e serviço de queries revisados para W4.
+missing-key correto, nenhuma coleção histórica e replay ≤ união de prefixos FORWARD ou sufixos BACKWARD. Handoff:
+PossibleValues real e serviço de queries revisados para W4. Ampliar S12/S13 à API
+real; S14 distingue solver estável de replay limitado, S15 confronta custo e qualidade.
+Effects semânticos precedem fixpoint; lógica de consumers não repara estado obsoleto.
 
 ## W4 — planner e consumers (EVAL-CFG-037)
 
@@ -86,7 +92,8 @@ de negócio, runtime plugins ou fusão universal. Integra W3 real, sem encerrar 
 mocks. S5/S6/S8: invariância do índice/runs ao aumentar K, matches reais inclusive
 sobrepostos, mesmo batch sem replay repetido, config/Entry distintas não colidem.
 DoD: fronteiras compiladas, segunda análise intacta, falhas de consumers tipadas,
-RED/restore/GREEN. Handoff: pipeline de extração pronta para composition root.
+S14 verifica status individual por consumer e publicação parcial explícita; S15
+inclui falhas de consumers sem ocultar qualidade. RED/restore/GREEN. Handoff: pipeline de extração pronta para composition root.
 
 ## W5 — produção e E2E (EVAL-CFG-038)
 
@@ -97,12 +104,29 @@ CFG, errors input/build/analysis/output, determinismo, identidade e PARTIAL.
 Consolidar S1–S9 e S10: dois runs reais desde COBOL CP4E, regressão CP3, JARs/pins/
 hashes/comandos e equivalência memória/arquivo. Novos artefatos E2E em sibling exigem
 autorização própria; esta preparação não os cria. DoD: gates/challenges/ledgers e
-review final; limitações de transporte separadas; sem CP6 automático.
+review final; limitações de transporte separadas; sem CP6 automático. S14 testa
+falha de output sem invalidar fixpoint e sem afirmar entrega completa; S15 mede
+qualidade junto a tempo/memória. Conservar recibo real de checkout/evento/árvores.
 
 ## Evidência por checkpoint
 
 Gates locais, RED nominal, hashes de restauração, segundo GREEN, SHAs/pins/ambiente,
-logs brutos, exact HEAD e recibo remoto no mesmo PR. PASS local, PASS remoto,
+logs brutos, PR head/base, checkout SHA real, head/checkout tree SHA, run ID/evento
+e conclusão no mesmo PR. Checkout literal do HEAD difere de merge sintético com
+árvore idêntica (conteúdo-fonte equivalente ao HEAD). PASS local, PASS remoto,
 UNAVAILABLE e NOT_APPLICABLE_YET são estados distintos. CI do SHA antigo não valida
 HEAD novo. Não embutir o hash do próprio commit no arquivo commitado: recibo final
 no PR permite descoberta pelo lifecycle sem ciclo de commits de metadados.
+
+## Limites dos slices posteriores
+
+CP6 é um CALL dependency slice, incluindo consumers e quaisquer contratos prévios
+necessários de Invoke/effects em AIR/lowering/CFG; não basta adicionar CallResolver.
+PERFORM/local control exige evolução própria de controle/contexto, local.invoke,
+completion ports/resume/frames ou contrato equivalente AIR. activationEntry não
+resolve pareamento universal de retorno; sobreaproximação deve ser declarada.
+GRBE byte-slice exige storage/region/view/codec ou redução justificada; substring de
+texto lógico não prova intervalo físico. Marginais de PossibleValues não provam
+pares de campos: correlação pode exigir tuple/partition/refinement/query especializada.
+Nenhum desses slices, regions ou domínio relacional geral entra no CP5 presente.
+[Detalhe das remediações](../architecture/cp5-post-audit.md).

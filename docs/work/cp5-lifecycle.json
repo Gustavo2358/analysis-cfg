@@ -11,10 +11,10 @@
     "draft": true,
     "auto_merge": false
   },
-  "current_checkpoint": "CP5_HARNESS_PREPARATION",
+  "current_checkpoint": "CP5_POST_AUDIT_HARNESS_REMEDIATION",
   "harness_preparation": {
     "status": "implemented",
-    "review": "AWAITING_HUMAN_REVIEW"
+    "review": "APPROVED"
   },
   "authorized_wave": null,
   "last_human_approval": {
@@ -53,7 +53,7 @@
       "title": "structural index/session",
       "status": "NOT_STARTED",
       "authorization": "NOT_AUTHORIZED",
-      "requires_review_of": "HARNESS_PREPARATION",
+      "requires_review_of": "POST_AUDIT_REMEDIATION",
       "approval_evidence": null,
       "completion_evidence": null,
       "eval": "EVAL-CFG-034"
@@ -100,7 +100,7 @@
     }
   ],
   "evidence": "docs/work/evidence/WORK-CFG-028/validation.md",
-  "exact_head_policy": "final committed HEAD and CI receipt recorded on the same PR after last push; avoids self-referential commit SHA",
+  "exact_head_policy": "Record PR head/base, actual checkout, both trees, run ID/event/conclusion; distinguish exact commit checkout, equivalent source tree, and different/stale source. Final receipt on same PR avoids self-referential commit SHA.",
   "last_human_review": {
     "date": "2026-09-09",
     "source": "explicit user review of PR #12",
@@ -115,5 +115,24 @@
     ],
     "does_not_authorize_waves": true,
     "correction_evidence": "docs/work/evidence/WORK-CFG-028/review-b1/validation.md"
+  },
+  "review_history": [
+    {
+      "date": "2026-09-09",
+      "source": "explicit user post-audit remediation request",
+      "discovery": "APPROVED",
+      "harness_preparation": "APPROVED",
+      "B1": "APPROVED",
+      "CP5-F01": "NONBLOCKING_FOLLOW_UP_W1",
+      "authorized_wave": null
+    }
+  ],
+  "audit_remediation": {
+    "decision": "KEEP_ARCHITECTURE_WITH_FOCUSED_REMEDIATIONS",
+    "authorization": "HARNESS_REMEDIATION_ONLY",
+    "review": "AWAITING_HUMAN_REVIEW",
+    "start_head": "feb79d59cc72d7dbc6269b7cacfb74db58f90867",
+    "audit_sha256": "32d4542adcf31445cf35196a5f6d2496e8e3962c0bfa9d10c26615f6ceea5bc1",
+    "evidence": "docs/work/evidence/WORK-CFG-028/architectural-audit-remediation/validation.md"
   }
 }

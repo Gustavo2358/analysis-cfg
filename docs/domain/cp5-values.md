@@ -94,3 +94,13 @@ pertinentes. No linear, Assign identificado pelo replay sustenta PROGA; um liter
 arbitrário do pool não prova definição alcançável. Sem árvore de caminhos ou claim
 de testemunho concreto; causalidade RD/Def-Use completa é futura.
 [Contrato de resultado para review](../architecture/analysis-dataflow-result-v1.md).
+
+## Limites explicitados pela auditoria
+
+[Regras B–H](../architecture/cp5-post-audit.md): replay usa âncora/ordem da direção;
+Cell/texto lógico não define bytes ou codec para GRBE. PossibleValues não relacional
+produz candidatos abstratos, sem provar pares de campos nem caminhos concretos.
+Effects semantics alimenta o transfer antes do fixpoint e não pode ser substituída
+por reparo de consumers. Invoke depende de slice futuro de controle/effects; Entry
+não é frame de retorno local. W3 agrega oracle concreto finito e métricas de
+qualidade ao custo, sem domains relacionais, regions ou Liveness de produto.

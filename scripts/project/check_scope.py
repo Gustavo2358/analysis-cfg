@@ -44,13 +44,20 @@ def main() -> int:
         work = json.loads((ROOT / "docs/work/active/WORK-CFG-028/work-item.json").read_text())
         if work["authorization"] != "implementation" or work["id"] != "WORK-CFG-028":
             raise ValueError("wrong implementation checkpoint")
-        if work["checkpoint"] != "CP5_HARNESS_PREPARATION":
+        if work["checkpoint"] != "CP5_POST_AUDIT_HARNESS_REMEDIATION":
             raise ValueError("scope checker applies only to preparation, update in authorized Wave")
         sys.path.insert(0, str(ROOT / "scripts/harness"))
         from validate_cp5 import validate_cp5
         preparation_errors = validate_cp5(ROOT)
         if preparation_errors: raise ValueError("; ".join(preparation_errors))
         scopes = work["source_scope"] + work["test_scope"]
+        # The aggregate PR includes historic AGENTS/ARCHITECTURE edits. This round does not.
+        remediation_base = "feb79d59cc72d7dbc6269b7cacfb74db58f90867"
+        focal_paths = git("diff", "--name-only", remediation_base).decode().splitlines()
+        focal_paths += git("ls-files", "--others", "--exclude-standard").decode().splitlines()
+        focal_scope = ["docs", "scripts/harness", "scripts/project", ".github/workflows/ci.yml", "MANIFEST.sha256"]
+        if any(not any(p == s or p.startswith(s + "/") for s in focal_scope) for p in focal_paths):
+            raise ValueError("path outside focal post-audit remediation scope")
         # Bind the offline Java/POM inventory to Git, so editing both cannot hide a change.
         names = git("ls-tree", "-r", "--name-only", BASE).decode().splitlines()
         baseline_sources = {p:hashlib.sha256(git("show", BASE + ":" + p)).hexdigest()

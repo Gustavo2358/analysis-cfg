@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "source_start_head": "feb79d59cc72d7dbc6269b7cacfb74db58f90867",
+  "scope": "post-audit preparation working tree; final commit/source tree and remote CI recorded on PR after push",
+  "maven_environment": {
+    "JAVA_HOME": "/tmp/cp5-harness-validation/jdk",
+    "MAVEN_OPTS": "-Dmaven.repo.local=/tmp/cp5-harness-validation/m2",
+    "PATH_prefix": "/tmp/cp5-harness-validation/jdk/bin"
+  },
+  "runs": [
+    {
+      "command": "python3 -m unittest discover -s scripts/harness -p test_cp5_harness.py",
+      "exit_code": 1,
+      "verdict": "EXPECTED_RED: 49 tests, 10 nominal assertions; old validator lacks post-audit/phase obligations",
+      "log": "logs/01-tdd-red.log.gz",
+      "raw_sha256": "e876261fde11abda8201f5f1a58925c0db8dcae4fdf456d4f79ce4cf17ae3eef",
+      "gzip_sha256": "31bfb2f9c9cf6fe54286f2b3683c40438e84beb2504c23e4b168e9313a195638",
+      "raw_bytes": 8062
+    },
+    {
+      "command": "python3 -m unittest discover -s scripts/harness -p test_cp5_harness.py",
+      "exit_code": 0,
+      "verdict": "PASS: 59 tests",
+      "log": "logs/02-first-green.log.gz",
+      "raw_sha256": "75a5d62e8754123f75285bad7a094eedd62e47899d8dc63f4b8c37e193b8648c",
+      "gzip_sha256": "8da2acdf35c8514f75fd868213425c01eb480598096971783a6a36a829711dcd",
+      "raw_bytes": 158
+    },
+    {
+      "command": "bash scripts/harness/check-fast.sh",
+      "exit_code": 1,
+      "verdict": "FAIL: protocol required heading Fatiamento renamed; restored heading, did not weaken validator",
+      "log": "logs/03-fast.log.gz",
+      "raw_sha256": "0a3cd5f1861ea7080abbd6340c646149476fceecb73eb851ad42b9946cf95cb2",
+      "gzip_sha256": "c451d0b0f48bcdc165cd2058db03c6274559f193f97ae6ff085b9e06d529f874",
+      "raw_bytes": 68
+    },
+    {
+      "command": "bash scripts/harness/check-fast.sh",
+      "exit_code": 0,
+      "verdict": "PASS: 47 original + 59 CP5 tests",
+      "log": "logs/04-fast.log.gz",
+      "raw_sha256": "322af3d537218dacfec6b8d006092988a3b81c396f71d27e3178604cb8a69a82",
+      "gzip_sha256": "48ca8fb4b4bc9c54a3ac160b536726237e8bdc1ad910bbed52784fe362e52cc5",
+      "raw_bytes": 13328
+    },
+    {
+      "command": "bash scripts/harness/check-architecture.sh",
+      "exit_code": 0,
+      "verdict": "PASS: existing sources/classfiles/dependencies + 102 kernel tests",
+      "log": "logs/05-architecture.log.gz",
+      "raw_sha256": "77ced4d5ca1eca4f6da088b76798f40dae391ad18858b45e64099c926ee3ebcb",
+      "gzip_sha256": "b7c2870dd7c02fe0c2415c97f5936ca6b2bc76ed30d65c6d54cab888ed8eab3c",
+      "raw_bytes": 719359
+    },
+    {
+      "command": "bash scripts/harness/check-full.sh",
+      "exit_code": 3,
+      "verdict": "UNAVAILABLE: fast/architecture/semantic PASS; performance hook absent, stops before integration",
+      "log": "logs/06-full.log.gz",
+      "raw_sha256": "2b006affa942f5a1014be5d015454bbe88a5151cff468a8acbc2bb5ef35b3025",
+      "gzip_sha256": "515b3246d00a51269a4f57ada2d1207d4169df2865efeceea9c35af696b1db94",
+      "raw_bytes": 736364
+    },
+    {
+      "command": "bash scripts/harness/check-integration.sh",
+      "exit_code": 0,
+      "verdict": "PASS: 5 suites, 37 methods",
+      "log": "logs/07-integration.log.gz",
+      "raw_sha256": "44430cdd6bf102814314fadb5d73f942ce55f23a8bce517a544b128ace9140a8",
+      "gzip_sha256": "416d088cf476f12763a92660c383a0a0ac2f2f2e3aac8cbc1b2d9ddb1dbfa9b1",
+      "raw_bytes": 10371
+    },
+    {
+      "command": "python3 -B scripts/project/check_scope.py --update-manifest",
+      "exit_code": 0,
+      "verdict": "PASS: inventory/pins/fixture/scope/diff, before final evidence-only additions",
+      "log": "logs/08-scope.log.gz",
+      "raw_sha256": "1966c832ef099a94842cfe566cd2422e3eaf118c456614e3c0c66f0a4ae08139",
+      "gzip_sha256": "98393fe25d86eca12802ff15f6c7a88b7ac3793065fcb332b2d05273cbed6707",
+      "raw_bytes": 479
+    },
+    {
+      "command": "mvn -B -ntp clean verify",
+      "exit_code": 0,
+      "verdict": "PASS: 139 tests, zero failures/errors/skips",
+      "log": "logs/09-maven-clean-verify.log.gz",
+      "raw_sha256": "b378df75d159a446ab1fb5bff6a23e0b7c0bc289f36d537d9a9935088b34905b",
+      "gzip_sha256": "bfcfc90d892fb7b622926e57043ae90926a97c6a5bca7871f9e8408c88972a70",
+      "raw_bytes": 10319
+    }
+  ]
+}

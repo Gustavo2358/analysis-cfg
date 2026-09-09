@@ -60,7 +60,7 @@ as novas raízes converge ao mesmo menor ponto fixo das equações por recomposi
 não requer distributividade. Kills internos de strong Assign não invalidam essa
 ascensão entre iterações, nem autorizam unir OUT novo a valores mortos.
 
-Budget interrompido retorna ANALYSIS_LIMIT com causa/fase. Estados provisórios não
+Budget do solver interrompido retorna ANALYSIS_LIMIT com causa/fase. Estados provisórios não
 são upper bounds do ponto fixo ainda desconhecido e não saem como facts finais.
 STABLE afirma solução do modelo admitido, sem prometer exaustividade da fonte.
 
@@ -89,3 +89,13 @@ Chegadas coalescidas, edges paralelas, primeiras publicações, contribuições
 subsumidas e múltiplas publicações têm casos próprios. W3 adiciona facts largos:
 joinEntriesVisited/alocações podem dominar mesmo com arestas incrementais.
 [Probes](../evals/cp5/probes.json) e [métricas](../engineering/cp5-performance.md).
+
+## Observação e oracle semântico
+
+Replay FORWARD ancora no IN estável e percorre primeira → última operação. Replay
+BACKWARD ancora no OUT estável e percorre última → primeira; before/after conservam
+os mesmos pontos. W2/S12 exige o witness def X; use X (OUT={}, before use={X},
+before def={}); W3 valida batching pela união de sufixos/prefixos conforme direção.
+W2/W3/S13 exigem oracle concreto finito independente de transfer/join/worklist,
+além de expected manual e recomposição abstrata. Falha posterior não desfaz STABLE: veja
+[regras B, F e G](../architecture/cp5-post-audit.md). Hooks reais ainda indisponíveis.

@@ -19,7 +19,13 @@
           "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
           "hook": null
         }
-      }
+      },
+      "audit_requirements": [
+        "A",
+        "E",
+        "F",
+        "H"
+      ]
     },
     {
       "wave": 2,
@@ -37,7 +43,14 @@
           "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
           "hook": null
         }
-      }
+      },
+      "audit_requirements": [
+        "B",
+        "E",
+        "F",
+        "G",
+        "H"
+      ]
     },
     {
       "wave": 3,
@@ -55,7 +68,16 @@
           "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
           "hook": null
         }
-      }
+      },
+      "audit_requirements": [
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "G",
+        "H"
+      ]
     },
     {
       "wave": 4,
@@ -73,7 +95,13 @@
           "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
           "hook": null
         }
-      }
+      },
+      "audit_requirements": [
+        "C",
+        "D",
+        "F",
+        "H"
+      ]
     },
     {
       "wave": 5,
@@ -95,7 +123,12 @@
           "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
           "hook": null
         }
-      }
+      },
+      "audit_requirements": [
+        "F",
+        "H",
+        "I"
+      ]
     }
   ]
 }

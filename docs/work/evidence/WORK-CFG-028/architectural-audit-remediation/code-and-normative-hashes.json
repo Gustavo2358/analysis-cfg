@@ -1,0 +1,25 @@
+{
+  "analysis-cfg": {
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CfgGraph.java": "b8dae01e337667599de45267e2beda83f1344d9a1a73069551b89ce02b2c3cc4",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CfgNode.java": "4a446d5b8c3676c3d2cdd108b88ed28b9df8624dc4624aaea7c95a3a459990e0",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CfgTransition.java": "9d0ed378926e0c057e84e588e3fd092a2365e566326bd413e9e1394fe6d89897",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CoreCfgProjection.java": "f9233544a2d2a71caef274edd7bb3f7c41018910c2d829b7d55c9914acfe34bb",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/CfgBuildResult.java": "fb3d5abb718877c0b4716757be808f391623a4b5db50d8067f49a0198f3d2bb6",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/BuildCfg.java": "81e332367e61d46df7d982a6b29958efba10bfdba5047a908bce5699c9debebe",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/CfgBuildCoordinator.java": "7908cbb37af5ab71be43b05dd179c3e009eeaa31969a5c3e80c9c7cd072db091"
+  },
+  "air-java": {
+    "air-model/src/main/java/io/github/gustavo2358/air/model/Sequence.java": "4880b0da9c44d78b275f9161097b7d0caab7b9dac22d844aac81dea683afb295",
+    "air-model/src/main/java/io/github/gustavo2358/air/model/Entries.java": "a4b68ce44a3130f84a689d74233faaa783f7e135b9c11218e8c49067f67e1f71",
+    "air-model/src/main/java/io/github/gustavo2358/air/model/Operations.java": "b6dc81c3bb12a4ec3492576180354a9d1247bae0f4689e2dade993a2c308756a",
+    "air-model/src/main/java/io/github/gustavo2358/air/model/Memory.java": "7dd645eb1cb65adeb4f8c2c9a13f0e6981b1f9e6cd1da9d284756dc3a1cf49b2",
+    "air-model/src/main/java/io/github/gustavo2358/air/model/Proofs.java": "8493bda69f66f799e9529f5afc68c27c31d49b0abbcde8c14672ab0db528f73c"
+  },
+  "analysis-ir": {
+    "especificacao/01-modelo-e-identidades.md": "414184c62626b71bf3852455ff3427383f0c2412061c29e9f56002aa7b50a91e",
+    "especificacao/03-memoria-e-aliases.md": "81fa9bad45151c07c5742c842a7eb34a2d8e6d3d707615e572c3226f87cb5a52",
+    "especificacao/04-operacoes.md": "7c0f71f657490e6fe110fc5c43e297e9a34e6b645ec1b2d923fc3e92b70ad16a",
+    "especificacao/05-controle-e-invocacoes.md": "cf072a83d8237a65e9d97cf0775bfcabbab41e22d106cf95c320b170e41a125d",
+    "especificacao/08-contrato-de-consumidores.md": "22db0d52c0fa4011e743db5efc60bac4fc9995ed34c7a2ba2d534ac2a6128b2b"
+  }
+}

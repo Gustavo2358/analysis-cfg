@@ -72,7 +72,9 @@
           "locationKind": "WHOLE_CELL"
         }
       }
-    ]
+    ],
+    "completion_note": "Hypothetical completed publication only; no engine, consumer or output executed. Phase failure counterexamples are exercised by harness tests.",
+    "requestedConsumers": []
   },
   "result": {
     "schema": "analysis-dataflow-result",
@@ -238,6 +240,27 @@
     "statistics": {
       "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
       "measurements": null
+    },
+    "completion": {
+      "pipelineStatus": "COMPLETE",
+      "publicationPolicy": "EXPLICIT_PARTIAL_BY_PHASE",
+      "admission": {
+        "status": "COMPLETE",
+        "reason": null
+      },
+      "analysis": {
+        "status": "STABLE",
+        "reason": null
+      },
+      "observation": {
+        "status": "COMPLETE",
+        "reason": null
+      },
+      "consumers": [],
+      "publication": {
+        "status": "COMPLETE",
+        "reason": null
+      }
     }
   }
 }

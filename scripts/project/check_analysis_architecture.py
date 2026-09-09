@@ -50,7 +50,7 @@ def check_preparation_air(root: Path) -> tuple[list[str], list[str]]:
               if p.is_file() and (p.suffix == '.java' or p.name == 'pom.xml') and 'target' not in p.parts}
     if baseline_issue in errors and launcher and launcher == actual:
         errors.remove(baseline_issue)
-        findings.append('CP5-F01 OPEN_FOR_HUMAN_REVIEW: unchanged baseline cfg-launcher uses transitive AIR; '
+        findings.append('CP5-F01 NONBLOCKING_FOLLOW_UP_W1: unchanged baseline cfg-launcher uses transitive AIR; '
                         'direct-dependency compliance is NOT claimed; POM correction requires Wave scope')
     return errors, findings
 

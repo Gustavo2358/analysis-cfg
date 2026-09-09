@@ -34,7 +34,7 @@ Aprop = Σ (firstPublication(v) + semanticChanges(v)) × affectedDegree(v)
 Tindex = O(V+E+I+D+R+P+B) com passes declarados
 Tsolve = init + Σ pops × (pop + blockTransfer + comparePublished)
          + Σ contributions × (edgeTransfer + joinInto + enqueueIfChanged)
-Tquery = O(Qraw + Q log Q) + custo dos prefixos unidos + Q × lookup
+Tquery = O(Qraw + Q log Q) + custo da união de prefixos FORWARD ou sufixos BACKWARD + Q × lookup
 Textract = O(C+M+Q) + trabalho específico + O(Fout log Fout + Bout)
 
 run completo: edgeContributionJoins = edgeTransferInvocations = Aprop
@@ -64,7 +64,7 @@ Cada loop/coleção: owner, fase, coleção percorrida, cardinalidade, passes, c
 evento, allocation, retenção, liberação e ponto de instrumentação. Nova coleção O(I)
 exige entrada. Separar decode/validator, BuildCfg (preflight/sorting/Entry expansion),
 índice (nodes/declarations; payload uma vez; edges em passes CSR), preparação de
-domínio (buckets/R/P), solver (revisitas), observação (prefixo por lote), consumers
+domínio (buckets/R/P), solver (revisitas), observação (prefixo/sufixo por lote conforme direção), consumers
 (C+M) e encoding. Não inserir terceira validação nem contar openSession como prova
 de uma única travessia física.
 
@@ -114,3 +114,16 @@ report pré-fabricado não são evidência. Gate de preparação exige todos hoo
 a ativação posterior exige mudança revisada do harness junto à Wave autorizada.
 S1–S9 in-memory não qualificam AIR >16 MiB; S10 mínimo não qualifica programas grandes.
 BACKLOG-LOWER-017/018 permanecem dependências externas para essa qualificação.
+
+## Pós-auditoria: qualidade e fases
+
+[Regras F/H](../architecture/cp5-post-audit.md) exigem métricas de qualidade junto ao
+custo: requests/unique/answered/unsupported/not-materialized, profiles storage/effect
+recusados, saturations, remainders, closed-in-model, limits e falhas por fase. S15
+acompanha S3/S6/S9/S10 com mesmo corpus/profile/k/budgets e denominadores explícitos.
+Uma otimização por early saturation ou unsupported-everything deve falhar no expected
+manual de qualidade, mesmo passando tempo/memória. Nenhum threshold percentual novo.
+Overflow de contador/budget tem causa na fase que ocorreu; observação limitada não
+vira ANALYSIS_LIMIT depois do fixpoint. Métricas não disponíveis continuam null.
+S11 mede integridade no índice W1; S12 direção W2/W3; S13 oracle semântico concreto
+W2/W3; S14 completion W3–W5; S15 qualidade W3–W5. Ativar hooks somente nas Waves.

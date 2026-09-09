@@ -20,3 +20,12 @@ fast/docs/harness + architecture + semantic + integration e Maven verify preserv
 CFG/4D. scope/manifest contra base CP4. performance/full retornam UNAVAILABLE/3,
 resultado esperado e explicitamente registrado. CI roda fast (inclui CP5 harness),
 scope e gates de produto existentes; não há CI de solver/performance CP5 implementada.
+
+## Self-validation pós-auditoria
+
+Remover cada obrigação A–I (incluindo integridade, direção, effects, fases, oracle
+concreto e qualidade) exige RED nominal. Alterar witness backward, retirar contagem
+de recusas, afirmar pipeline completa com replay/consumer/output limitado, omitir
+consumer solicitado ou declarar checkout literal sem hashes/árvores também falha.
+Git temporário testa HEAD literal, merge sintético com árvore igual, árvore diferente
+e recibo stale. Provas produtivas continuam NOT_AVAILABLE_UNTIL_IMPLEMENTED.

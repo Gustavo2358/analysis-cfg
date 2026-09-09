@@ -157,7 +157,7 @@
       "id": "replay-per-query-site",
       "wave": 3,
       "probe": "S6",
-      "oracle": "operationsReplayed is union prefix, not sum per site",
+      "oracle": "operationsReplayed is directional prefix/suffix union, not sum per site",
       "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
       "target": null,
       "hook": null
@@ -275,6 +275,134 @@
       "wave": 3,
       "probe": "S6",
       "oracle": "Compare independent request plan with outcomes by full point/subject: one per unique query, including after(Return) UNSUPPORTED_POINT; omission or substitution must fail",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "missing-required-edge",
+      "wave": 1,
+      "probe": "S11",
+      "oracle": "Reject missing FALSE even if all surviving TRUE transitions are valid.",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "missing-required-sequence",
+      "wave": 1,
+      "probe": "S11",
+      "oracle": "Reject omitted AIR Sequence including unreachable/orphan Sequence.",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "foreign-sequence-source",
+      "wave": 1,
+      "probe": "S11",
+      "oracle": "Reject replacement Sequence instance, including same label/owner and altered instructions.",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "foreign-publication-entry",
+      "wave": 1,
+      "probe": "S11",
+      "oracle": "Reject foreign Publication or Entry instance even with equal-looking IDs.",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "duplicated-wrong-contextual-edge",
+      "wave": 1,
+      "probe": "S11",
+      "oracle": "Reject duplicate/context-mismatched transition; equal Branch targets retain two distinct outcomes.",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "backward-replay-from-wrong-anchor",
+      "wave": 2,
+      "probe": "S12",
+      "oracle": "use Y; def X; use X has IN={Y}, OUT={}; after last use={} rejects the wrong IN anchor independently of order.",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "backward-replay-forward-order",
+      "wave": 2,
+      "probe": "S12",
+      "oracle": "Reverse gen/kill order must preserve the manual before/after witness at each operation.",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "consumer-repairs-stale-state",
+      "wave": null,
+      "probe": null,
+      "oracle": "Future Invoke/effects slice: consumer cannot repair incorrectly preserved PROGA after BY REFERENCE may-write.",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null,
+      "future_slice": "POST_CP5_INVOKE_EFFECTS"
+    },
+    {
+      "id": "unknown-invoke-treated-as-no-effect",
+      "wave": null,
+      "probe": null,
+      "oracle": "Future Invoke/effects slice: absent effect proof must open affected storage before fixpoint.",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null,
+      "future_slice": "POST_CP5_INVOKE_EFFECTS"
+    },
+    {
+      "id": "stable-analysis-observation-limit-reported-as-full-success",
+      "wave": 3,
+      "probe": "S14",
+      "oracle": "STABLE solver + LIMIT observation => INCOMPLETE pipeline, empty atomic batch, analysis limitReason null.",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "consumer-failure-reported-as-complete-output",
+      "wave": 4,
+      "probe": "S14",
+      "oracle": "Failed consumer leaves other completed consumer status intact and pipeline INCOMPLETE.",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "performance-optimization-by-early-saturation",
+      "wave": 3,
+      "probe": "S15",
+      "oracle": "Fixed corpus/profile/k: compare manual quality counts; early saturation changes expected closed outcomes.",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "performance-optimization-by-unsupported-everything",
+      "wave": 3,
+      "probe": "S15",
+      "oracle": "Fixed admitted queries: answered/unsupported counts and expected outcomes expose refusal replacing work.",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "shared-wrong-transfer-agreement",
+      "wave": 2,
+      "probe": "S13",
+      "oracle": "Manual and finite concrete inclusion oracle reject wrong gen/kill even when two abstract solvers agree.",
       "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
       "target": null,
       "hook": null

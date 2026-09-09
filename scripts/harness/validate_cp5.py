@@ -6,6 +6,7 @@ import json
 import re
 from pathlib import Path
 from validate_docs import existing, files_under, load_json
+import cp5_audit_contract as audit
 
 BASE = 'ec525cbbad96d70c9663faa88e2672148fa8ee71'
 LIFECYCLE = 'docs/work/cp5-lifecycle.json'
@@ -39,8 +40,11 @@ maxWorklistSize joinEntriesVisited stateCompareEntries stateAllocations stateByt
 stateBytesRetained stateRootsRetained maxSparseBindings setElementsRetained valuesInterned poolHits
 bytesHashed saturations candidateSites siteMatches consumerInvocations factsEmitted queryRequests
 uniqueQueries sequencesReplayed operationsReplayed analysisRuns analysisCacheHits'''.split())
+CHALLENGES.update({k:v[0] for k,v in audit.CHALLENGES.items()})
+PROBES.update(audit.PROBES)
+METRICS.update(audit.QUALITY)
 RESULT_FIELDS = set('''schema version analysisKey publicationId unitId entryId executionStatus
-modelScope sourceScope limitReason observations statistics'''.split())
+modelScope sourceScope limitReason observations statistics completion'''.split())
 OBS_FIELDS = set('''point subject queryStatus queryReason reachability value sourceUnknownRemainder effectiveUnknownRemainder
 precision premiseRefs evidenceRefs provenanceRefs'''.split())
 QUERY_STATUSES = {'VALUE', 'UNSUPPORTED_POINT'}
@@ -48,9 +52,9 @@ UNSUPPORTED_NULL_FIELDS = {'reachability', 'value', 'sourceUnknownRemainder',
                            'effectiveUnknownRemainder', 'precision'}
 
 
-def validate_result(result: dict, requested_queries: list[dict] | None = None) -> list[str]:
+def validate_result(result: dict, requested_queries: list[dict] | None = None, requested_consumers: list[str] | None = None) -> list[str]:
     """Review shape/consistency and optional external batch coverage; no AIR execution."""
-    errors = []
+    errors = audit.validate_completion(result, requested_consumers)
     def require(ok, reason):
         if not ok: errors.append('CP5 result: ' + reason)
     try:
@@ -85,7 +89,7 @@ def validate_result(result: dict, requested_queries: list[dict] | None = None) -
         require(source['inventory'] == 'COMPLETE' or source['open'], 'PARTIAL/UNAVAILABLE cannot close source')
         require(isinstance(result['observations'], list), 'observations array')
         if status != 'STABLE': require(result['observations'] == [], 'non-stable cannot emit provisional facts')
-        if status == 'STABLE' and requested_queries is not None:
+        if status == 'STABLE' and result['completion']['observation']['status'] == 'COMPLETE' and requested_queries is not None:
             # The caller supplies the plan independently of the response. Repeated
             # requests share one outcome for the same complete point + subject.
             require(isinstance(requested_queries, list) and
@@ -154,7 +158,7 @@ def validate_result(result: dict, requested_queries: list[dict] | None = None) -
 
 
 def validate_cp5(root: Path) -> list[str]:
-    errors = []
+    errors = audit.validate_audit(root)
     def require(ok, reason):
         if not ok: errors.append('CP5: ' + reason)
     def rows(items, key, expected, label):
@@ -166,9 +170,9 @@ def validate_cp5(root: Path) -> list[str]:
         require(life['schema_version'] == 1, 'lifecycle schema')
         require(life['work_item'] == work['id'] == 'WORK-CFG-028' and life['backlog_id'] == work['backlog_id'] == 'BACKLOG-CFG-020', 'work/backlog linkage')
         require(life['branch'] == 'feat/cp5-dataflow-engine' and life['base_main'] == BASE, 'branch/main baseline')
-        require(life['current_checkpoint'] == work['checkpoint'] == 'CP5_HARNESS_PREPARATION', 'preparation checkpoint only')
+        require(life['current_checkpoint'] == work['checkpoint'] == audit.CHECKPOINT, 'preparation checkpoint only')
         require(life['authorized_wave'] is None, 'no Wave authorized')
-        require(life['harness_preparation'] == {'status':'implemented','review':'AWAITING_HUMAN_REVIEW'}, 'preparation review state')
+        require(life['harness_preparation'] == {'status':'implemented','review':'APPROVED'}, 'preparation review state')
         require(work['authorization'] == 'implementation' and work['status'] == 'active', 'harness authorization')
         policy = life['policy']
         require(policy == {'same_branch_same_pr':True,'draft_until_explicit_human_change':True,'human_review_between_waves':True,'auto_start_next_wave':False,'commits_per_wave':'unrestricted_focused','no_intermediate_merge_required':True}, 'same branch/PR and review policy')
@@ -187,7 +191,7 @@ def validate_cp5(root: Path) -> list[str]:
             n = w['wave']
             require(w['status'] == 'NOT_STARTED' and w['authorization'] == 'NOT_AUTHORIZED', 'Waves 1-5 must be NOT_STARTED / NOT_AUTHORIZED')
             require(w['approval_evidence'] is None and w['completion_evidence'] is None, 'no Wave evidence invented')
-            require(w['requires_review_of'] == ('HARNESS_PREPARATION' if n == 1 else f'WAVE_{n-1}'), 'sequential Wave review dependency')
+            require(w['requires_review_of'] == ('POST_AUDIT_REMEDIATION' if n == 1 else f'WAVE_{n-1}'), 'sequential Wave review dependency')
             require(w['eval'] == f'EVAL-CFG-{33+n:03}', 'Wave eval linkage')
         require(set(work['related_decisions']) == {f'ADR-{n:04}' for n in range(10,14)}, 'ADR routing')
         for p in ['docs/architecture/cp5-dataflow.md','docs/domain/cp5-solver.md','docs/domain/cp5-values.md','docs/engineering/cp5-performance.md','docs/engineering/cp5-challenges.md','docs/architecture/analysis-dataflow-result-v1.md','docs/product/cp5-roadmap.md',LIFECYCLE]:
@@ -223,6 +227,8 @@ def validate_cp5(root: Path) -> list[str]:
         for c in challenges['challenges']:
             require(c['wave'] == CHALLENGES.get(c['id']) and c['oracle'], 'challenge Wave/oracle')
             require(c['probe'] is None or (c['probe'] in PROBES and c['wave'] in PROBES[c['probe']]), 'challenge/probe activation')
+            if c['wave'] is None:
+                require(c.get('future_slice') == 'POST_CP5_INVOKE_EFFECTS', 'future Invoke challenge routing')
             require(c['status'] == 'NOT_AVAILABLE_UNTIL_IMPLEMENTED' and c['hook'] is None and c['target'] is None, 'no fictitious engine mutant')
         plan = load_json(root / PLAN / 'gate-plan.json')
         require(plan['work_item'] == work['id'] and plan['preparation_check'] == 'scripts/harness/validate_cp5.py', 'gate plan linkage')
@@ -232,7 +238,7 @@ def validate_cp5(root: Path) -> list[str]:
             require(set(w['gates']) == ({'architecture','semantic','performance','integration'} if w['wave']==5 else {'architecture','semantic','performance'}), 'Wave gate inventory')
             require(all(g == {'status':'NOT_AVAILABLE_UNTIL_IMPLEMENTED','hook':None} for g in w['gates'].values()), 'no empty hook product PASS')
         arch = load_json(root / PLAN / 'architecture.json')
-        require(len(arch['baseline_findings']) == 1 and arch['baseline_findings'][0]['id'] == 'CP5-F01' and arch['baseline_findings'][0]['status'] == 'OPEN_FOR_HUMAN_REVIEW', 'baseline direct AIR finding stays explicit')
+        require(len(arch['baseline_findings']) == 1 and arch['baseline_findings'][0]['id'] == 'CP5-F01' and arch['baseline_findings'][0]['status'] == 'NONBLOCKING_FOLLOW_UP_W1', 'baseline direct AIR finding stays explicit')
         require(arch['air_direct_dependency'] == {'import_prefix':'io.github.gustavo2358.air.','group':'io.github.gustavo2358','artifact':'air-java','scope':'compile'}, 'direct AIR dependency declaration')
         require(arch['modules'] == {
             'cfg-kernel':{'wave':0,'direct':['air-java'],'forbidden':['analysis-kernel','analysis-values']},
@@ -250,6 +256,7 @@ def validate_cp5(root: Path) -> list[str]:
         require(set(contract['required_result_fields']) == RESULT_FIELDS and set(contract['required_observation_fields']) == OBS_FIELDS, 'result contract minimum fields')
         require(set(contract['query_statuses']) == QUERY_STATUSES and
                 set(contract['unsupported_point_null_fields']) == UNSUPPORTED_NULL_FIELDS, 'result contract query outcomes')
+        require(contract['completion']['required_fields'] == ['pipelineStatus','publicationPolicy','admission','analysis','observation','consumers','publication'] and contract['completion']['publication_policy'] == 'EXPLICIT_PARTIAL_BY_PHASE' and contract['completion']['observation_batch'] == 'ATOMIC', 'phase completion contract')
         snapshot = load_json(root / PLAN / 'result-review.json')
         require(snapshot['design']['kind'] == 'REVIEW_SNAPSHOT' and snapshot['design']['execution'] == 'NOT_EXECUTED', 'result example is design only')
         requests = snapshot['design']['requestedQueries']
@@ -258,7 +265,7 @@ def validate_cp5(root: Path) -> list[str]:
             before, after = requests
             require(before['point']['position'] == 'BEFORE' and before['point']['outcome'] is None and
                     after == {'point': dict(before['point'], position='AFTER'), 'subject': before['subject']}, 'mixed batch before/after same point and subject')
-        errors += validate_result(snapshot['result'], requests)
+        errors += validate_result(snapshot['result'], requests, snapshot['design']['requestedConsumers'])
         require(snapshot['result']['executionStatus'] == 'STABLE', 'mixed batch must remain STABLE')
         for request, expected_status in zip(requests, ('VALUE', 'UNSUPPORTED_POINT')):
             matches = [o for o in snapshot['result']['observations']
