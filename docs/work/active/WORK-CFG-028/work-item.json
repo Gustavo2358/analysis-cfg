@@ -4,10 +4,10 @@
   "title": "CP5 — harness e cinco Waves no mesmo PR draft",
   "status": "active",
   "risk": "high",
-  "goal": "Implementar somente Wave 2: solver genérico incremental forward/backward sobre AnalysisSession W1 aprovada; sem values/consumers/CLI.",
+  "goal": "Implementar somente Wave 3: PossibleValues scalar text, sparse state e queries intra-Sequence sobre W1/W2 aprovadas; sem consumers/resolvers/CLI.",
   "authorization": "implementation",
-  "authorization_evidence": "Pedido humano de 2026-09-09 confirma APPROVED H1-H7/R1/R2 do discovery revisado e autoriza somente harness/docs/scripts, commits, push e um PR draft único para CP5. Não autoriza Wave 1 nem qualquer engine. Evidência durável em docs/work/cp5-lifecycle.json. Pedido pós-auditoria autoriza remediações focais A-I, commits/push no mesmo PR #12 draft e novo review, com harness/B1 previamente APPROVED. Nenhuma Wave autorizada. Review humano do HEAD e053f14 aprova A/B/C/D/E/G/H/I e solicita somente F1/F2/F3; correção focal, gates e push no PR #12 draft. W1 continua não autorizada. Nova decisão humana após e86a57c aprova integralmente A–I/F1/F2/F3 e autoriza somente remediação CORE-SIZE-001 do harness, commits/push no PR #12 draft. Supersede caps/budgets de capacidade; não autoriza W1. Pedido humano de 2026-09-09 aprova CORE-SIZE-001 no HEAD 4aeb4c0ad086ec4fc8911879b13139d84ca57bc9 e autoriza explicitamente WAVE_1, inclusive CP5-F01, commits/push e CI no mesmo PR #12 draft. Evidência append-only em wave-1/authorization.json. Não autoriza W2–W5. Pedido humano de 2026-09-09 aprova W1 no HEAD b84389b6ccf94c259774b82a99bc7296278b65c0 e autoriza W2, commits/push/CI no mesmo PR #12 draft; wave-2/authorization.json. W3–W5 não autorizadas.",
-  "checkpoint": "WAVE_2",
+  "authorization_evidence": "Pedido humano de 2026-09-09 confirma APPROVED H1-H7/R1/R2 do discovery revisado e autoriza somente harness/docs/scripts, commits, push e um PR draft único para CP5. Não autoriza Wave 1 nem qualquer engine. Evidência durável em docs/work/cp5-lifecycle.json. Pedido pós-auditoria autoriza remediações focais A-I, commits/push no mesmo PR #12 draft e novo review, com harness/B1 previamente APPROVED. Nenhuma Wave autorizada. Review humano do HEAD e053f14 aprova A/B/C/D/E/G/H/I e solicita somente F1/F2/F3; correção focal, gates e push no PR #12 draft. W1 continua não autorizada. Nova decisão humana após e86a57c aprova integralmente A–I/F1/F2/F3 e autoriza somente remediação CORE-SIZE-001 do harness, commits/push no PR #12 draft. Supersede caps/budgets de capacidade; não autoriza W1. Pedido humano de 2026-09-09 aprova CORE-SIZE-001 no HEAD 4aeb4c0ad086ec4fc8911879b13139d84ca57bc9 e autoriza explicitamente WAVE_1, inclusive CP5-F01, commits/push e CI no mesmo PR #12 draft. Evidência append-only em wave-1/authorization.json. Não autoriza W2–W5. Pedido humano de 2026-09-09 aprova W1 no HEAD b84389b6ccf94c259774b82a99bc7296278b65c0 e autoriza W2, commits/push/CI no mesmo PR #12 draft; wave-2/authorization.json. W3–W5 não autorizadas. Pedido humano de 2026-09-09 aprova W2 no HEAD 0202c7424db04a1d83fb5e35fce055ea81f5b8fa e autoriza W3, commits/push/CI no mesmo PR #12 draft; wave-3/authorization.json. W4–W5 não autorizadas.",
+  "checkpoint": "WAVE_3",
   "must_read": [
     "AGENTS.md",
     "docs/work/index.md",
@@ -28,7 +28,8 @@
     "docs/evals/cp5/post-audit-contracts.json",
     "docs/architecture/decisions/ADR-0014.md",
     "docs/evals/cp5/core-size-contract.json",
-    "docs/engineering/cp5-w1-index-ledger.md"
+    "docs/engineering/cp5-w1-index-ledger.md",
+    "docs/engineering/cp5-w2-solver-ledger.md"
   ],
   "related_decisions": [
     "ADR-0010",
@@ -62,11 +63,13 @@
     "MANIFEST.sha256",
     "analysis-kernel",
     "pom.xml",
-    "cfg-launcher/pom.xml"
+    "cfg-launcher/pom.xml",
+    "analysis-values"
   ],
   "test_scope": [
     "scripts/harness",
-    "analysis-kernel/src/test"
+    "analysis-kernel/src/test",
+    "analysis-values/src/test"
   ],
   "must_not_change": [
     "cfg-kernel and cfg-adapters production and existing Java tests",
@@ -74,7 +77,7 @@
     "source pins and existing product fixtures",
     "sibling repositories",
     "historical reviews and evidence",
-    "W3–W5 production: values, consumers, dataflow CLI"
+    "W4–W5 production: consumers, planners, resolvers, dataflow CLI/writer"
   ],
   "gates": [
     "fast",

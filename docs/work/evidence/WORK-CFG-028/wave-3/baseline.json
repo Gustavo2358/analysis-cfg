@@ -1,0 +1,34 @@
+{
+  "head": "0202c7424db04a1d83fb5e35fce055ea81f5b8fa",
+  "base_main": "ec525cbbad96d70c9663faa88e2672148fa8ee71",
+  "branch": "feat/cp5-dataflow-engine",
+  "pr": {
+    "number": 12,
+    "state": "OPEN",
+    "draft": true,
+    "auto_merge": false,
+    "head": "0202c7424db04a1d83fb5e35fce055ea81f5b8fa"
+  },
+  "air_java_pin": "ce530a7e17ab12b23c48f29425f503ff920b09fb",
+  "analysis_ir_pin": "122ce54e1b9ef9b00646f93ece409ca8b63bc933",
+  "sources_lock_sha256": "e68fd901f8022c82b13d7bc8119000aba40f6141d5059f9898014d8ee1743a88",
+  "request_sha256": "b681bbe952d73cf656d7173c8149fd0dfe472d78a06500ab407df20481f704b2",
+  "production_w3_before_authorization": false,
+  "w2_production_sha256": {
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/AnalysisSession.java": "10ec707fa714805ef505b4acdb7893e00ae91028b7c173bbf2fa885c7887c1c8",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexMetrics.java": "c619b33867fbdf188bb59ed0474a187cc38ff039b02d1c7e309e16d60ccf868b",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/ContextView.java": "0f55daf17d118733392d1be234e0ed4b7977eb6cdb2f82760b9c156a06d4d221",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/ProgramIndex.java": "a25767e16ba9d9cc253afc3ead52fd35ad9b4a10c19e337b81fe43223a976c90",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexBuilder.java": "f39fa1377643ee5fd6622b5a24577de73bfabcb5292321c1db268a5c0b710fe0",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/LongIntDirectory.java": "678f92ae33059200d3e43d56aba6fa73a31b6ce744fd33e9ce01c03712d27dff",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/AnalysisPoint.java": "f243349d12e22f58b1caeb312add7cb928ad61b0b4c0c2493d2cb4406093ce6a",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java": "a049e86af35e386b205db620fc1fd44fb8374533fb9a8a7082749f1e3760595b",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/Direction.java": "33793941816afe033cc668835691f93913d79da58b13189b99283529e4f428fc",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowResult.java": "49b60189ab646f721a2862764c55ef9663b928430c0e8622d5ca22a3d3041a12",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/AnalysisDefinition.java": "91f555a4c1d75a4c1e3d46274a0be5cff45a4f9a28bc57405a44b2f8e04ebba9",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/SolverTopology.java": "9de73f073009dfc7189f567af0b23fd566542b59f828716532f50f8c0e846372",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/SolverMetrics.java": "3700550bbc5667a036d33a6ee56f21d119a82af2f92fc10759a5cee1f89b0f3e",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DomainWork.java": "8cd5cd1e49b6c87fca8d939589c6abbe877887541f3d07c5264fee55eb09d7c4",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/IntWorklist.java": "45c01beaab9aa86c4e7fd8a25b56b7967c39f401d29d722c9b1a8b6c136a9a8b"
+  }
+}

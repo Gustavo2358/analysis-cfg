@@ -11,12 +11,12 @@
     "draft": true,
     "auto_merge": false
   },
-  "current_checkpoint": "WAVE_2",
+  "current_checkpoint": "WAVE_3",
   "harness_preparation": {
     "status": "implemented",
     "review": "APPROVED"
   },
-  "authorized_wave": 2,
+  "authorized_wave": 3,
   "last_human_approval": {
     "date": "2026-09-09",
     "source": "explicit user request for harness preparation",
@@ -62,20 +62,21 @@
     {
       "wave": 2,
       "title": "generic incremental solver",
-      "status": "IMPLEMENTED",
+      "status": "APPROVED",
       "authorization": "AUTHORIZED",
       "requires_review_of": "WAVE_1",
       "approval_evidence": "docs/work/evidence/WORK-CFG-028/wave-2/authorization.json",
       "completion_evidence": "docs/work/evidence/WORK-CFG-028/wave-2/validation.md",
-      "eval": "EVAL-CFG-035"
+      "eval": "EVAL-CFG-035",
+      "reviewed_head": "0202c7424db04a1d83fb5e35fce055ea81f5b8fa"
     },
     {
       "wave": 3,
       "title": "PossibleValues/state/queries",
-      "status": "NOT_STARTED",
-      "authorization": "NOT_AUTHORIZED",
+      "status": "STARTED",
+      "authorization": "AUTHORIZED",
       "requires_review_of": "WAVE_2",
-      "approval_evidence": null,
+      "approval_evidence": "docs/work/evidence/WORK-CFG-028/wave-3/authorization.json",
       "completion_evidence": null,
       "eval": "EVAL-CFG-036"
     },
@@ -213,6 +214,21 @@
         "WAVE_4",
         "WAVE_5"
       ]
+    },
+    {
+      "date": "2026-09-09",
+      "source": "explicit human request authorizing CP5 W3 in PR #12",
+      "reviewed_head": "0202c7424db04a1d83fb5e35fce055ea81f5b8fa",
+      "decision": "WAVE_2_APPROVED_AND_WAVE_3_AUTHORIZED",
+      "W2": "APPROVED",
+      "authorized_wave": 3,
+      "current_checkpoint": "WAVE_3",
+      "scope": "PossibleValues scalar text profile, sparse state, generic direction-aware batched point observations, W3 gates/evidence; commits/push/final CI in same draft PR #12",
+      "evidence": "docs/work/evidence/WORK-CFG-028/wave-3/authorization.json",
+      "not_authorized": [
+        "WAVE_4",
+        "WAVE_5"
+      ]
     }
   ],
   "audit_remediation": {
@@ -251,9 +267,15 @@
   },
   "wave_2": {
     "authorization": "docs/work/evidence/WORK-CFG-028/wave-2/authorization.json",
-    "review": "AWAITING_HUMAN_REVIEW",
+    "review": "APPROVED",
     "evidence": "docs/work/evidence/WORK-CFG-028/wave-2/",
     "validated_implementation_head": "70ff8663d1d46f765354fbabce45216e8f9b1316",
-    "final_remote_ci": "Same draft PR #12 final receipt; .harness-results/WORK-CFG-028/wave-2/remote-ci.json"
+    "final_remote_ci": "Same draft PR #12 final receipt; .harness-results/WORK-CFG-028/wave-2/remote-ci.json",
+    "reviewed_head": "0202c7424db04a1d83fb5e35fce055ea81f5b8fa"
+  },
+  "wave_3": {
+    "authorization": "docs/work/evidence/WORK-CFG-028/wave-3/authorization.json",
+    "review": "NOT_REQUESTED",
+    "evidence": "docs/work/evidence/WORK-CFG-028/wave-3/"
   }
 }

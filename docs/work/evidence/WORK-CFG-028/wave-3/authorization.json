@@ -1,0 +1,15 @@
+{
+  "date": "2026-09-09",
+  "source": "explicit human request authorizing CP5 W3 in PR #12",
+  "reviewed_head": "0202c7424db04a1d83fb5e35fce055ea81f5b8fa",
+  "decision": "WAVE_2_APPROVED_AND_WAVE_3_AUTHORIZED",
+  "W2": "APPROVED",
+  "authorized_wave": 3,
+  "current_checkpoint": "WAVE_3",
+  "scope": "PossibleValues scalar text profile, sparse state, generic direction-aware batched point observations, W3 gates/evidence; commits/push/final CI in same draft PR #12",
+  "evidence": "docs/work/evidence/WORK-CFG-028/wave-3/authorization.json",
+  "not_authorized": [
+    "WAVE_4",
+    "WAVE_5"
+  ]
+}

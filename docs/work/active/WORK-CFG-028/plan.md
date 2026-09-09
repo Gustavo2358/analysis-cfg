@@ -67,3 +67,12 @@ Sem W3–W5, sem repin ou alterações de siblings. Parar para review humano W2.
 [Validação](../../evidence/WORK-CFG-028/wave-2/validation.md): solver/oracles,
 26 mutantes válidos e gates locais executados. W2 IMPLEMENTED / AWAITING_HUMAN_REVIEW.
 Recibo CI do HEAD final no mesmo PR #12; W3–W5 não autorizadas.
+
+## WAVE_3 — checkpoint autorizado atual
+
+W2 APPROVED no HEAD 0202c7424db04a1d83fb5e35fce055ea81f5b8fa. Autorização append-only em
+[wave-3/authorization.json](../../evidence/WORK-CFG-028/wave-3/authorization.json),
+registrada antes de produção. Implementar analysis-values scalar-text-direct@1,
+Cell/disjunção, domínio sparse sem cap, strong Assign e queries batch por direção.
+Preservar fontes W1/W2 e pins; oracles reais/concretos, escala, retenção, mutantes,
+gates locais e CI do último HEAD. W4/W5 NOT_STARTED / NOT_AUTHORIZED.
