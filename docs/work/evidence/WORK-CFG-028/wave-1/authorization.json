@@ -1,0 +1,19 @@
+{
+  "date": "2026-09-09",
+  "source": "explicit human authorization to start W1 after CORE-SIZE-001 approval",
+  "reviewed_head": "4aeb4c0ad086ec4fc8911879b13139d84ca57bc9",
+  "decision": "CORE_SIZE_UNBOUNDED_REMEDIATION_APPROVED_AND_WAVE_1_AUTHORIZED",
+  "CORE_SIZE_UNBOUNDED_REMEDIATION": "APPROVED",
+  "approved": [
+    "Discovery",
+    "Harness preparation",
+    "B1",
+    "Post-audit A\u2013I",
+    "F1/F2/F3",
+    "CORE-SIZE-001 / ADR-0014"
+  ],
+  "authorized_wave": 1,
+  "current_checkpoint": "WAVE_1",
+  "scope": "structural index / analysis session and focal CP5-F01 correction only",
+  "evidence": "docs/work/evidence/WORK-CFG-028/wave-1/authorization.json"
+}

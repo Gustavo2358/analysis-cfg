@@ -4,10 +4,10 @@
   "title": "CP5 — harness e cinco Waves no mesmo PR draft",
   "status": "active",
   "risk": "high",
-  "goal": "Preparar harness normativo e operacional autodescritivo do CP5 sem engine ou Wave iniciada.",
+  "goal": "Implementar somente Wave 1: índice estrutural e AnalysisSession sobre CfgBuildResult real, sem solver/values/consumers/CLI.",
   "authorization": "implementation",
-  "authorization_evidence": "Pedido humano de 2026-09-09 confirma APPROVED H1-H7/R1/R2 do discovery revisado e autoriza somente harness/docs/scripts, commits, push e um PR draft único para CP5. Não autoriza Wave 1 nem qualquer engine. Evidência durável em docs/work/cp5-lifecycle.json. Pedido pós-auditoria autoriza remediações focais A-I, commits/push no mesmo PR #12 draft e novo review, com harness/B1 previamente APPROVED. Nenhuma Wave autorizada. Review humano do HEAD e053f14 aprova A/B/C/D/E/G/H/I e solicita somente F1/F2/F3; correção focal, gates e push no PR #12 draft. W1 continua não autorizada. Nova decisão humana após e86a57c aprova integralmente A–I/F1/F2/F3 e autoriza somente remediação CORE-SIZE-001 do harness, commits/push no PR #12 draft. Supersede caps/budgets de capacidade; não autoriza W1.",
-  "checkpoint": "CP5_CORE_SIZE_UNBOUNDED_HARNESS_REMEDIATION",
+  "authorization_evidence": "Pedido humano de 2026-09-09 confirma APPROVED H1-H7/R1/R2 do discovery revisado e autoriza somente harness/docs/scripts, commits, push e um PR draft único para CP5. Não autoriza Wave 1 nem qualquer engine. Evidência durável em docs/work/cp5-lifecycle.json. Pedido pós-auditoria autoriza remediações focais A-I, commits/push no mesmo PR #12 draft e novo review, com harness/B1 previamente APPROVED. Nenhuma Wave autorizada. Review humano do HEAD e053f14 aprova A/B/C/D/E/G/H/I e solicita somente F1/F2/F3; correção focal, gates e push no PR #12 draft. W1 continua não autorizada. Nova decisão humana após e86a57c aprova integralmente A–I/F1/F2/F3 e autoriza somente remediação CORE-SIZE-001 do harness, commits/push no PR #12 draft. Supersede caps/budgets de capacidade; não autoriza W1. Pedido humano de 2026-09-09 aprova CORE-SIZE-001 no HEAD 4aeb4c0ad086ec4fc8911879b13139d84ca57bc9 e autoriza explicitamente WAVE_1, inclusive CP5-F01, commits/push e CI no mesmo PR #12 draft. Evidência append-only em wave-1/authorization.json. Não autoriza W2–W5.",
+  "checkpoint": "WAVE_1",
   "must_read": [
     "AGENTS.md",
     "docs/work/index.md",
@@ -58,18 +58,22 @@
     "scripts/harness",
     "scripts/project",
     ".github/workflows/ci.yml",
-    "MANIFEST.sha256"
+    "MANIFEST.sha256",
+    "analysis-kernel",
+    "pom.xml",
+    "cfg-launcher/pom.xml"
   ],
   "test_scope": [
-    "scripts/harness"
+    "scripts/harness",
+    "analysis-kernel/src/test"
   ],
   "must_not_change": [
-    "any Java source or pom.xml (including new files/modules)",
-    "existing product fixtures/pins/contracts",
+    "cfg-kernel and cfg-adapters production and existing Java tests",
+    "cfg-launcher Java / CLI behavior",
+    "source pins and existing product fixtures",
     "sibling repositories",
-    "historical evidence except lifecycle/link routing",
-    "production CFG/AIR/CLI behavior",
-    "Wave 1 through Wave 5 implementation"
+    "historical reviews and evidence",
+    "W2–W5 production: solver, values, consumers, dataflow CLI"
   ],
   "gates": [
     "fast",

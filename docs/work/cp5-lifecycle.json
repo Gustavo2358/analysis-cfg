@@ -11,12 +11,12 @@
     "draft": true,
     "auto_merge": false
   },
-  "current_checkpoint": "CP5_CORE_SIZE_UNBOUNDED_HARNESS_REMEDIATION",
+  "current_checkpoint": "WAVE_1",
   "harness_preparation": {
     "status": "implemented",
     "review": "APPROVED"
   },
-  "authorized_wave": null,
+  "authorized_wave": 1,
   "last_human_approval": {
     "date": "2026-09-09",
     "source": "explicit user request for harness preparation",
@@ -51,10 +51,10 @@
     {
       "wave": 1,
       "title": "structural index/session",
-      "status": "NOT_STARTED",
-      "authorization": "NOT_AUTHORIZED",
+      "status": "STARTED",
+      "authorization": "AUTHORIZED",
       "requires_review_of": "CORE_SIZE_UNBOUNDED_REMEDIATION",
-      "approval_evidence": null,
+      "approval_evidence": "docs/work/evidence/WORK-CFG-028/wave-1/authorization.json",
       "completion_evidence": null,
       "eval": "EVAL-CFG-034"
     },
@@ -177,6 +177,25 @@
       "decision_id": "CORE-SIZE-001",
       "supersedes": "capacity-based admission, resource outcomes and candidate caps only",
       "authorized_wave": null
+    },
+    {
+      "date": "2026-09-09",
+      "source": "explicit human authorization to start W1 after CORE-SIZE-001 approval",
+      "reviewed_head": "4aeb4c0ad086ec4fc8911879b13139d84ca57bc9",
+      "decision": "CORE_SIZE_UNBOUNDED_REMEDIATION_APPROVED_AND_WAVE_1_AUTHORIZED",
+      "CORE_SIZE_UNBOUNDED_REMEDIATION": "APPROVED",
+      "approved": [
+        "Discovery",
+        "Harness preparation",
+        "B1",
+        "Post-audit A–I",
+        "F1/F2/F3",
+        "CORE-SIZE-001 / ADR-0014"
+      ],
+      "authorized_wave": 1,
+      "current_checkpoint": "WAVE_1",
+      "scope": "structural index / analysis session and focal CP5-F01 correction only",
+      "evidence": "docs/work/evidence/WORK-CFG-028/wave-1/authorization.json"
     }
   ],
   "audit_remediation": {
@@ -204,5 +223,10 @@
       "FIFO"
     ],
     "evidence": "docs/work/evidence/WORK-CFG-028/core-size-unbounded/validation.md"
+  },
+  "wave_1": {
+    "authorization": "docs/work/evidence/WORK-CFG-028/wave-1/authorization.json",
+    "review": "NOT_SUBMITTED",
+    "evidence": "docs/work/evidence/WORK-CFG-028/wave-1/"
   }
 }

@@ -1,0 +1,325 @@
+{
+  "approved_head": "4aeb4c0ad086ec4fc8911879b13139d84ca57bc9",
+  "remote_head": "4aeb4c0ad086ec4fc8911879b13139d84ca57bc9",
+  "base_main": "ec525cbbad96d70c9663faa88e2672148fa8ee71",
+  "pr": {
+    "number": 12,
+    "state": "OPEN",
+    "draft": true,
+    "auto_merge": false,
+    "verified_via": "gh pr view (remote)"
+  },
+  "request_sha256": "b73bb735878f1c146b46546fe592604e13a391302459a77ca59789d634ad6a03",
+  "repositories": {
+    "analysis-cfg": {
+      "head": "4aeb4c0ad086ec4fc8911879b13139d84ca57bc9",
+      "branch": "feat/cp5-dataflow-engine",
+      "status": ""
+    },
+    "air-java": {
+      "head": "ce530a7e17ab12b23c48f29425f503ff920b09fb",
+      "branch": "main",
+      "status": ""
+    },
+    "analysis-ir": {
+      "head": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+      "branch": "main",
+      "status": ""
+    },
+    "cobol-lower": {
+      "head": "2329993ce61b33fd7105759e211a1861ca6cb217",
+      "branch": "feat/lower-scalar-move",
+      "status": ""
+    },
+    "proleap-poc": {
+      "head": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+      "branch": "main",
+      "status": ""
+    },
+    "artefatos-e2e": {
+      "head": "2484b76f9174a79ea702f17453f04955cd46a755",
+      "branch": "main",
+      "status": "?? checkpoint-4e/\n?? cp5/"
+    }
+  },
+  "pins_sha256": "e68fd901f8022c82b13d7bc8119000aba40f6141d5059f9898014d8ee1743a88",
+  "source_pins": {
+    "schema_version": 1,
+    "observed_on": "2026-09-06",
+    "analysis_ir": {
+      "repository": "Gustavo2358/analysis-ir",
+      "commit": "122ce54e1b9ef9b00646f93ece409ca8b63bc933",
+      "semantic_version": "2.0.0",
+      "role": "normative",
+      "canonical_ref": "main",
+      "upstream_review": {
+        "pull_request": 2,
+        "state": "merged",
+        "head_commit": "a6b771e03d143e1171cfc74448d51c2eabd8478c",
+        "merge_commit": "122ce54e1b9ef9b00646f93ece409ca8b63bc933",
+        "merged_at": "2026-09-06T14:29:50Z"
+      },
+      "json_binding": {
+        "owner": "Gustavo2358/analysis-ir",
+        "identifier": "Analysis IR JSON Binding",
+        "version": "1.0.0",
+        "status": "present",
+        "maturity": "DRAFT",
+        "targets_air_version": "2.0.0",
+        "path": "bindings/json-v1.md",
+        "review_path": "bindings/revisao-json-v1.md",
+        "checked_commit": "122ce54e1b9ef9b00646f93ece409ca8b63bc933",
+        "implemented_in_analysis_cfg": false
+      },
+      "files": [
+        {
+          "path": "README.md",
+          "git_blob_sha1": "8a3363bea3d3b37d00adb5320e82df3264ccede8"
+        },
+        {
+          "path": "REFERENCIAS.md",
+          "git_blob_sha1": "1da1486a3b825308cf4a4523d5d37fd54b87e137"
+        },
+        {
+          "path": "bindings/json-v1.md",
+          "git_blob_sha1": "13340318813b3e3f83649ec2c2ee01b978215d0f"
+        },
+        {
+          "path": "bindings/revisao-json-v1.md",
+          "git_blob_sha1": "059207365a3bab6b14c6e6b980a60ea961c44eea"
+        },
+        {
+          "path": "conformidade/01-invariantes.md",
+          "git_blob_sha1": "fa1309ff20fe5e2f49fb22c58aa824d606d65053"
+        },
+        {
+          "path": "conformidade/02-oraculos.md",
+          "git_blob_sha1": "2d74c72336be02f9645749d427b54fbff4940ced"
+        },
+        {
+          "path": "especificacao/00-escopo-e-convencoes.md",
+          "git_blob_sha1": "931ef7c8e748e9ba23eb4a31c6f5158911773995"
+        },
+        {
+          "path": "especificacao/01-modelo-e-identidades.md",
+          "git_blob_sha1": "4802a29f7be3f976becbad3881399c77aa254874"
+        },
+        {
+          "path": "especificacao/02-tipos-valores-e-operandos.md",
+          "git_blob_sha1": "bab3f66ff0f40c428195cb734bff7a7629f33b4e"
+        },
+        {
+          "path": "especificacao/03-memoria-e-aliases.md",
+          "git_blob_sha1": "36ae796ab84967a3673fdf817b2b723a3cde1de3"
+        },
+        {
+          "path": "especificacao/04-operacoes.md",
+          "git_blob_sha1": "5ff3486d056a6483e6c71e1003f8599b506c0464"
+        },
+        {
+          "path": "especificacao/05-controle-e-invocacoes.md",
+          "git_blob_sha1": "3b585d0fdbae7c722497d9f64e6fe239333de7fc"
+        },
+        {
+          "path": "especificacao/06-incompletude-e-proveniencia.md",
+          "git_blob_sha1": "79263e59a6bbb6d3189d63869a79c395947568a5"
+        },
+        {
+          "path": "especificacao/07-contrato-de-produtores.md",
+          "git_blob_sha1": "3b4d013adbe460b5f5257ec206ab41c29c62b47f"
+        },
+        {
+          "path": "especificacao/08-contrato-de-consumidores.md",
+          "git_blob_sha1": "dfc1658fe4d9f88f1190edc70e0e208c4da12288"
+        },
+        {
+          "path": "especificacao/09-extensibilidade-e-compatibilidade.md",
+          "git_blob_sha1": "4e5c9a72920f4f148ff14f98681b86027c9e73ca"
+        },
+        {
+          "path": "especificacao/10-perfis-de-conformidade.md",
+          "git_blob_sha1": "82479565846393cfbe27328f856622dc52afbb79"
+        },
+        {
+          "path": "especificacao/11-rastreabilidade-bilateral.md",
+          "git_blob_sha1": "1b00a33a241268a3e83d93552a2d3d48d32c583a"
+        },
+        {
+          "path": "exemplos/00-notacao.md",
+          "git_blob_sha1": "8705f0ea2d2e61f20ab4ece8982d18ca4f913fc2"
+        },
+        {
+          "path": "exemplos/01-fluxo-e-valores.md",
+          "git_blob_sha1": "0d3312063fd3f3f10b823fdcb36287170c8a2e12"
+        },
+        {
+          "path": "exemplos/02-memoria-e-chamadas.md",
+          "git_blob_sha1": "5d224e45a4b1189c9a861dd451abdf30fb1dac04"
+        },
+        {
+          "path": "exemplos/03-extensoes-e-parcialidade.md",
+          "git_blob_sha1": "dccab11fdd53e24c716307a6616ff5326a004c8e"
+        },
+        {
+          "path": "exemplos/04-conhecimento-de-tipo.md",
+          "git_blob_sha1": "e4e029f49d73822fb2e9a1ef2411df1f651f7d57"
+        }
+      ]
+    },
+    "air_java": {
+      "repository": "Gustavo2358/air-java",
+      "commit": "ce530a7e17ab12b23c48f29425f503ff920b09fb",
+      "canonical_ref": "main",
+      "role": "shared_java_model_and_validator",
+      "library_version": "0.1.0-SNAPSHOT",
+      "upstream_review": {
+        "pull_request": 6,
+        "state": "merged",
+        "head_commit": "f3698a78b2fe8d989247bfdeaf9fd667e5db1368",
+        "merge_commit": "ce530a7e17ab12b23c48f29425f503ff920b09fb",
+        "merged_at": "2026-09-08T16:03:41Z"
+      },
+      "analysis_ir": {
+        "semantic_version": "2.0.0",
+        "commit": "122ce54e1b9ef9b00646f93ece409ca8b63bc933"
+      },
+      "maven": {
+        "group_id": "io.github.gustavo2358",
+        "artifact_id": "air-java",
+        "version": "0.1.0-SNAPSHOT"
+      },
+      "java": {
+        "release": 21,
+        "preview": false
+      },
+      "release_status": "no_tag_or_release_observed",
+      "ci": {
+        "workflow": ".github/workflows/ci.yml",
+        "check_name": "contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "checked_commit": "ce530a7e17ab12b23c48f29425f503ff920b09fb",
+        "url": "https://github.com/Gustavo2358/air-java/actions/runs/34248728661",
+        "harness_url": "https://github.com/Gustavo2358/air-java/actions/runs/34248728645"
+      },
+      "read_paths": [
+        "README.md",
+        "pom.xml",
+        "ARCHITECTURE.md",
+        "docs/implementation-status.md",
+        "docs/model-catalog.md",
+        "docs/reconciliation-air-2.md",
+        "docs/sources.lock.json",
+        "docs/validation-evidence.md",
+        "air-model/src/main/java/io/github/gustavo2358/air/model/Publication.java",
+        "air-model/src/main/java/io/github/gustavo2358/air/model/Sequence.java",
+        "air-model/src/main/java/io/github/gustavo2358/air/model/Terminator.java",
+        "air-model/src/main/java/io/github/gustavo2358/air/model/Operations.java",
+        "air-model/src/main/java/io/github/gustavo2358/air/model/Interactions.java",
+        "air-model/src/main/java/io/github/gustavo2358/air/model/Control.java",
+        "air-model/src/main/java/io/github/gustavo2358/air/model/Origins.java",
+        "air-model/src/main/java/io/github/gustavo2358/air/model/Proofs.java",
+        "air-model/src/main/java/io/github/gustavo2358/air/validation/AirValidator.java",
+        "air-model/pom.xml",
+        "air-json/pom.xml",
+        "air-json/src/main/java/io/github/gustavo2358/air/json/AirJson.java",
+        "docs/engineering/air-json.md",
+        "air-model/src/main/java/io/github/gustavo2358/air/model/Memory.java",
+        "air-model/src/main/java/io/github/gustavo2358/air/model/Places.java",
+        "air-model/src/main/java/io/github/gustavo2358/air/model/Expressions.java",
+        "air-model/src/main/java/io/github/gustavo2358/air/model/Values.java",
+        "air-json/src/test/resources/scalar-assign.canonical.json"
+      ],
+      "observed_on": "2026-09-08",
+      "modules": {
+        "parent": {
+          "path": "pom.xml",
+          "artifact_id": "air-java-parent"
+        },
+        "model": {
+          "path": "air-model/pom.xml",
+          "artifact_id": "air-java",
+          "role": "shared_model_and_validator"
+        },
+        "codec": {
+          "path": "air-json/pom.xml",
+          "artifact_id": "air-json",
+          "role": "shared_codec_4B_scalar_assign_consumed_by_cfg_adapters",
+          "coverage": "1A GOBACK plus Object/Cell/Assign text, ObjectPlace, Literal TextValue and known(text); not full AIR binding"
+        }
+      }
+    },
+    "proleap_poc": {
+      "repository": "Gustavo2358/proleap-poc",
+      "main_commit": "7a376f33f55127f53c63b86d3228671b9c6a348d",
+      "role": "cobol_frontend_and_semantic_product_producer",
+      "java_release": 17,
+      "public_boundary": "cobol_semantic_product",
+      "json_product": "cobol-semantic-product",
+      "merged_reviews": [
+        {
+          "pull_request": 27,
+          "head_commit": "c9f1da3798f26535896a45f8da3efb97a9e58e5a",
+          "merge_commit": "107ce08a6d73a6a328f6d81e1ed859e9d92e86e5",
+          "merged_at": "2026-09-05T22:32:54Z"
+        },
+        {
+          "pull_request": 29,
+          "head_commit": "d0aa543f8ca1921d41ea79b4b8af1a214a576714",
+          "merge_commit": "001547f35cb9c658af2832e490d719194401ad45",
+          "merged_at": "2026-09-06T10:17:03Z"
+        },
+        {
+          "pull_request": 30,
+          "head_commit": "a8f7596391b63723d43fc58627abf0d2cf429a64",
+          "merge_commit": "7a376f33f55127f53c63b86d3228671b9c6a348d",
+          "merged_at": "2026-09-06T12:01:07Z"
+        }
+      ],
+      "read_paths": [
+        "AGENTS.md",
+        "pom.xml",
+        "ARCHITECTURE.md",
+        "docs/architecture/decisions/0013-cobol-semantic-product-precedes-language-neutral-lowering.md",
+        "docs/architecture/semantic-product-air-v2-audit.md",
+        "docs/domain/cobol-semantic-product.md",
+        "docs/work/history/WORK-SEMANTIC-PRODUCT-003.md"
+      ]
+    },
+    "cobol_lower": {
+      "repository": "Gustavo2358/cobol-lower",
+      "status": "planned_upstream_component",
+      "commit": null,
+      "api": null,
+      "role": "semantic_product_to_air_publication",
+      "evidence": "repository absent from owner repository inventory; boundary planned in proleap-poc"
+    },
+    "external": [
+      {
+        "id": "REF-CLEAN",
+        "url": "https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html",
+        "role": "dependency_rule"
+      },
+      {
+        "id": "REF-HEX",
+        "url": "https://alistair.cockburn.us/hexagonal-architecture",
+        "role": "ports_adapters"
+      },
+      {
+        "id": "REF-LLVM",
+        "url": "https://www.llvm.org/docs/LangRef.html",
+        "role": "terminator_reference_not_IR_authority"
+      },
+      {
+        "id": "REF-MAVEN",
+        "url": "https://maven.apache.org/guides/mini/guide-multiple-modules.html",
+        "role": "reactor"
+      },
+      {
+        "id": "REF-RHS",
+        "url": "https://research.cs.wisc.edu/wpis/abstracts/popl95.abs.html",
+        "role": "reading_lead_abstract_not_algorithm_adoption"
+      }
+    ]
+  }
+}

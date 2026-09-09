@@ -2,30 +2,25 @@
 
 ## Onde estamos
 
-CP5_CORE_SIZE_UNBOUNDED_HARNESS_REMEDIATION implementada / awaiting human review.
-Pós-auditoria A–I/F1/F2/F3 APPROVED no HEAD e86a57c1f744bd499dd47326ebcb84d23c61ab2d.
-[Lifecycle append-only](../../cp5-lifecycle.json) preserva os reviews anteriores e
-registra a nova autorização, somente harness. Branch feat/cp5-dataflow-engine,
-[PR #12 OPEN/DRAFT](https://github.com/Gustavo2358/analysis-cfg/pull/12).
-authorized_wave=null; W1–W5 NOT_STARTED / NOT_AUTHORIZED.
+WAVE_1 STARTED / AUTHORIZED. Review humano aprova CORE-SIZE-001 no HEAD
+4aeb4c0ad086ec4fc8911879b13139d84ca57bc9 e autoriza somente índice/session e CP5-F01.
+[Autorização append-only](../../evidence/WORK-CFG-028/wave-1/authorization.json).
+Branch feat/cp5-dataflow-engine; PR #12 confirmado OPEN/DRAFT nesse mesmo HEAD.
+W2–W5 NOT_STARTED / NOT_AUTHORIZED; authorized_wave=1.
 
 ## Verde conhecido
 
-[Evidência desta remediação](../../evidence/WORK-CFG-028/core-size-unbounded/validation.md)
-registra testes de contratos, gates aplicáveis e limitações. Aprovação arquitetural
-não é PASS de engine. [Evidência F anterior](../../evidence/WORK-CFG-028/review-f/validation.md)
-é histórica e permanece intacta; seus outcomes de capacidade foram supersedidos.
+Baseline fast: 47 testes originais + 83 CP5; nenhuma implementação W1 validada ainda.
+[Baseline e pins](../../evidence/WORK-CFG-028/wave-1/baseline.json).
 
 ## Restante
 
-Review humano de CORE-SIZE-001 e autorização explícita W1 em tarefa separada,
-na mesma branch/PR. Sem merge, auto-merge ou ready; nenhuma Wave automática.
+Implementar W1 com oracles, challenges compiláveis, métricas/ledger/retenção;
+regressões, gates W1, commits/push e recibo CI do HEAD publicado. Parar para review.
 
 ## Descobertas que afetam o plano
 
-Performance/full CP5 continuam UNAVAILABLE; não há hooks de engine implementados.
-CP5-F01 permanece NONBLOCKING/follow-up W1, sem POM modificado. [Dívidas de
-capacidade](../../cp5-follow-ups.md#size-cap-debts): upstream codec/validator e
-adapters/propagação legados ainda têm caps. A futura engine nasce sem size-based
-admission; a pipeline inteira ainda não pode receber esse claim. Migração produtiva
-é posterior, sem desabilitar validação, streaming/retry/ECS nesta sessão.
+CfgGraph protege arestas individuais, mas permite inventário mutilado e payload
+substituído com IDs iguais. W1 verifica completude e instâncias canônicas.
+CP5-F01 ainda aberto até correção produtiva e gate estrito. Pins inalterados;
+upstream/transport size-cap debts continuam fora desta Wave.
