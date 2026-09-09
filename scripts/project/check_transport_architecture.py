@@ -21,6 +21,8 @@ DIRECT_DEPENDENCIES = {
                      ("org.junit.jupiter", "junit-jupiter", "test")],
     "cfg-launcher": [("io.github.gustavo2358.analysis", "cfg-adapters", "compile"),
                      ("io.github.gustavo2358.analysis", "cfg-kernel", "compile"),
+                     ("io.github.gustavo2358", "air-java", "compile"),
+                     ("io.github.gustavo2358", "air-json", "compile"),
                      ("org.junit.jupiter", "junit-jupiter", "test")],
 }
 

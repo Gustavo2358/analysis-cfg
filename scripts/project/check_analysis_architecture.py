@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 """Direct AIR Maven dependencies now; reusable CP5 package checks for future bytecode hooks."""
 from __future__ import annotations
-import hashlib
-import json
 import re
 import sys
 import xml.etree.ElementTree as ET
@@ -39,31 +37,14 @@ def forbidden_dependencies(role: str, dependencies: list[str], rules: dict) -> l
     return [dep for dep in dependencies if any(token in dep.replace('/', '.') for token in denied)]
 
 
-def check_preparation_air(root: Path) -> tuple[list[str], list[str]]:
-    errors = check_direct_air(root)
-    baseline_issue = 'AIR imports require direct compile air-java dependency: cfg-launcher/pom.xml'
-    findings = []
-    inventory = json.loads((root / 'docs/evals/cp5/preparation-source-inventory.json').read_text())
-    launcher = {p:h for p,h in inventory['files'].items() if p.startswith('cfg-launcher/')}
-    actual = {str(p.relative_to(root)):hashlib.sha256(p.read_bytes()).hexdigest()
-              for p in (root / 'cfg-launcher').rglob('*')
-              if p.is_file() and (p.suffix == '.java' or p.name == 'pom.xml') and 'target' not in p.parts}
-    if baseline_issue in errors and launcher and launcher == actual:
-        errors.remove(baseline_issue)
-        findings.append('CP5-F01 NONBLOCKING_FOLLOW_UP_W1: unchanged baseline cfg-launcher uses transitive AIR; '
-                        'direct-dependency compliance is NOT claimed; POM correction requires Wave scope')
-    return errors, findings
-
 
 def main() -> int:
     try:
-        errors, findings = check_preparation_air(ROOT)
-        for finding in findings: print('[analysis-architecture] ' + finding)
+        errors = check_direct_air(ROOT)
         if errors:
             for error in errors: print('[analysis-architecture] FAIL: ' + error, file=sys.stderr)
             return 1
-        print('[analysis-architecture] PASS: preparation dependency guard, except explicit baseline finding; '
-              'future CP5 bytecode gates NOT_AVAILABLE_UNTIL_IMPLEMENTED')
+        print('[analysis-architecture] PASS: direct AIR dependencies; no preparation exception')
         return 0
     except (OSError, ET.ParseError) as exc:
         print('[analysis-architecture] FAIL: ' + str(exc), file=sys.stderr)
