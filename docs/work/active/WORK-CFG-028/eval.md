@@ -44,3 +44,17 @@ identidade/hash/destino não contradiz outcome observado. F3: StructuralConsumer
 COMPLETE + QueryConsumer bloqueado por batch FAILED controlado; zero análises,
 análise sem replay, consumer independente com falha e batches independentes.
 Partialidade por recursos é proibida. Provas de runtime continuam indisponíveis.
+
+## WAVE_1 — provas reais
+
+EVAL-CFG-034 agora é executável: AdmissionTest e StructureTest fornecem expected
+manual e contracasos; ScaleTest executa BuildCfg e a sessão real para S1/S2/S4/S8/S16.
+S11 é a admissão adversarial da primeira suíte. O gate nominal lista explicitamente
+métodos esperados e rejeita ausência/skip/falha ou medições omitidas.
+
+check_w1.py architecture inspeciona sources/classfiles, javap, jdeps e Maven;
+challenge_w1.py aplica 15 mutantes compiláveis e exige motivo RED nominal,
+restauração byte-exact e segundo GREEN. Testes de harness preservam contratos
+W2–W5 e recusam ativação automática, inventário oculto e hooks vazios.
+Não há thresholds semânticos de tempo/heap. Full global conserva UNAVAILABLE/3
+para W2–W5 mesmo depois de executar os probes W1.

@@ -59,36 +59,36 @@
       "wave": 1,
       "probe": "S2",
       "oracle": "referencesResolved/structuralVisits follows R, not I×D",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexBuilder.java",
+      "hook": "scripts/project/challenge_w1.py"
     },
     {
       "id": "scan-global-successors",
       "wave": 1,
       "probe": "S4",
       "oracle": "edge access follows contextual adjacency",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/ContextView.java",
+      "hook": "scripts/project/challenge_w1.py"
     },
     {
       "id": "identity-by-display-name",
       "wave": 1,
       "probe": "S8",
       "oracle": "same names different full owners; sparse ordinals; renaming",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/ProgramIndex.java",
+      "hook": "scripts/project/challenge_w1.py"
     },
     {
       "id": "ignore-activation-entry",
       "wave": 1,
       "probe": "S8",
       "oracle": "distinct entries and seeds/exits remain isolated",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/ContextView.java",
+      "hook": "scripts/project/challenge_w1.py"
     },
     {
       "id": "missing-key-as-bottom",
@@ -239,9 +239,9 @@
       "wave": 1,
       "probe": null,
       "oracle": "remove direct air-java dependency; build still compiles transitively but architecture rejects",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "cfg-launcher/pom.xml",
+      "hook": "scripts/project/challenge_w1.py"
     },
     {
       "id": "cache-ignores-options-entry",
@@ -284,45 +284,45 @@
       "wave": 1,
       "probe": "S11",
       "oracle": "Reject missing FALSE even if all surviving TRUE transitions are valid.",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexBuilder.java",
+      "hook": "scripts/project/challenge_w1.py"
     },
     {
       "id": "missing-required-sequence",
       "wave": 1,
       "probe": "S11",
       "oracle": "Reject omitted AIR Sequence including unreachable/orphan Sequence.",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexBuilder.java",
+      "hook": "scripts/project/challenge_w1.py"
     },
     {
       "id": "foreign-sequence-source",
       "wave": 1,
       "probe": "S11",
       "oracle": "Reject replacement Sequence instance, including same label/owner and altered instructions.",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexBuilder.java",
+      "hook": "scripts/project/challenge_w1.py"
     },
     {
       "id": "foreign-publication-entry",
       "wave": 1,
       "probe": "S11",
       "oracle": "Reject foreign Publication or Entry instance even with equal-looking IDs.",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexBuilder.java",
+      "hook": "scripts/project/challenge_w1.py"
     },
     {
       "id": "duplicated-wrong-contextual-edge",
       "wave": 1,
       "probe": "S11",
       "oracle": "Reject duplicate/context-mismatched transition; equal Branch targets retain two distinct outcomes.",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexBuilder.java",
+      "hook": "scripts/project/challenge_w1.py"
     },
     {
       "id": "backward-replay-from-wrong-anchor",
@@ -430,45 +430,45 @@
       "wave": 1,
       "probe": "S16",
       "oracle": "Valid supported N/2N/4N all remain ACCEPTED.",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexBuilder.java",
+      "hook": "scripts/project/challenge_w1.py"
     },
     {
       "id": "max-nodes-admission",
       "wave": 1,
       "probe": "S16",
       "oracle": "Changing only node count cannot change admission.",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexBuilder.java",
+      "hook": "scripts/project/challenge_w1.py"
     },
     {
       "id": "max-edges-admission",
       "wave": 1,
       "probe": "S16",
       "oracle": "Changing only edge count cannot change admission.",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexBuilder.java",
+      "hook": "scripts/project/challenge_w1.py"
     },
     {
       "id": "max-operations-admission",
       "wave": 1,
       "probe": "S16",
       "oracle": "Changing only operation count cannot change admission.",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexBuilder.java",
+      "hook": "scripts/project/challenge_w1.py"
     },
     {
       "id": "max-objects-admission",
       "wave": 1,
       "probe": "S16",
       "oracle": "Changing only object count cannot change admission.",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexBuilder.java",
+      "hook": "scripts/project/challenge_w1.py"
     },
     {
       "id": "max-visits-aborts-analysis",

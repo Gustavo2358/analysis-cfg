@@ -44,7 +44,7 @@ major 65/minor 0, dependências/classpath, javap e jdeps. Imports complementam b
   Header e os cinco tipos Instruction; Dispatch/Invoke/Raise/Opaque,
   LocalInvoke/Boundary/Resume/Unwind e IndirectJump continuam proibidos;
 - descriptors da porta, resultado, HaltExit.source e listas tipadas do produto;
-- adapters depende de kernel/air-java/air-json; launcher de adapters/kernel;
+- adapters depende de kernel/air-java/air-json; launcher de adapters/kernel/air-java/air-json;
 - inventário explícito em scripts/project/transport-inventory.json contém cada fonte,
   import, classfile e dependência bytecode dos módulos externos; Maven DAG efetivo
   também é exato, sem frontend ou ciclo; modelo air-java não aponta para CFG/codec;
@@ -138,14 +138,23 @@ check_scope.py agora usa a main CP4 ec525cbbad96d70c9663faa88e2672148fa8ee71,
 compara inventory contra objetos Git e limita o diff a docs/harness/CI necessários.
 CI inclui scope/manifest e fetch-depth 0 para checar a base exata.
 
-check_analysis_architecture.py detecta imports AIR sem dependência Maven direta.
-CP5-F01 (launcher do baseline) é finding aberto e não conformidade declarada;
-a exceção de preparação vale só nos bytes Java/POM originais. Módulos novos não têm
-exceção. Nenhum POM foi alterado para corrigir produto fora do escopo.
+check_analysis_architecture.py exige dependência Maven AIR direta em todos os módulos,
+sem exceção residual de preparação. CP5-F01 foi corrigido declarativamente na W1.
 
-[Performance/métricas](cp5-performance.md), [challenges](cp5-challenges.md) e
-[rotas por Wave](../evals/cp5/gate-plan.json). check_cp5_gate.py reporta exit 3 para
-runtime ausente; isso não é o hook performance produtivo. Performance/full existentes
-continuam UNAVAILABLE/3; não há CI de performance ou semântica de engine nesta entrega.
-A CI valida harness e regressões CFG. Novos hooks exigem execução nominal, probes,
-contracasos e review na Wave, não apenas alteração de status em JSON.
+## WAVE_1 produtiva
+
+analysis-kernel integra o reactor e o gate arquitetural: sources/classfiles exatos,
+DAG direto cfg-kernel + air-java, javap/jdeps e proibição de dependências W2+.
+O launcher declara air-java/air-json diretamente; seu Java e CLI são byte-exact.
+
+check_cp5_gate.py architecture/semantic/performance --wave 1 executa hooks reais.
+Semântica W1 exige 20 métodos nominais; performance exige os 26 métodos W1, incluindo
+S1/S2/S4/S8/S11/S16, contadores e walk de retenção. Nenhum gate infere PASS de hooks
+ou documentos presentes. Campanha de 15 mutantes exige compile/RED/restore/GREEN.
+
+Fast valida contratos W1 e W2–W5 indisponíveis. Architecture/integration/Maven
+preservam as regressões 139 CFG/transporte, mais 26 testes W1. Semantic CFG conserva
+seus 84 métodos nominais. CI executa separadamente o hook performance W1.
+Full roda os probes W1 e registra W1 PASS, mas retorna UNAVAILABLE/3 pela ausência
+W2–W5. Performance global permanece UNAVAILABLE. A W1 não certifica full CP5.
+[Ledger](cp5-w1-index-ledger.md), [evidência](../work/evidence/WORK-CFG-028/wave-1/validation.md).

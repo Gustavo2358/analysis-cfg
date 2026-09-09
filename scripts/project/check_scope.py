@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check CP5 preparation diff scope, fixed upstream authority and a complete tracked/untracked delivery manifest."""
+"""Check CP5 Wave 1 diff scope, fixed upstream authority and a complete tracked/untracked delivery manifest."""
 from __future__ import annotations
 import argparse
 import hashlib
@@ -27,7 +27,7 @@ def files() -> list[str]:
 
 
 def manifest() -> bytes:
-    lines = ["# SHA-256 da entrega CP5 harness; inclui arquivos versionáveis, exclui este manifesto e artefatos ignorados."]
+    lines = ["# SHA-256 da entrega CP5 W1; inclui arquivos versionáveis, exclui este manifesto e artefatos ignorados."]
     lines += [hashlib.sha256((ROOT / path).read_bytes()).hexdigest() + "  " + path for path in files()]
     return ("\n".join(lines) + "\n").encode()
 
@@ -39,37 +39,36 @@ def main() -> int:
     try:
         if git("merge-base", "--is-ancestor", BASE, "HEAD") != b"":
             raise ValueError("baseline ancestry not established")
-        if git("diff", "--name-only", BASE, "--", "cfg-kernel", "cfg-adapters", "cfg-launcher", "pom.xml", "docs/sources/sources.lock.json"):
-            raise ValueError("production differs from authorized baseline")
+        approved = "4aeb4c0ad086ec4fc8911879b13139d84ca57bc9"
+        if git("diff", "--name-only", approved, "--", "cfg-kernel", "cfg-adapters", "cfg-launcher/src", "docs/sources/sources.lock.json"):
+            raise ValueError("unapproved product/pin changes outside W1")
         work = json.loads((ROOT / "docs/work/active/WORK-CFG-028/work-item.json").read_text())
         if work["authorization"] != "implementation" or work["id"] != "WORK-CFG-028":
             raise ValueError("wrong implementation checkpoint")
-        if work["checkpoint"] != "CP5_CORE_SIZE_UNBOUNDED_HARNESS_REMEDIATION":
-            raise ValueError("scope checker applies only to preparation, update in authorized Wave")
+        if work["checkpoint"] != "WAVE_1":
+            raise ValueError("scope checker authorizes WAVE_1 only")
         sys.path.insert(0, str(ROOT / "scripts/harness"))
         from validate_cp5 import validate_cp5
         preparation_errors = validate_cp5(ROOT)
         if preparation_errors: raise ValueError("; ".join(preparation_errors))
         scopes = work["source_scope"] + work["test_scope"]
         # The aggregate PR includes historic AGENTS/ARCHITECTURE edits. This round does not.
-        remediation_base = "e86a57c1f744bd499dd47326ebcb84d23c61ab2d"
+        remediation_base = approved
         focal_paths = git("diff", "--name-only", remediation_base).decode().splitlines()
         focal_paths += git("ls-files", "--others", "--exclude-standard").decode().splitlines()
-        focal_scope = ["docs", "scripts/harness", "scripts/project", ".github/workflows/ci.yml", "MANIFEST.sha256"]
+        focal_scope = ["docs", "scripts/harness", "scripts/project", ".github/workflows/ci.yml", "MANIFEST.sha256", "pom.xml", "cfg-launcher/pom.xml", "analysis-kernel"]
         if any(not any(p == s or p.startswith(s + "/") for s in focal_scope) for p in focal_paths):
             raise ValueError("path outside focal post-audit remediation scope")
-        # CORE-SIZE-001 supersedes capacity only. Keep unrelated audit semantics and CI.
         def baseline_json(path): return json.loads(git("show", remediation_base + ":" + path))
         audit_path = "docs/evals/cp5/post-audit-contracts.json"
         before = baseline_json(audit_path)
         after = json.loads((ROOT/audit_path).read_text())
         for value in [before, after]:
-            for key in ["F", "H"]: value["requirements"].pop(key)
-            value.pop("quality")
-        if before != after: raise ValueError("size-only scope: unrelated approved audit contracts changed")
-        for path in [".github/workflows/ci.yml", "scripts/project/ci_source_receipt.py"]:
+            for row in value["requirements"].values(): row.pop("wave_hooks",None)
+        if before != after: raise ValueError("W1 scope: approved audit semantics changed")
+        for path in ["scripts/project/ci_source_receipt.py", "docs/evals/cp5/result-contract.json", "docs/evals/cp5/result-review.json", "docs/evals/cp5/phase-review.json", "docs/evals/cp5/core-size-review.json"]:
             if (ROOT/path).read_bytes() != git("show", remediation_base + ":" + path):
-                raise ValueError("size-only scope: approved CI receipt changed: " + path)
+                raise ValueError("W1 scope: future-wave contract/CI receipt changed: " + path)
         # Historical reviews/evidence are append-only, including previous await-review snapshots.
         life = json.loads((ROOT/"docs/work/cp5-lifecycle.json").read_text())
         old_life = baseline_json("docs/work/cp5-lifecycle.json")
@@ -78,7 +77,7 @@ def main() -> int:
         for key in ["last_human_review", "last_human_approval", "audit_remediation", "f_correction"]:
             if life[key] != old_life[key]: raise ValueError("historical decision rewritten: " + key)
         historical = git("diff", "--name-only", remediation_base, "--", "docs/work/evidence").decode().splitlines()
-        if any(not p.startswith("docs/work/evidence/WORK-CFG-028/core-size-unbounded/") for p in historical):
+        if any(not p.startswith("docs/work/evidence/WORK-CFG-028/wave-1/") for p in historical):
             raise ValueError("historical evidence changed")
         # Bind the offline Java/POM inventory to Git, so editing both cannot hide a change.
         names = git("ls-tree", "-r", "--name-only", BASE).decode().splitlines()
@@ -87,10 +86,9 @@ def main() -> int:
         inventory = json.loads((ROOT / "docs/evals/cp5/preparation-source-inventory.json").read_text())
         if inventory["files"] != baseline_sources:
             raise ValueError("preparation source inventory differs from immutable Git baseline")
-        from check_analysis_architecture import check_preparation_air
-        violations, findings = check_preparation_air(ROOT)
+        from check_analysis_architecture import check_direct_air
+        violations = check_direct_air(ROOT)
         if violations: raise ValueError("; ".join(violations))
-        for finding in findings: print("[scope] " + finding)
         changed = set(git("diff", "--name-only", "-z", BASE).decode().split("\0"))
         changed |= set(git("ls-files", "-z", "--others", "--exclude-standard").decode().split("\0"))
         outside = sorted(p for p in changed if p and not any(p == scope or p.startswith(scope + "/") for scope in scopes))
@@ -110,7 +108,7 @@ def main() -> int:
         elif (ROOT / "MANIFEST.sha256").read_bytes() != expected:
             raise ValueError("delivery manifest mismatch; review diff before --update-manifest")
         git("diff", "--check")
-        print("[scope/manifest] PASS: CP4 baseline, unchanged Java/POM/product, authorized harness paths/pins/DRAFT, AIR fixture hash and exact delivery manifest")
+        print("[scope/manifest] PASS: CP4 + approved W1 baseline, unchanged legacy Java/pins, W1 production scope/DRAFT, AIR fixture hash and exact delivery manifest")
         return 0
     except (GateFailure, ValueError, OSError, subprocess.CalledProcessError) as exc:
         print("[scope/manifest] FAIL: " + str(exc), file=sys.stderr); return 1

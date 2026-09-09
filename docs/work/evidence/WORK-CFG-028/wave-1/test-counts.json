@@ -1,0 +1,25 @@
+{
+  "suite_count": 16,
+  "tests": 165,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "suite_lines": [
+    "[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.036 s -- in io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistryTest",
+    "[INFO] Tests run: 20, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.133 s -- in io.github.gustavo2358.analysis.cfg.domain.EvalCfg030Test",
+    "[INFO] Tests run: 25, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.107 s -- in io.github.gustavo2358.analysis.cfg.domain.EvalCfg029Test",
+    "[INFO] Tests run: 22, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.043 s -- in io.github.gustavo2358.analysis.cfg.domain.EvalCfg028Test",
+    "[INFO] Tests run: 17, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.025 s -- in io.github.gustavo2358.analysis.cfg.domain.EvalCfg025Test",
+    "[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.006 s -- in io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinatorTest",
+    "[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.005 s -- in io.github.gustavo2358.analysis.cfg.application.BuildCfgContractTest",
+    "[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.004 s -- in io.github.gustavo2358.analysis.cfg.application.CfgPreflightTest",
+    "[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.222 s -- in io.github.gustavo2358.analysis.structure.ScaleTest",
+    "[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.019 s -- in io.github.gustavo2358.analysis.structure.StructureTest",
+    "[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.017 s -- in io.github.gustavo2358.analysis.structure.AdmissionTest",
+    "[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.364 s -- in io.github.gustavo2358.analysis.cfg.adapters.ScalarAssignTest",
+    "[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.064 s -- in io.github.gustavo2358.analysis.cfg.adapters.TransportTest",
+    "[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.028 s -- in io.github.gustavo2358.analysis.cfg.adapters.WriterDomainTest",
+    "[INFO] Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.494 s -- in io.github.gustavo2358.analysis.cfg.launcher.EvalCfg031Test",
+    "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.377 s -- in io.github.gustavo2358.analysis.cfg.launcher.ScalarAssignCliTest"
+  ]
+}

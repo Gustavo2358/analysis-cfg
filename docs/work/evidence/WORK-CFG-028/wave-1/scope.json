@@ -1,0 +1,13 @@
+{
+  "approved_head": "4aeb4c0ad086ec4fc8911879b13139d84ca57bc9",
+  "legacy_java_and_fixtures": "byte-exact via check_scope and immutable Git comparison",
+  "source_pins": "byte-exact",
+  "new_product_sources": 6,
+  "new_product_classes": 14,
+  "W2_plus_production": false,
+  "new_values_solver_consumers_cli": false,
+  "AIR_dependency": "isolated Maven cache built from verified approved extracted source; exact observed jar hashes in dependency-environment.json",
+  "memory": "logical retained identity counts; not measured physical heap bytes",
+  "JVM_flags": "default JVM inspection stored separately; no dedicated warmup, no elapsed SLA, default Surefire fork without argLine",
+  "future_hooks": "W2-W5 NOT_AVAILABLE_UNTIL_IMPLEMENTED"
+}

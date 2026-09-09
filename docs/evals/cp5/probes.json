@@ -21,7 +21,13 @@
       "oracle": "I operations indexed; transfer follows visits; no instruction snapshots or CFG-node growth",
       "kills": "full clone or node per Assign",
       "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "hook": null
+      "hook": null,
+      "wave_hooks": {
+        "1": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w1.py"
+        }
+      }
     },
     {
       "id": "S2",
@@ -41,7 +47,13 @@
       "oracle": "index proportional to D; resolution work follows R, never I×D",
       "kills": "scan all Objects per Assign",
       "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "hook": null
+      "hook": null,
+      "wave_hooks": {
+        "1": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w1.py"
+        }
+      }
     },
     {
       "id": "S3",
@@ -86,7 +98,13 @@
       "oracle": "W1 adjacency visits follow edges; W2 contribution bound Aprop, no global scans; fair convergence",
       "kills": "successor scan, redundant propagation/enqueue, lost self-loop",
       "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "hook": null
+      "hook": null,
+      "wave_hooks": {
+        "1": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w1.py"
+        }
+      }
     },
     {
       "id": "S4b",
@@ -192,7 +210,13 @@
       "oracle": "context buckets preserve activationEntry; demand-only views/runs; no eager Cartesian state",
       "kills": "ignore Entry/options, deep-hash cache, duplicate run",
       "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "hook": null
+      "hook": null,
+      "wave_hooks": {
+        "1": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w1.py"
+        }
+      }
     },
     {
       "id": "S9",
@@ -253,7 +277,13 @@
         "duplicated-wrong-contextual-edge"
       ],
       "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "hook": null
+      "hook": null,
+      "wave_hooks": {
+        "1": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w1.py"
+        }
+      }
     },
     {
       "id": "S12",
@@ -386,7 +416,13 @@
         "catch-oom-as-analysis-limit"
       ],
       "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "hook": null
+      "hook": null,
+      "wave_hooks": {
+        "1": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w1.py"
+        }
+      }
     }
   ]
 }

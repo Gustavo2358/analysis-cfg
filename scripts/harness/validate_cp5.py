@@ -167,8 +167,8 @@ def validate_cp5(root: Path) -> list[str]:
         require(life['schema_version'] == 1, 'lifecycle schema')
         require(life['work_item'] == work['id'] == 'WORK-CFG-028' and life['backlog_id'] == work['backlog_id'] == 'BACKLOG-CFG-020', 'work/backlog linkage')
         require(life['branch'] == 'feat/cp5-dataflow-engine' and life['base_main'] == BASE, 'branch/main baseline')
-        require(life['current_checkpoint'] == work['checkpoint'] == audit.CHECKPOINT, 'preparation checkpoint only')
-        require(life['authorized_wave'] is None, 'no Wave authorized')
+        require(life['current_checkpoint'] == work['checkpoint'] == 'WAVE_1', 'W1 checkpoint only')
+        require(life['authorized_wave'] == 1, 'only Wave 1 authorized')
         require(life['harness_preparation'] == {'status':'implemented','review':'APPROVED'}, 'preparation review state')
         require(work['authorization'] == 'implementation' and work['status'] == 'active', 'harness authorization')
         policy = life['policy']
@@ -186,8 +186,17 @@ def validate_cp5(root: Path) -> list[str]:
         require([w['wave'] for w in life['waves']] == list(range(1,6)), 'five Waves in order')
         for w in life['waves']:
             n = w['wave']
-            require(w['status'] == 'NOT_STARTED' and w['authorization'] == 'NOT_AUTHORIZED', 'Waves 1-5 must be NOT_STARTED / NOT_AUTHORIZED')
-            require(w['approval_evidence'] is None and w['completion_evidence'] is None, 'no Wave evidence invented')
+            if n == 1:
+                require(w['status'] in {'STARTED','IMPLEMENTED'} and w['authorization'] == 'AUTHORIZED', 'W1 implemented/started and authorized, never human-approved automatically')
+                require(w['approval_evidence'] == 'docs/work/evidence/WORK-CFG-028/wave-1/authorization.json', 'W1 explicit authorization evidence')
+                authorization = load_json(root / w['approval_evidence'])
+                require(len(life['review_history']) > 4 and authorization == life['review_history'][4] and authorization['reviewed_head'] == '4aeb4c0ad086ec4fc8911879b13139d84ca57bc9' and authorization['CORE_SIZE_UNBOUNDED_REMEDIATION'] == 'APPROVED' and authorization['authorized_wave'] == 1, 'W1 reviewed HEAD and append-only human authorization')
+                expected_evidence = None if w['status'] == 'STARTED' else 'docs/work/evidence/WORK-CFG-028/wave-1/validation.md'
+                require(w['completion_evidence'] == expected_evidence, 'no Wave evidence invented')
+                if w['status'] == 'IMPLEMENTED': require(life['wave_1']['review'] == 'AWAITING_HUMAN_REVIEW' and existing(root,expected_evidence), 'W1 awaits human review')
+            else:
+                require(w['status'] == 'NOT_STARTED' and w['authorization'] == 'NOT_AUTHORIZED', 'Waves 2-5 must be NOT_STARTED / NOT_AUTHORIZED')
+                require(w['approval_evidence'] is None and w['completion_evidence'] is None, 'no Wave evidence invented')
             require(w['requires_review_of'] == ('CORE_SIZE_UNBOUNDED_REMEDIATION' if n == 1 else f'WAVE_{n-1}'), 'sequential Wave review dependency')
             require(w['eval'] == f'EVAL-CFG-{33+n:03}', 'Wave eval linkage')
         require(set(work['related_decisions']) == {f'ADR-{n:04}' for n in range(10,15)}, 'ADR routing')
@@ -201,13 +210,13 @@ def validate_cp5(root: Path) -> list[str]:
         require(inventory['baseline'] == BASE, 'source inventory baseline')
         actual = {str(p.relative_to(root)):hashlib.sha256(p.read_bytes()).hexdigest()
                   for p in files_under(root) if p.suffix == '.java' or p.name == 'pom.xml'}
-        require(actual == inventory['files'], 'no unauthorized Java/POM implementation (exact inventory)')
-        require(not any((root/m).exists() for m in ['analysis-kernel','analysis-values']), 'no speculative modules')
+        require(actual == load_json(root / PLAN / 'w1-source-inventory.json')['files'], 'no unauthorized Java/POM implementation (exact inventory)')
+        require((root/'analysis-kernel').is_dir() and not (root/'analysis-values').exists(), 'no speculative modules beyond W1')
         require(not any(p.suffix in {'.jar','.class'} for p in files_under(root)), 'no vendored bytecode')
         gates = load_json(root / 'docs/engineering/gate-state.json')
         require(gates['product_gates']['performance'] == {'status':'unavailable','hook':None}, 'performance remains UNAVAILABLE')
         catalog = load_json(root / 'docs/evals/catalog.json')['evals']
-        require(all(next(e for e in catalog if e['id'] == f'EVAL-CFG-{n:03}')['status'] == 'planned' for n in range(34,39)), 'no engine eval implemented')
+        require(all(next(e for e in catalog if e['id'] == f'EVAL-CFG-{n:03}')['status'] == 'planned' for n in range(35,39)), 'no engine eval implemented')
         metrics = load_json(root / PLAN / 'metrics.json')['metrics']
         rows(metrics,'name',METRICS,'metric')
         for m in metrics:
@@ -217,6 +226,9 @@ def validate_cp5(root: Path) -> list[str]:
         for p in probes:
             require(p['waves'] == PROBES.get(p['id']), 'probe Wave routing ' + p['id'])
             require(p['status'] == 'NOT_AVAILABLE_UNTIL_IMPLEMENTED' and p['hook'] is None, 'no false probe PASS/hook')
+            if 1 in p['waves']:
+                require(p.get('wave_hooks') == {'1':{'status':'IMPLEMENTED','hook':'scripts/project/check_w1.py'}}, 'W1 real probe hook only')
+            else: require(not p.get('wave_hooks'), 'future probe unavailable')
             require(p['dimension'] and p['oracle'] and p['kills'] and p['metrics'] and set(p['metrics']) <= METRICS, 'probe cost/oracle/metric ' + p['id'])
         challenges = load_json(root / PLAN / 'challenges.json')
         require(challenges['stages'] == ['baseline_green','compilable_mutant','expected_red','byte_exact_restore','second_green'], 'challenge restore protocol')
@@ -226,16 +238,19 @@ def validate_cp5(root: Path) -> list[str]:
             require(c['probe'] is None or (c['probe'] in PROBES and c['wave'] in PROBES[c['probe']]), 'challenge/probe activation')
             if c['wave'] is None:
                 require(c.get('future_slice') == 'POST_CP5_INVOKE_EFFECTS', 'future Invoke challenge routing')
-            require(c['status'] == 'NOT_AVAILABLE_UNTIL_IMPLEMENTED' and c['hook'] is None and c['target'] is None, 'no fictitious engine mutant')
+            if c['wave'] == 1:
+                require(c['status'] == 'IMPLEMENTED' and c['hook'] == 'scripts/project/challenge_w1.py' and existing(root,c['hook']) and existing(root,c['target']), 'W1 concrete challenge target/hook')
+            else:
+                require(c['status'] == 'NOT_AVAILABLE_UNTIL_IMPLEMENTED' and c['hook'] is None and c['target'] is None, 'no fictitious engine mutant')
         plan = load_json(root / PLAN / 'gate-plan.json')
         require(plan['work_item'] == work['id'] and plan['preparation_check'] == 'scripts/harness/validate_cp5.py', 'gate plan linkage')
         require([w['wave'] for w in plan['waves']] == list(range(1,6)), 'gate plan Wave inventory')
         for w in plan['waves']:
             require(w['eval'] == f"EVAL-CFG-{33+w['wave']:03}", 'gate eval routing')
             require(set(w['gates']) == ({'architecture','semantic','performance','integration'} if w['wave']==5 else {'architecture','semantic','performance'}), 'Wave gate inventory')
-            require(all(g == {'status':'NOT_AVAILABLE_UNTIL_IMPLEMENTED','hook':None} for g in w['gates'].values()), 'no empty hook product PASS')
+            require(all(g == ({'status':'IMPLEMENTED','hook':'scripts/project/check_w1.py'} if w['wave']==1 else {'status':'NOT_AVAILABLE_UNTIL_IMPLEMENTED','hook':None}) for g in w['gates'].values()), 'no empty hook product PASS')
         arch = load_json(root / PLAN / 'architecture.json')
-        require(len(arch['baseline_findings']) == 1 and arch['baseline_findings'][0]['id'] == 'CP5-F01' and arch['baseline_findings'][0]['status'] == 'NONBLOCKING_FOLLOW_UP_W1', 'baseline direct AIR finding stays explicit')
+        require(len(arch['baseline_findings']) == 1 and arch['baseline_findings'][0]['id'] == 'CP5-F01' and arch['baseline_findings'][0]['status'] == 'FIXED_W1', 'baseline direct AIR finding fixed in W1')
         require(arch['air_direct_dependency'] == {'import_prefix':'io.github.gustavo2358.air.','group':'io.github.gustavo2358','artifact':'air-java','scope':'compile'}, 'direct AIR dependency declaration')
         require(arch['modules'] == {
             'cfg-kernel':{'wave':0,'direct':['air-java'],'forbidden':['analysis-kernel','analysis-values']},
@@ -246,8 +261,15 @@ def validate_cp5(root: Path) -> list[str]:
         for role,deny in required_deny.items():
             require(set(arch['package_rules'][role]['forbidden']) == deny, 'architecture boundary ' + role)
         require(set(arch['future_inventories']) == {'analysis-kernel','analysis-values'}, 'future architecture inventories')
-        for inv in arch['future_inventories'].values():
-            require(inv == {'status':'NOT_AVAILABLE_UNTIL_IMPLEMENTED','sources':None,'classfiles':None,'javap_descriptors':None,'jdeps_edges':None,'effective_maven':None}, 'unimplemented bytecode inventory')
+        for module,inv in arch['future_inventories'].items():
+            expected = {'status':'NOT_AVAILABLE_UNTIL_IMPLEMENTED','sources':None,'classfiles':None,'javap_descriptors':None,'jdeps_edges':None,'effective_maven':None}
+            if module == 'analysis-kernel': expected = {k:('IMPLEMENTED' if k=='status' else 'docs/evals/cp5/w1-inventory.json') for k in expected}
+            require(inv == expected, 'Wave bytecode inventory')
+        require(existing(root,'scripts/project/check_w1.py') and existing(root,'docs/evals/cp5/w1-inventory.json'), 'W1 gate and bytecode inventory exist')
+        import sys
+        sys.path.insert(0,str(root/'scripts/project'))
+        from check_analysis_architecture import check_direct_air
+        require(not check_direct_air(root), 'strict direct AIR dependencies')
         contract = load_json(root / PLAN / 'result-contract.json')
         require(contract['schema_version'] == 1 and contract['status'] == 'REVIEW_SNAPSHOT_NOT_CODEC' and contract['schema'] == 'analysis-dataflow-result' and contract['version'] == '1.0.0' and set(contract['execution_statuses']) == phases.EXECUTION_STATUSES and set(contract['value_kinds']) == {'Candidates'} and set(contract['reachability']) == {'REACHABLE','UNREACHABLE_IN_MODEL'}, 'result contract status/schema')
         require(set(contract['required_result_fields']) == RESULT_FIELDS and set(contract['required_observation_fields']) == OBS_FIELDS, 'result contract minimum fields')
@@ -272,7 +294,7 @@ def validate_cp5(root: Path) -> list[str]:
         require(snapshot['result']['sourceScope']['open'] is True, 'CP4E source remains open')
         baseline = load_json(root / 'docs/work/evidence/WORK-CFG-028/baseline.json')
         require(len(baseline['authorities']) == 2 and all(x['read'] == 'integral' and re.fullmatch('[0-9a-f]{64}',x['sha256']) for x in baseline['authorities'].values()), 'integral authority hashes')
-    except (OSError, KeyError, TypeError, ValueError, StopIteration) as exc:
+    except (OSError, KeyError, TypeError, ValueError, StopIteration, IndexError) as exc:
         errors.append('CP5: missing/invalid contract: ' + str(exc))
     return errors
 
@@ -288,7 +310,7 @@ def main() -> int:
         print('[cp5-harness] FAIL: ' + error)
     if errors:
         return 1
-    print('[cp5-harness] PASS: preparation contracts only; engine gates NOT_AVAILABLE_UNTIL_IMPLEMENTED')
+    print('[cp5-harness] PASS: W1 contracts only; product gates execute separately; W2-W5 NOT_AVAILABLE_UNTIL_IMPLEMENTED')
     return 0
 
 

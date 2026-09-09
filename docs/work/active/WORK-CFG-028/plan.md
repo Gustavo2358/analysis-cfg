@@ -33,7 +33,7 @@ Review F de e053f14: reproduzir RED; corrigir contratos/snapshots e validator;
 GREEN e contracasos; full/integration/Maven/scope; evidência append-only; commit/push
 no PR #12 draft e recibos CI do novo HEAD. Parar para review humano.
 
-## CORE-SIZE-001 — autorizado agora
+## CORE-SIZE-001 — histórico aprovado
 
 1. Confirmar checkout limpo, ancestralidade e PR #12 remoto, ler autoridades integrais.
 2. Auditar ocorrências por papel A–F; registrar dívidas externas/legadas sem editar produto.
@@ -41,3 +41,14 @@ no PR #12 draft e recibos CI do novo HEAD. Parar para review humano.
 4. Contracasos parseáveis de papéis/wire e N/2N/4N, restore byte-exact e segundo GREEN.
 5. Gates locais aplicáveis, inventário Java/POM, scope/manifest e evidência honesta.
 6. Commits/push, descrição do mesmo PR draft e recibo CI real do HEAD final; parar.
+
+## WAVE_1 — plano autorizado
+
+1. Confirmar HEAD aprovado/remoto, PR draft, pins e autorização append-only antes de produção.
+2. Expected manual e RED comportamental da sessão; implementar índice e admissão estrutural.
+3. Oracles de completude/contexto/identidade e S1/S2/S4/S8/S11/S16 W1 reais; medir
+   trabalho e retenção com deduplicação por identidade e ledger por coleção.
+4. Corrigir CP5-F01 e inventários Maven/javap/jdeps; ativar somente hooks W1.
+5. Campanha compilável GREEN/RED/restore/segundo GREEN; preservar tentativas inválidas.
+6. Regressões completas, scope/diff/manifest, commits e push no mesmo PR #12 draft;
+   confrontar CI do HEAD publicado e registrar recibo; parar para review humano.

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "contract_only",
+  "status": "W1_IMPLEMENTED_LATER_WAVES_UNAVAILABLE",
   "overflow": "Checked arithmetic; overflow is an implementation defect to correct, never a supported-size ceiling or semantic result.",
   "metrics": [
     {
@@ -526,5 +526,19 @@
       "audit": "Compare enumerated candidates with independent finite oracle; retain all candidates for any measured cardinality."
     }
   ],
-  "role": "OBSERVATION_ONLY"
+  "role": "OBSERVATION_ONLY",
+  "wave_1": {
+    "status": "IMPLEMENTED",
+    "owner": "IndexMetrics.Counter",
+    "hook": "scripts/project/check_w1.py",
+    "metrics": [
+      "nodesIndexed",
+      "edgesIndexed",
+      "operationsIndexed",
+      "referencesResolved",
+      "objectsIndexed",
+      "locationsIndexed",
+      "structuralVisits"
+    ]
+  }
 }

@@ -2,8 +2,8 @@
 
 Confrontados registry/backlog atuais com propostas do discovery. Nenhum backlog
 novo duplicado. [BACKLOG-CFG-020](backlog/BACKLOG-CFG-020.md) é o umbrella existente
-promovido apenas para **preparação do harness** por WORK-CFG-028. Waves e follow-ups
-abaixo não estão iniciados/autorizados. Dependência histórica de qualificação 011
+agora em **W1 estrutural autorizada** por WORK-CFG-028, após preparação aprovada.
+W2–W5 e os follow-ups externos abaixo não estão iniciados/autorizados. Dependência histórica de qualificação 011
 valia para análises gerais; CP5 tem profile próprio sobre base 027 aprovada, sem
 reivindicar AIR-STRUCTURE completo.
 
@@ -30,26 +30,16 @@ não qualificam grandes Publications nem iniciam esses follow-ups.
 
 ## CP5-F01 — launcher com dependência AIR transitiva no baseline
 
-O guard novo encontrou imports de Publication e AirJsonException em AnalysisCfg,
-mas cfg-launcher/pom.xml declara apenas cfg-adapters/cfg-kernel. O inventário
-arquitetural antigo exige exatamente esse DAG. Não alterar POM/Java neste harness.
-Registrar para review W1 a correção declarativa do launcher e atualização focal do
-inventário arquitetural existente, mediante escopo autorizado. Isso não muda H1.
+**FIXED_W1 / awaiting human review.** O launcher declara diretamente `air-java` e
+`air-json`. Sua produção Java e comportamento não mudaram. O detector estrito
+check_analysis_architecture.py não contém mais a exceção byte-exact de preparação.
+O DAG explícito de transporte foi atualizado e os inventários javap/jdeps verificam
+os tipos AIR efetivamente usados. O challenge `transitive-air-only` remove a
+dependência direta, compila por transitividade e exige RED arquitetural.
+[Evidência W1](evidence/WORK-CFG-028/wave-1/validation.md).
 
-check_analysis_architecture.py detecta a ausência em modo estrito; a rota de
-preparação reporta CP5-F01 **NONBLOCKING_FOLLOW_UP_W1**, permitindo somente os bytes
-Java/POM exatos do launcher da base CP4. Nenhum módulo novo recebe exceção e qualquer
-drift do launcher a invalida. PASS dessa rota é validação do guard, sem afirmar que
-o launcher já cumpre dependência direta. Não criar backlog duplicado: finding do
-umbrella 020/WORK-CFG-028. A correção produtiva não foi iniciada.
-
-
-Review humano reconheceu CP5-F01 como NONBLOCKING; o pós-audit não altera POM ou a
-exceção limitada aos bytes CP4. [Remediações A–I](../architecture/cp5-post-audit.md)
-roteiam integridade W1, replay/oracle W2–W3, completion W1–W5 e qualidade por fase.
-PERFORM exige local context/return pairing próprio, além de Entry. GRBE byte ranges
-e correlação de campos exigem capacidades futuras apropriadas, não substring de
-TextValue ou produto cartesiano declarado concreto. Nenhum follow-up foi iniciado.
+O estado NONBLOCKING_FOLLOW_UP_W1 nos reviews/evidências anteriores é histórico e
+permanece preservado. CORE-SIZE-001 mantém as dívidas de runtime abaixo.
 
 <a id="size-cap-debts"></a>
 

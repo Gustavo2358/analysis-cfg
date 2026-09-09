@@ -33,10 +33,23 @@ Corrigir somente F1 (admission LIMIT), F2 (DeliveryReceipt externo) e F3
 (dependências explícitas dos consumers). A/B/C/D/E/G/H/I aprovados permanecem
 preservados; nenhum Java/POM, engine, writer ou Wave iniciado.
 
-## CORE-SIZE-001 — checkpoint atual
+## CORE-SIZE-001 — checkpoint histórico, APPROVED em 4aeb4c0
 
 [ADR-0014](../../../architecture/decisions/ADR-0014.md): tamanho não define admissão,
 precisão ou término. Supersede budgets/outcomes de capacidade e cap de candidatos,
 preservando A–I, F2/F3 e convergência matemática. Atualizar contratos/snapshots,
 validators/challenges, métricas, scope guard e roteamento W1–W5; gates, push e review.
 Não implementar engine, Java/POM, sibling, retry/ECS ou streaming.
+
+## WAVE_1 — escopo atual autorizado
+
+Implementar analysis-kernel estrutural: admissão correlacionada ao snapshot e policy,
+identidades densas privadas, reverse handles, offsets, buckets por classes AIR,
+Object/Cell e ObjectPlace, adjacência forward/backward por activationEntry e views
+apenas das Entries selecionadas. Completude é inventário do profile core, sem
+reachability calculada nem fechamento de fonte. Reusar payload AIR/CFG por identidade.
+CP5-F01 permite somente dependências diretas do launcher e evolução focal dos checks.
+
+W2–W5 permanecem proibidas: nenhum solver, state, PossibleValues, consumer runtime,
+resolver ou CLI/writer de dataflow. Siblings read-only e source lock byte-exact.
+[Autorização](../../evidence/WORK-CFG-028/wave-1/authorization.json).

@@ -99,3 +99,14 @@ manifestos parseáveis e respostas de review contra um oracle independente do in
 N/N+1 que abre o modelo ou altera admissão deve dar RED. Isso verifica o harness,
 não substitui oracles de produto nas Waves. Não há solver Python ou mutante de
 classe futura. [Decisão](../architecture/decisions/ADR-0014.md).
+
+## Ativação W1
+
+Os 15 challenges roteados para W1 agora apontam para fontes e script executáveis.
+`challenge_w1.py` compila cada mutante, exige RED nominal, restaura todos os hashes
+Java/POM e exige segundo GREEN. A campanha mede scans preservando seus resultados,
+assim o RED é de custo, e remove dependência direta mantendo compilação transitiva.
+A campanha principal testa colapso por fragmento local; um contracaso adicional de
+identity-by-display-name usa literalmente displayName e também exige RED.
+[Evidência W1](../work/evidence/WORK-CFG-028/wave-1/validation.md).
+W2–W5 e os hooks Invoke/effects continuam indisponíveis; nenhum PASS deles é inferido.

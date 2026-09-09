@@ -10,17 +10,20 @@ W2–W5 NOT_STARTED / NOT_AUTHORIZED; authorized_wave=1.
 
 ## Verde conhecido
 
-Baseline fast: 47 testes originais + 83 CP5; nenhuma implementação W1 validada ainda.
-[Baseline e pins](../../evidence/WORK-CFG-028/wave-1/baseline.json).
+W1 implementada e validada localmente: Maven 165 testes; fast 132; arquitetura,
+semântica CFG/W1, integração/CLI e performance W1 PASS. Full global UNAVAILABLE/3
+com W1 PASS e W2–W5 ausentes. Campanha de 15 mutantes + displayName adicional:
+compile/RED/restore/segundo GREEN. CP5-F01 corrigido; pins/siblings preservados.
+[Evidência e limites](../../evidence/WORK-CFG-028/wave-1/validation.md).
 
 ## Restante
 
-Implementar W1 com oracles, challenges compiláveis, métricas/ledger/retenção;
-regressões, gates W1, commits/push e recibo CI do HEAD publicado. Parar para review.
+Publicar este conteúdo no PR #12 draft, confrontar CI real e registrar o recibo.
+Após CI, marcar W1 IMPLEMENTED/AWAITING_HUMAN_REVIEW e validar o HEAD final publicado.
+Nenhuma autorização W2–W5; sem merge, auto-merge ou ready.
 
 ## Descobertas que afetam o plano
 
-CfgGraph protege arestas individuais, mas permite inventário mutilado e payload
-substituído com IDs iguais. W1 verifica completude e instâncias canônicas.
-CP5-F01 ainda aberto até correção produtiva e gate estrito. Pins inalterados;
-upstream/transport size-cap debts continuam fora desta Wave.
+Retenção mede objetos/arrays lógicos por identidade, não bytes de heap total.
+Refs W1 cobrem ObjectPlace/CellBinding e owners/initialLabel; não interpretam effects,
+aliases ou premissas de valores. Dívidas externas de capacidade continuam explícitas.

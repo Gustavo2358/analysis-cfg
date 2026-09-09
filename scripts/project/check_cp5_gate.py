@@ -3,6 +3,7 @@
 from __future__ import annotations
 import argparse
 import sys
+import subprocess
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'harness'))
 from validate_docs import ROOT, load_json
@@ -16,6 +17,8 @@ def run(root: Path, category: str, wave: int) -> int:
         return 1
     plan = load_json(root / 'docs/evals/cp5/gate-plan.json')
     gate = plan['waves'][wave-1]['gates'].get(category)
+    if wave == 1 and gate is not None:
+        return subprocess.run([sys.executable,str(root/'scripts/project/check_w1.py'),category,'--root',str(root)],cwd=root).returncode
     if gate is None:
         print(f'[cp5-{category}] NOT_APPLICABLE_YET: category not due in Wave {wave} (exit 3)')
     else:

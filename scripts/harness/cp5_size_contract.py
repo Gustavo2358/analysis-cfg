@@ -120,7 +120,7 @@ def validate_size_contract(root: Path) -> list[str]:
         for name, expected in ROLES.items():
             require(data['roles'].get(name) == expected, 'role contract ' + name)
         require(data['waves'] == [dict(wave=n,roles=roles,probe='S16',
-                status='NOT_AVAILABLE_UNTIL_IMPLEMENTED',hook=None) for n,roles in WAVE_ROLES.items()], 'Wave role hooks')
+                status='IMPLEMENTED' if n==1 else 'NOT_AVAILABLE_UNTIL_IMPLEMENTED',hook='scripts/project/check_w1.py' if n==1 else None) for n,roles in WAVE_ROLES.items()], 'Wave role hooks')
         require(data['scale_review'] == 'docs/evals/cp5/core-size-review.json', 'scale review route')
         review = read(data['scale_review'])
         require(review['execution'] == 'NOT_EXECUTED' and review['kind'] == 'REVIEW_SNAPSHOT', 'scale review is not engine evidence')
@@ -134,7 +134,7 @@ def validate_size_contract(root: Path) -> list[str]:
         work = read('docs/work/active/WORK-CFG-028/work-item.json')
         require(ADR in work['must_read'] and PATH in work['must_read'], 'must-read route')
         life = read('docs/work/cp5-lifecycle.json')
-        approval, decision = life['review_history'][-2:]
+        approval, decision = life['review_history'][2:4]
         require(approval['decision'] == 'POST_AUDIT_REMEDIATION_APPROVED' and approval['reviewed_head'] == APPROVED_HEAD and
                 approval['approved_remediations'] == ['A','B','C','D','E','F1','F2','F3','G','H','I'] and approval['authorized_wave'] is None, 'post-audit approval at exact HEAD')
         require(decision['decision'] == 'CORE_SIZE_UNBOUNDED_AUTHORIZED_FOR_HARNESS_REMEDIATION_ONLY' and

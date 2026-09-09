@@ -1,6 +1,7 @@
 # CP5 — fronteiras da análise
 
-Arquitetura `accepted`, implementação ainda ausente. H1–H7/R1/R2 foram aprovados
+Arquitetura `accepted`; W1 estrutural implementada, em validação para review humano.
+W2–W5 permanecem ausentes. H1–H7/R1/R2 foram aprovados
 pelo pedido humano de 09/09/2026 que autoriza somente esta preparação.
 [Proveniência e hashes](../work/evidence/WORK-CFG-028/baseline.json) identificam o
 handoff 1.0 e o discovery revisado, lidos integralmente em `artefatos-e2e/cp5/`.
@@ -116,3 +117,14 @@ O [contrato pós-auditoria](cp5-post-audit.md) exige integridade da projeção e
 replay por direção e completion por fase. Storage/effect semantics participa de
 preparation/transfer antes do fixpoint; consumers interpretam fatos estáveis depois
 e não corrigem estado obsoleto. Entry context não fornece local invocation frames.
+
+## Handoff estrutural W1
+
+`AnalysisSession.open` recebe CfgBuildResult, snapshot esperado, ProjectionPolicy e
+Entries canônicas explicitamente selecionadas. `ProgramIndex` retém handles privados
+por nó e sites por operação, com ID completo na borda. `ContextView` fornece cursores
+sem scan global nem hashes AIR no hot path. Buckets usam classes de Operation AIR,
+sem interpretação de nomes. Nenhuma interface de solver/state nasceu nesta Wave.
+
+[Ledger e fronteira exata de referências](../engineering/cp5-w1-index-ledger.md),
+[oracles e evidência](../work/evidence/WORK-CFG-028/wave-1/validation.md).

@@ -14,7 +14,7 @@ from pathlib import Path
 from validate_docs import ROOT, load_json
 from validate_cp5 import validate_cp5, validate_result, LIFECYCLE, WORK, PLAN, CHALLENGES, METRICS
 sys.path.insert(0, str(ROOT / 'scripts/project'))
-from check_analysis_architecture import check_direct_air, check_preparation_air, forbidden_dependencies
+from check_analysis_architecture import check_direct_air, forbidden_dependencies
 from check_cp5_gate import run
 from cp5_phase_contract import validate_prepared, validate_delivery_receipt
 
@@ -181,7 +181,7 @@ class Cp5HarnessTests(unittest.TestCase):
 
     def test_size_decision_routing_and_approval_cannot_disappear(self):
         for path,change,diagnostic in [
-            (LIFECYCLE,lambda x:x['review_history'].pop(),'CORE-SIZE-001'),
+            (LIFECYCLE,lambda x:x['review_history'].pop(3),'CORE-SIZE-001'),
             (LIFECYCLE,lambda x:x['core_size_remediation']['implementation_candidates'].append('k=8'),'current review/candidates'),
             (PLAN+'core-size-contract.json',lambda x:x['roles'].pop('solver'),'role inventory'),
             (PLAN+'core-size-contract.json',lambda x:x['waves'][0].update(hook='fake'),'Wave role hooks'),
@@ -203,7 +203,7 @@ class Cp5HarnessTests(unittest.TestCase):
 
     def test_each_wave_cannot_start_or_be_authorized(self):
         original = (self.root/LIFECYCLE).read_bytes()
-        for index in range(5):
+        for index in range(1,5):
             for change in [dict(status='STARTED'),dict(authorization='AUTHORIZED')]:
                 with self.subTest(wave=index+1,change=change):
                     (self.root/LIFECYCLE).write_bytes(original)
@@ -211,8 +211,8 @@ class Cp5HarnessTests(unittest.TestCase):
                     self.guard('NOT_STARTED / NOT_AUTHORIZED')
 
     def test_no_active_wave_pointer(self):
-        self.edit(LIFECYCLE,lambda x:x.update(authorized_wave=1))
-        self.guard('no Wave authorized')
+        self.edit(LIFECYCLE,lambda x:x.update(authorized_wave=2))
+        self.guard('only Wave 1 authorized')
 
     def test_discovery_approval_cannot_authorize_wave(self):
         self.edit(LIFECYCLE,lambda x:x['last_human_approval'].update(does_not_authorize_waves=False))
@@ -323,7 +323,7 @@ class Cp5HarnessTests(unittest.TestCase):
 
     def test_product_routes_are_never_preparation_pass(self):
         with contextlib.redirect_stdout(io.StringIO()):
-            for wave in range(1,6):
+            for wave in range(2,6):
                 for category in ['architecture','semantic','performance','integration']:
                     self.assertEqual(3,run(self.root,category,wave))
 
@@ -340,14 +340,16 @@ class Cp5HarnessTests(unittest.TestCase):
         (p/'pom.xml').write_text(prefix+'<dependencies>'+dep.replace('</dependency>','<scope>test</scope></dependency>')+'</dependencies></project>')
         self.assertTrue(check_direct_air(p))
 
-    def test_baseline_air_debt_is_explicit_and_exception_cannot_expand(self):
+    def test_launcher_has_strict_direct_dependency_without_exception(self):
+        self.assertEqual([],check_direct_air(self.root))
+        pom=self.root/'cfg-launcher/pom.xml'
+        original=pom.read_text()
+        import re
+        pom.write_text(re.sub(r'    <dependency>\s*<groupId>io.github.gustavo2358</groupId>\s*<artifactId>air-java</artifactId>\s*</dependency>\n','',original))
         self.assertTrue(any('cfg-launcher/pom.xml' in e for e in check_direct_air(self.root)))
-        errors, findings = check_preparation_air(self.root)
-        self.assertEqual([],errors)
-        self.assertTrue(any('CP5-F01' in f for f in findings))
-        source=next((self.root/'cfg-launcher/src/main').rglob('*.java'))
-        source.write_text(source.read_text()+'\n// changed baseline\n')
-        self.assertTrue(check_preparation_air(self.root)[0])
+        self.guard('strict direct AIR dependencies')
+        pom.write_text(original)
+        self.assertEqual([],check_direct_air(self.root))
 
     def test_all_package_deny_rules_have_contracases(self):
         rules=load_json(self.root/PLAN/'architecture.json')
@@ -367,11 +369,28 @@ class Cp5HarnessTests(unittest.TestCase):
         command=[sys.executable,str(self.root/'scripts/harness/validate_cp5.py'),'--root',str(self.root)]
         good=subprocess.run(command,capture_output=True,text=True)
         self.assertEqual(0,good.returncode,good.stdout+good.stderr)
-        self.assertIn('preparation contracts only',good.stdout)
-        self.edit(LIFECYCLE,lambda x:x.update(authorized_wave=1))
+        self.assertIn('W1 contracts only',good.stdout)
+        self.edit(LIFECYCLE,lambda x:x.update(authorized_wave=2))
         bad=subprocess.run(command,capture_output=True,text=True)
         self.assertEqual(1,bad.returncode,bad.stdout+bad.stderr)
-        self.assertIn('no Wave authorized',bad.stdout)
+        self.assertIn('only Wave 1 authorized',bad.stdout)
+
+    def test_w1_authorization_and_runtime_hooks_are_required(self):
+        for path,change,reason in [
+            (LIFECYCLE,lambda x:x['waves'][0].update(status='APPROVED'),'never human-approved'),
+            (LIFECYCLE,lambda x:x['review_history'][4].update(reviewed_head='0'*40),'W1 reviewed HEAD'),
+            (PLAN+'probes.json',lambda x:x['probes'][0].pop('wave_hooks'),'W1 real probe'),
+            (PLAN+'gate-plan.json',lambda x:x['waves'][0]['gates']['performance'].update(hook=None),'no empty hook')]:
+            original=(self.root/path).read_bytes()
+            try:self.edit(path,change);self.guard(reason)
+            finally:(self.root/path).write_bytes(original)
+            self.assertEqual([],validate_cp5(self.root))
+
+    def test_w1_nominal_reports_and_metrics_cannot_be_fabricated(self):
+        from check_w1 import verify_reports, verify_metrics, Failure
+        with self.assertRaises(Failure):verify_reports(self.root,{'ScaleTest'})
+        for output in ['', 'W1_METRICS {}']:
+            with self.assertRaises((Failure,KeyError)):verify_metrics(output)
 
     def test_result_contract_cannot_drop_semantic_statuses_or_change_version(self):
         self.edit(PLAN+'result-contract.json',lambda x:x.update(version='2.0.0',execution_statuses=['STABLE']))
