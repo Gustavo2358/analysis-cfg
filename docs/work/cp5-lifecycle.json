@@ -5,9 +5,9 @@
   "branch": "feat/cp5-dataflow-engine",
   "base_main": "ec525cbbad96d70c9663faa88e2672148fa8ee71",
   "pr": {
-    "number": null,
-    "url": null,
-    "state": "NOT_CREATED",
+    "number": 12,
+    "url": "https://github.com/Gustavo2358/analysis-cfg/pull/12",
+    "state": "OPEN",
     "draft": true,
     "auto_merge": false
   },

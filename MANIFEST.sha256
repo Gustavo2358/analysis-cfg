@@ -136,7 +136,7 @@ f5e5e02a909f312521a229013e720ac5b727706d38cf398eceb033fb0d319242  docs/templates
 8b75509be1c221749f1c0e956cbf01c4861ac86ac32a4d2efb18d36c86ce5202  docs/work/active/WORK-CFG-028/eval.md
 3cabdd0b3990614d2b70343f1fca7b176daa3eb789b4639d2698619a900595ee  docs/work/active/WORK-CFG-028/plan.md
 a8d3d0e3afecacc7022fa8b9c9107a914d313130878b98ffd92000d1c9d0738b  docs/work/active/WORK-CFG-028/spec.md
-feba7d0bd450966b01d3b06cb5ff5575493e8cb87ef1e29eb885e911b3715e54  docs/work/active/WORK-CFG-028/state.md
+0067f7aca776acb9ab8c569540bcfbf35da96dc7889193168af67a437f8a63c1  docs/work/active/WORK-CFG-028/state.md
 f2abea977259d32fab31e61c77300abd9c19ac38aeff938177210dc3e56b3452  docs/work/active/WORK-CFG-028/work-item.json
 b44696fd695b0321f519370c3d3495ab692d4f99df08d93103e06d16e38bb719  docs/work/backlog.json
 62073561a3eea1afeb1df6ca29054a29acd568db560ac04ed54d58f96549b912  docs/work/backlog.md
@@ -168,7 +168,7 @@ bd9d75e3c9ae42e295188323bfa2ee6583ff95c683c8194f31c6159563cf1cfe  docs/work/back
 b611a45fc1a7797923900c1e4d7b7f085b8fdd0e3bac6158a4d5140b1c6d2e1d  docs/work/backlog/BACKLOG-CFG-026.md
 8ae589803dd43e3815b079bb595f93797e0ba6b6065d4623e3beb589f8b7f63f  docs/work/backlog/BACKLOG-CFG-027.md
 3ddc7699dc36005f38a589be1a1244d76e7daaeca77e208c2d4746732b0551c1  docs/work/cp5-follow-ups.md
-3173c788034b9bb8f13e6068f836c2eab984be3b91db686d4bc3925cf0b3145b  docs/work/cp5-lifecycle.json
+a47932de644edc8b00fb02ada8d514f848bce6ce0c78f4bac2a07f626564e9ba  docs/work/cp5-lifecycle.json
 70c80d062dffc36bc9aeac5f5264119e65706afa383e493109405934e31ed547  docs/work/evidence/WORK-CFG-025/architecture.log
 19b36c0894c0df8fdcfe566f586f8fb1a982453425f02232a18200eae411e766  docs/work/evidence/WORK-CFG-025/audit-provenance.py
 0063e82353bdebf4efda497aac350d113d8721088858b9cd0b4a7ee5c8e62b27  docs/work/evidence/WORK-CFG-025/cache.log

@@ -3,7 +3,7 @@
 ## Onde estamos
 
 CP5 harness preparation implementada / awaiting human review. Branch
-feat/cp5-dataflow-engine, PR e última aprovação no [lifecycle](../../cp5-lifecycle.json).
+feat/cp5-dataflow-engine, [PR #12 draft](https://github.com/Gustavo2358/analysis-cfg/pull/12); última aprovação no [lifecycle](../../cp5-lifecycle.json).
 As cinco Waves estão NOT STARTED; W1 está NOT AUTHORIZED. Nenhuma Wave automática.
 
 ## Verde conhecido
