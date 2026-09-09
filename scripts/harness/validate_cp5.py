@@ -33,6 +33,7 @@ CHALLENGES = {
     'fixture-specific-production-route': 5,
     'unsupported-query-aborts-batch': 3, 'unsupported-query-disappears': 3,
 }
+CHALLENGES.update({'missing-first-publication': 2, 'skip-edge-transfer': 2, 'skip-block-transfer': 2, 'apply-block-twice': 2, 'block-uses-wrong-state': 2, 'boundary-omitted': 2, 'wrong-boundary-side': 2, 'ignore-self-loop': 2, 'ignore-context-state': 2, 'duplicate-enqueue': 2, 'wrong-backward-direction': 2, 'wrong-backward-publication': 2, 'max-iterations': 2})
 METRICS = set('''nodesIndexed edgesIndexed operationsIndexed referencesResolved objectsIndexed
 locationsIndexed structuralVisits firstPublications nodesPopped nodesTransferred
 operationsTransferred initializationAttempts edgeContributionJoins edgeTransferInvocations
@@ -167,8 +168,8 @@ def validate_cp5(root: Path) -> list[str]:
         require(life['schema_version'] == 1, 'lifecycle schema')
         require(life['work_item'] == work['id'] == 'WORK-CFG-028' and life['backlog_id'] == work['backlog_id'] == 'BACKLOG-CFG-020', 'work/backlog linkage')
         require(life['branch'] == 'feat/cp5-dataflow-engine' and life['base_main'] == BASE, 'branch/main baseline')
-        require(life['current_checkpoint'] == work['checkpoint'] == 'WAVE_1', 'W1 checkpoint only')
-        require(life['authorized_wave'] == 1, 'only Wave 1 authorized')
+        require(life['current_checkpoint'] == work['checkpoint'] == 'WAVE_2', 'W2 checkpoint only')
+        require(life['authorized_wave'] == 2, 'only Wave 2 authorized')
         require(life['harness_preparation'] == {'status':'implemented','review':'APPROVED'}, 'preparation review state')
         require(work['authorization'] == 'implementation' and work['status'] == 'active', 'harness authorization')
         policy = life['policy']
@@ -187,15 +188,23 @@ def validate_cp5(root: Path) -> list[str]:
         for w in life['waves']:
             n = w['wave']
             if n == 1:
-                require(w['status'] in {'STARTED','IMPLEMENTED'} and w['authorization'] == 'AUTHORIZED', 'W1 implemented/started and authorized, never human-approved automatically')
+                require(w['status'] == 'APPROVED' and w['authorization'] == 'AUTHORIZED' and life['wave_1']['review'] == 'APPROVED' and w.get('reviewed_head') == 'b84389b6ccf94c259774b82a99bc7296278b65c0', 'W1 explicit human-approved HEAD required')
                 require(w['approval_evidence'] == 'docs/work/evidence/WORK-CFG-028/wave-1/authorization.json', 'W1 explicit authorization evidence')
                 authorization = load_json(root / w['approval_evidence'])
                 require(len(life['review_history']) > 4 and authorization == life['review_history'][4] and authorization['reviewed_head'] == '4aeb4c0ad086ec4fc8911879b13139d84ca57bc9' and authorization['CORE_SIZE_UNBOUNDED_REMEDIATION'] == 'APPROVED' and authorization['authorized_wave'] == 1, 'W1 reviewed HEAD and append-only human authorization')
                 expected_evidence = None if w['status'] == 'STARTED' else 'docs/work/evidence/WORK-CFG-028/wave-1/validation.md'
                 require(w['completion_evidence'] == expected_evidence, 'no Wave evidence invented')
                 if w['status'] == 'IMPLEMENTED': require(life['wave_1']['review'] == 'AWAITING_HUMAN_REVIEW' and existing(root,expected_evidence), 'W1 awaits human review')
+            elif n == 2:
+                require(w['status'] in {'STARTED','IMPLEMENTED'} and w['authorization'] == 'AUTHORIZED', 'W2 started/implemented, never human-approved automatically')
+                require(w['approval_evidence'] == 'docs/work/evidence/WORK-CFG-028/wave-2/authorization.json', 'W2 explicit authorization evidence')
+                authorization = load_json(root / w['approval_evidence'])
+                require(len(life['review_history']) > 5 and authorization == life['review_history'][5] and authorization['reviewed_head'] == 'b84389b6ccf94c259774b82a99bc7296278b65c0' and authorization['W1'] == 'APPROVED' and authorization['authorized_wave'] == 2, 'W2 reviewed HEAD and append-only human authorization')
+                expected_evidence = None if w['status'] == 'STARTED' else 'docs/work/evidence/WORK-CFG-028/wave-2/validation.md'
+                require(w['completion_evidence'] == expected_evidence, 'no Wave evidence invented')
+                if w['status'] == 'IMPLEMENTED': require(life['wave_2']['review'] == 'AWAITING_HUMAN_REVIEW' and existing(root,expected_evidence), 'W2 awaits human review')
             else:
-                require(w['status'] == 'NOT_STARTED' and w['authorization'] == 'NOT_AUTHORIZED', 'Waves 2-5 must be NOT_STARTED / NOT_AUTHORIZED')
+                require(w['status'] == 'NOT_STARTED' and w['authorization'] == 'NOT_AUTHORIZED', 'Waves 3-5 must be NOT_STARTED / NOT_AUTHORIZED')
                 require(w['approval_evidence'] is None and w['completion_evidence'] is None, 'no Wave evidence invented')
             require(w['requires_review_of'] == ('CORE_SIZE_UNBOUNDED_REMEDIATION' if n == 1 else f'WAVE_{n-1}'), 'sequential Wave review dependency')
             require(w['eval'] == f'EVAL-CFG-{33+n:03}', 'Wave eval linkage')
@@ -210,13 +219,13 @@ def validate_cp5(root: Path) -> list[str]:
         require(inventory['baseline'] == BASE, 'source inventory baseline')
         actual = {str(p.relative_to(root)):hashlib.sha256(p.read_bytes()).hexdigest()
                   for p in files_under(root) if p.suffix == '.java' or p.name == 'pom.xml'}
-        require(actual == load_json(root / PLAN / 'w1-source-inventory.json')['files'], 'no unauthorized Java/POM implementation (exact inventory)')
+        require(actual == load_json(root / PLAN / 'w2-source-inventory.json')['files'], 'no unauthorized Java/POM implementation (exact inventory)')
         require((root/'analysis-kernel').is_dir() and not (root/'analysis-values').exists(), 'no speculative modules beyond W1')
         require(not any(p.suffix in {'.jar','.class'} for p in files_under(root)), 'no vendored bytecode')
         gates = load_json(root / 'docs/engineering/gate-state.json')
         require(gates['product_gates']['performance'] == {'status':'unavailable','hook':None}, 'performance remains UNAVAILABLE')
         catalog = load_json(root / 'docs/evals/catalog.json')['evals']
-        require(all(next(e for e in catalog if e['id'] == f'EVAL-CFG-{n:03}')['status'] == 'planned' for n in range(35,39)), 'no engine eval implemented')
+        require(all(next(e for e in catalog if e['id'] == f'EVAL-CFG-{n:03}')['status'] == 'planned' for n in range(36,39)), 'no engine eval implemented')
         metrics = load_json(root / PLAN / 'metrics.json')['metrics']
         rows(metrics,'name',METRICS,'metric')
         for m in metrics:
@@ -226,9 +235,8 @@ def validate_cp5(root: Path) -> list[str]:
         for p in probes:
             require(p['waves'] == PROBES.get(p['id']), 'probe Wave routing ' + p['id'])
             require(p['status'] == 'NOT_AVAILABLE_UNTIL_IMPLEMENTED' and p['hook'] is None, 'no false probe PASS/hook')
-            if 1 in p['waves']:
-                require(p.get('wave_hooks') == {'1':{'status':'IMPLEMENTED','hook':'scripts/project/check_w1.py'}}, 'W1 real probe hook only')
-            else: require(not p.get('wave_hooks'), 'future probe unavailable')
+            expected_hooks = {str(n):{'status':'IMPLEMENTED','hook':f'scripts/project/check_w{n}.py'} for n in (1,2) if n in p['waves']}
+            require(p.get('wave_hooks',{}) == expected_hooks, 'W1/W2 real probe hooks only')
             require(p['dimension'] and p['oracle'] and p['kills'] and p['metrics'] and set(p['metrics']) <= METRICS, 'probe cost/oracle/metric ' + p['id'])
         challenges = load_json(root / PLAN / 'challenges.json')
         require(challenges['stages'] == ['baseline_green','compilable_mutant','expected_red','byte_exact_restore','second_green'], 'challenge restore protocol')
@@ -238,8 +246,8 @@ def validate_cp5(root: Path) -> list[str]:
             require(c['probe'] is None or (c['probe'] in PROBES and c['wave'] in PROBES[c['probe']]), 'challenge/probe activation')
             if c['wave'] is None:
                 require(c.get('future_slice') == 'POST_CP5_INVOKE_EFFECTS', 'future Invoke challenge routing')
-            if c['wave'] == 1:
-                require(c['status'] == 'IMPLEMENTED' and c['hook'] == 'scripts/project/challenge_w1.py' and existing(root,c['hook']) and existing(root,c['target']), 'W1 concrete challenge target/hook')
+            if c['wave'] in (1,2):
+                require(c['status'] == 'IMPLEMENTED' and c['hook'] == f"scripts/project/challenge_w{c['wave']}.py" and existing(root,c['hook']) and existing(root,c['target']), 'W1/W2 concrete challenge target/hook')
             else:
                 require(c['status'] == 'NOT_AVAILABLE_UNTIL_IMPLEMENTED' and c['hook'] is None and c['target'] is None, 'no fictitious engine mutant')
         plan = load_json(root / PLAN / 'gate-plan.json')
@@ -248,7 +256,7 @@ def validate_cp5(root: Path) -> list[str]:
         for w in plan['waves']:
             require(w['eval'] == f"EVAL-CFG-{33+w['wave']:03}", 'gate eval routing')
             require(set(w['gates']) == ({'architecture','semantic','performance','integration'} if w['wave']==5 else {'architecture','semantic','performance'}), 'Wave gate inventory')
-            require(all(g == ({'status':'IMPLEMENTED','hook':'scripts/project/check_w1.py'} if w['wave']==1 else {'status':'NOT_AVAILABLE_UNTIL_IMPLEMENTED','hook':None}) for g in w['gates'].values()), 'no empty hook product PASS')
+            require(all(g == ({'status':'IMPLEMENTED','hook':f"scripts/project/check_w{w['wave']}.py"} if w['wave'] in (1,2) else {'status':'NOT_AVAILABLE_UNTIL_IMPLEMENTED','hook':None}) for g in w['gates'].values()), 'no empty hook product PASS')
         arch = load_json(root / PLAN / 'architecture.json')
         require(len(arch['baseline_findings']) == 1 and arch['baseline_findings'][0]['id'] == 'CP5-F01' and arch['baseline_findings'][0]['status'] == 'FIXED_W1', 'baseline direct AIR finding fixed in W1')
         require(arch['air_direct_dependency'] == {'import_prefix':'io.github.gustavo2358.air.','group':'io.github.gustavo2358','artifact':'air-java','scope':'compile'}, 'direct AIR dependency declaration')
@@ -266,6 +274,8 @@ def validate_cp5(root: Path) -> list[str]:
             if module == 'analysis-kernel': expected = {k:('IMPLEMENTED' if k=='status' else 'docs/evals/cp5/w1-inventory.json') for k in expected}
             require(inv == expected, 'Wave bytecode inventory')
         require(existing(root,'scripts/project/check_w1.py') and existing(root,'docs/evals/cp5/w1-inventory.json'), 'W1 gate and bytecode inventory exist')
+        require(arch.get('solver_inventory') == 'docs/evals/cp5/w2-inventory.json' and existing(root,arch['solver_inventory']), 'W2 solver bytecode inventory exists')
+        require(load_json(root / PLAN / 'metrics.json').get('wave_2',{}).get('hook') == 'scripts/project/check_w2.py', 'W2 real metrics hook')
         import sys
         sys.path.insert(0,str(root/'scripts/project'))
         from check_analysis_architecture import check_direct_air
@@ -310,7 +320,7 @@ def main() -> int:
         print('[cp5-harness] FAIL: ' + error)
     if errors:
         return 1
-    print('[cp5-harness] PASS: W1 contracts only; product gates execute separately; W2-W5 NOT_AVAILABLE_UNTIL_IMPLEMENTED')
+    print('[cp5-harness] PASS: W1/W2 contracts only; product gates execute separately; W3-W5 NOT_AVAILABLE_UNTIL_IMPLEMENTED')
     return 0
 
 

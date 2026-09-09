@@ -1,0 +1,9 @@
+{
+  "implementation_head": "70ff8663d1d46f765354fbabce45216e8f9b1316",
+  "baseline": "b84389b6ccf94c259774b82a99bc7296278b65c0",
+  "source_pins_unchanged": true,
+  "w1_java_and_legacy_product_unchanged": true,
+  "sibling_access": "read-only; builds use isolated W1 JAR bytes, no integration of parallel sibling changes",
+  "w3_w5_production": false,
+  "new_modules": []
+}

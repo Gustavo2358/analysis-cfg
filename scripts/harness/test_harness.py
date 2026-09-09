@@ -8,6 +8,8 @@ import shutil
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
+from subprocess import CompletedProcess
 from pathlib import Path
 from validate_docs import ROOT, validate, load_json
 from run_gate import run
@@ -167,9 +169,12 @@ class HarnessGuardTests(unittest.TestCase):
             # Materialize the unavailable condition instead of assuming today's project state.
             self.edit_json('docs/engineering/gate-state.json',
                            lambda state: state['product_gates'][gate].update(status='unavailable', hook=None))
-            with self.subTest(gate=gate), contextlib.redirect_stdout(io.StringIO()) as out:
+            # Isolate routing: W1/W2 completed hooks are mocked here, never run Maven in fast.
+            with self.subTest(gate=gate), contextlib.redirect_stdout(io.StringIO()) as out, \
+                    patch('run_gate.subprocess.run', return_value=CompletedProcess([], 0)) as hooks:
                 self.assertEqual(3, run(gate, self.root))
                 self.assertIn('UNAVAILABLE', out.getvalue())
+                self.assertEqual(2 if gate == 'performance' else 0, hooks.call_count)
 
     def test_20_unresolved_eval(self):
         self.edit_json('docs/work/backlog.json', lambda x: x['items'][0]['evals'].append('EVAL-CFG-999'))

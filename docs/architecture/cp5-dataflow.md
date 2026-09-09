@@ -1,7 +1,7 @@
 # CP5 — fronteiras da análise
 
-Arquitetura `accepted`; W1 estrutural implementada, em validação para review humano.
-W2–W5 permanecem ausentes. H1–H7/R1/R2 foram aprovados
+Arquitetura `accepted`; W1 APPROVED no HEAD b84389b6. W2 implementada para review humano.
+W3–W5 permanecem ausentes. H1–H7/R1/R2 foram aprovados
 pelo pedido humano de 09/09/2026 que autoriza somente esta preparação.
 [Proveniência e hashes](../work/evidence/WORK-CFG-028/baseline.json) identificam o
 handoff 1.0 e o discovery revisado, lidos integralmente em `artefatos-e2e/cp5/`.

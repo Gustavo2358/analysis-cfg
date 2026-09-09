@@ -101,8 +101,8 @@
         "metrics"
       ],
       "probe": "S16",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "hook": null
+      "status": "IMPLEMENTED",
+      "hook": "scripts/project/check_w2.py"
     },
     {
       "wave": 3,

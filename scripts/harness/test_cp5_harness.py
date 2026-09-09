@@ -203,7 +203,7 @@ class Cp5HarnessTests(unittest.TestCase):
 
     def test_each_wave_cannot_start_or_be_authorized(self):
         original = (self.root/LIFECYCLE).read_bytes()
-        for index in range(1,5):
+        for index in range(2,5):
             for change in [dict(status='STARTED'),dict(authorization='AUTHORIZED')]:
                 with self.subTest(wave=index+1,change=change):
                     (self.root/LIFECYCLE).write_bytes(original)
@@ -211,8 +211,8 @@ class Cp5HarnessTests(unittest.TestCase):
                     self.guard('NOT_STARTED / NOT_AUTHORIZED')
 
     def test_no_active_wave_pointer(self):
-        self.edit(LIFECYCLE,lambda x:x.update(authorized_wave=2))
-        self.guard('only Wave 1 authorized')
+        self.edit(LIFECYCLE,lambda x:x.update(authorized_wave=3))
+        self.guard('only Wave 2 authorized')
 
     def test_discovery_approval_cannot_authorize_wave(self):
         self.edit(LIFECYCLE,lambda x:x['last_human_approval'].update(does_not_authorize_waves=False))
@@ -307,14 +307,14 @@ class Cp5HarnessTests(unittest.TestCase):
         self.edit(PLAN+'challenges.json',lambda x:x['stages'].remove('byte_exact_restore'))
         self.guard('challenge restore protocol')
         self.edit(PLAN+'challenges.json',lambda x:x['challenges'][0].update(target='planned.java',status='PASS'))
-        self.guard('no fictitious engine mutant')
+        self.guard('concrete challenge target/hook')
 
     def test_future_hook_cannot_be_empty_pass(self):
         self.edit(PLAN+'gate-plan.json',lambda x:x['waves'][0]['gates']['performance'].update(status='implemented',hook='true'))
         self.guard('no empty hook product PASS')
 
     def test_engine_eval_cannot_be_marked_implemented(self):
-        self.edit('docs/evals/catalog.json',lambda x:next(e for e in x['evals'] if e['id']=='EVAL-CFG-035').update(status='implemented'))
+        self.edit('docs/evals/catalog.json',lambda x:next(e for e in x['evals'] if e['id']=='EVAL-CFG-036').update(status='implemented'))
         self.guard('no engine eval implemented')
 
     def test_existing_performance_stays_unavailable(self):
@@ -323,7 +323,7 @@ class Cp5HarnessTests(unittest.TestCase):
 
     def test_product_routes_are_never_preparation_pass(self):
         with contextlib.redirect_stdout(io.StringIO()):
-            for wave in range(2,6):
+            for wave in range(3,6):
                 for category in ['architecture','semantic','performance','integration']:
                     self.assertEqual(3,run(self.root,category,wave))
 
@@ -369,17 +369,17 @@ class Cp5HarnessTests(unittest.TestCase):
         command=[sys.executable,str(self.root/'scripts/harness/validate_cp5.py'),'--root',str(self.root)]
         good=subprocess.run(command,capture_output=True,text=True)
         self.assertEqual(0,good.returncode,good.stdout+good.stderr)
-        self.assertIn('W1 contracts only',good.stdout)
-        self.edit(LIFECYCLE,lambda x:x.update(authorized_wave=2))
+        self.assertIn('W1/W2 contracts only',good.stdout)
+        self.edit(LIFECYCLE,lambda x:x.update(authorized_wave=3))
         bad=subprocess.run(command,capture_output=True,text=True)
         self.assertEqual(1,bad.returncode,bad.stdout+bad.stderr)
-        self.assertIn('only Wave 1 authorized',bad.stdout)
+        self.assertIn('only Wave 2 authorized',bad.stdout)
 
     def test_w1_authorization_and_runtime_hooks_are_required(self):
         for path,change,reason in [
-            (LIFECYCLE,lambda x:x['waves'][0].update(status='APPROVED'),'never human-approved'),
+            (LIFECYCLE,lambda x:x['waves'][1].update(status='APPROVED'),'never human-approved'),
             (LIFECYCLE,lambda x:x['review_history'][4].update(reviewed_head='0'*40),'W1 reviewed HEAD'),
-            (PLAN+'probes.json',lambda x:x['probes'][0].pop('wave_hooks'),'W1 real probe'),
+            (PLAN+'probes.json',lambda x:x['probes'][0].pop('wave_hooks'),'W1/W2 real probe'),
             (PLAN+'gate-plan.json',lambda x:x['waves'][0]['gates']['performance'].update(hook=None),'no empty hook')]:
             original=(self.root/path).read_bytes()
             try:self.edit(path,change);self.guard(reason)
@@ -391,6 +391,25 @@ class Cp5HarnessTests(unittest.TestCase):
         with self.assertRaises(Failure):verify_reports(self.root,{'ScaleTest'})
         for output in ['', 'W1_METRICS {}']:
             with self.assertRaises((Failure,KeyError)):verify_metrics(output)
+
+    def test_w2_authorization_and_approval_cannot_be_inferred(self):
+        for path,change,reason in [
+            (LIFECYCLE,lambda x:x['waves'][1].update(status='APPROVED'),'never human-approved'),
+            (LIFECYCLE,lambda x:x['waves'][0].update(reviewed_head='0'*40),'W1 explicit human-approved HEAD'),
+            (LIFECYCLE,lambda x:x['review_history'][5].update(reviewed_head='0'*40),'W2 reviewed HEAD'),
+            (PLAN+'gate-plan.json',lambda x:x['waves'][1]['gates']['semantic'].update(hook=None),'no empty hook')]:
+            original=(self.root/path).read_bytes()
+            try:self.edit(path,change);self.guard(reason)
+            finally:(self.root/path).write_bytes(original)
+            self.assertEqual([],validate_cp5(self.root))
+
+    def test_w2_nominal_metrics_corpus_and_reports_are_required(self):
+        from check_w2 import verify_reports,verify_metrics,verify_corpus,Failure
+        with self.assertRaises(Failure):verify_reports(self.root,{'SolverScaleTest'})
+        for output in ['', 'W2_METRICS {}']:
+            with self.assertRaises((Failure,KeyError)):verify_metrics(output)
+        for output in ['', 'W2_CORPUS {}']:
+            with self.assertRaises((Failure,KeyError)):verify_corpus(output)
 
     def test_result_contract_cannot_drop_semantic_statuses_or_change_version(self):
         self.edit(PLAN+'result-contract.json',lambda x:x.update(version='2.0.0',execution_statuses=['STABLE']))

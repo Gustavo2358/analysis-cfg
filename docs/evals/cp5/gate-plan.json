@@ -34,16 +34,16 @@
       "eval": "EVAL-CFG-035",
       "gates": {
         "architecture": {
-          "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-          "hook": null
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w2.py"
         },
         "semantic": {
-          "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-          "hook": null
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w2.py"
         },
         "performance": {
-          "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-          "hook": null
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w2.py"
         }
       },
       "audit_requirements": [

@@ -118,5 +118,6 @@
     }
   ],
   "core_size_contract": "docs/evals/cp5/core-size-contract.json",
-  "resource_failure_semantic_mappings": {}
+  "resource_failure_semantic_mappings": {},
+  "solver_inventory": "docs/evals/cp5/w2-inventory.json"
 }

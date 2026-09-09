@@ -249,6 +249,10 @@ def main() -> int:
         verify_reports(args.root / "cfg-kernel/target/surefire-reports")
         print(f"[semantic] PASS: EVAL-CFG-025/028/029/030, {sum(map(len, EXPECTED_SUITES.values()))} required tests, "
               "zero skipped; CFG-FIRST + linear/Jump/Branch/Halt + inventory policy, no complete AIR profile claim", flush=True)
+        from check_w1 import run as structural_semantics
+        from check_w2 import run as solver_semantics
+        structural_semantics(args.root, 'semantic')
+        solver_semantics(args.root, 'semantic')
         return 0
     except GateFailure as exc:
         print(f"[semantic] FAIL: {exc}", file=sys.stderr, flush=True)

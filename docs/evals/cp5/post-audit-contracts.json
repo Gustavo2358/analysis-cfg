@@ -37,7 +37,13 @@
       ],
       "documentation": "docs/architecture/cp5-post-audit.md#b",
       "runtime_status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "runtime_hook": null
+      "runtime_hook": null,
+      "wave_hooks": {
+        "2": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w2.py"
+        }
+      }
     },
     "C": {
       "obligations": [
@@ -89,6 +95,10 @@
         "1": {
           "status": "IMPLEMENTED",
           "hook": "scripts/project/check_w1.py"
+        },
+        "2": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w2.py"
         }
       }
     },
@@ -118,6 +128,10 @@
         "1": {
           "status": "IMPLEMENTED",
           "hook": "scripts/project/check_w1.py"
+        },
+        "2": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w2.py"
         }
       }
     },
@@ -137,7 +151,13 @@
       ],
       "documentation": "docs/architecture/cp5-post-audit.md#g",
       "runtime_status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "runtime_hook": null
+      "runtime_hook": null,
+      "wave_hooks": {
+        "2": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w2.py"
+        }
+      }
     },
     "H": {
       "obligations": [
@@ -160,6 +180,10 @@
         "1": {
           "status": "IMPLEMENTED",
           "hook": "scripts/project/check_w1.py"
+        },
+        "2": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w2.py"
         }
       }
     },

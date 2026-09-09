@@ -61,7 +61,7 @@ jobs:
         working-directory: analysis-cfg
         run: bash scripts/harness/check-fast.sh
 
-      - name: Check CP5 W1 scope and exact manifest
+      - name: Check CP5 W2 scope and exact manifest
         working-directory: analysis-cfg
         run: python3 -B scripts/project/check_scope.py
 
@@ -88,3 +88,9 @@ jobs:
         env:
           MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2
         run: python3 -B scripts/project/check_cp5_gate.py performance --wave 1
+
+      - name: Check CP5 W2 solver oracles and performance
+        working-directory: analysis-cfg
+        env:
+          MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2
+        run: python3 -B scripts/project/check_cp5_gate.py performance --wave 2

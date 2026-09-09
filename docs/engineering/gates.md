@@ -158,3 +158,12 @@ seus 84 métodos nominais. CI executa separadamente o hook performance W1.
 Full roda os probes W1 e registra W1 PASS, mas retorna UNAVAILABLE/3 pela ausência
 W2–W5. Performance global permanece UNAVAILABLE. A W1 não certifica full CP5.
 [Ledger](cp5-w1-index-ledger.md), [evidência](../work/evidence/WORK-CFG-028/wave-1/validation.md).
+
+## WAVE_2 produtiva
+
+[Ledger](cp5-w2-solver-ledger.md): solver/SPI genéricos, diretórios densos efetivos,
+IN/OUT por direção e root propagation. check_w2.py valida métodos nominais, corpus
+gerado, oracles concretos, S4b/escala e retenção lógica. Inventário W1 permanece
+byte-exact; inventário W2 amplia o módulo com fronteiras javap/jdeps próprias.
+Performance e full executam W1/W2, conservando UNAVAILABLE/3 para W3–W5.
+A CI executa W2 separadamente, além dos gates/regressões existentes.

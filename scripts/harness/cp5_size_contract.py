@@ -120,7 +120,7 @@ def validate_size_contract(root: Path) -> list[str]:
         for name, expected in ROLES.items():
             require(data['roles'].get(name) == expected, 'role contract ' + name)
         require(data['waves'] == [dict(wave=n,roles=roles,probe='S16',
-                status='IMPLEMENTED' if n==1 else 'NOT_AVAILABLE_UNTIL_IMPLEMENTED',hook='scripts/project/check_w1.py' if n==1 else None) for n,roles in WAVE_ROLES.items()], 'Wave role hooks')
+                status='IMPLEMENTED' if n in (1,2) else 'NOT_AVAILABLE_UNTIL_IMPLEMENTED',hook=f'scripts/project/check_w{n}.py' if n in (1,2) else None) for n,roles in WAVE_ROLES.items()], 'Wave role hooks')
         require(data['scale_review'] == 'docs/evals/cp5/core-size-review.json', 'scale review route')
         review = read(data['scale_review'])
         require(review['execution'] == 'NOT_EXECUTED' and review['kind'] == 'REVIEW_SNAPSHOT', 'scale review is not engine evidence')

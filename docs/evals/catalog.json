@@ -574,8 +574,8 @@
     {
       "id": "EVAL-CFG-035",
       "title": "generic incremental solver",
-      "status": "planned",
-      "expectation": "Wave obligations in docs/product/cp5-roadmap.md and docs/evals/cp5 manifests; runtime not available",
+      "status": "implemented",
+      "expectation": "Generic incremental solver forward/backward, program-order anchors, isolated contextual states, independent recomposition and concrete finite oracles; S4b/scale and retention; no production AIR semantics",
       "upstream_oracles": [],
       "invariants": [
         "INV-CFG-030",
@@ -583,7 +583,8 @@
         "INV-CFG-032",
         "INV-CFG-033",
         "INV-CFG-034"
-      ]
+      ],
+      "implementation_evidence": "analysis-kernel/src/test/java/io/github/gustavo2358/analysis/solver/OracleTest.java"
     },
     {
       "id": "EVAL-CFG-036",

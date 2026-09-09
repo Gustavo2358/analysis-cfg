@@ -2,7 +2,8 @@
 
 H4/R1/R2 aceitos; [ADR-0013](../architecture/decisions/ADR-0013.md).
 **W1 estrutural implementada e medida.** O hook W1 executa probes e oracles reais.
-Solver/W2–W5 não implementados; performance/full global conserva UNAVAILABLE/exit 3.
+Solver W2 implementado em validação; W3–W5 não implementados.
+Performance/full global conserva UNAVAILABLE/exit 3 após executar W1 e W2.
 [Ledger W1](cp5-w1-index-ledger.md) e [evidência](../work/evidence/WORK-CFG-028/wave-1/validation.md).
 [Manifest dos probes](../evals/cp5/probes.json) especifica ativação, N/2N, regressão
 e métricas. [Lifecycle](../work/cp5-lifecycle.json) não permite ativação automática.

@@ -34,7 +34,7 @@ def verify_sources(root:Path)->None:
     from check_analysis_architecture import check_direct_air, direct_dependencies
     errors=check_direct_air(root)
     if errors: raise Failure('; '.join(errors))
-    actual={p.relative_to(root).as_posix() for p in (root/'analysis-kernel/src/main/java').rglob('*.java')}
+    actual={p.relative_to(root).as_posix() for p in (root/'analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure').rglob('*.java')}
     if actual!=SOURCES: raise Failure('W1 exact source inventory mismatch')
     deps=direct_dependencies(root/'analysis-kernel/pom.xml')
     if deps!={('io.github.gustavo2358.analysis','cfg-kernel','compile'),('io.github.gustavo2358','air-java','compile'),('org.junit.jupiter','junit-jupiter','test')}:
@@ -89,12 +89,12 @@ def architecture(root:Path, update:bool=False)->None:
     cpfile=root/'analysis-kernel/target/architecture-classpath.txt'
     if not cpfile.exists(): raise Failure('W1 compiled dependency/classpath evidence missing')
     cp=cpfile.read_text().strip()
-    paths=sorted(p.relative_to(classes).as_posix() for p in classes.rglob('*.class'))
+    paths=sorted(p.relative_to(classes).as_posix() for p in (classes/'io/github/gustavo2358/analysis/structure').rglob('*.class'))
     if not paths: raise Failure('W1 classfiles absent')
     for path in paths:
         if struct.unpack('>IHH',(classes/path).read_bytes()[:8])!=(0xcafebabe,0,65): raise Failure('W1 requires Java 21 without preview')
     output=command(root,['jdeps','--multi-release','21','-filter:none','-verbose:class','-cp',cp,str(classes)])
-    edges=dependencies_from_jdeps(output)
+    edges={k:v for k,v in dependencies_from_jdeps(output).items() if k.startswith(PREFIX)}
     for source,targets in edges.items():
         for target in targets:
             if any(d in target for d in DENIED): raise Failure('W1 forbidden bytecode dependency: '+source+' -> '+target)

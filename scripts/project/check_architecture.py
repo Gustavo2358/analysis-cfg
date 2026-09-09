@@ -421,7 +421,9 @@ def verify_project_shape(root: Path) -> None:
     production_sources = {path.relative_to(root).as_posix() for path in production_paths}
     from check_transport_architecture import transport_source_inventory, verify_transport_shape
     from check_w1 import source_inventory, verify_sources
-    analysis_sources = source_inventory(root)
+    from check_w2 import SOURCES as SOLVER_SOURCES, verify_sources as verify_solver_sources
+    analysis_sources = source_inventory(root) | SOLVER_SOURCES
+    verify_solver_sources(root)
     verify_sources(root)
     transport_sources = transport_source_inventory(root)
     verify_transport_shape(root)
@@ -484,8 +486,11 @@ def verify_snapshot_pin(root: Path) -> str:
         raise GateFailure("CI must not resolve air-java from a mutable branch")
     if f'test "$(git rev-parse HEAD)" = "{sha}"' not in workflow:
         raise GateFailure("CI must verify air-java HEAD before installation")
-    if workflow.count("MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2") != 5:
+    if workflow.count("MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2") != 6:
         raise GateFailure("CI must share one isolated Maven repository across upstream and consumer")
+    for wave in (1, 2):
+        if f"scripts/project/check_cp5_gate.py performance --wave {wave}" not in workflow:
+            raise GateFailure(f"CI must execute CP5 Wave {wave} product probes")
     if 'distribution: temurin' not in workflow or 'java-version: "21"' not in workflow:
         raise GateFailure("CI must use Temurin 21")
     for gate in ("fast", "architecture", "semantic", "integration"):
@@ -769,6 +774,8 @@ def architecture_gate(root: Path) -> None:
     transport_gate(root, maven, repository, javap, jdeps, air_jar)
     from check_w1 import architecture
     architecture(root)
+    from check_w2 import architecture as solver_architecture
+    solver_architecture(root)
 
     print(f"[architecture] PASS: {total} kernel tests ({skipped} skipped), "
           f"{len(EXPECTED_CLASSFILES)} production classfiles, "

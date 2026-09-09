@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "W1_IMPLEMENTED_LATER_WAVES_UNAVAILABLE",
+  "status": "W1_W2_IMPLEMENTED_LATER_WAVES_UNAVAILABLE",
   "overflow": "Checked arithmetic; overflow is an implementation defect to correct, never a supported-size ceiling or semantic result.",
   "metrics": [
     {
@@ -540,5 +540,45 @@
       "locationsIndexed",
       "structuralVisits"
     ]
+  },
+  "wave_2": {
+    "status": "IMPLEMENTED",
+    "owner": "DataflowSolver.Run / DomainWork",
+    "hook": "scripts/project/check_w2.py",
+    "metrics": [
+      "firstPublications",
+      "nodesPopped",
+      "nodesTransferred",
+      "operationsTransferred",
+      "initializationAttempts",
+      "edgeContributionJoins",
+      "edgeTransferInvocations",
+      "accumulatorStatesChanged",
+      "accumulatorStatesUnchanged",
+      "publishedStatesChanged",
+      "publishedStatesUnchanged",
+      "predecessorContributionReads",
+      "boundaryJoins",
+      "worklistAttempts",
+      "worklistPushes",
+      "duplicatePushesSuppressed",
+      "maxWorklistSize",
+      "joinEntriesVisited",
+      "stateCompareEntries"
+    ],
+    "additional_observations": [
+      "analysisPoints",
+      "contextualEdges",
+      "successorContributionReads"
+    ],
+    "aliases": {
+      "worklistPops": "nodesPopped",
+      "blockTransferEvaluations": "nodesTransferred",
+      "edgeContributionDeliveries": "edgeContributionJoins",
+      "joinIntoCalls": "edgeContributionJoins + boundaryJoins",
+      "stateChanges": "publishedStatesChanged",
+      "duplicateEnqueueSuppressions": "duplicatePushesSuppressed"
+    },
+    "domain_observations": "operationsTransferred/joinEntriesVisited/stateCompareEntries reported by actual synthetic callbacks; opaque production domain internals cannot be inferred"
   }
 }

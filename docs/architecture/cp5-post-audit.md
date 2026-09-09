@@ -4,7 +4,8 @@ Checkpoint `CP5_POST_AUDIT_HARNESS_REMEDIATION`, WORK-CFG-028, branch
 `feat/cp5-dataflow-engine`, PR #12 OPEN/DRAFT. Discovery, preparação anterior e B1
 estão APPROVED; A–I/F1/F2/F3 foram aprovados no HEAD e86a57c.
 A remediação [CORE-SIZE-001](decisions/ADR-0014.md) foi aprovada no HEAD 4aeb4c0;
-somente W1 está autorizada e implementa a integridade estrutural. W2–W5 não autorizadas.
+W1 foi aprovada em b84389b6; W2 está autorizada para solver/oracles sintéticos.
+W3–W5 não autorizadas.
 [Lifecycle](../work/cp5-lifecycle.json) conserva o histórico B1 e a autorização focal.
 [Obrigações verificáveis](../evals/cp5/post-audit-contracts.json) complementam H1–H7/R1/R2
 sem reabrir host, separação cfg/analysis, algoritmo incremental ou cinco Waves.

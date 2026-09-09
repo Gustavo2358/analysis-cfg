@@ -119,6 +119,13 @@ Architecture inspeciona fontes/classes/DAG exatos e a chamada compilada AirJson.
 Integration executa a cadeia de arquivos e compara o resultado com oracle manual.
 A ligação real com 2A/cobol-lower e o E2E cross-repo continuam fora deste checkpoint.
 
-## CP5 aprovado, engine ainda não implementada
+## CP5 — W1 aprovada e W2 implementada para review
 
-[Subsistema de análise](docs/architecture/cp5-dataflow.md) downstream da construção: sessão/index → solver genérico + domínio → queries estáveis → consumers. Módulos futuros analysis-kernel e analysis-values com dependências AIR diretas; preparação não cria Java/POM. [Waves e review](docs/product/cp5-roadmap.md).
+[Subsistema de análise](docs/architecture/cp5-dataflow.md) downstream da construção:
+analysis-kernel contém índice/session W1 e solver genérico incremental W2, com estados
+opacos e propagação forward/backward por contexto. Depende de cfg-kernel e air-java;
+o CFG não depende da análise. [Contratos e ledger W2](docs/engineering/cp5-w2-solver-ledger.md).
+W1 APPROVED no HEAD b84389b6. W2 IMPLEMENTED / AWAITING_HUMAN_REVIEW no mesmo PR #12
+draft. PossibleValues, analysis-values, queries por operação, consumers e CLI de
+dataflow pertencem a W3–W5, ainda NOT_STARTED / NOT_AUTHORIZED.
+[Waves e review](docs/product/cp5-roadmap.md), [lifecycle](docs/work/cp5-lifecycle.json).

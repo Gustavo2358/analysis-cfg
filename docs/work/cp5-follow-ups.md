@@ -2,8 +2,8 @@
 
 Confrontados registry/backlog atuais com propostas do discovery. Nenhum backlog
 novo duplicado. [BACKLOG-CFG-020](backlog/BACKLOG-CFG-020.md) é o umbrella existente
-agora em **W1 estrutural autorizada** por WORK-CFG-028, após preparação aprovada.
-W2–W5 e os follow-ups externos abaixo não estão iniciados/autorizados. Dependência histórica de qualificação 011
+agora em **W2 solver genérico autorizada** por WORK-CFG-028, após preparação aprovada.
+W3–W5 e os follow-ups externos abaixo não estão iniciados/autorizados. Dependência histórica de qualificação 011
 valia para análises gerais; CP5 tem profile próprio sobre base 027 aprovada, sem
 reivindicar AIR-STRUCTURE completo.
 
@@ -30,7 +30,7 @@ não qualificam grandes Publications nem iniciam esses follow-ups.
 
 ## CP5-F01 — launcher com dependência AIR transitiva no baseline
 
-**FIXED_W1 / awaiting human review.** O launcher declara diretamente `air-java` e
+**FIXED_W1 / APPROVED no HEAD b84389b6.** O launcher declara diretamente `air-java` e
 `air-json`. Sua produção Java e comportamento não mudaram. O detector estrito
 check_analysis_architecture.py não contém mais a exceção byte-exact de preparação.
 O DAG explícito de transporte foi atualizado e os inventários javap/jdeps verificam

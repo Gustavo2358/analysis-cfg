@@ -14,36 +14,36 @@
       "wave": 2,
       "probe": "S4b",
       "oracle": "N contributions at J, zero predecessorContributionReads",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
     },
     {
       "id": "propagate-unchanged-out",
       "wave": 2,
       "probe": "S4",
       "oracle": "no propagation after equivalent published root",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
     },
     {
       "id": "enqueue-unchanged-join",
       "wave": 2,
       "probe": "S4",
       "oracle": "subsumed contribution creates no enqueue",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
     },
     {
       "id": "lose-self-loop-reenqueue",
       "wave": 2,
       "probe": "S4",
       "oracle": "manual fixpoint with membership cleared before transfer",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
     },
     {
       "id": "full-state-clone",
@@ -58,7 +58,7 @@
       "id": "scan-objects-per-assign",
       "wave": 1,
       "probe": "S2",
-      "oracle": "referencesResolved/structuralVisits follows R, not I×D",
+      "oracle": "referencesResolved/structuralVisits follows R, not I\u00d7D",
       "status": "IMPLEMENTED",
       "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexBuilder.java",
       "hook": "scripts/project/challenge_w1.py"
@@ -194,27 +194,27 @@
       "wave": 2,
       "probe": "S4",
       "oracle": "back-edge does not restore initial boundary",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
     },
     {
       "id": "backward-only-at-exits",
       "wave": 2,
       "probe": "S4",
       "oracle": "reachable SCC without exit and edge generation at first bottom publication",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
     },
     {
       "id": "identity-only-equality",
       "wave": 2,
       "probe": "S4",
       "oracle": "separately allocated equivalent states stop propagating",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
     },
     {
       "id": "storage-id-implies-disjoint",
@@ -230,9 +230,9 @@
       "wave": 2,
       "probe": null,
       "oracle": "javap/jdeps and solver/SPI package deny rules after successful compile",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
     },
     {
       "id": "transitive-air-only",
@@ -329,18 +329,18 @@
       "wave": 2,
       "probe": "S12",
       "oracle": "use Y; def X; use X has IN={Y}, OUT={}; after last use={} rejects the wrong IN anchor independently of order.",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/test/java/io/github/gustavo2358/analysis/solver/OracleTest.java",
+      "hook": "scripts/project/challenge_w2.py"
     },
     {
       "id": "backward-replay-forward-order",
       "wave": 2,
       "probe": "S12",
       "oracle": "Reverse gen/kill order must preserve the manual before/after witness at each operation.",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/test/java/io/github/gustavo2358/analysis/solver/OracleTest.java",
+      "hook": "scripts/project/challenge_w2.py"
     },
     {
       "id": "consumer-repairs-stale-state",
@@ -403,9 +403,9 @@
       "wave": 2,
       "probe": "S13",
       "oracle": "Manual and finite concrete inclusion oracle reject wrong gen/kill even when two abstract solvers agree.",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/test/java/io/github/gustavo2358/analysis/solver/SyntheticAnalyses.java",
+      "hook": "scripts/project/challenge_w2.py"
     },
     {
       "id": "prepared-payload-certifies-own-delivery",
@@ -475,18 +475,18 @@
       "wave": 2,
       "probe": "S16",
       "oracle": "Valid convergent run ends at fixed point regardless of visits/pushes/joins.",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
     },
     {
       "id": "resource-budget-changes-semantic-result",
       "wave": 2,
       "probe": "S16",
       "oracle": "No work/resource budget in solver SPI or semantic AnalysisKey.",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
     },
     {
       "id": "candidate-count-causes-top",
@@ -532,6 +532,123 @@
       "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
       "target": null,
       "hook": null
+    },
+    {
+      "id": "missing-first-publication",
+      "wave": 2,
+      "probe": "S4",
+      "oracle": "first bottom publication must deliver",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "skip-edge-transfer",
+      "wave": 2,
+      "probe": "S4",
+      "oracle": "expected:",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "skip-block-transfer",
+      "wave": 2,
+      "probe": "S4",
+      "oracle": "expected:",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "apply-block-twice",
+      "wave": 2,
+      "probe": "S4",
+      "oracle": "apply block exactly once",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "block-uses-wrong-state",
+      "wave": 2,
+      "probe": "S4",
+      "oracle": "expected:",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "boundary-omitted",
+      "wave": 2,
+      "probe": "S4",
+      "oracle": "boundary anchor side",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "wrong-boundary-side",
+      "wave": 2,
+      "probe": "S4",
+      "oracle": "boundary anchor side",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "ignore-self-loop",
+      "wave": 2,
+      "probe": "S4",
+      "oracle": "self loop reaches finite height",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "ignore-context-state",
+      "wave": 2,
+      "probe": "S8",
+      "oracle": "expected:",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/SolverTopology.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "duplicate-enqueue",
+      "wave": 2,
+      "probe": "S4",
+      "oracle": "coalesced diamond enqueues each point once",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "wrong-backward-direction",
+      "wave": 2,
+      "probe": "S4",
+      "oracle": "backward propagates IN to predecessor OUT",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "wrong-backward-publication",
+      "wave": 2,
+      "probe": "S4",
+      "oracle": "backward propagates IN to predecessor OUT",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "max-iterations",
+      "wave": 2,
+      "probe": "S16",
+      "oracle": "scale exact backward fact",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
     }
   ]
 }

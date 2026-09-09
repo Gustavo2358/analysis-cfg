@@ -61,3 +61,9 @@ contextos isolados e agenda justa. Domínios forward/backward, oracle por recomp
 e oracle concreto finito são test-only; S4b, escala N/2N/4N, retenção e challenges
 compiláveis com restore byte-exact. Gates locais, Maven, push e CI do HEAD final.
 Sem W3–W5, sem repin ou alterações de siblings. Parar para review humano W2.
+
+### Evidência W2 executada
+
+[Validação](../../evidence/WORK-CFG-028/wave-2/validation.md): solver/oracles,
+26 mutantes válidos e gates locais executados. W2 IMPLEMENTED / AWAITING_HUMAN_REVIEW.
+Recibo CI do HEAD final no mesmo PR #12; W3–W5 não autorizadas.

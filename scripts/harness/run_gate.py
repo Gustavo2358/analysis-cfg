@@ -35,12 +35,14 @@ def run(gate: str, root: Path) -> int:
         for issue in config_errors:
             print(issue, file=sys.stderr)
         return 1
+    if gate == 'performance' and (root/'analysis-kernel/pom.xml').is_file():
+        for wave in (1,2):
+            rc = subprocess.run([sys.executable,str(root/'scripts/project/check_cp5_gate.py'),'performance','--wave',str(wave),'--root',str(root)],cwd=root).returncode
+            if rc: return rc
+        print('[performance] W1 PASS; W2 PASS; UNAVAILABLE: W3-W5 NOT_AVAILABLE_UNTIL_IMPLEMENTED (exit 3)',flush=True)
+        return 3
     if gate == 'full':
         for child in ('fast', 'architecture', 'semantic', 'performance', 'integration'):
-            if child == 'performance' and (root/'analysis-kernel/pom.xml').is_file():
-                rc = subprocess.run([sys.executable,str(root/'scripts/project/check_cp5_gate.py'),'performance','--wave','1','--root',str(root)],cwd=root).returncode
-                if rc: return rc
-                print('[full] W1 PASS; W2-W5 NOT_AVAILABLE_UNTIL_IMPLEMENTED',flush=True)
             rc = run(child, root)
             if rc:
                 return rc

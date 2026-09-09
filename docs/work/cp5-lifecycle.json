@@ -19,19 +19,25 @@
   "authorized_wave": 2,
   "last_human_approval": {
     "date": "2026-09-09",
-    "source": "explicit human request authorizing CP5 W2 in PR #12",
-    "reviewed_head": "b84389b6ccf94c259774b82a99bc7296278b65c0",
-    "decision": "WAVE_1_APPROVED_AND_WAVE_2_AUTHORIZED",
-    "W1": "APPROVED",
-    "authorized_wave": 2,
-    "current_checkpoint": "WAVE_2",
-    "scope": "generic incremental direction-aware solver, synthetic oracles, W2 gates and evidence; commits/push/CI in same draft PR #12",
-    "evidence": "docs/work/evidence/WORK-CFG-028/wave-2/authorization.json",
-    "not_authorized": [
-      "WAVE_3",
-      "WAVE_4",
-      "WAVE_5"
-    ]
+    "source": "explicit user request for harness preparation",
+    "decision": "APPROVED_DISCOVERY_AND_HARNESS_PREPARATION_ONLY",
+    "approved": [
+      "H1",
+      "H2",
+      "H3",
+      "H4_PROPERTIES",
+      "H5",
+      "H6",
+      "H7",
+      "R1",
+      "R2"
+    ],
+    "implementation_candidates_not_frozen": [
+      "Patricia/radix",
+      "FIFO",
+      "k=8"
+    ],
+    "does_not_authorize_waves": true
   },
   "policy": {
     "same_branch_same_pr": true,
@@ -56,11 +62,11 @@
     {
       "wave": 2,
       "title": "generic incremental solver",
-      "status": "STARTED",
+      "status": "IMPLEMENTED",
       "authorization": "AUTHORIZED",
       "requires_review_of": "WAVE_1",
       "approval_evidence": "docs/work/evidence/WORK-CFG-028/wave-2/authorization.json",
-      "completion_evidence": null,
+      "completion_evidence": "docs/work/evidence/WORK-CFG-028/wave-2/validation.md",
       "eval": "EVAL-CFG-035"
     },
     {
@@ -245,7 +251,9 @@
   },
   "wave_2": {
     "authorization": "docs/work/evidence/WORK-CFG-028/wave-2/authorization.json",
-    "review": "NOT_REQUESTED",
-    "evidence": "docs/work/evidence/WORK-CFG-028/wave-2/"
+    "review": "AWAITING_HUMAN_REVIEW",
+    "evidence": "docs/work/evidence/WORK-CFG-028/wave-2/",
+    "validated_implementation_head": "70ff8663d1d46f765354fbabce45216e8f9b1316",
+    "final_remote_ci": "Same draft PR #12 final receipt; .harness-results/WORK-CFG-028/wave-2/remote-ci.json"
   }
 }
