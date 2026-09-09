@@ -26,3 +26,9 @@ preservado e APPROVED. A autorização atual é só de harness/docs/scripts/CI/e
 na mesma branch e PR #12 draft; não autoriza W1. Sem segundo builder/AirValidator,
 sem solver Python alternativo; oracle concreto finito requerido para W2/W3, hook
 NOT_AVAILABLE_UNTIL_IMPLEMENTED agora. CP5-F01 é NONBLOCKING e continua para W1.
+
+## Correção focal F
+
+Corrigir somente F1 (admission LIMIT), F2 (DeliveryReceipt externo) e F3
+(dependências explícitas dos consumers). A/B/C/D/E/G/H/I aprovados permanecem
+preservados; nenhum Java/POM, engine, writer ou Wave iniciado.

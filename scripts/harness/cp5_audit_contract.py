@@ -2,6 +2,7 @@
 from __future__ import annotations
 import json
 from pathlib import Path
+from cp5_phase_contract import validate_completion
 
 CHECKPOINT = 'CP5_POST_AUDIT_HARNESS_REMEDIATION'
 START_HEAD = 'feb79d59cc72d7dbc6269b7cacfb74db58f90867'
@@ -23,7 +24,9 @@ OBLIGATIONS = {
           'CONTEXT_INSENSITIVE_APPROXIMATION_MUST_BE_DECLARED'],
     'F': ['STABLE_ANALYSIS_SURVIVES_LATER_FAILURE', 'INCOMPLETE_PIPELINE_IS_EXPLICIT',
           'OBSERVATION_BATCH_ATOMIC', 'CONSUMER_COMPLETION_IS_INDEPENDENT',
-          'EXPLICIT_PARTIAL_BY_PHASE', 'OUTPUT_SUCCESS_REQUIRES_PUBLICATION_ACK'],
+          'EXPLICIT_PARTIAL_BY_PHASE', 'OUTPUT_SUCCESS_REQUIRES_EXTERNAL_DELIVERY_RECEIPT',
+          'ADMISSION_LIMIT_IS_NOT_UNSUPPORTED', 'CONSUMER_DEPENDENCIES_ARE_EXPLICIT',
+          'STRUCTURAL_CONSUMER_NEEDS_ZERO_ANALYSES'],
     'G': ['MANUAL_EXPECTED', 'INDEPENDENT_RECOMPUTATION_SOLVER', 'FINITE_CONCRETE_SEMANTIC_ORACLE',
           'TEST_ONLY_SYNTHETIC_FINITE_ENUMERATION', 'NO_PRODUCTION_TRANSFER_JOIN_WORKLIST_REUSE',
           'CONCRETE_BEHAVIORS_INCLUDED_IN_ABSTRACT_RESULT', 'NO_SECOND_FRAMEWORK'],
@@ -65,6 +68,11 @@ CHALLENGES = {
     'performance-optimization-by-unsupported-everything': (3, 'S15', 'Fixed admitted queries: answered/unsupported counts and expected outcomes expose refusal replacing work.'),
     'shared-wrong-transfer-agreement': (2, 'S13', 'Manual and finite concrete inclusion oracle reject wrong gen/kill even when two abstract solvers agree.'),
 }
+CHALLENGES.update({
+    'admission-budget-reported-as-unsupported': (1, None, 'ADMISSION_LIMIT with admission LIMIT, analysis NOT_STARTED; never UNSUPPORTED.'),
+    'prepared-payload-certifies-own-delivery': (5, 'S14', 'Writer failure preserves prepared bytes and solver state; only external receipt FAILED/LIMIT, never COMPLETE.'),
+    'observation-limit-blocks-independent-consumer': (4, 'S14', 'Limited QueryConsumer batch leaves zero-query StructuralConsumer COMPLETE; preparation INCOMPLETE.'),
+})
 PROBES = {'S11':[1], 'S12':[2,3], 'S13':[2,3], 'S14':[3,4,5], 'S15':[3,4,5]}
 
 
@@ -115,56 +123,31 @@ def validate_audit(root: Path) -> list[str]:
                 'authorization':'HARNESS_REMEDIATION_ONLY', 'review':'AWAITING_HUMAN_REVIEW',
                 'start_head':START_HEAD, 'audit_sha256':AUDIT_SHA,
                 'evidence':'docs/work/evidence/WORK-CFG-028/architectural-audit-remediation/validation.md'}, 'current authorization/evidence')
-        require(life['review_history'][-1] == {'date':'2026-09-09','source':'explicit user post-audit remediation request',
+        require(life['review_history'][0] == {'date':'2026-09-09','source':'explicit user post-audit remediation request',
                 'discovery':'APPROVED','harness_preparation':'APPROVED','B1':'APPROVED',
                 'CP5-F01':'NONBLOCKING_FOLLOW_UP_W1','authorized_wave':None}, 'approved history and nonblocking F01')
+        require(life['review_history'][-1] == {'date':'2026-09-09','source':'explicit human review of post-audit PR #12',
+                'reviewed_head':'e053f14f8f5dc7b0b80b7bbbe015fde684522835','decision':'REQUEST_CHANGES_F_ONLY',
+                'approved_remediations':['A','B','C','D','E','G','H','I'],'requested_changes':['F1','F2','F3'],
+                'CP5-F01':'NONBLOCKING_FOLLOW_UP_W1','authorized_wave':None}, 'F-only human review')
+        require(life['f_correction'] == {'reviewed_head':'e053f14f8f5dc7b0b80b7bbbe015fde684522835',
+                'authorization':'F1_F2_F3_ONLY','review':'AWAITING_HUMAN_REVIEW',
+                'evidence':'docs/work/evidence/WORK-CFG-028/review-f/validation.md'}, 'F-only authorization')
+        from cp5_phase_contract import validate_prepared
+        phase_review = read('docs/evals/cp5/phase-review.json')
+        require(phase_review['design']['kind'] == 'REVIEW_SNAPSHOT' and phase_review['design']['execution'] == 'NOT_EXECUTED', 'F snapshot design only')
+        prepared = phase_review['prepared']
+        errors += validate_prepared(prepared, phase_review['design']['requestedConsumers'], phase_review['design']['requestedQueriesByBatch'])
+        require(prepared['preparationStatus'] == 'INCOMPLETE' and len(prepared['results']) == 1, 'F3 limited batch witness')
+        result = prepared['results'][0]['result']
+        require(result['executionStatus'] == 'STABLE' and result['completion']['observation']['status'] == 'LIMIT', 'F3 stable analysis limited observation')
+        require(prepared['consumers'] == [{'id':'StructuralConsumer','status':'COMPLETE','reason':None},
+                {'id':'QueryConsumer','status':'NOT_STARTED','reason':'DEPENDENCY_UNAVAILABLE'}], 'F3 independent consumer witness')
+        require(prepared['consumerPlan'][0] == {'consumerId':'StructuralConsumer','requiredAnalysisKeys':[],
+                'requiredObservationBatchIds':[]}, 'F3 zero-analysis structural plan')
         evidence = read('docs/work/evidence/WORK-CFG-028/architectural-audit-remediation/baseline.json')
         require(evidence['audit']['sha256'] == AUDIT_SHA and evidence['audit']['read'] == 'integral', 'integral audit hash')
         require(evidence['analysis-cfg']['head'] == START_HEAD, 'real starting head')
     except (OSError, KeyError, TypeError, ValueError, IndexError) as exc:
         errors.append('CP5 post-audit: missing/invalid contract: ' + str(exc))
-    return errors
-
-
-def validate_completion(result: dict, requested_consumers: list[str] | None = None) -> list[str]:
-    """Validate proposed phase envelope; never executes analysis or publishes bytes."""
-    errors = []
-    def require(ok, reason):
-        if not ok: errors.append('CP5 phase completion: ' + reason)
-    try:
-        completion = result['completion']
-        require(set(completion) == {'pipelineStatus','publicationPolicy','admission','analysis','observation','consumers','publication'}, 'fields')
-        require(completion['publicationPolicy'] == 'EXPLICIT_PARTIAL_BY_PHASE', 'partial publication must be explicit')
-        allowed = {'admission':{'COMPLETE','REJECTED'}, 'analysis':{'STABLE','LIMIT','NOT_STARTED'},
-                   'observation':{'COMPLETE','LIMIT','FAILED','NOT_STARTED'},
-                   'publication':{'COMPLETE','LIMIT','FAILED','NOT_STARTED'}}
-        def phase(row, statuses, consumer=False):
-            require(set(row) == ({'id','status','reason'} if consumer else {'status','reason'}), 'phase fields')
-            require(row['status'] in statuses, 'phase status')
-            failed = row['status'] in {'REJECTED','LIMIT','FAILED'}
-            require((isinstance(row['reason'], str) and bool(row['reason'].strip())) if failed else row['reason'] is None, 'phase reason')
-        for name, statuses in allowed.items(): phase(completion[name], statuses)
-        consumers = completion['consumers']
-        require(isinstance(consumers, list), 'consumer inventory')
-        ids = []
-        for consumer in consumers:
-            phase(consumer, {'COMPLETE','LIMIT','FAILED','NOT_STARTED'}, True)
-            require(isinstance(consumer['id'],str) and bool(consumer['id'].strip()), 'consumer identity')
-            ids.append(consumer['id'])
-        require(len(ids) == len(set(ids)), 'unique consumer identity')
-        if requested_consumers is not None:
-            require(set(ids) == set(requested_consumers), 'requested consumer coverage')
-        status = result['executionStatus']
-        require(completion['analysis']['status'] == {'STABLE':'STABLE','ANALYSIS_LIMIT':'LIMIT','UNSUPPORTED':'NOT_STARTED','INVALID_INPUT':'NOT_STARTED'}[status], 'solver status is independent of later failure')
-        require(completion['admission']['status'] == ('REJECTED' if status in {'UNSUPPORTED','INVALID_INPUT'} else 'COMPLETE'), 'admission/analysis order')
-        if status == 'ANALYSIS_LIMIT': require(completion['analysis']['reason'] == result['limitReason'], 'analysis limit reason')
-        observation_done = completion['observation']['status'] == 'COMPLETE'
-        if status != 'STABLE': require(completion['observation']['status'] == 'NOT_STARTED', 'observation needs stable analysis')
-        if not observation_done:
-            require(result['observations'] == [], 'atomic observation batch, no partial values')
-            require(all(c['status'] == 'NOT_STARTED' for c in consumers), 'consumers need completed observations')
-        done = status == 'STABLE' and observation_done and all(c['status'] == 'COMPLETE' for c in consumers) and completion['publication']['status'] == 'COMPLETE'
-        require(completion['pipelineStatus'] == ('COMPLETE' if done else 'INCOMPLETE'), 'incomplete phases cannot be full success')
-    except (KeyError, TypeError, ValueError) as exc:
-        errors.append('CP5 phase completion: missing/invalid envelope: ' + str(exc))
     return errors

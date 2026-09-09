@@ -16,7 +16,7 @@ STABLE como execução real. Statistics ficam unavailable/null, sem counters inv
 | schema/version | analysis-dataflow-result / 1.0.0, evolução local explícita |
 | analysisKey | implementação/versão, profile, direção, precisão, options, Entry; cache pertence à sessão/snapshot |
 | publicationId/unitId/entryId | identidade completa, sem ordinais internos exportados |
-| executionStatus | STABLE, ANALYSIS_LIMIT, UNSUPPORTED ou INVALID_INPUT do solver/run; recusa isolada de query não altera esse status |
+| executionStatus | STABLE, ADMISSION_LIMIT, ANALYSIS_LIMIT, UNSUPPORTED ou INVALID_INPUT do solver/run; recusa isolada de query não altera esse status |
 | modelScope/sourceScope | KNOWN_GRAPH_ENTRY separado da abertura CONTROL/Unit da fonte |
 | observations | um resultado por query única (point, subject) do plano em run STABLE e observation COMPLETE, inclusive queries recusadas |
 | queryStatus/queryReason | VALUE com motivo null, ou UNSUPPORTED_POINT com motivo explícito não vazio; status por query separado de executionStatus |
@@ -80,41 +80,68 @@ reports e falhas antes do writer. A CLI separada usará AIR file → reader → 
 escritos por Sequence em before(terminator), sem selecionar primeiro Object/WS-PGM/
 PROGA ou varrer todos Objects por Sequence. CLI CFG existente mantém contrato próprio.
 
-## Envelope de completion por fase
+## Completion do run e preparação com consumers
 
-`completion` é obrigatório, com `pipelineStatus`, `publicationPolicy`, `admission`,
-`analysis`, `observation`, `consumers` e `publication`. Cada fase contém status/reason;
-cada consumer também tem id estável e único no plano independente solicitado.
+`AnalysisDataflowResult.completion` contém **somente** admission, analysis e
+observation, cada qual com status/reason. Não contém consumers nem publication.
 
-| Fase | Status | Motivo |
-| --- | --- | --- |
-| admission | COMPLETE / REJECTED | REJECTED exige motivo, inclusive profile/integridade/budget de admissão |
-| analysis | STABLE / LIMIT / NOT_STARTED | LIMIT exige motivo igual a limitReason global |
-| observation | COMPLETE / LIMIT / FAILED / NOT_STARTED | LIMIT/FAILED exigem motivo local |
-| cada consumer | COMPLETE / LIMIT / FAILED / NOT_STARTED | LIMIT/FAILED exigem motivo local |
-| publication | COMPLETE / LIMIT / FAILED / NOT_STARTED | COMPLETE representa confirmação externa; falha exige motivo |
+| executionStatus externo | admission | analysis | observation |
+| --- | --- | --- | --- |
+| ADMISSION_LIMIT | LIMIT | NOT_STARTED | NOT_STARTED |
+| UNSUPPORTED / INVALID_INPUT | REJECTED | NOT_STARTED | NOT_STARTED |
+| ANALYSIS_LIMIT | COMPLETE | LIMIT | NOT_STARTED |
+| STABLE | COMPLETE | STABLE | COMPLETE / LIMIT / FAILED / NOT_STARTED |
 
-Demais motivos são null. Admission REJECTED corresponde a UNSUPPORTED/INVALID_INPUT,
-analysis NOT_STARTED e observation NOT_STARTED. ANALYSIS_LIMIT corresponde a analysis
-LIMIT com observation NOT_STARTED. Observation só inicia após STABLE; consumers deste
-produto dependem do lote materializado completo. Sem consumer solicitado, lista vazia.
+ADMISSION_LIMIT e ANALYSIS_LIMIT exigem limitReason não vazio, igual ao motivo da
+fase respectiva. Demais executionStatus têm limitReason=null. REJECTED/LIMIT/FAILED
+exigem motivo; demais fases têm reason=null. ADMISSION_BUDGET nunca é UNSUPPORTED.
+Observation não COMPLETE mantém apenas seu lote vazio; budget de replay não altera
+STABLE nem vira UNSUPPORTED_POINT. B1 continua aplicado por batch completo.
 
-Política EXPLICIT_PARTIAL_BY_PHASE: observations é lote atômico. Se observation não
-completa, observations=[] e consumers solicitados ficam NOT_STARTED. STABLE com replay
-LIMIT continua STABLE, limitReason=null, pipelineStatus INCOMPLETE. Não inventar
-UNSUPPORTED_POINT para queries não materializadas. Se a materialização completa,
-preservar B1 e conferir exatamente todos os pontos/subjects do plano.
+`PreparedAnalysisResult` é envelope de preparação com schema/version, resultId,
+publicationId, results, consumerPlan, consumers, preparationStatus e partialPolicy.
+results liga cada observationBatchId único a um AnalysisDataflowResult. Batches da
+mesma AnalysisKey podem compartilhar run; seus status de análise/admissão e scopes
+precisam concordar. Não é autorização para repetir solver por query/consumer.
 
-Cada consumer é atômico e tem status próprio: A COMPLETE/B FAILED admite resultados
-concluídos de A e observations sob envelope INCOMPLETE explícito; nenhum fato parcial
-de B é sucesso. Conferir também cobertura do plano independente de consumers. O
-snapshot não define wire de fatos de consumers; esse contrato será vinculado em W4/W5.
-Publication FAILED/LIMIT não apaga a estabilidade nem confirma entrega; a confirmação
-é recibo externo do chamador, não um campo autodeclarado pelo writer em stream truncado.
-O envelope de review representa payload preparado e recibo de forma conceitual.
+ConsumerPlan contém consumerId, requiredAnalysisKeys completos e
+requiredObservationBatchIds. Todo batch requerido deve ser resolvido e seu
+AnalysisKey listado. Outcomes dos consumers têm id/status/reason e devem cobrir
+exatamente o plano independente, sem omissões ou alteração silenciosa de dependências.
 
-pipelineStatus COMPLETE se e somente se analysis STABLE, observation COMPLETE, todos
-consumers solicitados COMPLETE e publication COMPLETE. Em todos os demais casos,
-INCOMPLETE. Completion operacional não promete precisão fechada: UNSUPPORTED_POINT,
-source open e saturação continuam explícitos mesmo em pipeline concluída.
-[Decisão F e fases de ativação](cp5-post-audit.md#f). Nenhum runtime/writer implementado.
+Somente dependências indisponíveis forçam NOT_STARTED/DEPENDENCY_UNAVAILABLE.
+Dependências satisfeitas permitem COMPLETE (reason=null), FAILED/LIMIT com motivo,
+ou NOT_STARTED com motivo explícito caso o trabalho não tenha sido executado.
+StructuralConsumer pode ter ambas listas vazias e completar com results=[]; não
+inventar run STABLE. SiteView estrutural já deve ter sido admitida pelo contrato W1.
+Um consumer que requer somente AnalysisKey estável não depende de batch limitado.
+
+partialPolicy=EXPLICIT_PARTIAL_BY_DEPENDENCY: cada batch e cada consumer é atômico.
+preparationStatus COMPLETE exige todos os runs/batches solicitados completos e todos
+os consumers COMPLETE; caso contrário INCOMPLETE. Status e resultados concluídos de
+consumers independentes permanecem disponíveis. A preparação não afirma entrega.
+O wire dos bundles de facts continua para W4/W5; esta remediação especifica somente
+identidades, dependências e completion, sem implementação de consumers.
+
+## DeliveryReceipt externo ao payload
+
+Recibo separado: schema=analysis-delivery-receipt/version=1.0.0, resultId,
+resultSha256, destination, status COMPLETE/FAILED/LIMIT e reason. Correlacionar ao
+resultId preparado e destino da tentativa. COMPLETE exige hash dos bytes completos
+entregues e confirmação do chamador; FAILED/LIMIT exige motivo, e pode usar hash=null
+quando a falha ocorreu antes do hash completo. Se houver hash, deve identificar os
+bytes completos pretendidos, não prefixo truncado. Não impor buffer integral ou
+codec/serialização nesta revisão; W5 vincula esses campos ao writer real.
+
+O recibo é criado após a tentativa, armazenado/retornado fora do payload e nunca
+usado para reescrevê-lo. Falha de encoding/escrita/finalização preserva o resultado
+preparado e o fixpoint. Uma nova tentativa gera novo recibo. O sucesso end-to-end
+exige preparationStatus COMPLETE **e** receipt COMPLETE correlacionado. Um recibo
+COMPLETE de payload INCOMPLETE confirma transporte, sem promover preparação parcial.
+Sem recibo externo não há confirmação de entrega, mesmo com preparação completa.
+
+O snapshot de [batch B1](../evals/cp5/result-review.json) continua NOT_EXECUTED.
+O [witness de dependências F3](../evals/cp5/phase-review.json) conserva StructuralConsumer
+COMPLETE após query-batch LIMIT. Testes verificam ADMISSION_LIMIT, writer failure,
+hash/identity mismatch, self-certification, batches e consumers independentes.
+[Decisão F](cp5-post-audit.md#f). Nenhum runtime, workflow engine ou writer implementado.

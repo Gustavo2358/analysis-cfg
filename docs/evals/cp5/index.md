@@ -27,3 +27,6 @@ W3 acrescenta dimensão de bindings/J/alocações, sem congelar container.
 
 [Obrigações pós-auditoria A–I](post-audit-contracts.json): S11–S15 e desafios futuros
 Invoke/effects, com hooks indisponíveis até a implementação autorizada.
+
+[Witness de completion F3](phase-review.json): preparação parcial preserva consumer
+estrutural independente; o recibo de entrega não faz parte do payload.

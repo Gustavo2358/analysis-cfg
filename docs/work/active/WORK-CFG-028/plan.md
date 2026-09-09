@@ -26,3 +26,9 @@ ce530a7e17ab12b23c48f29425f503ff920b09fb, AIR normativa no lock inalterado.
 [Baseline/autoridades integrais](../../evidence/WORK-CFG-028/baseline.json).
 Uma branch feat/cp5-dataflow-engine e um PR draft até W5; sem merge intermediário.
 Waves são checkpoints de review, não unidades fixas de commits ou PRs.
+
+## Correção focal F
+
+Review F de e053f14: reproduzir RED; corrigir contratos/snapshots e validator;
+GREEN e contracasos; full/integration/Maven/scope; evidência append-only; commit/push
+no PR #12 draft e recibos CI do novo HEAD. Parar para review humano.

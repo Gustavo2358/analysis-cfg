@@ -37,3 +37,10 @@ Auditoria: KEEP ARCHITECTURE WITH FOCUSED REMEDIATIONS. Autorização focal A–
 sem implementação produtiva. [Evidência desta remediação](../../evidence/WORK-CFG-028/architectural-audit-remediation/validation.md)
 registra fonte/hash da auditoria, confronto com AIR/código, gates e limites. W1
 somente após aprovação desta remediação e tarefa separada com autorização explícita.
+
+
+Review humano de e053f14f8f5dc7b0b80b7bbbe015fde684522835: A/B/C/D/E/G/H/I APPROVED,
+REQUEST CHANGES somente F1/F2/F3. A correção focal distingue ADMISSION_LIMIT,
+externaliza DeliveryReceipt e declara dependências dos consumers, preservando
+resultados independentes. [Evidência F](../../evidence/WORK-CFG-028/review-f/validation.md).
+Mantém o checkpoint atual aguardando novo review e todas as Waves não autorizadas.

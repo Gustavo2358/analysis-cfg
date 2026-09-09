@@ -58,6 +58,25 @@ def main() -> int:
         focal_scope = ["docs", "scripts/harness", "scripts/project", ".github/workflows/ci.yml", "MANIFEST.sha256"]
         if any(not any(p == s or p.startswith(s + "/") for s in focal_scope) for p in focal_paths):
             raise ValueError("path outside focal post-audit remediation scope")
+        # This human review reopens only F. Preserve the other accepted machine contracts.
+        f_base = "e053f14f8f5dc7b0b80b7bbbe015fde684522835"
+        def baseline_json(path): return json.loads(git("show", f_base + ":" + path))
+        audit_path = "docs/evals/cp5/post-audit-contracts.json"
+        before = baseline_json(audit_path)
+        after = json.loads((ROOT/audit_path).read_text())
+        before["requirements"].pop("F"); after["requirements"].pop("F")
+        if before != after: raise ValueError("F-only scope: other approved audit contracts changed")
+        for path in ["docs/evals/cp5/metrics.json", "docs/evals/cp5/architecture.json",
+                     "docs/evals/cp5/gate-plan.json", ".github/workflows/ci.yml",
+                     "scripts/project/ci_source_receipt.py"]:
+            if (ROOT/path).read_bytes() != git("show", f_base + ":" + path):
+                raise ValueError("F-only scope: approved contract changed: " + path)
+        probe_path = "docs/evals/cp5/probes.json"
+        before = baseline_json(probe_path)
+        after = json.loads((ROOT/probe_path).read_text())
+        for value in [before,after]:
+            value["probes"] = [p for p in value["probes"] if p["id"] != "S14"]
+        if before != after: raise ValueError("F-only scope: non-F probes changed")
         # Bind the offline Java/POM inventory to Git, so editing both cannot hide a change.
         names = git("ls-tree", "-r", "--name-only", BASE).decode().splitlines()
         baseline_sources = {p:hashlib.sha256(git("show", BASE + ":" + p)).hexdigest()

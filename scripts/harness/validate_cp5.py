@@ -7,6 +7,7 @@ import re
 from pathlib import Path
 from validate_docs import existing, files_under, load_json
 import cp5_audit_contract as audit
+import cp5_phase_contract as phases
 
 BASE = 'ec525cbbad96d70c9663faa88e2672148fa8ee71'
 LIFECYCLE = 'docs/work/cp5-lifecycle.json'
@@ -52,16 +53,16 @@ UNSUPPORTED_NULL_FIELDS = {'reachability', 'value', 'sourceUnknownRemainder',
                            'effectiveUnknownRemainder', 'precision'}
 
 
-def validate_result(result: dict, requested_queries: list[dict] | None = None, requested_consumers: list[str] | None = None) -> list[str]:
+def validate_result(result: dict, requested_queries: list[dict] | None = None) -> list[str]:
     """Review shape/consistency and optional external batch coverage; no AIR execution."""
-    errors = audit.validate_completion(result, requested_consumers)
+    errors = audit.validate_completion(result)
     def require(ok, reason):
         if not ok: errors.append('CP5 result: ' + reason)
     try:
         require(set(result) == RESULT_FIELDS, 'required result fields')
         require((result['schema'], result['version']) == ('analysis-dataflow-result', '1.0.0'), 'schema/version')
         status = result['executionStatus']
-        require(status in {'STABLE', 'ANALYSIS_LIMIT', 'UNSUPPORTED', 'INVALID_INPUT'}, 'execution status')
+        require(status in phases.EXECUTION_STATUSES, 'execution status')
         require(result['modelScope'] == 'KNOWN_GRAPH_ENTRY', 'model scope')
         pub = result['publicationId']['localId']
         unit = result['unitId']['localId']
@@ -99,7 +100,7 @@ def validate_result(result: dict, requested_queries: list[dict] | None = None, r
             expected = {query_key(q) for q in requested_queries}
             actual = [query_key(o) for o in result['observations']]
             require(len(actual) == len(expected) and set(actual) == expected, 'requested query coverage')
-        require((status == 'ANALYSIS_LIMIT') == (result['limitReason'] is not None), 'budget limit distinct from stable/saturation')
+        require((status in {'ADMISSION_LIMIT','ANALYSIS_LIMIT'}) == (result['limitReason'] is not None), 'budget limit distinct from stable/saturation')
         for obs in result['observations']:
             require(set(obs) == OBS_FIELDS, 'required observation fields')
             query_status = obs['queryStatus']
@@ -252,11 +253,12 @@ def validate_cp5(root: Path) -> list[str]:
         for inv in arch['future_inventories'].values():
             require(inv == {'status':'NOT_AVAILABLE_UNTIL_IMPLEMENTED','sources':None,'classfiles':None,'javap_descriptors':None,'jdeps_edges':None,'effective_maven':None}, 'unimplemented bytecode inventory')
         contract = load_json(root / PLAN / 'result-contract.json')
-        require(contract['schema_version'] == 1 and contract['status'] == 'REVIEW_SNAPSHOT_NOT_CODEC' and contract['schema'] == 'analysis-dataflow-result' and contract['version'] == '1.0.0' and set(contract['execution_statuses']) == {'STABLE','ANALYSIS_LIMIT','UNSUPPORTED','INVALID_INPUT'} and set(contract['value_kinds']) == {'Candidates','Saturated'} and set(contract['reachability']) == {'REACHABLE','UNREACHABLE_IN_MODEL'}, 'result contract status/schema')
+        require(contract['schema_version'] == 1 and contract['status'] == 'REVIEW_SNAPSHOT_NOT_CODEC' and contract['schema'] == 'analysis-dataflow-result' and contract['version'] == '1.0.0' and set(contract['execution_statuses']) == phases.EXECUTION_STATUSES and set(contract['value_kinds']) == {'Candidates','Saturated'} and set(contract['reachability']) == {'REACHABLE','UNREACHABLE_IN_MODEL'}, 'result contract status/schema')
         require(set(contract['required_result_fields']) == RESULT_FIELDS and set(contract['required_observation_fields']) == OBS_FIELDS, 'result contract minimum fields')
         require(set(contract['query_statuses']) == QUERY_STATUSES and
                 set(contract['unsupported_point_null_fields']) == UNSUPPORTED_NULL_FIELDS, 'result contract query outcomes')
-        require(contract['completion']['required_fields'] == ['pipelineStatus','publicationPolicy','admission','analysis','observation','consumers','publication'] and contract['completion']['publication_policy'] == 'EXPLICIT_PARTIAL_BY_PHASE' and contract['completion']['observation_batch'] == 'ATOMIC', 'phase completion contract')
+        require(set(contract['completion']['required_fields']) == phases.COMPLETION_FIELDS and set(contract['completion']['prepared_fields']) == phases.PREPARED_FIELDS and set(contract['completion']['consumer_plan_fields']) == phases.PLAN_FIELDS and set(contract['completion']['delivery_receipt_fields']) == phases.RECEIPT_FIELDS and contract['completion']['observation_batch'] == 'ATOMIC', 'phase completion contract')
+        require(contract['completion']['admission_statuses'] == ['COMPLETE','REJECTED','LIMIT'] and contract['completion']['delivery_statuses'] == ['COMPLETE','FAILED','LIMIT'], 'F admission/delivery status contract')
         snapshot = load_json(root / PLAN / 'result-review.json')
         require(snapshot['design']['kind'] == 'REVIEW_SNAPSHOT' and snapshot['design']['execution'] == 'NOT_EXECUTED', 'result example is design only')
         requests = snapshot['design']['requestedQueries']
@@ -265,7 +267,7 @@ def validate_cp5(root: Path) -> list[str]:
             before, after = requests
             require(before['point']['position'] == 'BEFORE' and before['point']['outcome'] is None and
                     after == {'point': dict(before['point'], position='AFTER'), 'subject': before['subject']}, 'mixed batch before/after same point and subject')
-        errors += validate_result(snapshot['result'], requests, snapshot['design']['requestedConsumers'])
+        errors += validate_result(snapshot['result'], requests)
         require(snapshot['result']['executionStatus'] == 'STABLE', 'mixed batch must remain STABLE')
         for request, expected_status in zip(requests, ('VALUE', 'UNSUPPORTED_POINT')):
             matches = [o for o in snapshot['result']['observations']

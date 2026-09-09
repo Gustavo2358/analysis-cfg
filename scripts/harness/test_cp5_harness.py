@@ -16,6 +16,14 @@ from validate_cp5 import validate_cp5, validate_result, LIFECYCLE, WORK, PLAN, C
 sys.path.insert(0, str(ROOT / 'scripts/project'))
 from check_analysis_architecture import check_direct_air, check_preparation_air, forbidden_dependencies
 from check_cp5_gate import run
+from cp5_phase_contract import validate_prepared, validate_delivery_receipt
+
+def prepared_for(result):
+    return {'schema':'prepared-analysis-result', 'version':'1.0.0', 'resultId':'prepared-review',
+            'publicationId':copy.deepcopy(result['publicationId']),
+            'results':[{'observationBatchId':'batch','result':result}],
+            'consumerPlan':[],'consumers':[],'preparationStatus':'COMPLETE',
+            'partialPolicy':'EXPLICIT_PARTIAL_BY_DEPENDENCY'}
 
 
 class Cp5HarnessTests(unittest.TestCase):
@@ -84,17 +92,29 @@ class Cp5HarnessTests(unittest.TestCase):
 
     def test_stable_solver_is_not_complete_pipeline(self):
         result = load_json(self.root/PLAN/'result-review.json')['result']
-        result['completion'] = {
-            'pipelineStatus': 'COMPLETE', 'publicationPolicy': 'EXPLICIT_PARTIAL_BY_PHASE',
-            'admission': {'status': 'COMPLETE', 'reason': None},
-            'analysis': {'status': 'STABLE', 'reason': None},
-            'observation': {'status': 'LIMIT', 'reason': 'observation budget'},
-            'consumers': [], 'publication': {'status': 'COMPLETE', 'reason': None}}
+        result['completion']['observation'] = {'status':'LIMIT','reason':'observation budget'}
         result['observations'] = []
-        errors = validate_result(result)
-        self.assertTrue(any('phase completion' in e for e in errors), errors)
-        result['completion']['pipelineStatus'] = 'INCOMPLETE'
-        self.assertEqual([], validate_result(result, load_json(self.root/PLAN/'result-review.json')['design']['requestedQueries']))
+        prepared = prepared_for(result)
+        self.assertTrue(any('incomplete preparation' in e for e in validate_prepared(prepared)))
+        prepared['preparationStatus'] = 'INCOMPLETE'
+        self.assertEqual([], validate_prepared(prepared))
+
+    def test_f3_global_barrier_snapshot_is_rejected_and_restored(self):
+        path=self.root/PLAN/'phase-review.json';original=path.read_bytes()
+        self.edit(PLAN+'phase-review.json',lambda x:x['prepared']['consumers'][0].update(status='NOT_STARTED',reason='GLOBAL_BARRIER'))
+        self.guard('F3 independent consumer witness')
+        path.write_bytes(original)
+        self.assertEqual([],validate_cp5(self.root))
+
+    def test_f1_and_f2_contract_fields_cannot_disappear(self):
+        path=self.root/PLAN/'result-contract.json';original=path.read_bytes()
+        self.edit(PLAN+'result-contract.json',lambda x:x['completion']['admission_statuses'].remove('LIMIT'))
+        self.guard('F admission/delivery status contract')
+        path.write_bytes(original)
+        self.edit(PLAN+'result-contract.json',lambda x:x['completion']['delivery_receipt_fields'].remove('resultSha256'))
+        self.guard('phase completion contract')
+        path.write_bytes(original)
+        self.assertEqual([],validate_cp5(self.root))
 
     def test_valid_preparation(self):
         self.assertEqual([], validate_cp5(self.root))
@@ -321,29 +341,28 @@ class ResultContractTests(unittest.TestCase):
 
     def rejected_run(self, result, status):
         result.update(executionStatus=status, observations=[], limitReason='WORK_BUDGET' if status == 'ANALYSIS_LIMIT' else None)
-        result['completion'].update(pipelineStatus='INCOMPLETE',
-            admission={'status':'COMPLETE','reason':None} if status == 'ANALYSIS_LIMIT' else {'status':'REJECTED','reason':'profile or input rejected'},
+        result['completion'].update(admission={'status':'COMPLETE','reason':None} if status == 'ANALYSIS_LIMIT' else {'status':'REJECTED','reason':'profile or input rejected'},
             analysis={'status':'LIMIT','reason':'WORK_BUDGET'} if status == 'ANALYSIS_LIMIT' else {'status':'NOT_STARTED','reason':None},
             observation={'status':'NOT_STARTED','reason':None})
 
     def test_consumer_failure_keeps_other_completion_and_requires_full_plan(self):
-        result = copy.deepcopy(self.example)
-        result['completion'].update(pipelineStatus='INCOMPLETE', consumers=[
+        prepared = prepared_for(copy.deepcopy(self.example))
+        plans = [{'consumerId':name,'requiredAnalysisKeys':[],'requiredObservationBatchIds':[]} for name in ['A','B']]
+        prepared.update(preparationStatus='INCOMPLETE', consumerPlan=copy.deepcopy(plans), consumers=[
             {'id':'A','status':'COMPLETE','reason':None}, {'id':'B','status':'FAILED','reason':'extraction failed'}])
-        self.assertEqual([], validate_result(result, requested_consumers=['A','B']))
-        result['completion']['pipelineStatus'] = 'COMPLETE'
-        self.assertTrue(any('phase completion' in e for e in validate_result(result)))
-        result['completion']['pipelineStatus'] = 'INCOMPLETE'
-        result['completion']['consumers'].pop()
-        self.assertTrue(any('requested consumer coverage' in e for e in validate_result(result, requested_consumers=['A','B'])))
+        self.assertEqual([], validate_prepared(prepared, plans))
+        prepared['preparationStatus'] = 'COMPLETE'
+        self.assertTrue(any('incomplete preparation' in e for e in validate_prepared(prepared)))
+        prepared['preparationStatus'] = 'INCOMPLETE'
+        prepared['consumers'].pop()
+        self.assertTrue(any('requested consumer coverage' in e for e in validate_prepared(prepared, plans)))
 
     def test_phase_limit_or_failure_cannot_rewrite_stable_solver_or_emit_partial_batch(self):
-        for phase in ['observation','publication']:
+        for phase in ['observation']:
             for status in ['LIMIT','FAILED']:
                 with self.subTest(phase=phase,status=status):
                     result = copy.deepcopy(self.example)
                     result['completion'][phase] = {'status':status,'reason':'phase failure'}
-                    result['completion']['pipelineStatus'] = 'INCOMPLETE'
                     if phase == 'observation':
                         self.assertTrue(any('atomic observation batch' in e for e in validate_result(result)))
                         result['observations'] = []
@@ -357,11 +376,34 @@ class ResultContractTests(unittest.TestCase):
             mutant = copy.deepcopy(self.example)
             del mutant['completion'][field]
             self.assertTrue(any('phase completion' in e for e in validate_result(mutant)))
-        for change in [{'publicationPolicy':'IMPLICIT'}, {'observation':{'status':'LIMIT','reason':None}},
-                       {'consumers':[{'id':'A','status':'COMPLETE','reason':None}]*2}]:
+        for change in [{'publication':{'status':'COMPLETE','reason':None}},
+                       {'observation':{'status':'LIMIT','reason':None}}, {'consumers':[]}]:
             mutant = copy.deepcopy(self.example)
             mutant['completion'].update(change)
             self.assertTrue(any('phase completion' in e for e in validate_result(mutant)))
+
+    def test_f1_admission_limit_is_not_unsupported(self):
+        result = copy.deepcopy(self.example)
+        result.update(executionStatus='ADMISSION_LIMIT',limitReason='ADMISSION_BUDGET',observations=[])
+        result['completion'] = {'admission':{'status':'LIMIT','reason':'ADMISSION_BUDGET'},
+            'analysis':{'status':'NOT_STARTED','reason':None}, 'observation':{'status':'NOT_STARTED','reason':None}}
+        self.assertEqual([], validate_result(result))
+        result['executionStatus'] = 'UNSUPPORTED'
+        self.assertTrue(any('admission' in e for e in validate_result(result)))
+        result['completion']['admission']['status'] = 'REJECTED'
+        result['limitReason'] = None
+        self.assertTrue(any('ADMISSION_BUDGET is never UNSUPPORTED' in e for e in validate_result(result)))
+
+    def test_f2_result_cannot_self_certify_delivery(self):
+        self.assertNotIn('publication', self.example['completion'])
+        self.assertNotIn('publicationPolicy', self.example['completion'])
+
+    def test_f3_dependency_aware_prepared_result_contract_exists(self):
+        import importlib.util
+        self.assertIsNotNone(importlib.util.find_spec('cp5_phase_contract'), 'F3 dependency-aware contract absent')
+        import cp5_phase_contract as phase
+        self.assertTrue(callable(getattr(phase, 'validate_prepared', None)),
+                        'F3 needs a dependency-aware prepared-result validator')
 
     def mixed_batch(self):
         # Manual response oracle: no solver or expected-value regeneration.
@@ -498,6 +540,106 @@ class ResultContractTests(unittest.TestCase):
         self.example['observations'][0]['value']['kind']='Saturated'
         self.assertTrue(any('saturation must expose' in e for e in validate_result(self.example)))
 
+
+
+class FCompletionTests(unittest.TestCase):
+    def setUp(self):
+        self.snapshot = load_json(ROOT/PLAN/'phase-review.json')
+        self.prepared = copy.deepcopy(self.snapshot['prepared'])
+        self.plans = copy.deepcopy(self.snapshot['design']['requestedConsumers'])
+        self.queries = copy.deepcopy(self.snapshot['design']['requestedQueriesByBatch'])
+
+    def validate(self):
+        return validate_prepared(self.prepared, self.plans, self.queries)
+
+    def test_structural_consumer_survives_limited_query_batch(self):
+        self.assertEqual([], self.validate())
+        run = self.prepared['results'][0]['result']
+        self.assertEqual('STABLE', run['executionStatus'])
+        self.assertIsNone(run['limitReason'])
+        self.assertEqual([], run['observations'])
+        self.assertEqual(['COMPLETE','NOT_STARTED'], [c['status'] for c in self.prepared['consumers']])
+        self.assertEqual('INCOMPLETE', self.prepared['preparationStatus'])
+        self.prepared['consumers'][1].update(status='COMPLETE',reason=None)
+        self.assertTrue(any('dependent consumers blocked' in e for e in self.validate()))
+
+    def test_structural_only_needs_no_fake_analysis(self):
+        self.prepared.update(results=[],consumerPlan=self.plans[:1],consumers=self.prepared['consumers'][:1],preparationStatus='COMPLETE')
+        self.assertEqual([], validate_prepared(self.prepared,self.plans[:1],{}))
+
+    def test_analysis_only_consumer_does_not_depend_on_observation(self):
+        plan={'consumerId':'AnalysisOnly','requiredAnalysisKeys':self.plans[1]['requiredAnalysisKeys'],'requiredObservationBatchIds':[]}
+        self.plans.append(plan);self.prepared['consumerPlan'].append(copy.deepcopy(plan))
+        self.prepared['consumers'].append({'id':'AnalysisOnly','status':'COMPLETE','reason':None})
+        self.assertEqual([], self.validate())
+
+    def test_independent_batches_and_consumer_dependencies(self):
+        result=load_json(ROOT/PLAN/'result-review.json')['result']
+        self.prepared['results'].append({'observationBatchId':'independent','result':result})
+        self.queries['independent']=load_json(ROOT/PLAN/'result-review.json')['design']['requestedQueries']
+        plan={'consumerId':'IndependentQueries','requiredAnalysisKeys':[result['analysisKey']], 'requiredObservationBatchIds':['independent']}
+        self.plans.append(plan);self.prepared['consumerPlan'].append(copy.deepcopy(plan))
+        self.prepared['consumers'].append({'id':'IndependentQueries','status':'COMPLETE','reason':None})
+        self.assertEqual([], self.validate())
+        self.prepared['consumerPlan'][-1]['requiredObservationBatchIds']=['query-batch']
+        self.assertTrue(any('independent consumer plan' in e for e in self.validate()))
+        self.assertTrue(any('dependent consumers blocked' in e for e in self.validate()))
+
+    def test_dependencies_cannot_be_removed_or_rebound_silently(self):
+        original=copy.deepcopy(self.prepared)
+        for mutation in ['drop-consumer','drop-result','drop-plan','drop-dependency','foreign-key','foreign-batch','duplicate-result']:
+            self.prepared=copy.deepcopy(original)
+            if mutation=='drop-consumer':self.prepared['consumers'].pop()
+            elif mutation=='drop-result':self.prepared['results'].clear()
+            elif mutation=='drop-plan':self.prepared['consumerPlan'].pop()
+            elif mutation=='drop-dependency':self.prepared['consumerPlan'][1]['requiredObservationBatchIds']=[]
+            elif mutation=='foreign-key':self.prepared['consumerPlan'][1]['requiredAnalysisKeys'][0]['entryId']['localId']='foreign'
+            elif mutation=='foreign-batch':self.prepared['consumerPlan'][1]['requiredObservationBatchIds']=['foreign']
+            else:self.prepared['results'].append(copy.deepcopy(self.prepared['results'][0]))
+            with self.subTest(mutation=mutation):self.assertTrue(self.validate())
+
+    def test_writer_failure_keeps_prepared_bytes_and_cannot_claim_complete(self):
+        import hashlib
+        payload=json.dumps(self.prepared,sort_keys=True).encode()
+        digest=hashlib.sha256(payload).hexdigest()
+        before=copy.deepcopy(self.prepared)
+        for status in ['FAILED','LIMIT','COMPLETE']:
+            receipt={'schema':'analysis-delivery-receipt','version':'1.0.0','resultId':self.prepared['resultId'],'resultSha256':digest,
+                     'destination':'review://prepared.json','status':status,'reason':None if status=='COMPLETE' else 'WRITE_BUDGET_OR_IO'}
+            self.assertEqual([], validate_delivery_receipt(receipt,payload,status))
+            if status!='COMPLETE':
+                receipt.update(status='COMPLETE',reason=None)
+                self.assertTrue(any('independent delivery outcome' in e for e in validate_delivery_receipt(receipt,payload,status)))
+        self.assertEqual(before,self.prepared)
+        self.assertEqual(payload,json.dumps(self.prepared,sort_keys=True).encode())
+        self.assertEqual([],self.validate())
+        self.assertEqual('STABLE',self.prepared['results'][0]['result']['executionStatus'])
+
+    def test_delivery_failure_before_hash_does_not_require_buffering_or_fake_hash(self):
+        receipt={'schema':'analysis-delivery-receipt','version':'1.0.0','resultId':self.prepared['resultId'],
+                 'resultSha256':None,'destination':'review://out','status':'FAILED','reason':'ENCODING_FAILED'}
+        self.assertEqual([],validate_delivery_receipt(receipt,None,'FAILED',self.prepared['resultId']))
+        self.assertTrue(validate_delivery_receipt(receipt,None,'FAILED','foreign-result'))
+        self.assertTrue(validate_delivery_receipt(receipt,None,'FAILED',self.prepared['resultId'],'review://foreign'))
+        receipt.update(status='COMPLETE',reason=None)
+        self.assertTrue(validate_delivery_receipt(receipt,None,'COMPLETE',self.prepared['resultId']))
+
+    def test_receipt_correlation_and_self_certification_are_guarded(self):
+        import hashlib
+        payload=json.dumps(self.prepared).encode()
+        receipt={'schema':'analysis-delivery-receipt','version':'1.0.0','resultId':self.prepared['resultId'],'resultSha256':hashlib.sha256(payload).hexdigest(),
+                 'destination':'review://out','status':'COMPLETE','reason':None}
+        self.assertEqual([],validate_delivery_receipt(receipt,payload,'COMPLETE'))
+        self.assertTrue(validate_delivery_receipt(receipt,payload+b'\n','COMPLETE'))
+        for field in receipt:
+            mutant=copy.deepcopy(receipt);del mutant[field]
+            with self.subTest(field=field):self.assertTrue(validate_delivery_receipt(mutant,payload))
+        for field in ['publication','deliveryReceipt']:
+            mutant=copy.deepcopy(self.prepared);mutant[field]=receipt
+            self.assertTrue(any('exclude delivery' in e for e in validate_prepared(mutant)))
+        run=self.prepared['results'][0]['result']
+        run['completion']['publication']={'status':'COMPLETE','reason':None}
+        self.assertTrue(any('exclude consumers and delivery' in e for e in validate_result(run)))
 
 class CiReceiptTests(unittest.TestCase):
     def setUp(self):

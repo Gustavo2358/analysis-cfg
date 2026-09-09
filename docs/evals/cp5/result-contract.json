@@ -34,6 +34,7 @@
   ],
   "execution_statuses": [
     "STABLE",
+    "ADMISSION_LIMIT",
     "ANALYSIS_LIMIT",
     "UNSUPPORTED",
     "INVALID_INPUT"
@@ -65,18 +66,53 @@
   "batch_behavior": "STABLE with observation COMPLETE returns exactly one observation per unique requested (point, subject), including unsupported queries; incomplete observation phase returns an empty atomic batch with explicit INCOMPLETE pipeline",
   "completion": {
     "required_fields": [
-      "pipelineStatus",
-      "publicationPolicy",
       "admission",
       "analysis",
-      "observation",
-      "consumers",
-      "publication"
+      "observation"
     ],
-    "publication_policy": "EXPLICIT_PARTIAL_BY_PHASE",
     "observation_batch": "ATOMIC",
-    "consumer_identity": "one status per requested consumer; completed consumers retained independently",
-    "pipeline_success": "all requested phases complete, analysis STABLE, publication acknowledged",
-    "phase_limit": "observation/consumer/output LIMIT never rewrites stable analysis to ANALYSIS_LIMIT"
+    "prepared_fields": [
+      "consumerPlan",
+      "consumers",
+      "partialPolicy",
+      "preparationStatus",
+      "publicationId",
+      "results",
+      "schema",
+      "version",
+      "resultId"
+    ],
+    "consumer_plan_fields": [
+      "consumerId",
+      "requiredAnalysisKeys",
+      "requiredObservationBatchIds"
+    ],
+    "delivery_receipt_fields": [
+      "destination",
+      "reason",
+      "resultSha256",
+      "schema",
+      "status",
+      "version",
+      "resultId"
+    ],
+    "admission_statuses": [
+      "COMPLETE",
+      "REJECTED",
+      "LIMIT"
+    ],
+    "preparation_statuses": [
+      "COMPLETE",
+      "INCOMPLETE"
+    ],
+    "delivery_statuses": [
+      "COMPLETE",
+      "FAILED",
+      "LIMIT"
+    ],
+    "consumer_behavior": "Resolve full AnalysisKeys and batch IDs against independent plan; only unavailable dependencies block; structural consumer can request zero analyses/batches.",
+    "prepared_behavior": "Contains results, explicit dependencies and consumer outcomes; preparation COMPLETE says nothing about delivery.",
+    "delivery_behavior": "External receipt binds prepared resultId, destination and exact payload SHA-256 when available to independently observed delivery status. COMPLETE requires hash; failure before hashing uses null. Never inside prepared result.",
+    "phase_limit": "ADMISSION_LIMIT differs from UNSUPPORTED; later failure never rewrites STABLE analysis"
   }
 }

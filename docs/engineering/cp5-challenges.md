@@ -77,3 +77,11 @@ Self-validation atual remove cada obrigação separadamente em cópia descartáv
 exige RED nominal, restaura bytes e exige segundo GREEN. Também altera snapshot de
 completion e o recibo de CI, inclusive merge sintético com árvore idêntica e claim
 falso de checkout literal. São challenges de harness, não mutantes de engine.
+
+Review F acrescenta `admission-budget-reported-as-unsupported` (W1),
+`prepared-payload-certifies-own-delivery` (W5/S14) e
+`observation-limit-blocks-independent-consumer` (W4/S14). Witnesses de harness
+exigem ADMISSION_LIMIT distinto, recibo externo FAILED/LIMIT sem alteração do
+payload e StructuralConsumer COMPLETE após query-batch LIMIT. Batches independentes
+e consumers sem análise ou dependentes apenas do solver também têm contracasos.
+Hooks produtivos permanecem indisponíveis; não são testes de writer real.

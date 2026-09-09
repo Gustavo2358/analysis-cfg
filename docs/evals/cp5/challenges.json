@@ -406,6 +406,33 @@
       "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
       "target": null,
       "hook": null
+    },
+    {
+      "id": "admission-budget-reported-as-unsupported",
+      "wave": 1,
+      "probe": null,
+      "oracle": "ADMISSION_LIMIT with admission LIMIT, analysis NOT_STARTED; never UNSUPPORTED.",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "prepared-payload-certifies-own-delivery",
+      "wave": 5,
+      "probe": "S14",
+      "oracle": "Writer failure preserves prepared bytes and solver state; only external receipt FAILED/LIMIT, never COMPLETE.",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "observation-limit-blocks-independent-consumer",
+      "wave": 4,
+      "probe": "S14",
+      "oracle": "Limited QueryConsumer batch leaves zero-query StructuralConsumer COMPLETE; preparation INCOMPLETE.",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
     }
   ]
 }

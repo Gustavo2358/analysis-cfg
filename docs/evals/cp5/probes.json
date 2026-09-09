@@ -300,7 +300,7 @@
         5
       ],
       "dimension": "Completion by phase",
-      "oracle": "Inject observation budget, one consumer failure alongside a successful consumer, and publication failure; solver STABLE retained, pipeline INCOMPLETE explicit.",
+      "oracle": "Stable analysis + limited batch preserves independent structural/analysis-only consumers; only explicit unavailable dependencies block. External delivery receipt verifies intended bytes and destination after writer failure; no self-certifying payload. Preparation status excludes delivery.",
       "metrics": [
         "observationLimits",
         "consumerFailures",
@@ -308,7 +308,9 @@
       ],
       "kills": [
         "stable-analysis-observation-limit-reported-as-full-success",
-        "consumer-failure-reported-as-complete-output"
+        "consumer-failure-reported-as-complete-output",
+        "prepared-payload-certifies-own-delivery",
+        "observation-limit-blocks-independent-consumer"
       ],
       "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
       "hook": null

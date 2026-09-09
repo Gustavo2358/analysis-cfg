@@ -73,8 +73,7 @@
         }
       }
     ],
-    "completion_note": "Hypothetical completed publication only; no engine, consumer or output executed. Phase failure counterexamples are exercised by harness tests.",
-    "requestedConsumers": []
+    "completion_note": "Prepared per-run result only; no delivery acknowledgement or consumers inside this payload. No engine or writer executed."
   },
   "result": {
     "schema": "analysis-dataflow-result",
@@ -242,8 +241,6 @@
       "measurements": null
     },
     "completion": {
-      "pipelineStatus": "COMPLETE",
-      "publicationPolicy": "EXPLICIT_PARTIAL_BY_PHASE",
       "admission": {
         "status": "COMPLETE",
         "reason": null
@@ -253,11 +250,6 @@
         "reason": null
       },
       "observation": {
-        "status": "COMPLETE",
-        "reason": null
-      },
-      "consumers": [],
-      "publication": {
         "status": "COMPLETE",
         "reason": null
       }

@@ -6,6 +6,7 @@
 **CP5_POST_AUDIT_HARNESS_REMEDIATION implementada / awaiting human review**.
 Preparação anterior e B1 APPROVED; remediações A–I em
 [contrato pós-auditoria](../architecture/cp5-post-audit.md), sem Wave autorizada.
+Review de e053f14: A/B/C/D/E/G/H/I APPROVED; somente F1/F2/F3 em correção/review.
 [Estado](active/WORK-CFG-028/state.md), [lifecycle/branch/PR](cp5-lifecycle.json),
 [roadmap e critérios por Wave](../product/cp5-roadmap.md).
 W1–W5 NOT STARTED; nenhuma Wave autorizada. Continuar na mesma branch e PR draft.

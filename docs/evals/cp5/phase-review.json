@@ -1,0 +1,237 @@
+{
+  "design": {
+    "kind": "REVIEW_SNAPSHOT",
+    "execution": "NOT_EXECUTED",
+    "requestedConsumers": [
+      {
+        "consumerId": "StructuralConsumer",
+        "requiredAnalysisKeys": [],
+        "requiredObservationBatchIds": []
+      },
+      {
+        "consumerId": "QueryConsumer",
+        "requiredAnalysisKeys": [
+          {
+            "implementation": "PossibleValues",
+            "implementationVersion": "1",
+            "profile": "scalar-text-direct@1",
+            "direction": "FORWARD",
+            "precisionPolicy": "MODEL_WITH_SOURCE_REMAINDER",
+            "options": {
+              "maxCandidates": 2,
+              "resourceBudgets": "REVIEW_REQUIRED_BEFORE_EXECUTION"
+            },
+            "entryId": {
+              "domain": "entry",
+              "localId": "c4de8a797697cb8ddf3012f2248da01f",
+              "publication": "77ae4cc3ed75332c64011efce81c431b",
+              "unit": "unit"
+            }
+          }
+        ],
+        "requiredObservationBatchIds": [
+          "query-batch"
+        ]
+      }
+    ],
+    "requestedQueriesByBatch": {
+      "query-batch": [
+        {
+          "point": {
+            "position": "BEFORE",
+            "operationId": {
+              "domain": "operation",
+              "localId": "5ed7c27833651ab320a3b56d90ed923c",
+              "publication": "77ae4cc3ed75332c64011efce81c431b",
+              "unit": "unit"
+            },
+            "entryId": {
+              "domain": "entry",
+              "localId": "c4de8a797697cb8ddf3012f2248da01f",
+              "publication": "77ae4cc3ed75332c64011efce81c431b",
+              "unit": "unit"
+            },
+            "outcome": null
+          },
+          "subject": {
+            "place": "ObjectPlace",
+            "objectId": {
+              "domain": "object",
+              "localId": "d277a147621da9e9d6d7e52986bbb8ee",
+              "publication": "77ae4cc3ed75332c64011efce81c431b",
+              "unit": "unit"
+            },
+            "storageId": {
+              "domain": "storage",
+              "localId": "2eee2eced5889f75096c488505d6ba70",
+              "publication": "77ae4cc3ed75332c64011efce81c431b"
+            },
+            "locationKind": "WHOLE_CELL"
+          }
+        },
+        {
+          "point": {
+            "position": "AFTER",
+            "operationId": {
+              "domain": "operation",
+              "localId": "5ed7c27833651ab320a3b56d90ed923c",
+              "publication": "77ae4cc3ed75332c64011efce81c431b",
+              "unit": "unit"
+            },
+            "entryId": {
+              "domain": "entry",
+              "localId": "c4de8a797697cb8ddf3012f2248da01f",
+              "publication": "77ae4cc3ed75332c64011efce81c431b",
+              "unit": "unit"
+            },
+            "outcome": null
+          },
+          "subject": {
+            "place": "ObjectPlace",
+            "objectId": {
+              "domain": "object",
+              "localId": "d277a147621da9e9d6d7e52986bbb8ee",
+              "publication": "77ae4cc3ed75332c64011efce81c431b",
+              "unit": "unit"
+            },
+            "storageId": {
+              "domain": "storage",
+              "localId": "2eee2eced5889f75096c488505d6ba70",
+              "publication": "77ae4cc3ed75332c64011efce81c431b"
+            },
+            "locationKind": "WHOLE_CELL"
+          }
+        }
+      ]
+    },
+    "oracle": "Stable analysis with limited query batch leaves StructuralConsumer COMPLETE and blocks only QueryConsumer; no execution claimed."
+  },
+  "prepared": {
+    "schema": "prepared-analysis-result",
+    "version": "1.0.0",
+    "publicationId": {
+      "domain": "publication",
+      "localId": "77ae4cc3ed75332c64011efce81c431b"
+    },
+    "results": [
+      {
+        "observationBatchId": "query-batch",
+        "result": {
+          "schema": "analysis-dataflow-result",
+          "version": "1.0.0",
+          "analysisKey": {
+            "implementation": "PossibleValues",
+            "implementationVersion": "1",
+            "profile": "scalar-text-direct@1",
+            "direction": "FORWARD",
+            "precisionPolicy": "MODEL_WITH_SOURCE_REMAINDER",
+            "options": {
+              "maxCandidates": 2,
+              "resourceBudgets": "REVIEW_REQUIRED_BEFORE_EXECUTION"
+            },
+            "entryId": {
+              "domain": "entry",
+              "localId": "c4de8a797697cb8ddf3012f2248da01f",
+              "publication": "77ae4cc3ed75332c64011efce81c431b",
+              "unit": "unit"
+            }
+          },
+          "publicationId": {
+            "domain": "publication",
+            "localId": "77ae4cc3ed75332c64011efce81c431b"
+          },
+          "unitId": {
+            "domain": "unit",
+            "localId": "unit",
+            "publication": "77ae4cc3ed75332c64011efce81c431b"
+          },
+          "entryId": {
+            "domain": "entry",
+            "localId": "c4de8a797697cb8ddf3012f2248da01f",
+            "publication": "77ae4cc3ed75332c64011efce81c431b",
+            "unit": "unit"
+          },
+          "executionStatus": "STABLE",
+          "modelScope": "KNOWN_GRAPH_ENTRY",
+          "sourceScope": {
+            "open": true,
+            "inventory": "PARTIAL",
+            "dimension": "CONTROL",
+            "scope": {
+              "domain": "unit",
+              "localId": "unit",
+              "publication": "77ae4cc3ed75332c64011efce81c431b"
+            }
+          },
+          "limitReason": null,
+          "observations": [],
+          "statistics": {
+            "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+            "measurements": null
+          },
+          "completion": {
+            "admission": {
+              "status": "COMPLETE",
+              "reason": null
+            },
+            "analysis": {
+              "status": "STABLE",
+              "reason": null
+            },
+            "observation": {
+              "status": "LIMIT",
+              "reason": "QUERY_BUDGET"
+            }
+          }
+        }
+      }
+    ],
+    "consumerPlan": [
+      {
+        "consumerId": "StructuralConsumer",
+        "requiredAnalysisKeys": [],
+        "requiredObservationBatchIds": []
+      },
+      {
+        "consumerId": "QueryConsumer",
+        "requiredAnalysisKeys": [
+          {
+            "implementation": "PossibleValues",
+            "implementationVersion": "1",
+            "profile": "scalar-text-direct@1",
+            "direction": "FORWARD",
+            "precisionPolicy": "MODEL_WITH_SOURCE_REMAINDER",
+            "options": {
+              "maxCandidates": 2,
+              "resourceBudgets": "REVIEW_REQUIRED_BEFORE_EXECUTION"
+            },
+            "entryId": {
+              "domain": "entry",
+              "localId": "c4de8a797697cb8ddf3012f2248da01f",
+              "publication": "77ae4cc3ed75332c64011efce81c431b",
+              "unit": "unit"
+            }
+          }
+        ],
+        "requiredObservationBatchIds": [
+          "query-batch"
+        ]
+      }
+    ],
+    "consumers": [
+      {
+        "id": "StructuralConsumer",
+        "status": "COMPLETE",
+        "reason": null
+      },
+      {
+        "id": "QueryConsumer",
+        "status": "NOT_STARTED",
+        "reason": "DEPENDENCY_UNAVAILABLE"
+      }
+    ],
+    "preparationStatus": "INCOMPLETE",
+    "partialPolicy": "EXPLICIT_PARTIAL_BY_DEPENDENCY",
+    "resultId": "review-prepared-query-budget"
+  }
+}

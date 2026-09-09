@@ -49,8 +49,8 @@ inventário AIR + CFG recebido, com orçamento de admissão. Isso verifica as
 obrigações de projeção; não materializa outro grafo, não repete BuildCfg/CoreCfgProjection,
 AirValidator, traversal de fixpoint ou deep comparison de toda AIR. Falta estrutural
 é INVALID_INPUT/admission REJECTED, sem solver; profile sem suporte é UNSUPPORTED.
-Um limite de admissão deve ser explicitado como executionStatus UNSUPPORTED, admission REJECTED
-com motivo ADMISSION_BUDGET,
+Um limite de admissão deve ser explicitado como executionStatus ADMISSION_LIMIT, admission LIMIT
+com motivo ADMISSION_BUDGET (regra F1),
 sem atribuir ANALYSIS_LIMIT a solver que não iniciou.
 
 S11/W1 e seus cinco challenges exigem grafo íntegro aceito e rejeitam missing Branch
@@ -141,37 +141,63 @@ prometer contexto universal. CP5 não implementa PERFORM ou pilha semântica.
 
 ## F — Conclusão por fase
 
-O [resultado](analysis-dataflow-result-v1.md) acrescenta `completion`. executionStatus
-continua representando admissão/solver; queryStatus conserva VALUE/UNSUPPORTED_POINT.
-Há estados distintos de admissão, análise, materialização, cada consumer e publicação.
-`pipelineStatus=COMPLETE` exige todas as fases solicitadas concluídas e publicação
-confirmada. Solver STABLE sozinho nunca significa pipeline completa.
+Review do HEAD e053f14 aprovou A/B/C/D/E/G/H/I e solicitou somente F1/F2/F3.
+Os [contratos de resultado](analysis-dataflow-result-v1.md) separam três objetos de
+review; não implementam writer, scheduler ou framework de workflow.
 
-A política é EXPLICIT_PARTIAL_BY_PHASE: lote de observações atômico e cada consumer
-atômico independentemente. Se replay excede budget, descartar aquele lote, publicar
-observations=[], observation LIMIT com motivo, executionStatus STABLE/limitReason=null
-e pipeline INCOMPLETE. O plano solicitado independente demonstra que o lote não
-sumiu; queries não materializadas são contadas. Não converter budget em
-UNSUPPORTED_POINT. B1 continua exigindo respostas completas, inclusive recusas,
-quando observation COMPLETE; uma query recusada não limita o lote.
+**F1 — admission LIMIT.** Cada tentativa de análise conserva admission/analysis/
+observation. `ADMISSION_LIMIT` externo corresponde a admission LIMIT, motivo
+ADMISSION_BUDGET e analysis/observation NOT_STARTED. UNSUPPORTED significa falta de
+suporte ao profile/forma e corresponde a admission REJECTED; nunca recurso esgotado.
+ANALYSIS_LIMIT continua reservado ao solver iniciado que atingiu budget. Replay
+LIMIT mantém executionStatus STABLE e limitReason global null. Limites e rejeições
+são distinguíveis por campos tipados, sem interpretar texto de diagnóstico.
 
-Consumer A concluído e B falho mantêm status separados, com o ID de cada consumer
-solicitado. Payload parcial de B não pode sair; resultados concluídos de A e o lote
-estável podem ser publicados sob INCOMPLETE explícito. O plano de consumers deve ser
-comparado com a coleção de status, inclusive falhas; coleção vazia significa nenhum
-consumer solicitado, não falhas omitidas. O futuro wire de facts correlacionará cada
-bundle ao consumer concluído, sem novo framework nesta preparação.
+**F2 — payload e entrega.** AnalysisDataflowResult contém o resultado de um run e
+seu lote; `completion` contém somente admission, analysis e observation.
+PreparedAnalysisResult reúne esses resultados e outcomes de consumers, com
+preparationStatus COMPLETE/INCOMPLETE. Nenhum desses payloads contém publication,
+DeliveryReceipt ou confirmação de escrita. A estrutura preparada pode existir sem
+nenhuma tentativa de entrega. COMPLETE de preparação não afirma sucesso de entrega.
 
-Falha de output não reescreve solver, observation ou consumer. Publication FAILED/LIMIT
-significa que não existe confirmação de entrega completa; bytes truncados não são
-artefato válido. Recibo de entrega é externo ao payload preparado, registrado pelo
-chamador mesmo quando o writer falha. O snapshot modela esse recibo conceitualmente;
-um writer não pode colocar COMPLETE em bytes e tomar isso como confirmação de sua
-própria entrega. Publicação parcial é somente de bundles concluídos em envelope
-INCOMPLETE, nunca de fatos provisórios ou stream truncado.
+DeliveryReceipt é externo e construído pelo chamador após a tentativa: resultId,
+destination, status COMPLETE/FAILED/LIMIT, reason e SHA-256 dos bytes completos
+quando disponível. COMPLETE exige confirmação externa e hash; falha antes de
+calcular o hash completo conserva resultId e hash=null. Não impor buffering de
+output nem inventar hash de bytes truncados como hash do resultado. Outra tentativa
+produz outro recibo, sem modificar payload, fixpoint ou status dos consumers. O
+harness compara recibo com identidade/bytes e outcome externo de teste; isso não
+prova I/O real. W5 deve injetar falhas de encoding/escrita/finalização e demonstrar
+que não sai recibo COMPLETE. Entrega end-to-end completa exige preparação COMPLETE
+mais recibo COMPLETE correlacionado. Entregar um payload INCOMPLETE pode ter recibo
+de entrega COMPLETE, mas continua uma preparação incompleta explicitamente marcada.
 
-W1: admissão; W2: analysis limits; W3/S14: replay; W4/S14: consumer isolation; W5/S14:
-output e recibo. Testes atuais validam envelopes hipotéticos; não são runtime/writer.
+**F3 — dependências explícitas.** ConsumerPlan registra consumerId,
+requiredAnalysisKeys (identidade completa, incluindo options/Entry) e
+requiredObservationBatchIds. PreparedAnalysisResult liga cada batch a seu resultado
+de análise; a mesma análise estável pode sustentar batches independentes, sem novo
+run. O planner agrupa demandas com dependências de falha explícitas; não pode impor
+um batch global a consumidores que não o requerem. Conferir o plano independente
+contra as dependências e outcomes; ausência ou troca de IDs não vira sucesso.
+
+O lote continua atômico: observation LIMIT/FAILED implica observations=[] somente
+naquele batch. Bloqueia com NOT_STARTED/DEPENDENCY_UNAVAILABLE apenas consumers
+que requerem aquele batch; requerer somente AnalysisKey STABLE não exige replay
+completo. Consumers podem falhar com FAILED/LIMIT após dependências satisfeitas,
+sem invalidar outros. StructuralConsumer com ambas listas vazias pode completar,
+inclusive com zero runs; isso não dispensa a SiteView admitida pelo index/session
+W1. A admissibilidade estrutural não é fabricada a partir de uma análise recusada.
+
+O [witness F3](../evals/cp5/phase-review.json) exige solver STABLE, query-batch LIMIT,
+StructuralConsumer COMPLETE, QueryConsumer NOT_STARTED e preparação INCOMPLETE.
+B1 permanece intacto dentro de cada batch completo: VALUE e UNSUPPORTED_POINT têm
+um resultado por query única, conferido contra o plano. Reparo posterior de state
+por consumer permanece proibido. Publicação parcial é somente dos bundles
+concluídos, com incompletude explícita; nenhum fato provisório ou stream truncado.
+
+W1 ativa o oracle admission-budget; W3/S14 observation; W4/S14 dependências/isolamento
+(incluindo structural-only, análise sem query e batches independentes); W5/S14 recibo
+externo e falhas reais de entrega. Os hooks continuam NOT_AVAILABLE_UNTIL_IMPLEMENTED.
 
 <a id="g"></a>
 

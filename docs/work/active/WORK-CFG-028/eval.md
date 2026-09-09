@@ -29,3 +29,11 @@ de recusas, afirmar pipeline completa com replay/consumer/output limitado, omiti
 consumer solicitado ou declarar checkout literal sem hashes/árvores também falha.
 Git temporário testa HEAD literal, merge sintético com árvore igual, árvore diferente
 e recibo stale. Provas produtivas continuam NOT_AVAILABLE_UNTIL_IMPLEMENTED.
+
+## Correção focal F
+
+F1: ADMISSION_LIMIT aceito e UNSUPPORTED rejeitado para admission budget.
+F2: payload e fixpoint preservados em writer failure; recibo externo com
+identidade/hash/destino não pode contradizer o outcome observado.
+F3: StructuralConsumer COMPLETE + QueryConsumer bloqueado por batch LIMIT;
+zero análises, análise sem replay e batches independentes não sofrem barreira global.

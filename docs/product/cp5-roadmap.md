@@ -92,20 +92,21 @@ de negócio, runtime plugins ou fusão universal. Integra W3 real, sem encerrar 
 mocks. S5/S6/S8: invariância do índice/runs ao aumentar K, matches reais inclusive
 sobrepostos, mesmo batch sem replay repetido, config/Entry distintas não colidem.
 DoD: fronteiras compiladas, segunda análise intacta, falhas de consumers tipadas,
-S14 verifica status individual por consumer e publicação parcial explícita; S15
+S14 verifica dependências AnalysisKey/batch explícitas por consumer e preparação parcial; S15
 inclui falhas de consumers sem ocultar qualidade. RED/restore/GREEN. Handoff: pipeline de extração pronta para composition root.
 
 ## W5 — produção e E2E (EVAL-CFG-038)
 
 Entrypoint AnalysisDataflow separado e writer local nos adapters, versão de resultado
-revisada, defaults/budgets aprovados. AIR file→reader→BuildCfg→sessão→queries→resultado;
+revisada, defaults/budgets aprovados. AIR file→reader→BuildCfg→sessão→queries→resultado preparado;
+writer recebe payload imutável e chamador registra DeliveryReceipt externo;
 plano por destinos escritos/before terminator, sem nomes do fixture. Regressões CLI
 CFG, errors input/build/analysis/output, determinismo, identidade e PARTIAL.
 Consolidar S1–S9 e S10: dois runs reais desde COBOL CP4E, regressão CP3, JARs/pins/
 hashes/comandos e equivalência memória/arquivo. Novos artefatos E2E em sibling exigem
 autorização própria; esta preparação não os cria. DoD: gates/challenges/ledgers e
 review final; limitações de transporte separadas; sem CP6 automático. S14 testa
-falha de output sem invalidar fixpoint e sem afirmar entrega completa; S15 mede
+DeliveryReceipt externo e falha de output sem invalidar payload/fixpoint; S15 mede
 qualidade junto a tempo/memória. Conservar recibo real de checkout/evento/árvores.
 
 ## Evidência por checkpoint

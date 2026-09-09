@@ -125,6 +125,29 @@
       "B1": "APPROVED",
       "CP5-F01": "NONBLOCKING_FOLLOW_UP_W1",
       "authorized_wave": null
+    },
+    {
+      "date": "2026-09-09",
+      "source": "explicit human review of post-audit PR #12",
+      "reviewed_head": "e053f14f8f5dc7b0b80b7bbbe015fde684522835",
+      "decision": "REQUEST_CHANGES_F_ONLY",
+      "approved_remediations": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "G",
+        "H",
+        "I"
+      ],
+      "requested_changes": [
+        "F1",
+        "F2",
+        "F3"
+      ],
+      "CP5-F01": "NONBLOCKING_FOLLOW_UP_W1",
+      "authorized_wave": null
     }
   ],
   "audit_remediation": {
@@ -134,5 +157,11 @@
     "start_head": "feb79d59cc72d7dbc6269b7cacfb74db58f90867",
     "audit_sha256": "32d4542adcf31445cf35196a5f6d2496e8e3962c0bfa9d10c26615f6ceea5bc1",
     "evidence": "docs/work/evidence/WORK-CFG-028/architectural-audit-remediation/validation.md"
+  },
+  "f_correction": {
+    "reviewed_head": "e053f14f8f5dc7b0b80b7bbbe015fde684522835",
+    "authorization": "F1_F2_F3_ONLY",
+    "review": "AWAITING_HUMAN_REVIEW",
+    "evidence": "docs/work/evidence/WORK-CFG-028/review-f/validation.md"
   }
 }
