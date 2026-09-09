@@ -28,7 +28,8 @@ no adapter ou benchmark. Corpus sintético pode declarar premissa explicitamente
 
 ## Domínio e boundary
 
-PossibleValues é a análise; BoundedTextValues é seu primeiro domínio. Ponto
+PossibleValues é a análise; FiniteProgramTextValues descreve seu primeiro domínio.
+O nome não congela uma classe; a finitude vem do programa, sem cap configurável. Ponto
 inalcançado é separado de valor em ponto alcançado:
 
 | Valor conceitual | Significado |
@@ -37,7 +38,6 @@ inalcançado é separado de valor em ponto alcançado:
 | Candidates({PROGA}, false) | singleton fechado no modelo |
 | Candidates({A,B}, false) | alternativas fechadas no modelo |
 | Candidates({A}, true) | candidato sustentado e restante desconhecido |
-| Saturated(CARDINALITY_LIMIT) | limite local, restante aberto explícito |
 
 Candidates({}, false) não é valor normal de Cell alcançada. Ausência de chave em
 estado alcançado significa o default Candidates({}, true), **não bottom**.
@@ -48,19 +48,24 @@ não inventar zero, não reaplicar seed no loop, recusar condições contraditó
 Join une candidatos e OR do open. Chave presente só em um dos estados alcançados
 faz join com default desconhecido do outro: {A} fechado + ausência = {A} aberto.
 ⊥p adota a primeira contribuição alcançada sem abrir; inalcançável não adiciona
-restante. Ordem por inclusão de candidatos e false≤true, Saturated acima de todos.
+restante. Ordem por inclusão de candidatos e false≤true.
 Open universal não autoriza apagar evidência enumerada por igualdade denotacional.
 
 Strong Assign literal **substitui** valor corrente por singleton fechado, inclusive
-após open/saturated; não acumula literais mortos. União acima de k satura; k limita
-alternativas simultâneas, não Assigns/literais totais. Testar k e k+1, k=1/2 e
-configurações distintas sem congelar default. Saturação determinística não é
-truncagem dos primeiros valores pela agenda. A análise pode estabilizar com Cells
-saturadas, mas a consulta mantém razão e remainder; não esconder perda em STABLE.
-Resource budget interrompe o run (ANALYSIS_LIMIT), sem facts provisórios finais.
+após open; não acumula literais mortos. Join preserva todos os candidatos, seja sua
+cardinalidade 9, 100, 10.000 ou maior. Não há maxCandidates, k produtivo,
+CARDINALITY_LIMIT ou Saturated por contagem. Unknown remainder vem de incerteza
+semântica/escopo aberto, nunca da economia de memória.
+
+O conjunto U(P) de literais/condições iniciais admitidos é finito porque P é finito.
+Cada S ⊆ U(P); inclusão + open tem altura finita. O produto por locations finitas,
+com bottom de ponto separado e transfers monotônicos, converge sob agenda justa.
+Não impor teto a U(P). Domínios futuros de cadeia infinita precisam de abstração
+ou widening semanticamente justificados, sem usar heap como política de precisão.
+[Decisão e supersessão focal H4](../architecture/decisions/ADR-0014.md).
 
 Igualdade textual segue escalares Unicode; sem trim/case folding/normalização.
-Pool de valores por sessão/run, U distinto de k, sem String.intern global, cópia de
+Pool de valores por sessão/run, U proporcional aos valores do programa, sem String.intern global, cópia de
 chars por ocorrência ou pool de todos sets históricos. Provenance não cresce por
 caminhos. [H4, ledger e retenção](../engineering/cp5-performance.md).
 

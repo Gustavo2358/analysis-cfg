@@ -1,0 +1,27 @@
+{
+  "after_command": [
+    "rg",
+    "--sort",
+    "path",
+    "-n",
+    "--glob",
+    "!__pycache__/**",
+    "ADMISSION_LIMIT|ANALYSIS_LIMIT|WORK_BUDGET|QUERY_BUDGET|ADMISSION_BUDGET|resourceBudgets|maxCandidates|CARDINALITY_LIMIT|Saturated|maximumDocumentBytes|maximumBytes|maxNodes|maxOperations|maxObjects|maxEdges|maxSequences|maxQueries|maxFacts|maxVisits|maxIterations|maxWorklist|LIMIT|budget|threshold|k=8|bounded values",
+    "docs/architecture",
+    "docs/domain",
+    "docs/engineering",
+    "docs/evals/cp5",
+    "docs/product/cp5-roadmap.md",
+    "docs/work/active/WORK-CFG-028",
+    "docs/work/cp5-lifecycle.json",
+    "docs/work/cp5-follow-ups.md",
+    "scripts/harness",
+    "scripts/project",
+    "cfg-kernel/src/main",
+    "cfg-adapters/src/main",
+    "cfg-launcher/src/main"
+  ],
+  "exit": 0,
+  "sha256": "fba6cc2c0faf28900b821c25e3ecb792714e92ba76d81a1d01b03a223e12c2de",
+  "interpretation": "Matches include prohibitions, adversarial mutants, telemetry, history and explicitly deferred legacy runtime debt; count is not a policy verdict."
+}

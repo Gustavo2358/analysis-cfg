@@ -25,7 +25,9 @@
         "E",
         "F",
         "H"
-      ]
+      ],
+      "core_size_contract": "docs/evals/cp5/core-size-contract.json",
+      "core_size_probe": "S16"
     },
     {
       "wave": 2,
@@ -50,7 +52,9 @@
         "F",
         "G",
         "H"
-      ]
+      ],
+      "core_size_contract": "docs/evals/cp5/core-size-contract.json",
+      "core_size_probe": "S16"
     },
     {
       "wave": 3,
@@ -77,7 +81,9 @@
         "F",
         "G",
         "H"
-      ]
+      ],
+      "core_size_contract": "docs/evals/cp5/core-size-contract.json",
+      "core_size_probe": "S16"
     },
     {
       "wave": 4,
@@ -101,7 +107,9 @@
         "D",
         "F",
         "H"
-      ]
+      ],
+      "core_size_contract": "docs/evals/cp5/core-size-contract.json",
+      "core_size_probe": "S16"
     },
     {
       "wave": 5,
@@ -128,7 +136,9 @@
         "F",
         "H",
         "I"
-      ]
+      ],
+      "core_size_contract": "docs/evals/cp5/core-size-contract.json",
+      "core_size_probe": "S16"
     }
   ]
 }

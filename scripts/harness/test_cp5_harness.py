@@ -92,7 +92,7 @@ class Cp5HarnessTests(unittest.TestCase):
 
     def test_stable_solver_is_not_complete_pipeline(self):
         result = load_json(self.root/PLAN/'result-review.json')['result']
-        result['completion']['observation'] = {'status':'LIMIT','reason':'observation budget'}
+        result['completion']['observation'] = {'status':'FAILED','reason':'OBSERVATION_ERROR'}
         result['observations'] = []
         prepared = prepared_for(result)
         self.assertTrue(any('incomplete preparation' in e for e in validate_prepared(prepared)))
@@ -108,13 +108,89 @@ class Cp5HarnessTests(unittest.TestCase):
 
     def test_f1_and_f2_contract_fields_cannot_disappear(self):
         path=self.root/PLAN/'result-contract.json';original=path.read_bytes()
-        self.edit(PLAN+'result-contract.json',lambda x:x['completion']['admission_statuses'].remove('LIMIT'))
+        self.edit(PLAN+'result-contract.json',lambda x:x['completion']['admission_statuses'].remove('REJECTED'))
         self.guard('F admission/delivery status contract')
         path.write_bytes(original)
         self.edit(PLAN+'result-contract.json',lambda x:x['completion']['delivery_receipt_fields'].remove('resultSha256'))
         self.guard('phase completion contract')
         path.write_bytes(original)
         self.assertEqual([],validate_cp5(self.root))
+
+    def test_size_roles_have_parseable_counterexamples_and_exact_restore(self):
+        path = self.root/PLAN/'core-size-contract.json'
+        original = path.read_bytes()
+        self.assertEqual([],validate_cp5(self.root))
+        mutations = [
+            ('node-count-admission','admission', lambda r:r.update(criteria=['STRUCTURAL_VALIDITY','SUPPORTED_SEMANTIC_PROFILE','NODE_COUNT'])),
+            ('operation-count-admission','admission', lambda r:r['capacity_rejections'].append({'field':'operations','above':100,'outcome':'UNSUPPORTED'})),
+            ('query-count-admission','planner_consumers', lambda r:r.update(demand_count_effect='REJECT_ABOVE_100')),
+            ('maxCandidates','possible_values', lambda r:r.update(maxCandidates=8)),
+            ('CARDINALITY_LIMIT','possible_values', lambda r:r.update(capacity_saturation=True)),
+            ('resourceBudgets','analysis_key', lambda r:r['resource_policy_fields'].append('resourceBudgets')),
+            ('max-visits-aborts','solver', lambda r:r['resource_interruptions'].append({'field':'visits','above':100,'outcome':'LIMIT'})),
+            ('worklist-aborts','solver', lambda r:r.update(termination='MAX_WORKLIST_PUSHES')),
+            ('oom-mapping','execution_boundary', lambda r:r['resource_failure_semantic_mappings'].update(OutOfMemoryError='ANALYSIS_LIMIT')),
+            ('overflow-is-product-ceiling','representation', lambda r:r.update(integer_product_ceiling=2147483647)),
+            ('metric-as-policy','metrics', lambda r:r['rejection_thresholds'].update(maxWorklistSize=100)),
+            ('output-cap','composition', lambda r:r.update(input_output_size_policy={'maxBytes':100})),
+        ]
+        for name,role,change in mutations:
+            with self.subTest(mutant=name):
+                try:
+                    self.edit(PLAN+'core-size-contract.json',lambda x:change(x['roles'][role]))
+                    json.loads(path.read_bytes())  # parseable mutant, not incidental syntax RED
+                    self.guard('CORE-SIZE-001: role contract '+role)
+                    print('[core-size challenge] '+name+': parseable RED')
+                finally:
+                    path.write_bytes(original)
+                self.assertEqual(original,path.read_bytes())
+                self.assertEqual([],validate_cp5(self.root))
+        print('[core-size challenge] all role mutants: byte-exact restore / second GREEN')
+
+    def test_size_scale_outcomes_have_independent_oracle_and_restore(self):
+        path = self.root/PLAN/'core-size-review.json'; original = path.read_bytes()
+        self.assertEqual([],validate_cp5(self.root))
+        for name,change,diagnostic in [
+            ('candidate-N-plus-1-open',lambda x:x.update(model_remainder=True),'candidate count cannot open'),
+            ('candidate-N-plus-1-top',lambda x:x.update(value_kind='Saturated'),'no cardinality TOP'),
+            ('candidate-dropped',lambda x:x['candidates'].pop(),'all semantic candidates'),
+            ('large-unsupported',lambda x:x.update(admission='UNSUPPORTED'),'size cannot change admission'),
+            ('large-invalid',lambda x:x.update(admission='INVALID_INPUT'),'size cannot change admission'),
+            ('work-exhausted',lambda x:x.update(analysis='LIMIT'),'work cannot abort')]:
+            with self.subTest(mutant=name):
+                try:
+                    self.edit(PLAN+'core-size-review.json',lambda x:change(x['cases'][1]['outcome']))
+                    json.loads(path.read_bytes())
+                    self.guard('CORE-SIZE-001 scale: '+diagnostic)
+                    print('[core-size challenge] '+name+': parseable RED')
+                finally: path.write_bytes(original)
+                self.assertEqual(original,path.read_bytes())
+                self.assertEqual([],validate_cp5(self.root))
+        print('[core-size challenge] scale outcomes: byte-exact restore / second GREEN')
+
+    def test_architecture_cannot_map_oom_to_semantics(self):
+        path=self.root/PLAN/'architecture.json';original=path.read_bytes()
+        self.assertEqual([],validate_cp5(self.root))
+        try:
+            self.edit(PLAN+'architecture.json',lambda x:x['resource_failure_semantic_mappings'].update(OutOfMemoryError='ANALYSIS_LIMIT'))
+            json.loads(path.read_bytes())
+            self.guard('CORE-SIZE-001: architecture capacity behavior')
+        finally: path.write_bytes(original)
+        self.assertEqual(original,path.read_bytes())
+        self.assertEqual([],validate_cp5(self.root))
+
+    def test_size_decision_routing_and_approval_cannot_disappear(self):
+        for path,change,diagnostic in [
+            (LIFECYCLE,lambda x:x['review_history'].pop(),'CORE-SIZE-001'),
+            (LIFECYCLE,lambda x:x['core_size_remediation']['implementation_candidates'].append('k=8'),'current review/candidates'),
+            (PLAN+'core-size-contract.json',lambda x:x['roles'].pop('solver'),'role inventory'),
+            (PLAN+'core-size-contract.json',lambda x:x['waves'][0].update(hook='fake'),'Wave role hooks'),
+            (PLAN+'gate-plan.json',lambda x:x['waves'][0].pop('core_size_probe'),'CORE-SIZE-001')]:
+            original=(self.root/path).read_bytes()
+            try:
+                self.edit(path,change);self.guard(diagnostic)
+            finally:(self.root/path).write_bytes(original)
+            self.assertEqual([],validate_cp5(self.root))
 
     def test_valid_preparation(self):
         self.assertEqual([], validate_cp5(self.root))
@@ -156,7 +232,7 @@ class Cp5HarnessTests(unittest.TestCase):
         self.edit(LIFECYCLE,lambda x:x['policy'].update(auto_start_next_wave=True))
         self.guard('same branch/PR')
 
-    def test_h4_candidates_not_frozen(self):
+    def test_historical_h4_approval_is_not_rewritten(self):
         self.edit(LIFECYCLE,lambda x:x['last_human_approval']['implementation_candidates_not_frozen'].remove('k=8'))
         self.guard('implementation-neutral H4')
 
@@ -297,9 +373,46 @@ class Cp5HarnessTests(unittest.TestCase):
         self.assertEqual(1,bad.returncode,bad.stdout+bad.stderr)
         self.assertIn('no Wave authorized',bad.stdout)
 
-    def test_result_contract_cannot_drop_limits_or_change_version(self):
+    def test_result_contract_cannot_drop_semantic_statuses_or_change_version(self):
         self.edit(PLAN+'result-contract.json',lambda x:x.update(version='2.0.0',execution_statuses=['STABLE']))
         self.guard('result contract status/schema')
+
+    def test_wire_capacity_enums_and_options_are_rejected_with_exact_restore(self):
+        from cp5_size_contract import PHASE_ENUMS
+        path = self.root/PLAN/'result-contract.json'
+        original = path.read_bytes()
+        self.assertEqual([],validate_cp5(self.root))
+        changes = [(field, lambda x,field=field:x['completion'][field].append('LIMIT'))
+                   for field,value in PHASE_ENUMS.items() if isinstance(value,list)]
+        changes += [('resourceBudgets',lambda x:x['analysis_key_options'].update(resourceBudgets={'visits':100})),
+                    ('maxCandidates',lambda x:x['analysis_key_options'].update(maxCandidates=8)),
+                    ('ADMISSION_LIMIT',lambda x:x['execution_statuses'].append('ADMISSION_LIMIT')),
+                    ('ANALYSIS_LIMIT',lambda x:x['execution_statuses'].append('ANALYSIS_LIMIT'))]
+        for name,change in changes:
+            with self.subTest(mutant=name):
+                try:
+                    self.edit(PLAN+'result-contract.json',change)
+                    json.loads(path.read_bytes())
+                    self.assertTrue(validate_cp5(self.root))
+                    print('[core-size challenge] wire '+name+': parseable RED')
+                finally: path.write_bytes(original)
+                self.assertEqual(original,path.read_bytes())
+                self.assertEqual([],validate_cp5(self.root))
+
+    def test_scale_oracles_and_metric_role_cannot_be_weakened(self):
+        changes = [(PLAN+'probes.json',lambda x:next(p for p in x['probes'] if p['id']=='S16').update(oracle='Reject large input')),
+                   (PLAN+'probes.json',lambda x:next(p for p in x['probes'] if p['id']=='S7').update(oracle='TOP after 8')),
+                   (PLAN+'metrics.json',lambda x:x.update(role='ADMISSION_THRESHOLDS'))]
+        for path,change in changes:
+            original=(self.root/path).read_bytes()
+            self.assertEqual([],validate_cp5(self.root))
+            try:
+                self.edit(path,change)
+                json.loads((self.root/path).read_bytes())
+                self.guard('CORE-SIZE-001')
+            finally: (self.root/path).write_bytes(original)
+            self.assertEqual(original,(self.root/path).read_bytes())
+            self.assertEqual([],validate_cp5(self.root))
 
     def test_result_is_design_not_measurement(self):
         self.edit(PLAN+'result-review.json',lambda x:x['design'].update(execution='EXECUTED'))
@@ -340,16 +453,16 @@ class ResultContractTests(unittest.TestCase):
         self.example=load_json(ROOT/PLAN/'result-review.json')['result']
 
     def rejected_run(self, result, status):
-        result.update(executionStatus=status, observations=[], limitReason='WORK_BUDGET' if status == 'ANALYSIS_LIMIT' else None)
-        result['completion'].update(admission={'status':'COMPLETE','reason':None} if status == 'ANALYSIS_LIMIT' else {'status':'REJECTED','reason':'profile or input rejected'},
-            analysis={'status':'LIMIT','reason':'WORK_BUDGET'} if status == 'ANALYSIS_LIMIT' else {'status':'NOT_STARTED','reason':None},
-            observation={'status':'NOT_STARTED','reason':None})
+        result.update(executionStatus=status, observations=[])
+        result['completion'].update(admission={'status':'REJECTED','reason':
+            'INVALID_STRUCTURE' if status == 'INVALID_INPUT' else 'UNSUPPORTED_PROFILE'},
+            analysis={'status':'NOT_STARTED','reason':None}, observation={'status':'NOT_STARTED','reason':None})
 
     def test_consumer_failure_keeps_other_completion_and_requires_full_plan(self):
         prepared = prepared_for(copy.deepcopy(self.example))
         plans = [{'consumerId':name,'requiredAnalysisKeys':[],'requiredObservationBatchIds':[]} for name in ['A','B']]
         prepared.update(preparationStatus='INCOMPLETE', consumerPlan=copy.deepcopy(plans), consumers=[
-            {'id':'A','status':'COMPLETE','reason':None}, {'id':'B','status':'FAILED','reason':'extraction failed'}])
+            {'id':'A','status':'COMPLETE','reason':None}, {'id':'B','status':'FAILED','reason':'CONSUMER_ERROR'}])
         self.assertEqual([], validate_prepared(prepared, plans))
         prepared['preparationStatus'] = 'COMPLETE'
         self.assertTrue(any('incomplete preparation' in e for e in validate_prepared(prepared)))
@@ -357,19 +470,19 @@ class ResultContractTests(unittest.TestCase):
         prepared['consumers'].pop()
         self.assertTrue(any('requested consumer coverage' in e for e in validate_prepared(prepared, plans)))
 
-    def test_phase_limit_or_failure_cannot_rewrite_stable_solver_or_emit_partial_batch(self):
+    def test_controlled_failure_cannot_rewrite_stable_solver_or_emit_partial_batch(self):
         for phase in ['observation']:
-            for status in ['LIMIT','FAILED']:
+            for status in ['FAILED']:
                 with self.subTest(phase=phase,status=status):
                     result = copy.deepcopy(self.example)
-                    result['completion'][phase] = {'status':status,'reason':'phase failure'}
+                    result['completion'][phase] = {'status':status,'reason':'OBSERVATION_ERROR'}
                     if phase == 'observation':
                         self.assertTrue(any('atomic observation batch' in e for e in validate_result(result)))
                         result['observations'] = []
                     self.assertEqual([], validate_result(result))
                     result['executionStatus'] = 'ANALYSIS_LIMIT'
                     result['limitReason'] = 'wrong phase'
-                    self.assertTrue(any('solver status is independent' in e for e in validate_result(result)))
+                    self.assertTrue(any('execution status' in e for e in validate_result(result)))
 
     def test_completion_shape_reasons_and_partial_policy(self):
         for field in self.example['completion']:
@@ -382,17 +495,15 @@ class ResultContractTests(unittest.TestCase):
             mutant['completion'].update(change)
             self.assertTrue(any('phase completion' in e for e in validate_result(mutant)))
 
-    def test_f1_admission_limit_is_not_unsupported(self):
-        result = copy.deepcopy(self.example)
-        result.update(executionStatus='ADMISSION_LIMIT',limitReason='ADMISSION_BUDGET',observations=[])
-        result['completion'] = {'admission':{'status':'LIMIT','reason':'ADMISSION_BUDGET'},
-            'analysis':{'status':'NOT_STARTED','reason':None}, 'observation':{'status':'NOT_STARTED','reason':None}}
-        self.assertEqual([], validate_result(result))
-        result['executionStatus'] = 'UNSUPPORTED'
-        self.assertTrue(any('admission' in e for e in validate_result(result)))
-        result['completion']['admission']['status'] = 'REJECTED'
-        result['limitReason'] = None
-        self.assertTrue(any('ADMISSION_BUDGET is never UNSUPPORTED' in e for e in validate_result(result)))
+    def test_f1_semantic_admission_never_maps_capacity_to_rejection(self):
+        for status in ['INVALID_INPUT','UNSUPPORTED']:
+            result = copy.deepcopy(self.example)
+            self.rejected_run(result,status)
+            self.assertEqual([],validate_result(result))
+            for reason in ['ADMISSION_BUDGET','WORK_BUDGET','OutOfMemoryError','MAX_NODES']:
+                result['completion']['admission']['reason'] = reason
+                with self.subTest(status=status,reason=reason):
+                    self.assertTrue(any('semantic admission reason' in e for e in validate_result(result)))
 
     def test_f2_result_cannot_self_certify_delivery(self):
         self.assertNotIn('publication', self.example['completion'])
@@ -492,13 +603,13 @@ class ResultContractTests(unittest.TestCase):
         result['observations'][0]['point']['outcome'] = 'NORMAL'
         self.assertEqual([], validate_result(result))
         requests = [{'point': result['observations'][0]['point'], 'subject': result['observations'][0]['subject']}]
-        for status in ['ANALYSIS_LIMIT', 'UNSUPPORTED', 'INVALID_INPUT']:
+        for status in ['UNSUPPORTED', 'INVALID_INPUT']:
             self.rejected_run(result, status)
             self.assertEqual([], validate_result(result, requests))
 
-    def test_example_and_honest_unknown_unreachable_saturation_limit(self):
+    def test_example_and_honest_unknown_unreachable(self):
         self.assertEqual([],validate_result(self.example))
-        for kind in ['unknown','unreachable','saturated','limit']:
+        for kind in ['unknown','unreachable']:
             result=copy.deepcopy(self.example);obs=result['observations'][0]
             if kind=='unknown':
                 obs['value'].update(enumerated=[],modelValueRemainder=True)
@@ -506,11 +617,6 @@ class ResultContractTests(unittest.TestCase):
             elif kind=='unreachable':
                 obs.update(reachability='UNREACHABLE_IN_MODEL',value=None)
                 obs['precision']['model']='UNREACHABLE_IN_MODEL'
-            elif kind=='saturated':
-                obs['value'].update(kind='Saturated',enumerated=[],modelValueRemainder=True,saturationReason='CARDINALITY_LIMIT')
-                obs['precision']['model']='OPEN_IN_ADMITTED_MODEL'
-            else:
-                self.rejected_run(result, 'ANALYSIS_LIMIT')
             with self.subTest(kind=kind):self.assertEqual([],validate_result(result))
 
     def test_missing_fields_and_owner_mismatch(self):
@@ -532,13 +638,13 @@ class ResultContractTests(unittest.TestCase):
 
     def test_limit_cannot_be_stable_or_emit_provisional_facts(self):
         self.example['limitReason']='WORK_BUDGET'
-        self.assertTrue(any('budget limit' in e for e in validate_result(self.example)))
+        self.assertTrue(any('required result fields' in e for e in validate_result(self.example)))
         self.example['executionStatus']='ANALYSIS_LIMIT'
         self.assertTrue(any('provisional facts' in e for e in validate_result(self.example)))
 
-    def test_saturation_cannot_hide_reason_or_open_remainder(self):
+    def test_saturation_cannot_be_reintroduced(self):
         self.example['observations'][0]['value']['kind']='Saturated'
-        self.assertTrue(any('saturation must expose' in e for e in validate_result(self.example)))
+        self.assertTrue(any('value kind' in e for e in validate_result(self.example)))
 
 
 
@@ -552,11 +658,11 @@ class FCompletionTests(unittest.TestCase):
     def validate(self):
         return validate_prepared(self.prepared, self.plans, self.queries)
 
-    def test_structural_consumer_survives_limited_query_batch(self):
+    def test_structural_consumer_survives_controlled_failed_query_batch(self):
         self.assertEqual([], self.validate())
         run = self.prepared['results'][0]['result']
         self.assertEqual('STABLE', run['executionStatus'])
-        self.assertIsNone(run['limitReason'])
+        self.assertNotIn('limitReason',run)
         self.assertEqual([], run['observations'])
         self.assertEqual(['COMPLETE','NOT_STARTED'], [c['status'] for c in self.prepared['consumers']])
         self.assertEqual('INCOMPLETE', self.prepared['preparationStatus'])
@@ -603,9 +709,9 @@ class FCompletionTests(unittest.TestCase):
         payload=json.dumps(self.prepared,sort_keys=True).encode()
         digest=hashlib.sha256(payload).hexdigest()
         before=copy.deepcopy(self.prepared)
-        for status in ['FAILED','LIMIT','COMPLETE']:
+        for status in ['FAILED','COMPLETE']:
             receipt={'schema':'analysis-delivery-receipt','version':'1.0.0','resultId':self.prepared['resultId'],'resultSha256':digest,
-                     'destination':'review://prepared.json','status':status,'reason':None if status=='COMPLETE' else 'WRITE_BUDGET_OR_IO'}
+                     'destination':'review://prepared.json','status':status,'reason':None if status=='COMPLETE' else 'WRITE_FAILED'}
             self.assertEqual([], validate_delivery_receipt(receipt,payload,status))
             if status!='COMPLETE':
                 receipt.update(status='COMPLETE',reason=None)
@@ -640,6 +746,64 @@ class FCompletionTests(unittest.TestCase):
         run=self.prepared['results'][0]['result']
         run['completion']['publication']={'status':'COMPLETE','reason':None}
         self.assertTrue(any('exclude consumers and delivery' in e for e in validate_result(run)))
+
+class CoreSizeContractTests(unittest.TestCase):
+    """Wire/manifest counterexamples only; actual engine hooks remain unavailable."""
+
+    def setUp(self):
+        self.result = load_json(ROOT/PLAN/'result-review.json')['result']
+
+    def test_analysis_key_has_no_resource_options(self):
+        self.assertEqual({}, self.result['analysisKey']['options'])
+        for field in ['resourceBudgets', 'maxCandidates', 'maxNodes', 'maxQueries', 'k']:
+            mutant = copy.deepcopy(self.result)
+            mutant['analysisKey']['options'][field] = 8
+            with self.subTest(field=field):
+                self.assertTrue(validate_result(mutant))
+
+    def test_capacity_outcomes_cannot_be_reintroduced(self):
+        for status in ['ADMISSION_LIMIT', 'ANALYSIS_LIMIT']:
+            mutant = copy.deepcopy(self.result)
+            mutant.update(executionStatus=status, observations=[], limitReason='WORK_BUDGET')
+            with self.subTest(status=status): self.assertTrue(validate_result(mutant))
+        for phase in ['admission', 'analysis', 'observation']:
+            mutant = copy.deepcopy(self.result)
+            mutant['completion'][phase] = {'status':'LIMIT', 'reason':'QUERY_BUDGET'}
+            mutant['observations'] = []
+            with self.subTest(phase=phase): self.assertTrue(validate_result(mutant))
+
+    def test_all_finite_candidates_are_representable(self):
+        for count in [1, 8, 9, 100, 10000]:
+            result = copy.deepcopy(self.result)
+            result['observations'][0]['value']['enumerated'] = [str(i) for i in range(count)]
+            with self.subTest(count=count): self.assertEqual([], validate_result(result))
+
+    def test_capacity_cannot_hide_in_failed_phase_or_delivery(self):
+        for reason in ['WORK_BUDGET','QUERY_BUDGET','OutOfMemoryError','INFRA_TIMEOUT','DISK_EXHAUSTION']:
+            with self.subTest(reason=reason):
+                result = copy.deepcopy(self.result)
+                result['completion']['observation'] = {'status':'FAILED','reason':reason}
+                result['observations'] = []
+                self.assertTrue(validate_result(result))
+                prepared = prepared_for(copy.deepcopy(self.result))
+                prepared.update(consumerPlan=[{'consumerId':'A','requiredAnalysisKeys':[],'requiredObservationBatchIds':[]}],
+                                consumers=[{'id':'A','status':'FAILED','reason':reason}],preparationStatus='INCOMPLETE')
+                self.assertTrue(validate_prepared(prepared))
+                prepared['consumers'][0]['status'] = 'LIMIT'
+                self.assertTrue(validate_prepared(prepared))
+                receipt = {'schema':'analysis-delivery-receipt','version':'1.0.0','resultId':'review',
+                           'resultSha256':None,'destination':'review://out','status':'FAILED','reason':reason}
+                self.assertTrue(validate_delivery_receipt(receipt,None,'FAILED'))
+                receipt['status'] = 'LIMIT'
+                self.assertTrue(validate_delivery_receipt(receipt,None,'LIMIT'))
+
+    def test_cardinality_saturation_is_not_a_value_kind(self):
+        mutant = copy.deepcopy(self.result)
+        mutant['observations'][0]['value'].update(kind='Saturated', enumerated=[],
+            modelValueRemainder=True, saturationReason='CARDINALITY_LIMIT')
+        mutant['observations'][0]['precision']['model'] = 'OPEN_IN_ADMITTED_MODEL'
+        self.assertTrue(validate_result(mutant))
+
 
 class CiReceiptTests(unittest.TestCase):
     def setUp(self):

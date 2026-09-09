@@ -32,3 +32,12 @@ Waves são checkpoints de review, não unidades fixas de commits ou PRs.
 Review F de e053f14: reproduzir RED; corrigir contratos/snapshots e validator;
 GREEN e contracasos; full/integration/Maven/scope; evidência append-only; commit/push
 no PR #12 draft e recibos CI do novo HEAD. Parar para review humano.
+
+## CORE-SIZE-001 — autorizado agora
+
+1. Confirmar checkout limpo, ancestralidade e PR #12 remoto, ler autoridades integrais.
+2. Auditar ocorrências por papel A–F; registrar dívidas externas/legadas sem editar produto.
+3. Formalizar ADR-0014; RED de contratos, remover outcomes/budgets/caps, GREEN.
+4. Contracasos parseáveis de papéis/wire e N/2N/4N, restore byte-exact e segundo GREEN.
+5. Gates locais aplicáveis, inventário Java/POM, scope/manifest e evidência honesta.
+6. Commits/push, descrição do mesmo PR draft e recibo CI real do HEAD final; parar.

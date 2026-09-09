@@ -126,6 +126,12 @@ não cria benchmark nem implementa o gate performance.
 
 ## Preparação CP5
 
+[CORE-SIZE-001](../architecture/decisions/ADR-0014.md) remove caps de capacidade
+do desenho CP5. Os checks físicos de transporte descritos acima e seus testes
+permanecem regressões do produto legado, com [dívida explícita](../work/cp5-follow-ups.md#size-cap-debts).
+Não constituem aprovação de supported-size contract. S16 exigirá provas reais de
+admissão/precisão invariantes ao volume nas Waves; hoje valida somente contratos.
+
 fast inclui validate_cp5.py e test_cp5_harness.py: lifecycle/ordem/autorização,
 Java/POM byte-exact, ADRs, métricas/probes/challenges, DAG e resultado de design.
 check_scope.py agora usa a main CP4 ec525cbbad96d70c9663faa88e2672148fa8ee71,

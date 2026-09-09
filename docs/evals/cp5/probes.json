@@ -158,17 +158,17 @@
         3,
         5
       ],
-      "title": "Bounded candidates and pool",
-      "dimension": "k and k+1; N/2N overwrites U=N versus U=2; configurations k=1/2 and chosen default",
+      "title": "All finite candidates and pool",
+      "dimension": "N/2N/4N branch literals; include 8/9, 100 and 10000 candidates; overwrites U=N versus U=2",
       "metrics": [
         "valuesInterned",
         "poolHits",
         "bytesHashed",
-        "saturations",
+        "candidateCardinality",
         "setElementsRetained"
       ],
-      "oracle": "explicit cardinality saturation; U separate from k; pool budget and release",
-      "kills": "unbounded values, silent truncation, global/historical pool",
+      "oracle": "All supported finite candidates preserved without count-induced remainder; U source-proportional; sharing, convergence and pool release.",
+      "kills": "candidate truncation, count-induced TOP, nonconvergent domain, global/historical pool",
       "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
       "hook": null
     },
@@ -300,17 +300,17 @@
         5
       ],
       "dimension": "Completion by phase",
-      "oracle": "Stable analysis + limited batch preserves independent structural/analysis-only consumers; only explicit unavailable dependencies block. External delivery receipt verifies intended bytes and destination after writer failure; no self-certifying payload. Preparation status excludes delivery.",
+      "oracle": "Stable analysis + controlled failed batch preserves independent structural/analysis-only consumers; only explicit unavailable dependencies block. External delivery receipt verifies intended bytes and destination after writer failure; no self-certifying payload. No resource-induced partial results.",
       "metrics": [
-        "observationLimits",
+        "observationFailures",
         "consumerFailures",
         "publicationFailures"
       ],
       "kills": [
-        "stable-analysis-observation-limit-reported-as-full-success",
+        "stable-analysis-observation-failure-reported-as-full-success",
         "consumer-failure-reported-as-complete-output",
         "prepared-payload-certifies-own-delivery",
-        "observation-limit-blocks-independent-consumer"
+        "observation-failure-blocks-independent-consumer"
       ],
       "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
       "hook": null
@@ -323,11 +323,11 @@
         5
       ],
       "dimension": "Quality alongside cost",
-      "oracle": "Fixed finite corpus/profile/k/budget and independent expected outcomes; report refusals, open/closed outcomes, saturation and phase failures alongside time/memory; no aggregate percent threshold.",
+      "oracle": "Fixed finite corpus/semantic profile and independent expected outcomes; report refusals, all candidates, open/closed outcomes and controlled phase failures alongside time/memory; no aggregate percent threshold.",
       "metrics": [
         "queryRequests",
         "uniqueQueries",
-        "saturations",
+        "candidateCardinality",
         "queriesAnswered",
         "unsupportedQueries",
         "queriesNotMaterialized",
@@ -337,14 +337,53 @@
         "sourceOpenResults",
         "effectiveOpenResults",
         "closedInModelResults",
-        "analysisLimits",
-        "observationLimits",
+        "observationFailures",
         "consumerFailures",
         "publicationFailures"
       ],
       "kills": [
-        "performance-optimization-by-early-saturation",
+        "performance-optimization-by-lost-candidates",
         "performance-optimization-by-unsupported-everything"
+      ],
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "hook": null
+    },
+    {
+      "id": "S16",
+      "waves": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "title": "Size never defines semantic coverage",
+      "dimension": "N/2N/4N valid inputs of same semantic profile; independently vary nodes/edges/operations/objects/queries/visits/candidates/bytes",
+      "oracle": "All sizes admitted; convergent analyses STABLE; all finite candidates preserved with unchanged semantic remainder. Infra failure is not a semantic outcome. Core size role contracts and runtime scale oracles both required.",
+      "metrics": [
+        "nodesIndexed",
+        "edgesIndexed",
+        "operationsIndexed",
+        "objectsIndexed",
+        "worklistPushes",
+        "maxWorklistSize",
+        "candidateCardinality",
+        "uniqueQueries",
+        "stateBytesRetained"
+      ],
+      "kills": [
+        "size-cap-rejects-valid-program",
+        "max-nodes-admission",
+        "max-edges-admission",
+        "max-operations-admission",
+        "max-objects-admission",
+        "max-visits-aborts-analysis",
+        "resource-budget-changes-semantic-result",
+        "candidate-count-causes-top",
+        "max-queries-admission",
+        "max-consumers-admission",
+        "maximum-result-size",
+        "catch-oom-as-analysis-limit"
       ],
       "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
       "hook": null

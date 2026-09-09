@@ -11,7 +11,7 @@
     "draft": true,
     "auto_merge": false
   },
-  "current_checkpoint": "CP5_POST_AUDIT_HARNESS_REMEDIATION",
+  "current_checkpoint": "CP5_CORE_SIZE_UNBOUNDED_HARNESS_REMEDIATION",
   "harness_preparation": {
     "status": "implemented",
     "review": "APPROVED"
@@ -53,7 +53,7 @@
       "title": "structural index/session",
       "status": "NOT_STARTED",
       "authorization": "NOT_AUTHORIZED",
-      "requires_review_of": "POST_AUDIT_REMEDIATION",
+      "requires_review_of": "CORE_SIZE_UNBOUNDED_REMEDIATION",
       "approval_evidence": null,
       "completion_evidence": null,
       "eval": "EVAL-CFG-034"
@@ -148,6 +148,35 @@
       ],
       "CP5-F01": "NONBLOCKING_FOLLOW_UP_W1",
       "authorized_wave": null
+    },
+    {
+      "date": "2026-09-09",
+      "source": "explicit human approval in core size-unbounded remediation request",
+      "reviewed_head": "e86a57c1f744bd499dd47326ebcb84d23c61ab2d",
+      "decision": "POST_AUDIT_REMEDIATION_APPROVED",
+      "approved_remediations": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F1",
+        "F2",
+        "F3",
+        "G",
+        "H",
+        "I"
+      ],
+      "CP5-F01": "NONBLOCKING_FOLLOW_UP_W1",
+      "authorized_wave": null
+    },
+    {
+      "date": "2026-09-09",
+      "source": "explicit human CORE SIZE-UNBOUNDED decision after approved HEAD",
+      "decision": "CORE_SIZE_UNBOUNDED_AUTHORIZED_FOR_HARNESS_REMEDIATION_ONLY",
+      "decision_id": "CORE-SIZE-001",
+      "supersedes": "capacity-based admission, resource outcomes and candidate caps only",
+      "authorized_wave": null
     }
   ],
   "audit_remediation": {
@@ -163,5 +192,17 @@
     "authorization": "F1_F2_F3_ONLY",
     "review": "AWAITING_HUMAN_REVIEW",
     "evidence": "docs/work/evidence/WORK-CFG-028/review-f/validation.md"
+  },
+  "core_size_remediation": {
+    "decision": "CORE-SIZE-001",
+    "adr": "ADR-0014",
+    "authorization": "AUTHORIZED_FOR_HARNESS_REMEDIATION_ONLY",
+    "review": "AWAITING_HUMAN_REVIEW",
+    "approved_post_audit_head": "e86a57c1f744bd499dd47326ebcb84d23c61ab2d",
+    "implementation_candidates": [
+      "Patricia/radix",
+      "FIFO"
+    ],
+    "evidence": "docs/work/evidence/WORK-CFG-028/core-size-unbounded/validation.md"
   }
 }

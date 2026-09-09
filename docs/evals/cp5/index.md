@@ -30,3 +30,7 @@ Invoke/effects, com hooks indisponíveis até a implementação autorizada.
 
 [Witness de completion F3](phase-review.json): preparação parcial preserva consumer
 estrutural independente; o recibo de entrega não faz parte do payload.
+
+[CORE-SIZE-001](../../architecture/decisions/ADR-0014.md), [manifest por papel](core-size-contract.json)
+e [oracle de review N/2N/4N](core-size-review.json): S16 roteado para W1–W5.
+Guard atual verifica contratos e wire; nenhum desses snapshots é medição de engine.

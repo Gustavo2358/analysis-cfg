@@ -10,12 +10,15 @@ CP4E aceito pelo humano para DATA+MOVE+GOBACK; [baseline](../work/evidence/WORK-
 A ordem antiga MOVE→IF→CALL→dataflow cede à decisão aprovada CP4→CP5→CP6 CALL→IF
 futuro. Branch/Jump/ciclos AIR sintéticos já disponíveis não antecipam slices COBOL.
 Roadmap dos siblings permanece inalterado.
+[ADR-0014 / CORE-SIZE-001](../architecture/decisions/ADR-0014.md) governa todas as
+Waves. Métricas são observações, nunca thresholds de admissão ou precisão.
 
 | Checkpoint | Estado | Review necessário antes de iniciar |
 | --- | --- | --- |
 | Harness preparation + B1 | APPROVED | review humano registrado |
-| Post-audit remediation | implemented / awaiting human review | entrega presente A–I |
-| W1 — index/session | NOT STARTED / NOT AUTHORIZED | remediação pós-auditoria aprovada + autorização explícita W1 |
+| Post-audit remediation | APPROVED at e86a57c | A–I/F1/F2/F3 aprovados |
+| Core size-unbounded harness remediation | implemented / awaiting human review | CORE-SIZE-001, somente harness |
+| W1 — index/session | NOT STARTED / NOT AUTHORIZED | CORE-SIZE-001 harness aprovado + autorização explícita W1 |
 | W2 — generic incremental solver | NOT STARTED / NOT AUTHORIZED | W1 + autorização explícita W2 |
 | W3 — PossibleValues/state/query | NOT STARTED / NOT AUTHORIZED | W2 + autorização explícita W3 |
 | W4 — shared planner/consumers | NOT STARTED / NOT AUTHORIZED | W3 + autorização explícita W4 |
@@ -57,10 +60,15 @@ W1/S11 deve verificar membership canônico e completude do profile no índice, s
 reconstruir CFG ou repetir AirValidator. Corrigir CP5-F01 quando W1 for autorizada.
 Handoff: view/cursor contextual e ownership aceitos para W2, sem alegar frames locais.
 
+W1 nasce sem node/edge/operation/object/sequence count cap ou admission-visit budget.
+S16 compara N/2N/4N válidos e suportados: todos admitidos. Grafo inválido, profile
+sem suporte e violação de invariante continuam distintos; muitos nós não são motivo
+de falha semântica. Overflow é defeito de implementação, com aritmética checada.
+
 ## W2 — solver incremental e extensão (EVAL-CFG-035)
 
 SPI/solver generic de estado opaco, acumulação de raiz forward e dual backward,
-EdgeTransfer monotônico, scheduling substituível, status/budgets/statistics. Sem
+EdgeTransfer monotônico, scheduling substituível, status/statistics e convergência. Sem
 PossibleValues/CLI. Provar chain/diamond/cycle/self-loop, seeds, SCC sem saída,
 primeira publicação bottom backward, edges paralelas e não identidade. Segunda
 análise finita test-only com outro tipo de state e solver byte-idêntico; duas agendas
@@ -70,19 +78,27 @@ S13 acrescenta oracle concreto finito independente de transfer/join/worklist. Do
 OUT igual não propaga, join unchanged não enfileira, zero facts provisórios;
 RED compilável/restore/segundo GREEN. Handoff: SPI/context/result e custo revisados.
 
+W2 nasce sem maxIterations, maxWorklistPushes, maxJoins, work budget ou analysis
+timeout. Termina por convergência/fixed point; se não convergir quando deveria, é
+bug. S16 mede trabalho sem cortar execução ou reduzir cobertura.
+
 ## W3 — domínio, estado e queries (EVAL-CFG-036)
 
-Criar analysis-values: profile scalar-text-direct, Cell/disjunção, boundary, bounded
-text/open/saturation, pool, estado esparso compartilhado, Assign/Nop e queries de
+Criar analysis-values: profile scalar-text-direct, Cell/disjunção, boundary, texto finito por programa/open semântico, pool, estado esparso compartilhado, Assign/Nop e queries de
 ponto/batch. Sem CALL, Read/havoc/regiões produtivos ou RD. Provar overwrite, aliases
-de mesma Cell, recusa multibase sem premissa, diamond desconhecido, k/k+1, Unicode,
+de mesma Cell, recusa multibase sem premissa, diamond desconhecido, N/N+1 candidatos preservados, Unicode,
 PARTIAL/modelScope e before/after/unsupported point. S1/S2/S3/S6/S7/S9 e S4b largo.
-Calibrar container/default k e budgets com ledger, retention, GC/JFR e liberação;
-Patricia e 8 são candidatos, sem obrigação nominal. DoD inclui snapshot isolation,
+Medir container e cardinalidades crescentes com ledger, retention, GC/JFR e liberação;
+Patricia é candidato sem obrigação nominal; k=8 deixa de ser opção produtiva. DoD inclui snapshot isolation,
 missing-key correto, nenhuma coleção histórica e replay ≤ união de prefixos FORWARD ou sufixos BACKWARD. Handoff:
 PossibleValues real e serviço de queries revisados para W4. Ampliar S12/S13 à API
-real; S14 distingue solver estável de replay limitado, S15 confronta custo e qualidade.
+real; S14 distingue solver estável de replay com falha controlada, S15 confronta custo e qualidade.
 Effects semânticos precedem fixpoint; lógica de consumers não repara estado obsoleto.
+
+W3 preserva todos os candidatos semanticamente produzíveis no programa finito.
+Sem maxCandidates, k produtivo, CARDINALITY_LIMIT ou candidate-count saturation.
+S7/S16 exercitam 9, 100, 10.000 valores e N/2N/4N; remainder só por incerteza
+semântica. Domínios futuros infinitos precisam de convergência sem caps de máquina.
 
 ## W4 — planner e consumers (EVAL-CFG-037)
 
@@ -95,10 +111,14 @@ DoD: fronteiras compiladas, segunda análise intacta, falhas de consumers tipada
 S14 verifica dependências AnalysisKey/batch explícitas por consumer e preparação parcial; S15
 inclui falhas de consumers sem ocultar qualidade. RED/restore/GREEN. Handoff: pipeline de extração pronta para composition root.
 
+W4 não expõe maxConsumers/maxCandidateSites/maxQueries/maxObservationBatches como
+política de admissão. Demanda adicional aumenta trabalho, preserva cobertura e
+dependências explícitas; S16 verifica volumes crescentes.
+
 ## W5 — produção e E2E (EVAL-CFG-038)
 
 Entrypoint AnalysisDataflow separado e writer local nos adapters, versão de resultado
-revisada, defaults/budgets aprovados. AIR file→reader→BuildCfg→sessão→queries→resultado preparado;
+revisada, defaults semânticos aprovados. AIR file→reader→BuildCfg→sessão→queries→resultado preparado;
 writer recebe payload imutável e chamador registra DeliveryReceipt externo;
 plano por destinos escritos/before terminator, sem nomes do fixture. Regressões CLI
 CFG, errors input/build/analysis/output, determinismo, identidade e PARTIAL.
@@ -108,6 +128,13 @@ autorização própria; esta preparação não os cria. DoD: gates/challenges/le
 review final; limitações de transporte separadas; sem CP6 automático. S14 testa
 DeliveryReceipt externo e falha de output sem invalidar payload/fixpoint; S15 mede
 qualidade junto a tempo/memória. Conservar recibo real de checkout/evento/árvores.
+
+W5 não introduz maximum output/AIR/result size ou query count dentro do CP5.
+A composição não herda caps locais do reader/writer legado como política aprovada.
+[Siblings e legado](../work/cp5-follow-ups.md#size-cap-debts) podem ainda impedir
+a rota por arquivo; reportar EXTERNAL SIZE-CAP DEBT sem converter para outcome
+semântico CP5 nem desabilitar validação. Remoção produtiva de caps locais exige
+escopo autorizado antes da qualificação W5. Nenhum retry/ECS/streaming é decidido.
 
 ## Evidência por checkpoint
 

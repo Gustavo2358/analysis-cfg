@@ -10,15 +10,16 @@ e métricas. [Lifecycle](../work/cp5-lifecycle.json) não permite ativação aut
 
 Obrigatórios: state sparse; sem matriz node×location; sem clone integral por
 instruction; partes inalteradas compartilhadas; raízes expostas imutáveis/isoladas;
-lookup/update com bound explícito; retenção e lifecycle mensuráveis; small sets
-limitados; saturation/remainder explícitos; budgets de trabalho/memória/pool/query/
-saída verificados antes da alocação. Sem cadeia de deltas cujo lookup cresce com
+lookup/update com custo explícito; retenção e lifecycle mensuráveis; representação
+eficiente de singleton/sets, preservando todos os candidatos.
+[CORE-SIZE-001](../architecture/decisions/ADR-0014.md) supersede somente caps e
+budgets de capacidade de H4; remainder continua estritamente semântico. Sem cadeia de deltas cujo lookup cresce com
 histórico nem coleção pesada por singleton no hot path.
 
 “Persistent” significa preservar snapshots compartilhados/isolados sem cópia
-integral. Não exige classe PersistentMap. Patricia/radix, FIFO e k=8 são candidatos
+integral. Não exige classe PersistentMap. Patricia/radix e FIFO são candidatos
 experimentais falsificáveis, **não constraints**. W2 compara duas agendas justas;
-W3 mede container/default de k. Alternativa que preserve propriedades pode substituir
+W3 mede container e cardinalidades crescentes sem cap de candidatos. Alternativa que preserve propriedades pode substituir
 candidato por review normal com ledger/probes; não exige reabrir H4. Inventário de
 classes da implementação escolhida não muda esse contrato.
 
@@ -26,7 +27,7 @@ classes da implementação escolhida não muda esse contrato.
 
 V/E: nós/arestas já contextuais; I: instructions+terminadores; D: Objects/bases;
 R: referências; P: membros de premises/scopes; B: bytes textuais; Ve/Ee: view da Entry;
-F: bindings vivos; U: valores distintos; k: bound por Cell; C: sites; M: matches;
+F: bindings vivos; U: valores distintos; c: cardinalidade observada por Cell; C: sites; M: matches;
 K: consumers; Qraw/Q: pedidos/brutos únicos; Fout/Bout: facts/bytes de saída.
 
 ```text
@@ -45,17 +46,17 @@ forward produtivo: predecessorContributionReads = 0
 ```
 
 Boundary joins têm contador separado. FirstPublication não é mudança posterior.
-Budget pode cortar entrega: status e métricas parciais explícitos. Backward usa IN
+Nenhum budget corta trabalho no core. Backward usa IN
 publicado/OUT acumulado e affectedDegree dos predecessors. S4b isola contribuições
 a J: N, com join escalar constante; recomposição relê ~N² slots. Join de raiz inteira
 pode ser caro: J=joinEntriesVisited, Z=stateCompareEntries e alocações são medidos
 separadamente; Aprop não prova J linear. Não prometer O(V+E) geral de solver/build.
 
 Para um container escolhido, declarar custo de lookup/update/merge/compactação por
-F/D/k; distinguir worst-case e amortizado. Se trie for escolhida, seu d e O(d) por
+F/D/c; distinguir worst-case e amortizado. Se trie for escolhida, seu d e O(d) por
 write entram no ledger. Não usar d como gate universal de outras representações.
-Crescimento O(N log D) pode cumprir H4; clone O(N×F) não. Budget/threshold absoluto
-só após calibração reproduzível e review; nenhuma meta em milissegundos ou SLA de LOC
+Crescimento O(N log D) pode cumprir H4; clone O(N×F) não. Threshold de regressão absoluto
+somente no teste/CI após calibração reproduzível e review, sem rejeição produtiva; nenhuma meta em milissegundos ou SLA de LOC
 foi aprovada nesta preparação.
 
 ## Ledger obrigatório por componente na Wave que o introduzir
@@ -78,13 +79,13 @@ AIR/CFG entram no baseline do processo uma vez. Duas raízes de fronteira por po
 ativo, sem histórico por edge/instruction. Liberação de sessão/run solta índices,
 pools e views; facts selecionados podem sobreviver sem segurar raízes de solver.
 Diferenças reais entre blocos ainda custam memória; não prometer sharing universal.
-U=N em N overwrites distintos mesmo se F=1; k não limita U. Não internar globalmente.
+U=N em N overwrites distintos mesmo se F=1; não existe cap de U. Não internar globalmente.
 
 ## Métricas auditáveis
 
 O [manifest de métricas](../evals/cp5/metrics.json) define incremento/unidade/owner.
 Nomes seguem vocabulário do discovery, podendo ser mapeados ao estilo Java da Wave
-sem perder dimensões. Counters inteiros long, overflow tratado como limite, sem
+sem perder dimensões. Counters inteiros com aritmética checada; overflow é defeito a corrigir, sem
 logging por operação. Separar sessão, AnalysisKey/Entry, observation epoch e extração.
 
 Estado retido/bytes requer auditoria fora do hot path: factories instrumentadas,
@@ -119,11 +120,14 @@ BACKLOG-LOWER-017/018 permanecem dependências externas para essa qualificação
 
 [Regras F/H](../architecture/cp5-post-audit.md) exigem métricas de qualidade junto ao
 custo: requests/unique/answered/unsupported/not-materialized, profiles storage/effect
-recusados, saturations, remainders, closed-in-model, limits e falhas por fase. S15
-acompanha S3/S6/S9/S10 com mesmo corpus/profile/k/budgets e denominadores explícitos.
-Uma otimização por early saturation ou unsupported-everything deve falhar no expected
+recusados, candidateCardinality, remainders, closed-in-model e falhas controladas por fase. S15
+acompanha S3/S6/S9/S10 com mesmo corpus/profile semântico e denominadores explícitos.
+Uma otimização por perda de candidatos ou unsupported-everything deve falhar no expected
 manual de qualidade, mesmo passando tempo/memória. Nenhum threshold percentual novo.
-Overflow de contador/budget tem causa na fase que ocorreu; observação limitada não
-vira ANALYSIS_LIMIT depois do fixpoint. Métricas não disponíveis continuam null.
+Falhas externas não entram como conclusão semântica ou parcialidade por recursos.
+Métricas não disponíveis continuam null. maxWorklistSize, maxSparseBindings e
+cardinalidade são observações, nunca thresholds de rejeição. Medir elapsed time,
+heap e GC no probe externo, preservando custos de CPU/I/O quando aplicáveis.
+S16 exige N/2N/4N admitidos nas cinco Waves, com escala independente por dimensão.
 S11 mede integridade no índice W1; S12 direção W2/W3; S13 oracle semântico concreto
 W2/W3; S14 completion W3–W5; S15 qualidade W3–W5. Ativar hooks somente nas Waves.

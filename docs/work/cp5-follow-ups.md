@@ -15,7 +15,7 @@ reivindicar AIR-STRUCTURE completo.
 | Read/captura/havoc/outros literais, RD/Def-Use/causalidade, outras análises | residual de BACKLOG-CFG-020, depois do profile inicial; test-only backward não vira Liveness produto |
 | memória regional/weak update, local/interprocedural | residual de 020 e [BACKLOG-CFG-013](backlog/BACKLOG-CFG-013.md)/[014](backlog/BACKLOG-CFG-014.md)/[015](backlog/BACKLOG-CFG-015.md), com contrato próprio |
 | CALL/FILE/DB2/CICS/GRBE consumers | residual de 020, CP6 CALL dependency slice e posteriores, incluindo contratos prévios de effects; controle Invoke em [BACKLOG-CFG-007](backlog/BACKLOG-CFG-007.md) é distinto da interpretação dos consumers |
-| transporte/queries tardias multifase/streaming de facts | 019/020 após volume real e demanda; budgets já obrigatórios no CP5 |
+| transporte/queries tardias multifase/streaming de facts | 019/020 após volume real e demanda; sem caps de capacidade no CP5 (CORE-SIZE-001) |
 | disjunção multi-Cell upstream | external follow-up lower→AIR quando necessário; sem criar premissa/contrato no CFG; Cell única não bloqueada |
 | escopo/causalidade de gaps CONTROL | external follow-up AIR/lower antes de claim exaustivo; texto de gap não é prova |
 | validação repetida codec→BuildCfg | follow-up bilateral air-json/CFG se profiling justificar; não exportar índice privado nem terceira validação |
@@ -50,3 +50,29 @@ roteiam integridade W1, replay/oracle W2–W3, completion W1–W5 e qualidade po
 PERFORM exige local context/return pairing próprio, além de Entry. GRBE byte ranges
 e correlação de campos exigem capacidades futuras apropriadas, não substring de
 TextValue ou produto cartesiano declarado concreto. Nenhum follow-up foi iniciado.
+
+<a id="size-cap-debts"></a>
+
+## Dívidas de capacidade observadas sob CORE-SIZE-001
+
+A norma nova governa o desenho; não afirma que os binários legados ou a pipeline
+inteira já a implementem. Nenhuma dívida abaixo é propriedade aceita do CP5.
+Nenhum sibling ou Java/POM foi alterado nesta remediação.
+
+| Dívida / classificação | Evidência no snapshot | Encaminhamento |
+| --- | --- | --- |
+| EXTERNAL SIZE-CAP DEBT — codec AIR | air-java@ce530a7e: AirJson.Limits default 16 MiB/depth128, máximo configurável depth256 | BACKLOG-LOWER-017, tarefa upstream própria; W5 reporta dependência se persistir |
+| EXTERNAL SIZE-CAP DEBT — AirValidator | mesmo SHA: ValidationOptions default nesting128/entities2.000.000/issues10.000; nesting até512 | revisão própria upstream; preservar validade/IDs/owners, sem ignorar resultado incompleto |
+| Dívida local herdada do preflight | analysis-cfg@e86a57c: BuildOptions.validation e CfgBuildCoordinator propagam VALIDATION_LIMIT do upstream | adequação bilateral futura; não converter em UNSUPPORTED/INVALID_INPUT CP5 nem fabricar build válido |
+| Dívida local do reader | mesmo SHA: AirJsonFileReader/AirInputLimitException espelham maximumDocumentBytes e CLI reporta IMPLEMENTATION_LIMIT | migração produtiva autorizada antes de composição CP5 sem cap interno; não apenas elevar teto |
+| Dívida local do writer CFG legado | mesmo SHA: CfgJsonWriter default 64 MiB, CfgJsonBytes.maximumBytes interrompe output | manter bytes/testes legados nesta sessão; não reutilizar a política no writer CP5; correção produtiva própria |
+| EXTERNAL SIZE-CAP DEBT — lower (relatada) | handoff §15 relata SP32 MiB, JSON1.500.000 nodes, admission250.000 visits/depth64 no baseline 4C | evidência histórica referenciada, não revalidada ou corrigida nesta sessão |
+
+A propagação de VALIDATION_LIMIT é dívida de capacidade, não validação de correção
+por si só. A checagem de malformed JSON, Unicode válido, IDs, owners, grafo íntegro e
+AirValidator permanece obrigatória. Truncagem de linha humana do stderr legado
+(400 chars) é apresentação de diagnóstico; não trunca facts/resultado semântico.
+Heap amplification (BACKLOG-LOWER-018) é dívida de eficiência distinta do cap.
+W1 só pode medir a fronteira index/session sobre build íntegro disponível; grandes
+inputs barrados antes dessa fronteira precisam ser registrados como dívida externa.
+Não desabilitar guards ou inventar premissas para fabricar PASS.

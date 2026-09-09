@@ -1,0 +1,142 @@
+{
+  "decision": "CORE-SIZE-001",
+  "adr": "docs/architecture/decisions/ADR-0014.md",
+  "status": "CONTRACT_ONLY",
+  "roles": {
+    "admission": {
+      "criteria": [
+        "STRUCTURAL_VALIDITY",
+        "SUPPORTED_SEMANTIC_PROFILE"
+      ],
+      "size_count_effect": "OBSERVE_ONLY",
+      "capacity_rejections": []
+    },
+    "analysis_key": {
+      "configuration_role": "SEMANTIC_IDENTITY",
+      "cp5_options": {},
+      "resource_policy_fields": []
+    },
+    "solver": {
+      "termination": "DOMAIN_FIXED_POINT",
+      "convergence_proof": "REQUIRED",
+      "resource_interruptions": [],
+      "work_counters": "OBSERVE_ONLY"
+    },
+    "possible_values": {
+      "profile": "scalar-text-direct@1",
+      "enumeration": "ALL_SEMANTIC_CANDIDATES",
+      "universe": "FINITE_PROGRAM_LITERALS_AND_ADMITTED_SEEDS",
+      "candidate_count_effect": "OBSERVE_ONLY",
+      "remainder_sources": [
+        "SEMANTIC_UNKNOWN",
+        "SOURCE_SCOPE_OPEN"
+      ],
+      "capacity_saturation": false
+    },
+    "planner_consumers": {
+      "demand_count_effect": "MORE_WORK_SAME_COVERAGE",
+      "partial_policy": "EXPLICIT_PARTIAL_BY_DEPENDENCY",
+      "resource_partial_results": false
+    },
+    "composition": {
+      "input_output_size_policy": null,
+      "upstream_caps": "EXTERNAL_SIZE_CAP_DEBT",
+      "delivery_statuses": [
+        "COMPLETE",
+        "FAILED"
+      ]
+    },
+    "execution_boundary": {
+      "infrastructure_knobs_in_core": [],
+      "resource_failure_semantic_mappings": {},
+      "resource_exhaustion": "EXTERNAL_PROCESS_FAILURE_NO_SEMANTIC_RESULT",
+      "internal_invariant_failure": "IMPLEMENTATION_DEFECT_NOT_COVERAGE"
+    },
+    "representation": {
+      "checked_arithmetic": true,
+      "index_and_conversion_safety": true,
+      "overflow": "IMPLEMENTATION_DEFECT_NOT_SUPPORTED_SIZE_CONTRACT",
+      "integer_product_ceiling": null
+    },
+    "metrics": {
+      "role": "OBSERVATION_ONLY",
+      "rejection_thresholds": {},
+      "required_observations": [
+        "nodesIndexed",
+        "edgesIndexed",
+        "operationsIndexed",
+        "worklistPushes",
+        "joinEntriesVisited",
+        "stateAllocations",
+        "stateBytesRetained",
+        "candidateCardinality",
+        "maxSparseBindings",
+        "maxWorklistSize"
+      ],
+      "external_measurements": [
+        "elapsedTime",
+        "heap",
+        "GC"
+      ]
+    }
+  },
+  "waves": [
+    {
+      "wave": 1,
+      "roles": [
+        "admission",
+        "representation",
+        "metrics"
+      ],
+      "probe": "S16",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "hook": null
+    },
+    {
+      "wave": 2,
+      "roles": [
+        "solver",
+        "analysis_key",
+        "execution_boundary",
+        "metrics"
+      ],
+      "probe": "S16",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "hook": null
+    },
+    {
+      "wave": 3,
+      "roles": [
+        "possible_values",
+        "representation",
+        "metrics"
+      ],
+      "probe": "S16",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "hook": null
+    },
+    {
+      "wave": 4,
+      "roles": [
+        "planner_consumers",
+        "analysis_key",
+        "metrics"
+      ],
+      "probe": "S16",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "hook": null
+    },
+    {
+      "wave": 5,
+      "roles": [
+        "composition",
+        "execution_boundary",
+        "metrics"
+      ],
+      "probe": "S16",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "hook": null
+    }
+  ],
+  "scale_review": "docs/evals/cp5/core-size-review.json"
+}

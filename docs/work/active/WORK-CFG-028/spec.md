@@ -27,8 +27,16 @@ na mesma branch e PR #12 draft; não autoriza W1. Sem segundo builder/AirValidat
 sem solver Python alternativo; oracle concreto finito requerido para W2/W3, hook
 NOT_AVAILABLE_UNTIL_IMPLEMENTED agora. CP5-F01 é NONBLOCKING e continua para W1.
 
-## Correção focal F
+## Correção focal F — histórica, APPROVED em e86a57c
 
 Corrigir somente F1 (admission LIMIT), F2 (DeliveryReceipt externo) e F3
 (dependências explícitas dos consumers). A/B/C/D/E/G/H/I aprovados permanecem
 preservados; nenhum Java/POM, engine, writer ou Wave iniciado.
+
+## CORE-SIZE-001 — checkpoint atual
+
+[ADR-0014](../../../architecture/decisions/ADR-0014.md): tamanho não define admissão,
+precisão ou término. Supersede budgets/outcomes de capacidade e cap de candidatos,
+preservando A–I, F2/F3 e convergência matemática. Atualizar contratos/snapshots,
+validators/challenges, métricas, scope guard e roteamento W1–W5; gates, push e review.
+Não implementar engine, Java/POM, sibling, retry/ECS ou streaming.

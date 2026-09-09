@@ -29,7 +29,9 @@ usa a `Publication` do `air-java`; o reader AIR JSON vive em cfg-adapters e dele
 Diagnostics tipados e contadores determinísticos são resultados de domínio.
 Relógios, cronômetros, logging operacional, métricas exportadas e retries pertencem
 à aplicação externa/adapters conforme necessidade; não alteram o grafo silenciosamente.
-Limites de análise são opções explícitas e produzem status/razão, não truncamento.
+[CORE-SIZE-001](decisions/ADR-0014.md): tamanho/recursos não são opções de admissão
+ou precisão. Falha de processo/infra não produz conclusão semântica; abstrações
+semanticamente necessárias exigem convergência e contrato próprios.
 
 ## O que não é infraestrutura
 

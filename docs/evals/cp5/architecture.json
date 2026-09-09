@@ -105,7 +105,7 @@
       "effective_maven": null
     }
   },
-  "rule_note": "Package selectors and public API descriptors must be concretized in each Wave, including generics and method refs; no nominal container/policy/k rule.",
+  "rule_note": "Package selectors and public API descriptors must be concretized in each Wave, including generics and method refs; no nominal container/policy rule.",
   "baseline_findings": [
     {
       "id": "CP5-F01",
@@ -116,5 +116,7 @@
       "scope": "exact baseline launcher Java/POM only during harness preparation",
       "proposed_checkpoint": "W1 review should authorize direct dependency declaration and matching existing architecture inventory; no POM change in preparation"
     }
-  ]
+  ],
+  "core_size_contract": "docs/evals/cp5/core-size-contract.json",
+  "resource_failure_semantic_mappings": {}
 }

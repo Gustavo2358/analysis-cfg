@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 from cp5_phase_contract import validate_completion
 
-CHECKPOINT = 'CP5_POST_AUDIT_HARNESS_REMEDIATION'
+CHECKPOINT = 'CP5_CORE_SIZE_UNBOUNDED_HARNESS_REMEDIATION'
 START_HEAD = 'feb79d59cc72d7dbc6269b7cacfb74db58f90867'
 AUDIT_SHA = '32d4542adcf31445cf35196a5f6d2496e8e3962c0bfa9d10c26615f6ceea5bc1'
 DOC = 'docs/architecture/cp5-post-audit.md'
@@ -25,12 +25,12 @@ OBLIGATIONS = {
     'F': ['STABLE_ANALYSIS_SURVIVES_LATER_FAILURE', 'INCOMPLETE_PIPELINE_IS_EXPLICIT',
           'OBSERVATION_BATCH_ATOMIC', 'CONSUMER_COMPLETION_IS_INDEPENDENT',
           'EXPLICIT_PARTIAL_BY_PHASE', 'OUTPUT_SUCCESS_REQUIRES_EXTERNAL_DELIVERY_RECEIPT',
-          'ADMISSION_LIMIT_IS_NOT_UNSUPPORTED', 'CONSUMER_DEPENDENCIES_ARE_EXPLICIT',
+          'SIZE_IS_NOT_SEMANTIC_ADMISSION', 'CONSUMER_DEPENDENCIES_ARE_EXPLICIT',
           'STRUCTURAL_CONSUMER_NEEDS_ZERO_ANALYSES'],
     'G': ['MANUAL_EXPECTED', 'INDEPENDENT_RECOMPUTATION_SOLVER', 'FINITE_CONCRETE_SEMANTIC_ORACLE',
           'TEST_ONLY_SYNTHETIC_FINITE_ENUMERATION', 'NO_PRODUCTION_TRANSFER_JOIN_WORKLIST_REUSE',
           'CONCRETE_BEHAVIORS_INCLUDED_IN_ABSTRACT_RESULT', 'NO_SECOND_FRAMEWORK'],
-    'H': ['QUALITY_WITH_COST', 'RAW_COUNTS_AND_DENOMINATORS', 'SAME_CORPUS_PROFILE_BUDGETS',
+    'H': ['QUALITY_WITH_COST', 'RAW_COUNTS_AND_DENOMINATORS', 'SAME_CORPUS_SEMANTIC_PROFILE',
           'NO_UNJUSTIFIED_QUALITY_THRESHOLD'],
     'I': ['HEAD_AND_BASE_AND_CHECKOUT_SHA', 'HEAD_AND_CHECKOUT_TREE_SHA', 'RUN_ID_AND_EVENT',
           'EXACT_COMMIT_IS_NOT_TREE_EQUIVALENCE', 'NO_REMOTE_CALL_IN_HARNESS'],
@@ -47,10 +47,9 @@ QUALITY = {
     'sourceOpenResults': (3, 'query_batch', 'VALUE outcomes with sourceUnknownRemainder true'),
     'effectiveOpenResults': (3, 'query_batch', 'VALUE outcomes with effectiveUnknownRemainder true'),
     'closedInModelResults': (3, 'query_batch', 'reachable VALUE outcomes closed in admitted model'),
-    'analysisLimits': (2, 'session', 'analysis phases ending at resource limit'),
-    'observationLimits': (3, 'session', 'observation batches ending at resource limit'),
-    'consumerFailures': (4, 'extraction', 'consumer instances ending FAILED or LIMIT'),
-    'publicationFailures': (5, 'output', 'publication attempts ending FAILED or LIMIT'),
+    'observationFailures': (3, 'session', 'observation batches ending with a controlled failure'),
+    'consumerFailures': (4, 'extraction', 'consumer instances ending FAILED'),
+    'publicationFailures': (5, 'output', 'publication attempts ending FAILED'),
 }
 CHALLENGES = {
     'missing-required-edge': (1, 'S11', 'Reject missing FALSE even if all surviving TRUE transitions are valid.'),
@@ -62,16 +61,15 @@ CHALLENGES = {
     'backward-replay-forward-order': (2, 'S12', 'Reverse gen/kill order must preserve the manual before/after witness at each operation.'),
     'consumer-repairs-stale-state': (None, None, 'Future Invoke/effects slice: consumer cannot repair incorrectly preserved PROGA after BY REFERENCE may-write.'),
     'unknown-invoke-treated-as-no-effect': (None, None, 'Future Invoke/effects slice: absent effect proof must open affected storage before fixpoint.'),
-    'stable-analysis-observation-limit-reported-as-full-success': (3, 'S14', 'STABLE solver + LIMIT observation => INCOMPLETE pipeline, empty atomic batch, analysis limitReason null.'),
+    'stable-analysis-observation-failure-reported-as-full-success': (3, 'S14', 'STABLE solver + controlled observation failure => INCOMPLETE preparation with empty atomic batch; solver unchanged.'),
     'consumer-failure-reported-as-complete-output': (4, 'S14', 'Failed consumer leaves other completed consumer status intact and pipeline INCOMPLETE.'),
-    'performance-optimization-by-early-saturation': (3, 'S15', 'Fixed corpus/profile/k: compare manual quality counts; early saturation changes expected closed outcomes.'),
+    'performance-optimization-by-lost-candidates': (3, 'S15', 'Fixed corpus/profile: compare all candidates and manual quality counts; loss of candidates changes expected outcomes.'),
     'performance-optimization-by-unsupported-everything': (3, 'S15', 'Fixed admitted queries: answered/unsupported counts and expected outcomes expose refusal replacing work.'),
     'shared-wrong-transfer-agreement': (2, 'S13', 'Manual and finite concrete inclusion oracle reject wrong gen/kill even when two abstract solvers agree.'),
 }
 CHALLENGES.update({
-    'admission-budget-reported-as-unsupported': (1, None, 'ADMISSION_LIMIT with admission LIMIT, analysis NOT_STARTED; never UNSUPPORTED.'),
-    'prepared-payload-certifies-own-delivery': (5, 'S14', 'Writer failure preserves prepared bytes and solver state; only external receipt FAILED/LIMIT, never COMPLETE.'),
-    'observation-limit-blocks-independent-consumer': (4, 'S14', 'Limited QueryConsumer batch leaves zero-query StructuralConsumer COMPLETE; preparation INCOMPLETE.'),
+    'prepared-payload-certifies-own-delivery': (5, 'S14', 'Writer failure preserves prepared bytes and solver state; only external receipt FAILED, never COMPLETE.'),
+    'observation-failure-blocks-independent-consumer': (4, 'S14', 'Failed QueryConsumer batch leaves zero-query StructuralConsumer COMPLETE; preparation INCOMPLETE.'),
 })
 PROBES = {'S11':[1], 'S12':[2,3], 'S13':[2,3], 'S14':[3,4,5], 'S15':[3,4,5]}
 
@@ -100,7 +98,7 @@ def validate_audit(root: Path) -> list[str]:
                 'after_first':[],'before_first':['Y'],'execution':'NOT_EXECUTED','waves':[2,3]}, 'backward distinct-anchor witness')
         work = read('docs/work/active/WORK-CFG-028/work-item.json')
         require(DOC in work['must_read'] and 'docs/evals/cp5/post-audit-contracts.json' in work['must_read'], 'must-read routing')
-        require(data['quality']['metrics'] == ['queryRequests','uniqueQueries','saturations'] + list(QUALITY), 'precision quality metrics')
+        require(data['quality']['metrics'] == ['queryRequests','uniqueQueries','candidateCardinality'] + list(QUALITY), 'precision quality metrics')
         require(data['quality']['thresholds'] is None and data['quality']['measurements'] is None, 'quality unmeasured/no threshold')
         require(data['quality']['coverage_equation'] == 'uniqueQueries = queriesAnswered + unsupportedQueries + queriesNotMaterialized', 'query denominators')
         require(data['future_invoke_hook'] == {'slice':'POST_CP5_INVOKE_EFFECTS','status':'NOT_AVAILABLE_UNTIL_IMPLEMENTED','hook':None}, 'future Invoke hook')
@@ -126,7 +124,7 @@ def validate_audit(root: Path) -> list[str]:
         require(life['review_history'][0] == {'date':'2026-09-09','source':'explicit user post-audit remediation request',
                 'discovery':'APPROVED','harness_preparation':'APPROVED','B1':'APPROVED',
                 'CP5-F01':'NONBLOCKING_FOLLOW_UP_W1','authorized_wave':None}, 'approved history and nonblocking F01')
-        require(life['review_history'][-1] == {'date':'2026-09-09','source':'explicit human review of post-audit PR #12',
+        require(life['review_history'][1] == {'date':'2026-09-09','source':'explicit human review of post-audit PR #12',
                 'reviewed_head':'e053f14f8f5dc7b0b80b7bbbe015fde684522835','decision':'REQUEST_CHANGES_F_ONLY',
                 'approved_remediations':['A','B','C','D','E','G','H','I'],'requested_changes':['F1','F2','F3'],
                 'CP5-F01':'NONBLOCKING_FOLLOW_UP_W1','authorized_wave':None}, 'F-only human review')
@@ -138,9 +136,9 @@ def validate_audit(root: Path) -> list[str]:
         require(phase_review['design']['kind'] == 'REVIEW_SNAPSHOT' and phase_review['design']['execution'] == 'NOT_EXECUTED', 'F snapshot design only')
         prepared = phase_review['prepared']
         errors += validate_prepared(prepared, phase_review['design']['requestedConsumers'], phase_review['design']['requestedQueriesByBatch'])
-        require(prepared['preparationStatus'] == 'INCOMPLETE' and len(prepared['results']) == 1, 'F3 limited batch witness')
+        require(prepared['preparationStatus'] == 'INCOMPLETE' and len(prepared['results']) == 1, 'F3 failed batch witness')
         result = prepared['results'][0]['result']
-        require(result['executionStatus'] == 'STABLE' and result['completion']['observation']['status'] == 'LIMIT', 'F3 stable analysis limited observation')
+        require(result['executionStatus'] == 'STABLE' and result['completion']['observation']['status'] == 'FAILED', 'F3 stable analysis failed observation')
         require(prepared['consumers'] == [{'id':'StructuralConsumer','status':'COMPLETE','reason':None},
                 {'id':'QueryConsumer','status':'NOT_STARTED','reason':'DEPENDENCY_UNAVAILABLE'}], 'F3 independent consumer witness')
         require(prepared['consumerPlan'][0] == {'consumerId':'StructuralConsumer','requiredAnalysisKeys':[],

@@ -44,7 +44,7 @@ def main() -> int:
         work = json.loads((ROOT / "docs/work/active/WORK-CFG-028/work-item.json").read_text())
         if work["authorization"] != "implementation" or work["id"] != "WORK-CFG-028":
             raise ValueError("wrong implementation checkpoint")
-        if work["checkpoint"] != "CP5_POST_AUDIT_HARNESS_REMEDIATION":
+        if work["checkpoint"] != "CP5_CORE_SIZE_UNBOUNDED_HARNESS_REMEDIATION":
             raise ValueError("scope checker applies only to preparation, update in authorized Wave")
         sys.path.insert(0, str(ROOT / "scripts/harness"))
         from validate_cp5 import validate_cp5
@@ -52,31 +52,34 @@ def main() -> int:
         if preparation_errors: raise ValueError("; ".join(preparation_errors))
         scopes = work["source_scope"] + work["test_scope"]
         # The aggregate PR includes historic AGENTS/ARCHITECTURE edits. This round does not.
-        remediation_base = "feb79d59cc72d7dbc6269b7cacfb74db58f90867"
+        remediation_base = "e86a57c1f744bd499dd47326ebcb84d23c61ab2d"
         focal_paths = git("diff", "--name-only", remediation_base).decode().splitlines()
         focal_paths += git("ls-files", "--others", "--exclude-standard").decode().splitlines()
         focal_scope = ["docs", "scripts/harness", "scripts/project", ".github/workflows/ci.yml", "MANIFEST.sha256"]
         if any(not any(p == s or p.startswith(s + "/") for s in focal_scope) for p in focal_paths):
             raise ValueError("path outside focal post-audit remediation scope")
-        # This human review reopens only F. Preserve the other accepted machine contracts.
-        f_base = "e053f14f8f5dc7b0b80b7bbbe015fde684522835"
-        def baseline_json(path): return json.loads(git("show", f_base + ":" + path))
+        # CORE-SIZE-001 supersedes capacity only. Keep unrelated audit semantics and CI.
+        def baseline_json(path): return json.loads(git("show", remediation_base + ":" + path))
         audit_path = "docs/evals/cp5/post-audit-contracts.json"
         before = baseline_json(audit_path)
         after = json.loads((ROOT/audit_path).read_text())
-        before["requirements"].pop("F"); after["requirements"].pop("F")
-        if before != after: raise ValueError("F-only scope: other approved audit contracts changed")
-        for path in ["docs/evals/cp5/metrics.json", "docs/evals/cp5/architecture.json",
-                     "docs/evals/cp5/gate-plan.json", ".github/workflows/ci.yml",
-                     "scripts/project/ci_source_receipt.py"]:
-            if (ROOT/path).read_bytes() != git("show", f_base + ":" + path):
-                raise ValueError("F-only scope: approved contract changed: " + path)
-        probe_path = "docs/evals/cp5/probes.json"
-        before = baseline_json(probe_path)
-        after = json.loads((ROOT/probe_path).read_text())
-        for value in [before,after]:
-            value["probes"] = [p for p in value["probes"] if p["id"] != "S14"]
-        if before != after: raise ValueError("F-only scope: non-F probes changed")
+        for value in [before, after]:
+            for key in ["F", "H"]: value["requirements"].pop(key)
+            value.pop("quality")
+        if before != after: raise ValueError("size-only scope: unrelated approved audit contracts changed")
+        for path in [".github/workflows/ci.yml", "scripts/project/ci_source_receipt.py"]:
+            if (ROOT/path).read_bytes() != git("show", remediation_base + ":" + path):
+                raise ValueError("size-only scope: approved CI receipt changed: " + path)
+        # Historical reviews/evidence are append-only, including previous await-review snapshots.
+        life = json.loads((ROOT/"docs/work/cp5-lifecycle.json").read_text())
+        old_life = baseline_json("docs/work/cp5-lifecycle.json")
+        if life["review_history"][:len(old_life["review_history"])] != old_life["review_history"]:
+            raise ValueError("historical review rewritten")
+        for key in ["last_human_review", "last_human_approval", "audit_remediation", "f_correction"]:
+            if life[key] != old_life[key]: raise ValueError("historical decision rewritten: " + key)
+        historical = git("diff", "--name-only", remediation_base, "--", "docs/work/evidence").decode().splitlines()
+        if any(not p.startswith("docs/work/evidence/WORK-CFG-028/core-size-unbounded/") for p in historical):
+            raise ValueError("historical evidence changed")
         # Bind the offline Java/POM inventory to Git, so editing both cannot hide a change.
         names = git("ls-tree", "-r", "--name-only", BASE).decode().splitlines()
         baseline_sources = {p:hashlib.sha256(git("show", BASE + ":" + p)).hexdigest()

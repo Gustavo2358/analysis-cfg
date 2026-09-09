@@ -3,13 +3,12 @@
 ## Item ativo
 
 [WORK-CFG-028](active/WORK-CFG-028/work-item.json): CP5 umbrella,
-**CP5_POST_AUDIT_HARNESS_REMEDIATION implementada / awaiting human review**.
-Preparação anterior e B1 APPROVED; remediações A–I em
-[contrato pós-auditoria](../architecture/cp5-post-audit.md), sem Wave autorizada.
-Review de e053f14: A/B/C/D/E/G/H/I APPROVED; somente F1/F2/F3 em correção/review.
-[Estado](active/WORK-CFG-028/state.md), [lifecycle/branch/PR](cp5-lifecycle.json),
-[roadmap e critérios por Wave](../product/cp5-roadmap.md).
-W1–W5 NOT STARTED; nenhuma Wave autorizada. Continuar na mesma branch e PR draft.
+**CP5_CORE_SIZE_UNBOUNDED_HARNESS_REMEDIATION implementada / awaiting human review**.
+Pós-auditoria A–I/F1/F2/F3 APPROVED no HEAD e86a57c; nova decisão
+[CORE-SIZE-001](../architecture/decisions/ADR-0014.md) supersede somente caps/budgets
+de capacidade. [Estado](active/WORK-CFG-028/state.md), [lifecycle](cp5-lifecycle.json),
+[roadmap](../product/cp5-roadmap.md). W1–W5 NOT STARTED / NOT AUTHORIZED,
+authorized_wave=null. Mesma branch e PR #12 OPEN/DRAFT; parar para review.
 
 ## Último item concluído
 

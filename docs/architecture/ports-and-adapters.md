@@ -111,6 +111,12 @@ um objeto pronto e não serializar para JSON só para restabelecer lifetime.
 
 ## Arquivo e binding JSON no 2B
 
+Esta seção descreve o transporte legado ainda executável. Seus caps de bytes e
+profundidade são [dívidas de capacidade](../work/cp5-follow-ups.md#size-cap-debts),
+supersedidos como política para CP5 por [CORE-SIZE-001](decisions/ADR-0014.md).
+A preservação dos bytes Java nesta remediação não aprova esses caps para a futura
+composição. Permanecem a validação de corretude e a autoridade única do codec AIR.
+
 ```text
 AIR JSON/file → infrastructure reader → air-java Publication → BuildCfg
 memory caller ────────────────────────────────────────────────┘

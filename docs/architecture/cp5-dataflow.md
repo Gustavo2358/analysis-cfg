@@ -48,7 +48,7 @@ Não reconstruir CFG nem copiar AirValidator; codec/build já validam, sem terce
 
 Indexar uma vez por snapshot e reutilizar Publication/Sequence/Object/Cell/Origins
 por identidade. IDs completos tornam-se ordinais internos densos com tradução reversa,
-overflow/budget explícitos. CfgNodeId público não precisa ser contíguo; ordem física
+aritmética/overflow checados, sem teto de produto. CfgNodeId público não precisa ser contíguo; ordem física
 não determina execução. Hot path não usa display name, hash profundo do grafo ou
 hashing repetido de IDs textuais. Operações usam instructions() seguido de terminator(),
 sem materializar operations() por visita, wrappers por transfer ou nó por Assign.
@@ -61,13 +61,16 @@ Contextos são demandados, sem matriz eager Entries×Nodes×Locations. Facetas o
 
 ## Execução e extensões
 
+[CORE-SIZE-001](decisions/ADR-0014.md) exclui tamanho/capacidade da admissão e da
+precisão. Falha de processo/infra não é resultado semântico.
+
 [Contrato do solver](../domain/cp5-solver.md), [storage/valores/claims](../domain/cp5-values.md)
 e [ADRs](decisions/index.md) governam leis e admissão. PossibleValues é uma análise;
 RD, Liveness e Taint futuros podem ter outros tipos de estado e direção. Não fundir
 análises num megaestado nem obrigá-las ao container textual. Registro explícito,
 sem ServiceLoader/reflection dinâmica ou framework universal.
 
-AnalysisKey inclui implementação/versão, profile, opções (inclusive k e budgets),
+AnalysisKey inclui implementação/versão, profile, opções semânticas,
 direção, precisão e Entry; snapshot/lifetime pertencem à sessão. Mesma chave e contexto
 reutilizam run; outra configuração exige run distinto. Não cachear apenas por
 PublicationId ou graph.hashCode(). Execução inicialmente sequencial por contexto/análise.
@@ -95,7 +98,7 @@ repetidas compartilham facts imutáveis. Lookup não planejado retorna NOT_REQUE
 registro tardio exige novo batch/observation epoch explícito e medido. Consumidores
 não recebem Publication/graph.nodes() integrais nem executam análise/replay escondido.
 
-FactSink recebe apenas observações finais estabilizadas, com IDs completos, limites,
+FactSink recebe apenas observações finais estabilizadas, com IDs completos, escopos semânticos,
 premissas e evidência pertinente; erro de consumidor identifica fase e impede saída
 incompleta apresentada como sucesso. Ordenação/encoding ficam fora do fixpoint.
 [Snapshot do resultado](analysis-dataflow-result-v1.md) é design, sem writer/codec.

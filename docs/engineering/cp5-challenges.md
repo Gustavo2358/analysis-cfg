@@ -68,7 +68,7 @@ incorreto/duplicado. S12/W2–W3 cobre replay backward com IN ou ordem forward; 
 manual def X; use X. S13/W2–W3 exige oracle concreto finito independente para matar
 transfer errado compartilhado pelos dois solvers abstratos. S14/W3–W5 distingue
 fixpoint, replay, consumers e confirmação de output; S15/W3–W5 detecta ganho aparente
-por early saturation/unsupported-everything. Invoke desconhecido e reparo de state
+por perda de candidatos/unsupported-everything. Invoke desconhecido e reparo de state
 por consumer permanecem POST_CP5_INVOKE_EFFECTS, sem target/hook ou Wave fictícia.
 [Obrigações A–I](../evals/cp5/post-audit-contracts.json) e detalhes em
 [contrato pós-auditoria](../architecture/cp5-post-audit.md).
@@ -78,10 +78,24 @@ exige RED nominal, restaura bytes e exige segundo GREEN. Também altera snapshot
 completion e o recibo de CI, inclusive merge sintético com árvore idêntica e claim
 falso de checkout literal. São challenges de harness, não mutantes de engine.
 
-Review F acrescenta `admission-budget-reported-as-unsupported` (W1),
-`prepared-payload-certifies-own-delivery` (W5/S14) e
-`observation-limit-blocks-independent-consumer` (W4/S14). Witnesses de harness
-exigem ADMISSION_LIMIT distinto, recibo externo FAILED/LIMIT sem alteração do
-payload e StructuralConsumer COMPLETE após query-batch LIMIT. Batches independentes
-e consumers sem análise ou dependentes apenas do solver também têm contracasos.
-Hooks produtivos permanecem indisponíveis; não são testes de writer real.
+F2/F3 preservam `prepared-payload-certifies-own-delivery` (W5/S14) e
+`observation-failure-blocks-independent-consumer` (W4/S14). Witnesses de harness
+exigem recibo externo FAILED sem alterar payload e StructuralConsumer COMPLETE após
+query-batch FAILED controlado. Batches independentes e consumers sem análise ou
+dependentes apenas do solver conservam seus contracasos.
+
+CORE-SIZE-001 supersede o antigo `unbounded-values`: o substituto
+`non-convergent-semantic-domain` protege convergência matemática, representação
+eficiente e ausência de truncagem; um conjunto grande finito é válido. S7 preserva
+todos os literais e S16 exige N/2N/4N admitidos em cada dimensão devida na Wave.
+Os novos challenges de size admission, candidatos, queries, visitas, output e
+OOM mapping estão no inventário; hooks/targets seguem NOT_AVAILABLE_UNTIL_IMPLEMENTED.
+
+O guard `cp5_size_contract.py` verifica campos e comportamentos por papel: critérios
+de admissão, identidade semântica da AnalysisKey, término do solver, enumeração de
+valores, partialidade, composição e fronteira externa. Não proíbe palavras como max:
+maxWorklistSize e maxSparseBindings permanecem métricas obrigatórias. Testes mutam
+manifestos parseáveis e respostas de review contra um oracle independente do input;
+N/N+1 que abre o modelo ou altera admissão deve dar RED. Isso verifica o harness,
+não substitui oracles de produto nas Waves. Não há solver Python ou mutante de
+classe futura. [Decisão](../architecture/decisions/ADR-0014.md).

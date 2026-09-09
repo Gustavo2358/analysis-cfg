@@ -4,7 +4,7 @@ import hashlib
 import json
 import re
 
-EXECUTION_STATUSES = {'STABLE', 'ADMISSION_LIMIT', 'ANALYSIS_LIMIT', 'UNSUPPORTED', 'INVALID_INPUT'}
+EXECUTION_STATUSES = {'STABLE', 'UNSUPPORTED', 'INVALID_INPUT'}
 COMPLETION_FIELDS = {'admission', 'analysis', 'observation'}
 PREPARED_FIELDS = {'schema','version','resultId','publicationId','results','consumerPlan','consumers','preparationStatus','partialPolicy'}
 PLAN_FIELDS = {'consumerId','requiredAnalysisKeys','requiredObservationBatchIds'}
@@ -19,7 +19,7 @@ def identity(value):
 def check_phase(row, statuses, require, consumer=False):
     require(set(row) == ({'id','status','reason'} if consumer else {'status','reason'}), 'phase fields')
     require(row['status'] in statuses, 'phase status')
-    needs_reason = row['status'] in {'REJECTED','LIMIT','FAILED'} or (consumer and row['status'] == 'NOT_STARTED')
+    needs_reason = row['status'] in {'REJECTED','FAILED'} or (consumer and row['status'] == 'NOT_STARTED')
     require(isinstance(row['reason'],str) and bool(row['reason'].strip()) if needs_reason else row['reason'] is None, 'phase reason')
 
 
@@ -30,24 +30,20 @@ def validate_completion(result: dict) -> list[str]:
     try:
         c = result['completion']
         require(set(c) == COMPLETION_FIELDS, 'run fields exclude consumers and delivery acknowledgement')
-        check_phase(c['admission'], {'COMPLETE','REJECTED','LIMIT'}, require)
-        check_phase(c['analysis'], {'STABLE','LIMIT','NOT_STARTED'}, require)
-        check_phase(c['observation'], {'COMPLETE','LIMIT','FAILED','NOT_STARTED'}, require)
+        check_phase(c['admission'], {'COMPLETE','REJECTED'}, require)
+        check_phase(c['analysis'], {'STABLE','NOT_STARTED'}, require)
+        check_phase(c['observation'], {'COMPLETE','FAILED','NOT_STARTED'}, require)
         status = result['executionStatus']
         require(status in EXECUTION_STATUSES, 'execution status')
-        admission = {'STABLE':'COMPLETE','ANALYSIS_LIMIT':'COMPLETE',
-                     'ADMISSION_LIMIT':'LIMIT','UNSUPPORTED':'REJECTED','INVALID_INPUT':'REJECTED'}[status]
-        analysis = {'STABLE':'STABLE','ANALYSIS_LIMIT':'LIMIT','ADMISSION_LIMIT':'NOT_STARTED',
-                    'UNSUPPORTED':'NOT_STARTED','INVALID_INPUT':'NOT_STARTED'}[status]
-        require(c['admission']['status'] == admission, 'admission LIMIT differs from UNSUPPORTED/INVALID_INPUT')
+        admission = 'COMPLETE' if status == 'STABLE' else 'REJECTED'
+        analysis = 'STABLE' if status == 'STABLE' else 'NOT_STARTED'
+        require(c['admission']['status'] == admission, 'admission classification')
         require(c['analysis']['status'] == analysis, 'solver status is independent of later failure')
-        if status in {'ADMISSION_LIMIT','ANALYSIS_LIMIT'}:
-            phase = 'admission' if status == 'ADMISSION_LIMIT' else 'analysis'
-            require(c[phase]['reason'] == result['limitReason'], 'limit reason belongs to ' + phase)
-        else:
-            require(result['limitReason'] is None, 'no run resource limit on stable/unsupported/invalid input')
-        if c['admission']['reason'] == 'ADMISSION_BUDGET':
-            require(status == 'ADMISSION_LIMIT' and admission == 'LIMIT', 'ADMISSION_BUDGET is never UNSUPPORTED')
+        expected_reason = {'STABLE':None, 'UNSUPPORTED':'UNSUPPORTED_PROFILE',
+                           'INVALID_INPUT':'INVALID_STRUCTURE'}.get(status)
+        require(c['admission']['reason'] == expected_reason, 'semantic admission reason, never resource capacity')
+        if c['observation']['status'] == 'FAILED':
+            require(c['observation']['reason'] == 'OBSERVATION_ERROR', 'controlled observation failure, never resource exhaustion')
         if status != 'STABLE':
             require(c['observation']['status'] == 'NOT_STARTED', 'observation needs stable analysis')
         if c['observation']['status'] != 'COMPLETE':
@@ -81,7 +77,7 @@ def validate_prepared(prepared: dict, requested_consumers: list[dict] | None = N
             require(result['publicationId'] == pub, 'same publication snapshot')
             key = identity(result['analysisKey'])
             # Multiple batches can observe the same run; they cannot change its status/scope.
-            run = {k:result[k] for k in ['analysisKey','publicationId','unitId','entryId','executionStatus','modelScope','sourceScope','limitReason']}
+            run = {k:result[k] for k in ['analysisKey','publicationId','unitId','entryId','executionStatus','modelScope','sourceScope']}
             run.update(admission=result['completion']['admission'],analysis=result['completion']['analysis'])
             require(key not in analyses or analyses[key] == run, 'consistent run across observation batches')
             analyses[key] = run
@@ -103,7 +99,11 @@ def validate_prepared(prepared: dict, requested_consumers: list[dict] | None = N
             expected = {p['consumerId']:p for p in requested_consumers}
             require(len(expected) == len(requested_consumers) and plans == expected, 'independent consumer plan coverage/dependencies')
         for consumer in prepared['consumers']:
-            check_phase(consumer, {'COMPLETE','LIMIT','FAILED','NOT_STARTED'}, require, True)
+            check_phase(consumer, {'COMPLETE','FAILED','NOT_STARTED'}, require, True)
+            if consumer['status'] == 'FAILED':
+                require(consumer['reason'] == 'CONSUMER_ERROR', 'controlled consumer failure, never resource exhaustion')
+            if consumer['status'] == 'NOT_STARTED':
+                require(consumer['reason'] in {'DEPENDENCY_UNAVAILABLE','NOT_EXECUTED'}, 'consumer not-started reason')
             name = consumer['id']
             require(name in plans and name not in consumers, 'unique requested consumer result')
             consumers[name] = consumer
@@ -139,16 +139,18 @@ def validate_delivery_receipt(receipt: dict, payload_bytes: bytes | None,
             require(receipt['resultId'] == expected_result_id, 'result identity correlation')
         digest = receipt['resultSha256']
         if digest is None:
-            require(receipt['status'] in {'FAILED','LIMIT'}, 'COMPLETE requires payload hash')
+            require(receipt['status'] in {'FAILED'}, 'COMPLETE requires payload hash')
         else:
             require(isinstance(digest,str) and re.fullmatch('[0-9a-f]{64}',digest) is not None, 'SHA-256')
             require(payload_bytes is not None and digest == hashlib.sha256(payload_bytes).hexdigest(), 'exact intended payload bytes')
         require(isinstance(receipt['destination'],str) and bool(receipt['destination'].strip()), 'destination')
         if expected_destination is not None:
             require(receipt['destination'] == expected_destination, 'destination correlation')
-        check_phase({k:receipt[k] for k in ['status','reason']}, {'COMPLETE','FAILED','LIMIT'}, require)
+        check_phase({k:receipt[k] for k in ['status','reason']}, {'COMPLETE','FAILED'}, require)
+        if receipt['status'] == 'FAILED':
+            require(receipt['reason'] in {'ENCODING_FAILED','WRITE_FAILED','FINALIZATION_FAILED'}, 'controlled delivery failure reason')
         if observed_delivery_status is not None:
-            require(observed_delivery_status in {'COMPLETE','FAILED','LIMIT'} and receipt['status'] == observed_delivery_status, 'independent delivery outcome')
+            require(observed_delivery_status in {'COMPLETE','FAILED'} and receipt['status'] == observed_delivery_status, 'independent delivery outcome')
     except (KeyError, TypeError, ValueError) as exc:
         errors.append('CP5 delivery receipt: missing/invalid receipt: ' + str(exc))
     return errors

@@ -2,11 +2,13 @@
 
 Checkpoint `CP5_POST_AUDIT_HARNESS_REMEDIATION`, WORK-CFG-028, branch
 `feat/cp5-dataflow-engine`, PR #12 OPEN/DRAFT. Discovery, preparação anterior e B1
-estão APPROVED; esta remediação aguarda novo review humano. Nenhuma Wave autorizada.
+estão APPROVED; A–I/F1/F2/F3 foram aprovados no HEAD e86a57c.
+A nova remediação [CORE-SIZE-001](decisions/ADR-0014.md) aguarda review, sem Wave autorizada.
 [Lifecycle](../work/cp5-lifecycle.json) conserva o histórico B1 e a autorização focal.
 [Obrigações verificáveis](../evals/cp5/post-audit-contracts.json) complementam H1–H7/R1/R2
-sem reabrir host, separação cfg/analysis, algoritmo incremental, H4 ou cinco Waves.
-Patricia/radix, FIFO e k=8 continuam experimentais.
+sem reabrir host, separação cfg/analysis, algoritmo incremental ou cinco Waves.
+H4 é supersedido somente em caps/budgets de capacidade. Patricia/radix e FIFO
+continuam experimentais; k=8 sai do desenho produtivo.
 
 Autoridade de findings: `artefatos-e2e/cp5/cp5-architectural-audit.md`, no workspace
 irmão, SHA-256 `32d4542adcf31445cf35196a5f6d2496e8e3962c0bfa9d10c26615f6ceea5bc1`.
@@ -45,13 +47,12 @@ Completude aqui é fidelidade ao inventário AIR publicado; não fecha CONTROL/P
 ou prova reachability/fonte completa.
 
 Usar contagens/conjuntos de papéis e lookup das fontes no índice em custo linear no
-inventário AIR + CFG recebido, com orçamento de admissão. Isso verifica as
+inventário AIR + CFG recebido, sem orçamento de admissão. Isso verifica as
 obrigações de projeção; não materializa outro grafo, não repete BuildCfg/CoreCfgProjection,
 AirValidator, traversal de fixpoint ou deep comparison de toda AIR. Falta estrutural
 é INVALID_INPUT/admission REJECTED, sem solver; profile sem suporte é UNSUPPORTED.
-Um limite de admissão deve ser explicitado como executionStatus ADMISSION_LIMIT, admission LIMIT
-com motivo ADMISSION_BUDGET (regra F1),
-sem atribuir ANALYSIS_LIMIT a solver que não iniciou.
+Tamanho não pode causar nenhuma recusa. Falta de capacidade de execução/overflow
+não é classificação semântica; ver CORE-SIZE-001 e dívidas do runtime legado.
 
 S11/W1 e seus cinco challenges exigem grafo íntegro aceito e rejeitam missing Branch
 edge, missing required Sequence, foreign/replaced Sequence source, foreign
@@ -145,13 +146,13 @@ Review do HEAD e053f14 aprovou A/B/C/D/E/G/H/I e solicitou somente F1/F2/F3.
 Os [contratos de resultado](analysis-dataflow-result-v1.md) separam três objetos de
 review; não implementam writer, scheduler ou framework de workflow.
 
-**F1 — admission LIMIT.** Cada tentativa de análise conserva admission/analysis/
-observation. `ADMISSION_LIMIT` externo corresponde a admission LIMIT, motivo
-ADMISSION_BUDGET e analysis/observation NOT_STARTED. UNSUPPORTED significa falta de
-suporte ao profile/forma e corresponde a admission REJECTED; nunca recurso esgotado.
-ANALYSIS_LIMIT continua reservado ao solver iniciado que atingiu budget. Replay
-LIMIT mantém executionStatus STABLE e limitReason global null. Limites e rejeições
-são distinguíveis por campos tipados, sem interpretar texto de diagnóstico.
+**F1 — classificação semântica (supersessão CORE-SIZE-001).** Cada tentativa conserva
+admission/analysis/observation. UNSUPPORTED corresponde a profile/forma sem suporte;
+INVALID_INPUT corresponde a invalidade estrutural. Ambos usam admission REJECTED e
+analysis/observation NOT_STARTED. Entrada válida e suportada permanece admitida em
+qualquer tamanho; análise concluída usa STABLE. ADMISSION_LIMIT, ANALYSIS_LIMIT e
+LIMIT de capacidade deixam de existir no contrato. Falha externa não é resultado
+semântico nem abre remainder. Falha controlada de observação mantém STABLE.
 
 **F2 — payload e entrega.** AnalysisDataflowResult contém o resultado de um run e
 seu lote; `completion` contém somente admission, analysis e observation.
@@ -161,7 +162,7 @@ DeliveryReceipt ou confirmação de escrita. A estrutura preparada pode existir 
 nenhuma tentativa de entrega. COMPLETE de preparação não afirma sucesso de entrega.
 
 DeliveryReceipt é externo e construído pelo chamador após a tentativa: resultId,
-destination, status COMPLETE/FAILED/LIMIT, reason e SHA-256 dos bytes completos
+destination, status COMPLETE/FAILED, reason e SHA-256 dos bytes completos
 quando disponível. COMPLETE exige confirmação externa e hash; falha antes de
 calcular o hash completo conserva resultId e hash=null. Não impor buffering de
 output nem inventar hash de bytes truncados como hash do resultado. Outra tentativa
@@ -180,22 +181,23 @@ run. O planner agrupa demandas com dependências de falha explícitas; não pode
 um batch global a consumidores que não o requerem. Conferir o plano independente
 contra as dependências e outcomes; ausência ou troca de IDs não vira sucesso.
 
-O lote continua atômico: observation LIMIT/FAILED implica observations=[] somente
+O lote continua atômico: observation FAILED implica observations=[] somente
 naquele batch. Bloqueia com NOT_STARTED/DEPENDENCY_UNAVAILABLE apenas consumers
 que requerem aquele batch; requerer somente AnalysisKey STABLE não exige replay
-completo. Consumers podem falhar com FAILED/LIMIT após dependências satisfeitas,
+completo. Consumers podem falhar com FAILED após dependências satisfeitas,
 sem invalidar outros. StructuralConsumer com ambas listas vazias pode completar,
 inclusive com zero runs; isso não dispensa a SiteView admitida pelo index/session
 W1. A admissibilidade estrutural não é fabricada a partir de uma análise recusada.
 
-O [witness F3](../evals/cp5/phase-review.json) exige solver STABLE, query-batch LIMIT,
+O [witness F3](../evals/cp5/phase-review.json) exige solver STABLE, query-batch FAILED,
 StructuralConsumer COMPLETE, QueryConsumer NOT_STARTED e preparação INCOMPLETE.
 B1 permanece intacto dentro de cada batch completo: VALUE e UNSUPPORTED_POINT têm
 um resultado por query única, conferido contra o plano. Reparo posterior de state
 por consumer permanece proibido. Publicação parcial é somente dos bundles
 concluídos, com incompletude explícita; nenhum fato provisório ou stream truncado.
+Falha por resource exhaustion não autoriza publicação parcial nem FAILED semântico.
 
-W1 ativa o oracle admission-budget; W3/S14 observation; W4/S14 dependências/isolamento
+W1 ativa o oracle de admissão independente do tamanho (S16); W3/S14 observation; W4/S14 dependências/isolamento
 (incluindo structural-only, análise sem query e batches independentes); W5/S14 recibo
 externo e falhas reais de entrega. Os hooks continuam NOT_AVAILABLE_UNTIL_IMPLEMENTED.
 
@@ -228,17 +230,17 @@ como execução do código Java. S4b continua protegendo o custo incremental esc
 
 S15 acompanha S3/S6/S9/S10, além dos contadores por Wave em metrics.json. Registrar
 requests brutos, queries únicas, respondidas VALUE, recusadas, não materializadas,
-recusas de storage/effects, saturations, remainders de modelo/fonte/efetivos,
-closed-in-model, analysis/observation limits, consumer/publication failures. Incluir
-escopo, corpus, profile, k, budgets e denominadores; métrica unavailable não é zero.
+recusas de storage/effects, cardinalidade de candidatos, remainders de modelo/fonte/efetivos,
+closed-in-model e falhas controladas de observação/consumer/entrega. Incluir
+escopo, corpus, profile semântico e denominadores; métrica unavailable não é zero.
 
 Para lote completo, uniqueQueries = queriesAnswered + unsupportedQueries; no lote
-atômico limitado, queriesNotMaterialized cobre as queries sem resposta comprometida.
+atômico com falha controlada, queriesNotMaterialized cobre as queries sem resposta comprometida.
 Custo de trabalho descartado continua medido. Contadores de abertura podem se
 sobrepor; não somá-los como categorias exclusivas. Closed-in-model não fecha fonte.
-Comparar custo somente com a qualidade do mesmo corpus/configuração: early saturation
+Comparar custo somente com a qualidade do mesmo corpus/configuração: perda de candidatos
 ou unsupported-everything devem aparecer no oracle esperado e nos contadores. W2
-ativa analysis limits, W3 qualidade de queries, W4 consumers, W5 publicação. S15
+mede trabalho até convergência, W3 qualidade de queries, W4 consumers, W5 publicação. S15
 começa em W3 e adiciona somente as métricas disponíveis a cada Wave. Não há SLA,
 threshold percentual ou alegação de ganho antes de corpus e evidência.
 

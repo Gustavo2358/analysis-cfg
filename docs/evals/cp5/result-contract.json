@@ -13,7 +13,6 @@
     "executionStatus",
     "modelScope",
     "sourceScope",
-    "limitReason",
     "observations",
     "statistics",
     "completion"
@@ -34,14 +33,11 @@
   ],
   "execution_statuses": [
     "STABLE",
-    "ADMISSION_LIMIT",
-    "ANALYSIS_LIMIT",
     "UNSUPPORTED",
     "INVALID_INPUT"
   ],
   "value_kinds": [
-    "Candidates",
-    "Saturated"
+    "Candidates"
   ],
   "reachability": [
     "REACHABLE",
@@ -49,7 +45,6 @@
   ],
   "model_scope": "KNOWN_GRAPH_ENTRY",
   "effective_remainder": "modelValueRemainder OR sourceUnknownRemainder",
-  "limit_behavior": "non-STABLE run publishes no provisional observations; query refusal alone does not make a stable run non-STABLE",
   "unreachable_behavior": "value=null; source reachability not inferred",
   "query_statuses": [
     "VALUE",
@@ -98,8 +93,7 @@
     ],
     "admission_statuses": [
       "COMPLETE",
-      "REJECTED",
-      "LIMIT"
+      "REJECTED"
     ],
     "preparation_statuses": [
       "COMPLETE",
@@ -107,12 +101,49 @@
     ],
     "delivery_statuses": [
       "COMPLETE",
-      "FAILED",
-      "LIMIT"
+      "FAILED"
     ],
     "consumer_behavior": "Resolve full AnalysisKeys and batch IDs against independent plan; only unavailable dependencies block; structural consumer can request zero analyses/batches.",
     "prepared_behavior": "Contains results, explicit dependencies and consumer outcomes; preparation COMPLETE says nothing about delivery.",
     "delivery_behavior": "External receipt binds prepared resultId, destination and exact payload SHA-256 when available to independently observed delivery status. COMPLETE requires hash; failure before hashing uses null. Never inside prepared result.",
-    "phase_limit": "ADMISSION_LIMIT differs from UNSUPPORTED; later failure never rewrites STABLE analysis"
-  }
+    "analysis_statuses": [
+      "STABLE",
+      "NOT_STARTED"
+    ],
+    "observation_statuses": [
+      "COMPLETE",
+      "FAILED",
+      "NOT_STARTED"
+    ],
+    "consumer_statuses": [
+      "COMPLETE",
+      "FAILED",
+      "NOT_STARTED"
+    ],
+    "phase_failure": "Controlled phase failure never rewrites STABLE analysis; resource exhaustion produces no semantic result.",
+    "admission_reasons": {
+      "INVALID_INPUT": "INVALID_STRUCTURE",
+      "UNSUPPORTED": "UNSUPPORTED_PROFILE"
+    },
+    "observation_failure_reasons": [
+      "OBSERVATION_ERROR"
+    ],
+    "consumer_failure_reasons": [
+      "CONSUMER_ERROR"
+    ],
+    "delivery_failure_reasons": [
+      "ENCODING_FAILED",
+      "WRITE_FAILED",
+      "FINALIZATION_FAILED"
+    ]
+  },
+  "non_stable_behavior": "non-STABLE run publishes no provisional observations; query refusal alone does not make a stable run non-STABLE",
+  "core_size_decision": "CORE-SIZE-001",
+  "analysis_key_options": {},
+  "value_fields": [
+    "domain",
+    "kind",
+    "enumerated",
+    "modelValueRemainder"
+  ]
 }

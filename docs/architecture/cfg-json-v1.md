@@ -67,6 +67,11 @@ as transições são ENTRY 1→0 e RETURN 0→2, ambas na primary-entry.
 
 ## Encoding, determinismo, limites e publicação
 
+Os caps abaixo descrevem o produto legado, sem aprovação como política CP5.
+[CORE-SIZE-001](decisions/ADR-0014.md) os classifica como
+[dívidas de capacidade](../work/cp5-follow-ups.md#size-cap-debts); migração produtiva
+fica para tarefa autorizada, mantendo validações de encoding, IDs e aritmética.
+
 UTF-8 estrito sem BOM e sem newline final; JSON compacto, sem pretty printing.
 Propriedades seguem as ordens acima. Aspas/backslash são escapados; controles U+0000
 até U+001F usam `\u00xx` hexadecimal minúsculo. Outros scalars Unicode são UTF-8

@@ -60,8 +60,12 @@ as novas raízes converge ao mesmo menor ponto fixo das equações por recomposi
 não requer distributividade. Kills internos de strong Assign não invalidam essa
 ascensão entre iterações, nem autorizam unir OUT novo a valores mortos.
 
-Budget do solver interrompido retorna ANALYSIS_LIMIT com causa/fase. Estados provisórios não
-são upper bounds do ponto fixo ainda desconhecido e não saem como facts finais.
+O solver termina pela convergência matemática/ponto fixo, sem maxIterations,
+maxWorklistPushes, maxJoins, budget de trabalho ou timeout de análise no core.
+Estados provisórios não são upper bounds do ponto fixo desconhecido e não saem
+como facts finais. Não convergir quando o contrato garante término é bug.
+[CORE-SIZE-001](../architecture/decisions/ADR-0014.md) separa abstração semântica
+de capacidade e falha externa; nenhuma quantidade de trabalho altera cobertura.
 STABLE afirma solução do modelo admitido, sem prometer exaustividade da fonte.
 
 ## Backward e prova de extensão

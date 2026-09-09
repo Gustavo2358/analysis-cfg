@@ -17,10 +17,7 @@
             "profile": "scalar-text-direct@1",
             "direction": "FORWARD",
             "precisionPolicy": "MODEL_WITH_SOURCE_REMAINDER",
-            "options": {
-              "maxCandidates": 2,
-              "resourceBudgets": "REVIEW_REQUIRED_BEFORE_EXECUTION"
-            },
+            "options": {},
             "entryId": {
               "domain": "entry",
               "localId": "c4de8a797697cb8ddf3012f2248da01f",
@@ -104,7 +101,7 @@
         }
       ]
     },
-    "oracle": "Stable analysis with limited query batch leaves StructuralConsumer COMPLETE and blocks only QueryConsumer; no execution claimed."
+    "oracle": "Stable analysis with a controlled observation error leaves StructuralConsumer COMPLETE and blocks only QueryConsumer; no resource exhaustion or execution claimed."
   },
   "prepared": {
     "schema": "prepared-analysis-result",
@@ -125,10 +122,7 @@
             "profile": "scalar-text-direct@1",
             "direction": "FORWARD",
             "precisionPolicy": "MODEL_WITH_SOURCE_REMAINDER",
-            "options": {
-              "maxCandidates": 2,
-              "resourceBudgets": "REVIEW_REQUIRED_BEFORE_EXECUTION"
-            },
+            "options": {},
             "entryId": {
               "domain": "entry",
               "localId": "c4de8a797697cb8ddf3012f2248da01f",
@@ -163,7 +157,6 @@
               "publication": "77ae4cc3ed75332c64011efce81c431b"
             }
           },
-          "limitReason": null,
           "observations": [],
           "statistics": {
             "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
@@ -179,8 +172,8 @@
               "reason": null
             },
             "observation": {
-              "status": "LIMIT",
-              "reason": "QUERY_BUDGET"
+              "status": "FAILED",
+              "reason": "OBSERVATION_ERROR"
             }
           }
         }
@@ -201,10 +194,7 @@
             "profile": "scalar-text-direct@1",
             "direction": "FORWARD",
             "precisionPolicy": "MODEL_WITH_SOURCE_REMAINDER",
-            "options": {
-              "maxCandidates": 2,
-              "resourceBudgets": "REVIEW_REQUIRED_BEFORE_EXECUTION"
-            },
+            "options": {},
             "entryId": {
               "domain": "entry",
               "localId": "c4de8a797697cb8ddf3012f2248da01f",
@@ -232,6 +222,6 @@
     ],
     "preparationStatus": "INCOMPLETE",
     "partialPolicy": "EXPLICIT_PARTIAL_BY_DEPENDENCY",
-    "resultId": "review-prepared-query-budget"
+    "resultId": "review-prepared-observation-error"
   }
 }

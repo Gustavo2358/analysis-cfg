@@ -8,6 +8,7 @@ from pathlib import Path
 from validate_docs import existing, files_under, load_json
 import cp5_audit_contract as audit
 import cp5_phase_contract as phases
+import cp5_size_contract as size
 
 BASE = 'ec525cbbad96d70c9663faa88e2672148fa8ee71'
 LIFECYCLE = 'docs/work/cp5-lifecycle.json'
@@ -21,7 +22,7 @@ CHALLENGES = {
     'enqueue-unchanged-join': 2, 'lose-self-loop-reenqueue': 2,
     'full-state-clone': 3, 'scan-objects-per-assign': 1, 'scan-global-successors': 1,
     'identity-by-display-name': 1, 'ignore-activation-entry': 1,
-    'missing-key-as-bottom': 3, 'unbounded-values': 3, 'silent-truncation': 3,
+    'missing-key-as-bottom': 3, 'non-convergent-semantic-domain': 3, 'silent-truncation': 3,
     'unknown-effect-as-nop': 3, 'consumer-starts-solver': 4,
     'full-traversal-per-consumer': 4, 'broadcast-i-times-k': 4,
     'replay-per-query-site': 3, 'emit-provisional-facts': 4,
@@ -39,13 +40,15 @@ accumulatorStatesChanged accumulatorStatesUnchanged publishedStatesChanged publi
 predecessorContributionReads boundaryJoins worklistAttempts worklistPushes duplicatePushesSuppressed
 maxWorklistSize joinEntriesVisited stateCompareEntries stateAllocations stateBytesAllocated
 stateBytesRetained stateRootsRetained maxSparseBindings setElementsRetained valuesInterned poolHits
-bytesHashed saturations candidateSites siteMatches consumerInvocations factsEmitted queryRequests
+bytesHashed candidateCardinality candidateSites siteMatches consumerInvocations factsEmitted queryRequests
 uniqueQueries sequencesReplayed operationsReplayed analysisRuns analysisCacheHits'''.split())
 CHALLENGES.update({k:v[0] for k,v in audit.CHALLENGES.items()})
 PROBES.update(audit.PROBES)
 METRICS.update(audit.QUALITY)
+CHALLENGES.update({k:v[0] for k,v in size.CHALLENGES.items()})
+PROBES['S16'] = [1,2,3,4,5]
 RESULT_FIELDS = set('''schema version analysisKey publicationId unitId entryId executionStatus
-modelScope sourceScope limitReason observations statistics completion'''.split())
+modelScope sourceScope observations statistics completion'''.split())
 OBS_FIELDS = set('''point subject queryStatus queryReason reachability value sourceUnknownRemainder effectiveUnknownRemainder
 precision premiseRefs evidenceRefs provenanceRefs'''.split())
 QUERY_STATUSES = {'VALUE', 'UNSUPPORTED_POINT'}
@@ -80,9 +83,7 @@ def validate_result(result: dict, requested_queries: list[dict] | None = None) -
         require(key['entryId'] == result['entryId'], 'analysis key context')
         require(key['direction'] in {'FORWARD', 'BACKWARD'}, 'direction')
         require(all(isinstance(key[x], str) and key[x] for x in ['implementation','implementationVersion','profile','precisionPolicy']), 'analysis identity')
-        k = key['options']['maxCandidates']
-        require(type(k) is int and k > 0, 'positive configurable cardinality')
-        require('resourceBudgets' in key['options'], 'explicit resource budgets')
+        require(key['options'] == {}, 'CORE-SIZE-001: CP5 semantic options only; no resource/candidate cap')
         source = result['sourceScope']
         require(set(source) == {'open', 'inventory', 'dimension', 'scope'}, 'source scope fields')
         require(type(source['open']) is bool and source['inventory'] in {'COMPLETE','PARTIAL','UNAVAILABLE'}, 'source scope status')
@@ -100,7 +101,6 @@ def validate_result(result: dict, requested_queries: list[dict] | None = None) -
             expected = {query_key(q) for q in requested_queries}
             actual = [query_key(o) for o in result['observations']]
             require(len(actual) == len(expected) and set(actual) == expected, 'requested query coverage')
-        require((status in {'ADMISSION_LIMIT','ANALYSIS_LIMIT'}) == (result['limitReason'] is not None), 'budget limit distinct from stable/saturation')
         for obs in result['observations']:
             require(set(obs) == OBS_FIELDS, 'required observation fields')
             query_status = obs['queryStatus']
@@ -132,17 +132,13 @@ def validate_result(result: dict, requested_queries: list[dict] | None = None) -
                 require(obs['effectiveUnknownRemainder'] == source['open'], 'unreachable model is not source proof')
             else:
                 require(obs['reachability'] == 'REACHABLE', 'reachability')
-                require(isinstance(value, dict) and set(value) == {'domain','kind','enumerated','modelValueRemainder','saturationReason'}, 'value fields')
+                require(isinstance(value, dict) and set(value) == {'domain','kind','enumerated','modelValueRemainder'}, 'value fields')
                 require(value['domain'] == 'known(text)', 'value domain')
                 vals = value['enumerated']
                 require(isinstance(vals, list) and all(isinstance(x,str) for x in vals) and len(vals) == len(set(vals)), 'distinct text candidates')
                 require(type(value['modelValueRemainder']) is bool, 'model remainder type')
-                require(value['kind'] in {'Candidates','Saturated'}, 'value kind')
-                if value['kind'] == 'Saturated':
-                    require(value['modelValueRemainder'] and value['saturationReason'] == 'CARDINALITY_LIMIT', 'saturation must expose limit and remainder')
-                else:
-                    require(len(vals) <= k and value['saturationReason'] is None, 'bounded candidates, no silent truncation claim')
-                    require(bool(vals) or value['modelValueRemainder'], 'reachable empty closed value forbidden')
+                require(value['kind'] == 'Candidates', 'CORE-SIZE-001: value kind preserves all finite candidates')
+                require(bool(vals) or value['modelValueRemainder'], 'reachable empty closed value forbidden')
                 require(obs['effectiveUnknownRemainder'] == (value['modelValueRemainder'] or source['open']), 'effective remainder OR')
             precision = obs['precision']
             require(set(precision) == {'model','source','pathWitness'}, 'precision fields')
@@ -159,7 +155,7 @@ def validate_result(result: dict, requested_queries: list[dict] | None = None) -
 
 
 def validate_cp5(root: Path) -> list[str]:
-    errors = audit.validate_audit(root)
+    errors = audit.validate_audit(root) + size.validate_size_contract(root)
     def require(ok, reason):
         if not ok: errors.append('CP5: ' + reason)
     def rows(items, key, expected, label):
@@ -192,9 +188,9 @@ def validate_cp5(root: Path) -> list[str]:
             n = w['wave']
             require(w['status'] == 'NOT_STARTED' and w['authorization'] == 'NOT_AUTHORIZED', 'Waves 1-5 must be NOT_STARTED / NOT_AUTHORIZED')
             require(w['approval_evidence'] is None and w['completion_evidence'] is None, 'no Wave evidence invented')
-            require(w['requires_review_of'] == ('POST_AUDIT_REMEDIATION' if n == 1 else f'WAVE_{n-1}'), 'sequential Wave review dependency')
+            require(w['requires_review_of'] == ('CORE_SIZE_UNBOUNDED_REMEDIATION' if n == 1 else f'WAVE_{n-1}'), 'sequential Wave review dependency')
             require(w['eval'] == f'EVAL-CFG-{33+n:03}', 'Wave eval linkage')
-        require(set(work['related_decisions']) == {f'ADR-{n:04}' for n in range(10,14)}, 'ADR routing')
+        require(set(work['related_decisions']) == {f'ADR-{n:04}' for n in range(10,15)}, 'ADR routing')
         for p in ['docs/architecture/cp5-dataflow.md','docs/domain/cp5-solver.md','docs/domain/cp5-values.md','docs/engineering/cp5-performance.md','docs/engineering/cp5-challenges.md','docs/architecture/analysis-dataflow-result-v1.md','docs/product/cp5-roadmap.md',LIFECYCLE]:
             require(p in work['must_read'] and existing(root,p), 'required routing ' + p)
         for adr in work['related_decisions']:
@@ -253,12 +249,12 @@ def validate_cp5(root: Path) -> list[str]:
         for inv in arch['future_inventories'].values():
             require(inv == {'status':'NOT_AVAILABLE_UNTIL_IMPLEMENTED','sources':None,'classfiles':None,'javap_descriptors':None,'jdeps_edges':None,'effective_maven':None}, 'unimplemented bytecode inventory')
         contract = load_json(root / PLAN / 'result-contract.json')
-        require(contract['schema_version'] == 1 and contract['status'] == 'REVIEW_SNAPSHOT_NOT_CODEC' and contract['schema'] == 'analysis-dataflow-result' and contract['version'] == '1.0.0' and set(contract['execution_statuses']) == phases.EXECUTION_STATUSES and set(contract['value_kinds']) == {'Candidates','Saturated'} and set(contract['reachability']) == {'REACHABLE','UNREACHABLE_IN_MODEL'}, 'result contract status/schema')
+        require(contract['schema_version'] == 1 and contract['status'] == 'REVIEW_SNAPSHOT_NOT_CODEC' and contract['schema'] == 'analysis-dataflow-result' and contract['version'] == '1.0.0' and set(contract['execution_statuses']) == phases.EXECUTION_STATUSES and set(contract['value_kinds']) == {'Candidates'} and set(contract['reachability']) == {'REACHABLE','UNREACHABLE_IN_MODEL'}, 'result contract status/schema')
         require(set(contract['required_result_fields']) == RESULT_FIELDS and set(contract['required_observation_fields']) == OBS_FIELDS, 'result contract minimum fields')
         require(set(contract['query_statuses']) == QUERY_STATUSES and
                 set(contract['unsupported_point_null_fields']) == UNSUPPORTED_NULL_FIELDS, 'result contract query outcomes')
         require(set(contract['completion']['required_fields']) == phases.COMPLETION_FIELDS and set(contract['completion']['prepared_fields']) == phases.PREPARED_FIELDS and set(contract['completion']['consumer_plan_fields']) == phases.PLAN_FIELDS and set(contract['completion']['delivery_receipt_fields']) == phases.RECEIPT_FIELDS and contract['completion']['observation_batch'] == 'ATOMIC', 'phase completion contract')
-        require(contract['completion']['admission_statuses'] == ['COMPLETE','REJECTED','LIMIT'] and contract['completion']['delivery_statuses'] == ['COMPLETE','FAILED','LIMIT'], 'F admission/delivery status contract')
+        require(contract['completion']['admission_statuses'] == ['COMPLETE','REJECTED'] and contract['completion']['delivery_statuses'] == ['COMPLETE','FAILED'], 'F admission/delivery status contract')
         snapshot = load_json(root / PLAN / 'result-review.json')
         require(snapshot['design']['kind'] == 'REVIEW_SNAPSHOT' and snapshot['design']['execution'] == 'NOT_EXECUTED', 'result example is design only')
         requests = snapshot['design']['requestedQueries']

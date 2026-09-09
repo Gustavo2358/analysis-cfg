@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "status": "contract_only",
-  "overflow": "phase-local LIMIT with explicit reason; never wrap; only solver budget becomes ANALYSIS_LIMIT",
+  "overflow": "Checked arithmetic; overflow is an implementation defect to correct, never a supported-size ceiling or semantic result.",
   "metrics": [
     {
       "name": "nodesIndexed",
@@ -287,14 +287,14 @@
       "group": "state",
       "scope": "analysisKey/entry/run with replay separately labelled",
       "available_by_wave": 3,
-      "event": "distinct retained small-set payload elements under declared sharing ownership",
+      "event": "distinct retained candidate-set payload elements under declared sharing ownership",
       "unit": "count",
       "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
     },
     {
       "name": "valuesInterned",
       "group": "values",
-      "scope": "analysis preparation/pool; saturation per run",
+      "scope": "analysis preparation/pool",
       "available_by_wave": 3,
       "event": "new distinct semantic value inserted into pool",
       "unit": "count",
@@ -303,7 +303,7 @@
     {
       "name": "poolHits",
       "group": "values",
-      "scope": "analysis preparation/pool; saturation per run",
+      "scope": "analysis preparation/pool",
       "available_by_wave": 3,
       "event": "existing pool value reused",
       "unit": "count",
@@ -312,19 +312,10 @@
     {
       "name": "bytesHashed",
       "group": "values",
-      "scope": "analysis preparation/pool; saturation per run",
+      "scope": "analysis preparation/pool",
       "available_by_wave": 3,
       "event": "actual bytes/scalars processed for pool hashing, unit explicitly reported",
       "unit": "bytes_or_unicode_scalars_explicitly_labelled",
-      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
-    },
-    {
-      "name": "saturations",
-      "group": "values",
-      "scope": "analysis preparation/pool; saturation per run",
-      "available_by_wave": 3,
-      "event": "transition to Saturated, not subsequent already-saturated joins",
-      "unit": "count",
       "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
     },
     {
@@ -424,7 +415,7 @@
       "available_by_wave": 3,
       "event": "distinct VALUE outcomes; includes unreachable, excludes refusal",
       "unit": "count",
-      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, profile and budgets; no inferred zero when unavailable."
+      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, semantic profile; no inferred zero when unavailable."
     },
     {
       "name": "unsupportedQueries",
@@ -433,7 +424,7 @@
       "available_by_wave": 3,
       "event": "distinct UNSUPPORTED_POINT outcomes",
       "unit": "count",
-      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, profile and budgets; no inferred zero when unavailable."
+      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, semantic profile; no inferred zero when unavailable."
     },
     {
       "name": "queriesNotMaterialized",
@@ -442,7 +433,7 @@
       "available_by_wave": 3,
       "event": "distinct planned queries with no committed outcome after batch failure",
       "unit": "count",
-      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, profile and budgets; no inferred zero when unavailable."
+      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, semantic profile; no inferred zero when unavailable."
     },
     {
       "name": "unsupportedStorageProfiles",
@@ -451,7 +442,7 @@
       "available_by_wave": 3,
       "event": "analysis requests refused for insufficient storage semantics",
       "unit": "count",
-      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, profile and budgets; no inferred zero when unavailable."
+      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, semantic profile; no inferred zero when unavailable."
     },
     {
       "name": "unsupportedEffectProfiles",
@@ -460,7 +451,7 @@
       "available_by_wave": 3,
       "event": "analysis requests refused for insufficient effect semantics",
       "unit": "count",
-      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, profile and budgets; no inferred zero when unavailable."
+      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, semantic profile; no inferred zero when unavailable."
     },
     {
       "name": "modelOpenResults",
@@ -469,7 +460,7 @@
       "available_by_wave": 3,
       "event": "VALUE outcomes with modelValueRemainder true",
       "unit": "count",
-      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, profile and budgets; no inferred zero when unavailable."
+      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, semantic profile; no inferred zero when unavailable."
     },
     {
       "name": "sourceOpenResults",
@@ -478,7 +469,7 @@
       "available_by_wave": 3,
       "event": "VALUE outcomes with sourceUnknownRemainder true",
       "unit": "count",
-      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, profile and budgets; no inferred zero when unavailable."
+      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, semantic profile; no inferred zero when unavailable."
     },
     {
       "name": "effectiveOpenResults",
@@ -487,7 +478,7 @@
       "available_by_wave": 3,
       "event": "VALUE outcomes with effectiveUnknownRemainder true",
       "unit": "count",
-      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, profile and budgets; no inferred zero when unavailable."
+      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, semantic profile; no inferred zero when unavailable."
     },
     {
       "name": "closedInModelResults",
@@ -496,43 +487,44 @@
       "available_by_wave": 3,
       "event": "reachable VALUE outcomes closed in admitted model",
       "unit": "count",
-      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, profile and budgets; no inferred zero when unavailable."
+      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, semantic profile; no inferred zero when unavailable."
     },
     {
-      "name": "analysisLimits",
-      "group": "quality",
-      "scope": "session",
-      "available_by_wave": 2,
-      "event": "analysis phases ending at resource limit",
-      "unit": "count",
-      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, profile and budgets; no inferred zero when unavailable."
-    },
-    {
-      "name": "observationLimits",
+      "name": "observationFailures",
       "group": "quality",
       "scope": "session",
       "available_by_wave": 3,
-      "event": "observation batches ending at resource limit",
+      "event": "observation batches ending with a controlled failure",
       "unit": "count",
-      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, profile and budgets; no inferred zero when unavailable."
+      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, semantic profile; no inferred zero when unavailable."
     },
     {
       "name": "consumerFailures",
       "group": "quality",
       "scope": "extraction",
       "available_by_wave": 4,
-      "event": "consumer instances ending FAILED or LIMIT",
+      "event": "consumer instances ending FAILED",
       "unit": "count",
-      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, profile and budgets; no inferred zero when unavailable."
+      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, semantic profile; no inferred zero when unavailable."
     },
     {
       "name": "publicationFailures",
       "group": "quality",
       "scope": "output",
       "available_by_wave": 5,
-      "event": "publication attempts ending FAILED or LIMIT",
+      "event": "publication attempts ending FAILED",
       "unit": "count",
-      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, profile and budgets; no inferred zero when unavailable."
+      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, semantic profile; no inferred zero when unavailable."
+    },
+    {
+      "name": "candidateCardinality",
+      "group": "values",
+      "scope": "analysisKey/entry/run with replay separately labelled",
+      "available_by_wave": 3,
+      "event": "observed distinct semantic candidates in a fact; distribution and high-water mark, never a rejection threshold",
+      "unit": "count",
+      "audit": "Compare enumerated candidates with independent finite oracle; retain all candidates for any measured cardinality."
     }
-  ]
+  ],
+  "role": "OBSERVATION_ONLY"
 }

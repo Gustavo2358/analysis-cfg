@@ -16,16 +16,15 @@ STABLE como execução real. Statistics ficam unavailable/null, sem counters inv
 | schema/version | analysis-dataflow-result / 1.0.0, evolução local explícita |
 | analysisKey | implementação/versão, profile, direção, precisão, options, Entry; cache pertence à sessão/snapshot |
 | publicationId/unitId/entryId | identidade completa, sem ordinais internos exportados |
-| executionStatus | STABLE, ADMISSION_LIMIT, ANALYSIS_LIMIT, UNSUPPORTED ou INVALID_INPUT do solver/run; recusa isolada de query não altera esse status |
+| executionStatus | STABLE, UNSUPPORTED ou INVALID_INPUT do solver/run; recusa isolada de query não altera esse status |
 | modelScope/sourceScope | KNOWN_GRAPH_ENTRY separado da abertura CONTROL/Unit da fonte |
 | observations | um resultado por query única (point, subject) do plano em run STABLE e observation COMPLETE, inclusive queries recusadas |
 | queryStatus/queryReason | VALUE com motivo null, ou UNSUPPORTED_POINT com motivo explícito não vazio; status por query separado de executionStatus |
 | point | OperationId, Entry, before/after e outcome solicitado; after fronteira não admitida é UNSUPPORTED_POINT; outcome pode ser null nesse caso |
 | subject/place/storage | ObjectPlace/ObjectId consultado e Cell/Storage base; Object não é memória exclusiva |
 | reachability | REACHABLE/UNREACHABLE_IN_MODEL para VALUE; null em UNSUPPORTED_POINT, que não afirma inalcançabilidade |
-| value | known(text), Candidates/Saturated, enumerated e modelValueRemainder; null se inalcançável no modelo ou query recusada, distinguidos por queryStatus/reachability |
+| value | known(text), Candidates sem teto de cardinalidade, enumerated e modelValueRemainder; null se inalcançável no modelo ou query recusada, distinguidos por queryStatus/reachability |
 | sourceUnknownRemainder/effectiveUnknownRemainder | abertura pertinente de fonte e OR com remainder de modelo |
-| saturationReason/limitReason | cardinalidade local diferente de budget interrompido; causa/fase explícitas |
 | precision | exatidão somente no modelo declarado; sem claim de testemunho de caminho ou fonte completa |
 | premises/evidence/provenance | refs pertinentes da AIR/snapshot/regra, sem path tree ou causalidade inventada |
 | statistics | métricas por fase/run/Entry/epoch; unavailable neste exemplo, medidas na implementação |
@@ -63,10 +62,13 @@ das observations; ele é oracle manual de review, não campo adicional do transp
 `validate_result(result, requested_queries)` verifica a cobertura quando recebe o
 plano; validar só a forma de um resultado não demonstra cobertura do lote.
 
-Não enumerado por saturação mantém restante e motivo; não alcançado no modelo usa
-value=null, nunca Candidates({},false). Run limitado/recusado como um todo continua
-com observations=[] e não publica facts provisórios; limitReason não pode coexistir
-com STABLE. A recusa de after(Return/Halt) sozinha não é falha do solver/run e não
+[CORE-SIZE-001](decisions/ADR-0014.md) remove saturationReason/limitReason,
+resourceBudgets/maxCandidates e outcomes de capacidade. AnalysisKey.options={} no
+profile CP5 atual; extensões futuras só acrescentam configuração semântica sob review.
+Candidates contém todos os valores finitos sustentados. Reached unknown conserva
+remainder semântico; cardinalidade não abre resultado. Não alcançado no modelo usa
+value=null, nunca Candidates({},false). Run recusado como um todo continua com
+observations=[] e não publica facts provisórios. A recusa de after(Return/Halt) sozinha não é falha do solver/run e não
 pode promover executionStatus a UNSUPPORTED nem apagar outras queries válidas.
 
 O harness exige o lote misto do snapshot e rejeita aborto global e desaparecimento
@@ -74,7 +76,7 @@ da query recusada. Os challenges `unsupported-query-aborts-batch` e
 `unsupported-query-disappears` ativam em W3/S6 contra implementação real; nesta
 preparação a prova é apenas do contrato/validator, sem execução de engine.
 
-W5 deve congelar por review o wire definitivo, budgets/defaults, parser nominal de
+W5 deve congelar por review o wire definitivo e defaults semânticos, parser nominal de
 reports e falhas antes do writer. A CLI separada usará AIR file → reader → BuildCfg
 → sessão → PossibleValues → plano padrão → writer. Plano padrão observa destinos
 escritos por Sequence em before(terminator), sem selecionar primeiro Object/WS-PGM/
@@ -87,16 +89,18 @@ observation, cada qual com status/reason. Não contém consumers nem publication
 
 | executionStatus externo | admission | analysis | observation |
 | --- | --- | --- | --- |
-| ADMISSION_LIMIT | LIMIT | NOT_STARTED | NOT_STARTED |
 | UNSUPPORTED / INVALID_INPUT | REJECTED | NOT_STARTED | NOT_STARTED |
-| ANALYSIS_LIMIT | COMPLETE | LIMIT | NOT_STARTED |
-| STABLE | COMPLETE | STABLE | COMPLETE / LIMIT / FAILED / NOT_STARTED |
+| STABLE | COMPLETE | STABLE | COMPLETE / FAILED / NOT_STARTED |
 
-ADMISSION_LIMIT e ANALYSIS_LIMIT exigem limitReason não vazio, igual ao motivo da
-fase respectiva. Demais executionStatus têm limitReason=null. REJECTED/LIMIT/FAILED
-exigem motivo; demais fases têm reason=null. ADMISSION_BUDGET nunca é UNSUPPORTED.
-Observation não COMPLETE mantém apenas seu lote vazio; budget de replay não altera
-STABLE nem vira UNSUPPORTED_POINT. B1 continua aplicado por batch completo.
+REJECTED usa INVALID_STRUCTURE para INVALID_INPUT e UNSUPPORTED_PROFILE para
+UNSUPPORTED. Falha controlada de observation usa FAILED/OBSERVATION_ERROR;
+COMPLETE/STABLE/NOT_STARTED do run têm reason=null. Esses códigos classificam
+causas semânticas ou falhas controladas, não contagens/recursos. Falha interna antes
+de concluir a análise é erro de execução, fora desse payload semântico; não inventar
+run STABLE, recusa ou facts parciais. Observation não COMPLETE mantém apenas seu
+lote vazio; falha controlada não altera STABLE nem vira UNSUPPORTED_POINT. B1 continua
+aplicado por batch completo. OOM, killed/host failure, timeout de infra e disco
+esgotado externamente não são mapeados para esses outcomes ou remainder.
 
 `PreparedAnalysisResult` é envelope de preparação com schema/version, resultId,
 publicationId, results, consumerPlan, consumers, preparationStatus e partialPolicy.
@@ -110,25 +114,28 @@ AnalysisKey listado. Outcomes dos consumers têm id/status/reason e devem cobrir
 exatamente o plano independente, sem omissões ou alteração silenciosa de dependências.
 
 Somente dependências indisponíveis forçam NOT_STARTED/DEPENDENCY_UNAVAILABLE.
-Dependências satisfeitas permitem COMPLETE (reason=null), FAILED/LIMIT com motivo,
-ou NOT_STARTED com motivo explícito caso o trabalho não tenha sido executado.
+Dependências satisfeitas permitem COMPLETE (reason=null), FAILED/CONSUMER_ERROR,
+ou NOT_STARTED/NOT_EXECUTED caso o trabalho não tenha sido executado.
 StructuralConsumer pode ter ambas listas vazias e completar com results=[]; não
 inventar run STABLE. SiteView estrutural já deve ter sido admitida pelo contrato W1.
-Um consumer que requer somente AnalysisKey estável não depende de batch limitado.
+Um consumer que requer somente AnalysisKey estável não depende de batch com falha controlada.
 
 partialPolicy=EXPLICIT_PARTIAL_BY_DEPENDENCY: cada batch e cada consumer é atômico.
 preparationStatus COMPLETE exige todos os runs/batches solicitados completos e todos
 os consumers COMPLETE; caso contrário INCOMPLETE. Status e resultados concluídos de
-consumers independentes permanecem disponíveis. A preparação não afirma entrega.
+consumers independentes permanecem disponíveis. Essa partialidade não representa
+resource exhaustion nem permite liberar alguns facts porque o programa ficou grande.
+Fonte PARTIAL/profile aberto continuam nos scopes semânticos, sem alterar a admissão
+por tamanho. A preparação não afirma entrega.
 O wire dos bundles de facts continua para W4/W5; esta remediação especifica somente
 identidades, dependências e completion, sem implementação de consumers.
 
 ## DeliveryReceipt externo ao payload
 
 Recibo separado: schema=analysis-delivery-receipt/version=1.0.0, resultId,
-resultSha256, destination, status COMPLETE/FAILED/LIMIT e reason. Correlacionar ao
+resultSha256, destination, status COMPLETE/FAILED e reason. Correlacionar ao
 resultId preparado e destino da tentativa. COMPLETE exige hash dos bytes completos
-entregues e confirmação do chamador; FAILED/LIMIT exige motivo, e pode usar hash=null
+entregues e confirmação do chamador; FAILED exige ENCODING_FAILED, WRITE_FAILED ou FINALIZATION_FAILED, e pode usar hash=null
 quando a falha ocorreu antes do hash completo. Se houver hash, deve identificar os
 bytes completos pretendidos, não prefixo truncado. Não impor buffer integral ou
 codec/serialização nesta revisão; W5 vincula esses campos ao writer real.
@@ -142,6 +149,6 @@ Sem recibo externo não há confirmação de entrega, mesmo com preparação com
 
 O snapshot de [batch B1](../evals/cp5/result-review.json) continua NOT_EXECUTED.
 O [witness de dependências F3](../evals/cp5/phase-review.json) conserva StructuralConsumer
-COMPLETE após query-batch LIMIT. Testes verificam ADMISSION_LIMIT, writer failure,
+COMPLETE após query-batch FAILED controlado. Testes verificam admissão sem caps, writer failure,
 hash/identity mismatch, self-certification, batches e consumers independentes.
 [Decisão F](cp5-post-audit.md#f). Nenhum runtime, workflow engine ou writer implementado.

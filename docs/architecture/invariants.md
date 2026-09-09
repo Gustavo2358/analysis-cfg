@@ -85,7 +85,9 @@ não existe exit global único implícito para a Publication.
 
 ## INV-CFG-020 — Limites explícitos
 
-Corte de recursos/contextos exige ANALYSIS_LIMIT e precisão reduzida, nunca truncamento invisível.
+CORE-SIZE-001: tamanho/recursos não justificam corte, rejeição ou precisão reduzida.
+Convergência e abstração contextual são semânticas explícitas; falha externa não é
+resultado semântico. [ADR-0014](decisions/ADR-0014.md) supersede a política anterior.
 
 ## INV-CFG-021 — Oracle independente
 
@@ -143,11 +145,11 @@ Primeira publicação/mudança propaga raízes por arestas afetadas; acumulador 
 
 ## INV-CFG-032 — Locations e valores honestos
 
-Cell compartilhada e disjunção explícita; missing key desconhecido, bottom separado; strong write, open e saturation conforme ADR-0012.
+Cell compartilhada e disjunção explícita; missing key desconhecido, bottom separado; strong write e open semântico conforme ADR-0012/ADR-0014; todos os candidatos finitos preservados.
 
 ## INV-CFG-033 — Compartilhamento com custo verificável
 
-H4 protege propriedades de estado e métricas/retention, não Patricia/FIFO/k=8. Probes/challenges por Wave conforme ADR-0013.
+H4 protege propriedades de estado e métricas/retention, não Patricia/FIFO; k=8 foi removido por CORE-SIZE-001. Probes/challenges por Wave conforme ADR-0013.
 
 ## INV-CFG-034 — Observações estáveis e alcance do claim
 

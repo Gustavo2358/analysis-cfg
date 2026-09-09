@@ -4,7 +4,7 @@
     "execution": "NOT_EXECUTED",
     "fixture": "CP4E oracle only; fixture identifiers are not production constants",
     "airSha256": "dd3bb4819282e609a97937ea01b7e202786e2c2d9ba9c8a1821a8b982eeb8788",
-    "optionsNote": "maxCandidates=2 illustrates configurability, not an approved default",
+    "optionsNote": "CORE-SIZE-001: no capacity options in scalar-text-direct@1.",
     "requestedQueries": [
       {
         "point": {
@@ -84,10 +84,7 @@
       "profile": "scalar-text-direct@1",
       "direction": "FORWARD",
       "precisionPolicy": "MODEL_WITH_SOURCE_REMAINDER",
-      "options": {
-        "maxCandidates": 2,
-        "resourceBudgets": "REVIEW_REQUIRED_BEFORE_EXECUTION"
-      },
+      "options": {},
       "entryId": {
         "domain": "entry",
         "localId": "c4de8a797697cb8ddf3012f2248da01f",
@@ -122,7 +119,6 @@
         "publication": "77ae4cc3ed75332c64011efce81c431b"
       }
     },
-    "limitReason": null,
     "observations": [
       {
         "point": {
@@ -163,8 +159,7 @@
           "enumerated": [
             "PROGA"
           ],
-          "modelValueRemainder": false,
-          "saturationReason": null
+          "modelValueRemainder": false
         },
         "sourceUnknownRemainder": true,
         "effectiveUnknownRemainder": true,

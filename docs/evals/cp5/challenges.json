@@ -100,10 +100,10 @@
       "hook": null
     },
     {
-      "id": "unbounded-values",
+      "id": "non-convergent-semantic-domain",
       "wave": 3,
       "probe": "S7",
-      "oracle": "k+1 requires explicit Saturated",
+      "oracle": "A finite program-literal domain converges without truncation; a genuinely infinite ascending domain needs a semantic convergence contract, never a machine-size cap.",
       "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
       "target": null,
       "hook": null
@@ -112,7 +112,7 @@
       "id": "silent-truncation",
       "wave": 3,
       "probe": "S7",
-      "oracle": "saturation reason/remainder and agenda independence",
+      "oracle": "Preserve every semantically supported candidate independent of count and agenda; no silent truncation or artificial remainder.",
       "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
       "target": null,
       "hook": null
@@ -247,7 +247,7 @@
       "id": "cache-ignores-options-entry",
       "wave": 4,
       "probe": "S8",
-      "oracle": "different k/Entry creates distinct runs; equal key shared",
+      "oracle": "Different semantic profile/Entry creates distinct runs; equal semantic key shared; infrastructure options never enter key.",
       "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
       "target": null,
       "hook": null
@@ -363,10 +363,10 @@
       "future_slice": "POST_CP5_INVOKE_EFFECTS"
     },
     {
-      "id": "stable-analysis-observation-limit-reported-as-full-success",
+      "id": "stable-analysis-observation-failure-reported-as-full-success",
       "wave": 3,
       "probe": "S14",
-      "oracle": "STABLE solver + LIMIT observation => INCOMPLETE pipeline, empty atomic batch, analysis limitReason null.",
+      "oracle": "STABLE solver + controlled observation failure => INCOMPLETE preparation with empty atomic batch; solver unchanged.",
       "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
       "target": null,
       "hook": null
@@ -381,10 +381,10 @@
       "hook": null
     },
     {
-      "id": "performance-optimization-by-early-saturation",
+      "id": "performance-optimization-by-lost-candidates",
       "wave": 3,
       "probe": "S15",
-      "oracle": "Fixed corpus/profile/k: compare manual quality counts; early saturation changes expected closed outcomes.",
+      "oracle": "Fixed corpus/profile: compare all candidates and manual quality counts; loss of candidates changes expected outcomes.",
       "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
       "target": null,
       "hook": null
@@ -408,28 +408,127 @@
       "hook": null
     },
     {
-      "id": "admission-budget-reported-as-unsupported",
-      "wave": 1,
-      "probe": null,
-      "oracle": "ADMISSION_LIMIT with admission LIMIT, analysis NOT_STARTED; never UNSUPPORTED.",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
-    },
-    {
       "id": "prepared-payload-certifies-own-delivery",
       "wave": 5,
       "probe": "S14",
-      "oracle": "Writer failure preserves prepared bytes and solver state; only external receipt FAILED/LIMIT, never COMPLETE.",
+      "oracle": "Writer failure preserves prepared bytes and solver state; only external receipt FAILED, never COMPLETE.",
       "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
       "target": null,
       "hook": null
     },
     {
-      "id": "observation-limit-blocks-independent-consumer",
+      "id": "observation-failure-blocks-independent-consumer",
       "wave": 4,
       "probe": "S14",
-      "oracle": "Limited QueryConsumer batch leaves zero-query StructuralConsumer COMPLETE; preparation INCOMPLETE.",
+      "oracle": "Failed QueryConsumer batch leaves zero-query StructuralConsumer COMPLETE; preparation INCOMPLETE.",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "size-cap-rejects-valid-program",
+      "wave": 1,
+      "probe": "S16",
+      "oracle": "Valid supported N/2N/4N all remain ACCEPTED.",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "max-nodes-admission",
+      "wave": 1,
+      "probe": "S16",
+      "oracle": "Changing only node count cannot change admission.",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "max-edges-admission",
+      "wave": 1,
+      "probe": "S16",
+      "oracle": "Changing only edge count cannot change admission.",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "max-operations-admission",
+      "wave": 1,
+      "probe": "S16",
+      "oracle": "Changing only operation count cannot change admission.",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "max-objects-admission",
+      "wave": 1,
+      "probe": "S16",
+      "oracle": "Changing only object count cannot change admission.",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "max-visits-aborts-analysis",
+      "wave": 2,
+      "probe": "S16",
+      "oracle": "Valid convergent run ends at fixed point regardless of visits/pushes/joins.",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "resource-budget-changes-semantic-result",
+      "wave": 2,
+      "probe": "S16",
+      "oracle": "No work/resource budget in solver SPI or semantic AnalysisKey.",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "candidate-count-causes-top",
+      "wave": 3,
+      "probe": "S16",
+      "oracle": "All finite candidates survive N+1 including 9, 100 and 10000, without new remainder.",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "max-queries-admission",
+      "wave": 4,
+      "probe": "S16",
+      "oracle": "Increasing query demand changes work, not supported coverage.",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "max-consumers-admission",
+      "wave": 4,
+      "probe": "S16",
+      "oracle": "More consumers/sites/batches do not impose admission ceilings.",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "maximum-result-size",
+      "wave": 5,
+      "probe": "S16",
+      "oracle": "Composition has no internal AIR/result/output byte ceiling.",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "catch-oom-as-analysis-limit",
+      "wave": 5,
+      "probe": "S16",
+      "oracle": "OOM/container/host/timeout/disk exhaustion is not mapped to any semantic outcome.",
       "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
       "target": null,
       "hook": null

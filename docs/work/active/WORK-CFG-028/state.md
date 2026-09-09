@@ -2,45 +2,30 @@
 
 ## Onde estamos
 
-CP5_POST_AUDIT_HARNESS_REMEDIATION implementada / awaiting human review.
-Preparação anterior, discovery e B1 APPROVED por declaração humana nesta tarefa. Branch
-feat/cp5-dataflow-engine, [PR #12 draft](https://github.com/Gustavo2358/analysis-cfg/pull/12); última aprovação no [lifecycle](../../cp5-lifecycle.json).
-As cinco Waves estão NOT STARTED; W1 está NOT AUTHORIZED. Nenhuma Wave automática.
+CP5_CORE_SIZE_UNBOUNDED_HARNESS_REMEDIATION implementada / awaiting human review.
+Pós-auditoria A–I/F1/F2/F3 APPROVED no HEAD e86a57c1f744bd499dd47326ebcb84d23c61ab2d.
+[Lifecycle append-only](../../cp5-lifecycle.json) preserva os reviews anteriores e
+registra a nova autorização, somente harness. Branch feat/cp5-dataflow-engine,
+[PR #12 OPEN/DRAFT](https://github.com/Gustavo2358/analysis-cfg/pull/12).
+authorized_wave=null; W1–W5 NOT_STARTED / NOT_AUTHORIZED.
 
 ## Verde conhecido
 
-Arquitetura H1–H7/R1/R2 aprovada pelo pedido humano de 09/09/2026.
-Ver [evidência de validação](../../evidence/WORK-CFG-028/validation.md) para comandos,
-resultados, SHAs e limites; aprovação arquitetural não é PASS de engine.
-
-Review humano do HEAD 6675b1f9ff9d11e8f405f6dcf49c5acb0096346a pediu somente B1:
-resultado por query incapaz de expressar lote misto. A correção acrescenta
-queryStatus/queryReason, oracle before(Return) + after(Return), cobertura do plano
-e contracasos de aborto/omissão. [Recibo B1](../../evidence/WORK-CFG-028/review-b1/validation.md)
-com gates e limites; correção B1 agora APPROVED, sem autorização de Wave.
+[Evidência desta remediação](../../evidence/WORK-CFG-028/core-size-unbounded/validation.md)
+registra testes de contratos, gates aplicáveis e limitações. Aprovação arquitetural
+não é PASS de engine. [Evidência F anterior](../../evidence/WORK-CFG-028/review-f/validation.md)
+é histórica e permanece intacta; seus outcomes de capacidade foram supersedidos.
 
 ## Restante
 
-Review humano da remediação pós-auditoria e autorização explícita W1 em tarefa separada,
-na mesma branch e no mesmo PR draft. Sem merge, auto-merge ou ready for review.
+Review humano de CORE-SIZE-001 e autorização explícita W1 em tarefa separada,
+na mesma branch/PR. Sem merge, auto-merge ou ready; nenhuma Wave automática.
 
 ## Descobertas que afetam o plano
 
-027 roteava review apesar do merge confirmado; arquivado preservando o registro.
-020/012/019 reaproveitados; debts externos 017/018 permanecem fora do escopo.
-Performance/full continuam UNAVAILABLE, sem hooks engine antes das Waves.
-CP5-F01 foi reconhecido pelo review como dívida preexistente não bloqueante;
-dependência AIR direta do launcher permanece para decisão/execução autorizada em W1.
-
-
-Auditoria: KEEP ARCHITECTURE WITH FOCUSED REMEDIATIONS. Autorização focal A–I,
-sem implementação produtiva. [Evidência desta remediação](../../evidence/WORK-CFG-028/architectural-audit-remediation/validation.md)
-registra fonte/hash da auditoria, confronto com AIR/código, gates e limites. W1
-somente após aprovação desta remediação e tarefa separada com autorização explícita.
-
-
-Review humano de e053f14f8f5dc7b0b80b7bbbe015fde684522835: A/B/C/D/E/G/H/I APPROVED,
-REQUEST CHANGES somente F1/F2/F3. A correção focal distingue ADMISSION_LIMIT,
-externaliza DeliveryReceipt e declara dependências dos consumers, preservando
-resultados independentes. [Evidência F](../../evidence/WORK-CFG-028/review-f/validation.md).
-Mantém o checkpoint atual aguardando novo review e todas as Waves não autorizadas.
+Performance/full CP5 continuam UNAVAILABLE; não há hooks de engine implementados.
+CP5-F01 permanece NONBLOCKING/follow-up W1, sem POM modificado. [Dívidas de
+capacidade](../../cp5-follow-ups.md#size-cap-debts): upstream codec/validator e
+adapters/propagação legados ainda têm caps. A futura engine nasce sem size-based
+admission; a pipeline inteira ainda não pode receber esse claim. Migração produtiva
+é posterior, sem desabilitar validação, streaming/retry/ECS nesta sessão.

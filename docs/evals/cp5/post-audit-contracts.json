@@ -88,7 +88,7 @@
         "CONSUMER_COMPLETION_IS_INDEPENDENT",
         "EXPLICIT_PARTIAL_BY_PHASE",
         "OUTPUT_SUCCESS_REQUIRES_EXTERNAL_DELIVERY_RECEIPT",
-        "ADMISSION_LIMIT_IS_NOT_UNSUPPORTED",
+        "SIZE_IS_NOT_SEMANTIC_ADMISSION",
         "CONSUMER_DEPENDENCIES_ARE_EXPLICIT",
         "STRUCTURAL_CONSUMER_NEEDS_ZERO_ANALYSES"
       ],
@@ -125,7 +125,7 @@
       "obligations": [
         "QUALITY_WITH_COST",
         "RAW_COUNTS_AND_DENOMINATORS",
-        "SAME_CORPUS_PROFILE_BUDGETS",
+        "SAME_CORPUS_SEMANTIC_PROFILE",
         "NO_UNJUSTIFIED_QUALITY_THRESHOLD"
       ],
       "waves": [
@@ -180,7 +180,7 @@
     "metrics": [
       "queryRequests",
       "uniqueQueries",
-      "saturations",
+      "candidateCardinality",
       "queriesAnswered",
       "unsupportedQueries",
       "queriesNotMaterialized",
@@ -190,8 +190,7 @@
       "sourceOpenResults",
       "effectiveOpenResults",
       "closedInModelResults",
-      "analysisLimits",
-      "observationLimits",
+      "observationFailures",
       "consumerFailures",
       "publicationFailures"
     ],

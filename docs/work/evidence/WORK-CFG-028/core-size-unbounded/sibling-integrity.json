@@ -1,0 +1,87 @@
+{
+  "method": "Compare starting HEAD/branch/status and the three authority-file SHA-256 values. Not a retrospective byte snapshot of all unrelated untracked files. No sibling write commands performed.",
+  "repositories": {
+    "air-java": {
+      "before": {
+        "head": "ce530a7e17ab12b23c48f29425f503ff920b09fb",
+        "branch": "main",
+        "status": ""
+      },
+      "after": {
+        "head": "ce530a7e17ab12b23c48f29425f503ff920b09fb",
+        "branch": "main",
+        "status": ""
+      },
+      "same_head_branch_status": true
+    },
+    "analysis-ir": {
+      "before": {
+        "head": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+        "branch": "main",
+        "status": ""
+      },
+      "after": {
+        "head": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+        "branch": "main",
+        "status": ""
+      },
+      "same_head_branch_status": true
+    },
+    "cobol-lower": {
+      "before": {
+        "head": "2329993ce61b33fd7105759e211a1861ca6cb217",
+        "branch": "feat/lower-scalar-move",
+        "status": ""
+      },
+      "after": {
+        "head": "2329993ce61b33fd7105759e211a1861ca6cb217",
+        "branch": "feat/lower-scalar-move",
+        "status": ""
+      },
+      "same_head_branch_status": true
+    },
+    "proleap-poc": {
+      "before": {
+        "head": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+        "branch": "main",
+        "status": ""
+      },
+      "after": {
+        "head": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+        "branch": "main",
+        "status": ""
+      },
+      "same_head_branch_status": true
+    },
+    "artefatos-e2e": {
+      "before": {
+        "head": "2484b76f9174a79ea702f17453f04955cd46a755",
+        "branch": "main",
+        "status": "?? checkpoint-4e/\n?? cp5/"
+      },
+      "after": {
+        "head": "2484b76f9174a79ea702f17453f04955cd46a755",
+        "branch": "main",
+        "status": "?? checkpoint-4e/\n?? cp5/"
+      },
+      "same_head_branch_status": true
+    }
+  },
+  "authorities": {
+    "/home/gustavo/workspace/teste-e2e/artefatos-e2e/cp5/cp5-engine-handoff.md": {
+      "before": "aeda82a75d6d1111596df1b3bc61c1153dc85ea7c67d0466a5df85cb64c10da2",
+      "after": "aeda82a75d6d1111596df1b3bc61c1153dc85ea7c67d0466a5df85cb64c10da2",
+      "byte_hash_unchanged": true
+    },
+    "/home/gustavo/workspace/teste-e2e/artefatos-e2e/cp5/cp5-dataflow-engine-discovery.md": {
+      "before": "639f6b8c4e756a629a0e2203a06ef6f800a12aac722ca59cef94917334c9fc53",
+      "after": "639f6b8c4e756a629a0e2203a06ef6f800a12aac722ca59cef94917334c9fc53",
+      "byte_hash_unchanged": true
+    },
+    "/home/gustavo/workspace/teste-e2e/artefatos-e2e/cp5/cp5-architectural-audit.md": {
+      "before": "32d4542adcf31445cf35196a5f6d2496e8e3962c0bfa9d10c26615f6ceea5bc1",
+      "after": "32d4542adcf31445cf35196a5f6d2496e8e3962c0bfa9d10c26615f6ceea5bc1",
+      "byte_hash_unchanged": true
+    }
+  }
+}
