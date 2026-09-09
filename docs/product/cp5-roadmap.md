@@ -18,8 +18,8 @@ Waves. Métricas são observações, nunca thresholds de admissão ou precisão.
 | Harness preparation + B1 | APPROVED | review humano registrado |
 | Post-audit remediation | APPROVED at e86a57c | A–I/F1/F2/F3 aprovados |
 | Core size-unbounded harness remediation | APPROVED at 4aeb4c0 | review humano registrado antes W1 |
-| W1 — index/session | IMPLEMENTED / AWAITING_HUMAN_REVIEW | implementação e CI validadas; review humano do HEAD final antes de qualquer W2 |
-| W2 — generic incremental solver | NOT STARTED / NOT AUTHORIZED | W1 + autorização explícita W2 |
+| W1 — index/session | APPROVED at b84389b6 | review humano registrado antes de W2 |
+| W2 — generic incremental solver | STARTED / AUTHORIZED | autorização explícita registrada em wave-2/authorization.json |
 | W3 — PossibleValues/state/query | NOT STARTED / NOT AUTHORIZED | W2 + autorização explícita W3 |
 | W4 — shared planner/consumers | NOT STARTED / NOT AUTHORIZED | W3 + autorização explícita W4 |
 | W5 — production/E2E | NOT STARTED / NOT AUTHORIZED | W4 + autorização explícita W5 |

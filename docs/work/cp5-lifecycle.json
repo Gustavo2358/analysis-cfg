@@ -11,33 +11,27 @@
     "draft": true,
     "auto_merge": false
   },
-  "current_checkpoint": "WAVE_1",
+  "current_checkpoint": "WAVE_2",
   "harness_preparation": {
     "status": "implemented",
     "review": "APPROVED"
   },
-  "authorized_wave": 1,
+  "authorized_wave": 2,
   "last_human_approval": {
     "date": "2026-09-09",
-    "source": "explicit user request for harness preparation",
-    "decision": "APPROVED_DISCOVERY_AND_HARNESS_PREPARATION_ONLY",
-    "approved": [
-      "H1",
-      "H2",
-      "H3",
-      "H4_PROPERTIES",
-      "H5",
-      "H6",
-      "H7",
-      "R1",
-      "R2"
-    ],
-    "implementation_candidates_not_frozen": [
-      "Patricia/radix",
-      "FIFO",
-      "k=8"
-    ],
-    "does_not_authorize_waves": true
+    "source": "explicit human request authorizing CP5 W2 in PR #12",
+    "reviewed_head": "b84389b6ccf94c259774b82a99bc7296278b65c0",
+    "decision": "WAVE_1_APPROVED_AND_WAVE_2_AUTHORIZED",
+    "W1": "APPROVED",
+    "authorized_wave": 2,
+    "current_checkpoint": "WAVE_2",
+    "scope": "generic incremental direction-aware solver, synthetic oracles, W2 gates and evidence; commits/push/CI in same draft PR #12",
+    "evidence": "docs/work/evidence/WORK-CFG-028/wave-2/authorization.json",
+    "not_authorized": [
+      "WAVE_3",
+      "WAVE_4",
+      "WAVE_5"
+    ]
   },
   "policy": {
     "same_branch_same_pr": true,
@@ -51,20 +45,21 @@
     {
       "wave": 1,
       "title": "structural index/session",
-      "status": "IMPLEMENTED",
+      "status": "APPROVED",
       "authorization": "AUTHORIZED",
       "requires_review_of": "CORE_SIZE_UNBOUNDED_REMEDIATION",
       "approval_evidence": "docs/work/evidence/WORK-CFG-028/wave-1/authorization.json",
       "completion_evidence": "docs/work/evidence/WORK-CFG-028/wave-1/validation.md",
-      "eval": "EVAL-CFG-034"
+      "eval": "EVAL-CFG-034",
+      "reviewed_head": "b84389b6ccf94c259774b82a99bc7296278b65c0"
     },
     {
       "wave": 2,
       "title": "generic incremental solver",
-      "status": "NOT_STARTED",
-      "authorization": "NOT_AUTHORIZED",
+      "status": "STARTED",
+      "authorization": "AUTHORIZED",
       "requires_review_of": "WAVE_1",
-      "approval_evidence": null,
+      "approval_evidence": "docs/work/evidence/WORK-CFG-028/wave-2/authorization.json",
       "completion_evidence": null,
       "eval": "EVAL-CFG-035"
     },
@@ -196,6 +191,22 @@
       "current_checkpoint": "WAVE_1",
       "scope": "structural index / analysis session and focal CP5-F01 correction only",
       "evidence": "docs/work/evidence/WORK-CFG-028/wave-1/authorization.json"
+    },
+    {
+      "date": "2026-09-09",
+      "source": "explicit human request authorizing CP5 W2 in PR #12",
+      "reviewed_head": "b84389b6ccf94c259774b82a99bc7296278b65c0",
+      "decision": "WAVE_1_APPROVED_AND_WAVE_2_AUTHORIZED",
+      "W1": "APPROVED",
+      "authorized_wave": 2,
+      "current_checkpoint": "WAVE_2",
+      "scope": "generic incremental direction-aware solver, synthetic oracles, W2 gates and evidence; commits/push/CI in same draft PR #12",
+      "evidence": "docs/work/evidence/WORK-CFG-028/wave-2/authorization.json",
+      "not_authorized": [
+        "WAVE_3",
+        "WAVE_4",
+        "WAVE_5"
+      ]
     }
   ],
   "audit_remediation": {
@@ -226,9 +237,15 @@
   },
   "wave_1": {
     "authorization": "docs/work/evidence/WORK-CFG-028/wave-1/authorization.json",
-    "review": "AWAITING_HUMAN_REVIEW",
+    "review": "APPROVED",
     "evidence": "docs/work/evidence/WORK-CFG-028/wave-1/",
     "validated_implementation_head": "318181c072710f89ac58c2bd387c1645de434cd6",
-    "initial_remote_ci": "docs/work/evidence/WORK-CFG-028/wave-1/initial-remote-ci/receipt.json"
+    "initial_remote_ci": "docs/work/evidence/WORK-CFG-028/wave-1/initial-remote-ci/receipt.json",
+    "reviewed_head": "b84389b6ccf94c259774b82a99bc7296278b65c0"
+  },
+  "wave_2": {
+    "authorization": "docs/work/evidence/WORK-CFG-028/wave-2/authorization.json",
+    "review": "NOT_REQUESTED",
+    "evidence": "docs/work/evidence/WORK-CFG-028/wave-2/"
   }
 }

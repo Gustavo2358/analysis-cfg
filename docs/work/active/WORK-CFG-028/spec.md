@@ -41,7 +41,7 @@ preservando A–I, F2/F3 e convergência matemática. Atualizar contratos/snapsh
 validators/challenges, métricas, scope guard e roteamento W1–W5; gates, push e review.
 Não implementar engine, Java/POM, sibling, retry/ECS ou streaming.
 
-## WAVE_1 — escopo atual autorizado
+## WAVE_1 — histórico aprovado
 
 Implementar analysis-kernel estrutural: admissão correlacionada ao snapshot e policy,
 identidades densas privadas, reverse handles, offsets, buckets por classes AIR,
@@ -53,3 +53,12 @@ CP5-F01 permite somente dependências diretas do launcher e evolução focal dos
 W2–W5 permanecem proibidas: nenhum solver, state, PossibleValues, consumer runtime,
 resolver ou CLI/writer de dataflow. Siblings read-only e source lock byte-exact.
 [Autorização](../../evidence/WORK-CFG-028/wave-1/authorization.json).
+
+## WAVE_2 — checkpoint autorizado atual
+
+W1 APPROVED em b84389b6. Implementar solver genérico incremental, direction-aware,
+IN/OUT na ordem de execução, boundaries declarativas, primeira publicação,
+contextos isolados e agenda justa. Domínios forward/backward, oracle por recomposição
+e oracle concreto finito são test-only; S4b, escala N/2N/4N, retenção e challenges
+compiláveis com restore byte-exact. Gates locais, Maven, push e CI do HEAD final.
+Sem W3–W5, sem repin ou alterações de siblings. Parar para review humano W2.

@@ -42,7 +42,7 @@ no PR #12 draft e recibos CI do novo HEAD. Parar para review humano.
 5. Gates locais aplicáveis, inventário Java/POM, scope/manifest e evidência honesta.
 6. Commits/push, descrição do mesmo PR draft e recibo CI real do HEAD final; parar.
 
-## WAVE_1 — plano autorizado
+## WAVE_1 — plano histórico aprovado
 
 1. Confirmar HEAD aprovado/remoto, PR draft, pins e autorização append-only antes de produção.
 2. Expected manual e RED comportamental da sessão; implementar índice e admissão estrutural.
@@ -52,3 +52,12 @@ no PR #12 draft e recibos CI do novo HEAD. Parar para review humano.
 5. Campanha compilável GREEN/RED/restore/segundo GREEN; preservar tentativas inválidas.
 6. Regressões completas, scope/diff/manifest, commits e push no mesmo PR #12 draft;
    confrontar CI do HEAD publicado e registrar recibo; parar para review humano.
+
+## WAVE_2 — checkpoint autorizado atual
+
+W1 APPROVED em b84389b6. Implementar solver genérico incremental, direction-aware,
+IN/OUT na ordem de execução, boundaries declarativas, primeira publicação,
+contextos isolados e agenda justa. Domínios forward/backward, oracle por recomposição
+e oracle concreto finito são test-only; S4b, escala N/2N/4N, retenção e challenges
+compiláveis com restore byte-exact. Gates locais, Maven, push e CI do HEAD final.
+Sem W3–W5, sem repin ou alterações de siblings. Parar para review humano W2.

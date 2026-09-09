@@ -58,3 +58,12 @@ restauração byte-exact e segundo GREEN. Testes de harness preservam contratos
 W2–W5 e recusam ativação automática, inventário oculto e hooks vazios.
 Não há thresholds semânticos de tempo/heap. Full global conserva UNAVAILABLE/3
 para W2–W5 mesmo depois de executar os probes W1.
+
+## WAVE_2 — checkpoint autorizado atual
+
+W1 APPROVED em b84389b6. Implementar solver genérico incremental, direction-aware,
+IN/OUT na ordem de execução, boundaries declarativas, primeira publicação,
+contextos isolados e agenda justa. Domínios forward/backward, oracle por recomposição
+e oracle concreto finito são test-only; S4b, escala N/2N/4N, retenção e challenges
+compiláveis com restore byte-exact. Gates locais, Maven, push e CI do HEAD final.
+Sem W3–W5, sem repin ou alterações de siblings. Parar para review humano W2.
