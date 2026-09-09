@@ -540,6 +540,91 @@
         "INV-CFG-002"
       ],
       "implementation_evidence": "cfg-adapters/src/test/java/io/github/gustavo2358/analysis/cfg/adapters/ScalarAssignTest.java"
+    },
+    {
+      "id": "EVAL-CFG-033",
+      "title": "CP5 harness self-validation",
+      "status": "implemented",
+      "expectation": "Harness contracts only; no engine evidence",
+      "upstream_oracles": [],
+      "invariants": [
+        "INV-CFG-030",
+        "INV-CFG-031",
+        "INV-CFG-032",
+        "INV-CFG-033",
+        "INV-CFG-034"
+      ],
+      "implementation_evidence": "scripts/harness/test_cp5_harness.py"
+    },
+    {
+      "id": "EVAL-CFG-034",
+      "title": "structural index/session",
+      "status": "planned",
+      "expectation": "Wave obligations in docs/product/cp5-roadmap.md and docs/evals/cp5 manifests; runtime not available",
+      "upstream_oracles": [],
+      "invariants": [
+        "INV-CFG-030",
+        "INV-CFG-031",
+        "INV-CFG-032",
+        "INV-CFG-033",
+        "INV-CFG-034"
+      ]
+    },
+    {
+      "id": "EVAL-CFG-035",
+      "title": "generic incremental solver",
+      "status": "planned",
+      "expectation": "Wave obligations in docs/product/cp5-roadmap.md and docs/evals/cp5 manifests; runtime not available",
+      "upstream_oracles": [],
+      "invariants": [
+        "INV-CFG-030",
+        "INV-CFG-031",
+        "INV-CFG-032",
+        "INV-CFG-033",
+        "INV-CFG-034"
+      ]
+    },
+    {
+      "id": "EVAL-CFG-036",
+      "title": "PossibleValues/state/queries",
+      "status": "planned",
+      "expectation": "Wave obligations in docs/product/cp5-roadmap.md and docs/evals/cp5 manifests; runtime not available",
+      "upstream_oracles": [],
+      "invariants": [
+        "INV-CFG-030",
+        "INV-CFG-031",
+        "INV-CFG-032",
+        "INV-CFG-033",
+        "INV-CFG-034"
+      ]
+    },
+    {
+      "id": "EVAL-CFG-037",
+      "title": "shared planning/consumers",
+      "status": "planned",
+      "expectation": "Wave obligations in docs/product/cp5-roadmap.md and docs/evals/cp5 manifests; runtime not available",
+      "upstream_oracles": [],
+      "invariants": [
+        "INV-CFG-030",
+        "INV-CFG-031",
+        "INV-CFG-032",
+        "INV-CFG-033",
+        "INV-CFG-034"
+      ]
+    },
+    {
+      "id": "EVAL-CFG-038",
+      "title": "production/E2E",
+      "status": "planned",
+      "expectation": "Wave obligations in docs/product/cp5-roadmap.md and docs/evals/cp5 manifests; runtime not available",
+      "upstream_oracles": [],
+      "invariants": [
+        "INV-CFG-030",
+        "INV-CFG-031",
+        "INV-CFG-032",
+        "INV-CFG-033",
+        "INV-CFG-034"
+      ]
     }
   ]
 }

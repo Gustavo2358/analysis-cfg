@@ -1,0 +1,96 @@
+# CP5 — storage, PossibleValues e alcance dos resultados
+
+Contrato aceito H2/H3/H5, [ADR-0012](../architecture/decisions/ADR-0012.md).
+Autoridade AIR 2.0.0 no source lock: identidades §01, tipos §02, memória §03,
+operações §04, incompletude §06 e consumidores §08. Este domínio não redefine AIR.
+
+## Admissão e locations
+
+Primeiro profile `scalar-text-direct@1`: ObjectPlace inteiro, CellBinding direto,
+Object/Cell known(text), Assign literal textual sem conversão e Nop. Jump/Branch/
+Return/Halt controlam o grafo já existente. Outras expressões/writes, HavocMust/May,
+CopyBytes, aliases indiretos, views, choices, binding desconhecido e memória regional
+são recusados explicitamente. Aceitação estrutural pelo CFG não prova semântica de
+valor; efeito desconhecido nunca vira Nop.
+
+Location = Cell inteira no contexto da Entry/run. Object é declaração/subject de
+query, Storage é base; OperandId é ocorrência. Dois Objects com a mesma Cell
+compartilham estado. Bases distintas não provam disjunção. Uma base dispensa prova
+entre pares; múltiplas bases admitidas exigem **uma** DisjointStorage cobrindo todo
+seu conjunto, verificada em O(D+P) membros, sem materializar pares. A⊥B e B⊥C não
+implica A⊥C. Provas fragmentadas podem ser recusadas por limitação do profile,
+sem chamar a AIR de inválida. Premissas assumidas/obrigações estruturais ficam
+rastreáveis e não se tornam prova de verdade do produtor.
+
+Lower atual não publica essa premissa multi-Cell; follow-up externo, sem fabricá-la
+no adapter ou benchmark. Corpus sintético pode declarar premissa explicitamente.
+[Backlog e ownership](../work/cp5-follow-ups.md).
+
+## Domínio e boundary
+
+PossibleValues é a análise; BoundedTextValues é seu primeiro domínio. Ponto
+inalcançado é separado de valor em ponto alcançado:
+
+| Valor conceitual | Significado |
+| --- | --- |
+| Candidates({}, true) | alcançado desconhecido |
+| Candidates({PROGA}, false) | singleton fechado no modelo |
+| Candidates({A,B}, false) | alternativas fechadas no modelo |
+| Candidates({A}, true) | candidato sustentado e restante desconhecido |
+| Saturated(CARDINALITY_LIMIT) | limite local, restante aberto explícito |
+
+Candidates({}, false) não é valor normal de Cell alcançada. Ausência de chave em
+estado alcançado significa o default Candidates({}, true), **não bottom**.
+Boundary alcançado desconhecido, salvo condições iniciais literais admitidas.
+Preserve/externo/não inicializado/parâmetro desconhecido mantêm causas distintas;
+não inventar zero, não reaplicar seed no loop, recusar condições contraditórias.
+
+Join une candidatos e OR do open. Chave presente só em um dos estados alcançados
+faz join com default desconhecido do outro: {A} fechado + ausência = {A} aberto.
+⊥p adota a primeira contribuição alcançada sem abrir; inalcançável não adiciona
+restante. Ordem por inclusão de candidatos e false≤true, Saturated acima de todos.
+Open universal não autoriza apagar evidência enumerada por igualdade denotacional.
+
+Strong Assign literal **substitui** valor corrente por singleton fechado, inclusive
+após open/saturated; não acumula literais mortos. União acima de k satura; k limita
+alternativas simultâneas, não Assigns/literais totais. Testar k e k+1, k=1/2 e
+configurações distintas sem congelar default. Saturação determinística não é
+truncagem dos primeiros valores pela agenda. A análise pode estabilizar com Cells
+saturadas, mas a consulta mantém razão e remainder; não esconder perda em STABLE.
+Resource budget interrompe o run (ANALYSIS_LIMIT), sem facts provisórios finais.
+
+Igualdade textual segue escalares Unicode; sem trim/case folding/normalização.
+Pool de valores por sessão/run, U distinto de k, sem String.intern global, cópia de
+chars por ocorrência ou pool de todos sets históricos. Provenance não cresce por
+caminhos. [H4, ledger e retenção](../engineering/cp5-performance.md).
+
+## Pontos e claims
+
+Query tem Entry + OperationId completo + before/after/outcome. Before/after de
+Assign e before(terminator) são admitidos; after(Return/Halt) sem semântica de
+memória posterior retorna UNSUPPORTED_POINT. Não contaminar retroativamente
+before(Return) com dimensões posteriores indisponíveis. Não usar stateAt(node)
+como se distinguisse todas as operações da Sequence.
+
+Para CP4E em before(Return):
+
+```text
+modelScope = KNOWN_GRAPH_ENTRY
+modelValue = {PROGA}
+modelValueRemainder = false
+sourceScope = open (Unit CONTROL, Publication/Unit PARTIAL)
+effectiveUnknownRemainder = true
+```
+
+CFG_BUILT e KNOWN_SUBSET não certificam completude de fonte. Gap code textual não
+é prova de irrelevância: nenhuma whitelist de ALTERNATE_ENTRIES_NOT_PROJECTED.
+Resultado estabilizado do modelo conserva candidato e o restante efetivo exigido
+por controle aberto; não recusar todos PARTIAL nem promovê-los a exatos globalmente.
+Não alcançado no modelo não significa fonte inalcançável. Restante efetivo inclui
+restante do modelo **ou** abertura relevante de fonte; limites/recusa não são vazio.
+
+Evidence mínima: snapshot, regra/profile, ponto/subject, premises, refs AIR/origins
+pertinentes. No linear, Assign identificado pelo replay sustenta PROGA; um literal
+arbitrário do pool não prova definição alcançável. Sem árvore de caminhos ou claim
+de testemunho concreto; causalidade RD/Def-Use completa é futura.
+[Contrato de resultado para review](../architecture/analysis-dataflow-result-v1.md).

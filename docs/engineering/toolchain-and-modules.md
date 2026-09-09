@@ -93,8 +93,8 @@ semânticos; um grafo de dependências sozinho não prova essas propriedades.
 
 `cobol-lower` dependerá de `air-java`, não do CFG. O orquestrador recebe
 `Publication` do lowerer e chama `BuildCfg` diretamente, sem JSON ou arquivo
-intermediário. O lowerer ainda não existe; sua readiness é dependência externa dos
-itens E2E, não justificativa para adiar o kernel em memória.
+intermediário. O lowerer existe no baseline CP4; sua readiness para novos slices continua
+dependência externa, sem autorizar mudanças upstream no CP5.
 
 O reactor atual agrega exatamente kernel/adapters/launcher mantendo DAG. O kernel
 continua compilável/testável isoladamente. O integration gate executa arquivos e CLI
@@ -109,3 +109,7 @@ mergeado, cuja proveniência está em
 Resolução local deve manter repositórios Maven separados para o RED antigo e o
 GREEN 4B, pois ambos usam coordenadas SNAPSHOT iguais. Instalar sempre a raiz do
 upstream no SHA exato; não reutilizar artefato de origem desconhecida.
+
+## CP5 futuro
+
+[Contrato de módulos/packages](../architecture/cp5-dataflow.md) e [plano do gate](../evals/cp5/architecture.json). Todo módulo que importar tipos AIR declara air-java diretamente. Módulos de análise ausentes até a Wave autorizada; nenhum POM antecipado.

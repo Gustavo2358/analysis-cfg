@@ -18,8 +18,7 @@ subsets equivale a AIR-STRUCTURE completo.
 007, 009 e 010 ampliam/completam capabilities estruturais → 011 qualifica perfil.
 012 endurece escala. 013 é discovery de controle local, seguido por 014/015. 016 é
 indireção limitada. 023 é o micro-E2E condicionado ao lowerer externo; 017 preserva
-a aceitação bilateral madura e 018 integra módulos sem mudar a porta. 019/020 ficam
-adiados. 021 leva gates a CI e não bloqueia desenho semântico.
+a aceitação bilateral madura e 018 integra módulos sem mudar a porta. 019 continua adiado; 020 recebe o recorte CP5 aprovado, somente harness nesta tarefa. 021 leva gates a CI e não bloqueia desenho semântico.
 
 | Item | Entrega | Dependências | Estado |
 | --- | --- | --- | --- |
@@ -42,7 +41,7 @@ adiados. 021 leva gates a CI e não bloqueia desenho semântico.
 | [BACKLOG-CFG-017](backlog/BACKLOG-CFG-017.md) | Aceitação bilateral com CobolLower | BACKLOG-CFG-008 | planned |
 | [BACKLOG-CFG-018](backlog/BACKLOG-CFG-018.md) | Integração em monólito modular Maven | BACKLOG-CFG-023 | planned |
 | [BACKLOG-CFG-019](backlog/BACKLOG-CFG-019.md) | Evolução de contrato e otimizações opcionais | BACKLOG-CFG-011 | deferred |
-| [BACKLOG-CFG-020](backlog/BACKLOG-CFG-020.md) | Análises posteriores — fronteira reservada | BACKLOG-CFG-011 | deferred |
+| [BACKLOG-CFG-020](backlog/BACKLOG-CFG-020.md) | CP5 — umbrella; demais análises adiadas | BACKLOG-CFG-027 | active (harness only) |
 | [BACKLOG-CFG-021](backlog/BACKLOG-CFG-021.md) | CI dos gates e higiene do harness | BACKLOG-CFG-001 | planned |
 | [BACKLOG-CFG-022](backlog/BACKLOG-CFG-022.md) | Fluxo linear, jump e halt | BACKLOG-CFG-005 | completed |
 | [BACKLOG-CFG-023](backlog/BACKLOG-CFG-023.md) | E2E mínimo Semantic Product → AIR → CFG | BACKLOG-CFG-005 + cobol-lower externo | planned |
@@ -56,4 +55,8 @@ adiados. 021 leva gates a CI e não bloqueia desenho semântico.
 
 [BACKLOG-CFG-026](backlog/BACKLOG-CFG-026.md): completed; PR #10 merge confirmado.
 
-[BACKLOG-CFG-027](backlog/BACKLOG-CFG-027.md): active; somente checkpoint 4D.
+[BACKLOG-CFG-027](backlog/BACKLOG-CFG-027.md): completed; PR #11 merge confirmado.
+
+## CP5 aprovado
+
+WORK-CFG-028 reutiliza BACKLOG-CFG-020; cinco Waves na mesma branch/PR draft, sem início autorizado. [Lifecycle](cp5-lifecycle.json) e [follow-ups sem duplicação](cp5-follow-ups.md).

@@ -3,7 +3,7 @@
 ## Baseline e autoridade
 
 - analysis-cfg main limpa após fetch/pull --ff-only: `2b4df46d53ce5b21a5c315d3f691b183cb6bd124`.
-- Branch: `chore/pin-air-json-scalar-assign`; work item [WORK-CFG-027](../../active/WORK-CFG-027/work-item.json), implementation explicitamente autorizada.
+- Branch: `chore/pin-air-json-scalar-assign`; work item [WORK-CFG-027](../../history/WORK-CFG-027.md), implementation explicitamente autorizada.
 - [PR #10](baseline-pr10.json) mergeado reconciliado no histórico 026; evidência anterior preservada.
 - AIR normativa 2.0.0: `122ce54e1b9ef9b00646f93ece409ca8b63bc933`; seção analysis_ir inteira do lock inalterada, bindingVersion 1.0.0/DRAFT mantidos.
 - air-java runtime: `ce530a7e17ab12b23c48f29425f503ff920b09fb`, merge [PR #6](upstream-pr6.json); head aprovado `f3698a78b2fe8d989247bfdeaf9fd667e5db1368`, merged_at 2026-09-08T16:03:41Z. Main já no merge, nenhum avanço observado. CI do merge: [contracts](https://github.com/Gustavo2358/air-java/actions/runs/34248728661), [harness](https://github.com/Gustavo2358/air-java/actions/runs/34248728645), ambos success consultados nesta sessão.

@@ -13,7 +13,11 @@ def run(gate: str, root: Path) -> int:
     if gate == 'docs':
         return subprocess.run([sys.executable, str(base / 'validate_docs.py'), '--root', str(root)]).returncode
     if gate == 'harness':
-        return subprocess.run([sys.executable, str(base / 'test_harness.py')]).returncode
+        for suite in ('test_harness.py', 'test_cp5_harness.py'):
+            rc = subprocess.run([sys.executable, str(base / suite)]).returncode
+            if rc:
+                return rc
+        return 0
     if gate == 'fast':
         for child in ('docs', 'harness'):
             rc = run(child, root)

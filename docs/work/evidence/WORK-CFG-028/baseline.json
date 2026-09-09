@@ -1,0 +1,56 @@
+{
+  "recorded_on": "2026-09-09",
+  "baseline_main": "ec525cbbad96d70c9663faa88e2672148fa8ee71",
+  "fetch": "PASS with ssh -F /dev/null; initial system SSH configuration and sandbox DNS attempts failed",
+  "merge_evidence": {
+    "pr": 11,
+    "url": "https://github.com/Gustavo2358/analysis-cfg/pull/11",
+    "state": "MERGED",
+    "merge_sha": "ec525cbbad96d70c9663faa88e2672148fa8ee71"
+  },
+  "cp5_pr_search": "gh pr list --state all --limit 50: 11 results, none CP5; fetched branches also none",
+  "snapshots": {
+    "analysis-cfg": {
+      "head": "ec525cbbad96d70c9663faa88e2672148fa8ee71",
+      "branch": "feat/cp5-dataflow-engine",
+      "status": ""
+    },
+    "air-java": {
+      "head": "ce530a7e17ab12b23c48f29425f503ff920b09fb",
+      "branch": "main",
+      "status": ""
+    },
+    "analysis-ir": {
+      "head": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+      "branch": "main",
+      "status": ""
+    },
+    "cobol-lower": {
+      "head": "2329993ce61b33fd7105759e211a1861ca6cb217",
+      "branch": "feat/lower-scalar-move",
+      "status": ""
+    },
+    "proleap-poc": {
+      "head": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+      "branch": "main",
+      "status": ""
+    },
+    "artefatos-e2e": {
+      "head": "2484b76f9174a79ea702f17453f04955cd46a755",
+      "branch": "main",
+      "status": "?? checkpoint-4e/\n?? cp5/"
+    }
+  },
+  "authorities": {
+    "artefatos-e2e/cp5/cp5-engine-handoff.md": {
+      "sha256": "aeda82a75d6d1111596df1b3bc61c1153dc85ea7c67d0466a5df85cb64c10da2",
+      "bytes": 62225,
+      "read": "integral"
+    },
+    "artefatos-e2e/cp5/cp5-dataflow-engine-discovery.md": {
+      "sha256": "639f6b8c4e756a629a0e2203a06ef6f800a12aac722ca59cef94917334c9fc53",
+      "bytes": 149818,
+      "read": "integral"
+    }
+  }
+}

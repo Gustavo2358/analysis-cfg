@@ -2,9 +2,9 @@
   "schema_version": 1,
   "active": [
     {
-      "id": "WORK-CFG-027",
-      "backlog_id": "BACKLOG-CFG-027",
-      "path": "docs/work/active/WORK-CFG-027",
+      "id": "WORK-CFG-028",
+      "backlog_id": "BACKLOG-CFG-020",
+      "path": "docs/work/active/WORK-CFG-028",
       "status": "active",
       "authorization": "implementation"
     }
@@ -81,6 +81,14 @@
       "status": "completed",
       "authorization": "implementation",
       "completed_on": "2026-09-08"
+    },
+    {
+      "id": "WORK-CFG-027",
+      "backlog_id": "BACKLOG-CFG-027",
+      "path": "docs/work/history/WORK-CFG-027.md",
+      "status": "completed",
+      "authorization": "implementation",
+      "completed_on": "2026-09-09"
     }
   ]
 }

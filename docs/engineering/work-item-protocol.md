@@ -42,3 +42,7 @@ registrar resumo curto em history, remover active e atualizar registry/index/bac
 Não apagar evidência necessária nem deixar item encerrado roteado como ativo.
 Verificação remota de merge é ação separada com fonte confiável; gate offline não
 infere estado GitHub. Templates em [templates](../templates/README.md).
+
+## CP5
+
+CP5 usa WORK-CFG-028 como umbrella com os cinco arquivos existentes. [Lifecycle](../work/cp5-lifecycle.json) é metadado complementar roteado no manifesto; cinco Waves são checkpoints sequenciais, não novos itens ativos. Uma branch/PR draft da preparação até W5; review/autorização entre Waves sem merge intermediário. implementation no manifesto autoriza **somente seu checkpoint/source_scope**, não todo o plano. [Continuidade entre sessões](../product/cp5-roadmap.md#continuidade-entre-agentessessões).

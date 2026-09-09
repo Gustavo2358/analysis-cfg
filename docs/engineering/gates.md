@@ -5,7 +5,7 @@
 | Gate | Estado | Verifica |
 | --- | --- | --- |
 | check-docs.sh | executável | links, IDs, manifestos, lifecycle, DAG, source lock e fase |
-| check-harness.sh | executável | 47 testes adversariais do harness |
+| check-harness.sh | executável | 47 testes existentes + suíte adversarial CP5 do harness |
 | check-fast.sh | executável | docs + harness |
 | check-architecture.sh | executável | Maven/testes, inventários exatos, dependências, bytecode 21 e boundary air-java |
 | check-semantic.sh | executável | 17 do EVAL-CFG-025 + 22 do EVAL-CFG-028 + 25 do EVAL-CFG-029 + 20 do EVAL-CFG-030, métodos/suítes exatos |
@@ -22,7 +22,7 @@ Exit codes: 0=PASS, 1=FAIL, 2=erro de uso/configuração, 3=UNAVAILABLE.
 ## Estado explícito
 
 [gate-state.json](gate-state.json) registra fase implementation e autorização
-WORK-CFG-027. Hooks reais de architecture/semantic/integration em scripts/project;
+WORK-CFG-028 (somente checkpoint de preparação; produto CFG existente preservado). Hooks reais de architecture/semantic/integration em scripts/project;
 performance permanece sem hook. O checker verifica consistência local, não
 comprova autorização humana nem estado GitHub.
 
@@ -119,7 +119,27 @@ SHA-256, bytes e Git blob das fixtures. Com checkout upstream disponível, compa
 os bytes locais com git show do merge exato; sem checkout, verifica hashes offline.
 O source lock normativo da AIR e binding DRAFT permanecem fixos.
 
-check_scope.py agora governa o diff 4D desde 2b4df46d53ce5b21a5c315d3f691b183cb6bd124,
+No 4D, check_scope.py governou o diff 4D desde 2b4df46d53ce5b21a5c315d3f691b183cb6bd124,
 exigindo zero delta de produção no kernel/adapters/launcher. Evidência antiga do 2B
 permanece histórica. Performance/full continuam UNAVAILABLE: o smoke estrutural
 não cria benchmark nem implementa o gate performance.
+
+## Preparação CP5
+
+fast inclui validate_cp5.py e test_cp5_harness.py: lifecycle/ordem/autorização,
+Java/POM byte-exact, ADRs, métricas/probes/challenges, DAG e resultado de design.
+check_scope.py agora usa a main CP4 ec525cbbad96d70c9663faa88e2672148fa8ee71,
+compara inventory contra objetos Git e limita o diff a docs/harness/CI necessários.
+CI inclui scope/manifest e fetch-depth 0 para checar a base exata.
+
+check_analysis_architecture.py detecta imports AIR sem dependência Maven direta.
+CP5-F01 (launcher do baseline) é finding aberto e não conformidade declarada;
+a exceção de preparação vale só nos bytes Java/POM originais. Módulos novos não têm
+exceção. Nenhum POM foi alterado para corrigir produto fora do escopo.
+
+[Performance/métricas](cp5-performance.md), [challenges](cp5-challenges.md) e
+[rotas por Wave](../evals/cp5/gate-plan.json). check_cp5_gate.py reporta exit 3 para
+runtime ausente; isso não é o hook performance produtivo. Performance/full existentes
+continuam UNAVAILABLE/3; não há CI de performance ou semântica de engine nesta entrega.
+A CI valida harness e regressões CFG. Novos hooks exigem execução nominal, probes,
+contracasos e review na Wave, não apenas alteração de status em JSON.

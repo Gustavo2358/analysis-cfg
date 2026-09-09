@@ -402,6 +402,8 @@ def validate(root: Path) -> list[str]:
             error('Profile obligations drift: ' + str(ident))
     if {p.get('id') for p in profiles.get('profiles', [])} != set(expected):
         error('Profile inventory incomplete')
+    from validate_cp5 import validate_cp5
+    errors.extend(validate_cp5(root))
     return sorted(set(errors))
 
 

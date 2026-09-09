@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "work_item": "WORK-CFG-028",
+  "backlog_id": "BACKLOG-CFG-020",
+  "branch": "feat/cp5-dataflow-engine",
+  "base_main": "ec525cbbad96d70c9663faa88e2672148fa8ee71",
+  "pr": {
+    "number": null,
+    "url": null,
+    "state": "NOT_CREATED",
+    "draft": true,
+    "auto_merge": false
+  },
+  "current_checkpoint": "CP5_HARNESS_PREPARATION",
+  "harness_preparation": {
+    "status": "implemented",
+    "review": "AWAITING_HUMAN_REVIEW"
+  },
+  "authorized_wave": null,
+  "last_human_approval": {
+    "date": "2026-09-09",
+    "source": "explicit user request for harness preparation",
+    "decision": "APPROVED_DISCOVERY_AND_HARNESS_PREPARATION_ONLY",
+    "approved": [
+      "H1",
+      "H2",
+      "H3",
+      "H4_PROPERTIES",
+      "H5",
+      "H6",
+      "H7",
+      "R1",
+      "R2"
+    ],
+    "implementation_candidates_not_frozen": [
+      "Patricia/radix",
+      "FIFO",
+      "k=8"
+    ],
+    "does_not_authorize_waves": true
+  },
+  "policy": {
+    "same_branch_same_pr": true,
+    "draft_until_explicit_human_change": true,
+    "human_review_between_waves": true,
+    "auto_start_next_wave": false,
+    "commits_per_wave": "unrestricted_focused",
+    "no_intermediate_merge_required": true
+  },
+  "waves": [
+    {
+      "wave": 1,
+      "title": "structural index/session",
+      "status": "NOT_STARTED",
+      "authorization": "NOT_AUTHORIZED",
+      "requires_review_of": "HARNESS_PREPARATION",
+      "approval_evidence": null,
+      "completion_evidence": null,
+      "eval": "EVAL-CFG-034"
+    },
+    {
+      "wave": 2,
+      "title": "generic incremental solver",
+      "status": "NOT_STARTED",
+      "authorization": "NOT_AUTHORIZED",
+      "requires_review_of": "WAVE_1",
+      "approval_evidence": null,
+      "completion_evidence": null,
+      "eval": "EVAL-CFG-035"
+    },
+    {
+      "wave": 3,
+      "title": "PossibleValues/state/queries",
+      "status": "NOT_STARTED",
+      "authorization": "NOT_AUTHORIZED",
+      "requires_review_of": "WAVE_2",
+      "approval_evidence": null,
+      "completion_evidence": null,
+      "eval": "EVAL-CFG-036"
+    },
+    {
+      "wave": 4,
+      "title": "shared planning/consumers",
+      "status": "NOT_STARTED",
+      "authorization": "NOT_AUTHORIZED",
+      "requires_review_of": "WAVE_3",
+      "approval_evidence": null,
+      "completion_evidence": null,
+      "eval": "EVAL-CFG-037"
+    },
+    {
+      "wave": 5,
+      "title": "production/E2E",
+      "status": "NOT_STARTED",
+      "authorization": "NOT_AUTHORIZED",
+      "requires_review_of": "WAVE_4",
+      "approval_evidence": null,
+      "completion_evidence": null,
+      "eval": "EVAL-CFG-038"
+    }
+  ],
+  "evidence": "docs/work/evidence/WORK-CFG-028/validation.md",
+  "exact_head_policy": "final committed HEAD and CI receipt recorded on the same PR after last push; avoids self-referential commit SHA"
+}

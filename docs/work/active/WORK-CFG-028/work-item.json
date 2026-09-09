@@ -1,0 +1,78 @@
+{
+  "id": "WORK-CFG-028",
+  "backlog_id": "BACKLOG-CFG-020",
+  "title": "CP5 — harness e cinco Waves no mesmo PR draft",
+  "status": "active",
+  "risk": "high",
+  "goal": "Preparar harness normativo e operacional autodescritivo do CP5 sem engine ou Wave iniciada.",
+  "authorization": "implementation",
+  "authorization_evidence": "Pedido humano de 2026-09-09 confirma APPROVED H1-H7/R1/R2 do discovery revisado e autoriza somente harness/docs/scripts, commits, push e um PR draft único para CP5. Não autoriza Wave 1 nem qualquer engine. Evidência durável em docs/work/cp5-lifecycle.json.",
+  "checkpoint": "CP5_HARNESS_PREPARATION",
+  "must_read": [
+    "AGENTS.md",
+    "docs/work/index.md",
+    "docs/engineering/work-item-protocol.md",
+    "docs/work/cp5-lifecycle.json",
+    "docs/product/cp5-roadmap.md",
+    "docs/architecture/cp5-dataflow.md",
+    "docs/domain/cp5-solver.md",
+    "docs/domain/cp5-values.md",
+    "docs/engineering/cp5-performance.md",
+    "docs/engineering/cp5-challenges.md",
+    "docs/evals/cp5/index.md",
+    "docs/architecture/analysis-dataflow-result-v1.md",
+    "docs/work/cp5-follow-ups.md",
+    "docs/sources/sources.lock.json",
+    "docs/engineering/gates.md"
+  ],
+  "related_decisions": [
+    "ADR-0010",
+    "ADR-0011",
+    "ADR-0012",
+    "ADR-0013"
+  ],
+  "related_invariants": [
+    "INV-CFG-030",
+    "INV-CFG-031",
+    "INV-CFG-032",
+    "INV-CFG-033",
+    "INV-CFG-034"
+  ],
+  "evals": [
+    "EVAL-CFG-033",
+    "EVAL-CFG-034",
+    "EVAL-CFG-035",
+    "EVAL-CFG-036",
+    "EVAL-CFG-037",
+    "EVAL-CFG-038"
+  ],
+  "source_scope": [
+    "AGENTS.md",
+    "ARCHITECTURE.md",
+    "docs",
+    "scripts/harness",
+    "scripts/project",
+    ".github/workflows/ci.yml",
+    "MANIFEST.sha256"
+  ],
+  "test_scope": [
+    "scripts/harness"
+  ],
+  "must_not_change": [
+    "any Java source or pom.xml (including new files/modules)",
+    "existing product fixtures/pins/contracts",
+    "sibling repositories",
+    "historical evidence except lifecycle/link routing",
+    "production CFG/AIR/CLI behavior",
+    "Wave 1 through Wave 5 implementation"
+  ],
+  "gates": [
+    "fast",
+    "architecture",
+    "semantic",
+    "integration",
+    "performance",
+    "full"
+  ],
+  "stop_condition": "Gates locais aplicáveis, scope e diff revisados; commits/push, PR draft único e checks do HEAD final registrados; parar para review humano. Nenhuma Wave inicia automaticamente; sem merge/auto-merge/ready/rebase/force-push."
+}

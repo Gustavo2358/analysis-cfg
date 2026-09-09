@@ -24,3 +24,7 @@ A força dos testes será comprovada com falsificações/mutantes focalizados; c
 de testes e porcentagem de linhas cobertas não bastam.
 
 EVAL-CFG-032 acrescenta a prova 4D: seis métodos, golden escalar 4B, payload por identidade, limites default e smoke com 4096 Assigns. Não executa 4C/4E.
+
+## CP5
+
+[CP5 — harness e oracles planejados](cp5/index.md): EVAL-CFG-033 implementado somente no harness; Waves 1–5 sem produto.

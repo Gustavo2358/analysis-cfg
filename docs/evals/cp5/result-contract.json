@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "status": "REVIEW_SNAPSHOT_NOT_CODEC",
+  "schema": "analysis-dataflow-result",
+  "version": "1.0.0",
+  "required_result_fields": [
+    "schema",
+    "version",
+    "analysisKey",
+    "publicationId",
+    "unitId",
+    "entryId",
+    "executionStatus",
+    "modelScope",
+    "sourceScope",
+    "limitReason",
+    "observations",
+    "statistics"
+  ],
+  "required_observation_fields": [
+    "point",
+    "subject",
+    "reachability",
+    "value",
+    "sourceUnknownRemainder",
+    "effectiveUnknownRemainder",
+    "precision",
+    "premiseRefs",
+    "evidenceRefs",
+    "provenanceRefs"
+  ],
+  "execution_statuses": [
+    "STABLE",
+    "ANALYSIS_LIMIT",
+    "UNSUPPORTED",
+    "INVALID_INPUT"
+  ],
+  "value_kinds": [
+    "Candidates",
+    "Saturated"
+  ],
+  "reachability": [
+    "REACHABLE",
+    "UNREACHABLE_IN_MODEL"
+  ],
+  "model_scope": "KNOWN_GRAPH_ENTRY",
+  "effective_remainder": "modelValueRemainder OR sourceUnknownRemainder",
+  "limit_behavior": "non-STABLE publishes no provisional observations",
+  "unreachable_behavior": "value=null; source reachability not inferred"
+}

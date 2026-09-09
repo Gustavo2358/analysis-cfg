@@ -343,17 +343,22 @@
     },
     {
       "id": "BACKLOG-CFG-020",
-      "title": "Análises posteriores — fronteira reservada",
-      "phase": "deferred",
-      "status": "deferred",
+      "title": "CP5 — engine de análise em cinco Waves; demais análises adiadas",
+      "phase": "analysis",
+      "status": "active",
       "dependencies": [
-        "BACKLOG-CFG-011"
+        "BACKLOG-CFG-027"
       ],
       "evals": [
-        "EVAL-CFG-020"
+        "EVAL-CFG-033",
+        "EVAL-CFG-034",
+        "EVAL-CFG-035",
+        "EVAL-CFG-036",
+        "EVAL-CFG-037",
+        "EVAL-CFG-038"
       ],
       "path": "docs/work/backlog/BACKLOG-CFG-020.md",
-      "work_item": null
+      "work_item": "WORK-CFG-028"
     },
     {
       "id": "BACKLOG-CFG-021",
@@ -451,7 +456,7 @@
       "id": "BACKLOG-CFG-027",
       "title": "4D — pin 4B e payload escalar no CFG",
       "phase": "transport",
-      "status": "active",
+      "status": "completed",
       "dependencies": [
         "BACKLOG-CFG-026"
       ],
@@ -459,7 +464,8 @@
         "EVAL-CFG-032"
       ],
       "path": "docs/work/backlog/BACKLOG-CFG-027.md",
-      "work_item": "WORK-CFG-027"
+      "work_item": "WORK-CFG-027",
+      "completion_evidence": "docs/work/history/WORK-CFG-027.md"
     }
   ]
 }

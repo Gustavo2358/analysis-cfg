@@ -19,8 +19,7 @@ analysis-cfg
 CFG
 ```
 
-`proleap-poc` termina no produto semântico COBOL-specific. `cobol-lower`, ainda
-planejado upstream, traduz somente esse produto para a Analysis IR. O `analysis-cfg`
+`proleap-poc` termina no produto semântico COBOL-specific. `cobol-lower` traduz esse produto para a Analysis IR; CP4 foi demonstrado no E2E aceito, conforme baseline CP5. O `analysis-cfg`
 é consumer puro e nunca conhece construções COBOL, AST, symbols ou resolvers.
 
 ## Porta única
@@ -119,3 +118,7 @@ estão no reactor; não há módulo frontend, parser AIR próprio nem dependênc
 Architecture inspeciona fontes/classes/DAG exatos e a chamada compilada AirJson.decode.
 Integration executa a cadeia de arquivos e compara o resultado com oracle manual.
 A ligação real com 2A/cobol-lower e o E2E cross-repo continuam fora deste checkpoint.
+
+## CP5 aprovado, engine ainda não implementada
+
+[Subsistema de análise](docs/architecture/cp5-dataflow.md) downstream da construção: sessão/index → solver genérico + domínio → queries estáveis → consumers. Módulos futuros analysis-kernel e analysis-values com dependências AIR diretas; preparação não cria Java/POM. [Waves e review](docs/product/cp5-roadmap.md).

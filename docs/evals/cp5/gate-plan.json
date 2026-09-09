@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "work_item": "WORK-CFG-028",
+  "preparation_check": "scripts/harness/validate_cp5.py",
+  "waves": [
+    {
+      "wave": 1,
+      "eval": "EVAL-CFG-034",
+      "gates": {
+        "architecture": {
+          "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+          "hook": null
+        },
+        "semantic": {
+          "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+          "hook": null
+        },
+        "performance": {
+          "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+          "hook": null
+        }
+      }
+    },
+    {
+      "wave": 2,
+      "eval": "EVAL-CFG-035",
+      "gates": {
+        "architecture": {
+          "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+          "hook": null
+        },
+        "semantic": {
+          "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+          "hook": null
+        },
+        "performance": {
+          "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+          "hook": null
+        }
+      }
+    },
+    {
+      "wave": 3,
+      "eval": "EVAL-CFG-036",
+      "gates": {
+        "architecture": {
+          "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+          "hook": null
+        },
+        "semantic": {
+          "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+          "hook": null
+        },
+        "performance": {
+          "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+          "hook": null
+        }
+      }
+    },
+    {
+      "wave": 4,
+      "eval": "EVAL-CFG-037",
+      "gates": {
+        "architecture": {
+          "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+          "hook": null
+        },
+        "semantic": {
+          "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+          "hook": null
+        },
+        "performance": {
+          "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+          "hook": null
+        }
+      }
+    },
+    {
+      "wave": 5,
+      "eval": "EVAL-CFG-038",
+      "gates": {
+        "architecture": {
+          "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+          "hook": null
+        },
+        "semantic": {
+          "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+          "hook": null
+        },
+        "performance": {
+          "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+          "hook": null
+        },
+        "integration": {
+          "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+          "hook": null
+        }
+      }
+    }
+  ]
+}

@@ -22,3 +22,7 @@ Esta página roteia leitura; não exige carregar todos os documentos.
 
 [Backlog](work/backlog.md) é o mapa de trabalho futuro. Nenhum arquivo em história
 ou referência não consultada substitui regra canônica da versão em uso.
+
+## CP5
+
+[CP5 arquitetura](architecture/cp5-dataflow.md), [lifecycle](work/cp5-lifecycle.json) e [roadmap](product/cp5-roadmap.md).

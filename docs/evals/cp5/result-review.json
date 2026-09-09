@@ -1,0 +1,130 @@
+{
+  "design": {
+    "kind": "REVIEW_SNAPSHOT",
+    "execution": "NOT_EXECUTED",
+    "fixture": "CP4E oracle only; fixture identifiers are not production constants",
+    "airSha256": "dd3bb4819282e609a97937ea01b7e202786e2c2d9ba9c8a1821a8b982eeb8788",
+    "optionsNote": "maxCandidates=2 illustrates configurability, not an approved default"
+  },
+  "result": {
+    "schema": "analysis-dataflow-result",
+    "version": "1.0.0",
+    "analysisKey": {
+      "implementation": "PossibleValues",
+      "implementationVersion": "1",
+      "profile": "scalar-text-direct@1",
+      "direction": "FORWARD",
+      "precisionPolicy": "MODEL_WITH_SOURCE_REMAINDER",
+      "options": {
+        "maxCandidates": 2,
+        "resourceBudgets": "REVIEW_REQUIRED_BEFORE_EXECUTION"
+      },
+      "entryId": {
+        "domain": "entry",
+        "localId": "c4de8a797697cb8ddf3012f2248da01f",
+        "publication": "77ae4cc3ed75332c64011efce81c431b",
+        "unit": "unit"
+      }
+    },
+    "publicationId": {
+      "domain": "publication",
+      "localId": "77ae4cc3ed75332c64011efce81c431b"
+    },
+    "unitId": {
+      "domain": "unit",
+      "localId": "unit",
+      "publication": "77ae4cc3ed75332c64011efce81c431b"
+    },
+    "entryId": {
+      "domain": "entry",
+      "localId": "c4de8a797697cb8ddf3012f2248da01f",
+      "publication": "77ae4cc3ed75332c64011efce81c431b",
+      "unit": "unit"
+    },
+    "executionStatus": "STABLE",
+    "modelScope": "KNOWN_GRAPH_ENTRY",
+    "sourceScope": {
+      "open": true,
+      "inventory": "PARTIAL",
+      "dimension": "CONTROL",
+      "scope": {
+        "domain": "unit",
+        "localId": "unit",
+        "publication": "77ae4cc3ed75332c64011efce81c431b"
+      }
+    },
+    "limitReason": null,
+    "observations": [
+      {
+        "point": {
+          "position": "BEFORE",
+          "operationId": {
+            "domain": "operation",
+            "localId": "5ed7c27833651ab320a3b56d90ed923c",
+            "publication": "77ae4cc3ed75332c64011efce81c431b",
+            "unit": "unit"
+          },
+          "entryId": {
+            "domain": "entry",
+            "localId": "c4de8a797697cb8ddf3012f2248da01f",
+            "publication": "77ae4cc3ed75332c64011efce81c431b",
+            "unit": "unit"
+          },
+          "outcome": null
+        },
+        "subject": {
+          "place": "ObjectPlace",
+          "objectId": {
+            "domain": "object",
+            "localId": "d277a147621da9e9d6d7e52986bbb8ee",
+            "publication": "77ae4cc3ed75332c64011efce81c431b",
+            "unit": "unit"
+          },
+          "storageId": {
+            "domain": "storage",
+            "localId": "2eee2eced5889f75096c488505d6ba70",
+            "publication": "77ae4cc3ed75332c64011efce81c431b"
+          },
+          "locationKind": "WHOLE_CELL"
+        },
+        "reachability": "REACHABLE",
+        "value": {
+          "domain": "known(text)",
+          "kind": "Candidates",
+          "enumerated": [
+            "PROGA"
+          ],
+          "modelValueRemainder": false,
+          "saturationReason": null
+        },
+        "sourceUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "precision": {
+          "model": "CLOSED_IN_ADMITTED_MODEL",
+          "source": "OPEN",
+          "pathWitness": "NOT_PROVIDED"
+        },
+        "premiseRefs": [],
+        "evidenceRefs": [
+          {
+            "domain": "operation",
+            "localId": "e52226b01b4afc8f6c6214aafd63e5ab",
+            "publication": "77ae4cc3ed75332c64011efce81c431b",
+            "unit": "unit"
+          }
+        ],
+        "provenanceRefs": [
+          {
+            "domain": "origin",
+            "localId": "6e3b8590805b3e79519781a3f9a725c6",
+            "publication": "77ae4cc3ed75332c64011efce81c431b"
+          }
+        ]
+      }
+    ],
+    "statistics": {
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "measurements": null
+    }
+  }
+}

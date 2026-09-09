@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "air_direct_dependency": {
+    "import_prefix": "io.github.gustavo2358.air.",
+    "group": "io.github.gustavo2358",
+    "artifact": "air-java",
+    "scope": "compile"
+  },
+  "modules": {
+    "cfg-kernel": {
+      "wave": 0,
+      "direct": [
+        "air-java"
+      ],
+      "forbidden": [
+        "analysis-kernel",
+        "analysis-values"
+      ]
+    },
+    "analysis-kernel": {
+      "wave": 1,
+      "direct": [
+        "cfg-kernel",
+        "air-java"
+      ],
+      "forbidden": [
+        "analysis-values",
+        "cfg-adapters",
+        "cfg-launcher"
+      ]
+    },
+    "analysis-values": {
+      "wave": 3,
+      "direct": [
+        "analysis-kernel",
+        "air-java"
+      ],
+      "forbidden": [
+        "cfg-adapters",
+        "cfg-launcher",
+        "consumers"
+      ]
+    }
+  },
+  "package_rules": {
+    "solver_spi": {
+      "wave": 2,
+      "forbidden": [
+        "io.github.gustavo2358.air.model.Operations",
+        "io.github.gustavo2358.air.model.Values",
+        "analysis.values",
+        "analysis.extraction",
+        "analysis.consumers",
+        "cfg.adapters",
+        "cfg.launcher",
+        "java.io",
+        "java.nio.file",
+        "java.net",
+        "lower",
+        "cobolexplorer",
+        "org.antlr"
+      ]
+    },
+    "values": {
+      "wave": 3,
+      "forbidden": [
+        "analysis.consumers",
+        "analysis.extraction",
+        "cfg.adapters",
+        "cfg.launcher",
+        "cfg.application.BuildCfg",
+        "lower",
+        "cobolexplorer",
+        "org.antlr"
+      ]
+    },
+    "consumers": {
+      "wave": 4,
+      "forbidden": [
+        "cfg.application.BuildCfg",
+        "analysis.solver",
+        "analysis.structure.ProgramIndex",
+        "cfg.domain.CfgGraph",
+        "lower",
+        "cobolexplorer",
+        "org.antlr"
+      ]
+    }
+  },
+  "future_inventories": {
+    "analysis-kernel": {
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "sources": null,
+      "classfiles": null,
+      "javap_descriptors": null,
+      "jdeps_edges": null,
+      "effective_maven": null
+    },
+    "analysis-values": {
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "sources": null,
+      "classfiles": null,
+      "javap_descriptors": null,
+      "jdeps_edges": null,
+      "effective_maven": null
+    }
+  },
+  "rule_note": "Package selectors and public API descriptors must be concretized in each Wave, including generics and method refs; no nominal container/policy/k rule.",
+  "baseline_findings": [
+    {
+      "id": "CP5-F01",
+      "module": "cfg-launcher",
+      "baseline": "ec525cbbad96d70c9663faa88e2672148fa8ee71",
+      "issue": "Production imports Publication and AirJsonException transitively; air-java (and air-json) not direct",
+      "status": "OPEN_FOR_HUMAN_REVIEW",
+      "scope": "exact baseline launcher Java/POM only during harness preparation",
+      "proposed_checkpoint": "W1 review should authorize direct dependency declaration and matching existing architecture inventory; no POM change in preparation"
+    }
+  ]
+}

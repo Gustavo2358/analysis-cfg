@@ -1,0 +1,421 @@
+{
+  "schema_version": 1,
+  "status": "contract_only",
+  "overflow": "ANALYSIS_LIMIT; never wrap",
+  "metrics": [
+    {
+      "name": "nodesIndexed",
+      "group": "index",
+      "scope": "session",
+      "available_by_wave": 1,
+      "event": "node admitted to dense index",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "edgesIndexed",
+      "group": "index",
+      "scope": "session",
+      "available_by_wave": 1,
+      "event": "transition admitted to edge directory",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "operationsIndexed",
+      "group": "index",
+      "scope": "session",
+      "available_by_wave": 1,
+      "event": "instruction or terminator indexed once",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "referencesResolved",
+      "group": "index",
+      "scope": "session",
+      "available_by_wave": 1,
+      "event": "reference occurrence resolved through identity table",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "objectsIndexed",
+      "group": "index",
+      "scope": "session",
+      "available_by_wave": 1,
+      "event": "unique Object declaration indexed",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "locationsIndexed",
+      "group": "index",
+      "scope": "session",
+      "available_by_wave": 1,
+      "event": "unique admitted Cell location indexed",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "structuralVisits",
+      "group": "index",
+      "scope": "session",
+      "available_by_wave": 1,
+      "event": "actual element access, labelled phase and collection",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "firstPublications",
+      "group": "solver",
+      "scope": "analysisKey/entry/run",
+      "available_by_wave": 2,
+      "event": "first published root of an activated point, including backward bottom",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "nodesPopped",
+      "group": "solver",
+      "scope": "analysisKey/entry/run",
+      "available_by_wave": 2,
+      "event": "worklist removal",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "nodesTransferred",
+      "group": "solver",
+      "scope": "analysisKey/entry/run",
+      "available_by_wave": 2,
+      "event": "block transfer invoked",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "operationsTransferred",
+      "group": "solver",
+      "scope": "analysisKey/entry/run",
+      "available_by_wave": 2,
+      "event": "operation actually interpreted by solve, excluding replay",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "initializationAttempts",
+      "group": "solver",
+      "scope": "analysisKey/entry/run",
+      "available_by_wave": 2,
+      "event": "initial scheduling attempt including boundary activation",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "edgeContributionJoins",
+      "group": "propagation",
+      "scope": "analysisKey/entry/run",
+      "available_by_wave": 2,
+      "event": "joinInto invoked for one edge contribution",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "edgeTransferInvocations",
+      "group": "propagation",
+      "scope": "analysisKey/entry/run",
+      "available_by_wave": 2,
+      "event": "edge transfer invoked on a published root",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "accumulatorStatesChanged",
+      "group": "propagation",
+      "scope": "analysisKey/entry/run",
+      "available_by_wave": 2,
+      "event": "edge join changes accumulator semantically",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "accumulatorStatesUnchanged",
+      "group": "propagation",
+      "scope": "analysisKey/entry/run",
+      "available_by_wave": 2,
+      "event": "edge join leaves accumulator equivalent",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "publishedStatesChanged",
+      "group": "propagation",
+      "scope": "analysisKey/entry/run",
+      "available_by_wave": 2,
+      "event": "semantic publication change after the first publication",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "publishedStatesUnchanged",
+      "group": "propagation",
+      "scope": "analysisKey/entry/run",
+      "available_by_wave": 2,
+      "event": "computed root equivalent to already published root",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "predecessorContributionReads",
+      "group": "propagation",
+      "scope": "analysisKey/entry/run",
+      "available_by_wave": 2,
+      "event": "actual predecessor OUT slot reread to recompose forward input; excludes indexing and backward propagation",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "boundaryJoins",
+      "group": "propagation",
+      "scope": "analysisKey/entry/run",
+      "available_by_wave": 2,
+      "event": "one boundary contribution, separate from edge joins",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "worklistAttempts",
+      "group": "worklist",
+      "scope": "analysisKey/entry/run",
+      "available_by_wave": 2,
+      "event": "enqueueIfAbsent invocation",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "worklistPushes",
+      "group": "worklist",
+      "scope": "analysisKey/entry/run",
+      "available_by_wave": 2,
+      "event": "accepted enqueue",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "duplicatePushesSuppressed",
+      "group": "worklist",
+      "scope": "analysisKey/entry/run",
+      "available_by_wave": 2,
+      "event": "enqueue rejected because membership set",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "maxWorklistSize",
+      "group": "worklist",
+      "scope": "analysisKey/entry/run",
+      "available_by_wave": 2,
+      "event": "high-water mark of queued points",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "joinEntriesVisited",
+      "group": "state",
+      "scope": "analysisKey/entry/run with replay separately labelled",
+      "available_by_wave": 2,
+      "event": "binding/fact examined during join, not just join call",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "stateCompareEntries",
+      "group": "state",
+      "scope": "analysisKey/entry/run with replay separately labelled",
+      "available_by_wave": 2,
+      "event": "binding/fact examined for exact equivalence",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "stateAllocations",
+      "group": "state",
+      "scope": "analysisKey/entry/run with replay separately labelled",
+      "available_by_wave": 3,
+      "event": "actual container/fact allocation by category",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "stateBytesAllocated",
+      "group": "state",
+      "scope": "analysisKey/entry/run with replay separately labelled",
+      "available_by_wave": 3,
+      "event": "bytes by measured layout or explicitly labelled estimate",
+      "unit": "bytes_or_labelled_estimate",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "stateBytesRetained",
+      "group": "state",
+      "scope": "analysisKey/entry/run with replay separately labelled",
+      "available_by_wave": 3,
+      "event": "distinct reachable state bytes from retained roots, audited outside hot path",
+      "unit": "bytes_or_labelled_estimate",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "stateRootsRetained",
+      "group": "state",
+      "scope": "analysisKey/entry/run with replay separately labelled",
+      "available_by_wave": 3,
+      "event": "live boundary roots, not every historical version",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "maxSparseBindings",
+      "group": "state",
+      "scope": "analysisKey/entry/run with replay separately labelled",
+      "available_by_wave": 3,
+      "event": "maximum explicit non-default bindings in one root",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "setElementsRetained",
+      "group": "state",
+      "scope": "analysisKey/entry/run with replay separately labelled",
+      "available_by_wave": 3,
+      "event": "distinct retained small-set payload elements under declared sharing ownership",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "valuesInterned",
+      "group": "values",
+      "scope": "analysis preparation/pool; saturation per run",
+      "available_by_wave": 3,
+      "event": "new distinct semantic value inserted into pool",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "poolHits",
+      "group": "values",
+      "scope": "analysis preparation/pool; saturation per run",
+      "available_by_wave": 3,
+      "event": "existing pool value reused",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "bytesHashed",
+      "group": "values",
+      "scope": "analysis preparation/pool; saturation per run",
+      "available_by_wave": 3,
+      "event": "actual bytes/scalars processed for pool hashing, unit explicitly reported",
+      "unit": "bytes_or_unicode_scalars_explicitly_labelled",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "saturations",
+      "group": "values",
+      "scope": "analysis preparation/pool; saturation per run",
+      "available_by_wave": 3,
+      "event": "transition to Saturated, not subsequent already-saturated joins",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "candidateSites",
+      "group": "consumers",
+      "scope": "extraction plan/epoch",
+      "available_by_wave": 4,
+      "event": "unique selected site",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "siteMatches",
+      "group": "consumers",
+      "scope": "extraction plan/epoch",
+      "available_by_wave": 4,
+      "event": "matching site-consumer pair",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "consumerInvocations",
+      "group": "consumers",
+      "scope": "extraction plan/epoch",
+      "available_by_wave": 4,
+      "event": "actual callback, planning/final phases separately labelled",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "factsEmitted",
+      "group": "consumers",
+      "scope": "extraction plan/epoch",
+      "available_by_wave": 4,
+      "event": "fact accepted by sink",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "queryRequests",
+      "group": "queries",
+      "scope": "analysisKey/entry/observationEpoch",
+      "available_by_wave": 3,
+      "event": "raw requested point-subject-projection",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "uniqueQueries",
+      "group": "queries",
+      "scope": "analysisKey/entry/observationEpoch",
+      "available_by_wave": 3,
+      "event": "distinct complete query key in batch",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "sequencesReplayed",
+      "group": "queries",
+      "scope": "analysisKey/entry/observationEpoch",
+      "available_by_wave": 3,
+      "event": "one selected sequence prefix replay in epoch",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "operationsReplayed",
+      "group": "queries",
+      "scope": "analysisKey/entry/observationEpoch",
+      "available_by_wave": 3,
+      "event": "operation actually transferred during replay",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "analysisRuns",
+      "group": "session",
+      "scope": "session",
+      "available_by_wave": 4,
+      "event": "actual solver run started, not request count",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "analysisCacheHits",
+      "group": "session",
+      "scope": "session",
+      "available_by_wave": 4,
+      "event": "request served by compatible completed run",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    }
+  ]
+}

@@ -1,0 +1,265 @@
+{
+  "schema_version": 1,
+  "protocol": "docs/engineering/cp5-challenges.md",
+  "stages": [
+    "baseline_green",
+    "compilable_mutant",
+    "expected_red",
+    "byte_exact_restore",
+    "second_green"
+  ],
+  "challenges": [
+    {
+      "id": "predecessor-recomputation",
+      "wave": 2,
+      "probe": "S4b",
+      "oracle": "N contributions at J, zero predecessorContributionReads",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "propagate-unchanged-out",
+      "wave": 2,
+      "probe": "S4",
+      "oracle": "no propagation after equivalent published root",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "enqueue-unchanged-join",
+      "wave": 2,
+      "probe": "S4",
+      "oracle": "subsumed contribution creates no enqueue",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "lose-self-loop-reenqueue",
+      "wave": 2,
+      "probe": "S4",
+      "oracle": "manual fixpoint with membership cleared before transfer",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "full-state-clone",
+      "wave": 3,
+      "probe": "S3",
+      "oracle": "allocation/retention and bounded update ledger",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "scan-objects-per-assign",
+      "wave": 1,
+      "probe": "S2",
+      "oracle": "referencesResolved/structuralVisits follows R, not I×D",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "scan-global-successors",
+      "wave": 1,
+      "probe": "S4",
+      "oracle": "edge access follows contextual adjacency",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "identity-by-display-name",
+      "wave": 1,
+      "probe": "S8",
+      "oracle": "same names different full owners; sparse ordinals; renaming",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "ignore-activation-entry",
+      "wave": 1,
+      "probe": "S8",
+      "oracle": "distinct entries and seeds/exits remain isolated",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "missing-key-as-bottom",
+      "wave": 3,
+      "probe": "S7",
+      "oracle": "literal plus reached missing key retains open remainder",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "unbounded-values",
+      "wave": 3,
+      "probe": "S7",
+      "oracle": "k+1 requires explicit Saturated",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "silent-truncation",
+      "wave": 3,
+      "probe": "S7",
+      "oracle": "saturation reason/remainder and agenda independence",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "unknown-effect-as-nop",
+      "wave": 3,
+      "probe": "S7",
+      "oracle": "HavocMust/May CopyBytes and unsupported expressions refused",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "consumer-starts-solver",
+      "wave": 4,
+      "probe": "S5",
+      "oracle": "same-key analysisRuns invariant and consumer bytecode boundary",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "full-traversal-per-consumer",
+      "wave": 4,
+      "probe": "S5",
+      "oracle": "structuralVisits invariant with K",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "broadcast-i-times-k",
+      "wave": 4,
+      "probe": "S5",
+      "oracle": "callbacks match sparse site interests only",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "replay-per-query-site",
+      "wave": 3,
+      "probe": "S6",
+      "oracle": "operationsReplayed is union prefix, not sum per site",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "emit-provisional-facts",
+      "wave": 4,
+      "probe": "S5",
+      "oracle": "sink observes only stabilized model after overwrite/loop",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "partial-promoted-to-exact",
+      "wave": 3,
+      "probe": "S7",
+      "oracle": "known model singleton still has open source/effective remainder",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "mutate-shared-root",
+      "wave": 3,
+      "probe": "S3",
+      "oracle": "retained roots/branches/queries isolated byte/semantic snapshots",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "reapply-entry-seed",
+      "wave": 2,
+      "probe": "S4",
+      "oracle": "back-edge does not restore initial boundary",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "backward-only-at-exits",
+      "wave": 2,
+      "probe": "S4",
+      "oracle": "reachable SCC without exit and edge generation at first bottom publication",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "identity-only-equality",
+      "wave": 2,
+      "probe": "S4",
+      "oracle": "separately allocated equivalent states stop propagating",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "storage-id-implies-disjoint",
+      "wave": 3,
+      "probe": "S7",
+      "oracle": "two bases without covering premise refused; same Cell unified",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "solver-concrete-domain-dependency",
+      "wave": 2,
+      "probe": null,
+      "oracle": "javap/jdeps and solver/SPI package deny rules after successful compile",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "transitive-air-only",
+      "wave": 1,
+      "probe": null,
+      "oracle": "remove direct air-java dependency; build still compiles transitively but architecture rejects",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "cache-ignores-options-entry",
+      "wave": 4,
+      "probe": "S8",
+      "oracle": "different k/Entry creates distinct runs; equal key shared",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    },
+    {
+      "id": "fixture-specific-production-route",
+      "wave": 5,
+      "probe": "S10",
+      "oracle": "renamed subject/literal, overwrite, real new AIR and full result IDs",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null
+    }
+  ]
+}
