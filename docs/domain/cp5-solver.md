@@ -1,13 +1,14 @@
 # CP5 — equações, contexto e propagação incremental
 
 Contrato aceito por H1/H4/H5/R1; [ADR-0011](../architecture/decisions/ADR-0011.md).
-Pseudocódigo abaixo é especificação, não engine implementada.
+A engine W2 implementa as equações; [SPI, ledger e limites](../engineering/cp5-w2-solver-ledger.md).
 
 ## Contexto e equações
 
 Uma execução usa snapshot, configuração, direção e Entry fixos. Somente arestas
 com activationEntry correspondente pertencem à view. Inventário não é reachability.
-Forward usa bottom de ponto inalcançado `⊥p`, diferente de alcançado desconhecido:
+O domínio genérico define bottom, sem assumir reached-empty ou unreachable. O futuro
+profile PossibleValues distinguirá bottom inalcançado de alcançado desconhecido:
 
 ```text
 IN[e,n]  = Boundary[e,n] ⊔ join(EdgeTransfer[t](OUT[e,p]))
@@ -15,9 +16,10 @@ IN[e,n]  = Boundary[e,n] ⊔ join(EdgeTransfer[t](OUT[e,p]))
 OUT[e,n] = BlockTransfer[n](IN[e,n])
 ```
 
-Boundary contribui uma vez no EntryNode, nunca é reaplicado na Sequence inicial em
-back-edge. BlockTransfer/EdgeTransfer forward preservam ⊥p. Primeiro alcance mesmo
-sem bindings é mudança e deve ser processado. Dois braços de Branch são possíveis,
+Boundary contribui uma vez em cada ponto efetivo declarado pela análise; pode haver
+múltiplos roots. Não se reaplica em back-edge. A preservação de ⊥p por transfers
+forward é contrato do futuro profile PossibleValues, não pressuposto de estado da
+engine genérica. Primeira publicação é explícita mesmo quando igual a bottom. Dois braços de Branch são possíveis,
 inclusive predicado literal e destinos iguais; sem análise de viabilidade de condições.
 
 ## Protocolo obrigatório
@@ -102,4 +104,4 @@ os mesmos pontos. W2/S12 exige o witness def X; use X (OUT={}, before use={X},
 before def={}); W3 valida batching pela união de sufixos/prefixos conforme direção.
 W2/W3/S13 exigem oracle concreto finito independente de transfer/join/worklist,
 além de expected manual e recomposição abstrata. Falha posterior não desfaz STABLE: veja
-[regras B, F e G](../architecture/cp5-post-audit.md). Hooks reais ainda indisponíveis.
+[regras B, F e G](../architecture/cp5-post-audit.md). Hooks W2 executam os oracles sintéticos; W3 continua indisponível.
