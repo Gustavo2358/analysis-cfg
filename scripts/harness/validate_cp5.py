@@ -226,13 +226,25 @@ def validate_cp5(root: Path) -> list[str]:
                 require(w['completion_evidence']==expected_evidence, 'no Wave evidence invented')
                 if w['status']=='IMPLEMENTED': require(life['wave_3']['review']=='AWAITING_HUMAN_REVIEW' and existing(root,expected_evidence), 'W3 awaits human review')
             elif n == 4:
-                require(w['status'] in {'STARTED','IMPLEMENTED'} and w['authorization']=='AUTHORIZED', 'W4 started/implemented, never human-approved automatically')
+                require(w['status'] in {'STARTED','IMPLEMENTED','REQUEST_CHANGES'} and w['authorization']=='AUTHORIZED', 'W4 started/implemented, never human-approved automatically')
                 require(w['approval_evidence']=='docs/work/evidence/WORK-CFG-028/wave-4/authorization.json', 'W4 explicit authorization evidence')
                 authorization=load_json(root/w['approval_evidence'])
                 require(len(life['review_history'])>8 and authorization==life['review_history'][8] and authorization['reviewed_head']=='855628200fba3851493991cec869dee899e82299' and authorization['W3']=='APPROVED' and authorization['authorized_wave']==4, 'W4 reviewed HEAD and append-only human authorization')
                 require(authorization['resolved_findings']==['W3-F1','W3-F2'] and authorization['nonblocking_follow_ups']==['W3-PERF-01','W3-METRICS-01'], 'W3 findings resolution and remaining follow-ups')
                 require(life['wave_3']['remediation'].get('findings_resolution')=={'W3-F1':'RESOLVED','W3-F2':'RESOLVED','approved_head':'855628200fba3851493991cec869dee899e82299'}, 'W3 blockers resolved by explicit review')
                 expected_evidence=None if w['status']=='STARTED' else 'docs/work/evidence/WORK-CFG-028/wave-4/validation.md'
+                remediation=life['wave_4'].get('remediation')
+                require(remediation is not None, 'W4-F1 focal review required')
+                if remediation is not None:
+                    require(remediation['reviewed_head']=='330d63427c0905e8ef140924b643e9fb012c73de' and remediation['blockers']==['W4-F1'], 'W4-F1 exact reviewed HEAD and blocker')
+                    review=load_json(root/remediation['review_evidence'])
+                    require(len(life['review_history'])>9 and review==life['review_history'][9] and review['reviewed_head']=='330d63427c0905e8ef140924b643e9fb012c73de' and review['decision']=='REQUEST_CHANGES' and review['blockers']==['W4-F1'], 'W4-F1 append-only review')
+                    require(remediation['status'] in {'STARTED','IMPLEMENTED'}, 'W4-F1 focal status')
+                    if remediation['status']=='STARTED':
+                        require(w['status']=='REQUEST_CHANGES' and life['wave_4']['review']=='REQUEST_CHANGES' and remediation['completion_evidence'] is None, 'W4-F1 pending correction cannot claim completion')
+                    else:
+                        expected_evidence='docs/work/evidence/WORK-CFG-028/wave-4/review-f1/validation.md'
+                        require(w['status']=='IMPLEMENTED' and remediation['completion_evidence']==expected_evidence, 'W4-F1 focal completion evidence')
                 require(w['completion_evidence']==expected_evidence, 'no Wave evidence invented')
                 if w['status']=='IMPLEMENTED': require(life['wave_4']['review']=='AWAITING_HUMAN_REVIEW' and existing(root,expected_evidence), 'W4 awaits human review')
             else:

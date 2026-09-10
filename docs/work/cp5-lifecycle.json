@@ -84,7 +84,7 @@
     {
       "wave": 4,
       "title": "shared planning/consumers",
-      "status": "IMPLEMENTED",
+      "status": "REQUEST_CHANGES",
       "authorization": "AUTHORIZED",
       "requires_review_of": "WAVE_3",
       "approval_evidence": "docs/work/evidence/WORK-CFG-028/wave-4/authorization.json",
@@ -278,6 +278,40 @@
         "dataflow writer/CLI"
       ],
       "evidence": "docs/work/evidence/WORK-CFG-028/wave-4/authorization.json"
+    },
+    {
+      "date": "2026-09-10",
+      "source": "explicit human review of exact W4 HEAD",
+      "reviewed_head": "330d63427c0905e8ef140924b643e9fb012c73de",
+      "decision": "REQUEST_CHANGES",
+      "blockers": [
+        "W4-F1"
+      ],
+      "scope": "Site-derived observation declarations must register their batch binding independently of matched sites; no empty-request sentinel. Empty declared batch uses existing W3 COMPLETE semantics. Focal planning correction, tests/challenge/gates/evidence; existing same-PR commits/push/CI authorization continues.",
+      "accepted": [
+        "AnalysisKey",
+        "run cache",
+        "W4-BINDING-01",
+        "F3",
+        "FactSink",
+        "S5/S6/S8/S14/S15/S16",
+        "W1/W2/W3",
+        "CORE-SIZE-001",
+        "AnalysisSession.selectEntries"
+      ],
+      "remaining_nonblocking": [
+        "W3-PERF-01",
+        "W3-METRICS-01"
+      ],
+      "authorized_wave": 4,
+      "not_authorized": [
+        "WAVE_5",
+        "domain resolvers",
+        "writer/CLI",
+        "siblings",
+        "repin"
+      ],
+      "evidence": "docs/work/evidence/WORK-CFG-028/wave-4/review-f1/review.json"
     }
   ],
   "audit_remediation": {
@@ -349,7 +383,7 @@
   },
   "wave_4": {
     "authorization": "docs/work/evidence/WORK-CFG-028/wave-4/authorization.json",
-    "review": "AWAITING_HUMAN_REVIEW",
+    "review": "REQUEST_CHANGES",
     "evidence": "docs/work/evidence/WORK-CFG-028/wave-4/",
     "validated_implementation_head": "bad1b9a3785f22d21bd732143e54f82c6e632819",
     "final_remote_ci": "Same draft PR #12 final receipt; .harness-results/WORK-CFG-028/wave-4/remote-ci.json",
@@ -357,6 +391,15 @@
       "W4-BINDING-01": "RESOLVED",
       "wave_review": "AWAITING_HUMAN_REVIEW",
       "evidence": "docs/work/evidence/WORK-CFG-028/wave-4/validation.md"
+    },
+    "remediation": {
+      "reviewed_head": "330d63427c0905e8ef140924b643e9fb012c73de",
+      "status": "STARTED",
+      "blockers": [
+        "W4-F1"
+      ],
+      "review_evidence": "docs/work/evidence/WORK-CFG-028/wave-4/review-f1/review.json",
+      "completion_evidence": null
     }
   }
 }

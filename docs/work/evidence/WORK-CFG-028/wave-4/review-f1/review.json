@@ -1,0 +1,34 @@
+{
+  "date": "2026-09-10",
+  "source": "explicit human review of exact W4 HEAD",
+  "reviewed_head": "330d63427c0905e8ef140924b643e9fb012c73de",
+  "decision": "REQUEST_CHANGES",
+  "blockers": [
+    "W4-F1"
+  ],
+  "scope": "Site-derived observation declarations must register their batch binding independently of matched sites; no empty-request sentinel. Empty declared batch uses existing W3 COMPLETE semantics. Focal planning correction, tests/challenge/gates/evidence; existing same-PR commits/push/CI authorization continues.",
+  "accepted": [
+    "AnalysisKey",
+    "run cache",
+    "W4-BINDING-01",
+    "F3",
+    "FactSink",
+    "S5/S6/S8/S14/S15/S16",
+    "W1/W2/W3",
+    "CORE-SIZE-001",
+    "AnalysisSession.selectEntries"
+  ],
+  "remaining_nonblocking": [
+    "W3-PERF-01",
+    "W3-METRICS-01"
+  ],
+  "authorized_wave": 4,
+  "not_authorized": [
+    "WAVE_5",
+    "domain resolvers",
+    "writer/CLI",
+    "siblings",
+    "repin"
+  ],
+  "evidence": "docs/work/evidence/WORK-CFG-028/wave-4/review-f1/review.json"
+}

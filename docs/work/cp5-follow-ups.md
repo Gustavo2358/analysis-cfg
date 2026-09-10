@@ -98,3 +98,10 @@ execution e materializer; mismatch/key/cache/batch têm mutantes RED. Ver
 [evidência W4](evidence/WORK-CFG-028/wave-4/validation.md). O review W3 acima é histórico.
 W3-PERF-01 e W3-METRICS-01 continuam abertos; nenhum cap ou RefusalReason novo.
 W1/W2/W3 APPROVED; W4 IMPLEMENTED / AWAITING_HUMAN_REVIEW; W5 não autorizada.
+
+## Review focal W4-F1
+
+W4 REQUEST_CHANGES no HEAD 330d63427c0905e8ef140924b643e9fb012c73de. Blocker único:
+SiteQuery deve registrar batch conhecido mesmo com zero matches. [Review](evidence/WORK-CFG-028/wave-4/review-f1/review.json).
+Restante da arquitetura aceito; W4-BINDING-01 RESOLVED; W3-PERF-01/W3-METRICS-01
+não bloqueantes. W5 não autorizada.
