@@ -1,0 +1,168 @@
+{
+  "reason": "Native Maven whitespace caused staged diff-check failure. Raw bytes are preserved losslessly, not edited to change evidence. Final baseline-to-HEAD diff is checked after compression.",
+  "files": [
+    {
+      "original": "development/adversarial-1.log",
+      "compressed": "development/adversarial-1.log.gz",
+      "rawSha256": "5a1f7d3545fd5f74e4308152894753af885244ec8601adb27edde4c0458921d3",
+      "gzipSha256": "a12774e91efd3397bc0885ec983feb142e062590aa78f840b2469f442c527678"
+    },
+    {
+      "original": "development/batch-reason-green.log",
+      "compressed": "development/batch-reason-green.log.gz",
+      "rawSha256": "9f7a4c927febfa525bd05ee95ae615c8772df62ec06b72d9bd7142c7bcc11898",
+      "gzipSha256": "0044880a8fe487f520ca6016be4d0ccf45945993745df43ee71fe2f8d633c169"
+    },
+    {
+      "original": "development/batch-reason-real-red.log",
+      "compressed": "development/batch-reason-real-red.log.gz",
+      "rawSha256": "f13f118750c02b131f8615f37615978d15e9b20ddc9da736eab1a7751a33787a",
+      "gzipSha256": "272091138a709869c729655b0343024e20612e3952c14c1cf2ed9dbe8cbf0533"
+    },
+    {
+      "original": "development/batch-reason-red.log",
+      "compressed": "development/batch-reason-red.log.gz",
+      "rawSha256": "97dc6a7e5db5a7445409f4701677f5b802ef443570af6ada6a77250cedc613c5",
+      "gzipSha256": "809438e35f7764fa1a626315c94159fd793e5d115a53009cafcbe92c37961bfa"
+    },
+    {
+      "original": "development/challenges-1.log",
+      "compressed": "development/challenges-1.log.gz",
+      "rawSha256": "91296cb39a62e91666638f86f44ae7bfd3af23cbab0a2b636f41a9ab45a26ca7",
+      "gzipSha256": "842d2ff7e27b7dcd495556b381ed195a8d0de0b78930210634a74ac8c44884f0"
+    },
+    {
+      "original": "development/challenges-2.log",
+      "compressed": "development/challenges-2.log.gz",
+      "rawSha256": "4f2f7b6ce6a9e1854a99660775f501cfa630691c50772f6aeda98f1b3bf37ef9",
+      "gzipSha256": "f52bcb1291dcf16906cb6a4d5e02405774dd44ef73a0bfaf168b222a7dfb666f"
+    },
+    {
+      "original": "development/composition-green-1.log",
+      "compressed": "development/composition-green-1.log.gz",
+      "rawSha256": "b583329abd74ff4332fb49aae2e133c204902068adec1bac5b908d8adc0f4854",
+      "gzipSha256": "b36a775a469d4d08651e86b06d597d5bb8dab6a14556851a855f6ef95126b7e8"
+    },
+    {
+      "original": "development/composition-green-2.log",
+      "compressed": "development/composition-green-2.log.gz",
+      "rawSha256": "bb409a66b8326154a5b869da16c4c883aa8427c9d4e69cfb0c63a57be5246c95",
+      "gzipSha256": "63d86feb650a0685e713da11a6e08776186fcaae665034ceddc878ccc44750cc"
+    },
+    {
+      "original": "development/composition-initial-red.log",
+      "compressed": "development/composition-initial-red.log.gz",
+      "rawSha256": "b5545413f8bfaee12d6e79395dbb2d4315f5b6363d517f601d7c6e1bcc314dcd",
+      "gzipSha256": "32cd53be1b32015c04a7a86192413da7bba5c0b4e41a05102cf6acad19777462"
+    },
+    {
+      "original": "development/composition-red-2.log",
+      "compressed": "development/composition-red-2.log.gz",
+      "rawSha256": "ef2f0ab5f53804495a7c5c052b01a646cb1a41345e107aefe5c7c869c2094fe8",
+      "gzipSha256": "abbb095575c7083204e88fdf9ee549ce7296196bca10a42bd556d81fd33ac853"
+    },
+    {
+      "original": "development/delivery-initial-red.log",
+      "compressed": "development/delivery-initial-red.log.gz",
+      "rawSha256": "8e62fa193f7af615986389f51d55442f6d700fd38f73ef32da18838875cbc774",
+      "gzipSha256": "8133cdda13028bd11d6e09e880a866e4b5a989ed21d869d5508d77d3fb539343"
+    },
+    {
+      "original": "development/docs-initial.log",
+      "compressed": "development/docs-initial.log.gz",
+      "rawSha256": "4b7f9da7b00eb38a3845aca95692115c7d2607281e93aab5a202ec9e6666fbbc",
+      "gzipSha256": "7aae8ce8c53d1b89340733b7f2c23eaaae683c934506e2196df87880842becb2"
+    },
+    {
+      "original": "development/e2e-initial.log",
+      "compressed": "development/e2e-initial.log.gz",
+      "rawSha256": "58a5c26577ee07d69959ea07e3aa29420092e17484863045dab21873525bd3b4",
+      "gzipSha256": "a04670a712bf19e23baba410b395476f04bb2db021ef67661ca366ae06091a8b"
+    },
+    {
+      "original": "development/frontend-build-1.log",
+      "compressed": "development/frontend-build-1.log.gz",
+      "rawSha256": "0e96a7a8622e9e80c15768ec1ddb891a61c0d210d59b6e6cf76bc85ec238ab3a",
+      "gzipSha256": "96891eb8bc67962ddc7383a6980044077d1205a11903aafebd0b00714d05836a"
+    },
+    {
+      "original": "development/harness-initial.log",
+      "compressed": "development/harness-initial.log.gz",
+      "rawSha256": "8b500a4443f25fffad636e662303825a33898fb28b5da865aba3719325e243ea",
+      "gzipSha256": "6fa665dbd6d70a1fe6118090fbf60cf1acef75499579ed407d35423eb6f0f433"
+    },
+    {
+      "original": "development/lower-build-1.log",
+      "compressed": "development/lower-build-1.log.gz",
+      "rawSha256": "ba454382ba79e4c84f432e0ecfcdf06d938afbbe2ea48fd5abeceebed30a56eb",
+      "gzipSha256": "a0f1ae713dcd10e2cb7a7b2cb3fd9e427bbd1f4806f5a1480a059a6327b4b8e4"
+    },
+    {
+      "original": "development/lower-classpath.log",
+      "compressed": "development/lower-classpath.log.gz",
+      "rawSha256": "a4d19b20c8537d7a4965a739084eb10be2f33289100f594255e7255cd4650477",
+      "gzipSha256": "1ad330dd73db2d676550a5f51d0192db922c95da73c0b4ff56e3811ecb8515ef"
+    },
+    {
+      "original": "development/memory-1.log",
+      "compressed": "development/memory-1.log.gz",
+      "rawSha256": "464acc583a5f442fb514e97678da104b6aa8f182523b17bb34a26d6bcc87d18e",
+      "gzipSha256": "cdef9a6b0406a021a62df70400855ecdb44babb795cddabfc50dc3aae16963b6"
+    },
+    {
+      "original": "development/memory-2.log",
+      "compressed": "development/memory-2.log.gz",
+      "rawSha256": "f8e73ca9b6ae5959f1741a49a64af2cd04d40321a94434060ce53682396e8aef",
+      "gzipSha256": "5de721124462bc9e046f3fcb9b3794660e66d6394f845fad90c0ae467d707bf7"
+    },
+    {
+      "original": "development/scale-1.log",
+      "compressed": "development/scale-1.log.gz",
+      "rawSha256": "dcf71119afe6bcfed5fd30c1461364a49f475e19f3be2a136aa66865c522df25",
+      "gzipSha256": "8172f95ea59d786a0788a175fbc6e69df38e6462f930688471a8a99cca9eb684"
+    },
+    {
+      "original": "development/vertical-green-1.log",
+      "compressed": "development/vertical-green-1.log.gz",
+      "rawSha256": "7523965125489b0ded84385bd37ae5c5bc15f33205ef957b7d25f6685d9a7172",
+      "gzipSha256": "5864c370b5a27ca391fdbbe121a7fa7330efdabe21404b7896b702a83ef0feeb"
+    },
+    {
+      "original": "development/vertical-package-1.log",
+      "compressed": "development/vertical-package-1.log.gz",
+      "rawSha256": "43e88a8bb2d98442f7f424109834844cd01a72fe0bd5304ff8979356593958bc",
+      "gzipSha256": "c7f5a7b5a2ff1b1ca3396659dc47f0f20bf091218dbc734585a42afc49b5ba44"
+    },
+    {
+      "original": "development/w5-architecture-initial.log",
+      "compressed": "development/w5-architecture-initial.log.gz",
+      "rawSha256": "a37fc7525e426fb198a5a3bd17ebca3c6522e91d16bf546c54e60e81bbcfb264",
+      "gzipSha256": "fc25df30ae5c50b507fe2d08f206fbb1aa34c97bda6ea046672513d18fb38fdd"
+    },
+    {
+      "original": "development/w5-performance-initial.log",
+      "compressed": "development/w5-performance-initial.log.gz",
+      "rawSha256": "acb865d733e7515a945b2ebb8e74340384d4bec5edd52885c351a3703d141d64",
+      "gzipSha256": "5ba8268819f0137fd86ebea0d68a7f4f2888eb435e2a91242771dfa06572c055"
+    },
+    {
+      "original": "development/w5-refined-green.log",
+      "compressed": "development/w5-refined-green.log.gz",
+      "rawSha256": "2954c184ee5cffa0c32eebaf7deaef9c185fa4f898078e5c9e7ba50bcac065de",
+      "gzipSha256": "8afe373349aa40c92f73617a023862b982b477729b610121337ddfb896336f9d"
+    },
+    {
+      "original": "development/wire-green-1.log",
+      "compressed": "development/wire-green-1.log.gz",
+      "rawSha256": "2c63b49da783eb33f800f8c1a68b1618a8bfcb248984777a18ca119cad4f69fe",
+      "gzipSha256": "8284b879dc372c36596934c432ff4529ef8257750aa89953ede12107dfc818a1"
+    },
+    {
+      "original": "development/wire-initial-red.log",
+      "compressed": "development/wire-initial-red.log.gz",
+      "rawSha256": "e736c10a1b1b44233e22b92173a93fc10a00271dbc6aae22c2ce5e3665097066",
+      "gzipSha256": "1d2d559bb10dea6d80e308fe902a8ad4d91aaf9da97e9eea470e0afbda40f2da"
+    }
+  ],
+  "diffFailureRawSha256": "0a97ea17698962244798cc29888d97968b82f2d316c243f99cda279859b0f62c"
+}

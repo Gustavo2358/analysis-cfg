@@ -298,3 +298,7 @@ Implementado em WORK-CFG-026: 31 métodos / três suítes no integration gate, f
 ## EVAL-CFG-032 — 4D escalar
 
 Implementado em WORK-CFG-027: cinco métodos ScalarAssignTest e um ScalarAssignCliTest, obrigatórios no integration gate além dos 31 métodos anteriores. Object + Cell + Assign + Return pelo reader/shared codec 4B e BuildCfg defaults, payload por identidade, inventários PARTIAL e três nós/duas transições. Smoke de 4096 Assigns mantém uma SequenceNode. CLI real em dois processos compara golden CFG manual sem instructions/AIR duplicadas. RED de transporte com codec antigo precedeu o repin.
+
+## CP5
+
+EVAL-CFG-033 valida somente harness; EVAL-CFG-034, EVAL-CFG-035, EVAL-CFG-036, EVAL-CFG-037 e EVAL-CFG-038 planejam W1–W5, sem evidência de engine. [Contratos/manifests](cp5/index.md).

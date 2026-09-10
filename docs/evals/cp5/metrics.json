@@ -1,0 +1,862 @@
+{
+  "schema_version": 1,
+  "status": "W1_W2_W3_W4_W5_IMPLEMENTED",
+  "overflow": "Checked arithmetic; overflow is an implementation defect to correct, never a supported-size ceiling or semantic result.",
+  "metrics": [
+    {
+      "name": "nodesIndexed",
+      "group": "index",
+      "scope": "session",
+      "available_by_wave": 1,
+      "event": "node admitted to dense index",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "edgesIndexed",
+      "group": "index",
+      "scope": "session",
+      "available_by_wave": 1,
+      "event": "transition admitted to edge directory",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "operationsIndexed",
+      "group": "index",
+      "scope": "session",
+      "available_by_wave": 1,
+      "event": "instruction or terminator indexed once",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "referencesResolved",
+      "group": "index",
+      "scope": "session",
+      "available_by_wave": 1,
+      "event": "reference occurrence resolved through identity table",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "objectsIndexed",
+      "group": "index",
+      "scope": "session",
+      "available_by_wave": 1,
+      "event": "unique Object declaration indexed",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "locationsIndexed",
+      "group": "index",
+      "scope": "session",
+      "available_by_wave": 1,
+      "event": "unique admitted Cell location indexed",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "structuralVisits",
+      "group": "index",
+      "scope": "session",
+      "available_by_wave": 1,
+      "event": "actual element access, labelled phase and collection",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "firstPublications",
+      "group": "solver",
+      "scope": "analysisKey/entry/run",
+      "available_by_wave": 2,
+      "event": "first published root of an activated point, including backward bottom",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "nodesPopped",
+      "group": "solver",
+      "scope": "analysisKey/entry/run",
+      "available_by_wave": 2,
+      "event": "worklist removal",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "nodesTransferred",
+      "group": "solver",
+      "scope": "analysisKey/entry/run",
+      "available_by_wave": 2,
+      "event": "block transfer invoked",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "operationsTransferred",
+      "group": "solver",
+      "scope": "analysisKey/entry/run",
+      "available_by_wave": 2,
+      "event": "operation actually interpreted by solve, excluding replay",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "initializationAttempts",
+      "group": "solver",
+      "scope": "analysisKey/entry/run",
+      "available_by_wave": 2,
+      "event": "initial scheduling attempt including boundary activation",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "edgeContributionJoins",
+      "group": "propagation",
+      "scope": "analysisKey/entry/run",
+      "available_by_wave": 2,
+      "event": "joinInto invoked for one edge contribution",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "edgeTransferInvocations",
+      "group": "propagation",
+      "scope": "analysisKey/entry/run",
+      "available_by_wave": 2,
+      "event": "edge transfer invoked on a published root",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "accumulatorStatesChanged",
+      "group": "propagation",
+      "scope": "analysisKey/entry/run",
+      "available_by_wave": 2,
+      "event": "edge join changes accumulator semantically",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "accumulatorStatesUnchanged",
+      "group": "propagation",
+      "scope": "analysisKey/entry/run",
+      "available_by_wave": 2,
+      "event": "edge join leaves accumulator equivalent",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "publishedStatesChanged",
+      "group": "propagation",
+      "scope": "analysisKey/entry/run",
+      "available_by_wave": 2,
+      "event": "semantic publication change after the first publication",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "publishedStatesUnchanged",
+      "group": "propagation",
+      "scope": "analysisKey/entry/run",
+      "available_by_wave": 2,
+      "event": "computed root equivalent to already published root",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "predecessorContributionReads",
+      "group": "propagation",
+      "scope": "analysisKey/entry/run",
+      "available_by_wave": 2,
+      "event": "actual predecessor OUT slot reread to recompose forward input; excludes indexing and backward propagation",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "boundaryJoins",
+      "group": "propagation",
+      "scope": "analysisKey/entry/run",
+      "available_by_wave": 2,
+      "event": "one boundary contribution, separate from edge joins",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "worklistAttempts",
+      "group": "worklist",
+      "scope": "analysisKey/entry/run",
+      "available_by_wave": 2,
+      "event": "enqueueIfAbsent invocation",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "worklistPushes",
+      "group": "worklist",
+      "scope": "analysisKey/entry/run",
+      "available_by_wave": 2,
+      "event": "accepted enqueue",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "duplicatePushesSuppressed",
+      "group": "worklist",
+      "scope": "analysisKey/entry/run",
+      "available_by_wave": 2,
+      "event": "enqueue rejected because membership set",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "maxWorklistSize",
+      "group": "worklist",
+      "scope": "analysisKey/entry/run",
+      "available_by_wave": 2,
+      "event": "high-water mark of queued points",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "joinEntriesVisited",
+      "group": "state",
+      "scope": "analysisKey/entry/run with replay separately labelled",
+      "available_by_wave": 2,
+      "event": "binding/fact examined during join, not just join call",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "stateCompareEntries",
+      "group": "state",
+      "scope": "analysisKey/entry/run with replay separately labelled",
+      "available_by_wave": 2,
+      "event": "binding/fact examined for exact equivalence",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "stateAllocations",
+      "group": "state",
+      "scope": "analysisKey/entry/run with replay separately labelled",
+      "available_by_wave": 3,
+      "event": "actual container/fact allocation by category",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "stateBytesAllocated",
+      "group": "state",
+      "scope": "analysisKey/entry/run with replay separately labelled",
+      "available_by_wave": 3,
+      "event": "bytes by measured layout or explicitly labelled estimate",
+      "unit": "bytes_or_labelled_estimate",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "stateBytesRetained",
+      "group": "state",
+      "scope": "analysisKey/entry/run with replay separately labelled",
+      "available_by_wave": 3,
+      "event": "distinct reachable state bytes from retained roots, audited outside hot path",
+      "unit": "bytes_or_labelled_estimate",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "stateRootsRetained",
+      "group": "state",
+      "scope": "analysisKey/entry/run with replay separately labelled",
+      "available_by_wave": 3,
+      "event": "live boundary roots, not every historical version",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "maxSparseBindings",
+      "group": "state",
+      "scope": "analysisKey/entry/run with replay separately labelled",
+      "available_by_wave": 3,
+      "event": "maximum explicit non-default bindings in one root",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "setElementsRetained",
+      "group": "state",
+      "scope": "analysisKey/entry/run with replay separately labelled",
+      "available_by_wave": 3,
+      "event": "distinct retained candidate-set payload elements under declared sharing ownership",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "valuesInterned",
+      "group": "values",
+      "scope": "analysis preparation/pool",
+      "available_by_wave": 3,
+      "event": "new distinct semantic value inserted into pool",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "poolHits",
+      "group": "values",
+      "scope": "analysis preparation/pool",
+      "available_by_wave": 3,
+      "event": "existing pool value reused",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "bytesHashed",
+      "group": "values",
+      "scope": "analysis preparation/pool",
+      "available_by_wave": 3,
+      "event": "actual bytes/scalars processed for pool hashing, unit explicitly reported",
+      "unit": "bytes_or_unicode_scalars_explicitly_labelled",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "candidateSites",
+      "group": "consumers",
+      "scope": "extraction plan/epoch",
+      "available_by_wave": 4,
+      "event": "unique selected site",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "siteMatches",
+      "group": "consumers",
+      "scope": "extraction plan/epoch",
+      "available_by_wave": 4,
+      "event": "matching site-consumer pair",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "consumerInvocations",
+      "group": "consumers",
+      "scope": "extraction plan/epoch",
+      "available_by_wave": 4,
+      "event": "actual callback, planning/final phases separately labelled",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "factsEmitted",
+      "group": "consumers",
+      "scope": "extraction plan/epoch",
+      "available_by_wave": 4,
+      "event": "fact accepted by sink",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "queryRequests",
+      "group": "queries",
+      "scope": "analysisKey/entry/observationEpoch",
+      "available_by_wave": 3,
+      "event": "raw requested point-subject-projection",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "uniqueQueries",
+      "group": "queries",
+      "scope": "analysisKey/entry/observationEpoch",
+      "available_by_wave": 3,
+      "event": "distinct complete query key in batch",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "sequencesReplayed",
+      "group": "queries",
+      "scope": "analysisKey/entry/observationEpoch",
+      "available_by_wave": 3,
+      "event": "one selected Sequence directional prefix/suffix replay in epoch",
+      "unit": "count",
+      "audit": "Compare union of directional prefixes (forward) or suffixes (backward), not sum per query; include aborted replay cost."
+    },
+    {
+      "name": "operationsReplayed",
+      "group": "queries",
+      "scope": "analysisKey/entry/observationEpoch",
+      "available_by_wave": 3,
+      "event": "operation actually transferred during replay",
+      "unit": "count",
+      "audit": "Compare union of directional prefixes (forward) or suffixes (backward), not sum per query; include aborted replay cost."
+    },
+    {
+      "name": "analysisRuns",
+      "group": "session",
+      "scope": "session",
+      "available_by_wave": 4,
+      "event": "actual solver run started, not request count",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "analysisCacheHits",
+      "group": "session",
+      "scope": "session",
+      "available_by_wave": 4,
+      "event": "request served by compatible completed run",
+      "unit": "count",
+      "audit": "instrument actual event; ledger + adversarial mutation; retained graph/JFR for allocations and retention"
+    },
+    {
+      "name": "queriesAnswered",
+      "group": "quality",
+      "scope": "query_batch",
+      "available_by_wave": 3,
+      "event": "distinct VALUE outcomes; includes unreachable, excludes refusal",
+      "unit": "count",
+      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, semantic profile; no inferred zero when unavailable."
+    },
+    {
+      "name": "unsupportedQueries",
+      "group": "quality",
+      "scope": "query_batch",
+      "available_by_wave": 3,
+      "event": "distinct UNSUPPORTED_POINT outcomes",
+      "unit": "count",
+      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, semantic profile; no inferred zero when unavailable."
+    },
+    {
+      "name": "queriesNotMaterialized",
+      "group": "quality",
+      "scope": "query_batch",
+      "available_by_wave": 3,
+      "event": "distinct planned queries with no committed outcome after batch failure",
+      "unit": "count",
+      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, semantic profile; no inferred zero when unavailable."
+    },
+    {
+      "name": "unsupportedStorageProfiles",
+      "group": "quality",
+      "scope": "admission",
+      "available_by_wave": 3,
+      "event": "analysis requests refused for insufficient storage semantics",
+      "unit": "count",
+      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, semantic profile; no inferred zero when unavailable."
+    },
+    {
+      "name": "unsupportedEffectProfiles",
+      "group": "quality",
+      "scope": "admission",
+      "available_by_wave": 3,
+      "event": "analysis requests refused for insufficient effect semantics",
+      "unit": "count",
+      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, semantic profile; no inferred zero when unavailable."
+    },
+    {
+      "name": "modelOpenResults",
+      "group": "quality",
+      "scope": "query_batch",
+      "available_by_wave": 3,
+      "event": "VALUE outcomes with modelValueRemainder true",
+      "unit": "count",
+      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, semantic profile; no inferred zero when unavailable."
+    },
+    {
+      "name": "sourceOpenResults",
+      "group": "quality",
+      "scope": "query_batch",
+      "available_by_wave": 3,
+      "event": "VALUE outcomes with sourceUnknownRemainder true",
+      "unit": "count",
+      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, semantic profile; no inferred zero when unavailable."
+    },
+    {
+      "name": "effectiveOpenResults",
+      "group": "quality",
+      "scope": "query_batch",
+      "available_by_wave": 3,
+      "event": "VALUE outcomes with effectiveUnknownRemainder true",
+      "unit": "count",
+      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, semantic profile; no inferred zero when unavailable."
+    },
+    {
+      "name": "closedInModelResults",
+      "group": "quality",
+      "scope": "query_batch",
+      "available_by_wave": 3,
+      "event": "reachable VALUE outcomes closed in admitted model",
+      "unit": "count",
+      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, semantic profile; no inferred zero when unavailable."
+    },
+    {
+      "name": "observationFailures",
+      "group": "quality",
+      "scope": "session",
+      "available_by_wave": 3,
+      "event": "observation batches ending with a controlled failure",
+      "unit": "count",
+      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, semantic profile; no inferred zero when unavailable."
+    },
+    {
+      "name": "consumerFailures",
+      "group": "quality",
+      "scope": "extraction",
+      "available_by_wave": 4,
+      "event": "consumer instances ending FAILED",
+      "unit": "count",
+      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, semantic profile; no inferred zero when unavailable."
+    },
+    {
+      "name": "publicationFailures",
+      "group": "quality",
+      "scope": "output",
+      "available_by_wave": 5,
+      "event": "publication attempts ending FAILED",
+      "unit": "count",
+      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, semantic profile; no inferred zero when unavailable."
+    },
+    {
+      "name": "candidateCardinality",
+      "group": "values",
+      "scope": "analysisKey/entry/run with replay separately labelled",
+      "available_by_wave": 3,
+      "event": "observed distinct semantic candidates in a fact; distribution and high-water mark, never a rejection threshold",
+      "unit": "count",
+      "audit": "Compare enumerated candidates with independent finite oracle; retain all candidates for any measured cardinality."
+    },
+    {
+      "name": "observationBatchesPlanned",
+      "group": "planning",
+      "scope": "execution/planning epoch",
+      "available_by_wave": 4,
+      "event": "unique explicit batch frozen",
+      "unit": "count",
+      "audit": "actual event with checked arithmetic; nominal W4 oracle and compiled mutation"
+    },
+    {
+      "name": "observationBatchesExecuted",
+      "group": "observation",
+      "scope": "execution/planning epoch",
+      "available_by_wave": 4,
+      "event": "bound materializer invoked",
+      "unit": "count",
+      "audit": "actual event with checked arithmetic; nominal W4 oracle and compiled mutation"
+    },
+    {
+      "name": "factsStaged",
+      "group": "consumer",
+      "scope": "execution/planning epoch",
+      "available_by_wave": 4,
+      "event": "fact appended to local staging",
+      "unit": "count",
+      "audit": "actual event with checked arithmetic; nominal W4 oracle and compiled mutation"
+    },
+    {
+      "name": "factsCommitted",
+      "group": "consumer",
+      "scope": "execution/planning epoch",
+      "available_by_wave": 4,
+      "event": "fact committed in complete bundle",
+      "unit": "count",
+      "audit": "actual event with checked arithmetic; nominal W4 oracle and compiled mutation"
+    },
+    {
+      "name": "factsDiscarded",
+      "group": "consumer",
+      "scope": "execution/planning epoch",
+      "available_by_wave": 4,
+      "event": "staged fact discarded after controlled failure",
+      "unit": "count",
+      "audit": "actual event with checked arithmetic; nominal W4 oracle and compiled mutation"
+    },
+    {
+      "name": "consumersComplete",
+      "group": "consumer",
+      "scope": "execution/planning epoch",
+      "available_by_wave": 4,
+      "event": "consumer completed all selected callbacks",
+      "unit": "count",
+      "audit": "actual event with checked arithmetic; nominal W4 oracle and compiled mutation"
+    },
+    {
+      "name": "consumersNotStarted",
+      "group": "consumer",
+      "scope": "execution/planning epoch",
+      "available_by_wave": 4,
+      "event": "consumer blocked by explicit unavailable dependency",
+      "unit": "count",
+      "audit": "actual event with checked arithmetic; nominal W4 oracle and compiled mutation"
+    },
+    {
+      "name": "planningEpochs",
+      "group": "planning",
+      "scope": "execution/planning epoch",
+      "available_by_wave": 4,
+      "event": "new immutable plan created",
+      "unit": "count",
+      "audit": "actual event with checked arithmetic; nominal W4 oracle and compiled mutation"
+    },
+    {
+      "name": "notRequested",
+      "group": "consumer",
+      "scope": "execution/planning epoch",
+      "available_by_wave": 4,
+      "event": "late or undeclared query lookup refused without replay",
+      "unit": "count",
+      "audit": "actual event with checked arithmetic; nominal W4 oracle and compiled mutation"
+    },
+    {
+      "name": "filterEvaluations",
+      "group": "planning",
+      "scope": "execution/planning epoch",
+      "available_by_wave": 4,
+      "event": "static predicate invoked on matching bucket and owner",
+      "unit": "count",
+      "audit": "actual event with checked arithmetic; nominal W4 oracle and compiled mutation"
+    },
+    {
+      "name": "planningCallbacks",
+      "group": "planning",
+      "scope": "execution/planning epoch",
+      "available_by_wave": 4,
+      "event": "site query declaration invoked",
+      "unit": "count",
+      "audit": "actual event with checked arithmetic; nominal W4 oracle and compiled mutation"
+    },
+    {
+      "name": "analysisRequests",
+      "group": "planning",
+      "scope": "execution/planning epoch",
+      "available_by_wave": 4,
+      "event": "consumer AnalysisKey dependency registered",
+      "unit": "count",
+      "audit": "actual event with checked arithmetic; nominal W4 oracle and compiled mutation"
+    },
+    {
+      "name": "analysisAdmissionCacheHits",
+      "group": "analysis",
+      "scope": "execution/planning epoch",
+      "available_by_wave": 4,
+      "event": "refused admission reused without solver",
+      "unit": "count",
+      "audit": "actual event with checked arithmetic; nominal W4 oracle and compiled mutation"
+    },
+    {
+      "name": "compositionRuns",
+      "available_by_wave": 5,
+      "event": "actual compositionRuns boundary event; see W5 ledger",
+      "scope": "W5 composition/read/delivery attempt",
+      "unit": "count",
+      "audit": "nominal tests, independent file hashes/reader, scale N/2N/4N and mutation campaign"
+    },
+    {
+      "name": "airReads",
+      "available_by_wave": 5,
+      "event": "actual airReads boundary event; see W5 ledger",
+      "scope": "W5 composition/read/delivery attempt",
+      "unit": "count",
+      "audit": "nominal tests, independent file hashes/reader, scale N/2N/4N and mutation campaign"
+    },
+    {
+      "name": "airBytesObserved",
+      "available_by_wave": 5,
+      "event": "actual airBytesObserved boundary event; see W5 ledger",
+      "scope": "W5 composition/read/delivery attempt",
+      "unit": "bytes",
+      "audit": "nominal tests, independent file hashes/reader, scale N/2N/4N and mutation campaign"
+    },
+    {
+      "name": "cfgBuilds",
+      "available_by_wave": 5,
+      "event": "actual cfgBuilds boundary event; see W5 ledger",
+      "scope": "W5 composition/read/delivery attempt",
+      "unit": "count",
+      "audit": "nominal tests, independent file hashes/reader, scale N/2N/4N and mutation campaign"
+    },
+    {
+      "name": "defaultPlanDestinations",
+      "available_by_wave": 5,
+      "event": "actual defaultPlanDestinations boundary event; see W5 ledger",
+      "scope": "W5 composition/read/delivery attempt",
+      "unit": "count",
+      "audit": "nominal tests, independent file hashes/reader, scale N/2N/4N and mutation campaign"
+    },
+    {
+      "name": "defaultPlanQueries",
+      "available_by_wave": 5,
+      "event": "actual defaultPlanQueries boundary event; see W5 ledger",
+      "scope": "W5 composition/read/delivery attempt",
+      "unit": "count",
+      "audit": "nominal tests, independent file hashes/reader, scale N/2N/4N and mutation campaign"
+    },
+    {
+      "name": "defaultPlanAssignVisits",
+      "available_by_wave": 5,
+      "event": "actual defaultPlanAssignVisits boundary event; see W5 ledger",
+      "scope": "W5 composition/read/delivery attempt",
+      "unit": "count",
+      "audit": "nominal tests, independent file hashes/reader, scale N/2N/4N and mutation campaign"
+    },
+    {
+      "name": "resultBytesWritten",
+      "available_by_wave": 5,
+      "event": "actual resultBytesWritten boundary event; see W5 ledger",
+      "scope": "W5 composition/read/delivery attempt",
+      "unit": "bytes",
+      "audit": "nominal tests, independent file hashes/reader, scale N/2N/4N and mutation campaign"
+    },
+    {
+      "name": "resultSha256Computed",
+      "available_by_wave": 5,
+      "event": "actual resultSha256Computed boundary event; see W5 ledger",
+      "scope": "W5 composition/read/delivery attempt",
+      "unit": "count",
+      "audit": "nominal tests, independent file hashes/reader, scale N/2N/4N and mutation campaign"
+    },
+    {
+      "name": "deliveryAttempts",
+      "available_by_wave": 5,
+      "event": "actual deliveryAttempts boundary event; see W5 ledger",
+      "scope": "W5 composition/read/delivery attempt",
+      "unit": "count",
+      "audit": "nominal tests, independent file hashes/reader, scale N/2N/4N and mutation campaign"
+    },
+    {
+      "name": "deliveryComplete",
+      "available_by_wave": 5,
+      "event": "actual deliveryComplete boundary event; see W5 ledger",
+      "scope": "W5 composition/read/delivery attempt",
+      "unit": "count",
+      "audit": "nominal tests, independent file hashes/reader, scale N/2N/4N and mutation campaign"
+    },
+    {
+      "name": "deliveryFailures",
+      "available_by_wave": 5,
+      "event": "actual deliveryFailures boundary event; see W5 ledger",
+      "scope": "W5 composition/read/delivery attempt",
+      "unit": "count",
+      "audit": "nominal tests, independent file hashes/reader, scale N/2N/4N and mutation campaign"
+    },
+    {
+      "name": "encodingFailures",
+      "available_by_wave": 5,
+      "event": "actual encodingFailures boundary event; see W5 ledger",
+      "scope": "W5 composition/read/delivery attempt",
+      "unit": "count",
+      "audit": "nominal tests, independent file hashes/reader, scale N/2N/4N and mutation campaign"
+    },
+    {
+      "name": "writeFailures",
+      "available_by_wave": 5,
+      "event": "actual writeFailures boundary event; see W5 ledger",
+      "scope": "W5 composition/read/delivery attempt",
+      "unit": "count",
+      "audit": "nominal tests, independent file hashes/reader, scale N/2N/4N and mutation campaign"
+    },
+    {
+      "name": "finalizationFailures",
+      "available_by_wave": 5,
+      "event": "actual finalizationFailures boundary event; see W5 ledger",
+      "scope": "W5 composition/read/delivery attempt",
+      "unit": "count",
+      "audit": "nominal tests, independent file hashes/reader, scale N/2N/4N and mutation campaign"
+    },
+    {
+      "name": "cleanupFailures",
+      "available_by_wave": 5,
+      "event": "actual cleanupFailures boundary event; see W5 ledger",
+      "scope": "W5 composition/read/delivery attempt",
+      "unit": "count",
+      "audit": "nominal tests, independent file hashes/reader, scale N/2N/4N and mutation campaign"
+    }
+  ],
+  "role": "OBSERVATION_ONLY",
+  "wave_1": {
+    "status": "IMPLEMENTED",
+    "owner": "IndexMetrics.Counter",
+    "hook": "scripts/project/check_w1.py",
+    "metrics": [
+      "nodesIndexed",
+      "edgesIndexed",
+      "operationsIndexed",
+      "referencesResolved",
+      "objectsIndexed",
+      "locationsIndexed",
+      "structuralVisits"
+    ]
+  },
+  "wave_2": {
+    "status": "IMPLEMENTED",
+    "owner": "DataflowSolver.Run / DomainWork",
+    "hook": "scripts/project/check_w2.py",
+    "metrics": [
+      "firstPublications",
+      "nodesPopped",
+      "nodesTransferred",
+      "operationsTransferred",
+      "initializationAttempts",
+      "edgeContributionJoins",
+      "edgeTransferInvocations",
+      "accumulatorStatesChanged",
+      "accumulatorStatesUnchanged",
+      "publishedStatesChanged",
+      "publishedStatesUnchanged",
+      "predecessorContributionReads",
+      "boundaryJoins",
+      "worklistAttempts",
+      "worklistPushes",
+      "duplicatePushesSuppressed",
+      "maxWorklistSize",
+      "joinEntriesVisited",
+      "stateCompareEntries"
+    ],
+    "additional_observations": [
+      "analysisPoints",
+      "contextualEdges",
+      "successorContributionReads"
+    ],
+    "aliases": {
+      "worklistPops": "nodesPopped",
+      "blockTransferEvaluations": "nodesTransferred",
+      "edgeContributionDeliveries": "edgeContributionJoins",
+      "joinIntoCalls": "edgeContributionJoins + boundaryJoins",
+      "stateChanges": "publishedStatesChanged",
+      "duplicateEnqueueSuppressions": "duplicatePushesSuppressed"
+    },
+    "domain_observations": "operationsTransferred/joinEntriesVisited/stateCompareEntries reported by actual synthetic callbacks; opaque production domain internals cannot be inferred"
+  },
+  "wave_3": {
+    "status": "IMPLEMENTED",
+    "hook": "scripts/project/check_w3.py",
+    "mapping": "docs/engineering/cp5-w3-values-ledger.md",
+    "remediation": {
+      "review": "W3-F1/W3-F2",
+      "tests": "SupportSourceTest (11 methods, included in semantic and performance gates)",
+      "measurements": "W3_SUPPORT_METRICS: 1000/2000/4000/10000 equal-value producers, all preserved",
+      "counters": [
+        "producersPrepared",
+        "supportSets",
+        "supportElements",
+        "supportUnionEntries",
+        "supportBytesAllocatedEstimate",
+        "maxSupports",
+        "supportElementsRetained",
+        "supportBytesRetainedEstimate"
+      ],
+      "mutations": "scripts/project/challenge_w3_f12.py",
+      "evidence": "docs/work/evidence/WORK-CFG-028/wave-3/review-f1-f2/validation.md"
+    }
+  },
+  "wave_4": {
+    "status": "IMPLEMENTED",
+    "hook": "scripts/project/check_w4.py",
+    "mapping": "docs/engineering/cp5-w4-planning-ledger.md",
+    "observations": "Explicit batches never cache across epochs; same-epoch query union and immutable facts are shared. Index counters remain in W1, callbacks count one consume per matched site."
+  },
+  "wave_5": {
+    "hook": "scripts/project/check_w5.py",
+    "ledger": "docs/engineering/cp5-w5-composition-ledger.md",
+    "status": "IMPLEMENTED"
+  }
+}

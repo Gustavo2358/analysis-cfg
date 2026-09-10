@@ -22,8 +22,9 @@ clock, UUID aleatório ou paths absolutos de máquina no produto semântico.
 
 Recursão Java proporcional ao número de sequences é risco em input grande. Preferir
 traversal iterativo onde aplicável; não confundir pilha de implementação com pilha
-semântica de local frames. Um budget explícito termina com ANALYSIS_LIMIT e perda
-de precisão, não com falso grafo completo.
+semântica de local frames. [CORE-SIZE-001](../architecture/decisions/ADR-0014.md)
+proíbe orçamento de recursos como término semântico. Convergência é obrigação
+matemática; exaustão de processo/infra não produz grafo ou resultado parcial válido.
 
 BACKLOG-CFG-012 estabelece baseline no core estrutural; o controle local exige
 novo relatório de custo em seu discovery. Sem limite de hardware inventado neste

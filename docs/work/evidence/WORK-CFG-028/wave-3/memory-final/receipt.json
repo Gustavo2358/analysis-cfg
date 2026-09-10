@@ -1,0 +1,2813 @@
+{
+  "source_head": "327737be23ab619ae212f46689a5043884f50da4",
+  "working_source_hashes": {
+    "pom.xml": "a642017053e6cc60e33a2b59a54b41a6230d36a21db8418cef547ead491ed644",
+    "cfg-kernel/pom.xml": "0ee54d83103d2fe70f67e3e370273f6cd929613ba933bf917f3f15ecdb71aed2",
+    "cfg-launcher/pom.xml": "1d912984d124ce82bd8625052ef65ca5bdb9617115cace441a979f41b81f6080",
+    "analysis-values/pom.xml": "86de1ab79e8b958fab9feea49004029cbc524a946f73accc877465e5a67d9976",
+    "cfg-adapters/pom.xml": "d944ed0fd43ee7c668e6dece380c0606e841877d72260668079c4238696e0a87",
+    "analysis-kernel/pom.xml": "ccbc522193ba3be3c68d9389739840d6a774a80803308282c2cb6f483ba2b31d",
+    "docs/work/evidence/WORK-CFG-027/ScalarBaselineOracle.java": "da5b86ff22ea7c03f032f13c590e72c9fbebac6904c6978341ab2c4b32c3feba",
+    "analysis-kernel/src/test/java/io/github/gustavo2358/analysis/structure/SolverFixtureBridge.java": "d6d17fac5670a5b4cc5759621425dde41bce9e55ef9adf3986ab5525f34fb6c2",
+    "analysis-kernel/src/test/java/io/github/gustavo2358/analysis/structure/ScaleTest.java": "b5ec600b7e7ecf734218ea3113afd05e8fe1c6e701e871661a9968fc04ae61d1",
+    "analysis-kernel/src/test/java/io/github/gustavo2358/analysis/structure/StructuralFixtures.java": "290323aaa06941189b5ac71d55d46522ac3a8885dba7d170cea7caa56be27240",
+    "analysis-kernel/src/test/java/io/github/gustavo2358/analysis/structure/StructureTest.java": "d649b6534128edcbe0a88e6fe817faf43262666bdded39ea148b5d67769f73f8",
+    "analysis-kernel/src/test/java/io/github/gustavo2358/analysis/structure/RetentionWalk.java": "d3dae15343b80310ff6e8d617ac3e8d6b8b6305fe4186e7b956963c5dd23e833",
+    "analysis-kernel/src/test/java/io/github/gustavo2358/analysis/structure/AdmissionTest.java": "e0afd38cd0c0217b1a4c1de5825451ff3a3fc0b4e1f7edc2e24c1823a33e3647",
+    "analysis-kernel/src/test/java/io/github/gustavo2358/analysis/solver/Schedules.java": "0a70fc79ca1ebdfd76ceb5ac2bb776ed2733ffdd48851fa86cf1ded2073f9544",
+    "analysis-kernel/src/test/java/io/github/gustavo2358/analysis/solver/RecompositionOracle.java": "a3696b74866e1e9a7c3e1ca3ab83f6245545d0f60b09c848a1e55eaf53b51b87",
+    "analysis-kernel/src/test/java/io/github/gustavo2358/analysis/solver/SolverTest.java": "78beaa3f54f1f60673bdf2de2d504a0e378533593389573f19699f85364b6372",
+    "analysis-kernel/src/test/java/io/github/gustavo2358/analysis/solver/ConcreteOracle.java": "598a5a46e6ecd49d05997f28686f42bca4b6d3f13e71721b2edfc63b6482f6a8",
+    "analysis-kernel/src/test/java/io/github/gustavo2358/analysis/solver/SolverScaleTest.java": "2b903ade365f7b89675fe7fe6bd10dd701a089ce8bbed02dc75f04e1cf469008",
+    "analysis-kernel/src/test/java/io/github/gustavo2358/analysis/solver/OracleTest.java": "62e48ddbe5680745a93af9c7d8dfcbc6552ae3234ba94a1b08e9d85e26c1c986",
+    "analysis-kernel/src/test/java/io/github/gustavo2358/analysis/solver/SyntheticAnalyses.java": "31fc34ef18e54aeed36219266f50cffbc194c6be56680112aefcf3172914b183",
+    "analysis-kernel/src/test/java/io/github/gustavo2358/analysis/solver/SolverPropertiesTest.java": "b082de957b7b93862fdac813afb6680cb908380f68acb3f42585444de3f2d346",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/query/ProgramPoint.java": "73c071be97b509764bcb2be1297ed0501baf0448ac8318232918e73bb79116eb",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/query/PointQuery.java": "4a920026fcb29cb55cabac41d2a7e5f44b6565e1b74a136f903c1a0e1a9b72ba",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/query/ObservationBatch.java": "143c5a3ff66420ee625944bca1d114913192736de819001bdc37d8036d33ae4d",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/query/BatchReplayer.java": "af4b4aa094de65288938ac7bb2852a0be8da2532352475b20981b28fd16371f3",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/AnalysisSession.java": "10ec707fa714805ef505b4acdb7893e00ae91028b7c173bbf2fa885c7887c1c8",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexMetrics.java": "c619b33867fbdf188bb59ed0474a187cc38ff039b02d1c7e309e16d60ccf868b",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/ContextView.java": "0f55daf17d118733392d1be234e0ed4b7977eb6cdb2f82760b9c156a06d4d221",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/ProgramIndex.java": "a25767e16ba9d9cc253afc3ead52fd35ad9b4a10c19e337b81fe43223a976c90",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexBuilder.java": "f39fa1377643ee5fd6622b5a24577de73bfabcb5292321c1db268a5c0b710fe0",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/LongIntDirectory.java": "678f92ae33059200d3e43d56aba6fa73a31b6ce744fd33e9ce01c03712d27dff",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/AnalysisPoint.java": "f243349d12e22f58b1caeb312add7cb928ad61b0b4c0c2493d2cb4406093ce6a",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java": "a049e86af35e386b205db620fc1fd44fb8374533fb9a8a7082749f1e3760595b",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/Direction.java": "33793941816afe033cc668835691f93913d79da58b13189b99283529e4f428fc",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowResult.java": "49b60189ab646f721a2862764c55ef9663b928430c0e8622d5ca22a3d3041a12",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/AnalysisDefinition.java": "91f555a4c1d75a4c1e3d46274a0be5cff45a4f9a28bc57405a44b2f8e04ebba9",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/SolverTopology.java": "9de73f073009dfc7189f567af0b23fd566542b59f828716532f50f8c0e846372",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/SolverMetrics.java": "3700550bbc5667a036d33a6ee56f21d119a82af2f92fc10759a5cee1f89b0f3e",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DomainWork.java": "8cd5cd1e49b6c87fca8d939589c6abbe877887541f3d07c5264fee55eb09d7c4",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/IntWorklist.java": "45c01beaab9aa86c4e7fd8a25b56b7967c39f401d29d722c9b1a8b6c136a9a8b",
+    "cfg-adapters/src/test/java/io/github/gustavo2358/analysis/cfg/adapters/TransportTest.java": "ea52c5f63bdceb5b301da88e4965f6867698ed5615005ee5839d82e8b58b68ad",
+    "cfg-adapters/src/test/java/io/github/gustavo2358/analysis/cfg/adapters/WriterDomainTest.java": "971277ea84c8f29f3de9ba172571422a0bdf33e3a6b03651bbb8d3a4ff9220c1",
+    "cfg-adapters/src/test/java/io/github/gustavo2358/analysis/cfg/adapters/MemoryFacts.java": "36cad106bd39bd7fc6b0954fa7ab4370a2fa0c89e54a3a2c05ae43158d3fafa9",
+    "cfg-adapters/src/test/java/io/github/gustavo2358/analysis/cfg/adapters/ScalarAssignTest.java": "795e23a9356ca99fa209e63e415dfe9fe2812a390853a3598c8438b0d9abb70c",
+    "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirJsonFileReader.java": "0d9f54d26a728aad17163be2cf28e7ce458fe775554a37f0d7ba7d27dd73c393",
+    "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonException.java": "f0be54101b6d29f3e17a7f6972e20621c7e81c837cb16f77ab387d032a85bfdf",
+    "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirInputLimitException.java": "c0c2798b172fd98892f72d338de9583d5e44f1285d5d5e75fa05a6b06938e377",
+    "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonBytes.java": "579254467d367c6a067845c16f2a1c1b82558fcc707830bf7adc16e49997f7c6",
+    "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter.java": "ce11d494154f40302d17f266f86ce2dde604ddd9739cc291fb81949663e6db3a",
+    "analysis-values/src/test/java/io/github/gustavo2358/analysis/values/ValueOracleTest.java": "b1c9811f6cc75ad7fc2e960f4026bc4e708f17518ac7f9c6faf1b9b7df830a7a",
+    "analysis-values/src/test/java/io/github/gustavo2358/analysis/values/ValuesFixtures.java": "94cc41d5d414e78e7627f84b1fe2d053e6b98200587abcf284b6d39124a85c87",
+    "analysis-values/src/test/java/io/github/gustavo2358/analysis/values/ValuesScaleTest.java": "620702347a23f24bf725075aa10a47887d973433df37d1964ca06ebb46d6a3f1",
+    "analysis-values/src/test/java/io/github/gustavo2358/analysis/values/RetentionAudit.java": "52f15eff4408e4f9025a221172838f71b773547456a3bec0092997680395b8b6",
+    "analysis-values/src/test/java/io/github/gustavo2358/analysis/values/RetentionProbe.java": "072fbad02e21d3c7f20ecc10ea4a1b91569cf9e832ba478461d2d0c6f9c6aaa2",
+    "analysis-values/src/test/java/io/github/gustavo2358/analysis/values/ReplayTest.java": "a970c6bd645b7f8717a509fa8a7100bea26d1c9c609dff7cdd8ab807754bdc21",
+    "analysis-values/src/test/java/io/github/gustavo2358/analysis/values/ValuesTest.java": "0561c0beddb474bc8eec35540e6897763d4f101ff23e131c75799e5bfc333fab",
+    "analysis-values/src/test/java/io/github/gustavo2358/analysis/values/DomainTest.java": "137848b5847b06c4f74b188a5e5d1d2a5e047827543a4c534c1a2f04f5e7583c",
+    "analysis-values/src/test/java/io/github/gustavo2358/analysis/solver/WideScheduleBridge.java": "7e50b9780b9e97a78b391b6e629519681f4280e35a8c95125a34ed0170a16f2f",
+    "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesAnalysis.java": "2f7a66757f75777ae6d2d0ce81b2eef1c47172e4ddb4e4b86fde8f4cfb6fa29b",
+    "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/Candidates.java": "c4cc62ed36f7634d5e27aff98ebd1d5a3916d3043766765b5255bba64a8fc13d",
+    "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/TextProfile.java": "5153b286efe1b54ea60a900cea5e2499d222a5112a23b7463ca3eed8b9ed74d4",
+    "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/ValueFact.java": "c8cea0430ed1fec5acf6ee532b2f2976ae60942bbf5ee11f0643db87ca0d44db",
+    "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PersistentBindings.java": "8d914a1a12cc0633385fb2f8198a5c57239460c1363112daeb3d7fe532d1238d",
+    "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/ValuesWork.java": "17e4b6b35403a84f9fd757587cc98fd5b8256a864605044ea024ba7d84313668",
+    "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesState.java": "e793ee8df8ec0f6cbf8414ed1f49f94f37fc294fecb624cc29684b6451731b31",
+    "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/ValueUniverse.java": "7bfb3cf023081042e9d3ebd004c81acd172344e168b48f77fe220d13fc341ae7",
+    "cfg-launcher/src/test/java/io/github/gustavo2358/analysis/cfg/launcher/ScalarAssignCliTest.java": "734939a054e4647e7fc9c5aa4e1c9b886459de02dda05324ed158da9fca274c4",
+    "cfg-launcher/src/test/java/io/github/gustavo2358/analysis/cfg/launcher/EvalCfg031Test.java": "3b81776bffe0009c12bf0e1468123f295c1bba6053edcf058f713c104195bf37",
+    "cfg-launcher/src/main/java/io/github/gustavo2358/analysis/cfg/launcher/AnalysisCfg.java": "210bd8bac22014f2a72f3f1ef9cfcadf7235eb74539a5a885c8ddea2c6dada1d",
+    "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/extension/SemanticInterpreterRegistryTest.java": "7ccdbb32a7c77292e3f9067bf735cfa8cbaa28376874283fd86b23154d6c599e",
+    "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg030Test.java": "d8994275b714768630e72dbe677cb233f44f6ecad8c748050650e0adab08b1ce",
+    "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg028Test.java": "ab40c93d048586d63cfe3bab44e354af1238124229425cfee52bdfe5c21fb73c",
+    "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg029Test.java": "adce290fc975e60d7490814b3f7867f21f3d7c1e59cb97414fb1ceba3deb8fc4",
+    "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg025Test.java": "5efaebbe6b2d89eb2701b2ac8f7f92dd182106893721be92f8670beef945c710",
+    "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/application/BuildCfgContractTest.java": "7e1073d39a2e3ba908272a4576c7b6e107915dbbe2b1ce258bc0f203de1f4925",
+    "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/application/CfgPreflightTest.java": "70931f48c383add5c424463e0b179006dbdc0da27b756a0bed1f030d296ab41e",
+    "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/application/CfgBuildCoordinatorTest.java": "fa4aab02372a267e1c59a047623fd2d4237e3f72bccfe1ed7c85177a148f51f5",
+    "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/testing/AirPublications.java": "987c52ee4dc019539bc07d205753ac55589a0b648f3c9b70fa5ca6a8af2d5934",
+    "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/testing/BranchPublications.java": "6c8ac716fa54fdf49bab0bf8dc7d4b82ca1f34738c11e18f0650ee1df461b2d0",
+    "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/testing/CfgFirstPublications.java": "46b1b15e7179e025cb2f808be47e18784125b35d8880222dbe0e20382018abc6",
+    "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/testing/LinearPublications.java": "dcd38b93f9e585b4d767dc82720b5b3a17a2739e18779bdb7008984401778aa4",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/extension/SemanticInterpreter.java": "c48dcc088dda6a976900cf1e712519ae42b0276647b8cd30cc272b43f2817c0a",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/extension/SemanticInterpreterRegistry.java": "cfe3623e2b835f1670035895a41d19317001853736623815fcd330ee8beb6b62",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CfgTransition.java": "9d0ed378926e0c057e84e588e3fd092a2365e566326bd413e9e1394fe6d89897",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CfgNodeId.java": "3b1cde879b3889fde09906cc30a77c670d7c5005675e5dfbf55ca6a9c20c4f19",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CfgNode.java": "4a446d5b8c3676c3d2cdd108b88ed28b9df8624dc4624aaea7c95a3a459990e0",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CfgProjectionIssue.java": "50398a984a9b03f97920e82bb22edfe45a4d37fc981247a17e9bced2dfc703f6",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/ProjectionPolicy.java": "69aec6c05ffd5d50f6fbf862f1b9b54f30543ec5ef983c276800cbf496354cbd",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CfgGraph.java": "b8dae01e337667599de45267e2beda83f1344d9a1a73069551b89ce02b2c3cc4",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CoreCfgProjection.java": "f9233544a2d2a71caef274edd7bb3f7c41018910c2d829b7d55c9914acfe34bb",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/CfgBuildCoordinator.java": "7908cbb37af5ab71be43b05dd179c3e009eeaa31969a5c3e80c9c7cd072db091",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/BuildOptions.java": "5fc1925688f9527592eee73b3e92de258206ec81d67198a7b65e554d0d174417",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/BuildCfg.java": "81e332367e61d46df7d982a6b29958efba10bfdba5047a908bce5699c9debebe",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/CfgPreflight.java": "cb73a48c8d7b916bee2aee8f6faf9727a0d4ac2db33bc231d4977ce2707a1a0f",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/CfgBuildResult.java": "fb3d5abb718877c0b4716757be808f391623a4b5db50d8067f49a0198f3d2bb6"
+  },
+  "kind": "OBSERVATION_ONLY",
+  "physical_bytes": "HotSpot GC.class_histogram shallow bytes after full GC, not exclusive retained size",
+  "cases": [
+    {
+      "operations": 10000,
+      "command": [
+        "/tmp/cp5-harness-validation/jdk/bin/java",
+        "-Xms64m",
+        "-Xmx768m",
+        "-XX:+UseCompressedOops",
+        "-XX:+UseCompressedClassPointers",
+        "-XX:ObjectAlignmentInBytes=8",
+        "-Xlog:gc*:file=/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/WORK-CFG-028/wave-3/memory-final/10000/gc.log",
+        "-XX:StartFlightRecording=filename=/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/WORK-CFG-028/wave-3/memory-final/10000/recording.jfr,settings=profile,dumponexit=true",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target/test-classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/tmp/cp5-harness-validation/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/tmp/cp5-harness-validation/m2/org/junit/jupiter/junit-jupiter/5.12.2/junit-jupiter-5.12.2.jar:/tmp/cp5-harness-validation/m2/org/junit/jupiter/junit-jupiter-api/5.12.2/junit-jupiter-api-5.12.2.jar:/tmp/cp5-harness-validation/m2/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/tmp/cp5-harness-validation/m2/org/junit/platform/junit-platform-commons/1.12.2/junit-platform-commons-1.12.2.jar:/tmp/cp5-harness-validation/m2/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/tmp/cp5-harness-validation/m2/org/junit/jupiter/junit-jupiter-params/5.12.2/junit-jupiter-params-5.12.2.jar:/tmp/cp5-harness-validation/m2/org/junit/jupiter/junit-jupiter-engine/5.12.2/junit-jupiter-engine-5.12.2.jar:/tmp/cp5-harness-validation/m2/org/junit/platform/junit-platform-engine/1.12.2/junit-platform-engine-1.12.2.jar",
+        "io.github.gustavo2358.analysis.values.RetentionProbe",
+        "10000"
+      ],
+      "phases": {
+        "air_cfg": {
+          "sha256": "87d026bee66de909c7534a466797cab7a8fdd4b7cce0ed0bd83705ab42422f60",
+          "counts": {
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult$Status": {
+              "instances": 6,
+              "shallow_bytes": 144
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgTransition$Kind": {
+              "instances": 6,
+              "shallow_bytes": 144
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNodeId": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgTransition": {
+              "instances": 2,
+              "shallow_bytes": 64
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult": {
+              "instances": 1,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgGraph": {
+              "instances": 1,
+              "shallow_bytes": 40
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNode$NormalExit": {
+              "instances": 1,
+              "shallow_bytes": 32
+            },
+            "io.github.gustavo2358.analysis.cfg.application.BuildOptions": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNode$EntryNode": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNode$SequenceNode": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator$$Lambda/0x0000796224012e70": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator$$Lambda/0x00007962240130b0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgGraph$$Lambda/0x000079622409fbd0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000079622409bbf0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000079622409e000": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000079622409e240": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000079622409eab8": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry$$Lambda/0x0000796224013500": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry$$Lambda/0x0000796224013740": {
+              "instances": 1,
+              "shallow_bytes": 16
+            }
+          }
+        },
+        "prepared": {
+          "sha256": "6f57a6b179f57aafcc5bff946409fa04c38dadc680f90654b91fdeec4d8cee99",
+          "counts": {
+            "io.github.gustavo2358.analysis.structure.ProgramIndex$Site": {
+              "instances": 10001,
+              "shallow_bytes": 240024
+            },
+            "io.github.gustavo2358.analysis.values.TextProfile$Write": {
+              "instances": 10000,
+              "shallow_bytes": 240000
+            },
+            "io.github.gustavo2358.analysis.values.ValuesWork": {
+              "instances": 2,
+              "shallow_bytes": 272
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult$Status": {
+              "instances": 6,
+              "shallow_bytes": 144
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgTransition$Kind": {
+              "instances": 6,
+              "shallow_bytes": 144
+            },
+            "io.github.gustavo2358.analysis.structure.ProgramIndex": {
+              "instances": 1,
+              "shallow_bytes": 112
+            },
+            "io.github.gustavo2358.analysis.structure.ProgramIndex$Node": {
+              "instances": 3,
+              "shallow_bytes": 96
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNodeId": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.structure.AnalysisSession$Status": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.structure.IndexMetrics": {
+              "instances": 1,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.values.Candidates": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Status": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgTransition": {
+              "instances": 2,
+              "shallow_bytes": 64
+            },
+            "io.github.gustavo2358.analysis.values.TextProfile": {
+              "instances": 1,
+              "shallow_bytes": 56
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult": {
+              "instances": 1,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.structure.LongIntDirectory": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesState": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.values.ValueUniverse$TextKey": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgGraph": {
+              "instances": 1,
+              "shallow_bytes": 40
+            },
+            "io.github.gustavo2358.analysis.values.ValueUniverse": {
+              "instances": 1,
+              "shallow_bytes": 40
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNode$NormalExit": {
+              "instances": 1,
+              "shallow_bytes": 32
+            },
+            "io.github.gustavo2358.analysis.cfg.application.BuildOptions": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNode$EntryNode": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNode$SequenceNode": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.structure.AnalysisSession": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.structure.ContextView": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.values.TextProfile$Location": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator$$Lambda/0x0000796224012e70": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator$$Lambda/0x00007962240130b0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgGraph$$Lambda/0x000079622409fbd0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000079622409bbf0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000079622409e000": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000079622409e240": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000079622409eab8": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry$$Lambda/0x0000796224013500": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry$$Lambda/0x0000796224013740": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.structure.IndexBuilder$$Lambda/0x00007962240a6668": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.structure.IndexMetrics$Counter$$Lambda/0x00007962240a6228": {
+              "instances": 1,
+              "shallow_bytes": 16
+            }
+          }
+        },
+        "solved": {
+          "sha256": "b8dccc4521c8e3eefe0377e1eee6abfc438196490e1c7daac45761913eba8463",
+          "counts": {
+            "io.github.gustavo2358.analysis.structure.ProgramIndex$Site": {
+              "instances": 10001,
+              "shallow_bytes": 240024
+            },
+            "io.github.gustavo2358.analysis.values.TextProfile$Write": {
+              "instances": 10000,
+              "shallow_bytes": 240000
+            },
+            "io.github.gustavo2358.analysis.values.ValuesWork": {
+              "instances": 2,
+              "shallow_bytes": 272
+            },
+            "io.github.gustavo2358.analysis.solver.SolverMetrics": {
+              "instances": 1,
+              "shallow_bytes": 192
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult$Status": {
+              "instances": 6,
+              "shallow_bytes": 144
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgTransition$Kind": {
+              "instances": 6,
+              "shallow_bytes": 144
+            },
+            "io.github.gustavo2358.analysis.structure.ProgramIndex": {
+              "instances": 1,
+              "shallow_bytes": 112
+            },
+            "io.github.gustavo2358.analysis.structure.ProgramIndex$Node": {
+              "instances": 3,
+              "shallow_bytes": 96
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNodeId": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.solver.AnalysisPoint": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.structure.AnalysisSession$Status": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.structure.IndexMetrics": {
+              "instances": 1,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.values.Candidates": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Status": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesState": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgTransition": {
+              "instances": 2,
+              "shallow_bytes": 64
+            },
+            "io.github.gustavo2358.analysis.values.TextProfile": {
+              "instances": 1,
+              "shallow_bytes": 56
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult": {
+              "instances": 1,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.solver.Direction": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.structure.LongIntDirectory": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.values.ValueUniverse$TextKey": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgGraph": {
+              "instances": 1,
+              "shallow_bytes": 40
+            },
+            "io.github.gustavo2358.analysis.values.PersistentBindings$Node": {
+              "instances": 1,
+              "shallow_bytes": 40
+            },
+            "io.github.gustavo2358.analysis.values.ValueUniverse": {
+              "instances": 1,
+              "shallow_bytes": 40
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNode$NormalExit": {
+              "instances": 1,
+              "shallow_bytes": 32
+            },
+            "io.github.gustavo2358.analysis.solver.DataflowResult": {
+              "instances": 1,
+              "shallow_bytes": 32
+            },
+            "io.github.gustavo2358.analysis.cfg.application.BuildOptions": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNode$EntryNode": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNode$SequenceNode": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.structure.AnalysisSession": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.structure.ContextView": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Execution": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.values.TextProfile$Location": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator$$Lambda/0x0000796224012e70": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator$$Lambda/0x00007962240130b0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgGraph$$Lambda/0x000079622409fbd0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000079622409bbf0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000079622409e000": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000079622409e240": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000079622409eab8": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry$$Lambda/0x0000796224013500": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry$$Lambda/0x0000796224013740": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.solver.DataflowSolver$$Lambda/0x00007962240a1000": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.solver.SolverTopology$$Lambda/0x00007962240a1858": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.solver.SolverTopology$$Lambda/0x00007962240a1a78": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.structure.IndexBuilder$$Lambda/0x00007962240a6668": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.structure.IndexMetrics$Counter$$Lambda/0x00007962240a6228": {
+              "instances": 1,
+              "shallow_bytes": 16
+            }
+          }
+        },
+        "batch_only": {
+          "sha256": "080fa62fc2ceaa3bb19d95f9f5755985a2a8d378516c082ed826b4ace5550197",
+          "counts": {
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult$Status": {
+              "instances": 6,
+              "shallow_bytes": 144
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgTransition$Kind": {
+              "instances": 6,
+              "shallow_bytes": 144
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$Kind": {
+              "instances": 4,
+              "shallow_bytes": 96
+            },
+            "io.github.gustavo2358.analysis.query.ObservationBatch$Metrics": {
+              "instances": 1,
+              "shallow_bytes": 88
+            },
+            "io.github.gustavo2358.analysis.structure.AnalysisSession$Status": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Status": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.query.ObservationBatch$QueryStatus": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.query.ObservationBatch$Status": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.solver.Direction": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesState": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.values.ValueFact$Reachability": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.values.ValueFact": {
+              "instances": 1,
+              "shallow_bytes": 40
+            },
+            "io.github.gustavo2358.analysis.query.ObservationBatch": {
+              "instances": 1,
+              "shallow_bytes": 32
+            },
+            "io.github.gustavo2358.analysis.query.ObservationBatch$Observation": {
+              "instances": 1,
+              "shallow_bytes": 32
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint": {
+              "instances": 1,
+              "shallow_bytes": 32
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.query.PointQuery": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.solver.DataflowResult$Status": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.values.Candidates": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Execution$Observations": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator$$Lambda/0x0000796224012e70": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator$$Lambda/0x00007962240130b0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgGraph$$Lambda/0x000079622409fbd0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000079622409bbf0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000079622409e000": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000079622409e240": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000079622409eab8": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry$$Lambda/0x0000796224013500": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry$$Lambda/0x0000796224013740": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.BatchReplayer$$Lambda/0x00007962240ad958": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.BatchReplayer$$Lambda/0x00007962240adb98": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.BatchReplayer$$Lambda/0x00007962240ae1f0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.BatchReplayer$$Lambda/0x00007962240ae640": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x00007962240aab00": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x00007962240aad40": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x00007962240aaf80": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x00007962240ab1c0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x00007962240ab400": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x00007962240ab640": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x00007962240abac8": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x00007962240abd08": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x00007962240abf48": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.solver.DataflowSolver$$Lambda/0x00007962240a1000": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.solver.SolverTopology$$Lambda/0x00007962240a1858": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.solver.SolverTopology$$Lambda/0x00007962240a1a78": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.structure.IndexBuilder$$Lambda/0x00007962240a6668": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.structure.IndexMetrics$Counter$$Lambda/0x00007962240a6228": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Execution$$Lambda/0x00007962240ac380": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Execution$$Lambda/0x00007962240ac5c0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Execution$$Lambda/0x00007962240ac800": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.values.ValueUniverse$$Lambda/0x00007962240aeeb0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.values.ValuesTest$$Lambda/0x00007962240b4418": {
+              "instances": 1,
+              "shallow_bytes": 16
+            }
+          }
+        },
+        "released": {
+          "sha256": "5cfeedd228bd921683c843a722bf72047b167e4a2d0702f4b6180794ec9927b5",
+          "counts": {
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult$Status": {
+              "instances": 6,
+              "shallow_bytes": 144
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgTransition$Kind": {
+              "instances": 6,
+              "shallow_bytes": 144
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$Kind": {
+              "instances": 4,
+              "shallow_bytes": 96
+            },
+            "io.github.gustavo2358.analysis.structure.AnalysisSession$Status": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Status": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.query.ObservationBatch$QueryStatus": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.query.ObservationBatch$Status": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.solver.Direction": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesState": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.values.ValueFact$Reachability": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.solver.DataflowResult$Status": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.values.Candidates": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator$$Lambda/0x0000796224012e70": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator$$Lambda/0x00007962240130b0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgGraph$$Lambda/0x000079622409fbd0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000079622409bbf0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000079622409e000": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000079622409e240": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000079622409eab8": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry$$Lambda/0x0000796224013500": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry$$Lambda/0x0000796224013740": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.BatchReplayer$$Lambda/0x00007962240ad958": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.BatchReplayer$$Lambda/0x00007962240adb98": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.BatchReplayer$$Lambda/0x00007962240ae1f0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.BatchReplayer$$Lambda/0x00007962240ae640": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x00007962240aab00": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x00007962240aad40": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x00007962240aaf80": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x00007962240ab1c0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x00007962240ab400": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x00007962240ab640": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x00007962240abac8": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x00007962240abd08": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x00007962240abf48": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.solver.DataflowSolver$$Lambda/0x00007962240a1000": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.solver.SolverTopology$$Lambda/0x00007962240a1858": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.solver.SolverTopology$$Lambda/0x00007962240a1a78": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.structure.IndexBuilder$$Lambda/0x00007962240a6668": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.structure.IndexMetrics$Counter$$Lambda/0x00007962240a6228": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Execution$$Lambda/0x00007962240ac380": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Execution$$Lambda/0x00007962240ac5c0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Execution$$Lambda/0x00007962240ac800": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.values.ValueUniverse$$Lambda/0x00007962240aeeb0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.values.ValuesTest$$Lambda/0x00007962240b4418": {
+              "instances": 1,
+              "shallow_bytes": 16
+            }
+          }
+        }
+      },
+      "exit": 0,
+      "elapsed_seconds": 1.600385219004238
+    },
+    {
+      "operations": 20000,
+      "command": [
+        "/tmp/cp5-harness-validation/jdk/bin/java",
+        "-Xms64m",
+        "-Xmx768m",
+        "-XX:+UseCompressedOops",
+        "-XX:+UseCompressedClassPointers",
+        "-XX:ObjectAlignmentInBytes=8",
+        "-Xlog:gc*:file=/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/WORK-CFG-028/wave-3/memory-final/20000/gc.log",
+        "-XX:StartFlightRecording=filename=/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/WORK-CFG-028/wave-3/memory-final/20000/recording.jfr,settings=profile,dumponexit=true",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target/test-classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/tmp/cp5-harness-validation/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/tmp/cp5-harness-validation/m2/org/junit/jupiter/junit-jupiter/5.12.2/junit-jupiter-5.12.2.jar:/tmp/cp5-harness-validation/m2/org/junit/jupiter/junit-jupiter-api/5.12.2/junit-jupiter-api-5.12.2.jar:/tmp/cp5-harness-validation/m2/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/tmp/cp5-harness-validation/m2/org/junit/platform/junit-platform-commons/1.12.2/junit-platform-commons-1.12.2.jar:/tmp/cp5-harness-validation/m2/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/tmp/cp5-harness-validation/m2/org/junit/jupiter/junit-jupiter-params/5.12.2/junit-jupiter-params-5.12.2.jar:/tmp/cp5-harness-validation/m2/org/junit/jupiter/junit-jupiter-engine/5.12.2/junit-jupiter-engine-5.12.2.jar:/tmp/cp5-harness-validation/m2/org/junit/platform/junit-platform-engine/1.12.2/junit-platform-engine-1.12.2.jar",
+        "io.github.gustavo2358.analysis.values.RetentionProbe",
+        "20000"
+      ],
+      "phases": {
+        "air_cfg": {
+          "sha256": "03196cc11563f2aa9d188d1c710539c169e53ff09bf963d64b739346b9bdfdea",
+          "counts": {
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult$Status": {
+              "instances": 6,
+              "shallow_bytes": 144
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgTransition$Kind": {
+              "instances": 6,
+              "shallow_bytes": 144
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNodeId": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgTransition": {
+              "instances": 2,
+              "shallow_bytes": 64
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult": {
+              "instances": 1,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgGraph": {
+              "instances": 1,
+              "shallow_bytes": 40
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNode$NormalExit": {
+              "instances": 1,
+              "shallow_bytes": 32
+            },
+            "io.github.gustavo2358.analysis.cfg.application.BuildOptions": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNode$EntryNode": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNode$SequenceNode": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator$$Lambda/0x000073e664012e70": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator$$Lambda/0x000073e6640130b0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgGraph$$Lambda/0x000073e66409fbd0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000073e66409bbf0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000073e66409e000": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000073e66409e240": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000073e66409eab8": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry$$Lambda/0x000073e664013500": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry$$Lambda/0x000073e664013740": {
+              "instances": 1,
+              "shallow_bytes": 16
+            }
+          }
+        },
+        "prepared": {
+          "sha256": "d2aa1d9183520c87b2e8b6604e8e3b29fa062340da672bb4c87f81b25d7b959a",
+          "counts": {
+            "io.github.gustavo2358.analysis.structure.ProgramIndex$Site": {
+              "instances": 20001,
+              "shallow_bytes": 480024
+            },
+            "io.github.gustavo2358.analysis.values.TextProfile$Write": {
+              "instances": 20000,
+              "shallow_bytes": 480000
+            },
+            "io.github.gustavo2358.analysis.values.ValuesWork": {
+              "instances": 2,
+              "shallow_bytes": 272
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult$Status": {
+              "instances": 6,
+              "shallow_bytes": 144
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgTransition$Kind": {
+              "instances": 6,
+              "shallow_bytes": 144
+            },
+            "io.github.gustavo2358.analysis.structure.ProgramIndex": {
+              "instances": 1,
+              "shallow_bytes": 112
+            },
+            "io.github.gustavo2358.analysis.structure.ProgramIndex$Node": {
+              "instances": 3,
+              "shallow_bytes": 96
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNodeId": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.structure.AnalysisSession$Status": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.structure.IndexMetrics": {
+              "instances": 1,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.values.Candidates": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Status": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgTransition": {
+              "instances": 2,
+              "shallow_bytes": 64
+            },
+            "io.github.gustavo2358.analysis.values.TextProfile": {
+              "instances": 1,
+              "shallow_bytes": 56
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult": {
+              "instances": 1,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.structure.LongIntDirectory": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesState": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.values.ValueUniverse$TextKey": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgGraph": {
+              "instances": 1,
+              "shallow_bytes": 40
+            },
+            "io.github.gustavo2358.analysis.values.ValueUniverse": {
+              "instances": 1,
+              "shallow_bytes": 40
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNode$NormalExit": {
+              "instances": 1,
+              "shallow_bytes": 32
+            },
+            "io.github.gustavo2358.analysis.cfg.application.BuildOptions": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNode$EntryNode": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNode$SequenceNode": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.structure.AnalysisSession": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.structure.ContextView": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.values.TextProfile$Location": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator$$Lambda/0x000073e664012e70": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator$$Lambda/0x000073e6640130b0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgGraph$$Lambda/0x000073e66409fbd0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000073e66409bbf0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000073e66409e000": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000073e66409e240": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000073e66409eab8": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry$$Lambda/0x000073e664013500": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry$$Lambda/0x000073e664013740": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.structure.IndexBuilder$$Lambda/0x000073e6640a6668": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.structure.IndexMetrics$Counter$$Lambda/0x000073e6640a6228": {
+              "instances": 1,
+              "shallow_bytes": 16
+            }
+          }
+        },
+        "solved": {
+          "sha256": "6acfafd688d99dcc2b3b47bbbf7dfefbb3cfc76d01bbfa6f76ffff1e319a6ec8",
+          "counts": {
+            "io.github.gustavo2358.analysis.structure.ProgramIndex$Site": {
+              "instances": 20001,
+              "shallow_bytes": 480024
+            },
+            "io.github.gustavo2358.analysis.values.TextProfile$Write": {
+              "instances": 20000,
+              "shallow_bytes": 480000
+            },
+            "io.github.gustavo2358.analysis.values.ValuesWork": {
+              "instances": 2,
+              "shallow_bytes": 272
+            },
+            "io.github.gustavo2358.analysis.solver.SolverMetrics": {
+              "instances": 1,
+              "shallow_bytes": 192
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult$Status": {
+              "instances": 6,
+              "shallow_bytes": 144
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgTransition$Kind": {
+              "instances": 6,
+              "shallow_bytes": 144
+            },
+            "io.github.gustavo2358.analysis.structure.ProgramIndex": {
+              "instances": 1,
+              "shallow_bytes": 112
+            },
+            "io.github.gustavo2358.analysis.structure.ProgramIndex$Node": {
+              "instances": 3,
+              "shallow_bytes": 96
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNodeId": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.solver.AnalysisPoint": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.structure.AnalysisSession$Status": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.structure.IndexMetrics": {
+              "instances": 1,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.values.Candidates": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Status": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesState": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgTransition": {
+              "instances": 2,
+              "shallow_bytes": 64
+            },
+            "io.github.gustavo2358.analysis.values.TextProfile": {
+              "instances": 1,
+              "shallow_bytes": 56
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult": {
+              "instances": 1,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.solver.Direction": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.structure.LongIntDirectory": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.values.ValueUniverse$TextKey": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgGraph": {
+              "instances": 1,
+              "shallow_bytes": 40
+            },
+            "io.github.gustavo2358.analysis.values.PersistentBindings$Node": {
+              "instances": 1,
+              "shallow_bytes": 40
+            },
+            "io.github.gustavo2358.analysis.values.ValueUniverse": {
+              "instances": 1,
+              "shallow_bytes": 40
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNode$NormalExit": {
+              "instances": 1,
+              "shallow_bytes": 32
+            },
+            "io.github.gustavo2358.analysis.solver.DataflowResult": {
+              "instances": 1,
+              "shallow_bytes": 32
+            },
+            "io.github.gustavo2358.analysis.cfg.application.BuildOptions": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNode$EntryNode": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNode$SequenceNode": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.structure.AnalysisSession": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.structure.ContextView": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Execution": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.values.TextProfile$Location": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator$$Lambda/0x000073e664012e70": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator$$Lambda/0x000073e6640130b0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgGraph$$Lambda/0x000073e66409fbd0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000073e66409bbf0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000073e66409e000": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000073e66409e240": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000073e66409eab8": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry$$Lambda/0x000073e664013500": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry$$Lambda/0x000073e664013740": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.solver.DataflowSolver$$Lambda/0x000073e6640a1000": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.solver.SolverTopology$$Lambda/0x000073e6640a1858": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.solver.SolverTopology$$Lambda/0x000073e6640a1a78": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.structure.IndexBuilder$$Lambda/0x000073e6640a6668": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.structure.IndexMetrics$Counter$$Lambda/0x000073e6640a6228": {
+              "instances": 1,
+              "shallow_bytes": 16
+            }
+          }
+        },
+        "batch_only": {
+          "sha256": "a323a2ec266de5e77ccaabe3add3269e1f2fc8fe4b8f3143c61b05a52a930e84",
+          "counts": {
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult$Status": {
+              "instances": 6,
+              "shallow_bytes": 144
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgTransition$Kind": {
+              "instances": 6,
+              "shallow_bytes": 144
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$Kind": {
+              "instances": 4,
+              "shallow_bytes": 96
+            },
+            "io.github.gustavo2358.analysis.query.ObservationBatch$Metrics": {
+              "instances": 1,
+              "shallow_bytes": 88
+            },
+            "io.github.gustavo2358.analysis.structure.AnalysisSession$Status": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Status": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.query.ObservationBatch$QueryStatus": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.query.ObservationBatch$Status": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.solver.Direction": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesState": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.values.ValueFact$Reachability": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.values.ValueFact": {
+              "instances": 1,
+              "shallow_bytes": 40
+            },
+            "io.github.gustavo2358.analysis.query.ObservationBatch": {
+              "instances": 1,
+              "shallow_bytes": 32
+            },
+            "io.github.gustavo2358.analysis.query.ObservationBatch$Observation": {
+              "instances": 1,
+              "shallow_bytes": 32
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint": {
+              "instances": 1,
+              "shallow_bytes": 32
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.query.PointQuery": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.solver.DataflowResult$Status": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.values.Candidates": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Execution$Observations": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator$$Lambda/0x000073e664012e70": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator$$Lambda/0x000073e6640130b0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgGraph$$Lambda/0x000073e66409fbd0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000073e66409bbf0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000073e66409e000": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000073e66409e240": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000073e66409eab8": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry$$Lambda/0x000073e664013500": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry$$Lambda/0x000073e664013740": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.BatchReplayer$$Lambda/0x000073e6640ad958": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.BatchReplayer$$Lambda/0x000073e6640adb98": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.BatchReplayer$$Lambda/0x000073e6640ae1f0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.BatchReplayer$$Lambda/0x000073e6640ae640": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000073e6640aab00": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000073e6640aad40": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000073e6640aaf80": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000073e6640ab1c0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000073e6640ab400": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000073e6640ab640": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000073e6640abac8": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000073e6640abd08": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000073e6640abf48": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.solver.DataflowSolver$$Lambda/0x000073e6640a1000": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.solver.SolverTopology$$Lambda/0x000073e6640a1858": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.solver.SolverTopology$$Lambda/0x000073e6640a1a78": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.structure.IndexBuilder$$Lambda/0x000073e6640a6668": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.structure.IndexMetrics$Counter$$Lambda/0x000073e6640a6228": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Execution$$Lambda/0x000073e6640ac380": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Execution$$Lambda/0x000073e6640ac5c0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Execution$$Lambda/0x000073e6640ac800": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.values.ValueUniverse$$Lambda/0x000073e6640aeeb0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.values.ValuesTest$$Lambda/0x000073e6640b4418": {
+              "instances": 1,
+              "shallow_bytes": 16
+            }
+          }
+        },
+        "released": {
+          "sha256": "958f9052a1c146ddc518d9264807b06cda8cde77283d315a46f0875809687675",
+          "counts": {
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult$Status": {
+              "instances": 6,
+              "shallow_bytes": 144
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgTransition$Kind": {
+              "instances": 6,
+              "shallow_bytes": 144
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$Kind": {
+              "instances": 4,
+              "shallow_bytes": 96
+            },
+            "io.github.gustavo2358.analysis.structure.AnalysisSession$Status": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Status": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.query.ObservationBatch$QueryStatus": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.query.ObservationBatch$Status": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.solver.Direction": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesState": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.values.ValueFact$Reachability": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.solver.DataflowResult$Status": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.values.Candidates": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator$$Lambda/0x000073e664012e70": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator$$Lambda/0x000073e6640130b0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgGraph$$Lambda/0x000073e66409fbd0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000073e66409bbf0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000073e66409e000": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000073e66409e240": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000073e66409eab8": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry$$Lambda/0x000073e664013500": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry$$Lambda/0x000073e664013740": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.BatchReplayer$$Lambda/0x000073e6640ad958": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.BatchReplayer$$Lambda/0x000073e6640adb98": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.BatchReplayer$$Lambda/0x000073e6640ae1f0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.BatchReplayer$$Lambda/0x000073e6640ae640": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000073e6640aab00": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000073e6640aad40": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000073e6640aaf80": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000073e6640ab1c0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000073e6640ab400": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000073e6640ab640": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000073e6640abac8": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000073e6640abd08": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000073e6640abf48": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.solver.DataflowSolver$$Lambda/0x000073e6640a1000": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.solver.SolverTopology$$Lambda/0x000073e6640a1858": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.solver.SolverTopology$$Lambda/0x000073e6640a1a78": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.structure.IndexBuilder$$Lambda/0x000073e6640a6668": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.structure.IndexMetrics$Counter$$Lambda/0x000073e6640a6228": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Execution$$Lambda/0x000073e6640ac380": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Execution$$Lambda/0x000073e6640ac5c0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Execution$$Lambda/0x000073e6640ac800": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.values.ValueUniverse$$Lambda/0x000073e6640aeeb0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.values.ValuesTest$$Lambda/0x000073e6640b4418": {
+              "instances": 1,
+              "shallow_bytes": 16
+            }
+          }
+        }
+      },
+      "exit": 0,
+      "elapsed_seconds": 1.861471928001265
+    },
+    {
+      "operations": 200000,
+      "command": [
+        "/tmp/cp5-harness-validation/jdk/bin/java",
+        "-Xms64m",
+        "-Xmx768m",
+        "-XX:+UseCompressedOops",
+        "-XX:+UseCompressedClassPointers",
+        "-XX:ObjectAlignmentInBytes=8",
+        "-Xlog:gc*:file=/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/WORK-CFG-028/wave-3/memory-final/200000/gc.log",
+        "-XX:StartFlightRecording=filename=/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/WORK-CFG-028/wave-3/memory-final/200000/recording.jfr,settings=profile,dumponexit=true",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target/test-classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/tmp/cp5-harness-validation/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/tmp/cp5-harness-validation/m2/org/junit/jupiter/junit-jupiter/5.12.2/junit-jupiter-5.12.2.jar:/tmp/cp5-harness-validation/m2/org/junit/jupiter/junit-jupiter-api/5.12.2/junit-jupiter-api-5.12.2.jar:/tmp/cp5-harness-validation/m2/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/tmp/cp5-harness-validation/m2/org/junit/platform/junit-platform-commons/1.12.2/junit-platform-commons-1.12.2.jar:/tmp/cp5-harness-validation/m2/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/tmp/cp5-harness-validation/m2/org/junit/jupiter/junit-jupiter-params/5.12.2/junit-jupiter-params-5.12.2.jar:/tmp/cp5-harness-validation/m2/org/junit/jupiter/junit-jupiter-engine/5.12.2/junit-jupiter-engine-5.12.2.jar:/tmp/cp5-harness-validation/m2/org/junit/platform/junit-platform-engine/1.12.2/junit-platform-engine-1.12.2.jar",
+        "io.github.gustavo2358.analysis.values.RetentionProbe",
+        "200000"
+      ],
+      "phases": {
+        "air_cfg": {
+          "sha256": "8cea6f58d965cf6bd51271b33441b8511636104363266d80683a51962f278461",
+          "counts": {
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult$Status": {
+              "instances": 6,
+              "shallow_bytes": 144
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgTransition$Kind": {
+              "instances": 6,
+              "shallow_bytes": 144
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNodeId": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgTransition": {
+              "instances": 2,
+              "shallow_bytes": 64
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult": {
+              "instances": 1,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgGraph": {
+              "instances": 1,
+              "shallow_bytes": 40
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNode$NormalExit": {
+              "instances": 1,
+              "shallow_bytes": 32
+            },
+            "io.github.gustavo2358.analysis.cfg.application.BuildOptions": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNode$EntryNode": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNode$SequenceNode": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator$$Lambda/0x000075af80012e70": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator$$Lambda/0x000075af800130b0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgGraph$$Lambda/0x000075af8009fbd0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000075af8009bbf0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000075af8009e000": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000075af8009e240": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000075af8009eab8": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry$$Lambda/0x000075af80013500": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry$$Lambda/0x000075af80013740": {
+              "instances": 1,
+              "shallow_bytes": 16
+            }
+          }
+        },
+        "prepared": {
+          "sha256": "839934265a067d9a8f42cf45a21c819a705708c7c43f3cbc0c391b69a457af6a",
+          "counts": {
+            "io.github.gustavo2358.analysis.structure.ProgramIndex$Site": {
+              "instances": 200001,
+              "shallow_bytes": 4800024
+            },
+            "io.github.gustavo2358.analysis.values.TextProfile$Write": {
+              "instances": 200000,
+              "shallow_bytes": 4800000
+            },
+            "io.github.gustavo2358.analysis.values.ValuesWork": {
+              "instances": 2,
+              "shallow_bytes": 272
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult$Status": {
+              "instances": 6,
+              "shallow_bytes": 144
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgTransition$Kind": {
+              "instances": 6,
+              "shallow_bytes": 144
+            },
+            "io.github.gustavo2358.analysis.structure.ProgramIndex": {
+              "instances": 1,
+              "shallow_bytes": 112
+            },
+            "io.github.gustavo2358.analysis.structure.ProgramIndex$Node": {
+              "instances": 3,
+              "shallow_bytes": 96
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNodeId": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.structure.AnalysisSession$Status": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.structure.IndexMetrics": {
+              "instances": 1,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.values.Candidates": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Status": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgTransition": {
+              "instances": 2,
+              "shallow_bytes": 64
+            },
+            "io.github.gustavo2358.analysis.values.TextProfile": {
+              "instances": 1,
+              "shallow_bytes": 56
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult": {
+              "instances": 1,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.structure.LongIntDirectory": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesState": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.values.ValueUniverse$TextKey": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgGraph": {
+              "instances": 1,
+              "shallow_bytes": 40
+            },
+            "io.github.gustavo2358.analysis.values.ValueUniverse": {
+              "instances": 1,
+              "shallow_bytes": 40
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNode$NormalExit": {
+              "instances": 1,
+              "shallow_bytes": 32
+            },
+            "io.github.gustavo2358.analysis.cfg.application.BuildOptions": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNode$EntryNode": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNode$SequenceNode": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.structure.AnalysisSession": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.structure.ContextView": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.values.TextProfile$Location": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator$$Lambda/0x000075af80012e70": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator$$Lambda/0x000075af800130b0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgGraph$$Lambda/0x000075af8009fbd0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000075af8009bbf0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000075af8009e000": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000075af8009e240": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000075af8009eab8": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry$$Lambda/0x000075af80013500": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry$$Lambda/0x000075af80013740": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.structure.IndexBuilder$$Lambda/0x000075af800a6668": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.structure.IndexMetrics$Counter$$Lambda/0x000075af800a6228": {
+              "instances": 1,
+              "shallow_bytes": 16
+            }
+          }
+        },
+        "solved": {
+          "sha256": "2c71fdad0912953f3eac4e9046a256a1ebf9133a816d9855618cfceedff355f3",
+          "counts": {
+            "io.github.gustavo2358.analysis.structure.ProgramIndex$Site": {
+              "instances": 200001,
+              "shallow_bytes": 4800024
+            },
+            "io.github.gustavo2358.analysis.values.TextProfile$Write": {
+              "instances": 200000,
+              "shallow_bytes": 4800000
+            },
+            "io.github.gustavo2358.analysis.values.ValuesWork": {
+              "instances": 2,
+              "shallow_bytes": 272
+            },
+            "io.github.gustavo2358.analysis.solver.SolverMetrics": {
+              "instances": 1,
+              "shallow_bytes": 192
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult$Status": {
+              "instances": 6,
+              "shallow_bytes": 144
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgTransition$Kind": {
+              "instances": 6,
+              "shallow_bytes": 144
+            },
+            "io.github.gustavo2358.analysis.structure.ProgramIndex": {
+              "instances": 1,
+              "shallow_bytes": 112
+            },
+            "io.github.gustavo2358.analysis.structure.ProgramIndex$Node": {
+              "instances": 3,
+              "shallow_bytes": 96
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNodeId": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.solver.AnalysisPoint": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.structure.AnalysisSession$Status": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.structure.IndexMetrics": {
+              "instances": 1,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.values.Candidates": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Status": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesState": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgTransition": {
+              "instances": 2,
+              "shallow_bytes": 64
+            },
+            "io.github.gustavo2358.analysis.values.TextProfile": {
+              "instances": 1,
+              "shallow_bytes": 56
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult": {
+              "instances": 1,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.solver.Direction": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.structure.LongIntDirectory": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.values.ValueUniverse$TextKey": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgGraph": {
+              "instances": 1,
+              "shallow_bytes": 40
+            },
+            "io.github.gustavo2358.analysis.values.PersistentBindings$Node": {
+              "instances": 1,
+              "shallow_bytes": 40
+            },
+            "io.github.gustavo2358.analysis.values.ValueUniverse": {
+              "instances": 1,
+              "shallow_bytes": 40
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNode$NormalExit": {
+              "instances": 1,
+              "shallow_bytes": 32
+            },
+            "io.github.gustavo2358.analysis.solver.DataflowResult": {
+              "instances": 1,
+              "shallow_bytes": 32
+            },
+            "io.github.gustavo2358.analysis.cfg.application.BuildOptions": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNode$EntryNode": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgNode$SequenceNode": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.structure.AnalysisSession": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.structure.ContextView": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Execution": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.values.TextProfile$Location": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator$$Lambda/0x000075af80012e70": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator$$Lambda/0x000075af800130b0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgGraph$$Lambda/0x000075af8009fbd0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000075af8009bbf0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000075af8009e000": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000075af8009e240": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000075af8009eab8": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry$$Lambda/0x000075af80013500": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry$$Lambda/0x000075af80013740": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.solver.DataflowSolver$$Lambda/0x000075af800a1000": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.solver.SolverTopology$$Lambda/0x000075af800a1858": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.solver.SolverTopology$$Lambda/0x000075af800a1a78": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.structure.IndexBuilder$$Lambda/0x000075af800a6668": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.structure.IndexMetrics$Counter$$Lambda/0x000075af800a6228": {
+              "instances": 1,
+              "shallow_bytes": 16
+            }
+          }
+        },
+        "batch_only": {
+          "sha256": "9a3393f1e474c4b8b2fe59b175538e56d60f8971b52fa062b41d562cccd0fbbe",
+          "counts": {
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult$Status": {
+              "instances": 6,
+              "shallow_bytes": 144
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgTransition$Kind": {
+              "instances": 6,
+              "shallow_bytes": 144
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$Kind": {
+              "instances": 4,
+              "shallow_bytes": 96
+            },
+            "io.github.gustavo2358.analysis.query.ObservationBatch$Metrics": {
+              "instances": 1,
+              "shallow_bytes": 88
+            },
+            "io.github.gustavo2358.analysis.structure.AnalysisSession$Status": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Status": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.query.ObservationBatch$QueryStatus": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.query.ObservationBatch$Status": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.solver.Direction": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesState": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.values.ValueFact$Reachability": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.values.ValueFact": {
+              "instances": 1,
+              "shallow_bytes": 40
+            },
+            "io.github.gustavo2358.analysis.query.ObservationBatch": {
+              "instances": 1,
+              "shallow_bytes": 32
+            },
+            "io.github.gustavo2358.analysis.query.ObservationBatch$Observation": {
+              "instances": 1,
+              "shallow_bytes": 32
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint": {
+              "instances": 1,
+              "shallow_bytes": 32
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.query.PointQuery": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.solver.DataflowResult$Status": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.values.Candidates": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Execution$Observations": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator$$Lambda/0x000075af80012e70": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator$$Lambda/0x000075af800130b0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgGraph$$Lambda/0x000075af8009fbd0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000075af8009bbf0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000075af8009e000": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000075af8009e240": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000075af8009eab8": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry$$Lambda/0x000075af80013500": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry$$Lambda/0x000075af80013740": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.BatchReplayer$$Lambda/0x000075af800ad958": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.BatchReplayer$$Lambda/0x000075af800adb98": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.BatchReplayer$$Lambda/0x000075af800ae1f0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.BatchReplayer$$Lambda/0x000075af800ae640": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000075af800aab00": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000075af800aad40": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000075af800aaf80": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000075af800ab1c0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000075af800ab400": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000075af800ab640": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000075af800abac8": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000075af800abd08": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000075af800abf48": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.solver.DataflowSolver$$Lambda/0x000075af800a1000": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.solver.SolverTopology$$Lambda/0x000075af800a1858": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.solver.SolverTopology$$Lambda/0x000075af800a1a78": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.structure.IndexBuilder$$Lambda/0x000075af800a6668": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.structure.IndexMetrics$Counter$$Lambda/0x000075af800a6228": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Execution$$Lambda/0x000075af800ac380": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Execution$$Lambda/0x000075af800ac5c0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Execution$$Lambda/0x000075af800ac800": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.values.ValueUniverse$$Lambda/0x000075af800af0c0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.values.ValuesTest$$Lambda/0x000075af800b4418": {
+              "instances": 1,
+              "shallow_bytes": 16
+            }
+          }
+        },
+        "released": {
+          "sha256": "1853c24317e381d17dfa4c56b7ef46f353df71a4e550f1807687c0e79d21c6ac",
+          "counts": {
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult$Status": {
+              "instances": 6,
+              "shallow_bytes": 144
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgTransition$Kind": {
+              "instances": 6,
+              "shallow_bytes": 144
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$Kind": {
+              "instances": 4,
+              "shallow_bytes": 96
+            },
+            "io.github.gustavo2358.analysis.structure.AnalysisSession$Status": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Status": {
+              "instances": 3,
+              "shallow_bytes": 72
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.query.ObservationBatch$QueryStatus": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.query.ObservationBatch$Status": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.solver.Direction": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesState": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.values.ValueFact$Reachability": {
+              "instances": 2,
+              "shallow_bytes": 48
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.solver.DataflowResult$Status": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.values.Candidates": {
+              "instances": 1,
+              "shallow_bytes": 24
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator$$Lambda/0x000075af80012e70": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator$$Lambda/0x000075af800130b0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CfgGraph$$Lambda/0x000075af8009fbd0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000075af8009bbf0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000075af8009e000": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000075af8009e240": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection$$Lambda/0x000075af8009eab8": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry$$Lambda/0x000075af80013500": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry$$Lambda/0x000075af80013740": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.BatchReplayer$$Lambda/0x000075af800ad958": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.BatchReplayer$$Lambda/0x000075af800adb98": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.BatchReplayer$$Lambda/0x000075af800ae1f0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.BatchReplayer$$Lambda/0x000075af800ae640": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000075af800aab00": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000075af800aad40": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000075af800aaf80": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000075af800ab1c0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000075af800ab400": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000075af800ab640": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000075af800abac8": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000075af800abd08": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.query.ProgramPoint$$Lambda/0x000075af800abf48": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.solver.DataflowSolver$$Lambda/0x000075af800a1000": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.solver.SolverTopology$$Lambda/0x000075af800a1858": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.solver.SolverTopology$$Lambda/0x000075af800a1a78": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.structure.IndexBuilder$$Lambda/0x000075af800a6668": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.structure.IndexMetrics$Counter$$Lambda/0x000075af800a6228": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Execution$$Lambda/0x000075af800ac380": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Execution$$Lambda/0x000075af800ac5c0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.values.PossibleValuesAnalysis$Execution$$Lambda/0x000075af800ac800": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.values.ValueUniverse$$Lambda/0x000075af800af0c0": {
+              "instances": 1,
+              "shallow_bytes": 16
+            },
+            "io.github.gustavo2358.analysis.values.ValuesTest$$Lambda/0x000075af800b4418": {
+              "instances": 1,
+              "shallow_bytes": 16
+            }
+          }
+        }
+      },
+      "exit": 0,
+      "elapsed_seconds": 4.233200943999691
+    }
+  ],
+  "files": {
+    "10000/GC.heap_info.txt": "31494576fabed0915fc1d1e4dfb66cf911f46726b734b899cbdf67fba8202b3e",
+    "10000/VM.flags.txt": "67d351b90e4f17cdb195c83001db7b3311a5251ccf7d1aa01342d548fddc2139",
+    "10000/VM.version.txt": "cfaf120e44c4c6cf6f8525711e07d25ac05357a7e83e1f0ee60017422430be11",
+    "10000/air_cfg.histogram.txt.gz": "27b47dcacea442735c43390badb80d3b4d52e25b7a074b5dcc2cda19d60fc4cb",
+    "10000/batch_only.histogram.txt.gz": "37f7521a82b1c97ed0f0878460e4ac0f1d0cff0fdae6456ada0b40f8f0714b9c",
+    "10000/gc.log.gz": "f57de033dd092f6bfeb2d9844e4b2656bea3b4983fcdb480fce54987c3e6252e",
+    "10000/jfr-summary.txt": "523d1c004e98df372703642bb6828efed2715720d880e515cdf4ab035055b651",
+    "10000/prepared.histogram.txt.gz": "95645e27bb46e5535df40cc76527a5698387ddf954f68f271d09a3b4f61aa918",
+    "10000/process.log": "8f303173c39577af05be00689bb3a8e3c3b98c3ec057ebfc34eaa0dda4d0c12a",
+    "10000/recording.jfr.gz": "cb00acd91f20d01e44bd3c0359e73e594c7bfe7c742cdbc262e09e6caa238678",
+    "10000/released.histogram.txt.gz": "8743c0cb63d1a5f9e724ef43818b844a89c135b3e21097a3b9afe4a5b17bc5a0",
+    "10000/solved.histogram.txt.gz": "fe5cd7762e659451b877e6772936433c32e76f29e4775ada5a01e1690007611a",
+    "20000/GC.heap_info.txt": "f3056a63c9a7278fd9c26acbbc63da44845292f0b7a506766bc714bdff455d7d",
+    "20000/VM.flags.txt": "b9687faa97a9bbd4653dac8f328e60da50681909de2a9636976d6a7ba9029f8f",
+    "20000/VM.version.txt": "ce662959f9a1a00b6bee904d7165cd9e37a89f2ba82f72a7ad046ca04e9064bb",
+    "20000/air_cfg.histogram.txt.gz": "b6d53acb90ffaec03abd827105ff8647344815527c7f363bd0eb361711c28f9b",
+    "20000/batch_only.histogram.txt.gz": "8c574dabc893bec2f02cb160e83706447a434d43e63ec5190ff571d5f3509868",
+    "20000/gc.log.gz": "e60b0535fc6a7d909b6c9ed746b88ec95f2ac841b432d32d044ab0c2876e98e4",
+    "20000/jfr-summary.txt": "6bb2c571b03a8282f3f93ae0d8364fca8f5a61ef9bb85361fc0c15bb6d0893e3",
+    "20000/prepared.histogram.txt.gz": "d62f0036d8193b2070de847da225960b70332e1118fa76ffcc2056c42ccb17a5",
+    "20000/process.log": "c5a8a2df138cec0588c805bb3b1a408cbafdbfa7d9fce53183a666b317292bc1",
+    "20000/recording.jfr.gz": "70a74e6bb2f592afbc172aa92929d112b7732fe0feeb4d1f0c6a18eb1166ed72",
+    "20000/released.histogram.txt.gz": "8af88865209283d9f1e57e78358565b3f3dfb46a8895a2d08d98ec21c3ecf2ec",
+    "20000/solved.histogram.txt.gz": "e135243675e4858b81680085d5c89adf8b8e067dc20a14f0927266b20bb179ad",
+    "200000/GC.heap_info.txt": "495f5a3fa193b9c9e701aafc420f68da25f98758c32defdf8e2647cdc2dc0835",
+    "200000/VM.flags.txt": "fe6a7f40f40167ab78ace6e9203c646bccfa9d85d3a52ca439141d09efe81e2e",
+    "200000/VM.version.txt": "da7b197bb7f5f3bf2afb76cd8bb2cd4015ee7ad1ff3249915741410981871f78",
+    "200000/air_cfg.histogram.txt.gz": "edb092ad80812972138e6db052274adaca42c77e8aacd55c16488cd93912115b",
+    "200000/batch_only.histogram.txt.gz": "1706e6dc978e8bd6fcfe8930c69f1372bd32debc20ecfd132df36a2b7b9d13d0",
+    "200000/gc.log.gz": "21ba6f446e3527b74b47a8cee3ae1d3f1e183f6d6a3adccd2310c41e2b09331b",
+    "200000/jfr-summary.txt": "6ab57a3ed342639731a3bd9d138b6d1207e9fa3432f3bc6978540a610b6777f7",
+    "200000/prepared.histogram.txt.gz": "e9f3f4f2529294f9c18039b785c76db38d7927c8bdcf4754eda494e7a1624d8b",
+    "200000/process.log": "26093a7ecc35626628264c662381a15853ab86e1f70d7a9ed1eda54e2f67db8a",
+    "200000/recording.jfr.gz": "5ff374ea82f7ba3940888f3e90aeea41eac485625772b7b6947d241765d2b298",
+    "200000/released.histogram.txt.gz": "bf5367c81e9c1cc9270cefbbeedc55028d87b953069563c656446efbf161b4e5",
+    "200000/solved.histogram.txt.gz": "c5d7bb5a5a41893ccd9652f8a335fbc4d819f4b77e84793e6ddcd40155bb798e",
+    "receipt.json": "b94be4ee04bd1a8c9904b77ab219ddd24530c9d4dc9125afe830b948191ca2db"
+  }
+}

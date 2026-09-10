@@ -1,0 +1,130 @@
+{
+  "schema": "w5-producer-build",
+  "before": {
+    "proleap-poc": {
+      "path": "/home/gustavo/workspace/teste-e2e/proleap-poc",
+      "head": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+      "branch": "main",
+      "status": ""
+    },
+    "cobol-lower": {
+      "path": "/home/gustavo/workspace/teste-e2e/cobol-lower",
+      "head": "2329993ce61b33fd7105759e211a1861ca6cb217",
+      "branch": "feat/lower-scalar-move",
+      "status": ""
+    }
+  },
+  "after": {
+    "proleap-poc": {
+      "path": "/home/gustavo/workspace/teste-e2e/proleap-poc",
+      "head": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+      "branch": "main",
+      "status": ""
+    },
+    "cobol-lower": {
+      "path": "/home/gustavo/workspace/teste-e2e/cobol-lower",
+      "head": "2329993ce61b33fd7105759e211a1861ca6cb217",
+      "branch": "feat/lower-scalar-move",
+      "status": ""
+    }
+  },
+  "commands": [
+    {
+      "argv": [
+        "mvn",
+        "-B",
+        "-ntp",
+        "clean",
+        "compile",
+        "org.apache.maven.plugins:maven-jar-plugin:3.4.2:jar",
+        "org.apache.maven.plugins:maven-dependency-plugin:3.8.1:build-classpath",
+        "-DincludeScope=runtime",
+        "-Dmdep.outputFile=/tmp/cp5-w5-binaries-sealed/frontend-classpath.txt"
+      ],
+      "cwd": "/tmp/cp5-w5-binaries-sealed/proleap-poc",
+      "exitCode": 0,
+      "log": "/tmp/cp5-w5-binaries-sealed/1-proleap-poc-build.log",
+      "logSha256": "f1b30e9780963c00126335a699c0a5fa85c585bf33dc2de11f755dae8e691690"
+    },
+    {
+      "argv": [
+        "mvn",
+        "-B",
+        "-ntp",
+        "clean",
+        "install",
+        "-DskipTests",
+        "-Dexec.skip=true"
+      ],
+      "cwd": "/tmp/cp5-w5-binaries-sealed/cobol-lower",
+      "exitCode": 0,
+      "log": "/tmp/cp5-w5-binaries-sealed/2-cobol-lower-build.log",
+      "logSha256": "9129a877a36aacac250764391df5a7a5ab883907a0cd39b9d2b2289cfce6d550"
+    },
+    {
+      "argv": [
+        "mvn",
+        "-B",
+        "-ntp",
+        "-pl",
+        "adapters",
+        "org.apache.maven.plugins:maven-dependency-plugin:3.8.1:build-classpath",
+        "-DincludeScope=runtime",
+        "-Dmdep.outputFile=/tmp/cp5-w5-binaries-sealed/lower-classpath.txt"
+      ],
+      "cwd": "/tmp/cp5-w5-binaries-sealed/cobol-lower",
+      "exitCode": 0,
+      "log": "/tmp/cp5-w5-binaries-sealed/3-cobol-lower-build.log",
+      "logSha256": "2bbcf080c0aeb36accbaa709736ac07b7482dc76c2079d714dbe49b46aa05c90"
+    }
+  ],
+  "javaVersion": "openjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)\n",
+  "frontend": {
+    "main": "io.github.gustavo2358.cobolexplorer.ExplorerMain",
+    "cwd": "/tmp/cp5-w5-binaries-sealed/proleap-poc",
+    "classpath": [
+      "/tmp/cp5-w5-binaries-sealed/proleap-poc/target/antlr-parse-tree-explorer-1.0.0-SNAPSHOT.jar",
+      "/tmp/cp5-w5-binaries-final-m2/org/antlr/antlr4-runtime/4.13.2/antlr4-runtime-4.13.2.jar",
+      "/tmp/cp5-w5-binaries-final-m2/org/slf4j/slf4j-api/2.0.18/slf4j-api-2.0.18.jar",
+      "/tmp/cp5-w5-binaries-final-m2/ch/qos/logback/logback-classic/1.6.3/logback-classic-1.6.3.jar",
+      "/tmp/cp5-w5-binaries-final-m2/ch/qos/logback/logback-core/1.6.3/logback-core-1.6.3.jar",
+      "/tmp/cp5-w5-binaries-final-m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar",
+      "/tmp/cp5-w5-binaries-final-m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar",
+      "/tmp/cp5-w5-binaries-final-m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar"
+    ],
+    "jars": {
+      "/tmp/cp5-w5-binaries-sealed/proleap-poc/target/antlr-parse-tree-explorer-1.0.0-SNAPSHOT.jar": "eb55e277426e0d894c5edce403b0344c4c4a5d5a2a276bde42563737aa986ee9",
+      "/tmp/cp5-w5-binaries-final-m2/org/antlr/antlr4-runtime/4.13.2/antlr4-runtime-4.13.2.jar": "dd3e8a13a2d669bf84fb8d834de35ce4875f27157698d206241ec8488aadcaf7",
+      "/tmp/cp5-w5-binaries-final-m2/org/slf4j/slf4j-api/2.0.18/slf4j-api-2.0.18.jar": "44508fd1576500688c790b190acdd16fec4f8c79a3e0b900afd70503cf055f55",
+      "/tmp/cp5-w5-binaries-final-m2/ch/qos/logback/logback-classic/1.6.3/logback-classic-1.6.3.jar": "beebede8db065fe1b72909ecc66bb49acda618901635d86c25fce14a5915e37e",
+      "/tmp/cp5-w5-binaries-final-m2/ch/qos/logback/logback-core/1.6.3/logback-core-1.6.3.jar": "a6967a28c8b086dee75a694d2f6fb8830c71153539866d7d8af065c9b6df91e0",
+      "/tmp/cp5-w5-binaries-final-m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar": "d0da14c12b16b5d54719aa172d83b542ff4abeb8b0fb7db476fde8ceece760ca",
+      "/tmp/cp5-w5-binaries-final-m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar": "21ddb598807d3a51a876704eb979d9296e1c6a6f47ab1826ff88c6d6a127a2d0",
+      "/tmp/cp5-w5-binaries-final-m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar": "ff167a6317be15895706c26668f45b898efe40ab8780970658210fe1393d52a6"
+    }
+  },
+  "lower": {
+    "main": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
+    "cwd": "/tmp/cp5-w5-binaries-sealed/cobol-lower",
+    "classpath": [
+      "/tmp/cp5-w5-binaries-sealed/cobol-lower/adapters/target/cobol-lower-adapters-0.1.0-SNAPSHOT.jar",
+      "/tmp/cp5-w5-binaries-final-m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar",
+      "/tmp/cp5-w5-binaries-final-m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar",
+      "/tmp/cp5-w5-binaries-final-m2/io/github/gustavo2358/cobol-lower-core/0.1.0-SNAPSHOT/cobol-lower-core-0.1.0-SNAPSHOT.jar",
+      "/tmp/cp5-w5-binaries-final-m2/com/dynatrace/hash4j/hash4j/0.30.0/hash4j-0.30.0.jar",
+      "/tmp/cp5-w5-binaries-final-m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar",
+      "/tmp/cp5-w5-binaries-final-m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar",
+      "/tmp/cp5-w5-binaries-final-m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar"
+    ],
+    "jars": {
+      "/tmp/cp5-w5-binaries-sealed/cobol-lower/adapters/target/cobol-lower-adapters-0.1.0-SNAPSHOT.jar": "6d268df76c0c77386d618a05cf0e8c31e277409f3757b78157d688d036913ef2",
+      "/tmp/cp5-w5-binaries-final-m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar": "3816358bbe1052e3dfc5674461ae998082323be38e48bc13567b2052a753e539",
+      "/tmp/cp5-w5-binaries-final-m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar": "1765d3ade2882f92dca9f588143b71928e7852c4ee39ecf922b8e846e21904dd",
+      "/tmp/cp5-w5-binaries-final-m2/io/github/gustavo2358/cobol-lower-core/0.1.0-SNAPSHOT/cobol-lower-core-0.1.0-SNAPSHOT.jar": "da75eafbac99a7b4568dec240af71576daa36c3e29623ac158df2cdd6f1cc4a9",
+      "/tmp/cp5-w5-binaries-final-m2/com/dynatrace/hash4j/hash4j/0.30.0/hash4j-0.30.0.jar": "d3224b113ea835ce3452097747e5209ec760cf443dbed770d6ba68a0d480178f",
+      "/tmp/cp5-w5-binaries-final-m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar": "d0da14c12b16b5d54719aa172d83b542ff4abeb8b0fb7db476fde8ceece760ca",
+      "/tmp/cp5-w5-binaries-final-m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar": "21ddb598807d3a51a876704eb979d9296e1c6a6f47ab1826ff88c6d6a127a2d0",
+      "/tmp/cp5-w5-binaries-final-m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar": "ff167a6317be15895706c26668f45b898efe40ab8780970658210fe1393d52a6"
+    }
+  }
+}

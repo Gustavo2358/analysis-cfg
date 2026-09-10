@@ -1,0 +1,12 @@
+{
+  "head": "7cf1b397b14c25b91489fb8e49faf65835f923d2",
+  "command": [
+    "bash",
+    "scripts/harness/check-full.sh"
+  ],
+  "exit": 3,
+  "elapsedSeconds": 207.07363383999473,
+  "log": "full.log.gz",
+  "rawSha256": "09fa250b747f58a79ff9bf41f7f1812d839af335f68690126ecfadc8394836dd",
+  "outcome": "UNAVAILABLE_W5"
+}

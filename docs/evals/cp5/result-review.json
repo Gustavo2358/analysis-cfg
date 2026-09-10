@@ -1,0 +1,8 @@
+{
+  "kind": "EXECUTED_W5_SNAPSHOT",
+  "scope": "Canonical CP4E fresh development run; not broad corpus qualification",
+  "result_file": "docs/evals/cp5/w5-prepared.snapshot.json",
+  "result_sha256": "aacb6e6cedbd7d1dbbd44e7a476b398df3eeff51f1a63b90257d4dc412705dec",
+  "historical_design": "docs/evals/cp5/history/result-review.json",
+  "provenance": "docs/work/evidence/WORK-CFG-028/wave-5/validation.md"
+}

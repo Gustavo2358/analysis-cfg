@@ -1,0 +1,455 @@
+{
+  "schema_version": 1,
+  "work_item": "WORK-CFG-028",
+  "backlog_id": "BACKLOG-CFG-020",
+  "branch": "feat/cp5-dataflow-engine",
+  "base_main": "ec525cbbad96d70c9663faa88e2672148fa8ee71",
+  "pr": {
+    "number": 12,
+    "url": "https://github.com/Gustavo2358/analysis-cfg/pull/12",
+    "state": "OPEN",
+    "draft": true,
+    "auto_merge": false
+  },
+  "current_checkpoint": "WAVE_5",
+  "harness_preparation": {
+    "status": "implemented",
+    "review": "APPROVED"
+  },
+  "authorized_wave": 5,
+  "last_human_approval": {
+    "date": "2026-09-09",
+    "source": "explicit user request for harness preparation",
+    "decision": "APPROVED_DISCOVERY_AND_HARNESS_PREPARATION_ONLY",
+    "approved": [
+      "H1",
+      "H2",
+      "H3",
+      "H4_PROPERTIES",
+      "H5",
+      "H6",
+      "H7",
+      "R1",
+      "R2"
+    ],
+    "implementation_candidates_not_frozen": [
+      "Patricia/radix",
+      "FIFO",
+      "k=8"
+    ],
+    "does_not_authorize_waves": true
+  },
+  "policy": {
+    "same_branch_same_pr": true,
+    "draft_until_explicit_human_change": true,
+    "human_review_between_waves": true,
+    "auto_start_next_wave": false,
+    "commits_per_wave": "unrestricted_focused",
+    "no_intermediate_merge_required": true
+  },
+  "waves": [
+    {
+      "wave": 1,
+      "title": "structural index/session",
+      "status": "APPROVED",
+      "authorization": "AUTHORIZED",
+      "requires_review_of": "CORE_SIZE_UNBOUNDED_REMEDIATION",
+      "approval_evidence": "docs/work/evidence/WORK-CFG-028/wave-1/authorization.json",
+      "completion_evidence": "docs/work/evidence/WORK-CFG-028/wave-1/validation.md",
+      "eval": "EVAL-CFG-034",
+      "reviewed_head": "b84389b6ccf94c259774b82a99bc7296278b65c0"
+    },
+    {
+      "wave": 2,
+      "title": "generic incremental solver",
+      "status": "APPROVED",
+      "authorization": "AUTHORIZED",
+      "requires_review_of": "WAVE_1",
+      "approval_evidence": "docs/work/evidence/WORK-CFG-028/wave-2/authorization.json",
+      "completion_evidence": "docs/work/evidence/WORK-CFG-028/wave-2/validation.md",
+      "eval": "EVAL-CFG-035",
+      "reviewed_head": "0202c7424db04a1d83fb5e35fce055ea81f5b8fa"
+    },
+    {
+      "wave": 3,
+      "title": "PossibleValues/state/queries",
+      "status": "APPROVED",
+      "authorization": "AUTHORIZED",
+      "requires_review_of": "WAVE_2",
+      "approval_evidence": "docs/work/evidence/WORK-CFG-028/wave-3/authorization.json",
+      "completion_evidence": "docs/work/evidence/WORK-CFG-028/wave-3/review-f1-f2/validation.md",
+      "eval": "EVAL-CFG-036",
+      "reviewed_head": "855628200fba3851493991cec869dee899e82299"
+    },
+    {
+      "wave": 4,
+      "title": "shared planning/consumers",
+      "status": "APPROVED",
+      "authorization": "AUTHORIZED",
+      "requires_review_of": "WAVE_3",
+      "approval_evidence": "docs/work/evidence/WORK-CFG-028/wave-4/authorization.json",
+      "completion_evidence": "docs/work/evidence/WORK-CFG-028/wave-4/review-f1/validation.md",
+      "eval": "EVAL-CFG-037",
+      "reviewed_head": "21d65d08512f1fb8a945009c2919946a61566eed"
+    },
+    {
+      "wave": 5,
+      "title": "production/E2E",
+      "status": "IMPLEMENTED",
+      "authorization": "AUTHORIZED",
+      "requires_review_of": "WAVE_4",
+      "approval_evidence": "docs/work/evidence/WORK-CFG-028/wave-5/authorization.json",
+      "completion_evidence": "docs/work/evidence/WORK-CFG-028/wave-5/validation.md",
+      "eval": "EVAL-CFG-038"
+    }
+  ],
+  "evidence": "docs/work/evidence/WORK-CFG-028/validation.md",
+  "exact_head_policy": "Record PR head/base, actual checkout, both trees, run ID/event/conclusion; distinguish exact commit checkout, equivalent source tree, and different/stale source. Final receipt on same PR avoids self-referential commit SHA.",
+  "last_human_review": {
+    "date": "2026-09-09",
+    "source": "explicit user review of PR #12",
+    "reviewed_head": "6675b1f9ff9d11e8f405f6dcf49c5acb0096346a",
+    "decision": "REQUEST_CHANGES",
+    "blockers": [
+      "B1"
+    ],
+    "scope": "Per-query outcome and mixed-batch result contract only; other preparation architecture approved.",
+    "nonblocking_findings": [
+      "CP5-F01"
+    ],
+    "does_not_authorize_waves": true,
+    "correction_evidence": "docs/work/evidence/WORK-CFG-028/review-b1/validation.md"
+  },
+  "review_history": [
+    {
+      "date": "2026-09-09",
+      "source": "explicit user post-audit remediation request",
+      "discovery": "APPROVED",
+      "harness_preparation": "APPROVED",
+      "B1": "APPROVED",
+      "CP5-F01": "NONBLOCKING_FOLLOW_UP_W1",
+      "authorized_wave": null
+    },
+    {
+      "date": "2026-09-09",
+      "source": "explicit human review of post-audit PR #12",
+      "reviewed_head": "e053f14f8f5dc7b0b80b7bbbe015fde684522835",
+      "decision": "REQUEST_CHANGES_F_ONLY",
+      "approved_remediations": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "G",
+        "H",
+        "I"
+      ],
+      "requested_changes": [
+        "F1",
+        "F2",
+        "F3"
+      ],
+      "CP5-F01": "NONBLOCKING_FOLLOW_UP_W1",
+      "authorized_wave": null
+    },
+    {
+      "date": "2026-09-09",
+      "source": "explicit human approval in core size-unbounded remediation request",
+      "reviewed_head": "e86a57c1f744bd499dd47326ebcb84d23c61ab2d",
+      "decision": "POST_AUDIT_REMEDIATION_APPROVED",
+      "approved_remediations": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F1",
+        "F2",
+        "F3",
+        "G",
+        "H",
+        "I"
+      ],
+      "CP5-F01": "NONBLOCKING_FOLLOW_UP_W1",
+      "authorized_wave": null
+    },
+    {
+      "date": "2026-09-09",
+      "source": "explicit human CORE SIZE-UNBOUNDED decision after approved HEAD",
+      "decision": "CORE_SIZE_UNBOUNDED_AUTHORIZED_FOR_HARNESS_REMEDIATION_ONLY",
+      "decision_id": "CORE-SIZE-001",
+      "supersedes": "capacity-based admission, resource outcomes and candidate caps only",
+      "authorized_wave": null
+    },
+    {
+      "date": "2026-09-09",
+      "source": "explicit human authorization to start W1 after CORE-SIZE-001 approval",
+      "reviewed_head": "4aeb4c0ad086ec4fc8911879b13139d84ca57bc9",
+      "decision": "CORE_SIZE_UNBOUNDED_REMEDIATION_APPROVED_AND_WAVE_1_AUTHORIZED",
+      "CORE_SIZE_UNBOUNDED_REMEDIATION": "APPROVED",
+      "approved": [
+        "Discovery",
+        "Harness preparation",
+        "B1",
+        "Post-audit A–I",
+        "F1/F2/F3",
+        "CORE-SIZE-001 / ADR-0014"
+      ],
+      "authorized_wave": 1,
+      "current_checkpoint": "WAVE_1",
+      "scope": "structural index / analysis session and focal CP5-F01 correction only",
+      "evidence": "docs/work/evidence/WORK-CFG-028/wave-1/authorization.json"
+    },
+    {
+      "date": "2026-09-09",
+      "source": "explicit human request authorizing CP5 W2 in PR #12",
+      "reviewed_head": "b84389b6ccf94c259774b82a99bc7296278b65c0",
+      "decision": "WAVE_1_APPROVED_AND_WAVE_2_AUTHORIZED",
+      "W1": "APPROVED",
+      "authorized_wave": 2,
+      "current_checkpoint": "WAVE_2",
+      "scope": "generic incremental direction-aware solver, synthetic oracles, W2 gates and evidence; commits/push/CI in same draft PR #12",
+      "evidence": "docs/work/evidence/WORK-CFG-028/wave-2/authorization.json",
+      "not_authorized": [
+        "WAVE_3",
+        "WAVE_4",
+        "WAVE_5"
+      ]
+    },
+    {
+      "date": "2026-09-09",
+      "source": "explicit human request authorizing CP5 W3 in PR #12",
+      "reviewed_head": "0202c7424db04a1d83fb5e35fce055ea81f5b8fa",
+      "decision": "WAVE_2_APPROVED_AND_WAVE_3_AUTHORIZED",
+      "W2": "APPROVED",
+      "authorized_wave": 3,
+      "current_checkpoint": "WAVE_3",
+      "scope": "PossibleValues scalar text profile, sparse state, generic direction-aware batched point observations, W3 gates/evidence; commits/push/final CI in same draft PR #12",
+      "evidence": "docs/work/evidence/WORK-CFG-028/wave-3/authorization.json",
+      "not_authorized": [
+        "WAVE_4",
+        "WAVE_5"
+      ]
+    },
+    {
+      "date": "2026-09-09",
+      "source": "explicit human review and focal remediation request",
+      "reviewed_head": "8cb55b86c83644e4727cc532787a518775d7e868",
+      "decision": "REQUEST_CHANGES",
+      "blockers": [
+        "W3-F1",
+        "W3-F2"
+      ],
+      "preserved": [
+        "W1",
+        "W2",
+        "CORE-SIZE-001",
+        "AVL",
+        "sparse state",
+        "solver",
+        "batching",
+        "replay"
+      ],
+      "scope": "candidate support/origin/premises and EntryState/same-Cell source uncertainty; same draft PR #12, no W4/W5",
+      "authorized_wave": 3,
+      "evidence": "docs/work/evidence/WORK-CFG-028/wave-3/review-f1-f2/review.json"
+    },
+    {
+      "date": "2026-09-09",
+      "source": "explicit human request authorizing CP5 Wave 4 in same draft PR #12",
+      "reviewed_head": "855628200fba3851493991cec869dee899e82299",
+      "decision": "WAVE_3_APPROVED_AND_WAVE_4_AUTHORIZED",
+      "W3": "APPROVED",
+      "resolved_findings": [
+        "W3-F1",
+        "W3-F2"
+      ],
+      "nonblocking_follow_ups": [
+        "W3-PERF-01",
+        "W3-METRICS-01"
+      ],
+      "authorized_wave": 4,
+      "current_checkpoint": "WAVE_4",
+      "scope": "generic shared planning/providers/consumers/FactSink and in-memory composition; tests, gates, evidence, commits/push/final CI",
+      "not_authorized": [
+        "WAVE_5",
+        "siblings",
+        "domain resolvers",
+        "dataflow writer/CLI"
+      ],
+      "evidence": "docs/work/evidence/WORK-CFG-028/wave-4/authorization.json"
+    },
+    {
+      "date": "2026-09-10",
+      "source": "explicit human review of exact W4 HEAD",
+      "reviewed_head": "330d63427c0905e8ef140924b643e9fb012c73de",
+      "decision": "REQUEST_CHANGES",
+      "blockers": [
+        "W4-F1"
+      ],
+      "scope": "Site-derived observation declarations must register their batch binding independently of matched sites; no empty-request sentinel. Empty declared batch uses existing W3 COMPLETE semantics. Focal planning correction, tests/challenge/gates/evidence; existing same-PR commits/push/CI authorization continues.",
+      "accepted": [
+        "AnalysisKey",
+        "run cache",
+        "W4-BINDING-01",
+        "F3",
+        "FactSink",
+        "S5/S6/S8/S14/S15/S16",
+        "W1/W2/W3",
+        "CORE-SIZE-001",
+        "AnalysisSession.selectEntries"
+      ],
+      "remaining_nonblocking": [
+        "W3-PERF-01",
+        "W3-METRICS-01"
+      ],
+      "authorized_wave": 4,
+      "not_authorized": [
+        "WAVE_5",
+        "domain resolvers",
+        "writer/CLI",
+        "siblings",
+        "repin"
+      ],
+      "evidence": "docs/work/evidence/WORK-CFG-028/wave-4/review-f1/review.json"
+    },
+    {
+      "date": "2026-09-10",
+      "source": "explicit human request authorizing final CP5 Wave 5 in same draft PR #12",
+      "reviewed_head": "21d65d08512f1fb8a945009c2919946a61566eed",
+      "decision": "WAVE_4_APPROVED_AND_WAVE_5_AUTHORIZED",
+      "W4": "APPROVED",
+      "resolved_findings": [
+        "W4-F1",
+        "W4-BINDING-01"
+      ],
+      "nonblocking_follow_ups": [
+        "W3-PERF-01",
+        "W3-METRICS-01"
+      ],
+      "authorized_wave": 5,
+      "current_checkpoint": "WAVE_5",
+      "scope": "Production composition, generic write observation plan, versioned result wire/parser, deterministic local writer/external receipt, separate CLI, real fresh CP4E twice and CP3 E2Es using siblings read-only; tests, harness, evidence, commits/push and final HEAD CI. Local W5 input adapter may omit legacy pre-read cap.",
+      "not_authorized": [
+        "CP6",
+        "domain resolvers",
+        "sibling changes",
+        "repin",
+        "merge",
+        "ready",
+        "auto-merge"
+      ],
+      "evidence": "docs/work/evidence/WORK-CFG-028/wave-5/authorization.json",
+      "request_sha256": "4f0f0656f0220982dbe7540812d2a15cd10173aa504e4e1de4717b24f168a746"
+    }
+  ],
+  "audit_remediation": {
+    "decision": "KEEP_ARCHITECTURE_WITH_FOCUSED_REMEDIATIONS",
+    "authorization": "HARNESS_REMEDIATION_ONLY",
+    "review": "AWAITING_HUMAN_REVIEW",
+    "start_head": "feb79d59cc72d7dbc6269b7cacfb74db58f90867",
+    "audit_sha256": "32d4542adcf31445cf35196a5f6d2496e8e3962c0bfa9d10c26615f6ceea5bc1",
+    "evidence": "docs/work/evidence/WORK-CFG-028/architectural-audit-remediation/validation.md"
+  },
+  "f_correction": {
+    "reviewed_head": "e053f14f8f5dc7b0b80b7bbbe015fde684522835",
+    "authorization": "F1_F2_F3_ONLY",
+    "review": "AWAITING_HUMAN_REVIEW",
+    "evidence": "docs/work/evidence/WORK-CFG-028/review-f/validation.md"
+  },
+  "core_size_remediation": {
+    "decision": "CORE-SIZE-001",
+    "adr": "ADR-0014",
+    "authorization": "AUTHORIZED_FOR_HARNESS_REMEDIATION_ONLY",
+    "review": "AWAITING_HUMAN_REVIEW",
+    "approved_post_audit_head": "e86a57c1f744bd499dd47326ebcb84d23c61ab2d",
+    "implementation_candidates": [
+      "Patricia/radix",
+      "FIFO"
+    ],
+    "evidence": "docs/work/evidence/WORK-CFG-028/core-size-unbounded/validation.md"
+  },
+  "wave_1": {
+    "authorization": "docs/work/evidence/WORK-CFG-028/wave-1/authorization.json",
+    "review": "APPROVED",
+    "evidence": "docs/work/evidence/WORK-CFG-028/wave-1/",
+    "validated_implementation_head": "318181c072710f89ac58c2bd387c1645de434cd6",
+    "initial_remote_ci": "docs/work/evidence/WORK-CFG-028/wave-1/initial-remote-ci/receipt.json",
+    "reviewed_head": "b84389b6ccf94c259774b82a99bc7296278b65c0"
+  },
+  "wave_2": {
+    "authorization": "docs/work/evidence/WORK-CFG-028/wave-2/authorization.json",
+    "review": "APPROVED",
+    "evidence": "docs/work/evidence/WORK-CFG-028/wave-2/",
+    "validated_implementation_head": "70ff8663d1d46f765354fbabce45216e8f9b1316",
+    "final_remote_ci": "Same draft PR #12 final receipt; .harness-results/WORK-CFG-028/wave-2/remote-ci.json",
+    "reviewed_head": "0202c7424db04a1d83fb5e35fce055ea81f5b8fa"
+  },
+  "wave_3": {
+    "authorization": "docs/work/evidence/WORK-CFG-028/wave-3/authorization.json",
+    "review": "APPROVED",
+    "evidence": "docs/work/evidence/WORK-CFG-028/wave-3/",
+    "validated_implementation_head": "327737be23ab619ae212f46689a5043884f50da4",
+    "final_remote_ci": "Same draft PR #12 final receipt; .harness-results/WORK-CFG-028/wave-3/remote-ci.json",
+    "remediation": {
+      "reviewed_head": "8cb55b86c83644e4727cc532787a518775d7e868",
+      "status": "IMPLEMENTED",
+      "blockers": [
+        "W3-F1",
+        "W3-F2"
+      ],
+      "review_evidence": "docs/work/evidence/WORK-CFG-028/wave-3/review-f1-f2/review.json",
+      "completion_evidence": "docs/work/evidence/WORK-CFG-028/wave-3/review-f1-f2/validation.md",
+      "validated_implementation_head": "74331d7b92644e2f5193ad37d3a7f2015116b0b1",
+      "final_remote_ci": "Same draft PR #12 final remediation receipt; .harness-results/WORK-CFG-028/wave-3/review-f1-f2/remote-ci.json",
+      "findings_resolution": {
+        "W3-F1": "RESOLVED",
+        "W3-F2": "RESOLVED",
+        "approved_head": "855628200fba3851493991cec869dee899e82299"
+      }
+    },
+    "reviewed_head": "855628200fba3851493991cec869dee899e82299"
+  },
+  "wave_4": {
+    "authorization": "docs/work/evidence/WORK-CFG-028/wave-4/authorization.json",
+    "review": "APPROVED",
+    "evidence": "docs/work/evidence/WORK-CFG-028/wave-4/",
+    "validated_implementation_head": "bad1b9a3785f22d21bd732143e54f82c6e632819",
+    "final_remote_ci": "Same draft PR #12 final receipt; .harness-results/WORK-CFG-028/wave-4/remote-ci.json",
+    "binding_finding": {
+      "W4-BINDING-01": "RESOLVED",
+      "wave_review": "APPROVED",
+      "evidence": "docs/work/evidence/WORK-CFG-028/wave-4/validation.md"
+    },
+    "remediation": {
+      "reviewed_head": "330d63427c0905e8ef140924b643e9fb012c73de",
+      "status": "IMPLEMENTED",
+      "blockers": [
+        "W4-F1"
+      ],
+      "review_evidence": "docs/work/evidence/WORK-CFG-028/wave-4/review-f1/review.json",
+      "completion_evidence": "docs/work/evidence/WORK-CFG-028/wave-4/review-f1/validation.md",
+      "validated_implementation_head": "7cf1b397b14c25b91489fb8e49faf65835f923d2",
+      "final_remote_ci": "Same draft PR #12 final W4-F1 receipt; .harness-results/WORK-CFG-028/wave-4/review-f1/remote-ci.json",
+      "findings_resolution": {
+        "W4-F1": "RESOLVED",
+        "W4-BINDING-01": "RESOLVED",
+        "approved_head": "21d65d08512f1fb8a945009c2919946a61566eed"
+      }
+    },
+    "reviewed_head": "21d65d08512f1fb8a945009c2919946a61566eed"
+  },
+  "wave_5": {
+    "authorization": "docs/work/evidence/WORK-CFG-028/wave-5/authorization.json",
+    "review": "AWAITING_HUMAN_REVIEW",
+    "evidence": "docs/work/evidence/WORK-CFG-028/wave-5/",
+    "final_remote_ci": "Final HEAD receipt published as a comment on the same draft PR #12 after source/evidence commits and final push; no self-referential evidence commit.",
+    "validated_implementation_head": "e4e3eb2d337a146c3984385001349868d386952e"
+  },
+  "cp6": {
+    "status": "NOT_STARTED",
+    "authorization": "NOT_AUTHORIZED"
+  },
+  "cp5_status": "AWAITING_FINAL_HUMAN_REVIEW"
+}

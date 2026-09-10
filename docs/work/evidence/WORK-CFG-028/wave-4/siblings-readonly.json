@@ -1,0 +1,30 @@
+{
+  "scope": "Read-only end-of-implementation inventory. No sibling modifications or builds performed by this W4 task; existing local state preserved. Only analysis-cfg is a write target.",
+  "repositories": {
+    "proleap-poc": {
+      "head": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+      "status": "",
+      "remote": "origin\tgit@github.com:Gustavo2358/proleap-poc.git (fetch)\norigin\tgit@github.com:Gustavo2358/proleap-poc.git (push)"
+    },
+    "cobol-lower": {
+      "head": "2329993ce61b33fd7105759e211a1861ca6cb217",
+      "status": "",
+      "remote": "origin\tgit@github.com:Gustavo2358/cobol-lower.git (fetch)\norigin\tgit@github.com:Gustavo2358/cobol-lower.git (push)"
+    },
+    "air-java": {
+      "head": "17029898fd0ee8fabcaaae89f7260148633d4b12",
+      "status": "",
+      "remote": "origin\tgit@github.com:Gustavo2358/air-java.git (fetch)\norigin\tgit@github.com:Gustavo2358/air-java.git (push)"
+    },
+    "analysis-ir": {
+      "head": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+      "status": "",
+      "remote": "origin\tgit@github.com:Gustavo2358/analysis-ir.git (fetch)\norigin\tgit@github.com:Gustavo2358/analysis-ir.git (push)"
+    },
+    "artefatos-e2e": {
+      "head": "2484b76f9174a79ea702f17453f04955cd46a755",
+      "status": "?? checkpoint-4e/\n?? cp5/",
+      "remote": ""
+    }
+  }
+}

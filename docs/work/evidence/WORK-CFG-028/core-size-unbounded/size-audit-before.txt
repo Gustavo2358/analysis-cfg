@@ -1,0 +1,209 @@
+cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirInputLimitException.java:8:    private final int maximumDocumentBytes;
+cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirInputLimitException.java:10:    public AirInputLimitException(int maximumDocumentBytes) {
+cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirInputLimitException.java:11:        super("AIR file exceeds maximumDocumentBytes=" + maximumDocumentBytes);
+cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirInputLimitException.java:12:        this.maximumDocumentBytes = maximumDocumentBytes;
+cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirInputLimitException.java:15:    public int maximumDocumentBytes() { return maximumDocumentBytes; }
+docs/evals/cp5/metrics.json:4:  "overflow": "phase-local LIMIT with explicit reason; never wrap; only solver budget becomes ANALYSIS_LIMIT",
+docs/evals/cp5/metrics.json:214:      "name": "maxWorklistSize",
+docs/evals/cp5/metrics.json:326:      "event": "transition to Saturated, not subsequent already-saturated joins",
+docs/evals/cp5/metrics.json:427:      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, profile and budgets; no inferred zero when unavailable."
+docs/evals/cp5/metrics.json:436:      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, profile and budgets; no inferred zero when unavailable."
+docs/evals/cp5/metrics.json:445:      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, profile and budgets; no inferred zero when unavailable."
+docs/evals/cp5/metrics.json:454:      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, profile and budgets; no inferred zero when unavailable."
+docs/evals/cp5/metrics.json:463:      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, profile and budgets; no inferred zero when unavailable."
+docs/evals/cp5/metrics.json:472:      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, profile and budgets; no inferred zero when unavailable."
+docs/evals/cp5/metrics.json:481:      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, profile and budgets; no inferred zero when unavailable."
+docs/evals/cp5/metrics.json:490:      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, profile and budgets; no inferred zero when unavailable."
+docs/evals/cp5/metrics.json:499:      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, profile and budgets; no inferred zero when unavailable."
+docs/evals/cp5/metrics.json:506:      "event": "analysis phases ending at resource limit",
+docs/evals/cp5/metrics.json:508:      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, profile and budgets; no inferred zero when unavailable."
+docs/evals/cp5/metrics.json:515:      "event": "observation batches ending at resource limit",
+docs/evals/cp5/metrics.json:517:      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, profile and budgets; no inferred zero when unavailable."
+docs/evals/cp5/metrics.json:524:      "event": "consumer instances ending FAILED or LIMIT",
+docs/evals/cp5/metrics.json:526:      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, profile and budgets; no inferred zero when unavailable."
+docs/evals/cp5/metrics.json:533:      "event": "publication attempts ending FAILED or LIMIT",
+docs/evals/cp5/metrics.json:535:      "audit": "Independent request/consumer plan and completed phase reports; compare same corpus, profile and budgets; no inferred zero when unavailable."
+scripts/project/check_transport_architecture.py:56:    if "return codec.decode(bytes);" not in text or "readNBytes(limits.maximumDocumentBytes())" not in text:
+cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonException.java:3:/** Expected CFG transport rejection, including output limit and unrepresentable UTF-16 input. */
+cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirJsonFileReader.java:27:            bytes = input.readNBytes(limits.maximumDocumentBytes());
+cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirJsonFileReader.java:29:            if (input.read() != -1) throw new AirInputLimitException(limits.maximumDocumentBytes());
+scripts/harness/cp5_phase_contract.py:7:EXECUTION_STATUSES = {'STABLE', 'ADMISSION_LIMIT', 'ANALYSIS_LIMIT', 'UNSUPPORTED', 'INVALID_INPUT'}
+scripts/harness/cp5_phase_contract.py:22:    needs_reason = row['status'] in {'REJECTED','LIMIT','FAILED'} or (consumer and row['status'] == 'NOT_STARTED')
+scripts/harness/cp5_phase_contract.py:33:        check_phase(c['admission'], {'COMPLETE','REJECTED','LIMIT'}, require)
+scripts/harness/cp5_phase_contract.py:34:        check_phase(c['analysis'], {'STABLE','LIMIT','NOT_STARTED'}, require)
+scripts/harness/cp5_phase_contract.py:35:        check_phase(c['observation'], {'COMPLETE','LIMIT','FAILED','NOT_STARTED'}, require)
+scripts/harness/cp5_phase_contract.py:38:        admission = {'STABLE':'COMPLETE','ANALYSIS_LIMIT':'COMPLETE',
+scripts/harness/cp5_phase_contract.py:39:                     'ADMISSION_LIMIT':'LIMIT','UNSUPPORTED':'REJECTED','INVALID_INPUT':'REJECTED'}[status]
+scripts/harness/cp5_phase_contract.py:40:        analysis = {'STABLE':'STABLE','ANALYSIS_LIMIT':'LIMIT','ADMISSION_LIMIT':'NOT_STARTED',
+scripts/harness/cp5_phase_contract.py:42:        require(c['admission']['status'] == admission, 'admission LIMIT differs from UNSUPPORTED/INVALID_INPUT')
+scripts/harness/cp5_phase_contract.py:44:        if status in {'ADMISSION_LIMIT','ANALYSIS_LIMIT'}:
+scripts/harness/cp5_phase_contract.py:45:            phase = 'admission' if status == 'ADMISSION_LIMIT' else 'analysis'
+scripts/harness/cp5_phase_contract.py:46:            require(c[phase]['reason'] == result['limitReason'], 'limit reason belongs to ' + phase)
+scripts/harness/cp5_phase_contract.py:48:            require(result['limitReason'] is None, 'no run resource limit on stable/unsupported/invalid input')
+scripts/harness/cp5_phase_contract.py:49:        if c['admission']['reason'] == 'ADMISSION_BUDGET':
+scripts/harness/cp5_phase_contract.py:50:            require(status == 'ADMISSION_LIMIT' and admission == 'LIMIT', 'ADMISSION_BUDGET is never UNSUPPORTED')
+scripts/harness/cp5_phase_contract.py:106:            check_phase(consumer, {'COMPLETE','LIMIT','FAILED','NOT_STARTED'}, require, True)
+scripts/harness/cp5_phase_contract.py:142:            require(receipt['status'] in {'FAILED','LIMIT'}, 'COMPLETE requires payload hash')
+scripts/harness/cp5_phase_contract.py:149:        check_phase({k:receipt[k] for k in ['status','reason']}, {'COMPLETE','FAILED','LIMIT'}, require)
+scripts/harness/cp5_phase_contract.py:151:            require(observed_delivery_status in {'COMPLETE','FAILED','LIMIT'} and receipt['status'] == observed_delivery_status, 'independent delivery outcome')
+scripts/harness/test_cp5_harness.py:81:            (lambda x:x['quality'].update(thresholds={'resolve_percent':95}), 'quality unmeasured/no threshold')]:
+scripts/harness/test_cp5_harness.py:95:        result['completion']['observation'] = {'status':'LIMIT','reason':'observation budget'}
+scripts/harness/test_cp5_harness.py:111:        self.edit(PLAN+'result-contract.json',lambda x:x['completion']['admission_statuses'].remove('LIMIT'))
+scripts/harness/test_cp5_harness.py:160:        self.edit(LIFECYCLE,lambda x:x['last_human_approval']['implementation_candidates_not_frozen'].remove('k=8'))
+scripts/harness/test_cp5_harness.py:343:        result.update(executionStatus=status, observations=[], limitReason='WORK_BUDGET' if status == 'ANALYSIS_LIMIT' else None)
+scripts/harness/test_cp5_harness.py:344:        result['completion'].update(admission={'status':'COMPLETE','reason':None} if status == 'ANALYSIS_LIMIT' else {'status':'REJECTED','reason':'profile or input rejected'},
+scripts/harness/test_cp5_harness.py:345:            analysis={'status':'LIMIT','reason':'WORK_BUDGET'} if status == 'ANALYSIS_LIMIT' else {'status':'NOT_STARTED','reason':None},
+scripts/harness/test_cp5_harness.py:362:            for status in ['LIMIT','FAILED']:
+scripts/harness/test_cp5_harness.py:370:                    result['executionStatus'] = 'ANALYSIS_LIMIT'
+scripts/harness/test_cp5_harness.py:380:                       {'observation':{'status':'LIMIT','reason':None}}, {'consumers':[]}]:
+scripts/harness/test_cp5_harness.py:385:    def test_f1_admission_limit_is_not_unsupported(self):
+scripts/harness/test_cp5_harness.py:387:        result.update(executionStatus='ADMISSION_LIMIT',limitReason='ADMISSION_BUDGET',observations=[])
+scripts/harness/test_cp5_harness.py:388:        result['completion'] = {'admission':{'status':'LIMIT','reason':'ADMISSION_BUDGET'},
+scripts/harness/test_cp5_harness.py:395:        self.assertTrue(any('ADMISSION_BUDGET is never UNSUPPORTED' in e for e in validate_result(result)))
+scripts/harness/test_cp5_harness.py:495:        for status in ['ANALYSIS_LIMIT', 'UNSUPPORTED', 'INVALID_INPUT']:
+scripts/harness/test_cp5_harness.py:501:        for kind in ['unknown','unreachable','saturated','limit']:
+scripts/harness/test_cp5_harness.py:509:            elif kind=='saturated':
+scripts/harness/test_cp5_harness.py:510:                obs['value'].update(kind='Saturated',enumerated=[],modelValueRemainder=True,saturationReason='CARDINALITY_LIMIT')
+scripts/harness/test_cp5_harness.py:513:                self.rejected_run(result, 'ANALYSIS_LIMIT')
+scripts/harness/test_cp5_harness.py:534:        self.example['limitReason']='WORK_BUDGET'
+scripts/harness/test_cp5_harness.py:535:        self.assertTrue(any('budget limit' in e for e in validate_result(self.example)))
+scripts/harness/test_cp5_harness.py:536:        self.example['executionStatus']='ANALYSIS_LIMIT'
+scripts/harness/test_cp5_harness.py:540:        self.example['observations'][0]['value']['kind']='Saturated'
+scripts/harness/test_cp5_harness.py:606:        for status in ['FAILED','LIMIT','COMPLETE']:
+scripts/harness/test_cp5_harness.py:608:                     'destination':'review://prepared.json','status':status,'reason':None if status=='COMPLETE' else 'WRITE_BUDGET_OR_IO'}
+scripts/harness/cache_ir.py:66:                    raise ValueError('source exceeds conservative transfer limit: ' + str(rel))
+scripts/harness/validate_cp5.py:24:    'missing-key-as-bottom': 3, 'unbounded-values': 3, 'silent-truncation': 3,
+scripts/harness/validate_cp5.py:40:maxWorklistSize joinEntriesVisited stateCompareEntries stateAllocations stateBytesAllocated
+scripts/harness/validate_cp5.py:83:        k = key['options']['maxCandidates']
+scripts/harness/validate_cp5.py:85:        require('resourceBudgets' in key['options'], 'explicit resource budgets')
+scripts/harness/validate_cp5.py:103:        require((status in {'ADMISSION_LIMIT','ANALYSIS_LIMIT'}) == (result['limitReason'] is not None), 'budget limit distinct from stable/saturation')
+scripts/harness/validate_cp5.py:140:                require(value['kind'] in {'Candidates','Saturated'}, 'value kind')
+scripts/harness/validate_cp5.py:141:                if value['kind'] == 'Saturated':
+scripts/harness/validate_cp5.py:142:                    require(value['modelValueRemainder'] and value['saturationReason'] == 'CARDINALITY_LIMIT', 'saturation must expose limit and remainder')
+scripts/harness/validate_cp5.py:182:        require(set(approval['implementation_candidates_not_frozen']) == {'Patricia/radix','FIFO','k=8'}, 'implementation-neutral H4')
+scripts/harness/validate_cp5.py:256:        require(contract['schema_version'] == 1 and contract['status'] == 'REVIEW_SNAPSHOT_NOT_CODEC' and contract['schema'] == 'analysis-dataflow-result' and contract['version'] == '1.0.0' and set(contract['execution_statuses']) == phases.EXECUTION_STATUSES and set(contract['value_kinds']) == {'Candidates','Saturated'} and set(contract['reachability']) == {'REACHABLE','UNREACHABLE_IN_MODEL'}, 'result contract status/schema')
+scripts/harness/validate_cp5.py:261:        require(contract['completion']['admission_statuses'] == ['COMPLETE','REJECTED','LIMIT'] and contract['completion']['delivery_statuses'] == ['COMPLETE','FAILED','LIMIT'], 'F admission/delivery status contract')
+cfg-launcher/src/main/java/io/github/gustavo2358/analysis/cfg/launcher/AnalysisCfg.java:38:        catch (AirInputLimitException limit) {
+cfg-launcher/src/main/java/io/github/gustavo2358/analysis/cfg/launcher/AnalysisCfg.java:39:            err.println("AIR IMPLEMENTATION_LIMIT path=$ maximumDocumentBytes=" + limit.maximumDocumentBytes());
+docs/work/active/WORK-CFG-028/eval.md:14:resultado PARTIAL sem resto efetivo; confundir limit/saturation/unreachable; hook
+docs/work/active/WORK-CFG-028/eval.md:35:F1: ADMISSION_LIMIT aceito e UNSUPPORTED rejeitado para admission budget.
+docs/work/active/WORK-CFG-028/eval.md:38:F3: StructuralConsumer COMPLETE + QueryConsumer bloqueado por batch LIMIT;
+docs/work/active/WORK-CFG-028/spec.md:32:Corrigir somente F1 (admission LIMIT), F2 (DeliveryReceipt externo) e F3
+docs/evals/cp5/post-audit-contracts.json:91:        "ADMISSION_LIMIT_IS_NOT_UNSUPPORTED",
+docs/evals/cp5/post-audit-contracts.json:128:        "SAME_CORPUS_PROFILE_BUDGETS",
+docs/evals/cp5/post-audit-contracts.json:129:        "NO_UNJUSTIFIED_QUALITY_THRESHOLD"
+docs/evals/cp5/post-audit-contracts.json:198:    "thresholds": null,
+docs/evals/cp5/phase-review.json:21:              "maxCandidates": 2,
+docs/evals/cp5/phase-review.json:22:              "resourceBudgets": "REVIEW_REQUIRED_BEFORE_EXECUTION"
+docs/evals/cp5/phase-review.json:129:              "maxCandidates": 2,
+docs/evals/cp5/phase-review.json:130:              "resourceBudgets": "REVIEW_REQUIRED_BEFORE_EXECUTION"
+docs/evals/cp5/phase-review.json:182:              "status": "LIMIT",
+docs/evals/cp5/phase-review.json:183:              "reason": "QUERY_BUDGET"
+docs/evals/cp5/phase-review.json:205:              "maxCandidates": 2,
+docs/evals/cp5/phase-review.json:206:              "resourceBudgets": "REVIEW_REQUIRED_BEFORE_EXECUTION"
+docs/evals/cp5/phase-review.json:235:    "resultId": "review-prepared-query-budget"
+docs/domain/cp5-solver.md:63:Budget do solver interrompido retorna ANALYSIS_LIMIT com causa/fase. Estados provisórios não
+scripts/harness/cp5_audit_contract.py:28:          'ADMISSION_LIMIT_IS_NOT_UNSUPPORTED', 'CONSUMER_DEPENDENCIES_ARE_EXPLICIT',
+scripts/harness/cp5_audit_contract.py:33:    'H': ['QUALITY_WITH_COST', 'RAW_COUNTS_AND_DENOMINATORS', 'SAME_CORPUS_PROFILE_BUDGETS',
+scripts/harness/cp5_audit_contract.py:34:          'NO_UNJUSTIFIED_QUALITY_THRESHOLD'],
+scripts/harness/cp5_audit_contract.py:50:    'analysisLimits': (2, 'session', 'analysis phases ending at resource limit'),
+scripts/harness/cp5_audit_contract.py:51:    'observationLimits': (3, 'session', 'observation batches ending at resource limit'),
+scripts/harness/cp5_audit_contract.py:52:    'consumerFailures': (4, 'extraction', 'consumer instances ending FAILED or LIMIT'),
+scripts/harness/cp5_audit_contract.py:53:    'publicationFailures': (5, 'output', 'publication attempts ending FAILED or LIMIT'),
+scripts/harness/cp5_audit_contract.py:65:    'stable-analysis-observation-limit-reported-as-full-success': (3, 'S14', 'STABLE solver + LIMIT observation => INCOMPLETE pipeline, empty atomic batch, analysis limitReason null.'),
+scripts/harness/cp5_audit_contract.py:72:    'admission-budget-reported-as-unsupported': (1, None, 'ADMISSION_LIMIT with admission LIMIT, analysis NOT_STARTED; never UNSUPPORTED.'),
+scripts/harness/cp5_audit_contract.py:73:    'prepared-payload-certifies-own-delivery': (5, 'S14', 'Writer failure preserves prepared bytes and solver state; only external receipt FAILED/LIMIT, never COMPLETE.'),
+scripts/harness/cp5_audit_contract.py:74:    'observation-limit-blocks-independent-consumer': (4, 'S14', 'Limited QueryConsumer batch leaves zero-query StructuralConsumer COMPLETE; preparation INCOMPLETE.'),
+scripts/harness/cp5_audit_contract.py:104:        require(data['quality']['thresholds'] is None and data['quality']['measurements'] is None, 'quality unmeasured/no threshold')
+scripts/harness/cp5_audit_contract.py:143:        require(result['executionStatus'] == 'STABLE' and result['completion']['observation']['status'] == 'LIMIT', 'F3 stable analysis limited observation')
+docs/work/active/WORK-CFG-028/state.md:43:REQUEST CHANGES somente F1/F2/F3. A correção focal distingue ADMISSION_LIMIT,
+docs/evals/cp5/result-contract.json:37:    "ADMISSION_LIMIT",
+docs/evals/cp5/result-contract.json:38:    "ANALYSIS_LIMIT",
+docs/evals/cp5/result-contract.json:44:    "Saturated"
+docs/evals/cp5/result-contract.json:102:      "LIMIT"
+docs/evals/cp5/result-contract.json:111:      "LIMIT"
+docs/evals/cp5/result-contract.json:116:    "phase_limit": "ADMISSION_LIMIT differs from UNSUPPORTED; later failure never rewrites STABLE analysis"
+docs/evals/cp5/result-review.json:7:    "optionsNote": "maxCandidates=2 illustrates configurability, not an approved default",
+docs/evals/cp5/result-review.json:88:        "maxCandidates": 2,
+docs/evals/cp5/result-review.json:89:        "resourceBudgets": "REVIEW_REQUIRED_BEFORE_EXECUTION"
+docs/evals/cp5/challenges.json:103:      "id": "unbounded-values",
+docs/evals/cp5/challenges.json:106:      "oracle": "k+1 requires explicit Saturated",
+docs/evals/cp5/challenges.json:366:      "id": "stable-analysis-observation-limit-reported-as-full-success",
+docs/evals/cp5/challenges.json:369:      "oracle": "STABLE solver + LIMIT observation => INCOMPLETE pipeline, empty atomic batch, analysis limitReason null.",
+docs/evals/cp5/challenges.json:411:      "id": "admission-budget-reported-as-unsupported",
+docs/evals/cp5/challenges.json:414:      "oracle": "ADMISSION_LIMIT with admission LIMIT, analysis NOT_STARTED; never UNSUPPORTED.",
+docs/evals/cp5/challenges.json:423:      "oracle": "Writer failure preserves prepared bytes and solver state; only external receipt FAILED/LIMIT, never COMPLETE.",
+docs/evals/cp5/challenges.json:429:      "id": "observation-limit-blocks-independent-consumer",
+docs/engineering/performance.md:25:semântica de local frames. Um budget explícito termina com ANALYSIS_LIMIT e perda
+docs/evals/cp5/probes.json:84:        "maxWorklistSize"
+docs/evals/cp5/probes.json:170:      "oracle": "explicit cardinality saturation; U separate from k; pool budget and release",
+docs/evals/cp5/probes.json:171:      "kills": "unbounded values, silent truncation, global/historical pool",
+docs/evals/cp5/probes.json:310:        "stable-analysis-observation-limit-reported-as-full-success",
+docs/evals/cp5/probes.json:313:        "observation-limit-blocks-independent-consumer"
+docs/evals/cp5/probes.json:326:      "oracle": "Fixed finite corpus/profile/k/budget and independent expected outcomes; report refusals, open/closed outcomes, saturation and phase failures alongside time/memory; no aggregate percent threshold.",
+docs/domain/open-control.md:34:`ANALYSIS_LIMIT`, escopo e perda de precisão visível. Não truncar silently nem
+docs/domain/cp5-values.md:40:| Saturated(CARDINALITY_LIMIT) | limite local, restante aberto explícito |
+docs/domain/cp5-values.md:51:restante. Ordem por inclusão de candidatos e false≤true, Saturated acima de todos.
+docs/domain/cp5-values.md:55:após open/saturated; não acumula literais mortos. União acima de k satura; k limita
+docs/domain/cp5-values.md:60:Resource budget interrompe o run (ANALYSIS_LIMIT), sem facts provisórios finais.
+docs/engineering/cp5-performance.md:14:limitados; saturation/remainder explícitos; budgets de trabalho/memória/pool/query/
+docs/engineering/cp5-performance.md:19:integral. Não exige classe PersistentMap. Patricia/radix, FIFO e k=8 são candidatos
+docs/engineering/cp5-performance.md:43:worklistPushes ≤ worklistAttempts; maxWorklistSize ≤ pontos ativos
+docs/engineering/cp5-performance.md:48:Budget pode cortar entrega: status e métricas parciais explícitos. Backward usa IN
+docs/engineering/cp5-performance.md:57:Crescimento O(N log D) pode cumprir H4; clone O(N×F) não. Budget/threshold absoluto
+docs/engineering/cp5-performance.md:123:acompanha S3/S6/S9/S10 com mesmo corpus/profile/k/budgets e denominadores explícitos.
+docs/engineering/cp5-performance.md:125:manual de qualidade, mesmo passando tempo/memória. Nenhum threshold percentual novo.
+docs/engineering/cp5-performance.md:126:Overflow de contador/budget tem causa na fase que ocorreu; observação limitada não
+docs/engineering/cp5-performance.md:127:vira ANALYSIS_LIMIT depois do fixpoint. Métricas não disponíveis continuam null.
+docs/engineering/cp5-challenges.md:81:Review F acrescenta `admission-budget-reported-as-unsupported` (W1),
+docs/engineering/cp5-challenges.md:83:`observation-limit-blocks-independent-consumer` (W4/S14). Witnesses de harness
+docs/engineering/cp5-challenges.md:84:exigem ADMISSION_LIMIT distinto, recibo externo FAILED/LIMIT sem alteração do
+docs/engineering/cp5-challenges.md:85:payload e StructuralConsumer COMPLETE após query-batch LIMIT. Batches independentes
+docs/product/cp5-roadmap.md:63:EdgeTransfer monotônico, scheduling substituível, status/budgets/statistics. Sem
+docs/product/cp5-roadmap.md:80:Calibrar container/default k e budgets com ledger, retention, GC/JFR e liberação;
+docs/product/cp5-roadmap.md:101:revisada, defaults/budgets aprovados. AIR file→reader→BuildCfg→sessão→queries→resultado preparado;
+docs/architecture/invariants.md:88:Corte de recursos/contextos exige ANALYSIS_LIMIT e precisão reduzida, nunca truncamento invisível.
+docs/architecture/invariants.md:150:H4 protege propriedades de estado e métricas/retention, não Patricia/FIFO/k=8. Probes/challenges por Wave conforme ADR-0013.
+docs/architecture/cp5-dataflow.md:51:overflow/budget explícitos. CfgNodeId público não precisa ser contíguo; ordem física
+docs/architecture/cp5-dataflow.md:70:AnalysisKey inclui implementação/versão, profile, opções (inclusive k e budgets),
+docs/engineering/testing.md:153:threshold temporal. Não é prova geral de complexidade do validator nem benchmark.
+docs/architecture/ports-and-adapters.md:127:antes do codec é IMPLEMENTATION_LIMIT com maximumDocumentBytes. INPUT_IO distingue
+docs/architecture/decisions/ADR-0013.md:13:Exigir esparsidade, compartilhamento/isolamento de snapshots, ausência de cópia integral por instruction, lookup/update limitado, retenção/lifecycle mensurável, small sets bounded, saturation e budgets explícitos. Ledgers e métricas auditáveis por fase, probes N/2N e challenges compiláveis com restore e segundo GREEN fazem parte do DoD.
+docs/architecture/decisions/ADR-0013.md:17:PASS de performance por Markdown/tempo total; counter declarativo sem observar trabalho; gate nominal Patricia/FIFO/k=8; adiar toda escala para W5.
+docs/architecture/decisions/ADR-0013.md:21:Patricia/radix, FIFO e k=8 são EXPERIMENTAL implementation candidates. Alternativas que cumpram propriedades são permitidas sob evidência/review. W1–W5 sequenciais, review entre Waves, mesma branch/PR draft por autorização humana específica; thresholds calibrados por Wave, sem SLA fictício.
+docs/architecture/decisions/ADR-0013.md:31:por fase, com denominadores/corpus/configuração. Sem novos thresholds ou freeze de
+docs/architecture/decisions/ADR-0013.md:32:Patricia/radix, FIFO ou k=8.
+docs/architecture/cp5-post-audit.md:9:Patricia/radix, FIFO e k=8 continuam experimentais.
+docs/architecture/cp5-post-audit.md:52:Um limite de admissão deve ser explicitado como executionStatus ADMISSION_LIMIT, admission LIMIT
+docs/architecture/cp5-post-audit.md:53:com motivo ADMISSION_BUDGET (regra F1),
+docs/architecture/cp5-post-audit.md:54:sem atribuir ANALYSIS_LIMIT a solver que não iniciou.
+docs/architecture/cp5-post-audit.md:148:**F1 — admission LIMIT.** Cada tentativa de análise conserva admission/analysis/
+docs/architecture/cp5-post-audit.md:149:observation. `ADMISSION_LIMIT` externo corresponde a admission LIMIT, motivo
+docs/architecture/cp5-post-audit.md:150:ADMISSION_BUDGET e analysis/observation NOT_STARTED. UNSUPPORTED significa falta de
+docs/architecture/cp5-post-audit.md:152:ANALYSIS_LIMIT continua reservado ao solver iniciado que atingiu budget. Replay
+docs/architecture/cp5-post-audit.md:153:LIMIT mantém executionStatus STABLE e limitReason global null. Limites e rejeições
+docs/architecture/cp5-post-audit.md:164:destination, status COMPLETE/FAILED/LIMIT, reason e SHA-256 dos bytes completos
+docs/architecture/cp5-post-audit.md:183:O lote continua atômico: observation LIMIT/FAILED implica observations=[] somente
+docs/architecture/cp5-post-audit.md:186:completo. Consumers podem falhar com FAILED/LIMIT após dependências satisfeitas,
+docs/architecture/cp5-post-audit.md:191:O [witness F3](../evals/cp5/phase-review.json) exige solver STABLE, query-batch LIMIT,
+docs/architecture/cp5-post-audit.md:198:W1 ativa o oracle admission-budget; W3/S14 observation; W4/S14 dependências/isolamento
+docs/architecture/cp5-post-audit.md:233:escopo, corpus, profile, k, budgets e denominadores; métrica unavailable não é zero.
+docs/architecture/cp5-post-audit.md:243:threshold percentual ou alegação de ganho antes de corpus e evidência.
+docs/architecture/analysis-dataflow-result-v1.md:19:| executionStatus | STABLE, ADMISSION_LIMIT, ANALYSIS_LIMIT, UNSUPPORTED ou INVALID_INPUT do solver/run; recusa isolada de query não altera esse status |
+docs/architecture/analysis-dataflow-result-v1.md:26:| value | known(text), Candidates/Saturated, enumerated e modelValueRemainder; null se inalcançável no modelo ou query recusada, distinguidos por queryStatus/reachability |
+docs/architecture/analysis-dataflow-result-v1.md:28:| saturationReason/limitReason | cardinalidade local diferente de budget interrompido; causa/fase explícitas |
+docs/architecture/analysis-dataflow-result-v1.md:77:W5 deve congelar por review o wire definitivo, budgets/defaults, parser nominal de
+docs/architecture/analysis-dataflow-result-v1.md:90:| ADMISSION_LIMIT | LIMIT | NOT_STARTED | NOT_STARTED |
+docs/architecture/analysis-dataflow-result-v1.md:92:| ANALYSIS_LIMIT | COMPLETE | LIMIT | NOT_STARTED |
+docs/architecture/analysis-dataflow-result-v1.md:93:| STABLE | COMPLETE | STABLE | COMPLETE / LIMIT / FAILED / NOT_STARTED |
+docs/architecture/analysis-dataflow-result-v1.md:95:ADMISSION_LIMIT e ANALYSIS_LIMIT exigem limitReason não vazio, igual ao motivo da
+docs/architecture/analysis-dataflow-result-v1.md:96:fase respectiva. Demais executionStatus têm limitReason=null. REJECTED/LIMIT/FAILED
+docs/architecture/analysis-dataflow-result-v1.md:97:exigem motivo; demais fases têm reason=null. ADMISSION_BUDGET nunca é UNSUPPORTED.
+docs/architecture/analysis-dataflow-result-v1.md:98:Observation não COMPLETE mantém apenas seu lote vazio; budget de replay não altera
+docs/architecture/analysis-dataflow-result-v1.md:113:Dependências satisfeitas permitem COMPLETE (reason=null), FAILED/LIMIT com motivo,
+docs/architecture/analysis-dataflow-result-v1.md:129:resultSha256, destination, status COMPLETE/FAILED/LIMIT e reason. Correlacionar ao
+docs/architecture/analysis-dataflow-result-v1.md:131:entregues e confirmação do chamador; FAILED/LIMIT exige motivo, e pode usar hash=null
+docs/architecture/analysis-dataflow-result-v1.md:145:COMPLETE após query-batch LIMIT. Testes verificam ADMISSION_LIMIT, writer failure,
+docs/architecture/decisions/ADR-0011.md:13:Propagar primeira publicação e raízes semanticamente alteradas somente pelas arestas afetadas. joinInto acumula monotonicamente; enqueue apenas com mudança ou inicialização. Preservar Entry, seeds uma vez, self-loop e dual backward. Join/transfer de bloco e aresta têm leis explícitas; budget não é fixpoint.
+docs/architecture/decisions/ADR-0012.md:13:Location por Cell inteira/Entry, mesma Cell compartilhada, multibase requer DisjointStorage cobrindo bases admitidas. PossibleValues com Candidates(S,open) e Saturated(reason), bottom de ponto separado. Missing key alcançado é unknown; strong Assign substitui. Queries/resultados distinguem escopo de modelo e fonte; CP4E conserva PROGA com effectiveUnknownRemainder=true.
+docs/architecture/decisions/ADR-0012.md:35:Correção focal F: ADMISSION_LIMIT não é UNSUPPORTED. Completion do run contém

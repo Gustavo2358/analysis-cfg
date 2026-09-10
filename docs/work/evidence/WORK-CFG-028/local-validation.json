@@ -1,0 +1,157 @@
+{
+  "recorded_on": "2026-09-09",
+  "source_head_before_commit": "ec525cbbad96d70c9663faa88e2672148fa8ee71",
+  "source_state": "uncommitted harness preparation; Java/POM exact base inventory",
+  "environment": {
+    "jdk": "Temurin 21.0.12.1+1",
+    "maven": "3.9.16",
+    "python": "Python 3.14.4",
+    "JAVA_HOME": "/tmp/cp5-harness-validation/jdk",
+    "MAVEN_OPTS": "-Dmaven.repo.local=/tmp/cp5-harness-validation/m2",
+    "upstream_source": "git archive ce530a7e17ab12b23c48f29425f503ff920b09fb, no sibling build writes"
+  },
+  "runs": [
+    {
+      "name": "full",
+      "command": [
+        "bash",
+        "scripts/harness/check-full.sh"
+      ],
+      "exit": 3,
+      "expected_exit": 3,
+      "elapsed_seconds": 32.696,
+      "log": "/tmp/cp5-harness-validation/full.log",
+      "sha256": "b94d1fad89643f8da3a110ace5c2442d6a14c97f4b7fc797995674389a45372a"
+    },
+    {
+      "name": "integration",
+      "command": [
+        "bash",
+        "scripts/harness/check-integration.sh"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "elapsed_seconds": 6.066,
+      "log": "/tmp/cp5-harness-validation/integration.log",
+      "sha256": "3dc9829c5a151fb2c21fd438339b8fcf47f7885899830a777bc6f6761745a035"
+    },
+    {
+      "name": "maven-verify",
+      "command": [
+        "mvn",
+        "-B",
+        "-ntp",
+        "clean",
+        "verify"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "elapsed_seconds": 5.998,
+      "log": "/tmp/cp5-harness-validation/maven-verify.log",
+      "sha256": "25e8fc191b128c4f7722514eeb5d15304b3a671473a80aaa1fb1b49d87fd9672"
+    },
+    {
+      "name": "scope",
+      "command": [
+        "python3",
+        "-B",
+        "scripts/project/check_scope.py"
+      ],
+      "exit": 1,
+      "expected_exit": 0,
+      "elapsed_seconds": 0.219,
+      "log": "/tmp/cp5-harness-validation/scope.log",
+      "sha256": "420eaddb66fd267dd03baeac0a6b636305d4c63e35a7ec94dcc06c3971cc58f0"
+    }
+  ],
+  "logs": [
+    {
+      "raw_log": "/tmp/cp5-harness-validation/air-install.log",
+      "archived_log": "docs/work/evidence/WORK-CFG-028/logs/air-install.log.gz",
+      "raw_sha256": "284fe1f26a613f56d94dc7b5ccd6353eb127787ddfa8a9a14f1810dad2908a20",
+      "raw_bytes": 21435,
+      "archive_sha256": "c033dd9a9a321cf6d62be4d0a248aa3013b6117479d9acb6e76cfda54fd1f09e"
+    },
+    {
+      "raw_log": "/tmp/cp5-harness-validation/fast-initial.log",
+      "archived_log": "docs/work/evidence/WORK-CFG-028/logs/fast-initial.log.gz",
+      "raw_sha256": "1343031ed14ed8fbe57e8426a1d8fe4c6144bf147699e8c788b862c4e21d5d16",
+      "raw_bytes": 9610,
+      "archive_sha256": "8ebcc5e3d7e64464a2cd5c1f0685201c4ef0f0090f9f38eddaa9ca45fa6914d0"
+    },
+    {
+      "raw_log": "/tmp/cp5-harness-validation/full.log",
+      "archived_log": "docs/work/evidence/WORK-CFG-028/logs/full.log.gz",
+      "raw_sha256": "b94d1fad89643f8da3a110ace5c2442d6a14c97f4b7fc797995674389a45372a",
+      "raw_bytes": 732574,
+      "archive_sha256": "668e2168cfe42b8d7ec87ae8e5a88a5026cd6be635fcdfbe508afde9f1600821"
+    },
+    {
+      "raw_log": "/tmp/cp5-harness-validation/integration.log",
+      "archived_log": "docs/work/evidence/WORK-CFG-028/logs/integration.log.gz",
+      "raw_sha256": "3dc9829c5a151fb2c21fd438339b8fcf47f7885899830a777bc6f6761745a035",
+      "raw_bytes": 10371,
+      "archive_sha256": "105a2c4d8cf2af758e1f95f4405e690c1c7a4115094a133d7bf932413a809627"
+    },
+    {
+      "raw_log": "/tmp/cp5-harness-validation/maven-verify.log",
+      "archived_log": "docs/work/evidence/WORK-CFG-028/logs/maven-verify.log.gz",
+      "raw_sha256": "25e8fc191b128c4f7722514eeb5d15304b3a671473a80aaa1fb1b49d87fd9672",
+      "raw_bytes": 10319,
+      "archive_sha256": "bc19d71b018da314d3d6f3bcef92dc227ad8c277d59d32f0357cad168b2f3ce4"
+    },
+    {
+      "raw_log": "/tmp/cp5-harness-validation/scope.log",
+      "archived_log": "docs/work/evidence/WORK-CFG-028/logs/scope.log.gz",
+      "raw_sha256": "420eaddb66fd267dd03baeac0a6b636305d4c63e35a7ec94dcc06c3971cc58f0",
+      "raw_bytes": 417,
+      "archive_sha256": "ce35904324eb8a5df8e7ffb5b1d26e28a89f2748cc68b810b424887a9a941afb"
+    },
+    {
+      "raw_log": "/tmp/cp5-harness-initial.log",
+      "archived_log": "docs/work/evidence/WORK-CFG-028/logs/cp5-harness-initial.log.gz",
+      "raw_sha256": "aeac51d613745224063c1fcb940b17b98130d68f1fdee93dd581203a6b7dbc5e",
+      "raw_bytes": 5004,
+      "archive_sha256": "43201e5c9df436aeefeb07d4e1275a8f8372ccea90fc0422ba8b5bb118ab44bf"
+    }
+  ],
+  "shared_jars": [
+    {
+      "artifact": "air-java",
+      "built": "/tmp/cp5-harness-validation/air-java/air-model/target/air-java-0.1.0-SNAPSHOT.jar",
+      "installed_and_consumed": "/tmp/cp5-harness-validation/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar",
+      "built_sha256": "1765d3ade2882f92dca9f588143b71928e7852c4ee39ecf922b8e846e21904dd",
+      "installed_sha256": "1765d3ade2882f92dca9f588143b71928e7852c4ee39ecf922b8e846e21904dd",
+      "equal": true
+    },
+    {
+      "artifact": "air-json",
+      "built": "/tmp/cp5-harness-validation/air-java/air-json/target/air-json-0.1.0-SNAPSHOT.jar",
+      "installed_and_consumed": "/tmp/cp5-harness-validation/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar",
+      "built_sha256": "3816358bbe1052e3dfc5674461ae998082323be38e48bc13567b2052a753e539",
+      "installed_sha256": "3816358bbe1052e3dfc5674461ae998082323be38e48bc13567b2052a753e539",
+      "equal": true
+    }
+  ],
+  "limits": [
+    "No CP5 product performance measured",
+    "full exit 3 is UNAVAILABLE, not PASS",
+    "Initial strict AIR dependency self-test exposed CP5-F01; preserved as explicit baseline finding",
+    "Initial scope receipt mismatch after adding result-source-audit.json; final scope run recorded separately"
+  ],
+  "reviewed_harness": {
+    "command": [
+      "bash",
+      "scripts/harness/check-fast.sh"
+    ],
+    "exit": 0,
+    "tests": {
+      "existing": 47,
+      "cp5": 37,
+      "total_nominal": 84
+    },
+    "raw_sha256": "626a449863b5836708ff09e4afeb825fcd2e2161598e2ec8e7b0a09aa1b7f21a",
+    "log": "docs/work/evidence/WORK-CFG-028/logs/fast-reviewed.log.gz",
+    "reason_for_repeat": "Added direct validator CLI negative and result-contract drift tests; no product code changed"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "date": "2026-09-09",
+  "source": "explicit human review and focal remediation request",
+  "reviewed_head": "8cb55b86c83644e4727cc532787a518775d7e868",
+  "decision": "REQUEST_CHANGES",
+  "blockers": [
+    "W3-F1",
+    "W3-F2"
+  ],
+  "preserved": [
+    "W1",
+    "W2",
+    "CORE-SIZE-001",
+    "AVL",
+    "sparse state",
+    "solver",
+    "batching",
+    "replay"
+  ],
+  "scope": "candidate support/origin/premises and EntryState/same-Cell source uncertainty; same draft PR #12, no W4/W5",
+  "authorized_wave": 3,
+  "evidence": "docs/work/evidence/WORK-CFG-028/wave-3/review-f1-f2/review.json"
+}

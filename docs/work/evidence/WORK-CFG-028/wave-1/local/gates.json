@@ -1,0 +1,73 @@
+[
+  {
+    "name": "full",
+    "command": [
+      "bash",
+      "scripts/harness/check-full.sh"
+    ],
+    "exit": 3,
+    "expected_exit": 3,
+    "elapsed_seconds": 69.3502938849997,
+    "log": "full.log.gz",
+    "sha256": "cf49401cc70a3cf4e82cb61191db0a1223e9f64d0ac7e52acf2e3d49d6bb157c"
+  },
+  {
+    "name": "integration",
+    "command": [
+      "bash",
+      "scripts/harness/check-integration.sh"
+    ],
+    "exit": 0,
+    "expected_exit": 0,
+    "elapsed_seconds": 15.943209467997804,
+    "log": "integration.log.gz",
+    "sha256": "c109ed502836808a863e659704cc5122e25a110ba2a8e9c1e015d606ed2e7497"
+  },
+  {
+    "name": "maven-verify",
+    "command": [
+      "mvn",
+      "-B",
+      "-ntp",
+      "clean",
+      "verify"
+    ],
+    "exit": 0,
+    "expected_exit": 0,
+    "elapsed_seconds": 16.033413552999264,
+    "log": "maven-verify.log.gz",
+    "sha256": "c885d25a4f456bb02d100b48ec97326b0fd124fed631a533df63d029993f7619"
+  },
+  {
+    "name": "w1-semantic",
+    "command": [
+      "python3",
+      "-B",
+      "scripts/project/check_cp5_gate.py",
+      "semantic",
+      "--wave",
+      "1"
+    ],
+    "exit": 0,
+    "expected_exit": 0,
+    "elapsed_seconds": 4.304132441000547,
+    "log": "w1-semantic.log.gz",
+    "sha256": "6075c802c9ede0d2c803a4c77a3c670f0bbbfae4e5126acfe7082a0f7ee4ee6e"
+  },
+  {
+    "name": "w1-architecture",
+    "command": [
+      "python3",
+      "-B",
+      "scripts/project/check_cp5_gate.py",
+      "architecture",
+      "--wave",
+      "1"
+    ],
+    "exit": 0,
+    "expected_exit": 0,
+    "elapsed_seconds": 5.884142831000645,
+    "log": "w1-architecture.log.gz",
+    "sha256": "cda7b3916defb3eae8aa177318ee5b577566b74c0a82455b9b1ef8a4f945e0f0"
+  }
+]

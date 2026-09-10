@@ -1,0 +1,11 @@
+{
+  "command": "bash scripts/harness/check-fast.sh",
+  "exit_code": 0,
+  "original_tests": 47,
+  "cp5_tests": 85,
+  "log": "final-fast.log.gz",
+  "raw_log_sha256": "391b16d6a23186640b374067432700a3b559a58dce4f243101650a76b11393d5",
+  "source_validation_head": "318181c072710f89ac58c2bd387c1645de434cd6",
+  "production_delta_since_validated_head": [],
+  "final_changes": "lifecycle/docs/CI evidence only; final HEAD requires new remote workflows"
+}

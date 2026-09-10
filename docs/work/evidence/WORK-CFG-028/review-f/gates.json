@@ -1,0 +1,90 @@
+{
+  "reviewed_head": "e053f14f8f5dc7b0b80b7bbbe015fde684522835",
+  "scope": "F1/F2/F3 preparation; final committed head/remote CI recorded on PR after push",
+  "environment": {
+    "JAVA_HOME": "/tmp/cp5-harness-validation/jdk",
+    "MAVEN_OPTS": "-Dmaven.repo.local=/tmp/cp5-harness-validation/m2"
+  },
+  "runs": [
+    {
+      "command": "python3 -m unittest discover -s scripts/harness -p test_cp5_harness.py",
+      "exit_code": 1,
+      "result": "EXPECTED_RED: 62 tests, 3 nominal failures for F1/F2/F3",
+      "log": "logs/01-red.log.gz",
+      "raw_sha256": "802e6c96619ec27faaba4542887ce618649fcda103daa079b62548f1feae1406",
+      "gzip_sha256": "dc4a6b48ece504aab2aa20d78b0f362af0e6f26049b8d7ad029a7b7068688439"
+    },
+    {
+      "command": "python3 -m unittest discover -s scripts/harness -p test_cp5_harness.py",
+      "exit_code": 0,
+      "result": "PASS: 62 tests",
+      "log": "logs/02-first-green.log.gz",
+      "raw_sha256": "aba98d4cb83e23b11391a94bbd0bd9e5534f6aff1a435ca1fb27ba20c494381f",
+      "gzip_sha256": "323c71475856d19c76028edce712592fc3fed14f3baa5a413c0fc4d2612434ba"
+    },
+    {
+      "command": "python3 -m unittest discover -s scripts/harness -p test_cp5_harness.py",
+      "exit_code": 0,
+      "result": "PASS: 71 tests",
+      "log": "logs/03-green.log.gz",
+      "raw_sha256": "9ed098487b461d02fb78e3251338aac57213c873e94ff860dfa7e046886249e0",
+      "gzip_sha256": "099f6c5396cd1106083bceed5ce740c9adff95dd9930f693a77299b9753fc3ae"
+    },
+    {
+      "command": "python3 -m unittest discover -s scripts/harness -p test_cp5_harness.py",
+      "exit_code": 0,
+      "result": "PASS: 72 tests",
+      "log": "logs/04-green.log.gz",
+      "raw_sha256": "48b20fe604e0880c51cbe1186e1e35faf6dab632036c18262f95f88e47db1188",
+      "gzip_sha256": "e04c651c92184c9d4c7b870bfa73a622ab5b8add9e1df198992751a5e61cf27d"
+    },
+    {
+      "command": "python3 -B scripts/harness/validate_docs.py",
+      "exit_code": 0,
+      "result": "PASS",
+      "log": "logs/05-docs.log.gz",
+      "raw_sha256": "df2da5af253a30334f548f0567e9293bb9d88daef721e2c685ac43e2a8048136",
+      "gzip_sha256": "455c24eb08da800b365f85d340c16d8f360272da515c71d99a97ee0a0805005e"
+    },
+    {
+      "command": "bash scripts/harness/check-full.sh",
+      "exit_code": 3,
+      "result": "fast/architecture/semantic PASS; performance UNAVAILABLE stops full before integration",
+      "log": "logs/06-full.log.gz",
+      "raw_sha256": "881586c5e28442c05dd4ae463c4bddd7d34c1a1b190beb84ae3a3c9f01f67ef5",
+      "gzip_sha256": "fe694612dd037aa363ebf7f21fe667b99295a8ea21a0a9d333586124d048ea9d"
+    },
+    {
+      "command": "python3 -B scripts/project/check_scope.py --update-manifest",
+      "exit_code": 0,
+      "result": "PASS before evidence-only additions",
+      "log": "logs/07-scope.log.gz",
+      "raw_sha256": "1966c832ef099a94842cfe566cd2422e3eaf118c456614e3c0c66f0a4ae08139",
+      "gzip_sha256": "98393fe25d86eca12802ff15f6c7a88b7ac3793065fcb332b2d05273cbed6707"
+    },
+    {
+      "command": "bash scripts/harness/check-integration.sh",
+      "exit_code": 0,
+      "result": "PASS: 37 methods",
+      "log": "logs/08-integration.log.gz",
+      "raw_sha256": "d1c560c40e5fbe9724cbaef5cd7fbf6b39d91faa1e2d28cb036745084563a718",
+      "gzip_sha256": "d4ba15b3b2f6fa733bfe3cd160de6e28066e7b290a111395220ac543d28fff62"
+    },
+    {
+      "command": "mvn -B -ntp clean verify",
+      "exit_code": 0,
+      "result": "PASS: 139 tests",
+      "log": "logs/09-maven.log.gz",
+      "raw_sha256": "843ba7ccc18fce0c0e11692a3b68ba8a82a2ebc82db167d00ad10f7868416b9b",
+      "gzip_sha256": "04df7310adfc30b1bda08076e4bf259a0222af3b6715426856746fa0f9330ede"
+    },
+    {
+      "command": "bash scripts/harness/check-fast.sh",
+      "exit_code": 0,
+      "result": "PASS: 47 original + 72 CP5 = 119 tests",
+      "log": "logs/10-final-fast.log.gz",
+      "raw_sha256": "387a05e4a0f8b9f0bde840c7de9ac16d13a0c4b8129f27c4f3c1c2d032d2b62a",
+      "gzip_sha256": "242cac8abad4c327781a389cdfbb5816c41c8dc6b62b5af4391c2f43192bd91f"
+    }
+  ]
+}

@@ -1,0 +1,162 @@
+{
+  "valid": {
+    "consumer-starts-solver": {
+      "receipt": "challenges-attempt-1/receipt.json",
+      "nominalTest": "architecture",
+      "diagnostic": "W4 forbidden consumers bytecode dependency"
+    },
+    "full-traversal-per-consumer": {
+      "receipt": "challenges-attempt-1/receipt.json",
+      "nominalTest": "PlanningScaleTest#sparseOverlappingConsumersShareBucketsAndOneActualAnalysis",
+      "diagnostic": "bucket scan once"
+    },
+    "broadcast-i-times-k": {
+      "receipt": "challenges-attempt-1/receipt.json",
+      "nominalTest": "PlanningContractTest#overlappingInterestsDispatchOnlyExactPairsAndKeepStructuralPresence",
+      "diagnostic": "expected:"
+    },
+    "cache-ignores-options-entry": {
+      "receipt": "challenges-attempt-2/receipt.json",
+      "nominalTest": "PlanningContractTest#distinctProfilesOptionsAndEntriesRunSeparatelyWithNoPhantomContext",
+      "diagnostic": "wrong batch bound to analysis key"
+    },
+    "solver-per-consumer": {
+      "receipt": "challenges-attempt-2/receipt.json",
+      "nominalTest": "PlanningRuntimeTest#realVerticalSharesRunQueryReplayAndProducerSupport",
+      "diagnostic": "one actual provider solve"
+    },
+    "solver-per-observation-batch": {
+      "receipt": "challenges-attempt-2/receipt.json",
+      "nominalTest": "PlanningRuntimeTest#f3FailureIsLocalAndIndependentBatchesShareStableRun",
+      "diagnostic": "batches reuse stable run"
+    },
+    "replay-per-consumer": {
+      "receipt": "challenges-attempt-2/receipt.json",
+      "nominalTest": "PlanningRuntimeTest#realVerticalSharesRunQueryReplayAndProducerSupport",
+      "diagnostic": "one actual observation batch"
+    },
+    "observation-failure-blocks-independent-consumer": {
+      "receipt": "challenges-attempt-2/receipt.json",
+      "nominalTest": "PlanningRuntimeTest#f3FailureIsLocalAndIndependentBatchesShareStableRun",
+      "diagnostic": "independent structural consumer completes"
+    },
+    "analysis-only-consumer-forced-to-depend-on-batch": {
+      "receipt": "challenges-attempt-2/receipt.json",
+      "nominalTest": "PlanningRuntimeTest#f3FailureIsLocalAndIndependentBatchesShareStableRun",
+      "diagnostic": "analysis-only does not depend on batch"
+    },
+    "structural-consumer-forced-to-start-analysis": {
+      "receipt": "challenges-attempt-2/receipt.json",
+      "nominalTest": "PlanningRuntimeTest#analysisOnlyDoesNotCreateObservationAndStructuralStartsNoAnalysis",
+      "diagnostic": "expected:"
+    },
+    "consumer-failure-reported-as-complete-output": {
+      "receipt": "challenges-attempt-2/receipt.json",
+      "nominalTest": "PlanningRuntimeTest#failingConsumerDiscardsEveryStagedFactAndOthersComplete",
+      "diagnostic": "expected: <FAILED>"
+    },
+    "consumer-partial-facts-committed-on-failure": {
+      "receipt": "challenges-attempt-2/receipt.json",
+      "nominalTest": "PlanningRuntimeTest#failingConsumerDiscardsEveryStagedFactAndOthersComplete",
+      "diagnostic": "failed consumer commits no partial bundle"
+    },
+    "missing-consumer-dependency-treated-as-success": {
+      "receipt": "challenges-attempt-2/receipt.json",
+      "nominalTest": "PlanningRuntimeTest#missingDependenciesAndWrongBindingsNeverProduceSuccess",
+      "diagnostic": "missing batch dependency"
+    },
+    "wrong-batch-bound-to-analysis-key": {
+      "receipt": "challenges-attempt-3/receipt.json",
+      "nominalTest": "PlanningContractTest#batchesWithSameIdCannotAliasDifferentKeys",
+      "diagnostic": "batch ID binds exact key"
+    },
+    "wrong-provider-execution-binding": {
+      "receipt": "challenges-attempt-3/receipt.json",
+      "nominalTest": "PlanningRuntimeTest#registryRejectsWrongPreparedAndExecutionKey",
+      "diagnostic": "provider binding mismatch rejected"
+    },
+    "unplanned-query-triggers-hidden-replay": {
+      "receipt": "challenges-attempt-3/receipt.json",
+      "nominalTest": "PlanningRuntimeTest#lateQueryIsNotRequestedAndNewEpochExplicitlyReusesRun",
+      "diagnostic": "late access cannot replay"
+    },
+    "global-static-run-cache": {
+      "receipt": "challenges-attempt-3/receipt.json",
+      "nominalTest": "PlanningContractTest#differentSessionsCannotShareRunsOrPlansEvenWithEqualIds",
+      "diagnostic": "cache owner is session lifetime"
+    },
+    "max-consumers-admission": {
+      "receipt": "challenges-attempt-3/receipt.json",
+      "nominalTest": "PlanningScaleTest#consumersQueriesMatchesFactsAndBatchesHaveNoCapacitySemantics",
+      "diagnostic": "mutant consumer capacity"
+    },
+    "max-queries-admission": {
+      "receipt": "challenges-attempt-3/receipt.json",
+      "nominalTest": "PlanningScaleTest#consumersQueriesMatchesFactsAndBatchesHaveNoCapacitySemantics",
+      "diagnostic": "mutant query capacity"
+    },
+    "resource-cap-on-sites": {
+      "receipt": "challenges-attempt-3/receipt.json",
+      "nominalTest": "PlanningScaleTest#consumersQueriesMatchesFactsAndBatchesHaveNoCapacitySemantics",
+      "diagnostic": "mutant site capacity"
+    },
+    "resource-cap-on-facts": {
+      "receipt": "challenges-attempt-3/receipt.json",
+      "nominalTest": "PlanningScaleTest#consumersQueriesMatchesFactsAndBatchesHaveNoCapacitySemantics",
+      "diagnostic": "size never changes completion"
+    },
+    "resource-cap-on-batches": {
+      "receipt": "challenges-attempt-3/receipt.json",
+      "nominalTest": "PlanningScaleTest#consumersQueriesMatchesFactsAndBatchesHaveNoCapacitySemantics",
+      "diagnostic": "mutant batch capacity"
+    },
+    "drop-W3-support-or-remainder-before-consumer": {
+      "receipt": "challenges-attempt-3/receipt.json",
+      "nominalTest": "PlanningRuntimeTest#realVerticalSharesRunQueryReplayAndProducerSupport",
+      "diagnostic": "candidate support preserved at consumer boundary"
+    },
+    "w4-drop-candidates": {
+      "receipt": "challenges-attempt-3/receipt.json",
+      "nominalTest": "PlanningRuntimeTest#realVerticalSharesRunQueryReplayAndProducerSupport",
+      "diagnostic": "all real candidates reach sink"
+    },
+    "w4-unsupported-everything": {
+      "receipt": "challenges-attempt-3/receipt.json",
+      "nominalTest": "PlanningRuntimeTest#realVerticalSharesRunQueryReplayAndProducerSupport",
+      "diagnostic": "query consumer receives supported value"
+    },
+    "emit-provisional-facts": {
+      "receipt": "challenges-attempt-4/receipt.json",
+      "nominalTest": "PlanningRuntimeTest#finalFactsReflectFixedPointAfterOverwritesAndLoop",
+      "diagnostic": "only final stable overwrite reaches sink"
+    }
+  },
+  "invalidAttempts": [
+    {
+      "receipt": "challenges-attempt-1/receipt.json",
+      "mutant": "cache-ignores-options-entry",
+      "compileExit": 0,
+      "redExit": 1,
+      "restored": true,
+      "secondGreen": 0
+    },
+    {
+      "receipt": "challenges-attempt-2/receipt.json",
+      "mutant": "wrong-batch-bound-to-analysis-key",
+      "compileExit": 0,
+      "redExit": 0,
+      "restored": true,
+      "secondGreen": 0
+    },
+    {
+      "receipt": "challenges-attempt-3/receipt.json",
+      "mutant": "emit-provisional-facts",
+      "compileExit": 0,
+      "redExit": 1,
+      "restored": true,
+      "secondGreen": 0
+    }
+  ],
+  "validCount": 26,
+  "interpretation": "26 compiled RED + byte-exact restore + second GREEN. Earlier attempts remain INVALID_OR_SURVIVED: two early diagnostic mismatches and one inadequate test subsequently strengthened. No compilation failure counted as RED."
+}

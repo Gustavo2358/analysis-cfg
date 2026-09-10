@@ -1,0 +1,1264 @@
+{
+  "unit": "Each matching baseline source line; A dominates mixed clauses. B/D and new F observations are expanded in audit-classification.md.",
+  "counts": {
+    "A": 193,
+    "C": 14,
+    "E": 2
+  },
+  "matches": [
+    {
+      "baseline_match": 1,
+      "source": "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirInputLimitException.java:8",
+      "category": "A",
+      "disposition": "Local legacy product/guard debt recorded; byte-exact Java preserved by authorized harness-only scope. Not approved for CP5."
+    },
+    {
+      "baseline_match": 2,
+      "source": "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirInputLimitException.java:10",
+      "category": "A",
+      "disposition": "Local legacy product/guard debt recorded; byte-exact Java preserved by authorized harness-only scope. Not approved for CP5."
+    },
+    {
+      "baseline_match": 3,
+      "source": "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirInputLimitException.java:11",
+      "category": "A",
+      "disposition": "Local legacy product/guard debt recorded; byte-exact Java preserved by authorized harness-only scope. Not approved for CP5."
+    },
+    {
+      "baseline_match": 4,
+      "source": "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirInputLimitException.java:12",
+      "category": "A",
+      "disposition": "Local legacy product/guard debt recorded; byte-exact Java preserved by authorized harness-only scope. Not approved for CP5."
+    },
+    {
+      "baseline_match": 5,
+      "source": "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirInputLimitException.java:15",
+      "category": "A",
+      "disposition": "Local legacy product/guard debt recorded; byte-exact Java preserved by authorized harness-only scope. Not approved for CP5."
+    },
+    {
+      "baseline_match": 6,
+      "source": "docs/evals/cp5/metrics.json:4",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 7,
+      "source": "docs/evals/cp5/metrics.json:214",
+      "category": "C",
+      "disposition": "Keep observational metric or absence of unmeasured quality threshold; mixed prior budget/profile wording removed."
+    },
+    {
+      "baseline_match": 8,
+      "source": "docs/evals/cp5/metrics.json:326",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 9,
+      "source": "docs/evals/cp5/metrics.json:427",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 10,
+      "source": "docs/evals/cp5/metrics.json:436",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 11,
+      "source": "docs/evals/cp5/metrics.json:445",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 12,
+      "source": "docs/evals/cp5/metrics.json:454",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 13,
+      "source": "docs/evals/cp5/metrics.json:463",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 14,
+      "source": "docs/evals/cp5/metrics.json:472",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 15,
+      "source": "docs/evals/cp5/metrics.json:481",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 16,
+      "source": "docs/evals/cp5/metrics.json:490",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 17,
+      "source": "docs/evals/cp5/metrics.json:499",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 18,
+      "source": "docs/evals/cp5/metrics.json:506",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 19,
+      "source": "docs/evals/cp5/metrics.json:508",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 20,
+      "source": "docs/evals/cp5/metrics.json:515",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 21,
+      "source": "docs/evals/cp5/metrics.json:517",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 22,
+      "source": "docs/evals/cp5/metrics.json:524",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 23,
+      "source": "docs/evals/cp5/metrics.json:526",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 24,
+      "source": "docs/evals/cp5/metrics.json:533",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 25,
+      "source": "docs/evals/cp5/metrics.json:535",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 26,
+      "source": "scripts/project/check_transport_architecture.py:56",
+      "category": "A",
+      "disposition": "Local legacy product/guard debt recorded; byte-exact Java preserved by authorized harness-only scope. Not approved for CP5."
+    },
+    {
+      "baseline_match": 27,
+      "source": "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonException.java:3",
+      "category": "A",
+      "disposition": "Local legacy product/guard debt recorded; byte-exact Java preserved by authorized harness-only scope. Not approved for CP5."
+    },
+    {
+      "baseline_match": 28,
+      "source": "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirJsonFileReader.java:27",
+      "category": "A",
+      "disposition": "Local legacy product/guard debt recorded; byte-exact Java preserved by authorized harness-only scope. Not approved for CP5."
+    },
+    {
+      "baseline_match": 29,
+      "source": "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirJsonFileReader.java:29",
+      "category": "A",
+      "disposition": "Local legacy product/guard debt recorded; byte-exact Java preserved by authorized harness-only scope. Not approved for CP5."
+    },
+    {
+      "baseline_match": 30,
+      "source": "scripts/harness/cp5_phase_contract.py:7",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 31,
+      "source": "scripts/harness/cp5_phase_contract.py:22",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 32,
+      "source": "scripts/harness/cp5_phase_contract.py:33",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 33,
+      "source": "scripts/harness/cp5_phase_contract.py:34",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 34,
+      "source": "scripts/harness/cp5_phase_contract.py:35",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 35,
+      "source": "scripts/harness/cp5_phase_contract.py:38",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 36,
+      "source": "scripts/harness/cp5_phase_contract.py:39",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 37,
+      "source": "scripts/harness/cp5_phase_contract.py:40",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 38,
+      "source": "scripts/harness/cp5_phase_contract.py:42",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 39,
+      "source": "scripts/harness/cp5_phase_contract.py:44",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 40,
+      "source": "scripts/harness/cp5_phase_contract.py:45",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 41,
+      "source": "scripts/harness/cp5_phase_contract.py:46",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 42,
+      "source": "scripts/harness/cp5_phase_contract.py:48",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 43,
+      "source": "scripts/harness/cp5_phase_contract.py:49",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 44,
+      "source": "scripts/harness/cp5_phase_contract.py:50",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 45,
+      "source": "scripts/harness/cp5_phase_contract.py:106",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 46,
+      "source": "scripts/harness/cp5_phase_contract.py:142",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 47,
+      "source": "scripts/harness/cp5_phase_contract.py:149",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 48,
+      "source": "scripts/harness/cp5_phase_contract.py:151",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 49,
+      "source": "scripts/harness/test_cp5_harness.py:81",
+      "category": "C",
+      "disposition": "Keep observational metric or absence of unmeasured quality threshold; mixed prior budget/profile wording removed."
+    },
+    {
+      "baseline_match": 50,
+      "source": "scripts/harness/test_cp5_harness.py:95",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 51,
+      "source": "scripts/harness/test_cp5_harness.py:111",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 52,
+      "source": "scripts/harness/test_cp5_harness.py:160",
+      "category": "A",
+      "disposition": "Append-only historical review retained; current ADR/lifecycle supersedes candidate cap."
+    },
+    {
+      "baseline_match": 53,
+      "source": "scripts/harness/test_cp5_harness.py:343",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 54,
+      "source": "scripts/harness/test_cp5_harness.py:344",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 55,
+      "source": "scripts/harness/test_cp5_harness.py:345",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 56,
+      "source": "scripts/harness/test_cp5_harness.py:362",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 57,
+      "source": "scripts/harness/test_cp5_harness.py:370",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 58,
+      "source": "scripts/harness/test_cp5_harness.py:380",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 59,
+      "source": "scripts/harness/test_cp5_harness.py:385",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 60,
+      "source": "scripts/harness/test_cp5_harness.py:387",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 61,
+      "source": "scripts/harness/test_cp5_harness.py:388",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 62,
+      "source": "scripts/harness/test_cp5_harness.py:395",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 63,
+      "source": "scripts/harness/test_cp5_harness.py:495",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 64,
+      "source": "scripts/harness/test_cp5_harness.py:501",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 65,
+      "source": "scripts/harness/test_cp5_harness.py:509",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 66,
+      "source": "scripts/harness/test_cp5_harness.py:510",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 67,
+      "source": "scripts/harness/test_cp5_harness.py:513",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 68,
+      "source": "scripts/harness/test_cp5_harness.py:534",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 69,
+      "source": "scripts/harness/test_cp5_harness.py:535",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 70,
+      "source": "scripts/harness/test_cp5_harness.py:536",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 71,
+      "source": "scripts/harness/test_cp5_harness.py:540",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 72,
+      "source": "scripts/harness/test_cp5_harness.py:606",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 73,
+      "source": "scripts/harness/test_cp5_harness.py:608",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 74,
+      "source": "scripts/harness/cache_ir.py:66",
+      "category": "E",
+      "disposition": "Pinned specification download safety/timeout in harness only, not program analysis."
+    },
+    {
+      "baseline_match": 75,
+      "source": "scripts/harness/validate_cp5.py:24",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 76,
+      "source": "scripts/harness/validate_cp5.py:40",
+      "category": "C",
+      "disposition": "Keep observational metric or absence of unmeasured quality threshold; mixed prior budget/profile wording removed."
+    },
+    {
+      "baseline_match": 77,
+      "source": "scripts/harness/validate_cp5.py:83",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 78,
+      "source": "scripts/harness/validate_cp5.py:85",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 79,
+      "source": "scripts/harness/validate_cp5.py:103",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 80,
+      "source": "scripts/harness/validate_cp5.py:140",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 81,
+      "source": "scripts/harness/validate_cp5.py:141",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 82,
+      "source": "scripts/harness/validate_cp5.py:142",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 83,
+      "source": "scripts/harness/validate_cp5.py:182",
+      "category": "A",
+      "disposition": "Append-only historical review retained; current ADR/lifecycle supersedes candidate cap."
+    },
+    {
+      "baseline_match": 84,
+      "source": "scripts/harness/validate_cp5.py:256",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 85,
+      "source": "scripts/harness/validate_cp5.py:261",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 86,
+      "source": "cfg-launcher/src/main/java/io/github/gustavo2358/analysis/cfg/launcher/AnalysisCfg.java:38",
+      "category": "A",
+      "disposition": "Local legacy product/guard debt recorded; byte-exact Java preserved by authorized harness-only scope. Not approved for CP5."
+    },
+    {
+      "baseline_match": 87,
+      "source": "cfg-launcher/src/main/java/io/github/gustavo2358/analysis/cfg/launcher/AnalysisCfg.java:39",
+      "category": "A",
+      "disposition": "Local legacy product/guard debt recorded; byte-exact Java preserved by authorized harness-only scope. Not approved for CP5."
+    },
+    {
+      "baseline_match": 88,
+      "source": "docs/work/active/WORK-CFG-028/eval.md:14",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 89,
+      "source": "docs/work/active/WORK-CFG-028/eval.md:35",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 90,
+      "source": "docs/work/active/WORK-CFG-028/eval.md:38",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 91,
+      "source": "docs/work/active/WORK-CFG-028/spec.md:32",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 92,
+      "source": "docs/evals/cp5/post-audit-contracts.json:91",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 93,
+      "source": "docs/evals/cp5/post-audit-contracts.json:128",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 94,
+      "source": "docs/evals/cp5/post-audit-contracts.json:129",
+      "category": "C",
+      "disposition": "Keep observational metric or absence of unmeasured quality threshold; mixed prior budget/profile wording removed."
+    },
+    {
+      "baseline_match": 95,
+      "source": "docs/evals/cp5/post-audit-contracts.json:198",
+      "category": "C",
+      "disposition": "Keep observational metric or absence of unmeasured quality threshold; mixed prior budget/profile wording removed."
+    },
+    {
+      "baseline_match": 96,
+      "source": "docs/evals/cp5/phase-review.json:21",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 97,
+      "source": "docs/evals/cp5/phase-review.json:22",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 98,
+      "source": "docs/evals/cp5/phase-review.json:129",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 99,
+      "source": "docs/evals/cp5/phase-review.json:130",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 100,
+      "source": "docs/evals/cp5/phase-review.json:182",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 101,
+      "source": "docs/evals/cp5/phase-review.json:183",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 102,
+      "source": "docs/evals/cp5/phase-review.json:205",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 103,
+      "source": "docs/evals/cp5/phase-review.json:206",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 104,
+      "source": "docs/evals/cp5/phase-review.json:235",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 105,
+      "source": "docs/domain/cp5-solver.md:63",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 106,
+      "source": "scripts/harness/cp5_audit_contract.py:28",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 107,
+      "source": "scripts/harness/cp5_audit_contract.py:33",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 108,
+      "source": "scripts/harness/cp5_audit_contract.py:34",
+      "category": "C",
+      "disposition": "Keep observational metric or absence of unmeasured quality threshold; mixed prior budget/profile wording removed."
+    },
+    {
+      "baseline_match": 109,
+      "source": "scripts/harness/cp5_audit_contract.py:50",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 110,
+      "source": "scripts/harness/cp5_audit_contract.py:51",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 111,
+      "source": "scripts/harness/cp5_audit_contract.py:52",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 112,
+      "source": "scripts/harness/cp5_audit_contract.py:53",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 113,
+      "source": "scripts/harness/cp5_audit_contract.py:65",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 114,
+      "source": "scripts/harness/cp5_audit_contract.py:72",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 115,
+      "source": "scripts/harness/cp5_audit_contract.py:73",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 116,
+      "source": "scripts/harness/cp5_audit_contract.py:74",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 117,
+      "source": "scripts/harness/cp5_audit_contract.py:104",
+      "category": "C",
+      "disposition": "Keep observational metric or absence of unmeasured quality threshold; mixed prior budget/profile wording removed."
+    },
+    {
+      "baseline_match": 118,
+      "source": "scripts/harness/cp5_audit_contract.py:143",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 119,
+      "source": "docs/work/active/WORK-CFG-028/state.md:43",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 120,
+      "source": "docs/evals/cp5/result-contract.json:37",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 121,
+      "source": "docs/evals/cp5/result-contract.json:38",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 122,
+      "source": "docs/evals/cp5/result-contract.json:44",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 123,
+      "source": "docs/evals/cp5/result-contract.json:102",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 124,
+      "source": "docs/evals/cp5/result-contract.json:111",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 125,
+      "source": "docs/evals/cp5/result-contract.json:116",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 126,
+      "source": "docs/evals/cp5/result-review.json:7",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 127,
+      "source": "docs/evals/cp5/result-review.json:88",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 128,
+      "source": "docs/evals/cp5/result-review.json:89",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 129,
+      "source": "docs/evals/cp5/challenges.json:103",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 130,
+      "source": "docs/evals/cp5/challenges.json:106",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 131,
+      "source": "docs/evals/cp5/challenges.json:366",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 132,
+      "source": "docs/evals/cp5/challenges.json:369",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 133,
+      "source": "docs/evals/cp5/challenges.json:411",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 134,
+      "source": "docs/evals/cp5/challenges.json:414",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 135,
+      "source": "docs/evals/cp5/challenges.json:423",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 136,
+      "source": "docs/evals/cp5/challenges.json:429",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 137,
+      "source": "docs/engineering/performance.md:25",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 138,
+      "source": "docs/evals/cp5/probes.json:84",
+      "category": "C",
+      "disposition": "Keep observational metric or absence of unmeasured quality threshold; mixed prior budget/profile wording removed."
+    },
+    {
+      "baseline_match": 139,
+      "source": "docs/evals/cp5/probes.json:170",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 140,
+      "source": "docs/evals/cp5/probes.json:171",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 141,
+      "source": "docs/evals/cp5/probes.json:310",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 142,
+      "source": "docs/evals/cp5/probes.json:313",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 143,
+      "source": "docs/evals/cp5/probes.json:326",
+      "category": "C",
+      "disposition": "Keep observational metric or absence of unmeasured quality threshold; mixed prior budget/profile wording removed."
+    },
+    {
+      "baseline_match": 144,
+      "source": "docs/domain/open-control.md:34",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 145,
+      "source": "docs/domain/cp5-values.md:40",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 146,
+      "source": "docs/domain/cp5-values.md:51",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 147,
+      "source": "docs/domain/cp5-values.md:55",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 148,
+      "source": "docs/domain/cp5-values.md:60",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 149,
+      "source": "docs/engineering/cp5-performance.md:14",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 150,
+      "source": "docs/engineering/cp5-performance.md:19",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 151,
+      "source": "docs/engineering/cp5-performance.md:43",
+      "category": "C",
+      "disposition": "Measured maximum and algorithmic membership invariant, not abort threshold."
+    },
+    {
+      "baseline_match": 152,
+      "source": "docs/engineering/cp5-performance.md:48",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 153,
+      "source": "docs/engineering/cp5-performance.md:57",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 154,
+      "source": "docs/engineering/cp5-performance.md:123",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 155,
+      "source": "docs/engineering/cp5-performance.md:125",
+      "category": "C",
+      "disposition": "Keep observational metric or absence of unmeasured quality threshold; mixed prior budget/profile wording removed."
+    },
+    {
+      "baseline_match": 156,
+      "source": "docs/engineering/cp5-performance.md:126",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 157,
+      "source": "docs/engineering/cp5-performance.md:127",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 158,
+      "source": "docs/engineering/cp5-challenges.md:81",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 159,
+      "source": "docs/engineering/cp5-challenges.md:83",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 160,
+      "source": "docs/engineering/cp5-challenges.md:84",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 161,
+      "source": "docs/engineering/cp5-challenges.md:85",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 162,
+      "source": "docs/product/cp5-roadmap.md:63",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 163,
+      "source": "docs/product/cp5-roadmap.md:80",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 164,
+      "source": "docs/product/cp5-roadmap.md:101",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 165,
+      "source": "docs/architecture/invariants.md:88",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 166,
+      "source": "docs/architecture/invariants.md:150",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 167,
+      "source": "docs/architecture/cp5-dataflow.md:51",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 168,
+      "source": "docs/architecture/cp5-dataflow.md:70",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 169,
+      "source": "docs/engineering/testing.md:153",
+      "category": "E",
+      "disposition": "Existing test smoke is not core admission or runtime evidence of CP5."
+    },
+    {
+      "baseline_match": 170,
+      "source": "docs/architecture/ports-and-adapters.md:127",
+      "category": "A",
+      "disposition": "Local legacy product/guard debt recorded; byte-exact Java preserved by authorized harness-only scope. Not approved for CP5."
+    },
+    {
+      "baseline_match": 171,
+      "source": "docs/architecture/decisions/ADR-0013.md:13",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 172,
+      "source": "docs/architecture/decisions/ADR-0013.md:17",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 173,
+      "source": "docs/architecture/decisions/ADR-0013.md:21",
+      "category": "C",
+      "disposition": "Keep observational metric or absence of unmeasured quality threshold; mixed prior budget/profile wording removed."
+    },
+    {
+      "baseline_match": 174,
+      "source": "docs/architecture/decisions/ADR-0013.md:31",
+      "category": "C",
+      "disposition": "Keep observational metric or absence of unmeasured quality threshold; mixed prior budget/profile wording removed."
+    },
+    {
+      "baseline_match": 175,
+      "source": "docs/architecture/decisions/ADR-0013.md:32",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 176,
+      "source": "docs/architecture/cp5-post-audit.md:9",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 177,
+      "source": "docs/architecture/cp5-post-audit.md:52",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 178,
+      "source": "docs/architecture/cp5-post-audit.md:53",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 179,
+      "source": "docs/architecture/cp5-post-audit.md:54",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 180,
+      "source": "docs/architecture/cp5-post-audit.md:148",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 181,
+      "source": "docs/architecture/cp5-post-audit.md:149",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 182,
+      "source": "docs/architecture/cp5-post-audit.md:150",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 183,
+      "source": "docs/architecture/cp5-post-audit.md:152",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 184,
+      "source": "docs/architecture/cp5-post-audit.md:153",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 185,
+      "source": "docs/architecture/cp5-post-audit.md:164",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 186,
+      "source": "docs/architecture/cp5-post-audit.md:183",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 187,
+      "source": "docs/architecture/cp5-post-audit.md:186",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 188,
+      "source": "docs/architecture/cp5-post-audit.md:191",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 189,
+      "source": "docs/architecture/cp5-post-audit.md:198",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 190,
+      "source": "docs/architecture/cp5-post-audit.md:233",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 191,
+      "source": "docs/architecture/cp5-post-audit.md:243",
+      "category": "C",
+      "disposition": "Keep observational metric or absence of unmeasured quality threshold; mixed prior budget/profile wording removed."
+    },
+    {
+      "baseline_match": 192,
+      "source": "docs/architecture/analysis-dataflow-result-v1.md:19",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 193,
+      "source": "docs/architecture/analysis-dataflow-result-v1.md:26",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 194,
+      "source": "docs/architecture/analysis-dataflow-result-v1.md:28",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 195,
+      "source": "docs/architecture/analysis-dataflow-result-v1.md:77",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 196,
+      "source": "docs/architecture/analysis-dataflow-result-v1.md:90",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 197,
+      "source": "docs/architecture/analysis-dataflow-result-v1.md:92",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 198,
+      "source": "docs/architecture/analysis-dataflow-result-v1.md:93",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 199,
+      "source": "docs/architecture/analysis-dataflow-result-v1.md:95",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 200,
+      "source": "docs/architecture/analysis-dataflow-result-v1.md:96",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 201,
+      "source": "docs/architecture/analysis-dataflow-result-v1.md:97",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 202,
+      "source": "docs/architecture/analysis-dataflow-result-v1.md:98",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 203,
+      "source": "docs/architecture/analysis-dataflow-result-v1.md:113",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 204,
+      "source": "docs/architecture/analysis-dataflow-result-v1.md:129",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 205,
+      "source": "docs/architecture/analysis-dataflow-result-v1.md:131",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 206,
+      "source": "docs/architecture/analysis-dataflow-result-v1.md:145",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 207,
+      "source": "docs/architecture/decisions/ADR-0011.md:13",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 208,
+      "source": "docs/architecture/decisions/ADR-0012.md:13",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    },
+    {
+      "baseline_match": 209,
+      "source": "docs/architecture/decisions/ADR-0012.md:35",
+      "category": "A",
+      "disposition": "Capacity clause superseded in active CP5 contract; negative counterexamples may retain the spelling."
+    }
+  ]
+}

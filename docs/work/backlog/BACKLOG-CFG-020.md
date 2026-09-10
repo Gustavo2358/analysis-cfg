@@ -1,11 +1,11 @@
 # BACKLOG-CFG-020 — Análises posteriores — fronteira reservada
 
-**Estado:** `deferred`. **Fase:** `deferred`. **Autorização:** backlog não autoriza execução.
-Dependências: BACKLOG-CFG-011.
+**Estado:** `active` somente na preparação CP5. **Fase:** `analysis`. **Autorização:** backlog não autoriza execução.
+Dependência focal CP5: BACKLOG-CFG-027. A dependência histórica BACKLOG-CFG-011 continua aplicável à qualificação de análises gerais, não ao profile CP5 aprovado.
 
 ## Problema e objetivo observável
 
-Reservar evolução para effects/storage, RD, values e dependency facts sem implementá-los agora.
+Formalizar e desenvolver CP5 em cinco Waves no WORK-CFG-028; autorização atual cobre somente harness. Demais análises continuam adiadas.
 
 ## Escopo e estratégia
 
@@ -39,10 +39,14 @@ item porque ficou verde. Sem duplicar este plano em tasklist permanente.
 
 ## Fora de escopo
 
-Todo dataflow, reaching definitions, storage solver, CDG, dominância, slicing e dependency extraction fora do escopo atual.
+Nesta preparação: toda implementação dataflow/values. Após CP5 autorizado por Waves, continuam fora: RD completo, storage geral, CDG/dominância/slicing e consumers de negócio.
 
 ## Evidência de conclusão
 
 Revisão/commit, diff explicado, testes/gates com exit codes, falsificação adversarial,
 capabilities/precisão realmente entregues e limitações. Até existir essa evidência,
 o estado permanece planejado e nenhum perfil recebe claim por antecipação.
+
+## Recorte CP5 aprovado em 09/09/2026
+
+[Lifecycle](../cp5-lifecycle.json), [roadmap](../../product/cp5-roadmap.md) e [follow-ups](../cp5-follow-ups.md). Reutilização deste item evita backlog CP5 duplicado. Nenhuma Wave nem follow-up foi iniciado.

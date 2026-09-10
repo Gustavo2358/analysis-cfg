@@ -1,0 +1,131 @@
+[
+  {
+    "name": "full",
+    "command": [
+      "bash",
+      "scripts/harness/check-full.sh"
+    ],
+    "exit": 3,
+    "expected_exit": 3,
+    "elapsed_seconds": 38.722,
+    "log": "full.log.gz",
+    "sha256": "a93445766880551c3f94e8b5deec0b17a19fed445a8e8693a42a9bb213b810cf",
+    "gzip_sha256": "33b772f18d33d96efd2821742ee46425fbccf4873b9ec15afd106c9bacf25531",
+    "raw_bytes": 741742
+  },
+  {
+    "name": "integration",
+    "command": [
+      "bash",
+      "scripts/harness/check-integration.sh"
+    ],
+    "exit": 0,
+    "expected_exit": 0,
+    "elapsed_seconds": 6.191,
+    "log": "integration.log.gz",
+    "sha256": "642917d3ad68564fc0e12765efd82205016a2c5e2d6ae3ab1294fc4475941c0f",
+    "gzip_sha256": "7268dd1ae700a031e524dc3251084e87d2ae9fb445e4631f067388d85e207c6a",
+    "raw_bytes": 10371
+  },
+  {
+    "name": "performance",
+    "command": [
+      "bash",
+      "scripts/harness/check-performance.sh"
+    ],
+    "exit": 3,
+    "expected_exit": 3,
+    "elapsed_seconds": 0.302,
+    "log": "performance.log.gz",
+    "sha256": "aafbc9e42e055b1d51f54a256cb82cdb4e0c40dd32bbeb3c2aadd5ddb121518b",
+    "gzip_sha256": "0c625237980668637f5e27129d3197fb2cd53b13c8a8c9473ed6f3c15d92e75f",
+    "raw_bytes": 69
+  },
+  {
+    "name": "maven-verify",
+    "command": [
+      "mvn",
+      "-B",
+      "-ntp",
+      "clean",
+      "verify"
+    ],
+    "exit": 0,
+    "expected_exit": 0,
+    "elapsed_seconds": 6.119,
+    "log": "maven-verify.log.gz",
+    "sha256": "d9384c188cc5ffdf485778e1050d8f4b1101ffede08ca2b39cd433e25e57d5f5",
+    "gzip_sha256": "7d178f98acf1c17c0579dac4c698ee670e0a2366e92abc1bc6b0d4fdfb103976",
+    "raw_bytes": 10319
+  },
+  {
+    "name": "baseline-fast",
+    "log": "baseline-fast.log.gz",
+    "command": [
+      "bash",
+      "scripts/harness/check-fast.sh"
+    ],
+    "exit": 0,
+    "interpretation": "Baseline at approved HEAD: 47 original + 72 CP5 tests.",
+    "sha256": "d71508def17d179bc3d3b0d941eb550a040d86b34773893241097de3250ef737",
+    "gzip_sha256": "98b55b93d3c6bb65a1c1a98071408c2743055fb0fc2ae534fc9650d920ffb3b6",
+    "raw_bytes": 15218
+  },
+  {
+    "name": "initial-red",
+    "log": "initial-red.log.gz",
+    "command": [
+      "python3",
+      "scripts/harness/test_cp5_harness.py",
+      "CoreSizeContractTests"
+    ],
+    "exit": 1,
+    "interpretation": "TDD: four tests, seven failing subcases before contract correction.",
+    "sha256": "04472236d94571076380efcb1be59493c6d91c13509ceb9b65d6fc16688b32b0",
+    "gzip_sha256": "4680feced676f8d2b1f8f79d83b128dd2607b69932bffe72f9c13be2666206df",
+    "raw_bytes": 7121
+  },
+  {
+    "name": "intermediate-red",
+    "log": "intermediate-red.log.gz",
+    "command": [
+      "python3",
+      "-B",
+      "scripts/harness/test_cp5_harness.py"
+    ],
+    "exit": 1,
+    "interpretation": "80 tests: one diagnostic substring mismatch. Guard correctly rejected open-by-count; assertion corrected without weakening behavior.",
+    "sha256": "9388c5ec7699e7b31b4afc58e89b7d6d1abd17086d9e70a06000438ba3736741",
+    "gzip_sha256": "eaf86f4c25fbd4394af968970702f7265624fa7848907eb71e4d81edb4d97e59",
+    "raw_bytes": 13266
+  },
+  {
+    "name": "second-green",
+    "log": "second-green.log.gz",
+    "command": [
+      "python3",
+      "-B",
+      "scripts/harness/test_cp5_harness.py"
+    ],
+    "exit": 0,
+    "interpretation": "83 tests, includes parseable role/wire/scale mutants, exact restore and second GREEN.",
+    "sha256": "62b49f558e0c7f15f73e6585391cc17897f0f4e2407549d9aceaec2047eeba1e",
+    "gzip_sha256": "27ac724be4182846820759b64105f4a3d19441a4522676d28eaf8b8af1a78e58",
+    "raw_bytes": 13421
+  },
+  {
+    "name": "scope",
+    "log": "scope.log.gz",
+    "command": [
+      "python3",
+      "-B",
+      "scripts/project/check_scope.py",
+      "--update-manifest"
+    ],
+    "exit": 0,
+    "interpretation": "Scope, immutable Java/POM baseline and manifest; refreshed again after evidence files.",
+    "sha256": "1966c832ef099a94842cfe566cd2422e3eaf118c456614e3c0c66f0a4ae08139",
+    "gzip_sha256": "98393fe25d86eca12802ff15f6c7a88b7ac3793065fcb332b2d05273cbed6707",
+    "raw_bytes": 479
+  }
+]

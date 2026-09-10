@@ -1,0 +1,9 @@
+{
+  "kind": "design-source-reference-audit-not-dataflow",
+  "air_sha256": "dd3bb4819282e609a97937ea01b7e202786e2c2d9ba9c8a1821a8b982eeb8788",
+  "example_sha256": "fdb48c2171c816ed06de73c3e86349b483b4ac617c055a651fdcbc4ebfc8bdb9",
+  "reference_occurrences": 11,
+  "all_references_found_in_fixture": true,
+  "missing": [],
+  "limits": "Checks reference ownership/presence only; expected PROGA is not execution evidence"
+}

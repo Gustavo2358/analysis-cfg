@@ -1,0 +1,14 @@
+{
+  "kind": "IMPLEMENTED_W5_PHASE_CONTRACT",
+  "historical_design": "docs/evals/cp5/history/phase-review.json",
+  "nominal_witnesses": [
+    "analysis-adapters/src/test/java/io/github/gustavo2358/analysis/adapters/DeliveryTest.java",
+    "scripts/project/test_result_wire.py",
+    "analysis-adapters/src/test/java/io/github/gustavo2358/analysis/adapters/WireAdversarialTest.java"
+  ],
+  "executed_snapshot": "docs/evals/cp5/w5-prepared.snapshot.json",
+  "partialPolicy": "EXPLICIT_PARTIAL_BY_DEPENDENCY",
+  "receipt": "external; COMPLETE never promotes prepared status",
+  "executed_partial_snapshot": "docs/evals/cp5/w5-unsupported.snapshot.json",
+  "partial_snapshot_sha256": "d8a66423f48da01d531edd157e9a0bcea77f3a2c652a57f7ed604fe2a4c3db1e"
+}

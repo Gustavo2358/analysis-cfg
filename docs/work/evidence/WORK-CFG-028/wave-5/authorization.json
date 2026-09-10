@@ -1,0 +1,29 @@
+{
+  "date": "2026-09-10",
+  "source": "explicit human request authorizing final CP5 Wave 5 in same draft PR #12",
+  "reviewed_head": "21d65d08512f1fb8a945009c2919946a61566eed",
+  "decision": "WAVE_4_APPROVED_AND_WAVE_5_AUTHORIZED",
+  "W4": "APPROVED",
+  "resolved_findings": [
+    "W4-F1",
+    "W4-BINDING-01"
+  ],
+  "nonblocking_follow_ups": [
+    "W3-PERF-01",
+    "W3-METRICS-01"
+  ],
+  "authorized_wave": 5,
+  "current_checkpoint": "WAVE_5",
+  "scope": "Production composition, generic write observation plan, versioned result wire/parser, deterministic local writer/external receipt, separate CLI, real fresh CP4E twice and CP3 E2Es using siblings read-only; tests, harness, evidence, commits/push and final HEAD CI. Local W5 input adapter may omit legacy pre-read cap.",
+  "not_authorized": [
+    "CP6",
+    "domain resolvers",
+    "sibling changes",
+    "repin",
+    "merge",
+    "ready",
+    "auto-merge"
+  ],
+  "evidence": "docs/work/evidence/WORK-CFG-028/wave-5/authorization.json",
+  "request_sha256": "4f0f0656f0220982dbe7540812d2a15cd10173aa504e4e1de4717b24f168a746"
+}

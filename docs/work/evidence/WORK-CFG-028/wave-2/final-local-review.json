@@ -1,0 +1,17 @@
+{
+  "review": "local implementation and scope review; not human approval",
+  "implementation_head": "70ff8663d1d46f765354fbabce45216e8f9b1316",
+  "w1_sources_and_poms_byte_exact": true,
+  "w2_source_inventory_verified": true,
+  "sources_lock_sha256": "e68fd901f8022c82b13d7bc8119000aba40f6141d5059f9898014d8ee1743a88",
+  "maven_tests": 183,
+  "harness_tests": 134,
+  "product_mutants": 23,
+  "test_only_oracle_mutants": 3,
+  "unavailable": [
+    "W3",
+    "W4",
+    "W5"
+  ],
+  "final_remote_ci": "Required after final push; receipt on same draft PR #12"
+}

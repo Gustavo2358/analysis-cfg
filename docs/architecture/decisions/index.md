@@ -15,3 +15,8 @@ Nenhum desses estados afirma implementação existente.
 | [ADR-0007](ADR-0007.md) | Java 21 e modelo AIR compartilhado via air-java | accepted |
 | [ADR-0008](ADR-0008.md) | Entrega por slices e TDD independente | accepted |
 | [ADR-0009](ADR-0009.md) | Binding JSON pertence à especificação AIR | accepted |
+| [ADR-0010](ADR-0010.md) | Sessão de análise, DAG e observação compartilhada | accepted |
+| [ADR-0011](ADR-0011.md) | Propagação incremental por contexto e direção | accepted |
+| [ADR-0012](ADR-0012.md) | Locations, valores finitos e claims por escopo | accepted |
+| [ADR-0013](ADR-0013.md) | Propriedades de estado, custo e evidência falsificável | accepted |
+| [ADR-0014](ADR-0014.md) | CORE-SIZE-001: tamanho não define cobertura semântica | accepted |

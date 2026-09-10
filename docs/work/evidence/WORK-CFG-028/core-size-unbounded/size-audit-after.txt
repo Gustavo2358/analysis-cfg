@@ -1,0 +1,127 @@
+docs/architecture/analysis-dataflow-result-v1.md:66:resourceBudgets/maxCandidates e outcomes de capacidade. AnalysisKey.options={} no
+docs/architecture/cfg-json-v1.md:83:IMPLEMENTATION_LIMIT físico. Não carregar arquivo arbitrariamente grande.
+docs/architecture/cp5-post-audit.md:10:H4 é supersedido somente em caps/budgets de capacidade. Patricia/radix e FIFO
+docs/architecture/cp5-post-audit.md:11:continuam experimentais; k=8 sai do desenho produtivo.
+docs/architecture/cp5-post-audit.md:153:qualquer tamanho; análise concluída usa STABLE. ADMISSION_LIMIT, ANALYSIS_LIMIT e
+docs/architecture/cp5-post-audit.md:154:LIMIT de capacidade deixam de existir no contrato. Falha externa não é resultado
+docs/architecture/cp5-post-audit.md:245:threshold percentual ou alegação de ganho antes de corpus e evidência.
+docs/architecture/decisions/ADR-0011.md:13:Propagar primeira publicação e raízes semanticamente alteradas somente pelas arestas afetadas. joinInto acumula monotonicamente; enqueue apenas com mudança ou inicialização. Preservar Entry, seeds uma vez, self-loop e dual backward. Join/transfer de bloco e aresta têm leis explícitas; término por convergência, sem budget de capacidade (CORE-SIZE-001).
+docs/architecture/decisions/ADR-0012.md:21:Profile textual escalar estreito com recusas tipadas; RD/Def-Use/aliases gerais adiados. CORE-SIZE-001 remove k/maxCandidates e saturação por contagem. Snapshot de resultado é review de design, não codec nem execução.
+docs/architecture/decisions/ADR-0013.md:17:PASS de performance por Markdown/tempo total; counter declarativo sem observar trabalho; gate nominal Patricia/FIFO/k=8; adiar toda escala para W5.
+docs/architecture/decisions/ADR-0013.md:21:Patricia/radix e FIFO são EXPERIMENTAL implementation candidates; k=8 foi supersedido por CORE-SIZE-001. Alternativas que cumpram propriedades são permitidas sob evidência/review. W1–W5 sequenciais, review entre Waves, mesma branch/PR draft por autorização humana específica. Eventuais thresholds de testes de performance são calibrados por Wave, fora do core; nunca definem admissão, término ou precisão. Sem SLA fictício.
+docs/architecture/decisions/ADR-0013.md:31:por fase, com denominadores/corpus/configuração. Sem novos thresholds ou freeze de
+docs/architecture/decisions/ADR-0014.md:12:não pode alterar ACCEPTED para UNSUPPORTED, LIMIT, TRUNCATED ou resultado menos
+docs/architecture/decisions/ADR-0014.md:22:nunca resourceBudgets, maxCandidates, tamanho da máquina ou política de execução.
+docs/architecture/decisions/ADR-0014.md:57:exigiam bounded candidate sets por capacidade, k=8 (inclusive como default
+docs/architecture/decisions/ADR-0014.md:58:experimental produtivo), maxCandidates, CARDINALITY_LIMIT/Saturated por contagem,
+docs/architecture/decisions/ADR-0014.md:59:budgets como término ou ADMISSION_LIMIT/ANALYSIS_LIMIT/LIMIT de fase por recursos.
+docs/architecture/decisions/ADR-0014.md:74:facts porque o trabalho excedeu um budget, mesmo sob rótulo parcial ou FAILED.
+docs/architecture/decisions/ADR-0014.md:85:externo não viram conclusão semântica: nem LIMIT, UNSUPPORTED, INVALID_INPUT,
+docs/architecture/decisions/ADR-0014.md:87:ANALYSIS_LIMIT e qualquer mapping equivalente. Falha interna controlável por bug ou
+docs/architecture/decisions/ADR-0014.md:120:thresholds de testes/CI ficam fora do core e nunca alteram o resultado esperado.
+docs/architecture/invariants.md:152:H4 protege propriedades de estado e métricas/retention, não Patricia/FIFO; k=8 foi removido por CORE-SIZE-001. Probes/challenges por Wave conforme ADR-0013.
+docs/architecture/ports-and-adapters.md:26:`INVALID_IR`, `UNSUPPORTED_CAPABILITY`, `UNSUPPORTED_INPUT`, `VALIDATION_LIMIT` e
+docs/architecture/ports-and-adapters.md:95:`INCOMPLETE_VALIDATION`, `VALIDATION_LIMIT` e `UNSUPPORTED_CAPABILITY` não são
+docs/architecture/ports-and-adapters.md:133:antes do codec é IMPLEMENTATION_LIMIT com maximumDocumentBytes. INPUT_IO distingue
+docs/domain/cp5-solver.md:63:O solver termina pela convergência matemática/ponto fixo, sem maxIterations,
+docs/domain/cp5-solver.md:64:maxWorklistPushes, maxJoins, budget de trabalho ou timeout de análise no core.
+docs/domain/cp5-values.md:56:cardinalidade 9, 100, 10.000 ou maior. Não há maxCandidates, k produtivo,
+docs/domain/cp5-values.md:57:CARDINALITY_LIMIT ou Saturated por contagem. Unknown remainder vem de incerteza
+docs/engineering/cp5-challenges.md:97:maxWorklistSize e maxSparseBindings permanecem métricas obrigatórias. Testes mutam
+docs/engineering/cp5-performance.md:16:budgets de capacidade de H4; remainder continua estritamente semântico. Sem cadeia de deltas cujo lookup cresce com
+docs/engineering/cp5-performance.md:44:worklistPushes ≤ worklistAttempts; maxWorklistSize ≤ pontos ativos
+docs/engineering/cp5-performance.md:49:Nenhum budget corta trabalho no core. Backward usa IN
+docs/engineering/cp5-performance.md:126:manual de qualidade, mesmo passando tempo/memória. Nenhum threshold percentual novo.
+docs/engineering/cp5-performance.md:128:Métricas não disponíveis continuam null. maxWorklistSize, maxSparseBindings e
+docs/engineering/cp5-performance.md:129:cardinalidade são observações, nunca thresholds de rejeição. Medir elapsed time,
+docs/engineering/downstream-impact.md:5:`PRECISION_LIMIT`, `INVALID_IR` ou `UNASSESSED`. Esta classificação é local ao harness,
+docs/engineering/testing.md:153:threshold temporal. Não é prova geral de complexidade do validator nem benchmark.
+docs/evals/cp5/challenges.json:483:      "id": "resource-budget-changes-semantic-result",
+docs/evals/cp5/challenges.json:486:      "oracle": "No work/resource budget in solver SPI or semantic AnalysisKey.",
+docs/evals/cp5/core-size-contract.json:63:      "rejection_thresholds": {},
+docs/evals/cp5/core-size-contract.json:74:        "maxWorklistSize"
+docs/evals/cp5/metrics.json:214:      "name": "maxWorklistSize",
+docs/evals/cp5/metrics.json:524:      "event": "observed distinct semantic candidates in a fact; distribution and high-water mark, never a rejection threshold",
+docs/evals/cp5/post-audit-contracts.json:197:    "thresholds": null,
+docs/evals/cp5/probes.json:84:        "maxWorklistSize"
+docs/evals/cp5/probes.json:326:      "oracle": "Fixed finite corpus/semantic profile and independent expected outcomes; report refusals, all candidates, open/closed outcomes and controlled phase failures alongside time/memory; no aggregate percent threshold.",
+docs/evals/cp5/probes.json:369:        "maxWorklistSize",
+docs/evals/cp5/probes.json:381:        "resource-budget-changes-semantic-result",
+docs/product/cp5-roadmap.md:14:Waves. Métricas são observações, nunca thresholds de admissão ou precisão.
+docs/product/cp5-roadmap.md:63:W1 nasce sem node/edge/operation/object/sequence count cap ou admission-visit budget.
+docs/product/cp5-roadmap.md:81:W2 nasce sem maxIterations, maxWorklistPushes, maxJoins, work budget ou analysis
+docs/product/cp5-roadmap.md:92:Patricia é candidato sem obrigação nominal; k=8 deixa de ser opção produtiva. DoD inclui snapshot isolation,
+docs/product/cp5-roadmap.md:99:Sem maxCandidates, k produtivo, CARDINALITY_LIMIT ou candidate-count saturation.
+docs/product/cp5-roadmap.md:114:W4 não expõe maxConsumers/maxCandidateSites/maxQueries/maxObservationBatches como
+docs/work/active/WORK-CFG-028/plan.md:40:3. Formalizar ADR-0014; RED de contratos, remover outcomes/budgets/caps, GREEN.
+docs/work/active/WORK-CFG-028/spec.md:32:Corrigir somente F1 (admission LIMIT), F2 (DeliveryReceipt externo) e F3
+docs/work/active/WORK-CFG-028/spec.md:39:precisão ou término. Supersede budgets/outcomes de capacidade e cap de candidatos,
+docs/work/active/WORK-CFG-028/work-item.json:9:  "authorization_evidence": "Pedido humano de 2026-09-09 confirma APPROVED H1-H7/R1/R2 do discovery revisado e autoriza somente harness/docs/scripts, commits, push e um PR draft único para CP5. Não autoriza Wave 1 nem qualquer engine. Evidência durável em docs/work/cp5-lifecycle.json. Pedido pós-auditoria autoriza remediações focais A-I, commits/push no mesmo PR #12 draft e novo review, com harness/B1 previamente APPROVED. Nenhuma Wave autorizada. Review humano do HEAD e053f14 aprova A/B/C/D/E/G/H/I e solicita somente F1/F2/F3; correção focal, gates e push no PR #12 draft. W1 continua não autorizada. Nova decisão humana após e86a57c aprova integralmente A–I/F1/F2/F3 e autoriza somente remediação CORE-SIZE-001 do harness, commits/push no PR #12 draft. Supersede caps/budgets de capacidade; não autoriza W1.",
+docs/work/cp5-lifecycle.json:38:      "k=8"
+docs/work/cp5-follow-ups.md:66:| Dívida local herdada do preflight | analysis-cfg@e86a57c: BuildOptions.validation e CfgBuildCoordinator propagam VALIDATION_LIMIT do upstream | adequação bilateral futura; não converter em UNSUPPORTED/INVALID_INPUT CP5 nem fabricar build válido |
+docs/work/cp5-follow-ups.md:67:| Dívida local do reader | mesmo SHA: AirJsonFileReader/AirInputLimitException espelham maximumDocumentBytes e CLI reporta IMPLEMENTATION_LIMIT | migração produtiva autorizada antes de composição CP5 sem cap interno; não apenas elevar teto |
+docs/work/cp5-follow-ups.md:68:| Dívida local do writer CFG legado | mesmo SHA: CfgJsonWriter default 64 MiB, CfgJsonBytes.maximumBytes interrompe output | manter bytes/testes legados nesta sessão; não reutilizar a política no writer CP5; correção produtiva própria |
+docs/work/cp5-follow-ups.md:71:A propagação de VALIDATION_LIMIT é dívida de capacidade, não validação de correção
+scripts/harness/cp5_audit_contract.py:102:        require(data['quality']['thresholds'] is None and data['quality']['measurements'] is None, 'quality unmeasured/no threshold')
+scripts/harness/cp5_size_contract.py:39:    'metrics': {'role':'OBSERVATION_ONLY', 'rejection_thresholds':{},
+scripts/harness/cp5_size_contract.py:42:                    'candidateCardinality','maxSparseBindings','maxWorklistSize'],
+scripts/harness/cp5_size_contract.py:57:    'resource-budget-changes-semantic-result': (2, 'No work/resource budget in solver SPI or semantic AnalysisKey.'),
+scripts/harness/test_cp5_harness.py:81:            (lambda x:x['quality'].update(thresholds={'resolve_percent':95}), 'quality unmeasured/no threshold')]:
+scripts/harness/test_cp5_harness.py:127:            ('maxCandidates','possible_values', lambda r:r.update(maxCandidates=8)),
+scripts/harness/test_cp5_harness.py:128:            ('CARDINALITY_LIMIT','possible_values', lambda r:r.update(capacity_saturation=True)),
+scripts/harness/test_cp5_harness.py:129:            ('resourceBudgets','analysis_key', lambda r:r['resource_policy_fields'].append('resourceBudgets')),
+scripts/harness/test_cp5_harness.py:130:            ('max-visits-aborts','solver', lambda r:r['resource_interruptions'].append({'field':'visits','above':100,'outcome':'LIMIT'})),
+scripts/harness/test_cp5_harness.py:132:            ('oom-mapping','execution_boundary', lambda r:r['resource_failure_semantic_mappings'].update(OutOfMemoryError='ANALYSIS_LIMIT')),
+scripts/harness/test_cp5_harness.py:134:            ('metric-as-policy','metrics', lambda r:r['rejection_thresholds'].update(maxWorklistSize=100)),
+scripts/harness/test_cp5_harness.py:155:            ('candidate-N-plus-1-top',lambda x:x.update(value_kind='Saturated'),'no cardinality TOP'),
+scripts/harness/test_cp5_harness.py:159:            ('work-exhausted',lambda x:x.update(analysis='LIMIT'),'work cannot abort')]:
+scripts/harness/test_cp5_harness.py:175:            self.edit(PLAN+'architecture.json',lambda x:x['resource_failure_semantic_mappings'].update(OutOfMemoryError='ANALYSIS_LIMIT'))
+scripts/harness/test_cp5_harness.py:185:            (LIFECYCLE,lambda x:x['core_size_remediation']['implementation_candidates'].append('k=8'),'current review/candidates'),
+scripts/harness/test_cp5_harness.py:236:        self.edit(LIFECYCLE,lambda x:x['last_human_approval']['implementation_candidates_not_frozen'].remove('k=8'))
+scripts/harness/test_cp5_harness.py:385:        changes = [(field, lambda x,field=field:x['completion'][field].append('LIMIT'))
+scripts/harness/test_cp5_harness.py:387:        changes += [('resourceBudgets',lambda x:x['analysis_key_options'].update(resourceBudgets={'visits':100})),
+scripts/harness/test_cp5_harness.py:388:                    ('maxCandidates',lambda x:x['analysis_key_options'].update(maxCandidates=8)),
+scripts/harness/test_cp5_harness.py:389:                    ('ADMISSION_LIMIT',lambda x:x['execution_statuses'].append('ADMISSION_LIMIT')),
+scripts/harness/test_cp5_harness.py:390:                    ('ANALYSIS_LIMIT',lambda x:x['execution_statuses'].append('ANALYSIS_LIMIT'))]
+scripts/harness/test_cp5_harness.py:483:                    result['executionStatus'] = 'ANALYSIS_LIMIT'
+scripts/harness/test_cp5_harness.py:493:                       {'observation':{'status':'LIMIT','reason':None}}, {'consumers':[]}]:
+scripts/harness/test_cp5_harness.py:503:            for reason in ['ADMISSION_BUDGET','WORK_BUDGET','OutOfMemoryError','MAX_NODES']:
+scripts/harness/test_cp5_harness.py:640:        self.example['limitReason']='WORK_BUDGET'
+scripts/harness/test_cp5_harness.py:642:        self.example['executionStatus']='ANALYSIS_LIMIT'
+scripts/harness/test_cp5_harness.py:646:        self.example['observations'][0]['value']['kind']='Saturated'
+scripts/harness/test_cp5_harness.py:758:        for field in ['resourceBudgets', 'maxCandidates', 'maxNodes', 'maxQueries', 'k']:
+scripts/harness/test_cp5_harness.py:765:        for status in ['ADMISSION_LIMIT', 'ANALYSIS_LIMIT']:
+scripts/harness/test_cp5_harness.py:767:            mutant.update(executionStatus=status, observations=[], limitReason='WORK_BUDGET')
+scripts/harness/test_cp5_harness.py:771:            mutant['completion'][phase] = {'status':'LIMIT', 'reason':'QUERY_BUDGET'}
+scripts/harness/test_cp5_harness.py:782:        for reason in ['WORK_BUDGET','QUERY_BUDGET','OutOfMemoryError','INFRA_TIMEOUT','DISK_EXHAUSTION']:
+scripts/harness/test_cp5_harness.py:792:                prepared['consumers'][0]['status'] = 'LIMIT'
+scripts/harness/test_cp5_harness.py:797:                receipt['status'] = 'LIMIT'
+scripts/harness/test_cp5_harness.py:798:                self.assertTrue(validate_delivery_receipt(receipt,None,'LIMIT'))
+scripts/harness/test_cp5_harness.py:802:        mutant['observations'][0]['value'].update(kind='Saturated', enumerated=[],
+scripts/harness/test_cp5_harness.py:803:            modelValueRemainder=True, saturationReason='CARDINALITY_LIMIT')
+scripts/harness/validate_cp5.py:41:maxWorklistSize joinEntriesVisited stateCompareEntries stateAllocations stateBytesAllocated
+scripts/harness/validate_cp5.py:178:        require(set(approval['implementation_candidates_not_frozen']) == {'Patricia/radix','FIFO','k=8'}, 'implementation-neutral H4')
+scripts/project/check_transport_architecture.py:56:    if "return codec.decode(bytes);" not in text or "readNBytes(limits.maximumDocumentBytes())" not in text:
+cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/CfgBuildCoordinator.java:47:        } else if (has(preflight, ValidationIssue.Kind.VALIDATION_LIMIT)) {
+cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/CfgBuildCoordinator.java:48:            status = CfgBuildResult.Status.VALIDATION_LIMIT;
+cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/CfgBuildResult.java:56:        VALIDATION_LIMIT,
+cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirInputLimitException.java:5:/** Physical IMPLEMENTATION_LIMIT before any codec call; no Publication has been materialized. */
+cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirInputLimitException.java:8:    private final int maximumDocumentBytes;
+cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirInputLimitException.java:10:    public AirInputLimitException(int maximumDocumentBytes) {
+cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirInputLimitException.java:11:        super("AIR file exceeds maximumDocumentBytes=" + maximumDocumentBytes);
+cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirInputLimitException.java:12:        this.maximumDocumentBytes = maximumDocumentBytes;
+cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirInputLimitException.java:15:    public int maximumDocumentBytes() { return maximumDocumentBytes; }
+cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirJsonFileReader.java:27:            bytes = input.readNBytes(limits.maximumDocumentBytes());
+cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirJsonFileReader.java:29:            if (input.read() != -1) throw new AirInputLimitException(limits.maximumDocumentBytes());
+cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonBytes.java:9:    private final int maximumBytes;
+cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonBytes.java:11:    CfgJsonBytes(int maximumBytes) {
+cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonBytes.java:12:        if (maximumBytes < 1) throw new IllegalArgumentException("positive maximumBytes required");
+cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonBytes.java:13:        this.maximumBytes = maximumBytes;
+cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonBytes.java:14:        output = new ByteArrayOutputStream(Math.min(maximumBytes, 8192));
+cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonBytes.java:18:        if (output.size() == maximumBytes) throw new CfgJsonException("CFG JSON exceeds maximumBytes=" + maximumBytes);
+cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter.java:23:    private final int maximumBytes;
+cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter.java:27:    public CfgJsonWriter(int maximumBytes) {
+cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter.java:28:        if (maximumBytes < 1) throw new IllegalArgumentException("positive maximumBytes required");
+cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter.java:29:        this.maximumBytes = maximumBytes;
+cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter.java:37:        var out = new CfgJsonBytes(maximumBytes);
+cfg-launcher/src/main/java/io/github/gustavo2358/analysis/cfg/launcher/AnalysisCfg.java:39:            err.println("AIR IMPLEMENTATION_LIMIT path=$ maximumDocumentBytes=" + limit.maximumDocumentBytes());

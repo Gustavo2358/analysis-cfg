@@ -1,0 +1,114 @@
+[
+  {
+    "id": "unsupported-query-aborts-batch",
+    "kind": "harness-snapshot-contracase-not-engine-mutation",
+    "mutant_json_parseable": true,
+    "snapshot_before_sha256": "698c9d768dd5d03cbcdf566c5b96ae81199a96820a7cdda6170591811725f339",
+    "mutant_sha256": "9e1a23206594a97c1f9e7584b10936665a8066593669fe242723d7862c68ba9c",
+    "snapshot_after_sha256": "698c9d768dd5d03cbcdf566c5b96ae81199a96820a7cdda6170591811725f339",
+    "byte_exact_restore": true,
+    "steps": [
+      {
+        "stage": "unsupported-query-aborts-batch-baseline-green",
+        "command": [
+          "/usr/bin/python3",
+          "-B",
+          "/tmp/cp5-b1-challenges-x8hb8e1l/repo/scripts/harness/validate_cp5.py",
+          "--root",
+          "/tmp/cp5-b1-challenges-x8hb8e1l/repo"
+        ],
+        "exit": 0,
+        "expected_exit": 0,
+        "required_diagnostic": null,
+        "log": "/tmp/cp5-b1-validation/unsupported-query-aborts-batch-baseline-green.log",
+        "sha256": "b1190d62427fcf1221bf6427463786b008a198da5f39f8bbd0f9fad65e25b610"
+      },
+      {
+        "stage": "unsupported-query-aborts-batch-expected-red",
+        "command": [
+          "/usr/bin/python3",
+          "-B",
+          "/tmp/cp5-b1-challenges-x8hb8e1l/repo/scripts/harness/validate_cp5.py",
+          "--root",
+          "/tmp/cp5-b1-challenges-x8hb8e1l/repo"
+        ],
+        "exit": 1,
+        "expected_exit": 1,
+        "required_diagnostic": "mixed batch must remain STABLE",
+        "log": "/tmp/cp5-b1-validation/unsupported-query-aborts-batch-expected-red.log",
+        "sha256": "13f5a421a1507e165356b4cc696319ae50c59df6f419ab9679e1c14457b7ddf0"
+      },
+      {
+        "stage": "unsupported-query-aborts-batch-second-green",
+        "command": [
+          "/usr/bin/python3",
+          "-B",
+          "/tmp/cp5-b1-challenges-x8hb8e1l/repo/scripts/harness/validate_cp5.py",
+          "--root",
+          "/tmp/cp5-b1-challenges-x8hb8e1l/repo"
+        ],
+        "exit": 0,
+        "expected_exit": 0,
+        "required_diagnostic": null,
+        "log": "/tmp/cp5-b1-validation/unsupported-query-aborts-batch-second-green.log",
+        "sha256": "b1190d62427fcf1221bf6427463786b008a198da5f39f8bbd0f9fad65e25b610"
+      }
+    ]
+  },
+  {
+    "id": "unsupported-query-disappears",
+    "kind": "harness-snapshot-contracase-not-engine-mutation",
+    "mutant_json_parseable": true,
+    "snapshot_before_sha256": "698c9d768dd5d03cbcdf566c5b96ae81199a96820a7cdda6170591811725f339",
+    "mutant_sha256": "fc6e874a3ff1923b50c13c520cb1f8082a0475f0894a332ea7eab715471c0382",
+    "snapshot_after_sha256": "698c9d768dd5d03cbcdf566c5b96ae81199a96820a7cdda6170591811725f339",
+    "byte_exact_restore": true,
+    "steps": [
+      {
+        "stage": "unsupported-query-disappears-baseline-green",
+        "command": [
+          "/usr/bin/python3",
+          "-B",
+          "/tmp/cp5-b1-challenges-x8hb8e1l/repo/scripts/harness/validate_cp5.py",
+          "--root",
+          "/tmp/cp5-b1-challenges-x8hb8e1l/repo"
+        ],
+        "exit": 0,
+        "expected_exit": 0,
+        "required_diagnostic": null,
+        "log": "/tmp/cp5-b1-validation/unsupported-query-disappears-baseline-green.log",
+        "sha256": "b1190d62427fcf1221bf6427463786b008a198da5f39f8bbd0f9fad65e25b610"
+      },
+      {
+        "stage": "unsupported-query-disappears-expected-red",
+        "command": [
+          "/usr/bin/python3",
+          "-B",
+          "/tmp/cp5-b1-challenges-x8hb8e1l/repo/scripts/harness/validate_cp5.py",
+          "--root",
+          "/tmp/cp5-b1-challenges-x8hb8e1l/repo"
+        ],
+        "exit": 1,
+        "expected_exit": 1,
+        "required_diagnostic": "requested query coverage",
+        "log": "/tmp/cp5-b1-validation/unsupported-query-disappears-expected-red.log",
+        "sha256": "2bdaface916422e4f471549d821fdff94ed3127e784030390360df3fd17f7596"
+      },
+      {
+        "stage": "unsupported-query-disappears-second-green",
+        "command": [
+          "/usr/bin/python3",
+          "-B",
+          "/tmp/cp5-b1-challenges-x8hb8e1l/repo/scripts/harness/validate_cp5.py",
+          "--root",
+          "/tmp/cp5-b1-challenges-x8hb8e1l/repo"
+        ],
+        "exit": 0,
+        "expected_exit": 0,
+        "required_diagnostic": null,
+        "log": "/tmp/cp5-b1-validation/unsupported-query-disappears-second-green.log",
+        "sha256": "b1190d62427fcf1221bf6427463786b008a198da5f39f8bbd0f9fad65e25b610"
+      }
+    ]
+  }
+]

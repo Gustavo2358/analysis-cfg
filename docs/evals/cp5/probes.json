@@ -1,0 +1,602 @@
+{
+  "schema_version": 1,
+  "status": "IMPLEMENTED_BY_WAVE_HOOKS",
+  "probes": [
+    {
+      "id": "S1",
+      "waves": [
+        1,
+        3,
+        5
+      ],
+      "title": "Long Sequence, one Cell",
+      "dimension": "I=N/2N (10k/20k then 100k/200k), V/E/D fixed, U=2",
+      "metrics": [
+        "operationsIndexed",
+        "operationsTransferred",
+        "valuesInterned",
+        "stateAllocations",
+        "stateRootsRetained"
+      ],
+      "oracle": "I operations indexed; transfer follows visits; no instruction snapshots or CFG-node growth",
+      "kills": "full clone or node per Assign",
+      "status": "IMPLEMENTED_BY_WAVE_HOOKS",
+      "hook": null,
+      "wave_hooks": {
+        "1": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w1.py"
+        },
+        "3": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w3.py"
+        },
+        "5": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
+        }
+      }
+    },
+    {
+      "id": "S2",
+      "waves": [
+        1,
+        3,
+        5
+      ],
+      "title": "Wide declarations",
+      "dimension": "D=1k/2k/10k; I and R fixed",
+      "metrics": [
+        "objectsIndexed",
+        "locationsIndexed",
+        "referencesResolved",
+        "structuralVisits"
+      ],
+      "oracle": "index proportional to D; resolution work follows R, never I\u00d7D",
+      "kills": "scan all Objects per Assign",
+      "status": "IMPLEMENTED_BY_WAVE_HOOKS",
+      "hook": null,
+      "wave_hooks": {
+        "1": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w1.py"
+        },
+        "3": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w3.py"
+        },
+        "5": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
+        }
+      }
+    },
+    {
+      "id": "S3",
+      "waves": [
+        3,
+        5
+      ],
+      "title": "Many live facts",
+      "dimension": "D=N/2N, writes=N/2N in one Sequence and chain of N blocks",
+      "metrics": [
+        "stateAllocations",
+        "stateBytesAllocated",
+        "stateBytesRetained",
+        "stateRootsRetained",
+        "maxSparseBindings",
+        "setElementsRetained"
+      ],
+      "oracle": "representation-specific bounded update/sharing ledger; compare writes/roots, measured heap and release",
+      "kills": "full state clone, dense matrix, historical roots or leaked pool",
+      "status": "IMPLEMENTED_BY_WAVE_HOOKS",
+      "hook": null,
+      "quality_companion": "S15",
+      "wave_hooks": {
+        "3": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w3.py"
+        },
+        "5": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
+        }
+      }
+    },
+    {
+      "id": "S4",
+      "waves": [
+        1,
+        2,
+        5
+      ],
+      "title": "Chains, diamonds, cycles and fan-in",
+      "dimension": "V=1k/2k/10k; E and published changes reported separately",
+      "metrics": [
+        "nodesIndexed",
+        "edgesIndexed",
+        "structuralVisits",
+        "edgeContributionJoins",
+        "publishedStatesChanged",
+        "worklistAttempts",
+        "maxWorklistSize"
+      ],
+      "oracle": "W1 adjacency visits follow edges; W2 contribution bound Aprop, no global scans; fair convergence",
+      "kills": "successor scan, redundant propagation/enqueue, lost self-loop",
+      "status": "IMPLEMENTED_BY_WAVE_HOOKS",
+      "hook": null,
+      "wave_hooks": {
+        "1": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w1.py"
+        },
+        "2": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w2.py"
+        },
+        "5": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
+        }
+      }
+    },
+    {
+      "id": "S4b",
+      "waves": [
+        2,
+        3,
+        5
+      ],
+      "title": "Staggered fan-in P1,J,P2,J,...",
+      "dimension": "N=1k/2k/10k predecessors; constant-size max(rank) state; W3 additionally varies live bindings",
+      "metrics": [
+        "edgeContributionJoins",
+        "predecessorContributionReads",
+        "joinEntriesVisited",
+        "stateAllocations",
+        "accumulatorStatesChanged"
+      ],
+      "oracle": "N contributions specifically to J and zero predecessor rereads; auxiliary edges separately counted; coalesced/multi-publication controls",
+      "kills": "semantically correct predecessor recomputation with ~N\u00b2 reads",
+      "status": "IMPLEMENTED_BY_WAVE_HOOKS",
+      "hook": null,
+      "wave_hooks": {
+        "2": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w2.py"
+        },
+        "3": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w3.py"
+        },
+        "5": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
+        }
+      }
+    },
+    {
+      "id": "S5",
+      "waves": [
+        4,
+        5
+      ],
+      "title": "Sparse overlapping consumers",
+      "dimension": "I=100k; C=20/30/10 supported sites; K=1/2/20",
+      "metrics": [
+        "operationsIndexed",
+        "structuralVisits",
+        "candidateSites",
+        "siteMatches",
+        "consumerInvocations",
+        "analysisRuns"
+      ],
+      "oracle": "index and same-key analysisRuns unchanged with K; callbacks equal actual matches, phases labelled",
+      "kills": "per-consumer traversal, I\u00d7K broadcast, solver per consumer",
+      "status": "IMPLEMENTED_BY_WAVE_HOOKS",
+      "hook": null,
+      "wave_hooks": {
+        "4": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w4.py"
+        },
+        "5": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
+        }
+      }
+    },
+    {
+      "id": "S6",
+      "waves": [
+        3,
+        4,
+        5
+      ],
+      "title": "Dense and duplicate queries",
+      "dimension": "Q=I/2 then I in same Sequence; duplicate requests over K consumers",
+      "metrics": [
+        "queryRequests",
+        "uniqueQueries",
+        "sequencesReplayed",
+        "operationsReplayed",
+        "stateBytesRetained"
+      ],
+      "oracle": "one directional prefix/suffix union per analysis/Entry/Sequence/epoch; selected facts O(Q), not Q\u00d7F; stable IN forward or stable OUT backward.",
+      "kills": "replay per query/site, implicit late replay, full state per query",
+      "status": "IMPLEMENTED_BY_WAVE_HOOKS",
+      "hook": null,
+      "quality_companion": "S15",
+      "wave_hooks": {
+        "3": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w3.py"
+        },
+        "4": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w4.py"
+        },
+        "5": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
+        }
+      }
+    },
+    {
+      "id": "S7",
+      "waves": [
+        3,
+        5
+      ],
+      "title": "All finite candidates and pool",
+      "dimension": "N/2N/4N branch literals; include 8/9, 100 and 10000 candidates; overwrites U=N versus U=2",
+      "metrics": [
+        "valuesInterned",
+        "poolHits",
+        "bytesHashed",
+        "candidateCardinality",
+        "setElementsRetained"
+      ],
+      "oracle": "All supported finite candidates preserved without count-induced remainder; U source-proportional; sharing, convergence and pool release.",
+      "kills": "candidate truncation, count-induced TOP, nonconvergent domain, global/historical pool",
+      "status": "IMPLEMENTED_BY_WAVE_HOOKS",
+      "hook": null,
+      "wave_hooks": {
+        "3": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w3.py"
+        },
+        "5": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
+        }
+      }
+    },
+    {
+      "id": "S8",
+      "waves": [
+        1,
+        2,
+        4,
+        5
+      ],
+      "title": "Entry contexts and analysis keys",
+      "dimension": "Entries=1/2/20 with only 1/2 selected; equal/distinct keys/configs",
+      "metrics": [
+        "edgesIndexed",
+        "structuralVisits",
+        "nodesTransferred",
+        "analysisRuns",
+        "analysisCacheHits"
+      ],
+      "oracle": "context buckets preserve activationEntry; demand-only views/runs; no eager Cartesian state",
+      "kills": "ignore Entry/options, deep-hash cache, duplicate run",
+      "status": "IMPLEMENTED_BY_WAVE_HOOKS",
+      "hook": null,
+      "wave_hooks": {
+        "1": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w1.py"
+        },
+        "2": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w2.py"
+        },
+        "4": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w4.py"
+        },
+        "5": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
+        }
+      }
+    },
+    {
+      "id": "S9",
+      "waves": [
+        3,
+        5
+      ],
+      "title": "Text bytes and memory",
+      "dimension": "B=N/2N with I fixed; short/long IDs, Unicode and long literals",
+      "metrics": [
+        "bytesHashed",
+        "poolHits",
+        "stateBytesAllocated",
+        "stateBytesRetained"
+      ],
+      "oracle": "text processing at boundary once with declared cost; AIR baseline separated",
+      "kills": "rehash/duplicate strings per iteration/join",
+      "status": "IMPLEMENTED_BY_WAVE_HOOKS",
+      "hook": null,
+      "quality_companion": "S15",
+      "wave_hooks": {
+        "3": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w3.py"
+        },
+        "5": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
+        }
+      }
+    },
+    {
+      "id": "S10",
+      "waves": [
+        5
+      ],
+      "title": "Production composition and E2E",
+      "dimension": "two fresh runs CP4E plus CP3; N/2N dimension not applicable to minimal E2E",
+      "metrics": [
+        "analysisRuns",
+        "queryRequests",
+        "uniqueQueries",
+        "factsEmitted"
+      ],
+      "oracle": "real stages, same defaults, hashes/JARs/pins, memory/file equivalence, PARTIAL preserved",
+      "kills": "fixture-specific shortcut, golden substituted for stage, result promotes source precision",
+      "status": "IMPLEMENTED_BY_WAVE_HOOKS",
+      "hook": null,
+      "quality_companion": "S15",
+      "wave_hooks": {
+        "5": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
+        }
+      }
+    },
+    {
+      "id": "S11",
+      "waves": [
+        1
+      ],
+      "dimension": "CFG projection integrity",
+      "oracle": "Manual node/edge role inventory from AIR fixture and corruptions; supported boundary result admitted, each mutilation rejected.",
+      "metrics": [
+        "nodesIndexed",
+        "edgesIndexed",
+        "structuralVisits"
+      ],
+      "kills": [
+        "missing-required-edge",
+        "missing-required-sequence",
+        "foreign-sequence-source",
+        "foreign-publication-entry",
+        "duplicated-wrong-contextual-edge"
+      ],
+      "status": "IMPLEMENTED_BY_WAVE_HOOKS",
+      "hook": null,
+      "wave_hooks": {
+        "1": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w1.py"
+        }
+      }
+    },
+    {
+      "id": "S12",
+      "waves": [
+        2,
+        3
+      ],
+      "dimension": "Direction-aware replay",
+      "oracle": "Manual def X; use X and distinct-anchor use Y; def X; use X witnesses plus independent gen/kill round solver; verify BEFORE/AFTER values and stable OUT reverse suffix replay.",
+      "metrics": [
+        "sequencesReplayed",
+        "operationsReplayed"
+      ],
+      "kills": [
+        "backward-replay-from-wrong-anchor",
+        "backward-replay-forward-order"
+      ],
+      "status": "IMPLEMENTED_BY_WAVE_HOOKS",
+      "hook": null,
+      "wave_hooks": {
+        "2": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w2.py"
+        },
+        "3": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w3.py"
+        }
+      }
+    },
+    {
+      "id": "S13",
+      "waves": [
+        2,
+        3
+      ],
+      "dimension": "Independent finite concrete semantics",
+      "oracle": "Enumerate finite synthetic executions/states independently of product transfer/join/worklist; every concrete value/point is covered by delivered abstraction; include deliberately wrong transfer.",
+      "metrics": [
+        "nodesTransferred",
+        "operationsTransferred"
+      ],
+      "kills": [
+        "shared-wrong-transfer-agreement"
+      ],
+      "status": "IMPLEMENTED_BY_WAVE_HOOKS",
+      "hook": null,
+      "wave_hooks": {
+        "2": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w2.py"
+        },
+        "3": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w3.py"
+        }
+      }
+    },
+    {
+      "id": "S14",
+      "waves": [
+        3,
+        4,
+        5
+      ],
+      "dimension": "Completion by phase",
+      "oracle": "Stable analysis + controlled failed batch preserves independent structural/analysis-only consumers; only explicit unavailable dependencies block. External delivery receipt verifies intended bytes and destination after writer failure; no self-certifying payload. No resource-induced partial results.",
+      "metrics": [
+        "observationFailures",
+        "consumerFailures",
+        "publicationFailures"
+      ],
+      "kills": [
+        "stable-analysis-observation-failure-reported-as-full-success",
+        "consumer-failure-reported-as-complete-output",
+        "prepared-payload-certifies-own-delivery",
+        "observation-failure-blocks-independent-consumer"
+      ],
+      "status": "IMPLEMENTED_BY_WAVE_HOOKS",
+      "hook": null,
+      "wave_hooks": {
+        "3": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w3.py"
+        },
+        "4": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w4.py"
+        },
+        "5": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
+        }
+      }
+    },
+    {
+      "id": "S15",
+      "waves": [
+        3,
+        4,
+        5
+      ],
+      "dimension": "Quality alongside cost",
+      "oracle": "Fixed finite corpus/semantic profile and independent expected outcomes; report refusals, all candidates, open/closed outcomes and controlled phase failures alongside time/memory; no aggregate percent threshold.",
+      "metrics": [
+        "queryRequests",
+        "uniqueQueries",
+        "candidateCardinality",
+        "queriesAnswered",
+        "unsupportedQueries",
+        "queriesNotMaterialized",
+        "unsupportedStorageProfiles",
+        "unsupportedEffectProfiles",
+        "modelOpenResults",
+        "sourceOpenResults",
+        "effectiveOpenResults",
+        "closedInModelResults",
+        "observationFailures",
+        "consumerFailures",
+        "publicationFailures"
+      ],
+      "kills": [
+        "performance-optimization-by-lost-candidates",
+        "performance-optimization-by-unsupported-everything"
+      ],
+      "status": "IMPLEMENTED_BY_WAVE_HOOKS",
+      "hook": null,
+      "wave_hooks": {
+        "3": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w3.py"
+        },
+        "4": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w4.py"
+        },
+        "5": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
+        }
+      }
+    },
+    {
+      "id": "S16",
+      "waves": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "title": "Size never defines semantic coverage",
+      "dimension": "N/2N/4N valid inputs of same semantic profile; independently vary nodes/edges/operations/objects/queries/visits/candidates/bytes",
+      "oracle": "All sizes admitted; convergent analyses STABLE; all finite candidates preserved with unchanged semantic remainder. Infra failure is not a semantic outcome. Core size role contracts and runtime scale oracles both required.",
+      "metrics": [
+        "nodesIndexed",
+        "edgesIndexed",
+        "operationsIndexed",
+        "objectsIndexed",
+        "worklistPushes",
+        "maxWorklistSize",
+        "candidateCardinality",
+        "uniqueQueries",
+        "stateBytesRetained"
+      ],
+      "kills": [
+        "size-cap-rejects-valid-program",
+        "max-nodes-admission",
+        "max-edges-admission",
+        "max-operations-admission",
+        "max-objects-admission",
+        "max-visits-aborts-analysis",
+        "resource-budget-changes-semantic-result",
+        "candidate-count-causes-top",
+        "max-queries-admission",
+        "max-consumers-admission",
+        "maximum-result-size",
+        "catch-oom-as-analysis-limit"
+      ],
+      "status": "IMPLEMENTED_BY_WAVE_HOOKS",
+      "hook": null,
+      "wave_hooks": {
+        "1": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w1.py"
+        },
+        "2": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w2.py"
+        },
+        "3": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w3.py"
+        },
+        "4": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w4.py"
+        },
+        "5": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
+        }
+      }
+    }
+  ]
+}

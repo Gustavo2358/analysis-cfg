@@ -1,0 +1,12 @@
+{
+  "air_java_pin": "ce530a7e17ab12b23c48f29425f503ff920b09fb",
+  "maven_repo": "/tmp/cp5-harness-validation/m2",
+  "jdk": "/tmp/cp5-harness-validation/jdk",
+  "jar_sha256": {
+    "/tmp/cp5-harness-validation/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar": "3816358bbe1052e3dfc5674461ae998082323be38e48bc13567b2052a753e539",
+    "/tmp/cp5-harness-validation/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar": "1765d3ade2882f92dca9f588143b71928e7852c4ee39ecf922b8e846e21904dd"
+  },
+  "verification": "byte-exact same isolated JARs recorded by W1; no sibling checkout used for compilation; no repin",
+  "java_version": "openjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)\n",
+  "python": "3.14.4 (main, Aug 20 2026, 10:41:58) [GCC 15.2.0]"
+}

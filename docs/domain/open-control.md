@@ -30,9 +30,10 @@ comportamento. Uma extensão sem envelope exigido recebe diagnóstico localizado
 
 ## Limites operacionais
 
-Corte de profundidade contextual, número de estados ou orçamento de análise exige
-`ANALYSIS_LIMIT`, escopo e perda de precisão visível. Não truncar silently nem
-anunciar conformidade precisa por ter processado os primeiros N nós.
+[CORE-SIZE-001](../architecture/decisions/ADR-0014.md) proíbe cortes por quantidade
+de estados, trabalho ou recursos. Abstração contextual futura exige justificativa
+semântica/convergência, nunca um teto de máquina. Não anunciar conformidade precisa
+ou parcial semântica por ter processado somente os primeiros N nós.
 A ausência de capacidade no consumidor não reduz a cardinalidade da publicação.
 
 ## Política do MVP

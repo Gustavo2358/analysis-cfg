@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "status": "REVIEW_SNAPSHOT_NOT_CODEC",
+  "schema": "analysis-dataflow-result",
+  "version": "1.0.0",
+  "required_result_fields": [
+    "schema",
+    "version",
+    "analysisKey",
+    "publicationId",
+    "unitId",
+    "entryId",
+    "executionStatus",
+    "modelScope",
+    "sourceScope",
+    "observations",
+    "statistics",
+    "completion"
+  ],
+  "required_observation_fields": [
+    "point",
+    "subject",
+    "queryStatus",
+    "queryReason",
+    "reachability",
+    "value",
+    "sourceUnknownRemainder",
+    "effectiveUnknownRemainder",
+    "precision",
+    "premiseRefs",
+    "evidenceRefs",
+    "provenanceRefs"
+  ],
+  "execution_statuses": [
+    "STABLE",
+    "UNSUPPORTED",
+    "INVALID_INPUT"
+  ],
+  "value_kinds": [
+    "Candidates"
+  ],
+  "reachability": [
+    "REACHABLE",
+    "UNREACHABLE_IN_MODEL"
+  ],
+  "model_scope": "KNOWN_GRAPH_ENTRY",
+  "effective_remainder": "modelValueRemainder OR sourceUnknownRemainder",
+  "unreachable_behavior": "value=null; source reachability not inferred",
+  "query_statuses": [
+    "VALUE",
+    "UNSUPPORTED_POINT"
+  ],
+  "unsupported_point_null_fields": [
+    "reachability",
+    "value",
+    "sourceUnknownRemainder",
+    "effectiveUnknownRemainder",
+    "precision"
+  ],
+  "query_behavior": "VALUE: supported query, queryReason=null; UNSUPPORTED_POINT: nonempty queryReason, null semantic fields, preserves requested point/subject; does not change run status",
+  "batch_behavior": "STABLE with observation COMPLETE returns exactly one observation per unique requested (point, subject), including unsupported queries; incomplete observation phase returns an empty atomic batch with explicit INCOMPLETE pipeline",
+  "completion": {
+    "required_fields": [
+      "admission",
+      "analysis",
+      "observation"
+    ],
+    "observation_batch": "ATOMIC",
+    "prepared_fields": [
+      "consumerPlan",
+      "consumers",
+      "partialPolicy",
+      "preparationStatus",
+      "publicationId",
+      "results",
+      "schema",
+      "version",
+      "resultId"
+    ],
+    "consumer_plan_fields": [
+      "consumerId",
+      "requiredAnalysisKeys",
+      "requiredObservationBatchIds"
+    ],
+    "delivery_receipt_fields": [
+      "destination",
+      "reason",
+      "resultSha256",
+      "schema",
+      "status",
+      "version",
+      "resultId"
+    ],
+    "admission_statuses": [
+      "COMPLETE",
+      "REJECTED"
+    ],
+    "preparation_statuses": [
+      "COMPLETE",
+      "INCOMPLETE"
+    ],
+    "delivery_statuses": [
+      "COMPLETE",
+      "FAILED"
+    ],
+    "consumer_behavior": "Resolve full AnalysisKeys and batch IDs against independent plan; only unavailable dependencies block; structural consumer can request zero analyses/batches.",
+    "prepared_behavior": "Contains results, explicit dependencies and consumer outcomes; preparation COMPLETE says nothing about delivery.",
+    "delivery_behavior": "External receipt binds prepared resultId, destination and exact payload SHA-256 when available to independently observed delivery status. COMPLETE requires hash; failure before hashing uses null. Never inside prepared result.",
+    "analysis_statuses": [
+      "STABLE",
+      "NOT_STARTED"
+    ],
+    "observation_statuses": [
+      "COMPLETE",
+      "FAILED",
+      "NOT_STARTED"
+    ],
+    "consumer_statuses": [
+      "COMPLETE",
+      "FAILED",
+      "NOT_STARTED"
+    ],
+    "phase_failure": "Controlled phase failure never rewrites STABLE analysis; resource exhaustion produces no semantic result.",
+    "admission_reasons": {
+      "INVALID_INPUT": "INVALID_STRUCTURE",
+      "UNSUPPORTED": "UNSUPPORTED_PROFILE"
+    },
+    "observation_failure_reasons": [
+      "OBSERVATION_ERROR"
+    ],
+    "consumer_failure_reasons": [
+      "CONSUMER_ERROR"
+    ],
+    "delivery_failure_reasons": [
+      "ENCODING_FAILED",
+      "WRITE_FAILED",
+      "FINALIZATION_FAILED"
+    ]
+  },
+  "non_stable_behavior": "non-STABLE run publishes no provisional observations; query refusal alone does not make a stable run non-STABLE",
+  "core_size_decision": "CORE-SIZE-001",
+  "analysis_key_options": {},
+  "value_fields": [
+    "domain",
+    "kind",
+    "enumerated",
+    "modelValueRemainder"
+  ]
+}

@@ -4,7 +4,8 @@
 
 Entregar uma aplicação Java 21/Maven independente que recebe a `Publication`
 imutável do `air-java` e produz um CFG utilizável por análises futuras. Não criar
-analisador COBOL, lowerer, modelo AIR paralelo, dataflow ou visualizador como núcleo.
+analisador COBOL, lowerer, modelo AIR paralelo ou visualizador como núcleo.
+Dataflow fica no subsistema CP5 separado da construção CFG e sujeito às Waves.
 Arquivo e memória convergem para a mesma porta sem serialização obrigatória.
 
 ## CFG-FIRST: Entry → Return → normal exit
@@ -56,7 +57,7 @@ equivalência de observações de controle/coverage com memória no GOBACK.
 O E2E externo com cobol-lower, orquestrador, dataflow, possible values e fact projection
 continuam fora do produto entregue.
 
-## Slices seguintes
+## Ampliação estrutural futura (não ordem operacional CP5)
 
 Depois do MVP, `invoke` entra com outcomes materializados (normal, excepcional,
 halt, diverge e restante aberto quando sustentado). `raise(tag, values)` é saída
@@ -83,9 +84,14 @@ provam a interpretação do consumer.
 `AIR-STRUCTURE@2/PRECISE_FOR_PROFILE` até cumprir todas as obrigações estruturais
 daquele perfil.
 
-Dataflow, reaching definitions, possible values, storage analysis, targets
-dinâmicos, dominância e coalescing ficam adiados. Preservar insumos não significa
+CP5 aprova engine e primeiro PossibleValues como plano separado; preparação atual
+não implementa esses produtos. RD completo, storage geral, targets dinâmicos,
+dominância e coalescing permanecem adiados. Preservar insumos não significa
 implementá-los.
 
 Fontes: [contrato e estado upstream](../sources/index.md); execução:
 [backlog](../work/backlog.md).
+
+## Ordem operacional aprovada em 09/09/2026
+
+CP4 complete → CP5 harness → W1 index/session → W2 solver incremental → W3 values/state/query → W4 planner/consumers → W5 produção/E2E → CP6 CALL futuro. [Roadmap e limites](cp5-roadmap.md) prevalecem sobre a ordem histórica de ampliação estrutural acima; review humano entre Waves.

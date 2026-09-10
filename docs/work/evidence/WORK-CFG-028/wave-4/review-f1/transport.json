@@ -1,0 +1,14 @@
+{
+  "resource-cap-on-sites.diff": {
+    "transport": "resource-cap-on-sites.diff.gz",
+    "rawSha256": "68726fbc8a2b8a5457160a9f05cffeb5bdb7c3cac335525d188799f12ae4536b"
+  },
+  "wrong-batch-bound-to-analysis-key.diff": {
+    "transport": "wrong-batch-bound-to-analysis-key.diff.gz",
+    "rawSha256": "065a59299f04c5fd2cfc05e6412fdb82417ff82fdb61c1388a41e6cc60369400"
+  },
+  "site-query-zero-match-drops-required-batch.diff": {
+    "transport": "site-query-zero-match-drops-required-batch.diff.gz",
+    "rawSha256": "0055bbce4b27f857e8310d082047c5d77dc3c02294929ef7f1ff2cf0838adfdc"
+  }
+}

@@ -1,0 +1,4748 @@
+{
+  "scope": "test-only synthetic language, no AIR transfer semantics",
+  "generator": "OracleTest.generatedForwardBackwardCorpusMatchesIndependentOraclesAndSchedules; java.util.Random seeds 19073..19152",
+  "graphs": [
+    {
+      "seed": 19073,
+      "roots": [
+        0,
+        0
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          0
+        ]
+      ],
+      "operations": [
+        [
+          "USE_X"
+        ]
+      ],
+      "contextualPoints": 4
+    },
+    {
+      "seed": 19074,
+      "roots": [
+        0,
+        1
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          0
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "SET_X"
+        ],
+        []
+      ],
+      "contextualPoints": 7
+    },
+    {
+      "seed": 19075,
+      "roots": [
+        0,
+        1
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          1
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "CLEAR_X",
+          "SET_X"
+        ],
+        [
+          "SET_X",
+          "USE_X"
+        ],
+        [
+          "USE_X",
+          "FLIP_X"
+        ]
+      ],
+      "contextualPoints": 9
+    },
+    {
+      "seed": 19076,
+      "roots": [
+        0,
+        2
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          2
+        ],
+        [
+          3,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "operations": [
+        [],
+        [
+          "SET_Y",
+          "USE_Y",
+          "USE_Y"
+        ],
+        [
+          "USE_X",
+          "USE_X"
+        ],
+        [
+          "SET_X"
+        ]
+      ],
+      "contextualPoints": 10
+    },
+    {
+      "seed": 19077,
+      "roots": [
+        0,
+        2
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "SET_Y"
+        ],
+        [
+          "CLEAR_X",
+          "SET_X",
+          "USE_X"
+        ],
+        [
+          "SET_Y",
+          "FLIP_X"
+        ],
+        [
+          "CLEAR_X"
+        ],
+        []
+      ],
+      "contextualPoints": 12
+    },
+    {
+      "seed": 19078,
+      "roots": [
+        0,
+        3
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          3,
+          1
+        ],
+        [
+          4,
+          2
+        ],
+        [
+          5,
+          0
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "CLEAR_X",
+          "FLIP_X"
+        ],
+        [
+          "SET_Y",
+          "USE_X",
+          "SET_Y"
+        ],
+        [
+          "USE_X",
+          "SET_Y"
+        ],
+        [
+          "FLIP_X",
+          "FLIP_X",
+          "SET_X"
+        ],
+        [
+          "SET_X"
+        ],
+        [
+          "FLIP_X",
+          "FLIP_X"
+        ]
+      ],
+      "contextualPoints": 16
+    },
+    {
+      "seed": 19079,
+      "roots": [
+        0,
+        3
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          4,
+          0
+        ],
+        [
+          5,
+          1
+        ],
+        [
+          6,
+          5
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "operations": [
+        [
+          "CLEAR_X",
+          "USE_X",
+          "USE_X"
+        ],
+        [],
+        [],
+        [
+          "FLIP_X"
+        ],
+        [
+          "SET_X"
+        ],
+        [],
+        [
+          "SET_X",
+          "CLEAR_X"
+        ]
+      ],
+      "contextualPoints": 16
+    },
+    {
+      "seed": 19080,
+      "roots": [
+        0,
+        4
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          2
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          5,
+          0
+        ],
+        [
+          6,
+          4
+        ],
+        [
+          7,
+          4
+        ],
+        []
+      ],
+      "operations": [
+        [],
+        [],
+        [
+          "SET_X"
+        ],
+        [],
+        [
+          "SET_Y",
+          "SET_X",
+          "SET_Y"
+        ],
+        [
+          "CLEAR_X"
+        ],
+        [
+          "USE_Y",
+          "USE_Y"
+        ],
+        []
+      ],
+      "contextualPoints": 20
+    },
+    {
+      "seed": 19081,
+      "roots": [
+        0,
+        4
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ],
+        [
+          5
+        ],
+        [
+          6
+        ],
+        [
+          7
+        ],
+        [
+          8
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "SET_Y"
+        ],
+        [
+          "SET_X"
+        ],
+        [
+          "SET_Y",
+          "USE_X"
+        ],
+        [],
+        [
+          "USE_Y"
+        ],
+        [
+          "USE_Y"
+        ],
+        [
+          "SET_Y"
+        ],
+        [
+          "CLEAR_X",
+          "FLIP_X"
+        ],
+        [
+          "USE_X"
+        ]
+      ],
+      "contextualPoints": 18
+    },
+    {
+      "seed": 19082,
+      "roots": [
+        0,
+        5
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          7
+        ],
+        [
+          3,
+          2
+        ],
+        [
+          4,
+          1
+        ],
+        [
+          5,
+          9
+        ],
+        [
+          6,
+          9
+        ],
+        [
+          7,
+          3
+        ],
+        [
+          8,
+          8
+        ],
+        [
+          9,
+          4
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "operations": [
+        [
+          "USE_X",
+          "FLIP_X"
+        ],
+        [
+          "USE_Y",
+          "USE_X",
+          "FLIP_X"
+        ],
+        [
+          "USE_X"
+        ],
+        [
+          "SET_Y",
+          "USE_X",
+          "USE_Y"
+        ],
+        [
+          "CLEAR_X",
+          "SET_Y"
+        ],
+        [
+          "SET_Y",
+          "CLEAR_X"
+        ],
+        [
+          "USE_X"
+        ],
+        [
+          "SET_X"
+        ],
+        [
+          "SET_Y",
+          "FLIP_X",
+          "USE_Y"
+        ],
+        [
+          "USE_X",
+          "USE_Y",
+          "SET_X"
+        ]
+      ],
+      "contextualPoints": 22
+    },
+    {
+      "seed": 19083,
+      "roots": [
+        0,
+        5
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          8
+        ],
+        [
+          2,
+          10
+        ],
+        [
+          3,
+          6
+        ],
+        [
+          4,
+          2
+        ],
+        [
+          5,
+          7
+        ],
+        [
+          6,
+          9
+        ],
+        [
+          7,
+          9
+        ],
+        [
+          8,
+          6
+        ],
+        [
+          9,
+          6
+        ],
+        [
+          10,
+          4
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "SET_Y",
+          "SET_Y",
+          "SET_Y"
+        ],
+        [],
+        [
+          "CLEAR_X",
+          "USE_Y"
+        ],
+        [],
+        [
+          "CLEAR_X",
+          "SET_Y"
+        ],
+        [
+          "USE_Y",
+          "USE_X"
+        ],
+        [
+          "SET_Y",
+          "CLEAR_X",
+          "SET_Y"
+        ],
+        [
+          "USE_Y",
+          "SET_X"
+        ],
+        [],
+        [
+          "SET_Y",
+          "FLIP_X",
+          "USE_Y"
+        ],
+        [
+          "SET_Y"
+        ]
+      ],
+      "contextualPoints": 22
+    },
+    {
+      "seed": 19084,
+      "roots": [
+        0,
+        6
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          9
+        ],
+        [
+          2,
+          5
+        ],
+        [
+          3,
+          2
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          5,
+          3
+        ],
+        [
+          6,
+          5
+        ],
+        [
+          7,
+          0
+        ],
+        [
+          8,
+          1
+        ],
+        [
+          9,
+          6
+        ],
+        [
+          10,
+          9
+        ],
+        [
+          11,
+          9
+        ],
+        []
+      ],
+      "operations": [
+        [],
+        [
+          "USE_X"
+        ],
+        [],
+        [
+          "USE_X",
+          "USE_Y"
+        ],
+        [],
+        [
+          "USE_X"
+        ],
+        [],
+        [
+          "CLEAR_X"
+        ],
+        [
+          "FLIP_X",
+          "FLIP_X",
+          "SET_Y"
+        ],
+        [
+          "CLEAR_X",
+          "SET_X",
+          "USE_X"
+        ],
+        [
+          "FLIP_X"
+        ],
+        []
+      ],
+      "contextualPoints": 28
+    },
+    {
+      "seed": 19085,
+      "roots": [
+        0,
+        6
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ],
+        [
+          5
+        ],
+        [
+          6
+        ],
+        [
+          7
+        ],
+        [
+          8
+        ],
+        [
+          9
+        ],
+        [
+          10
+        ],
+        [
+          11
+        ],
+        [
+          12
+        ],
+        [
+          0
+        ]
+      ],
+      "operations": [
+        [
+          "SET_Y"
+        ],
+        [],
+        [],
+        [
+          "USE_X",
+          "USE_Y",
+          "USE_Y"
+        ],
+        [
+          "USE_Y",
+          "SET_X",
+          "USE_Y"
+        ],
+        [
+          "SET_X",
+          "CLEAR_X"
+        ],
+        [
+          "USE_Y"
+        ],
+        [
+          "SET_Y",
+          "FLIP_X",
+          "SET_Y"
+        ],
+        [],
+        [],
+        [
+          "FLIP_X",
+          "FLIP_X"
+        ],
+        [
+          "CLEAR_X",
+          "SET_X"
+        ],
+        []
+      ],
+      "contextualPoints": 28
+    },
+    {
+      "seed": 19086,
+      "roots": [
+        0,
+        0
+      ],
+      "selected": 2,
+      "successors": [
+        []
+      ],
+      "operations": [
+        [
+          "USE_Y"
+        ]
+      ],
+      "contextualPoints": 6
+    },
+    {
+      "seed": 19087,
+      "roots": [
+        0,
+        1
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          0
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "USE_Y",
+          "SET_Y",
+          "SET_X"
+        ],
+        [
+          "SET_Y"
+        ]
+      ],
+      "contextualPoints": 7
+    },
+    {
+      "seed": 19088,
+      "roots": [
+        0,
+        1
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "operations": [
+        [
+          "SET_Y",
+          "USE_X"
+        ],
+        [
+          "USE_X",
+          "CLEAR_X",
+          "FLIP_X"
+        ],
+        [
+          "SET_X",
+          "SET_X"
+        ]
+      ],
+      "contextualPoints": 8
+    },
+    {
+      "seed": 19089,
+      "roots": [
+        0,
+        2
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "FLIP_X"
+        ],
+        [
+          "SET_X"
+        ],
+        [
+          "USE_Y",
+          "CLEAR_X",
+          "SET_X"
+        ],
+        [
+          "SET_Y",
+          "USE_X"
+        ]
+      ],
+      "contextualPoints": 10
+    },
+    {
+      "seed": 19090,
+      "roots": [
+        0,
+        2
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          2
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          4,
+          2
+        ],
+        []
+      ],
+      "operations": [
+        [],
+        [
+          "USE_Y"
+        ],
+        [
+          "CLEAR_X",
+          "USE_Y"
+        ],
+        [
+          "USE_X"
+        ],
+        [
+          "FLIP_X",
+          "USE_X"
+        ]
+      ],
+      "contextualPoints": 14
+    },
+    {
+      "seed": 19091,
+      "roots": [
+        0,
+        3
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          5,
+          3
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "operations": [
+        [
+          "CLEAR_X"
+        ],
+        [
+          "USE_Y",
+          "SET_X"
+        ],
+        [
+          "SET_X",
+          "SET_X",
+          "FLIP_X"
+        ],
+        [
+          "USE_X"
+        ],
+        [
+          "USE_X",
+          "FLIP_X",
+          "USE_X"
+        ],
+        []
+      ],
+      "contextualPoints": 14
+    },
+    {
+      "seed": 19092,
+      "roots": [
+        0,
+        3
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          6
+        ],
+        [
+          4,
+          3
+        ],
+        [
+          5,
+          4
+        ],
+        [
+          6,
+          1
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "USE_Y",
+          "SET_X",
+          "USE_Y"
+        ],
+        [
+          "SET_Y"
+        ],
+        [
+          "USE_Y",
+          "USE_X"
+        ],
+        [],
+        [
+          "SET_X",
+          "CLEAR_X",
+          "FLIP_X"
+        ],
+        [
+          "FLIP_X",
+          "SET_X",
+          "USE_X"
+        ],
+        [
+          "CLEAR_X",
+          "USE_X",
+          "SET_Y"
+        ]
+      ],
+      "contextualPoints": 17
+    },
+    {
+      "seed": 19093,
+      "roots": [
+        0,
+        4
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ],
+        [
+          5
+        ],
+        [
+          6
+        ],
+        [
+          7
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "USE_X"
+        ],
+        [],
+        [
+          "SET_Y",
+          "USE_X",
+          "CLEAR_X"
+        ],
+        [
+          "USE_Y"
+        ],
+        [
+          "FLIP_X"
+        ],
+        [
+          "SET_Y",
+          "FLIP_X",
+          "CLEAR_X"
+        ],
+        [
+          "FLIP_X",
+          "CLEAR_X"
+        ],
+        [
+          "USE_Y",
+          "USE_X"
+        ]
+      ],
+      "contextualPoints": 16
+    },
+    {
+      "seed": 19094,
+      "roots": [
+        0,
+        4
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          6
+        ],
+        [
+          3,
+          1
+        ],
+        [
+          4,
+          6
+        ],
+        [
+          5,
+          2
+        ],
+        [
+          6,
+          8
+        ],
+        [
+          7,
+          3
+        ],
+        [
+          8,
+          7
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "operations": [
+        [],
+        [
+          "SET_Y",
+          "USE_X"
+        ],
+        [
+          "USE_X",
+          "USE_X"
+        ],
+        [],
+        [],
+        [
+          "USE_Y",
+          "USE_Y",
+          "USE_X"
+        ],
+        [
+          "USE_X",
+          "CLEAR_X"
+        ],
+        [
+          "SET_X",
+          "USE_Y"
+        ],
+        [
+          "SET_X",
+          "FLIP_X"
+        ]
+      ],
+      "contextualPoints": 20
+    },
+    {
+      "seed": 19095,
+      "roots": [
+        0,
+        5
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          8
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          4,
+          3
+        ],
+        [
+          5,
+          5
+        ],
+        [
+          6,
+          6
+        ],
+        [
+          7,
+          5
+        ],
+        [
+          8,
+          0
+        ],
+        [
+          9,
+          3
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "USE_Y"
+        ],
+        [],
+        [
+          "CLEAR_X",
+          "USE_X"
+        ],
+        [
+          "CLEAR_X",
+          "CLEAR_X"
+        ],
+        [
+          "USE_X",
+          "SET_Y"
+        ],
+        [
+          "SET_X",
+          "USE_Y"
+        ],
+        [
+          "USE_X"
+        ],
+        [
+          "SET_Y",
+          "USE_X"
+        ],
+        [],
+        [
+          "SET_X",
+          "USE_X"
+        ]
+      ],
+      "contextualPoints": 24
+    },
+    {
+      "seed": 19096,
+      "roots": [
+        0,
+        5
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          10
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          4,
+          9
+        ],
+        [
+          5,
+          3
+        ],
+        [
+          6,
+          1
+        ],
+        [
+          7,
+          1
+        ],
+        [
+          8,
+          8
+        ],
+        [
+          9,
+          2
+        ],
+        [
+          10,
+          1
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "FLIP_X",
+          "FLIP_X",
+          "USE_X"
+        ],
+        [
+          "USE_X"
+        ],
+        [],
+        [
+          "USE_X"
+        ],
+        [
+          "FLIP_X"
+        ],
+        [
+          "FLIP_X"
+        ],
+        [
+          "USE_Y"
+        ],
+        [
+          "CLEAR_X",
+          "USE_X",
+          "CLEAR_X"
+        ],
+        [],
+        [
+          "USE_Y",
+          "USE_X"
+        ],
+        []
+      ],
+      "contextualPoints": 25
+    },
+    {
+      "seed": 19097,
+      "roots": [
+        0,
+        6
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ],
+        [
+          5
+        ],
+        [
+          6
+        ],
+        [
+          7
+        ],
+        [
+          8
+        ],
+        [
+          9
+        ],
+        [
+          10
+        ],
+        [
+          11
+        ],
+        [
+          0
+        ]
+      ],
+      "operations": [
+        [
+          "USE_X"
+        ],
+        [
+          "USE_X",
+          "SET_X"
+        ],
+        [
+          "SET_Y"
+        ],
+        [
+          "USE_X",
+          "SET_X"
+        ],
+        [
+          "FLIP_X",
+          "USE_X"
+        ],
+        [
+          "USE_Y",
+          "USE_X",
+          "USE_Y"
+        ],
+        [],
+        [
+          "CLEAR_X",
+          "CLEAR_X"
+        ],
+        [],
+        [
+          "SET_X",
+          "CLEAR_X"
+        ],
+        [
+          "FLIP_X",
+          "CLEAR_X"
+        ],
+        [
+          "USE_X",
+          "USE_X"
+        ]
+      ],
+      "contextualPoints": 26
+    },
+    {
+      "seed": 19098,
+      "roots": [
+        0,
+        6
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          12
+        ],
+        [
+          2,
+          11
+        ],
+        [
+          3,
+          2
+        ],
+        [
+          4,
+          2
+        ],
+        [
+          5,
+          4
+        ],
+        [
+          6,
+          1
+        ],
+        [
+          7,
+          12
+        ],
+        [
+          8,
+          8
+        ],
+        [
+          9,
+          4
+        ],
+        [
+          10,
+          6
+        ],
+        [
+          11,
+          10
+        ],
+        [
+          12,
+          9
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "USE_X"
+        ],
+        [
+          "SET_Y",
+          "SET_X"
+        ],
+        [
+          "SET_Y"
+        ],
+        [
+          "SET_Y",
+          "USE_Y"
+        ],
+        [],
+        [
+          "SET_Y",
+          "CLEAR_X"
+        ],
+        [
+          "USE_X"
+        ],
+        [],
+        [
+          "USE_X",
+          "USE_X"
+        ],
+        [
+          "FLIP_X",
+          "USE_X",
+          "USE_Y"
+        ],
+        [
+          "CLEAR_X",
+          "SET_X",
+          "SET_Y"
+        ],
+        [],
+        [
+          "SET_X"
+        ]
+      ],
+      "contextualPoints": 29
+    },
+    {
+      "seed": 19099,
+      "roots": [
+        0,
+        0
+      ],
+      "selected": 2,
+      "successors": [
+        []
+      ],
+      "operations": [
+        [
+          "CLEAR_X"
+        ]
+      ],
+      "contextualPoints": 6
+    },
+    {
+      "seed": 19100,
+      "roots": [
+        0,
+        1
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "operations": [
+        [
+          "FLIP_X",
+          "USE_Y",
+          "FLIP_X"
+        ],
+        [
+          "CLEAR_X",
+          "CLEAR_X"
+        ]
+      ],
+      "contextualPoints": 6
+    },
+    {
+      "seed": 19101,
+      "roots": [
+        0,
+        1
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1
+        ],
+        [
+          2
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "USE_X"
+        ],
+        [
+          "SET_Y"
+        ],
+        [
+          "SET_X",
+          "USE_Y"
+        ]
+      ],
+      "contextualPoints": 9
+    },
+    {
+      "seed": 19102,
+      "roots": [
+        0,
+        2
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          3,
+          3
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "SET_X"
+        ],
+        [
+          "SET_X",
+          "FLIP_X",
+          "CLEAR_X"
+        ],
+        [],
+        [
+          "SET_X"
+        ]
+      ],
+      "contextualPoints": 10
+    },
+    {
+      "seed": 19103,
+      "roots": [
+        0,
+        2
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          3,
+          3
+        ],
+        [
+          4,
+          0
+        ],
+        [
+          0,
+          4
+        ]
+      ],
+      "operations": [
+        [
+          "USE_Y",
+          "CLEAR_X"
+        ],
+        [
+          "USE_Y",
+          "SET_Y",
+          "FLIP_X"
+        ],
+        [],
+        [],
+        []
+      ],
+      "contextualPoints": 12
+    },
+    {
+      "seed": 19104,
+      "roots": [
+        0,
+        3
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          3,
+          3
+        ],
+        [
+          4,
+          3
+        ],
+        [
+          5,
+          5
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "USE_X",
+          "SET_X"
+        ],
+        [
+          "CLEAR_X",
+          "SET_X"
+        ],
+        [
+          "USE_X"
+        ],
+        [
+          "SET_Y",
+          "USE_X"
+        ],
+        [],
+        [
+          "USE_X",
+          "FLIP_X",
+          "SET_X"
+        ]
+      ],
+      "contextualPoints": 13
+    },
+    {
+      "seed": 19105,
+      "roots": [
+        0,
+        3
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ],
+        [
+          5
+        ],
+        [
+          6
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "SET_Y"
+        ],
+        [
+          "USE_X",
+          "USE_X"
+        ],
+        [
+          "USE_Y"
+        ],
+        [],
+        [
+          "CLEAR_X"
+        ],
+        [
+          "USE_Y",
+          "SET_X"
+        ],
+        [
+          "USE_X",
+          "USE_X",
+          "USE_X"
+        ]
+      ],
+      "contextualPoints": 15
+    },
+    {
+      "seed": 19106,
+      "roots": [
+        0,
+        4
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          5,
+          0
+        ],
+        [
+          6,
+          0
+        ],
+        [
+          7,
+          0
+        ],
+        [
+          0,
+          7
+        ]
+      ],
+      "operations": [
+        [],
+        [
+          "USE_Y",
+          "USE_X",
+          "FLIP_X"
+        ],
+        [],
+        [
+          "SET_X",
+          "FLIP_X"
+        ],
+        [
+          "CLEAR_X",
+          "SET_Y"
+        ],
+        [
+          "FLIP_X"
+        ],
+        [
+          "SET_Y"
+        ],
+        []
+      ],
+      "contextualPoints": 18
+    },
+    {
+      "seed": 19107,
+      "roots": [
+        0,
+        4
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          8
+        ],
+        [
+          3,
+          2
+        ],
+        [
+          4,
+          8
+        ],
+        [
+          5,
+          5
+        ],
+        [
+          6,
+          2
+        ],
+        [
+          7,
+          0
+        ],
+        [
+          8,
+          7
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "USE_X"
+        ],
+        [],
+        [
+          "FLIP_X",
+          "SET_Y",
+          "USE_Y"
+        ],
+        [
+          "USE_Y",
+          "USE_Y"
+        ],
+        [
+          "SET_X",
+          "USE_Y"
+        ],
+        [
+          "FLIP_X"
+        ],
+        [],
+        [
+          "USE_X"
+        ],
+        [
+          "FLIP_X"
+        ]
+      ],
+      "contextualPoints": 22
+    },
+    {
+      "seed": 19108,
+      "roots": [
+        0,
+        5
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          4,
+          9
+        ],
+        [
+          5,
+          5
+        ],
+        [
+          6,
+          7
+        ],
+        [
+          7,
+          7
+        ],
+        [
+          8,
+          7
+        ],
+        [
+          9,
+          7
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "USE_Y",
+          "FLIP_X"
+        ],
+        [
+          "USE_X",
+          "CLEAR_X"
+        ],
+        [],
+        [],
+        [
+          "FLIP_X"
+        ],
+        [
+          "SET_X"
+        ],
+        [
+          "USE_Y",
+          "FLIP_X",
+          "CLEAR_X"
+        ],
+        [
+          "USE_X",
+          "USE_Y",
+          "USE_Y"
+        ],
+        [],
+        []
+      ],
+      "contextualPoints": 19
+    },
+    {
+      "seed": 19109,
+      "roots": [
+        0,
+        5
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ],
+        [
+          5
+        ],
+        [
+          6
+        ],
+        [
+          7
+        ],
+        [
+          8
+        ],
+        [
+          9
+        ],
+        [
+          10
+        ],
+        [
+          0
+        ]
+      ],
+      "operations": [
+        [
+          "SET_Y"
+        ],
+        [],
+        [
+          "SET_Y"
+        ],
+        [
+          "FLIP_X"
+        ],
+        [
+          "SET_Y"
+        ],
+        [],
+        [
+          "CLEAR_X"
+        ],
+        [
+          "SET_X",
+          "SET_X"
+        ],
+        [
+          "SET_Y",
+          "SET_X",
+          "USE_Y"
+        ],
+        [],
+        [
+          "CLEAR_X",
+          "USE_Y",
+          "CLEAR_X"
+        ]
+      ],
+      "contextualPoints": 24
+    },
+    {
+      "seed": 19110,
+      "roots": [
+        0,
+        6
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          10
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          4,
+          6
+        ],
+        [
+          5,
+          7
+        ],
+        [
+          6,
+          8
+        ],
+        [
+          7,
+          1
+        ],
+        [
+          8,
+          1
+        ],
+        [
+          9,
+          1
+        ],
+        [
+          10,
+          6
+        ],
+        [
+          11,
+          7
+        ],
+        []
+      ],
+      "operations": [
+        [],
+        [
+          "SET_Y",
+          "CLEAR_X",
+          "CLEAR_X"
+        ],
+        [
+          "SET_Y",
+          "SET_X"
+        ],
+        [
+          "CLEAR_X",
+          "USE_Y",
+          "FLIP_X"
+        ],
+        [
+          "SET_X",
+          "USE_X"
+        ],
+        [
+          "USE_Y",
+          "FLIP_X",
+          "SET_Y"
+        ],
+        [
+          "SET_X",
+          "CLEAR_X",
+          "CLEAR_X"
+        ],
+        [
+          "CLEAR_X",
+          "USE_Y"
+        ],
+        [
+          "FLIP_X",
+          "CLEAR_X",
+          "USE_X"
+        ],
+        [],
+        [],
+        [
+          "USE_X",
+          "CLEAR_X"
+        ]
+      ],
+      "contextualPoints": 27
+    },
+    {
+      "seed": 19111,
+      "roots": [
+        0,
+        6
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          8
+        ],
+        [
+          4,
+          2
+        ],
+        [
+          5,
+          6
+        ],
+        [
+          6,
+          5
+        ],
+        [
+          7,
+          12
+        ],
+        [
+          8,
+          1
+        ],
+        [
+          9,
+          6
+        ],
+        [
+          10,
+          7
+        ],
+        [
+          11,
+          8
+        ],
+        [
+          12,
+          1
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "FLIP_X"
+        ],
+        [
+          "SET_Y"
+        ],
+        [
+          "FLIP_X"
+        ],
+        [
+          "SET_Y",
+          "CLEAR_X",
+          "CLEAR_X"
+        ],
+        [
+          "FLIP_X",
+          "FLIP_X",
+          "CLEAR_X"
+        ],
+        [
+          "USE_Y",
+          "CLEAR_X"
+        ],
+        [
+          "SET_Y",
+          "USE_Y",
+          "FLIP_X"
+        ],
+        [
+          "SET_Y",
+          "SET_Y"
+        ],
+        [],
+        [
+          "FLIP_X"
+        ],
+        [
+          "FLIP_X"
+        ],
+        [
+          "FLIP_X",
+          "SET_Y",
+          "USE_X"
+        ],
+        []
+      ],
+      "contextualPoints": 29
+    },
+    {
+      "seed": 19112,
+      "roots": [
+        0,
+        0
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          0,
+          0
+        ]
+      ],
+      "operations": [
+        [
+          "SET_X",
+          "USE_Y"
+        ]
+      ],
+      "contextualPoints": 4
+    },
+    {
+      "seed": 19113,
+      "roots": [
+        0,
+        1
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "SET_X"
+        ],
+        [
+          "SET_Y",
+          "SET_X",
+          "SET_X"
+        ]
+      ],
+      "contextualPoints": 7
+    },
+    {
+      "seed": 19114,
+      "roots": [
+        0,
+        1
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          2
+        ],
+        []
+      ],
+      "operations": [
+        [],
+        [],
+        []
+      ],
+      "contextualPoints": 9
+    },
+    {
+      "seed": 19115,
+      "roots": [
+        0,
+        2
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          3,
+          1
+        ],
+        [
+          0,
+          3
+        ]
+      ],
+      "operations": [
+        [
+          "SET_X"
+        ],
+        [
+          "CLEAR_X",
+          "FLIP_X"
+        ],
+        [
+          "USE_Y",
+          "SET_X"
+        ],
+        [
+          "USE_X",
+          "CLEAR_X"
+        ]
+      ],
+      "contextualPoints": 10
+    },
+    {
+      "seed": 19116,
+      "roots": [
+        0,
+        2
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          4,
+          3
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "CLEAR_X",
+          "USE_X",
+          "FLIP_X"
+        ],
+        [],
+        [
+          "USE_Y"
+        ],
+        [
+          "SET_X"
+        ],
+        [
+          "CLEAR_X",
+          "FLIP_X",
+          "SET_X"
+        ]
+      ],
+      "contextualPoints": 14
+    },
+    {
+      "seed": 19117,
+      "roots": [
+        0,
+        3
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ],
+        [
+          5
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "SET_X"
+        ],
+        [
+          "CLEAR_X",
+          "USE_X"
+        ],
+        [],
+        [
+          "SET_Y",
+          "FLIP_X",
+          "SET_X"
+        ],
+        [
+          "CLEAR_X",
+          "SET_X"
+        ],
+        [
+          "CLEAR_X"
+        ]
+      ],
+      "contextualPoints": 13
+    },
+    {
+      "seed": 19118,
+      "roots": [
+        0,
+        3
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          6
+        ],
+        [
+          3,
+          6
+        ],
+        [
+          4,
+          1
+        ],
+        [
+          5,
+          4
+        ],
+        [
+          6,
+          6
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "operations": [
+        [
+          "FLIP_X"
+        ],
+        [
+          "FLIP_X"
+        ],
+        [],
+        [
+          "CLEAR_X",
+          "USE_X"
+        ],
+        [
+          "USE_X",
+          "FLIP_X"
+        ],
+        [
+          "FLIP_X",
+          "USE_Y"
+        ],
+        [
+          "SET_Y",
+          "USE_Y"
+        ]
+      ],
+      "contextualPoints": 16
+    },
+    {
+      "seed": 19119,
+      "roots": [
+        0,
+        4
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          7
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          4,
+          0
+        ],
+        [
+          5,
+          0
+        ],
+        [
+          6,
+          5
+        ],
+        [
+          7,
+          4
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "SET_X",
+          "USE_Y"
+        ],
+        [
+          "CLEAR_X",
+          "CLEAR_X"
+        ],
+        [
+          "SET_Y",
+          "USE_Y"
+        ],
+        [],
+        [
+          "USE_Y"
+        ],
+        [
+          "FLIP_X"
+        ],
+        [
+          "FLIP_X"
+        ],
+        [
+          "USE_X"
+        ]
+      ],
+      "contextualPoints": 20
+    },
+    {
+      "seed": 19120,
+      "roots": [
+        0,
+        4
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          8
+        ],
+        [
+          3,
+          2
+        ],
+        [
+          4,
+          2
+        ],
+        [
+          5,
+          3
+        ],
+        [
+          6,
+          2
+        ],
+        [
+          7,
+          8
+        ],
+        [
+          8,
+          6
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "FLIP_X"
+        ],
+        [
+          "SET_X",
+          "CLEAR_X"
+        ],
+        [],
+        [],
+        [
+          "USE_X"
+        ],
+        [
+          "USE_X",
+          "SET_Y",
+          "SET_X"
+        ],
+        [
+          "USE_X"
+        ],
+        [
+          "SET_Y",
+          "USE_Y",
+          "CLEAR_X"
+        ],
+        [
+          "CLEAR_X"
+        ]
+      ],
+      "contextualPoints": 20
+    },
+    {
+      "seed": 19121,
+      "roots": [
+        0,
+        5
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ],
+        [
+          5
+        ],
+        [
+          6
+        ],
+        [
+          7
+        ],
+        [
+          8
+        ],
+        [
+          9
+        ],
+        [
+          0
+        ]
+      ],
+      "operations": [
+        [
+          "SET_Y"
+        ],
+        [
+          "SET_Y",
+          "FLIP_X",
+          "CLEAR_X"
+        ],
+        [],
+        [
+          "FLIP_X",
+          "USE_X"
+        ],
+        [
+          "CLEAR_X",
+          "FLIP_X",
+          "CLEAR_X"
+        ],
+        [],
+        [
+          "SET_Y",
+          "SET_Y"
+        ],
+        [
+          "SET_X",
+          "USE_X"
+        ],
+        [
+          "SET_X",
+          "SET_Y"
+        ],
+        []
+      ],
+      "contextualPoints": 22
+    },
+    {
+      "seed": 19122,
+      "roots": [
+        0,
+        5
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          10
+        ],
+        [
+          4,
+          8
+        ],
+        [
+          5,
+          6
+        ],
+        [
+          6,
+          4
+        ],
+        [
+          7,
+          9
+        ],
+        [
+          8,
+          1
+        ],
+        [
+          9,
+          2
+        ],
+        [
+          10,
+          7
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "USE_Y",
+          "USE_X",
+          "SET_X"
+        ],
+        [
+          "FLIP_X",
+          "CLEAR_X"
+        ],
+        [
+          "SET_X",
+          "SET_Y",
+          "USE_Y"
+        ],
+        [
+          "USE_X",
+          "SET_Y",
+          "USE_Y"
+        ],
+        [],
+        [
+          "SET_X"
+        ],
+        [
+          "SET_Y",
+          "SET_X"
+        ],
+        [
+          "FLIP_X",
+          "SET_Y"
+        ],
+        [
+          "SET_X"
+        ],
+        [],
+        [
+          "SET_Y",
+          "USE_X"
+        ]
+      ],
+      "contextualPoints": 25
+    },
+    {
+      "seed": 19123,
+      "roots": [
+        0,
+        6
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          5
+        ],
+        [
+          3,
+          10
+        ],
+        [
+          4,
+          7
+        ],
+        [
+          5,
+          4
+        ],
+        [
+          6,
+          2
+        ],
+        [
+          7,
+          2
+        ],
+        [
+          8,
+          7
+        ],
+        [
+          9,
+          10
+        ],
+        [
+          10,
+          1
+        ],
+        [
+          11,
+          5
+        ],
+        []
+      ],
+      "operations": [
+        [],
+        [
+          "FLIP_X",
+          "CLEAR_X"
+        ],
+        [
+          "USE_X"
+        ],
+        [
+          "SET_Y"
+        ],
+        [
+          "SET_Y",
+          "FLIP_X",
+          "FLIP_X"
+        ],
+        [
+          "SET_Y",
+          "SET_Y"
+        ],
+        [
+          "SET_X",
+          "USE_Y"
+        ],
+        [
+          "FLIP_X",
+          "CLEAR_X"
+        ],
+        [],
+        [
+          "CLEAR_X",
+          "FLIP_X",
+          "USE_Y"
+        ],
+        [
+          "SET_Y"
+        ],
+        [
+          "USE_X"
+        ]
+      ],
+      "contextualPoints": 27
+    },
+    {
+      "seed": 19124,
+      "roots": [
+        0,
+        6
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          12
+        ],
+        [
+          2,
+          11
+        ],
+        [
+          3,
+          6
+        ],
+        [
+          4,
+          11
+        ],
+        [
+          5,
+          5
+        ],
+        [
+          6,
+          1
+        ],
+        [
+          7,
+          4
+        ],
+        [
+          8,
+          10
+        ],
+        [
+          9,
+          3
+        ],
+        [
+          10,
+          8
+        ],
+        [
+          11,
+          12
+        ],
+        [
+          12,
+          6
+        ],
+        [
+          0,
+          6
+        ]
+      ],
+      "operations": [
+        [
+          "SET_X"
+        ],
+        [
+          "FLIP_X",
+          "SET_Y",
+          "USE_Y"
+        ],
+        [
+          "FLIP_X"
+        ],
+        [
+          "SET_X",
+          "FLIP_X"
+        ],
+        [
+          "USE_X"
+        ],
+        [
+          "SET_X",
+          "CLEAR_X",
+          "FLIP_X"
+        ],
+        [
+          "USE_X",
+          "FLIP_X"
+        ],
+        [
+          "SET_X",
+          "SET_Y",
+          "FLIP_X"
+        ],
+        [],
+        [],
+        [
+          "FLIP_X"
+        ],
+        [
+          "FLIP_X"
+        ],
+        [
+          "SET_Y",
+          "USE_Y",
+          "CLEAR_X"
+        ]
+      ],
+      "contextualPoints": 28
+    },
+    {
+      "seed": 19125,
+      "roots": [
+        0,
+        0
+      ],
+      "selected": 2,
+      "successors": [
+        []
+      ],
+      "operations": [
+        [
+          "SET_Y"
+        ]
+      ],
+      "contextualPoints": 6
+    },
+    {
+      "seed": 19126,
+      "roots": [
+        0,
+        1
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          0
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "CLEAR_X",
+          "SET_X",
+          "USE_Y"
+        ],
+        [
+          "USE_X",
+          "USE_Y"
+        ]
+      ],
+      "contextualPoints": 7
+    },
+    {
+      "seed": 19127,
+      "roots": [
+        0,
+        1
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          2
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "operations": [
+        [],
+        [
+          "CLEAR_X",
+          "SET_X",
+          "FLIP_X"
+        ],
+        []
+      ],
+      "contextualPoints": 8
+    },
+    {
+      "seed": 19128,
+      "roots": [
+        0,
+        2
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          3,
+          3
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "SET_X"
+        ],
+        [],
+        [
+          "FLIP_X"
+        ],
+        [
+          "SET_Y",
+          "SET_Y",
+          "SET_X"
+        ]
+      ],
+      "contextualPoints": 10
+    },
+    {
+      "seed": 19129,
+      "roots": [
+        0,
+        2
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "SET_Y"
+        ],
+        [],
+        [
+          "SET_Y",
+          "FLIP_X"
+        ],
+        [
+          "SET_X"
+        ],
+        [
+          "USE_X"
+        ]
+      ],
+      "contextualPoints": 12
+    },
+    {
+      "seed": 19130,
+      "roots": [
+        0,
+        3
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          5
+        ],
+        [
+          3,
+          2
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          5,
+          2
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "operations": [
+        [
+          "CLEAR_X",
+          "SET_X",
+          "USE_X"
+        ],
+        [
+          "USE_Y",
+          "USE_Y",
+          "USE_X"
+        ],
+        [
+          "CLEAR_X"
+        ],
+        [
+          "CLEAR_X",
+          "FLIP_X",
+          "SET_X"
+        ],
+        [
+          "SET_X",
+          "USE_Y"
+        ],
+        [
+          "CLEAR_X",
+          "CLEAR_X"
+        ]
+      ],
+      "contextualPoints": 14
+    },
+    {
+      "seed": 19131,
+      "roots": [
+        0,
+        3
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          3,
+          1
+        ],
+        [
+          4,
+          3
+        ],
+        [
+          5,
+          5
+        ],
+        [
+          6,
+          3
+        ],
+        []
+      ],
+      "operations": [
+        [],
+        [],
+        [],
+        [
+          "FLIP_X",
+          "FLIP_X",
+          "SET_X"
+        ],
+        [
+          "USE_X"
+        ],
+        [
+          "USE_Y",
+          "SET_X",
+          "USE_X"
+        ],
+        [
+          "SET_X",
+          "USE_Y",
+          "FLIP_X"
+        ]
+      ],
+      "contextualPoints": 15
+    },
+    {
+      "seed": 19132,
+      "roots": [
+        0,
+        4
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          4,
+          6
+        ],
+        [
+          5,
+          5
+        ],
+        [
+          6,
+          3
+        ],
+        [
+          7,
+          6
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "USE_X",
+          "SET_X"
+        ],
+        [
+          "FLIP_X",
+          "FLIP_X",
+          "USE_Y"
+        ],
+        [],
+        [
+          "FLIP_X"
+        ],
+        [
+          "CLEAR_X",
+          "CLEAR_X",
+          "USE_Y"
+        ],
+        [
+          "USE_X",
+          "USE_X",
+          "SET_Y"
+        ],
+        [
+          "USE_X",
+          "CLEAR_X",
+          "USE_Y"
+        ],
+        [
+          "USE_Y",
+          "SET_X",
+          "SET_X"
+        ]
+      ],
+      "contextualPoints": 17
+    },
+    {
+      "seed": 19133,
+      "roots": [
+        0,
+        4
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ],
+        [
+          5
+        ],
+        [
+          6
+        ],
+        [
+          7
+        ],
+        [
+          8
+        ],
+        [
+          0
+        ]
+      ],
+      "operations": [
+        [
+          "SET_Y"
+        ],
+        [
+          "SET_X",
+          "CLEAR_X",
+          "USE_X"
+        ],
+        [
+          "FLIP_X"
+        ],
+        [
+          "SET_Y",
+          "SET_Y",
+          "USE_Y"
+        ],
+        [
+          "FLIP_X",
+          "CLEAR_X",
+          "USE_X"
+        ],
+        [
+          "SET_Y",
+          "FLIP_X",
+          "FLIP_X"
+        ],
+        [
+          "FLIP_X",
+          "SET_X",
+          "SET_Y"
+        ],
+        [
+          "FLIP_X",
+          "CLEAR_X",
+          "CLEAR_X"
+        ],
+        []
+      ],
+      "contextualPoints": 20
+    },
+    {
+      "seed": 19134,
+      "roots": [
+        0,
+        5
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          7
+        ],
+        [
+          2,
+          8
+        ],
+        [
+          3,
+          1
+        ],
+        [
+          4,
+          7
+        ],
+        [
+          5,
+          2
+        ],
+        [
+          6,
+          3
+        ],
+        [
+          7,
+          0
+        ],
+        [
+          8,
+          5
+        ],
+        [
+          9,
+          9
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "SET_Y",
+          "FLIP_X",
+          "FLIP_X"
+        ],
+        [],
+        [
+          "USE_Y",
+          "CLEAR_X"
+        ],
+        [],
+        [
+          "CLEAR_X",
+          "FLIP_X",
+          "CLEAR_X"
+        ],
+        [
+          "USE_X",
+          "CLEAR_X",
+          "SET_X"
+        ],
+        [
+          "SET_X",
+          "USE_Y"
+        ],
+        [
+          "USE_X"
+        ],
+        [
+          "FLIP_X"
+        ],
+        [
+          "USE_Y",
+          "USE_Y",
+          "USE_X"
+        ]
+      ],
+      "contextualPoints": 24
+    },
+    {
+      "seed": 19135,
+      "roots": [
+        0,
+        5
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          8
+        ],
+        [
+          3,
+          1
+        ],
+        [
+          4,
+          6
+        ],
+        [
+          5,
+          7
+        ],
+        [
+          6,
+          4
+        ],
+        [
+          7,
+          2
+        ],
+        [
+          8,
+          1
+        ],
+        [
+          9,
+          10
+        ],
+        [
+          10,
+          2
+        ],
+        []
+      ],
+      "operations": [
+        [],
+        [
+          "USE_Y"
+        ],
+        [
+          "SET_X",
+          "USE_X",
+          "SET_X"
+        ],
+        [
+          "USE_Y",
+          "SET_X",
+          "SET_X"
+        ],
+        [
+          "CLEAR_X",
+          "USE_X",
+          "FLIP_X"
+        ],
+        [
+          "CLEAR_X",
+          "SET_Y"
+        ],
+        [],
+        [
+          "SET_X",
+          "USE_Y",
+          "USE_X"
+        ],
+        [
+          "USE_Y",
+          "SET_Y"
+        ],
+        [
+          "USE_X",
+          "FLIP_X"
+        ],
+        []
+      ],
+      "contextualPoints": 25
+    },
+    {
+      "seed": 19136,
+      "roots": [
+        0,
+        6
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          3,
+          10
+        ],
+        [
+          4,
+          3
+        ],
+        [
+          5,
+          1
+        ],
+        [
+          6,
+          11
+        ],
+        [
+          7,
+          4
+        ],
+        [
+          8,
+          0
+        ],
+        [
+          9,
+          11
+        ],
+        [
+          10,
+          8
+        ],
+        [
+          11,
+          0
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "operations": [
+        [],
+        [
+          "SET_Y",
+          "USE_Y",
+          "FLIP_X"
+        ],
+        [
+          "CLEAR_X",
+          "SET_Y",
+          "SET_X"
+        ],
+        [
+          "CLEAR_X",
+          "CLEAR_X"
+        ],
+        [
+          "USE_Y"
+        ],
+        [],
+        [],
+        [],
+        [
+          "CLEAR_X"
+        ],
+        [],
+        [],
+        [
+          "CLEAR_X",
+          "SET_X",
+          "SET_X"
+        ]
+      ],
+      "contextualPoints": 26
+    },
+    {
+      "seed": 19137,
+      "roots": [
+        0,
+        6
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ],
+        [
+          5
+        ],
+        [
+          6
+        ],
+        [
+          7
+        ],
+        [
+          8
+        ],
+        [
+          9
+        ],
+        [
+          10
+        ],
+        [
+          11
+        ],
+        [
+          12
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "FLIP_X"
+        ],
+        [
+          "SET_Y",
+          "FLIP_X",
+          "SET_X"
+        ],
+        [
+          "USE_X",
+          "CLEAR_X"
+        ],
+        [],
+        [],
+        [],
+        [
+          "SET_Y",
+          "SET_Y"
+        ],
+        [
+          "FLIP_X",
+          "CLEAR_X",
+          "FLIP_X"
+        ],
+        [
+          "SET_Y",
+          "FLIP_X",
+          "CLEAR_X"
+        ],
+        [
+          "SET_X",
+          "SET_X"
+        ],
+        [
+          "SET_X",
+          "CLEAR_X",
+          "USE_Y"
+        ],
+        [
+          "SET_Y"
+        ],
+        [
+          "USE_Y",
+          "FLIP_X"
+        ]
+      ],
+      "contextualPoints": 24
+    },
+    {
+      "seed": 19138,
+      "roots": [
+        0,
+        0
+      ],
+      "selected": 2,
+      "successors": [
+        []
+      ],
+      "operations": [
+        [
+          "CLEAR_X"
+        ]
+      ],
+      "contextualPoints": 6
+    },
+    {
+      "seed": 19139,
+      "roots": [
+        0,
+        1
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "operations": [
+        [
+          "SET_X",
+          "USE_Y",
+          "USE_X"
+        ],
+        [
+          "USE_X",
+          "FLIP_X",
+          "SET_X"
+        ]
+      ],
+      "contextualPoints": 6
+    },
+    {
+      "seed": 19140,
+      "roots": [
+        0,
+        1
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          1
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "CLEAR_X"
+        ],
+        [],
+        [
+          "CLEAR_X",
+          "USE_X",
+          "USE_Y"
+        ]
+      ],
+      "contextualPoints": 9
+    },
+    {
+      "seed": 19141,
+      "roots": [
+        0,
+        2
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "FLIP_X"
+        ],
+        [
+          "CLEAR_X",
+          "USE_Y"
+        ],
+        [
+          "USE_Y",
+          "USE_Y"
+        ],
+        [
+          "USE_X",
+          "SET_Y"
+        ]
+      ],
+      "contextualPoints": 10
+    },
+    {
+      "seed": 19142,
+      "roots": [
+        0,
+        2
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          3
+        ],
+        [
+          4,
+          3
+        ],
+        [
+          0,
+          3
+        ]
+      ],
+      "operations": [
+        [
+          "SET_X",
+          "FLIP_X"
+        ],
+        [
+          "FLIP_X"
+        ],
+        [
+          "USE_X",
+          "CLEAR_X"
+        ],
+        [
+          "SET_Y"
+        ],
+        [
+          "USE_X",
+          "SET_Y"
+        ]
+      ],
+      "contextualPoints": 12
+    },
+    {
+      "seed": 19143,
+      "roots": [
+        0,
+        3
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          5,
+          0
+        ],
+        []
+      ],
+      "operations": [
+        [],
+        [
+          "CLEAR_X"
+        ],
+        [],
+        [
+          "SET_X",
+          "USE_X",
+          "SET_X"
+        ],
+        [
+          "FLIP_X"
+        ],
+        []
+      ],
+      "contextualPoints": 16
+    },
+    {
+      "seed": 19144,
+      "roots": [
+        0,
+        3
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          3,
+          3
+        ],
+        [
+          4,
+          2
+        ],
+        [
+          5,
+          4
+        ],
+        [
+          6,
+          6
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "SET_Y"
+        ],
+        [
+          "USE_Y"
+        ],
+        [
+          "USE_X"
+        ],
+        [
+          "SET_Y",
+          "USE_X",
+          "SET_Y"
+        ],
+        [
+          "FLIP_X",
+          "FLIP_X",
+          "SET_Y"
+        ],
+        [],
+        [
+          "FLIP_X",
+          "USE_X"
+        ]
+      ],
+      "contextualPoints": 16
+    },
+    {
+      "seed": 19145,
+      "roots": [
+        0,
+        4
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ],
+        [
+          5
+        ],
+        [
+          6
+        ],
+        [
+          7
+        ],
+        [
+          0
+        ]
+      ],
+      "operations": [
+        [
+          "FLIP_X"
+        ],
+        [
+          "USE_Y"
+        ],
+        [],
+        [
+          "FLIP_X",
+          "FLIP_X"
+        ],
+        [],
+        [
+          "FLIP_X",
+          "USE_Y"
+        ],
+        [
+          "SET_Y"
+        ],
+        [
+          "USE_X",
+          "USE_Y"
+        ]
+      ],
+      "contextualPoints": 18
+    },
+    {
+      "seed": 19146,
+      "roots": [
+        0,
+        4
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          3,
+          6
+        ],
+        [
+          4,
+          1
+        ],
+        [
+          5,
+          2
+        ],
+        [
+          6,
+          4
+        ],
+        [
+          7,
+          0
+        ],
+        [
+          8,
+          2
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "USE_X",
+          "FLIP_X",
+          "CLEAR_X"
+        ],
+        [
+          "USE_X"
+        ],
+        [
+          "USE_Y",
+          "FLIP_X"
+        ],
+        [
+          "CLEAR_X",
+          "CLEAR_X",
+          "USE_X"
+        ],
+        [
+          "SET_X"
+        ],
+        [
+          "SET_X",
+          "USE_X"
+        ],
+        [
+          "FLIP_X",
+          "FLIP_X"
+        ],
+        [],
+        [
+          "SET_X"
+        ]
+      ],
+      "contextualPoints": 22
+    },
+    {
+      "seed": 19147,
+      "roots": [
+        0,
+        5
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          7
+        ],
+        [
+          2,
+          9
+        ],
+        [
+          3,
+          9
+        ],
+        [
+          4,
+          9
+        ],
+        [
+          5,
+          8
+        ],
+        [
+          6,
+          3
+        ],
+        [
+          7,
+          0
+        ],
+        [
+          8,
+          0
+        ],
+        [
+          9,
+          5
+        ],
+        []
+      ],
+      "operations": [
+        [],
+        [
+          "SET_X",
+          "USE_X"
+        ],
+        [
+          "SET_Y",
+          "FLIP_X",
+          "SET_X"
+        ],
+        [],
+        [
+          "USE_X",
+          "CLEAR_X"
+        ],
+        [
+          "USE_X"
+        ],
+        [],
+        [
+          "USE_X"
+        ],
+        [
+          "FLIP_X",
+          "USE_Y"
+        ],
+        [
+          "USE_Y",
+          "FLIP_X",
+          "USE_X"
+        ]
+      ],
+      "contextualPoints": 24
+    },
+    {
+      "seed": 19148,
+      "roots": [
+        0,
+        5
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          4,
+          2
+        ],
+        [
+          5,
+          4
+        ],
+        [
+          6,
+          2
+        ],
+        [
+          7,
+          9
+        ],
+        [
+          8,
+          9
+        ],
+        [
+          9,
+          4
+        ],
+        [
+          10,
+          1
+        ],
+        [
+          0,
+          6
+        ]
+      ],
+      "operations": [
+        [
+          "USE_Y"
+        ],
+        [
+          "USE_X",
+          "SET_Y",
+          "FLIP_X"
+        ],
+        [
+          "SET_X"
+        ],
+        [],
+        [
+          "FLIP_X",
+          "USE_X"
+        ],
+        [
+          "CLEAR_X"
+        ],
+        [],
+        [
+          "SET_Y"
+        ],
+        [],
+        [
+          "SET_Y",
+          "SET_X",
+          "SET_Y"
+        ],
+        [
+          "USE_X"
+        ]
+      ],
+      "contextualPoints": 24
+    },
+    {
+      "seed": 19149,
+      "roots": [
+        0,
+        6
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ],
+        [
+          5
+        ],
+        [
+          6
+        ],
+        [
+          7
+        ],
+        [
+          8
+        ],
+        [
+          9
+        ],
+        [
+          10
+        ],
+        [
+          11
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "FLIP_X"
+        ],
+        [
+          "USE_X",
+          "FLIP_X",
+          "SET_Y"
+        ],
+        [
+          "USE_Y",
+          "SET_Y",
+          "CLEAR_X"
+        ],
+        [],
+        [
+          "FLIP_X",
+          "SET_X",
+          "SET_X"
+        ],
+        [
+          "CLEAR_X",
+          "USE_X",
+          "USE_X"
+        ],
+        [
+          "FLIP_X",
+          "FLIP_X"
+        ],
+        [],
+        [],
+        [],
+        [
+          "USE_X"
+        ],
+        [
+          "FLIP_X",
+          "USE_Y",
+          "CLEAR_X"
+        ]
+      ],
+      "contextualPoints": 22
+    },
+    {
+      "seed": 19150,
+      "roots": [
+        0,
+        6
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          5
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          5,
+          7
+        ],
+        [
+          6,
+          11
+        ],
+        [
+          7,
+          4
+        ],
+        [
+          8,
+          5
+        ],
+        [
+          9,
+          6
+        ],
+        [
+          10,
+          11
+        ],
+        [
+          11,
+          3
+        ],
+        [
+          12,
+          11
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "USE_X",
+          "USE_Y",
+          "FLIP_X"
+        ],
+        [
+          "USE_Y",
+          "FLIP_X"
+        ],
+        [],
+        [
+          "CLEAR_X",
+          "USE_Y",
+          "FLIP_X"
+        ],
+        [],
+        [
+          "SET_Y",
+          "SET_Y"
+        ],
+        [
+          "SET_Y",
+          "SET_Y",
+          "USE_X"
+        ],
+        [
+          "FLIP_X",
+          "USE_X"
+        ],
+        [
+          "USE_X",
+          "SET_X"
+        ],
+        [],
+        [
+          "USE_Y",
+          "USE_Y"
+        ],
+        [
+          "USE_Y",
+          "SET_X",
+          "CLEAR_X"
+        ],
+        [
+          "USE_Y",
+          "USE_X"
+        ]
+      ],
+      "contextualPoints": 27
+    },
+    {
+      "seed": 19151,
+      "roots": [
+        0,
+        0
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          0,
+          0
+        ]
+      ],
+      "operations": [
+        []
+      ],
+      "contextualPoints": 4
+    },
+    {
+      "seed": 19152,
+      "roots": [
+        0,
+        1
+      ],
+      "selected": 2,
+      "successors": [
+        [
+          1,
+          0
+        ],
+        []
+      ],
+      "operations": [
+        [
+          "CLEAR_X",
+          "CLEAR_X",
+          "USE_Y"
+        ],
+        [
+          "FLIP_X"
+        ]
+      ],
+      "contextualPoints": 7
+    }
+  ],
+  "total_contextual_points": 1284
+}

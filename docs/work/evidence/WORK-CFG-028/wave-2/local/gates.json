@@ -1,0 +1,118 @@
+{
+  "source_head": "70ff8663d1d46f765354fbabce45216e8f9b1316",
+  "scope": "W2 worktree with exact Java/POM hashes from w2-source-inventory.json; W3-W5 unavailable",
+  "gates": [
+    {
+      "gate": "fast",
+      "command": [
+        "python3",
+        "-B",
+        "scripts/harness/run.py",
+        "fast"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "elapsed_seconds": 41.22751586799859,
+      "log": "fast.log.gz",
+      "sha256": "f39a7a275df916d40b1c47e04f15170cd7d7b42a1f9a04bf8afbb1653d272f66"
+    },
+    {
+      "gate": "architecture",
+      "command": [
+        "python3",
+        "-B",
+        "scripts/harness/run.py",
+        "architecture"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "elapsed_seconds": 36.93967195600271,
+      "log": "architecture.log.gz",
+      "sha256": "dfd9b5812f86e60d2f66436423edb627165693e7fba32058aa26447a869ff28a"
+    },
+    {
+      "gate": "semantic",
+      "command": [
+        "python3",
+        "-B",
+        "scripts/harness/run.py",
+        "semantic"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "elapsed_seconds": 14.794503695004096,
+      "log": "semantic.log.gz",
+      "sha256": "d28c33a71283583577e95b4233db35c50127d9fc32fe08c6aed7921af1eab3e7"
+    },
+    {
+      "gate": "integration",
+      "command": [
+        "python3",
+        "-B",
+        "scripts/harness/run.py",
+        "integration"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "elapsed_seconds": 20.590882677999616,
+      "log": "integration.log.gz",
+      "sha256": "993ae696cdc16d28c3ee5f16e7853fca215e8d9d27d1e7cdd4739535c9d8d3d3"
+    },
+    {
+      "gate": "performance",
+      "command": [
+        "python3",
+        "-B",
+        "scripts/harness/run.py",
+        "performance"
+      ],
+      "exit": 3,
+      "expected_exit": 3,
+      "elapsed_seconds": 22.185339308001858,
+      "log": "performance.log.gz",
+      "sha256": "8a31d90b83314a3e01ed01fd5870c2f2495177c56d83d90af278acbd392887b1"
+    },
+    {
+      "gate": "full",
+      "command": [
+        "python3",
+        "-B",
+        "scripts/harness/run.py",
+        "full"
+      ],
+      "exit": 3,
+      "expected_exit": 3,
+      "elapsed_seconds": 120.46781620299589,
+      "log": "full.log.gz",
+      "sha256": "972b180628de8364c892e5e4a8641036bb49a6f3b418f7191ddccce06c4f0db9"
+    },
+    {
+      "gate": "maven",
+      "command": [
+        "mvn",
+        "-B",
+        "-ntp",
+        "clean",
+        "verify"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "elapsed_seconds": 17.250609579998127,
+      "log": "maven.log.gz",
+      "sha256": "831aca4f311790a48d6cc8ace1fb6e4fa5f23d96e49b4fae94cf6bba7ba3b3ef"
+    },
+    {
+      "gate": "diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "elapsed_seconds": 0.010944754001684487,
+      "log": "diff.log.gz",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

@@ -540,6 +540,96 @@
         "INV-CFG-002"
       ],
       "implementation_evidence": "cfg-adapters/src/test/java/io/github/gustavo2358/analysis/cfg/adapters/ScalarAssignTest.java"
+    },
+    {
+      "id": "EVAL-CFG-033",
+      "title": "CP5 harness self-validation",
+      "status": "implemented",
+      "expectation": "Harness contracts only; no engine evidence",
+      "upstream_oracles": [],
+      "invariants": [
+        "INV-CFG-030",
+        "INV-CFG-031",
+        "INV-CFG-032",
+        "INV-CFG-033",
+        "INV-CFG-034"
+      ],
+      "implementation_evidence": "scripts/harness/test_cp5_harness.py"
+    },
+    {
+      "id": "EVAL-CFG-034",
+      "title": "structural index/session",
+      "status": "implemented",
+      "expectation": "W1 structural session/index, canonical membership and complete core inventory; manual and scale oracles only, no solver",
+      "upstream_oracles": [],
+      "invariants": [
+        "INV-CFG-030",
+        "INV-CFG-031",
+        "INV-CFG-032",
+        "INV-CFG-033",
+        "INV-CFG-034"
+      ],
+      "implementation_evidence": "analysis-kernel/src/test/java/io/github/gustavo2358/analysis/structure/AdmissionTest.java"
+    },
+    {
+      "id": "EVAL-CFG-035",
+      "title": "generic incremental solver",
+      "status": "implemented",
+      "expectation": "Generic incremental solver forward/backward, program-order anchors, isolated contextual states, independent recomposition and concrete finite oracles; S4b/scale and retention; no production AIR semantics",
+      "upstream_oracles": [],
+      "invariants": [
+        "INV-CFG-030",
+        "INV-CFG-031",
+        "INV-CFG-032",
+        "INV-CFG-033",
+        "INV-CFG-034"
+      ],
+      "implementation_evidence": "analysis-kernel/src/test/java/io/github/gustavo2358/analysis/solver/OracleTest.java"
+    },
+    {
+      "id": "EVAL-CFG-036",
+      "title": "PossibleValues/state/queries",
+      "status": "implemented",
+      "expectation": "Wave obligations in docs/product/cp5-roadmap.md and docs/evals/cp5 manifests; runtime not available",
+      "upstream_oracles": [],
+      "invariants": [
+        "INV-CFG-030",
+        "INV-CFG-031",
+        "INV-CFG-032",
+        "INV-CFG-033",
+        "INV-CFG-034"
+      ],
+      "implementation_evidence": "analysis-values/src/test/java/io/github/gustavo2358/analysis/values/ValuesTest.java"
+    },
+    {
+      "id": "EVAL-CFG-037",
+      "title": "shared planning/consumers",
+      "status": "implemented",
+      "expectation": "Shared planning/run/query union, explicit local dependencies, atomic FactSink and real W3 provider; S5/S6/S8/S14/S15/S16.",
+      "upstream_oracles": [],
+      "invariants": [
+        "INV-CFG-030",
+        "INV-CFG-031",
+        "INV-CFG-032",
+        "INV-CFG-033",
+        "INV-CFG-034"
+      ],
+      "implementation_evidence": "analysis-values/src/test/java/io/github/gustavo2358/analysis/values/PlanningRuntimeTest.java"
+    },
+    {
+      "id": "EVAL-CFG-038",
+      "title": "production/E2E",
+      "status": "implemented",
+      "expectation": "Real production composition, lossless result wire, external delivery, fresh COBOL CP4E twice and CP3, S14/S15/S16 without local capacity policy.",
+      "upstream_oracles": [],
+      "invariants": [
+        "INV-CFG-030",
+        "INV-CFG-031",
+        "INV-CFG-032",
+        "INV-CFG-033",
+        "INV-CFG-034"
+      ],
+      "implementation_evidence": "scripts/project/check_w5.py"
     }
   ]
 }

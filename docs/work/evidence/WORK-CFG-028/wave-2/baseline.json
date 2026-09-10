@@ -1,0 +1,17 @@
+{
+  "head": "b84389b6ccf94c259774b82a99bc7296278b65c0",
+  "base_main": "ec525cbbad96d70c9663faa88e2672148fa8ee71",
+  "branch": "feat/cp5-dataflow-engine",
+  "pr": {
+    "number": 12,
+    "state": "OPEN",
+    "draft": true,
+    "auto_merge": false,
+    "head": "b84389b6ccf94c259774b82a99bc7296278b65c0"
+  },
+  "air_java_pin": "ce530a7e17ab12b23c48f29425f503ff920b09fb",
+  "analysis_ir_pin": "122ce54e1b9ef9b00646f93ece409ca8b63bc933",
+  "sources_lock_sha256": "e68fd901f8022c82b13d7bc8119000aba40f6141d5059f9898014d8ee1743a88",
+  "request_sha256": "a30f5cb73f1e558f1ad9ed420f90d3ffc16b7170195ff1236b182d29ec838667",
+  "production_w2_before_authorization": false
+}

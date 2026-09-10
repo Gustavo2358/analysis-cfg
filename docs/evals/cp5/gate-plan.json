@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "work_item": "WORK-CFG-028",
+  "preparation_check": "scripts/harness/validate_cp5.py",
+  "waves": [
+    {
+      "wave": 1,
+      "eval": "EVAL-CFG-034",
+      "gates": {
+        "architecture": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w1.py"
+        },
+        "semantic": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w1.py"
+        },
+        "performance": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w1.py"
+        }
+      },
+      "audit_requirements": [
+        "A",
+        "E",
+        "F",
+        "H"
+      ],
+      "core_size_contract": "docs/evals/cp5/core-size-contract.json",
+      "core_size_probe": "S16"
+    },
+    {
+      "wave": 2,
+      "eval": "EVAL-CFG-035",
+      "gates": {
+        "architecture": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w2.py"
+        },
+        "semantic": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w2.py"
+        },
+        "performance": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w2.py"
+        }
+      },
+      "audit_requirements": [
+        "B",
+        "E",
+        "F",
+        "G",
+        "H"
+      ],
+      "core_size_contract": "docs/evals/cp5/core-size-contract.json",
+      "core_size_probe": "S16"
+    },
+    {
+      "wave": 3,
+      "eval": "EVAL-CFG-036",
+      "gates": {
+        "architecture": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w3.py"
+        },
+        "semantic": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w3.py"
+        },
+        "performance": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w3.py"
+        }
+      },
+      "audit_requirements": [
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "G",
+        "H"
+      ],
+      "core_size_contract": "docs/evals/cp5/core-size-contract.json",
+      "core_size_probe": "S16"
+    },
+    {
+      "wave": 4,
+      "eval": "EVAL-CFG-037",
+      "gates": {
+        "architecture": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w4.py"
+        },
+        "semantic": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w4.py"
+        },
+        "performance": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w4.py"
+        }
+      },
+      "audit_requirements": [
+        "C",
+        "D",
+        "F",
+        "H"
+      ],
+      "core_size_contract": "docs/evals/cp5/core-size-contract.json",
+      "core_size_probe": "S16"
+    },
+    {
+      "wave": 5,
+      "eval": "EVAL-CFG-038",
+      "gates": {
+        "architecture": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
+        },
+        "semantic": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
+        },
+        "performance": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
+        },
+        "integration": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
+        }
+      },
+      "audit_requirements": [
+        "F",
+        "H",
+        "I"
+      ],
+      "core_size_contract": "docs/evals/cp5/core-size-contract.json",
+      "core_size_probe": "S16"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "role": "OBSERVATION_ONLY",
+  "source": "local-gates-attempt-2/performance.log.gz",
+  "measurements": [
+    {
+      "keys": 8,
+      "consumers": 16,
+      "analysisRuns": 8,
+      "analysisCacheHits": 8,
+      "pointsPerRun": 3,
+      "unselectedEntries": 18
+    }
+  ]
+}

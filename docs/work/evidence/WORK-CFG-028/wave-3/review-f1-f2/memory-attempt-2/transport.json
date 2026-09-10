@@ -1,0 +1,81 @@
+{
+  "encoding": "gzip; decompress each archive to the original relative name recorded in receipt.json",
+  "receipt_unchanged": true,
+  "files": {
+    "10000/GC.heap_info.txt": {
+      "archive": "10000/GC.heap_info.txt.gz",
+      "raw_sha256": "e712215579628c281ce4514f123afddfa08f66e9864477314cd05f4ceb666410",
+      "archive_sha256": "9ddbe0ae699d85bdd0652c6a3fa3628d69ce591b7baf1f19ac91e00c3d2dc33c"
+    },
+    "10000/VM.flags.txt": {
+      "archive": "10000/VM.flags.txt.gz",
+      "raw_sha256": "622f2c29fc28c94aa17e63f98c6e85330715b40604c732f655c08fe6d7a3f8c2",
+      "archive_sha256": "08ee984b489fd2070109233b0da76fd91df03f162f7aefea11a9666ac53f8c1d"
+    },
+    "10000/VM.version.txt": {
+      "archive": "10000/VM.version.txt.gz",
+      "raw_sha256": "8108024844023fd887311c81cd6d31b62c09b89c024e9ae0bfc2af63cb2be80f",
+      "archive_sha256": "f5496d9a7d4ceb116dc5e105a7b07fba302a113b7ef1fd86597a3c70288f75c0"
+    },
+    "10000/jfr-summary.txt": {
+      "archive": "10000/jfr-summary.txt.gz",
+      "raw_sha256": "f96e29ae801d024387992bfbc0e7910c897aede002f3787a22f27121d615a017",
+      "archive_sha256": "4577ba3e3f3fd8134b1b8d39fbca9aac08751bd9230bf16030fb2b422a9999d6"
+    },
+    "10000/process.log": {
+      "archive": "10000/process.log.gz",
+      "raw_sha256": "fe67856d3b44f54145c12c952450eb81f45448ab513f9eaa58adcb852f65da08",
+      "archive_sha256": "fcdaaf248db1bbca87b33db4852c0808404f55ac4e730cfca7e2591108100fb4"
+    },
+    "20000/GC.heap_info.txt": {
+      "archive": "20000/GC.heap_info.txt.gz",
+      "raw_sha256": "791cc97fd13d356a2939f4f6716b1ebfb7a6c461340ad99add5fc4d4f9b52abc",
+      "archive_sha256": "fedf97fe6c0e2f7b684bc315e3e3fd221f084d9ed82d1a7f84b4d39fe13aeb1f"
+    },
+    "20000/VM.flags.txt": {
+      "archive": "20000/VM.flags.txt.gz",
+      "raw_sha256": "f651f9331645254993698fdc8f7543b850edd7bf2d8ade99f35f776a82e00f9f",
+      "archive_sha256": "e6bd69dcf69eb144d46d800a62f371c8185d12dff34359b0bcfaac4362b782f3"
+    },
+    "20000/VM.version.txt": {
+      "archive": "20000/VM.version.txt.gz",
+      "raw_sha256": "3961c2650b11e995dd853a8fd49c501e47fd6edafb0cbfb9348bdbfc283391fd",
+      "archive_sha256": "5554c2e8ad708634f310e0e939a2f565a9deaf9246b36ab8dc96bbfe3095eb56"
+    },
+    "20000/jfr-summary.txt": {
+      "archive": "20000/jfr-summary.txt.gz",
+      "raw_sha256": "1547dded556c6608e467170beef9474898b93b7ef98b3de7697016665fc52fea",
+      "archive_sha256": "668b225cadcda0ec8fa88c24847e34c619658a5b4e15e081af44c2cc239ade5b"
+    },
+    "20000/process.log": {
+      "archive": "20000/process.log.gz",
+      "raw_sha256": "b985dd35327c06a506e9622181ce842238a73e96d6fffd721c593d0b2f9e01d1",
+      "archive_sha256": "ed3c96f4c80745429be41871d3ec13e53bc2d8065c4b42d1a2371d76dd64006a"
+    },
+    "200000/GC.heap_info.txt": {
+      "archive": "200000/GC.heap_info.txt.gz",
+      "raw_sha256": "65c52cbf27725e21b0683682c679ede12888b8be3dc3a7173f67d5fee3cb73d1",
+      "archive_sha256": "4530716377d46e791ed0b2c721cfb9b872ce0410506c204e4778fb947c1ccac5"
+    },
+    "200000/VM.flags.txt": {
+      "archive": "200000/VM.flags.txt.gz",
+      "raw_sha256": "2568f73dc32e180ec91dcadcdd3af8013322da3bacdb4dd577dd2d854e0281b7",
+      "archive_sha256": "ced777eb3213b16e467c818e6dee8f761ecfb0d00c7df8fcbc996255cb3ffa76"
+    },
+    "200000/VM.version.txt": {
+      "archive": "200000/VM.version.txt.gz",
+      "raw_sha256": "0ac44f6f7625606b91dd9991d06ef0868935313ee890a91f1f32c31875d1b53d",
+      "archive_sha256": "bfce6430f5486d5ce57e0bdbb68fd1db6374f33029b30be80f9532dfac51d2d7"
+    },
+    "200000/jfr-summary.txt": {
+      "archive": "200000/jfr-summary.txt.gz",
+      "raw_sha256": "311b083809d3cf3bcedd6d90d01ea21a86791072a8ac6099ec5780ad07ef71b4",
+      "archive_sha256": "2d34dba2aa2725b22137be2f1789fb17f926fc30fe64f3f87b685dbff6f84544"
+    },
+    "200000/process.log": {
+      "archive": "200000/process.log.gz",
+      "raw_sha256": "e4f3396d8e9d4839cfa3203d570aa02eae4d9f3c8d818631e0bc23aeaa91675e",
+      "archive_sha256": "53f62ae2bcbcd24c4facb01f02feb4e9b4a09a57a389ffb4d491c0ea5f08ea50"
+    }
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "id": "WORK-CFG-028",
+  "backlog_id": "BACKLOG-CFG-020",
+  "title": "CP5 — harness e cinco Waves no mesmo PR draft",
+  "status": "active",
+  "risk": "high",
+  "goal": "Compose W1–W4 in production with lossless versioned results, deterministic local delivery and fresh COBOL E2Es; stop for final W5 human review.",
+  "authorization": "implementation",
+  "authorization_evidence": "Pedido humano de 2026-09-09 confirma APPROVED H1-H7/R1/R2 do discovery revisado e autoriza somente harness/docs/scripts, commits, push e um PR draft único para CP5. Não autoriza Wave 1 nem qualquer engine. Evidência durável em docs/work/cp5-lifecycle.json. Pedido pós-auditoria autoriza remediações focais A-I, commits/push no mesmo PR #12 draft e novo review, com harness/B1 previamente APPROVED. Nenhuma Wave autorizada. Review humano do HEAD e053f14 aprova A/B/C/D/E/G/H/I e solicita somente F1/F2/F3; correção focal, gates e push no PR #12 draft. W1 continua não autorizada. Nova decisão humana após e86a57c aprova integralmente A–I/F1/F2/F3 e autoriza somente remediação CORE-SIZE-001 do harness, commits/push no PR #12 draft. Supersede caps/budgets de capacidade; não autoriza W1. Pedido humano de 2026-09-09 aprova CORE-SIZE-001 no HEAD 4aeb4c0ad086ec4fc8911879b13139d84ca57bc9 e autoriza explicitamente WAVE_1, inclusive CP5-F01, commits/push e CI no mesmo PR #12 draft. Evidência append-only em wave-1/authorization.json. Não autoriza W2–W5. Pedido humano de 2026-09-09 aprova W1 no HEAD b84389b6ccf94c259774b82a99bc7296278b65c0 e autoriza W2, commits/push/CI no mesmo PR #12 draft; wave-2/authorization.json. W3–W5 não autorizadas. Pedido humano de 2026-09-09 aprova W2 no HEAD 0202c7424db04a1d83fb5e35fce055ea81f5b8fa e autoriza W3, commits/push/CI no mesmo PR #12 draft; wave-3/authorization.json. W4–W5 não autorizadas. Review humano do HEAD 8cb55b86c83644e4727cc532787a518775d7e868 solicita remediação focal W3-F1/W3-F2, preservando W1/W2/AVL/solver/replay e a autorização de commits/push/CI no mesmo PR #12 draft. Evidência em wave-3/review-f1-f2/review.json. Pedido humano aprova W3 em 855628200fba3851493991cec869dee899e82299 e resolve W3-F1/W3-F2; autoriza somente W4, commits/push/CI no mesmo PR #12 draft. docs/work/evidence/WORK-CFG-028/wave-4/authorization.json. W5 não autorizada. Review humano de 330d63427c0905e8ef140924b643e9fb012c73de solicita somente W4-F1, preservando autorização de commits/push/CI no mesmo PR #12 draft. docs/work/evidence/WORK-CFG-028/wave-4/review-f1/review.json. Human request 2026-09-10 approves W4 at 21d65d08512f1fb8a945009c2919946a61566eed; W4-F1/W4-BINDING-01 resolved. Authorizes W5, commits/push/CI and read-only sibling execution; docs/work/evidence/WORK-CFG-028/wave-5/authorization.json. No CP6, repin or merge.",
+  "checkpoint": "WAVE_5",
+  "must_read": [
+    "AGENTS.md",
+    "docs/work/index.md",
+    "docs/engineering/work-item-protocol.md",
+    "docs/work/cp5-lifecycle.json",
+    "docs/product/cp5-roadmap.md",
+    "docs/architecture/cp5-dataflow.md",
+    "docs/domain/cp5-solver.md",
+    "docs/domain/cp5-values.md",
+    "docs/engineering/cp5-performance.md",
+    "docs/engineering/cp5-challenges.md",
+    "docs/evals/cp5/index.md",
+    "docs/architecture/analysis-dataflow-result-v1.md",
+    "docs/work/cp5-follow-ups.md",
+    "docs/sources/sources.lock.json",
+    "docs/engineering/gates.md",
+    "docs/architecture/cp5-post-audit.md",
+    "docs/evals/cp5/post-audit-contracts.json",
+    "docs/architecture/decisions/ADR-0014.md",
+    "docs/evals/cp5/core-size-contract.json",
+    "docs/engineering/cp5-w1-index-ledger.md",
+    "docs/engineering/cp5-w2-solver-ledger.md",
+    "docs/engineering/cp5-w3-values-ledger.md",
+    "docs/engineering/cp5-w4-planning-ledger.md",
+    "docs/engineering/cp5-w5-composition-ledger.md"
+  ],
+  "related_decisions": [
+    "ADR-0010",
+    "ADR-0011",
+    "ADR-0012",
+    "ADR-0013",
+    "ADR-0014"
+  ],
+  "related_invariants": [
+    "INV-CFG-030",
+    "INV-CFG-031",
+    "INV-CFG-032",
+    "INV-CFG-033",
+    "INV-CFG-034"
+  ],
+  "evals": [
+    "EVAL-CFG-033",
+    "EVAL-CFG-034",
+    "EVAL-CFG-035",
+    "EVAL-CFG-036",
+    "EVAL-CFG-037",
+    "EVAL-CFG-038"
+  ],
+  "source_scope": [
+    "AGENTS.md",
+    "ARCHITECTURE.md",
+    "docs",
+    "scripts/harness",
+    "scripts/project",
+    ".github/workflows/ci.yml",
+    "MANIFEST.sha256",
+    "analysis-kernel",
+    "pom.xml",
+    "cfg-launcher/pom.xml",
+    "analysis-values",
+    "analysis-dataflow",
+    "analysis-adapters",
+    "analysis-launcher"
+  ],
+  "test_scope": [
+    "scripts/harness",
+    "analysis-kernel/src/test",
+    "analysis-values/src/test",
+    "analysis-dataflow/src/test",
+    "analysis-adapters/src/test",
+    "analysis-launcher/src/test"
+  ],
+  "must_not_change": [
+    "Existing cfg-kernel/cfg-adapters/cfg-launcher production and tests",
+    "W1–W4 production unless required additive API change proved by RED",
+    "source pins and existing product fixtures",
+    "sibling repositories",
+    "historical reviews and evidence",
+    "CP6/domain resolvers/Invoke effects/local frames"
+  ],
+  "gates": [
+    "fast",
+    "architecture",
+    "semantic",
+    "integration",
+    "performance",
+    "full"
+  ],
+  "stop_condition": "Gates locais aplicáveis, scope e diff revisados; commits/push, PR draft único e checks do HEAD final registrados; parar para review humano. Nenhuma Wave inicia automaticamente; sem merge/auto-merge/ready/rebase/force-push."
+}

@@ -1,0 +1,18 @@
+{
+  "head": "21d65d08512f1fb8a945009c2919946a61566eed",
+  "branch": "feat/cp5-dataflow-engine",
+  "status_before": "",
+  "origin_main": "ec525cbbad96d70c9663faa88e2672148fa8ee71",
+  "pr": {
+    "number": 12,
+    "state": "OPEN",
+    "isDraft": true,
+    "autoMergeRequest": null,
+    "headRefOid": "21d65d08512f1fb8a945009c2919946a61566eed"
+  },
+  "pins": {
+    "air_java": "ce530a7e17ab12b23c48f29425f503ff920b09fb",
+    "analysis_ir": "122ce54e1b9ef9b00646f93ece409ca8b63bc933"
+  },
+  "fetch": "completed with sandbox escalation; initial sandbox SSH/config failure did not modify source"
+}

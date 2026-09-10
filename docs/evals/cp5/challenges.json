@@ -1,0 +1,1006 @@
+{
+  "schema_version": 1,
+  "protocol": "docs/engineering/cp5-challenges.md",
+  "stages": [
+    "baseline_green",
+    "compilable_mutant",
+    "expected_red",
+    "byte_exact_restore",
+    "second_green"
+  ],
+  "challenges": [
+    {
+      "id": "predecessor-recomputation",
+      "wave": 2,
+      "probe": "S4b",
+      "oracle": "N contributions at J, zero predecessorContributionReads",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "propagate-unchanged-out",
+      "wave": 2,
+      "probe": "S4",
+      "oracle": "no propagation after equivalent published root",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "enqueue-unchanged-join",
+      "wave": 2,
+      "probe": "S4",
+      "oracle": "subsumed contribution creates no enqueue",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "lose-self-loop-reenqueue",
+      "wave": 2,
+      "probe": "S4",
+      "oracle": "manual fixpoint with membership cleared before transfer",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "full-state-clone",
+      "wave": 3,
+      "probe": "S3",
+      "oracle": "allocation/retention and bounded update ledger",
+      "status": "IMPLEMENTED",
+      "target": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesState.java",
+      "hook": "scripts/project/challenge_w3.py"
+    },
+    {
+      "id": "scan-objects-per-assign",
+      "wave": 1,
+      "probe": "S2",
+      "oracle": "referencesResolved/structuralVisits follows R, not I\u00d7D",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexBuilder.java",
+      "hook": "scripts/project/challenge_w1.py"
+    },
+    {
+      "id": "scan-global-successors",
+      "wave": 1,
+      "probe": "S4",
+      "oracle": "edge access follows contextual adjacency",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/ContextView.java",
+      "hook": "scripts/project/challenge_w1.py"
+    },
+    {
+      "id": "identity-by-display-name",
+      "wave": 1,
+      "probe": "S8",
+      "oracle": "same names different full owners; sparse ordinals; renaming",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/ProgramIndex.java",
+      "hook": "scripts/project/challenge_w1.py"
+    },
+    {
+      "id": "ignore-activation-entry",
+      "wave": 1,
+      "probe": "S8",
+      "oracle": "distinct entries and seeds/exits remain isolated",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/ContextView.java",
+      "hook": "scripts/project/challenge_w1.py"
+    },
+    {
+      "id": "missing-key-as-bottom",
+      "wave": 3,
+      "probe": "S7",
+      "oracle": "literal plus reached missing key retains open remainder",
+      "status": "IMPLEMENTED",
+      "target": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesState.java",
+      "hook": "scripts/project/challenge_w3.py"
+    },
+    {
+      "id": "non-convergent-semantic-domain",
+      "wave": 3,
+      "probe": "S7",
+      "oracle": "A finite program-literal domain converges without truncation; a genuinely infinite ascending domain needs a semantic convergence contract, never a machine-size cap.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/Candidates.java",
+      "hook": "scripts/project/challenge_w3.py"
+    },
+    {
+      "id": "silent-truncation",
+      "wave": 3,
+      "probe": "S7",
+      "oracle": "Preserve every semantically supported candidate independent of count and agenda; no silent truncation or artificial remainder.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/Candidates.java",
+      "hook": "scripts/project/challenge_w3.py"
+    },
+    {
+      "id": "unknown-effect-as-nop",
+      "wave": 3,
+      "probe": "S7",
+      "oracle": "HavocMust/May CopyBytes and unsupported expressions refused",
+      "status": "IMPLEMENTED",
+      "target": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/TextProfile.java",
+      "hook": "scripts/project/challenge_w3.py"
+    },
+    {
+      "id": "consumer-starts-solver",
+      "wave": 4,
+      "probe": "S5",
+      "oracle": "same-key analysisRuns invariant and consumer bytecode boundary",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/consumers/FactConsumer.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "architecture",
+      "expected_diagnostic": "W4 forbidden consumers bytecode dependency"
+    },
+    {
+      "id": "full-traversal-per-consumer",
+      "wave": 4,
+      "probe": "S5",
+      "oracle": "structuralVisits invariant with K",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/SitePlanner.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningScaleTest#sparseOverlappingConsumersShareBucketsAndOneActualAnalysis",
+      "expected_diagnostic": "bucket scan once"
+    },
+    {
+      "id": "broadcast-i-times-k",
+      "wave": 4,
+      "probe": "S5",
+      "oracle": "callbacks match sparse site interests only",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/SitePlanner.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningContractTest#overlappingInterestsDispatchOnlyExactPairsAndKeepStructuralPresence",
+      "expected_diagnostic": "expected:"
+    },
+    {
+      "id": "replay-per-query-site",
+      "wave": 3,
+      "probe": "S6",
+      "oracle": "operationsReplayed is directional prefix/suffix union, not sum per site",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/query/BatchReplayer.java",
+      "hook": "scripts/project/challenge_w3.py"
+    },
+    {
+      "id": "emit-provisional-facts",
+      "wave": 4,
+      "probe": "S5",
+      "oracle": "sink observes only stabilized model after overwrite/loop",
+      "status": "IMPLEMENTED",
+      "target": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesProvider.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningRuntimeTest#finalFactsReflectFixedPointAfterOverwritesAndLoop",
+      "expected_diagnostic": "only final stable overwrite reaches sink"
+    },
+    {
+      "id": "partial-promoted-to-exact",
+      "wave": 3,
+      "probe": "S7",
+      "oracle": "known model singleton still has open source/effective remainder",
+      "status": "IMPLEMENTED",
+      "target": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesAnalysis.java",
+      "hook": "scripts/project/challenge_w3.py"
+    },
+    {
+      "id": "mutate-shared-root",
+      "wave": 3,
+      "probe": "S3",
+      "oracle": "retained roots/branches/queries isolated byte/semantic snapshots",
+      "status": "IMPLEMENTED",
+      "target": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PersistentBindings.java",
+      "hook": "scripts/project/challenge_w3.py"
+    },
+    {
+      "id": "reapply-entry-seed",
+      "wave": 2,
+      "probe": "S4",
+      "oracle": "back-edge does not restore initial boundary",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "backward-only-at-exits",
+      "wave": 2,
+      "probe": "S4",
+      "oracle": "reachable SCC without exit and edge generation at first bottom publication",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "identity-only-equality",
+      "wave": 2,
+      "probe": "S4",
+      "oracle": "separately allocated equivalent states stop propagating",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "storage-id-implies-disjoint",
+      "wave": 3,
+      "probe": "S7",
+      "oracle": "two bases without covering premise refused; same Cell unified",
+      "status": "IMPLEMENTED",
+      "target": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/TextProfile.java",
+      "hook": "scripts/project/challenge_w3.py"
+    },
+    {
+      "id": "solver-concrete-domain-dependency",
+      "wave": 2,
+      "probe": null,
+      "oracle": "javap/jdeps and solver/SPI package deny rules after successful compile",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "transitive-air-only",
+      "wave": 1,
+      "probe": null,
+      "oracle": "remove direct air-java dependency; build still compiles transitively but architecture rejects",
+      "status": "IMPLEMENTED",
+      "target": "cfg-launcher/pom.xml",
+      "hook": "scripts/project/challenge_w1.py"
+    },
+    {
+      "id": "cache-ignores-options-entry",
+      "wave": 4,
+      "probe": "S8",
+      "oracle": "Different semantic profile/Entry creates distinct runs; equal semantic key shared; infrastructure options never enter key.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/PlanningExecution.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningContractTest#distinctProfilesOptionsAndEntriesRunSeparatelyWithNoPhantomContext",
+      "expected_diagnostic": "wrong batch bound to analysis key"
+    },
+    {
+      "id": "fixture-specific-production-route",
+      "wave": 5,
+      "probe": "S10",
+      "oracle": "renamed subject/literal, overwrite, real new AIR and full result IDs",
+      "status": "IMPLEMENTED",
+      "target": "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/DefaultValuePlan.java",
+      "hook": "scripts/project/challenge_w5.py"
+    },
+    {
+      "id": "unsupported-query-aborts-batch",
+      "wave": 3,
+      "probe": "S6",
+      "oracle": "Stable run, same subject: before(Return) retains {PROGA}; after(Return) yields UNSUPPORTED_POINT with reason and null value; rejecting the entire batch must fail",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/query/BatchReplayer.java",
+      "hook": "scripts/project/challenge_w3.py"
+    },
+    {
+      "id": "unsupported-query-disappears",
+      "wave": 3,
+      "probe": "S6",
+      "oracle": "Compare independent request plan with outcomes by full point/subject: one per unique query, including after(Return) UNSUPPORTED_POINT; omission or substitution must fail",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/query/BatchReplayer.java",
+      "hook": "scripts/project/challenge_w3.py"
+    },
+    {
+      "id": "missing-required-edge",
+      "wave": 1,
+      "probe": "S11",
+      "oracle": "Reject missing FALSE even if all surviving TRUE transitions are valid.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexBuilder.java",
+      "hook": "scripts/project/challenge_w1.py"
+    },
+    {
+      "id": "missing-required-sequence",
+      "wave": 1,
+      "probe": "S11",
+      "oracle": "Reject omitted AIR Sequence including unreachable/orphan Sequence.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexBuilder.java",
+      "hook": "scripts/project/challenge_w1.py"
+    },
+    {
+      "id": "foreign-sequence-source",
+      "wave": 1,
+      "probe": "S11",
+      "oracle": "Reject replacement Sequence instance, including same label/owner and altered instructions.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexBuilder.java",
+      "hook": "scripts/project/challenge_w1.py"
+    },
+    {
+      "id": "foreign-publication-entry",
+      "wave": 1,
+      "probe": "S11",
+      "oracle": "Reject foreign Publication or Entry instance even with equal-looking IDs.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexBuilder.java",
+      "hook": "scripts/project/challenge_w1.py"
+    },
+    {
+      "id": "duplicated-wrong-contextual-edge",
+      "wave": 1,
+      "probe": "S11",
+      "oracle": "Reject duplicate/context-mismatched transition; equal Branch targets retain two distinct outcomes.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexBuilder.java",
+      "hook": "scripts/project/challenge_w1.py"
+    },
+    {
+      "id": "backward-replay-from-wrong-anchor",
+      "wave": 2,
+      "probe": "S12",
+      "oracle": "use Y; def X; use X has IN={Y}, OUT={}; after last use={} rejects the wrong IN anchor independently of order.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/test/java/io/github/gustavo2358/analysis/solver/OracleTest.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "backward-replay-forward-order",
+      "wave": 2,
+      "probe": "S12",
+      "oracle": "Reverse gen/kill order must preserve the manual before/after witness at each operation.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/test/java/io/github/gustavo2358/analysis/solver/OracleTest.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "consumer-repairs-stale-state",
+      "wave": null,
+      "probe": null,
+      "oracle": "Future Invoke/effects slice: consumer cannot repair incorrectly preserved PROGA after BY REFERENCE may-write.",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null,
+      "future_slice": "POST_CP5_INVOKE_EFFECTS"
+    },
+    {
+      "id": "unknown-invoke-treated-as-no-effect",
+      "wave": null,
+      "probe": null,
+      "oracle": "Future Invoke/effects slice: absent effect proof must open affected storage before fixpoint.",
+      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "target": null,
+      "hook": null,
+      "future_slice": "POST_CP5_INVOKE_EFFECTS"
+    },
+    {
+      "id": "stable-analysis-observation-failure-reported-as-full-success",
+      "wave": 3,
+      "probe": "S14",
+      "oracle": "STABLE solver + controlled observation failure => INCOMPLETE preparation with empty atomic batch; solver unchanged.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/query/BatchReplayer.java",
+      "hook": "scripts/project/challenge_w3.py"
+    },
+    {
+      "id": "consumer-failure-reported-as-complete-output",
+      "wave": 4,
+      "probe": "S14",
+      "oracle": "Failed consumer leaves other completed consumer status intact and pipeline INCOMPLETE.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/PlanningExecution.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningRuntimeTest#failingConsumerDiscardsEveryStagedFactAndOthersComplete",
+      "expected_diagnostic": "expected: <FAILED>"
+    },
+    {
+      "id": "performance-optimization-by-lost-candidates",
+      "wave": 3,
+      "probe": "S15",
+      "oracle": "Fixed corpus/profile: compare all candidates and manual quality counts; loss of candidates changes expected outcomes.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/Candidates.java",
+      "hook": "scripts/project/challenge_w3.py"
+    },
+    {
+      "id": "performance-optimization-by-unsupported-everything",
+      "wave": 3,
+      "probe": "S15",
+      "oracle": "Fixed admitted queries: answered/unsupported counts and expected outcomes expose refusal replacing work.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/query/BatchReplayer.java",
+      "hook": "scripts/project/challenge_w3.py"
+    },
+    {
+      "id": "shared-wrong-transfer-agreement",
+      "wave": 2,
+      "probe": "S13",
+      "oracle": "Manual and finite concrete inclusion oracle reject wrong gen/kill even when two abstract solvers agree.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/test/java/io/github/gustavo2358/analysis/solver/SyntheticAnalyses.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "prepared-payload-certifies-own-delivery",
+      "wave": 5,
+      "probe": "S14",
+      "oracle": "Writer failure preserves prepared bytes and solver state; only external receipt FAILED, never COMPLETE.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/ResultJson.java",
+      "hook": "scripts/project/challenge_w5.py"
+    },
+    {
+      "id": "observation-failure-blocks-independent-consumer",
+      "wave": 4,
+      "probe": "S14",
+      "oracle": "Failed QueryConsumer batch leaves zero-query StructuralConsumer COMPLETE; preparation INCOMPLETE.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/PlanningExecution.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningRuntimeTest#f3FailureIsLocalAndIndependentBatchesShareStableRun",
+      "expected_diagnostic": "independent structural consumer completes"
+    },
+    {
+      "id": "size-cap-rejects-valid-program",
+      "wave": 1,
+      "probe": "S16",
+      "oracle": "Valid supported N/2N/4N all remain ACCEPTED.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexBuilder.java",
+      "hook": "scripts/project/challenge_w1.py"
+    },
+    {
+      "id": "max-nodes-admission",
+      "wave": 1,
+      "probe": "S16",
+      "oracle": "Changing only node count cannot change admission.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexBuilder.java",
+      "hook": "scripts/project/challenge_w1.py"
+    },
+    {
+      "id": "max-edges-admission",
+      "wave": 1,
+      "probe": "S16",
+      "oracle": "Changing only edge count cannot change admission.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexBuilder.java",
+      "hook": "scripts/project/challenge_w1.py"
+    },
+    {
+      "id": "max-operations-admission",
+      "wave": 1,
+      "probe": "S16",
+      "oracle": "Changing only operation count cannot change admission.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexBuilder.java",
+      "hook": "scripts/project/challenge_w1.py"
+    },
+    {
+      "id": "max-objects-admission",
+      "wave": 1,
+      "probe": "S16",
+      "oracle": "Changing only object count cannot change admission.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexBuilder.java",
+      "hook": "scripts/project/challenge_w1.py"
+    },
+    {
+      "id": "max-visits-aborts-analysis",
+      "wave": 2,
+      "probe": "S16",
+      "oracle": "Valid convergent run ends at fixed point regardless of visits/pushes/joins.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "resource-budget-changes-semantic-result",
+      "wave": 2,
+      "probe": "S16",
+      "oracle": "No work/resource budget in solver SPI or semantic AnalysisKey.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "candidate-count-causes-top",
+      "wave": 3,
+      "probe": "S16",
+      "oracle": "All finite candidates survive N+1 including 9, 100 and 10000, without new remainder.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/Candidates.java",
+      "hook": "scripts/project/challenge_w3.py"
+    },
+    {
+      "id": "max-queries-admission",
+      "wave": 4,
+      "probe": "S16",
+      "oracle": "Increasing query demand changes work, not supported coverage.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/SitePlanner.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningScaleTest#consumersQueriesMatchesFactsAndBatchesHaveNoCapacitySemantics",
+      "expected_diagnostic": "mutant query capacity"
+    },
+    {
+      "id": "max-consumers-admission",
+      "wave": 4,
+      "probe": "S16",
+      "oracle": "More consumers/sites/batches do not impose admission ceilings.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/SitePlanner.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningScaleTest#consumersQueriesMatchesFactsAndBatchesHaveNoCapacitySemantics",
+      "expected_diagnostic": "mutant consumer capacity"
+    },
+    {
+      "id": "maximum-result-size",
+      "wave": 5,
+      "probe": "S16",
+      "oracle": "Composition has no internal AIR/result/output byte ceiling.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/LocalResultWriter.java",
+      "hook": "scripts/project/challenge_w5.py"
+    },
+    {
+      "id": "catch-oom-as-analysis-limit",
+      "wave": 5,
+      "probe": "S16",
+      "oracle": "OOM/container/host/timeout/disk exhaustion is not mapped to any semantic outcome.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/LocalResultWriter.java",
+      "hook": "scripts/project/challenge_w5.py"
+    },
+    {
+      "id": "missing-first-publication",
+      "wave": 2,
+      "probe": "S4",
+      "oracle": "first bottom publication must deliver",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "skip-edge-transfer",
+      "wave": 2,
+      "probe": "S4",
+      "oracle": "expected:",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "skip-block-transfer",
+      "wave": 2,
+      "probe": "S4",
+      "oracle": "expected:",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "apply-block-twice",
+      "wave": 2,
+      "probe": "S4",
+      "oracle": "apply block exactly once",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "block-uses-wrong-state",
+      "wave": 2,
+      "probe": "S4",
+      "oracle": "expected:",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "boundary-omitted",
+      "wave": 2,
+      "probe": "S4",
+      "oracle": "boundary anchor side",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "wrong-boundary-side",
+      "wave": 2,
+      "probe": "S4",
+      "oracle": "boundary anchor side",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "ignore-self-loop",
+      "wave": 2,
+      "probe": "S4",
+      "oracle": "self loop reaches finite height",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "ignore-context-state",
+      "wave": 2,
+      "probe": "S8",
+      "oracle": "expected:",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/SolverTopology.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "duplicate-enqueue",
+      "wave": 2,
+      "probe": "S4",
+      "oracle": "coalesced diamond enqueues each point once",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "wrong-backward-direction",
+      "wave": 2,
+      "probe": "S4",
+      "oracle": "backward propagates IN to predecessor OUT",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "wrong-backward-publication",
+      "wave": 2,
+      "probe": "S4",
+      "oracle": "backward propagates IN to predecessor OUT",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "max-iterations",
+      "wave": 2,
+      "probe": "S16",
+      "oracle": "scale exact backward fact",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "solver-per-consumer",
+      "wave": 4,
+      "probe": "S5",
+      "oracle": "one actual provider solve",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/PlanningExecution.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningRuntimeTest#realVerticalSharesRunQueryReplayAndProducerSupport",
+      "expected_diagnostic": "one actual provider solve"
+    },
+    {
+      "id": "solver-per-observation-batch",
+      "wave": 4,
+      "probe": "S6",
+      "oracle": "batches reuse stable run",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/PlanningExecution.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningRuntimeTest#f3FailureIsLocalAndIndependentBatchesShareStableRun",
+      "expected_diagnostic": "batches reuse stable run"
+    },
+    {
+      "id": "replay-per-consumer",
+      "wave": 4,
+      "probe": "S6",
+      "oracle": "one actual observation batch",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/PlanningExecution.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningRuntimeTest#realVerticalSharesRunQueryReplayAndProducerSupport",
+      "expected_diagnostic": "one actual observation batch"
+    },
+    {
+      "id": "analysis-only-consumer-forced-to-depend-on-batch",
+      "wave": 4,
+      "probe": "S14",
+      "oracle": "analysis-only does not depend on batch",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/PlanningExecution.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningRuntimeTest#f3FailureIsLocalAndIndependentBatchesShareStableRun",
+      "expected_diagnostic": "analysis-only does not depend on batch"
+    },
+    {
+      "id": "structural-consumer-forced-to-start-analysis",
+      "wave": 4,
+      "probe": "S14",
+      "oracle": "expected:",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/PlanningExecution.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningRuntimeTest#analysisOnlyDoesNotCreateObservationAndStructuralStartsNoAnalysis",
+      "expected_diagnostic": "expected:"
+    },
+    {
+      "id": "consumer-partial-facts-committed-on-failure",
+      "wave": 4,
+      "probe": "S14",
+      "oracle": "failed consumer commits no partial bundle",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/PlanningExecution.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningRuntimeTest#failingConsumerDiscardsEveryStagedFactAndOthersComplete",
+      "expected_diagnostic": "failed consumer commits no partial bundle"
+    },
+    {
+      "id": "missing-consumer-dependency-treated-as-success",
+      "wave": 4,
+      "probe": "S14",
+      "oracle": "missing batch dependency",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/SitePlanner.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningRuntimeTest#missingDependenciesAndWrongBindingsNeverProduceSuccess",
+      "expected_diagnostic": "missing batch dependency"
+    },
+    {
+      "id": "wrong-batch-bound-to-analysis-key",
+      "wave": 4,
+      "probe": "S8",
+      "oracle": "batch ID binds exact key",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/SitePlanner.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningContractTest#batchesWithSameIdCannotAliasDifferentKeys",
+      "expected_diagnostic": "batch ID binds exact key"
+    },
+    {
+      "id": "wrong-provider-execution-binding",
+      "wave": 4,
+      "probe": "S8",
+      "oracle": "provider binding mismatch rejected",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/PlanningExecution.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningRuntimeTest#registryRejectsWrongPreparedAndExecutionKey",
+      "expected_diagnostic": "provider binding mismatch rejected"
+    },
+    {
+      "id": "unplanned-query-triggers-hidden-replay",
+      "wave": 4,
+      "probe": "S6",
+      "oracle": "late access cannot replay",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/PlanningExecution.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningRuntimeTest#lateQueryIsNotRequestedAndNewEpochExplicitlyReusesRun",
+      "expected_diagnostic": "late access cannot replay"
+    },
+    {
+      "id": "global-static-run-cache",
+      "wave": 4,
+      "probe": "S8",
+      "oracle": "cache owner is session lifetime",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/PlanningExecution.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningContractTest#differentSessionsCannotShareRunsOrPlansEvenWithEqualIds",
+      "expected_diagnostic": "cache owner is session lifetime"
+    },
+    {
+      "id": "resource-cap-on-sites",
+      "wave": 4,
+      "probe": "S16",
+      "oracle": "mutant site capacity",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/SitePlanner.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningScaleTest#consumersQueriesMatchesFactsAndBatchesHaveNoCapacitySemantics",
+      "expected_diagnostic": "mutant site capacity"
+    },
+    {
+      "id": "resource-cap-on-facts",
+      "wave": 4,
+      "probe": "S16",
+      "oracle": "size never changes completion",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/PlanningExecution.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningScaleTest#consumersQueriesMatchesFactsAndBatchesHaveNoCapacitySemantics",
+      "expected_diagnostic": "size never changes completion"
+    },
+    {
+      "id": "resource-cap-on-batches",
+      "wave": 4,
+      "probe": "S16",
+      "oracle": "mutant batch capacity",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/SitePlanner.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningScaleTest#consumersQueriesMatchesFactsAndBatchesHaveNoCapacitySemantics",
+      "expected_diagnostic": "mutant batch capacity"
+    },
+    {
+      "id": "drop-W3-support-or-remainder-before-consumer",
+      "wave": 4,
+      "probe": "S15",
+      "oracle": "candidate support preserved at consumer boundary",
+      "status": "IMPLEMENTED",
+      "target": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesProvider.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningRuntimeTest#realVerticalSharesRunQueryReplayAndProducerSupport",
+      "expected_diagnostic": "candidate support preserved at consumer boundary"
+    },
+    {
+      "id": "w4-unsupported-everything",
+      "wave": 4,
+      "probe": "S15",
+      "oracle": "query consumer receives supported value",
+      "status": "IMPLEMENTED",
+      "target": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesProvider.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningRuntimeTest#realVerticalSharesRunQueryReplayAndProducerSupport",
+      "expected_diagnostic": "query consumer receives supported value"
+    },
+    {
+      "id": "w4-drop-candidates",
+      "wave": 4,
+      "probe": "S15",
+      "oracle": "all real candidates reach sink",
+      "status": "IMPLEMENTED",
+      "target": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesProvider.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningRuntimeTest#realVerticalSharesRunQueryReplayAndProducerSupport",
+      "expected_diagnostic": "all real candidates reach sink"
+    },
+    {
+      "id": "site-query-zero-match-drops-required-batch",
+      "wave": 4,
+      "probe": "S14",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/SitePlanner.java",
+      "mutation": "Bind a SiteQuery batch only after the first matched site, dropping declared empty observation dependencies.",
+      "oracle": "Known SiteQuery batch survives zero matches and completes empty through W3; unknown dependencies remain invalid.",
+      "status": "IMPLEMENTED",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningZeroMatchTest#absentKindKeepsDeclaredEmptyBatch",
+      "expected_diagnostic": "declared SiteQuery batch survives zero matches"
+    },
+    {
+      "id": "drop-candidate-support-in-wire",
+      "wave": 5,
+      "probe": "S15",
+      "oracle": "Compilable mutation rejected by nominal W5 production/reader/delivery oracle; exact restore and second GREEN required.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/ResultJson.java",
+      "hook": "scripts/project/challenge_w5.py"
+    },
+    {
+      "id": "swap-candidate-support-in-wire",
+      "wave": 5,
+      "probe": "S15",
+      "oracle": "Compilable mutation rejected by nominal W5 production/reader/delivery oracle; exact restore and second GREEN required.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/ResultJson.java",
+      "hook": "scripts/project/challenge_w5.py"
+    },
+    {
+      "id": "source-partial-promoted-to-exact-in-wire",
+      "wave": 5,
+      "probe": "S15",
+      "oracle": "Compilable mutation rejected by nominal W5 production/reader/delivery oracle; exact restore and second GREEN required.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/ResultJson.java",
+      "hook": "scripts/project/challenge_w5.py"
+    },
+    {
+      "id": "full-id-owner-loss",
+      "wave": 5,
+      "probe": "S15",
+      "oracle": "Compilable mutation rejected by nominal W5 production/reader/delivery oracle; exact restore and second GREEN required.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/WireIds.java",
+      "hook": "scripts/project/challenge_w5.py"
+    },
+    {
+      "id": "wrong-result-id-receipt",
+      "wave": 5,
+      "probe": "S14",
+      "oracle": "Compilable mutation rejected by nominal W5 production/reader/delivery oracle; exact restore and second GREEN required.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/LocalResultWriter.java",
+      "hook": "scripts/project/challenge_w5.py"
+    },
+    {
+      "id": "wrong-result-hash-receipt",
+      "wave": 5,
+      "probe": "S14",
+      "oracle": "Compilable mutation rejected by nominal W5 production/reader/delivery oracle; exact restore and second GREEN required.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/LocalResultWriter.java",
+      "hook": "scripts/project/challenge_w5.py"
+    },
+    {
+      "id": "wrong-result-destination-receipt",
+      "wave": 5,
+      "probe": "S14",
+      "oracle": "Compilable mutation rejected by nominal W5 production/reader/delivery oracle; exact restore and second GREEN required.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/LocalResultWriter.java",
+      "hook": "scripts/project/challenge_w5.py"
+    },
+    {
+      "id": "writer-failure-reported-complete",
+      "wave": 5,
+      "probe": "S14",
+      "oracle": "Compilable mutation rejected by nominal W5 production/reader/delivery oracle; exact restore and second GREEN required.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/LocalResultWriter.java",
+      "hook": "scripts/project/challenge_w5.py"
+    },
+    {
+      "id": "partial-final-file-after-write-failure",
+      "wave": 5,
+      "probe": "S14",
+      "oracle": "Compilable mutation rejected by nominal W5 production/reader/delivery oracle; exact restore and second GREEN required.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/LocalResultWriter.java",
+      "hook": "scripts/project/challenge_w5.py"
+    },
+    {
+      "id": "nondeterministic-result-order",
+      "wave": 5,
+      "probe": "S15",
+      "oracle": "Compilable mutation rejected by nominal W5 production/reader/delivery oracle; exact restore and second GREEN required.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/ResultJson.java",
+      "hook": "scripts/project/challenge_w5.py"
+    },
+    {
+      "id": "local-input-size-cap-used-as-semantic-admission",
+      "wave": 5,
+      "probe": "S16",
+      "oracle": "Compilable mutation rejected by nominal W5 production/reader/delivery oracle; exact restore and second GREEN required.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/DataflowAirReader.java",
+      "hook": "scripts/project/challenge_w5.py"
+    },
+    {
+      "id": "resource-cap-on-result-facts-queries",
+      "wave": 5,
+      "probe": "S16",
+      "oracle": "Compilable mutation rejected by nominal W5 production/reader/delivery oracle; exact restore and second GREEN required.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/DefaultValuePlan.java",
+      "hook": "scripts/project/challenge_w5.py"
+    },
+    {
+      "id": "legacy-cfg-writer-used-for-analysis-result",
+      "wave": 5,
+      "probe": "S14",
+      "oracle": "Compilable mutation rejected by nominal W5 production/reader/delivery oracle; exact restore and second GREEN required.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/ResultJson.java",
+      "hook": "scripts/project/challenge_w5.py"
+    },
+    {
+      "id": "golden-substituted-for-real-stage",
+      "wave": 5,
+      "probe": "S10",
+      "oracle": "Compilable mutation rejected by nominal W5 production/reader/delivery oracle; exact restore and second GREEN required.",
+      "status": "IMPLEMENTED",
+      "target": "scripts/project/e2e_w5.py",
+      "hook": "scripts/project/challenge_w5.py"
+    },
+    {
+      "id": "drop-batch-dependency-reason-in-wire",
+      "wave": 5,
+      "probe": "S14",
+      "oracle": "Real refused W3 profile retains W4 DEPENDENCY_UNAVAILABLE batch reason, prepared INCOMPLETE and independent external delivery COMPLETE.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/ResultJson.java",
+      "hook": "scripts/project/challenge_w5.py"
+    }
+  ]
+}

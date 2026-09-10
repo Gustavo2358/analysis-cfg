@@ -1,0 +1,16 @@
+{
+  "date": "2026-09-09",
+  "source": "explicit human request authorizing CP5 W2 in PR #12",
+  "reviewed_head": "b84389b6ccf94c259774b82a99bc7296278b65c0",
+  "decision": "WAVE_1_APPROVED_AND_WAVE_2_AUTHORIZED",
+  "W1": "APPROVED",
+  "authorized_wave": 2,
+  "current_checkpoint": "WAVE_2",
+  "scope": "generic incremental direction-aware solver, synthetic oracles, W2 gates and evidence; commits/push/CI in same draft PR #12",
+  "evidence": "docs/work/evidence/WORK-CFG-028/wave-2/authorization.json",
+  "not_authorized": [
+    "WAVE_3",
+    "WAVE_4",
+    "WAVE_5"
+  ]
+}

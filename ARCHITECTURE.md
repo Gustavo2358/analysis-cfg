@@ -19,8 +19,7 @@ analysis-cfg
 CFG
 ```
 
-`proleap-poc` termina no produto semântico COBOL-specific. `cobol-lower`, ainda
-planejado upstream, traduz somente esse produto para a Analysis IR. O `analysis-cfg`
+`proleap-poc` termina no produto semântico COBOL-specific. `cobol-lower` traduz esse produto para a Analysis IR; CP4 foi demonstrado no E2E aceito, conforme baseline CP5. O `analysis-cfg`
 é consumer puro e nunca conhece construções COBOL, AST, symbols ou resolvers.
 
 ## Porta única
@@ -119,3 +118,28 @@ estão no reactor; não há módulo frontend, parser AIR próprio nem dependênc
 Architecture inspeciona fontes/classes/DAG exatos e a chamada compilada AirJson.decode.
 Integration executa a cadeia de arquivos e compara o resultado com oracle manual.
 A ligação real com 2A/cobol-lower e o E2E cross-repo continuam fora deste checkpoint.
+
+## CP5 — produção W1–W5
+
+W1–W4 estão APPROVED. A W5 foi autorizada separadamente para composição e entrega;
+continua sujeita a review humano final no mesmo PR #12 draft.
+analysis-kernel contém índice/session, solver genérico, queries, planner e consumers.
+analysis-values implementa PossibleValues. Nenhuma dependência aponta do CFG para análise.
+
+```text
+analysis-launcher → analysis-adapters → analysis-dataflow
+                         ↓                    ↓
+                     air-json          analysis-values → analysis-kernel → cfg-kernel
+                         └──────────────────────────────→ air-java
+```
+
+As dependências AIR diretas adicionais constam dos POMs/inventários. A aplicação
+recebe Publication e compõe BuildCfg → AnalysisSession → registry explícito →
+plano de destinos escritos BEFORE terminator → PlanningExecution → resultado detached.
+O adapter escreve o wire 1.1.0 e retorna receipt externo 1.0.0. A CLI CFG permanece
+byte-exact. Não há CALL resolver ou CP6.
+
+[Arquitetura CP5](docs/architecture/cp5-dataflow.md),
+[ledger W5](docs/engineering/cp5-w5-composition-ledger.md),
+[wire](docs/architecture/analysis-dataflow-result-v1.md),
+[roadmap](docs/product/cp5-roadmap.md), [lifecycle](docs/work/cp5-lifecycle.json).

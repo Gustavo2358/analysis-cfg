@@ -85,7 +85,9 @@ não existe exit global único implícito para a Publication.
 
 ## INV-CFG-020 — Limites explícitos
 
-Corte de recursos/contextos exige ANALYSIS_LIMIT e precisão reduzida, nunca truncamento invisível.
+CORE-SIZE-001: tamanho/recursos não justificam corte, rejeição ou precisão reduzida.
+Convergência e abstração contextual são semânticas explícitas; falha externa não é
+resultado semântico. [ADR-0014](decisions/ADR-0014.md) supersede a política anterior.
 
 ## INV-CFG-021 — Oracle independente
 
@@ -132,3 +134,23 @@ ativação dinâmica.
 `unknown_type` não é booleano e não recebe default, coerção ou inferência do uso.
 
 Fonte: [Analysis IR e inspirações](../sources/index.md). Evidência: [evals](../evals/index.md).
+
+## INV-CFG-030 — Sessão e solver separados
+
+Sessão/index downstream de BuildCfg; solver neutro e estado opaco; DAG e imports AIR diretos conforme ADR-0010.
+
+## INV-CFG-031 — Propagação incremental contextual
+
+Primeira publicação/mudança propaga raízes por arestas afetadas; acumulador inalterado não enfileira. Entry, first reach, dual backward e self-loop conforme ADR-0011. Recomposição só oracle test-only.
+
+## INV-CFG-032 — Locations e valores honestos
+
+Cell compartilhada e disjunção explícita; missing key desconhecido, bottom separado; strong write e open semântico conforme ADR-0012/ADR-0014; todos os candidatos finitos preservados.
+
+## INV-CFG-033 — Compartilhamento com custo verificável
+
+H4 protege propriedades de estado e métricas/retention, não Patricia/FIFO; k=8 foi removido por CORE-SIZE-001. Probes/challenges por Wave conforme ADR-0013.
+
+## INV-CFG-034 — Observações estáveis e alcance do claim
+
+Batch e indexed dispatch sem I×K ou replays por site; model scope separado da abertura de fonte. CP4E não prova exaustividade; resultado derivado mantém restante efetivo.

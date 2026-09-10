@@ -1,0 +1,183 @@
+{
+  "schema_version": 1,
+  "air_direct_dependency": {
+    "import_prefix": "io.github.gustavo2358.air.",
+    "group": "io.github.gustavo2358",
+    "artifact": "air-java",
+    "scope": "compile"
+  },
+  "modules": {
+    "cfg-kernel": {
+      "wave": 0,
+      "direct": [
+        "air-java"
+      ],
+      "forbidden": [
+        "analysis-kernel",
+        "analysis-values"
+      ]
+    },
+    "analysis-kernel": {
+      "wave": 1,
+      "direct": [
+        "cfg-kernel",
+        "air-java"
+      ],
+      "forbidden": [
+        "analysis-values",
+        "cfg-adapters",
+        "cfg-launcher"
+      ]
+    },
+    "analysis-values": {
+      "wave": 3,
+      "direct": [
+        "analysis-kernel",
+        "air-java",
+        "cfg-kernel"
+      ],
+      "forbidden": [
+        "cfg-adapters",
+        "cfg-launcher",
+        "consumers"
+      ]
+    },
+    "analysis-dataflow": {
+      "wave": 5,
+      "direct": [
+        "cfg-kernel",
+        "analysis-kernel",
+        "analysis-values",
+        "air-java"
+      ],
+      "forbidden": [
+        "analysis-adapters",
+        "analysis-launcher",
+        "air-json"
+      ]
+    },
+    "analysis-adapters": {
+      "wave": 5,
+      "direct": [
+        "analysis-dataflow",
+        "analysis-kernel",
+        "analysis-values",
+        "air-java",
+        "air-json"
+      ],
+      "forbidden": [
+        "analysis-launcher",
+        "cfg-adapters",
+        "cfg-launcher"
+      ]
+    },
+    "analysis-launcher": {
+      "wave": 5,
+      "direct": [
+        "analysis-dataflow",
+        "analysis-adapters",
+        "analysis-kernel",
+        "air-java",
+        "air-json"
+      ],
+      "forbidden": [
+        "cfg-launcher"
+      ]
+    }
+  },
+  "package_rules": {
+    "solver_spi": {
+      "wave": 2,
+      "forbidden": [
+        "io.github.gustavo2358.air.model.Operations",
+        "io.github.gustavo2358.air.model.Values",
+        "analysis.values",
+        "analysis.extraction",
+        "analysis.consumers",
+        "cfg.adapters",
+        "cfg.launcher",
+        "java.io",
+        "java.nio.file",
+        "java.net",
+        "lower",
+        "cobolexplorer",
+        "org.antlr"
+      ]
+    },
+    "values": {
+      "wave": 3,
+      "forbidden": [
+        "analysis.consumers",
+        "analysis.extraction",
+        "cfg.adapters",
+        "cfg.launcher",
+        "cfg.application.BuildCfg",
+        "lower",
+        "cobolexplorer",
+        "org.antlr"
+      ]
+    },
+    "consumers": {
+      "wave": 4,
+      "forbidden": [
+        "cfg.application.BuildCfg",
+        "analysis.solver",
+        "analysis.structure.ProgramIndex",
+        "cfg.domain.CfgGraph",
+        "lower",
+        "cobolexplorer",
+        "org.antlr",
+        "analysis.structure.AnalysisSession",
+        "analysis.application",
+        "analysis.query.BatchReplayer",
+        "analysis.values.PossibleValuesAnalysis",
+        "analysis.values.PossibleValuesProvider",
+        "cfg.application.CfgBuildCoordinator",
+        "java.io",
+        "java.nio.file",
+        "java.net",
+        "java.lang.reflect",
+        "java.util.ServiceLoader",
+        "air.model.Publication",
+        "air.model.Sequence",
+        "air.model.Unit"
+      ]
+    }
+  },
+  "future_inventories": {
+    "analysis-kernel": {
+      "status": "IMPLEMENTED",
+      "sources": "docs/evals/cp5/w1-inventory.json",
+      "classfiles": "docs/evals/cp5/w1-inventory.json",
+      "javap_descriptors": "docs/evals/cp5/w1-inventory.json",
+      "jdeps_edges": "docs/evals/cp5/w1-inventory.json",
+      "effective_maven": "docs/evals/cp5/w1-inventory.json"
+    },
+    "analysis-values": {
+      "status": "IMPLEMENTED",
+      "sources": "docs/evals/cp5/w3-inventory.json",
+      "classfiles": "docs/evals/cp5/w3-inventory.json",
+      "javap_descriptors": "docs/evals/cp5/w3-inventory.json",
+      "jdeps_edges": "docs/evals/cp5/w3-inventory.json",
+      "effective_maven": "docs/evals/cp5/w3-inventory.json"
+    }
+  },
+  "rule_note": "Package selectors and public API descriptors must be concretized in each Wave, including generics and method refs; no nominal container/policy rule.",
+  "baseline_findings": [
+    {
+      "id": "CP5-F01",
+      "module": "cfg-launcher",
+      "baseline": "ec525cbbad96d70c9663faa88e2672148fa8ee71",
+      "issue": "Production imports Publication and AirJsonException transitively; air-java (and air-json) not direct",
+      "status": "FIXED_W1",
+      "scope": "direct air-java and air-json declarations in cfg-launcher; strict guard with no preparation exception",
+      "proposed_checkpoint": "W1 implemented; awaiting human review"
+    }
+  ],
+  "core_size_contract": "docs/evals/cp5/core-size-contract.json",
+  "resource_failure_semantic_mappings": {},
+  "solver_inventory": "docs/evals/cp5/w2-inventory.json",
+  "query_inventory": "docs/evals/cp5/w3-inventory.json",
+  "planning_inventory": "docs/evals/cp5/w4-inventory.json",
+  "composition_inventory": "docs/evals/cp5/w5-inventory.json"
+}

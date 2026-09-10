@@ -1,0 +1,25 @@
+{
+  "date": "2026-09-09",
+  "source": "explicit human request authorizing CP5 Wave 4 in same draft PR #12",
+  "reviewed_head": "855628200fba3851493991cec869dee899e82299",
+  "decision": "WAVE_3_APPROVED_AND_WAVE_4_AUTHORIZED",
+  "W3": "APPROVED",
+  "resolved_findings": [
+    "W3-F1",
+    "W3-F2"
+  ],
+  "nonblocking_follow_ups": [
+    "W3-PERF-01",
+    "W3-METRICS-01"
+  ],
+  "authorized_wave": 4,
+  "current_checkpoint": "WAVE_4",
+  "scope": "generic shared planning/providers/consumers/FactSink and in-memory composition; tests, gates, evidence, commits/push/final CI",
+  "not_authorized": [
+    "WAVE_5",
+    "siblings",
+    "domain resolvers",
+    "dataflow writer/CLI"
+  ],
+  "evidence": "docs/work/evidence/WORK-CFG-028/wave-4/authorization.json"
+}

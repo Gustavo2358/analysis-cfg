@@ -1,0 +1,193 @@
+{
+  "total_count": 1,
+  "jobs": [
+    {
+      "id": 102640220224,
+      "run_id": 34403320170,
+      "workflow_name": "Core CFG checks",
+      "head_branch": "feat/cp5-dataflow-engine",
+      "run_url": "https://api.github.com/repos/Gustavo2358/analysis-cfg/actions/runs/34403320170",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUPqjU88AAAAX5dV4QA",
+      "head_sha": "318181c072710f89ac58c2bd387c1645de434cd6",
+      "url": "https://api.github.com/repos/Gustavo2358/analysis-cfg/actions/jobs/102640220224",
+      "html_url": "https://github.com/Gustavo2358/analysis-cfg/actions/runs/34403320170/job/102640220224",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-09T20:49:09Z",
+      "started_at": "2026-09-09T20:49:12Z",
+      "completed_at": "2026-09-09T20:52:22Z",
+      "name": "boundary",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-09-09T20:49:13Z",
+          "completed_at": "2026-09-09T20:49:14Z"
+        },
+        {
+          "name": "Check out analysis-cfg",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-09-09T20:49:14Z",
+          "completed_at": "2026-09-09T20:49:16Z"
+        },
+        {
+          "name": "Check out pinned air-java source",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-09-09T20:49:16Z",
+          "completed_at": "2026-09-09T20:49:17Z"
+        },
+        {
+          "name": "Set up Java 21",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-09-09T20:49:17Z",
+          "completed_at": "2026-09-09T20:49:17Z"
+        },
+        {
+          "name": "Set up Python 3.12",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-09-09T20:49:17Z",
+          "completed_at": "2026-09-09T20:49:17Z"
+        },
+        {
+          "name": "Record actual CI source checkout",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-09-09T20:49:17Z",
+          "completed_at": "2026-09-09T20:49:17Z"
+        },
+        {
+          "name": "Preserve CI source receipt",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-09-09T20:49:17Z",
+          "completed_at": "2026-09-09T20:49:18Z"
+        },
+        {
+          "name": "Verify pinned air-java checkout",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-09-09T20:49:18Z",
+          "completed_at": "2026-09-09T20:49:19Z"
+        },
+        {
+          "name": "Install pinned air-java SNAPSHOT",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-09-09T20:49:19Z",
+          "completed_at": "2026-09-09T20:49:49Z"
+        },
+        {
+          "name": "Check documentation and harness",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-09-09T20:49:49Z",
+          "completed_at": "2026-09-09T20:50:47Z"
+        },
+        {
+          "name": "Check CP5 W1 scope and exact manifest",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-09-09T20:50:47Z",
+          "completed_at": "2026-09-09T20:50:48Z"
+        },
+        {
+          "name": "Check Java architecture boundary",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-09-09T20:50:48Z",
+          "completed_at": "2026-09-09T20:51:31Z"
+        },
+        {
+          "name": "Check CFG-FIRST, linear, Branch and projection policy oracles",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-09-09T20:51:31Z",
+          "completed_at": "2026-09-09T20:51:38Z"
+        },
+        {
+          "name": "Check real AIR file to CFG JSON integration",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-09-09T20:51:38Z",
+          "completed_at": "2026-09-09T20:52:00Z"
+        },
+        {
+          "name": "Check CP5 W1 structural semantics and performance",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-09-09T20:52:00Z",
+          "completed_at": "2026-09-09T20:52:18Z"
+        },
+        {
+          "name": "Post Set up Python 3.12",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 27,
+          "started_at": "2026-09-09T20:52:18Z",
+          "completed_at": "2026-09-09T20:52:18Z"
+        },
+        {
+          "name": "Post Set up Java 21",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 28,
+          "started_at": "2026-09-09T20:52:18Z",
+          "completed_at": "2026-09-09T20:52:18Z"
+        },
+        {
+          "name": "Post Check out pinned air-java source",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 29,
+          "started_at": "2026-09-09T20:52:18Z",
+          "completed_at": "2026-09-09T20:52:18Z"
+        },
+        {
+          "name": "Post Check out analysis-cfg",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 30,
+          "started_at": "2026-09-09T20:52:18Z",
+          "completed_at": "2026-09-09T20:52:18Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 31,
+          "started_at": "2026-09-09T20:52:18Z",
+          "completed_at": "2026-09-09T20:52:19Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Gustavo2358/analysis-cfg/check-runs/102640220224",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000000141,
+      "runner_name": "GitHub Actions 1000000141",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    }
+  ]
+}
