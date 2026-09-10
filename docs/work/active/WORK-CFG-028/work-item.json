@@ -4,10 +4,10 @@
   "title": "CP5 — harness e cinco Waves no mesmo PR draft",
   "status": "active",
   "risk": "high",
-  "goal": "Remediar somente W4-F1: SiteQuery declara batch mesmo com zero sites/queries, sem sentinela; preservar restante W4 e W1–W3.",
+  "goal": "Compose W1–W4 in production with lossless versioned results, deterministic local delivery and fresh COBOL E2Es; stop for final W5 human review.",
   "authorization": "implementation",
-  "authorization_evidence": "Pedido humano de 2026-09-09 confirma APPROVED H1-H7/R1/R2 do discovery revisado e autoriza somente harness/docs/scripts, commits, push e um PR draft único para CP5. Não autoriza Wave 1 nem qualquer engine. Evidência durável em docs/work/cp5-lifecycle.json. Pedido pós-auditoria autoriza remediações focais A-I, commits/push no mesmo PR #12 draft e novo review, com harness/B1 previamente APPROVED. Nenhuma Wave autorizada. Review humano do HEAD e053f14 aprova A/B/C/D/E/G/H/I e solicita somente F1/F2/F3; correção focal, gates e push no PR #12 draft. W1 continua não autorizada. Nova decisão humana após e86a57c aprova integralmente A–I/F1/F2/F3 e autoriza somente remediação CORE-SIZE-001 do harness, commits/push no PR #12 draft. Supersede caps/budgets de capacidade; não autoriza W1. Pedido humano de 2026-09-09 aprova CORE-SIZE-001 no HEAD 4aeb4c0ad086ec4fc8911879b13139d84ca57bc9 e autoriza explicitamente WAVE_1, inclusive CP5-F01, commits/push e CI no mesmo PR #12 draft. Evidência append-only em wave-1/authorization.json. Não autoriza W2–W5. Pedido humano de 2026-09-09 aprova W1 no HEAD b84389b6ccf94c259774b82a99bc7296278b65c0 e autoriza W2, commits/push/CI no mesmo PR #12 draft; wave-2/authorization.json. W3–W5 não autorizadas. Pedido humano de 2026-09-09 aprova W2 no HEAD 0202c7424db04a1d83fb5e35fce055ea81f5b8fa e autoriza W3, commits/push/CI no mesmo PR #12 draft; wave-3/authorization.json. W4–W5 não autorizadas. Review humano do HEAD 8cb55b86c83644e4727cc532787a518775d7e868 solicita remediação focal W3-F1/W3-F2, preservando W1/W2/AVL/solver/replay e a autorização de commits/push/CI no mesmo PR #12 draft. Evidência em wave-3/review-f1-f2/review.json. Pedido humano aprova W3 em 855628200fba3851493991cec869dee899e82299 e resolve W3-F1/W3-F2; autoriza somente W4, commits/push/CI no mesmo PR #12 draft. docs/work/evidence/WORK-CFG-028/wave-4/authorization.json. W5 não autorizada. Review humano de 330d63427c0905e8ef140924b643e9fb012c73de solicita somente W4-F1, preservando autorização de commits/push/CI no mesmo PR #12 draft. docs/work/evidence/WORK-CFG-028/wave-4/review-f1/review.json.",
-  "checkpoint": "WAVE_4",
+  "authorization_evidence": "Pedido humano de 2026-09-09 confirma APPROVED H1-H7/R1/R2 do discovery revisado e autoriza somente harness/docs/scripts, commits, push e um PR draft único para CP5. Não autoriza Wave 1 nem qualquer engine. Evidência durável em docs/work/cp5-lifecycle.json. Pedido pós-auditoria autoriza remediações focais A-I, commits/push no mesmo PR #12 draft e novo review, com harness/B1 previamente APPROVED. Nenhuma Wave autorizada. Review humano do HEAD e053f14 aprova A/B/C/D/E/G/H/I e solicita somente F1/F2/F3; correção focal, gates e push no PR #12 draft. W1 continua não autorizada. Nova decisão humana após e86a57c aprova integralmente A–I/F1/F2/F3 e autoriza somente remediação CORE-SIZE-001 do harness, commits/push no PR #12 draft. Supersede caps/budgets de capacidade; não autoriza W1. Pedido humano de 2026-09-09 aprova CORE-SIZE-001 no HEAD 4aeb4c0ad086ec4fc8911879b13139d84ca57bc9 e autoriza explicitamente WAVE_1, inclusive CP5-F01, commits/push e CI no mesmo PR #12 draft. Evidência append-only em wave-1/authorization.json. Não autoriza W2–W5. Pedido humano de 2026-09-09 aprova W1 no HEAD b84389b6ccf94c259774b82a99bc7296278b65c0 e autoriza W2, commits/push/CI no mesmo PR #12 draft; wave-2/authorization.json. W3–W5 não autorizadas. Pedido humano de 2026-09-09 aprova W2 no HEAD 0202c7424db04a1d83fb5e35fce055ea81f5b8fa e autoriza W3, commits/push/CI no mesmo PR #12 draft; wave-3/authorization.json. W4–W5 não autorizadas. Review humano do HEAD 8cb55b86c83644e4727cc532787a518775d7e868 solicita remediação focal W3-F1/W3-F2, preservando W1/W2/AVL/solver/replay e a autorização de commits/push/CI no mesmo PR #12 draft. Evidência em wave-3/review-f1-f2/review.json. Pedido humano aprova W3 em 855628200fba3851493991cec869dee899e82299 e resolve W3-F1/W3-F2; autoriza somente W4, commits/push/CI no mesmo PR #12 draft. docs/work/evidence/WORK-CFG-028/wave-4/authorization.json. W5 não autorizada. Review humano de 330d63427c0905e8ef140924b643e9fb012c73de solicita somente W4-F1, preservando autorização de commits/push/CI no mesmo PR #12 draft. docs/work/evidence/WORK-CFG-028/wave-4/review-f1/review.json. Human request 2026-09-10 approves W4 at 21d65d08512f1fb8a945009c2919946a61566eed; W4-F1/W4-BINDING-01 resolved. Authorizes W5, commits/push/CI and read-only sibling execution; docs/work/evidence/WORK-CFG-028/wave-5/authorization.json. No CP6, repin or merge.",
+  "checkpoint": "WAVE_5",
   "must_read": [
     "AGENTS.md",
     "docs/work/index.md",
@@ -66,20 +66,26 @@
     "analysis-kernel",
     "pom.xml",
     "cfg-launcher/pom.xml",
-    "analysis-values"
+    "analysis-values",
+    "analysis-dataflow",
+    "analysis-adapters",
+    "analysis-launcher"
   ],
   "test_scope": [
     "scripts/harness",
     "analysis-kernel/src/test",
-    "analysis-values/src/test"
+    "analysis-values/src/test",
+    "analysis-dataflow/src/test",
+    "analysis-adapters/src/test",
+    "analysis-launcher/src/test"
   ],
   "must_not_change": [
-    "cfg-kernel and cfg-adapters production and existing Java tests",
-    "cfg-launcher Java / CLI behavior",
+    "Existing cfg-kernel/cfg-adapters/cfg-launcher production and tests",
+    "W1–W4 production unless required additive API change proved by RED",
     "source pins and existing product fixtures",
     "sibling repositories",
     "historical reviews and evidence",
-    "W5 production: domain resolvers, dataflow CLI/writer, delivery/publication"
+    "CP6/domain resolvers/Invoke effects/local frames"
   ],
   "gates": [
     "fast",

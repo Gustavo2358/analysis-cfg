@@ -109,3 +109,14 @@ Provar S5/S6/S8/S14/S15/S16, vertical PossibleValues real, determinismo, retenç
 mutantes compiláveis com RED/restauração/segundo GREEN e regressões W1–W3.
 Atualizar hooks W4, executar gates/Maven/full, publicar CI do HEAD final no PR #12 draft.
 W5 NOT_STARTED / NOT_AUTHORIZED; nenhum resolver, writer/CLI ou sibling alterado.
+
+## WAVE_5 — autorização vigente
+
+W4 APPROVED em 21d65d08512f1fb8a945009c2919946a61566eed; W4-F1/W4-BINDING-01 RESOLVED.
+[Autorização](../../evidence/WORK-CFG-028/wave-5/authorization.json) registrada antes de produção.
+Compor Publication → BuildCfg → AnalysisSession → default plan → PlanningExecution
+→ PreparedAnalysisResult, wire explícito/parser, writer streaming local e receipt externo,
+CLI separada. Provar CP4E duas vezes e CP3 com stages reais, equivalência/determinismo,
+S1–S10/S14/S15/S16, falhas, challenges e retenção. Preservar W1–W4, pins e siblings.
+Gates locais/Maven/full, push e CI do HEAD final; parar para review humano W5/CP5.
+CP6, merge, ready, auto-merge e repins não autorizados.

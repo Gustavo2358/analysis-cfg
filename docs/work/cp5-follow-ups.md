@@ -111,3 +111,9 @@ não bloqueantes. W5 não autorizada.
 Somente SitePlanner registra bindings de SiteQuery antes da seleção; batch declarado
 vazio completa sem sentinela, queries, replay ou consumer callbacks. [Validação](evidence/WORK-CFG-028/wave-4/review-f1/validation.md).
 W4 IMPLEMENTED / AWAITING_HUMAN_REVIEW; REQUEST_CHANGES acima permanece histórico.
+
+## W4 aprovada / W5 autorizada
+
+Review humano de 21d65d08512f1fb8a945009c2919946a61566eed: W4 APPROVED; W4-F1 e W4-BINDING-01 RESOLVED.
+W5 AUTHORIZED / STARTED. W3-PERF-01/W3-METRICS-01 permanecem não bloqueantes.
+CP6 não autorizado; nenhum repin ou sibling editado.

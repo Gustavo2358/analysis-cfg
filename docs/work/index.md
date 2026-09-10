@@ -2,11 +2,11 @@
 
 ## Item ativo
 
-[WORK-CFG-028](active/WORK-CFG-028/work-item.json): CP5 umbrella, **WAVE_4 IMPLEMENTED / AWAITING_HUMAN_REVIEW — W4-F1**.
-W1/W2/W3 APPROVED; W3 reviewed head 855628200fba3851493991cec869dee899e82299.
-W3-F1/W3-F2 RESOLVED. [Estado](active/WORK-CFG-028/state.md), [lifecycle](cp5-lifecycle.json),
-[autorização W4](evidence/WORK-CFG-028/wave-4/authorization.json).
-authorized_wave=4; W5 NOT_STARTED / NOT_AUTHORIZED. Mesmo PR #12 OPEN/DRAFT.
+[WORK-CFG-028](active/WORK-CFG-028/work-item.json): CP5 umbrella, **WAVE_5 AUTHORIZED / STARTED**.
+W1/W2/W3/W4 APPROVED; W4 reviewed head 21d65d08512f1fb8a945009c2919946a61566eed.
+W4-F1/W4-BINDING-01 RESOLVED. [Estado](active/WORK-CFG-028/state.md),
+[lifecycle](cp5-lifecycle.json), [autorização W5](evidence/WORK-CFG-028/wave-5/authorization.json).
+authorized_wave=5; CP6 NOT_STARTED / NOT_AUTHORIZED. Mesmo PR #12 OPEN/DRAFT.
 
 ## Último item concluído
 
