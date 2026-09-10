@@ -1,0 +1,8 @@
+[0.261s][info][jfr,startup] Started recording 1. No limit specified, using maxsize=250MB as default.
+[0.261s][info][jfr,startup] 
+[0.261s][info][jfr,startup] Use jcmd 387346 JFR.dump name=1 to copy recording data to file.
+W3_PHASE air_cfg
+W3_PHASE prepared
+W3_PHASE solved
+W3_PHASE batch_only
+W3_PHASE released

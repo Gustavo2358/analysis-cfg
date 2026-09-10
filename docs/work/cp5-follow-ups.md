@@ -2,8 +2,8 @@
 
 Confrontados registry/backlog atuais com propostas do discovery. Nenhum backlog
 novo duplicado. [BACKLOG-CFG-020](backlog/BACKLOG-CFG-020.md) é o umbrella existente
-agora em **W2 solver genérico autorizada** por WORK-CFG-028, após preparação aprovada.
-W3–W5 e os follow-ups externos abaixo não estão iniciados/autorizados. Dependência histórica de qualificação 011
+agora em **W3 IMPLEMENTED / AWAITING_HUMAN_REVIEW** por WORK-CFG-028. W1/W2 aprovadas;
+W4/W5 e os follow-ups externos abaixo não estão iniciados/autorizados. Dependência histórica de qualificação 011
 valia para análises gerais; CP5 tem profile próprio sobre base 027 aprovada, sem
 reivindicar AIR-STRUCTURE completo.
 
@@ -74,7 +74,8 @@ Não desabilitar guards ou inventar premissas para fabricar PASS.
 
 - W3-PERF-01 (não bloqueante): growing candidate-set union may exhibit quadratic
   cumulative work; representation remains replaceable and must be profiled before
-  broad production qualification. Sem trocar representação/cap nesta remediação.
+  broad production qualification. Também observado no novo suporte crescente;
+  medições no ledger W3. Sem trocar representação/cap nesta remediação.
 - W3-METRICS-01 (não bloqueante): substituir classificação de Refusal por texto
   por RefusalReason tipado; fora dos blockers F1/F2.
 - W4-BINDING-01 (não autorizado): planner/AnalysisKey deve vincular result, direction

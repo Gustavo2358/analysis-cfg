@@ -1,0 +1,35 @@
+{
+  "role": "OBSERVATION_ONLY",
+  "source": "local-gates-attempt-1/performance.log.gz",
+  "source_sha256": "74b99c528cf53a5ecc48795be5b11a5e17ed2cf93a9f57c05b67061c221bb58a",
+  "measurements": [
+    {
+      "N": 1000,
+      "candidates": 1,
+      "supports": 1000,
+      "supportUnionEntriesVisited": 500499,
+      "supportBytesAllocatedEstimate": 4063928
+    },
+    {
+      "N": 2000,
+      "candidates": 1,
+      "supports": 2000,
+      "supportUnionEntriesVisited": 2000999,
+      "supportBytesAllocatedEstimate": 16127928
+    },
+    {
+      "N": 4000,
+      "candidates": 1,
+      "supports": 4000,
+      "supportUnionEntriesVisited": 8001999,
+      "supportBytesAllocatedEstimate": 64255928
+    },
+    {
+      "N": 10000,
+      "candidates": 1,
+      "supports": 10000,
+      "supportUnionEntriesVisited": 50004999,
+      "supportBytesAllocatedEstimate": 400639928
+    }
+  ]
+}

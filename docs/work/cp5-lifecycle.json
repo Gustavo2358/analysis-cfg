@@ -73,11 +73,11 @@
     {
       "wave": 3,
       "title": "PossibleValues/state/queries",
-      "status": "REQUEST_CHANGES",
+      "status": "IMPLEMENTED",
       "authorization": "AUTHORIZED",
       "requires_review_of": "WAVE_2",
       "approval_evidence": "docs/work/evidence/WORK-CFG-028/wave-3/authorization.json",
-      "completion_evidence": "docs/work/evidence/WORK-CFG-028/wave-3/validation.md",
+      "completion_evidence": "docs/work/evidence/WORK-CFG-028/wave-3/review-f1-f2/validation.md",
       "eval": "EVAL-CFG-036"
     },
     {
@@ -298,19 +298,21 @@
   },
   "wave_3": {
     "authorization": "docs/work/evidence/WORK-CFG-028/wave-3/authorization.json",
-    "review": "REQUEST_CHANGES",
+    "review": "AWAITING_HUMAN_REVIEW",
     "evidence": "docs/work/evidence/WORK-CFG-028/wave-3/",
     "validated_implementation_head": "327737be23ab619ae212f46689a5043884f50da4",
     "final_remote_ci": "Same draft PR #12 final receipt; .harness-results/WORK-CFG-028/wave-3/remote-ci.json",
     "remediation": {
       "reviewed_head": "8cb55b86c83644e4727cc532787a518775d7e868",
-      "status": "STARTED",
+      "status": "IMPLEMENTED",
       "blockers": [
         "W3-F1",
         "W3-F2"
       ],
       "review_evidence": "docs/work/evidence/WORK-CFG-028/wave-3/review-f1-f2/review.json",
-      "completion_evidence": null
+      "completion_evidence": "docs/work/evidence/WORK-CFG-028/wave-3/review-f1-f2/validation.md",
+      "validated_implementation_head": "74331d7b92644e2f5193ad37d3a7f2015116b0b1",
+      "final_remote_ci": "Same draft PR #12 final remediation receipt; .harness-results/WORK-CFG-028/wave-3/review-f1-f2/remote-ci.json"
     }
   }
 }

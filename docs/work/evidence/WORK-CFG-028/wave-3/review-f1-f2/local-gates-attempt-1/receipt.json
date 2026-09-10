@@ -1,0 +1,105 @@
+{
+  "source_head": "74331d7b92644e2f5193ad37d3a7f2015116b0b1",
+  "gates": [
+    {
+      "gate": "fast",
+      "command": [
+        "bash",
+        "scripts/harness/check-fast.sh"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "elapsed_seconds": 55.05961332599691,
+      "sha256": "c36cd855592e62c9d0020e8f60f44cc35bfa79c13fb3a4b8781018bbbb836b33",
+      "log": "fast.log.gz"
+    },
+    {
+      "gate": "architecture",
+      "command": [
+        "bash",
+        "scripts/harness/check-architecture.sh"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "elapsed_seconds": 47.454209568000806,
+      "sha256": "5164a8c4fefb5be2c11ed6ce279148dd73eaf4f580a26c71dacaedcf4503d55a",
+      "log": "architecture.log.gz"
+    },
+    {
+      "gate": "semantic",
+      "command": [
+        "bash",
+        "scripts/harness/check-semantic.sh"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "elapsed_seconds": 19.831776084000012,
+      "sha256": "81b0b0dcf773865b5cd15dbf32c658eb1019db32bf4337cead2404025e82608e",
+      "log": "semantic.log.gz"
+    },
+    {
+      "gate": "integration",
+      "command": [
+        "bash",
+        "scripts/harness/check-integration.sh"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "elapsed_seconds": 25.66691771600017,
+      "sha256": "380c929b0a6e1424a6aff34364f420e27eac9348cce28b77eab9ecab07f3cb89",
+      "log": "integration.log.gz"
+    },
+    {
+      "gate": "performance",
+      "command": [
+        "bash",
+        "scripts/harness/check-performance.sh"
+      ],
+      "exit": 3,
+      "expected_exit": 3,
+      "elapsed_seconds": 32.66907368599641,
+      "sha256": "74b99c528cf53a5ecc48795be5b11a5e17ed2cf93a9f57c05b67061c221bb58a",
+      "log": "performance.log.gz"
+    },
+    {
+      "gate": "full",
+      "command": [
+        "bash",
+        "scripts/harness/check-full.sh"
+      ],
+      "exit": 3,
+      "expected_exit": 3,
+      "elapsed_seconds": 156.25284939099947,
+      "sha256": "6d17f0cc77e37011a72451c9ec601ba5f8b66796951b82f5e39ac6ddf3c4a266",
+      "log": "full.log.gz"
+    },
+    {
+      "gate": "maven-verify",
+      "command": [
+        "mvn",
+        "-B",
+        "-ntp",
+        "clean",
+        "verify"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "elapsed_seconds": 25.192088184994645,
+      "sha256": "157736923d3a8344a12347e1c9a73080ad5b784ec183830842cf7b62545496c0",
+      "log": "maven-verify.log.gz"
+    },
+    {
+      "gate": "diff-check",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "elapsed_seconds": 0.01077044100384228,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "log": "diff-check.log.gz"
+    }
+  ]
+}

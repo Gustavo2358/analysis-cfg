@@ -119,3 +119,17 @@ O texto conceitual acima não amplia as formas admitidas: storage direto textual
 premissa única cobrindo bases distintas e effects explicitamente enumerados.
 Outcomes de query reutilizam Control.OutcomeKey da AIR fixada; after terminator e
 outcomes não materializáveis produzem UNSUPPORTED_POINT. A camada wire continua W5.
+
+Na remediação W3-F1/F2, suporte acompanha o domínio: join une produtores por
+candidato, equivalência detecta mudança só de suporte e strong Assign mata suporte
+anterior. Assign contribui OperationId/OriginId; InitialCondition literal contribui
+place OperandId, origin e premises. ValueFact expõe a associação por candidato e
+refs agregadas, sem reconstrução externa nem árvore de caminhos. O conjunto finito
+de produtores acrescenta uma dimensão de inclusão à prova de convergência acima.
+
+EntryState.uncertainties não vazio abre sourceUnknownRemainder nessa Entry, sem
+abrir o modelo. Coverage/precision relevante de qualquer alias Object da mesma
+Cell participa da abertura da fonte. Dimensão apenas dependencies, mantendo
+storage/values EXACT e coverage MODELED, não abre values; outra Cell não contamina
+a consulta. Nenhuma decisão usa o texto informal do gap. Evidência focal e limites
+ficam no ledger W3 e em wave-3/review-f1-f2.

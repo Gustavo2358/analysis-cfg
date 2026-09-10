@@ -60,6 +60,7 @@ def main():
         data=(case/'recording.jfr').read_bytes();(case/'recording.jfr.gz').write_bytes(gzip.compress(data,mtime=0));(case/'recording.jfr').unlink()
         data=(case/'gc.log').read_bytes();(case/'gc.log.gz').write_bytes(gzip.compress(data,mtime=0));(case/'gc.log').unlink()
         print(f'[w3-memory] N={n}: measured node=1; batch releases execution/state/universe; release removes fact',flush=True)
-    receipt['files']={p.relative_to(out).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(out.rglob('*')) if p.is_file()}
+    # The final receipt cannot contain its own digest; hash only the raw evidence.
+    receipt['files']={p.relative_to(out).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(out.rglob('*')) if p.is_file() and p!=out/'receipt.json'}
     (out/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
 if __name__=='__main__':main()

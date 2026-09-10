@@ -584,6 +584,23 @@
   "wave_3": {
     "status": "IMPLEMENTED",
     "hook": "scripts/project/check_w3.py",
-    "mapping": "docs/engineering/cp5-w3-values-ledger.md"
+    "mapping": "docs/engineering/cp5-w3-values-ledger.md",
+    "remediation": {
+      "review": "W3-F1/W3-F2",
+      "tests": "SupportSourceTest (11 methods, included in semantic and performance gates)",
+      "measurements": "W3_SUPPORT_METRICS: 1000/2000/4000/10000 equal-value producers, all preserved",
+      "counters": [
+        "producersPrepared",
+        "supportSets",
+        "supportElements",
+        "supportUnionEntries",
+        "supportBytesAllocatedEstimate",
+        "maxSupports",
+        "supportElementsRetained",
+        "supportBytesRetainedEstimate"
+      ],
+      "mutations": "scripts/project/challenge_w3_f12.py",
+      "evidence": "docs/work/evidence/WORK-CFG-028/wave-3/review-f1-f2/validation.md"
+    }
   }
 }

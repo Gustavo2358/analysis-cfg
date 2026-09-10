@@ -86,3 +86,12 @@ alias relevante da mesma Cell. Preservar W1/W2, AVL, solver e replay. Testes RED
 compiláveis antes da correção; provar strong kill, join de suportes, seeds/premissas,
 Entry gaps e aliases. Repetir gates/escala/retention e mutations focais, CI do HEAD
 final no mesmo PR draft. W4/W5 não autorizadas.
+
+
+### Remediação focal executada
+
+[Validação W3-F1/F2](../../evidence/WORK-CFG-028/wave-3/review-f1-f2/validation.md):
+11 testes W3 novos, 18 mutantes compiláveis detectados, suporte até 10k produtores,
+retenção externa até 200k writes e gates locais/regressões. Estado IMPLEMENTED /
+AWAITING_HUMAN_REVIEW; REQUEST_CHANGES original preservado no histórico.
+CI do HEAD final no mesmo PR #12 draft. W4/W5 não autorizadas.
