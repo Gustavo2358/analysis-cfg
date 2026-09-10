@@ -75,6 +75,16 @@ A seleção esparsa depende de buckets apropriados, não de elapsed time.
 Requests por consumer precisam listar explicitamente sua AnalysisKey e batch ID.
 Batch requerido inexistente, provider desconhecido, Entry não selecionada, query com
 Entry errada ou colisão de binding falham no planning, antes de qualquer run.
+SiteQuery registra seu binding antes de procurar sites e antes de avaliar filtros,
+validando provider/projection/tipos e dependências explícitas. O binding existe mesmo
+com bucket vazio ou filtro que rejeita todos. Nenhuma ObservationRequest sentinela
+é exigida nem fabricada. Para batch declarado com zero queries, o run declarado
+continua requerido e W3 materializa COMPLETE vazio: requests/uniqueQueries/grupos/
+operações/observations = zero. Consumer sem matches completa sem callbacks/facts,
+desde que suas dependências concluam; preparação também pode ser COMPLETE.
+Um batch desconhecido continua sendo erro de planning. Registro antecipado custa
+uma validação/inserção por declaração SiteQuery; não executa sua função de query.
+
 Pedidos equivalentes são unidos por batch + PointQuery completo. A lista final de
 queries usa ProgramPoint.ORDER e o comparador de subject do provider. Requests
 fixos e SiteQueries alimentam a mesma união; todos os pedidos brutos são contados.

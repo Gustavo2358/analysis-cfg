@@ -21,6 +21,7 @@ final class SitePlanner {
         var byKind = new TreeMap<Class<? extends Operation>,Map<UnitId,List<Binding>>>(Comparator.comparing(Class::getName));
         var sites = new TreeMap<String,TreeSet<SiteView>>();
         var requests = new TreeMap<String,List<ObservationRequest<?,?>>>();
+        var batches = new TreeMap<String,PendingBatch>();
         var keys = new TreeSet<AnalysisKey>(AnalysisKey.ORDER);
         var counts = new Counts("planningEpochs","candidateSites","structuralVisits","siteMatches","filterEvaluations",
             "planningCallbacks","queryRequests","uniqueQueries","observationBatchesPlanned","analysisRequests");
@@ -34,6 +35,8 @@ final class SitePlanner {
             }
             for (var interest : registration.interests()) {
                 requireContext(session,interest.entry());
+                // A declaration binds the batch even when its bucket/filter produces no sites.
+                for (var query : interest.queries()) bindBatch(batches,registry,dependency,query.batch());
                 byKind.computeIfAbsent(interest.kind(),ignored -> new HashMap<>())
                     .computeIfAbsent(interest.entry().unit(),ignored -> new ArrayList<>()).add(new Binding(id,interest));
             }
@@ -54,16 +57,12 @@ final class SitePlanner {
                 }
             }
         }
-        var batches = new TreeMap<String,PendingBatch>();
         var localRequests = new TreeMap<String,Map<String,Set<PointQuery<?>>>>();
         for (var consumer : consumers.values()) {
             var dependencies = consumer.dependencies(); var requested = new TreeMap<String,Set<PointQuery<?>>>();
             for (var request : requests.get(dependencies.consumerId())) {
-                var batch = request.batch(); registry.require(batch);
-                if (!dependencies.requiredAnalysisKeys().contains(batch.analysisKey()) || !dependencies.requiredObservationBatchIds().contains(batch.id()))
-                    throw new IllegalArgumentException("request missing explicit consumer dependency");
-                var pending = batches.computeIfAbsent(batch.id(),ignored -> new PendingBatch(batch));
-                if (!pending.id.equals(batch)) throw new IllegalArgumentException("incompatible batch ID binding");
+                var batch = request.batch();
+                var pending = bindBatch(batches,registry,dependencies,batch);
                 var local = requested.computeIfAbsent(batch.id(),ignored -> new HashSet<>());
                 for (var query : request.queries()) {
                     if (!query.point().entry().equals(batch.analysisKey().entry()) || !batch.subjectType().isInstance(query.subject()))
@@ -89,6 +88,15 @@ final class SitePlanner {
         }
         var selected = new TreeMap<String,List<SiteView>>(); sites.forEach((id,values) -> selected.put(id,List.copyOf(values)));
         return new ExecutionPlan<>(owner,epoch,List.copyOf(consumers.values()),selected,List.copyOf(keys),frozen,localRequests,counts.snapshot());
+    }
+    private static PendingBatch bindBatch(Map<String,PendingBatch> batches, AnalysisRegistry registry,
+                                          ConsumerPlan dependencies, ObservationBatchId<?,?> batch) {
+        registry.require(batch);
+        if (!dependencies.requiredAnalysisKeys().contains(batch.analysisKey()) || !dependencies.requiredObservationBatchIds().contains(batch.id()))
+            throw new IllegalArgumentException("request missing explicit consumer dependency");
+        var pending = batches.computeIfAbsent(batch.id(),ignored -> new PendingBatch(batch));
+        if (!pending.id.equals(batch)) throw new IllegalArgumentException("incompatible batch ID binding");
+        return pending;
     }
     private static void requireContext(AnalysisSession session, io.github.gustavo2358.air.model.Ids.EntryId entry) {
         if (session.context(entry) == null) throw new IllegalArgumentException("Entry not selected in this session");
