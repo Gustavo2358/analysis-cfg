@@ -135,3 +135,11 @@ W1/W2 APPROVED; W4/W5 NOT_STARTED / NOT_AUTHORIZED. CP5 global permanece incompl
 CI final usa o collector inalterado e recibo no mesmo PR #12 OPEN/DRAFT, com SHA
 head/base/checkout, árvores, run/event/conclusion/classification. Cópia local:
 .harness-results/WORK-CFG-028/wave-3/review-f1-f2/remote-ci.json. Sem merge/ready/auto-merge.
+
+
+A checagem do diff com os logs novos staged identificou whitespace emitido pelo
+próprio HotSpot em VM.flags/JFR/process.log. Esses outputs foram empacotados em
+gzip sem alterar nenhum byte descomprimido; transport.json mapeia nomes originais,
+arquivos e hashes. receipt.json permanece intacto. O primeiro diff-check está
+preservado em development/w3-f12-raw-diff-check.log.gz. O diff final foi conferido
+novamente; não houve limpeza/edição do conteúdo de evidência.

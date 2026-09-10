@@ -1,3 +1,0 @@
-376202:
-OpenJDK 64-Bit Server VM version 21.0.12.1+1-LTS
-JDK 21.0.12.1

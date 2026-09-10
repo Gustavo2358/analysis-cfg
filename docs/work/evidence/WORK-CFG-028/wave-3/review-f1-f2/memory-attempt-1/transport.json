@@ -1,0 +1,81 @@
+{
+  "encoding": "gzip; decompress each archive to the original relative name recorded in receipt.json",
+  "receipt_unchanged": true,
+  "files": {
+    "10000/GC.heap_info.txt": {
+      "archive": "10000/GC.heap_info.txt.gz",
+      "raw_sha256": "728c9643c7ec5760e607293c2bd6c16fab2bed70e0670d0a29ce8323e93e10cf",
+      "archive_sha256": "8aa24f591778fa3b597bcf75b6352f52703cba3146b6ca9ef2febddcb104971e"
+    },
+    "10000/VM.flags.txt": {
+      "archive": "10000/VM.flags.txt.gz",
+      "raw_sha256": "1d7b8b5d9dff318d808ea9c031eba0270fdc8e57b185f0ed55b4baa1141b7a0a",
+      "archive_sha256": "c9960a72a2f29f3b8f937ce8c710b617eff9549e8da1a36bc39ca01b9d73442a"
+    },
+    "10000/VM.version.txt": {
+      "archive": "10000/VM.version.txt.gz",
+      "raw_sha256": "1489304b84e493f4ec99905dcd4c26320a1dab92ac8497a6d674f4fa42f58009",
+      "archive_sha256": "55944c576a3fb51b37504503c6776da4d434b129e3236de7a5cbfec1cb7b3b5a"
+    },
+    "10000/jfr-summary.txt": {
+      "archive": "10000/jfr-summary.txt.gz",
+      "raw_sha256": "3880be090f45b6962c7ded6f1de21428a5145fb2da5db29f2f8ab746f90fa35b",
+      "archive_sha256": "cfa3721baf01706bf44dfe4608990ea9d7e7289a112b5d8ced14ba42a0708fc4"
+    },
+    "10000/process.log": {
+      "archive": "10000/process.log.gz",
+      "raw_sha256": "86b6aa406507ba78fca1d92b5981ae893aa35a39e508443d98cc834b7f258101",
+      "archive_sha256": "f89565e34cbe901e1c377393e40aea1a0a59421002ed3d6f548b35a6cdda78f3"
+    },
+    "20000/GC.heap_info.txt": {
+      "archive": "20000/GC.heap_info.txt.gz",
+      "raw_sha256": "76959f5c41da11a637607e38ad6c525f4ef6210017b0cb99542f778f9ccd2504",
+      "archive_sha256": "75866c921fcf5984d9ff8b00b81d375612776097e8b2b5ddc9c0bbbd24c7a332"
+    },
+    "20000/VM.flags.txt": {
+      "archive": "20000/VM.flags.txt.gz",
+      "raw_sha256": "c1d122e580ca5d7257387424e61b0fa58b25fa9be9cce734c7072401d44e8b51",
+      "archive_sha256": "b4384cf8b4abac79f9886d70001678d76fb95dacae6f8fcb0bd8df860e7f8287"
+    },
+    "20000/VM.version.txt": {
+      "archive": "20000/VM.version.txt.gz",
+      "raw_sha256": "9cf06b9214bcf187a5a3c7d0f9954f18a835635993aff8866f10465de8a80dce",
+      "archive_sha256": "167054fa08d76dfc6e9051b1d31c7acaa6cc07c25542e64bffba7efea62762b6"
+    },
+    "20000/jfr-summary.txt": {
+      "archive": "20000/jfr-summary.txt.gz",
+      "raw_sha256": "8aa9e08afbe10f8633bfa86fb05cda964bd481eaedc59d2d771da2d3f3cd53ab",
+      "archive_sha256": "d3dec0002c0a775b0430ef3485ac431664fd41c372fc6908b9ba1f084a6a794a"
+    },
+    "20000/process.log": {
+      "archive": "20000/process.log.gz",
+      "raw_sha256": "7cbe952df959d87f35b009fc0594779d064eca4657aa708a0dc535a5b66555b0",
+      "archive_sha256": "237049bde7533070bc896d12e74ee213c1c6fc51f40b70c8bb0c6d202e779ed7"
+    },
+    "200000/GC.heap_info.txt": {
+      "archive": "200000/GC.heap_info.txt.gz",
+      "raw_sha256": "1ec5ea966baab1cb70d57852558bdf9113e98f5d38d8e9eafeee0d67fad8108f",
+      "archive_sha256": "1483963db411bece79609952472da1d41211c3e79022d01a2b4a657b5a1f4876"
+    },
+    "200000/VM.flags.txt": {
+      "archive": "200000/VM.flags.txt.gz",
+      "raw_sha256": "99b658740c3f69857fde502ef81e2e579d0a1b408248bf620e87010fd9f37ea7",
+      "archive_sha256": "7010da841733f8e531516182d63f8b68d7fdde27ea322025be3676cbb19378a6"
+    },
+    "200000/VM.version.txt": {
+      "archive": "200000/VM.version.txt.gz",
+      "raw_sha256": "baa3a08ef5efab75914698e7f91ec48cd6bf103cd5039a54cf5971c1a75966c8",
+      "archive_sha256": "6896a801182b089407e2550ba573d069505edd4c720f0a33472b96f98e3045e0"
+    },
+    "200000/jfr-summary.txt": {
+      "archive": "200000/jfr-summary.txt.gz",
+      "raw_sha256": "564fbb9271598c991fef4daca3f94fe9bb81bc140f74ec86f4364913f63a02fd",
+      "archive_sha256": "3926e959be5300e2ee0d5158b1ba8a159b8781e232cb84ad76467848f3b1cb28"
+    },
+    "200000/process.log": {
+      "archive": "200000/process.log.gz",
+      "raw_sha256": "fb039cfb1c669352f3b32689044f018d040ca5357f23f36c562729ecef3a21bd",
+      "archive_sha256": "dfe1b209358336927e97702d1486cd6f8bdb363bef1eda3401da77770beadc85"
+    }
+  }
+}
