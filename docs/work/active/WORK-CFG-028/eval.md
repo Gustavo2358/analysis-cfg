@@ -127,3 +127,11 @@ W5 NOT_STARTED / NOT_AUTHORIZED; nenhum resolver, writer/CLI ou sibling alterado
 [Validação e limites](../../evidence/WORK-CFG-028/wave-4/validation.md): planning por
 buckets, provider/key, reuse, dependências e staging; 24 testes W4, 26 mutantes
 válidos, escala/GC/JFR e regressões. W4 aguarda review humano; W5 não autorizada.
+
+## Remediação focal W4-F1
+
+[Review](../../evidence/WORK-CFG-028/wave-4/review-f1/review.json): registrar batch de
+SiteQuery antes dos matches. Dois oracles (kind ausente/filtro rejeita todos) e
+validação antecipada de declarations. Mutante de retorno ao comportamento antigo,
+restauração byte-exact/segundo GREEN e regressões dos gates; nenhuma outra produção
+além de SitePlanner. Preservar histórico W4 e W1–W3. W5 não autorizada.

@@ -1,0 +1,14 @@
+{
+  "reviewed_head": "330d63427c0905e8ef140924b643e9fb012c73de",
+  "implementation_head": "7cf1b397b14c25b91489fb8e49faf65835f923d2",
+  "frozen_file_count": 123,
+  "all_frozen_hashes_match": true,
+  "changed_production": [
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/SitePlanner.java"
+  ],
+  "new_test": "analysis-values/src/test/java/io/github/gustavo2358/analysis/values/PlanningZeroMatchTest.java",
+  "public_api_changes": false,
+  "pins_and_poms": "byte-exact",
+  "old_w4_tests": "byte-exact",
+  "runtime_provider_cache_FactSink_and_W1_W2_W3": "byte-exact"
+}

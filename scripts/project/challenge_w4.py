@@ -52,7 +52,7 @@ def cases():
     add('global-static-run-cache','PlanningContractTest#differentSessionsCannotShareRunsOrPlansEvenWithEqualIds','cache owner is session lifetime',change(RUNTIME,'private final Map<AnalysisKey,CachedRun> runs','private static final Map<AnalysisKey,CachedRun> runs'))
     add('max-consumers-admission',scale,'mutant consumer capacity',change(PLANNER,'        var consumers = new TreeMap','        if (registrations.size()>64) throw new IllegalArgumentException("mutant consumer capacity");\n        var consumers = new TreeMap'))
     add('max-queries-admission',scale,'mutant query capacity',change(PLANNER,'pending.queries.add(query); local.add(query);','pending.queries.add(query); local.add(query);\n                    if (pending.queries.size()>64) throw new IllegalArgumentException("mutant query capacity");'))
-    add('resource-cap-on-sites',scale,'mutant site capacity',change(PLANNER,'        var batches = new TreeMap','        if (counts.snapshot().get("siteMatches")>64) throw new IllegalArgumentException("mutant site capacity");\n        var batches = new TreeMap'))
+    add('resource-cap-on-sites',scale,'mutant site capacity',change(PLANNER,'        var localRequests = new TreeMap','        if (counts.snapshot().get("siteMatches")>64) throw new IllegalArgumentException("mutant site capacity");\n        var localRequests = new TreeMap'))
     add('resource-cap-on-facts',scale,'size never changes completion',change(RUNTIME,'facts.add(Objects.requireNonNull(fact)); counts.add("factsStaged",1);','if (counts.snapshot().get("factsStaged")>=64) throw new FactConsumer.ConsumerException("mutant fact capacity");\n            facts.add(Objects.requireNonNull(fact)); counts.add("factsStaged",1);'))
     add('resource-cap-on-batches',scale,'mutant batch capacity',change(PLANNER,'        var selected = new TreeMap','        if (frozen.size()>64) throw new IllegalArgumentException("mutant batch capacity");\n        var selected = new TreeMap'))
     normal='return new Materialized<>(observations.batch(),work);'
@@ -68,6 +68,7 @@ def cases():
                         var provisional = new ArrayList<io.github.gustavo2358.analysis.query.ObservationBatch.Observation<ObjectId,ValueFact>>();
                         for (var q : queries) provisional.add(new io.github.gustavo2358.analysis.query.ObservationBatch.Observation<>(q,io.github.gustavo2358.analysis.query.ObservationBatch.QueryStatus.VALUE,null,early.batch().observations().getFirst().value()));
                         var observations = new PossibleValuesAnalysis.Execution.Observations(new io.github.gustavo2358.analysis.query.ObservationBatch<>(early.batch().status(),early.batch().reason(),provisional,early.batch().metrics()),early.stateMetrics(),early.quality());'''))
+    add('site-query-zero-match-drops-required-batch','PlanningZeroMatchTest#absentKindKeepsDeclaredEmptyBatch','declared SiteQuery batch survives zero matches',change(PLANNER,'                for (var query : interest.queries()) bindBatch(batches,registry,dependency,query.batch());','                /* mutant binds only after first matching site */'))
     return c
 
 def hashes(root):

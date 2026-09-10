@@ -81,6 +81,19 @@ def main() -> int:
             raise ValueError("historical evidence changed")
         from check_w4 import verify_foundation
         verify_foundation(ROOT)
+        from check_w4 import verify_focal_preservation
+        verify_focal_preservation(ROOT)
+        focal_review = "330d63427c0905e8ef140924b643e9fb012c73de"
+        review_dir = "docs/work/evidence/WORK-CFG-028/wave-4/review-f1/"
+        old_review = json.loads(git("show",focal_review+":docs/work/cp5-lifecycle.json"))
+        if life["review_history"][:len(old_review["review_history"])] != old_review["review_history"]:
+            raise ValueError("W4-F1 rewrote historical review")
+        if any(not p.startswith(review_dir) for p in git("diff","--name-only",focal_review,"--","docs/work/evidence").decode().splitlines()):
+            raise ValueError("W4-F1 changed historical evidence")
+        pinned = json.loads((ROOT/review_dir/"baseline.json").read_text())["files"]
+        for path,digest in pinned.items():
+            if hashlib.sha256(git("show",focal_review+":"+path)).hexdigest()!=digest:
+                raise ValueError("W4-F1 baseline differs from reviewed Git source")
         old_sources = baseline_json("docs/evals/cp5/w3-source-inventory.json")["files"]
         from check_w4_scope import preserved_digest
         for path, digest in old_sources.items():

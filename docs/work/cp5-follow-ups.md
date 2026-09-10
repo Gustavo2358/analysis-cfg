@@ -105,3 +105,9 @@ W4 REQUEST_CHANGES no HEAD 330d63427c0905e8ef140924b643e9fb012c73de. Blocker ún
 SiteQuery deve registrar batch conhecido mesmo com zero matches. [Review](evidence/WORK-CFG-028/wave-4/review-f1/review.json).
 Restante da arquitetura aceito; W4-BINDING-01 RESOLVED; W3-PERF-01/W3-METRICS-01
 não bloqueantes. W5 não autorizada.
+
+### W4-F1 implementado para novo review
+
+Somente SitePlanner registra bindings de SiteQuery antes da seleção; batch declarado
+vazio completa sem sentinela, queries, replay ou consumer callbacks. [Validação](evidence/WORK-CFG-028/wave-4/review-f1/validation.md).
+W4 IMPLEMENTED / AWAITING_HUMAN_REVIEW; REQUEST_CHANGES acima permanece histórico.

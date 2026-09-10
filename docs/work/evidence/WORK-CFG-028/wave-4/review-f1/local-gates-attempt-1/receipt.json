@@ -1,6 +1,6 @@
 {
-  "baseline": "855628200fba3851493991cec869dee899e82299",
-  "files": {
+  "head": "8ca8033a895d6514713750a7e8d73c6833697542",
+  "source_sha256": {
     "analysis-kernel/pom.xml": "ccbc522193ba3be3c68d9389739840d6a774a80803308282c2cb6f483ba2b31d",
     "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/AnalysisProvider.java": "c597be24ead79a6b93c7dc25b3b81461682efefdf7c6cc4a925285fba03e17ff",
     "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/AnalysisRegistry.java": "e74ccf147d5931022336eaea37dec7b43098bf65974618b8a13d9e7918dde2a5",
@@ -125,5 +125,83 @@
     "cfg-launcher/src/test/java/io/github/gustavo2358/analysis/cfg/launcher/ScalarAssignCliTest.java": "734939a054e4647e7fc9c5aa4e1c9b886459de02dda05324ed158da9fca274c4",
     "docs/work/evidence/WORK-CFG-027/ScalarBaselineOracle.java": "da5b86ff22ea7c03f032f13c590e72c9fbebac6904c6978341ab2c4b32c3feba",
     "pom.xml": "a642017053e6cc60e33a2b59a54b41a6230d36a21db8418cef547ead491ed644"
-  }
+  },
+  "gates": [
+    {
+      "gate": "fast",
+      "command": [
+        "bash",
+        "scripts/harness/check-fast.sh"
+      ],
+      "exit": 0,
+      "expectedExit": 0,
+      "sha256": "87c54372f2f084045dfb28706346af7dda4ae9d508a42da36ebff9a3c111b0d4",
+      "log": "fast.log.gz",
+      "elapsedSeconds": 81.04874006899627
+    },
+    {
+      "gate": "architecture",
+      "command": [
+        "bash",
+        "scripts/harness/check-architecture.sh"
+      ],
+      "exit": 0,
+      "expectedExit": 0,
+      "sha256": "63c44006ddd68645e83160db5b22f2b53c80705382d063b460a55f364e0dff54",
+      "log": "architecture.log.gz",
+      "elapsedSeconds": 56.65257592600392
+    },
+    {
+      "gate": "semantic",
+      "command": [
+        "bash",
+        "scripts/harness/check-semantic.sh"
+      ],
+      "exit": 0,
+      "expectedExit": 0,
+      "sha256": "744fb78d7a8b7e687a6e248b25c3ff898c6f226f833767ee17c9d110688591b0",
+      "log": "semantic.log.gz",
+      "elapsedSeconds": 26.57748526600335
+    },
+    {
+      "gate": "integration",
+      "command": [
+        "bash",
+        "scripts/harness/check-integration.sh"
+      ],
+      "exit": 0,
+      "expectedExit": 0,
+      "sha256": "a8d9bdd229011de8ecaeab1a8c14a7daa39e809727bad11207ad3f05ca67ab02",
+      "log": "integration.log.gz",
+      "elapsedSeconds": 27.923164809995797
+    },
+    {
+      "gate": "maven",
+      "command": [
+        "mvn",
+        "-B",
+        "-ntp",
+        "clean",
+        "verify"
+      ],
+      "exit": 0,
+      "expectedExit": 0,
+      "sha256": "9e96d430cee24e8138fa0d48f8ffc6670bff2aa2e62c5f7090ba0b97221d92f5",
+      "log": "maven.log.gz",
+      "elapsedSeconds": 27.06577538899728
+    },
+    {
+      "gate": "performance",
+      "command": [
+        "bash",
+        "scripts/harness/check-performance.sh"
+      ],
+      "exit": 3,
+      "expectedExit": 3,
+      "sha256": "10977815bcb3f047525eaf8aa9e9851e9a92b0268aebd1104d7f6b8eac1f1015",
+      "log": "performance.log.gz",
+      "elapsedSeconds": 41.825697466003476
+    }
+  ],
+  "status": "EXPECTED_EXITS"
 }

@@ -452,6 +452,26 @@ class Cp5HarnessTests(unittest.TestCase):
         for output in ['', 'W3_CORPUS {}']:
             with self.assertRaises((Failure,KeyError)):verify_corpus(output)
 
+    def test_w4_focal_review_and_blocker_cannot_disappear(self):
+        for change in [lambda x:x['wave_4']['remediation'].update(reviewed_head='0'*40),
+                       lambda x:x['wave_4']['remediation'].update(blockers=[])]:
+            original=(self.root/LIFECYCLE).read_bytes()
+            try:self.edit(LIFECYCLE,change);self.guard('W4-F1 exact reviewed HEAD and blocker')
+            finally:(self.root/LIFECYCLE).write_bytes(original)
+        self.assertEqual([],validate_cp5(self.root))
+
+    def test_w4_focal_scope_freezes_runtime_provider_and_old_tests(self):
+        from check_w4 import verify_focal_preservation,Failure
+        for path in ['analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/PlanningExecution.java',
+                     'analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesProvider.java',
+                     'analysis-values/src/test/java/io/github/gustavo2358/analysis/values/PlanningRuntimeTest.java']:
+            p=self.root/path;original=p.read_bytes()
+            try:
+                p.write_bytes(original+b'\n')
+                with self.assertRaisesRegex(Failure,'W4-F1 changed reviewed source'):verify_focal_preservation(self.root)
+            finally:p.write_bytes(original)
+        verify_focal_preservation(self.root)
+
     def test_w4_authorization_and_hooks_cannot_be_inferred(self):
         for path,change,reason in [
             (LIFECYCLE,lambda x:x['waves'][3].update(status='APPROVED'),'never human-approved'),

@@ -18,6 +18,7 @@ KERNEL_SOURCES={f'analysis-kernel/src/main/java/io/github/gustavo2358/analysis/{
 PROVIDER='analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesProvider.java'
 SOURCES=KERNEL_SOURCES|{PROVIDER}
 TESTS={
+'PlanningZeroMatchTest':set('absentKindKeepsDeclaredEmptyBatch rejectingFilterKeepsDeclaredEmptyBatch zeroMatchDeclarationsValidateBindingsBeforeSelection'.split()),
 'PlanningTest':set('structuralConsumerCompletesWithoutAnalysis duplicateConsumerIdsArePlanningErrors'.split()),
 'PlanningRuntimeTest':set('realVerticalSharesRunQueryReplayAndProducerSupport f3FailureIsLocalAndIndependentBatchesShareStableRun failingConsumerDiscardsEveryStagedFactAndOthersComplete analysisOnlyDoesNotCreateObservationAndStructuralStartsNoAnalysis lateQueryIsNotRequestedAndNewEpochExplicitlyReusesRun cannotReadAnotherConsumersUnrequestedSubjectInSharedBatch missingDependenciesAndWrongBindingsNeverProduceSuccess registryRejectsWrongPreparedAndExecutionKey sinkIsClosedAndInfrastructureErrorsPropagateWithoutPartialResult finalFactsReflectFixedPointAfterOverwritesAndLoop preparedResultAndClosedRuntimeDetachSessionRunAndConsumer'.split()),
 'PlanningContractTest':set('completeSemanticKeyIdentityAndOrderingCannotCollide distinctProfilesOptionsAndEntriesRunSeparatelyWithNoPhantomContext differentSessionsCannotShareRunsOrPlansEvenWithEqualIds registrationInterestAndQueryOrderHaveDeterministicPlansAndFacts overlappingInterestsDispatchOnlyExactPairsAndKeepStructuralPresence batchesWithSameIdCannotAliasDifferentKeys perSiteQueriesAreCompiledBeforeExecutionAndDependenciesAreExplicit modelCandidatesSupportsAndPremisesRemainAbstractAtConsumerBoundary'.split()),
@@ -49,13 +50,22 @@ def verify_sources(root:Path)->None:
         if any(d in source for d in denied):raise Failure('W4 forbidden source dependency: '+path)
         if '/application/' in path and ('PossibleValuesAnalysis' in source or 'analysis.values.' in source):raise Failure('generic application imports concrete values')
         if re.search(r'\bstatic\s+(?:final\s+)?(?:Map|HashMap|ConcurrentHashMap|List|Set)<',source):raise Failure('W4 global static cache/container')
-    verify_foundation(root)
+    verify_foundation(root);verify_focal_preservation(root)
 
 def verify_foundation(root:Path)->None:
     from check_w4_scope import preserved_digest
     baseline=json.loads((root/'docs/work/evidence/WORK-CFG-028/wave-4/baseline.json').read_text())
     for path,digest in baseline['productionAndPinSha256'].items():
         if preserved_digest(root,path)!=digest:raise Failure('W4 changed approved foundation outside additive context selection: '+path)
+
+def verify_focal_preservation(root:Path)->None:
+    baseline=json.loads((root/'docs/work/evidence/WORK-CFG-028/wave-4/review-f1/baseline.json').read_text())
+    if baseline['reviewed_head']!='330d63427c0905e8ef140924b643e9fb012c73de':raise Failure('W4-F1 reviewed baseline mismatch')
+    mutable='analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/SitePlanner.java'
+    if baseline['mutable_production']!=[mutable]:raise Failure('W4-F1 may change only SitePlanner production')
+    for path,digest in baseline['files'].items():
+        if path!=mutable and hashlib.sha256((root/path).read_bytes()).hexdigest()!=digest:
+            raise Failure('W4-F1 changed reviewed source: '+path)
 
 def selected_class(name:str)->bool:
     return any(name.startswith(PREFIX+pkg+'.') for pkg in PACKAGES) or name.startswith(PREFIX+'values.PossibleValuesProvider')

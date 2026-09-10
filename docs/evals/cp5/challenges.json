@@ -854,6 +854,18 @@
       "hook": "scripts/project/challenge_w4.py",
       "nominal_test": "PlanningRuntimeTest#realVerticalSharesRunQueryReplayAndProducerSupport",
       "expected_diagnostic": "all real candidates reach sink"
+    },
+    {
+      "id": "site-query-zero-match-drops-required-batch",
+      "wave": 4,
+      "probe": "S14",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/SitePlanner.java",
+      "mutation": "Bind a SiteQuery batch only after the first matched site, dropping declared empty observation dependencies.",
+      "oracle": "Known SiteQuery batch survives zero matches and completes empty through W3; unknown dependencies remain invalid.",
+      "status": "IMPLEMENTED",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningZeroMatchTest#absentKindKeepsDeclaredEmptyBatch",
+      "expected_diagnostic": "declared SiteQuery batch survives zero matches"
     }
   ]
 }
