@@ -23,7 +23,7 @@ não contém callback para completar fatos.
 `CfgBuildResult` registra `PublicationId`, versão AIR, options, o
 `ValidationResult` integral, capabilities requeridas sem intérprete, issues tipados
 da projeção e `Optional<CfgGraph>`. `CFG_BUILT` exige produto presente;
-`INVALID_IR`, `UNSUPPORTED_CAPABILITY`, `UNSUPPORTED_INPUT`, `VALIDATION_LIMIT` e
+`INVALID_IR`, `UNSUPPORTED_CAPABILITY`, `UNSUPPORTED_INPUT`, `RESOURCE_LIMIT`, `VALIDATION_LIMIT` e
 `INCOMPLETE_VALIDATION` exigem ausência de grafo. O antigo
 `READY_FOR_CFG_PROJECTION` foi removido. O construtor rejeita envelope com produto
 em falha ou com metadata/preflight incompatíveis. `CfgBuildCoordinator` delega a
@@ -92,9 +92,9 @@ em memória também passa por `AirValidator`. `INVALID_IR` não é reparada. Sta
 validação incompleta/capability incompatível é tratado de forma explícita antes do
 builder. O consumer não reimplementa um validator AIR divergente.
 
-`INCOMPLETE_VALIDATION`, `VALIDATION_LIMIT` e `UNSUPPORTED_CAPABILITY` não são
+`INCOMPLETE_VALIDATION`, `RESOURCE_LIMIT`, `VALIDATION_LIMIT` e `UNSUPPORTED_CAPABILITY` não são
 convertidos em sucesso por conveniência. Uma extensão requerida conhecida pelo
-registry ainda preserva o `INCOMPLETE_VALIDATION` que o validator upstream emitiu;
+registry não apaga `UNSUPPORTED_CAPABILITY` tipada emitida pelo validator upstream;
 o seam não certifica a semântica da extensão. `SEMANTIC_OBLIGATION` preserva uma
 obrigação cuja verdade externa não foi provada; o CFG não a promove a fato.
 
@@ -171,3 +171,7 @@ Uma Publication construída independentemente em memória mantém as mesmas corr
 topologia e inventários e gera os mesmos bytes CFG. Seus fatos AIR não transportados
 (origins/precision) diferem deliberadamente: essa prova não substitui todo o escopo
 futuro de EVAL-CFG-008 nem a qualificação de perfil AIR.
+
+
+A [taxonomia operacional atual](resource-limit-preflight.md) preserva RESOURCE_LIMIT
+por diagnóstico tipado e contagens totais, sem produzir grafo ou resultado semântico.

@@ -1002,5 +1002,6 @@
       "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/ResultJson.java",
       "hook": "scripts/project/challenge_w5.py"
     }
-  ]
+  ],
+  "post_cp5_compatibility_challenges": "docs/evals/resource-limit-compatibility.json"
 }

@@ -1,135 +1,58 @@
 #!/usr/bin/env python3
-"""Check CP5 Wave 5 diff scope, fixed upstream authority and a complete tracked/untracked delivery manifest."""
-from __future__ import annotations
-import argparse
-import hashlib
-import json
-import subprocess
-import sys
+"""Post-CP5 RESOURCE_LIMIT focal diff, immutable baseline and exact delivery manifest."""
+import argparse,hashlib,json,subprocess,sys
 from pathlib import Path
-from check_architecture import GateFailure
-
-ROOT = Path(__file__).resolve().parents[2]
-BASE = "ec525cbbad96d70c9663faa88e2672148fa8ee71"
-AIR = "ce530a7e17ab12b23c48f29425f503ff920b09fb"
-IR = "122ce54e1b9ef9b00646f93ece409ca8b63bc933"
-FIXTURE = "cfg-adapters/src/test/resources/air/goback.canonical.json"
-FIXTURE_HASH = "fa299c2e5f3fae75afe365363b9f16925f0cfea591f631768ace82f0fb9a1075"
-
-
-def git(*args: str) -> bytes:
-    return subprocess.check_output(["git", *args], cwd=ROOT)
-
-
-def files() -> list[str]:
-    return sorted({p for p in git("ls-files", "-z", "--cached", "--others", "--exclude-standard").decode().split("\0")
-                   if p and p != "MANIFEST.sha256" and (ROOT / p).is_file()})
-
-
-def manifest() -> bytes:
-    lines = ["# SHA-256 da entrega CP5 W5; inclui arquivos versionáveis, exclui este manifesto e artefatos ignorados."]
-    lines += [hashlib.sha256((ROOT / path).read_bytes()).hexdigest() + "  " + path for path in files()]
-    return ("\n".join(lines) + "\n").encode()
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--update-manifest", action="store_true")
-    args = parser.parse_args()
+from resource_limit_scope import BASE,PRODUCTION,TESTS,contract,sha,boundaries,INVENTORY
+ROOT=Path(__file__).resolve().parents[2]
+def git(*args):return subprocess.check_output(['git',*args],cwd=ROOT)
+def files():return sorted({p for p in git('ls-files','-z','--cached','--others','--exclude-standard').decode().split('\0') if p and p!='MANIFEST.sha256' and (ROOT/p).is_file()})
+def manifest():return ('# SHA-256 da remediação RESOURCE_LIMIT; exclui este manifesto e artefatos ignorados.\n'+''.join(sha((ROOT/p).read_bytes())+'  '+p+'\n' for p in files())).encode()
+def main():
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--update-manifest',action='store_true');args=parser.parse_args()
     try:
-        if git("merge-base", "--is-ancestor", BASE, "HEAD") != b"":
-            raise ValueError("baseline ancestry not established")
-        approved = "21d65d08512f1fb8a945009c2919946a61566eed"
-        if git("diff", "--name-only", approved, "--", "cfg-kernel", "cfg-adapters", "cfg-launcher/src", "docs/sources/sources.lock.json"):
-            raise ValueError("unapproved product/pin changes outside W5")
-        work = json.loads((ROOT / "docs/work/active/WORK-CFG-028/work-item.json").read_text())
-        if work["authorization"] != "implementation" or work["id"] != "WORK-CFG-028":
-            raise ValueError("wrong implementation checkpoint")
-        if work["checkpoint"] != "WAVE_5":
-            raise ValueError("scope checker authorizes WAVE_5 only")
-        sys.path.insert(0, str(ROOT / "scripts/harness"))
-        from validate_cp5 import validate_cp5
-        preparation_errors = validate_cp5(ROOT)
-        if preparation_errors: raise ValueError("; ".join(preparation_errors))
-        scopes = work["source_scope"] + work["test_scope"]
-        # The aggregate PR includes historic AGENTS edits; W3 refreshes the architecture overview.
-        remediation_base = approved
-        focal_paths = git("diff", "--name-only", remediation_base).decode().splitlines()
-        focal_paths += git("ls-files", "--others", "--exclude-standard").decode().splitlines()
-        focal_scope = ["ARCHITECTURE.md", "docs", "scripts/harness", "scripts/project", ".github/workflows/ci.yml", "MANIFEST.sha256", "pom.xml", "cfg-launcher/pom.xml", "analysis-kernel", "analysis-values", "analysis-dataflow", "analysis-adapters", "analysis-launcher"]
-        if any(not any(p == s or p.startswith(s + "/") for s in focal_scope) for p in focal_paths):
-            raise ValueError("path outside focal post-audit remediation scope")
-        def baseline_json(path): return json.loads(git("show", remediation_base + ":" + path))
-        audit_path = "docs/evals/cp5/post-audit-contracts.json"
-        before = baseline_json(audit_path)
-        after = json.loads((ROOT/audit_path).read_text())
-        for value in [before, after]:
-            for row in value["requirements"].values():
-                row.pop("wave_hooks",None)
-                if value is after:
-                    if row.get('runtime_status')!='IMPLEMENTED_BY_WAVE_HOOKS':raise ValueError('W5 audit runtime requires complete wave hooks')
-                    row['runtime_status']='NOT_AVAILABLE_UNTIL_IMPLEMENTED'
-        if before != after: raise ValueError("W4 scope: approved audit semantics changed")
-        for path in ["scripts/project/ci_source_receipt.py", "docs/evals/cp5/core-size-review.json"]:
-            if (ROOT/path).read_bytes() != git("show", remediation_base + ":" + path):
-                raise ValueError("W4 scope: future-wave contract/CI receipt changed: " + path)
-        # Historical reviews/evidence are append-only, including previous await-review snapshots.
-        life = json.loads((ROOT/"docs/work/cp5-lifecycle.json").read_text())
-        old_life = baseline_json("docs/work/cp5-lifecycle.json")
-        if life["review_history"][:len(old_life["review_history"])] != old_life["review_history"]:
-            raise ValueError("historical review rewritten")
-        for key in ["last_human_review", "last_human_approval", "audit_remediation", "f_correction"]:
-            if life[key] != old_life[key]: raise ValueError("historical decision rewritten: " + key)
-        historical = git("diff", "--name-only", remediation_base, "--", "docs/work/evidence").decode().splitlines()
-        if any(not p.startswith("docs/work/evidence/WORK-CFG-028/wave-5/") for p in historical):
-            raise ValueError("historical evidence changed")
-        from check_w4 import verify_foundation
-        verify_foundation(ROOT)
-        from check_w4 import verify_focal_preservation
-        verify_focal_preservation(ROOT)
-        for name in ['result-contract.json','result-review.json','phase-review.json']:
-            if (ROOT/'docs/evals/cp5/history'/name).read_bytes()!=git('show',approved+':docs/evals/cp5/'+name):
-                raise ValueError('W5 altered historical wire design: '+name)
-        old_sources = baseline_json('docs/evals/cp5/w4-source-inventory.json')['files']
-        from check_w5 import original_pom
-        for path,digest in old_sources.items():
-            baseline_data=git('show',approved+':'+path)
-            if hashlib.sha256(baseline_data).hexdigest()!=digest:raise ValueError('W4 baseline differs from immutable reviewed Git: '+path)
-            data=(ROOT/path).read_bytes()
-            if path=='pom.xml':data=original_pom(data)
-            if hashlib.sha256(data).hexdigest()!=digest:raise ValueError('W5 changed approved W1–W4 source/test/POM: '+path)
-        # Bind the offline Java/POM inventory to Git, so editing both cannot hide a change.
-        names = git("ls-tree", "-r", "--name-only", BASE).decode().splitlines()
-        baseline_sources = {p:hashlib.sha256(git("show", BASE + ":" + p)).hexdigest()
-                            for p in names if p.endswith(".java") or p.endswith("pom.xml")}
-        inventory = json.loads((ROOT / "docs/evals/cp5/preparation-source-inventory.json").read_text())
-        if inventory["files"] != baseline_sources:
-            raise ValueError("preparation source inventory differs from immutable Git baseline")
-        from check_analysis_architecture import check_direct_air
-        violations = check_direct_air(ROOT)
-        if violations: raise ValueError("; ".join(violations))
-        changed = set(git("diff", "--name-only", "-z", BASE).decode().split("\0"))
-        changed |= set(git("ls-files", "-z", "--others", "--exclude-standard").decode().split("\0"))
-        outside = sorted(p for p in changed if p and not any(p == scope or p.startswith(scope + "/") for scope in scopes))
-        if outside: raise ValueError("paths outside CP5 harness scope: " + repr(outside))
-        lock = json.loads((ROOT / "docs/sources/sources.lock.json").read_text())
-        if lock["air_java"]["commit"] != AIR or lock["analysis_ir"]["commit"] != IR:
-            raise ValueError("authorized pin changed")
-        binding = lock["analysis_ir"]["json_binding"]
-        if (binding["version"], binding["targets_air_version"], binding["maturity"], binding["implemented_in_analysis_cfg"]) != ("1.0.0", "2.0.0", "DRAFT", False):
-            raise ValueError("binding authority changed")
-        if hashlib.sha256((ROOT / FIXTURE).read_bytes()).hexdigest() != FIXTURE_HASH:
-            raise ValueError("upstream AIR fixture provenance drift")
+        git('merge-base','--is-ancestor',BASE,'HEAD')
+        if git('rev-parse',BASE+'^{tree}').decode().strip()!='3bc8b948de250c9eb4a756513294fb14a3ccc6db':raise ValueError('CP5 tree mismatch')
+        c=contract(ROOT)
+        if c['base']!=BASE or set(c['changed_production'])!=PRODUCTION or set(c['changed_tests'])!=TESTS or set(c['baseline_sha256'])!=PRODUCTION|TESTS|{'docs/sources/sources.lock.json'}:raise ValueError('focal production authority mismatch')
+        work=json.loads((ROOT/'docs/work/active/WORK-CFG-029/work-item.json').read_text())
+        if work['authorization']!='implementation' or work['checkpoint']!='POST_CP5_COMPATIBILITY_REMEDIATION':raise ValueError('wrong authorized checkpoint')
+        changed=set(git('diff','--name-only',BASE).decode().splitlines())|set(git('ls-files','--others','--exclude-standard').decode().splitlines())
+        allowed=PRODUCTION|set(c['changed_tests'])|{'MANIFEST.sha256','.github/workflows/ci.yml'}
+        for p in changed:
+            if p.endswith('.java') or p.endswith('pom.xml'):
+                if p not in allowed:raise ValueError('unapproved source/POM change: '+p)
+            elif p not in allowed and not p.startswith(('docs/','scripts/')):raise ValueError('path outside focal scope: '+p)
+        protected=['docs/work/evidence/WORK-CFG-028','docs/work/active/WORK-CFG-028','cfg-adapters/src/test/resources','analysis-adapters/src/test/resources','analysis-launcher/src/test/resources','scripts/project/ci_source_receipt.py']
+        protected += ['docs/evals/cp5/'+p for p in ['history','preparation-source-inventory.json','w1-inventory.json','w2-inventory.json','w3-inventory.json','w4-inventory.json','w5-inventory.json','w1-source-inventory.json','w2-source-inventory.json','w3-source-inventory.json','w4-source-inventory.json','w5-source-inventory.json','core-size-review.json','result-review.json','phase-review.json']]
+        if git('diff','--name-only',BASE,'--',*protected):raise ValueError('historical evidence/approved inventory/fixture/receipt changed')
+        for p,digest in c['baseline_sha256'].items():
+            if sha(git('show',BASE+':'+p))!=digest:raise ValueError('focal baseline digest differs from Git: '+p)
+            if sha((ROOT/p).read_bytes())!=c['current_sha256'][p]:raise ValueError('unreviewed focal bytes: '+p)
+        historical_life=json.loads(git('show',BASE+':docs/work/cp5-lifecycle.json'))
+        historical_life['pr'].update(state='MERGED',draft=False,merge_commit=BASE)
+        historical_life['waves'][4].update(status='APPROVED',reviewed_head='c6b12bf3efe6360b4e33c9a587ad0185b449990d')
+        historical_life['wave_5'].update(review='APPROVED',reviewed_head='c6b12bf3efe6360b4e33c9a587ad0185b449990d')
+        historical_life['cp5_status']='APPROVED / MERGED'
+        historical_life['closure']=dict(merge=BASE,tree='3bc8b948de250c9eb4a756513294fb14a3ccc6db',evidence='docs/work/evidence/WORK-CFG-029/upstream-remote.json',authorization='docs/work/evidence/WORK-CFG-029/authorization.json')
+        if json.loads((ROOT/'docs/work/cp5-lifecycle.json').read_text())!=historical_life:raise ValueError('historical CP5 lifecycle changed outside explicit final approval/merge')
+        before=json.loads(git('show',BASE+':docs/sources/sources.lock.json'));after=json.loads((ROOT/'docs/sources/sources.lock.json').read_text())
+        before.pop('air_java');a=after.pop('air_java')
+        if before!=after or a['commit']!='17029898fd0ee8fabcaaae89f7260148633d4b12':raise ValueError('only exact air-java repin authorized')
+        actual={p:sha((ROOT/p).read_bytes()) for p in files() if p.endswith('.java') or p.endswith('pom.xml')}
+        if actual!=json.loads((ROOT/INVENTORY).read_text())['files']:raise ValueError('exact source inventory mismatch')
         from check_scalar_contract import verify_scalar_contract
-        verify_scalar_contract(ROOT)
-        expected = manifest()
-        if args.update_manifest: (ROOT / "MANIFEST.sha256").write_bytes(expected)
-        elif (ROOT / "MANIFEST.sha256").read_bytes() != expected:
-            raise ValueError("delivery manifest mismatch; review diff before --update-manifest")
-        git("diff", "--check")
-        print("[scope/manifest] PASS: CP4 + approved W1 baseline, unchanged legacy Java/pins, W5 production scope/DRAFT, AIR fixture hash and exact delivery manifest")
+        verify_scalar_contract(ROOT);boundaries(ROOT)
+        from check_analysis_architecture import check_direct_air
+        if check_direct_air(ROOT):raise ValueError('direct AIR dependency drift')
+        sys.path.insert(0,str(ROOT/'scripts/harness'))
+        from validate_cp5 import validate_cp5
+        errors=validate_cp5(ROOT)
+        if errors:raise ValueError('; '.join(errors))
+        expected=manifest()
+        if args.update_manifest:(ROOT/'MANIFEST.sha256').write_bytes(expected)
+        elif (ROOT/'MANIFEST.sha256').read_bytes()!=expected:raise ValueError('delivery manifest mismatch; review diff before --update-manifest')
+        git('diff','--check',BASE)
+        print('[scope/manifest] PASS: exact CP5 base; focal production; W1–W4/wire/writer/history preserved; only air-java repinned')
         return 0
-    except (GateFailure, ValueError, OSError, subprocess.CalledProcessError) as exc:
-        print("[scope/manifest] FAIL: " + str(exc), file=sys.stderr); return 1
-
-if __name__ == "__main__": sys.exit(main())
+    except (ValueError,OSError,subprocess.CalledProcessError) as e:print('[scope/manifest] FAIL: '+str(e));return 1
+if __name__=='__main__':sys.exit(main())

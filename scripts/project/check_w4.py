@@ -5,6 +5,7 @@ import argparse, hashlib, json, os, re, struct, sys
 from pathlib import Path
 import xml.etree.ElementTree as ET
 from check_w1 import ROOT, Failure, command
+from resource_limit_scope import allows_change
 
 BASE='855628200fba3851493991cec869dee899e82299'
 PREFIX='io.github.gustavo2358.analysis.'
@@ -56,7 +57,7 @@ def verify_foundation(root:Path)->None:
     from check_w4_scope import preserved_digest
     baseline=json.loads((root/'docs/work/evidence/WORK-CFG-028/wave-4/baseline.json').read_text())
     for path,digest in baseline['productionAndPinSha256'].items():
-        if preserved_digest(root,path)!=digest:raise Failure('W4 changed approved foundation outside additive context selection: '+path)
+        if preserved_digest(root,path)!=digest and not allows_change(root,path,digest):raise Failure('W4 changed approved foundation outside additive context selection: '+path)
 
 def verify_focal_preservation(root:Path)->None:
     baseline=json.loads((root/'docs/work/evidence/WORK-CFG-028/wave-4/review-f1/baseline.json').read_text())
@@ -68,7 +69,7 @@ def verify_focal_preservation(root:Path)->None:
         if path=='pom.xml':
             from check_w5 import original_pom
             data=original_pom(data)
-        if path!=mutable and hashlib.sha256(data).hexdigest()!=digest:
+        if path!=mutable and hashlib.sha256(data).hexdigest()!=digest and not allows_change(root,path,digest):
             raise Failure('W4-F1 changed reviewed source: '+path)
 
 def selected_class(name:str)->bool:

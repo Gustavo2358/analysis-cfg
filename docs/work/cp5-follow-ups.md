@@ -127,3 +127,14 @@ O reader W5 não copia o pre-read cap legado. O writer W5 ultrapassou 64 MiB com
 resultado completo. Isso não encerra os caps do codec/AirValidator nem qualifica
 AIRs grandes por arquivo. W3-PERF-01/W3-METRICS-01 seguem abertos e não bloqueantes.
 Nenhum sibling ou pin alterado; CP6 NOT_STARTED / NOT_AUTHORIZED.
+
+
+## Post-CP5 RESOURCE_LIMIT compatibility
+
+CP5 W1–W5 are APPROVED / MERGED at 4229ec1cfd9c1d9f9e851f3cabe6993b4d4ed9b8.
+WORK-CFG-029 is a separate POST_CP5_COMPATIBILITY_REMEDIATION. Current air-java pin
+17029898fd0ee8fabcaaae89f7260148633d4b12 separates operational RESOURCE_LIMIT from
+specific VALIDATION_LIMIT and generic INCOMPLETE_VALIDATION. Historical CP5 evidence
+above retains its original pins/defaults. The new default codec no longer has a
+16 MiB ceiling; explicit operational budgets still fail without any semantic result.
+See [the current preflight contract](../architecture/resource-limit-preflight.md).

@@ -90,7 +90,7 @@ Use the six production modules plus pinned air-java/air-json dependencies on the
 classpath. Stdout is one external receipt when delivery is attempted; expected
 diagnostics use stderr without stacktraces. Exit codes are 0 complete; 2 usage;
 3 input transport/version/I/O; 4 invalid AIR/unsupported profile; 5 execution or
-preparation failure; 6 output/delivery; 7 pinned upstream size/validation debt.
+preparation failure; 6 output/delivery; 7 operational resource failure, specific legacy validation debt or generic incomplete validation.
 Resource exhaustion is never semantic UNSUPPORTED or source-open coverage.
 
 The independent reader is invoked with:
@@ -104,3 +104,14 @@ The new reader has no local pre-read size check, but pinned AIR codec/validator 
 remain **EXTERNAL SIZE-CAP DEBT**. This is not proof of an unbounded file route.
 See the [ledger](../engineering/cp5-w5-composition-ledger.md) and
 [W5 evidence](../work/evidence/WORK-CFG-028/wave-5/validation.md).
+
+
+## Post-CP5 RESOURCE_LIMIT compatibility
+
+CP5 W1–W5 are APPROVED / MERGED at 4229ec1cfd9c1d9f9e851f3cabe6993b4d4ed9b8.
+WORK-CFG-029 is a separate POST_CP5_COMPATIBILITY_REMEDIATION. Current air-java pin
+17029898fd0ee8fabcaaae89f7260148633d4b12 separates operational RESOURCE_LIMIT from
+specific VALIDATION_LIMIT and generic INCOMPLETE_VALIDATION. Historical CP5 evidence
+above retains its original pins/defaults. The new default codec no longer has a
+16 MiB ceiling; explicit operational budgets still fail without any semantic result.
+See [the current preflight contract](resource-limit-preflight.md).

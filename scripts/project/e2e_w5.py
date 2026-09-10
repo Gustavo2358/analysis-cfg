@@ -117,7 +117,7 @@ def run(root,work,config):
     require(unordered(reports['cp4e-a'])==unordered(reports['cp4e-b']),'fresh semantic determinism')
     for field in ('spSha256','airSha256','resultSha256'):require(chain['cp4e-a'][field]==chain['cp4e-b'][field],'fresh byte determinism: '+field)
     after={n:snapshot(Path(v['path'])) for n,v in config['before'].items()};require(before==after,'sibling modified')
-    result=dict(schema='w5-s10-evidence',status='PASS',javaVersion=subprocess.check_output([java,'-version'],stderr=subprocess.STDOUT,text=True),producers=config,analysisJars=jars,before=before,after=after,runs=chain,scope='Canonical CP4E/CP3 only; external pinned AIR codec size debt remains')
+    result=dict(schema='w5-s10-evidence',status='PASS',javaVersion=subprocess.check_output([java,'-version'],stderr=subprocess.STDOUT,text=True),producers=config,analysisJars=jars,before=before,after=after,runs=chain,scope='Canonical CP4E/CP3 only; operational budgets and physical resources remain separate; no 117k qualification')
     (work/'receipt.json').write_text(json.dumps(result,indent=2)+'\n');print('[w5-S10] PASS: two fresh COBOL CP4E runs + CP3 + generic overwrite; actual stages; independent AIR and memory oracles');return result
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--root',type=Path,default=ROOT);p.add_argument('--work',type=Path,required=True);p.add_argument('--producers',type=Path,required=True);a=p.parse_args();run(a.root.resolve(),a.work.resolve(),load(a.producers))

@@ -184,11 +184,11 @@ def validate_cp5(root: Path) -> list[str]:
         require(set(approval['implementation_candidates_not_frozen']) == {'Patricia/radix','FIFO','k=8'}, 'implementation-neutral H4')
         require(approval['source'] and approval['date'] and approval['decision'] == 'APPROVED_DISCOVERY_AND_HARNESS_PREPARATION_ONLY', 'human evidence')
         pr = life['pr']
-        require(pr['draft'] is True and pr['auto_merge'] is False, 'PR draft without auto-merge')
+        require(pr['draft'] is False and pr['auto_merge'] is False, 'approved CP5 PR without auto-merge')
         if pr['number'] is None:
             require(pr['url'] is None and pr['state'] == 'NOT_CREATED', 'pending PR metadata')
         else:
-            require(type(pr['number']) is int and pr['number'] > 0 and pr['state'] == 'OPEN' and pr['url'] == f"https://github.com/Gustavo2358/analysis-cfg/pull/{pr['number']}", 'PR linkage')
+            require(type(pr['number']) is int and pr['number'] > 0 and pr['state'] == 'MERGED' and pr['url'] == f"https://github.com/Gustavo2358/analysis-cfg/pull/{pr['number']}", 'PR linkage')
         require([w['wave'] for w in life['waves']] == list(range(1,6)), 'five Waves in order')
         for w in life['waves']:
             n = w['wave']
@@ -251,7 +251,7 @@ def validate_cp5(root: Path) -> list[str]:
                 require(w['completion_evidence']==expected_evidence, 'no Wave evidence invented')
                 if w['status']=='IMPLEMENTED': require(life['wave_4']['review']=='AWAITING_HUMAN_REVIEW' and existing(root,expected_evidence), 'W4 awaits human review')
             else:
-                require(w['status'] in {'STARTED','IMPLEMENTED'} and w['authorization']=='AUTHORIZED', 'W5 started/implemented, never human-approved automatically')
+                require(w['status']=='APPROVED' and w['authorization']=='AUTHORIZED' and life['wave_5']['review']=='APPROVED' and life['cp5_status']=='APPROVED / MERGED' and life['closure']['merge']=='4229ec1cfd9c1d9f9e851f3cabe6993b4d4ed9b8' and w['reviewed_head']=='c6b12bf3efe6360b4e33c9a587ad0185b449990d', 'W5 explicit final human approval and merge required')
                 require(w['approval_evidence']=='docs/work/evidence/WORK-CFG-028/wave-5/authorization.json','W5 explicit authorization evidence')
                 authorization=load_json(root/w['approval_evidence'])
                 require(len(life['review_history'])>10 and authorization==life['review_history'][10] and authorization['reviewed_head']=='21d65d08512f1fb8a945009c2919946a61566eed' and authorization['W4']=='APPROVED' and authorization['authorized_wave']==5,'W5 reviewed HEAD and append-only human authorization')
@@ -274,7 +274,7 @@ def validate_cp5(root: Path) -> list[str]:
         require(inventory['baseline'] == BASE, 'source inventory baseline')
         actual = {str(p.relative_to(root)):hashlib.sha256(p.read_bytes()).hexdigest()
                   for p in files_under(root) if p.suffix == '.java' or p.name == 'pom.xml'}
-        require(actual == load_json(root / PLAN / 'w5-source-inventory.json')['files'], 'no unauthorized Java/POM implementation (exact inventory)')
+        require(actual == load_json(root / 'docs/work/evidence/WORK-CFG-029/source-inventory.json')['files'], 'no unauthorized Java/POM implementation (exact inventory)')
         require((root/'analysis-kernel').is_dir() and (root/'analysis-values').is_dir(), 'W3 modules required')
         require(not (root/'analysis-consumers').exists(), 'no speculative consumer modules')
         require(not any(p.suffix in {'.jar','.class'} for p in files_under(root)), 'no vendored bytecode')

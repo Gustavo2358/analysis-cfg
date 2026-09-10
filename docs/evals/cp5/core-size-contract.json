@@ -44,7 +44,8 @@
       "delivery_statuses": [
         "COMPLETE",
         "FAILED"
-      ]
+      ],
+      "operational_preflight_failure": "EXTERNAL_RESOURCE_LIMIT_NO_SEMANTIC_RESULT"
     },
     "execution_boundary": {
       "infrastructure_knobs_in_core": [],

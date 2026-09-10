@@ -1,0 +1,46 @@
+{
+  "status": "PASS",
+  "cp5Baseline": "4229ec1cfd9c1d9f9e851f3cabe6993b4d4ed9b8",
+  "gates": {
+    "fast": "PASS",
+    "architecture": "PASS",
+    "semantic": "PASS",
+    "performance": "PASS",
+    "integration": "PASS",
+    "full": "PASS",
+    "maven_clean_verify": "PASS",
+    "scope_manifest": "PASS",
+    "diff_check": "PASS"
+  },
+  "waves": {
+    "1": "PASS",
+    "2": "PASS",
+    "3": "PASS",
+    "4": "PASS",
+    "5": "PASS"
+  },
+  "fullLog": "full-first.log.gz",
+  "cp4eByteIdenticalToCp5": true,
+  "cp4eResultSha256": "aacb6e6cedbd7d1dbbd44e7a476b398df3eeff51f1a63b90257d4dc412705dec",
+  "mutationValid": 9,
+  "mutationKilled": 9,
+  "mutationRestored": 9,
+  "mutationSecondGreen": 9,
+  "invalidMutants": 0,
+  "abortedMutationSetups": 1,
+  "limitations": [
+    "canonical CP4E/CP3 only",
+    "117k qualification not executed",
+    "W3-PERF-01 and W3-METRICS-01 unchanged",
+    "no broad baseline sync or CP6"
+  ],
+  "setupAndIntermediateFailures": [
+    "DNS/plugin resolution before isolated dependencies available",
+    "legacy default+1 test reached JVM array representation limit; corrected to explicit 128-byte budget, no Error catch introduced",
+    "initial mutation baseline omitted WireTest; no mutation applied",
+    "initial harness rerun overlapped active mutation; not counted as validation; final full ran after all restores",
+    "initial architecture preservation guards needed focal SHA authority; historical bytes kept"
+  ],
+  "mavenLog": "maven-final.log.gz",
+  "finalFastLog": "fast-final.log.gz"
+}

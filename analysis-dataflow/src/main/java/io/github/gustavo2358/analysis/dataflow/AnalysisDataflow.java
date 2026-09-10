@@ -14,18 +14,14 @@ public final class AnalysisDataflow {
         return prepare(publication,resultId).result();
     }
     public PreparedDataflowResult prepare(Publication publication, String resultId) {
+        return prepare(publication, resultId, BuildOptions.defaults());
+    }
+    PreparedDataflowResult prepare(Publication publication, String resultId, BuildOptions options) {
         Objects.requireNonNull(publication); Objects.requireNonNull(resultId);
         if(resultId.isBlank()) throw new IllegalArgumentException("caller must supply a stable resultId");
-        var options=BuildOptions.defaults();
         BuildCfg builder=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty());
         var cfg=builder.build(publication,options);
-        switch(cfg.status()) {
-            case CFG_BUILT -> { }
-            case INVALID_IR -> throw new PreparationException(Failure.INVALID_INPUT,"BuildCfg INVALID_IR");
-            case UNSUPPORTED_INPUT, UNSUPPORTED_CAPABILITY -> throw new PreparationException(Failure.UNSUPPORTED_PROFILE,"BuildCfg unsupported profile");
-            case VALIDATION_LIMIT -> throw new PreparationException(Failure.EXTERNAL_SIZE_CAP_DEBT,"EXTERNAL SIZE-CAP DEBT: pinned AirValidator");
-            case INCOMPLETE_VALIDATION -> throw new PreparationException(Failure.INCOMPLETE_VALIDATION,"BuildCfg validation did not complete");
-        }
+        requireBuilt(cfg);
         var entries=publication.units().stream().flatMap(u->u.entries().stream()).toList();
         var admission=AnalysisSession.open(cfg,publication,options.projectionPolicy(),entries);
         if(admission.status()!=AnalysisSession.Status.ACCEPTED)
@@ -38,7 +34,17 @@ public final class AnalysisDataflow {
             return PreparedDataflowResult.capture(result,publication,session.index().metrics(),selected.metrics());
         }
     }
-    public enum Failure { INVALID_INPUT, UNSUPPORTED_PROFILE, EXTERNAL_SIZE_CAP_DEBT, INCOMPLETE_VALIDATION }
+    static void requireBuilt(CfgBuildResult cfg) {
+        switch(cfg.status()) {
+            case CFG_BUILT -> { }
+            case INVALID_IR -> throw new PreparationException(Failure.INVALID_INPUT,"BuildCfg INVALID_IR");
+            case UNSUPPORTED_INPUT, UNSUPPORTED_CAPABILITY -> throw new PreparationException(Failure.UNSUPPORTED_PROFILE,"BuildCfg unsupported profile");
+            case VALIDATION_LIMIT -> throw new PreparationException(Failure.EXTERNAL_SIZE_CAP_DEBT,"EXTERNAL SIZE-CAP DEBT: pinned AirValidator");
+            case RESOURCE_LIMIT -> throw new PreparationException(Failure.EXTERNAL_RESOURCE_LIMIT,"EXTERNAL_RESOURCE_LIMIT: AirValidator operational budget exhausted");
+            case INCOMPLETE_VALIDATION -> throw new PreparationException(Failure.INCOMPLETE_VALIDATION,"BuildCfg validation did not complete");
+        }
+    }
+    public enum Failure { INVALID_INPUT, UNSUPPORTED_PROFILE, EXTERNAL_SIZE_CAP_DEBT, EXTERNAL_RESOURCE_LIMIT, INCOMPLETE_VALIDATION }
     public static final class PreparationException extends RuntimeException {
         private static final long serialVersionUID=1L;
         private final Failure failure;

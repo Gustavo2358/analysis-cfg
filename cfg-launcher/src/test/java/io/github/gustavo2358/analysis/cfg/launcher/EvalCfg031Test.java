@@ -167,10 +167,14 @@ class EvalCfg031Test {
     @Test void oversizedPhysicalInputReturnsThreeBeforeCodec() throws Exception {
         Path source = temporary.resolve("oversized.json");
         try (var file = new java.io.RandomAccessFile(source.toFile(), "rw")) {
-            file.setLength((long) AirJson.Limits.defaults().maximumDocumentBytes() + 1);
+            file.setLength(129);
         }
-        failsWithoutPublishing(source, "IMPLEMENTATION_LIMIT");
-        assertTrue(diagnostic().contains("maximumDocumentBytes="));
+        assertEquals(3,AnalysisCfg.run(new String[]{source.toString(),output().toString()},err,
+                new AirJsonFileReader(new AirJson.Limits(128,128),io.github.gustavo2358.air.validation.ValidationOptions.defaults()),
+                new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()),new CfgJsonWriter()));
+        assertFalse(Files.exists(output()));
+        assertTrue(diagnostic().contains("IMPLEMENTATION_LIMIT"));
+        assertTrue(diagnostic().contains("maximumDocumentBytes=128"));
     }
 
 }

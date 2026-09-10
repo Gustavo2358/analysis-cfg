@@ -1,0 +1,41 @@
+{
+  "analysisCfgSource": "4229ec1cfd9c1d9f9e851f3cabe6993b4d4ed9b8",
+  "airJavaSource": "17029898fd0ee8fabcaaae89f7260148633d4b12",
+  "airJavaTree": "6f863c3321b6cbf82b021d85b47cab02748eed78",
+  "mavenRepository": "/tmp/cfg-resource-limit/m2",
+  "java": "openjdk version \"25.0.4\" 2026-07-21 LTS\nOpenJDK Runtime Environment Temurin-25.0.4+7 (build 25.0.4+7-LTS)\nOpenJDK 64-Bit Server VM Temurin-25.0.4+7 (build 25.0.4+7-LTS, mixed mode, sharing)\n",
+  "maven": "Apache Maven 3.9.16 (2bdd9fddda4b155ebf8000e807eb73fd829a51d5)\nMaven home: /home/gustavo/.sdkman/candidates/maven/current\nJava version: 25.0.4, vendor: Eclipse Adoptium, runtime: /home/gustavo/.sdkman/candidates/java/25.0.4-tem\nDefault locale: en, platform encoding: UTF-8\nOS name: \"linux\", version: \"7.0.0-31-generic\", arch: \"amd64\", family: \"unix\"\n",
+  "jars": {
+    "air-java": {
+      "path": "/tmp/cfg-resource-limit/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar",
+      "sha256": "d0999878f235666f2d97cdfac6246ca250795247f9099c5cbff686726cc0573a"
+    },
+    "air-json": {
+      "path": "/tmp/cfg-resource-limit/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar",
+      "sha256": "1146b1ad973f0f1db3207543b7e8574f8f3a20905378ecb403a296df2077a45f"
+    }
+  },
+  "originalAirJavaBefore": {
+    "head": "17029898fd0ee8fabcaaae89f7260148633d4b12",
+    "branch": "main",
+    "status": ""
+  },
+  "baselineRed": {
+    "tests": [
+      "CfgBuildCoordinatorTest.validationLimitHasItsOwnResultState",
+      "EvalCfg030Test.validationLimitsStillBlockBeforeProjection"
+    ],
+    "expected": "VALIDATION_LIMIT",
+    "observed": "INCOMPLETE_VALIDATION",
+    "exitCode": 1,
+    "testsRun": 2,
+    "failures": 2,
+    "errors": 0,
+    "skips": 0,
+    "log": "baseline-red-network.log.gz"
+  },
+  "setupFailures": [
+    "upstream-build.log.gz",
+    "baseline-red.log.gz"
+  ]
+}

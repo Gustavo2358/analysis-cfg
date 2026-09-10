@@ -140,5 +140,17 @@
       "core_size_contract": "docs/evals/cp5/core-size-contract.json",
       "core_size_probe": "S16"
     }
-  ]
+  ],
+  "post_cp5_compatibility": {
+    "work_item": "WORK-CFG-029",
+    "contract": "docs/evals/resource-limit-compatibility.json",
+    "regression_waves": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "new_wave": false
+  }
 }

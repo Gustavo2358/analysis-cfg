@@ -7,9 +7,10 @@
   "pr": {
     "number": 12,
     "url": "https://github.com/Gustavo2358/analysis-cfg/pull/12",
-    "state": "OPEN",
-    "draft": true,
-    "auto_merge": false
+    "state": "MERGED",
+    "draft": false,
+    "auto_merge": false,
+    "merge_commit": "4229ec1cfd9c1d9f9e851f3cabe6993b4d4ed9b8"
   },
   "current_checkpoint": "WAVE_5",
   "harness_preparation": {
@@ -95,12 +96,13 @@
     {
       "wave": 5,
       "title": "production/E2E",
-      "status": "IMPLEMENTED",
+      "status": "APPROVED",
       "authorization": "AUTHORIZED",
       "requires_review_of": "WAVE_4",
       "approval_evidence": "docs/work/evidence/WORK-CFG-028/wave-5/authorization.json",
       "completion_evidence": "docs/work/evidence/WORK-CFG-028/wave-5/validation.md",
-      "eval": "EVAL-CFG-038"
+      "eval": "EVAL-CFG-038",
+      "reviewed_head": "c6b12bf3efe6360b4e33c9a587ad0185b449990d"
     }
   ],
   "evidence": "docs/work/evidence/WORK-CFG-028/validation.md",
@@ -442,14 +444,21 @@
   },
   "wave_5": {
     "authorization": "docs/work/evidence/WORK-CFG-028/wave-5/authorization.json",
-    "review": "AWAITING_HUMAN_REVIEW",
+    "review": "APPROVED",
     "evidence": "docs/work/evidence/WORK-CFG-028/wave-5/",
     "final_remote_ci": "Final HEAD receipt published as a comment on the same draft PR #12 after source/evidence commits and final push; no self-referential evidence commit.",
-    "validated_implementation_head": "e4e3eb2d337a146c3984385001349868d386952e"
+    "validated_implementation_head": "e4e3eb2d337a146c3984385001349868d386952e",
+    "reviewed_head": "c6b12bf3efe6360b4e33c9a587ad0185b449990d"
   },
   "cp6": {
     "status": "NOT_STARTED",
     "authorization": "NOT_AUTHORIZED"
   },
-  "cp5_status": "AWAITING_FINAL_HUMAN_REVIEW"
+  "cp5_status": "APPROVED / MERGED",
+  "closure": {
+    "merge": "4229ec1cfd9c1d9f9e851f3cabe6993b4d4ed9b8",
+    "tree": "3bc8b948de250c9eb4a756513294fb14a3ccc6db",
+    "evidence": "docs/work/evidence/WORK-CFG-029/upstream-remote.json",
+    "authorization": "docs/work/evidence/WORK-CFG-029/authorization.json"
+  }
 }
