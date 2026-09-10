@@ -73,7 +73,7 @@
     {
       "wave": 3,
       "title": "PossibleValues/state/queries",
-      "status": "IMPLEMENTED",
+      "status": "REQUEST_CHANGES",
       "authorization": "AUTHORIZED",
       "requires_review_of": "WAVE_2",
       "approval_evidence": "docs/work/evidence/WORK-CFG-028/wave-3/authorization.json",
@@ -229,6 +229,29 @@
         "WAVE_4",
         "WAVE_5"
       ]
+    },
+    {
+      "date": "2026-09-09",
+      "source": "explicit human review and focal remediation request",
+      "reviewed_head": "8cb55b86c83644e4727cc532787a518775d7e868",
+      "decision": "REQUEST_CHANGES",
+      "blockers": [
+        "W3-F1",
+        "W3-F2"
+      ],
+      "preserved": [
+        "W1",
+        "W2",
+        "CORE-SIZE-001",
+        "AVL",
+        "sparse state",
+        "solver",
+        "batching",
+        "replay"
+      ],
+      "scope": "candidate support/origin/premises and EntryState/same-Cell source uncertainty; same draft PR #12, no W4/W5",
+      "authorized_wave": 3,
+      "evidence": "docs/work/evidence/WORK-CFG-028/wave-3/review-f1-f2/review.json"
     }
   ],
   "audit_remediation": {
@@ -275,9 +298,19 @@
   },
   "wave_3": {
     "authorization": "docs/work/evidence/WORK-CFG-028/wave-3/authorization.json",
-    "review": "AWAITING_HUMAN_REVIEW",
+    "review": "REQUEST_CHANGES",
     "evidence": "docs/work/evidence/WORK-CFG-028/wave-3/",
     "validated_implementation_head": "327737be23ab619ae212f46689a5043884f50da4",
-    "final_remote_ci": "Same draft PR #12 final receipt; .harness-results/WORK-CFG-028/wave-3/remote-ci.json"
+    "final_remote_ci": "Same draft PR #12 final receipt; .harness-results/WORK-CFG-028/wave-3/remote-ci.json",
+    "remediation": {
+      "reviewed_head": "8cb55b86c83644e4727cc532787a518775d7e868",
+      "status": "STARTED",
+      "blockers": [
+        "W3-F1",
+        "W3-F2"
+      ],
+      "review_evidence": "docs/work/evidence/WORK-CFG-028/wave-3/review-f1-f2/review.json",
+      "completion_evidence": null
+    }
   }
 }

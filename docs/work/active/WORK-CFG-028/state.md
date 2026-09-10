@@ -4,7 +4,7 @@
 
 W1 APPROVED em b84389b6ccf94c259774b82a99bc7296278b65c0.
 W2 APPROVED em 0202c7424db04a1d83fb5e35fce055ea81f5b8fa.
-W3 IMPLEMENTED / AWAITING_HUMAN_REVIEW; authorized_wave=3; current_checkpoint=WAVE_3.
+W3 REQUEST_CHANGES / AUTHORIZED; authorized_wave=3; current_checkpoint=WAVE_3.
 W4/W5 NOT_STARTED / NOT_AUTHORIZED. Mesma branch feat/cp5-dataflow-engine e PR #12
 OPEN/DRAFT, sem auto-merge. A próxima Wave exige review humano explícito deste HEAD.
 
@@ -25,4 +25,8 @@ ou writer/CLI de dataflow implementado. Escopo encerrado para review humano W3.
 
 ## Restante
 
-Review humano explícito de W3 no HEAD final. Não iniciar W4.
+Corrigir W3-F1 (support/origin/premises) e W3-F2 (source gaps por Entry/Cell),
+validar e atualizar o mesmo PR draft. Não iniciar W4.
+
+Review focal recebido no HEAD 8cb55b86c83644e4727cc532787a518775d7e868;
+[evidência](../../evidence/WORK-CFG-028/wave-3/review-f1-f2/review.json).

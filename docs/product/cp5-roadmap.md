@@ -20,7 +20,7 @@ Waves. Métricas são observações, nunca thresholds de admissão ou precisão.
 | Core size-unbounded harness remediation | APPROVED at 4aeb4c0 | review humano registrado antes W1 |
 | W1 — index/session | APPROVED at b84389b6 | review humano registrado antes de W2 |
 | W2 — generic incremental solver | APPROVED at 0202c742 | review humano registrado antes de W3 |
-| W3 — PossibleValues/state/query | IMPLEMENTED / AWAITING HUMAN REVIEW | evidência W3; aguarda review humano explícito |
+| W3 — PossibleValues/state/query | REQUEST CHANGES | remediação focal W3-F1/W3-F2 autorizada |
 | W4 — shared planner/consumers | NOT STARTED / NOT AUTHORIZED | W3 + autorização explícita W4 |
 | W5 — production/E2E | NOT STARTED / NOT AUTHORIZED | W4 + autorização explícita W5 |
 | CP6 — CALL dependency slice | futuro, fora CP5 | review final CP5 e tarefa própria |

@@ -68,3 +68,15 @@ Heap amplification (BACKLOG-LOWER-018) é dívida de eficiência distinta do cap
 W1 só pode medir a fronteira index/session sobre build íntegro disponível; grandes
 inputs barrados antes dessa fronteira precisam ser registrados como dívida externa.
 Não desabilitar guards ou inventar premissas para fabricar PASS.
+
+
+## Review W3 de 8cb55b86
+
+- W3-PERF-01 (não bloqueante): growing candidate-set union may exhibit quadratic
+  cumulative work; representation remains replaceable and must be profiled before
+  broad production qualification. Sem trocar representação/cap nesta remediação.
+- W3-METRICS-01 (não bloqueante): substituir classificação de Refusal por texto
+  por RefusalReason tipado; fora dos blockers F1/F2.
+- W4-BINDING-01 (não autorizado): planner/AnalysisKey deve vincular result, direction
+  e transfer da mesma análise. Execution.observe W3 já fornece o binding correto;
+  não modificar replay nesta remediação.

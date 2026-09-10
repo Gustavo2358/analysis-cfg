@@ -76,3 +76,13 @@ registrada antes de produção. Implementar analysis-values scalar-text-direct@1
 Cell/disjunção, domínio sparse sem cap, strong Assign e queries batch por direção.
 Preservar fontes W1/W2 e pins; oracles reais/concretos, escala, retenção, mutantes,
 gates locais e CI do último HEAD. W4/W5 NOT_STARTED / NOT_AUTHORIZED.
+
+
+## Remediação W3-F1/W3-F2
+
+Review do HEAD 8cb55b86c83644e4727cc532787a518775d7e868 solicita somente support de
+candidato com AIR producer/origin/premises e abertura da fonte por EntryState e
+alias relevante da mesma Cell. Preservar W1/W2, AVL, solver e replay. Testes RED
+compiláveis antes da correção; provar strong kill, join de suportes, seeds/premissas,
+Entry gaps e aliases. Repetir gates/escala/retention e mutations focais, CI do HEAD
+final no mesmo PR draft. W4/W5 não autorizadas.
