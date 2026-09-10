@@ -34,6 +34,7 @@ def validate(root):
         phase=read('docs/evals/cp5/phase-review.json');require(phase['kind']=='IMPLEMENTED_W5_PHASE_CONTRACT','current phase review')
         partial=root/phase['executed_partial_snapshot'];require(hashlib.sha256(partial.read_bytes()).hexdigest()==phase['partial_snapshot_sha256'],'partial snapshot hash');read_result(partial)
         require(contract['completion']['observation_not_started_reasons']==['DEPENDENCY_UNAVAILABLE'],'explicit unavailable batch reason')
+        require(read('docs/evals/cp5/architecture.json')['compatibility_composition_inventory']=='docs/evals/resource-limit-w5-inventory.json','focal compatibility bytecode inventory')
         require(read('docs/evals/cp5/architecture.json')['composition_inventory']=='docs/evals/cp5/w5-inventory.json','W5 bytecode inventory')
         require(read('docs/evals/cp5/metrics.json')['wave_5']['hook']=='scripts/project/check_w5.py','W5 metrics hook')
     except Exception as e:errors.append('W5 contract: '+str(e))

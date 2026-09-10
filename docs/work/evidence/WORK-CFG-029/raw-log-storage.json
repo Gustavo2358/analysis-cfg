@@ -1,0 +1,22 @@
+{
+  "baseline-red-network.log": {
+    "storage": "baseline-red-network.log.gz",
+    "uncompressedSha256": "02fc0c5ce84fe73d20a90cd8f547dc18e932a52acb8c437d87046f488ed731ba"
+  },
+  "baseline-red.log": {
+    "storage": "baseline-red.log.gz",
+    "uncompressedSha256": "dcf06360598e5b1758f78ce749e22af7a9cad1eeefa4da33e66e2cc90c43385b"
+  },
+  "oracle-red.log": {
+    "storage": "oracle-red.log.gz",
+    "uncompressedSha256": "0433524d59c3efbb6de36679f21545bf8546138f639930569a24b8d9555c7282"
+  },
+  "upstream-build-network.log": {
+    "storage": "upstream-build-network.log.gz",
+    "uncompressedSha256": "a7e719c6039578212f6582343c11ce85353e04e79034b8393ccf1d2fd0c13a44"
+  },
+  "upstream-build.log": {
+    "storage": "upstream-build.log.gz",
+    "uncompressedSha256": "0bc1e49ed17d0a85e6a8627776af24da7b5de71aa1a36c272cdbd8b7b826ed1e"
+  }
+}

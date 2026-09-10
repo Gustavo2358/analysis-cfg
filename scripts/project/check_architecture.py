@@ -166,7 +166,7 @@ EXPECTED_CLASSFILES = {
 EXPECTED_CLASSFILES.update((DOMAIN_CLASS + name).replace(".", "/") + ".class" for name in CFG_CLASS_NAMES)
 EXPECTED_TEST_CASES = {
     "io.github.gustavo2358.analysis.cfg.application.BuildCfgContractTest": 4,
-    "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinatorTest": 6,
+    "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinatorTest": 12,
     "io.github.gustavo2358.analysis.cfg.application.CfgPreflightTest": 4,
     "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistryTest": 4,
     DOMAIN_CLASS + "EvalCfg025Test": 17,
@@ -492,8 +492,10 @@ def verify_snapshot_pin(root: Path) -> str:
         raise GateFailure("CI must not resolve air-java from a mutable branch")
     if f'test "$(git rev-parse HEAD)" = "{sha}"' not in workflow:
         raise GateFailure("CI must verify air-java HEAD before installation")
-    if workflow.count("MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2") != 10:
+    if workflow.count("MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2") != 11:
         raise GateFailure("CI must share one isolated Maven repository across upstream and consumer")
+    if 'scripts/harness/check-full.sh' not in workflow or 'scripts/project/record_air_dependency.py' not in workflow:
+        raise GateFailure("CI must run full regression and record exact upstream tree/JAR provenance")
     for wave in (1, 2, 3, 4, 5):
         if f"scripts/project/check_cp5_gate.py performance --wave {wave}" not in workflow:
             raise GateFailure(f"CI must execute CP5 Wave {wave} product probes")

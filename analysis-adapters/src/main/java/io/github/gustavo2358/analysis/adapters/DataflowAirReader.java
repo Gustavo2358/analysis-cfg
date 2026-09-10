@@ -7,11 +7,14 @@ import java.nio.file.*;
 
 /** Shared pinned codec; no second local pre-read size admission policy. */
 public final class DataflowAirReader {
+    private final AirJson codec;
+    public DataflowAirReader() { this(new AirJson()); }
+    /** Optional operational codec configuration remains outside semantic analysis. */
+    public DataflowAirReader(AirJson codec) { this.codec=java.util.Objects.requireNonNull(codec); }
     public record Read(Publication publication,long airReads,long airBytesObserved) { }
     public Read read(Path path) throws IOException {
         byte[] bytes;
         try(var input=Files.newInputStream(path)) {bytes=input.readAllBytes();}
-        // The pinned codec still owns its external capacity debt. Validation remains enabled.
-        return new Read(new AirJson().decode(bytes),1,bytes.length);
+        return new Read(codec.decode(bytes),1,bytes.length);
     }
 }

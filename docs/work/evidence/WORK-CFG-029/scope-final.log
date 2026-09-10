@@ -1,0 +1,4 @@
+[4D] PASS: local scalar/GOBACK equal actual upstream merge blobs
+[4D] PASS: approved merge, CI/lock, scalar SHA-256/Git blob/size/provenance and GOBACK hash
+[scope/manifest] PASS: exact CP5 base; focal production; W1–W4/wire/writer/history preserved; only air-java repinned
+git diff --check: exit 0

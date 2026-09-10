@@ -54,6 +54,8 @@ public record CfgBuildResult(
         UNSUPPORTED_CAPABILITY,
         UNSUPPORTED_INPUT,
         VALIDATION_LIMIT,
+        /** Operational preflight exhaustion; no graph or semantic partial product exists. */
+        RESOURCE_LIMIT,
         INCOMPLETE_VALIDATION
     }
 }

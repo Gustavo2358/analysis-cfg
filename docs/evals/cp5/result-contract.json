@@ -194,5 +194,6 @@
     "resultId": "caller-supplied nonblank stable identifier",
     "buffering": "incremental UTF-8 BufferedWriter, no whole-output byte array requirement",
     "delivery": "external only; temp in destination directory, atomic replace, no fallback, complete after successful close and move"
-  }
+  },
+  "preflight_failure": "RESOURCE_LIMIT -> EXTERNAL_RESOURCE_LIMIT; no prepared/semantic result or delivery receipt; outside wire 1.1.0"
 }

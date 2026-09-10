@@ -28,6 +28,7 @@ ROLES = {
                           'partial_policy':'EXPLICIT_PARTIAL_BY_DEPENDENCY',
                           'resource_partial_results':False},
     'composition': {'input_output_size_policy':None, 'upstream_caps':'EXTERNAL_SIZE_CAP_DEBT',
+                    'operational_preflight_failure':'EXTERNAL_RESOURCE_LIMIT_NO_SEMANTIC_RESULT',
                     'delivery_statuses':['COMPLETE','FAILED']},
     'execution_boundary': {'infrastructure_knobs_in_core':[],
                            'resource_failure_semantic_mappings':{},

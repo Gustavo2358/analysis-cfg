@@ -115,12 +115,16 @@ class TransportTest {
         assertThrows(CfgJsonException.class, () -> new CfgJsonWriter().write(result, output));
         assertFalse(Files.exists(output));
     }
-    @Test void incompleteValidationPreservesTypedCodecIssues() throws Exception {
+    @Test void resourceLimitPreservesTypedCodecIssues() throws Exception {
         var options = new ValidationOptions(128, 1, 100);
         var limits = AirJson.Limits.defaults();
         var direct = assertThrows(AirJsonException.class, () -> new AirJson(limits, options).decode(Files.readAllBytes(fixture())));
         var actual = assertThrows(AirJsonException.class, () -> new AirJsonFileReader(limits, options).read(fixture()));
-        assertEquals(AirJsonException.Code.INCOMPLETE_VALIDATION, actual.code());
+        assertEquals(AirJsonException.Code.RESOURCE_LIMIT, actual.code());
+        var validation=actual.validationResult().orElseThrow();
+        assertEquals(io.github.gustavo2358.air.validation.ValidationResult.Status.INCOMPLETE_VALIDATION,validation.status());
+        assertTrue(validation.hasIssues(io.github.gustavo2358.air.validation.ValidationIssue.Kind.RESOURCE_LIMIT));
+        assertFalse(validation.diagnostics().traversalCompleted());
         assertEquals(direct.path(), actual.path());
         assertEquals(direct.issues(), actual.issues());
         assertFalse(actual.issues().isEmpty());

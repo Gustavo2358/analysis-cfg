@@ -1,0 +1,33 @@
+{
+  "schema": "resource-limit-mutations",
+  "source_head": "4229ec1cfd9c1d9f9e851f3cabe6993b4d4ed9b8",
+  "original_sha256": {
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/CfgBuildResult.java": "905678b7092067fa40255b144c6fd896dc1790b33b5d9e74fe1784e4d47e828b",
+    "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/AnalysisDataflow.java": "68c60fa05024e27544fc45e60a5e5cedf7974494ba2bff15d34bb0852972aa1a",
+    "analysis-launcher/src/main/java/io/github/gustavo2358/analysis/launcher/AnalysisDataflow.java": "ab9f2b7297da4763570eb169094ad7c4abcec247544e007ff5ff15c4ad335e6a",
+    "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/DataflowAirReader.java": "51188302ee4a257cbe8d17f231fcbff1d584dbde2cf02321da1761f05736209b",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/CfgBuildCoordinator.java": "19b2e44fe365e3cfbfbd5637196e4d3456d5ca1b30b9d79e2c3c042be10d4d1f"
+  },
+  "attempts": [
+    {
+      "name": "generic-fallthrough",
+      "target": "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/CfgBuildCoordinator.java",
+      "expectedDiagnostic": "expected: <RESOURCE_LIMIT>",
+      "baseline": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=CfgBuildCoordinatorTest,EvalCfg030Test,CompositionTest,DataflowCliTest,BuildCfgContractTest,StructureTest,ValuesTest"
+        ],
+        "exitCode": 1,
+        "log": "generic-fallthrough/baseline-green.log.gz",
+        "sha256": "c9ca0d611f73dfaaf8e345f83a0be73bb6e523f4c6b562d4263b209f013339c6"
+      }
+    }
+  ]
+}

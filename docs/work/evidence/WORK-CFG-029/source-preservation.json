@@ -1,0 +1,321 @@
+{
+  "base": "4229ec1cfd9c1d9f9e851f3cabe6993b4d4ed9b8",
+  "changed_production": [
+    "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/DataflowAirReader.java",
+    "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/AnalysisDataflow.java",
+    "analysis-launcher/src/main/java/io/github/gustavo2358/analysis/launcher/AnalysisDataflow.java",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/CfgBuildCoordinator.java",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/CfgBuildResult.java"
+  ],
+  "preserved": {
+    "W1": [
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/AnalysisSession.java",
+        "sha256": "58ccd1a8cc05462e2a548566230cb621c6c700fe774a4775e2cef743e6e5660e"
+      },
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/ContextView.java",
+        "sha256": "0f55daf17d118733392d1be234e0ed4b7977eb6cdb2f82760b9c156a06d4d221"
+      },
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexBuilder.java",
+        "sha256": "f39fa1377643ee5fd6622b5a24577de73bfabcb5292321c1db268a5c0b710fe0"
+      },
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexMetrics.java",
+        "sha256": "c619b33867fbdf188bb59ed0474a187cc38ff039b02d1c7e309e16d60ccf868b"
+      },
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/LongIntDirectory.java",
+        "sha256": "678f92ae33059200d3e43d56aba6fa73a31b6ce744fd33e9ce01c03712d27dff"
+      },
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/ProgramIndex.java",
+        "sha256": "a25767e16ba9d9cc253afc3ead52fd35ad9b4a10c19e337b81fe43223a976c90"
+      }
+    ],
+    "W2": [
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/AnalysisDefinition.java",
+        "sha256": "91f555a4c1d75a4c1e3d46274a0be5cff45a4f9a28bc57405a44b2f8e04ebba9"
+      },
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/AnalysisPoint.java",
+        "sha256": "f243349d12e22f58b1caeb312add7cb928ad61b0b4c0c2493d2cb4406093ce6a"
+      },
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowResult.java",
+        "sha256": "49b60189ab646f721a2862764c55ef9663b928430c0e8622d5ca22a3d3041a12"
+      },
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+        "sha256": "a049e86af35e386b205db620fc1fd44fb8374533fb9a8a7082749f1e3760595b"
+      },
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/Direction.java",
+        "sha256": "33793941816afe033cc668835691f93913d79da58b13189b99283529e4f428fc"
+      },
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DomainWork.java",
+        "sha256": "8cd5cd1e49b6c87fca8d939589c6abbe877887541f3d07c5264fee55eb09d7c4"
+      },
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/IntWorklist.java",
+        "sha256": "45c01beaab9aa86c4e7fd8a25b56b7967c39f401d29d722c9b1a8b6c136a9a8b"
+      },
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/SolverMetrics.java",
+        "sha256": "3700550bbc5667a036d33a6ee56f21d119a82af2f92fc10759a5cee1f89b0f3e"
+      },
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/SolverTopology.java",
+        "sha256": "9de73f073009dfc7189f567af0b23fd566542b59f828716532f50f8c0e846372"
+      }
+    ],
+    "W3": [
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/query/BatchReplayer.java",
+        "sha256": "af4b4aa094de65288938ac7bb2852a0be8da2532352475b20981b28fd16371f3"
+      },
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/query/ObservationBatch.java",
+        "sha256": "143c5a3ff66420ee625944bca1d114913192736de819001bdc37d8036d33ae4d"
+      },
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/query/PointQuery.java",
+        "sha256": "4a920026fcb29cb55cabac41d2a7e5f44b6565e1b74a136f903c1a0e1a9b72ba"
+      },
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/query/ProgramPoint.java",
+        "sha256": "73c071be97b509764bcb2be1297ed0501baf0448ac8318232918e73bb79116eb"
+      },
+      {
+        "path": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/Candidates.java",
+        "sha256": "7289ec5d54e2bd4b755531777289c6abef50055cfb03b97b5fe06ebb2116acc4"
+      },
+      {
+        "path": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PersistentBindings.java",
+        "sha256": "8d914a1a12cc0633385fb2f8198a5c57239460c1363112daeb3d7fe532d1238d"
+      },
+      {
+        "path": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesAnalysis.java",
+        "sha256": "e71ad5ac167100401947ee113ef30b8c99557ee55e98ea6cc42581e98e791aa6"
+      },
+      {
+        "path": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesState.java",
+        "sha256": "e793ee8df8ec0f6cbf8414ed1f49f94f37fc294fecb624cc29684b6451731b31"
+      },
+      {
+        "path": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/SupportSet.java",
+        "sha256": "ac5da05f587360894b665863628353261cc0189a799d0c26bab0f64c4fa62146"
+      },
+      {
+        "path": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/TextProfile.java",
+        "sha256": "676e65ce19ff8f7ae3aad7d97a67484212598462d99899ff9713d0b082dc619f"
+      },
+      {
+        "path": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/ValueFact.java",
+        "sha256": "c474f680dc4cf7ab904e990bf37f6555e7b67429826ca521754388db3043deef"
+      },
+      {
+        "path": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/ValueUniverse.java",
+        "sha256": "33f1c8b19440535172b0f8125632f654c10b5b5efd10181675e566296249cb9e"
+      },
+      {
+        "path": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/ValuesWork.java",
+        "sha256": "469ebd57747bdfdc75662b0d5b7cfcca7100b6289ac00c79db20aa459b56b40a"
+      }
+    ],
+    "W4": [
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/AnalysisProvider.java",
+        "sha256": "c597be24ead79a6b93c7dc25b3b81461682efefdf7c6cc4a925285fba03e17ff"
+      },
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/AnalysisRegistry.java",
+        "sha256": "e74ccf147d5931022336eaea37dec7b43098bf65974618b8a13d9e7918dde2a5"
+      },
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/ConsumerRegistration.java",
+        "sha256": "06b3c32b700418631d2990d0a95bda29fb12b0a4b46dc76e660d6a63b6c06bd3"
+      },
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/Counts.java",
+        "sha256": "2705dc356f2b2131170f1d036d633f1728b9608bb2d388a2bf7f71e39a2a4f76"
+      },
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/ExecutionPlan.java",
+        "sha256": "8fe043966ec165b97ad8d425f456cba160d1337fecacbcc89af9a2267a52059d"
+      },
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/PlanningExecution.java",
+        "sha256": "b52d53a3258748ec560c0ca1a72fa85ea0465eca03eeffd75ba2bf677b1ed173"
+      },
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/PreparedAnalysisResult.java",
+        "sha256": "9df149857a49756eb14e9c41260817caefc5594f9484034ddc19ba10a0187683"
+      },
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/SitePlanner.java",
+        "sha256": "d0b5d1e2fb71e50a0161a16bc6fca4eb419e0adfe388411f1776b75904f547a5"
+      },
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/consumers/FactConsumer.java",
+        "sha256": "7f6fc72797718ecb0781b3b3d801aebdbf6cbb491d366a814b979b822d2b233e"
+      },
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/consumers/FactSink.java",
+        "sha256": "1bd331ba3701825269a94220fb226649f57847954edc3bf2c110d7ddf0727eb1"
+      },
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/consumers/PreparedFacts.java",
+        "sha256": "e7197f254477ac35acaff63d6df879552a5b1dd4029298bc1d213d4ca204b53c"
+      },
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/consumers/SiteView.java",
+        "sha256": "70e4b474560411e641acd5fe515a39683daa51c75dba569094da26630b579ade"
+      },
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/plan/AnalysisKey.java",
+        "sha256": "31148fcb4a9dd8b84d67ce541377460621c7ac0606bca4064a0daf801f0ed68d"
+      },
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/plan/AnalysisOutcome.java",
+        "sha256": "41bd61d2471951fb2a968077b1089921844fba6b4851ac2858b511d6f1d362ca"
+      },
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/plan/ConsumerPlan.java",
+        "sha256": "274648ce4a908981e87f62cde27effa722988b557d35a561710703aadd60f715"
+      },
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/plan/ObservationBatchId.java",
+        "sha256": "334a11a673e5b199755358bbea66280ce420b62616894a6c9ed2b33b62d1177a"
+      },
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/plan/ObservationRequest.java",
+        "sha256": "62a2f213dfaba59417f76870bdb97359b380cf0a5636e42f4268ab4b68b68645"
+      },
+      {
+        "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/plan/SiteInterest.java",
+        "sha256": "2150a14b1592729058e5702b3a836b9a7d6d247f5172014905d081e3fe8eb3f6"
+      },
+      {
+        "path": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesProvider.java",
+        "sha256": "21d804a84dcc95cbc63c8acdcf7518db104bcdb39404519ad97b1ddae628746f"
+      }
+    ],
+    "W5_wire_writer_plan": [
+      {
+        "path": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/DeliveryReceipt.java",
+        "sha256": "e5e41db33dc1cbe7ee6b1020a29572db9093fc22a042f5eee2b866f32fa06a54"
+      },
+      {
+        "path": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/JsonOutput.java",
+        "sha256": "a5f7765b05874467496744b883cc96b9e85923a8183e3f0b99583da01bdf152c"
+      },
+      {
+        "path": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/LocalResultWriter.java",
+        "sha256": "e1b40c25678555a1afbfc158f9b28be7a916c5e805d30ad992ab27cc4a2c64db"
+      },
+      {
+        "path": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/ReceiptJson.java",
+        "sha256": "65f6e62862ca7a180634ae80cc439655e2942cf6f5f0e5c004341fe42b0174cd"
+      },
+      {
+        "path": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/ResultJson.java",
+        "sha256": "0dd4d942874f71e7b69de6efcdbf24423d56faa80b39ce6f74075f52e59521c1"
+      },
+      {
+        "path": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/WireIds.java",
+        "sha256": "d695ec0e0a3169e6d22a0c28ddd281e48509d8b9693eea4b6dd947bb75c43d74"
+      },
+      {
+        "path": "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/DefaultValuePlan.java",
+        "sha256": "7c9e543f2c01ed0816bc7c15a23e657bc12a803512313a69284d52b70a5b1531"
+      },
+      {
+        "path": "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/ObservedValueFact.java",
+        "sha256": "825d656cb88a0f2d1de71693be3acf8825fd0b3dbe2e4ccdaffbbd751d7e1c75"
+      },
+      {
+        "path": "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/PreparedDataflowResult.java",
+        "sha256": "b28e6c32356e45591e96eeffaaa7e34f118507ac53a0d457dfe31f80a6909a0d"
+      }
+    ],
+    "legacy_other": [
+      {
+        "path": "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirInputLimitException.java",
+        "sha256": "c0c2798b172fd98892f72d338de9583d5e44f1285d5d5e75fa05a6b06938e377"
+      },
+      {
+        "path": "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirJsonFileReader.java",
+        "sha256": "0d9f54d26a728aad17163be2cf28e7ce458fe775554a37f0d7ba7d27dd73c393"
+      },
+      {
+        "path": "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonBytes.java",
+        "sha256": "579254467d367c6a067845c16f2a1c1b82558fcc707830bf7adc16e49997f7c6"
+      },
+      {
+        "path": "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonException.java",
+        "sha256": "f0be54101b6d29f3e17a7f6972e20621c7e81c837cb16f77ab387d032a85bfdf"
+      },
+      {
+        "path": "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter.java",
+        "sha256": "ce11d494154f40302d17f266f86ce2dde604ddd9739cc291fb81949663e6db3a"
+      },
+      {
+        "path": "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/BuildCfg.java",
+        "sha256": "81e332367e61d46df7d982a6b29958efba10bfdba5047a908bce5699c9debebe"
+      },
+      {
+        "path": "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/BuildOptions.java",
+        "sha256": "5fc1925688f9527592eee73b3e92de258206ec81d67198a7b65e554d0d174417"
+      },
+      {
+        "path": "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/CfgPreflight.java",
+        "sha256": "cb73a48c8d7b916bee2aee8f6faf9727a0d4ac2db33bc231d4977ce2707a1a0f"
+      },
+      {
+        "path": "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CfgGraph.java",
+        "sha256": "b8dae01e337667599de45267e2beda83f1344d9a1a73069551b89ce02b2c3cc4"
+      },
+      {
+        "path": "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CfgNode.java",
+        "sha256": "4a446d5b8c3676c3d2cdd108b88ed28b9df8624dc4624aaea7c95a3a459990e0"
+      },
+      {
+        "path": "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CfgNodeId.java",
+        "sha256": "3b1cde879b3889fde09906cc30a77c670d7c5005675e5dfbf55ca6a9c20c4f19"
+      },
+      {
+        "path": "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CfgProjectionIssue.java",
+        "sha256": "50398a984a9b03f97920e82bb22edfe45a4d37fc981247a17e9bced2dfc703f6"
+      },
+      {
+        "path": "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CfgTransition.java",
+        "sha256": "9d0ed378926e0c057e84e588e3fd092a2365e566326bd413e9e1394fe6d89897"
+      },
+      {
+        "path": "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CoreCfgProjection.java",
+        "sha256": "f9233544a2d2a71caef274edd7bb3f7c41018910c2d829b7d55c9914acfe34bb"
+      },
+      {
+        "path": "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/ProjectionPolicy.java",
+        "sha256": "69aec6c05ffd5d50f6fbf862f1b9b54f30543ec5ef983c276800cbf496354cbd"
+      },
+      {
+        "path": "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/extension/SemanticInterpreter.java",
+        "sha256": "c48dcc088dda6a976900cf1e712519ae42b0276647b8cd30cc272b43f2817c0a"
+      },
+      {
+        "path": "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/extension/SemanticInterpreterRegistry.java",
+        "sha256": "cfe3623e2b835f1670035895a41d19317001853736623815fcd330ee8beb6b62"
+      },
+      {
+        "path": "cfg-launcher/src/main/java/io/github/gustavo2358/analysis/cfg/launcher/AnalysisCfg.java",
+        "sha256": "210bd8bac22014f2a72f3f1ef9cfcadf7235eb74539a5a885c8ddea2c6dada1d"
+      }
+    ]
+  },
+  "preserved_count": 74
+}

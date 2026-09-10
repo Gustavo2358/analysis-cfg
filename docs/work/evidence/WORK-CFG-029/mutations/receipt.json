@@ -1,0 +1,639 @@
+{
+  "schema": "resource-limit-mutations",
+  "source_head": "4229ec1cfd9c1d9f9e851f3cabe6993b4d4ed9b8",
+  "original_sha256": {
+    "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/DataflowAirReader.java": "51188302ee4a257cbe8d17f231fcbff1d584dbde2cf02321da1761f05736209b",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/CfgBuildResult.java": "905678b7092067fa40255b144c6fd896dc1790b33b5d9e74fe1784e4d47e828b",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/CfgBuildCoordinator.java": "19b2e44fe365e3cfbfbd5637196e4d3456d5ca1b30b9d79e2c3c042be10d4d1f",
+    "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/AnalysisDataflow.java": "68c60fa05024e27544fc45e60a5e5cedf7974494ba2bff15d34bb0852972aa1a",
+    "analysis-launcher/src/main/java/io/github/gustavo2358/analysis/launcher/AnalysisDataflow.java": "ab9f2b7297da4763570eb169094ad7c4abcec247544e007ff5ff15c4ad335e6a"
+  },
+  "attempts": [
+    {
+      "name": "generic-fallthrough",
+      "target": "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/CfgBuildCoordinator.java",
+      "expectedDiagnostic": "expected: <RESOURCE_LIMIT>",
+      "baseline": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=CfgBuildCoordinatorTest,EvalCfg030Test,CompositionTest,DataflowCliTest,BuildCfgContractTest,StructureTest,ValuesTest,WireTest"
+        ],
+        "exitCode": 0,
+        "log": "generic-fallthrough/baseline-green.log.gz",
+        "sha256": "70102d192972f0d30ce043f333aca0c972583eb1f279d4d2b0560be31572bd86"
+      },
+      "mutant_sha256": "30b18828e0340337faca6ff830111f7d970f01202512b571f7df9e069ded4eaf",
+      "compile": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "clean",
+          "package",
+          "-DskipTests"
+        ],
+        "exitCode": 0,
+        "log": "generic-fallthrough/compile.log.gz",
+        "sha256": "c5d3194676adfdd056088b52a8dab12969a51c9d0a98da46c794fa5efe375cce"
+      },
+      "valid": true,
+      "red": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=CfgBuildCoordinatorTest,EvalCfg030Test,CompositionTest,DataflowCliTest,BuildCfgContractTest,StructureTest,ValuesTest,WireTest"
+        ],
+        "exitCode": 1,
+        "log": "generic-fallthrough/nominal-red.log.gz",
+        "sha256": "f80ffaa5a36fd81e662407ae3e4c5fb14105caa1a933fdee3639b8aff43617df"
+      },
+      "killed": true,
+      "restore_byte_exact": true,
+      "second_green": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=CfgBuildCoordinatorTest,EvalCfg030Test,CompositionTest,DataflowCliTest,BuildCfgContractTest,StructureTest,ValuesTest,WireTest"
+        ],
+        "exitCode": 0,
+        "log": "generic-fallthrough/second-green.log.gz",
+        "sha256": "282b7e5f110d7752dce5663b1a720b362adb27224b67349824dbcc6b0876c172"
+      }
+    },
+    {
+      "name": "unsupported",
+      "target": "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/CfgBuildCoordinator.java",
+      "expectedDiagnostic": "expected: <RESOURCE_LIMIT>",
+      "baseline": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=CfgBuildCoordinatorTest,EvalCfg030Test,CompositionTest,DataflowCliTest,BuildCfgContractTest,StructureTest,ValuesTest,WireTest"
+        ],
+        "exitCode": 0,
+        "log": "unsupported/baseline-green.log.gz",
+        "sha256": "9be1cc4b5ea89ef0d20bb07bb56b286a31c27191a039e38bdc1eb537d8606fd6"
+      },
+      "mutant_sha256": "f939c9535b220baba27e36e897bf1d15dc9cab7161dec82738480218847048a5",
+      "compile": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "clean",
+          "package",
+          "-DskipTests"
+        ],
+        "exitCode": 0,
+        "log": "unsupported/compile.log.gz",
+        "sha256": "79b16db3159da8a17ce3ff23de3268078bec762672016cbc0c21122e549698b8"
+      },
+      "valid": true,
+      "red": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=CfgBuildCoordinatorTest,EvalCfg030Test,CompositionTest,DataflowCliTest,BuildCfgContractTest,StructureTest,ValuesTest,WireTest"
+        ],
+        "exitCode": 1,
+        "log": "unsupported/nominal-red.log.gz",
+        "sha256": "0e754e76bd5cfd999ee951c1764e8a75baf6c3f5888e5cf8a4d70880f1c7e899"
+      },
+      "killed": true,
+      "restore_byte_exact": true,
+      "second_green": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=CfgBuildCoordinatorTest,EvalCfg030Test,CompositionTest,DataflowCliTest,BuildCfgContractTest,StructureTest,ValuesTest,WireTest"
+        ],
+        "exitCode": 0,
+        "log": "unsupported/second-green.log.gz",
+        "sha256": "caedaf75d08473e94a2b3f28db78cef01877b23307bb0a45c4abf4d599c4a499"
+      }
+    },
+    {
+      "name": "invalid",
+      "target": "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/CfgBuildCoordinator.java",
+      "expectedDiagnostic": "expected: <RESOURCE_LIMIT>",
+      "baseline": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=CfgBuildCoordinatorTest,EvalCfg030Test,CompositionTest,DataflowCliTest,BuildCfgContractTest,StructureTest,ValuesTest,WireTest"
+        ],
+        "exitCode": 0,
+        "log": "invalid/baseline-green.log.gz",
+        "sha256": "16779aea67b9b4529fa4178529c5654716c3cd44092a7e82586518cad10cbfb3"
+      },
+      "mutant_sha256": "6fda8ef4b8358674cdbe264a7edd7877cf195248cd40bf5c040b9796ddd1ce97",
+      "compile": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "clean",
+          "package",
+          "-DskipTests"
+        ],
+        "exitCode": 0,
+        "log": "invalid/compile.log.gz",
+        "sha256": "f0e0559a82a8425faf8d431b8a79a6fbd899cf88c658f55787d5ba22ff9974f6"
+      },
+      "valid": true,
+      "red": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=CfgBuildCoordinatorTest,EvalCfg030Test,CompositionTest,DataflowCliTest,BuildCfgContractTest,StructureTest,ValuesTest,WireTest"
+        ],
+        "exitCode": 1,
+        "log": "invalid/nominal-red.log.gz",
+        "sha256": "3730b43e59fba5010e50ed6e4bb7d6aacd8a53e20b10e36ec3128040934bf6e1"
+      },
+      "killed": true,
+      "restore_byte_exact": true,
+      "second_green": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=CfgBuildCoordinatorTest,EvalCfg030Test,CompositionTest,DataflowCliTest,BuildCfgContractTest,StructureTest,ValuesTest,WireTest"
+        ],
+        "exitCode": 0,
+        "log": "invalid/second-green.log.gz",
+        "sha256": "484d4f789c5a5d49d61471fd506d3135e73ea9cf15376b8305a882ac85d5d97b"
+      }
+    },
+    {
+      "name": "collapse-validation-limit",
+      "target": "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/CfgBuildCoordinator.java",
+      "expectedDiagnostic": "expected: <RESOURCE_LIMIT>",
+      "baseline": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=CfgBuildCoordinatorTest,EvalCfg030Test,CompositionTest,DataflowCliTest,BuildCfgContractTest,StructureTest,ValuesTest,WireTest"
+        ],
+        "exitCode": 0,
+        "log": "collapse-validation-limit/baseline-green.log.gz",
+        "sha256": "d84f79e8c69a1507149f80ca3b34c8bcff13e2493c1f2431238bbf1986ba9337"
+      },
+      "mutant_sha256": "b9456c9771e6834b40ba86c4ccdaf549841b7560ce457a1ff41060e9f830f626",
+      "compile": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "clean",
+          "package",
+          "-DskipTests"
+        ],
+        "exitCode": 0,
+        "log": "collapse-validation-limit/compile.log.gz",
+        "sha256": "60f39c30712a0688566997f529ffb0d6d1f3b50e1e6dcbc783ea78267b2b7127"
+      },
+      "valid": true,
+      "red": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=CfgBuildCoordinatorTest,EvalCfg030Test,CompositionTest,DataflowCliTest,BuildCfgContractTest,StructureTest,ValuesTest,WireTest"
+        ],
+        "exitCode": 1,
+        "log": "collapse-validation-limit/nominal-red.log.gz",
+        "sha256": "fac97ed570a03a2f32c0b1ce503becb0cdafb2ec3a0ddf0fadf6ced0867fc86b"
+      },
+      "killed": true,
+      "restore_byte_exact": true,
+      "second_green": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=CfgBuildCoordinatorTest,EvalCfg030Test,CompositionTest,DataflowCliTest,BuildCfgContractTest,StructureTest,ValuesTest,WireTest"
+        ],
+        "exitCode": 0,
+        "log": "collapse-validation-limit/second-green.log.gz",
+        "sha256": "98a78b34102f27eb2eaae29212074afdcb2b7edf074c6485c46ec4210b5a5ddb"
+      }
+    },
+    {
+      "name": "allows-cfg-product",
+      "target": "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/CfgBuildCoordinator.java",
+      "expectedDiagnostic": "CFG product disagrees with preflight",
+      "baseline": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=CfgBuildCoordinatorTest,EvalCfg030Test,CompositionTest,DataflowCliTest,BuildCfgContractTest,StructureTest,ValuesTest,WireTest"
+        ],
+        "exitCode": 0,
+        "log": "allows-cfg-product/baseline-green.log.gz",
+        "sha256": "cbe5812d3c125d42ff400950437811938ea5bd6ccd718362e39016678d0921ac"
+      },
+      "mutant_sha256": "4c0803194bc936fa69640f248c7996edb3016be49aa4d49b0fef350c24af958a",
+      "compile": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "clean",
+          "package",
+          "-DskipTests"
+        ],
+        "exitCode": 0,
+        "log": "allows-cfg-product/compile.log.gz",
+        "sha256": "00652d953a127eb065227c98b4346430166fc2e5bcced00d4259943ffa845840"
+      },
+      "valid": true,
+      "red": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=CfgBuildCoordinatorTest,EvalCfg030Test,CompositionTest,DataflowCliTest,BuildCfgContractTest,StructureTest,ValuesTest,WireTest"
+        ],
+        "exitCode": 1,
+        "log": "allows-cfg-product/nominal-red.log.gz",
+        "sha256": "befdd10bf0a400ad6c8bbb9798fe5e1903097dcd1ba57ee4bde5d18db3c95337"
+      },
+      "killed": true,
+      "restore_byte_exact": true,
+      "second_green": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=CfgBuildCoordinatorTest,EvalCfg030Test,CompositionTest,DataflowCliTest,BuildCfgContractTest,StructureTest,ValuesTest,WireTest"
+        ],
+        "exitCode": 0,
+        "log": "allows-cfg-product/second-green.log.gz",
+        "sha256": "1b9e9ef14037603dd7c769bd1548627485ee058ef25a312c3166da39fd217ecd"
+      }
+    },
+    {
+      "name": "generic-incomplete-as-resource",
+      "target": "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/CfgBuildCoordinator.java",
+      "expectedDiagnostic": "expected: <INCOMPLETE_VALIDATION>",
+      "baseline": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=CfgBuildCoordinatorTest,EvalCfg030Test,CompositionTest,DataflowCliTest,BuildCfgContractTest,StructureTest,ValuesTest,WireTest"
+        ],
+        "exitCode": 0,
+        "log": "generic-incomplete-as-resource/baseline-green.log.gz",
+        "sha256": "8984d71285e4888955d442e46c5a4de5a563e06b15b1dc692d28029eef2e768d"
+      },
+      "mutant_sha256": "55faf7d3c13061e66abed7527c329b35f841c55ad2c40b8fcbe2a815748200b5",
+      "compile": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "clean",
+          "package",
+          "-DskipTests"
+        ],
+        "exitCode": 0,
+        "log": "generic-incomplete-as-resource/compile.log.gz",
+        "sha256": "2999742ca3a1937eef69a8d162af16a5e37b8a3bb88b01091773d29a2b15de82"
+      },
+      "valid": true,
+      "red": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=CfgBuildCoordinatorTest,EvalCfg030Test,CompositionTest,DataflowCliTest,BuildCfgContractTest,StructureTest,ValuesTest,WireTest"
+        ],
+        "exitCode": 1,
+        "log": "generic-incomplete-as-resource/nominal-red.log.gz",
+        "sha256": "b1c2635efd0f0926306d63aa0df5ea7582d5ecbacfd78418ab4339d0d7c1c99a"
+      },
+      "killed": true,
+      "restore_byte_exact": true,
+      "second_green": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=CfgBuildCoordinatorTest,EvalCfg030Test,CompositionTest,DataflowCliTest,BuildCfgContractTest,StructureTest,ValuesTest,WireTest"
+        ],
+        "exitCode": 0,
+        "log": "generic-incomplete-as-resource/second-green.log.gz",
+        "sha256": "a6c3287ff7226edead5e664fbcdda4aba5ccad4a62e78ede34e299fcb56d6434"
+      }
+    },
+    {
+      "name": "starts-session",
+      "target": "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/AnalysisDataflow.java",
+      "expectedDiagnostic": "resource failure starts analysis",
+      "baseline": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=CfgBuildCoordinatorTest,EvalCfg030Test,CompositionTest,DataflowCliTest,BuildCfgContractTest,StructureTest,ValuesTest,WireTest"
+        ],
+        "exitCode": 0,
+        "log": "starts-session/baseline-green.log.gz",
+        "sha256": "bcb40b9991543f39f378914f419b6d7a46f5a0193ab804d466cee61855656977"
+      },
+      "mutant_sha256": "159ca5fcac9561b3bd3a84ed9a757ab97f78bca30aa0b93f071ad19de466538c",
+      "compile": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "clean",
+          "package",
+          "-DskipTests"
+        ],
+        "exitCode": 0,
+        "log": "starts-session/compile.log.gz",
+        "sha256": "9483339a3f0e9a7a3f16d487ddf3db9dd906567dd0349b6a774512efc0a9bc7c"
+      },
+      "valid": true,
+      "red": {
+        "argv": [
+          "/usr/bin/python3",
+          "-B",
+          "scripts/project/resource_limit_scope.py"
+        ],
+        "exitCode": 1,
+        "log": "starts-session/nominal-red.log.gz",
+        "sha256": "9902eeb10d5c3e3a28c3a9a07a8e28c38c541f0d85232bffd7550768aece7866"
+      },
+      "killed": true,
+      "restore_byte_exact": true,
+      "second_green": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=CfgBuildCoordinatorTest,EvalCfg030Test,CompositionTest,DataflowCliTest,BuildCfgContractTest,StructureTest,ValuesTest,WireTest"
+        ],
+        "exitCode": 0,
+        "log": "starts-session/second-green.log.gz",
+        "sha256": "0c99219406ed9108cb47ac06667d47668997db030ddf563f8b81e163f451856d"
+      }
+    },
+    {
+      "name": "source-open-result",
+      "target": "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/AnalysisDataflow.java",
+      "expectedDiagnostic": "Expected io.github.gustavo2358.analysis.dataflow.AnalysisDataflow.PreparationException",
+      "baseline": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=CfgBuildCoordinatorTest,EvalCfg030Test,CompositionTest,DataflowCliTest,BuildCfgContractTest,StructureTest,ValuesTest,WireTest"
+        ],
+        "exitCode": 0,
+        "log": "source-open-result/baseline-green.log.gz",
+        "sha256": "ed9193833221e6a2d8f7342f837a57f5e4a64a5f01689d92d522ee2a6de7b3fe"
+      },
+      "mutant_sha256": "47b3afefce6dcf81458b7a221a01c4318d1619221c65be0cac6778b8f2915e84",
+      "compile": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "clean",
+          "package",
+          "-DskipTests"
+        ],
+        "exitCode": 0,
+        "log": "source-open-result/compile.log.gz",
+        "sha256": "bb7f4cb43f4399ffe224fb3bce95c5c3ca93ffa20112b68167a8e1a2b846061e"
+      },
+      "valid": true,
+      "red": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=CfgBuildCoordinatorTest,EvalCfg030Test,CompositionTest,DataflowCliTest,BuildCfgContractTest,StructureTest,ValuesTest,WireTest"
+        ],
+        "exitCode": 1,
+        "log": "source-open-result/nominal-red.log.gz",
+        "sha256": "80d4884f6da9f7f785cbe07a44d4721bff8b1a2c04626a1b460b11b37247ae9f"
+      },
+      "killed": true,
+      "restore_byte_exact": true,
+      "second_green": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=CfgBuildCoordinatorTest,EvalCfg030Test,CompositionTest,DataflowCliTest,BuildCfgContractTest,StructureTest,ValuesTest,WireTest"
+        ],
+        "exitCode": 0,
+        "log": "source-open-result/second-green.log.gz",
+        "sha256": "487dd3bb10df212564ec4517b20ff306d10059840281af59b93ee38f0e173404"
+      }
+    },
+    {
+      "name": "cli-unsupported",
+      "target": "analysis-launcher/src/main/java/io/github/gustavo2358/analysis/launcher/AnalysisDataflow.java",
+      "expectedDiagnostic": "operational category",
+      "baseline": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=CfgBuildCoordinatorTest,EvalCfg030Test,CompositionTest,DataflowCliTest,BuildCfgContractTest,StructureTest,ValuesTest,WireTest"
+        ],
+        "exitCode": 0,
+        "log": "cli-unsupported/baseline-green.log.gz",
+        "sha256": "8209810e776d9569d8eb122f45b9b29439c46ea0262eb680923c824ecf579d8a"
+      },
+      "mutant_sha256": "6afe140c2c3df6a34a3a0b5297995ef4952186272307fa1a0ad1d42c5ac900e4",
+      "compile": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "clean",
+          "package",
+          "-DskipTests"
+        ],
+        "exitCode": 0,
+        "log": "cli-unsupported/compile.log.gz",
+        "sha256": "cf3e260b580904c40851dffdfccf215d91dc35db76f925c87464917a34fe597f"
+      },
+      "valid": true,
+      "red": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=CfgBuildCoordinatorTest,EvalCfg030Test,CompositionTest,DataflowCliTest,BuildCfgContractTest,StructureTest,ValuesTest,WireTest"
+        ],
+        "exitCode": 1,
+        "log": "cli-unsupported/nominal-red.log.gz",
+        "sha256": "fa1be200bb3ce13e74e2312745fe5a58666667e9359596cafcc190b12e89106a"
+      },
+      "killed": true,
+      "restore_byte_exact": true,
+      "second_green": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=CfgBuildCoordinatorTest,EvalCfg030Test,CompositionTest,DataflowCliTest,BuildCfgContractTest,StructureTest,ValuesTest,WireTest"
+        ],
+        "exitCode": 0,
+        "log": "cli-unsupported/second-green.log.gz",
+        "sha256": "c652f810781a655d1c8de1f975796a741e5e5945d4c45ff899e5d828ec5d2e54"
+      }
+    }
+  ],
+  "status": "PASS"
+}

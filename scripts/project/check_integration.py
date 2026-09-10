@@ -17,14 +17,14 @@ SUITES = {
             "sequencePayloadAndObjectCellIdentitySurviveRealReaderAndBuild",
             "topologyIsExactlyEntrySequenceReturnAndPartialKnowledgeIsPreserved",
             "manualCfgGoldenRemainsTopologyOnlyAndDeterministic",
-            "defaultPhysicalAndCodecLimitsRemainSixteenMiBAndDepth128",
+            "defaultBudgetsAreRepresentationalAndExplicitPhysicalBudgetStillApplies",
             "manyAssignsRemainOneSequenceNodeWithoutCopyingPayload",
         },
         "io.github.gustavo2358.analysis.cfg.adapters.TransportTest": {
             "fileDecodePreservesExpectedAirFacts", "realBuildHasExactManualTopologyAndCorrelations",
             "writerMatchesIndependentGoldenBytesAndIsDeterministic", "readerPhysicalBoundAcceptsExactSizeAndRejectsOneExtra",
             "codecFailurePreservesCodePathAndIssues", "outputLimitPreservesExistingDestinationBeforeAnyTemp",
-            "nonBuiltResultCannotBeSerializedOrPublished", "incompleteValidationPreservesTypedCodecIssues",
+            "nonBuiltResultCannotBeSerializedOrPublished", "resourceLimitPreservesTypedCodecIssues",
             "unsupportedCapabilityRemainsACodecFailure",
         },
         "io.github.gustavo2358.analysis.cfg.adapters.WriterDomainTest": {

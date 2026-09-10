@@ -10,7 +10,7 @@ O modelo compartilhado vem de:
 
 ```text
 repository: Gustavo2358/air-java
-commit:     ce530a7e17ab12b23c48f29425f503ff920b09fb
+commit:     17029898fd0ee8fabcaaae89f7260148633d4b12
 Maven:      io.github.gustavo2358:air-java:0.1.0-SNAPSHOT
 AIR:        2.0.0 @ 122ce54e1b9ef9b00646f93ece409ca8b63bc933
 JDK:        21, sem preview

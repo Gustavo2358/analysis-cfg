@@ -221,9 +221,9 @@ class Cp5HarnessTests(unittest.TestCase):
         self.edit(LIFECYCLE,lambda x:x['waves'][0].update(completion_evidence='PASS'))
         self.guard('no Wave evidence')
 
-    def test_single_draft_pr_policy(self):
+    def test_merged_cp5_pr_cannot_be_reopened(self):
         original = (self.root/LIFECYCLE).read_bytes()
-        for change in [dict(draft=False),dict(auto_merge=True),dict(number=12,url='https://example.com',state='OPEN')]:
+        for change in [dict(draft=True),dict(auto_merge=True),dict(number=12,url='https://example.com',state='OPEN')]:
             (self.root/LIFECYCLE).write_bytes(original)
             self.edit(LIFECYCLE,lambda x:x['pr'].update(change))
             self.guard('PR')
@@ -377,7 +377,7 @@ class Cp5HarnessTests(unittest.TestCase):
 
     def test_w1_authorization_and_runtime_hooks_are_required(self):
         for path,change,reason in [
-            (LIFECYCLE,lambda x:x['waves'][4].update(status='APPROVED'),'never human-approved'),
+            (LIFECYCLE,lambda x:x['waves'][4].update(reviewed_head='0'*40),'explicit final human approval'),
             (LIFECYCLE,lambda x:x['review_history'][4].update(reviewed_head='0'*40),'W1 reviewed HEAD'),
             (PLAN+'probes.json',lambda x:x['probes'][0].pop('wave_hooks'),'W1/W2/W3/W4/W5 real probe'),
             (PLAN+'gate-plan.json',lambda x:x['waves'][0]['gates']['performance'].update(hook=None),'no empty hook')]:
@@ -412,7 +412,7 @@ class Cp5HarnessTests(unittest.TestCase):
 
     def test_w2_authorization_and_approval_cannot_be_inferred(self):
         for path,change,reason in [
-            (LIFECYCLE,lambda x:x['waves'][4].update(status='APPROVED'),'never human-approved'),
+            (LIFECYCLE,lambda x:x['waves'][4].update(reviewed_head='0'*40),'explicit final human approval'),
             (LIFECYCLE,lambda x:x['waves'][0].update(reviewed_head='0'*40),'W1 explicit human-approved HEAD'),
             (LIFECYCLE,lambda x:x['review_history'][5].update(reviewed_head='0'*40),'W2 reviewed HEAD'),
             (PLAN+'gate-plan.json',lambda x:x['waves'][1]['gates']['semantic'].update(hook=None),'no empty hook')]:
@@ -432,8 +432,8 @@ class Cp5HarnessTests(unittest.TestCase):
     def test_w3_focal_review_cannot_drop_blocker_or_approve_itself(self):
         self.edit(LIFECYCLE,lambda x:x['wave_3']['remediation']['blockers'].remove('W3-F1'))
         self.guard('W3 focal blockers')
-        self.edit(LIFECYCLE,lambda x:x['waves'][4].update(status='APPROVED'))
-        self.guard('W5 started/implemented')
+        self.edit(LIFECYCLE,lambda x:x['waves'][4].update(reviewed_head='0'*40))
+        self.guard('explicit final human approval')
 
     def test_w3_focal_scope_freezes_reviewed_replay(self):
         from check_w3 import verify_sources,Failure
@@ -452,7 +452,7 @@ class Cp5HarnessTests(unittest.TestCase):
 
     def test_w3_authorization_hooks_and_approved_w2_are_required(self):
         for path,change,reason in [
-            (LIFECYCLE,lambda x:x['waves'][4].update(status='APPROVED'),'never human-approved'),
+            (LIFECYCLE,lambda x:x['waves'][4].update(reviewed_head='0'*40),'explicit final human approval'),
             (LIFECYCLE,lambda x:x['waves'][1].update(reviewed_head='0'*40),'W2 explicit human-approved HEAD'),
             (LIFECYCLE,lambda x:x['review_history'][6].update(reviewed_head='0'*40),'W3 reviewed HEAD'),
             (PLAN+'gate-plan.json',lambda x:x['waves'][2]['gates']['semantic'].update(hook=None),'no empty hook'),
@@ -492,7 +492,7 @@ class Cp5HarnessTests(unittest.TestCase):
 
     def test_w4_authorization_and_hooks_cannot_be_inferred(self):
         for path,change,reason in [
-            (LIFECYCLE,lambda x:x['waves'][4].update(status='APPROVED'),'never human-approved'),
+            (LIFECYCLE,lambda x:x['waves'][4].update(reviewed_head='0'*40),'explicit final human approval'),
             (LIFECYCLE,lambda x:x['waves'][2].update(reviewed_head='0'*40),'W3 explicit human-approved HEAD'),
             (LIFECYCLE,lambda x:x['review_history'][8].update(reviewed_head='0'*40),'W4 reviewed HEAD'),
             (PLAN+'gate-plan.json',lambda x:x['waves'][3]['gates']['semantic'].update(hook=None),'no empty hook'),

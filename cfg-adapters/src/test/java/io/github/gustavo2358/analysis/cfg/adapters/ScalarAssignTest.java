@@ -109,16 +109,16 @@ class ScalarAssignTest {
         assertArrayEquals(expected, writer.encode(build(read())));
     }
 
-    @Test void defaultPhysicalAndCodecLimitsRemainSixteenMiBAndDepth128() throws Exception {
-        assertEquals(16 * 1024 * 1024, AirJson.Limits.defaults().maximumDocumentBytes());
-        assertEquals(128, AirJson.Limits.defaults().maximumDepth());
+    @Test void defaultBudgetsAreRepresentationalAndExplicitPhysicalBudgetStillApplies() throws Exception {
+        assertEquals(Integer.MAX_VALUE, AirJson.Limits.defaults().maximumDocumentBytes());
+        assertEquals(Integer.MAX_VALUE, AirJson.Limits.defaults().maximumDepth());
         assertEquals(14554, Files.size(fixture()));
         assertNotNull(read());
         Path excess = temporary.resolve("over-default.json");
         try (var file = new java.io.RandomAccessFile(excess.toFile(), "rw")) {
             file.setLength(16L * 1024 * 1024 + 1);
         }
-        var failure = assertThrows(AirInputLimitException.class, () -> new AirJsonFileReader().read(excess));
+        var failure = assertThrows(AirInputLimitException.class, () -> new AirJsonFileReader(new AirJson.Limits(16 * 1024 * 1024,128), io.github.gustavo2358.air.validation.ValidationOptions.defaults()).read(excess));
         assertEquals(16 * 1024 * 1024, failure.maximumDocumentBytes());
     }
 

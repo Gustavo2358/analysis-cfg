@@ -69,3 +69,14 @@ is not broad corpus qualification. The unchanged pinned AIR codec's 16 MiB ceili
 and validator limits remain **EXTERNAL SIZE-CAP DEBT**. A valid document plus padding
 beyond that boundary exits 7 without a prepared result. W3-PERF-01 (growing candidate/
 support unions may be quadratic) and W3-METRICS-01 (typed refusal) remain nonblocking.
+
+
+## Post-CP5 RESOURCE_LIMIT compatibility
+
+CP5 W1–W5 are APPROVED / MERGED at 4229ec1cfd9c1d9f9e851f3cabe6993b4d4ed9b8.
+WORK-CFG-029 is a separate POST_CP5_COMPATIBILITY_REMEDIATION. Current air-java pin
+17029898fd0ee8fabcaaae89f7260148633d4b12 separates operational RESOURCE_LIMIT from
+specific VALIDATION_LIMIT and generic INCOMPLETE_VALIDATION. Historical CP5 evidence
+above retains its original pins/defaults. The new default codec no longer has a
+16 MiB ceiling; explicit operational budgets still fail without any semantic result.
+See [the current preflight contract](../architecture/resource-limit-preflight.md).

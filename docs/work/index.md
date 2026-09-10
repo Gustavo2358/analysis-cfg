@@ -1,5 +1,10 @@
 # Trabalho
 
+## Item focal pós-CP5
+
+[WORK-CFG-029](active/WORK-CFG-029/work-item.json): CP6-BASELINE-COMPAT-001, POST_CP5_COMPATIBILITY_REMEDIATION. CP5 aprovado e mergeado conforme autorização humana; estado pré-merge abaixo é histórico. CP6 NOT_STARTED / NOT_AUTHORIZED.
+
+
 ## Item ativo
 
 [WORK-CFG-028](active/WORK-CFG-028/work-item.json): CP5 umbrella, **WAVE_5 IMPLEMENTED / AWAITING_HUMAN_REVIEW**.

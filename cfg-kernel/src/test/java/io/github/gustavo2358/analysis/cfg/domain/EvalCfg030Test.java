@@ -225,13 +225,14 @@ class EvalCfg030Test {
     }
 
     @Test
-    void incompleteValidationCannotBeOverriddenByInventoryPolicy() {
+    void upstreamUnsupportedCapabilityCannotBeOverriddenByInventoryPolicy() {
         var capability = new Capabilities.Capability("test.unvalidated", "1");
         Publication p = requiring(inventory(minimal(), PARTIAL, PARTIAL), List.of(capability));
         for (var policy : ProjectionPolicy.values()) {
             var result = new CfgBuildCoordinator(SemanticInterpreterRegistry.of(List.of(() -> capability)))
                     .build(p, options(policy));
-            assertEquals(CfgBuildResult.Status.INCOMPLETE_VALIDATION, result.status());
+            assertEquals(CfgBuildResult.Status.UNSUPPORTED_CAPABILITY, result.status());
+            assertTrue(result.preflight().hasIssues(io.github.gustavo2358.air.validation.ValidationIssue.Kind.UNSUPPORTED_CAPABILITY));
             assertTrue(result.graph().isEmpty());
             assertEquals(AirValidator.validate(p), result.preflight());
             assertTrue(result.projectionIssues().isEmpty());
@@ -273,11 +274,14 @@ class EvalCfg030Test {
     }
 
     @Test
-    void validationLimitsStillBlockBeforeProjection() {
+    void resourceLimitsStillBlockBeforeProjection() {
         Publication p = inventory(minimal(), PARTIAL, PARTIAL);
         for (var policy : ProjectionPolicy.values()) {
             var result = build(p, new BuildOptions(new ValidationOptions(128, 1, 100), policy));
-            assertEquals(CfgBuildResult.Status.VALIDATION_LIMIT, result.status());
+            assertEquals(CfgBuildResult.Status.RESOURCE_LIMIT, result.status());
+            assertEquals(ValidationResult.Status.INCOMPLETE_VALIDATION,result.preflight().status());
+            assertTrue(result.preflight().hasIssues(io.github.gustavo2358.air.validation.ValidationIssue.Kind.RESOURCE_LIMIT));
+            assertFalse(result.preflight().diagnostics().traversalCompleted());
             assertTrue(result.graph().isEmpty());
             assertTrue(result.projectionIssues().isEmpty());
         }

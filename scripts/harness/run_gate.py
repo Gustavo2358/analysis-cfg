@@ -13,7 +13,7 @@ def run(gate: str, root: Path) -> int:
     if gate == 'docs':
         return subprocess.run([sys.executable, str(base / 'validate_docs.py'), '--root', str(root)]).returncode
     if gate == 'harness':
-        for suite in ('test_harness.py', 'test_cp5_harness.py', '../project/test_result_wire.py'):
+        for suite in ('test_harness.py', 'test_cp5_harness.py', 'test_resource_limit_harness.py', '../project/test_result_wire.py'):
             rc = subprocess.run([sys.executable, str(base / suite)]).returncode
             if rc:
                 return rc

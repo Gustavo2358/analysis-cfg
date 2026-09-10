@@ -32,6 +32,13 @@ public final class CfgBuildCoordinator implements BuildCfg {
         Objects.requireNonNull(options, "options");
 
         ValidationResult preflight = CfgPreflight.validate(publication, options.validation());
+        return buildAfterPreflight(publication, options, preflight);
+    }
+
+    // Package seam for upstream outcomes without a natural Publication fixture.
+    // The public boundary always runs the real validator above.
+    CfgBuildResult buildAfterPreflight(Publication publication, BuildOptions options,
+                                       ValidationResult preflight) {
         List<Capabilities.Capability> unsupported = publication.capabilities().required().stream()
                 .filter(capability -> !CoreCfgProjection.supportsControlCapability(capability)
                         && interpreters.find(capability).isEmpty())
@@ -44,9 +51,11 @@ public final class CfgBuildCoordinator implements BuildCfg {
         Optional<CfgGraph> graph = Optional.empty();
         if (has(preflight, ValidationIssue.Kind.INVALID_IR)) {
             status = CfgBuildResult.Status.INVALID_IR;
+        } else if (has(preflight, ValidationIssue.Kind.RESOURCE_LIMIT)) {
+            status = CfgBuildResult.Status.RESOURCE_LIMIT;
         } else if (has(preflight, ValidationIssue.Kind.VALIDATION_LIMIT)) {
             status = CfgBuildResult.Status.VALIDATION_LIMIT;
-        } else if (!unsupported.isEmpty()) {
+        } else if (has(preflight, ValidationIssue.Kind.UNSUPPORTED_CAPABILITY) || !unsupported.isEmpty()) {
             status = CfgBuildResult.Status.UNSUPPORTED_CAPABILITY;
         } else if (preflight.status() == ValidationResult.Status.INCOMPLETE_VALIDATION) {
             status = CfgBuildResult.Status.INCOMPLETE_VALIDATION;
@@ -64,6 +73,6 @@ public final class CfgBuildCoordinator implements BuildCfg {
     }
 
     private static boolean has(ValidationResult result, ValidationIssue.Kind kind) {
-        return result.issues().stream().anyMatch(issue -> issue.kind() == kind);
+        return result.hasIssues(kind);
     }
 }

@@ -189,3 +189,20 @@ completion por dependências e FactSink atômico. Métricas de S5/S6/S8/S14/S15/
 e inventários compilados são nominais. [Ledger](cp5-w4-planning-ledger.md).
 Performance/full executam W1/W2/W3/W4 e preservam UNAVAILABLE/3 por W5.
 CI acrescenta performance W4 obrigatória e mantém o collector de checkout intacto.
+
+
+## Pós-CP5: compatibilidade RESOURCE_LIMIT
+
+WORK-CFG-029 executa os mesmos gates W1–W5 contra air-java 17029898fd0ee8fabcaaae89f7260148633d4b12.
+Os parágrafos anteriores são checkpoints históricos. Full executa fast, architecture,
+semantic, performance e integration reais. O scope usa o merge CP5 4229ec1 como base
+e compara bytes de produção, testes, POMs, fixtures e evidências históricas; só os
+caminhos focais explicitamente enumerados podem mudar. Inventários aprovados não
+são reescritos: a exceção focal exige hash histórico e hash atual exatos. O inventário
+compilado W5 desta remediação é separado do snapshot CP5.
+
+record_air_dependency.py compara cada arquivo do build com o SHA Git pinado e os JARs
+instalados com os produtos do build; CI registra árvore e hashes após clean install.
+check_scope.py confere somente repin de air-java; outras autoridades são byte-idênticas.
+challenge_resource_limit.py executa nove mutantes compiláveis, RED nominal, restauração
+byte-exact e segundo GREEN individual. Falha de compilação ou baseline não conta.

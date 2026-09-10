@@ -264,3 +264,14 @@ evidence não autoriza claim exact-head; o validador do recibo deve falhar. O co
 imprime e salva JSON para artifact de CI, sem consulta remota no hot path. O recibo
 não prova que dependências, ambiente ou runtime futuros foram executados: os gates
 nominais e suas limitações permanecem registrados separadamente.
+
+
+## Post-CP5 RESOURCE_LIMIT compatibility
+
+CP5 W1–W5 are APPROVED / MERGED at 4229ec1cfd9c1d9f9e851f3cabe6993b4d4ed9b8.
+WORK-CFG-029 is a separate POST_CP5_COMPATIBILITY_REMEDIATION. Current air-java pin
+17029898fd0ee8fabcaaae89f7260148633d4b12 separates operational RESOURCE_LIMIT from
+specific VALIDATION_LIMIT and generic INCOMPLETE_VALIDATION. Historical CP5 evidence
+above retains its original pins/defaults. The new default codec no longer has a
+16 MiB ceiling; explicit operational budgets still fail without any semantic result.
+See [the current preflight contract](resource-limit-preflight.md).

@@ -179,5 +179,7 @@
   "solver_inventory": "docs/evals/cp5/w2-inventory.json",
   "query_inventory": "docs/evals/cp5/w3-inventory.json",
   "planning_inventory": "docs/evals/cp5/w4-inventory.json",
-  "composition_inventory": "docs/evals/cp5/w5-inventory.json"
+  "composition_inventory": "docs/evals/cp5/w5-inventory.json",
+  "operational_preflight_contract": "docs/evals/resource-limit-compatibility.json",
+  "compatibility_composition_inventory": "docs/evals/resource-limit-w5-inventory.json"
 }

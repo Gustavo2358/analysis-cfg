@@ -5,6 +5,7 @@ import argparse, hashlib, json, os, re, struct, subprocess, sys, tempfile
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from check_w1 import Failure, command
+from resource_limit_scope import allows_change, boundaries
 
 ROOT=Path(__file__).resolve().parents[2]
 MODULES=['analysis-dataflow','analysis-adapters','analysis-launcher']
@@ -13,9 +14,9 @@ NAMES={'analysis-dataflow':['AnalysisDataflow','DefaultValuePlan','ObservedValue
        'analysis-launcher':['AnalysisDataflow']}
 SOURCES={m+'/src/main/java/io/github/gustavo2358/analysis/'+m.removeprefix('analysis-').replace('launcher','launcher')+'/'+n+'.java' for m,names in NAMES.items() for n in names}
 TESTS={
- 'analysis-dataflow':{'CompositionTest':set('genericOverwriteUsesRealPipelineAndLastProducer noWritesProducesCompleteWithoutInventedStableRun everyTerminatorAndOrphanAreObservedBefore'.split())},
+ 'analysis-dataflow':{'CompositionTest':set('genericOverwriteUsesRealPipelineAndLastProducer noWritesProducesCompleteWithoutInventedStableRun everyTerminatorAndOrphanAreObservedBefore resourcePreflightNeverProducesSemanticResultAndRecovers incompleteAndLegacyPreparationFailuresRemainDistinct'.split())},
  'analysis-adapters':{'WireTest':{'realValueSupportAndSourceRemainderReachWire'},'DeliveryTest':set('completeReceiptBindsExactFinalBytesAndReplacesExistingAtomically controlledFailuresPreservePreparedResultAndExistingDestination resourceExhaustionIsNotACompletedOrSemanticDeliveryOutcome'.split()),'WideResultTest':set('scaleKeepsAllQueriesFactsAndDetachedResult resultBeyondLegacy64MiBHasNoOutputCapacityPolicy'.split()),'WireAdversarialTest':set('unavailableBatchRetainsItsExplicitDependencyReason distinctCandidatesKeepTheirOwnProducerSupport permutedInputRegistrationQueriesCandidatesSupportsAndFactsAreByteStable fullIdentitySeparatesOwnersEvenWhenLocalIdsCollide unsupportedAndUnreachableHaveDifferentExplicitNullSemantics invalidUnicodeIsEncodingFailureAndDoesNotCertifyDelivery'.split())},
- 'analysis-launcher':{'DataflowCliTest':set('fileRouteMatchesInMemoryAndReceiptIsSeparate usageMalformedMissingAndOutputFailuresAreDistinct externalCodecCapIsOperationalDebtWithoutLocalReadAdmission'.split())}}
+ 'analysis-launcher':{'DataflowCliTest':set('fileRouteMatchesInMemoryAndReceiptIsSeparate usageMalformedMissingAndOutputFailuresAreDistinct defaultCodecAcceptsBeyondHistoricalCapWithoutLocalReadAdmission realCodecResourceLimitStopsBeforeDeliveryAndRecovers'.split())}}
 DENIED=('java.lang.reflect','java.util.ServiceLoader','cobolexplorer','org.antlr','lower.adapters','CallResolver','FileResolver','Db2Resolver','CicsResolver','GrbeResolver','ProgramDependency','CfgJsonWriter','CfgJsonBytes')
 POM_ADDITION=b'    <module>analysis-dataflow</module>\n    <module>analysis-adapters</module>\n    <module>analysis-launcher</module>\n'
 def original_pom(data):
@@ -35,7 +36,7 @@ def verify_sources(root):
     for path,sha in prior.items():
         data=(root/path).read_bytes()
         if path=='pom.xml':data=original_pom(data)
-        if hashlib.sha256(data).hexdigest()!=sha:raise Failure('W5 changed approved W1–W4 or legacy source: '+path)
+        if hashlib.sha256(data).hexdigest()!=sha and not allows_change(root,path,sha):raise Failure('W5 changed approved W1–W4 or legacy source: '+path)
 def capture(root,args):
     p=subprocess.run(args,cwd=root,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True)
     if p.returncode:raise Failure(p.stdout+'\ncommand failed: '+repr(args))
@@ -43,7 +44,7 @@ def capture(root,args):
 def architecture(root,update=False):
     from check_transport_architecture import dependencies_from_jdeps
     from check_architecture import parse_tgf
-    verify_sources(root);actual={}
+    verify_sources(root);boundaries(root);actual={}
     for module in MODULES:
         classes=root/module/'target/classes';cp=(root/module/'target/architecture-classpath.txt').read_text().strip()
         paths=sorted(p.relative_to(classes).as_posix() for p in classes.rglob('*.class'))
@@ -62,7 +63,7 @@ def architecture(root,update=False):
         cp=(root/module/'target/architecture-classpath.txt').read_text().strip()
         raw=capture(root,['jdeps','--multi-release','21','-filter:none','-verbose:class','-cp',cp,str(root/module/'target/classes')])
         if any('io.github.gustavo2358.analysis.'+p in raw for p in ('dataflow.','adapters.','launcher.')):raise Failure('W5 dependency inverted into '+module)
-    path=root/'docs/evals/cp5/w5-inventory.json'
+    path=root/'docs/evals/resource-limit-w5-inventory.json'
     if update:path.write_text(json.dumps(actual,indent=2)+'\n')
     elif load(path)!=json.loads(json.dumps(actual)):raise Failure('W5 compiled inventory drift')
     print('[w5-architecture] PASS: explicit source/classfile/javap/jdeps/Maven inventories; inner direction preserved')

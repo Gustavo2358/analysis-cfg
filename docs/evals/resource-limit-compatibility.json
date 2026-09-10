@@ -1,0 +1,119 @@
+{
+  "work_item": "WORK-CFG-029",
+  "checkpoint": "POST_CP5_COMPATIBILITY_REMEDIATION",
+  "origin": "CP6-BASELINE-COMPAT-001",
+  "base": "4229ec1cfd9c1d9f9e851f3cabe6993b4d4ed9b8",
+  "air_java": "17029898fd0ee8fabcaaae89f7260148633d4b12",
+  "analysis_ir": "122ce54e1b9ef9b00646f93ece409ca8b63bc933",
+  "changed_production": [
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/CfgBuildCoordinator.java",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/CfgBuildResult.java",
+    "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/AnalysisDataflow.java",
+    "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/DataflowAirReader.java",
+    "analysis-launcher/src/main/java/io/github/gustavo2358/analysis/launcher/AnalysisDataflow.java"
+  ],
+  "changed_tests": [
+    "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/application/CfgBuildCoordinatorTest.java",
+    "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg030Test.java",
+    "cfg-adapters/src/test/java/io/github/gustavo2358/analysis/cfg/adapters/TransportTest.java",
+    "cfg-adapters/src/test/java/io/github/gustavo2358/analysis/cfg/adapters/ScalarAssignTest.java",
+    "analysis-dataflow/src/test/java/io/github/gustavo2358/analysis/dataflow/CompositionTest.java",
+    "analysis-launcher/src/test/java/io/github/gustavo2358/analysis/launcher/DataflowCliTest.java",
+    "cfg-launcher/src/test/java/io/github/gustavo2358/analysis/cfg/launcher/EvalCfg031Test.java"
+  ],
+  "baseline_sha256": {
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/CfgBuildCoordinator.java": "7908cbb37af5ab71be43b05dd179c3e009eeaa31969a5c3e80c9c7cd072db091",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/CfgBuildResult.java": "fb3d5abb718877c0b4716757be808f391623a4b5db50d8067f49a0198f3d2bb6",
+    "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/AnalysisDataflow.java": "fa54bca6545c60db3b453f921d0fab79fefa2664e85a2ba67ce984166caa145c",
+    "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/DataflowAirReader.java": "190ceeefdb7ea403ee4e43bfe0afcdd2162e0294247def6703fe638edee6b7b4",
+    "analysis-launcher/src/main/java/io/github/gustavo2358/analysis/launcher/AnalysisDataflow.java": "d9359b5e4aa45bf99a0b91c9471c1bebf950a902aca324f31e217ea56a7a8afe",
+    "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/application/CfgBuildCoordinatorTest.java": "fa4aab02372a267e1c59a047623fd2d4237e3f72bccfe1ed7c85177a148f51f5",
+    "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg030Test.java": "d8994275b714768630e72dbe677cb233f44f6ecad8c748050650e0adab08b1ce",
+    "cfg-adapters/src/test/java/io/github/gustavo2358/analysis/cfg/adapters/TransportTest.java": "ea52c5f63bdceb5b301da88e4965f6867698ed5615005ee5839d82e8b58b68ad",
+    "cfg-adapters/src/test/java/io/github/gustavo2358/analysis/cfg/adapters/ScalarAssignTest.java": "795e23a9356ca99fa209e63e415dfe9fe2812a390853a3598c8438b0d9abb70c",
+    "analysis-dataflow/src/test/java/io/github/gustavo2358/analysis/dataflow/CompositionTest.java": "959b7fc3f6af698495069373b0a1437dc722e52948d52d234da9ef45c72fc076",
+    "analysis-launcher/src/test/java/io/github/gustavo2358/analysis/launcher/DataflowCliTest.java": "b46fd1ba7990de5e5a115b9c4f1fc6d0611d177f02505294e54668edfc0b370a",
+    "docs/sources/sources.lock.json": "e68fd901f8022c82b13d7bc8119000aba40f6141d5059f9898014d8ee1743a88",
+    "cfg-launcher/src/test/java/io/github/gustavo2358/analysis/cfg/launcher/EvalCfg031Test.java": "3b81776bffe0009c12bf0e1468123f295c1bba6053edcf058f713c104195bf37"
+  },
+  "current_sha256": {
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/CfgBuildCoordinator.java": "19b2e44fe365e3cfbfbd5637196e4d3456d5ca1b30b9d79e2c3c042be10d4d1f",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/CfgBuildResult.java": "905678b7092067fa40255b144c6fd896dc1790b33b5d9e74fe1784e4d47e828b",
+    "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/AnalysisDataflow.java": "68c60fa05024e27544fc45e60a5e5cedf7974494ba2bff15d34bb0852972aa1a",
+    "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/DataflowAirReader.java": "51188302ee4a257cbe8d17f231fcbff1d584dbde2cf02321da1761f05736209b",
+    "analysis-launcher/src/main/java/io/github/gustavo2358/analysis/launcher/AnalysisDataflow.java": "ab9f2b7297da4763570eb169094ad7c4abcec247544e007ff5ff15c4ad335e6a",
+    "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/application/CfgBuildCoordinatorTest.java": "7edd43b04ca852935e3ab3fec8c2c775d47b02d0646c02faa58c56d98337180d",
+    "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg030Test.java": "7daa02db70dbd62509884b63b11a051683e582424a2dc97b81d9e0841642e22d",
+    "cfg-adapters/src/test/java/io/github/gustavo2358/analysis/cfg/adapters/TransportTest.java": "f20ace881f1244a63cb8ddb82c4bd87e13be8704e56dc16a7b2993d831f23b5d",
+    "cfg-adapters/src/test/java/io/github/gustavo2358/analysis/cfg/adapters/ScalarAssignTest.java": "abaff760591132b11ce5dcf69b8e9a4e5d6a718f7cc364fdd17f2213a0e7b3f5",
+    "analysis-dataflow/src/test/java/io/github/gustavo2358/analysis/dataflow/CompositionTest.java": "2674338d3116ccbff2bc5c219c37f9c951e97947b4f2f1a43e7ac66d9874dc29",
+    "analysis-launcher/src/test/java/io/github/gustavo2358/analysis/launcher/DataflowCliTest.java": "5ae145fe0f4fc4879141c2277773904608011d9d5cd9d5a908653aa84def5ae3",
+    "docs/sources/sources.lock.json": "22e2163689b8e8afc22a236c0f9872f79452aa6b73d54aac0f89fc4bd42fd9db",
+    "cfg-launcher/src/test/java/io/github/gustavo2358/analysis/cfg/launcher/EvalCfg031Test.java": "5e21e9902a8992d08fcc1a653ffb544b51d254eb7715c193ee7b32d8f0d3b2a1"
+  },
+  "source_inventory": "docs/work/evidence/WORK-CFG-029/source-inventory.json",
+  "compiled_inventory": "docs/evals/resource-limit-w5-inventory.json",
+  "classification_precedence": [
+    "INVALID_IR",
+    "RESOURCE_LIMIT",
+    "VALIDATION_LIMIT",
+    "UNSUPPORTED_CAPABILITY",
+    "INCOMPLETE_VALIDATION",
+    "UNSUPPORTED_INPUT",
+    "CFG_BUILT"
+  ],
+  "resource_semantics": "OPERATIONAL_PREFLIGHT_FAILURE_NO_SEMANTIC_RESULT",
+  "graph": "ONLY_CFG_BUILT",
+  "wire_versions": {
+    "prepared-analysis-result": "1.1.0",
+    "analysis-dataflow-result": "1.1.0",
+    "analysis-delivery-receipt": "1.0.0"
+  },
+  "challenges": {
+    "generic-fallthrough": {
+      "hook": "scripts/project/challenge_resource_limit.py",
+      "status": "IMPLEMENTED",
+      "oracle": "typed RESOURCE_LIMIT"
+    },
+    "unsupported": {
+      "hook": "scripts/project/challenge_resource_limit.py",
+      "status": "IMPLEMENTED",
+      "oracle": "operational not unsupported"
+    },
+    "invalid": {
+      "hook": "scripts/project/challenge_resource_limit.py",
+      "status": "IMPLEMENTED",
+      "oracle": "operational not invalid"
+    },
+    "collapse-validation-limit": {
+      "hook": "scripts/project/challenge_resource_limit.py",
+      "status": "IMPLEMENTED",
+      "oracle": "distinct from legacy validation limit"
+    },
+    "allows-cfg-product": {
+      "hook": "scripts/project/challenge_resource_limit.py",
+      "status": "IMPLEMENTED",
+      "oracle": "no graph before completed preflight"
+    },
+    "generic-incomplete-as-resource": {
+      "hook": "scripts/project/challenge_resource_limit.py",
+      "status": "IMPLEMENTED",
+      "oracle": "generic incomplete without typed issue"
+    },
+    "starts-session": {
+      "hook": "scripts/project/challenge_resource_limit.py",
+      "status": "IMPLEMENTED",
+      "oracle": "no analysis entry before classification"
+    },
+    "source-open-result": {
+      "hook": "scripts/project/challenge_resource_limit.py",
+      "status": "IMPLEMENTED",
+      "oracle": "no semantic/source-open fallback"
+    },
+    "cli-unsupported": {
+      "hook": "scripts/project/challenge_resource_limit.py",
+      "status": "IMPLEMENTED",
+      "oracle": "exit 7, EXTERNAL_RESOURCE_LIMIT, no receipt or output"
+    }
+  }
+}
