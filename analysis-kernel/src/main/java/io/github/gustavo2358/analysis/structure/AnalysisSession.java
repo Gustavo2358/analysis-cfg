@@ -30,6 +30,22 @@ public final class AnalysisSession {
     public Collection<ContextView> contexts() { return contexts.values(); }
 
     /**
+     * A narrower explicit context selection sharing this already admitted index. No AIR/CFG traversal,
+     * validation or projection is repeated. Only Entries selected by this owner can be selected again.
+     * The new view has its own contextual handles; it does not mutate this session or any stable run.
+     */
+    public AnalysisSession selectEntries(Collection<EntryId> selectedEntries) {
+        var selected = new ArrayList<Entries.Entry>();
+        for (var id : selectedEntries) {
+            var context = contexts.get(Objects.requireNonNull(id));
+            if (context == null) throw new IllegalArgumentException("Entry not selected by owning session");
+            selected.add(context.entry());
+        }
+        return new AnalysisSession(index, selected);
+    }
+
+
+    /**
      * Correlates a successful core BuildCfg result with the expected snapshot and policy.
      * Structural checks are linear in inventoried entities/references/nodes/edges, with expected O(1)
      * hash lookups. It neither reruns validation/projection nor certifies producer truth or source coverage.
