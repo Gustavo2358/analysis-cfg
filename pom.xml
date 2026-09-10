@@ -18,6 +18,9 @@
     <module>analysis-values</module>
     <module>cfg-adapters</module>
     <module>cfg-launcher</module>
+    <module>analysis-dataflow</module>
+    <module>analysis-adapters</module>
+    <module>analysis-launcher</module>
   </modules>
 
   <properties>
