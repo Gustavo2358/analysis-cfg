@@ -48,6 +48,9 @@ def main():
         def count(phase,name):return row['phases'][phase]['counts'].get(prefix+name,{}).get('instances',0)
         assert count('solved','PersistentBindings$Node')==1, row
         assert count('solved','PossibleValuesState')<=4
+        assert count('solved','SupportSet')==n+1, 'prepared singleton supports plus EMPTY'
+        assert count('batch_only','SupportSet')==1 and count('released','SupportSet')==1, 'only global EMPTY support remains'
+        assert count('batch_only','ValueFact$Support')==1 and count('released','ValueFact$Support')==0, 'detached support released'
         for phase in ['batch_only','released']:
             for name in ['PersistentBindings$Node','ValueUniverse','PossibleValuesAnalysis$Execution','PossibleValuesAnalysis','TextProfile']:
                 assert count(phase,name)==0,(n,phase,name)

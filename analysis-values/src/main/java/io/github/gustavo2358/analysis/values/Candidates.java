@@ -8,7 +8,18 @@ final class Candidates {
     private final int singleton;
     private final int[] many;
     private final boolean open;
-    private Candidates(int singleton,int[] many,boolean open) { this.singleton=singleton;this.many=many;this.open=open; }
+    final SupportSet supports;
+    private Candidates(int singleton,int[] many,boolean open) { this(singleton,many,open,SupportSet.EMPTY); }
+    private Candidates(int singleton,int[] many,boolean open,SupportSet supports) {
+        this.singleton=singleton;this.many=many;this.open=open;this.supports=supports;
+    }
+    Candidates supportedBy(int producer,ValuesWork work) {
+        return withSupport(SupportSet.singleton(producer,work),work);
+    }
+    private Candidates withSupport(SupportSet next,ValuesWork work) {
+        if(supports.equivalent(next))return this;
+        work.candidate(0);return new Candidates(singleton,many,open,next);
+    }
     static Candidates singleton(int value,ValuesWork w) {
         if(value<0)throw new IllegalArgumentException("negative value ordinal");
         w.candidate(1);return new Candidates(value,null,false);
@@ -19,11 +30,15 @@ final class Candidates {
     int[] ordinals() { return many==null?(singleton<0?new int[0]:new int[]{singleton}):many.clone(); }
     Candidates withOpen(ValuesWork w) {
         if(open)return this;
-        w.candidate(0);return new Candidates(singleton,many,true);
+        w.candidate(0);return new Candidates(singleton,many,true,supports);
     }
-    boolean equivalent(Candidates b) { return this==b||(open==b.open&&singleton==b.singleton&&Arrays.equals(many,b.many)); }
+    boolean equivalent(Candidates b) { return this==b||(open==b.open&&singleton==b.singleton&&Arrays.equals(many,b.many)&&supports.equivalent(b.supports)); }
     Candidates join(Candidates b,ValuesWork w) {
         if(this==b)return this;
+        var support=supports.join(b.supports,w);
+        return joinValues(b,w).withSupport(support,w);
+    }
+    private Candidates joinValues(Candidates b,ValuesWork w) {
         if(size()==0)return open?b.withOpen(w):b;
         if(b.size()==0)return b.open?withOpen(w):this;
         w.array(Math.addExact(size(),b.size()));

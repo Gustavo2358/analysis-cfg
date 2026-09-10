@@ -60,7 +60,7 @@ def main():
     def run(name,cmd):
         start=time.monotonic();p=subprocess.run(cmd,cwd=ROOT,stdout=subprocess.PIPE,stderr=subprocess.STDOUT);raw=p.stdout;(out/(name+'.log.gz')).write_bytes(gzip.compress(raw,mtime=0))
         return dict(command=cmd,exit=p.returncode,elapsed_seconds=time.monotonic()-start,log=name+'.log.gz',sha256=hashlib.sha256(raw).hexdigest()),raw.decode(errors='replace')
-    maven=['mvn','-B','-ntp','-pl','analysis-values','-am'];tests='BuildCfgContractTest,StructureTest,DomainTest,ValuesTest,ReplayTest,ValueOracleTest,ValuesScaleTest'
+    maven=['mvn','-B','-ntp','-pl','analysis-values','-am'];tests='BuildCfgContractTest,StructureTest,DomainTest,ValuesTest,ReplayTest,ValueOracleTest,ValuesScaleTest,SupportSourceTest'
     receipt['baseline'],_=run('baseline',maven+['clean','test','-Dtest='+tests]);save()
     if receipt['baseline']['exit']:raise RuntimeError('baseline not GREEN')
     for name in ([args.only] if args.only else MUTATIONS):

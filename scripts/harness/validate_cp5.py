@@ -204,11 +204,23 @@ def validate_cp5(root: Path) -> list[str]:
                 require(w['completion_evidence'] == expected_evidence, 'no Wave evidence invented')
                 if w['status'] == 'IMPLEMENTED': require(life['wave_2']['review'] == 'AWAITING_HUMAN_REVIEW' and existing(root,expected_evidence), 'W2 awaits human review')
             elif n == 3:
-                require(w['status'] in {'STARTED','IMPLEMENTED'} and w['authorization'] == 'AUTHORIZED', 'W3 started/implemented, never human-approved automatically')
+                require(w['status'] in {'STARTED','IMPLEMENTED','REQUEST_CHANGES'} and w['authorization'] == 'AUTHORIZED', 'W3 started/implemented, never human-approved automatically')
                 require(w['approval_evidence'] == 'docs/work/evidence/WORK-CFG-028/wave-3/authorization.json', 'W3 explicit authorization evidence')
                 authorization=load_json(root / w['approval_evidence'])
                 require(len(life['review_history'])>6 and authorization==life['review_history'][6] and authorization['reviewed_head']=='0202c7424db04a1d83fb5e35fce055ea81f5b8fa' and authorization['W2']=='APPROVED' and authorization['authorized_wave']==3, 'W3 reviewed HEAD and append-only human authorization')
                 expected_evidence=None if w['status']=='STARTED' else 'docs/work/evidence/WORK-CFG-028/wave-3/validation.md'
+                remediation=life['wave_3'].get('remediation')
+                require(remediation is not None, 'W3 F1/F2 remediation review required')
+                if remediation is not None:
+                    require(remediation['reviewed_head']=='8cb55b86c83644e4727cc532787a518775d7e868' and remediation['blockers']==['W3-F1','W3-F2'], 'W3 focal blockers and reviewed HEAD')
+                    review=load_json(root / remediation['review_evidence'])
+                    require(review==life['review_history'][7] and review['reviewed_head']=='8cb55b86c83644e4727cc532787a518775d7e868' and review['decision']=='REQUEST_CHANGES' and review['blockers']==['W3-F1','W3-F2'], 'W3 F1/F2 exact reviewed HEAD/blockers')
+                    require(remediation['status'] in {'STARTED','IMPLEMENTED'}, 'W3 focal remediation status')
+                    if remediation['status']=='STARTED':
+                        require(w['status']=='REQUEST_CHANGES' and life['wave_3']['review']=='REQUEST_CHANGES' and remediation['completion_evidence'] is None, 'W3 review remains REQUEST_CHANGES until remediation')
+                    else:
+                        expected_evidence='docs/work/evidence/WORK-CFG-028/wave-3/review-f1-f2/validation.md'
+                        require(w['status']=='IMPLEMENTED' and remediation['completion_evidence']==expected_evidence, 'W3 remediation evidence')
                 require(w['completion_evidence']==expected_evidence, 'no Wave evidence invented')
                 if w['status']=='IMPLEMENTED': require(life['wave_3']['review']=='AWAITING_HUMAN_REVIEW' and existing(root,expected_evidence), 'W3 awaits human review')
             else:

@@ -61,7 +61,7 @@ public final class PossibleValuesAnalysis implements AnalysisDefinition<Possible
         private Execution(TextProfile profile,DataflowResult<PossibleValuesState> dataflow,Map<String,Long> metrics){this.profile=profile;this.dataflow=dataflow;this.solveMetrics=metrics;}
         public DataflowResult<PossibleValuesState> dataflow(){return dataflow;}
         public Map<String,Long> solveMetrics(){return solveMetrics;}
-        public Map<String,Long> preparationMetrics(){var m=new HashMap<>(profile.preparation.snapshot());m.put("valuesInterned",(long)profile.universe.size());m.put("poolHits",profile.universe.poolHits);m.put("unicodeScalarsHashed",profile.universe.scalarsHashed);return Map.copyOf(m);}
+        public Map<String,Long> preparationMetrics(){var m=new HashMap<>(profile.preparation.snapshot());m.put("valuesInterned",(long)profile.universe.size());m.put("producersPrepared",(long)profile.universe.producerCount());m.put("poolHits",profile.universe.poolHits);m.put("unicodeScalarsHashed",profile.universe.scalarsHashed);return Map.copyOf(m);}
         public record Observations(ObservationBatch<ObjectId,ValueFact> batch,Map<String,Long> stateMetrics,Map<String,Long> quality) { }
         public Observations observe(Iterable<PointQuery<ObjectId>> queries) {
             var replayWork=new ValuesWork();
@@ -71,12 +71,16 @@ public final class PossibleValuesAnalysis implements AnalysisDefinition<Possible
                     @Override public boolean supports(PointQuery<ObjectId> query){return profile.supports(query.subject(),query.point().entry());}
                     @Override public ValueFact project(PointQuery<ObjectId> query,PossibleValuesState state) {
                         var cell=profile.subjects.get(query.subject());boolean source=profile.sourceOpen(query.subject(),query.point().entry());
-                        var evidence=new ArrayList<Id>();evidence.add(query.point().entry());evidence.add(query.subject());evidence.add(cell.cell().header().id());
-                        if(query.point().operation()!=null)evidence.add(query.point().operation());
+                        var supports=state.isReached()?profile.universe.materializeSupports(state.value(cell.ordinal(),replayWork)):List.<ValueFact.CandidateSupport>of();
+                        var evidence=new LinkedHashSet<Id>();var provenance=new LinkedHashSet<OriginId>();
+                        var premises=new LinkedHashSet<PremiseId>(profile.premises);
+                        for(var candidate:supports)for(var producer:candidate.producers()) {
+                            evidence.add(producer.evidence());provenance.add(producer.origin());premises.addAll(producer.premises());
+                        }
                         boolean model=state.isReached()&&state.value(cell.ordinal(),replayWork).open();
                         return new ValueFact(cell.cell().header().id(),state.isReached()?ValueFact.Reachability.REACHABLE:ValueFact.Reachability.UNREACHABLE_IN_MODEL,
                             state.isReached()?profile.universe.materialize(state.value(cell.ordinal(),replayWork)):null,state.isReached()?model:null,
-                            source,model||source,profile.premises,evidence);
+                            source,model||source,List.copyOf(premises),List.copyOf(evidence),List.copyOf(provenance),supports);
                     }
                 });
             var quality=new HashMap<String,Long>();

@@ -9,13 +9,15 @@ final class RetentionAudit {
     static Map<String,Long> count(Object root) {
         var seen=Collections.newSetFromMap(new IdentityHashMap<Object,Boolean>());var todo=new ArrayDeque<Object>();todo.add(root);
         var result=new TreeMap<String,Long>();
+        var candidateArrays=Collections.newSetFromMap(new IdentityHashMap<Object,Boolean>());
+        var supportArrays=Collections.newSetFromMap(new IdentityHashMap<Object,Boolean>());
         while(!todo.isEmpty()) {
             Object value=todo.remove();if(!seen.add(value))continue;
             var type=value.getClass();var name=type.getName();
             if(name.startsWith("io.github.gustavo2358.air.")||name.startsWith("io.github.gustavo2358.analysis.structure.")||name.startsWith("io.github.gustavo2358.analysis.cfg."))continue;
             result.merge(type.getSimpleName(),1L,Math::addExact);
-            if(value instanceof Candidates c && c.size()==1)result.merge("setElementsRetained",1L,Math::addExact);
-            if(value instanceof int[] a)result.merge("setElementsRetained",(long)a.length,Math::addExact);
+            if(value instanceof Candidates c)payload(value,c.size(),candidateArrays,result,"setElementsRetained");
+            if(value instanceof SupportSet s)payload(value,s.size(),supportArrays,result,"supportElementsRetained");
             if(value instanceof Map<?,?> map){for(var e:map.entrySet()){add(todo,e.getKey());add(todo,e.getValue());}continue;}
             if(value instanceof Iterable<?> iterable){for(var item:iterable)add(todo,item);continue;}
             if(type.isArray()){
@@ -27,10 +29,19 @@ final class RetentionAudit {
                 try{field.setAccessible(true);add(todo,field.get(value));}catch(ReflectiveOperationException e){throw new AssertionError(e);}
             }
         }
-        long bytes=24L*result.getOrDefault("PossibleValuesState",0L)+40L*result.getOrDefault("Node",0L)+24L*result.getOrDefault("Candidates",0L);
+        long bytes=24L*result.getOrDefault("PossibleValuesState",0L)+40L*result.getOrDefault("Node",0L)+32L*result.getOrDefault("Candidates",0L)+24L*result.getOrDefault("SupportSet",0L);
         for(Object value:seen)if(value instanceof int[] a)bytes+=8L*((23L+4L*a.length)/8L);
         result.put("stateBytesRetainedEstimate",bytes);
+        long supportBytes=24L*result.getOrDefault("SupportSet",0L);
+        for(var a:supportArrays)supportBytes+=8L*((23L+4L*((int[])a).length)/8L);
+        result.put("supportBytesRetainedEstimate",supportBytes);
         return result;
+    }
+    private static void payload(Object value,int size,Set<Object> arrays,Map<String,Long> result,String key) {
+        try {
+            var field=value.getClass().getDeclaredField("many");field.setAccessible(true);var array=field.get(value);
+            if(array==null||arrays.add(array))result.merge(key,(long)size,Math::addExact);
+        } catch(ReflectiveOperationException e){throw new AssertionError(e);}
     }
     static int nodeCount(PersistentBindings.Node n){return n==null?0:1+nodeCount(n.left)+nodeCount(n.right);}
     static int shared(PersistentBindings.Node a,PersistentBindings.Node b){var seen=Collections.newSetFromMap(new IdentityHashMap<PersistentBindings.Node,Boolean>());collect(a,seen);return shared(b,seen);}

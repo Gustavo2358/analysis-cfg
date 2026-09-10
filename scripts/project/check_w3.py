@@ -8,12 +8,13 @@ from check_w1 import ROOT, Failure, command
 
 PREFIX='io.github.gustavo2358.analysis.values.'
 QUERY_PREFIX='io.github.gustavo2358.analysis.query.'
-VALUE_NAMES='Candidates PersistentBindings PossibleValuesState ValuesWork ValueUniverse TextProfile ValueFact PossibleValuesAnalysis'.split()
+VALUE_NAMES='Candidates SupportSet PersistentBindings PossibleValuesState ValuesWork ValueUniverse TextProfile ValueFact PossibleValuesAnalysis'.split()
 QUERY_NAMES='ProgramPoint PointQuery ObservationBatch BatchReplayer'.split()
 VALUE_SOURCES={f'analysis-values/src/main/java/io/github/gustavo2358/analysis/values/{n}.java' for n in VALUE_NAMES}
 QUERY_SOURCES={f'analysis-kernel/src/main/java/io/github/gustavo2358/analysis/query/{n}.java' for n in QUERY_NAMES}
 INVENTORY='docs/evals/cp5/w3-inventory.json'
 TESTS={
+'SupportSourceTest':set('producerSurvivesBlocksAndStrongUpdateKillsOldSupport equalCandidateDiamondUnionsBothProducers entrySeedPremisesFollowValueAndAreKilledByAssignment entryUncertaintyOpensOnlyThatEntryWithoutChangingModel relevantAliasSourceGapCannotDisappearByQueryingExactAlias sourceGapDoesNotLeakFromOtherCellOrDependencyDimension candidateSupportsStayAssociatedWithTheirValue supportGrowthAtFixedValuePropagatesThroughCycle supportLatticeLawsAndStrongUpdatesRemainFinite sameCellInitialConditionsRetainBothPremises supportCardinalityPreservesAllEqualValueProducers'.split()),
 'DomainTest':set('missingStrongUpdateAndJoinHaveIndependentExpected finiteLatticeLawsAndAssignmentMonotonicity persistentUpdatesShareAndRetainNoHistory allFiniteCandidatesSurviveAndUnionConverges'.split()),
 'ValuesTest':set('realVerticalMixedBatchHasOneObservationPerLogicalQuery partialSourceIsSeparateFromExactModelAndUnknownWitness diamondsMissingPathsStrongUpdatesAndOtherCells sameCellAliasesAndDisjointnessAreSemanticAdmission unsupportedReadAndIndirectStorageAreNotIdentity entrySeedsContextsUnreachableAndUnicodeKeepTheirIdentity'.split()),
 'ReplayTest':set('backwardReplayUsesStableOutAndReverseSuffixOnce controlledObservationFailureIsAtomicAndPreservesStableRun foreignStableRunCannotMasqueradeAsUnreachableInAnotherSession'.split()),
@@ -40,6 +41,10 @@ def verify_sources(root:Path)->None:
     for path,digest in baseline['w2_production_sha256'].items():
         if hashlib.sha256((root/path).read_bytes()).hexdigest()!=digest:raise Failure('W3 modified approved W1/W2 production: '+path)
 
+    reviewed=json.loads((root/'docs/work/evidence/WORK-CFG-028/wave-3/review-f1-f2/baseline.json').read_text())
+    for path,digest in reviewed['frozen_sha256'].items():
+        if hashlib.sha256((root/path).read_bytes()).hexdigest()!=digest:raise Failure('W3 F1/F2 changed reviewed foundation: '+path)
+
 def verify_reports(root:Path,names:set[str])->None:
     reports=list((root/'analysis-values/target/surefire-reports').glob('TEST-*.xml'))
     if {p.name for p in reports}!={'TEST-'+PREFIX+n+'.xml' for n in names}:raise Failure('W3 nominal report inventory mismatch')
@@ -62,7 +67,7 @@ def verify_metrics(output:str)->list[dict]:
     for r in rows:
         if not required<=set(r) or any(type(r[k])!=int or r[k]<0 for k in required):raise Failure('W3 missing/invalid metric')
         if r['uniqueQueries']!=r['queriesAnswered']+r['unsupportedQueries']+r['queriesNotMaterialized'] or r['predecessorContributionReads']!=0 or r['retained_Object[]']!=2 or r['retained_arraySlots']<2*r['analysisPoints']:raise Failure('W3 runtime ledger mismatch')
-        if any(r.get('batchRetained_'+name,0) for name in ['PossibleValuesState','Node','ValueUniverse']):raise Failure('W3 observation retains state/history')
+        if any(r.get('batchRetained_'+name,0) for name in ['PossibleValuesState','Node','ValueUniverse','SupportSet']):raise Failure('W3 observation retains state/history')
         n=r['N'];probe=r['probe']
         if probe=='S2-S16' and (r['solve_maxSparseBindings']!=1 or r['retained_Node']!=1):raise Failure('W3 dense inventory state')
         if probe=='S6-S16' and (r['operationsReplayed']!=n or r['sequencesReplayed']!=1 or r['uniqueQueries']!=n or r['queryRequests']!=2*n):raise Failure('W3 replay-per-query or lost query')
@@ -72,6 +77,14 @@ def verify_metrics(output:str)->list[dict]:
     if {r['N'] for r in staggered}!={1000,2000,4000} or len(staggered)!=3:raise Failure('W3 wide staggered probe missing')
     for r in staggered:
         if r['deliveries']!=r['N'] or r['joinTransfers']!=r['N']+1 or r['bindings']!=r['N']//125 or r['predecessorContributionReads']!=0 or r['joinEntriesVisited']<=r['N']*r['bindings']:raise Failure('W3 staggered work mismatch')
+    support_rows=verify_support_metrics(output)
+    return rows
+
+def verify_support_metrics(output:str)->list[dict]:
+    rows=[json.loads(s) for s in re.findall(r'^W3_SUPPORT_METRICS (\{.*\})$',output,re.M)]
+    if len(rows)!=4 or {r['N'] for r in rows}!={1000,2000,4000,10000}:raise Failure('W3 support scale missing')
+    for r in rows:
+        if r['candidates']!=1 or r['supports']!=r['N'] or r['supportUnionEntriesVisited']<=0 or r['supportBytesAllocatedEstimate']<=0:raise Failure('W3 support loss or unmeasured union')
     return rows
 
 def architecture(root:Path,update:bool=False)->None:
@@ -103,10 +116,10 @@ def run(root:Path,category:str,update:bool=False)->None:
     else:
         names=set(TESTS) if category=='performance' else set(TESTS)-{'ValuesScaleTest'}
         output=command(root,maven+['-pl','analysis-values','-am','clean','test','-Dtest=BuildCfgContractTest,StructureTest,'+','.join(sorted(names))])
-        verify_reports(root,names);corpus=verify_corpus(output)
+        verify_reports(root,names);corpus=verify_corpus(output);verify_support_metrics(output)
         if category=='performance':
             rows=verify_metrics(output);path=root/'.harness-results/w3-performance.json';path.parent.mkdir(exist_ok=True)
-            path.write_text(json.dumps({'scope':'W3 real AIR/CFG/PossibleValues; W4/W5 unavailable','role':'OBSERVATION_ONLY','corpus':corpus,'measurements':rows,'retention':'identity walk of actual reachable objects; logical counts, allocated byte estimates explicitly labelled'},indent=2)+'\n')
+            path.write_text(json.dumps({'scope':'W3 real AIR/CFG/PossibleValues; W4/W5 unavailable','role':'OBSERVATION_ONLY','corpus':corpus,'measurements':rows,'supportMeasurements':verify_support_metrics(output),'retention':'identity walk of actual reachable objects; logical counts, allocated byte estimates explicitly labelled'},indent=2)+'\n')
         print('[w3-'+category+'] PASS: '+str(sum(len(TESTS[n]) for n in names))+' nominal tests; real AIR/CFG/W1/W2/W3, no skips')
 
 if __name__=='__main__':

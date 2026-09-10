@@ -79,6 +79,14 @@ def main() -> int:
         historical = git("diff", "--name-only", remediation_base, "--", "docs/work/evidence").decode().splitlines()
         if any(not p.startswith("docs/work/evidence/WORK-CFG-028/wave-3/") for p in historical):
             raise ValueError("historical evidence changed")
+        reviewed = "8cb55b86c83644e4727cc532787a518775d7e868"
+        if git("diff", "--name-only", reviewed, "--", "analysis-kernel", "pom.xml", "analysis-values/pom.xml", "cfg-kernel", "cfg-adapters", "cfg-launcher"):
+            raise ValueError("W3 F1/F2 may not change reviewed W1/W2/AVL/replay/module DAG")
+        avl="analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PersistentBindings.java"
+        if (ROOT/avl).read_bytes()!=git("show",reviewed+":"+avl):raise ValueError("W3 F1/F2 preserves AVL")
+        for path in git("diff","--name-only",reviewed,"--","docs/work/evidence").decode().splitlines():
+            if not path.startswith("docs/work/evidence/WORK-CFG-028/wave-3/review-f1-f2/"):
+                raise ValueError("W3 F1/F2 historical evidence changed: "+path)
         # Bind the offline Java/POM inventory to Git, so editing both cannot hide a change.
         names = git("ls-tree", "-r", "--name-only", BASE).decode().splitlines()
         baseline_sources = {p:hashlib.sha256(git("show", BASE + ":" + p)).hexdigest()

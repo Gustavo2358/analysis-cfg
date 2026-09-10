@@ -411,6 +411,27 @@ class Cp5HarnessTests(unittest.TestCase):
         for output in ['', 'W2_CORPUS {}']:
             with self.assertRaises((Failure,KeyError)):verify_corpus(output)
 
+    def test_w3_focal_review_cannot_drop_blocker_or_approve_itself(self):
+        self.edit(LIFECYCLE,lambda x:x['wave_3']['remediation']['blockers'].remove('W3-F1'))
+        self.guard('W3 focal blockers')
+        self.edit(LIFECYCLE,lambda x:x['waves'][2].update(status='APPROVED'))
+        self.guard('W3 started/implemented')
+
+    def test_w3_focal_scope_freezes_reviewed_replay(self):
+        from check_w3 import verify_sources,Failure
+        p=self.root/'analysis-kernel/src/main/java/io/github/gustavo2358/analysis/query/BatchReplayer.java'
+        p.write_text(p.read_text()+'\n')
+        with self.assertRaisesRegex(Failure,'changed reviewed foundation'):verify_sources(self.root)
+
+    def test_w3_support_metrics_cannot_be_empty_or_lose_support(self):
+        from check_w3 import verify_support_metrics,Failure
+        with self.assertRaisesRegex(Failure,'support scale missing'):verify_support_metrics('')
+        rows=[dict(N=n,candidates=1,supports=n,supportUnionEntriesVisited=1,supportBytesAllocatedEstimate=1) for n in [1000,2000,4000,10000]]
+        output=lambda:'\n'.join('W3_SUPPORT_METRICS '+json.dumps(r) for r in rows)
+        self.assertEqual(rows,verify_support_metrics(output()))
+        rows[0]['supports']=999
+        with self.assertRaisesRegex(Failure,'support loss'):verify_support_metrics(output())
+
     def test_w3_authorization_hooks_and_approved_w2_are_required(self):
         for path,change,reason in [
             (LIFECYCLE,lambda x:x['waves'][2].update(status='APPROVED'),'never human-approved'),

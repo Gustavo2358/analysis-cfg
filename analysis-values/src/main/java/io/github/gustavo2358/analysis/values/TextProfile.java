@@ -15,6 +15,8 @@ final class TextProfile {
     final IdentityHashMap<ContextView,PossibleValuesState> boundaries=new IdentityHashMap<>();
     private final Map<UnitId,Set<ObjectId>> visible=new HashMap<>();
     final Map<UnitId,Boolean> sourceOpen=new HashMap<>();
+    private final Set<Integer> sourceOpenCells=new HashSet<>();
+    private final Set<EntryId> sourceOpenEntries=new HashSet<>();
     final ValueUniverse universe=new ValueUniverse();
     final List<PremiseId> premises=new ArrayList<>();
     final ValuesWork preparation=new ValuesWork();
@@ -30,6 +32,8 @@ final class TextProfile {
             var location=cells.get(cell.header().id());
             if(location==null){int ordinal=cells.size();Math.incrementExact(ordinal);location=new Location(ordinal,cell);cells.put(cell.header().id(),location);}
             subjects.put(object.id(),location);
+            if(object.coverage()!=Evidence.CoverageStatus.MODELED||open(object.precision().storage())||open(object.precision().values()))
+                sourceOpenCells.add(location.ordinal());
         }
         // A single premise must cover all admitted bases. Scan premise members once, not pairs.
         if(cells.size()>1) {
@@ -50,6 +54,7 @@ final class TextProfile {
             sourceOpen.put(unit.id(),open);visible.put(unit.id(),Set.copyOf(unit.visibleObjects()));
         }
         for(var context:session.contexts()) {
+            if(!context.entry().state().uncertainties().isEmpty())sourceOpenEntries.add(context.entry().id());
             var seed=PossibleValuesState.reached();var initial=new HashMap<Integer,Entries.InitialValue>();
             for(var condition:context.entry().state().conditions()) {
                 if(!(condition.place() instanceof Places.ObjectPlace object))throw new Refusal(false,"UNSUPPORTED_INITIAL_PLACE");
@@ -63,7 +68,10 @@ final class TextProfile {
                 }
                 if(condition.value() instanceof Entries.LiteralInitial literal) {
                     if(!(literal.value().value() instanceof Values.TextValue text))throw new Refusal(false,"UNSUPPORTED_INITIAL_VALUE");
-                    seed=seed.assign(location.ordinal(),universe.intern(text,preparation),preparation);
+                    var value=universe.supported(text,condition.place().header().id(),condition.origin(),condition.premises(),preparation);
+                    // Conditions are simultaneous; equal literals on one Cell retain both supports.
+                    if(previous!=null)value=seed.value(location.ordinal(),preparation).join(value,preparation);
+                    seed=seed.assign(location.ordinal(),value,preparation);
                 }
             }
             boundaries.put(context,seed);
@@ -76,7 +84,7 @@ final class TextProfile {
                 throw new Refusal(false,"UNSUPPORTED_EFFECT_PROFILE");
             var location=subjects.get(destination.object());
             if(location==null)throw new Refusal(false,"UNSUPPORTED_STORAGE_PROFILE");
-            writes.put(operation,new Write(location,universe.intern(text,preparation)));
+            writes.put(operation,new Write(location,universe.supported(text,assign.header().id(),assign.header().origin(),List.of(),preparation)));
         } else if(!(operation instanceof Operations.Nop||operation instanceof Operations.Return||operation instanceof Operations.Jump||operation instanceof Operations.Branch||operation instanceof Operations.Halt))
             throw new Refusal(false,"UNSUPPORTED_EFFECT_PROFILE");
         admitted.add(operation);
@@ -94,9 +102,8 @@ final class TextProfile {
         return subject.unit().equals(entry.unit())||visible.get(entry.unit()).contains(subject);
     }
     boolean sourceOpen(ObjectId subject,EntryId entry) {
-        var object=session.index().object(subject);
-        return sourceOpen.get(entry.unit())||object.coverage()!=Evidence.CoverageStatus.MODELED
-                ||open(object.precision().storage())||open(object.precision().values());
+        return sourceOpen.get(entry.unit())||sourceOpenEntries.contains(entry)
+                ||sourceOpenCells.contains(subjects.get(subject).ordinal());
     }
     private static boolean open(Evidence.Coverage coverage) { return coverage.inventory()!=Evidence.InventoryStatus.COMPLETE||!coverage.uncertainties().isEmpty(); }
     private static boolean open(Evidence.Claim claim) { return claim.status()!=Evidence.PrecisionStatus.EXACT&&claim.status()!=Evidence.PrecisionStatus.NOT_APPLICABLE; }

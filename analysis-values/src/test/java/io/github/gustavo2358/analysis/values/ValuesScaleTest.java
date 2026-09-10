@@ -18,7 +18,7 @@ class ValuesScaleTest {
         m.put("queriesNotMaterialized",metrics.queriesNotMaterialized());m.put("observationFailures",metrics.observationFailures());
         m.put("analysisPoints",run.dataflow().metrics().analysisPoints());m.put("operationsTransferred",run.dataflow().metrics().operationsTransferred());m.put("predecessorContributionReads",run.dataflow().metrics().predecessorContributionReads());m.put("edgeContributionJoins",run.dataflow().metrics().edgeContributionJoins());
         RetentionAudit.count(run.dataflow()).forEach((k,v)->m.put("retained_"+k,v));RetentionAudit.count(batch).forEach((k,v)->m.put("batchRetained_"+k,v));
-        assertEquals(0,m.getOrDefault("batchRetained_PossibleValuesState",0L));assertEquals(0,m.getOrDefault("batchRetained_Node",0L));assertEquals(0,m.getOrDefault("batchRetained_ValueUniverse",0L));
+        assertEquals(0,m.getOrDefault("batchRetained_PossibleValuesState",0L));assertEquals(0,m.getOrDefault("batchRetained_Node",0L));assertEquals(0,m.getOrDefault("batchRetained_ValueUniverse",0L));assertEquals(0,m.getOrDefault("batchRetained_SupportSet",0L));
         return m;
     }
     private static void report(String probe,int n,Map<String,Long> metrics,long elapsed) {
@@ -36,6 +36,9 @@ class ValuesScaleTest {
             long start=System.nanoTime();var p=longSequence(n,1,false,false);var run=execute(p);var batch=run.observe(List.of(before(p,0,0)));
             expected(batch.batch().observations().getFirst().value(),false,"v1");
             assertEquals(2,run.preparationMetrics().get("valuesInterned"));
+            var observed=batch.batch().observations().getFirst().value();
+            assertEquals(List.of(new OperationId(p.units().getFirst().id(),"i"+(n-1))),observed.evidence(),"only final producer survives strong writes");
+            assertEquals(1,RetentionAudit.count(run.dataflow()).get("supportElementsRetained"));
             assertEquals(1,run.solveMetrics().get("maxSparseBindings"));
             assertTrue(RetentionAudit.count(run.dataflow()).get("PossibleValuesState")<=3,"no instruction state history");
             assertEquals(n,batch.batch().metrics().operationsReplayed());report("S1",n,measurements(run,batch),System.nanoTime()-start);
