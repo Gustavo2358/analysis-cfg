@@ -1,7 +1,7 @@
 # CP5 — fronteiras da análise
 
-Arquitetura `accepted`; W1/W2 APPROVED. W3 autorizada e em validação.
-W4/W5 permanecem ausentes. H1–H7/R1/R2 foram aprovados
+Arquitetura `accepted`; W1/W2/W3 APPROVED. W4 autorizada para shared planning/consumers.
+W5 permanece ausente e não autorizada. H1–H7/R1/R2 foram aprovados
 pelo pedido humano de 09/09/2026 que autoriza somente esta preparação.
 [Proveniência e hashes](../work/evidence/WORK-CFG-028/baseline.json) identificam o
 handoff 1.0 e o discovery revisado, lidos integralmente em `artefatos-e2e/cp5/`.
@@ -135,3 +135,12 @@ sem interpretação de nomes. Nenhuma interface de solver/state nasceu nesta Wav
 W2, com estado por Cell e subjects ObjectId. analysis-kernel/query implementa replay
 genérico por direção; W1/W2 Java intactos. A dependência direta cfg-kernel em values
 é exigida pelas assinaturas CfgTransition/CfgNode existentes, sem inversão do DAG.
+
+## W4 — planejamento compartilhado
+
+[Contrato, custos e ownership](../engineering/cp5-w4-planning-ledger.md): aplicação
+genérica, registry explícito, key semântica completa, plano imutável por buckets W1,
+união de queries e provider W3 com binding de execução/replay. Consumers têm somente
+SiteView e facts preparados; FactSink faz staging atômico por consumer.
+selectEntries acrescenta escopo sem reindexação; solver/domínio/replay anteriores
+permanecem byte-exact. Nenhuma composição wire/CLI/entrega W5.

@@ -90,16 +90,16 @@
       "eval": "EVAL-CFG-037",
       "gates": {
         "architecture": {
-          "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-          "hook": null
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w4.py"
         },
         "semantic": {
-          "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-          "hook": null
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w4.py"
         },
         "performance": {
-          "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-          "hook": null
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w4.py"
         }
       },
       "audit_requirements": [

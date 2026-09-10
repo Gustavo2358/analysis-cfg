@@ -36,10 +36,10 @@ def run(gate: str, root: Path) -> int:
             print(issue, file=sys.stderr)
         return 1
     if gate == 'performance' and (root/'analysis-kernel/pom.xml').is_file():
-        for wave in (1,2,3):
+        for wave in (1,2,3,4):
             rc = subprocess.run([sys.executable,str(root/'scripts/project/check_cp5_gate.py'),'performance','--wave',str(wave),'--root',str(root)],cwd=root).returncode
             if rc: return rc
-        print('[performance] W1 PASS; W2 PASS; W3 PASS; UNAVAILABLE: W4-W5 NOT_AVAILABLE_UNTIL_IMPLEMENTED (exit 3)',flush=True)
+        print('[performance] W1 PASS; W2 PASS; W3 PASS; W4 PASS; UNAVAILABLE: W5 NOT_AVAILABLE_UNTIL_IMPLEMENTED (exit 3)',flush=True)
         return 3
     if gate == 'full':
         for child in ('fast', 'architecture', 'semantic', 'performance', 'integration'):

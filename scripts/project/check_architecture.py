@@ -423,7 +423,9 @@ def verify_project_shape(root: Path) -> None:
     from check_w1 import source_inventory, verify_sources
     from check_w2 import SOURCES as SOLVER_SOURCES, verify_sources as verify_solver_sources
     from check_w3 import QUERY_SOURCES, VALUE_SOURCES, verify_sources as verify_value_sources
-    analysis_sources = source_inventory(root) | SOLVER_SOURCES | QUERY_SOURCES | VALUE_SOURCES
+    from check_w4 import SOURCES as PLANNING_SOURCES, verify_sources as verify_planning_sources
+    analysis_sources = source_inventory(root) | SOLVER_SOURCES | QUERY_SOURCES | VALUE_SOURCES | PLANNING_SOURCES
+    verify_planning_sources(root)
     verify_value_sources(root)
     verify_solver_sources(root)
     verify_sources(root)
@@ -488,9 +490,9 @@ def verify_snapshot_pin(root: Path) -> str:
         raise GateFailure("CI must not resolve air-java from a mutable branch")
     if f'test "$(git rev-parse HEAD)" = "{sha}"' not in workflow:
         raise GateFailure("CI must verify air-java HEAD before installation")
-    if workflow.count("MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2") != 7:
+    if workflow.count("MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2") != 8:
         raise GateFailure("CI must share one isolated Maven repository across upstream and consumer")
-    for wave in (1, 2):
+    for wave in (1, 2, 3, 4):
         if f"scripts/project/check_cp5_gate.py performance --wave {wave}" not in workflow:
             raise GateFailure(f"CI must execute CP5 Wave {wave} product probes")
     if 'distribution: temurin' not in workflow or 'java-version: "21"' not in workflow:
@@ -780,6 +782,8 @@ def architecture_gate(root: Path) -> None:
     solver_architecture(root)
     from check_w3 import architecture as values_architecture
     values_architecture(root)
+    from check_w4 import architecture as planning_architecture
+    planning_architecture(root)
 
     print(f"[architecture] PASS: {total} kernel tests ({skipped} skipped), "
           f"{len(EXPECTED_CLASSFILES)} production classfiles, "

@@ -135,3 +135,10 @@ dataflow pertencem a W3–W5, ainda NOT_STARTED / NOT_AUTHORIZED.
 analysis-values acrescenta scalar-text-direct@1, estado sparse por Cell, pool de
 textos e observações; analysis-kernel/query acrescenta replay genérico por direção.
 [Contrato e ledger](docs/engineering/cp5-w3-values-ledger.md). Sem consumers/CLI.
+
+## CP5 W4
+
+W1/W2/W3 aprovadas; shared planner/consumers autorizados e implementados no kernel
+de análise existente. Descritores em plan, SPI restrita em consumers e runtime em
+application; provider concreto em analysis-values. [Ledger W4](docs/engineering/cp5-w4-planning-ledger.md).
+W5 segue não autorizada: sem writer, CLI de dataflow ou resolvers de negócio.

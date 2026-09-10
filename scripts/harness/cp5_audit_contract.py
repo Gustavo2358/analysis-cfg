@@ -89,8 +89,8 @@ def validate_audit(root: Path) -> list[str]:
             require(row.get('documentation') == DOC+'#'+key.lower() and '\n## '+key+' — ' in document, 'documentation ' + key)
             require(row.get('runtime_status') == 'NOT_AVAILABLE_UNTIL_IMPLEMENTED' and row.get('runtime_hook') is None, 'no engine claim ' + key)
         for key in OBLIGATIONS:
-            expected_hooks = {str(n):{'status':'IMPLEMENTED','hook':f'scripts/project/check_w{n}.py'} for n in (1,2,3) if n in WAVES[key]}
-            require(data['requirements'][key].get('wave_hooks',{}) == expected_hooks, 'W1/W2/W3 audit hook '+key)
+            expected_hooks = {str(n):{'status':'IMPLEMENTED','hook':f'scripts/project/check_w{n}.py'} for n in (1,2,3,4) if n in WAVES[key]}
+            require(data['requirements'][key].get('wave_hooks',{}) == expected_hooks, 'W1/W2/W3/W4 audit hook '+key)
         witness = data['backward_witness']
         require(witness == {'language':'TEST_ONLY_GEN_KILL', 'operations':['def X','use X'],
                 'OUT':[], 'after_use':[], 'before_use':['X'], 'after_def':['X'], 'before_def':[],

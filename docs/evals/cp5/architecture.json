@@ -84,7 +84,21 @@
         "cfg.domain.CfgGraph",
         "lower",
         "cobolexplorer",
-        "org.antlr"
+        "org.antlr",
+        "analysis.structure.AnalysisSession",
+        "analysis.application",
+        "analysis.query.BatchReplayer",
+        "analysis.values.PossibleValuesAnalysis",
+        "analysis.values.PossibleValuesProvider",
+        "cfg.application.CfgBuildCoordinator",
+        "java.io",
+        "java.nio.file",
+        "java.net",
+        "java.lang.reflect",
+        "java.util.ServiceLoader",
+        "air.model.Publication",
+        "air.model.Sequence",
+        "air.model.Unit"
       ]
     }
   },
@@ -121,5 +135,6 @@
   "core_size_contract": "docs/evals/cp5/core-size-contract.json",
   "resource_failure_semantic_mappings": {},
   "solver_inventory": "docs/evals/cp5/w2-inventory.json",
-  "query_inventory": "docs/evals/cp5/w3-inventory.json"
+  "query_inventory": "docs/evals/cp5/w3-inventory.json",
+  "planning_inventory": "docs/evals/cp5/w4-inventory.json"
 }

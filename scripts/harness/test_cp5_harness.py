@@ -203,7 +203,7 @@ class Cp5HarnessTests(unittest.TestCase):
 
     def test_each_wave_cannot_start_or_be_authorized(self):
         original = (self.root/LIFECYCLE).read_bytes()
-        for index in range(3,5):
+        for index in range(4,5):
             for change in [dict(status='STARTED'),dict(authorization='AUTHORIZED')]:
                 with self.subTest(wave=index+1,change=change):
                     (self.root/LIFECYCLE).write_bytes(original)
@@ -211,8 +211,8 @@ class Cp5HarnessTests(unittest.TestCase):
                     self.guard('NOT_STARTED / NOT_AUTHORIZED')
 
     def test_no_active_wave_pointer(self):
-        self.edit(LIFECYCLE,lambda x:x.update(authorized_wave=4))
-        self.guard('only Wave 3 authorized')
+        self.edit(LIFECYCLE,lambda x:x.update(authorized_wave=5))
+        self.guard('only Wave 4 authorized')
 
     def test_discovery_approval_cannot_authorize_wave(self):
         self.edit(LIFECYCLE,lambda x:x['last_human_approval'].update(does_not_authorize_waves=False))
@@ -314,7 +314,7 @@ class Cp5HarnessTests(unittest.TestCase):
         self.guard('no empty hook product PASS')
 
     def test_engine_eval_cannot_be_marked_implemented(self):
-        self.edit('docs/evals/catalog.json',lambda x:next(e for e in x['evals'] if e['id']=='EVAL-CFG-037').update(status='implemented'))
+        self.edit('docs/evals/catalog.json',lambda x:next(e for e in x['evals'] if e['id']=='EVAL-CFG-038').update(status='implemented'))
         self.guard('no engine eval implemented')
 
     def test_existing_performance_stays_unavailable(self):
@@ -323,7 +323,7 @@ class Cp5HarnessTests(unittest.TestCase):
 
     def test_product_routes_are_never_preparation_pass(self):
         with contextlib.redirect_stdout(io.StringIO()):
-            for wave in range(4,6):
+            for wave in range(5,6):
                 for category in ['architecture','semantic','performance','integration']:
                     self.assertEqual(3,run(self.root,category,wave))
 
@@ -369,17 +369,17 @@ class Cp5HarnessTests(unittest.TestCase):
         command=[sys.executable,str(self.root/'scripts/harness/validate_cp5.py'),'--root',str(self.root)]
         good=subprocess.run(command,capture_output=True,text=True)
         self.assertEqual(0,good.returncode,good.stdout+good.stderr)
-        self.assertIn('W1/W2/W3 contracts only',good.stdout)
-        self.edit(LIFECYCLE,lambda x:x.update(authorized_wave=4))
+        self.assertIn('W1/W2/W3/W4 contracts only',good.stdout)
+        self.edit(LIFECYCLE,lambda x:x.update(authorized_wave=5))
         bad=subprocess.run(command,capture_output=True,text=True)
         self.assertEqual(1,bad.returncode,bad.stdout+bad.stderr)
-        self.assertIn('only Wave 3 authorized',bad.stdout)
+        self.assertIn('only Wave 4 authorized',bad.stdout)
 
     def test_w1_authorization_and_runtime_hooks_are_required(self):
         for path,change,reason in [
-            (LIFECYCLE,lambda x:x['waves'][2].update(status='APPROVED'),'never human-approved'),
+            (LIFECYCLE,lambda x:x['waves'][3].update(status='APPROVED'),'never human-approved'),
             (LIFECYCLE,lambda x:x['review_history'][4].update(reviewed_head='0'*40),'W1 reviewed HEAD'),
-            (PLAN+'probes.json',lambda x:x['probes'][0].pop('wave_hooks'),'W1/W2/W3 real probe'),
+            (PLAN+'probes.json',lambda x:x['probes'][0].pop('wave_hooks'),'W1/W2/W3/W4 real probe'),
             (PLAN+'gate-plan.json',lambda x:x['waves'][0]['gates']['performance'].update(hook=None),'no empty hook')]:
             original=(self.root/path).read_bytes()
             try:self.edit(path,change);self.guard(reason)
@@ -394,7 +394,7 @@ class Cp5HarnessTests(unittest.TestCase):
 
     def test_w2_authorization_and_approval_cannot_be_inferred(self):
         for path,change,reason in [
-            (LIFECYCLE,lambda x:x['waves'][2].update(status='APPROVED'),'never human-approved'),
+            (LIFECYCLE,lambda x:x['waves'][3].update(status='APPROVED'),'never human-approved'),
             (LIFECYCLE,lambda x:x['waves'][0].update(reviewed_head='0'*40),'W1 explicit human-approved HEAD'),
             (LIFECYCLE,lambda x:x['review_history'][5].update(reviewed_head='0'*40),'W2 reviewed HEAD'),
             (PLAN+'gate-plan.json',lambda x:x['waves'][1]['gates']['semantic'].update(hook=None),'no empty hook')]:
@@ -414,8 +414,8 @@ class Cp5HarnessTests(unittest.TestCase):
     def test_w3_focal_review_cannot_drop_blocker_or_approve_itself(self):
         self.edit(LIFECYCLE,lambda x:x['wave_3']['remediation']['blockers'].remove('W3-F1'))
         self.guard('W3 focal blockers')
-        self.edit(LIFECYCLE,lambda x:x['waves'][2].update(status='APPROVED'))
-        self.guard('W3 started/implemented')
+        self.edit(LIFECYCLE,lambda x:x['waves'][3].update(status='APPROVED'))
+        self.guard('W4 started/implemented')
 
     def test_w3_focal_scope_freezes_reviewed_replay(self):
         from check_w3 import verify_sources,Failure
@@ -434,7 +434,7 @@ class Cp5HarnessTests(unittest.TestCase):
 
     def test_w3_authorization_hooks_and_approved_w2_are_required(self):
         for path,change,reason in [
-            (LIFECYCLE,lambda x:x['waves'][2].update(status='APPROVED'),'never human-approved'),
+            (LIFECYCLE,lambda x:x['waves'][3].update(status='APPROVED'),'never human-approved'),
             (LIFECYCLE,lambda x:x['waves'][1].update(reviewed_head='0'*40),'W2 explicit human-approved HEAD'),
             (LIFECYCLE,lambda x:x['review_history'][6].update(reviewed_head='0'*40),'W3 reviewed HEAD'),
             (PLAN+'gate-plan.json',lambda x:x['waves'][2]['gates']['semantic'].update(hook=None),'no empty hook'),
@@ -451,6 +451,50 @@ class Cp5HarnessTests(unittest.TestCase):
             with self.assertRaises((Failure,KeyError)):verify_metrics(output)
         for output in ['', 'W3_CORPUS {}']:
             with self.assertRaises((Failure,KeyError)):verify_corpus(output)
+
+    def test_w4_authorization_and_hooks_cannot_be_inferred(self):
+        for path,change,reason in [
+            (LIFECYCLE,lambda x:x['waves'][3].update(status='APPROVED'),'never human-approved'),
+            (LIFECYCLE,lambda x:x['waves'][2].update(reviewed_head='0'*40),'W3 explicit human-approved HEAD'),
+            (LIFECYCLE,lambda x:x['review_history'][8].update(reviewed_head='0'*40),'W4 reviewed HEAD'),
+            (PLAN+'gate-plan.json',lambda x:x['waves'][3]['gates']['semantic'].update(hook=None),'no empty hook'),
+            (PLAN+'metrics.json',lambda x:x['wave_4'].update(hook=None),'W4 real metrics hook')]:
+            original=(self.root/path).read_bytes()
+            try:self.edit(path,change);self.guard(reason)
+            finally:(self.root/path).write_bytes(original)
+            self.assertEqual([],validate_cp5(self.root))
+
+    def test_w4_approved_sources_are_frozen_except_exact_additive_selection(self):
+        from check_w4 import verify_foundation,Failure
+        verify_foundation(self.root)
+        p=self.root/'analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/AnalysisSession.java'
+        p.write_text(p.read_text().replace('return index;', 'return java.util.Objects.requireNonNull(index);'))
+        with self.assertRaisesRegex(Failure,'changed approved foundation'):verify_foundation(self.root)
+
+    def test_w4_nominal_reports_and_context_witness_cannot_be_empty(self):
+        from check_w4 import verify_reports,verify_keys,Failure
+        with self.assertRaises(Failure):verify_reports(self.root,{'PlanningRuntimeTest'})
+        for output in ['', 'W4_KEYS {}', 'W4_KEYS {"analysisRuns":1}']:
+            with self.assertRaises(Failure):verify_keys(output)
+
+    def test_w4_actual_scale_quality_retention_and_no_k_replay_are_guarded(self):
+        from check_w4 import verify_metrics,Failure
+        rows=load_json(self.root/'docs/work/evidence/WORK-CFG-028/wave-4/scale.json')['measurements']
+        output=lambda values:'\n'.join('W4_METRICS '+json.dumps(r) for r in values)
+        self.assertEqual(rows,verify_metrics(output(rows)))
+        for field in ['analysis_analysisRuns','observation_operationsReplayed','observation_queriesAnswered',
+                      'consumer_factsCommitted','retained_DataflowResult','planning_structuralVisits']:
+            mutant=copy.deepcopy(rows);row=next(r for r in mutant if r['probe']=='S6-all' and r['N']==4000 and r['K']==20);row[field]+=1
+            with self.subTest(field=field),self.assertRaises(Failure):verify_metrics(output(mutant))
+        for mutant in [rows[:-1],rows+[rows[0]],[]]:
+            with self.assertRaises(Failure):verify_metrics(output(mutant))
+
+    def test_w4_consumers_cannot_import_run_replay_session_or_io(self):
+        from check_w4 import verify_edges,Failure
+        consumer='io.github.gustavo2358.analysis.consumers.Test'
+        for target in ['io.github.gustavo2358.analysis.solver.DataflowSolver','io.github.gustavo2358.analysis.structure.AnalysisSession',
+                       'io.github.gustavo2358.analysis.query.BatchReplayer','java.nio.file.Files']:
+            with self.subTest(target=target),self.assertRaisesRegex(Failure,'forbidden consumers'):verify_edges({consumer:[target]})
 
     def test_result_contract_cannot_drop_semantic_statuses_or_change_version(self):
         self.edit(PLAN+'result-contract.json',lambda x:x.update(version='2.0.0',execution_statuses=['STABLE']))

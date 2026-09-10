@@ -58,7 +58,7 @@
       "id": "scan-objects-per-assign",
       "wave": 1,
       "probe": "S2",
-      "oracle": "referencesResolved/structuralVisits follows R, not I×D",
+      "oracle": "referencesResolved/structuralVisits follows R, not I\u00d7D",
       "status": "IMPLEMENTED",
       "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexBuilder.java",
       "hook": "scripts/project/challenge_w1.py"
@@ -131,27 +131,33 @@
       "wave": 4,
       "probe": "S5",
       "oracle": "same-key analysisRuns invariant and consumer bytecode boundary",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/consumers/FactConsumer.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "architecture",
+      "expected_diagnostic": "W4 forbidden consumers bytecode dependency"
     },
     {
       "id": "full-traversal-per-consumer",
       "wave": 4,
       "probe": "S5",
       "oracle": "structuralVisits invariant with K",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/SitePlanner.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningScaleTest#sparseOverlappingConsumersShareBucketsAndOneActualAnalysis",
+      "expected_diagnostic": "bucket scan once"
     },
     {
       "id": "broadcast-i-times-k",
       "wave": 4,
       "probe": "S5",
       "oracle": "callbacks match sparse site interests only",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/SitePlanner.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningContractTest#overlappingInterestsDispatchOnlyExactPairsAndKeepStructuralPresence",
+      "expected_diagnostic": "expected:"
     },
     {
       "id": "replay-per-query-site",
@@ -167,9 +173,11 @@
       "wave": 4,
       "probe": "S5",
       "oracle": "sink observes only stabilized model after overwrite/loop",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesProvider.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningRuntimeTest#finalFactsReflectFixedPointAfterOverwritesAndLoop",
+      "expected_diagnostic": "only final stable overwrite reaches sink"
     },
     {
       "id": "partial-promoted-to-exact",
@@ -248,9 +256,11 @@
       "wave": 4,
       "probe": "S8",
       "oracle": "Different semantic profile/Entry creates distinct runs; equal semantic key shared; infrastructure options never enter key.",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/PlanningExecution.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningContractTest#distinctProfilesOptionsAndEntriesRunSeparatelyWithNoPhantomContext",
+      "expected_diagnostic": "wrong batch bound to analysis key"
     },
     {
       "id": "fixture-specific-production-route",
@@ -376,9 +386,11 @@
       "wave": 4,
       "probe": "S14",
       "oracle": "Failed consumer leaves other completed consumer status intact and pipeline INCOMPLETE.",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/PlanningExecution.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningRuntimeTest#failingConsumerDiscardsEveryStagedFactAndOthersComplete",
+      "expected_diagnostic": "expected: <FAILED>"
     },
     {
       "id": "performance-optimization-by-lost-candidates",
@@ -421,9 +433,11 @@
       "wave": 4,
       "probe": "S14",
       "oracle": "Failed QueryConsumer batch leaves zero-query StructuralConsumer COMPLETE; preparation INCOMPLETE.",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/PlanningExecution.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningRuntimeTest#f3FailureIsLocalAndIndependentBatchesShareStableRun",
+      "expected_diagnostic": "independent structural consumer completes"
     },
     {
       "id": "size-cap-rejects-valid-program",
@@ -502,18 +516,22 @@
       "wave": 4,
       "probe": "S16",
       "oracle": "Increasing query demand changes work, not supported coverage.",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/SitePlanner.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningScaleTest#consumersQueriesMatchesFactsAndBatchesHaveNoCapacitySemantics",
+      "expected_diagnostic": "mutant query capacity"
     },
     {
       "id": "max-consumers-admission",
       "wave": 4,
       "probe": "S16",
       "oracle": "More consumers/sites/batches do not impose admission ceilings.",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/SitePlanner.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningScaleTest#consumersQueriesMatchesFactsAndBatchesHaveNoCapacitySemantics",
+      "expected_diagnostic": "mutant consumer capacity"
     },
     {
       "id": "maximum-result-size",
@@ -649,6 +667,193 @@
       "status": "IMPLEMENTED",
       "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
       "hook": "scripts/project/challenge_w2.py"
+    },
+    {
+      "id": "solver-per-consumer",
+      "wave": 4,
+      "probe": "S5",
+      "oracle": "one actual provider solve",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/PlanningExecution.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningRuntimeTest#realVerticalSharesRunQueryReplayAndProducerSupport",
+      "expected_diagnostic": "one actual provider solve"
+    },
+    {
+      "id": "solver-per-observation-batch",
+      "wave": 4,
+      "probe": "S6",
+      "oracle": "batches reuse stable run",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/PlanningExecution.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningRuntimeTest#f3FailureIsLocalAndIndependentBatchesShareStableRun",
+      "expected_diagnostic": "batches reuse stable run"
+    },
+    {
+      "id": "replay-per-consumer",
+      "wave": 4,
+      "probe": "S6",
+      "oracle": "one actual observation batch",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/PlanningExecution.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningRuntimeTest#realVerticalSharesRunQueryReplayAndProducerSupport",
+      "expected_diagnostic": "one actual observation batch"
+    },
+    {
+      "id": "analysis-only-consumer-forced-to-depend-on-batch",
+      "wave": 4,
+      "probe": "S14",
+      "oracle": "analysis-only does not depend on batch",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/PlanningExecution.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningRuntimeTest#f3FailureIsLocalAndIndependentBatchesShareStableRun",
+      "expected_diagnostic": "analysis-only does not depend on batch"
+    },
+    {
+      "id": "structural-consumer-forced-to-start-analysis",
+      "wave": 4,
+      "probe": "S14",
+      "oracle": "expected:",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/PlanningExecution.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningRuntimeTest#analysisOnlyDoesNotCreateObservationAndStructuralStartsNoAnalysis",
+      "expected_diagnostic": "expected:"
+    },
+    {
+      "id": "consumer-partial-facts-committed-on-failure",
+      "wave": 4,
+      "probe": "S14",
+      "oracle": "failed consumer commits no partial bundle",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/PlanningExecution.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningRuntimeTest#failingConsumerDiscardsEveryStagedFactAndOthersComplete",
+      "expected_diagnostic": "failed consumer commits no partial bundle"
+    },
+    {
+      "id": "missing-consumer-dependency-treated-as-success",
+      "wave": 4,
+      "probe": "S14",
+      "oracle": "missing batch dependency",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/SitePlanner.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningRuntimeTest#missingDependenciesAndWrongBindingsNeverProduceSuccess",
+      "expected_diagnostic": "missing batch dependency"
+    },
+    {
+      "id": "wrong-batch-bound-to-analysis-key",
+      "wave": 4,
+      "probe": "S8",
+      "oracle": "batch ID binds exact key",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/SitePlanner.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningContractTest#batchesWithSameIdCannotAliasDifferentKeys",
+      "expected_diagnostic": "batch ID binds exact key"
+    },
+    {
+      "id": "wrong-provider-execution-binding",
+      "wave": 4,
+      "probe": "S8",
+      "oracle": "provider binding mismatch rejected",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/PlanningExecution.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningRuntimeTest#registryRejectsWrongPreparedAndExecutionKey",
+      "expected_diagnostic": "provider binding mismatch rejected"
+    },
+    {
+      "id": "unplanned-query-triggers-hidden-replay",
+      "wave": 4,
+      "probe": "S6",
+      "oracle": "late access cannot replay",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/PlanningExecution.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningRuntimeTest#lateQueryIsNotRequestedAndNewEpochExplicitlyReusesRun",
+      "expected_diagnostic": "late access cannot replay"
+    },
+    {
+      "id": "global-static-run-cache",
+      "wave": 4,
+      "probe": "S8",
+      "oracle": "cache owner is session lifetime",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/PlanningExecution.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningContractTest#differentSessionsCannotShareRunsOrPlansEvenWithEqualIds",
+      "expected_diagnostic": "cache owner is session lifetime"
+    },
+    {
+      "id": "resource-cap-on-sites",
+      "wave": 4,
+      "probe": "S16",
+      "oracle": "mutant site capacity",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/SitePlanner.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningScaleTest#consumersQueriesMatchesFactsAndBatchesHaveNoCapacitySemantics",
+      "expected_diagnostic": "mutant site capacity"
+    },
+    {
+      "id": "resource-cap-on-facts",
+      "wave": 4,
+      "probe": "S16",
+      "oracle": "size never changes completion",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/PlanningExecution.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningScaleTest#consumersQueriesMatchesFactsAndBatchesHaveNoCapacitySemantics",
+      "expected_diagnostic": "size never changes completion"
+    },
+    {
+      "id": "resource-cap-on-batches",
+      "wave": 4,
+      "probe": "S16",
+      "oracle": "mutant batch capacity",
+      "status": "IMPLEMENTED",
+      "target": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/SitePlanner.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningScaleTest#consumersQueriesMatchesFactsAndBatchesHaveNoCapacitySemantics",
+      "expected_diagnostic": "mutant batch capacity"
+    },
+    {
+      "id": "drop-W3-support-or-remainder-before-consumer",
+      "wave": 4,
+      "probe": "S15",
+      "oracle": "candidate support preserved at consumer boundary",
+      "status": "IMPLEMENTED",
+      "target": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesProvider.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningRuntimeTest#realVerticalSharesRunQueryReplayAndProducerSupport",
+      "expected_diagnostic": "candidate support preserved at consumer boundary"
+    },
+    {
+      "id": "w4-unsupported-everything",
+      "wave": 4,
+      "probe": "S15",
+      "oracle": "query consumer receives supported value",
+      "status": "IMPLEMENTED",
+      "target": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesProvider.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningRuntimeTest#realVerticalSharesRunQueryReplayAndProducerSupport",
+      "expected_diagnostic": "query consumer receives supported value"
+    },
+    {
+      "id": "w4-drop-candidates",
+      "wave": 4,
+      "probe": "S15",
+      "oracle": "all real candidates reach sink",
+      "status": "IMPLEMENTED",
+      "target": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesProvider.java",
+      "hook": "scripts/project/challenge_w4.py",
+      "nominal_test": "PlanningRuntimeTest#realVerticalSharesRunQueryReplayAndProducerSupport",
+      "expected_diagnostic": "all real candidates reach sink"
     }
   ]
 }

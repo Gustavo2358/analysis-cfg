@@ -6,7 +6,7 @@
 | EVAL-CFG-034 | W1 executável | índice/identidade/contexto, arquitetura módulo, S1/S2/S4/S8 estruturais |
 | EVAL-CFG-035 | W2 executável | solver incremental/direção/leis, extensão test-only, S4/S4b/S8 |
 | EVAL-CFG-036 | W3 executável | storage/valores/claims/query/retention, S1/S2/S3/S4b/S6/S7/S9 |
-| EVAL-CFG-037 | W4 planned | consumers reais com values W3, cache/dispatch/batch, S5/S6/S8 |
+| EVAL-CFG-037 | W4 executável | consumers reais com values W3, cache/dispatch/batch, S5/S6/S8 |
 | EVAL-CFG-038 | W5 planned | seam produtivo, regressões, S1–S9 + S10 E2E |
 
 [Roadmap/DoDs](../../product/cp5-roadmap.md), [lifecycle](../../work/cp5-lifecycle.json),
@@ -15,7 +15,7 @@
 [contrato de review](result-contract.json), [exemplo](result-review.json),
 [inventário Java/POM de preparação](preparation-source-inventory.json).
 
-W1/W2/W3 usam wave_hooks e gates produtivos; hooks W4/W5 permanecem nulos.
+W1/W2/W3/W4 usam wave_hooks e gates produtivos; hooks W5 permanecem nulos; W4 tem gates reais.
 Performance/semântica de solver/arquitetura de módulos ausentes não recebem PASS.
 `python3 scripts/project/check_cp5_gate.py performance --wave 1` executa os probes reais.
 Ativação parcial por Wave não fecha nenhuma parcela futura.

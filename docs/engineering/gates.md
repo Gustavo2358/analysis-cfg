@@ -180,3 +180,12 @@ O inventário javap/jdeps/Maven é exato; W1/W2 Java ficam byte-exact.
 Performance/full executam W1/W2/W3 e retornam UNAVAILABLE/3 somente por W4/W5.
 CI executa os três hooks de performance separadamente, além de integration.
 [Ledger W3](cp5-w3-values-ledger.md) explicita admission, custos, ownership e limites.
+
+
+## WAVE_4 produtiva
+
+check_w4.py executa seleção por buckets, provider real, keys/Entry, união de queries,
+completion por dependências e FactSink atômico. Métricas de S5/S6/S8/S14/S15/S16
+e inventários compilados são nominais. [Ledger](cp5-w4-planning-ledger.md).
+Performance/full executam W1/W2/W3/W4 e preservam UNAVAILABLE/3 por W5.
+CI acrescenta performance W4 obrigatória e mantém o collector de checkout intacto.

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "W1_W2_W3_IMPLEMENTED_LATER_WAVES_UNAVAILABLE",
+  "status": "W1_W2_W3_W4_IMPLEMENTED_W5_UNAVAILABLE",
   "overflow": "Checked arithmetic; overflow is an implementation defect to correct, never a supported-size ceiling or semantic result.",
   "metrics": [
     {
@@ -524,6 +524,123 @@
       "event": "observed distinct semantic candidates in a fact; distribution and high-water mark, never a rejection threshold",
       "unit": "count",
       "audit": "Compare enumerated candidates with independent finite oracle; retain all candidates for any measured cardinality."
+    },
+    {
+      "name": "observationBatchesPlanned",
+      "group": "planning",
+      "scope": "execution/planning epoch",
+      "available_by_wave": 4,
+      "event": "unique explicit batch frozen",
+      "unit": "count",
+      "audit": "actual event with checked arithmetic; nominal W4 oracle and compiled mutation"
+    },
+    {
+      "name": "observationBatchesExecuted",
+      "group": "observation",
+      "scope": "execution/planning epoch",
+      "available_by_wave": 4,
+      "event": "bound materializer invoked",
+      "unit": "count",
+      "audit": "actual event with checked arithmetic; nominal W4 oracle and compiled mutation"
+    },
+    {
+      "name": "factsStaged",
+      "group": "consumer",
+      "scope": "execution/planning epoch",
+      "available_by_wave": 4,
+      "event": "fact appended to local staging",
+      "unit": "count",
+      "audit": "actual event with checked arithmetic; nominal W4 oracle and compiled mutation"
+    },
+    {
+      "name": "factsCommitted",
+      "group": "consumer",
+      "scope": "execution/planning epoch",
+      "available_by_wave": 4,
+      "event": "fact committed in complete bundle",
+      "unit": "count",
+      "audit": "actual event with checked arithmetic; nominal W4 oracle and compiled mutation"
+    },
+    {
+      "name": "factsDiscarded",
+      "group": "consumer",
+      "scope": "execution/planning epoch",
+      "available_by_wave": 4,
+      "event": "staged fact discarded after controlled failure",
+      "unit": "count",
+      "audit": "actual event with checked arithmetic; nominal W4 oracle and compiled mutation"
+    },
+    {
+      "name": "consumersComplete",
+      "group": "consumer",
+      "scope": "execution/planning epoch",
+      "available_by_wave": 4,
+      "event": "consumer completed all selected callbacks",
+      "unit": "count",
+      "audit": "actual event with checked arithmetic; nominal W4 oracle and compiled mutation"
+    },
+    {
+      "name": "consumersNotStarted",
+      "group": "consumer",
+      "scope": "execution/planning epoch",
+      "available_by_wave": 4,
+      "event": "consumer blocked by explicit unavailable dependency",
+      "unit": "count",
+      "audit": "actual event with checked arithmetic; nominal W4 oracle and compiled mutation"
+    },
+    {
+      "name": "planningEpochs",
+      "group": "planning",
+      "scope": "execution/planning epoch",
+      "available_by_wave": 4,
+      "event": "new immutable plan created",
+      "unit": "count",
+      "audit": "actual event with checked arithmetic; nominal W4 oracle and compiled mutation"
+    },
+    {
+      "name": "notRequested",
+      "group": "consumer",
+      "scope": "execution/planning epoch",
+      "available_by_wave": 4,
+      "event": "late or undeclared query lookup refused without replay",
+      "unit": "count",
+      "audit": "actual event with checked arithmetic; nominal W4 oracle and compiled mutation"
+    },
+    {
+      "name": "filterEvaluations",
+      "group": "planning",
+      "scope": "execution/planning epoch",
+      "available_by_wave": 4,
+      "event": "static predicate invoked on matching bucket and owner",
+      "unit": "count",
+      "audit": "actual event with checked arithmetic; nominal W4 oracle and compiled mutation"
+    },
+    {
+      "name": "planningCallbacks",
+      "group": "planning",
+      "scope": "execution/planning epoch",
+      "available_by_wave": 4,
+      "event": "site query declaration invoked",
+      "unit": "count",
+      "audit": "actual event with checked arithmetic; nominal W4 oracle and compiled mutation"
+    },
+    {
+      "name": "analysisRequests",
+      "group": "planning",
+      "scope": "execution/planning epoch",
+      "available_by_wave": 4,
+      "event": "consumer AnalysisKey dependency registered",
+      "unit": "count",
+      "audit": "actual event with checked arithmetic; nominal W4 oracle and compiled mutation"
+    },
+    {
+      "name": "analysisAdmissionCacheHits",
+      "group": "analysis",
+      "scope": "execution/planning epoch",
+      "available_by_wave": 4,
+      "event": "refused admission reused without solver",
+      "unit": "count",
+      "audit": "actual event with checked arithmetic; nominal W4 oracle and compiled mutation"
     }
   ],
   "role": "OBSERVATION_ONLY",
@@ -602,5 +719,11 @@
       "mutations": "scripts/project/challenge_w3_f12.py",
       "evidence": "docs/work/evidence/WORK-CFG-028/wave-3/review-f1-f2/validation.md"
     }
+  },
+  "wave_4": {
+    "status": "IMPLEMENTED",
+    "hook": "scripts/project/check_w4.py",
+    "mapping": "docs/engineering/cp5-w4-planning-ledger.md",
+    "observations": "Explicit batches never cache across epochs; same-epoch query union and immutable facts are shared. Index counters remain in W1, callbacks count one consume per matched site."
   }
 }

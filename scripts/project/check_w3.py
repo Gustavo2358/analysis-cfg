@@ -27,7 +27,8 @@ def verify_sources(root:Path)->None:
     if check_direct_air(root):raise Failure('W3 requires direct air-java dependency')
     actual={p.relative_to(root).as_posix() for p in (root/'analysis-values/src/main').rglob('*.java')}
     query={p.relative_to(root).as_posix() for p in (root/'analysis-kernel/src/main/java/io/github/gustavo2358/analysis/query').rglob('*.java')}
-    if actual!=VALUE_SOURCES or query!=QUERY_SOURCES:raise Failure('W3 exact source inventory mismatch')
+    from check_w4 import PROVIDER
+    if actual!=VALUE_SOURCES|{PROVIDER} or query!=QUERY_SOURCES:raise Failure('W3 exact source inventory mismatch')
     expected={('io.github.gustavo2358.analysis',n,'compile') for n in ['analysis-kernel','cfg-kernel']}|{('io.github.gustavo2358','air-java','compile'),('org.junit.jupiter','junit-jupiter','test')}
     if direct_dependencies(root/'analysis-values/pom.xml')!=expected:raise Failure('W3 direct Maven DAG mismatch')
     for path in VALUE_SOURCES|QUERY_SOURCES:
@@ -36,14 +37,14 @@ def verify_sources(root:Path)->None:
         if path in QUERY_SOURCES and 'analysis.values' in source:raise Failure('generic query cannot depend on values')
         if path in QUERY_SOURCES and 'DataflowSolver' in source:raise Failure('W3 replay cannot rerun solver')
         if path.endswith('PossibleValuesAnalysis.java') and 'DataflowSolver' in source[source.index('public static final class Execution'):]:raise Failure('W3 observation cannot rerun solver')
-    import hashlib
+    from check_w4_scope import preserved_digest
     baseline=json.loads((root/'docs/work/evidence/WORK-CFG-028/wave-3/baseline.json').read_text())
     for path,digest in baseline['w2_production_sha256'].items():
-        if hashlib.sha256((root/path).read_bytes()).hexdigest()!=digest:raise Failure('W3 modified approved W1/W2 production: '+path)
+        if preserved_digest(root,path)!=digest:raise Failure('W3 modified approved W1/W2 production: '+path)
 
     reviewed=json.loads((root/'docs/work/evidence/WORK-CFG-028/wave-3/review-f1-f2/baseline.json').read_text())
     for path,digest in reviewed['frozen_sha256'].items():
-        if hashlib.sha256((root/path).read_bytes()).hexdigest()!=digest:raise Failure('W3 F1/F2 changed reviewed foundation: '+path)
+        if preserved_digest(root,path)!=digest:raise Failure('W3 F1/F2 changed reviewed foundation: '+path)
 
 def verify_reports(root:Path,names:set[str])->None:
     reports=list((root/'analysis-values/target/surefire-reports').glob('TEST-*.xml'))
@@ -93,11 +94,11 @@ def architecture(root:Path,update:bool=False)->None:
     verify_sources(root);actual={}
     for module,prefix,sources in [('analysis-kernel',QUERY_PREFIX,QUERY_SOURCES),('analysis-values',PREFIX,VALUE_SOURCES)]:
         classes=root/module/'target/classes';cp=(root/module/'target/architecture-classpath.txt').read_text().strip()
-        paths=sorted(p.relative_to(classes).as_posix() for p in (classes/Path(prefix.replace('.','/'))).rglob('*.class'))
+        paths=sorted(p.relative_to(classes).as_posix() for p in (classes/Path(prefix.replace('.','/'))).rglob('*.class') if p.name.split('$')[0].removesuffix('.class') in (QUERY_NAMES if module=='analysis-kernel' else VALUE_NAMES))
         if not paths:raise Failure('W3 classfiles missing')
         for path in paths:
             if struct.unpack('>IHH',(classes/path).read_bytes()[:8])!=(0xcafebabe,0,65):raise Failure('W3 requires Java 21 without preview')
-        edges={k:sorted(v) for k,v in dependencies_from_jdeps(command(root,['jdeps','--multi-release','21','-filter:none','-verbose:class','-cp',cp,str(classes)])).items() if k.startswith(prefix)}
+        edges={k:sorted(v) for k,v in dependencies_from_jdeps(command(root,['jdeps','--multi-release','21','-filter:none','-verbose:class','-cp',cp,str(classes)])).items() if k.startswith(prefix) and k.removeprefix(prefix).split('$')[0] in (QUERY_NAMES if module=='analysis-kernel' else VALUE_NAMES)}
         for source,targets in edges.items():
             for target in targets:
                 if ('BatchReplayer' in source or 'PossibleValuesAnalysis$Execution' in source) and 'DataflowSolver' in target:raise Failure('W3 observation cannot rerun solver')

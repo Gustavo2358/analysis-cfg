@@ -174,7 +174,13 @@
       "oracle": "index and same-key analysisRuns unchanged with K; callbacks equal actual matches, phases labelled",
       "kills": "per-consumer traversal, I×K broadcast, solver per consumer",
       "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "hook": null
+      "hook": null,
+      "wave_hooks": {
+        "4": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w4.py"
+        }
+      }
     },
     {
       "id": "S6",
@@ -201,6 +207,10 @@
         "3": {
           "status": "IMPLEMENTED",
           "hook": "scripts/project/check_w3.py"
+        },
+        "4": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w4.py"
         }
       }
     },
@@ -259,6 +269,10 @@
         "2": {
           "status": "IMPLEMENTED",
           "hook": "scripts/project/check_w2.py"
+        },
+        "4": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w4.py"
         }
       }
     },
@@ -418,6 +432,10 @@
         "3": {
           "status": "IMPLEMENTED",
           "hook": "scripts/project/check_w3.py"
+        },
+        "4": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w4.py"
         }
       }
     },
@@ -457,6 +475,10 @@
         "3": {
           "status": "IMPLEMENTED",
           "hook": "scripts/project/check_w3.py"
+        },
+        "4": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w4.py"
         }
       }
     },
@@ -511,6 +533,10 @@
         "3": {
           "status": "IMPLEMENTED",
           "hook": "scripts/project/check_w3.py"
+        },
+        "4": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w4.py"
         }
       }
     }

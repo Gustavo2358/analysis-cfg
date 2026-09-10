@@ -28,7 +28,8 @@ def verify_sources(root:Path)->None:
     structural(root)
     actual={p.relative_to(root).as_posix() for p in (root/'analysis-kernel/src/main/java').rglob('*.java')}
     from check_w3 import QUERY_SOURCES
-    if actual!=STRUCTURAL|SOURCES|QUERY_SOURCES: raise Failure('W2 exact source inventory mismatch')
+    from check_w4 import KERNEL_SOURCES
+    if actual!=STRUCTURAL|SOURCES|QUERY_SOURCES|KERNEL_SOURCES: raise Failure('W2 exact source inventory mismatch')
     for path in SOURCES:
         source=(root/path).read_text()
         if any(d in source for d in DENIED): raise Failure('W2 forbidden solver/SPI dependency: '+path)
