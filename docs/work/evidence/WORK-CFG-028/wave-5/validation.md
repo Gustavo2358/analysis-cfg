@@ -299,6 +299,10 @@ compilados por clean verify/full. [Scope/fast/architecture após consolidação]
 Manifesto/scope/diff são selados novamente antes/depois do commit de evidência.
 CI remoto validará exatamente a árvore do último commit.
 
+O diff staged inicialmente encontrou whitespace nativo nos logs brutos Maven.
+[Compressão de logs](development/compression.json) preserva os bytes e hashes
+originais sem sanitizar evidência; o diff completo W4→HEAD é novamente verificado.
+
 ## CI final e checkpoint seguinte
 
 O workflow executa push e pull_request, preservando o coletor original de source
