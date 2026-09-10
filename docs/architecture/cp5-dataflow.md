@@ -1,6 +1,6 @@
 # CP5 — fronteiras da análise
 
-Arquitetura `accepted`; W1/W2/W3 APPROVED. W4 autorizada para shared planning/consumers.
+Arquitetura `accepted`; W1/W2/W3 APPROVED. W4 IMPLEMENTED / AWAITING_HUMAN_REVIEW para shared planning/consumers.
 W5 permanece ausente e não autorizada. H1–H7/R1/R2 foram aprovados
 pelo pedido humano de 09/09/2026 que autoriza somente esta preparação.
 [Proveniência e hashes](../work/evidence/WORK-CFG-028/baseline.json) identificam o

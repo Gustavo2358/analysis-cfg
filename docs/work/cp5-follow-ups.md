@@ -2,8 +2,8 @@
 
 Confrontados registry/backlog atuais com propostas do discovery. Nenhum backlog
 novo duplicado. [BACKLOG-CFG-020](backlog/BACKLOG-CFG-020.md) é o umbrella existente
-agora em **W3 IMPLEMENTED / AWAITING_HUMAN_REVIEW** por WORK-CFG-028. W1/W2 aprovadas;
-W4/W5 e os follow-ups externos abaixo não estão iniciados/autorizados. Dependência histórica de qualificação 011
+agora em **W4 IMPLEMENTED / AWAITING_HUMAN_REVIEW** por WORK-CFG-028. W1/W2/W3 aprovadas;
+W5 e os follow-ups externos abaixo não estão iniciados/autorizados. Dependência histórica de qualificação 011
 valia para análises gerais; CP5 tem profile próprio sobre base 027 aprovada, sem
 reivindicar AIR-STRUCTURE completo.
 
@@ -90,3 +90,11 @@ W3-F1 = RESOLVED; W3-F2 = RESOLVED. W3-PERF-01 e W3-METRICS-01
 permanecem abertos e não bloqueantes. W4-BINDING-01 está autorizado para W4.
 Este registro sucede o estado histórico acima, sem reescrever o review anterior.
 W4 AUTHORIZED / STARTED; W5 NOT_STARTED / NOT_AUTHORIZED.
+
+## W4 implementada para review
+
+W4-BINDING-01 RESOLVED pela implementação W4 (review da Wave pendente): registry/provider e BoundRun privado ligam key,
+execution e materializer; mismatch/key/cache/batch têm mutantes RED. Ver
+[evidência W4](evidence/WORK-CFG-028/wave-4/validation.md). O review W3 acima é histórico.
+W3-PERF-01 e W3-METRICS-01 continuam abertos; nenhum cap ou RefusalReason novo.
+W1/W2/W3 APPROVED; W4 IMPLEMENTED / AWAITING_HUMAN_REVIEW; W5 não autorizada.

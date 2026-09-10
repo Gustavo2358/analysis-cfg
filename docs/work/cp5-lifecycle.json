@@ -84,11 +84,11 @@
     {
       "wave": 4,
       "title": "shared planning/consumers",
-      "status": "STARTED",
+      "status": "IMPLEMENTED",
       "authorization": "AUTHORIZED",
       "requires_review_of": "WAVE_3",
       "approval_evidence": "docs/work/evidence/WORK-CFG-028/wave-4/authorization.json",
-      "completion_evidence": null,
+      "completion_evidence": "docs/work/evidence/WORK-CFG-028/wave-4/validation.md",
       "eval": "EVAL-CFG-037"
     },
     {
@@ -349,7 +349,14 @@
   },
   "wave_4": {
     "authorization": "docs/work/evidence/WORK-CFG-028/wave-4/authorization.json",
-    "review": "NOT_SUBMITTED",
-    "evidence": "docs/work/evidence/WORK-CFG-028/wave-4/"
+    "review": "AWAITING_HUMAN_REVIEW",
+    "evidence": "docs/work/evidence/WORK-CFG-028/wave-4/",
+    "validated_implementation_head": "bad1b9a3785f22d21bd732143e54f82c6e632819",
+    "final_remote_ci": "Same draft PR #12 final receipt; .harness-results/WORK-CFG-028/wave-4/remote-ci.json",
+    "binding_finding": {
+      "W4-BINDING-01": "RESOLVED",
+      "wave_review": "AWAITING_HUMAN_REVIEW",
+      "evidence": "docs/work/evidence/WORK-CFG-028/wave-4/validation.md"
+    }
   }
 }

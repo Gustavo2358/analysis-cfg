@@ -21,7 +21,7 @@ Waves. Métricas são observações, nunca thresholds de admissão ou precisão.
 | W1 — index/session | APPROVED at b84389b6 | review humano registrado antes de W2 |
 | W2 — generic incremental solver | APPROVED at 0202c742 | review humano registrado antes de W3 |
 | W3 — PossibleValues/state/query | APPROVED at 85562820 | W3-F1/W3-F2 RESOLVED por review humano |
-| W4 — shared planner/consumers | AUTHORIZED / STARTED | W3 aprovada; wave-4/authorization.json registrada antes do código |
+| W4 — shared planner/consumers | IMPLEMENTED / AWAITING_HUMAN_REVIEW | W3 aprovada; wave-4/authorization.json registrada antes do código |
 | W5 — production/E2E | NOT STARTED / NOT AUTHORIZED | W4 + autorização explícita W5 |
 | CP6 — CALL dependency slice | futuro, fora CP5 | review final CP5 e tarefa própria |
 

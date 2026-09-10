@@ -1,0 +1,39 @@
+{
+  "checks": [
+    {
+      "name": "docs",
+      "command": [
+        "python3",
+        "-B",
+        "scripts/harness/validate_docs.py"
+      ],
+      "exit": 0,
+      "rawSha256": "df2da5af253a30334f548f0567e9293bb9d88daef721e2c685ac43e2a8048136",
+      "log": "docs.log.gz"
+    },
+    {
+      "name": "scope",
+      "command": [
+        "python3",
+        "-B",
+        "scripts/project/check_scope.py",
+        "--update-manifest"
+      ],
+      "exit": 0,
+      "rawSha256": "03417214602b5553483525b5328274526c19e643965d701d2ec7742748a7f0b8",
+      "log": "scope.log.gz"
+    },
+    {
+      "name": "diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "rawSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "log": "diff.log.gz"
+    }
+  ],
+  "note": "Scope/diff executed before adding this receipt; manifest is refreshed and rechecked after packaging and commit. Final CI checks final tracked manifest."
+}

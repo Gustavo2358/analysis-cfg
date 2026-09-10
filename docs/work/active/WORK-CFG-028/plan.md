@@ -108,3 +108,9 @@ Provar S5/S6/S8/S14/S15/S16, vertical PossibleValues real, determinismo, retenç
 mutantes compiláveis com RED/restauração/segundo GREEN e regressões W1–W3.
 Atualizar hooks W4, executar gates/Maven/full, publicar CI do HEAD final no PR #12 draft.
 W5 NOT_STARTED / NOT_AUTHORIZED; nenhum resolver, writer/CLI ou sibling alterado.
+
+## W4 implementada
+
+[Validação e limites](../../evidence/WORK-CFG-028/wave-4/validation.md): planning por
+buckets, provider/key, reuse, dependências e staging; 24 testes W4, 26 mutantes
+válidos, escala/GC/JFR e regressões. W4 aguarda review humano; W5 não autorizada.

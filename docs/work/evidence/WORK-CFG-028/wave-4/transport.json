@@ -1,0 +1,129 @@
+{
+  "description": "Lossless gzip transport for raw JVM logs/JFR and mutation diffs; receipts remain byte-exact. Paths in each receipt name original files; this map resolves compressed transport.",
+  "files": {
+    "challenges-attempt-1/broadcast-i-times-k.diff": {
+      "transport": "challenges-attempt-1/broadcast-i-times-k.diff.gz",
+      "rawSha256": "974d6a5c90303f02fb5b5e15c26e6d3e6dbd8de381905e3a417ee9a4edd9f6d5"
+    },
+    "challenges-attempt-1/cache-ignores-options-entry.diff": {
+      "transport": "challenges-attempt-1/cache-ignores-options-entry.diff.gz",
+      "rawSha256": "3ffb42c644007c64d6f365d517e628a55508f80453415946c138e72535fd84cb"
+    },
+    "challenges-attempt-1/consumer-starts-solver.diff": {
+      "transport": "challenges-attempt-1/consumer-starts-solver.diff.gz",
+      "rawSha256": "39608b724d4a0856dfac5b2a63f620df8771b6510ac548b020de89d3991e843e"
+    },
+    "challenges-attempt-1/full-traversal-per-consumer.diff": {
+      "transport": "challenges-attempt-1/full-traversal-per-consumer.diff.gz",
+      "rawSha256": "d82688ba2c2c3da21e54fa2a3a1672084c7b48832706207e5c62267a9cb89841"
+    },
+    "challenges-attempt-2/analysis-only-consumer-forced-to-depend-on-batch.diff": {
+      "transport": "challenges-attempt-2/analysis-only-consumer-forced-to-depend-on-batch.diff.gz",
+      "rawSha256": "747cc82f288689453ff9106c5f43cb517ecb7c3955e2c4feb14ae199f284a5ac"
+    },
+    "challenges-attempt-2/cache-ignores-options-entry.diff": {
+      "transport": "challenges-attempt-2/cache-ignores-options-entry.diff.gz",
+      "rawSha256": "3ffb42c644007c64d6f365d517e628a55508f80453415946c138e72535fd84cb"
+    },
+    "challenges-attempt-2/consumer-failure-reported-as-complete-output.diff": {
+      "transport": "challenges-attempt-2/consumer-failure-reported-as-complete-output.diff.gz",
+      "rawSha256": "d5e30c7831ecbf9ff49cad3ebde9b5d37b2e0697bf7478ce8f0cccc270b9d798"
+    },
+    "challenges-attempt-2/consumer-partial-facts-committed-on-failure.diff": {
+      "transport": "challenges-attempt-2/consumer-partial-facts-committed-on-failure.diff.gz",
+      "rawSha256": "4fe9cf0b4cbae2e279fa2d14f7205b48f04209cc1584ab11fed74cc1de69f9fe"
+    },
+    "challenges-attempt-2/missing-consumer-dependency-treated-as-success.diff": {
+      "transport": "challenges-attempt-2/missing-consumer-dependency-treated-as-success.diff.gz",
+      "rawSha256": "bcf7c782e9b716a091fa8fea711b96b18fb0d2ac5d769b96cfde705f4b221339"
+    },
+    "challenges-attempt-2/observation-failure-blocks-independent-consumer.diff": {
+      "transport": "challenges-attempt-2/observation-failure-blocks-independent-consumer.diff.gz",
+      "rawSha256": "7545f350f8a775796c766a60dd3efeb68c5149bf0f2e6724ca8632f25a267360"
+    },
+    "challenges-attempt-2/replay-per-consumer.diff": {
+      "transport": "challenges-attempt-2/replay-per-consumer.diff.gz",
+      "rawSha256": "f5d6c862446efce139e375382d3da7d30c3bdec53f7fe0fc1cc192eeb85b23a1"
+    },
+    "challenges-attempt-2/solver-per-consumer.diff": {
+      "transport": "challenges-attempt-2/solver-per-consumer.diff.gz",
+      "rawSha256": "82c2d244a70be747feae7c7f6c6edf6a949229fdf90b68e76b38f57aee79e2c0"
+    },
+    "challenges-attempt-2/solver-per-observation-batch.diff": {
+      "transport": "challenges-attempt-2/solver-per-observation-batch.diff.gz",
+      "rawSha256": "0018898d248e3f6445eacfc48464b67c382c980d7183d7a3890b91c42e718756"
+    },
+    "challenges-attempt-2/structural-consumer-forced-to-start-analysis.diff": {
+      "transport": "challenges-attempt-2/structural-consumer-forced-to-start-analysis.diff.gz",
+      "rawSha256": "77fcfc902816d43087a75713b28145fee7a24f12ff4226d60f94f7ea50f7b716"
+    },
+    "challenges-attempt-2/wrong-batch-bound-to-analysis-key.diff": {
+      "transport": "challenges-attempt-2/wrong-batch-bound-to-analysis-key.diff.gz",
+      "rawSha256": "558cc220f5c6c29bce06a2b2f21b16098b43b979b014be1fba427a95a62b78d2"
+    },
+    "challenges-attempt-3/drop-W3-support-or-remainder-before-consumer.diff": {
+      "transport": "challenges-attempt-3/drop-W3-support-or-remainder-before-consumer.diff.gz",
+      "rawSha256": "e63b66d01d60f4d5e354ea20677e1b80d0da2b473106d61e26a760439f589f37"
+    },
+    "challenges-attempt-3/emit-provisional-facts.diff": {
+      "transport": "challenges-attempt-3/emit-provisional-facts.diff.gz",
+      "rawSha256": "4d909b05cc57e8b73cdcabd39beb3eec6e389c0f605ccaa12d7363048356620f"
+    },
+    "challenges-attempt-3/global-static-run-cache.diff": {
+      "transport": "challenges-attempt-3/global-static-run-cache.diff.gz",
+      "rawSha256": "a2978abbbab08cf9c14a7442146874dc0cccdae796d4ec600132975091dfd82a"
+    },
+    "challenges-attempt-3/max-consumers-admission.diff": {
+      "transport": "challenges-attempt-3/max-consumers-admission.diff.gz",
+      "rawSha256": "849b51c26c906181483a129d960eac68d4bd14267091dd85f8bfc2c088ce950c"
+    },
+    "challenges-attempt-3/max-queries-admission.diff": {
+      "transport": "challenges-attempt-3/max-queries-admission.diff.gz",
+      "rawSha256": "0df2aec32c051289b366f8c901cf16ad95d95254c26698ddce5c48220d742c43"
+    },
+    "challenges-attempt-3/resource-cap-on-batches.diff": {
+      "transport": "challenges-attempt-3/resource-cap-on-batches.diff.gz",
+      "rawSha256": "9f80da9aca3e13f78c93c3a0306681ca849bdb259b0303e700566de1681639b2"
+    },
+    "challenges-attempt-3/resource-cap-on-facts.diff": {
+      "transport": "challenges-attempt-3/resource-cap-on-facts.diff.gz",
+      "rawSha256": "860396affe33bf4459f7a3c8a6f06d8d17cd1a2cc5232a740226a57cf4fc7d47"
+    },
+    "challenges-attempt-3/resource-cap-on-sites.diff": {
+      "transport": "challenges-attempt-3/resource-cap-on-sites.diff.gz",
+      "rawSha256": "cb1322a10144a86a7115ec50ff610dba58145ddc9bdae3deb40f1da115669437"
+    },
+    "challenges-attempt-3/unplanned-query-triggers-hidden-replay.diff": {
+      "transport": "challenges-attempt-3/unplanned-query-triggers-hidden-replay.diff.gz",
+      "rawSha256": "42dd6a30d518ce56cff09a18c1cbbc55b465f24e8670ca22efc4c206c4fbdbc1"
+    },
+    "challenges-attempt-3/w4-drop-candidates.diff": {
+      "transport": "challenges-attempt-3/w4-drop-candidates.diff.gz",
+      "rawSha256": "fc5c786e767d2eec2d9c62641be169a2bb9ba3375a4c8bd47c61a26a97cb5f83"
+    },
+    "challenges-attempt-3/w4-unsupported-everything.diff": {
+      "transport": "challenges-attempt-3/w4-unsupported-everything.diff.gz",
+      "rawSha256": "6e973678a1f283eabb303fb0ee6d814511ae3c5df817032cf3718a49eeee4c21"
+    },
+    "challenges-attempt-3/wrong-batch-bound-to-analysis-key.diff": {
+      "transport": "challenges-attempt-3/wrong-batch-bound-to-analysis-key.diff.gz",
+      "rawSha256": "558cc220f5c6c29bce06a2b2f21b16098b43b979b014be1fba427a95a62b78d2"
+    },
+    "challenges-attempt-3/wrong-provider-execution-binding.diff": {
+      "transport": "challenges-attempt-3/wrong-provider-execution-binding.diff.gz",
+      "rawSha256": "84f8d04299b9fc0931a2027ecc7c98d008f5d92d6f24221908d27b189181a53a"
+    },
+    "challenges-attempt-4/emit-provisional-facts.diff": {
+      "transport": "challenges-attempt-4/emit-provisional-facts.diff.gz",
+      "rawSha256": "4d909b05cc57e8b73cdcabd39beb3eec6e389c0f605ccaa12d7363048356620f"
+    },
+    "memory-attempt-1/1000/gc.log": {
+      "transport": "memory-attempt-1/1000/gc.log.gz",
+      "rawSha256": "2238323de4566101dfbdd8be5a8498eac0a3248211939c26500f880dc674d024"
+    },
+    "memory-attempt-1/1000/recording.jfr": {
+      "transport": "memory-attempt-1/1000/recording.jfr.gz",
+      "rawSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}
