@@ -11,12 +11,12 @@
     "draft": true,
     "auto_merge": false
   },
-  "current_checkpoint": "WAVE_3",
+  "current_checkpoint": "WAVE_4",
   "harness_preparation": {
     "status": "implemented",
     "review": "APPROVED"
   },
-  "authorized_wave": 3,
+  "authorized_wave": 4,
   "last_human_approval": {
     "date": "2026-09-09",
     "source": "explicit user request for harness preparation",
@@ -73,20 +73,21 @@
     {
       "wave": 3,
       "title": "PossibleValues/state/queries",
-      "status": "IMPLEMENTED",
+      "status": "APPROVED",
       "authorization": "AUTHORIZED",
       "requires_review_of": "WAVE_2",
       "approval_evidence": "docs/work/evidence/WORK-CFG-028/wave-3/authorization.json",
       "completion_evidence": "docs/work/evidence/WORK-CFG-028/wave-3/review-f1-f2/validation.md",
-      "eval": "EVAL-CFG-036"
+      "eval": "EVAL-CFG-036",
+      "reviewed_head": "855628200fba3851493991cec869dee899e82299"
     },
     {
       "wave": 4,
       "title": "shared planning/consumers",
-      "status": "NOT_STARTED",
-      "authorization": "NOT_AUTHORIZED",
+      "status": "STARTED",
+      "authorization": "AUTHORIZED",
       "requires_review_of": "WAVE_3",
-      "approval_evidence": null,
+      "approval_evidence": "docs/work/evidence/WORK-CFG-028/wave-4/authorization.json",
       "completion_evidence": null,
       "eval": "EVAL-CFG-037"
     },
@@ -252,6 +253,31 @@
       "scope": "candidate support/origin/premises and EntryState/same-Cell source uncertainty; same draft PR #12, no W4/W5",
       "authorized_wave": 3,
       "evidence": "docs/work/evidence/WORK-CFG-028/wave-3/review-f1-f2/review.json"
+    },
+    {
+      "date": "2026-09-09",
+      "source": "explicit human request authorizing CP5 Wave 4 in same draft PR #12",
+      "reviewed_head": "855628200fba3851493991cec869dee899e82299",
+      "decision": "WAVE_3_APPROVED_AND_WAVE_4_AUTHORIZED",
+      "W3": "APPROVED",
+      "resolved_findings": [
+        "W3-F1",
+        "W3-F2"
+      ],
+      "nonblocking_follow_ups": [
+        "W3-PERF-01",
+        "W3-METRICS-01"
+      ],
+      "authorized_wave": 4,
+      "current_checkpoint": "WAVE_4",
+      "scope": "generic shared planning/providers/consumers/FactSink and in-memory composition; tests, gates, evidence, commits/push/final CI",
+      "not_authorized": [
+        "WAVE_5",
+        "siblings",
+        "domain resolvers",
+        "dataflow writer/CLI"
+      ],
+      "evidence": "docs/work/evidence/WORK-CFG-028/wave-4/authorization.json"
     }
   ],
   "audit_remediation": {
@@ -298,7 +324,7 @@
   },
   "wave_3": {
     "authorization": "docs/work/evidence/WORK-CFG-028/wave-3/authorization.json",
-    "review": "AWAITING_HUMAN_REVIEW",
+    "review": "APPROVED",
     "evidence": "docs/work/evidence/WORK-CFG-028/wave-3/",
     "validated_implementation_head": "327737be23ab619ae212f46689a5043884f50da4",
     "final_remote_ci": "Same draft PR #12 final receipt; .harness-results/WORK-CFG-028/wave-3/remote-ci.json",
@@ -312,7 +338,18 @@
       "review_evidence": "docs/work/evidence/WORK-CFG-028/wave-3/review-f1-f2/review.json",
       "completion_evidence": "docs/work/evidence/WORK-CFG-028/wave-3/review-f1-f2/validation.md",
       "validated_implementation_head": "74331d7b92644e2f5193ad37d3a7f2015116b0b1",
-      "final_remote_ci": "Same draft PR #12 final remediation receipt; .harness-results/WORK-CFG-028/wave-3/review-f1-f2/remote-ci.json"
-    }
+      "final_remote_ci": "Same draft PR #12 final remediation receipt; .harness-results/WORK-CFG-028/wave-3/review-f1-f2/remote-ci.json",
+      "findings_resolution": {
+        "W3-F1": "RESOLVED",
+        "W3-F2": "RESOLVED",
+        "approved_head": "855628200fba3851493991cec869dee899e82299"
+      }
+    },
+    "reviewed_head": "855628200fba3851493991cec869dee899e82299"
+  },
+  "wave_4": {
+    "authorization": "docs/work/evidence/WORK-CFG-028/wave-4/authorization.json",
+    "review": "NOT_SUBMITTED",
+    "evidence": "docs/work/evidence/WORK-CFG-028/wave-4/"
   }
 }

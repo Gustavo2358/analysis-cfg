@@ -96,3 +96,16 @@ final no mesmo PR draft. W4/W5 não autorizadas.
 retenção externa até 200k writes e gates locais/regressões. Estado IMPLEMENTED /
 AWAITING_HUMAN_REVIEW; REQUEST_CHANGES original preservado no histórico.
 CI do HEAD final no mesmo PR #12 draft. W4/W5 não autorizadas.
+
+
+## WAVE_4 — autorização vigente
+
+W3 APPROVED em 855628200fba3851493991cec869dee899e82299; W3-F1/W3-F2 RESOLVED.
+[Registro anterior à produção](../../evidence/WORK-CFG-028/wave-4/authorization.json).
+Implementar planning genérico por buckets W1, AnalysisKey completo, providers explícitos
+e binding inseparável, reuse de runs e união de batches W3. ConsumerPlan imutável,
+dependências locais, SPI restrita e FactSink transacional por consumer.
+Provar S5/S6/S8/S14/S15/S16, vertical PossibleValues real, determinismo, retenção,
+mutantes compiláveis com RED/restauração/segundo GREEN e regressões W1–W3.
+Atualizar hooks W4, executar gates/Maven/full, publicar CI do HEAD final no PR #12 draft.
+W5 NOT_STARTED / NOT_AUTHORIZED; nenhum resolver, writer/CLI ou sibling alterado.

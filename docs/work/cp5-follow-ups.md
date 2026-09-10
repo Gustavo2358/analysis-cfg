@@ -81,3 +81,12 @@ Não desabilitar guards ou inventar premissas para fabricar PASS.
 - W4-BINDING-01 (não autorizado): planner/AnalysisKey deve vincular result, direction
   e transfer da mesma análise. Execution.observe W3 já fornece o binding correto;
   não modificar replay nesta remediação.
+
+
+## Review W3 aprovado / W4 autorizada
+
+Review humano do HEAD 855628200fba3851493991cec869dee899e82299 aprova W3 e registra
+W3-F1 = RESOLVED; W3-F2 = RESOLVED. W3-PERF-01 e W3-METRICS-01
+permanecem abertos e não bloqueantes. W4-BINDING-01 está autorizado para W4.
+Este registro sucede o estado histórico acima, sem reescrever o review anterior.
+W4 AUTHORIZED / STARTED; W5 NOT_STARTED / NOT_AUTHORIZED.
