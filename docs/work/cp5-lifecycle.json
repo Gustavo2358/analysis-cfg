@@ -95,11 +95,11 @@
     {
       "wave": 5,
       "title": "production/E2E",
-      "status": "STARTED",
+      "status": "IMPLEMENTED",
       "authorization": "AUTHORIZED",
       "requires_review_of": "WAVE_4",
       "approval_evidence": "docs/work/evidence/WORK-CFG-028/wave-5/authorization.json",
-      "completion_evidence": null,
+      "completion_evidence": "docs/work/evidence/WORK-CFG-028/wave-5/validation.md",
       "eval": "EVAL-CFG-038"
     }
   ],
@@ -442,11 +442,14 @@
   },
   "wave_5": {
     "authorization": "docs/work/evidence/WORK-CFG-028/wave-5/authorization.json",
-    "review": "NOT_REQUESTED",
-    "evidence": "docs/work/evidence/WORK-CFG-028/wave-5/"
+    "review": "AWAITING_HUMAN_REVIEW",
+    "evidence": "docs/work/evidence/WORK-CFG-028/wave-5/",
+    "final_remote_ci": "Final HEAD receipt published as a comment on the same draft PR #12 after source/evidence commits and final push; no self-referential evidence commit.",
+    "validated_implementation_head": "e4e3eb2d337a146c3984385001349868d386952e"
   },
   "cp6": {
     "status": "NOT_STARTED",
     "authorization": "NOT_AUTHORIZED"
-  }
+  },
+  "cp5_status": "AWAITING_FINAL_HUMAN_REVIEW"
 }

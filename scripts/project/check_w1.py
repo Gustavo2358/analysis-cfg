@@ -127,7 +127,7 @@ def run(root:Path,category:str)->None:
         verify_reports(root,names)
         if category=='performance':
             rows=verify_metrics(out); path=root/'.harness-results/w1-performance.json';path.parent.mkdir(exist_ok=True)
-            path.write_text(json.dumps({'scope':'W1 only; W2-W5 unavailable','role':'OBSERVATION_ONLY','memory_method':'identity-deduplicated logical retained containers and arrays; not JVM bytes/backing map nodes','measurements':rows},indent=2)+'\n')
+            path.write_text(json.dumps({'scope':'W1 structural dimension; later Waves execute separately','role':'OBSERVATION_ONLY','memory_method':'identity-deduplicated logical retained containers and arrays; not JVM bytes/backing map nodes','measurements':rows},indent=2)+'\n')
         print('[w1-'+category+'] PASS: '+str(sum(len(TESTS[n]) for n in names))+' nominal tests, zero skips; runtime product executed')
 
 if __name__=='__main__':

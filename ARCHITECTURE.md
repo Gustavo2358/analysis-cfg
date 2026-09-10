@@ -119,26 +119,27 @@ Architecture inspeciona fontes/classes/DAG exatos e a chamada compilada AirJson.
 Integration executa a cadeia de arquivos e compara o resultado com oracle manual.
 A ligação real com 2A/cobol-lower e o E2E cross-repo continuam fora deste checkpoint.
 
-## CP5 — W1 aprovada e W2 implementada para review
+## CP5 — produção W1–W5
 
-[Subsistema de análise](docs/architecture/cp5-dataflow.md) downstream da construção:
-analysis-kernel contém índice/session W1 e solver genérico incremental W2, com estados
-opacos e propagação forward/backward por contexto. Depende de cfg-kernel e air-java;
-o CFG não depende da análise. [Contratos e ledger W2](docs/engineering/cp5-w2-solver-ledger.md).
-W1 APPROVED no HEAD b84389b6. W2 IMPLEMENTED / AWAITING_HUMAN_REVIEW no mesmo PR #12
-draft. PossibleValues, analysis-values, queries por operação, consumers e CLI de
-dataflow pertencem a W3–W5, ainda NOT_STARTED / NOT_AUTHORIZED.
-[Waves e review](docs/product/cp5-roadmap.md), [lifecycle](docs/work/cp5-lifecycle.json).
+W1–W4 estão APPROVED. A W5 foi autorizada separadamente para composição e entrega;
+continua sujeita a review humano final no mesmo PR #12 draft.
+analysis-kernel contém índice/session, solver genérico, queries, planner e consumers.
+analysis-values implementa PossibleValues. Nenhuma dependência aponta do CFG para análise.
 
-## CP5 W3
+```text
+analysis-launcher → analysis-adapters → analysis-dataflow
+                         ↓                    ↓
+                     air-json          analysis-values → analysis-kernel → cfg-kernel
+                         └──────────────────────────────→ air-java
+```
 
-analysis-values acrescenta scalar-text-direct@1, estado sparse por Cell, pool de
-textos e observações; analysis-kernel/query acrescenta replay genérico por direção.
-[Contrato e ledger](docs/engineering/cp5-w3-values-ledger.md). Sem consumers/CLI.
+As dependências AIR diretas adicionais constam dos POMs/inventários. A aplicação
+recebe Publication e compõe BuildCfg → AnalysisSession → registry explícito →
+plano de destinos escritos BEFORE terminator → PlanningExecution → resultado detached.
+O adapter escreve o wire 1.1.0 e retorna receipt externo 1.0.0. A CLI CFG permanece
+byte-exact. Não há CALL resolver ou CP6.
 
-## CP5 W4
-
-W1/W2/W3 aprovadas; shared planner/consumers autorizados e implementados no kernel
-de análise existente. Descritores em plan, SPI restrita em consumers e runtime em
-application; provider concreto em analysis-values. [Ledger W4](docs/engineering/cp5-w4-planning-ledger.md).
-W5 segue não autorizada: sem writer, CLI de dataflow ou resolvers de negócio.
+[Arquitetura CP5](docs/architecture/cp5-dataflow.md),
+[ledger W5](docs/engineering/cp5-w5-composition-ledger.md),
+[wire](docs/architecture/analysis-dataflow-result-v1.md),
+[roadmap](docs/product/cp5-roadmap.md), [lifecycle](docs/work/cp5-lifecycle.json).

@@ -31,7 +31,8 @@
     "docs/engineering/cp5-w1-index-ledger.md",
     "docs/engineering/cp5-w2-solver-ledger.md",
     "docs/engineering/cp5-w3-values-ledger.md",
-    "docs/engineering/cp5-w4-planning-ledger.md"
+    "docs/engineering/cp5-w4-planning-ledger.md",
+    "docs/engineering/cp5-w5-composition-ledger.md"
   ],
   "related_decisions": [
     "ADR-0010",

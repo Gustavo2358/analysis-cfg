@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check CP5 Wave 4 diff scope, fixed upstream authority and a complete tracked/untracked delivery manifest."""
+"""Check CP5 Wave 5 diff scope, fixed upstream authority and a complete tracked/untracked delivery manifest."""
 from __future__ import annotations
 import argparse
 import hashlib
@@ -27,7 +27,7 @@ def files() -> list[str]:
 
 
 def manifest() -> bytes:
-    lines = ["# SHA-256 da entrega CP5 W4; inclui arquivos versionáveis, exclui este manifesto e artefatos ignorados."]
+    lines = ["# SHA-256 da entrega CP5 W5; inclui arquivos versionáveis, exclui este manifesto e artefatos ignorados."]
     lines += [hashlib.sha256((ROOT / path).read_bytes()).hexdigest() + "  " + path for path in files()]
     return ("\n".join(lines) + "\n").encode()
 
@@ -39,14 +39,14 @@ def main() -> int:
     try:
         if git("merge-base", "--is-ancestor", BASE, "HEAD") != b"":
             raise ValueError("baseline ancestry not established")
-        approved = "855628200fba3851493991cec869dee899e82299"
+        approved = "21d65d08512f1fb8a945009c2919946a61566eed"
         if git("diff", "--name-only", approved, "--", "cfg-kernel", "cfg-adapters", "cfg-launcher/src", "docs/sources/sources.lock.json"):
-            raise ValueError("unapproved product/pin changes outside W4")
+            raise ValueError("unapproved product/pin changes outside W5")
         work = json.loads((ROOT / "docs/work/active/WORK-CFG-028/work-item.json").read_text())
         if work["authorization"] != "implementation" or work["id"] != "WORK-CFG-028":
             raise ValueError("wrong implementation checkpoint")
-        if work["checkpoint"] != "WAVE_4":
-            raise ValueError("scope checker authorizes WAVE_4 only")
+        if work["checkpoint"] != "WAVE_5":
+            raise ValueError("scope checker authorizes WAVE_5 only")
         sys.path.insert(0, str(ROOT / "scripts/harness"))
         from validate_cp5 import validate_cp5
         preparation_errors = validate_cp5(ROOT)
@@ -56,7 +56,7 @@ def main() -> int:
         remediation_base = approved
         focal_paths = git("diff", "--name-only", remediation_base).decode().splitlines()
         focal_paths += git("ls-files", "--others", "--exclude-standard").decode().splitlines()
-        focal_scope = ["ARCHITECTURE.md", "docs", "scripts/harness", "scripts/project", ".github/workflows/ci.yml", "MANIFEST.sha256", "pom.xml", "cfg-launcher/pom.xml", "analysis-kernel", "analysis-values"]
+        focal_scope = ["ARCHITECTURE.md", "docs", "scripts/harness", "scripts/project", ".github/workflows/ci.yml", "MANIFEST.sha256", "pom.xml", "cfg-launcher/pom.xml", "analysis-kernel", "analysis-values", "analysis-dataflow", "analysis-adapters", "analysis-launcher"]
         if any(not any(p == s or p.startswith(s + "/") for s in focal_scope) for p in focal_paths):
             raise ValueError("path outside focal post-audit remediation scope")
         def baseline_json(path): return json.loads(git("show", remediation_base + ":" + path))
@@ -64,9 +64,13 @@ def main() -> int:
         before = baseline_json(audit_path)
         after = json.loads((ROOT/audit_path).read_text())
         for value in [before, after]:
-            for row in value["requirements"].values(): row.pop("wave_hooks",None)
+            for row in value["requirements"].values():
+                row.pop("wave_hooks",None)
+                if value is after:
+                    if row.get('runtime_status')!='IMPLEMENTED_BY_WAVE_HOOKS':raise ValueError('W5 audit runtime requires complete wave hooks')
+                    row['runtime_status']='NOT_AVAILABLE_UNTIL_IMPLEMENTED'
         if before != after: raise ValueError("W4 scope: approved audit semantics changed")
-        for path in ["scripts/project/ci_source_receipt.py", "docs/evals/cp5/result-contract.json", "docs/evals/cp5/result-review.json", "docs/evals/cp5/phase-review.json", "docs/evals/cp5/core-size-review.json"]:
+        for path in ["scripts/project/ci_source_receipt.py", "docs/evals/cp5/core-size-review.json"]:
             if (ROOT/path).read_bytes() != git("show", remediation_base + ":" + path):
                 raise ValueError("W4 scope: future-wave contract/CI receipt changed: " + path)
         # Historical reviews/evidence are append-only, including previous await-review snapshots.
@@ -77,28 +81,23 @@ def main() -> int:
         for key in ["last_human_review", "last_human_approval", "audit_remediation", "f_correction"]:
             if life[key] != old_life[key]: raise ValueError("historical decision rewritten: " + key)
         historical = git("diff", "--name-only", remediation_base, "--", "docs/work/evidence").decode().splitlines()
-        if any(not p.startswith("docs/work/evidence/WORK-CFG-028/wave-4/") for p in historical):
+        if any(not p.startswith("docs/work/evidence/WORK-CFG-028/wave-5/") for p in historical):
             raise ValueError("historical evidence changed")
         from check_w4 import verify_foundation
         verify_foundation(ROOT)
         from check_w4 import verify_focal_preservation
         verify_focal_preservation(ROOT)
-        focal_review = "330d63427c0905e8ef140924b643e9fb012c73de"
-        review_dir = "docs/work/evidence/WORK-CFG-028/wave-4/review-f1/"
-        old_review = json.loads(git("show",focal_review+":docs/work/cp5-lifecycle.json"))
-        if life["review_history"][:len(old_review["review_history"])] != old_review["review_history"]:
-            raise ValueError("W4-F1 rewrote historical review")
-        if any(not p.startswith(review_dir) for p in git("diff","--name-only",focal_review,"--","docs/work/evidence").decode().splitlines()):
-            raise ValueError("W4-F1 changed historical evidence")
-        pinned = json.loads((ROOT/review_dir/"baseline.json").read_text())["files"]
-        for path,digest in pinned.items():
-            if hashlib.sha256(git("show",focal_review+":"+path)).hexdigest()!=digest:
-                raise ValueError("W4-F1 baseline differs from reviewed Git source")
-        old_sources = baseline_json("docs/evals/cp5/w3-source-inventory.json")["files"]
-        from check_w4_scope import preserved_digest
-        for path, digest in old_sources.items():
-            if preserved_digest(ROOT, path) != digest:
-                raise ValueError("W4 changed approved W1-W3 source/test/POM: " + path)
+        for name in ['result-contract.json','result-review.json','phase-review.json']:
+            if (ROOT/'docs/evals/cp5/history'/name).read_bytes()!=git('show',approved+':docs/evals/cp5/'+name):
+                raise ValueError('W5 altered historical wire design: '+name)
+        old_sources = baseline_json('docs/evals/cp5/w4-source-inventory.json')['files']
+        from check_w5 import original_pom
+        for path,digest in old_sources.items():
+            baseline_data=git('show',approved+':'+path)
+            if hashlib.sha256(baseline_data).hexdigest()!=digest:raise ValueError('W4 baseline differs from immutable reviewed Git: '+path)
+            data=(ROOT/path).read_bytes()
+            if path=='pom.xml':data=original_pom(data)
+            if hashlib.sha256(data).hexdigest()!=digest:raise ValueError('W5 changed approved W1–W4 source/test/POM: '+path)
         # Bind the offline Java/POM inventory to Git, so editing both cannot hide a change.
         names = git("ls-tree", "-r", "--name-only", BASE).decode().splitlines()
         baseline_sources = {p:hashlib.sha256(git("show", BASE + ":" + p)).hexdigest()
@@ -128,7 +127,7 @@ def main() -> int:
         elif (ROOT / "MANIFEST.sha256").read_bytes() != expected:
             raise ValueError("delivery manifest mismatch; review diff before --update-manifest")
         git("diff", "--check")
-        print("[scope/manifest] PASS: CP4 + approved W1 baseline, unchanged legacy Java/pins, W4 production scope/DRAFT, AIR fixture hash and exact delivery manifest")
+        print("[scope/manifest] PASS: CP4 + approved W1 baseline, unchanged legacy Java/pins, W5 production scope/DRAFT, AIR fixture hash and exact delivery manifest")
         return 0
     except (GateFailure, ValueError, OSError, subprocess.CalledProcessError) as exc:
         print("[scope/manifest] FAIL: " + str(exc), file=sys.stderr); return 1

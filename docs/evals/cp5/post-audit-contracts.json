@@ -15,7 +15,7 @@
         1
       ],
       "documentation": "docs/architecture/cp5-post-audit.md#a",
-      "runtime_status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "runtime_status": "IMPLEMENTED_BY_WAVE_HOOKS",
       "runtime_hook": null,
       "wave_hooks": {
         "1": {
@@ -36,7 +36,7 @@
         3
       ],
       "documentation": "docs/architecture/cp5-post-audit.md#b",
-      "runtime_status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "runtime_status": "IMPLEMENTED_BY_WAVE_HOOKS",
       "runtime_hook": null,
       "wave_hooks": {
         "2": {
@@ -63,7 +63,7 @@
         4
       ],
       "documentation": "docs/architecture/cp5-post-audit.md#c",
-      "runtime_status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "runtime_status": "IMPLEMENTED_BY_WAVE_HOOKS",
       "runtime_hook": null,
       "wave_hooks": {
         "3": {
@@ -88,7 +88,7 @@
         4
       ],
       "documentation": "docs/architecture/cp5-post-audit.md#d",
-      "runtime_status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "runtime_status": "IMPLEMENTED_BY_WAVE_HOOKS",
       "runtime_hook": null,
       "wave_hooks": {
         "3": {
@@ -113,7 +113,7 @@
         3
       ],
       "documentation": "docs/architecture/cp5-post-audit.md#e",
-      "runtime_status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "runtime_status": "IMPLEMENTED_BY_WAVE_HOOKS",
       "runtime_hook": null,
       "wave_hooks": {
         "1": {
@@ -150,7 +150,7 @@
         5
       ],
       "documentation": "docs/architecture/cp5-post-audit.md#f",
-      "runtime_status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "runtime_status": "IMPLEMENTED_BY_WAVE_HOOKS",
       "runtime_hook": null,
       "wave_hooks": {
         "1": {
@@ -168,6 +168,10 @@
         "4": {
           "status": "IMPLEMENTED",
           "hook": "scripts/project/check_w4.py"
+        },
+        "5": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
         }
       }
     },
@@ -186,7 +190,7 @@
         3
       ],
       "documentation": "docs/architecture/cp5-post-audit.md#g",
-      "runtime_status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "runtime_status": "IMPLEMENTED_BY_WAVE_HOOKS",
       "runtime_hook": null,
       "wave_hooks": {
         "2": {
@@ -214,7 +218,7 @@
         5
       ],
       "documentation": "docs/architecture/cp5-post-audit.md#h",
-      "runtime_status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "runtime_status": "IMPLEMENTED_BY_WAVE_HOOKS",
       "runtime_hook": null,
       "wave_hooks": {
         "1": {
@@ -232,6 +236,10 @@
         "4": {
           "status": "IMPLEMENTED",
           "hook": "scripts/project/check_w4.py"
+        },
+        "5": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
         }
       }
     },
@@ -247,8 +255,14 @@
         5
       ],
       "documentation": "docs/architecture/cp5-post-audit.md#i",
-      "runtime_status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "runtime_hook": null
+      "runtime_status": "IMPLEMENTED_BY_WAVE_HOOKS",
+      "runtime_hook": null,
+      "wave_hooks": {
+        "5": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
+        }
+      }
     }
   },
   "backward_witness": {

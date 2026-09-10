@@ -64,7 +64,11 @@ def verify_focal_preservation(root:Path)->None:
     mutable='analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/SitePlanner.java'
     if baseline['mutable_production']!=[mutable]:raise Failure('W4-F1 may change only SitePlanner production')
     for path,digest in baseline['files'].items():
-        if path!=mutable and hashlib.sha256((root/path).read_bytes()).hexdigest()!=digest:
+        data=(root/path).read_bytes()
+        if path=='pom.xml':
+            from check_w5 import original_pom
+            data=original_pom(data)
+        if path!=mutable and hashlib.sha256(data).hexdigest()!=digest:
             raise Failure('W4-F1 changed reviewed source: '+path)
 
 def selected_class(name:str)->bool:
@@ -148,7 +152,7 @@ def run(root:Path,category:str,update:bool=False)->None:
         output=command(root,maven+['-pl','analysis-values','-am','clean','test','-Dtest=BuildCfgContractTest,StructureTest,'+','.join(sorted(names))]);verify_reports(root,names);verify_keys(output)
         if category=='performance':
             rows=verify_metrics(output);path=root/'.harness-results/w4-performance.json';path.parent.mkdir(exist_ok=True)
-            path.write_text(json.dumps({'scope':'W4 shared planning with real W3; W5 unavailable','role':'OBSERVATION_ONLY','measurements':rows,'retention':'identity-deduplicated reachable logical objects, not physical heap'},indent=2)+'\n')
+            path.write_text(json.dumps({'scope':'W4 shared planning with real W3; W5 composition executes separately','role':'OBSERVATION_ONLY','measurements':rows,'retention':'identity-deduplicated reachable logical objects, not physical heap'},indent=2)+'\n')
         print('[w4-'+category+'] PASS: '+str(sum(len(TESTS[n]) for n in names))+' nominal tests; real AIR/CFG/W1/W2/W3/W4; no skipped methods')
 
 if __name__=='__main__':

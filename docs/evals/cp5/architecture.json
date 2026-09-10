@@ -41,6 +41,48 @@
         "cfg-launcher",
         "consumers"
       ]
+    },
+    "analysis-dataflow": {
+      "wave": 5,
+      "direct": [
+        "cfg-kernel",
+        "analysis-kernel",
+        "analysis-values",
+        "air-java"
+      ],
+      "forbidden": [
+        "analysis-adapters",
+        "analysis-launcher",
+        "air-json"
+      ]
+    },
+    "analysis-adapters": {
+      "wave": 5,
+      "direct": [
+        "analysis-dataflow",
+        "analysis-kernel",
+        "analysis-values",
+        "air-java",
+        "air-json"
+      ],
+      "forbidden": [
+        "analysis-launcher",
+        "cfg-adapters",
+        "cfg-launcher"
+      ]
+    },
+    "analysis-launcher": {
+      "wave": 5,
+      "direct": [
+        "analysis-dataflow",
+        "analysis-adapters",
+        "analysis-kernel",
+        "air-java",
+        "air-json"
+      ],
+      "forbidden": [
+        "cfg-launcher"
+      ]
     }
   },
   "package_rules": {
@@ -136,5 +178,6 @@
   "resource_failure_semantic_mappings": {},
   "solver_inventory": "docs/evals/cp5/w2-inventory.json",
   "query_inventory": "docs/evals/cp5/w3-inventory.json",
-  "planning_inventory": "docs/evals/cp5/w4-inventory.json"
+  "planning_inventory": "docs/evals/cp5/w4-inventory.json",
+  "composition_inventory": "docs/evals/cp5/w5-inventory.json"
 }

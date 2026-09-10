@@ -120,7 +120,7 @@ def run(root:Path,category:str,update:bool=False)->None:
         verify_reports(root,names);corpus=verify_corpus(output);verify_support_metrics(output)
         if category=='performance':
             rows=verify_metrics(output);path=root/'.harness-results/w3-performance.json';path.parent.mkdir(exist_ok=True)
-            path.write_text(json.dumps({'scope':'W3 real AIR/CFG/PossibleValues; W4/W5 unavailable','role':'OBSERVATION_ONLY','corpus':corpus,'measurements':rows,'supportMeasurements':verify_support_metrics(output),'retention':'identity walk of actual reachable objects; logical counts, allocated byte estimates explicitly labelled'},indent=2)+'\n')
+            path.write_text(json.dumps({'scope':'W3 real AIR/CFG/PossibleValues; W4/W5 execute separately','role':'OBSERVATION_ONLY','corpus':corpus,'measurements':rows,'supportMeasurements':verify_support_metrics(output),'retention':'identity walk of actual reachable objects; logical counts, allocated byte estimates explicitly labelled'},indent=2)+'\n')
         print('[w3-'+category+'] PASS: '+str(sum(len(TESTS[n]) for n in names))+' nominal tests; real AIR/CFG/W1/W2/W3, no skips')
 
 if __name__=='__main__':

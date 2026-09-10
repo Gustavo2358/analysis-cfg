@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+  "status": "IMPLEMENTED_BY_WAVE_HOOKS",
   "probes": [
     {
       "id": "S1",
@@ -20,7 +20,7 @@
       ],
       "oracle": "I operations indexed; transfer follows visits; no instruction snapshots or CFG-node growth",
       "kills": "full clone or node per Assign",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "status": "IMPLEMENTED_BY_WAVE_HOOKS",
       "hook": null,
       "wave_hooks": {
         "1": {
@@ -30,6 +30,10 @@
         "3": {
           "status": "IMPLEMENTED",
           "hook": "scripts/project/check_w3.py"
+        },
+        "5": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
         }
       }
     },
@@ -48,9 +52,9 @@
         "referencesResolved",
         "structuralVisits"
       ],
-      "oracle": "index proportional to D; resolution work follows R, never I×D",
+      "oracle": "index proportional to D; resolution work follows R, never I\u00d7D",
       "kills": "scan all Objects per Assign",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "status": "IMPLEMENTED_BY_WAVE_HOOKS",
       "hook": null,
       "wave_hooks": {
         "1": {
@@ -60,6 +64,10 @@
         "3": {
           "status": "IMPLEMENTED",
           "hook": "scripts/project/check_w3.py"
+        },
+        "5": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
         }
       }
     },
@@ -81,13 +89,17 @@
       ],
       "oracle": "representation-specific bounded update/sharing ledger; compare writes/roots, measured heap and release",
       "kills": "full state clone, dense matrix, historical roots or leaked pool",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "status": "IMPLEMENTED_BY_WAVE_HOOKS",
       "hook": null,
       "quality_companion": "S15",
       "wave_hooks": {
         "3": {
           "status": "IMPLEMENTED",
           "hook": "scripts/project/check_w3.py"
+        },
+        "5": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
         }
       }
     },
@@ -111,7 +123,7 @@
       ],
       "oracle": "W1 adjacency visits follow edges; W2 contribution bound Aprop, no global scans; fair convergence",
       "kills": "successor scan, redundant propagation/enqueue, lost self-loop",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "status": "IMPLEMENTED_BY_WAVE_HOOKS",
       "hook": null,
       "wave_hooks": {
         "1": {
@@ -121,6 +133,10 @@
         "2": {
           "status": "IMPLEMENTED",
           "hook": "scripts/project/check_w2.py"
+        },
+        "5": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
         }
       }
     },
@@ -141,8 +157,8 @@
         "accumulatorStatesChanged"
       ],
       "oracle": "N contributions specifically to J and zero predecessor rereads; auxiliary edges separately counted; coalesced/multi-publication controls",
-      "kills": "semantically correct predecessor recomputation with ~N² reads",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "kills": "semantically correct predecessor recomputation with ~N\u00b2 reads",
+      "status": "IMPLEMENTED_BY_WAVE_HOOKS",
       "hook": null,
       "wave_hooks": {
         "2": {
@@ -152,6 +168,10 @@
         "3": {
           "status": "IMPLEMENTED",
           "hook": "scripts/project/check_w3.py"
+        },
+        "5": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
         }
       }
     },
@@ -172,13 +192,17 @@
         "analysisRuns"
       ],
       "oracle": "index and same-key analysisRuns unchanged with K; callbacks equal actual matches, phases labelled",
-      "kills": "per-consumer traversal, I×K broadcast, solver per consumer",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "kills": "per-consumer traversal, I\u00d7K broadcast, solver per consumer",
+      "status": "IMPLEMENTED_BY_WAVE_HOOKS",
       "hook": null,
       "wave_hooks": {
         "4": {
           "status": "IMPLEMENTED",
           "hook": "scripts/project/check_w4.py"
+        },
+        "5": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
         }
       }
     },
@@ -198,9 +222,9 @@
         "operationsReplayed",
         "stateBytesRetained"
       ],
-      "oracle": "one directional prefix/suffix union per analysis/Entry/Sequence/epoch; selected facts O(Q), not Q×F; stable IN forward or stable OUT backward.",
+      "oracle": "one directional prefix/suffix union per analysis/Entry/Sequence/epoch; selected facts O(Q), not Q\u00d7F; stable IN forward or stable OUT backward.",
       "kills": "replay per query/site, implicit late replay, full state per query",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "status": "IMPLEMENTED_BY_WAVE_HOOKS",
       "hook": null,
       "quality_companion": "S15",
       "wave_hooks": {
@@ -211,6 +235,10 @@
         "4": {
           "status": "IMPLEMENTED",
           "hook": "scripts/project/check_w4.py"
+        },
+        "5": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
         }
       }
     },
@@ -231,12 +259,16 @@
       ],
       "oracle": "All supported finite candidates preserved without count-induced remainder; U source-proportional; sharing, convergence and pool release.",
       "kills": "candidate truncation, count-induced TOP, nonconvergent domain, global/historical pool",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "status": "IMPLEMENTED_BY_WAVE_HOOKS",
       "hook": null,
       "wave_hooks": {
         "3": {
           "status": "IMPLEMENTED",
           "hook": "scripts/project/check_w3.py"
+        },
+        "5": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
         }
       }
     },
@@ -259,7 +291,7 @@
       ],
       "oracle": "context buckets preserve activationEntry; demand-only views/runs; no eager Cartesian state",
       "kills": "ignore Entry/options, deep-hash cache, duplicate run",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "status": "IMPLEMENTED_BY_WAVE_HOOKS",
       "hook": null,
       "wave_hooks": {
         "1": {
@@ -273,6 +305,10 @@
         "4": {
           "status": "IMPLEMENTED",
           "hook": "scripts/project/check_w4.py"
+        },
+        "5": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
         }
       }
     },
@@ -292,13 +328,17 @@
       ],
       "oracle": "text processing at boundary once with declared cost; AIR baseline separated",
       "kills": "rehash/duplicate strings per iteration/join",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "status": "IMPLEMENTED_BY_WAVE_HOOKS",
       "hook": null,
       "quality_companion": "S15",
       "wave_hooks": {
         "3": {
           "status": "IMPLEMENTED",
           "hook": "scripts/project/check_w3.py"
+        },
+        "5": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
         }
       }
     },
@@ -317,9 +357,15 @@
       ],
       "oracle": "real stages, same defaults, hashes/JARs/pins, memory/file equivalence, PARTIAL preserved",
       "kills": "fixture-specific shortcut, golden substituted for stage, result promotes source precision",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "status": "IMPLEMENTED_BY_WAVE_HOOKS",
       "hook": null,
-      "quality_companion": "S15"
+      "quality_companion": "S15",
+      "wave_hooks": {
+        "5": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
+        }
+      }
     },
     {
       "id": "S11",
@@ -340,7 +386,7 @@
         "foreign-publication-entry",
         "duplicated-wrong-contextual-edge"
       ],
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "status": "IMPLEMENTED_BY_WAVE_HOOKS",
       "hook": null,
       "wave_hooks": {
         "1": {
@@ -365,7 +411,7 @@
         "backward-replay-from-wrong-anchor",
         "backward-replay-forward-order"
       ],
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "status": "IMPLEMENTED_BY_WAVE_HOOKS",
       "hook": null,
       "wave_hooks": {
         "2": {
@@ -393,7 +439,7 @@
       "kills": [
         "shared-wrong-transfer-agreement"
       ],
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "status": "IMPLEMENTED_BY_WAVE_HOOKS",
       "hook": null,
       "wave_hooks": {
         "2": {
@@ -426,7 +472,7 @@
         "prepared-payload-certifies-own-delivery",
         "observation-failure-blocks-independent-consumer"
       ],
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "status": "IMPLEMENTED_BY_WAVE_HOOKS",
       "hook": null,
       "wave_hooks": {
         "3": {
@@ -436,6 +482,10 @@
         "4": {
           "status": "IMPLEMENTED",
           "hook": "scripts/project/check_w4.py"
+        },
+        "5": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
         }
       }
     },
@@ -469,7 +519,7 @@
         "performance-optimization-by-lost-candidates",
         "performance-optimization-by-unsupported-everything"
       ],
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "status": "IMPLEMENTED_BY_WAVE_HOOKS",
       "hook": null,
       "wave_hooks": {
         "3": {
@@ -479,6 +529,10 @@
         "4": {
           "status": "IMPLEMENTED",
           "hook": "scripts/project/check_w4.py"
+        },
+        "5": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
         }
       }
     },
@@ -519,7 +573,7 @@
         "maximum-result-size",
         "catch-oom-as-analysis-limit"
       ],
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
+      "status": "IMPLEMENTED_BY_WAVE_HOOKS",
       "hook": null,
       "wave_hooks": {
         "1": {
@@ -537,6 +591,10 @@
         "4": {
           "status": "IMPLEMENTED",
           "hook": "scripts/project/check_w4.py"
+        },
+        "5": {
+          "status": "IMPLEMENTED",
+          "hook": "scripts/project/check_w5.py"
         }
       }
     }

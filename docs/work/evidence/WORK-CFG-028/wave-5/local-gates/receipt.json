@@ -1,0 +1,98 @@
+[
+  {
+    "gate": "scope",
+    "command": [
+      "python3",
+      "-B",
+      "scripts/project/check_scope.py",
+      "--update-manifest"
+    ],
+    "exitCode": 0,
+    "elapsedNanos": 1021933702,
+    "logSha256": "b1e61dbf5211db7e34df907664007bccc12474375cd6e7e05ea17ba25ddd8c06"
+  },
+  {
+    "gate": "fast",
+    "command": [
+      "bash",
+      "scripts/harness/check-fast.sh"
+    ],
+    "exitCode": 0,
+    "elapsedNanos": 111375777487,
+    "logSha256": "d9371d40d616d13db14a894e86ec75fb2a2d70a53c4ee929a2c6779485cfc7d4"
+  },
+  {
+    "gate": "architecture",
+    "command": [
+      "bash",
+      "scripts/harness/check-architecture.sh"
+    ],
+    "exitCode": 0,
+    "elapsedNanos": 67491564688,
+    "logSha256": "42846cee9b80d9b54134432722c0894a74078a81b55d1af56c902eb8bf5d39c0"
+  },
+  {
+    "gate": "semantic",
+    "command": [
+      "bash",
+      "scripts/harness/check-semantic.sh"
+    ],
+    "exitCode": 0,
+    "elapsedNanos": 35313154548,
+    "logSha256": "34edb1a4232273eb05c9e9b44a60cb6cd26ea2d2e2d42d11a777a5ea618d7f7e"
+  },
+  {
+    "gate": "integration",
+    "command": [
+      "bash",
+      "scripts/harness/check-integration.sh"
+    ],
+    "exitCode": 0,
+    "elapsedNanos": 47136045242,
+    "logSha256": "6868fae6d392b23a6a4c12c3515f0af3566402872f6730eeeb00ad195526b7cb"
+  },
+  {
+    "gate": "performance",
+    "command": [
+      "bash",
+      "scripts/harness/check-performance.sh"
+    ],
+    "exitCode": 0,
+    "elapsedNanos": 56709956729,
+    "logSha256": "7c634ae07936a96dfb274866abaf0b9a75eeb6121a2ea2fd2fb3ecc1b82dcd91"
+  },
+  {
+    "gate": "maven-clean-verify",
+    "command": [
+      "mvn",
+      "-B",
+      "-ntp",
+      "clean",
+      "verify"
+    ],
+    "exitCode": 0,
+    "elapsedNanos": 30525836574,
+    "logSha256": "297911a8dc7b19081ec6b9cf36f9787d751088dbc0ed871f9a269398259bee00"
+  },
+  {
+    "gate": "diff",
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exitCode": 0,
+    "elapsedNanos": 15972763,
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "gate": "full",
+    "command": [
+      "bash",
+      "scripts/harness/check-full.sh"
+    ],
+    "exitCode": 0,
+    "elapsedNanos": 314638394529,
+    "logSha256": "fe341c41561944421aefb1096a897fc090485b060619ee73a2a488a6612057b4"
+  }
+]

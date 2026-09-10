@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "status": "REVIEW_SNAPSHOT_NOT_CODEC",
+  "status": "IMPLEMENTED_W5",
   "schema": "analysis-dataflow-result",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "required_result_fields": [
     "schema",
     "version",
@@ -15,7 +15,8 @@
     "sourceScope",
     "observations",
     "statistics",
-    "completion"
+    "completion",
+    "analysisReason"
   ],
   "required_observation_fields": [
     "point",
@@ -29,7 +30,8 @@
     "precision",
     "premiseRefs",
     "evidenceRefs",
-    "provenanceRefs"
+    "provenanceRefs",
+    "candidateSupports"
   ],
   "execution_statuses": [
     "STABLE",
@@ -75,7 +77,10 @@
       "results",
       "schema",
       "version",
-      "resultId"
+      "resultId",
+      "analyses",
+      "planningEpoch",
+      "statistics"
     ],
     "consumer_plan_fields": [
       "consumerId",
@@ -135,6 +140,9 @@
       "ENCODING_FAILED",
       "WRITE_FAILED",
       "FINALIZATION_FAILED"
+    ],
+    "observation_not_started_reasons": [
+      "DEPENDENCY_UNAVAILABLE"
     ]
   },
   "non_stable_behavior": "non-STABLE run publishes no provisional observations; query refusal alone does not make a stable run non-STABLE",
@@ -145,5 +153,46 @@
     "kind",
     "enumerated",
     "modelValueRemainder"
-  ]
+  ],
+  "writer": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/ResultJson.java",
+  "reader": "scripts/project/result_wire.py",
+  "historical_design": "docs/evals/cp5/history/result-contract.json",
+  "version_decision": "1.1.0 adds candidateSupports, analysisReason, full source inventory/per-observation remainders, Entry/Outcome points, operand owner IDs, analyses and generic W4 consumer facts without losing 1.0 intent.",
+  "prepared_schema": "prepared-analysis-result",
+  "prepared_version": "1.1.0",
+  "receipt_schema": "analysis-delivery-receipt",
+  "receipt_version": "1.0.0",
+  "candidate_support_fields": [
+    "candidate",
+    "producers"
+  ],
+  "producer_fields": [
+    "evidence",
+    "origin",
+    "premiseRefs"
+  ],
+  "fact_fields": [
+    "kind",
+    "sequenceId",
+    "observationBatchId",
+    "query"
+  ],
+  "source_scope_fields": [
+    "scope",
+    "publicationInventory",
+    "unitInventory",
+    "entryUncertaintyRefs",
+    "remainderPolicy"
+  ],
+  "encoding": {
+    "charset": "UTF-8",
+    "fields": "lexicographic Java String order",
+    "arrays": "explicit full-ID/key/query/candidate/producer order; consumer facts sorted by sequence, batch, point, subject",
+    "numbers": "base-10 signed integral counters; unavailable null",
+    "escaping": "JSON quotes/backslash/controls; valid Unicode unchanged; unpaired surrogate rejected",
+    "newlines": "one final LF",
+    "resultId": "caller-supplied nonblank stable identifier",
+    "buffering": "incremental UTF-8 BufferedWriter, no whole-output byte array requirement",
+    "delivery": "external only; temp in destination directory, atomic replace, no fallback, complete after successful close and move"
+  }
 }

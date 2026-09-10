@@ -1,8 +1,9 @@
 # CP5 — fronteiras da análise
 
-Arquitetura `accepted`; W1/W2/W3 APPROVED. W4 IMPLEMENTED / AWAITING_HUMAN_REVIEW para shared planning/consumers.
-W5 permanece ausente e não autorizada. H1–H7/R1/R2 foram aprovados
-pelo pedido humano de 09/09/2026 que autoriza somente esta preparação.
+Arquitetura `accepted`; W1/W2/W3/W4 APPROVED. W5 autorizada para composição,
+wire/entrega e E2E reais, aguardando conclusão dos gates e review final humano.
+H1–H7/R1/R2 foram aprovados na preparação; cada Wave teve autorização separada.
+O [ledger W5](../engineering/cp5-w5-composition-ledger.md) registra os módulos reais.
 [Proveniência e hashes](../work/evidence/WORK-CFG-028/baseline.json) identificam o
 handoff 1.0 e o discovery revisado, lidos integralmente em `artefatos-e2e/cp5/`.
 A aprovação registrada no [lifecycle](../work/cp5-lifecycle.json) sucede o status

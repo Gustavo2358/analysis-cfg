@@ -7,7 +7,7 @@
 | EVAL-CFG-035 | W2 executável | solver incremental/direção/leis, extensão test-only, S4/S4b/S8 |
 | EVAL-CFG-036 | W3 executável | storage/valores/claims/query/retention, S1/S2/S3/S4b/S6/S7/S9 |
 | EVAL-CFG-037 | W4 executável | consumers reais com values W3, cache/dispatch/batch, S5/S6/S8 |
-| EVAL-CFG-038 | W5 planned | seam produtivo, regressões, S1–S9 + S10 E2E |
+| EVAL-CFG-038 | W5 executável | seam produtivo, regressões, S1–S9 + S10 E2E |
 
 [Roadmap/DoDs](../../product/cp5-roadmap.md), [lifecycle](../../work/cp5-lifecycle.json),
 [probes](probes.json), [métricas](metrics.json), [challenges](challenges.json),
@@ -15,7 +15,7 @@
 [contrato de review](result-contract.json), [exemplo](result-review.json),
 [inventário Java/POM de preparação](preparation-source-inventory.json).
 
-W1/W2/W3/W4 usam wave_hooks e gates produtivos; hooks W5 permanecem nulos; W4 tem gates reais.
+W1–W5 usam wave_hooks e gates produtivos; o runner global compõe todas as Waves.
 Performance/semântica de solver/arquitetura de módulos ausentes não recebem PASS.
 `python3 scripts/project/check_cp5_gate.py performance --wave 1` executa os probes reais.
 Ativação parcial por Wave não fecha nenhuma parcela futura.
@@ -33,4 +33,5 @@ estrutural independente; o recibo de entrega não faz parte do payload.
 
 [CORE-SIZE-001](../../architecture/decisions/ADR-0014.md), [manifest por papel](core-size-contract.json)
 e [oracle de review N/2N/4N](core-size-review.json): S16 roteado para W1–W5.
-Guard atual verifica contratos e wire; nenhum desses snapshots é medição de engine.
+Os exemplos 1.0 em history/ e core-size-review são históricos e não medem engine.
+O snapshot W5 atual deriva de execução; métricas e processos brutos ficam na evidência W5.

@@ -12,8 +12,8 @@
       "hook": "scripts/project/check-semantic.sh"
     },
     "performance": {
-      "status": "unavailable",
-      "hook": null
+      "status": "implemented",
+      "hook": "scripts/project/check-performance.sh"
     },
     "integration": {
       "status": "implemented",

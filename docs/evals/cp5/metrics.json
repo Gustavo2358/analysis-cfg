@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "W1_W2_W3_W4_IMPLEMENTED_W5_UNAVAILABLE",
+  "status": "W1_W2_W3_W4_W5_IMPLEMENTED",
   "overflow": "Checked arithmetic; overflow is an implementation defect to correct, never a supported-size ceiling or semantic result.",
   "metrics": [
     {
@@ -641,6 +641,134 @@
       "event": "refused admission reused without solver",
       "unit": "count",
       "audit": "actual event with checked arithmetic; nominal W4 oracle and compiled mutation"
+    },
+    {
+      "name": "compositionRuns",
+      "available_by_wave": 5,
+      "event": "actual compositionRuns boundary event; see W5 ledger",
+      "scope": "W5 composition/read/delivery attempt",
+      "unit": "count",
+      "audit": "nominal tests, independent file hashes/reader, scale N/2N/4N and mutation campaign"
+    },
+    {
+      "name": "airReads",
+      "available_by_wave": 5,
+      "event": "actual airReads boundary event; see W5 ledger",
+      "scope": "W5 composition/read/delivery attempt",
+      "unit": "count",
+      "audit": "nominal tests, independent file hashes/reader, scale N/2N/4N and mutation campaign"
+    },
+    {
+      "name": "airBytesObserved",
+      "available_by_wave": 5,
+      "event": "actual airBytesObserved boundary event; see W5 ledger",
+      "scope": "W5 composition/read/delivery attempt",
+      "unit": "bytes",
+      "audit": "nominal tests, independent file hashes/reader, scale N/2N/4N and mutation campaign"
+    },
+    {
+      "name": "cfgBuilds",
+      "available_by_wave": 5,
+      "event": "actual cfgBuilds boundary event; see W5 ledger",
+      "scope": "W5 composition/read/delivery attempt",
+      "unit": "count",
+      "audit": "nominal tests, independent file hashes/reader, scale N/2N/4N and mutation campaign"
+    },
+    {
+      "name": "defaultPlanDestinations",
+      "available_by_wave": 5,
+      "event": "actual defaultPlanDestinations boundary event; see W5 ledger",
+      "scope": "W5 composition/read/delivery attempt",
+      "unit": "count",
+      "audit": "nominal tests, independent file hashes/reader, scale N/2N/4N and mutation campaign"
+    },
+    {
+      "name": "defaultPlanQueries",
+      "available_by_wave": 5,
+      "event": "actual defaultPlanQueries boundary event; see W5 ledger",
+      "scope": "W5 composition/read/delivery attempt",
+      "unit": "count",
+      "audit": "nominal tests, independent file hashes/reader, scale N/2N/4N and mutation campaign"
+    },
+    {
+      "name": "defaultPlanAssignVisits",
+      "available_by_wave": 5,
+      "event": "actual defaultPlanAssignVisits boundary event; see W5 ledger",
+      "scope": "W5 composition/read/delivery attempt",
+      "unit": "count",
+      "audit": "nominal tests, independent file hashes/reader, scale N/2N/4N and mutation campaign"
+    },
+    {
+      "name": "resultBytesWritten",
+      "available_by_wave": 5,
+      "event": "actual resultBytesWritten boundary event; see W5 ledger",
+      "scope": "W5 composition/read/delivery attempt",
+      "unit": "bytes",
+      "audit": "nominal tests, independent file hashes/reader, scale N/2N/4N and mutation campaign"
+    },
+    {
+      "name": "resultSha256Computed",
+      "available_by_wave": 5,
+      "event": "actual resultSha256Computed boundary event; see W5 ledger",
+      "scope": "W5 composition/read/delivery attempt",
+      "unit": "count",
+      "audit": "nominal tests, independent file hashes/reader, scale N/2N/4N and mutation campaign"
+    },
+    {
+      "name": "deliveryAttempts",
+      "available_by_wave": 5,
+      "event": "actual deliveryAttempts boundary event; see W5 ledger",
+      "scope": "W5 composition/read/delivery attempt",
+      "unit": "count",
+      "audit": "nominal tests, independent file hashes/reader, scale N/2N/4N and mutation campaign"
+    },
+    {
+      "name": "deliveryComplete",
+      "available_by_wave": 5,
+      "event": "actual deliveryComplete boundary event; see W5 ledger",
+      "scope": "W5 composition/read/delivery attempt",
+      "unit": "count",
+      "audit": "nominal tests, independent file hashes/reader, scale N/2N/4N and mutation campaign"
+    },
+    {
+      "name": "deliveryFailures",
+      "available_by_wave": 5,
+      "event": "actual deliveryFailures boundary event; see W5 ledger",
+      "scope": "W5 composition/read/delivery attempt",
+      "unit": "count",
+      "audit": "nominal tests, independent file hashes/reader, scale N/2N/4N and mutation campaign"
+    },
+    {
+      "name": "encodingFailures",
+      "available_by_wave": 5,
+      "event": "actual encodingFailures boundary event; see W5 ledger",
+      "scope": "W5 composition/read/delivery attempt",
+      "unit": "count",
+      "audit": "nominal tests, independent file hashes/reader, scale N/2N/4N and mutation campaign"
+    },
+    {
+      "name": "writeFailures",
+      "available_by_wave": 5,
+      "event": "actual writeFailures boundary event; see W5 ledger",
+      "scope": "W5 composition/read/delivery attempt",
+      "unit": "count",
+      "audit": "nominal tests, independent file hashes/reader, scale N/2N/4N and mutation campaign"
+    },
+    {
+      "name": "finalizationFailures",
+      "available_by_wave": 5,
+      "event": "actual finalizationFailures boundary event; see W5 ledger",
+      "scope": "W5 composition/read/delivery attempt",
+      "unit": "count",
+      "audit": "nominal tests, independent file hashes/reader, scale N/2N/4N and mutation campaign"
+    },
+    {
+      "name": "cleanupFailures",
+      "available_by_wave": 5,
+      "event": "actual cleanupFailures boundary event; see W5 ledger",
+      "scope": "W5 composition/read/delivery attempt",
+      "unit": "count",
+      "audit": "nominal tests, independent file hashes/reader, scale N/2N/4N and mutation campaign"
     }
   ],
   "role": "OBSERVATION_ONLY",
@@ -725,5 +853,10 @@
     "hook": "scripts/project/check_w4.py",
     "mapping": "docs/engineering/cp5-w4-planning-ledger.md",
     "observations": "Explicit batches never cache across epochs; same-epoch query union and immutable facts are shared. Index counters remain in W1, callbacks count one consume per matched site."
+  },
+  "wave_5": {
+    "hook": "scripts/project/check_w5.py",
+    "ledger": "docs/engineering/cp5-w5-composition-ledger.md",
+    "status": "IMPLEMENTED"
   }
 }

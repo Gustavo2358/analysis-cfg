@@ -1,0 +1,1504 @@
+{
+  "schema": "w5-challenge-campaign",
+  "source_head": "ffdf2807d39186f2f204d2d53f70196a5d735ddd",
+  "source_sha256": {
+    "analysis-adapters/pom.xml": "775fcd53dffb66762a1233a9c16937f07cf2b64dbdd08902be5b1bea232022a6",
+    "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/DataflowAirReader.java": "190ceeefdb7ea403ee4e43bfe0afcdd2162e0294247def6703fe638edee6b7b4",
+    "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/DeliveryReceipt.java": "e5e41db33dc1cbe7ee6b1020a29572db9093fc22a042f5eee2b866f32fa06a54",
+    "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/JsonOutput.java": "a5f7765b05874467496744b883cc96b9e85923a8183e3f0b99583da01bdf152c",
+    "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/LocalResultWriter.java": "e1b40c25678555a1afbfc158f9b28be7a916c5e805d30ad992ab27cc4a2c64db",
+    "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/ReceiptJson.java": "65f6e62862ca7a180634ae80cc439655e2942cf6f5f0e5c004341fe42b0174cd",
+    "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/ResultJson.java": "0dd4d942874f71e7b69de6efcdbf24423d56faa80b39ce6f74075f52e59521c1",
+    "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/WireIds.java": "d695ec0e0a3169e6d22a0c28ddd281e48509d8b9693eea4b6dd947bb75c43d74",
+    "analysis-adapters/src/test/java/io/github/gustavo2358/analysis/adapters/DataflowRetentionProbe.java": "f2232d5ee60f23e8be40cd6718968c06ac431c7d62ccdf4015cbc6a4544e9ffd",
+    "analysis-adapters/src/test/java/io/github/gustavo2358/analysis/adapters/DeliveryTest.java": "c772e0e438e92e693ac84e967c0ee8b31f31b2ef923f1dcf834db8768c046821",
+    "analysis-adapters/src/test/java/io/github/gustavo2358/analysis/adapters/MemoryOracle.java": "f17a2e163c3ee28e3a4546763025a2df880a090759bfb4460a23b707c31af541",
+    "analysis-adapters/src/test/java/io/github/gustavo2358/analysis/adapters/ResultFixtures.java": "ebac12873e5f6be01388b1382347f06ac627ed89a6b88f59e4180e211ea1401d",
+    "analysis-adapters/src/test/java/io/github/gustavo2358/analysis/adapters/WideResultTest.java": "911634347ed179af17141bed5cef3a77959b5925fbfec9f2ee391f1f4d913ad4",
+    "analysis-adapters/src/test/java/io/github/gustavo2358/analysis/adapters/WireAdversarialTest.java": "b518dd2dba05261f61e79c91269b29bcc57999beee53f0e76bba3b63752cc236",
+    "analysis-adapters/src/test/java/io/github/gustavo2358/analysis/adapters/WireTest.java": "6ac1ba43f7883adf634460127bb45655c220dd632121ba39eeff4eb5a41f6810",
+    "analysis-dataflow/pom.xml": "7daf81689d95bc3327f510b1d85e9aa77c944993adf881cba806c7d0d98f0ca1",
+    "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/AnalysisDataflow.java": "fa54bca6545c60db3b453f921d0fab79fefa2664e85a2ba67ce984166caa145c",
+    "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/DefaultValuePlan.java": "7c9e543f2c01ed0816bc7c15a23e657bc12a803512313a69284d52b70a5b1531",
+    "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/ObservedValueFact.java": "825d656cb88a0f2d1de71693be3acf8825fd0b3dbe2e4ccdaffbbd751d7e1c75",
+    "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/PreparedDataflowResult.java": "b28e6c32356e45591e96eeffaaa7e34f118507ac53a0d457dfe31f80a6909a0d",
+    "analysis-dataflow/src/test/java/io/github/gustavo2358/analysis/dataflow/CompositionTest.java": "959b7fc3f6af698495069373b0a1437dc722e52948d52d234da9ef45c72fc076",
+    "analysis-dataflow/src/test/java/io/github/gustavo2358/analysis/dataflow/FlowFixtures.java": "a60d852bd4bffe08bcd460d26516bca52b17605bd40f6390e42f9d026a50b63e",
+    "analysis-launcher/pom.xml": "609f0a0b678f452a1283032ecd1fc09c5b916c1e4b5194ee7ed33af82db30a2c",
+    "analysis-launcher/src/main/java/io/github/gustavo2358/analysis/launcher/AnalysisDataflow.java": "d9359b5e4aa45bf99a0b91c9471c1bebf950a902aca324f31e217ea56a7a8afe",
+    "analysis-launcher/src/test/java/io/github/gustavo2358/analysis/launcher/DataflowCliTest.java": "b46fd1ba7990de5e5a115b9c4f1fc6d0611d177f02505294e54668edfc0b370a",
+    "pom.xml": "b5bcc9ed2ad4ee511f02b0d500622dd935120cb0f68b99a937c6e024458170fa",
+    "scripts/project/e2e_w5.py": "a632bf69b5e185e4e6f10e31584e27347c28198a1f20ee450d2719c5778aede1",
+    "scripts/project/result_wire.py": "f5c812d4f985ca7fc8a6ea7d5509038fa4abaf30cc6322fef24a5649beb78ce8",
+    "scripts/project/test_result_wire.py": "c145fd8581f1f6a4dea20ad0616d54549f0b046bd9ab391b9926e8742cf2d72a"
+  },
+  "attempts": [
+    {
+      "id": "fixture-specific-production-route",
+      "target": "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/DefaultValuePlan.java",
+      "status": "KILLED",
+      "stages": [
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "fixture-specific-production-route/baseline-green.log.gz",
+          "sha256": "7760f5897d943d60fbe9531959e1fdb18e1a982f09064aace742d6b94d9875ee"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test-compile",
+            "-DskipTests"
+          ],
+          "exitCode": 0,
+          "log": "fixture-specific-production-route/compile.log.gz",
+          "sha256": "1dac101c5bea2688942eea16b027317ad798aa2fd86879c86c190de21af41517"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 1,
+          "log": "fixture-specific-production-route/nominal-red.log.gz",
+          "sha256": "b2de02bf35176a1377c98cc25dcdc0e090b1d5f32164265239bb3d0cc29a1861"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "fixture-specific-production-route/second-green.log.gz",
+          "sha256": "898d4b84321058108d0c4ac8602ed8f595724c55c1553f45b0a48cc2758dcbcb"
+        }
+      ],
+      "mutant_sha256": "26e1d0c1be046ad8512bd3d426ceb18ede840238ec902cf07910461901ea6649",
+      "nominal_failures": [
+        {
+          "classname": "io.github.gustavo2358.analysis.dataflow.CompositionTest",
+          "method": "genericOverwriteUsesRealPipelineAndLastProducer"
+        },
+        {
+          "classname": "io.github.gustavo2358.analysis.dataflow.CompositionTest",
+          "method": "everyTerminatorAndOrphanAreObservedBefore"
+        }
+      ],
+      "byte_exact_restore": true
+    },
+    {
+      "id": "prepared-payload-certifies-own-delivery",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/ResultJson.java",
+      "status": "KILLED",
+      "stages": [
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "prepared-payload-certifies-own-delivery/baseline-green.log.gz",
+          "sha256": "4832cddd46cff4b09ec20f9f47fff7cd48a7d6b04daff67fc6c648fcccaeae0d"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test-compile",
+            "-DskipTests"
+          ],
+          "exitCode": 0,
+          "log": "prepared-payload-certifies-own-delivery/compile.log.gz",
+          "sha256": "9edbe0532095784a84da44911979dff505f0b094b1fbdda34522269ecde2d0cc"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 1,
+          "log": "prepared-payload-certifies-own-delivery/nominal-red.log.gz",
+          "sha256": "3b2adb7f8c92c8b6a6dc6bb26e947e1c21407d2b3e92c12d5bf406aebf00873a"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "prepared-payload-certifies-own-delivery/second-green.log.gz",
+          "sha256": "cdcf86f411a4af23e99b37c2404c3e479072f1a1e99b10cc883603721279c4bc"
+        }
+      ],
+      "mutant_sha256": "21c5561f4d00ddb8cc136c3833b42744a89df30ce5a33f746740fbbaf124b069",
+      "nominal_failures": [
+        {
+          "classname": "io.github.gustavo2358.analysis.adapters.WireTest",
+          "method": "realValueSupportAndSourceRemainderReachWire"
+        }
+      ],
+      "byte_exact_restore": true
+    },
+    {
+      "id": "drop-batch-dependency-reason-in-wire",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/ResultJson.java",
+      "status": "KILLED",
+      "stages": [
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "drop-batch-dependency-reason-in-wire/baseline-green.log.gz",
+          "sha256": "b77f9ca6e2711c239b18a0a517a34092e171ee20ce0e5b18840bb61991b6372a"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test-compile",
+            "-DskipTests"
+          ],
+          "exitCode": 0,
+          "log": "drop-batch-dependency-reason-in-wire/compile.log.gz",
+          "sha256": "6415b5e20ca1d0130d6734fa8793850542db2af323911e3192048dfb034d413e"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 1,
+          "log": "drop-batch-dependency-reason-in-wire/nominal-red.log.gz",
+          "sha256": "75739c5a2c4654e78e2f81795acbd7e52468df6ebbf6915dfb8ed47aa769a62c"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "drop-batch-dependency-reason-in-wire/second-green.log.gz",
+          "sha256": "dce4aaf8f4255ef70c0a366f39524609b4cc2461a7cf74f08de3fa0ac56eb9d8"
+        }
+      ],
+      "mutant_sha256": "9c8a1a535bf589e8c6206dadbc212933e1514a0921d2335cf940648fc9ca82e5",
+      "nominal_failures": [
+        {
+          "classname": "io.github.gustavo2358.analysis.adapters.WireAdversarialTest",
+          "method": "unavailableBatchRetainsItsExplicitDependencyReason"
+        }
+      ],
+      "byte_exact_restore": true
+    },
+    {
+      "id": "drop-candidate-support-in-wire",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/ResultJson.java",
+      "status": "KILLED",
+      "stages": [
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "drop-candidate-support-in-wire/baseline-green.log.gz",
+          "sha256": "aa77799c98cde98343318105589a5cf24cd20b01bde1ae8cdc82da118cd57b59"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test-compile",
+            "-DskipTests"
+          ],
+          "exitCode": 0,
+          "log": "drop-candidate-support-in-wire/compile.log.gz",
+          "sha256": "0d0e394018a2e9f24a0bfdb481328561f2642f84feecb6a539fab743adb51b62"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 1,
+          "log": "drop-candidate-support-in-wire/nominal-red.log.gz",
+          "sha256": "1abb6f42d6bc9d38b2707bb434561121104cfe80a1a80f228097bc66f7680891"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "drop-candidate-support-in-wire/second-green.log.gz",
+          "sha256": "f43c7a085d554237434067ecf247ae99ab99f7bf46749e8b6a6a144ccf84a458"
+        }
+      ],
+      "mutant_sha256": "e6d0498be3c1395031ca72efb08ebab33ac5407586aec268136f4cb2d1b53336",
+      "nominal_failures": [
+        {
+          "classname": "io.github.gustavo2358.analysis.adapters.WideResultTest",
+          "method": "resultBeyondLegacy64MiBHasNoOutputCapacityPolicy"
+        },
+        {
+          "classname": "io.github.gustavo2358.analysis.adapters.WireAdversarialTest",
+          "method": "distinctCandidatesKeepTheirOwnProducerSupport"
+        },
+        {
+          "classname": "io.github.gustavo2358.analysis.adapters.WireTest",
+          "method": "realValueSupportAndSourceRemainderReachWire"
+        }
+      ],
+      "byte_exact_restore": true
+    },
+    {
+      "id": "swap-candidate-support-in-wire",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/ResultJson.java",
+      "status": "KILLED",
+      "stages": [
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "swap-candidate-support-in-wire/baseline-green.log.gz",
+          "sha256": "5e3490b81de4fdfca0fcb66576cf3818768b9ea53bc11daf2aaa051d03800b66"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test-compile",
+            "-DskipTests"
+          ],
+          "exitCode": 0,
+          "log": "swap-candidate-support-in-wire/compile.log.gz",
+          "sha256": "3cbef66e04a9c100d2fb8ca5157dbb37330cb8709243ffcaceb379662799e595"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 1,
+          "log": "swap-candidate-support-in-wire/nominal-red.log.gz",
+          "sha256": "d9dd59ea5e34831544931ed5e7153d8324f03499e54cec635ba95d70327f4600"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "swap-candidate-support-in-wire/second-green.log.gz",
+          "sha256": "84419c386ec12a3ee126637ebeca2ee520a31f247b9431ec9f890b6ac0b1331e"
+        }
+      ],
+      "mutant_sha256": "aec7ecfbd5e46494ca45dc2810b34e454d56a84499342bcfc2a587aee51cf6e4",
+      "nominal_failures": [
+        {
+          "classname": "io.github.gustavo2358.analysis.adapters.WireAdversarialTest",
+          "method": "distinctCandidatesKeepTheirOwnProducerSupport"
+        }
+      ],
+      "byte_exact_restore": true
+    },
+    {
+      "id": "source-partial-promoted-to-exact-in-wire",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/ResultJson.java",
+      "status": "KILLED",
+      "stages": [
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "source-partial-promoted-to-exact-in-wire/baseline-green.log.gz",
+          "sha256": "60d945bbd262554fdc3aea72ee7b8731ee8552fdd882aa180c2390dea5f8eac0"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test-compile",
+            "-DskipTests"
+          ],
+          "exitCode": 0,
+          "log": "source-partial-promoted-to-exact-in-wire/compile.log.gz",
+          "sha256": "dc7cfd92a82bd5a41af9b62e5704ac798d3f0a8793f46ac8f24103abfb4f2e21"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 1,
+          "log": "source-partial-promoted-to-exact-in-wire/nominal-red.log.gz",
+          "sha256": "6ea186aab289d8356e732c2571871bd96131a2055fd5988954e835197eef53a1"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "source-partial-promoted-to-exact-in-wire/second-green.log.gz",
+          "sha256": "c3946e4d5ef62d08c3d69b320ae50e2ddef93a9990d0a38859d1795e50ea141e"
+        }
+      ],
+      "mutant_sha256": "03e41ae2f32ef3460aff7457133fcf6b25a81cdcee6e6e14f7589986cbb91ff4",
+      "nominal_failures": [
+        {
+          "classname": "io.github.gustavo2358.analysis.adapters.WireAdversarialTest",
+          "method": "unsupportedAndUnreachableHaveDifferentExplicitNullSemantics"
+        },
+        {
+          "classname": "io.github.gustavo2358.analysis.adapters.WireTest",
+          "method": "realValueSupportAndSourceRemainderReachWire"
+        }
+      ],
+      "byte_exact_restore": true
+    },
+    {
+      "id": "full-id-owner-loss",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/WireIds.java",
+      "status": "KILLED",
+      "stages": [
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "full-id-owner-loss/baseline-green.log.gz",
+          "sha256": "9b97f7b2b4806a438e8b444796f6133c96778462682ae5e441216bcbc7454e57"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test-compile",
+            "-DskipTests"
+          ],
+          "exitCode": 0,
+          "log": "full-id-owner-loss/compile.log.gz",
+          "sha256": "3edc877f58618c29481c0cf80948af237a29ebe51d726240837683f239f1f8de"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 1,
+          "log": "full-id-owner-loss/nominal-red.log.gz",
+          "sha256": "9775c0490de813fd60f236da6fad802dc1eb9a1954a13e0d881aaaa8e8637abb"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "full-id-owner-loss/second-green.log.gz",
+          "sha256": "81dcbbefa64c0835259584508274e5497b4bc6b9cce19dac27ab5efee1a2dc57"
+        }
+      ],
+      "mutant_sha256": "00b9ca2be90dd209c03c4933d3e9232403f10ccb5547d2b72dc4bff9e3eed11b",
+      "nominal_failures": [
+        {
+          "classname": "io.github.gustavo2358.analysis.adapters.WideResultTest",
+          "method": "scaleKeepsAllQueriesFactsAndDetachedResult"
+        },
+        {
+          "classname": "io.github.gustavo2358.analysis.adapters.WireAdversarialTest",
+          "method": "permutedInputRegistrationQueriesCandidatesSupportsAndFactsAreByteStable"
+        },
+        {
+          "classname": "io.github.gustavo2358.analysis.adapters.WireAdversarialTest",
+          "method": "fullIdentitySeparatesOwnersEvenWhenLocalIdsCollide"
+        },
+        {
+          "classname": "io.github.gustavo2358.analysis.adapters.WireAdversarialTest",
+          "method": "distinctCandidatesKeepTheirOwnProducerSupport"
+        },
+        {
+          "classname": "io.github.gustavo2358.analysis.adapters.WireTest",
+          "method": "realValueSupportAndSourceRemainderReachWire"
+        }
+      ],
+      "byte_exact_restore": true
+    },
+    {
+      "id": "wrong-result-id-receipt",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/LocalResultWriter.java",
+      "status": "KILLED",
+      "stages": [
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "wrong-result-id-receipt/baseline-green.log.gz",
+          "sha256": "ff68bd49f358ff13db7a0e2940577d00de2715f3941a9eb99e6a7e7c4c7bced4"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test-compile",
+            "-DskipTests"
+          ],
+          "exitCode": 0,
+          "log": "wrong-result-id-receipt/compile.log.gz",
+          "sha256": "532793b9e5022a6e37c96998da8bb3a68b69019a53382ed2939db189a44aa415"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 1,
+          "log": "wrong-result-id-receipt/nominal-red.log.gz",
+          "sha256": "a20f83769d9b30a89ac32660bdae8458ef27a43787cf80d7eb66e448ff5ca8a9"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "wrong-result-id-receipt/second-green.log.gz",
+          "sha256": "989a1f8a34ed645589f220485fa8e2aca46dcde5be39734ec514722b06e55266"
+        }
+      ],
+      "mutant_sha256": "98705a3dbe872af4d8a16100f0a531d0089955efcc82cd5254565d61256cd11c",
+      "nominal_failures": [
+        {
+          "classname": "io.github.gustavo2358.analysis.adapters.DeliveryTest",
+          "method": "completeReceiptBindsExactFinalBytesAndReplacesExistingAtomically"
+        }
+      ],
+      "byte_exact_restore": true
+    },
+    {
+      "id": "wrong-result-hash-receipt",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/LocalResultWriter.java",
+      "status": "KILLED",
+      "stages": [
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "wrong-result-hash-receipt/baseline-green.log.gz",
+          "sha256": "a545304bc49b15989e578cedf04f903d150526bb2b7cec9f3af08983900b62f0"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test-compile",
+            "-DskipTests"
+          ],
+          "exitCode": 0,
+          "log": "wrong-result-hash-receipt/compile.log.gz",
+          "sha256": "8a0380a990bc7c18427fe3d49ebf877e0a9d06cf01be0ff26784330843ef4e5a"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 1,
+          "log": "wrong-result-hash-receipt/nominal-red.log.gz",
+          "sha256": "9166ced301cc290567519a8caaa14c1480b8cb06aa6f289cda48aa24de6667e1"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "wrong-result-hash-receipt/second-green.log.gz",
+          "sha256": "ba025959285bcb8588f36f65c8d533600806408570b9996f255c68e69d2bd4fa"
+        }
+      ],
+      "mutant_sha256": "61bc1ca1bca64b505982ba989eeaa358ea0acfa0a50c93eb6fd06a262e9cf152",
+      "nominal_failures": [
+        {
+          "classname": "io.github.gustavo2358.analysis.adapters.DeliveryTest",
+          "method": "completeReceiptBindsExactFinalBytesAndReplacesExistingAtomically"
+        }
+      ],
+      "byte_exact_restore": true
+    },
+    {
+      "id": "wrong-result-destination-receipt",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/LocalResultWriter.java",
+      "status": "KILLED",
+      "stages": [
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "wrong-result-destination-receipt/baseline-green.log.gz",
+          "sha256": "773ef1fc76c9e1d2bb361e1fc8a3e280f3c0d5d740dcf81d3152c4f8b758a95e"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test-compile",
+            "-DskipTests"
+          ],
+          "exitCode": 0,
+          "log": "wrong-result-destination-receipt/compile.log.gz",
+          "sha256": "e0480c1a3561618b495d89be8df0006f39c048f83c1734c49e353543438b8152"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 1,
+          "log": "wrong-result-destination-receipt/nominal-red.log.gz",
+          "sha256": "fa8c1f0f08a88cb914fa2cc964f5348492279b984647290922fbcb08accd5da2"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "wrong-result-destination-receipt/second-green.log.gz",
+          "sha256": "4e2c93b39dff68cf0e020c089042d29d7a04ff8efc24599de20ed851bd7fe0f1"
+        }
+      ],
+      "mutant_sha256": "cea02283aba83466adf59e9a961ce67ae8c5ac8b4bda90f199632060aad6f02d",
+      "nominal_failures": [
+        {
+          "classname": "io.github.gustavo2358.analysis.adapters.DeliveryTest",
+          "method": "completeReceiptBindsExactFinalBytesAndReplacesExistingAtomically"
+        }
+      ],
+      "byte_exact_restore": true
+    },
+    {
+      "id": "writer-failure-reported-complete",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/LocalResultWriter.java",
+      "status": "KILLED",
+      "stages": [
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "writer-failure-reported-complete/baseline-green.log.gz",
+          "sha256": "b06a4fb083b9e64f5f2c878b5cc7387c7407b78d9890fbf80ae8f006a114d4c4"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test-compile",
+            "-DskipTests"
+          ],
+          "exitCode": 0,
+          "log": "writer-failure-reported-complete/compile.log.gz",
+          "sha256": "c880bc5a2049b646c5df4a38dbd0a58f24cc248a507f15e403f8dd7333857f85"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 1,
+          "log": "writer-failure-reported-complete/nominal-red.log.gz",
+          "sha256": "2438b47ba08f1906b46ce504ba46efd260202b9be5fc4262dce6e88bc8aad9e3"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "writer-failure-reported-complete/second-green.log.gz",
+          "sha256": "54e2cf7b14c097895bb8308a180582f16a107b27c14dc304ae70e210f6feddc2"
+        }
+      ],
+      "mutant_sha256": "28f7b36a3a843659a135fa5751008120695546c60274d9a8a7994fb010727af1",
+      "nominal_failures": [
+        {
+          "classname": "io.github.gustavo2358.analysis.adapters.DeliveryTest",
+          "method": "controlledFailuresPreservePreparedResultAndExistingDestination"
+        }
+      ],
+      "byte_exact_restore": true
+    },
+    {
+      "id": "partial-final-file-after-write-failure",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/LocalResultWriter.java",
+      "status": "KILLED",
+      "stages": [
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "partial-final-file-after-write-failure/baseline-green.log.gz",
+          "sha256": "b88719b2c0c18213716984230be04abbd6ba10ae4f09d2b751713e013deaf166"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test-compile",
+            "-DskipTests"
+          ],
+          "exitCode": 0,
+          "log": "partial-final-file-after-write-failure/compile.log.gz",
+          "sha256": "8ed0e32dc4a4d3916ae401050a22287b5c24611b38420c9637b90972b05e6dbc"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 1,
+          "log": "partial-final-file-after-write-failure/nominal-red.log.gz",
+          "sha256": "b6ee554ef6f25379fbf20dcafd7ad9934db9582527470bf5acfc9894f873fe61"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "partial-final-file-after-write-failure/second-green.log.gz",
+          "sha256": "033c54bb13150280d5c7ee79ca95db5fe1bc5d578f2c22d7b6045eaa3ce6add1"
+        }
+      ],
+      "mutant_sha256": "1ed5f3bf8439f57db412267c77c3d8e823edbde763b8882c0602321347c10bc2",
+      "nominal_failures": [
+        {
+          "classname": "io.github.gustavo2358.analysis.adapters.DeliveryTest",
+          "method": "resourceExhaustionIsNotACompletedOrSemanticDeliveryOutcome"
+        },
+        {
+          "classname": "io.github.gustavo2358.analysis.adapters.DeliveryTest",
+          "method": "controlledFailuresPreservePreparedResultAndExistingDestination"
+        }
+      ],
+      "byte_exact_restore": true
+    },
+    {
+      "id": "nondeterministic-result-order",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/ResultJson.java",
+      "status": "KILLED",
+      "stages": [
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "nondeterministic-result-order/baseline-green.log.gz",
+          "sha256": "71dcb77a1ef45784920782ac8e7d6f16b1accb5574440129ecf49ab0caf16961"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test-compile",
+            "-DskipTests"
+          ],
+          "exitCode": 0,
+          "log": "nondeterministic-result-order/compile.log.gz",
+          "sha256": "59d0a32a60c18ba34345ce8ff8d5cc8594802b2301603b7998b6322dd5be8d79"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 1,
+          "log": "nondeterministic-result-order/nominal-red.log.gz",
+          "sha256": "5b65bf9feb96e7cec4fad8baaaacf9807bf94f10c9a0aecb3e225f724d8e3acb"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "nondeterministic-result-order/second-green.log.gz",
+          "sha256": "d3dbc573082ef9a8879190fd4b7e42fd793af68123c381cdde81a98fd8ce8686"
+        }
+      ],
+      "mutant_sha256": "f46b5925ee62f9c0fc7e7dff696b37b7452ddba69d06a35a1e11e99bdc6fb6b3",
+      "nominal_failures": [
+        {
+          "classname": "io.github.gustavo2358.analysis.adapters.WireAdversarialTest",
+          "method": "permutedInputRegistrationQueriesCandidatesSupportsAndFactsAreByteStable"
+        }
+      ],
+      "byte_exact_restore": true
+    },
+    {
+      "id": "local-input-size-cap-used-as-semantic-admission",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/DataflowAirReader.java",
+      "status": "KILLED",
+      "stages": [
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "local-input-size-cap-used-as-semantic-admission/baseline-green.log.gz",
+          "sha256": "50fb893311f793426f210e72b327f6ab94e2322a41f2ac2d674011255c4a0204"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test-compile",
+            "-DskipTests"
+          ],
+          "exitCode": 0,
+          "log": "local-input-size-cap-used-as-semantic-admission/compile.log.gz",
+          "sha256": "e1cf97caab287f1b266782a7141099deceebb2fb63ab0a5ca769b89a28a168a0"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 1,
+          "log": "local-input-size-cap-used-as-semantic-admission/nominal-red.log.gz",
+          "sha256": "cab99d516691f9e4ab760d388e10bf983d61b1e104cc4ececa4a5aa8e70fa22a"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "local-input-size-cap-used-as-semantic-admission/second-green.log.gz",
+          "sha256": "67595eca71963b05b5f9d158c6bd386a61d1a0c9ccd792ede1da14950b721a38"
+        }
+      ],
+      "mutant_sha256": "db80bffc64e37866fb574179eee8cf71864bcaa302b1cd78a0cf7a8628385fff",
+      "nominal_failures": [
+        {
+          "classname": "io.github.gustavo2358.analysis.launcher.DataflowCliTest",
+          "method": "externalCodecCapIsOperationalDebtWithoutLocalReadAdmission"
+        }
+      ],
+      "byte_exact_restore": true
+    },
+    {
+      "id": "maximum-result-size",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/LocalResultWriter.java",
+      "status": "KILLED",
+      "stages": [
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "maximum-result-size/baseline-green.log.gz",
+          "sha256": "f68c5347ffcca5acb02338b6958c3ff0f281e5b1a8bec294406e8d7dc6016fb1"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test-compile",
+            "-DskipTests"
+          ],
+          "exitCode": 0,
+          "log": "maximum-result-size/compile.log.gz",
+          "sha256": "fded9862664a02194765bc02959e44c05a3f967bd321651fc6d19887f23ff6f4"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 1,
+          "log": "maximum-result-size/nominal-red.log.gz",
+          "sha256": "54ae68425d993f3685ce4a0b65e9b2b35688c3c3801f753a075b39feeac8f16a"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "maximum-result-size/second-green.log.gz",
+          "sha256": "0b19d8259ca9fd2adac8c3de32197924a61c52d9ed9e53d4d856adb21b598148"
+        }
+      ],
+      "mutant_sha256": "32536c85a00a29f64029239ac7db43a1e910ba37f94990b78bfaef74de603b17",
+      "nominal_failures": [
+        {
+          "classname": "io.github.gustavo2358.analysis.adapters.WideResultTest",
+          "method": "resultBeyondLegacy64MiBHasNoOutputCapacityPolicy"
+        }
+      ],
+      "byte_exact_restore": true
+    },
+    {
+      "id": "resource-cap-on-result-facts-queries",
+      "target": "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/DefaultValuePlan.java",
+      "status": "KILLED",
+      "stages": [
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "resource-cap-on-result-facts-queries/baseline-green.log.gz",
+          "sha256": "b3bc748ac3f1ce2dff3303e6453597af2a6da5b4f5e1c0382f433d6da6d4b441"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test-compile",
+            "-DskipTests"
+          ],
+          "exitCode": 0,
+          "log": "resource-cap-on-result-facts-queries/compile.log.gz",
+          "sha256": "7c546f5b3bf53b378578d99036e01b3df9fecd3dbba22b299fac6be41b2637d3"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 1,
+          "log": "resource-cap-on-result-facts-queries/nominal-red.log.gz",
+          "sha256": "0cdeac418dc55cfdedc71519c076c2619e6414e3c47703f8ffbaf54f7e8549c2"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "resource-cap-on-result-facts-queries/second-green.log.gz",
+          "sha256": "53316d64dadd34f1c389a4cfba4304fcf5e1384245e09b657661fcb50a9859bc"
+        }
+      ],
+      "mutant_sha256": "e37fce0a2a9b7b58c842142369c7611c84c00b25bd1ac42a89b80fa38d607b0c",
+      "nominal_failures": [
+        {
+          "classname": "io.github.gustavo2358.analysis.adapters.WideResultTest",
+          "method": "scaleKeepsAllQueriesFactsAndDetachedResult"
+        }
+      ],
+      "byte_exact_restore": true
+    },
+    {
+      "id": "catch-oom-as-analysis-limit",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/LocalResultWriter.java",
+      "status": "KILLED",
+      "stages": [
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "catch-oom-as-analysis-limit/baseline-green.log.gz",
+          "sha256": "e12040a2617b0ab67adb363344b3c55d078f2e90a6d3517570bed2a639f793de"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test-compile",
+            "-DskipTests"
+          ],
+          "exitCode": 0,
+          "log": "catch-oom-as-analysis-limit/compile.log.gz",
+          "sha256": "c02732e8f427dce57e4bba9ecb06d0ac0ba2836aec722a6aeaa2502cbf3d287f"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 1,
+          "log": "catch-oom-as-analysis-limit/nominal-red.log.gz",
+          "sha256": "8ad3f41399313b7a402b079fa70c03846d426d27cc9a89b0491d7e4e01978e86"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "catch-oom-as-analysis-limit/second-green.log.gz",
+          "sha256": "6a71f5f46ece18409c20bca4f960b35b123a63cdaf51baefad318b190e0c749c"
+        }
+      ],
+      "mutant_sha256": "c0c6cccfa6cca67c7560a18e81f681daec3088614b58c39a5768ed9713a980d9",
+      "nominal_failures": [
+        {
+          "classname": "io.github.gustavo2358.analysis.adapters.DeliveryTest",
+          "method": "resourceExhaustionIsNotACompletedOrSemanticDeliveryOutcome"
+        }
+      ],
+      "byte_exact_restore": true
+    },
+    {
+      "id": "legacy-cfg-writer-used-for-analysis-result",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/ResultJson.java",
+      "status": "KILLED",
+      "stages": [
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "legacy-cfg-writer-used-for-analysis-result/baseline-green.log.gz",
+          "sha256": "f3eff95cbf56ba7a9fe5eec8e995c6cdc7f94990ae8d46b7e57efe3bc1f20ce9"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test-compile",
+            "-DskipTests"
+          ],
+          "exitCode": 0,
+          "log": "legacy-cfg-writer-used-for-analysis-result/compile.log.gz",
+          "sha256": "652d51ac82003d3cbadaef879fbfedb06ae25d70c084afc0405ce1d03c4476cc"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 1,
+          "log": "legacy-cfg-writer-used-for-analysis-result/nominal-red.log.gz",
+          "sha256": "1d14444f571d0e4c8156ec7add436a5095945f1d2a6d53d79751858c24e072b1"
+        },
+        {
+          "command": [
+            "mvn",
+            "-B",
+            "-ntp",
+            "-pl",
+            "analysis-launcher",
+            "-am",
+            "test",
+            "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,WireTest,DeliveryTest,WideResultTest,WireAdversarialTest,DataflowCliTest"
+          ],
+          "exitCode": 0,
+          "log": "legacy-cfg-writer-used-for-analysis-result/second-green.log.gz",
+          "sha256": "6d8b38f0d3f59a2df6d06fa0d13584c328b2989e35c16bd13cf0fccfb46027a3"
+        }
+      ],
+      "mutant_sha256": "b059eb705e5748f4c03ea443b365266398996c0f3b17c85ec20ba86130f54560",
+      "nominal_failures": [
+        {
+          "classname": "io.github.gustavo2358.analysis.adapters.WireTest",
+          "method": "realValueSupportAndSourceRemainderReachWire"
+        }
+      ],
+      "byte_exact_restore": true
+    },
+    {
+      "id": "golden-substituted-for-real-stage",
+      "target": "scripts/project/e2e_w5.py",
+      "status": "KILLED",
+      "stages": [
+        {
+          "command": [
+            "/usr/bin/python3",
+            "-B",
+            "scripts/project/test_result_wire.py"
+          ],
+          "exitCode": 0,
+          "log": "golden-substituted-for-real-stage/baseline-green.log.gz",
+          "sha256": "695edf8a1aafc52d55201582f55e8b15fa5ac4b3293ae72ec825be4c9eaf1e42"
+        },
+        {
+          "command": [
+            "/usr/bin/python3",
+            "-c",
+            "import ast,pathlib;ast.parse(pathlib.Path('/home/gustavo/workspace/teste-e2e/analysis-cfg/scripts/project/e2e_w5.py').read_text())"
+          ],
+          "exitCode": 0,
+          "log": "golden-substituted-for-real-stage/compile.log.gz",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "command": [
+            "/usr/bin/python3",
+            "-B",
+            "scripts/project/test_result_wire.py"
+          ],
+          "exitCode": 1,
+          "log": "golden-substituted-for-real-stage/nominal-red.log.gz",
+          "sha256": "b6962920dd3550951a2973a9af46831fad144cbbfd8041fe55e55d6eb6449af9"
+        },
+        {
+          "command": [
+            "/usr/bin/python3",
+            "-B",
+            "scripts/project/test_result_wire.py"
+          ],
+          "exitCode": 0,
+          "log": "golden-substituted-for-real-stage/second-green.log.gz",
+          "sha256": "695edf8a1aafc52d55201582f55e8b15fa5ac4b3293ae72ec825be4c9eaf1e42"
+        }
+      ],
+      "mutant_sha256": "d92e562ff8a5125768e6304bff932df65e62ebe305cbb0f2b3624f71cd414c3d",
+      "byte_exact_restore": true
+    }
+  ],
+  "status": "PASS",
+  "final_source_sha256": {
+    "analysis-adapters/pom.xml": "775fcd53dffb66762a1233a9c16937f07cf2b64dbdd08902be5b1bea232022a6",
+    "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/DataflowAirReader.java": "190ceeefdb7ea403ee4e43bfe0afcdd2162e0294247def6703fe638edee6b7b4",
+    "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/DeliveryReceipt.java": "e5e41db33dc1cbe7ee6b1020a29572db9093fc22a042f5eee2b866f32fa06a54",
+    "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/JsonOutput.java": "a5f7765b05874467496744b883cc96b9e85923a8183e3f0b99583da01bdf152c",
+    "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/LocalResultWriter.java": "e1b40c25678555a1afbfc158f9b28be7a916c5e805d30ad992ab27cc4a2c64db",
+    "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/ReceiptJson.java": "65f6e62862ca7a180634ae80cc439655e2942cf6f5f0e5c004341fe42b0174cd",
+    "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/ResultJson.java": "0dd4d942874f71e7b69de6efcdbf24423d56faa80b39ce6f74075f52e59521c1",
+    "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/WireIds.java": "d695ec0e0a3169e6d22a0c28ddd281e48509d8b9693eea4b6dd947bb75c43d74",
+    "analysis-adapters/src/test/java/io/github/gustavo2358/analysis/adapters/DataflowRetentionProbe.java": "f2232d5ee60f23e8be40cd6718968c06ac431c7d62ccdf4015cbc6a4544e9ffd",
+    "analysis-adapters/src/test/java/io/github/gustavo2358/analysis/adapters/DeliveryTest.java": "c772e0e438e92e693ac84e967c0ee8b31f31b2ef923f1dcf834db8768c046821",
+    "analysis-adapters/src/test/java/io/github/gustavo2358/analysis/adapters/MemoryOracle.java": "f17a2e163c3ee28e3a4546763025a2df880a090759bfb4460a23b707c31af541",
+    "analysis-adapters/src/test/java/io/github/gustavo2358/analysis/adapters/ResultFixtures.java": "ebac12873e5f6be01388b1382347f06ac627ed89a6b88f59e4180e211ea1401d",
+    "analysis-adapters/src/test/java/io/github/gustavo2358/analysis/adapters/WideResultTest.java": "911634347ed179af17141bed5cef3a77959b5925fbfec9f2ee391f1f4d913ad4",
+    "analysis-adapters/src/test/java/io/github/gustavo2358/analysis/adapters/WireAdversarialTest.java": "b518dd2dba05261f61e79c91269b29bcc57999beee53f0e76bba3b63752cc236",
+    "analysis-adapters/src/test/java/io/github/gustavo2358/analysis/adapters/WireTest.java": "6ac1ba43f7883adf634460127bb45655c220dd632121ba39eeff4eb5a41f6810",
+    "analysis-dataflow/pom.xml": "7daf81689d95bc3327f510b1d85e9aa77c944993adf881cba806c7d0d98f0ca1",
+    "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/AnalysisDataflow.java": "fa54bca6545c60db3b453f921d0fab79fefa2664e85a2ba67ce984166caa145c",
+    "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/DefaultValuePlan.java": "7c9e543f2c01ed0816bc7c15a23e657bc12a803512313a69284d52b70a5b1531",
+    "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/ObservedValueFact.java": "825d656cb88a0f2d1de71693be3acf8825fd0b3dbe2e4ccdaffbbd751d7e1c75",
+    "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/PreparedDataflowResult.java": "b28e6c32356e45591e96eeffaaa7e34f118507ac53a0d457dfe31f80a6909a0d",
+    "analysis-dataflow/src/test/java/io/github/gustavo2358/analysis/dataflow/CompositionTest.java": "959b7fc3f6af698495069373b0a1437dc722e52948d52d234da9ef45c72fc076",
+    "analysis-dataflow/src/test/java/io/github/gustavo2358/analysis/dataflow/FlowFixtures.java": "a60d852bd4bffe08bcd460d26516bca52b17605bd40f6390e42f9d026a50b63e",
+    "analysis-launcher/pom.xml": "609f0a0b678f452a1283032ecd1fc09c5b916c1e4b5194ee7ed33af82db30a2c",
+    "analysis-launcher/src/main/java/io/github/gustavo2358/analysis/launcher/AnalysisDataflow.java": "d9359b5e4aa45bf99a0b91c9471c1bebf950a902aca324f31e217ea56a7a8afe",
+    "analysis-launcher/src/test/java/io/github/gustavo2358/analysis/launcher/DataflowCliTest.java": "b46fd1ba7990de5e5a115b9c4f1fc6d0611d177f02505294e54668edfc0b370a",
+    "pom.xml": "b5bcc9ed2ad4ee511f02b0d500622dd935120cb0f68b99a937c6e024458170fa",
+    "scripts/project/e2e_w5.py": "a632bf69b5e185e4e6f10e31584e27347c28198a1f20ee450d2719c5778aede1",
+    "scripts/project/result_wire.py": "f5c812d4f985ca7fc8a6ea7d5509038fa4abaf30cc6322fef24a5649beb78ce8",
+    "scripts/project/test_result_wire.py": "c145fd8581f1f6a4dea20ad0616d54549f0b046bd9ab391b9926e8742cf2d72a"
+  }
+}

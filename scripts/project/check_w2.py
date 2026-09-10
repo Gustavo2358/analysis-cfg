@@ -99,7 +99,7 @@ def run(root:Path,category:str)->None:
         verify_reports(root,names); corpus=verify_corpus(output)
         if category=='performance':
             rows=verify_metrics(output); path=root/'.harness-results/w2-performance.json'; path.parent.mkdir(exist_ok=True)
-            path.write_text(json.dumps({'scope':'W2 synthetic domains; W3-W5 unavailable','role':'OBSERVATION_ONLY','corpus':corpus,'measurements':rows,'retention':'identity walk of result-owned roots/maps/points; no physical heap byte claim'},indent=2)+'\n')
+            path.write_text(json.dumps({'scope':'W2 synthetic domains; concrete W3/W5 execute separately','role':'OBSERVATION_ONLY','corpus':corpus,'measurements':rows,'retention':'identity walk of result-owned roots/maps/points; no physical heap byte claim'},indent=2)+'\n')
         print('[w2-'+category+'] PASS: '+str(sum(len(TESTS[n]) for n in names))+' nominal tests, no skips; actual product solver executed')
 
 if __name__=='__main__':

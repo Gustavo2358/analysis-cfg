@@ -120,7 +120,7 @@ def validate_size_contract(root: Path) -> list[str]:
         for name, expected in ROLES.items():
             require(data['roles'].get(name) == expected, 'role contract ' + name)
         require(data['waves'] == [dict(wave=n,roles=roles,probe='S16',
-                status='IMPLEMENTED' if n in (1,2,3,4) else 'NOT_AVAILABLE_UNTIL_IMPLEMENTED',hook=f'scripts/project/check_w{n}.py' if n in (1,2,3,4) else None) for n,roles in WAVE_ROLES.items()], 'Wave role hooks')
+                status='IMPLEMENTED' if n in (1,2,3,4,5) else 'NOT_AVAILABLE_UNTIL_IMPLEMENTED',hook=f'scripts/project/check_w{n}.py' if n in (1,2,3,4,5) else None) for n,roles in WAVE_ROLES.items()], 'Wave role hooks')
         require(data['scale_review'] == 'docs/evals/cp5/core-size-review.json', 'scale review route')
         review = read(data['scale_review'])
         require(review['execution'] == 'NOT_EXECUTED' and review['kind'] == 'REVIEW_SNAPSHOT', 'scale review is not engine evidence')
@@ -147,7 +147,7 @@ def validate_size_contract(root: Path) -> list[str]:
         require(arch['core_size_contract'] == PATH and arch['resource_failure_semantic_mappings'] == {}, 'architecture capacity behavior')
         for wave in read('docs/evals/cp5/gate-plan.json')['waves']:
             require(wave['core_size_contract'] == PATH and wave['core_size_probe'] == 'S16', 'gate activation route')
-        contract = read('docs/evals/cp5/result-contract.json')
+        contract = read('docs/evals/cp5/history/result-contract.json')
         require(contract['core_size_decision'] == DECISION and contract['analysis_key_options'] == {}, 'result semantic configuration')
         require(contract['value_fields'] == ['domain','kind','enumerated','modelValueRemainder'], 'result value fields')
         for field, expected in PHASE_ENUMS.items():

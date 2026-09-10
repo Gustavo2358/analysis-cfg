@@ -387,7 +387,7 @@ def verify_project_shape(root: Path) -> None:
         for item in modules_element.findall(namespace + "module")
         if item.text and item.text.strip()
     ]
-    if modules != [KERNEL_ARTIFACT, "analysis-kernel", "analysis-values", "cfg-adapters", "cfg-launcher"]:
+    if modules != [KERNEL_ARTIFACT, "analysis-kernel", "analysis-values", "cfg-adapters", "cfg-launcher", "analysis-dataflow", "analysis-adapters", "analysis-launcher"]:
         raise GateFailure("W3 reactor must contain exactly cfg-kernel, analysis-kernel, analysis-values, cfg-adapters, cfg-launcher")
 
     properties = project.find(namespace + "properties")
@@ -424,7 +424,9 @@ def verify_project_shape(root: Path) -> None:
     from check_w2 import SOURCES as SOLVER_SOURCES, verify_sources as verify_solver_sources
     from check_w3 import QUERY_SOURCES, VALUE_SOURCES, verify_sources as verify_value_sources
     from check_w4 import SOURCES as PLANNING_SOURCES, verify_sources as verify_planning_sources
-    analysis_sources = source_inventory(root) | SOLVER_SOURCES | QUERY_SOURCES | VALUE_SOURCES | PLANNING_SOURCES
+    from check_w5 import SOURCES as COMPOSITION_SOURCES, verify_sources as verify_composition_sources
+    verify_composition_sources(root)
+    analysis_sources = COMPOSITION_SOURCES | source_inventory(root) | SOLVER_SOURCES | QUERY_SOURCES | VALUE_SOURCES | PLANNING_SOURCES
     verify_planning_sources(root)
     verify_value_sources(root)
     verify_solver_sources(root)
@@ -490,9 +492,9 @@ def verify_snapshot_pin(root: Path) -> str:
         raise GateFailure("CI must not resolve air-java from a mutable branch")
     if f'test "$(git rev-parse HEAD)" = "{sha}"' not in workflow:
         raise GateFailure("CI must verify air-java HEAD before installation")
-    if workflow.count("MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2") != 8:
+    if workflow.count("MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2") != 10:
         raise GateFailure("CI must share one isolated Maven repository across upstream and consumer")
-    for wave in (1, 2, 3, 4):
+    for wave in (1, 2, 3, 4, 5):
         if f"scripts/project/check_cp5_gate.py performance --wave {wave}" not in workflow:
             raise GateFailure(f"CI must execute CP5 Wave {wave} product probes")
     if 'distribution: temurin' not in workflow or 'java-version: "21"' not in workflow:
@@ -784,6 +786,8 @@ def architecture_gate(root: Path) -> None:
     values_architecture(root)
     from check_w4 import architecture as planning_architecture
     planning_architecture(root)
+    from check_w5 import architecture as composition_architecture
+    composition_architecture(root)
 
     print(f"[architecture] PASS: {total} kernel tests ({skipped} skipped), "
           f"{len(EXPECTED_CLASSFILES)} production classfiles, "

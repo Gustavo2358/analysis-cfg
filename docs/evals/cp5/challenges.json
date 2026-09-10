@@ -267,9 +267,9 @@
       "wave": 5,
       "probe": "S10",
       "oracle": "renamed subject/literal, overwrite, real new AIR and full result IDs",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/DefaultValuePlan.java",
+      "hook": "scripts/project/challenge_w5.py"
     },
     {
       "id": "unsupported-query-aborts-batch",
@@ -424,9 +424,9 @@
       "wave": 5,
       "probe": "S14",
       "oracle": "Writer failure preserves prepared bytes and solver state; only external receipt FAILED, never COMPLETE.",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/ResultJson.java",
+      "hook": "scripts/project/challenge_w5.py"
     },
     {
       "id": "observation-failure-blocks-independent-consumer",
@@ -538,18 +538,18 @@
       "wave": 5,
       "probe": "S16",
       "oracle": "Composition has no internal AIR/result/output byte ceiling.",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/LocalResultWriter.java",
+      "hook": "scripts/project/challenge_w5.py"
     },
     {
       "id": "catch-oom-as-analysis-limit",
       "wave": 5,
       "probe": "S16",
       "oracle": "OOM/container/host/timeout/disk exhaustion is not mapped to any semantic outcome.",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "target": null,
-      "hook": null
+      "status": "IMPLEMENTED",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/LocalResultWriter.java",
+      "hook": "scripts/project/challenge_w5.py"
     },
     {
       "id": "missing-first-publication",
@@ -866,6 +866,141 @@
       "hook": "scripts/project/challenge_w4.py",
       "nominal_test": "PlanningZeroMatchTest#absentKindKeepsDeclaredEmptyBatch",
       "expected_diagnostic": "declared SiteQuery batch survives zero matches"
+    },
+    {
+      "id": "drop-candidate-support-in-wire",
+      "wave": 5,
+      "probe": "S15",
+      "oracle": "Compilable mutation rejected by nominal W5 production/reader/delivery oracle; exact restore and second GREEN required.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/ResultJson.java",
+      "hook": "scripts/project/challenge_w5.py"
+    },
+    {
+      "id": "swap-candidate-support-in-wire",
+      "wave": 5,
+      "probe": "S15",
+      "oracle": "Compilable mutation rejected by nominal W5 production/reader/delivery oracle; exact restore and second GREEN required.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/ResultJson.java",
+      "hook": "scripts/project/challenge_w5.py"
+    },
+    {
+      "id": "source-partial-promoted-to-exact-in-wire",
+      "wave": 5,
+      "probe": "S15",
+      "oracle": "Compilable mutation rejected by nominal W5 production/reader/delivery oracle; exact restore and second GREEN required.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/ResultJson.java",
+      "hook": "scripts/project/challenge_w5.py"
+    },
+    {
+      "id": "full-id-owner-loss",
+      "wave": 5,
+      "probe": "S15",
+      "oracle": "Compilable mutation rejected by nominal W5 production/reader/delivery oracle; exact restore and second GREEN required.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/WireIds.java",
+      "hook": "scripts/project/challenge_w5.py"
+    },
+    {
+      "id": "wrong-result-id-receipt",
+      "wave": 5,
+      "probe": "S14",
+      "oracle": "Compilable mutation rejected by nominal W5 production/reader/delivery oracle; exact restore and second GREEN required.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/LocalResultWriter.java",
+      "hook": "scripts/project/challenge_w5.py"
+    },
+    {
+      "id": "wrong-result-hash-receipt",
+      "wave": 5,
+      "probe": "S14",
+      "oracle": "Compilable mutation rejected by nominal W5 production/reader/delivery oracle; exact restore and second GREEN required.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/LocalResultWriter.java",
+      "hook": "scripts/project/challenge_w5.py"
+    },
+    {
+      "id": "wrong-result-destination-receipt",
+      "wave": 5,
+      "probe": "S14",
+      "oracle": "Compilable mutation rejected by nominal W5 production/reader/delivery oracle; exact restore and second GREEN required.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/LocalResultWriter.java",
+      "hook": "scripts/project/challenge_w5.py"
+    },
+    {
+      "id": "writer-failure-reported-complete",
+      "wave": 5,
+      "probe": "S14",
+      "oracle": "Compilable mutation rejected by nominal W5 production/reader/delivery oracle; exact restore and second GREEN required.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/LocalResultWriter.java",
+      "hook": "scripts/project/challenge_w5.py"
+    },
+    {
+      "id": "partial-final-file-after-write-failure",
+      "wave": 5,
+      "probe": "S14",
+      "oracle": "Compilable mutation rejected by nominal W5 production/reader/delivery oracle; exact restore and second GREEN required.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/LocalResultWriter.java",
+      "hook": "scripts/project/challenge_w5.py"
+    },
+    {
+      "id": "nondeterministic-result-order",
+      "wave": 5,
+      "probe": "S15",
+      "oracle": "Compilable mutation rejected by nominal W5 production/reader/delivery oracle; exact restore and second GREEN required.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/ResultJson.java",
+      "hook": "scripts/project/challenge_w5.py"
+    },
+    {
+      "id": "local-input-size-cap-used-as-semantic-admission",
+      "wave": 5,
+      "probe": "S16",
+      "oracle": "Compilable mutation rejected by nominal W5 production/reader/delivery oracle; exact restore and second GREEN required.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/DataflowAirReader.java",
+      "hook": "scripts/project/challenge_w5.py"
+    },
+    {
+      "id": "resource-cap-on-result-facts-queries",
+      "wave": 5,
+      "probe": "S16",
+      "oracle": "Compilable mutation rejected by nominal W5 production/reader/delivery oracle; exact restore and second GREEN required.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/DefaultValuePlan.java",
+      "hook": "scripts/project/challenge_w5.py"
+    },
+    {
+      "id": "legacy-cfg-writer-used-for-analysis-result",
+      "wave": 5,
+      "probe": "S14",
+      "oracle": "Compilable mutation rejected by nominal W5 production/reader/delivery oracle; exact restore and second GREEN required.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/ResultJson.java",
+      "hook": "scripts/project/challenge_w5.py"
+    },
+    {
+      "id": "golden-substituted-for-real-stage",
+      "wave": 5,
+      "probe": "S10",
+      "oracle": "Compilable mutation rejected by nominal W5 production/reader/delivery oracle; exact restore and second GREEN required.",
+      "status": "IMPLEMENTED",
+      "target": "scripts/project/e2e_w5.py",
+      "hook": "scripts/project/challenge_w5.py"
+    },
+    {
+      "id": "drop-batch-dependency-reason-in-wire",
+      "wave": 5,
+      "probe": "S14",
+      "oracle": "Real refused W3 profile retains W4 DEPENDENCY_UNAVAILABLE batch reason, prepared INCOMPLETE and independent external delivery COMPLETE.",
+      "status": "IMPLEMENTED",
+      "target": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/ResultJson.java",
+      "hook": "scripts/project/challenge_w5.py"
     }
   ]
 }

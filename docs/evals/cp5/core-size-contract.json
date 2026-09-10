@@ -134,8 +134,8 @@
         "metrics"
       ],
       "probe": "S16",
-      "status": "NOT_AVAILABLE_UNTIL_IMPLEMENTED",
-      "hook": null
+      "status": "IMPLEMENTED",
+      "hook": "scripts/project/check_w5.py"
     }
   ],
   "scale_review": "docs/evals/cp5/core-size-review.json"

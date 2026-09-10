@@ -2,8 +2,8 @@
 
 Confrontados registry/backlog atuais com propostas do discovery. Nenhum backlog
 novo duplicado. [BACKLOG-CFG-020](backlog/BACKLOG-CFG-020.md) é o umbrella existente
-agora em **W4 IMPLEMENTED / AWAITING_HUMAN_REVIEW** por WORK-CFG-028. W1/W2/W3 aprovadas;
-W5 e os follow-ups externos abaixo não estão iniciados/autorizados. Dependência histórica de qualificação 011
+agora em **W5 IMPLEMENTED / AWAITING_HUMAN_REVIEW** por WORK-CFG-028. W1–W4 aprovadas;
+CP5 AWAITING_FINAL_HUMAN_REVIEW. Os follow-ups externos abaixo não foram iniciados. Dependência histórica de qualificação 011
 valia para análises gerais; CP5 tem profile próprio sobre base 027 aprovada, sem
 reivindicar AIR-STRUCTURE completo.
 
@@ -117,3 +117,13 @@ W4 IMPLEMENTED / AWAITING_HUMAN_REVIEW; REQUEST_CHANGES acima permanece históri
 Review humano de 21d65d08512f1fb8a945009c2919946a61566eed: W4 APPROVED; W4-F1 e W4-BINDING-01 RESOLVED.
 W5 AUTHORIZED / STARTED. W3-PERF-01/W3-METRICS-01 permanecem não bloqueantes.
 CP6 não autorizado; nenhum repin ou sibling editado.
+
+## W5 implementada — review final pendente
+
+[Validação W5](evidence/WORK-CFG-028/wave-5/validation.md): composição, plano por writes,
+wire/parser 1.1.0, writer streaming/receipt externo e CLI separados; CP4E A/B, CP3 e
+sobrescrita genérica executados. Gates W1–W5/full PASS, 19 mutantes válidos eliminados.
+O reader W5 não copia o pre-read cap legado. O writer W5 ultrapassou 64 MiB com
+resultado completo. Isso não encerra os caps do codec/AirValidator nem qualifica
+AIRs grandes por arquivo. W3-PERF-01/W3-METRICS-01 seguem abertos e não bloqueantes.
+Nenhum sibling ou pin alterado; CP6 NOT_STARTED / NOT_AUTHORIZED.

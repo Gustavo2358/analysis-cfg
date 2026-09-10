@@ -1,154 +1,106 @@
-# analysis-dataflow-result / 1.0.0 — snapshot de review
+# Production result wire — 1.1.0
 
-**Design/harness somente.** Nome/versão do futuro artefato derivado; nenhum writer,
-codec, CLI ou resultado calculado existe nesta entrega. H6 aprova separação do
-resultado/CLI; este snapshot permite review dos campos antes W5. Não é binding AIR,
-CFG JSON v2 ou schema normativo do upstream.
+W5 implements analysis-dataflow-result and prepared-analysis-result 1.1.0; the
+external analysis-delivery-receipt is 1.0.0. The [machine contract](../evals/cp5/result-contract.json)
+and [nominal reader](../../scripts/project/result_wire.py) define closed shapes.
+The [1.0 contract](../evals/cp5/history/result-contract.json),
+[result witness](../evals/cp5/history/result-review.json) and
+[phase witness](../evals/cp5/history/phase-review.json) remain historical NOT_EXECUTED
+design examples. The [current snapshot](../evals/cp5/result-review.json) is from a
+fresh CP4E production pipeline.
 
-[Exemplo CP4E](../evals/cp5/result-review.json) usa envelope `design` que declara
-NOT_EXECUTED; `result` contém o expected conceitual. Não reportar seu executionStatus
-STABLE como execução real. Statistics ficam unavailable/null, sem counters inventados.
-[Contrato de campos](../evals/cp5/result-contract.json) é validado pelo harness junto
-às relações de owner, scopes e remainder; não é um codec nem um validator AIR.
+## Version decision
 
-| Campo | Significado/obrigação |
-| --- | --- |
-| schema/version | analysis-dataflow-result / 1.0.0, evolução local explícita |
-| analysisKey | implementação/versão, profile, direção, precisão, options, Entry; cache pertence à sessão/snapshot |
-| publicationId/unitId/entryId | identidade completa, sem ordinais internos exportados |
-| executionStatus | STABLE, UNSUPPORTED ou INVALID_INPUT do solver/run; recusa isolada de query não altera esse status |
-| modelScope/sourceScope | KNOWN_GRAPH_ENTRY separado da abertura CONTROL/Unit da fonte |
-| observations | um resultado por query única (point, subject) do plano em run STABLE e observation COMPLETE, inclusive queries recusadas |
-| queryStatus/queryReason | VALUE com motivo null, ou UNSUPPORTED_POINT com motivo explícito não vazio; status por query separado de executionStatus |
-| point | OperationId, Entry, before/after e outcome solicitado; after fronteira não admitida é UNSUPPORTED_POINT; outcome pode ser null nesse caso |
-| subject/place/storage | ObjectPlace/ObjectId consultado e Cell/Storage base; Object não é memória exclusiva |
-| reachability | REACHABLE/UNREACHABLE_IN_MODEL para VALUE; null em UNSUPPORTED_POINT, que não afirma inalcançabilidade |
-| value | known(text), Candidates sem teto de cardinalidade, enumerated e modelValueRemainder; null se inalcançável no modelo ou query recusada, distinguidos por queryStatus/reachability |
-| sourceUnknownRemainder/effectiveUnknownRemainder | abertura pertinente de fonte e OR com remainder de modelo |
-| precision | exatidão somente no modelo declarado; sem claim de testemunho de caminho ou fonte completa |
-| premises/evidence/provenance | refs pertinentes da AIR/snapshot/regra, sem path tree ou causalidade inventada |
-| statistics | métricas por fase/run/Entry/epoch; unavailable neste exemplo, medidas na implementação |
+Draft 1.0 could not losslessly transport W3 candidate-specific supports, W4 analysis-only
+outcomes, generic consumer facts and every current point form. Version 1.1 explicitly
+adds candidateSupports, analysisReason, prepared analyses, planningEpoch and statistics,
+plus generic observation references. It includes Entry/Outcome points, full operand
+owners and source inventory independently from per-observation W3 remainders. Reflection,
+Java class names, dense ordinals and enum toString do not define the wire.
 
-IDs usam domínio/localId e owners completos de Publication/Unit quando pertinentes.
-A forma estrutural é proposta de transporte local, sem exigir codec AIR para validar
-resultado. A prova futura de resolução dos refs usa a AIR correlacionada. IDs/hashes
-CP4E só entram em fixtures/evidências, nunca constantes de produção.
+## Prepared results and identity
 
-O exemplo before(Return) conserva modelValue {PROGA} fechado, fonte CONTROL aberta,
-restante efetivo true e precisão condicionada ao modelo. Nenhum gap text fecha scope.
-O mesmo lote contém after(Return) recusado, preservando o primeiro resultado:
+The envelope contains schema/version, caller-supplied nonblank stable resultId, full
+publicationId, planningEpoch, analyses, batches, consumerPlan, consumers,
+preparationStatus, partialPolicy and statistics. partialPolicy is
+EXPLICIT_PARTIAL_BY_DEPENDENCY. Each batch has a stable ID, ValueFact@1 projection and
+analysis result. A generic fact has kind ObservedValueFact, full sequenceId,
+observationBatchId and query (point/objectId). Its value is a resolvable observation
+reference, with no interpretation as a program/file/database dependency.
 
-| executionStatus | point | queryStatus | value | queryReason |
-| --- | --- | --- | --- | --- |
-| STABLE | before(Return) | VALUE | {PROGA}, fechado no modelo | null |
-| STABLE | after(Return) | UNSUPPORTED_POINT | null | estado de memória posterior não admitido |
+Each run/batch has a complete AnalysisKey (implementation/version, profile, direction,
+precision policy, semantic options and Entry), Publication/Unit/Entry identities,
+executionStatus, analysisReason, modelScope=KNOWN_GRAPH_ENTRY, sourceScope, observations,
+statistics and completion. Source scope carries Publication/Unit inventory and Entry
+uncertainties, with remainderPolicy=PER_OBSERVATION_W3. The provider's per-subject
+source remainder remains authoritative; PARTIAL cannot become exact from a singleton.
 
-`VALUE` identifica uma query admitida, inclusive um ponto UNREACHABLE_IN_MODEL,
-cujo value é null conforme o contrato de alcance. Em `UNSUPPORTED_POINT`, value,
-reachability, sourceUnknownRemainder, effectiveUnknownRemainder e precision são
-null: a recusa não calcula valor, alcance ou precisão nesse ponto. O sourceScope
-global continua declarado. Refs permanecem listas de identidades completas e só
-podem justificar a recusa; não constituem evidência de valor. queryReason é texto
-explicativo, não inferência de semântica a partir do nome de operação ou de gaps.
+IDs contain domain/localId and Publication owner, plus Unit where required. Operand
+IDs carry a complete OperationId or EntryId owner. Storage, Origin, Premise and
+Uncertainty IDs are Publication-owned. Equal local IDs with distinct owners stay distinct.
 
-BEFORE usa outcome=null. AFTER admitido exige outcome explícito; after(Return/Halt)
-sem estado posterior usa outcome=null e UNSUPPORTED_POINT, sem inventar aresta.
-point e subject reproduzem a query solicitada, mesmo quando recusada. No run STABLE com observation COMPLETE,
-o plano externo de queries deve ser comparado com os resultados: exatamente um por
-par único de (point completo, subject completo), sem omissões, duplicações ou
-substituições. Requests repetidos compartilham o resultado e a ordem da resposta
-não é semântica. O snapshot guarda esse plano em `design.requestedQueries`, separado
-das observations; ele é oracle manual de review, não campo adicional do transporte.
-`validate_result(result, requested_queries)` verifica a cobertura quando recebe o
-plano; validar só a forma de um resultado não demonstra cobertura do lote.
+## Observations and phases
 
-[CORE-SIZE-001](decisions/ADR-0014.md) remove saturationReason/limitReason,
-resourceBudgets/maxCandidates e outcomes de capacidade. AnalysisKey.options={} no
-profile CP5 atual; extensões futuras só acrescentam configuração semântica sob review.
-Candidates contém todos os valores finitos sustentados. Reached unknown conserva
-remainder semântico; cardinalidade não abre resultado. Não alcançado no modelo usa
-value=null, nunca Candidates({},false). Run recusado como um todo continua com
-observations=[] e não publica facts provisórios. A recusa de after(Return/Halt) sozinha não é falha do solver/run e não
-pode promover executionStatus a UNSUPPORTED nem apagar outras queries válidas.
+VALUE retains reachability, all candidates, modelValueRemainder, sourceUnknownRemainder
+and their OR as effectiveUnknownRemainder. Each candidate has producers, each with
+evidence (Assign OperationId or initial-condition OperandId), OriginId and PremiseIds.
+Aggregate evidence/premises/provenance remain available. pathWitness=NOT_PROVIDED:
+producer evidence is abstract support, not a concrete path claim.
 
-O harness exige o lote misto do snapshot e rejeita aborto global e desaparecimento
-da query recusada. Os challenges `unsupported-query-aborts-batch` e
-`unsupported-query-disappears` ativam em W3/S6 contra implementação real; nesta
-preparação a prova é apenas do contrato/validator, sem execução de engine.
+UNSUPPORTED_POINT has a canonical nonnull queryReason and null value, reachability,
+remainders and precision. It stays in a COMPLETE batch without making the run
+UNSUPPORTED. UNREACHABLE_IN_MODEL uses value=null, never empty closed Candidates.
+A reachable value cannot be empty and closed.
 
-W5 deve congelar por review o wire definitivo e defaults semânticos, parser nominal de
-reports e falhas antes do writer. A CLI separada usará AIR file → reader → BuildCfg
-→ sessão → PossibleValues → plano padrão → writer. Plano padrão observa destinos
-escritos por Sequence em before(terminator), sem selecionar primeiro Object/WS-PGM/
-PROGA ou varrer todos Objects por Sequence. CLI CFG existente mantém contrato próprio.
+Admission is COMPLETE/REJECTED, analysis STABLE/NOT_STARTED, observations and consumers
+COMPLETE/FAILED/NOT_STARTED. A failed batch is empty and atomic; only dependent
+consumers are blocked. Independent successes survive. Failed consumers publish no
+partial facts. A batch NOT_STARTED preserves DEPENDENCY_UNAVAILABLE; the analysis-only
+view has no batch reason. Delivery success cannot promote an INCOMPLETE prepared result.
 
-## Completion do run e preparação com consumers
+## Encoding and delivery
 
-`AnalysisDataflowResult.completion` contém **somente** admission, analysis e
-observation, cada qual com status/reason. Não contém consumers nem publication.
+UTF-8 preserves whitespace and Unicode normalization form. Unpaired surrogates fail
+encoding. Object fields sort by Java String order; arrays use explicit full-ID,
+AnalysisKey, point, candidate and producer ordering. Generic facts sort by Sequence,
+batch, point and subject. Counters use integral decimal values; unavailable fields
+are explicit null. Encoding ends in exactly one LF. No clock, UUID, process identity
+or duration enters the deterministic payload.
 
-| executionStatus externo | admission | analysis | observation |
-| --- | --- | --- | --- |
-| UNSUPPORTED / INVALID_INPUT | REJECTED | NOT_STARTED | NOT_STARTED |
-| STABLE | COMPLETE | STABLE | COMPLETE / FAILED / NOT_STARTED |
+Encoding streams to a temporary file in the destination directory while hashing exact
+accepted bytes. COMPLETE requires successful encoding, close and atomic replacement.
+There is no non-atomic fallback, retry engine, fsync guarantee or output/query/fact/
+consumer/candidate ceiling. Cleanup failure is counted and cannot certify delivery.
 
-REJECTED usa INVALID_STRUCTURE para INVALID_INPUT e UNSUPPORTED_PROFILE para
-UNSUPPORTED. Falha controlada de observation usa FAILED/OBSERVATION_ERROR;
-COMPLETE/STABLE/NOT_STARTED do run têm reason=null. Esses códigos classificam
-causas semânticas ou falhas controladas, não contagens/recursos. Falha interna antes
-de concluir a análise é erro de execução, fora desse payload semântico; não inventar
-run STABLE, recusa ou facts parciais. Observation não COMPLETE mantém apenas seu
-lote vazio; falha controlada não altera STABLE nem vira UNSUPPORTED_POINT. B1 continua
-aplicado por batch completo. OOM, killed/host failure, timeout de infra e disco
-esgotado externamente não são mapeados para esses outcomes ou remainder.
+The external receipt contains schema/version, resultId, resultSha256, absolute normalized
+destination, status and reason. COMPLETE carries the exact final SHA-256 and null
+reason. FAILED uses ENCODING_FAILED, WRITE_FAILED or FINALIZATION_FAILED. Hash is null
+until complete encoding and close; finalization failure can retain that complete hash.
+The reader verifies ID, hash and destination correlation. Receipt never enters payload.
 
-`PreparedAnalysisResult` é envelope de preparação com schema/version, resultId,
-publicationId, results, consumerPlan, consumers, preparationStatus e partialPolicy.
-results liga cada observationBatchId único a um AnalysisDataflowResult. Batches da
-mesma AnalysisKey podem compartilhar run; seus status de análise/admissão e scopes
-precisam concordar. Não é autorização para repetir solver por query/consumer.
+## CLI
 
-ConsumerPlan contém consumerId, requiredAnalysisKeys completos e
-requiredObservationBatchIds. Todo batch requerido deve ser resolvido e seu
-AnalysisKey listado. Outcomes dos consumers têm id/status/reason e devem cobrir
-exatamente o plano independente, sem omissões ou alteração silenciosa de dependências.
+Run io.github.gustavo2358.analysis.launcher.AnalysisDataflow with:
 
-Somente dependências indisponíveis forçam NOT_STARTED/DEPENDENCY_UNAVAILABLE.
-Dependências satisfeitas permitem COMPLETE (reason=null), FAILED/CONSUMER_ERROR,
-ou NOT_STARTED/NOT_EXECUTED caso o trabalho não tenha sido executado.
-StructuralConsumer pode ter ambas listas vazias e completar com results=[]; não
-inventar run STABLE. SiteView estrutural já deve ter sido admitida pelo contrato W1.
-Um consumer que requer somente AnalysisKey estável não depende de batch com falha controlada.
+```text
+<input.air.json> <output.result.json> --result-id <stable-id>
+```
 
-partialPolicy=EXPLICIT_PARTIAL_BY_DEPENDENCY: cada batch e cada consumer é atômico.
-preparationStatus COMPLETE exige todos os runs/batches solicitados completos e todos
-os consumers COMPLETE; caso contrário INCOMPLETE. Status e resultados concluídos de
-consumers independentes permanecem disponíveis. Essa partialidade não representa
-resource exhaustion nem permite liberar alguns facts porque o programa ficou grande.
-Fonte PARTIAL/profile aberto continuam nos scopes semânticos, sem alterar a admissão
-por tamanho. A preparação não afirma entrega.
-O wire dos bundles de facts continua para W4/W5; esta remediação especifica somente
-identidades, dependências e completion, sem implementação de consumers.
+Use the six production modules plus pinned air-java/air-json dependencies on the
+classpath. Stdout is one external receipt when delivery is attempted; expected
+diagnostics use stderr without stacktraces. Exit codes are 0 complete; 2 usage;
+3 input transport/version/I/O; 4 invalid AIR/unsupported profile; 5 execution or
+preparation failure; 6 output/delivery; 7 pinned upstream size/validation debt.
+Resource exhaustion is never semantic UNSUPPORTED or source-open coverage.
 
-## DeliveryReceipt externo ao payload
+The independent reader is invoked with:
 
-Recibo separado: schema=analysis-delivery-receipt/version=1.0.0, resultId,
-resultSha256, destination, status COMPLETE/FAILED e reason. Correlacionar ao
-resultId preparado e destino da tentativa. COMPLETE exige hash dos bytes completos
-entregues e confirmação do chamador; FAILED exige ENCODING_FAILED, WRITE_FAILED ou FINALIZATION_FAILED, e pode usar hash=null
-quando a falha ocorreu antes do hash completo. Se houver hash, deve identificar os
-bytes completos pretendidos, não prefixo truncado. Não impor buffer integral ou
-codec/serialização nesta revisão; W5 vincula esses campos ao writer real.
+```text
+python3 -B scripts/project/result_wire.py result.json --receipt receipt.json
+```
 
-O recibo é criado após a tentativa, armazenado/retornado fora do payload e nunca
-usado para reescrevê-lo. Falha de encoding/escrita/finalização preserva o resultado
-preparado e o fixpoint. Uma nova tentativa gera novo recibo. O sucesso end-to-end
-exige preparationStatus COMPLETE **e** receipt COMPLETE correlacionado. Um recibo
-COMPLETE de payload INCOMPLETE confirma transporte, sem promover preparação parcial.
-Sem recibo externo não há confirmação de entrega, mesmo com preparação completa.
-
-O snapshot de [batch B1](../evals/cp5/result-review.json) continua NOT_EXECUTED.
-O [witness de dependências F3](../evals/cp5/phase-review.json) conserva StructuralConsumer
-COMPLETE após query-batch FAILED controlado. Testes verificam admissão sem caps, writer failure,
-hash/identity mismatch, self-certification, batches e consumers independentes.
-[Decisão F](cp5-post-audit.md#f). Nenhum runtime, workflow engine ou writer implementado.
+Legacy CFG arguments, exits, writer/reader behavior and Java bytes remain unchanged.
+The new reader has no local pre-read size check, but pinned AIR codec/validator bounds
+remain **EXTERNAL SIZE-CAP DEBT**. This is not proof of an unbounded file route.
+See the [ledger](../engineering/cp5-w5-composition-ledger.md) and
+[W5 evidence](../work/evidence/WORK-CFG-028/wave-5/validation.md).

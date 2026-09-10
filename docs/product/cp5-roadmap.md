@@ -22,7 +22,7 @@ Waves. Métricas são observações, nunca thresholds de admissão ou precisão.
 | W2 — generic incremental solver | APPROVED at 0202c742 | review humano registrado antes de W3 |
 | W3 — PossibleValues/state/query | APPROVED at 85562820 | W3-F1/W3-F2 RESOLVED por review humano |
 | W4 — shared planner/consumers | APPROVED at 21d65d08 | W4-F1/W4-BINDING-01 RESOLVED |
-| W5 — production/E2E | AUTHORIZED / STARTED | wave-5/authorization.json registrada antes do código |
+| W5 — production/E2E | IMPLEMENTED / AWAITING_HUMAN_REVIEW | review final W5/CP5 pendente; [evidência](../work/evidence/WORK-CFG-028/wave-5/validation.md) |
 | CP6 — CALL dependency slice | futuro, fora CP5 | review final CP5 e tarefa própria |
 
 ## Continuidade entre agentes/sessões
@@ -134,7 +134,10 @@ A composição não herda caps locais do reader/writer legado como política apr
 [Siblings e legado](../work/cp5-follow-ups.md#size-cap-debts) podem ainda impedir
 a rota por arquivo; reportar EXTERNAL SIZE-CAP DEBT sem converter para outcome
 semântico CP5 nem desabilitar validação. Remoção produtiva de caps locais exige
-escopo autorizado antes da qualificação W5. Nenhum retry/ECS/streaming é decidido.
+escopo autorizado antes da qualificação W5. O pedido W5 autorizou seu reader sem
+pre-read cap e seu writer streaming com finalização atômica; ambos foram implementados.
+O codec/validator upstream e o writer/CLI CFG legado permanecem inalterados.
+CP5 está AWAITING_FINAL_HUMAN_REVIEW; CP6 exige nova instrução humana.
 
 ## Evidência por checkpoint
 

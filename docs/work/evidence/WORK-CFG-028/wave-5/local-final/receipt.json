@@ -1,0 +1,37 @@
+{
+  "scope": "Post-consolidation checks. Java/nominal oracle source is byte-identical to the final mutation campaign. Scope is checked once more after sealing evidence and committing. No remote CI claim.",
+  "checks": [
+    {
+      "gate": "scope",
+      "command": [
+        "python3",
+        "-B",
+        "scripts/project/check_scope.py",
+        "--update-manifest"
+      ],
+      "exitCode": 0,
+      "log": "scope.log.gz",
+      "rawSha256": "b1e61dbf5211db7e34df907664007bccc12474375cd6e7e05ea17ba25ddd8c06"
+    },
+    {
+      "gate": "fast",
+      "command": [
+        "bash",
+        "scripts/harness/check-fast.sh"
+      ],
+      "exitCode": 0,
+      "log": "fast.log.gz",
+      "rawSha256": "339c3741717f4145f5e190c88464a8c1f20b4121e9a378da4b128a6eff205b51"
+    },
+    {
+      "gate": "architecture",
+      "command": [
+        "bash",
+        "scripts/harness/check-architecture.sh"
+      ],
+      "exitCode": 0,
+      "log": "architecture.log.gz",
+      "rawSha256": "38f07f739d2521d4fad6316a28a324610949eb5e27052e0da06e7d03f68c4e01"
+    }
+  ]
+}

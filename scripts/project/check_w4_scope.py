@@ -7,6 +7,9 @@ ADDITION = '\n\n    /**\n     * A narrower explicit context selection sharing th
 
 def preserved_digest(root: Path, path: str) -> str:
     data = (root / path).read_bytes()
+    if path == 'pom.xml':
+        from check_w5 import original_pom
+        data = original_pom(data)
     if path == SESSION:
         addition = ADDITION.encode()
         if data.count(addition) != 1:

@@ -30,6 +30,20 @@ jobs:
           distribution: temurin
           java-version: "21"
 
+      - name: Check out read-only E2E frontend baseline
+        uses: actions/checkout@v4
+        with:
+          repository: Gustavo2358/proleap-poc
+          ref: 8722945cc4cd2052c6091533f6ee6989278aa2f8
+          path: proleap-poc
+
+      - name: Check out read-only E2E lowering baseline
+        uses: actions/checkout@v4
+        with:
+          repository: Gustavo2358/cobol-lower
+          ref: 2329993ce61b33fd7105759e211a1861ca6cb217
+          path: cobol-lower
+
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
@@ -61,7 +75,13 @@ jobs:
         working-directory: analysis-cfg
         run: bash scripts/harness/check-fast.sh
 
-      - name: Check CP5 W4 scope and exact manifest
+      - name: Build isolated E2E producer snapshots
+        working-directory: analysis-cfg
+        env:
+          MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2
+        run: python3 -B scripts/project/prepare_w5_producers.py --work "${{ runner.temp }}/w5-producers"
+
+      - name: Check CP5 W5 scope and exact manifest
         working-directory: analysis-cfg
         run: python3 -B scripts/project/check_scope.py
 
@@ -81,6 +101,7 @@ jobs:
         working-directory: analysis-cfg
         env:
           MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2
+          W5_PRODUCERS: ${{ runner.temp }}/w5-producers/producers.json
         run: bash scripts/harness/check-integration.sh
 
       - name: Check CP5 W1 structural semantics and performance
@@ -106,3 +127,18 @@ jobs:
         env:
           MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2
         run: python3 -B scripts/project/check_cp5_gate.py performance --wave 4
+
+      - name: Check CP5 W5 production, delivery, scale and quality
+        working-directory: analysis-cfg
+        env:
+          MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2
+        run: python3 -B scripts/project/check_cp5_gate.py performance --wave 5
+
+      - name: Preserve W5 execution evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: w5-execution-evidence
+          path: analysis-cfg/.harness-results/
+          include-hidden-files: true
+          if-no-files-found: error

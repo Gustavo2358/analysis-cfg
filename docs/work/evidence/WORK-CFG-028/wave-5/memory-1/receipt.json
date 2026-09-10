@@ -1,0 +1,64 @@
+{
+  "source_head": "ffdf2807d39186f2f204d2d53f70196a5d735ddd",
+  "source_sha256": {
+    "analysis-adapters/pom.xml": "775fcd53dffb66762a1233a9c16937f07cf2b64dbdd08902be5b1bea232022a6",
+    "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/DataflowAirReader.java": "190ceeefdb7ea403ee4e43bfe0afcdd2162e0294247def6703fe638edee6b7b4",
+    "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/DeliveryReceipt.java": "e5e41db33dc1cbe7ee6b1020a29572db9093fc22a042f5eee2b866f32fa06a54",
+    "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/JsonOutput.java": "a5f7765b05874467496744b883cc96b9e85923a8183e3f0b99583da01bdf152c",
+    "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/LocalResultWriter.java": "e1b40c25678555a1afbfc158f9b28be7a916c5e805d30ad992ab27cc4a2c64db",
+    "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/ReceiptJson.java": "65f6e62862ca7a180634ae80cc439655e2942cf6f5f0e5c004341fe42b0174cd",
+    "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/ResultJson.java": "9c8a1a535bf589e8c6206dadbc212933e1514a0921d2335cf940648fc9ca82e5",
+    "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/WireIds.java": "d695ec0e0a3169e6d22a0c28ddd281e48509d8b9693eea4b6dd947bb75c43d74",
+    "analysis-adapters/src/test/java/io/github/gustavo2358/analysis/adapters/DataflowRetentionProbe.java": "f2232d5ee60f23e8be40cd6718968c06ac431c7d62ccdf4015cbc6a4544e9ffd",
+    "analysis-adapters/src/test/java/io/github/gustavo2358/analysis/adapters/DeliveryTest.java": "c772e0e438e92e693ac84e967c0ee8b31f31b2ef923f1dcf834db8768c046821",
+    "analysis-adapters/src/test/java/io/github/gustavo2358/analysis/adapters/MemoryOracle.java": "f17a2e163c3ee28e3a4546763025a2df880a090759bfb4460a23b707c31af541",
+    "analysis-adapters/src/test/java/io/github/gustavo2358/analysis/adapters/ResultFixtures.java": "ebac12873e5f6be01388b1382347f06ac627ed89a6b88f59e4180e211ea1401d",
+    "analysis-adapters/src/test/java/io/github/gustavo2358/analysis/adapters/WideResultTest.java": "2b913a6caab800824b01116ba3cb715ff350ac0df58ed31a53c499d9d31d6150",
+    "analysis-adapters/src/test/java/io/github/gustavo2358/analysis/adapters/WireAdversarialTest.java": "0243bebef488584c8866c8d17a9ebb39ae638211b9356044864047fad9e3f279",
+    "analysis-adapters/src/test/java/io/github/gustavo2358/analysis/adapters/WireTest.java": "6ac1ba43f7883adf634460127bb45655c220dd632121ba39eeff4eb5a41f6810",
+    "analysis-dataflow/pom.xml": "7daf81689d95bc3327f510b1d85e9aa77c944993adf881cba806c7d0d98f0ca1",
+    "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/AnalysisDataflow.java": "fa54bca6545c60db3b453f921d0fab79fefa2664e85a2ba67ce984166caa145c",
+    "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/DefaultValuePlan.java": "7c9e543f2c01ed0816bc7c15a23e657bc12a803512313a69284d52b70a5b1531",
+    "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/ObservedValueFact.java": "825d656cb88a0f2d1de71693be3acf8825fd0b3dbe2e4ccdaffbbd751d7e1c75",
+    "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/PreparedDataflowResult.java": "b28e6c32356e45591e96eeffaaa7e34f118507ac53a0d457dfe31f80a6909a0d",
+    "analysis-dataflow/src/test/java/io/github/gustavo2358/analysis/dataflow/CompositionTest.java": "959b7fc3f6af698495069373b0a1437dc722e52948d52d234da9ef45c72fc076",
+    "analysis-dataflow/src/test/java/io/github/gustavo2358/analysis/dataflow/FlowFixtures.java": "a60d852bd4bffe08bcd460d26516bca52b17605bd40f6390e42f9d026a50b63e",
+    "analysis-launcher/pom.xml": "609f0a0b678f452a1283032ecd1fc09c5b916c1e4b5194ee7ed33af82db30a2c",
+    "analysis-launcher/src/main/java/io/github/gustavo2358/analysis/launcher/AnalysisDataflow.java": "d9359b5e4aa45bf99a0b91c9471c1bebf950a902aca324f31e217ea56a7a8afe",
+    "analysis-launcher/src/test/java/io/github/gustavo2358/analysis/launcher/DataflowCliTest.java": "b46fd1ba7990de5e5a115b9c4f1fc6d0611d177f02505294e54668edfc0b370a",
+    "pom.xml": "b5bcc9ed2ad4ee511f02b0d500622dd935120cb0f68b99a937c6e024458170fa",
+    "scripts/project/e2e_w5.py": "6fee9cb151081c2f7cb3f3acd7add85d730353cdd0f588e1e394a0e4cb12409e",
+    "scripts/project/result_wire.py": "63c859a2fd20b35b30a75581fbb03184250ba1b210c9fbe590c812766a181bec",
+    "scripts/project/test_result_wire.py": "1b6cb5b58529115cc4c6cca03552dd4d4fce8b110ce77baea3acc856d9de22ef"
+  },
+  "kind": "OBSERVATION_ONLY",
+  "measurement": "HotSpot GC.class_histogram shallow bytes after full GC; not exclusive retained heap. JFR allocation samples, not census.",
+  "cases": [
+    {
+      "objects": 1000,
+      "operations": 1000,
+      "warmupRuns": 0,
+      "command": [
+        "/tmp/cp5-harness-validation/jdk/bin/java",
+        "-Xms64m",
+        "-Xmx768m",
+        "-XX:+UseCompressedOops",
+        "-XX:+UseCompressedClassPointers",
+        "-XX:ObjectAlignmentInBytes=8",
+        "-Xlog:gc*:file=/home/gustavo/workspace/teste-e2e/analysis-cfg/docs/work/evidence/WORK-CFG-028/wave-5/memory-1/1000/gc.log",
+        "-XX:StartFlightRecording=filename=/home/gustavo/workspace/teste-e2e/analysis-cfg/docs/work/evidence/WORK-CFG-028/wave-5/memory-1/1000/recording.jfr,settings=profile,dumponexit=true",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-adapters/target/test-classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/cfg-kernel-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target/analysis-kernel-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target/analysis-values-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dataflow/target/analysis-dataflow-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-adapters/target/analysis-adapters-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-launcher/target/analysis-launcher-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dataflow/target/analysis-dataflow-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/cfg-kernel-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target/analysis-values-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-adapters/target/analysis-adapters-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target/analysis-kernel-0.1.0-SNAPSHOT.jar:/tmp/cp5-harness-validation/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/tmp/cp5-harness-validation/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar",
+        "io.github.gustavo2358.analysis.adapters.DataflowRetentionProbe",
+        "1000",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/docs/work/evidence/WORK-CFG-028/wave-5/memory-1/1000/result.json"
+      ],
+      "phases": {}
+    }
+  ],
+  "files": {
+    "1000/gc.log": "e77040e3625b23245fb9d3ac4af767bab2f4db14527c959a4d35f67e8bce5f2c",
+    "1000/process.log.gz": "c51f36a8ff8f3a2890fdeef8ef4b3187f020921e68b899d7c1818b429ee14ff1",
+    "1000/recording.jfr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

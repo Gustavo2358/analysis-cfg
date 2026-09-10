@@ -1,0 +1,324 @@
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] Analysis CFG                                                       [pom]
+[INFO] Analysis CFG Kernel                                                [jar]
+[INFO] Analysis Structural Kernel                                         [jar]
+[INFO] Analysis Possible Values                                           [jar]
+[INFO] analysis-dataflow                                                  [jar]
+[INFO] analysis-adapters                                                  [jar]
+[INFO] analysis-launcher                                                  [jar]
+[INFO] 
+[INFO] ---------< io.github.gustavo2358.analysis:analysis-cfg-parent >---------
+[INFO] Building Analysis CFG 0.1.0-SNAPSHOT                               [1/7]
+[INFO]   from pom.xml
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ analysis-cfg-parent ---
+[INFO] Deleting /home/gustavo/workspace/teste-e2e/analysis-cfg/target
+[INFO] 
+[INFO] --- dependency:3.8.1:build-classpath (default-cli) @ analysis-cfg-parent ---
+[INFO] No dependencies found.
+[INFO] Wrote classpath file '/home/gustavo/workspace/teste-e2e/analysis-cfg/target/runtime-classpath.txt'.
+[INFO] 
+[INFO] -------------< io.github.gustavo2358.analysis:cfg-kernel >--------------
+[INFO] Building Analysis CFG Kernel 0.1.0-SNAPSHOT                        [2/7]
+[INFO]   from cfg-kernel/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ cfg-kernel ---
+[INFO] Deleting /home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target
+[INFO] 
+[INFO] --- resources:3.4.0:resources (default-resources) @ cfg-kernel ---
+[INFO] skip non existing resourceDirectory /home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ cfg-kernel ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 14 source files with javac [debug release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.4.0:testResources (default-testResources) @ cfg-kernel ---
+[INFO] skip non existing resourceDirectory /home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ cfg-kernel ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 12 source files with javac [debug release 21] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.5.3:test (default-test) @ cfg-kernel ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running io.github.gustavo2358.analysis.cfg.application.BuildCfgContractTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.087 s -- in io.github.gustavo2358.analysis.cfg.application.BuildCfgContractTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- jar:3.4.2:jar (default-jar) @ cfg-kernel ---
+[INFO] Building jar: /home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/cfg-kernel-0.1.0-SNAPSHOT.jar
+[INFO] 
+[INFO] --- dependency:3.8.1:build-classpath (default-cli) @ cfg-kernel ---
+[INFO] Wrote classpath file '/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/runtime-classpath.txt'.
+[INFO] 
+[INFO] -----------< io.github.gustavo2358.analysis:analysis-kernel >-----------
+[INFO] Building Analysis Structural Kernel 0.1.0-SNAPSHOT                 [3/7]
+[INFO]   from analysis-kernel/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ analysis-kernel ---
+[INFO] Deleting /home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target
+[INFO] 
+[INFO] --- resources:3.4.0:resources (default-resources) @ analysis-kernel ---
+[INFO] skip non existing resourceDirectory /home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ analysis-kernel ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 37 source files with javac [debug release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.4.0:testResources (default-testResources) @ analysis-kernel ---
+[INFO] skip non existing resourceDirectory /home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ analysis-kernel ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 14 source files with javac [debug release 21] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.5.3:test (default-test) @ analysis-kernel ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running io.github.gustavo2358.analysis.structure.StructureTest
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.134 s -- in io.github.gustavo2358.analysis.structure.StructureTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- jar:3.4.2:jar (default-jar) @ analysis-kernel ---
+[INFO] Building jar: /home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target/analysis-kernel-0.1.0-SNAPSHOT.jar
+[INFO] 
+[INFO] --- dependency:3.8.1:build-classpath (default-cli) @ analysis-kernel ---
+[INFO] Wrote classpath file '/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target/runtime-classpath.txt'.
+[INFO] 
+[INFO] -----------< io.github.gustavo2358.analysis:analysis-values >-----------
+[INFO] Building Analysis Possible Values 0.1.0-SNAPSHOT                   [4/7]
+[INFO]   from analysis-values/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ analysis-values ---
+[INFO] Deleting /home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target
+[INFO] 
+[INFO] --- resources:3.4.0:resources (default-resources) @ analysis-values ---
+[INFO] skip non existing resourceDirectory /home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ analysis-values ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 10 source files with javac [debug release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.4.0:testResources (default-testResources) @ analysis-values ---
+[INFO] skip non existing resourceDirectory /home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ analysis-values ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 18 source files with javac [debug release 21] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.5.3:test (default-test) @ analysis-values ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running io.github.gustavo2358.analysis.values.ValuesTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.160 s -- in io.github.gustavo2358.analysis.values.ValuesTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- jar:3.4.2:jar (default-jar) @ analysis-values ---
+[INFO] Building jar: /home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target/analysis-values-0.1.0-SNAPSHOT.jar
+[INFO] 
+[INFO] --- dependency:3.8.1:build-classpath (default-cli) @ analysis-values ---
+[INFO] Wrote classpath file '/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target/runtime-classpath.txt'.
+[INFO] 
+[INFO] ----------< io.github.gustavo2358.analysis:analysis-dataflow >----------
+[INFO] Building analysis-dataflow 0.1.0-SNAPSHOT                          [5/7]
+[INFO]   from analysis-dataflow/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ analysis-dataflow ---
+[INFO] Deleting /home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dataflow/target
+[INFO] 
+[INFO] --- resources:3.4.0:resources (default-resources) @ analysis-dataflow ---
+[INFO] skip non existing resourceDirectory /home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dataflow/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ analysis-dataflow ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 4 source files with javac [debug release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.4.0:testResources (default-testResources) @ analysis-dataflow ---
+[INFO] skip non existing resourceDirectory /home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dataflow/src/test/resources
+[INFO] Copying 7 resources from ../cfg-adapters/src/test/resources to target/test-classes
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ analysis-dataflow ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 2 source files with javac [debug release 21] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.5.3:test (default-test) @ analysis-dataflow ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running io.github.gustavo2358.analysis.dataflow.CompositionTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.151 s -- in io.github.gustavo2358.analysis.dataflow.CompositionTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- jar:3.4.2:jar (default-jar) @ analysis-dataflow ---
+[INFO] Building jar: /home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dataflow/target/analysis-dataflow-0.1.0-SNAPSHOT.jar
+[INFO] 
+[INFO] --- dependency:3.8.1:build-classpath (default-cli) @ analysis-dataflow ---
+[INFO] Wrote classpath file '/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dataflow/target/runtime-classpath.txt'.
+[INFO] 
+[INFO] ----------< io.github.gustavo2358.analysis:analysis-adapters >----------
+[INFO] Building analysis-adapters 0.1.0-SNAPSHOT                          [6/7]
+[INFO]   from analysis-adapters/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ analysis-adapters ---
+[INFO] Deleting /home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-adapters/target
+[INFO] 
+[INFO] --- resources:3.4.0:resources (default-resources) @ analysis-adapters ---
+[INFO] skip non existing resourceDirectory /home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-adapters/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ analysis-adapters ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 7 source files with javac [debug release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.4.0:testResources (default-testResources) @ analysis-adapters ---
+[INFO] skip non existing resourceDirectory /home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-adapters/src/test/resources
+[INFO] Copying 7 resources from ../cfg-adapters/src/test/resources to target/test-classes
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ analysis-adapters ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 7 source files with javac [debug release 21] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.5.3:test (default-test) @ analysis-adapters ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running io.github.gustavo2358.analysis.adapters.DeliveryTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.212 s -- in io.github.gustavo2358.analysis.adapters.DeliveryTest
+[INFO] Running io.github.gustavo2358.analysis.adapters.WireAdversarialTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.049 s -- in io.github.gustavo2358.analysis.adapters.WireAdversarialTest
+[INFO] Running io.github.gustavo2358.analysis.adapters.WideResultTest
+W5_LARGE_BYTES 75508329
+W5_METRICS {"N":1000,"analysisRuns":1,"cfgBuilds":1,"cleanupFailures":0,"closedInModelResults":1000,"compositionRuns":1,"defaultPlanAssignVisits":1000,"defaultPlanDestinations":1000,"defaultPlanQueries":1000,"deliveryAttempts":1,"deliveryComplete":1,"deliveryFailures":0,"edgesIndexed":2,"effectiveOpenResults":0,"elapsedNanos":208933388,"encodingFailures":0,"factsEmitted":1000,"finalizationFailures":0,"locationsIndexed":1,"modelOpenResults":0,"nodesIndexed":3,"objectsIndexed":1000,"observationBatchesExecuted":1,"observationFailures":0,"operationsIndexed":1001,"operationsReplayed":1000,"queriesAnswered":1000,"queriesNotMaterialized":0,"queryRequests":1000,"referencesResolved":2002,"resultBytesWritten":1754081,"resultSha256Computed":1,"retainedLogicalObjects":16254,"sequencesReplayed":1,"sourceOpenResults":0,"structuralVisits":7018,"uniqueQueries":1000,"unsupportedQueries":0,"writeFailures":0}
+W5_METRICS {"N":2000,"analysisRuns":1,"cfgBuilds":1,"cleanupFailures":0,"closedInModelResults":2000,"compositionRuns":1,"defaultPlanAssignVisits":2000,"defaultPlanDestinations":2000,"defaultPlanQueries":2000,"deliveryAttempts":1,"deliveryComplete":1,"deliveryFailures":0,"edgesIndexed":2,"effectiveOpenResults":0,"elapsedNanos":224180633,"encodingFailures":0,"factsEmitted":2000,"finalizationFailures":0,"locationsIndexed":1,"modelOpenResults":0,"nodesIndexed":3,"objectsIndexed":2000,"observationBatchesExecuted":1,"observationFailures":0,"operationsIndexed":2001,"operationsReplayed":2000,"queriesAnswered":2000,"queriesNotMaterialized":0,"queryRequests":2000,"referencesResolved":4002,"resultBytesWritten":3509089,"resultSha256Computed":1,"retainedLogicalObjects":32254,"sequencesReplayed":1,"sourceOpenResults":0,"structuralVisits":14018,"uniqueQueries":2000,"unsupportedQueries":0,"writeFailures":0}
+W5_METRICS {"N":4000,"analysisRuns":1,"cfgBuilds":1,"cleanupFailures":0,"closedInModelResults":4000,"compositionRuns":1,"defaultPlanAssignVisits":4000,"defaultPlanDestinations":4000,"defaultPlanQueries":4000,"deliveryAttempts":1,"deliveryComplete":1,"deliveryFailures":0,"edgesIndexed":2,"effectiveOpenResults":0,"elapsedNanos":266533384,"encodingFailures":0,"factsEmitted":4000,"finalizationFailures":0,"locationsIndexed":1,"modelOpenResults":0,"nodesIndexed":3,"objectsIndexed":4000,"observationBatchesExecuted":1,"observationFailures":0,"operationsIndexed":4001,"operationsReplayed":4000,"queriesAnswered":4000,"queriesNotMaterialized":0,"queryRequests":4000,"referencesResolved":8002,"resultBytesWritten":7011090,"resultSha256Computed":1,"retainedLogicalObjects":64254,"sequencesReplayed":1,"sourceOpenResults":0,"structuralVisits":28018,"uniqueQueries":4000,"unsupportedQueries":0,"writeFailures":0}
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.390 s -- in io.github.gustavo2358.analysis.adapters.WideResultTest
+[INFO] Running io.github.gustavo2358.analysis.adapters.WireTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.010 s -- in io.github.gustavo2358.analysis.adapters.WireTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 12, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- jar:3.4.2:jar (default-jar) @ analysis-adapters ---
+[INFO] Building jar: /home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-adapters/target/analysis-adapters-0.1.0-SNAPSHOT.jar
+[INFO] 
+[INFO] --- dependency:3.8.1:build-classpath (default-cli) @ analysis-adapters ---
+[INFO] Wrote classpath file '/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-adapters/target/runtime-classpath.txt'.
+[INFO] 
+[INFO] ----------< io.github.gustavo2358.analysis:analysis-launcher >----------
+[INFO] Building analysis-launcher 0.1.0-SNAPSHOT                          [7/7]
+[INFO]   from analysis-launcher/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ analysis-launcher ---
+[INFO] Deleting /home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-launcher/target
+[INFO] 
+[INFO] --- resources:3.4.0:resources (default-resources) @ analysis-launcher ---
+[INFO] skip non existing resourceDirectory /home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-launcher/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ analysis-launcher ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 1 source file with javac [debug release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.4.0:testResources (default-testResources) @ analysis-launcher ---
+[INFO] skip non existing resourceDirectory /home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-launcher/src/test/resources
+[INFO] Copying 7 resources from ../cfg-adapters/src/test/resources to target/test-classes
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ analysis-launcher ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 1 source file with javac [debug release 21] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.5.3:test (default-test) @ analysis-launcher ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running io.github.gustavo2358.analysis.launcher.DataflowCliTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.245 s -- in io.github.gustavo2358.analysis.launcher.DataflowCliTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- jar:3.4.2:jar (default-jar) @ analysis-launcher ---
+[INFO] Building jar: /home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-launcher/target/analysis-launcher-0.1.0-SNAPSHOT.jar
+[INFO] 
+[INFO] --- dependency:3.8.1:build-classpath (default-cli) @ analysis-launcher ---
+[INFO] Wrote classpath file '/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-launcher/target/runtime-classpath.txt'.
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary for Analysis CFG 0.1.0-SNAPSHOT:
+[INFO] 
+[INFO] Analysis CFG ....................................... SUCCESS [  0.517 s]
+[INFO] Analysis CFG Kernel ................................ SUCCESS [  2.267 s]
+[INFO] Analysis Structural Kernel ......................... SUCCESS [  1.212 s]
+[INFO] Analysis Possible Values ........................... SUCCESS [  1.186 s]
+[INFO] analysis-dataflow .................................. SUCCESS [  0.653 s]
+[INFO] analysis-adapters .................................. SUCCESS [  2.263 s]
+[INFO] analysis-launcher .................................. SUCCESS [  0.628 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  8.869 s
+[INFO] Finished at: 2026-09-10T01:43:06-03:00
+[INFO] ------------------------------------------------------------------------
+test_candidate_support_loss_and_malformed_association_are_rejected (__main__.ResultReaderTest.test_candidate_support_loss_and_malformed_association_are_rejected) ... ok
+test_consumer_dependencies_and_outcomes_are_checked (__main__.ResultReaderTest.test_consumer_dependencies_and_outcomes_are_checked) ... ok
+test_duplicate_members_and_nonfinite_numbers_are_rejected (__main__.ResultReaderTest.test_duplicate_members_and_nonfinite_numbers_are_rejected) ... ok
+test_failed_batch_preserves_independent_consumers (__main__.ResultReaderTest.test_failed_batch_preserves_independent_consumers) ... ok
+test_full_ids_reject_lost_or_wrong_owners (__main__.ResultReaderTest.test_full_ids_reject_lost_or_wrong_owners) ... ok
+test_golden_substitution_without_real_stage_receipt_is_rejected (__main__.ResultReaderTest.test_golden_substitution_without_real_stage_receipt_is_rejected) ... ok
+test_missing_schema_version_and_unknown_status_are_rejected (__main__.ResultReaderTest.test_missing_schema_version_and_unknown_status_are_rejected) ... ok
+test_payload_cannot_certify_own_delivery (__main__.ResultReaderTest.test_payload_cannot_certify_own_delivery) ... ok
+test_production_snapshot_is_valid (__main__.ResultReaderTest.test_production_snapshot_is_valid) ... ok
+test_real_stage_must_execute_before_output_is_accepted (__main__.ResultReaderTest.test_real_stage_must_execute_before_output_is_accepted) ... ok
+test_receipt_correlates_exact_hash_result_id_and_destination (__main__.ResultReaderTest.test_receipt_correlates_exact_hash_result_id_and_destination) ... ok
+test_report_is_detached_from_input_file (__main__.ResultReaderTest.test_report_is_detached_from_input_file) ... ok
+test_source_partial_and_effective_remainder_are_not_promoted (__main__.ResultReaderTest.test_source_partial_and_effective_remainder_are_not_promoted) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.027s
+
+OK
+{"preparationStatus": "INCOMPLETE", "resultId": "unsupported-profile", "schema": "analysis-result-validation", "status": "PASS"}
+[w5-performance] PASS: nominal W5 production/delivery/reader tests; S1–S9 additionally composed by global W1–W4 gates

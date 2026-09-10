@@ -619,8 +619,8 @@
     {
       "id": "EVAL-CFG-038",
       "title": "production/E2E",
-      "status": "planned",
-      "expectation": "Wave obligations in docs/product/cp5-roadmap.md and docs/evals/cp5 manifests; runtime not available",
+      "status": "implemented",
+      "expectation": "Real production composition, lossless result wire, external delivery, fresh COBOL CP4E twice and CP3, S14/S15/S16 without local capacity policy.",
       "upstream_oracles": [],
       "invariants": [
         "INV-CFG-030",
@@ -628,7 +628,8 @@
         "INV-CFG-032",
         "INV-CFG-033",
         "INV-CFG-034"
-      ]
+      ],
+      "implementation_evidence": "scripts/project/check_w5.py"
     }
   ]
 }

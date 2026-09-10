@@ -146,3 +146,13 @@ CLI separada. Provar CP4E duas vezes e CP3 com stages reais, equivalência/deter
 S1–S10/S14/S15/S16, falhas, challenges e retenção. Preservar W1–W4, pins e siblings.
 Gates locais/Maven/full, push e CI do HEAD final; parar para review humano W5/CP5.
 CP6, merge, ready, auto-merge e repins não autorizados.
+
+## WAVE_5 — implementação concluída para review humano final
+
+W5 IMPLEMENTED / AWAITING_HUMAN_REVIEW; CP5 AWAITING_FINAL_HUMAN_REVIEW.
+[Validação consolidada](../../evidence/WORK-CFG-028/wave-5/validation.md) registra
+produção in-memory/file, plano genérico, wire 1.1.0 e receipt externo 1.0.0,
+quatro E2Es frescos, 261 testes Java, gates W1–W5/full, 19 mutantes válidos e GC/JFR.
+O histórico de autorizações e evidências anteriores permanece preservado. O recibo
+CI do último push pertence ao comentário final do mesmo PR #12 draft. Review,
+merge/ready/auto-merge e CP6 não são inferidos de gates verdes.

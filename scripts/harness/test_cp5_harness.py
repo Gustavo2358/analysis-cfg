@@ -10,6 +10,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 from validate_docs import ROOT, load_json
 from validate_cp5 import validate_cp5, validate_result, LIFECYCLE, WORK, PLAN, CHALLENGES, METRICS
@@ -91,7 +92,7 @@ class Cp5HarnessTests(unittest.TestCase):
         self.guard('post-audit')
 
     def test_stable_solver_is_not_complete_pipeline(self):
-        result = load_json(self.root/PLAN/'result-review.json')['result']
+        result = load_json(self.root/PLAN/'history/result-review.json')['result']
         result['completion']['observation'] = {'status':'FAILED','reason':'OBSERVATION_ERROR'}
         result['observations'] = []
         prepared = prepared_for(result)
@@ -100,18 +101,18 @@ class Cp5HarnessTests(unittest.TestCase):
         self.assertEqual([], validate_prepared(prepared))
 
     def test_f3_global_barrier_snapshot_is_rejected_and_restored(self):
-        path=self.root/PLAN/'phase-review.json';original=path.read_bytes()
-        self.edit(PLAN+'phase-review.json',lambda x:x['prepared']['consumers'][0].update(status='NOT_STARTED',reason='GLOBAL_BARRIER'))
+        path=self.root/PLAN/'history/phase-review.json';original=path.read_bytes()
+        self.edit(PLAN+'history/phase-review.json',lambda x:x['prepared']['consumers'][0].update(status='NOT_STARTED',reason='GLOBAL_BARRIER'))
         self.guard('F3 independent consumer witness')
         path.write_bytes(original)
         self.assertEqual([],validate_cp5(self.root))
 
     def test_f1_and_f2_contract_fields_cannot_disappear(self):
-        path=self.root/PLAN/'result-contract.json';original=path.read_bytes()
-        self.edit(PLAN+'result-contract.json',lambda x:x['completion']['admission_statuses'].remove('REJECTED'))
+        path=self.root/PLAN/'history/result-contract.json';original=path.read_bytes()
+        self.edit(PLAN+'history/result-contract.json',lambda x:x['completion']['admission_statuses'].remove('REJECTED'))
         self.guard('F admission/delivery status contract')
         path.write_bytes(original)
-        self.edit(PLAN+'result-contract.json',lambda x:x['completion']['delivery_receipt_fields'].remove('resultSha256'))
+        self.edit(PLAN+'history/result-contract.json',lambda x:x['completion']['delivery_receipt_fields'].remove('resultSha256'))
         self.guard('phase completion contract')
         path.write_bytes(original)
         self.assertEqual([],validate_cp5(self.root))
@@ -201,18 +202,16 @@ class Cp5HarnessTests(unittest.TestCase):
         self.edit(LIFECYCLE, lambda x:x['waves'][0].update(requires_review_of='HARNESS_PREPARATION'))
         self.guard('sequential Wave review')
 
-    def test_each_wave_cannot_start_or_be_authorized(self):
-        original = (self.root/LIFECYCLE).read_bytes()
-        for index in range(4,5):
-            for change in [dict(status='STARTED'),dict(authorization='AUTHORIZED')]:
-                with self.subTest(wave=index+1,change=change):
-                    (self.root/LIFECYCLE).write_bytes(original)
-                    self.edit(LIFECYCLE, lambda x:x['waves'][index].update(change))
-                    self.guard('NOT_STARTED / NOT_AUTHORIZED')
+    def test_cp6_cannot_start_or_be_authorized(self):
+        original=(self.root/LIFECYCLE).read_bytes()
+        for change in [dict(status='STARTED'),dict(authorization='AUTHORIZED')]:
+            (self.root/LIFECYCLE).write_bytes(original)
+            self.edit(LIFECYCLE,lambda x:x['cp6'].update(change))
+            self.guard('CP6 remains unauthorized')
 
-    def test_no_active_wave_pointer(self):
-        self.edit(LIFECYCLE,lambda x:x.update(authorized_wave=5))
-        self.guard('only Wave 4 authorized')
+    def test_no_unauthorized_active_wave_pointer(self):
+        self.edit(LIFECYCLE,lambda x:x.update(authorized_wave=6))
+        self.guard('only Wave 5 authorized')
 
     def test_discovery_approval_cannot_authorize_wave(self):
         self.edit(LIFECYCLE,lambda x:x['last_human_approval'].update(does_not_authorize_waves=False))
@@ -313,19 +312,20 @@ class Cp5HarnessTests(unittest.TestCase):
         self.edit(PLAN+'gate-plan.json',lambda x:x['waves'][0]['gates']['performance'].update(status='implemented',hook='true'))
         self.guard('no empty hook product PASS')
 
-    def test_engine_eval_cannot_be_marked_implemented(self):
-        self.edit('docs/evals/catalog.json',lambda x:next(e for e in x['evals'] if e['id']=='EVAL-CFG-038').update(status='implemented'))
-        self.guard('no engine eval implemented')
+    def test_w5_eval_cannot_be_demoted_without_removing_implementation(self):
+        self.edit('docs/evals/catalog.json',lambda x:next(e for e in x['evals'] if e['id']=='EVAL-CFG-038').update(status='planned'))
+        self.guard('W5 eval requires implementation')
 
-    def test_existing_performance_stays_unavailable(self):
+    def test_performance_requires_real_composed_hook(self):
         self.edit('docs/engineering/gate-state.json',lambda x:x['product_gates']['performance'].update(status='implemented',hook='scripts/project/check_cp5_gate.py'))
-        self.guard('performance remains UNAVAILABLE')
+        self.guard('performance requires actual W1–W5 hook')
 
-    def test_product_routes_are_never_preparation_pass(self):
-        with contextlib.redirect_stdout(io.StringIO()):
-            for wave in range(5,6):
-                for category in ['architecture','semantic','performance','integration']:
-                    self.assertEqual(3,run(self.root,category,wave))
+    def test_product_routes_propagate_actual_hook_failure(self):
+        with contextlib.redirect_stdout(io.StringIO()), patch('check_cp5_gate.subprocess.run',return_value=subprocess.CompletedProcess([],17)) as invoke:
+            for category in ['architecture','semantic','performance','integration']:
+                self.assertEqual(17,run(self.root,category,5))
+            self.assertEqual(4,invoke.call_count)
+            for call in invoke.call_args_list:self.assertIn(str(self.root/'scripts/project/check_w5.py'),call.args[0])
 
     def test_direct_air_dependency_contracase(self):
         # A dependencyManagement entry and transitive cfg-kernel are insufficient.
@@ -369,22 +369,40 @@ class Cp5HarnessTests(unittest.TestCase):
         command=[sys.executable,str(self.root/'scripts/harness/validate_cp5.py'),'--root',str(self.root)]
         good=subprocess.run(command,capture_output=True,text=True)
         self.assertEqual(0,good.returncode,good.stdout+good.stderr)
-        self.assertIn('W1/W2/W3/W4 contracts only',good.stdout)
-        self.edit(LIFECYCLE,lambda x:x.update(authorized_wave=5))
+        self.assertIn('W1/W2/W3/W4/W5 contracts only',good.stdout)
+        self.edit(LIFECYCLE,lambda x:x.update(authorized_wave=6))
         bad=subprocess.run(command,capture_output=True,text=True)
         self.assertEqual(1,bad.returncode,bad.stdout+bad.stderr)
-        self.assertIn('only Wave 4 authorized',bad.stdout)
+        self.assertIn('only Wave 5 authorized',bad.stdout)
 
     def test_w1_authorization_and_runtime_hooks_are_required(self):
         for path,change,reason in [
-            (LIFECYCLE,lambda x:x['waves'][3].update(status='APPROVED'),'never human-approved'),
+            (LIFECYCLE,lambda x:x['waves'][4].update(status='APPROVED'),'never human-approved'),
             (LIFECYCLE,lambda x:x['review_history'][4].update(reviewed_head='0'*40),'W1 reviewed HEAD'),
-            (PLAN+'probes.json',lambda x:x['probes'][0].pop('wave_hooks'),'W1/W2/W3/W4 real probe'),
+            (PLAN+'probes.json',lambda x:x['probes'][0].pop('wave_hooks'),'W1/W2/W3/W4/W5 real probe'),
             (PLAN+'gate-plan.json',lambda x:x['waves'][0]['gates']['performance'].update(hook=None),'no empty hook')]:
             original=(self.root/path).read_bytes()
             try:self.edit(path,change);self.guard(reason)
             finally:(self.root/path).write_bytes(original)
             self.assertEqual([],validate_cp5(self.root))
+
+    def test_w5_authorization_and_current_wire_are_guarded(self):
+        for path,change,reason in [
+            (LIFECYCLE,lambda x:x['review_history'][10].update(reviewed_head='0'*40),'W5 reviewed HEAD'),
+            (LIFECYCLE,lambda x:x['waves'][3].update(reviewed_head='0'*40),'W4 explicit human-approved HEAD'),
+            (PLAN+'gate-plan.json',lambda x:x['waves'][4]['gates']['integration'].update(hook=None),'no empty hook'),
+            (PLAN+'result-contract.json',lambda x:x['required_observation_fields'].remove('candidateSupports'),'lossless observation'),
+            (PLAN+'result-contract.json',lambda x:x.update(version='1.0.0'),'production result schema/version')]:
+            original=(self.root/path).read_bytes()
+            try:self.edit(path,change);self.guard(reason)
+            finally:(self.root/path).write_bytes(original)
+            self.assertEqual([],validate_cp5(self.root))
+
+    def test_w5_nominal_reports_and_scale_cannot_be_fabricated(self):
+        from check_w5 import verify_reports,verify_metrics,test_inventory,Failure
+        with self.assertRaises(Failure):verify_reports(self.root,test_inventory('performance'))
+        for output in ['', 'W5_METRICS {}']:
+            with self.assertRaises((Failure,KeyError)):verify_metrics(output)
 
     def test_w1_nominal_reports_and_metrics_cannot_be_fabricated(self):
         from check_w1 import verify_reports, verify_metrics, Failure
@@ -394,7 +412,7 @@ class Cp5HarnessTests(unittest.TestCase):
 
     def test_w2_authorization_and_approval_cannot_be_inferred(self):
         for path,change,reason in [
-            (LIFECYCLE,lambda x:x['waves'][3].update(status='APPROVED'),'never human-approved'),
+            (LIFECYCLE,lambda x:x['waves'][4].update(status='APPROVED'),'never human-approved'),
             (LIFECYCLE,lambda x:x['waves'][0].update(reviewed_head='0'*40),'W1 explicit human-approved HEAD'),
             (LIFECYCLE,lambda x:x['review_history'][5].update(reviewed_head='0'*40),'W2 reviewed HEAD'),
             (PLAN+'gate-plan.json',lambda x:x['waves'][1]['gates']['semantic'].update(hook=None),'no empty hook')]:
@@ -414,8 +432,8 @@ class Cp5HarnessTests(unittest.TestCase):
     def test_w3_focal_review_cannot_drop_blocker_or_approve_itself(self):
         self.edit(LIFECYCLE,lambda x:x['wave_3']['remediation']['blockers'].remove('W3-F1'))
         self.guard('W3 focal blockers')
-        self.edit(LIFECYCLE,lambda x:x['waves'][3].update(status='APPROVED'))
-        self.guard('W4 started/implemented')
+        self.edit(LIFECYCLE,lambda x:x['waves'][4].update(status='APPROVED'))
+        self.guard('W5 started/implemented')
 
     def test_w3_focal_scope_freezes_reviewed_replay(self):
         from check_w3 import verify_sources,Failure
@@ -434,7 +452,7 @@ class Cp5HarnessTests(unittest.TestCase):
 
     def test_w3_authorization_hooks_and_approved_w2_are_required(self):
         for path,change,reason in [
-            (LIFECYCLE,lambda x:x['waves'][3].update(status='APPROVED'),'never human-approved'),
+            (LIFECYCLE,lambda x:x['waves'][4].update(status='APPROVED'),'never human-approved'),
             (LIFECYCLE,lambda x:x['waves'][1].update(reviewed_head='0'*40),'W2 explicit human-approved HEAD'),
             (LIFECYCLE,lambda x:x['review_history'][6].update(reviewed_head='0'*40),'W3 reviewed HEAD'),
             (PLAN+'gate-plan.json',lambda x:x['waves'][2]['gates']['semantic'].update(hook=None),'no empty hook'),
@@ -474,7 +492,7 @@ class Cp5HarnessTests(unittest.TestCase):
 
     def test_w4_authorization_and_hooks_cannot_be_inferred(self):
         for path,change,reason in [
-            (LIFECYCLE,lambda x:x['waves'][3].update(status='APPROVED'),'never human-approved'),
+            (LIFECYCLE,lambda x:x['waves'][4].update(status='APPROVED'),'never human-approved'),
             (LIFECYCLE,lambda x:x['waves'][2].update(reviewed_head='0'*40),'W3 explicit human-approved HEAD'),
             (LIFECYCLE,lambda x:x['review_history'][8].update(reviewed_head='0'*40),'W4 reviewed HEAD'),
             (PLAN+'gate-plan.json',lambda x:x['waves'][3]['gates']['semantic'].update(hook=None),'no empty hook'),
@@ -517,12 +535,12 @@ class Cp5HarnessTests(unittest.TestCase):
             with self.subTest(target=target),self.assertRaisesRegex(Failure,'forbidden consumers'):verify_edges({consumer:[target]})
 
     def test_result_contract_cannot_drop_semantic_statuses_or_change_version(self):
-        self.edit(PLAN+'result-contract.json',lambda x:x.update(version='2.0.0',execution_statuses=['STABLE']))
+        self.edit(PLAN+'history/result-contract.json',lambda x:x.update(version='2.0.0',execution_statuses=['STABLE']))
         self.guard('result contract status/schema')
 
     def test_wire_capacity_enums_and_options_are_rejected_with_exact_restore(self):
         from cp5_size_contract import PHASE_ENUMS
-        path = self.root/PLAN/'result-contract.json'
+        path = self.root/PLAN/'history/result-contract.json'
         original = path.read_bytes()
         self.assertEqual([],validate_cp5(self.root))
         changes = [(field, lambda x,field=field:x['completion'][field].append('LIMIT'))
@@ -534,7 +552,7 @@ class Cp5HarnessTests(unittest.TestCase):
         for name,change in changes:
             with self.subTest(mutant=name):
                 try:
-                    self.edit(PLAN+'result-contract.json',change)
+                    self.edit(PLAN+'history/result-contract.json',change)
                     json.loads(path.read_bytes())
                     self.assertTrue(validate_cp5(self.root))
                     print('[core-size challenge] wire '+name+': parseable RED')
@@ -558,13 +576,13 @@ class Cp5HarnessTests(unittest.TestCase):
             self.assertEqual([],validate_cp5(self.root))
 
     def test_result_is_design_not_measurement(self):
-        self.edit(PLAN+'result-review.json',lambda x:x['design'].update(execution='EXECUTED'))
+        self.edit(PLAN+'history/result-review.json',lambda x:x['design'].update(execution='EXECUTED'))
         self.guard('result example is design only')
-        self.edit(PLAN+'result-review.json',lambda x:x['result']['statistics'].update(measurements={'nodesPopped':3}))
+        self.edit(PLAN+'history/result-review.json',lambda x:x['result']['statistics'].update(measurements={'nodesPopped':3}))
         self.guard('design must not invent measurements')
 
     def test_mixed_snapshot_cannot_abort_batch_or_drop_unsupported_query(self):
-        path = PLAN + 'result-review.json'
+        path = PLAN + 'history/result-review.json'
         original = (self.root/path).read_bytes()
         self.assertEqual([], validate_cp5(self.root))
         mutations = [
@@ -582,18 +600,18 @@ class Cp5HarnessTests(unittest.TestCase):
         self.assertEqual([], validate_cp5(self.root))
 
     def test_result_contract_cannot_drop_query_outcome_rules(self):
-        self.edit(PLAN+'result-contract.json', lambda x:x.update(query_statuses=['VALUE']))
+        self.edit(PLAN+'history/result-contract.json', lambda x:x.update(query_statuses=['VALUE']))
         self.guard('result contract query outcomes')
 
     def test_mixed_request_plan_cannot_be_removed_with_unsupported_response(self):
-        self.edit(PLAN+'result-review.json', lambda x:x['design']['requestedQueries'].pop())
-        self.edit(PLAN+'result-review.json', lambda x:x['result']['observations'].pop())
+        self.edit(PLAN+'history/result-review.json', lambda x:x['design']['requestedQueries'].pop())
+        self.edit(PLAN+'history/result-review.json', lambda x:x['result']['observations'].pop())
         self.guard('mixed batch requires two requested queries')
 
 
 class ResultContractTests(unittest.TestCase):
     def setUp(self):
-        self.example=load_json(ROOT/PLAN/'result-review.json')['result']
+        self.example=load_json(ROOT/PLAN/'history/result-review.json')['result']
 
     def rejected_run(self, result, status):
         result.update(executionStatus=status, observations=[])
@@ -793,7 +811,7 @@ class ResultContractTests(unittest.TestCase):
 
 class FCompletionTests(unittest.TestCase):
     def setUp(self):
-        self.snapshot = load_json(ROOT/PLAN/'phase-review.json')
+        self.snapshot = load_json(ROOT/PLAN/'history/phase-review.json')
         self.prepared = copy.deepcopy(self.snapshot['prepared'])
         self.plans = copy.deepcopy(self.snapshot['design']['requestedConsumers'])
         self.queries = copy.deepcopy(self.snapshot['design']['requestedQueriesByBatch'])
@@ -823,9 +841,9 @@ class FCompletionTests(unittest.TestCase):
         self.assertEqual([], self.validate())
 
     def test_independent_batches_and_consumer_dependencies(self):
-        result=load_json(ROOT/PLAN/'result-review.json')['result']
+        result=load_json(ROOT/PLAN/'history/result-review.json')['result']
         self.prepared['results'].append({'observationBatchId':'independent','result':result})
-        self.queries['independent']=load_json(ROOT/PLAN/'result-review.json')['design']['requestedQueries']
+        self.queries['independent']=load_json(ROOT/PLAN/'history/result-review.json')['design']['requestedQueries']
         plan={'consumerId':'IndependentQueries','requiredAnalysisKeys':[result['analysisKey']], 'requiredObservationBatchIds':['independent']}
         self.plans.append(plan);self.prepared['consumerPlan'].append(copy.deepcopy(plan))
         self.prepared['consumers'].append({'id':'IndependentQueries','status':'COMPLETE','reason':None})
@@ -894,7 +912,7 @@ class CoreSizeContractTests(unittest.TestCase):
     """Wire/manifest counterexamples only; actual engine hooks remain unavailable."""
 
     def setUp(self):
-        self.result = load_json(ROOT/PLAN/'result-review.json')['result']
+        self.result = load_json(ROOT/PLAN/'history/result-review.json')['result']
 
     def test_analysis_key_has_no_resource_options(self):
         self.assertEqual({}, self.result['analysisKey']['options'])

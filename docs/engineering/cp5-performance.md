@@ -1,9 +1,9 @@
 # CP5 — contrato de performance, métricas e retenção
 
 H4/R1/R2 aceitos; [ADR-0013](../architecture/decisions/ADR-0013.md).
-**W1 estrutural implementada e medida.** O hook W1 executa probes e oracles reais.
-Solver W2 implementado em validação; W3–W5 não implementados.
-Performance/full global conserva UNAVAILABLE/exit 3 após executar W1 e W2.
+W1–W5 possuem hooks produtivos. Performance global executa cada Wave; full inclui
+S10 por integração fresca. PASS requer execução e oráculos reais de todas as parcelas;
+a dívida externa do codec AIR não significa qualificação ampla da rota de arquivos.
 [Ledger W1](cp5-w1-index-ledger.md) e [evidência](../work/evidence/WORK-CFG-028/wave-1/validation.md).
 [Manifest dos probes](../evals/cp5/probes.json) especifica ativação, N/2N, regressão
 e métricas. [Lifecycle](../work/cp5-lifecycle.json) não permite ativação automática.
@@ -106,15 +106,15 @@ precisa falhar na engine/propriedade, sem OOM incidental do builder.
 W1 ativa probes estruturais S1/S2/S4/S8 com execução real e contracasos; W2 S4/S4b/S8;
 W3 S1/S2/S3/S4b largo/S6/S7/S9 com retenção; W4 S5/S6/S8 com W3 real; W5 consolida
 S1–S9 e S10 de produção. Ativações parciais não fecham probes de outras Waves.
-Script `scripts/project/check_cp5_gate.py performance --wave 1` executa W1; Waves 2–5
-retornam UNAVAILABLE. Antes de ligar um hook: definir gerador/oracle, relatório bruto e
+Script `scripts/project/check_cp5_gate.py performance --wave N` executa a Wave N
+(1 a 5). S10 requer também o gate integration W5 e seus produtores reais. Antes de ligar um hook: definir gerador/oracle, relatório bruto e
 parser nominal que rejeite teste ausente/skip/contador omitido, executar GREEN,
 mutante compilável RED, restore byte-exact, segundo GREEN, registrar SHA/ambiente.
 
 Performance PASS exige hook produtivo executado para **todos** probes devidos na
 Wave, bounds do ledger e contracasos. Markdown, flag implemented, exit 0 vazio ou
-report pré-fabricado não são evidência. Gate de preparação exige todos hooks nulos;
-a ativação posterior exige mudança revisada do harness junto à Wave autorizada.
+report pré-fabricado não são evidência. O gate histórico de preparação exigia hooks nulos; a ativação em cada Wave é
+registrada junto da implementação autorizada.
 S1–S9 in-memory não qualificam AIR >16 MiB; S10 mínimo não qualifica programas grandes.
 BACKLOG-LOWER-017/018 permanecem dependências externas para essa qualificação.
 

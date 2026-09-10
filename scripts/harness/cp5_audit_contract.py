@@ -87,10 +87,10 @@ def validate_audit(root: Path) -> list[str]:
             row = data['requirements'].get(key, {})
             require(row.get('obligations') == obligations and row.get('waves') == WAVES[key], 'obligations/routing ' + key)
             require(row.get('documentation') == DOC+'#'+key.lower() and '\n## '+key+' — ' in document, 'documentation ' + key)
-            require(row.get('runtime_status') == 'NOT_AVAILABLE_UNTIL_IMPLEMENTED' and row.get('runtime_hook') is None, 'no engine claim ' + key)
+            require(row.get('runtime_status') == 'IMPLEMENTED_BY_WAVE_HOOKS' and row.get('runtime_hook') is None, 'no engine claim ' + key)
         for key in OBLIGATIONS:
-            expected_hooks = {str(n):{'status':'IMPLEMENTED','hook':f'scripts/project/check_w{n}.py'} for n in (1,2,3,4) if n in WAVES[key]}
-            require(data['requirements'][key].get('wave_hooks',{}) == expected_hooks, 'W1/W2/W3/W4 audit hook '+key)
+            expected_hooks = {str(n):{'status':'IMPLEMENTED','hook':f'scripts/project/check_w{n}.py'} for n in (1,2,3,4,5) if n in WAVES[key]}
+            require(data['requirements'][key].get('wave_hooks',{}) == expected_hooks, 'W1/W2/W3/W4/W5 audit hook '+key)
         witness = data['backward_witness']
         require(witness == {'language':'TEST_ONLY_GEN_KILL', 'operations':['def X','use X'],
                 'OUT':[], 'after_use':[], 'before_use':['X'], 'after_def':['X'], 'before_def':[],
@@ -135,7 +135,7 @@ def validate_audit(root: Path) -> list[str]:
                 'authorization':'F1_F2_F3_ONLY','review':'AWAITING_HUMAN_REVIEW',
                 'evidence':'docs/work/evidence/WORK-CFG-028/review-f/validation.md'}, 'F-only authorization')
         from cp5_phase_contract import validate_prepared
-        phase_review = read('docs/evals/cp5/phase-review.json')
+        phase_review = read('docs/evals/cp5/history/phase-review.json')
         require(phase_review['design']['kind'] == 'REVIEW_SNAPSHOT' and phase_review['design']['execution'] == 'NOT_EXECUTED', 'F snapshot design only')
         prepared = phase_review['prepared']
         errors += validate_prepared(prepared, phase_review['design']['requestedConsumers'], phase_review['design']['requestedQueriesByBatch'])

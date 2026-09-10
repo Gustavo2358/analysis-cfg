@@ -257,6 +257,8 @@ def main() -> int:
         values_semantics(args.root, 'semantic')
         from check_w4 import run as planning_semantics
         planning_semantics(args.root, 'semantic')
+        from check_w5 import run as composition_semantics
+        composition_semantics(args.root, 'semantic')
         return 0
     except GateFailure as exc:
         print(f"[semantic] FAIL: {exc}", file=sys.stderr, flush=True)
