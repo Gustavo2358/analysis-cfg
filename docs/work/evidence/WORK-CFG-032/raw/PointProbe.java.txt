@@ -1,0 +1,19 @@
+package io.github.gustavo2358.analysis.values;
+import io.github.gustavo2358.air.model.*;
+import io.github.gustavo2358.analysis.query.*;
+import java.util.*;
+import static io.github.gustavo2358.analysis.values.ValuesFixtures.*;
+public class PointProbe {
+  public static void main(String[] args) {
+    var p=graph(new String[]{"A"},new int[][]{{}},1,false,false);
+    var u=p.units().getFirst();var s=u.sequences().getFirst();var o=u.objects().getFirst().id();var e=u.entries().getFirst().id();
+    var a=assign(u.id(),"first",o,"A");var b=assign(u.id(),"middle",o,"B");var c=assign(u.id(),"last",o,"C");
+    p=replace(p,List.of(unit(u.id(),u.entries(),List.of(new Sequence(s.label(),List.of(a,b,c),s.terminator(),s.origin())),u.objects())),p.coverage(),p.uncertainties(),p.premises());
+    var run=execute(p);
+    var queries=List.of(new PointQuery<>(ProgramPoint.before(e,b.header().id()),o),new PointQuery<>(ProgramPoint.after(e,b.header().id()),o),new PointQuery<>(ProgramPoint.before(e,s.terminator().header().id()),o));
+    var batch=run.observe(queries).batch();
+    for(var q:queries) {var answer=batch.observations().stream().filter(x->x.query().equals(q)).findFirst().orElseThrow();System.out.println(q+" -> "+answer.value());}
+    System.out.println("metrics="+batch.metrics());
+    System.out.println("This probe exercises existing Assign APIs only; it does not implement or simulate future CALL lowering.");
+  }
+}

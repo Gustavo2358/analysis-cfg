@@ -1,0 +1,81 @@
+{
+  "schema": "cp6-baseline-documentation-addendum",
+  "schema_version": 1,
+  "finding": "PRECP6-F1",
+  "status": "RESOLVED / MERGED",
+  "created_at": "2026-09-11T02:21:49.835662+00:00",
+  "runtime_baseline": {
+    "receipt": "../receipt.json",
+    "sha256": "4f61539c7bc09120ef05abf9efb818e61870097b506e173eaed38735bba331e0",
+    "analysis_cfg_source": "89ee2ca3f922f021f149d4ad7273056d0c402b9f",
+    "unchanged": true
+  },
+  "documentation_closeout": {
+    "pr": 16,
+    "head": "e41f97ba941b9a2a5a2f3cf991e96bcf69a9b74d",
+    "merge": "e9daaed9f8a2f2df3926a624f1067aba3d53297c",
+    "tree": "30f854c3c5dc626d2e2185611efa5fd254c6a502"
+  },
+  "changed_paths": [
+    "MANIFEST.sha256",
+    "docs/work/cp5-lifecycle.json"
+  ],
+  "unchanged_tree_entries_sha256": "167ba2dfe8efdbf000c1012e0bdb3e08c34467526fc19937f4d39f58eaf9579e",
+  "baseline_synchronization": "COMPLETED / FROZEN / VERIFIED",
+  "cp6": {
+    "status": "NOT_STARTED",
+    "authorization": "NOT_AUTHORIZED"
+  },
+  "production_changes": false,
+  "scope": "Only current baseline_synchronization metadata and its derived manifest; every other file and every other lifecycle field identical. Prior blocked object preserved as investigation history.",
+  "ci_runs": [
+    {
+      "id": 34552696619,
+      "event": "pull_request",
+      "head_sha": "e41f97ba941b9a2a5a2f3cf991e96bcf69a9b74d",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/Gustavo2358/analysis-cfg/actions/runs/34552696619"
+    },
+    {
+      "id": 34552675035,
+      "event": "push",
+      "head_sha": "e41f97ba941b9a2a5a2f3cf991e96bcf69a9b74d",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/Gustavo2358/analysis-cfg/actions/runs/34552675035"
+    }
+  ],
+  "validation": "Focal before/after assertions; local fast/docs/scope/manifest/diff; exact-head configured CI including full regression. Original runtime artifacts and E2E evidence remain unchanged and are verified through the original receipt.",
+  "evidence_sha256": {
+    "evidence/addendum.py": "3e13799745daa0704ed32aea09b3c7a1aa855cac7f573b26149e269753e1c849",
+    "evidence/ci/34552675035/ci-source-receipt.json": "769763d321e29731dbdda721e701a48fbf5b3d886ffd5983925ea32501f21fb0",
+    "evidence/ci/34552675035/jobs.json": "8cfb26a003436901e8c46a3a6bf148ea6bff6dd2bffd70440a2db4843a31a103",
+    "evidence/ci/34552696619/ci-source-receipt.json": "0229745fec317ef5498257fa5d3a9c88314c7f59e85d2a70e7b2660e36f94ca6",
+    "evidence/ci/34552696619/jobs.json": "67c2644bc79c508646a394d0cce2b837666407e1e508013659db3ee9029d89ff",
+    "evidence/ci/pr-watch.log.gz": "6382d2eafbdb628b584072386a1a45701a08ad3bd47bb04f86886c916ea6a540",
+    "evidence/ci/push-watch.log.gz": "4d89a5ebf0c6d73a3f44cf07efd570d858ddb3518538e285f04fcec9433c43c1",
+    "evidence/ci/status.json": "1b14d2d79d19e73485980cd8b54fba2947537056d6b0cdf57778b1fe43a3ae20",
+    "evidence/diff.log.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+    "evidence/docs.log.gz": "455c24eb08da800b365f85d340c16d8f360272da515c71d99a97ee0a0805005e",
+    "evidence/fast-result.json": "8911c4c9a6fdc969d6b6c31d17421447a34b1c98ef1a638b3fe29df5dab77eef",
+    "evidence/fast.log.gz": "8c0d85735adfdade5d6830f776219bb459f77dad4da29914ea7666cc5844ff29",
+    "evidence/finish-addendum.py": "57c052ae154f0f69bbf790085d6bc007f3c44a73a50ee3c59d319b9543ec3808",
+    "evidence/focal-check.json": "9222e49a92793a63b44089aca1bbc986dd504936599b9cbf0ee6abacf3785afa",
+    "evidence/gates.json": "7791cba727df63327c9b6b2dd0976a2dc25b383a99c4391ea47ec9c6afd135d5",
+    "evidence/lifecycle-before.json": "cae1f7e277835319606a91e0958f92975a295a917c496f291d6885eb500134db",
+    "evidence/manifest.log.gz": "289425f273e1d23d6be099de2f52364259ba53b9b0046586aa39aca28c6392a8",
+    "evidence/merge.json": "9f9eba9a7b5715465dddbd2bde0adfe483b8b065384887e8ce5b3810e82029d9",
+    "evidence/merge.py": "856be8d0bb771a7cb55558aeb5a8fc42ed0ebdeca5691d6583336b1501325908",
+    "evidence/post-merge-diff.log.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+    "evidence/post-merge-docs.log.gz": "455c24eb08da800b365f85d340c16d8f360272da515c71d99a97ee0a0805005e",
+    "evidence/post-merge-gates.json": "b1083477a77a6d1e21388123b608cdaa64434ffd41f06f2aa582ce93e4418d0b",
+    "evidence/post-merge-scope-manifest.log.gz": "289425f273e1d23d6be099de2f52364259ba53b9b0046586aa39aca28c6392a8",
+    "evidence/pr-body.md": "1d93b2c622842a3fccf51b2a9eeea10d642360f6e1f485f03c80507de4326a1c",
+    "evidence/scope.log.gz": "289425f273e1d23d6be099de2f52364259ba53b9b0046586aa39aca28c6392a8",
+    "evidence/self-review.md": "1110e740bc7d1866be15d05dcf33cc45d3361365acfd52e555017f485d014739",
+    "evidence/user-review.json": "ed77a3321ad8f86a9a7e1520f5f87beb72ebb3860bf4542fb38d81c33f1feb8e",
+    "evidence/verify-addendum.py": "a2fd2ff1925abd67040d3155946f4a3934c520180da9b9e6fd7497bcc4005c19",
+    "verify.py": "a2fd2ff1925abd67040d3155946f4a3934c520180da9b9e6fd7497bcc4005c19"
+  }
+}

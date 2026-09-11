@@ -1,0 +1,734 @@
+{
+  "schema": "cp6-baseline-receipt",
+  "schema_version": 1,
+  "created_at": "2026-09-11T01:27:15.466732+00:00",
+  "components": {
+    "proleap-poc": {
+      "repository_path": "/home/gustavo/workspace/teste-e2e/proleap-poc",
+      "source_sha": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+      "source_tree": "63eba137162aa47e38d4858ff522058a8678a8dd"
+    },
+    "cobol-lower": {
+      "repository_path": "/home/gustavo/workspace/teste-e2e/cobol-lower",
+      "source_sha": "18016f16b4f63149eb1bb4ca13db7e12593d8909",
+      "source_tree": "0139edc52e34c703b643ff484a33e70871ef091d"
+    },
+    "analysis-ir": {
+      "repository_path": "/home/gustavo/workspace/teste-e2e/analysis-ir",
+      "source_sha": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+      "source_tree": "11b2361a40cb5ae9b6c201f0157f30ef2387d1b8"
+    },
+    "air-java": {
+      "repository_path": "/home/gustavo/workspace/teste-e2e/air-java",
+      "source_sha": "3bafe3978f0f392e842038ad5628e85dfd91d00d",
+      "source_tree": "201096ee137a897fb43b22e4c831d82e948d6f81"
+    },
+    "analysis-cfg": {
+      "repository_path": "/home/gustavo/workspace/teste-e2e/analysis-cfg",
+      "source_sha": "89ee2ca3f922f021f149d4ad7273056d0c402b9f",
+      "source_tree": "696b3a196d20f8ac7eafb66a924a37722149aa54"
+    }
+  },
+  "artifacts": [
+    {
+      "component": "proleap-poc",
+      "role": "frontend",
+      "path": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/producers/proleap-poc/target/antlr-parse-tree-explorer-1.0.0-SNAPSHOT.jar",
+      "sha256": "cbdbc590d62f5485de6ad3f00f8efbcf83d9b5980194a9d96d515e30b7b829ff",
+      "source_sha": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+      "source_tree": "63eba137162aa47e38d4858ff522058a8678a8dd",
+      "java": "openjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)\n",
+      "maven_local_repository": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2"
+    },
+    {
+      "component": "cobol-lower",
+      "role": "lower",
+      "path": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/producers/cobol-lower/adapters/target/cobol-lower-adapters-0.1.0-SNAPSHOT.jar",
+      "sha256": "8b6a028544373bc6ed7f299c75becedd3df05f107448757b840451e8f673b65d",
+      "source_sha": "18016f16b4f63149eb1bb4ca13db7e12593d8909",
+      "source_tree": "0139edc52e34c703b643ff484a33e70871ef091d",
+      "java": "openjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)\n",
+      "maven_local_repository": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2"
+    },
+    {
+      "component": "cobol-lower",
+      "role": "lower-core",
+      "path": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2/io/github/gustavo2358/cobol-lower-core/0.1.0-SNAPSHOT/cobol-lower-core-0.1.0-SNAPSHOT.jar",
+      "sha256": "e0da14a38255d57058fb86818710f6fb6194696e009e30986caac4adc40fc66a",
+      "source_sha": "18016f16b4f63149eb1bb4ca13db7e12593d8909",
+      "source_tree": "0139edc52e34c703b643ff484a33e70871ef091d",
+      "java": "openjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)\n",
+      "maven_local_repository": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2"
+    },
+    {
+      "component": "air-java",
+      "role": "air-java",
+      "path": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar",
+      "sha256": "bea96d84e7179af397ad692745aad8f9e40142d846467a8480c58167ea53fd0e",
+      "source_sha": "3bafe3978f0f392e842038ad5628e85dfd91d00d",
+      "source_tree": "201096ee137a897fb43b22e4c831d82e948d6f81",
+      "java": "openjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)\n",
+      "maven_local_repository": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2"
+    },
+    {
+      "component": "air-java",
+      "role": "air-json",
+      "path": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar",
+      "sha256": "723ba4313428ee87d9d29b51b1f485d98bf697720419c69860ce8b04d675a032",
+      "source_sha": "3bafe3978f0f392e842038ad5628e85dfd91d00d",
+      "source_tree": "201096ee137a897fb43b22e4c831d82e948d6f81",
+      "java": "openjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)\n",
+      "maven_local_repository": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2"
+    },
+    {
+      "component": "analysis-cfg",
+      "role": "cfg-kernel",
+      "path": "/home/gustavo/workspace/teste-e2e/.pre-cp6/final/cfg-kernel/target/cfg-kernel-0.1.0-SNAPSHOT.jar",
+      "sha256": "b660f25c8b0da69eee61133897a31a0b90cac65c84df82cbe2d09c7d4362c0c8",
+      "source_sha": "89ee2ca3f922f021f149d4ad7273056d0c402b9f",
+      "source_tree": "696b3a196d20f8ac7eafb66a924a37722149aa54",
+      "java": "openjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)\n",
+      "maven_local_repository": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2"
+    },
+    {
+      "component": "analysis-cfg",
+      "role": "analysis-kernel",
+      "path": "/home/gustavo/workspace/teste-e2e/.pre-cp6/final/analysis-kernel/target/analysis-kernel-0.1.0-SNAPSHOT.jar",
+      "sha256": "a66876db4f0fa7b5563f60da5484ab740f95099b33433049693c43bbb9699fce",
+      "source_sha": "89ee2ca3f922f021f149d4ad7273056d0c402b9f",
+      "source_tree": "696b3a196d20f8ac7eafb66a924a37722149aa54",
+      "java": "openjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)\n",
+      "maven_local_repository": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2"
+    },
+    {
+      "component": "analysis-cfg",
+      "role": "analysis-values",
+      "path": "/home/gustavo/workspace/teste-e2e/.pre-cp6/final/analysis-values/target/analysis-values-0.1.0-SNAPSHOT.jar",
+      "sha256": "e00325110ec9ab826d7ee531fd6c91eac1f69bbce48f25463974992b945b0229",
+      "source_sha": "89ee2ca3f922f021f149d4ad7273056d0c402b9f",
+      "source_tree": "696b3a196d20f8ac7eafb66a924a37722149aa54",
+      "java": "openjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)\n",
+      "maven_local_repository": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2"
+    },
+    {
+      "component": "analysis-cfg",
+      "role": "analysis-dataflow",
+      "path": "/home/gustavo/workspace/teste-e2e/.pre-cp6/final/analysis-dataflow/target/analysis-dataflow-0.1.0-SNAPSHOT.jar",
+      "sha256": "623617e91f3acd3ed3839657a2f8b27963d7abee2ff65125fca4ccf51eec5666",
+      "source_sha": "89ee2ca3f922f021f149d4ad7273056d0c402b9f",
+      "source_tree": "696b3a196d20f8ac7eafb66a924a37722149aa54",
+      "java": "openjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)\n",
+      "maven_local_repository": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2"
+    },
+    {
+      "component": "analysis-cfg",
+      "role": "analysis-adapters",
+      "path": "/home/gustavo/workspace/teste-e2e/.pre-cp6/final/analysis-adapters/target/analysis-adapters-0.1.0-SNAPSHOT.jar",
+      "sha256": "839316a1a3b045accd36d9bebbbd11ee7e796570b21cc8f6edc015a97f96d5dd",
+      "source_sha": "89ee2ca3f922f021f149d4ad7273056d0c402b9f",
+      "source_tree": "696b3a196d20f8ac7eafb66a924a37722149aa54",
+      "java": "openjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)\n",
+      "maven_local_repository": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2"
+    },
+    {
+      "component": "analysis-cfg",
+      "role": "analysis-launcher",
+      "path": "/home/gustavo/workspace/teste-e2e/.pre-cp6/final/analysis-launcher/target/analysis-launcher-0.1.0-SNAPSHOT.jar",
+      "sha256": "28a2ec49c0f2c7dae3b04946f09b75a9eceac19e3b8291f9aa3cb7c434bf0857",
+      "source_sha": "89ee2ca3f922f021f149d4ad7273056d0c402b9f",
+      "source_tree": "696b3a196d20f8ac7eafb66a924a37722149aa54",
+      "java": "openjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)\n",
+      "maven_local_repository": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2"
+    }
+  ],
+  "java": "openjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)\n",
+  "maven_local_repository": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2",
+  "build_provenance": "All consumed upstream artifacts built clean in this session in an isolated Maven repository seeded without first-party artifacts; hashes checked on every E2E. Analyzer rebuilt clean from exact final merged source.",
+  "repins": {
+    "analysis-ir": {
+      "old": "122ce54e1b9ef9b00646f93ece409ca8b63bc933",
+      "new": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+      "reason": "docs/provenance; normative specification, conformance and binding byte-identical"
+    },
+    "air-java": {
+      "old": "17029898fd0ee8fabcaaae89f7260148633d4b12",
+      "new": "3bafe3978f0f392e842038ad5628e85dfd91d00d",
+      "reason": "docs/provenance and harness; model/validator/codec/POM byte-identical"
+    },
+    "cobol-lower": {
+      "old": "2329993ce61b33fd7105759e211a1861ca6cb217",
+      "new": "18016f16b4f63149eb1bb4ca13db7e12593d8909",
+      "reason": "approved capacity/operational, harness and pins; six production files remove size admission limits; scalar translation unchanged"
+    },
+    "proleap-poc": {
+      "old": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+      "new": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+      "reason": "unchanged"
+    }
+  },
+  "source_lock_metadata_updates": {
+    "analysis_ir": {
+      "old": "122ce54e1b9ef9b00646f93ece409ca8b63bc933",
+      "new": "51b4d9a8ae0364232bd97103cd73a77e1a34996c"
+    },
+    "air_java": {
+      "old": "17029898fd0ee8fabcaaae89f7260148633d4b12",
+      "new": "3bafe3978f0f392e842038ad5628e85dfd91d00d"
+    },
+    "proleap_poc": {
+      "old": "7a376f33f55127f53c63b86d3228671b9c6a348d",
+      "new": "8722945cc4cd2052c6091533f6ee6989278aa2f8"
+    },
+    "cobol_lower": {
+      "old": null,
+      "new": "18016f16b4f63149eb1bb4ca13db7e12593d8909"
+    }
+  },
+  "gates": {
+    "maven": "PASS",
+    "focal": "PASS",
+    "fast": "PASS",
+    "docs": "PASS",
+    "architecture": "PASS",
+    "w5-isolated": "PASS",
+    "w5-adversarial": "PASS",
+    "semantic": "PASS",
+    "integration": "PASS",
+    "performance": "PASS",
+    "full": "PASS",
+    "scope-manifest": "PASS",
+    "scope": "PASS",
+    "diff-check": "PASS",
+    "e2e-comparison": "PASS"
+  },
+  "waves": {
+    "W1": "PASS",
+    "W2": "PASS",
+    "W3": "PASS",
+    "W4": "PASS",
+    "W5": "PASS"
+  },
+  "maven": {
+    "tests": 270,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "semantic_comparison": {
+    "status": "PASS",
+    "old_baseline": "CP5 e2e-sealed",
+    "cp4e_ab": "SEMANTIC_AND_BYTE_IDENTICAL",
+    "runs": {
+      "cp4e-a": {
+        "assertions": {
+          "candidate": "PROGA",
+          "producer": {
+            "domain": "operation",
+            "localId": "e52226b01b4afc8f6c6214aafd63e5ab",
+            "publication": "77ae4cc3ed75332c64011efce81c431b",
+            "unit": "unit"
+          },
+          "producer_kind": "real Assign",
+          "origin": {
+            "id": {
+              "domain": "origin",
+              "localId": "6e3b8590805b3e79519781a3f9a725c6",
+              "publication": "77ae4cc3ed75332c64011efce81c431b"
+            },
+            "inputs": [
+              {
+                "domain": "origin",
+                "localId": "097b1e086dae7b064d2d38d70bf060c7",
+                "publication": "77ae4cc3ed75332c64011efce81c431b"
+              },
+              {
+                "domain": "origin",
+                "localId": "94120e2cc4ddfe39a35cae90898738d2",
+                "publication": "77ae4cc3ed75332c64011efce81c431b"
+              }
+            ],
+            "kind": "derived",
+            "rule": "sp-provenance/original-expanded@1"
+          },
+          "model_remainder": false,
+          "source_remainder": true,
+          "effective_remainder": true,
+          "support": "real Assign"
+        },
+        "hashes": {
+          "air.json": {
+            "old": "dd3bb4819282e609a97937ea01b7e202786e2c2d9ba9c8a1821a8b982eeb8788",
+            "new": "dd3bb4819282e609a97937ea01b7e202786e2c2d9ba9c8a1821a8b982eeb8788",
+            "byte_identical": true
+          },
+          "result.json": {
+            "old": "aacb6e6cedbd7d1dbbd44e7a476b398df3eeff51f1a63b90257d4dc412705dec",
+            "new": "aacb6e6cedbd7d1dbbd44e7a476b398df3eeff51f1a63b90257d4dc412705dec",
+            "byte_identical": true
+          },
+          "frontend/cobol-semantic-product.json": {
+            "old": "468e3207f578e428ace89a311eadbd6e27c670331b739675b761479352adc7af",
+            "new": "468e3207f578e428ace89a311eadbd6e27c670331b739675b761479352adc7af",
+            "byte_identical": true
+          },
+          "AIR-MOVE.cbl": {
+            "old": "3a35079c4954548bca08b4b298583c2b29a336d73432b529cac939d9b9013113",
+            "new": "3a35079c4954548bca08b4b298583c2b29a336d73432b529cac939d9b9013113",
+            "byte_identical": true
+          }
+        },
+        "memory_file": "BYTE_IDENTICAL"
+      },
+      "cp4e-b": {
+        "assertions": {
+          "candidate": "PROGA",
+          "producer": {
+            "domain": "operation",
+            "localId": "e52226b01b4afc8f6c6214aafd63e5ab",
+            "publication": "77ae4cc3ed75332c64011efce81c431b",
+            "unit": "unit"
+          },
+          "producer_kind": "real Assign",
+          "origin": {
+            "id": {
+              "domain": "origin",
+              "localId": "6e3b8590805b3e79519781a3f9a725c6",
+              "publication": "77ae4cc3ed75332c64011efce81c431b"
+            },
+            "inputs": [
+              {
+                "domain": "origin",
+                "localId": "097b1e086dae7b064d2d38d70bf060c7",
+                "publication": "77ae4cc3ed75332c64011efce81c431b"
+              },
+              {
+                "domain": "origin",
+                "localId": "94120e2cc4ddfe39a35cae90898738d2",
+                "publication": "77ae4cc3ed75332c64011efce81c431b"
+              }
+            ],
+            "kind": "derived",
+            "rule": "sp-provenance/original-expanded@1"
+          },
+          "model_remainder": false,
+          "source_remainder": true,
+          "effective_remainder": true,
+          "support": "real Assign"
+        },
+        "hashes": {
+          "air.json": {
+            "old": "dd3bb4819282e609a97937ea01b7e202786e2c2d9ba9c8a1821a8b982eeb8788",
+            "new": "dd3bb4819282e609a97937ea01b7e202786e2c2d9ba9c8a1821a8b982eeb8788",
+            "byte_identical": true
+          },
+          "result.json": {
+            "old": "aacb6e6cedbd7d1dbbd44e7a476b398df3eeff51f1a63b90257d4dc412705dec",
+            "new": "aacb6e6cedbd7d1dbbd44e7a476b398df3eeff51f1a63b90257d4dc412705dec",
+            "byte_identical": true
+          },
+          "frontend/cobol-semantic-product.json": {
+            "old": "468e3207f578e428ace89a311eadbd6e27c670331b739675b761479352adc7af",
+            "new": "468e3207f578e428ace89a311eadbd6e27c670331b739675b761479352adc7af",
+            "byte_identical": true
+          },
+          "AIR-MOVE.cbl": {
+            "old": "3a35079c4954548bca08b4b298583c2b29a336d73432b529cac939d9b9013113",
+            "new": "3a35079c4954548bca08b4b298583c2b29a336d73432b529cac939d9b9013113",
+            "byte_identical": true
+          }
+        },
+        "memory_file": "BYTE_IDENTICAL"
+      },
+      "cp3": {
+        "assertions": {
+          "prepared": "COMPLETE",
+          "analyses": 0,
+          "queries": 0,
+          "facts": 0
+        },
+        "hashes": {
+          "air.json": {
+            "old": "46919c1429db4aa310e66fc9df9374eeba53fd98e50a287fdd005c17622f33ad",
+            "new": "46919c1429db4aa310e66fc9df9374eeba53fd98e50a287fdd005c17622f33ad",
+            "byte_identical": true
+          },
+          "result.json": {
+            "old": "34d21be2b0daf6b2dd7673a599dbf95d1dccbeb9610283be34840ca0e75568b0",
+            "new": "34d21be2b0daf6b2dd7673a599dbf95d1dccbeb9610283be34840ca0e75568b0",
+            "byte_identical": true
+          },
+          "frontend/cobol-semantic-product.json": {
+            "old": "eab4f4c3902cd1661779d2a57e526b9d88999068cf35c92531f9df888f3c9954",
+            "new": "eab4f4c3902cd1661779d2a57e526b9d88999068cf35c92531f9df888f3c9954",
+            "byte_identical": true
+          },
+          "semantic-product-entry-goback.cbl": {
+            "old": "218b07a63098838ccd00c5aa5139620110045230975a20f1d5c285237e5ba67a",
+            "new": "218b07a63098838ccd00c5aa5139620110045230975a20f1d5c285237e5ba67a",
+            "byte_identical": true
+          }
+        },
+        "memory_file": "BYTE_IDENTICAL"
+      },
+      "generic-overwrite": {
+        "assertions": {
+          "candidate": "NEWER",
+          "producer": {
+            "domain": "operation",
+            "localId": "fb0e4051dc6c509849ea2c12755aff86",
+            "publication": "dff0630bef81a3648579e12ba2d0c8ea",
+            "unit": "unit"
+          },
+          "producer_kind": "real Assign",
+          "origin": {
+            "id": {
+              "domain": "origin",
+              "localId": "03604a019cfc597e2d3a551583a29e96",
+              "publication": "dff0630bef81a3648579e12ba2d0c8ea"
+            },
+            "inputs": [
+              {
+                "domain": "origin",
+                "localId": "73461710a99641aef52334de92667000",
+                "publication": "dff0630bef81a3648579e12ba2d0c8ea"
+              },
+              {
+                "domain": "origin",
+                "localId": "3a102e689c742d6d863263c0e2d1fb4f",
+                "publication": "dff0630bef81a3648579e12ba2d0c8ea"
+              }
+            ],
+            "kind": "derived",
+            "rule": "sp-provenance/original-expanded@1"
+          },
+          "model_remainder": false,
+          "source_remainder": true,
+          "effective_remainder": true,
+          "support": "last Assign"
+        },
+        "hashes": {
+          "air.json": {
+            "old": "14f5e554d5259a29265897b68f84abd3606d2ee627e09266bf86c36e57e4d7de",
+            "new": "14f5e554d5259a29265897b68f84abd3606d2ee627e09266bf86c36e57e4d7de",
+            "byte_identical": true
+          },
+          "result.json": {
+            "old": "3917538fb90c4c12bc2d4d85a5170fb6d2bc80b8cdec51840ad383e046fc4109",
+            "new": "3917538fb90c4c12bc2d4d85a5170fb6d2bc80b8cdec51840ad383e046fc4109",
+            "byte_identical": true
+          },
+          "frontend/cobol-semantic-product.json": {
+            "old": "8dcb91eb0310e58feb8cc4cae6a7b69ab3b26b5f377c2f8d103afcc28120a0bc",
+            "new": "8dcb91eb0310e58feb8cc4cae6a7b69ab3b26b5f377c2f8d103afcc28120a0bc",
+            "byte_identical": true
+          },
+          "AIR-MOVE.cbl": {
+            "old": "7e7002a4d2528916fa22b9c88109922cead966d09c4629801c28a0d5cfcdab31",
+            "new": "7e7002a4d2528916fa22b9c88109922cead966d09c4629801c28a0d5cfcdab31",
+            "byte_identical": true
+          }
+        },
+        "memory_file": "BYTE_IDENTICAL"
+      }
+    }
+  },
+  "harness_findings": {
+    "HARNESS-REGISTRY-DRIFT-001": "RESOLVED",
+    "W5-JAVAP-DIAGNOSTIC-CONTAMINATION-001": "RESOLVED",
+    "production_architecture_changed": false,
+    "historical_architecture_drift": "NOT PROVEN",
+    "investigation_history": "Initial historical failure NOT REPRODUCED then; later independent RED REPRODUCED as diagnostic contamination; prior STOPs and explicit lost-evidence limit retained."
+  },
+  "work_cfg_031": {
+    "sha": "5bec16d9c609fc37b7ad66c275004f1ed1c4a07e",
+    "merged": true,
+    "message": "Pull Request successfully merged",
+    "pr": 14,
+    "head": "3284f2927f6a09afdd9cf72c4edc4d151b3196ee",
+    "base": "15bd3afe1affdcb5ec49956960f884bde8c89498",
+    "head_tree": "e54c5332183d47507b888ffff9bcbe3ed70a3674",
+    "merge_tree": "e54c5332183d47507b888ffff9bcbe3ed70a3674",
+    "head_guard": true,
+    "ci_runs": [
+      {
+        "id": 34545471829,
+        "event": "pull_request",
+        "head_sha": "3284f2927f6a09afdd9cf72c4edc4d151b3196ee",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/Gustavo2358/analysis-cfg/actions/runs/34545471829"
+      },
+      {
+        "id": 34545444298,
+        "event": "push",
+        "head_sha": "3284f2927f6a09afdd9cf72c4edc4d151b3196ee",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/Gustavo2358/analysis-cfg/actions/runs/34545444298"
+      }
+    ],
+    "self_review": "Explicitly authorized agent self-review; no invented independent human review"
+  },
+  "synchronization": {
+    "sha": "89ee2ca3f922f021f149d4ad7273056d0c402b9f",
+    "merged": true,
+    "message": "Pull Request successfully merged",
+    "pr": 15,
+    "head": "ac07c69039f47724f9e2799fe43e05c6cbf79237",
+    "base": "5bec16d9c609fc37b7ad66c275004f1ed1c4a07e",
+    "head_tree": "696b3a196d20f8ac7eafb66a924a37722149aa54",
+    "merge_tree": "696b3a196d20f8ac7eafb66a924a37722149aa54",
+    "head_guard": true,
+    "ci_runs": [
+      {
+        "id": 34547494018,
+        "event": "pull_request",
+        "head_sha": "ac07c69039f47724f9e2799fe43e05c6cbf79237",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/Gustavo2358/analysis-cfg/actions/runs/34547494018"
+      },
+      {
+        "id": 34547479837,
+        "event": "push",
+        "head_sha": "ac07c69039f47724f9e2799fe43e05c6cbf79237",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/Gustavo2358/analysis-cfg/actions/runs/34547479837"
+      }
+    ],
+    "self_review": "Explicitly authorized agent self-review; no invented independent human review"
+  },
+  "nonblocking_backlog": {
+    "W3-PERF-01": "OPEN",
+    "W3-METRICS-01": "OPEN",
+    "117k broad qualification": "NOT EXECUTED / NONBLOCKING",
+    "general heap optimization": "DEFERRED",
+    "full streaming": "DEFERRED",
+    "lower amplification": "OPEN",
+    "IMPLEMENTATION_LIMIT diagnostic naming": "DEFERRED",
+    "GitHub Actions runtime deprecations": "NONBLOCKING: successful final CI annotated Node 20 actions running on Node 24 and setup-java v4 deprecation; dependency maintenance deferred",
+    "frontend JAR ZIP metadata": "Archive hashes vary; source and every uncompressed entry match. Exact consumed artifact hashes recorded."
+  },
+  "lifecycle": {
+    "CP5": "APPROVED / MERGED / CLOSED",
+    "CP6_BASELINE": "FROZEN / VERIFIED",
+    "CP6": "READY TO START / NOT IMPLEMENTED"
+  },
+  "not_implemented": {
+    "Invoke": true,
+    "CALL lowering": true,
+    "CallResolver": true,
+    "CP6 implementation": true
+  },
+  "evidence_sha256": {
+    "e2e/cp3/air.json.gz": "356a8cadf87566ef0c1f4a10ca1ef93de93701fdbac6df982fb92a82e0eff69b",
+    "e2e/cp3/analysis-process.json.gz": "e16439cabef7c1b4a8ba5d076a5069a142aaa7e63c46125123edeafb0e8ca487",
+    "e2e/cp3/analysis.stderr.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+    "e2e/cp3/analysis.stdout.gz": "4de40ca56fb975df31121e39e9374948d82d807216f1689a2cac9d83dcf66e10",
+    "e2e/cp3/frontend/app.js.gz": "78d4bb9ead724f6ae6fea1d69725a0f4dafcc9cbf7cad799c8f744486a5cb904",
+    "e2e/cp3/frontend/ast-app.js.gz": "fa62d956ce1403b4063b527ae44bd78689b3d73cf8ee90898bf4a7a52de9c107",
+    "e2e/cp3/frontend/ast-data.js.gz": "9c6c4de3ab2a984c2e853c36a0a95bd003f3c4ef49226e453deb6a0e4411ecdf",
+    "e2e/cp3/frontend/ast.html.gz": "19f270f1ac3593ba50447ab66ca76b85db1eda7ca07d2114ebf1ac12da965b75",
+    "e2e/cp3/frontend/cobol-semantic-product.json.gz": "0fee8be082f91d42ecedb31a4a9e1c88ced05cadae00a4e90927fb29dd3a5d5e",
+    "e2e/cp3/frontend/coverage-data.js.gz": "9c74981a8891139974079e331d70355f51aa5ef65bb0daf507bcaf2fadc34842",
+    "e2e/cp3/frontend/index.html.gz": "7f95867bc1b198c32fd640e15985b5f3b2d70dc2b93ad77efbae8a246a2faf89",
+    "e2e/cp3/frontend/preprocessed.cbl.gz": "a7e3115f70e3ab2fccb42ef8b61a743a5d61f8ccdd0752246067a6b2432b8147",
+    "e2e/cp3/frontend/resolution-app.js.gz": "80fc52516bedc2e24f52a409afb4dda69d1a97c76433705d0b7de707d245029c",
+    "e2e/cp3/frontend/resolution-data.js.gz": "cdbd5810db8e2cf465472e2e0ff7e523a680a74438482d95d1a9dcef5eaa970c",
+    "e2e/cp3/frontend/resolution.html.gz": "4de8f30e20125f142624620e297a3d1f499520744b7de6d9896dc9d005198228",
+    "e2e/cp3/frontend/semantic-product.json.gz": "0fee8be082f91d42ecedb31a4a9e1c88ced05cadae00a4e90927fb29dd3a5d5e",
+    "e2e/cp3/frontend/styles.css.gz": "02e7b67226d376442f99e1ac87e6caaaa6f9e03130293ad4104031a0af3b8acc",
+    "e2e/cp3/frontend/symbol-data.js.gz": "b90e409ccff58729f7dc8b4557f48c7bd3279ee425005229e8e5fdc679de6353",
+    "e2e/cp3/frontend/symbols-app.js.gz": "af6caff49da3fe1aa8eb7f17f9e59a027a03dc9448f7ffed034329b0c9bed39f",
+    "e2e/cp3/frontend/symbols.html.gz": "5fb2cb159295ba61072985d6041b8e0c8040492fa515c5ca6e369f2353550d3e",
+    "e2e/cp3/frontend/tree-data.js.gz": "061c7c6f437d96e4ce0397093db788cc29a3cb1818c846368ff61e99ffbc2653",
+    "e2e/cp3/frontend-process.json.gz": "0bd92b8275e1ebf078feb4ee4b7390076b01acf522d3d860a9c4928c1b6ca76b",
+    "e2e/cp3/frontend.stderr.gz": "b155555ddfdcb40209b9492523c5ddd62c8361348ad8c59513e330390f8d9acb",
+    "e2e/cp3/frontend.stdout.gz": "94bc617141e6df3e5c668e40699bc0ed3d3bc48a01c65c0d8573ebee02c12193",
+    "e2e/cp3/lower-process.json.gz": "38efd06a42f4e78c6b38a9736307c70e2956f2e7d626fdb1e1dbf065a417b6fb",
+    "e2e/cp3/lower.stderr.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+    "e2e/cp3/lower.stdout.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+    "e2e/cp3/memory-process.json.gz": "96f101755624fde498928a8108ec41dd860a1a441ca6da667a71fea7b0a0ec41",
+    "e2e/cp3/memory-result.json.gz": "d5f96b427d0dfa4ae7ea3553a45fbbdfb9df63e20acf0c7f6bccce86aa93c281",
+    "e2e/cp3/memory-semantics.json.gz": "b3c3c5b4eff2b73b7d3a0ce455eb6fbebc88b0be56718ae4cbcccbef23a19e78",
+    "e2e/cp3/memory.stderr.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+    "e2e/cp3/memory.stdout.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+    "e2e/cp3/result.json.gz": "d5f96b427d0dfa4ae7ea3553a45fbbdfb9df63e20acf0c7f6bccce86aa93c281",
+    "e2e/cp3/semantic-product-entry-goback.cbl.gz": "8ad54542a75f268972aea6b4416a353270ed10f566e49204f049ad9d4e7c03de",
+    "e2e/cp4e-a/AIR-MOVE.cbl.gz": "06b84a22811f0d1c6ac2b10e680d814039a9cd6af5b96c46abe7bf7c69d28d72",
+    "e2e/cp4e-a/air.json.gz": "1cd3c6eef17da4bfb8505243281c0692eb49a698c856e73dbbe87f2b1ffa209f",
+    "e2e/cp4e-a/analysis-process.json.gz": "d76657876ae80ccf9d3287dd3988a18b009aaa13a846656f4b3b4ab94316f02d",
+    "e2e/cp4e-a/analysis.stderr.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+    "e2e/cp4e-a/analysis.stdout.gz": "b4ca71079dee2275a1297051080b0dab171bae4ea4eb50af77f30a66b3c2d458",
+    "e2e/cp4e-a/frontend/app.js.gz": "78d4bb9ead724f6ae6fea1d69725a0f4dafcc9cbf7cad799c8f744486a5cb904",
+    "e2e/cp4e-a/frontend/ast-app.js.gz": "fa62d956ce1403b4063b527ae44bd78689b3d73cf8ee90898bf4a7a52de9c107",
+    "e2e/cp4e-a/frontend/ast-data.js.gz": "60a1ba7699a010cbebad4e2622f2cf3496ac10e86f2c6cd426240ee764f677e1",
+    "e2e/cp4e-a/frontend/ast.html.gz": "19f270f1ac3593ba50447ab66ca76b85db1eda7ca07d2114ebf1ac12da965b75",
+    "e2e/cp4e-a/frontend/cobol-semantic-product.json.gz": "ba2413c06a249b39302423527b4edfdadc45c85ed7e2db114ab866fd1b5e0601",
+    "e2e/cp4e-a/frontend/coverage-data.js.gz": "7d2f11384425acc2c39abf75fcdbee2324a138d1e332b0212e9ad1625db0ba30",
+    "e2e/cp4e-a/frontend/index.html.gz": "7f95867bc1b198c32fd640e15985b5f3b2d70dc2b93ad77efbae8a246a2faf89",
+    "e2e/cp4e-a/frontend/preprocessed.cbl.gz": "f0a6572a65c17e0594522b08a1982fe0af4f0091ba53e7c03394f21fc5745ea5",
+    "e2e/cp4e-a/frontend/resolution-app.js.gz": "80fc52516bedc2e24f52a409afb4dda69d1a97c76433705d0b7de707d245029c",
+    "e2e/cp4e-a/frontend/resolution-data.js.gz": "c82e91e60c1845c70d535787a34bfdfd461b319d4b707fa8ed8bcba0251e42cc",
+    "e2e/cp4e-a/frontend/resolution.html.gz": "4de8f30e20125f142624620e297a3d1f499520744b7de6d9896dc9d005198228",
+    "e2e/cp4e-a/frontend/semantic-product.json.gz": "ba2413c06a249b39302423527b4edfdadc45c85ed7e2db114ab866fd1b5e0601",
+    "e2e/cp4e-a/frontend/styles.css.gz": "02e7b67226d376442f99e1ac87e6caaaa6f9e03130293ad4104031a0af3b8acc",
+    "e2e/cp4e-a/frontend/symbol-data.js.gz": "d1f924d474ba2c5e3d7ac352a15bf8eef73f664dcf2010297c5422e1834f16f0",
+    "e2e/cp4e-a/frontend/symbols-app.js.gz": "af6caff49da3fe1aa8eb7f17f9e59a027a03dc9448f7ffed034329b0c9bed39f",
+    "e2e/cp4e-a/frontend/symbols.html.gz": "5fb2cb159295ba61072985d6041b8e0c8040492fa515c5ca6e369f2353550d3e",
+    "e2e/cp4e-a/frontend/tree-data.js.gz": "32056231e7f510f002403c8e47c10402d5674dc9d5198b698dde17b1f8cbaed8",
+    "e2e/cp4e-a/frontend-process.json.gz": "98226a85ee82d8cbeca7ba46621e4d612da563dd35fc8b8a3210eb765b46f751",
+    "e2e/cp4e-a/frontend.stderr.gz": "7e5e41589593e86b65fc137ac43bc20bf4faf8378c214e9ed2e0008ab44b0db3",
+    "e2e/cp4e-a/frontend.stdout.gz": "e1daedcc1f6f47e38a5b351045fc8637f70f01802f19d4c9e2a7dab8cf783b3f",
+    "e2e/cp4e-a/lower-process.json.gz": "68f434974441b392a9deb20d7d01cc6dca66df6b9339357caf9d235ac94adb5a",
+    "e2e/cp4e-a/lower.stderr.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+    "e2e/cp4e-a/lower.stdout.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+    "e2e/cp4e-a/memory-process.json.gz": "ee76d42c18cb66384068b2ff56c00c21301dbabe2c8a31c1c469842b506847c4",
+    "e2e/cp4e-a/memory-result.json.gz": "c475ea1bd8573cf9c7359745dea9c6ea2e7cf5fdeeaf46b66f41e99edaca212e",
+    "e2e/cp4e-a/memory-semantics.json.gz": "4f143b4919dc606ad87bb4ac902ff4b4e3ae9ec07d67c9b1d68d9cf1d9b1bdb7",
+    "e2e/cp4e-a/memory.stderr.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+    "e2e/cp4e-a/memory.stdout.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+    "e2e/cp4e-a/result.json.gz": "c475ea1bd8573cf9c7359745dea9c6ea2e7cf5fdeeaf46b66f41e99edaca212e",
+    "e2e/cp4e-b/AIR-MOVE.cbl.gz": "06b84a22811f0d1c6ac2b10e680d814039a9cd6af5b96c46abe7bf7c69d28d72",
+    "e2e/cp4e-b/air.json.gz": "1cd3c6eef17da4bfb8505243281c0692eb49a698c856e73dbbe87f2b1ffa209f",
+    "e2e/cp4e-b/analysis-process.json.gz": "01698b883e7676bfcf456ec0c59cfd7033e54fb696bb7c9029eed63e07b7a8e2",
+    "e2e/cp4e-b/analysis.stderr.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+    "e2e/cp4e-b/analysis.stdout.gz": "bbd39ceef2d4394b18f84ca518b72216aa5782d4c630bd4972bd094a28174271",
+    "e2e/cp4e-b/frontend/app.js.gz": "78d4bb9ead724f6ae6fea1d69725a0f4dafcc9cbf7cad799c8f744486a5cb904",
+    "e2e/cp4e-b/frontend/ast-app.js.gz": "fa62d956ce1403b4063b527ae44bd78689b3d73cf8ee90898bf4a7a52de9c107",
+    "e2e/cp4e-b/frontend/ast-data.js.gz": "60a1ba7699a010cbebad4e2622f2cf3496ac10e86f2c6cd426240ee764f677e1",
+    "e2e/cp4e-b/frontend/ast.html.gz": "19f270f1ac3593ba50447ab66ca76b85db1eda7ca07d2114ebf1ac12da965b75",
+    "e2e/cp4e-b/frontend/cobol-semantic-product.json.gz": "ba2413c06a249b39302423527b4edfdadc45c85ed7e2db114ab866fd1b5e0601",
+    "e2e/cp4e-b/frontend/coverage-data.js.gz": "7d2f11384425acc2c39abf75fcdbee2324a138d1e332b0212e9ad1625db0ba30",
+    "e2e/cp4e-b/frontend/index.html.gz": "7f95867bc1b198c32fd640e15985b5f3b2d70dc2b93ad77efbae8a246a2faf89",
+    "e2e/cp4e-b/frontend/preprocessed.cbl.gz": "f0a6572a65c17e0594522b08a1982fe0af4f0091ba53e7c03394f21fc5745ea5",
+    "e2e/cp4e-b/frontend/resolution-app.js.gz": "80fc52516bedc2e24f52a409afb4dda69d1a97c76433705d0b7de707d245029c",
+    "e2e/cp4e-b/frontend/resolution-data.js.gz": "c82e91e60c1845c70d535787a34bfdfd461b319d4b707fa8ed8bcba0251e42cc",
+    "e2e/cp4e-b/frontend/resolution.html.gz": "4de8f30e20125f142624620e297a3d1f499520744b7de6d9896dc9d005198228",
+    "e2e/cp4e-b/frontend/semantic-product.json.gz": "ba2413c06a249b39302423527b4edfdadc45c85ed7e2db114ab866fd1b5e0601",
+    "e2e/cp4e-b/frontend/styles.css.gz": "02e7b67226d376442f99e1ac87e6caaaa6f9e03130293ad4104031a0af3b8acc",
+    "e2e/cp4e-b/frontend/symbol-data.js.gz": "d1f924d474ba2c5e3d7ac352a15bf8eef73f664dcf2010297c5422e1834f16f0",
+    "e2e/cp4e-b/frontend/symbols-app.js.gz": "af6caff49da3fe1aa8eb7f17f9e59a027a03dc9448f7ffed034329b0c9bed39f",
+    "e2e/cp4e-b/frontend/symbols.html.gz": "5fb2cb159295ba61072985d6041b8e0c8040492fa515c5ca6e369f2353550d3e",
+    "e2e/cp4e-b/frontend/tree-data.js.gz": "32056231e7f510f002403c8e47c10402d5674dc9d5198b698dde17b1f8cbaed8",
+    "e2e/cp4e-b/frontend-process.json.gz": "0ee4da5036e6183adfcc9ec5d949a7f3bb763d6f5d3e4e06ff6ceb78853d1f54",
+    "e2e/cp4e-b/frontend.stderr.gz": "e365ba2174904e4a66d091319387d5351a717ed3c1548c267aca99f524b2bb57",
+    "e2e/cp4e-b/frontend.stdout.gz": "fc208bdc06a6d3b3254a74e7973979169a2ee05032a76d22db17f5bd7cd2beb1",
+    "e2e/cp4e-b/lower-process.json.gz": "24b23d19834d35d208387e84c6eae8893b32d73ae9d6fc1fdb6f56b13d69d575",
+    "e2e/cp4e-b/lower.stderr.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+    "e2e/cp4e-b/lower.stdout.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+    "e2e/cp4e-b/memory-process.json.gz": "89eebe8f537aceae77b7f973f55ad446a6d0772f4264f8ddf7a410322c16336e",
+    "e2e/cp4e-b/memory-result.json.gz": "c475ea1bd8573cf9c7359745dea9c6ea2e7cf5fdeeaf46b66f41e99edaca212e",
+    "e2e/cp4e-b/memory-semantics.json.gz": "4f143b4919dc606ad87bb4ac902ff4b4e3ae9ec07d67c9b1d68d9cf1d9b1bdb7",
+    "e2e/cp4e-b/memory.stderr.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+    "e2e/cp4e-b/memory.stdout.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+    "e2e/cp4e-b/result.json.gz": "c475ea1bd8573cf9c7359745dea9c6ea2e7cf5fdeeaf46b66f41e99edaca212e",
+    "e2e/generic-overwrite/AIR-MOVE.cbl.gz": "6704782d3b9556a0d0ac874dd1aae6d8650763ed4fb5a18af26a32dffa8d67d5",
+    "e2e/generic-overwrite/air.json.gz": "57bd0f9702041b7f6349500389cc6c19ff1c06c068f4c036a5f56a62b98d29e9",
+    "e2e/generic-overwrite/analysis-process.json.gz": "8c9c8c8aca447060290adac46f7caefd1f80cc4bf436c499de6d0f4b4ae2b62f",
+    "e2e/generic-overwrite/analysis.stderr.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+    "e2e/generic-overwrite/analysis.stdout.gz": "eb47600763d8c8017d21d09a64ad5367466509c098f05667690d2397a8290470",
+    "e2e/generic-overwrite/frontend/app.js.gz": "78d4bb9ead724f6ae6fea1d69725a0f4dafcc9cbf7cad799c8f744486a5cb904",
+    "e2e/generic-overwrite/frontend/ast-app.js.gz": "fa62d956ce1403b4063b527ae44bd78689b3d73cf8ee90898bf4a7a52de9c107",
+    "e2e/generic-overwrite/frontend/ast-data.js.gz": "cd3d79110e8bc9841258bd6adb9549d4de0e0243b597c1acf5c317925f8e597f",
+    "e2e/generic-overwrite/frontend/ast.html.gz": "19f270f1ac3593ba50447ab66ca76b85db1eda7ca07d2114ebf1ac12da965b75",
+    "e2e/generic-overwrite/frontend/cobol-semantic-product.json.gz": "9ba36b8544f57aa83a78512f5c0136aeaf2850db67e68218d0eb2dca3d7e3a91",
+    "e2e/generic-overwrite/frontend/coverage-data.js.gz": "47dc99a0119f9b1becf179d292ef381882c79a094bb07386aaf21d4ffbdf6c54",
+    "e2e/generic-overwrite/frontend/index.html.gz": "7f95867bc1b198c32fd640e15985b5f3b2d70dc2b93ad77efbae8a246a2faf89",
+    "e2e/generic-overwrite/frontend/preprocessed.cbl.gz": "a102375f0d2680b61d423248703897578f3791d9b977800cff1fcf0008fad736",
+    "e2e/generic-overwrite/frontend/resolution-app.js.gz": "80fc52516bedc2e24f52a409afb4dda69d1a97c76433705d0b7de707d245029c",
+    "e2e/generic-overwrite/frontend/resolution-data.js.gz": "1b3c829c1707cd7621a164df29880948619ad3a553a23459dec39ff7c99c426f",
+    "e2e/generic-overwrite/frontend/resolution.html.gz": "4de8f30e20125f142624620e297a3d1f499520744b7de6d9896dc9d005198228",
+    "e2e/generic-overwrite/frontend/semantic-product.json.gz": "9ba36b8544f57aa83a78512f5c0136aeaf2850db67e68218d0eb2dca3d7e3a91",
+    "e2e/generic-overwrite/frontend/styles.css.gz": "02e7b67226d376442f99e1ac87e6caaaa6f9e03130293ad4104031a0af3b8acc",
+    "e2e/generic-overwrite/frontend/symbol-data.js.gz": "8a01fce12215040f175d5d06a8410ef76837bfa8091c8e181cf9d8a97ccd4320",
+    "e2e/generic-overwrite/frontend/symbols-app.js.gz": "af6caff49da3fe1aa8eb7f17f9e59a027a03dc9448f7ffed034329b0c9bed39f",
+    "e2e/generic-overwrite/frontend/symbols.html.gz": "5fb2cb159295ba61072985d6041b8e0c8040492fa515c5ca6e369f2353550d3e",
+    "e2e/generic-overwrite/frontend/tree-data.js.gz": "09ef77a64c3da8f1c1cdcb876dc32f765f514eeddbdd181c2d32fc9bcb06eb22",
+    "e2e/generic-overwrite/frontend-process.json.gz": "43c0f8ec4a9fc67016a6e08419928afa2f8189ead176463df3791f6e29fc39b1",
+    "e2e/generic-overwrite/frontend.stderr.gz": "88ddb7ee0597283b6a0ad80ae4964b934b884fb4876406344f92975c96a3bdaf",
+    "e2e/generic-overwrite/frontend.stdout.gz": "54415e59978f7c3c3e50842adde9b1ccb79be12dab5633edba44cadd2b14e1a1",
+    "e2e/generic-overwrite/lower-process.json.gz": "21f13848df8f5a6ab5d57a2a738ba58bb3c23bb47e42c73fc7ade924607c5806",
+    "e2e/generic-overwrite/lower.stderr.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+    "e2e/generic-overwrite/lower.stdout.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+    "e2e/generic-overwrite/memory-process.json.gz": "75e68c7ebf90aded76f39c6ec79efcd5dea88bb80cb7abd93f8f1d9518025bd1",
+    "e2e/generic-overwrite/memory-result.json.gz": "8d04b1e4f1d55e3a6e777bebf5f985ebbb564ab3f584911f96900fff10fbab5c",
+    "e2e/generic-overwrite/memory-semantics.json.gz": "38a4048ddab734dca1391aedfa3e59fb5b3fd0fbca90da925f1c308caac45176",
+    "e2e/generic-overwrite/memory.stderr.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+    "e2e/generic-overwrite/memory.stdout.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+    "e2e/generic-overwrite/result.json.gz": "8d04b1e4f1d55e3a6e777bebf5f985ebbb564ab3f584911f96900fff10fbab5c",
+    "e2e/receipt.json.gz": "8c17c62d98bf7b21157069bd84fe14be8b2e0adf1de844b9899a247826fc4a61",
+    "gates/architecture.log.gz": "7685953e2bd33fc7df6c3546490b2ba166cb1939bac0b19f54f722da47ba289e",
+    "gates/diff-check.log.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+    "gates/docs.log.gz": "455c24eb08da800b365f85d340c16d8f360272da515c71d99a97ee0a0805005e",
+    "gates/e2e-comparison.json": "372223e4395f425dd84f53ca6462bf9ab5529c9a676046013a374a705633015c",
+    "gates/e2e-comparison.log.gz": "82fedee5e4506dd458e2dcf55f8d892bdc467061a8bb65ee64b8c267b6b78db8",
+    "gates/environment.json": "8744b2683706c0fc0a61fd9a7a7e5a7e9e40ea206bc88b8b3558a52e5c536836",
+    "gates/fast.log.gz": "b048b3cd642e64d3e438a002bdadfe5c125cf46a62dbc583d8933b8e1db3674c",
+    "gates/focal-observation/receipt.json": "9410517dbebb7a88183bfcc20bf70d0b0188bccd57aebb444ded501edf002428",
+    "gates/focal.log.gz": "828b21fb599acdb6b8ca9fdfe53b87eaac7aed1787442b9190a0dcb275a5ba22",
+    "gates/full.log.gz": "babbff9220784f6baec6494144c4fb2b7aea848980eaa8681e4f339e2b315e6d",
+    "gates/integration.log.gz": "11a13c40da859b933af3bf59aaa2c6989d1719cf9dfb31a9d55fd6d97e259d9e",
+    "gates/inventory-adversarial.json": "b0d0a576d78fc08abe2eaf276bacee0fe0fac297229b638bef2b07f9d7dfe306",
+    "gates/maven-summary.json": "978d96833b35d2bced636118998af85a1dd5d96627a67f12cee1ac3af987219e",
+    "gates/maven.log.gz": "bdcd87ca9093544caa7e3082806d787c067fac51f4c8732d7bab07c2c68e590a",
+    "gates/performance.log.gz": "b49ccbd2b160f66fcbcf4614f926eb41559991b8a22fd7554c11457afef9e9dd",
+    "gates/results.json": "a4b305d2b82b490d2513d322672036314e21915e295d74eaf38826640e4c4d75",
+    "gates/scope-manifest.log.gz": "85f0cf64b1073a652dd60a8c2452ce2c46ea986c7bd37de5f782b1ec730b91bb",
+    "gates/scope.log.gz": "85f0cf64b1073a652dd60a8c2452ce2c46ea986c7bd37de5f782b1ec730b91bb",
+    "gates/semantic.log.gz": "a28e04f5eeb8252c3044092a8436e8831ab031135af36dd7d1985db607c526bd",
+    "gates/source-preservation.json": "1d517abd92c66382881af38cace7dd4418dd1648d124fcb77d2c3c3dff7db429",
+    "gates/w5-adversarial.log.gz": "ca03765819fb5fc771ac778a6a4c7fcbbfc52dd40772bd2583f92761d33ffb21",
+    "gates/w5-isolated.log.gz": "99cc9953dfd6c49b8fc734db20ab221f6f344fe3a17ed39d669f6e111f1367e1",
+    "provenance/candidate/air-receipt.json": "dab5c348c5e58424d6f6a674476f8716a73166997e63a9f0cdf2c49dd6e6f64e",
+    "provenance/candidate/build/environment.json": "8744b2683706c0fc0a61fd9a7a7e5a7e9e40ea206bc88b8b3558a52e5c536836",
+    "provenance/candidate/build/results.json": "7def7c6041b40f6e6b4c96979ab876955162ee24de18c3741b025f81c66a3a58",
+    "provenance/candidate/producers/producers.json": "19809b5879b92d6ff47d999df6ae50be257ef439bcf31b86fdfb6e1b4cc2fe30",
+    "provenance/candidate/sources.json": "ea991dde54c1a564b40a80bc525579ee88246e9e031b41c39cefcb069a58611b",
+    "provenance/delta-review/air-jar-equality.json": "66c20a42c63d270ca0dbc018ecaf4bcb0d077576294dc773beaf23de39b9fb66",
+    "provenance/delta-review/air-java.patch.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+    "provenance/delta-review/analysis-ir.patch.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+    "provenance/delta-review/cobol-lower.patch.gz": "c19de07273985d45d5e19d18c73a6cd6744c55b689d9da20c9e52791de53602a",
+    "provenance/delta-review/lock-synchronization.json": "52c81fd1bc86163b8a281dc3a3898c914b1acd85226d84bb0f416a6017a186c2",
+    "provenance/delta-review/proleap-poc.patch.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+    "provenance/delta-review/review.json": "f2ee8769c6dd485cd48a028ed2498ff4a9c3ff2bd45c434d091880245bfd0b27",
+    "provenance/final-main-ci.json": "024f13fff80fa2733983127a9b3fc1f16142473e5fa44a8ff4da8ab7672347f6",
+    "provenance/final-source.json": "0f55e05437a844e03aa5be6d0573ee248a2e42a1cea401b659d8d0157b609060",
+    "provenance/main/air-receipt.json": "81733eeb559a2746a95dd676343de58a2ca0c9faca5b3083082ab617ddb5451a",
+    "provenance/main/build/environment.json": "e91e11787e1f8f6bdc49c2836128c77f1a6ff53f31562f8dcdeaa67c5fd80ab0",
+    "provenance/main/build/results.json": "5a1a673d5db1cbd17cd407bcce2892d2586f126f67b26e314944912433c5fe94",
+    "provenance/main/producers/producers.json": "e1a3f772d42ddca0ca3b155bbd0ab8aea4f8aff42a34097e7842f97e4729afb0",
+    "provenance/main/sources.json": "934f736829a500885e98fb776a6e170c8bd6c075cc9ab89ff9980b815c30abe1",
+    "provenance/preserved-original-sync-commit.json": "94a774e2ec8a8cba2ba87e5283a3296a01175aaccb1075adb322c0d51a386211",
+    "provenance/remote-final.json": "dabe686cc24c4b571e6c38ba621d8c13bf3044a8f329ab6849487c8508f508e9",
+    "provenance/remote-start.json": "e5110b6e0ccbfcb69c71304de02c1549151b43457562c4b58ecde65290385f95",
+    "provenance/stale-worktree-observation.json": "5d38327adaaf7be7cfea7c628dc7cb75d8a768b366f6f1f01bc6751764ab5efa",
+    "provenance/sync-merge.json": "dbecd4f00bdff481af79dad60d9d80b83f7fc9c99d3e619aa599ae7b2146b12b",
+    "provenance/w31-merge.json": "d6532f8a0eda68fd843678a1aeac096af58effba68e0024365abcff452ab4ca3",
+    "remote/ci-final-main/34549136440/ci-source-receipt.json": "bc4e0d378317d580275d3f490699b1d058f17a4ef6762ad58b13be2f5c3bfdaa",
+    "remote/ci-final-main/34549136440/jobs.json": "ba690165af5d6675bce8398abe5e5677931fc558c9902e72d625e28371908710",
+    "remote/ci-final-main/status.json": "024f13fff80fa2733983127a9b3fc1f16142473e5fa44a8ff4da8ab7672347f6",
+    "remote/ci-final-main/watch.log.gz": "97769e92f3dde1b4c261012519bdf692639a27d8d37de00bf50d132502a2937b",
+    "remote/ci-sync/34547479837/ci-source-receipt.json": "7689a0fd9fea588fb99a84d39acc756de090e0cd220dab9b85071272d4349a64",
+    "remote/ci-sync/34547479837/jobs.json": "9100d14fac8c1dde44e275b0402acdb0533323a20787bec11862afb32d666b7b",
+    "remote/ci-sync/34547494018/ci-source-receipt.json": "6dc19a0fc5b66375a85a721219e1061df1f9b3ae9ca219942c24a78c14837644",
+    "remote/ci-sync/34547494018/jobs.json": "bdf8cb67bcd8ab7a3243238f80a209f08e0987f33279acd88a549bc84d796f98",
+    "remote/ci-sync/pr-watch.log.gz": "691016cea723a260d06131f43ec39b23ea38f7eaaf7dfa3ffcd36746f2c9dc07",
+    "remote/ci-sync/push-watch.log.gz": "aade4872fa193a9b4d7baf07b2158932b5ce2efaff3e6d7a19ffd3cbb6efb6b1",
+    "remote/ci-sync/self-review.md": "3c1730a137799beace40d5897135c7985b31ef6c7aef38a9174281c25bcc3a20",
+    "remote/ci-sync/status.json": "278faf64f0898e3409bbb0b08082079fac0f1613e6d8f311a9d76a6905ed4d9d",
+    "remote/ci-w31/34545444298/ci-source-receipt.json": "810a78080befc6304cd8a86c2f8df3987f3f99a489f4d36c5d68e1df7622ca5a",
+    "remote/ci-w31/34545444298/jobs.json": "c73d125163fb7db84a42700ece6a22cb1566dbb5bc182b3f679b4e13cf761a01",
+    "remote/ci-w31/34545471829/ci-source-receipt.json": "d9d0ba8e0fb13a7ceb8f27f312a40a9492827bff12952811eee7e96c4b0fa0d1",
+    "remote/ci-w31/34545471829/jobs.json": "2e9702cb60ef1f9e0e41273bf8f4098d1cfd59b721347369a6aa0dfc3dc394b4",
+    "remote/ci-w31/push-watch.log.gz": "689ca12794e83d8a916fcbd9b44c65cb3b0767c8920782f44ae725751bd37e12",
+    "remote/ci-w31/self-review.md": "402b6669b16a0b403a70267e36134c96953ccb9431e82e351bd383fd7f05e703",
+    "remote/ci-w31/status.json": "beb80c5e9f8d14d8282d336ba2d5872574f4e6bac6ce159ada719790169829e5",
+    "scripts/compare_e2e.py": "052a8a0dd6a85de7c85ab152d2294f7160d907488ca41ef496b02f3bbe81e850",
+    "scripts/prepare-final-validation.py": "1c8833ab2f66f8ab94b12f57ce72209a68685f095e5048e283bbdd30e8d60b53",
+    "scripts/render-handoff.py": "df1fbde7740fe4d841f40b3873b7ca8a71aabe751325b47655c4c2cfc9fc2742",
+    "scripts/run.py": "44e79ce889ed5af39ff89e6ec904b7398164b912d34a85ac17518b3d1d21f3a8",
+    "scripts/verify_baseline.py": "0b3f1339dde3ea263422f400ca832e9acf68c517877e331e568cabb6ee3fef4a"
+  }
+}

@@ -3,6 +3,8 @@
 **Estado:** `planned`. **Fase:** `structure`. **Autorização:** backlog não autoriza execução.
 Dependências: BACKLOG-CFG-006.
 
+[WORK-CFG-032](../active/WORK-CFG-032/work-item.json) autoriza somente discovery CP6 de target/dependency, relacionado à fronteira Invoke deste backlog. O escopo produtivo amplo abaixo continua planned e não autorizado.
+
 ## Problema e objetivo observável
 
 Preservar sites de chamada, outcomes e saídas excepcionais sem resolver targets ou

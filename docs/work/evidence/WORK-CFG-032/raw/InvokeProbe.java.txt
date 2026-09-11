@@ -1,0 +1,19 @@
+import io.github.gustavo2358.air.model.*;
+import io.github.gustavo2358.air.validation.*;
+import io.github.gustavo2358.air.json.*;
+import io.github.gustavo2358.analysis.cfg.application.*;
+import io.github.gustavo2358.analysis.cfg.extension.*;
+import java.lang.reflect.*;
+public class InvokeProbe {
+  public static void main(String[] args) throws Exception {
+    var fixture=Class.forName("io.github.gustavo2358.air.validation.ContractSuite").getDeclaredMethod("literalInvokeFixture");fixture.setAccessible(true);
+    var f=fixture.invoke(null);var build=f.getClass().getDeclaredMethod("build");build.setAccessible(true);var p=(Publication)build.invoke(f);
+    var v=AirValidator.validate(p);System.out.println("validator="+v.status()+" diagnostics="+v.diagnostics()+" issues="+v.issues());
+    try {new AirJson().encode(p);throw new AssertionError("unexpected encoded Invoke");} catch(AirJsonException x){System.out.println("encode="+x.code()+" path="+x.path()+" message="+x.getMessage());}
+    // Diagnostic reflection isolates the existing validation policy after coverage, without modifying the codec.
+    var policy=AirJson.class.getDeclaredMethod("validate",Publication.class);policy.setAccessible(true);
+    try {policy.invoke(new AirJson(),p);throw new AssertionError("unexpected accepted validation policy");} catch(InvocationTargetException x){var failure=(AirJsonException)x.getCause();System.out.println("isolated codec policy="+failure.code()+" issues="+failure.issues());}
+    var cfg=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).build(p,BuildOptions.defaults());System.out.println("CfgBuild="+cfg.status()+" issues="+cfg.projectionIssues());
+    System.out.println("Frozen air-java fixture with KnownContract, not COBOL E2E evidence and not a producer contract proposal.");
+  }
+}
