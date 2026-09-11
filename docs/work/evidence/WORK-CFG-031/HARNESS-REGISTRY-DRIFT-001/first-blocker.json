@@ -1,0 +1,90 @@
+{
+  "status": "STOP_FOR_HUMAN_REVIEW",
+  "provisional_id": "W5-JAVAP-DIAGNOSTIC-CONTAMINATION-001",
+  "harness_finding": "RESOLVED",
+  "historical_inventory_issue": "REPRODUCED (new exact W5 inventory oracle RED); historical causal identity NOT ESTABLISHED",
+  "first_failing_gate": "architecture",
+  "first_failing_oracle": "check_w5.py:68 expected compiled inventory equals actual",
+  "command": [
+    "bash",
+    "scripts/harness/check-architecture.sh"
+  ],
+  "cwd": "/home/gustavo/workspace/teste-e2e/.w5-recovery/remediation/candidate",
+  "exit_code": 1,
+  "expected": "Exact equality with docs/evals/resource-limit-w5-inventory.json",
+  "observed": "W5 compiled inventory drift; one javap_descriptors entry contains JVM hsperfdata lock warning prefix",
+  "differences": [
+    {
+      "module": "analysis-adapters",
+      "field": "javap_descriptors",
+      "key": "io/github/gustavo2358/analysis/adapters/LocalResultWriter$Attempt.class",
+      "expected_sha256": "95e71064260bc91f4c83825d2a632c5e383f89fd1b7bf3e4f62366af8616cf4f",
+      "actual_sha256": "47d4b5606ed1722177291b2748fe42ac39b5eeafd81c1db7586cfa3bfedd9c2b",
+      "extra_prefix": "[0.001s][warning][perf,memops] Cannot use file /tmp/hsperfdata_gustavo/4248 because it is locked by another process (errno = 11)\n",
+      "expected": "Compiled from \"LocalResultWriter.java\"\npublic final class io.github.gustavo2358.analysis.adapters.LocalResultWriter$Attempt extends java.lang.Record {\n  public io.github.gustavo2358.analysis.adapters.LocalResultWriter$Attempt(io.github.gustavo2358.analysis.adapters.DeliveryReceipt, java.util.Map<java.lang.String, java.lang.Long>);\n    descriptor: (Lio/github/gustavo2358/analysis/adapters/DeliveryReceipt;Ljava/util/Map;)V\n\n  public final java.lang.String toString();\n    descriptor: ()Ljava/lang/String;\n\n  public final int hashCode();\n    descriptor: ()I\n\n  public final boolean equals(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)Z\n\n  public io.github.gustavo2358.analysis.adapters.DeliveryReceipt receipt();\n    descriptor: ()Lio/github/gustavo2358/analysis/adapters/DeliveryReceipt;\n\n  public java.util.Map<java.lang.String, java.lang.Long> metrics();\n    descriptor: ()Ljava/util/Map;\n}\n",
+      "observed": "[0.001s][warning][perf,memops] Cannot use file /tmp/hsperfdata_gustavo/4248 because it is locked by another process (errno = 11)\nCompiled from \"LocalResultWriter.java\"\npublic final class io.github.gustavo2358.analysis.adapters.LocalResultWriter$Attempt extends java.lang.Record {\n  public io.github.gustavo2358.analysis.adapters.LocalResultWriter$Attempt(io.github.gustavo2358.analysis.adapters.DeliveryReceipt, java.util.Map<java.lang.String, java.lang.Long>);\n    descriptor: (Lio/github/gustavo2358/analysis/adapters/DeliveryReceipt;Ljava/util/Map;)V\n\n  public final java.lang.String toString();\n    descriptor: ()Ljava/lang/String;\n\n  public final int hashCode();\n    descriptor: ()I\n\n  public final boolean equals(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)Z\n\n  public io.github.gustavo2358.analysis.adapters.DeliveryReceipt receipt();\n    descriptor: ()Lio/github/gustavo2358/analysis/adapters/DeliveryReceipt;\n\n  public java.util.Map<java.lang.String, java.lang.Long> metrics();\n    descriptor: ()Ljava/util/Map;\n}\n"
+    }
+  ],
+  "expected_file_sha256": "f74ef96cc97720767dd267f421d48cbf54784600bf6c7aa0eb229fd19a7c93a5",
+  "expected_canonical_sha256": "f7f268d52d267cd6a1a6052dbd4326588a9f87c58178a4074c498d0f6c969cee",
+  "actual_canonical_sha256": "994e46f0f0161b386e586812ce8f40703187661df9b3fec03861a1f63b09344d",
+  "log_sha256": "d312efecd2a53c2c7c2c62e3fbb539b33600252cccc4bc7234e9589733d38d93",
+  "reproduction": "One exact observed failure. Repeated/deterministic reproduction NOT ESTABLISHED; no rerun after mandatory STOP.",
+  "main_also_fails": false,
+  "main_evidence": "Fresh main architecture and separate full both PASS",
+  "candidate_w5_isolated": "NOT RUN after STOP (historical PASS only)",
+  "candidate_full": "NOT RUN after STOP",
+  "relevant_files": [
+    "scripts/project/check_w5.py:68",
+    "docs/evals/resource-limit-w5-inventory.json",
+    "analysis-adapters/target/classes/io/github/gustavo2358/analysis/adapters/LocalResultWriter$Attempt.class"
+  ],
+  "environment": {
+    "PATH": "/home/gustavo/workspace/teste-e2e/.w5-recovery/toolchains/jdk-21.0.12.1+1/bin:/home/gustavo/.codex/tmp/arg0/codex-arg0onmbkv:/home/gustavo/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/home/gustavo/.nvm/versions/node/v24.19.0/bin:/home/gustavo/.sdkman/candidates/maven/current/bin:/home/gustavo/.sdkman/candidates/java/current/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin:/home/gustavo/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/usr/lib/chatgpt/resources",
+    "JAVA_HOME": "/home/gustavo/workspace/teste-e2e/.w5-recovery/toolchains/jdk-21.0.12.1+1",
+    "MAVEN_OPTS": "-Xmx3g -Dmaven.repo.local=/home/gustavo/workspace/teste-e2e/.w5-recovery/sync-env/m2",
+    "MAVEN_ARGS": null,
+    "W5_PRODUCERS": "/home/gustavo/workspace/teste-e2e/.w5-recovery/sync-env/producers/producers.json",
+    "maven.repo.local": "/home/gustavo/workspace/teste-e2e/.w5-recovery/sync-env/m2",
+    "tools": {
+      "java": {
+        "which": "/home/gustavo/workspace/teste-e2e/.w5-recovery/toolchains/jdk-21.0.12.1+1/bin/java",
+        "realpath": "/home/gustavo/workspace/teste-e2e/.w5-recovery/toolchains/jdk-21.0.12.1+1/bin/java",
+        "output": "openjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)\n",
+        "exit_code": 0
+      },
+      "javac": {
+        "which": "/home/gustavo/workspace/teste-e2e/.w5-recovery/toolchains/jdk-21.0.12.1+1/bin/javac",
+        "realpath": "/home/gustavo/workspace/teste-e2e/.w5-recovery/toolchains/jdk-21.0.12.1+1/bin/javac",
+        "output": "javac 21.0.12.1\n",
+        "exit_code": 0
+      },
+      "javap": {
+        "which": "/home/gustavo/workspace/teste-e2e/.w5-recovery/toolchains/jdk-21.0.12.1+1/bin/javap",
+        "realpath": "/home/gustavo/workspace/teste-e2e/.w5-recovery/toolchains/jdk-21.0.12.1+1/bin/javap",
+        "output": "21.0.12.1\n",
+        "exit_code": 0
+      },
+      "jdeps": {
+        "which": "/home/gustavo/workspace/teste-e2e/.w5-recovery/toolchains/jdk-21.0.12.1+1/bin/jdeps",
+        "realpath": "/home/gustavo/workspace/teste-e2e/.w5-recovery/toolchains/jdk-21.0.12.1+1/bin/jdeps",
+        "output": "21.0.12.1\n",
+        "exit_code": 0
+      },
+      "mvn": {
+        "which": "/home/gustavo/.sdkman/candidates/maven/current/bin/mvn",
+        "realpath": "/home/gustavo/.sdkman/candidates/maven/3.9.16/bin/mvn",
+        "output": "Apache Maven 3.9.16 (2bdd9fddda4b155ebf8000e807eb73fd829a51d5)\nMaven home: /home/gustavo/.sdkman/candidates/maven/current\nJava version: 21.0.12.1, vendor: Eclipse Adoptium, runtime: /home/gustavo/workspace/teste-e2e/.w5-recovery/toolchains/jdk-21.0.12.1+1\nDefault locale: en, platform encoding: UTF-8\nOS name: \"linux\", version: \"7.0.0-31-generic\", arch: \"amd64\", family: \"unix\"\n",
+        "exit_code": 0
+      }
+    }
+  },
+  "candidate_production_bytes_unchanged": true,
+  "build_state_archive": {
+    "path": "/home/gustavo/workspace/teste-e2e/.w5-recovery/remediation/candidate-failure-build-state.tar.gz",
+    "sha256": "ac7a7e5ce80348a7d6175971a95bc72479bde243b8840df5cfa15d70a467aee6",
+    "committed": false
+  },
+  "no_remediation_attempted": true,
+  "publication": "Commit/push/PR/remote CI NOT RUN because explicit architecture-failure STOP applies"
+}

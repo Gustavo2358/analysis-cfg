@@ -1,0 +1,8 @@
+{
+  "classification": "Class A evidence packaging",
+  "raw_files_byte_exact": true,
+  "attributes": "docs/work/evidence/WORK-CFG-031/HARNESS-REGISTRY-DRIFT-001/harness-only.patch: whitespace: unset\ndocs/work/evidence/WORK-CFG-031/HARNESS-REGISTRY-DRIFT-001/old-blocked.log: whitespace: unset\ndocs/work/evidence/WORK-CFG-031/HARNESS-REGISTRY-DRIFT-001/ritual-red.log: whitespace: unset\ndocs/work/evidence/WORK-CFG-031/javap-remediation/harness.patch: whitespace: unset\nscripts/project/check_w5.py: whitespace: unspecified\n",
+  "diff_check_exit": 0,
+  "unrelated_text_whitespace_red_exit": 3,
+  "unrelated_text_diagnostic": "/tmp/whitespace-oracle-oomhco_n/after.txt:1: trailing whitespace.\n+source with error \n"
+}

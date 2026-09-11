@@ -1,0 +1,28 @@
+[
+  {
+    "jdk": "21",
+    "java_home": "/home/gustavo/workspace/teste-e2e/.w5-recovery/toolchains/jdk-21.0.12.1+1",
+    "java_version": "openjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)\n",
+    "command": [
+      "python3",
+      "-B",
+      "scripts/harness/test_harness.py",
+      "HarnessGuardTests.test_07_registry_drift"
+    ],
+    "exit_code": 0,
+    "log_sha256": "4a397bcd41c8061613034d8d24ba2756d2fef354df66d402e0a9cfc332e68e81"
+  },
+  {
+    "jdk": "25",
+    "java_home": "/home/gustavo/.sdkman/candidates/java/25.0.4-tem",
+    "java_version": "openjdk version \"25.0.4\" 2026-07-21 LTS\nOpenJDK Runtime Environment Temurin-25.0.4+7 (build 25.0.4+7-LTS)\nOpenJDK 64-Bit Server VM Temurin-25.0.4+7 (build 25.0.4+7-LTS, mixed mode, sharing)\n",
+    "command": [
+      "python3",
+      "-B",
+      "scripts/harness/test_harness.py",
+      "HarnessGuardTests.test_07_registry_drift"
+    ],
+    "exit_code": 0,
+    "log_sha256": "b1e155292d2ae6ce3a63550e434961450fe22da60df951eea6bfc11b140d3414"
+  }
+]

@@ -38,8 +38,12 @@ def verify_sources(root):
         if path=='pom.xml':data=original_pom(data)
         if hashlib.sha256(data).hexdigest()!=sha and not allows_change(root,path,sha):raise Failure('W5 changed approved W1–W4 or legacy source: '+path)
 def capture(root,args):
-    p=subprocess.run(args,cwd=root,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True)
-    if p.returncode:raise Failure(p.stdout+'\ncommand failed: '+repr(args))
+    p=subprocess.run(args,cwd=root,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
+    if p.returncode:
+        raise Failure('command failed (exit '+str(p.returncode)+'): '+repr(args)
+                      +'\nstdout:\n'+p.stdout+'\nstderr:\n'+p.stderr)
+    # Tool diagnostics remain observable but are never part of its product.
+    if p.stderr:print(p.stderr,end='',file=sys.stderr)
     return p.stdout
 def architecture(root,update=False):
     from check_transport_architecture import dependencies_from_jdeps

@@ -1,0 +1,11 @@
+{
+  "label": "fast",
+  "command": [
+    "bash",
+    "scripts/harness/check-fast.sh"
+  ],
+  "cwd": "/home/gustavo/workspace/teste-e2e/.w5-recovery/remediation/main",
+  "exit_code": 0,
+  "elapsed_seconds": 130.58415293693542,
+  "log_sha256": "0423beaeb0a525d46f1827c1e0417486e9ffbf019fda3c14b18b013aa5c3ff6b"
+}

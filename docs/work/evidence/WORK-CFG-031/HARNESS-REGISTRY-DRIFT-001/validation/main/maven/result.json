@@ -1,0 +1,14 @@
+{
+  "label": "maven",
+  "command": [
+    "mvn",
+    "-B",
+    "-ntp",
+    "clean",
+    "verify"
+  ],
+  "cwd": "/home/gustavo/workspace/teste-e2e/.w5-recovery/remediation/main",
+  "exit_code": 0,
+  "elapsed_seconds": 31.405293226242065,
+  "log_sha256": "8c19ca14865d82760c529cd8e2226c1e1004cc0846f3cf798462b0967e3494b0"
+}

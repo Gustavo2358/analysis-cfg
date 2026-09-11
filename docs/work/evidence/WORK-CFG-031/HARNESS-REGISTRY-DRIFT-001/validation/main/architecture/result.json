@@ -1,0 +1,11 @@
+{
+  "label": "architecture",
+  "command": [
+    "bash",
+    "scripts/harness/check-architecture.sh"
+  ],
+  "cwd": "/home/gustavo/workspace/teste-e2e/.w5-recovery/remediation/main",
+  "exit_code": 0,
+  "elapsed_seconds": 83.11419987678528,
+  "log_sha256": "9bb48dd00cbe2b1b878e7ba82d9349cd202e1ec4a739ea2fbfb3724439cb1574"
+}

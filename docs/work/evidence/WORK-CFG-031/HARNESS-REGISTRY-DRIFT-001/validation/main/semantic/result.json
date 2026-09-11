@@ -1,0 +1,11 @@
+{
+  "label": "semantic",
+  "command": [
+    "bash",
+    "scripts/harness/check-semantic.sh"
+  ],
+  "cwd": "/home/gustavo/workspace/teste-e2e/.w5-recovery/remediation/main",
+  "exit_code": 0,
+  "elapsed_seconds": 42.333781242370605,
+  "log_sha256": "6013e6c2b0627ca83c7b143eb1c286219f477c38fc5e911e2b2df6757a601dae"
+}

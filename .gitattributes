@@ -3,3 +3,8 @@
 *.json text eol=lf
 *.py text eol=lf
 *.sh text eol=lf
+# Immutable raw investigation output: spaces are captured data, including patch context.
+docs/work/evidence/WORK-CFG-031/HARNESS-REGISTRY-DRIFT-001/harness-only.patch -whitespace
+docs/work/evidence/WORK-CFG-031/HARNESS-REGISTRY-DRIFT-001/old-blocked.log -whitespace
+docs/work/evidence/WORK-CFG-031/HARNESS-REGISTRY-DRIFT-001/ritual-red.log -whitespace
+docs/work/evidence/WORK-CFG-031/javap-remediation/harness.patch -whitespace

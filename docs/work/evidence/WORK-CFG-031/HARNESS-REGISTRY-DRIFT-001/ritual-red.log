@@ -1,0 +1,20 @@
+test_07_registry_drift (__main__.HarnessGuardTests.test_07_registry_drift) ... 
+  test_07_registry_drift (__main__.HarnessGuardTests.test_07_registry_drift) (matched_status='blocked') ... FAIL
+
+======================================================================
+FAIL: test_07_registry_drift (__main__.HarnessGuardTests.test_07_registry_drift) (matched_status='blocked')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/gustavo/workspace/teste-e2e/.worktrees/analysis-cfg-w5/scripts/harness/test_harness.py", line 129, in test_07_registry_drift
+    self.assertNotEqual(load_json(self.root / work_path)['status'],
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        registry_entry()['status'],
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        'registry drift adversarial was not constructed')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'blocked' == 'blocked' : registry drift adversarial was not constructed
+
+----------------------------------------------------------------------
+Ran 1 test in 1.762s
+
+FAILED (failures=1)

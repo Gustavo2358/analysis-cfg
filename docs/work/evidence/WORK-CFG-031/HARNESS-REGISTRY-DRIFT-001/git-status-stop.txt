@@ -1,0 +1,5 @@
+ M docs/work/index.md
+ M docs/work/registry.json
+ M scripts/harness/test_harness.py
+?? docs/work/active/WORK-CFG-031/
+?? docs/work/evidence/WORK-CFG-031/

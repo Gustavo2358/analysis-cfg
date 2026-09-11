@@ -1,0 +1,218 @@
+{
+  "status": "PASS",
+  "old_baseline": "CP5 e2e-sealed",
+  "cp4e_ab": "SEMANTIC_AND_BYTE_IDENTICAL",
+  "runs": {
+    "cp4e-a": {
+      "assertions": {
+        "candidate": "PROGA",
+        "producer": {
+          "domain": "operation",
+          "localId": "e52226b01b4afc8f6c6214aafd63e5ab",
+          "publication": "77ae4cc3ed75332c64011efce81c431b",
+          "unit": "unit"
+        },
+        "producer_kind": "real Assign",
+        "origin": {
+          "id": {
+            "domain": "origin",
+            "localId": "6e3b8590805b3e79519781a3f9a725c6",
+            "publication": "77ae4cc3ed75332c64011efce81c431b"
+          },
+          "inputs": [
+            {
+              "domain": "origin",
+              "localId": "097b1e086dae7b064d2d38d70bf060c7",
+              "publication": "77ae4cc3ed75332c64011efce81c431b"
+            },
+            {
+              "domain": "origin",
+              "localId": "94120e2cc4ddfe39a35cae90898738d2",
+              "publication": "77ae4cc3ed75332c64011efce81c431b"
+            }
+          ],
+          "kind": "derived",
+          "rule": "sp-provenance/original-expanded@1"
+        },
+        "model_remainder": false,
+        "source_remainder": true,
+        "effective_remainder": true,
+        "support": "real Assign"
+      },
+      "hashes": {
+        "air.json": {
+          "old": "dd3bb4819282e609a97937ea01b7e202786e2c2d9ba9c8a1821a8b982eeb8788",
+          "new": "dd3bb4819282e609a97937ea01b7e202786e2c2d9ba9c8a1821a8b982eeb8788",
+          "byte_identical": true
+        },
+        "result.json": {
+          "old": "aacb6e6cedbd7d1dbbd44e7a476b398df3eeff51f1a63b90257d4dc412705dec",
+          "new": "aacb6e6cedbd7d1dbbd44e7a476b398df3eeff51f1a63b90257d4dc412705dec",
+          "byte_identical": true
+        },
+        "frontend/cobol-semantic-product.json": {
+          "old": "468e3207f578e428ace89a311eadbd6e27c670331b739675b761479352adc7af",
+          "new": "468e3207f578e428ace89a311eadbd6e27c670331b739675b761479352adc7af",
+          "byte_identical": true
+        },
+        "AIR-MOVE.cbl": {
+          "old": "3a35079c4954548bca08b4b298583c2b29a336d73432b529cac939d9b9013113",
+          "new": "3a35079c4954548bca08b4b298583c2b29a336d73432b529cac939d9b9013113",
+          "byte_identical": true
+        }
+      },
+      "memory_file": "BYTE_IDENTICAL"
+    },
+    "cp4e-b": {
+      "assertions": {
+        "candidate": "PROGA",
+        "producer": {
+          "domain": "operation",
+          "localId": "e52226b01b4afc8f6c6214aafd63e5ab",
+          "publication": "77ae4cc3ed75332c64011efce81c431b",
+          "unit": "unit"
+        },
+        "producer_kind": "real Assign",
+        "origin": {
+          "id": {
+            "domain": "origin",
+            "localId": "6e3b8590805b3e79519781a3f9a725c6",
+            "publication": "77ae4cc3ed75332c64011efce81c431b"
+          },
+          "inputs": [
+            {
+              "domain": "origin",
+              "localId": "097b1e086dae7b064d2d38d70bf060c7",
+              "publication": "77ae4cc3ed75332c64011efce81c431b"
+            },
+            {
+              "domain": "origin",
+              "localId": "94120e2cc4ddfe39a35cae90898738d2",
+              "publication": "77ae4cc3ed75332c64011efce81c431b"
+            }
+          ],
+          "kind": "derived",
+          "rule": "sp-provenance/original-expanded@1"
+        },
+        "model_remainder": false,
+        "source_remainder": true,
+        "effective_remainder": true,
+        "support": "real Assign"
+      },
+      "hashes": {
+        "air.json": {
+          "old": "dd3bb4819282e609a97937ea01b7e202786e2c2d9ba9c8a1821a8b982eeb8788",
+          "new": "dd3bb4819282e609a97937ea01b7e202786e2c2d9ba9c8a1821a8b982eeb8788",
+          "byte_identical": true
+        },
+        "result.json": {
+          "old": "aacb6e6cedbd7d1dbbd44e7a476b398df3eeff51f1a63b90257d4dc412705dec",
+          "new": "aacb6e6cedbd7d1dbbd44e7a476b398df3eeff51f1a63b90257d4dc412705dec",
+          "byte_identical": true
+        },
+        "frontend/cobol-semantic-product.json": {
+          "old": "468e3207f578e428ace89a311eadbd6e27c670331b739675b761479352adc7af",
+          "new": "468e3207f578e428ace89a311eadbd6e27c670331b739675b761479352adc7af",
+          "byte_identical": true
+        },
+        "AIR-MOVE.cbl": {
+          "old": "3a35079c4954548bca08b4b298583c2b29a336d73432b529cac939d9b9013113",
+          "new": "3a35079c4954548bca08b4b298583c2b29a336d73432b529cac939d9b9013113",
+          "byte_identical": true
+        }
+      },
+      "memory_file": "BYTE_IDENTICAL"
+    },
+    "cp3": {
+      "assertions": {
+        "prepared": "COMPLETE",
+        "analyses": 0,
+        "queries": 0,
+        "facts": 0
+      },
+      "hashes": {
+        "air.json": {
+          "old": "46919c1429db4aa310e66fc9df9374eeba53fd98e50a287fdd005c17622f33ad",
+          "new": "46919c1429db4aa310e66fc9df9374eeba53fd98e50a287fdd005c17622f33ad",
+          "byte_identical": true
+        },
+        "result.json": {
+          "old": "34d21be2b0daf6b2dd7673a599dbf95d1dccbeb9610283be34840ca0e75568b0",
+          "new": "34d21be2b0daf6b2dd7673a599dbf95d1dccbeb9610283be34840ca0e75568b0",
+          "byte_identical": true
+        },
+        "frontend/cobol-semantic-product.json": {
+          "old": "eab4f4c3902cd1661779d2a57e526b9d88999068cf35c92531f9df888f3c9954",
+          "new": "eab4f4c3902cd1661779d2a57e526b9d88999068cf35c92531f9df888f3c9954",
+          "byte_identical": true
+        },
+        "semantic-product-entry-goback.cbl": {
+          "old": "218b07a63098838ccd00c5aa5139620110045230975a20f1d5c285237e5ba67a",
+          "new": "218b07a63098838ccd00c5aa5139620110045230975a20f1d5c285237e5ba67a",
+          "byte_identical": true
+        }
+      },
+      "memory_file": "BYTE_IDENTICAL"
+    },
+    "generic-overwrite": {
+      "assertions": {
+        "candidate": "NEWER",
+        "producer": {
+          "domain": "operation",
+          "localId": "fb0e4051dc6c509849ea2c12755aff86",
+          "publication": "dff0630bef81a3648579e12ba2d0c8ea",
+          "unit": "unit"
+        },
+        "producer_kind": "real Assign",
+        "origin": {
+          "id": {
+            "domain": "origin",
+            "localId": "03604a019cfc597e2d3a551583a29e96",
+            "publication": "dff0630bef81a3648579e12ba2d0c8ea"
+          },
+          "inputs": [
+            {
+              "domain": "origin",
+              "localId": "73461710a99641aef52334de92667000",
+              "publication": "dff0630bef81a3648579e12ba2d0c8ea"
+            },
+            {
+              "domain": "origin",
+              "localId": "3a102e689c742d6d863263c0e2d1fb4f",
+              "publication": "dff0630bef81a3648579e12ba2d0c8ea"
+            }
+          ],
+          "kind": "derived",
+          "rule": "sp-provenance/original-expanded@1"
+        },
+        "model_remainder": false,
+        "source_remainder": true,
+        "effective_remainder": true,
+        "support": "last Assign"
+      },
+      "hashes": {
+        "air.json": {
+          "old": "14f5e554d5259a29265897b68f84abd3606d2ee627e09266bf86c36e57e4d7de",
+          "new": "14f5e554d5259a29265897b68f84abd3606d2ee627e09266bf86c36e57e4d7de",
+          "byte_identical": true
+        },
+        "result.json": {
+          "old": "3917538fb90c4c12bc2d4d85a5170fb6d2bc80b8cdec51840ad383e046fc4109",
+          "new": "3917538fb90c4c12bc2d4d85a5170fb6d2bc80b8cdec51840ad383e046fc4109",
+          "byte_identical": true
+        },
+        "frontend/cobol-semantic-product.json": {
+          "old": "8dcb91eb0310e58feb8cc4cae6a7b69ab3b26b5f377c2f8d103afcc28120a0bc",
+          "new": "8dcb91eb0310e58feb8cc4cae6a7b69ab3b26b5f377c2f8d103afcc28120a0bc",
+          "byte_identical": true
+        },
+        "AIR-MOVE.cbl": {
+          "old": "7e7002a4d2528916fa22b9c88109922cead966d09c4629801c28a0d5cfcdab31",
+          "new": "7e7002a4d2528916fa22b9c88109922cead966d09c4629801c28a0d5cfcdab31",
+          "byte_identical": true
+        }
+      },
+      "memory_file": "BYTE_IDENTICAL"
+    }
+  }
+}

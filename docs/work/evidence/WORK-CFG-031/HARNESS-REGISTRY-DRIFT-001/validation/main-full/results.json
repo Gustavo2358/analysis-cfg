@@ -1,0 +1,13 @@
+[
+  {
+    "label": "full",
+    "command": [
+      "bash",
+      "scripts/harness/check-full.sh"
+    ],
+    "cwd": "/home/gustavo/workspace/teste-e2e/.w5-recovery/remediation/main-full",
+    "exit_code": 0,
+    "elapsed_seconds": 372.33237862586975,
+    "log_sha256": "1dd9166ee30f2918032bc51db11363047c616a1a05e5e38e9aa77a54b0d5338f"
+  }
+]

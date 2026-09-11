@@ -1,0 +1,13 @@
+{
+  "label": "scope-manifest",
+  "command": [
+    "python3",
+    "-B",
+    "scripts/project/check_scope.py",
+    "--update-manifest"
+  ],
+  "cwd": "/home/gustavo/workspace/teste-e2e/.w5-recovery/remediation/main",
+  "exit_code": 0,
+  "elapsed_seconds": 0.9861116409301758,
+  "log_sha256": "0e94e86bab5445b1e1464f1dc85f6c00471061a76788360d636e560b98329fd0"
+}

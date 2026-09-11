@@ -1,0 +1,6 @@
+{
+  "scripts/harness/run_gate.py": "b044710d5effe90f7f3a3cd7aedca07d73b7dda8696511d4256e2bd33f85bf21",
+  "scripts/project/check_w5.py": "f5fe99ddb65e3d8542a65235de7acc60d99b7c3ebb5b63a8531e6157766620ce",
+  "scripts/project/test_w5_capture.py": "5a669e21949d90caba61ab0db1238a440dcd5b21653ea973ed80eee6f43fe405",
+  "test_07_registry_drift": "2131970fdb4200ff948904981beb8191952608678f8e8e4547e64ccafd028679"
+}

@@ -1,0 +1,13 @@
+# State
+
+## Onde estamos
+IMPLEMENTATION of HARNESS-REGISTRY-DRIFT-001 under the human follow-up. The earlier STOP was correct; historical W5 inventory hypothesis remains NOT REPRODUCED, with no production/inventory correction.
+
+## Verde conhecido
+Prior results are explicitly reported in the recovered STOP summary. Frozen candidate restored with identical manifest SHA-256; branch/base origin/main remains 15bd3afe.
+
+## Restante
+Independently repeat focal RED/green/ritual and main/candidate validation after temporary directory loss; publish only authorized focal changes, stop on new blocker, no merge.
+
+## Descobertas que afetam o plano
+Old raw temporary evidence is unavailable; record that gap without fabricating receipts. Work item 030 stays paused and untouched. CP5 APPROVED / MERGED; CP6_BASELINE NOT_FROZEN; CP6 NOT_STARTED / NOT_AUTHORIZED.

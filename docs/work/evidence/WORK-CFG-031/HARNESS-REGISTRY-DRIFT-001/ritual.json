@@ -1,0 +1,80 @@
+{
+  "mutant": "constant-blocked-status",
+  "valid": 1,
+  "killed": 1,
+  "baseline_sha256": "bcc5d67ac4187a4d2cbbc2fcfac83af29638c78f9aa6f8dadec1d55d98325885",
+  "restored_sha256": "bcc5d67ac4187a4d2cbbc2fcfac83af29638c78f9aa6f8dadec1d55d98325885",
+  "byte_exact_restore": true,
+  "logs": {
+    "green-active": {
+      "command": [
+        "python3",
+        "-B",
+        "/home/gustavo/workspace/teste-e2e/.w5-recovery/remediation/focal-probe.py",
+        "--root",
+        "/home/gustavo/workspace/teste-e2e/.worktrees/analysis-cfg-w5",
+        "--out",
+        "/home/gustavo/workspace/teste-e2e/.w5-recovery/remediation/green-active",
+        "--matched",
+        "active"
+      ],
+      "exit_code": 0,
+      "log_sha256": "917705e774b78793f41881b57d1f56092a2b7a1ba79ddb29dbb4274adde86f97"
+    },
+    "green-blocked": {
+      "command": [
+        "python3",
+        "-B",
+        "/home/gustavo/workspace/teste-e2e/.w5-recovery/remediation/focal-probe.py",
+        "--root",
+        "/home/gustavo/workspace/teste-e2e/.worktrees/analysis-cfg-w5",
+        "--out",
+        "/home/gustavo/workspace/teste-e2e/.w5-recovery/remediation/green-blocked",
+        "--matched",
+        "blocked"
+      ],
+      "exit_code": 0,
+      "log_sha256": "45cdd18977bc085edcf3c5a458a0a0e64d66acd55d601834f5044d0e675dbb17"
+    },
+    "ritual-green": {
+      "command": [
+        "python3",
+        "-B",
+        "scripts/harness/test_harness.py",
+        "HarnessGuardTests.test_07_registry_drift"
+      ],
+      "exit_code": 0,
+      "log_sha256": "733c51e57ad5778fcf908ab7ae2cb41c9c758fe068ee9019566b11726d993560"
+    },
+    "ritual-mutant-import": {
+      "command": [
+        "python3",
+        "-B",
+        "-c",
+        "import sys; sys.path.insert(0,'scripts/harness'); import test_harness"
+      ],
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "ritual-red": {
+      "command": [
+        "python3",
+        "-B",
+        "scripts/harness/test_harness.py",
+        "HarnessGuardTests.test_07_registry_drift"
+      ],
+      "exit_code": 1,
+      "log_sha256": "a94e24008ec1e735e133986f46966628048fee9a8e88c53be5200eb415626857"
+    },
+    "ritual-second-green": {
+      "command": [
+        "python3",
+        "-B",
+        "scripts/harness/test_harness.py",
+        "HarnessGuardTests.test_07_registry_drift"
+      ],
+      "exit_code": 0,
+      "log_sha256": "6b5016eb3cc596c1e85372816f8609c3baa4cfd8981beca1ceb19d8349d42d91"
+    }
+  }
+}

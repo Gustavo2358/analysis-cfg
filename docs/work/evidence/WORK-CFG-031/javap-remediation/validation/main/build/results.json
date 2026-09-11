@@ -1,0 +1,65 @@
+[
+  {
+    "label": "java",
+    "command": [
+      "java",
+      "-version"
+    ],
+    "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/main",
+    "exit_code": 0,
+    "elapsed_seconds": 0.021092891693115234,
+    "log_sha256": "5b4412738541184e84f6b2d7520d4f4a7c2a455f60650491464c61adcbbbdeb0"
+  },
+  {
+    "label": "air-install",
+    "command": [
+      "mvn",
+      "-B",
+      "-ntp",
+      "clean",
+      "install"
+    ],
+    "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/main-env/air-java",
+    "exit_code": 0,
+    "elapsed_seconds": 12.805616855621338,
+    "log_sha256": "62bd3da4a7f3f983f73fb8effe271917c1ba5ef7f4c6d1e2d2833dc2510da982"
+  },
+  {
+    "label": "air-receipt",
+    "command": [
+      "python3",
+      "-B",
+      "scripts/project/record_air_dependency.py",
+      "--checkout",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/main-env/air-java",
+      "--built-source",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/main-env/air-java",
+      "--maven-repo",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/main-env/m2",
+      "--output",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/main-env/air-receipt.json"
+    ],
+    "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/main",
+    "exit_code": 0,
+    "elapsed_seconds": 0.3624753952026367,
+    "log_sha256": "82cba2a0fe4ca86a5c2a47b803fa6949d34ed0a767174b40b4065533b2e20eb9"
+  },
+  {
+    "label": "producers",
+    "command": [
+      "python3",
+      "-B",
+      "scripts/project/prepare_w5_producers.py",
+      "--work",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/main-env/producers",
+      "--frontend",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/main-env/proleap-poc",
+      "--lower",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/main-env/cobol-lower"
+    ],
+    "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/main",
+    "exit_code": 0,
+    "elapsed_seconds": 11.994678020477295,
+    "log_sha256": "fde156a5d04a1a4af6e97d8247052e1b0c166b06dc87c9c96f801f7d82c33590"
+  }
+]

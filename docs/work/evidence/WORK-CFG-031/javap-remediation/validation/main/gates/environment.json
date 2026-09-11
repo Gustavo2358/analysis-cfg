@@ -1,0 +1,6 @@
+{
+  "JAVA_HOME": "/home/gustavo/workspace/teste-e2e/.w5-recovery/toolchains/jdk-21.0.12.1+1",
+  "MAVEN_OPTS": "-Xmx3g -Dmaven.repo.local=/home/gustavo/workspace/teste-e2e/.pre-cp6/main-env/m2",
+  "PATH": "/home/gustavo/workspace/teste-e2e/.w5-recovery/toolchains/jdk-21.0.12.1+1/bin:/home/gustavo/.codex/tmp/arg0/codex-arg0onmbkv:/home/gustavo/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/home/gustavo/.nvm/versions/node/v24.19.0/bin:/home/gustavo/.sdkman/candidates/maven/current/bin:/home/gustavo/.sdkman/candidates/java/current/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin:/home/gustavo/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/usr/lib/chatgpt/resources",
+  "W5_PRODUCERS": "/home/gustavo/workspace/teste-e2e/.pre-cp6/main-env/producers/producers.json"
+}

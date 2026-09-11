@@ -1,0 +1,48 @@
+{
+  "id": "WORK-CFG-031",
+  "backlog_id": "BACKLOG-CFG-020",
+  "title": "POST_CP5_W5_INVENTORY_REPRODUCIBILITY",
+  "status": "active",
+  "risk": "high",
+  "goal": "Resolve registry adversarial construction and W5 tool diagnostic contamination; verify merged baseline and same frozen candidate with reliable harness.",
+  "authorization": "implementation",
+  "authorization_evidence": "Explicit user continuation: docs/work/evidence/WORK-CFG-031/javap-remediation/authorization.json",
+  "checkpoint": "POST_CP5_HARNESS_REMEDIATION",
+  "must_read": [
+    "AGENTS.md",
+    "docs/engineering/work-item-protocol.md",
+    "docs/engineering/gates.md",
+    "docs/engineering/testing.md"
+  ],
+  "related_decisions": [],
+  "related_invariants": [],
+  "evals": [],
+  "source_scope": [
+    "scripts/harness/test_harness.py",
+    "scripts/harness/run_gate.py",
+    "scripts/project/check_w5.py",
+    "scripts/project/test_w5_capture.py",
+    "docs/work",
+    "MANIFEST.sha256",
+    ".gitattributes",
+    "scripts/project/check_scope.py"
+  ],
+  "test_scope": [
+    "scripts/harness/test_harness.py",
+    "scripts/project/test_w5_capture.py"
+  ],
+  "must_not_change": [
+    "Production/test Java, POMs, pins, expected inventories and validator logic",
+    "Historical STOPs and raw evidence",
+    "No CP6 implementation"
+  ],
+  "gates": [
+    "fast",
+    "architecture",
+    "semantic",
+    "performance",
+    "integration",
+    "full"
+  ],
+  "stop_condition": "Stop only for a new semantic/contract decision or inability to establish exact source identity for safe merge. Class A/B harness and mechanical compatibility fixes are authorized."
+}

@@ -1,0 +1,3 @@
+[4D] upstream checkout absent; verified pinned content hashes offline
+[4D] PASS: approved merge, CI/lock, scalar SHA-256/Git blob/size/provenance and GOBACK hash
+[scope/manifest] FAIL: delivery manifest mismatch; review diff before --update-manifest

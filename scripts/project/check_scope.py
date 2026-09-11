@@ -17,7 +17,7 @@ def main():
         work=json.loads((ROOT/'docs/work/active/WORK-CFG-029/work-item.json').read_text())
         if work['authorization']!='implementation' or work['checkpoint']!='POST_CP5_COMPATIBILITY_REMEDIATION':raise ValueError('wrong authorized checkpoint')
         changed=set(git('diff','--name-only',BASE).decode().splitlines())|set(git('ls-files','--others','--exclude-standard').decode().splitlines())
-        allowed=PRODUCTION|set(c['changed_tests'])|{'MANIFEST.sha256','.github/workflows/ci.yml'}
+        allowed=PRODUCTION|set(c['changed_tests'])|{'MANIFEST.sha256','.github/workflows/ci.yml','.gitattributes'}
         for p in changed:
             if p.endswith('.java') or p.endswith('pom.xml'):
                 if p not in allowed:raise ValueError('unapproved source/POM change: '+p)

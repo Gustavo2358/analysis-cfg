@@ -1,0 +1,7 @@
+{
+  "original_blocked_tree_unchanged": true,
+  "frozen_snapshot_sha256": "c88ac70d20be2eb1707d95e3a4535d9b999f7663b7a743e9d16bf0f05ed9cb4d",
+  "candidate_tracked_diff_unchanged_after_fix": true,
+  "candidate_untracked_frozen_files_unchanged": true,
+  "all_protected_bytes_unchanged": true
+}
