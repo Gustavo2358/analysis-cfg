@@ -1,0 +1,77 @@
+diff --git a/scripts/harness/run_gate.py b/scripts/harness/run_gate.py
+index 24736fa..5c0d446 100644
+--- a/scripts/harness/run_gate.py
++++ b/scripts/harness/run_gate.py
+@@ -13,7 +13,7 @@ def run(gate: str, root: Path) -> int:
+     if gate == 'docs':
+         return subprocess.run([sys.executable, str(base / 'validate_docs.py'), '--root', str(root)]).returncode
+     if gate == 'harness':
+-        for suite in ('test_harness.py', 'test_cp5_harness.py', 'test_resource_limit_harness.py', '../project/test_result_wire.py'):
++        for suite in ('test_harness.py', 'test_cp5_harness.py', 'test_resource_limit_harness.py', '../project/test_result_wire.py', '../project/test_w5_capture.py'):
+             rc = subprocess.run([sys.executable, str(base / suite)]).returncode
+             if rc:
+                 return rc
+diff --git a/scripts/harness/test_harness.py b/scripts/harness/test_harness.py
+index e542e01..6fe9806 100644
+--- a/scripts/harness/test_harness.py
++++ b/scripts/harness/test_harness.py
+@@ -99,9 +99,37 @@ class HarnessGuardTests(unittest.TestCase):
+ 
+     def test_07_registry_drift(self):
+         ident = self.ensure_active_work()
+-        self.edit_json('docs/work/registry.json', lambda x: next(
+-            item for item in x['active'] if item['id'] == ident).update(status='blocked'))
+-        self.assert_guard('Work registry mismatch')
++        work_path = 'docs/work/active/' + ident + '/work-item.json'
++        registry_path = 'docs/work/registry.json'
++        diagnostic = 'Work registry mismatch status: ' + ident
++
++        def registry_entry():
++            return next(item for item in load_json(self.root / registry_path)['active']
++                        if item['id'] == ident)
++
++        for original in ('active', 'blocked'):
++            with self.subTest(matched_status=original):
++                # Control both starting states in the temporary fixture only.
++                self.edit_json(work_path, lambda work: work.update(status=original))
++                self.edit_json(registry_path, lambda registry: next(
++                    item for item in registry['active'] if item['id'] == ident
++                ).update(status=original))
++                self.assertEqual(original, load_json(self.root / work_path)['status'])
++                self.assertEqual(original, registry_entry()['status'])
++                self.assertNotIn(diagnostic, validate(self.root))
++
++                work_bytes = (self.root / work_path).read_bytes()
++                work_status = load_json(self.root / work_path)['status']
++                mutated = 'active' if work_status == 'blocked' else 'blocked'
++                self.assertIn(mutated, ('active', 'blocked'))
++                self.edit_json(registry_path, lambda registry: next(
++                    item for item in registry['active'] if item['id'] == ident
++                ).update(status=mutated))
++                self.assertEqual(work_bytes, (self.root / work_path).read_bytes())
++                self.assertNotEqual(load_json(self.root / work_path)['status'],
++                                    registry_entry()['status'],
++                                    'registry drift adversarial was not constructed')
++                self.assertIn(diagnostic, validate(self.root))
+ 
+     def test_08_completed_item_left_active(self):
+         ident = self.ensure_active_work()
+diff --git a/scripts/project/check_w5.py b/scripts/project/check_w5.py
+index 07dac08..fcf630a 100644
+--- a/scripts/project/check_w5.py
++++ b/scripts/project/check_w5.py
+@@ -38,8 +38,12 @@ def verify_sources(root):
+         if path=='pom.xml':data=original_pom(data)
+         if hashlib.sha256(data).hexdigest()!=sha and not allows_change(root,path,sha):raise Failure('W5 changed approved W1–W4 or legacy source: '+path)
+ def capture(root,args):
+-    p=subprocess.run(args,cwd=root,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True)
+-    if p.returncode:raise Failure(p.stdout+'\ncommand failed: '+repr(args))
++    p=subprocess.run(args,cwd=root,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
++    if p.returncode:
++        raise Failure('command failed (exit '+str(p.returncode)+'): '+repr(args)
++                      +'\nstdout:\n'+p.stdout+'\nstderr:\n'+p.stderr)
++    # Tool diagnostics remain observable but are never part of its product.
++    if p.stderr:print(p.stderr,end='',file=sys.stderr)
+     return p.stdout
+ def architecture(root,update=False):
+     from check_transport_architecture import dependencies_from_jdeps

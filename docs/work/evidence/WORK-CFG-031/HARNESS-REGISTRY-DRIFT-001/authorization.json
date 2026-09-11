@@ -1,0 +1,9 @@
+{
+  "finding": "HARNESS-REGISTRY-DRIFT-001",
+  "authorization": "Explicit human follow-up: harness test only, both matched states and controls, main gates, exact frozen candidate, commit/push/draft PR/CI, then human review; no merge",
+  "historical_inventory": "NOT REPRODUCED; no production inventory correction justified",
+  "base": "15bd3afe1affdcb5ec49956960f884bde8c89498",
+  "frozen_candidate_sha256": "c88ac70d20be2eb1707d95e3a4535d9b999f7663b7a743e9d16bf0f05ed9cb4d",
+  "recovery": "Persistent worktree restored on user continue after /tmp loss; old raw evidence unavailable, new validation must be independently rerun",
+  "stop": "First new candidate blocker or actual W5 RED; no extra correction"
+}

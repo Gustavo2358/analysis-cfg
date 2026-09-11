@@ -1,0 +1,48 @@
+[
+  {
+    "command": [
+      "mvn",
+      "-B",
+      "-ntp",
+      "clean",
+      "install"
+    ],
+    "cwd": "/home/gustavo/workspace/teste-e2e/.w5-recovery/main-env/air-java",
+    "exit_code": 0,
+    "log_sha256": "67291f7a61bf4dd7e1fcf9b9b9eae38f780bf40763726620a0a8d7339e590178"
+  },
+  {
+    "command": [
+      "python3",
+      "-B",
+      "scripts/project/record_air_dependency.py",
+      "--checkout",
+      "/home/gustavo/workspace/teste-e2e/.w5-recovery/main-env/air-java",
+      "--built-source",
+      "/home/gustavo/workspace/teste-e2e/.w5-recovery/main-env/air-java",
+      "--maven-repo",
+      "/home/gustavo/workspace/teste-e2e/.w5-recovery/main-env/m2",
+      "--output",
+      "/home/gustavo/workspace/teste-e2e/.w5-recovery/main-env/air-receipt.json"
+    ],
+    "cwd": "/home/gustavo/workspace/teste-e2e/.w5-recovery/remediation/main",
+    "exit_code": 0,
+    "log_sha256": "e8bc3adfdedc2f2023db34bf5a3bb0953301226b95c6c40171899f6730f3fc08"
+  },
+  {
+    "command": [
+      "python3",
+      "-B",
+      "scripts/project/prepare_w5_producers.py",
+      "--work",
+      "/home/gustavo/workspace/teste-e2e/.w5-recovery/main-env/producers",
+      "--frontend",
+      "/home/gustavo/workspace/teste-e2e/.w5-recovery/main-env/proleap-poc",
+      "--lower",
+      "/home/gustavo/workspace/teste-e2e/.w5-recovery/main-env/cobol-lower"
+    ],
+    "cwd": "/home/gustavo/workspace/teste-e2e/.w5-recovery/remediation/main",
+    "exit_code": 0,
+    "log_sha256": "d3f59b3b153db5d61701a0e29bbc83c1745baf8e54020b4011cd12cb9c2437cc"
+  }
+]

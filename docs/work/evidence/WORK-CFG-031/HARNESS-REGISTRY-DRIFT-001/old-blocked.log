@@ -1,0 +1,16 @@
+BEFORE {"id": "WORK-CFG-030", "work_status": "blocked", "registry_status": "blocked", "work_sha256": "5acdf33c971b33a7889e198aebeb31cd8f1c4665375b7e02dcc4b05883689e62", "mismatch": false}
+VALIDATE {"id": "WORK-CFG-030", "work_status": "blocked", "registry_status": "blocked", "work_sha256": "5acdf33c971b33a7889e198aebeb31cd8f1c4665375b7e02dcc4b05883689e62", "mismatch": false, "diagnostics": []}
+Traceback (most recent call last):
+  File "/home/gustavo/workspace/teste-e2e/.w5-recovery/remediation/focal-probe.py", line 20, in <module>
+    with patch.object(h,'validate',side_effect=capture):case.test_07_registry_drift()
+                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/gustavo/workspace/teste-e2e/analysis-cfg/scripts/harness/test_harness.py", line 104, in test_07_registry_drift
+    self.assert_guard('Work registry mismatch')
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/gustavo/workspace/teste-e2e/analysis-cfg/scripts/harness/test_harness.py", line 36, in assert_guard
+    self.assertTrue(any(expected in e for e in errors), '\n'.join(errors))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/unittest/case.py", line 762, in assertTrue
+    raise self.failureException(msg)
+AssertionError: False is not true : 
+AFTER {"id": "WORK-CFG-030", "work_status": "blocked", "registry_status": "blocked", "work_sha256": "5acdf33c971b33a7889e198aebeb31cd8f1c4665375b7e02dcc4b05883689e62", "mismatch": false}

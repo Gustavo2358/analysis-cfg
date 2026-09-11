@@ -1,0 +1,11 @@
+{
+  "label": "integration",
+  "command": [
+    "bash",
+    "scripts/harness/check-integration.sh"
+  ],
+  "cwd": "/home/gustavo/workspace/teste-e2e/.w5-recovery/remediation/main",
+  "exit_code": 0,
+  "elapsed_seconds": 59.01953434944153,
+  "log_sha256": "1b50707eebdc933d79f43e3264452173a8a12a3f952876f376b82b11b12145c7"
+}

@@ -1,5 +1,7 @@
 # Trabalho
 
+[WORK-CFG-031](active/WORK-CFG-031/work-item.json): VERIFIED_LOCALLY — both harness findings resolved; main and the frozen candidate green. Exact-head CI/merge next; prior STOPs are investigation history. CP6 NOT_STARTED.
+
 ## Item focal pós-CP5
 
 [WORK-CFG-029](active/WORK-CFG-029/work-item.json): CP6-BASELINE-COMPAT-001, POST_CP5_COMPATIBILITY_REMEDIATION. CP5 aprovado e mergeado conforme autorização humana; estado pré-merge abaixo é histórico. CP6 NOT_STARTED / NOT_AUTHORIZED.

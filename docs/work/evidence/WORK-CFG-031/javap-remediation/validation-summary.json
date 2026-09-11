@@ -1,0 +1,52 @@
+{
+  "main": {
+    "gates": {
+      "maven": "PASS",
+      "focal": "PASS",
+      "fast": "PASS",
+      "docs": "PASS",
+      "architecture": "PASS",
+      "w5-isolated": "PASS",
+      "w5-adversarial": "PASS",
+      "semantic": "PASS",
+      "integration": "PASS",
+      "performance": "PASS",
+      "full": "PASS",
+      "scope-manifest": "PASS",
+      "scope": "PASS",
+      "diff-check": "PASS",
+      "e2e-comparison": "PASS"
+    },
+    "maven": {
+      "tests": 270,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "candidate": {
+    "gates": {
+      "maven": "PASS",
+      "focal": "PASS",
+      "fast": "PASS",
+      "docs": "PASS",
+      "architecture": "PASS",
+      "w5-isolated": "PASS",
+      "w5-adversarial": "PASS",
+      "semantic": "PASS",
+      "integration": "PASS",
+      "performance": "PASS",
+      "full": "PASS",
+      "scope-manifest": "PASS",
+      "scope": "PASS",
+      "diff-check": "PASS",
+      "e2e-comparison": "PASS"
+    },
+    "maven": {
+      "tests": 270,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  }
+}

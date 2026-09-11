@@ -1,0 +1,8 @@
+test_nonzero_exit_preserves_both_streams_for_investigation (test_w5_capture.ToolCaptureTests.test_nonzero_exit_preserves_both_streams_for_investigation) ... ok
+test_stdout_is_never_filtered (test_w5_capture.ToolCaptureTests.test_stdout_is_never_filtered) ... ok
+test_success_preserves_stdout_exactly_and_reports_arbitrary_stderr (test_w5_capture.ToolCaptureTests.test_success_preserves_stdout_exactly_and_reports_arbitrary_stderr) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.056s
+
+OK

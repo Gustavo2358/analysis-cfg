@@ -1,0 +1,10 @@
+{
+  "snapshot": "/home/gustavo/workspace/teste-e2e/.w5-recovery/sync-snapshot",
+  "files": 69,
+  "sha256": "c88ac70d20be2eb1707d95e3a4535d9b999f7663b7a743e9d16bf0f05ed9cb4d",
+  "previous_sha256": "c88ac70d20be2eb1707d95e3a4535d9b999f7663b7a743e9d16bf0f05ed9cb4d",
+  "byte_exact_match": true,
+  "missing_previous_worktree": "/tmp/w5-inventory-repro/fix",
+  "missing_previous_focal_work": "/tmp/registry-drift-remediation",
+  "previous_branch_head": "15bd3afe1affdcb5ec49956960f884bde8c89498"
+}

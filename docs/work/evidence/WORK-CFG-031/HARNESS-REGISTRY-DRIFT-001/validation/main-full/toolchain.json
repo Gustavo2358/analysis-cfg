@@ -1,0 +1,40 @@
+{
+  "PATH": "/home/gustavo/workspace/teste-e2e/.w5-recovery/toolchains/jdk-21.0.12.1+1/bin:/home/gustavo/.codex/tmp/arg0/codex-arg0onmbkv:/home/gustavo/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/home/gustavo/.nvm/versions/node/v24.19.0/bin:/home/gustavo/.sdkman/candidates/maven/current/bin:/home/gustavo/.sdkman/candidates/java/current/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin:/home/gustavo/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/usr/lib/chatgpt/resources",
+  "JAVA_HOME": "/home/gustavo/workspace/teste-e2e/.w5-recovery/toolchains/jdk-21.0.12.1+1",
+  "MAVEN_OPTS": "-Xmx3g -Dmaven.repo.local=/home/gustavo/workspace/teste-e2e/.w5-recovery/main-env/m2",
+  "MAVEN_ARGS": null,
+  "W5_PRODUCERS": "/home/gustavo/workspace/teste-e2e/.w5-recovery/main-env/producers/producers.json",
+  "maven.repo.local": "/home/gustavo/workspace/teste-e2e/.w5-recovery/main-env/m2",
+  "tools": {
+    "java": {
+      "which": "/home/gustavo/workspace/teste-e2e/.w5-recovery/toolchains/jdk-21.0.12.1+1/bin/java",
+      "realpath": "/home/gustavo/workspace/teste-e2e/.w5-recovery/toolchains/jdk-21.0.12.1+1/bin/java",
+      "output": "[0.001s][warning][perf,memops] Cannot use file /tmp/hsperfdata_gustavo/3 because it is locked by another process (errno = 11)\nopenjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)\n",
+      "exit_code": 0
+    },
+    "javac": {
+      "which": "/home/gustavo/workspace/teste-e2e/.w5-recovery/toolchains/jdk-21.0.12.1+1/bin/javac",
+      "realpath": "/home/gustavo/workspace/teste-e2e/.w5-recovery/toolchains/jdk-21.0.12.1+1/bin/javac",
+      "output": "[0.002s][warning][perf,memops] Cannot use file /tmp/hsperfdata_gustavo/20 because it is locked by another process (errno = 11)\njavac 21.0.12.1\n",
+      "exit_code": 0
+    },
+    "javap": {
+      "which": "/home/gustavo/workspace/teste-e2e/.w5-recovery/toolchains/jdk-21.0.12.1+1/bin/javap",
+      "realpath": "/home/gustavo/workspace/teste-e2e/.w5-recovery/toolchains/jdk-21.0.12.1+1/bin/javap",
+      "output": "21.0.12.1\n",
+      "exit_code": 0
+    },
+    "jdeps": {
+      "which": "/home/gustavo/workspace/teste-e2e/.w5-recovery/toolchains/jdk-21.0.12.1+1/bin/jdeps",
+      "realpath": "/home/gustavo/workspace/teste-e2e/.w5-recovery/toolchains/jdk-21.0.12.1+1/bin/jdeps",
+      "output": "21.0.12.1\n",
+      "exit_code": 0
+    },
+    "mvn": {
+      "which": "/home/gustavo/.sdkman/candidates/maven/current/bin/mvn",
+      "realpath": "/home/gustavo/.sdkman/candidates/maven/3.9.16/bin/mvn",
+      "output": "Apache Maven 3.9.16 (2bdd9fddda4b155ebf8000e807eb73fd829a51d5)\nMaven home: /home/gustavo/.sdkman/candidates/maven/current\nJava version: 21.0.12.1, vendor: Eclipse Adoptium, runtime: /home/gustavo/workspace/teste-e2e/.w5-recovery/toolchains/jdk-21.0.12.1+1\nDefault locale: en, platform encoding: UTF-8\nOS name: \"linux\", version: \"7.0.0-31-generic\", arch: \"amd64\", family: \"unix\"\n",
+      "exit_code": 0
+    }
+  }
+}

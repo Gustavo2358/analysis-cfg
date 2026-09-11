@@ -1,0 +1,16 @@
+{
+  "label": "focal",
+  "command": [
+    "python3",
+    "-B",
+    "/home/gustavo/workspace/teste-e2e/.w5-recovery/remediation/focal-probe.py",
+    "--root",
+    "/home/gustavo/workspace/teste-e2e/.w5-recovery/remediation/candidate",
+    "--out",
+    "/home/gustavo/workspace/teste-e2e/.w5-recovery/remediation/results/candidate/focal-observation"
+  ],
+  "cwd": "/home/gustavo/workspace/teste-e2e/.w5-recovery/remediation/candidate",
+  "exit_code": 0,
+  "elapsed_seconds": 2.636564016342163,
+  "log_sha256": "f9877ec20f35506ee91ff0243be7d50573611136e475bbff70a4c32202098295"
+}

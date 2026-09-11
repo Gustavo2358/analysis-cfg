@@ -1,0 +1,11 @@
+{
+  "label": "docs",
+  "command": [
+    "bash",
+    "scripts/harness/check-docs.sh"
+  ],
+  "cwd": "/home/gustavo/workspace/teste-e2e/.w5-recovery/remediation/candidate",
+  "exit_code": 0,
+  "elapsed_seconds": 1.1146423816680908,
+  "log_sha256": "df2da5af253a30334f548f0567e9293bb9d88daef721e2c685ac43e2a8048136"
+}

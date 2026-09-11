@@ -1,0 +1,65 @@
+[
+  {
+    "label": "java",
+    "command": [
+      "java",
+      "-version"
+    ],
+    "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate",
+    "exit_code": 0,
+    "elapsed_seconds": 0.021236658096313477,
+    "log_sha256": "5b4412738541184e84f6b2d7520d4f4a7c2a455f60650491464c61adcbbbdeb0"
+  },
+  {
+    "label": "air-install",
+    "command": [
+      "mvn",
+      "-B",
+      "-ntp",
+      "clean",
+      "install"
+    ],
+    "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/air-java",
+    "exit_code": 0,
+    "elapsed_seconds": 12.594083786010742,
+    "log_sha256": "ef17a380a908f503d8b63fc934df5ff30cab5bc28a87f06b1c1765ed2243f912"
+  },
+  {
+    "label": "air-receipt",
+    "command": [
+      "python3",
+      "-B",
+      "scripts/project/record_air_dependency.py",
+      "--checkout",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/air-java",
+      "--built-source",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/air-java",
+      "--maven-repo",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2",
+      "--output",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/air-receipt.json"
+    ],
+    "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate",
+    "exit_code": 0,
+    "elapsed_seconds": 0.36621832847595215,
+    "log_sha256": "4082fdc1318d31d157a79ac30c9cdd5cde1cbe89317f20f3207cfb851d01e339"
+  },
+  {
+    "label": "producers",
+    "command": [
+      "python3",
+      "-B",
+      "scripts/project/prepare_w5_producers.py",
+      "--work",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/producers",
+      "--frontend",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/proleap-poc",
+      "--lower",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/cobol-lower"
+    ],
+    "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate",
+    "exit_code": 0,
+    "elapsed_seconds": 13.941063642501831,
+    "log_sha256": "e726dd425db1c980f70541f363752b43a8b2b8e154d21250d2a2d15da85cad1b"
+  }
+]

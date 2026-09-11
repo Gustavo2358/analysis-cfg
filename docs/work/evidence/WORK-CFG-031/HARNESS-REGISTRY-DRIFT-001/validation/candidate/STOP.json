@@ -1,0 +1,15 @@
+{
+  "first_failing": {
+    "label": "architecture",
+    "command": [
+      "bash",
+      "scripts/harness/check-architecture.sh"
+    ],
+    "cwd": "/home/gustavo/workspace/teste-e2e/.w5-recovery/remediation/candidate",
+    "exit_code": 1,
+    "elapsed_seconds": 78.19185948371887,
+    "log_sha256": "d312efecd2a53c2c7c2c62e3fbb539b33600252cccc4bc7234e9589733d38d93"
+  },
+  "status": "STOP_FOR_HUMAN_REVIEW",
+  "no_remediation_attempted": true
+}

@@ -1,0 +1,33 @@
+{
+  "cases": [
+    {
+      "case": "old-boundary-red",
+      "command": [
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "test_w5_capture"
+      ],
+      "exit_code": 1,
+      "helper_sha256": "524103ac827ec7870a6b5a34a6f317498a2ce2842b89ea94401ff446f79cac5c",
+      "log_sha256": "ad1ee4fd793b20dcd5da83d4aa717c042ed1b342294c2f244e6c0bb33ed8fa7e"
+    },
+    {
+      "case": "restored-boundary-green",
+      "command": [
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "test_w5_capture"
+      ],
+      "exit_code": 0,
+      "helper_sha256": "f5fe99ddb65e3d8542a65235de7acc60d99b7c3ebb5b63a8531e6157766620ce",
+      "log_sha256": "3a679acfaf4ce1f7f9df72d0efe1ea965d7c78054cdeb7cfa715c15374851fd3"
+    }
+  ],
+  "worktree_helper_unchanged": true
+}

@@ -1,0 +1,8 @@
+{
+  "docs": 0,
+  "scope_manifest": 0,
+  "scope": 1,
+  "reason": "Receipt log was added to deliverable after manifest generation; assembly-order failure, not a candidate/product gate. Raw log retained. Final checks write outside the deliverable.",
+  "candidate_rerun": false,
+  "product_remediation": false
+}

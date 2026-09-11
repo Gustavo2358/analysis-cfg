@@ -1,0 +1,22 @@
+test_nonzero_exit_preserves_both_streams_for_investigation (test_w5_capture.ToolCaptureTests.test_nonzero_exit_preserves_both_streams_for_investigation) ... ok
+test_stdout_is_never_filtered (test_w5_capture.ToolCaptureTests.test_stdout_is_never_filtered) ... ok
+test_success_preserves_stdout_exactly_and_reports_arbitrary_stderr (test_w5_capture.ToolCaptureTests.test_success_preserves_stdout_exactly_and_reports_arbitrary_stderr) ... FAIL
+
+======================================================================
+FAIL: test_success_preserves_stdout_exactly_and_reports_arbitrary_stderr (test_w5_capture.ToolCaptureTests.test_success_preserves_stdout_exactly_and_reports_arbitrary_stderr)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/w5-capture-challenge-k66bj4y4/test_w5_capture.py", line 26, in test_success_preserves_stdout_exactly_and_reports_arbitrary_stderr
+    self.assertEqual(descriptor, value)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+AssertionError: 'public class Example {\n  descriptor: ()V\n}\n' != 'arbitrary diagnostic /tmp/random-123\npub[39 chars]n}\n'
++ arbitrary diagnostic /tmp/random-123
+  public class Example {
+    descriptor: ()V
+  }
+
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.033s
+
+FAILED (failures=1)

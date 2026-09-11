@@ -1,0 +1,12 @@
+{
+  "label": "diff-check",
+  "command": [
+    "git",
+    "diff",
+    "--check"
+  ],
+  "cwd": "/home/gustavo/workspace/teste-e2e/.w5-recovery/remediation/main",
+  "exit_code": 0,
+  "elapsed_seconds": 0.10011124610900879,
+  "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

@@ -1,0 +1,38 @@
+{
+  "command": [
+    ".w5-recovery/remediation/focal-probe.py",
+    "--root",
+    "/home/gustavo/workspace/teste-e2e/analysis-cfg",
+    "--out",
+    "/home/gustavo/workspace/teste-e2e/.w5-recovery/remediation/old-blocked",
+    "--matched",
+    "blocked"
+  ],
+  "exit_code": 1,
+  "setup_succeeded": true,
+  "before": {
+    "id": "WORK-CFG-030",
+    "work_status": "blocked",
+    "registry_status": "blocked",
+    "work_sha256": "5acdf33c971b33a7889e198aebeb31cd8f1c4665375b7e02dcc4b05883689e62",
+    "mismatch": false
+  },
+  "after": {
+    "id": "WORK-CFG-030",
+    "work_status": "blocked",
+    "registry_status": "blocked",
+    "work_sha256": "5acdf33c971b33a7889e198aebeb31cd8f1c4665375b7e02dcc4b05883689e62",
+    "mismatch": false
+  },
+  "validator_calls": [
+    {
+      "id": "WORK-CFG-030",
+      "work_status": "blocked",
+      "registry_status": "blocked",
+      "work_sha256": "5acdf33c971b33a7889e198aebeb31cd8f1c4665375b7e02dcc4b05883689e62",
+      "mismatch": false,
+      "diagnostics": []
+    }
+  ],
+  "test_source_sha256": "81e5e655084806e0051c098477ed7acb05cc0bf3931c126850b3c76986101cf3"
+}

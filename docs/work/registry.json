@@ -14,6 +14,13 @@
       "path": "docs/work/active/WORK-CFG-029",
       "status": "active",
       "authorization": "implementation"
+    },
+    {
+      "id": "WORK-CFG-031",
+      "backlog_id": "BACKLOG-CFG-020",
+      "path": "docs/work/active/WORK-CFG-031",
+      "status": "active",
+      "authorization": "implementation"
     }
   ],
   "history": [

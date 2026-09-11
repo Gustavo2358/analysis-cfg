@@ -1,0 +1,64 @@
+{
+  "command": [
+    "/home/gustavo/workspace/teste-e2e/.w5-recovery/remediation/focal-probe.py",
+    "--root",
+    "/home/gustavo/workspace/teste-e2e/.w5-recovery/remediation/candidate",
+    "--out",
+    "/home/gustavo/workspace/teste-e2e/.w5-recovery/remediation/results/candidate/focal-observation"
+  ],
+  "exit_code": 0,
+  "setup_succeeded": true,
+  "before": {
+    "id": "WORK-CFG-030",
+    "work_status": "blocked",
+    "registry_status": "blocked",
+    "work_sha256": "5acdf33c971b33a7889e198aebeb31cd8f1c4665375b7e02dcc4b05883689e62",
+    "mismatch": false
+  },
+  "after": {
+    "id": "WORK-CFG-030",
+    "work_status": "blocked",
+    "registry_status": "active",
+    "work_sha256": "5acdf33c971b33a7889e198aebeb31cd8f1c4665375b7e02dcc4b05883689e62",
+    "mismatch": true
+  },
+  "validator_calls": [
+    {
+      "id": "WORK-CFG-030",
+      "work_status": "active",
+      "registry_status": "active",
+      "work_sha256": "43d368e958fd62e7506c157f7757918bd8a552db27286afb38f5d8124ce5a2dc",
+      "mismatch": false,
+      "diagnostics": []
+    },
+    {
+      "id": "WORK-CFG-030",
+      "work_status": "active",
+      "registry_status": "blocked",
+      "work_sha256": "43d368e958fd62e7506c157f7757918bd8a552db27286afb38f5d8124ce5a2dc",
+      "mismatch": true,
+      "diagnostics": [
+        "Work registry mismatch status: WORK-CFG-030"
+      ]
+    },
+    {
+      "id": "WORK-CFG-030",
+      "work_status": "blocked",
+      "registry_status": "blocked",
+      "work_sha256": "5acdf33c971b33a7889e198aebeb31cd8f1c4665375b7e02dcc4b05883689e62",
+      "mismatch": false,
+      "diagnostics": []
+    },
+    {
+      "id": "WORK-CFG-030",
+      "work_status": "blocked",
+      "registry_status": "active",
+      "work_sha256": "5acdf33c971b33a7889e198aebeb31cd8f1c4665375b7e02dcc4b05883689e62",
+      "mismatch": true,
+      "diagnostics": [
+        "Work registry mismatch status: WORK-CFG-030"
+      ]
+    }
+  ],
+  "test_source_sha256": "a8f1c43a864c6fa4d06471902ffedacf5b2660c4ffd5a2bc1e67f5eb509c6025"
+}

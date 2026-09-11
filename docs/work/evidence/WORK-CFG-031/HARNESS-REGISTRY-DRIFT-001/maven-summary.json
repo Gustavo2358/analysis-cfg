@@ -1,0 +1,16 @@
+{
+  "command": [
+    "mvn",
+    "-B",
+    "-ntp",
+    "clean",
+    "verify"
+  ],
+  "log_sha256": "8c19ca14865d82760c529cd8e2226c1e1004cc0846f3cf798462b0967e3494b0",
+  "source": "actual Maven suite result lines (not later reused reports)",
+  "tests": 270,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "suites": 37
+}

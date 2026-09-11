@@ -1,0 +1,17 @@
+{
+  "cases": [
+    {
+      "case": "arbitrary stderr on every real javap and jdeps process",
+      "architecture": "PASS",
+      "javap_descriptors_equal": true,
+      "expected_inventory_hash": "f7f268d52d267cd6a1a6052dbd4326588a9f87c58178a4074c498d0f6c969cee",
+      "actual_inventory_hash": "f7f268d52d267cd6a1a6052dbd4326588a9f87c58178a4074c498d0f6c969cee"
+    },
+    {
+      "case": "stdout descriptor changed",
+      "architecture": "FAIL as required",
+      "diagnostic": "W5 compiled inventory drift"
+    }
+  ],
+  "expected_inventory_unchanged": true
+}

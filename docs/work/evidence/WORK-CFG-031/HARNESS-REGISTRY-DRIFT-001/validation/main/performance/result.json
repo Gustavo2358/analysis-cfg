@@ -1,0 +1,11 @@
+{
+  "label": "performance",
+  "command": [
+    "bash",
+    "scripts/harness/check-performance.sh"
+  ],
+  "cwd": "/home/gustavo/workspace/teste-e2e/.w5-recovery/remediation/main",
+  "exit_code": 0,
+  "elapsed_seconds": 58.4616003036499,
+  "log_sha256": "f153f4c3f1463a6e710b61f25f054fe114f8528315d466e792650892fac76703"
+}

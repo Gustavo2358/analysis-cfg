@@ -1,0 +1,7 @@
+--- expected/io/github/gustavo2358/analysis/adapters/LocalResultWriter$Attempt.class
++++ actual/io/github/gustavo2358/analysis/adapters/LocalResultWriter$Attempt.class
+@@ -1,3 +1,4 @@
++[0.001s][warning][perf,memops] Cannot use file /tmp/hsperfdata_gustavo/4248 because it is locked by another process (errno = 11)
+ Compiled from "LocalResultWriter.java"
+ public final class io.github.gustavo2358.analysis.adapters.LocalResultWriter$Attempt extends java.lang.Record {
+   public io.github.gustavo2358.analysis.adapters.LocalResultWriter$Attempt(io.github.gustavo2358.analysis.adapters.DeliveryReceipt, java.util.Map<java.lang.String, java.lang.Long>);

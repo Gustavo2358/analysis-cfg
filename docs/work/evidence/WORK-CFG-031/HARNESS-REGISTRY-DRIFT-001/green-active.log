@@ -1,0 +1,6 @@
+BEFORE {"id": "WORK-CFG-028", "work_status": "active", "registry_status": "active", "work_sha256": "bae096749a4249b6aa479b50fb9f0d9ef8504264311feb5d8db147a212f91dcc", "mismatch": false}
+VALIDATE {"id": "WORK-CFG-028", "work_status": "active", "registry_status": "active", "work_sha256": "bae096749a4249b6aa479b50fb9f0d9ef8504264311feb5d8db147a212f91dcc", "mismatch": false, "diagnostics": []}
+VALIDATE {"id": "WORK-CFG-028", "work_status": "active", "registry_status": "blocked", "work_sha256": "bae096749a4249b6aa479b50fb9f0d9ef8504264311feb5d8db147a212f91dcc", "mismatch": true, "diagnostics": ["Work registry mismatch status: WORK-CFG-028"]}
+VALIDATE {"id": "WORK-CFG-028", "work_status": "blocked", "registry_status": "blocked", "work_sha256": "b0e9ed437df133f9f7b180d4be1b85a35b32156230a3dbe8578dae825cca81ee", "mismatch": false, "diagnostics": ["CP5: harness authorization"]}
+VALIDATE {"id": "WORK-CFG-028", "work_status": "blocked", "registry_status": "active", "work_sha256": "b0e9ed437df133f9f7b180d4be1b85a35b32156230a3dbe8578dae825cca81ee", "mismatch": true, "diagnostics": ["CP5: harness authorization", "Work registry mismatch status: WORK-CFG-028"]}
+AFTER {"id": "WORK-CFG-028", "work_status": "blocked", "registry_status": "active", "work_sha256": "b0e9ed437df133f9f7b180d4be1b85a35b32156230a3dbe8578dae825cca81ee", "mismatch": true}

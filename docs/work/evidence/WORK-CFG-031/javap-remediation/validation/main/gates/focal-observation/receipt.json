@@ -1,0 +1,67 @@
+{
+  "command": [
+    "/home/gustavo/workspace/teste-e2e/.worktrees/analysis-cfg-w5/docs/work/evidence/WORK-CFG-031/HARNESS-REGISTRY-DRIFT-001/focal-probe.py",
+    "--root",
+    "/home/gustavo/workspace/teste-e2e/.pre-cp6/main",
+    "--out",
+    "/home/gustavo/workspace/teste-e2e/.pre-cp6/results/main/gates/focal-observation"
+  ],
+  "exit_code": 0,
+  "setup_succeeded": true,
+  "before": {
+    "id": "WORK-CFG-028",
+    "work_status": "active",
+    "registry_status": "active",
+    "work_sha256": "bae096749a4249b6aa479b50fb9f0d9ef8504264311feb5d8db147a212f91dcc",
+    "mismatch": false
+  },
+  "after": {
+    "id": "WORK-CFG-028",
+    "work_status": "blocked",
+    "registry_status": "active",
+    "work_sha256": "b0e9ed437df133f9f7b180d4be1b85a35b32156230a3dbe8578dae825cca81ee",
+    "mismatch": true
+  },
+  "validator_calls": [
+    {
+      "id": "WORK-CFG-028",
+      "work_status": "active",
+      "registry_status": "active",
+      "work_sha256": "bae096749a4249b6aa479b50fb9f0d9ef8504264311feb5d8db147a212f91dcc",
+      "mismatch": false,
+      "diagnostics": []
+    },
+    {
+      "id": "WORK-CFG-028",
+      "work_status": "active",
+      "registry_status": "blocked",
+      "work_sha256": "bae096749a4249b6aa479b50fb9f0d9ef8504264311feb5d8db147a212f91dcc",
+      "mismatch": true,
+      "diagnostics": [
+        "Work registry mismatch status: WORK-CFG-028"
+      ]
+    },
+    {
+      "id": "WORK-CFG-028",
+      "work_status": "blocked",
+      "registry_status": "blocked",
+      "work_sha256": "b0e9ed437df133f9f7b180d4be1b85a35b32156230a3dbe8578dae825cca81ee",
+      "mismatch": false,
+      "diagnostics": [
+        "CP5: harness authorization"
+      ]
+    },
+    {
+      "id": "WORK-CFG-028",
+      "work_status": "blocked",
+      "registry_status": "active",
+      "work_sha256": "b0e9ed437df133f9f7b180d4be1b85a35b32156230a3dbe8578dae825cca81ee",
+      "mismatch": true,
+      "diagnostics": [
+        "CP5: harness authorization",
+        "Work registry mismatch status: WORK-CFG-028"
+      ]
+    }
+  ],
+  "test_source_sha256": "bcc5d67ac4187a4d2cbbc2fcfac83af29638c78f9aa6f8dadec1d55d98325885"
+}
