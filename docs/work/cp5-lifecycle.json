@@ -479,8 +479,21 @@
   },
   "baseline_synchronization": {
     "work_item": "WORK-CFG-030",
-    "status": "BLOCKED_FOR_HUMAN_REVIEW",
+    "status": "COMPLETED",
+    "baseline_status": "FROZEN / VERIFIED",
     "production_changes_authorized": false,
-    "blocker": "docs/work/evidence/WORK-CFG-030/full-blocker.json"
+    "completion_evidence": {
+      "merge_commit": "89ee2ca3f922f021f149d4ad7273056d0c402b9f",
+      "receipt": "https://github.com/Gustavo2358/analysis-cfg/pull/15#issuecomment-5628007957",
+      "receipt_sha256": "4f61539c7bc09120ef05abf9efb818e61870097b506e173eaed38735bba331e0"
+    },
+    "investigation_history": [
+      {
+        "work_item": "WORK-CFG-030",
+        "status": "BLOCKED_FOR_HUMAN_REVIEW",
+        "production_changes_authorized": false,
+        "blocker": "docs/work/evidence/WORK-CFG-030/full-blocker.json"
+      }
+    ]
   }
 }
