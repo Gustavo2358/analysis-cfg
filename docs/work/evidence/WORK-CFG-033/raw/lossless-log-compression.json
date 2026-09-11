@@ -1,0 +1,30 @@
+[
+  {
+    "original": "cfg-red-tests.log",
+    "stored": "cfg-red-tests.log.gz",
+    "uncompressedSha256": "b93abf5719cef4d58ec3a55a3aefbd6addf0088c11ac41f5dc753f73dab58145",
+    "compressedSha256": "fd61d5e02eed9d6e481a1b6c57cd7a126818827aad5d83810aedd401d18fc003",
+    "byteExactAfterDecompression": true
+  },
+  {
+    "original": "dependency-red.log",
+    "stored": "dependency-red.log.gz",
+    "uncompressedSha256": "0cd5fae1762cf34060608b161e51de01adea03e7ada245ff2c14be544c9c19d9",
+    "compressedSha256": "2ccf62098dee76eae1721ef5f03ea21166d157f46252ffcb1ff07fbc8832c66c",
+    "byteExactAfterDecompression": true
+  },
+  {
+    "original": "effects-green.log",
+    "stored": "effects-green.log.gz",
+    "uncompressedSha256": "c86ce2d6eee4c7b893b24548197ad198df0041df757b3a57fbdce8148b5cc8af",
+    "compressedSha256": "42697763bc5706238cc788f8e41f83c77f817075b686b002f9deb2f21ab08d7d",
+    "byteExactAfterDecompression": true
+  },
+  {
+    "original": "effects-red.log",
+    "stored": "effects-red.log.gz",
+    "uncompressedSha256": "efab75264bcedbfac27ebdccc702b88ef939c4b686e01fda37879c586626b56c",
+    "compressedSha256": "cac71a8292f9e6f2930149c43e981dbcfba4512a9e4a578b55e80bca7fcc99aa",
+    "byteExactAfterDecompression": true
+  }
+]

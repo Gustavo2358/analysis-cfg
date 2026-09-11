@@ -13,6 +13,9 @@ from check_architecture import GateFailure, GateConfigurationError, command_path
 # Reviewed nominal obligations. Never derive this inventory from reports or Java source at runtime.
 SUITES = {
     "cfg-adapters": {
+        "io.github.gustavo2358.analysis.cfg.adapters.W1dInvokeWireTest": {
+            "realInvokeRetainsDistinctTerminatorAndTransitionInExistingCfgWire",
+        },
         "io.github.gustavo2358.analysis.cfg.adapters.ScalarAssignTest": {
             "sequencePayloadAndObjectCellIdentitySurviveRealReaderAndBuild",
             "topologyIsExactlyEntrySequenceReturnAndPartialKnowledgeIsPreserved",
@@ -132,7 +135,7 @@ def main() -> int:
             raise GateFailure("real integration execution failed")
         verify_reports(args.root)
         total = sum(len(methods) for suites in SUITES.values() for methods in suites.values())
-        print(f"[integration] PASS: EVAL-CFG-031/032, 5 nominal suites / {total} methods; real files, shared AirJson, BuildCfg, CLI/process, golden and memory equivalence", flush=True)
+        print(f"[integration] PASS: EVAL-CFG-031/032 and W1D Invoke wire, {sum(len(suites) for suites in SUITES.values())} nominal suites / {total} methods; real files, shared AirJson, BuildCfg, CLI/process, golden and memory equivalence", flush=True)
         return 0
     except GateFailure as exc:
         print("[integration] FAIL: " + str(exc), file=sys.stderr); return 1

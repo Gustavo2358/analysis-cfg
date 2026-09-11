@@ -1,0 +1,66 @@
+{
+  "id": "WORK-CFG-033",
+  "backlog_id": "BACKLOG-CFG-007",
+  "title": "CP6 W1D \u2014 resolve COBOL CALL dependencies from AIR dataflow",
+  "status": "active",
+  "risk": "high",
+  "goal": "Real W1A/W1C COBOL CALL through typed intraprocedural Invoke CFG, effect-aware generic values and dependency site facts.",
+  "authorization": "implementation",
+  "authorization_evidence": "Explicit user CP6 W1D request, 2026-09-11. Commit, push and Draft PR authorized; no merge and no W2.",
+  "checkpoint": "CP6_W1D",
+  "must_read": [
+    "AGENTS.md",
+    "docs/engineering/work-item-protocol.md",
+    "docs/engineering/gates.md",
+    "docs/architecture/cp6-call-dependency-discovery.md",
+    "docs/domain/cp5-solver.md",
+    "docs/domain/cp5-values.md",
+    "docs/engineering/cp5-w3-values-ledger.md",
+    "docs/engineering/cp5-w4-planning-ledger.md",
+    "docs/engineering/cp5-w5-composition-ledger.md",
+    "docs/architecture/analysis-dependency-result-v1.md",
+    "docs/domain/cp6-call-name-policy.md"
+  ],
+  "related_decisions": [],
+  "related_invariants": [],
+  "evals": [],
+  "source_scope": [
+    "cfg-kernel",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure",
+    "analysis-values",
+    "cfg-adapters",
+    "cfg-launcher",
+    "analysis-dependencies",
+    "analysis-adapters",
+    "analysis-launcher",
+    "pom.xml",
+    "scripts",
+    "docs",
+    "MANIFEST.sha256",
+    ".github/workflows/ci.yml"
+  ],
+  "test_scope": [
+    "cfg-kernel/src/test",
+    "cfg-adapters/src/test",
+    "analysis-values/src/test",
+    "analysis-adapters/src/test",
+    "analysis-launcher/src/test"
+  ],
+  "must_not_change": [
+    "analysis-kernel solver production sources",
+    "PossibleValuesState.java, Candidates.java, ValueUniverse.java",
+    "DefaultValuePlan.java",
+    "Sibling production sources and normative AIR",
+    "CP5 evidence and existing golden bytes"
+  ],
+  "gates": [
+    "docs",
+    "fast",
+    "architecture",
+    "semantic",
+    "integration",
+    "performance",
+    "full"
+  ],
+  "stop_condition": "W1D and CP6 W1 IMPLEMENTED / AWAITING_HUMAN_REVIEW; Draft PR; W2 NOT_STARTED / NOT_AUTHORIZED; no merge."
+}

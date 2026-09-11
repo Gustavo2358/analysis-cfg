@@ -155,6 +155,7 @@ public final class CfgJsonWriter {
         return switch (kind) {
             case ENTRY -> "ENTRY"; case JUMP -> "JUMP"; case BRANCH_TRUE -> "BRANCH_TRUE";
             case BRANCH_FALSE -> "BRANCH_FALSE"; case RETURN -> "RETURN"; case HALT -> "HALT";
+            case INVOKE_NORMAL -> "INVOKE_NORMAL";
         };
     }
     private static String terminatorKind(Terminator terminator) throws CfgJsonException {
@@ -163,6 +164,7 @@ public final class CfgJsonWriter {
             case Operations.Branch ignored -> "BRANCH";
             case Operations.Return ignored -> "RETURN";
             case Operations.Halt ignored -> "HALT";
+            case Operations.Invoke ignored -> "INVOKE";
             default -> throw new CfgJsonException("terminator outside CFG JSON v1");
         };
     }

@@ -1,0 +1,157 @@
+{
+  "schema": "cp6-w1d-local-validation@1",
+  "recordedAt": "2026-09-11T21:48:57.438948+00:00",
+  "baseline": "c39a92f930b1c693857a0b30a1f5155f3f81520c",
+  "javaHome": "/tmp/cp6-w1c/jdk21",
+  "mavenRepository": "/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2",
+  "historicalProducerMavenRepository": "/home/gustavo/workspace/teste-e2e/.cp6-w1d/w5-m2",
+  "logs": {
+    "full": {
+      "path": "raw/full-4.log.gz",
+      "uncompressedSha256": "2dcc7c4bd36628f3af943509b354ef6d9025316455384091ea5a95db1a60fddf",
+      "exitCode": 0,
+      "argv": [
+        "scripts/harness/check-full.sh"
+      ]
+    },
+    "w1d": {
+      "path": "raw/w1d-gate-final.log.gz",
+      "uncompressedSha256": "b8155566e92356ea592b5f968077f140e3fd3030bf6fa67f488074f65d92a2be",
+      "exitCode": 0,
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/project/check_w1d.py"
+      ]
+    },
+    "e2e": {
+      "path": "raw/e2e-final-3.log.gz",
+      "uncompressedSha256": "2bfd84975fed1dc0f3ee1376edce9bd3a41ad57d0f6d2cb0cd1c84a2eaf62cc8",
+      "exitCode": 0,
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/project/e2e_w1d.py",
+        "--work",
+        "/home/gustavo/workspace/teste-e2e/.cp6-w1d/e2e-final-3",
+        "--producers",
+        "/home/gustavo/workspace/teste-e2e/.cp6-w1d/w1d-producers/producers.json"
+      ]
+    },
+    "mutations": {
+      "path": "raw/mutations-final.log.gz",
+      "uncompressedSha256": "32e9b96b418876070b9595e53c22dfaa2b878c7b2dc9f3ac71d18a43eff2ef77",
+      "exitCode": 0,
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/project/challenge_w1d.py",
+        "--work",
+        "/home/gustavo/workspace/teste-e2e/.cp6-w1d/mutations-final"
+      ]
+    },
+    "defaultPlanArchitecture": {
+      "path": "raw/default-plan-architecture.log.gz",
+      "uncompressedSha256": "045c207e9e04596b71a5290e38100f132fc01795c265b69fe9639dc4327e43a5",
+      "exitCode": 0,
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/project/challenge_w1d.py",
+        "--work",
+        "/home/gustavo/workspace/teste-e2e/.cp6-w1d/default-plan-architecture",
+        "--only",
+        "default-value-plan-call-logic"
+      ]
+    },
+    "cliWrapper": {
+      "path": "raw/cli-wrapper.log.gz",
+      "uncompressedSha256": "e6c4c67bcd20557a19986fafc868a78ea6fc3059ae45179be942f37d0ca19f3e",
+      "exitCode": 0,
+      "argv": [
+        "python3",
+        "-B",
+        "/home/gustavo/workspace/teste-e2e/.cp6-w1d/check_cli_wrapper.py"
+      ]
+    }
+  },
+  "canonicalSummaries": [
+    "[docs] PASS: local harness structure; NOT Java/IR/CFG semantic validation",
+    "[fast] PASS: documentation and harness tests only",
+    "[analysis-architecture] PASS: direct AIR dependencies; no preparation exception",
+    "[architecture] PASS: adapters/launcher exact sources, classfiles, bytecode edges and effective Maven DAG; shared decoder call; model has no CFG back-edge",
+    "[w1-architecture] PASS: direct dependencies, sources, classfiles, javap/jdeps and effective Maven DAG",
+    "[w2-architecture] PASS: opaque solver/SPI, exact sources/classfiles/javap/jdeps, W1 DAG preserved",
+    "[w3-architecture] PASS: exact sources/classfiles/javap/jdeps/direct Maven; W1/W2 production byte-exact",
+    "[w4-architecture] PASS: compiled consumer capabilities, generic application, bound provider; exact sources/classfiles/javap/jdeps/Maven",
+    "[w5-architecture] PASS: explicit source/classfile/javap/jdeps/Maven inventories; inner direction preserved",
+    "PASS: compiled W1D module/consumer capabilities; generic effects; frozen solver/lattice/DefaultValuePlan",
+    "[architecture] PASS: 108 kernel tests (0 skipped), 22 production classfiles, Java class major 65/no preview (Maven runtime 21.0.12.1)",
+    "[architecture] PASS: compile dependency io.github.gustavo2358:air-java:0.1.0-SNAPSHOT and JDK module java.base only",
+    "[architecture] PASS: CI source pin Gustavo2358/air-java@2a37f5e980ba25fdc79614a66030a84d8bf5b8c9",
+    "[architecture] PASS: BuildCfg(Publication, BuildOptions) -> CfgBuildResult and direct AirValidator preflight",
+    "[architecture] PASS: explicit capability/version registry; no transport, reflection, frontend, AIR shadow, or control primitives beyond the explicit Jump/Branch/Return/Halt/Invoke-Normal slice",
+    "[architecture] PASS (exit 0)",
+    "[semantic] PASS: EVAL-CFG-025/028/029/030, 84 required tests, zero skipped; CFG-FIRST + linear/Jump/Branch/Halt + inventory policy, no complete AIR profile claim",
+    "[w1-semantic] PASS: 20 nominal tests, zero skips; runtime product executed",
+    "[w2-semantic] PASS: 15 nominal tests, no skips; actual product solver executed",
+    "[w3-semantic] PASS: 26 nominal tests; real AIR/CFG/W1/W2/W3, no skips",
+    "[w4-semantic] PASS: 24 nominal tests; real AIR/CFG/W1/W2/W3/W4; no skipped methods",
+    "[w5-semantic] PASS: nominal W5 production/delivery/reader tests; S1\u2013S9 additionally composed by global W1\u2013W4 gates",
+    "[semantic] PASS (exit 0)",
+    "[w1-performance] PASS: 26 nominal tests, zero skips; runtime product executed",
+    "[w2-performance] PASS: 18 nominal tests, no skips; actual product solver executed",
+    "[w3-performance] PASS: 33 nominal tests; real AIR/CFG/W1/W2/W3, no skips",
+    "[w4-performance] PASS: 27 nominal tests; real AIR/CFG/W1/W2/W3/W4; no skipped methods",
+    "[w5-performance] PASS: nominal W5 production/delivery/reader tests; S1\u2013S9 additionally composed by global W1\u2013W4 gates",
+    "[performance] PASS (exit 0)",
+    "[4D] PASS: historical scalar/GOBACK equal actual pinned upstream blobs",
+    "[4D] PASS: approved merge, CI/lock, scalar SHA-256/Git blob/size/provenance and GOBACK hash",
+    "[integration] PASS: EVAL-CFG-031/032 and W1D Invoke wire, 6 nominal suites / 38 methods; real files, shared AirJson, BuildCfg, CLI/process, golden and memory equivalence",
+    "[w5-S10] PASS: two fresh COBOL CP4E runs + CP3 + generic overwrite; actual stages; independent AIR and memory oracles",
+    "[w5-integration] PASS: nominal W5 production/delivery/reader tests; S1\u2013S9 additionally composed by global W1\u2013W4 gates",
+    "[integration] PASS (exit 0)",
+    "[full] PASS"
+  ],
+  "w1dNominalTests": 34,
+  "independentWireTests": 4,
+  "scale": [
+    {
+      "dimension": "invokes",
+      "N": 256,
+      "sites": 256,
+      "queries": 512,
+      "transfers": 258,
+      "elapsedNanos": 56411974
+    },
+    {
+      "dimension": "invokes",
+      "N": 512,
+      "sites": 512,
+      "queries": 1024,
+      "transfers": 514,
+      "elapsedNanos": 78009646
+    }
+  ],
+  "mutations": 20,
+  "defaultPlanArchitectureRepeated": true,
+  "solverLatticeDefaultPlanByteExact": true,
+  "fullEarlierAttempts": [
+    {
+      "log": "raw/full-1.log.gz",
+      "result": "FAIL",
+      "reason": "Strict CI guard still expected the pre-W1D Maven step count."
+    },
+    {
+      "log": "raw/full-2.log.gz",
+      "result": "FAIL",
+      "reason": "Historical W5 selector omitted the newly added reactor module test; fixed by selecting NameInterpreterTest while preserving strict absence-of-tests failures."
+    },
+    {
+      "log": "raw/full-3.log.gz",
+      "result": "FAIL",
+      "reason": "Scalar integration guard still required the old runtime pin; now requires the exact W1B pin and compares unchanged historical fixture hashes/blobs with that pinned source."
+    }
+  ],
+  "remoteCI": "Recorded after commit in delivery handoff and Draft PR."
+}

@@ -12,6 +12,9 @@ final class TextProfile {
     final AnalysisSession session;
     final Map<ObjectId,Location> subjects=new HashMap<>();
     final IdentityHashMap<Operation,Write> writes=new IdentityHashMap<>();
+    private final IdentityHashMap<Operation,ForeignEffectTransfer> effects=new IdentityHashMap<>();
+    private final boolean effectAware;
+    private final List<Location> modeledCells;
     final IdentityHashMap<ContextView,PossibleValuesState> boundaries=new IdentityHashMap<>();
     private final Map<UnitId,Set<ObjectId>> visible=new HashMap<>();
     final Map<UnitId,Boolean> sourceOpen=new HashMap<>();
@@ -21,7 +24,8 @@ final class TextProfile {
     final List<PremiseId> premises=new ArrayList<>();
     final ValuesWork preparation=new ValuesWork();
     private final Set<Operation> admitted=Collections.newSetFromMap(new IdentityHashMap<>());
-    TextProfile(AnalysisSession session) {
+    TextProfile(AnalysisSession session,boolean effectAware) {
+        this.effectAware=effectAware;
         this.session=Objects.requireNonNull(session);
         var index=session.index();var publication=index.publication();
         var cells=new HashMap<StorageId,Location>();
@@ -35,6 +39,7 @@ final class TextProfile {
             if(object.coverage()!=Evidence.CoverageStatus.MODELED||open(object.precision().storage())||open(object.precision().values()))
                 sourceOpenCells.add(location.ordinal());
         }
+        modeledCells=cells.values().stream().sorted(Comparator.comparingInt(Location::ordinal)).toList();
         // A single premise must cover all admitted bases. Scan premise members once, not pairs.
         if(cells.size()>1) {
             boolean covered=false;
@@ -50,6 +55,8 @@ final class TextProfile {
             for(var sequence:unit.sequences()) {
                 for(var instruction:sequence.instructions()){prepare(instruction);open|=open(instruction.header());}
                 prepare(sequence.terminator());open|=open(sequence.terminator().header());
+                if(effectAware && sequence.terminator() instanceof Operations.Invoke invoke)
+                    open|=invoke.outcomes().remainder() instanceof Scopes.WithinControl;
             }
             sourceOpen.put(unit.id(),open);visible.put(unit.id(),Set.copyOf(unit.visibleObjects()));
         }
@@ -85,6 +92,9 @@ final class TextProfile {
             var location=subjects.get(destination.object());
             if(location==null)throw new Refusal(false,"UNSUPPORTED_STORAGE_PROFILE");
             writes.put(operation,new Write(location,universe.supported(text,assign.header().id(),assign.header().origin(),List.of(),preparation)));
+        } else if(effectAware && operation instanceof Operations.Invoke invoke) {
+            if(!invoke.results().isEmpty())throw new Refusal(false,"UNSUPPORTED_EFFECT_PROFILE");
+            effects.put(operation,ForeignEffectTransfer.prepare(invoke.effectBound(),modeledCells));
         } else if(!(operation instanceof Operations.Nop||operation instanceof Operations.Return||operation instanceof Operations.Jump||operation instanceof Operations.Branch||operation instanceof Operations.Halt))
             throw new Refusal(false,"UNSUPPORTED_EFFECT_PROFILE");
         admitted.add(operation);
@@ -92,6 +102,8 @@ final class TextProfile {
     PossibleValuesState transferOperation(PossibleValuesState state,Operation operation,ValuesWork work) {
         if(!admitted.contains(operation))throw new IllegalArgumentException("operation outside prepared snapshot");
         if(!state.isReached())return state;
+        var effect=effects.get(operation);
+        if(effect!=null)return effect.apply(state,work);
         var write=writes.get(operation);
         if(write==null)return state;
         work.strongAssignments=Math.incrementExact(work.strongAssignments);

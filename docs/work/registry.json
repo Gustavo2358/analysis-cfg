@@ -2,11 +2,11 @@
   "schema_version": 1,
   "active": [
     {
-      "id": "WORK-CFG-032",
+      "id": "WORK-CFG-033",
       "backlog_id": "BACKLOG-CFG-007",
-      "path": "docs/work/active/WORK-CFG-032",
+      "path": "docs/work/active/WORK-CFG-033",
       "status": "active",
-      "authorization": "discovery"
+      "authorization": "implementation"
     }
   ],
   "history": [
@@ -125,6 +125,16 @@
       "status": "completed",
       "authorization": "implementation",
       "completed_on": "2026-09-10"
+    },
+    {
+      "id": "WORK-CFG-032",
+      "backlog_id": "BACKLOG-CFG-007",
+      "path": "docs/work/history/WORK-CFG-032.md",
+      "status": "completed",
+      "authorization": "discovery",
+      "completed_on": "2026-09-11",
+      "pr": 17,
+      "merge_commit": "c39a92f930b1c693857a0b30a1f5155f3f81520c"
     }
   ]
 }

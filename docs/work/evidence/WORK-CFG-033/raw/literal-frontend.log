@@ -1,0 +1,9 @@
+2026-09-11T17:19:45.092-03:00 level=INFO logger=i.g.g.cobolexplorer.ExplorerMain thread=main runId=d75ddb41-5d5b-4b71-813b-fadb81be4b5b source=literal.cbl programUnit=none event=analysis_started phase=ANALYSIS output=/home/gustavo/workspace/teste-e2e/.cp6-w1d/red-vertical/literal
+2026-09-11T17:19:45.697-03:00 level=WARN logger=i.g.g.cobolexplorer.ExplorerMain thread=main runId=d75ddb41-5d5b-4b71-813b-fadb81be4b5b source=literal.cbl programUnit=CALLER event=analysis_degraded phase=REFERENCE_RESOLUTION gaps=1 blockingReasons=[CALL_LINKAGE_UNKNOWN] reason=RESOLUTION_GAPS fallback=RESULT_PUBLISHED_WITH_GAPS impact=DEPENDENCY_ANALYSIS_NOT_READY statusCounts={AMBIGUOUS=0, EXTERNAL_OBSERVED=1, UNSUPPORTED=0, RESOLVED=0, UNRESOLVED=0}
+Generated /home/gustavo/workspace/teste-e2e/.cp6-w1d/red-vertical/literal/index.html, /home/gustavo/workspace/teste-e2e/.cp6-w1d/red-vertical/literal/ast.html, /home/gustavo/workspace/teste-e2e/.cp6-w1d/red-vertical/literal/symbols.html and /home/gustavo/workspace/teste-e2e/.cp6-w1d/red-vertical/literal/resolution.html
+Source: literal.cbl
+Parse tree: 33 nodes | 18 tokens | depth 10
+AST: 9 nodes | depth 5 | literal-target CALLs 1
+Symbols: 1 declarations | 5 scopes | 0 diagnostics | parser errors 0
+Reference binding: 1 entries | 1 gaps | dependency analysis ready: false
+2026-09-11T17:19:45.698-03:00 level=INFO logger=i.g.g.cobolexplorer.ExplorerMain thread=main runId=d75ddb41-5d5b-4b71-813b-fadb81be4b5b source=literal.cbl programUnit=CALLER event=analysis_completed phase=ANALYSIS elapsedMs=621 programUnits=1 references=1 gaps=1 dependencyAnalysisReady=false output=/home/gustavo/workspace/teste-e2e/.cp6-w1d/red-vertical/literal

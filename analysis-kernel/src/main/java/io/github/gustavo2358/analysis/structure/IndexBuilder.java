@@ -129,7 +129,9 @@ final class IndexBuilder {
                 unique(sequences, sequence.label(), sequence, "duplicate Sequence label");
                 Terminator term = sequence.terminator();
                 supported(term instanceof Operations.Jump || term instanceof Operations.Branch
-                        || term instanceof Operations.Return || term instanceof Operations.Halt, "unsupported terminator profile");
+                        || term instanceof Operations.Return || term instanceof Operations.Halt
+                        || term instanceof Operations.Invoke invoke && (invoke.outcomes().known().size()==1 && invoke.outcomes().known().getFirst() instanceof Control.Normal
+                            && (invoke.outcomes().remainder() instanceof Scopes.NoControl || invoke.outcomes().remainder() instanceof Scopes.WithinControl bound && bound.scope() instanceof Scopes.AllControl)), "unsupported terminator profile");
                 arity = Math.addExact(arity, term instanceof Operations.Branch ? 2 : 1);
                 if (term instanceof Operations.Halt) expectedHalts = Math.incrementExact(expectedHalts);
                 int offset = 0;
@@ -282,6 +284,8 @@ final class IndexBuilder {
         if (!(source.source() instanceof CfgNode.SequenceNode node)) return null;
         return switch (node.source().terminator()) {
             case Operations.Jump jump -> kind == CfgTransition.Kind.JUMP ? sequenceNodes.get(jump.destination()) : null;
+            case Operations.Invoke invoke -> kind == CfgTransition.Kind.INVOKE_NORMAL
+                    ? sequenceNodes.get(((Control.Normal) invoke.outcomes().known().getFirst()).label()) : null;
             case Operations.Branch branch -> switch (kind) {
                 case BRANCH_TRUE -> sequenceNodes.get(branch.trueDestination());
                 case BRANCH_FALSE -> sequenceNodes.get(branch.falseDestination());

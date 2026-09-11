@@ -274,7 +274,15 @@ def validate_cp5(root: Path) -> list[str]:
         require(inventory['baseline'] == BASE, 'source inventory baseline')
         actual = {str(p.relative_to(root)):hashlib.sha256(p.read_bytes()).hexdigest()
                   for p in files_under(root) if p.suffix == '.java' or p.name == 'pom.xml'}
-        require(actual == load_json(root / 'docs/work/evidence/WORK-CFG-029/source-inventory.json')['files'], 'no unauthorized Java/POM implementation (exact inventory)')
+        from w1d_scope import authorized, verify, INVENTORY as W1D_INVENTORY
+        if authorized(root):
+            try:
+                verify(root)
+            except ValueError as error:
+                require(False, str(error))
+            require(actual == load_json(root / W1D_INVENTORY)['files'], 'no unauthorized Java/POM implementation (exact inventory)')
+        else:
+            require(actual == load_json(root / 'docs/work/evidence/WORK-CFG-029/source-inventory.json')['files'], 'no unauthorized Java/POM implementation (exact inventory)')
         require((root/'analysis-kernel').is_dir() and (root/'analysis-values').is_dir(), 'W3 modules required')
         require(not (root/'analysis-consumers').exists(), 'no speculative consumer modules')
         require(not any(p.suffix in {'.jar','.class'} for p in files_under(root)), 'no vendored bytecode')

@@ -15,6 +15,8 @@ TESTS={'cfg-adapters/src/test/java/io/github/gustavo2358/analysis/cfg/adapters/T
 def sha(data):return hashlib.sha256(data).hexdigest()
 def contract(root):return json.loads((root/CONTRACT).read_text())
 def allows_change(root,path,old_digest):
+    from w1d_scope import allows_change as w1d_allows
+    if w1d_allows(root,path,old_digest): return True
     c=contract(root)
     if (path=='docs/sources/sources.lock.json' and c['base']==BASE and c['baseline_sha256'].get(path)==old_digest
             and set(c['changed_tests'])==TESTS and set(c['changed_production'])==PRODUCTION):

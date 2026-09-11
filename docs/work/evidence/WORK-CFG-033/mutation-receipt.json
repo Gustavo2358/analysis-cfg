@@ -1,0 +1,1220 @@
+{
+  "schema": "w1d-mutations@1",
+  "firstGreen": {
+    "argv": [
+      "mvn",
+      "-B",
+      "-ntp",
+      "-pl",
+      "analysis-launcher",
+      "-am",
+      "test",
+      "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,NameInterpreterTest,W1d*Test,DependencyCliTest"
+    ],
+    "exitCode": 0,
+    "log": "first-green.log",
+    "sha256": "0977c096d2f0130419db5681750bc842e18fd27e53bd28e5fc21a94cb664c0f1"
+  },
+  "mutants": [
+    {
+      "name": "invoke-unsupported",
+      "path": "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CoreCfgProjection.java",
+      "originalSha256": "f4bfa838da978e9db61ce0d129262b262c12e25ef3d59caa2eefc20cc2a2c456",
+      "mutatedSha256": "57fc49c032a96961a77332d444d23722017e35d97edfad96f2eb45dc5307cd7e",
+      "byteExactRestore": true,
+      "execution": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,NameInterpreterTest,W1d*Test,DependencyCliTest"
+        ],
+        "exitCode": 1,
+        "log": "invoke-unsupported.log",
+        "sha256": "0f7001bfc80d4803bb1bb5ddc0c6f07e0834dc93b354d4c471df1e0c95ec7528"
+      },
+      "semanticFailures": [
+        {
+          "suite": "W1dBoundaryTest",
+          "test": "literalRetainsLiteralWithoutFakeObjectOrAssign",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "[CfgProjectionIssue[code=UNSUPPORTED_TERMINATOR, subject=OperationId[unit=UnitId[publication=PublicationId[localId=3e110705fa33dadb2ada6f675475f8d4], localId=unit], localId=634d4a9c739693f77b9703bedae07d12]]] ==> expected: <CFG_BUILT> but was: <UNSUPPORTED_INPUT>"
+        },
+        {
+          "suite": "W1dBoundaryTest",
+          "test": "oldValuesProfileStillRefusesRealInvoke",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "[CfgProjectionIssue[code=UNSUPPORTED_TERMINATOR, subject=OperationId[unit=UnitId[publication=PublicationId[localId=437c54421d9cd62278589ab67b6c7064], localId=unit], localId=5357696c937658b9eac2d662086444cd]]] ==> expected: <CFG_BUILT> but was: <UNSUPPORTED_INPUT>"
+        },
+        {
+          "suite": "W1dBoundaryTest",
+          "test": "realDynamicInvokeHasTypedLocalNormalAndOriginalAir",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "expected: <CFG_BUILT> but was: <UNSUPPORTED_INPUT>"
+        },
+        {
+          "suite": "W1dEffectsTest",
+          "test": "mayWritePreservesCandidateAndOpensNormalContinuation",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "[CfgProjectionIssue[code=UNSUPPORTED_TERMINATOR, subject=OperationId[unit=UnitId[publication=PublicationId[localId=437c54421d9cd62278589ab67b6c7064], localId=unit], localId=5357696c937658b9eac2d662086444cd]]] ==> expected: <CFG_BUILT> but was: <UNSUPPORTED_INPUT>"
+        },
+        {
+          "suite": "W1dEffectsTest",
+          "test": "loopBeforeInvokeContainsPreviousEffectAtFixpoint",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "[CfgProjectionIssue[code=UNSUPPORTED_TERMINATOR, subject=OperationId[unit=UnitId[publication=PublicationId[localId=437c54421d9cd62278589ab67b6c7064], localId=unit], localId=5357696c937658b9eac2d662086444cd]]] ==> expected: <CFG_BUILT> but was: <UNSUPPORTED_INPUT>"
+        },
+        {
+          "suite": "W1dEffectsTest",
+          "test": "perOutcomeEffectsAreExplicitlyUnsupported",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "[CfgProjectionIssue[code=UNSUPPORTED_TERMINATOR, subject=OperationId[unit=UnitId[publication=PublicationId[localId=437c54421d9cd62278589ab67b6c7064], localId=unit], localId=5357696c937658b9eac2d662086444cd]]] ==> expected: <CFG_BUILT> but was: <UNSUPPORTED_INPUT>"
+        },
+        {
+          "suite": "W1dEffectsTest",
+          "test": "beforeRealInvokeIsClosedPaddedValueWithAssignSupport",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "[CfgProjectionIssue[code=UNSUPPORTED_TERMINATOR, subject=OperationId[unit=UnitId[publication=PublicationId[localId=437c54421d9cd62278589ab67b6c7064], localId=unit], localId=5357696c937658b9eac2d662086444cd]]] ==> expected: <CFG_BUILT> but was: <UNSUPPORTED_INPUT>"
+        },
+        {
+          "suite": "W1dEffectsTest",
+          "test": "mustOverwriteOutsideSliceHasExplicitRefusal",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "[CfgProjectionIssue[code=UNSUPPORTED_TERMINATOR, subject=OperationId[unit=UnitId[publication=PublicationId[localId=437c54421d9cd62278589ab67b6c7064], localId=unit], localId=5357696c937658b9eac2d662086444cd]]] ==> expected: <CFG_BUILT> but was: <UNSUPPORTED_INPUT>"
+        },
+        {
+          "suite": "W1dEffectsTest",
+          "test": "explicitNoMemoryDoesNotOpenLoopValue",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "[CfgProjectionIssue[code=UNSUPPORTED_TERMINATOR, subject=OperationId[unit=UnitId[publication=PublicationId[localId=437c54421d9cd62278589ab67b6c7064], localId=unit], localId=5357696c937658b9eac2d662086444cd]]] ==> expected: <CFG_BUILT> but was: <UNSUPPORTED_INPUT>"
+        },
+        {
+          "suite": "W1dEffectsTest",
+          "test": "narrowerMemoryScopeIsRefusedRatherThanSilentlyIgnored",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "[CfgProjectionIssue[code=UNSUPPORTED_TERMINATOR, subject=OperationId[unit=UnitId[publication=PublicationId[localId=437c54421d9cd62278589ab67b6c7064], localId=unit], localId=5357696c937658b9eac2d662086444cd]]] ==> expected: <CFG_BUILT> but was: <UNSUPPORTED_INPUT>"
+        },
+        {
+          "suite": "W1dDependencyTest",
+          "test": "noMoveIsReachableOpenWithoutInventedProgram",
+          "type": "io.github.gustavo2358.analysis.dependencies.DependencyAnalysis$Failure",
+          "message": "CFG_UNSUPPORTED"
+        },
+        {
+          "suite": "W1dDependencyTest",
+          "test": "literalHasNoPossibleValuesPreparationOrRun",
+          "type": "io.github.gustavo2358.analysis.dependencies.DependencyAnalysis$Failure",
+          "message": "CFG_UNSUPPORTED"
+        },
+        {
+          "suite": "W1dDependencyTest",
+          "test": "rawValueExistsButDependencyMustBeProduced",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "[CfgProjectionIssue[code=UNSUPPORTED_TERMINATOR, subject=OperationId[unit=UnitId[publication=PublicationId[localId=437c54421d9cd62278589ab67b6c7064], localId=unit], localId=5357696c937658b9eac2d662086444cd]]] ==> expected: <CFG_BUILT> but was: <UNSUPPORTED_INPUT>"
+        },
+        {
+          "suite": "W1dAdversarialTest",
+          "test": "literalPlannerHasZeroValuesDependenciesAndNoValuesProviderInstalled",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "[CfgProjectionIssue[code=UNSUPPORTED_TERMINATOR, subject=OperationId[unit=UnitId[publication=PublicationId[localId=3e110705fa33dadb2ada6f675475f8d4], localId=unit], localId=634d4a9c739693f77b9703bedae07d12]]] ==> expected: <CFG_BUILT> but was: <UNSUPPORTED_INPUT>"
+        },
+        {
+          "suite": "W1dAdversarialTest",
+          "test": "sharedAndRepeatedQueriesExecuteOneValuesRun",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "[CfgProjectionIssue[code=UNSUPPORTED_TERMINATOR, subject=OperationId[unit=UnitId[publication=PublicationId[localId=437c54421d9cd62278589ab67b6c7064], localId=unit], localId=5357696c937658b9eac2d662086444cd]]] ==> expected: <CFG_BUILT> but was: <UNSUPPORTED_INPUT>"
+        },
+        {
+          "suite": "W1dAdversarialTest",
+          "test": "explicitContinuationSurvivesPhysicalPermutationAndDecoy",
+          "type": "io.github.gustavo2358.analysis.dependencies.DependencyAnalysis$Failure",
+          "message": "CFG_UNSUPPORTED"
+        },
+        {
+          "suite": "W1dAdversarialTest",
+          "test": "orphanLiteralAndComputedEmitSiteWithoutExecutableEdge",
+          "type": "io.github.gustavo2358.analysis.dependencies.DependencyAnalysis$Failure",
+          "message": "CFG_UNSUPPORTED"
+        },
+        {
+          "suite": "W1dAdversarialTest",
+          "test": "strictWireInputsAreWrittenForIndependentParserAndOriginAudit",
+          "type": "io.github.gustavo2358.analysis.dependencies.DependencyAnalysis$Failure",
+          "message": "CFG_UNSUPPORTED"
+        },
+        {
+          "suite": "W1dAdversarialTest",
+          "test": "wrongNamespaceAndCategoryAreNotProgramDependencies",
+          "type": "io.github.gustavo2358.analysis.dependencies.DependencyAnalysis$Failure",
+          "message": "CFG_UNSUPPORTED"
+        },
+        {
+          "suite": "W1dAdversarialTest",
+          "test": "noncanonicalLiteralPreservesRawAndOpensInterpretation",
+          "type": "io.github.gustavo2358.analysis.dependencies.DependencyAnalysis$Failure",
+          "message": "CFG_UNSUPPORTED"
+        },
+        {
+          "suite": "W1dAdversarialTest",
+          "test": "unsupportedComputedExpressionIsDiagnosticNotInventedLiteral",
+          "type": "io.github.gustavo2358.analysis.dependencies.DependencyAnalysis$Failure",
+          "message": "CFG_UNSUPPORTED"
+        },
+        {
+          "suite": "W1dModelTest",
+          "test": "allMemoryOpensEveryModeledCellWhileNoMemoryPreservesThem",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "CfgBuildResult[status=UNSUPPORTED_INPUT, publicationId=PublicationId[localId=w1d-model], airVersion=2.0.0, options=BuildOptions[validation=ValidationOptions[maximumNesting=2147483647, maximumEntities=2147483647, maximumIssues=10000], projectionPolicy=KNOWN_SUBSET], preflight=ValidationResult[issues=[ValidationIssue[kind=SEMANTIC_OBLIGATION, rule=I-59, subject=Optional[PremiseId[publication=PublicationId[localId=w1d-model], localId=disjoint]], detail=authority must substantiate pairwise physical separation for the whole publication], ValidationIssue[kind=SEMANTIC_OBLIGATION, rule=I-56, subject=Optional[OperationId[unit=UnitId[publication=PublicationId[localId=w1d-model], localId=caller], localId=effect]], detail=producer/authority must substantiate materialized signature, effects and outcomes; structural validation does not compare them with external semantics or a body], ValidationIssue[kind=SEMANTIC_OBLIGATION, rule=I-56, subject=Optional[OperationId[unit=UnitId[publication=Publicatio"
+        },
+        {
+          "suite": "W1dModelTest",
+          "test": "targetObjectIdentityIsNotFirstObjectInUnit",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "CfgBuildResult[status=UNSUPPORTED_INPUT, publicationId=PublicationId[localId=w1d-model], airVersion=2.0.0, options=BuildOptions[validation=ValidationOptions[maximumNesting=2147483647, maximumEntities=2147483647, maximumIssues=10000], projectionPolicy=KNOWN_SUBSET], preflight=ValidationResult[issues=[ValidationIssue[kind=SEMANTIC_OBLIGATION, rule=I-59, subject=Optional[PremiseId[publication=PublicationId[localId=w1d-model], localId=disjoint]], detail=authority must substantiate pairwise physical separation for the whole publication], ValidationIssue[kind=SEMANTIC_OBLIGATION, rule=I-56, subject=Optional[OperationId[unit=UnitId[publication=PublicationId[localId=w1d-model], localId=caller], localId=invoke]], detail=producer/authority must substantiate materialized signature, effects and outcomes; structural validation does not compare them with external semantics or a body]], statistics=Statistics[entities=21, operands=6, operations=4, domainQueries=2], diagnostics=Diagnostics[counts={SEMA"
+        },
+        {
+          "suite": "W1dModelTest",
+          "test": "invokeAndEffectsScaleHaveLinearWorkCounts",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "CfgBuildResult[status=UNSUPPORTED_INPUT, publicationId=PublicationId[localId=w1d-model], airVersion=2.0.0, options=BuildOptions[validation=ValidationOptions[maximumNesting=2147483647, maximumEntities=2147483647, maximumIssues=10000], projectionPolicy=KNOWN_SUBSET], preflight=ValidationResult[issues=[ValidationIssue[kind=SEMANTIC_OBLIGATION, rule=I-56, subject=Optional[OperationId[unit=UnitId[publication=PublicationId[localId=w1d-model], localId=caller], localId=call-0]], detail=producer/authority must substantiate materialized signature, effects and outcomes; structural validation does not compare them with external semantics or a body], ValidationIssue[kind=SEMANTIC_OBLIGATION, rule=I-56, subject=Optional[OperationId[unit=UnitId[publication=PublicationId[localId=w1d-model], localId=caller], localId=call-1]], detail=producer/authority must substantiate materialized signature, effects and outcomes; structural validation does not compare them with external semantics or a body], Validatio"
+        },
+        {
+          "suite": "W1dModelTest",
+          "test": "joinKeepsDifferentCandidatesAndTheirSpecificAssignments",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "CfgBuildResult[status=UNSUPPORTED_INPUT, publicationId=PublicationId[localId=w1d-model], airVersion=2.0.0, options=BuildOptions[validation=ValidationOptions[maximumNesting=2147483647, maximumEntities=2147483647, maximumIssues=10000], projectionPolicy=KNOWN_SUBSET], preflight=ValidationResult[issues=[ValidationIssue[kind=SEMANTIC_OBLIGATION, rule=I-56, subject=Optional[OperationId[unit=UnitId[publication=PublicationId[localId=w1d-model], localId=caller], localId=invoke]], detail=producer/authority must substantiate materialized signature, effects and outcomes; structural validation does not compare them with external semantics or a body]], statistics=Statistics[entities=25, operands=7, operations=7, domainQueries=2], diagnostics=Diagnostics[counts={SEMANTIC_OBLIGATION=1}, traversalCompleted=true]], unsupportedCapabilities=[], projectionIssues=[CfgProjectionIssue[code=UNSUPPORTED_TERMINATOR, subject=OperationId[unit=UnitId[publication=PublicationId[localId=w1d-model], localId=caller], lo"
+        }
+      ]
+    },
+    {
+      "name": "invoke-generic-jump",
+      "path": "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CoreCfgProjection.java",
+      "originalSha256": "f4bfa838da978e9db61ce0d129262b262c12e25ef3d59caa2eefc20cc2a2c456",
+      "mutatedSha256": "2b8f8ff3808c0a55065e4e1d7059bf3163510b04a155bb88028e36c2ceddb9fd",
+      "byteExactRestore": true,
+      "execution": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,NameInterpreterTest,W1d*Test,DependencyCliTest"
+        ],
+        "exitCode": 1,
+        "log": "invoke-generic-jump.log",
+        "sha256": "ebf6695eafd535716424299c603c99d43ad47492d60884f38eae69de36739bf5"
+      },
+      "semanticFailures": [
+        {
+          "suite": "W1dBoundaryTest",
+          "test": "literalRetainsLiteralWithoutFakeObjectOrAssign",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dBoundaryTest",
+          "test": "oldValuesProfileStillRefusesRealInvoke",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dBoundaryTest",
+          "test": "realDynamicInvokeHasTypedLocalNormalAndOriginalAir",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dEffectsTest",
+          "test": "mayWritePreservesCandidateAndOpensNormalContinuation",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dEffectsTest",
+          "test": "loopBeforeInvokeContainsPreviousEffectAtFixpoint",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dEffectsTest",
+          "test": "perOutcomeEffectsAreExplicitlyUnsupported",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dEffectsTest",
+          "test": "beforeRealInvokeIsClosedPaddedValueWithAssignSupport",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dEffectsTest",
+          "test": "mustOverwriteOutsideSliceHasExplicitRefusal",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dEffectsTest",
+          "test": "explicitNoMemoryDoesNotOpenLoopValue",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dEffectsTest",
+          "test": "narrowerMemoryScopeIsRefusedRatherThanSilentlyIgnored",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dDependencyTest",
+          "test": "noMoveIsReachableOpenWithoutInventedProgram",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dDependencyTest",
+          "test": "literalHasNoPossibleValuesPreparationOrRun",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dDependencyTest",
+          "test": "rawValueExistsButDependencyMustBeProduced",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dAdversarialTest",
+          "test": "literalPlannerHasZeroValuesDependenciesAndNoValuesProviderInstalled",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dAdversarialTest",
+          "test": "sharedAndRepeatedQueriesExecuteOneValuesRun",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dAdversarialTest",
+          "test": "explicitContinuationSurvivesPhysicalPermutationAndDecoy",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dAdversarialTest",
+          "test": "orphanLiteralAndComputedEmitSiteWithoutExecutableEdge",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dAdversarialTest",
+          "test": "strictWireInputsAreWrittenForIndependentParserAndOriginAudit",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dAdversarialTest",
+          "test": "wrongNamespaceAndCategoryAreNotProgramDependencies",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dAdversarialTest",
+          "test": "noncanonicalLiteralPreservesRawAndOpensInterpretation",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dAdversarialTest",
+          "test": "unsupportedComputedExpressionIsDiagnosticNotInventedLiteral",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dModelTest",
+          "test": "allMemoryOpensEveryModeledCellWhileNoMemoryPreservesThem",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dModelTest",
+          "test": "targetObjectIdentityIsNotFirstObjectInUnit",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dModelTest",
+          "test": "invokeAndEffectsScaleHaveLinearWorkCounts",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dModelTest",
+          "test": "joinKeepsDifferentCandidatesAndTheirSpecificAssignments",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        }
+      ]
+    },
+    {
+      "name": "physical-next-sequence",
+      "path": "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CoreCfgProjection.java",
+      "originalSha256": "f4bfa838da978e9db61ce0d129262b262c12e25ef3d59caa2eefc20cc2a2c456",
+      "mutatedSha256": "ddb9f710ce725b4bfa40ab6ae52cabdef37bd33edbb0c683f0c83359f263bb97",
+      "byteExactRestore": true,
+      "execution": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,NameInterpreterTest,W1d*Test,DependencyCliTest"
+        ],
+        "exitCode": 1,
+        "log": "physical-next-sequence.log",
+        "sha256": "3029cbd5f939722f19c54bd1ea29a90d88cb72b661ba24172fe6896bce152d15"
+      },
+      "semanticFailures": [
+        {
+          "suite": "W1dEffectsTest",
+          "test": "loopBeforeInvokeContainsPreviousEffectAtFixpoint",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dEffectsTest",
+          "test": "explicitNoMemoryDoesNotOpenLoopValue",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dAdversarialTest",
+          "test": "explicitContinuationSurvivesPhysicalPermutationAndDecoy",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        }
+      ]
+    },
+    {
+      "name": "fabricated-callee-entry-edge",
+      "path": "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CoreCfgProjection.java",
+      "originalSha256": "f4bfa838da978e9db61ce0d129262b262c12e25ef3d59caa2eefc20cc2a2c456",
+      "mutatedSha256": "320a99b31487f25f725b6c14a9dac79be72e2e9bf60d2abba65ece149810143c",
+      "byteExactRestore": true,
+      "execution": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,NameInterpreterTest,W1d*Test,DependencyCliTest"
+        ],
+        "exitCode": 1,
+        "log": "fabricated-callee-entry-edge.log",
+        "sha256": "2ab77fecfb50c1c231cd4247b7e5c9fc8afff6f3cad8650d086dcc5e5fc54c17"
+      },
+      "semanticFailures": [
+        {
+          "suite": "W1dBoundaryTest",
+          "test": "literalRetainsLiteralWithoutFakeObjectOrAssign",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dBoundaryTest",
+          "test": "oldValuesProfileStillRefusesRealInvoke",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dBoundaryTest",
+          "test": "realDynamicInvokeHasTypedLocalNormalAndOriginalAir",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dEffectsTest",
+          "test": "mayWritePreservesCandidateAndOpensNormalContinuation",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dEffectsTest",
+          "test": "loopBeforeInvokeContainsPreviousEffectAtFixpoint",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dEffectsTest",
+          "test": "perOutcomeEffectsAreExplicitlyUnsupported",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dEffectsTest",
+          "test": "beforeRealInvokeIsClosedPaddedValueWithAssignSupport",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dEffectsTest",
+          "test": "mustOverwriteOutsideSliceHasExplicitRefusal",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dEffectsTest",
+          "test": "explicitNoMemoryDoesNotOpenLoopValue",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dEffectsTest",
+          "test": "narrowerMemoryScopeIsRefusedRatherThanSilentlyIgnored",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dDependencyTest",
+          "test": "noMoveIsReachableOpenWithoutInventedProgram",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dDependencyTest",
+          "test": "literalHasNoPossibleValuesPreparationOrRun",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dDependencyTest",
+          "test": "rawValueExistsButDependencyMustBeProduced",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dAdversarialTest",
+          "test": "literalPlannerHasZeroValuesDependenciesAndNoValuesProviderInstalled",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dAdversarialTest",
+          "test": "sharedAndRepeatedQueriesExecuteOneValuesRun",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dAdversarialTest",
+          "test": "explicitContinuationSurvivesPhysicalPermutationAndDecoy",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dAdversarialTest",
+          "test": "orphanLiteralAndComputedEmitSiteWithoutExecutableEdge",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dAdversarialTest",
+          "test": "strictWireInputsAreWrittenForIndependentParserAndOriginAudit",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dAdversarialTest",
+          "test": "wrongNamespaceAndCategoryAreNotProgramDependencies",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dAdversarialTest",
+          "test": "noncanonicalLiteralPreservesRawAndOpensInterpretation",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dAdversarialTest",
+          "test": "unsupportedComputedExpressionIsDiagnosticNotInventedLiteral",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dModelTest",
+          "test": "allMemoryOpensEveryModeledCellWhileNoMemoryPreservesThem",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dModelTest",
+          "test": "targetObjectIdentityIsNotFirstObjectInUnit",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dModelTest",
+          "test": "invokeAndEffectsScaleHaveLinearWorkCounts",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        },
+        {
+          "suite": "W1dModelTest",
+          "test": "joinKeepsDifferentCandidatesAndTheirSpecificAssignments",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "CFG transition disagrees with its typed endpoints/correlation"
+        }
+      ]
+    },
+    {
+      "name": "effect-as-nop",
+      "path": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/TextProfile.java",
+      "originalSha256": "dba8b5e20c1b3a5ea5663c482bcacd91919458a3352b1b61a778b901939711ac",
+      "mutatedSha256": "b10b84ae919e7a48709b01b12f1f2877ce2778743db7261b39d6bd97a2f85f60",
+      "byteExactRestore": true,
+      "execution": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,NameInterpreterTest,W1d*Test,DependencyCliTest"
+        ],
+        "exitCode": 1,
+        "log": "effect-as-nop.log",
+        "sha256": "10d77f0514b5fd3bc9b0890c0bc58c2ba22c90e224837c7f8ec3d92222e11d44"
+      },
+      "semanticFailures": [
+        {
+          "suite": "W1dEffectsTest",
+          "test": "mayWritePreservesCandidateAndOpensNormalContinuation",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "expected: <true> but was: <false>"
+        },
+        {
+          "suite": "W1dEffectsTest",
+          "test": "loopBeforeInvokeContainsPreviousEffectAtFixpoint",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "expected: <true> but was: <false>"
+        },
+        {
+          "suite": "W1dModelTest",
+          "test": "allMemoryOpensEveryModeledCellWhileNoMemoryPreservesThem",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "expected: <true> but was: <false>"
+        }
+      ]
+    },
+    {
+      "name": "may-write-strong-kill",
+      "path": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/ForeignEffectTransfer.java",
+      "originalSha256": "3006fe3efb65740464df617688bfa2d887232a2b284e33a3163f7d3b5350d79d",
+      "mutatedSha256": "f6d2d8abed3c5191c38f89196496657084b39931cb49b939c2e67cc14e37d391",
+      "byteExactRestore": true,
+      "execution": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,NameInterpreterTest,W1d*Test,DependencyCliTest"
+        ],
+        "exitCode": 1,
+        "log": "may-write-strong-kill.log",
+        "sha256": "63bf54739dbabd57a72525def655ef27375d00e82144ba89ce4611e64446a325"
+      },
+      "semanticFailures": [
+        {
+          "suite": "W1dEffectsTest",
+          "test": "mayWritePreservesCandidateAndOpensNormalContinuation",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "expected: <[TextValue[value=PROGA   ]]> but was: <[]>"
+        },
+        {
+          "suite": "W1dModelTest",
+          "test": "allMemoryOpensEveryModeledCellWhileNoMemoryPreservesThem",
+          "type": "java.util.NoSuchElementException",
+          "message": ""
+        },
+        {
+          "suite": "W1dModelTest",
+          "test": "invokeAndEffectsScaleHaveLinearWorkCounts",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "expected: <256> but was: <1>"
+        }
+      ]
+    },
+    {
+      "name": "effect-only-in-replay",
+      "path": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesAnalysis.java",
+      "originalSha256": "81be102d08cb279799d301319e1a5a3d600c80c5cc45654f3ec87bf66ded72ee",
+      "mutatedSha256": "857d0bfc78f6043eb6edd21e54fdd575dd5f6150aae23a5b8e011e9d8518f2eb",
+      "byteExactRestore": true,
+      "execution": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,NameInterpreterTest,W1d*Test,DependencyCliTest"
+        ],
+        "exitCode": 1,
+        "log": "effect-only-in-replay.log",
+        "sha256": "a87edbfc1137dc2a4511065ca07234f606a2b894562e6d77a26e32fa585697ac"
+      },
+      "semanticFailures": [
+        {
+          "suite": "W1dEffectsTest",
+          "test": "mayWritePreservesCandidateAndOpensNormalContinuation",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "expected: <true> but was: <false>"
+        },
+        {
+          "suite": "W1dEffectsTest",
+          "test": "loopBeforeInvokeContainsPreviousEffectAtFixpoint",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "expected: <true> but was: <false>"
+        },
+        {
+          "suite": "W1dModelTest",
+          "test": "allMemoryOpensEveryModeledCellWhileNoMemoryPreservesThem",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "expected: <true> but was: <false>"
+        }
+      ]
+    },
+    {
+      "name": "before-to-after",
+      "path": "analysis-dependencies/src/main/java/io/github/gustavo2358/analysis/dependencies/CallDependencyPlan.java",
+      "originalSha256": "1bc2e49d32880ab80a60733d10bcf429f2cee1b1e825ff199d0872a8478738d8",
+      "mutatedSha256": "a90d6c03d45fc2b7a5ab52dfb28fe8d1403eadab2aef0009690ac2a4a3ae8c03",
+      "byteExactRestore": true,
+      "execution": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,NameInterpreterTest,W1d*Test,DependencyCliTest"
+        ],
+        "exitCode": 1,
+        "log": "before-to-after.log",
+        "sha256": "0ba54a6be641fb01b23927f9dbf1cfb78094451a2caa891555df4ee55f13c3a9"
+      },
+      "semanticFailures": [
+        {
+          "suite": "W1dDependencyTest",
+          "test": "noMoveIsReachableOpenWithoutInventedProgram",
+          "type": "io.github.gustavo2358.analysis.dependencies.DependencyAnalysis$Failure",
+          "message": "dependency preparation incomplete"
+        },
+        {
+          "suite": "W1dDependencyTest",
+          "test": "rawValueExistsButDependencyMustBeProduced",
+          "type": "io.github.gustavo2358.analysis.dependencies.DependencyAnalysis$Failure",
+          "message": "dependency preparation incomplete"
+        },
+        {
+          "suite": "W1dAdversarialTest",
+          "test": "sharedAndRepeatedQueriesExecuteOneValuesRun",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "expected: <COMPLETE> but was: <INCOMPLETE>"
+        },
+        {
+          "suite": "W1dAdversarialTest",
+          "test": "explicitContinuationSurvivesPhysicalPermutationAndDecoy",
+          "type": "io.github.gustavo2358.analysis.dependencies.DependencyAnalysis$Failure",
+          "message": "dependency preparation incomplete"
+        },
+        {
+          "suite": "W1dAdversarialTest",
+          "test": "strictWireInputsAreWrittenForIndependentParserAndOriginAudit",
+          "type": "io.github.gustavo2358.analysis.dependencies.DependencyAnalysis$Failure",
+          "message": "dependency preparation incomplete"
+        },
+        {
+          "suite": "W1dModelTest",
+          "test": "allMemoryOpensEveryModeledCellWhileNoMemoryPreservesThem",
+          "type": "io.github.gustavo2358.analysis.dependencies.DependencyAnalysis$Failure",
+          "message": "dependency preparation incomplete"
+        },
+        {
+          "suite": "W1dModelTest",
+          "test": "targetObjectIdentityIsNotFirstObjectInUnit",
+          "type": "io.github.gustavo2358.analysis.dependencies.DependencyAnalysis$Failure",
+          "message": "dependency preparation incomplete"
+        },
+        {
+          "suite": "W1dModelTest",
+          "test": "invokeAndEffectsScaleHaveLinearWorkCounts",
+          "type": "io.github.gustavo2358.analysis.dependencies.DependencyAnalysis$Failure",
+          "message": "dependency preparation incomplete"
+        },
+        {
+          "suite": "W1dModelTest",
+          "test": "joinKeepsDifferentCandidatesAndTheirSpecificAssignments",
+          "type": "io.github.gustavo2358.analysis.dependencies.DependencyAnalysis$Failure",
+          "message": "dependency preparation incomplete"
+        }
+      ]
+    },
+    {
+      "name": "dynamic-as-literal",
+      "path": "analysis-dependencies/src/main/java/io/github/gustavo2358/analysis/dependencies/CallDependencyConsumer.java",
+      "originalSha256": "6925665968b4bc57420fec91835361acda8ee35eb304380df28963e60e8e6426",
+      "mutatedSha256": "9afc34eb983d3a93a861a6b7aaa460b8582f1d8deee81c4f5a5119d7611710d1",
+      "byteExactRestore": true,
+      "execution": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,NameInterpreterTest,W1d*Test,DependencyCliTest"
+        ],
+        "exitCode": 1,
+        "log": "dynamic-as-literal.log",
+        "sha256": "e8c1c647942995d3f32f3093f2418c2d90f6f9b3ce98d2e0b66937ca915c2cb8"
+      },
+      "semanticFailures": [
+        {
+          "suite": "W1dDependencyTest",
+          "test": "rawValueExistsButDependencyMustBeProduced",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "expected: <COMPUTED> but was: <LITERAL>"
+        }
+      ]
+    },
+    {
+      "name": "wrong-object",
+      "path": "analysis-dependencies/src/main/java/io/github/gustavo2358/analysis/dependencies/CallDependencyPlan.java",
+      "originalSha256": "1bc2e49d32880ab80a60733d10bcf429f2cee1b1e825ff199d0872a8478738d8",
+      "mutatedSha256": "1aee7fe9a8be8c75e7627c6db3bc996095d7accabc2ff7336f50e4adec546ba5",
+      "byteExactRestore": true,
+      "execution": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,NameInterpreterTest,W1d*Test,DependencyCliTest"
+        ],
+        "exitCode": 1,
+        "log": "wrong-object.log",
+        "sha256": "77d1ad1c15b1a30fb62843de56d9e6f956d4e599300538ef81a63e703c8153aa"
+      },
+      "semanticFailures": [
+        {
+          "suite": "W1dDependencyTest",
+          "test": "noMoveIsReachableOpenWithoutInventedProgram",
+          "type": "io.github.gustavo2358.analysis.dependencies.DependencyAnalysis$Failure",
+          "message": "dependency preparation incomplete"
+        },
+        {
+          "suite": "W1dDependencyTest",
+          "test": "rawValueExistsButDependencyMustBeProduced",
+          "type": "io.github.gustavo2358.analysis.dependencies.DependencyAnalysis$Failure",
+          "message": "dependency preparation incomplete"
+        },
+        {
+          "suite": "W1dAdversarialTest",
+          "test": "sharedAndRepeatedQueriesExecuteOneValuesRun",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "expected: <COMPLETE> but was: <INCOMPLETE>"
+        },
+        {
+          "suite": "W1dAdversarialTest",
+          "test": "explicitContinuationSurvivesPhysicalPermutationAndDecoy",
+          "type": "io.github.gustavo2358.analysis.dependencies.DependencyAnalysis$Failure",
+          "message": "dependency preparation incomplete"
+        },
+        {
+          "suite": "W1dAdversarialTest",
+          "test": "strictWireInputsAreWrittenForIndependentParserAndOriginAudit",
+          "type": "io.github.gustavo2358.analysis.dependencies.DependencyAnalysis$Failure",
+          "message": "dependency preparation incomplete"
+        },
+        {
+          "suite": "W1dModelTest",
+          "test": "allMemoryOpensEveryModeledCellWhileNoMemoryPreservesThem",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "expected: <B> but was: <A>"
+        },
+        {
+          "suite": "W1dModelTest",
+          "test": "targetObjectIdentityIsNotFirstObjectInUnit",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "expected: <object-1> but was: <object-0>"
+        }
+      ]
+    },
+    {
+      "name": "lost-raw-padding",
+      "path": "analysis-dependencies/src/main/java/io/github/gustavo2358/analysis/dependencies/CallDependencyConsumer.java",
+      "originalSha256": "6925665968b4bc57420fec91835361acda8ee35eb304380df28963e60e8e6426",
+      "mutatedSha256": "a0da65a91ad3735389221c9d2bf04dc3a25df31a3be0450a7d1a9f0f391da7e9",
+      "byteExactRestore": true,
+      "execution": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,NameInterpreterTest,W1d*Test,DependencyCliTest"
+        ],
+        "exitCode": 1,
+        "log": "lost-raw-padding.log",
+        "sha256": "5ec239ca977ea7cea3b296cd331153392761d474e5813d68f0213bd3c3f9b82b"
+      },
+      "semanticFailures": [
+        {
+          "suite": "W1dDependencyTest",
+          "test": "rawValueExistsButDependencyMustBeProduced",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "expected: <PROGA   > but was: <PROGA>"
+        }
+      ]
+    },
+    {
+      "name": "values-canonicalizes-name",
+      "path": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/TextProfile.java",
+      "originalSha256": "dba8b5e20c1b3a5ea5663c482bcacd91919458a3352b1b61a778b901939711ac",
+      "mutatedSha256": "5a625df0c2e90cc87f7e2ccded9e1ade183f6021412217ebef84e76b7a758c18",
+      "byteExactRestore": true,
+      "execution": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,NameInterpreterTest,W1d*Test,DependencyCliTest"
+        ],
+        "exitCode": 1,
+        "log": "values-canonicalizes-name.log",
+        "sha256": "2f9bbe113e7c8f308bd3e544a3404cd720542cb2225315bc05b21ddf810f2ddc"
+      },
+      "semanticFailures": [
+        {
+          "suite": "W1dEffectsTest",
+          "test": "mayWritePreservesCandidateAndOpensNormalContinuation",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "expected: <[TextValue[value=PROGA   ]]> but was: <[TextValue[value=PROGA]]>"
+        },
+        {
+          "suite": "W1dEffectsTest",
+          "test": "loopBeforeInvokeContainsPreviousEffectAtFixpoint",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "expected: <[TextValue[value=PROGA   ]]> but was: <[TextValue[value=PROGA]]>"
+        },
+        {
+          "suite": "W1dEffectsTest",
+          "test": "beforeRealInvokeIsClosedPaddedValueWithAssignSupport",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "expected: <[TextValue[value=PROGA   ]]> but was: <[TextValue[value=PROGA]]>"
+        },
+        {
+          "suite": "W1dEffectsTest",
+          "test": "explicitNoMemoryDoesNotOpenLoopValue",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "expected: <[TextValue[value=PROGA   ]]> but was: <[TextValue[value=PROGA]]>"
+        },
+        {
+          "suite": "W1dDependencyTest",
+          "test": "rawValueExistsButDependencyMustBeProduced",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "expected: <[TextValue[value=PROGA   ]]> but was: <[TextValue[value=PROGA]]>"
+        }
+      ]
+    },
+    {
+      "name": "globalized-candidate-support",
+      "path": "analysis-dependencies/src/main/java/io/github/gustavo2358/analysis/dependencies/CallDependencyConsumer.java",
+      "originalSha256": "6925665968b4bc57420fec91835361acda8ee35eb304380df28963e60e8e6426",
+      "mutatedSha256": "4991fc90c934ab105b7ad8740954f6a6a19ee3961957394fcc040883c6a16029",
+      "byteExactRestore": true,
+      "execution": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,NameInterpreterTest,W1d*Test,DependencyCliTest"
+        ],
+        "exitCode": 1,
+        "log": "globalized-candidate-support.log",
+        "sha256": "6a422c8020c99ac0a99fe01511f3940d6bea7102b6659009fdbc5370b33b3ef5"
+      },
+      "semanticFailures": [
+        {
+          "suite": "W1dModelTest",
+          "test": "joinKeepsDifferentCandidatesAndTheirSpecificAssignments",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "expected: <[assign-a]> but was: <[assign-a, assign-b]>"
+        }
+      ]
+    },
+    {
+      "name": "literal-starts-values",
+      "path": "analysis-dependencies/src/main/java/io/github/gustavo2358/analysis/dependencies/CallDependencyPlan.java",
+      "originalSha256": "1bc2e49d32880ab80a60733d10bcf429f2cee1b1e825ff199d0872a8478738d8",
+      "mutatedSha256": "291d1bcf49c90699ed2f2c4b663c5da4b494e8659bbe17c8a5ed8af099adcb16",
+      "byteExactRestore": true,
+      "execution": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,NameInterpreterTest,W1d*Test,DependencyCliTest"
+        ],
+        "exitCode": 1,
+        "log": "literal-starts-values.log",
+        "sha256": "a0f9f2601fc663f48302bcdbe45ae17f4a8469d35d0deaa7e4b2dc1708f64422"
+      },
+      "semanticFailures": [
+        {
+          "suite": "W1dDependencyTest",
+          "test": "literalHasNoPossibleValuesPreparationOrRun",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "expected: <0> but was: <1>"
+        },
+        {
+          "suite": "W1dAdversarialTest",
+          "test": "literalPlannerHasZeroValuesDependenciesAndNoValuesProviderInstalled",
+          "type": "java.lang.IllegalArgumentException",
+          "message": "unknown analysis provider"
+        }
+      ]
+    },
+    {
+      "name": "unreachable-produces-edge",
+      "path": "analysis-dependencies/src/main/java/io/github/gustavo2358/analysis/dependencies/ReachabilityProvider.java",
+      "originalSha256": "9701a2eb315360ba9466fce3728c59e3034eea4c5936b228e1013982d0ad25b7",
+      "mutatedSha256": "03f6debf4760eb14b4409c44941bc4f2eac89d72d58b0b52cd03711beb89ca12",
+      "byteExactRestore": true,
+      "execution": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,NameInterpreterTest,W1d*Test,DependencyCliTest"
+        ],
+        "exitCode": 1,
+        "log": "unreachable-produces-edge.log",
+        "sha256": "a075782f6cd1579a1cf4e36bba6ce0b4db8605104788c6adc61f165d2c93c27c"
+      },
+      "semanticFailures": [
+        {
+          "suite": "W1dAdversarialTest",
+          "test": "orphanLiteralAndComputedEmitSiteWithoutExecutableEdge",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "expected: <UNREACHABLE_IN_MODEL> but was: <REACHABLE>"
+        }
+      ]
+    },
+    {
+      "name": "source-remainder-dropped",
+      "path": "analysis-dependencies/src/main/java/io/github/gustavo2358/analysis/dependencies/CallDependencyConsumer.java",
+      "originalSha256": "6925665968b4bc57420fec91835361acda8ee35eb304380df28963e60e8e6426",
+      "mutatedSha256": "878783a55dc4291d5530012c2f634bbddb05d98348166a79b53bf43677904697",
+      "byteExactRestore": true,
+      "execution": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,NameInterpreterTest,W1d*Test,DependencyCliTest"
+        ],
+        "exitCode": 1,
+        "log": "source-remainder-dropped.log",
+        "sha256": "430bfe04a62077ae0b8f89fb3d2d0c8b9ce75194d34f2216385663e85586a31d"
+      },
+      "semanticFailures": [
+        {
+          "suite": "W1dDependencyTest",
+          "test": "rawValueExistsButDependencyMustBeProduced",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "expected: <true> but was: <false>"
+        }
+      ]
+    },
+    {
+      "name": "interpretation-remainder-dropped",
+      "path": "analysis-dependencies/src/main/java/io/github/gustavo2358/analysis/dependencies/CallDependencyConsumer.java",
+      "originalSha256": "6925665968b4bc57420fec91835361acda8ee35eb304380df28963e60e8e6426",
+      "mutatedSha256": "14506473180b9d3251c4a3c3a493033b5ad22a864df874183cadc39da766256c",
+      "byteExactRestore": true,
+      "execution": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,NameInterpreterTest,W1d*Test,DependencyCliTest"
+        ],
+        "exitCode": 1,
+        "log": "interpretation-remainder-dropped.log",
+        "sha256": "547057a427ebed4944838ceb05b2adfa8b53ea53981d33ef4a47c7b6cc88c563"
+      },
+      "semanticFailures": [
+        {
+          "suite": "W1dDependencyTest",
+          "test": "rawValueExistsButDependencyMustBeProduced",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "expected: <true> but was: <false>"
+        },
+        {
+          "suite": "W1dAdversarialTest",
+          "test": "noncanonicalLiteralPreservesRawAndOpensInterpretation",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "expected: <true> but was: <false>"
+        }
+      ]
+    },
+    {
+      "name": "old-profile-admits-invoke",
+      "path": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesAnalysis.java",
+      "originalSha256": "81be102d08cb279799d301319e1a5a3d600c80c5cc45654f3ec87bf66ded72ee",
+      "mutatedSha256": "27f73da102edac450de7f4a5f86c92c3bd0060b32ec3533df5b49f9b757308bc",
+      "byteExactRestore": true,
+      "execution": {
+        "argv": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "analysis-launcher",
+          "-am",
+          "test",
+          "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,NameInterpreterTest,W1d*Test,DependencyCliTest"
+        ],
+        "exitCode": 1,
+        "log": "old-profile-admits-invoke.log",
+        "sha256": "2025a3dd4e63c4f0e57876c2c0bebc2e932583f50d0874ece115a812355687d2"
+      },
+      "semanticFailures": [
+        {
+          "suite": "W1dBoundaryTest",
+          "test": "oldValuesProfileStillRefusesRealInvoke",
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "expected: <UNSUPPORTED> but was: <ACCEPTED>"
+        }
+      ]
+    },
+    {
+      "name": "default-value-plan-call-logic",
+      "path": "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/DefaultValuePlan.java",
+      "byteExactRestore": true,
+      "execution": {
+        "argv": [
+          "python3",
+          "-B",
+          "scripts/project/w1d_scope.py"
+        ],
+        "exitCode": 1,
+        "log": "default-value-plan-call-logic.log",
+        "sha256": "56e4be7cba3616647662c296b5ca8a3d8d7011c1baf20d0097280b32cb2a6241"
+      },
+      "detection": "SCOPE_GATE"
+    },
+    {
+      "name": "solver-source-change",
+      "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java",
+      "byteExactRestore": true,
+      "execution": {
+        "argv": [
+          "python3",
+          "-B",
+          "scripts/project/w1d_scope.py"
+        ],
+        "exitCode": 1,
+        "log": "solver-source-change.log",
+        "sha256": "145509c985eae713b07fd8a9e827b92fbc7c6af4cc6ba3dec7cfc3f7a188a734"
+      },
+      "detection": "SCOPE_GATE"
+    }
+  ],
+  "secondGreen": {
+    "argv": [
+      "mvn",
+      "-B",
+      "-ntp",
+      "-pl",
+      "analysis-launcher",
+      "-am",
+      "test",
+      "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,NameInterpreterTest,W1d*Test,DependencyCliTest"
+    ],
+    "exitCode": 0,
+    "log": "second-green.log",
+    "sha256": "f50534f1162577c3a4cccc02d7cb7c62b56080a0f829998837e2901dbd547f44"
+  },
+  "secondGreenNominalTests": 33,
+  "compilerFailuresAccepted": false,
+  "restoration": {
+    "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/DefaultValuePlan.java": "7c9e543f2c01ed0816bc7c15a23e657bc12a803512313a69284d52b70a5b1531",
+    "analysis-dependencies/src/main/java/io/github/gustavo2358/analysis/dependencies/CallDependencyConsumer.java": "6925665968b4bc57420fec91835361acda8ee35eb304380df28963e60e8e6426",
+    "analysis-dependencies/src/main/java/io/github/gustavo2358/analysis/dependencies/CallDependencyPlan.java": "1bc2e49d32880ab80a60733d10bcf429f2cee1b1e825ff199d0872a8478738d8",
+    "analysis-dependencies/src/main/java/io/github/gustavo2358/analysis/dependencies/ReachabilityProvider.java": "9701a2eb315360ba9466fce3728c59e3034eea4c5936b228e1013982d0ad25b7",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java": "a049e86af35e386b205db620fc1fd44fb8374533fb9a8a7082749f1e3760595b",
+    "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/ForeignEffectTransfer.java": "3006fe3efb65740464df617688bfa2d887232a2b284e33a3163f7d3b5350d79d",
+    "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesAnalysis.java": "81be102d08cb279799d301319e1a5a3d600c80c5cc45654f3ec87bf66ded72ee",
+    "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/TextProfile.java": "dba8b5e20c1b3a5ea5663c482bcacd91919458a3352b1b61a778b901939711ac",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CoreCfgProjection.java": "f4bfa838da978e9db61ce0d129262b262c12e25ef3d59caa2eefc20cc2a2c456"
+  }
+}

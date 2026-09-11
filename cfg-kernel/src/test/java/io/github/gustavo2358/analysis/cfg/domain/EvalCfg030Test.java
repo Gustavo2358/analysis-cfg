@@ -55,6 +55,7 @@ class EvalCfg030Test {
         Set<Edge> edges = new HashSet<>();
         for (CfgTransition t : graph.transitions()) {
             Arm arm = switch (t.kind()) {
+                case INVOKE_NORMAL -> throw new AssertionError("Invoke belongs to CP6 W1D");
                 case ENTRY -> Arm.ENTRY;
                 case RETURN -> Arm.RETURN;
                 case JUMP -> Arm.JUMP;

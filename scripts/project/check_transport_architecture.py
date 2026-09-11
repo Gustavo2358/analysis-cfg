@@ -28,7 +28,7 @@ DIRECT_DEPENDENCIES = {
 
 
 def inventory(root: Path) -> dict:
-    return json.loads((root / "scripts/project/transport-inventory.json").read_text(encoding="utf-8"))
+    return json.loads((root / "docs/evals/cp6/w1d-transport-inventory.json").read_text(encoding="utf-8"))
 
 
 def transport_source_inventory(root: Path) -> set[str]:

@@ -21,7 +21,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: Gustavo2358/air-java
-          ref: 3bafe3978f0f392e842038ad5628e85dfd91d00d
+          ref: 2a37f5e980ba25fdc79614a66030a84d8bf5b8c9
           path: air-java
 
       - name: Set up Java 21
@@ -34,15 +34,17 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: Gustavo2358/proleap-poc
-          ref: 8722945cc4cd2052c6091533f6ee6989278aa2f8
+          ref: 53d774026a1e4bcd969c7783a1d277aaa87b5f2f
           path: proleap-poc
+          fetch-depth: 0
 
       - name: Check out read-only E2E lowering baseline
         uses: actions/checkout@v4
         with:
           repository: Gustavo2358/cobol-lower
-          ref: 18016f16b4f63149eb1bb4ca13db7e12593d8909
+          ref: 9de3825da64898258e647727393f01b9e9198d9e
           path: cobol-lower
+          fetch-depth: 0
 
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
@@ -63,7 +65,7 @@ jobs:
 
       - name: Verify pinned air-java checkout
         working-directory: air-java
-        run: test "$(git rev-parse HEAD)" = "3bafe3978f0f392e842038ad5628e85dfd91d00d"
+        run: test "$(git rev-parse HEAD)" = "2a37f5e980ba25fdc79614a66030a84d8bf5b8c9"
 
       - name: Install pinned air-java SNAPSHOT
         working-directory: air-java
@@ -79,11 +81,13 @@ jobs:
         working-directory: analysis-cfg
         run: bash scripts/harness/check-fast.sh
 
-      - name: Build isolated E2E producer snapshots
+      - name: Build isolated historical CP5 producer snapshots
         working-directory: analysis-cfg
         env:
-          MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2
-        run: python3 -B scripts/project/prepare_w5_producers.py --work "${{ runner.temp }}/w5-producers"
+          MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/w5-m2
+        run: |
+          cp -a "${{ runner.temp }}/analysis-cfg-m2" "${{ runner.temp }}/w5-m2"
+          python3 -B scripts/project/prepare_w5_producers.py --work "${{ runner.temp }}/w5-producers"
 
       - name: Check baseline scope and exact manifest
         working-directory: analysis-cfg
@@ -145,7 +149,31 @@ jobs:
           W5_PRODUCERS: ${{ runner.temp }}/w5-producers/producers.json
         run: bash scripts/harness/check-full.sh
 
-      - name: Preserve W5 execution evidence
+      - name: Build exact isolated W1A and W1C producers
+        working-directory: analysis-cfg
+        env:
+          MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2
+        run: python3 -B scripts/project/prepare_w1d_producers.py --work "${{ runner.temp }}/w1d-producers"
+
+      - name: Check W1D CFG effects consumer planning wire and CLI
+        working-directory: analysis-cfg
+        env:
+          MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2
+        run: python3 -B scripts/project/check_w1d.py
+
+      - name: Check real W1D vertical twice without injections
+        working-directory: analysis-cfg
+        env:
+          MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2
+        run: python3 -B scripts/project/e2e_w1d.py --work .harness-results/w1d-e2e --producers "${{ runner.temp }}/w1d-producers/producers.json"
+
+      - name: Challenge W1D semantics and restore exact source
+        working-directory: analysis-cfg
+        env:
+          MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2
+        run: python3 -B scripts/project/challenge_w1d.py --work .harness-results/w1d-mutations
+
+      - name: Preserve CP5 and W1D execution evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:

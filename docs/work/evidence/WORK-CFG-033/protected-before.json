@@ -1,0 +1,15 @@
+{
+  "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/DefaultValuePlan.java": "7c9e543f2c01ed0816bc7c15a23e657bc12a803512313a69284d52b70a5b1531",
+  "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/AnalysisDefinition.java": "91f555a4c1d75a4c1e3d46274a0be5cff45a4f9a28bc57405a44b2f8e04ebba9",
+  "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/AnalysisPoint.java": "f243349d12e22f58b1caeb312add7cb928ad61b0b4c0c2493d2cb4406093ce6a",
+  "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowResult.java": "49b60189ab646f721a2862764c55ef9663b928430c0e8622d5ca22a3d3041a12",
+  "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java": "a049e86af35e386b205db620fc1fd44fb8374533fb9a8a7082749f1e3760595b",
+  "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/Direction.java": "33793941816afe033cc668835691f93913d79da58b13189b99283529e4f428fc",
+  "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DomainWork.java": "8cd5cd1e49b6c87fca8d939589c6abbe877887541f3d07c5264fee55eb09d7c4",
+  "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/IntWorklist.java": "45c01beaab9aa86c4e7fd8a25b56b7967c39f401d29d722c9b1a8b6c136a9a8b",
+  "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/SolverMetrics.java": "3700550bbc5667a036d33a6ee56f21d119a82af2f92fc10759a5cee1f89b0f3e",
+  "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/SolverTopology.java": "9de73f073009dfc7189f567af0b23fd566542b59f828716532f50f8c0e846372",
+  "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/Candidates.java": "7289ec5d54e2bd4b755531777289c6abef50055cfb03b97b5fe06ebb2116acc4",
+  "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesState.java": "e793ee8df8ec0f6cbf8414ed1f49f94f37fc294fecb624cc29684b6451731b31",
+  "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/ValueUniverse.java": "33f1c8b19440535172b0f8125632f654c10b5b5efd10181675e566296249cb9e"
+}

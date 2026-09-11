@@ -1,0 +1,9 @@
+2026-09-11T17:19:46.552-03:00 level=INFO logger=i.g.g.cobolexplorer.ExplorerMain thread=main runId=5e743d2a-20da-425c-9c85-8d0b431a4a56 source=dynamic-no-move.cbl programUnit=none event=analysis_started phase=ANALYSIS output=/home/gustavo/workspace/teste-e2e/.cp6-w1d/red-vertical/dynamic-no-move
+2026-09-11T17:19:47.235-03:00 level=WARN logger=i.g.g.cobolexplorer.ExplorerMain thread=main runId=5e743d2a-20da-425c-9c85-8d0b431a4a56 source=dynamic-no-move.cbl programUnit=CALLER event=analysis_degraded phase=REFERENCE_RESOLUTION gaps=1 blockingReasons=[DYNAMIC_CALL_TARGET_VALUE_UNKNOWN] reason=RESOLUTION_GAPS fallback=RESULT_PUBLISHED_WITH_GAPS impact=DEPENDENCY_ANALYSIS_NOT_READY statusCounts={AMBIGUOUS=0, RESOLVED=1, UNRESOLVED=0, EXTERNAL_OBSERVED=0, UNSUPPORTED=0}
+Generated /home/gustavo/workspace/teste-e2e/.cp6-w1d/red-vertical/dynamic-no-move/index.html, /home/gustavo/workspace/teste-e2e/.cp6-w1d/red-vertical/dynamic-no-move/ast.html, /home/gustavo/workspace/teste-e2e/.cp6-w1d/red-vertical/dynamic-no-move/symbols.html and /home/gustavo/workspace/teste-e2e/.cp6-w1d/red-vertical/dynamic-no-move/resolution.html
+Source: dynamic-no-move.cbl
+Parse tree: 65 nodes | 37 tokens | depth 14
+AST: 13 nodes | depth 5 | literal-target CALLs 0
+Symbols: 2 declarations | 8 scopes | 0 diagnostics | parser errors 0
+Reference binding: 1 entries | 1 gaps | dependency analysis ready: false
+2026-09-11T17:19:47.236-03:00 level=INFO logger=i.g.g.cobolexplorer.ExplorerMain thread=main runId=5e743d2a-20da-425c-9c85-8d0b431a4a56 source=dynamic-no-move.cbl programUnit=CALLER event=analysis_completed phase=ANALYSIS elapsedMs=698 programUnits=1 references=1 gaps=1 dependencyAnalysisReady=false output=/home/gustavo/workspace/teste-e2e/.cp6-w1d/red-vertical/dynamic-no-move

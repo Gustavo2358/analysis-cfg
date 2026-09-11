@@ -13,7 +13,7 @@ import sys
 import xml.etree.ElementTree as ET
 
 ROOT=Path(__file__).resolve().parents[2]
-INVENTORY='docs/evals/cp5/w1-inventory.json'
+INVENTORY='docs/evals/cp6/w1d-w1-inventory.json'
 PREFIX='io.github.gustavo2358.analysis.structure.'
 TESTS={
  'AdmissionTest':set('realBuildIsAccepted missingBranchEdgeIsInvalid missingOrphanIsInvalid equalLookingReplacementSequenceIsInvalid equalLookingForeignSnapshotIsInvalid equalLookingForeignEntrySelectionIsInvalid duplicateAndWrongContextEdgesAreInvalid missingEntryExitHaltAndReplacedHaltAreInvalid foreignEntryNodeAndDuplicateSequenceRoleAreInvalid unsupportedProfileAndPolicyMismatchHaveDistinctTaxonomy incompleteUpstreamValidationDoesNotBecomeSemanticSizeOutcome'.split()),

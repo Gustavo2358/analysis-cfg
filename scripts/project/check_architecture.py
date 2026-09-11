@@ -148,6 +148,7 @@ EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CfgGraph.java"].update({
 })
 EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CoreCfgProjection.java"].add(
     "io.github.gustavo2358.air.model.Capabilities")
+EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CoreCfgProjection.java"].update({"io.github.gustavo2358.air.model.Control", "io.github.gustavo2358.air.model.Scopes"})
 CFG_CLASS_NAMES = {
     "CfgNodeId", "CfgNode", "CfgNode$EntryNode", "CfgNode$SequenceNode", "CfgNode$NormalExit", "CfgNode$HaltExit",
     "CfgTransition", "CfgTransition$Kind", "CfgGraph", "CfgGraph$1",
@@ -203,6 +204,7 @@ FORBIDDEN_BYTECODE_TYPES = {
 }
 # Exact inventory for the authorized structural slice; no wildcard operation support.
 ALLOWED_OPERATION_TYPES = {
+    "io.github.gustavo2358.air.model.Operations$Invoke",
     "io.github.gustavo2358.air.model.Operations$Return",
     "io.github.gustavo2358.air.model.Operations$Jump",
     "io.github.gustavo2358.air.model.Operations$Branch",
@@ -262,7 +264,6 @@ def detector_self_test() -> None:
         "example.SemanticProductInput",
         "local.BuildCfgInput",
         "io.github.gustavo2358.air.model.Operations$Dispatch",
-        "io.github.gustavo2358.air.model.Operations$Invoke",
         "io.github.gustavo2358.air.model.Operations$Raise",
         "io.github.gustavo2358.air.model.Operations$Opaque",
         "io.github.gustavo2358.air.model.Operations$LocalInvoke",
@@ -387,8 +388,8 @@ def verify_project_shape(root: Path) -> None:
         for item in modules_element.findall(namespace + "module")
         if item.text and item.text.strip()
     ]
-    if modules != [KERNEL_ARTIFACT, "analysis-kernel", "analysis-values", "cfg-adapters", "cfg-launcher", "analysis-dataflow", "analysis-adapters", "analysis-launcher"]:
-        raise GateFailure("W3 reactor must contain exactly cfg-kernel, analysis-kernel, analysis-values, cfg-adapters, cfg-launcher")
+    if modules != [KERNEL_ARTIFACT, "analysis-kernel", "analysis-values", "cfg-adapters", "cfg-launcher", "analysis-dataflow", "analysis-dependencies", "analysis-adapters", "analysis-launcher"]:
+        raise GateFailure("W1D reactor must contain the exact reviewed nine modules")
 
     properties = project.find(namespace + "properties")
     release = None if properties is None else properties.find(namespace + "maven.compiler.release")
@@ -427,6 +428,10 @@ def verify_project_shape(root: Path) -> None:
     from check_w5 import SOURCES as COMPOSITION_SOURCES, verify_sources as verify_composition_sources
     verify_composition_sources(root)
     analysis_sources = COMPOSITION_SOURCES | source_inventory(root) | SOLVER_SOURCES | QUERY_SOURCES | VALUE_SOURCES | PLANNING_SOURCES
+    from w1d_scope import authorized, NEW_W5, NEW_VALUES, verify
+    if authorized(root):
+        verify(root)
+        analysis_sources |= NEW_W5 | {NEW_VALUES} | {p.relative_to(root).as_posix() for p in (root/'analysis-dependencies/src/main/java').rglob('*.java')}
     verify_planning_sources(root)
     verify_value_sources(root)
     verify_solver_sources(root)
@@ -492,8 +497,14 @@ def verify_snapshot_pin(root: Path) -> str:
         raise GateFailure("CI must not resolve air-java from a mutable branch")
     if f'test "$(git rev-parse HEAD)" = "{sha}"' not in workflow:
         raise GateFailure("CI must verify air-java HEAD before installation")
-    if workflow.count("MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2") != 11:
-        raise GateFailure("CI must share one isolated Maven repository across upstream and consumer")
+    if workflow.count("MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2") != 14:
+        raise GateFailure("CI must share the exact AIR/W1D Maven repository across fourteen production steps")
+    if workflow.count("MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/w5-m2") != 1 or 'cp -a "${{ runner.temp }}/analysis-cfg-m2" "${{ runner.temp }}/w5-m2"' not in workflow:
+        raise GateFailure("historical CP5 producers require a separate Maven repository seeded from the exact AIR install")
+    for pin in (lock['proleap_poc']['main_commit'], lock['cobol_lower']['commit']):
+        if refs.count(pin)!=1:raise GateFailure("CI W1D producer source pin differs from lock")
+    for script in ('prepare_w1d_producers.py','check_w1d.py','e2e_w1d.py','challenge_w1d.py'):
+        if 'scripts/project/'+script not in workflow:raise GateFailure('CI missing W1D execution: '+script)
     if 'scripts/harness/check-full.sh' not in workflow or 'scripts/project/record_air_dependency.py' not in workflow:
         raise GateFailure("CI must run full regression and record exact upstream tree/JAR provenance")
     for wave in (1, 2, 3, 4, 5):
@@ -790,6 +801,8 @@ def architecture_gate(root: Path) -> None:
     planning_architecture(root)
     from check_w5 import architecture as composition_architecture
     composition_architecture(root)
+    from check_w1d_boundary import check as dependency_boundary
+    dependency_boundary(root)
 
     print(f"[architecture] PASS: {total} kernel tests ({skipped} skipped), "
           f"{len(EXPECTED_CLASSFILES)} production classfiles, "
@@ -800,7 +813,7 @@ def architecture_gate(root: Path) -> None:
     print("[architecture] PASS: BuildCfg(Publication, BuildOptions) -> CfgBuildResult and direct "
           "AirValidator preflight", flush=True)
     print("[architecture] PASS: explicit capability/version registry; no transport, reflection, "
-          "frontend, AIR shadow, or control primitives beyond Jump/Branch/Return/Halt", flush=True)
+          "frontend, AIR shadow, or control primitives beyond the explicit Jump/Branch/Return/Halt/Invoke-Normal slice", flush=True)
 
 
 def main() -> int:

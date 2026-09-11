@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "observed_on": "2026-09-10",
+  "observed_on": "2026-09-11",
   "analysis_ir": {
     "repository": "Gustavo2358/analysis-ir",
     "commit": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
@@ -124,16 +124,10 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "3bafe3978f0f392e842038ad5628e85dfd91d00d",
+    "commit": "2a37f5e980ba25fdc79614a66030a84d8bf5b8c9",
     "canonical_ref": "main",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
-    "upstream_review": {
-      "pull_request": 8,
-      "state": "merged",
-      "head_commit": "cc5087cbf4009d90481b1ed49c74051845b4035d",
-      "merge_commit": "3bafe3978f0f392e842038ad5628e85dfd91d00d"
-    },
     "analysis_ir": {
       "semantic_version": "2.0.0",
       "commit": "51b4d9a8ae0364232bd97103cd73a77e1a34996c"
@@ -148,16 +142,6 @@
       "preview": false
     },
     "release_status": "no_tag_or_release_observed",
-    "ci": {
-      "workflow": ".github/workflows/ci.yml",
-      "check_name": "contracts",
-      "status": "completed",
-      "conclusion": "success",
-      "checked_commit": "3bafe3978f0f392e842038ad5628e85dfd91d00d",
-      "url": "https://github.com/Gustavo2358/air-java/actions/runs/34511392324",
-      "harness_url": "https://github.com/Gustavo2358/air-java/actions/runs/34511392395",
-      "merge_tree_equal_validated_head": true
-    },
     "read_paths": [
       "README.md",
       "pom.xml",
@@ -201,15 +185,23 @@
         "path": "air-json/pom.xml",
         "artifact_id": "air-json",
         "role": "shared_codec_4B_scalar_assign_consumed_by_cfg_adapters",
-        "coverage": "1A GOBACK plus Object/Cell/Assign text, ObjectPlace, Literal TextValue and known(text); not full AIR binding"
+        "coverage": "W1B Invoke first slice, Read(ObjectPlace), effects/outcomes and structural transport with semantic obligations preserved"
       }
     },
-    "source_tree": "201096ee137a897fb43b22e4c831d82e948d6f81",
-    "compatibility_evidence": "docs/work/evidence/WORK-CFG-030/baseline.json"
+    "source_tree": "8d248f4ccf207eb7b609aa9ff0cdbcd512e526c8",
+    "compatibility_evidence": "docs/work/evidence/WORK-CFG-033/upstream-sources.json",
+    "w1d_authority": "docs/work/evidence/WORK-CFG-033/upstream-sources.json",
+    "ci": {
+      "checked_commit": "2a37f5e980ba25fdc79614a66030a84d8bf5b8c9",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Gustavo2358/air-java/actions/runs/34617652790",
+      "harness_url": "https://github.com/Gustavo2358/air-java/actions/runs/34617652849"
+    }
   },
   "proleap_poc": {
     "repository": "Gustavo2358/proleap-poc",
-    "main_commit": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+    "main_commit": "53d774026a1e4bcd969c7783a1d277aaa87b5f2f",
     "role": "cobol_frontend_and_semantic_product_producer",
     "java_release": 17,
     "public_boundary": "cobol_semantic_product",
@@ -238,6 +230,12 @@
         "head_commit": "fa871da2a9ca2e68c0271d3e91439fa60f1ca4f4",
         "merge_commit": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
         "merged_at": "2026-09-09T11:56:28Z"
+      },
+      {
+        "pull_request": 34,
+        "head_commit": "bd6dd1c49bd724899a599beeff7dd3cb66d0f879",
+        "merge_commit": "53d774026a1e4bcd969c7783a1d277aaa87b5f2f",
+        "merged_at": "2026-09-11T14:40:07Z"
       }
     ],
     "read_paths": [
@@ -248,29 +246,20 @@
       "docs/architecture/semantic-product-air-v2-audit.md",
       "docs/domain/cobol-semantic-product.md",
       "docs/work/history/WORK-SEMANTIC-PRODUCT-003.md"
-    ]
+    ],
+    "source_tree": "a43f0fc4ef8a227d47f012b9fcb4e410842ffcc0",
+    "w1d_authority": "docs/work/evidence/WORK-CFG-033/upstream-sources.json",
+    "semantic_product_version": "1.3.0"
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "verified",
-    "commit": "18016f16b4f63149eb1bb4ca13db7e12593d8909",
+    "commit": "9de3825da64898258e647727393f01b9e9198d9e",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
-    "evidence": "docs/work/evidence/WORK-CFG-030/baseline.json",
-    "source_tree": "0139edc52e34c703b643ff484a33e70871ef091d",
-    "upstream_review": {
-      "pull_request": 10,
-      "state": "merged",
-      "head_commit": "36b0020cd26e14f42fa8334eb37f936dcd5986bd",
-      "merge_commit": "18016f16b4f63149eb1bb4ca13db7e12593d8909"
-    },
-    "ci": {
-      "status": "completed",
-      "conclusion": "success",
-      "checked_commit": "36b0020cd26e14f42fa8334eb37f936dcd5986bd",
-      "url": "https://github.com/Gustavo2358/cobol-lower/actions/runs/34519741431",
-      "merge_tree_equal_validated_head": true
-    }
+    "evidence": "docs/work/evidence/WORK-CFG-033/upstream-sources.json",
+    "source_tree": "2e3027df2fc4f9e550df8df9518e7e80f89324f1",
+    "w1d_authority": "docs/work/evidence/WORK-CFG-033/upstream-sources.json"
   },
   "external": [
     {

@@ -10,6 +10,7 @@ import java.util.*;
 /** Generic scalar text analysis, using the approved W2 solver and a shared operation transfer. */
 public final class PossibleValuesAnalysis implements AnalysisDefinition<PossibleValuesState> {
     public static final String PROFILE="scalar-text-direct@1";
+    public static final String EFFECTS_PROFILE="scalar-text-effects@1";
     private final TextProfile profile;
     private final ValuesWork work=new ValuesWork();
     private PossibleValuesAnalysis(TextProfile profile){this.profile=profile;}
@@ -17,7 +18,12 @@ public final class PossibleValuesAnalysis implements AnalysisDefinition<Possible
     public record Admission(Status status,String reason,Optional<PossibleValuesAnalysis> analysis,
                             long unsupportedStorageProfiles,long unsupportedEffectProfiles) { }
     public static Admission prepare(AnalysisSession session) {
-        try { return new Admission(Status.ACCEPTED,null,Optional.of(new PossibleValuesAnalysis(new TextProfile(session))),0,0); }
+        return prepare(session,PROFILE);
+    }
+    public static Admission prepare(AnalysisSession session,String profile) {
+        if(!PROFILE.equals(profile)&&!EFFECTS_PROFILE.equals(profile))
+            return new Admission(Status.UNSUPPORTED,"UNSUPPORTED_EFFECT_PROFILE",Optional.empty(),0,1);
+        try { return new Admission(Status.ACCEPTED,null,Optional.of(new PossibleValuesAnalysis(new TextProfile(session,EFFECTS_PROFILE.equals(profile)))),0,0); }
         catch(TextProfile.Refusal refusal) {
             return new Admission(refusal.invalid?Status.INVALID_INPUT:Status.UNSUPPORTED,refusal.getMessage(),Optional.empty(),
                 refusal.getMessage().contains("STORAGE")?1:0,refusal.getMessage().contains("EFFECT")?1:0);

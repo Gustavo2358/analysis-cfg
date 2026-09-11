@@ -10,7 +10,7 @@ from resource_limit_scope import allows_change
 BASE='855628200fba3851493991cec869dee899e82299'
 PREFIX='io.github.gustavo2358.analysis.'
 TEST_PREFIX=PREFIX+'values.'
-INVENTORY='docs/evals/cp5/w4-inventory.json'
+INVENTORY='docs/evals/cp6/w1d-w4-inventory.json'
 PACKAGES={
 'application':'AnalysisProvider AnalysisRegistry ConsumerRegistration Counts ExecutionPlan PlanningExecution PreparedAnalysisResult SitePlanner'.split(),
 'plan':'AnalysisKey AnalysisOutcome ConsumerPlan ObservationBatchId ObservationRequest SiteInterest'.split(),
