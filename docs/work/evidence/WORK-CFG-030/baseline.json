@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "work_item": "WORK-CFG-030",
+  "base": "15bd3afe1affdcb5ec49956960f884bde8c89498",
+  "base_tree": "0de533bcabd868e2ee18686a9cdd265973408f75",
+  "status": "BLOCKED_FULL_ARCHITECTURE_W5_INVENTORY",
+  "cp6": {
+    "status": "NOT_STARTED",
+    "authorization": "NOT_AUTHORIZED"
+  },
+  "sources": {
+    "analysis_ir": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+    "air_java": "3bafe3978f0f392e842038ad5628e85dfd91d00d",
+    "proleap_poc": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+    "cobol_lower": "18016f16b4f63149eb1bb4ca13db7e12593d8909"
+  },
+  "source_lock_sha256": "7a1278d6c60f6a3260d4859fc982a1eddd001cdc58732cc63fe72b4ca75051d2",
+  "old_cp5_baseline": {
+    "analysis_cfg": "c6b12bf3efe6360b4e33c9a587ad0185b449990d",
+    "air_java": "ce530a7e17ab12b23c48f29425f503ff920b09fb",
+    "analysis_ir": "122ce54e1b9ef9b00646f93ece409ca8b63bc933",
+    "proleap_poc": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+    "cobol_lower": "2329993ce61b33fd7105759e211a1861ca6cb217"
+  },
+  "candidate_snapshot": {
+    "analysis_cfg_post_cp5": "4229ec1cfd9c1d9f9e851f3cabe6993b4d4ed9b8",
+    "air_java": "17029898fd0ee8fabcaaae89f7260148633d4b12",
+    "analysis_ir": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+    "proleap_poc": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+    "cobol_lower": "fe7e6ef3762dc855f89a2495064bf1e954c0720a"
+  },
+  "approved_blocker_remediation": {
+    "pr": 13,
+    "head": "d083870b38c2b49bcad93eec17895cc6102019ca",
+    "merge": "15bd3afe1affdcb5ec49956960f884bde8c89498",
+    "maven_tests": 270
+  },
+  "production_semantic_changes": false,
+  "blocker": "docs/work/evidence/WORK-CFG-030/full-blocker.json"
+}

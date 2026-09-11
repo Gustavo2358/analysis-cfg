@@ -107,7 +107,7 @@ incompleta apresentada como sucesso. Ordenação/encoding ficam fora do fixpoint
 
 ## Roteamento de implementação
 
-[Roadmap](../product/cp5-roadmap.md), [work item](../work/active/WORK-CFG-028/work-item.json),
+[Roadmap](../product/cp5-roadmap.md), [work item](../work/history/WORK-CFG-028/work-item.json),
 [performance/métricas](../engineering/cp5-performance.md),
 [challenges](../engineering/cp5-challenges.md) e
 [evals/manifests](../evals/cp5/index.md). A aprovação arquitetural não autoriza Wave.

@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "pr": "https://github.com/Gustavo2358/cobol-lower/pull/10",
+  "head": "36b0020cd26e14f42fa8334eb37f936dcd5986bd",
+  "certified_parent": "cd55cbdf37155f47b68f651411c2bff78abd3e0a",
+  "merge": "18016f16b4f63149eb1bb4ca13db7e12593d8909",
+  "tree": "0139edc52e34c703b643ff484a33e70871ef091d",
+  "parents": [
+    "fe7e6ef3762dc855f89a2495064bf1e954c0720a",
+    "36b0020cd26e14f42fa8334eb37f936dcd5986bd"
+  ],
+  "merged_at": "2026-09-10T19:48:49Z",
+  "actor": "Gustavo2358",
+  "production_semantic_changes": false,
+  "ci": "SUCCESS",
+  "ci_runs": [
+    34516870209,
+    34519741431
+  ],
+  "observed_at": "2026-09-10T19:49:49.435451+00:00",
+  "cp6": "NOT_STARTED / NOT_AUTHORIZED"
+}

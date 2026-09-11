@@ -60,3 +60,5 @@ a aceitação bilateral madura e 018 integra módulos sem mudar a porta. 019 con
 ## CP5 aprovado
 
 WORK-CFG-028 reutiliza BACKLOG-CFG-020; cinco Waves na mesma branch/PR draft, sem início autorizado. [Lifecycle](cp5-lifecycle.json) e [follow-ups sem duplicação](cp5-follow-ups.md).
+
+CP5 WORK-CFG-028 is COMPLETED (PR12 merged); post-CP5 remediation WORK-CFG-029 is COMPLETED (PR13 merged). WORK-CFG-030 owns baseline synchronization only. CP6 NOT_STARTED / NOT_AUTHORIZED.

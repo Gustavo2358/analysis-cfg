@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "production_source": "15bd3afe1affdcb5ec49956960f884bde8c89498",
+  "air_source": "3bafe3978f0f392e842038ad5628e85dfd91d00d",
+  "maven_repository": "/tmp/cp5-baseline-resume-pr13-20260910/synchronized-candidate/m2",
+  "command": "mvn -B -ntp clean verify",
+  "status": "PASS",
+  "tests": 270,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0
+}

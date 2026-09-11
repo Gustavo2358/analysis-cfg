@@ -1,0 +1,13 @@
+{
+  "old_source": "17029898fd0ee8fabcaaae89f7260148633d4b12",
+  "new_source": "3bafe3978f0f392e842038ad5628e85dfd91d00d",
+  "old": {
+    "air-java": "bea96d84e7179af397ad692745aad8f9e40142d846467a8480c58167ea53fd0e",
+    "air-json": "723ba4313428ee87d9d29b51b1f485d98bf697720419c69860ce8b04d675a032"
+  },
+  "new": {
+    "air-java": "bea96d84e7179af397ad692745aad8f9e40142d846467a8480c58167ea53fd0e",
+    "air-json": "723ba4313428ee87d9d29b51b1f485d98bf697720419c69860ce8b04d675a032"
+  },
+  "byte_identical": true
+}

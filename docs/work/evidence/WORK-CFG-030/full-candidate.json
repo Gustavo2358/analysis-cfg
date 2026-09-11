@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "source_base": "15bd3afe1affdcb5ec49956960f884bde8c89498",
+  "sources": {
+    "analysis_ir": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+    "air_java": "3bafe3978f0f392e842038ad5628e85dfd91d00d",
+    "proleap_poc": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+    "cobol_lower": "fe7e6ef3762dc855f89a2495064bf1e954c0720a"
+  },
+  "command": "bash scripts/harness/check-full.sh",
+  "java": "Temurin21.0.12.1+1",
+  "maven_repository": "/tmp/cp5-baseline-resume-pr13-20260910/candidate-producers/m2",
+  "status": "PASS",
+  "gates": {
+    "fast": "PASS",
+    "architecture": "PASS",
+    "semantic": "PASS",
+    "performance": "PASS",
+    "integration": "PASS",
+    "full": "PASS"
+  },
+  "waves": {
+    "W1": "PASS",
+    "W2": "PASS",
+    "W3": "PASS",
+    "W4": "PASS",
+    "W5": "PASS"
+  },
+  "e2e": {
+    "CP4E_A": "PASS",
+    "CP4E_B": "PASS",
+    "CP3": "PASS",
+    "generic_overwrite": "PASS",
+    "fresh_determinism": "BYTE_EQUAL",
+    "memory_file": "SEMANTIC_AND_BYTE_EQUAL"
+  },
+  "production_semantic_changes": false,
+  "limitations": [
+    "Final lower source pin and exact-head baseline CI still pending; no final-main freeze claimed.",
+    "No117k qualification. W3-PERF-01/W3-METRICS-01 and transport amplification remain open."
+  ]
+}

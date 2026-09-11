@@ -1,7 +1,9 @@
-# Roadmap CP5 — um work item, uma branch, um PR
+# Roadmap CP5 — completed
+
+CP5 APPROVED / MERGED / CLOSED. [WORK-CFG-028](../work/history/WORK-CFG-028.md) is historical; [WORK-CFG-030](../work/history/WORK-CFG-030/work-item.json) records the synchronized baseline. CP6 NOT_STARTED / NOT_AUTHORIZED.
 
 [Lifecycle canônico](../work/cp5-lifecycle.json) registra branch, PR, checkpoint,
-última aprovação humana e estados por Wave. [Manifesto](../work/active/WORK-CFG-028/work-item.json)
+última aprovação humana e estados por Wave. [Manifesto](../work/history/WORK-CFG-028/work-item.json)
 mantém o protocolo existente de cinco arquivos; Waves são checkpoints desse umbrella,
 sem novos itens ativos nem hierarquia paralela.
 
@@ -22,10 +24,12 @@ Waves. Métricas são observações, nunca thresholds de admissão ou precisão.
 | W2 — generic incremental solver | APPROVED at 0202c742 | review humano registrado antes de W3 |
 | W3 — PossibleValues/state/query | APPROVED at 85562820 | W3-F1/W3-F2 RESOLVED por review humano |
 | W4 — shared planner/consumers | APPROVED at 21d65d08 | W4-F1/W4-BINDING-01 RESOLVED |
-| W5 — production/E2E | IMPLEMENTED / AWAITING_HUMAN_REVIEW | review final W5/CP5 pendente; [evidência](../work/evidence/WORK-CFG-028/wave-5/validation.md) |
+| W5 — production/E2E | APPROVED at c6b12bf3 / MERGED / CLOSED | PR12 merged4229ec1; [evidência](../work/evidence/WORK-CFG-028/wave-5/validation.md) |
 | CP6 — CALL dependency slice | futuro, fora CP5 | review final CP5 e tarefa própria |
 
-## Continuidade entre agentes/sessões
+<a id="continuidade-entre-agentessessões"></a>
+
+## Protocolo histórico de continuidade entre Waves
 
 Começar na raiz do workspace e seguir AGENTS → índice → work item/state → lifecycle
 → must_read → Git/PR. Conferir status/HEAD/branch e PR no GitHub; evidência offline
@@ -137,7 +141,7 @@ semântico CP5 nem desabilitar validação. Remoção produtiva de caps locais e
 escopo autorizado antes da qualificação W5. O pedido W5 autorizou seu reader sem
 pre-read cap e seu writer streaming com finalização atômica; ambos foram implementados.
 O codec/validator upstream e o writer/CLI CFG legado permanecem inalterados.
-CP5 está AWAITING_FINAL_HUMAN_REVIEW; CP6 exige nova instrução humana.
+CP5 está APPROVED / MERGED / CLOSED; CP6 continua NOT_STARTED / NOT_AUTHORIZED e exige nova instrução humana.
 
 ## Evidência por checkpoint
 

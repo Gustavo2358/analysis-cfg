@@ -1,0 +1,6 @@
+{
+  "authority": "Explicit user end-to-end preparation request, 2026-09-10",
+  "scope": "Finish WORK-CFG-031, synchronize frozen candidate, commit/push/PR/CI/self-review/merge and final post-merge freeze; Class A/B autonomous",
+  "semantic_change": false,
+  "cp6_implementation": false
+}

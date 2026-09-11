@@ -2,8 +2,8 @@
 
 Confrontados registry/backlog atuais com propostas do discovery. Nenhum backlog
 novo duplicado. [BACKLOG-CFG-020](backlog/BACKLOG-CFG-020.md) é o umbrella existente
-agora em **W5 IMPLEMENTED / AWAITING_HUMAN_REVIEW** por WORK-CFG-028. W1–W4 aprovadas;
-CP5 AWAITING_FINAL_HUMAN_REVIEW. Os follow-ups externos abaixo não foram iniciados. Dependência histórica de qualificação 011
+agora **COMPLETED** por WORK-CFG-028. W1–W5 aprovadas;
+CP5 APPROVED / MERGED / CLOSED. Os follow-ups externos abaixo não foram iniciados. Dependência histórica de qualificação 011
 valia para análises gerais; CP5 tem profile próprio sobre base 027 aprovada, sem
 reivindicar AIR-STRUCTURE completo.
 
@@ -138,3 +138,7 @@ specific VALIDATION_LIMIT and generic INCOMPLETE_VALIDATION. Historical CP5 evid
 above retains its original pins/defaults. The new default codec no longer has a
 16 MiB ceiling; explicit operational budgets still fail without any semantic result.
 See [the current preflight contract](../architecture/resource-limit-preflight.md).
+
+## Requalification on synchronized upstream candidate (2026-09-10)
+
+AIR170/3bafe removes the historical default byte/entity/nesting operational caps within Java representability; explicit operational budgets still fail closed as RESOURCE_LIMIT. The 10k lower probe succeeds with112117041 AIR bytes and a canonical round-trip. The former16MiB debt is RESOLVED_BY_UPSTREAM_BASELINE for this probe; general runtime/heap limits and lower transport amplification remain open. W3-PERF-01 and W3-METRICS-01 are unchanged and STILL_OPEN. No117k qualification claimed. PR13 resolved resource failure classification without starting analysis or producing facts. Historical observations above retain their original baseline context.

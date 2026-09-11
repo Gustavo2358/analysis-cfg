@@ -1,0 +1,78 @@
+{
+  "id": "WORK-CFG-030",
+  "backlog_id": "BACKLOG-CFG-020",
+  "title": "Close CP5 and synchronize CP6 baseline",
+  "status": "completed",
+  "risk": "high",
+  "goal": "Close CP5, adopt the same verified frozen component authorities, bind final merged source/artifacts in the external post-merge receipt.",
+  "authorization": "implementation",
+  "authorization_evidence": "docs/work/evidence/WORK-CFG-030/final-sync/authorization.json",
+  "checkpoint": "CP5_CLOSEOUT_AND_CP6_BASELINE_SYNCHRONIZATION",
+  "must_read": [
+    "AGENTS.md",
+    "ARCHITECTURE.md",
+    "docs/engineering/work-item-protocol.md",
+    "docs/architecture/invariants.md",
+    "docs/architecture/cp5-dataflow.md",
+    "docs/architecture/cp5-post-audit.md",
+    "docs/architecture/analysis-dataflow-result-v1.md",
+    "docs/evals/cp5/core-size-contract.json",
+    "docs/evals/cp5/result-contract.json",
+    "docs/evals/cp5/architecture.json",
+    "docs/evals/cp5/challenges.json",
+    "docs/evals/cp5/gate-plan.json",
+    "docs/work/cp5-follow-ups.md",
+    "docs/work/cp5-lifecycle.json",
+    "docs/engineering/cp5-w5-composition-ledger.md"
+  ],
+  "related_decisions": [
+    "ADR-0010",
+    "ADR-0011",
+    "ADR-0012",
+    "ADR-0013",
+    "ADR-0014"
+  ],
+  "related_invariants": [
+    "INV-CFG-030",
+    "INV-CFG-031",
+    "INV-CFG-032",
+    "INV-CFG-033",
+    "INV-CFG-034"
+  ],
+  "evals": [
+    "EVAL-CFG-033",
+    "EVAL-CFG-034",
+    "EVAL-CFG-035",
+    "EVAL-CFG-036",
+    "EVAL-CFG-037",
+    "EVAL-CFG-038"
+  ],
+  "source_scope": [
+    "docs",
+    "scripts/harness",
+    "scripts/project",
+    ".github/workflows/ci.yml",
+    "AGENTS.md",
+    "MANIFEST.sha256",
+    ".gitattributes",
+    "ARCHITECTURE.md"
+  ],
+  "test_scope": [
+    "scripts/harness",
+    "scripts/project"
+  ],
+  "must_not_change": [
+    "Production/test Java, POMs, fixtures and approved inventories against merged PR13",
+    "Historical raw evidence and STOPs",
+    "No CP6 implementation"
+  ],
+  "gates": [
+    "fast",
+    "architecture",
+    "semantic",
+    "integration",
+    "performance",
+    "full"
+  ],
+  "stop_condition": "Implementation complete; final exact-head CI/merge and external post-merge receipt under existing authorization. Stop only on semantic/contract ambiguity or unverifiable source identity."
+}

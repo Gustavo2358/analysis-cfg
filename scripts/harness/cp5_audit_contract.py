@@ -99,7 +99,7 @@ def validate_audit(root: Path) -> list[str]:
                 'operations':['use Y','def X','use X'],'IN':['Y'],'OUT':[],
                 'after_last':[],'before_last':['X'],'after_def':['X'],'before_def':[],
                 'after_first':[],'before_first':['Y'],'execution':'NOT_EXECUTED','waves':[2,3]}, 'backward distinct-anchor witness')
-        work = read('docs/work/active/WORK-CFG-028/work-item.json')
+        work = read('docs/work/history/WORK-CFG-028/work-item.json')
         require(DOC in work['must_read'] and 'docs/evals/cp5/post-audit-contracts.json' in work['must_read'], 'must-read routing')
         require(data['quality']['metrics'] == ['queryRequests','uniqueQueries','candidateCardinality'] + list(QUALITY), 'precision quality metrics')
         require(data['quality']['thresholds'] is None and data['quality']['measurements'] is None, 'quality unmeasured/no threshold')

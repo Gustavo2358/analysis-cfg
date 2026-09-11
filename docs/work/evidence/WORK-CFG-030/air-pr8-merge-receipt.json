@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "pr": "https://github.com/Gustavo2358/air-java/pull/8",
+  "head": "cc5087cbf4009d90481b1ed49c74051845b4035d",
+  "merge": "3bafe3978f0f392e842038ad5628e85dfd91d00d",
+  "tree": "201096ee137a897fb43b22e4c831d82e948d6f81",
+  "parents": [
+    "17029898fd0ee8fabcaaae89f7260148633d4b12",
+    "cc5087cbf4009d90481b1ed49c74051845b4035d"
+  ],
+  "normative_pin": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+  "production_semantic_changes": false,
+  "local_main": "3bafe3978f0f392e842038ad5628e85dfd91d00d",
+  "ci_runs": [
+    34511097177,
+    34511097100,
+    34511063552,
+    34511063561
+  ],
+  "ci": "SUCCESS",
+  "observed_at": "2026-09-10T18:00:00.746102+00:00"
+}

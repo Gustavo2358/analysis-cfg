@@ -1,0 +1,32 @@
+{
+  "analysis-ir": {
+    "HEAD": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+    "main": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+    "origin/main": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+    "origin/main^{tree}": "11b2361a40cb5ae9b6c201f0157f30ef2387d1b8"
+  },
+  "air-java": {
+    "HEAD": "3bafe3978f0f392e842038ad5628e85dfd91d00d",
+    "main": "3bafe3978f0f392e842038ad5628e85dfd91d00d",
+    "origin/main": "3bafe3978f0f392e842038ad5628e85dfd91d00d",
+    "origin/main^{tree}": "201096ee137a897fb43b22e4c831d82e948d6f81"
+  },
+  "proleap-poc": {
+    "HEAD": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+    "main": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+    "origin/main": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+    "origin/main^{tree}": "63eba137162aa47e38d4858ff522058a8678a8dd"
+  },
+  "cobol-lower": {
+    "HEAD": "2329993ce61b33fd7105759e211a1861ca6cb217",
+    "main": "18016f16b4f63149eb1bb4ca13db7e12593d8909",
+    "origin/main": "18016f16b4f63149eb1bb4ca13db7e12593d8909",
+    "origin/main^{tree}": "0139edc52e34c703b643ff484a33e70871ef091d"
+  },
+  "analysis-cfg": {
+    "HEAD": "15bd3afe1affdcb5ec49956960f884bde8c89498",
+    "main": "15bd3afe1affdcb5ec49956960f884bde8c89498",
+    "origin/main": "15bd3afe1affdcb5ec49956960f884bde8c89498",
+    "origin/main^{tree}": "0de533bcabd868e2ee18686a9cdd265973408f75"
+  }
+}

@@ -1,0 +1,289 @@
+{
+  "total_count": 1,
+  "jobs": [
+    {
+      "id": 103096940646,
+      "run_id": 34545444298,
+      "workflow_name": "Core CFG checks",
+      "head_branch": "fix/w5-inventory-reproducibility",
+      "run_url": "https://api.github.com/repos/Gustavo2358/analysis-cfg/actions/runs/34545444298",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUPqjU88AAAAYAQ54Zg",
+      "head_sha": "3284f2927f6a09afdd9cf72c4edc4d151b3196ee",
+      "url": "https://api.github.com/repos/Gustavo2358/analysis-cfg/actions/jobs/103096940646",
+      "html_url": "https://github.com/Gustavo2358/analysis-cfg/actions/runs/34545444298/job/103096940646",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-11T00:11:50Z",
+      "started_at": "2026-09-11T00:11:52Z",
+      "completed_at": "2026-09-11T00:34:17Z",
+      "name": "boundary",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-09-11T00:11:52Z",
+          "completed_at": "2026-09-11T00:11:53Z"
+        },
+        {
+          "name": "Check out analysis-cfg",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-09-11T00:11:53Z",
+          "completed_at": "2026-09-11T00:11:55Z"
+        },
+        {
+          "name": "Check out pinned air-java source",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-09-11T00:11:55Z",
+          "completed_at": "2026-09-11T00:11:56Z"
+        },
+        {
+          "name": "Set up Java 21",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-09-11T00:11:56Z",
+          "completed_at": "2026-09-11T00:11:56Z"
+        },
+        {
+          "name": "Check out read-only E2E frontend baseline",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-09-11T00:11:56Z",
+          "completed_at": "2026-09-11T00:11:59Z"
+        },
+        {
+          "name": "Check out read-only E2E lowering baseline",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-09-11T00:11:59Z",
+          "completed_at": "2026-09-11T00:11:59Z"
+        },
+        {
+          "name": "Set up Python 3.12",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-09-11T00:11:59Z",
+          "completed_at": "2026-09-11T00:12:00Z"
+        },
+        {
+          "name": "Record actual CI source checkout",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-09-11T00:12:00Z",
+          "completed_at": "2026-09-11T00:12:00Z"
+        },
+        {
+          "name": "Preserve CI source receipt",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-09-11T00:12:00Z",
+          "completed_at": "2026-09-11T00:12:00Z"
+        },
+        {
+          "name": "Verify pinned air-java checkout",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-09-11T00:12:00Z",
+          "completed_at": "2026-09-11T00:12:00Z"
+        },
+        {
+          "name": "Install pinned air-java SNAPSHOT",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-09-11T00:12:00Z",
+          "completed_at": "2026-09-11T00:12:43Z"
+        },
+        {
+          "name": "Record exact upstream tree and installed JAR provenance",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-09-11T00:12:43Z",
+          "completed_at": "2026-09-11T00:12:43Z"
+        },
+        {
+          "name": "Check documentation and harness",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-09-11T00:12:43Z",
+          "completed_at": "2026-09-11T00:17:49Z"
+        },
+        {
+          "name": "Build isolated E2E producer snapshots",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-09-11T00:17:49Z",
+          "completed_at": "2026-09-11T00:18:14Z"
+        },
+        {
+          "name": "Check focal compatibility scope and exact manifest",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-09-11T00:18:14Z",
+          "completed_at": "2026-09-11T00:18:15Z"
+        },
+        {
+          "name": "Check Java architecture boundary",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2026-09-11T00:18:15Z",
+          "completed_at": "2026-09-11T00:20:06Z"
+        },
+        {
+          "name": "Check CFG-FIRST, linear, Branch and projection policy oracles",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17,
+          "started_at": "2026-09-11T00:20:06Z",
+          "completed_at": "2026-09-11T00:21:04Z"
+        },
+        {
+          "name": "Check real AIR file to CFG JSON integration",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 18,
+          "started_at": "2026-09-11T00:21:04Z",
+          "completed_at": "2026-09-11T00:22:20Z"
+        },
+        {
+          "name": "Check CP5 W1 structural semantics and performance",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19,
+          "started_at": "2026-09-11T00:22:20Z",
+          "completed_at": "2026-09-11T00:22:41Z"
+        },
+        {
+          "name": "Check CP5 W2 solver oracles and performance",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2026-09-11T00:22:41Z",
+          "completed_at": "2026-09-11T00:22:51Z"
+        },
+        {
+          "name": "Check CP5 W3 values, point queries and performance",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-09-11T00:22:51Z",
+          "completed_at": "2026-09-11T00:23:12Z"
+        },
+        {
+          "name": "Check CP5 W4 shared planning, consumers and performance",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 22,
+          "started_at": "2026-09-11T00:23:12Z",
+          "completed_at": "2026-09-11T00:23:25Z"
+        },
+        {
+          "name": "Check CP5 W5 production, delivery, scale and quality",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 23,
+          "started_at": "2026-09-11T00:23:25Z",
+          "completed_at": "2026-09-11T00:23:43Z"
+        },
+        {
+          "name": "Check full W1\u2013W5 regression on the new upstream",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 24,
+          "started_at": "2026-09-11T00:23:43Z",
+          "completed_at": "2026-09-11T00:34:13Z"
+        },
+        {
+          "name": "Preserve W5 execution evidence",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 25,
+          "started_at": "2026-09-11T00:34:13Z",
+          "completed_at": "2026-09-11T00:34:14Z"
+        },
+        {
+          "name": "Post Set up Python 3.12",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 45,
+          "started_at": "2026-09-11T00:34:14Z",
+          "completed_at": "2026-09-11T00:34:15Z"
+        },
+        {
+          "name": "Post Check out read-only E2E lowering baseline",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 46,
+          "started_at": "2026-09-11T00:34:15Z",
+          "completed_at": "2026-09-11T00:34:15Z"
+        },
+        {
+          "name": "Post Check out read-only E2E frontend baseline",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 47,
+          "started_at": "2026-09-11T00:34:15Z",
+          "completed_at": "2026-09-11T00:34:15Z"
+        },
+        {
+          "name": "Post Set up Java 21",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 48,
+          "started_at": "2026-09-11T00:34:15Z",
+          "completed_at": "2026-09-11T00:34:15Z"
+        },
+        {
+          "name": "Post Check out pinned air-java source",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 49,
+          "started_at": "2026-09-11T00:34:15Z",
+          "completed_at": "2026-09-11T00:34:15Z"
+        },
+        {
+          "name": "Post Check out analysis-cfg",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 50,
+          "started_at": "2026-09-11T00:34:15Z",
+          "completed_at": "2026-09-11T00:34:16Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 51,
+          "started_at": "2026-09-11T00:34:16Z",
+          "completed_at": "2026-09-11T00:34:16Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Gustavo2358/analysis-cfg/check-runs/103096940646",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000000180,
+      "runner_name": "GitHub Actions 1000000180",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    }
+  ]
+}

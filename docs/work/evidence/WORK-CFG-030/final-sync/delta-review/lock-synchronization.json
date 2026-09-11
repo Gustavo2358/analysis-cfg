@@ -1,0 +1,51 @@
+{
+  "pins": {
+    "analysis_ir": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+    "air_java": "3bafe3978f0f392e842038ad5628e85dfd91d00d",
+    "proleap_poc": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+    "cobol_lower": "18016f16b4f63149eb1bb4ca13db7e12593d8909"
+  },
+  "repins": {
+    "analysis_ir": {
+      "old": "122ce54e1b9ef9b00646f93ece409ca8b63bc933",
+      "new": "51b4d9a8ae0364232bd97103cd73a77e1a34996c"
+    },
+    "air_java": {
+      "old": "17029898fd0ee8fabcaaae89f7260148633d4b12",
+      "new": "3bafe3978f0f392e842038ad5628e85dfd91d00d"
+    },
+    "proleap_poc": {
+      "old": "7a376f33f55127f53c63b86d3228671b9c6a348d",
+      "new": "8722945cc4cd2052c6091533f6ee6989278aa2f8"
+    },
+    "cobol_lower": {
+      "old": null,
+      "new": "18016f16b4f63149eb1bb4ca13db7e12593d8909"
+    }
+  },
+  "all_consumed_authorities_synchronized": true,
+  "historical_inspiration_pins_not_runtime_authorities": true,
+  "runtime_authority_repins": {
+    "analysis-ir": {
+      "old": "122ce54e1b9ef9b00646f93ece409ca8b63bc933",
+      "new": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+      "reason": "docs/provenance; normative specification, conformance and binding byte-identical"
+    },
+    "air-java": {
+      "old": "17029898fd0ee8fabcaaae89f7260148633d4b12",
+      "new": "3bafe3978f0f392e842038ad5628e85dfd91d00d",
+      "reason": "docs/provenance and harness; model/validator/codec/POM byte-identical"
+    },
+    "cobol-lower": {
+      "old": "2329993ce61b33fd7105759e211a1861ca6cb217",
+      "new": "18016f16b4f63149eb1bb4ca13db7e12593d8909",
+      "reason": "approved capacity/operational, harness and pins; six production files remove size admission limits; scalar translation unchanged"
+    },
+    "proleap-poc": {
+      "old": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+      "new": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+      "reason": "unchanged"
+    }
+  },
+  "distinction": "repins records source-lock metadata entries; runtime_authority_repins records the actual components previously consumed by W5. Old frontend inspiration pin was not the runtime authority; lower lacked a source-lock entry but already had a W5 producer pin."
+}

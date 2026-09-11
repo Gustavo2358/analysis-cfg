@@ -17,8 +17,8 @@ GOBACK_HASH = "fa299c2e5f3fae75afe365363b9f16925f0cfea591f631768ace82f0fb9a1075"
 
 
 def verify_scalar_contract(root: Path) -> None:
-    if verify_snapshot_pin(root) != "17029898fd0ee8fabcaaae89f7260148633d4b12":
-        raise GateFailure("RESOURCE_LIMIT compatibility requires the exact authorized air-java pin")
+    if verify_snapshot_pin(root) != "3bafe3978f0f392e842038ad5628e85dfd91d00d":
+        raise GateFailure("Baseline synchronization requires the exact authorized air-java pin")
     data = (root / SCALAR).read_bytes()
     if len(data) != 14554 or hashlib.sha256(data).hexdigest() != SHA256:
         raise GateFailure("scalar fixture is not byte-identical to approved upstream")
@@ -38,7 +38,7 @@ def verify_scalar_contract(root: Path) -> None:
     if (upstream / ".git").exists():
         for local in (SCALAR, GOBACK):
             path = "air-json/src/test/resources/" + Path(local).name
-            result = subprocess.run(["git", "-C", str(upstream), "show", "17029898fd0ee8fabcaaae89f7260148633d4b12" + ":" + path],
+            result = subprocess.run(["git", "-C", str(upstream), "show", "3bafe3978f0f392e842038ad5628e85dfd91d00d" + ":" + path],
                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
             if result.returncode or result.stdout != (root / local).read_bytes():
                 raise GateFailure("local fixture differs from upstream merge blob: " + path)

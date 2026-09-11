@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """Build immutable sibling snapshots in a controlled directory; never build in a sibling."""
 from __future__ import annotations
-import argparse, hashlib, io, json, os, subprocess, tarfile
+import argparse, hashlib, io, json, os, shlex, subprocess, tarfile
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[2]
 FRONT='8722945cc4cd2052c6091533f6ee6989278aa2f8'
-LOWER='2329993ce61b33fd7105759e211a1861ca6cb217'
+LOWER='18016f16b4f63149eb1bb4ca13db7e12593d8909'
 def digest(path):
     with Path(path).open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
 def snapshot(path):
@@ -15,8 +15,10 @@ def snapshot(path):
 def build(work,front,lower):
     work.mkdir(parents=True,exist_ok=False);before={n:snapshot(p) for n,p in [('proleap-poc',front),('cobol-lower',lower)]}
     for name,expected in [('proleap-poc',FRONT),('cobol-lower',LOWER)]:
-        if before[name]['head']!=expected or before[name]['status']:raise ValueError('E2E producer source differs from reviewed execution baseline: '+name)
-        data=subprocess.check_output(['git','-C',before[name]['path'],'archive','--format=tar','HEAD'])
+        # Export exact reviewed Git objects; preserve occupied sibling checkouts.
+        actual=subprocess.check_output(['git','-C',before[name]['path'],'rev-parse',expected+'^{commit}'],text=True).strip()
+        if actual!=expected:raise ValueError('E2E producer commit unavailable: '+name)
+        data=subprocess.check_output(['git','-C',before[name]['path'],'archive','--format=tar',expected])
         (work/name).mkdir()
         with tarfile.open(fileobj=io.BytesIO(data)) as archive:archive.extractall(work/name,filter='data')
     commands=[]
@@ -30,7 +32,7 @@ def build(work,front,lower):
     run('cobol-lower',['mvn','-B','-ntp','-pl','adapters','org.apache.maven.plugins:maven-dependency-plugin:3.8.1:build-classpath','-DincludeScope=runtime','-Dmdep.outputFile='+str(work/'lower-classpath.txt')])
     after={n:snapshot(Path(v['path'])) for n,v in before.items()}
     if before!=after:raise ValueError('sibling state changed')
-    config=dict(schema='w5-producer-build',before=before,after=after,commands=commands,javaVersion=subprocess.check_output(['java','-version'],stderr=subprocess.STDOUT,text=True))
+    config=dict(schema='w5-producer-build',sources={'proleap-poc':FRONT,'cobol-lower':LOWER},mavenRepository=next((x.split('=',1)[1] for x in shlex.split(os.environ.get('MAVEN_OPTS','')) if x.startswith('-Dmaven.repo.local=')),None),before=before,after=after,commands=commands,javaVersion=subprocess.check_output(['java','-version'],stderr=subprocess.STDOUT,text=True))
     for name,jar,cp,main in [('frontend','proleap-poc/target/antlr-parse-tree-explorer-1.0.0-SNAPSHOT.jar','frontend-classpath.txt','io.github.gustavo2358.cobolexplorer.ExplorerMain'),('lower','cobol-lower/adapters/target/cobol-lower-adapters-0.1.0-SNAPSHOT.jar','lower-classpath.txt','io.github.gustavo2358.lower.adapters.cli.CobolLower')]:
         paths=[str(work/jar),*(work/cp).read_text().strip().split(os.pathsep)]
         config[name]=dict(main=main,cwd=str(work/('proleap-poc' if name=='frontend' else 'cobol-lower')),classpath=paths,jars={p:digest(p) for p in paths})

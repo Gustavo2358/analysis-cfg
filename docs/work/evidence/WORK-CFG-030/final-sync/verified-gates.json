@@ -1,0 +1,378 @@
+{
+  "main": [
+    {
+      "label": "maven",
+      "command": [
+        "mvn",
+        "-B",
+        "-ntp",
+        "clean",
+        "verify"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/main",
+      "exit_code": 0,
+      "elapsed_seconds": 31.675606727600098,
+      "log_sha256": "ec12e71548a8650b6c97117d5cec225e751286261a62867316b3093714e4e9da"
+    },
+    {
+      "label": "focal",
+      "command": [
+        "python3",
+        "-B",
+        "/home/gustavo/workspace/teste-e2e/.worktrees/analysis-cfg-w5/docs/work/evidence/WORK-CFG-031/HARNESS-REGISTRY-DRIFT-001/focal-probe.py",
+        "--root",
+        "/home/gustavo/workspace/teste-e2e/.pre-cp6/main",
+        "--out",
+        "/home/gustavo/workspace/teste-e2e/.pre-cp6/results/main/gates/focal-observation"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/main",
+      "exit_code": 0,
+      "elapsed_seconds": 2.357616662979126,
+      "log_sha256": "917705e774b78793f41881b57d1f56092a2b7a1ba79ddb29dbb4274adde86f97"
+    },
+    {
+      "label": "fast",
+      "command": [
+        "bash",
+        "scripts/harness/check-fast.sh"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/main",
+      "exit_code": 0,
+      "elapsed_seconds": 130.3112292289734,
+      "log_sha256": "2e8a102db9645d43766af039b833be73cadb05b4aa130301b4d818f4cf089b7e"
+    },
+    {
+      "label": "docs",
+      "command": [
+        "bash",
+        "scripts/harness/check-docs.sh"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/main",
+      "exit_code": 0,
+      "elapsed_seconds": 1.0709316730499268,
+      "log_sha256": "df2da5af253a30334f548f0567e9293bb9d88daef721e2c685ac43e2a8048136"
+    },
+    {
+      "label": "architecture",
+      "command": [
+        "bash",
+        "scripts/harness/check-architecture.sh"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/main",
+      "exit_code": 0,
+      "elapsed_seconds": 66.47393560409546,
+      "log_sha256": "e4bf04819d2729f39988532cc566b31ab07f6b8ca65355ce4e3f5910a3628fc8"
+    },
+    {
+      "label": "w5-isolated",
+      "command": [
+        "python3",
+        "-B",
+        "scripts/project/check_w5.py",
+        "architecture"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/main",
+      "exit_code": 0,
+      "elapsed_seconds": 7.9171462059021,
+      "log_sha256": "d7e9c0742b4bf630441bc5f775a200f529ddc7e41115be00e2eb1822c18f9f9d"
+    },
+    {
+      "label": "w5-adversarial",
+      "command": [
+        "python3",
+        "-B",
+        "/home/gustavo/workspace/teste-e2e/.pre-cp6/inventory_adversary.py",
+        "/home/gustavo/workspace/teste-e2e/.pre-cp6/main",
+        "/home/gustavo/workspace/teste-e2e/.pre-cp6/results/main/gates/inventory-adversarial.json"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/main",
+      "exit_code": 0,
+      "elapsed_seconds": 12.899624824523926,
+      "log_sha256": "5d85ceca95a65391d6f595f7d9e0afc18f8ef618e79db65911d3fb94a5f1cf3e"
+    },
+    {
+      "label": "semantic",
+      "command": [
+        "bash",
+        "scripts/harness/check-semantic.sh"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/main",
+      "exit_code": 0,
+      "elapsed_seconds": 36.40105152130127,
+      "log_sha256": "b46247853b2e02ade14e73579a3901983eec3402c80ed2309747f664016eb05f"
+    },
+    {
+      "label": "integration",
+      "command": [
+        "bash",
+        "scripts/harness/check-integration.sh"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/main",
+      "exit_code": 0,
+      "elapsed_seconds": 46.398483991622925,
+      "log_sha256": "4cc57a1a46156267e412e5b7d5ead1657c1fb825eeb8f3f32c0921e409554867"
+    },
+    {
+      "label": "performance",
+      "command": [
+        "bash",
+        "scripts/harness/check-performance.sh"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/main",
+      "exit_code": 0,
+      "elapsed_seconds": 51.9268901348114,
+      "log_sha256": "889e98bdcaa3e6a98e9dd9c131934fb1bdd97c51124276978ed2cd82f3191255"
+    },
+    {
+      "label": "full",
+      "command": [
+        "bash",
+        "scripts/harness/check-full.sh"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/main",
+      "exit_code": 0,
+      "elapsed_seconds": 324.8952136039734,
+      "log_sha256": "130d582ee21258c5db95e601d13275d15d9bc594cbe826623f804d0088fbae08"
+    },
+    {
+      "label": "scope-manifest",
+      "command": [
+        "python3",
+        "-B",
+        "scripts/project/check_scope.py",
+        "--update-manifest"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/main",
+      "exit_code": 0,
+      "elapsed_seconds": 0.9819467067718506,
+      "log_sha256": "0e94e86bab5445b1e1464f1dc85f6c00471061a76788360d636e560b98329fd0"
+    },
+    {
+      "label": "scope",
+      "command": [
+        "python3",
+        "-B",
+        "scripts/project/check_scope.py"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/main",
+      "exit_code": 0,
+      "elapsed_seconds": 0.9809544086456299,
+      "log_sha256": "0e94e86bab5445b1e1464f1dc85f6c00471061a76788360d636e560b98329fd0"
+    },
+    {
+      "label": "diff-check",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/main",
+      "exit_code": 0,
+      "elapsed_seconds": 0.1009979248046875,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "e2e-comparison",
+      "command": [
+        "python3",
+        "-B",
+        "/home/gustavo/workspace/teste-e2e/.pre-cp6/compare_e2e.py",
+        "/home/gustavo/workspace/teste-e2e/.pre-cp6/main",
+        "/home/gustavo/workspace/teste-e2e/.pre-cp6/main/.harness-results/w5-s10-ma3_gjhc",
+        "/home/gustavo/workspace/teste-e2e/.pre-cp6/results/main/gates/e2e-comparison.json"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e",
+      "exit_code": 0,
+      "elapsed_seconds": 0.02877211570739746,
+      "log_sha256": "92ca25e24a72f96c908496a3a21a5b1b17c1852ad735c7ff3eb70ce22c27d235"
+    }
+  ],
+  "candidate": [
+    {
+      "label": "maven",
+      "command": [
+        "mvn",
+        "-B",
+        "-ntp",
+        "clean",
+        "verify"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate",
+      "exit_code": 0,
+      "elapsed_seconds": 31.845791816711426,
+      "log_sha256": "a8539de717e1fcde0c0517302142612513382470699501e27c52e9a3306e937b"
+    },
+    {
+      "label": "focal",
+      "command": [
+        "python3",
+        "-B",
+        "/home/gustavo/workspace/teste-e2e/.worktrees/analysis-cfg-w5/docs/work/evidence/WORK-CFG-031/HARNESS-REGISTRY-DRIFT-001/focal-probe.py",
+        "--root",
+        "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate",
+        "--out",
+        "/home/gustavo/workspace/teste-e2e/.pre-cp6/results/candidate/gates/focal-observation"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate",
+      "exit_code": 0,
+      "elapsed_seconds": 2.425084352493286,
+      "log_sha256": "f9877ec20f35506ee91ff0243be7d50573611136e475bbff70a4c32202098295"
+    },
+    {
+      "label": "fast",
+      "command": [
+        "bash",
+        "scripts/harness/check-fast.sh"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate",
+      "exit_code": 0,
+      "elapsed_seconds": 128.54494619369507,
+      "log_sha256": "9cd8bd40703ff32e7c763328fadd7677996fa6e7b91aeaa45caaa30b4a5ce300"
+    },
+    {
+      "label": "docs",
+      "command": [
+        "bash",
+        "scripts/harness/check-docs.sh"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate",
+      "exit_code": 0,
+      "elapsed_seconds": 1.0777859687805176,
+      "log_sha256": "df2da5af253a30334f548f0567e9293bb9d88daef721e2c685ac43e2a8048136"
+    },
+    {
+      "label": "architecture",
+      "command": [
+        "bash",
+        "scripts/harness/check-architecture.sh"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate",
+      "exit_code": 0,
+      "elapsed_seconds": 67.76963806152344,
+      "log_sha256": "241a2a5d92e49b176a5d370cf4e51b2b3412bdbb35e53526d4136f01e24c28d8"
+    },
+    {
+      "label": "w5-isolated",
+      "command": [
+        "python3",
+        "-B",
+        "scripts/project/check_w5.py",
+        "architecture"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate",
+      "exit_code": 0,
+      "elapsed_seconds": 7.899018287658691,
+      "log_sha256": "aeb500853f076eb00132f1b1d5e6a33686be4d731c67ba5d867edce514f1aafa"
+    },
+    {
+      "label": "w5-adversarial",
+      "command": [
+        "python3",
+        "-B",
+        "/home/gustavo/workspace/teste-e2e/.pre-cp6/inventory_adversary.py",
+        "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate",
+        "/home/gustavo/workspace/teste-e2e/.pre-cp6/results/candidate/gates/inventory-adversarial.json"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate",
+      "exit_code": 0,
+      "elapsed_seconds": 12.95835542678833,
+      "log_sha256": "5d85ceca95a65391d6f595f7d9e0afc18f8ef618e79db65911d3fb94a5f1cf3e"
+    },
+    {
+      "label": "semantic",
+      "command": [
+        "bash",
+        "scripts/harness/check-semantic.sh"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate",
+      "exit_code": 0,
+      "elapsed_seconds": 35.38548564910889,
+      "log_sha256": "edfe4acf6e4669f1a260244523553f93a3ee2c9e6cd3293b7e5fcbe1923e9470"
+    },
+    {
+      "label": "integration",
+      "command": [
+        "bash",
+        "scripts/harness/check-integration.sh"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate",
+      "exit_code": 0,
+      "elapsed_seconds": 49.26184272766113,
+      "log_sha256": "8bbfb0592b0552e6e3e434056d4c640eb7922640e953c5a06e1c31f00b6ce9a5"
+    },
+    {
+      "label": "performance",
+      "command": [
+        "bash",
+        "scripts/harness/check-performance.sh"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate",
+      "exit_code": 0,
+      "elapsed_seconds": 53.99938249588013,
+      "log_sha256": "c8b0c5f39f121f7ff860dfb52d7e2111582a1a7ac300e4f2090d23059054b66a"
+    },
+    {
+      "label": "full",
+      "command": [
+        "bash",
+        "scripts/harness/check-full.sh"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate",
+      "exit_code": 0,
+      "elapsed_seconds": 334.42121982574463,
+      "log_sha256": "b345fa98db7b62affd0fd16cacfae911977cae71107fe485e1e7350ceb6aed84"
+    },
+    {
+      "label": "scope-manifest",
+      "command": [
+        "python3",
+        "-B",
+        "scripts/project/check_scope.py",
+        "--update-manifest"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate",
+      "exit_code": 0,
+      "elapsed_seconds": 0.9567608833312988,
+      "log_sha256": "43c56970393f541ad94a1c88a1fecf2c778b1cd40c35c5a00d6545df17c5df3f"
+    },
+    {
+      "label": "scope",
+      "command": [
+        "python3",
+        "-B",
+        "scripts/project/check_scope.py"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate",
+      "exit_code": 0,
+      "elapsed_seconds": 0.9501831531524658,
+      "log_sha256": "43c56970393f541ad94a1c88a1fecf2c778b1cd40c35c5a00d6545df17c5df3f"
+    },
+    {
+      "label": "diff-check",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate",
+      "exit_code": 0,
+      "elapsed_seconds": 0.10148811340332031,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "e2e-comparison",
+      "command": [
+        "python3",
+        "-B",
+        "/home/gustavo/workspace/teste-e2e/.pre-cp6/compare_e2e.py",
+        "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate",
+        "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate/.harness-results/w5-s10-ly4py3iw",
+        "/home/gustavo/workspace/teste-e2e/.pre-cp6/results/candidate/gates/e2e-comparison.json"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate",
+      "exit_code": 0,
+      "elapsed_seconds": 0.027289152145385742,
+      "log_sha256": "92ca25e24a72f96c908496a3a21a5b1b17c1852ad735c7ff3eb70ce22c27d235"
+    }
+  ]
+}

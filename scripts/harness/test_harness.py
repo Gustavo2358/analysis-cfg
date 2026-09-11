@@ -291,7 +291,7 @@ class HarnessGuardTests(unittest.TestCase):
 
     def test_37_planned_lowerer_cannot_claim_api(self):
         self.edit_json('docs/sources/sources.lock.json',
-                       lambda x: x['cobol_lower'].update(api='invented'))
+                       lambda x: x['cobol_lower'].update(status='planned_upstream_component', api='invented'))
         self.assert_guard('planned cobol-lower cannot claim commit or API')
 
     def test_38_proleap_main_evidence_cannot_drift(self):

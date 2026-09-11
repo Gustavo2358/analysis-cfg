@@ -14,7 +14,7 @@ import cp5_w5_contract as w5
 BASE = 'ec525cbbad96d70c9663faa88e2672148fa8ee71'
 LIFECYCLE = 'docs/work/cp5-lifecycle.json'
 PLAN = 'docs/evals/cp5/'
-WORK = 'docs/work/active/WORK-CFG-028/work-item.json'
+WORK = 'docs/work/history/WORK-CFG-028/work-item.json'
 PROBES = {'S1': [1, 3, 5], 'S2': [1, 3, 5], 'S3': [3, 5], 'S4': [1, 2, 5],
           'S4b': [2, 3, 5], 'S5': [4, 5], 'S6': [3, 4, 5], 'S7': [3, 5],
           'S8': [1, 2, 4, 5], 'S9': [3, 5], 'S10': [5]}
@@ -251,7 +251,7 @@ def validate_cp5(root: Path) -> list[str]:
                 require(w['completion_evidence']==expected_evidence, 'no Wave evidence invented')
                 if w['status']=='IMPLEMENTED': require(life['wave_4']['review']=='AWAITING_HUMAN_REVIEW' and existing(root,expected_evidence), 'W4 awaits human review')
             else:
-                require(w['status']=='APPROVED' and w['authorization']=='AUTHORIZED' and life['wave_5']['review']=='APPROVED' and life['cp5_status']=='APPROVED / MERGED' and life['closure']['merge']=='4229ec1cfd9c1d9f9e851f3cabe6993b4d4ed9b8' and w['reviewed_head']=='c6b12bf3efe6360b4e33c9a587ad0185b449990d', 'W5 explicit final human approval and merge required')
+                require(w['status']=='APPROVED' and w['authorization']=='AUTHORIZED' and life['wave_5']['review']=='APPROVED' and life['cp5_status']=='APPROVED / MERGED / CLOSED' and life['closure']['merge']=='4229ec1cfd9c1d9f9e851f3cabe6993b4d4ed9b8' and w['reviewed_head']=='c6b12bf3efe6360b4e33c9a587ad0185b449990d', 'W5 explicit final human approval and merge required')
                 require(w['approval_evidence']=='docs/work/evidence/WORK-CFG-028/wave-5/authorization.json','W5 explicit authorization evidence')
                 authorization=load_json(root/w['approval_evidence'])
                 require(len(life['review_history'])>10 and authorization==life['review_history'][10] and authorization['reviewed_head']=='21d65d08512f1fb8a945009c2919946a61566eed' and authorization['W4']=='APPROVED' and authorization['authorized_wave']==5,'W5 reviewed HEAD and append-only human authorization')

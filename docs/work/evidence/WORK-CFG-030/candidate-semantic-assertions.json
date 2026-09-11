@@ -1,0 +1,162 @@
+{
+  "schema": "cp5-baseline-semantic-assertions",
+  "version": 1,
+  "created_at": "2026-09-10T19:23:22.760710+00:00",
+  "status": "PASS",
+  "receipt_sha256": "8cdcb9a713481116202ec4d72099fc2b30bdd37eba6be8598f9ac0f261f45f6f",
+  "fresh_determinism": "SP_AIR_RESULT_BYTE_EQUAL",
+  "runs": {
+    "cp4e-a": {
+      "cobolSha256": "3a35079c4954548bca08b4b298583c2b29a336d73432b529cac939d9b9013113",
+      "spSha256": "468e3207f578e428ace89a311eadbd6e27c670331b739675b761479352adc7af",
+      "airSha256": "dd3bb4819282e609a97937ea01b7e202786e2c2d9ba9c8a1821a8b982eeb8788",
+      "resultSha256": "aacb6e6cedbd7d1dbbd44e7a476b398df3eeff51f1a63b90257d4dc412705dec",
+      "memoryFile": "SEMANTIC_AND_BYTE_IDENTICAL",
+      "preparation": "COMPLETE",
+      "analyses": 1,
+      "batches": 1,
+      "consumers": 1,
+      "facts": 1,
+      "candidate": "PROGA",
+      "support": {
+        "domain": "operation",
+        "localId": "e52226b01b4afc8f6c6214aafd63e5ab",
+        "publication": "77ae4cc3ed75332c64011efce81c431b",
+        "unit": "unit"
+      },
+      "origin": {
+        "domain": "origin",
+        "localId": "6e3b8590805b3e79519781a3f9a725c6",
+        "publication": "77ae4cc3ed75332c64011efce81c431b"
+      },
+      "model_remainder": false,
+      "source_remainder": true,
+      "effective_remainder": true,
+      "publication_inventory": "PARTIAL",
+      "object_count": 1,
+      "cell_count": 1,
+      "assign_count": 1,
+      "support_is_last_real_assign": true
+    },
+    "cp4e-b": {
+      "cobolSha256": "3a35079c4954548bca08b4b298583c2b29a336d73432b529cac939d9b9013113",
+      "spSha256": "468e3207f578e428ace89a311eadbd6e27c670331b739675b761479352adc7af",
+      "airSha256": "dd3bb4819282e609a97937ea01b7e202786e2c2d9ba9c8a1821a8b982eeb8788",
+      "resultSha256": "aacb6e6cedbd7d1dbbd44e7a476b398df3eeff51f1a63b90257d4dc412705dec",
+      "memoryFile": "SEMANTIC_AND_BYTE_IDENTICAL",
+      "preparation": "COMPLETE",
+      "analyses": 1,
+      "batches": 1,
+      "consumers": 1,
+      "facts": 1,
+      "candidate": "PROGA",
+      "support": {
+        "domain": "operation",
+        "localId": "e52226b01b4afc8f6c6214aafd63e5ab",
+        "publication": "77ae4cc3ed75332c64011efce81c431b",
+        "unit": "unit"
+      },
+      "origin": {
+        "domain": "origin",
+        "localId": "6e3b8590805b3e79519781a3f9a725c6",
+        "publication": "77ae4cc3ed75332c64011efce81c431b"
+      },
+      "model_remainder": false,
+      "source_remainder": true,
+      "effective_remainder": true,
+      "publication_inventory": "PARTIAL",
+      "object_count": 1,
+      "cell_count": 1,
+      "assign_count": 1,
+      "support_is_last_real_assign": true
+    },
+    "cp3": {
+      "cobolSha256": "218b07a63098838ccd00c5aa5139620110045230975a20f1d5c285237e5ba67a",
+      "spSha256": "eab4f4c3902cd1661779d2a57e526b9d88999068cf35c92531f9df888f3c9954",
+      "airSha256": "46919c1429db4aa310e66fc9df9374eeba53fd98e50a287fdd005c17622f33ad",
+      "resultSha256": "34d21be2b0daf6b2dd7673a599dbf95d1dccbeb9610283be34840ca0e75568b0",
+      "memoryFile": "SEMANTIC_AND_BYTE_IDENTICAL",
+      "preparation": "COMPLETE",
+      "analyses": 0,
+      "batches": 0,
+      "consumers": 0,
+      "facts": 0
+    },
+    "generic-overwrite": {
+      "cobolSha256": "7e7002a4d2528916fa22b9c88109922cead966d09c4629801c28a0d5cfcdab31",
+      "spSha256": "8dcb91eb0310e58feb8cc4cae6a7b69ab3b26b5f377c2f8d103afcc28120a0bc",
+      "airSha256": "14f5e554d5259a29265897b68f84abd3606d2ee627e09266bf86c36e57e4d7de",
+      "resultSha256": "3917538fb90c4c12bc2d4d85a5170fb6d2bc80b8cdec51840ad383e046fc4109",
+      "memoryFile": "SEMANTIC_AND_BYTE_IDENTICAL",
+      "preparation": "COMPLETE",
+      "analyses": 1,
+      "batches": 1,
+      "consumers": 1,
+      "facts": 1,
+      "candidate": "NEWER",
+      "support": {
+        "domain": "operation",
+        "localId": "fb0e4051dc6c509849ea2c12755aff86",
+        "publication": "dff0630bef81a3648579e12ba2d0c8ea",
+        "unit": "unit"
+      },
+      "origin": {
+        "domain": "origin",
+        "localId": "03604a019cfc597e2d3a551583a29e96",
+        "publication": "dff0630bef81a3648579e12ba2d0c8ea"
+      },
+      "model_remainder": false,
+      "source_remainder": true,
+      "effective_remainder": true,
+      "publication_inventory": "PARTIAL",
+      "object_count": 1,
+      "cell_count": 1,
+      "assign_count": 2,
+      "support_is_last_real_assign": true
+    }
+  },
+  "producers": {
+    "frontend": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+    "lower_base": "fe7e6ef3762dc855f89a2495064bf1e954c0720a",
+    "lower_candidate": "WORK-LOWER-009 staged pins/harness; production byte-identical to base",
+    "air_java": "3bafe3978f0f392e842038ad5628e85dfd91d00d",
+    "analysis_ir": "51b4d9a8ae0364232bd97103cd73a77e1a34996c"
+  },
+  "analysis_jars": {
+    "/tmp/cp5-baseline-resume-pr13-20260910/analysis-cfg/cfg-kernel/target/cfg-kernel-0.1.0-SNAPSHOT.jar": "b660f25c8b0da69eee61133897a31a0b90cac65c84df82cbe2d09c7d4362c0c8",
+    "/tmp/cp5-baseline-resume-pr13-20260910/analysis-cfg/analysis-kernel/target/analysis-kernel-0.1.0-SNAPSHOT.jar": "a66876db4f0fa7b5563f60da5484ab740f95099b33433049693c43bbb9699fce",
+    "/tmp/cp5-baseline-resume-pr13-20260910/analysis-cfg/analysis-values/target/analysis-values-0.1.0-SNAPSHOT.jar": "e00325110ec9ab826d7ee531fd6c91eac1f69bbce48f25463974992b945b0229",
+    "/tmp/cp5-baseline-resume-pr13-20260910/analysis-cfg/analysis-dataflow/target/analysis-dataflow-0.1.0-SNAPSHOT.jar": "623617e91f3acd3ed3839657a2f8b27963d7abee2ff65125fca4ccf51eec5666",
+    "/tmp/cp5-baseline-resume-pr13-20260910/analysis-cfg/analysis-adapters/target/analysis-adapters-0.1.0-SNAPSHOT.jar": "839316a1a3b045accd36d9bebbbd11ee7e796570b21cc8f6edc015a97f96d5dd",
+    "/tmp/cp5-baseline-resume-pr13-20260910/analysis-cfg/analysis-launcher/target/analysis-launcher-0.1.0-SNAPSHOT.jar": "28a2ec49c0f2c7dae3b04946f09b75a9eceac19e3b8291f9aa3cb7c434bf0857",
+    "/tmp/cp5-baseline-resume-pr13-20260910/candidate-producers/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar": "723ba4313428ee87d9d29b51b1f485d98bf697720419c69860ce8b04d675a032",
+    "/tmp/cp5-baseline-resume-pr13-20260910/candidate-producers/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar": "bea96d84e7179af397ad692745aad8f9e40142d846467a8480c58167ea53fd0e",
+    "/tmp/cp5-baseline-resume-pr13-20260910/candidate-producers/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar": "d0da14c12b16b5d54719aa172d83b542ff4abeb8b0fb7db476fde8ceece760ca",
+    "/tmp/cp5-baseline-resume-pr13-20260910/candidate-producers/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar": "21ddb598807d3a51a876704eb979d9296e1c6a6f47ab1826ff88c6d6a127a2d0",
+    "/tmp/cp5-baseline-resume-pr13-20260910/candidate-producers/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar": "ff167a6317be15895706c26668f45b898efe40ab8780970658210fe1393d52a6"
+  },
+  "producer_jars": {
+    "frontend": {
+      "/tmp/cp5-baseline-resume-pr13-20260910/candidate-producers/proleap-poc/target/antlr-parse-tree-explorer-1.0.0-SNAPSHOT.jar": "7f4cc2e5e948ff282ae6c913f6a8f3a2432e2972ae590fc477d4a6e67bddc22b",
+      "/tmp/cp5-baseline-resume-pr13-20260910/candidate-producers/m2/org/antlr/antlr4-runtime/4.13.2/antlr4-runtime-4.13.2.jar": "dd3e8a13a2d669bf84fb8d834de35ce4875f27157698d206241ec8488aadcaf7",
+      "/tmp/cp5-baseline-resume-pr13-20260910/candidate-producers/m2/org/slf4j/slf4j-api/2.0.18/slf4j-api-2.0.18.jar": "44508fd1576500688c790b190acdd16fec4f8c79a3e0b900afd70503cf055f55",
+      "/tmp/cp5-baseline-resume-pr13-20260910/candidate-producers/m2/ch/qos/logback/logback-classic/1.6.3/logback-classic-1.6.3.jar": "beebede8db065fe1b72909ecc66bb49acda618901635d86c25fce14a5915e37e",
+      "/tmp/cp5-baseline-resume-pr13-20260910/candidate-producers/m2/ch/qos/logback/logback-core/1.6.3/logback-core-1.6.3.jar": "a6967a28c8b086dee75a694d2f6fb8830c71153539866d7d8af065c9b6df91e0",
+      "/tmp/cp5-baseline-resume-pr13-20260910/candidate-producers/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar": "d0da14c12b16b5d54719aa172d83b542ff4abeb8b0fb7db476fde8ceece760ca",
+      "/tmp/cp5-baseline-resume-pr13-20260910/candidate-producers/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar": "21ddb598807d3a51a876704eb979d9296e1c6a6f47ab1826ff88c6d6a127a2d0",
+      "/tmp/cp5-baseline-resume-pr13-20260910/candidate-producers/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar": "ff167a6317be15895706c26668f45b898efe40ab8780970658210fe1393d52a6"
+    },
+    "lower": {
+      "/tmp/cp5-baseline-resume-pr13-20260910/candidate-producers/cobol-lower/adapters/target/cobol-lower-adapters-0.1.0-SNAPSHOT.jar": "8b6a028544373bc6ed7f299c75becedd3df05f107448757b840451e8f673b65d",
+      "/tmp/cp5-baseline-resume-pr13-20260910/candidate-producers/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar": "723ba4313428ee87d9d29b51b1f485d98bf697720419c69860ce8b04d675a032",
+      "/tmp/cp5-baseline-resume-pr13-20260910/candidate-producers/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar": "bea96d84e7179af397ad692745aad8f9e40142d846467a8480c58167ea53fd0e",
+      "/tmp/cp5-baseline-resume-pr13-20260910/candidate-producers/m2/io/github/gustavo2358/cobol-lower-core/0.1.0-SNAPSHOT/cobol-lower-core-0.1.0-SNAPSHOT.jar": "e0da14a38255d57058fb86818710f6fb6194696e009e30986caac4adc40fc66a",
+      "/tmp/cp5-baseline-resume-pr13-20260910/candidate-producers/m2/com/dynatrace/hash4j/hash4j/0.30.0/hash4j-0.30.0.jar": "d3224b113ea835ce3452097747e5209ec760cf443dbed770d6ba68a0d480178f",
+      "/tmp/cp5-baseline-resume-pr13-20260910/candidate-producers/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar": "d0da14c12b16b5d54719aa172d83b542ff4abeb8b0fb7db476fde8ceece760ca",
+      "/tmp/cp5-baseline-resume-pr13-20260910/candidate-producers/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar": "21ddb598807d3a51a876704eb979d9296e1c6a6f47ab1826ff88c6d6a127a2d0",
+      "/tmp/cp5-baseline-resume-pr13-20260910/candidate-producers/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar": "ff167a6317be15895706c26668f45b898efe40ab8780970658210fe1393d52a6"
+    }
+  },
+  "maven_repository": "/tmp/cp5-baseline-resume-pr13-20260910/candidate-producers/m2",
+  "java_version": "openjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)\n"
+}

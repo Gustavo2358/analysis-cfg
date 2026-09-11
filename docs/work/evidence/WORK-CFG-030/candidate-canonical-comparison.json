@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "status": "PASS",
+  "cfg_merged_source": "15bd3afe1affdcb5ec49956960f884bde8c89498",
+  "upstreams": {
+    "frontend": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+    "lower_base": "fe7e6ef3762dc855f89a2495064bf1e954c0720a",
+    "lower_candidate": "WORK-LOWER-009 staged pins/harness; production byte-identical to base",
+    "air_java": "3bafe3978f0f392e842038ad5628e85dfd91d00d",
+    "analysis_ir": "51b4d9a8ae0364232bd97103cd73a77e1a34996c"
+  },
+  "runs": {
+    "cp4e-a": {
+      "cobolSha256": "3a35079c4954548bca08b4b298583c2b29a336d73432b529cac939d9b9013113",
+      "spSha256": "468e3207f578e428ace89a311eadbd6e27c670331b739675b761479352adc7af",
+      "airSha256": "dd3bb4819282e609a97937ea01b7e202786e2c2d9ba9c8a1821a8b982eeb8788",
+      "resultSha256": "aacb6e6cedbd7d1dbbd44e7a476b398df3eeff51f1a63b90257d4dc412705dec",
+      "candidate": "PROGA",
+      "memoryFile": "SEMANTIC_AND_BYTE_IDENTICAL",
+      "equal_to_cp5": true
+    },
+    "cp4e-b": {
+      "cobolSha256": "3a35079c4954548bca08b4b298583c2b29a336d73432b529cac939d9b9013113",
+      "spSha256": "468e3207f578e428ace89a311eadbd6e27c670331b739675b761479352adc7af",
+      "airSha256": "dd3bb4819282e609a97937ea01b7e202786e2c2d9ba9c8a1821a8b982eeb8788",
+      "resultSha256": "aacb6e6cedbd7d1dbbd44e7a476b398df3eeff51f1a63b90257d4dc412705dec",
+      "candidate": "PROGA",
+      "memoryFile": "SEMANTIC_AND_BYTE_IDENTICAL",
+      "equal_to_cp5": true
+    },
+    "cp3": {
+      "cobolSha256": "218b07a63098838ccd00c5aa5139620110045230975a20f1d5c285237e5ba67a",
+      "spSha256": "eab4f4c3902cd1661779d2a57e526b9d88999068cf35c92531f9df888f3c9954",
+      "airSha256": "46919c1429db4aa310e66fc9df9374eeba53fd98e50a287fdd005c17622f33ad",
+      "resultSha256": "34d21be2b0daf6b2dd7673a599dbf95d1dccbeb9610283be34840ca0e75568b0",
+      "candidate": null,
+      "memoryFile": "SEMANTIC_AND_BYTE_IDENTICAL",
+      "equal_to_cp5": true
+    },
+    "generic-overwrite": {
+      "cobolSha256": "7e7002a4d2528916fa22b9c88109922cead966d09c4629801c28a0d5cfcdab31",
+      "spSha256": "8dcb91eb0310e58feb8cc4cae6a7b69ab3b26b5f377c2f8d103afcc28120a0bc",
+      "airSha256": "14f5e554d5259a29265897b68f84abd3606d2ee627e09266bf86c36e57e4d7de",
+      "resultSha256": "3917538fb90c4c12bc2d4d85a5170fb6d2bc80b8cdec51840ad383e046fc4109",
+      "candidate": "NEWER",
+      "memoryFile": "SEMANTIC_AND_BYTE_IDENTICAL",
+      "equal_to_cp5": true
+    }
+  }
+}

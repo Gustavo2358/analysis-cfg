@@ -1,5 +1,8 @@
 # Gates estáveis e honestos
 
+Estado vigente pós-CP5: W1–W5 APPROVED / MERGED / CLOSED; harness remediado e candidato congelado verificado. A sincronização usa AIR51b4d9a, air-java3bafe397, lower18016f16 e frontend8722945. Full executa todos os gates. Os checkpoints abaixo conservam seu contexto histórico. Próximo trabalho: CP6 discovery; nenhum Invoke/CALL/CallResolver foi implementado nesta preparação. O receipt pós-merge no repositório E2E local fixa a identidade final.
+
+
 ## Estado atual
 
 | Gate | Estado | Verifica |

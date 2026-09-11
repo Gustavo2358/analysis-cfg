@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "status": "CANDIDATE_VERIFIED_FINAL_MERGED_LOWER_PENDING",
+  "archive": "candidate-canonical-e2e.tar.gz",
+  "sha256": "8acabd2ac2c48d2d52d00185fcc218d64cee691e3115e0bf18a982924d722490",
+  "original_raw_directory": "/tmp/cp5-baseline-resume-pr13-20260910/candidate-e2e",
+  "description": "Lossless raw process logs, COBOL/SP/AIR/results, memory/file outputs and artifact/classpath provenance. Candidate lower production equals fe7e6ef; final merged-main run remains mandatory."
+}
