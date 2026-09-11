@@ -23,7 +23,9 @@
     "scripts/project/check_w5.py",
     "scripts/project/test_w5_capture.py",
     "docs/work",
-    "MANIFEST.sha256"
+    "MANIFEST.sha256",
+    ".gitattributes",
+    "scripts/project/check_scope.py"
   ],
   "test_scope": [
     "scripts/harness/test_harness.py",
