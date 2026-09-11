@@ -60,3 +60,7 @@ não rastreados existentes; eles não foram editados.
 O gate scope usa seu closeout histórico como base e imprime “no CP6”. Essa frase
 continua significando ausência de implementação CP6; o work item de discovery
 ativo é validado pelo harness. Nenhum checker foi enfraquecido.
+
+Após o adendo factual de caller identity, [docs](raw/correlation-docs-gate.log.gz)
+e [fast](raw/correlation-fast-gate.log.gz) foram executados novamente com exit 0
+([comandos](raw/correlation-gate-executions.json)); os logs anteriores permanecem intactos.

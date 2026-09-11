@@ -39,6 +39,9 @@ Sequência mínima dentro da vertical, com ownership:
 3. **cobol-lower** preserva payload no domínio, aplica prova de fitting, emite Assign
    real e Invoke real com continuação/outcomes, target e origins. Rejeita features
    fora da slice com diagnósticos independentes; não filtra CALL desconhecido.
+   Preserva também a correlação UnitKey/PROGRAM-ID → UnitId: ela existe no resultado
+   em memória, mas a CLI atual não a transporta. Se o output exibir nome do caller,
+   publicar descriptor/receipt explícito separado da semântica AIR, sem reparse.
 4. **analysis-cfg** projeta Invoke/outcomes e indexa o site; estende perfil genérico
    de efeitos; registra consumer e reachability; serializa produto de dependency.
    Gate/inventário só evolui junto do código autorizado e provas correspondentes.
@@ -118,6 +121,8 @@ Esperado após W1 autorizada:
   a lacuna runtime/contract apenas para obter false/false/false.
 - Output caller CALLER → candidate PROGA é referência possível, sem linkage/runtime
   lookup. O E2E usa o lower real: nenhuma Publication/value/dependency manual após ele.
+  CALLER é o display comprovado pela correlação do produtor; o identificador
+  obrigatório do fato é UnitId. Não supor que UnitId.localId contém PROGRAM-ID.
 
 ### Dinâmico multi-candidate
 

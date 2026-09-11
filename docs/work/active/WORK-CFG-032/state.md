@@ -17,8 +17,9 @@ W1–W5 deve ser consultada no HEAD exato do PR; status remoto não é inferido 
 
 ## Restante
 
-Review humano do documento e das decisões semânticas/compatibilidade. Entrega
-externa somente por PR DRAFT; CI W1–W5 e URL/HEAD são informados no handoff.
+Review humano do documento e das decisões semânticas/compatibilidade.
+[PR #17](https://github.com/Gustavo2358/analysis-cfg/pull/17) OPEN / DRAFT;
+CI W1–W5 e HEAD final são informados no handoff e nos checks do próprio PR.
 Nenhum merge, auto-merge ou início de W1.
 
 ## Descobertas que afetam o plano
@@ -28,3 +29,5 @@ transporta e sua política recusa I-56 mesmo com KnownContract. SP perde literal
 argumentos e continuação tipada; lower descarta o target. X(8) exige fitting e
 interpretação de nome explícitos. Perfil de valores recusa efeitos, não faz noop
 silencioso. BEFORE por operação e W4 planner são reutilizáveis; solver change NONE.
+Caller UnitId é identidade técnica; PROGRAM-ID display exige correlação explícita
+do produtor, pois a CLI lower atual exporta somente Publication.

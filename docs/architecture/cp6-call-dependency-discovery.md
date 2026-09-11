@@ -192,6 +192,20 @@ por linha inventada ou reparse. Esse mecanismo pode servir ao Invoke e às
 derivações de fitting, preservando suas lacunas existentes.
 [L08–L10](../work/evidence/WORK-CFG-032/source-catalog.md#l08)
 
+Há ainda uma distinção na identidade do **caller**: `SpInput.UnitKey` conserva
+`canonicalProgramName`; `CanonicalRevision` incorpora essa chave na identidade da
+publicação. `ScalarMoveLowerer` cria UnitId(publication,"unit"), e
+[Unit AIR](https://github.com/Gustavo2358/air-java/blob/3bafe3978f0f392e842038ad5628e85dfd91d00d/air-model/src/main/java/io/github/gustavo2358/air/model/Unit.java#L5)
+não tem campo de nome de programa. `LoweringResult.EntryLink/StatementLink` conserva
+UnitKey do source junto dos IDs AIR em memória, mas `CobolLower.run` exporta somente
+Publication pelo AirFileOutput, sem essas correlações. Portanto UnitId identifica
+o caller, mas a string CALLER não está automaticamente disponível no AIR JSON.
+Recomenda-se caller UnitId obrigatório e nome de exibição opcional, obtido somente
+de correlação explícita do produtor (receipt/sidecar ou composição em memória),
+nunca de parsing de IDs, de origin lines ou de catálogo global. Se a primeira CLI
+de dependency precisar exibir CALLER, esse transporte de correlação pertence à W1.
+Não exige nova AIR. [L11–L14](../work/evidence/WORK-CFG-032/source-catalog.md#l11)
+
 A mudança mínima futura atravessa wire → domain → admission → assembler/handler:
 CallFact com target tipado, whole-item proof quando aplicável, origin, continuação,
 restrições e fatos de assinatura/efeitos/outcomes. LiteralResource para literal;
@@ -438,7 +452,8 @@ Contrato mínimo conceitual, sem definir sintaxe wire de produção:
 ```text
 DependencySiteFact
   schema/consumer/profile versions; publication/revision
-  caller: UnitId (+ source PROGRAM-ID display); entry: EntryId
+  caller: UnitId (+ optional source PROGRAM-ID display with producer correlation)
+  entry: EntryId
   site: OperationId, Sequence/offset, operation origin
   target: literal | computed; operand/expression IDs; ObjectId when applicable
   observation: BEFORE(site) for computed; direct-literal for literal

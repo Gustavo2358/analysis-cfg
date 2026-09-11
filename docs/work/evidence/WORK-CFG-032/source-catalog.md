@@ -373,3 +373,27 @@ structural preflight and unsupported operation behavior.
 [analysis-ir: especificacao/02-tipos-valores-e-operandos.md:145](https://github.com/Gustavo2358/analysis-ir/blob/51b4d9a8ae0364232bd97103cd73a77e1a34996c/especificacao/02-tipos-valores-e-operandos.md#L145)
 
 fit_text/trim_right/read, tipos e papéis de operandos.
+
+## L11
+
+[cobol-lower: core/src/main/java/io/github/gustavo2358/lower/application/ScalarMoveLowerer.java:25](https://github.com/Gustavo2358/cobol-lower/blob/18016f16b4f63149eb1bb4ca13db7e12593d8909/core/src/main/java/io/github/gustavo2358/lower/application/ScalarMoveLowerer.java#L25)
+
+UnitId(publication,unit); LoweringResult source links.
+
+## L12
+
+[cobol-lower: core/src/main/java/io/github/gustavo2358/lower/application/LoweringResult.java:42](https://github.com/Gustavo2358/cobol-lower/blob/18016f16b4f63149eb1bb4ca13db7e12593d8909/core/src/main/java/io/github/gustavo2358/lower/application/LoweringResult.java#L42)
+
+EntryLink/StatementLink source UnitKey -> AIR IDs.
+
+## L13
+
+[cobol-lower: adapters/src/main/java/io/github/gustavo2358/lower/adapters/cli/CobolLower.java:49](https://github.com/Gustavo2358/cobol-lower/blob/18016f16b4f63149eb1bb4ca13db7e12593d8909/adapters/src/main/java/io/github/gustavo2358/lower/adapters/cli/CobolLower.java#L49)
+
+CLI exports only Publication; source correlations not serialized.
+
+## L14
+
+[cobol-lower: core/src/main/java/io/github/gustavo2358/lower/application/CanonicalRevision.java:105](https://github.com/Gustavo2358/cobol-lower/blob/18016f16b4f63149eb1bb4ca13db7e12593d8909/core/src/main/java/io/github/gustavo2358/lower/application/CanonicalRevision.java#L105)
+
+UnitKey canonicalProgramName contributes to nonreversible revision identity.

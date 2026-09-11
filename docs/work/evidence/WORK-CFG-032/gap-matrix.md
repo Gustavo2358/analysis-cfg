@@ -18,6 +18,7 @@ outro, mas tem classificação primária explícita. Nenhum finding autoriza imp
 | Decoder wire CALL atual | G0 | EXISTS | Wire/Wire12 CallDocument | Não confundir transporte parcial com domínio |
 | Payload perdido no adapter lower | G3 | MISSING | Materialize → OtherStatement | Domínio CallFact tipado e mapeamento; cobol-lower |
 | CALL lowering/outcomes/effects | G3 | MISSING | Admission e assembler; cinco recusas | Handler/assembler de Invoke neutro sob slice delimitada; cobol-lower |
+| Caller display/correlation no transporte | G1 | PARTIAL | SpInput.UnitKey; LoweringResult.EntryLink/StatementLink; CobolLower exporta só Publication; Unit sem nome (L11–L14) | Fact usa UnitId; transportar correlação do produtor se exigir display CALLER na CLI. Não decodificar hash/ID nem ler source por linha |
 | AIR invocation normativa | G4 | EXISTS, sem gap necessário | N01–N07 | **AIR version change NONE**; Invoke é terminador |
 | air-java Invoke/Target/effects | G4 | EXISTS, sem gap de tipo necessário | J01–J06 | Reutilizar modelos; sem CobolCall |
 | Invocation estrutural e I-56 | G0 | EXISTS | J07,J08,J12; invoke-probe | Não apagar obrigação externa do validator |

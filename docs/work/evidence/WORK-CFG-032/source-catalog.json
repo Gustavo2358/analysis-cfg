@@ -494,5 +494,37 @@
     "file": "especificacao/02-tipos-valores-e-operandos.md",
     "line": 145,
     "symbols_fields": "fit_text/trim_right/read"
+  },
+  {
+    "id": "L11",
+    "repo": "cobol-lower",
+    "sha": "18016f16b4f63149eb1bb4ca13db7e12593d8909",
+    "file": "core/src/main/java/io/github/gustavo2358/lower/application/ScalarMoveLowerer.java",
+    "line": 25,
+    "symbols_fields": "UnitId(publication,unit); LoweringResult source links"
+  },
+  {
+    "id": "L12",
+    "repo": "cobol-lower",
+    "sha": "18016f16b4f63149eb1bb4ca13db7e12593d8909",
+    "file": "core/src/main/java/io/github/gustavo2358/lower/application/LoweringResult.java",
+    "line": 42,
+    "symbols_fields": "EntryLink/StatementLink source UnitKey -> AIR IDs"
+  },
+  {
+    "id": "L13",
+    "repo": "cobol-lower",
+    "sha": "18016f16b4f63149eb1bb4ca13db7e12593d8909",
+    "file": "adapters/src/main/java/io/github/gustavo2358/lower/adapters/cli/CobolLower.java",
+    "line": 49,
+    "symbols_fields": "CLI exports only Publication; source correlations not serialized"
+  },
+  {
+    "id": "L14",
+    "repo": "cobol-lower",
+    "sha": "18016f16b4f63149eb1bb4ca13db7e12593d8909",
+    "file": "core/src/main/java/io/github/gustavo2358/lower/application/CanonicalRevision.java",
+    "line": 105,
+    "symbols_fields": "UnitKey canonicalProgramName contributes to nonreversible revision identity"
   }
 ]
