@@ -18,7 +18,7 @@ def main():
             protections(ROOT);verify(ROOT)
             changed=set(git('diff','--name-only','c39a92f930b1c693857a0b30a1f5155f3f81520c').decode().splitlines())|set(git('ls-files','--others','--exclude-standard').decode().splitlines())
             for p in changed:
-                if p not in {'ARCHITECTURE.md','MANIFEST.sha256','pom.xml','.github/workflows/ci.yml'} and not p.startswith(('docs/','scripts/','analysis-','cfg-')):raise ValueError('path outside W1D scope: '+p)
+                if p not in {'ARCHITECTURE.md','MANIFEST.sha256','pom.xml','.github/workflows/ci.yml','.github/workflows/qualification.yml'} and not p.startswith(('docs/','scripts/','analysis-','cfg-')):raise ValueError('path outside W1D scope: '+p)
             expected=manifest()
             if args.update_manifest:(ROOT/'MANIFEST.sha256').write_bytes(expected)
             elif (ROOT/'MANIFEST.sha256').read_bytes()!=expected:raise ValueError('delivery manifest mismatch; review diff before --update-manifest')

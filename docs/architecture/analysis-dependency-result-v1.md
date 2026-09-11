@@ -145,3 +145,5 @@ As autoridades W5 antigas continuam no script próprio de CP5, sem repinar seus
 fixtures históricos para obter PASS. Receipts registram comandos, exits, bytes,
 hashes, árvores e estado dos checkouts ocupados. W2 permanece NOT_STARTED /
 NOT_AUTHORIZED.
+
+A versão do CFG correlacionado segue [CFG JSON 2.0.0](cfg-json-v2.md) quando há Invoke. Isso não muda a versão nem os bytes deste produto de dependência.

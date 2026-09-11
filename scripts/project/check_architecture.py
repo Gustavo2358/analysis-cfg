@@ -497,24 +497,8 @@ def verify_snapshot_pin(root: Path) -> str:
         raise GateFailure("CI must not resolve air-java from a mutable branch")
     if f'test "$(git rev-parse HEAD)" = "{sha}"' not in workflow:
         raise GateFailure("CI must verify air-java HEAD before installation")
-    if workflow.count("MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2") != 14:
-        raise GateFailure("CI must share the exact AIR/W1D Maven repository across fourteen production steps")
-    if workflow.count("MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/w5-m2") != 1 or 'cp -a "${{ runner.temp }}/analysis-cfg-m2" "${{ runner.temp }}/w5-m2"' not in workflow:
-        raise GateFailure("historical CP5 producers require a separate Maven repository seeded from the exact AIR install")
-    for pin in (lock['proleap_poc']['main_commit'], lock['cobol_lower']['commit']):
-        if refs.count(pin)!=1:raise GateFailure("CI W1D producer source pin differs from lock")
-    for script in ('prepare_w1d_producers.py','check_w1d.py','e2e_w1d.py','challenge_w1d.py'):
-        if 'scripts/project/'+script not in workflow:raise GateFailure('CI missing W1D execution: '+script)
-    if 'scripts/harness/check-full.sh' not in workflow or 'scripts/project/record_air_dependency.py' not in workflow:
-        raise GateFailure("CI must run full regression and record exact upstream tree/JAR provenance")
-    for wave in (1, 2, 3, 4, 5):
-        if f"scripts/project/check_cp5_gate.py performance --wave {wave}" not in workflow:
-            raise GateFailure(f"CI must execute CP5 Wave {wave} product probes")
-    if 'distribution: temurin' not in workflow or 'java-version: "21"' not in workflow:
-        raise GateFailure("CI must use Temurin 21")
-    for gate in ("fast", "architecture", "semantic", "integration"):
-        if f"bash scripts/harness/check-{gate}.sh" not in workflow:
-            raise GateFailure("CI must execute " + gate)
+    from check_ci_orchestration import verify
+    verify(root)
     return sha
 
 
@@ -761,7 +745,7 @@ def verify_jdeps(jdeps: str, root: Path, classes: Path, air_jar: Path) -> None:
     )
 
 
-def architecture_gate(root: Path) -> None:
+def architecture_gate(root: Path, test_profile: str = "full") -> None:
     detector_self_test()
     verify_project_shape(root)
     air_sha = verify_snapshot_pin(root)
@@ -770,7 +754,13 @@ def architecture_gate(root: Path) -> None:
     jdeps = command_path("jdeps")
     repository = local_repository_argument()
     runtime = assert_maven_runtime(maven, root, repository)
-    run([maven, *repository, "--batch-mode", "--no-transfer-progress", "clean", "test"], root)
+    test_arguments = []
+    if test_profile == "fast":
+        from fast_tests import selector, verify_reports
+        test_arguments = ["-Dtest=" + selector(root)]
+    run([maven, *repository, "--batch-mode", "--no-transfer-progress", "clean", "test", *test_arguments], root)
+    if test_profile == "fast":
+        verify_reports(root)
     kernel = root / KERNEL_ARTIFACT
     total, skipped = count_tests(kernel)
 
@@ -820,13 +810,14 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[2])
     parser.add_argument("--self-test", action="store_true")
+    parser.add_argument("--test-profile", choices=("full", "fast"), default="full")
     args = parser.parse_args()
     try:
         if args.self_test:
             detector_self_test()
             print("[architecture] PASS: detector fixtures", flush=True)
         else:
-            architecture_gate(args.root.resolve())
+            architecture_gate(args.root.resolve(), args.test_profile)
         return 0
     except GateFailure as exc:
         print(f"[architecture] FAIL: {exc}", file=sys.stderr, flush=True)

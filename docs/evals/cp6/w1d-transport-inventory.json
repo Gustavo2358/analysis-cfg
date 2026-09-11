@@ -43,6 +43,7 @@
       "io/github/gustavo2358/analysis/cfg/adapters/CfgJsonException.class",
       "io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter$1.class",
       "io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter$MoveOperation.class",
+      "io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter$WireKind.class",
       "io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter.class"
     ],
     "bytecode_dependencies": {
@@ -120,6 +121,7 @@
         "io.github.gustavo2358.analysis.cfg.adapters.CfgJsonException",
         "io.github.gustavo2358.analysis.cfg.adapters.CfgJsonWriter$1",
         "io.github.gustavo2358.analysis.cfg.adapters.CfgJsonWriter$MoveOperation",
+        "io.github.gustavo2358.analysis.cfg.adapters.CfgJsonWriter$WireKind",
         "io.github.gustavo2358.analysis.cfg.application.BuildOptions",
         "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult",
         "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult$Status",
@@ -180,6 +182,13 @@
         "java.lang.Object",
         "java.nio.file.CopyOption",
         "java.nio.file.Path"
+      ],
+      "io.github.gustavo2358.analysis.cfg.adapters.CfgJsonWriter$WireKind": [
+        "io.github.gustavo2358.analysis.cfg.adapters.CfgJsonWriter",
+        "java.lang.Class",
+        "java.lang.Enum",
+        "java.lang.Object",
+        "java.lang.String"
       ]
     }
   },

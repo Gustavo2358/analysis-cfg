@@ -1,14 +1,13 @@
-name: Fast PR CI
+name: Full Qualification
 
 on:
-  push:
-  pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  fast:
+  qualification:
     runs-on: ubuntu-latest
     steps:
       - name: Check out analysis-cfg
@@ -39,27 +38,31 @@ jobs:
         working-directory: air-java
         run: test "$(git rev-parse HEAD)" = "2a37f5e980ba25fdc79614a66030a84d8bf5b8c9"
 
-      - name: Record actual CI source checkout
-        working-directory: analysis-cfg
-        run: python3 -B scripts/project/ci_source_receipt.py --output .harness-results/ci-source-receipt.json
+      - name: Check out read-only E2E frontend baseline
+        uses: actions/checkout@v4
+        with:
+          repository: Gustavo2358/proleap-poc
+          ref: 53d774026a1e4bcd969c7783a1d277aaa87b5f2f
+          path: proleap-poc
+          fetch-depth: 0
 
-      - name: Preserve CI source receipt
+      - name: Check out read-only E2E lowering baseline
+        uses: actions/checkout@v4
+        with:
+          repository: Gustavo2358/cobol-lower
+          ref: 9de3825da64898258e647727393f01b9e9198d9e
+          path: cobol-lower
+          fetch-depth: 0
+
+      - name: REMOTE_MANUAL_QUALIFICATION
+        working-directory: analysis-cfg
+        run: bash scripts/harness/check-qualification.sh --work .harness-results/qualification --maven-repo "${{ runner.temp }}/analysis-cfg-m2"
+
+      - name: Preserve full qualification evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ci-source-receipt
-          path: analysis-cfg/.harness-results/ci-source-receipt.json
-          if-no-files-found: error
-
-      - name: FAST_CI
-        working-directory: analysis-cfg
-        run: bash scripts/harness/check-pr-fast.sh --work .harness-results/fast-ci --maven-repo "${{ runner.temp }}/analysis-cfg-m2"
-
-      - name: Preserve Fast CI evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: fast-ci-evidence
-          path: analysis-cfg/.harness-results/fast-ci/evidence/
+          name: full-qualification-evidence
+          path: analysis-cfg/.harness-results/qualification/evidence/
           include-hidden-files: true
           if-no-files-found: error

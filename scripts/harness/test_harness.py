@@ -344,7 +344,10 @@ class HarnessGuardTests(unittest.TestCase):
         from check_transport_architecture import verify_transport_shape
         from check_architecture import GateFailure
         path = self.root / 'cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter.java'
-        path.write_text(path.read_text().replace('out.string(transitionKind(transition.kind()))', 'out.string(transition.kind().name())'))
+        original = path.read_text()
+        anchor = 'out.string(transitionKind(transition.kind()).token)'
+        self.assertEqual(1, original.count(anchor), 'enum-name mutation must actually change the writer')
+        path.write_text(original.replace(anchor, 'out.string(transition.kind().name())'))
         with self.assertRaises(GateFailure): verify_transport_shape(self.root)
 
 

@@ -22,6 +22,6 @@ def run():
     check(ROOT)
     count=reports();subprocess.run([sys.executable,'-B','scripts/project/test_dependency_wire.py'],cwd=ROOT,check=True)
     wire=ET.parse(ROOT/'cfg-adapters/target/surefire-reports/TEST-io.github.gustavo2358.analysis.cfg.adapters.W1dInvokeWireTest.xml').getroot()
-    if int(wire.attrib['tests'])!=1 or any(int(wire.attrib[k]) for k in ('failures','errors','skipped')):raise ValueError('CFG Invoke wire test missing/failed')
-    print('PASS: W1D '+str(count+1)+' nominal tests; CFG, effects/fixpoint, values, consumer, planning, scale, CLI and strict independent wire')
+    if int(wire.attrib['tests'])!=5 or any(int(wire.attrib[k]) for k in ('failures','errors','skipped')):raise ValueError('CFG Invoke wire test missing/failed')
+    print('PASS: W1D '+str(count+5)+' nominal tests; CFG, effects/fixpoint, values, consumer, planning, scale, CLI and strict independent wire')
 if __name__=='__main__':run()

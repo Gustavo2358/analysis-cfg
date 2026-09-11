@@ -1,5 +1,8 @@
 # Gates estáveis e honestos
 
+Estado vigente CP6 W1D: [Fast CI e qualificação explícita](qualification.md).
+Os registros por checkpoint abaixo permanecem históricos.
+
 Estado vigente: CP5 W1–W5 aprovado e fechado. W1D adiciona `check_w1d.py`, `e2e_w1d.py` e `challenge_w1d.py`, com inventários atuais separados em `docs/evals/cp6`. Full executa fast/architecture/semantic/performance/integration. Os estados históricos abaixo descrevem checkpoints anteriores e não limitam os gates atuais. W2 não está autorizado.
 
 

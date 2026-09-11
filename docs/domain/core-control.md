@@ -107,3 +107,5 @@ exata em `preciseControlCapabilities()`; nenhuma outra versão é presumida.
 A regra é core, sem intérprete fictício no SemanticInterpreterRegistry. Capability
 local/indireta/desconhecida continua dependendo da negociação existente; registrar
 identidade não implementa semântica. O manifesto obrigatório nunca é dispensado.
+
+O transporte de Invoke declara explicitamente [analysis-cfg-json 2.0.0](../architecture/cfg-json-v2.md); grafos do domínio anterior continuam em v1.

@@ -6,7 +6,7 @@
   "risk": "high",
   "goal": "Real W1A/W1C COBOL CALL through typed intraprocedural Invoke CFG, effect-aware generic values and dependency site facts.",
   "authorization": "implementation",
-  "authorization_evidence": "Explicit user CP6 W1D request, 2026-09-11. Commit, push and Draft PR authorized; no merge and no W2.",
+  "authorization_evidence": "Explicit user CP6 W1D request, 2026-09-11. Commit, push and Draft PR authorized; no merge and no W2. Explicit remediation request on PR #18: versioned CFG Invoke wire and automatic Fast CI / explicit full qualification, including final local qualification before push.",
   "checkpoint": "CP6_W1D",
   "must_read": [
     "AGENTS.md",
@@ -37,7 +37,8 @@
     "scripts",
     "docs",
     "MANIFEST.sha256",
-    ".github/workflows/ci.yml"
+    ".github/workflows/ci.yml",
+    ".github/workflows/qualification.yml"
   ],
   "test_scope": [
     "cfg-kernel/src/test",

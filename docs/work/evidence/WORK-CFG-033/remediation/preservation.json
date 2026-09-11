@@ -1,6 +1,10 @@
 {
-  "base": "c39a92f930b1c693857a0b30a1f5155f3f81520c",
-  "files": {
+  "baseline": "1ab16bdeae8d8af23e723d0b239ba191a695764a",
+  "changed": [
+    "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter.java",
+    "cfg-adapters/src/test/java/io/github/gustavo2358/analysis/cfg/adapters/W1dInvokeWireTest.java"
+  ],
+  "byteExact": {
     "analysis-adapters/pom.xml": "0d40c7f90ba543fc43a0363830d72c5101a8b5adf7f6ebd4c6f6f7be885ce670",
     "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/DataflowAirReader.java": "51188302ee4a257cbe8d17f231fcbff1d584dbde2cf02321da1761f05736209b",
     "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/DeliveryReceipt.java": "e5e41db33dc1cbe7ee6b1020a29572db9093fc22a042f5eee2b866f32fa06a54",
@@ -23,6 +27,9 @@
     "analysis-adapters/src/test/java/io/github/gustavo2358/analysis/adapters/WideResultTest.java": "911634347ed179af17141bed5cef3a77959b5925fbfec9f2ee391f1f4d913ad4",
     "analysis-adapters/src/test/java/io/github/gustavo2358/analysis/adapters/WireAdversarialTest.java": "b518dd2dba05261f61e79c91269b29bcc57999beee53f0e76bba3b63752cc236",
     "analysis-adapters/src/test/java/io/github/gustavo2358/analysis/adapters/WireTest.java": "6ac1ba43f7883adf634460127bb45655c220dd632121ba39eeff4eb5a41f6810",
+    "analysis-adapters/src/test/resources/cp6/dynamic-no-move.air.json": "993d039e70fa2bd1cdd31830cff5b0d38b0f723bc3cf147a34bca63c1d77df9b",
+    "analysis-adapters/src/test/resources/cp6/dynamic-x8.air.json": "bef5d8979c0ffd3fb96272dd405b18d7b873e4e4d9244eeeb9ac98587fb973d2",
+    "analysis-adapters/src/test/resources/cp6/literal.air.json": "d532b89c074d3a3fe8672090cef5432d9b664e137f3ce1bd37058af5fc59e67d",
     "analysis-dataflow/pom.xml": "7daf81689d95bc3327f510b1d85e9aa77c944993adf881cba806c7d0d98f0ca1",
     "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/AnalysisDataflow.java": "68c60fa05024e27544fc45e60a5e5cedf7974494ba2bff15d34bb0852972aa1a",
     "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/DefaultValuePlan.java": "7c9e543f2c01ed0816bc7c15a23e657bc12a803512313a69284d52b70a5b1531",
@@ -131,12 +138,17 @@
     "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirJsonFileReader.java": "0d9f54d26a728aad17163be2cf28e7ce458fe775554a37f0d7ba7d27dd73c393",
     "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonBytes.java": "579254467d367c6a067845c16f2a1c1b82558fcc707830bf7adc16e49997f7c6",
     "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonException.java": "f0be54101b6d29f3e17a7f6972e20621c7e81c837cb16f77ab387d032a85bfdf",
-    "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter.java": "c87a9796b61360ee070f4d19042f0f6a5a6c8cc4597d1832f78dcd8718edab4e",
     "cfg-adapters/src/test/java/io/github/gustavo2358/analysis/cfg/adapters/MemoryFacts.java": "36cad106bd39bd7fc6b0954fa7ab4370a2fa0c89e54a3a2c05ae43158d3fafa9",
     "cfg-adapters/src/test/java/io/github/gustavo2358/analysis/cfg/adapters/ScalarAssignTest.java": "abaff760591132b11ce5dcf69b8e9a4e5d6a718f7cc364fdd17f2213a0e7b3f5",
     "cfg-adapters/src/test/java/io/github/gustavo2358/analysis/cfg/adapters/TransportTest.java": "f20ace881f1244a63cb8ddb82c4bd87e13be8704e56dc16a7b2993d831f23b5d",
-    "cfg-adapters/src/test/java/io/github/gustavo2358/analysis/cfg/adapters/W1dInvokeWireTest.java": "7f20eb745eba1023266a1eb499488fcba9d0f57b88747e0fa83ee6a93b1ac874",
     "cfg-adapters/src/test/java/io/github/gustavo2358/analysis/cfg/adapters/WriterDomainTest.java": "971277ea84c8f29f3de9ba172571422a0bdf33e3a6b03651bbb8d3a4ff9220c1",
+    "cfg-adapters/src/test/resources/air/PROVENANCE.md": "35d2012dd9f9da64d41cf9f88d09c16a8b396f0dda1e618910362d624143b454",
+    "cfg-adapters/src/test/resources/air/goback.canonical.json": "fa299c2e5f3fae75afe365363b9f16925f0cfea591f631768ace82f0fb9a1075",
+    "cfg-adapters/src/test/resources/air/scalar-assign.canonical.json": "40b9cec1bcc1c1e40cf3b9e3c48e834835e478e1d84bccafa575d63497ef3b60",
+    "cfg-adapters/src/test/resources/air/scalar-assign.provenance.json": "247d760d86a5dccde52467440379bf341d577a1209869006c1fe7be0aaad17bc",
+    "cfg-adapters/src/test/resources/cfg/ORACLE.md": "5203ca497557cba97908e5bb4f2a323abe720b1a3f4f3e87b43cbaae5646a482",
+    "cfg-adapters/src/test/resources/cfg/goback.manual.json": "9ea8b230c99dd59cde758f91ae6a70885eb2b41a3a8d37346d6d955dd0e22640",
+    "cfg-adapters/src/test/resources/cfg/scalar-assign.manual.json": "bbb7f3198acc81eb32a520214a7e7dbeabcfea69a8b1801e499a4dd7be6b01f0",
     "cfg-kernel/pom.xml": "0ee54d83103d2fe70f67e3e370273f6cd929613ba933bf917f3f15ecdb71aed2",
     "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/BuildCfg.java": "81e332367e61d46df7d982a6b29958efba10bfdba5047a908bce5699c9debebe",
     "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/BuildOptions.java": "5fc1925688f9527592eee73b3e92de258206ec81d67198a7b65e554d0d174417",
@@ -168,82 +180,75 @@
     "cfg-launcher/src/main/java/io/github/gustavo2358/analysis/cfg/launcher/AnalysisCfg.java": "210bd8bac22014f2a72f3f1ef9cfcadf7235eb74539a5a885c8ddea2c6dada1d",
     "cfg-launcher/src/test/java/io/github/gustavo2358/analysis/cfg/launcher/EvalCfg031Test.java": "5e21e9902a8992d08fcc1a653ffb544b51d254eb7715c193ee7b32d8f0d3b2a1",
     "cfg-launcher/src/test/java/io/github/gustavo2358/analysis/cfg/launcher/ScalarAssignCliTest.java": "734939a054e4647e7fc9c5aa4e1c9b886459de02dda05324ed158da9fca274c4",
+    "docs/architecture/cfg-json-v1.md": "7c4d28d749eaa576b2298a3e7c863ec59a82343148a5f78bf00aaa786c246853",
     "docs/work/evidence/WORK-CFG-027/ScalarBaselineOracle.java": "da5b86ff22ea7c03f032f13c590e72c9fbebac6904c6978341ab2c4b32c3feba",
+    "docs/work/evidence/WORK-CFG-033/README.md": "679058cd7d0f8234aab9528bf38d21074d6435962beae848464cd48eb1057ee7",
+    "docs/work/evidence/WORK-CFG-033/default-plan-architecture-receipt.json": "c2059a563a6267a6310ffeadfa0e50ee0cb4c2dd86ef72d1b51d2da3ab4359f7",
+    "docs/work/evidence/WORK-CFG-033/e2e-receipt.json": "b79a0b724eff0bd821ca12d0f96ed5ef34985aba06c03c16552fbf048f893d28",
+    "docs/work/evidence/WORK-CFG-033/exact-upstream.json": "2ecb5e308c2e925734811a3b1a0c497aadb3089fd352a3f146e3a92d19729e08",
+    "docs/work/evidence/WORK-CFG-033/mutation-final-receipt.json": "ab8da041848834d5ebb9810b66fd38ad3b30d19dee1ec572b60df9692c94982d",
+    "docs/work/evidence/WORK-CFG-033/mutation-receipt.json": "7e3edeff77bf071b0218c40eaebe903ca4d0d07a65abefbae75640e0444a9176",
+    "docs/work/evidence/WORK-CFG-033/protected-after.json": "741796b3d3bec0327aa6c3bfca8b82fb6f86d6e6721a7176153b75f8a2ee0599",
+    "docs/work/evidence/WORK-CFG-033/protected-before.json": "741796b3d3bec0327aa6c3bfca8b82fb6f86d6e6721a7176153b75f8a2ee0599",
+    "docs/work/evidence/WORK-CFG-033/raw/DependencyAnalysis-red.java.txt": "dc51815497c5736c4c5af6e3e2aeafcb613e5f1b9b02519e55721eb728fcd482",
+    "docs/work/evidence/WORK-CFG-033/raw/W1dBoundaryTest-red.java.txt": "0d5addf98aed2323a7435ccd5854e30f5c375886dbafe4283a88f73aa1d56c4a",
+    "docs/work/evidence/WORK-CFG-033/raw/W1dEffectsTest-red.java.txt": "56af14b7abb566f94b72f23a3b53947d9b604b3da689dccf945f96d9b2ca5300",
+    "docs/work/evidence/WORK-CFG-033/raw/architecture-gate-2.log.gz": "fb1a343737f87b67482c7a3402d5410268926af3d294a54bc01f88c49b87a485",
+    "docs/work/evidence/WORK-CFG-033/raw/cfg-red-tests.log.gz": "fd61d5e02eed9d6e481a1b6c57cd7a126818827aad5d83810aedd401d18fc003",
+    "docs/work/evidence/WORK-CFG-033/raw/cfg-red-tests.xml": "633fbc66fbf3c2e2bb346839812821d2bf7e81a2921c4ae2612030bcf6616977",
+    "docs/work/evidence/WORK-CFG-033/raw/cfg-wire-red.log.gz": "b22404d4cad2d74f3946cbd7645c89e38fe8321be11976028398e5d266a5d57b",
+    "docs/work/evidence/WORK-CFG-033/raw/cli-wrapper.log.gz": "350271fc12765d35e010d4daa6624ff9da576cc081f4affbeb075d8f6c26ba00",
+    "docs/work/evidence/WORK-CFG-033/raw/default-plan-architecture.log.gz": "132977c2692509ea564463267be1be3af17012bc2db347fbc71b94c47f19c09f",
+    "docs/work/evidence/WORK-CFG-033/raw/default-plan-architecture.tar.gz": "041709ac13a1e0a434635aa3546ba70d8f03b456fe3db252e15551404ec42b2a",
+    "docs/work/evidence/WORK-CFG-033/raw/dependency-red.log.gz": "2ccf62098dee76eae1721ef5f03ea21166d157f46252ffcb1ff07fbc8832c66c",
+    "docs/work/evidence/WORK-CFG-033/raw/dependency-red.xml": "575f8efb11dc1f02bd134ce89415fcf25740e6b9f66b0954a7fd5231543656b6",
+    "docs/work/evidence/WORK-CFG-033/raw/dynamic-no-move-cfg-red.log": "32cac488408c3831876796eed75633aecf3ced1859d63fa5b7987800bd65e722",
+    "docs/work/evidence/WORK-CFG-033/raw/dynamic-no-move-cobol-semantic-product.json": "e8154804671967305eed214b64c7a3be44a3e441426688635d2442221d3375cc",
+    "docs/work/evidence/WORK-CFG-033/raw/dynamic-no-move-dynamic-no-move.cbl": "4d038880fb2931a9ef98af18172eb74a89a1b4f305637a1f646eb1806acf347c",
+    "docs/work/evidence/WORK-CFG-033/raw/dynamic-no-move-frontend.log": "0179f16904a6a36b506f6b12cfa98bd5438202ffe2a85de74a6ffc16f6ffd7f4",
+    "docs/work/evidence/WORK-CFG-033/raw/dynamic-no-move-lower.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/work/evidence/WORK-CFG-033/raw/dynamic-no-move-program.air.json": "993d039e70fa2bd1cdd31830cff5b0d38b0f723bc3cf147a34bca63c1d77df9b",
+    "docs/work/evidence/WORK-CFG-033/raw/dynamic-x8-cfg-red.log": "3e763362aedbf2691baec0801b3b0bbecd74716ea57929eeef8ed924d33f396b",
+    "docs/work/evidence/WORK-CFG-033/raw/dynamic-x8-cobol-semantic-product.json": "e45c6fe191c6e9be4b35da793663fc908b0b600c848a236d797170e286614010",
+    "docs/work/evidence/WORK-CFG-033/raw/dynamic-x8-dynamic-x8.cbl": "e322e5af1ec7dd4380bded9a44329b10e82c0dcc851ad18e61807f8475847725",
+    "docs/work/evidence/WORK-CFG-033/raw/dynamic-x8-frontend.log": "ace17f7e94deb5153688712b6789f2f4d4a9ccb31f59d6eda2b6ed264f8db27f",
+    "docs/work/evidence/WORK-CFG-033/raw/dynamic-x8-lower.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/work/evidence/WORK-CFG-033/raw/dynamic-x8-program.air.json": "bef5d8979c0ffd3fb96272dd405b18d7b873e4e4d9244eeeb9ac98587fb973d2",
+    "docs/work/evidence/WORK-CFG-033/raw/e2e-final-3.log.gz": "99b9406614be6479486d874198856d98221291f55fa59d21e632c7833a18b8ba",
+    "docs/work/evidence/WORK-CFG-033/raw/effects-green.log.gz": "42697763bc5706238cc788f8e41f83c77f817075b686b002f9deb2f21ab08d7d",
+    "docs/work/evidence/WORK-CFG-033/raw/effects-red.log.gz": "cac71a8292f9e6f2930149c43e981dbcfba4512a9e4a578b55e80bca7fcc99aa",
+    "docs/work/evidence/WORK-CFG-033/raw/effects-red.xml": "13936ecf99ae49ff047a102cf2341735f959ee393b0f0e293dc74b7effaae341",
+    "docs/work/evidence/WORK-CFG-033/raw/full-1.log.gz": "4069b86cf324087651d21bd1f42ebf372f44ebe16849f89b6711a9320010331e",
+    "docs/work/evidence/WORK-CFG-033/raw/full-2.log.gz": "858b977dfd150ba3da7aa51cff679da3451055ca2a09696bb13a4add50d86ba7",
+    "docs/work/evidence/WORK-CFG-033/raw/full-3.log.gz": "d4221da6f142cc348a634e058f29426ee3ea0e65928ca14be210d751618b556f",
+    "docs/work/evidence/WORK-CFG-033/raw/full-4.log.gz": "f94fbcb77f1a2f1665f55cfec08b627514ca8ee71d5115dfe1cc69088be28b7d",
+    "docs/work/evidence/WORK-CFG-033/raw/harness-focal.log.gz": "c52e650e4fef09c644196ca46dac7747fba2dbe7ff2ce5ca4ae51cf1cdc0be5a",
+    "docs/work/evidence/WORK-CFG-033/raw/integration-pin-fix.log.gz": "82ae82f52e0659bcf1af5d124563f87032121bc9e0ce1e2341435ed0f90d387c",
+    "docs/work/evidence/WORK-CFG-033/raw/literal-cfg-red.log": "4c7b6081b693a4723c2df20008912334c99264191bb5705026be39719ce8a16b",
+    "docs/work/evidence/WORK-CFG-033/raw/literal-cobol-semantic-product.json": "e88bb1029fd184e3dabefd28bf37cdea99193630a9f5caeeebc1bd00e56870a1",
+    "docs/work/evidence/WORK-CFG-033/raw/literal-frontend.log": "ac83dd513f99ecd50aabe4f6a78ca88426a18a93797b29c4c3b6563651f6b7b0",
+    "docs/work/evidence/WORK-CFG-033/raw/literal-literal.cbl": "dde454f21d80fb95b5653fbb4166de61e05c6f4a457362328f24dd69adc239b9",
+    "docs/work/evidence/WORK-CFG-033/raw/literal-lower.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/work/evidence/WORK-CFG-033/raw/literal-program.air.json": "d532b89c074d3a3fe8672090cef5432d9b664e137f3ce1bd37058af5fc59e67d",
+    "docs/work/evidence/WORK-CFG-033/raw/lossless-log-compression.json": "42978a5ecbc0cb24c12259712b907776ff23807bee63fc4280385c3ca32bfaa3",
+    "docs/work/evidence/WORK-CFG-033/raw/mutations-final.log.gz": "d65900088d345ac657bffe5071769293e2b4d0bce9281859062774dd5356f3ab",
+    "docs/work/evidence/WORK-CFG-033/raw/red-vertical-commands.json": "e3fe36a8e74a73d8f9884651fad76aa23a8daea92a11df21dd00237786c95ed8",
+    "docs/work/evidence/WORK-CFG-033/raw/w1d-boundary.log.gz": "4d0cd7335267838d072157aa663d4f35e521b1ab7c9683b3cdc134ab4c45f7f1",
+    "docs/work/evidence/WORK-CFG-033/raw/w1d-gate-2.log.gz": "3cf2fcfa6291b162daaeca500e0a365ab8b05951ea636a3255784ae5e8b0c9ef",
+    "docs/work/evidence/WORK-CFG-033/raw/w1d-gate-final.log.gz": "da59113f46f3c9f3174fa2df514363912430efd0e141f482170c9235725233a9",
+    "docs/work/evidence/WORK-CFG-033/raw/w1d-mutations-final.tar.gz": "5cb9bef35f579160ebe07c7764fcf5bfe724fd11c76811e7c041afdd7cfb6d5a",
+    "docs/work/evidence/WORK-CFG-033/raw/w1d-mutations-first.tar.gz": "3af1061092e8dbac8f036afb176459574dd98b62f9ab2c4208adb1bd59689b18",
+    "docs/work/evidence/WORK-CFG-033/raw/w1d-real-e2e-final.tar.gz": "17528bda845bc8e523840d386d6e9d0e26ed6d1ccadc512858b50b08c9a7fc8d",
+    "docs/work/evidence/WORK-CFG-033/raw/w1d-real-e2e.tar.gz": "d724dd854a7473eb592afc6a682119f024cbe6f0632029e14171877adf0f34b1",
+    "docs/work/evidence/WORK-CFG-033/raw/w5-real-e2e-final.tar.gz": "5b3f107a0200f69dd9dc972bce1ba643076113e395702345bba6ec5c4b98be9b",
+    "docs/work/evidence/WORK-CFG-033/raw/w5-selector-fix.log.gz": "a7f98b8aaba9a1948261c7faadb09cbb672e6fdf5dfc8de76a44e3c03a7f0710",
+    "docs/work/evidence/WORK-CFG-033/siblings-final.json": "b68b480fd3cadcbbde2c9f4d4c068f3f368539b44720bcf403028a82f2e9c6b3",
+    "docs/work/evidence/WORK-CFG-033/upstream-sources.json": "db56c6eff55c1bbde0256ff4d909b6655da4b041649b48550936ca45c692d1f7",
+    "docs/work/evidence/WORK-CFG-033/validation-receipt.json": "7e0f343a96591bd24da2850a430416853151969c9c490d63a8329292130c0b25",
+    "docs/work/evidence/WORK-CFG-033/w1d-producers.json": "aef0a6c55c0534dbbc68c6b2575aae5e61e50767c08a863dcb19f6035356b50f",
+    "docs/work/evidence/WORK-CFG-033/w5-final-receipt.json": "fd41bd1c16966a79c6d17811eb45c348fc5bd5458741910bc09106d1eeb10cd8",
+    "docs/work/evidence/WORK-CFG-033/w5-performance.json": "67e14bd883ad834840578f94a5cd695d783fc2c3c58cc0e812f0d7537a11058f",
+    "docs/work/evidence/WORK-CFG-033/w5-producers.json": "40165cb82164bd801bca1126d5313f46545ca499e074f48d4ca97b98c3dbc02c",
     "pom.xml": "6551fd75524f1251ab94ef4bc1e0b54cc43eaa298f3cfb980b0ba64c66d47b83"
-  },
-  "current": {
-    "analysis-adapters/pom.xml": "0d40c7f90ba543fc43a0363830d72c5101a8b5adf7f6ebd4c6f6f7be885ce670",
-    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexBuilder.java": "8c73f3eddc09711e83bf8b53b2f19e3ef8ae28395eab730a7a977313eb80ba0c",
-    "analysis-launcher/pom.xml": "097afe4ef5b8e04959ab120a0de526cc8c4d12c272eee8c49a824323b707d206",
-    "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesAnalysis.java": "81be102d08cb279799d301319e1a5a3d600c80c5cc45654f3ec87bf66ded72ee",
-    "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesProvider.java": "ee4c976e686154e62d2e1645185e3b9b9349cfcee2e5e4ddfa861695af319f02",
-    "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/TextProfile.java": "dba8b5e20c1b3a5ea5663c482bcacd91919458a3352b1b61a778b901939711ac",
-    "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter.java": "c87a9796b61360ee070f4d19042f0f6a5a6c8cc4597d1832f78dcd8718edab4e",
-    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CfgGraph.java": "1fc3ffcd730a7c07cedbb6a3b20d5b81fdc1c5decaf0eacdc9b3f190ae13da25",
-    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CfgTransition.java": "9ea2c535468249c7e633ca807858db902a2b5721f03fd93d034854d95719a781",
-    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CoreCfgProjection.java": "f4bfa838da978e9db61ce0d129262b262c12e25ef3d59caa2eefc20cc2a2c456",
-    "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg028Test.java": "8b70db77a1ba13c16243357b20ac36fa8f891740ba4b2aface6514288344f80b",
-    "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg029Test.java": "e49bb39f551f15dff56500ce94b5a73be60798dcf5e71b29f0698c375cc98c3b",
-    "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg030Test.java": "2154f497fb51ac5c5e48f43377a5d60441b21b3281836877d45db0efceb399be",
-    "docs/sources/sources.lock.json": "456f429fe74e81540b36127920bd8d6a6405433fc625e89c54e90df78681afeb",
-    "pom.xml": "6551fd75524f1251ab94ef4bc1e0b54cc43eaa298f3cfb980b0ba64c66d47b83"
-  },
-  "historicalDigests": {
-    "analysis-adapters/pom.xml": [
-      "775fcd53dffb66762a1233a9c16937f07cf2b64dbdd08902be5b1bea232022a6"
-    ],
-    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexBuilder.java": [
-      "f39fa1377643ee5fd6622b5a24577de73bfabcb5292321c1db268a5c0b710fe0"
-    ],
-    "analysis-launcher/pom.xml": [
-      "609f0a0b678f452a1283032ecd1fc09c5b916c1e4b5194ee7ed33af82db30a2c"
-    ],
-    "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesAnalysis.java": [
-      "2f7a66757f75777ae6d2d0ce81b2eef1c47172e4ddb4e4b86fde8f4cfb6fa29b",
-      "e71ad5ac167100401947ee113ef30b8c99557ee55e98ea6cc42581e98e791aa6"
-    ],
-    "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesProvider.java": [
-      "11677086dfb7774ff397ee1586b33e651c8c8126551b8f3169455d29c9a101a4",
-      "21d804a84dcc95cbc63c8acdcf7518db104bcdb39404519ad97b1ddae628746f",
-      "6137ba7b867832db54eede1833f1bee704eacbd5698015e4da3a8974b226ad5e",
-      "6827c4d5c21e406652758cb4391eb4c88751892c1d9ab1174433556862a400cb",
-      "f3476e370ea15821844d66dddc47f942220e1644fc627ba4e03492f37707169d"
-    ],
-    "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/TextProfile.java": [
-      "5153b286efe1b54ea60a900cea5e2499d222a5112a23b7463ca3eed8b9ed74d4",
-      "676e65ce19ff8f7ae3aad7d97a67484212598462d99899ff9713d0b082dc619f"
-    ],
-    "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter.java": [
-      "ce11d494154f40302d17f266f86ce2dde604ddd9739cc291fb81949663e6db3a"
-    ],
-    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CfgGraph.java": [
-      "b8dae01e337667599de45267e2beda83f1344d9a1a73069551b89ce02b2c3cc4"
-    ],
-    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CfgTransition.java": [
-      "9d0ed378926e0c057e84e588e3fd092a2365e566326bd413e9e1394fe6d89897"
-    ],
-    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CoreCfgProjection.java": [
-      "f9233544a2d2a71caef274edd7bb3f7c41018910c2d829b7d55c9914acfe34bb"
-    ],
-    "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg028Test.java": [
-      "ab40c93d048586d63cfe3bab44e354af1238124229425cfee52bdfe5c21fb73c"
-    ],
-    "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg029Test.java": [
-      "adce290fc975e60d7490814b3f7867f21f3d7c1e59cb97414fb1ceba3deb8fc4"
-    ],
-    "cfg-kernel/src/test/java/io/github/gustavo2358/analysis/cfg/domain/EvalCfg030Test.java": [
-      "7daa02db70dbd62509884b63b11a051683e582424a2dc97b81d9e0841642e22d",
-      "d8994275b714768630e72dbe677cb233f44f6ecad8c748050650e0adab08b1ce"
-    ],
-    "docs/sources/sources.lock.json": [
-      "7a1278d6c60f6a3260d4859fc982a1eddd001cdc58732cc63fe72b4ca75051d2",
-      "e68fd901f8022c82b13d7bc8119000aba40f6141d5059f9898014d8ee1743a88"
-    ],
-    "pom.xml": [
-      "75d015faecc70b2a9c0fa6bc89b682c8589bfd3ab6e1d4fd39fe5df76af9aeca",
-      "a642017053e6cc60e33a2b59a54b41a6230d36a21db8418cef547ead491ed644",
-      "b5bcc9ed2ad4ee511f02b0d500622dd935120cb0f68b99a937c6e024458170fa",
-      "c69bd9f835e7a77fa4010b2f0b184d9450d44a5d6df55d93b104c0e298119687"
-    ]
   }
 }

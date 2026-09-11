@@ -15,3 +15,13 @@ IR_GUARANTEED: Invoke é terminador; outcomes possuem o controle; expressão é 
 ## Fora de escopo
 
 W2, análise interprocedural, lookup de callee/corpus, IF COBOL real multi-candidate, USING/RETURNING, finite exception outcomes, perOutcome e mustOverwrite, formas de armazenamento fora do perfil, regras IBM completas e mudanças normativas AIR. Solver, lattice, DefaultValuePlan, resultado W5 e golden bytes anteriores ficam preservados. A aprovação desta implementação pertence ao review humano.
+
+## Remediação autorizada no PR #18
+
+Dois objetivos independentes: preservar analysis-cfg-json 1.0.0 para todo grafo
+do domínio legado e declarar major 2.0.0 para Invoke; separar automatic Fast CI
+da full qualification local/manual explícita. Contratos em
+[CFG v2](../../../architecture/cfg-json-v2.md) e
+[qualification](../../../engineering/qualification.md). Nenhum pin, golden histórico,
+solver, lattice, DefaultValuePlan, semântica de values ou sibling muda nesta remediação.
+W2 continua NOT_STARTED / NOT_AUTHORIZED.

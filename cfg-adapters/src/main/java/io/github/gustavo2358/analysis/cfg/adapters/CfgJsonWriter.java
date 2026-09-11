@@ -17,7 +17,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 
-/** Explicit analysis-cfg-json 1.0.0 mapping; the AIR input remains the source of full AIR facts. */
+/** Explicit analysis-cfg-json 1.0.0/2.0.0 mapping; the AIR input remains the source of full AIR facts. */
 public final class CfgJsonWriter {
     public static final int DEFAULT_MAXIMUM_BYTES = 64 * 1024 * 1024;
     private final int maximumBytes;
@@ -35,7 +35,17 @@ public final class CfgJsonWriter {
             throw new CfgJsonException("only CFG_BUILT can be serialized");
         var graph = result.graph().orElseThrow();
         var out = new CfgJsonBytes(maximumBytes);
-        out.raw("{\"schema\":\"analysis-cfg-json\",\"schemaVersion\":\"1.0.0\",\"airVersion\":");
+        // Token mappings carry their contract requirement. Inspect the product, not its source text.
+        boolean requiresV2 = false;
+        for (var node : graph.nodes()) {
+            if (node instanceof CfgNode.SequenceNode sequence)
+                requiresV2 |= terminatorKind(sequence.source().terminator()).requiresV2;
+        }
+        for (var transition : graph.transitions())
+            requiresV2 |= transitionKind(transition.kind()).requiresV2;
+        out.raw("{\"schema\":\"analysis-cfg-json\",\"schemaVersion\":");
+        out.string(requiresV2 ? "2.0.0" : "1.0.0");
+        out.raw(",\"airVersion\":");
         var version = result.airVersion();
         out.string(version.major() + "." + version.minor() + "." + version.patch());
         out.raw(",\"publication\":"); airId(out, result.publicationId());
@@ -57,7 +67,7 @@ public final class CfgJsonWriter {
         out.raw("],\"transitions\":["); comma = false;
         for (var transition : graph.transitions()) {
             if (comma) out.raw(","); comma = true;
-            out.raw("{\"kind\":"); out.string(transitionKind(transition.kind()));
+            out.raw("{\"kind\":"); out.string(transitionKind(transition.kind()).token);
             out.raw(",\"from\":"); cfgId(out, transition.from());
             out.raw(",\"to\":"); cfgId(out, transition.to());
             out.raw(",\"activationEntry\":"); airId(out, transition.activationEntry()); out.raw("}");
@@ -101,7 +111,7 @@ public final class CfgJsonWriter {
             }
             case CfgNode.SequenceNode sequence -> {
                 out.raw(",\"kind\":\"SEQUENCE\",\"label\":"); airId(out, sequence.source().label());
-                out.raw(",\"terminator\":{\"kind\":"); out.string(terminatorKind(sequence.source().terminator()));
+                out.raw(",\"terminator\":{\"kind\":"); out.string(terminatorKind(sequence.source().terminator()).token);
                 out.raw(",\"operation\":"); airId(out, sequence.source().terminator().header().id()); out.raw("}");
             }
             case CfgNode.NormalExit exit -> {
@@ -131,7 +141,7 @@ public final class CfgJsonWriter {
             case Ids.EntryId entry -> scopedId(out, entry.unit(), entry.localId());
             case Ids.LabelId label -> scopedId(out, label.unit(), label.localId());
             case Ids.OperationId operation -> scopedId(out, operation.unit(), operation.localId());
-            default -> throw new CfgJsonException("AIR correlation domain outside CFG JSON v1");
+            default -> throw new CfgJsonException("AIR correlation domain outside supported CFG JSON contracts");
         }
         out.raw("}");
     }
@@ -151,21 +161,36 @@ public final class CfgJsonWriter {
     private static String haltKind(Operations.HaltKind kind) {
         return switch (kind) { case NORMAL -> "NORMAL"; case ABNORMAL -> "ABNORMAL"; };
     }
-    private static String transitionKind(CfgTransition.Kind kind) {
+    /** Each explicit wire token declares whether it extends the closed v1 domain. */
+    private enum WireKind {
+        ENTRY("ENTRY", false), JUMP("JUMP", false), BRANCH("BRANCH", false),
+        BRANCH_TRUE("BRANCH_TRUE", false), BRANCH_FALSE("BRANCH_FALSE", false),
+        RETURN("RETURN", false), HALT("HALT", false),
+        INVOKE("INVOKE", true), INVOKE_NORMAL("INVOKE_NORMAL", true);
+
+        private final String token;
+        private final boolean requiresV2;
+        WireKind(String token, boolean requiresV2) {
+            this.token = token;
+            this.requiresV2 = requiresV2;
+        }
+    }
+
+    private static WireKind transitionKind(CfgTransition.Kind kind) {
         return switch (kind) {
-            case ENTRY -> "ENTRY"; case JUMP -> "JUMP"; case BRANCH_TRUE -> "BRANCH_TRUE";
-            case BRANCH_FALSE -> "BRANCH_FALSE"; case RETURN -> "RETURN"; case HALT -> "HALT";
-            case INVOKE_NORMAL -> "INVOKE_NORMAL";
+            case ENTRY -> WireKind.ENTRY; case JUMP -> WireKind.JUMP; case BRANCH_TRUE -> WireKind.BRANCH_TRUE;
+            case BRANCH_FALSE -> WireKind.BRANCH_FALSE; case RETURN -> WireKind.RETURN; case HALT -> WireKind.HALT;
+            case INVOKE_NORMAL -> WireKind.INVOKE_NORMAL;
         };
     }
-    private static String terminatorKind(Terminator terminator) throws CfgJsonException {
+    private static WireKind terminatorKind(Terminator terminator) throws CfgJsonException {
         return switch (terminator) {
-            case Operations.Jump ignored -> "JUMP";
-            case Operations.Branch ignored -> "BRANCH";
-            case Operations.Return ignored -> "RETURN";
-            case Operations.Halt ignored -> "HALT";
-            case Operations.Invoke ignored -> "INVOKE";
-            default -> throw new CfgJsonException("terminator outside CFG JSON v1");
+            case Operations.Jump ignored -> WireKind.JUMP;
+            case Operations.Branch ignored -> WireKind.BRANCH;
+            case Operations.Return ignored -> WireKind.RETURN;
+            case Operations.Halt ignored -> WireKind.HALT;
+            case Operations.Invoke ignored -> WireKind.INVOKE;
+            default -> throw new CfgJsonException("terminator outside supported CFG JSON contracts");
         };
     }
 }

@@ -68,6 +68,14 @@ def protections(root):
     for path in changed:
         if path!=route or (root/path).read_bytes()!=git(root,'show',BASE+':'+path).replace(b'../../active/WORK-CFG-032/state.md',b'../../history/WORK-CFG-032/state.md'):
             raise ValueError('historical evidence or frozen solver/W5 result changed: '+path)
+    # Remediation preserves the first W1D delivery, including its now-diagnosed wire evidence.
+    remediation_base='1ab16bdeae8d8af23e723d0b239ba191a695764a'
+    remediation_mutable={NEW_CFG_TEST, 'cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter.java'}
+    for path in git(root,'ls-tree','-r','--name-only',remediation_base).decode().splitlines():
+        frozen=(path.endswith('.java') or path.endswith('pom.xml') or '/src/test/resources/' in path
+                or path.startswith('docs/work/evidence/WORK-CFG-033/') or path=='docs/architecture/cfg-json-v1.md')
+        if frozen and path not in remediation_mutable and (root/path).read_bytes()!=git(root,'show',remediation_base+':'+path):
+            raise ValueError('remediation changed protected source/evidence: '+path)
     lock=json.loads((root/'docs/sources/sources.lock.json').read_text())
     for key,field,sha in [('air_java','commit','2a37f5e980ba25fdc79614a66030a84d8bf5b8c9'),('proleap_poc','main_commit','53d774026a1e4bcd969c7783a1d277aaa87b5f2f'),('cobol_lower','commit','9de3825da64898258e647727393f01b9e9198d9e'),('analysis_ir','commit','51b4d9a8ae0364232bd97103cd73a77e1a34996c')]:
         if lock[key][field]!=sha: raise ValueError('W1D frozen source pin drift: '+key)

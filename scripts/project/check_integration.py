@@ -15,6 +15,10 @@ SUITES = {
     "cfg-adapters": {
         "io.github.gustavo2358.analysis.cfg.adapters.W1dInvokeWireTest": {
             "realInvokeRetainsDistinctTerminatorAndTransitionInExistingCfgWire",
+            "historicalGoldensRemainExactlyV1",
+            "allLegacyKindsAndMisleadingIdsStillSelectV1",
+            "invokeNodeRequiresV2EvenWithoutTransitions",
+            "onlyProjectedDomainSelectsVersionAndWriterHasNoStickyState",
         },
         "io.github.gustavo2358.analysis.cfg.adapters.ScalarAssignTest": {
             "sequencePayloadAndObjectCellIdentitySurviveRealReaderAndBuild",
