@@ -380,6 +380,15 @@ def child_text(element: ET.Element, namespace: str, name: str, default: str = ""
     return child.text.strip() if child is not None and child.text else default
 
 
+
+def repository_inputs(root: Path, pattern: str):
+    """Exclude root-level build/evidence stores, never similarly named production packages."""
+    for path in root.rglob(pattern):
+        parts = path.relative_to(root).parts
+        if parts[0] not in {'.git', '.cache', '.harness-results'} and 'target' not in parts:
+            yield path
+
+
 def verify_project_shape(root: Path) -> None:
     project, namespace = xml_root(root / "pom.xml")
     modules_element = project.find(namespace + "modules")
@@ -415,9 +424,8 @@ def verify_project_shape(root: Path) -> None:
 
     production_paths = sorted(
         path
-        for path in root.rglob("*.java")
-        if "target" not in path.relative_to(root).parts
-        and "/src/main/java/" in "/" + path.relative_to(root).as_posix()
+        for path in repository_inputs(root, "*.java")
+        if "/src/main/java/" in "/" + path.relative_to(root).as_posix()
     )
     production_sources = {path.relative_to(root).as_posix() for path in production_paths}
     from check_transport_architecture import transport_source_inventory, verify_transport_shape
@@ -455,7 +463,7 @@ def verify_project_shape(root: Path) -> None:
             if pattern.search(source):
                 raise GateFailure(f"{relative} contains forbidden {label}")
 
-    preview_files = list(root.glob("**/pom.xml")) + [
+    preview_files = list(repository_inputs(root, "pom.xml")) + [
         root / ".mvn/jvm.config",
         root / ".mvn/maven.config",
     ]

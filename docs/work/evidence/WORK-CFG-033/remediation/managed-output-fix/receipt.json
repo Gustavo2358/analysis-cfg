@@ -1,0 +1,45 @@
+{
+  "sourceBeforeCorrection": "16d43974643b630d226c2863c18a6c4e9c956d97",
+  "previousLocalQualification": {
+    "result": "PASS",
+    "durationSeconds": 707.316,
+    "receiptSha256": "99db881da21ad822a17ac145a8b152cfffa3e51aeb14eed1c58a0dd30a0dc102"
+  },
+  "remoteFailures": [
+    {
+      "event": "push",
+      "run": 34657400477,
+      "result": "FAIL",
+      "phase": "fast-tests-and-architecture",
+      "reason": "root-level .harness-results build exports were incorrectly inventoried as reactor production sources; stopped before Maven tests"
+    },
+    {
+      "event": "pull_request",
+      "run": 34657403312,
+      "result": "FAIL",
+      "phase": "fast-tests-and-architecture",
+      "reason": "root-level .harness-results build exports were incorrectly inventoried as reactor production sources; stopped before Maven tests"
+    }
+  ],
+  "regression": {
+    "redExit": 1,
+    "redTests": 3,
+    "redErrors": 1,
+    "greenExit": 0,
+    "greenTests": 3
+  },
+  "fastWithBuildInsideCheckout": {
+    "result": "PASS",
+    "durationSeconds": 273.324,
+    "javaMethods": 286,
+    "receiptSha256": "99f51f15d7524cfcee5f1d040db6b3aab26935e09d558880049374fa6942960a"
+  },
+  "artifacts": {
+    "fast-same-layout-pass.tar.gz": "f62329fffe999df717f0370a7d85ca3e2d405ff5be67229a7a28705f69c582f5",
+    "managed-output-green.log.gz": "d81bb828878d373cf3fefcbf2bacb00da139b9f74710c463072f3926f1bfc8aa",
+    "managed-output-red.log.gz": "7940e087915b57ac1a56d7976dab635d9ea8a3d26644cc0df8c2a3a16088b3d6",
+    "pr-failed-fast.tar.gz": "7dca4374047c49aeb58b2907c122623bea5eb6c8b4e75bff23c18212dc94fdb9",
+    "push-failed-fast.tar.gz": "9885c5544482dcaffb3e7d4543b82b593367d6df13d4fa7b3887bb0b0e23e4af",
+    "qualification-16d-receipt.json": "99db881da21ad822a17ac145a8b152cfffa3e51aeb14eed1c58a0dd30a0dc102"
+  }
+}

@@ -41,3 +41,14 @@ Fast local observado: PASS em 245.893 s, 286 métodos, zero skips, todos os
 boundaries. Challenge de versão: três mutantes compiláveis detectados por
 assertions (3/3/1 failures), restauração byte-exact e segundo GREEN. Receipts e
 primeiro Fast falho estão preservados no pacote de remediação.
+
+O HEAD 16d4397 passou Full Qualification local (707.316 s), mas os Fast CIs
+remotos 34657400477/34657403312 falharam no inventário, antes de Maven: fontes
+AIR exportadas sob .harness-results foram confundidas com fontes do reactor.
+A correção separa stores de build na raiz; três testes provam essa separação e
+a detecção de fontes extras reais, inclusive com nome interno .harness-results.
+Fast com a mesma disposição do GitHub: PASS em 273.324 s, 286 métodos
+e boundaries completos. Evidência em
+[managed-output-fix](../../evidence/WORK-CFG-033/remediation/managed-output-fix/README.md).
+O novo HEAD será qualificado integralmente antes do novo push; o receipt de
+16d4397 permanece histórico e não é atribuído ao novo commit.

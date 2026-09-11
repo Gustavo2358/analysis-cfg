@@ -101,3 +101,9 @@ e qualification local nunca são tratados como a mesma autoridade.
 
 O PR #18 permanece OPEN / DRAFT / AWAITING_HUMAN_REVIEW. W2 permanece
 NOT_STARTED / NOT_AUTHORIZED; nenhum gate inicia implementação ou merge.
+
+O inventário de fontes Java/POM separa os stores de build/evidência na raiz
+(.harness-results, .cache e .git) do código do reactor. Uma pasta com o mesmo
+nome dentro de src/main/java não recebe essa exclusão. Os três contracasos
+executáveis e o Fast com work dentro do checkout cobrem a disposição usada no
+GitHub. Essa separação não altera a lista fixa de testes nem consulta o diff.
