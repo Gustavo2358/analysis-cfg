@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "approved_head": "c6b12bf3efe6360b4e33c9a587ad0185b449990d",
+  "approved_tree": "3bc8b948de250c9eb4a756513294fb14a3ccc6db",
+  "merge": "4229ec1cfd9c1d9f9e851f3cabe6993b4d4ed9b8",
+  "merge_tree": "3bc8b948de250c9eb4a756513294fb14a3ccc6db",
+  "parents": [
+    "ec525cbbad96d70c9663faa88e2672148fa8ee71",
+    "c6b12bf3efe6360b4e33c9a587ad0185b449990d"
+  ],
+  "merged_at": "2026-09-10T10:59:34Z",
+  "actor": "Gustavo2358",
+  "pr": "https://github.com/Gustavo2358/analysis-cfg/pull/12",
+  "remote_receipt": "https://github.com/Gustavo2358/analysis-cfg/pull/12#issuecomment-5617673248",
+  "exact_ci_runs": [
+    34440933174,
+    34440936985
+  ],
+  "exact_ci": "SUCCESS"
+}

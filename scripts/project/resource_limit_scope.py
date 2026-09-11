@@ -16,6 +16,10 @@ def sha(data):return hashlib.sha256(data).hexdigest()
 def contract(root):return json.loads((root/CONTRACT).read_text())
 def allows_change(root,path,old_digest):
     c=contract(root)
+    if (path=='docs/sources/sources.lock.json' and c['base']==BASE and c['baseline_sha256'].get(path)==old_digest
+            and set(c['changed_tests'])==TESTS and set(c['changed_production'])==PRODUCTION):
+        b=json.loads((root/'docs/work/evidence/WORK-CFG-030/baseline.json').read_text())
+        return b['source_lock_sha256']==sha((root/path).read_bytes())
     return (c['base']==BASE and c['baseline_sha256'].get(path)==old_digest
             and c['current_sha256'].get(path)==sha((root/path).read_bytes())
             and set(c['changed_tests'])==TESTS and set(c['changed_production'])==PRODUCTION

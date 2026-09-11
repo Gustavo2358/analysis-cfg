@@ -51,7 +51,7 @@ do item autorizado. Carregue somente `must_read` e amplie por dependência real.
 | Algoritmo não trivial | [política semântica](docs/engineering/semantic-policy.md) |
 | TDD/oráculos | [testes](docs/engineering/testing.md) e [evals](docs/evals/index.md) |
 | Gates/lifecycle | [gates](docs/engineering/gates.md) e [protocolo](docs/engineering/work-item-protocol.md) |
-| CP5: arquitetura e estado autorizado | [arquitetura CP5](docs/architecture/cp5-dataflow.md), [WORK-CFG-028](docs/work/active/WORK-CFG-028/work-item.json), [lifecycle/branch/PR](docs/work/cp5-lifecycle.json), [Waves](docs/product/cp5-roadmap.md) |
+| CP5: arquitetura e estado autorizado | [arquitetura CP5](docs/architecture/cp5-dataflow.md), [WORK-CFG-028](docs/work/history/WORK-CFG-028/work-item.json), [lifecycle/branch/PR](docs/work/cp5-lifecycle.json), [Waves](docs/product/cp5-roadmap.md) |
 | CP5: gates e resultado | [performance](docs/engineering/cp5-performance.md), [challenges](docs/engineering/cp5-challenges.md), [snapshot de resultado](docs/architecture/analysis-dataflow-result-v1.md) |
 | Estado do frontend | [baseline upstream](docs/sources/upstream-state.md) |
 

@@ -1,0 +1,8 @@
+{
+  "command": [
+    "bash",
+    "scripts/harness/check-fast.sh"
+  ],
+  "exit_code": 0,
+  "log_sha256": "76d35ab6730c244a77ccdb5c52f94f55fccc1cae858247fb699658b2824176c8"
+}

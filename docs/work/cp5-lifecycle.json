@@ -194,7 +194,7 @@
         "Discovery",
         "Harness preparation",
         "B1",
-        "Post-audit A–I",
+        "Post-audit A\u2013I",
         "F1/F2/F3",
         "CORE-SIZE-001 / ADR-0014"
       ],
@@ -344,6 +344,20 @@
       ],
       "evidence": "docs/work/evidence/WORK-CFG-028/wave-5/authorization.json",
       "request_sha256": "4f0f0656f0220982dbe7540812d2a15cd10173aa504e4e1de4717b24f168a746"
+    },
+    {
+      "date": "2026-09-10",
+      "source": "Explicit human CP5 integration checkpoint request",
+      "decision": "CP5_APPROVED_AND_EXACT_MERGE_AUTHORIZED",
+      "reviewed_head": "c6b12bf3efe6360b4e33c9a587ad0185b449990d",
+      "W1": "APPROVED",
+      "W2": "APPROVED",
+      "W3": "APPROVED",
+      "W4": "APPROVED",
+      "W5": "APPROVED",
+      "CP5": "APPROVED",
+      "scope": "Close CP5 and synchronize/freeze baseline only",
+      "CP6": "NOT_STARTED / NOT_AUTHORIZED"
     }
   ],
   "audit_remediation": {
@@ -454,11 +468,19 @@
     "status": "NOT_STARTED",
     "authorization": "NOT_AUTHORIZED"
   },
-  "cp5_status": "APPROVED / MERGED",
+  "cp5_status": "APPROVED / MERGED / CLOSED",
   "closure": {
     "merge": "4229ec1cfd9c1d9f9e851f3cabe6993b4d4ed9b8",
     "tree": "3bc8b948de250c9eb4a756513294fb14a3ccc6db",
     "evidence": "docs/work/evidence/WORK-CFG-029/upstream-remote.json",
-    "authorization": "docs/work/evidence/WORK-CFG-029/authorization.json"
+    "authorization": "docs/work/evidence/WORK-CFG-029/authorization.json",
+    "work_item_status": "COMPLETED",
+    "receipt": "docs/work/evidence/WORK-CFG-030/cp5-merge-receipt.json"
+  },
+  "baseline_synchronization": {
+    "work_item": "WORK-CFG-030",
+    "status": "BLOCKED_FOR_HUMAN_REVIEW",
+    "production_changes_authorized": false,
+    "blocker": "docs/work/evidence/WORK-CFG-030/full-blocker.json"
   }
 }

@@ -132,7 +132,7 @@ def validate_size_contract(root: Path) -> list[str]:
             require(case['input']['branch_literals'] == [f'literal-{n}' for n in range(9*factor)], 'independent literal fixture')
             errors += validate_scale_review(case)
         require((root/ADR).is_file() and 'Program size is not a semantic admission criterion' in (root/ADR).read_text(), 'normative ADR')
-        work = read('docs/work/active/WORK-CFG-028/work-item.json')
+        work = read('docs/work/history/WORK-CFG-028/work-item.json')
         require(ADR in work['must_read'] and PATH in work['must_read'], 'must-read route')
         life = read('docs/work/cp5-lifecycle.json')
         approval, decision = life['review_history'][2:4]

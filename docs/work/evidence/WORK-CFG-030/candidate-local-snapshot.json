@@ -1,0 +1,45 @@
+{
+  "created_at": "2026-09-10T10:57:47.527489+00:00",
+  "repos": {
+    "analysis-cfg": {
+      "local_branch": "feat/cp5-dataflow-engine",
+      "local_head": "c6b12bf3efe6360b4e33c9a587ad0185b449990d",
+      "status": "",
+      "origin_main": "ec525cbbad96d70c9663faa88e2672148fa8ee71",
+      "remotes": "origin\tgit@github.com:Gustavo2358/analysis-cfg.git (fetch)\norigin\tgit@github.com:Gustavo2358/analysis-cfg.git (push)",
+      "worktrees": "worktree /home/gustavo/workspace/teste-e2e/analysis-cfg\nHEAD c6b12bf3efe6360b4e33c9a587ad0185b449990d\nbranch refs/heads/feat/cp5-dataflow-engine"
+    },
+    "air-java": {
+      "local_branch": "main",
+      "local_head": "17029898fd0ee8fabcaaae89f7260148633d4b12",
+      "status": "",
+      "origin_main": "17029898fd0ee8fabcaaae89f7260148633d4b12",
+      "remotes": "origin\tgit@github.com:Gustavo2358/air-java.git (fetch)\norigin\tgit@github.com:Gustavo2358/air-java.git (push)",
+      "worktrees": "worktree /home/gustavo/workspace/teste-e2e/air-java\nHEAD 17029898fd0ee8fabcaaae89f7260148633d4b12\nbranch refs/heads/main"
+    },
+    "analysis-ir": {
+      "local_branch": "main",
+      "local_head": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+      "status": "",
+      "origin_main": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+      "remotes": "origin\tgit@github.com:Gustavo2358/analysis-ir.git (fetch)\norigin\tgit@github.com:Gustavo2358/analysis-ir.git (push)",
+      "worktrees": "worktree /home/gustavo/workspace/teste-e2e/analysis-ir\nHEAD 51b4d9a8ae0364232bd97103cd73a77e1a34996c\nbranch refs/heads/main"
+    },
+    "cobol-lower": {
+      "local_branch": "feat/lower-scalar-move",
+      "local_head": "2329993ce61b33fd7105759e211a1861ca6cb217",
+      "status": "",
+      "origin_main": "fe7e6ef3762dc855f89a2495064bf1e954c0720a",
+      "remotes": "origin\tgit@github.com:Gustavo2358/cobol-lower.git (fetch)\norigin\tgit@github.com:Gustavo2358/cobol-lower.git (push)",
+      "worktrees": "worktree /home/gustavo/workspace/teste-e2e/cobol-lower\nHEAD 2329993ce61b33fd7105759e211a1861ca6cb217\nbranch refs/heads/feat/lower-scalar-move\n\nworktree /home/gustavo/workspace/teste-e2e/cobol-lower-ci-bootstrap\nHEAD b37a2c8b00a6235e4c2845cc989cafce5f7edd54\nbranch refs/heads/fix/ci-initial-cp0-merge\n\nworktree /home/gustavo/workspace/teste-e2e/cobol-lower-size-limits\nHEAD 0c4cc7838deccc0323e3650669df350d263489c1\nbranch refs/heads/fix/lower-remove-artificial-size-limits\n\nworktree /tmp/checkpoint-4e-fg_cqbq_/cobol-lower\nHEAD 50cc57d78ac319d4a86f9d72c4b50ce9d3403297\ndetached\nprunable gitdir file points to non-existent location"
+    },
+    "proleap-poc": {
+      "local_branch": "main",
+      "local_head": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+      "status": "",
+      "origin_main": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+      "remotes": "origin\tgit@github.com:Gustavo2358/proleap-poc.git (fetch)\norigin\tgit@github.com:Gustavo2358/proleap-poc.git (push)",
+      "worktrees": "worktree /home/gustavo/workspace/teste-e2e/proleap-poc\nHEAD 8722945cc4cd2052c6091533f6ee6989278aa2f8\nbranch refs/heads/main\n\nworktree /home/gustavo/workspace/teste-e2e/proleap-poc-next-sentence\nHEAD fa871da2a9ca2e68c0271d3e91439fa60f1ca4f4\nbranch refs/heads/codex/discovery-next-sentence-coverage\n\nworktree /tmp/checkpoint-4e-fg_cqbq_/proleap-poc\nHEAD 2815e805fd3a9ef4762a39ab9435260fc76da0e8\ndetached\nprunable gitdir file points to non-existent location"
+    }
+  }
+}

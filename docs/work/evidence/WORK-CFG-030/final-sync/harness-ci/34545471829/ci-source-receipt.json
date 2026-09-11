@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "event": "pull_request",
+  "workflow_run_id": "34545471829",
+  "source_head_sha": "3284f2927f6a09afdd9cf72c4edc4d151b3196ee",
+  "pr_head_sha": "3284f2927f6a09afdd9cf72c4edc4d151b3196ee",
+  "pr_base_sha": "15bd3afe1affdcb5ec49956960f884bde8c89498",
+  "event_checkout_sha": "dd2262ca674ed50f0e1f28c73549778f0715ed85",
+  "actual_checkout_sha": "dd2262ca674ed50f0e1f28c73549778f0715ed85",
+  "head_tree_sha": "e54c5332183d47507b888ffff9bcbe3ed70a3674",
+  "checkout_tree_sha": "e54c5332183d47507b888ffff9bcbe3ed70a3674",
+  "checkout_parent_shas": [
+    "15bd3afe1affdcb5ec49956960f884bde8c89498",
+    "3284f2927f6a09afdd9cf72c4edc4d151b3196ee"
+  ],
+  "classification": "SYNTHETIC_MERGE_IDENTICAL_TREE"
+}

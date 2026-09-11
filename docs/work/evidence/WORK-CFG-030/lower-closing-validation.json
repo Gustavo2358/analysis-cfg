@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "observed_at": "2026-09-10T19:32:00.834231+00:00",
+  "head": "36b0020cd26e14f42fa8334eb37f936dcd5986bd",
+  "certified_parent": "cd55cbdf37155f47b68f651411c2bff78abd3e0a",
+  "docs": "PASS",
+  "closeout_parent_binding": "PASS",
+  "verify_commit": "PASS",
+  "harness_tests": "PASS 173",
+  "diff_check": "PASS",
+  "remote_closing_ci": "PENDING",
+  "no_changes_to_certificate_production_tests_pins": true
+}
