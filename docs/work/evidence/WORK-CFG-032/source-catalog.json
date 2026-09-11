@@ -1,0 +1,498 @@
+[
+  {
+    "id": "F01",
+    "repo": "proleap-poc",
+    "sha": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+    "file": "src/main/antlr4/Cobol.g4",
+    "line": 1164,
+    "symbols_fields": "callStatement, callUsingPhrase, callByReference/Content/ValuePhrase, callGivingPhrase, exception clauses"
+  },
+  {
+    "id": "F02",
+    "repo": "proleap-poc",
+    "sha": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+    "file": "src/main/java/io/github/gustavo2358/cobolexplorer/Ast.java",
+    "line": 210,
+    "symbols_fields": "CallStatement.targetSyntax/target/arguments/returning/exceptionFlow; CallArgument.passingMode/kind/value/writtenText; Meta"
+  },
+  {
+    "id": "F03",
+    "repo": "proleap-poc",
+    "sha": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+    "file": "src/main/java/io/github/gustavo2358/cobolexplorer/AstBuilder.java",
+    "line": 663,
+    "symbols_fields": "buildCall; normalContinuations/addSentenceContinuations; meta/sourceMap.provenance"
+  },
+  {
+    "id": "F04",
+    "repo": "proleap-poc",
+    "sha": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+    "file": "src/main/java/io/github/gustavo2358/cobolexplorer/semanticproduct/CobolSemanticProduct.java",
+    "line": 551,
+    "symbols_fields": "CallFact; DataReference/NominalBinding; StatementHeader; Provenance; IfFact"
+  },
+  {
+    "id": "F05",
+    "repo": "proleap-poc",
+    "sha": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+    "file": "src/main/java/io/github/gustavo2358/cobolexplorer/semanticproduct/projection/CobolSemanticProductProjector.java",
+    "line": 262,
+    "symbols_fields": "callCapability, CALL projection, addUnprojectedCallSurfaceGaps, callReadiness"
+  },
+  {
+    "id": "F06",
+    "repo": "proleap-poc",
+    "sha": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+    "file": "src/main/java/io/github/gustavo2358/cobolexplorer/semanticproduct/transport/SemanticProductJsonWriter.java",
+    "line": 130,
+    "symbols_fields": "CallDocument and call serialization; dataReference.wholeItemAccess"
+  },
+  {
+    "id": "F07",
+    "repo": "proleap-poc",
+    "sha": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+    "file": "src/main/java/io/github/gustavo2358/cobolexplorer/ScalarMoveSemantics.java",
+    "line": 13,
+    "symbols_fields": "scalar admission; Copy.FULL_IDENTITY/UNAVAILABLE; analyze length equality; continuation"
+  },
+  {
+    "id": "F08",
+    "repo": "proleap-poc",
+    "sha": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+    "file": "src/main/java/io/github/gustavo2358/cobolexplorer/ReferenceOccurrenceCollector.java",
+    "line": 85,
+    "symbols_fields": "CALL_TARGET / arguments / returning occurrence roles"
+  },
+  {
+    "id": "F09",
+    "repo": "proleap-poc",
+    "sha": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+    "file": "src/main/java/io/github/gustavo2358/cobolexplorer/ProgramNameCanonicalizer.java",
+    "line": 29,
+    "symbols_fields": "external/nested/dynamicExternal; policy-dependent keys, not dependency resolver"
+  },
+  {
+    "id": "L01",
+    "repo": "cobol-lower",
+    "sha": "18016f16b4f63149eb1bb4ca13db7e12593d8909",
+    "file": "adapters/src/main/java/io/github/gustavo2358/lower/adapters/sp/Wire12.java",
+    "line": 37,
+    "symbols_fields": "typed input CALL wire"
+  },
+  {
+    "id": "L02",
+    "repo": "cobol-lower",
+    "sha": "18016f16b4f63149eb1bb4ca13db7e12593d8909",
+    "file": "adapters/src/main/java/io/github/gustavo2358/lower/adapters/sp/Wire.java",
+    "line": 68,
+    "symbols_fields": "prior supported input CALL wire"
+  },
+  {
+    "id": "L03",
+    "repo": "cobol-lower",
+    "sha": "18016f16b4f63149eb1bb4ca13db7e12593d8909",
+    "file": "adapters/src/main/java/io/github/gustavo2358/lower/adapters/sp/SpJsonDecoder.java",
+    "line": 38,
+    "symbols_fields": "decoder variants and unsupported variants reporting"
+  },
+  {
+    "id": "L04",
+    "repo": "cobol-lower",
+    "sha": "18016f16b4f63149eb1bb4ca13db7e12593d8909",
+    "file": "adapters/src/main/java/io/github/gustavo2358/lower/adapters/sp/Materialize.java",
+    "line": 42,
+    "symbols_fields": "CALL/IF -> OtherStatement, loss of payload"
+  },
+  {
+    "id": "L05",
+    "repo": "cobol-lower",
+    "sha": "18016f16b4f63149eb1bb4ca13db7e12593d8909",
+    "file": "core/src/main/java/io/github/gustavo2358/lower/domain/SpInput.java",
+    "line": 20,
+    "symbols_fields": "StatementFact, Variant, OtherStatement"
+  },
+  {
+    "id": "L06",
+    "repo": "cobol-lower",
+    "sha": "18016f16b4f63149eb1bb4ca13db7e12593d8909",
+    "file": "core/src/main/java/io/github/gustavo2358/lower/application/ScalarMoveAdmission.java",
+    "line": 67,
+    "symbols_fields": "typed root statements/continuation/shape/proof admission"
+  },
+  {
+    "id": "L07",
+    "repo": "cobol-lower",
+    "sha": "18016f16b4f63149eb1bb4ca13db7e12593d8909",
+    "file": "core/src/main/java/io/github/gustavo2358/lower/application/ScalarSequenceAssembler.java",
+    "line": 8,
+    "symbols_fields": "Entry.start + explicit normalContinuation; Assign + Return"
+  },
+  {
+    "id": "L08",
+    "repo": "cobol-lower",
+    "sha": "18016f16b4f63149eb1bb4ca13db7e12593d8909",
+    "file": "core/src/main/java/io/github/gustavo2358/lower/application/MoveHandler.java",
+    "line": 9,
+    "symbols_fields": "ObjectPlace + LiteralText and correlations"
+  },
+  {
+    "id": "L09",
+    "repo": "cobol-lower",
+    "sha": "18016f16b4f63149eb1bb4ca13db7e12593d8909",
+    "file": "core/src/main/java/io/github/gustavo2358/lower/application/SourceOrigins.java",
+    "line": 13,
+    "symbols_fields": "source/derived original+expanded provenance"
+  },
+  {
+    "id": "L10",
+    "repo": "cobol-lower",
+    "sha": "18016f16b4f63149eb1bb4ca13db7e12593d8909",
+    "file": "core/src/main/java/io/github/gustavo2358/lower/application/OutputAssessment.java",
+    "line": 1,
+    "symbols_fields": "validation status mapping"
+  },
+  {
+    "id": "N01",
+    "repo": "analysis-ir",
+    "sha": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+    "file": "especificacao/04-operacoes.md",
+    "line": 81,
+    "symbols_fields": "operations, Invoke terminator, target/arguments/effects/contract"
+  },
+  {
+    "id": "N02",
+    "repo": "analysis-ir",
+    "sha": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+    "file": "especificacao/05-controle-e-invocacoes.md",
+    "line": 7,
+    "symbols_fields": "outcomes, local labels, propagation, halt/diverge/open"
+  },
+  {
+    "id": "N03",
+    "repo": "analysis-ir",
+    "sha": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+    "file": "especificacao/06-incompletude-e-proveniencia.md",
+    "line": 27,
+    "symbols_fields": "coverage, source/derived/contract origins, envelope"
+  },
+  {
+    "id": "N04",
+    "repo": "analysis-ir",
+    "sha": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+    "file": "especificacao/08-contrato-de-consumidores.md",
+    "line": 1,
+    "symbols_fields": "consumer dependency modes and before invocation"
+  },
+  {
+    "id": "N05",
+    "repo": "analysis-ir",
+    "sha": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+    "file": "especificacao/09-extensibilidade-e-compatibilidade.md",
+    "line": 1,
+    "symbols_fields": "extensions/profile limits do not authorize noop"
+  },
+  {
+    "id": "N06",
+    "repo": "analysis-ir",
+    "sha": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+    "file": "bindings/json-v1.md",
+    "line": 234,
+    "symbols_fields": "normative JSON full invoke, operands, scopes, contracts/outcomes"
+  },
+  {
+    "id": "J01",
+    "repo": "air-java",
+    "sha": "3bafe3978f0f392e842038ad5628e85dfd91d00d",
+    "file": "air-model/src/main/java/io/github/gustavo2358/air/model/Operations.java",
+    "line": 103,
+    "symbols_fields": "Invoke implements Terminator; full payload"
+  },
+  {
+    "id": "J02",
+    "repo": "air-java",
+    "sha": "3bafe3978f0f392e842038ad5628e85dfd91d00d",
+    "file": "air-model/src/main/java/io/github/gustavo2358/air/model/Interactions.java",
+    "line": 28,
+    "symbols_fields": "Targets, NamePolicy, arguments, signatures, effects, contract"
+  },
+  {
+    "id": "J03",
+    "repo": "air-java",
+    "sha": "3bafe3978f0f392e842038ad5628e85dfd91d00d",
+    "file": "air-model/src/main/java/io/github/gustavo2358/air/model/Expressions.java",
+    "line": 22,
+    "symbols_fields": "Read/FitText/TrimRight/Unknown types"
+  },
+  {
+    "id": "J04",
+    "repo": "air-java",
+    "sha": "3bafe3978f0f392e842038ad5628e85dfd91d00d",
+    "file": "air-model/src/main/java/io/github/gustavo2358/air/model/Places.java",
+    "line": 11,
+    "symbols_fields": "ObjectPlace ObjectId and operand Header"
+  },
+  {
+    "id": "J05",
+    "repo": "air-java",
+    "sha": "3bafe3978f0f392e842038ad5628e85dfd91d00d",
+    "file": "air-model/src/main/java/io/github/gustavo2358/air/model/Operands.java",
+    "line": 40,
+    "symbols_fields": "roots of computed target/arguments/results/effectOperands"
+  },
+  {
+    "id": "J06",
+    "repo": "air-java",
+    "sha": "3bafe3978f0f392e842038ad5628e85dfd91d00d",
+    "file": "air-model/src/main/java/io/github/gustavo2358/air/model/Scopes.java",
+    "line": 55,
+    "symbols_fields": "NoMemory/WithinMemory/VisibleMemory/AllMemory"
+  },
+  {
+    "id": "J07",
+    "repo": "air-java",
+    "sha": "3bafe3978f0f392e842038ad5628e85dfd91d00d",
+    "file": "air-model/src/main/java/io/github/gustavo2358/air/validation/OperationChecks.java",
+    "line": 209,
+    "symbols_fields": "invocation validation and unconditional I-56 obligation"
+  },
+  {
+    "id": "J08",
+    "repo": "air-java",
+    "sha": "3bafe3978f0f392e842038ad5628e85dfd91d00d",
+    "file": "air-model/src/main/java/io/github/gustavo2358/air/validation/ValidationResult.java",
+    "line": 23,
+    "symbols_fields": "SEMANTIC_OBLIGATION independent of STRUCTURALLY_VALID"
+  },
+  {
+    "id": "J09",
+    "repo": "air-java",
+    "sha": "3bafe3978f0f392e842038ad5628e85dfd91d00d",
+    "file": "air-json/src/main/java/io/github/gustavo2358/air/json/BindingReader.java",
+    "line": 154,
+    "symbols_fields": "known invoke fields; mapping only Return, unsupported limit"
+  },
+  {
+    "id": "J10",
+    "repo": "air-java",
+    "sha": "3bafe3978f0f392e842038ad5628e85dfd91d00d",
+    "file": "air-json/src/main/java/io/github/gustavo2358/air/json/BindingWriter.java",
+    "line": 1,
+    "symbols_fields": "terminator, instruction, expression coverage"
+  },
+  {
+    "id": "J11",
+    "repo": "air-java",
+    "sha": "3bafe3978f0f392e842038ad5628e85dfd91d00d",
+    "file": "air-json/src/main/java/io/github/gustavo2358/air/json/AirJson.java",
+    "line": 51,
+    "symbols_fields": "coverage first; every semantic obligation rejected"
+  },
+  {
+    "id": "J12",
+    "repo": "air-java",
+    "sha": "3bafe3978f0f392e842038ad5628e85dfd91d00d",
+    "file": "air-model/src/test/java/io/github/gustavo2358/air/validation/ContractSuite.java",
+    "line": 174,
+    "symbols_fields": "existing invocation positive/negative tests; literalInvokeFixture"
+  },
+  {
+    "id": "C01",
+    "repo": "analysis-cfg",
+    "sha": "e9daaed9f8a2f2df3926a624f1067aba3d53297c",
+    "file": "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CoreCfgProjection.java",
+    "line": 28,
+    "symbols_fields": "terminator allowlist; sequences and intraprocedural successors"
+  },
+  {
+    "id": "C02",
+    "repo": "analysis-cfg",
+    "sha": "e9daaed9f8a2f2df3926a624f1067aba3d53297c",
+    "file": "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CfgTransition.java",
+    "line": 23,
+    "symbols_fields": "transition kinds and payload"
+  },
+  {
+    "id": "C03",
+    "repo": "analysis-cfg",
+    "sha": "e9daaed9f8a2f2df3926a624f1067aba3d53297c",
+    "file": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexBuilder.java",
+    "line": 70,
+    "symbols_fields": "terminator admission, arity, operation offsets and transitions"
+  },
+  {
+    "id": "C04",
+    "repo": "analysis-cfg",
+    "sha": "e9daaed9f8a2f2df3926a624f1067aba3d53297c",
+    "file": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/ProgramIndex.java",
+    "line": 64,
+    "symbols_fields": "generic operation class buckets"
+  },
+  {
+    "id": "C05",
+    "repo": "analysis-cfg",
+    "sha": "e9daaed9f8a2f2df3926a624f1067aba3d53297c",
+    "file": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/query/ProgramPoint.java",
+    "line": 18,
+    "symbols_fields": "BEFORE entry+operation identity"
+  },
+  {
+    "id": "C06",
+    "repo": "analysis-cfg",
+    "sha": "e9daaed9f8a2f2df3926a624f1067aba3d53297c",
+    "file": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/query/BatchReplayer.java",
+    "line": 23,
+    "symbols_fields": "prefix replay at operation offset; BEFORE/AFTER/OUTCOME"
+  },
+  {
+    "id": "C07",
+    "repo": "analysis-cfg",
+    "sha": "e9daaed9f8a2f2df3926a624f1067aba3d53297c",
+    "file": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/TextProfile.java",
+    "line": 84,
+    "symbols_fields": "admission, transferOperation, sourceOpen"
+  },
+  {
+    "id": "C08",
+    "repo": "analysis-cfg",
+    "sha": "e9daaed9f8a2f2df3926a624f1067aba3d53297c",
+    "file": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesAnalysis.java",
+    "line": 44,
+    "symbols_fields": "generic flow execution invokes profile; transferEdge"
+  },
+  {
+    "id": "C09",
+    "repo": "analysis-cfg",
+    "sha": "e9daaed9f8a2f2df3926a624f1067aba3d53297c",
+    "file": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/Candidates.java",
+    "line": 31,
+    "symbols_fields": "finite candidates, supports and open remainder"
+  },
+  {
+    "id": "C10",
+    "repo": "analysis-cfg",
+    "sha": "e9daaed9f8a2f2df3926a624f1067aba3d53297c",
+    "file": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/ValueFact.java",
+    "line": 16,
+    "symbols_fields": "reachability and candidate-specific supports; three remainders"
+  },
+  {
+    "id": "C11",
+    "repo": "analysis-cfg",
+    "sha": "e9daaed9f8a2f2df3926a624f1067aba3d53297c",
+    "file": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/plan/SiteInterest.java",
+    "line": 11,
+    "symbols_fields": "operation class/filter/query factories"
+  },
+  {
+    "id": "C12",
+    "repo": "analysis-cfg",
+    "sha": "e9daaed9f8a2f2df3926a624f1067aba3d53297c",
+    "file": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/SitePlanner.java",
+    "line": 12,
+    "symbols_fields": "generic bucket selector and requests"
+  },
+  {
+    "id": "C13",
+    "repo": "analysis-cfg",
+    "sha": "e9daaed9f8a2f2df3926a624f1067aba3d53297c",
+    "file": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/ConsumerRegistration.java",
+    "line": 8,
+    "symbols_fields": "dependencies/interests/requests/consumer"
+  },
+  {
+    "id": "C14",
+    "repo": "analysis-cfg",
+    "sha": "e9daaed9f8a2f2df3926a624f1067aba3d53297c",
+    "file": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/PlanningExecution.java",
+    "line": 11,
+    "symbols_fields": "keyed providers/batch sharing and atomic FactSink"
+  },
+  {
+    "id": "C15",
+    "repo": "analysis-cfg",
+    "sha": "e9daaed9f8a2f2df3926a624f1067aba3d53297c",
+    "file": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/plan/AnalysisKey.java",
+    "line": 8,
+    "symbols_fields": "implementation/version/profile/direction/precision/options/Entry"
+  },
+  {
+    "id": "C16",
+    "repo": "analysis-cfg",
+    "sha": "e9daaed9f8a2f2df3926a624f1067aba3d53297c",
+    "file": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesProvider.java",
+    "line": 12,
+    "symbols_fields": "ObjectId -> ValueFact, not arbitrary Expression"
+  },
+  {
+    "id": "C17",
+    "repo": "analysis-cfg",
+    "sha": "e9daaed9f8a2f2df3926a624f1067aba3d53297c",
+    "file": "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/DefaultValuePlan.java",
+    "line": 13,
+    "symbols_fields": "Assign write observation before Sequence terminator"
+  },
+  {
+    "id": "C18",
+    "repo": "analysis-cfg",
+    "sha": "e9daaed9f8a2f2df3926a624f1067aba3d53297c",
+    "file": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/consumers/SiteView.java",
+    "line": 16,
+    "symbols_fields": "STRUCTURAL only, not reachability"
+  },
+  {
+    "id": "C19",
+    "repo": "analysis-cfg",
+    "sha": "e9daaed9f8a2f2df3926a624f1067aba3d53297c",
+    "file": "analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/ResultJson.java",
+    "line": 16,
+    "symbols_fields": "W5 existing result serialization"
+  },
+  {
+    "id": "C20",
+    "repo": "analysis-cfg",
+    "sha": "e9daaed9f8a2f2df3926a624f1067aba3d53297c",
+    "file": "analysis-values/src/test/java/io/github/gustavo2358/analysis/values/SupportSourceTest.java",
+    "line": 18,
+    "symbols_fields": "candidate-to-producer association and cyclic supports"
+  },
+  {
+    "id": "C21",
+    "repo": "analysis-cfg",
+    "sha": "e9daaed9f8a2f2df3926a624f1067aba3d53297c",
+    "file": "analysis-values/src/test/java/io/github/gustavo2358/analysis/values/ValuesTest.java",
+    "line": 22,
+    "symbols_fields": "existing point/unknown/join/admission/unreachable tests"
+  },
+  {
+    "id": "C22",
+    "repo": "analysis-cfg",
+    "sha": "e9daaed9f8a2f2df3926a624f1067aba3d53297c",
+    "file": "analysis-values/src/test/java/io/github/gustavo2358/analysis/values/ReplayTest.java",
+    "line": 33,
+    "symbols_fields": "existing interior instruction points"
+  },
+  {
+    "id": "C23",
+    "repo": "analysis-cfg",
+    "sha": "e9daaed9f8a2f2df3926a624f1067aba3d53297c",
+    "file": "analysis-values/src/test/java/io/github/gustavo2358/analysis/values/PlanningContractTest.java",
+    "line": 50,
+    "symbols_fields": "existing site/query/planning contracts"
+  },
+  {
+    "id": "C24",
+    "repo": "analysis-cfg",
+    "sha": "e9daaed9f8a2f2df3926a624f1067aba3d53297c",
+    "file": "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/application/CfgBuildCoordinator.java",
+    "line": 35,
+    "symbols_fields": "structural preflight and unsupported operation behavior"
+  },
+  {
+    "id": "N07",
+    "repo": "analysis-ir",
+    "sha": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+    "file": "especificacao/02-tipos-valores-e-operandos.md",
+    "line": 145,
+    "symbols_fields": "fit_text/trim_right/read"
+  }
+]

@@ -1,0 +1,43 @@
+{
+  "id": "WORK-CFG-032",
+  "backlog_id": "BACKLOG-CFG-007",
+  "title": "CP6 dynamic COBOL CALL dependency discovery",
+  "status": "active",
+  "risk": "high",
+  "goal": "Trace frozen COBOL CALL through SP/AIR/CFG/PossibleValues and propose the smallest sound dependency slice, without production changes.",
+  "authorization": "discovery",
+  "authorization_evidence": "User request in this session, 2026-09-11: CP6 discovery AUTHORIZED; implementation NOT_AUTHORIZED; draft PR only, no merge.",
+  "checkpoint": "CP6_DISCOVERY",
+  "must_read": [
+    "AGENTS.md",
+    "docs/engineering/work-item-protocol.md",
+    "docs/engineering/gates.md",
+    "docs/architecture/cp5-dataflow.md",
+    "docs/work/evidence/WORK-CFG-032/discovery-baseline.json",
+    "docs/architecture/cp6-call-dependency-discovery.md"
+  ],
+  "related_decisions": [],
+  "related_invariants": [],
+  "evals": [],
+  "source_scope": [
+    "docs/work/active/WORK-CFG-032",
+    "docs/work/evidence/WORK-CFG-032",
+    "docs/work/registry.json",
+    "docs/work/index.md",
+    "docs/work/backlog/BACKLOG-CFG-007.md",
+    "docs/architecture/cp6-call-dependency-discovery.md",
+    "MANIFEST.sha256"
+  ],
+  "test_scope": [],
+  "must_not_change": [
+    "All production Java, tests, POMs, scripts, CI, fixtures, source locks and historical evidence",
+    "Sibling checkouts and all analysis-ir normative contracts",
+    "CP5 frozen lifecycle and baseline receipt",
+    "No future RED tests or implementation APIs"
+  ],
+  "gates": [
+    "docs",
+    "fast"
+  ],
+  "stop_condition": "CP6 DISCOVERY_COMPLETE / AWAITING_HUMAN_REVIEW; PR OPEN / DRAFT; implementation NOT_STARTED / NOT_AUTHORIZED; no merge, auto-merge or W1."
+}

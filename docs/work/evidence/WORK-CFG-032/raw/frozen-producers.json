@@ -1,0 +1,135 @@
+{
+  "schema": "w5-producer-build",
+  "sources": {
+    "proleap-poc": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+    "cobol-lower": "18016f16b4f63149eb1bb4ca13db7e12593d8909"
+  },
+  "mavenRepository": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2",
+  "before": {
+    "proleap-poc": {
+      "path": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/proleap-poc",
+      "head": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+      "branch": "",
+      "status": ""
+    },
+    "cobol-lower": {
+      "path": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/cobol-lower",
+      "head": "18016f16b4f63149eb1bb4ca13db7e12593d8909",
+      "branch": "",
+      "status": ""
+    }
+  },
+  "after": {
+    "proleap-poc": {
+      "path": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/proleap-poc",
+      "head": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+      "branch": "",
+      "status": ""
+    },
+    "cobol-lower": {
+      "path": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/cobol-lower",
+      "head": "18016f16b4f63149eb1bb4ca13db7e12593d8909",
+      "branch": "",
+      "status": ""
+    }
+  },
+  "commands": [
+    {
+      "argv": [
+        "mvn",
+        "-B",
+        "-ntp",
+        "clean",
+        "compile",
+        "org.apache.maven.plugins:maven-jar-plugin:3.4.2:jar",
+        "org.apache.maven.plugins:maven-dependency-plugin:3.8.1:build-classpath",
+        "-DincludeScope=runtime",
+        "-Dmdep.outputFile=/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/producers/frontend-classpath.txt"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/producers/proleap-poc",
+      "exitCode": 0,
+      "log": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/producers/1-proleap-poc-build.log",
+      "logSha256": "8bc3d9c7a20028143d5cfbbdc3b53deb14d9e81d781eb35949f861a493aaf092"
+    },
+    {
+      "argv": [
+        "mvn",
+        "-B",
+        "-ntp",
+        "clean",
+        "install",
+        "-DskipTests",
+        "-Dexec.skip=true"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/producers/cobol-lower",
+      "exitCode": 0,
+      "log": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/producers/2-cobol-lower-build.log",
+      "logSha256": "6410d37c564a866e29c51235a2115923f94c7cc705166dd336b30da4981a3635"
+    },
+    {
+      "argv": [
+        "mvn",
+        "-B",
+        "-ntp",
+        "-pl",
+        "adapters",
+        "org.apache.maven.plugins:maven-dependency-plugin:3.8.1:build-classpath",
+        "-DincludeScope=runtime",
+        "-Dmdep.outputFile=/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/producers/lower-classpath.txt"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/producers/cobol-lower",
+      "exitCode": 0,
+      "log": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/producers/3-cobol-lower-build.log",
+      "logSha256": "56f999745f056df2e50c48943b4690d3bfa41bac55e4dea442533ca7773ed5e5"
+    }
+  ],
+  "javaVersion": "openjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)\n",
+  "frontend": {
+    "main": "io.github.gustavo2358.cobolexplorer.ExplorerMain",
+    "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/producers/proleap-poc",
+    "classpath": [
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/producers/proleap-poc/target/antlr-parse-tree-explorer-1.0.0-SNAPSHOT.jar",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2/org/antlr/antlr4-runtime/4.13.2/antlr4-runtime-4.13.2.jar",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2/org/slf4j/slf4j-api/2.0.18/slf4j-api-2.0.18.jar",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2/ch/qos/logback/logback-classic/1.6.3/logback-classic-1.6.3.jar",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2/ch/qos/logback/logback-core/1.6.3/logback-core-1.6.3.jar",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar"
+    ],
+    "jars": {
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/producers/proleap-poc/target/antlr-parse-tree-explorer-1.0.0-SNAPSHOT.jar": "cbdbc590d62f5485de6ad3f00f8efbcf83d9b5980194a9d96d515e30b7b829ff",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2/org/antlr/antlr4-runtime/4.13.2/antlr4-runtime-4.13.2.jar": "dd3e8a13a2d669bf84fb8d834de35ce4875f27157698d206241ec8488aadcaf7",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2/org/slf4j/slf4j-api/2.0.18/slf4j-api-2.0.18.jar": "44508fd1576500688c790b190acdd16fec4f8c79a3e0b900afd70503cf055f55",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2/ch/qos/logback/logback-classic/1.6.3/logback-classic-1.6.3.jar": "beebede8db065fe1b72909ecc66bb49acda618901635d86c25fce14a5915e37e",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2/ch/qos/logback/logback-core/1.6.3/logback-core-1.6.3.jar": "a6967a28c8b086dee75a694d2f6fb8830c71153539866d7d8af065c9b6df91e0",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar": "d0da14c12b16b5d54719aa172d83b542ff4abeb8b0fb7db476fde8ceece760ca",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar": "21ddb598807d3a51a876704eb979d9296e1c6a6f47ab1826ff88c6d6a127a2d0",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar": "ff167a6317be15895706c26668f45b898efe40ab8780970658210fe1393d52a6"
+    }
+  },
+  "lower": {
+    "main": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
+    "cwd": "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/producers/cobol-lower",
+    "classpath": [
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/producers/cobol-lower/adapters/target/cobol-lower-adapters-0.1.0-SNAPSHOT.jar",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2/io/github/gustavo2358/cobol-lower-core/0.1.0-SNAPSHOT/cobol-lower-core-0.1.0-SNAPSHOT.jar",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2/com/dynatrace/hash4j/hash4j/0.30.0/hash4j-0.30.0.jar",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar"
+    ],
+    "jars": {
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/producers/cobol-lower/adapters/target/cobol-lower-adapters-0.1.0-SNAPSHOT.jar": "8b6a028544373bc6ed7f299c75becedd3df05f107448757b840451e8f673b65d",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar": "723ba4313428ee87d9d29b51b1f485d98bf697720419c69860ce8b04d675a032",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar": "bea96d84e7179af397ad692745aad8f9e40142d846467a8480c58167ea53fd0e",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2/io/github/gustavo2358/cobol-lower-core/0.1.0-SNAPSHOT/cobol-lower-core-0.1.0-SNAPSHOT.jar": "e0da14a38255d57058fb86818710f6fb6194696e009e30986caac4adc40fc66a",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2/com/dynatrace/hash4j/hash4j/0.30.0/hash4j-0.30.0.jar": "d3224b113ea835ce3452097747e5209ec760cf443dbed770d6ba68a0d480178f",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar": "d0da14c12b16b5d54719aa172d83b542ff4abeb8b0fb7db476fde8ceece760ca",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar": "21ddb598807d3a51a876704eb979d9296e1c6a6f47ab1826ff88c6d6a127a2d0",
+      "/home/gustavo/workspace/teste-e2e/.pre-cp6/candidate-env/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar": "ff167a6317be15895706c26668f45b898efe40ab8780970658210fe1393d52a6"
+    }
+  }
+}

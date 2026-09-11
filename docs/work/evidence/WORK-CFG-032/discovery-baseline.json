@@ -1,0 +1,40 @@
+{
+  "kind": "CP6 discovery exact source receipt",
+  "recorded_at": "2026-09-11T10:27:45.532319+00:00",
+  "authority": "User frozen SHAs; never track newer main for discovery",
+  "runtime_receipt_sha256": "4f61539c7bc09120ef05abf9efb818e61870097b506e173eaed38735bba331e0",
+  "runtime_receipt_note": "Original analysis-cfg runtime SHA 89ee2ca; PRECP6-F1 addendum records documentation-only closeout to required e9daaed. Original receipt bytes preserved.",
+  "components": {
+    "proleap-poc": {
+      "sha": "8722945cc4cd2052c6091533f6ee6989278aa2f8",
+      "tree": "63eba137162aa47e38d4858ff522058a8678a8dd",
+      "checkout_status_before": "",
+      "inspection": "/home/gustavo/workspace/teste-e2e/.cp6-discovery/proleap-poc"
+    },
+    "cobol-lower": {
+      "sha": "18016f16b4f63149eb1bb4ca13db7e12593d8909",
+      "tree": "0139edc52e34c703b643ff484a33e70871ef091d",
+      "checkout_status_before": "",
+      "inspection": "/home/gustavo/workspace/teste-e2e/.cp6-discovery/cobol-lower"
+    },
+    "analysis-ir": {
+      "sha": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+      "tree": "11b2361a40cb5ae9b6c201f0157f30ef2387d1b8",
+      "checkout_status_before": "",
+      "inspection": "/home/gustavo/workspace/teste-e2e/.cp6-discovery/analysis-ir"
+    },
+    "air-java": {
+      "sha": "3bafe3978f0f392e842038ad5628e85dfd91d00d",
+      "tree": "201096ee137a897fb43b22e4c831d82e948d6f81",
+      "checkout_status_before": "",
+      "inspection": "/home/gustavo/workspace/teste-e2e/.cp6-discovery/air-java"
+    },
+    "analysis-cfg": {
+      "sha": "e9daaed9f8a2f2df3926a624f1067aba3d53297c",
+      "tree": "30f854c3c5dc626d2e2185611efa5fd254c6a502",
+      "checkout_status_before": "",
+      "inspection": "/home/gustavo/workspace/teste-e2e/.worktrees/cp6-discovery"
+    }
+  },
+  "implementation": "NOT_AUTHORIZED"
+}

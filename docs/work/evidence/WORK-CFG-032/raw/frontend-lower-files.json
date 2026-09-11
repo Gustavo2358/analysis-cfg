@@ -1,0 +1,287 @@
+[
+  {
+    "path": "dynamic-x5-control/CALLER.cbl",
+    "sha256": "c20dd9a39508fc3b3078df372a7cbe081b2ec34873fc2f3624cfdd29b7be0d78",
+    "bytes": 245
+  },
+  {
+    "path": "dynamic-x5-control/frontend/ast-data.js",
+    "sha256": "ac82ed1e7484e596cebc1b64e481d8205ad1051899be46d1b239493da819789d",
+    "bytes": 4544
+  },
+  {
+    "path": "dynamic-x5-control/frontend/cobol-semantic-product.json",
+    "sha256": "03c1821c076552fbdba8af9e90ac66ccaeeac44227ef518538360649dc19fb57",
+    "bytes": 6864
+  },
+  {
+    "path": "dynamic-x5-control/frontend/preprocessed.cbl",
+    "sha256": "a4a0d402011b13fddeec518cb8e193b9f8876af5712738a3188ce5a7e60f284a",
+    "bytes": 182
+  },
+  {
+    "path": "dynamic-x5-control/frontend/resolution-data.js",
+    "sha256": "fe85ecf2843429e636d2a77e90228eca884b6cf9d71d7ccea542141d23c3bb7d",
+    "bytes": 4367
+  },
+  {
+    "path": "dynamic-x5-control/frontend-stderr.log",
+    "sha256": "c0c175e68f58e2a0da8ef97d3e6a57598d8da3132e48b2cc59d420dc003a4c86",
+    "bytes": 1151
+  },
+  {
+    "path": "dynamic-x5-control/frontend-stdout.log",
+    "sha256": "3a1eadc3701eb605f2b1289321ec6577b3c1957c6d4e32c69345db8527dda698",
+    "bytes": 655
+  },
+  {
+    "path": "dynamic-x5-control/lower-stderr.log",
+    "sha256": "dc67aeff66c3e2cf2151edfed703dda0b8d8e87fd69f6cbde195450bb4990f18",
+    "bytes": 114
+  },
+  {
+    "path": "dynamic-x5-control/lower-stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "dynamic-x5-control/stderr.log",
+    "sha256": "d719f26b6538c775144be642f5224bb3f5d94d3d1a8eb63d5ada9c07c96390c5",
+    "bytes": 162
+  },
+  {
+    "path": "dynamic-x5-control/stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "dynamic-x8/CALLER.cbl",
+    "sha256": "e322e5af1ec7dd4380bded9a44329b10e82c0dcc851ad18e61807f8475847725",
+    "bytes": 245
+  },
+  {
+    "path": "dynamic-x8/frontend/ast-data.js",
+    "sha256": "ee200aeba0a8da01af9314b561145629b127e958302345b19b65e9e9ce09219a",
+    "bytes": 4544
+  },
+  {
+    "path": "dynamic-x8/frontend/cobol-semantic-product.json",
+    "sha256": "ff19f80df11e0dd5fd0dd21e1d841da94b2b89c027b2e603c1837ae6a8839bf7",
+    "bytes": 7225
+  },
+  {
+    "path": "dynamic-x8/frontend/preprocessed.cbl",
+    "sha256": "289e789940710cf14b6e266a0925c07696a51a8ed8bab8c3249bd018694086e5",
+    "bytes": 182
+  },
+  {
+    "path": "dynamic-x8/frontend/resolution-data.js",
+    "sha256": "19e2da5cade7eebf31baf986500edddc346ad3c19260eb1581900288f0bb8ebc",
+    "bytes": 4367
+  },
+  {
+    "path": "dynamic-x8/frontend-stderr.log",
+    "sha256": "2ff4cd2e5b4118faad493817024a1f607d47210ccc5f3feb9d52257cbeffa529",
+    "bytes": 1135
+  },
+  {
+    "path": "dynamic-x8/frontend-stdout.log",
+    "sha256": "c65d55af10c9e6671499e8032c739bb169eaa535dbf992b95d3e0e386d34822e",
+    "bytes": 623
+  },
+  {
+    "path": "dynamic-x8/lower-stderr.log",
+    "sha256": "7966f6d09630944e3a3799166af1e5d4e9ac1e72c7aedc49d7f33ef3d9b77dab",
+    "bytes": 315
+  },
+  {
+    "path": "dynamic-x8/lower-stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "dynamic-x8/stderr.log",
+    "sha256": "d719f26b6538c775144be642f5224bb3f5d94d3d1a8eb63d5ada9c07c96390c5",
+    "bytes": 162
+  },
+  {
+    "path": "dynamic-x8/stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "failed-jar-launch.json",
+    "sha256": "5540c0f2f9affc1c784e104b37781f03d6409bcd6b2907e787bbdbb8fa9d6e38",
+    "bytes": 3940
+  },
+  {
+    "path": "literal/CALLER.cbl",
+    "sha256": "14bf7e845674fe05f7b731160a33a26c939c4270db32c7e2e7118a8db8073179",
+    "bytes": 184
+  },
+  {
+    "path": "literal/frontend/ast-data.js",
+    "sha256": "8080cc916805ae7e55fa208475744f4c93a315bb0cc566806cc8e147c16cbab2",
+    "bytes": 2912
+  },
+  {
+    "path": "literal/frontend/cobol-semantic-product.json",
+    "sha256": "642c85d0180308e4d488cbe53b22bc944cbbfbc7ba1ac8e61e7ab57ab735d7eb",
+    "bytes": 4215
+  },
+  {
+    "path": "literal/frontend/preprocessed.cbl",
+    "sha256": "162e5237d4911c366d8795908de977fc29cd1d237128f5984a47649857022918",
+    "bytes": 135
+  },
+  {
+    "path": "literal/frontend/resolution-data.js",
+    "sha256": "5c167786cfeef755b6d657abee8f0561588ce029e85832b2a931f549cad976fd",
+    "bytes": 3195
+  },
+  {
+    "path": "literal/frontend-stderr.log",
+    "sha256": "5d1bb389554c9371c2b8ec29a9cf6c4103a41bd097f62f301b6bc56b2c8d429b",
+    "bytes": 1116
+  },
+  {
+    "path": "literal/frontend-stdout.log",
+    "sha256": "c5304c67b80f0c1172ab5e189b819c8f1b9a3c05ace51e8736b0eee58b3e6f0e",
+    "bytes": 611
+  },
+  {
+    "path": "literal/lower-stderr.log",
+    "sha256": "e680b274ebcaf66eae02152bb642c4d1725bd2a179b73fbf315c46fbd0e4e2b1",
+    "bytes": 202
+  },
+  {
+    "path": "literal/lower-stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "literal/stderr.log",
+    "sha256": "d719f26b6538c775144be642f5224bb3f5d94d3d1a8eb63d5ada9c07c96390c5",
+    "bytes": 162
+  },
+  {
+    "path": "literal/stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "multi-path/CALLER.cbl",
+    "sha256": "ed4c2b585b8e48eec3c04473e1e5a9df4fec243f99eab538c416caca2d554b89",
+    "bytes": 370
+  },
+  {
+    "path": "multi-path/frontend/ast-data.js",
+    "sha256": "4d38aad9959816dbef0cfa6170736d4265d5f5af66b57e7c22ac64acb3976ad9",
+    "bytes": 6710
+  },
+  {
+    "path": "multi-path/frontend/cobol-semantic-product.json",
+    "sha256": "efa1dcd76a77c20b63a52a90df9b01b621c7efe1394cf253bde00944d51ee1d2",
+    "bytes": 12989
+  },
+  {
+    "path": "multi-path/frontend/preprocessed.cbl",
+    "sha256": "15efee45328d19b9ff27189da7db893fb4043046bd54aeaca4b07129a22885ba",
+    "bytes": 272
+  },
+  {
+    "path": "multi-path/frontend/resolution-data.js",
+    "sha256": "c93075bf55d82ee5c68482f4eae16a19044df51310257bfcc48b19863df4c5d6",
+    "bytes": 6225
+  },
+  {
+    "path": "multi-path/frontend-stderr.log",
+    "sha256": "ca437053e4fe89d03394f2d978d4b8ba1b9ab680fdf2d35710c1d84ea9773c02",
+    "bytes": 1135
+  },
+  {
+    "path": "multi-path/frontend-stdout.log",
+    "sha256": "837b6d7b644f72f1eae014cc111430437c7fb63b9dec045ac167ff848366149d",
+    "bytes": 624
+  },
+  {
+    "path": "multi-path/lower-stderr.log",
+    "sha256": "c7643dea93ed3c7873eba74039482638f85c77d573f4f23bb279d5541e74f3c0",
+    "bytes": 799
+  },
+  {
+    "path": "multi-path/lower-stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "multi-path/stderr.log",
+    "sha256": "d719f26b6538c775144be642f5224bb3f5d94d3d1a8eb63d5ada9c07c96390c5",
+    "bytes": 162
+  },
+  {
+    "path": "multi-path/stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "runs.json",
+    "sha256": "0754ee2cf622818acbb33726262f2a1de5a9f8799ed6f21537c138ad5bfa7c78",
+    "bytes": 18527
+  },
+  {
+    "path": "using-modes/CALLER.cbl",
+    "sha256": "b7ce2472fb642a79c416bb44d53bc883354cbba4bcb7eba7f32323307b7d91f9",
+    "bytes": 495
+  },
+  {
+    "path": "using-modes/frontend/ast-data.js",
+    "sha256": "8cbf1b3bf0492d2703e6d0e783eed3bcb686362bf85eba9359d44c8d65da12e6",
+    "bytes": 9633
+  },
+  {
+    "path": "using-modes/frontend/cobol-semantic-product.json",
+    "sha256": "84da45471d1bf189355b35f8c1f9aaef0cce36432b2b6b001f4ff31b90b00c5c",
+    "bytes": 14247
+  },
+  {
+    "path": "using-modes/frontend/preprocessed.cbl",
+    "sha256": "9c0dc9a6d65e5d2256125c786274f2489e7b8cddcfca3dfbe0bd2ded79d17504",
+    "bytes": 376
+  },
+  {
+    "path": "using-modes/frontend/resolution-data.js",
+    "sha256": "950d5eafcae0fa9d8897eb51fd9c260bceda2712fc18e002ac1a83569849ff1e",
+    "bytes": 8066
+  },
+  {
+    "path": "using-modes/frontend-stderr.log",
+    "sha256": "26628a8141cb7bf309b2e64c0b366511434621ad4c52e8dd2f5aafc93a9597f4",
+    "bytes": 1137
+  },
+  {
+    "path": "using-modes/frontend-stdout.log",
+    "sha256": "1460a702f9f88d74a45ff0f4e01673d48c99fa17d92dd1386d46e7a289ff36f6",
+    "bytes": 630
+  },
+  {
+    "path": "using-modes/lower-stderr.log",
+    "sha256": "1852c43c4fe93dc26eccf6e6c708ad1d3b6df8d846a6a09ade3f88feaed5d9ef",
+    "bytes": 546
+  },
+  {
+    "path": "using-modes/lower-stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "using-modes/stderr.log",
+    "sha256": "d719f26b6538c775144be642f5224bb3f5d94d3d1a8eb63d5ada9c07c96390c5",
+    "bytes": 162
+  },
+  {
+    "path": "using-modes/stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  }
+]

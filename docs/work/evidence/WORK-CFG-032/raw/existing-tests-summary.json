@@ -1,0 +1,210 @@
+[
+  {
+    "module": "cfg-kernel",
+    "suite": "io.github.gustavo2358.analysis.cfg.application.BuildCfgContractTest",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "module": "cfg-kernel",
+    "suite": "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinatorTest",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "module": "cfg-kernel",
+    "suite": "io.github.gustavo2358.analysis.cfg.application.CfgPreflightTest",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "module": "cfg-kernel",
+    "suite": "io.github.gustavo2358.analysis.cfg.domain.EvalCfg025Test",
+    "tests": 17,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "module": "cfg-kernel",
+    "suite": "io.github.gustavo2358.analysis.cfg.domain.EvalCfg028Test",
+    "tests": 22,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "module": "cfg-kernel",
+    "suite": "io.github.gustavo2358.analysis.cfg.domain.EvalCfg029Test",
+    "tests": 25,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "module": "cfg-kernel",
+    "suite": "io.github.gustavo2358.analysis.cfg.domain.EvalCfg030Test",
+    "tests": 20,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "module": "cfg-kernel",
+    "suite": "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistryTest",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "module": "analysis-kernel",
+    "suite": "io.github.gustavo2358.analysis.solver.OracleTest",
+    "tests": 7,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "module": "analysis-kernel",
+    "suite": "io.github.gustavo2358.analysis.solver.SolverPropertiesTest",
+    "tests": 7,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "module": "analysis-kernel",
+    "suite": "io.github.gustavo2358.analysis.solver.SolverScaleTest",
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "module": "analysis-kernel",
+    "suite": "io.github.gustavo2358.analysis.solver.SolverTest",
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "module": "analysis-kernel",
+    "suite": "io.github.gustavo2358.analysis.structure.AdmissionTest",
+    "tests": 11,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "module": "analysis-kernel",
+    "suite": "io.github.gustavo2358.analysis.structure.ScaleTest",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "module": "analysis-kernel",
+    "suite": "io.github.gustavo2358.analysis.structure.StructureTest",
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "module": "analysis-values",
+    "suite": "io.github.gustavo2358.analysis.values.DomainTest",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "module": "analysis-values",
+    "suite": "io.github.gustavo2358.analysis.values.PlanningContractTest",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "module": "analysis-values",
+    "suite": "io.github.gustavo2358.analysis.values.PlanningRuntimeTest",
+    "tests": 11,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "module": "analysis-values",
+    "suite": "io.github.gustavo2358.analysis.values.PlanningScaleTest",
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "module": "analysis-values",
+    "suite": "io.github.gustavo2358.analysis.values.PlanningTest",
+    "tests": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "module": "analysis-values",
+    "suite": "io.github.gustavo2358.analysis.values.PlanningZeroMatchTest",
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "module": "analysis-values",
+    "suite": "io.github.gustavo2358.analysis.values.ReplayTest",
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "module": "analysis-values",
+    "suite": "io.github.gustavo2358.analysis.values.SupportSourceTest",
+    "tests": 11,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "module": "analysis-values",
+    "suite": "io.github.gustavo2358.analysis.values.ValueOracleTest",
+    "tests": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "module": "analysis-values",
+    "suite": "io.github.gustavo2358.analysis.values.ValuesScaleTest",
+    "tests": 7,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "module": "analysis-values",
+    "suite": "io.github.gustavo2358.analysis.values.ValuesTest",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  }
+]

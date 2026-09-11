@@ -2,7 +2,7 @@
 
 CP5 = APPROVED / MERGED / CLOSED. The verified frozen component authorities are synchronized. Final source/artifact identity is recorded by the post-merge protocol in `artefatos-e2e/pre-cp6-baseline/receipt.json` in the workspace.
 
-Next product work: CP6 discovery / first CALL vertical slice. CP6 NOT_STARTED / NOT_IMPLEMENTED; this preparation adds no Invoke, CALL lowering or CallResolver.
+[WORK-CFG-032](active/WORK-CFG-032/work-item.json): CP6 discovery DISCOVERY_COMPLETE / AWAITING_HUMAN_REVIEW, sobre o baseline congelado. CP6 implementation = NOT_STARTED / NOT_AUTHORIZED. O registro CP6 em cp5-lifecycle.json é o closeout congelado anterior; a autorização atual de discovery vive neste work item. Nenhuma implementação de Invoke, CALL lowering ou CallResolver.
 
 ## Itens concluídos
 
