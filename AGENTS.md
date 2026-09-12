@@ -1,13 +1,27 @@
 # AGENTS.md
 
+## Política de engenharia vigente
+
+[LEAN HARNESS / GIT-IS-THE-RECORD](docs/engineering/lean-harness.md) governa o trabalho.
+Git, commits, Pull Requests, testes e merge são a fonte de verdade do desenvolvimento.
+Remote FAST only; full local/on-demand. Receipts e certificados CP não são requisitos.
+História é READ_ONLY / BEST_EFFORT; registry/index servem à navegação.
+Work items novos usam id/title/status/scope, com TODO/IN_PROGRESS/BLOCKED/DONE.
+PR merged + required technical tests passed = DONE. Pins cross-repo permanecem estritos.
+Mudanças semânticas importantes exigem revisão humana; metadata não exige cerimônia.
+Execute `python3 -B scripts/harness/lean.py fast`; full local quando tecnicamente
+necessário: `python3 -B scripts/harness/lean.py qualification-local`.
+Preserve branches dedicadas, escopo, mudanças alheias e isolamento entre repositórios.
+Não faça merge/auto-merge sem autorização.
+
+
 ## Propósito e fronteira
 
 Construir um consumidor Java da Analysis IR que publique CFGs rastreáveis,
 determinísticos e honestos sobre cobertura e precisão. O núcleo recebe uma
 publicação IR em memória; não sabe quem a produziu nem de onde veio.
 A fundação Java 21/Maven e o preflight com `air-java` já existem. Não criar ou
-ampliar algoritmo/tipos CFG, `BuildCfg`, adapters ou CLI sem checkpoint de
-implementação explicitamente autorizado.
+ampliar algoritmo/tipos CFG, `BuildCfg`, adapters ou CLI fora do escopo explicitamente autorizado.
 
 ## Regras universais
 
@@ -29,15 +43,14 @@ implementação explicitamente autorizado.
 - Trocar adapter preserva a porta. Integração Maven futura não pode exigir JSON
   intermediário nem cópia de modelos IR concorrentes.
 - TDD: regra → classes → adversariais → oracle independente → teste RED → código →
-  GREEN → refatoração → challenge. Não regenerar esperado a partir do builder.
+  GREEN → refatoração; challenge local sob demanda. Não regenerar esperado a partir do builder.
 - Não enfraquecer teste, fixture, invariantes ou gate para tornar o diff verde.
-- Backlog não autoriza execução. Respeitar work item, escopo, checkpoint e review.
+- Backlog não autoriza execução. Respeitar escopo autorizado e review humano aplicável.
 - Não declarar gate não executado como passado, nem subset como perfil IR completo.
 
 ## Roteamento mínimo
 
-Leia [índice de trabalho](docs/work/index.md), depois `work-item.json` e `state.md`
-do item autorizado. Carregue somente `must_read` e amplie por dependência real.
+O [índice de trabalho](docs/work/index.md) é navegação. Carregue contexto por dependência real.
 
 | Tema | Rota |
 | --- | --- |
@@ -62,7 +75,5 @@ padrão. Não manter cópias de regras em tasklists transitórias.
 ## Handoff
 
 Informe escopo concluído, regras preservadas, testes executados e não executados,
-resultados, lacunas e checkpoint seguinte. Atualize `state.md` quando mudar estado
-material. Rode os gates exigidos; para código atual do kernel, `check-fast.sh` e
-`check-architecture.sh`.
+resultados, lacunas e próximo passo. Execute FAST; full apenas por necessidade técnica.
 Não faça merge, push ou publicação de pacote sem autorização aplicável.

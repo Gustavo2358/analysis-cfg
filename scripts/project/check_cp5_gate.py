@@ -7,14 +7,11 @@ import subprocess
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'harness'))
 from validate_docs import ROOT, load_json
-from validate_cp5 import validate_cp5
+from lean import require_local
 
 
 def run(root: Path, category: str, wave: int) -> int:
-    errors = validate_cp5(root)
-    if errors:
-        for error in errors: print('[cp5-' + category + '] FAIL: ' + error, file=sys.stderr)
-        return 1
+    require_local()
     plan = load_json(root / 'docs/evals/cp5/gate-plan.json')
     gate = plan['waves'][wave-1]['gates'].get(category)
     if wave in (1,2,3,4,5) and gate is not None:

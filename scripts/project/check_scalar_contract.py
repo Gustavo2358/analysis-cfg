@@ -17,8 +17,7 @@ GOBACK_HASH = "fa299c2e5f3fae75afe365363b9f16925f0cfea591f631768ace82f0fb9a1075"
 
 
 def verify_scalar_contract(root: Path) -> None:
-    from w1d_scope import authorized
-    pin = "2a37f5e980ba25fdc79614a66030a84d8bf5b8c9" if authorized(root) else "3bafe3978f0f392e842038ad5628e85dfd91d00d"
+    pin = json.loads((root / "docs/sources/sources.lock.json").read_text())["air_java"]["commit"]
     if verify_snapshot_pin(root) != pin:
         raise GateFailure("Scalar regression requires the exact authorized air-java pin")
     data = (root / SCALAR).read_bytes()

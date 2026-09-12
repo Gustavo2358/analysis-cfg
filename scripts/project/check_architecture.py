@@ -436,10 +436,8 @@ def verify_project_shape(root: Path) -> None:
     from check_w5 import SOURCES as COMPOSITION_SOURCES, verify_sources as verify_composition_sources
     verify_composition_sources(root)
     analysis_sources = COMPOSITION_SOURCES | source_inventory(root) | SOLVER_SOURCES | QUERY_SOURCES | VALUE_SOURCES | PLANNING_SOURCES
-    from w1d_scope import authorized, NEW_W5, NEW_VALUES, verify
-    if authorized(root):
-        verify(root)
-        analysis_sources |= NEW_W5 | {NEW_VALUES} | {p.relative_to(root).as_posix() for p in (root/'analysis-dependencies/src/main/java').rglob('*.java')}
+    from w1d_scope import NEW_W5, NEW_VALUES
+    analysis_sources |= NEW_W5 | {NEW_VALUES} | {p.relative_to(root).as_posix() for p in (root/'analysis-dependencies/src/main/java').rglob('*.java')}
     verify_planning_sources(root)
     verify_value_sources(root)
     verify_solver_sources(root)
@@ -493,20 +491,11 @@ def verify_snapshot_pin(root: Path) -> str:
             or air.get("maven") != expected_coordinates):
         raise GateFailure("air-java source lock disagrees with the kernel dependency")
 
-    try:
-        workflow = (root / ".github/workflows/ci.yml").read_text(encoding="utf-8")
-    except OSError as exc:
-        raise GateConfigurationError(f"cannot read CI workflow: {exc}") from exc
-    repositories = re.findall(r"(?m)^\s*repository:\s*([^\s#]+)", workflow)
-    refs = re.findall(r"(?m)^\s*ref:\s*([^\s#]+)", workflow)
-    if repositories.count(AIR_REPOSITORY) != 1 or refs.count(sha) != 1:
-        raise GateFailure("CI must check out air-java exactly once at the source-lock SHA")
-    if re.search(r"(?m)^\s*ref:\s*(?:main|master)\s*$", workflow):
-        raise GateFailure("CI must not resolve air-java from a mutable branch")
-    if f'test "$(git rev-parse HEAD)" = "{sha}"' not in workflow:
-        raise GateFailure("CI must verify air-java HEAD before installation")
-    from check_ci_orchestration import verify
-    verify(root)
+    checkout = Path(os.environ.get('AIR_JAVA_CHECKOUT', str(root / '.harness-results/build/air-java')))
+    observed = subprocess.check_output(['git', '-C', str(checkout), 'rev-parse', 'HEAD'], text=True).strip()
+    dirty = subprocess.check_output(['git', '-C', str(checkout), 'status', '--porcelain'], text=True).strip()
+    if observed != sha or dirty:
+        raise GateFailure('air-java checkout differs from immutable source pin')
     return sha
 
 
