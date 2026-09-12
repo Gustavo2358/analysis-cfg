@@ -26,7 +26,7 @@ O slice requer Units com corpo disponível e inventário admitido pela
 [ProjectionPolicy](../architecture/ports-and-adapters.md#política-de-projeção):
 KNOWN_SUBSET default aceita COMPLETE/PARTIAL; STRICT exige COMPLETE. UNAVAILABLE
 permanece recusado. A parcialidade original não é elevada e nenhum fato desconhecido
-recebe nó/aresta sintético. Cada Entry usa
+recebe uma aresta apresentada como precisa sem prova. Cada Entry usa
 initialLabel; cada Sequence permanece um único nó, inclusive
 órfãs. Label pendente é INVALID_IR no preflight; falta de terminador não é reparada.
 
@@ -45,10 +45,19 @@ por Entry mesmo quando nenhum Return os utiliza; isso não afirma alcançabilida
 
 A slice [W1D](../architecture/analysis-dependency-result-v1.md) admite Invoke com um Normal conhecido e remainder NoControl/AllControl, por aresta INVOKE_NORMAL. Outros outcomes continuam fora.
 
-Dispatch, Raise, Opaque e Local*/IndirectJump permanecem fora
+Dispatch, Raise e Local*/IndirectJump permanecem fora
 do slice, inclusive em órfãs. Recusa é explícita e correlacionada, sem produto que omita
 essas ocorrências. Isso é distinto de projetar fatos suportados de inventário PARTIAL.
 As demais linhas da tabela são direção futura.
+
+WORK-CFG-038 consome Opaque com alternativas Jump/Normal/Return conhecidas e
+remainder de controle. O CFG conserva o terminador original e suas arestas
+OPAQUE_JUMP/OPAQUE_RETURN. A ContextView enumera destinos possíveis dentro do
+contexto selecionado a partir do scope AIR, em ambos os sentidos, sem matriz densa.
+OPAQUE_UNKNOWN é uma aresta transitória dessa consulta, não uma aresta precisa
+publicada no CFG. Invoke sem Normal conhecido também conserva seu bound aberto.
+Escopos que permitem saídas além dos nós internos mantêm control uncertainty;
+um successor normal conhecido não certifica ausência de saída anormal.
 
 AIR §04.8 e `Operations.Return(Header, List<Expression>)` não possuem seletor
 `entryScope`. O retorno segue a Entry da ativação. Por isso a transição RETURN

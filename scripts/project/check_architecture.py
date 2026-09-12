@@ -205,6 +205,7 @@ FORBIDDEN_BYTECODE_TYPES = {
 # Exact inventory for the authorized structural slice; no wildcard operation support.
 ALLOWED_OPERATION_TYPES = {
     "io.github.gustavo2358.air.model.Operations$Invoke",
+    "io.github.gustavo2358.air.model.Operations$Opaque",
     "io.github.gustavo2358.air.model.Operations$Return",
     "io.github.gustavo2358.air.model.Operations$Jump",
     "io.github.gustavo2358.air.model.Operations$Branch",
@@ -265,7 +266,6 @@ def detector_self_test() -> None:
         "local.BuildCfgInput",
         "io.github.gustavo2358.air.model.Operations$Dispatch",
         "io.github.gustavo2358.air.model.Operations$Raise",
-        "io.github.gustavo2358.air.model.Operations$Opaque",
         "io.github.gustavo2358.air.model.Operations$LocalInvoke",
         "io.github.gustavo2358.air.model.Operations$LocalBoundary",
         "io.github.gustavo2358.air.model.Operations$LocalResume",
@@ -800,7 +800,7 @@ def architecture_gate(root: Path, test_profile: str = "full") -> None:
     print("[architecture] PASS: BuildCfg(Publication, BuildOptions) -> CfgBuildResult and direct "
           "AirValidator preflight", flush=True)
     print("[architecture] PASS: explicit capability/version registry; no transport, reflection, "
-          "frontend, AIR shadow, or control primitives beyond the explicit Jump/Branch/Return/Halt/Invoke-Normal slice", flush=True)
+          "frontend, AIR shadow, or control primitives beyond Jump/Branch/Return/Halt/Invoke-Normal and conservative Opaque envelopes", flush=True)
 
 
 def main() -> int:

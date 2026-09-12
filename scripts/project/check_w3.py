@@ -8,7 +8,7 @@ from check_w1 import ROOT, Failure, command
 
 PREFIX='io.github.gustavo2358.analysis.values.'
 QUERY_PREFIX='io.github.gustavo2358.analysis.query.'
-VALUE_NAMES='Candidates SupportSet PersistentBindings PossibleValuesState ValuesWork ValueUniverse TextProfile ForeignEffectTransfer ValueFact PossibleValuesAnalysis'.split()
+VALUE_NAMES='Candidates SupportSet PersistentBindings PossibleValuesState ValuesWork ValueUniverse TextProfile ForeignEffectTransfer ConservativeEffectTransfer ValueFact PossibleValuesAnalysis'.split()
 QUERY_NAMES='ProgramPoint PointQuery ObservationBatch BatchReplayer'.split()
 VALUE_SOURCES={f'analysis-values/src/main/java/io/github/gustavo2358/analysis/values/{n}.java' for n in VALUE_NAMES}
 QUERY_SOURCES={f'analysis-kernel/src/main/java/io/github/gustavo2358/analysis/query/{n}.java' for n in QUERY_NAMES}
@@ -102,7 +102,7 @@ def architecture(root:Path,update:bool=False)->None:
         actual[module]={'sources':sorted(sources),'classfiles':paths,'jdeps_edges':dict(sorted(edges.items())),'javap_descriptors':descriptors,'effective_maven':sorted(parse_tgf(root/module/'target/architecture-dependencies.tgf'))}
     if update:(root/INVENTORY).write_text(json.dumps(actual,indent=2)+'\n')
     elif json.loads((root/INVENTORY).read_text())!=actual:raise Failure('W3 compiled inventory drift')
-    print('[w3-architecture] PASS: exact sources/classfiles/javap/jdeps/direct Maven; W1/W2 production byte-exact')
+    print('[w3-architecture] PASS: exact sources/classfiles/javap/jdeps/direct Maven; generic structure boundary; solver and lattice unchanged')
 
 def run(root:Path,category:str,update:bool=False)->None:
     verify_sources(root);maven=['mvn','-B','-ntp']

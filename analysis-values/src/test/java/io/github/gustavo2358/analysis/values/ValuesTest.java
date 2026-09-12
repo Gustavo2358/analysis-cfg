@@ -95,7 +95,10 @@ class ValuesTest {
                 new Operations.HavocMay(mayHeader,new Scopes.ObjectsMemory(List.of(u.objects().getFirst().id())),gap))) {
             var effects=new Sequence(seq.label(),List.of(assign,effect),seq.terminator(),seq.origin());
             var effectPublication=replace(p,List.of(unit(u.id(),u.entries(),List.of(effects),u.objects())),p.coverage(),List.of(uncertainty),p.premises());
-            assertEquals(PossibleValuesAnalysis.Status.UNSUPPORTED,PossibleValuesAnalysis.prepare(session(effectPublication)).status(),"unmodeled write cannot be identity");
+            var partial=PossibleValuesAnalysis.prepare(session(effectPublication));
+            assertEquals(PossibleValuesAnalysis.Status.ACCEPTED,partial.status());
+            var result=fact(partial.analysis().orElseThrow().execute(),before(effectPublication,0,0));
+            if(effect instanceof Operations.HavocMust)expected(result,true);else expected(result,true,"A");
         }
         var regionId=new StorageId(p.id(),"region");
         var region=new Memory.Region(new Memory.StorageHeader(regionId,Optional.of(u.id()),Memory.Lifetime.ACTIVATION,Memory.Visibility.PRIVATE,origin(p.id())),Optional.of(java.math.BigInteger.TEN),Optional.empty());

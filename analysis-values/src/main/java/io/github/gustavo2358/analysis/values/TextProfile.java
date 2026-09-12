@@ -15,6 +15,7 @@ final class TextProfile {
     final Map<ObjectId,Location> subjects=new HashMap<>();
     final IdentityHashMap<Operation,Write> writes=new IdentityHashMap<>();
     private final IdentityHashMap<Operation,ForeignEffectTransfer> effects=new IdentityHashMap<>();
+    private final IdentityHashMap<Operation,ConservativeEffectTransfer> conservative=new IdentityHashMap<>();
     private final boolean effectAware;
     private final List<Location> modeledCells;
     final IdentityHashMap<ContextView,PossibleValuesState> boundaries=new IdentityHashMap<>();
@@ -55,8 +56,8 @@ final class TextProfile {
         for(var unit:publication.units()) {
             boolean open=open(publication.coverage())||open(unit.coverage());
             for(var sequence:unit.sequences()) {
-                for(var instruction:sequence.instructions()){prepare(instruction);open|=open(instruction.header());}
-                prepare(sequence.terminator());open|=open(sequence.terminator().header());
+                for(var instruction:sequence.instructions()){prepare(instruction);open|=!(instruction instanceof Operations.HavocMust||instruction instanceof Operations.HavocMay)&&open(instruction.header());}
+                prepare(sequence.terminator());open|=!(sequence.terminator() instanceof Operations.Opaque)&&open(sequence.terminator().header());
                 if(effectAware && sequence.terminator() instanceof Operations.Invoke invoke)
                     open|=invoke.outcomes().remainder() instanceof Scopes.WithinControl;
             }
@@ -100,6 +101,8 @@ final class TextProfile {
                 if(sourceLocation==null)throw new Refusal(false,"UNSUPPORTED_STORAGE_PROFILE");
                 writes.put(operation,new CopyWrite(location,sourceLocation));
             } else throw new Refusal(false,"UNSUPPORTED_EFFECT_PROFILE");
+        } else if(operation instanceof Operations.HavocMust || operation instanceof Operations.HavocMay || operation instanceof Operations.Opaque) {
+            conservative.put(operation,ConservativeEffectTransfer.prepare(operation,this));
         } else if(effectAware && operation instanceof Operations.Invoke invoke) {
             if(!invoke.results().isEmpty())throw new Refusal(false,"UNSUPPORTED_EFFECT_PROFILE");
             effects.put(operation,ForeignEffectTransfer.prepare(invoke.effectBound(),modeledCells));
@@ -110,6 +113,8 @@ final class TextProfile {
     PossibleValuesState transferOperation(PossibleValuesState state,Operation operation,ValuesWork work) {
         if(!admitted.contains(operation))throw new IllegalArgumentException("operation outside prepared snapshot");
         if(!state.isReached())return state;
+        var partial=conservative.get(operation);
+        if(partial!=null)return partial.apply(state,work);
         var effect=effects.get(operation);
         if(effect!=null)return effect.apply(state,work);
         var write=writes.get(operation);

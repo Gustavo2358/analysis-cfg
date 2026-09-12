@@ -147,3 +147,5 @@ hashes, árvores e estado dos checkouts ocupados. W2 permanece NOT_STARTED /
 NOT_AUTHORIZED.
 
 A versão do CFG correlacionado segue [CFG JSON 2.0.0](cfg-json-v2.md) quando há Invoke. Isso não muda a versão nem os bytes deste produto de dependência.
+
+WORK-CFG-038 preserva este wire. O CFG correlacionado usa [v3](cfg-json-v3.md) quando há Opaque; a incerteza localizada chega pelos campos de remainder existentes.

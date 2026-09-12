@@ -24,6 +24,13 @@ class CfgWireContractTest(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'incompatible'):
                 verify(self.document('1.0.0', terminator, transition))
 
+    def test_each_conservative_token_requires_v3_independently(self):
+        for term, edge in (('OPAQUE','ENTRY'),('RETURN','OPAQUE_JUMP'),('RETURN','OPAQUE_RETURN')):
+            self.assertEqual('3.0.0', verify(self.document('3.0.0',term,edge))['schemaVersion'])
+            for version in ('1.0.0','2.0.0'):
+                with self.assertRaisesRegex(ValueError,'incompatible'):
+                    verify(self.document(version,term,edge))
+
     def test_rejects_unknown_versions_tokens_and_unnecessary_upgrade(self):
         for version, term, edge in (('1.1.0', 'INVOKE', 'INVOKE_NORMAL'), ('2.0.0', 'CALL', 'INVOKE_NORMAL'),
                                     ('2.0.0', 'INVOKE', 'CALL'), ('2.0.0', 'RETURN', 'RETURN')):

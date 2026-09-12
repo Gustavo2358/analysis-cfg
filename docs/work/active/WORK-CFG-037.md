@@ -1,7 +1,6 @@
 # CP6 MULTI-CALL PROGRAM COVERAGE
 
-Status: **IMPLEMENTED / AWAITING HUMAN REVIEW**. Lean status stays IN_PROGRESS
-until merge. Discovery preceded production. No receipts/certificates.
+Status: **DONE / MERGED**. All three PRs merged on 2026-09-12. Discovery preceded production. No receipts/certificates.
 
 ## Post-PERFORM baseline
 
@@ -145,4 +144,14 @@ GitHub checks on the final Draft head remain the remote authority.
 CP6 MULTI-CALL PROGRAM COVERAGE: **IMPLEMENTED / AWAITING HUMAN REVIEW**.
 Input: supported COBOL program. Output: all possible known subprograms from every
 reachable CALL site, with per-site detail and the exact program-wide union.
-No merge/auto-merge. WORK-CFG-036 is DONE / MERGED. NEXT: **EVALUATE**.
+No merge/auto-merge. WORK-CFG-036 is DONE / MERGED. NEXT: **COMPOSITIONALITY + PARTIAL CONSERVATIVE LOWERING**.
+
+
+## Merge closeout
+
+GitHub confirmed #39/#16/#23 MERGED; fetch, main fast-forward, clean working trees
+and equality with origin/main verified before this wave. Actual merge commits:
+
+- proleap-poc: `ff3704911e53b3d8b337fc610cf84343cdc5fe90`
+- cobol-lower: `797dcbd6f05f12661299339746c607b5b57ac1ba`
+- analysis-cfg: `664a932af0421d8a604b77d8de5852e7ac8db955`

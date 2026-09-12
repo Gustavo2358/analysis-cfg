@@ -36,9 +36,23 @@ semântica/convergência, nunca um teto de máquina. Não anunciar conformidade 
 ou parcial semântica por ter processado somente os primeiros N nós.
 A ausência de capacidade no consumidor não reduz a cardinalidade da publicação.
 
-## Política do MVP
+## Política histórica do MVP
 
 Antes da implementação dos envelopes completos, rejeitar explicitamente o escopo
 com controle aberto é aceitável. Esse MVP não satisfaz AIR-STRUCTURE completo.
 Quando BACKLOG-CFG-010 entrar, a representação de fronteira/consulta deve ser
 provada com reentrada em label interior, não apenas uma seta para o fim.
+
+## Consumo atual — WORK-CFG-038
+
+Opaque usa alternativas conhecidas e scopes AIR genéricos. LabelsControl limita
+os successors possíveis aos labels declarados; UnitControl respeita flags de
+labels/saída normal/halt. AllControl/uniões conservam os destinos internos admitidos
+no contexto selecionado. Outros efeitos de saída permanecem abertos, sem inventar
+nós que afirmem seu fechamento. Queries posteriores propagam control uncertainty;
+regiões anteriores só são afetadas quando o bound permite reentrada.
+
+A topologia conhecida fica no CFG, o envelope completo permanece na AIR e a
+ContextView percorre edges conservadoras sob demanda. Solver e lattice não mudam.
+Os testes verificam fronteira, região anterior e equivalência dos cursores forward
+/backward. Veja [contrato da wave](../architecture/compositional-partial-lowering.md).

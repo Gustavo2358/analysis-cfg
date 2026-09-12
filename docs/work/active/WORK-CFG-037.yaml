@@ -1,16 +1,20 @@
 id: WORK-CFG-037
 title: CP6 — resolve all supported CALL sites in one program
-status: IN_PROGRESS
+status: DONE
 scope:
   - Multi-CALL discovery, model proofs, seven real E2Es and focal challenges
   - Exact producer pins and PERFORM Lean closeout
   - No CFG production, solver, lattice, AIR or air-java changes without real RED
 pr: 23
 notes: >-
-  IMPLEMENTED / AWAITING HUMAN REVIEW. Full local PASS in all three repositories;
+  DONE / MERGED. Full local PASS in all three repositories;
   CFG final source 3c16a35eaa1997acd83d0cb91c70026273080cd8 covers all seven multi-CALL
   programs plus prior regressions. Exact per-site candidates/supports/remainders,
   reachable distinct union, A/B bytes, sequence reversal and shared analyses PASS.
   Ten local focal challenges killed. Production CFG/AIR/air-java/solver/lattice NONE.
-  Drafts proleap-poc#39, cobol-lower#16 and analysis-cfg#23; no merge/auto-merge.
-  Full log /tmp/multicall-cfg-full.log. Later changes documentary only. Next EVALUATE.
+  Merged proleap-poc#39, cobol-lower#16 and analysis-cfg#23; real merge SHAs below.
+  Full log /tmp/multicall-cfg-full.log. Later changes documentary only. Next COMPOSITIONALITY + PARTIAL CONSERVATIVE LOWERING.
+merge_commits:
+  proleap-poc: ff3704911e53b3d8b337fc610cf84343cdc5fe90
+  cobol-lower: 797dcbd6f05f12661299339746c607b5b57ac1ba
+  analysis-cfg: 664a932af0421d8a604b77d8de5852e7ac8db955

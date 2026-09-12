@@ -11,6 +11,7 @@ import java.util.*;
  * Collection order is snapshot order (CFG order for nodes/edges, AIR instruction order for sites).
  */
 public final class ProgramIndex {
+    final Map<UnitId,List<Node>> unitNodes = new HashMap<>(), openSources = new HashMap<>();
     final Object identity;
     final Node[] nodes;
     final CfgTransition[] edges;
@@ -35,6 +36,12 @@ public final class ProgramIndex {
         identity = b.identity;
         publication = b.snapshot;
         nodes = b.nodes;
+        for (var node : nodes) {
+            unitNodes.computeIfAbsent(node.owner().id(), ignored -> new ArrayList<>()).add(node);
+            if (OpenControl.bound(node) instanceof Scopes.WithinControl)
+                openSources.computeIfAbsent(node.owner().id(), ignored -> new ArrayList<>()).add(node);
+        }
+        unitNodes.replaceAll((u, list) -> List.copyOf(list)); openSources.replaceAll((u, list) -> List.copyOf(list));
         edges = b.edges;
         from = b.from; to = b.to; entry = b.edgeEntry;
         forwardNext = b.forwardNext; backwardNext = b.backwardNext;

@@ -56,6 +56,7 @@ public final class CoreCfgProjection {
                         && !(sequence.terminator() instanceof Operations.Jump)
                         && !(sequence.terminator() instanceof Operations.Branch)
                         && !(sequence.terminator() instanceof Operations.Invoke invoke && supportsInvoke(invoke))
+                        && !(sequence.terminator() instanceof Operations.Opaque opaque && supportsOpaque(opaque))
                         && !(sequence.terminator() instanceof Operations.Halt)) {
                     issues.add(new CfgProjectionIssue(CfgProjectionIssue.Code.UNSUPPORTED_TERMINATOR,
                             sequence.terminator().header().id()));
@@ -68,11 +69,21 @@ public final class CoreCfgProjection {
     /** First neutral invocation slice: one explicit local Normal, with closed or open AllControl remainder.
      * Open remainder remains on the original AIR; this projection enumerates known control only. */
     public static boolean supportsInvoke(Operations.Invoke invoke) {
-        return invoke.outcomes().known().size() == 1
-                && invoke.outcomes().known().getFirst() instanceof Control.Normal
+        return invoke.outcomes().known().stream().allMatch(Control.Normal.class::isInstance)
                 && (invoke.outcomes().remainder() instanceof Scopes.NoControl
                     || invoke.outcomes().remainder() instanceof Scopes.WithinControl bound
-                        && bound.scope() instanceof Scopes.AllControl);
+                        && (bound.scope() instanceof Scopes.AllControl || bound.scope() instanceof Scopes.UnitControl || bound.scope() instanceof Scopes.LabelsControl));
+    }
+
+    public static boolean supportsOpaque(Operations.Opaque opaque) {
+        return opaque.envelope().control().known().stream().allMatch(a -> a instanceof Control.JumpAlternative
+            || a instanceof Control.Normal || a instanceof Control.ReturnAlternative);
+    }
+    public static LabelId alternativeLabel(Control.ControlAlternative a) {
+        return a instanceof Control.JumpAlternative j ? j.label() : a instanceof Control.Normal n ? n.label() : null;
+    }
+    public static boolean opaqueDestination(Operations.Opaque o, LabelId label) {
+        return o.envelope().control().known().stream().anyMatch(a -> label.equals(alternativeLabel(a)));
     }
 
     /** Requires successful AirValidator preflight and an empty unsupported inventory. */
@@ -116,9 +127,18 @@ public final class CoreCfgProjection {
                         transitions.add(new CfgTransition(from, sequences.get(jump.destination()).id(),
                                 CfgTransition.Kind.JUMP, entry.id()));
                     } else if (sequence.terminator() instanceof Operations.Invoke invoke && supportsInvoke(invoke)) {
-                        var normal = (Control.Normal) invoke.outcomes().known().getFirst();
+                        for (var outcome : invoke.outcomes().known()) {
+                        var normal = (Control.Normal) outcome;
                         transitions.add(new CfgTransition(from, sequences.get(normal.label()).id(),
                                 CfgTransition.Kind.INVOKE_NORMAL, entry.id()));
+                        }
+                    } else if (sequence.terminator() instanceof Operations.Opaque opaque) {
+                        var destinations = new java.util.HashSet<LabelId>();
+                        for (var alternative : opaque.envelope().control().known()) {
+                            var target = alternativeLabel(alternative);
+                            if (target != null && destinations.add(target)) transitions.add(new CfgTransition(from, sequences.get(target).id(), CfgTransition.Kind.OPAQUE_JUMP, entry.id()));
+                            else if (alternative instanceof Control.ReturnAlternative) transitions.add(new CfgTransition(from, exit.id(), CfgTransition.Kind.OPAQUE_RETURN, entry.id()));
+                        }
                     } else if (sequence.terminator() instanceof Operations.Halt) {
                         transitions.add(new CfgTransition(from, halts.get(sequence.label()).id(),
                                 CfgTransition.Kind.HALT, entry.id()));
