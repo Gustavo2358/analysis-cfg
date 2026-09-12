@@ -1,7 +1,11 @@
 # CP6 MOVE→MOVE — scalar value propagation
 
 [Lean work item](WORK-CFG-035.yaml). Baseline `cad8b45cdcd2d380cb98ba9984f34859551430e0`.
-Branch `feat/move-data-to-data`; implementation awaits human review in a Draft PR.
+DONE / MERGED in [PR #21](https://github.com/Gustavo2358/analysis-cfg/pull/21).
+Qualified/source HEAD `947b3317f0736399f4a64e81310d18c6c8e00695`; actual merge SHA
+`49ddb060bc515f3bdb1eba6ac50ccbeef0e4ee46`. Local qualification and remote FAST
+passed on the qualified source, as recorded in PR #21. The scope below records
+the implementation at qualification.
 
 Authority: AIR 2.0.0 at `51b4d9a8ae0364232bd97103cd73a77e1a34996c`,
 `especificacao/04-operacoes.md` §1: Assign stores the evaluation of its expression

@@ -2,11 +2,13 @@
 
 [WORK-CFG-033](history/WORK-CFG-033.md): CP6 W1D e CP6 W1 APPROVED / MERGED / CLOSED, PR #18. [Baseline W1 congelado](cp6-lifecycle.json) para a próxima wave. [WORK-CFG-034](history/WORK-CFG-034.md): CP6 W2D COMPLETED / MERGED, PR #20; W2 APPROVED / MERGED / CLOSED.
 
-[WORK-CFG-035](active/WORK-CFG-035.yaml): CP6 MOVE→MOVE corrente, IN_PROGRESS; [escopo e validação](active/WORK-CFG-035.md).
+[WORK-CFG-035](history/WORK-CFG-035.yaml): CP6 MOVE→MOVE DONE / MERGED, PR #21; [escopo e validação](history/WORK-CFG-035.md).
+
+[WORK-CFG-036](active/WORK-CFG-036.yaml): CP6 PERFORM BASIC, IMPLEMENTED / AWAITING HUMAN REVIEW, Draft PR #22 (Lean IN_PROGRESS até merge).
 
 CP5 = APPROVED / MERGED / CLOSED. The verified frozen component authorities are synchronized. Final source/artifact identity is recorded by the post-merge protocol in `artefatos-e2e/pre-cp6-baseline/receipt.json` in the workspace.
 
-[WORK-CFG-032](history/WORK-CFG-032.md): discovery APPROVED / MERGED. O lifecycle CP5 conserva o closeout anterior; o trabalho corrente é MOVE→MOVE em WORK-CFG-035, autorizada na sessão e registrada no item Lean.
+[WORK-CFG-032](history/WORK-CFG-032.md): discovery APPROVED / MERGED. O lifecycle CP5 conserva o closeout anterior; o trabalho corrente é PERFORM BASIC em WORK-CFG-036, autorizada na sessão e registrada no item Lean.
 
 ## Itens concluídos
 

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "work_item": "WORK-CFG-035",
+  "work_item": "WORK-CFG-036",
   "status": "IMPLEMENTED / AWAITING HUMAN REVIEW",
   "work_item_status": "IN_PROGRESS",
   "authorization": "implementation",
@@ -43,8 +43,35 @@
   "closeout": "docs/work/evidence/WORK-CFG-033/closeout/README.md",
   "move_data": {
     "work_item": "WORK-CFG-035",
-    "status": "IN_PROGRESS",
+    "status": "DONE / MERGED",
     "branch": "feat/move-data-to-data",
-    "record": "docs/work/active/WORK-CFG-035.md"
+    "record": "docs/work/history/WORK-CFG-035.md",
+    "pr": 21,
+    "qualified_source_head": "947b3317f0736399f4a64e81310d18c6c8e00695",
+    "merge_commit": "49ddb060bc515f3bdb1eba6ac50ccbeef0e4ee46"
+  },
+  "perform_basic": {
+    "work_item": "WORK-CFG-036",
+    "status": "IMPLEMENTED / AWAITING HUMAN REVIEW",
+    "profile": "SIMPLE_SINGLE_CALLSITE_PROCEDURE_PERFORM",
+    "baselines": {
+      "proleap-poc": "8493a8e356bdc3b0002f578581aef5e5b54c4d33",
+      "cobol-lower": "59897f9d17ff30c9c2284f85ce56f50331dca77a",
+      "analysis-cfg": "49ddb060bc515f3bdb1eba6ac50ccbeef0e4ee46"
+    },
+    "baseline_verification": "All three merged; fetch, main fast-forward and clean working trees verified on 2026-09-12. Actual merge order: proleap-poc 20:35:35Z, analysis-cfg 20:35:57Z, cobol-lower 20:36:09Z; all merged before wave start.",
+    "unchanged_pins": {
+      "analysis-ir": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+      "air-java": "760593b923ca7311f699547c36349f54eb0dac42"
+    },
+    "source_pins": {
+      "proleap-poc": "a2e9645a2d0fa5e86befdc6f60c6bf2b5cf6f84b",
+      "cobol-lower": "bcd9980bed1255910f71b58f056dbf9857510a26"
+    },
+    "record": "docs/work/active/WORK-CFG-036.md",
+    "next": "EVALUATE",
+    "pr": 22,
+    "qualified_source_head": "656b2cb7568ac253af84248e3f99106a9eb4caaa",
+    "local_full": "PASS: once per repository; CFG includes real PERFORM A/B"
   }
 }
