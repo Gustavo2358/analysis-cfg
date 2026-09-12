@@ -1,0 +1,57 @@
+[
+  {
+    "event": "push",
+    "id": 34659126531,
+    "url": "https://github.com/Gustavo2358/analysis-cfg/actions/runs/34659126531",
+    "result": "SUCCESS",
+    "authority": "FAST_CI",
+    "durationSeconds": 439.987,
+    "source": {
+      "schema_version": 1,
+      "event": "push",
+      "workflow_run_id": "34659126531",
+      "source_head_sha": "d8f9652f79c3aefb1eeae25f48760256564e081e",
+      "pr_head_sha": null,
+      "pr_base_sha": null,
+      "event_checkout_sha": "d8f9652f79c3aefb1eeae25f48760256564e081e",
+      "actual_checkout_sha": "d8f9652f79c3aefb1eeae25f48760256564e081e",
+      "head_tree_sha": "943c8eb77b63ce08c7d5bdc685e08d3a4f7d7a45",
+      "checkout_tree_sha": "943c8eb77b63ce08c7d5bdc685e08d3a4f7d7a45",
+      "checkout_parent_shas": [
+        "16d43974643b630d226c2863c18a6c4e9c956d97"
+      ],
+      "classification": "EXACT_COMMIT_CHECKOUT"
+    },
+    "receiptSha256": "2eff0ce39bf97e2572a6c1dc3771bc1b2d25163b80d0a9205e6bfa731107d0e1",
+    "javaMethods": 286,
+    "suites": 40
+  },
+  {
+    "event": "pr",
+    "id": 34659128976,
+    "url": "https://github.com/Gustavo2358/analysis-cfg/actions/runs/34659128976",
+    "result": "SUCCESS",
+    "authority": "FAST_CI",
+    "durationSeconds": 316.733,
+    "source": {
+      "schema_version": 1,
+      "event": "pull_request",
+      "workflow_run_id": "34659128976",
+      "source_head_sha": "d8f9652f79c3aefb1eeae25f48760256564e081e",
+      "pr_head_sha": "d8f9652f79c3aefb1eeae25f48760256564e081e",
+      "pr_base_sha": "c39a92f930b1c693857a0b30a1f5155f3f81520c",
+      "event_checkout_sha": "db6c2f8217aa066f6bf5fd131dfc90052450965e",
+      "actual_checkout_sha": "db6c2f8217aa066f6bf5fd131dfc90052450965e",
+      "head_tree_sha": "943c8eb77b63ce08c7d5bdc685e08d3a4f7d7a45",
+      "checkout_tree_sha": "943c8eb77b63ce08c7d5bdc685e08d3a4f7d7a45",
+      "checkout_parent_shas": [
+        "c39a92f930b1c693857a0b30a1f5155f3f81520c",
+        "d8f9652f79c3aefb1eeae25f48760256564e081e"
+      ],
+      "classification": "SYNTHETIC_MERGE_IDENTICAL_TREE"
+    },
+    "receiptSha256": "97d04bd7925492aa242b4064f842d6398c543e5d5bbeea8ae9c9cb5af0ff855e",
+    "javaMethods": 286,
+    "suites": 40
+  }
+]

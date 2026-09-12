@@ -99,8 +99,13 @@ o desenvolvimento e aponta esse protocolo; não antecipa PASS do HEAD final. Qua
 correção de fonte após o commit exige nova qualification do novo HEAD. Fast CI remoto
 e qualification local nunca são tratados como a mesma autoridade.
 
-O PR #18 permanece OPEN / DRAFT / AWAITING_HUMAN_REVIEW. W2 permanece
-NOT_STARTED / NOT_AUTHORIZED; nenhum gate inicia implementação ou merge.
+O PR #18 foi mergeado após aprovação humana, em `61065d55642d68320afaa1f9f6c46b322912e151`.
+A tree do merge é idêntica à fonte qualificada: QUALIFIED_TREE_PRESERVED;
+a Full Qualification não foi repetida. O [closeout](../work/evidence/WORK-CFG-033/closeout/README.md)
+e o [lifecycle](../work/cp6-lifecycle.json) vinculam essas identidades. O commit
+administrativo posterior arquiva o item e ajusta somente o roteamento do harness;
+não reatribui ao merge ou ao arquivamento as execuções feitas em d8f9652.
+W2 permanece NOT_STARTED / NOT_AUTHORIZED; nenhum gate inicia implementação ou merge.
 
 O inventário de fontes Java/POM separa os stores de build/evidência na raiz
 (.harness-results, .cache e .git) do código do reactor. Uma pasta com o mesmo

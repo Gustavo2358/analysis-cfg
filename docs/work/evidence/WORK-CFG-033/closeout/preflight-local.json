@@ -1,0 +1,13 @@
+{
+  "checkedAt": "2026-09-12T03:00:10.405073+00:00",
+  "head": "d8f9652f79c3aefb1eeae25f48760256564e081e",
+  "tree": "943c8eb77b63ce08c7d5bdc685e08d3a4f7d7a45",
+  "base": "c39a92f930b1c693857a0b30a1f5155f3f81520c",
+  "prospectiveTree": "943c8eb77b63ce08c7d5bdc685e08d3a4f7d7a45",
+  "syntheticMerge": "db6c2f8217aa066f6bf5fd131dfc90052450965e",
+  "qualificationReceipt": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/receipt.json",
+  "qualificationReceiptSha256": "de496f5d112d8ee3df3836a8f8e7c334e134f0e10c677291d98c6df7d19ac81d",
+  "qualificationArtifactsVerified": 382,
+  "mergeMethod": "merge",
+  "mergeConventionEvidence": "PRs #13\u2013#17 use two-parent merge commits; PR #17 is c39a92f with base/source parents."
+}

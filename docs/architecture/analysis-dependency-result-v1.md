@@ -1,6 +1,6 @@
 # CP6 W1D — dependency site facts e transporte 1.0.0
 
-Contrato interno autorizado por [WORK-CFG-033](../work/active/WORK-CFG-033/work-item.json).
+Contrato interno autorizado por [WORK-CFG-033](../work/history/WORK-CFG-033/work-item.json).
 `INTERNAL-CONTRACT-DEV-001`: a primeira versão do produto é explícita; não há mecanismo
 de compatibilidade especulativo. O resultado W5 `analysis-dataflow-result` permanece
 byte-exact, com seu mapper, snapshots e consumidores anteriores preservados.

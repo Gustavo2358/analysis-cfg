@@ -1,6 +1,6 @@
 # Trabalho
 
-[WORK-CFG-033](active/WORK-CFG-033/work-item.json): CP6 W1D e CP6 W1 IMPLEMENTED / AWAITING_HUMAN_REVIEW. Discovery and W1A–W1C APPROVED / MERGED per current human authority; historical discovery records below retain their original state. W2 NOT_STARTED / NOT_AUTHORIZED.
+[WORK-CFG-033](history/WORK-CFG-033.md): CP6 W1D e CP6 W1 APPROVED / MERGED / CLOSED, PR #18. [Baseline W1 congelado](cp6-lifecycle.json) para a próxima wave. Nenhum work item ativo. W2 NOT_STARTED / NOT_AUTHORIZED.
 
 CP5 = APPROVED / MERGED / CLOSED. The verified frozen component authorities are synchronized. Final source/artifact identity is recorded by the post-merge protocol in `artefatos-e2e/pre-cp6-baseline/receipt.json` in the workspace.
 

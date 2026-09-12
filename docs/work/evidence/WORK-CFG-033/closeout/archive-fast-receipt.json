@@ -1,0 +1,13 @@
+{
+  "authority": "CLOSEOUT_DOCS_HARNESS_VALIDATION",
+  "command": [
+    "bash",
+    "scripts/harness/check-fast.sh"
+  ],
+  "exitCode": 0,
+  "result": "PASS",
+  "durationSeconds": 167.017,
+  "sourceHead": "61065d55642d68320afaa1f9f6c46b322912e151",
+  "sourceStatus": "administrative uncommitted changes after qualified-tree-preserved merge",
+  "logSha256": "79a756cb87d432650b6c25189e726396b4b4b659594f1383539202a91620b2c6"
+}

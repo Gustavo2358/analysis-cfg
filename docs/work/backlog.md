@@ -61,4 +61,4 @@ a aceitação bilateral madura e 018 integra módulos sem mudar a porta. 019 con
 
 WORK-CFG-028 reutiliza BACKLOG-CFG-020; cinco Waves na mesma branch/PR draft, sem início autorizado. [Lifecycle](cp5-lifecycle.json) e [follow-ups sem duplicação](cp5-follow-ups.md).
 
-CP5 WORK-CFG-028 is COMPLETED (PR12 merged); post-CP5 remediation WORK-CFG-029 is COMPLETED (PR13 merged). WORK-CFG-030 owns baseline synchronization only. CP6 NOT_STARTED / NOT_AUTHORIZED.
+CP5 WORK-CFG-028 is COMPLETED (PR12 merged); post-CP5 remediation WORK-CFG-029 is COMPLETED (PR13 merged). WORK-CFG-030 concluiu a sincronização histórica de baseline. CP6 W1/W1D foi encerrado em [WORK-CFG-033](history/WORK-CFG-033.md); o restante de BACKLOG-CFG-007 continua planned. W2 NOT_STARTED / NOT_AUTHORIZED; seu único handoff é conceitual e exige autorização separada.

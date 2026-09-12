@@ -1,0 +1,588 @@
+{
+  "schema": "cp6-w1d-e2e@1",
+  "producers": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/build/w1d-producers/producers.json",
+  "cases": {
+    "dynamic-x8": [
+      {
+        "dynamic-x8.cbl": "e322e5af1ec7dd4380bded9a44329b10e82c0dcc851ad18e61807f8475847725",
+        "cobol-semantic-product.json": "e45c6fe191c6e9be4b35da793663fc908b0b600c848a236d797170e286614010",
+        "program.air.json": "bef5d8979c0ffd3fb96272dd405b18d7b873e4e4d9244eeeb9ac98587fb973d2",
+        "cfg.json": "8f538ba5962de6e50d26293872a16bf6b1882b8779395944ceb95003b474680c",
+        "dependencies.json": "9e546ba99d0d8747e06433f281a04ca62b3776fcdc67e155ea3f98697511a8c7"
+      },
+      {
+        "dynamic-x8.cbl": "e322e5af1ec7dd4380bded9a44329b10e82c0dcc851ad18e61807f8475847725",
+        "cobol-semantic-product.json": "e45c6fe191c6e9be4b35da793663fc908b0b600c848a236d797170e286614010",
+        "program.air.json": "bef5d8979c0ffd3fb96272dd405b18d7b873e4e4d9244eeeb9ac98587fb973d2",
+        "cfg.json": "8f538ba5962de6e50d26293872a16bf6b1882b8779395944ceb95003b474680c",
+        "dependencies.json": "9e546ba99d0d8747e06433f281a04ca62b3776fcdc67e155ea3f98697511a8c7"
+      }
+    ],
+    "literal": [
+      {
+        "literal.cbl": "dde454f21d80fb95b5653fbb4166de61e05c6f4a457362328f24dd69adc239b9",
+        "cobol-semantic-product.json": "e88bb1029fd184e3dabefd28bf37cdea99193630a9f5caeeebc1bd00e56870a1",
+        "program.air.json": "d532b89c074d3a3fe8672090cef5432d9b664e137f3ce1bd37058af5fc59e67d",
+        "cfg.json": "e36cc530e234856f41041f254e79bc60208ccf5df3db9066594d2464664f6dcb",
+        "dependencies.json": "de51f32917c9c65e227109d208f056b0902232a1e8e016e5b23dcbb9307240e7"
+      },
+      {
+        "literal.cbl": "dde454f21d80fb95b5653fbb4166de61e05c6f4a457362328f24dd69adc239b9",
+        "cobol-semantic-product.json": "e88bb1029fd184e3dabefd28bf37cdea99193630a9f5caeeebc1bd00e56870a1",
+        "program.air.json": "d532b89c074d3a3fe8672090cef5432d9b664e137f3ce1bd37058af5fc59e67d",
+        "cfg.json": "e36cc530e234856f41041f254e79bc60208ccf5df3db9066594d2464664f6dcb",
+        "dependencies.json": "de51f32917c9c65e227109d208f056b0902232a1e8e016e5b23dcbb9307240e7"
+      }
+    ],
+    "dynamic-no-move": [
+      {
+        "dynamic-no-move.cbl": "4d038880fb2931a9ef98af18172eb74a89a1b4f305637a1f646eb1806acf347c",
+        "cobol-semantic-product.json": "e8154804671967305eed214b64c7a3be44a3e441426688635d2442221d3375cc",
+        "program.air.json": "993d039e70fa2bd1cdd31830cff5b0d38b0f723bc3cf147a34bca63c1d77df9b",
+        "cfg.json": "789794f37619d2154b297c6e5f62e74206793529c92e1817f566e86755012ba0",
+        "dependencies.json": "4fdb463035857227b55e17d5b947e8096f3b9bfeebfdd24f6a7a475080b30acb"
+      },
+      {
+        "dynamic-no-move.cbl": "4d038880fb2931a9ef98af18172eb74a89a1b4f305637a1f646eb1806acf347c",
+        "cobol-semantic-product.json": "e8154804671967305eed214b64c7a3be44a3e441426688635d2442221d3375cc",
+        "program.air.json": "993d039e70fa2bd1cdd31830cff5b0d38b0f723bc3cf147a34bca63c1d77df9b",
+        "cfg.json": "789794f37619d2154b297c6e5f62e74206793529c92e1817f566e86755012ba0",
+        "dependencies.json": "4fdb463035857227b55e17d5b947e8096f3b9bfeebfdd24f6a7a475080b30acb"
+      }
+    ],
+    "using": [
+      {
+        "source": "acf515568d8488fd9ac481c9ad55fbbf9f6c2aa4aaec2dfdd3a25ae0a6712e47",
+        "sp": "23def3c4b1b52f02a675f02832235e4f80516064261564825b9b01a831602baf",
+        "lowerExit": 4
+      },
+      {
+        "source": "acf515568d8488fd9ac481c9ad55fbbf9f6c2aa4aaec2dfdd3a25ae0a6712e47",
+        "sp": "23def3c4b1b52f02a675f02832235e4f80516064261564825b9b01a831602baf",
+        "lowerExit": 4
+      }
+    ]
+  },
+  "cfgContracts": {
+    "dynamic-x8": {
+      "schemaVersion": "2.0.0",
+      "terminators": [
+        "INVOKE",
+        "RETURN"
+      ],
+      "transitions": [
+        "ENTRY",
+        "INVOKE_NORMAL",
+        "RETURN"
+      ]
+    },
+    "literal": {
+      "schemaVersion": "2.0.0",
+      "terminators": [
+        "INVOKE",
+        "RETURN"
+      ],
+      "transitions": [
+        "ENTRY",
+        "INVOKE_NORMAL",
+        "RETURN"
+      ]
+    },
+    "dynamic-no-move": {
+      "schemaVersion": "2.0.0",
+      "terminators": [
+        "INVOKE",
+        "RETURN"
+      ],
+      "transitions": [
+        "ENTRY",
+        "INVOKE_NORMAL",
+        "RETURN"
+      ]
+    }
+  },
+  "commands": [
+    {
+      "argv": [
+        "java",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/build/w1d-producers/proleap-poc/target/antlr-parse-tree-explorer-1.0.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/org/antlr/antlr4-runtime/4.13.2/antlr4-runtime-4.13.2.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/org/slf4j/slf4j-api/2.0.18/slf4j-api-2.0.18.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/ch/qos/logback/logback-classic/1.6.3/logback-classic-1.6.3.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/ch/qos/logback/logback-core/1.6.3/logback-core-1.6.3.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar",
+        "io.github.gustavo2358.cobolexplorer.ExplorerMain",
+        "--source",
+        "dynamic-x8.cbl",
+        "--copybooks",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/build/w1d-producers/proleap-poc/corpus/cpy",
+        "--output",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-1/sp"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-1",
+      "exitCode": 0,
+      "stdout": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-1/frontend.stdout",
+      "stderr": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-1/frontend.stderr",
+      "stdoutSha256": "622e813540ed0d24fe066556dc52bea3b047c1c1061c773ea67a9e3c74a90e02",
+      "stderrSha256": "d141b6c71aedfb5607250690e4524903ed6f8fa656bfd603307c69a50b1593e7"
+    },
+    {
+      "argv": [
+        "java",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/build/w1d-producers/cobol-lower/adapters/target/cobol-lower-adapters-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/cobol-lower-core/0.1.0-SNAPSHOT/cobol-lower-core-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/dynatrace/hash4j/hash4j/0.30.0/hash4j-0.30.0.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar",
+        "io.github.gustavo2358.lower.adapters.cli.CobolLower",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-1/sp/cobol-semantic-product.json",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-1/program.air.json"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-1",
+      "exitCode": 0,
+      "stdout": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-1/lower.stdout",
+      "stderr": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-1/lower.stderr",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "java",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-launcher/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-launcher/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar",
+        "io.github.gustavo2358.analysis.cfg.launcher.AnalysisCfg",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-1/program.air.json",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-1/cfg.json"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-1",
+      "exitCode": 0,
+      "stdout": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-1/cfg.stdout",
+      "stderr": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-1/cfg.stderr",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "java",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-launcher/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-launcher/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar",
+        "io.github.gustavo2358.analysis.launcher.AnalysisDependencies",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-1/program.air.json",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-1/dependencies.json"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-1",
+      "exitCode": 0,
+      "stdout": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-1/dependency.stdout",
+      "stderr": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-1/dependency.stderr",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "java",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/build/w1d-producers/proleap-poc/target/antlr-parse-tree-explorer-1.0.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/org/antlr/antlr4-runtime/4.13.2/antlr4-runtime-4.13.2.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/org/slf4j/slf4j-api/2.0.18/slf4j-api-2.0.18.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/ch/qos/logback/logback-classic/1.6.3/logback-classic-1.6.3.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/ch/qos/logback/logback-core/1.6.3/logback-core-1.6.3.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar",
+        "io.github.gustavo2358.cobolexplorer.ExplorerMain",
+        "--source",
+        "dynamic-x8.cbl",
+        "--copybooks",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/build/w1d-producers/proleap-poc/corpus/cpy",
+        "--output",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-2/sp"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-2",
+      "exitCode": 0,
+      "stdout": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-2/frontend.stdout",
+      "stderr": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-2/frontend.stderr",
+      "stdoutSha256": "f1bc152e800b42c3ea1ca5186252a432f2fba5c4183aad076bac78f2a915d80c",
+      "stderrSha256": "c6fb32dcc0aa5fc4d451a0fc541eb6351633f7a0af3621049393eec1bdbc63f4"
+    },
+    {
+      "argv": [
+        "java",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/build/w1d-producers/cobol-lower/adapters/target/cobol-lower-adapters-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/cobol-lower-core/0.1.0-SNAPSHOT/cobol-lower-core-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/dynatrace/hash4j/hash4j/0.30.0/hash4j-0.30.0.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar",
+        "io.github.gustavo2358.lower.adapters.cli.CobolLower",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-2/sp/cobol-semantic-product.json",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-2/program.air.json"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-2",
+      "exitCode": 0,
+      "stdout": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-2/lower.stdout",
+      "stderr": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-2/lower.stderr",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "java",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-launcher/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-launcher/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar",
+        "io.github.gustavo2358.analysis.cfg.launcher.AnalysisCfg",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-2/program.air.json",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-2/cfg.json"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-2",
+      "exitCode": 0,
+      "stdout": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-2/cfg.stdout",
+      "stderr": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-2/cfg.stderr",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "java",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-launcher/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-launcher/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar",
+        "io.github.gustavo2358.analysis.launcher.AnalysisDependencies",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-2/program.air.json",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-2/dependencies.json"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-2",
+      "exitCode": 0,
+      "stdout": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-2/dependency.stdout",
+      "stderr": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-x8-2/dependency.stderr",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "java",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/build/w1d-producers/proleap-poc/target/antlr-parse-tree-explorer-1.0.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/org/antlr/antlr4-runtime/4.13.2/antlr4-runtime-4.13.2.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/org/slf4j/slf4j-api/2.0.18/slf4j-api-2.0.18.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/ch/qos/logback/logback-classic/1.6.3/logback-classic-1.6.3.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/ch/qos/logback/logback-core/1.6.3/logback-core-1.6.3.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar",
+        "io.github.gustavo2358.cobolexplorer.ExplorerMain",
+        "--source",
+        "literal.cbl",
+        "--copybooks",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/build/w1d-producers/proleap-poc/corpus/cpy",
+        "--output",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-1/sp"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-1",
+      "exitCode": 0,
+      "stdout": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-1/frontend.stdout",
+      "stderr": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-1/frontend.stderr",
+      "stdoutSha256": "3ea54010a7f45f79eb9f8a97dd24438639ee71f9314d11b3e9251e0ac627b41b",
+      "stderrSha256": "09152c067533481c9a5dfb09dcd7a2dcb8b0d0330dbb4e1335d13c92683a3ce9"
+    },
+    {
+      "argv": [
+        "java",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/build/w1d-producers/cobol-lower/adapters/target/cobol-lower-adapters-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/cobol-lower-core/0.1.0-SNAPSHOT/cobol-lower-core-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/dynatrace/hash4j/hash4j/0.30.0/hash4j-0.30.0.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar",
+        "io.github.gustavo2358.lower.adapters.cli.CobolLower",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-1/sp/cobol-semantic-product.json",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-1/program.air.json"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-1",
+      "exitCode": 0,
+      "stdout": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-1/lower.stdout",
+      "stderr": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-1/lower.stderr",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "java",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-launcher/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-launcher/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar",
+        "io.github.gustavo2358.analysis.cfg.launcher.AnalysisCfg",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-1/program.air.json",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-1/cfg.json"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-1",
+      "exitCode": 0,
+      "stdout": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-1/cfg.stdout",
+      "stderr": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-1/cfg.stderr",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "java",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-launcher/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-launcher/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar",
+        "io.github.gustavo2358.analysis.launcher.AnalysisDependencies",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-1/program.air.json",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-1/dependencies.json"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-1",
+      "exitCode": 0,
+      "stdout": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-1/dependency.stdout",
+      "stderr": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-1/dependency.stderr",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "java",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/build/w1d-producers/proleap-poc/target/antlr-parse-tree-explorer-1.0.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/org/antlr/antlr4-runtime/4.13.2/antlr4-runtime-4.13.2.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/org/slf4j/slf4j-api/2.0.18/slf4j-api-2.0.18.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/ch/qos/logback/logback-classic/1.6.3/logback-classic-1.6.3.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/ch/qos/logback/logback-core/1.6.3/logback-core-1.6.3.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar",
+        "io.github.gustavo2358.cobolexplorer.ExplorerMain",
+        "--source",
+        "literal.cbl",
+        "--copybooks",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/build/w1d-producers/proleap-poc/corpus/cpy",
+        "--output",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-2/sp"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-2",
+      "exitCode": 0,
+      "stdout": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-2/frontend.stdout",
+      "stderr": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-2/frontend.stderr",
+      "stdoutSha256": "0c8b3a2e8267fa37ad2b11a908f56df6995cc96c16e98782d4f8af564d98a6bb",
+      "stderrSha256": "a1832765fb11684ce797821b5e2320a6136a54df016474c9e03b967f8a6e3dab"
+    },
+    {
+      "argv": [
+        "java",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/build/w1d-producers/cobol-lower/adapters/target/cobol-lower-adapters-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/cobol-lower-core/0.1.0-SNAPSHOT/cobol-lower-core-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/dynatrace/hash4j/hash4j/0.30.0/hash4j-0.30.0.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar",
+        "io.github.gustavo2358.lower.adapters.cli.CobolLower",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-2/sp/cobol-semantic-product.json",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-2/program.air.json"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-2",
+      "exitCode": 0,
+      "stdout": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-2/lower.stdout",
+      "stderr": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-2/lower.stderr",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "java",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-launcher/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-launcher/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar",
+        "io.github.gustavo2358.analysis.cfg.launcher.AnalysisCfg",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-2/program.air.json",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-2/cfg.json"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-2",
+      "exitCode": 0,
+      "stdout": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-2/cfg.stdout",
+      "stderr": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-2/cfg.stderr",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "java",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-launcher/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-launcher/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar",
+        "io.github.gustavo2358.analysis.launcher.AnalysisDependencies",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-2/program.air.json",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-2/dependencies.json"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-2",
+      "exitCode": 0,
+      "stdout": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-2/dependency.stdout",
+      "stderr": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/literal-2/dependency.stderr",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "java",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/build/w1d-producers/proleap-poc/target/antlr-parse-tree-explorer-1.0.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/org/antlr/antlr4-runtime/4.13.2/antlr4-runtime-4.13.2.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/org/slf4j/slf4j-api/2.0.18/slf4j-api-2.0.18.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/ch/qos/logback/logback-classic/1.6.3/logback-classic-1.6.3.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/ch/qos/logback/logback-core/1.6.3/logback-core-1.6.3.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar",
+        "io.github.gustavo2358.cobolexplorer.ExplorerMain",
+        "--source",
+        "dynamic-no-move.cbl",
+        "--copybooks",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/build/w1d-producers/proleap-poc/corpus/cpy",
+        "--output",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-1/sp"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-1",
+      "exitCode": 0,
+      "stdout": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-1/frontend.stdout",
+      "stderr": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-1/frontend.stderr",
+      "stdoutSha256": "5584c764773a8ca1cec1698a51b6168b1b4b112a6435a2e8cbc656a60d53fd46",
+      "stderrSha256": "4e5739307a4dfaeebb5c4c725a4f8cef36d768b94418156a25e6ac8ce68ae1dd"
+    },
+    {
+      "argv": [
+        "java",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/build/w1d-producers/cobol-lower/adapters/target/cobol-lower-adapters-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/cobol-lower-core/0.1.0-SNAPSHOT/cobol-lower-core-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/dynatrace/hash4j/hash4j/0.30.0/hash4j-0.30.0.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar",
+        "io.github.gustavo2358.lower.adapters.cli.CobolLower",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-1/sp/cobol-semantic-product.json",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-1/program.air.json"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-1",
+      "exitCode": 0,
+      "stdout": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-1/lower.stdout",
+      "stderr": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-1/lower.stderr",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "java",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-launcher/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-launcher/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar",
+        "io.github.gustavo2358.analysis.cfg.launcher.AnalysisCfg",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-1/program.air.json",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-1/cfg.json"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-1",
+      "exitCode": 0,
+      "stdout": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-1/cfg.stdout",
+      "stderr": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-1/cfg.stderr",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "java",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-launcher/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-launcher/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar",
+        "io.github.gustavo2358.analysis.launcher.AnalysisDependencies",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-1/program.air.json",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-1/dependencies.json"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-1",
+      "exitCode": 0,
+      "stdout": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-1/dependency.stdout",
+      "stderr": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-1/dependency.stderr",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "java",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/build/w1d-producers/proleap-poc/target/antlr-parse-tree-explorer-1.0.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/org/antlr/antlr4-runtime/4.13.2/antlr4-runtime-4.13.2.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/org/slf4j/slf4j-api/2.0.18/slf4j-api-2.0.18.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/ch/qos/logback/logback-classic/1.6.3/logback-classic-1.6.3.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/ch/qos/logback/logback-core/1.6.3/logback-core-1.6.3.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar",
+        "io.github.gustavo2358.cobolexplorer.ExplorerMain",
+        "--source",
+        "dynamic-no-move.cbl",
+        "--copybooks",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/build/w1d-producers/proleap-poc/corpus/cpy",
+        "--output",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-2/sp"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-2",
+      "exitCode": 0,
+      "stdout": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-2/frontend.stdout",
+      "stderr": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-2/frontend.stderr",
+      "stdoutSha256": "5be1c385fa53881048d4d45487e6bf61018ab4ad6b9fcf6d37db2c57d45ee6d9",
+      "stderrSha256": "c23134749d11948a5dc4f2e4688df2c7db2e54b2654a48d9126d5992a67e27fb"
+    },
+    {
+      "argv": [
+        "java",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/build/w1d-producers/cobol-lower/adapters/target/cobol-lower-adapters-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/cobol-lower-core/0.1.0-SNAPSHOT/cobol-lower-core-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/dynatrace/hash4j/hash4j/0.30.0/hash4j-0.30.0.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar",
+        "io.github.gustavo2358.lower.adapters.cli.CobolLower",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-2/sp/cobol-semantic-product.json",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-2/program.air.json"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-2",
+      "exitCode": 0,
+      "stdout": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-2/lower.stdout",
+      "stderr": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-2/lower.stderr",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "java",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-launcher/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-launcher/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar",
+        "io.github.gustavo2358.analysis.cfg.launcher.AnalysisCfg",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-2/program.air.json",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-2/cfg.json"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-2",
+      "exitCode": 0,
+      "stdout": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-2/cfg.stdout",
+      "stderr": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-2/cfg.stderr",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "java",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-launcher/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-launcher/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar",
+        "io.github.gustavo2358.analysis.launcher.AnalysisDependencies",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-2/program.air.json",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-2/dependencies.json"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-2",
+      "exitCode": 0,
+      "stdout": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-2/dependency.stdout",
+      "stderr": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/dynamic-no-move-2/dependency.stderr",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "java",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/build/w1d-producers/proleap-poc/target/antlr-parse-tree-explorer-1.0.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/org/antlr/antlr4-runtime/4.13.2/antlr4-runtime-4.13.2.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/org/slf4j/slf4j-api/2.0.18/slf4j-api-2.0.18.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/ch/qos/logback/logback-classic/1.6.3/logback-classic-1.6.3.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/ch/qos/logback/logback-core/1.6.3/logback-core-1.6.3.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar",
+        "io.github.gustavo2358.cobolexplorer.ExplorerMain",
+        "--source",
+        "using.cbl",
+        "--copybooks",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/build/w1d-producers/proleap-poc/corpus/cpy",
+        "--output",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/using-1/sp"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/using-1",
+      "exitCode": 0,
+      "stdout": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/using-1/frontend.stdout",
+      "stderr": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/using-1/frontend.stderr",
+      "stdoutSha256": "833e9359340de2d532e6f0185349e5ee84b958c9ff7a951af1d73473c6c0d02f",
+      "stderrSha256": "ffd5a252bd82f4bc3d7f7294469396575f70418578315fae28467f5db15d6356"
+    },
+    {
+      "argv": [
+        "java",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/build/w1d-producers/cobol-lower/adapters/target/cobol-lower-adapters-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/cobol-lower-core/0.1.0-SNAPSHOT/cobol-lower-core-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/dynatrace/hash4j/hash4j/0.30.0/hash4j-0.30.0.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar",
+        "io.github.gustavo2358.lower.adapters.cli.CobolLower",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/using-1/sp/cobol-semantic-product.json",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/using-1/program.air.json"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/using-1",
+      "exitCode": 4,
+      "stdout": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/using-1/lower.stdout",
+      "stderr": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/using-1/lower.stderr",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "f85cce3cb07df5c508a69a88406946c3c22cf6be694741fcee167f80e5507dda"
+    },
+    {
+      "argv": [
+        "java",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/build/w1d-producers/proleap-poc/target/antlr-parse-tree-explorer-1.0.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/org/antlr/antlr4-runtime/4.13.2/antlr4-runtime-4.13.2.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/org/slf4j/slf4j-api/2.0.18/slf4j-api-2.0.18.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/ch/qos/logback/logback-classic/1.6.3/logback-classic-1.6.3.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/ch/qos/logback/logback-core/1.6.3/logback-core-1.6.3.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar",
+        "io.github.gustavo2358.cobolexplorer.ExplorerMain",
+        "--source",
+        "using.cbl",
+        "--copybooks",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/build/w1d-producers/proleap-poc/corpus/cpy",
+        "--output",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/using-2/sp"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/using-2",
+      "exitCode": 0,
+      "stdout": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/using-2/frontend.stdout",
+      "stderr": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/using-2/frontend.stderr",
+      "stdoutSha256": "3c2fe622933a2f0af8246b9a33afbc52fdec6302416ad2dc3796975f8bd6eb85",
+      "stderrSha256": "184e44f61002683fc59319027fd74e4868c08816489d2601f82e5990f197b986"
+    },
+    {
+      "argv": [
+        "java",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/build/w1d-producers/cobol-lower/adapters/target/cobol-lower-adapters-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/io/github/gustavo2358/cobol-lower-core/0.1.0-SNAPSHOT/cobol-lower-core-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/dynatrace/hash4j/hash4j/0.30.0/hash4j-0.30.0.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar:/home/gustavo/workspace/teste-e2e/.cp6-w1d/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar",
+        "io.github.gustavo2358.lower.adapters.cli.CobolLower",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/using-2/sp/cobol-semantic-product.json",
+        "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/using-2/program.air.json"
+      ],
+      "cwd": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/using-2",
+      "exitCode": 4,
+      "stdout": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/using-2/lower.stdout",
+      "stderr": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/w1d-e2e/using-2/lower.stderr",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "f85cce3cb07df5c508a69a88406946c3c22cf6be694741fcee167f80e5507dda"
+    }
+  ],
+  "injections": false,
+  "determinism": "BYTE_IDENTICAL"
+}

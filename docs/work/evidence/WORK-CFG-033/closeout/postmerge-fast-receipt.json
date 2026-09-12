@@ -1,0 +1,13 @@
+{
+  "authority": "POST_MERGE_DOCS_HARNESS_SMOKE",
+  "command": [
+    "bash",
+    "scripts/harness/check-fast.sh"
+  ],
+  "exitCode": 0,
+  "result": "PASS",
+  "durationSeconds": 166.255,
+  "sourceHead": "61065d55642d68320afaa1f9f6c46b322912e151",
+  "sourceTree": "943c8eb77b63ce08c7d5bdc685e08d3a4f7d7a45",
+  "logSha256": "7b824741c6b028025ae96ad4a4218d22a8adb560d53b2050f421d5ecc0909f41"
+}

@@ -29,7 +29,8 @@ NEW_CFG_TEST = 'cfg-adapters/src/test/java/io/github/gustavo2358/analysis/cfg/ad
 def digest(data): return hashlib.sha256(data).hexdigest()
 def git(root,*args): return subprocess.check_output(['git','-C',str(root),*args])
 def authorized(root):
-    p=root/'docs/work/active/WORK-CFG-033/work-item.json'
+    # Closed W1D retains its exact approved scope in the immutable archive.
+    p=root/'docs/work/history/WORK-CFG-033/work-item.json'
     if not p.exists(): return False
     w=json.loads(p.read_text())
     return w['id']=='WORK-CFG-033' and w['authorization']=='implementation' and w['checkpoint']=='CP6_W1D'

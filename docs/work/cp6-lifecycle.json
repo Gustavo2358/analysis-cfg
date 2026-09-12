@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "work_item": "WORK-CFG-033",
+  "status": "APPROVED / MERGED / CLOSED",
+  "work_item_status": "completed",
+  "authorization": "closeout_only",
+  "authorization_evidence": "docs/work/evidence/WORK-CFG-033/closeout/merge-receipt.json",
+  "pr": 18,
+  "w1": "APPROVED / MERGED / CLOSED",
+  "w1d": "APPROVED / MERGED / CLOSED",
+  "baseline": {
+    "status": "FROZEN",
+    "commit": "61065d55642d68320afaa1f9f6c46b322912e151",
+    "tree": "943c8eb77b63ce08c7d5bdc685e08d3a4f7d7a45",
+    "qualified_source_head": "d8f9652f79c3aefb1eeae25f48760256564e081e",
+    "qualified_source_tree": "943c8eb77b63ce08c7d5bdc685e08d3a4f7d7a45",
+    "classification": "QUALIFIED_TREE_PRESERVED",
+    "qualification_authority": "LOCAL_QUALIFICATION",
+    "qualification_receipt": "docs/work/evidence/WORK-CFG-033/closeout/qualified-source-receipt.json",
+    "qualification_receipt_sha256": "de496f5d112d8ee3df3836a8f8e7c334e134f0e10c677291d98c6df7d19ac81d"
+  },
+  "contracts": {
+    "analysis-cfg-json": {
+      "legacy": "1.0.0",
+      "Invoke": "2.0.0",
+      "selection": "minimum contract required by actual graph domain"
+    },
+    "analysis-dependency-result": "1.0.0"
+  },
+  "upstream_pins": {
+    "W1A": "53d774026a1e4bcd969c7783a1d277aaa87b5f2f",
+    "W1B": "2a37f5e980ba25fdc79614a66030a84d8bf5b8c9",
+    "W1C": "9de3825da64898258e647727393f01b9e9198d9e",
+    "AIR": "51b4d9a8ae0364232bd97103cd73a77e1a34996c"
+  },
+  "w2": {
+    "status": "NOT_STARTED",
+    "authorization": "NOT_AUTHORIZED",
+    "next_objective": "IF COBOL real, multi-candidate e open remainder",
+    "branch": null,
+    "work_item": null
+  },
+  "closeout": "docs/work/evidence/WORK-CFG-033/closeout/README.md"
+}

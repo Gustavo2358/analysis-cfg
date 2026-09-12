@@ -1,0 +1,44 @@
+{
+  "archivedWorkItemSha256": {
+    "eval.md": "0b2070e0ada93bc5d00f799bd2175b46992b8f536e8f91e2784a68868c749c6c",
+    "plan.md": "b7525fefac081f590f6152f4df78d1512a32df94c9e40f6d7c77060987bbd1a0",
+    "spec.md": "b260ccad9e5a4f75515d9afb5fa884ae11c589d394af704a54370edee453836c",
+    "state.md": "23115a74fbaaa2e255d50378718c1b8ac24ce610d6adf290c26b6810902f9db2",
+    "work-item.json": "23e42e0da4e6643cbd8eb01e8a25d3c87c40c8249b43706577919aeaefd5f735"
+  },
+  "qualifiedSourceHead": "d8f9652f79c3aefb1eeae25f48760256564e081e",
+  "sourceLockSha256": "456f429fe74e81540b36127920bd8d6a6405433fc625e89c54e90df78681afeb",
+  "siblings": {
+    "analysis-cfg": {
+      "head": "d8f9652f79c3aefb1eeae25f48760256564e081e",
+      "tree": "943c8eb77b63ce08c7d5bdc685e08d3a4f7d7a45",
+      "branch": "feat/cp6-w1d-call-dependency",
+      "status": ""
+    },
+    "analysis-ir": {
+      "head": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+      "tree": "11b2361a40cb5ae9b6c201f0157f30ef2387d1b8",
+      "branch": "main",
+      "status": ""
+    },
+    "air-java": {
+      "head": "09560ee9bf288ea4a3e8464f9dcac952dace6506",
+      "tree": "8d248f4ccf207eb7b609aa9ff0cdbcd512e526c8",
+      "branch": "feat/cp6-w1b-invoke-air-json",
+      "status": ""
+    },
+    "proleap-poc": {
+      "head": "bd6dd1c49bd724899a599beeff7dd3cb66d0f879",
+      "tree": "a43f0fc4ef8a227d47f012b9fcb4e410842ffcc0",
+      "branch": "feat/cp6-w1a-call-semantic-product",
+      "status": ""
+    },
+    "cobol-lower": {
+      "head": "7df2989d8d02c13552645386bbd963de00c7b4b4",
+      "tree": "2e3027df2fc4f9e550df8df9518e7e80f89324f1",
+      "branch": "feat/cp6-w1c-call-lowering",
+      "status": ""
+    }
+  },
+  "policy": "All previously tracked evidence, Java, POMs, fixtures, inventories and pins are byte-exact against the qualified source. Only work-item routing/lifecycle, its manifest and the harness archive lookup change."
+}

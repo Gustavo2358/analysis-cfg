@@ -3,7 +3,7 @@
 **Estado:** `planned`. **Fase:** `structure`. **Autorização:** backlog não autoriza execução.
 Dependências: BACKLOG-CFG-006.
 
-[WORK-CFG-032](../history/WORK-CFG-032.md) concluiu discovery. [WORK-CFG-033](../active/WORK-CFG-033/work-item.json) autoriza somente a slice W1D de Invoke Normal, effects e CALL dependency. O restante do escopo amplo abaixo continua planned e não autorizado.
+[WORK-CFG-032](../history/WORK-CFG-032.md) concluiu discovery. [WORK-CFG-033](../history/WORK-CFG-033.md) encerrou a slice W1D de Invoke Normal, effects e CALL dependency (APPROVED / MERGED / CLOSED). W2 permanece NOT_STARTED / NOT_AUTHORIZED. O restante do escopo amplo abaixo continua planned e não autorizado.
 
 ## Problema e objetivo observável
 

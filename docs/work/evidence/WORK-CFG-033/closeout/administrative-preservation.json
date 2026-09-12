@@ -1,0 +1,33 @@
+{
+  "protectedFilesVerified": 2231,
+  "siblingsAfter": {
+    "analysis-ir": {
+      "head": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+      "tree": "11b2361a40cb5ae9b6c201f0157f30ef2387d1b8",
+      "branch": "main",
+      "status": ""
+    },
+    "air-java": {
+      "head": "09560ee9bf288ea4a3e8464f9dcac952dace6506",
+      "tree": "8d248f4ccf207eb7b609aa9ff0cdbcd512e526c8",
+      "branch": "feat/cp6-w1b-invoke-air-json",
+      "status": ""
+    },
+    "proleap-poc": {
+      "head": "bd6dd1c49bd724899a599beeff7dd3cb66d0f879",
+      "tree": "a43f0fc4ef8a227d47f012b9fcb4e410842ffcc0",
+      "branch": "feat/cp6-w1a-call-semantic-product",
+      "status": ""
+    },
+    "cobol-lower": {
+      "head": "7df2989d8d02c13552645386bbd963de00c7b4b4",
+      "tree": "2e3027df2fc4f9e550df8df9518e7e80f89324f1",
+      "branch": "feat/cp6-w1c-call-lowering",
+      "status": ""
+    }
+  },
+  "result": "PASS",
+  "productChanged": false,
+  "pinsChanged": false,
+  "w2Started": false
+}

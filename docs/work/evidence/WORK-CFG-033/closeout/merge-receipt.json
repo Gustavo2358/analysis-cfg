@@ -1,0 +1,30 @@
+{
+  "schema": "cp6-w1-closeout@1",
+  "pr": 18,
+  "prUrl": "https://github.com/Gustavo2358/analysis-cfg/pull/18",
+  "prState": "MERGED / CLOSED",
+  "mergeMethod": "merge",
+  "mergedAt": "2026-09-12T03:00:53Z",
+  "mergeCommit": "61065d55642d68320afaa1f9f6c46b322912e151",
+  "mainHeadAtMerge": "61065d55642d68320afaa1f9f6c46b322912e151",
+  "mainTreeAtMerge": "943c8eb77b63ce08c7d5bdc685e08d3a4f7d7a45",
+  "previousBase": "c39a92f930b1c693857a0b30a1f5155f3f81520c",
+  "qualifiedSourceHead": "d8f9652f79c3aefb1eeae25f48760256564e081e",
+  "qualifiedSourceTree": "943c8eb77b63ce08c7d5bdc685e08d3a4f7d7a45",
+  "classification": "QUALIFIED_TREE_PRESERVED",
+  "qualificationAuthority": "LOCAL_QUALIFICATION",
+  "qualificationReceipt": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/qualification-remediation-final-2/evidence/receipt.json",
+  "qualificationReceiptSha256": "de496f5d112d8ee3df3836a8f8e7c334e134f0e10c677291d98c6df7d19ac81d",
+  "qualificationArtifactsVerified": 382,
+  "fullQualificationRerun": false,
+  "humanApproval": "Explicit user instruction in this task: CP6 W1 APPROVED; W1D IMPLEMENTED / QUALIFIED / APPROVED FOR MERGE; closeout and merge authorized.",
+  "w1": "APPROVED / MERGED / CLOSED",
+  "w1d": "APPROVED / MERGED / CLOSED",
+  "w2": {
+    "status": "NOT_STARTED",
+    "authorization": "NOT_AUTHORIZED",
+    "baselineStatus": "FROZEN",
+    "baselineCommit": "61065d55642d68320afaa1f9f6c46b322912e151",
+    "baselineTree": "943c8eb77b63ce08c7d5bdc685e08d3a4f7d7a45"
+  }
+}

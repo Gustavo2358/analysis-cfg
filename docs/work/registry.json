@@ -1,14 +1,6 @@
 {
   "schema_version": 1,
-  "active": [
-    {
-      "id": "WORK-CFG-033",
-      "backlog_id": "BACKLOG-CFG-007",
-      "path": "docs/work/active/WORK-CFG-033",
-      "status": "active",
-      "authorization": "implementation"
-    }
-  ],
+  "active": [],
   "history": [
     {
       "id": "WORK-CFG-001",
@@ -135,6 +127,16 @@
       "completed_on": "2026-09-11",
       "pr": 17,
       "merge_commit": "c39a92f930b1c693857a0b30a1f5155f3f81520c"
+    },
+    {
+      "id": "WORK-CFG-033",
+      "backlog_id": "BACKLOG-CFG-007",
+      "path": "docs/work/history/WORK-CFG-033.md",
+      "status": "completed",
+      "authorization": "implementation",
+      "completed_on": "2026-09-12",
+      "pr": 18,
+      "merge_commit": "61065d55642d68320afaa1f9f6c46b322912e151"
     }
   ]
 }
