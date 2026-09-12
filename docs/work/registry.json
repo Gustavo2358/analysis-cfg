@@ -2,8 +2,9 @@
   "schema_version": 1,
   "active": [
     {
-      "id": "WORK-CFG-036",
-      "path": "docs/work/active/WORK-CFG-036.yaml"
+      "id": "WORK-CFG-037",
+      "path": "docs/work/active/WORK-CFG-037.yaml",
+      "status": "IN_PROGRESS"
     }
   ],
   "history": [
@@ -157,6 +158,13 @@
       "pr": 21,
       "qualified_source_head": "947b3317f0736399f4a64e81310d18c6c8e00695",
       "merge_commit": "49ddb060bc515f3bdb1eba6ac50ccbeef0e4ee46"
+    },
+    {
+      "id": "WORK-CFG-036",
+      "path": "docs/work/active/WORK-CFG-036.yaml",
+      "status": "DONE",
+      "pr": 22,
+      "merge_commit": "e200b101455fa7addf59413ce5e6548c03d9116f"
     }
   ]
 }

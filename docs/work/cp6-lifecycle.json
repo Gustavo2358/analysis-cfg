@@ -52,7 +52,7 @@
   },
   "perform_basic": {
     "work_item": "WORK-CFG-036",
-    "status": "IMPLEMENTED / AWAITING HUMAN REVIEW",
+    "status": "DONE / MERGED",
     "profile": "SIMPLE_SINGLE_CALLSITE_PROCEDURE_PERFORM",
     "baselines": {
       "proleap-poc": "8493a8e356bdc3b0002f578581aef5e5b54c4d33",
@@ -72,6 +72,18 @@
     "next": "EVALUATE",
     "pr": 22,
     "qualified_source_head": "656b2cb7568ac253af84248e3f99106a9eb4caaa",
-    "local_full": "PASS: once per repository; CFG includes real PERFORM A/B"
+    "local_full": "PASS: once per repository; CFG includes real PERFORM A/B",
+    "merge_commit": "e200b101455fa7addf59413ce5e6548c03d9116f"
+  },
+  "multi_call": {
+    "work_item": "WORK-CFG-037",
+    "status": "IN_PROGRESS",
+    "baselines": {
+      "proleap-poc": "a14147106f329cce2f0006aa94194b47db96f367",
+      "cobol-lower": "546af4067bc42540bb73e88684e18e3082ddfb94",
+      "analysis-cfg": "e200b101455fa7addf59413ce5e6548c03d9116f"
+    },
+    "record": "docs/work/active/WORK-CFG-037.md",
+    "next": "EVALUATE"
   }
 }

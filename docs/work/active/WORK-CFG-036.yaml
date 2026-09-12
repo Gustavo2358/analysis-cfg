@@ -1,7 +1,8 @@
 id: WORK-CFG-036
 title: CP6 PERFORM BASIC
-status: IN_PROGRESS
+status: DONE
 scope:
   - SIMPLE_SINGLE_CALLSITE_PROCEDURE_PERFORM discovery and model/E2E tests
   - PossibleValues documentation correction and MOVE-to-MOVE Lean closeout
   - exact producer pins; no CFG production, solver, lattice or AIR changes
+notes: MERGED as e200b101455fa7addf59413ce5e6548c03d9116f; prior final qualifications and FAST passed.

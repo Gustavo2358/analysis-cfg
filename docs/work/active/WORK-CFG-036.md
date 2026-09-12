@@ -152,3 +152,10 @@ or cross-repo E2E ran remotely. GitHub checks on the final Draft head are the
 remote authority; no additional receipt/certificate is created.
 
 Final local FAST selector check: PASS, `/tmp/perform-cfg-final-fast.log` (64.092s).
+
+## Lean closeout — 2026-09-12
+
+DONE / MERGED. PR #22 merged as `e200b101455fa7addf59413ce5e6548c03d9116f`.
+Producer PRs #38/#15 also merged; exact new baselines in WORK-CFG-037.
+The earlier awaiting-review text above is the preserved pre-merge record.
+NEXT: MULTI-CALL PROGRAM COVERAGE; EVALUATE follows that wave.

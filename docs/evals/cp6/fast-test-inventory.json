@@ -71,6 +71,11 @@
       "literalThenCopyParagraphBeforeCall",
       "performedStrongWriteKillsOldProgram",
       "explicitEntryAndAllTwentyFourSequencePermutationsPreserveResult"
+    ],
+    "io.github.gustavo2358.analysis.adapters.MultiCallModelTest": [
+      "threeMixedSitesKeepPointValuesSupportsAndExcludeUnreachableLiteral",
+      "ifJoinThenOverwriteSameObjectUsesDifferentProgramPoints",
+      "twoDynamicThreeLiteralSitesShareRunsAndDeduplicateGlobalNames"
     ]
   },
   "analysis-dataflow": {
