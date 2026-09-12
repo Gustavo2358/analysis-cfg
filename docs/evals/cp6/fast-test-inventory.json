@@ -51,6 +51,15 @@
     ],
     "io.github.gustavo2358.analysis.adapters.WireTest": [
       "realValueSupportAndSourceRemainderReachWire"
+    ],
+    "io.github.gustavo2358.analysis.adapters.W2dModelTest": [
+      "closedUnknownBooleanJoinKeepsTwoPaddedCandidatesAndSpecificSupports",
+      "openUnknownBooleanJoinKeepsCandidateAndNaturalRemainder",
+      "unreachableAssignmentCannotContaminateEitherJoin",
+      "physicalSequencePermutationPreservesBothResults",
+      "cfgUsesExplicitEntryAndExistingLabeledEdges",
+      "interpretationRemainderIsIndependentOfModelAndSource",
+      "w1SingletonAndLiteralKeepTheirCandidatesAndSupports"
     ]
   },
   "analysis-dataflow": {

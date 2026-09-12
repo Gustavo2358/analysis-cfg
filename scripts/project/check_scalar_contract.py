@@ -3,6 +3,7 @@
 from __future__ import annotations
 import hashlib
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -35,7 +36,9 @@ def verify_scalar_contract(root: Path) -> None:
         raise GateFailure("scalar provenance metadata disagrees with approved blob")
     if hashlib.sha256((root / GOBACK).read_bytes()).hexdigest() != GOBACK_HASH:
         raise GateFailure("GOBACK upstream fixture regression")
-    upstream = root.parent / "air-java"
+    # Use the same isolated source already validated by verify_snapshot_pin above.
+    # A sibling's occupied branch/object database is not the dependency authority.
+    upstream = Path(os.environ.get('AIR_JAVA_CHECKOUT', str(root / '.harness-results/build/air-java')))
     if (upstream / ".git").exists():
         for local in (SCALAR, GOBACK):
             path = "air-json/src/test/resources/" + Path(local).name

@@ -1,0 +1,5 @@
+id: WORK-CFG-034
+title: CP6 W2D — resolve real IF CALL dependencies
+status: IN_PROGRESS
+scope:
+  - real SP 1.4 / AIR diamond to dependency result
