@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "work_item": "WORK-CFG-036",
-  "status": "IMPLEMENTED / QUALIFICATION IN PROGRESS",
+  "status": "IMPLEMENTED / AWAITING HUMAN REVIEW",
   "work_item_status": "IN_PROGRESS",
   "authorization": "implementation",
   "w1": "APPROVED / MERGED / CLOSED",
@@ -52,7 +52,7 @@
   },
   "perform_basic": {
     "work_item": "WORK-CFG-036",
-    "status": "IMPLEMENTED / QUALIFICATION IN PROGRESS",
+    "status": "IMPLEMENTED / AWAITING HUMAN REVIEW",
     "profile": "SIMPLE_SINGLE_CALLSITE_PROCEDURE_PERFORM",
     "baselines": {
       "proleap-poc": "8493a8e356bdc3b0002f578581aef5e5b54c4d33",
@@ -69,6 +69,9 @@
       "cobol-lower": "bcd9980bed1255910f71b58f056dbf9857510a26"
     },
     "record": "docs/work/active/WORK-CFG-036.md",
-    "next": "EVALUATE"
+    "next": "EVALUATE",
+    "pr": 22,
+    "qualified_source_head": "656b2cb7568ac253af84248e3f99106a9eb4caaa",
+    "local_full": "PASS: once per repository; CFG includes real PERFORM A/B"
   }
 }

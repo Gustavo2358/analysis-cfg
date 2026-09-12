@@ -4,7 +4,7 @@
 
 [WORK-CFG-035](history/WORK-CFG-035.yaml): CP6 MOVE→MOVE DONE / MERGED, PR #21; [escopo e validação](history/WORK-CFG-035.md).
 
-[WORK-CFG-036](active/WORK-CFG-036.yaml): CP6 PERFORM BASIC, IN_PROGRESS.
+[WORK-CFG-036](active/WORK-CFG-036.yaml): CP6 PERFORM BASIC, IMPLEMENTED / AWAITING HUMAN REVIEW, Draft PR #22 (Lean IN_PROGRESS até merge).
 
 CP5 = APPROVED / MERGED / CLOSED. The verified frozen component authorities are synchronized. Final source/artifact identity is recorded by the post-merge protocol in `artefatos-e2e/pre-cp6-baseline/receipt.json` in the workspace.
 

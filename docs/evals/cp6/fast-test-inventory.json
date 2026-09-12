@@ -70,8 +70,7 @@
       "literalParagraphBeforeCall",
       "literalThenCopyParagraphBeforeCall",
       "performedStrongWriteKillsOldProgram",
-      "explicitEntryAndAllTwentyFourSequencePermutationsPreserveResult",
-      "oracleKillsSkippedBodyAndWrongReturnChallenges"
+      "explicitEntryAndAllTwentyFourSequencePermutationsPreserveResult"
     ]
   },
   "analysis-dataflow": {

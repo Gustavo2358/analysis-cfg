@@ -125,3 +125,30 @@ NOT SUPPORTED: THRU, loops, inline, multiple callsites, nested control or other
 ordinary target entries. Solver/lattice/strong update/CFG Jump/AIR unchanged;
 RD and generic PERFORM stack not implemented. NEXT: EVALUATE (no work authorized
 by this navigation entry). Review/merge remains human-only.
+
+## Final review state
+
+**IMPLEMENTED / AWAITING HUMAN REVIEW**. [CFG Draft PR #22](https://github.com/Gustavo2358/analysis-cfg/pull/22).
+WORK-CFG-036 remains IN_PROGRESS under Lean until merge. No PR was merged.
+
+Final local `python3 -B scripts/harness/lean.py qualification-local`: PASS once in
+all three repositories. CFG tested source `656b2cb7568ac253af84248e3f99106a9eb4caaa`,
+with the exact final producer pins above; raw log `/tmp/perform-cfg-full.log`.
+Its final real E2E outputs are at `/tmp/move-cfg-build/w2d-tdqgmvia/perform-basic/`, including SP/AIR/CFG/dependency
+A/B and permuted AIR/results. The final follow-up changes only this review record,
+navigation and the remote test selector: the skipped-body/wrong-return falsification
+is excluded from FAST and retained in the full local suite (all 5 model tests PASS).
+No production or Full test/fixture changed; Full was not repeated for this follow-up.
+
+Remote FAST results on implementation sources:
+
+- frontend: [34718498847](https://github.com/Gustavo2358/proleap-poc/actions/runs/34718498847), PASS;
+- lower: [34718604740](https://github.com/Gustavo2358/cobol-lower/actions/runs/34718604740), PASS;
+- CFG: [34718660286](https://github.com/Gustavo2358/analysis-cfg/actions/runs/34718660286), PASS.
+
+The first CFG run included the cheap in-memory falsification method; the final
+selector removes it to keep that challenge local. No production mutation campaign
+or cross-repo E2E ran remotely. GitHub checks on the final Draft head are the
+remote authority; no additional receipt/certificate is created.
+
+Final local FAST selector check: PASS, `/tmp/perform-cfg-final-fast.log` (64.092s).
