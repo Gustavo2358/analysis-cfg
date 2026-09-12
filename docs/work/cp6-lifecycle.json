@@ -52,7 +52,7 @@
   },
   "perform_basic": {
     "work_item": "WORK-CFG-036",
-    "status": "IMPLEMENTED / AWAITING HUMAN REVIEW",
+    "status": "DONE / MERGED",
     "profile": "SIMPLE_SINGLE_CALLSITE_PROCEDURE_PERFORM",
     "baselines": {
       "proleap-poc": "8493a8e356bdc3b0002f578581aef5e5b54c4d33",
@@ -72,6 +72,26 @@
     "next": "EVALUATE",
     "pr": 22,
     "qualified_source_head": "656b2cb7568ac253af84248e3f99106a9eb4caaa",
-    "local_full": "PASS: once per repository; CFG includes real PERFORM A/B"
+    "local_full": "PASS: once per repository; CFG includes real PERFORM A/B",
+    "merge_commit": "e200b101455fa7addf59413ce5e6548c03d9116f"
+  },
+  "multi_call": {
+    "work_item": "WORK-CFG-037",
+    "status": "IMPLEMENTED / AWAITING HUMAN REVIEW",
+    "baselines": {
+      "proleap-poc": "a14147106f329cce2f0006aa94194b47db96f367",
+      "cobol-lower": "546af4067bc42540bb73e88684e18e3082ddfb94",
+      "analysis-cfg": "e200b101455fa7addf59413ce5e6548c03d9116f"
+    },
+    "record": "docs/work/active/WORK-CFG-037.md",
+    "next": "EVALUATE",
+    "pr": 23,
+    "qualified_source_head": "3c16a35eaa1997acd83d0cb91c70026273080cd8",
+    "source_pins": {
+      "proleap-poc": "01ee3492c04736850f1f092bea2027b0d0d63366",
+      "cobol-lower": "1fe4a56d6cb7e81ff6fbd249808f65a72195322b"
+    },
+    "local_full": "PASS in all three repositories; CFG seven real multi-CALL programs plus all earlier regressions; later changes documentary only",
+    "production_analysis_cfg": "NONE"
   }
 }

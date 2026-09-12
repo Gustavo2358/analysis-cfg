@@ -1,0 +1,18 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. CALLER.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 WS-A PIC X(8).
+       01 WS-TMP PIC X(8).
+       01 WS-B PIC X(8).
+       PROCEDURE DIVISION.
+       MAIN.
+       MOVE 'PROGA' TO WS-A.
+       CALL WS-A.
+       PERFORM DEFINE-B.
+       CALL WS-B.
+       CALL 'PROGC'.
+       GOBACK.
+       DEFINE-B.
+       MOVE 'PROGB' TO WS-TMP.
+       MOVE WS-TMP TO WS-B.

@@ -18,3 +18,6 @@ CP5 = APPROVED / MERGED / CLOSED. The verified frozen component authorities are 
 - [WORK-CFG-028](history/WORK-CFG-028.md): CP5 W1–W5 approved and merged PR12.
 
 [Registry](registry.json), [backlog](backlog.md), [lifecycle](cp5-lifecycle.json), [follow-ups](cp5-follow-ups.md). Historical STOPs are investigation history; W3-PERF-01/W3-METRICS-01, 117k qualification, broad heap/streaming optimization, lower amplification and IMPLEMENTATION_LIMIT naming remain nonblocking backlog.
+
+- WORK-CFG-036: DONE / MERGED #22 (`e200b101455fa7addf59413ce5e6548c03d9116f`); record retained in active path for stable links.
+- [WORK-CFG-037](active/WORK-CFG-037.md): CP6 multi-CALL program coverage, IN_PROGRESS; next after review is EVALUATE.
