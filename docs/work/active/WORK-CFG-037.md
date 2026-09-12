@@ -1,6 +1,7 @@
 # CP6 MULTI-CALL PROGRAM COVERAGE
 
-Status: IN_PROGRESS. Discovery precedes production. No receipts/certificates.
+Status: **IMPLEMENTED / AWAITING HUMAN REVIEW**. Lean status stays IN_PROGRESS
+until merge. Discovery preceded production. No receipts/certificates.
 
 ## Post-PERFORM baseline
 
@@ -68,7 +69,7 @@ No new AIR/result wire, solver, lattice, RD, EVALUATE, GO TO or multi-PERFORM.
 Program names are derived as distinct reachable DependencyResult.edges candidates;
 site remainders remain independent and no global closed-world claim follows.
 
-## Implemented composition and qualification in progress
+## Implemented composition and qualification
 
 Frontend productive source `01ee3492c04736850f1f092bea2027b0d0d63366`, Draft
 [proleap-poc #39](https://github.com/Gustavo2358/proleap-poc/pull/39), publishes SP1.7
@@ -124,6 +125,24 @@ wave preserves that semantics. The union is exact for reachable **known** candid
 and does not assert a closed runtime target set. The AIR-only isolated models have
 closed value remainders and exclude an actual orphan BADPROG Invoke.
 
-Final analysis-cfg qualification-local will execute all prior regressions and all
-seven multi-CALL programs on the final test source. No remote cross-repo E2Es;
-FAST contains the focused multi-site, same-object, IF, batching and orphan tests.
+Final analysis-cfg **qualification-local PASS** on
+`3c16a35eaa1997acd83d0cb91c70026273080cd8`; exit 0, raw log
+`/tmp/multicall-cfg-full.log`. Real final products and per-process outputs remain at
+`/tmp/move-cfg-build/w2d-ddavvnzb/`: W2D closed/open, four MOVE-copy cases, three
+PERFORM cases, W1 literal/dynamic/open and all seven multi-CALL programs. No
+production/test/fixture/harness changes follow this qualification, only documentation.
+No remote cross-repo E2Es; FAST contains the focused multi-site, same-object, IF,
+batching and orphan tests. All ten focal challenges passed before the final Full;
+no additional broad mutation campaign was run.
+
+Draft reviews: [frontend #39](https://github.com/Gustavo2358/proleap-poc/pull/39),
+[lower #16](https://github.com/Gustavo2358/cobol-lower/pull/16),
+[CFG #23](https://github.com/Gustavo2358/analysis-cfg/pull/23). Remote FAST is SUCCESS
+at frontend `01ee3492c04736850f1f092bea2027b0d0d63366`, lower documentary HEAD
+`3d38514cbd48422e30155c75eaa61ce8cd654d8f`, and CFG qualified source above.
+GitHub checks on the final Draft head remain the remote authority.
+
+CP6 MULTI-CALL PROGRAM COVERAGE: **IMPLEMENTED / AWAITING HUMAN REVIEW**.
+Input: supported COBOL program. Output: all possible known subprograms from every
+reachable CALL site, with per-site detail and the exact program-wide union.
+No merge/auto-merge. WORK-CFG-036 is DONE / MERGED. NEXT: **EVALUATE**.
