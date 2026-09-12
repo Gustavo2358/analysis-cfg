@@ -26,3 +26,6 @@ ou referência não consultada substitui regra canônica da versão em uso.
 ## CP5
 
 [CP5 arquitetura](architecture/cp5-dataflow.md), [lifecycle](work/cp5-lifecycle.json) e [roadmap](product/cp5-roadmap.md).
+
+- [CFG JSON 2.0.0 e preservação v1](architecture/cfg-json-v2.md).
+- [Fast CI e Full Qualification explícita](engineering/qualification.md).

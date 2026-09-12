@@ -1,11 +1,13 @@
 package io.github.gustavo2358.analysis.cfg.domain;
 
 import io.github.gustavo2358.air.model.Capabilities;
+import io.github.gustavo2358.air.model.Control;
 import io.github.gustavo2358.air.model.Entries;
 import io.github.gustavo2358.air.model.Ids.LabelId;
 import io.github.gustavo2358.air.model.Operations;
 import io.github.gustavo2358.air.model.Publication;
 import io.github.gustavo2358.air.model.Sequence;
+import io.github.gustavo2358.air.model.Scopes;
 import io.github.gustavo2358.air.model.Unit;
 
 import java.util.ArrayList;
@@ -53,6 +55,7 @@ public final class CoreCfgProjection {
                 if (!(sequence.terminator() instanceof Operations.Return)
                         && !(sequence.terminator() instanceof Operations.Jump)
                         && !(sequence.terminator() instanceof Operations.Branch)
+                        && !(sequence.terminator() instanceof Operations.Invoke invoke && supportsInvoke(invoke))
                         && !(sequence.terminator() instanceof Operations.Halt)) {
                     issues.add(new CfgProjectionIssue(CfgProjectionIssue.Code.UNSUPPORTED_TERMINATOR,
                             sequence.terminator().header().id()));
@@ -60,6 +63,16 @@ public final class CoreCfgProjection {
             }
         }
         return List.copyOf(issues);
+    }
+
+    /** First neutral invocation slice: one explicit local Normal, with closed or open AllControl remainder.
+     * Open remainder remains on the original AIR; this projection enumerates known control only. */
+    public static boolean supportsInvoke(Operations.Invoke invoke) {
+        return invoke.outcomes().known().size() == 1
+                && invoke.outcomes().known().getFirst() instanceof Control.Normal
+                && (invoke.outcomes().remainder() instanceof Scopes.NoControl
+                    || invoke.outcomes().remainder() instanceof Scopes.WithinControl bound
+                        && bound.scope() instanceof Scopes.AllControl);
     }
 
     /** Requires successful AirValidator preflight and an empty unsupported inventory. */
@@ -102,6 +115,10 @@ public final class CoreCfgProjection {
                     } else if (sequence.terminator() instanceof Operations.Jump jump) {
                         transitions.add(new CfgTransition(from, sequences.get(jump.destination()).id(),
                                 CfgTransition.Kind.JUMP, entry.id()));
+                    } else if (sequence.terminator() instanceof Operations.Invoke invoke && supportsInvoke(invoke)) {
+                        var normal = (Control.Normal) invoke.outcomes().known().getFirst();
+                        transitions.add(new CfgTransition(from, sequences.get(normal.label()).id(),
+                                CfgTransition.Kind.INVOKE_NORMAL, entry.id()));
                     } else if (sequence.terminator() instanceof Operations.Halt) {
                         transitions.add(new CfgTransition(from, halts.get(sequence.label()).id(),
                                 CfgTransition.Kind.HALT, entry.id()));

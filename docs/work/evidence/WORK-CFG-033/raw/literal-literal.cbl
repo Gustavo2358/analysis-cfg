@@ -1,0 +1,5 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. CALLER.
+       PROCEDURE DIVISION.
+           CALL 'PROGA'.
+           GOBACK.

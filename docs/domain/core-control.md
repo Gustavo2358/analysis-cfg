@@ -43,7 +43,9 @@ Uma ocorrência pode ser compartilhada por Entries: o contexto fica na transiç�
 HALT. O destino não tem transições de saída. NormalExits continuam inventariados
 por Entry mesmo quando nenhum Return os utiliza; isso não afirma alcançabilidade.
 
-Dispatch, Invoke, Raise, Opaque e Local*/IndirectJump permanecem fora
+A slice [W1D](../architecture/analysis-dependency-result-v1.md) admite Invoke com um Normal conhecido e remainder NoControl/AllControl, por aresta INVOKE_NORMAL. Outros outcomes continuam fora.
+
+Dispatch, Raise, Opaque e Local*/IndirectJump permanecem fora
 do slice, inclusive em órfãs. Recusa é explícita e correlacionada, sem produto que omita
 essas ocorrências. Isso é distinto de projetar fatos suportados de inventário PARTIAL.
 As demais linhas da tabela são direção futura.
@@ -105,3 +107,5 @@ exata em `preciseControlCapabilities()`; nenhuma outra versão é presumida.
 A regra é core, sem intérprete fictício no SemanticInterpreterRegistry. Capability
 local/indireta/desconhecida continua dependendo da negociação existente; registrar
 identidade não implementa semântica. O manifesto obrigatório nunca é dispensado.
+
+O transporte de Invoke declara explicitamente [analysis-cfg-json 2.0.0](../architecture/cfg-json-v2.md); grafos do domínio anterior continuam em v1.

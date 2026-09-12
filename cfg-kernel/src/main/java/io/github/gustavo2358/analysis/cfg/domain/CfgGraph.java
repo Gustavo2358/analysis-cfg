@@ -75,6 +75,13 @@ public final class CfgGraph {
                         && jump.destination().equals(target.source().label())
                         && sequence.source().label().unit().equals(transition.activationEntry().unit())
                         && target.source().label().unit().equals(transition.activationEntry().unit());
+                case INVOKE_NORMAL -> from instanceof CfgNode.SequenceNode sequence
+                        && sequence.source().terminator() instanceof Operations.Invoke invoke
+                        && CoreCfgProjection.supportsInvoke(invoke)
+                        && to instanceof CfgNode.SequenceNode target
+                        && ((io.github.gustavo2358.air.model.Control.Normal) invoke.outcomes().known().getFirst()).label().equals(target.source().label())
+                        && sequence.source().label().unit().equals(transition.activationEntry().unit())
+                        && target.source().label().unit().equals(transition.activationEntry().unit());
                 case BRANCH_TRUE, BRANCH_FALSE -> from instanceof CfgNode.SequenceNode sequence
                         && sequence.source().terminator() instanceof Operations.Branch branch
                         && to instanceof CfgNode.SequenceNode target

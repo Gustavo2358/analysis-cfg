@@ -49,7 +49,7 @@ perdas do SP; `multi-path` verifica controle/bindings e lacunas antes do lower.
 
 Trace, gaps, contrato de dependency, efeitos, waves e oráculos são propostas para
 review, não cobertura nova. Gates e identidade final da entrega ficam no
-[estado ativo](../../active/WORK-CFG-032/state.md) e no PR draft. Os logs de [docs](raw/docs-gate.log.gz) e [fast](raw/fast-gate.log.gz), com
+[estado ativo](../../history/WORK-CFG-032/state.md) e no PR draft. Os logs de [docs](raw/docs-gate.log.gz) e [fast](raw/fast-gate.log.gz), com
 [comandos e exits](raw/gate-executions.json), registram PASS; CI deve ser lida pelo HEAD exato publicado.
 Nenhum merge, auto-merge ou início de W1 está autorizado.
 

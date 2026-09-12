@@ -85,6 +85,7 @@ class EvalCfg028Test {
             assertTrue(nodes.containsKey(t.from()));
             assertTrue(nodes.containsKey(t.to()));
             EdgeKind kind = switch (t.kind()) {
+                case INVOKE_NORMAL -> throw new AssertionError("Invoke belongs to CP6 W1D");
                 case ENTRY -> EdgeKind.ENTRY;
                 case JUMP -> EdgeKind.JUMP;
                 case RETURN -> EdgeKind.RETURN;
@@ -364,7 +365,7 @@ class EvalCfg028Test {
                 List.of(), List.of(), new Interactions.EntrySignature(E), List.of(),
                 new Interactions.EffectBound(new Interactions.ForeignEffects(Scopes.NoMemory.INSTANCE,
                         Scopes.NoMemory.INSTANCE, List.of()), List.of()),
-                new Control.InvocationOutcomes(List.of(new Control.Normal(L)), Scopes.NoControl.INSTANCE),
+                new Control.InvocationOutcomes(List.of(new Control.Normal(L), Control.Diverge.INSTANCE), Scopes.NoControl.INSTANCE),
                 new Interactions.KnownContract(new Interactions.ContractRef("test-contract", "1", List.of(ORIGIN))));
         var opaque = new Operations.Opaque(new Operations.Header(opaqueId, ORIGIN, Evidence.CoverageStatus.ABSTRACTED,
                 header(opaqueId).precision(), List.of(GAP)), "jump display is not semantics", List.of(), List.of(),

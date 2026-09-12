@@ -1,0 +1,64 @@
+{
+  "schema": "w1d-mutations@1",
+  "firstGreen": {
+    "argv": [
+      "mvn",
+      "-B",
+      "-ntp",
+      "-pl",
+      "analysis-launcher",
+      "-am",
+      "test",
+      "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,NameInterpreterTest,W1d*Test,DependencyCliTest"
+    ],
+    "exitCode": 0,
+    "log": "first-green.log",
+    "sha256": "54b98b7cdde71c40fb7f94984c5862f46641d70c2b15231a007857197468c057"
+  },
+  "mutants": [
+    {
+      "name": "default-value-plan-call-logic",
+      "path": "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/DefaultValuePlan.java",
+      "byteExactRestore": true,
+      "execution": {
+        "argv": [
+          "python3",
+          "-B",
+          "scripts/project/check_w1d_boundary.py"
+        ],
+        "exitCode": 1,
+        "log": "default-value-plan-call-logic.log",
+        "sha256": "4e38877275b6696a010433d72b7252e620ca39b9cbdd567b47fd1dde7effadd8"
+      },
+      "detection": "SCOPE_GATE"
+    }
+  ],
+  "secondGreen": {
+    "argv": [
+      "mvn",
+      "-B",
+      "-ntp",
+      "-pl",
+      "analysis-launcher",
+      "-am",
+      "test",
+      "-Dtest=BuildCfgContractTest,StructureTest,ValuesTest,CompositionTest,NameInterpreterTest,W1d*Test,DependencyCliTest"
+    ],
+    "exitCode": 0,
+    "log": "second-green.log",
+    "sha256": "bd4ebe2c1feb268cc2c7a95d1aad8f2e738ad0bbe87cd322ad0aedc5f30ec817"
+  },
+  "secondGreenNominalTests": 33,
+  "compilerFailuresAccepted": false,
+  "restoration": {
+    "analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/DefaultValuePlan.java": "7c9e543f2c01ed0816bc7c15a23e657bc12a803512313a69284d52b70a5b1531",
+    "analysis-dependencies/src/main/java/io/github/gustavo2358/analysis/dependencies/CallDependencyConsumer.java": "6925665968b4bc57420fec91835361acda8ee35eb304380df28963e60e8e6426",
+    "analysis-dependencies/src/main/java/io/github/gustavo2358/analysis/dependencies/CallDependencyPlan.java": "1bc2e49d32880ab80a60733d10bcf429f2cee1b1e825ff199d0872a8478738d8",
+    "analysis-dependencies/src/main/java/io/github/gustavo2358/analysis/dependencies/ReachabilityProvider.java": "9701a2eb315360ba9466fce3728c59e3034eea4c5936b228e1013982d0ad25b7",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java": "a049e86af35e386b205db620fc1fd44fb8374533fb9a8a7082749f1e3760595b",
+    "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/ForeignEffectTransfer.java": "3006fe3efb65740464df617688bfa2d887232a2b284e33a3163f7d3b5350d79d",
+    "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesAnalysis.java": "81be102d08cb279799d301319e1a5a3d600c80c5cc45654f3ec87bf66ded72ee",
+    "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/TextProfile.java": "dba8b5e20c1b3a5ea5663c482bcacd91919458a3352b1b61a778b901939711ac",
+    "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CoreCfgProjection.java": "f4bfa838da978e9db61ce0d129262b262c12e25ef3d59caa2eefc20cc2a2c456"
+  }
+}

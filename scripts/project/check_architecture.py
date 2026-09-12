@@ -148,6 +148,7 @@ EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CfgGraph.java"].update({
 })
 EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CoreCfgProjection.java"].add(
     "io.github.gustavo2358.air.model.Capabilities")
+EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CoreCfgProjection.java"].update({"io.github.gustavo2358.air.model.Control", "io.github.gustavo2358.air.model.Scopes"})
 CFG_CLASS_NAMES = {
     "CfgNodeId", "CfgNode", "CfgNode$EntryNode", "CfgNode$SequenceNode", "CfgNode$NormalExit", "CfgNode$HaltExit",
     "CfgTransition", "CfgTransition$Kind", "CfgGraph", "CfgGraph$1",
@@ -203,6 +204,7 @@ FORBIDDEN_BYTECODE_TYPES = {
 }
 # Exact inventory for the authorized structural slice; no wildcard operation support.
 ALLOWED_OPERATION_TYPES = {
+    "io.github.gustavo2358.air.model.Operations$Invoke",
     "io.github.gustavo2358.air.model.Operations$Return",
     "io.github.gustavo2358.air.model.Operations$Jump",
     "io.github.gustavo2358.air.model.Operations$Branch",
@@ -262,7 +264,6 @@ def detector_self_test() -> None:
         "example.SemanticProductInput",
         "local.BuildCfgInput",
         "io.github.gustavo2358.air.model.Operations$Dispatch",
-        "io.github.gustavo2358.air.model.Operations$Invoke",
         "io.github.gustavo2358.air.model.Operations$Raise",
         "io.github.gustavo2358.air.model.Operations$Opaque",
         "io.github.gustavo2358.air.model.Operations$LocalInvoke",
@@ -379,6 +380,15 @@ def child_text(element: ET.Element, namespace: str, name: str, default: str = ""
     return child.text.strip() if child is not None and child.text else default
 
 
+
+def repository_inputs(root: Path, pattern: str):
+    """Exclude root-level build/evidence stores, never similarly named production packages."""
+    for path in root.rglob(pattern):
+        parts = path.relative_to(root).parts
+        if parts[0] not in {'.git', '.cache', '.harness-results'} and 'target' not in parts:
+            yield path
+
+
 def verify_project_shape(root: Path) -> None:
     project, namespace = xml_root(root / "pom.xml")
     modules_element = project.find(namespace + "modules")
@@ -387,8 +397,8 @@ def verify_project_shape(root: Path) -> None:
         for item in modules_element.findall(namespace + "module")
         if item.text and item.text.strip()
     ]
-    if modules != [KERNEL_ARTIFACT, "analysis-kernel", "analysis-values", "cfg-adapters", "cfg-launcher", "analysis-dataflow", "analysis-adapters", "analysis-launcher"]:
-        raise GateFailure("W3 reactor must contain exactly cfg-kernel, analysis-kernel, analysis-values, cfg-adapters, cfg-launcher")
+    if modules != [KERNEL_ARTIFACT, "analysis-kernel", "analysis-values", "cfg-adapters", "cfg-launcher", "analysis-dataflow", "analysis-dependencies", "analysis-adapters", "analysis-launcher"]:
+        raise GateFailure("W1D reactor must contain the exact reviewed nine modules")
 
     properties = project.find(namespace + "properties")
     release = None if properties is None else properties.find(namespace + "maven.compiler.release")
@@ -414,9 +424,8 @@ def verify_project_shape(root: Path) -> None:
 
     production_paths = sorted(
         path
-        for path in root.rglob("*.java")
-        if "target" not in path.relative_to(root).parts
-        and "/src/main/java/" in "/" + path.relative_to(root).as_posix()
+        for path in repository_inputs(root, "*.java")
+        if "/src/main/java/" in "/" + path.relative_to(root).as_posix()
     )
     production_sources = {path.relative_to(root).as_posix() for path in production_paths}
     from check_transport_architecture import transport_source_inventory, verify_transport_shape
@@ -427,6 +436,10 @@ def verify_project_shape(root: Path) -> None:
     from check_w5 import SOURCES as COMPOSITION_SOURCES, verify_sources as verify_composition_sources
     verify_composition_sources(root)
     analysis_sources = COMPOSITION_SOURCES | source_inventory(root) | SOLVER_SOURCES | QUERY_SOURCES | VALUE_SOURCES | PLANNING_SOURCES
+    from w1d_scope import authorized, NEW_W5, NEW_VALUES, verify
+    if authorized(root):
+        verify(root)
+        analysis_sources |= NEW_W5 | {NEW_VALUES} | {p.relative_to(root).as_posix() for p in (root/'analysis-dependencies/src/main/java').rglob('*.java')}
     verify_planning_sources(root)
     verify_value_sources(root)
     verify_solver_sources(root)
@@ -450,7 +463,7 @@ def verify_project_shape(root: Path) -> None:
             if pattern.search(source):
                 raise GateFailure(f"{relative} contains forbidden {label}")
 
-    preview_files = list(root.glob("**/pom.xml")) + [
+    preview_files = list(repository_inputs(root, "pom.xml")) + [
         root / ".mvn/jvm.config",
         root / ".mvn/maven.config",
     ]
@@ -492,18 +505,8 @@ def verify_snapshot_pin(root: Path) -> str:
         raise GateFailure("CI must not resolve air-java from a mutable branch")
     if f'test "$(git rev-parse HEAD)" = "{sha}"' not in workflow:
         raise GateFailure("CI must verify air-java HEAD before installation")
-    if workflow.count("MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2") != 11:
-        raise GateFailure("CI must share one isolated Maven repository across upstream and consumer")
-    if 'scripts/harness/check-full.sh' not in workflow or 'scripts/project/record_air_dependency.py' not in workflow:
-        raise GateFailure("CI must run full regression and record exact upstream tree/JAR provenance")
-    for wave in (1, 2, 3, 4, 5):
-        if f"scripts/project/check_cp5_gate.py performance --wave {wave}" not in workflow:
-            raise GateFailure(f"CI must execute CP5 Wave {wave} product probes")
-    if 'distribution: temurin' not in workflow or 'java-version: "21"' not in workflow:
-        raise GateFailure("CI must use Temurin 21")
-    for gate in ("fast", "architecture", "semantic", "integration"):
-        if f"bash scripts/harness/check-{gate}.sh" not in workflow:
-            raise GateFailure("CI must execute " + gate)
+    from check_ci_orchestration import verify
+    verify(root)
     return sha
 
 
@@ -750,7 +753,7 @@ def verify_jdeps(jdeps: str, root: Path, classes: Path, air_jar: Path) -> None:
     )
 
 
-def architecture_gate(root: Path) -> None:
+def architecture_gate(root: Path, test_profile: str = "full") -> None:
     detector_self_test()
     verify_project_shape(root)
     air_sha = verify_snapshot_pin(root)
@@ -759,7 +762,13 @@ def architecture_gate(root: Path) -> None:
     jdeps = command_path("jdeps")
     repository = local_repository_argument()
     runtime = assert_maven_runtime(maven, root, repository)
-    run([maven, *repository, "--batch-mode", "--no-transfer-progress", "clean", "test"], root)
+    test_arguments = []
+    if test_profile == "fast":
+        from fast_tests import selector, verify_reports
+        test_arguments = ["-Dtest=" + selector(root)]
+    run([maven, *repository, "--batch-mode", "--no-transfer-progress", "clean", "test", *test_arguments], root)
+    if test_profile == "fast":
+        verify_reports(root)
     kernel = root / KERNEL_ARTIFACT
     total, skipped = count_tests(kernel)
 
@@ -790,6 +799,8 @@ def architecture_gate(root: Path) -> None:
     planning_architecture(root)
     from check_w5 import architecture as composition_architecture
     composition_architecture(root)
+    from check_w1d_boundary import check as dependency_boundary
+    dependency_boundary(root)
 
     print(f"[architecture] PASS: {total} kernel tests ({skipped} skipped), "
           f"{len(EXPECTED_CLASSFILES)} production classfiles, "
@@ -800,20 +811,21 @@ def architecture_gate(root: Path) -> None:
     print("[architecture] PASS: BuildCfg(Publication, BuildOptions) -> CfgBuildResult and direct "
           "AirValidator preflight", flush=True)
     print("[architecture] PASS: explicit capability/version registry; no transport, reflection, "
-          "frontend, AIR shadow, or control primitives beyond Jump/Branch/Return/Halt", flush=True)
+          "frontend, AIR shadow, or control primitives beyond the explicit Jump/Branch/Return/Halt/Invoke-Normal slice", flush=True)
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[2])
     parser.add_argument("--self-test", action="store_true")
+    parser.add_argument("--test-profile", choices=("full", "fast"), default="full")
     args = parser.parse_args()
     try:
         if args.self_test:
             detector_self_test()
             print("[architecture] PASS: detector fixtures", flush=True)
         else:
-            architecture_gate(args.root.resolve())
+            architecture_gate(args.root.resolve(), args.test_profile)
         return 0
     except GateFailure as exc:
         print(f"[architecture] FAIL: {exc}", file=sys.stderr, flush=True)

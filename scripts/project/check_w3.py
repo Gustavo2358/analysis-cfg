@@ -8,11 +8,11 @@ from check_w1 import ROOT, Failure, command
 
 PREFIX='io.github.gustavo2358.analysis.values.'
 QUERY_PREFIX='io.github.gustavo2358.analysis.query.'
-VALUE_NAMES='Candidates SupportSet PersistentBindings PossibleValuesState ValuesWork ValueUniverse TextProfile ValueFact PossibleValuesAnalysis'.split()
+VALUE_NAMES='Candidates SupportSet PersistentBindings PossibleValuesState ValuesWork ValueUniverse TextProfile ForeignEffectTransfer ValueFact PossibleValuesAnalysis'.split()
 QUERY_NAMES='ProgramPoint PointQuery ObservationBatch BatchReplayer'.split()
 VALUE_SOURCES={f'analysis-values/src/main/java/io/github/gustavo2358/analysis/values/{n}.java' for n in VALUE_NAMES}
 QUERY_SOURCES={f'analysis-kernel/src/main/java/io/github/gustavo2358/analysis/query/{n}.java' for n in QUERY_NAMES}
-INVENTORY='docs/evals/cp5/w3-inventory.json'
+INVENTORY='docs/evals/cp6/w1d-w3-inventory.json'
 TESTS={
 'SupportSourceTest':set('producerSurvivesBlocksAndStrongUpdateKillsOldSupport equalCandidateDiamondUnionsBothProducers entrySeedPremisesFollowValueAndAreKilledByAssignment entryUncertaintyOpensOnlyThatEntryWithoutChangingModel relevantAliasSourceGapCannotDisappearByQueryingExactAlias sourceGapDoesNotLeakFromOtherCellOrDependencyDimension candidateSupportsStayAssociatedWithTheirValue supportGrowthAtFixedValuePropagatesThroughCycle supportLatticeLawsAndStrongUpdatesRemainFinite sameCellInitialConditionsRetainBothPremises supportCardinalityPreservesAllEqualValueProducers'.split()),
 'DomainTest':set('missingStrongUpdateAndJoinHaveIndependentExpected finiteLatticeLawsAndAssignmentMonotonicity persistentUpdatesShareAndRetainNoHistory allFiniteCandidatesSurviveAndUnionConverges'.split()),
@@ -28,7 +28,9 @@ def verify_sources(root:Path)->None:
     actual={p.relative_to(root).as_posix() for p in (root/'analysis-values/src/main').rglob('*.java')}
     query={p.relative_to(root).as_posix() for p in (root/'analysis-kernel/src/main/java/io/github/gustavo2358/analysis/query').rglob('*.java')}
     from check_w4 import PROVIDER
-    if actual!=VALUE_SOURCES|{PROVIDER} or query!=QUERY_SOURCES:raise Failure('W3 exact source inventory mismatch')
+    from w1d_scope import NEW_VALUES, authorized
+    expected_sources=VALUE_SOURCES|{PROVIDER}|({NEW_VALUES} if authorized(root) else set())
+    if actual!=expected_sources or query!=QUERY_SOURCES:raise Failure('W3 exact source inventory mismatch')
     expected={('io.github.gustavo2358.analysis',n,'compile') for n in ['analysis-kernel','cfg-kernel']}|{('io.github.gustavo2358','air-java','compile'),('org.junit.jupiter','junit-jupiter','test')}
     if direct_dependencies(root/'analysis-values/pom.xml')!=expected:raise Failure('W3 direct Maven DAG mismatch')
     for path in VALUE_SOURCES|QUERY_SOURCES:

@@ -1,0 +1,68 @@
+name: Full Qualification
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qualification:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out analysis-cfg
+        uses: actions/checkout@v4
+        with:
+          path: analysis-cfg
+          fetch-depth: 0
+
+      - name: Check out pinned air-java source
+        uses: actions/checkout@v4
+        with:
+          repository: Gustavo2358/air-java
+          ref: 2a37f5e980ba25fdc79614a66030a84d8bf5b8c9
+          path: air-java
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verify pinned air-java checkout
+        working-directory: air-java
+        run: test "$(git rev-parse HEAD)" = "2a37f5e980ba25fdc79614a66030a84d8bf5b8c9"
+
+      - name: Check out read-only E2E frontend baseline
+        uses: actions/checkout@v4
+        with:
+          repository: Gustavo2358/proleap-poc
+          ref: 53d774026a1e4bcd969c7783a1d277aaa87b5f2f
+          path: proleap-poc
+          fetch-depth: 0
+
+      - name: Check out read-only E2E lowering baseline
+        uses: actions/checkout@v4
+        with:
+          repository: Gustavo2358/cobol-lower
+          ref: 9de3825da64898258e647727393f01b9e9198d9e
+          path: cobol-lower
+          fetch-depth: 0
+
+      - name: REMOTE_MANUAL_QUALIFICATION
+        working-directory: analysis-cfg
+        run: bash scripts/harness/check-qualification.sh --work .harness-results/qualification --maven-repo "${{ runner.temp }}/analysis-cfg-m2"
+
+      - name: Preserve full qualification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-qualification-evidence
+          path: analysis-cfg/.harness-results/qualification/evidence/
+          include-hidden-files: true
+          if-no-files-found: error

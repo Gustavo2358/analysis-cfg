@@ -78,6 +78,7 @@ class EvalCfg029Test {
             assertTrue(nodes.containsKey(t.from()));
             assertTrue(nodes.containsKey(t.to()));
             Arm arm = switch (t.kind()) {
+                case INVOKE_NORMAL -> throw new AssertionError("Invoke belongs to CP6 W1D");
                 case ENTRY -> Arm.ENTRY;
                 case BRANCH_TRUE -> Arm.TRUE;
                 case BRANCH_FALSE -> Arm.FALSE;

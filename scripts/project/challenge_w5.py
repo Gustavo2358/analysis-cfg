@@ -36,7 +36,7 @@ def hashes(root):
 def campaign(root,out,selected):
     out.mkdir(parents=True,exist_ok=False);original=hashes(root);receipt=dict(schema='w5-challenge-campaign',source_head=subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip(),source_sha256=original,attempts=[])
     env=dict(os.environ,W5_GOLDEN_RESULT=str(root/'docs/evals/cp5/w5-prepared.snapshot.json'))
-    selector=','.join(['BuildCfgContractTest','StructureTest','ValuesTest',*(t for suites in TESTS.values() for t in suites)])
+    selector=','.join(['BuildCfgContractTest','StructureTest','ValuesTest','NameInterpreterTest',*(t for suites in TESTS.values() for t in suites)])
     mvn=['mvn','-B','-ntp','-pl','analysis-launcher','-am']
     nominal=mvn+['test','-Dtest='+selector]
     def save(): (out/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')

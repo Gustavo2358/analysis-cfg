@@ -1,0 +1,4 @@
+CFG UNSUPPORTED_INPUT
+  projectionIssue=UNSUPPORTED_TERMINATOR subject=OperationId[unit=UnitId[publication=PublicationId[localId=546031713a32f5e94de399b0956fe488], localId=unit], localId=634d4a9c739693f77b9703bedae07d12]
+  SEMANTIC_OBLIGATION I-56 producer/authority must substantiate materialized signature, effects and outcomes; structural validation does not compare them with external semantics or a body
+  SEMANTIC_OBLIGATION I-23/I-56 unknown authority does not turn materialized effects or outcomes into empty facts

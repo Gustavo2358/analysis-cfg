@@ -1,0 +1,163 @@
+{
+  "baseline": "1ab16bdeae8d8af23e723d0b239ba191a695764a",
+  "wireRed": {
+    "exitCode": 1,
+    "tests": 5,
+    "failures": 3,
+    "errors": 0,
+    "skipped": 0
+  },
+  "wireGreen": {
+    "exitCode": 0,
+    "cfgTransportMethods": 42
+  },
+  "losslessLogs": {
+    "wire-red.log": {
+      "rawSha256": "9e5e0d0545a11f82b6477cfcbe8fe22e1136c5a1dde01fe4052a90657e42ed4b",
+      "gzipSha256": "089fd527b07c9f1a09b6716b03214481d5fab92bfc0e37b52f06e76124a339e0"
+    },
+    "wire-red.xml": {
+      "rawSha256": "f2af17eea821d2ce585e0901e7cd2ec31246d07b0d1fb0879e1db52284ee0155",
+      "gzipSha256": "dcb48707935c7a29728f1b80aeb09b26fc2819c2104e881565657983ac7e235c"
+    },
+    "wire-green.log": {
+      "rawSha256": "f3c1027da36e6ceb22b4a6cd82417e9aba791041431e3748f8d421e860e141bf",
+      "gzipSha256": "32c586d4f1ee55affa92ba6396d7e1a943dcb755ecd28dfbe808cef1feaa2584"
+    }
+  },
+  "fastAttempts": [
+    {
+      "attempt": "fast-1",
+      "authority": "FAST_CI",
+      "result": "FAIL",
+      "durationSeconds": 59.788,
+      "receiptSha256": "3a8a19c76c6038fdafce5bf840391d52cb4cbde4bac44e3ea580870e8035332d",
+      "archiveSha256": "4697a2b1bc12b2d0ddb74e8465c1d8c7057b73239beafd555e98be6d04828c70",
+      "reason": "Harness enum.name mutation anchor no longer matched the writer. The test now checks a unique current anchor; no guard was removed."
+    },
+    {
+      "attempt": "fast-2",
+      "authority": "FAST_CI",
+      "result": "PASS",
+      "durationSeconds": 245.893,
+      "receiptSha256": "a6f5ad67d2520623ac8bb8634c76d1a9982a0938f6dd9eefd85d671b7d332efe",
+      "archiveSha256": "ec3d7a21afdba0dabf326815d59466656edfbb5259e212e27543a0355b85d671"
+    }
+  ],
+  "versionChallenge": {
+    "originalSha256": "c87a9796b61360ee070f4d19042f0f6a5a6c8cc4597d1832f78dcd8718edab4e",
+    "mutants": [
+      {
+        "command": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "cfg-adapters",
+          "-am",
+          "test",
+          "-Dtest=BuildCfgContractTest,W1dInvokeWireTest"
+        ],
+        "exitCode": 1,
+        "log": "force-v1.log",
+        "logSha256": "26b7389fd79f6939ca9cfa9e95f66399f20af8d2ece311f729d7cdc266a7b963",
+        "tests": 5,
+        "failures": 3,
+        "errors": 0,
+        "skipped": 0,
+        "compileError": false,
+        "name": "force-v1",
+        "mutatedSha256": "4ff618cb36206d5e4c6c7495fe5f38d45ed18880a6cac1cfc59dd90473d43022",
+        "byteExactRestore": true
+      },
+      {
+        "command": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "cfg-adapters",
+          "-am",
+          "test",
+          "-Dtest=BuildCfgContractTest,W1dInvokeWireTest"
+        ],
+        "exitCode": 1,
+        "log": "force-v2.log",
+        "logSha256": "2cfa3e3007c927851c0da08062c4f8ead1cf84b09cc1e4f4595b2a990b399018",
+        "tests": 5,
+        "failures": 3,
+        "errors": 0,
+        "skipped": 0,
+        "compileError": false,
+        "name": "force-v2",
+        "mutatedSha256": "8b50d669d35a549d57c6a44fc5761b906450dac7b19a5d9d839463b6161e5057",
+        "byteExactRestore": true
+      },
+      {
+        "command": [
+          "mvn",
+          "-B",
+          "-ntp",
+          "-pl",
+          "cfg-adapters",
+          "-am",
+          "test",
+          "-Dtest=BuildCfgContractTest,W1dInvokeWireTest"
+        ],
+        "exitCode": 1,
+        "log": "invoke-as-jump.log",
+        "logSha256": "e174d10f004623e33c1ba1bdc60f9e7b1e0486a2ed8c0c73611d6848aad968e1",
+        "tests": 5,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "compileError": false,
+        "name": "invoke-as-jump",
+        "mutatedSha256": "6ffa517314b53065f00ee3c270589cf7580c99e87cdf8a3144ec8f43a48a9351",
+        "byteExactRestore": true
+      }
+    ],
+    "firstGreen": {
+      "command": [
+        "mvn",
+        "-B",
+        "-ntp",
+        "-pl",
+        "cfg-adapters",
+        "-am",
+        "test",
+        "-Dtest=BuildCfgContractTest,W1dInvokeWireTest"
+      ],
+      "exitCode": 0,
+      "log": "first-green.log",
+      "logSha256": "d0026892664aafae71fe72e2a222070e1d44b61efa25e17b850bf7206582778a",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "compileError": false
+    },
+    "secondGreen": {
+      "command": [
+        "mvn",
+        "-B",
+        "-ntp",
+        "-pl",
+        "cfg-adapters",
+        "-am",
+        "test",
+        "-Dtest=BuildCfgContractTest,W1dInvokeWireTest"
+      ],
+      "exitCode": 0,
+      "log": "second-green.log",
+      "logSha256": "aeed04666f8c732cdd06c28556a75e40d2570df93454f63b3235863bfb0e5723",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "compileError": false
+    },
+    "result": "PASS",
+    "restoredSha256": "c87a9796b61360ee070f4d19042f0f6a5a6c8cc4597d1832f78dcd8718edab4e"
+  }
+}

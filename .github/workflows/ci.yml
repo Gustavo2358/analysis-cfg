@@ -1,4 +1,4 @@
-name: Core CFG checks
+name: Fast PR CI
 
 on:
   push:
@@ -8,7 +8,7 @@ permissions:
   contents: read
 
 jobs:
-  boundary:
+  fast:
     runs-on: ubuntu-latest
     steps:
       - name: Check out analysis-cfg
@@ -21,7 +21,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: Gustavo2358/air-java
-          ref: 3bafe3978f0f392e842038ad5628e85dfd91d00d
+          ref: 2a37f5e980ba25fdc79614a66030a84d8bf5b8c9
           path: air-java
 
       - name: Set up Java 21
@@ -30,24 +30,14 @@ jobs:
           distribution: temurin
           java-version: "21"
 
-      - name: Check out read-only E2E frontend baseline
-        uses: actions/checkout@v4
-        with:
-          repository: Gustavo2358/proleap-poc
-          ref: 8722945cc4cd2052c6091533f6ee6989278aa2f8
-          path: proleap-poc
-
-      - name: Check out read-only E2E lowering baseline
-        uses: actions/checkout@v4
-        with:
-          repository: Gustavo2358/cobol-lower
-          ref: 18016f16b4f63149eb1bb4ca13db7e12593d8909
-          path: cobol-lower
-
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+
+      - name: Verify pinned air-java checkout
+        working-directory: air-java
+        run: test "$(git rev-parse HEAD)" = "2a37f5e980ba25fdc79614a66030a84d8bf5b8c9"
 
       - name: Record actual CI source checkout
         working-directory: analysis-cfg
@@ -61,95 +51,15 @@ jobs:
           path: analysis-cfg/.harness-results/ci-source-receipt.json
           if-no-files-found: error
 
-      - name: Verify pinned air-java checkout
-        working-directory: air-java
-        run: test "$(git rev-parse HEAD)" = "3bafe3978f0f392e842038ad5628e85dfd91d00d"
-
-      - name: Install pinned air-java SNAPSHOT
-        working-directory: air-java
-        env:
-          MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2
-        run: mvn -B -ntp clean install
-
-      - name: Record exact upstream tree and installed JAR provenance
+      - name: FAST_CI
         working-directory: analysis-cfg
-        run: python3 -B scripts/project/record_air_dependency.py --checkout ../air-java --built-source ../air-java --maven-repo "${{ runner.temp }}/analysis-cfg-m2" --output .harness-results/air-dependency-receipt.json
+        run: bash scripts/harness/check-pr-fast.sh --work .harness-results/fast-ci --maven-repo "${{ runner.temp }}/analysis-cfg-m2"
 
-      - name: Check documentation and harness
-        working-directory: analysis-cfg
-        run: bash scripts/harness/check-fast.sh
-
-      - name: Build isolated E2E producer snapshots
-        working-directory: analysis-cfg
-        env:
-          MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2
-        run: python3 -B scripts/project/prepare_w5_producers.py --work "${{ runner.temp }}/w5-producers"
-
-      - name: Check baseline scope and exact manifest
-        working-directory: analysis-cfg
-        run: python3 -B scripts/project/check_scope.py
-
-      - name: Check Java architecture boundary
-        working-directory: analysis-cfg
-        env:
-          MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2
-        run: bash scripts/harness/check-architecture.sh
-
-      - name: Check CFG-FIRST, linear, Branch and projection policy oracles
-        working-directory: analysis-cfg
-        env:
-          MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2
-        run: bash scripts/harness/check-semantic.sh
-
-      - name: Check real AIR file to CFG JSON integration
-        working-directory: analysis-cfg
-        env:
-          MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2
-          W5_PRODUCERS: ${{ runner.temp }}/w5-producers/producers.json
-        run: bash scripts/harness/check-integration.sh
-
-      - name: Check CP5 W1 structural semantics and performance
-        working-directory: analysis-cfg
-        env:
-          MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2
-        run: python3 -B scripts/project/check_cp5_gate.py performance --wave 1
-
-      - name: Check CP5 W2 solver oracles and performance
-        working-directory: analysis-cfg
-        env:
-          MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2
-        run: python3 -B scripts/project/check_cp5_gate.py performance --wave 2
-
-      - name: Check CP5 W3 values, point queries and performance
-        working-directory: analysis-cfg
-        env:
-          MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2
-        run: python3 -B scripts/project/check_cp5_gate.py performance --wave 3
-
-      - name: Check CP5 W4 shared planning, consumers and performance
-        working-directory: analysis-cfg
-        env:
-          MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2
-        run: python3 -B scripts/project/check_cp5_gate.py performance --wave 4
-
-      - name: Check CP5 W5 production, delivery, scale and quality
-        working-directory: analysis-cfg
-        env:
-          MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2
-        run: python3 -B scripts/project/check_cp5_gate.py performance --wave 5
-
-      - name: Check full W1–W5 regression on the new upstream
-        working-directory: analysis-cfg
-        env:
-          MAVEN_OPTS: -Dmaven.repo.local=${{ runner.temp }}/analysis-cfg-m2
-          W5_PRODUCERS: ${{ runner.temp }}/w5-producers/producers.json
-        run: bash scripts/harness/check-full.sh
-
-      - name: Preserve W5 execution evidence
+      - name: Preserve Fast CI evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: w5-execution-evidence
-          path: analysis-cfg/.harness-results/
+          name: fast-ci-evidence
+          path: analysis-cfg/.harness-results/fast-ci/evidence/
           include-hidden-files: true
           if-no-files-found: error

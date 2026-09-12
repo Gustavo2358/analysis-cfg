@@ -344,8 +344,40 @@ class HarnessGuardTests(unittest.TestCase):
         from check_transport_architecture import verify_transport_shape
         from check_architecture import GateFailure
         path = self.root / 'cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter.java'
-        path.write_text(path.read_text().replace('out.string(transitionKind(transition.kind()))', 'out.string(transition.kind().name())'))
+        original = path.read_text()
+        anchor = 'out.string(transitionKind(transition.kind()).token)'
+        self.assertEqual(1, original.count(anchor), 'enum-name mutation must actually change the writer')
+        path.write_text(original.replace(anchor, 'out.string(transition.kind().name())'))
         with self.assertRaises(GateFailure): verify_transport_shape(self.root)
+
+
+    def test_48_qualification_exports_are_not_reactor_sources(self):
+        sys.path.insert(0, str(ROOT / 'scripts/project'))
+        from check_architecture import verify_project_shape
+        for output in ('.harness-results/fast/build', '.cache/qualification'):
+            parent = self.root / output / 'air-java'
+            source = parent / 'src/main/java/example/External.java'
+            source.parent.mkdir(parents=True)
+            source.write_text('package example; class External {}')
+            (parent / 'pom.xml').write_text('<project><!-- --enable-preview --></project>')
+        verify_project_shape(self.root)
+
+    def test_49_unregistered_reactor_source_is_still_rejected(self):
+        sys.path.insert(0, str(ROOT / 'scripts/project'))
+        from check_architecture import verify_project_shape, GateFailure
+        path = self.root / 'cfg-kernel/src/main/java/Unexpected.java'
+        path.write_text('class Unexpected {}')
+        with self.assertRaises((GateFailure, ValueError)):
+            verify_project_shape(self.root)
+
+    def test_50_nested_output_name_cannot_hide_reactor_source(self):
+        sys.path.insert(0, str(ROOT / 'scripts/project'))
+        from check_architecture import verify_project_shape, GateFailure
+        path = self.root / 'cfg-kernel/src/main/java/.harness-results/Unexpected.java'
+        path.parent.mkdir(parents=True)
+        path.write_text('class Unexpected {}')
+        with self.assertRaises(GateFailure):
+            verify_project_shape(self.root)
 
 
 class PinnedCacheTests(unittest.TestCase):

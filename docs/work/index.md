@@ -1,8 +1,10 @@
 # Trabalho
 
+[WORK-CFG-033](active/WORK-CFG-033/work-item.json): CP6 W1D e CP6 W1 IMPLEMENTED / AWAITING_HUMAN_REVIEW. Discovery and W1A–W1C APPROVED / MERGED per current human authority; historical discovery records below retain their original state. W2 NOT_STARTED / NOT_AUTHORIZED.
+
 CP5 = APPROVED / MERGED / CLOSED. The verified frozen component authorities are synchronized. Final source/artifact identity is recorded by the post-merge protocol in `artefatos-e2e/pre-cp6-baseline/receipt.json` in the workspace.
 
-[WORK-CFG-032](active/WORK-CFG-032/work-item.json): CP6 discovery DISCOVERY_COMPLETE / AWAITING_HUMAN_REVIEW, sobre o baseline congelado. CP6 implementation = NOT_STARTED / NOT_AUTHORIZED. O registro CP6 em cp5-lifecycle.json é o closeout congelado anterior; a autorização atual de discovery vive neste work item. Nenhuma implementação de Invoke, CALL lowering ou CallResolver.
+[WORK-CFG-032](history/WORK-CFG-032.md): discovery APPROVED / MERGED. O lifecycle CP5 conserva o closeout anterior; a autorização de implementação vigente é a W1D em WORK-CFG-033.
 
 ## Itens concluídos
 

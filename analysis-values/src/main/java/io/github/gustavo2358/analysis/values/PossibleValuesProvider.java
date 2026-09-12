@@ -15,7 +15,10 @@ public final class PossibleValuesProvider implements AnalysisProvider<ObjectId,V
     public static final String PRECISION = "FINITE_PROGRAM_TEXT_VALUES";
     public static final String PROJECTION = "ValueFact@1";
     public static AnalysisKey key(EntryId entry) {
-        return new AnalysisKey(IMPLEMENTATION,VERSION,PossibleValuesAnalysis.PROFILE,Direction.FORWARD,PRECISION,Map.of(),entry);
+        return key(entry,PossibleValuesAnalysis.PROFILE);
+    }
+    public static AnalysisKey key(EntryId entry,String profile) {
+        return new AnalysisKey(IMPLEMENTATION,VERSION,profile,Direction.FORWARD,PRECISION,Map.of(),entry);
     }
     public static ObservationBatchId<ObjectId,ValueFact> batch(String id, AnalysisKey key) {
         return new ObservationBatchId<>(id,key,PROJECTION,ObjectId.class,ValueFact.class);
@@ -25,7 +28,7 @@ public final class PossibleValuesProvider implements AnalysisProvider<ObjectId,V
     public Set<String> semanticOptionNames() { return Set.of(); }
     public boolean supports(AnalysisKey key) {
         return key.implementation().equals(IMPLEMENTATION) && key.version().equals(VERSION)
-            && key.profile().equals(PossibleValuesAnalysis.PROFILE) && key.direction() == Direction.FORWARD
+            && (key.profile().equals(PossibleValuesAnalysis.PROFILE)||key.profile().equals(PossibleValuesAnalysis.EFFECTS_PROFILE)) && key.direction() == Direction.FORWARD
             && key.precisionPolicy().equals(PRECISION) && key.options().isEmpty();
     }
     public String projection() { return PROJECTION; }
@@ -37,7 +40,7 @@ public final class PossibleValuesProvider implements AnalysisProvider<ObjectId,V
     public Prepared<ObjectId,ValueFact> prepare(AnalysisSession owner, AnalysisKey key) {
         if (!supports(key)) throw new IllegalArgumentException("unsupported PossibleValues key");
         var scoped = owner.selectEntries(List.of(key.entry()));
-        var admission = PossibleValuesAnalysis.prepare(scoped);
+        var admission = PossibleValuesAnalysis.prepare(scoped,key.profile());
         return new Prepared<>() {
             public AnalysisKey key() { return key; }
             public AnalysisOutcome refusal() {

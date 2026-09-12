@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+exec java -cp "$ROOT/analysis-launcher/target/classes:$ROOT/analysis-launcher/target/dependency/*" \
+  io.github.gustavo2358.analysis.launcher.AnalysisDependencies "$@"

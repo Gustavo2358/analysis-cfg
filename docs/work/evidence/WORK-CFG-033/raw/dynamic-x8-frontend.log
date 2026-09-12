@@ -1,0 +1,9 @@
+2026-09-11T17:19:43.441-03:00 level=INFO logger=i.g.g.cobolexplorer.ExplorerMain thread=main runId=3cc33bfd-591e-4a8f-a6d6-b673b0111313 source=dynamic-x8.cbl programUnit=none event=analysis_started phase=ANALYSIS output=/home/gustavo/workspace/teste-e2e/.cp6-w1d/red-vertical/dynamic-x8
+2026-09-11T17:19:44.134-03:00 level=WARN logger=i.g.g.cobolexplorer.ExplorerMain thread=main runId=3cc33bfd-591e-4a8f-a6d6-b673b0111313 source=dynamic-x8.cbl programUnit=CALLER event=analysis_degraded phase=REFERENCE_RESOLUTION gaps=1 blockingReasons=[DYNAMIC_CALL_TARGET_VALUE_UNKNOWN] reason=RESOLUTION_GAPS fallback=RESULT_PUBLISHED_WITH_GAPS impact=DEPENDENCY_ANALYSIS_NOT_READY statusCounts={RESOLVED=2, AMBIGUOUS=0, EXTERNAL_OBSERVED=0, UNSUPPORTED=0, UNRESOLVED=0}
+Generated /home/gustavo/workspace/teste-e2e/.cp6-w1d/red-vertical/dynamic-x8/index.html, /home/gustavo/workspace/teste-e2e/.cp6-w1d/red-vertical/dynamic-x8/ast.html, /home/gustavo/workspace/teste-e2e/.cp6-w1d/red-vertical/dynamic-x8/symbols.html and /home/gustavo/workspace/teste-e2e/.cp6-w1d/red-vertical/dynamic-x8/resolution.html
+Source: dynamic-x8.cbl
+Parse tree: 81 nodes | 45 tokens | depth 15
+AST: 17 nodes | depth 5 | literal-target CALLs 0
+Symbols: 2 declarations | 8 scopes | 0 diagnostics | parser errors 0
+Reference binding: 2 entries | 1 gaps | dependency analysis ready: false
+2026-09-11T17:19:44.136-03:00 level=INFO logger=i.g.g.cobolexplorer.ExplorerMain thread=main runId=3cc33bfd-591e-4a8f-a6d6-b673b0111313 source=dynamic-x8.cbl programUnit=CALLER event=analysis_completed phase=ANALYSIS elapsedMs=709 programUnits=1 references=2 gaps=1 dependencyAnalysisReady=false output=/home/gustavo/workspace/teste-e2e/.cp6-w1d/red-vertical/dynamic-x8

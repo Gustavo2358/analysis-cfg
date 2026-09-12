@@ -31,7 +31,7 @@ def campaign(out):
     out.mkdir(parents=True,exist_ok=False)
     originals={p:(ROOT/p).read_bytes() for p in PRODUCTION}
     record={'schema':'resource-limit-mutations','source_head':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'original_sha256':{p:sha(b) for p,b in originals.items()},'attempts':[]}
-    selector='CfgBuildCoordinatorTest,EvalCfg030Test,CompositionTest,DataflowCliTest,BuildCfgContractTest,StructureTest,ValuesTest,WireTest'
+    selector='CfgBuildCoordinatorTest,EvalCfg030Test,CompositionTest,DataflowCliTest,BuildCfgContractTest,StructureTest,ValuesTest,NameInterpreterTest,WireTest'
     maven=['mvn','-B','-ntp','-pl','analysis-launcher','-am']
     def execute(folder,phase,argv):
         run=subprocess.run(argv,cwd=ROOT,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)

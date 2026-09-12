@@ -20,11 +20,13 @@ TESTS={
 DENIED=('java.lang.reflect','java.util.ServiceLoader','cobolexplorer','org.antlr','lower.adapters','CallResolver','FileResolver','Db2Resolver','CicsResolver','GrbeResolver','ProgramDependency','CfgJsonWriter','CfgJsonBytes')
 POM_ADDITION=b'    <module>analysis-dataflow</module>\n    <module>analysis-adapters</module>\n    <module>analysis-launcher</module>\n'
 def original_pom(data):
+    data=data.replace(b'    <module>analysis-dependencies</module>\n',b'',1)
     if data.count(POM_ADDITION)!=1:raise Failure('W5 parent POM only exact additive modules allowed')
     return data.replace(POM_ADDITION,b'',1)
 def verify_sources(root):
     actual={p.relative_to(root).as_posix() for m in MODULES for p in (root/m/'src/main/java').rglob('*.java')}
-    if actual!=SOURCES:raise Failure('W5 exact production source inventory')
+    from w1d_scope import NEW_W5, authorized
+    if actual!=SOURCES|(NEW_W5 if authorized(root) else set()):raise Failure('W5 exact production source inventory')
     for path in SOURCES:
         s=(root/path).read_text()
         if any(x in s for x in DENIED):raise Failure('W5 forbidden dependency: '+path)
@@ -67,7 +69,7 @@ def architecture(root,update=False):
         cp=(root/module/'target/architecture-classpath.txt').read_text().strip()
         raw=capture(root,['jdeps','--multi-release','21','-filter:none','-verbose:class','-cp',cp,str(root/module/'target/classes')])
         if any('io.github.gustavo2358.analysis.'+p in raw for p in ('dataflow.','adapters.','launcher.')):raise Failure('W5 dependency inverted into '+module)
-    path=root/'docs/evals/resource-limit-w5-inventory.json'
+    path=root/'docs/evals/cp6/w1d-w5-inventory.json'
     if update:path.write_text(json.dumps(actual,indent=2)+'\n')
     elif load(path)!=json.loads(json.dumps(actual)):raise Failure('W5 compiled inventory drift')
     print('[w5-architecture] PASS: explicit source/classfile/javap/jdeps/Maven inventories; inner direction preserved')
@@ -101,7 +103,7 @@ def run(root,category,update=False):
     verify_sources(root)
     if category=='architecture':
         command(root,['mvn','-B','-ntp','-DskipTests','package','org.apache.maven.plugins:maven-dependency-plugin:3.8.1:tree','-Dscope=compile','-DoutputType=tgf','-DoutputFile=target/architecture-dependencies.tgf','org.apache.maven.plugins:maven-dependency-plugin:3.8.1:build-classpath','-DincludeScope=compile','-Dmdep.outputFile=target/architecture-classpath.txt']);architecture(root,update);return
-    expected=test_inventory(category);selector=','.join(['BuildCfgContractTest','StructureTest','ValuesTest',*(t for suites in expected.values() for t in suites)])
+    expected=test_inventory(category);selector=','.join(['BuildCfgContractTest','StructureTest','ValuesTest','NameInterpreterTest',*(t for suites in expected.values() for t in suites)])
     output=command(root,['mvn','-B','-ntp','-pl','analysis-launcher','-am','clean','package','-Dtest='+selector,'org.apache.maven.plugins:maven-dependency-plugin:3.8.1:build-classpath','-DincludeScope=runtime','-Dmdep.outputFile=target/runtime-classpath.txt']);verify_reports(root,expected)
     command(root,[sys.executable,'-B','scripts/project/test_result_wire.py'])
     command(root,[sys.executable,'-B','scripts/project/result_wire.py','analysis-adapters/target/w5-cases/unsupported-profile.json'])

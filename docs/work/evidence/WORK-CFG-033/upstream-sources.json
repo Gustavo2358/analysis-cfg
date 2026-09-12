@@ -1,0 +1,26 @@
+{
+  "proleap-poc": {
+    "sha": "53d774026a1e4bcd969c7783a1d277aaa87b5f2f",
+    "tree": "a43f0fc4ef8a227d47f012b9fcb4e410842ffcc0",
+    "checkoutHead": "bd6dd1c49bd724899a599beeff7dd3cb66d0f879",
+    "checkoutStatus": ""
+  },
+  "air-java": {
+    "sha": "2a37f5e980ba25fdc79614a66030a84d8bf5b8c9",
+    "tree": "8d248f4ccf207eb7b609aa9ff0cdbcd512e526c8",
+    "checkoutHead": "09560ee9bf288ea4a3e8464f9dcac952dace6506",
+    "checkoutStatus": ""
+  },
+  "cobol-lower": {
+    "sha": "9de3825da64898258e647727393f01b9e9198d9e",
+    "tree": "2e3027df2fc4f9e550df8df9518e7e80f89324f1",
+    "checkoutHead": "7df2989d8d02c13552645386bbd963de00c7b4b4",
+    "checkoutStatus": ""
+  },
+  "analysis-ir": {
+    "sha": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+    "tree": "11b2361a40cb5ae9b6c201f0157f30ef2387d1b8",
+    "checkoutHead": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+    "checkoutStatus": ""
+  }
+}

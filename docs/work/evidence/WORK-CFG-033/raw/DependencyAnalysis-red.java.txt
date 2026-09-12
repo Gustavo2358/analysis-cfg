@@ -1,0 +1,10 @@
+package io.github.gustavo2358.analysis.dependencies;
+
+import io.github.gustavo2358.air.model.Publication;
+
+/** CP6 W1D application boundary. */
+public final class DependencyAnalysis {
+    public DependencyResult prepare(Publication publication) {
+        throw new UnsupportedOperationException("dependency consumer/output not implemented");
+    }
+}

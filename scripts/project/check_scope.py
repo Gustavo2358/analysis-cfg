@@ -9,10 +9,22 @@ BASE_TREE='0de533bcabd868e2ee18686a9cdd265973408f75'
 BASELINE='docs/work/evidence/WORK-CFG-030/baseline.json'
 def git(*args):return subprocess.check_output(['git',*args],cwd=ROOT)
 def files():return sorted({p for p in git('ls-files','-z','--cached','--others','--exclude-standard').decode().split('\0') if p and p!='MANIFEST.sha256' and (ROOT/p).is_file()})
-def manifest():return ('# SHA-256 do closeout CP5 e sincronização de baseline; exclui este manifesto e artefatos ignorados.\n'+''.join(sha((ROOT/p).read_bytes())+'  '+p+'\n' for p in files())).encode()
+def manifest():return ('# SHA-256 da entrega analysis-cfg; exclui este manifesto e artefatos ignorados.\n'+''.join(sha((ROOT/p).read_bytes())+'  '+p+'\n' for p in files())).encode()
 def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--update-manifest',action='store_true');args=parser.parse_args()
     try:
+        from w1d_scope import authorized, protections, verify
+        if authorized(ROOT):
+            protections(ROOT);verify(ROOT)
+            changed=set(git('diff','--name-only','c39a92f930b1c693857a0b30a1f5155f3f81520c').decode().splitlines())|set(git('ls-files','--others','--exclude-standard').decode().splitlines())
+            for p in changed:
+                if p not in {'ARCHITECTURE.md','MANIFEST.sha256','pom.xml','.github/workflows/ci.yml','.github/workflows/qualification.yml'} and not p.startswith(('docs/','scripts/','analysis-','cfg-')):raise ValueError('path outside W1D scope: '+p)
+            expected=manifest()
+            if args.update_manifest:(ROOT/'MANIFEST.sha256').write_bytes(expected)
+            elif (ROOT/'MANIFEST.sha256').read_bytes()!=expected:raise ValueError('delivery manifest mismatch; review diff before --update-manifest')
+            git('diff','--check','c39a92f930b1c693857a0b30a1f5155f3f81520c')
+            print('[scope/manifest] PASS: exact W1D delta; protected historical evidence, solver, lattice and DefaultValuePlan')
+            return 0
         git('merge-base','--is-ancestor',BASE,'HEAD')
         if git('rev-parse',BASE+'^{tree}').decode().strip()!=BASE_TREE:raise ValueError('approved post-CP5 tree mismatch')
         b=json.loads((ROOT/BASELINE).read_text())

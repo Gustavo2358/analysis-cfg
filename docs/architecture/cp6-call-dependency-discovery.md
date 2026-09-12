@@ -1,7 +1,9 @@
 # CP6 — dynamic COBOL CALL dependency discovery
 
+> Registro histórico: discovery APPROVED / MERGED. O conteúdo abaixo preserva o diagnóstico do baseline anterior. A implementação W1D tem [contrato próprio](analysis-dependency-result-v1.md).
+
 **DISCOVERY / NOT IMPLEMENTED — DISCOVERY_COMPLETE / AWAITING_HUMAN_REVIEW.**
-Work item: [WORK-CFG-032](../work/active/WORK-CFG-032/work-item.json).
+Work item: [WORK-CFG-032](../work/history/WORK-CFG-032/work-item.json).
 Implementação: **NOT_STARTED / NOT_AUTHORIZED**. Este documento propõe responsabilidades
 e critérios de aceite; não congela APIs, perfis, wire formats nem decisões de implementação.
 

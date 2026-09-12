@@ -1,0 +1,386 @@
+{
+  "analysis-adapters": {
+    "io.github.gustavo2358.analysis.adapters.DeliveryTest": [
+      "resourceExhaustionIsNotACompletedOrSemanticDeliveryOutcome",
+      "completeReceiptBindsExactFinalBytesAndReplacesExistingAtomically",
+      "controlledFailuresPreservePreparedResultAndExistingDestination"
+    ],
+    "io.github.gustavo2358.analysis.adapters.W1dAdversarialTest": [
+      "orphanLiteralAndComputedEmitSiteWithoutExecutableEdge",
+      "wrongNamespaceAndCategoryAreNotProgramDependencies",
+      "noncanonicalLiteralPreservesRawAndOpensInterpretation",
+      "unsupportedComputedExpressionIsDiagnosticNotInventedLiteral",
+      "finiteNonNormalOutcomesAreExplicitlyRefused",
+      "explicitContinuationSurvivesPhysicalPermutationAndDecoy",
+      "sharedAndRepeatedQueriesExecuteOneValuesRun",
+      "literalPlannerHasZeroValuesDependenciesAndNoValuesProviderInstalled",
+      "strictWireInputsAreWrittenForIndependentParserAndOriginAudit"
+    ],
+    "io.github.gustavo2358.analysis.adapters.W1dBoundaryTest": [
+      "realDynamicInvokeHasTypedLocalNormalAndOriginalAir",
+      "oldValuesProfileStillRefusesRealInvoke",
+      "literalRetainsLiteralWithoutFakeObjectOrAssign"
+    ],
+    "io.github.gustavo2358.analysis.adapters.W1dDependencyTest": [
+      "rawValueExistsButDependencyMustBeProduced",
+      "literalHasNoPossibleValuesPreparationOrRun",
+      "noMoveIsReachableOpenWithoutInventedProgram"
+    ],
+    "io.github.gustavo2358.analysis.adapters.W1dEffectsTest": [
+      "beforeRealInvokeIsClosedPaddedValueWithAssignSupport",
+      "mayWritePreservesCandidateAndOpensNormalContinuation",
+      "loopBeforeInvokeContainsPreviousEffectAtFixpoint",
+      "explicitNoMemoryDoesNotOpenLoopValue",
+      "profilesAreDistinctAndUnknownProfileIsRejected",
+      "perOutcomeEffectsAreExplicitlyUnsupported",
+      "narrowerMemoryScopeIsRefusedRatherThanSilentlyIgnored",
+      "mustOverwriteOutsideSliceHasExplicitRefusal"
+    ],
+    "io.github.gustavo2358.analysis.adapters.W1dModelTest": [
+      "joinKeepsDifferentCandidatesAndTheirSpecificAssignments",
+      "targetObjectIdentityIsNotFirstObjectInUnit",
+      "allMemoryOpensEveryModeledCellWhileNoMemoryPreservesThem"
+    ],
+    "io.github.gustavo2358.analysis.adapters.WireAdversarialTest": [
+      "unavailableBatchRetainsItsExplicitDependencyReason",
+      "distinctCandidatesKeepTheirOwnProducerSupport",
+      "permutedInputRegistrationQueriesCandidatesSupportsAndFactsAreByteStable",
+      "fullIdentitySeparatesOwnersEvenWhenLocalIdsCollide",
+      "unsupportedAndUnreachableHaveDifferentExplicitNullSemantics",
+      "invalidUnicodeIsEncodingFailureAndDoesNotCertifyDelivery"
+    ],
+    "io.github.gustavo2358.analysis.adapters.WireTest": [
+      "realValueSupportAndSourceRemainderReachWire"
+    ]
+  },
+  "analysis-dataflow": {
+    "io.github.gustavo2358.analysis.dataflow.CompositionTest": [
+      "genericOverwriteUsesRealPipelineAndLastProducer",
+      "noWritesProducesCompleteWithoutInventedStableRun",
+      "everyTerminatorAndOrphanAreObservedBefore",
+      "resourcePreflightNeverProducesSemanticResultAndRecovers",
+      "incompleteAndLegacyPreparationFailuresRemainDistinct"
+    ]
+  },
+  "analysis-dependencies": {
+    "io.github.gustavo2358.analysis.dependencies.NameInterpreterTest": [
+      "canonicalSubsetAndOnlyComputedTrailingSpaces",
+      "unsupportedRuntimeTransformationsRemainOpen"
+    ]
+  },
+  "analysis-kernel": {
+    "io.github.gustavo2358.analysis.solver.OracleTest": [
+      "generatedForwardBackwardCorpusMatchesIndependentOraclesAndSchedules",
+      "backwardAnchorsAndReverseOperationOrderAreObservable",
+      "monotoneButWrongSharedTransferIsRejectedByConcreteInclusion",
+      "alwaysTopPassesInclusionButFailsMinimumPrecision",
+      "validForwardTransferPassesConcreteAndPrecisionOracle",
+      "distinctContextsRemainIsolatedAndUnselectedEntriesCreateNoPoints",
+      "finiteDomainLawsAndNonIdempotentBlockTransfer"
+    ],
+    "io.github.gustavo2358.analysis.solver.SolverPropertiesTest": [
+      "firstBottomPublicationAndExitlessSccAreProcessed",
+      "selfLoopReenqueuesAfterMembershipIsCleared",
+      "multipleBoundariesJoinOnceOnCorrectSideInBothDirections",
+      "coalescedArrivalsSuppressDuplicateEnqueueAndSubsumedJoins",
+      "equivalentFreshRootsStopPropagationAndKeepPublishedRoot",
+      "failuresExposeNoStableResultAndForeignBoundaryIsRejected",
+      "emptySelectionIsStableWithoutPhantomStates"
+    ],
+    "io.github.gustavo2358.analysis.solver.SolverTest": [
+      "forwardBoundaryBlockAndEdgeHaveProgramOrderMeaning"
+    ],
+    "io.github.gustavo2358.analysis.structure.AdmissionTest": [
+      "realBuildIsAccepted",
+      "missingBranchEdgeIsInvalid",
+      "missingOrphanIsInvalid",
+      "equalLookingReplacementSequenceIsInvalid",
+      "equalLookingForeignSnapshotIsInvalid",
+      "equalLookingForeignEntrySelectionIsInvalid",
+      "duplicateAndWrongContextEdgesAreInvalid",
+      "missingEntryExitHaltAndReplacedHaltAreInvalid",
+      "foreignEntryNodeAndDuplicateSequenceRoleAreInvalid",
+      "unsupportedProfileAndPolicyMismatchHaveDistinctTaxonomy",
+      "incompleteUpstreamValidationDoesNotBecomeSemanticSizeOutcome"
+    ],
+    "io.github.gustavo2358.analysis.structure.StructureTest": [
+      "offsetsBucketsAndPayloadAreCanonical",
+      "multipleEntriesKeepEntryReturnAndContextSeparate",
+      "sameTargetBranchKeepsTwoOutcomesAndBackwardEdges",
+      "orphanIsIndexedWithoutInventedReachability",
+      "sparseNodeIdsRoundTripWithoutDensePublicAssumption",
+      "fullOwnersAndDisplayRenamingDoNotCollide",
+      "physicalOrderDoesNotDefineControlAndSameSnapshotIsDeterministic",
+      "emptySelectionCreatesNoContextsAndForeignHandleIsRejected",
+      "cycleAndSelfLoopKeepLiteralControl"
+    ]
+  },
+  "analysis-launcher": {
+    "io.github.gustavo2358.analysis.launcher.DataflowCliTest": [
+      "defaultCodecAcceptsBeyondHistoricalCapWithoutLocalReadAdmission",
+      "fileRouteMatchesInMemoryAndReceiptIsSeparate",
+      "usageMalformedMissingAndOutputFailuresAreDistinct",
+      "realCodecResourceLimitStopsBeforeDeliveryAndRecovers"
+    ],
+    "io.github.gustavo2358.analysis.launcher.DependencyCliTest": [
+      "successReplacesExistingFileAndMatchesMemoryExactly",
+      "inputAndOutputFailuresPreserveDestinationAndCleanupTemporaryFile",
+      "realCodecOperationalLimitIsSevenAndProducesNoPartialResult",
+      "cfgAndAnalysisUnsupportedHaveDifferentExitsAndNoPartialOutput"
+    ]
+  },
+  "analysis-values": {
+    "io.github.gustavo2358.analysis.values.DomainTest": [
+      "missingStrongUpdateAndJoinHaveIndependentExpected",
+      "finiteLatticeLawsAndAssignmentMonotonicity",
+      "persistentUpdatesShareAndRetainNoHistory",
+      "allFiniteCandidatesSurviveAndUnionConverges"
+    ],
+    "io.github.gustavo2358.analysis.values.PlanningContractTest": [
+      "completeSemanticKeyIdentityAndOrderingCannotCollide",
+      "distinctProfilesOptionsAndEntriesRunSeparatelyWithNoPhantomContext",
+      "differentSessionsCannotShareRunsOrPlansEvenWithEqualIds",
+      "registrationInterestAndQueryOrderHaveDeterministicPlansAndFacts",
+      "overlappingInterestsDispatchOnlyExactPairsAndKeepStructuralPresence",
+      "batchesWithSameIdCannotAliasDifferentKeys",
+      "perSiteQueriesAreCompiledBeforeExecutionAndDependenciesAreExplicit",
+      "modelCandidatesSupportsAndPremisesRemainAbstractAtConsumerBoundary"
+    ],
+    "io.github.gustavo2358.analysis.values.PlanningRuntimeTest": [
+      "realVerticalSharesRunQueryReplayAndProducerSupport",
+      "f3FailureIsLocalAndIndependentBatchesShareStableRun",
+      "failingConsumerDiscardsEveryStagedFactAndOthersComplete",
+      "analysisOnlyDoesNotCreateObservationAndStructuralStartsNoAnalysis",
+      "lateQueryIsNotRequestedAndNewEpochExplicitlyReusesRun",
+      "cannotReadAnotherConsumersUnrequestedSubjectInSharedBatch",
+      "missingDependenciesAndWrongBindingsNeverProduceSuccess",
+      "registryRejectsWrongPreparedAndExecutionKey",
+      "sinkIsClosedAndInfrastructureErrorsPropagateWithoutPartialResult",
+      "finalFactsReflectFixedPointAfterOverwritesAndLoop",
+      "preparedResultAndClosedRuntimeDetachSessionRunAndConsumer"
+    ],
+    "io.github.gustavo2358.analysis.values.PlanningTest": [
+      "structuralConsumerCompletesWithoutAnalysis",
+      "duplicateConsumerIdsArePlanningErrors"
+    ],
+    "io.github.gustavo2358.analysis.values.PlanningZeroMatchTest": [
+      "absentKindKeepsDeclaredEmptyBatch",
+      "rejectingFilterKeepsDeclaredEmptyBatch",
+      "zeroMatchDeclarationsValidateBindingsBeforeSelection"
+    ],
+    "io.github.gustavo2358.analysis.values.ReplayTest": [
+      "backwardReplayUsesStableOutAndReverseSuffixOnce",
+      "foreignStableRunCannotMasqueradeAsUnreachableInAnotherSession",
+      "controlledObservationFailureIsAtomicAndPreservesStableRun"
+    ],
+    "io.github.gustavo2358.analysis.values.SupportSourceTest": [
+      "producerSurvivesBlocksAndStrongUpdateKillsOldSupport",
+      "equalCandidateDiamondUnionsBothProducers",
+      "entrySeedPremisesFollowValueAndAreKilledByAssignment",
+      "entryUncertaintyOpensOnlyThatEntryWithoutChangingModel",
+      "relevantAliasSourceGapCannotDisappearByQueryingExactAlias",
+      "sourceGapDoesNotLeakFromOtherCellOrDependencyDimension",
+      "candidateSupportsStayAssociatedWithTheirValue",
+      "supportGrowthAtFixedValuePropagatesThroughCycle",
+      "supportLatticeLawsAndStrongUpdatesRemainFinite",
+      "sameCellInitialConditionsRetainBothPremises",
+      "supportCardinalityPreservesAllEqualValueProducers"
+    ],
+    "io.github.gustavo2358.analysis.values.ValueOracleTest": [
+      "generatedRealAirMatchesIndependentRecompositionAndConcreteOracle",
+      "concreteAndPrecisionOraclesRejectSharedWrongOrAlwaysUnknownAnswers"
+    ],
+    "io.github.gustavo2358.analysis.values.ValuesTest": [
+      "realVerticalMixedBatchHasOneObservationPerLogicalQuery",
+      "partialSourceIsSeparateFromExactModelAndUnknownWitness",
+      "diamondsMissingPathsStrongUpdatesAndOtherCells",
+      "sameCellAliasesAndDisjointnessAreSemanticAdmission",
+      "unsupportedReadAndIndirectStorageAreNotIdentity",
+      "entrySeedsContextsUnreachableAndUnicodeKeepTheirIdentity"
+    ]
+  },
+  "cfg-adapters": {
+    "io.github.gustavo2358.analysis.cfg.adapters.ScalarAssignTest": [
+      "sequencePayloadAndObjectCellIdentitySurviveRealReaderAndBuild",
+      "topologyIsExactlyEntrySequenceReturnAndPartialKnowledgeIsPreserved",
+      "manualCfgGoldenRemainsTopologyOnlyAndDeterministic",
+      "defaultBudgetsAreRepresentationalAndExplicitPhysicalBudgetStillApplies",
+      "manyAssignsRemainOneSequenceNodeWithoutCopyingPayload"
+    ],
+    "io.github.gustavo2358.analysis.cfg.adapters.TransportTest": [
+      "fileDecodePreservesExpectedAirFacts",
+      "realBuildHasExactManualTopologyAndCorrelations",
+      "writerMatchesIndependentGoldenBytesAndIsDeterministic",
+      "readerPhysicalBoundAcceptsExactSizeAndRejectsOneExtra",
+      "codecFailurePreservesCodePathAndIssues",
+      "outputLimitPreservesExistingDestinationBeforeAnyTemp",
+      "nonBuiltResultCannotBeSerializedOrPublished",
+      "resourceLimitPreservesTypedCodecIssues",
+      "unsupportedCapabilityRemainsACodecFailure"
+    ],
+    "io.github.gustavo2358.analysis.cfg.adapters.W1dInvokeWireTest": [
+      "realInvokeRetainsDistinctTerminatorAndTransitionInExistingCfgWire",
+      "historicalGoldensRemainExactlyV1",
+      "allLegacyKindsAndMisleadingIdsStillSelectV1",
+      "invokeNodeRequiresV2EvenWithoutTransitions",
+      "onlyProjectedDomainSelectsVersionAndWriterHasNoStickyState"
+    ],
+    "io.github.gustavo2358.analysis.cfg.adapters.WriterDomainTest": [
+      "memoryAndFileHaveEquivalentControlCoverageWire",
+      "writerCoversEveryCurrentKindWithExactContextualTransitions",
+      "utf8EscapingAndByteLimitAreExact",
+      "invalidUnicodeIsRejectedByOutputPrimitiveAndAirModel",
+      "nonAtomicFallbackIsExplicitAndMovesCompleteBytes",
+      "failedMoveCleansTemporaryAndDoesNotReportSuccess"
+    ]
+  },
+  "cfg-kernel": {
+    "io.github.gustavo2358.analysis.cfg.application.BuildCfgContractTest": [
+      "portHasTheExactInMemoryAirJavaSignature",
+      "transportCannotEnterThePortSignature",
+      "optionsAreSmallImmutableConsumerPolicy",
+      "resultEnvelopeRequiresARealProductExactlyOnSuccess"
+    ],
+    "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinatorTest": [
+      "completeZeroUnitInventoryProducesAnActuallyEmptyCfg",
+      "registeredSyntheticInterpreterParticipatesWithoutCoordinatorChanges",
+      "unregisteredRequiredCapabilityIsExplicitlyUnsupported",
+      "invalidIrAndItsDiagnosticsRemainVisible",
+      "resourceLimitHasItsOwnResultState",
+      "semanticObligationIsPreservedWithoutBecomingCfgEvidence",
+      "samePublicationBudgetAndRecoveryDoNotChangeSemantics",
+      "genericIncompleteWithoutResourceIssueRemainsDistinct",
+      "typedPrecedenceUsesTotalCountsIncludingOmittedMessages",
+      "legacyValidationLimitStillHasItsOwnResultState",
+      "invalidIrWithConfiguredBudgetRemainsInvalid",
+      "onlyCfgBuiltCanCarryGraphIncludingResourceLimit"
+    ],
+    "io.github.gustavo2358.analysis.cfg.application.CfgPreflightTest": [
+      "realAirJavaPublicationCrossesTheBoundary",
+      "invalidIrIsNeitherRepairedNorReinterpreted",
+      "unsupportedCapabilityRemainsIncompleteValidation",
+      "semanticObligationRemainsVisibleRatherThanBecomingProof"
+    ],
+    "io.github.gustavo2358.analysis.cfg.domain.EvalCfg025Test": [
+      "entryReturnAndNormalExitMatchIndependentOracle",
+      "missingInitialLabelIsInvalidIrAndIsNotRepaired",
+      "sequenceCannotBeConstructedWithoutTerminator",
+      "returnNeverFallsThroughToPhysicalNextSequence",
+      "physicalSequencePermutationPreservesCorrelatedControlAndCfgIds",
+      "orphanRemainsInventoriedAndCorrelatedWithoutArtificialPredecessor",
+      "sharedReturnPreservesBothActivationEntriesAndTheirExits",
+      "unitsWithSameLocalIdsRemainDistinctAndOrderIndependent",
+      "cfgIdsHaveTheirOwnDomainEvenWhenAirLocalIdsCollide",
+      "graphIsImmutableAndRetainsTheOriginalAirObjectsWithoutDeepCopy",
+      "navigationReusesMaterializedImmutableInventories",
+      "unknownRequiredCapabilityCannotBecomeSuccessfulCfg",
+      "returnOperandsAndOriginsRemainSharedAndOrdered",
+      "entryCollectionOrderCannotChooseTheActivationOrItsInitialLabel",
+      "unavailableInventoryIsNotACompleteEmptyGraph",
+      "unavailableUnitBodyIsNotInvented",
+      "registeredCapabilityIdentityAloneDoesNotImplementItsSemantics"
+    ],
+    "io.github.gustavo2358.analysis.cfg.domain.EvalCfg028Test": [
+      "m1MatchesManualControlAndOrderedOccurrences",
+      "allInstructionKindsRetainOperandsHeadersOriginsPrecisionAndGaps",
+      "jumpUsesExplicitForwardTargetInsteadOfPhysicalOrSortedNeighbor",
+      "backwardTargetAndPhysicalPermutationPreserveControlAndCfgIds",
+      "alphaRenamePreservesControlUnderExplicitDomainCorrelation",
+      "explicitSplitPreservesOriginalOperationOrderAndCorrelatedPoints",
+      "displayAndOriginPresentationCannotChooseControlAndAreRetained",
+      "missingJumpLabelIsInvalidIrWithoutRepairOrExternalTarget",
+      "explicitSelfLoopIsPreservedWithoutInventedCompletion",
+      "orphanJumpAndInstructionsRemainWithoutArtificialPredecessor",
+      "haltDiffersFromReturnAndNeverFallsThroughOrReturnsNormally",
+      "haltKindsAndSeparateOrphanOccurrencesKeepTheirOwnCorrelation",
+      "jumpPreservesEveryActivationWithoutReachabilityFiltering",
+      "sharedHaltPreservesBothActivationContextsAndDeterministicInventory",
+      "jumpAndHaltNeverFuseHomonymousUnitNamespaces",
+      "unsupportedTerminatorsInOrphansAreAllDiagnosedWithoutPartialGraph",
+      "instructionCardinalityIsNotLimitedByCapabilityOrIds",
+      "memoryRegionsConsumptionIsDeclaredPreciselyForControlOnly",
+      "missingMemoryManifestStillFailsAirValidation",
+      "anotherMemoryCapabilityVersionIsNotInvented",
+      "memorySupportDoesNotAbsorbControlOrUnknownCapabilities",
+      "haltNavigationReusesMaterializedImmutableInventory"
+    ],
+    "io.github.gustavo2358.analysis.cfg.domain.EvalCfg029Test": [
+      "diamondMatchesManualOracleWithoutSiblingOrImplicitJoinEdges",
+      "literalTrueDoesNotPruneFalseAlternative",
+      "literalFalseDoesNotPruneTrueAlternative",
+      "unknownBooleanRetainsPredicateDependenciesReasonTypeAndOriginByIdentity",
+      "unknownTypePredicateIsInvalidWithoutBooleanInference",
+      "incorrectPredicateRoleIsRejectedByPreflight",
+      "missingTrueTargetIsInvalidWithoutRepair",
+      "missingFalseTargetIsInvalidWithoutRepair",
+      "targetInAnotherUnitIsInvalidEvenWithSameLocalLabel",
+      "emptyFalseArmUsesExplicitJoinWithoutSyntheticNodesOrOperations",
+      "nestedBranchesUseTheirOwnExplicitDestinations",
+      "terminatingHaltArmNeverReconvergesOrFallsThrough",
+      "terminatingReturnArmNeverReconvergesOrFallsThrough",
+      "sameDestinationPreservesTwoAlternativesAndThePredicate",
+      "physicalPermutationPreservesCorrelatedControlAndCfgIds",
+      "alphaRenamePreservesControlOperandsAndOriginsUnderExplicitCorrelation",
+      "displayAndOriginPresentationCannotSelectTargets",
+      "sequenceSplitPreservesBranchContinuationAndOriginalPoints",
+      "multipleEntriesPreserveEveryBranchActivationWithoutReachabilityFiltering",
+      "orphanBranchKeepsBothRulesWithoutArtificialPredecessor",
+      "unsupportedOrphanStillBlocksAnOtherwiseValidBranchGraph",
+      "all258BranchOccurrencesRetainBothExplicitAlternatives",
+      "graphRejectsWrongBranchArmsTargetsAndEndpointKinds",
+      "graphRejectsForeignOrMissingBranchActivationEntries",
+      "sameDestinationTransitionEqualityKeepsArmsAndRejectsExactDuplicates"
+    ],
+    "io.github.gustavo2358.analysis.cfg.domain.EvalCfg030Test": [
+      "defaultProjectsBothPartialInventoriesWithExactReturnOracle",
+      "allPublicDefaultsSelectKnownSubsetAndNullPolicyIsRejected",
+      "knownSubsetCompleteBuildsManualReturnGraph",
+      "strictCompleteBuildsManualReturnGraph",
+      "knownSubsetAllowsPartialAtEitherScopeIndependently",
+      "strictRejectsPartialPublicationWithTypedSubject",
+      "strictRejectsPartialUnitWithTypedSubject",
+      "strictReportsBothIncompleteScopesInStableOrder",
+      "unavailableInventoryIsRejectedAtEitherScopeUnderBothPolicies",
+      "emptyPartialInventoryRemainsPartialWithoutInventedNodes",
+      "unsupportedOrphanTerminatorIsNeverSilentlyOmitted",
+      "unsupportedCapabilityStillBlocksBeforeProjectionPolicy",
+      "registeredKnownCapabilityStillRequiresImplementedSemantics",
+      "upstreamUnsupportedCapabilityCannotBeOverriddenByInventoryPolicy",
+      "invalidReferencesAndUnexplainedPartialRemainInvalidAir",
+      "unavailableBodyStillBlocksKnownControlProjection",
+      "resourceLimitsStillBlockBeforeProjection",
+      "partialCoverageItemsPremisesAndDimensionalEvidenceRemainOriginal",
+      "gapCodesReasonsAndOriginTextCannotDecideAdmissionOrControl",
+      "partialMixedControlKeepsAllArmsContextsOrphansAndOrdering"
+    ],
+    "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistryTest": [
+      "syntheticCapabilityIsRegisteredWithoutProductionConstants",
+      "duplicateOrConflictingRegistrationFailsExplicitly",
+      "registrationOrderCreatesNoPriorityAndVersionsRemainDistinct",
+      "missingCapabilityIsNotResolvedAsANop"
+    ]
+  },
+  "cfg-launcher": {
+    "io.github.gustavo2358.analysis.cfg.launcher.EvalCfg031Test": [
+      "fileThroughRealCliMatchesManualGolden",
+      "twoIndependentExecutionsProduceIdenticalBytes",
+      "missingAirFileCannotPublish",
+      "bomIsTypedAirFailureWithoutOutput",
+      "malformedUtf8IsTypedAirFailureWithoutOutput",
+      "wrongBindingVersionPreservesCodecPath",
+      "unsupportedCodecFormNeverBecomesCfgUnsupportedInput",
+      "unavailableInventoryReachesRealKernelAndIsRejected",
+      "allNonBuiltStatusesReturnFourWithoutOutput",
+      "outputFilesystemFailureIsSixAndCleansTemp",
+      "missingOutputParentIsSix",
+      "serializationFailureIsFiveAndPreservesDestination",
+      "usageNeverCallsBuild",
+      "unexpectedBuildBugPropagatesUnchanged",
+      "mainProcessUsesRealExitCodesAndFilePipeline",
+      "oversizedPhysicalInputReturnsThreeBeforeCodec"
+    ],
+    "io.github.gustavo2358.analysis.cfg.launcher.ScalarAssignCliTest": [
+      "twoRealCliProcessesMatchScalarManualGoldenByteForByte"
+    ]
+  }
+}

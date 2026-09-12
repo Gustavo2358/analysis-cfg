@@ -1,6 +1,6 @@
 # Baseline factual dos repositórios
 
-Estado vigente pós-CP5: W1–W5 APPROVED / MERGED / CLOSED; harness remediado e candidato congelado verificado. A sincronização usa AIR51b4d9a, air-java3bafe397, lower18016f16 e frontend8722945. Full executa todos os gates. Os checkpoints abaixo conservam seu contexto histórico. Próximo trabalho: CP6 discovery; nenhum Invoke/CALL/CallResolver foi implementado nesta preparação. O receipt pós-merge no repositório E2E local fixa a identidade final.
+Estado vigente: CP5 APPROVED / MERGED / CLOSED; CP6 discovery e W1A–W1C APPROVED / MERGED. W1D é a implementação autorizada em validação, com [contrato de dependências](../architecture/analysis-dependency-result-v1.md). Pins atuais: frontend53d7740, air-java2a37f5e, lower9de3825, AIR51b4d9a. W2 NOT_STARTED / NOT_AUTHORIZED. Os checkpoints abaixo conservam seu contexto histórico.
 
 
 Observada em 06/09/2026; apenas air-java revalidado em 08/09/2026. Este documento é contexto de integração, não contrato CFG.
