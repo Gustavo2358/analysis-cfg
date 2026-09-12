@@ -1,5 +1,12 @@
 # Analysis CFG — consumer AIR
 
+Desenvolvimento: `python3 -B scripts/harness/lean.py fast`.
+Antes de merge importante: `python3 -B scripts/harness/lean.py qualification-local` (local/on-demand).
+Abra PR, revisão humana, merge, DONE. [Política lean](docs/engineering/lean-harness.md).
+Os fluxos técnicos e exemplos abaixo permanecem úteis; requisitos antigos de receipts
+ou qualification remota foram substituídos pela política lean.
+
+
 **Entrega atual:** CFG estrutural em memória: Entry, instructions, Jump,
 Branch TRUE/FALSE, Return/NormalExit e Halt/HaltExit,
 com Java 21/Maven, `air-java` e seam explícito de capabilities.
@@ -83,17 +90,11 @@ GOBACK estão em WORK-CFG-026; não promovem integralmente os backlogs históric
 
 ## O que os gates significam hoje
 
-`docs`, `harness` e `fast` verificam arquivos, referências, IDs, dependências de
-backlog, work items e os próprios validadores documentais. `architecture` executa
-Maven/testes e inspeciona dependências e bytecode do kernel. `semantic` executa
-explicitamente os 17 testes de EVAL-CFG-025, 22 de EVAL-CFG-028, 25 de EVAL-CFG-029
-e 20 de EVAL-CFG-030; rejeita
-suítes/métodos ausentes, extras, duplicados ou pulados.
-`integration` executa 31 métodos nominais em três suítes: arquivos reais, codec,
-porta, golden, equivalência de controle/coverage em memória e processo CLI.
-`performance` e, por consequência, `full` permanecem
-**UNAVAILABLE / exit 3**; full executa fast, architecture e semantic antes de parar
-em performance. CFG-FIRST não implica conformidade com um perfil AIR completo.
+`docs` verifica política e navegação sem build. `fast` compila e executa o
+inventário focal fixo de contratos, arquitetura e integração básica. `semantic`,
+`performance`, integração completa e `full` são ferramentas locais sob demanda.
+Nenhum gate exige evidência histórica ou certificado de checkpoint.
+CFG-FIRST não implica conformidade com um perfil AIR completo.
 
 A especificação upstream é referenciada por commit e hashes de blobs. O pacote
 contém um mapa de leitura e síntese, **não uma cópia integral da especificação**.

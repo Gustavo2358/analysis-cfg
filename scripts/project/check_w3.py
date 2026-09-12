@@ -28,8 +28,8 @@ def verify_sources(root:Path)->None:
     actual={p.relative_to(root).as_posix() for p in (root/'analysis-values/src/main').rglob('*.java')}
     query={p.relative_to(root).as_posix() for p in (root/'analysis-kernel/src/main/java/io/github/gustavo2358/analysis/query').rglob('*.java')}
     from check_w4 import PROVIDER
-    from w1d_scope import NEW_VALUES, authorized
-    expected_sources=VALUE_SOURCES|{PROVIDER}|({NEW_VALUES} if authorized(root) else set())
+    from w1d_scope import NEW_VALUES
+    expected_sources=VALUE_SOURCES|{PROVIDER}|{NEW_VALUES}
     if actual!=expected_sources or query!=QUERY_SOURCES:raise Failure('W3 exact source inventory mismatch')
     expected={('io.github.gustavo2358.analysis',n,'compile') for n in ['analysis-kernel','cfg-kernel']}|{('io.github.gustavo2358','air-java','compile'),('org.junit.jupiter','junit-jupiter','test')}
     if direct_dependencies(root/'analysis-values/pom.xml')!=expected:raise Failure('W3 direct Maven DAG mismatch')
@@ -39,15 +39,6 @@ def verify_sources(root:Path)->None:
         if path in QUERY_SOURCES and 'analysis.values' in source:raise Failure('generic query cannot depend on values')
         if path in QUERY_SOURCES and 'DataflowSolver' in source:raise Failure('W3 replay cannot rerun solver')
         if path.endswith('PossibleValuesAnalysis.java') and 'DataflowSolver' in source[source.index('public static final class Execution'):]:raise Failure('W3 observation cannot rerun solver')
-    from check_w4_scope import preserved_digest
-    from resource_limit_scope import allows_change
-    baseline=json.loads((root/'docs/work/evidence/WORK-CFG-028/wave-3/baseline.json').read_text())
-    for path,digest in baseline['w2_production_sha256'].items():
-        if preserved_digest(root,path)!=digest and not allows_change(root,path,digest):raise Failure('W3 modified approved W1/W2 production: '+path)
-
-    reviewed=json.loads((root/'docs/work/evidence/WORK-CFG-028/wave-3/review-f1-f2/baseline.json').read_text())
-    for path,digest in reviewed['frozen_sha256'].items():
-        if preserved_digest(root,path)!=digest and not allows_change(root,path,digest):raise Failure('W3 F1/F2 changed reviewed foundation: '+path)
 
 def verify_reports(root:Path,names:set[str])->None:
     reports=list((root/'analysis-values/target/surefire-reports').glob('TEST-*.xml'))

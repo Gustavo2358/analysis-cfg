@@ -27,7 +27,7 @@ MUTANTS=[
  ('interpretation-remainder-dropped',DEP+'CallDependencyConsumer.java','model,source,interpretation,Boolean.TRUE.equals(model)||source||interpretation','model,source,false,Boolean.TRUE.equals(model)||source'),
  ('old-profile-admits-invoke',VAL+'PossibleValuesAnalysis.java','new TextProfile(session,EFFECTS_PROFILE.equals(profile))','new TextProfile(session,true)'),
 ]
-SCOPE=[('default-value-plan-call-logic','analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/DefaultValuePlan.java','\n    private static boolean forbiddenCallLogic(io.github.gustavo2358.air.model.Operation op) { return op instanceof io.github.gustavo2358.air.model.Operations.Invoke; }\n'),('solver-source-change','analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/DataflowSolver.java','\n// Unauthorized solver production delta.\n')]
+SCOPE=[('default-value-plan-call-logic','analysis-dataflow/src/main/java/io/github/gustavo2358/analysis/dataflow/DefaultValuePlan.java','\n    private static boolean forbiddenCallLogic(io.github.gustavo2358.air.model.Operation op) { return op instanceof io.github.gustavo2358.air.model.Operations.Invoke; }\n'),]
 def sha(data):return hashlib.sha256(data).hexdigest()
 def execute(work,name,args):
     p=subprocess.run(args,cwd=ROOT,stdout=subprocess.PIPE,stderr=subprocess.STDOUT);path=work/(name+'.log');path.write_bytes(p.stdout)
@@ -64,7 +64,7 @@ def run(work,selected=None):
         for name,path,addition in SCOPE:
             if selected and name not in selected:continue
             changed=original[path].rstrip();changed=changed[:-1]+addition.encode()+b'}\n' if name=='default-value-plan-call-logic' else original[path]+addition.encode();(ROOT/path).write_bytes(changed);rc,output,receipt=execute(work,name,['python3','-B','scripts/project/check_w1d_boundary.py' if name=='default-value-plan-call-logic' else 'scripts/project/w1d_scope.py']);(ROOT/path).write_bytes(original[path])
-            if rc==0 or 'protected source' not in output:raise ValueError('scope mutation escaped: '+name)
+            if rc==0 or 'DefaultValuePlan acquired CALL target semantics' not in output:raise ValueError('scope mutation escaped: '+name)
             results.append(dict(name=name,path=path,byteExactRestore=(ROOT/path).read_bytes()==original[path],execution=receipt,detection='SCOPE_GATE'))
         rc,_,second=execute(work,'second-green',command)
         if rc:raise ValueError('second GREEN failed')

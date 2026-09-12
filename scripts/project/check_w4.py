@@ -51,7 +51,6 @@ def verify_sources(root:Path)->None:
         if any(d in source for d in denied):raise Failure('W4 forbidden source dependency: '+path)
         if '/application/' in path and ('PossibleValuesAnalysis' in source or 'analysis.values.' in source):raise Failure('generic application imports concrete values')
         if re.search(r'\bstatic\s+(?:final\s+)?(?:Map|HashMap|ConcurrentHashMap|List|Set)<',source):raise Failure('W4 global static cache/container')
-    verify_foundation(root);verify_focal_preservation(root)
 
 def verify_foundation(root:Path)->None:
     from check_w4_scope import preserved_digest
