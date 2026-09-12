@@ -1,6 +1,6 @@
 # Baseline factual dos repositórios
 
-Estado vigente: CP5 APPROVED / MERGED / CLOSED; CP6 discovery e W1A–W1C APPROVED / MERGED. W1D é a implementação autorizada em validação, com [contrato de dependências](../architecture/analysis-dependency-result-v1.md). Pins atuais: frontend53d7740, air-java2a37f5e, lower9de3825, AIR51b4d9a. W2 NOT_STARTED / NOT_AUTHORIZED. Os checkpoints abaixo conservam seu contexto histórico.
+Estado vigente: CP5 e CP6 W1 integrados. CP6 W2D autorizado em [WORK-CFG-034](../work/active/WORK-CFG-034.md), consumindo SP 1.4.0 / W2A `4a29b7b`, lower W2B `a8fbffd`, air-java W2C `760593b`; AIR normativa permanece `51b4d9a` (2.0.0; JSON binding 1.0.0 DRAFT). O [source lock](sources.lock.json) contém os SHAs completos. Os checkpoints abaixo conservam seu contexto histórico.
 
 
 Observada em 06/09/2026; apenas air-java revalidado em 08/09/2026. Este documento é contexto de integração, não contrato CFG.

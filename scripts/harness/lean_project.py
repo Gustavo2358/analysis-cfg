@@ -66,3 +66,13 @@ def full_local(root):
     os.environ['W5_PRODUCERS'] = str(producers / 'producers.json')
     for gate in ('semantic', 'performance', 'integration'):
         subprocess.run(['bash', 'scripts/project/check-' + gate + '.sh'], cwd=root, check=True)
+    # W2D is a real, local-only cross-repo qualification; remote Fast uses in-memory AIR.
+    w2d = Path(tempfile.mkdtemp(prefix='w2d-', dir=build))
+    os.environ.setdefault('W2D_MAVEN_REPO', str(build / 'm2'))
+    subprocess.run([sys.executable, '-B', 'scripts/project/prepare_w2d_producers.py',
+                    '--work', str(w2d / 'producers')], cwd=root, check=True)
+    subprocess.run(['mvn', '-B', '-ntp', '-DskipTests', 'package',
+                    'org.apache.maven.plugins:maven-dependency-plugin:3.8.1:build-classpath',
+                    '-DincludeScope=runtime', '-Dmdep.outputFile=target/runtime-classpath.txt'], cwd=root, check=True)
+    subprocess.run([sys.executable, '-B', 'scripts/project/e2e_w2d.py', '--work', str(w2d / 'e2e'),
+                    '--producers', str(w2d / 'producers/producers.json')], cwd=root, check=True)

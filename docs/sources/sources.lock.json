@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "observed_on": "2026-09-11",
+  "observed_on": "2026-09-12",
   "analysis_ir": {
     "repository": "Gustavo2358/analysis-ir",
     "commit": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
@@ -124,7 +124,7 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "2a37f5e980ba25fdc79614a66030a84d8bf5b8c9",
+    "commit": "760593b923ca7311f699547c36349f54eb0dac42",
     "canonical_ref": "main",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
@@ -170,7 +170,7 @@
       "air-model/src/main/java/io/github/gustavo2358/air/model/Values.java",
       "air-json/src/test/resources/scalar-assign.canonical.json"
     ],
-    "observed_on": "2026-09-10",
+    "observed_on": "2026-09-12",
     "modules": {
       "parent": {
         "path": "pom.xml",
@@ -185,23 +185,14 @@
         "path": "air-json/pom.xml",
         "artifact_id": "air-json",
         "role": "shared_codec_4B_scalar_assign_consumed_by_cfg_adapters",
-        "coverage": "W1B Invoke first slice, Read(ObjectPlace), effects/outcomes and structural transport with semantic obligations preserved"
+        "coverage": "W2C Unknown BOOL Branch diamond, Assign, Jump and Invoke structural transport with semantic obligations preserved"
       }
     },
-    "source_tree": "8d248f4ccf207eb7b609aa9ff0cdbcd512e526c8",
-    "compatibility_evidence": "docs/work/evidence/WORK-CFG-033/upstream-sources.json",
-    "w1d_authority": "docs/work/evidence/WORK-CFG-033/upstream-sources.json",
-    "ci": {
-      "checked_commit": "2a37f5e980ba25fdc79614a66030a84d8bf5b8c9",
-      "status": "completed",
-      "conclusion": "success",
-      "url": "https://github.com/Gustavo2358/air-java/actions/runs/34617652790",
-      "harness_url": "https://github.com/Gustavo2358/air-java/actions/runs/34617652849"
-    }
+    "w2d_validation": "docs/work/active/WORK-CFG-034.md"
   },
   "proleap_poc": {
     "repository": "Gustavo2358/proleap-poc",
-    "main_commit": "53d774026a1e4bcd969c7783a1d277aaa87b5f2f",
+    "main_commit": "4a29b7b730f9b61b289f46dc8227d5321adbd3ec",
     "role": "cobol_frontend_and_semantic_product_producer",
     "java_release": 17,
     "public_boundary": "cobol_semantic_product",
@@ -247,19 +238,16 @@
       "docs/domain/cobol-semantic-product.md",
       "docs/work/history/WORK-SEMANTIC-PRODUCT-003.md"
     ],
-    "source_tree": "a43f0fc4ef8a227d47f012b9fcb4e410842ffcc0",
-    "w1d_authority": "docs/work/evidence/WORK-CFG-033/upstream-sources.json",
-    "semantic_product_version": "1.3.0"
+    "semantic_product_version": "1.4.0",
+    "w2d_validation": "docs/work/active/WORK-CFG-034.md"
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "verified",
-    "commit": "9de3825da64898258e647727393f01b9e9198d9e",
+    "commit": "a8fbffd3be43032327a8fff85283e2d206ba6419",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
-    "evidence": "docs/work/evidence/WORK-CFG-033/upstream-sources.json",
-    "source_tree": "2e3027df2fc4f9e550df8df9518e7e80f89324f1",
-    "w1d_authority": "docs/work/evidence/WORK-CFG-033/upstream-sources.json"
+    "w2d_validation": "docs/work/active/WORK-CFG-034.md"
   },
   "external": [
     {

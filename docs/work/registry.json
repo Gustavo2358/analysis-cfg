@@ -1,6 +1,11 @@
 {
   "schema_version": 1,
-  "active": [],
+  "active": [
+    {
+      "id": "WORK-CFG-034",
+      "path": "docs/work/active/WORK-CFG-034.yaml"
+    }
+  ],
   "history": [
     {
       "id": "WORK-CFG-001",
