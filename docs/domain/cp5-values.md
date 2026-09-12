@@ -7,7 +7,9 @@ operações §04, incompletude §06 e consumidores §08. Este domínio não rede
 ## Admissão e locations
 
 Primeiro profile `scalar-text-direct@1`: ObjectPlace inteiro, CellBinding direto,
-Object/Cell known(text), Assign literal textual sem conversão e Nop. Jump/Branch/
+Object/Cell known(text), Assign(destination, Literal(TextValue)) ou
+Assign(destination, Read(ObjectPlace(source))) para Cells TEXT diretas admitidas,
+sem conversão, e Nop. Jump/Branch/
 Return/Halt controlam o grafo já existente. Outras expressões/writes, HavocMust/May,
 CopyBytes, aliases indiretos, views, choices, binding desconhecido e memória regional
 são recusados explicitamente. Aceitação estrutural pelo CFG não prova semântica de
@@ -22,8 +24,9 @@ implica A⊥C. Provas fragmentadas podem ser recusadas por limitação do profil
 sem chamar a AIR de inválida. Premissas assumidas/obrigações estruturais ficam
 rastreáveis e não se tornam prova de verdade do produtor.
 
-Lower atual não publica essa premissa multi-Cell; follow-up externo, sem fabricá-la
-no adapter ou benchmark. Corpus sintético pode declarar premissa explicitamente.
+O lower traduz a evidência source-derived IndependentStorageSet para essa premissa
+multi-Cell nos profiles admitidos; não a fabrica por IDs distintos. Corpus sintético
+pode declarar premissa explicitamente.
 [Backlog e ownership](../work/cp5-follow-ups.md).
 
 ## Domínio e boundary
@@ -51,8 +54,12 @@ faz join com default desconhecido do outro: {A} fechado + ausência = {A} aberto
 restante. Ordem por inclusão de candidatos e false≤true.
 Open universal não autoriza apagar evidência enumerada por igualdade denotacional.
 
-Strong Assign literal **substitui** valor corrente por singleton fechado, inclusive
-após open; não acumula literais mortos. Join preserva todos os candidatos, seja sua
+Strong Assign **substitui** o valor corrente. Literal produz singleton fechado,
+inclusive após open. Read direto copia os Candidates da source **antes da escrita**:
+destination := valor anterior de source, preservando candidates, open remainder e
+candidate supports. É cópia de valor, sem criar alias; escritas posteriores na source
+não alteram o valor copiado. Outras Expressions continuam não suportadas.
+Strong update não acumula valores mortos. Join preserva todos os candidatos, seja sua
 cardinalidade 9, 100, 10.000 ou maior. Não há maxCandidates, k produtivo,
 CARDINALITY_LIMIT ou Saturated por contagem. Unknown remainder vem de incerteza
 semântica/escopo aberto, nunca da economia de memória.
@@ -122,7 +129,8 @@ outcomes não materializáveis produzem UNSUPPORTED_POINT. A camada wire continu
 
 Na remediação W3-F1/F2, suporte acompanha o domínio: join une produtores por
 candidato, equivalência detecta mudança só de suporte e strong Assign mata suporte
-anterior. Assign contribui OperationId/OriginId; InitialCondition literal contribui
+anterior. Assign literal contribui OperationId/OriginId; Read direto preserva os
+suportes do valor copiado. InitialCondition literal contribui
 place OperandId, origin e premises. ValueFact expõe a associação por candidato e
 refs agregadas, sem reconstrução externa nem árvore de caminhos. O conjunto finito
 de produtores acrescenta uma dimensão de inclusão à prova de convergência acima.

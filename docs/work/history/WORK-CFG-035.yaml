@@ -1,6 +1,8 @@
 id: WORK-CFG-035
 title: CP6 — propagate scalar MOVE data-to-data into CALL targets
-status: IN_PROGRESS
+status: DONE
 scope:
   - Assign destination = Read(source)
   - real MOVE→MOVE→CALL vertical
+pr: 21
+notes: "MERGED; qualified/source HEAD 947b3317f0736399f4a64e81310d18c6c8e00695; actual merge SHA 49ddb060bc515f3bdb1eba6ac50ccbeef0e4ee46"

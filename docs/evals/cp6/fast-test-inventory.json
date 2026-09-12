@@ -65,6 +65,13 @@
       "branchClosedCopyResolvesBothCandidatesWithSpecificSupports",
       "branchOpenCopyRetainsCandidateAndModelRemainder",
       "copyResultsIgnoreUnreachableBlockAndPhysicalSequenceOrder"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PerformBasicModelTest": [
+      "literalParagraphBeforeCall",
+      "literalThenCopyParagraphBeforeCall",
+      "performedStrongWriteKillsOldProgram",
+      "explicitEntryAndAllTwentyFourSequencePermutationsPreserveResult",
+      "oracleKillsSkippedBodyAndWrongReturnChallenges"
     ]
   },
   "analysis-dataflow": {

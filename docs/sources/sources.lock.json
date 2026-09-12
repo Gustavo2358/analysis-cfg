@@ -238,19 +238,21 @@
       "docs/domain/cobol-semantic-product.md",
       "docs/work/history/WORK-SEMANTIC-PRODUCT-003.md"
     ],
-    "semantic_product_version": "1.5.0",
+    "semantic_product_version": "1.6.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "2b72d0c7ad72cbc9379a7e364607de89d5d1097c",
-    "move_data_validation": "docs/work/active/WORK-CFG-035.md"
+    "commit": "a2e9645a2d0fa5e86befdc6f60c6bf2b5cf6f84b",
+    "move_data_validation": "docs/work/history/WORK-CFG-035.md",
+    "perform_basic_validation": "docs/work/active/WORK-CFG-036.md"
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "verified",
-    "commit": "16275bad22b2e48a13c3b2b3cf52bb29747e2ec1",
+    "commit": "bcd9980bed1255910f71b58f056dbf9857510a26",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "move_data_validation": "docs/work/active/WORK-CFG-035.md"
+    "move_data_validation": "docs/work/history/WORK-CFG-035.md",
+    "perform_basic_validation": "docs/work/active/WORK-CFG-036.md"
   },
   "external": [
     {

@@ -78,3 +78,5 @@ def full_local(root):
                     '--producers', str(w2d / 'producers/producers.json')], cwd=root, check=True)
     subprocess.run([sys.executable, '-B', 'scripts/project/e2e_move_data.py', '--work', str(w2d / 'move-data'),
                     '--producers', str(w2d / 'producers/producers.json')], cwd=root, check=True)
+    subprocess.run([sys.executable, '-B', 'scripts/project/e2e_perform_basic.py', '--work', str(w2d / 'perform-basic'),
+                    '--producers', str(w2d / 'producers/producers.json')], cwd=root, check=True)
