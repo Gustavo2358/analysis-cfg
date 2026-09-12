@@ -18,7 +18,7 @@ MUTATIONS={
 'missing-key-as-bottom':(S,[('return Candidates.UNKNOWN;','throw new IllegalStateException("missing binding incorrectly treated as bottom");')],DOMAIN,'missing binding incorrectly treated as bottom'),
 'non-convergent-semantic-domain':(C,[('if(this==b)return this;','if(this==b)return new Candidates(singleton,many,!open);')],'DomainTest#allFiniteCandidatesSurviveAndUnionConverges','finite fixed point'),
 'silent-truncation':(C,[('Arrays.copyOf(merged,k)','Arrays.copyOf(merged,Math.min(k,8))')],'DomainTest#allFiniteCandidatesSurviveAndUnionConverges','all finite candidates preserved'),
-'unknown-effect-as-nop':(P,[('throw new Refusal(false,"UNSUPPORTED_EFFECT_PROFILE");','admitted.add(operation);')],'ValuesTest#unsupportedReadAndIndirectStorageAreNotIdentity','unmodeled write cannot be identity'),
+'unknown-effect-as-nop':(P,[('throw new Refusal(false,"UNSUPPORTED_EFFECT_PROFILE");','admitted.add(operation);')],'ValuesTest#directReadIsCopyWhileOtherEffectsAndIndirectStorageRemainUnsupported','unmodeled write cannot be identity'),
 'replay-per-query-site':(R,[('                for(var q:selected) {\n                    while(cursor!=q.boundary()) {','''                S originalAnchor=state;int originalCursor=cursor;
                 for(var q:selected) {
                     state=originalAnchor;cursor=originalCursor;
@@ -51,7 +51,7 @@ MUTATIONS={
 }
 # The unknown-write mutant removes the guard and skips preparing that unsupported assignment,
 # keeping a valid Java pattern-variable scope and preserving compilation.
-MUTATIONS['unknown-effect-as-nop']=(P,[('throw new Refusal(false,"UNSUPPORTED_EFFECT_PROFILE");','{ admitted.add(operation);return; }')],'ValuesTest#unsupportedReadAndIndirectStorageAreNotIdentity','unmodeled write cannot be identity')
+MUTATIONS['unknown-effect-as-nop']=(P,[('throw new Refusal(false,"UNSUPPORTED_EFFECT_PROFILE");','{ admitted.add(operation);return; }')],'ValuesTest#directReadIsCopyWhileOtherEffectsAndIndirectStorageRemainUnsupported','unmodeled write cannot be identity')
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--only',choices=sorted(MUTATIONS));parser.add_argument('--output',type=Path,required=True);args=parser.parse_args();out=args.output;out.mkdir(parents=True,exist_ok=False)

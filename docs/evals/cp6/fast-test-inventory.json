@@ -60,6 +60,11 @@
       "cfgUsesExplicitEntryAndExistingLabeledEdges",
       "interpretationRemainderIsIndependentOfModelAndSource",
       "w1SingletonAndLiteralKeepTheirCandidatesAndSupports"
+    ],
+    "io.github.gustavo2358.analysis.adapters.MoveCopyModelTest": [
+      "branchClosedCopyResolvesBothCandidatesWithSpecificSupports",
+      "branchOpenCopyRetainsCandidateAndModelRemainder",
+      "copyResultsIgnoreUnreachableBlockAndPhysicalSequenceOrder"
     ]
   },
   "analysis-dataflow": {
@@ -204,8 +209,14 @@
       "partialSourceIsSeparateFromExactModelAndUnknownWitness",
       "diamondsMissingPathsStrongUpdatesAndOtherCells",
       "sameCellAliasesAndDisjointnessAreSemanticAdmission",
-      "unsupportedReadAndIndirectStorageAreNotIdentity",
+      "directReadIsCopyWhileOtherEffectsAndIndirectStorageRemainUnsupported",
       "entrySeedsContextsUnreachableAndUnicodeKeepTheirIdentity"
+    ],
+    "io.github.gustavo2358.analysis.values.MoveCopyTest": [
+      "copyOverwritesAndRetainsSnapshotAndOriginalSupport",
+      "missingSourceStronglyReplacesKnownDestinationWithOpenEmpty",
+      "repeatedForwardCopiesHaveNoHopLimit",
+      "copiesDoNotCreateStorageIndependence"
     ]
   },
   "cfg-adapters": {

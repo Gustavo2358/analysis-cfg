@@ -1,11 +1,9 @@
 {
   "schema_version": 1,
-  "work_item": "WORK-CFG-033",
-  "status": "APPROVED / MERGED / CLOSED",
-  "work_item_status": "completed",
-  "authorization": "closeout_only",
-  "authorization_evidence": "docs/work/evidence/WORK-CFG-033/closeout/merge-receipt.json",
-  "pr": 18,
+  "work_item": "WORK-CFG-035",
+  "status": "IMPLEMENTED / AWAITING HUMAN REVIEW",
+  "work_item_status": "IN_PROGRESS",
+  "authorization": "implementation",
   "w1": "APPROVED / MERGED / CLOSED",
   "w1d": "APPROVED / MERGED / CLOSED",
   "baseline": {
@@ -34,11 +32,19 @@
     "AIR": "51b4d9a8ae0364232bd97103cd73a77e1a34996c"
   },
   "w2": {
-    "status": "NOT_STARTED",
-    "authorization": "NOT_AUTHORIZED",
-    "next_objective": "IF COBOL real, multi-candidate e open remainder",
-    "branch": null,
-    "work_item": null
+    "status": "APPROVED / MERGED / CLOSED",
+    "work_item": "WORK-CFG-034",
+    "pr": 20,
+    "qualified_source_head": "0ea0fea5fe2d8d1688d94b7a666edf13b2f3e2ca",
+    "merge_commit": "cad8b45cdcd2d380cb98ba9984f34859551430e0",
+    "preserved_tree": "7548ca15210d7f2fbc09b99040e7c90bcf700791",
+    "record": "docs/work/history/WORK-CFG-034.md"
   },
-  "closeout": "docs/work/evidence/WORK-CFG-033/closeout/README.md"
+  "closeout": "docs/work/evidence/WORK-CFG-033/closeout/README.md",
+  "move_data": {
+    "work_item": "WORK-CFG-035",
+    "status": "IN_PROGRESS",
+    "branch": "feat/move-data-to-data",
+    "record": "docs/work/active/WORK-CFG-035.md"
+  }
 }

@@ -134,7 +134,8 @@ def run(work, config_path):
             sp = cwd / 'sp/cobol-semantic-product.json'
             semantic = json.loads(sp.read_text())
             version = semantic['contractVersion']
-            require(version == '1.4.0', 'W2D requires SP 1.4.0; actual real producer emitted ' + version)
+            require(version == config['semanticProductVersion'] == lock['proleap_poc']['semantic_product_version'],
+                    'W2D must consume the exact locked SP version; actual producer emitted ' + version)
             require(semantic['unit']['canonicalProgramName'] == 'CALLER', 'real caller program identity')
             air = cwd / 'program.air.json'
             execute(cwd, 'lower', ['java', '-cp', os.pathsep.join(config['lower']['classpath']), config['lower']['main'], str(sp), str(air)])

@@ -76,3 +76,5 @@ def full_local(root):
                     '-DincludeScope=runtime', '-Dmdep.outputFile=target/runtime-classpath.txt'], cwd=root, check=True)
     subprocess.run([sys.executable, '-B', 'scripts/project/e2e_w2d.py', '--work', str(w2d / 'e2e'),
                     '--producers', str(w2d / 'producers/producers.json')], cwd=root, check=True)
+    subprocess.run([sys.executable, '-B', 'scripts/project/e2e_move_data.py', '--work', str(w2d / 'move-data'),
+                    '--producers', str(w2d / 'producers/producers.json')], cwd=root, check=True)

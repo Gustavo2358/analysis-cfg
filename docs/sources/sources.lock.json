@@ -188,11 +188,11 @@
         "coverage": "W2C Unknown BOOL Branch diamond, Assign, Jump and Invoke structural transport with semantic obligations preserved"
       }
     },
-    "w2d_validation": "docs/work/active/WORK-CFG-034.md"
+    "w2d_validation": "docs/work/history/WORK-CFG-034.md",
+    "move_data_validation": "docs/work/active/WORK-CFG-035.md"
   },
   "proleap_poc": {
     "repository": "Gustavo2358/proleap-poc",
-    "main_commit": "4a29b7b730f9b61b289f46dc8227d5321adbd3ec",
     "role": "cobol_frontend_and_semantic_product_producer",
     "java_release": 17,
     "public_boundary": "cobol_semantic_product",
@@ -238,16 +238,19 @@
       "docs/domain/cobol-semantic-product.md",
       "docs/work/history/WORK-SEMANTIC-PRODUCT-003.md"
     ],
-    "semantic_product_version": "1.4.0",
-    "w2d_validation": "docs/work/active/WORK-CFG-034.md"
+    "semantic_product_version": "1.5.0",
+    "w2d_validation": "docs/work/history/WORK-CFG-034.md",
+    "commit": "2b72d0c7ad72cbc9379a7e364607de89d5d1097c",
+    "move_data_validation": "docs/work/active/WORK-CFG-035.md"
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "verified",
-    "commit": "a8fbffd3be43032327a8fff85283e2d206ba6419",
+    "commit": "16275bad22b2e48a13c3b2b3cf52bb29747e2ec1",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
-    "w2d_validation": "docs/work/active/WORK-CFG-034.md"
+    "w2d_validation": "docs/work/history/WORK-CFG-034.md",
+    "move_data_validation": "docs/work/active/WORK-CFG-035.md"
   },
   "external": [
     {
