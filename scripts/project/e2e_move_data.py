@@ -79,15 +79,18 @@ def air_oracle(air, data, moves, case):
                     and expression['place']['object'] == objects[value]
                     and expression['place']['header']['role'] == 'VALUE_READ', 'data MOVE is Read of source object')
             # Direct copy preserves statement and both operand origins independently.
-            origins = {o['id']['localId']: o for o in p['origins']}
             for header, provenance in ((assign['header'], move['header']['provenance']),
                                        (expression['header'], move['source']['reference']['provenance']),
                                        (expression['place']['header'], move['source']['reference']['provenance']),
                                        (assign['destination']['header'], move['target']['provenance'])):
-                origin = origins[header['origin']['localId']]
-                require(origin['kind'] == 'written', 'copy origin is real source occurrence')
-                require(all(int(origin['location'][k]) == provenance['original'][k]
-                            for k in ('startLine', 'startColumn', 'endLine', 'endColumn')), 'exact copy occurrence span')
+                # The lower retains original + expanded spans through a Derived origin.
+                spans = source_spans(p, {'origin': header['origin']}, Path(provenance['original']['file']))
+                require(len(spans) == 1, 'copy retains one exact original source occurrence')
+                span = spans[0]['span']
+                require(span['lineBase'] == '1' and span['columnBase'] == '0'
+                        and span['columnUnit'] == 'UNICODE_SCALAR' and span['endExclusive'] is False, 'SP coordinate conventions')
+                require(all(int(span[side][axis]) == provenance['original'][side + axis.title()]
+                            for side in ('start', 'end') for axis in ('line', 'column')), 'exact copy occurrence span')
     invoke = call['terminator']
     require(invoke['target']['name']['kind'] == 'read'
             and invoke['target']['name']['place']['object'] == objects['WS-PGM'], 'dynamic CALL reads final receiver')

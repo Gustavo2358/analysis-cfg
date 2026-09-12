@@ -42,9 +42,9 @@ def source_spans(result, support, source):
             continue
         seen.add(key)
         origin = origins[key]
-        if origin['kind'] == 'DERIVED':
+        if origin['kind'].upper() == 'DERIVED':
             pending.extend(o['localId'] for o in origin['inputs'])
-        elif origin['kind'] == 'WRITTEN' and artifacts[origin['artifact']['localId']] == source.name:
+        elif origin['kind'].upper() == 'WRITTEN' and artifacts[origin['artifact']['localId']] == source.name:
             spans.append(origin['location'])
     require(bool(spans), 'candidate must reach original COBOL span')
     return spans
