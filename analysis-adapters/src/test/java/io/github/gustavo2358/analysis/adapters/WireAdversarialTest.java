@@ -18,7 +18,9 @@ final class WireAdversarialTest {
         var base=ResultFixtures.linear(1,1,1,1);var unit=base.units().getFirst();var seq=unit.sequences().getFirst();
         var assign=(io.github.gustavo2358.air.model.Operations.Assign)seq.instructions().getFirst();
         var read=new io.github.gustavo2358.air.model.Expressions.Read(ResultFixtures.operand(assign.header().id(),"read",io.github.gustavo2358.air.model.Operand.Role.VALUE_READ),new io.github.gustavo2358.air.model.Places.ObjectPlace(ResultFixtures.operand(assign.header().id(),"read-place",io.github.gustavo2358.air.model.Operand.Role.VALUE_READ),unit.objects().getFirst().id()));
-        var changed=new io.github.gustavo2358.air.model.Sequence(seq.label(),List.of(new io.github.gustavo2358.air.model.Operations.Assign(assign.header(),assign.destination(),read)),seq.terminator(),seq.origin());
+        // Direct Read is supported; fitting remains outside the scalar copy profile.
+        var fit=new io.github.gustavo2358.air.model.Expressions.FitText(ResultFixtures.operand(assign.header().id(),"fit",io.github.gustavo2358.air.model.Operand.Role.VALUE_READ),read,java.math.BigInteger.ONE," ");
+        var changed=new io.github.gustavo2358.air.model.Sequence(seq.label(),List.of(new io.github.gustavo2358.air.model.Operations.Assign(assign.header(),assign.destination(),fit)),seq.terminator(),seq.origin());
         var publication=ResultFixtures.publication(base.id(),List.of(ResultFixtures.unit(unit.id(),unit.entries(),List.of(changed),unit.objects())),base.storage());
         var result=new AnalysisDataflow().prepare(publication,"unsupported-profile");
         assertEquals(PreparationStatus.INCOMPLETE,result.result().preparationStatus());assertEquals("DEPENDENCY_UNAVAILABLE",result.result().results().getFirst().reason());

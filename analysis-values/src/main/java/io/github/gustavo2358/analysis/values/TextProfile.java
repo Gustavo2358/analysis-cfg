@@ -8,7 +8,9 @@ import java.util.*;
 /** Admission/preparation for scalar-text-direct@1. No effect is inferred from operation spelling. */
 final class TextProfile {
     record Location(int ordinal,Memory.Cell cell) { }
-    record Write(Location location,Candidates value) { }
+    sealed interface Write permits LiteralWrite, CopyWrite { Location location(); }
+    record LiteralWrite(Location location,Candidates value) implements Write { }
+    record CopyWrite(Location location,Location source) implements Write { }
     final AnalysisSession session;
     final Map<ObjectId,Location> subjects=new HashMap<>();
     final IdentityHashMap<Operation,Write> writes=new IdentityHashMap<>();
@@ -87,11 +89,17 @@ final class TextProfile {
     private static boolean text(Types.TypeRef type) { return type instanceof Types.Known k&&k.type()==Types.Builtin.TEXT; }
     private void prepare(Operation operation) {
         if(operation instanceof Operations.Assign assign) {
-            if(!(assign.destination() instanceof Places.ObjectPlace destination)||!(assign.value() instanceof Expressions.Literal literal)||!(literal.value() instanceof Values.TextValue text))
+            if(!(assign.destination() instanceof Places.ObjectPlace destination))
                 throw new Refusal(false,"UNSUPPORTED_EFFECT_PROFILE");
             var location=subjects.get(destination.object());
             if(location==null)throw new Refusal(false,"UNSUPPORTED_STORAGE_PROFILE");
-            writes.put(operation,new Write(location,universe.supported(text,assign.header().id(),assign.header().origin(),List.of(),preparation)));
+            if(assign.value() instanceof Expressions.Literal literal && literal.value() instanceof Values.TextValue text)
+                writes.put(operation,new LiteralWrite(location,universe.supported(text,assign.header().id(),assign.header().origin(),List.of(),preparation)));
+            else if(assign.value() instanceof Expressions.Read read && read.place() instanceof Places.ObjectPlace source) {
+                var sourceLocation=subjects.get(source.object());
+                if(sourceLocation==null)throw new Refusal(false,"UNSUPPORTED_STORAGE_PROFILE");
+                writes.put(operation,new CopyWrite(location,sourceLocation));
+            } else throw new Refusal(false,"UNSUPPORTED_EFFECT_PROFILE");
         } else if(effectAware && operation instanceof Operations.Invoke invoke) {
             if(!invoke.results().isEmpty())throw new Refusal(false,"UNSUPPORTED_EFFECT_PROFILE");
             effects.put(operation,ForeignEffectTransfer.prepare(invoke.effectBound(),modeledCells));
@@ -107,7 +115,11 @@ final class TextProfile {
         var write=writes.get(operation);
         if(write==null)return state;
         work.strongAssignments=Math.incrementExact(work.strongAssignments);
-        return state.assign(write.location().ordinal(),write.value(),work);
+        // Capture the immutable source value before the strong update, preserving
+        // its open remainder and candidate supports without creating an alias.
+        var value=write instanceof LiteralWrite literal ? literal.value()
+            : state.value(((CopyWrite)write).source().ordinal(),work);
+        return state.assign(write.location().ordinal(),value,work);
     }
     boolean supports(ObjectId subject,EntryId entry) {
         if(!subjects.containsKey(subject))return false;

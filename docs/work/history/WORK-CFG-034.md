@@ -2,8 +2,14 @@
 
 [Work item Lean](WORK-CFG-034.yaml). Baseline confirmado por fetch:
 `7549982461c04bb924ef935e4411762eab39e277`. Branch:
-`feat/cp6-w2d-real-if-dependency`. Implementação aguardando revisão humana;
-status permanece IN_PROGRESS até merge. Git/PR/testes são o registro.
+`feat/cp6-w2d-real-if-dependency`. COMPLETED / MERGED no [PR #20](https://github.com/Gustavo2358/analysis-cfg/pull/20).
+W2 = APPROVED / MERGED / CLOSED. Git/PR/testes são o registro.
+
+Qualified/source HEAD: `0ea0fea5fe2d8d1688d94b7a666edf13b2f3e2ca`.
+Merge: `cad8b45cdcd2d380cb98ba9984f34859551430e0`.
+Tree preservado em ambos: `7548ca15210d7f2fbc09b99040e7c90bcf700791`.
+Esta sincronização documental ocorre no PR de MOVE→MOVE (WORK-CFG-035);
+a validação abaixo registra o W2D já mergeado.
 
 Produção Java: nenhuma alteração. Solver, lattice, strong updates, fixed point,
 CFG core e interpretação genérica de nomes permanecem iguais ao baseline.
@@ -91,4 +97,5 @@ Closed prova fechamento apenas no modelo de valores da AIR. SP/AIR reais ainda
 publicam PARTIAL, política de nomes desconhecida e open control; não há promessa
 de resolução completa em runtime. Não houve ampliação de perfis de efeitos,
 predicados, AIR normativa ou upstreams. O algoritmo é o fixed point existente;
-nenhuma enumeração de caminhos foi introduzida. Pare no Draft PR, sem merge.
+nenhuma enumeração de caminhos foi introduzida. O PR #20 foi aprovado e mergeado;
+o novo trabalho MOVE→MOVE segue em WORK-CFG-035.

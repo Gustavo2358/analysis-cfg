@@ -76,12 +76,13 @@ class ValuesTest {
         var fragmented=replace(three,three.units(),three.coverage(),three.uncertainties(),proofs);
         assertEquals(PossibleValuesAnalysis.Status.UNSUPPORTED,PossibleValuesAnalysis.prepare(session(fragmented)).status());
     }
-    @Test void unsupportedReadAndIndirectStorageAreNotIdentity() {
+    @Test void directReadIsCopyWhileOtherEffectsAndIndirectStorageRemainUnsupported() {
         var p=graph(new String[]{"A"},new int[][]{{}},1,false,false);var u=p.units().getFirst();var seq=u.sequences().getFirst();var assign=(Operations.Assign)seq.instructions().getFirst();
         var read=new Expressions.Read(operand(assign.header().id(),"read",Operand.Role.VALUE_READ),new Places.ObjectPlace(operand(assign.header().id(),"readplace",Operand.Role.VALUE_READ),u.objects().getFirst().id()));
         var changed=new Sequence(seq.label(),List.of(new Operations.Assign(assign.header(),assign.destination(),read)),seq.terminator(),seq.origin());
         var q=replace(p,List.of(unit(u.id(),u.entries(),List.of(changed),u.objects())),p.coverage(),p.uncertainties(),p.premises());
-        var refused=PossibleValuesAnalysis.prepare(session(q));assertEquals(PossibleValuesAnalysis.Status.UNSUPPORTED,refused.status(),"unmodeled write cannot be identity");assertEquals(1,refused.unsupportedEffectProfiles());
+        var admitted=PossibleValuesAnalysis.prepare(session(q));assertEquals(PossibleValuesAnalysis.Status.ACCEPTED,admitted.status());
+        expected(fact(admitted.analysis().orElseThrow().execute(),before(q,0,0)),true);
         var gap=new UncertaintyId(p.id(),"effects");
         var uncertainty=new Evidence.Uncertainty(gap,"UNKNOWN_WRITE",List.of(Evidence.Dimension.EFFECTS,Evidence.Dimension.VALUES),new Scopes.UnitScope(u.id()),"unmodeled write",origin(p.id()));
         var exact=header(u.id(),"metadata").precision().control();

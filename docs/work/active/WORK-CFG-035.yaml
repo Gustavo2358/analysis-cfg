@@ -1,0 +1,6 @@
+id: WORK-CFG-035
+title: CP6 — propagate scalar MOVE data-to-data into CALL targets
+status: IN_PROGRESS
+scope:
+  - Assign destination = Read(source)
+  - real MOVE→MOVE→CALL vertical

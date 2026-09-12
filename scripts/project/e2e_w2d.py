@@ -42,9 +42,9 @@ def source_spans(result, support, source):
             continue
         seen.add(key)
         origin = origins[key]
-        if origin['kind'] == 'DERIVED':
+        if origin['kind'].upper() == 'DERIVED':
             pending.extend(o['localId'] for o in origin['inputs'])
-        elif origin['kind'] == 'WRITTEN' and artifacts[origin['artifact']['localId']] == source.name:
+        elif origin['kind'].upper() == 'WRITTEN' and artifacts[origin['artifact']['localId']] == source.name:
             spans.append(origin['location'])
     require(bool(spans), 'candidate must reach original COBOL span')
     return spans
@@ -134,7 +134,8 @@ def run(work, config_path):
             sp = cwd / 'sp/cobol-semantic-product.json'
             semantic = json.loads(sp.read_text())
             version = semantic['contractVersion']
-            require(version == '1.4.0', 'W2D requires SP 1.4.0; actual real producer emitted ' + version)
+            require(version == config['semanticProductVersion'] == lock['proleap_poc']['semantic_product_version'],
+                    'W2D must consume the exact locked SP version; actual producer emitted ' + version)
             require(semantic['unit']['canonicalProgramName'] == 'CALLER', 'real caller program identity')
             air = cwd / 'program.air.json'
             execute(cwd, 'lower', ['java', '-cp', os.pathsep.join(config['lower']['classpath']), config['lower']['main'], str(sp), str(air)])
