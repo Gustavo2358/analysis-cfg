@@ -19,11 +19,11 @@ def check_snapshot(path, pin):
         raise ValueError('snapshot must be clean at exact pin: ' + str(path))
 
 
-def prepare(work, maven_repo=None):
+def prepare(work, maven_repo=None, pins_path=None):
     require_local()
     started = time.monotonic_ns()
     work.mkdir(parents=True, exist_ok=False)
-    pins = json.loads(PINS.read_text())
+    pins = json.loads((pins_path or PINS).read_text())
     lock = {'proleap_poc': {'semantic_product_version': pins['semanticProductVersion']}}
     for name, sha in pins['analysisRepositories'].items():
         lock.setdefault(name.replace('-', '_'), {}).update(repository='Gustavo2358/' + name, commit=sha)
@@ -74,6 +74,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--work', type=Path, required=True)
     parser.add_argument('--maven-repo', type=Path)
+    parser.add_argument('--pins', type=Path, help='explicit immutable snapshots for an after-vs-before run')
     args = parser.parse_args()
-    prepare(args.work.resolve(), args.maven_repo)
+    prepare(args.work.resolve(), args.maven_repo, args.pins)
     print('Prepared exact pipeline snapshots; see ' + str(args.work / 'setup.log'))

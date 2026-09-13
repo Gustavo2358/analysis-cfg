@@ -5,13 +5,43 @@ from pathlib import Path
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 import zipfile
 
 import carddemo_baseline as runner
 import carddemo_metrics as metrics
+import carddemo_entry_delta as entry_delta
 
 
 class BaselineTests(unittest.TestCase):
+    def test_explicit_after_pins_keep_strict_runtime_admission(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp); pins = root / 'pins.json'; runtime = root / 'runtime.json'
+            pins.write_text(json.dumps({'analysisRepositories': {'frontend': 'a' * 40}}))
+            runtime.write_text(json.dumps({'sources': {'frontend': 'b' * 40}}))
+            with patch.object(runner, 'PINS', root / 'unused-historical-pins.json'):
+                with self.assertRaisesRegex(ValueError, 'runtime pipeline snapshots differ'):
+                    runner.run(root / 'upstream', root / 'run', runtime, 120, [], pins)
+
+    def test_entry_delta_call_identity_ignores_expanded_lines_but_keeps_include_instance(self):
+        call = {'provenance': {'original': {'file': 'a.cbl', 'startLine': 8},
+                               'includeChain': [], 'expanded': {'startLine': 30}}}
+        changed = copy.deepcopy(call); changed['provenance']['expanded']['startLine'] = 60
+        self.assertEqual(entry_delta.call_key(call), entry_delta.call_key(changed))
+        changed['provenance']['includeChain'] = [{'includedFile': 'X', 'line': 2}]
+        self.assertNotEqual(entry_delta.call_key(call), entry_delta.call_key(changed))
+        with self.assertRaisesRegex(ValueError, 'ambiguous source CALL'):
+            entry_delta.calls({'path': 'a.cbl', 'sourceCallInventory': [dict(call, statement='s1'),
+                               dict(call, statement='s2')], 'callSites': []})
+
+    def test_entry_delta_distinguishes_observed_sites_from_analyzed_sites(self):
+        p = {'stages': {stage: {'state': 'PARTIAL'} for stage in runner.STAGES},
+             'sourceCallInventory': [{}, {}], 'callSites': []}
+        value = entry_delta.totals([p])
+        self.assertEqual(value['callsObserved'], 2)
+        self.assertEqual(value['callsAnalyzed'], 0)
+        self.assertEqual(value['withKnownCandidates'], 0)
+
     def test_enumerates_case_insensitively_without_success_whitelist(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

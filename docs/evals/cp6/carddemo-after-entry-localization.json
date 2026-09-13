@@ -1,0 +1,4365 @@
+{
+  "schemaVersion": "carddemo-entry-localization-delta-1.0.0",
+  "baselineReference": "carddemo-full-baseline.json",
+  "baselineSnapshot": {
+    "upstream": {
+      "repository": "aws-samples/aws-mainframe-modernization-carddemo",
+      "commit": "59cc6c2fd7ebd7ef7925cad552a01a4b8b6e4d5e"
+    },
+    "analysisRepositories": {
+      "air-java": "96cd5e545723c6fd76d1520f431ebbc196af84f6",
+      "proleap-poc": "59ac43bc3ab4bd186092a13732381512cbdaddba",
+      "cobol-lower": "7da4980067c2860b3827ecc3eea641a6afa2a526",
+      "analysis-cfg": "18a78a6599bfad2d983a4a32d7515d379a9bac60"
+    },
+    "semanticProductVersion": "1.8.0",
+    "decisionPolicy": "HUMAN",
+    "rankingAuthority": "ADVISORY_ONLY"
+  },
+  "snapshot": {
+    "upstream": {
+      "repository": "aws-samples/aws-mainframe-modernization-carddemo",
+      "commit": "59cc6c2fd7ebd7ef7925cad552a01a4b8b6e4d5e"
+    },
+    "analysisRepositories": {
+      "air-java": "96cd5e545723c6fd76d1520f431ebbc196af84f6",
+      "proleap-poc": "38b8d7d8cf5b363ec4bda0d2517450b6b1b6ffdd",
+      "cobol-lower": "24be819d96bd640f1c090f7c82dbb8c6e7ae31d3",
+      "analysis-cfg": "18a78a6599bfad2d983a4a32d7515d379a9bac60"
+    },
+    "semanticProductVersion": "1.9.0",
+    "decisionPolicy": "HUMAN",
+    "rankingAuthority": "ADVISORY_ONLY"
+  },
+  "measurementDirectory": "/tmp/entry-localization-20260913/full",
+  "before": {
+    "attempted": 73,
+    "frontend": 67,
+    "lower": 27,
+    "cfg": 27,
+    "dependency": 27,
+    "callsObserved": 73,
+    "callsAnalyzed": 36,
+    "callsReachable": 36,
+    "withKnownCandidates": 36,
+    "categories": {
+      "CLOSED_RESOLVED": 0,
+      "PARTIAL_RESOLVED": 36,
+      "OPEN_UNRESOLVED": 0,
+      "UNREACHABLE_IN_MODEL": 0,
+      "OTHER": 0
+    },
+    "remainders": {
+      "modelValueRemainder": 0,
+      "sourceValueRemainder": 36,
+      "interpretationUnknownRemainder": 36,
+      "effectiveUnknownRemainder": 36,
+      "openControlRemainder": 36
+    }
+  },
+  "after": {
+    "attempted": 73,
+    "frontend": 67,
+    "lower": 67,
+    "cfg": 67,
+    "dependency": 67,
+    "callsObserved": 73,
+    "callsAnalyzed": 73,
+    "callsReachable": 73,
+    "withKnownCandidates": 73,
+    "categories": {
+      "CLOSED_RESOLVED": 0,
+      "PARTIAL_RESOLVED": 73,
+      "OPEN_UNRESOLVED": 0,
+      "UNREACHABLE_IN_MODEL": 0,
+      "OTHER": 0
+    },
+    "remainders": {
+      "modelValueRemainder": 0,
+      "sourceValueRemainder": 73,
+      "interpretationUnknownRemainder": 73,
+      "effectiveUnknownRemainder": 73,
+      "openControlRemainder": 73
+    }
+  },
+  "classes": {
+    "A": {
+      "attempted": 3,
+      "frontend": 3,
+      "lower": 3,
+      "cfg": 3,
+      "dependency": 3,
+      "callsObserved": 9,
+      "callsAnalyzed": 9,
+      "callsReachable": 9,
+      "withKnownCandidates": 9,
+      "categories": {
+        "CLOSED_RESOLVED": 0,
+        "PARTIAL_RESOLVED": 9,
+        "OPEN_UNRESOLVED": 0,
+        "UNREACHABLE_IN_MODEL": 0,
+        "OTHER": 0
+      },
+      "remainders": {
+        "modelValueRemainder": 0,
+        "sourceValueRemainder": 9,
+        "interpretationUnknownRemainder": 9,
+        "effectiveUnknownRemainder": 9,
+        "openControlRemainder": 9
+      }
+    },
+    "B": {
+      "attempted": 35,
+      "frontend": 35,
+      "lower": 35,
+      "cfg": 35,
+      "dependency": 35,
+      "callsObserved": 10,
+      "callsAnalyzed": 10,
+      "callsReachable": 10,
+      "withKnownCandidates": 10,
+      "categories": {
+        "CLOSED_RESOLVED": 0,
+        "PARTIAL_RESOLVED": 10,
+        "OPEN_UNRESOLVED": 0,
+        "UNREACHABLE_IN_MODEL": 0,
+        "OTHER": 0
+      },
+      "remainders": {
+        "modelValueRemainder": 0,
+        "sourceValueRemainder": 10,
+        "interpretationUnknownRemainder": 10,
+        "effectiveUnknownRemainder": 10,
+        "openControlRemainder": 10
+      }
+    },
+    "C": {
+      "attempted": 2,
+      "frontend": 2,
+      "lower": 2,
+      "cfg": 2,
+      "dependency": 2,
+      "callsObserved": 18,
+      "callsAnalyzed": 18,
+      "callsReachable": 18,
+      "withKnownCandidates": 18,
+      "categories": {
+        "CLOSED_RESOLVED": 0,
+        "PARTIAL_RESOLVED": 18,
+        "OPEN_UNRESOLVED": 0,
+        "UNREACHABLE_IN_MODEL": 0,
+        "OTHER": 0
+      },
+      "remainders": {
+        "modelValueRemainder": 0,
+        "sourceValueRemainder": 18,
+        "interpretationUnknownRemainder": 18,
+        "effectiveUnknownRemainder": 18,
+        "openControlRemainder": 18
+      }
+    }
+  },
+  "previouslyStrandedCallsNowAnalyzed": 37,
+  "existingCallSitesPreserved": 36,
+  "entryBlockersRemaining": 0,
+  "newBlockers": [],
+  "allBlockers": [
+    {
+      "path": "app/app-authorization-ims-db2-mq/cbl/CBPAUP0C.cbl",
+      "stage": "frontend",
+      "state": "BLOCKED",
+      "reasonCategory": "PREPROCESSING_GAP",
+      "reasonCode": "PREPROCESSOR_EXEC_POLICY_MISSING",
+      "diagnostic": "2026-09-12T22:45:26.784-03:00 level=INFO logger=i.g.g.cobolexplorer.ExplorerMain thread=main runId=170750a9-541d-4708-9dbf-73b2bfd64c20 source=CBPAUP0C.cbl programUnit=none event=analysis_started phase=ANALYSIS output=/tmp/entry-localization-20260913/full/programs/app/app-authorization-ims-db2-mq/cbl/CBPAUP0C.cbl/sp\n2026-09-12T22:45:26.947-03:00 level=ERROR logger=i.g.g.cobolexplorer.ExplorerMain thread=main runId=170750a9-541d-4708-9dbf-73b2bfd64c20 source=CBPAUP0C.cbl programUnit=none event=analysis_failed phase=PREPROCESSING elapsedMs=177 reason=IllegalStateException impact=NO_RESULT\njava.lang.IllegalStateException: Preprocessor grammar construct has no explicit policy: EXEC\n\tat io.github.gustavo2358.cobolexplorer.PreprocessorEngine.policyFor(PreprocessorEngine.java:324)\n\tat io.github.gustavo2358.cobolexplorer.PreprocessorEngine.processRecursive(PreprocessorEngine.java:151)\n\tat io.github.gustavo2358.cobolexplorer.PreprocessorEngine.process(PreprocessorEngine.java:84)\n\tat io.github.gustavo2358.cobolexplorer.ExplorerMain.analyze(ExplorerMain.java:73)\n\tat io.github.gustavo2358.cobolexplorer.ExplorerMain.main(ExplorerMain.java:39)\nException in thread \"main\" java.lang.IllegalStateException: Preprocessor grammar construct has no explicit policy: EXEC\n\tat io.github.gustavo2358.cobolexplorer.PreprocessorEngine.policyFor(PreprocessorEngine.java:324)\n\tat io.github.gustavo2358.cobolexplorer.PreprocessorEngine.processRecursive(PreprocessorEngine.java:151)\n\tat io.github.gustavo2358.cobolexplorer.PreprocessorEngine.process(PreprocessorEngine.java:84)\n\tat io.github.gustavo2358.cobolexplorer.ExplorerMain.analyze(ExplorerMain.java:73)\n\tat io.github.gustavo2358.cobolexplorer.ExplorerMain.main(ExplorerMain.java:39)\n",
+      "configuredTimeoutSeconds": 120.0,
+      "command": [
+        "java",
+        "-Xmx2g",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/proleap-poc/target/antlr-parse-tree-explorer-1.0.0-SNAPSHOT.jar:/tmp/lean-harness-wave/cfg-build/m2/org/antlr/antlr4-runtime/4.13.2/antlr4-runtime-4.13.2.jar:/tmp/lean-harness-wave/cfg-build/m2/org/slf4j/slf4j-api/2.0.18/slf4j-api-2.0.18.jar:/tmp/lean-harness-wave/cfg-build/m2/ch/qos/logback/logback-classic/1.6.3/logback-classic-1.6.3.jar:/tmp/lean-harness-wave/cfg-build/m2/ch/qos/logback/logback-core/1.6.3/logback-core-1.6.3.jar:/tmp/lean-harness-wave/cfg-build/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/tmp/lean-harness-wave/cfg-build/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar:/tmp/lean-harness-wave/cfg-build/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar",
+        "io.github.gustavo2358.cobolexplorer.ExplorerMain",
+        "--source",
+        "/tmp/carddemo-full-20260913/upstream/app/app-authorization-ims-db2-mq/cbl/CBPAUP0C.cbl",
+        "--copybooks",
+        "/tmp/carddemo-full-20260913/upstream/app/app-authorization-ims-db2-mq/cpy,/tmp/carddemo-full-20260913/upstream/app/app-authorization-ims-db2-mq/cpy-bms,/tmp/carddemo-full-20260913/upstream/app/app-authorization-ims-db2-mq/dcl,/tmp/carddemo-full-20260913/upstream/app/app-transaction-type-db2/cpy,/tmp/carddemo-full-20260913/upstream/app/app-transaction-type-db2/cpy-bms,/tmp/carddemo-full-20260913/upstream/app/app-transaction-type-db2/dcl,/tmp/carddemo-full-20260913/upstream/app/cpy,/tmp/carddemo-full-20260913/upstream/app/cpy-bms,/tmp/entry-localization-20260913/full/archive-members/samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cpy,/tmp/entry-localization-20260913/full/archive-members/samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cpy-bms",
+        "--output",
+        "/tmp/entry-localization-20260913/full/programs/app/app-authorization-ims-db2-mq/cbl/CBPAUP0C.cbl/sp"
+      ],
+      "stdout": "frontend.stdout",
+      "stderr": "frontend.stderr",
+      "exitCode": 1,
+      "elapsedMs": 414.564986,
+      "artifactProduced": false
+    },
+    {
+      "path": "app/app-authorization-ims-db2-mq/cbl/COPAUA0C.cbl",
+      "stage": "frontend",
+      "state": "BLOCKED",
+      "reasonCategory": "PREPROCESSING_GAP",
+      "reasonCode": "PREPROCESSOR_EXEC_POLICY_MISSING",
+      "diagnostic": "2026-09-12T22:45:27.227-03:00 level=INFO logger=i.g.g.cobolexplorer.ExplorerMain thread=main runId=7e404c68-c507-4700-8569-f86af0161fac source=COPAUA0C.cbl programUnit=none event=analysis_started phase=ANALYSIS output=/tmp/entry-localization-20260913/full/programs/app/app-authorization-ims-db2-mq/cbl/COPAUA0C.cbl/sp\n2026-09-12T22:45:27.420-03:00 level=ERROR logger=i.g.g.cobolexplorer.ExplorerMain thread=main runId=7e404c68-c507-4700-8569-f86af0161fac source=COPAUA0C.cbl programUnit=none event=analysis_failed phase=PREPROCESSING elapsedMs=207 reason=IllegalStateException impact=NO_RESULT\njava.lang.IllegalStateException: Preprocessor grammar construct has no explicit policy: EXEC\n\tat io.github.gustavo2358.cobolexplorer.PreprocessorEngine.policyFor(PreprocessorEngine.java:324)\n\tat io.github.gustavo2358.cobolexplorer.PreprocessorEngine.processRecursive(PreprocessorEngine.java:151)\n\tat io.github.gustavo2358.cobolexplorer.PreprocessorEngine.process(PreprocessorEngine.java:84)\n\tat io.github.gustavo2358.cobolexplorer.ExplorerMain.analyze(ExplorerMain.java:73)\n\tat io.github.gustavo2358.cobolexplorer.ExplorerMain.main(ExplorerMain.java:39)\nException in thread \"main\" java.lang.IllegalStateException: Preprocessor grammar construct has no explicit policy: EXEC\n\tat io.github.gustavo2358.cobolexplorer.PreprocessorEngine.policyFor(PreprocessorEngine.java:324)\n\tat io.github.gustavo2358.cobolexplorer.PreprocessorEngine.processRecursive(PreprocessorEngine.java:151)\n\tat io.github.gustavo2358.cobolexplorer.PreprocessorEngine.process(PreprocessorEngine.java:84)\n\tat io.github.gustavo2358.cobolexplorer.ExplorerMain.analyze(ExplorerMain.java:73)\n\tat io.github.gustavo2358.cobolexplorer.ExplorerMain.main(ExplorerMain.java:39)\n",
+      "configuredTimeoutSeconds": 120.0,
+      "command": [
+        "java",
+        "-Xmx2g",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/proleap-poc/target/antlr-parse-tree-explorer-1.0.0-SNAPSHOT.jar:/tmp/lean-harness-wave/cfg-build/m2/org/antlr/antlr4-runtime/4.13.2/antlr4-runtime-4.13.2.jar:/tmp/lean-harness-wave/cfg-build/m2/org/slf4j/slf4j-api/2.0.18/slf4j-api-2.0.18.jar:/tmp/lean-harness-wave/cfg-build/m2/ch/qos/logback/logback-classic/1.6.3/logback-classic-1.6.3.jar:/tmp/lean-harness-wave/cfg-build/m2/ch/qos/logback/logback-core/1.6.3/logback-core-1.6.3.jar:/tmp/lean-harness-wave/cfg-build/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/tmp/lean-harness-wave/cfg-build/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar:/tmp/lean-harness-wave/cfg-build/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar",
+        "io.github.gustavo2358.cobolexplorer.ExplorerMain",
+        "--source",
+        "/tmp/carddemo-full-20260913/upstream/app/app-authorization-ims-db2-mq/cbl/COPAUA0C.cbl",
+        "--copybooks",
+        "/tmp/carddemo-full-20260913/upstream/app/app-authorization-ims-db2-mq/cpy,/tmp/carddemo-full-20260913/upstream/app/app-authorization-ims-db2-mq/cpy-bms,/tmp/carddemo-full-20260913/upstream/app/app-authorization-ims-db2-mq/dcl,/tmp/carddemo-full-20260913/upstream/app/app-transaction-type-db2/cpy,/tmp/carddemo-full-20260913/upstream/app/app-transaction-type-db2/cpy-bms,/tmp/carddemo-full-20260913/upstream/app/app-transaction-type-db2/dcl,/tmp/carddemo-full-20260913/upstream/app/cpy,/tmp/carddemo-full-20260913/upstream/app/cpy-bms,/tmp/entry-localization-20260913/full/archive-members/samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cpy,/tmp/entry-localization-20260913/full/archive-members/samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cpy-bms",
+        "--output",
+        "/tmp/entry-localization-20260913/full/programs/app/app-authorization-ims-db2-mq/cbl/COPAUA0C.cbl/sp"
+      ],
+      "stdout": "frontend.stdout",
+      "stderr": "frontend.stderr",
+      "exitCode": 1,
+      "elapsedMs": 464.662874,
+      "artifactProduced": false
+    },
+    {
+      "path": "app/app-authorization-ims-db2-mq/cbl/COPAUS0C.cbl",
+      "stage": "frontend",
+      "state": "BLOCKED",
+      "reasonCategory": "PREPROCESSING_GAP",
+      "reasonCode": "PREPROCESSOR_EXEC_POLICY_MISSING",
+      "diagnostic": "2026-09-12T22:45:27.712-03:00 level=INFO logger=i.g.g.cobolexplorer.ExplorerMain thread=main runId=b8922124-4643-4709-a610-51fd5d6a61ac source=COPAUS0C.cbl programUnit=none event=analysis_started phase=ANALYSIS output=/tmp/entry-localization-20260913/full/programs/app/app-authorization-ims-db2-mq/cbl/COPAUS0C.cbl/sp\n2026-09-12T22:45:27.910-03:00 level=ERROR logger=i.g.g.cobolexplorer.ExplorerMain thread=main runId=b8922124-4643-4709-a610-51fd5d6a61ac source=COPAUS0C.cbl programUnit=none event=analysis_failed phase=PREPROCESSING elapsedMs=211 reason=IllegalStateException impact=NO_RESULT\njava.lang.IllegalStateException: Preprocessor grammar construct has no explicit policy: EXEC\n\tat io.github.gustavo2358.cobolexplorer.PreprocessorEngine.policyFor(PreprocessorEngine.java:324)\n\tat io.github.gustavo2358.cobolexplorer.PreprocessorEngine.processRecursive(PreprocessorEngine.java:151)\n\tat io.github.gustavo2358.cobolexplorer.PreprocessorEngine.process(PreprocessorEngine.java:84)\n\tat io.github.gustavo2358.cobolexplorer.ExplorerMain.analyze(ExplorerMain.java:73)\n\tat io.github.gustavo2358.cobolexplorer.ExplorerMain.main(ExplorerMain.java:39)\nException in thread \"main\" java.lang.IllegalStateException: Preprocessor grammar construct has no explicit policy: EXEC\n\tat io.github.gustavo2358.cobolexplorer.PreprocessorEngine.policyFor(PreprocessorEngine.java:324)\n\tat io.github.gustavo2358.cobolexplorer.PreprocessorEngine.processRecursive(PreprocessorEngine.java:151)\n\tat io.github.gustavo2358.cobolexplorer.PreprocessorEngine.process(PreprocessorEngine.java:84)\n\tat io.github.gustavo2358.cobolexplorer.ExplorerMain.analyze(ExplorerMain.java:73)\n\tat io.github.gustavo2358.cobolexplorer.ExplorerMain.main(ExplorerMain.java:39)\n",
+      "configuredTimeoutSeconds": 120.0,
+      "command": [
+        "java",
+        "-Xmx2g",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/proleap-poc/target/antlr-parse-tree-explorer-1.0.0-SNAPSHOT.jar:/tmp/lean-harness-wave/cfg-build/m2/org/antlr/antlr4-runtime/4.13.2/antlr4-runtime-4.13.2.jar:/tmp/lean-harness-wave/cfg-build/m2/org/slf4j/slf4j-api/2.0.18/slf4j-api-2.0.18.jar:/tmp/lean-harness-wave/cfg-build/m2/ch/qos/logback/logback-classic/1.6.3/logback-classic-1.6.3.jar:/tmp/lean-harness-wave/cfg-build/m2/ch/qos/logback/logback-core/1.6.3/logback-core-1.6.3.jar:/tmp/lean-harness-wave/cfg-build/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/tmp/lean-harness-wave/cfg-build/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar:/tmp/lean-harness-wave/cfg-build/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar",
+        "io.github.gustavo2358.cobolexplorer.ExplorerMain",
+        "--source",
+        "/tmp/carddemo-full-20260913/upstream/app/app-authorization-ims-db2-mq/cbl/COPAUS0C.cbl",
+        "--copybooks",
+        "/tmp/carddemo-full-20260913/upstream/app/app-authorization-ims-db2-mq/cpy,/tmp/carddemo-full-20260913/upstream/app/app-authorization-ims-db2-mq/cpy-bms,/tmp/carddemo-full-20260913/upstream/app/app-authorization-ims-db2-mq/dcl,/tmp/carddemo-full-20260913/upstream/app/app-transaction-type-db2/cpy,/tmp/carddemo-full-20260913/upstream/app/app-transaction-type-db2/cpy-bms,/tmp/carddemo-full-20260913/upstream/app/app-transaction-type-db2/dcl,/tmp/carddemo-full-20260913/upstream/app/cpy,/tmp/carddemo-full-20260913/upstream/app/cpy-bms,/tmp/entry-localization-20260913/full/archive-members/samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cpy,/tmp/entry-localization-20260913/full/archive-members/samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cpy-bms",
+        "--output",
+        "/tmp/entry-localization-20260913/full/programs/app/app-authorization-ims-db2-mq/cbl/COPAUS0C.cbl/sp"
+      ],
+      "stdout": "frontend.stdout",
+      "stderr": "frontend.stderr",
+      "exitCode": 1,
+      "elapsedMs": 464.663175,
+      "artifactProduced": false
+    },
+    {
+      "path": "app/app-authorization-ims-db2-mq/cbl/COPAUS1C.cbl",
+      "stage": "frontend",
+      "state": "BLOCKED",
+      "reasonCategory": "PREPROCESSING_GAP",
+      "reasonCode": "PREPROCESSOR_EXEC_POLICY_MISSING",
+      "diagnostic": "2026-09-12T22:45:28.213-03:00 level=INFO logger=i.g.g.cobolexplorer.ExplorerMain thread=main runId=dcd8e0df-91f3-4cec-8cf2-74f370d94278 source=COPAUS1C.cbl programUnit=none event=analysis_started phase=ANALYSIS output=/tmp/entry-localization-20260913/full/programs/app/app-authorization-ims-db2-mq/cbl/COPAUS1C.cbl/sp\n2026-09-12T22:45:28.397-03:00 level=ERROR logger=i.g.g.cobolexplorer.ExplorerMain thread=main runId=dcd8e0df-91f3-4cec-8cf2-74f370d94278 source=COPAUS1C.cbl programUnit=none event=analysis_failed phase=PREPROCESSING elapsedMs=198 reason=IllegalStateException impact=NO_RESULT\njava.lang.IllegalStateException: Preprocessor grammar construct has no explicit policy: EXEC\n\tat io.github.gustavo2358.cobolexplorer.PreprocessorEngine.policyFor(PreprocessorEngine.java:324)\n\tat io.github.gustavo2358.cobolexplorer.PreprocessorEngine.processRecursive(PreprocessorEngine.java:151)\n\tat io.github.gustavo2358.cobolexplorer.PreprocessorEngine.process(PreprocessorEngine.java:84)\n\tat io.github.gustavo2358.cobolexplorer.ExplorerMain.analyze(ExplorerMain.java:73)\n\tat io.github.gustavo2358.cobolexplorer.ExplorerMain.main(ExplorerMain.java:39)\nException in thread \"main\" java.lang.IllegalStateException: Preprocessor grammar construct has no explicit policy: EXEC\n\tat io.github.gustavo2358.cobolexplorer.PreprocessorEngine.policyFor(PreprocessorEngine.java:324)\n\tat io.github.gustavo2358.cobolexplorer.PreprocessorEngine.processRecursive(PreprocessorEngine.java:151)\n\tat io.github.gustavo2358.cobolexplorer.PreprocessorEngine.process(PreprocessorEngine.java:84)\n\tat io.github.gustavo2358.cobolexplorer.ExplorerMain.analyze(ExplorerMain.java:73)\n\tat io.github.gustavo2358.cobolexplorer.ExplorerMain.main(ExplorerMain.java:39)\n",
+      "configuredTimeoutSeconds": 120.0,
+      "command": [
+        "java",
+        "-Xmx2g",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/proleap-poc/target/antlr-parse-tree-explorer-1.0.0-SNAPSHOT.jar:/tmp/lean-harness-wave/cfg-build/m2/org/antlr/antlr4-runtime/4.13.2/antlr4-runtime-4.13.2.jar:/tmp/lean-harness-wave/cfg-build/m2/org/slf4j/slf4j-api/2.0.18/slf4j-api-2.0.18.jar:/tmp/lean-harness-wave/cfg-build/m2/ch/qos/logback/logback-classic/1.6.3/logback-classic-1.6.3.jar:/tmp/lean-harness-wave/cfg-build/m2/ch/qos/logback/logback-core/1.6.3/logback-core-1.6.3.jar:/tmp/lean-harness-wave/cfg-build/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/tmp/lean-harness-wave/cfg-build/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar:/tmp/lean-harness-wave/cfg-build/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar",
+        "io.github.gustavo2358.cobolexplorer.ExplorerMain",
+        "--source",
+        "/tmp/carddemo-full-20260913/upstream/app/app-authorization-ims-db2-mq/cbl/COPAUS1C.cbl",
+        "--copybooks",
+        "/tmp/carddemo-full-20260913/upstream/app/app-authorization-ims-db2-mq/cpy,/tmp/carddemo-full-20260913/upstream/app/app-authorization-ims-db2-mq/cpy-bms,/tmp/carddemo-full-20260913/upstream/app/app-authorization-ims-db2-mq/dcl,/tmp/carddemo-full-20260913/upstream/app/app-transaction-type-db2/cpy,/tmp/carddemo-full-20260913/upstream/app/app-transaction-type-db2/cpy-bms,/tmp/carddemo-full-20260913/upstream/app/app-transaction-type-db2/dcl,/tmp/carddemo-full-20260913/upstream/app/cpy,/tmp/carddemo-full-20260913/upstream/app/cpy-bms,/tmp/entry-localization-20260913/full/archive-members/samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cpy,/tmp/entry-localization-20260913/full/archive-members/samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cpy-bms",
+        "--output",
+        "/tmp/entry-localization-20260913/full/programs/app/app-authorization-ims-db2-mq/cbl/COPAUS1C.cbl/sp"
+      ],
+      "stdout": "frontend.stdout",
+      "stderr": "frontend.stderr",
+      "exitCode": 1,
+      "elapsedMs": 464.579714,
+      "artifactProduced": false
+    },
+    {
+      "path": "app/app-transaction-type-db2/cbl/COTRTLIC.cbl",
+      "stage": "frontend",
+      "state": "BLOCKED",
+      "reasonCategory": "NORMALIZATION_GAP",
+      "reasonCode": "FIXED_FORMAT_TAB",
+      "diagnostic": "2026-09-12T22:45:43.540-03:00 level=INFO logger=i.g.g.cobolexplorer.ExplorerMain thread=main runId=714e26a9-a3ce-437e-b0b4-f5e10df210ce source=COTRTLIC.cbl programUnit=none event=analysis_started phase=ANALYSIS output=/tmp/entry-localization-20260913/full/programs/app/app-transaction-type-db2/cbl/COTRTLIC.cbl/sp\n2026-09-12T22:45:43.575-03:00 level=ERROR logger=i.g.g.cobolexplorer.ExplorerMain thread=main runId=714e26a9-a3ce-437e-b0b4-f5e10df210ce source=COTRTLIC.cbl programUnit=none event=analysis_failed phase=NORMALIZATION elapsedMs=50 reason=IllegalArgumentException impact=NO_RESULT\njava.lang.IllegalArgumentException: Unsupported tab in fixed-format source at offset 75337\n\tat io.github.gustavo2358.cobolexplorer.SourceNormalizer.validateFixedCharacters(SourceNormalizer.java:481)\n\tat io.github.gustavo2358.cobolexplorer.SourceNormalizer.normalizeFixed(SourceNormalizer.java:100)\n\tat io.github.gustavo2358.cobolexplorer.SourceNormalizer.normalize(SourceNormalizer.java:90)\n\tat io.github.gustavo2358.cobolexplorer.ExplorerMain.analyze(ExplorerMain.java:59)\n\tat io.github.gustavo2358.cobolexplorer.ExplorerMain.main(ExplorerMain.java:39)\nException in thread \"main\" java.lang.IllegalArgumentException: Unsupported tab in fixed-format source at offset 75337\n\tat io.github.gustavo2358.cobolexplorer.SourceNormalizer.validateFixedCharacters(SourceNormalizer.java:481)\n\tat io.github.gustavo2358.cobolexplorer.SourceNormalizer.normalizeFixed(SourceNormalizer.java:100)\n\tat io.github.gustavo2358.cobolexplorer.SourceNormalizer.normalize(SourceNormalizer.java:90)\n\tat io.github.gustavo2358.cobolexplorer.ExplorerMain.analyze(ExplorerMain.java:59)\n\tat io.github.gustavo2358.cobolexplorer.ExplorerMain.main(ExplorerMain.java:39)\n",
+      "configuredTimeoutSeconds": 120.0,
+      "command": [
+        "java",
+        "-Xmx2g",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/proleap-poc/target/antlr-parse-tree-explorer-1.0.0-SNAPSHOT.jar:/tmp/lean-harness-wave/cfg-build/m2/org/antlr/antlr4-runtime/4.13.2/antlr4-runtime-4.13.2.jar:/tmp/lean-harness-wave/cfg-build/m2/org/slf4j/slf4j-api/2.0.18/slf4j-api-2.0.18.jar:/tmp/lean-harness-wave/cfg-build/m2/ch/qos/logback/logback-classic/1.6.3/logback-classic-1.6.3.jar:/tmp/lean-harness-wave/cfg-build/m2/ch/qos/logback/logback-core/1.6.3/logback-core-1.6.3.jar:/tmp/lean-harness-wave/cfg-build/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/tmp/lean-harness-wave/cfg-build/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar:/tmp/lean-harness-wave/cfg-build/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar",
+        "io.github.gustavo2358.cobolexplorer.ExplorerMain",
+        "--source",
+        "/tmp/carddemo-full-20260913/upstream/app/app-transaction-type-db2/cbl/COTRTLIC.cbl",
+        "--copybooks",
+        "/tmp/carddemo-full-20260913/upstream/app/app-transaction-type-db2/cpy,/tmp/carddemo-full-20260913/upstream/app/app-transaction-type-db2/cpy-bms,/tmp/carddemo-full-20260913/upstream/app/app-transaction-type-db2/dcl,/tmp/carddemo-full-20260913/upstream/app/app-authorization-ims-db2-mq/cpy,/tmp/carddemo-full-20260913/upstream/app/app-authorization-ims-db2-mq/cpy-bms,/tmp/carddemo-full-20260913/upstream/app/app-authorization-ims-db2-mq/dcl,/tmp/carddemo-full-20260913/upstream/app/cpy,/tmp/carddemo-full-20260913/upstream/app/cpy-bms,/tmp/entry-localization-20260913/full/archive-members/samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cpy,/tmp/entry-localization-20260913/full/archive-members/samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cpy-bms",
+        "--output",
+        "/tmp/entry-localization-20260913/full/programs/app/app-transaction-type-db2/cbl/COTRTLIC.cbl/sp"
+      ],
+      "stdout": "frontend.stdout",
+      "stderr": "frontend.stderr",
+      "exitCode": 1,
+      "elapsedMs": 264.260467,
+      "artifactProduced": false
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/CBSTM03A.cbl",
+      "stage": "frontend",
+      "state": "BLOCKED",
+      "reasonCategory": "NORMALIZATION_GAP",
+      "reasonCode": "NORMALIZATION_REJECTED",
+      "diagnostic": "2026-09-12T22:48:48.660-03:00 level=INFO logger=i.g.g.cobolexplorer.ExplorerMain thread=main runId=056c355d-d9ba-48fc-9d1e-a959a1deac5f source=CBSTM03A.cbl programUnit=none event=analysis_started phase=ANALYSIS output=/tmp/entry-localization-20260913/full/programs/samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/CBSTM03A.cbl/sp\n2026-09-12T22:48:48.906-03:00 level=ERROR logger=i.g.g.cobolexplorer.ExplorerMain thread=main runId=056c355d-d9ba-48fc-9d1e-a959a1deac5f source=CBSTM03A.cbl programUnit=none event=analysis_failed phase=PREPROCESSING elapsedMs=260 reason=IllegalArgumentException impact=NO_RESULT\njava.lang.IllegalArgumentException: Unsupported fixed-format indicator '0' at line 6, column 7\n\tat io.github.gustavo2358.cobolexplorer.SourceNormalizer.indicator(SourceNormalizer.java:516)\n\tat io.github.gustavo2358.cobolexplorer.SourceNormalizer.normalizeFixed(SourceNormalizer.java:106)\n\tat io.github.gustavo2358.cobolexplorer.SourceNormalizer.normalize(SourceNormalizer.java:90)\n\tat io.github.gustavo2358.cobolexplorer.CopybookLibrary.readNormalized(CopybookLibrary.java:37)\n\tat io.github.gustavo2358.cobolexplorer.PreprocessorEngine.processRecursive(PreprocessorEngine.java:207)\n\tat io.github.gustavo2358.cobolexplorer.PreprocessorEngine.process(PreprocessorEngine.java:84)\n\tat io.github.gustavo2358.cobolexplorer.ExplorerMain.analyze(ExplorerMain.java:73)\n\tat io.github.gustavo2358.cobolexplorer.ExplorerMain.main(ExplorerMain.java:39)\nException in thread \"main\" java.lang.IllegalArgumentException: Unsupported fixed-format indicator '0' at line 6, column 7\n\tat io.github.gustavo2358.cobolexplorer.SourceNormalizer.indicator(SourceNormalizer.java:516)\n\tat io.github.gustavo2358.cobolexplorer.SourceNormalizer.normalizeFixed(SourceNormalizer.java:106)\n\tat io.github.gustavo2358.cobolexplorer.SourceNormalizer.normalize(SourceNormalizer.java:90)\n\tat io.github.gustavo2358.cobolexplorer.CopybookLibrary.readNormalized(CopybookLibrary.java:37)\n\tat io.github.gustavo2358.cobolexplorer.PreprocessorEngine.processRecursive(PreprocessorEngine.java:207)\n\tat io.github.gustavo2358.cobolexplorer.PreprocessorEngine.process(PreprocessorEngine.java:84)\n\tat io.github.gustavo2358.cobolexplorer.ExplorerMain.analyze(ExplorerMain.java:73)\n\tat io.github.gustavo2358.cobolexplorer.ExplorerMain.main(ExplorerMain.java:39)\n",
+      "configuredTimeoutSeconds": 120.0,
+      "command": [
+        "java",
+        "-Xmx2g",
+        "-cp",
+        "/home/gustavo/workspace/teste-e2e/proleap-poc/target/antlr-parse-tree-explorer-1.0.0-SNAPSHOT.jar:/tmp/lean-harness-wave/cfg-build/m2/org/antlr/antlr4-runtime/4.13.2/antlr4-runtime-4.13.2.jar:/tmp/lean-harness-wave/cfg-build/m2/org/slf4j/slf4j-api/2.0.18/slf4j-api-2.0.18.jar:/tmp/lean-harness-wave/cfg-build/m2/ch/qos/logback/logback-classic/1.6.3/logback-classic-1.6.3.jar:/tmp/lean-harness-wave/cfg-build/m2/ch/qos/logback/logback-core/1.6.3/logback-core-1.6.3.jar:/tmp/lean-harness-wave/cfg-build/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/tmp/lean-harness-wave/cfg-build/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar:/tmp/lean-harness-wave/cfg-build/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar",
+        "io.github.gustavo2358.cobolexplorer.ExplorerMain",
+        "--source",
+        "/tmp/entry-localization-20260913/full/archive-members/samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/CBSTM03A.cbl",
+        "--copybooks",
+        "/tmp/entry-localization-20260913/full/archive-members/samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cpy,/tmp/entry-localization-20260913/full/archive-members/samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cpy-bms,/tmp/carddemo-full-20260913/upstream/app/app-authorization-ims-db2-mq/cpy,/tmp/carddemo-full-20260913/upstream/app/app-authorization-ims-db2-mq/cpy-bms,/tmp/carddemo-full-20260913/upstream/app/app-authorization-ims-db2-mq/dcl,/tmp/carddemo-full-20260913/upstream/app/app-transaction-type-db2/cpy,/tmp/carddemo-full-20260913/upstream/app/app-transaction-type-db2/cpy-bms,/tmp/carddemo-full-20260913/upstream/app/app-transaction-type-db2/dcl,/tmp/carddemo-full-20260913/upstream/app/cpy,/tmp/carddemo-full-20260913/upstream/app/cpy-bms",
+        "--output",
+        "/tmp/entry-localization-20260913/full/programs/samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/CBSTM03A.cbl/sp"
+      ],
+      "stdout": "frontend.stdout",
+      "stderr": "frontend.stderr",
+      "exitCode": 1,
+      "elapsedMs": 514.734686,
+      "artifactProduced": false
+    }
+  ],
+  "changedPrograms": [
+    {
+      "path": "app/app-authorization-ims-db2-mq/cbl/DBUNLDGS.CBL",
+      "class": "A",
+      "sourceSha256": "13c409d1b14b52c4d334c9297aaa7dafa209901569f809127f3831d780722e33",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:20"
+      },
+      "inputInventory": "COMPLETE",
+      "missingCopies": [],
+      "calls": [
+        {
+          "statement": "statement:0",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 47,
+              "endLine": 414,
+              "file": "<preprocessed>",
+              "startColumn": 5,
+              "startLine": 411
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 54,
+              "endLine": 225,
+              "file": "DBUNLDGS.CBL",
+              "startColumn": 12,
+              "startLine": 222
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "634d4a9c739693f77b9703bedae07d12",
+                "publication": "568a64afc8994b12722936293b93a9e4",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "CBLTDLI",
+                  "referenceName": "CBLTDLI",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "968e853966bf261e53d4f8c94a1d21c7",
+                        "publication": "568a64afc8994b12722936293b93a9e4"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "634d4a9c739693f77b9703bedae07d12",
+                        "publication": "568a64afc8994b12722936293b93a9e4",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        },
+        {
+          "statement": "statement:4",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 48,
+              "endLine": 459,
+              "file": "<preprocessed>",
+              "startColumn": 5,
+              "startLine": 456
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 55,
+              "endLine": 270,
+              "file": "DBUNLDGS.CBL",
+              "startColumn": 12,
+              "startLine": 267
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "464a8ee157caaeef320d0d134b12431a",
+                "publication": "568a64afc8994b12722936293b93a9e4",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "CBLTDLI",
+                  "referenceName": "CBLTDLI",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "b3bc8c14f21888194325eb23e4bbf03e",
+                        "publication": "568a64afc8994b12722936293b93a9e4"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "464a8ee157caaeef320d0d134b12431a",
+                        "publication": "568a64afc8994b12722936293b93a9e4",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        },
+        {
+          "statement": "statement:7",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 52,
+              "endLine": 493,
+              "file": "<preprocessed>",
+              "startColumn": 5,
+              "startLine": 491
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 59,
+              "endLine": 304,
+              "file": "DBUNLDGS.CBL",
+              "startColumn": 12,
+              "startLine": 302
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "020b7184648ecb8cbae1804f876d0188",
+                "publication": "568a64afc8994b12722936293b93a9e4",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "CBLTDLI",
+                  "referenceName": "CBLTDLI",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "42057087a1f446efde60581ca81c3163",
+                        "publication": "568a64afc8994b12722936293b93a9e4"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "020b7184648ecb8cbae1804f876d0188",
+                        "publication": "568a64afc8994b12722936293b93a9e4",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        },
+        {
+          "statement": "statement:8",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 52,
+              "endLine": 512,
+              "file": "<preprocessed>",
+              "startColumn": 5,
+              "startLine": 510
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 59,
+              "endLine": 323,
+              "file": "DBUNLDGS.CBL",
+              "startColumn": 12,
+              "startLine": 321
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "c8baf74dc28e962ff4b65a22c1163a2f",
+                "publication": "568a64afc8994b12722936293b93a9e4",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "CBLTDLI",
+                  "referenceName": "CBLTDLI",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "37f640c45dff9fbdf32c934a4521ff76",
+                        "publication": "568a64afc8994b12722936293b93a9e4"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "c8baf74dc28e962ff4b65a22c1163a2f",
+                        "publication": "568a64afc8994b12722936293b93a9e4",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        }
+      ],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 1115.896724,
+          "lowerMs": 564.827523,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 1706.524041
+        },
+        "after": {
+          "preprocessingFrontendMs": 1366.205203,
+          "lowerMs": 815.245012,
+          "cfgMs": 364.555386,
+          "dependencyMs": 464.656433,
+          "programElapsedMs": 3065.04671
+        }
+      }
+    },
+    {
+      "path": "app/app-authorization-ims-db2-mq/cbl/PAUDBLOD.CBL",
+      "class": "A",
+      "sourceSha256": "5694a2ed8a12dd4dc82717b401c655866a0e1f9abb0acf395151ead2b0cb31a7",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:27"
+      },
+      "inputInventory": "COMPLETE",
+      "missingCopies": [],
+      "calls": [
+        {
+          "statement": "statement:2",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 47,
+              "endLine": 384,
+              "file": "<preprocessed>",
+              "startColumn": 5,
+              "startLine": 381
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 54,
+              "endLine": 247,
+              "file": "PAUDBLOD.CBL",
+              "startColumn": 12,
+              "startLine": 244
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "e1a7b1fa2b2bc50ba59c59bae2bfeb00",
+                "publication": "ff9f1b682a1932956107afd59050e494",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "CBLTDLI",
+                  "referenceName": "CBLTDLI",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "6e4830f2730391295e803940d64d04a1",
+                        "publication": "ff9f1b682a1932956107afd59050e494"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "e1a7b1fa2b2bc50ba59c59bae2bfeb00",
+                        "publication": "ff9f1b682a1932956107afd59050e494",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        },
+        {
+          "statement": "statement:6",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 45,
+              "endLine": 436,
+              "file": "<preprocessed>",
+              "startColumn": 5,
+              "startLine": 433
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 52,
+              "endLine": 299,
+              "file": "PAUDBLOD.CBL",
+              "startColumn": 12,
+              "startLine": 296
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "77c6236f20d48215210a9779128105ee",
+                "publication": "ff9f1b682a1932956107afd59050e494",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "CBLTDLI",
+                  "referenceName": "CBLTDLI",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "f388c527888085e5f725af92ac3cf20b",
+                        "publication": "ff9f1b682a1932956107afd59050e494"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "77c6236f20d48215210a9779128105ee",
+                        "publication": "ff9f1b682a1932956107afd59050e494",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        },
+        {
+          "statement": "statement:7",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 48,
+              "endLine": 461,
+              "file": "<preprocessed>",
+              "startColumn": 11,
+              "startLine": 458
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 55,
+              "endLine": 324,
+              "file": "PAUDBLOD.CBL",
+              "startColumn": 18,
+              "startLine": 321
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "020b7184648ecb8cbae1804f876d0188",
+                "publication": "ff9f1b682a1932956107afd59050e494",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "CBLTDLI",
+                  "referenceName": "CBLTDLI",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "42057087a1f446efde60581ca81c3163",
+                        "publication": "ff9f1b682a1932956107afd59050e494"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "020b7184648ecb8cbae1804f876d0188",
+                        "publication": "ff9f1b682a1932956107afd59050e494",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        }
+      ],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 1165.810519,
+          "lowerMs": 615.554194,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 1804.851464
+        },
+        "after": {
+          "preprocessingFrontendMs": 1316.012061,
+          "lowerMs": 815.218163,
+          "cfgMs": 364.503923,
+          "dependencyMs": 514.755034,
+          "programElapsedMs": 3072.540841
+        }
+      }
+    },
+    {
+      "path": "app/app-authorization-ims-db2-mq/cbl/PAUDBUNL.CBL",
+      "class": "A",
+      "sourceSha256": "cf174417cd833193fec178a782fa8d7cabb95da9a8c2ca709af598c45f485625",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:20"
+      },
+      "inputInventory": "COMPLETE",
+      "missingCopies": [],
+      "calls": [
+        {
+          "statement": "statement:0",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 47,
+              "endLine": 353,
+              "file": "<preprocessed>",
+              "startColumn": 5,
+              "startLine": 350
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 54,
+              "endLine": 216,
+              "file": "PAUDBUNL.CBL",
+              "startColumn": 12,
+              "startLine": 213
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "634d4a9c739693f77b9703bedae07d12",
+                "publication": "752c279ae3efe97bb1aa1d5a166ee1d8",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "CBLTDLI",
+                  "referenceName": "CBLTDLI",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "968e853966bf261e53d4f8c94a1d21c7",
+                        "publication": "752c279ae3efe97bb1aa1d5a166ee1d8"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "634d4a9c739693f77b9703bedae07d12",
+                        "publication": "752c279ae3efe97bb1aa1d5a166ee1d8",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        },
+        {
+          "statement": "statement:4",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 48,
+              "endLine": 397,
+              "file": "<preprocessed>",
+              "startColumn": 5,
+              "startLine": 394
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 55,
+              "endLine": 260,
+              "file": "PAUDBUNL.CBL",
+              "startColumn": 12,
+              "startLine": 257
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "464a8ee157caaeef320d0d134b12431a",
+                "publication": "752c279ae3efe97bb1aa1d5a166ee1d8",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "CBLTDLI",
+                  "referenceName": "CBLTDLI",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "b3bc8c14f21888194325eb23e4bbf03e",
+                        "publication": "752c279ae3efe97bb1aa1d5a166ee1d8"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "464a8ee157caaeef320d0d134b12431a",
+                        "publication": "752c279ae3efe97bb1aa1d5a166ee1d8",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        }
+      ],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 1116.724469,
+          "lowerMs": 614.867546,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 1755.102399
+        },
+        "after": {
+          "preprocessingFrontendMs": 1366.289676,
+          "lowerMs": 765.390385,
+          "cfgMs": 364.545258,
+          "dependencyMs": 464.690184,
+          "programElapsedMs": 3017.500806
+        }
+      }
+    },
+    {
+      "path": "app/app-transaction-type-db2/cbl/COTRTUPC.cbl",
+      "class": "B",
+      "sourceSha256": "c16e40c391c0ad2d3e797a0e01144ef5b78d3b0db0a1771411a95a9d08b01f67",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:149"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHBMSCA",
+        "DFHAID"
+      ],
+      "calls": [],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 2117.902885,
+          "lowerMs": 765.228444,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 2915.963373
+        },
+        "after": {
+          "preprocessingFrontendMs": 2317.745469,
+          "lowerMs": 1316.251576,
+          "cfgMs": 665.107648,
+          "dependencyMs": 815.268485,
+          "programElapsedMs": 5688.912353
+        }
+      }
+    },
+    {
+      "path": "app/app-vsam-mq/cbl/COACCT01.cbl",
+      "class": "C",
+      "sourceSha256": "92776ed2801da1148839a9ed98b6537de4b41e0c7f050c8dcaae0d4e4ea543b5",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:0"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "CMQGMOV",
+        "CMQPMOV",
+        "CMQMDV",
+        "CMQODV",
+        "CMQV",
+        "CMQTML"
+      ],
+      "calls": [
+        {
+          "statement": "statement:8",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 37,
+              "endLine": 261,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 256
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 44,
+              "endLine": 238,
+              "file": "COACCT01.cbl",
+              "startColumn": 11,
+              "startLine": 233
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "c8baf74dc28e962ff4b65a22c1163a2f",
+                "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "MQOPEN",
+                  "referenceName": "MQOPEN",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "37f640c45dff9fbdf32c934a4521ff76",
+                        "publication": "60c54d23a9f81d2e7ab7beacacab537f"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "c8baf74dc28e962ff4b65a22c1163a2f",
+                        "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        },
+        {
+          "statement": "statement:18",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 37,
+              "endLine": 295,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 290
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 44,
+              "endLine": 272,
+              "file": "COACCT01.cbl",
+              "startColumn": 11,
+              "startLine": 267
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "4e48a1e62bcedc8524ca909e4cab1198",
+                "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "MQOPEN",
+                  "referenceName": "MQOPEN",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "49976d91e69dc8e9c3d0bd8b460eca2c",
+                        "publication": "60c54d23a9f81d2e7ab7beacacab537f"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "4e48a1e62bcedc8524ca909e4cab1198",
+                        "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        },
+        {
+          "statement": "statement:29",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 37,
+              "endLine": 330,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 325
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 44,
+              "endLine": 307,
+              "file": "COACCT01.cbl",
+              "startColumn": 11,
+              "startLine": 302
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "77b32a946b08cdcd12740e4955788e6c",
+                "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "MQOPEN",
+                  "referenceName": "MQOPEN",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "e9df6335b3caa4f0f8dc4eb9fba1f194",
+                        "publication": "60c54d23a9f81d2e7ab7beacacab537f"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "77b32a946b08cdcd12740e4955788e6c",
+                        "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        },
+        {
+          "statement": "statement:45",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 37,
+              "endLine": 382,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 374
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 44,
+              "endLine": 360,
+              "file": "COACCT01.cbl",
+              "startColumn": 11,
+              "startLine": 352
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "54bd1e1755d2b1cb420fed58f9d5cc28",
+                "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "MQGET",
+                  "referenceName": "MQGET",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "e6702676b1ad9bd633dcedd55501ff85",
+                        "publication": "60c54d23a9f81d2e7ab7beacacab537f"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "54bd1e1755d2b1cb420fed58f9d5cc28",
+                        "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        },
+        {
+          "statement": "statement:83",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 37,
+              "endLine": 501,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 494
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 44,
+              "endLine": 486,
+              "file": "COACCT01.cbl",
+              "startColumn": 11,
+              "startLine": 479
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "611aa691784f71a7d03cda9c73339a3d",
+                "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "MQPUT",
+                  "referenceName": "MQPUT",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "637e50b669fb16e86dfceaa0bb073ef4",
+                        "publication": "60c54d23a9f81d2e7ab7beacacab537f"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "611aa691784f71a7d03cda9c73339a3d",
+                        "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        },
+        {
+          "statement": "statement:94",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 37,
+              "endLine": 538,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 531
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 44,
+              "endLine": 523,
+              "file": "COACCT01.cbl",
+              "startColumn": 11,
+              "startLine": 516
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "92e65fe4d808fcb287257609e8f796a8",
+                "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "MQPUT",
+                  "referenceName": "MQPUT",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "b0d9bc5c811ded4755f7f1acb7522d82",
+                        "publication": "60c54d23a9f81d2e7ab7beacacab537f"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "92e65fe4d808fcb287257609e8f796a8",
+                        "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        },
+        {
+          "statement": "statement:103",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 38,
+              "endLine": 577,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 573
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 45,
+              "endLine": 561,
+              "file": "COACCT01.cbl",
+              "startColumn": 11,
+              "startLine": 557
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "c5b2ea4392bf20bfce59f6210a6142fc",
+                "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "MQCLOSE",
+                  "referenceName": "MQCLOSE",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "726609418b76d5f03e4baabf85b83b60",
+                        "publication": "60c54d23a9f81d2e7ab7beacacab537f"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "c5b2ea4392bf20bfce59f6210a6142fc",
+                        "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        },
+        {
+          "statement": "statement:112",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 38,
+              "endLine": 599,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 595
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 45,
+              "endLine": 583,
+              "file": "COACCT01.cbl",
+              "startColumn": 11,
+              "startLine": 579
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "6a6e961b5c64ee97d70952069cc95c75",
+                "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "MQCLOSE",
+                  "referenceName": "MQCLOSE",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "90d6a00f2e937400fb38ad6a51ea98a5",
+                        "publication": "60c54d23a9f81d2e7ab7beacacab537f"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "6a6e961b5c64ee97d70952069cc95c75",
+                        "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        },
+        {
+          "statement": "statement:121",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 38,
+              "endLine": 622,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 618
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 45,
+              "endLine": 606,
+              "file": "COACCT01.cbl",
+              "startColumn": 11,
+              "startLine": 602
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "0c8814021266c059971c519c004ff91b",
+                "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "MQCLOSE",
+                  "referenceName": "MQCLOSE",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "0758b66a48d196cb4e92997c310a7ea1",
+                        "publication": "60c54d23a9f81d2e7ab7beacacab537f"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "0c8814021266c059971c519c004ff91b",
+                        "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        }
+      ],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 1466.472165,
+          "lowerMs": 665.038508,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 2161.776533
+        },
+        "after": {
+          "preprocessingFrontendMs": 1666.686796,
+          "lowerMs": 1266.180866,
+          "cfgMs": 564.902413,
+          "dependencyMs": 765.286837,
+          "programElapsedMs": 4576.847838
+        }
+      }
+    },
+    {
+      "path": "app/app-vsam-mq/cbl/CODATE01.cbl",
+      "class": "C",
+      "sourceSha256": "97fcba3faa272c98778eb7ef50ef87faec7290168e24a9b1714996453d660ddb",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:0"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "CMQGMOV",
+        "CMQPMOV",
+        "CMQMDV",
+        "CMQODV",
+        "CMQV",
+        "CMQTML"
+      ],
+      "calls": [
+        {
+          "statement": "statement:8",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 37,
+              "endLine": 190,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 185
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 44,
+              "endLine": 187,
+              "file": "CODATE01.cbl",
+              "startColumn": 11,
+              "startLine": 182
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "c8baf74dc28e962ff4b65a22c1163a2f",
+                "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "MQOPEN",
+                  "referenceName": "MQOPEN",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "37f640c45dff9fbdf32c934a4521ff76",
+                        "publication": "e8de5f585ebf8263b6566f3f0ba9f52b"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "c8baf74dc28e962ff4b65a22c1163a2f",
+                        "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        },
+        {
+          "statement": "statement:18",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 37,
+              "endLine": 224,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 219
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 44,
+              "endLine": 221,
+              "file": "CODATE01.cbl",
+              "startColumn": 11,
+              "startLine": 216
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "4e48a1e62bcedc8524ca909e4cab1198",
+                "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "MQOPEN",
+                  "referenceName": "MQOPEN",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "49976d91e69dc8e9c3d0bd8b460eca2c",
+                        "publication": "e8de5f585ebf8263b6566f3f0ba9f52b"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "4e48a1e62bcedc8524ca909e4cab1198",
+                        "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        },
+        {
+          "statement": "statement:29",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 37,
+              "endLine": 259,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 254
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 44,
+              "endLine": 256,
+              "file": "CODATE01.cbl",
+              "startColumn": 11,
+              "startLine": 251
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "77b32a946b08cdcd12740e4955788e6c",
+                "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "MQOPEN",
+                  "referenceName": "MQOPEN",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "e9df6335b3caa4f0f8dc4eb9fba1f194",
+                        "publication": "e8de5f585ebf8263b6566f3f0ba9f52b"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "77b32a946b08cdcd12740e4955788e6c",
+                        "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        },
+        {
+          "statement": "statement:45",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 37,
+              "endLine": 311,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 303
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 44,
+              "endLine": 309,
+              "file": "CODATE01.cbl",
+              "startColumn": 11,
+              "startLine": 301
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "54bd1e1755d2b1cb420fed58f9d5cc28",
+                "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "MQGET",
+                  "referenceName": "MQGET",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "e6702676b1ad9bd633dcedd55501ff85",
+                        "publication": "e8de5f585ebf8263b6566f3f0ba9f52b"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "54bd1e1755d2b1cb420fed58f9d5cc28",
+                        "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        },
+        {
+          "statement": "statement:66",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 37,
+              "endLine": 386,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 379
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 44,
+              "endLine": 390,
+              "file": "CODATE01.cbl",
+              "startColumn": 11,
+              "startLine": 383
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "3dd6799c57a81177bfea1c11d06b1a39",
+                "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "MQPUT",
+                  "referenceName": "MQPUT",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "34aacbf0475f7d65eaf9a1ddb14f10cc",
+                        "publication": "e8de5f585ebf8263b6566f3f0ba9f52b"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "3dd6799c57a81177bfea1c11d06b1a39",
+                        "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        },
+        {
+          "statement": "statement:77",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 37,
+              "endLine": 423,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 416
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 44,
+              "endLine": 427,
+              "file": "CODATE01.cbl",
+              "startColumn": 11,
+              "startLine": 420
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "bbbc61b3bcb19026d6f4f10127c8523d",
+                "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "MQPUT",
+                  "referenceName": "MQPUT",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "6e4e0c2262ae58c77c9e1a459253eaaf",
+                        "publication": "e8de5f585ebf8263b6566f3f0ba9f52b"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "bbbc61b3bcb19026d6f4f10127c8523d",
+                        "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        },
+        {
+          "statement": "statement:86",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 38,
+              "endLine": 462,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 458
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 45,
+              "endLine": 465,
+              "file": "CODATE01.cbl",
+              "startColumn": 11,
+              "startLine": 461
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "279beb1b146a78e35e54274547d79141",
+                "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "MQCLOSE",
+                  "referenceName": "MQCLOSE",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "bc4ecf16961bc33701082895e1d65be8",
+                        "publication": "e8de5f585ebf8263b6566f3f0ba9f52b"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "279beb1b146a78e35e54274547d79141",
+                        "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        },
+        {
+          "statement": "statement:95",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 38,
+              "endLine": 484,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 480
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 45,
+              "endLine": 487,
+              "file": "CODATE01.cbl",
+              "startColumn": 11,
+              "startLine": 483
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "f667e3826bbf3af0e5d4df3fa2ea6b9e",
+                "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "MQCLOSE",
+                  "referenceName": "MQCLOSE",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "43e4afe70296d31dca2aa857f5e9b1c1",
+                        "publication": "e8de5f585ebf8263b6566f3f0ba9f52b"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "f667e3826bbf3af0e5d4df3fa2ea6b9e",
+                        "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        },
+        {
+          "statement": "statement:104",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 38,
+              "endLine": 507,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 503
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 45,
+              "endLine": 510,
+              "file": "CODATE01.cbl",
+              "startColumn": 11,
+              "startLine": 506
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "dcac0a30595c2b1005070c7575e1663c",
+                "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "MQCLOSE",
+                  "referenceName": "MQCLOSE",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "53822d3207fbb17e24ae8fb3a4062eeb",
+                        "publication": "e8de5f585ebf8263b6566f3f0ba9f52b"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "dcac0a30595c2b1005070c7575e1663c",
+                        "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        }
+      ],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 1266.007328,
+          "lowerMs": 665.051232,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 1956.717297
+        },
+        "after": {
+          "preprocessingFrontendMs": 1716.961577,
+          "lowerMs": 1165.956996,
+          "cfgMs": 565.260683,
+          "dependencyMs": 765.246744,
+          "programElapsedMs": 4476.720263
+        }
+      }
+    },
+    {
+      "path": "app/cbl/COACTUPC.cbl",
+      "class": "B",
+      "sourceSha256": "b5bb7d6ccad022e0fc91b4dd1e971f49d184adf89b56abdce14eccff35b39396",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:852"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHBMSCA",
+        "DFHAID"
+      ],
+      "calls": [
+        {
+          "statement": "statement:576",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 34,
+              "endLine": 7992,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 7989
+            },
+            "includeChain": [
+              {
+                "includeLine": 4232,
+                "includedFile": "CSUTLDPY.cpy",
+                "includingFile": "COACTUPC.cbl",
+                "requestedName": "CSUTLDPY"
+              }
+            ],
+            "original": {
+              "endColumn": 41,
+              "endLine": 296,
+              "file": "CSUTLDPY.cpy",
+              "startColumn": 11,
+              "startLine": 293
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "a7c39180db357cdc8af45d5d1422bd39",
+                "publication": "9951013f50e2f953fc857c8af088ddb1",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "CSUTLDTC",
+                  "referenceName": "CSUTLDTC",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "6dbcce2b3eeff3626a8af724c52eb4c0",
+                        "publication": "9951013f50e2f953fc857c8af088ddb1"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "a7c39180db357cdc8af45d5d1422bd39",
+                        "publication": "9951013f50e2f953fc857c8af088ddb1",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        }
+      ],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 4321.229334,
+          "lowerMs": 1216.032152,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 5597.433402
+        },
+        "after": {
+          "preprocessingFrontendMs": 4722.016959,
+          "lowerMs": 2317.999931,
+          "cfgMs": 1216.133749,
+          "dependencyMs": 1817.586735,
+          "programElapsedMs": 18946.351921
+        }
+      }
+    },
+    {
+      "path": "app/cbl/COACTVWC.cbl",
+      "class": "B",
+      "sourceSha256": "4f1e55176f69edfb55b7af7a161aceb8c3bc3bd1b2924a704a76256e0e751b54",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:141"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHBMSCA",
+        "DFHAID"
+      ],
+      "calls": [],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 2367.727571,
+          "lowerMs": 765.153679,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 3161.766149
+        },
+        "after": {
+          "preprocessingFrontendMs": 2668.449919,
+          "lowerMs": 1215.968539,
+          "cfgMs": 564.907591,
+          "dependencyMs": 665.059501,
+          "programElapsedMs": 5489.394783
+        }
+      }
+    },
+    {
+      "path": "app/cbl/COADM01C.cbl",
+      "class": "B",
+      "sourceSha256": "4e49afda5f685f3ebeb95ed04a93cf88df93d39c66d8d7f9ba2b9a3e00a1f690",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:51"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHAID",
+        "DFHBMSCA"
+      ],
+      "calls": [],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 1316.097803,
+          "lowerMs": 614.928548,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 1957.74311
+        },
+        "after": {
+          "preprocessingFrontendMs": 1566.583106,
+          "lowerMs": 915.531496,
+          "cfgMs": 414.659998,
+          "dependencyMs": 464.687179,
+          "programElapsedMs": 3449.664423
+        }
+      }
+    },
+    {
+      "path": "app/cbl/COBIL00C.cbl",
+      "class": "B",
+      "sourceSha256": "b5c46039eb8fd2f7ed7d3ca379172e56fa87385a369023bef706b04986fe1cfb",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:108"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHAID",
+        "DFHBMSCA"
+      ],
+      "calls": [],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 1666.679786,
+          "lowerMs": 664.976776,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 2360.998553
+        },
+        "after": {
+          "preprocessingFrontendMs": 1967.523646,
+          "lowerMs": 1065.743966,
+          "cfgMs": 464.700694,
+          "dependencyMs": 564.873901,
+          "programElapsedMs": 4272.962462
+        }
+      }
+    },
+    {
+      "path": "app/cbl/COCRDLIC.cbl",
+      "class": "B",
+      "sourceSha256": "d6a9210ad3062bd657881fc3f0d2a7368db3ff4869594e0d6a878d8f410d87b6",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:280"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHBMSCA",
+        "DFHAID"
+      ],
+      "calls": [],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 2518.271541,
+          "lowerMs": 865.521519,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 3420.752794
+        },
+        "after": {
+          "preprocessingFrontendMs": 2768.590828,
+          "lowerMs": 1516.483452,
+          "cfgMs": 715.160406,
+          "dependencyMs": 915.505428,
+          "programElapsedMs": 6881.822262
+        }
+      }
+    },
+    {
+      "path": "app/cbl/COCRDSLC.cbl",
+      "class": "B",
+      "sourceSha256": "d5af307fb4b1a155f03df9eea14b402d866a332360e14a1e37dbefe59b73363b",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:128"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHBMSCA",
+        "DFHAID"
+      ],
+      "calls": [],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 1666.695434,
+          "lowerMs": 715.042937,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 2412.054332
+        },
+        "after": {
+          "preprocessingFrontendMs": 1917.123978,
+          "lowerMs": 1166.02018,
+          "cfgMs": 514.759381,
+          "dependencyMs": 665.04255,
+          "programElapsedMs": 4570.562743
+        }
+      }
+    },
+    {
+      "path": "app/cbl/COCRDUPC.cbl",
+      "class": "B",
+      "sourceSha256": "c245cf383a4a3f721773a13ca231eb76bd5ae75c1830d58c7aba898a554a0de9",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:243"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHBMSCA",
+        "DFHAID"
+      ],
+      "calls": [],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 2267.738489,
+          "lowerMs": 815.359073,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 3120.037099
+        },
+        "after": {
+          "preprocessingFrontendMs": 2569.343078,
+          "lowerMs": 1516.621764,
+          "cfgMs": 665.237564,
+          "dependencyMs": 865.54015,
+          "programElapsedMs": 6411.738591
+        }
+      }
+    },
+    {
+      "path": "app/cbl/COMEN01C.cbl",
+      "class": "B",
+      "sourceSha256": "c77747b4caaf00b45177a6449562b7f59ec336db832937595edef8b32fdce6fa",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:60"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHAID",
+        "DFHBMSCA"
+      ],
+      "calls": [],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 1416.264277,
+          "lowerMs": 615.00672,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 2056.879413
+        },
+        "after": {
+          "preprocessingFrontendMs": 1666.740634,
+          "lowerMs": 915.305746,
+          "cfgMs": 414.432525,
+          "dependencyMs": 514.572162,
+          "programElapsedMs": 3616.052383
+        }
+      }
+    },
+    {
+      "path": "app/cbl/CORPT00C.cbl",
+      "class": "B",
+      "sourceSha256": "0b06bd5d4f38f17871de8985c439dfce7ed30d28e02b6ffeb8459e0cd8db4fc2",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:147"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHAID",
+        "DFHBMSCA"
+      ],
+      "calls": [
+        {
+          "statement": "statement:80",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 50,
+              "endLine": 796,
+              "file": "<preprocessed>",
+              "startColumn": 12,
+              "startLine": 794
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 57,
+              "endLine": 394,
+              "file": "CORPT00C.cbl",
+              "startColumn": 19,
+              "startLine": 392
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "9772efe5d3b9035827a546b447a3f467",
+                "publication": "76f31c5075979a78c9b2c270e3cd12ff",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "CSUTLDTC",
+                  "referenceName": "CSUTLDTC",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "4a23d45bf05ac1e21699cfa0d1f0a973",
+                        "publication": "76f31c5075979a78c9b2c270e3cd12ff"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "9772efe5d3b9035827a546b447a3f467",
+                        "publication": "76f31c5075979a78c9b2c270e3cd12ff",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        },
+        {
+          "statement": "statement:87",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 50,
+              "endLine": 816,
+              "file": "<preprocessed>",
+              "startColumn": 12,
+              "startLine": 814
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 57,
+              "endLine": 414,
+              "file": "CORPT00C.cbl",
+              "startColumn": 19,
+              "startLine": 412
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "3568329b5e5d00cebbd88e3f0b0f10b1",
+                "publication": "76f31c5075979a78c9b2c270e3cd12ff",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "CSUTLDTC",
+                  "referenceName": "CSUTLDTC",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "39733e5489731cfba097636f3e8d7c83",
+                        "publication": "76f31c5075979a78c9b2c270e3cd12ff"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "3568329b5e5d00cebbd88e3f0b0f10b1",
+                        "publication": "76f31c5075979a78c9b2c270e3cd12ff",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        }
+      ],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 4671.662206,
+          "lowerMs": 715.091506,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 5418.237534
+        },
+        "after": {
+          "preprocessingFrontendMs": 5674.274548,
+          "lowerMs": 1266.268365,
+          "cfgMs": 565.120569,
+          "dependencyMs": 765.361773,
+          "programElapsedMs": 8579.683479
+        }
+      }
+    },
+    {
+      "path": "app/cbl/COSGN00C.cbl",
+      "class": "B",
+      "sourceSha256": "4f901ae6b113eebae60ae1d94b30f8cb9906d031a4419770bf56980bdf97e377",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:45"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHAID",
+        "DFHBMSCA"
+      ],
+      "calls": [],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 1217.646275,
+          "lowerMs": 564.921024,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 1807.706932
+        },
+        "after": {
+          "preprocessingFrontendMs": 1716.921975,
+          "lowerMs": 965.707607,
+          "cfgMs": 414.870901,
+          "dependencyMs": 514.844877,
+          "programElapsedMs": 3700.270232
+        }
+      }
+    },
+    {
+      "path": "app/cbl/COTRN00C.cbl",
+      "class": "B",
+      "sourceSha256": "51479f131b4fb300008403f0c4f9fdbde56f22a7fb341c782492da29f0d23bbe",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:204"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHAID",
+        "DFHBMSCA"
+      ],
+      "calls": [],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 2167.935575,
+          "lowerMs": 815.573773,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 3016.712506
+        },
+        "after": {
+          "preprocessingFrontendMs": 2818.937148,
+          "lowerMs": 1567.089565,
+          "cfgMs": 715.875444,
+          "dependencyMs": 915.498576,
+          "programElapsedMs": 6584.939114
+        }
+      }
+    },
+    {
+      "path": "app/cbl/COTRN01C.cbl",
+      "class": "B",
+      "sourceSha256": "fc24ff879ac6ae12bc6817554cb756f14c5e86e0ca2dd0037af49599887f03c0",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:64"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHAID",
+        "DFHBMSCA"
+      ],
+      "calls": [],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 1466.353029,
+          "lowerMs": 614.980061,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 2109.688007
+        },
+        "after": {
+          "preprocessingFrontendMs": 2017.956723,
+          "lowerMs": 1066.035296,
+          "cfgMs": 465.237929,
+          "dependencyMs": 565.427457,
+          "programElapsedMs": 4229.553532
+        }
+      }
+    },
+    {
+      "path": "app/cbl/COTRN02C.cbl",
+      "class": "B",
+      "sourceSha256": "dc33b4c797a98d2732070a223f43cc78992c2846681163a032e376630742b1ed",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:189"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHAID",
+        "DFHBMSCA"
+      ],
+      "calls": [
+        {
+          "statement": "statement:83",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 42,
+              "endLine": 876,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 874
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 49,
+              "endLine": 395,
+              "file": "COTRN02C.cbl",
+              "startColumn": 11,
+              "startLine": 393
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "611aa691784f71a7d03cda9c73339a3d",
+                "publication": "5d89126b67c571516c261984b7fbd5ec",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "CSUTLDTC",
+                  "referenceName": "CSUTLDTC",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "637e50b669fb16e86dfceaa0bb073ef4",
+                        "publication": "5d89126b67c571516c261984b7fbd5ec"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "611aa691784f71a7d03cda9c73339a3d",
+                        "publication": "5d89126b67c571516c261984b7fbd5ec",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        },
+        {
+          "statement": "statement:90",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 42,
+              "endLine": 896,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 894
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 49,
+              "endLine": 415,
+              "file": "COTRN02C.cbl",
+              "startColumn": 11,
+              "startLine": 413
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "2937505fd2dbb9f01afce2936f1f12ed",
+                "publication": "5d89126b67c571516c261984b7fbd5ec",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "CSUTLDTC",
+                  "referenceName": "CSUTLDTC",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "4a7a9fc978f28ebd6011e7f2b3bc0c89",
+                        "publication": "5d89126b67c571516c261984b7fbd5ec"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "2937505fd2dbb9f01afce2936f1f12ed",
+                        "publication": "5d89126b67c571516c261984b7fbd5ec",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        }
+      ],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 1917.229348,
+          "lowerMs": 715.176059,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 2665.703226
+        },
+        "after": {
+          "preprocessingFrontendMs": 2569.304788,
+          "lowerMs": 1617.567664,
+          "cfgMs": 767.263908,
+          "dependencyMs": 915.597816,
+          "programElapsedMs": 6382.603406
+        }
+      }
+    },
+    {
+      "path": "app/cbl/COUSR00C.cbl",
+      "class": "B",
+      "sourceSha256": "831433c6ec8306038c85cb86a8307f91dca48c26ef33a997f402187cbd9f4e04",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:198"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHAID",
+        "DFHBMSCA"
+      ],
+      "calls": [],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 2117.570381,
+          "lowerMs": 765.28115,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 2917.689009
+        },
+        "after": {
+          "preprocessingFrontendMs": 2873.406156,
+          "lowerMs": 1316.159388,
+          "cfgMs": 564.927969,
+          "dependencyMs": 715.087633,
+          "programElapsedMs": 5965.192592
+        }
+      }
+    },
+    {
+      "path": "app/cbl/COUSR01C.cbl",
+      "class": "B",
+      "sourceSha256": "aa131b1e3382dc6d101b42f1c97d4fb0c2fdd706819ed9f9a0187c82b30f3019",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:62"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHAID",
+        "DFHBMSCA"
+      ],
+      "calls": [],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 1316.173601,
+          "lowerMs": 614.999316,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 1956.651537
+        },
+        "after": {
+          "preprocessingFrontendMs": 1566.547801,
+          "lowerMs": 865.617029,
+          "cfgMs": 414.675776,
+          "dependencyMs": 464.728263,
+          "programElapsedMs": 3413.920325
+        }
+      }
+    },
+    {
+      "path": "app/cbl/COUSR02C.cbl",
+      "class": "B",
+      "sourceSha256": "85d36699cbd3079320e689576ea8406d07ad78901f4f3a68a129b869359b46ca",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:93"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHAID",
+        "DFHBMSCA"
+      ],
+      "calls": [],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 1566.510297,
+          "lowerMs": 614.969992,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 2211.376788
+        },
+        "after": {
+          "preprocessingFrontendMs": 1766.847491,
+          "lowerMs": 965.735628,
+          "cfgMs": 464.744583,
+          "dependencyMs": 564.968853,
+          "programElapsedMs": 3925.92358
+        }
+      }
+    },
+    {
+      "path": "app/cbl/COUSR03C.cbl",
+      "class": "B",
+      "sourceSha256": "bcd68f08c145b3b9b9c809a7082834e9519d78b6f363a0d1c5ff9d9576dcf888",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:69"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHAID",
+        "DFHBMSCA"
+      ],
+      "calls": [],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 1416.277952,
+          "lowerMs": 615.001801,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 2057.85764
+        },
+        "after": {
+          "preprocessingFrontendMs": 1616.54647,
+          "lowerMs": 915.535693,
+          "cfgMs": 414.577257,
+          "dependencyMs": 514.782804,
+          "programElapsedMs": 3582.168752
+        }
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COACTUPC.cl2",
+      "class": "B",
+      "sourceSha256": "e944b2b469cf737296489e87158801cfe1a174e2965b5bb9ad5006fc65a2b176",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:845"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHBMSCA",
+        "DFHAID"
+      ],
+      "calls": [
+        {
+          "statement": "statement:576",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 34,
+              "endLine": 8007,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 8004
+            },
+            "includeChain": [
+              {
+                "includeLine": 4240,
+                "includedFile": "CSUTLDPY",
+                "includingFile": "COACTUPC.cl2",
+                "requestedName": "CSUTLDPY"
+              }
+            ],
+            "original": {
+              "endColumn": 41,
+              "endLine": 303,
+              "file": "CSUTLDPY",
+              "startColumn": 11,
+              "startLine": 300
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "a7c39180db357cdc8af45d5d1422bd39",
+                "publication": "a3a409175f5d26aa30474cddbc640b4e",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "CSUTLDTC",
+                  "referenceName": "CSUTLDTC",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "6dbcce2b3eeff3626a8af724c52eb4c0",
+                        "publication": "a3a409175f5d26aa30474cddbc640b4e"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "a7c39180db357cdc8af45d5d1422bd39",
+                        "publication": "a3a409175f5d26aa30474cddbc640b4e",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        }
+      ],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 4070.852014,
+          "lowerMs": 1216.019138,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 5352.554543
+        },
+        "after": {
+          "preprocessingFrontendMs": 4421.718688,
+          "lowerMs": 2368.023315,
+          "cfgMs": 1266.076246,
+          "dependencyMs": 1817.123043,
+          "programElapsedMs": 18875.510367
+        }
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COACTVWC.cl2",
+      "class": "B",
+      "sourceSha256": "4f1e55176f69edfb55b7af7a161aceb8c3bc3bd1b2924a704a76256e0e751b54",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:141"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHBMSCA",
+        "DFHAID"
+      ],
+      "calls": [],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 2418.110918,
+          "lowerMs": 715.181709,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 3165.449253
+        },
+        "after": {
+          "preprocessingFrontendMs": 2618.42415,
+          "lowerMs": 1165.910211,
+          "cfgMs": 565.019555,
+          "dependencyMs": 665.073396,
+          "programElapsedMs": 5351.288641
+        }
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COADM01C.cl2",
+      "class": "B",
+      "sourceSha256": "69842c4dd419ed70365682d65423d2744173f3eec695b25b5ed27bd29289608d",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:49"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHAID",
+        "DFHBMSCA"
+      ],
+      "calls": [],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 1316.057479,
+          "lowerMs": 614.999717,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 1957.710331
+        },
+        "after": {
+          "preprocessingFrontendMs": 1566.520662,
+          "lowerMs": 865.802266,
+          "cfgMs": 364.708544,
+          "dependencyMs": 464.767545,
+          "programElapsedMs": 3345.697596
+        }
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COBIL00C.cl2",
+      "class": "B",
+      "sourceSha256": "b5c46039eb8fd2f7ed7d3ca379172e56fa87385a369023bef706b04986fe1cfb",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:108"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHAID",
+        "DFHBMSCA"
+      ],
+      "calls": [],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 1666.789736,
+          "lowerMs": 664.986674,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 2361.314527
+        },
+        "after": {
+          "preprocessingFrontendMs": 2018.33445,
+          "lowerMs": 1065.860758,
+          "cfgMs": 464.809051,
+          "dependencyMs": 615.006974,
+          "programElapsedMs": 4379.911797
+        }
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COCRDLIC.cl2",
+      "class": "B",
+      "sourceSha256": "d6a9210ad3062bd657881fc3f0d2a7368db3ff4869594e0d6a878d8f410d87b6",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:280"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHBMSCA",
+        "DFHAID"
+      ],
+      "calls": [],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 2518.210991,
+          "lowerMs": 815.300977,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 3372.846348
+        },
+        "after": {
+          "preprocessingFrontendMs": 2818.747403,
+          "lowerMs": 1516.596327,
+          "cfgMs": 715.245019,
+          "dependencyMs": 915.406158,
+          "programElapsedMs": 6947.666079
+        }
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COCRDSLC.cl2",
+      "class": "B",
+      "sourceSha256": "d5af307fb4b1a155f03df9eea14b402d866a332360e14a1e37dbefe59b73363b",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:128"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHBMSCA",
+        "DFHAID"
+      ],
+      "calls": [],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 1666.651094,
+          "lowerMs": 715.212225,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 2412.536458
+        },
+        "after": {
+          "preprocessingFrontendMs": 1867.017393,
+          "lowerMs": 1166.099905,
+          "cfgMs": 514.796589,
+          "dependencyMs": 614.91086,
+          "programElapsedMs": 4472.734935
+        }
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COCRDUPC.cl2",
+      "class": "B",
+      "sourceSha256": "3ffeeb3d3c53e64e632bde36771dbbcf080e92ed4168d30d90c21e4dc198e6ef",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:243"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHBMSCA",
+        "DFHAID"
+      ],
+      "calls": [],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 2367.762444,
+          "lowerMs": 815.29167,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 3221.227133
+        },
+        "after": {
+          "preprocessingFrontendMs": 2568.463801,
+          "lowerMs": 1416.498407,
+          "cfgMs": 665.110654,
+          "dependencyMs": 865.428367,
+          "programElapsedMs": 6310.834838
+        }
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COMEN01C.cl2",
+      "class": "B",
+      "sourceSha256": "ad5e376ac9221b21b8ce47597a5ca17fc1f39dc913793c814c6675e9b046fc09",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:54"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHAID",
+        "DFHBMSCA"
+      ],
+      "calls": [],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 1316.034498,
+          "lowerMs": 615.02298,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 1959.297726
+        },
+        "after": {
+          "preprocessingFrontendMs": 1567.005362,
+          "lowerMs": 865.469402,
+          "cfgMs": 414.593437,
+          "dependencyMs": 464.734775,
+          "programElapsedMs": 3400.485994
+        }
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/CORPT00C.cl2",
+      "class": "B",
+      "sourceSha256": "0b06bd5d4f38f17871de8985c439dfce7ed30d28e02b6ffeb8459e0cd8db4fc2",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:147"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHAID",
+        "DFHBMSCA"
+      ],
+      "calls": [
+        {
+          "statement": "statement:80",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 50,
+              "endLine": 796,
+              "file": "<preprocessed>",
+              "startColumn": 12,
+              "startLine": 794
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 57,
+              "endLine": 394,
+              "file": "CORPT00C.cl2",
+              "startColumn": 19,
+              "startLine": 392
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "9772efe5d3b9035827a546b447a3f467",
+                "publication": "dd90984df723d2abbfe855cbd7f5d497",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "CSUTLDTC",
+                  "referenceName": "CSUTLDTC",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "4a23d45bf05ac1e21699cfa0d1f0a973",
+                        "publication": "dd90984df723d2abbfe855cbd7f5d497"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "9772efe5d3b9035827a546b447a3f467",
+                        "publication": "dd90984df723d2abbfe855cbd7f5d497",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        },
+        {
+          "statement": "statement:87",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 50,
+              "endLine": 816,
+              "file": "<preprocessed>",
+              "startColumn": 12,
+              "startLine": 814
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 57,
+              "endLine": 414,
+              "file": "CORPT00C.cl2",
+              "startColumn": 19,
+              "startLine": 412
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "3568329b5e5d00cebbd88e3f0b0f10b1",
+                "publication": "dd90984df723d2abbfe855cbd7f5d497",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "CSUTLDTC",
+                  "referenceName": "CSUTLDTC",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "39733e5489731cfba097636f3e8d7c83",
+                        "publication": "dd90984df723d2abbfe855cbd7f5d497"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "3568329b5e5d00cebbd88e3f0b0f10b1",
+                        "publication": "dd90984df723d2abbfe855cbd7f5d497",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        }
+      ],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 4922.140659,
+          "lowerMs": 665.106372,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 5618.912423
+        },
+        "after": {
+          "preprocessingFrontendMs": 4972.575942,
+          "lowerMs": 1115.901994,
+          "cfgMs": 514.912921,
+          "dependencyMs": 665.046227,
+          "programElapsedMs": 7552.783252
+        }
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COSGN00C.cl2",
+      "class": "B",
+      "sourceSha256": "4f901ae6b113eebae60ae1d94b30f8cb9906d031a4419770bf56980bdf97e377",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:45"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHAID",
+        "DFHBMSCA"
+      ],
+      "calls": [],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 1215.848859,
+          "lowerMs": 614.980111,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 1856.044452
+        },
+        "after": {
+          "preprocessingFrontendMs": 1416.189596,
+          "lowerMs": 815.264618,
+          "cfgMs": 364.622829,
+          "dependencyMs": 464.732961,
+          "programElapsedMs": 3137.040456
+        }
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COTRN00C.cl2",
+      "class": "B",
+      "sourceSha256": "51479f131b4fb300008403f0c4f9fdbde56f22a7fb341c782492da29f0d23bbe",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:204"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHAID",
+        "DFHBMSCA"
+      ],
+      "calls": [],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 2217.706841,
+          "lowerMs": 765.190555,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 3016.933117
+        },
+        "after": {
+          "preprocessingFrontendMs": 2418.079639,
+          "lowerMs": 1266.157343,
+          "cfgMs": 614.953697,
+          "dependencyMs": 714.999564,
+          "programElapsedMs": 5521.060085
+        }
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COTRN01C.cl2",
+      "class": "B",
+      "sourceSha256": "fc24ff879ac6ae12bc6817554cb756f14c5e86e0ca2dd0037af49599887f03c0",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:64"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHAID",
+        "DFHBMSCA"
+      ],
+      "calls": [],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 1717.115168,
+          "lowerMs": 715.713104,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 2459.360638
+        },
+        "after": {
+          "preprocessingFrontendMs": 1766.820513,
+          "lowerMs": 915.486655,
+          "cfgMs": 414.80404,
+          "dependencyMs": 464.78165,
+          "programElapsedMs": 3664.700438
+        }
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COTRN02C.cl2",
+      "class": "B",
+      "sourceSha256": "dc33b4c797a98d2732070a223f43cc78992c2846681163a032e376630742b1ed",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:189"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHAID",
+        "DFHBMSCA"
+      ],
+      "calls": [
+        {
+          "statement": "statement:83",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 42,
+              "endLine": 876,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 874
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 49,
+              "endLine": 395,
+              "file": "COTRN02C.cl2",
+              "startColumn": 11,
+              "startLine": 393
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "611aa691784f71a7d03cda9c73339a3d",
+                "publication": "af9cca72acd0f24aea968cf52df9f6d0",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "CSUTLDTC",
+                  "referenceName": "CSUTLDTC",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "637e50b669fb16e86dfceaa0bb073ef4",
+                        "publication": "af9cca72acd0f24aea968cf52df9f6d0"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "611aa691784f71a7d03cda9c73339a3d",
+                        "publication": "af9cca72acd0f24aea968cf52df9f6d0",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        },
+        {
+          "statement": "statement:90",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 42,
+              "endLine": 896,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 894
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 49,
+              "endLine": 415,
+              "file": "COTRN02C.cl2",
+              "startColumn": 11,
+              "startLine": 413
+            }
+          },
+          "sites": [
+            {
+              "operation": {
+                "domain": "operation",
+                "localId": "2937505fd2dbb9f01afce2936f1f12ed",
+                "publication": "af9cca72acd0f24aea968cf52df9f6d0",
+                "unit": "unit"
+              },
+              "classification": "PARTIAL_RESOLVED",
+              "reachability": "REACHABLE",
+              "candidates": [
+                {
+                  "rawValue": "CSUTLDTC",
+                  "referenceName": "CSUTLDTC",
+                  "supports": [
+                    {
+                      "kind": "CALL_LITERAL",
+                      "origin": {
+                        "domain": "origin",
+                        "localId": "4a7a9fc978f28ebd6011e7f2b3bc0c89",
+                        "publication": "af9cca72acd0f24aea968cf52df9f6d0"
+                      },
+                      "premises": [],
+                      "producer": {
+                        "domain": "operation",
+                        "localId": "2937505fd2dbb9f01afce2936f1f12ed",
+                        "publication": "af9cca72acd0f24aea968cf52df9f6d0",
+                        "unit": "unit"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "modelValueRemainder": false,
+              "sourceValueRemainder": true,
+              "interpretationUnknownRemainder": true,
+              "effectiveUnknownRemainder": true,
+              "openControlRemainder": true
+            }
+          ]
+        }
+      ],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 2017.85665,
+          "lowerMs": 765.293332,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 2817.17898
+        },
+        "after": {
+          "preprocessingFrontendMs": 2117.480982,
+          "lowerMs": 1266.076416,
+          "cfgMs": 564.893627,
+          "dependencyMs": 815.345275,
+          "programElapsedMs": 5211.716366
+        }
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COUSR00C.cl2",
+      "class": "B",
+      "sourceSha256": "831433c6ec8306038c85cb86a8307f91dca48c26ef33a997f402187cbd9f4e04",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:198"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHAID",
+        "DFHBMSCA"
+      ],
+      "calls": [],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 2167.79539,
+          "lowerMs": 765.155282,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 2969.509909
+        },
+        "after": {
+          "preprocessingFrontendMs": 2418.018759,
+          "lowerMs": 1266.241085,
+          "cfgMs": 564.938008,
+          "dependencyMs": 715.121525,
+          "programElapsedMs": 5467.246427
+        }
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COUSR01C.cl2",
+      "class": "B",
+      "sourceSha256": "aa131b1e3382dc6d101b42f1c97d4fb0c2fdd706819ed9f9a0187c82b30f3019",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:62"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHAID",
+        "DFHBMSCA"
+      ],
+      "calls": [],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 1316.080041,
+          "lowerMs": 614.922477,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 1959.945372
+        },
+        "after": {
+          "preprocessingFrontendMs": 1618.617782,
+          "lowerMs": 865.334016,
+          "cfgMs": 414.587646,
+          "dependencyMs": 464.707706,
+          "programElapsedMs": 3469.201037
+        }
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COUSR02C.cl2",
+      "class": "B",
+      "sourceSha256": "85d36699cbd3079320e689576ea8406d07ad78901f4f3a68a129b869359b46ca",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:93"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHAID",
+        "DFHBMSCA"
+      ],
+      "calls": [],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 1616.602204,
+          "lowerMs": 614.893314,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 2259.745153
+        },
+        "after": {
+          "preprocessingFrontendMs": 1816.98935,
+          "lowerMs": 965.718948,
+          "cfgMs": 464.816875,
+          "dependencyMs": 565.026458,
+          "programElapsedMs": 3984.017832
+        }
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COUSR03C.cl2",
+      "class": "B",
+      "sourceSha256": "bcd68f08c145b3b9b9c809a7082834e9519d78b6f363a0d1c5ff9d9576dcf888",
+      "beforeStages": {
+        "frontend": "PARTIAL",
+        "lower": "BLOCKED",
+        "cfg": "NOT_REACHED",
+        "dependency": "NOT_REACHED"
+      },
+      "afterStages": {
+        "frontend": "PARTIAL",
+        "lower": "PARTIAL",
+        "cfg": "PARTIAL",
+        "dependency": "PARTIAL"
+      },
+      "entryStart": {
+        "availability": "KNOWN",
+        "statement": "statement:69"
+      },
+      "inputInventory": "INPUT_MISSING",
+      "missingCopies": [
+        "DFHAID",
+        "DFHBMSCA"
+      ],
+      "calls": [],
+      "timingMs": {
+        "before": {
+          "preprocessingFrontendMs": 1366.269135,
+          "lowerMs": 615.023951,
+          "cfgMs": null,
+          "dependencyMs": null,
+          "programElapsedMs": 2007.393386
+        },
+        "after": {
+          "preprocessingFrontendMs": 1717.431641,
+          "lowerMs": 915.502173,
+          "cfgMs": 414.656161,
+          "dependencyMs": 514.821694,
+          "programElapsedMs": 3690.321232
+        }
+      }
+    }
+  ],
+  "timing": {
+    "beforeCorpusMs": 192221.354346,
+    "afterCorpusMs": 317438.309216,
+    "beforePrograms": {
+      "count": 73,
+      "totalMs": 192097.547231,
+      "meanMs": 2631.473249739726,
+      "medianMs": 2465.939322,
+      "minMs": 285.72835,
+      "maxMs": 5618.912423,
+      "p95Ms": 5352.554543,
+      "p95Method": "nearest rank; published for n >= 20",
+      "fastestProgram": "app/app-transaction-type-db2/cbl/COTRTLIC.cbl",
+      "fastestProgramMs": 285.72835,
+      "slowestProgram": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/CORPT00C.cl2",
+      "slowestProgramMs": 5618.912423
+    },
+    "afterPrograms": {
+      "count": 73,
+      "totalMs": 317274.062796,
+      "meanMs": 4346.22003830137,
+      "medianMs": 3925.92358,
+      "minMs": 286.546324,
+      "maxMs": 18946.351921,
+      "p95Ms": 7552.783252,
+      "p95Method": "nearest rank; published for n >= 20",
+      "fastestProgram": "app/app-transaction-type-db2/cbl/COTRTLIC.cbl",
+      "fastestProgramMs": 286.546324,
+      "slowestProgram": "app/cbl/COACTUPC.cbl",
+      "slowestProgramMs": 18946.351921
+    }
+  }
+}
