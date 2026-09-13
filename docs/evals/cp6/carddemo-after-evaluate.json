@@ -3,7 +3,7 @@
   "decisionPolicy": "HUMAN",
   "rankingAuthority": "ADVISORY_ONLY",
   "beforeMeasurements": "/tmp/entry-localization-20260913/full/measurements.json",
-  "afterMeasurements": "/tmp/evaluate-carddemo/full/measurements.json",
+  "afterMeasurements": "/tmp/evaluate-finding-20260913/full/measurements-final.json",
   "beforeSnapshot": {
     "upstream": {
       "repository": "aws-samples/aws-mainframe-modernization-carddemo",
@@ -27,7 +27,7 @@
     "analysisRepositories": {
       "air-java": "96cd5e545723c6fd76d1520f431ebbc196af84f6",
       "proleap-poc": "54ca76f9cf91696d335b2678e9dd2425f81065a5",
-      "cobol-lower": "5d450768690b39823fee4b8bce5639292245f252",
+      "cobol-lower": "b61204e6959c6454b4bc4961acf265d99536a237",
       "analysis-cfg": "18a78a6599bfad2d983a4a32d7515d379a9bac60"
     },
     "semanticProductVersion": "2.0.0",
@@ -6227,49 +6227,31 @@
     }
   ],
   "potentialImpactMeaning": "Unique sites contained by an EVALUATE-derived Opaque control bound, per program. Potential membership, not causal attribution.",
-  "focused": {
-    "measurements": "/tmp/evaluate-carddemo/affected/measurements.json",
-    "totals": {
-      "attempted": 46,
-      "frontend": 46,
-      "lower": 46,
-      "cfg": 46,
-      "dependency": 46,
-      "callsObserved": 47,
-      "callsAnalyzed": 47,
-      "callsReachable": 47,
-      "withKnownCandidates": 47,
-      "categories": {
-        "CLOSED_RESOLVED": 0,
-        "PARTIAL_RESOLVED": 47,
-        "OPEN_UNRESOLVED": 0,
-        "UNREACHABLE_IN_MODEL": 0,
-        "OTHER": 0
-      },
-      "remainders": {
-        "modelValueRemainder": 0,
-        "sourceValueRemainder": 47,
-        "interpretationUnknownRemainder": 47,
-        "effectiveUnknownRemainder": 47,
-        "openControlRemainder": 47
-      }
-    },
-    "evaluate": {
-      "programs": 46,
-      "callSites": 47,
-      "occurrences": 264,
-      "typed": 10,
-      "observed": 254,
-      "modeledControl": 8,
-      "potentialCallSites": 45,
-      "coverage": {
-        "PARTIAL": 10,
-        "UNSUPPORTED": 254
-      },
-      "airOperations": {
-        "branch": 16,
-        "opaque": 256
-      }
+  "remediationValidation": {
+    "previousLower": "5d450768690b39823fee4b8bce5639292245f252",
+    "finalLower": "b61204e6959c6454b4bc4961acf265d99536a237",
+    "previousMeasurements": "/tmp/evaluate-carddemo/full/measurements.json",
+    "previousComparisonCommit": "7686a21534585949037dc5290ba107d8beba840f",
+    "callSitesChecked": 73,
+    "identicalDependencyProducts": 67,
+    "fieldsChecked": [
+      "candidateValues",
+      "classification",
+      "reachability",
+      "modelValueRemainder",
+      "sourceValueRemainder",
+      "interpretationUnknownRemainder",
+      "effectiveUnknownRemainder",
+      "openControlRemainder"
+    ],
+    "candidateRemainderRegressions": [],
+    "fullRecovery": {
+      "reason": "Disk quota exceeded on /tmp; successful records and all failed raw files preserved",
+      "reusedPrograms": 25,
+      "resumedPrograms": 48,
+      "interruptedLog": "/tmp/evaluate-finding-20260913/full.log",
+      "resumedLog": "/tmp/evaluate-finding-20260913/resume.log",
+      "interruptedMeasurements": "/tmp/evaluate-finding-20260913/full/measurements.json"
     }
   }
 }

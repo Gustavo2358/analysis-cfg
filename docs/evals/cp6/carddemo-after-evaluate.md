@@ -6,6 +6,15 @@ Drafts: [frontend #42](https://github.com/Gustavo2358/proleap-poc/pull/42),
 [CFG evaluation #28](https://github.com/Gustavo2358/analysis-cfg/pull/28).
 No merge or auto-merge.
 
+Closed-primary remediation: lower `b61204e6959c6454b4bc4961acf265d99536a237`
+keeps the iterative IF/EVALUATE traversal, but requires every frontier to close
+through GOBACK. Open continuations/arms and cycles cannot qualify an isolated
+BASIC body; completed shared joins remain valid. Target disjointness is preserved.
+The no-GOBACK regression failed against the previous lower and now passes, along
+with open IF/EVALUATE arms, cycle rejection and valid BASIC cases. Lower FAST and
+one qualification-local passed on this final source; all 18 E2Es were rerun A/B.
+Frontend and CFG production are unchanged by the remediation.
+
 SP **2.0.0** publishes a simple DATA reference, ordered textual WHEN literals,
 explicit arm identity/membership/entry, OTHER presence and normal continuation.
 The lower retains decoders 1.1–1.9 and adds a distinct 2.0 decoder. Each WHEN
@@ -61,10 +70,23 @@ with 73 CALLs already reaching dependency. The earlier full baseline is unchange
 qualified frontend/lower commits. The [JSON comparison](carddemo-after-evaluate.json)
 contains every affected program and site, candidate supports and all five remainders.
 
-The affected run completed **46/46 programs and 47/47 CALLs** before one Full run.
-The Full attempted **73 sources** and completed **67 SP/AIR/CFG/dependency programs**.
-The 184 affected SP/AIR/CFG/dependency products have identical hashes between
-focused and Full runs. No source/COPY inventory was changed.
+The initial slice's affected run completed **46/46 programs and 47/47 CALLs**
+before its Full run. That comparison remains preserved in
+[commit 7686a21](https://github.com/Gustavo2358/analysis-cfg/blob/7686a21534585949037dc5290ba107d8beba840f/docs/evals/cp6/carddemo-after-evaluate.json)
+and its raw outputs. The remediation uses one new final Full with the corrected
+lower, without repeating the affected run. The table reports this final source
+against the unchanged ENTRY baseline.
+
+A `/tmp` quota interruption required resuming that same Full: 25 completed
+program records were reused and 48 interrupted/uncompleted programs resumed.
+Original failure logs and outputs were not overwritten. Resumed outputs live on
+the workspace disk through `full/resume`; `full/measurements-final.json` is the
+completed aggregate. No successful program was rerun for this recovery.
+
+Compared with the previous EVALUATE lower, all 73 CALL sites preserve candidate
+values, classification, reachability and all five remainders. The 67 dependency
+products are byte-identical. The JSON's `remediationValidation` records this
+comparison and the quota recovery separately from the ENTRY-to-EVALUATE delta.
 
 | Metric | Before (ENTRY baseline) | After EVALUATE |
 | --- | ---: | ---: |
@@ -102,9 +124,9 @@ one fixed-format tab and one normalization rejection. Their CALL inventories
 remain unknown. Missing DATA COPY stays partial; missing PROCEDURE COPY stays
 conservative. No next blocker was implemented.
 
-Raw outputs and logs are preserved under `/tmp/evaluate-carddemo/{affected,full}`;
-configuration is `/tmp/evaluate-carddemo/runtime.json`. Focal E2E outputs are in
-`/tmp/evaluate-e2e-2` and `/tmp/evaluate-e2e-remaining`; combined results are
-`/tmp/evaluate-e2e-results.json`. The evaluator scripts are
+Final outputs and logs are under `/tmp/evaluate-finding-20260913/{e2e,full}`;
+configuration is `/tmp/evaluate-finding-20260913/runtime.json`, and the 18 E2E
+results are in `e2e/results.json`. The previous outputs remain untouched under
+`/tmp/evaluate-carddemo/{affected,full}`. The evaluator scripts are
 `scripts/project/e2e_evaluate.py` and `scripts/project/carddemo_evaluate.py`.
 Remote runs are FAST only; CardDemo is local/on-demand.

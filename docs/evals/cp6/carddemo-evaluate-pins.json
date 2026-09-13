@@ -6,7 +6,7 @@
   "analysisRepositories": {
     "air-java": "96cd5e545723c6fd76d1520f431ebbc196af84f6",
     "proleap-poc": "54ca76f9cf91696d335b2678e9dd2425f81065a5",
-    "cobol-lower": "5d450768690b39823fee4b8bce5639292245f252",
+    "cobol-lower": "b61204e6959c6454b4bc4961acf265d99536a237",
     "analysis-cfg": "18a78a6599bfad2d983a4a32d7515d379a9bac60"
   },
   "semanticProductVersion": "2.0.0",
