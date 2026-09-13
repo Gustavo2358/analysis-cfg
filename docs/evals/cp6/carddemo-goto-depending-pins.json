@@ -39,5 +39,34 @@
         "docs/evals/cp6/carddemo-perform-family-pins.json"
       ]
     }
+  },
+  "analysisRepositories": {
+    "air-java": "d51a5051124d962c4c5dc94f163eb68f97136186",
+    "proleap-poc": "8cf4a2d80ab22691aa4d5bc17e504054eb204429",
+    "cobol-lower": "5674b72ef280a18be7b6395d48c7766f2ac6d912",
+    "analysis-cfg": "0d618595c51648763878211537958dfdfb67c2e9"
+  },
+  "semanticProductVersion": "2.6.0",
+  "runtimeJarSha256": {
+    "frontend": "e47ab0f5c5fdeb08dbbedb1446e41ee9c92f1180161e0cac47bf8222567420a8",
+    "lower-core": "5c99dba451e7c54ad660afe0fcf546a4b071346999e4675b18b2d2b3818fc448",
+    "lower-adapters": "5195cbd053b8ed555300aeac5bbea2ea6c02f15f33ce3831d6015bab1a582c02",
+    "air-model": "1f8a540ef92bca0b777e599f664469d50aba7336708a2813ed3b9a253d1e3d4c",
+    "air-json": "532b271a66e22734969de4273e13f62bd8cf91527a5490ed835a7426d32667ba",
+    "cfg-kernel": "5d649c05f3c7298f0ff76843785a92d70c1b49e2824e6a24ffb49c332bdad509",
+    "cfg-adapters": "e5337c769e18ffc461f6ba66ad306ccff1b6d58a6e0cb822d50185fec519ee23",
+    "cfg-launcher": "45ee90e9b083ae76299d7fe0b581ba1b06cf9ef15df8aa1b55a4e595d26399e7",
+    "analysis-kernel": "afa8beaa5f0103d919ae04d7cfec066c72a7e1cb5c1b41022cfa7438782036f0",
+    "analysis-values": "864b4088e0451a315aa8ff3d9b5a86272b4ec4a15a713b36775eecad5498a397",
+    "analysis-dependencies": "a9370bb9a49cd137bdb9d518a15b759192425f50edb5fac7c8bc0ffd4db65e75",
+    "analysis-dataflow": "d3b26fcebaa7fb59766b60306a1edb8e4acb7f8c660ecf9b2b02f715c033d55c",
+    "analysis-adapters": "7f2a20a77e4b543c163a5c681021eb8d351471133b0a78f5f883df65aec2f94a",
+    "analysis-launcher": "610d4c40573297e6a2c3800dec3e6b5713633b8447072330ef70dad02db88146"
+  },
+  "note": "analysisRepositories are exact clean snapshots used by final focals, regressions, affected and the single local Full. Later evaluation-only commits do not alter these execution pins.",
+  "draftPRs": {
+    "proleap-poc": "https://github.com/Gustavo2358/proleap-poc/pull/45",
+    "cobol-lower": "https://github.com/Gustavo2358/cobol-lower/pull/22",
+    "analysis-cfg": "https://github.com/Gustavo2358/analysis-cfg/pull/31"
   }
 }

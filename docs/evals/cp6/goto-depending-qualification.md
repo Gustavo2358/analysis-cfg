@@ -33,3 +33,12 @@ unavailable executable entry/continuation, ALTER and above-profile input do not
 receive precise closed control. No numeric selector pruning is implemented.
 
 decisionPolicy = HUMAN; rankingAuthority = ADVISORY_ONLY. No merge authorized.
+
+## Final execution
+
+All planned gates passed on the exact clean snapshots in the pins.
+Final counts: focal/adversarial 33; GO TO 23; EVALUATE 18; PERFORM 89; historical 38.
+The affected population is zero. One final local Full preserved all 73 CALL vectors
+and all six input blockers. See [the measured delta](carddemo-after-goto-depending.md)
+and [machine-readable qualification](goto-depending-qualification.json).
+No AIR/CFG/PossibleValues production change or merge occurred.

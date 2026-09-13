@@ -1,0 +1,443 @@
+{
+  "decisionPolicy": "HUMAN",
+  "rankingAuthority": "ADVISORY_ONLY",
+  "status": "READY_FOR_HUMAN_REVIEW",
+  "executionPins": {
+    "air-java": "d51a5051124d962c4c5dc94f163eb68f97136186",
+    "proleap-poc": "8cf4a2d80ab22691aa4d5bc17e504054eb204429",
+    "cobol-lower": "5674b72ef280a18be7b6395d48c7766f2ac6d912",
+    "analysis-cfg": "0d618595c51648763878211537958dfdfb67c2e9"
+  },
+  "suites": {
+    "focals": {
+      "passed": 33,
+      "sha256": "346d9c16701146802e07884d700a0a67d6c1453e7061046c3c399792aaf554f5"
+    },
+    "goto": {
+      "passed": 23,
+      "sha256": "015f172f1a63487a140dd794f9e9e1c7f01414370652c87207251dbab620af0f"
+    },
+    "evaluate": {
+      "passed": 18,
+      "sha256": "b22b74e62cbaced7828dfb667bb0e0bd703d522203b6b9d6d94606bb5e02d3e9"
+    },
+    "perform": {
+      "passed": 89,
+      "sha256": "763c2b3f98f59430ff0ae514b43dd8da42b66356f9e2427c9ad14affb6086a4a"
+    },
+    "historical": {
+      "passed": 38,
+      "sha256": "888c00900e5e161442e30345e66dcc767d71d111d066a9ed528146eef985b30a"
+    }
+  },
+  "cardinalities": {
+    "1": "PASS",
+    "2": "PASS",
+    "5": "PASS",
+    "40": "PASS",
+    "100": "PASS",
+    "200": "PASS",
+    "255": "PASS"
+  },
+  "aboveProfile256": "all destinations retained; typed partial; IBM profile gap",
+  "focals": {
+    "d1": {
+      "destinations": 3,
+      "precise": true,
+      "candidates": [
+        [
+          "FALLPGM",
+          "PROGA",
+          "PROGB",
+          "PROGC"
+        ]
+      ],
+      "elapsedSeconds": 6.941
+    },
+    "d2": {
+      "destinations": 3,
+      "precise": true,
+      "candidates": [
+        [
+          "FALLPGM",
+          "PROGA",
+          "PROGB",
+          "PROGC"
+        ]
+      ],
+      "elapsedSeconds": 6.838
+    },
+    "d3": {
+      "destinations": 3,
+      "precise": true,
+      "candidates": [
+        [
+          "FALLPGM",
+          "PROGA",
+          "PROGB",
+          "PROGC"
+        ]
+      ],
+      "elapsedSeconds": 6.344
+    },
+    "d4": {
+      "destinations": 4,
+      "precise": true,
+      "candidates": [
+        [
+          "FALLPGM",
+          "PROGA",
+          "PROGB",
+          "PROGC"
+        ]
+      ],
+      "elapsedSeconds": 6.371
+    },
+    "d5": {
+      "destinations": 3,
+      "precise": false,
+      "candidates": [
+        [
+          "FALLPGM",
+          "PROGA",
+          "PROGB",
+          "PROGC"
+        ]
+      ],
+      "elapsedSeconds": 6.288
+    },
+    "d6": {
+      "destinations": 3,
+      "precise": false,
+      "candidates": [
+        [
+          "FALLPGM",
+          "PROGA",
+          "PROGB",
+          "PROGC"
+        ]
+      ],
+      "elapsedSeconds": 6.471
+    },
+    "d7": {
+      "destinations": 3,
+      "precise": true,
+      "candidates": [
+        [
+          "FALLPGM",
+          "PROGA",
+          "PROGB",
+          "PROGC"
+        ]
+      ],
+      "elapsedSeconds": 6.589
+    },
+    "d8": {
+      "destinations": 3,
+      "precise": true,
+      "candidates": [
+        [
+          "FALLPGM",
+          "PROGA",
+          "PROGB",
+          "PROGC"
+        ]
+      ],
+      "elapsedSeconds": 6.875
+    },
+    "d9": {
+      "destinations": 3,
+      "precise": true,
+      "candidates": [
+        [
+          "FALLPGM",
+          "PROGA",
+          "PROGB",
+          "PROGC"
+        ]
+      ],
+      "elapsedSeconds": 6.716
+    },
+    "d10": {
+      "destinations": 3,
+      "precise": true,
+      "candidates": [
+        [
+          "FALLPGM",
+          "PROGA",
+          "PROGB",
+          "PROGC"
+        ]
+      ],
+      "elapsedSeconds": 6.838
+    },
+    "d11": {
+      "destinations": 3,
+      "precise": true,
+      "candidates": [
+        [
+          "FALLPGM",
+          "PROGA",
+          "PROGB",
+          "PROGC"
+        ]
+      ],
+      "elapsedSeconds": 6.882
+    },
+    "d12": {
+      "destinations": 4,
+      "precise": true,
+      "candidates": [
+        [
+          "FALLPGM",
+          "PROGA",
+          "PROGB",
+          "PROGC",
+          "PROGD"
+        ]
+      ],
+      "elapsedSeconds": 6.839
+    },
+    "cycle": {
+      "destinations": 2,
+      "precise": true,
+      "candidates": [
+        [
+          "BASE",
+          "FALLPGM",
+          "PROGA"
+        ]
+      ],
+      "elapsedSeconds": 6.859
+    },
+    "capacity-1": {
+      "destinations": 1,
+      "precise": true,
+      "candidates": [
+        [
+          "FALLPGM"
+        ]
+      ],
+      "elapsedSeconds": 6.384
+    },
+    "capacity-2": {
+      "destinations": 2,
+      "precise": true,
+      "candidates": [
+        [
+          "FALLPGM"
+        ]
+      ],
+      "elapsedSeconds": 6.402
+    },
+    "capacity-5": {
+      "destinations": 5,
+      "precise": true,
+      "candidates": [
+        [
+          "FALLPGM"
+        ]
+      ],
+      "elapsedSeconds": 6.526
+    },
+    "capacity-40": {
+      "destinations": 40,
+      "precise": true,
+      "candidates": [
+        [
+          "FALLPGM"
+        ]
+      ],
+      "elapsedSeconds": 7.957
+    },
+    "capacity-100": {
+      "destinations": 100,
+      "precise": true,
+      "candidates": [
+        [
+          "FALLPGM"
+        ]
+      ],
+      "elapsedSeconds": 9.593
+    },
+    "capacity-200": {
+      "destinations": 200,
+      "precise": true,
+      "candidates": [
+        [
+          "FALLPGM"
+        ]
+      ],
+      "elapsedSeconds": 11.911
+    },
+    "capacity-255": {
+      "destinations": 255,
+      "precise": true,
+      "candidates": [
+        [
+          "FALLPGM"
+        ]
+      ],
+      "elapsedSeconds": 12.742
+    },
+    "capacity-256": {
+      "destinations": 256,
+      "precise": false,
+      "candidates": [
+        [
+          "FALLPGM"
+        ]
+      ],
+      "elapsedSeconds": 13.263
+    },
+    "basic-incoming": {
+      "destinations": 2,
+      "precise": true,
+      "candidates": [
+        []
+      ],
+      "elapsedSeconds": 6.562
+    },
+    "range-internal": {
+      "destinations": 2,
+      "precise": true,
+      "candidates": [
+        [
+          "PROGC"
+        ]
+      ],
+      "elapsedSeconds": 6.202
+    },
+    "range-escape": {
+      "destinations": 2,
+      "precise": true,
+      "candidates": [
+        [
+          "PROGC"
+        ]
+      ],
+      "elapsedSeconds": 6.944
+    },
+    "range-partial-target": {
+      "destinations": 2,
+      "precise": false,
+      "candidates": [
+        [
+          "PROGC"
+        ]
+      ],
+      "elapsedSeconds": 6.62
+    },
+    "range-incoming": {
+      "destinations": 2,
+      "precise": true,
+      "candidates": [
+        [
+          "PROGA",
+          "PROGC"
+        ]
+      ],
+      "elapsedSeconds": 6.729
+    },
+    "empty": {
+      "destinations": 3,
+      "precise": false,
+      "candidates": [
+        [
+          "FALLPGM",
+          "PROGA",
+          "PROGC"
+        ]
+      ],
+      "elapsedSeconds": 6.435
+    },
+    "section": {
+      "destinations": 2,
+      "precise": false,
+      "candidates": [],
+      "elapsedSeconds": 6.083
+    },
+    "ambiguous": {
+      "destinations": 2,
+      "precise": false,
+      "candidates": [],
+      "elapsedSeconds": 5.9
+    },
+    "alter": {
+      "destinations": 3,
+      "precise": false,
+      "candidates": [
+        [
+          "FALLPGM",
+          "PROGA",
+          "PROGB",
+          "PROGC"
+        ]
+      ],
+      "elapsedSeconds": 6.507
+    },
+    "no-fallthrough": {
+      "destinations": 1,
+      "precise": false,
+      "candidates": [],
+      "elapsedSeconds": 5.973
+    },
+    "selector-text": {
+      "destinations": 3,
+      "precise": false,
+      "candidates": [
+        [
+          "FALLPGM",
+          "PROGA",
+          "PROGB",
+          "PROGC"
+        ]
+      ],
+      "elapsedSeconds": 6.776
+    },
+    "cross-unit": {
+      "destinations": 2,
+      "precise": false,
+      "candidates": [],
+      "elapsedSeconds": 5.908
+    }
+  },
+  "determinism": "SP/AIR/CFG/dependency A/B byte identity for all 33 focals",
+  "physicalPermutations": "SP statement inventory and JSON fields; AIR sequences and fields; semantic target order untouched",
+  "targetCapAudit": "PASS: 255 only profile qualification; existing diagnostics subList does not touch targets",
+  "complexity": "indexed resolution and one generic finite control envelope, O(N); linear admission-work assertion and frontend timeout guard",
+  "numericEvaluation": "NOT_IMPLEMENTED",
+  "productionChanges": {
+    "AIR": "NONE",
+    "CFG": "NONE",
+    "PossibleValues": "NONE",
+    "RD": "NONE"
+  },
+  "localFast": {
+    "frontend": "PASS 142 tests",
+    "lower": "PASS",
+    "cfg": "PASS"
+  },
+  "qualificationLocal": {
+    "frontend": "PASS; 633 tests, one pre-existing skip; source normalization E2E and naming PASS",
+    "lower": "PASS; semantic, existing 10k/20k production capacity, architecture"
+  },
+  "remote": "FAST ONLY; three Draft PRs green",
+  "historicalEntryLocalization": "EntryLocalizationSuite included in lower FAST and qualification",
+  "rawEvidence": "/home/gustavo/workspace/teste-e2e/goto-depending/evidence",
+  "fullRuns": 1,
+  "fullElapsedSeconds": 315.948904663,
+  "evidenceHashes": {
+    "focals-final/results.json": "346d9c16701146802e07884d700a0a67d6c1453e7061046c3c399792aaf554f5",
+    "target-cap-audit.json": "36483e494ed8f9ba33ee1cfc7d0bb939955e102db629e17ebe1749f03ae4a521",
+    "runtime-final/runtime.json": "a966f0173ae1effa9a524cbe2ea0a1d6f81bbdff8a4ae96b3e60c76d60fe0c27",
+    "gates/frontend-fast-04.log": "d44894b2e1069fcb277950941b2c2781245d6ea07e89d18a777ef6d762617288",
+    "gates/frontend-qualification-03.log": "adf15cddb4b49ad49afc637fc8e1c9606dc0af9a98ce13af82ccc206f6e84f27",
+    "gates/lower-fast-01.log": "80ed3d07c005083c67053cf93339e4dc07014ea2525ea7d95ae10c4b4c4501b2",
+    "lower-qualification-02.log": "ea1e9a00e18ac8c66d0878c4763b89b0ef7fbbd4039c3e303a2089d76774fae7",
+    "cfg-fast-02.log": "77982252f5e2913ad14096cee92c3fb0e0043ef4b4f69d307ad9cd608db4cc4a",
+    "affected-final/measurements.json": "3d196d2f9f0c3d7fedc3a9a88482f1324ac40aa2022aa8582cfd0477184d9b94",
+    "full-final/measurements.json": "464d4ac842fc9a39de569ce048d3978feff0b2af102d33a9f20c7eabeeb9afbd",
+    "full-final-delta.json": "98bac31dfbce91bcd91e11ddf7155d877e4eac77f353b917165bf3a46952de47"
+  }
+}
