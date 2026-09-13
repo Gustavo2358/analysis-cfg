@@ -16,5 +16,10 @@ design_w1:
 design_w2:
   contract: docs/domain/regional-analysis.md
   ownership: analysis-kernel/storage prepares locations and normalized effects; analysis-kernel/rd consumes the existing solver SPI.
-  progress: Interval RD, entry events, stable batched before/after/outcome queries and file traversal have independent oracle coverage; cumulative W2 qualification is in progress.
+  progress: Interval RD, entry events, stable batched before/after/outcome queries and file traversal have independent oracle coverage; cumulative W2/M0 qualified at ec28ba125e3d2490f2ad78ae72225bd89e3ef849.
   boundaries: No source language interpretation, new solver or consumer-side repair; explicit bases, proofs, alternatives, unknown tails and outcomes.
+design_w3:
+  contract: docs/domain/regional-values.md
+  progress: Regional image foundation, explicit provider and CALL-before-Invoke projection have focal and complete repository FAST coverage; real source E2E and cumulative M1 qualification remain pending.
+  oracle: Independent octet examples and 48 full-string control graphs with 240 observations; displaced view, unknown prefix, alias effects, scalar mixture, support convergence and integral copy capture.
+  boundaries: Existing solver/replay reused; historical scalar profiles and wire preserved; multi-producer projection keeps FRAGMENT_COMPOSITION_PENDING until W5; no regional-initializer validator expansion.

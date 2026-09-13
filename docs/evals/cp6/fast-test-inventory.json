@@ -89,6 +89,11 @@
     ],
     "io.github.gustavo2358.analysis.adapters.RegionalFileTest": [
       "realAirFilePreservesPhysicalOffsetsAndSurvivingDefinitions"
+    ],
+    "io.github.gustavo2358.analysis.adapters.RegionalDependencyTest": [
+      "wholeWriteFeedsDisplacedCallViewBeforeForeignMayEffects",
+      "literalOnlySitesDoNotDemandRegionalValues",
+      "historicalScalarProfilesContinueToRefuseRegions"
     ]
   },
   "analysis-dataflow": {
@@ -278,6 +283,23 @@
       "missingSourceStronglyReplacesKnownDestinationWithOpenEmpty",
       "repeatedForwardCopiesHaveNoHopLimit",
       "copiesDoNotCreateStorageIndependence"
+    ],
+    "io.github.gustavo2358.analysis.values.ByteImageTest": [
+      "unknownIsNotEmptyAndKnownSliceUsesItsOriginalOffset",
+      "partialWriteKeepsSuffixAndPartialUnknownInvalidatesWholeRead",
+      "copiesCaptureImmutableImageAndOverlapReadsOldBytes",
+      "unknownTailAndHugeExtentRemainSparseAndZeroIsIdentity"
+    ],
+    "io.github.gustavo2358.analysis.values.RegionalValuesTest": [
+      "missingStateIsUnknownAndUnreachableIsSeparate",
+      "unknownPrefixPreservesKnownSuffixAndCannotReviveWholeCandidate",
+      "w3DoesNotClaimUnqualifiedFragmentComposition",
+      "branchAndLoopSupportsConvergeWithoutPathHistories",
+      "sameBytesDifferentCodecsProduceDifferentText",
+      "identicalInitialConditionsRetainBothSupportsAndConflictsAreRefused",
+      "scalarAndRegionCoexistOnlyExplicitSeparationClosesTheOtherBase",
+      "wholeAreaCopyCapturesItsSourceBeforeLaterAssignment",
+      "finiteConcreteOracleChecksFullWritesJoinsLoopsAndMissingBranches"
     ]
   },
   "cfg-adapters": {

@@ -7,6 +7,7 @@ import io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry;
 import io.github.gustavo2358.analysis.plan.*;
 import io.github.gustavo2358.analysis.structure.AnalysisSession;
 import io.github.gustavo2358.analysis.values.PossibleValuesProvider;
+import io.github.gustavo2358.analysis.values.RegionalValuesProvider;
 import java.util.*;
 
 /** CP6 W1D application boundary. */
@@ -24,7 +25,7 @@ public final class DependencyAnalysis {
         var opened=AnalysisSession.open(cfg,publication,options.projectionPolicy(),publication.units().stream().flatMap(u->u.entries().stream()).toList());
         if(opened.status()!=AnalysisSession.Status.ACCEPTED)throw new Failure(Kind.CFG_UNSUPPORTED,opened.reason());
         var session=opened.session().orElseThrow();
-        try(var execution=new PlanningExecution(session,new AnalysisRegistry(List.of(new PossibleValuesProvider(),new ReachabilityProvider())))) {
+        try(var execution=new PlanningExecution(session,new AnalysisRegistry(List.of(new PossibleValuesProvider(),new RegionalValuesProvider(),new ReachabilityProvider())))) {
             var plan=execution.plan(CallDependencyPlan.select(session));var result=execution.execute("dependencies@1",plan);
             for(var analysis:result.analyses())if(analysis.status()!=AnalysisOutcome.Status.STABLE)throw new Failure(Kind.ANALYSIS_UNSUPPORTED,analysis.reason());
             if(result.preparationStatus()!=PreparedAnalysisResult.PreparationStatus.COMPLETE)throw new Failure(Kind.CONSUMER_FAILURE,"dependency preparation incomplete");
@@ -34,7 +35,7 @@ public final class DependencyAnalysis {
                 for(var candidate:site.candidates())edges.add(new DependencyResult.Edge(site.caller(),site.entry(),site.operation(),candidate,site.effectiveUnknownRemainder()));
             var metrics=new TreeMap<String,Long>();
             result.metrics().forEach((phase,counts)->counts.forEach((name,value)->metrics.put(phase+"."+name,value)));
-            long values=result.analyses().stream().filter(a->a.key().implementation().equals(PossibleValuesProvider.IMPLEMENTATION)).count();
+            long values=result.analyses().stream().filter(a->a.key().implementation().equals(PossibleValuesProvider.IMPLEMENTATION)||a.key().implementation().equals(RegionalValuesProvider.IMPLEMENTATION)).count();
             metrics.put("possibleValuesPreparations",values);metrics.put("possibleValuesRuns",values);
             metrics.put("reachabilityRuns",result.analyses().stream().filter(a->a.key().implementation().equals("Reachability")).count());
             metrics.put("indexedOperations",session.index().metrics().operationsIndexed());

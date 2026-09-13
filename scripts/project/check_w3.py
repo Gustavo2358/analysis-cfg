@@ -8,7 +8,7 @@ from check_w1 import ROOT, Failure, command
 
 PREFIX='io.github.gustavo2358.analysis.values.'
 QUERY_PREFIX='io.github.gustavo2358.analysis.query.'
-VALUE_NAMES='Candidates SupportSet PersistentBindings PossibleValuesState ValuesWork ValueUniverse TextProfile ForeignEffectTransfer ConservativeEffectTransfer ValueFact PossibleValuesAnalysis'.split()
+VALUE_NAMES='Candidates SupportSet PersistentBindings PossibleValuesState ValuesWork ValueUniverse TextProfile ForeignEffectTransfer ConservativeEffectTransfer ValueFact PossibleValuesAnalysis ByteImage TextValueFact RegionalValueFact RegionalValuesAnalysis'.split()
 QUERY_NAMES='ProgramPoint PointQuery ObservationBatch BatchReplayer'.split()
 VALUE_SOURCES={f'analysis-values/src/main/java/io/github/gustavo2358/analysis/values/{n}.java' for n in VALUE_NAMES}
 QUERY_SOURCES={f'analysis-kernel/src/main/java/io/github/gustavo2358/analysis/query/{n}.java' for n in QUERY_NAMES}
@@ -27,9 +27,9 @@ def verify_sources(root:Path)->None:
     if check_direct_air(root):raise Failure('W3 requires direct air-java dependency')
     actual={p.relative_to(root).as_posix() for p in (root/'analysis-values/src/main').rglob('*.java')}
     query={p.relative_to(root).as_posix() for p in (root/'analysis-kernel/src/main/java/io/github/gustavo2358/analysis/query').rglob('*.java')}
-    from check_w4 import PROVIDER
+    from check_w4 import PROVIDERS
     from w1d_scope import NEW_VALUES
-    expected_sources=VALUE_SOURCES|{PROVIDER}|{NEW_VALUES}
+    expected_sources=VALUE_SOURCES|PROVIDERS|{NEW_VALUES}
     if actual!=expected_sources or query!=QUERY_SOURCES:raise Failure('W3 exact source inventory mismatch')
     expected={('io.github.gustavo2358.analysis',n,'compile') for n in ['analysis-kernel','cfg-kernel']}|{('io.github.gustavo2358','air-java','compile'),('org.junit.jupiter','junit-jupiter','test')}
     if direct_dependencies(root/'analysis-values/pom.xml')!=expected:raise Failure('W3 direct Maven DAG mismatch')
@@ -95,9 +95,9 @@ def architecture(root:Path,update:bool=False)->None:
         edges={k:sorted(v) for k,v in dependencies_from_jdeps(command(root,['jdeps','--multi-release','21','-filter:none','-verbose:class','-cp',cp,str(classes)])).items() if k.startswith(prefix) and k.removeprefix(prefix).split('$')[0] in (QUERY_NAMES if module=='analysis-kernel' else VALUE_NAMES)}
         for source,targets in edges.items():
             for target in targets:
-                if ('BatchReplayer' in source or 'PossibleValuesAnalysis$Execution' in source) and 'DataflowSolver' in target:raise Failure('W3 observation cannot rerun solver')
+                if ('BatchReplayer' in source or 'PossibleValuesAnalysis$Execution' in source or 'RegionalValuesAnalysis$Execution' in source) and 'DataflowSolver' in target:raise Failure('W3 observation cannot rerun solver')
                 if any(d in target for d in DENIED) or (module=='analysis-kernel' and target.startswith(PREFIX)):raise Failure('W3 forbidden bytecode dependency: '+target)
-                if not target.startswith(('java.',prefix,'io.github.gustavo2358.air.model.','io.github.gustavo2358.analysis.structure.','io.github.gustavo2358.analysis.solver.','io.github.gustavo2358.analysis.query.','io.github.gustavo2358.analysis.cfg.domain.')):raise Failure('W3 DAG: '+target)
+                if not target.startswith(('java.',prefix,'io.github.gustavo2358.air.model.','io.github.gustavo2358.analysis.structure.','io.github.gustavo2358.analysis.solver.','io.github.gustavo2358.analysis.query.','io.github.gustavo2358.analysis.cfg.domain.','io.github.gustavo2358.analysis.storage.','io.github.gustavo2358.analysis.rd.ReachingDefinitions')):raise Failure('W3 DAG: '+target)
         descriptors={p[:-6].replace('/','.'):command(root,['javap','-classpath',str(classes)+os.pathsep+cp,'-public','-s',p[:-6].replace('/','.')]) for p in paths}
         actual[module]={'sources':sorted(sources),'classfiles':paths,'jdeps_edges':dict(sorted(edges.items())),'javap_descriptors':descriptors,'effective_maven':sorted(parse_tgf(root/module/'target/architecture-dependencies.tgf'))}
     if update:(root/INVENTORY).write_text(json.dumps(actual,indent=2)+'\n')

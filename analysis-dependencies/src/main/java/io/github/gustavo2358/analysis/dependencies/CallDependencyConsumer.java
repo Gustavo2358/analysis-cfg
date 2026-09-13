@@ -6,14 +6,15 @@ import io.github.gustavo2358.analysis.consumers.*;
 import io.github.gustavo2358.analysis.plan.ObservationBatchId;
 import io.github.gustavo2358.analysis.query.*;
 import io.github.gustavo2358.analysis.values.ValueFact;
+import io.github.gustavo2358.analysis.values.TextValueFact;
 import java.util.*;
 import static io.github.gustavo2358.analysis.dependencies.DependencySiteFact.*;
 
 /** Lookup-only consumer of the observations declared by CallDependencyPlan before execution. */
 final class CallDependencyConsumer implements FactConsumer<DependencySiteFact> {
     private final ObservationBatchId<LabelId,ReachabilityProvider.Fact> reach;
-    private final ObservationBatchId<ObjectId,ValueFact> values;
-    CallDependencyConsumer(ObservationBatchId<LabelId,ReachabilityProvider.Fact> reach,ObservationBatchId<ObjectId,ValueFact> values){this.reach=reach;this.values=values;}
+    private final ObservationBatchId<ObjectId,? extends TextValueFact> values;
+    CallDependencyConsumer(ObservationBatchId<LabelId,ReachabilityProvider.Fact> reach,ObservationBatchId<ObjectId,? extends TextValueFact> values){this.reach=reach;this.values=values;}
     public void consume(SiteView site,PreparedFacts facts,FactSink<DependencySiteFact> sink) {
         var invoke=(Operations.Invoke)site.operation();boolean computed=invoke.target() instanceof Interactions.ComputedTarget;
         var reachable=lookup(facts,reach,CallDependencyPlan.reachQuery(site));

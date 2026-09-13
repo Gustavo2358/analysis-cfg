@@ -1,0 +1,50 @@
+package io.github.gustavo2358.analysis.values;
+
+import io.github.gustavo2358.analysis.storage.StorageRange;
+import io.github.gustavo2358.air.model.Values;
+import java.math.BigInteger;
+import java.util.*;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+/** Independent octet oracle for the image foundation; no AIR transfer or byte codec is invoked. */
+class ByteImageTest {
+    static StorageRange range(long start,long count){return StorageRange.exact(BigInteger.valueOf(start),BigInteger.valueOf(count));}
+    @Test void unknownIsNotEmptyAndKnownSliceUsesItsOriginalOffset() {
+        var empty=ByteImage.unknown(Optional.of(BigInteger.valueOf(8)),"ENTRY_UNKNOWN");
+        assertTrue(empty.read(range(0,8)).bytes().isEmpty());
+        var image=empty.write(range(0,8),ByteImage.literal(new Values.BytesValue(List.of(65,66,67,68,69,70,71,72)),1));
+        var child=image.read(range(4,4));assertEquals(List.of(69,70,71,72),child.bytes().orElseThrow().octets());
+        assertEquals(1,child.parts().size());assertEquals(BigInteger.valueOf(4),child.parts().getFirst().producerOffset());
+        assertTrue(empty.read(range(0,8)).bytes().isEmpty(),"old immutable root unchanged");
+    }
+    @Test void partialWriteKeepsSuffixAndPartialUnknownInvalidatesWholeRead() {
+        var image=ByteImage.literal(new Values.BytesValue(List.of(65,66,67,68,69,70,71,72)),1);
+        var written=image.write(range(0,4),ByteImage.literal(new Values.BytesValue(List.of(87,88,89,90)),2));
+        assertEquals(List.of(87,88,89,90,69,70,71,72),written.read(range(0,8)).bytes().orElseThrow().octets());
+        assertEquals(List.of(2,1),written.parts().stream().map(ByteImage.Part::producer).toList());
+        var unknown=written.write(range(0,4),ByteImage.unknown(Optional.of(BigInteger.valueOf(4)),"HAVOC_MUST"));
+        assertTrue(unknown.read(range(0,8)).bytes().isEmpty());
+        assertEquals(List.of(69,70,71,72),unknown.read(range(4,4)).bytes().orElseThrow().octets());
+        assertEquals(Set.of("HAVOC_MUST"),unknown.read(range(0,8)).reasons());
+    }
+    @Test void copiesCaptureImmutableImageAndOverlapReadsOldBytes() {
+        var x=ByteImage.literal(new Values.BytesValue(List.of(65,66,67,68)),1);
+        var captured=x.slice(range(0,4)).copied(2);
+        x=x.write(range(0,4),ByteImage.literal(new Values.BytesValue(List.of(87,88,89,90)),3));
+        assertEquals(List.of(65,66,67,68),captured.read(range(0,4)).bytes().orElseThrow().octets());
+        assertEquals(Set.of(2),captured.parts().getFirst().copies());
+        var original=ByteImage.literal(new Values.BytesValue(List.of(65,66,67,68)),1);
+        var overlap=original.write(range(1,3),original.slice(range(0,3)).copied(4));
+        assertEquals(List.of(65,65,66,67),overlap.read(range(0,4)).bytes().orElseThrow().octets());
+        assertEquals(List.of(87,88,89,90),x.read(range(0,4)).bytes().orElseThrow().octets());
+    }
+    @Test void unknownTailAndHugeExtentRemainSparseAndZeroIsIdentity() {
+        var huge=BigInteger.ONE.shiftLeft(100);var image=ByteImage.unknown(Optional.of(huge),"UNINITIALIZED");
+        assertEquals(1,image.parts().size());assertTrue(image.read(new StorageRange(BigInteger.ZERO,Optional.of(huge))).bytes().isEmpty());
+        assertSame(image,image.write(range(0,0),ByteImage.literal(new Values.BytesValue(List.of()),1)));
+        var tail=ByteImage.unknown(Optional.empty(),"UNKNOWN_EXTENT");
+        assertTrue(tail.extent().isEmpty());assertTrue(tail.read(range(0,8)).bytes().isEmpty());
+        assertThrows(IllegalArgumentException.class,()->image.write(range(0,4),ByteImage.literal(new Values.BytesValue(List.of(1,2)),1)));
+    }
+}

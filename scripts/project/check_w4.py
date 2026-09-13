@@ -17,7 +17,9 @@ PACKAGES={
 'consumers':'FactConsumer FactSink PreparedFacts SiteView'.split()}
 KERNEL_SOURCES={f'analysis-kernel/src/main/java/io/github/gustavo2358/analysis/{pkg}/{name}.java' for pkg,names in PACKAGES.items() for name in names}
 PROVIDER='analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesProvider.java'
-SOURCES=KERNEL_SOURCES|{PROVIDER}
+REGIONAL_PROVIDER='analysis-values/src/main/java/io/github/gustavo2358/analysis/values/RegionalValuesProvider.java'
+PROVIDERS={PROVIDER,REGIONAL_PROVIDER}
+SOURCES=KERNEL_SOURCES|PROVIDERS
 TESTS={
 'PlanningZeroMatchTest':set('absentKindKeepsDeclaredEmptyBatch rejectingFilterKeepsDeclaredEmptyBatch zeroMatchDeclarationsValidateBindingsBeforeSelection'.split()),
 'PlanningTest':set('structuralConsumerCompletesWithoutAnalysis duplicateConsumerIdsArePlanningErrors'.split()),
@@ -27,11 +29,11 @@ TESTS={
 COMMON_DENIED=('java.io.','java.nio.file.','java.net.','java.lang.reflect.','java.util.ServiceLoader','cfg.adapters.','cfg.launcher.',
     'cfg.application.BuildCfg','cfg.application.CfgBuildCoordinator','org.antlr','cobolexplorer','lower.')
 CONSUMER_DENIED=COMMON_DENIED+('analysis.solver.','analysis.structure.','analysis.application.','analysis.query.BatchReplayer',
-    'analysis.values.PossibleValuesAnalysis','analysis.values.PossibleValuesProvider','air.model.Publication','air.model.Sequence','air.model.Unit','cfg.domain.CfgGraph')
+    'analysis.values.PossibleValuesAnalysis','analysis.values.PossibleValuesProvider','analysis.values.RegionalValuesAnalysis','analysis.values.RegionalValuesProvider','air.model.Publication','air.model.Sequence','air.model.Unit','cfg.domain.CfgGraph')
 
 def role(source:str)->str:
     if '.consumers.' in source:return 'consumers'
-    if 'PossibleValuesProvider' in source:return 'provider'
+    if 'PossibleValuesProvider' in source or 'RegionalValuesProvider' in source:return 'provider'
     return 'application'
 
 def verify_edges(edges:dict)->None:
@@ -44,7 +46,7 @@ def verify_edges(edges:dict)->None:
 
 def verify_sources(root:Path)->None:
     actual={p.relative_to(root).as_posix() for pkg in PACKAGES for p in (root/'analysis-kernel/src/main/java/io/github/gustavo2358/analysis'/pkg).rglob('*.java')}
-    if actual!=KERNEL_SOURCES or not (root/PROVIDER).is_file():raise Failure('W4 exact production source inventory mismatch')
+    if actual!=KERNEL_SOURCES or any(not (root/p).is_file() for p in PROVIDERS):raise Failure('W4 exact production source inventory mismatch')
     for path in SOURCES:
         source=(root/path).read_text()
         denied=CONSUMER_DENIED if '/consumers/' in path else COMMON_DENIED
@@ -72,7 +74,7 @@ def verify_focal_preservation(root:Path)->None:
             raise Failure('W4-F1 changed reviewed source: '+path)
 
 def selected_class(name:str)->bool:
-    return any(name.startswith(PREFIX+pkg+'.') for pkg in PACKAGES) or name.startswith(PREFIX+'values.PossibleValuesProvider')
+    return any(name.startswith(PREFIX+pkg+'.') for pkg in PACKAGES) or name.startswith((PREFIX+'values.PossibleValuesProvider',PREFIX+'values.RegionalValuesProvider'))
 
 def compiled_edges(root:Path)->dict:
     from check_transport_architecture import dependencies_from_jdeps
@@ -94,11 +96,15 @@ def architecture(root:Path,update:bool=False)->None:
         for path in paths:
             if struct.unpack('>IHH',(classes/path).read_bytes()[:8])!=(0xcafebabe,0,65):raise Failure('W4 requires Java 21 without preview')
         descriptors={p[:-6].replace('/','.'):command(root,['javap','-classpath',str(classes)+os.pathsep+cp,'-public','-s',p[:-6].replace('/','.')]) for p in paths}
-        actual[module]={'sources':sorted(KERNEL_SOURCES if module=='analysis-kernel' else {PROVIDER}),'classfiles':paths,
+        actual[module]={'sources':sorted(KERNEL_SOURCES if module=='analysis-kernel' else PROVIDERS),'classfiles':paths,
             'jdeps_edges':{k:v for k,v in edges.items() if (role(k)=='provider')==(module=='analysis-values')},'javap_descriptors':descriptors,
             'effective_maven':sorted(parse_tgf(root/module/'target/architecture-dependencies.tgf'))}
     if update:(root/INVENTORY).write_text(json.dumps(actual,indent=2)+'\n')
-    elif json.loads((root/INVENTORY).read_text())!=actual:raise Failure('W4 compiled inventory drift')
+    else:
+        expected=json.loads((root/INVENTORY).read_text())
+        if expected!=actual:
+            changed=[module+'.'+facet for module,facets in actual.items() for facet,value in facets.items() if expected.get(module,{}).get(facet)!=value]
+            raise Failure('W4 compiled inventory drift: '+', '.join(changed))
     print('[w4-architecture] PASS: compiled consumer capabilities, generic application, bound provider; exact sources/classfiles/javap/jdeps/Maven')
 
 def verify_reports(root:Path,names:set[str])->None:
