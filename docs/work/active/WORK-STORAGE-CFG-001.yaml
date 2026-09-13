@@ -1,0 +1,10 @@
+id: WORK-STORAGE-CFG-001
+title: Storage Semantics campaign — ST-W0..ST-W5
+status: IN_PROGRESS
+scope:
+  - Promote storage/RD/value residuals of BACKLOG-CFG-020 and BACKLOG-DF-001/004/003 handoffs.
+  - ST-W0 baseline/contracts/oracles; ST-W1 control transport integration and explicit codecs.
+  - ST-W2 resolver/canonical effects/interval RD/query/replay using existing solver.
+  - ST-W3/W4 regional values and dependency projection; ST-W5 fragments/copy/joins/context/provenance.
+  - Cumulative FAST, E2E, adversarial/mutation and final local corpus qualification; no W6-W8 or merge.
+notes: One campaign branch and persistent draft PR, with human review after qualified W5 only.
