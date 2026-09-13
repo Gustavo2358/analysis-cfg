@@ -13,6 +13,7 @@ final class TextProfile {
     record CopyWrite(Location location,Location source) implements Write { }
     final AnalysisSession session;
     final Map<ObjectId,Location> subjects=new HashMap<>();
+    private final Set<ObjectId> textSubjects=new HashSet<>();
     final IdentityHashMap<Operation,Write> writes=new IdentityHashMap<>();
     private final IdentityHashMap<Operation,ForeignEffectTransfer> effects=new IdentityHashMap<>();
     private final IdentityHashMap<Operation,ConservativeEffectTransfer> conservative=new IdentityHashMap<>();
@@ -34,11 +35,12 @@ final class TextProfile {
         var cells=new HashMap<StorageId,Location>();
         for(var unit:publication.units())for(var object:unit.objects()) {
             var cell=index.directCell(object.id());
-            if(!(object.storage() instanceof Memory.CellBinding)||cell==null||!text(object.typeRef())||!text(cell.typeRef()))
+            if(!(object.storage() instanceof Memory.CellBinding)||cell==null||!cellDomain(object.typeRef())||!cellDomain(cell.typeRef()))
                 throw new Refusal(false,"UNSUPPORTED_STORAGE_PROFILE");
             var location=cells.get(cell.header().id());
             if(location==null){int ordinal=cells.size();Math.incrementExact(ordinal);location=new Location(ordinal,cell);cells.put(cell.header().id(),location);}
             subjects.put(object.id(),location);
+            if(text(object.typeRef()))textSubjects.add(object.id());
             if(object.coverage()!=Evidence.CoverageStatus.MODELED||open(object.precision().storage())||open(object.precision().values()))
                 sourceOpenCells.add(location.ordinal());
         }
@@ -88,6 +90,11 @@ final class TextProfile {
         }
     }
     private static boolean text(Types.TypeRef type) { return type instanceof Types.Known k&&k.type()==Types.Builtin.TEXT; }
+    // Auxiliary integer cells participate in alias/effect bounds, without numeric
+    // evaluation or candidate queries. Their open value uses the existing top.
+    private static boolean cellDomain(Types.TypeRef type) {
+        return type instanceof Types.Known k&&(k.type()==Types.Builtin.TEXT||k.type()==Types.Builtin.INT);
+    }
     private void prepare(Operation operation) {
         if(operation instanceof Operations.Assign assign) {
             if(!(assign.destination() instanceof Places.ObjectPlace destination))
@@ -127,7 +134,7 @@ final class TextProfile {
         return state.assign(write.location().ordinal(),value,work);
     }
     boolean supports(ObjectId subject,EntryId entry) {
-        if(!subjects.containsKey(subject))return false;
+        if(!textSubjects.contains(subject))return false;
         return subject.unit().equals(entry.unit())||visible.get(entry.unit()).contains(subject);
     }
     boolean sourceOpen(ObjectId subject,EntryId entry) {
