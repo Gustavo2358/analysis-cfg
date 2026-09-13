@@ -11,6 +11,11 @@
     {
       "id": "WORK-CFG-039",
       "path": "docs/work/active/WORK-CFG-039.yaml",
+      "status": "DONE"
+    },
+    {
+      "id": "WORK-CFG-040",
+      "path": "docs/evals/cp6/carddemo-entry-start-discovery.md",
       "status": "IN_PROGRESS"
     }
   ],
