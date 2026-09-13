@@ -35,7 +35,7 @@ def program_candidates(result):
 
 
 def source_oracle(sp, case):
-    require(sp['contractVersion'] in ('1.8.0','1.9.0','2.0.0','2.1.0','2.2.0', '2.3.0') and sp['unit']['canonicalProgramName'] == 'CALLER', 'SP1.8 real CALLER')
+    require(sp['contractVersion'] in ('1.8.0','1.9.0','2.0.0','2.1.0','2.2.0', '2.3.0', '2.4.0') and sp['unit']['canonicalProgramName'] == 'CALLER', 'SP1.8 real CALLER')
     facts = {s['header']['id']: s for s in sp['statements']}
     require(len(facts) == len(sp['statements']) and all(s['header']['coverage'] == 'MODELED' for s in facts.values()), 'complete typed source facts')
     require(all(s['variant'] in {'MOVE', 'CALL', 'IF', 'PERFORM', 'GOBACK'} for s in facts.values()), 'no unknown statement filtering')

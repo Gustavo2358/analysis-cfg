@@ -69,3 +69,44 @@ Raw evidence: `carddemo-until`, `carddemo-until-delta.json`,
 of the original unchanged measurement records.
 
 No Full corpus run has been performed in this wave. Continue to TIMES/VARYING.
+
+
+## Phase 3 implementation boundary discovered
+
+The pinned AIR model already represents `known(int)`, but its JSON codec rejected
+that type. The wave's `air-java` Draft PR #13 adds that existing generic transport
+form; AIR and binding versions remain unchanged. PossibleValues also rejected
+an entire publication if any direct cell was non-text. Its conservative auxiliary
+integer admission will keep those cell values open and restrict candidate queries
+to text objects. A single source-derived disjointness premise must still cover
+all admitted cells, including auxiliary ones. Localized integer writes then leave
+independent text candidates unchanged; all-memory effects still open text values.
+This is a generic profile-admission extension, not numeric evaluation, lattice,
+solver or CFG projection work. The existing per-cell effect transfer is reused.
+Oracle: text PROGA survives a disjoint integer must-write, a numeric query is
+unsupported, an all-memory may-write opens PROGA, and missing disjointness refuses.
+
+
+## Phase 3A checkpoint — TIMES GREEN; THRU/UNTIL regression GREEN
+
+Frontend `2a9c3ebf09257c213ed3b78b3f6c364bdc1c16ac`, lower
+`b0d0cd03156f42623f8e6bb503c9a30e6b19b3e4`, auxiliary-cell admission
+`d723dace8844311e26057e13de2f47a6602377e6`, AIR codec
+`8be19ff385b42a5987a407acc464319d212081c3`. SP 2.4 preserves all older decoders.
+
+THRU+UNTIL+TIMES 60/60 PASS; GO TO 23/23; EVALUATE 18/18; historical 38/38.
+TIMES includes literal 1/5/1000000, identifier count, THRU, multiplicity 1/2/5/40,
+partial counts/ranges, contradictory proofs, A/B bytes and physical permutations.
+The three literal count fixtures each have 6 sequences, 8 operations and 2
+Assigns: the initial text write and one body write. The identifier is read only
+at activation entry; exhaustion decisions never reread it.
+FAST frontend 132 tests PASS; lower PASS; CFG PASS; AIR PASS. AIR local
+qualification also PASS: 179 model + 110 transport deterministic checks via Maven
+clean verify. CFG projection production remains unchanged; the generic
+PossibleValues admission boundary described above is the only dataflow change.
+No lattice, solver, numeric value analysis or Reaching Definitions change.
+
+Raw evidence: `times-focal-02`, `times-cumulative`, `goto-times`, `evaluate-times`,
+`historical-times`, `times-static-size.json`. Failed discoveries remain preserved.
+Final cumulative affected corpus qualification follows VARYING. No Full corpus
+run has been performed. Continue immediately to single-variable VARYING.

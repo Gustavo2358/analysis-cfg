@@ -58,6 +58,23 @@ def until():
     return cases
 
 
+def times():
+    body="A.\nMOVE 'NEWPROG' TO WS-PGM.\n"
+    def make(control, tail=body):
+        return source("MOVE 'OLDPROG' TO WS-PGM.\nPERFORM A "+control+".\nCALL WS-PGM.",tail).replace('01 FLAG PIC X.','01 FLAG PIC X.\n01 WS-N PIC S9(9).')
+    cases={'times-identifier':make('WS-N TIMES'), 'times-one':make('1 TIMES'),
+           'times-positive':make('5 TIMES'), 'times-large':make('1000000 TIMES'),
+           'times-thru':make('THRU C 5 TIMES',"A.\nMOVE 'PROGA' TO WS-PGM.\nB.\nMOVE 'PROGB' TO WS-PGM.\nC.\nMOVE 'NEWPROG' TO WS-PGM.\n"),
+           'times-unresolved':make('MISSING TIMES'),
+           'times-noninteger':make('FLAG TIMES'),
+           'times-zero':make('0 TIMES')}
+    for n in (1,2,5,40):
+        cases['times-'+str(n)]=source('\n'.join(['PERFORM A 5 TIMES.\nCALL WS-PGM.']*n),body)
+    for name in ('incoming','escape','cycle','recursive','partial-end','unknown-body'):
+        cases['times-'+name]=thru()[name].replace('PERFORM A THRU C.','PERFORM A THRU C 5 TIMES.').replace('PERFORM A THRU MISSING.','PERFORM A THRU MISSING 5 TIMES.')
+    return cases
+
+
 if __name__=='__main__':
     FIXTURES.mkdir(parents=True,exist_ok=True)
-    for name,text in {**thru(),**until()}.items():(FIXTURES/(name+'.cbl')).write_text(''.join('       '+part+'\n' for line in text.splitlines() for part in textwrap.wrap(line,width=65,break_long_words=False,break_on_hyphens=False)))
+    for name,text in {**thru(),**until(),**times()}.items():(FIXTURES/(name+'.cbl')).write_text(''.join('       '+part+'\n' for line in text.splitlines() for part in textwrap.wrap(line,width=65,break_long_words=False,break_on_hyphens=False)))

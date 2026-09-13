@@ -19,14 +19,21 @@ EXPECTED.update({'until-before':[{'OLDPROG','NEWPROG'}],'until-default':[{'OLDPR
     **{'until-'+str(n):[{'NEWPROG'}]*n for n in (1,2,5,40)}})
 PARTIAL+=tuple('until-'+n for n in ('unresolved','unsupported','incoming','escape','cycle','recursive','partial-end','unknown-body'))
 
+EXPECTED.update({'times-identifier':[{'OLDPROG','NEWPROG'}],
+    **{'times-'+n:[{'NEWPROG'}] for n in ('one','positive','large','thru')},
+    **{'times-'+str(n):[{'NEWPROG'}]*n for n in (1,2,5,40)}})
+PARTIAL+=tuple('times-'+n for n in ('unresolved','noninteger','zero','incoming','escape','cycle','recursive','partial-end','unknown-body'))
+
 
 def oracle(name,source,sp,air,cfg,result):
-    require(sp['contractVersion']=='2.3.0','versioned range/loop contract')
+    require(sp['contractVersion']=='2.4.0','versioned range/loop contract')
     publication=air['publication'];sequences=publication['units'][0]['sequences']
     ops={op['header']['id']['localId']:op for seq in sequences for op in seq['instructions']+[seq['terminator']]}
     links={s['header']['id']:[o['localId'] for item in publication['coverage']['items']
         if item['sourceKey'].endswith('/'+s['header']['id']) for o in item['outputs'] if o['domain']=='operation'] for s in sp['statements']}
     require(all(links.values()),'every source statement retained')
+    if name in ('times-one','times-positive','times-large'):
+        require(sum(op['kind']=='assign' for op in ops.values())==2,'one body assignment independent of literal iteration count')
     label_by_op={op['header']['id']['localId']:seq['label']['localId'] for seq in sequences for op in seq['instructions']+[seq['terminator']]}
     labels={n['id']['ordinal']:n['label']['localId'] for n in cfg['nodes'] if n['kind']=='SEQUENCE'}
     normal_edges={l:set() for l in labels.values()}
@@ -55,6 +62,20 @@ def oracle(name,source,sp,air,cfg,result):
             require(decision['trueDestination']['localId'] in {label_by_op[o] for o in links[p['normalContinuation']['statement']]},'UNTIL true resumes own callsite')
             predicate=decision['predicate'];require(predicate['kind']=='unknown' and predicate['typeRef']['type']['kind']=='bool','unknown Boolean, no predicate pruning')
             require(len(predicate['dependencies'])==len(p['loop']['condition']['references']) and all(r['kind']=='read' for r in predicate['dependencies']),'condition reads retained')
+        elif p.get('times'):
+            count=p['times'];variable=count['profile']=='INTEGER_ITEM'
+            require(len(branches)==(2 if variable else 1) and len(control)==len(branches)+1,'constant static body size for TIMES')
+            resume_labels={label_by_op[o] for o in links[p['normalContinuation']['statement']]}
+            for branch in branches:
+                here=label_by_op[branch['header']['id']['localId']];control_labels.add(here)
+                require(branch['falseDestination']['localId'] in first_labels and branch['trueDestination']['localId'] in resume_labels,'count decision body/resume')
+                require(branch['predicate']['kind']=='unknown','exhaustion is abstract')
+                if here==entry:
+                    require(variable and len(branch['predicate']['dependencies'])==1,'initial count read retained exactly once')
+                    require(branch['predicate']['dependencies'][0]['kind']=='read','count item read')
+                    require(not any(entry in successors for label,successors in normal_edges.items() if label!=label_by_op[jumps[0]['header']['id']['localId']]),'back edge never reevaluates count')
+                else:require(not branch['predicate']['dependencies'],'repetition decision does not reread source count')
+            require(entry in control_labels if variable else entry in first_labels,'unknown count permits zero; positive literal executes body first')
         else:require(len(control)==1 and entry in first_labels,'typed first paragraph entry')
         members={i for r in p['procedures'] for i in r['statements']}
         body_labels={label_by_op[o] for i in members for o in links[i]}

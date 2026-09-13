@@ -1,0 +1,15 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. FAMILY.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 WS-PGM PIC X(8).
+       01 FLAG PIC X.
+       01 WS-N PIC S9(9).
+       PROCEDURE DIVISION.
+       MAIN.
+       MOVE 'OLDPROG' TO WS-PGM.
+       PERFORM A MISSING TIMES.
+       CALL WS-PGM.
+       GOBACK.
+       A.
+       MOVE 'NEWPROG' TO WS-PGM.
