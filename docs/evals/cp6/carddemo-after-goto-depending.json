@@ -1,0 +1,251 @@
+{
+  "schemaVersion": "carddemo-after-goto-depending-1.0.0",
+  "decisionPolicy": "HUMAN",
+  "rankingAuthority": "ADVISORY_ONLY",
+  "beforeMeasurements": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/perform-family/carddemo-family-full/measurements.json",
+  "afterMeasurements": "/home/gustavo/workspace/teste-e2e/goto-depending/evidence/full-final/measurements.json",
+  "beforeMeasurementsSha256": "2e397008ce8b46f6e2bc9c15372116ecc9fecae636888ad4655bd0ac62e60c38",
+  "afterMeasurementsSha256": "464d4ac842fc9a39de569ce048d3978feff0b2af102d33a9f20c7eabeeb9afbd",
+  "beforeSnapshot": {
+    "baselineMergeShas": {
+      "proleap-poc": "f62e4cf2792d518de5f4f9c753d0d86e92d3f755",
+      "cobol-lower": "715f196369d1e82cfd7e4affb31ee34dc73c0e2d",
+      "analysis-cfg": "51beeb1859689dc83e16aca9cc8a1fc9fc7e0bc7"
+    },
+    "airJava": "96cd5e545723c6fd76d1520f431ebbc196af84f6",
+    "analysisIr": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+    "upstream": {
+      "repository": "aws-samples/aws-mainframe-modernization-carddemo",
+      "commit": "59cc6c2fd7ebd7ef7925cad552a01a4b8b6e4d5e"
+    },
+    "decisionPolicy": "HUMAN",
+    "rankingAuthority": "ADVISORY_ONLY",
+    "analysisRepositories": {
+      "air-java": "8be19ff385b42a5987a407acc464319d212081c3",
+      "proleap-poc": "642ba4b3aeaffdfa0942f3fb462a4be17070d0d1",
+      "cobol-lower": "e8cdc95491b7225c2c899e6f4dc229f64f26a8d7",
+      "analysis-cfg": "982179c812ff526e9e6095ea3feaffa5e42c7985"
+    },
+    "semanticProductVersion": "2.5.0"
+  },
+  "afterSnapshot": {
+    "baselineMergeShas": {
+      "air-java": "d51a5051124d962c4c5dc94f163eb68f97136186",
+      "proleap-poc": "6598c08191538602e9521647ea4d7180b8008fb6",
+      "cobol-lower": "0676ca72aa67d5f6ffcf3f7f1b82edcb1b78d2ad",
+      "analysis-cfg": "459a9de69c785928f4252a75013fd45b9f5497e6"
+    },
+    "analysisIr": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+    "upstream": {
+      "repository": "aws-samples/aws-mainframe-modernization-carddemo",
+      "commit": "59cc6c2fd7ebd7ef7925cad552a01a4b8b6e4d5e"
+    },
+    "decisionPolicy": "HUMAN",
+    "rankingAuthority": "ADVISORY_ONLY",
+    "preservedBaselineAnalysisRepositories": {
+      "air-java": "8be19ff385b42a5987a407acc464319d212081c3",
+      "proleap-poc": "642ba4b3aeaffdfa0942f3fb462a4be17070d0d1",
+      "cobol-lower": "e8cdc95491b7225c2c899e6f4dc229f64f26a8d7",
+      "analysis-cfg": "982179c812ff526e9e6095ea3feaffa5e42c7985"
+    },
+    "baselineProductionEquivalence": {
+      "air-java": {
+        "productionAndBuildUnchanged": true,
+        "changedPaths": []
+      },
+      "proleap-poc": {
+        "productionAndBuildUnchanged": true,
+        "changedPaths": []
+      },
+      "cobol-lower": {
+        "productionAndBuildUnchanged": true,
+        "changedPaths": []
+      },
+      "analysis-cfg": {
+        "productionAndBuildUnchanged": true,
+        "changedPaths": [
+          "docs/evals/cp6/carddemo-after-perform-family.json",
+          "docs/evals/cp6/carddemo-after-perform-family.md",
+          "docs/evals/cp6/carddemo-perform-family-pins.json"
+        ]
+      }
+    },
+    "analysisRepositories": {
+      "air-java": "d51a5051124d962c4c5dc94f163eb68f97136186",
+      "proleap-poc": "8cf4a2d80ab22691aa4d5bc17e504054eb204429",
+      "cobol-lower": "5674b72ef280a18be7b6395d48c7766f2ac6d912",
+      "analysis-cfg": "0d618595c51648763878211537958dfdfb67c2e9"
+    },
+    "semanticProductVersion": "2.6.0",
+    "runtimeJarSha256": {
+      "frontend": "e47ab0f5c5fdeb08dbbedb1446e41ee9c92f1180161e0cac47bf8222567420a8",
+      "lower-core": "5c99dba451e7c54ad660afe0fcf546a4b071346999e4675b18b2d2b3818fc448",
+      "lower-adapters": "5195cbd053b8ed555300aeac5bbea2ea6c02f15f33ce3831d6015bab1a582c02",
+      "air-model": "1f8a540ef92bca0b777e599f664469d50aba7336708a2813ed3b9a253d1e3d4c",
+      "air-json": "532b271a66e22734969de4273e13f62bd8cf91527a5490ed835a7426d32667ba",
+      "cfg-kernel": "5d649c05f3c7298f0ff76843785a92d70c1b49e2824e6a24ffb49c332bdad509",
+      "cfg-adapters": "e5337c769e18ffc461f6ba66ad306ccff1b6d58a6e0cb822d50185fec519ee23",
+      "cfg-launcher": "45ee90e9b083ae76299d7fe0b581ba1b06cf9ef15df8aa1b55a4e595d26399e7",
+      "analysis-kernel": "afa8beaa5f0103d919ae04d7cfec066c72a7e1cb5c1b41022cfa7438782036f0",
+      "analysis-values": "864b4088e0451a315aa8ff3d9b5a86272b4ec4a15a713b36775eecad5498a397",
+      "analysis-dependencies": "a9370bb9a49cd137bdb9d518a15b759192425f50edb5fac7c8bc0ffd4db65e75",
+      "analysis-dataflow": "d3b26fcebaa7fb59766b60306a1edb8e4acb7f8c660ecf9b2b02f715c033d55c",
+      "analysis-adapters": "7f2a20a77e4b543c163a5c681021eb8d351471133b0a78f5f883df65aec2f94a",
+      "analysis-launcher": "610d4c40573297e6a2c3800dec3e6b5713633b8447072330ef70dad02db88146"
+    }
+  },
+  "pipeline": {
+    "before": {
+      "attempted": 73,
+      "frontend": 67,
+      "lower": 67,
+      "cfg": 67,
+      "dependency": 67,
+      "callsObserved": 73,
+      "callsAnalyzed": 73,
+      "callsReachable": 73,
+      "withKnownCandidates": 73,
+      "categories": {
+        "CLOSED_RESOLVED": 0,
+        "PARTIAL_RESOLVED": 73,
+        "OPEN_UNRESOLVED": 0,
+        "UNREACHABLE_IN_MODEL": 0,
+        "OTHER": 0
+      },
+      "remainders": {
+        "modelValueRemainder": 0,
+        "sourceValueRemainder": 73,
+        "interpretationUnknownRemainder": 73,
+        "effectiveUnknownRemainder": 73,
+        "openControlRemainder": 73
+      }
+    },
+    "after": {
+      "attempted": 73,
+      "frontend": 67,
+      "lower": 67,
+      "cfg": 67,
+      "dependency": 67,
+      "callsObserved": 73,
+      "callsAnalyzed": 73,
+      "callsReachable": 73,
+      "withKnownCandidates": 73,
+      "categories": {
+        "CLOSED_RESOLVED": 0,
+        "PARTIAL_RESOLVED": 73,
+        "OPEN_UNRESOLVED": 0,
+        "UNREACHABLE_IN_MODEL": 0,
+        "OTHER": 0
+      },
+      "remainders": {
+        "modelValueRemainder": 0,
+        "sourceValueRemainder": 73,
+        "interpretationUnknownRemainder": 73,
+        "effectiveUnknownRemainder": 73,
+        "openControlRemainder": 73
+      }
+    }
+  },
+  "conditionalGoTo": {
+    "before": {
+      "programsAffected": 0,
+      "occurrences": 0,
+      "targetCount": {
+        "min": null,
+        "median": null,
+        "p95": null,
+        "max": null
+      },
+      "totalDestinationOccurrences": 0,
+      "typed": 0,
+      "precise": 0,
+      "structured": 0,
+      "partial": 0,
+      "unsupported": 0,
+      "gaps": {}
+    },
+    "after": {
+      "programsAffected": 0,
+      "occurrences": 0,
+      "targetCount": {
+        "min": null,
+        "median": null,
+        "p95": null,
+        "max": null
+      },
+      "totalDestinationOccurrences": 0,
+      "typed": 0,
+      "precise": 0,
+      "structured": 0,
+      "partial": 0,
+      "unsupported": 0,
+      "gaps": {}
+    }
+  },
+  "cohortCalls": {
+    "before": {
+      "attempted": 0,
+      "frontend": 0,
+      "lower": 0,
+      "cfg": 0,
+      "dependency": 0,
+      "callsObserved": 0,
+      "callsAnalyzed": 0,
+      "callsReachable": 0,
+      "withKnownCandidates": 0,
+      "categories": {
+        "CLOSED_RESOLVED": 0,
+        "PARTIAL_RESOLVED": 0,
+        "OPEN_UNRESOLVED": 0,
+        "UNREACHABLE_IN_MODEL": 0,
+        "OTHER": 0
+      },
+      "remainders": {
+        "modelValueRemainder": 0,
+        "sourceValueRemainder": 0,
+        "interpretationUnknownRemainder": 0,
+        "effectiveUnknownRemainder": 0,
+        "openControlRemainder": 0
+      }
+    },
+    "after": {
+      "attempted": 0,
+      "frontend": 0,
+      "lower": 0,
+      "cfg": 0,
+      "dependency": 0,
+      "callsObserved": 0,
+      "callsAnalyzed": 0,
+      "callsReachable": 0,
+      "withKnownCandidates": 0,
+      "categories": {
+        "CLOSED_RESOLVED": 0,
+        "PARTIAL_RESOLVED": 0,
+        "OPEN_UNRESOLVED": 0,
+        "UNREACHABLE_IN_MODEL": 0,
+        "OTHER": 0
+      },
+      "remainders": {
+        "modelValueRemainder": 0,
+        "sourceValueRemainder": 0,
+        "interpretationUnknownRemainder": 0,
+        "effectiveUnknownRemainder": 0,
+        "openControlRemainder": 0
+      }
+    }
+  },
+  "candidateChanges": {
+    "sites": 0,
+    "additions": 0,
+    "removals": 0
+  },
+  "preservedSiteVectors": 73,
+  "outsideFrontierPreserved": 73,
+  "changedSites": [],
+  "unexpectedRegressions": [],
+  "productResult": "NO_REAL_DEPENDENCY_CHANGE",
+  "qualificationSummary": "goto-depending-qualification.json",
+  "fullRuns": 1,
+  "controlFidelityGain": "Proved by synthetic focal programs; no matching historical CardDemo occurrence",
+  "callCandidateGain": "NONE"
+}

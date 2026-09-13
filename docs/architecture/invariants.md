@@ -165,3 +165,16 @@ specific VALIDATION_LIMIT and generic INCOMPLETE_VALIDATION. Historical CP5 evid
 above retains its original pins/defaults. The new default codec no longer has a
 16 MiB ceiling; explicit operational budgets still fail without any semantic result.
 See [the current preflight contract](resource-limit-preflight.md).
+
+
+## Finite Multiplicity
+
+One supported occurrence implies arbitrary valid finite multiplicity must remain
+supported unless the source language itself defines a semantic limit. Product code
+must not impose a smaller implementation count limit.
+
+For GO TO DEPENDING ON, lists with hundreds of destinations are normal supported
+inputs and must not be truncated, rejected, or degraded merely because of target
+count. Destination order and duplicate occurrences are semantic. A profile gap
+never authorizes dropping a parser-observed tail. Oracles include destination counts
+1/2/5/40/100/200/255, source occurrence multiplicity 1/2/5/40, and indexed work checks.
