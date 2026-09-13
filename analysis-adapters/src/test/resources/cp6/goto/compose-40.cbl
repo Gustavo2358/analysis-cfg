@@ -1,0 +1,210 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. GOTOTEST.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 WS-PGM PIC X(8).
+       01 FLAG PIC X.
+       01 WS-X PIC X.
+       01 IDX PIC 9.
+       PROCEDURE DIVISION.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-0.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-0.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-1.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-1.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-2.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-2.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-3.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-3.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-4.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-4.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-5.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-5.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-6.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-6.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-7.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-7.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-8.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-8.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-9.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-9.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-10.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-10.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-11.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-11.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-12.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-12.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-13.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-13.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-14.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-14.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-15.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-15.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-16.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-16.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-17.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-17.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-18.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-18.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-19.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-19.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-20.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-20.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-21.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-21.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-22.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-22.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-23.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-23.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-24.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-24.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-25.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-25.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-26.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-26.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-27.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-27.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-28.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-28.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-29.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-29.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-30.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-30.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-31.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-31.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-32.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-32.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-33.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-33.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-34.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-34.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-35.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-35.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-36.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-36.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-37.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-37.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-38.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-38.
+       CALL WS-PGM.
+       MOVE 'PROGA' TO WS-PGM.
+       GO TO TARGET-39.
+       MOVE 'BADPROG' TO WS-PGM.
+       TARGET-39.
+       CALL WS-PGM.
+       GOBACK.

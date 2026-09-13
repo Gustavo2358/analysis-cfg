@@ -1,0 +1,561 @@
+{
+  "schemaVersion": "carddemo-after-goto-1.0.0",
+  "decisionPolicy": "HUMAN",
+  "rankingAuthority": "ADVISORY_ONLY",
+  "scope": "FULL",
+  "baselineIntegratedMerges": {
+    "proleap-poc": "04a74a00c3692e05c5ffde2b492205ccdc04d262",
+    "cobol-lower": "4a72bb27d62326f26236586095eb8b2122635fea",
+    "analysis-cfg": "b40c24279783a873f73b465b9c75e1ee2245d11b",
+    "air-java": "96cd5e545723c6fd76d1520f431ebbc196af84f6"
+  },
+  "baselineEquivalence": "Preserved EVALUATE measurements; src/main and build descriptors byte-identical to these integrated merges.",
+  "beforeMeasurements": "/tmp/evaluate-finding-20260913/full/measurements-final.json",
+  "afterMeasurements": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/goto/full/measurements.json",
+  "beforeSnapshot": {
+    "upstream": {
+      "repository": "aws-samples/aws-mainframe-modernization-carddemo",
+      "commit": "59cc6c2fd7ebd7ef7925cad552a01a4b8b6e4d5e"
+    },
+    "analysisRepositories": {
+      "air-java": "96cd5e545723c6fd76d1520f431ebbc196af84f6",
+      "proleap-poc": "54ca76f9cf91696d335b2678e9dd2425f81065a5",
+      "cobol-lower": "b61204e6959c6454b4bc4961acf265d99536a237",
+      "analysis-cfg": "18a78a6599bfad2d983a4a32d7515d379a9bac60"
+    },
+    "semanticProductVersion": "2.0.0",
+    "decisionPolicy": "HUMAN",
+    "rankingAuthority": "ADVISORY_ONLY"
+  },
+  "afterSnapshot": {
+    "upstream": {
+      "repository": "aws-samples/aws-mainframe-modernization-carddemo",
+      "commit": "59cc6c2fd7ebd7ef7925cad552a01a4b8b6e4d5e"
+    },
+    "analysisRepositories": {
+      "air-java": "96cd5e545723c6fd76d1520f431ebbc196af84f6",
+      "proleap-poc": "3842239551153e98590744ceb8b1e730885b1bbd",
+      "cobol-lower": "2dd97f4fb07eadb2a5cb76d94f94f587aa59a175",
+      "analysis-cfg": "f7c12eaac5d9b6b08c51e923491bce517f3f692b"
+    },
+    "semanticProductVersion": "2.1.0",
+    "decisionPolicy": "HUMAN",
+    "rankingAuthority": "ADVISORY_ONLY"
+  },
+  "pipeline": {
+    "before": {
+      "attempted": 73,
+      "frontend": 67,
+      "lower": 67,
+      "cfg": 67,
+      "dependency": 67,
+      "callsObserved": 73,
+      "callsAnalyzed": 73,
+      "callsReachable": 73,
+      "withKnownCandidates": 73,
+      "categories": {
+        "CLOSED_RESOLVED": 0,
+        "PARTIAL_RESOLVED": 73,
+        "OPEN_UNRESOLVED": 0,
+        "UNREACHABLE_IN_MODEL": 0,
+        "OTHER": 0
+      },
+      "remainders": {
+        "modelValueRemainder": 0,
+        "sourceValueRemainder": 73,
+        "interpretationUnknownRemainder": 73,
+        "effectiveUnknownRemainder": 73,
+        "openControlRemainder": 73
+      }
+    },
+    "after": {
+      "attempted": 73,
+      "frontend": 67,
+      "lower": 67,
+      "cfg": 67,
+      "dependency": 67,
+      "callsObserved": 73,
+      "callsAnalyzed": 73,
+      "callsReachable": 73,
+      "withKnownCandidates": 73,
+      "categories": {
+        "CLOSED_RESOLVED": 0,
+        "PARTIAL_RESOLVED": 73,
+        "OPEN_UNRESOLVED": 0,
+        "UNREACHABLE_IN_MODEL": 0,
+        "OTHER": 0
+      },
+      "remainders": {
+        "modelValueRemainder": 0,
+        "sourceValueRemainder": 73,
+        "interpretationUnknownRemainder": 73,
+        "effectiveUnknownRemainder": 73,
+        "openControlRemainder": 73
+      }
+    }
+  },
+  "goto": {
+    "before": {
+      "programs": 16,
+      "callSites": 20,
+      "occurrences": 306,
+      "typed": 0,
+      "preciseJump": 0,
+      "partial": 0,
+      "unsupported": 306,
+      "potentialCallSites": 20,
+      "gapCodes": {}
+    },
+    "after": {
+      "programs": 16,
+      "callSites": 20,
+      "occurrences": 306,
+      "typed": 306,
+      "preciseJump": 227,
+      "partial": 79,
+      "unsupported": 0,
+      "potentialCallSites": 20,
+      "gapCodes": {
+        "GO_TO_PROVENANCE_INCOMPLETE": 62,
+        "CONTAINMENT_NOT_PROJECTED": 51,
+        "GO_TO_ALTER_IN_UNIT": 14
+      }
+    }
+  },
+  "candidateChanges": {
+    "sites": 0,
+    "additions": 0,
+    "removals": 0
+  },
+  "preservedSiteVectors": 73,
+  "sitesOutsideGotoFrontierPreserved": 53,
+  "unexpectedRegressions": [],
+  "programs": [
+    {
+      "path": "app/app-transaction-type-db2/cbl/COTRTUPC.cbl",
+      "before": {
+        "occurrences": 23,
+        "typed": 0,
+        "preciseJump": 0,
+        "partial": 0,
+        "unsupported": 23,
+        "gapCodes": {},
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 23,
+        "typed": 23,
+        "preciseJump": 14,
+        "partial": 9,
+        "unsupported": 0,
+        "gapCodes": {
+          "GO_TO_PROVENANCE_INCOMPLETE": 8,
+          "CONTAINMENT_NOT_PROJECTED": 9
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "app/cbl/CBSTM03A.CBL",
+      "before": {
+        "occurrences": 14,
+        "typed": 0,
+        "preciseJump": 0,
+        "partial": 0,
+        "unsupported": 14,
+        "gapCodes": {},
+        "potentialCallSites": 14
+      },
+      "after": {
+        "occurrences": 14,
+        "typed": 14,
+        "preciseJump": 0,
+        "partial": 14,
+        "unsupported": 0,
+        "gapCodes": {
+          "GO_TO_ALTER_IN_UNIT": 14,
+          "CONTAINMENT_NOT_PROJECTED": 6
+        },
+        "potentialCallSites": 14
+      }
+    },
+    {
+      "path": "app/cbl/CBSTM03B.CBL",
+      "before": {
+        "occurrences": 13,
+        "typed": 0,
+        "preciseJump": 0,
+        "partial": 0,
+        "unsupported": 13,
+        "gapCodes": {},
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 13,
+        "typed": 13,
+        "preciseJump": 12,
+        "partial": 1,
+        "unsupported": 0,
+        "gapCodes": {
+          "CONTAINMENT_NOT_PROJECTED": 1
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "app/cbl/COACTUPC.cbl",
+      "before": {
+        "occurrences": 66,
+        "typed": 0,
+        "preciseJump": 0,
+        "partial": 0,
+        "unsupported": 66,
+        "gapCodes": {},
+        "potentialCallSites": 1
+      },
+      "after": {
+        "occurrences": 66,
+        "typed": 66,
+        "preciseJump": 62,
+        "partial": 4,
+        "unsupported": 0,
+        "gapCodes": {
+          "GO_TO_PROVENANCE_INCOMPLETE": 4,
+          "CONTAINMENT_NOT_PROJECTED": 3
+        },
+        "potentialCallSites": 1
+      }
+    },
+    {
+      "path": "app/cbl/COACTVWC.cbl",
+      "before": {
+        "occurrences": 9,
+        "typed": 0,
+        "preciseJump": 0,
+        "partial": 0,
+        "unsupported": 9,
+        "gapCodes": {},
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 9,
+        "typed": 9,
+        "preciseJump": 5,
+        "partial": 4,
+        "unsupported": 0,
+        "gapCodes": {
+          "GO_TO_PROVENANCE_INCOMPLETE": 4,
+          "CONTAINMENT_NOT_PROJECTED": 1
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "app/cbl/COCRDLIC.cbl",
+      "before": {
+        "occurrences": 16,
+        "typed": 0,
+        "preciseJump": 0,
+        "partial": 0,
+        "unsupported": 16,
+        "gapCodes": {},
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 16,
+        "typed": 16,
+        "preciseJump": 7,
+        "partial": 9,
+        "unsupported": 0,
+        "gapCodes": {
+          "GO_TO_PROVENANCE_INCOMPLETE": 9,
+          "CONTAINMENT_NOT_PROJECTED": 7
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "app/cbl/COCRDSLC.cbl",
+      "before": {
+        "occurrences": 9,
+        "typed": 0,
+        "preciseJump": 0,
+        "partial": 0,
+        "unsupported": 9,
+        "gapCodes": {},
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 9,
+        "typed": 9,
+        "preciseJump": 4,
+        "partial": 5,
+        "unsupported": 0,
+        "gapCodes": {
+          "GO_TO_PROVENANCE_INCOMPLETE": 5,
+          "CONTAINMENT_NOT_PROJECTED": 2
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "app/cbl/COCRDUPC.cbl",
+      "before": {
+        "occurrences": 21,
+        "typed": 0,
+        "preciseJump": 0,
+        "partial": 0,
+        "unsupported": 21,
+        "gapCodes": {},
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 21,
+        "typed": 21,
+        "preciseJump": 17,
+        "partial": 4,
+        "unsupported": 0,
+        "gapCodes": {
+          "GO_TO_PROVENANCE_INCOMPLETE": 4,
+          "CONTAINMENT_NOT_PROJECTED": 4
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "app/cbl/CORPT00C.cbl",
+      "before": {
+        "occurrences": 1,
+        "typed": 0,
+        "preciseJump": 0,
+        "partial": 0,
+        "unsupported": 1,
+        "gapCodes": {},
+        "potentialCallSites": 2
+      },
+      "after": {
+        "occurrences": 1,
+        "typed": 1,
+        "preciseJump": 0,
+        "partial": 1,
+        "unsupported": 0,
+        "gapCodes": {
+          "GO_TO_PROVENANCE_INCOMPLETE": 1
+        },
+        "potentialCallSites": 2
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/CBSTM03B.cbl",
+      "before": {
+        "occurrences": 13,
+        "typed": 0,
+        "preciseJump": 0,
+        "partial": 0,
+        "unsupported": 13,
+        "gapCodes": {},
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 13,
+        "typed": 13,
+        "preciseJump": 12,
+        "partial": 1,
+        "unsupported": 0,
+        "gapCodes": {
+          "CONTAINMENT_NOT_PROJECTED": 1
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COACTUPC.cl2",
+      "before": {
+        "occurrences": 65,
+        "typed": 0,
+        "preciseJump": 0,
+        "partial": 0,
+        "unsupported": 65,
+        "gapCodes": {},
+        "potentialCallSites": 1
+      },
+      "after": {
+        "occurrences": 65,
+        "typed": 65,
+        "preciseJump": 61,
+        "partial": 4,
+        "unsupported": 0,
+        "gapCodes": {
+          "GO_TO_PROVENANCE_INCOMPLETE": 4,
+          "CONTAINMENT_NOT_PROJECTED": 3
+        },
+        "potentialCallSites": 1
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COACTVWC.cl2",
+      "before": {
+        "occurrences": 9,
+        "typed": 0,
+        "preciseJump": 0,
+        "partial": 0,
+        "unsupported": 9,
+        "gapCodes": {},
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 9,
+        "typed": 9,
+        "preciseJump": 5,
+        "partial": 4,
+        "unsupported": 0,
+        "gapCodes": {
+          "GO_TO_PROVENANCE_INCOMPLETE": 4,
+          "CONTAINMENT_NOT_PROJECTED": 1
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COCRDLIC.cl2",
+      "before": {
+        "occurrences": 16,
+        "typed": 0,
+        "preciseJump": 0,
+        "partial": 0,
+        "unsupported": 16,
+        "gapCodes": {},
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 16,
+        "typed": 16,
+        "preciseJump": 7,
+        "partial": 9,
+        "unsupported": 0,
+        "gapCodes": {
+          "GO_TO_PROVENANCE_INCOMPLETE": 9,
+          "CONTAINMENT_NOT_PROJECTED": 7
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COCRDSLC.cl2",
+      "before": {
+        "occurrences": 9,
+        "typed": 0,
+        "preciseJump": 0,
+        "partial": 0,
+        "unsupported": 9,
+        "gapCodes": {},
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 9,
+        "typed": 9,
+        "preciseJump": 4,
+        "partial": 5,
+        "unsupported": 0,
+        "gapCodes": {
+          "GO_TO_PROVENANCE_INCOMPLETE": 5,
+          "CONTAINMENT_NOT_PROJECTED": 2
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COCRDUPC.cl2",
+      "before": {
+        "occurrences": 21,
+        "typed": 0,
+        "preciseJump": 0,
+        "partial": 0,
+        "unsupported": 21,
+        "gapCodes": {},
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 21,
+        "typed": 21,
+        "preciseJump": 17,
+        "partial": 4,
+        "unsupported": 0,
+        "gapCodes": {
+          "GO_TO_PROVENANCE_INCOMPLETE": 4,
+          "CONTAINMENT_NOT_PROJECTED": 4
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/CORPT00C.cl2",
+      "before": {
+        "occurrences": 1,
+        "typed": 0,
+        "preciseJump": 0,
+        "partial": 0,
+        "unsupported": 1,
+        "gapCodes": {},
+        "potentialCallSites": 2
+      },
+      "after": {
+        "occurrences": 1,
+        "typed": 1,
+        "preciseJump": 0,
+        "partial": 1,
+        "unsupported": 0,
+        "gapCodes": {
+          "GO_TO_PROVENANCE_INCOMPLETE": 1
+        },
+        "potentialCallSites": 2
+      }
+    }
+  ],
+  "changedSites": [],
+  "productResult": "NO_REAL_CALL_CANDIDATE_GAIN",
+  "impactMeaning": "Membership in prior GO TO Opaque unit control bounds. Candidate changes require source-support and structural justification; membership alone is not causality.",
+  "affected": {
+    "measurements": "/home/gustavo/workspace/teste-e2e/analysis-cfg/.harness-results/goto/affected-final/measurements.json",
+    "pipeline": {
+      "attempted": 16,
+      "frontend": 16,
+      "lower": 16,
+      "cfg": 16,
+      "dependency": 16,
+      "callsObserved": 20,
+      "callsAnalyzed": 20,
+      "callsReachable": 20,
+      "withKnownCandidates": 20,
+      "categories": {
+        "CLOSED_RESOLVED": 0,
+        "PARTIAL_RESOLVED": 20,
+        "OPEN_UNRESOLVED": 0,
+        "UNREACHABLE_IN_MODEL": 0,
+        "OTHER": 0
+      },
+      "remainders": {
+        "modelValueRemainder": 0,
+        "sourceValueRemainder": 20,
+        "interpretationUnknownRemainder": 20,
+        "effectiveUnknownRemainder": 20,
+        "openControlRemainder": 20
+      }
+    },
+    "goto": {
+      "programs": 16,
+      "callSites": 20,
+      "occurrences": 306,
+      "typed": 306,
+      "preciseJump": 227,
+      "partial": 79,
+      "unsupported": 0,
+      "potentialCallSites": 20,
+      "gapCodes": {
+        "GO_TO_PROVENANCE_INCOMPLETE": 62,
+        "CONTAINMENT_NOT_PROJECTED": 51,
+        "GO_TO_ALTER_IN_UNIT": 14
+      }
+    }
+  }
+}

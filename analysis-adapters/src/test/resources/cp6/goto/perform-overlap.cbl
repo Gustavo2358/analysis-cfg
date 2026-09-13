@@ -1,0 +1,15 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. GOTOTEST.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 WS-PGM PIC X(8).
+       01 FLAG PIC X.
+       01 WS-X PIC X.
+       01 IDX PIC 9.
+       PROCEDURE DIVISION.
+       MAIN.
+       PERFORM SET-PGM.
+       GO TO SET-PGM.
+       GOBACK.
+       SET-PGM.
+       MOVE 'PROGA' TO WS-PGM.

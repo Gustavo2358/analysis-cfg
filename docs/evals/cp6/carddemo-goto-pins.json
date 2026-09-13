@@ -1,0 +1,20 @@
+{
+  "upstream": {
+    "repository": "aws-samples/aws-mainframe-modernization-carddemo",
+    "commit": "59cc6c2fd7ebd7ef7925cad552a01a4b8b6e4d5e"
+  },
+  "analysisRepositories": {
+    "air-java": "96cd5e545723c6fd76d1520f431ebbc196af84f6",
+    "proleap-poc": "3842239551153e98590744ceb8b1e730885b1bbd",
+    "cobol-lower": "2dd97f4fb07eadb2a5cb76d94f94f587aa59a175",
+    "analysis-cfg": "f7c12eaac5d9b6b08c51e923491bce517f3f692b"
+  },
+  "semanticProductVersion": "2.1.0",
+  "decisionPolicy": "HUMAN",
+  "rankingAuthority": "ADVISORY_ONLY",
+  "normativeAirSource": {
+    "repository": "Gustavo2358/analysis-ir",
+    "commit": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+    "semanticVersion": "2.0.0"
+  }
+}
