@@ -1,0 +1,6257 @@
+{
+  "schemaVersion": "carddemo-after-evaluate-1.0.0",
+  "decisionPolicy": "HUMAN",
+  "rankingAuthority": "ADVISORY_ONLY",
+  "beforeMeasurements": "/tmp/entry-localization-20260913/full/measurements.json",
+  "afterMeasurements": "/tmp/evaluate-finding-20260913/full/measurements-final.json",
+  "beforeSnapshot": {
+    "upstream": {
+      "repository": "aws-samples/aws-mainframe-modernization-carddemo",
+      "commit": "59cc6c2fd7ebd7ef7925cad552a01a4b8b6e4d5e"
+    },
+    "analysisRepositories": {
+      "air-java": "96cd5e545723c6fd76d1520f431ebbc196af84f6",
+      "proleap-poc": "38b8d7d8cf5b363ec4bda0d2517450b6b1b6ffdd",
+      "cobol-lower": "24be819d96bd640f1c090f7c82dbb8c6e7ae31d3",
+      "analysis-cfg": "18a78a6599bfad2d983a4a32d7515d379a9bac60"
+    },
+    "semanticProductVersion": "1.9.0",
+    "decisionPolicy": "HUMAN",
+    "rankingAuthority": "ADVISORY_ONLY"
+  },
+  "afterSnapshot": {
+    "upstream": {
+      "repository": "aws-samples/aws-mainframe-modernization-carddemo",
+      "commit": "59cc6c2fd7ebd7ef7925cad552a01a4b8b6e4d5e"
+    },
+    "analysisRepositories": {
+      "air-java": "96cd5e545723c6fd76d1520f431ebbc196af84f6",
+      "proleap-poc": "54ca76f9cf91696d335b2678e9dd2425f81065a5",
+      "cobol-lower": "b61204e6959c6454b4bc4961acf265d99536a237",
+      "analysis-cfg": "18a78a6599bfad2d983a4a32d7515d379a9bac60"
+    },
+    "semanticProductVersion": "2.0.0",
+    "decisionPolicy": "HUMAN",
+    "rankingAuthority": "ADVISORY_ONLY"
+  },
+  "full": {
+    "before": {
+      "attempted": 73,
+      "frontend": 67,
+      "lower": 67,
+      "cfg": 67,
+      "dependency": 67,
+      "callsObserved": 73,
+      "callsAnalyzed": 73,
+      "callsReachable": 73,
+      "withKnownCandidates": 73,
+      "categories": {
+        "CLOSED_RESOLVED": 0,
+        "PARTIAL_RESOLVED": 73,
+        "OPEN_UNRESOLVED": 0,
+        "UNREACHABLE_IN_MODEL": 0,
+        "OTHER": 0
+      },
+      "remainders": {
+        "modelValueRemainder": 0,
+        "sourceValueRemainder": 73,
+        "interpretationUnknownRemainder": 73,
+        "effectiveUnknownRemainder": 73,
+        "openControlRemainder": 73
+      }
+    },
+    "after": {
+      "attempted": 73,
+      "frontend": 67,
+      "lower": 67,
+      "cfg": 67,
+      "dependency": 67,
+      "callsObserved": 73,
+      "callsAnalyzed": 73,
+      "callsReachable": 73,
+      "withKnownCandidates": 73,
+      "categories": {
+        "CLOSED_RESOLVED": 0,
+        "PARTIAL_RESOLVED": 73,
+        "OPEN_UNRESOLVED": 0,
+        "UNREACHABLE_IN_MODEL": 0,
+        "OTHER": 0
+      },
+      "remainders": {
+        "modelValueRemainder": 0,
+        "sourceValueRemainder": 73,
+        "interpretationUnknownRemainder": 73,
+        "effectiveUnknownRemainder": 73,
+        "openControlRemainder": 73
+      }
+    }
+  },
+  "evaluate": {
+    "before": {
+      "programs": 46,
+      "callSites": 47,
+      "occurrences": 264,
+      "typed": 0,
+      "observed": 264,
+      "modeledControl": 0,
+      "potentialCallSites": 47,
+      "coverage": {
+        "UNSUPPORTED": 264
+      },
+      "airOperations": {
+        "opaque": 264
+      }
+    },
+    "after": {
+      "programs": 46,
+      "callSites": 47,
+      "occurrences": 264,
+      "typed": 10,
+      "observed": 254,
+      "modeledControl": 8,
+      "potentialCallSites": 45,
+      "coverage": {
+        "PARTIAL": 10,
+        "UNSUPPORTED": 254
+      },
+      "airOperations": {
+        "branch": 16,
+        "opaque": 256
+      }
+    }
+  },
+  "knownCandidateCounts": {
+    "before": 73,
+    "after": 73
+  },
+  "programs": [
+    {
+      "path": "app/app-transaction-type-db2/cbl/COBTUPDT.cbl",
+      "sourceSha256": "0213fd5718c6aadd3fba6bbfb1818456d75d10843181bff63aca9ff57d39e87c",
+      "before": {
+        "occurrences": 4,
+        "typed": 0,
+        "observed": 4,
+        "coverage": {
+          "UNSUPPORTED": 4
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 4
+        },
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 4,
+        "typed": 1,
+        "observed": 3,
+        "coverage": {
+          "PARTIAL": 1,
+          "UNSUPPORTED": 3
+        },
+        "modeledControl": 1,
+        "airOperations": {
+          "branch": 4,
+          "opaque": 3
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "app/app-transaction-type-db2/cbl/COTRTUPC.cbl",
+      "sourceSha256": "c16e40c391c0ad2d3e797a0e01144ef5b78d3b0db0a1771411a95a9d08b01f67",
+      "before": {
+        "occurrences": 14,
+        "typed": 0,
+        "observed": 14,
+        "coverage": {
+          "UNSUPPORTED": 14
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 14
+        },
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 14,
+        "typed": 0,
+        "observed": 14,
+        "coverage": {
+          "UNSUPPORTED": 14
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 14
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "app/app-vsam-mq/cbl/COACCT01.cbl",
+      "sourceSha256": "92776ed2801da1148839a9ed98b6537de4b41e0c7f050c8dcaae0d4e4ea543b5",
+      "before": {
+        "occurrences": 9,
+        "typed": 0,
+        "observed": 9,
+        "coverage": {
+          "UNSUPPORTED": 9
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 9
+        },
+        "potentialCallSites": 9
+      },
+      "after": {
+        "occurrences": 9,
+        "typed": 0,
+        "observed": 9,
+        "coverage": {
+          "UNSUPPORTED": 9
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 9
+        },
+        "potentialCallSites": 9
+      }
+    },
+    {
+      "path": "app/app-vsam-mq/cbl/CODATE01.cbl",
+      "sourceSha256": "97fcba3faa272c98778eb7ef50ef87faec7290168e24a9b1714996453d660ddb",
+      "before": {
+        "occurrences": 8,
+        "typed": 0,
+        "observed": 8,
+        "coverage": {
+          "UNSUPPORTED": 8
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 8
+        },
+        "potentialCallSites": 9
+      },
+      "after": {
+        "occurrences": 8,
+        "typed": 0,
+        "observed": 8,
+        "coverage": {
+          "UNSUPPORTED": 8
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 8
+        },
+        "potentialCallSites": 9
+      }
+    },
+    {
+      "path": "app/cbl/CBIMPORT.cbl",
+      "sourceSha256": "0eccb28695cb3a8ea6f6ea7da26d1b48a4529787f6130b2c98bead33bc661967",
+      "before": {
+        "occurrences": 1,
+        "typed": 0,
+        "observed": 1,
+        "coverage": {
+          "UNSUPPORTED": 1
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 1
+        },
+        "potentialCallSites": 1
+      },
+      "after": {
+        "occurrences": 1,
+        "typed": 1,
+        "observed": 0,
+        "coverage": {
+          "PARTIAL": 1
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 1
+        },
+        "potentialCallSites": 1
+      }
+    },
+    {
+      "path": "app/cbl/CBSTM03A.CBL",
+      "sourceSha256": "23c8753b6b4e0c24d4560c83861fe8162626bab195faec0fe88cf80b8bf432b5",
+      "before": {
+        "occurrences": 5,
+        "typed": 0,
+        "observed": 5,
+        "coverage": {
+          "UNSUPPORTED": 5
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 5
+        },
+        "potentialCallSites": 14
+      },
+      "after": {
+        "occurrences": 5,
+        "typed": 4,
+        "observed": 1,
+        "coverage": {
+          "UNSUPPORTED": 1,
+          "PARTIAL": 4
+        },
+        "modeledControl": 3,
+        "airOperations": {
+          "opaque": 2,
+          "branch": 4
+        },
+        "potentialCallSites": 14
+      }
+    },
+    {
+      "path": "app/cbl/CBSTM03B.CBL",
+      "sourceSha256": "ac004f7f40dcb3f2a14dfb83a743f83fed9383675bc93452f3424c40cb6475a7",
+      "before": {
+        "occurrences": 1,
+        "typed": 0,
+        "observed": 1,
+        "coverage": {
+          "UNSUPPORTED": 1
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 1
+        },
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 1,
+        "typed": 0,
+        "observed": 1,
+        "coverage": {
+          "UNSUPPORTED": 1
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 1
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "app/cbl/CBTRN03C.cbl",
+      "sourceSha256": "8691e625502b7efcfd7ba4ae61797132e7b68f3fd5fedcdcc7dd6488f6871eef",
+      "before": {
+        "occurrences": 2,
+        "typed": 0,
+        "observed": 2,
+        "coverage": {
+          "UNSUPPORTED": 2
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 2
+        },
+        "potentialCallSites": 1
+      },
+      "after": {
+        "occurrences": 2,
+        "typed": 2,
+        "observed": 0,
+        "coverage": {
+          "PARTIAL": 2
+        },
+        "modeledControl": 2,
+        "airOperations": {
+          "branch": 4
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "app/cbl/COACTUPC.cbl",
+      "sourceSha256": "b5bb7d6ccad022e0fc91b4dd1e971f49d184adf89b56abdce14eccff35b39396",
+      "before": {
+        "occurrences": 11,
+        "typed": 0,
+        "observed": 11,
+        "coverage": {
+          "UNSUPPORTED": 11
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 11
+        },
+        "potentialCallSites": 1
+      },
+      "after": {
+        "occurrences": 11,
+        "typed": 0,
+        "observed": 11,
+        "coverage": {
+          "UNSUPPORTED": 11
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 11
+        },
+        "potentialCallSites": 1
+      }
+    },
+    {
+      "path": "app/cbl/COACTVWC.cbl",
+      "sourceSha256": "4f1e55176f69edfb55b7af7a161aceb8c3bc3bd1b2924a704a76256e0e751b54",
+      "before": {
+        "occurrences": 6,
+        "typed": 0,
+        "observed": 6,
+        "coverage": {
+          "UNSUPPORTED": 6
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 6
+        },
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 6,
+        "typed": 0,
+        "observed": 6,
+        "coverage": {
+          "UNSUPPORTED": 6
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 6
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "app/cbl/COADM01C.cbl",
+      "sourceSha256": "4e49afda5f685f3ebeb95ed04a93cf88df93d39c66d8d7f9ba2b9a3e00a1f690",
+      "before": {
+        "occurrences": 2,
+        "typed": 0,
+        "observed": 2,
+        "coverage": {
+          "UNSUPPORTED": 2
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 2
+        },
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 2,
+        "typed": 0,
+        "observed": 2,
+        "coverage": {
+          "UNSUPPORTED": 2
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 2
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "app/cbl/COBIL00C.cbl",
+      "sourceSha256": "b5c46039eb8fd2f7ed7d3ca379172e56fa87385a369023bef706b04986fe1cfb",
+      "before": {
+        "occurrences": 9,
+        "typed": 0,
+        "observed": 9,
+        "coverage": {
+          "UNSUPPORTED": 9
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 9
+        },
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 9,
+        "typed": 0,
+        "observed": 9,
+        "coverage": {
+          "UNSUPPORTED": 9
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 9
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "app/cbl/COCRDLIC.cbl",
+      "sourceSha256": "d6a9210ad3062bd657881fc3f0d2a7368db3ff4869594e0d6a878d8f410d87b6",
+      "before": {
+        "occurrences": 10,
+        "typed": 0,
+        "observed": 10,
+        "coverage": {
+          "UNSUPPORTED": 10
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 10
+        },
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 10,
+        "typed": 0,
+        "observed": 10,
+        "coverage": {
+          "UNSUPPORTED": 10
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 10
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "app/cbl/COCRDSLC.cbl",
+      "sourceSha256": "d5af307fb4b1a155f03df9eea14b402d866a332360e14a1e37dbefe59b73363b",
+      "before": {
+        "occurrences": 5,
+        "typed": 0,
+        "observed": 5,
+        "coverage": {
+          "UNSUPPORTED": 5
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 5
+        },
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 5,
+        "typed": 0,
+        "observed": 5,
+        "coverage": {
+          "UNSUPPORTED": 5
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 5
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "app/cbl/COCRDUPC.cbl",
+      "sourceSha256": "c245cf383a4a3f721773a13ca231eb76bd5ae75c1830d58c7aba898a554a0de9",
+      "before": {
+        "occurrences": 9,
+        "typed": 0,
+        "observed": 9,
+        "coverage": {
+          "UNSUPPORTED": 9
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 9
+        },
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 9,
+        "typed": 0,
+        "observed": 9,
+        "coverage": {
+          "UNSUPPORTED": 9
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 9
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "app/cbl/COMEN01C.cbl",
+      "sourceSha256": "c77747b4caaf00b45177a6449562b7f59ec336db832937595edef8b32fdce6fa",
+      "before": {
+        "occurrences": 3,
+        "typed": 0,
+        "observed": 3,
+        "coverage": {
+          "UNSUPPORTED": 3
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 3
+        },
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 3,
+        "typed": 0,
+        "observed": 3,
+        "coverage": {
+          "UNSUPPORTED": 3
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 3
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "app/cbl/CORPT00C.cbl",
+      "sourceSha256": "0b06bd5d4f38f17871de8985c439dfce7ed30d28e02b6ffeb8459e0cd8db4fc2",
+      "before": {
+        "occurrences": 5,
+        "typed": 0,
+        "observed": 5,
+        "coverage": {
+          "UNSUPPORTED": 5
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 5
+        },
+        "potentialCallSites": 2
+      },
+      "after": {
+        "occurrences": 5,
+        "typed": 0,
+        "observed": 5,
+        "coverage": {
+          "UNSUPPORTED": 5
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 5
+        },
+        "potentialCallSites": 2
+      }
+    },
+    {
+      "path": "app/cbl/COSGN00C.cbl",
+      "sourceSha256": "4f901ae6b113eebae60ae1d94b30f8cb9906d031a4419770bf56980bdf97e377",
+      "before": {
+        "occurrences": 3,
+        "typed": 0,
+        "observed": 3,
+        "coverage": {
+          "UNSUPPORTED": 3
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 3
+        },
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 3,
+        "typed": 0,
+        "observed": 3,
+        "coverage": {
+          "UNSUPPORTED": 3
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 3
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "app/cbl/COTRN00C.cbl",
+      "sourceSha256": "51479f131b4fb300008403f0c4f9fdbde56f22a7fb341c782492da29f0d23bbe",
+      "before": {
+        "occurrences": 8,
+        "typed": 0,
+        "observed": 8,
+        "coverage": {
+          "UNSUPPORTED": 8
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 8
+        },
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 8,
+        "typed": 0,
+        "observed": 8,
+        "coverage": {
+          "UNSUPPORTED": 8
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 8
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "app/cbl/COTRN01C.cbl",
+      "sourceSha256": "fc24ff879ac6ae12bc6817554cb756f14c5e86e0ca2dd0037af49599887f03c0",
+      "before": {
+        "occurrences": 3,
+        "typed": 0,
+        "observed": 3,
+        "coverage": {
+          "UNSUPPORTED": 3
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 3
+        },
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 3,
+        "typed": 0,
+        "observed": 3,
+        "coverage": {
+          "UNSUPPORTED": 3
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 3
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "app/cbl/COTRN02C.cbl",
+      "sourceSha256": "dc33b4c797a98d2732070a223f43cc78992c2846681163a032e376630742b1ed",
+      "before": {
+        "occurrences": 13,
+        "typed": 0,
+        "observed": 13,
+        "coverage": {
+          "UNSUPPORTED": 13
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 13
+        },
+        "potentialCallSites": 2
+      },
+      "after": {
+        "occurrences": 13,
+        "typed": 0,
+        "observed": 13,
+        "coverage": {
+          "UNSUPPORTED": 13
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 13
+        },
+        "potentialCallSites": 2
+      }
+    },
+    {
+      "path": "app/cbl/COUSR00C.cbl",
+      "sourceSha256": "831433c6ec8306038c85cb86a8307f91dca48c26ef33a997f402187cbd9f4e04",
+      "before": {
+        "occurrences": 8,
+        "typed": 0,
+        "observed": 8,
+        "coverage": {
+          "UNSUPPORTED": 8
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 8
+        },
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 8,
+        "typed": 0,
+        "observed": 8,
+        "coverage": {
+          "UNSUPPORTED": 8
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 8
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "app/cbl/COUSR01C.cbl",
+      "sourceSha256": "aa131b1e3382dc6d101b42f1c97d4fb0c2fdd706819ed9f9a0187c82b30f3019",
+      "before": {
+        "occurrences": 3,
+        "typed": 0,
+        "observed": 3,
+        "coverage": {
+          "UNSUPPORTED": 3
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 3
+        },
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 3,
+        "typed": 0,
+        "observed": 3,
+        "coverage": {
+          "UNSUPPORTED": 3
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 3
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "app/cbl/COUSR02C.cbl",
+      "sourceSha256": "85d36699cbd3079320e689576ea8406d07ad78901f4f3a68a129b869359b46ca",
+      "before": {
+        "occurrences": 5,
+        "typed": 0,
+        "observed": 5,
+        "coverage": {
+          "UNSUPPORTED": 5
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 5
+        },
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 5,
+        "typed": 0,
+        "observed": 5,
+        "coverage": {
+          "UNSUPPORTED": 5
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 5
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "app/cbl/COUSR03C.cbl",
+      "sourceSha256": "bcd68f08c145b3b9b9c809a7082834e9519d78b6f363a0d1c5ff9d9576dcf888",
+      "before": {
+        "occurrences": 5,
+        "typed": 0,
+        "observed": 5,
+        "coverage": {
+          "UNSUPPORTED": 5
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 5
+        },
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 5,
+        "typed": 0,
+        "observed": 5,
+        "coverage": {
+          "UNSUPPORTED": 5
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 5
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "app/cbl/CSUTLDTC.cbl",
+      "sourceSha256": "58c165dcfc3927232c02c152c673e3dee551587b85e7fe56ca67325c980eebb6",
+      "before": {
+        "occurrences": 1,
+        "typed": 0,
+        "observed": 1,
+        "coverage": {
+          "UNSUPPORTED": 1
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 1
+        },
+        "potentialCallSites": 1
+      },
+      "after": {
+        "occurrences": 1,
+        "typed": 0,
+        "observed": 1,
+        "coverage": {
+          "UNSUPPORTED": 1
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 1
+        },
+        "potentialCallSites": 1
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/CBSTM03B.cbl",
+      "sourceSha256": "c183707f0dae0b5e9387373fc3624f0462ad95ccbbb6c8a34167591e206bcbf8",
+      "before": {
+        "occurrences": 1,
+        "typed": 0,
+        "observed": 1,
+        "coverage": {
+          "UNSUPPORTED": 1
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 1
+        },
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 1,
+        "typed": 0,
+        "observed": 1,
+        "coverage": {
+          "UNSUPPORTED": 1
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 1
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/CBTRN03C.cbl",
+      "sourceSha256": "c9c5428073cbe19c1cd19fc066ed99972560c209a80b4aea3bae3cc5e20a3536",
+      "before": {
+        "occurrences": 2,
+        "typed": 0,
+        "observed": 2,
+        "coverage": {
+          "UNSUPPORTED": 2
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 2
+        },
+        "potentialCallSites": 1
+      },
+      "after": {
+        "occurrences": 2,
+        "typed": 2,
+        "observed": 0,
+        "coverage": {
+          "PARTIAL": 2
+        },
+        "modeledControl": 2,
+        "airOperations": {
+          "branch": 4
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COACTUPC.cl2",
+      "sourceSha256": "e944b2b469cf737296489e87158801cfe1a174e2965b5bb9ad5006fc65a2b176",
+      "before": {
+        "occurrences": 11,
+        "typed": 0,
+        "observed": 11,
+        "coverage": {
+          "UNSUPPORTED": 11
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 11
+        },
+        "potentialCallSites": 1
+      },
+      "after": {
+        "occurrences": 11,
+        "typed": 0,
+        "observed": 11,
+        "coverage": {
+          "UNSUPPORTED": 11
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 11
+        },
+        "potentialCallSites": 1
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COACTVWC.cl2",
+      "sourceSha256": "4f1e55176f69edfb55b7af7a161aceb8c3bc3bd1b2924a704a76256e0e751b54",
+      "before": {
+        "occurrences": 6,
+        "typed": 0,
+        "observed": 6,
+        "coverage": {
+          "UNSUPPORTED": 6
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 6
+        },
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 6,
+        "typed": 0,
+        "observed": 6,
+        "coverage": {
+          "UNSUPPORTED": 6
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 6
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COADM01C.cl2",
+      "sourceSha256": "69842c4dd419ed70365682d65423d2744173f3eec695b25b5ed27bd29289608d",
+      "before": {
+        "occurrences": 2,
+        "typed": 0,
+        "observed": 2,
+        "coverage": {
+          "UNSUPPORTED": 2
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 2
+        },
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 2,
+        "typed": 0,
+        "observed": 2,
+        "coverage": {
+          "UNSUPPORTED": 2
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 2
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COBIL00C.cl2",
+      "sourceSha256": "b5c46039eb8fd2f7ed7d3ca379172e56fa87385a369023bef706b04986fe1cfb",
+      "before": {
+        "occurrences": 9,
+        "typed": 0,
+        "observed": 9,
+        "coverage": {
+          "UNSUPPORTED": 9
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 9
+        },
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 9,
+        "typed": 0,
+        "observed": 9,
+        "coverage": {
+          "UNSUPPORTED": 9
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 9
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COCRDLIC.cl2",
+      "sourceSha256": "d6a9210ad3062bd657881fc3f0d2a7368db3ff4869594e0d6a878d8f410d87b6",
+      "before": {
+        "occurrences": 10,
+        "typed": 0,
+        "observed": 10,
+        "coverage": {
+          "UNSUPPORTED": 10
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 10
+        },
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 10,
+        "typed": 0,
+        "observed": 10,
+        "coverage": {
+          "UNSUPPORTED": 10
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 10
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COCRDSLC.cl2",
+      "sourceSha256": "d5af307fb4b1a155f03df9eea14b402d866a332360e14a1e37dbefe59b73363b",
+      "before": {
+        "occurrences": 5,
+        "typed": 0,
+        "observed": 5,
+        "coverage": {
+          "UNSUPPORTED": 5
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 5
+        },
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 5,
+        "typed": 0,
+        "observed": 5,
+        "coverage": {
+          "UNSUPPORTED": 5
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 5
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COCRDUPC.cl2",
+      "sourceSha256": "3ffeeb3d3c53e64e632bde36771dbbcf080e92ed4168d30d90c21e4dc198e6ef",
+      "before": {
+        "occurrences": 9,
+        "typed": 0,
+        "observed": 9,
+        "coverage": {
+          "UNSUPPORTED": 9
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 9
+        },
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 9,
+        "typed": 0,
+        "observed": 9,
+        "coverage": {
+          "UNSUPPORTED": 9
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 9
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COMEN01C.cl2",
+      "sourceSha256": "ad5e376ac9221b21b8ce47597a5ca17fc1f39dc913793c814c6675e9b046fc09",
+      "before": {
+        "occurrences": 2,
+        "typed": 0,
+        "observed": 2,
+        "coverage": {
+          "UNSUPPORTED": 2
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 2
+        },
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 2,
+        "typed": 0,
+        "observed": 2,
+        "coverage": {
+          "UNSUPPORTED": 2
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 2
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/CORPT00C.cl2",
+      "sourceSha256": "0b06bd5d4f38f17871de8985c439dfce7ed30d28e02b6ffeb8459e0cd8db4fc2",
+      "before": {
+        "occurrences": 5,
+        "typed": 0,
+        "observed": 5,
+        "coverage": {
+          "UNSUPPORTED": 5
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 5
+        },
+        "potentialCallSites": 2
+      },
+      "after": {
+        "occurrences": 5,
+        "typed": 0,
+        "observed": 5,
+        "coverage": {
+          "UNSUPPORTED": 5
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 5
+        },
+        "potentialCallSites": 2
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COSGN00C.cl2",
+      "sourceSha256": "4f901ae6b113eebae60ae1d94b30f8cb9906d031a4419770bf56980bdf97e377",
+      "before": {
+        "occurrences": 3,
+        "typed": 0,
+        "observed": 3,
+        "coverage": {
+          "UNSUPPORTED": 3
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 3
+        },
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 3,
+        "typed": 0,
+        "observed": 3,
+        "coverage": {
+          "UNSUPPORTED": 3
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 3
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COTRN00C.cl2",
+      "sourceSha256": "51479f131b4fb300008403f0c4f9fdbde56f22a7fb341c782492da29f0d23bbe",
+      "before": {
+        "occurrences": 8,
+        "typed": 0,
+        "observed": 8,
+        "coverage": {
+          "UNSUPPORTED": 8
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 8
+        },
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 8,
+        "typed": 0,
+        "observed": 8,
+        "coverage": {
+          "UNSUPPORTED": 8
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 8
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COTRN01C.cl2",
+      "sourceSha256": "fc24ff879ac6ae12bc6817554cb756f14c5e86e0ca2dd0037af49599887f03c0",
+      "before": {
+        "occurrences": 3,
+        "typed": 0,
+        "observed": 3,
+        "coverage": {
+          "UNSUPPORTED": 3
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 3
+        },
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 3,
+        "typed": 0,
+        "observed": 3,
+        "coverage": {
+          "UNSUPPORTED": 3
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 3
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COTRN02C.cl2",
+      "sourceSha256": "dc33b4c797a98d2732070a223f43cc78992c2846681163a032e376630742b1ed",
+      "before": {
+        "occurrences": 13,
+        "typed": 0,
+        "observed": 13,
+        "coverage": {
+          "UNSUPPORTED": 13
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 13
+        },
+        "potentialCallSites": 2
+      },
+      "after": {
+        "occurrences": 13,
+        "typed": 0,
+        "observed": 13,
+        "coverage": {
+          "UNSUPPORTED": 13
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 13
+        },
+        "potentialCallSites": 2
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COUSR00C.cl2",
+      "sourceSha256": "831433c6ec8306038c85cb86a8307f91dca48c26ef33a997f402187cbd9f4e04",
+      "before": {
+        "occurrences": 8,
+        "typed": 0,
+        "observed": 8,
+        "coverage": {
+          "UNSUPPORTED": 8
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 8
+        },
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 8,
+        "typed": 0,
+        "observed": 8,
+        "coverage": {
+          "UNSUPPORTED": 8
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 8
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COUSR01C.cl2",
+      "sourceSha256": "aa131b1e3382dc6d101b42f1c97d4fb0c2fdd706819ed9f9a0187c82b30f3019",
+      "before": {
+        "occurrences": 3,
+        "typed": 0,
+        "observed": 3,
+        "coverage": {
+          "UNSUPPORTED": 3
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 3
+        },
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 3,
+        "typed": 0,
+        "observed": 3,
+        "coverage": {
+          "UNSUPPORTED": 3
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 3
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COUSR02C.cl2",
+      "sourceSha256": "85d36699cbd3079320e689576ea8406d07ad78901f4f3a68a129b869359b46ca",
+      "before": {
+        "occurrences": 5,
+        "typed": 0,
+        "observed": 5,
+        "coverage": {
+          "UNSUPPORTED": 5
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 5
+        },
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 5,
+        "typed": 0,
+        "observed": 5,
+        "coverage": {
+          "UNSUPPORTED": 5
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 5
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COUSR03C.cl2",
+      "sourceSha256": "bcd68f08c145b3b9b9c809a7082834e9519d78b6f363a0d1c5ff9d9576dcf888",
+      "before": {
+        "occurrences": 5,
+        "typed": 0,
+        "observed": 5,
+        "coverage": {
+          "UNSUPPORTED": 5
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 5
+        },
+        "potentialCallSites": 0
+      },
+      "after": {
+        "occurrences": 5,
+        "typed": 0,
+        "observed": 5,
+        "coverage": {
+          "UNSUPPORTED": 5
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 5
+        },
+        "potentialCallSites": 0
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/CSUTLDTC.cbl",
+      "sourceSha256": "05565b6ca61098097391bd6ae14268eb122d41c76570d2336253b0cdb5a961fa",
+      "before": {
+        "occurrences": 1,
+        "typed": 0,
+        "observed": 1,
+        "coverage": {
+          "UNSUPPORTED": 1
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 1
+        },
+        "potentialCallSites": 1
+      },
+      "after": {
+        "occurrences": 1,
+        "typed": 0,
+        "observed": 1,
+        "coverage": {
+          "UNSUPPORTED": 1
+        },
+        "modeledControl": 0,
+        "airOperations": {
+          "opaque": 1
+        },
+        "potentialCallSites": 1
+      }
+    }
+  ],
+  "sites": [
+    {
+      "path": "app/app-vsam-mq/cbl/COACCT01.cbl",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 37,
+          "endLine": 261,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 256
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 44,
+          "endLine": 238,
+          "file": "COACCT01.cbl",
+          "startColumn": 11,
+          "startLine": 233
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:8",
+        "operation": {
+          "domain": "operation",
+          "localId": "c8baf74dc28e962ff4b65a22c1163a2f",
+          "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQOPEN",
+            "referenceName": "MQOPEN",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "37f640c45dff9fbdf32c934a4521ff76",
+                  "publication": "60c54d23a9f81d2e7ab7beacacab537f"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "c8baf74dc28e962ff4b65a22c1163a2f",
+                  "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:8",
+        "operation": {
+          "domain": "operation",
+          "localId": "c8baf74dc28e962ff4b65a22c1163a2f",
+          "publication": "2523e4da94ccf8f7a67a5ff2e47c9a01",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQOPEN",
+            "referenceName": "MQOPEN",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "37f640c45dff9fbdf32c934a4521ff76",
+                  "publication": "2523e4da94ccf8f7a67a5ff2e47c9a01"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "c8baf74dc28e962ff4b65a22c1163a2f",
+                  "publication": "2523e4da94ccf8f7a67a5ff2e47c9a01",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/app-vsam-mq/cbl/COACCT01.cbl",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 37,
+          "endLine": 295,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 290
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 44,
+          "endLine": 272,
+          "file": "COACCT01.cbl",
+          "startColumn": 11,
+          "startLine": 267
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:18",
+        "operation": {
+          "domain": "operation",
+          "localId": "4e48a1e62bcedc8524ca909e4cab1198",
+          "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQOPEN",
+            "referenceName": "MQOPEN",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "49976d91e69dc8e9c3d0bd8b460eca2c",
+                  "publication": "60c54d23a9f81d2e7ab7beacacab537f"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "4e48a1e62bcedc8524ca909e4cab1198",
+                  "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:18",
+        "operation": {
+          "domain": "operation",
+          "localId": "4e48a1e62bcedc8524ca909e4cab1198",
+          "publication": "2523e4da94ccf8f7a67a5ff2e47c9a01",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQOPEN",
+            "referenceName": "MQOPEN",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "49976d91e69dc8e9c3d0bd8b460eca2c",
+                  "publication": "2523e4da94ccf8f7a67a5ff2e47c9a01"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "4e48a1e62bcedc8524ca909e4cab1198",
+                  "publication": "2523e4da94ccf8f7a67a5ff2e47c9a01",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/app-vsam-mq/cbl/COACCT01.cbl",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 37,
+          "endLine": 330,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 325
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 44,
+          "endLine": 307,
+          "file": "COACCT01.cbl",
+          "startColumn": 11,
+          "startLine": 302
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:29",
+        "operation": {
+          "domain": "operation",
+          "localId": "77b32a946b08cdcd12740e4955788e6c",
+          "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQOPEN",
+            "referenceName": "MQOPEN",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "e9df6335b3caa4f0f8dc4eb9fba1f194",
+                  "publication": "60c54d23a9f81d2e7ab7beacacab537f"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "77b32a946b08cdcd12740e4955788e6c",
+                  "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:29",
+        "operation": {
+          "domain": "operation",
+          "localId": "77b32a946b08cdcd12740e4955788e6c",
+          "publication": "2523e4da94ccf8f7a67a5ff2e47c9a01",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQOPEN",
+            "referenceName": "MQOPEN",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "e9df6335b3caa4f0f8dc4eb9fba1f194",
+                  "publication": "2523e4da94ccf8f7a67a5ff2e47c9a01"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "77b32a946b08cdcd12740e4955788e6c",
+                  "publication": "2523e4da94ccf8f7a67a5ff2e47c9a01",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/app-vsam-mq/cbl/COACCT01.cbl",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 37,
+          "endLine": 382,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 374
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 44,
+          "endLine": 360,
+          "file": "COACCT01.cbl",
+          "startColumn": 11,
+          "startLine": 352
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:45",
+        "operation": {
+          "domain": "operation",
+          "localId": "54bd1e1755d2b1cb420fed58f9d5cc28",
+          "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQGET",
+            "referenceName": "MQGET",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "e6702676b1ad9bd633dcedd55501ff85",
+                  "publication": "60c54d23a9f81d2e7ab7beacacab537f"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "54bd1e1755d2b1cb420fed58f9d5cc28",
+                  "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:45",
+        "operation": {
+          "domain": "operation",
+          "localId": "54bd1e1755d2b1cb420fed58f9d5cc28",
+          "publication": "2523e4da94ccf8f7a67a5ff2e47c9a01",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQGET",
+            "referenceName": "MQGET",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "e6702676b1ad9bd633dcedd55501ff85",
+                  "publication": "2523e4da94ccf8f7a67a5ff2e47c9a01"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "54bd1e1755d2b1cb420fed58f9d5cc28",
+                  "publication": "2523e4da94ccf8f7a67a5ff2e47c9a01",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/app-vsam-mq/cbl/COACCT01.cbl",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 37,
+          "endLine": 501,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 494
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 44,
+          "endLine": 486,
+          "file": "COACCT01.cbl",
+          "startColumn": 11,
+          "startLine": 479
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:83",
+        "operation": {
+          "domain": "operation",
+          "localId": "611aa691784f71a7d03cda9c73339a3d",
+          "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQPUT",
+            "referenceName": "MQPUT",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "637e50b669fb16e86dfceaa0bb073ef4",
+                  "publication": "60c54d23a9f81d2e7ab7beacacab537f"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "611aa691784f71a7d03cda9c73339a3d",
+                  "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:83",
+        "operation": {
+          "domain": "operation",
+          "localId": "611aa691784f71a7d03cda9c73339a3d",
+          "publication": "2523e4da94ccf8f7a67a5ff2e47c9a01",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQPUT",
+            "referenceName": "MQPUT",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "637e50b669fb16e86dfceaa0bb073ef4",
+                  "publication": "2523e4da94ccf8f7a67a5ff2e47c9a01"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "611aa691784f71a7d03cda9c73339a3d",
+                  "publication": "2523e4da94ccf8f7a67a5ff2e47c9a01",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/app-vsam-mq/cbl/COACCT01.cbl",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 37,
+          "endLine": 538,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 531
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 44,
+          "endLine": 523,
+          "file": "COACCT01.cbl",
+          "startColumn": 11,
+          "startLine": 516
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:94",
+        "operation": {
+          "domain": "operation",
+          "localId": "92e65fe4d808fcb287257609e8f796a8",
+          "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQPUT",
+            "referenceName": "MQPUT",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "b0d9bc5c811ded4755f7f1acb7522d82",
+                  "publication": "60c54d23a9f81d2e7ab7beacacab537f"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "92e65fe4d808fcb287257609e8f796a8",
+                  "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:94",
+        "operation": {
+          "domain": "operation",
+          "localId": "92e65fe4d808fcb287257609e8f796a8",
+          "publication": "2523e4da94ccf8f7a67a5ff2e47c9a01",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQPUT",
+            "referenceName": "MQPUT",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "b0d9bc5c811ded4755f7f1acb7522d82",
+                  "publication": "2523e4da94ccf8f7a67a5ff2e47c9a01"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "92e65fe4d808fcb287257609e8f796a8",
+                  "publication": "2523e4da94ccf8f7a67a5ff2e47c9a01",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/app-vsam-mq/cbl/COACCT01.cbl",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 38,
+          "endLine": 577,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 573
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 45,
+          "endLine": 561,
+          "file": "COACCT01.cbl",
+          "startColumn": 11,
+          "startLine": 557
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:103",
+        "operation": {
+          "domain": "operation",
+          "localId": "c5b2ea4392bf20bfce59f6210a6142fc",
+          "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQCLOSE",
+            "referenceName": "MQCLOSE",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "726609418b76d5f03e4baabf85b83b60",
+                  "publication": "60c54d23a9f81d2e7ab7beacacab537f"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "c5b2ea4392bf20bfce59f6210a6142fc",
+                  "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:103",
+        "operation": {
+          "domain": "operation",
+          "localId": "c5b2ea4392bf20bfce59f6210a6142fc",
+          "publication": "2523e4da94ccf8f7a67a5ff2e47c9a01",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQCLOSE",
+            "referenceName": "MQCLOSE",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "726609418b76d5f03e4baabf85b83b60",
+                  "publication": "2523e4da94ccf8f7a67a5ff2e47c9a01"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "c5b2ea4392bf20bfce59f6210a6142fc",
+                  "publication": "2523e4da94ccf8f7a67a5ff2e47c9a01",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/app-vsam-mq/cbl/COACCT01.cbl",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 38,
+          "endLine": 599,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 595
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 45,
+          "endLine": 583,
+          "file": "COACCT01.cbl",
+          "startColumn": 11,
+          "startLine": 579
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:112",
+        "operation": {
+          "domain": "operation",
+          "localId": "6a6e961b5c64ee97d70952069cc95c75",
+          "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQCLOSE",
+            "referenceName": "MQCLOSE",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "90d6a00f2e937400fb38ad6a51ea98a5",
+                  "publication": "60c54d23a9f81d2e7ab7beacacab537f"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "6a6e961b5c64ee97d70952069cc95c75",
+                  "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:112",
+        "operation": {
+          "domain": "operation",
+          "localId": "6a6e961b5c64ee97d70952069cc95c75",
+          "publication": "2523e4da94ccf8f7a67a5ff2e47c9a01",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQCLOSE",
+            "referenceName": "MQCLOSE",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "90d6a00f2e937400fb38ad6a51ea98a5",
+                  "publication": "2523e4da94ccf8f7a67a5ff2e47c9a01"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "6a6e961b5c64ee97d70952069cc95c75",
+                  "publication": "2523e4da94ccf8f7a67a5ff2e47c9a01",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/app-vsam-mq/cbl/COACCT01.cbl",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 38,
+          "endLine": 622,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 618
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 45,
+          "endLine": 606,
+          "file": "COACCT01.cbl",
+          "startColumn": 11,
+          "startLine": 602
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:121",
+        "operation": {
+          "domain": "operation",
+          "localId": "0c8814021266c059971c519c004ff91b",
+          "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQCLOSE",
+            "referenceName": "MQCLOSE",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "0758b66a48d196cb4e92997c310a7ea1",
+                  "publication": "60c54d23a9f81d2e7ab7beacacab537f"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "0c8814021266c059971c519c004ff91b",
+                  "publication": "60c54d23a9f81d2e7ab7beacacab537f",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:121",
+        "operation": {
+          "domain": "operation",
+          "localId": "0c8814021266c059971c519c004ff91b",
+          "publication": "2523e4da94ccf8f7a67a5ff2e47c9a01",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQCLOSE",
+            "referenceName": "MQCLOSE",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "0758b66a48d196cb4e92997c310a7ea1",
+                  "publication": "2523e4da94ccf8f7a67a5ff2e47c9a01"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "0c8814021266c059971c519c004ff91b",
+                  "publication": "2523e4da94ccf8f7a67a5ff2e47c9a01",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/app-vsam-mq/cbl/CODATE01.cbl",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 37,
+          "endLine": 190,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 185
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 44,
+          "endLine": 187,
+          "file": "CODATE01.cbl",
+          "startColumn": 11,
+          "startLine": 182
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:8",
+        "operation": {
+          "domain": "operation",
+          "localId": "c8baf74dc28e962ff4b65a22c1163a2f",
+          "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQOPEN",
+            "referenceName": "MQOPEN",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "37f640c45dff9fbdf32c934a4521ff76",
+                  "publication": "e8de5f585ebf8263b6566f3f0ba9f52b"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "c8baf74dc28e962ff4b65a22c1163a2f",
+                  "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:8",
+        "operation": {
+          "domain": "operation",
+          "localId": "c8baf74dc28e962ff4b65a22c1163a2f",
+          "publication": "2c58d40cae4936dd0560248c6ee6cd37",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQOPEN",
+            "referenceName": "MQOPEN",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "37f640c45dff9fbdf32c934a4521ff76",
+                  "publication": "2c58d40cae4936dd0560248c6ee6cd37"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "c8baf74dc28e962ff4b65a22c1163a2f",
+                  "publication": "2c58d40cae4936dd0560248c6ee6cd37",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/app-vsam-mq/cbl/CODATE01.cbl",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 37,
+          "endLine": 224,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 219
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 44,
+          "endLine": 221,
+          "file": "CODATE01.cbl",
+          "startColumn": 11,
+          "startLine": 216
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:18",
+        "operation": {
+          "domain": "operation",
+          "localId": "4e48a1e62bcedc8524ca909e4cab1198",
+          "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQOPEN",
+            "referenceName": "MQOPEN",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "49976d91e69dc8e9c3d0bd8b460eca2c",
+                  "publication": "e8de5f585ebf8263b6566f3f0ba9f52b"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "4e48a1e62bcedc8524ca909e4cab1198",
+                  "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:18",
+        "operation": {
+          "domain": "operation",
+          "localId": "4e48a1e62bcedc8524ca909e4cab1198",
+          "publication": "2c58d40cae4936dd0560248c6ee6cd37",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQOPEN",
+            "referenceName": "MQOPEN",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "49976d91e69dc8e9c3d0bd8b460eca2c",
+                  "publication": "2c58d40cae4936dd0560248c6ee6cd37"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "4e48a1e62bcedc8524ca909e4cab1198",
+                  "publication": "2c58d40cae4936dd0560248c6ee6cd37",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/app-vsam-mq/cbl/CODATE01.cbl",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 37,
+          "endLine": 259,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 254
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 44,
+          "endLine": 256,
+          "file": "CODATE01.cbl",
+          "startColumn": 11,
+          "startLine": 251
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:29",
+        "operation": {
+          "domain": "operation",
+          "localId": "77b32a946b08cdcd12740e4955788e6c",
+          "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQOPEN",
+            "referenceName": "MQOPEN",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "e9df6335b3caa4f0f8dc4eb9fba1f194",
+                  "publication": "e8de5f585ebf8263b6566f3f0ba9f52b"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "77b32a946b08cdcd12740e4955788e6c",
+                  "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:29",
+        "operation": {
+          "domain": "operation",
+          "localId": "77b32a946b08cdcd12740e4955788e6c",
+          "publication": "2c58d40cae4936dd0560248c6ee6cd37",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQOPEN",
+            "referenceName": "MQOPEN",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "e9df6335b3caa4f0f8dc4eb9fba1f194",
+                  "publication": "2c58d40cae4936dd0560248c6ee6cd37"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "77b32a946b08cdcd12740e4955788e6c",
+                  "publication": "2c58d40cae4936dd0560248c6ee6cd37",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/app-vsam-mq/cbl/CODATE01.cbl",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 37,
+          "endLine": 311,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 303
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 44,
+          "endLine": 309,
+          "file": "CODATE01.cbl",
+          "startColumn": 11,
+          "startLine": 301
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:45",
+        "operation": {
+          "domain": "operation",
+          "localId": "54bd1e1755d2b1cb420fed58f9d5cc28",
+          "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQGET",
+            "referenceName": "MQGET",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "e6702676b1ad9bd633dcedd55501ff85",
+                  "publication": "e8de5f585ebf8263b6566f3f0ba9f52b"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "54bd1e1755d2b1cb420fed58f9d5cc28",
+                  "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:45",
+        "operation": {
+          "domain": "operation",
+          "localId": "54bd1e1755d2b1cb420fed58f9d5cc28",
+          "publication": "2c58d40cae4936dd0560248c6ee6cd37",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQGET",
+            "referenceName": "MQGET",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "e6702676b1ad9bd633dcedd55501ff85",
+                  "publication": "2c58d40cae4936dd0560248c6ee6cd37"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "54bd1e1755d2b1cb420fed58f9d5cc28",
+                  "publication": "2c58d40cae4936dd0560248c6ee6cd37",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/app-vsam-mq/cbl/CODATE01.cbl",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 37,
+          "endLine": 386,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 379
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 44,
+          "endLine": 390,
+          "file": "CODATE01.cbl",
+          "startColumn": 11,
+          "startLine": 383
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:66",
+        "operation": {
+          "domain": "operation",
+          "localId": "3dd6799c57a81177bfea1c11d06b1a39",
+          "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQPUT",
+            "referenceName": "MQPUT",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "34aacbf0475f7d65eaf9a1ddb14f10cc",
+                  "publication": "e8de5f585ebf8263b6566f3f0ba9f52b"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "3dd6799c57a81177bfea1c11d06b1a39",
+                  "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:66",
+        "operation": {
+          "domain": "operation",
+          "localId": "3dd6799c57a81177bfea1c11d06b1a39",
+          "publication": "2c58d40cae4936dd0560248c6ee6cd37",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQPUT",
+            "referenceName": "MQPUT",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "34aacbf0475f7d65eaf9a1ddb14f10cc",
+                  "publication": "2c58d40cae4936dd0560248c6ee6cd37"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "3dd6799c57a81177bfea1c11d06b1a39",
+                  "publication": "2c58d40cae4936dd0560248c6ee6cd37",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/app-vsam-mq/cbl/CODATE01.cbl",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 37,
+          "endLine": 423,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 416
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 44,
+          "endLine": 427,
+          "file": "CODATE01.cbl",
+          "startColumn": 11,
+          "startLine": 420
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:77",
+        "operation": {
+          "domain": "operation",
+          "localId": "bbbc61b3bcb19026d6f4f10127c8523d",
+          "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQPUT",
+            "referenceName": "MQPUT",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "6e4e0c2262ae58c77c9e1a459253eaaf",
+                  "publication": "e8de5f585ebf8263b6566f3f0ba9f52b"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "bbbc61b3bcb19026d6f4f10127c8523d",
+                  "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:77",
+        "operation": {
+          "domain": "operation",
+          "localId": "bbbc61b3bcb19026d6f4f10127c8523d",
+          "publication": "2c58d40cae4936dd0560248c6ee6cd37",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQPUT",
+            "referenceName": "MQPUT",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "6e4e0c2262ae58c77c9e1a459253eaaf",
+                  "publication": "2c58d40cae4936dd0560248c6ee6cd37"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "bbbc61b3bcb19026d6f4f10127c8523d",
+                  "publication": "2c58d40cae4936dd0560248c6ee6cd37",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/app-vsam-mq/cbl/CODATE01.cbl",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 38,
+          "endLine": 462,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 458
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 45,
+          "endLine": 465,
+          "file": "CODATE01.cbl",
+          "startColumn": 11,
+          "startLine": 461
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:86",
+        "operation": {
+          "domain": "operation",
+          "localId": "279beb1b146a78e35e54274547d79141",
+          "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQCLOSE",
+            "referenceName": "MQCLOSE",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "bc4ecf16961bc33701082895e1d65be8",
+                  "publication": "e8de5f585ebf8263b6566f3f0ba9f52b"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "279beb1b146a78e35e54274547d79141",
+                  "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:86",
+        "operation": {
+          "domain": "operation",
+          "localId": "279beb1b146a78e35e54274547d79141",
+          "publication": "2c58d40cae4936dd0560248c6ee6cd37",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQCLOSE",
+            "referenceName": "MQCLOSE",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "bc4ecf16961bc33701082895e1d65be8",
+                  "publication": "2c58d40cae4936dd0560248c6ee6cd37"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "279beb1b146a78e35e54274547d79141",
+                  "publication": "2c58d40cae4936dd0560248c6ee6cd37",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/app-vsam-mq/cbl/CODATE01.cbl",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 38,
+          "endLine": 484,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 480
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 45,
+          "endLine": 487,
+          "file": "CODATE01.cbl",
+          "startColumn": 11,
+          "startLine": 483
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:95",
+        "operation": {
+          "domain": "operation",
+          "localId": "f667e3826bbf3af0e5d4df3fa2ea6b9e",
+          "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQCLOSE",
+            "referenceName": "MQCLOSE",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "43e4afe70296d31dca2aa857f5e9b1c1",
+                  "publication": "e8de5f585ebf8263b6566f3f0ba9f52b"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "f667e3826bbf3af0e5d4df3fa2ea6b9e",
+                  "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:95",
+        "operation": {
+          "domain": "operation",
+          "localId": "f667e3826bbf3af0e5d4df3fa2ea6b9e",
+          "publication": "2c58d40cae4936dd0560248c6ee6cd37",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQCLOSE",
+            "referenceName": "MQCLOSE",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "43e4afe70296d31dca2aa857f5e9b1c1",
+                  "publication": "2c58d40cae4936dd0560248c6ee6cd37"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "f667e3826bbf3af0e5d4df3fa2ea6b9e",
+                  "publication": "2c58d40cae4936dd0560248c6ee6cd37",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/app-vsam-mq/cbl/CODATE01.cbl",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 38,
+          "endLine": 507,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 503
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 45,
+          "endLine": 510,
+          "file": "CODATE01.cbl",
+          "startColumn": 11,
+          "startLine": 506
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:104",
+        "operation": {
+          "domain": "operation",
+          "localId": "dcac0a30595c2b1005070c7575e1663c",
+          "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQCLOSE",
+            "referenceName": "MQCLOSE",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "53822d3207fbb17e24ae8fb3a4062eeb",
+                  "publication": "e8de5f585ebf8263b6566f3f0ba9f52b"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "dcac0a30595c2b1005070c7575e1663c",
+                  "publication": "e8de5f585ebf8263b6566f3f0ba9f52b",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:104",
+        "operation": {
+          "domain": "operation",
+          "localId": "dcac0a30595c2b1005070c7575e1663c",
+          "publication": "2c58d40cae4936dd0560248c6ee6cd37",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "MQCLOSE",
+            "referenceName": "MQCLOSE",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "53822d3207fbb17e24ae8fb3a4062eeb",
+                  "publication": "2c58d40cae4936dd0560248c6ee6cd37"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "dcac0a30595c2b1005070c7575e1663c",
+                  "publication": "2c58d40cae4936dd0560248c6ee6cd37",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/cbl/CBIMPORT.cbl",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 17,
+          "endLine": 679,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 679
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 24,
+          "endLine": 484,
+          "file": "CBIMPORT.cbl",
+          "startColumn": 11,
+          "startLine": 484
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:66",
+        "operation": {
+          "domain": "operation",
+          "localId": "3dd6799c57a81177bfea1c11d06b1a39",
+          "publication": "9b2be1b8f6dc90df166439c204960fe6",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CEE3ABD",
+            "referenceName": "CEE3ABD",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "34aacbf0475f7d65eaf9a1ddb14f10cc",
+                  "publication": "9b2be1b8f6dc90df166439c204960fe6"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "3dd6799c57a81177bfea1c11d06b1a39",
+                  "publication": "9b2be1b8f6dc90df166439c204960fe6",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:66",
+        "operation": {
+          "domain": "operation",
+          "localId": "3dd6799c57a81177bfea1c11d06b1a39",
+          "publication": "ac5900412d06e0acb89eca14a4fac4eb",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CEE3ABD",
+            "referenceName": "CEE3ABD",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "34aacbf0475f7d65eaf9a1ddb14f10cc",
+                  "publication": "ac5900412d06e0acb89eca14a4fac4eb"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "3dd6799c57a81177bfea1c11d06b1a39",
+                  "publication": "ac5900412d06e0acb89eca14a4fac4eb",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/cbl/CBSTM03A.CBL",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 37,
+          "endLine": 446,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 446
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 44,
+          "endLine": 351,
+          "file": "CBSTM03A.CBL",
+          "startColumn": 11,
+          "startLine": 351
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:5",
+        "operation": {
+          "domain": "operation",
+          "localId": "9998a599e758a72cd7f4c67091cfdfba",
+          "publication": "4524988f54be22d1a9cddb8b201fdd18",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CBSTM03B",
+            "referenceName": "CBSTM03B",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "99a7b8e78fc7dd199d0f6f0dce6cd01f",
+                  "publication": "4524988f54be22d1a9cddb8b201fdd18"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "9998a599e758a72cd7f4c67091cfdfba",
+                  "publication": "4524988f54be22d1a9cddb8b201fdd18",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:5",
+        "operation": {
+          "domain": "operation",
+          "localId": "9998a599e758a72cd7f4c67091cfdfba",
+          "publication": "70997b6d590acc992e666f50ba38c5e6",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CBSTM03B",
+            "referenceName": "CBSTM03B",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "99a7b8e78fc7dd199d0f6f0dce6cd01f",
+                  "publication": "70997b6d590acc992e666f50ba38c5e6"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "9998a599e758a72cd7f4c67091cfdfba",
+                  "publication": "70997b6d590acc992e666f50ba38c5e6",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/cbl/CBSTM03A.CBL",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 37,
+          "endLine": 472,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 472
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 44,
+          "endLine": 377,
+          "file": "CBSTM03A.CBL",
+          "startColumn": 11,
+          "startLine": 377
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:13",
+        "operation": {
+          "domain": "operation",
+          "localId": "7f50a8230f6f0402c08a30514e4df52c",
+          "publication": "4524988f54be22d1a9cddb8b201fdd18",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CBSTM03B",
+            "referenceName": "CBSTM03B",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "f05e4890a5cb848e48dc7ca1d140a7a2",
+                  "publication": "4524988f54be22d1a9cddb8b201fdd18"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "7f50a8230f6f0402c08a30514e4df52c",
+                  "publication": "4524988f54be22d1a9cddb8b201fdd18",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:13",
+        "operation": {
+          "domain": "operation",
+          "localId": "7f50a8230f6f0402c08a30514e4df52c",
+          "publication": "70997b6d590acc992e666f50ba38c5e6",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CBSTM03B",
+            "referenceName": "CBSTM03B",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "f05e4890a5cb848e48dc7ca1d140a7a2",
+                  "publication": "70997b6d590acc992e666f50ba38c5e6"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "7f50a8230f6f0402c08a30514e4df52c",
+                  "publication": "70997b6d590acc992e666f50ba38c5e6",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/cbl/CBSTM03A.CBL",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 37,
+          "endLine": 496,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 496
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 44,
+          "endLine": 401,
+          "file": "CBSTM03A.CBL",
+          "startColumn": 11,
+          "startLine": 401
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:20",
+        "operation": {
+          "domain": "operation",
+          "localId": "5fb65ce8779a4a6531d78dcc1735ca06",
+          "publication": "4524988f54be22d1a9cddb8b201fdd18",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CBSTM03B",
+            "referenceName": "CBSTM03B",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "b758d4a6df26323c0b186ee00763ebba",
+                  "publication": "4524988f54be22d1a9cddb8b201fdd18"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "5fb65ce8779a4a6531d78dcc1735ca06",
+                  "publication": "4524988f54be22d1a9cddb8b201fdd18",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:20",
+        "operation": {
+          "domain": "operation",
+          "localId": "5fb65ce8779a4a6531d78dcc1735ca06",
+          "publication": "70997b6d590acc992e666f50ba38c5e6",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CBSTM03B",
+            "referenceName": "CBSTM03B",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "b758d4a6df26323c0b186ee00763ebba",
+                  "publication": "70997b6d590acc992e666f50ba38c5e6"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "5fb65ce8779a4a6531d78dcc1735ca06",
+                  "publication": "70997b6d590acc992e666f50ba38c5e6",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/cbl/CBSTM03A.CBL",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 37,
+          "endLine": 829,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 829
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 44,
+          "endLine": 734,
+          "file": "CBSTM03A.CBL",
+          "startColumn": 11,
+          "startLine": 734
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:49",
+        "operation": {
+          "domain": "operation",
+          "localId": "9ceaabca66220459c297090df1060cee",
+          "publication": "4524988f54be22d1a9cddb8b201fdd18",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CBSTM03B",
+            "referenceName": "CBSTM03B",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "8cde3db3bd773dcfcf74b19d9ae58908",
+                  "publication": "4524988f54be22d1a9cddb8b201fdd18"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "9ceaabca66220459c297090df1060cee",
+                  "publication": "4524988f54be22d1a9cddb8b201fdd18",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:49",
+        "operation": {
+          "domain": "operation",
+          "localId": "9ceaabca66220459c297090df1060cee",
+          "publication": "70997b6d590acc992e666f50ba38c5e6",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CBSTM03B",
+            "referenceName": "CBSTM03B",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "8cde3db3bd773dcfcf74b19d9ae58908",
+                  "publication": "70997b6d590acc992e666f50ba38c5e6"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "9ceaabca66220459c297090df1060cee",
+                  "publication": "70997b6d590acc992e666f50ba38c5e6",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/cbl/CBSTM03A.CBL",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 37,
+          "endLine": 841,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 841
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 44,
+          "endLine": 746,
+          "file": "CBSTM03A.CBL",
+          "startColumn": 11,
+          "startLine": 746
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:51",
+        "operation": {
+          "domain": "operation",
+          "localId": "0b50bf05b8ef647687ec24a1ca2dfc95",
+          "publication": "4524988f54be22d1a9cddb8b201fdd18",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CBSTM03B",
+            "referenceName": "CBSTM03B",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "d7ac2d006f24fcf9feac74532e26069f",
+                  "publication": "4524988f54be22d1a9cddb8b201fdd18"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "0b50bf05b8ef647687ec24a1ca2dfc95",
+                  "publication": "4524988f54be22d1a9cddb8b201fdd18",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:51",
+        "operation": {
+          "domain": "operation",
+          "localId": "0b50bf05b8ef647687ec24a1ca2dfc95",
+          "publication": "70997b6d590acc992e666f50ba38c5e6",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CBSTM03B",
+            "referenceName": "CBSTM03B",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "d7ac2d006f24fcf9feac74532e26069f",
+                  "publication": "70997b6d590acc992e666f50ba38c5e6"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "0b50bf05b8ef647687ec24a1ca2dfc95",
+                  "publication": "70997b6d590acc992e666f50ba38c5e6",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/cbl/CBSTM03A.CBL",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 37,
+          "endLine": 864,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 864
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 44,
+          "endLine": 769,
+          "file": "CBSTM03A.CBL",
+          "startColumn": 11,
+          "startLine": 769
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:59",
+        "operation": {
+          "domain": "operation",
+          "localId": "f4cb8f2f4043755b5cd0035ab1bfba9c",
+          "publication": "4524988f54be22d1a9cddb8b201fdd18",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CBSTM03B",
+            "referenceName": "CBSTM03B",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "312cefa46a3d19e6ff4639651973eeaf",
+                  "publication": "4524988f54be22d1a9cddb8b201fdd18"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "f4cb8f2f4043755b5cd0035ab1bfba9c",
+                  "publication": "4524988f54be22d1a9cddb8b201fdd18",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:59",
+        "operation": {
+          "domain": "operation",
+          "localId": "f4cb8f2f4043755b5cd0035ab1bfba9c",
+          "publication": "70997b6d590acc992e666f50ba38c5e6",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CBSTM03B",
+            "referenceName": "CBSTM03B",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "312cefa46a3d19e6ff4639651973eeaf",
+                  "publication": "70997b6d590acc992e666f50ba38c5e6"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "f4cb8f2f4043755b5cd0035ab1bfba9c",
+                  "publication": "70997b6d590acc992e666f50ba38c5e6",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/cbl/CBSTM03A.CBL",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 37,
+          "endLine": 882,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 882
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 44,
+          "endLine": 787,
+          "file": "CBSTM03A.CBL",
+          "startColumn": 11,
+          "startLine": 787
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:63",
+        "operation": {
+          "domain": "operation",
+          "localId": "26a0251344375a655e006d04afb2c77a",
+          "publication": "4524988f54be22d1a9cddb8b201fdd18",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CBSTM03B",
+            "referenceName": "CBSTM03B",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "cf00241478c97ab1f98735ee6bdad0db",
+                  "publication": "4524988f54be22d1a9cddb8b201fdd18"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "26a0251344375a655e006d04afb2c77a",
+                  "publication": "4524988f54be22d1a9cddb8b201fdd18",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:63",
+        "operation": {
+          "domain": "operation",
+          "localId": "26a0251344375a655e006d04afb2c77a",
+          "publication": "70997b6d590acc992e666f50ba38c5e6",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CBSTM03B",
+            "referenceName": "CBSTM03B",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "cf00241478c97ab1f98735ee6bdad0db",
+                  "publication": "70997b6d590acc992e666f50ba38c5e6"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "26a0251344375a655e006d04afb2c77a",
+                  "publication": "70997b6d590acc992e666f50ba38c5e6",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/cbl/CBSTM03A.CBL",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 37,
+          "endLine": 900,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 900
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 44,
+          "endLine": 805,
+          "file": "CBSTM03A.CBL",
+          "startColumn": 11,
+          "startLine": 805
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:67",
+        "operation": {
+          "domain": "operation",
+          "localId": "867ad979f51cffb96c885f10a31f88c2",
+          "publication": "4524988f54be22d1a9cddb8b201fdd18",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CBSTM03B",
+            "referenceName": "CBSTM03B",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "f570fb37866cb73a36a70d644427eeb6",
+                  "publication": "4524988f54be22d1a9cddb8b201fdd18"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "867ad979f51cffb96c885f10a31f88c2",
+                  "publication": "4524988f54be22d1a9cddb8b201fdd18",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:67",
+        "operation": {
+          "domain": "operation",
+          "localId": "867ad979f51cffb96c885f10a31f88c2",
+          "publication": "70997b6d590acc992e666f50ba38c5e6",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CBSTM03B",
+            "referenceName": "CBSTM03B",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "f570fb37866cb73a36a70d644427eeb6",
+                  "publication": "70997b6d590acc992e666f50ba38c5e6"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "867ad979f51cffb96c885f10a31f88c2",
+                  "publication": "70997b6d590acc992e666f50ba38c5e6",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/cbl/CBSTM03A.CBL",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 37,
+          "endLine": 930,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 930
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 44,
+          "endLine": 835,
+          "file": "CBSTM03A.CBL",
+          "startColumn": 11,
+          "startLine": 835
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:76",
+        "operation": {
+          "domain": "operation",
+          "localId": "bba2590c9f4be4314e3b6b0eea4508f1",
+          "publication": "4524988f54be22d1a9cddb8b201fdd18",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CBSTM03B",
+            "referenceName": "CBSTM03B",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "b5b6a752cd4dbf5be20b27c62db28727",
+                  "publication": "4524988f54be22d1a9cddb8b201fdd18"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "bba2590c9f4be4314e3b6b0eea4508f1",
+                  "publication": "4524988f54be22d1a9cddb8b201fdd18",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:76",
+        "operation": {
+          "domain": "operation",
+          "localId": "bba2590c9f4be4314e3b6b0eea4508f1",
+          "publication": "70997b6d590acc992e666f50ba38c5e6",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CBSTM03B",
+            "referenceName": "CBSTM03B",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "b5b6a752cd4dbf5be20b27c62db28727",
+                  "publication": "70997b6d590acc992e666f50ba38c5e6"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "bba2590c9f4be4314e3b6b0eea4508f1",
+                  "publication": "70997b6d590acc992e666f50ba38c5e6",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/cbl/CBSTM03A.CBL",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 37,
+          "endLine": 955,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 955
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 44,
+          "endLine": 860,
+          "file": "CBSTM03A.CBL",
+          "startColumn": 11,
+          "startLine": 860
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:82",
+        "operation": {
+          "domain": "operation",
+          "localId": "898beef865426245c37fb7525944d8ea",
+          "publication": "4524988f54be22d1a9cddb8b201fdd18",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CBSTM03B",
+            "referenceName": "CBSTM03B",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "4283458e00a7028458ed1b976da56e3a",
+                  "publication": "4524988f54be22d1a9cddb8b201fdd18"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "898beef865426245c37fb7525944d8ea",
+                  "publication": "4524988f54be22d1a9cddb8b201fdd18",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:82",
+        "operation": {
+          "domain": "operation",
+          "localId": "898beef865426245c37fb7525944d8ea",
+          "publication": "70997b6d590acc992e666f50ba38c5e6",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CBSTM03B",
+            "referenceName": "CBSTM03B",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "4283458e00a7028458ed1b976da56e3a",
+                  "publication": "70997b6d590acc992e666f50ba38c5e6"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "898beef865426245c37fb7525944d8ea",
+                  "publication": "70997b6d590acc992e666f50ba38c5e6",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/cbl/CBSTM03A.CBL",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 37,
+          "endLine": 972,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 972
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 44,
+          "endLine": 877,
+          "file": "CBSTM03A.CBL",
+          "startColumn": 11,
+          "startLine": 877
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:85",
+        "operation": {
+          "domain": "operation",
+          "localId": "7fbc8bfd352f3faeaf5b4d16a161ae04",
+          "publication": "4524988f54be22d1a9cddb8b201fdd18",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CBSTM03B",
+            "referenceName": "CBSTM03B",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "cac3ff36ae0f42814f62eb480694d154",
+                  "publication": "4524988f54be22d1a9cddb8b201fdd18"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "7fbc8bfd352f3faeaf5b4d16a161ae04",
+                  "publication": "4524988f54be22d1a9cddb8b201fdd18",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:85",
+        "operation": {
+          "domain": "operation",
+          "localId": "7fbc8bfd352f3faeaf5b4d16a161ae04",
+          "publication": "70997b6d590acc992e666f50ba38c5e6",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CBSTM03B",
+            "referenceName": "CBSTM03B",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "cac3ff36ae0f42814f62eb480694d154",
+                  "publication": "70997b6d590acc992e666f50ba38c5e6"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "7fbc8bfd352f3faeaf5b4d16a161ae04",
+                  "publication": "70997b6d590acc992e666f50ba38c5e6",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/cbl/CBSTM03A.CBL",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 37,
+          "endLine": 988,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 988
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 44,
+          "endLine": 893,
+          "file": "CBSTM03A.CBL",
+          "startColumn": 11,
+          "startLine": 893
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:88",
+        "operation": {
+          "domain": "operation",
+          "localId": "0311eb93be82fc0b9be8d23b9c52b241",
+          "publication": "4524988f54be22d1a9cddb8b201fdd18",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CBSTM03B",
+            "referenceName": "CBSTM03B",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "5ec4b142f2c54c4396b17d039ef7f26c",
+                  "publication": "4524988f54be22d1a9cddb8b201fdd18"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "0311eb93be82fc0b9be8d23b9c52b241",
+                  "publication": "4524988f54be22d1a9cddb8b201fdd18",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:88",
+        "operation": {
+          "domain": "operation",
+          "localId": "0311eb93be82fc0b9be8d23b9c52b241",
+          "publication": "70997b6d590acc992e666f50ba38c5e6",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CBSTM03B",
+            "referenceName": "CBSTM03B",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "5ec4b142f2c54c4396b17d039ef7f26c",
+                  "publication": "70997b6d590acc992e666f50ba38c5e6"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "0311eb93be82fc0b9be8d23b9c52b241",
+                  "publication": "70997b6d590acc992e666f50ba38c5e6",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/cbl/CBSTM03A.CBL",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 37,
+          "endLine": 1004,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 1004
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 44,
+          "endLine": 909,
+          "file": "CBSTM03A.CBL",
+          "startColumn": 11,
+          "startLine": 909
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:91",
+        "operation": {
+          "domain": "operation",
+          "localId": "8ceae33b8a25883cbfbc4042b8887d8e",
+          "publication": "4524988f54be22d1a9cddb8b201fdd18",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CBSTM03B",
+            "referenceName": "CBSTM03B",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "85fe08bcd297a568b39f9d41110ec290",
+                  "publication": "4524988f54be22d1a9cddb8b201fdd18"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "8ceae33b8a25883cbfbc4042b8887d8e",
+                  "publication": "4524988f54be22d1a9cddb8b201fdd18",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:91",
+        "operation": {
+          "domain": "operation",
+          "localId": "8ceae33b8a25883cbfbc4042b8887d8e",
+          "publication": "70997b6d590acc992e666f50ba38c5e6",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CBSTM03B",
+            "referenceName": "CBSTM03B",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "85fe08bcd297a568b39f9d41110ec290",
+                  "publication": "70997b6d590acc992e666f50ba38c5e6"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "8ceae33b8a25883cbfbc4042b8887d8e",
+                  "publication": "70997b6d590acc992e666f50ba38c5e6",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/cbl/CBSTM03A.CBL",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 17,
+          "endLine": 1018,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 1018
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 24,
+          "endLine": 923,
+          "file": "CBSTM03A.CBL",
+          "startColumn": 11,
+          "startLine": 923
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:92",
+        "operation": {
+          "domain": "operation",
+          "localId": "7f6aadc705e9f49abb3c1158b23d232a",
+          "publication": "4524988f54be22d1a9cddb8b201fdd18",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CEE3ABD",
+            "referenceName": "CEE3ABD",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "05b22d4ae3e5fcba53864e5130c9b276",
+                  "publication": "4524988f54be22d1a9cddb8b201fdd18"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "7f6aadc705e9f49abb3c1158b23d232a",
+                  "publication": "4524988f54be22d1a9cddb8b201fdd18",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:92",
+        "operation": {
+          "domain": "operation",
+          "localId": "7f6aadc705e9f49abb3c1158b23d232a",
+          "publication": "70997b6d590acc992e666f50ba38c5e6",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CEE3ABD",
+            "referenceName": "CEE3ABD",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "05b22d4ae3e5fcba53864e5130c9b276",
+                  "publication": "70997b6d590acc992e666f50ba38c5e6"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "7f6aadc705e9f49abb3c1158b23d232a",
+                  "publication": "70997b6d590acc992e666f50ba38c5e6",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/cbl/CBTRN03C.cbl",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 38,
+          "endLine": 757,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 757
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 45,
+          "endLine": 630,
+          "file": "CBTRN03C.cbl",
+          "startColumn": 11,
+          "startLine": 630
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:91",
+        "operation": {
+          "domain": "operation",
+          "localId": "8ceae33b8a25883cbfbc4042b8887d8e",
+          "publication": "c957b68a1c4669b596827729eaf38922",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CEE3ABD",
+            "referenceName": "CEE3ABD",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "85fe08bcd297a568b39f9d41110ec290",
+                  "publication": "c957b68a1c4669b596827729eaf38922"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "8ceae33b8a25883cbfbc4042b8887d8e",
+                  "publication": "c957b68a1c4669b596827729eaf38922",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:91",
+        "operation": {
+          "domain": "operation",
+          "localId": "8ceae33b8a25883cbfbc4042b8887d8e",
+          "publication": "3c927a6511bbab15890fd97ad7625818",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CEE3ABD",
+            "referenceName": "CEE3ABD",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "85fe08bcd297a568b39f9d41110ec290",
+                  "publication": "3c927a6511bbab15890fd97ad7625818"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "8ceae33b8a25883cbfbc4042b8887d8e",
+                  "publication": "3c927a6511bbab15890fd97ad7625818",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/cbl/COACTUPC.cbl",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 34,
+          "endLine": 7992,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 7989
+        },
+        "includeChain": [
+          {
+            "includeLine": 4232,
+            "includedFile": "CSUTLDPY.cpy",
+            "includingFile": "COACTUPC.cbl",
+            "requestedName": "CSUTLDPY"
+          }
+        ],
+        "original": {
+          "endColumn": 41,
+          "endLine": 296,
+          "file": "CSUTLDPY.cpy",
+          "startColumn": 11,
+          "startLine": 293
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:576",
+        "operation": {
+          "domain": "operation",
+          "localId": "a7c39180db357cdc8af45d5d1422bd39",
+          "publication": "9951013f50e2f953fc857c8af088ddb1",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CSUTLDTC",
+            "referenceName": "CSUTLDTC",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "6dbcce2b3eeff3626a8af724c52eb4c0",
+                  "publication": "9951013f50e2f953fc857c8af088ddb1"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "a7c39180db357cdc8af45d5d1422bd39",
+                  "publication": "9951013f50e2f953fc857c8af088ddb1",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:576",
+        "operation": {
+          "domain": "operation",
+          "localId": "a7c39180db357cdc8af45d5d1422bd39",
+          "publication": "cb4c39de95b3331cdd5be21c50846faa",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CSUTLDTC",
+            "referenceName": "CSUTLDTC",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "6dbcce2b3eeff3626a8af724c52eb4c0",
+                  "publication": "cb4c39de95b3331cdd5be21c50846faa"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "a7c39180db357cdc8af45d5d1422bd39",
+                  "publication": "cb4c39de95b3331cdd5be21c50846faa",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/cbl/CORPT00C.cbl",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 50,
+          "endLine": 796,
+          "file": "<preprocessed>",
+          "startColumn": 12,
+          "startLine": 794
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 57,
+          "endLine": 394,
+          "file": "CORPT00C.cbl",
+          "startColumn": 19,
+          "startLine": 392
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:80",
+        "operation": {
+          "domain": "operation",
+          "localId": "9772efe5d3b9035827a546b447a3f467",
+          "publication": "76f31c5075979a78c9b2c270e3cd12ff",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CSUTLDTC",
+            "referenceName": "CSUTLDTC",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "4a23d45bf05ac1e21699cfa0d1f0a973",
+                  "publication": "76f31c5075979a78c9b2c270e3cd12ff"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "9772efe5d3b9035827a546b447a3f467",
+                  "publication": "76f31c5075979a78c9b2c270e3cd12ff",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:80",
+        "operation": {
+          "domain": "operation",
+          "localId": "9772efe5d3b9035827a546b447a3f467",
+          "publication": "fc942d2310aa270584bbf02469ef2fb7",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CSUTLDTC",
+            "referenceName": "CSUTLDTC",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "4a23d45bf05ac1e21699cfa0d1f0a973",
+                  "publication": "fc942d2310aa270584bbf02469ef2fb7"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "9772efe5d3b9035827a546b447a3f467",
+                  "publication": "fc942d2310aa270584bbf02469ef2fb7",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/cbl/CORPT00C.cbl",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 50,
+          "endLine": 816,
+          "file": "<preprocessed>",
+          "startColumn": 12,
+          "startLine": 814
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 57,
+          "endLine": 414,
+          "file": "CORPT00C.cbl",
+          "startColumn": 19,
+          "startLine": 412
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:87",
+        "operation": {
+          "domain": "operation",
+          "localId": "3568329b5e5d00cebbd88e3f0b0f10b1",
+          "publication": "76f31c5075979a78c9b2c270e3cd12ff",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CSUTLDTC",
+            "referenceName": "CSUTLDTC",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "39733e5489731cfba097636f3e8d7c83",
+                  "publication": "76f31c5075979a78c9b2c270e3cd12ff"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "3568329b5e5d00cebbd88e3f0b0f10b1",
+                  "publication": "76f31c5075979a78c9b2c270e3cd12ff",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:87",
+        "operation": {
+          "domain": "operation",
+          "localId": "3568329b5e5d00cebbd88e3f0b0f10b1",
+          "publication": "fc942d2310aa270584bbf02469ef2fb7",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CSUTLDTC",
+            "referenceName": "CSUTLDTC",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "39733e5489731cfba097636f3e8d7c83",
+                  "publication": "fc942d2310aa270584bbf02469ef2fb7"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "3568329b5e5d00cebbd88e3f0b0f10b1",
+                  "publication": "fc942d2310aa270584bbf02469ef2fb7",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/cbl/COTRN02C.cbl",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 42,
+          "endLine": 876,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 874
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 49,
+          "endLine": 395,
+          "file": "COTRN02C.cbl",
+          "startColumn": 11,
+          "startLine": 393
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:83",
+        "operation": {
+          "domain": "operation",
+          "localId": "611aa691784f71a7d03cda9c73339a3d",
+          "publication": "5d89126b67c571516c261984b7fbd5ec",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CSUTLDTC",
+            "referenceName": "CSUTLDTC",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "637e50b669fb16e86dfceaa0bb073ef4",
+                  "publication": "5d89126b67c571516c261984b7fbd5ec"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "611aa691784f71a7d03cda9c73339a3d",
+                  "publication": "5d89126b67c571516c261984b7fbd5ec",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:83",
+        "operation": {
+          "domain": "operation",
+          "localId": "611aa691784f71a7d03cda9c73339a3d",
+          "publication": "75201915b24e1c02bbda1064604c71f1",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CSUTLDTC",
+            "referenceName": "CSUTLDTC",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "637e50b669fb16e86dfceaa0bb073ef4",
+                  "publication": "75201915b24e1c02bbda1064604c71f1"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "611aa691784f71a7d03cda9c73339a3d",
+                  "publication": "75201915b24e1c02bbda1064604c71f1",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/cbl/COTRN02C.cbl",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 42,
+          "endLine": 896,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 894
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 49,
+          "endLine": 415,
+          "file": "COTRN02C.cbl",
+          "startColumn": 11,
+          "startLine": 413
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:90",
+        "operation": {
+          "domain": "operation",
+          "localId": "2937505fd2dbb9f01afce2936f1f12ed",
+          "publication": "5d89126b67c571516c261984b7fbd5ec",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CSUTLDTC",
+            "referenceName": "CSUTLDTC",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "4a7a9fc978f28ebd6011e7f2b3bc0c89",
+                  "publication": "5d89126b67c571516c261984b7fbd5ec"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "2937505fd2dbb9f01afce2936f1f12ed",
+                  "publication": "5d89126b67c571516c261984b7fbd5ec",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:90",
+        "operation": {
+          "domain": "operation",
+          "localId": "2937505fd2dbb9f01afce2936f1f12ed",
+          "publication": "75201915b24e1c02bbda1064604c71f1",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CSUTLDTC",
+            "referenceName": "CSUTLDTC",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "4a7a9fc978f28ebd6011e7f2b3bc0c89",
+                  "publication": "75201915b24e1c02bbda1064604c71f1"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "2937505fd2dbb9f01afce2936f1f12ed",
+                  "publication": "75201915b24e1c02bbda1064604c71f1",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "app/cbl/CSUTLDTC.cbl",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 23,
+          "endLine": 120,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 116
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 30,
+          "endLine": 120,
+          "file": "CSUTLDTC.cbl",
+          "startColumn": 11,
+          "startLine": 116
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:8",
+        "operation": {
+          "domain": "operation",
+          "localId": "c8baf74dc28e962ff4b65a22c1163a2f",
+          "publication": "9b4b18b7280b8d1f2be52c5107821a44",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CEEDAYS",
+            "referenceName": "CEEDAYS",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "37f640c45dff9fbdf32c934a4521ff76",
+                  "publication": "9b4b18b7280b8d1f2be52c5107821a44"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "c8baf74dc28e962ff4b65a22c1163a2f",
+                  "publication": "9b4b18b7280b8d1f2be52c5107821a44",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:8",
+        "operation": {
+          "domain": "operation",
+          "localId": "c8baf74dc28e962ff4b65a22c1163a2f",
+          "publication": "9b4b18b7280b8d1f2be52c5107821a44",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CEEDAYS",
+            "referenceName": "CEEDAYS",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "37f640c45dff9fbdf32c934a4521ff76",
+                  "publication": "9b4b18b7280b8d1f2be52c5107821a44"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "c8baf74dc28e962ff4b65a22c1163a2f",
+                  "publication": "9b4b18b7280b8d1f2be52c5107821a44",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/CBTRN03C.cbl",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 17,
+          "endLine": 757,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 757
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 24,
+          "endLine": 630,
+          "file": "CBTRN03C.cbl",
+          "startColumn": 11,
+          "startLine": 630
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:91",
+        "operation": {
+          "domain": "operation",
+          "localId": "8ceae33b8a25883cbfbc4042b8887d8e",
+          "publication": "66bd94cbde7703941ae1f1ca8c704d87",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CEE3ABD",
+            "referenceName": "CEE3ABD",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "85fe08bcd297a568b39f9d41110ec290",
+                  "publication": "66bd94cbde7703941ae1f1ca8c704d87"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "8ceae33b8a25883cbfbc4042b8887d8e",
+                  "publication": "66bd94cbde7703941ae1f1ca8c704d87",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:91",
+        "operation": {
+          "domain": "operation",
+          "localId": "8ceae33b8a25883cbfbc4042b8887d8e",
+          "publication": "41b159b7716ddb903607d67238573e2c",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CEE3ABD",
+            "referenceName": "CEE3ABD",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "85fe08bcd297a568b39f9d41110ec290",
+                  "publication": "41b159b7716ddb903607d67238573e2c"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "8ceae33b8a25883cbfbc4042b8887d8e",
+                  "publication": "41b159b7716ddb903607d67238573e2c",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COACTUPC.cl2",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 34,
+          "endLine": 8007,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 8004
+        },
+        "includeChain": [
+          {
+            "includeLine": 4240,
+            "includedFile": "CSUTLDPY",
+            "includingFile": "COACTUPC.cl2",
+            "requestedName": "CSUTLDPY"
+          }
+        ],
+        "original": {
+          "endColumn": 41,
+          "endLine": 303,
+          "file": "CSUTLDPY",
+          "startColumn": 11,
+          "startLine": 300
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:576",
+        "operation": {
+          "domain": "operation",
+          "localId": "a7c39180db357cdc8af45d5d1422bd39",
+          "publication": "a3a409175f5d26aa30474cddbc640b4e",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CSUTLDTC",
+            "referenceName": "CSUTLDTC",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "6dbcce2b3eeff3626a8af724c52eb4c0",
+                  "publication": "a3a409175f5d26aa30474cddbc640b4e"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "a7c39180db357cdc8af45d5d1422bd39",
+                  "publication": "a3a409175f5d26aa30474cddbc640b4e",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:576",
+        "operation": {
+          "domain": "operation",
+          "localId": "a7c39180db357cdc8af45d5d1422bd39",
+          "publication": "85c4566e5b58e1f2896c5080548562d6",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CSUTLDTC",
+            "referenceName": "CSUTLDTC",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "6dbcce2b3eeff3626a8af724c52eb4c0",
+                  "publication": "85c4566e5b58e1f2896c5080548562d6"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "a7c39180db357cdc8af45d5d1422bd39",
+                  "publication": "85c4566e5b58e1f2896c5080548562d6",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/CORPT00C.cl2",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 50,
+          "endLine": 796,
+          "file": "<preprocessed>",
+          "startColumn": 12,
+          "startLine": 794
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 57,
+          "endLine": 394,
+          "file": "CORPT00C.cl2",
+          "startColumn": 19,
+          "startLine": 392
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:80",
+        "operation": {
+          "domain": "operation",
+          "localId": "9772efe5d3b9035827a546b447a3f467",
+          "publication": "dd90984df723d2abbfe855cbd7f5d497",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CSUTLDTC",
+            "referenceName": "CSUTLDTC",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "4a23d45bf05ac1e21699cfa0d1f0a973",
+                  "publication": "dd90984df723d2abbfe855cbd7f5d497"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "9772efe5d3b9035827a546b447a3f467",
+                  "publication": "dd90984df723d2abbfe855cbd7f5d497",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:80",
+        "operation": {
+          "domain": "operation",
+          "localId": "9772efe5d3b9035827a546b447a3f467",
+          "publication": "182df92a896d55be8f2c29d474e29880",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CSUTLDTC",
+            "referenceName": "CSUTLDTC",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "4a23d45bf05ac1e21699cfa0d1f0a973",
+                  "publication": "182df92a896d55be8f2c29d474e29880"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "9772efe5d3b9035827a546b447a3f467",
+                  "publication": "182df92a896d55be8f2c29d474e29880",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/CORPT00C.cl2",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 50,
+          "endLine": 816,
+          "file": "<preprocessed>",
+          "startColumn": 12,
+          "startLine": 814
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 57,
+          "endLine": 414,
+          "file": "CORPT00C.cl2",
+          "startColumn": 19,
+          "startLine": 412
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:87",
+        "operation": {
+          "domain": "operation",
+          "localId": "3568329b5e5d00cebbd88e3f0b0f10b1",
+          "publication": "dd90984df723d2abbfe855cbd7f5d497",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CSUTLDTC",
+            "referenceName": "CSUTLDTC",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "39733e5489731cfba097636f3e8d7c83",
+                  "publication": "dd90984df723d2abbfe855cbd7f5d497"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "3568329b5e5d00cebbd88e3f0b0f10b1",
+                  "publication": "dd90984df723d2abbfe855cbd7f5d497",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:87",
+        "operation": {
+          "domain": "operation",
+          "localId": "3568329b5e5d00cebbd88e3f0b0f10b1",
+          "publication": "182df92a896d55be8f2c29d474e29880",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CSUTLDTC",
+            "referenceName": "CSUTLDTC",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "39733e5489731cfba097636f3e8d7c83",
+                  "publication": "182df92a896d55be8f2c29d474e29880"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "3568329b5e5d00cebbd88e3f0b0f10b1",
+                  "publication": "182df92a896d55be8f2c29d474e29880",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COTRN02C.cl2",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 42,
+          "endLine": 876,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 874
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 49,
+          "endLine": 395,
+          "file": "COTRN02C.cl2",
+          "startColumn": 11,
+          "startLine": 393
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:83",
+        "operation": {
+          "domain": "operation",
+          "localId": "611aa691784f71a7d03cda9c73339a3d",
+          "publication": "af9cca72acd0f24aea968cf52df9f6d0",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CSUTLDTC",
+            "referenceName": "CSUTLDTC",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "637e50b669fb16e86dfceaa0bb073ef4",
+                  "publication": "af9cca72acd0f24aea968cf52df9f6d0"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "611aa691784f71a7d03cda9c73339a3d",
+                  "publication": "af9cca72acd0f24aea968cf52df9f6d0",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:83",
+        "operation": {
+          "domain": "operation",
+          "localId": "611aa691784f71a7d03cda9c73339a3d",
+          "publication": "230270b2ce1c82d5e75fafb190c5ac73",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CSUTLDTC",
+            "referenceName": "CSUTLDTC",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "637e50b669fb16e86dfceaa0bb073ef4",
+                  "publication": "230270b2ce1c82d5e75fafb190c5ac73"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "611aa691784f71a7d03cda9c73339a3d",
+                  "publication": "230270b2ce1c82d5e75fafb190c5ac73",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COTRN02C.cl2",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 42,
+          "endLine": 896,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 894
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 49,
+          "endLine": 415,
+          "file": "COTRN02C.cl2",
+          "startColumn": 11,
+          "startLine": 413
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:90",
+        "operation": {
+          "domain": "operation",
+          "localId": "2937505fd2dbb9f01afce2936f1f12ed",
+          "publication": "af9cca72acd0f24aea968cf52df9f6d0",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CSUTLDTC",
+            "referenceName": "CSUTLDTC",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "4a7a9fc978f28ebd6011e7f2b3bc0c89",
+                  "publication": "af9cca72acd0f24aea968cf52df9f6d0"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "2937505fd2dbb9f01afce2936f1f12ed",
+                  "publication": "af9cca72acd0f24aea968cf52df9f6d0",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:90",
+        "operation": {
+          "domain": "operation",
+          "localId": "2937505fd2dbb9f01afce2936f1f12ed",
+          "publication": "230270b2ce1c82d5e75fafb190c5ac73",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CSUTLDTC",
+            "referenceName": "CSUTLDTC",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "4a7a9fc978f28ebd6011e7f2b3bc0c89",
+                  "publication": "230270b2ce1c82d5e75fafb190c5ac73"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "2937505fd2dbb9f01afce2936f1f12ed",
+                  "publication": "230270b2ce1c82d5e75fafb190c5ac73",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    },
+    {
+      "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/CSUTLDTC.cbl",
+      "provenance": {
+        "exact": true,
+        "expanded": {
+          "endColumn": 23,
+          "endLine": 148,
+          "file": "<preprocessed>",
+          "startColumn": 4,
+          "startLine": 144
+        },
+        "includeChain": [],
+        "original": {
+          "endColumn": 30,
+          "endLine": 148,
+          "file": "CSUTLDTC.cbl",
+          "startColumn": 11,
+          "startLine": 144
+        }
+      },
+      "candidatesChanged": false,
+      "before": {
+        "statement": "statement:8",
+        "operation": {
+          "domain": "operation",
+          "localId": "c8baf74dc28e962ff4b65a22c1163a2f",
+          "publication": "50e6b43c934b900960e925c81c62ef20",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CEEDAYS",
+            "referenceName": "CEEDAYS",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "37f640c45dff9fbdf32c934a4521ff76",
+                  "publication": "50e6b43c934b900960e925c81c62ef20"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "c8baf74dc28e962ff4b65a22c1163a2f",
+                  "publication": "50e6b43c934b900960e925c81c62ef20",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      },
+      "after": {
+        "statement": "statement:8",
+        "operation": {
+          "domain": "operation",
+          "localId": "c8baf74dc28e962ff4b65a22c1163a2f",
+          "publication": "50e6b43c934b900960e925c81c62ef20",
+          "unit": "unit"
+        },
+        "classification": "PARTIAL_RESOLVED",
+        "reachability": "REACHABLE",
+        "candidates": [
+          {
+            "rawValue": "CEEDAYS",
+            "referenceName": "CEEDAYS",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "37f640c45dff9fbdf32c934a4521ff76",
+                  "publication": "50e6b43c934b900960e925c81c62ef20"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "c8baf74dc28e962ff4b65a22c1163a2f",
+                  "publication": "50e6b43c934b900960e925c81c62ef20",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "modelValueRemainder": false,
+        "sourceValueRemainder": true,
+        "interpretationUnknownRemainder": true,
+        "effectiveUnknownRemainder": true,
+        "openControlRemainder": true
+      }
+    }
+  ],
+  "potentialImpactMeaning": "Unique sites contained by an EVALUATE-derived Opaque control bound, per program. Potential membership, not causal attribution.",
+  "remediationValidation": {
+    "previousLower": "5d450768690b39823fee4b8bce5639292245f252",
+    "finalLower": "b61204e6959c6454b4bc4961acf265d99536a237",
+    "previousMeasurements": "/tmp/evaluate-carddemo/full/measurements.json",
+    "previousComparisonCommit": "7686a21534585949037dc5290ba107d8beba840f",
+    "callSitesChecked": 73,
+    "identicalDependencyProducts": 67,
+    "fieldsChecked": [
+      "candidateValues",
+      "classification",
+      "reachability",
+      "modelValueRemainder",
+      "sourceValueRemainder",
+      "interpretationUnknownRemainder",
+      "effectiveUnknownRemainder",
+      "openControlRemainder"
+    ],
+    "candidateRemainderRegressions": [],
+    "fullRecovery": {
+      "reason": "Disk quota exceeded on /tmp; successful records and all failed raw files preserved",
+      "reusedPrograms": 25,
+      "resumedPrograms": 48,
+      "interruptedLog": "/tmp/evaluate-finding-20260913/full.log",
+      "resumedLog": "/tmp/evaluate-finding-20260913/resume.log",
+      "interruptedMeasurements": "/tmp/evaluate-finding-20260913/full/measurements.json"
+    }
+  }
+}
