@@ -1,145 +1,143 @@
-# PERFORM family — cumulative evaluation in progress
+# PERFORM FAMILY LONG-RUNNING — READY FOR HUMAN REVIEW
 
-Goal: THRU/THROUGH + UNTIL + TIMES + single-variable VARYING end-to-end.
-Human review is reserved for the completed wave. No merge performed.
-Baseline merges and the unchanged CardDemo snapshot are in
-[pins](carddemo-perform-family-pins.json).
+THRU/THROUGH, UNTIL, TIMES and single-variable VARYING are implemented end-to-end
+and cumulatively qualified. No merge performed. Roadmap authority: **HUMAN**.
+The wave uses one `feat/perform-family` branch and one Draft PR per affected repo.
 
-## Phase 1 checkpoint — THRU GREEN
+The control gain is demonstrated by the supported focal profiles: typed ordered
+ranges, activation-specific resumes, BEFORE/AFTER decisions, one-time TIMES
+count reads and localized VARYING initialization/update writes. **CardDemo has
+no real CALL candidate gain:** 373 occurrences now carry typed procedure facts,
+but all remain partial; no structured activation is claimed in this corpus.
 
-Frontend `68ccdbff9bad0e4a43a82d43c904231d8ee32eb5`, lower
-`5ce1705ae1906080aaa7537ad56f2a6f7e70c55b`, CFG production unchanged.
-FAST: frontend 130 tests PASS; lower PASS; CFG PASS.
-Focused THRU: 23 fixtures PASS, including multiplicity 1/2/5/40,
-source/AIR permutations, byte determinism, adversarial ranges and composed bodies.
-Cumulative E2E: GO TO 23/23, EVALUATE 18/18, historical BASIC PERFORM,
-MOVE, Multi-CALL, IF and partial/input 38/38.
+## Immutable snapshots
 
-Affected qualification used 19 programs selected by typed THRU references in the
-historical AST. Their 419 PERFORM occurrences include 371 with THRU/THROUGH;
-365 now have typed range facts, all partial. Six combine later loop controls.
-The remaining 54 PERFORM occurrences are outside this phase's profile.
-Missing COPY/input, unsupported boundaries/control, incoming edges and unproved
-primary isolation remain explicit. No closed range is claimed in this cohort.
+[Exact pins and baseline equivalence](carddemo-perform-family-pins.json).
+Historical GO TO measurements use pre-merge producer SHAs with identical
+production/build inputs to the actual baseline merges; the five CFG differences
+are evaluation/work metadata and are listed in the pins.
 
-Dependency: 19 → 19 programs; 27 → 27 analyzed CALL sites, all with known
-candidates and PARTIAL_RESOLVED. All 27 candidate/classification/reachability/
-remainder vectors are unchanged. Additions 0; removals 0; unexpected regressions 0.
-Remainders: model value 0, source value 27, interpretation unknown 27,
-effective unknown 27, open control 27. Result: NO_REAL_CALL_CANDIDATE_GAIN.
+| Repository | Baseline main merge | Final execution snapshot |
+| --- | --- | --- |
+| proleap-poc #43 | `f62e4cf2792d518de5f4f9c753d0d86e92d3f755` | `642ba4b3aeaffdfa0942f3fb462a4be17070d0d1` |
+| cobol-lower #20 | `715f196369d1e82cfd7e4affb31ee34dc73c0e2d` | `e8cdc95491b7225c2c899e6f4dc229f64f26a8d7` |
+| analysis-cfg #29 | `51beeb1859689dc83e16aca9cc8a1fc9fc7e0bc7` | `982179c812ff526e9e6095ea3feaffa5e42c7985` |
+| air-java | `96cd5e545723c6fd76d1520f431ebbc196af84f6` | `8be19ff385b42a5987a407acc464319d212081c3` |
 
-Raw runs are preserved locally under `.harness-results/perform-family/`:
-`thru-provenance`, `goto-thru-final`, `evaluate-thru-final`,
-`historical-thru-final`, `carddemo-thru`, `carddemo-thru-delta.json`.
-The provenance fix was additionally replayed against all 19 corpus SPs:
-`thru-lower-replay` proves byte-identical AIR, so its existing CFG/dependency
-outputs remain applicable. Historical GO TO producer trees equal their actual
-merge trees; CFG differs only in evaluation files, not production/build inputs.
+CardDemo remains `59cc6c2fd7ebd7ef7925cad552a01a4b8b6e4d5e`; sources and missing
+COPY/dependency inputs were unchanged. `analysis-ir` remains
+`51b4d9a8ae0364232bd97103cd73a77e1a34996c`.
+Later evaluation-only commits do not replace these execution pins.
 
-## Phase 2 checkpoint — UNTIL GREEN; THRU regression GREEN
+## Cumulative qualification
 
-Frontend `a622c084707d8fd3750c75152bde6a008b221981`, lower
-`36f5a7ccaa8747633e4f8aaceea12ec1bc88a117`, evaluation
-`4d9f3bdff66a4363c6f558f27af427d08b06ea43`; CFG production unchanged.
-SP 2.3 preserves 2.2 decoding. Default/explicit TEST BEFORE permits zero
-iterations; TEST AFTER executes the body before its first decision. Predicates
-retain typed reads and unknown truth. No pruning or iteration unrolling.
+| Family | Focal/adversarial E2E | Result |
+| --- | ---: | --- |
+| THRU / THROUGH | 23 | PASS: typed range, composed bodies and activation-specific resumes |
+| UNTIL | 19 | PASS: default/explicit BEFORE, AFTER, fixed point and THRU composition |
+| TIMES | 18 | PASS: positive literals, conservative identifier, THRU and no unrolling |
+| VARYING | 28 | PASS: single variable, FROM/BY effects, condition reads, TEST modes and THRU |
+| Mixed families + BASIC | 1 | PASS |
 
-FAST frontend 131 tests PASS; lower PASS; CFG PASS. THRU+UNTIL 42/42;
-GO TO 23/23; EVALUATE 18/18; historical regressions 38/38. UNTIL includes
-BEFORE/AFTER candidate oracles, fixed point, THRU/BASIC composition,
-multiplicity 1/2/5/40, partial/adversarial controls and byte/order determinism.
-Final frontend replay reproduces identical SP for all 42 cases; final lower
-class files equal the tested runtime. Raw evidence: `phase2-cumulative`,
-`goto-phase2`, `evaluate-phase2`, `historical-phase2`, `until-frontend-replay.json`.
+**89/89 PERFORM E2E PASS.** All applicable families pass 1/2/5/40 callsites,
+SP/AIR/CFG/dependency A/B bytes, statement-inventory and JSON-field permutations,
+and AIR-sequence permutations. Candidates retain source-derived MOVE/literal-CALL
+supports. UNTIL/VARYING BEFORE preserves OLDPROG+NEWPROG; AFTER preserves NEWPROG
+alone after the body strong update. Literal 1/5/1000000 TIMES each has one static
+body: 6 sequences, 8 operations and 2 text assignments in its focal publication.
 
-Affected qualification: 21 programs, 479 PERFORM occurrences, 373 typed partial
-procedure facts; 371/371 THRU typed and 8/8 out-of-line UNTIL typed. Structured
-activations remain 0 in this cohort; 106 occurrences remain outside the profile.
-Dependency: 21 → 21 programs; 45 → 45 known-candidate CALL sites, all partial.
-All 45 site vectors preserved; candidate changes/additions/removals 0;
-unexpected regressions 0. Remainders: model 0, source/interpretation/effective/
-open-control 45 each. NO_REAL_CALL_CANDIDATE_GAIN.
+Adversarial tests cover dangling identities, wrong endpoints/resume, overlap,
+ordinary incoming/escaping GO TO, cycles, recursive activation, open continuation,
+contradictory proofs, unresolved/unsupported operands and conditions. Contradictions
+are INVALID_INPUT or conservative fallback; no fabricated finite return is admitted.
 
-Did UNTIL change or regress a result already produced by THRU? **No.**
-The separately compared 19-program THRU cohort preserves all 27 site vectors,
-including candidates, classification, reachability and all five remainders.
-Raw evidence: `carddemo-until`, `carddemo-until-delta.json`,
-`carddemo-thru-after-until-delta.json`; the latter uses a declared subset view
-of the original unchanged measurement records.
+GO TO **23/23**, EVALUATE **18/18**, historical BASIC PERFORM, MOVE, IF,
+Multi-CALL and ENTRY/partial/compositional lowering **38/38 PASS**.
+Frontend FAST **139 tests PASS**; lower, CFG and AIR FAST **PASS**.
+Remote CI is **FAST ONLY**, with successful runs for all productive heads.
+Final qualification-local: frontend **PASS** (629 executed tests; one existing
+future-condition opt-in test skipped), lower **PASS**, AIR **PASS** (179 model +
+110 transport checks). No inventory or historical baseline was changed to get PASS.
+A local CFG inventory check failed during concurrent shared dependency builds;
+an independent capture matched the unchanged baseline and a serialized full FAST
+rerun passed. Raw failed and successful runs remain preserved.
 
-No Full corpus run has been performed in this wave. Continue to TIMES/VARYING.
+SP evolves through 2.2 range, 2.3 loop, 2.4 count/integer declaration and 2.5 VARYING
+wire shapes. Historical SP 1.x, 2.0 and 2.1 decoders, plus intermediate wave
+versions, remain available. Semantic authority and boundaries are documented in
+[frontend PERFORM semantics](https://github.com/Gustavo2358/proleap-poc/blob/642ba4b3aeaffdfa0942f3fb462a4be17070d0d1/docs/domain/perform-family.md)
+and [lowering rules](https://github.com/Gustavo2358/cobol-lower/blob/e8cdc95491b7225c2c899e6f4dc229f64f26a8d7/docs/domain/perform-family.md),
+using the official IBM Enterprise COBOL 6.4 Language Reference.
 
+## Affected corpus and one final Full
 
-## Phase 3 implementation boundary discovered
+Phase 1 qualified 19 THRU programs and preserved 27 CALL vectors. Phase 2 qualified
+21 cumulative programs and preserved 45 vectors; its separate THRU comparison
+preserved all 27. The final affected run again qualified those 21 programs and
+preserved all 45 vectors against the baseline and UNTIL, and all 27 against THRU.
+**TIMES/VARYING did not regress any earlier THRU or UNTIL result.**
 
-The pinned AIR model already represents `known(int)`, but its JSON codec rejected
-that type. The wave's `air-java` Draft PR #13 adds that existing generic transport
-form; AIR and binding versions remain unchanged. PossibleValues also rejected
-an entire publication if any direct cell was non-text. Its conservative auxiliary
-integer admission will keep those cell values open and restrict candidate queries
-to text objects. A single source-derived disjointness premise must still cover
-all admitted cells, including auxiliary ones. Localized integer writes then leave
-independent text candidates unchanged; all-memory effects still open text values.
-This is a generic profile-admission extension, not numeric evaluation, lattice,
-solver or CFG projection work. The existing per-cell effect transfer is reused.
-Oracle: text PROGA survives a disjoint integer must-write, a numeric query is
-unsupported, an all-memory may-write opens PROGA, and missing disjointness refuses.
+After all cumulative gates and affected comparisons passed, **exactly one final
+Full** attempted all 73 historical sources. 67 reached SP → AIR → CFG → dependency;
+the six historical frontend blockers retained identical stage states and reason
+codes. Full qualification is PASS with those unchanged input boundaries, not a
+claim of complete semantics for every source. No stubs, new COPY dependencies or
+source edits were used.
 
+There are **1,829 observed PERFORM occurrences in the 67 available SP publications**:
 
-## Phase 3A checkpoint — TIMES GREEN; THRU/UNTIL regression GREEN
+| Family | Occurrences | Out of line | Typed | Structured/precise | Typed partial | Unsupported |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| THRU | 371 | 371 | 371 | 0 | 371 | 0 |
+| UNTIL | 45 | 8 | 8 | 0 | 8 | 37 |
+| TIMES | 0 | 0 | 0 | 0 | 0 | 0 |
+| VARYING | 24 | 0 | 0 | 0 | 0 | 24 |
 
-Frontend `2a9c3ebf09257c213ed3b78b3f6c364bdc1c16ac`, lower
-`b0d0cd03156f42623f8e6bb503c9a30e6b19b3e4`, auxiliary-cell admission
-`d723dace8844311e26057e13de2f47a6602377e6`, AIR codec
-`8be19ff385b42a5987a407acc464319d212081c3`. SP 2.4 preserves all older decoders.
+THRU+UNTIL contributes to both family rows: 373 distinct typed partial facts.
+The remaining **1,456 unsupported** occurrences are 1,395 unproved procedure/ONCE,
+37 inline UNTIL and 24 inline VARYING. There are no out-of-line TIMES or VARYING
+occurrences in this snapshot. Missing input, unproved primary isolation, paragraph
+boundaries, incoming control, range control and overlap remain explicit gaps.
 
-THRU+UNTIL+TIMES 60/60 PASS; GO TO 23/23; EVALUATE 18/18; historical 38/38.
-TIMES includes literal 1/5/1000000, identifier count, THRU, multiplicity 1/2/5/40,
-partial counts/ranges, contradictory proofs, A/B bytes and physical permutations.
-The three literal count fixtures each have 6 sequences, 8 operations and 2
-Assigns: the initial text write and one body write. The identifier is read only
-at activation entry; exhaustion decisions never reread it.
-FAST frontend 132 tests PASS; lower PASS; CFG PASS; AIR PASS. AIR local
-qualification also PASS: 179 model + 110 transport deterministic checks via Maven
-clean verify. CFG projection production remains unchanged; the generic
-PossibleValues admission boundary described above is the only dataflow change.
-No lattice, solver, numeric value analysis or Reaching Definitions change.
+Dependency programs **67 → 67**; analyzed CALL sites **73 → 73**; known-candidate
+sites **73 → 73**. All 73 candidate/classification/reachability/remainder vectors
+are preserved, including 28 sites outside the affected program cohort.
+Changed candidate sites **0**, additions **0**, removals **0**; unexpected regressions
+**NONE**. Closed **0**, partial **73**, open **0**. Result: **NO_REAL_CALL_CANDIDATE_GAIN**.
 
-Raw evidence: `times-focal-02`, `times-cumulative`, `goto-times`, `evaluate-times`,
-`historical-times`, `times-static-size.json`. Failed discoveries remain preserved.
-Final cumulative affected corpus qualification follows VARYING. No Full corpus
-run has been performed. Continue immediately to single-variable VARYING.
+| Remainder | Before | After |
+| --- | ---: | ---: |
+| modelValueRemainder | 0 | 0 |
+| sourceValueRemainder | 73 | 73 |
+| interpretationUnknownRemainder | 73 | 73 |
+| effectiveUnknownRemainder | 73 | 73 |
+| openControlRemainder | 73 | 73 |
 
+## Production boundary and handoff
 
-## Phase 3B checkpoint — complete PERFORM family GREEN
+CFG projection production change: **NONE**. Two generic supporting changes were
+necessary: AIR JSON transport of the existing `known(int)` type, and PossibleValues
+admission of disjoint auxiliary integer cells while queries remain TEXT-only
+(`d723dace8844311e26057e13de2f47a6602377e6`). Existing effect transfer and fixed point
+are reused. No new AIR operation, numeric evaluation, solver, lattice or RD.
 
-Frontend `642ba4b3aeaffdfa0942f3fb462a4be17070d0d1`, lower
-`e8cdc95491b7225c2c899e6f4dc229f64f26a8d7`, cumulative E2E
-`519272ffaaefad1fc785fc3370554e156b28a437`; AIR codec unchanged at the Phase 3A pin.
-SP 2.5 adds typed control-variable/FROM/BY operands and explicit VARYING levels.
-The shared UNTIL decision models BEFORE and AFTER, with initialization before
-entry and AFTER increments only on the repeat path. Integer values stay open;
-initialization/update must-write only the proved control item. FROM reads,
-implicit increment reads, subscript reads and provenance are retained.
-Multi-level AFTER remains explicitly typed and conservative.
+VARYING initialization and increments must-write only the known control item with
+open numeric values. TEST AFTER is supported; multi-level **AFTER is explicitly
+typed/conservative outside the slice**. Unknown nonzero BY proof and unsupported
+numeric/condition/range profiles remain partial. Inline PERFORM remains outside
+this wave. UNTIL reuses the existing scalar TEXT equality predicate profile;
+VARYING also admits simple integer relations. Other conditions remain partial.
 
-Cumulative E2E: 89/89 PASS (23 THRU, 19 UNTIL, 18 TIMES, 28 VARYING,
-plus one mixed program composing all families and BASIC PERFORM).
-Includes 1/2/5/40 callsites per family, A/B byte determinism at SP/AIR/CFG/dependency,
-physical statement/JSON-field/AIR-sequence permutations, precise candidate oracles,
-partial/adversarial control and source-derived candidate supports.
-GO TO 23/23, EVALUATE 18/18, historical BASIC/MOVE/Multi-CALL/IF/partial/input 38/38.
-Frontend FAST 139 tests PASS; lower FAST PASS; CFG FAST PASS; AIR FAST PASS.
-All four Draft PRs have successful remote Fast CI runs at their productive heads.
-Final qualification-local: frontend PASS (629 executed tests; one historical
-future-condition opt-in test skipped), lower PASS, AIR PASS. Frozen historical
-facts and bytes are unchanged; additive null integer metadata is checked explicitly.
-An initial local CFG inventory check failed during concurrent shared dependency
-builds; an independent capture matched the unchanged inventory, and a serialized
-complete CFG FAST rerun passed. No inventory baseline was changed.
+[Small machine-readable delta](carddemo-after-perform-family.json) includes the
+historical blockers and raw measurement hashes. Immutable raw SP/AIR/CFG/dependency,
+logs, A/B runs and comparisons remain under `.harness-results/perform-family/`,
+including `varying-cumulative`, `carddemo-family-affected`, `carddemo-family-full`,
+`carddemo-until-after-family-delta.json` and `carddemo-thru-after-family-delta.json`.
+The prior green checkpoints remain auditable in the branch history.
 
-Raw evidence: `varying-cumulative`, `goto-final`, `evaluate-final`,
-`historical-final`; runtime artifacts are immutable jars with SHA-256 hashes.
-Final affected qualification and the single final Full corpus run follow this
-checkpoint. No Full corpus run has yet been performed.
+Draft PRs: [frontend #44](https://github.com/Gustavo2358/proleap-poc/pull/44),
+[lower #21](https://github.com/Gustavo2358/cobol-lower/pull/21),
+[evaluation/values #30](https://github.com/Gustavo2358/analysis-cfg/pull/30),
+[existing int transport #13](https://github.com/Gustavo2358/air-java/pull/13).
+
+**No merge performed. Roadmap authority HUMAN.**

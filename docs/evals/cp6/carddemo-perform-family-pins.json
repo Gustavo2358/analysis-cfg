@@ -11,5 +11,40 @@
     "commit": "59cc6c2fd7ebd7ef7925cad552a01a4b8b6e4d5e"
   },
   "decisionPolicy": "HUMAN",
-  "rankingAuthority": "ADVISORY_ONLY"
+  "rankingAuthority": "ADVISORY_ONLY",
+  "analysisRepositories": {
+    "air-java": "8be19ff385b42a5987a407acc464319d212081c3",
+    "proleap-poc": "642ba4b3aeaffdfa0942f3fb462a4be17070d0d1",
+    "cobol-lower": "e8cdc95491b7225c2c899e6f4dc229f64f26a8d7",
+    "analysis-cfg": "982179c812ff526e9e6095ea3feaffa5e42c7985"
+  },
+  "semanticProductVersion": "2.5.0",
+  "historicalBeforeAnalysisRepositories": {
+    "air-java": "96cd5e545723c6fd76d1520f431ebbc196af84f6",
+    "proleap-poc": "3842239551153e98590744ceb8b1e730885b1bbd",
+    "cobol-lower": "2dd97f4fb07eadb2a5cb76d94f94f587aa59a175",
+    "analysis-cfg": "f7c12eaac5d9b6b08c51e923491bce517f3f692b"
+  },
+  "baselineProductionEquivalence": {
+    "proleap-poc": {
+      "productionAndBuildUnchanged": true,
+      "evaluationAndWorkMetadataChanges": []
+    },
+    "cobol-lower": {
+      "productionAndBuildUnchanged": true,
+      "evaluationAndWorkMetadataChanges": []
+    },
+    "analysis-cfg": {
+      "productionAndBuildUnchanged": true,
+      "evaluationAndWorkMetadataChanges": [
+        "docs/evals/cp6/carddemo-after-goto.json",
+        "docs/evals/cp6/carddemo-after-goto.md",
+        "docs/evals/cp6/carddemo-goto-pins.json",
+        "docs/work/active/WORK-CFG-041.yaml",
+        "scripts/project/carddemo_goto.py"
+      ]
+    }
+  },
+  "cfgProductionChange": "d723dace8844311e26057e13de2f47a6602377e6",
+  "note": "analysisRepositories are exact clean snapshots used by final affected and Full runs. Later evaluation-only commits do not alter these immutable execution pins."
 }
