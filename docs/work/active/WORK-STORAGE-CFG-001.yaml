@@ -8,3 +8,8 @@ scope:
   - ST-W3/W4 regional values and dependency projection; ST-W5 fragments/copy/joins/context/provenance.
   - Cumulative FAST, E2E, adversarial/mutation and final local corpus qualification; no W6-W8 or merge.
 notes: One campaign branch and persistent draft PR, with human review after qualified W5 only.
+design_w1:
+  authority: AIR codec extension 12 at a928791; air-java model/validator/JSON at 3feccca.
+  change: Exact IBM1047 capability admission for sequential control after validator preflight; original operations retained.
+  oracle: Manual regional wire, CopyBytes followed by computed CALL and Return, independent topology and concrete byte expectation.
+  boundaries: No storage/value analysis in BuildCfg; other capability names or versions remain unsupported.

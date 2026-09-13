@@ -118,3 +118,18 @@ local/indireta/desconhecida continua dependendo da negociação existente; regis
 identidade não implementa semântica. O manifesto obrigatório nunca é dispensado.
 
 O transporte de Invoke declara explicitamente [analysis-cfg-json 2.0.0](../architecture/cfg-json-v2.md); grafos do domínio anterior continuam em v1.
+
+## ST-W1 — capability de codec no papel de controle
+
+O pin AIR `a9287917241a70665ad8d3d32d974928690e69f3` define a extensão opcional
+`text.ebcdic.ibm1047@1`; o pin air-java `3fecccabd68c81946ae089a9e4b4fc605d234722`
+valida domínio, limites e pureza e transporta as formas regionais. Após esse
+preflight, o core pode conservar controle sequencial e a operação CopyBytes sem
+interpretar bytes. A capability é admitida exatamente por nome/versão nesse papel,
+sem admitir outras versões/codecs ou acrescentar execução de RD/values ao BuildCfg.
+
+O FAST cobre AIR manual por arquivo, Assign de bytes, CopyBytes, vista IBM1047,
+CALL calculado e Return. Compara topologia/correlações e observações arquivo/memória,
+preserva PARTIAL, origem, fallback e inteiro maior que 64 bits. A tabela de codec
+é compartilhada por air-java; nenhum charset ambiental ou regra fonte entra no CFG.
+Controle preciso não significa valor de CALL já calculado: isso pertence a W2/W3.

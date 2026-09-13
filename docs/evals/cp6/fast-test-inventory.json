@@ -257,7 +257,8 @@
       "outputLimitPreservesExistingDestinationBeforeAnyTemp",
       "nonBuiltResultCannotBeSerializedOrPublished",
       "resourceLimitPreservesTypedCodecIssues",
-      "unsupportedCapabilityRemainsACodecFailure"
+      "unsupportedCapabilityRemainsACodecFailure",
+      "regionalFileCopyThenComputedCallPreservesControlAndCodec"
     ],
     "io.github.gustavo2358.analysis.cfg.adapters.W1dInvokeWireTest": [
       "realInvokeRetainsDistinctTerminatorAndTransitionInExistingCfgWire",
