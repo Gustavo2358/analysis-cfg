@@ -288,18 +288,29 @@
       "unknownIsNotEmptyAndKnownSliceUsesItsOriginalOffset",
       "partialWriteKeepsSuffixAndPartialUnknownInvalidatesWholeRead",
       "copiesCaptureImmutableImageAndOverlapReadsOldBytes",
-      "unknownTailAndHugeExtentRemainSparseAndZeroIsIdentity"
+      "unknownTailAndHugeExtentRemainSparseAndZeroIsIdentity",
+      "copySupportsAloneChangeEqualityAndConvergeAsStaticSets"
     ],
     "io.github.gustavo2358.analysis.values.RegionalValuesTest": [
       "missingStateIsUnknownAndUnreachableIsSeparate",
       "unknownPrefixPreservesKnownSuffixAndCannotReviveWholeCandidate",
-      "w3DoesNotClaimUnqualifiedFragmentComposition",
+      "composedWholeRetainsTheIndependentlyReadableHalves",
       "branchAndLoopSupportsConvergeWithoutPathHistories",
       "sameBytesDifferentCodecsProduceDifferentText",
       "identicalInitialConditionsRetainBothSupportsAndConflictsAreRefused",
       "scalarAndRegionCoexistOnlyExplicitSeparationClosesTheOtherBase",
       "wholeAreaCopyCapturesItsSourceBeforeLaterAssignment",
       "finiteConcreteOracleChecksFullWritesJoinsLoopsAndMissingBranches"
+    ],
+    "io.github.gustavo2358.analysis.values.RegionalCompositionTest": [
+      "extendedDomainHasAnExplicitProfileAndRejectsTheOldKey",
+      "partialLiteralComposesTwoProducers",
+      "branchHalvesStayInTheirOriginalImage",
+      "crossBasePartialCopyPreservesBranchPairs",
+      "oneDestinationChoiceCannotWriteBothHalves",
+      "overlappingCopyLoopHasExactlyTheFiniteConcreteImages",
+      "jointStoreJoinLawsAndTransfersIncludeUnknownAndSupportOnlyChanges",
+      "copyConnectedInventoryPermutationPreservesFactsAndSupports"
     ]
   },
   "cfg-adapters": {

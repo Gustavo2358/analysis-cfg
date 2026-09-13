@@ -47,4 +47,17 @@ class ByteImageTest {
         assertTrue(tail.extent().isEmpty());assertTrue(tail.read(range(0,8)).bytes().isEmpty());
         assertThrows(IllegalArgumentException.class,()->image.write(range(0,4),ByteImage.literal(new Values.BytesValue(List.of(1,2)),1)));
     }
+    @Test void copySupportsAloneChangeEqualityAndConvergeAsStaticSets() {
+        var initial=ByteImage.literal(new Values.BytesValue(List.of(65,66,67,68)),1);
+        var first=initial.copied(2);assertNotEquals(initial,first);
+        assertEquals(initial.read(range(0,4)).bytes(),first.read(range(0,4)).bytes());
+        assertSame(first,first.copied(2));
+        var both=first.copied(3);assertNotEquals(first,both);assertSame(both,both.copied(2).copied(3));
+        assertEquals(Set.of(2,3),both.parts().getFirst().copies());
+        var shifted=initial;
+        for(int i=0;i<30;i++)shifted=shifted.write(range(1,3),shifted.slice(range(0,3)).copied(4));
+        assertEquals(List.of(65,65,65,65),shifted.read(range(0,4)).bytes().orElseThrow().octets());
+        for(var part:shifted.parts()){assertTrue(part.producerOffset().compareTo(BigInteger.valueOf(4))<0);assertTrue(part.payloadOffset()<4);}
+        assertEquals(shifted,shifted.write(range(1,3),shifted.slice(range(0,3)).copied(4)));
+    }
 }

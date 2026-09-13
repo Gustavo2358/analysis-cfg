@@ -51,10 +51,10 @@ class RegionalValuesTest {
         assertEquals(List.of("ABCDEFGH"),texts(at(execution,"erase-prefix",WHOLE)));
         var after=execution.observe(List.of(new PointQuery<>(ProgramPoint.after(new EntryId(U,"entry"),h.id()),SUFFIX))).observations().getFirst().value();assertEquals(List.of("EFGH"),texts(after));
     }
-    @Test void w3DoesNotClaimUnqualifiedFragmentComposition() {
+    @Test void composedWholeRetainsTheIndependentlyReadableHalves() {
         var execution=run(regional(List.of(returning(U,"s0",List.of(assign(U,"whole-write",WHOLE,"ABCDEFGH"),assign(U,"prefix-write",PREFIX,"WXYZ"))))));
         assertEquals(List.of("WXYZ"),texts(at(execution,"return-s0",PREFIX)));assertEquals(List.of("EFGH"),texts(at(execution,"return-s0",SUFFIX)));
-        var whole=at(execution,"return-s0",WHOLE);assertTrue(whole.modelValueRemainder());assertTrue(whole.modelReasons().contains("FRAGMENT_COMPOSITION_PENDING"));
+        var whole=at(execution,"return-s0",WHOLE);assertFalse(whole.modelValueRemainder());assertEquals(List.of("WXYZEFGH"),texts(whole));
     }
     @Test void branchAndLoopSupportsConvergeWithoutPathHistories() {
         var b=branch(U,"s0","a","b");var a=jump(U,"a","join");var c=jump(U,"b","join");var join=branch(U,"join","s0","exit");

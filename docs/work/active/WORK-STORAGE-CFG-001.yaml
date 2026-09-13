@@ -28,3 +28,8 @@ design_w4:
   integration: Seventeen independent source recipes cover both overlay directions, larger/smaller footprint, nested FILLER, disjoint sibling/half, descending internal levels, copybook, 1/2/5/40 same-name components, scalar INT mixture and two conservative negatives.
   gates: Development E2E and repository FAST passed after correcting two fixture/adapter errors; cumulative A/B, inventory permutations and mutations remain required before M2.
   boundaries: Generic AIR analysis unchanged; same bytes with different codecs remain different interpretations. Multi-producer candidate composition remains pending W5.
+design_w5:
+  contract: docs/domain/regional-values.md
+  progress: M2 qualified in the campaign receipt; W5.1 joint image domain and exclusive destination effects under focal verification.
+  oracle: Five independent composition/correlation/overlap tests first failed semantically, then passed; join laws and support-only equality also passed.
+  boundaries: RegionalValues 2 and regional-text-images@2 identify the extended domain; RegionalValueFact@1 and legacy scalar wire remain compatible. No path witness or arbitrary candidate cap.

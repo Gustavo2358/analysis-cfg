@@ -8,6 +8,8 @@ import java.util.*;
 /** Canonical AIR memory semantics, prepared outside the solver and shared by RD and values. */
 public final class StatementEffects {
     public enum Strength { MUST, MAY }
+    /** One evaluated destination is distinct from an effect that can touch a set of locations. */
+    public enum Selection { SINGLE_DESTINATION, MAY_SET }
     public enum ReadKind { VALUE, ADDRESS, TARGET, FOREIGN }
     public sealed interface Source permits ExpressionSource, CapturedBytes, UnknownSource { }
     public record ExpressionSource(Expression value) implements Source { }
@@ -17,8 +19,12 @@ public final class StatementEffects {
     public record Target(StorageIndex.Location location,Strength strength,boolean sourceApplicable,List<PremiseId> premises,List<String> reasons) {
         public Target { premises=List.copyOf(premises);reasons=List.copyOf(reasons); }
     }
-    public record Write(int slot,Optional<OperandId> occurrence,StorageIndex.Resolution destination,Source source,List<Target> targets) {
-        public Write { targets=List.copyOf(targets); }
+    public record Write(int slot,Optional<OperandId> occurrence,StorageIndex.Resolution destination,Source source,List<Target> targets,
+                        Selection selection,Strength occurrenceStrength) {
+        public Write { targets=List.copyOf(targets);Objects.requireNonNull(selection);Objects.requireNonNull(occurrenceStrength); }
+        public Write(int slot,Optional<OperandId> occurrence,StorageIndex.Resolution destination,Source source,List<Target> targets) {
+            this(slot,occurrence,destination,source,targets,Selection.SINGLE_DESTINATION,Strength.MUST);
+        }
     }
     public record Statement(Operation operation,List<Read> reads,List<Write> writes,
                             Map<Control.OutcomeKey,List<Write>> outcomes,List<Write> otherwise) {
@@ -136,9 +142,12 @@ public final class StatementEffects {
         final Map<OperandId,Place> places=new HashMap<>();int nextSlot;
         Builder(Operation operation){this.operation=operation;}
         void write(List<Write> out,Optional<OperandId> occurrence,StorageIndex.Resolution destination,Strength strength,Source source) {
-            out.add(new Write(nextSlot++,occurrence,destination,source,targets(destination,strength)));
+            out.add(new Write(nextSlot++,occurrence,destination,source,targets(destination,strength),Selection.SINGLE_DESTINATION,strength));
         }
-        void scopeWrite(List<Write> out,Scopes.MemoryScope scope,String reason) { write(out,Optional.empty(),storage.select(scope),Strength.MAY,new UnknownSource(reason)); }
+        void scopeWrite(List<Write> out,Scopes.MemoryScope scope,String reason) {
+            var destination=storage.select(scope);
+            out.add(new Write(nextSlot++,Optional.empty(),destination,new UnknownSource(reason),targets(destination,Strength.MAY),Selection.MAY_SET,Strength.MAY));
+        }
         void boundRead(Scopes.MemoryBound bound,ReadKind kind) { if(bound instanceof Scopes.WithinMemory w)reads.add(new Read(Optional.empty(),kind,storage.select(w.scope()))); }
         void foreign(Interactions.ForeignEffects e,List<Write> out) {
             boundRead(e.reads(),ReadKind.FOREIGN);

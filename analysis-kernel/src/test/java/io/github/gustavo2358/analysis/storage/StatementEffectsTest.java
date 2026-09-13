@@ -32,7 +32,10 @@ class StatementEffectsTest {
         var effects=new StatementEffects(index);
         assertEquals(2,effects.statement(must.header().id()).writes().getFirst().targets().size());
         assertTrue(effects.statement(must.header().id()).writes().getFirst().targets().stream().allMatch(t->t.strength()==StatementEffects.Strength.MAY));
+        assertEquals(StatementEffects.Selection.SINGLE_DESTINATION,effects.statement(must.header().id()).writes().getFirst().selection());
+        assertEquals(StatementEffects.Strength.MUST,effects.statement(must.header().id()).writes().getFirst().occurrenceStrength());
         var scoped=effects.statement(may.header().id()).writes().getFirst();assertEquals(1,scoped.targets().size());
+        assertEquals(StatementEffects.Selection.MAY_SET,scoped.selection());assertEquals(StatementEffects.Strength.MAY,scoped.occurrenceStrength());
         assertEquals(Optional.of(StorageRangeTest.range(0,4)),scoped.targets().getFirst().location().range());assertEquals(StatementEffects.Strength.MAY,scoped.targets().getFirst().strength());
     }
     @Test void copyCapturesSourceAndOpaqueUnknownWritesAreExplicit() {

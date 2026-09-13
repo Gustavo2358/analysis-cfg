@@ -178,3 +178,59 @@ O caso de escrita no prefixo consulta o sufixo e verifica sua definição antiga
 a consulta composta integral é qualificada em W5. Views com codecs distintos
 continuam separadas no resolver e na interpretação, mesmo sobre a mesma faixa.
 `StorageIndexTest` e `RegionalValuesTest` são controles pequenos dessa regra.
+
+## Decisão de domínio ST-W5.1, antes da implementação
+
+Estender a fundação W3 para um produto de conjuntos de stores conjuntos. Um
+fator reúne bases ligadas por uma dependência de leitura→escrita interpretada,
+obtida exclusivamente dos efeitos canônicos antes da análise (CopyBytes e Read
+lógico). União transitiva dessas dependências é uma partição de correlação da
+análise: não é prova de alias, alocação ou disjunção. Fatores singleton preservam
+o caso barato. Cada store guarda uma imagem imutável por base do fator; join une
+stores completos. A transferência lê um único store anterior, recorta a origem
+e escreve somente o destino, mantendo os demais membros. A escolha descarta a
+alternativa de simplesmente remover a guarda W3: o produto cartesiano X/Y após
+um join pode fabricar combinações que nunca coexistiram no modelo.
+
+StatementEffects publicará também a seleção do efeito: SINGLE_DESTINATION
+significa uma Place avaliada, mesmo com vários candidatos; MAY_SET significa
+escopo que pode atingir vários locais. A obrigatoriedade da ocorrência é
+distinta da força de cada target. Para SINGLE_DESTINATION, cada alternativa
+direta recebe uma escrita, e identidade permanece quando a ocorrência é MAY,
+há remainder, o outcome é possível ou o destino pode estar fora do fator.
+Efeitos indiretos sem disjunção provada continuam fracos e desconhecidos.
+MAY_SET admite subconjuntos dos locais, sempre com conteúdo não interpretado
+nos efeitos admitidos. RD continua fazendo união de definições possíveis e
+nunca promove todos os candidatos a MUST. Não inferir essa distinção de nomes,
+strings de gaps ou ausência de occurrence. Todos os reads de uma operação usam
+seu mesmo store anterior; não há leitura tardia após atualizar o destino.
+
+A ordem é inclusão de stores (incluindo metadados), o join é união e transfer
+distribui sobre alternativas. Unknown alcançado é store explícito, bottom é
+inalcançado. O universo é finito: bases, eventos, payloads literais e resultados
+de codecs são finitos; offsets de payload/produtor ficam limitados ao payload,
+crop avança ambos, shift muda somente a posição do destino. Unknown usa offsets
+zero e conjuntos de motivos estáticos; cópias usam sets de eventos estáticos,
+sem cadeia de ocorrências. Em extent E, fronteiras pertencem a [0,E]. Em extent
+desconhecido, todas as escritas interpretadas têm limite constante finito B;
+o sufixo desconhecido além de B nunca é refinado por deslocamentos ilimitados.
+Isso dá imagens finitas, stores finitos e powersets de altura finita, embora
+potencialmente grandes. Supports participam de igualdade e estabilização. Não
+há K, poda de candidatos ou apagamento de supports para garantir terminação.
+
+Essa construção aplica a distinção entre semântica coletora e solução por ponto
+fixo da referência de Cousot acima (§§3.3–3.4, consultada novamente para W5).
+A prova específica é nossa obrigação, não conclusão importada da referência.
+O oracle independente executa strings/stores concretos finitos em branches e
+loops; testes também cobrem leis, permutações e mudanças somente de suporte.
+Complexidade depende de stores e fragmentos produzidos; registrar crescimento,
+transferência e replay, e reportar exaustão como falha operacional. Os produtos
+continuam sendo supports abstratos sem path witness. W5.3 fechará o transporte
+de fragmentos, intervalos e eventos capturados; esta decisão não declara M3.
+
+A implementação e o profile passam a `RegionalValues` versão `2`,
+`regional-text-images@2`, precisão `FINITE_CORRELATED_STORAGE_IMAGES`.
+`RegionalValueFact@1` conserva sua forma de projeção textual compatível; os
+profiles escalares e o wire legado não mudam. A chave antiga não é aceita como
+sinônimo silencioso do novo domínio. A remoção da guarda de composição W3 é
+acompanhada por testes independentes de branch, Choice, cópia e finitude.

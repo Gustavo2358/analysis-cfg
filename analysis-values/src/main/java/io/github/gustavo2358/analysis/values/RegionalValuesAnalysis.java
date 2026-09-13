@@ -11,15 +11,17 @@ import io.github.gustavo2358.analysis.structure.*;
 import java.math.BigInteger;
 import java.util.*;
 
-/** Finite images per physical base; uses canonical effects and the shared solver/replayer. */
+/** Finite joint images of copy-connected bases; canonical effects and the shared solver/replayer. */
 public final class RegionalValuesAnalysis {
-    public static final String PROFILE="regional-text-images@1";
+    public static final String PROFILE="regional-text-images@2";
     static final Comparator<ObjectId> OBJECT_ORDER=Comparator.comparing((ObjectId id)->id.unit().publication().localId()).thenComparing(id->id.unit().localId()).thenComparing(ObjectId::localId);
     private final AnalysisSession session;
     private final StatementEffects effects;
     private final StoragePartition partition;
     private final List<StorageIndex.Location> bases;
     private final Map<StorageId,Integer> ordinals=new HashMap<>();
+    private final List<List<Integer>> groups;
+    private final int[] groupOf,positionInGroup;
     private final Map<Operation,List<Plan>> operations=new IdentityHashMap<>();
     private final Map<Operation,Map<Control.OutcomeKey,List<Plan>>> outcomes=new IdentityHashMap<>();
     private final Map<Operation,List<Plan>> otherwise=new IdentityHashMap<>();
@@ -31,6 +33,13 @@ public final class RegionalValuesAnalysis {
     private record SourceGap(StorageIndex.Location location,OriginId origin) { }
     private sealed interface Content permits Bytes,Scalar { }
     private record Bytes(ByteImage image) implements Content { }
+    private record Store(List<Content> contents) {
+        Store { contents=List.copyOf(contents); }
+        Store put(int position,Content content) {
+            if(contents.get(position).equals(content))return this;
+            var updated=new ArrayList<>(contents);updated.set(position,content);return new Store(updated);
+        }
+    }
     private record Scalar(Optional<Values.TextValue> text,Set<Integer> producers,Set<String> reasons) implements Content {
         Scalar { producers=Set.copyOf(producers);reasons=Set.copyOf(reasons); }
     }
@@ -75,13 +84,39 @@ public final class RegionalValuesAnalysis {
                     var target=plan.target();
                     // Admission proved equal simultaneous literals on an identical footprint.
                     // Preserve both supports without retaining the unspecified entry possibility.
-                    if(target.strength()==StatementEffects.Strength.MUST&&!seededLocations.add(target.location()))
+                    var selectedWrite=plan.write();
+                    if(target.strength()==StatementEffects.Strength.MUST&&!seededLocations.add(target.location())) {
                         target=new StatementEffects.Target(target.location(),StatementEffects.Strength.MAY,target.sourceApplicable(),target.premises(),target.reasons());
-                    seeds.add(new Plan(plan.write(),target,plan.event()));
+                        selectedWrite=new StatementEffects.Write(selectedWrite.slot(),selectedWrite.occurrence(),selectedWrite.destination(),selectedWrite.source(),selectedWrite.targets(),selectedWrite.selection(),StatementEffects.Strength.MAY);
+                    }
+                    seeds.add(new Plan(selectedWrite,target,plan.event()));
                 }
             }
             initial.put(context.entry().id(),List.copyOf(seeds));
         }
+        // Static read/write connectivity preserves branch correlations before the first copy executes.
+        int[] parent=new int[bases.size()];for(int i=0;i<parent.length;i++)parent[i]=i;
+        var allPlans=new ArrayList<Plan>();operations.values().forEach(allPlans::addAll);otherwise.values().forEach(allPlans::addAll);
+        outcomes.values().forEach(m->m.values().forEach(allPlans::addAll));initial.values().forEach(allPlans::addAll);
+        for(var plan:allPlans)if(plan.target.sourceApplicable()) {
+            StorageIndex.Resolution reads=null;
+            if(plan.write.source() instanceof StatementEffects.CapturedBytes copy)reads=copy.source();
+            else if(plan.target.location().range().isEmpty()&&plan.write.source() instanceof StatementEffects.ExpressionSource expression&&expression.value() instanceof Expressions.Read read)
+                reads=effects.storage().resolve(read.place());
+            if(reads!=null)for(var source:reads.candidates()) {
+                int a=representative(parent,ordinals.get(source.location().base().id()));
+                int b=representative(parent,ordinals.get(plan.target.location().base().id()));
+                parent[Math.max(a,b)]=Math.min(a,b);
+            }
+        }
+        var components=new TreeMap<Integer,List<Integer>>();
+        for(int i=0;i<bases.size();i++)components.computeIfAbsent(representative(parent,i),ignored->new ArrayList<>()).add(i);
+        groups=components.values().stream().map(List::copyOf).toList();groupOf=new int[bases.size()];positionInGroup=new int[bases.size()];
+        for(int g=0;g<groups.size();g++)for(int i=0;i<groups.get(g).size();i++){int ordinal=groups.get(g).get(i);groupOf[ordinal]=g;positionInGroup[ordinal]=i;}
+    }
+    private static int representative(int[] parent,int member) {
+        int root=member;while(parent[root]!=root)root=parent[root];
+        while(parent[member]!=member){int next=parent[member];parent[member]=root;member=next;}return root;
     }
     private List<Plan> compile(List<StatementEffects.Write> writes,Id evidence,OriginId origin,List<PremiseId> initialPremises) {
         var result=new ArrayList<Plan>();
@@ -94,24 +129,25 @@ public final class RegionalValuesAnalysis {
     }
     public static final class State {
         private final EntryId entry;
-        private final SegmentMap<Set<Content>> bindings;
-        private State(EntryId entry,SegmentMap<Set<Content>> bindings){this.entry=entry;this.bindings=bindings;}
+        private final SegmentMap<Set<Store>> bindings;
+        private State(EntryId entry,SegmentMap<Set<Store>> bindings){this.entry=entry;this.bindings=bindings;}
         public boolean reached(){return entry!=null;}
-        public int explicitBases(){return bindings.size();}
+        public int explicitBases(){int[] count={0};bindings.forEach((g,stores)->count[0]+=stores.iterator().next().contents().size());return count[0];}
     }
     private static final State BOTTOM=new State(null,new SegmentMap<>());
     private static Scalar unknownScalar(String reason){return new Scalar(Optional.empty(),Set.of(),Set.of(reason));}
     private Content unknown(StorageIndex.Location location,String reason) {
         return location.range().isPresent()?new Bytes(ByteImage.unknown(location.range().get().end().map(e->e.subtract(location.range().get().start())),reason)):unknownScalar(reason);
     }
-    private final class Engine implements AnalysisDefinition<State> {
+    final class Engine implements AnalysisDefinition<State> {
         long contentReads,contentUpdates,alternativeVisits;
         @Override public Direction direction(){return Direction.FORWARD;}
         @Override public State bottom(){return BOTTOM;}
-        private Set<Content> value(State state,int ordinal) {
-            contentReads++;var present=state.bindings.get(ordinal);
-            return present==null?Set.of(unknown(bases.get(ordinal),"UNSPECIFIED_ENTRY_CONTENT")):present;
+        private Set<Store> value(State state,int group) {
+            contentReads++;var present=state.bindings.get(group);
+            return present==null?Set.of(new Store(groups.get(group).stream().map(i->unknown(bases.get(i),"UNSPECIFIED_ENTRY_CONTENT")).toList())):present;
         }
+        private Content content(Store store,int ordinal){return store.contents().get(positionInGroup[ordinal]);}
         @Override public Iterable<Boundary<State>> boundaries(AnalysisSession selected) {
             if(session!=selected)throw new IllegalArgumentException("foreign session");
             var result=new ArrayList<Boundary<State>>();
@@ -121,11 +157,11 @@ public final class RegionalValuesAnalysis {
             }
             return result;
         }
-        private Set<Content> union(Set<Content> a,Set<Content> b){if(a.containsAll(b))return a;var r=new HashSet<>(a);r.addAll(b);return Set.copyOf(r);}
+        private Set<Store> union(Set<Store> a,Set<Store> b){if(a.containsAll(b))return a;var r=new HashSet<>(a);r.addAll(b);return Set.copyOf(r);}
         @Override public Join<State> joinInto(State a,State b,DomainWork work) {
             if(!b.reached())return new Join<>(a,false);if(!a.reached())return new Join<>(b,true);
             if(!a.entry.equals(b.entry))throw new IllegalArgumentException("different entries");
-            final class Accumulator { SegmentMap<Set<Content>> root=a.bindings; }
+            final class Accumulator { SegmentMap<Set<Store>> root=a.bindings; }
             var acc=new Accumulator();
             b.bindings.forEach((key,v)->{work.joinEntryVisited();acc.root=acc.root.put(key,union(value(a,key),v));});
             a.bindings.forEach((key,v)->{if(b.bindings.get(key)==null){work.joinEntryVisited();acc.root=acc.root.put(key,union(v,value(b,key)));}});
@@ -137,40 +173,57 @@ public final class RegionalValuesAnalysis {
         }
         private State apply(State before,List<Plan> plans,boolean forceMay) {
             if(!before.reached()||plans.isEmpty())return before;
-            // Group by destination base to keep every same-base read tied to its pre-write image.
-            var grouped=new LinkedHashMap<Integer,List<Plan>>();
-            for(var plan:plans)grouped.computeIfAbsent(ordinals.get(plan.target.location().base().id()),ignored->new ArrayList<>()).add(plan);
+            // Preserve write occurrence grouping; each source is captured in the same pre-operation store.
+            var grouped=new LinkedHashMap<Integer,LinkedHashMap<StatementEffects.Write,List<Plan>>>();
+            for(var plan:plans)grouped.computeIfAbsent(groupOf[ordinals.get(plan.target.location().base().id())],ignored->new LinkedHashMap<>())
+                .computeIfAbsent(plan.write,ignored->new ArrayList<>()).add(plan);
             var root=before.bindings;
             for(var entry:grouped.entrySet()) {
-                int ordinal=entry.getKey();var all=new HashSet<Content>();
-                for(var original:value(before,ordinal)) {
-                    Set<Content> current=Set.of(original);
-                    for(var plan:entry.getValue()) {
-                        var next=new HashSet<Content>();
-                        if(forceMay||plan.target.strength()==StatementEffects.Strength.MAY)next.addAll(current);
-                        var replacements=replacements(before,plan,ordinal,original);
-                        for(var old:current)for(var replacement:replacements) {
-                            alternativeVisits++;
-                            next.add(old instanceof Bytes b?new Bytes(b.image().write(plan.target.location().range().orElseThrow(),((Bytes)replacement).image())):replacement);
-                        }
-                        current=Set.copyOf(next);
-                    }
+                int group=entry.getKey();var all=new HashSet<Store>();
+                for(var original:value(before,group)) {
+                    Set<Store> current=Set.of(original);
+                    for(var occurrence:entry.getValue().entrySet())current=write(current,original,group,occurrence.getKey(),occurrence.getValue(),forceMay);
                     all.addAll(current);
                 }
-                var updated=root.put(ordinal,Set.copyOf(all));if(updated!=root)contentUpdates++;root=updated;
+                var updated=root.put(group,Set.copyOf(all));if(updated!=root)contentUpdates++;root=updated;
             }
             return root==before.bindings?before:new State(before.entry,root);
         }
-        private Set<Content> replacements(State before,Plan plan,int destination,Content original) {
+        private Set<Store> write(Set<Store> current,Store captured,int group,StatementEffects.Write write,List<Plan> plans,boolean forceMay) {
+            if(write.selection()==StatementEffects.Selection.MAY_SET) {
+                for(var plan:plans)current=weak(current,captured,plan,true);return current;
+            }
+            var next=new HashSet<Store>();
+            boolean outside=write.destination().candidates().stream().anyMatch(c->groupOf[ordinals.get(c.location().base().id())]!=group
+                ||c.location().range().filter(StorageRange::empty).isPresent());
+            if(forceMay||write.occurrenceStrength()==StatementEffects.Strength.MAY||!(write.destination().remainder() instanceof Scopes.NoMemory)||outside)next.addAll(current);
+            for(var plan:plans)if(plan.target.sourceApplicable())for(var old:current)next.addAll(replace(old,captured,plan));
+            // No direct destination in this factor: only conservative possible alias/scope impacts.
+            if(next.isEmpty())next.addAll(current);
+            current=Set.copyOf(next);
+            for(var plan:plans)if(!plan.target.sourceApplicable())current=weak(current,captured,plan,true);
+            return current;
+        }
+        private Set<Store> weak(Set<Store> current,Store captured,Plan plan,boolean keep) {
+            var next=new HashSet<Store>();if(keep)next.addAll(current);
+            for(var old:current)next.addAll(replace(old,captured,plan));return Set.copyOf(next);
+        }
+        private Set<Store> replace(Store old,Store captured,Plan plan) {
+            int ordinal=ordinals.get(plan.target.location().base().id());var prior=content(old,ordinal);var result=new HashSet<Store>();
+            for(var replacement:replacements(plan,captured)) {
+                alternativeVisits++;
+                var updated=prior instanceof Bytes b?new Bytes(b.image().write(plan.target.location().range().orElseThrow(),((Bytes)replacement).image())):replacement;
+                result.add(old.put(positionInGroup[ordinal],updated));
+            }
+            return result;
+        }
+        private Set<Content> replacements(Plan plan,Store captured) {
             var target=plan.target.location();
             if(!plan.target.sourceApplicable())return Set.of(unknown(target,"UNPROVEN_WRITE_DESTINATION"));
             var source=plan.write.source();
             if(source instanceof StatementEffects.CapturedBytes copy) {
                 var c=copy.source().candidates().getFirst();int ordinal=ordinals.get(c.location().base().id());
-                var result=new HashSet<Content>();
-                for(var content:ordinal==destination?Set.of(original):value(before,ordinal))
-                    result.add(new Bytes(((Bytes)content).image().slice(c.location().range().orElseThrow()).copied(plan.event)));
-                return Set.copyOf(result);
+                return Set.of(new Bytes(((Bytes)content(captured,ordinal)).image().slice(c.location().range().orElseThrow()).copied(plan.event)));
             }
             if(source instanceof StatementEffects.UnknownSource u)return Set.of(unknown(target,u.reason()));
             var expression=((StatementEffects.ExpressionSource)source).value();
@@ -194,13 +247,13 @@ public final class RegionalValuesAnalysis {
                 if(!(resolution.remainder() instanceof Scopes.NoMemory))result.add(unknownScalar("READ_LOCATION_REMAINDER"));
                 for(var candidate:resolution.candidates()) {
                     int ordinal=ordinals.get(candidate.location().base().id());
-                    for(var content:ordinal==destination?Set.of(original):value(before,ordinal))result.add(project(content,candidate));
+                    result.add(project(content(captured,ordinal),candidate));
                 }
                 if(!result.isEmpty())return Set.copyOf(result);
             }
             return Set.of(unknown(target,"UNINTERPRETED_VALUE_EXPRESSION"));
         }
-        private State operation(State state,Operation operation) {
+        State operation(State state,Operation operation) {
             var plans=operations.get(operation);if(plans==null)throw new IllegalArgumentException("foreign operation");return apply(state,plans,false);
         }
         @Override public State transferBlock(AnalysisPoint point,State anchor,DomainWork work) {
@@ -222,12 +275,7 @@ public final class RegionalValuesAnalysis {
         if(candidate.codec().isEmpty()||range.end().isEmpty())return unknownScalar("UNINTERPRETED_VIEW");
         var decoded=MemoryCodecs.decodeText(candidate.codec().get(),read.bytes().get(),range.end().get().subtract(range.start()));
         if(decoded.value().isEmpty())return unknownScalar(decoded.status().name());
-        // W3 admits a complete slice of one literal producer. Composition is qualified in W5.
-        var producers=new HashSet<Integer>();int prior=-1;BigInteger expected=null;
-        for(var part:read.parts()) {
-            if(prior!=-1&&(part.producer()!=prior||!part.producerOffset().equals(expected)))return unknownScalar("FRAGMENT_COMPOSITION_PENDING");
-            producers.add(part.producer());prior=part.producer();expected=part.producerOffset().add(part.range().end().orElseThrow().subtract(part.range().start()));
-        }
+        var producers=new HashSet<Integer>();for(var part:read.parts())producers.add(part.producer());
         return new Scalar(decoded.value(),producers,Set.of());
     }
     public Execution execute(){var engine=new Engine();return new Execution(engine,DataflowSolver.solve(session,engine));}
@@ -238,7 +286,7 @@ public final class RegionalValuesAnalysis {
         public Map<String,Long> solveMetrics(){return solveMetrics;}
         /** Cumulative domain work, including observed replay; no semantic budget. */
         public Map<String,Long> metrics(){return engine.metrics();}
-        public Map<String,Long> preparationMetrics(){var result=new TreeMap<>(effects.preparationMetrics());result.putAll(effects.storage().preparationMetrics());result.put("partitionSegments",(long)partition.segments().size());result.put("eventsPrepared",(long)events.size());return Map.copyOf(result);}
+        public Map<String,Long> preparationMetrics(){var result=new TreeMap<>(effects.preparationMetrics());result.putAll(effects.storage().preparationMetrics());result.put("partitionSegments",(long)partition.segments().size());result.put("eventsPrepared",(long)events.size());result.put("correlationGroups",(long)groups.size());result.put("maxGroupBases",groups.stream().mapToLong(List::size).max().orElse(0));return Map.copyOf(result);}
         public ObservationBatch<ObjectId,RegionalValueFact> observe(Iterable<PointQuery<ObjectId>> requests) {
             return BatchReplayer.materialize(session,stable,Direction.FORWARD,BOTTOM,requests,OBJECT_ORDER,engine::operation,new BatchReplayer.Projection<State,ObjectId,RegionalValueFact>() {
                 @Override public boolean supports(PointQuery<ObjectId> query) {
@@ -261,8 +309,9 @@ public final class RegionalValuesAnalysis {
             for(var gap:sourceGaps)if(resolution.candidates().stream().anyMatch(c->!storage.disjoint(c.location(),gap.location()))) {source=true;origins.add(gap.origin());}
             if(state.reached())for(var candidate:resolution.candidates()) {
                 origins.addAll(candidate.origins());
-                for(var content:engine.value(state,ordinals.get(candidate.location().base().id()))) {
-                    var value=RegionalValuesAnalysis.this.project(content,candidate);
+                int ordinal=ordinals.get(candidate.location().base().id());
+                for(var store:engine.value(state,groupOf[ordinal])) {
+                    var value=RegionalValuesAnalysis.this.project(engine.content(store,ordinal),candidate);
                     if(value.text().isEmpty()){model=true;reasons.addAll(value.reasons());}
                     else supports.computeIfAbsent(value.text().get().value(),ignored->new HashSet<>()).addAll(value.producers());
                 }
