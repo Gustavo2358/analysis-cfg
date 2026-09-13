@@ -128,7 +128,7 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "3fecccabd68c81946ae089a9e4b4fc605d234722",
+    "commit": "990619390bb61f2cc05d18bb98b506b2ea714475",
     "canonical_ref": "feat/storage-semantics-st-w0-w5",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
@@ -244,9 +244,9 @@
       "docs/domain/cobol-semantic-product.md",
       "docs/work/history/WORK-SEMANTIC-PRODUCT-003.md"
     ],
-    "semantic_product_version": "2.6.0",
+    "semantic_product_version": "2.7.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "8cf4a2d80ab22691aa4d5bc17e504054eb204429",
+    "commit": "da5a658b827303ce1dbff11b45129d2871eeb147",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -255,12 +255,14 @@
     "goto_validation": {
       "contract": "2.1.0",
       "scope": "local unconditional paragraph identity and explicit entry; G1-G5 and 1/2/5/40"
-    }
+    },
+    "storage_contract_version": "1.0.0",
+    "canonical_ref": "feat/storage-semantics-st-w0-w5"
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "verified",
-    "commit": "5674b72ef280a18be7b6395d48c7766f2ac6d912",
+    "commit": "513194dc355720a59667430be2efd70f9ede692f",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -271,7 +273,8 @@
     "evaluate_validation": "docs/work/active/WORK-CFG-040.yaml",
     "goto_validation": {
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
-    }
+    },
+    "canonical_ref": "feat/storage-semantics-st-w0-w5"
   },
   "external": [
     {
@@ -299,5 +302,11 @@
       "url": "https://research.cs.wisc.edu/wpis/abstracts/popl95.abs.html",
       "role": "reading_lead_abstract_not_algorithm_adoption"
     }
-  ]
+  ],
+  "storage_campaign": {
+    "id": "ST-20260913-01",
+    "status": "W0-W2 qualified; W3 integration in progress, M1 not yet qualified",
+    "profile": "ibm-enterprise-6.4-fixed-display-1047@1",
+    "authority": "Existing AIR 2.0.0 plus optional IBM1047; source semantic facts owned by frontend, translated by lower"
+  }
 }
