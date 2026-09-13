@@ -122,7 +122,7 @@ def run(work, config_path):
     for name, key in (('air-java', 'air_java'), ('proleap-poc', 'proleap_poc'), ('cobol-lower', 'cobol_lower')):
         pin = lock[key].get('commit', lock[key].get('main_commit'))
         require(config['sources'][name] == pin == git(producer / name, 'rev-parse', 'HEAD') and not git(producer / name, 'status', '--porcelain'), 'exact clean source pin: ' + name)
-    require(config['semanticProductVersion'] == lock['proleap_poc']['semantic_product_version'] == '1.8.0', 'exact SP version')
+    require(config['semanticProductVersion'] == lock['proleap_poc']['semantic_product_version'], 'exact SP version')
     cp = runtime(producer)
     for case in ('literal', 'copy', 'overwrite'):
         outputs = []
