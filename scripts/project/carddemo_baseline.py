@@ -130,6 +130,9 @@ def classify_failure(stage, code, diagnostic):
     """Classify process diagnostics, never infer a missing COBOL capability from normalization."""
     if any(x in diagnostic for x in ('OutOfMemoryError', 'RESOURCE_LIMIT', 'IMPLEMENTATION_LIMIT', 'StackOverflowError')):
         return 'BLOCKED', 'RESOURCE_LIMIT', 'RESOURCE_LIMIT'
+    if any(x in diagnostic for x in ('NullPointerException', 'AssertionError', 'ClassNotFoundException',
+                                     'NoClassDefFoundError', 'LinkageError', 'Could not find or load main class')):
+        return 'FAILED', 'INTERNAL_FAILURE', 'UNEXPECTED_RUNTIME_FAILURE'
     if 'COPY_NOT_FOUND' in diagnostic:
         return 'BLOCKED', 'COPYBOOK_MISSING', 'COPY_NOT_FOUND'
     if any(x in diagnostic for x in ('Unsupported tab in fixed-format', 'Unsupported fixed-format indicator',

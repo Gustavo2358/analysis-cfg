@@ -91,6 +91,11 @@ class BaselineTests(unittest.TestCase):
             self.assertEqual(runner.classify_failure('frontend', 1, text)[1], category)
         self.assertEqual(runner.classify_failure('lower', 5, 'AIR codec INVALID_INPUT')[1], 'AIR_TRANSPORT_GAP')
 
+    def test_unexpected_java_failure_is_not_a_frontend_capability_gap(self):
+        for failure in ('NullPointerException', 'NoClassDefFoundError', 'Could not find or load main class'):
+            self.assertEqual(runner.classify_failure('frontend', 1, 'phase=PREPROCESSING ' + failure),
+                             ('FAILED', 'INTERNAL_FAILURE', 'UNEXPECTED_RUNTIME_FAILURE'))
+
     def test_timing_statistics_and_extremes(self):
         values = [('c', 9), ('a', 1), ('b', 2), ('d', 4)]
         actual = metrics.timing_stats(values)

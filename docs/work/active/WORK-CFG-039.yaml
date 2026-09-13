@@ -6,6 +6,7 @@ scope:
   - Runner, focal FAST tests, statement/gap/CALL inventories and observed timings
   - Machine-readable and human-readable historical baseline with human advisory policy
 review_state: IMPLEMENTED / AWAITING HUMAN REVIEW
+pr: 25
 production_changes: NONE
 decisionPolicy: HUMAN
 rankingAuthority: ADVISORY_ONLY
@@ -20,7 +21,7 @@ results:
   partialSites: 36
   openUnresolvedSites: 0
 validation: >-
-  PASS: 19 focal runner/aggregation/schema tests and analysis-cfg lean.py fast.
+  PASS: 20 focal runner/aggregation/schema tests and analysis-cfg lean.py fast.
   One canonical sequential full-universe run; preliminary filesystem-only run
   preserved and excluded after archive discovery. Full product qualification NOT_RUN.
 record: docs/evals/cp6/carddemo-full-baseline.md
