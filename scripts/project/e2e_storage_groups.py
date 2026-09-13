@@ -21,7 +21,7 @@ def ordered_nodes(storage):
     visit(None);require(len(output)==len(nodes),'every physical node belongs to the forest');return output
 
 def oracle(name,case,sp,air,cfg,dependency,probe):
-    require(sp['contractVersion']=='2.7.0','SP 2.7 explicit contract');storage=sp['storage'];require(storage['version']=='1.0.0' and storage['profileId']==PROFILE,'explicit storage profile')
+    storage=sp['storage'];require((sp['contractVersion'],storage['version']) in [('2.7.0','1.0.0'),('2.8.0','1.1.0')],'explicit SP/storage contract pair');require(storage['profileId']==PROFILE,'explicit storage profile')
     publication=air['publication'];units=publication['units'];require(len(units)==1,'fixture one-unit scope');unit=units[0]
     statements={s['header']['id']:s for s in sp['statements']};operations={local(op['header']['id']):op for seq in unit['sequences'] for op in seq['instructions']+[seq['terminator']]}
     coverage=publication['coverage']['items']
@@ -107,13 +107,13 @@ def oracle(name,case,sp,air,cfg,dependency,probe):
     verify_cfg_wire(json.dumps(cfg).encode());control_oracle(air,cfg)
     return dict(calls=len(sites),candidates=sum(len(s['candidates']) for s in sites.values()),unknownTargets=0,sourceOpen=sum(s['sourceValueRemainder'] for s in sites.values()),modelOpen=sum(s['modelValueRemainder'] for s in sites.values()),qualifiedPhysicalQueries=len(queries),bases=len(base_ids),nodes=len(nodes),cells=case['cells'])
 
-def run(work,runtime,names=None,attempts=2,permutations=True):
-    require(not os.environ.get('CI'),'local qualification only');work.mkdir(parents=True,exist_ok=False);config=json.loads(runtime.read_text());require(config['semanticProductVersion']=='2.7.0','pinned SP runtime')
+def run(work,runtime,names=None,attempts=2,permutations=True,*,cases=None,inspect=oracle,status="W3_FOCAL_VERTICAL"):
+    require(not os.environ.get('CI'),'local qualification only');work.mkdir(parents=True,exist_ok=False);config=json.loads(runtime.read_text());require(config['semanticProductVersion'] in ('2.7.0','2.8.0'),'pinned SP runtime')
     source=ROOT/'analysis-adapters/src/test/java/io/github/gustavo2358/analysis/adapters/StorageE2eProbe.java';probe=work/'probe';probe.mkdir();shutil.copyfile(source,probe/source.name);classes=probe/'classes';classes.mkdir()
     command=['javac','-cp',os.pathsep.join(config['cfg']['classpath']),'-d',str(classes),str(probe/source.name)];write_json(probe/'compile.command.json',command)
     with (probe/'compile.stdout.log').open('w') as out,(probe/'compile.stderr.log').open('w') as err:require(subprocess.run(command,stdout=out,stderr=err).returncode==0,'test probe compilation')
     config['probe']=dict(main='io.github.gustavo2358.analysis.adapters.StorageE2eProbe',classpath=[str(classes)]+config['cfg']['classpath']);results={}
-    selected={k:v for k,v in fixtures().items() if not names or k in names};require(bool(selected),'nonempty selected fixture set')
+    selected={k:v for k,v in (fixtures() if cases is None else cases).items() if not names or k in names};require(bool(selected),'nonempty selected fixture set')
     for name,case in selected.items():
         cwd=work/name;cwd.mkdir();source=cwd/(name+'.cbl');source.write_text(case['source']);write_json(cwd/'independent-golden.json',{k:v for k,v in case.items() if k not in ('source','books')})
         for filename,content in case['books'].items():(cwd/filename).write_text(content)
@@ -124,12 +124,12 @@ def run(work,runtime,names=None,attempts=2,permutations=True):
             execute(cwd,'frontend-'+label,config,'frontend',['--source',source.name,'--copybooks',cwd,'--output',out/'sp','--storage-profile',PROFILE])
             sp=out/'sp/cobol-semantic-product.json';air=out/'air.json';cfg=out/'cfg.json';dependency=out/'dependency.json';probe=out/'probe.json'
             for stage,paths in [('lower',[sp,air]),('cfg',[air,cfg]),('dependency',[air,dependency]),('probe',[air,probe])]:execute(cwd,stage+'-'+label,config,stage,paths)
-            results[name]=oracle(name,case,json.loads(sp.read_text()),json.loads(air.read_text()),json.loads(cfg.read_text()),read(dependency),json.loads(probe.read_text()))
+            results[name]=inspect(name,case,json.loads(sp.read_text()),json.loads(air.read_text()),json.loads(cfg.read_text()),read(dependency),json.loads(probe.read_text()))
             snapshots.append([p.read_bytes() for p in (sp,air,cfg,dependency,probe)])
         require(all(s==snapshots[0] for s in snapshots),'A/B byte identity across five boundaries '+name)
         if permutations:
             spdoc=json.loads(snapshots[0][0]);spdoc['statements'].reverse();spdoc['dataDeclarations'].reverse()
-            for field in ['nodes','bases','views']:spdoc['storage'][field].reverse()
+            for field in ['nodes','bases','views']+(['relations'] if spdoc['contractVersion']=='2.8.0' else []):spdoc['storage'][field].reverse()
             perm=cwd/'permuted.sp.json';write_json(perm,spdoc);ap=cwd/'permuted.lower.air.json';execute(cwd,'sp-permutation',config,'lower',[perm,ap]);require(ap.read_bytes()==snapshots[0][1],'SP inventory permutation preserves canonical AIR '+name)
             a=json.loads(ap.read_text());a['publication']['storage'].reverse()
             for unit in a['publication']['units']:unit['objects'].reverse();unit['sequences'].reverse()
@@ -137,7 +137,7 @@ def run(work,runtime,names=None,attempts=2,permutations=True):
             for stage,index in [('cfg',2),('dependency',3),('probe',4)]:
                 dest=cwd/('permuted.'+stage+'.json');execute(cwd,stage+'-permutation',config,stage,[ap,dest]);require(dest.read_bytes()==snapshots[0][index],'AIR inventory permutation '+stage+' '+name)
         results[name]['elapsedSeconds']=round(time.monotonic()-started,3);print(name+': PASS '+json.dumps(results[name]),flush=True)
-    write_json(work/'results.json',dict(status='W3_FOCAL_VERTICAL',runtime=str(runtime),sources=config['sources'],results=results))
+    write_json(work/'results.json',dict(status=status,runtime=str(runtime),sources=config['sources'],results=results))
     return results
 if __name__=='__main__':
     parser=argparse.ArgumentParser();parser.add_argument('--work',type=Path,required=True);parser.add_argument('--runtime',type=Path,required=True);parser.add_argument('--cases',nargs='*');parser.add_argument('--attempts',type=int,default=2);parser.add_argument('--no-permutations',action='store_true');a=parser.parse_args();run(a.work.resolve(),a.runtime.resolve(),a.cases,a.attempts,not a.no_permutations)

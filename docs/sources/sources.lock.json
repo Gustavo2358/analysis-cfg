@@ -244,9 +244,9 @@
       "docs/domain/cobol-semantic-product.md",
       "docs/work/history/WORK-SEMANTIC-PRODUCT-003.md"
     ],
-    "semantic_product_version": "2.7.0",
+    "semantic_product_version": "2.8.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "da5a658b827303ce1dbff11b45129d2871eeb147",
+    "commit": "58d3aa919f62fae0c2c297d78fbf96d74fe5dde4",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -256,13 +256,13 @@
       "contract": "2.1.0",
       "scope": "local unconditional paragraph identity and explicit entry; G1-G5 and 1/2/5/40"
     },
-    "storage_contract_version": "1.0.0",
+    "storage_contract_version": "1.1.0",
     "canonical_ref": "feat/storage-semantics-st-w0-w5"
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "verified",
-    "commit": "513194dc355720a59667430be2efd70f9ede692f",
+    "commit": "b28fc827cb839dda833d77fa36bd317163f4f193",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",

@@ -23,7 +23,7 @@ CASES = {
 
 
 def source_oracle(sp, case, version):
-    require(sp['contractVersion'] == version and version in ('1.5.0', '1.6.0', '1.7.0', '1.8.0','1.9.0','2.0.0','2.1.0','2.2.0', '2.3.0', '2.4.0', '2.5.0', '2.6.0', '2.7.0'), 'locked typed MOVE source contract')
+    require(sp['contractVersion'] == version and version in ('1.5.0', '1.6.0', '1.7.0', '1.8.0','1.9.0','2.0.0','2.1.0','2.2.0', '2.3.0', '2.4.0', '2.5.0', '2.6.0', '2.7.0','2.8.0'), 'locked typed MOVE source contract')
     require(sp['unit']['canonicalProgramName'] == 'CALLER', 'real caller identity')
     data = {d['canonicalName']: d['id'] for d in sp['dataDeclarations']}
     require(set(data) == ({'WS-A', 'WS-B', 'WS-PGM'} if case == 'multi-hop' else {'WS-A', 'WS-PGM'}), 'scalar declarations')

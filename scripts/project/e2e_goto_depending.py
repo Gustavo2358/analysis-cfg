@@ -22,7 +22,7 @@ def maps(sp,air):
     return p,ops,labels,links
 
 def oracle(name,case,sp,air,cfg,result):
-    require(sp['contractVersion'] in ('2.6.0','2.7.0'),'explicit new SP wire version')
+    require(sp['contractVersion'] in ('2.6.0','2.7.0','2.8.0'),'explicit new SP wire version')
     gs=[s for s in sp['statements'] if s['variant']=='GO_TO_DEPENDING_ON'];require(len(gs)==1,'one typed source occurrence')
     g=gs[0];ds=g['destinations'];require(len(ds)==len(case['order']),'all destination occurrences survive')
     facts={s['header']['id']:s for s in sp['statements']}

@@ -163,3 +163,18 @@ Os inventários compilados incluem explicitamente o domínio e o novo provider.
 O domínio pode depender do storage/effects e da admissão RD no kernel; os
 providers continuam na fronteira de composição. Os checks de dependência,
 Java 21, fontes exatas, javap/jdeps e ausência de I/O permanecem ativos.
+
+## Qualificação de overlays ST-W4
+
+O consumidor recebe SP 2.8.0 pelo lower pinado; a análise continua recebendo
+somente AIR. Region/View preserva mesma base e offsets próprios, incluindo
+FILLER e componentes de footprint máximo. O E2E de overlays reutiliza os
+mesmos oracles físicos de grupos e adiciona goldens independentes para relações,
+origens e precisão escalar localizada. Fixtures sem alvo comprovado ou com
+footprint desconhecido conservam resultado aberto. Comparações A/B e permutações
+incluem o inventário de relações SP; nenhum nome fonte governa RD/values.
+
+O caso de escrita no prefixo consulta o sufixo e verifica sua definição antiga;
+a consulta composta integral é qualificada em W5. Views com codecs distintos
+continuam separadas no resolver e na interpretação, mesmo sobre a mesma faixa.
+`StorageIndexTest` e `RegionalValuesTest` são controles pequenos dessa regra.

@@ -35,5 +35,5 @@ def freeze(root,work,m2,allow_dirty=False,semantic_product_version="2.6.0"):
     (work/'runtime.json').write_text(json.dumps(config,indent=2)+'\n')
     return config
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('--root',type=Path,required=True);p.add_argument('--work',type=Path,required=True);p.add_argument('--m2',type=Path,required=True);p.add_argument('--allow-dirty',action='store_true');p.add_argument('--semantic-product-version',choices=['2.6.0','2.7.0'],default='2.6.0')
+    p=argparse.ArgumentParser();p.add_argument('--root',type=Path,required=True);p.add_argument('--work',type=Path,required=True);p.add_argument('--m2',type=Path,required=True);p.add_argument('--allow-dirty',action='store_true');p.add_argument('--semantic-product-version',choices=['2.6.0','2.7.0','2.8.0'],default='2.6.0')
     a=p.parse_args();freeze(a.root.resolve(),a.work.resolve(),a.m2.resolve(),a.allow_dirty,a.semantic_product_version)
