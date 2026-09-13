@@ -76,6 +76,16 @@
       "threeMixedSitesKeepPointValuesSupportsAndExcludeUnreachableLiteral",
       "ifJoinThenOverwriteSameObjectUsesDifferentProgramPoints",
       "twoDynamicThreeLiteralSitesShareRunsAndDeduplicateGlobalNames"
+    ],
+    "io.github.gustavo2358.analysis.adapters.ConservativeOperationBoundaryTest": [
+      "mandatoryWriteKillsOnlyTheOverwrittenValue",
+      "possibleWriteKeepsKnownCandidateAndOpensRemainder",
+      "opaqueAppliesDeclaredMemoryAndKnownContinuation",
+      "boundedOpenControlReachesLaterSitesWithoutChangingEarlierFacts",
+      "provedDisjointWriteScopeDoesNotOpenUnrelatedTarget",
+      "preciseControlBeforeAddingRegionProvesBothCallTargets",
+      "opaqueKnownOperandWritesHonorMandatoryAndPossibleEffects",
+      "boundedControlHasMatchingForwardAndBackwardCursors"
     ]
   },
   "analysis-dataflow": {

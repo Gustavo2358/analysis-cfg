@@ -128,11 +128,14 @@ final class IndexBuilder {
                 valid(sequence.label().unit().equals(unit.id()), "foreign Sequence owner");
                 unique(sequences, sequence.label(), sequence, "duplicate Sequence label");
                 Terminator term = sequence.terminator();
-                supported(term instanceof Operations.Jump || term instanceof Operations.Branch
-                        || term instanceof Operations.Return || term instanceof Operations.Halt
-                        || term instanceof Operations.Invoke invoke && (invoke.outcomes().known().size()==1 && invoke.outcomes().known().getFirst() instanceof Control.Normal
-                            && (invoke.outcomes().remainder() instanceof Scopes.NoControl || invoke.outcomes().remainder() instanceof Scopes.WithinControl bound && bound.scope() instanceof Scopes.AllControl)), "unsupported terminator profile");
-                arity = Math.addExact(arity, term instanceof Operations.Branch ? 2 : 1);
+                supported(term instanceof Operations.Jump || term instanceof Operations.Branch || term instanceof Operations.Return || term instanceof Operations.Halt
+                    || term instanceof Operations.Invoke invoke && OpenControl.supportsInvoke(invoke)
+                    || term instanceof Operations.Opaque opaque && OpenControl.supportsOpaque(opaque), "unsupported control");
+                int degree = term instanceof Operations.Branch ? 2 : term instanceof Operations.Invoke invoke ? invoke.outcomes().known().size()
+                    : term instanceof Operations.Opaque opaque ? (int) opaque.envelope().control().known().stream().map(a -> {
+                        var l = OpenControl.alternativeLabel(a); return l == null ? a : l;
+                    }).distinct().count() : 1;
+                arity = Math.addExact(arity, degree);
                 if (term instanceof Operations.Halt) expectedHalts = Math.incrementExact(expectedHalts);
                 int offset = 0;
                 for (Instruction instruction : sequence.instructions()) {
@@ -254,14 +257,14 @@ final class IndexBuilder {
             Entries.Entry activation = entries.get(edge.activationEntry());
             valid(source != null && target != null && activation != null, "foreign edge endpoint/Entry");
             valid(source.owner().id().equals(activation.id().unit()) && target.owner().id().equals(activation.id().unit()), "wrong edge activationEntry");
-            ProgramIndex.Node expected = expectedTarget(source, activation, edge.kind());
+            ProgramIndex.Node expected = expectedTarget(source, activation, edge.kind(), target);
             valid(expected != null && expected == target, "wrong edge destination/kind/context");
             int context = entryOrdinals.get(activation.id());
             long key = LongIntDirectory.key(context, source.ordinal);
             int roles = seenRoles.get(key);
             if (roles < 0) roles = 0;
             int bit = 1 << edge.kind().ordinal();
-            valid((roles & bit) == 0, "duplicate semantic contextual edge");
+            valid(edge.kind() == CfgTransition.Kind.OPAQUE_JUMP || (roles & bit) == 0, "duplicate semantic contextual edge");
             seenRoles.put(key, roles | bit);
             edges[ordinal] = edge; from[ordinal] = source.ordinal; to[ordinal] = target.ordinal; edgeEntry[ordinal] = context;
             ordinal = Math.incrementExact(ordinal);
@@ -276,13 +279,16 @@ final class IndexBuilder {
         }
     }
 
-    private ProgramIndex.Node expectedTarget(ProgramIndex.Node source, Entries.Entry activation, CfgTransition.Kind kind) {
+    private ProgramIndex.Node expectedTarget(ProgramIndex.Node source, Entries.Entry activation, CfgTransition.Kind kind, ProgramIndex.Node target) {
         if (source.source() instanceof CfgNode.EntryNode entry) {
             return kind == CfgTransition.Kind.ENTRY && entry.source() == activation
                     ? sequenceNodes.get(activation.initialLabel().orElseThrow()) : null;
         }
         if (!(source.source() instanceof CfgNode.SequenceNode node)) return null;
         return switch (node.source().terminator()) {
+            case Operations.Opaque opaque -> kind == CfgTransition.Kind.OPAQUE_RETURN && opaque.envelope().control().known().contains(Control.ReturnAlternative.INSTANCE)
+                ? normalExits.get(activation.id()) : kind == CfgTransition.Kind.OPAQUE_JUMP && target.source() instanceof CfgNode.SequenceNode seq
+                    && OpenControl.opaqueDestination(opaque, seq.source().label()) ? target : null;
             case Operations.Jump jump -> kind == CfgTransition.Kind.JUMP ? sequenceNodes.get(jump.destination()) : null;
             case Operations.Invoke invoke -> kind == CfgTransition.Kind.INVOKE_NORMAL
                     ? sequenceNodes.get(((Control.Normal) invoke.outcomes().known().getFirst()).label()) : null;

@@ -12,7 +12,9 @@ import java.util.*;
 
 /** Generic forward BFS over the existing contextual graph. Does not execute a values solver. */
 public final class ReachabilityProvider implements AnalysisProvider<LabelId,ReachabilityProvider.Fact> {
-    public record Fact(boolean reachable,boolean sourceUnknownRemainder) { }
+    public record Fact(boolean reachable,boolean sourceUnknownRemainder,boolean controlUnknown) {
+        public Fact(boolean reachable,boolean sourceUnknownRemainder){this(reachable,sourceUnknownRemainder,false);}
+    }
     public static AnalysisKey key(EntryId entry) {return new AnalysisKey("Reachability","1","known-graph@1",Direction.FORWARD,"KNOWN_GRAPH_ENTRY",Map.of(),entry);}
     public static ObservationBatchId<LabelId,Fact> batch(String id,EntryId entry) {return new ObservationBatchId<>(id,key(entry),"ReachabilityFact@1",LabelId.class,Fact.class);}
     public String implementation(){return "Reachability";}
@@ -28,8 +30,8 @@ public final class ReachabilityProvider implements AnalysisProvider<LabelId,Reac
         var context=session.context(key.entry());var unit=session.index().unit(key.entry().unit());
         boolean open=open(session.index().publication().coverage())||open(unit.coverage())||!context.entry().state().uncertainties().isEmpty();
         for(var sequence:unit.sequences()) {
-            for(var instruction:sequence.instructions())open|=open(instruction.header());
-            open|=open(sequence.terminator().header());
+            for(var instruction:sequence.instructions())if(!(instruction instanceof Operations.HavocMust||instruction instanceof Operations.HavocMay))open|=open(instruction.header());
+            if(!(sequence.terminator() instanceof Operations.Opaque))open|=open(sequence.terminator().header());
             if(sequence.terminator() instanceof Operations.Invoke invoke)open|=invoke.outcomes().remainder() instanceof Scopes.WithinControl;
         }
         final boolean sourceOpen=open;
@@ -39,12 +41,18 @@ public final class ReachabilityProvider implements AnalysisProvider<LabelId,Reac
             public Run<LabelId,Fact> execute() {
                 Set<ProgramIndex.Node> seen=Collections.newSetFromMap(new IdentityHashMap<>());
                 var pending=new ArrayDeque<ProgramIndex.Node>();var labels=new HashSet<LabelId>();
+                var uncertain=Collections.newSetFromMap(new IdentityHashMap<ProgramIndex.Node,Boolean>());var openLabels=new HashSet<LabelId>();
                 seen.add(context.entryNode());pending.add(context.entryNode());long edges=0;
                 while(!pending.isEmpty()) {
                     var node=pending.removeFirst();if(node.source() instanceof CfgNode.SequenceNode sequence)labels.add(sequence.source().label());
                     var cursor=context.successors(node);
-                    while(cursor.advance()){edges=Math.incrementExact(edges);if(seen.add(cursor.target()))pending.addLast(cursor.target());}
+                    while(cursor.advance()){
+                        edges=Math.incrementExact(edges);boolean newOpen=false;
+                        if(uncertain.contains(node)||node.source() instanceof CfgNode.SequenceNode region && region.source().terminator() instanceof Operations.Opaque opaque && opaque.envelope().control().remainder() instanceof Scopes.WithinControl||cursor.transition().kind()==io.github.gustavo2358.analysis.cfg.domain.CfgTransition.Kind.OPAQUE_UNKNOWN)newOpen=uncertain.add(cursor.target());
+                        if(seen.add(cursor.target())||newOpen)pending.addLast(cursor.target());
+                    }
                 }
+                for(var node:uncertain)if(node.source() instanceof CfgNode.SequenceNode sequence)openLabels.add(sequence.source().label());
                 var reached=Set.copyOf(labels);
                 var outcome=new AnalysisOutcome(key,AnalysisOutcome.Status.STABLE,null,Map.of("nodesVisited",(long)seen.size(),"edgesVisited",edges,"reachabilityRuns",1L));
                 return new Run<>() {
@@ -55,7 +63,7 @@ public final class ReachabilityProvider implements AnalysisProvider<LabelId,Reac
                             var site=session.index().site(q.point().operation());
                             if(q.point().kind()!=ProgramPoint.Kind.BEFORE||!q.point().entry().equals(key.entry())||site==null||!site.sequence().label().equals(q.subject()))
                                 throw new ObservationBatch.ObservationException("unbound reachability point");
-                            answers.add(new ObservationBatch.Observation<>(q,ObservationBatch.QueryStatus.VALUE,null,new Fact(reached.contains(q.subject()),sourceOpen)));
+                            answers.add(new ObservationBatch.Observation<>(q,ObservationBatch.QueryStatus.VALUE,null,new Fact(reached.contains(q.subject()),sourceOpen,openLabels.contains(q.subject()))));
                         }
                         return new Materialized<>(new ObservationBatch<>(ObservationBatch.Status.COMPLETE,null,answers,
                             new ObservationBatch.Metrics(queries.size(),queries.size(),0,0,0,queries.size(),0,0,0)),Map.of());

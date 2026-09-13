@@ -1,0 +1,15 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. PARTIAL-PGM.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 WS-A PIC X(8).
+       01 WS-B PIC X(8).
+       01 FLAG PIC X.
+       01 UNMODELED-NUMBER PIC 9(4).
+       PROCEDURE DIVISION.
+       MOVE 'PROGA' TO WS-A.
+       CALL WS-A.
+       DISPLAY WS-A.
+       MOVE 'PROGB' TO WS-B.
+       CALL WS-B.
+       GOBACK.

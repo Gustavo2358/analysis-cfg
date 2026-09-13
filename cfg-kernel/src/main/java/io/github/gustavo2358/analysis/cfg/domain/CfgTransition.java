@@ -20,5 +20,5 @@ public record CfgTransition(CfgNodeId from, CfgNodeId to, Kind kind, EntryId act
         }
     }
 
-    public enum Kind { ENTRY, RETURN, JUMP, HALT, BRANCH_TRUE, BRANCH_FALSE, INVOKE_NORMAL }
+    public enum Kind { ENTRY, RETURN, JUMP, HALT, BRANCH_TRUE, BRANCH_FALSE, INVOKE_NORMAL, OPAQUE_JUMP, OPAQUE_RETURN, OPAQUE_UNKNOWN }
 }

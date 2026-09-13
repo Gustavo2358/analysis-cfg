@@ -35,7 +35,7 @@ def program_candidates(result):
 
 
 def source_oracle(sp, case):
-    require(sp['contractVersion'] == '1.7.0' and sp['unit']['canonicalProgramName'] == 'CALLER', 'SP1.7 real CALLER')
+    require(sp['contractVersion'] == '1.8.0' and sp['unit']['canonicalProgramName'] == 'CALLER', 'SP1.8 real CALLER')
     facts = {s['header']['id']: s for s in sp['statements']}
     require(len(facts) == len(sp['statements']) and all(s['header']['coverage'] == 'MODELED' for s in facts.values()), 'complete typed source facts')
     require(all(s['variant'] in {'MOVE', 'CALL', 'IF', 'PERFORM', 'GOBACK'} for s in facts.values()), 'no unknown statement filtering')
@@ -52,10 +52,10 @@ def source_oracle(sp, case):
     performs = [s for s in facts.values() if s['variant'] == 'PERFORM']
     require(len(performs) == (1 if case in (4, 5, 6) else 0), 'MULTI-CALL is not MULTI-PERFORM')
     for p in performs:
-        require(p['profile'] == 'SIMPLE_SINGLE_CALLSITE_PROCEDURE_PERFORM' and not p['gapCodes'], 'isolated activation')
-        require(set(p['primaryStatements']) == seen and set(p['targetStatements']).isdisjoint(seen), 'complete direct primary and separate target')
+        require(p['profile'] == 'BASIC_PROCEDURE_PERFORM' and not p['gapCodes'], 'isolated activation')
+        require('primaryStatements' not in p and set(p['targetStatements']).isdisjoint(seen), 'complete direct primary and separate target')
         seen.update(p['targetStatements'])
-        require(facts[p['targetExit']]['normalContinuation']['statement'] == p['normalContinuation']['statement'], 'body returns to unique resume')
+        require(facts[p['targetExit']]['normalContinuation']['availability'] == 'NONE', 'body returns to unique resume')
     seen.update(s['header']['id'] for s in facts.values() if s['header']['containment']['parent'] is not None)
     require(seen == set(facts), 'full source inventory accounted for')
     return facts, calls
@@ -82,7 +82,11 @@ def air_oracle(air, sp, semantic):
         seq, offset, op = links[ident]; kind = fact['variant']
         require(op['kind'] == {'MOVE': 'assign', 'CALL': 'invoke', 'IF': 'branch', 'PERFORM': 'jump', 'GOBACK': 'return'}[kind], 'existing AIR operation per typed statement')
         if kind == 'MOVE':
-            target_seq, target_offset, _ = links[fact['normalContinuation']['statement']]
+            next_id = fact['normalContinuation']['statement']
+            if next_id is None:
+                owner = next(p for p in facts.values() if p['variant'] == 'PERFORM' and p['targetExit'] == ident)
+                next_id = owner['normalContinuation']['statement']
+            target_seq, target_offset, _ = links[next_id]
             require(offset < len(seq['instructions']), 'MOVE is instruction')
             if target_seq == seq: require(target_offset == offset + 1, 'MOVE next instruction/terminator')
             else: require(seq['terminator']['kind'] == 'jump' and seq['terminator']['destination'] == target_seq['label'], 'MOVE arm/body explicit completion')
@@ -96,7 +100,8 @@ def air_oracle(air, sp, semantic):
         elif kind == 'PERFORM':
             body = links[fact['targetEntry']][0]
             require(op['destination'] == body['label'], 'PERFORM enters target')
-            require([i['header']['id'] for i in body['instructions']] == [links[s][2]['header']['id'] for s in fact['targetStatements']], 'entire target body in published order')
+            require(all(links[s][2]['kind'] == 'assign' for s in fact['targetStatements']), 'entire target body represented')
+            body = links[fact['targetExit']][0]
             require(body['terminator']['kind'] == 'jump' and body['terminator']['destination'] == links[fact['normalContinuation']['statement']][0]['label'], 'PERFORM unique resume')
     require(sum(s['terminator']['kind'] == 'invoke' for s in unit['sequences']) == len(calls), 'all CALLs and no synthetic dependency sites')
     return unit, links
@@ -159,7 +164,7 @@ def w1_regressions(work, producer, config, cp):
             (web / 'web').symlink_to(producer / 'proleap-poc/src/main/resources/web', target_is_directory=True)
             execute(cwd, 'frontend', ['java', '-cp', os.pathsep.join(config['frontend']['classpath']), config['frontend']['main'], '--source', source.name, '--copybooks', str(producer / 'proleap-poc/corpus/cpy'), '--output', str(cwd / 'sp')])
             sp = cwd / 'sp/cobol-semantic-product.json'; air = cwd / 'program.air.json'; cfg = cwd / 'cfg.json'; dep = cwd / 'dependencies.json'
-            require(json.loads(sp.read_text())['contractVersion'] == '1.7.0', 'current pinned W1 SP')
+            require(json.loads(sp.read_text())['contractVersion'] == '1.8.0', 'current pinned W1 SP')
             execute(cwd, 'lower', ['java', '-cp', os.pathsep.join(config['lower']['classpath']), config['lower']['main'], str(sp), str(air)])
             execute(cwd, 'cfg', ['java', '-cp', cp, 'io.github.gustavo2358.analysis.cfg.launcher.AnalysisCfg', str(air), str(cfg)])
             verify_cfg_wire(cfg.read_bytes())
@@ -174,7 +179,7 @@ def w1_regressions(work, producer, config, cp):
             require(site['sourceValueRemainder'] and site['interpretationUnknownRemainder'] and site['effectiveUnknownRemainder'], 'W1 remainders retained')
             require(result['metrics']['possibleValuesRuns'] == (0 if name == 'literal' else 1), 'W1 literal zero values analyses')
             if name == 'dynamic-x8':
-                assign = sequence['instructions'][0]; candidate = site['candidates'][0]
+                assign = next(i for s in unit['sequences'] for i in s['instructions'] if i['kind'] == 'assign'); candidate = site['candidates'][0]
                 require(candidate['rawValue'] == 'PROGA   ' and candidate['supports'][0]['producer'] == assign['header']['id'], 'W1 padded value and original producer')
             outputs.append([p.read_bytes() for p in (sp, air, cfg, dep)])
         require(outputs[0] == outputs[1], 'W1 A/B exact bytes ' + name)
@@ -187,7 +192,7 @@ def run(work, config_path):
     for name, key in (('air-java', 'air_java'), ('proleap-poc', 'proleap_poc'), ('cobol-lower', 'cobol_lower')):
         pin = lock[key].get('commit', lock[key].get('main_commit'))
         require(config['sources'][name] == pin == git(producer / name, 'rev-parse', 'HEAD') and not git(producer / name, 'status', '--porcelain'), 'exact clean source pin: ' + name)
-    require(config['semanticProductVersion'] == lock['proleap_poc']['semantic_product_version'] == '1.7.0', 'exact producer version')
+    require(config['semanticProductVersion'] == lock['proleap_poc']['semantic_product_version'] == '1.8.0', 'exact producer version')
     cp = runtime(producer)
     w1_regressions(work, producer, config, cp)
     for case in SITES:

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "work_item": "WORK-CFG-036",
-  "status": "IMPLEMENTED / AWAITING HUMAN REVIEW",
+  "work_item": "WORK-CFG-038",
+  "status": "IN_PROGRESS",
   "work_item_status": "IN_PROGRESS",
   "authorization": "implementation",
   "w1": "APPROVED / MERGED / CLOSED",
@@ -21,7 +21,8 @@
     "analysis-cfg-json": {
       "legacy": "1.0.0",
       "Invoke": "2.0.0",
-      "selection": "minimum contract required by actual graph domain"
+      "selection": "minimum contract required by actual graph domain",
+      "Opaque": "3.0.0"
     },
     "analysis-dependency-result": "1.0.0"
   },
@@ -69,7 +70,7 @@
       "cobol-lower": "bcd9980bed1255910f71b58f056dbf9857510a26"
     },
     "record": "docs/work/active/WORK-CFG-036.md",
-    "next": "EVALUATE",
+    "next": "COMPOSITIONALITY + PARTIAL CONSERVATIVE LOWERING",
     "pr": 22,
     "qualified_source_head": "656b2cb7568ac253af84248e3f99106a9eb4caaa",
     "local_full": "PASS: once per repository; CFG includes real PERFORM A/B",
@@ -77,14 +78,14 @@
   },
   "multi_call": {
     "work_item": "WORK-CFG-037",
-    "status": "IMPLEMENTED / AWAITING HUMAN REVIEW",
+    "status": "DONE / MERGED",
     "baselines": {
       "proleap-poc": "a14147106f329cce2f0006aa94194b47db96f367",
       "cobol-lower": "546af4067bc42540bb73e88684e18e3082ddfb94",
       "analysis-cfg": "e200b101455fa7addf59413ce5e6548c03d9116f"
     },
     "record": "docs/work/active/WORK-CFG-037.md",
-    "next": "EVALUATE",
+    "next": "COMPOSITIONALITY + PARTIAL CONSERVATIVE LOWERING",
     "pr": 23,
     "qualified_source_head": "3c16a35eaa1997acd83d0cb91c70026273080cd8",
     "source_pins": {
@@ -92,6 +93,31 @@
       "cobol-lower": "1fe4a56d6cb7e81ff6fbd249808f65a72195322b"
     },
     "local_full": "PASS in all three repositories; CFG seven real multi-CALL programs plus all earlier regressions; later changes documentary only",
-    "production_analysis_cfg": "NONE"
-  }
+    "production_analysis_cfg": "NONE",
+    "merge_commit": "664a932af0421d8a604b77d8de5852e7ac8db955",
+    "merge_commits": {
+      "proleap-poc": "ff3704911e53b3d8b337fc610cf84343cdc5fe90",
+      "cobol-lower": "797dcbd6f05f12661299339746c607b5b57ac1ba",
+      "analysis-cfg": "664a932af0421d8a604b77d8de5852e7ac8db955"
+    }
+  },
+  "compositional_partial": {
+    "work_item": "WORK-CFG-038",
+    "status": "IN_PROGRESS",
+    "baselines": {
+      "proleap-poc": "ff3704911e53b3d8b337fc610cf84343cdc5fe90",
+      "cobol-lower": "797dcbd6f05f12661299339746c607b5b57ac1ba",
+      "analysis-cfg": "664a932af0421d8a604b77d8de5852e7ac8db955"
+    },
+    "record": "docs/work/active/WORK-CFG-038.md",
+    "next": "CARDDEMO BASELINE",
+    "review_state": "IMPLEMENTED / AWAITING HUMAN REVIEW",
+    "local_full": "PASS in frontend, lower, CFG and extended codec; documentation closeout does not repeat Full",
+    "source_pins": {
+      "proleap-poc": "15354e946904337a74980ca659119f2eb22df57b",
+      "cobol-lower": "bb377189aeaffa4c81f0a0a4c3d65a763974d5a7",
+      "air-java": "b1c45b8f23452082c9f3969b78915976747e87c7"
+    }
+  },
+  "next": "CARDDEMO BASELINE"
 }

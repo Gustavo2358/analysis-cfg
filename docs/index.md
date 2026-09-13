@@ -29,3 +29,5 @@ ou referência não consultada substitui regra canônica da versão em uso.
 
 - [CFG JSON 2.0.0 e preservação v1](architecture/cfg-json-v2.md).
 - [Fast CI e Full Qualification explícita](engineering/qualification.md).
+
+- [CFG JSON 3.0.0](architecture/cfg-json-v3.md) e [compositionality/partial lowering](architecture/compositional-partial-lowering.md).

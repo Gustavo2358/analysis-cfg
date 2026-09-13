@@ -18,24 +18,28 @@ FIXTURES = ROOT / 'analysis-adapters/src/test/resources/cp6/perform-basic'
 
 
 def source_oracle(sp, case):
-    require(sp['contractVersion'] == '1.7.0' and sp['unit']['canonicalProgramName'] == 'CALLER', 'real CALLER at SP1.7')
+    require(sp['contractVersion'] == '1.8.0' and sp['unit']['canonicalProgramName'] == 'CALLER', 'real CALLER at SP1.8')
     statements = {s['header']['id']: s for s in sp['statements']}
     performs = [s for s in statements.values() if s['variant'] == 'PERFORM']
     require(len(performs) == 1, 'one typed PERFORM')
     p = performs[0]
-    require(p['profile'] == 'SIMPLE_SINGLE_CALLSITE_PROCEDURE_PERFORM' and not p['gapCodes'], 'isolated single-callsite proof')
+    require(p['profile'] == 'BASIC_PROCEDURE_PERFORM' and not p['gapCodes'], 'isolated single-callsite proof')
     require(p['target']['id'].startswith('procedure:'), 'canonical typed procedure identity')
     body = [statements[s] for s in p['targetStatements']]
-    primary = [statements[s] for s in p['primaryStatements']]
+    primary=[]; current=sp['entryInventory']['entries'][0]['start']['statement']; seen=set()
+    while current is not None:
+        require(current not in seen,'acyclic primary');seen.add(current);fact=statements[current];primary.append(fact)
+        current=None if fact['variant']=='GOBACK' else fact['normalContinuation']['statement']
+    primary_ids=[s['header']['id'] for s in primary]
     require(len(body) == (2 if case == 'copy' else 1), 'complete nonempty body')
     require([s['variant'] for s in primary] == (['MOVE'] if case == 'overwrite' else []) + ['PERFORM', 'CALL', 'GOBACK'], 'closed primary flow ends at GOBACK')
-    require(set(p['primaryStatements']).isdisjoint(p['targetStatements'])
-            and set(p['primaryStatements'] + p['targetStatements']) == set(statements), 'no extra modeled target entry')
+    require(set(primary_ids).isdisjoint(p['targetStatements'])
+            and set(primary_ids + p['targetStatements']) == set(statements), 'no extra modeled target entry')
     require(sp['entryInventory']['entries'][0]['start']['statement'] == primary[0]['header']['id'], 'explicit primary entry')
     require(p['targetEntry'] == body[0]['header']['id'] and p['targetExit'] == body[-1]['header']['id'], 'published body endpoints')
     call = primary[-2]
     require(p['normalContinuation']['availability'] == 'KNOWN' and p['normalContinuation']['statement'] == call['header']['id'], 'unique resume')
-    require(body[-1]['normalContinuation']['statement'] == call['header']['id'], 'isolated activation return fact')
+    require(body[-1]['normalContinuation']['availability'] == 'NONE', 'isolated activation return fact')
     data = {d['canonicalName']: d['id'] for d in sp['dataDeclarations']}
     require(set(data) == ({'WS-A', 'WS-PGM'} if case == 'copy' else {'WS-PGM'}), 'actual scalar declarations')
     require(body[0]['source']['variant'] == 'LITERAL' and body[0]['source']['logicalValue']['value'] == 'PROGA'
@@ -54,20 +58,23 @@ def air_oracle(air, semantic, case, source):
     perform, data, source_body = semantic
     require(air['airVersion'] == '2.0.0' and air['bindingVersion'] == '1.0.0', 'unchanged AIR contracts')
     p = air['publication']; require(len(p['units']) == 1, 'one unit')
-    unit = p['units'][0]; seq = unit['sequences']; require(len(seq) == 4, 'four explicit control sequences')
-    labels = {s['label']['localId']: s for s in seq}
-    main = labels[unit['entries'][0]['initialLabel']['localId']]
-    require(main['terminator']['kind'] == 'jump', 'PERFORM is direct Jump, never Invoke or bypass')
-    target = labels[main['terminator']['destination']['localId']]
-    require(target != main and target['terminator']['kind'] == 'jump', 'separate paragraph body returns with Jump')
-    call = labels[target['terminator']['destination']['localId']]
-    require(call != main and call != target and call['terminator']['kind'] == 'invoke' and not call['instructions'], 'one CALL only at resume')
-    returns = [s for s in seq if s['terminator']['kind'] == 'return']; require(len(returns) == 1, 'GOBACK Return')
-    require(call['terminator']['outcomes']['known'] == [{'kind': 'normal', 'label': returns[0]['label']}], 'CALL return')
-    require(sum(s['terminator']['kind'] == 'invoke' for s in seq) == 1, 'no PERFORM program dependency site')
-    require(len(main['instructions']) == (1 if case == 'overwrite' else 0), 'no duplicate CALL or body in primary block')
-    if case == 'overwrite': require(main['instructions'][0]['value']['value']['value'] == 'OLDPROG ', 'old value executes before PERFORM')
-    assigns = target['instructions']; require(len(assigns) == len(source_body) and all(a['kind'] == 'assign' for a in assigns), 'entire MOVE body')
+    unit = p['units'][0]; seq = unit['sequences']
+    require(len(seq)==len(source_body)+3+(case=='overwrite'),'one sequence per source occurrence')
+    labels={s['label']['localId']:s for s in seq}
+    main=labels[unit['entries'][0]['initialLabel']['localId']]
+    if case=='overwrite':
+        require(len(main['instructions'])==1 and main['instructions'][0]['value']['value']['value']=='OLDPROG ','old value precedes activation')
+        main=labels[main['terminator']['destination']['localId']]
+    require(not main['instructions'] and main['terminator']['kind']=='jump','PERFORM is an explicit Jump')
+    target=labels[main['terminator']['destination']['localId']]; current=target; assigns=[]
+    for fact in source_body:
+        require(len(current['instructions'])==1 and current['terminator']['kind']=='jump','each intrinsic body MOVE has a precise continuation')
+        assigns.extend(current['instructions']); last=current; current=labels[current['terminator']['destination']['localId']]
+    call=current
+    require(call['terminator']['kind']=='invoke' and not call['instructions'],'activation resumes at CALL')
+    returns=[s for s in seq if s['terminator']['kind']=='return'];require(len(returns)==1,'GOBACK Return')
+    require(call['terminator']['outcomes']['known']==[{'kind':'normal','label':returns[0]['label']}],'CALL return')
+    require(sum(s['terminator']['kind']=='invoke' for s in seq)==1,'PERFORM creates no dependency site')
     require(assigns[0]['value']['kind'] == 'literal' and assigns[0]['value']['value']['value'] == 'PROGA   ', 'literal body value')
     objects = {}
     for name, identity in data.items():
@@ -83,7 +90,7 @@ def air_oracle(air, semantic, case, source):
     for assign, fact in zip(assigns, source_body):
         spans = source_spans(p, {'origin': assign['header']['origin']}, source)
         require(all(int(s['span']['start']['line']) == fact['header']['provenance']['original']['startLine'] for s in spans), 'body origins preserved')
-    control_spans = source_spans(p, {'origin': target['terminator']['header']['origin']}, source)
+    control_spans = source_spans(p, {'origin': last['terminator']['header']['origin']}, source)
     required_lines = {perform['header']['provenance']['original']['startLine'], perform['target']['paragraphOrigin']['original']['startLine'], perform['normalContinuation']['provenance']['original']['startLine']}
     require(required_lines <= {int(s['span']['start']['line']) for s in control_spans}, 'return preserves callsite/paragraph/resume provenance')
     return unit, call, assigns[0], objects['WS-PGM']
@@ -115,7 +122,7 @@ def run(work, config_path):
     for name, key in (('air-java', 'air_java'), ('proleap-poc', 'proleap_poc'), ('cobol-lower', 'cobol_lower')):
         pin = lock[key].get('commit', lock[key].get('main_commit'))
         require(config['sources'][name] == pin == git(producer / name, 'rev-parse', 'HEAD') and not git(producer / name, 'status', '--porcelain'), 'exact clean source pin: ' + name)
-    require(config['semanticProductVersion'] == lock['proleap_poc']['semantic_product_version'] == '1.7.0', 'exact SP version')
+    require(config['semanticProductVersion'] == lock['proleap_poc']['semantic_product_version'] == '1.8.0', 'exact SP version')
     cp = runtime(producer)
     for case in ('literal', 'copy', 'overwrite'):
         outputs = []

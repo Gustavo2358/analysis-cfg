@@ -146,3 +146,5 @@ byte-exact. Não há CALL resolver ou CP6.
 [ledger W5](docs/engineering/cp5-w5-composition-ledger.md),
 [wire](docs/architecture/analysis-dataflow-result-v1.md),
 [roadmap](docs/product/cp5-roadmap.md), [lifecycle](docs/work/cp5-lifecycle.json).
+
+Current pipeline policy: [compositionality and conservative partial lowering](docs/architecture/compositional-partial-lowering.md).

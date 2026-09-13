@@ -10,10 +10,16 @@ Primeiro profile `scalar-text-direct@1`: ObjectPlace inteiro, CellBinding direto
 Object/Cell known(text), Assign(destination, Literal(TextValue)) ou
 Assign(destination, Read(ObjectPlace(source))) para Cells TEXT diretas admitidas,
 sem conversão, e Nop. Jump/Branch/
-Return/Halt controlam o grafo já existente. Outras expressões/writes, HavocMust/May,
-CopyBytes, aliases indiretos, views, choices, binding desconhecido e memória regional
+Return/Halt controlam o grafo já existente. Outras expressões/writes, CopyBytes, aliases indiretos, views, choices, binding desconhecido e memória regional
 são recusados explicitamente. Aceitação estrutural pelo CFG não prova semântica de
 valor; efeito desconhecido nunca vira Nop.
+
+WORK-CFG-038 acrescenta os efeitos genéricos existentes na AIR: HavocMust para
+whole ObjectPlace mata o valor anterior; HavocMay abre os locais do scope sem
+apagar candidatos que podem sobreviver. Opaque aplica knownWrites, mustOverwrite
+e otherWrites. A seleção usa Cell/Objects/Storage/Visible/All/Union, sem interpretar
+nomes de construções fonte. A incerteza de uma operação é aplicada em seu ponto,
+sem agregação retroativa sobre valores independentes. O lattice não mudou.
 
 Location = Cell inteira no contexto da Entry/run. Object é declaração/subject de
 query, Storage é base; OperandId é ocorrência. Dois Objects com a mesma Cell

@@ -7,6 +7,8 @@ TERMINATORS = {'1.0.0': {'JUMP', 'BRANCH', 'RETURN', 'HALT'},
 TRANSITIONS = {'1.0.0': {'ENTRY', 'JUMP', 'BRANCH_TRUE', 'BRANCH_FALSE', 'RETURN', 'HALT'},
                '2.0.0': {'ENTRY', 'JUMP', 'BRANCH_TRUE', 'BRANCH_FALSE', 'RETURN', 'HALT', 'INVOKE_NORMAL'}}
 
+TERMINATORS['3.0.0'] = TERMINATORS['2.0.0'] | {'OPAQUE'}
+TRANSITIONS['3.0.0'] = TRANSITIONS['2.0.0'] | {'OPAQUE_JUMP', 'OPAQUE_RETURN'}
 
 def pairs(items):
     result = {}
@@ -26,7 +28,7 @@ def verify(data):
     transitions = {t['kind'] for t in doc['transitions']}
     if not terminators <= TERMINATORS[version] or not transitions <= TRANSITIONS[version]:
         raise ValueError('CFG tokens incompatible with declared version')
-    minimum = '2.0.0' if 'INVOKE' in terminators or 'INVOKE_NORMAL' in transitions else '1.0.0'
+    minimum = '3.0.0' if 'OPAQUE' in terminators or transitions & {'OPAQUE_JUMP', 'OPAQUE_RETURN'} else '2.0.0' if 'INVOKE' in terminators or 'INVOKE_NORMAL' in transitions else '1.0.0'
     if version != minimum:
         raise ValueError('writer did not select the minimum required CFG contract')
     return dict(schemaVersion=version, terminators=sorted(terminators), transitions=sorted(transitions))

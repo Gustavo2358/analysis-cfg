@@ -23,7 +23,7 @@ CASES = {
 
 
 def source_oracle(sp, case, version):
-    require(sp['contractVersion'] == version and version in ('1.5.0', '1.6.0', '1.7.0'), 'locked typed MOVE source contract')
+    require(sp['contractVersion'] == version and version in ('1.5.0', '1.6.0', '1.7.0', '1.8.0'), 'locked typed MOVE source contract')
     require(sp['unit']['canonicalProgramName'] == 'CALLER', 'real caller identity')
     data = {d['canonicalName']: d['id'] for d in sp['dataDeclarations']}
     require(set(data) == ({'WS-A', 'WS-B', 'WS-PGM'} if case == 'multi-hop' else {'WS-A', 'WS-PGM'}), 'scalar declarations')
@@ -54,10 +54,10 @@ def air_oracle(air, data, moves, case):
     require(air['airVersion'] == '2.0.0' and air['bindingVersion'] == '1.0.0', 'AIR contracts unchanged')
     p = air['publication']; require(len(p['units']) == 1, 'one caller unit')
     unit = p['units'][0]
-    require(len(unit['sequences']) == 2, 'one Invoke sequence and its Return continuation')
+    require(len(unit['sequences']) == len(moves) + 2, 'one Invoke sequence and its Return continuation')
     call = next(s for s in unit['sequences'] if s['terminator']['kind'] == 'invoke')
     ret = next(s for s in unit['sequences'] if s['terminator']['kind'] == 'return')
-    require(unit['entries'][0]['initialLabel'] == call['label'] and not ret['instructions'], 'linear explicit entry and return')
+    require(not call['instructions'] and not ret['instructions'], 'linear explicit entry and return')
     require(call['terminator']['outcomes']['known'] == [{'kind': 'normal', 'label': ret['label']}], 'normal return continuation')
     objects = {}
     for name, identity in data.items():
@@ -67,7 +67,12 @@ def air_oracle(air, data, moves, case):
     require(len(cells) == len(data) and len(p['premises']) == 1, 'multiple cells require published premise')
     premise = p['premises'][0]['assertion']
     require(premise['kind'] == 'disjoint_storage' and all(c in premise['storage'] for c in cells), 'translated DisjointStorage covers cells')
-    assigns = call['instructions']; require(len(assigns) == len(moves), 'one Assign per source MOVE')
+    labels = {s['label']['localId']: s for s in unit['sequences']}
+    current=labels[unit['entries'][0]['initialLabel']['localId']]; assigns=[]
+    for move in moves:
+        require(len(current['instructions']) == 1 and current['terminator']['kind'] == 'jump','one explicit MOVE and continuation')
+        assigns.extend(current['instructions']); current=labels[current['terminator']['destination']['localId']]
+    require(current == call,'all MOVEs precede the CALL in source order')
     for assign, move, (kind, value, target) in zip(assigns, moves, CASES[case]):
         require(assign['kind'] == 'assign' and assign['destination']['object'] == objects[target]
                 and assign['destination']['header']['role'] == 'VALUE_WRITE', 'exact destination and write role')
@@ -103,7 +108,7 @@ def dependency_oracle(result, model, source, case):
     site = result['sites'][0]
     require(site['caller'] == unit['id'] and site['entry'] == unit['entries'][0]['id'], 'CALLER identity')
     require(site['operation'] == call['terminator']['header']['id'] and site['sequence'] == call['label']
-            and site['offset'] == len(assigns), 'real Invoke location after all MOVEs')
+            and site['offset'] == 0, 'real Invoke location after all MOVEs')
     require(site['valuePoint']['position'] == 'BEFORE' and site['valuePoint']['operationId'] == site['operation'], 'BEFORE Invoke')
     require(site['targetKind'] == 'COMPUTED' and site['reachability'] == 'REACHABLE' and site['subject'] == objects['WS-PGM'], 'computed reachable WS-PGM')
     require(site['modelValueRemainder'] is False, 'closed model from forward propagation')

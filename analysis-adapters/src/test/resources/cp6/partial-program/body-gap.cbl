@@ -1,0 +1,17 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. PARTIAL-PGM.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 WS-A PIC X(8).
+       01 WS-B PIC X(8).
+       01 FLAG PIC X.
+       PROCEDURE DIVISION.
+       MAIN.
+       PERFORM DEFINE-A.
+       CALL WS-A.
+       MOVE 'OLD' TO WS-A.
+       PERFORM DEFINE-A.
+       CALL WS-A.
+       GOBACK.
+       DEFINE-A.
+       MOVE 'LONG-PROGRAM-NAME' TO WS-A.

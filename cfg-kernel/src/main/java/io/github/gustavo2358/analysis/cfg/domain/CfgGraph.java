@@ -75,6 +75,16 @@ public final class CfgGraph {
                         && jump.destination().equals(target.source().label())
                         && sequence.source().label().unit().equals(transition.activationEntry().unit())
                         && target.source().label().unit().equals(transition.activationEntry().unit());
+                case OPAQUE_JUMP -> from instanceof CfgNode.SequenceNode sequence
+                        && sequence.source().terminator() instanceof Operations.Opaque opaque
+                        && to instanceof CfgNode.SequenceNode target
+                        && CoreCfgProjection.opaqueDestination(opaque, target.source().label())
+                        && sequence.source().label().unit().equals(transition.activationEntry().unit());
+                case OPAQUE_RETURN -> from instanceof CfgNode.SequenceNode sequence
+                        && sequence.source().terminator() instanceof Operations.Opaque opaque
+                        && opaque.envelope().control().known().contains(io.github.gustavo2358.air.model.Control.ReturnAlternative.INSTANCE)
+                        && to instanceof CfgNode.NormalExit exit && exit.entryId().equals(transition.activationEntry());
+                case OPAQUE_UNKNOWN -> false; // symbolic transitions exist only in the contextual cursor
                 case INVOKE_NORMAL -> from instanceof CfgNode.SequenceNode sequence
                         && sequence.source().terminator() instanceof Operations.Invoke invoke
                         && CoreCfgProjection.supportsInvoke(invoke)

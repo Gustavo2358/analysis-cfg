@@ -92,8 +92,13 @@
         "java.lang.String"
       ],
       "io.github.gustavo2358.analysis.cfg.adapters.CfgJsonWriter": [
+        "io.github.gustavo2358.air.model.Control",
+        "io.github.gustavo2358.air.model.Control$ControlEnvelope",
+        "io.github.gustavo2358.air.model.Control$InvocationOutcomes",
         "io.github.gustavo2358.air.model.Entries",
         "io.github.gustavo2358.air.model.Entries$Entry",
+        "io.github.gustavo2358.air.model.Envelopes",
+        "io.github.gustavo2358.air.model.Envelopes$Envelope",
         "io.github.gustavo2358.air.model.Evidence",
         "io.github.gustavo2358.air.model.Evidence$Coverage",
         "io.github.gustavo2358.air.model.Evidence$InventoryStatus",
@@ -111,8 +116,12 @@
         "io.github.gustavo2358.air.model.Operations$Header",
         "io.github.gustavo2358.air.model.Operations$Invoke",
         "io.github.gustavo2358.air.model.Operations$Jump",
+        "io.github.gustavo2358.air.model.Operations$Opaque",
         "io.github.gustavo2358.air.model.Operations$Return",
         "io.github.gustavo2358.air.model.Publication",
+        "io.github.gustavo2358.air.model.Scopes",
+        "io.github.gustavo2358.air.model.Scopes$ControlBound",
+        "io.github.gustavo2358.air.model.Scopes$WithinControl",
         "io.github.gustavo2358.air.model.SemanticVersion",
         "io.github.gustavo2358.air.model.Sequence",
         "io.github.gustavo2358.air.model.Terminator",
@@ -161,7 +170,9 @@
         "java.util.Iterator",
         "java.util.List",
         "java.util.Objects",
-        "java.util.Optional"
+        "java.util.Optional",
+        "java.util.function.Predicate",
+        "java.util.stream.Stream"
       ],
       "io.github.gustavo2358.analysis.cfg.adapters.CfgJsonWriter$1": [
         "io.github.gustavo2358.air.model.Evidence",

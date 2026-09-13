@@ -49,7 +49,7 @@ final class CallDependencyConsumer implements FactConsumer<DependencySiteFact> {
         var uncertainties=new LinkedHashSet<>(invoke.header().uncertainties());if(policy instanceof Interactions.UnknownName unknown)uncertainties.add(unknown.uncertainty());
         sink.emit(new DependencySiteFact(site.entry().unit(),site.entry(),site.sequence(),site.operationId(),site.offset(),site.origin(),targetOrigin,
             computed?TargetKind.COMPUTED:TargetKind.LITERAL,subject,point,reachable.reachable()?Reachability.REACHABLE:Reachability.UNREACHABLE_IN_MODEL,status,raw,candidates,
-            model,source,interpretation,Boolean.TRUE.equals(model)||source||interpretation,invoke.outcomes().remainder() instanceof Scopes.WithinControl,
+            model,source,interpretation,Boolean.TRUE.equals(model)||source||interpretation,reachable.controlUnknown()||invoke.outcomes().remainder() instanceof Scopes.WithinControl,
             List.copyOf(evidence),List.copyOf(origins),List.copyOf(premises),List.copyOf(uncertainties)));
     }
     private static <T,V> V lookup(PreparedFacts facts,ObservationBatchId<T,V> batch,PointQuery<T> query) {

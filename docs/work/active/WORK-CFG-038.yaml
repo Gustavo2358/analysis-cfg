@@ -1,0 +1,13 @@
+id: WORK-CFG-038
+title: CP6 — compositionality and conservative partial lowering
+status: IN_PROGRESS
+scope:
+  - Multiplicity contracts and localized conservative partial lowering across SP, AIR and CFG
+  - Generic AIR conservative-operation probes before CFG production changes
+  - FAST remote, final qualification local, coordinated Draft PRs without merge
+review_state: IMPLEMENTED / AWAITING HUMAN REVIEW
+next: CARDDEMO BASELINE
+validation: >-
+  Final qualification-local PASS; FAST local PASS and remote FAST required.
+  Real source A/B across SP/AIR/CFG/dependency, 22 partial/compositional programs
+  and all seven MULTI-CALL regressions. See WORK-CFG-038.md and PR checks.

@@ -86,6 +86,7 @@ class EvalCfg028Test {
             assertTrue(nodes.containsKey(t.to()));
             EdgeKind kind = switch (t.kind()) {
                 case INVOKE_NORMAL -> throw new AssertionError("Invoke belongs to CP6 W1D");
+                case OPAQUE_JUMP, OPAQUE_RETURN, OPAQUE_UNKNOWN -> throw new AssertionError("Opaque belongs to WORK-CFG-038");
                 case ENTRY -> EdgeKind.ENTRY;
                 case JUMP -> EdgeKind.JUMP;
                 case RETURN -> EdgeKind.RETURN;
@@ -383,7 +384,7 @@ class EvalCfg028Test {
         var result = build(input);
         assertEquals(CfgBuildResult.Status.UNSUPPORTED_INPUT, result.status());
         assertTrue(result.graph().isEmpty());
-        assertEquals(List.of(dispatchId, raiseId, invokeId, opaqueId), result.projectionIssues().stream().map(CfgProjectionIssue::subject).toList());
+        assertEquals(List.of(dispatchId, raiseId, invokeId), result.projectionIssues().stream().map(CfgProjectionIssue::subject).toList());
         assertTrue(result.projectionIssues().stream().allMatch(i -> i.code() == CfgProjectionIssue.Code.UNSUPPORTED_TERMINATOR));
     }
 
