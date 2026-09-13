@@ -283,3 +283,35 @@ normalização, incluindo fragmentos desconhecidos; o universo permanece finito.
 
 O produto por faixa e o transporte detalhado de eventos/fragmentos ainda estão
 em implementação na mesma subtask. Esta correção focal não qualifica W5/M3.
+
+## ST-W5.3 — observações destacadas e intervalos de captura
+
+StorageSubject admite consulta por objeto ou faixa física, com validação de
+visibilidade, bounds e referências de codec contra a publicação admitida.
+StorageValueFact publica as alternativas da leitura, fragmentos conhecidos ou
+unknown, produtores originais, escritores unknown e capturas. DefinitionEvent
+é materializado pela mesma fábrica em RD e values: os registros concordam em
+Entry, operação/condição inicial, ocorrência, slot, outcome e base. O produto
+não conserva Store, Trace, ByteImage, sessão ou roots do solver.
+
+Cópias mantêm evento→set de offsets de origem por fragmento. Crop avança cada
+offset; shift muda somente a localização observada. O intervalo contribuinte
+no destino de cada captura é derivado do deslocamento relativo à fonte daquela
+CopyBytes. Repetições do mesmo evento em loop agregam posições possíveis dentro
+do intervalo estático finito da cópia. Os offsets e sets participam de igualdade
+e normalização. Não representam ordem de ocorrências, multiplicidade ou path.
+
+Read lógico conserva fragmentos capturados da origem sob LOGICAL_CAPTURE quando
+há bytes conhecidos; a localização e contribuição ao destino são WHOLE_CELL,
+sem offsets físicos inventados na Cell. Eventos ASSIGN de Read continuam com o
+mesmo campo unknown de RD, que descreve o produtor RD, independentemente de a
+análise de valores conhecer o texto capturado. Unknown sem evento de escrita,
+como estado inicial não especificado, não ganha produtor literal artificial.
+
+A projeção RegionalValueFact usada pelo consumer textual conserva forma e
+candidateSupports de produtores literais. Sua evidence/provenance agregada passa
+a incluir também capturas e escritores unknown sobreviventes, extensão explícita
+do profile @2. Isso permite explicar um resultado aberto sem afirmar candidato.
+Testes fixam composição, RD correspondente, cópia de cópia recortada, unknown
+parcial, source gap, branches, inventários permutados, Cell, zero e unreachable.
+O wire separado e sua qualificação ainda estão pendentes na subtask W5.3.

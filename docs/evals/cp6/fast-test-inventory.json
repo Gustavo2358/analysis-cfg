@@ -193,6 +193,13 @@
       "seededCellIsNotReinitializedOnLoopOrNextSequence",
       "hugeBoundsUnknownTailAndZeroLengthNeverAllocatePerByte",
       "wideDefinitionsAndDuplicateQueriesHaveNoCandidateCapOrRepeatedReplay"
+    ],
+    "io.github.gustavo2358.analysis.storage.StorageQueryTest": [
+      "namedViewAndPhysicalRangeShareTheSameDefinitionProduct",
+      "physicalQueriesKeepBigIntegerUnknownTailAndZeroDistinct",
+      "foreignHiddenCellAndOutOfBoundsSubjectsAreExplicitlyUnsupported",
+      "codecIsPartOfQueryIdentityAndDuplicateRequestsShareReplay",
+      "queryCodecReferencesMustBelongToTheValidatedPublication"
     ]
   },
   "analysis-launcher": {
@@ -290,7 +297,8 @@
       "copiesCaptureImmutableImageAndOverlapReadsOldBytes",
       "unknownTailAndHugeExtentRemainSparseAndZeroIsIdentity",
       "copySupportsAloneChangeEqualityAndConvergeAsStaticSets",
-      "capturedSourceGapSplitsOnlyItsRangeAndSurvivesUnknownIndependently"
+      "capturedSourceGapSplitsOnlyItsRangeAndSurvivesUnknownIndependently",
+      "captureOffsetsFollowCropsAndRetainEarlierCopyContributions"
     ],
     "io.github.gustavo2358.analysis.values.RegionalValuesTest": [
       "missingStateIsUnknownAndUnreachableIsSeparate",
@@ -329,6 +337,16 @@
     "io.github.gustavo2358.analysis.values.RegionalProvenanceTest": [
       "copiedSourceRemainderSurvivesDisjointDestinationAndDiesOnOverwrite",
       "sourceGapIsCroppedWithItsFragmentAndDoesNotContaminateCopiedSuffix"
+    ],
+    "io.github.gustavo2358.analysis.values.StorageValueObservationTest": [
+      "composedCandidateExposesBothSurvivingProducerIntervalsAndMatchingRdEvents",
+      "copiedFragmentHasOriginalProducerAndSeparateCaptureWithExactRanges",
+      "copyOfCopyRetainsCroppedIntermediateAndOriginalContributions",
+      "unknownPrefixExposesItsWriterAndKeepsOnlyTheSurvivingLiteralSuffix",
+      "branchSupportsRemainSeparateAlternativesAndInventoryOrderIsIrrelevant",
+      "sourceGapMetadataFollowsOnlyTheCapturedPrefix",
+      "zeroLengthUnreachableAndUninterpretedBytesHaveDistinctProducts",
+      "logicalCaptureReportsWholeCellDestinationWithoutInventedByteOffsets"
     ]
   },
   "cfg-adapters": {

@@ -8,7 +8,7 @@ from check_w1 import ROOT, Failure, command
 
 PREFIX='io.github.gustavo2358.analysis.values.'
 QUERY_PREFIX='io.github.gustavo2358.analysis.query.'
-VALUE_NAMES='Candidates SupportSet PersistentBindings PossibleValuesState ValuesWork ValueUniverse TextProfile ForeignEffectTransfer ConservativeEffectTransfer ValueFact PossibleValuesAnalysis ByteImage TextValueFact RegionalValueFact RegionalValuesAnalysis'.split()
+VALUE_NAMES='Candidates SupportSet PersistentBindings PossibleValuesState ValuesWork ValueUniverse TextProfile ForeignEffectTransfer ConservativeEffectTransfer ValueFact PossibleValuesAnalysis ByteImage TextValueFact RegionalValueFact RegionalValuesAnalysis StorageValueFact StorageValueOrder'.split()
 QUERY_NAMES='ProgramPoint PointQuery ObservationBatch BatchReplayer'.split()
 VALUE_SOURCES={f'analysis-values/src/main/java/io/github/gustavo2358/analysis/values/{n}.java' for n in VALUE_NAMES}
 QUERY_SOURCES={f'analysis-kernel/src/main/java/io/github/gustavo2358/analysis/query/{n}.java' for n in QUERY_NAMES}
@@ -97,7 +97,7 @@ def architecture(root:Path,update:bool=False)->None:
             for target in targets:
                 if ('BatchReplayer' in source or 'PossibleValuesAnalysis$Execution' in source or 'RegionalValuesAnalysis$Execution' in source) and 'DataflowSolver' in target:raise Failure('W3 observation cannot rerun solver')
                 if any(d in target for d in DENIED) or (module=='analysis-kernel' and target.startswith(PREFIX)):raise Failure('W3 forbidden bytecode dependency: '+target)
-                if not target.startswith(('java.',prefix,'io.github.gustavo2358.air.model.','io.github.gustavo2358.analysis.structure.','io.github.gustavo2358.analysis.solver.','io.github.gustavo2358.analysis.query.','io.github.gustavo2358.analysis.cfg.domain.','io.github.gustavo2358.analysis.storage.','io.github.gustavo2358.analysis.rd.ReachingDefinitions')):raise Failure('W3 DAG: '+target)
+                if not target.startswith(('java.',prefix,'io.github.gustavo2358.air.model.','io.github.gustavo2358.analysis.structure.','io.github.gustavo2358.analysis.solver.','io.github.gustavo2358.analysis.query.','io.github.gustavo2358.analysis.cfg.domain.','io.github.gustavo2358.analysis.storage.','io.github.gustavo2358.analysis.rd.ReachingDefinitions','io.github.gustavo2358.analysis.rd.DefinitionEvent')):raise Failure('W3 DAG: '+target)
         descriptors={p[:-6].replace('/','.'):command(root,['javap','-classpath',str(classes)+os.pathsep+cp,'-public','-s',p[:-6].replace('/','.')]) for p in paths}
         actual[module]={'sources':sorted(sources),'classfiles':paths,'jdeps_edges':dict(sorted(edges.items())),'javap_descriptors':descriptors,'effective_maven':sorted(parse_tgf(root/module/'target/architecture-dependencies.tgf'))}
     if update:(root/INVENTORY).write_text(json.dumps(actual,indent=2)+'\n')

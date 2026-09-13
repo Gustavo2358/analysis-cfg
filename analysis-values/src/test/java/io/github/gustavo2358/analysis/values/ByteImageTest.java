@@ -72,4 +72,18 @@ class ByteImageTest {
         assertTrue(unknown.read(range(0,8)).bytes().isEmpty());assertEquals(Set.of("UNKNOWN"),unknown.read(range(0,8)).reasons());
         assertEquals(Set.of(7),unknown.slice(range(2,3)).parts().getFirst().sourceGaps());assertTrue(unknown.slice(range(5,3)).parts().getFirst().sourceGaps().isEmpty());
     }
+    @Test void captureOffsetsFollowCropsAndRetainEarlierCopyContributions() {
+        var initial=ByteImage.literal(new Values.BytesValue(List.of(65,66,67,68,69,70,71,72)),1);
+        var first=initial.slice(range(2,4)).copied(3,BigInteger.valueOf(2));
+        assertEquals(Map.of(3,Set.of(BigInteger.valueOf(2))),first.parts().getFirst().capturedOffsets());
+        var next=first.slice(range(1,2)).copied(4,BigInteger.valueOf(5));
+        assertEquals(Map.of(3,Set.of(BigInteger.valueOf(3)),4,Set.of(BigInteger.valueOf(5))),next.parts().getFirst().capturedOffsets());
+        assertEquals(BigInteger.valueOf(3),next.parts().getFirst().producerOffset());
+        var placed=initial.write(range(6,2),next);var contribution=placed.parts().getLast();
+        assertEquals(next.parts().getFirst().capturedOffsets(),contribution.capturedOffsets());
+        assertEquals(BigInteger.valueOf(3),contribution.producerOffset());
+        var unknown=ByteImage.unknown(Optional.of(BigInteger.valueOf(8)),"UNKNOWN").copied(8,BigInteger.valueOf(10)).slice(range(3,2));
+        assertEquals(Set.of(BigInteger.valueOf(13)),unknown.parts().getFirst().capturedOffsets().get(8));
+        assertEquals(BigInteger.ZERO,unknown.parts().getFirst().producerOffset());
+    }
 }

@@ -31,10 +31,12 @@ public final class StorageIndex {
     private final Map<ObjectId,Resolution> objects=new HashMap<>();
     private final Map<StorageId,Set<PremiseId>> separation=new HashMap<>();
     private final Map<ObjectId,List<ObjectId>> aliasDependencies=new HashMap<>();
+    private final Set<UncertaintyId> uncertaintyIds=new HashSet<>();
     private long bindingVisits,premiseMembers;
     public StorageIndex(AnalysisSession session) {
         this.session=Objects.requireNonNull(session);
         var publication=session.index().publication();
+        publication.uncertainties().forEach(u->uncertaintyIds.add(u.id()));
         for(var base:publication.storage())bases.put(base.header().id(),base);
         for(var unit:publication.units())for(var object:unit.objects())declarations.put(object.id(),object);
         for(var premise:publication.premises())if(premise.assertion() instanceof Proofs.DisjointStorage d)
@@ -88,6 +90,41 @@ public final class StorageIndex {
     public Resolution object(ObjectId object) {
         var resolution=objects.get(object);
         if(resolution==null)throw new IllegalArgumentException("object outside storage snapshot");return resolution;
+    }
+    /** Query admission is separate from a value interpretation or a proof of source completeness. */
+    public boolean supports(StorageSubject subject,UnitId atUnit) {
+        var unit=session.index().unit(atUnit);if(unit==null)return false;
+        if(subject instanceof StorageSubject.NamedObject named)
+            return declarations.containsKey(named.object())&&(named.object().unit().equals(atUnit)||unit.visibleObjects().contains(named.object()));
+        var range=(StorageSubject.PhysicalRange)subject;
+        if(!codecReferences(range.codec())||!(bases.get(range.storage()) instanceof Memory.Region region)||!new StorageRange(BigInteger.ZERO,region.extent()).contains(range.range()))return false;
+        var header=region.header();
+        if(header.owner().filter(atUnit::equals).isPresent()||header.visibility()==Memory.Visibility.SHARED||header.lifetime()==Memory.Lifetime.EXTERNAL)return true;
+        var visible=new ArrayList<ObjectId>(unit.visibleObjects());unit.objects().forEach(o->visible.add(o.id()));
+        for(var object:visible)for(var candidate:object(object).candidates())
+            if(candidate.location().base().id().equals(range.storage())&&candidate.location().range().filter(r->r.contains(range.range())).isPresent())return true;
+        return false;
+    }
+    private boolean codecReferences(Memory.Codec codec) {
+        if(codec instanceof Memory.UnknownCodec unknown)return uncertaintyIds.contains(unknown.reason())&&typeReferences(unknown.logicalType());
+        return !(codec instanceof Memory.ExtensionCodec extension)||typeReferences(extension.logicalType());
+    }
+    private boolean typeReferences(Types.TypeRef type) {
+        if(type instanceof Types.UnknownType unknown)return uncertaintyIds.contains(unknown.uncertainty());
+        var known=((Types.Known)type).type();
+        if(known instanceof Types.LabelType labels)return session.index().unit(labels.unit())!=null
+            &&labels.labels().stream().allMatch(id->id.unit().equals(labels.unit())&&session.index().sequence(id)!=null);
+        return true;
+    }
+    public Resolution resolve(StorageSubject subject) {
+        if(subject instanceof StorageSubject.NamedObject named)return object(named.object());
+        var range=(StorageSubject.PhysicalRange)subject;
+        if(!(bases.get(range.storage()) instanceof Memory.Region region)||!new StorageRange(BigInteger.ZERO,region.extent()).contains(range.range()))throw new IllegalArgumentException("query range outside storage snapshot");
+        return new Resolution(List.of(new Candidate(new Location(region.header(),Optional.of(range.range())),Optional.of(range.codec()),List.of(region.header().origin()))),
+            region.extent().isPresent()?Scopes.NoMemory.INSTANCE:within(range.storage()),region.extent().isPresent()?List.of():List.of("UNKNOWN_EXTENT"),region.extentUnknown().stream().toList());
+    }
+    public Set<OriginId> subjectOrigins(StorageSubject subject) {
+        return subject instanceof StorageSubject.NamedObject named?objectOrigins(named.object()):Set.of(whole(((StorageSubject.PhysicalRange)subject).storage()).base().origin());
     }
     public Location whole(StorageId id) {
         var base=bases.get(id);if(base==null)throw new IllegalArgumentException("storage outside snapshot");

@@ -137,17 +137,7 @@ public final class ReachingDefinitions {
             for(var context:session.contexts()) {
                 var entry=context.entry().id();var root=new SegmentMap<Set<EventHandle>>();
                 for(var seed:owner.initial.get(entry)) {
-                    var value=seed.condition().value();
-                    var kind=value instanceof Entries.LiteralInitial?DefinitionEvent.Kind.INITIAL_CONDITION
-                        :value instanceof Entries.Preserve?DefinitionEvent.Kind.ENTRY_PRESERVE
-                        :value instanceof Entries.ParameterInitial?DefinitionEvent.Kind.ENTRY_PARAMETER
-                        :value instanceof Entries.ExternalUnknown?DefinitionEvent.Kind.ENTRY_EXTERNAL:DefinitionEvent.Kind.ENTRY_UNINITIALIZED;
-                    var uncertainty=new LinkedHashSet<UncertaintyId>();
-                    if(value instanceof Entries.ExternalUnknown u)uncertainty.add(u.reason());
-                    if(value instanceof Entries.Uninitialized u)uncertainty.add(u.reason());
-                    uncertainty.addAll(owner.effects.storage().resolve(seed.condition().place()).uncertainties());
-                    var premises=new LinkedHashSet<>(seed.condition().premises());premises.addAll(seed.target().premises());
-                    var event=intern(new DefinitionEvent(entry,Optional.empty(),Optional.of(seed.condition().place().header().id()),seed.slot(),Optional.empty(),seed.target().location().base().id(),kind,!(value instanceof Entries.LiteralInitial)||!seed.target().sourceApplicable(),seed.condition().origin(),List.copyOf(premises),List.copyOf(uncertainty),seed.target().reasons()));
+                    var event=intern(DefinitionEvent.initial(entry,seed.condition(),seed.slot(),seed.target(),owner.effects.storage().resolve(seed.condition().place())));
                     for(var segment:seed.segments()) {
                         var previous=root.get(segment.ordinal());
                         if(previous==null)previous=seed.target().strength()==StatementEffects.Strength.MUST?Set.of():Set.of(entryEvent(entry,segment));
@@ -173,16 +163,7 @@ public final class ReachingDefinitions {
             var equal=new boolean[]{true};a.bindings.forEach((key,value)->{work.stateCompareEntry();if(!value.equals(b.bindings.get(key)))equal[0]=false;});return equal[0];
         }
         private EventHandle event(EntryId entry,Plan plan) {
-            return events.computeIfAbsent(entry,ignored->new IdentityHashMap<>()).computeIfAbsent(plan,p->{
-                var source=p.write.source();var operation=p.operation;var unknown=source instanceof StatementEffects.UnknownSource||!p.target.sourceApplicable();
-                if(source instanceof StatementEffects.ExpressionSource expression && !(expression.value() instanceof Expressions.Literal))unknown=true;
-                var kind=source instanceof StatementEffects.CapturedBytes?DefinitionEvent.Kind.COPY:source instanceof StatementEffects.ExpressionSource?DefinitionEvent.Kind.ASSIGN:DefinitionEvent.Kind.UNKNOWN_WRITE;
-                var uncertainty=new LinkedHashSet<>(operation.header().uncertainties());uncertainty.addAll(p.write.destination().uncertainties());
-                if(operation instanceof Operations.HavocMust h)uncertainty.add(h.reason());
-                if(operation instanceof Operations.HavocMay h)uncertainty.add(h.reason());
-                var reasons=new LinkedHashSet<>(p.target.reasons());if(source instanceof StatementEffects.UnknownSource u)reasons.add(u.reason());
-                return intern(new DefinitionEvent(entry,Optional.of(operation.header().id()),p.write.occurrence(),p.write.slot(),p.outcome,p.target.location().base().id(),kind,unknown,operation.header().origin(),p.target.premises(),List.copyOf(uncertainty),List.copyOf(reasons)));
-            });
+            return events.computeIfAbsent(entry,ignored->new IdentityHashMap<>()).computeIfAbsent(plan,p->intern(DefinitionEvent.write(entry,p.operation,p.write,p.target,p.outcome)));
         }
         private State apply(State state,List<Plan> plans,boolean forceMay) {
             if(!state.reached())return state;var root=state.bindings;
@@ -227,26 +208,31 @@ public final class ReachingDefinitions {
         public Map<String,Long> metrics(){return Map.of("segments",(long)owner.partition.segments().size(),"segmentUpdates",engine.updates,"segmentReads",engine.segmentReads,"eventUnionEntries",engine.eventUnions);}
         public ObservationBatch<ObjectId,DefinitionFact> observe(Iterable<PointQuery<ObjectId>> requests){
             var comparator=Comparator.comparing((ObjectId id)->id.unit().publication().localId()).thenComparing(id->id.unit().localId()).thenComparing(ObjectId::localId);
-            return BatchReplayer.materialize(owner.session,stable,Direction.FORWARD,BOTTOM,requests,comparator,engine::operation,new BatchReplayer.Projection<State,ObjectId,DefinitionFact>() {
-                @Override public boolean supports(PointQuery<ObjectId> query) {
-                    var object=owner.session.index().object(query.subject());var unit=owner.session.index().unit(query.point().entry().unit());
-                    return object!=null&&unit!=null&&(object.id().unit().equals(unit.id())||unit.visibleObjects().contains(object.id()));
+            return observe(requests,comparator,StorageSubject.NamedObject::new);
+        }
+        public ObservationBatch<StorageSubject,DefinitionFact> observeStorage(Iterable<PointQuery<StorageSubject>> requests) {
+            return observe(requests,StorageSubject.ORDER,java.util.function.Function.identity());
+        }
+        private <T> ObservationBatch<T,DefinitionFact> observe(Iterable<PointQuery<T>> requests,Comparator<T> comparator,java.util.function.Function<T,StorageSubject> subject) {
+            return BatchReplayer.materialize(owner.session,stable,Direction.FORWARD,BOTTOM,requests,comparator,engine::operation,new BatchReplayer.Projection<State,T,DefinitionFact>() {
+                @Override public boolean supports(PointQuery<T> query) {
+                    return owner.effects.storage().supports(subject.apply(query.subject()),query.point().entry().unit());
                 }
-                @Override public DefinitionFact project(PointQuery<ObjectId> query,State state) { return fact(query,state); }
-                @Override public boolean supportsOutcome(PointQuery<ObjectId> query) {
+                @Override public DefinitionFact project(PointQuery<T> query,State state) { return fact(new PointQuery<>(query.point(),subject.apply(query.subject())),state); }
+                @Override public boolean supportsOutcome(PointQuery<T> query) {
                     var site=owner.session.index().site(query.point().operation());
                     return site!=null&&site.operation() instanceof Operations.Invoke invoke&&query.point().outcome()==Control.NormalOutcome.INSTANCE
                         &&invoke.outcomes().known().stream().anyMatch(Control.Normal.class::isInstance);
                 }
-                @Override public State transferOutcome(PointQuery<ObjectId> query,State before) {
+                @Override public State transferOutcome(PointQuery<T> query,State before) {
                     var operation=owner.session.index().site(query.point().operation()).operation();
                     return engine.apply(before,owner.outcomes.get(operation).get(query.point().outcome()),false);
                 }
             });
         }
-        private DefinitionFact fact(PointQuery<ObjectId> query,State state) {
-            var storage=owner.effects.storage();var resolution=storage.object(query.subject());
-            var origins=new LinkedHashSet<>(storage.objectOrigins(query.subject()));var premises=new LinkedHashSet<PremiseId>();var uncertainties=new LinkedHashSet<>(resolution.uncertainties());
+        private DefinitionFact fact(PointQuery<StorageSubject> query,State state) {
+            var storage=owner.effects.storage();var resolution=storage.resolve(query.subject());
+            var origins=new LinkedHashSet<>(storage.subjectOrigins(query.subject()));var premises=new LinkedHashSet<PremiseId>();var uncertainties=new LinkedHashSet<>(resolution.uncertainties());
             var contributions=new LinkedHashMap<DefinitionEvent,Set<StorageIndex.Location>>();
             boolean unknown=!(resolution.remainder() instanceof Scopes.NoMemory);
             boolean source=sourceOpen(query);
@@ -269,13 +255,14 @@ public final class ReachingDefinitions {
             for(var event:ordered)output.add(new DefinitionFact.Contribution(event,coalesce(contributions.get(event)).stream().map(l->l.in(query.point().entry())).toList()));
             return new DefinitionFact(query.point(),state.reached()?DefinitionFact.Reachability.REACHABLE:DefinitionFact.Reachability.UNREACHABLE_IN_MODEL,output,state.reached()?unknown:null,!(resolution.remainder() instanceof Scopes.NoMemory),source,evidenceOrder(premises),evidenceOrder(origins),evidenceOrder(uncertainties));
         }
-        private boolean sourceOpen(PointQuery<ObjectId> query) {
-            var publication=owner.session.index().publication();var unit=owner.session.index().unit(query.point().entry().unit());var object=owner.session.index().object(query.subject());
+        private boolean sourceOpen(PointQuery<StorageSubject> query) {
+            var publication=owner.session.index().publication();var unit=owner.session.index().unit(query.point().entry().unit());
+            var object=query.subject() instanceof StorageSubject.NamedObject named?owner.session.index().object(named.object()):null;
             return publication.coverage().inventory()!=Evidence.InventoryStatus.COMPLETE||!publication.coverage().uncertainties().isEmpty()
                 ||unit.coverage().inventory()!=Evidence.InventoryStatus.COMPLETE||!unit.coverage().uncertainties().isEmpty()
                 ||owner.controlOpen.getOrDefault(unit.id(),false)
                 ||!owner.session.context(query.point().entry()).entry().state().uncertainties().isEmpty()
-                ||object.coverage()!=Evidence.CoverageStatus.MODELED||open(object.precision().storage())||open(object.precision().values());
+                ||object!=null&&(object.coverage()!=Evidence.CoverageStatus.MODELED||open(object.precision().storage())||open(object.precision().values()));
         }
     }
     private static boolean open(Evidence.Claim claim){return claim.status()!=Evidence.PrecisionStatus.EXACT&&claim.status()!=Evidence.PrecisionStatus.NOT_APPLICABLE;}
