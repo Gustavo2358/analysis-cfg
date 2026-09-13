@@ -46,8 +46,8 @@ def affected(before,upstream,work,runtime,pins,phase):
     check_snapshot(upstream,snapshot['upstream']['commit'])
 
 
-def annotate(path):
-    raw,programs=load_after(path)
+def annotate(path,selected=None):
+    raw,programs=load_after(path,selected)
     for p in programs:
         sp=json.loads((path.parent/p['artifacts']['frontend']['path']).read_text()) if 'frontend' in p['artifacts'] else {}
         air=json.loads((path.parent/p['artifacts']['lower']['path']).read_text())['publication'] if 'lower' in p['artifacts'] else {}
@@ -81,7 +81,8 @@ def vector(site):
 
 
 def compare(before,after,output):
-    braw,bp=annotate(before);araw,ap=annotate(after)
+    selected={p['path'] for p in json.loads(after.read_text())['programs']}
+    braw,bp=annotate(before,selected);araw,ap=annotate(after)
     if braw['snapshot']['upstream']!=araw['snapshot']['upstream']:raise ValueError('different corpus')
     old={p['path']:p for p in bp};changes=[];unexpected=[];preserved=outside=additions=removals=0
     for a in ap:
