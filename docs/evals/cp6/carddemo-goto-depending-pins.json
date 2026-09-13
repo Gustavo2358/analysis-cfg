@@ -1,0 +1,43 @@
+{
+  "baselineMergeShas": {
+    "air-java": "d51a5051124d962c4c5dc94f163eb68f97136186",
+    "proleap-poc": "6598c08191538602e9521647ea4d7180b8008fb6",
+    "cobol-lower": "0676ca72aa67d5f6ffcf3f7f1b82edcb1b78d2ad",
+    "analysis-cfg": "459a9de69c785928f4252a75013fd45b9f5497e6"
+  },
+  "analysisIr": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+  "upstream": {
+    "repository": "aws-samples/aws-mainframe-modernization-carddemo",
+    "commit": "59cc6c2fd7ebd7ef7925cad552a01a4b8b6e4d5e"
+  },
+  "decisionPolicy": "HUMAN",
+  "rankingAuthority": "ADVISORY_ONLY",
+  "preservedBaselineAnalysisRepositories": {
+    "air-java": "8be19ff385b42a5987a407acc464319d212081c3",
+    "proleap-poc": "642ba4b3aeaffdfa0942f3fb462a4be17070d0d1",
+    "cobol-lower": "e8cdc95491b7225c2c899e6f4dc229f64f26a8d7",
+    "analysis-cfg": "982179c812ff526e9e6095ea3feaffa5e42c7985"
+  },
+  "baselineProductionEquivalence": {
+    "air-java": {
+      "productionAndBuildUnchanged": true,
+      "changedPaths": []
+    },
+    "proleap-poc": {
+      "productionAndBuildUnchanged": true,
+      "changedPaths": []
+    },
+    "cobol-lower": {
+      "productionAndBuildUnchanged": true,
+      "changedPaths": []
+    },
+    "analysis-cfg": {
+      "productionAndBuildUnchanged": true,
+      "changedPaths": [
+        "docs/evals/cp6/carddemo-after-perform-family.json",
+        "docs/evals/cp6/carddemo-after-perform-family.md",
+        "docs/evals/cp6/carddemo-perform-family-pins.json"
+      ]
+    }
+  }
+}

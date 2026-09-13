@@ -51,6 +51,7 @@ def technical_fast(root):
                     [sys.executable, '-B', 'scripts/project/test_dependency_wire.py'],
                     [sys.executable, '-B', 'scripts/project/test_lean_boundary.py'],
                     [sys.executable, '-B', 'scripts/project/test_carddemo_baseline.py'],
+                    [sys.executable, '-B', 'scripts/project/test_goto_depending.py'],
                     [sys.executable, '-B', 'scripts/project/test_validation.py']):
         subprocess.run(command, cwd=root, check=True)
 

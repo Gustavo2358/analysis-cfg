@@ -1,0 +1,5 @@
+id: WORK-CFG-GOTO-DEPENDING
+title: GO TO DEPENDING ON end-to-end
+status: IN_PROGRESS
+scope:
+  - Conditional GO TO, ordered finite destinations, conservative control and integrated qualification

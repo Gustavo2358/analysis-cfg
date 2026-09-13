@@ -124,8 +124,8 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "8be19ff385b42a5987a407acc464319d212081c3",
-    "canonical_ref": "feat/perform-family",
+    "commit": "d51a5051124d962c4c5dc94f163eb68f97136186",
+    "canonical_ref": "main",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
     "analysis_ir": {
@@ -238,9 +238,9 @@
       "docs/domain/cobol-semantic-product.md",
       "docs/work/history/WORK-SEMANTIC-PRODUCT-003.md"
     ],
-    "semantic_product_version": "2.1.0",
+    "semantic_product_version": "2.6.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "3842239551153e98590744ceb8b1e730885b1bbd",
+    "commit": "8cf4a2d80ab22691aa4d5bc17e504054eb204429",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -254,7 +254,7 @@
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "verified",
-    "commit": "2dd97f4fb07eadb2a5cb76d94f94f587aa59a175",
+    "commit": "5674b72ef280a18be7b6395d48c7766f2ac6d912",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
