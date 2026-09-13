@@ -148,6 +148,23 @@
       "physicalOrderDoesNotDefineControlAndSameSnapshotIsDeterministic",
       "emptySelectionCreatesNoContextsAndForeignHandleIsRejected",
       "cycleAndSelfLoopKeepLiteralControl"
+    ],
+    "io.github.gustavo2358.analysis.storage.StorageRangeTest": [
+      "essentialPartialIntervalAndAdjacency",
+      "unboundedTailAndArbitraryIntegerRemainDistinctFromZero"
+    ],
+    "io.github.gustavo2358.analysis.storage.StorageIndexTest": [
+      "disjointPremisesAreNotTransitiveAndCodecDoesNotChangePhysicalOverlap",
+      "cyclicAndDanglingAssociationsFailBeforeAnalysis",
+      "snapshotIsolationAndPreparationCountFollowObjectsNotPairs",
+      "physicalAliasesAndAdjacentRangesDoNotDependOnNames",
+      "distinctBasesRequirePremiseAndLifetimeQualifiesActivationOnly",
+      "alternativesAndUnknownExtentRetainIndependentRemainder"
+    ],
+    "io.github.gustavo2358.analysis.storage.StatementEffectsTest": [
+      "mustIsPartialAndUnprovedForeignBaseReceivesMayEffect",
+      "ambiguousMustAndScopedMayNeverBecomeSimultaneousStrongWrites",
+      "copyCapturesSourceAndOpaqueUnknownWritesAreExplicit"
     ]
   },
   "analysis-launcher": {
