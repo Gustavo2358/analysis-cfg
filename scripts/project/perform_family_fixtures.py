@@ -36,6 +36,28 @@ def thru():
     return cases
 
 
+def until():
+    body="A.\nMOVE 'NEWPROG' TO WS-PGM.\n"
+    def main(control):return "MOVE 'OLDPROG' TO WS-PGM.\nPERFORM A "+control+".\nCALL WS-PGM."
+    cases={
+        'until-before':source(main("WITH TEST BEFORE UNTIL FLAG = 'Y'"),body),
+        'until-default':source(main("UNTIL FLAG = 'Y'"),body),
+        'until-after':source(main("WITH TEST AFTER UNTIL FLAG = 'Y'"),body),
+        'until-constant':source("MOVE 'Y' TO FLAG.\n"+main("UNTIL FLAG = 'Y'"),body),
+        'until-mixed':source("PERFORM Z.\nCALL WS-PGM.\nPERFORM A THRU B.\nCALL WS-PGM.\nPERFORM U WITH TEST AFTER UNTIL FLAG = 'Y'.\nCALL WS-PGM.",
+            "A.\nMOVE 'PROGA' TO WS-PGM.\nB.\nMOVE 'PROGB' TO WS-PGM.\nU.\nMOVE 'NEWPROG' TO WS-PGM.\nZ.\nMOVE 'BASICPGM' TO WS-PGM.\n"),
+        'until-branches':source(main("WITH TEST AFTER UNTIL FLAG = 'Y'"),"A.\nIF FLAG = 'X' MOVE 'PROGA' TO WS-PGM ELSE MOVE 'PROGB' TO WS-PGM END-IF.\n"),
+        'until-thru':source(main("THRU C WITH TEST AFTER UNTIL FLAG = 'Y'"),"A.\nMOVE 'PROGA' TO WS-PGM.\nB.\nMOVE 'PROGB' TO WS-PGM.\nC.\nMOVE 'NEWPROG' TO WS-PGM.\n"),
+        'until-unresolved':source(main("UNTIL MISSING = 'Y'"),body),
+        'until-unsupported':source(main("UNTIL FUNCTION RANDOM > 0"),body)}
+    for n in (1,2,5,40):cases['until-'+str(n)]=source('\n'.join([main("WITH TEST AFTER UNTIL FLAG = 'Y'")]*n),body)
+    for name in ('incoming','escape','cycle','recursive','partial-end','unknown-body'):
+        # Fixture construction only. Production never parses or rewrites source text this way.
+        text=thru()[name].replace('PERFORM A THRU C.','PERFORM A THRU C UNTIL FLAG = \'Y\'.').replace('PERFORM A THRU MISSING.','PERFORM A THRU MISSING UNTIL FLAG = \'Y\'.')
+        cases['until-'+name]=text
+    return cases
+
+
 if __name__=='__main__':
     FIXTURES.mkdir(parents=True,exist_ok=True)
-    for name,text in thru().items():(FIXTURES/(name+'.cbl')).write_text(''.join('       '+part+'\n' for line in text.splitlines() for part in textwrap.wrap(line,width=65,break_long_words=False,break_on_hyphens=False)))
+    for name,text in {**thru(),**until()}.items():(FIXTURES/(name+'.cbl')).write_text(''.join('       '+part+'\n' for line in text.splitlines() for part in textwrap.wrap(line,width=65,break_long_words=False,break_on_hyphens=False)))

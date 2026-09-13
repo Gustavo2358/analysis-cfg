@@ -13,10 +13,15 @@ EXPECTED={'t1':[{'PROGA'}],'t2':[{'PROGC'}],'through':[{'PROGC'}],'t3':[{'PROGC'
     'terminal':[set()],'call-body':[{'PROGC'},{'PROGA'}],
     **{'thru-'+str(n):[{'PROGC'}]*n for n in (1,2,5,40)}}
 PARTIAL=('unknown-body','incoming','escape','overlap','recursive','cycle','partial-end','partial-start','reverse','empty')
+EXPECTED.update({'until-before':[{'OLDPROG','NEWPROG'}],'until-default':[{'OLDPROG','NEWPROG'}],
+    'until-constant':[{'OLDPROG','NEWPROG'}],'until-mixed':[{'BASICPGM'},{'PROGB'},{'NEWPROG'}],
+    'until-after':[{'NEWPROG'}],'until-branches':[{'PROGA','PROGB'}],'until-thru':[{'NEWPROG'}],
+    **{'until-'+str(n):[{'NEWPROG'}]*n for n in (1,2,5,40)}})
+PARTIAL+=tuple('until-'+n for n in ('unresolved','unsupported','incoming','escape','cycle','recursive','partial-end','unknown-body'))
 
 
 def oracle(name,source,sp,air,cfg,result):
-    require(sp['contractVersion']=='2.2.0','versioned range contract')
+    require(sp['contractVersion']=='2.3.0','versioned range/loop contract')
     publication=air['publication'];sequences=publication['units'][0]['sequences']
     ops={op['header']['id']['localId']:op for seq in sequences for op in seq['instructions']+[seq['terminator']]}
     links={s['header']['id']:[o['localId'] for item in publication['coverage']['items']
@@ -37,9 +42,20 @@ def oracle(name,source,sp,air,cfg,result):
         if p['gapCodes']:
             require(all(op['kind']=='opaque' and not op['envelope']['control']['known'] for op in control),'partial control has no manufactured return')
             continue
-        require(len(control)==1 and control[0]['kind']=='jump','one activation entry')
-        entry=control[0]['destination']['localId'];first=p['procedures'][0]['entry']
-        require(entry in {label_by_op[o] for o in links[first]},'typed first paragraph entry')
+        jumps=[op for op in control if op['kind']=='jump'];branches=[op for op in control if op['kind']=='branch']
+        require(len(jumps)==1,'one activation entry')
+        entry=jumps[0]['destination']['localId'];first=p['procedures'][0]['entry']
+        first_labels={label_by_op[o] for o in links[first]}
+        control_labels=set()
+        if p.get('loop'):
+            require(len(branches)==1 and len(control)==2,'one decision, independent of iteration count')
+            decision=branches[0];decision_label=label_by_op[decision['header']['id']['localId']];control_labels.add(decision_label)
+            body_entry=decision['falseDestination']['localId'];require(body_entry in first_labels,'UNTIL false enters typed range')
+            require(entry==decision_label if p['loop']['testMode']=='BEFORE' else entry==body_entry,'TEST mode controls first execution')
+            require(decision['trueDestination']['localId'] in {label_by_op[o] for o in links[p['normalContinuation']['statement']]},'UNTIL true resumes own callsite')
+            predicate=decision['predicate'];require(predicate['kind']=='unknown' and predicate['typeRef']['type']['kind']=='bool','unknown Boolean, no predicate pruning')
+            require(len(predicate['dependencies'])==len(p['loop']['condition']['references']) and all(r['kind']=='read' for r in predicate['dependencies']),'condition reads retained')
+        else:require(len(control)==1 and entry in first_labels,'typed first paragraph entry')
         members={i for r in p['procedures'] for i in r['statements']}
         body_labels={label_by_op[o] for i in members for o in links[i]}
         resume=p['normalContinuation']['statement'];resumes={label_by_op[o] for o in links[resume]}
@@ -47,7 +63,7 @@ def oracle(name,source,sp,air,cfg,result):
         while todo:
             label=todo.pop()
             if label in seen:continue
-            seen.add(label);require(label in body_labels,'control remains in activation body until its own resume')
+            seen.add(label);require(label in body_labels|control_labels,'control remains in activation body/decision until its own resume')
             for successor in normal_edges[label]:
                 if successor not in resumes:todo.append(successor)
         require(not (seen & resumes),'body and resume disjoint')

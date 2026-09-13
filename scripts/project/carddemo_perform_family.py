@@ -20,9 +20,11 @@ def cohort(before,phase):
     raw=json.loads(before.read_text());selected=set()
     for p in raw['programs']:
         nodes=ast_performs(before,p)
-        # Presence of the typed through-reference selects the first cohort. Later phases
-        # use a conservative superset because historical SP does not type loop controls.
-        if any(n['a'].get('through') if phase=='thru' else n['a'].get('performKind')=='PROCEDURE' for n in nodes):selected.add(p['path'])
+        # Historical written-control tokens select a cohort only, never semantic facts.
+        # Include prior THRU programs to requalify the cumulative frontier.
+        keywords={'UNTIL'} if phase=='until' else {'UNTIL','TIMES','VARYING'}
+        if any(n['a'].get('through') or phase!='thru' and n['a'].get('performKind')=='PROCEDURE'
+               and keywords.intersection(n['a'].get('control','').upper().split()) for n in nodes):selected.add(p['path'])
     return selected
 
 
@@ -40,7 +42,7 @@ def affected(before,upstream,work,runtime,pins,phase):
         record=runner.attempt_program(source,upstream,work,config,120,['-Xmx2g']);records.append(record)
         print(source['path']+': '+', '.join(k+'='+v['state'] for k,v in record['stages'].items()),flush=True)
     runner.dump(work/'measurements.json',{'schemaVersion':'carddemo-measurements-1.0.0','snapshot':snapshot,'programs':records,
-        'scope':'THRU typed-reference cohort' if phase=='thru' else 'out-of-line PERFORM cohort; historical SP has untyped loop variants',
+        'scope':'THRU typed-reference cohort' if phase=='thru' else 'cumulative THRU and written loop-keyword cohort; semantic counts come from produced facts',
         'timings':{'corpusElapsedMs':runner.elapsed(started)}})
     for name,sha in config['sources'].items():check_snapshot(Path(config['checkouts'][name]),sha)
     check_snapshot(upstream,snapshot['upstream']['commit'])
@@ -63,9 +65,26 @@ def annotate(path,selected=None):
                 typed+=1;precise+=not f['gapCodes'] and any(o['kind'] in ('jump','branch') for o in ops)
                 if not f['gapCodes']:evidence.append(f)
         ast=ast_performs(path,p)
+        ast_index={}
+        for n in ast:ast_index.setdefault((n['l'],n['c'],n['e']),[]).append(n)
+        families={k:dict(occurrences=0,outOfLineOccurrences=0,typed=0,structured=0,partial=0,unsupported=0) for k in ('THRU','UNTIL','TIMES','VARYING')}
+        variants=Counter()
+        for f in facts:
+            loc=f['header']['provenance']['expanded'];matches=ast_index.get((loc['startLine'],loc['startColumn'],loc['endLine']),[])
+            if len(matches)!=1:raise ValueError('PERFORM must correlate to one AST occurrence by source span')
+            n=matches[0];a=n['a'];tokens=a.get('control','').upper().split()
+            repetition=a.get('repetition') or next((v for v in ('VARYING','UNTIL','TIMES') if v in tokens),'ONCE')
+            kinds=([repetition] if repetition in families else [])+(['THRU'] if a.get('through') else [])
+            typed_fact=f['variant']=='PERFORM_PROCEDURE'
+            structured=typed_fact and not f['gapCodes'] and any(o['kind'] in ('jump','branch') for o in links.get(f['header']['id'],[]))
+            for kind in kinds:
+                item=families[kind];item['occurrences']+=1;item['outOfLineOccurrences']+=a['performKind']=='PROCEDURE'
+                item['typed']+=typed_fact;item['structured']+=structured;item['partial']+=typed_fact and not structured;item['unsupported']+=not typed_fact
+            if f['variant']=='OBSERVED':variants[a['performKind']+'/'+repetition+('/THRU' if a.get('through') else '')]+=1
         p['performFamily']={'occurrences':len(facts),'thruOccurrences':sum(bool(n['a'].get('through')) for n in ast),
             'typed':typed,'structured':precise,'partial':typed-precise,'unsupported':sum(f['variant']=='OBSERVED' for f in facts),
-            'potentialCallSites':len(potential),'gaps':dict(Counter(g for f in facts for g in f.get('gapCodes',[])))}
+            'potentialCallSites':len(potential),'gaps':dict(Counter(g for f in facts for g in f.get('gapCodes',[]))),
+            'families':families,'remainingUnsupportedVariants':dict(variants)}
         p['performPotentialStatements']=potential;p['performControlEvidence']=evidence
     return raw,programs
 
@@ -73,7 +92,10 @@ def annotate(path,selected=None):
 def aggregate(programs):
     fields=('occurrences','thruOccurrences','typed','structured','partial','unsupported','potentialCallSites')
     return {**{k:sum(p['performFamily'][k] for p in programs) for k in fields},
-        'gaps':dict(sum((Counter(p['performFamily']['gaps']) for p in programs),Counter()))}
+        'gaps':dict(sum((Counter(p['performFamily']['gaps']) for p in programs),Counter())),
+        'families':{k:{v:sum(p['performFamily']['families'][k][v] for p in programs)
+            for v in ('occurrences','outOfLineOccurrences','typed','structured','partial','unsupported')} for k in ('THRU','UNTIL','TIMES','VARYING')},
+        'remainingUnsupportedVariants':dict(sum((Counter(p['performFamily']['remainingUnsupportedVariants']) for p in programs),Counter()))}
 
 
 def vector(site):

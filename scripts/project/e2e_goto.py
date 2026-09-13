@@ -23,7 +23,7 @@ EXPECTED = {'g1': [{'PROGA'}], 'g2': [{'PROGA', 'PROGB'}], 'g3': [{'PROGA'}, {'P
 
 
 def oracle(name, source, sp, air, cfg, result):
-    require(sp['contractVersion'] in ('2.1.0','2.2.0'), 'GO TO requires SP2.1')
+    require(sp['contractVersion'] in ('2.1.0','2.2.0', '2.3.0'), 'GO TO requires SP2.1')
     publication = air['publication']; sequences = publication['units'][0]['sequences']
     ops = {o['header']['id']['localId']: o for s in sequences for o in s['instructions'] + [s['terminator']]}
     links = {f['header']['id']: [o['localId'] for item in publication['coverage']['items']
