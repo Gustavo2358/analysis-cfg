@@ -1,0 +1,28 @@
+id: WORK-CFG-039
+title: CP6 — full CardDemo baseline and advisory capability analysis
+status: IN_PROGRESS
+scope:
+  - Sequential local evaluation of every COBOL source in pinned upstream, including archived variants
+  - Runner, focal FAST tests, statement/gap/CALL inventories and observed timings
+  - Machine-readable and human-readable historical baseline with human advisory policy
+review_state: IMPLEMENTED / AWAITING HUMAN REVIEW
+production_changes: NONE
+decisionPolicy: HUMAN
+rankingAuthority: ADVISORY_ONLY
+results:
+  programsDiscovered: 73
+  programsAttempted: 73
+  programsReachingSP: 67
+  programsReachingDependency: 27
+  observedSPCallSites: 73
+  analyzedCallSites: 36
+  closedSites: 0
+  partialSites: 36
+  openUnresolvedSites: 0
+validation: >-
+  PASS: 19 focal runner/aggregation/schema tests and analysis-cfg lean.py fast.
+  One canonical sequential full-universe run; preliminary filesystem-only run
+  preserved and excluded after archive discovery. Full product qualification NOT_RUN.
+record: docs/evals/cp6/carddemo-full-baseline.md
+raw_evidence: /tmp/carddemo-full-20260913/canonical
+next: HUMAN PRIORITIZATION USING FULL CARDDEMO BASELINE

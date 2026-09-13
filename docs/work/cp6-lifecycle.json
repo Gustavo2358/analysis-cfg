@@ -103,7 +103,7 @@
   },
   "compositional_partial": {
     "work_item": "WORK-CFG-038",
-    "status": "IN_PROGRESS",
+    "status": "DONE / MERGED",
     "baselines": {
       "proleap-poc": "ff3704911e53b3d8b337fc610cf84343cdc5fe90",
       "cobol-lower": "797dcbd6f05f12661299339746c607b5b57ac1ba",
@@ -111,13 +111,30 @@
     },
     "record": "docs/work/active/WORK-CFG-038.md",
     "next": "CARDDEMO BASELINE",
-    "review_state": "IMPLEMENTED / AWAITING HUMAN REVIEW",
+    "review_state": "MERGED",
     "local_full": "PASS in frontend, lower, CFG and extended codec; documentation closeout does not repeat Full",
     "source_pins": {
       "proleap-poc": "15354e946904337a74980ca659119f2eb22df57b",
       "cobol-lower": "bb377189aeaffa4c81f0a0a4c3d65a763974d5a7",
       "air-java": "b1c45b8f23452082c9f3969b78915976747e87c7"
+    },
+    "pr": 24,
+    "merge_commit": "18a78a6599bfad2d983a4a32d7515d379a9bac60",
+    "merge_commits": {
+      "air-java": "96cd5e545723c6fd76d1520f431ebbc196af84f6",
+      "proleap-poc": "59ac43bc3ab4bd186092a13732381512cbdaddba",
+      "cobol-lower": "7da4980067c2860b3827ecc3eea641a6afa2a526",
+      "analysis-cfg": "18a78a6599bfad2d983a4a32d7515d379a9bac60"
     }
   },
-  "next": "CARDDEMO BASELINE"
+  "next": "HUMAN PRIORITIZATION USING FULL CARDDEMO BASELINE",
+  "carddemo_full_baseline": {
+    "work_item": "WORK-CFG-039",
+    "status": "IN_PROGRESS",
+    "review_state": "IMPLEMENTED / AWAITING HUMAN REVIEW",
+    "record": "docs/work/active/WORK-CFG-039.yaml",
+    "production_changes": "NONE",
+    "decisionPolicy": "HUMAN",
+    "rankingAuthority": "ADVISORY_ONLY"
+  }
 }

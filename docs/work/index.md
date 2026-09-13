@@ -1,6 +1,6 @@
 # Trabalho
 
-Atual: [WORK-CFG-038](active/WORK-CFG-038.md), CP6 compositionality e partial lowering. [Invariantes permanentes](../architecture/compositional-partial-lowering.md).
+Atual: [WORK-CFG-039](active/WORK-CFG-039.yaml), full CardDemo baseline e análise consultiva. WORK-CFG-038: DONE / MERGED #24. [Invariantes permanentes](../architecture/compositional-partial-lowering.md).
 
 [WORK-CFG-033](history/WORK-CFG-033.md): CP6 W1D e CP6 W1 APPROVED / MERGED / CLOSED, PR #18. [Baseline W1 congelado](cp6-lifecycle.json) para a próxima wave. [WORK-CFG-034](history/WORK-CFG-034.md): CP6 W2D COMPLETED / MERGED, PR #20; W2 APPROVED / MERGED / CLOSED.
 
@@ -10,7 +10,7 @@ Atual: [WORK-CFG-038](active/WORK-CFG-038.md), CP6 compositionality e partial lo
 
 CP5 = APPROVED / MERGED / CLOSED. The verified frozen component authorities are synchronized. Final source/artifact identity is recorded by the post-merge protocol in `artefatos-e2e/pre-cp6-baseline/receipt.json` in the workspace.
 
-[WORK-CFG-032](history/WORK-CFG-032.md): discovery APPROVED / MERGED. O lifecycle CP5 conserva o closeout anterior; o trabalho corrente é compositionality e partial lowering em WORK-CFG-038, autorizada na sessão e registrada no item Lean.
+[WORK-CFG-032](history/WORK-CFG-032.md): discovery APPROVED / MERGED. O lifecycle CP5 conserva o closeout anterior; o trabalho corrente é avaliação full CardDemo em WORK-CFG-039, autorizada na sessão e registrada no item Lean.
 
 ## Itens concluídos
 
@@ -24,6 +24,6 @@ CP5 = APPROVED / MERGED / CLOSED. The verified frozen component authorities are 
 - WORK-CFG-036: DONE / MERGED #22 (`e200b101455fa7addf59413ce5e6548c03d9116f`); record retained in active path for stable links.
 - [WORK-CFG-037](active/WORK-CFG-037.md): CP6 multi-CALL program coverage, DONE / MERGED; baseline for WORK-CFG-038.
 
-- [WORK-CFG-038](active/WORK-CFG-038.md): CP6 compositionality and conservative partial lowering, IN_PROGRESS / IMPLEMENTED / AWAITING HUMAN REVIEW.
+- [WORK-CFG-038](active/WORK-CFG-038.md): CP6 compositionality and conservative partial lowering, DONE / MERGED #24 (`18a78a6599bfad2d983a4a32d7515d379a9bac60`).
 
-NEXT: **CARDDEMO BASELINE** — contar construções e programas afetados, medir impacto nos CALL sites, priorizar ganho de cobertura e reexecutar após cada vertical.
+NEXT: **HUMAN PRIORITIZATION USING FULL CARDDEMO BASELINE**. O corpus fornece evidência consultiva; não seleciona nem determina a próxima capability. [Baseline](../evals/cp6/carddemo-full-baseline.md).

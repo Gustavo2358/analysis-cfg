@@ -50,6 +50,7 @@ def technical_fast(root):
     for command in ([sys.executable, '-B', 'scripts/project/check_architecture.py', '--test-profile', 'fast'],
                     [sys.executable, '-B', 'scripts/project/test_dependency_wire.py'],
                     [sys.executable, '-B', 'scripts/project/test_lean_boundary.py'],
+                    [sys.executable, '-B', 'scripts/project/test_carddemo_baseline.py'],
                     [sys.executable, '-B', 'scripts/project/test_validation.py']):
         subprocess.run(command, cwd=root, check=True)
 
