@@ -297,11 +297,11 @@ def environment(jvm_args):
             'executionMode': 'SEQUENTIAL; one canonical measured run per source; no warmup or JIT correction'}
 
 
-def run(upstream, work, runtime_path, timeout, jvm_args):
+def run(upstream, work, runtime_path, timeout, jvm_args, pins_path=None):
     require_local()
     if timeout <= 0: raise ValueError('stage timeout must be positive')
     work.mkdir(parents=True, exist_ok=False)
-    pins, config = json.loads(PINS.read_text()), json.loads(runtime_path.read_text())
+    pins, config = json.loads((pins_path or PINS).read_text()), json.loads(runtime_path.read_text())
     if config['sources'] != pins['analysisRepositories']:
         raise ValueError('runtime pipeline snapshots differ from baseline pins')
     check_snapshot(upstream, pins['upstream']['commit'])
@@ -351,5 +351,6 @@ if __name__ == '__main__':
     parser.add_argument('--stage-timeout-seconds', type=float, default=120,
                         help='operational protection per process, default 120 seconds, not an analyzer SLA')
     parser.add_argument('--jvm-arg', action='append', default=None, help='repeatable JVM argument; default -Xmx2g')
+    parser.add_argument('--pins', type=Path, help='explicit immutable snapshots; historical pins remain the default')
     args = parser.parse_args()
-    run(args.upstream.resolve(), args.work.resolve(), args.runtime.resolve(), args.stage_timeout_seconds, args.jvm_arg or ['-Xmx2g'])
+    run(args.upstream.resolve(), args.work.resolve(), args.runtime.resolve(), args.stage_timeout_seconds, args.jvm_arg or ['-Xmx2g'], args.pins)
