@@ -98,7 +98,10 @@
     "io.github.gustavo2358.analysis.adapters.RegionalWireTest": [
       "fileProductCarriesIndependentCompositionAndCopyIntervals",
       "inventoryAndQueryPermutationPreserveTheEntireWire",
-      "hugeUnknownTailZeroAndLogicalCellsRetainTheirDistinctWireShapes"
+      "hugeUnknownTailZeroAndLogicalCellsRetainTheirDistinctWireShapes",
+      "detachedResultRetentionContainsOnlyValuesMetadataAndReferenceIds",
+      "regionalLiteralSeedsRemainAnExplicitValidatorLimit",
+      "distinctEntryPathsKeepRegionalContentsAndReachabilitySeparate"
     ]
   },
   "analysis-dataflow": {
@@ -362,6 +365,12 @@
       "sourceGapMetadataFollowsOnlyTheCapturedPrefix",
       "zeroLengthUnreachableAndUninterpretedBytesHaveDistinctProducts",
       "logicalCaptureReportsWholeCellDestinationWithoutInventedByteOffsets"
+    ],
+    "io.github.gustavo2358.analysis.values.RegionalConcreteOracleTest": [
+      "finiteBranchGraphsCompareEveryByteCandidateAndProducer",
+      "zeroOneAndManyIterationsIncludeOverlappingCopiesAndUnknownRepair",
+      "supportOnlyLoopChangesReachTheExitAndTwoExplicitResumesStaySeparate",
+      "measuredFragmentCandidateAndReplayGrowthHasNoSemanticCutoff"
     ]
   },
   "cfg-adapters": {

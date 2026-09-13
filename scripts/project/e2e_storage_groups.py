@@ -107,12 +107,12 @@ def oracle(name,case,sp,air,cfg,dependency,probe):
     verify_cfg_wire(json.dumps(cfg).encode());control_oracle(air,cfg)
     return dict(calls=len(sites),candidates=sum(len(s['candidates']) for s in sites.values()),unknownTargets=0,sourceOpen=sum(s['sourceValueRemainder'] for s in sites.values()),modelOpen=sum(s['modelValueRemainder'] for s in sites.values()),qualifiedPhysicalQueries=len(queries),bases=len(base_ids),nodes=len(nodes),cells=case['cells'])
 
-def run(work,runtime,names=None,attempts=2,permutations=True,*,cases=None,inspect=oracle,status="W3_FOCAL_VERTICAL"):
+def run(work,runtime,names=None,attempts=2,permutations=True,*,cases=None,inspect=oracle,status="W3_FOCAL_VERTICAL",probe_name="StorageE2eProbe"):
     require(not os.environ.get('CI'),'local qualification only');work.mkdir(parents=True,exist_ok=False);config=json.loads(runtime.read_text());require(config['semanticProductVersion'] in ('2.7.0','2.8.0'),'pinned SP runtime')
-    source=ROOT/'analysis-adapters/src/test/java/io/github/gustavo2358/analysis/adapters/StorageE2eProbe.java';probe=work/'probe';probe.mkdir();shutil.copyfile(source,probe/source.name);classes=probe/'classes';classes.mkdir()
+    source=ROOT/('analysis-adapters/src/test/java/io/github/gustavo2358/analysis/adapters/'+probe_name+'.java');probe=work/'probe';probe.mkdir();shutil.copyfile(source,probe/source.name);classes=probe/'classes';classes.mkdir()
     command=['javac','-cp',os.pathsep.join(config['cfg']['classpath']),'-d',str(classes),str(probe/source.name)];write_json(probe/'compile.command.json',command)
     with (probe/'compile.stdout.log').open('w') as out,(probe/'compile.stderr.log').open('w') as err:require(subprocess.run(command,stdout=out,stderr=err).returncode==0,'test probe compilation')
-    config['probe']=dict(main='io.github.gustavo2358.analysis.adapters.StorageE2eProbe',classpath=[str(classes)]+config['cfg']['classpath']);results={}
+    config['probe']=dict(main='io.github.gustavo2358.analysis.adapters.'+probe_name,classpath=[str(classes)]+config['cfg']['classpath']);results={}
     selected={k:v for k,v in (fixtures() if cases is None else cases).items() if not names or k in names};require(bool(selected),'nonempty selected fixture set')
     for name,case in selected.items():
         cwd=work/name;cwd.mkdir();source=cwd/(name+'.cbl');source.write_text(case['source']);write_json(cwd/'independent-golden.json',{k:v for k,v in case.items() if k not in ('source','books')})

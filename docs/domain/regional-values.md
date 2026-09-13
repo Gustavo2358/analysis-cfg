@@ -315,3 +315,49 @@ do profile @2. Isso permite explicar um resultado aberto sem afirmar candidato.
 Testes fixam composição, RD correspondente, cópia de cópia recortada, unknown
 parcial, source gap, branches, inventários permutados, Cell, zero e unreachable.
 O wire separado e sua qualificação ainda estão pendentes na subtask W5.3.
+
+## W5: controle, oracle e custo
+
+`RegionalConcreteOracleTest` compara 31 grafos AIR com uma máquina concreta
+independente: cada byte carrega caráter, produtor estático, base e coordenada
+original. A fila termina por identidade dos estados visitados, sem corte de
+iterações/candidatos. São comparados todos os pontos e as duas bases, incluindo
+branches, cópias sobrepostas, zero/uma/várias iterações, reparo de unknown e
+mudanças apenas nos supports. O caso de dois contextos usa continuations já
+explícitas na AIR; não admite nem achata `LocalInvoke`/`LocalResume`.
+
+As sondagens de crescimento variam fragmentos (1/2/4/8), alternativas
+(2/4/8/16) e captures estáticos (1/4/16/64), registrando preparação, solver e
+replay. Esses tamanhos são fixtures, não limites semânticos. O custo observado
+nesses casos não constitui garantia de crescimento polinomial: stores conjuntos
+podem crescer com combinações distinguíveis de conteúdo e provenance. O domínio
+não impõe um `K` e não transforma falha operacional em resultado completo.
+
+`RegionalWireTest` percorre por identidade todo o grafo retido no resultado
+público. IDs, metadados e valores são permitidos; Publication, Unit, Sequence,
+Operation, sessão, solver e imagens internas são recusados. Um controle negativo
+injeta deliberadamente uma Publication para verificar o detector. O teste usa
+reflexão apenas no código de teste e não mede bytes de heap.
+
+A vertical `scripts/project/e2e_storage_composition.py` usa COBOL real, SP2.8,
+AIR por arquivo, CFG e o produto regional público. Goldens de bytes e intervalos
+correlacionam a linha fonte com coverage/IDs; não consultam nomes no core. Cobrem
+partial write, copy capture, IF (inclusive braços regionais), EVALUATE, GO TO,
+PERFORM BASIC, duas ativações e PERFORM TIMES já admitidos pelos produtores.
+Uma declaração `RAW-TEXT REDEFINES RAW-AREA PIC X(8)` fornece a interpretação
+textual explícita do grupo. CALL direto de grupo sem acesso textual publicado
+continua fora dessa prova. Remainders de fonte e controle externo permanecem.
+
+O lower pode usar predicado e continuations provados de um IF cujo perfil
+escalar legado seja `OUTSIDE_SLICE`; esse rótulo sozinho não determina a admissão
+regional. Predicado sem prova e PERFORM de corpo sem prova mantêm Opaque e
+remainder. Um Opaque em código morto é preservado e consultado como
+`UNREACHABLE_IN_MODEL`; não é descartado para fechar o modelo.
+
+Entradas distintas mantêm estados e reachability separados. Seeds literais em
+Cell pertencem ao perfil já existente; seeds literais regionais permanecem
+`VALIDATION_LIMIT` no validator fixado, expostos pela composição como a categoria
+legada `EXTERNAL_SIZE_CAP_DEBT`. O teste verifica a mensagem específica de
+consistência de inicializadores regionais. Não é suporte a VALUE regional de
+COBOL, que pertence a W7. Falhas de quota de recursos usam a categoria distinta
+`EXTERNAL_RESOURCE_LIMIT` e não produzem produto semântico.

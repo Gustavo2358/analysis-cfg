@@ -67,4 +67,64 @@ class RegionalWireTest {
         assertEquals(4,result.observations().size());assertEquals(1,result.observations().stream().filter(o->Boolean.FALSE.equals(o.values().value().modelValueRemainder())).count());
         var out=Path.of("target/regional-wire");Files.createDirectories(out);Files.write(out.resolve("limits.result.json"),encode(result));
     }
+
+    static Set<Object> retained(Object root) throws ReflectiveOperationException {
+        var seen=Collections.newSetFromMap(new IdentityHashMap<Object,Boolean>());var pending=new ArrayDeque<Object>();pending.add(root);
+        while(!pending.isEmpty()) {
+            var value=pending.removeLast();if(!seen.add(value))continue;var type=value.getClass();
+            assertFalse(value instanceof Publication||value instanceof Operation||value instanceof Unit||value instanceof Sequence,"AIR graph retained: "+type);
+            assertFalse(type.getName().startsWith("io.github.gustavo2358.analysis.structure.")||type.getName().startsWith("io.github.gustavo2358.analysis.solver.")
+                ||type.getName().contains("RegionalValuesAnalysis")||type.getName().contains("ByteImage"),"execution/domain retained: "+type);
+            if(value instanceof String||value instanceof Number||value instanceof Boolean||type.isEnum())continue;
+            if(value instanceof Collection<?> collection) {pending.addAll(collection);continue;}
+            if(value instanceof Map<?,?> map) {pending.addAll(map.keySet());pending.addAll(map.values());continue;}
+            if(value instanceof Optional<?> optional) {optional.ifPresent(pending::add);continue;}
+            assertTrue(type.isRecord(),"every retained non-leaf type must be inspected: "+type);
+            for(var component:type.getRecordComponents()) {var nested=component.getAccessor().invoke(value);if(nested!=null)pending.add(nested);}
+        }
+        return seen;
+    }
+    @Test void detachedResultRetentionContainsOnlyValuesMetadataAndReferenceIds() throws Exception {
+        var p=fixture();var result=new RegionalAnalysis().prepare(p,"retention",queries());var graph=retained(result);
+        assertFalse(graph.contains(p));assertTrue(graph.stream().anyMatch(v->v instanceof io.github.gustavo2358.analysis.values.StorageValueFact.Capture));
+        assertThrows(AssertionError.class,()->retained(List.of(result,p)),"detector must reject a deliberately retained publication");
+        var before=encode(result);new RegionalAnalysis().prepare(fixture(),"unrelated",queries());assertArrayEquals(before,encode(result));
+        System.out.println("W5_RETENTION resultObjects="+graph.size()+" forbiddenRoots=0 wireBytes="+before.length);
+    }
+    @Test void regionalLiteralSeedsRemainAnExplicitValidatorLimit() {
+        var p=fixture();var unit=p.units().getFirst();var entries=new ArrayList<Entries.Entry>();
+        for(int i=0;i<2;i++) {
+            var e=entry(U,"seed-"+i,"body");var owner=new EntryOwner(e.id());
+            var place=new Places.ObjectPlace(new Operand.Header(new OperandId(owner,"place"),Operand.Role.VALUE_WRITE,origin(P)),WHOLE);
+            var literal=new Expressions.Literal(new Operand.Header(new OperandId(owner,"literal"),Operand.Role.VALUE_READ,origin(P)),new Values.TextValue(i==0?"AAAABBBB":"CCCCDDDD"));
+            entries.add(new Entries.Entry(e.id(),e.initialLabel(),e.signature(),new Entries.EntryState(List.of(new Entries.InitialCondition(place,new Entries.LiteralInitial(literal),origin(P),List.of())),List.of()),e.origin()));
+        }
+        p=new Publication(P,p.airVersion(),p.capabilities(),p.artifacts(),List.of(unit(U,entries,unit.sequences(),unit.objects())),p.storage(),p.resources(),p.artifactRelations(),p.origins(),p.coverage(),p.uncertainties(),p.premises());
+        var queries=entries.stream().map(e->new PointQuery<StorageSubject>(ProgramPoint.entry(e.id()),new StorageSubject.NamedObject(WHOLE))).toList();
+        var input=p;
+        var failure=assertThrows(AnalysisDataflow.PreparationException.class,()->new RegionalAnalysis().prepare(input,"seeds",queries));
+        assertEquals(AnalysisDataflow.Failure.EXTERNAL_SIZE_CAP_DEBT,failure.failure());
+        assertTrue(io.github.gustavo2358.air.validation.AirValidator.validate(p).issues().stream().anyMatch(issue->issue.detail().contains("overlapping region initializers")));
+    }
+
+    @Test void distinctEntryPathsKeepRegionalContentsAndReachabilitySeparate() {
+        var p=fixture();var unit=p.units().getFirst();var entries=List.of(entry(U,"a","seed-a"),entry(U,"b","seed-b"));
+        var sequences=new ArrayList<>(unit.sequences());
+        for(int i=0;i<2;i++) {
+            String label=i==0?"seed-a":"seed-b";var control=jump(U,label,"body");
+            sequences.add(new Sequence(control.label(),List.of(assign(U,"write-"+label,WHOLE,i==0?"AAAABBBB":"CCCCDDDD")),control.terminator(),origin(P)));
+        }
+        p=new Publication(P,p.airVersion(),p.capabilities(),p.artifacts(),List.of(unit(U,entries,sequences,unit.objects())),p.storage(),p.resources(),p.artifactRelations(),p.origins(),p.coverage(),p.uncertainties(),p.premises());
+        var queries=new ArrayList<PointQuery<StorageSubject>>();
+        for(var e:entries)for(var operation:List.of("old","write-seed-a","write-seed-b"))queries.add(new PointQuery<>(ProgramPoint.before(e.id(),new OperationId(U,operation)),new StorageSubject.NamedObject(WHOLE)));
+        var result=new RegionalAnalysis().prepare(p,"entry-paths",queries);
+        for(var o:result.observations()) {
+            var e=o.query().point().entry();var op=o.query().point().operation().localId();
+            if(op.equals("old")) {
+                assertEquals(List.of(new Values.TextValue(e.localId().equals("a")?"AAAABBBB":"CCCCDDDD")),o.values().value().candidates());
+                assertEquals(e,o.rd().value().definitions().getFirst().definition().entry());assertFalse(o.values().value().modelValueRemainder());
+            } else if(op.equals("write-seed-"+e.localId()))assertTrue(o.values().value().modelValueRemainder());
+            else {assertNull(o.values().value().candidates());assertEquals(io.github.gustavo2358.analysis.values.ValueFact.Reachability.UNREACHABLE_IN_MODEL,o.values().value().reachability());}
+        }
+    }
 }
