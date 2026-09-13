@@ -1,12 +1,13 @@
 id: WORK-CFG-039
 title: CP6 — full CardDemo baseline and advisory capability analysis
-status: IN_PROGRESS
+status: DONE
 scope:
   - Sequential local evaluation of every COBOL source in pinned upstream, including archived variants
   - Runner, focal FAST tests, statement/gap/CALL inventories and observed timings
   - Machine-readable and human-readable historical baseline with human advisory policy
-review_state: IMPLEMENTED / AWAITING HUMAN REVIEW
+review_state: DONE / MERGED
 pr: 25
+merge_commit: b13ba042e53a4f93c6556418f478e5946d6a48f1
 production_changes: NONE
 decisionPolicy: HUMAN
 rankingAuthority: ADVISORY_ONLY
