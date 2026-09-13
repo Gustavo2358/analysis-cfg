@@ -19,9 +19,15 @@ class BaselineTests(unittest.TestCase):
             root = Path(tmp); pins = root / 'pins.json'; runtime = root / 'runtime.json'
             pins.write_text(json.dumps({'analysisRepositories': {'frontend': 'a' * 40}}))
             runtime.write_text(json.dumps({'sources': {'frontend': 'b' * 40}}))
-            with patch.object(runner, 'PINS', root / 'unused-historical-pins.json'):
+            # Exercise only synthetic pin admission; never run a corpus in FAST.
+            with (patch.object(runner, 'PINS', root / 'unused-historical-pins.json'),
+                  patch.object(runner, 'require_local'),
+                  patch.object(runner, 'check_snapshot') as snapshot,
+                  patch.object(runner, 'attempt_program') as attempt):
                 with self.assertRaisesRegex(ValueError, 'runtime pipeline snapshots differ'):
                     runner.run(root / 'upstream', root / 'run', runtime, 120, [], pins)
+                snapshot.assert_not_called()
+                attempt.assert_not_called()
 
     def test_entry_delta_call_identity_ignores_expanded_lines_but_keeps_include_instance(self):
         call = {'provenance': {'original': {'file': 'a.cbl', 'startLine': 8},
