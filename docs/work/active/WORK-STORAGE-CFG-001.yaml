@@ -30,7 +30,10 @@ design_w4:
   boundaries: Generic AIR analysis unchanged; same bytes with different codecs remain different interpretations. Multi-producer candidate composition remains pending W5.
 design_w5:
   contract: docs/domain/regional-values.md
-  progress: M2 qualified in the campaign receipt; W5.1 joint image domain and exclusive destination effects under focal verification.
+  progress: M2 qualified in the campaign receipt; W5.1–W5.4 implemented with focal and full FAST checks. Final cumulative M3 qualification is recorded separately in campaign evidence.
   oracle: Five independent composition/correlation/overlap tests first failed semantically, then passed; join laws and support-only equality also passed.
   boundaries: RegionalValues 2 and regional-text-images@2 identify the extended domain; RegionalValueFact@1 and legacy scalar wire remain compatible. No path witness or arbitrary candidate cap.
   transfers: Eleven focal tests verify partial MUST/MAY, choice, capture, logical Read, self/overlap/zero, open remainder and validator boundaries. Existing implementation reused; W5.2 FAST and final wave qualification tracked in campaign evidence.
+  public_product: Generic detached regional result and strict JSON reader/writer/CLI; physical-range and object queries share RD/values before/after/outcome replay. Original and capture provenance stay distinct; no path witness is claimed.
+  composition: Independent concrete byte/producer oracle covers 31 control graphs and 404 point/base comparisons; thirteen COBOL recipes cover partial writes, branch joins, GO TO, repeated PERFORM, copy capture and explicit fallbacks.
+  limits: Regional literal entry seeds remain a shared-validator VALIDATION_LIMIT; finite static capture metadata does not store path histories. Growth and retention measurements describe tested fixtures only.
