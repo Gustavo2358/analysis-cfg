@@ -1,7 +1,16 @@
 # CP6 — compositionality and conservative partial lowering
 
-Status: **IN_PROGRESS — IMPLEMENTED / AWAITING HUMAN REVIEW**. Git/PR/tests/merge are the source of truth; no receipts,
+Status: **DONE / MERGED**. Git/PR/tests/merge are the source of truth; no receipts,
 certificates, evidence bundles or hash chains. Replaces the former EVALUATE next step.
+
+Merge closure verified after fetch on 2026-09-13 UTC: all four clean mains equal
+origin/main. Real merge commits: air-java #12 `96cd5e545723c6fd76d1520f431ebbc196af84f6`,
+proleap-poc #40 `59ac43bc3ab4bd186092a13732381512cbdaddba`, cobol-lower #17
+`7da4980067c2860b3827ecc3eea641a6afa2a526`, analysis-cfg #24
+`18a78a6599bfad2d983a4a32d7515d379a9bac60`. GitHub #24 is MERGED with both FAST
+checks SUCCESS; local product qualification is preserved below. The remaining
+pre-merge narrative is historical. WORK-CFG-039 evaluates the full pinned corpus;
+it does not authorize the next capability or change semantic production.
 
 ## Verified merge baseline
 

@@ -3,8 +3,15 @@
   "active": [
     {
       "id": "WORK-CFG-038",
-      "status": "IN_PROGRESS",
-      "path": "docs/work/active/WORK-CFG-038.yaml"
+      "status": "DONE",
+      "path": "docs/work/active/WORK-CFG-038.yaml",
+      "pr": 24,
+      "merge_commit": "18a78a6599bfad2d983a4a32d7515d379a9bac60"
+    },
+    {
+      "id": "WORK-CFG-039",
+      "path": "docs/work/active/WORK-CFG-039.yaml",
+      "status": "IN_PROGRESS"
     }
   ],
   "history": [
