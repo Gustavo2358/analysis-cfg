@@ -124,7 +124,7 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "b1c45b8f23452082c9f3969b78915976747e87c7",
+    "commit": "96cd5e545723c6fd76d1520f431ebbc196af84f6",
     "canonical_ref": "feat/conservative-air-json",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
@@ -238,19 +238,23 @@
       "docs/domain/cobol-semantic-product.md",
       "docs/work/history/WORK-SEMANTIC-PRODUCT-003.md"
     ],
-    "semantic_product_version": "2.0.0",
+    "semantic_product_version": "2.1.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "54ca76f9cf91696d335b2678e9dd2425f81065a5",
+    "commit": "3842239551153e98590744ceb8b1e730885b1bbd",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
     "partial_validation": "docs/work/active/WORK-CFG-038.md",
-    "evaluate_validation": "docs/work/active/WORK-CFG-040.yaml"
+    "evaluate_validation": "docs/work/active/WORK-CFG-040.yaml",
+    "goto_validation": {
+      "contract": "2.1.0",
+      "scope": "local unconditional paragraph identity and explicit entry; G1-G5 and 1/2/5/40"
+    }
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "verified",
-    "commit": "b61204e6959c6454b4bc4961acf265d99536a237",
+    "commit": "2dd97f4fb07eadb2a5cb76d94f94f587aa59a175",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -258,7 +262,10 @@
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
     "partial_validation": "docs/work/active/WORK-CFG-038.md",
-    "evaluate_validation": "docs/work/active/WORK-CFG-040.yaml"
+    "evaluate_validation": "docs/work/active/WORK-CFG-040.yaml",
+    "goto_validation": {
+      "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
+    }
   },
   "external": [
     {

@@ -1,0 +1,4 @@
+id: WORK-CFG-041
+title: GO TO first slice E2E and CardDemo delta
+status: IN_PROGRESS
+scope: G1-G5, explicit Jump/no fallthrough, multiplicity and regression tests; affected then one Full local CardDemo. No CFG production changes. Human review only.
