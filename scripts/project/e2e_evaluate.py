@@ -30,7 +30,7 @@ EXPECTED = {
 
 
 def oracle(name, source, sp, air, result):
-    require(sp['contractVersion'] in ('2.0.0', '2.1.0'), 'SP2 typed family')
+    require(sp['contractVersion'] in ('2.0.0', '2.1.0','2.2.0'), 'SP2 typed family')
     publication = air['publication']
     ops = {op['header']['id']['localId']: op for seq in publication['units'][0]['sequences']
            for op in seq['instructions'] + [seq['terminator']]}

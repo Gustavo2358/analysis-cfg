@@ -41,7 +41,7 @@ def source_calls(sp):
 
 
 def oracle(name, sp, air, result):
-    require(sp['contractVersion'] == '1.8.0', 'current SP1.8')
+    require(sp['contractVersion'] in ('1.8.0','1.9.0','2.0.0','2.1.0','2.2.0'), 'current SP1.8')
     p = air['publication']; unit = p['units'][0]
     operations = {op['header']['id']['localId']: op for seq in unit['sequences'] for op in seq['instructions'] + [seq['terminator']]}
     links = {}

@@ -1,0 +1,15 @@
+{
+  "baselineMergeShas": {
+    "proleap-poc": "f62e4cf2792d518de5f4f9c753d0d86e92d3f755",
+    "cobol-lower": "715f196369d1e82cfd7e4affb31ee34dc73c0e2d",
+    "analysis-cfg": "51beeb1859689dc83e16aca9cc8a1fc9fc7e0bc7"
+  },
+  "airJava": "96cd5e545723c6fd76d1520f431ebbc196af84f6",
+  "analysisIr": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+  "upstream": {
+    "repository": "aws-samples/aws-mainframe-modernization-carddemo",
+    "commit": "59cc6c2fd7ebd7ef7925cad552a01a4b8b6e4d5e"
+  },
+  "decisionPolicy": "HUMAN",
+  "rankingAuthority": "ADVISORY_ONLY"
+}
