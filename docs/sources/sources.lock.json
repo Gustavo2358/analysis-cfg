@@ -124,8 +124,8 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "96cd5e545723c6fd76d1520f431ebbc196af84f6",
-    "canonical_ref": "feat/conservative-air-json",
+    "commit": "8be19ff385b42a5987a407acc464319d212081c3",
+    "canonical_ref": "feat/perform-family",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
     "analysis_ir": {
@@ -170,7 +170,7 @@
       "air-model/src/main/java/io/github/gustavo2358/air/model/Values.java",
       "air-json/src/test/resources/scalar-assign.canonical.json"
     ],
-    "observed_on": "2026-09-12",
+    "observed_on": "2026-09-13",
     "modules": {
       "parent": {
         "path": "pom.xml",

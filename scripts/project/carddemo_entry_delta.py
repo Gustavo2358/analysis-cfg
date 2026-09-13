@@ -42,10 +42,12 @@ def totals(programs):
             'remainders': {r: sum(s[r] is True for s in sites) for r in REMAINDERS}}
 
 
-def load_after(path):
+def load_after(path, selected=None):
     raw = json.loads(path.read_text()); root = path.parent
     programs = []
     for p in raw['programs']:
+        if selected is not None and p['path'] not in selected:
+            continue
         data = {}
         for stage, artifact in p['artifacts'].items():
             file = root / artifact['path']

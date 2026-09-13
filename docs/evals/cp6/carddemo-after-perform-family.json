@@ -1,0 +1,423 @@
+{
+  "schemaVersion": "carddemo-after-perform-family-1.0.0",
+  "decisionPolicy": "HUMAN",
+  "rankingAuthority": "ADVISORY_ONLY",
+  "pipeline": {
+    "before": {
+      "attempted": 73,
+      "frontend": 67,
+      "lower": 67,
+      "cfg": 67,
+      "dependency": 67,
+      "callsObserved": 73,
+      "callsAnalyzed": 73,
+      "callsReachable": 73,
+      "withKnownCandidates": 73,
+      "categories": {
+        "CLOSED_RESOLVED": 0,
+        "PARTIAL_RESOLVED": 73,
+        "OPEN_UNRESOLVED": 0,
+        "UNREACHABLE_IN_MODEL": 0,
+        "OTHER": 0
+      },
+      "remainders": {
+        "modelValueRemainder": 0,
+        "sourceValueRemainder": 73,
+        "interpretationUnknownRemainder": 73,
+        "effectiveUnknownRemainder": 73,
+        "openControlRemainder": 73
+      }
+    },
+    "after": {
+      "attempted": 73,
+      "frontend": 67,
+      "lower": 67,
+      "cfg": 67,
+      "dependency": 67,
+      "callsObserved": 73,
+      "callsAnalyzed": 73,
+      "callsReachable": 73,
+      "withKnownCandidates": 73,
+      "categories": {
+        "CLOSED_RESOLVED": 0,
+        "PARTIAL_RESOLVED": 73,
+        "OPEN_UNRESOLVED": 0,
+        "UNREACHABLE_IN_MODEL": 0,
+        "OTHER": 0
+      },
+      "remainders": {
+        "modelValueRemainder": 0,
+        "sourceValueRemainder": 73,
+        "interpretationUnknownRemainder": 73,
+        "effectiveUnknownRemainder": 73,
+        "openControlRemainder": 73
+      }
+    }
+  },
+  "performFamily": {
+    "before": {
+      "occurrences": 1829,
+      "thruOccurrences": 371,
+      "typed": 0,
+      "structured": 0,
+      "partial": 0,
+      "unsupported": 1829,
+      "potentialCallSites": 72,
+      "gaps": {},
+      "families": {
+        "THRU": {
+          "occurrences": 371,
+          "outOfLineOccurrences": 371,
+          "typed": 0,
+          "structured": 0,
+          "partial": 0,
+          "unsupported": 371
+        },
+        "UNTIL": {
+          "occurrences": 45,
+          "outOfLineOccurrences": 8,
+          "typed": 0,
+          "structured": 0,
+          "partial": 0,
+          "unsupported": 45
+        },
+        "TIMES": {
+          "occurrences": 0,
+          "outOfLineOccurrences": 0,
+          "typed": 0,
+          "structured": 0,
+          "partial": 0,
+          "unsupported": 0
+        },
+        "VARYING": {
+          "occurrences": 24,
+          "outOfLineOccurrences": 0,
+          "typed": 0,
+          "structured": 0,
+          "partial": 0,
+          "unsupported": 24
+        }
+      },
+      "remainingUnsupportedVariants": {
+        "PROCEDURE/ONCE": 1395,
+        "PROCEDURE/ONCE/THRU": 365,
+        "PROCEDURE/UNTIL/THRU": 6,
+        "INLINE/UNTIL": 37,
+        "PROCEDURE/UNTIL": 2,
+        "INLINE/VARYING": 24
+      }
+    },
+    "after": {
+      "occurrences": 1829,
+      "thruOccurrences": 371,
+      "typed": 373,
+      "structured": 0,
+      "partial": 373,
+      "unsupported": 1456,
+      "potentialCallSites": 72,
+      "gaps": {
+        "PERFORM_PROCEDURE_STRUCTURE_NOT_PROVEN": 27,
+        "PERFORM_ORDERED_RANGE_NOT_PROVEN": 27,
+        "PERFORM_ISOLATED_PRIMARY_NOT_PROVEN": 373,
+        "PERFORM_UNTIL_PREDICATE_NOT_PROVEN": 8,
+        "PERFORM_RESUME_NOT_PROVEN": 51,
+        "PERFORM_INPUT_INCOMPLETE": 344,
+        "PERFORM_PARAGRAPH_BOUNDARY_NOT_PROVEN": 227,
+        "PERFORM_ORDINARY_INCOMING_NOT_EXCLUDED": 344,
+        "PERFORM_RANGE_CONTROL_NOT_PROVEN": 119,
+        "CONTAINMENT_NOT_PROJECTED": 112,
+        "CONDITION_REFERENCE_KIND_NOT_PROJECTED": 2,
+        "PERFORM_OVERLAPPING_RANGES": 12
+      },
+      "families": {
+        "THRU": {
+          "occurrences": 371,
+          "outOfLineOccurrences": 371,
+          "typed": 371,
+          "structured": 0,
+          "partial": 371,
+          "unsupported": 0
+        },
+        "UNTIL": {
+          "occurrences": 45,
+          "outOfLineOccurrences": 8,
+          "typed": 8,
+          "structured": 0,
+          "partial": 8,
+          "unsupported": 37
+        },
+        "TIMES": {
+          "occurrences": 0,
+          "outOfLineOccurrences": 0,
+          "typed": 0,
+          "structured": 0,
+          "partial": 0,
+          "unsupported": 0
+        },
+        "VARYING": {
+          "occurrences": 24,
+          "outOfLineOccurrences": 0,
+          "typed": 0,
+          "structured": 0,
+          "partial": 0,
+          "unsupported": 24
+        }
+      },
+      "remainingUnsupportedVariants": {
+        "PROCEDURE/ONCE": 1395,
+        "INLINE/UNTIL": 37,
+        "INLINE/VARYING": 24
+      }
+    }
+  },
+  "candidateChanges": {
+    "sites": 0,
+    "additions": 0,
+    "removals": 0
+  },
+  "preservedSiteVectors": 73,
+  "outsideFrontierPreserved": 1,
+  "changedSites": [],
+  "unexpectedRegressions": [],
+  "productResult": "NO_REAL_CALL_CANDIDATE_GAIN",
+  "status": "READY_FOR_HUMAN_REVIEW",
+  "pins": "carddemo-perform-family-pins.json",
+  "semanticProductVersion": "2.5.0",
+  "cumulative": {
+    "THRU": 23,
+    "UNTIL": 19,
+    "TIMES": 18,
+    "VARYING": 28,
+    "mixedAllFamiliesAndBasic": 1,
+    "total": 89,
+    "GO_TO": 23,
+    "EVALUATE": 18,
+    "historical": 38,
+    "adversarial": "PASS",
+    "multiplicity": [
+      1,
+      2,
+      5,
+      40
+    ],
+    "byteDeterminism": [
+      "SP",
+      "AIR",
+      "CFG",
+      "dependency"
+    ],
+    "physicalPermutations": [
+      "SP statement inventory",
+      "JSON fields",
+      "AIR sequences"
+    ]
+  },
+  "fast": {
+    "frontend": "PASS (139 tests)",
+    "lower": "PASS",
+    "cfg": "PASS",
+    "air": "PASS",
+    "remote": "FAST ONLY; productive heads PASS"
+  },
+  "qualification": {
+    "frontend": "PASS (629 executed; one existing future-condition opt-in test skipped)",
+    "lower": "PASS",
+    "air": "PASS (179 model + 110 transport)"
+  },
+  "affectedQualification": {
+    "carddemo-family-affected-delta": {
+      "programs": 21,
+      "preservedSiteVectors": 45,
+      "candidateChanges": {
+        "sites": 0,
+        "additions": 0,
+        "removals": 0
+      }
+    },
+    "carddemo-until-after-family-delta": {
+      "programs": 21,
+      "preservedSiteVectors": 45,
+      "candidateChanges": {
+        "sites": 0,
+        "additions": 0,
+        "removals": 0
+      }
+    },
+    "carddemo-thru-after-family-delta": {
+      "programs": 19,
+      "preservedSiteVectors": 27,
+      "candidateChanges": {
+        "sites": 0,
+        "additions": 0,
+        "removals": 0
+      }
+    }
+  },
+  "finalFull": {
+    "runs": 1,
+    "attempted": 73,
+    "reachingDependency": 67,
+    "status": "PASS_WITH_UNCHANGED_HISTORICAL_INPUT_BOUNDARIES",
+    "historicalBlockedPrograms": [
+      {
+        "path": "app/app-authorization-ims-db2-mq/cbl/CBPAUP0C.cbl",
+        "stages": {
+          "frontend": {
+            "state": "BLOCKED",
+            "reasonCode": "PREPROCESSING_FAILED"
+          },
+          "lower": {
+            "state": "NOT_REACHED",
+            "reasonCode": "UPSTREAM_NOT_PRODUCED"
+          },
+          "cfg": {
+            "state": "NOT_REACHED",
+            "reasonCode": "UPSTREAM_NOT_PRODUCED"
+          },
+          "dependency": {
+            "state": "NOT_REACHED",
+            "reasonCode": "UPSTREAM_NOT_PRODUCED"
+          }
+        }
+      },
+      {
+        "path": "app/app-authorization-ims-db2-mq/cbl/COPAUA0C.cbl",
+        "stages": {
+          "frontend": {
+            "state": "BLOCKED",
+            "reasonCode": "PREPROCESSING_FAILED"
+          },
+          "lower": {
+            "state": "NOT_REACHED",
+            "reasonCode": "UPSTREAM_NOT_PRODUCED"
+          },
+          "cfg": {
+            "state": "NOT_REACHED",
+            "reasonCode": "UPSTREAM_NOT_PRODUCED"
+          },
+          "dependency": {
+            "state": "NOT_REACHED",
+            "reasonCode": "UPSTREAM_NOT_PRODUCED"
+          }
+        }
+      },
+      {
+        "path": "app/app-authorization-ims-db2-mq/cbl/COPAUS0C.cbl",
+        "stages": {
+          "frontend": {
+            "state": "BLOCKED",
+            "reasonCode": "PREPROCESSING_FAILED"
+          },
+          "lower": {
+            "state": "NOT_REACHED",
+            "reasonCode": "UPSTREAM_NOT_PRODUCED"
+          },
+          "cfg": {
+            "state": "NOT_REACHED",
+            "reasonCode": "UPSTREAM_NOT_PRODUCED"
+          },
+          "dependency": {
+            "state": "NOT_REACHED",
+            "reasonCode": "UPSTREAM_NOT_PRODUCED"
+          }
+        }
+      },
+      {
+        "path": "app/app-authorization-ims-db2-mq/cbl/COPAUS1C.cbl",
+        "stages": {
+          "frontend": {
+            "state": "BLOCKED",
+            "reasonCode": "PREPROCESSING_FAILED"
+          },
+          "lower": {
+            "state": "NOT_REACHED",
+            "reasonCode": "UPSTREAM_NOT_PRODUCED"
+          },
+          "cfg": {
+            "state": "NOT_REACHED",
+            "reasonCode": "UPSTREAM_NOT_PRODUCED"
+          },
+          "dependency": {
+            "state": "NOT_REACHED",
+            "reasonCode": "UPSTREAM_NOT_PRODUCED"
+          }
+        }
+      },
+      {
+        "path": "app/app-transaction-type-db2/cbl/COTRTLIC.cbl",
+        "stages": {
+          "frontend": {
+            "state": "BLOCKED",
+            "reasonCode": "FIXED_FORMAT_TAB"
+          },
+          "lower": {
+            "state": "NOT_REACHED",
+            "reasonCode": "UPSTREAM_NOT_PRODUCED"
+          },
+          "cfg": {
+            "state": "NOT_REACHED",
+            "reasonCode": "UPSTREAM_NOT_PRODUCED"
+          },
+          "dependency": {
+            "state": "NOT_REACHED",
+            "reasonCode": "UPSTREAM_NOT_PRODUCED"
+          }
+        }
+      },
+      {
+        "path": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/CBSTM03A.cbl",
+        "stages": {
+          "frontend": {
+            "state": "BLOCKED",
+            "reasonCode": "NORMALIZATION_REJECTED"
+          },
+          "lower": {
+            "state": "NOT_REACHED",
+            "reasonCode": "UPSTREAM_NOT_PRODUCED"
+          },
+          "cfg": {
+            "state": "NOT_REACHED",
+            "reasonCode": "UPSTREAM_NOT_PRODUCED"
+          },
+          "dependency": {
+            "state": "NOT_REACHED",
+            "reasonCode": "UPSTREAM_NOT_PRODUCED"
+          }
+        }
+      }
+    ]
+  },
+  "semanticControlGain": "Typed range identity and activation-specific returns; conservative BEFORE/AFTER/count loops; localized VARYING initialization/update writes. Proven by 89 cumulative E2E cases. Real-corpus newly typed ranges remain partial.",
+  "limits": [
+    "Out-of-line profiles only; inline PERFORM remains outside this wave.",
+    "Multi-level VARYING AFTER is explicitly typed/conservative; TEST AFTER is supported.",
+    "Numeric values remain open; BY identifiers without proof of nonzero value remain partial.",
+    "Unproved range isolation, incoming/escaping control, overlap, recursion, operands and conditions remain conservative.",
+    "UNTIL reuses the existing scalar TEXT equality predicate profile; VARYING also admits simple integer relations. Other conditions remain partial."
+  ],
+  "productionChanges": {
+    "frontend": "PERFORM family typed semantics and SP 2.5",
+    "lower": "existing AIR control and localized implicit effects",
+    "air": "generic transport for existing known(int)",
+    "cfgProjection": "NONE",
+    "possibleValues": "generic auxiliary integer-cell admission, text queries only; existing transfer/fixed point/lattice"
+  },
+  "noMergePerformed": true,
+  "roadmapAuthority": "HUMAN",
+  "outsideAffectedProgramCohortPreserved": 28,
+  "frontierNote": "The raw control-bound frontier is conservative over PERFORM occurrences. Every CALL vector is unchanged, including all sites outside the 21-program affected cohort.",
+  "measurements": {
+    "before": {
+      "path": ".harness-results/goto/full/measurements.json",
+      "sha256": "091fe9f7cf334836eccd761decc38edbe23d9bb0fc0fc0784652d93c3b4daaa1"
+    },
+    "after": {
+      "path": ".harness-results/perform-family/carddemo-family-full/measurements.json",
+      "sha256": "2e397008ce8b46f6e2bc9c15372116ecc9fecae636888ad4655bd0ac62e60c38"
+    },
+    "affected": {
+      "path": ".harness-results/perform-family/carddemo-family-affected/measurements.json",
+      "sha256": "0b6c51078a9e77f3eb8c480d26f35395922131db7aa62ff80f73802167431b55"
+    }
+  }
+}

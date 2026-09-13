@@ -10,6 +10,26 @@ import static org.junit.jupiter.api.Assertions.*;
 import static io.github.gustavo2358.analysis.values.ValuesFixtures.*;
 
 class ValuesTest {
+    @Test void auxiliaryIntegerCellsPreserveTextCandidatesAndRequireDisjointness() {
+        var p=graph(new String[]{"PROGA"},new int[][]{{}},2,true,true);var u=p.units().getFirst();var old=u.objects().get(1);
+        var objects=new ArrayList<>(u.objects());var integer=Types.known(Types.Builtin.INT);
+        objects.set(1,new Memory.ObjectDeclaration(old.id(),old.displayName(),integer,old.storage(),old.visibility(),old.origin(),old.coverage(),old.precision()));
+        var storage=new ArrayList<>(p.storage());var cell=(Memory.Cell)storage.get(1);storage.set(1,new Memory.Cell(cell.header(),integer));
+        var gap=new UncertaintyId(p.id(),"integer-open-value");
+        var uncertainty=new Evidence.Uncertainty(gap,"UNKNOWN_WRITE",List.of(Evidence.Dimension.VALUES,Evidence.Dimension.EFFECTS),new Scopes.UnitScope(u.id()),"unknown integer update",origin(p.id()));
+        var h=header(u.id(),"integer-update");var exact=h.precision().control();var open=new Evidence.Claim(new Scopes.UnitScope(u.id()),Evidence.PrecisionStatus.OPEN,List.of(gap));
+        var effectHeader=new Operations.Header(h.id(),h.origin(),Evidence.CoverageStatus.ABSTRACTED,new Evidence.Precision(exact,exact,open,open,exact),List.of(gap));
+        var s=u.sequences().getFirst();
+        for(boolean all:List.of(false,true)) {
+            Instruction effect=all?new Operations.HavocMay(effectHeader,new Scopes.AllMemory(p.id(),false),gap):new Operations.HavocMust(effectHeader,new Places.ObjectPlace(operand(h.id(),"destination",Operand.Role.VALUE_WRITE),old.id()),gap);
+            var instructions=new ArrayList<Instruction>(s.instructions());instructions.add(effect);
+            var changed=new Publication(p.id(),p.airVersion(),p.capabilities(),p.artifacts(),List.of(unit(u.id(),u.entries(),List.of(new Sequence(s.label(),instructions,s.terminator(),s.origin())),objects)),storage,p.resources(),p.artifactRelations(),p.origins(),p.coverage(),List.of(uncertainty),p.premises());
+            var run=execute(changed);expected(fact(run,before(changed,0,0)),all,"PROGA");
+            assertEquals(ObservationBatch.PointReason.UNSUPPORTED_SUBJECT,run.observe(List.of(before(changed,0,1))).batch().observations().getFirst().reason());
+            var noProof=replace(changed,changed.units(),changed.coverage(),changed.uncertainties(),List.of());
+            assertEquals(PossibleValuesAnalysis.Status.UNSUPPORTED,PossibleValuesAnalysis.prepare(session(noProof)).status(),"auxiliary numeric storage still needs disjointness");
+        }
+    }
     static PointQuery<ObjectId> before(Publication p,int seq,int object) {
         var u=p.units().getFirst();return new PointQuery<>(ProgramPoint.before(u.entries().getFirst().id(),u.sequences().get(seq).terminator().header().id()),u.objects().get(object).id());
     }

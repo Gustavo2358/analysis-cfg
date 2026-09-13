@@ -1,0 +1,15 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. FAMILY.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 WS-PGM PIC X(8).
+       01 FLAG PIC X.
+       PROCEDURE DIVISION.
+       MAIN.
+       PERFORM A THRU B.
+       CALL WS-PGM.
+       GOBACK.
+       A.
+       MOVE 'PROGA' TO WS-PGM.
+       B.
+       MOVE WS-PGM TO WS-PGM.
