@@ -53,9 +53,10 @@ sites preserve exact known candidate values, classifications, reachability and
 all five remainder fields. No source CALL disappeared or was added.
 
 **New blockers: NONE.** The six previous failures before SP remain: four
-PREPROCESSING_FAILED (app/cbl/COTRTLIC.cbl, app/cbl/COTRTUPC.cbl and their ZIP
-`.cl2` variants), FIXED_FORMAT_TAB (app/app-transaction-type-db2/cbl/COTRTLIC.cbl),
-and NORMALIZATION_REJECTED (ZIP migrated_app/cbl/CBSTM03A.cbl). CALLs in those six
+PREPROCESSOR_EXEC_POLICY_MISSING (CBPAUP0C.cbl, COPAUA0C.cbl, COPAUS0C.cbl,
+COPAUS1C.cbl under app/app-authorization-ims-db2-mq/cbl), FIXED_FORMAT_TAB
+(app/app-transaction-type-db2/cbl/COTRTLIC.cbl), and NORMALIZATION_REJECTED
+(ZIP migrated_app/cbl/CBSTM03A.cbl). CALLs in those six
 sources remain unknown because SP is unavailable. No follow-on capability was
 implemented.
 
