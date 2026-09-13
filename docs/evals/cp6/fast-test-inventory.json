@@ -86,6 +86,9 @@
       "preciseControlBeforeAddingRegionProvesBothCallTargets",
       "opaqueKnownOperandWritesHonorMandatoryAndPossibleEffects",
       "boundedControlHasMatchingForwardAndBackwardCursors"
+    ],
+    "io.github.gustavo2358.analysis.adapters.RegionalFileTest": [
+      "realAirFilePreservesPhysicalOffsetsAndSurvivingDefinitions"
     ]
   },
   "analysis-dataflow": {
@@ -165,6 +168,26 @@
       "mustIsPartialAndUnprovedForeignBaseReceivesMayEffect",
       "ambiguousMustAndScopedMayNeverBecomeSimultaneousStrongWrites",
       "copyCapturesSourceAndOpaqueUnknownWritesAreExplicit"
+    ],
+    "io.github.gustavo2358.analysis.storage.ReachingDefinitionsTest": [
+      "invocationTargetIsObservedBeforeNormalEffectsAndOutcomeReplay",
+      "entryDefinitionsAreSeededOnceAndStaySeparateAcrossContexts",
+      "regionalLiteralInitializerRemainsExplicitValidatorLimit",
+      "essentialPartialKillHasIndependentManualContributedRanges",
+      "mandatoryUnknownPartialKillsOnlyItsRangeAndMayRetainsOldDefinition",
+      "reachedUnknownAndEmptyBatchRemainExplicitAndReplayIsShared"
+    ],
+    "io.github.gustavo2358.analysis.storage.RegionalDefinitionOracleTest": [
+      "generatedBranchesLoopsAndOrphansMatchConcreteAndRecomposition",
+      "independentOracleRejectsWholeKillAndMayAsMustMutants"
+    ],
+    "io.github.gustavo2358.analysis.storage.RegionalDefinitionAdversarialTest": [
+      "differentBasesAndAlternativeDestinationsKeepPossibleOldDefinitions",
+      "opaqueEffectIsNotNopAndBeforePointStaysIndependent",
+      "sourceGapFollowsPhysicalAliasButNotAdjacentInterval",
+      "seededCellIsNotReinitializedOnLoopOrNextSequence",
+      "hugeBoundsUnknownTailAndZeroLengthNeverAllocatePerByte",
+      "wideDefinitionsAndDuplicateQueriesHaveNoCandidateCapOrRepeatedReplay"
     ]
   },
   "analysis-launcher": {

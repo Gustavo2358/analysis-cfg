@@ -9,6 +9,7 @@
     "classfiles": [
       "io/github/gustavo2358/analysis/query/BatchReplayer$Counts.class",
       "io/github/gustavo2358/analysis/query/BatchReplayer$Group.class",
+      "io/github/gustavo2358/analysis/query/BatchReplayer$OutcomePoint.class",
       "io/github/gustavo2358/analysis/query/BatchReplayer$Projection.class",
       "io/github/gustavo2358/analysis/query/BatchReplayer$Selected.class",
       "io/github/gustavo2358/analysis/query/BatchReplayer$Transfer.class",
@@ -42,6 +43,7 @@
         "io.github.gustavo2358.analysis.cfg.domain.CfgNode$SequenceNode",
         "io.github.gustavo2358.analysis.query.BatchReplayer$Counts",
         "io.github.gustavo2358.analysis.query.BatchReplayer$Group",
+        "io.github.gustavo2358.analysis.query.BatchReplayer$OutcomePoint",
         "io.github.gustavo2358.analysis.query.BatchReplayer$Projection",
         "io.github.gustavo2358.analysis.query.BatchReplayer$Selected",
         "io.github.gustavo2358.analysis.query.BatchReplayer$Transfer",
@@ -109,10 +111,28 @@
         "java.lang.invoke.TypeDescriptor",
         "java.lang.runtime.ObjectMethods"
       ],
+      "io.github.gustavo2358.analysis.query.BatchReplayer$OutcomePoint": [
+        "io.github.gustavo2358.air.model.Control",
+        "io.github.gustavo2358.air.model.Control$OutcomeKey",
+        "io.github.gustavo2358.air.model.Ids",
+        "io.github.gustavo2358.air.model.Ids$OperationId",
+        "io.github.gustavo2358.analysis.query.BatchReplayer",
+        "java.lang.Class",
+        "java.lang.Object",
+        "java.lang.Record",
+        "java.lang.String",
+        "java.lang.invoke.MethodHandle",
+        "java.lang.invoke.MethodHandles",
+        "java.lang.invoke.MethodHandles$Lookup",
+        "java.lang.invoke.TypeDescriptor",
+        "java.lang.runtime.ObjectMethods"
+      ],
       "io.github.gustavo2358.analysis.query.BatchReplayer$Projection": [
         "io.github.gustavo2358.analysis.query.BatchReplayer",
         "io.github.gustavo2358.analysis.query.PointQuery",
-        "java.lang.Object"
+        "java.lang.IllegalArgumentException",
+        "java.lang.Object",
+        "java.lang.String"
       ],
       "io.github.gustavo2358.analysis.query.BatchReplayer$Selected": [
         "io.github.gustavo2358.analysis.query.BatchReplayer",
@@ -268,7 +288,8 @@
     "javap_descriptors": {
       "io.github.gustavo2358.analysis.query.BatchReplayer$Counts": "Compiled from \"BatchReplayer.java\"\nfinal class io.github.gustavo2358.analysis.query.BatchReplayer$Counts {\n}\n",
       "io.github.gustavo2358.analysis.query.BatchReplayer$Group": "Compiled from \"BatchReplayer.java\"\nfinal class io.github.gustavo2358.analysis.query.BatchReplayer$Group extends java.lang.Record {\n  public final java.lang.String toString();\n    descriptor: ()Ljava/lang/String;\n\n  public final int hashCode();\n    descriptor: ()I\n\n  public final boolean equals(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)Z\n\n  public io.github.gustavo2358.analysis.structure.ContextView context();\n    descriptor: ()Lio/github/gustavo2358/analysis/structure/ContextView;\n\n  public io.github.gustavo2358.analysis.structure.ProgramIndex$Node node();\n    descriptor: ()Lio/github/gustavo2358/analysis/structure/ProgramIndex$Node;\n}\n",
-      "io.github.gustavo2358.analysis.query.BatchReplayer$Projection": "Compiled from \"BatchReplayer.java\"\npublic interface io.github.gustavo2358.analysis.query.BatchReplayer$Projection<S, T, V> {\n  public abstract boolean supports(io.github.gustavo2358.analysis.query.PointQuery<T>);\n    descriptor: (Lio/github/gustavo2358/analysis/query/PointQuery;)Z\n\n  public abstract V project(io.github.gustavo2358.analysis.query.PointQuery<T>, S);\n    descriptor: (Lio/github/gustavo2358/analysis/query/PointQuery;Ljava/lang/Object;)Ljava/lang/Object;\n}\n",
+      "io.github.gustavo2358.analysis.query.BatchReplayer$OutcomePoint": "Compiled from \"BatchReplayer.java\"\nfinal class io.github.gustavo2358.analysis.query.BatchReplayer$OutcomePoint extends java.lang.Record {\n  public final java.lang.String toString();\n    descriptor: ()Ljava/lang/String;\n\n  public final int hashCode();\n    descriptor: ()I\n\n  public final boolean equals(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)Z\n\n  public io.github.gustavo2358.air.model.Ids$OperationId operation();\n    descriptor: ()Lio/github/gustavo2358/air/model/Ids$OperationId;\n\n  public io.github.gustavo2358.air.model.Control$OutcomeKey outcome();\n    descriptor: ()Lio/github/gustavo2358/air/model/Control$OutcomeKey;\n}\n",
+      "io.github.gustavo2358.analysis.query.BatchReplayer$Projection": "Compiled from \"BatchReplayer.java\"\npublic interface io.github.gustavo2358.analysis.query.BatchReplayer$Projection<S, T, V> {\n  public abstract boolean supports(io.github.gustavo2358.analysis.query.PointQuery<T>);\n    descriptor: (Lio/github/gustavo2358/analysis/query/PointQuery;)Z\n\n  public abstract V project(io.github.gustavo2358.analysis.query.PointQuery<T>, S);\n    descriptor: (Lio/github/gustavo2358/analysis/query/PointQuery;Ljava/lang/Object;)Ljava/lang/Object;\n\n  public default boolean supportsOutcome(io.github.gustavo2358.analysis.query.PointQuery<T>);\n    descriptor: (Lio/github/gustavo2358/analysis/query/PointQuery;)Z\n\n  public default S transferOutcome(io.github.gustavo2358.analysis.query.PointQuery<T>, S);\n    descriptor: (Lio/github/gustavo2358/analysis/query/PointQuery;Ljava/lang/Object;)Ljava/lang/Object;\n}\n",
       "io.github.gustavo2358.analysis.query.BatchReplayer$Selected": "Compiled from \"BatchReplayer.java\"\nfinal class io.github.gustavo2358.analysis.query.BatchReplayer$Selected<T> extends java.lang.Record {\n  public final java.lang.String toString();\n    descriptor: ()Ljava/lang/String;\n\n  public final int hashCode();\n    descriptor: ()I\n\n  public final boolean equals(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)Z\n\n  public io.github.gustavo2358.analysis.query.PointQuery<T> query();\n    descriptor: ()Lio/github/gustavo2358/analysis/query/PointQuery;\n\n  public int boundary();\n    descriptor: ()I\n}\n",
       "io.github.gustavo2358.analysis.query.BatchReplayer$Transfer": "Compiled from \"BatchReplayer.java\"\npublic interface io.github.gustavo2358.analysis.query.BatchReplayer$Transfer<S> {\n  public abstract S apply(S, io.github.gustavo2358.air.model.Operation);\n    descriptor: (Ljava/lang/Object;Lio/github/gustavo2358/air/model/Operation;)Ljava/lang/Object;\n}\n",
       "io.github.gustavo2358.analysis.query.BatchReplayer": "Compiled from \"BatchReplayer.java\"\npublic final class io.github.gustavo2358.analysis.query.BatchReplayer {\n  public static <S, T, V> io.github.gustavo2358.analysis.query.ObservationBatch<T, V> materialize(io.github.gustavo2358.analysis.structure.AnalysisSession, io.github.gustavo2358.analysis.solver.DataflowResult<S>, io.github.gustavo2358.analysis.solver.Direction, S, java.lang.Iterable<io.github.gustavo2358.analysis.query.PointQuery<T>>, java.util.Comparator<T>, io.github.gustavo2358.analysis.query.BatchReplayer$Transfer<S>, io.github.gustavo2358.analysis.query.BatchReplayer$Projection<S, T, V>);\n    descriptor: (Lio/github/gustavo2358/analysis/structure/AnalysisSession;Lio/github/gustavo2358/analysis/solver/DataflowResult;Lio/github/gustavo2358/analysis/solver/Direction;Ljava/lang/Object;Ljava/lang/Iterable;Ljava/util/Comparator;Lio/github/gustavo2358/analysis/query/BatchReplayer$Transfer;Lio/github/gustavo2358/analysis/query/BatchReplayer$Projection;)Lio/github/gustavo2358/analysis/query/ObservationBatch;\n}\n",

@@ -15,6 +15,6 @@ design_w1:
   boundaries: No storage/value analysis in BuildCfg; other capability names or versions remain unsupported.
 design_w2:
   contract: docs/domain/regional-analysis.md
-  ownership: analysis-kernel/storage prepares locations and normalized effects; analysis-kernel/rd will consume the existing solver SPI.
-  progress: Resolver and effects have manual AIR RED/GREEN coverage; RD, stable queries and W2 qualification remain pending.
+  ownership: analysis-kernel/storage prepares locations and normalized effects; analysis-kernel/rd consumes the existing solver SPI.
+  progress: Interval RD, entry events, stable batched before/after/outcome queries and file traversal have independent oracle coverage; cumulative W2 qualification is in progress.
   boundaries: No source language interpretation, new solver or consumer-side repair; explicit bases, proofs, alternatives, unknown tails and outcomes.

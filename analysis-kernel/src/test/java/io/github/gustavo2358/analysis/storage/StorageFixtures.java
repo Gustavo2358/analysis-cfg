@@ -48,6 +48,16 @@ final class StorageFixtures {
         return new Envelopes.Envelope(new Envelopes.MemoryEnvelope(List.of(),writes,List.of(),writes,List.of()),new Control.ControlEnvelope(List.of(successor),Scopes.NoControl.INSTANCE),new Envelopes.DependencyEnvelope(List.of(),Scopes.NoResources.INSTANCE));
     }
     static Operations.Header uncertainHeader(String name) { var h=header(name);return new Operations.Header(h.id(),h.origin(),h.coverage(),h.precision(),List.of(UNKNOWN)); }
+    static Publication withEntries(Publication p,List<Entries.Entry> entries) {
+        var u=p.units().getFirst();var unit=new io.github.gustavo2358.air.model.Unit(u.id(),u.containingUnit(),u.objects(),u.visibleObjects(),entries,u.sequences(),u.completionPorts(),u.body(),u.bodyUnavailable(),u.coverage(),u.origin());
+        return new Publication(p.id(),p.airVersion(),p.capabilities(),p.artifacts(),List.of(unit),p.storage(),p.resources(),p.artifactRelations(),p.origins(),p.coverage(),p.uncertainties(),p.premises());
+    }
+    static Entries.Entry seeded(String name,String start,String subject,int... bytes) {
+        var e=entry(name,start);var owner=new EntryOwner(e.id());
+        var place=new Places.ObjectPlace(new Operand.Header(new OperandId(owner,"destination"),Operand.Role.VALUE_WRITE,O),object(subject));
+        var literal=new Expressions.Literal(new Operand.Header(new OperandId(owner,"initial"),Operand.Role.VALUE_READ,O),new Values.BytesValue(Arrays.stream(bytes).boxed().toList()));
+        return new Entries.Entry(e.id(),e.initialLabel(),e.signature(),new Entries.EntryState(List.of(new Entries.InitialCondition(place,new Entries.LiteralInitial(literal),O,List.of())),List.of()),e.origin());
+    }
     static Publication publication(List<Memory.Storage> bases,List<Memory.ObjectDeclaration> objects,List<Sequence> sequences,List<Proofs.Premise> premises) {
         var unit=new io.github.gustavo2358.air.model.Unit(U,Optional.empty(),objects,List.of(),List.of(entry("main",sequences.getFirst().label().localId())),sequences,List.of(),io.github.gustavo2358.air.model.Unit.BodyAvailability.AVAILABLE,Optional.empty(),coverage(new Scopes.UnitScope(U)),O);
         var uncertainty=new Evidence.Uncertainty(UNKNOWN,"UNPROVED",List.of(Evidence.Dimension.STORAGE),new Scopes.PublicationScope(P),"test unknown",O);

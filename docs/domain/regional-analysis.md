@@ -44,6 +44,37 @@ unknown definitions. Replay shares the stable solver run and ordered prefix.
 Unsupported points remain explicit. This typed in-memory API needs no new wire
 version in W2; W5 will add a separately versioned RD wire product if delivery needs it.
 
+`ReachingDefinitions.prepare(effects)` reports admission, and `execute()` reuses the
+generic `AnalysisDefinition`/`DataflowSolver`. Its Execution owns the exact session,
+partition, proofs and finite event pool. AnalysisKey includes implementation/version,
+storage/effects profiles, direction, precision and Entry; it is meaningful only
+within that session lifetime. Repeated `observe` calls reuse STABLE. No global cache
+uses publication ID or AnalysisKey alone. Ordinal event handles keep composite IDs
+out of hot set unions. Sparse state uses persistent AVL updates rather than copying
+the whole storage map per instruction; fixedpoint roots contain no path histories.
+
+An event identifies the Entry, operation/initial condition, destination occurrence,
+slot, outcome and affected storage base. Its unknown flag and reasons distinguish
+unknown effects, possible cross-base alias impact and entry content. Literal entry,
+preserve, external, parameter and uninitialized origins remain separate. Normal
+Invoke effects run on the normal edge; target is observed before that transfer.
+Open control conservatively weakens the possible outcome effects. The query API
+materializes an explicit OUTCOME only when the CFG supports it. Generic batch replay
+computes its subject-independent transfer once for that point/outcome; all legacy
+profiles retain their existing refusal via the default optional hook.
+
+Source gaps are indexed by physical scope and follow aliases, while an adjacent
+proved-disjoint interval stays precise. Source remainder is distinct from unknown
+model definitions. Origin, uncertainty and premise lists use explicit deterministic
+ordering. Contributed ranges joined from different alternatives express potential
+contributions, never a claim that every range is simultaneously written on a path.
+
+AIR currently refuses literal regional initializers with VALIDATION_LIMIT, including
+a singleton, because byte/codec initializer consistency is outside its validator
+slice. W2 preserves that guard; existing Cell literals and explicit admitted unknown
+entry conditions have events. Unsupported overlapping conditions are classified
+before the solve. This is not general VALUE/layout initialization support (W7).
+
 Required independent witnesses include D1[0,8), D2[0,4) yielding D2[0,4) and
 D1[4,8); unknown partial MUST/MAY, aliases, unproved cross-base overlap, alternatives,
 branch without write, loops, separate Entries, unknown tail, zero length, before/

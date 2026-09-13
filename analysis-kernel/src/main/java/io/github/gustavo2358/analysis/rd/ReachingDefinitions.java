@@ -1,0 +1,300 @@
+package io.github.gustavo2358.analysis.rd;
+
+import io.github.gustavo2358.air.model.*;
+import io.github.gustavo2358.air.model.Ids.*;
+import io.github.gustavo2358.analysis.cfg.domain.*;
+import io.github.gustavo2358.analysis.plan.AnalysisKey;
+import io.github.gustavo2358.analysis.query.*;
+import io.github.gustavo2358.analysis.solver.*;
+import io.github.gustavo2358.analysis.storage.*;
+import io.github.gustavo2358.analysis.structure.*;
+import java.util.*;
+
+/** Regional reaching definitions on the existing generic solver. */
+public final class ReachingDefinitions {
+    public static final String PROFILE="regional-reaching-definitions@1";
+    private final StatementEffects effects;
+    private final StoragePartition partition;
+    private final AnalysisSession session;
+    private final Map<Operation,List<Plan>> operations=new IdentityHashMap<>();
+    private final Map<Operation,Map<Control.OutcomeKey,List<Plan>>> outcomes=new IdentityHashMap<>();
+    private final Map<Operation,List<Plan>> otherwise=new IdentityHashMap<>();
+    private final Map<EntryId,List<Initial>> initial=new HashMap<>();
+    private final List<SourceGap> sourceGaps=new ArrayList<>();
+    private final Map<UnitId,Boolean> controlOpen=new HashMap<>();
+    private record SourceGap(StorageIndex.Location location,OriginId origin,List<UncertaintyId> uncertainties) { }
+    private record Plan(Operation operation,StatementEffects.Write write,StatementEffects.Target target,
+                        Optional<Control.OutcomeKey> outcome,List<StoragePartition.Segment> segments) { }
+    private record Initial(int slot,Entries.InitialCondition condition,StatementEffects.Target target,List<StoragePartition.Segment> segments) { }
+    public enum Status { ACCEPTED, UNSUPPORTED, INVALID_INPUT }
+    public record Admission(Status status,String reason,Optional<ReachingDefinitions> analysis) { }
+    private static final class Refusal extends IllegalArgumentException {
+        private static final long serialVersionUID=1L;
+        final Status status;
+        Refusal(Status status,String reason){super(reason);this.status=status;}
+    }
+    public static Admission prepare(StatementEffects effects) {
+        try{return new Admission(Status.ACCEPTED,null,Optional.of(new ReachingDefinitions(effects)));}
+        catch(Refusal refusal){return new Admission(refusal.status,refusal.getMessage(),Optional.empty());}
+    }
+    public ReachingDefinitions(StatementEffects effects) {
+        this.effects=Objects.requireNonNull(effects);session=effects.storage().session();partition=new StoragePartition(effects);
+        for(var object:effects.storage().declarations())if(object.coverage()!=Evidence.CoverageStatus.MODELED||open(object.precision().storage())||open(object.precision().values())) {
+            var resolution=effects.storage().object(object.id());var uncertainty=new LinkedHashSet<>(object.precision().storage().reasons());uncertainty.addAll(object.precision().values().reasons());uncertainty.addAll(resolution.uncertainties());
+            for(var target:effects.targets(resolution,StatementEffects.Strength.MAY))sourceGaps.add(new SourceGap(target.location(),object.origin(),List.copyOf(uncertainty)));
+        }
+        for(var unit:session.index().publication().units()) {
+            boolean open=false;
+            for(var sequence:unit.sequences()) {
+                for(var instruction:sequence.instructions())open|=open(instruction.header().precision().control());
+                var terminator=sequence.terminator();open|=open(terminator.header().precision().control());
+                if(terminator instanceof Operations.Invoke i)open|=i.outcomes().remainder() instanceof Scopes.WithinControl;
+                if(terminator instanceof Operations.Opaque o)open|=o.envelope().control().remainder() instanceof Scopes.WithinControl;
+            }
+            controlOpen.put(unit.id(),open);
+        }
+        for(var statement:effects.statements()) {
+            var op=statement.operation();var normal=Optional.<Control.OutcomeKey>of(Control.NormalOutcome.INSTANCE);
+            operations.put(op,compile(op,statement.writes(),normal));
+            otherwise.put(op,compile(op,statement.otherwise(),Optional.empty()));
+            var choices=new HashMap<Control.OutcomeKey,List<Plan>>();
+            statement.outcomes().forEach((key,writes)->choices.put(key,compile(op,writes,Optional.of(key))));
+            outcomes.put(op,Map.copyOf(choices));
+        }
+        for(var context:session.contexts()) {
+            var seeds=new ArrayList<Initial>();var occupied=new HashMap<Integer,Initial>();int slot=0;
+            for(var condition:context.entry().state().conditions()) {
+                var resolution=effects.storage().resolve(condition.place());
+                for(var target:effects.targets(resolution,StatementEffects.Strength.MUST)) {
+                    var seed=new Initial(slot,condition,target,List.copyOf(partition.intersecting(target.location())));
+                    for(var segment:seed.segments()) {
+                        var prior=occupied.putIfAbsent(segment.ordinal(),seed);
+                        if(prior!=null && prior.slot()!=slot) {
+                            boolean sameFootprint=prior.target().location().equals(target.location());
+                            boolean literal=condition.value() instanceof Entries.LiteralInitial && prior.condition().value() instanceof Entries.LiteralInitial;
+                            boolean sameInterpretation=effects.storage().resolve(prior.condition().place()).candidates().stream().map(StorageIndex.Candidate::codec).toList().equals(resolution.candidates().stream().map(StorageIndex.Candidate::codec).toList());
+                            boolean equal=literal&&((Entries.LiteralInitial)condition.value()).value().value().equals(((Entries.LiteralInitial)prior.condition().value()).value().value());
+                            if(!(sameFootprint&&sameInterpretation&&equal))throw new Refusal(sameFootprint&&sameInterpretation&&literal?Status.INVALID_INPUT:Status.UNSUPPORTED,"OVERLAPPING_INITIAL_CONDITIONS");
+                        }
+                    }
+                    seeds.add(seed);
+                }
+                slot=Math.incrementExact(slot);
+            }
+            initial.put(context.entry().id(),List.copyOf(seeds));
+        }
+    }
+    private List<Plan> compile(Operation operation,List<StatementEffects.Write> writes,Optional<Control.OutcomeKey> outcome) {
+        var result=new ArrayList<Plan>();
+        for(var write:writes)for(var target:write.targets())result.add(new Plan(operation,write,target,outcome,List.copyOf(partition.intersecting(target.location()))));
+        return List.copyOf(result);
+    }
+    public StoragePartition partition(){return partition;}
+    public Execution execute(){var engine=new Engine(this);var stable=DataflowSolver.solve(session,engine);return new Execution(this,engine,stable);}
+    /** Full IDs are materialized once; hot sets compare canonical handles with dense hashes. */
+    private static final class EventHandle {
+        final int ordinal;final DefinitionEvent definition;
+        EventHandle(int ordinal,DefinitionEvent definition){this.ordinal=ordinal;this.definition=definition;}
+        @Override public int hashCode(){return ordinal;}
+    }
+    /** Reached absence is interpreted through the entry event, never as bottom. */
+    public static final class State {
+        private final EntryId entry;
+        private final SegmentMap<Set<EventHandle>> bindings;
+        private State(EntryId entry,SegmentMap<Set<EventHandle>> bindings){this.entry=entry;this.bindings=bindings;}
+        public boolean reached(){return entry!=null;}
+        public int explicitSegments(){return bindings.size();}
+    }
+    private static final State BOTTOM=new State(null,new SegmentMap<>());
+    private static final class Engine implements AnalysisDefinition<State> {
+        private final ReachingDefinitions owner;
+        private final Map<EntryId,Map<StorageId,EventHandle>> entryEvents=new HashMap<>();
+        private final Map<EntryId,Map<Plan,EventHandle>> events=new HashMap<>();
+        private final Map<DefinitionEvent,EventHandle> interned=new HashMap<>();
+        private long updates,segmentReads,eventUnions;
+        Engine(ReachingDefinitions owner){this.owner=owner;}
+        private EventHandle intern(DefinitionEvent definition) {
+            var previous=interned.get(definition);if(previous!=null)return previous;
+            var handle=new EventHandle(Math.incrementExact(interned.size()),definition);interned.put(definition,handle);return handle;
+        }
+        @Override public Direction direction(){return Direction.FORWARD;}
+        @Override public State bottom(){return BOTTOM;}
+        private EventHandle entryEvent(EntryId entry,StoragePartition.Segment segment) {
+            var base=segment.location().base();
+            return entryEvents.computeIfAbsent(entry,ignored->new HashMap<>()).computeIfAbsent(base.id(),ignored->
+                intern(new DefinitionEvent(entry,Optional.empty(),Optional.empty(),-1,Optional.empty(),base.id(),DefinitionEvent.Kind.ENTRY_UNKNOWN,true,base.origin(),List.of(),List.of(),List.of("UNSPECIFIED_ENTRY_CONTENT"))));
+        }
+        private Set<EventHandle> value(State state,StoragePartition.Segment segment) {
+            segmentReads++;var explicit=state.bindings.get(segment.ordinal());
+            return explicit==null?Set.of(entryEvent(state.entry,segment)):explicit;
+        }
+        private Set<EventHandle> union(Set<EventHandle> a,Set<EventHandle> b) {
+            eventUnions+=b.size();if(a.containsAll(b))return a;var result=new HashSet<>(a);result.addAll(b);return Set.copyOf(result);
+        }
+        @Override public Iterable<Boundary<State>> boundaries(AnalysisSession session) {
+            if(session!=owner.session)throw new IllegalArgumentException("foreign session");
+            var result=new ArrayList<Boundary<State>>();
+            for(var context:session.contexts()) {
+                var entry=context.entry().id();var root=new SegmentMap<Set<EventHandle>>();
+                for(var seed:owner.initial.get(entry)) {
+                    var value=seed.condition().value();
+                    var kind=value instanceof Entries.LiteralInitial?DefinitionEvent.Kind.INITIAL_CONDITION
+                        :value instanceof Entries.Preserve?DefinitionEvent.Kind.ENTRY_PRESERVE
+                        :value instanceof Entries.ParameterInitial?DefinitionEvent.Kind.ENTRY_PARAMETER
+                        :value instanceof Entries.ExternalUnknown?DefinitionEvent.Kind.ENTRY_EXTERNAL:DefinitionEvent.Kind.ENTRY_UNINITIALIZED;
+                    var uncertainty=new LinkedHashSet<UncertaintyId>();
+                    if(value instanceof Entries.ExternalUnknown u)uncertainty.add(u.reason());
+                    if(value instanceof Entries.Uninitialized u)uncertainty.add(u.reason());
+                    uncertainty.addAll(owner.effects.storage().resolve(seed.condition().place()).uncertainties());
+                    var premises=new LinkedHashSet<>(seed.condition().premises());premises.addAll(seed.target().premises());
+                    var event=intern(new DefinitionEvent(entry,Optional.empty(),Optional.of(seed.condition().place().header().id()),seed.slot(),Optional.empty(),seed.target().location().base().id(),kind,!(value instanceof Entries.LiteralInitial)||!seed.target().sourceApplicable(),seed.condition().origin(),List.copyOf(premises),List.copyOf(uncertainty),seed.target().reasons()));
+                    for(var segment:seed.segments()) {
+                        var previous=root.get(segment.ordinal());
+                        if(previous==null)previous=seed.target().strength()==StatementEffects.Strength.MUST?Set.of():Set.of(entryEvent(entry,segment));
+                        root=root.put(segment.ordinal(),union(previous,Set.of(event)));
+                    }
+                }
+                result.add(new Boundary<>(context,context.entryNode(),new State(entry,root)));
+            }
+            return result;
+        }
+        @Override public Join<State> joinInto(State a,State b,DomainWork work) {
+            if(!b.reached())return new Join<>(a,false);if(!a.reached())return new Join<>(b,true);
+            if(!a.entry.equals(b.entry))throw new IllegalArgumentException("different activation contexts");
+            // Sparse immutable roots, including the default unknown contribution on missing keys.
+            final class Accumulator { SegmentMap<Set<EventHandle>> root=a.bindings; }
+            var result=new Accumulator();
+            b.bindings.forEach((ordinal,definitions)->{work.joinEntryVisited();var segment=owner.partition.segments().get(ordinal);result.root=result.root.put(ordinal,union(value(a,segment),definitions));});
+            a.bindings.forEach((ordinal,definitions)->{if(b.bindings.get(ordinal)==null){work.joinEntryVisited();var segment=owner.partition.segments().get(ordinal);result.root=result.root.put(ordinal,union(definitions,value(b,segment)));}});
+            return result.root==a.bindings?new Join<>(a,false):new Join<>(new State(a.entry,result.root),true);
+        }
+        @Override public boolean equivalent(State a,State b,DomainWork work) {
+            if(a==b)return true;if(!Objects.equals(a.entry,b.entry)||a.bindings.size()!=b.bindings.size())return false;
+            var equal=new boolean[]{true};a.bindings.forEach((key,value)->{work.stateCompareEntry();if(!value.equals(b.bindings.get(key)))equal[0]=false;});return equal[0];
+        }
+        private EventHandle event(EntryId entry,Plan plan) {
+            return events.computeIfAbsent(entry,ignored->new IdentityHashMap<>()).computeIfAbsent(plan,p->{
+                var source=p.write.source();var operation=p.operation;var unknown=source instanceof StatementEffects.UnknownSource||!p.target.sourceApplicable();
+                if(source instanceof StatementEffects.ExpressionSource expression && !(expression.value() instanceof Expressions.Literal))unknown=true;
+                var kind=source instanceof StatementEffects.CapturedBytes?DefinitionEvent.Kind.COPY:source instanceof StatementEffects.ExpressionSource?DefinitionEvent.Kind.ASSIGN:DefinitionEvent.Kind.UNKNOWN_WRITE;
+                var uncertainty=new LinkedHashSet<>(operation.header().uncertainties());uncertainty.addAll(p.write.destination().uncertainties());
+                if(operation instanceof Operations.HavocMust h)uncertainty.add(h.reason());
+                if(operation instanceof Operations.HavocMay h)uncertainty.add(h.reason());
+                var reasons=new LinkedHashSet<>(p.target.reasons());if(source instanceof StatementEffects.UnknownSource u)reasons.add(u.reason());
+                return intern(new DefinitionEvent(entry,Optional.of(operation.header().id()),p.write.occurrence(),p.write.slot(),p.outcome,p.target.location().base().id(),kind,unknown,operation.header().origin(),p.target.premises(),List.copyOf(uncertainty),List.copyOf(reasons)));
+            });
+        }
+        private State apply(State state,List<Plan> plans,boolean forceMay) {
+            if(!state.reached())return state;var root=state.bindings;
+            for(var plan:plans) {
+                var definition=event(state.entry,plan);
+                for(var segment:plan.segments) {
+                    var previous=root.get(segment.ordinal());if(previous==null)previous=Set.of(entryEvent(state.entry,segment));
+                    var next=!forceMay&&plan.target.strength()==StatementEffects.Strength.MUST?Set.of(definition):union(previous,Set.of(definition));
+                    var updated=root.put(segment.ordinal(),next);if(updated!=root)updates++;root=updated;
+                }
+            }
+            return root==state.bindings?state:new State(state.entry,root);
+        }
+        private State operation(State state,Operation operation) {
+            var plans=owner.operations.get(operation);
+            if(plans==null)throw new IllegalArgumentException("foreign operation snapshot");
+            return apply(state,plans,false);
+        }
+        @Override public State transferBlock(AnalysisPoint point,State anchor,DomainWork work) {
+            if(!(point.node().source() instanceof CfgNode.SequenceNode node))return anchor;
+            var state=anchor;for(var operation:node.source().instructions()){work.operationTransferred();state=operation(state,operation);}
+            work.operationTransferred();return operation(state,node.source().terminator());
+        }
+        @Override public State transferEdge(AnalysisPoint point,CfgTransition edge,State state,DomainWork work) {
+            if(!(point.node().source() instanceof CfgNode.SequenceNode node)||!(node.source().terminator() instanceof Operations.Invoke invoke))return state;
+            if(edge.kind()==CfgTransition.Kind.INVOKE_NORMAL)return apply(state,owner.outcomes.get(invoke).get(Control.NormalOutcome.INSTANCE),false);
+            // Open control does not identify the completed outcome. Preserve every possible old definition.
+            state=apply(state,owner.otherwise.get(invoke),true);
+            for(var plans:owner.outcomes.get(invoke).values())state=apply(state,plans,true);return state;
+        }
+    }
+    public static final class Execution {
+        private final ReachingDefinitions owner;
+        private final Engine engine;
+        private final DataflowResult<State> stable;
+        private Execution(ReachingDefinitions owner,Engine engine,DataflowResult<State> stable){this.owner=owner;this.engine=engine;this.stable=stable;}
+        public DataflowResult<State> dataflow(){return stable;}
+        public AnalysisKey key(EntryId entry) {
+            if(owner.session.context(entry)==null)throw new IllegalArgumentException("unselected entry");
+            return new AnalysisKey("reaching-definitions","1",PROFILE,Direction.FORWARD,"finite-interval-events",Map.of("storage",StorageIndex.PROFILE,"effects","regional-effects@1"),entry);
+        }
+        public Map<String,Long> metrics(){return Map.of("segments",(long)owner.partition.segments().size(),"segmentUpdates",engine.updates,"segmentReads",engine.segmentReads,"eventUnionEntries",engine.eventUnions);}
+        public ObservationBatch<ObjectId,DefinitionFact> observe(Iterable<PointQuery<ObjectId>> requests){
+            var comparator=Comparator.comparing((ObjectId id)->id.unit().publication().localId()).thenComparing(id->id.unit().localId()).thenComparing(ObjectId::localId);
+            return BatchReplayer.materialize(owner.session,stable,Direction.FORWARD,BOTTOM,requests,comparator,engine::operation,new BatchReplayer.Projection<State,ObjectId,DefinitionFact>() {
+                @Override public boolean supports(PointQuery<ObjectId> query) {
+                    var object=owner.session.index().object(query.subject());var unit=owner.session.index().unit(query.point().entry().unit());
+                    return object!=null&&unit!=null&&(object.id().unit().equals(unit.id())||unit.visibleObjects().contains(object.id()));
+                }
+                @Override public DefinitionFact project(PointQuery<ObjectId> query,State state) { return fact(query,state); }
+                @Override public boolean supportsOutcome(PointQuery<ObjectId> query) {
+                    var site=owner.session.index().site(query.point().operation());
+                    return site!=null&&site.operation() instanceof Operations.Invoke invoke&&query.point().outcome()==Control.NormalOutcome.INSTANCE
+                        &&invoke.outcomes().known().stream().anyMatch(Control.Normal.class::isInstance);
+                }
+                @Override public State transferOutcome(PointQuery<ObjectId> query,State before) {
+                    var operation=owner.session.index().site(query.point().operation()).operation();
+                    return engine.apply(before,owner.outcomes.get(operation).get(query.point().outcome()),false);
+                }
+            });
+        }
+        private DefinitionFact fact(PointQuery<ObjectId> query,State state) {
+            var storage=owner.effects.storage();var resolution=storage.object(query.subject());
+            var origins=new LinkedHashSet<>(storage.objectOrigins(query.subject()));var premises=new LinkedHashSet<PremiseId>();var uncertainties=new LinkedHashSet<>(resolution.uncertainties());
+            var contributions=new LinkedHashMap<DefinitionEvent,Set<StorageIndex.Location>>();
+            boolean unknown=!(resolution.remainder() instanceof Scopes.NoMemory);
+            boolean source=sourceOpen(query);
+            for(var gap:owner.sourceGaps)if(resolution.candidates().stream().anyMatch(c->!storage.disjoint(c.location(),gap.location()))) {
+                source=true;origins.add(gap.origin());uncertainties.addAll(gap.uncertainties());
+            }
+            if(state.reached())for(var candidate:resolution.candidates()) {
+                origins.addAll(candidate.origins());
+                for(var segment:owner.partition.intersecting(candidate.location())) {
+                    var location=intersection(segment.location(),candidate.location());
+                    for(var handle:engine.value(state,segment)) {
+                        var definition=handle.definition;
+                        contributions.computeIfAbsent(definition,ignored->new LinkedHashSet<>()).add(location);
+                        origins.add(definition.origin());premises.addAll(definition.premises());uncertainties.addAll(definition.uncertainties());unknown|=definition.unknown();
+                    }
+                }
+            }
+            var ordered=new ArrayList<>(contributions.keySet());ordered.sort(Comparator.comparing((DefinitionEvent e)->e.operation().map(OperationId::localId).orElse("")).thenComparingInt(DefinitionEvent::slot).thenComparing(e->e.storage().localId()).thenComparing(DefinitionEvent::unknown));
+            var output=new ArrayList<DefinitionFact.Contribution>();
+            for(var event:ordered)output.add(new DefinitionFact.Contribution(event,coalesce(contributions.get(event)).stream().map(l->l.in(query.point().entry())).toList()));
+            return new DefinitionFact(query.point(),state.reached()?DefinitionFact.Reachability.REACHABLE:DefinitionFact.Reachability.UNREACHABLE_IN_MODEL,output,state.reached()?unknown:null,!(resolution.remainder() instanceof Scopes.NoMemory),source,evidenceOrder(premises),evidenceOrder(origins),evidenceOrder(uncertainties));
+        }
+        private boolean sourceOpen(PointQuery<ObjectId> query) {
+            var publication=owner.session.index().publication();var unit=owner.session.index().unit(query.point().entry().unit());var object=owner.session.index().object(query.subject());
+            return publication.coverage().inventory()!=Evidence.InventoryStatus.COMPLETE||!publication.coverage().uncertainties().isEmpty()
+                ||unit.coverage().inventory()!=Evidence.InventoryStatus.COMPLETE||!unit.coverage().uncertainties().isEmpty()
+                ||owner.controlOpen.getOrDefault(unit.id(),false)
+                ||!owner.session.context(query.point().entry()).entry().state().uncertainties().isEmpty()
+                ||object.coverage()!=Evidence.CoverageStatus.MODELED||open(object.precision().storage())||open(object.precision().values());
+        }
+    }
+    private static boolean open(Evidence.Claim claim){return claim.status()!=Evidence.PrecisionStatus.EXACT&&claim.status()!=Evidence.PrecisionStatus.NOT_APPLICABLE;}
+    private static <T extends Id> List<T> evidenceOrder(Collection<T> evidence){return evidence.stream().sorted(Comparator.comparing((T id)->id.publication().localId()).thenComparing(Id::localId)).toList();}
+    private static StorageIndex.Location intersection(StorageIndex.Location a,StorageIndex.Location b) {
+        return a.range().isEmpty()?a:new StorageIndex.Location(a.base(),a.range().get().intersect(b.range().orElseThrow()));
+    }
+    private static List<StorageIndex.Location> coalesce(Set<StorageIndex.Location> locations) {
+        var sorted=new ArrayList<>(locations);sorted.sort(Comparator.comparing((StorageIndex.Location l)->l.base().id().publication().localId()).thenComparing(l->l.base().id().localId()).thenComparing(l->l.range().map(StorageRange::start).orElse(java.math.BigInteger.ZERO)));
+        var result=new ArrayList<StorageIndex.Location>();
+        for(var location:sorted) {
+            if(!result.isEmpty()) {
+                var prior=result.getLast();
+                if(prior.base().equals(location.base())&&prior.range().isPresent()&&location.range().isPresent()&&prior.range().get().end().equals(Optional.of(location.range().get().start()))) {
+                    result.set(result.size()-1,new StorageIndex.Location(prior.base(),Optional.of(new StorageRange(prior.range().get().start(),location.range().get().end()))));continue;
+                }
+            }
+            result.add(location);
+        }
+        return List.copyOf(result);
+    }
+}
