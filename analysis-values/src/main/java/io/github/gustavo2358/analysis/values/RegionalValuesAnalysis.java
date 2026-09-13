@@ -28,9 +28,11 @@ public final class RegionalValuesAnalysis {
     private final Map<EntryId,List<Plan>> initial=new HashMap<>();
     private final List<ValueFact.Support> events=new ArrayList<>();
     private final List<SourceGap> sourceGaps=new ArrayList<>();
+    private final Map<StorageIndex.Location,List<CapturedGap>> capturedGaps=new HashMap<>();
     private final Set<UnitId> controlOpen=new HashSet<>();
     private record Plan(StatementEffects.Write write,StatementEffects.Target target,int event) { }
     private record SourceGap(StorageIndex.Location location,OriginId origin) { }
+    private record CapturedGap(int gap,Optional<StorageRange> range) { }
     private sealed interface Content permits Bytes,Scalar { }
     private record Bytes(ByteImage image) implements Content { }
     private record Store(List<Content> contents) {
@@ -40,8 +42,9 @@ public final class RegionalValuesAnalysis {
             var updated=new ArrayList<>(contents);updated.set(position,content);return new Store(updated);
         }
     }
-    private record Scalar(Optional<Values.TextValue> text,Set<Integer> producers,Set<String> reasons) implements Content {
-        Scalar { producers=Set.copyOf(producers);reasons=Set.copyOf(reasons); }
+    private record Scalar(Optional<Values.TextValue> text,Set<Integer> producers,Set<String> reasons,Set<Integer> sourceGaps) implements Content {
+        Scalar { producers=Set.copyOf(producers);reasons=Set.copyOf(reasons);sourceGaps=Set.copyOf(sourceGaps); }
+        Scalar(Optional<Values.TextValue> text,Set<Integer> producers,Set<String> reasons){this(text,producers,reasons,Set.of());}
     }
     public enum Status { ACCEPTED, UNSUPPORTED, INVALID_INPUT }
     public record Admission(Status status,String reason,Optional<RegionalValuesAnalysis> analysis) { }
@@ -104,6 +107,7 @@ public final class RegionalValuesAnalysis {
             else if(plan.target.location().range().isEmpty()&&plan.write.source() instanceof StatementEffects.ExpressionSource expression&&expression.value() instanceof Expressions.Read read)
                 reads=effects.storage().resolve(read.place());
             if(reads!=null)for(var source:reads.candidates()) {
+                capturedGaps.computeIfAbsent(source.location(),this::captureGaps);
                 int a=representative(parent,ordinals.get(source.location().base().id()));
                 int b=representative(parent,ordinals.get(plan.target.location().base().id()));
                 parent[Math.max(a,b)]=Math.min(a,b);
@@ -223,7 +227,7 @@ public final class RegionalValuesAnalysis {
             var source=plan.write.source();
             if(source instanceof StatementEffects.CapturedBytes copy) {
                 var c=copy.source().candidates().getFirst();int ordinal=ordinals.get(c.location().base().id());
-                return Set.of(new Bytes(((Bytes)content(captured,ordinal)).image().slice(c.location().range().orElseThrow()).copied(plan.event)));
+                return Set.of(new Bytes(((Bytes)capture(content(captured,ordinal),c.location())).image().slice(c.location().range().orElseThrow()).copied(plan.event)));
             }
             if(source instanceof StatementEffects.UnknownSource u)return Set.of(unknown(target,u.reason()));
             var expression=((StatementEffects.ExpressionSource)source).value();
@@ -247,7 +251,7 @@ public final class RegionalValuesAnalysis {
                 if(!(resolution.remainder() instanceof Scopes.NoMemory))result.add(unknownScalar("READ_LOCATION_REMAINDER"));
                 for(var candidate:resolution.candidates()) {
                     int ordinal=ordinals.get(candidate.location().base().id());
-                    result.add(project(content(captured,ordinal),candidate));
+                    result.add(project(capture(content(captured,ordinal),candidate.location()),candidate));
                 }
                 if(!result.isEmpty())return Set.copyOf(result);
             }
@@ -268,15 +272,38 @@ public final class RegionalValuesAnalysis {
         }
         private Map<String,Long> metrics(){return Map.of("contentReads",contentReads,"contentUpdates",contentUpdates,"alternativeVisits",alternativeVisits);}
     }
+    private List<CapturedGap> captureGaps(StorageIndex.Location selected) {
+        var result=new ArrayList<CapturedGap>();
+        for(int i=0;i<sourceGaps.size();i++) {
+            var gap=sourceGaps.get(i);if(effects.storage().disjoint(selected,gap.location()))continue;
+            var affected=selected.range();
+            if(affected.isPresent()&&selected.base().id().equals(gap.location().base().id()))affected=affected.get().intersect(gap.location().range().orElseThrow());
+            result.add(new CapturedGap(i,affected));
+        }
+        return List.copyOf(result);
+    }
+    private Content capture(Content content,StorageIndex.Location selected) {
+        // Prepared intersections: transfer/replay do not scan source inventories.
+        for(var gap:Objects.requireNonNull(capturedGaps.get(selected),"unprepared captured read")) {
+            if(content instanceof Bytes bytes) {
+                content=new Bytes(bytes.image().withSourceGap(gap.range().orElseThrow(),gap.gap()));
+            } else {
+                var scalar=(Scalar)content;var gaps=new HashSet<>(scalar.sourceGaps());gaps.add(gap.gap());
+                content=new Scalar(scalar.text(),scalar.producers(),scalar.reasons(),gaps);
+            }
+        }
+        return content;
+    }
     private Scalar project(Content content,StorageIndex.Candidate candidate) {
         if(content instanceof Scalar scalar)return scalar;
         var range=candidate.location().range().orElseThrow();var read=((Bytes)content).image().read(range);
-        if(read.bytes().isEmpty())return new Scalar(Optional.empty(),Set.of(),read.reasons());
-        if(candidate.codec().isEmpty()||range.end().isEmpty())return unknownScalar("UNINTERPRETED_VIEW");
+        var gaps=new HashSet<Integer>();read.parts().forEach(p->gaps.addAll(p.sourceGaps()));
+        if(read.bytes().isEmpty())return new Scalar(Optional.empty(),Set.of(),read.reasons(),gaps);
+        if(candidate.codec().isEmpty()||range.end().isEmpty())return new Scalar(Optional.empty(),Set.of(),Set.of("UNINTERPRETED_VIEW"),gaps);
         var decoded=MemoryCodecs.decodeText(candidate.codec().get(),read.bytes().get(),range.end().get().subtract(range.start()));
-        if(decoded.value().isEmpty())return unknownScalar(decoded.status().name());
+        if(decoded.value().isEmpty())return new Scalar(Optional.empty(),Set.of(),Set.of(decoded.status().name()),gaps);
         var producers=new HashSet<Integer>();for(var part:read.parts())producers.add(part.producer());
-        return new Scalar(decoded.value(),producers,Set.of());
+        return new Scalar(decoded.value(),producers,Set.of(),gaps);
     }
     public Execution execute(){var engine=new Engine();return new Execution(engine,DataflowSolver.solve(session,engine));}
     public final class Execution {
@@ -312,6 +339,7 @@ public final class RegionalValuesAnalysis {
                 int ordinal=ordinals.get(candidate.location().base().id());
                 for(var store:engine.value(state,groupOf[ordinal])) {
                     var value=RegionalValuesAnalysis.this.project(engine.content(store,ordinal),candidate);
+                    for(var gap:value.sourceGaps()){source=true;origins.add(sourceGaps.get(gap).origin());}
                     if(value.text().isEmpty()){model=true;reasons.addAll(value.reasons());}
                     else supports.computeIfAbsent(value.text().get().value(),ignored->new HashSet<>()).addAll(value.producers());
                 }

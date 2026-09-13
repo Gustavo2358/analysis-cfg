@@ -60,4 +60,16 @@ class ByteImageTest {
         for(var part:shifted.parts()){assertTrue(part.producerOffset().compareTo(BigInteger.valueOf(4))<0);assertTrue(part.payloadOffset()<4);}
         assertEquals(shifted,shifted.write(range(1,3),shifted.slice(range(0,3)).copied(4)));
     }
+    @Test void capturedSourceGapSplitsOnlyItsRangeAndSurvivesUnknownIndependently() {
+        var initial=ByteImage.literal(new Values.BytesValue(List.of(65,66,67,68,69,70,71,72)),1);
+        var marked=initial.withSourceGap(range(0,4),7);assertNotEquals(initial,marked);
+        assertEquals(initial.read(range(0,8)).bytes(),marked.read(range(0,8)).bytes());
+        assertSame(marked,marked.withSourceGap(range(0,4),7));assertEquals(2,marked.parts().size());
+        assertEquals(Set.of(7),marked.slice(range(0,4)).copied(2).parts().getFirst().sourceGaps());
+        assertEquals(Set.of(),marked.slice(range(4,4)).copied(2).parts().getFirst().sourceGaps());
+        var repaired=marked.write(range(0,4),initial.slice(range(0,4)));assertEquals(initial,repaired);
+        var unknown=ByteImage.unknown(Optional.of(BigInteger.valueOf(8)),"UNKNOWN").withSourceGap(range(2,3),7);
+        assertTrue(unknown.read(range(0,8)).bytes().isEmpty());assertEquals(Set.of("UNKNOWN"),unknown.read(range(0,8)).reasons());
+        assertEquals(Set.of(7),unknown.slice(range(2,3)).parts().getFirst().sourceGaps());assertTrue(unknown.slice(range(5,3)).parts().getFirst().sourceGaps().isEmpty());
+    }
 }

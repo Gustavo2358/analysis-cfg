@@ -8,15 +8,18 @@ import java.util.*;
 /** One immutable byte image, represented by spans rather than one allocation per octet. */
 final class ByteImage {
     record Part(StorageRange range,Optional<Values.BytesValue> payload,int payloadOffset,int producer,
-                BigInteger producerOffset,Set<Integer> copies,Set<String> reasons) {
-        Part { Objects.requireNonNull(range);Objects.requireNonNull(payload);Objects.requireNonNull(producerOffset);copies=Set.copyOf(copies);reasons=Set.copyOf(reasons); }
+                BigInteger producerOffset,Set<Integer> copies,Set<String> reasons,Set<Integer> sourceGaps) {
+        Part { Objects.requireNonNull(range);Objects.requireNonNull(payload);Objects.requireNonNull(producerOffset);copies=Set.copyOf(copies);reasons=Set.copyOf(reasons);sourceGaps=Set.copyOf(sourceGaps); }
+        Part(StorageRange range,Optional<Values.BytesValue> payload,int payloadOffset,int producer,BigInteger producerOffset,Set<Integer> copies,Set<String> reasons) {
+            this(range,payload,payloadOffset,producer,producerOffset,copies,reasons,Set.of());
+        }
         Part crop(StorageRange slice) {
             var delta=slice.start().subtract(range.start());
             return new Part(slice,payload,payload.isPresent()?Math.addExact(payloadOffset,delta.intValueExact()):0,producer,
-                payload.isPresent()?producerOffset.add(delta):BigInteger.ZERO,copies,reasons);
+                payload.isPresent()?producerOffset.add(delta):BigInteger.ZERO,copies,reasons,sourceGaps);
         }
         Part shift(BigInteger offset) {
-            return new Part(new StorageRange(range.start().add(offset),range.end().map(e->e.add(offset))),payload,payloadOffset,producer,producerOffset,copies,reasons);
+            return new Part(new StorageRange(range.start().add(offset),range.end().map(e->e.add(offset))),payload,payloadOffset,producer,producerOffset,copies,reasons,sourceGaps);
         }
     }
     record Read(Optional<Values.BytesValue> bytes,List<Part> parts,Set<String> reasons) {
@@ -57,7 +60,21 @@ final class ByteImage {
         var result=new ArrayList<Part>();
         for(var part:parts) {
             var copies=new HashSet<>(part.copies());copies.add(event);
-            result.add(new Part(part.range(),part.payload(),part.payloadOffset(),part.producer(),part.producerOffset(),copies,part.reasons()));
+            result.add(new Part(part.range(),part.payload(),part.payloadOffset(),part.producer(),part.producerOffset(),copies,part.reasons(),part.sourceGaps()));
+        }
+        var next=new ByteImage(extent,result);return equals(next)?this:next;
+    }
+    /** Source uncertainty belongs only to the captured intersection, independently of known bytes. */
+    ByteImage withSourceGap(StorageRange selected,int gap) {
+        requireBounds(selected);if(selected.empty())return this;var result=new ArrayList<Part>();
+        for(var part:parts) {
+            var overlap=part.range().intersect(selected);if(overlap.isEmpty()){result.add(part);continue;}
+            var range=overlap.get();
+            if(part.range().start().compareTo(range.start())<0)result.add(part.crop(new StorageRange(part.range().start(),Optional.of(range.start()))));
+            var middle=part.crop(range);var gaps=new HashSet<>(middle.sourceGaps());gaps.add(gap);
+            result.add(new Part(middle.range(),middle.payload(),middle.payloadOffset(),middle.producer(),middle.producerOffset(),middle.copies(),middle.reasons(),gaps));
+            if(range.end().isPresent()&&(part.range().end().isEmpty()||range.end().get().compareTo(part.range().end().get())<0))
+                result.add(part.crop(new StorageRange(range.end().get(),part.range().end())));
         }
         var next=new ByteImage(extent,result);return equals(next)?this:next;
     }
@@ -97,12 +114,12 @@ final class ByteImage {
             if(!result.isEmpty()) {
                 var previous=result.getLast();
                 boolean adjacent=previous.range().end().equals(Optional.of(part.range().start()));
-                boolean metadata=previous.producer()==part.producer()&&previous.copies().equals(part.copies())&&previous.reasons().equals(part.reasons());
+                boolean metadata=previous.producer()==part.producer()&&previous.copies().equals(part.copies())&&previous.reasons().equals(part.reasons())&&previous.sourceGaps().equals(part.sourceGaps());
                 boolean payload=previous.payload().equals(part.payload())&&(part.payload().isEmpty()
                     ||BigInteger.valueOf(previous.payloadOffset()).add(part.range().start().subtract(previous.range().start())).equals(BigInteger.valueOf(part.payloadOffset()))
                         &&previous.producerOffset().add(part.range().start().subtract(previous.range().start())).equals(part.producerOffset()));
                 if(adjacent&&metadata&&payload) {
-                    result.set(result.size()-1,new Part(new StorageRange(previous.range().start(),part.range().end()),previous.payload(),previous.payloadOffset(),previous.producer(),previous.producerOffset(),previous.copies(),previous.reasons()));continue;
+                    result.set(result.size()-1,new Part(new StorageRange(previous.range().start(),part.range().end()),previous.payload(),previous.payloadOffset(),previous.producer(),previous.producerOffset(),previous.copies(),previous.reasons(),previous.sourceGaps()));continue;
                 }
             }
             result.add(part);

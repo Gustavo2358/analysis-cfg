@@ -261,3 +261,25 @@ incluindo remainder (I-51). A fixture publica a prova de domínio TEXT e mantém
 remainder físico aberto; prova de tipo não prova localização nem MUST de todos
 os destinos. Observações após efeitos de Opaque usam o ponto do sucessor
 explícito. AFTER de terminador não é um ponto genérico de replay admitido.
+
+## ST-W5.3 — incerteza de fonte capturada
+
+Dois testes RED com Publication/Unit COMPLETE demonstraram que a captura W3
+perdia source remainder ao copiar bytes de objeto values OPEN para outra base
+explicitamente disjunta. A lacuna local era reconhecida em consultas da origem,
+mas não acompanhava a imagem capturada. A correção carrega handles finitos de
+source gaps nos fragmentos (e na captura para valor lógico), separados de
+modelReasons e do conteúdo conhecido. Isso conserva candidatos modelados sem
+declarar fonte completa.
+
+Interseções da leitura com gaps são preparadas antes de solve/replay. Captura
+recorta os fragmentos nos limites físicos desses gaps; crop/copy/shift preservam
+os handles e MUST substitui somente os fragmentos escritos. Um prefixo com gap
+não contamina a cópia do sufixo; substituir o prefixo do destino remove sua
+incerteza herdada. A lacuna estática local da declaração original continua sendo
+considerada quando aquele subject é consultado. Não abrir bases globais nem
+inferir irrelevância de strings de gaps. Metadados participam de igualdade e
+normalização, incluindo fragmentos desconhecidos; o universo permanece finito.
+
+O produto por faixa e o transporte detalhado de eventos/fragmentos ainda estão
+em implementação na mesma subtask. Esta correção focal não qualifica W5/M3.

@@ -289,7 +289,8 @@
       "partialWriteKeepsSuffixAndPartialUnknownInvalidatesWholeRead",
       "copiesCaptureImmutableImageAndOverlapReadsOldBytes",
       "unknownTailAndHugeExtentRemainSparseAndZeroIsIdentity",
-      "copySupportsAloneChangeEqualityAndConvergeAsStaticSets"
+      "copySupportsAloneChangeEqualityAndConvergeAsStaticSets",
+      "capturedSourceGapSplitsOnlyItsRangeAndSurvivesUnknownIndependently"
     ],
     "io.github.gustavo2358.analysis.values.RegionalValuesTest": [
       "missingStateIsUnknownAndUnreachableIsSeparate",
@@ -324,6 +325,10 @@
       "unknownSourceExtentDoesNotBecomeZeroOrAClosedCopy",
       "destinationRemainderKeepsOpenAlternativesRatherThanChoosingTheKnownPlace",
       "logicalReadCapturesAComposedRegionalValueBeforeLaterWrite"
+    ],
+    "io.github.gustavo2358.analysis.values.RegionalProvenanceTest": [
+      "copiedSourceRemainderSurvivesDisjointDestinationAndDiesOnOverwrite",
+      "sourceGapIsCroppedWithItsFragmentAndDoesNotContaminateCopiedSuffix"
     ]
   },
   "cfg-adapters": {
