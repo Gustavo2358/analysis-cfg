@@ -143,4 +143,5 @@ if __name__ == '__main__':
     p = sub.add_parser('compare')
     for name in ('before','after','output'): p.add_argument('--'+name, type=Path, required=True)
     p.add_argument('--focal', type=Path)
-    args = vars(parser.parse_args()); command = args.pop('command'); globals()[command](**args)
+    args = vars(parser.parse_args()); command = args.pop('command')
+    globals()[command](**{k: v.resolve() if isinstance(v, Path) else v for k, v in args.items()})

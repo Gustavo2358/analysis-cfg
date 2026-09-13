@@ -2,3 +2,4 @@ id: WORK-CFG-041
 title: GO TO first slice E2E and CardDemo delta
 status: IN_PROGRESS
 scope: G1-G5, explicit Jump/no fallthrough, multiplicity and regression tests; affected then one Full local CardDemo. No CFG production changes. Human review only.
+notes: READY FOR HUMAN REVIEW. 23 GO TO and 18 EVALUATE E2Es PASS; affected 16 programs then one Full. 306 typed GO TO, 227 Jump, 79 partial. All 73 CALL vectors preserved. See docs/evals/cp6/carddemo-after-goto.md. No merge; HUMAN authority.
