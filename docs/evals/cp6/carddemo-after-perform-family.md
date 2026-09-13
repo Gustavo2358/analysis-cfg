@@ -110,3 +110,36 @@ Raw evidence: `times-focal-02`, `times-cumulative`, `goto-times`, `evaluate-time
 `historical-times`, `times-static-size.json`. Failed discoveries remain preserved.
 Final cumulative affected corpus qualification follows VARYING. No Full corpus
 run has been performed. Continue immediately to single-variable VARYING.
+
+
+## Phase 3B checkpoint — complete PERFORM family GREEN
+
+Frontend `642ba4b3aeaffdfa0942f3fb462a4be17070d0d1`, lower
+`e8cdc95491b7225c2c899e6f4dc229f64f26a8d7`, cumulative E2E
+`519272ffaaefad1fc785fc3370554e156b28a437`; AIR codec unchanged at the Phase 3A pin.
+SP 2.5 adds typed control-variable/FROM/BY operands and explicit VARYING levels.
+The shared UNTIL decision models BEFORE and AFTER, with initialization before
+entry and AFTER increments only on the repeat path. Integer values stay open;
+initialization/update must-write only the proved control item. FROM reads,
+implicit increment reads, subscript reads and provenance are retained.
+Multi-level AFTER remains explicitly typed and conservative.
+
+Cumulative E2E: 89/89 PASS (23 THRU, 19 UNTIL, 18 TIMES, 28 VARYING,
+plus one mixed program composing all families and BASIC PERFORM).
+Includes 1/2/5/40 callsites per family, A/B byte determinism at SP/AIR/CFG/dependency,
+physical statement/JSON-field/AIR-sequence permutations, precise candidate oracles,
+partial/adversarial control and source-derived candidate supports.
+GO TO 23/23, EVALUATE 18/18, historical BASIC/MOVE/Multi-CALL/IF/partial/input 38/38.
+Frontend FAST 139 tests PASS; lower FAST PASS; CFG FAST PASS; AIR FAST PASS.
+All four Draft PRs have successful remote Fast CI runs at their productive heads.
+Final qualification-local: frontend PASS (629 executed tests; one historical
+future-condition opt-in test skipped), lower PASS, AIR PASS. Frozen historical
+facts and bytes are unchanged; additive null integer metadata is checked explicitly.
+An initial local CFG inventory check failed during concurrent shared dependency
+builds; an independent capture matched the unchanged inventory, and a serialized
+complete CFG FAST rerun passed. No inventory baseline was changed.
+
+Raw evidence: `varying-cumulative`, `goto-final`, `evaluate-final`,
+`historical-final`; runtime artifacts are immutable jars with SHA-256 hashes.
+Final affected qualification and the single final Full corpus run follow this
+checkpoint. No Full corpus run has yet been performed.
