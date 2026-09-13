@@ -94,6 +94,11 @@
       "wholeWriteFeedsDisplacedCallViewBeforeForeignMayEffects",
       "literalOnlySitesDoNotDemandRegionalValues",
       "historicalScalarProfilesContinueToRefuseRegions"
+    ],
+    "io.github.gustavo2358.analysis.adapters.RegionalWireTest": [
+      "fileProductCarriesIndependentCompositionAndCopyIntervals",
+      "inventoryAndQueryPermutationPreserveTheEntireWire",
+      "hugeUnknownTailZeroAndLogicalCellsRetainTheirDistinctWireShapes"
     ]
   },
   "analysis-dataflow": {
@@ -103,6 +108,11 @@
       "everyTerminatorAndOrphanAreObservedBefore",
       "resourcePreflightNeverProducesSemanticResultAndRecovers",
       "incompleteAndLegacyPreparationFailuresRemainDistinct"
+    ],
+    "io.github.gustavo2358.analysis.dataflow.RegionalAnalysisTest": [
+      "rdAndValuesShareSelectedEntriesAndOneBatchPerExecution",
+      "unselectedAndMissingQueriesAreExplicitWithoutDiscardingValidResults",
+      "resourcePreflightFailsBeforeAnySemanticResultAndRecovers"
     ]
   },
   "analysis-dependencies": {
@@ -214,6 +224,11 @@
       "inputAndOutputFailuresPreserveDestinationAndCleanupTemporaryFile",
       "realCodecOperationalLimitIsSevenAndProducesNoPartialResult",
       "cfgAndAnalysisUnsupportedHaveDifferentExitsAndNoPartialOutput"
+    ],
+    "io.github.gustavo2358.analysis.launcher.RegionalCliTest": [
+      "missingInputAndBadQueryNeverReplaceOutput",
+      "realRegionalFileHasStableOutputAndExplicitUnsupportedQuery",
+      "malformedAirAndOutputFailurePreserveExistingContentAndCleanTemporary"
     ]
   },
   "analysis-values": {

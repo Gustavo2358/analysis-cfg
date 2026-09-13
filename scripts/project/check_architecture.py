@@ -761,6 +761,7 @@ def architecture_gate(root: Path, test_profile: str = "full") -> None:
     run([maven, *repository, "--batch-mode", "--no-transfer-progress", "clean", "test", *test_arguments], root)
     if test_profile == "fast":
         verify_reports(root)
+    run([sys.executable, "-B", "scripts/project/test_regional_result_wire.py"], root)
     kernel = root / KERNEL_ARTIFACT
     total, skipped = count_tests(kernel)
 
