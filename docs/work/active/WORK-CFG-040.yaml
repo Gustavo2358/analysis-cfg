@@ -1,0 +1,7 @@
+id: WORK-CFG-040
+title: CP6 — EVALUATE first vertical slice
+status: IN_PROGRESS
+scope:
+  - Focused EVALUATE pipelines, candidates, supports and remainders
+  - Affected CardDemo programs followed by one Full run
+  - Human roadmap authority; Draft PRs for review
