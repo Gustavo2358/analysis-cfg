@@ -24,9 +24,17 @@ EXPECTED.update({'times-identifier':[{'OLDPROG','NEWPROG'}],
     **{'times-'+str(n):[{'NEWPROG'}]*n for n in (1,2,5,40)}})
 PARTIAL+=tuple('times-'+n for n in ('unresolved','noninteger','zero','incoming','escape','cycle','recursive','partial-end','unknown-body'))
 
+EXPECTED['family-mixed']=[{'PROGB'},{'OLDPROG','PROGB'},{'OLDPROG','PROGB'},{'PROGB'},{'PROGC'}]
+EXPECTED.update({**{'varying-'+n:[{'OLDPROG','NEWPROG'}] for n in ('before','default','from-read')},
+    **{'varying-'+n:[{'NEWPROG'}] for n in ('after','thru','decrement')},
+    'varying-branches':[{'PROGA','PROGB'}],
+    **{'varying-'+str(n):[{'NEWPROG'}]*n for n in (1,2,5,40)}})
+PARTIAL+=tuple('varying-'+n for n in ('unresolved-control','noninteger','nonscalar','subscript-control','unknown-from','unknown-by','variable-by','zero-by',
+    'unsupported-condition','unresolved-condition','after-level','incoming','escape','cycle','recursive','partial-end','unknown-body'))
+
 
 def oracle(name,source,sp,air,cfg,result):
-    require(sp['contractVersion']=='2.4.0','versioned range/loop contract')
+    require(sp['contractVersion']=='2.5.0','versioned range/loop contract')
     publication=air['publication'];sequences=publication['units'][0]['sequences']
     ops={op['header']['id']['localId']:op for seq in sequences for op in seq['instructions']+[seq['terminator']]}
     links={s['header']['id']:[o['localId'] for item in publication['coverage']['items']
@@ -55,10 +63,37 @@ def oracle(name,source,sp,air,cfg,result):
         first_labels={label_by_op[o] for o in links[first]}
         control_labels=set()
         if p.get('loop'):
-            require(len(branches)==1 and len(control)==2,'one decision, independent of iteration count')
+            require(len(branches)==1 and len(control)==(4 if p.get('varying') else 2),'one decision, independent of iteration count')
             decision=branches[0];decision_label=label_by_op[decision['header']['id']['localId']];control_labels.add(decision_label)
-            body_entry=decision['falseDestination']['localId'];require(body_entry in first_labels,'UNTIL false enters typed range')
-            require(entry==decision_label if p['loop']['testMode']=='BEFORE' else entry==body_entry,'TEST mode controls first execution')
+            body_entry=decision['falseDestination']['localId']
+            if p.get('varying'):
+                effects={op['observedKind']:op for op in control if op['kind']=='opaque'}
+                require(set(effects)=={'perform-varying-initialization','perform-varying-increment'},'initialization and increment retained')
+                initial=effects['perform-varying-initialization'];increment=effects['perform-varying-increment']
+                initial_label=label_by_op[initial['header']['id']['localId']];increment_label=label_by_op[increment['header']['id']['localId']]
+                control_labels.update((initial_label,increment_label));require(entry==initial_label,'initialize before any test/body')
+                def successor(op):
+                    envelope=op['envelope'];require(envelope['control']['remainder']['kind']=='none' and len(envelope['control']['known'])==1,'closed implicit operation')
+                    memory=envelope['memory'];require(memory['otherReads']['kind']=='none' and memory['otherWrites']['kind']=='none','no global havoc')
+                    require(len(memory['knownWrites'])==1 and memory['mustOverwrite']==memory['knownWrites'],'exact single control item must-write')
+                    writes={x['header']['id']['localId']:x for x in op['knownOperands']}
+                    target=writes[memory['knownWrites'][0]['localId']]
+                    require(target['header']['role']=='VALUE_WRITE','control item is written')
+                    return envelope['control']['known'][0]['label']['localId'],target['object']['localId'],memory
+                initial_next,initial_item,initial_memory=successor(initial);increment_next,increment_item,increment_memory=successor(increment)
+                require(initial_item==increment_item,'same control item initialized and incremented')
+                require(len(increment_memory['knownReads'])==1,'increment reads current item')
+                from_operand=next(o for o in p['varying']['controls'] if o['role']=='FROM')
+                require(len(initial_memory['knownReads'])==len(from_operand['references']),'FROM item read preserved')
+                if p['loop']['testMode']=='BEFORE':
+                    require(initial_next==decision_label and increment_next==decision_label and body_entry in first_labels,'BEFORE init/test/body/increment/test')
+                    require(any(increment_label in targets for label,targets in normal_edges.items() if label not in control_labels),'body completes into increment')
+                else:
+                    require(initial_next in first_labels and increment_next==initial_next and body_entry==increment_label,'AFTER init/body/test and repeat increments before next body')
+                    require(any(decision_label in targets for label,targets in normal_edges.items() if label not in control_labels),'AFTER body completes into decision before increment')
+            else:
+                require(body_entry in first_labels,'UNTIL false enters typed range')
+                require(entry==decision_label if p['loop']['testMode']=='BEFORE' else entry==body_entry,'TEST mode controls first execution')
             require(decision['trueDestination']['localId'] in {label_by_op[o] for o in links[p['normalContinuation']['statement']]},'UNTIL true resumes own callsite')
             predicate=decision['predicate'];require(predicate['kind']=='unknown' and predicate['typeRef']['type']['kind']=='bool','unknown Boolean, no predicate pruning')
             require(len(predicate['dependencies'])==len(p['loop']['condition']['references']) and all(r['kind']=='read' for r in predicate['dependencies']),'condition reads retained')

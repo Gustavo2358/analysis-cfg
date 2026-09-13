@@ -75,6 +75,38 @@ def times():
     return cases
 
 
+def varying():
+    body="A.\nMOVE 'NEWPROG' TO WS-PGM.\n"
+    def make(control="VARYING I FROM 1 BY 1 UNTIL I > LIM",tail=body):
+        return source("MOVE 'OLDPROG' TO WS-PGM.\nPERFORM A "+control+".\nCALL WS-PGM.",tail).replace('01 FLAG PIC X.','01 FLAG PIC X.\n01 I PIC S9(9).\n01 LIM PIC 9(9).\n01 J PIC 9(9).')
+    cases={'varying-before':make('WITH TEST BEFORE VARYING I FROM 1 BY 1 UNTIL I > LIM'),
+           'varying-default':make(),
+           'varying-after':make('WITH TEST AFTER VARYING I FROM 1 BY 1 UNTIL I > LIM'),
+           'varying-thru':make('THRU C WITH TEST AFTER VARYING I FROM 1 BY 1 UNTIL I > LIM',"A.\nMOVE 'PROGA' TO WS-PGM.\nB.\nMOVE 'PROGB' TO WS-PGM.\nC.\nMOVE 'NEWPROG' TO WS-PGM.\n"),
+           'varying-from-read':make('VARYING I FROM LIM BY 1 UNTIL I > 10'),
+           'varying-decrement':make('WITH TEST AFTER VARYING I FROM 10 BY -1 UNTIL I < 1'),
+           'varying-branches':make('WITH TEST AFTER VARYING I FROM 1 BY 1 UNTIL I > LIM',"A.\nIF FLAG = 'Y' MOVE 'PROGA' TO WS-PGM ELSE MOVE 'PROGB' TO WS-PGM END-IF.\n"),
+           'varying-unresolved-control':make('VARYING MISSING FROM 1 BY 1 UNTIL I > LIM'),
+           'varying-noninteger':make().replace('I PIC S9(9)','I PIC 9V9'),
+           'varying-nonscalar':make().replace('I PIC S9(9)','I PIC 9 OCCURS 2'),
+           'varying-subscript-control':make('VARYING I(J) FROM 1 BY 1 UNTIL J > LIM').replace('I PIC S9(9)','I PIC 9 OCCURS 2'),
+           'varying-unknown-from':make('VARYING I FROM MISSING BY 1 UNTIL I > LIM'),
+           'varying-unknown-by':make('VARYING I FROM 1 BY MISSING UNTIL I > LIM'),
+           'varying-variable-by':make('VARYING I FROM 1 BY LIM UNTIL I > LIM'),
+           'varying-zero-by':make('VARYING I FROM 1 BY 0 UNTIL I > LIM'),
+           'varying-unsupported-condition':make('VARYING I FROM 1 BY 1 UNTIL FUNCTION RANDOM > 0'),
+           'varying-unresolved-condition':make('VARYING I FROM 1 BY 1 UNTIL I > MISSING'),
+           'varying-after-level':make('VARYING I FROM 1 BY 1 UNTIL I > LIM AFTER J FROM 1 BY 1 UNTIL J > LIM')}
+    for n in (1,2,5,40):
+        text=make('WITH TEST AFTER VARYING I FROM 1 BY 1 UNTIL I > LIM')
+        call="PERFORM A WITH TEST AFTER VARYING I FROM 1 BY 1 UNTIL I > LIM.\nCALL WS-PGM."
+        cases['varying-'+str(n)]=text.replace(call,'\n'.join([call]*n))
+    for name in ('incoming','escape','cycle','recursive','partial-end','unknown-body'):
+        cases['varying-'+name]=thru()[name].replace('01 FLAG PIC X.','01 FLAG PIC X.\n01 I PIC 9(9).\n01 LIM PIC 9(9).').replace('PERFORM A THRU C.','PERFORM A THRU C VARYING I FROM 1 BY 1 UNTIL I > LIM.').replace('PERFORM A THRU MISSING.','PERFORM A THRU MISSING VARYING I FROM 1 BY 1 UNTIL I > LIM.')
+    cases['family-mixed']=source("MOVE 'OLDPROG' TO WS-PGM.\nPERFORM A THRU B.\nCALL WS-PGM.\nMOVE 'OLDPROG' TO WS-PGM.\nPERFORM A THRU B WITH TEST BEFORE UNTIL FLAG = 'Y'.\nCALL WS-PGM.\nMOVE 'OLDPROG' TO WS-PGM.\nPERFORM A THRU B WS-N TIMES.\nCALL WS-PGM.\nMOVE 'OLDPROG' TO WS-PGM.\nPERFORM A THRU B WITH TEST AFTER VARYING I FROM 1 BY 1 UNTIL I > LIM.\nCALL WS-PGM.\nPERFORM D.\nCALL WS-PGM.","A.\nMOVE 'PROGA' TO WS-PGM.\nB.\nMOVE 'PROGB' TO WS-PGM.\nD.\nMOVE 'PROGC' TO WS-PGM.\n").replace('01 FLAG PIC X.','01 FLAG PIC X.\n01 I PIC 9(9).\n01 LIM PIC 9(9).\n01 WS-N PIC 9(9).')
+    return cases
+
+
 if __name__=='__main__':
     FIXTURES.mkdir(parents=True,exist_ok=True)
-    for name,text in {**thru(),**until(),**times()}.items():(FIXTURES/(name+'.cbl')).write_text(''.join('       '+part+'\n' for line in text.splitlines() for part in textwrap.wrap(line,width=65,break_long_words=False,break_on_hyphens=False)))
+    for name,text in {**thru(),**until(),**times(),**varying()}.items():(FIXTURES/(name+'.cbl')).write_text(''.join('       '+part+'\n' for line in text.splitlines() for part in textwrap.wrap(line,width=65,break_long_words=False,break_on_hyphens=False)))

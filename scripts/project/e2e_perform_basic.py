@@ -18,7 +18,7 @@ FIXTURES = ROOT / 'analysis-adapters/src/test/resources/cp6/perform-basic'
 
 
 def source_oracle(sp, case):
-    require(sp['contractVersion'] in ('1.8.0','1.9.0','2.0.0','2.1.0','2.2.0', '2.3.0', '2.4.0') and sp['unit']['canonicalProgramName'] == 'CALLER', 'real CALLER at SP1.8')
+    require(sp['contractVersion'] in ('1.8.0','1.9.0','2.0.0','2.1.0','2.2.0', '2.3.0', '2.4.0', '2.5.0') and sp['unit']['canonicalProgramName'] == 'CALLER', 'real CALLER at SP1.8')
     statements = {s['header']['id']: s for s in sp['statements']}
     performs = [s for s in statements.values() if s['variant'] == 'PERFORM']
     require(len(performs) == 1, 'one typed PERFORM')
