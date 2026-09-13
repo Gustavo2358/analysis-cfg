@@ -234,3 +234,30 @@ A implementação e o profile passam a `RegionalValues` versão `2`,
 profiles escalares e o wire legado não mudam. A chave antiga não é aceita como
 sinônimo silencioso do novo domínio. A remoção da guarda de composição W3 é
 acompanhada por testes independentes de branch, Choice, cópia e finitude.
+
+## Transferências ST-W5.2 e fronteiras de erro
+
+Os onze testes de RegionalTransferTest exercitam o motor W3 ampliado em W5.1,
+sem reimplementar capacidades comprovadas: MUST desconhecido e reparo parcial,
+MAY parcial, Choice MUST desconhecida, RegionSlice literal, cópia parcial seguida
+de alteração da origem, self-copy, zero length e overlap em ambas as direções
+(a outra direção está no loop W5.1), cópia de segmento desconhecido, remainder
+de destino com prova explícita de domínio e captura de view composta em Cell
+lógica. A Cell conserva os produtores originais e o valor anterior da view.
+Assign regional não interpretado permanece desconhecido; cópias físicas usam
+CopyBytes. Isso não afirma MOVE COBOL sobreposto irrestrito.
+
+O validator AIR no pin continua recusando comprimento maior que o intervalo ou
+intervalo fora da região com I-13. Bounds calculados e acesso a região de extent
+desconhecido continuam em VALIDATION_LIMIT/PRECONDITION_NOT_DISCHARGED antes da
+análise; o envelope de CopyBytes não dispensa essa obrigação do validator.
+Uma forma Opaque explícita e válida transporta o fallback e produz MAY aberto,
+preservando bases cuja disjunção foi provada. Não converter esse limite em
+extent zero nem bypassar o preflight. ByteImage preserva seu sufixo desconhecido
+esparso, mas isso não torna todo acesso AIR de extensão desconhecida admissível.
+
+Choice aberta com tipo conhecido exige SameDomain sobre a ocorrência inteira,
+incluindo remainder (I-51). A fixture publica a prova de domínio TEXT e mantém
+remainder físico aberto; prova de tipo não prova localização nem MUST de todos
+os destinos. Observações após efeitos de Opaque usam o ponto do sucessor
+explícito. AFTER de terminador não é um ponto genérico de replay admitido.

@@ -311,6 +311,19 @@
       "overlappingCopyLoopHasExactlyTheFiniteConcreteImages",
       "jointStoreJoinLawsAndTransfersIncludeUnknownAndSupportOnlyChanges",
       "copyConnectedInventoryPermutationPreservesFactsAndSupports"
+    ],
+    "io.github.gustavo2358.analysis.values.RegionalTransferTest": [
+      "unknownMustPrefixCannotKeepWholeCandidateAndLiteralCanRepairIt",
+      "scopedMayPreservesOldPossibilityAndUntouchedSuffix",
+      "mandatoryUnknownChoiceAlwaysInvalidatesWholeAndKeepsPossibleHalves",
+      "rangeWritesAndCapturedPartialCopySurviveLaterSourceChanges",
+      "selfCopyAndZeroLengthPreserveTextWhileOverlapUsesPreWriteBytes",
+      "copyingUnknownPrefixPreservesOnlyDestinationSuffix",
+      "uncomputedCopyBoundsKeepValidationLimitAndExplicitOpaqueFallback",
+      "contradictoryCopyExtentAndOutOfBoundsAreRejectedBeforeAnalysis",
+      "unknownSourceExtentDoesNotBecomeZeroOrAClosedCopy",
+      "destinationRemainderKeepsOpenAlternativesRatherThanChoosingTheKnownPlace",
+      "logicalReadCapturesAComposedRegionalValueBeforeLaterWrite"
     ]
   },
   "cfg-adapters": {
