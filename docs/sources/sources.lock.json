@@ -128,7 +128,7 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "ee1967fe0f6d313918ee0194a80e5e0023db060d",
+    "commit": "21be595c2d1e03ed8c6b0b1d94af273b81a461d3",
     "canonical_ref": "feat/storage-semantics-st-w6-w8",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
@@ -244,9 +244,9 @@
       "docs/domain/cobol-semantic-product.md",
       "docs/work/history/WORK-SEMANTIC-PRODUCT-003.md"
     ],
-    "semantic_product_version": "2.11.0",
+    "semantic_product_version": "2.12.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "5547647ba220888cdd8d46dcbd0218cd701824e4",
+    "commit": "784dbea89bb4c7fcdcc0410991c9760bb6bff4e0",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -256,13 +256,13 @@
       "contract": "2.1.0",
       "scope": "local unconditional paragraph identity and explicit entry; G1-G5 and 1/2/5/40"
     },
-    "storage_contract_version": "1.2.0",
+    "storage_contract_version": "1.3.0",
     "canonical_ref": "feat/storage-semantics-st-w6-w8"
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "verified",
-    "commit": "dd1e25bbda8ad1e93e3b89845f9f624c7a8a1307",
+    "commit": "bd0f5409794fec0bacfc8e49b23ab7dcb090da7f",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
