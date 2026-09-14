@@ -133,7 +133,7 @@
   "air_java": {
     "repository": "Gustavo2358/air-java",
     "commit": "b34c4c575270cd7f4047a0ad10bda3303ea8c001",
-    "canonical_ref": "main",
+    "canonical_ref": "feat/recall-first-partial-semantics",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
     "analysis_ir": {
@@ -249,9 +249,9 @@
       "docs/work/history/WORK-SEMANTIC-PRODUCT-003.md",
       "docs/domain/declarative-value-inference.md"
     ],
-    "semantic_product_version": "2.15.0",
+    "semantic_product_version": "2.16.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "c5d2bfe4319800e6b6c4c30ffe7e4a2c2451e892",
+    "commit": "8ff3b03ca5694d7f5c50c3b0a9c31b4613ac23d2",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -262,12 +262,12 @@
       "scope": "local unconditional paragraph identity and explicit entry; G1-G5 and 1/2/5/40"
     },
     "storage_contract_version": "1.4.0",
-    "canonical_ref": "main"
+    "canonical_ref": "fix/dvi-alias-aware-call-escape"
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "verified",
-    "commit": "c39ea3f88065a35e060e9f68fcd7bfbf05c48ff5",
+    "commit": "bf42219d0600193dca2921768b739d99c4d7b085",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -279,7 +279,7 @@
     "goto_validation": {
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
     },
-    "canonical_ref": "main"
+    "canonical_ref": "feat/recall-first-partial-semantics"
   },
   "external": [
     {

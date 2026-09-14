@@ -107,18 +107,25 @@ public final class RegionalValuesAnalysis {
             var seeds=new ArrayList<Plan>();int slot=0;var seededLocations=new HashSet<StorageIndex.Location>();
             for(var condition:context.entry().state().conditions()) {
                 var resolution=effects.storage().resolve(condition.place());
-                StatementEffects.Source source=condition.value() instanceof Entries.LiteralInitial l?new StatementEffects.ExpressionSource(l.value()):new StatementEffects.UnknownSource("ENTRY_CONTENT_NOT_LITERAL");
-                var write=new StatementEffects.Write(slot++,Optional.of(condition.place().header().id()),resolution,source,effects.targets(resolution,StatementEffects.Strength.MUST));
-                for(var plan:compile(List.of(write),condition.place().header().id(),condition.origin(),condition.premises(),null,condition,Optional.empty())) {
-                    var target=plan.target();
-                    // Admission proved equal simultaneous literals on an identical footprint.
-                    // Preserve both supports without retaining the unspecified entry possibility.
-                    var selectedWrite=plan.write();
-                    if(target.location().range().isEmpty()&&target.strength()==StatementEffects.Strength.MUST&&!seededLocations.add(target.location())) {
-                        target=new StatementEffects.Target(target.location(),StatementEffects.Strength.MAY,target.sourceApplicable(),target.premises(),target.reasons());
-                        selectedWrite=new StatementEffects.Write(selectedWrite.slot(),selectedWrite.occurrence(),selectedWrite.destination(),selectedWrite.source(),selectedWrite.targets(),selectedWrite.selection(),StatementEffects.Strength.MAY);
+                var sources=new ArrayList<StatementEffects.Source>();
+                boolean possible=condition.value() instanceof Entries.PossibleLiterals;
+                if(condition.value() instanceof Entries.PossibleLiterals p)
+                    p.candidates().forEach(l->sources.add(new StatementEffects.ExpressionSource(l)));
+                else sources.add(condition.value() instanceof Entries.LiteralInitial l?new StatementEffects.ExpressionSource(l.value()):new StatementEffects.UnknownSource("ENTRY_CONTENT_NOT_LITERAL"));
+                var strength=possible?StatementEffects.Strength.MAY:StatementEffects.Strength.MUST;
+                for(var source:sources) {
+                    var write=new StatementEffects.Write(slot++,Optional.of(condition.place().header().id()),resolution,source,effects.targets(resolution,strength),StatementEffects.Selection.SINGLE_DESTINATION,strength);
+                    for(var plan:compile(List.of(write),condition.place().header().id(),condition.origin(),condition.premises(),null,condition,Optional.empty())) {
+                        var target=plan.target();
+                        // Equal simultaneous strong literals retain both supports; a possible
+                        // entry uses MAY from the outset, preserving unspecified entry content.
+                        var selectedWrite=plan.write();
+                        if(target.location().range().isEmpty()&&target.strength()==StatementEffects.Strength.MUST&&!seededLocations.add(target.location())) {
+                            target=new StatementEffects.Target(target.location(),StatementEffects.Strength.MAY,target.sourceApplicable(),target.premises(),target.reasons());
+                            selectedWrite=new StatementEffects.Write(selectedWrite.slot(),selectedWrite.occurrence(),selectedWrite.destination(),selectedWrite.source(),selectedWrite.targets(),selectedWrite.selection(),StatementEffects.Strength.MAY);
+                        }
+                        seeds.add(new Plan(selectedWrite,target,plan.event()));
                     }
-                    seeds.add(new Plan(selectedWrite,target,plan.event()));
                 }
             }
             initial.put(context.entry().id(),List.copyOf(seeds));

@@ -60,7 +60,29 @@ class PossibleEntryTest {
     }
     @Test void backedgeToInitialLabelNeverExecutesEntrySeedAgain() {
         var p=possible(List.of(with(jump(U,"s0","head"),assign(U,"overwrite",WHOLE,"OTHERPGM")),branch(U,"head","s0","exit"),returning(U,"exit",List.of())),"PGM00001");
-        var value=at(run(p),"return-exit",WHOLE);assertEquals(List.of("OTHERPGM"),texts(value));assertFalse(value.modelValueRemainder());
+        var context=session(p).contexts().iterator().next();
+        assertFalse(context.predecessors(context.entryNode()).advance(),"backedge cannot reach the invocation boundary");
+        var execution=run(p);
+        assertEquals(List.of("OTHERPGM","PGM00001"),texts(at(execution,"overwrite",WHOLE)),"backedge value is not reset to entry literal");
+        var value=at(execution,"return-exit",WHOLE);assertEquals(List.of("OTHERPGM"),texts(value));assertFalse(value.modelValueRemainder());
         assertEquals(List.of("overwrite"),value.candidateSupports().getFirst().producers().stream().map(s->s.evidence().localId()).toList());
+    }
+    @Test void scalarAndRegionalProvidersAgreeOnPossibleCellEntryAndMustKill() {
+        for(boolean overwrite:List.of(false,true)) {
+            var p=graph(new String[]{overwrite?"OTHERPGM":null},new int[][]{{}},1,false,false);
+            var u=p.units().getFirst();var e=u.entries().getFirst();var owner=new EntryOwner(e.id());var o=e.origin();
+            var gap=new UncertaintyId(p.id(),"lifecycle");
+            var place=new Places.ObjectPlace(new Operand.Header(new OperandId(owner,"entry-place"),Operand.Role.VALUE_WRITE,o),u.objects().getFirst().id());
+            var candidates=new ArrayList<Expressions.Literal>();
+            for(String text:List.of("PGM00001","PGM00002"))candidates.add(new Expressions.Literal(new Operand.Header(new OperandId(owner,"value-"+text),Operand.Role.VALUE_READ,o),new Values.TextValue(text)));
+            var condition=new Entries.InitialCondition(place,new Entries.PossibleLiterals(candidates,gap),o,List.of());
+            var entry=new Entries.Entry(e.id(),e.initialLabel(),e.signature(),new Entries.EntryState(List.of(condition),List.of()),o);
+            p=new Publication(p.id(),p.airVersion(),new Capabilities.Manifest(List.of(Capabilities.ENTRY_POSSIBILITIES),List.of()),p.artifacts(),List.of(unit(u.id(),List.of(entry),u.sequences(),u.objects())),p.storage(),p.resources(),p.artifactRelations(),p.origins(),p.coverage(),
+                List.of(new Evidence.Uncertainty(gap,"ENTRY_LIFECYCLE_OPEN",List.of(Evidence.Dimension.VALUES),new Scopes.UnitScope(u.id()),"not a constant",o)),p.premises());
+            var expected=overwrite?List.of("OTHERPGM"):List.of("PGM00001","PGM00002");var query=ValuesTest.before(p,0,0);
+            ValuesTest.expected(ValuesTest.fact(execute(p),query),!overwrite,expected.toArray(String[]::new));
+            var regional=run(p).observe(List.of(query)).observations().getFirst().value();
+            assertEquals(expected,texts(regional));assertEquals(!overwrite,regional.modelValueRemainder());
+        }
     }
 }

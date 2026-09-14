@@ -65,7 +65,7 @@ public final class ReachingDefinitions {
             var seeds=new ArrayList<Initial>();var occupied=new HashMap<Integer,Initial>();int slot=0;
             for(var condition:context.entry().state().conditions()) {
                 var resolution=effects.storage().resolve(condition.place());
-                for(var target:effects.targets(resolution,StatementEffects.Strength.MUST)) {
+                for(var target:effects.targets(resolution,condition.value() instanceof Entries.PossibleLiterals?StatementEffects.Strength.MAY:StatementEffects.Strength.MUST)) {
                     var seed=new Initial(slot,condition,target,List.copyOf(partition.intersecting(target.location())));
                     for(var segment:seed.segments()) {
                         var prior=occupied.putIfAbsent(segment.ordinal(),seed);

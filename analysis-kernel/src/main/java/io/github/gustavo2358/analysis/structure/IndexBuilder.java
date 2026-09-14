@@ -64,7 +64,7 @@ final class IndexBuilder {
         var namePolicies = NamePolicies.extensions(snapshot);
         for (var capability : snapshot.capabilities().required()) {
             count.visit("requiredCapabilities");
-            supported(capability.equals(Capabilities.MEMORY_REGIONS) || capability.equals(Capabilities.IBM1047) || namePolicies.contains(capability), "unsupported control capability");
+            supported(capability.equals(Capabilities.MEMORY_REGIONS) || capability.equals(Capabilities.IBM1047) || capability.equals(Capabilities.ENTRY_POSSIBILITIES) || namePolicies.contains(capability), "unsupported control capability");
         }
         supported(policy.acceptsInventory(snapshot.coverage().inventory()), "unsupported publication inventory policy");
         declarations();
@@ -159,6 +159,8 @@ final class IndexBuilder {
                     operands(List.of(condition.place()), new EntryOwner(entry.id()));
                     if (condition.value() instanceof Entries.LiteralInitial initial)
                         operands(List.of(initial.value()), new EntryOwner(entry.id()));
+                    if (condition.value() instanceof Entries.PossibleLiterals possible)
+                        operands(new ArrayList<Operand>(possible.candidates()), new EntryOwner(entry.id()));
                 }
             }
             // Expected cardinality plus unique valid roles proves completeness without constructing

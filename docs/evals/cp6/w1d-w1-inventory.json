@@ -142,6 +142,7 @@
       "io.github.gustavo2358.air.model.Entries$InitialCondition",
       "io.github.gustavo2358.air.model.Entries$InitialValue",
       "io.github.gustavo2358.air.model.Entries$LiteralInitial",
+      "io.github.gustavo2358.air.model.Entries$PossibleLiterals",
       "io.github.gustavo2358.air.model.Envelopes",
       "io.github.gustavo2358.air.model.Envelopes$Envelope",
       "io.github.gustavo2358.air.model.Evidence",
