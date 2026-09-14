@@ -26,7 +26,7 @@ def classpaths(frontend,lower,m2):
 
 def oracle(case,sp,air,dependency,cfg):
     verify_cfg(cfg)
-    require(sp['contractVersion']=='2.13.0' and sp['storage']['version']=='1.3.0','current SP/storage contract')
+    require(sp['contractVersion']=='2.14.0' and sp['storage']['version']=='1.3.0','current SP/storage contract')
     p=air['publication'];u=p['units'][0];ops={o['header']['id']['localId']:o for s in u['sequences'] for o in s['instructions']+[s['terminator']]}
     def linked(statement):
         return {o['localId'] for item in p['coverage']['items'] if item['sourceKey'].endswith('/'+statement['header']['id']) for o in item['outputs'] if o['domain']=='operation'}
@@ -41,7 +41,8 @@ def oracle(case,sp,air,dependency,cfg):
         require(all(op['signature']['signature'][k]['remainder']['kind']=='unknown' for k in ['parameters','results']),'partial signature is not zero arity')
         require(op['effectBound']['otherwise']['writes']['scope']['kind']=='all' and not op['effectBound']['otherwise']['mustOverwrite'],'conservative foreign effects')
         if s['command']=='XCTL':require(not op['outcomes']['known'],'no success return or halt invented for XCTL')
-        elif s['localContinuation']['availability']=='KNOWN':require(any(o['kind']=='normal' for o in op['outcomes']['known']),'LINK normal continuation retained')
+        elif s['ordinaryContinuation']['availability']=='KNOWN':require(any(o['kind']=='normal' for o in op['outcomes']['known']),'LINK normal continuation retained')
+        if case.get('link_return'):require(any(o['kind']=='normal' for o in op['outcomes']['known']),'handwritten LINK return expectation independent of SP availability')
         if case.get('closed_value'):require(site['modelValueRemainder'] is False and site['valuePoint']['position']=='BEFORE','precise BEFORE observation')
         if case.get('unreadable'):require(site['interpretationUnknownRemainder'] and not site['candidates'],'unproved name area stays open')
         if case.get('gap'):require(case['gap'] in s['gapCodes'],'source diagnostic retained')
@@ -54,9 +55,21 @@ def oracle(case,sp,air,dependency,cfg):
         site=next(s for s in calls if s['operation']['localId'] in linked(source_call))
         require((site['reachability']=='REACHABLE')==case['after'],'actual downstream reachability')
         require([c['referenceName'] for c in site['candidates']]==(['AFTER'] if case['after'] else []),'actual downstream value/candidate, not edge count')
+    if case.get('activation_return') and case['mode']!='disabled':
+        # A later opaque COBOL CALL may reach other paragraphs through its open remainder.
+        # Check the CICS activation's actual destination, then the downstream query above.
+        after_source=next(s for s in sp['statements'] if s['variant']=='CALL' and s['target'].get('text')=='AFTER')
+        after_labels={seq['label']['localId'] for seq in u['sequences'] if seq['terminator']['header']['id']['localId'] in linked(after_source)}
+        for s in source:
+            require(s['localContinuation']['availability']=='NONE' and s['ordinaryContinuation']['availability']=='KNOWN','performed completion distinct from ordinary continuation')
+            op=ops[next(site['operation']['localId'] for site in cics if site['operation']['localId'] in linked(s))]
+            remainder=op['outcomes']['remainder']['scope']
+            require(remainder['kind']=='union' and any(m['kind']=='labels' and {x['localId'] for x in m['labels']}==after_labels for m in remainder['members']),'local CICS error returns to activation resume')
+            if s['command']=='LINK':require({o['label']['localId'] for o in op['outcomes']['known'] if o['kind']=='normal'}==after_labels,'LINK success returns to activation resume')
+    if case.get('perform_disabled'):require(all(s['gapCodes'] and not s['procedures'] for s in sp['statements'] if s['variant']=='PERFORM_PROCEDURE'),'disabled CICS supplies no paragraph control proof')
     if case.get('perform'):require(all(not s['gapCodes'] for s in sp['statements'] if s['variant']=='PERFORM_PROCEDURE'),'supported performed range')
     if case.get('copy'):require(any(s['header']['provenance']['includeChain'] for s in source),'COPY provenance through target site')
-    if case['mode']=='disabled':require(sum(s['variant']=='OBSERVED' for s in sp['statements'])>=2,'disabled extension remains opaque')
+    if case['mode']=='disabled':require(sum(s['variant']=='OBSERVED' for s in sp['statements'])>=case.get('observed',2),'disabled extension remains opaque')
     return {'sites':len(cics),'names':sorted({c['referenceName'] for s in cics for c in s['candidates']}),'sourceOpen':sum(s['sourceValueRemainder'] for s in cics)}
 
 
@@ -77,6 +90,13 @@ def run(args):
         for filename,content in case['books'].items():(folder/filename).write_text(content)
         execute(['java','-Xmx1g','-cp',paths['frontend'],'io.github.gustavo2358.cobolexplorer.ExplorerMain','--source',source,'--copybooks',folder,'--output',folder/'frontend','--storage-profile','ibm-enterprise-6.4-fixed-display-1047@1','--cics-entry-mode',case['mode']],args.frontend,folder/'frontend.log')
         sp=folder/'frontend/cobol-semantic-product.json';air=folder/'air.json';cfg=folder/'cfg.json';deps=folder/'dependencies.json'
+        if case.get('missing_return'):
+            document=json.loads(sp.read_text())
+            for statement in document['statements']:
+                if statement['variant']=='CICS_PROGRAM_CONTROL':
+                    for field in ['localContinuation','ordinaryContinuation']:
+                        statement[field]['availability']='UNAVAILABLE';statement[field]['statement']=None
+            sp=folder/'missing-return.sp.json';sp.write_text(json.dumps(document))
         original=hashlib.sha256(sp.read_bytes()).digest()
         execute(['java','-Xmx1g','-cp',paths['lower'],'io.github.gustavo2358.lower.adapters.cli.CobolLower',sp,air],args.lower,folder/'lower.log')
         require(hashlib.sha256(sp.read_bytes()).digest()==original,'lower never rewrites SP')

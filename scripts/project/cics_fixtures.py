@@ -30,6 +30,12 @@ def fixtures():
     result['handler']=one("EXEC CICS HANDLE CONDITION ERROR(ERR-PARA) END-EXEC.\nEXEC CICS XCTL PROGRAM('PROGA') END-EXEC.\nCALL 'AFTER'.\nGOBACK.\nERR-PARA.\nGOBACK.",after=True)
     for command in ['LINK','XCTL']:
         result['perform-'+command.lower()]=one("MAIN.\nPERFORM BODY-PARA THRU BODY-PARA.\nCALL 'AFTER'.\nGOBACK.\nBODY-PARA.\nEXEC CICS "+command+" PROGRAM('PROGA') NOHANDLE END-EXEC.\nMOVE 'PROGB' TO WS-PGM.",after=True,perform=True)
+    result['link-paragraph']=dict(one("MAIN-PARA.\nEXEC CICS LINK PROGRAM('PROGA') END-EXEC.\nAFTER-PARA.\nCALL 'AFTER'.\nGOBACK.", after=True, link_return=True), mode='new-logical-level')
+    result['link-unavailable']=dict(result['link-paragraph'],link_return=False,missing_return=True)
+    for command in ['LINK','XCTL']:
+        key='perform-last-'+command.lower()
+        result[key]=one("MAIN.\nPERFORM BODY-PARA THRU BODY-PARA.\nCALL 'AFTER'.\nGOBACK.\nBODY-PARA.\nEXEC CICS "+command+" PROGRAM('PROGA') NOHANDLE END-EXEC.\nUNPERFORMED.\nCALL 'OUTSIDE'.\nGOBACK.", after=True, perform=True, activation_return=True)
+        result[key+'-disabled']=dict(result[key], mode='disabled', names=[], count=0, perform=False, perform_disabled=True, observed=1)
     for suffix, data, target in [('short','01 WS-PGM PIC X(5).','WS-PGM'),('dynamic',d+'\n01 IDX PIC 9.','WS-PGM(IDX:8)'),('codec','01 WS-PGM PIC N(8).','WS-PGM')]:
         result[suffix]=dict(source=source(data,"EXEC CICS LINK PROGRAM("+target+") END-EXEC.\nGOBACK."),names=[],books={},mode='unknown',unreadable=True)
     result['slice']=dict(source=source('01 WS-PGM PIC X(10).',"MOVE 'XXPROGA   ' TO WS-PGM.\nEXEC CICS LINK PROGRAM(WS-PGM(3:8)) NOHANDLE END-EXEC.\nGOBACK."),names=['PROGA'],books={},mode='unknown',closed_value=True)

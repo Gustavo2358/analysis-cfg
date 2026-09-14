@@ -1,0 +1,21 @@
+frontend be2b74bff2a37c3970a0e5f754a77ab430cd7cd8
+lower 6837010f27ffee62fcef16ec7573da4a3a72d46d
+cfg 4962eb677e37b7b53f0ac43007ab4b69093494f8
+link-literal PASS {"sites": 1, "names": ["PROGA"], "sourceOpen": 1}
+before-overlap PASS {"sites": 1, "names": ["PROGA"], "sourceOpen": 1}
+after-overlap PASS {"sites": 1, "names": ["PROGA"], "sourceOpen": 1}
+overlay PASS {"sites": 1, "names": ["PROGA"], "sourceOpen": 1}
+if PASS {"sites": 1, "names": ["PROGA", "PROGB"], "sourceOpen": 1}
+mixed PASS {"sites": 2, "names": ["PROGA", "PROGB"], "sourceOpen": 2}
+xctl-default PASS {"sites": 1, "names": ["PROGA"], "sourceOpen": 1}
+xctl-unknown PASS {"sites": 1, "names": ["PROGA"], "sourceOpen": 1}
+xctl-nohandle PASS {"sites": 1, "names": ["PROGA"], "sourceOpen": 1}
+xctl-resp PASS {"sites": 1, "names": ["PROGA"], "sourceOpen": 1}
+perform-link PASS {"sites": 1, "names": ["PROGA"], "sourceOpen": 1}
+perform-xctl PASS {"sites": 1, "names": ["PROGA"], "sourceOpen": 1}
+link-paragraph PASS {"sites": 1, "names": ["PROGA"], "sourceOpen": 1}
+link-unavailable PASS {"sites": 1, "names": ["PROGA"], "sourceOpen": 1}
+perform-last-link PASS {"sites": 1, "names": ["PROGA"], "sourceOpen": 1}
+perform-last-link-disabled PASS {"sites": 0, "names": [], "sourceOpen": 0}
+perform-last-xctl PASS {"sites": 1, "names": ["PROGA"], "sourceOpen": 1}
+perform-last-xctl-disabled PASS {"sites": 0, "names": [], "sourceOpen": 0}

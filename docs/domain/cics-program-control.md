@@ -40,7 +40,7 @@ CicsTargetTimingTest proves real physical RD/value facts before the Invoke and
 unknown writes at its local successor, including overlapping COMMAREA.
 
 Local W4 acceptance uses `scripts/project/e2e_cics_program_control.py` with prepared
-frontend/lower runtime classpaths and an isolated Maven repository. Its 27 source
+frontend/lower runtime classpaths and an isolated Maven repository. Its original 27 source
 cases traverse all production CLIs and independently check C01–C18 together with
 the parser, version/capability and query tests. `e2e_cics_cohort.py` checks the four
 unchanged CardDemo sources at the documented upstream SHA; source incompleteness
@@ -53,3 +53,10 @@ GREEN is required. Use an isolated checkout with no concurrent build or consumer
 The other control challenges use the independent E2E expectations: LINK retains
 normal return, XCTL has no success return, RESP/NOHANDLE remains reachable, default
 entry with its explicit premise is unreachable, and unknown handlers remain open.
+
+Review remediation adds six selected cases, using SP 2.14.0 and the existing
+prepared-build runner: ordinary paragraph return, missing LINK return destination,
+and LINK/XCTL as the last performed statement with the extension active/disabled.
+The oracle checks actual downstream reachability and candidate values, plus the
+activation destination. It does not infer absence of continuation from edge count
+or from a missing SP successor. See [review evidence](../evals/cics-review.md).

@@ -124,7 +124,7 @@
         "git_blob_sha1": "a33cb30bc1979b60ff59cdcf0b1a22e8c9778166"
       }
     ],
-    "baseline_assessment": "Merged W0\u2013W5 normative baseline; no normative change in W6."
+    "baseline_assessment": "Merged W0–W5 normative baseline; no normative change in W6."
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
@@ -244,9 +244,9 @@
       "docs/domain/cobol-semantic-product.md",
       "docs/work/history/WORK-SEMANTIC-PRODUCT-003.md"
     ],
-    "semantic_product_version": "2.13.0",
+    "semantic_product_version": "2.14.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "d36b145b10285e260fe6fb832c7e55cee0e1f6c0",
+    "commit": "be2b74bff2a37c3970a0e5f754a77ab430cd7cd8",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -262,7 +262,7 @@
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "CICS campaign draft; technical evidence recorded in product tests",
-    "commit": "f1d8f90d24d9f20d48b0e80a8960c152717d914f",
+    "commit": "60af22d33c66af3bd897720a1518334c65418cd0",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
