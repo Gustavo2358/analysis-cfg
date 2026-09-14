@@ -9,6 +9,12 @@ class DependencyWireTests(unittest.TestCase):
     def reject(self,change):
         d=copy.deepcopy(self.d);change(d)
         with self.assertRaises((ValueError,KeyError,TypeError)):validate(d)
+    def test_physical_range_query_keeps_before_point_without_object_id(self):
+        d=copy.deepcopy(self.d);d['sites'][0]['subject']=None
+        validate(d)
+        for point in (None,dict(d['sites'][0]['valuePoint'],position='AFTER')):
+            bad=copy.deepcopy(d);bad['sites'][0]['valuePoint']=point
+            with self.assertRaises((ValueError,KeyError,TypeError)):validate(bad)
     def test_real_cases(self):
         for name in ('dynamic-x8','literal','dynamic-no-move','orphan'):read(self.path.with_name(name+'.json'))
     def test_closed_wire_fields_enums_versions_null_ids_and_boolean(self):

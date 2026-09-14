@@ -17,8 +17,13 @@ query factory: `PreparedFacts.lookup` não cria demanda nem executa análise tar
 
 `CallDependencyPlan` visita uma vez o bucket indexado de `Operations.Invoke`,
 selecionando `category=program`, `namespace=cobol.program`. Registra grupos literal,
-computed `Read(ObjectPlace)` e formas não suportadas. Cada query computed usa o
-`ObjectId` nominal do target e `BEFORE(EntryId, Invoke.OperationId)`. O literal
+computed `Read(ObjectPlace)`, `Read(RegionSlice)` constante e formas não suportadas.
+Cada query computed usa `BEFORE(EntryId, Invoke.OperationId)`. Para ObjectPlace,
+`subject` é o ObjectId nominal. Para faixa física, `subject` é null e `valuePoint`
+permanece BEFORE: a operação AIR referenciada conserva region/offset/length/codec.
+Não se fabrica declaração nominal para a faixa. A combinação null/BEFORE é coberta
+pelo perfil regional; null/null continua exigindo forma não consultável ou unreachable.
+O literal
 declara apenas reachability. Um teste executa esse plano sem sequer instalar um
 `PossibleValuesProvider`. Dois consumidores e requests duplicados reutilizam a
 mesma `AnalysisKey` e os batches W4, com uma execução de valores por chave.
