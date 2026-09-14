@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Independent strict parser/oracle for analysis-dependency-result 1.0.0."""
+"""Independent strict parser/oracle for analysis-dependency-result 1.1.0."""
 import argparse
 import json
 import re
@@ -76,16 +76,16 @@ def refs(values, domain=None):
 def supports(values):
     for s in array(values):
         fields(s, 'kind producer origin premises')
-        require(s['kind'] in ('VALUE_PRODUCER', 'CALL_LITERAL'), 'support kind')
+        require(s['kind'] in ('VALUE_PRODUCER', 'CALL_LITERAL', 'CICS_LITERAL'), 'support kind')
         identity(s['producer'], 'operation operand'); identity(s['origin'], 'origin'); refs(s['premises'], 'premise')
     ordered(values, lambda s: (id_order(s['producer']), id_order(s['origin'])))
 
 
-def candidate(c, raw=False):
+def candidate(c, raw=False, technology="COBOL"):
     fields(c, 'rawValue supports' if raw else 'referenceName rawValue supports')
     text(c['rawValue']); supports(c['supports']); require(bool(c['supports']), 'candidate without support')
     if not raw:
-        text(c['referenceName']); require(re.fullmatch(r'[A-Z_][A-Z0-9_@#$]{0,7}', c['referenceName']) is not None, 'noncanonical reference')
+        text(c['referenceName']); require(re.fullmatch(r'[A-Z0-9$@#]{1,8}' if technology=='CICS' else r'[A-Z_][A-Z0-9_@#$]{0,7}', c['referenceName']) is not None, 'noncanonical reference')
 
 
 def location(loc):
@@ -106,9 +106,12 @@ def location(loc):
 
 
 def site(s):
-    fields(s, 'caller entry sequence operation offset siteOrigin targetOrigin targetKind subject valuePoint reachability targetStatus rawCandidates candidates modelValueRemainder sourceValueRemainder interpretationUnknownRemainder effectiveUnknownRemainder openControlRemainder evidence provenance premises uncertaintyRefs')
+    fields(s, 'caller entry sequence operation offset siteOrigin targetOrigin technology command namespace nameProfile targetKind subject valuePoint reachability targetStatus rawCandidates candidates modelValueRemainder sourceValueRemainder interpretationUnknownRemainder effectiveUnknownRemainder openControlRemainder evidence provenance premises uncertaintyRefs')
     for name, domain in [('caller', 'unit'), ('entry', 'entry'), ('sequence', 'label'), ('operation', 'operation'), ('siteOrigin', 'origin'), ('targetOrigin', 'origin')]:
         identity(s[name], domain)
+    require((s['technology'],s['namespace']) in (('CICS','cics.program'),('COBOL','cobol.program')), 'technology namespace')
+    require(s['command'] in (('LINK','XCTL','UNKNOWN') if s['technology']=='CICS' else ('CALL',)), 'command')
+    text(s['nameProfile']); require(bool(s['nameProfile']), 'name profile')
     integer(s['offset']); require(s['targetKind'] in ('LITERAL', 'COMPUTED'), 'target kind')
     for name in ('sourceValueRemainder', 'interpretationUnknownRemainder', 'effectiveUnknownRemainder', 'openControlRemainder'):
         boolean(s[name])
@@ -122,9 +125,9 @@ def site(s):
         candidate(c, raw=True)
     ordered(s['rawCandidates'], lambda c: u16(c['rawValue']))
     for c in array(s['candidates']):
-        candidate(c)
+        candidate(c,technology=s['technology'])
         require({'rawValue': c['rawValue'], 'supports': c['supports']} in s['rawCandidates'], 'candidate-specific raw/support association')
-        interpreted = c['rawValue'].rstrip(' ') if s['targetKind'] == 'COMPUTED' else c['rawValue']
+        interpreted = c['rawValue'].rstrip(' ') if s['targetKind'] == 'COMPUTED' or s['technology']=='CICS' else c['rawValue']
         require(c['referenceName'] == interpreted, 'unauthorized name transformation')
     ordered(s['candidates'], lambda c: (u16(c['referenceName']), u16(c['rawValue'])))
     for c in s['rawCandidates']:
@@ -132,7 +135,7 @@ def site(s):
             require(support['producer'] in s['evidence'] and support['origin'] in s['provenance'], 'support refs lost')
             require(all(p in s['premises'] for p in support['premises']), 'premises lost')
             if s['targetKind'] == 'LITERAL':
-                require(support['kind'] == 'CALL_LITERAL' and support['producer'] == s['operation'] and support['origin'] == s['targetOrigin'], 'literal support')
+                require(support['kind'] == ('CICS_LITERAL' if s['technology']=='CICS' else 'CALL_LITERAL') and support['producer'] == s['operation'] and support['origin'] == s['targetOrigin'], 'literal support')
             else:
                 require(support['kind'] == 'VALUE_PRODUCER', 'computed support')
     require(all(s[n]['publication'] == s['caller']['publication'] for n in ('entry', 'sequence', 'operation', 'siteOrigin', 'targetOrigin')), 'site publication')
@@ -162,9 +165,9 @@ def site_order(s):
 
 def validate(d):
     fields(d, 'schema version airVersion publication interpretationProfile valuesProfile modelScope publicationInventory sites edges metrics origins artifacts sourceUncertaintyRefs')
-    require(d['schema'] == 'analysis-dependency-result' and d['version'] == '1.0.0' and d['airVersion'] == '2.0.0', 'schema/version')
+    require(d['schema'] == 'analysis-dependency-result' and d['version'] == '1.1.0' and d['airVersion'] == '2.0.0', 'schema/version')
     identity(d['publication'], 'publication')
-    require(d['interpretationProfile'] == 'cobol-zos-dynamic-call-minimal@1' and d['valuesProfile'] == 'scalar-text-effects@1' and d['modelScope'] == 'KNOWN_GRAPH_ENTRY', 'profiles/scope')
+    require(d['interpretationProfile'] == 'per-site' and d['valuesProfile'] == 'scalar-text-effects@1' and d['modelScope'] == 'KNOWN_GRAPH_ENTRY', 'profiles/scope')
     require(d['publicationInventory'] in ('COMPLETE', 'PARTIAL', 'UNAVAILABLE'), 'inventory')
     for s in array(d['sites']):
         site(s); require(s['caller']['publication'] == d['publication']['localId'], 'foreign site')

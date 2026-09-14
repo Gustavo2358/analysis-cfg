@@ -11,7 +11,7 @@ final class OpenControl {
         return invoke.outcomes().known().stream().allMatch(Control.Normal.class::isInstance)
             && (invoke.outcomes().remainder() instanceof Scopes.NoControl
                 || invoke.outcomes().remainder() instanceof Scopes.WithinControl w
-                    && (w.scope() instanceof Scopes.AllControl || w.scope() instanceof Scopes.UnitControl || w.scope() instanceof Scopes.LabelsControl));
+                    && (w.scope() instanceof Scopes.AllControl || w.scope() instanceof Scopes.UnitControl || w.scope() instanceof Scopes.LabelsControl || w.scope() instanceof Scopes.ControlUnion));
     }
     static boolean supportsOpaque(Operations.Opaque opaque) {
         return opaque.envelope().control().known().stream().allMatch(a -> a instanceof Control.JumpAlternative || a instanceof Control.Normal || a instanceof Control.ReturnAlternative);
@@ -27,7 +27,7 @@ final class OpenControl {
     static Scopes.ControlBound bound(ProgramIndex.Node node) {
         if(node.source() instanceof CfgNode.SequenceNode s) {
             if(s.source().terminator() instanceof Operations.Opaque o)return o.envelope().control().remainder();
-            if(s.source().terminator() instanceof Operations.Invoke i && i.outcomes().known().isEmpty())return i.outcomes().remainder();
+            if(s.source().terminator() instanceof Operations.Invoke i)return i.outcomes().remainder();
         }
         return Scopes.NoControl.INSTANCE;
     }

@@ -61,9 +61,10 @@ final class IndexBuilder {
         CfgGraph graph = result.graph().orElseThrow();
         valid(graph.publication() == snapshot, "foreign Publication instance");
         supported(snapshot.airVersion().equals(SemanticVersion.AIR_2_0_0), "unsupported AIR version");
+        var namePolicies = NamePolicies.extensions(snapshot);
         for (var capability : snapshot.capabilities().required()) {
             count.visit("requiredCapabilities");
-            supported(capability.equals(Capabilities.MEMORY_REGIONS) || capability.equals(Capabilities.IBM1047), "unsupported control capability");
+            supported(capability.equals(Capabilities.MEMORY_REGIONS) || capability.equals(Capabilities.IBM1047) || namePolicies.contains(capability), "unsupported control capability");
         }
         supported(policy.acceptsInventory(snapshot.coverage().inventory()), "unsupported publication inventory policy");
         declarations();

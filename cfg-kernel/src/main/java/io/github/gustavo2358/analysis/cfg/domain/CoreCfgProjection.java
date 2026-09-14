@@ -36,7 +36,8 @@ public final class CoreCfgProjection {
     public static List<CfgProjectionIssue> unsupported(Publication publication, ProjectionPolicy policy) {
         Objects.requireNonNull(policy, "policy");
         List<CfgProjectionIssue> issues = new ArrayList<>();
-        if (publication.capabilities().required().stream().anyMatch(c -> !supportsControlCapability(c))) {
+        var namePolicies = io.github.gustavo2358.air.model.NamePolicies.extensions(publication);
+        if (publication.capabilities().required().stream().anyMatch(c -> !supportsControlCapability(c) && !namePolicies.contains(c))) {
             issues.add(new CfgProjectionIssue(CfgProjectionIssue.Code.EXTENSION_SEMANTICS_OUTSIDE_SLICE,
                     publication.id()));
         }
@@ -73,7 +74,7 @@ public final class CoreCfgProjection {
         return invoke.outcomes().known().stream().allMatch(Control.Normal.class::isInstance)
                 && (invoke.outcomes().remainder() instanceof Scopes.NoControl
                     || invoke.outcomes().remainder() instanceof Scopes.WithinControl bound
-                        && (bound.scope() instanceof Scopes.AllControl || bound.scope() instanceof Scopes.UnitControl || bound.scope() instanceof Scopes.LabelsControl));
+                        && (bound.scope() instanceof Scopes.AllControl || bound.scope() instanceof Scopes.UnitControl || bound.scope() instanceof Scopes.LabelsControl || bound.scope() instanceof Scopes.ControlUnion));
     }
 
     public static boolean supportsOpaque(Operations.Opaque opaque) {
