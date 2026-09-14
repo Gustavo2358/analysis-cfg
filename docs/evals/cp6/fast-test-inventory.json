@@ -94,14 +94,15 @@
       "wholeWriteFeedsDisplacedCallViewBeforeForeignMayEffects",
       "literalOnlySitesDoNotDemandRegionalValues",
       "historicalScalarProfilesContinueToRefuseRegions",
-      "fixedSliceCallQueriesOnlyItsBytesBeforeForeignEffects"
+      "fixedSliceCallQueriesOnlyItsBytesBeforeForeignEffects",
+      "literalCallsSurviveUnknownMixedStorageWithoutDemandingValueAnalysis"
     ],
     "io.github.gustavo2358.analysis.adapters.RegionalWireTest": [
       "fileProductCarriesIndependentCompositionAndCopyIntervals",
       "inventoryAndQueryPermutationPreserveTheEntireWire",
       "hugeUnknownTailZeroAndLogicalCellsRetainTheirDistinctWireShapes",
       "detachedResultRetentionContainsOnlyValuesMetadataAndReferenceIds",
-      "regionalLiteralSeedsRemainAnExplicitValidatorLimit",
+      "regionalLiteralSeedsKeepEntryIdentityAndNonoverlappingWireCovers",
       "distinctEntryPathsKeepRegionalContentsAndReachabilitySeparate"
     ]
   },
@@ -381,6 +382,7 @@
     ],
     "io.github.gustavo2358.analysis.values.RegionalInitialTest": [
       "partialOverlappingInitialConditionsAreSimultaneousAndRetainAllSupports",
+      "detachedAlternativesPreserveNonoverlappingWireFragmentsAndEveryInitialOrigin",
       "partialKillDropsOnlyCoveredInitialSupportsAndCopyRetainsTheRest",
       "unspecifiedBytesRemainUnknownWhileKnownChildCanBeRead",
       "overwriteKillsInitialDefinitionAcrossLoopAndInitialLabelBackedge"
@@ -392,6 +394,9 @@
       "noNormalOutcomeCannotInventContinuationOrEraseTheBeforeRead",
       "explicitDivergenceKeepsTheExistingUnsupportedControlBoundary",
       "aliasScopeUsesPhysicalIntersection"
+    ],
+    "io.github.gustavo2358.analysis.values.MixedStorageTest": [
+      "unknownRegionAndCodecRetainInventoryAndInterfereOnlyWithoutSeparationProof"
     ]
   },
   "cfg-adapters": {

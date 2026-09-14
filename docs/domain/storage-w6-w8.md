@@ -29,3 +29,10 @@ external effects. A normal-outcome override replaces otherwise effects on that
 outcome; absent normal outcomes never create a normal continuation. CALL target
 reads are before effects. ExternalStorageScopeTest supplies six independent
 oracles for union/alias, private/all, outcome MUST, disjoint base and no known normal outcome. Explicit Diverge retains UNSUPPORTED_INPUT (existing control boundary); an open LabelsControl outcome creates only its allowed unknown destinations, never an invented normal edge.
+
+W7.3: o mesmo snapshot comporta Cell, Region conhecida, Region sem extensão e
+codec desconhecido. O havoc no componente opaco propaga interferência possível
+para bases sem separação provada; com DisjointStorage a precisão local permanece.
+O oracle AIR independente testa os dois casos, incluindo PRIVATE sem prova.
+CALL literal preserva candidatos e dispensa a execução de values mesmo nesse
+inventário misto. Declarações não suportadas continuam explícitas no produtor.

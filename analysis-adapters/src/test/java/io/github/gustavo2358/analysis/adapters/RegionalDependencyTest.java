@@ -69,6 +69,17 @@ class RegionalDependencyTest {
     @Test void literalOnlySitesDoNotDemandRegionalValues() {
         var result=new DependencyAnalysis().prepare(group(true));assertEquals(2,result.sites().size());assertEquals(0L,result.metrics().get("possibleValuesRuns"));
     }
+    @Test void literalCallsSurviveUnknownMixedStorageWithoutDemandingValueAnalysis() {
+        var p=group(true);var u=p.units().getFirst();var o=origin(p.id());var gap=new UncertaintyId(p.id(),"unknown-storage");var typeGap=new UncertaintyId(p.id(),"unknown-type");var open=new StorageId(p.id(),"open-storage");var cell=new StorageId(p.id(),"legacy-cell");
+        var objects=new ArrayList<>(u.objects());objects.add(new Memory.ObjectDeclaration(new ObjectId(u.id(),"unsupported"),Optional.empty(),new Types.UnknownType(typeGap),new Memory.UnknownBinding(new Scopes.StorageMemory(List.of(open)),gap),Memory.Visibility.UNKNOWN,o,Evidence.CoverageStatus.ABSTRACTED,header(u.id(),"meta").precision()));
+        objects.add(new Memory.ObjectDeclaration(new ObjectId(u.id(),"legacy"),Optional.empty(),Types.known(Types.Builtin.INT),new Memory.CellBinding(cell),Memory.Visibility.PRIVATE,o,Evidence.CoverageStatus.MODELED,header(u.id(),"meta").precision()));
+        var storage=new ArrayList<>(p.storage());storage.add(new Memory.Region(new Memory.StorageHeader(open,Optional.of(u.id()),Memory.Lifetime.PERSISTENT,Memory.Visibility.UNKNOWN,o),Optional.empty(),Optional.of(gap)));storage.add(new Memory.Cell(new Memory.StorageHeader(cell,Optional.of(u.id()),Memory.Lifetime.PERSISTENT,Memory.Visibility.PRIVATE,o),Types.known(Types.Builtin.INT)));
+        var uncertainties=List.of(new Evidence.Uncertainty(gap,"UNSUPPORTED_STORAGE",List.of(Evidence.Dimension.STORAGE),new Scopes.UnitScope(u.id()),"unknown physical representation",o),new Evidence.Uncertainty(typeGap,"TYPE_UNKNOWN",List.of(Evidence.Dimension.VALUES),new Scopes.UnitScope(u.id()),"unknown declaration type",o));
+        p=new Publication(p.id(),p.airVersion(),p.capabilities(),p.artifacts(),List.of(unit(u.id(),u.entries(),u.sequences(),objects)),storage,p.resources(),p.artifactRelations(),p.origins(),p.coverage(),uncertainties,p.premises());
+        var validation=io.github.gustavo2358.air.validation.AirValidator.validate(p);assertEquals(io.github.gustavo2358.air.validation.ValidationResult.Status.STRUCTURALLY_VALID,validation.status(),validation.issues().toString());
+        var result=new DependencyAnalysis().prepare(p);assertEquals(2,result.sites().size());assertEquals(0L,result.metrics().get("possibleValuesRuns"));
+        for(var site:result.sites())assertFalse(site.candidates().isEmpty());
+    }
     @Test void historicalScalarProfilesContinueToRefuseRegions() {
         var p=group(false);var cfg=W1dBoundaryTest.build(p);assertEquals(CfgBuildResult.Status.CFG_BUILT,cfg.status());
         var session=AnalysisSession.open(cfg,p,ProjectionPolicy.KNOWN_SUBSET,p.units().getFirst().entries()).session().orElseThrow();
