@@ -93,7 +93,8 @@
     "io.github.gustavo2358.analysis.adapters.RegionalDependencyTest": [
       "wholeWriteFeedsDisplacedCallViewBeforeForeignMayEffects",
       "literalOnlySitesDoNotDemandRegionalValues",
-      "historicalScalarProfilesContinueToRefuseRegions"
+      "historicalScalarProfilesContinueToRefuseRegions",
+      "fixedSliceCallQueriesOnlyItsBytesBeforeForeignEffects"
     ],
     "io.github.gustavo2358.analysis.adapters.RegionalWireTest": [
       "fileProductCarriesIndependentCompositionAndCopyIntervals",
@@ -372,6 +373,11 @@
       "zeroOneAndManyIterationsIncludeOverlappingCopiesAndUnknownRepair",
       "supportOnlyLoopChangesReachTheExitAndTwoExplicitResumesStaySeparate",
       "measuredFragmentCandidateAndReplayGrowthHasNoSemanticCutoff"
+    ],
+    "io.github.gustavo2358.analysis.values.RegionalFitTest": [
+      "exactFitPreservesOutsideBytesAndCapturesBeforeLaterSourceWrites",
+      "truncationCanRemoveAnUnknownTailWithoutInventingInputBytes",
+      "branchAlternativesRemainCorrelatedThroughFits"
     ]
   },
   "cfg-adapters": {

@@ -8,13 +8,16 @@ import io.github.gustavo2358.analysis.query.*;
 import io.github.gustavo2358.analysis.values.ValueFact;
 import io.github.gustavo2358.analysis.values.TextValueFact;
 import java.util.*;
+import io.github.gustavo2358.analysis.storage.StorageSubject;
+import io.github.gustavo2358.analysis.values.StorageValueFact;
 import static io.github.gustavo2358.analysis.dependencies.DependencySiteFact.*;
 
 /** Lookup-only consumer of the observations declared by CallDependencyPlan before execution. */
 final class CallDependencyConsumer implements FactConsumer<DependencySiteFact> {
     private final ObservationBatchId<LabelId,ReachabilityProvider.Fact> reach;
     private final ObservationBatchId<ObjectId,? extends TextValueFact> values;
-    CallDependencyConsumer(ObservationBatchId<LabelId,ReachabilityProvider.Fact> reach,ObservationBatchId<ObjectId,? extends TextValueFact> values){this.reach=reach;this.values=values;}
+    private final ObservationBatchId<StorageSubject,StorageValueFact> storageValues;
+    CallDependencyConsumer(ObservationBatchId<LabelId,ReachabilityProvider.Fact> reach,ObservationBatchId<ObjectId,? extends TextValueFact> values,ObservationBatchId<StorageSubject,StorageValueFact> storageValues){this.reach=reach;this.values=values;this.storageValues=storageValues;}
     public void consume(SiteView site,PreparedFacts facts,FactSink<DependencySiteFact> sink) {
         var invoke=(Operations.Invoke)site.operation();boolean computed=invoke.target() instanceof Interactions.ComputedTarget;
         var reachable=lookup(facts,reach,CallDependencyPlan.reachQuery(site));
@@ -32,8 +35,14 @@ final class CallDependencyConsumer implements FactConsumer<DependencySiteFact> {
         else {
             if(computed) {
                 // Reconstruct the same immutable lookup key; PreparedFacts cannot request or execute work.
-                var query=CallDependencyPlan.valueQuery(site);subject=query.subject();point=query.point();
-                var value=lookup(facts,values,query);
+                TextValueFact value;
+                if(storageValues!=null) {
+                    var query=CallDependencyPlan.storageQuery(site);point=query.point();
+                    if(query.subject() instanceof StorageSubject.NamedObject object)subject=object.object();
+                    value=lookup(facts,storageValues,query);
+                } else {
+                    var query=CallDependencyPlan.valueQuery(site);subject=query.subject();point=query.point();value=lookup(facts,values,query);
+                }
                 if(value.reachability()!=ValueFact.Reachability.REACHABLE)throw new ConsumerException("reachability/value disagreement");
                 model=value.modelValueRemainder();source=value.sourceUnknownRemainder();evidence.addAll(value.evidence());origins.addAll(value.provenance());premises.addAll(value.premises());
                 for(var candidate:value.candidateSupports())raw.add(new RawCandidate(candidate.candidate().value(),candidate.producers().stream().map(s->new Support(SupportKind.VALUE_PRODUCER,s.evidence(),s.origin(),s.premises())).toList()));
@@ -45,7 +54,10 @@ final class CallDependencyConsumer implements FactConsumer<DependencySiteFact> {
             }
             status=candidates.isEmpty()?TargetStatus.OPEN_TARGET:TargetStatus.RESOLVED_CANDIDATES;
         }
-        if(computed&&CallDependencyPlan.readable(invoke)&&subject==null){var query=CallDependencyPlan.valueQuery(site);subject=query.subject();point=query.point();}
+        if(computed&&CallDependencyPlan.readable(invoke)&&point==null) {
+            if(storageValues!=null){var query=CallDependencyPlan.storageQuery(site);point=query.point();if(query.subject() instanceof StorageSubject.NamedObject object)subject=object.object();}
+            else {var query=CallDependencyPlan.valueQuery(site);subject=query.subject();point=query.point();}
+        }
         raw.sort(Comparator.comparing(RawCandidate::rawValue));candidates.sort(Comparator.comparing(Candidate::referenceName).thenComparing(Candidate::rawValue));
         var uncertainties=new LinkedHashSet<>(invoke.header().uncertainties());if(policy instanceof Interactions.UnknownName unknown)uncertainties.add(unknown.uncertainty());
         sink.emit(new DependencySiteFact(site.entry().unit(),site.entry(),site.sequence(),site.operationId(),site.offset(),site.origin(),targetOrigin,

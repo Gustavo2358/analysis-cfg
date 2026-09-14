@@ -9,6 +9,7 @@ import io.github.gustavo2358.analysis.query.*;
 import io.github.gustavo2358.analysis.structure.AnalysisSession;
 import io.github.gustavo2358.analysis.values.*;
 import java.util.*;
+import io.github.gustavo2358.analysis.storage.*;
 
 /** Registers separate literal/computed consumers through the existing W4 planner. */
 public final class CallDependencyPlan {
@@ -20,7 +21,12 @@ public final class CallDependencyPlan {
             default -> false;
         };
     }
-    static boolean readable(Operations.Invoke i){return i.target() instanceof Interactions.ComputedTarget t&&t.name() instanceof Expressions.Read r&&r.place() instanceof Places.ObjectPlace;}
+    static boolean readable(Operations.Invoke i) {
+        if(!(i.target() instanceof Interactions.ComputedTarget t&&t.name() instanceof Expressions.Read r))return false;
+        return r.place() instanceof Places.ObjectPlace||r.place() instanceof Places.RegionSlice slice
+            &&slice.offset() instanceof Expressions.Literal offset&&offset.value() instanceof Values.IntValue
+            &&slice.length() instanceof Expressions.Literal length&&length.value() instanceof Values.IntValue;
+    }
     static boolean shape(Operations.Invoke i){return i.arguments().isEmpty()&&i.results().isEmpty();}
     static int group(Operations.Invoke i){return !shape(i)?2:i.target() instanceof Interactions.LiteralTarget?0:readable(i)?1:2;}
     static PointQuery<ObjectId> valueQuery(SiteView site) {
@@ -28,20 +34,35 @@ public final class CallDependencyPlan {
         var object=(Places.ObjectPlace)((Expressions.Read)target.name()).place();
         return new PointQuery<>(ProgramPoint.before(site.entry(),site.operationId()),object.object());
     }
+    static PointQuery<StorageSubject> storageQuery(SiteView site) {
+        var read=(Expressions.Read)((Interactions.ComputedTarget)((Operations.Invoke)site.operation()).target()).name();
+        StorageSubject subject;
+        if(read.place() instanceof Places.ObjectPlace object)subject=new StorageSubject.NamedObject(object.object());
+        else {
+            var slice=(Places.RegionSlice)read.place();var offset=((Values.IntValue)((Expressions.Literal)slice.offset()).value()).value();
+            var length=((Values.IntValue)((Expressions.Literal)slice.length()).value()).value();
+            subject=new StorageSubject.PhysicalRange(slice.region(),StorageRange.exact(offset,length),slice.codec());
+        }
+        return new PointQuery<>(ProgramPoint.before(site.entry(),site.operationId()),subject);
+    }
     static PointQuery<LabelId> reachQuery(SiteView site){return new PointQuery<>(ProgramPoint.before(site.entry(),site.operationId()),site.sequence());}
     public static List<ConsumerRegistration<DependencySiteFact>> select(AnalysisSession session){return select(session,"call",false);}
     /** Explicit registration namespace and duplicate requests support composition/testing of shared W4 batches. */
     public static List<ConsumerRegistration<DependencySiteFact>> select(AnalysisSession session,String namespace,boolean duplicateQuery) {
         // Only the indexed Invoke bucket is inspected, once, to avoid demanding values for literal-only units.
-        var groups=new HashMap<UnitId,Set<Integer>>();
+        var groups=new HashMap<UnitId,Set<Integer>>();var slicedUnits=new HashSet<UnitId>();
         for(var site:session.index().sites(Operations.Invoke.class)) {
-            var invoke=(Operations.Invoke)site.operation();if(selected(invoke))groups.computeIfAbsent(site.owner().id(),ignored->new HashSet<>()).add(group(invoke));
+            var invoke=(Operations.Invoke)site.operation();if(selected(invoke)) {
+                groups.computeIfAbsent(site.owner().id(),ignored->new HashSet<>()).add(group(invoke));
+                if(readable(invoke)&&((Expressions.Read)((Interactions.ComputedTarget)invoke.target()).name()).place() instanceof Places.RegionSlice)slicedUnits.add(site.owner().id());
+            }
         }
         var registrations=new ArrayList<ConsumerRegistration<DependencySiteFact>>();
         boolean regional=session.index().publication().storage().stream().anyMatch(Memory.Region.class::isInstance);
         for(var context:session.contexts()) {
             var entry=context.entry().id();String id=part(entry.publication().localId())+part(entry.unit().localId())+part(entry.localId());
-            var reach=ReachabilityProvider.batch("reach:"+id,entry);
+            var reach=ReachabilityProvider.batch("reach:"+id,entry);boolean physical=slicedUnits.contains(entry.unit());
+            var storageValues=StorageValuesProvider.batch("call-values:"+id,StorageValuesProvider.key(entry));
             ObservationBatchId<ObjectId,? extends TextValueFact> values=regional
                 ?RegionalValuesProvider.batch("call-values:"+id,RegionalValuesProvider.key(entry))
                 :PossibleValuesProvider.batch("call-values:"+id,PossibleValuesProvider.key(entry,PossibleValuesAnalysis.EFFECTS_PROFILE));
@@ -49,11 +70,16 @@ public final class CallDependencyPlan {
                 var keys=new ArrayList<AnalysisKey>();keys.add(reach.analysisKey());var batches=new ArrayList<String>();batches.add(reach.id());
                 List<SiteInterest.SiteQuery<?,?>> queries=new ArrayList<>();queries.add(new SiteInterest.SiteQuery<>(reach,CallDependencyPlan::reachQuery));
                 if(group==1) {
-                    keys.add(values.analysisKey());batches.add(values.id());
-                    var query=new SiteInterest.SiteQuery<>(values,CallDependencyPlan::valueQuery);queries.add(query);if(duplicateQuery)queries.add(query);
+                    if(physical) {
+                        keys.add(storageValues.analysisKey());batches.add(storageValues.id());
+                        var query=new SiteInterest.SiteQuery<>(storageValues,CallDependencyPlan::storageQuery);queries.add(query);if(duplicateQuery)queries.add(query);
+                    } else {
+                        keys.add(values.analysisKey());batches.add(values.id());
+                        var query=new SiteInterest.SiteQuery<>(values,CallDependencyPlan::valueQuery);queries.add(query);if(duplicateQuery)queries.add(query);
+                    }
                 }
                 var interest=new SiteInterest(Operations.Invoke.class,entry,s->selected((Operations.Invoke)s.operation())&&group((Operations.Invoke)s.operation())==group,queries);
-                registrations.add(new ConsumerRegistration<>(new ConsumerPlan(namespace+":"+id+":"+group,keys,batches),List.of(interest),List.of(),new CallDependencyConsumer(reach,group==1?values:null)));
+                registrations.add(new ConsumerRegistration<>(new ConsumerPlan(namespace+":"+id+":"+group,keys,batches),List.of(interest),List.of(),new CallDependencyConsumer(reach,group==1&&!physical?values:null,group==1&&physical?storageValues:null)));
             }
         }
         return List.copyOf(registrations);

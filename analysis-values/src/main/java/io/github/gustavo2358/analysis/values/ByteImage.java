@@ -64,6 +64,17 @@ final class ByteImage {
         for(var part:parts)part.range().intersect(selected).ifPresent(r->result.add(part.crop(r).shift(selected.start().negate())));
         return new ByteImage(selected.end().map(e->e.subtract(selected.start())),result);
     }
+    /** Total one-byte repertoire fit after the caller proves matching text codecs. */
+    ByteImage fit(BigInteger length,int pad,int producer) {
+        var size=extent.orElseThrow();var kept=size.min(length);
+        var result=new ArrayList<>(slice(StorageRange.exact(BigInteger.ZERO,kept)).parts);
+        if(length.compareTo(kept)>0) {
+            var count=length.subtract(kept);
+            var payload=new Values.BytesValue(Collections.nCopies(count.intValueExact(),pad));
+            result.add(new Part(StorageRange.exact(kept,count),Optional.of(payload),0,producer,kept,Map.of(),Set.of()));
+        }
+        return new ByteImage(Optional.of(length),result);
+    }
     ByteImage copied(int event) {return copied(event,BigInteger.ZERO);}
     ByteImage copied(int event,BigInteger sourceStart) {
         var result=new ArrayList<Part>();

@@ -51,6 +51,21 @@ class RegionalDependencyTest {
         assertEquals(List.of("PGM00001"),after.candidates().stream().map(DependencySiteFact.Candidate::referenceName).toList());
         assertTrue(after.modelValueRemainder(),"foreign MAY effects apply after target evaluation and preserve old possibilities");
     }
+    @Test void fixedSliceCallQueriesOnlyItsBytesBeforeForeignEffects() {
+        var p=group(false);var u=p.units().getFirst();var first=u.sequences().getFirst();var call=(Operations.Invoke)first.terminator();var old=(Interactions.ComputedTarget)call.target();
+        var read=(Expressions.Read)old.name();var codec=((Memory.ViewBinding)u.objects().getFirst().storage()).codec();
+        var slice=new Places.RegionSlice(((Places.ObjectPlace)read.place()).header(),p.storage().getFirst().header().id(),
+            new Expressions.Literal(operand(call.header().id(),"slice-offset",Operand.Role.VALUE_READ),new Values.IntValue(BigInteger.valueOf(6))),
+            new Expressions.Literal(operand(call.header().id(),"slice-length",Operand.Role.VALUE_READ),new Values.IntValue(BigInteger.valueOf(3))),codec,Types.known(Types.Builtin.TEXT));
+        var target=new Interactions.ComputedTarget(old.category(),old.namespace(),new Expressions.Read(read.header(),slice),old.namePolicy(),old.origin());
+        var changed=new Operations.Invoke(call.header(),call.action(),target,call.arguments(),call.results(),call.signature(),call.effectOperands(),call.effectBound(),call.outcomes(),call.contract());
+        var sequences=new ArrayList<>(u.sequences());sequences.set(0,new Sequence(first.label(),first.instructions(),changed,first.origin()));
+        var unit=new io.github.gustavo2358.air.model.Unit(u.id(),u.containingUnit(),u.objects(),u.visibleObjects(),u.entries(),sequences,u.completionPorts(),u.body(),u.bodyUnavailable(),u.coverage(),u.origin());
+        p=new Publication(p.id(),p.airVersion(),p.capabilities(),p.artifacts(),List.of(unit),p.storage(),p.resources(),p.artifactRelations(),p.origins(),p.coverage(),p.uncertainties(),p.premises());
+        var result=new DependencyAnalysis().prepare(p);var site=result.sites().stream().filter(x->x.operation().equals(call.header().id())).findFirst().orElseThrow();
+        assertEquals(List.of("PGM"),site.candidates().stream().map(DependencySiteFact.Candidate::referenceName).toList());assertFalse(site.modelValueRemainder());
+        assertEquals(1L,result.metrics().get("possibleValuesRuns"));assertNull(site.subject());assertNotNull(site.valuePoint());
+    }
     @Test void literalOnlySitesDoNotDemandRegionalValues() {
         var result=new DependencyAnalysis().prepare(group(true));assertEquals(2,result.sites().size());assertEquals(0L,result.metrics().get("possibleValuesRuns"));
     }

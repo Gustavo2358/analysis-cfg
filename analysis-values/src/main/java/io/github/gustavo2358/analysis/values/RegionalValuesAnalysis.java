@@ -23,6 +23,7 @@ public final class RegionalValuesAnalysis {
     private final Map<StorageId,Integer> ordinals=new HashMap<>();
     private final List<List<Integer>> groups;
     private final int[] groupOf,positionInGroup;
+    private final Map<StatementEffects.Write,StorageIndex.Resolution> preparedReads=new IdentityHashMap<>();
     private final Map<Operation,List<Plan>> operations=new IdentityHashMap<>();
     private final Map<Operation,Map<Control.OutcomeKey,List<Plan>>> outcomes=new IdentityHashMap<>();
     private final Map<Operation,List<Plan>> otherwise=new IdentityHashMap<>();
@@ -127,10 +128,7 @@ public final class RegionalValuesAnalysis {
         var allPlans=new ArrayList<Plan>();operations.values().forEach(allPlans::addAll);otherwise.values().forEach(allPlans::addAll);
         outcomes.values().forEach(m->m.values().forEach(allPlans::addAll));initial.values().forEach(allPlans::addAll);
         for(var plan:allPlans)if(plan.target.sourceApplicable()) {
-            StorageIndex.Resolution reads=null;
-            if(plan.write.source() instanceof StatementEffects.CapturedBytes copy)reads=copy.source();
-            else if(plan.target.location().range().isEmpty()&&plan.write.source() instanceof StatementEffects.ExpressionSource expression&&expression.value() instanceof Expressions.Read read)
-                reads=effects.storage().resolve(read.place());
+            var reads=readSource(plan.write);
             if(reads!=null)for(var source:reads.candidates()) {
                 capturedGaps.computeIfAbsent(source.location(),this::captureGaps);
                 int a=representative(parent,ordinals.get(source.location().base().id()));
@@ -142,6 +140,14 @@ public final class RegionalValuesAnalysis {
         for(int i=0;i<bases.size();i++)components.computeIfAbsent(representative(parent,i),ignored->new ArrayList<>()).add(i);
         groups=components.values().stream().map(List::copyOf).toList();groupOf=new int[bases.size()];positionInGroup=new int[bases.size()];
         for(int g=0;g<groups.size();g++)for(int i=0;i<groups.get(g).size();i++){int ordinal=groups.get(g).get(i);groupOf[ordinal]=g;positionInGroup[ordinal]=i;}
+    }
+    private StorageIndex.Resolution readSource(StatementEffects.Write write) {
+        if(write.source() instanceof StatementEffects.CapturedBytes copy)return copy.source();
+        return preparedReads.computeIfAbsent(write,w->{
+            if(!(w.source() instanceof StatementEffects.ExpressionSource e))return null;
+            Expression value=e.value();if(value instanceof Expressions.FitText fit)value=fit.value();
+            return value instanceof Expressions.Read read?effects.storage().resolve(read.place()):null;
+        });
     }
     private static int representative(int[] parent,int member) {
         int root=member;while(parent[root]!=root)root=parent[root];
@@ -259,6 +265,21 @@ public final class RegionalValuesAnalysis {
             }
             if(source instanceof StatementEffects.UnknownSource u)return Set.of(unknown(target,u.reason(),plan.event));
             var expression=((StatementEffects.ExpressionSource)source).value();
+            if(expression instanceof Expressions.FitText fit&&fit.value() instanceof Expressions.Read
+                    &&target.range().isPresent()&&target.range().get().end().map(e->e.subtract(target.range().get().start())).filter(fit.length()::equals).isPresent()) {
+                var reads=readSource(plan.write);
+                var codecs=plan.write.destination().candidates().stream().filter(c->c.location().equals(target)).map(StorageIndex.Candidate::codec).distinct().toList();
+                if(reads.candidates().size()==1&&reads.remainder() instanceof Scopes.NoMemory
+                        &&codecs.size()==1&&codecs.getFirst().filter(MemoryCodecs::isIbm1047).isPresent()) {
+                    var candidate=reads.candidates().getFirst();var range=candidate.location().range();
+                    var pad=MemoryCodecs.encodeText(codecs.getFirst().orElseThrow(),new Values.TextValue(fit.pad()),BigInteger.ONE);
+                    if(range.isPresent()&&range.get().end().isPresent()&&candidate.codec().filter(MemoryCodecs::isIbm1047).isPresent()&&pad.status()==MemoryCodecs.Status.EXACT) {
+                        int ordinal=ordinals.get(candidate.location().base().id());
+                        var image=((Bytes)capture(content(captured,ordinal),candidate.location())).image().slice(range.get()).copied(plan.event,range.get().start());
+                        return Set.of(new Bytes(image.fit(fit.length(),pad.value().orElseThrow().octets().getFirst(),plan.event)));
+                    }
+                }
+            }
             if(expression instanceof Expressions.Literal literal) {
                 var v=literal.value();
                 if(target.range().isEmpty())return Set.of(v instanceof Values.TextValue t
@@ -348,7 +369,7 @@ public final class RegionalValuesAnalysis {
         }
         var captures=new HashMap<Integer,Set<CapturedRead>>();
         for(var entry:part.capturedOffsets().entrySet()) {
-            var event=eventDetails.get(entry.getKey());var source=((StatementEffects.CapturedBytes)event.write().source()).source().candidates().getFirst().location();
+            var event=eventDetails.get(entry.getKey());var source=readSource(event.write()).candidates().getFirst().location();
             var destination=event.target().location();var portions=new HashSet<CapturedRead>();
             for(var offset:entry.getValue()) {
                 var src=new StorageIndex.Location(source.base(),Optional.of(StorageRange.exact(offset,length.orElseThrow())));
