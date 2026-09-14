@@ -93,14 +93,16 @@
     "io.github.gustavo2358.analysis.adapters.RegionalDependencyTest": [
       "wholeWriteFeedsDisplacedCallViewBeforeForeignMayEffects",
       "literalOnlySitesDoNotDemandRegionalValues",
-      "historicalScalarProfilesContinueToRefuseRegions"
+      "historicalScalarProfilesContinueToRefuseRegions",
+      "fixedSliceCallQueriesOnlyItsBytesBeforeForeignEffects",
+      "literalCallsSurviveUnknownMixedStorageWithoutDemandingValueAnalysis"
     ],
     "io.github.gustavo2358.analysis.adapters.RegionalWireTest": [
       "fileProductCarriesIndependentCompositionAndCopyIntervals",
       "inventoryAndQueryPermutationPreserveTheEntireWire",
       "hugeUnknownTailZeroAndLogicalCellsRetainTheirDistinctWireShapes",
       "detachedResultRetentionContainsOnlyValuesMetadataAndReferenceIds",
-      "regionalLiteralSeedsRemainAnExplicitValidatorLimit",
+      "regionalLiteralSeedsKeepEntryIdentityAndNonoverlappingWireCovers",
       "distinctEntryPathsKeepRegionalContentsAndReachabilitySeparate"
     ]
   },
@@ -190,7 +192,7 @@
     "io.github.gustavo2358.analysis.storage.ReachingDefinitionsTest": [
       "invocationTargetIsObservedBeforeNormalEffectsAndOutcomeReplay",
       "entryDefinitionsAreSeededOnceAndStaySeparateAcrossContexts",
-      "regionalLiteralInitializerRemainsExplicitValidatorLimit",
+      "regionalLiteralInitializerProducesOneRangedEntryDefinition",
       "essentialPartialKillHasIndependentManualContributedRanges",
       "mandatoryUnknownPartialKillsOnlyItsRangeAndMayRetainsOldDefinition",
       "reachedUnknownAndEmptyBatchRemainExplicitAndReplayIsShared"
@@ -372,6 +374,29 @@
       "zeroOneAndManyIterationsIncludeOverlappingCopiesAndUnknownRepair",
       "supportOnlyLoopChangesReachTheExitAndTwoExplicitResumesStaySeparate",
       "measuredFragmentCandidateAndReplayGrowthHasNoSemanticCutoff"
+    ],
+    "io.github.gustavo2358.analysis.values.RegionalFitTest": [
+      "exactFitPreservesOutsideBytesAndCapturesBeforeLaterSourceWrites",
+      "truncationCanRemoveAnUnknownTailWithoutInventingInputBytes",
+      "branchAlternativesRemainCorrelatedThroughFits"
+    ],
+    "io.github.gustavo2358.analysis.values.RegionalInitialTest": [
+      "partialOverlappingInitialConditionsAreSimultaneousAndRetainAllSupports",
+      "detachedAlternativesPreserveNonoverlappingWireFragmentsAndEveryInitialOrigin",
+      "partialKillDropsOnlyCoveredInitialSupportsAndCopyRetainsTheRest",
+      "unspecifiedBytesRemainUnknownWhileKnownChildCanBeRead",
+      "overwriteKillsInitialDefinitionAcrossLoopAndInitialLabelBackedge"
+    ],
+    "io.github.gustavo2358.analysis.values.ExternalStorageScopeTest": [
+      "namedUnionMayAffectsOnlyProvedPrefixAndKeepsOldCandidate",
+      "privateStorageIsIncludedByAnExplicitAllMemoryEffect",
+      "normalOutcomeMustOverridesBroadOtherwiseAndKillsOnlyItsRange",
+      "noNormalOutcomeCannotInventContinuationOrEraseTheBeforeRead",
+      "explicitDivergenceKeepsTheExistingUnsupportedControlBoundary",
+      "aliasScopeUsesPhysicalIntersection"
+    ],
+    "io.github.gustavo2358.analysis.values.MixedStorageTest": [
+      "unknownRegionAndCodecRetainInventoryAndInterfereOnlyWithoutSeparationProof"
     ]
   },
   "cfg-adapters": {

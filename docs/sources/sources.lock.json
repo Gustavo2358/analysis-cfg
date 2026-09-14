@@ -3,10 +3,10 @@
   "observed_on": "2026-09-13",
   "analysis_ir": {
     "repository": "Gustavo2358/analysis-ir",
-    "commit": "a9287917241a70665ad8d3d32d974928690e69f3",
+    "commit": "31893d1f4d203d19a61a750e2c4220120d9dab84",
     "semantic_version": "2.0.0",
     "role": "normative",
-    "canonical_ref": "feat/storage-semantics-st-w0-w5",
+    "canonical_ref": "main",
     "upstream_review": {
       "pull_request": 2,
       "state": "merged",
@@ -23,7 +23,7 @@
       "targets_air_version": "2.0.0",
       "path": "bindings/json-v1.md",
       "review_path": "bindings/revisao-json-v1.md",
-      "checked_commit": "a9287917241a70665ad8d3d32d974928690e69f3",
+      "checked_commit": "31893d1f4d203d19a61a750e2c4220120d9dab84",
       "implemented_in_analysis_cfg": false
     },
     "files": [
@@ -124,17 +124,17 @@
         "git_blob_sha1": "a33cb30bc1979b60ff59cdcf0b1a22e8c9778166"
       }
     ],
-    "baseline_assessment": "ST-W1: optional explicit IBM1047 extension; existing AIR/binding forms unchanged. Draft PR #4, not merged. Historical review metadata retained."
+    "baseline_assessment": "Merged W0\u2013W5 normative baseline; no normative change in W6."
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "acbe927023b6652ff5bb41a0aa5ef368f28bcc0e",
+    "commit": "87122046b7fd647a4100b8475b642a9d41464bb8",
     "canonical_ref": "main",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
     "analysis_ir": {
       "semantic_version": "2.0.0",
-      "commit": "a9287917241a70665ad8d3d32d974928690e69f3"
+      "commit": "31893d1f4d203d19a61a750e2c4220120d9dab84"
     },
     "maven": {
       "group_id": "io.github.gustavo2358",
@@ -191,7 +191,7 @@
         "path": "air-json/pom.xml",
         "artifact_id": "air-json",
         "role": "shared_codec_4B_scalar_assign_consumed_by_cfg_adapters",
-        "coverage": "ST-W1 regional constant bounds, Region/View/alias, bytes, CopyBytes and explicit IBM1047; historical scalar/control forms preserved"
+        "coverage": "ST-W1 regional constant bounds, Region/View/alias, bytes, CopyBytes and explicit IBM1047; historical scalar/control forms preserved; W6 generic fit_text roundtrip with explicit pad and exact length"
       }
     },
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -244,9 +244,9 @@
       "docs/domain/cobol-semantic-product.md",
       "docs/work/history/WORK-SEMANTIC-PRODUCT-003.md"
     ],
-    "semantic_product_version": "2.8.0",
+    "semantic_product_version": "2.12.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "58d3aa919f62fae0c2c297d78fbf96d74fe5dde4",
+    "commit": "8533fc36c30797e9631481a59822dfa9e67cdd56",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -256,13 +256,13 @@
       "contract": "2.1.0",
       "scope": "local unconditional paragraph identity and explicit entry; G1-G5 and 1/2/5/40"
     },
-    "storage_contract_version": "1.1.0",
-    "canonical_ref": "feat/storage-semantics-st-w0-w5"
+    "storage_contract_version": "1.3.0",
+    "canonical_ref": "main"
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "verified",
-    "commit": "d337a40a1d98a6d0d17d09b39f13b253cc429e19",
+    "commit": "5fc7ca9776ab440fd2f16758fc5d3becd090e721",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -274,7 +274,7 @@
     "goto_validation": {
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
     },
-    "canonical_ref": "feat/storage-semantics-st-w0-w5"
+    "canonical_ref": "main"
   },
   "external": [
     {
@@ -304,8 +304,8 @@
     }
   ],
   "storage_campaign": {
-    "id": "ST-20260913-01",
-    "status": "ST-W0..W5 implementation; qualification is recorded in campaign receipts; human review and merge remain pending",
+    "id": "ST-W6-W8",
+    "status": "W6 development; local feature checkpoints, no merge; G2 and W7/W8 pending",
     "profile": "ibm-enterprise-6.4-fixed-display-1047@1",
     "authority": "Existing AIR 2.0.0 plus optional IBM1047; source semantic facts owned by frontend, translated by lower"
   }

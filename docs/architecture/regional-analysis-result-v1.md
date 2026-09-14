@@ -192,3 +192,9 @@ exato daquele codec, sem alegar que valida todos os textos de todos os codecs.
 O golden manual também rejeita texto fabricado que concorde com seus próprios bytes.
 Os testes Python e Java pequenos estão no FAST; corpus e mutação de domínio são
 obrigações adicionais da qualificação W5.
+
+W7 simultaneous initialization retains the nonoverlapping-fragment contract.
+For several equal initial origins on an interval, observations publish complete
+fragment covers whose union retains every contribution. All covers describe the
+same byte image; their inventory order is not an execution order. The domain
+stores co-initial origins per span and does not enumerate initialization orders.

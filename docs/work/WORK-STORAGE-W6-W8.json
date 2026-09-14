@@ -1,0 +1,14 @@
+{
+  "id": "WORK-STORAGE-W6-W8",
+  "title": "Consume generic regional fits and fixed read slices",
+  "status": "IN_PROGRESS",
+  "scope": "Authorized ST-W6..W8; existing AIR FitText/RegionSlice, shared regional memory and observers",
+  "authority": "analysis-ir@31893d1f4d203d19a61a750e2c4220120d9dab84: fit_text has exact output length, right truncation and explicit one-scalar pad; Assign evaluates its value before writing",
+  "premises": "IR_GUARANTEED expression evaluation and exact bounded places. EXPLICIT_CONTRACT IBM1047 maps one byte to one scalar bijectively. No COBOL source rules, corpus assumptions or guessed codec.",
+  "algorithm": "For a direct FitText(Read) under matching IBM1047 codecs, capture the existing immutable source byte image, crop its prefix to min(source length,n), append the encoded pad for any suffix, then update the declared destination. Reuse existing ByteImage fragments/captures/gaps and correlation groups. Other shapes retain explicit unknown. Query CALL constant RegionSlice via existing StorageSubject.PhysicalRange and observeStorage.",
+  "complexity": "Indexed source/destination resolution once per prepared expression; linear in touched fragments and emitted known payload. No receiver cap, new storage lattice or source-language parsing. Unknown paths remain monotone finite events under existing solver.",
+  "oracle": "ABCD fitted to two gives AB; AB fitted to four gives AB followed by two explicit spaces; later source write does not change captured destination; unknown source tail remains unknown unless truncated away. CALL reads only its declared slice before invocation.",
+  "qualification": "W6 12/12 G2 PASS; W7 12/12 G2 PASS; W8 technical G3 PASS (composed unchanged evidence + affected RC3 requalification).",
+  "review": "READY_FOR_HUMAN_REVIEW; no merge/auto-merge; lifecycle status remains IN_PROGRESS until merge",
+  "qualification_document": "docs/engineering/storage-w8-qualification.md"
+}

@@ -70,11 +70,12 @@ public final class ReachingDefinitions {
                     for(var segment:seed.segments()) {
                         var prior=occupied.putIfAbsent(segment.ordinal(),seed);
                         if(prior!=null && prior.slot()!=slot) {
-                            boolean sameFootprint=prior.target().location().equals(target.location());
-                            boolean literal=condition.value() instanceof Entries.LiteralInitial && prior.condition().value() instanceof Entries.LiteralInitial;
-                            boolean sameInterpretation=effects.storage().resolve(prior.condition().place()).candidates().stream().map(StorageIndex.Candidate::codec).toList().equals(resolution.candidates().stream().map(StorageIndex.Candidate::codec).toList());
-                            boolean equal=literal&&((Entries.LiteralInitial)condition.value()).value().value().equals(((Entries.LiteralInitial)prior.condition().value()).value().value());
-                            if(!(sameFootprint&&sameInterpretation&&equal))throw new Refusal(sameFootprint&&sameInterpretation&&literal?Status.INVALID_INPUT:Status.UNSUPPORTED,"OVERLAPPING_INITIAL_CONDITIONS");
+                            // The session owns a fully validated AIR publication: I-17 has
+                            // already proved simultaneous literal consistency, including ranges.
+                            // This consumer check only excludes unresolved/mixed initial forms.
+                            boolean literal=condition.value() instanceof Entries.LiteralInitial&&prior.condition().value() instanceof Entries.LiteralInitial;
+                            if(!(literal&&resolution.exact()&&target.sourceApplicable()&&prior.target().sourceApplicable()))
+                                throw new Refusal(Status.UNSUPPORTED,"OVERLAPPING_INITIAL_CONDITIONS");
                         }
                     }
                     seeds.add(seed);

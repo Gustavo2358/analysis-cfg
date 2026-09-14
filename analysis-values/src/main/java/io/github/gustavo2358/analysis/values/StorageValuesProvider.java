@@ -7,18 +7,19 @@ import io.github.gustavo2358.analysis.query.PointQuery;
 import io.github.gustavo2358.analysis.solver.Direction;
 import io.github.gustavo2358.analysis.structure.AnalysisSession;
 import java.util.*;
+import io.github.gustavo2358.analysis.storage.StorageSubject;
 
 /** Explicit regional provider; one execution and shared replay per selected Entry. */
-public final class RegionalValuesProvider implements AnalysisProvider<ObjectId,RegionalValueFact> {
-    public static final String IMPLEMENTATION = "RegionalValues";
-    public static final String VERSION = "2";
+public final class StorageValuesProvider implements AnalysisProvider<StorageSubject,StorageValueFact> {
+    public static final String IMPLEMENTATION = "StorageValues";
+    public static final String VERSION = "1";
     public static final String PRECISION = "FINITE_CORRELATED_STORAGE_IMAGES";
-    public static final String PROJECTION = "RegionalValueFact@1";
+    public static final String PROJECTION = "StorageValueFact@1";
     public static AnalysisKey key(EntryId entry) {
         return new AnalysisKey(IMPLEMENTATION,VERSION,RegionalValuesAnalysis.PROFILE,Direction.FORWARD,PRECISION,Map.of(),entry);
     }
-    public static ObservationBatchId<ObjectId,RegionalValueFact> batch(String id, AnalysisKey key) {
-        return new ObservationBatchId<>(id,key,PROJECTION,ObjectId.class,RegionalValueFact.class);
+    public static ObservationBatchId<StorageSubject,StorageValueFact> batch(String id, AnalysisKey key) {
+        return new ObservationBatchId<>(id,key,PROJECTION,StorageSubject.class,StorageValueFact.class);
     }
     public String implementation() { return IMPLEMENTATION; }
     public String version() { return VERSION; }
@@ -29,11 +30,11 @@ public final class RegionalValuesProvider implements AnalysisProvider<ObjectId,R
             && key.precisionPolicy().equals(PRECISION) && key.options().isEmpty();
     }
     public String projection() { return PROJECTION; }
-    public Class<ObjectId> subjectType() { return ObjectId.class; }
-    public Class<RegionalValueFact> factType() { return RegionalValueFact.class; }
-    public Comparator<ObjectId> subjectOrder() { return RegionalValuesAnalysis.OBJECT_ORDER; }
-    public Prepared<ObjectId,RegionalValueFact> prepare(AnalysisSession owner, AnalysisKey key) {
+    public Class<StorageSubject> subjectType() { return StorageSubject.class; }
+    public Class<StorageValueFact> factType() { return StorageValueFact.class; }
+    public Comparator<StorageSubject> subjectOrder() { return StorageSubject.ORDER; }
+    public Prepared<StorageSubject,StorageValueFact> prepare(AnalysisSession owner, AnalysisKey key) {
         if (!supports(key)) throw new IllegalArgumentException("unsupported RegionalValues key");
-        return RegionalProviderSupport.prepare(owner,key,RegionalValuesAnalysis.Execution::observe);
+        return RegionalProviderSupport.prepare(owner,key,RegionalValuesAnalysis.Execution::observeStorage);
     }
 }

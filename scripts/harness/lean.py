@@ -120,6 +120,18 @@ def workflow_errors(root):
             events = doc.get('on', doc.get(True))  # YAML 1.1 also parses on as True.
             if not isinstance(events, dict) or set(events) != {'push', 'pull_request'}:
                 errors.append('remote events must be push/PR; workflow_dispatch is prohibited')
+            from lean_project import LOCK
+            pending=[json.loads((root/LOCK).read_text())];locked=[]
+            while pending:
+                item=pending.pop()
+                if isinstance(item,dict):
+                    if item.get('repository')=='Gustavo2358/air-java':locked.append(item.get('commit'))
+                    pending.extend(item.values())
+                elif isinstance(item,list):pending.extend(item)
+            checkouts=[step.get('with',{}).get('ref') for job in doc['jobs'].values() for step in job['steps']
+                       if step.get('with',{}).get('repository')=='Gustavo2358/air-java']
+            if len(locked)!=1 or checkouts!=locked:
+                errors.append('CI AIR checkout differs from immutable source lock')
             jobs = doc['jobs']
             if len(jobs) != 1:
                 errors.append('only one Fast job is allowed')

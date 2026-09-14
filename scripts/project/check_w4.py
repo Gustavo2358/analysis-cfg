@@ -18,7 +18,9 @@ PACKAGES={
 KERNEL_SOURCES={f'analysis-kernel/src/main/java/io/github/gustavo2358/analysis/{pkg}/{name}.java' for pkg,names in PACKAGES.items() for name in names}
 PROVIDER='analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesProvider.java'
 REGIONAL_PROVIDER='analysis-values/src/main/java/io/github/gustavo2358/analysis/values/RegionalValuesProvider.java'
-PROVIDERS={PROVIDER,REGIONAL_PROVIDER}
+STORAGE_PROVIDER='analysis-values/src/main/java/io/github/gustavo2358/analysis/values/StorageValuesProvider.java'
+PROVIDER_SUPPORT='analysis-values/src/main/java/io/github/gustavo2358/analysis/values/RegionalProviderSupport.java'
+PROVIDERS={PROVIDER,REGIONAL_PROVIDER,STORAGE_PROVIDER,PROVIDER_SUPPORT}
 SOURCES=KERNEL_SOURCES|PROVIDERS
 TESTS={
 'PlanningZeroMatchTest':set('absentKindKeepsDeclaredEmptyBatch rejectingFilterKeepsDeclaredEmptyBatch zeroMatchDeclarationsValidateBindingsBeforeSelection'.split()),
@@ -29,11 +31,11 @@ TESTS={
 COMMON_DENIED=('java.io.','java.nio.file.','java.net.','java.lang.reflect.','java.util.ServiceLoader','cfg.adapters.','cfg.launcher.',
     'cfg.application.BuildCfg','cfg.application.CfgBuildCoordinator','org.antlr','cobolexplorer','lower.')
 CONSUMER_DENIED=COMMON_DENIED+('analysis.solver.','analysis.structure.','analysis.application.','analysis.query.BatchReplayer',
-    'analysis.values.PossibleValuesAnalysis','analysis.values.PossibleValuesProvider','analysis.values.RegionalValuesAnalysis','analysis.values.RegionalValuesProvider','air.model.Publication','air.model.Sequence','air.model.Unit','cfg.domain.CfgGraph')
+    'analysis.values.PossibleValuesAnalysis','analysis.values.PossibleValuesProvider','analysis.values.RegionalValuesAnalysis','analysis.values.RegionalValuesProvider','analysis.values.StorageValuesProvider','analysis.values.RegionalProviderSupport','air.model.Publication','air.model.Sequence','air.model.Unit','cfg.domain.CfgGraph')
 
 def role(source:str)->str:
     if '.consumers.' in source:return 'consumers'
-    if 'PossibleValuesProvider' in source or 'RegionalValuesProvider' in source:return 'provider'
+    if any(name in source for name in ('PossibleValuesProvider','RegionalValuesProvider','StorageValuesProvider','RegionalProviderSupport')):return 'provider'
     return 'application'
 
 def verify_edges(edges:dict)->None:
@@ -74,7 +76,7 @@ def verify_focal_preservation(root:Path)->None:
             raise Failure('W4-F1 changed reviewed source: '+path)
 
 def selected_class(name:str)->bool:
-    return any(name.startswith(PREFIX+pkg+'.') for pkg in PACKAGES) or name.startswith((PREFIX+'values.PossibleValuesProvider',PREFIX+'values.RegionalValuesProvider'))
+    return any(name.startswith(PREFIX+pkg+'.') for pkg in PACKAGES) or name.startswith((PREFIX+'values.PossibleValuesProvider',PREFIX+'values.RegionalValuesProvider',PREFIX+'values.StorageValuesProvider',PREFIX+'values.RegionalProviderSupport'))
 
 def compiled_edges(root:Path)->dict:
     from check_transport_architecture import dependencies_from_jdeps

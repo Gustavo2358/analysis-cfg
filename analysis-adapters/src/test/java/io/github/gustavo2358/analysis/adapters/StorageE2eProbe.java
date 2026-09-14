@@ -18,7 +18,7 @@ import java.util.*;
 public final class StorageE2eProbe {
     private StorageE2eProbe() { }
     public static void main(String[] args) throws Exception {
-        if(args.length!=2)throw new IllegalArgumentException("AIR input and test diagnostic output required");
+        if(args.length<2||args.length>3)throw new IllegalArgumentException("AIR input and test diagnostic output required");
         var codec=new AirJson();var bytes=Files.readAllBytes(Path.of(args[0]));var publication=codec.decode(bytes);
         var canonical=codec.encode(publication);
         if(!Arrays.equals(canonical,codec.encode(codec.decode(canonical))))throw new AssertionError("canonical AIR round-trip");
@@ -27,18 +27,26 @@ public final class StorageE2eProbe {
         var admission=AnalysisSession.open(cfg,publication,ProjectionPolicy.KNOWN_SUBSET,publication.units().stream().flatMap(u->u.entries().stream()).toList());
         if(admission.status()!=AnalysisSession.Status.ACCEPTED)throw new AssertionError(admission.reason());
         var session=admission.session().orElseThrow();var effects=new StatementEffects(new StorageIndex(session));
-        var queries=new ArrayList<PointQuery<ObjectId>>();var skipped=new ArrayList<String>();
+        var queries=new ArrayList<PointQuery<StorageSubject>>();var skipped=new ArrayList<String>();
         for(var context:session.contexts())for(var site:session.index().sites(Operations.Invoke.class))if(site.owner().id().equals(context.entry().id().unit())) {
             var invoke=(Operations.Invoke)site.operation();
-            if(invoke.target() instanceof Interactions.ComputedTarget target&&target.name() instanceof Expressions.Read read&&read.place() instanceof Places.ObjectPlace object)
-                queries.add(new PointQuery<>(ProgramPoint.before(context.entry().id(),invoke.header().id()),object.object()));
-            else skipped.add(invoke.header().id().localId());
+            var point=ProgramPoint.before(context.entry().id(),invoke.header().id());
+            StorageSubject subject=null;
+            if(invoke.target() instanceof Interactions.ComputedTarget target&&target.name() instanceof Expressions.Read read) {
+                if(read.place() instanceof Places.ObjectPlace object)subject=new StorageSubject.NamedObject(object.object());
+                else if(read.place() instanceof Places.RegionSlice slice&&slice.offset() instanceof Expressions.Literal o&&o.value() instanceof Values.IntValue offset
+                        &&slice.length() instanceof Expressions.Literal l&&l.value() instanceof Values.IntValue length)
+                    subject=new StorageSubject.PhysicalRange(slice.region(),StorageRange.exact(offset.value(),length.value()),slice.codec());
+            }
+            if(subject!=null)queries.add(new PointQuery<>(point,subject));else skipped.add(invoke.header().id().localId());
+            if(args.length==3&&args[2].equals("all-objects"))for(var object:site.owner().objects())
+                queries.add(new PointQuery<>(point,new StorageSubject.NamedObject(object.id())));
         }
         var rd=ReachingDefinitions.prepare(effects);if(rd.status()!=ReachingDefinitions.Status.ACCEPTED)throw new AssertionError(rd.reason());
-        var rdExecution=rd.analysis().orElseThrow().execute();var definitions=rdExecution.observe(queries);
+        var rdExecution=rd.analysis().orElseThrow().execute();var definitions=rdExecution.observeStorage(queries);
         var values=RegionalValuesAnalysis.prepare(session);if(values.status()!=RegionalValuesAnalysis.Status.ACCEPTED)throw new AssertionError(values.reason());
-        var valueExecution=values.analysis().orElseThrow().execute();var projected=valueExecution.observe(queries);
-        var valueMap=new HashMap<PointQuery<ObjectId>,RegionalValueFact>();
+        var valueExecution=values.analysis().orElseThrow().execute();var projected=valueExecution.observeStorage(queries);
+        var valueMap=new HashMap<PointQuery<StorageSubject>,StorageValueFact>();
         for(var observation:projected.observations()) {
             if(observation.status()!=ObservationBatch.QueryStatus.VALUE)throw new AssertionError(observation.status());
             valueMap.put(observation.query(),observation.value());
@@ -47,7 +55,7 @@ public final class StorageE2eProbe {
         for(var observation:definitions.observations()) {
             if(observation.status()!=ObservationBatch.QueryStatus.VALUE)throw new AssertionError(observation.status());
             var query=observation.query();var fact=observation.value();var value=valueMap.get(query);var row=new TreeMap<String,Object>();
-            row.put("unit",query.point().entry().unit().localId());row.put("operation",query.point().operation().localId());row.put("entry",query.point().entry().localId());row.put("object",query.subject().localId());
+            row.put("unit",query.point().entry().unit().localId());row.put("operation",query.point().operation().localId());row.put("entry",query.point().entry().localId());row.put("object",query.subject() instanceof StorageSubject.NamedObject named?named.object().localId():null);
             row.put("reachability",fact.reachability().name());row.put("rdModelRemainder",fact.unknownRemainder());row.put("rdSourceRemainder",fact.sourceUnknownRemainder());
             row.put("values",value.candidates()==null?null:value.candidates().stream().map(Values.TextValue::value).toList());row.put("valueModelRemainder",value.modelValueRemainder());row.put("valueSourceRemainder",value.sourceUnknownRemainder());
             var contributions=new ArrayList<Map<String,Object>>();
@@ -58,7 +66,7 @@ public final class StorageE2eProbe {
             row.put("definitions",contributions);row.put("interpretations",value.interpretations().stream().map(i->location(i.location())).toList());
             row.put("producers",value.candidateSupports().stream().map(c->{var producer=new TreeMap<String,Object>();producer.put("value",c.candidate().value());producer.put("operations",c.producers().stream().map(p->p.evidence().localId()).sorted().toList());return producer;}).toList());output.add(row);
         }
-        output.sort(Comparator.comparing((Map<String,Object> row)->row.get("unit").toString()).thenComparing(row->row.get("entry").toString()).thenComparing(row->row.get("operation").toString()).thenComparing(row->row.get("object").toString()));
+        output.sort(Comparator.comparing((Map<String,Object> row)->row.get("unit").toString()).thenComparing(row->row.get("entry").toString()).thenComparing(row->row.get("operation").toString()).thenComparing(row->Objects.toString(row.get("object"),"")) .thenComparing(row->row.get("interpretations").toString()));
         var result=new TreeMap<String,Object>();result.put("schema","storage-e2e-diagnostic@1");result.put("status","TEST_ONLY_NOT_PUBLIC_PRODUCT_WIRE");result.put("queries",output);result.put("unreadableOrLiteralCalls",skipped.stream().sorted().toList());result.put("rdMetrics",new TreeMap<>(rdExecution.metrics()));result.put("valueMetrics",new TreeMap<>(valueExecution.metrics()));
         try(var stream=Files.newOutputStream(Path.of(args[1]))) {
             var json=new JsonOutput(stream);json.value(result);json.finish();

@@ -56,6 +56,13 @@ class RegionalWireContract(unittest.TestCase):
         tail=by_kind['open:0']['values']['fact'];self.assertIsNone(tail['alternatives'][0]['fragments'][0]['location']['range']['end'])
         cell=by_kind['logical']['values']['fact'];self.assertEqual('WHOLE_CELL',cell['interpretations'][0]['location']['kind']);self.assertIsNone(cell['interpretations'][0]['location']['range'])
         self.assertEqual(str(2**100),next(b['extent'] for b in r['inventory']['storages'] if b['storageId']['localId']=='huge'))
+    def test_initial_overlaps_keep_all_origins_in_valid_covers(self):
+        path=PRODUCT.parent/'initial.result.json';result=read(path)
+        self.assertEqual(path.read_bytes(),canonical(result));self.assertEqual(2,len(result['observations']))
+        for o in result['observations']:
+            f=o['values']['fact'];self.assertEqual(['AAAABBBB' if o['point']['entryId']['localId']=='seed-0' else 'CCCCDDDD'],f['candidates'])
+            self.assertFalse(f['modelValueRemainder'])
+            self.assertEqual({'place','prefix-place'},{p['producer']['definition']['destination']['localId'] for a in f['alternatives'] for p in a['fragments']})
     def test_closed_shape_identity_ranges_and_provenance_mutations(self):
         v=['observations',0,'values','fact'];f=v+['alternatives',0,'fragments',0];e=f+['producer','definition'];c=f+['captures',0]
         mutations={

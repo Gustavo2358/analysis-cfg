@@ -139,11 +139,13 @@ def site(s):
     require(all(s[n]['unit'] == s['caller']['localId'] for n in ('entry', 'sequence', 'operation')), 'caller UnitId')
     if s['targetKind'] == 'LITERAL':
         require(s['subject'] is None and s['valuePoint'] is None, 'literal value query')
-    elif s['subject'] is not None:
-        identity(s['subject'], 'object'); p = s['valuePoint']
+    elif s['valuePoint'] is not None:
+        # A fixed physical read has no nominal ObjectId; its AIR operation owns the range.
+        if s['subject'] is not None: identity(s['subject'], 'object')
+        p = s['valuePoint']
         fields(p, 'position entryId operationId outcome'); require(p == {'position': 'BEFORE', 'entryId': s['entry'], 'operationId': s['operation'], 'outcome': None}, 'BEFORE actual Invoke')
     else:
-        require(s['valuePoint'] is None and s['targetStatus'] in ('UNSUPPORTED_TARGET_EXPRESSION', 'UNREACHABLE_IN_MODEL', 'UNSUPPORTED_INVOCATION_SHAPE'), 'missing computed subject')
+        require(s['subject'] is None and s['targetStatus'] in ('UNSUPPORTED_TARGET_EXPRESSION', 'UNREACHABLE_IN_MODEL', 'UNSUPPORTED_INVOCATION_SHAPE'), 'missing computed subject')
     if s['reachability'] == 'UNREACHABLE_IN_MODEL':
         require(s['targetStatus'] == 'UNREACHABLE_IN_MODEL' and s['modelValueRemainder'] is None and not s['candidates'] and not s['rawCandidates'], 'unreachable shape')
     elif s['targetStatus'] == 'RESOLVED_CANDIDATES':

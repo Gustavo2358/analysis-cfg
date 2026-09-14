@@ -51,8 +51,34 @@ class RegionalDependencyTest {
         assertEquals(List.of("PGM00001"),after.candidates().stream().map(DependencySiteFact.Candidate::referenceName).toList());
         assertTrue(after.modelValueRemainder(),"foreign MAY effects apply after target evaluation and preserve old possibilities");
     }
+    @Test void fixedSliceCallQueriesOnlyItsBytesBeforeForeignEffects() {
+        var p=group(false);var u=p.units().getFirst();var first=u.sequences().getFirst();var call=(Operations.Invoke)first.terminator();var old=(Interactions.ComputedTarget)call.target();
+        var read=(Expressions.Read)old.name();var codec=((Memory.ViewBinding)u.objects().getFirst().storage()).codec();
+        var slice=new Places.RegionSlice(((Places.ObjectPlace)read.place()).header(),p.storage().getFirst().header().id(),
+            new Expressions.Literal(operand(call.header().id(),"slice-offset",Operand.Role.VALUE_READ),new Values.IntValue(BigInteger.valueOf(6))),
+            new Expressions.Literal(operand(call.header().id(),"slice-length",Operand.Role.VALUE_READ),new Values.IntValue(BigInteger.valueOf(3))),codec,Types.known(Types.Builtin.TEXT));
+        var target=new Interactions.ComputedTarget(old.category(),old.namespace(),new Expressions.Read(read.header(),slice),old.namePolicy(),old.origin());
+        var changed=new Operations.Invoke(call.header(),call.action(),target,call.arguments(),call.results(),call.signature(),call.effectOperands(),call.effectBound(),call.outcomes(),call.contract());
+        var sequences=new ArrayList<>(u.sequences());sequences.set(0,new Sequence(first.label(),first.instructions(),changed,first.origin()));
+        var unit=new io.github.gustavo2358.air.model.Unit(u.id(),u.containingUnit(),u.objects(),u.visibleObjects(),u.entries(),sequences,u.completionPorts(),u.body(),u.bodyUnavailable(),u.coverage(),u.origin());
+        p=new Publication(p.id(),p.airVersion(),p.capabilities(),p.artifacts(),List.of(unit),p.storage(),p.resources(),p.artifactRelations(),p.origins(),p.coverage(),p.uncertainties(),p.premises());
+        var result=new DependencyAnalysis().prepare(p);var site=result.sites().stream().filter(x->x.operation().equals(call.header().id())).findFirst().orElseThrow();
+        assertEquals(List.of("PGM"),site.candidates().stream().map(DependencySiteFact.Candidate::referenceName).toList());assertFalse(site.modelValueRemainder());
+        assertEquals(1L,result.metrics().get("possibleValuesRuns"));assertNull(site.subject());assertNotNull(site.valuePoint());
+    }
     @Test void literalOnlySitesDoNotDemandRegionalValues() {
         var result=new DependencyAnalysis().prepare(group(true));assertEquals(2,result.sites().size());assertEquals(0L,result.metrics().get("possibleValuesRuns"));
+    }
+    @Test void literalCallsSurviveUnknownMixedStorageWithoutDemandingValueAnalysis() {
+        var p=group(true);var u=p.units().getFirst();var o=origin(p.id());var gap=new UncertaintyId(p.id(),"unknown-storage");var typeGap=new UncertaintyId(p.id(),"unknown-type");var open=new StorageId(p.id(),"open-storage");var cell=new StorageId(p.id(),"legacy-cell");
+        var objects=new ArrayList<>(u.objects());objects.add(new Memory.ObjectDeclaration(new ObjectId(u.id(),"unsupported"),Optional.empty(),new Types.UnknownType(typeGap),new Memory.UnknownBinding(new Scopes.StorageMemory(List.of(open)),gap),Memory.Visibility.UNKNOWN,o,Evidence.CoverageStatus.ABSTRACTED,header(u.id(),"meta").precision()));
+        objects.add(new Memory.ObjectDeclaration(new ObjectId(u.id(),"legacy"),Optional.empty(),Types.known(Types.Builtin.INT),new Memory.CellBinding(cell),Memory.Visibility.PRIVATE,o,Evidence.CoverageStatus.MODELED,header(u.id(),"meta").precision()));
+        var storage=new ArrayList<>(p.storage());storage.add(new Memory.Region(new Memory.StorageHeader(open,Optional.of(u.id()),Memory.Lifetime.PERSISTENT,Memory.Visibility.UNKNOWN,o),Optional.empty(),Optional.of(gap)));storage.add(new Memory.Cell(new Memory.StorageHeader(cell,Optional.of(u.id()),Memory.Lifetime.PERSISTENT,Memory.Visibility.PRIVATE,o),Types.known(Types.Builtin.INT)));
+        var uncertainties=List.of(new Evidence.Uncertainty(gap,"UNSUPPORTED_STORAGE",List.of(Evidence.Dimension.STORAGE),new Scopes.UnitScope(u.id()),"unknown physical representation",o),new Evidence.Uncertainty(typeGap,"TYPE_UNKNOWN",List.of(Evidence.Dimension.VALUES),new Scopes.UnitScope(u.id()),"unknown declaration type",o));
+        p=new Publication(p.id(),p.airVersion(),p.capabilities(),p.artifacts(),List.of(unit(u.id(),u.entries(),u.sequences(),objects)),storage,p.resources(),p.artifactRelations(),p.origins(),p.coverage(),uncertainties,p.premises());
+        var validation=io.github.gustavo2358.air.validation.AirValidator.validate(p);assertEquals(io.github.gustavo2358.air.validation.ValidationResult.Status.STRUCTURALLY_VALID,validation.status(),validation.issues().toString());
+        var result=new DependencyAnalysis().prepare(p);assertEquals(2,result.sites().size());assertEquals(0L,result.metrics().get("possibleValuesRuns"));
+        for(var site:result.sites())assertFalse(site.candidates().isEmpty());
     }
     @Test void historicalScalarProfilesContinueToRefuseRegions() {
         var p=group(false);var cfg=W1dBoundaryTest.build(p);assertEquals(CfgBuildResult.Status.CFG_BUILT,cfg.status());
