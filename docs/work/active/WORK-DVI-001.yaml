@@ -1,6 +1,6 @@
 id: WORK-DVI-001
 title: Qualify declarative entry knowledge through shared dependency values
-status: IN_PROGRESS
+status: DONE
 scope:
   - DVI-W2/W3 selected production CLI E2Es, adversarial checks and CardDemo deltas
   - Existing Regional Values/RD/CALL/LINK/XCTL machinery; no production solver change
