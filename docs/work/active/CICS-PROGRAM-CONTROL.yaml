@@ -1,5 +1,5 @@
 id: CICS-PROGRAM-CONTROL
 title: CICS LINK and XCTL program dependencies
-status: IN_PROGRESS
+status: DONE
 scope:
   - Invoke remainder queries and CICS dependency interpretation
