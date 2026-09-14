@@ -25,6 +25,7 @@ final class InvocationIndependenceTest {
         var header=i.header();var owner=new OperationOwner(header.id());var origin=header.origin();
         Interactions.Target target=computed?name:new Interactions.LiteralTarget(name.category(),name.namespace(),"PROGA",name.namePolicy(),name.origin());
         var args=new ArrayList<Interactions.Argument>();var results=new ArrayList<Place>();var objects=new ArrayList<>(u.objects());
+        var removed=computed?Set.<Id>of():Set.<Id>of(name.name().header().id(),((Expressions.Read)name.name()).place().header().id());
         var gap=p.uncertainties().stream().filter(g->g.dimensions().contains(Evidence.Dimension.VALUES)&&g.scope() instanceof Scopes.UnitScope).findFirst().orElseThrow().id();
         if(shape.equals("argument"))args.add(new Interactions.ReferenceArgument(new Places.ObjectPlace(new Operand.Header(new OperandId(owner,"rf-arg"),Operand.Role.ARGUMENT_REFERENCE,origin),object)));
         if(shape.equals("unknown-argument"))args.add(new Interactions.ValueArgument(new Expressions.Unknown(new Operand.Header(new OperandId(owner,"rf-arg"),Operand.Role.ARGUMENT_VALUE,origin),Types.known(Types.Builtin.TEXT),List.of(),new Scopes.WithinMemory(new Scopes.AllMemory(p.id(),true)),gap)));
@@ -36,9 +37,13 @@ final class InvocationIndependenceTest {
             }
             results.add(new Places.ObjectPlace(new Operand.Header(new OperandId(owner,"rf-result"),Operand.Role.RESULT_TARGET,origin),destination));
         }
-        var updated=new Operations.Invoke(header,i.action(),target,args,results,i.signature(),i.effectOperands(),i.effectBound(),i.outcomes(),i.contract());
-        var unit=new io.github.gustavo2358.air.model.Unit(u.id(),u.containingUnit(),objects,u.visibleObjects(),u.entries(),u.sequences().stream().map(s->s.terminator()==i?new Sequence(s.label(),s.instructions(),updated,s.origin()):s).toList(),u.completionPorts(),u.body(),u.bodyUnavailable(),u.coverage(),u.origin());
-        return new Publication(p.id(),p.airVersion(),p.capabilities(),p.artifacts(),List.of(unit),p.storage(),p.resources(),p.artifactRelations(),p.origins(),p.coverage(),p.uncertainties(),p.premises());
+        var signature=new Interactions.ExternalSignature(new Interactions.Signature(new Interactions.ParameterInventory(List.of(),new Interactions.UnknownRemainder(gap)),new Interactions.ResultInventory(List.of(),new Interactions.UnknownRemainder(gap)),origin));
+        var updated=new Operations.Invoke(header,i.action(),target,args,results,signature,i.effectOperands(),i.effectBound(),i.outcomes(),i.contract());
+        var unit=new io.github.gustavo2358.air.model.Unit(u.id(),u.containingUnit(),objects,u.visibleObjects(),u.entries(),u.sequences().stream().map(s->s.terminator()==i?new Sequence(s.label(),s.instructions(),updated,s.origin()):s).toList(),u.completionPorts(),u.body(),u.bodyUnavailable(),coverage(u.coverage(),removed),u.origin());
+        return new Publication(p.id(),p.airVersion(),p.capabilities(),p.artifacts(),List.of(unit),p.storage(),p.resources(),p.artifactRelations(),p.origins(),coverage(p.coverage(),removed),p.uncertainties(),p.premises());
+    }
+    static Evidence.Coverage coverage(Evidence.Coverage c,Set<Id> removed) {
+        return new Evidence.Coverage(c.inventory(),c.scope(),c.items().stream().map(i->new Evidence.CoverageItem(i.sourceKey(),i.origin(),i.status(),i.outputs().stream().map(id->removed.contains(id)?((OperationOwner)((OperandId)id).owner()).operation():id).distinct().toList(),i.uncertainties(),i.elimination())).toList(),c.uncertainties());
     }
     @Test void memoryEightShapesPreserveTargetAndRemainder() throws Exception {
         for(boolean computed:List.of(false,true))for(String shape:List.of("none","argument","result",computed?"unknown-result":"unknown-argument")) {
@@ -46,6 +51,8 @@ final class InvocationIndependenceTest {
         }
     }
     static DependencyResult assertTarget(Publication p,String label) {
+        var validation=io.github.gustavo2358.air.validation.AirValidator.validate(p);
+        assertTrue(validation.isStructurallyValid(),()->label+" "+validation.issues());
         var result=new DependencyAnalysis().prepare(p);var fact=result.sites().getFirst();
         assertEquals(List.of("PROGA"),fact.candidates().stream().map(DependencySiteFact.Candidate::referenceName).toList(),label);
         assertEquals(DependencySiteFact.TargetStatus.RESOLVED_CANDIDATES,fact.targetStatus(),label);
