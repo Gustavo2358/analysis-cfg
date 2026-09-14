@@ -128,7 +128,7 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "3c3737e3a08a6fee4702280d8ef2f69a214953a9",
+    "commit": "6772eab5349cfdb6b4429a97b9b868d9b73b2200",
     "canonical_ref": "feat/storage-semantics-st-w6-w8",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
@@ -246,7 +246,7 @@
     ],
     "semantic_product_version": "2.12.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "f803d64572f20c97eb8400eeb13ca039e2a121b7",
+    "commit": "4f798d1d53b0be25af5eb09fdfdafa58884d4b95",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -262,7 +262,7 @@
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "verified",
-    "commit": "da7b2980c06cc32b81d22cb1f579a364a5847903",
+    "commit": "921f29c4a58bc6c79aba0e3c71ce62b8fb082e51",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
