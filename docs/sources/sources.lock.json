@@ -128,7 +128,7 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "74ff41c067c18c28a940407cec53bd3e637291cd",
+    "commit": "3c3737e3a08a6fee4702280d8ef2f69a214953a9",
     "canonical_ref": "feat/storage-semantics-st-w6-w8",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
@@ -262,7 +262,7 @@
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "verified",
-    "commit": "d4a043b7477408d176d1626ce058a6335c2736bd",
+    "commit": "cad302c2d6b54496358f4e0b2acedae6fc11667d",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
