@@ -1,0 +1,278 @@
+[
+  {
+    "case": "invariant-call",
+    "sourceSha256": "38fb8e8c14954f9723864fbadc96643034945d5ca4f349343ab5a4d029c64050",
+    "names": [
+      "PROGA"
+    ],
+    "unknownRemainder": true,
+    "modelValueRemainder": true,
+    "sourceValueRemainder": true,
+    "interpretationUnknownRemainder": true,
+    "proof": "DECLARATIVE_INVARIANT"
+  },
+  {
+    "case": "explicit-initial",
+    "sourceSha256": "38fb8e8c14954f9723864fbadc96643034945d5ca4f349343ab5a4d029c64050",
+    "names": [
+      "PROGA"
+    ],
+    "unknownRemainder": true,
+    "modelValueRemainder": true,
+    "sourceValueRemainder": true,
+    "interpretationUnknownRemainder": true,
+    "proof": "EXPLICIT_INITIAL"
+  },
+  {
+    "case": "explicit-preserved",
+    "sourceSha256": "38fb8e8c14954f9723864fbadc96643034945d5ca4f349343ab5a4d029c64050",
+    "names": [],
+    "unknownRemainder": true,
+    "modelValueRemainder": true,
+    "sourceValueRemainder": true,
+    "interpretationUnknownRemainder": true,
+    "proof": "EXPLICIT_PRESERVED"
+  },
+  {
+    "case": "program-initial",
+    "sourceSha256": "3b9512362da332004b12b34a9b0d3aaf730b58de8b773fb0f89d1e60f2f6e4e4",
+    "names": [
+      "PROGA"
+    ],
+    "unknownRemainder": true,
+    "modelValueRemainder": true,
+    "sourceValueRemainder": true,
+    "interpretationUnknownRemainder": true,
+    "proof": "PROGRAM_INITIAL"
+  },
+  {
+    "case": "data-move-call",
+    "sourceSha256": "ef3847b29014fe7a743b2f6183668abef74050f2690577ed234c8f2c66a6b603",
+    "names": [
+      "PROGA"
+    ],
+    "unknownRemainder": true,
+    "modelValueRemainder": true,
+    "sourceValueRemainder": true,
+    "interpretationUnknownRemainder": true,
+    "proof": "DECLARATIVE_INVARIANT"
+  },
+  {
+    "case": "data-move-link",
+    "sourceSha256": "121456171d7b7d8346797cf8b97a6cb5feb24c318fb21012a3e625268f002158",
+    "names": [
+      "PROGA"
+    ],
+    "unknownRemainder": true,
+    "modelValueRemainder": false,
+    "sourceValueRemainder": true,
+    "interpretationUnknownRemainder": false,
+    "proof": "DECLARATIVE_INVARIANT"
+  },
+  {
+    "case": "data-move-xctl",
+    "sourceSha256": "49dc9487f86dc16710e3cf12a5fe957bf6e4e12dbf194b8d29c6ec604efa005d",
+    "names": [
+      "PROGA"
+    ],
+    "unknownRemainder": true,
+    "modelValueRemainder": false,
+    "sourceValueRemainder": true,
+    "interpretationUnknownRemainder": false,
+    "proof": "DECLARATIVE_INVARIANT"
+  },
+  {
+    "case": "runtime-branch",
+    "sourceSha256": "110270bd871056e35710de5d50203d59ee7a9455fd6c88f1e855b96300d84aaf",
+    "names": [
+      "PROGA"
+    ],
+    "unknownRemainder": true,
+    "modelValueRemainder": true,
+    "sourceValueRemainder": true,
+    "interpretationUnknownRemainder": true,
+    "proof": "DECLARATIVE_INVARIANT"
+  },
+  {
+    "case": "runtime-cics",
+    "sourceSha256": "2fd275969acb36e5565321128ff29db0a71fdadb0bc42fe6efb9a434d0539083",
+    "names": [
+      "PROGA"
+    ],
+    "unknownRemainder": true,
+    "modelValueRemainder": true,
+    "sourceValueRemainder": true,
+    "interpretationUnknownRemainder": false,
+    "proof": "DECLARATIVE_INVARIANT"
+  },
+  {
+    "case": "direct-write",
+    "sourceSha256": "0c2852c5e5feaf8651a3aa53125dae1d67805e71809ccd63b5cfb8d0fe5313ef",
+    "names": [],
+    "unknownRemainder": true,
+    "modelValueRemainder": true,
+    "sourceValueRemainder": true,
+    "interpretationUnknownRemainder": true,
+    "proof": "NONE"
+  },
+  {
+    "case": "disjoint-write",
+    "sourceSha256": "ebd9f3eefcf8a84626df2db33d935807da92d41d744ca7c7f1b4ad390c393c74",
+    "names": [
+      "PROGA"
+    ],
+    "unknownRemainder": true,
+    "modelValueRemainder": true,
+    "sourceValueRemainder": true,
+    "interpretationUnknownRemainder": true,
+    "proof": "DECLARATIVE_INVARIANT"
+  },
+  {
+    "case": "group-write",
+    "sourceSha256": "a997874b0d1e97e30a8a0d754c52e94eb83bff0a1b24e369e5d127a361e23cf1",
+    "names": [],
+    "unknownRemainder": true,
+    "modelValueRemainder": true,
+    "sourceValueRemainder": true,
+    "interpretationUnknownRemainder": true,
+    "proof": "NONE"
+  },
+  {
+    "case": "alias-write",
+    "sourceSha256": "a510220470d1f26c59b46054ec80c0150edfe1b7836f5288c737e30dd4d50db0",
+    "names": [],
+    "unknownRemainder": true,
+    "modelValueRemainder": true,
+    "sourceValueRemainder": true,
+    "interpretationUnknownRemainder": true,
+    "proof": "NONE"
+  },
+  {
+    "case": "renames-write",
+    "sourceSha256": "05506fd72efdf2d568ed481d04bc86e117692716e1823fd406297841200c79a7",
+    "names": [],
+    "unknownRemainder": true,
+    "modelValueRemainder": true,
+    "sourceValueRemainder": true,
+    "interpretationUnknownRemainder": true,
+    "proof": "NONE"
+  },
+  {
+    "case": "slice-disjoint",
+    "sourceSha256": "96074e5b10b11c64dd0249e8d785a12f2e1add372ba7765f2f3612f5e87e3c4d",
+    "names": [
+      "PROGA"
+    ],
+    "unknownRemainder": true,
+    "modelValueRemainder": true,
+    "sourceValueRemainder": true,
+    "interpretationUnknownRemainder": true,
+    "proof": "DECLARATIVE_INVARIANT"
+  },
+  {
+    "case": "slice-overlap",
+    "sourceSha256": "f55ce4150045f8b8d8ecffac464a60c0fbb4a9c55af11b9bbc403d7af29c8b1e",
+    "names": [],
+    "unknownRemainder": true,
+    "modelValueRemainder": true,
+    "sourceValueRemainder": true,
+    "interpretationUnknownRemainder": true,
+    "proof": "NONE"
+  },
+  {
+    "case": "slice-dynamic",
+    "sourceSha256": "9571aaaeea665b13cb859bc51d59be4f3df1f0ada49880cf9a921fe334d35967",
+    "names": [],
+    "unknownRemainder": true,
+    "modelValueRemainder": true,
+    "sourceValueRemainder": true,
+    "interpretationUnknownRemainder": true,
+    "proof": "NONE"
+  },
+  {
+    "case": "unknown-effect",
+    "sourceSha256": "30b843a51572385f328200a786f2f6b2fe2cf529a69f5e62c08458793bee998a",
+    "names": [],
+    "unknownRemainder": true,
+    "modelValueRemainder": true,
+    "sourceValueRemainder": true,
+    "interpretationUnknownRemainder": true,
+    "proof": "NONE"
+  },
+  {
+    "case": "escape",
+    "sourceSha256": "151eb15682bf60e37ec8e080c568f1e78e8acae7484e62e030692d58aa15cb91",
+    "names": [],
+    "unknownRemainder": true,
+    "modelValueRemainder": true,
+    "sourceValueRemainder": true,
+    "interpretationUnknownRemainder": true,
+    "proof": "NONE"
+  },
+  {
+    "case": "loop-kill",
+    "sourceSha256": "6e01afd8c4a222e3b06ebf6b6cc87b90ace24ac641a42422ead1f5990094bb19",
+    "names": [
+      "OTHERPGM"
+    ],
+    "unknownRemainder": true,
+    "modelValueRemainder": true,
+    "sourceValueRemainder": true,
+    "interpretationUnknownRemainder": true,
+    "proof": "PROGRAM_INITIAL"
+  },
+  {
+    "case": "renamed-format",
+    "sourceSha256": "7937d65a95a44194f25eb21e293f263f1122d757c53672ef2c2c8e2254d55870",
+    "names": [
+      "PROGA"
+    ],
+    "unknownRemainder": true,
+    "modelValueRemainder": true,
+    "sourceValueRemainder": true,
+    "interpretationUnknownRemainder": true,
+    "proof": "DECLARATIVE_INVARIANT"
+  },
+  {
+    "case": "incomplete-input",
+    "sourceSha256": "bdcc847a6416826d7bb6223cc73394b1e84d58b56200b06d1260ddf2be2b4f2c",
+    "names": [],
+    "unknownRemainder": true,
+    "modelValueRemainder": null,
+    "sourceValueRemainder": true,
+    "interpretationUnknownRemainder": true,
+    "proof": "NONE"
+  },
+  {
+    "case": "two-blockers",
+    "sourceSha256": "92ea675b9a5d43f3555bbd019d564a880c13a12fd61996ac5dd9ba8ac5dbf456",
+    "names": [],
+    "unknownRemainder": true,
+    "modelValueRemainder": true,
+    "sourceValueRemainder": true,
+    "interpretationUnknownRemainder": true,
+    "proof": "NONE"
+  },
+  {
+    "case": "remove-one-blocker",
+    "sourceSha256": "a510220470d1f26c59b46054ec80c0150edfe1b7836f5288c737e30dd4d50db0",
+    "names": [],
+    "unknownRemainder": true,
+    "modelValueRemainder": true,
+    "sourceValueRemainder": true,
+    "interpretationUnknownRemainder": true,
+    "proof": "NONE"
+  },
+  {
+    "case": "remove-all-blockers",
+    "sourceSha256": "01e2347c3fff6dee494cfbe32c35957562b74b7a68fd54333ecbca3a11356f47",
+    "names": [
+      "PROGA"
+    ],
+    "unknownRemainder": true,
+    "modelValueRemainder": true,
+    "sourceValueRemainder": true,
+    "interpretationUnknownRemainder": true,
+    "proof": "DECLARATIVE_INVARIANT"
+  }
+]
