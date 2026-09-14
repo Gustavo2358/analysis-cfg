@@ -7,7 +7,17 @@ import java.util.*;
 
 /** One immutable byte image, represented by spans rather than one allocation per octet. */
 final class ByteImage {
-    record Part(StorageRange range,Optional<Values.BytesValue> payload,int payloadOffset,int producer,
+    /** Dense literals retain their source payload; a repeated octet needs one span. */
+    record Payload(Values.BytesValue bytes,boolean repeated) {
+        Payload { Objects.requireNonNull(bytes);if(repeated&&bytes.octets().size()!=1)throw new IllegalArgumentException("repeat requires one octet"); }
+        int advance(int offset,BigInteger delta) {return repeated?0:Math.addExact(offset,delta.intValueExact());}
+        boolean fits(int offset,BigInteger count) {return offset>=0&&(repeated?offset==0:BigInteger.valueOf(offset).add(count).compareTo(BigInteger.valueOf(bytes.octets().size()))<=0);}
+        Values.BytesValue materialize(int offset,BigInteger count) {
+            int size=count.intValueExact();
+            return new Values.BytesValue(repeated?Collections.nCopies(size,bytes.octets().getFirst()):bytes.octets().subList(offset,Math.addExact(offset,size)));
+        }
+    }
+    record Part(StorageRange range,Optional<Payload> payload,int payloadOffset,int producer,
                 BigInteger producerOffset,Map<Integer,Set<BigInteger>> capturedOffsets,Set<String> reasons,Set<Integer> sourceGaps,Map<Integer,BigInteger> coInitial) {
         Part {
             Objects.requireNonNull(range);Objects.requireNonNull(payload);Objects.requireNonNull(producerOffset);coInitial=Map.copyOf(coInitial);
@@ -16,7 +26,7 @@ final class ByteImage {
                 copies.put(event,Set.copyOf(offsets));
             });capturedOffsets=Map.copyOf(copies);reasons=Set.copyOf(reasons);sourceGaps=Set.copyOf(sourceGaps);
         }
-        Part(StorageRange range,Optional<Values.BytesValue> payload,int payloadOffset,int producer,BigInteger producerOffset,Map<Integer,Set<BigInteger>> capturedOffsets,Set<String> reasons,Set<Integer> sourceGaps) {
+        Part(StorageRange range,Optional<Payload> payload,int payloadOffset,int producer,BigInteger producerOffset,Map<Integer,Set<BigInteger>> capturedOffsets,Set<String> reasons,Set<Integer> sourceGaps) {
             this(range,payload,payloadOffset,producer,producerOffset,capturedOffsets,reasons,sourceGaps,Map.of());
         }
         Map<Integer,BigInteger> contributors() {
@@ -25,13 +35,14 @@ final class ByteImage {
         Part contributor(int event,BigInteger offset) {
             return new Part(range,payload,payloadOffset,event,offset,capturedOffsets,reasons,sourceGaps);
         }
-        Part(StorageRange range,Optional<Values.BytesValue> payload,int payloadOffset,int producer,BigInteger producerOffset,Map<Integer,Set<BigInteger>> capturedOffsets,Set<String> reasons) {
+        Part(StorageRange range,Optional<Payload> payload,int payloadOffset,int producer,BigInteger producerOffset,Map<Integer,Set<BigInteger>> capturedOffsets,Set<String> reasons) {
             this(range,payload,payloadOffset,producer,producerOffset,capturedOffsets,reasons,Set.of());
         }
+        Optional<Values.BytesValue> materialize() {return payload.map(p->p.materialize(payloadOffset,range.end().orElseThrow().subtract(range.start())));}
         Set<Integer> copies(){return capturedOffsets.keySet();}
         Part crop(StorageRange slice) {
             var delta=slice.start().subtract(range.start());
-            return new Part(slice,payload,payload.isPresent()?Math.addExact(payloadOffset,delta.intValueExact()):0,producer,
+            return new Part(slice,payload,payload.isPresent()?payload.get().advance(payloadOffset,delta):0,producer,
                 payload.isPresent()?producerOffset.add(delta):BigInteger.ZERO,advance(capturedOffsets,delta),reasons,sourceGaps,advanceInitial(coInitial,delta));
         }
         Part shift(BigInteger offset) {
@@ -52,7 +63,7 @@ final class ByteImage {
             cursor=part.range().end();
             if(part.payload().isPresent()) {
                 if(cursor.isEmpty()||part.producer()<0||!part.reasons().isEmpty()||part.payloadOffset()<0
-                    ||BigInteger.valueOf(part.payloadOffset()).add(cursor.get().subtract(part.range().start())).compareTo(BigInteger.valueOf(part.payload().get().octets().size()))>0)
+                    ||!part.payload().get().fits(part.payloadOffset(),cursor.get().subtract(part.range().start())))
                     throw new IllegalArgumentException("known fragment must fit its immutable payload");
             } else if(part.reasons().isEmpty())throw new IllegalArgumentException("unknown fragment needs a reason");
         }
@@ -66,7 +77,7 @@ final class ByteImage {
     }
     static ByteImage literal(Values.BytesValue bytes,int producer) {
         var size=BigInteger.valueOf(bytes.octets().size());
-        return new ByteImage(Optional.of(size),size.signum()==0?List.of():List.of(new Part(StorageRange.exact(BigInteger.ZERO,size),Optional.of(bytes),0,producer,BigInteger.ZERO,Map.of(),Set.of())));
+        return new ByteImage(Optional.of(size),size.signum()==0?List.of():List.of(new Part(StorageRange.exact(BigInteger.ZERO,size),Optional.of(new Payload(bytes,false)),0,producer,BigInteger.ZERO,Map.of(),Set.of())));
     }
     ByteImage slice(StorageRange selected) {
         requireBounds(selected);var result=new ArrayList<Part>();
@@ -79,7 +90,7 @@ final class ByteImage {
         var result=new ArrayList<>(slice(StorageRange.exact(BigInteger.ZERO,kept)).parts);
         if(length.compareTo(kept)>0) {
             var count=length.subtract(kept);
-            var payload=new Values.BytesValue(Collections.nCopies(count.intValueExact(),pad));
+            var payload=new Payload(new Values.BytesValue(List.of(pad)),true);
             result.add(new Part(StorageRange.exact(kept,count),Optional.of(payload),0,producer,kept,Map.of(),Set.of()));
         }
         return new ByteImage(Optional.of(length),result);
@@ -146,8 +157,7 @@ final class ByteImage {
         if(image.parts.stream().anyMatch(p->p.payload().isEmpty()))return new Read(Optional.empty(),image.parts,reasons);
         var bytes=new ArrayList<Integer>();
         for(var part:image.parts) {
-            int count=part.range().end().orElseThrow().subtract(part.range().start()).intValueExact();
-            bytes.addAll(part.payload().orElseThrow().octets().subList(part.payloadOffset(),Math.addExact(part.payloadOffset(),count)));
+            bytes.addAll(part.materialize().orElseThrow().octets());
         }
         return new Read(Optional.of(new Values.BytesValue(bytes)),image.parts,reasons);
     }
@@ -169,7 +179,7 @@ final class ByteImage {
                 boolean adjacent=previous.range().end().equals(Optional.of(part.range().start()));
                 boolean metadata=advanceInitial(previous.coInitial(),part.range().start().subtract(previous.range().start())).equals(part.coInitial())&&previous.producer()==part.producer()&&advance(previous.capturedOffsets(),part.range().start().subtract(previous.range().start())).equals(part.capturedOffsets())&&previous.reasons().equals(part.reasons())&&previous.sourceGaps().equals(part.sourceGaps());
                 boolean payload=previous.payload().equals(part.payload())&&(part.payload().isEmpty()
-                    ||BigInteger.valueOf(previous.payloadOffset()).add(part.range().start().subtract(previous.range().start())).equals(BigInteger.valueOf(part.payloadOffset()))
+                    ||(part.payload().get().repeated()||BigInteger.valueOf(previous.payloadOffset()).add(part.range().start().subtract(previous.range().start())).equals(BigInteger.valueOf(part.payloadOffset())))
                         &&previous.producerOffset().add(part.range().start().subtract(previous.range().start())).equals(part.producerOffset()));
                 if(adjacent&&metadata&&payload) {
                     result.set(result.size()-1,new Part(new StorageRange(previous.range().start(),part.range().end()),previous.payload(),previous.payloadOffset(),previous.producer(),previous.producerOffset(),previous.capturedOffsets(),previous.reasons(),previous.sourceGaps(),previous.coInitial()));continue;

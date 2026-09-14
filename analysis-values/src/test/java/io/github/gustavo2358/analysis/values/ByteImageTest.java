@@ -86,4 +86,20 @@ class ByteImageTest {
         assertEquals(Set.of(BigInteger.valueOf(13)),unknown.parts().getFirst().capturedOffsets().get(8));
         assertEquals(BigInteger.ZERO,unknown.parts().getFirst().producerOffset());
     }
+    @Test void hugeTextPaddingIsSparseAndTailReadsKeepExactProvenance() {
+        var huge=BigInteger.ONE.shiftLeft(100);
+        var fitted=ByteImage.literal(new Values.BytesValue(List.of(193,194)),1).fit(huge,64,2);
+        assertEquals(Optional.of(huge),fitted.extent());assertEquals(2,fitted.parts().size());
+        assertEquals(List.of(193,194,64,64),fitted.read(range(0,4)).bytes().orElseThrow().octets());
+        var start=huge.subtract(BigInteger.valueOf(4));
+        var tail=fitted.slice(StorageRange.exact(start,BigInteger.valueOf(4))).copied(3,start);
+        assertEquals(List.of(64,64,64,64),tail.read(range(0,4)).bytes().orElseThrow().octets());
+        assertEquals(start,tail.parts().getFirst().producerOffset());
+        assertEquals(Map.of(3,Set.of(start)),tail.parts().getFirst().capturedOffsets());
+        var patched=fitted.write(StorageRange.exact(huge.subtract(BigInteger.TWO),BigInteger.ONE),ByteImage.literal(new Values.BytesValue(List.of(240)),4));
+        assertEquals(4,patched.parts().size());
+        assertEquals(List.of(64,64,240,64),patched.read(StorageRange.exact(start,BigInteger.valueOf(4))).bytes().orElseThrow().octets());
+        assertEquals(fitted,fitted.withSourceGap(StorageRange.exact(start,BigInteger.ONE),9).write(StorageRange.exact(start,BigInteger.ONE),fitted.slice(StorageRange.exact(start,BigInteger.ONE))));
+    }
+
 }

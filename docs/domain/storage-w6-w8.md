@@ -36,3 +36,13 @@ para bases sem separação provada; com DisjointStorage a precisão local perman
 O oracle AIR independente testa os dois casos, incluindo PRIVATE sem prova.
 CALL literal preserva candidatos e dispensa a execução de values mesmo nesse
 inventário misto. Declarações não suportadas continuam explícitas no produtor.
+
+W8 demonstrated fix: `ByteImage.fit` previously allocated padding by extent and
+failed at 2^100 bytes even for a four-byte tail observation. Internal payloads now
+represent repeated padding as one span. Slice/copy/kill retain exact producer and
+capture offsets; solver/replay tests observe the tail without extent-sized work.
+Materializing an actual dense byte/text result remains proportional to the output
+size and subject to JVM representation/memory limits; this is not a candidate cap.
+W8 metamorphic tests compare candidates, remainder flags, byte contributions and
+supports across display renaming/alias observations, shuffled inventories and
+simultaneous initial conditions, and insertion of proved-disjoint overlays.

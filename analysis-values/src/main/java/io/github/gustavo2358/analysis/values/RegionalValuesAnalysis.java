@@ -370,7 +370,7 @@ public final class RegionalValuesAnalysis {
         var readStart=selected.range().orElseThrow().start();
         var observed=new StorageIndex.Location(selected.base(),Optional.of(new StorageRange(readStart.add(part.range().start()),part.range().end().map(e->e.add(readStart)))));
         var length=part.range().end().map(e->e.subtract(part.range().start()));
-        var bytes=part.payload().map(payload->new Values.BytesValue(payload.octets().subList(part.payloadOffset(),Math.addExact(part.payloadOffset(),length.orElseThrow().intValueExact()))));
+        var bytes=part.materialize();
         Optional<StorageIndex.Location> original=Optional.empty();
         if(bytes.isPresent()) {
             var written=eventDetails.get(part.producer()).target().location();
