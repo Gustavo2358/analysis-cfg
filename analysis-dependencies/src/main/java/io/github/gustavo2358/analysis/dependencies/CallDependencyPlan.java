@@ -27,8 +27,7 @@ public final class CallDependencyPlan {
             &&slice.offset() instanceof Expressions.Literal offset&&offset.value() instanceof Values.IntValue
             &&slice.length() instanceof Expressions.Literal length&&length.value() instanceof Values.IntValue;
     }
-    static boolean shape(Operations.Invoke i){return i.arguments().isEmpty()&&i.results().isEmpty();}
-    static int group(Operations.Invoke i){return !shape(i)?2:i.target() instanceof Interactions.LiteralTarget?0:readable(i)?1:2;}
+    static int group(Operations.Invoke i){return i.target() instanceof Interactions.LiteralTarget?0:readable(i)?1:2;}
     static PointQuery<ObjectId> valueQuery(SiteView site) {
         var target=(Interactions.ComputedTarget)((Operations.Invoke)site.operation()).target();
         var object=(Places.ObjectPlace)((Expressions.Read)target.name()).place();
@@ -63,7 +62,10 @@ public final class CallDependencyPlan {
             }
         }
         var registrations=new ArrayList<ConsumerRegistration<DependencySiteFact>>();
-        boolean regional=session.index().publication().storage().stream().anyMatch(Memory.Region.class::isInstance);
+        // Result assignments belong to normal-return edges. Select the existing regional
+        // provider that models those edges, including Cell storage, without changing solvers.
+        boolean regional=session.index().publication().storage().stream().anyMatch(Memory.Region.class::isInstance)
+            ||session.index().sites(Operations.Invoke.class).stream().anyMatch(s->!((Operations.Invoke)s.operation()).results().isEmpty());
         for(var context:session.contexts()) {
             var entry=context.entry().id();String id=part(entry.publication().localId())+part(entry.unit().localId())+part(entry.localId());
             var reach=ReachabilityProvider.batch("reach:"+id,entry);boolean physical=slicedUnits.contains(entry.unit());

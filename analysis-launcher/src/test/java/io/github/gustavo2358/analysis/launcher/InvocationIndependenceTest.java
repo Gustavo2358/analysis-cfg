@@ -8,6 +8,9 @@ import io.github.gustavo2358.analysis.dependencies.*;
 import io.github.gustavo2358.analysis.values.*;
 import io.github.gustavo2358.analysis.query.*;
 import io.github.gustavo2358.analysis.plan.*;
+import io.github.gustavo2358.analysis.cfg.application.*;
+import io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry;
+import io.github.gustavo2358.analysis.structure.AnalysisSession;
 import java.util.*;
 import java.nio.file.*;
 import java.io.*;
@@ -45,8 +48,8 @@ final class InvocationIndependenceTest {
     static Evidence.Coverage coverage(Evidence.Coverage c,Set<Id> removed) {
         return new Evidence.Coverage(c.inventory(),c.scope(),c.items().stream().map(i->new Evidence.CoverageItem(i.sourceKey(),i.origin(),i.status(),i.outputs().stream().map(id->removed.contains(id)?((OperationOwner)((OperandId)id).owner()).operation():id).distinct().toList(),i.uncertainties(),i.elimination())).toList(),c.uncertainties());
     }
-    @Test void memoryEightShapesPreserveTargetAndRemainder() throws Exception {
-        for(boolean computed:List.of(false,true))for(String shape:List.of("none","argument","result",computed?"unknown-result":"unknown-argument")) {
+    @Test void memoryTenShapesPreserveTargetAndRemainder() throws Exception {
+        for(boolean computed:List.of(false,true))for(String shape:List.of("none","argument","result","unknown-result","unknown-argument")) {
             var p=fixture(computed,shape);assertTarget(p,computed+":"+shape);
         }
     }
@@ -60,8 +63,26 @@ final class InvocationIndependenceTest {
         if(fact.targetKind()==DependencySiteFact.TargetKind.COMPUTED)assertEquals(ProgramPoint.Kind.BEFORE,fact.valuePoint().kind());
         return result;
     }
-    @Test void jsonCliEightShapesRetainOperandsAndEqualMemory() throws Exception {
-        for(boolean computed:List.of(false,true))for(String shape:List.of("none","argument","result",computed?"unknown-result":"unknown-argument")) {
+    @Test void normalResultKillsOldValueButUnknownDestinationOnlyWidens() throws Exception {
+        for(String shape:List.of("result","unknown-result")) {
+            var p=fixture(true,shape);var unit=p.units().getFirst();var entry=unit.entries().getFirst().id();
+            var invoke=(Operations.Invoke)unit.sequences().stream().map(Sequence::terminator).filter(Operations.Invoke.class::isInstance).findFirst().orElseThrow();
+            var target=((Places.ObjectPlace)((Expressions.Read)((Interactions.ComputedTarget)invoke.target()).name()).place()).object();
+            var options=BuildOptions.defaults();var cfg=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).build(p,options);
+            var session=AnalysisSession.open(cfg,p,options.projectionPolicy(),unit.entries()).session().orElseThrow();
+            var prepared=new RegionalValuesProvider().prepare(session,RegionalValuesProvider.key(entry));assertNull(prepared.refusal());
+            var run=prepared.execute();var after=unit.sequences().stream().map(Sequence::terminator).filter(Operations.Return.class::isInstance).findFirst().orElseThrow();
+            var before=run.observe(List.of(new PointQuery<>(ProgramPoint.before(entry,invoke.header().id()),target))).batch().observations().getFirst().value();
+            var normal=run.observe(List.of(new PointQuery<>(new ProgramPoint(entry,ProgramPoint.Kind.OUTCOME,invoke.header().id(),Control.NormalOutcome.INSTANCE),target))).batch().observations().getFirst().value();
+            assertEquals(List.of(new Values.TextValue("PROGA   ")),before.candidates());
+            assertEquals(shape.equals("result")?List.of():before.candidates(),normal.candidates());assertTrue(normal.modelValueRemainder());
+            // The broad open control remainder can also reach this label without normal return.
+            var joined=run.observe(List.of(new PointQuery<>(ProgramPoint.before(entry,after.header().id()),target))).batch().observations().getFirst().value();
+            assertEquals(before.candidates(),joined.candidates());assertTrue(joined.modelValueRemainder());
+        }
+    }
+    @Test void jsonCliTenShapesRetainOperandsAndEqualMemory() throws Exception {
+        for(boolean computed:List.of(false,true))for(String shape:List.of("none","argument","result","unknown-result","unknown-argument")) {
             var p=fixture(computed,shape);var result=assertTarget(p,computed+":"+shape);
             var wire=new AirJson().encode(p);assertEquals(p,new AirJson().decode(wire));
             var input=dir.resolve("input");var output=dir.resolve("dependencies.json");Files.write(input,wire);

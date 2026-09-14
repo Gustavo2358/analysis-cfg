@@ -132,13 +132,13 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "b34c4c575270cd7f4047a0ad10bda3303ea8c001",
+    "commit": "2b0c7c336666265a423b1accaecbd2690fe0dcc7",
     "canonical_ref": "feat/recall-first-partial-semantics",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
     "analysis_ir": {
       "semantic_version": "2.0.0",
-      "commit": "31893d1f4d203d19a61a750e2c4220120d9dab84"
+      "commit": "796d113f5a7afffdd421e0c2652e44e1de7bf49c"
     },
     "maven": {
       "group_id": "io.github.gustavo2358",
@@ -195,7 +195,7 @@
         "path": "air-json/pom.xml",
         "artifact_id": "air-json",
         "role": "shared_codec_4B_scalar_assign_consumed_by_cfg_adapters",
-        "coverage": "ST-W1 regional constant bounds, Region/View/alias, bytes, CopyBytes and explicit IBM1047; historical scalar/control forms preserved; W6 generic fit_text roundtrip with explicit pad and exact length"
+        "coverage": "ST-W1 regional constant bounds, Region/View/alias, bytes, CopyBytes and explicit IBM1047; historical scalar/control forms preserved; W6 generic fit_text roundtrip with explicit pad and exact length; RF-W3 Argument value/copy/reference and results Place[]"
       }
     },
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
