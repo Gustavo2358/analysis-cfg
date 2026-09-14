@@ -6,7 +6,7 @@ import java.util.*;
 
 /** Primary, detached fact. A possible reference is not a proof of runtime linkage. */
 public record DependencySiteFact(UnitId caller,EntryId entry,LabelId sequence,OperationId operation,int offset,
-        OriginId siteOrigin,OriginId targetOrigin,TargetKind targetKind,ObjectId subject,ProgramPoint valuePoint,
+        OriginId siteOrigin,OriginId targetOrigin,String technology,String command,String namespace,String nameProfile,TargetKind targetKind,ObjectId subject,ProgramPoint valuePoint,
         Reachability reachability,TargetStatus targetStatus,List<RawCandidate> rawCandidates,List<Candidate> candidates,
         Boolean modelValueRemainder,boolean sourceValueRemainder,boolean interpretationUnknownRemainder,
         boolean effectiveUnknownRemainder,boolean openControlRemainder,List<Id> evidence,List<OriginId> provenance,
@@ -14,7 +14,7 @@ public record DependencySiteFact(UnitId caller,EntryId entry,LabelId sequence,Op
     public enum TargetKind { LITERAL, COMPUTED }
     public enum Reachability { REACHABLE, UNREACHABLE_IN_MODEL }
     public enum TargetStatus { RESOLVED_CANDIDATES, OPEN_TARGET, UNREACHABLE_IN_MODEL, UNSUPPORTED_TARGET_EXPRESSION, UNSUPPORTED_INVOCATION_SHAPE }
-    public enum SupportKind { VALUE_PRODUCER, CALL_LITERAL }
+    public enum SupportKind { VALUE_PRODUCER, CALL_LITERAL, CICS_LITERAL }
     public record Support(SupportKind kind,Id producer,OriginId origin,List<PremiseId> premises) {
         public Support {Objects.requireNonNull(kind);Objects.requireNonNull(producer);Objects.requireNonNull(origin);premises=List.copyOf(premises);}
     }
@@ -27,6 +27,7 @@ public record DependencySiteFact(UnitId caller,EntryId entry,LabelId sequence,Op
     public DependencySiteFact {
         Objects.requireNonNull(caller);Objects.requireNonNull(entry);Objects.requireNonNull(sequence);Objects.requireNonNull(operation);
         Objects.requireNonNull(siteOrigin);Objects.requireNonNull(targetOrigin);Objects.requireNonNull(targetKind);
+        Objects.requireNonNull(technology);Objects.requireNonNull(command);Objects.requireNonNull(namespace);Objects.requireNonNull(nameProfile);
         Objects.requireNonNull(reachability);Objects.requireNonNull(targetStatus);
         rawCandidates=List.copyOf(rawCandidates);candidates=List.copyOf(candidates);evidence=List.copyOf(evidence);
         provenance=List.copyOf(provenance);premises=List.copyOf(premises);uncertaintyRefs=List.copyOf(uncertaintyRefs);

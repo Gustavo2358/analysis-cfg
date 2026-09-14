@@ -169,6 +169,7 @@
       "io.github.gustavo2358.air.model.Memory$ObjectDeclaration",
       "io.github.gustavo2358.air.model.Memory$Storage",
       "io.github.gustavo2358.air.model.Memory$StorageHeader",
+      "io.github.gustavo2358.air.model.NamePolicies",
       "io.github.gustavo2358.air.model.Operand",
       "io.github.gustavo2358.air.model.Operand$Header",
       "io.github.gustavo2358.air.model.Operands",

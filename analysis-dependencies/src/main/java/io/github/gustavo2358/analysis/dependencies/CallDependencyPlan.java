@@ -16,8 +16,8 @@ public final class CallDependencyPlan {
     private CallDependencyPlan(){ }
     public static boolean selected(Operations.Invoke i) {
         return switch(i.target()) {
-            case Interactions.LiteralTarget t -> t.category().equals("program")&&t.namespace().equals("cobol.program");
-            case Interactions.ComputedTarget t -> t.category().equals("program")&&t.namespace().equals("cobol.program");
+            case Interactions.LiteralTarget t -> t.category().equals("program")&&(t.namespace().equals("cobol.program")||t.namespace().equals("cics.program"));
+            case Interactions.ComputedTarget t -> t.category().equals("program")&&(t.namespace().equals("cobol.program")||t.namespace().equals("cics.program"));
             default -> false;
         };
     }
@@ -50,9 +50,14 @@ public final class CallDependencyPlan {
     /** Explicit registration namespace and duplicate requests support composition/testing of shared W4 batches. */
     public static List<ConsumerRegistration<DependencySiteFact>> select(AnalysisSession session,String namespace,boolean duplicateQuery) {
         // Only the indexed Invoke bucket is inspected, once, to avoid demanding values for literal-only units.
-        var groups=new HashMap<UnitId,Set<Integer>>();var slicedUnits=new HashSet<UnitId>();
+        var cicsAreas=new HashSet<OperationId>();var groups=new HashMap<UnitId,Set<Integer>>();var slicedUnits=new HashSet<UnitId>();
         for(var site:session.index().sites(Operations.Invoke.class)) {
             var invoke=(Operations.Invoke)site.operation();if(selected(invoke)) {
+                if(readable(invoke)) {
+                    var place=((Expressions.Read)((Interactions.ComputedTarget)invoke.target()).name()).place();
+                    var binding=place instanceof Places.ObjectPlace object?session.index().object(object.object()).storage():null;
+                    if(CicsNameInterpreter.area(place,binding))cicsAreas.add(invoke.header().id());
+                }
                 groups.computeIfAbsent(site.owner().id(),ignored->new HashSet<>()).add(group(invoke));
                 if(readable(invoke)&&((Expressions.Read)((Interactions.ComputedTarget)invoke.target()).name()).place() instanceof Places.RegionSlice)slicedUnits.add(site.owner().id());
             }
@@ -79,7 +84,7 @@ public final class CallDependencyPlan {
                     }
                 }
                 var interest=new SiteInterest(Operations.Invoke.class,entry,s->selected((Operations.Invoke)s.operation())&&group((Operations.Invoke)s.operation())==group,queries);
-                registrations.add(new ConsumerRegistration<>(new ConsumerPlan(namespace+":"+id+":"+group,keys,batches),List.of(interest),List.of(),new CallDependencyConsumer(reach,group==1&&!physical?values:null,group==1&&physical?storageValues:null)));
+                registrations.add(new ConsumerRegistration<>(new ConsumerPlan(namespace+":"+id+":"+group,keys,batches),List.of(interest),List.of(),new CallDependencyConsumer(Set.copyOf(cicsAreas),reach,group==1&&!physical?values:null,group==1&&physical?storageValues:null)));
             }
         }
         return List.copyOf(registrations);

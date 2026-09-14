@@ -39,9 +39,10 @@ public final class CfgBuildCoordinator implements BuildCfg {
     // The public boundary always runs the real validator above.
     CfgBuildResult buildAfterPreflight(Publication publication, BuildOptions options,
                                        ValidationResult preflight) {
+        var namePolicies = io.github.gustavo2358.air.model.NamePolicies.extensions(publication);
         List<Capabilities.Capability> unsupported = publication.capabilities().required().stream()
                 .filter(capability -> !CoreCfgProjection.supportsControlCapability(capability)
-                        && interpreters.find(capability).isEmpty())
+                        && !namePolicies.contains(capability) && interpreters.find(capability).isEmpty())
                 .distinct()
                 .sorted(CAPABILITY_ORDER)
                 .toList();

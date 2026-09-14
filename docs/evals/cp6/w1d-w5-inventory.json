@@ -649,7 +649,6 @@
         "io.github.gustavo2358.analysis.adapters.JsonOutput",
         "io.github.gustavo2358.analysis.adapters.ResultJson",
         "io.github.gustavo2358.analysis.adapters.WireIds",
-        "io.github.gustavo2358.analysis.dependencies.CallNameInterpreter",
         "io.github.gustavo2358.analysis.dependencies.DependencyResult",
         "io.github.gustavo2358.analysis.dependencies.DependencyResult$Edge",
         "io.github.gustavo2358.analysis.dependencies.DependencySiteFact",

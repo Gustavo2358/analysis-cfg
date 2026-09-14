@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "observed_on": "2026-09-13",
+  "observed_on": "2026-09-14",
   "analysis_ir": {
     "repository": "Gustavo2358/analysis-ir",
     "commit": "31893d1f4d203d19a61a750e2c4220120d9dab84",
@@ -124,12 +124,12 @@
         "git_blob_sha1": "a33cb30bc1979b60ff59cdcf0b1a22e8c9778166"
       }
     ],
-    "baseline_assessment": "Merged W0\u2013W5 normative baseline; no normative change in W6."
+    "baseline_assessment": "Merged W0–W5 normative baseline; no normative change in W6."
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "87122046b7fd647a4100b8475b642a9d41464bb8",
-    "canonical_ref": "main",
+    "commit": "0af506962ac719c3cff7603d81e51a66f875f704",
+    "canonical_ref": "feat/cics-program-control",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
     "analysis_ir": {
@@ -244,9 +244,9 @@
       "docs/domain/cobol-semantic-product.md",
       "docs/work/history/WORK-SEMANTIC-PRODUCT-003.md"
     ],
-    "semantic_product_version": "2.12.0",
+    "semantic_product_version": "2.14.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "8533fc36c30797e9631481a59822dfa9e67cdd56",
+    "commit": "be2b74bff2a37c3970a0e5f754a77ab430cd7cd8",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -257,12 +257,12 @@
       "scope": "local unconditional paragraph identity and explicit entry; G1-G5 and 1/2/5/40"
     },
     "storage_contract_version": "1.3.0",
-    "canonical_ref": "main"
+    "canonical_ref": "feat/cics-program-control"
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
-    "status": "verified",
-    "commit": "5fc7ca9776ab440fd2f16758fc5d3becd090e721",
+    "status": "CICS campaign draft; technical evidence recorded in product tests",
+    "commit": "60af22d33c66af3bd897720a1518334c65418cd0",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -274,7 +274,7 @@
     "goto_validation": {
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
     },
-    "canonical_ref": "main"
+    "canonical_ref": "feat/cics-program-control"
   },
   "external": [
     {

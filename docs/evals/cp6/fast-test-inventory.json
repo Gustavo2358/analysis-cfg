@@ -104,6 +104,18 @@
       "detachedResultRetentionContainsOnlyValuesMetadataAndReferenceIds",
       "regionalLiteralSeedsKeepEntryIdentityAndNonoverlappingWireCovers",
       "distinctEntryPathsKeepRegionalContentsAndReachabilitySeparate"
+    ],
+    "io.github.gustavo2358.analysis.adapters.CicsInvokeRouteTest": [
+      "knownNormalDoesNotEraseLocalRemainderFromQueries",
+      "emptyKnownWithLocalRemainderRemainsPossible",
+      "externalOnlyHasNoLocalContinuationInQueries",
+      "conditionCanContinueWithoutNormalSuccess",
+      "extensionPolicySurvivesTransportWithoutCobolSubstitution",
+      "platformProfileAcceptsDigitAndPreservesUnsupportedSpelling",
+      "eightCharactersWithoutPhysicalNameAreaRemainUnsupported"
+    ],
+    "io.github.gustavo2358.analysis.adapters.CicsTargetTimingTest": [
+      "nameAndSupportsAreObservedBeforeForeignEffects"
     ]
   },
   "analysis-dataflow": {
