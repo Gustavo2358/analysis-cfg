@@ -205,7 +205,8 @@
       "sourceGapFollowsPhysicalAliasButNotAdjacentInterval",
       "seededCellIsNotReinitializedOnLoopOrNextSequence",
       "hugeBoundsUnknownTailAndZeroLengthNeverAllocatePerByte",
-      "wideDefinitionsAndDuplicateQueriesHaveNoCandidateCapOrRepeatedReplay"
+      "wideDefinitionsAndDuplicateQueriesHaveNoCandidateCapOrRepeatedReplay",
+      "openEnvironmentDefinitionsKeepDistinctPremisesInCanonicalOrder"
     ],
     "io.github.gustavo2358.analysis.storage.StorageQueryTest": [
       "namedViewAndPhysicalRangeShareTheSameDefinitionProduct",

@@ -250,7 +250,7 @@ public final class ReachingDefinitions {
                     }
                 }
             }
-            var ordered=new ArrayList<>(contributions.keySet());ordered.sort(Comparator.comparing((DefinitionEvent e)->e.operation().map(OperationId::localId).orElse("")).thenComparingInt(DefinitionEvent::slot).thenComparing(e->e.storage().localId()).thenComparing(DefinitionEvent::unknown));
+            var ordered=new ArrayList<>(contributions.keySet());ordered.sort(Comparator.comparing((DefinitionEvent e)->e.operation().map(OperationId::localId).orElse("")).thenComparingInt(DefinitionEvent::slot).thenComparing(e->e.storage().localId()).thenComparing(DefinitionEvent::unknown).thenComparing(DefinitionEvent.ORDER));
             var output=new ArrayList<DefinitionFact.Contribution>();
             for(var event:ordered)output.add(new DefinitionFact.Contribution(event,coalesce(contributions.get(event)).stream().map(l->l.in(query.point().entry())).toList()));
             return new DefinitionFact(query.point(),state.reached()?DefinitionFact.Reachability.REACHABLE:DefinitionFact.Reachability.UNREACHABLE_IN_MODEL,output,state.reached()?unknown:null,!(resolution.remainder() instanceof Scopes.NoMemory),source,evidenceOrder(premises),evidenceOrder(origins),evidenceOrder(uncertainties));

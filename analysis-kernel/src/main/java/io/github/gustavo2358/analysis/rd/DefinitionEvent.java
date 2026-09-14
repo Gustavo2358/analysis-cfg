@@ -31,4 +31,55 @@ public record DefinitionEvent(EntryId entry,Optional<OperationId> operation,Opti
         return new DefinitionEvent(entry,Optional.empty(),Optional.of(condition.place().header().id()),slot,Optional.empty(),target.location().base().id(),kind,!(value instanceof Entries.LiteralInitial)||!target.sourceApplicable(),condition.origin(),List.copyOf(premises),List.copyOf(uncertainty),target.reasons());
     }
     private static <T extends Id> List<T> ordered(List<T> ids){return ids.stream().distinct().sorted(Comparator.comparing((T id)->id.publication().localId()).thenComparing(Id::localId)).toList();}
+
+    // Complete typed tie-breaker: equal operation/slot/storage is not equal evidence.
+    private static <T> Comparator<Optional<T>> optional(Comparator<? super T> order) {
+        return (a,b)->a.isEmpty()?(b.isEmpty()?0:-1):b.isEmpty()?1:order.compare(a.get(),b.get());
+    }
+    private static <T> Comparator<List<T>> list(Comparator<? super T> order) {
+        return (a,b)->{for(int i=0;i<Math.min(a.size(),b.size());i++){int c=order.compare(a.get(i),b.get(i));if(c!=0)return c;}return Integer.compare(a.size(),b.size());};
+    }
+    private static List<String> idParts(Id id) {
+        var result=new ArrayList<String>();result.add(id.publication().localId());
+        switch(id) {
+            case PublicationId ignored -> result.add("publication");
+            case UnitId ignored -> result.add("unit");
+            case StorageId ignored -> result.add("storage");
+            case ResourceId ignored -> result.add("resource");
+            case ArtifactId ignored -> result.add("artifact");
+            case ArtifactRelationId ignored -> result.add("artifact-relation");
+            case OriginId ignored -> result.add("origin");
+            case UncertaintyId ignored -> result.add("uncertainty");
+            case PremiseId ignored -> result.add("premise");
+            case EntryId i -> result.addAll(List.of("entry",i.unit().localId()));
+            case LabelId i -> result.addAll(List.of("label",i.unit().localId()));
+            case OperationId i -> result.addAll(List.of("operation",i.unit().localId()));
+            case ObjectId i -> result.addAll(List.of("object",i.unit().localId()));
+            case CompletionPortId i -> result.addAll(List.of("completion-port",i.unit().localId()));
+            case OperandId i -> {
+                result.addAll(List.of("operand",i.owner().unit().localId()));
+                switch(i.owner()) {
+                    case OperationOwner o -> result.addAll(List.of("operation",o.operation().localId()));
+                    case EntryOwner o -> result.addAll(List.of("entry",o.entry().localId()));
+                }
+            }
+        }
+        result.add(id.localId());return result;
+    }
+    private static final Comparator<Id> ID=Comparator.comparing(DefinitionEvent::idParts,list(Comparator.naturalOrder()));
+    private static List<String> outcome(Control.OutcomeKey outcome) {
+        return switch(outcome) {
+            case Control.NormalOutcome ignored -> List.of("normal");
+            case Control.ExceptionOutcome e -> List.of("exception",e.tag());
+            case Control.OtherExceptionOutcome ignored -> List.of("other-exception");
+            case Control.HaltOutcome ignored -> List.of("halt");
+            case Control.DivergeOutcome ignored -> List.of("diverge");
+        };
+    }
+    static final Comparator<DefinitionEvent> ORDER=Comparator.comparing(DefinitionEvent::entry,ID)
+        .thenComparing(DefinitionEvent::operation,optional(ID)).thenComparing(DefinitionEvent::destination,optional(ID))
+        .thenComparingInt(DefinitionEvent::slot).thenComparing(DefinitionEvent::outcome,optional(Comparator.comparing(DefinitionEvent::outcome,list(Comparator.naturalOrder()))))
+        .thenComparing(DefinitionEvent::storage,ID).thenComparing(DefinitionEvent::kind).thenComparing(DefinitionEvent::unknown)
+        .thenComparing(DefinitionEvent::origin,ID).thenComparing(DefinitionEvent::premises,list(ID)).thenComparing(DefinitionEvent::uncertainties,list(ID))
+        .thenComparing(DefinitionEvent::reasons,list(Comparator.naturalOrder()));
 }

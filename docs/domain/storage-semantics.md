@@ -40,6 +40,9 @@ constant interval boundaries required by accesses; do not materialize storage
 per byte. A state records contributing events by segment. Exact MUST replaces
 only covered segments; MAY/ambiguous writes retain surviving contributors.
 Entry unknown is a definition/remainder, distinct from unreachable bottom.
+Definition output has a typed total order, including premises, uncertainties and
+all other event metadata. Direct and environment-remainder events may share
+operation/slot/storage while retaining distinct proofs; neither is discarded.
 
 The immutable query result includes definitions, contributedRanges,
 unknownRemainder, reachability, point (before/after/outcome), entry/context,

@@ -81,4 +81,19 @@ class RegionalDefinitionAdversarialTest {
             System.out.println("ST_RD_SCALE definitions="+size+" segments="+analysis.partition().segments().size()+" replay="+batch.metrics().operationsReplayed()+" queries="+batch.metrics().uniqueQueries());
         }
     }
+
+    @Test void openEnvironmentDefinitionsKeepDistinctPremisesInCanonicalOrder() {
+        for(int attempt=0;attempt<32;attempt++) {
+            var effect=new Operations.HavocMay(header("effect"),new Scopes.AllMemory(P,true),UNKNOWN);
+            var p=publication(List.of(region("a",8L,Memory.Lifetime.ACTIVATION),region("b",8L,Memory.Lifetime.ACTIVATION)),
+                List.of(view("a","a",0,8),view("b","b",0,8)),List.of(sequence("s",List.of(effect))),List.of(disjoint("a","b")));
+            var run=new ReachingDefinitions(new StatementEffects(new StorageIndex(session(p)))).execute();
+            var result=fact(run,after("effect","a"));
+            var events=result.definitions().stream().map(DefinitionFact.Contribution::definition).filter(e->e.operation().isPresent()).toList();
+            assertEquals(2,events.size(),"direct and environment remainder events remain distinct");
+            assertEquals(List.of(List.of(),List.of(new PremiseId(P,"disjoint"))),events.stream().map(DefinitionEvent::premises).toList(),"full event metadata has canonical order");
+            assertTrue(result.unknownRemainder());
+            assertEquals(Set.of("ENTRY:0..8","effect:0..8"),contributions(result));
+        }
+    }
 }
