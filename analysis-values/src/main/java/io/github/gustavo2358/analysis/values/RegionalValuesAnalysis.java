@@ -436,7 +436,22 @@ public final class RegionalValuesAnalysis {
                     if(value.text().isEmpty()){model=true;reasons.addAll(value.reasons());}
                     else supports.computeIfAbsent(value.text().get().value(),ignored->new HashSet<>()).addAll(value.producers());
                     var fragments=value.traces().stream().map(t->fragment(t,query.point().entry(),value.text().isPresent())).distinct().sorted(StorageValueOrder.FRAGMENT).toList();
-                    alternatives.add(new StorageValueFact.Alternative(new RegionalValueFact.Interpretation(candidate.location().in(query.point().entry()),candidate.codec()),value.text(),fragments));
+                    var interpretation=new RegionalValueFact.Interpretation(candidate.location().in(query.point().entry()),candidate.codec());
+                    if(candidate.location().range().isEmpty())alternatives.add(new StorageValueFact.Alternative(interpretation,value.text(),fragments));
+                    else {
+                        // Co-initial contributors prove the same image, not alternative byte values.
+                        // Keep the established nonoverlapping-fragment wire: a canonical complete
+                        // cover plus one complete cover for each additional contribution suffices
+                        // to retain every interval/provenance association without Cartesian products.
+                        var byRange=new LinkedHashMap<StorageIndex.ContextualLocation,List<StorageValueFact.Fragment>>();
+                        for(var fragment:fragments)byRange.computeIfAbsent(fragment.location(),ignored->new ArrayList<>()).add(fragment);
+                        var groups=new ArrayList<>(byRange.values());var cover=groups.stream().map(List::getFirst).toList();
+                        alternatives.add(new StorageValueFact.Alternative(interpretation,value.text(),cover));
+                        for(int i=0;i<groups.size();i++)for(int j=1;j<groups.get(i).size();j++) {
+                            var variant=new ArrayList<>(cover);variant.set(i,groups.get(i).get(j));
+                            alternatives.add(new StorageValueFact.Alternative(interpretation,value.text(),variant));
+                        }
+                    }
                 }
             }
             if(state.reached()&&supports.isEmpty()){model=true;reasons.add("NO_KNOWN_TEXT_PROJECTION");}

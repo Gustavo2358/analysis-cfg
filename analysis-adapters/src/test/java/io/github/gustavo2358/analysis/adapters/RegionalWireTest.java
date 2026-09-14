@@ -91,20 +91,25 @@ class RegionalWireTest {
         var before=encode(result);new RegionalAnalysis().prepare(fixture(),"unrelated",queries());assertArrayEquals(before,encode(result));
         System.out.println("W5_RETENTION resultObjects="+graph.size()+" forbiddenRoots=0 wireBytes="+before.length);
     }
-    @Test void regionalLiteralSeedsRemainAnExplicitValidatorLimit() {
+    @Test void regionalLiteralSeedsKeepEntryIdentityAndNonoverlappingWireCovers() throws Exception {
         var p=fixture();var unit=p.units().getFirst();var entries=new ArrayList<Entries.Entry>();
         for(int i=0;i<2;i++) {
             var e=entry(U,"seed-"+i,"body");var owner=new EntryOwner(e.id());
             var place=new Places.ObjectPlace(new Operand.Header(new OperandId(owner,"place"),Operand.Role.VALUE_WRITE,origin(P)),WHOLE);
             var literal=new Expressions.Literal(new Operand.Header(new OperandId(owner,"literal"),Operand.Role.VALUE_READ,origin(P)),new Values.TextValue(i==0?"AAAABBBB":"CCCCDDDD"));
-            entries.add(new Entries.Entry(e.id(),e.initialLabel(),e.signature(),new Entries.EntryState(List.of(new Entries.InitialCondition(place,new Entries.LiteralInitial(literal),origin(P),List.of())),List.of()),e.origin()));
+            var prefixPlace=new Places.ObjectPlace(new Operand.Header(new OperandId(owner,"prefix-place"),Operand.Role.VALUE_WRITE,origin(P)),PREFIX);
+            var prefixLiteral=new Expressions.Literal(new Operand.Header(new OperandId(owner,"prefix-literal"),Operand.Role.VALUE_READ,origin(P)),new Values.TextValue(i==0?"AAAA":"CCCC"));
+            entries.add(new Entries.Entry(e.id(),e.initialLabel(),e.signature(),new Entries.EntryState(List.of(new Entries.InitialCondition(place,new Entries.LiteralInitial(literal),origin(P),List.of()),new Entries.InitialCondition(prefixPlace,new Entries.LiteralInitial(prefixLiteral),origin(P),List.of())),List.of()),e.origin()));
         }
         p=new Publication(P,p.airVersion(),p.capabilities(),p.artifacts(),List.of(unit(U,entries,unit.sequences(),unit.objects())),p.storage(),p.resources(),p.artifactRelations(),p.origins(),p.coverage(),p.uncertainties(),p.premises());
         var queries=entries.stream().map(e->new PointQuery<StorageSubject>(ProgramPoint.entry(e.id()),new StorageSubject.NamedObject(WHOLE))).toList();
-        var input=p;
-        var failure=assertThrows(AnalysisDataflow.PreparationException.class,()->new RegionalAnalysis().prepare(input,"seeds",queries));
-        assertEquals(AnalysisDataflow.Failure.EXTERNAL_SIZE_CAP_DEBT,failure.failure());
-        assertTrue(io.github.gustavo2358.air.validation.AirValidator.validate(p).issues().stream().anyMatch(issue->issue.detail().contains("overlapping region initializers")));
+        var result=new RegionalAnalysis().prepare(p,"seeds",queries);
+        for(var observation:result.observations()) {
+            var value=observation.values().value();assertEquals(List.of(new Values.TextValue(observation.query().point().entry().localId().equals("seed-0")?"AAAABBBB":"CCCCDDDD")),value.candidates());
+            assertFalse(value.modelValueRemainder());assertEquals(2,value.candidateSupports().getFirst().producers().size());
+        }
+        var codec=new AirJson();assertEquals(p,codec.decode(codec.encode(p)));
+        var out=Path.of("target/regional-wire");Files.createDirectories(out);Files.write(out.resolve("initial.result.json"),encode(result));
     }
 
     @Test void distinctEntryPathsKeepRegionalContentsAndReachabilitySeparate() {

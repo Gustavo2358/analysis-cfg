@@ -1220,6 +1220,7 @@
         "java.util.Comparator",
         "java.util.HashSet",
         "java.util.Iterator",
+        "java.util.LinkedHashMap",
         "java.util.LinkedHashSet",
         "java.util.List",
         "java.util.Map",

@@ -11,8 +11,8 @@ consistency; RD retains each initial definition per intersecting segment and
 refuses unresolved overlapping forms. Values keeps one image with co-initial
 provenance per span, unioned at equal overlaps. It does not enumerate alternative
 orders of initialization. Writes kill all prior supports only on written bytes;
-copies preserve each surviving contribution. Detached contribution fragments may
-share an interval when equal simultaneous conditions justify the same bytes.
+copies preserve each surviving contribution. Detached alternatives preserve nonoverlapping complete fragment covers; their
+union retains every co-initial interval/provenance association.
 Unprovided bytes remain open. Entry boundary seeds run once; local invocation
 and initial-label backedges do not reseed.
 

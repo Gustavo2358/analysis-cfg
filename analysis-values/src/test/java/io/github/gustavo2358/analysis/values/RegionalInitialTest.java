@@ -39,6 +39,20 @@ class RegionalInitialTest {
         var copied=at(run(twice),"return-s0",SUFFIX);assertEquals(List.of("ABCD"),texts(copied));
         assertEquals(Set.of("whole","prefix"),new HashSet<>(copied.candidateSupports().getFirst().producers().stream().map(s->s.evidence().localId()).toList()));
     }
+    @Test void detachedAlternativesPreserveNonoverlappingWireFragmentsAndEveryInitialOrigin() {
+        var p=seeded(List.of(returning(U,"s0",List.of())),List.of(seed("left",0,"ABCDEF"),seed("right",2,"CDEFGH"),seed("middle",3,"DE")));
+        var q=new PointQuery<io.github.gustavo2358.analysis.storage.StorageSubject>(ProgramPoint.before(new EntryId(U,"entry"),new OperationId(U,"return-s0")),new io.github.gustavo2358.analysis.storage.StorageSubject.NamedObject(WHOLE));
+        var fact=run(p).observeStorage(List.of(q)).observations().getFirst().value();var producers=new HashSet<String>();
+        for(var alternative:fact.alternatives()) {
+            var cursor=BigInteger.ZERO;
+            for(var fragment:alternative.fragments()) {
+                var range=fragment.location().location().range().orElseThrow();assertEquals(cursor,range.start(),"wire alternative must have no overlap or hole");cursor=range.end().orElseThrow();
+                producers.add(fragment.producer().orElseThrow().definition().destination().orElseThrow().localId());
+            }
+            assertEquals(BigInteger.valueOf(8),cursor);
+        }
+        assertEquals(Set.of("left","right","middle"),producers);assertTrue(fact.alternatives().size()<=5);
+    }
     @Test void unspecifiedBytesRemainUnknownWhileKnownChildCanBeRead() {
         var execution=run(seeded(List.of(returning(U,"s0",List.of())),List.of(seed("prefix",0,"ABCD"))));
         assertEquals(List.of("ABCD"),texts(at(execution,"return-s0",PREFIX)));assertFalse(at(execution,"return-s0",PREFIX).modelValueRemainder());
