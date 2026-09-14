@@ -20,6 +20,7 @@ def oracle(case,sp,air,dep,cfg):
     require(names==sorted(case['names']),'handwritten candidates: '+str(names)+' != '+str(case['names']))
     opened=any(site[k] for k in ['modelValueRemainder','sourceValueRemainder','interpretationUnknownRemainder'])
     if case.get('open') or not names:require(opened,'runtime/unknown alternatives must stay open')
+    if case.get('open'):require(site['modelValueRemainder'] is True,'runtime branch must retain its model value remainder independently of source gaps')
     if case.get('command'):require(site['technology']=='CICS' and site['command']==case['command'],'shared CICS dependency consumer')
     if names:
         require(site['valuePoint']['position']=='BEFORE','target observed before invocation effects')
