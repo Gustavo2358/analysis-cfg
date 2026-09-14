@@ -8,13 +8,22 @@ import java.util.*;
 /** One immutable byte image, represented by spans rather than one allocation per octet. */
 final class ByteImage {
     record Part(StorageRange range,Optional<Values.BytesValue> payload,int payloadOffset,int producer,
-                BigInteger producerOffset,Map<Integer,Set<BigInteger>> capturedOffsets,Set<String> reasons,Set<Integer> sourceGaps) {
+                BigInteger producerOffset,Map<Integer,Set<BigInteger>> capturedOffsets,Set<String> reasons,Set<Integer> sourceGaps,Map<Integer,BigInteger> coInitial) {
         Part {
-            Objects.requireNonNull(range);Objects.requireNonNull(payload);Objects.requireNonNull(producerOffset);
+            Objects.requireNonNull(range);Objects.requireNonNull(payload);Objects.requireNonNull(producerOffset);coInitial=Map.copyOf(coInitial);
             var copies=new HashMap<Integer,Set<BigInteger>>();capturedOffsets.forEach((event,offsets)->{
                 if(event<0||offsets.isEmpty()||offsets.stream().anyMatch(o->o.signum()<0))throw new IllegalArgumentException("invalid capture contribution");
                 copies.put(event,Set.copyOf(offsets));
             });capturedOffsets=Map.copyOf(copies);reasons=Set.copyOf(reasons);sourceGaps=Set.copyOf(sourceGaps);
+        }
+        Part(StorageRange range,Optional<Values.BytesValue> payload,int payloadOffset,int producer,BigInteger producerOffset,Map<Integer,Set<BigInteger>> capturedOffsets,Set<String> reasons,Set<Integer> sourceGaps) {
+            this(range,payload,payloadOffset,producer,producerOffset,capturedOffsets,reasons,sourceGaps,Map.of());
+        }
+        Map<Integer,BigInteger> contributors() {
+            var all=new HashMap<>(coInitial);if(producer>=0)all.put(producer,producerOffset);return Map.copyOf(all);
+        }
+        Part contributor(int event,BigInteger offset) {
+            return new Part(range,payload,payloadOffset,event,offset,capturedOffsets,reasons,sourceGaps);
         }
         Part(StorageRange range,Optional<Values.BytesValue> payload,int payloadOffset,int producer,BigInteger producerOffset,Map<Integer,Set<BigInteger>> capturedOffsets,Set<String> reasons) {
             this(range,payload,payloadOffset,producer,producerOffset,capturedOffsets,reasons,Set.of());
@@ -23,10 +32,10 @@ final class ByteImage {
         Part crop(StorageRange slice) {
             var delta=slice.start().subtract(range.start());
             return new Part(slice,payload,payload.isPresent()?Math.addExact(payloadOffset,delta.intValueExact()):0,producer,
-                payload.isPresent()?producerOffset.add(delta):BigInteger.ZERO,advance(capturedOffsets,delta),reasons,sourceGaps);
+                payload.isPresent()?producerOffset.add(delta):BigInteger.ZERO,advance(capturedOffsets,delta),reasons,sourceGaps,advanceInitial(coInitial,delta));
         }
         Part shift(BigInteger offset) {
-            return new Part(new StorageRange(range.start().add(offset),range.end().map(e->e.add(offset))),payload,payloadOffset,producer,producerOffset,capturedOffsets,reasons,sourceGaps);
+            return new Part(new StorageRange(range.start().add(offset),range.end().map(e->e.add(offset))),payload,payloadOffset,producer,producerOffset,capturedOffsets,reasons,sourceGaps,coInitial);
         }
     }
     record Read(Optional<Values.BytesValue> bytes,List<Part> parts,Set<String> reasons) {
@@ -81,7 +90,7 @@ final class ByteImage {
         for(var part:parts) {
             var copies=new HashMap<>(part.capturedOffsets());var offsets=new HashSet<>(copies.getOrDefault(event,Set.of()));
             offsets.add(sourceStart.add(part.range().start()));copies.put(event,Set.copyOf(offsets));
-            result.add(new Part(part.range(),part.payload(),part.payloadOffset(),part.producer(),part.producerOffset(),copies,part.reasons(),part.sourceGaps()));
+            result.add(new Part(part.range(),part.payload(),part.payloadOffset(),part.producer(),part.producerOffset(),copies,part.reasons(),part.sourceGaps(),part.coInitial()));
         }
         var next=new ByteImage(extent,result);return equals(next)?this:next;
     }
@@ -93,11 +102,27 @@ final class ByteImage {
             var range=overlap.get();
             if(part.range().start().compareTo(range.start())<0)result.add(part.crop(new StorageRange(part.range().start(),Optional.of(range.start()))));
             var middle=part.crop(range);var gaps=new HashSet<>(middle.sourceGaps());gaps.add(gap);
-            result.add(new Part(middle.range(),middle.payload(),middle.payloadOffset(),middle.producer(),middle.producerOffset(),middle.capturedOffsets(),middle.reasons(),gaps));
+            result.add(new Part(middle.range(),middle.payload(),middle.payloadOffset(),middle.producer(),middle.producerOffset(),middle.capturedOffsets(),middle.reasons(),gaps,middle.coInitial()));
             if(range.end().isPresent()&&(part.range().end().isEmpty()||range.end().get().compareTo(part.range().end().get())<0))
                 result.add(part.crop(new StorageRange(range.end().get(),part.range().end())));
         }
         var next=new ByteImage(extent,result);return equals(next)?this:next;
+    }
+    /** Simultaneous consistent literals refine open bytes and union provenance at intersections. */
+    ByteImage initialize(StorageRange destination,ByteImage replacement) {
+        var prior=slice(destination);var merged=new ArrayList<Part>();int i=0,j=0;
+        while(i<prior.parts.size()&&j<replacement.parts.size()) {
+            var a=prior.parts.get(i);var b=replacement.parts.get(j);var intersection=a.range().intersect(b.range()).orElseThrow();
+            var left=a.crop(intersection);var right=b.crop(intersection);
+            if(left.payload().isPresent()&&right.payload().isPresent()) {
+                var contributors=new HashMap<>(left.contributors());contributors.putAll(right.coInitial());contributors.remove(right.producer());
+                right=new Part(right.range(),right.payload(),right.payloadOffset(),right.producer(),right.producerOffset(),right.capturedOffsets(),right.reasons(),right.sourceGaps(),contributors);
+            }
+            merged.add(right);
+            if(a.range().end().equals(intersection.end()))i++;
+            if(b.range().end().equals(intersection.end()))j++;
+        }
+        return write(destination,new ByteImage(replacement.extent,merged));
     }
     ByteImage write(StorageRange destination,ByteImage replacement) {
         requireBounds(destination);
@@ -129,6 +154,9 @@ final class ByteImage {
     private void requireBounds(StorageRange selected) {
         if(!new StorageRange(BigInteger.ZERO,extent).contains(selected))throw new IllegalArgumentException("range outside image");
     }
+    private static Map<Integer,BigInteger> advanceInitial(Map<Integer,BigInteger> offsets,BigInteger delta) {
+        if(delta.signum()==0||offsets.isEmpty())return offsets;var result=new HashMap<Integer,BigInteger>();offsets.forEach((k,v)->result.put(k,v.add(delta)));return Map.copyOf(result);
+    }
     private static Map<Integer,Set<BigInteger>> advance(Map<Integer,Set<BigInteger>> captures,BigInteger delta) {
         if(delta.signum()==0||captures.isEmpty())return captures;var next=new HashMap<Integer,Set<BigInteger>>();
         captures.forEach((event,offsets)->{var shifted=new HashSet<BigInteger>();offsets.forEach(o->shifted.add(o.add(delta)));next.put(event,Set.copyOf(shifted));});return Map.copyOf(next);
@@ -139,12 +167,12 @@ final class ByteImage {
             if(!result.isEmpty()) {
                 var previous=result.getLast();
                 boolean adjacent=previous.range().end().equals(Optional.of(part.range().start()));
-                boolean metadata=previous.producer()==part.producer()&&advance(previous.capturedOffsets(),part.range().start().subtract(previous.range().start())).equals(part.capturedOffsets())&&previous.reasons().equals(part.reasons())&&previous.sourceGaps().equals(part.sourceGaps());
+                boolean metadata=advanceInitial(previous.coInitial(),part.range().start().subtract(previous.range().start())).equals(part.coInitial())&&previous.producer()==part.producer()&&advance(previous.capturedOffsets(),part.range().start().subtract(previous.range().start())).equals(part.capturedOffsets())&&previous.reasons().equals(part.reasons())&&previous.sourceGaps().equals(part.sourceGaps());
                 boolean payload=previous.payload().equals(part.payload())&&(part.payload().isEmpty()
                     ||BigInteger.valueOf(previous.payloadOffset()).add(part.range().start().subtract(previous.range().start())).equals(BigInteger.valueOf(part.payloadOffset()))
                         &&previous.producerOffset().add(part.range().start().subtract(previous.range().start())).equals(part.producerOffset()));
                 if(adjacent&&metadata&&payload) {
-                    result.set(result.size()-1,new Part(new StorageRange(previous.range().start(),part.range().end()),previous.payload(),previous.payloadOffset(),previous.producer(),previous.producerOffset(),previous.capturedOffsets(),previous.reasons(),previous.sourceGaps()));continue;
+                    result.set(result.size()-1,new Part(new StorageRange(previous.range().start(),part.range().end()),previous.payload(),previous.payloadOffset(),previous.producer(),previous.producerOffset(),previous.capturedOffsets(),previous.reasons(),previous.sourceGaps(),previous.coInitial()));continue;
                 }
             }
             result.add(part);

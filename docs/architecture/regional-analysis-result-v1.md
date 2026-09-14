@@ -192,3 +192,8 @@ exato daquele codec, sem alegar que valida todos os textos de todos os codecs.
 O golden manual também rejeita texto fabricado que concorde com seus próprios bytes.
 Os testes Python e Java pequenos estão no FAST; corpus e mutação de domínio são
 obrigações adicionais da qualificação W5.
+
+W7 clarification: fragments describe contributions. Equal simultaneous entry
+conditions can produce multiple fragments over the same byte interval, each
+with its own producer; this is not an ordering or contradictory byte alternative.
+No field or wire version changes.

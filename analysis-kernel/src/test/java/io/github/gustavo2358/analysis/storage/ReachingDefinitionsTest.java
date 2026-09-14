@@ -5,6 +5,7 @@ import io.github.gustavo2358.air.model.Ids.*;
 import io.github.gustavo2358.analysis.query.*;
 import io.github.gustavo2358.analysis.rd.*;
 import java.util.*;
+import java.math.BigInteger;
 import org.junit.jupiter.api.Test;
 import static io.github.gustavo2358.analysis.storage.StorageFixtures.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -43,11 +44,16 @@ class ReachingDefinitionsTest {
             assertEquals(ReachingDefinitions.PROFILE,run.key(q.point().entry()).profile());
         }
     }
-    @Test void regionalLiteralInitializerRemainsExplicitValidatorLimit() {
+    @Test void regionalLiteralInitializerProducesOneRangedEntryDefinition() {
         var p=publication(List.of(region("r",8L,Memory.Lifetime.ACTIVATION)),List.of(view("all","r",0,8)),List.of(sequence("s",List.of())),List.of());
         p=withEntries(p,List.of(seeded("one","s","all",65,66,67,68,69,70,71,72)));
         var result=new io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator(io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry.empty()).build(p,io.github.gustavo2358.analysis.cfg.application.BuildOptions.defaults());
-        assertEquals(io.github.gustavo2358.analysis.cfg.application.CfgBuildResult.Status.VALIDATION_LIMIT,result.status());assertTrue(result.graph().isEmpty());
+        assertEquals(io.github.gustavo2358.analysis.cfg.application.CfgBuildResult.Status.CFG_BUILT,result.status());
+        var run=new ReachingDefinitions(new StatementEffects(new StorageIndex(session(p)))).execute();
+        var answer=fact(run,new PointQuery<>(ProgramPoint.before(new EntryId(U,"one"),new OperationId(U,"return-s")),object("all")));
+        assertFalse(answer.unknownRemainder());assertEquals(1,answer.definitions().size());
+        assertEquals(DefinitionEvent.Kind.INITIAL_CONDITION,answer.definitions().getFirst().definition().kind());
+        assertEquals(StorageRange.exact(BigInteger.ZERO,BigInteger.valueOf(8)),answer.definitions().getFirst().contributedRanges().getFirst().location().range().orElseThrow());
     }
     static ReachingDefinitions.Execution execution(List<Instruction> instructions) {
         var p=publication(List.of(region("r",8L,Memory.Lifetime.ACTIVATION)),List.of(view("all","r",0,8),view("left","r",0,4),view("right","r",4,4),declaration("alias",new Memory.AliasBinding(object("all")))),List.of(sequence("s",instructions)),List.of());

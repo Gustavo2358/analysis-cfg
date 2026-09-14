@@ -191,7 +191,7 @@
     "io.github.gustavo2358.analysis.storage.ReachingDefinitionsTest": [
       "invocationTargetIsObservedBeforeNormalEffectsAndOutcomeReplay",
       "entryDefinitionsAreSeededOnceAndStaySeparateAcrossContexts",
-      "regionalLiteralInitializerRemainsExplicitValidatorLimit",
+      "regionalLiteralInitializerProducesOneRangedEntryDefinition",
       "essentialPartialKillHasIndependentManualContributedRanges",
       "mandatoryUnknownPartialKillsOnlyItsRangeAndMayRetainsOldDefinition",
       "reachedUnknownAndEmptyBatchRemainExplicitAndReplayIsShared"
@@ -378,6 +378,12 @@
       "exactFitPreservesOutsideBytesAndCapturesBeforeLaterSourceWrites",
       "truncationCanRemoveAnUnknownTailWithoutInventingInputBytes",
       "branchAlternativesRemainCorrelatedThroughFits"
+    ],
+    "io.github.gustavo2358.analysis.values.RegionalInitialTest": [
+      "partialOverlappingInitialConditionsAreSimultaneousAndRetainAllSupports",
+      "partialKillDropsOnlyCoveredInitialSupportsAndCopyRetainsTheRest",
+      "unspecifiedBytesRemainUnknownWhileKnownChildCanBeRead",
+      "overwriteKillsInitialDefinitionAcrossLoopAndInitialLabelBackedge"
     ]
   },
   "cfg-adapters": {
