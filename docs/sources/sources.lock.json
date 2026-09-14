@@ -262,7 +262,7 @@
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "verified",
-    "commit": "49a50561951b8a66fb2a4d79a06aaeedf050685c",
+    "commit": "dd1e25bbda8ad1e93e3b89845f9f624c7a8a1307",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",

@@ -70,6 +70,15 @@ class LeanPolicy(unittest.TestCase):
         path.write_text('{')
         self.assertTrue(lean.navigation_errors(self.root))
 
+    def test_ci_dependency_checkout_must_match_immutable_pin(self):
+        self.fixture()
+        workflow=next((self.root/'.github/workflows').glob('*.y*ml'))
+        doc=lean.yaml.safe_load(workflow.read_text())
+        step=next(s for job in doc['jobs'].values() for s in job['steps'] if s.get('with',{}).get('repository')=='Gustavo2358/air-java')
+        step['with']['ref']='0'*40
+        workflow.write_text(lean.yaml.safe_dump(doc))
+        self.assertTrue(any('checkout' in error for error in lean.workflow_errors(self.root)))
+
     def test_missing_cross_repo_pin(self):
         lean_project.copy_pin_fixture(ROOT, self.root)
         self.assertEqual([], lean_project.pin_errors(self.root))
