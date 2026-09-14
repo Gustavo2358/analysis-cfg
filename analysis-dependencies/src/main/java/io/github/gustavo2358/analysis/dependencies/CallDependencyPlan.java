@@ -38,10 +38,13 @@ public final class CallDependencyPlan {
             var invoke=(Operations.Invoke)site.operation();if(selected(invoke))groups.computeIfAbsent(site.owner().id(),ignored->new HashSet<>()).add(group(invoke));
         }
         var registrations=new ArrayList<ConsumerRegistration<DependencySiteFact>>();
+        boolean regional=session.index().publication().storage().stream().anyMatch(Memory.Region.class::isInstance);
         for(var context:session.contexts()) {
             var entry=context.entry().id();String id=part(entry.publication().localId())+part(entry.unit().localId())+part(entry.localId());
             var reach=ReachabilityProvider.batch("reach:"+id,entry);
-            var values=PossibleValuesProvider.batch("call-values:"+id,PossibleValuesProvider.key(entry,PossibleValuesAnalysis.EFFECTS_PROFILE));
+            ObservationBatchId<ObjectId,? extends TextValueFact> values=regional
+                ?RegionalValuesProvider.batch("call-values:"+id,RegionalValuesProvider.key(entry))
+                :PossibleValuesProvider.batch("call-values:"+id,PossibleValuesProvider.key(entry,PossibleValuesAnalysis.EFFECTS_PROFILE));
             for(int group:groups.getOrDefault(entry.unit(),Set.of())) {
                 var keys=new ArrayList<AnalysisKey>();keys.add(reach.analysisKey());var batches=new ArrayList<String>();batches.add(reach.id());
                 List<SiteInterest.SiteQuery<?,?>> queries=new ArrayList<>();queries.add(new SiteInterest.SiteQuery<>(reach,CallDependencyPlan::reachQuery));

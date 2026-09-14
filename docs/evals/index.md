@@ -28,3 +28,5 @@ EVAL-CFG-032 acrescenta a prova 4D: seis métodos, golden escalar 4B, payload po
 ## CP5
 
 [CP5 — harness e oracles planejados](cp5/index.md): EVAL-CFG-033 implementado somente no harness; Waves 1–5 sem produto.
+
+[Storage groups](storage-groups.md): ST-W3 physical goldens and file qualification.

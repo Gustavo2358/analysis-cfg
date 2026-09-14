@@ -35,7 +35,7 @@ def program_candidates(result):
 
 
 def source_oracle(sp, case):
-    require(sp['contractVersion'] in ('1.8.0','1.9.0','2.0.0','2.1.0','2.2.0', '2.3.0', '2.4.0', '2.5.0', '2.6.0') and sp['unit']['canonicalProgramName'] == 'CALLER', 'SP1.8 real CALLER')
+    require(sp['contractVersion'] in ('1.8.0','1.9.0','2.0.0','2.1.0','2.2.0', '2.3.0', '2.4.0', '2.5.0', '2.6.0', '2.7.0','2.8.0') and sp['unit']['canonicalProgramName'] == 'CALLER', 'SP1.8 real CALLER')
     facts = {s['header']['id']: s for s in sp['statements']}
     require(len(facts) == len(sp['statements']) and all(s['header']['coverage'] == 'MODELED' for s in facts.values()), 'complete typed source facts')
     require(all(s['variant'] in {'MOVE', 'CALL', 'IF', 'PERFORM', 'GOBACK'} for s in facts.values()), 'no unknown statement filtering')
@@ -164,7 +164,7 @@ def w1_regressions(work, producer, config, cp):
             (web / 'web').symlink_to(producer / 'proleap-poc/src/main/resources/web', target_is_directory=True)
             execute(cwd, 'frontend', ['java', '-cp', os.pathsep.join(config['frontend']['classpath']), config['frontend']['main'], '--source', source.name, '--copybooks', str(producer / 'proleap-poc/corpus/cpy'), '--output', str(cwd / 'sp')])
             sp = cwd / 'sp/cobol-semantic-product.json'; air = cwd / 'program.air.json'; cfg = cwd / 'cfg.json'; dep = cwd / 'dependencies.json'
-            require(json.loads(sp.read_text())['contractVersion'] == '1.8.0', 'current pinned W1 SP')
+            require(json.loads(sp.read_text())['contractVersion'] == config['semanticProductVersion'], 'current pinned W1 SP')
             execute(cwd, 'lower', ['java', '-cp', os.pathsep.join(config['lower']['classpath']), config['lower']['main'], str(sp), str(air)])
             execute(cwd, 'cfg', ['java', '-cp', cp, 'io.github.gustavo2358.analysis.cfg.launcher.AnalysisCfg', str(air), str(cfg)])
             verify_cfg_wire(cfg.read_bytes())
@@ -192,7 +192,7 @@ def run(work, config_path):
     for name, key in (('air-java', 'air_java'), ('proleap-poc', 'proleap_poc'), ('cobol-lower', 'cobol_lower')):
         pin = lock[key].get('commit', lock[key].get('main_commit'))
         require(config['sources'][name] == pin == git(producer / name, 'rev-parse', 'HEAD') and not git(producer / name, 'status', '--porcelain'), 'exact clean source pin: ' + name)
-    require(config['semanticProductVersion'] == lock['proleap_poc']['semantic_product_version'] == '1.8.0', 'exact producer version')
+    require(config['semanticProductVersion'] == lock['proleap_poc']['semantic_product_version'], 'exact producer version')
     cp = runtime(producer)
     w1_regressions(work, producer, config, cp)
     for case in SITES:

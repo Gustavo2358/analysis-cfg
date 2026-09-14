@@ -18,7 +18,7 @@ FIXTURES = ROOT / 'analysis-adapters/src/test/resources/cp6/perform-basic'
 
 
 def source_oracle(sp, case):
-    require(sp['contractVersion'] in ('1.8.0','1.9.0','2.0.0','2.1.0','2.2.0', '2.3.0', '2.4.0', '2.5.0', '2.6.0') and sp['unit']['canonicalProgramName'] == 'CALLER', 'real CALLER at SP1.8')
+    require(sp['contractVersion'] in ('1.8.0','1.9.0','2.0.0','2.1.0','2.2.0', '2.3.0', '2.4.0', '2.5.0', '2.6.0', '2.7.0','2.8.0') and sp['unit']['canonicalProgramName'] == 'CALLER', 'real CALLER at SP1.8')
     statements = {s['header']['id']: s for s in sp['statements']}
     performs = [s for s in statements.values() if s['variant'] == 'PERFORM']
     require(len(performs) == 1, 'one typed PERFORM')
@@ -122,7 +122,7 @@ def run(work, config_path):
     for name, key in (('air-java', 'air_java'), ('proleap-poc', 'proleap_poc'), ('cobol-lower', 'cobol_lower')):
         pin = lock[key].get('commit', lock[key].get('main_commit'))
         require(config['sources'][name] == pin == git(producer / name, 'rev-parse', 'HEAD') and not git(producer / name, 'status', '--porcelain'), 'exact clean source pin: ' + name)
-    require(config['semanticProductVersion'] == lock['proleap_poc']['semantic_product_version'] == '1.8.0', 'exact SP version')
+    require(config['semanticProductVersion'] == lock['proleap_poc']['semantic_product_version'], 'exact SP version')
     cp = runtime(producer)
     for case in ('literal', 'copy', 'overwrite'):
         outputs = []

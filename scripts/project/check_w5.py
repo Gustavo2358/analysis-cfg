@@ -9,14 +9,17 @@ from resource_limit_scope import allows_change, boundaries
 
 ROOT=Path(__file__).resolve().parents[2]
 MODULES=['analysis-dataflow','analysis-adapters','analysis-launcher']
-NAMES={'analysis-dataflow':['AnalysisDataflow','DefaultValuePlan','ObservedValueFact','PreparedDataflowResult'],
-       'analysis-adapters':['DataflowAirReader','DeliveryReceipt','JsonOutput','LocalResultWriter','ReceiptJson','ResultJson','WireIds'],
-       'analysis-launcher':['AnalysisDataflow']}
+NAMES={'analysis-dataflow':['AnalysisDataflow','DefaultValuePlan','ObservedValueFact','PreparedDataflowResult','RegionalAnalysis','RegionalAnalysisResult'],
+       'analysis-adapters':['DataflowAirReader','DeliveryReceipt','JsonOutput','LocalResultWriter','ReceiptJson','ResultJson','WireIds','RegionalResultJson'],
+       'analysis-launcher':['AnalysisDataflow','RegionalAnalysis']}
 SOURCES={m+'/src/main/java/io/github/gustavo2358/analysis/'+m.removeprefix('analysis-').replace('launcher','launcher')+'/'+n+'.java' for m,names in NAMES.items() for n in names}
 TESTS={
  'analysis-dataflow':{'CompositionTest':set('genericOverwriteUsesRealPipelineAndLastProducer noWritesProducesCompleteWithoutInventedStableRun everyTerminatorAndOrphanAreObservedBefore resourcePreflightNeverProducesSemanticResultAndRecovers incompleteAndLegacyPreparationFailuresRemainDistinct'.split())},
  'analysis-adapters':{'WireTest':{'realValueSupportAndSourceRemainderReachWire'},'DeliveryTest':set('completeReceiptBindsExactFinalBytesAndReplacesExistingAtomically controlledFailuresPreservePreparedResultAndExistingDestination resourceExhaustionIsNotACompletedOrSemanticDeliveryOutcome'.split()),'WideResultTest':set('scaleKeepsAllQueriesFactsAndDetachedResult resultBeyondLegacy64MiBHasNoOutputCapacityPolicy'.split()),'WireAdversarialTest':set('unavailableBatchRetainsItsExplicitDependencyReason distinctCandidatesKeepTheirOwnProducerSupport permutedInputRegistrationQueriesCandidatesSupportsAndFactsAreByteStable fullIdentitySeparatesOwnersEvenWhenLocalIdsCollide unsupportedAndUnreachableHaveDifferentExplicitNullSemantics invalidUnicodeIsEncodingFailureAndDoesNotCertifyDelivery'.split())},
  'analysis-launcher':{'DataflowCliTest':set('fileRouteMatchesInMemoryAndReceiptIsSeparate usageMalformedMissingAndOutputFailuresAreDistinct defaultCodecAcceptsBeyondHistoricalCapWithoutLocalReadAdmission realCodecResourceLimitStopsBeforeDeliveryAndRecovers'.split())}}
+TESTS['analysis-dataflow']['RegionalAnalysisTest']=set(['rdAndValuesShareSelectedEntriesAndOneBatchPerExecution', 'unselectedAndMissingQueriesAreExplicitWithoutDiscardingValidResults', 'resourcePreflightFailsBeforeAnySemanticResultAndRecovers'])
+TESTS['analysis-adapters']['RegionalWireTest']=set(['fileProductCarriesIndependentCompositionAndCopyIntervals', 'inventoryAndQueryPermutationPreserveTheEntireWire', 'hugeUnknownTailZeroAndLogicalCellsRetainTheirDistinctWireShapes','detachedResultRetentionContainsOnlyValuesMetadataAndReferenceIds','regionalLiteralSeedsRemainAnExplicitValidatorLimit','distinctEntryPathsKeepRegionalContentsAndReachabilitySeparate'])
+TESTS['analysis-launcher']['RegionalCliTest']=set(['missingInputAndBadQueryNeverReplaceOutput', 'realRegionalFileHasStableOutputAndExplicitUnsupportedQuery', 'malformedAirAndOutputFailurePreserveExistingContentAndCleanTemporary'])
 DENIED=('java.lang.reflect','java.util.ServiceLoader','cobolexplorer','org.antlr','lower.adapters','CallResolver','FileResolver','Db2Resolver','CicsResolver','GrbeResolver','ProgramDependency','CfgJsonWriter','CfgJsonBytes')
 POM_ADDITION=b'    <module>analysis-dataflow</module>\n    <module>analysis-adapters</module>\n    <module>analysis-launcher</module>\n'
 def original_pom(data):
@@ -102,6 +105,7 @@ def run(root,category,update=False):
     expected=test_inventory(category);selector=','.join(['BuildCfgContractTest','StructureTest','ValuesTest','NameInterpreterTest',*(t for suites in expected.values() for t in suites)])
     output=command(root,['mvn','-B','-ntp','-pl','analysis-launcher','-am','clean','package','-Dtest='+selector,'org.apache.maven.plugins:maven-dependency-plugin:3.8.1:build-classpath','-DincludeScope=runtime','-Dmdep.outputFile=target/runtime-classpath.txt']);verify_reports(root,expected)
     command(root,[sys.executable,'-B','scripts/project/test_result_wire.py'])
+    command(root,[sys.executable,'-B','scripts/project/test_regional_result_wire.py'])
     command(root,[sys.executable,'-B','scripts/project/result_wire.py','analysis-adapters/target/w5-cases/unsupported-profile.json'])
     if category=='performance':
         p=root/'.harness-results/w5-performance.json';p.parent.mkdir(exist_ok=True);p.write_text(json.dumps(verify_metrics(output),indent=2)+'\n')

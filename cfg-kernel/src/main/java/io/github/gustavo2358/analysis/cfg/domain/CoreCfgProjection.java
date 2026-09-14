@@ -21,9 +21,10 @@ import java.util.Objects;
 public final class CoreCfgProjection {
     private CoreCfgProjection() { }
 
-    /** AIR memory.regions@1 has precise sequential control; this does not interpret storage or effects. */
+    /** Regional operations and the pure IBM1047 codec preserve sequential control after AIR preflight.
+     * This role does not calculate storage, bytes or possible values. */
     public static boolean supportsControlCapability(Capabilities.Capability capability) {
-        return Capabilities.MEMORY_REGIONS.equals(capability);
+        return Capabilities.MEMORY_REGIONS.equals(capability) || Capabilities.IBM1047.equals(capability);
     }
 
     /** Default admission of the known subset; requires the same preflight as explicit policy admission. */

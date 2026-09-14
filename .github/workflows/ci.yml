@@ -13,6 +13,14 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Checkout pinned private AIR dependency
+        uses: actions/checkout@v4
+        with:
+          repository: Gustavo2358/air-java
+          ref: acbe927023b6652ff5bb41a0aa5ef368f28bcc0e
+          token: ${{ secrets.AIR_JAVA_READ_TOKEN }}
+          path: .harness-results/build/air-java
+          persist-credentials: false
       - uses: actions/setup-java@v4
         with:
           distribution: temurin

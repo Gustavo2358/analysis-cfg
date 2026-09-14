@@ -31,3 +31,5 @@ ou referência não consultada substitui regra canônica da versão em uso.
 - [Fast CI e Full Qualification explícita](engineering/qualification.md).
 
 - [CFG JSON 3.0.0](architecture/cfg-json-v3.md) e [compositionality/partial lowering](architecture/compositional-partial-lowering.md).
+
+- [Storage queries, RD, fragmentos e resultado regional 1.0.0](architecture/regional-analysis-result-v1.md).

@@ -34,7 +34,7 @@ PARTIAL+=tuple('varying-'+n for n in ('unresolved-control','noninteger','nonscal
 
 
 def oracle(name,source,sp,air,cfg,result):
-    require(sp['contractVersion'] in ('2.5.0','2.6.0'),'versioned range/loop contract')
+    require(sp['contractVersion'] in ('2.5.0','2.6.0', '2.7.0','2.8.0'),'versioned range/loop contract')
     publication=air['publication'];sequences=publication['units'][0]['sequences']
     ops={op['header']['id']['localId']:op for seq in sequences for op in seq['instructions']+[seq['terminator']]}
     links={s['header']['id']:[o['localId'] for item in publication['coverage']['items']

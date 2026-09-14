@@ -436,6 +436,9 @@ def verify_project_shape(root: Path) -> None:
     from check_w5 import SOURCES as COMPOSITION_SOURCES, verify_sources as verify_composition_sources
     verify_composition_sources(root)
     analysis_sources = COMPOSITION_SOURCES | source_inventory(root) | SOLVER_SOURCES | QUERY_SOURCES | VALUE_SOURCES | PLANNING_SOURCES
+    from check_storage import SOURCES as STORAGE_SOURCES, verify_sources as verify_storage_sources
+    verify_storage_sources(root)
+    analysis_sources |= STORAGE_SOURCES
     from w1d_scope import NEW_W5, NEW_VALUES
     analysis_sources |= NEW_W5 | {NEW_VALUES} | {p.relative_to(root).as_posix() for p in (root/'analysis-dependencies/src/main/java').rglob('*.java')}
     verify_planning_sources(root)
@@ -758,6 +761,7 @@ def architecture_gate(root: Path, test_profile: str = "full") -> None:
     run([maven, *repository, "--batch-mode", "--no-transfer-progress", "clean", "test", *test_arguments], root)
     if test_profile == "fast":
         verify_reports(root)
+    run([sys.executable, "-B", "scripts/project/test_regional_result_wire.py"], root)
     kernel = root / KERNEL_ARTIFACT
     total, skipped = count_tests(kernel)
 
@@ -790,6 +794,8 @@ def architecture_gate(root: Path, test_profile: str = "full") -> None:
     composition_architecture(root)
     from check_w1d_boundary import check as dependency_boundary
     dependency_boundary(root)
+    from check_storage import architecture as storage_architecture
+    storage_architecture(root)
 
     print(f"[architecture] PASS: {total} kernel tests ({skipped} skipped), "
           f"{len(EXPECTED_CLASSFILES)} production classfiles, "

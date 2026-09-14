@@ -8,7 +8,7 @@ import java.util.Objects;
 /** Facts are detached from solver roots/universe. Exactness is conditional on the admitted model. */
 public record ValueFact(StorageId cell,Reachability reachability,List<TextValue> candidates,Boolean modelValueRemainder,
                         boolean sourceUnknownRemainder,boolean effectiveUnknownRemainder,List<PremiseId> premises,
-                        List<Id> evidence,List<OriginId> provenance,List<CandidateSupport> candidateSupports) {
+                        List<Id> evidence,List<OriginId> provenance,List<CandidateSupport> candidateSupports) implements TextValueFact {
     /** A producer reference is an Assign OperationId or an initial-condition place OperandId. */
     public record Support(Id evidence,OriginId origin,List<PremiseId> premises) {
         public Support { Objects.requireNonNull(evidence);Objects.requireNonNull(origin);premises=List.copyOf(premises); }

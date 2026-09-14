@@ -86,6 +86,22 @@
       "preciseControlBeforeAddingRegionProvesBothCallTargets",
       "opaqueKnownOperandWritesHonorMandatoryAndPossibleEffects",
       "boundedControlHasMatchingForwardAndBackwardCursors"
+    ],
+    "io.github.gustavo2358.analysis.adapters.RegionalFileTest": [
+      "realAirFilePreservesPhysicalOffsetsAndSurvivingDefinitions"
+    ],
+    "io.github.gustavo2358.analysis.adapters.RegionalDependencyTest": [
+      "wholeWriteFeedsDisplacedCallViewBeforeForeignMayEffects",
+      "literalOnlySitesDoNotDemandRegionalValues",
+      "historicalScalarProfilesContinueToRefuseRegions"
+    ],
+    "io.github.gustavo2358.analysis.adapters.RegionalWireTest": [
+      "fileProductCarriesIndependentCompositionAndCopyIntervals",
+      "inventoryAndQueryPermutationPreserveTheEntireWire",
+      "hugeUnknownTailZeroAndLogicalCellsRetainTheirDistinctWireShapes",
+      "detachedResultRetentionContainsOnlyValuesMetadataAndReferenceIds",
+      "regionalLiteralSeedsRemainAnExplicitValidatorLimit",
+      "distinctEntryPathsKeepRegionalContentsAndReachabilitySeparate"
     ]
   },
   "analysis-dataflow": {
@@ -95,6 +111,11 @@
       "everyTerminatorAndOrphanAreObservedBefore",
       "resourcePreflightNeverProducesSemanticResultAndRecovers",
       "incompleteAndLegacyPreparationFailuresRemainDistinct"
+    ],
+    "io.github.gustavo2358.analysis.dataflow.RegionalAnalysisTest": [
+      "rdAndValuesShareSelectedEntriesAndOneBatchPerExecution",
+      "unselectedAndMissingQueriesAreExplicitWithoutDiscardingValidResults",
+      "resourcePreflightFailsBeforeAnySemanticResultAndRecovers"
     ]
   },
   "analysis-dependencies": {
@@ -148,6 +169,51 @@
       "physicalOrderDoesNotDefineControlAndSameSnapshotIsDeterministic",
       "emptySelectionCreatesNoContextsAndForeignHandleIsRejected",
       "cycleAndSelfLoopKeepLiteralControl"
+    ],
+    "io.github.gustavo2358.analysis.storage.StorageRangeTest": [
+      "essentialPartialIntervalAndAdjacency",
+      "unboundedTailAndArbitraryIntegerRemainDistinctFromZero"
+    ],
+    "io.github.gustavo2358.analysis.storage.StorageIndexTest": [
+      "disjointPremisesAreNotTransitiveAndCodecDoesNotChangePhysicalOverlap",
+      "cyclicAndDanglingAssociationsFailBeforeAnalysis",
+      "snapshotIsolationAndPreparationCountFollowObjectsNotPairs",
+      "physicalAliasesAndAdjacentRangesDoNotDependOnNames",
+      "distinctBasesRequirePremiseAndLifetimeQualifiesActivationOnly",
+      "alternativesAndUnknownExtentRetainIndependentRemainder"
+    ],
+    "io.github.gustavo2358.analysis.storage.StatementEffectsTest": [
+      "mustIsPartialAndUnprovedForeignBaseReceivesMayEffect",
+      "ambiguousMustAndScopedMayNeverBecomeSimultaneousStrongWrites",
+      "copyCapturesSourceAndOpaqueUnknownWritesAreExplicit"
+    ],
+    "io.github.gustavo2358.analysis.storage.ReachingDefinitionsTest": [
+      "invocationTargetIsObservedBeforeNormalEffectsAndOutcomeReplay",
+      "entryDefinitionsAreSeededOnceAndStaySeparateAcrossContexts",
+      "regionalLiteralInitializerRemainsExplicitValidatorLimit",
+      "essentialPartialKillHasIndependentManualContributedRanges",
+      "mandatoryUnknownPartialKillsOnlyItsRangeAndMayRetainsOldDefinition",
+      "reachedUnknownAndEmptyBatchRemainExplicitAndReplayIsShared"
+    ],
+    "io.github.gustavo2358.analysis.storage.RegionalDefinitionOracleTest": [
+      "generatedBranchesLoopsAndOrphansMatchConcreteAndRecomposition",
+      "independentOracleRejectsWholeKillAndMayAsMustMutants"
+    ],
+    "io.github.gustavo2358.analysis.storage.RegionalDefinitionAdversarialTest": [
+      "differentBasesAndAlternativeDestinationsKeepPossibleOldDefinitions",
+      "opaqueEffectIsNotNopAndBeforePointStaysIndependent",
+      "sourceGapFollowsPhysicalAliasButNotAdjacentInterval",
+      "seededCellIsNotReinitializedOnLoopOrNextSequence",
+      "hugeBoundsUnknownTailAndZeroLengthNeverAllocatePerByte",
+      "wideDefinitionsAndDuplicateQueriesHaveNoCandidateCapOrRepeatedReplay",
+      "openEnvironmentDefinitionsKeepDistinctPremisesInCanonicalOrder"
+    ],
+    "io.github.gustavo2358.analysis.storage.StorageQueryTest": [
+      "namedViewAndPhysicalRangeShareTheSameDefinitionProduct",
+      "physicalQueriesKeepBigIntegerUnknownTailAndZeroDistinct",
+      "foreignHiddenCellAndOutOfBoundsSubjectsAreExplicitlyUnsupported",
+      "codecIsPartOfQueryIdentityAndDuplicateRequestsShareReplay",
+      "queryCodecReferencesMustBelongToTheValidatedPublication"
     ]
   },
   "analysis-launcher": {
@@ -162,6 +228,11 @@
       "inputAndOutputFailuresPreserveDestinationAndCleanupTemporaryFile",
       "realCodecOperationalLimitIsSevenAndProducesNoPartialResult",
       "cfgAndAnalysisUnsupportedHaveDifferentExitsAndNoPartialOutput"
+    ],
+    "io.github.gustavo2358.analysis.launcher.RegionalCliTest": [
+      "missingInputAndBadQueryNeverReplaceOutput",
+      "realRegionalFileHasStableOutputAndExplicitUnsupportedQuery",
+      "malformedAirAndOutputFailurePreserveExistingContentAndCleanTemporary"
     ]
   },
   "analysis-values": {
@@ -238,6 +309,69 @@
       "missingSourceStronglyReplacesKnownDestinationWithOpenEmpty",
       "repeatedForwardCopiesHaveNoHopLimit",
       "copiesDoNotCreateStorageIndependence"
+    ],
+    "io.github.gustavo2358.analysis.values.ByteImageTest": [
+      "unknownIsNotEmptyAndKnownSliceUsesItsOriginalOffset",
+      "partialWriteKeepsSuffixAndPartialUnknownInvalidatesWholeRead",
+      "copiesCaptureImmutableImageAndOverlapReadsOldBytes",
+      "unknownTailAndHugeExtentRemainSparseAndZeroIsIdentity",
+      "copySupportsAloneChangeEqualityAndConvergeAsStaticSets",
+      "capturedSourceGapSplitsOnlyItsRangeAndSurvivesUnknownIndependently",
+      "captureOffsetsFollowCropsAndRetainEarlierCopyContributions"
+    ],
+    "io.github.gustavo2358.analysis.values.RegionalValuesTest": [
+      "missingStateIsUnknownAndUnreachableIsSeparate",
+      "unknownPrefixPreservesKnownSuffixAndCannotReviveWholeCandidate",
+      "composedWholeRetainsTheIndependentlyReadableHalves",
+      "branchAndLoopSupportsConvergeWithoutPathHistories",
+      "sameBytesDifferentCodecsProduceDifferentText",
+      "identicalInitialConditionsRetainBothSupportsAndConflictsAreRefused",
+      "scalarAndRegionCoexistOnlyExplicitSeparationClosesTheOtherBase",
+      "wholeAreaCopyCapturesItsSourceBeforeLaterAssignment",
+      "finiteConcreteOracleChecksFullWritesJoinsLoopsAndMissingBranches"
+    ],
+    "io.github.gustavo2358.analysis.values.RegionalCompositionTest": [
+      "extendedDomainHasAnExplicitProfileAndRejectsTheOldKey",
+      "partialLiteralComposesTwoProducers",
+      "branchHalvesStayInTheirOriginalImage",
+      "crossBasePartialCopyPreservesBranchPairs",
+      "oneDestinationChoiceCannotWriteBothHalves",
+      "overlappingCopyLoopHasExactlyTheFiniteConcreteImages",
+      "jointStoreJoinLawsAndTransfersIncludeUnknownAndSupportOnlyChanges",
+      "copyConnectedInventoryPermutationPreservesFactsAndSupports"
+    ],
+    "io.github.gustavo2358.analysis.values.RegionalTransferTest": [
+      "unknownMustPrefixCannotKeepWholeCandidateAndLiteralCanRepairIt",
+      "scopedMayPreservesOldPossibilityAndUntouchedSuffix",
+      "mandatoryUnknownChoiceAlwaysInvalidatesWholeAndKeepsPossibleHalves",
+      "rangeWritesAndCapturedPartialCopySurviveLaterSourceChanges",
+      "selfCopyAndZeroLengthPreserveTextWhileOverlapUsesPreWriteBytes",
+      "copyingUnknownPrefixPreservesOnlyDestinationSuffix",
+      "uncomputedCopyBoundsKeepValidationLimitAndExplicitOpaqueFallback",
+      "contradictoryCopyExtentAndOutOfBoundsAreRejectedBeforeAnalysis",
+      "unknownSourceExtentDoesNotBecomeZeroOrAClosedCopy",
+      "destinationRemainderKeepsOpenAlternativesRatherThanChoosingTheKnownPlace",
+      "logicalReadCapturesAComposedRegionalValueBeforeLaterWrite"
+    ],
+    "io.github.gustavo2358.analysis.values.RegionalProvenanceTest": [
+      "copiedSourceRemainderSurvivesDisjointDestinationAndDiesOnOverwrite",
+      "sourceGapIsCroppedWithItsFragmentAndDoesNotContaminateCopiedSuffix"
+    ],
+    "io.github.gustavo2358.analysis.values.StorageValueObservationTest": [
+      "composedCandidateExposesBothSurvivingProducerIntervalsAndMatchingRdEvents",
+      "copiedFragmentHasOriginalProducerAndSeparateCaptureWithExactRanges",
+      "copyOfCopyRetainsCroppedIntermediateAndOriginalContributions",
+      "unknownPrefixExposesItsWriterAndKeepsOnlyTheSurvivingLiteralSuffix",
+      "branchSupportsRemainSeparateAlternativesAndInventoryOrderIsIrrelevant",
+      "sourceGapMetadataFollowsOnlyTheCapturedPrefix",
+      "zeroLengthUnreachableAndUninterpretedBytesHaveDistinctProducts",
+      "logicalCaptureReportsWholeCellDestinationWithoutInventedByteOffsets"
+    ],
+    "io.github.gustavo2358.analysis.values.RegionalConcreteOracleTest": [
+      "finiteBranchGraphsCompareEveryByteCandidateAndProducer",
+      "zeroOneAndManyIterationsIncludeOverlappingCopiesAndUnknownRepair",
+      "supportOnlyLoopChangesReachTheExitAndTwoExplicitResumesStaySeparate",
+      "measuredFragmentCandidateAndReplayGrowthHasNoSemanticCutoff"
     ]
   },
   "cfg-adapters": {
@@ -257,7 +391,8 @@
       "outputLimitPreservesExistingDestinationBeforeAnyTemp",
       "nonBuiltResultCannotBeSerializedOrPublished",
       "resourceLimitPreservesTypedCodecIssues",
-      "unsupportedCapabilityRemainsACodecFailure"
+      "unsupportedCapabilityRemainsACodecFailure",
+      "regionalFileCopyThenComputedCallPreservesControlAndCodec"
     ],
     "io.github.gustavo2358.analysis.cfg.adapters.W1dInvokeWireTest": [
       "realInvokeRetainsDistinctTerminatorAndTransitionInExistingCfgWire",

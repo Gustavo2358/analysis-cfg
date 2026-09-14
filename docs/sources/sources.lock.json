@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "observed_on": "2026-09-12",
+  "observed_on": "2026-09-13",
   "analysis_ir": {
     "repository": "Gustavo2358/analysis-ir",
-    "commit": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+    "commit": "a9287917241a70665ad8d3d32d974928690e69f3",
     "semantic_version": "2.0.0",
     "role": "normative",
-    "canonical_ref": "main",
+    "canonical_ref": "feat/storage-semantics-st-w0-w5",
     "upstream_review": {
       "pull_request": 2,
       "state": "merged",
@@ -23,13 +23,13 @@
       "targets_air_version": "2.0.0",
       "path": "bindings/json-v1.md",
       "review_path": "bindings/revisao-json-v1.md",
-      "checked_commit": "51b4d9a8ae0364232bd97103cd73a77e1a34996c",
+      "checked_commit": "a9287917241a70665ad8d3d32d974928690e69f3",
       "implemented_in_analysis_cfg": false
     },
     "files": [
       {
         "path": "README.md",
-        "git_blob_sha1": "6657360fb484fcec88c2afeba100db288b633ec0"
+        "git_blob_sha1": "a621f802c2f625b541460092ad213a7dd772a0ea"
       },
       {
         "path": "REFERENCIAS.md",
@@ -65,7 +65,7 @@
       },
       {
         "path": "especificacao/03-memoria-e-aliases.md",
-        "git_blob_sha1": "36ae796ab84967a3673fdf817b2b723a3cde1de3"
+        "git_blob_sha1": "c8f8c8d2476c9d3cea48b1255619ef069fd52205"
       },
       {
         "path": "especificacao/04-operacoes.md",
@@ -118,19 +118,23 @@
       {
         "path": "exemplos/04-conhecimento-de-tipo.md",
         "git_blob_sha1": "e4e029f49d73822fb2e9a1ef2411df1f651f7d57"
+      },
+      {
+        "path": "especificacao/12-codec-ibm1047.md",
+        "git_blob_sha1": "a33cb30bc1979b60ff59cdcf0b1a22e8c9778166"
       }
     ],
-    "baseline_assessment": "Normative bytes unchanged against 122ce54; only README/informative binding notes differ. See WORK-CFG-030 baseline matrix."
+    "baseline_assessment": "ST-W1: optional explicit IBM1047 extension; existing AIR/binding forms unchanged. Draft PR #4, not merged. Historical review metadata retained."
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "d51a5051124d962c4c5dc94f163eb68f97136186",
+    "commit": "acbe927023b6652ff5bb41a0aa5ef368f28bcc0e",
     "canonical_ref": "main",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
     "analysis_ir": {
       "semantic_version": "2.0.0",
-      "commit": "51b4d9a8ae0364232bd97103cd73a77e1a34996c"
+      "commit": "a9287917241a70665ad8d3d32d974928690e69f3"
     },
     "maven": {
       "group_id": "io.github.gustavo2358",
@@ -168,7 +172,9 @@
       "air-model/src/main/java/io/github/gustavo2358/air/model/Places.java",
       "air-model/src/main/java/io/github/gustavo2358/air/model/Expressions.java",
       "air-model/src/main/java/io/github/gustavo2358/air/model/Values.java",
-      "air-json/src/test/resources/scalar-assign.canonical.json"
+      "air-json/src/test/resources/scalar-assign.canonical.json",
+      "air-model/src/main/java/io/github/gustavo2358/air/model/MemoryCodecs.java",
+      "air-json/src/test/resources/regional.canonical.json"
     ],
     "observed_on": "2026-09-13",
     "modules": {
@@ -185,7 +191,7 @@
         "path": "air-json/pom.xml",
         "artifact_id": "air-json",
         "role": "shared_codec_4B_scalar_assign_consumed_by_cfg_adapters",
-        "coverage": "W2C Unknown BOOL Branch diamond, Assign, Jump and Invoke structural transport with semantic obligations preserved"
+        "coverage": "ST-W1 regional constant bounds, Region/View/alias, bytes, CopyBytes and explicit IBM1047; historical scalar/control forms preserved"
       }
     },
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -238,9 +244,9 @@
       "docs/domain/cobol-semantic-product.md",
       "docs/work/history/WORK-SEMANTIC-PRODUCT-003.md"
     ],
-    "semantic_product_version": "2.6.0",
+    "semantic_product_version": "2.8.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "8cf4a2d80ab22691aa4d5bc17e504054eb204429",
+    "commit": "58d3aa919f62fae0c2c297d78fbf96d74fe5dde4",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -249,12 +255,14 @@
     "goto_validation": {
       "contract": "2.1.0",
       "scope": "local unconditional paragraph identity and explicit entry; G1-G5 and 1/2/5/40"
-    }
+    },
+    "storage_contract_version": "1.1.0",
+    "canonical_ref": "feat/storage-semantics-st-w0-w5"
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "verified",
-    "commit": "5674b72ef280a18be7b6395d48c7766f2ac6d912",
+    "commit": "d337a40a1d98a6d0d17d09b39f13b253cc429e19",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -265,7 +273,8 @@
     "evaluate_validation": "docs/work/active/WORK-CFG-040.yaml",
     "goto_validation": {
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
-    }
+    },
+    "canonical_ref": "feat/storage-semantics-st-w0-w5"
   },
   "external": [
     {
@@ -293,5 +302,11 @@
       "url": "https://research.cs.wisc.edu/wpis/abstracts/popl95.abs.html",
       "role": "reading_lead_abstract_not_algorithm_adoption"
     }
-  ]
+  ],
+  "storage_campaign": {
+    "id": "ST-20260913-01",
+    "status": "ST-W0..W5 implementation; qualification is recorded in campaign receipts; human review and merge remain pending",
+    "profile": "ibm-enterprise-6.4-fixed-display-1047@1",
+    "authority": "Existing AIR 2.0.0 plus optional IBM1047; source semantic facts owned by frontend, translated by lower"
+  }
 }

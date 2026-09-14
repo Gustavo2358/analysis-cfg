@@ -18,9 +18,15 @@ public final class BatchReplayer {
     public interface Projection<S,T,V> {
         boolean supports(PointQuery<T> query);
         V project(PointQuery<T> query,S state);
+        /** Optional domain extension for a materializable terminator outcome. */
+        default boolean supportsOutcome(PointQuery<T> query) { return false; }
+        /** Receives the state immediately before that terminator; never a successor join.
+         * The transfer must be subject-independent: one result is shared per point/outcome. */
+        default S transferOutcome(PointQuery<T> query,S before) { throw new IllegalArgumentException("outcome unavailable"); }
     }
     private record Group(ContextView context,ProgramIndex.Node node) { }
     private record Selected<T>(PointQuery<T> query,int boundary) { }
+    private record OutcomePoint(io.github.gustavo2358.air.model.Ids.OperationId operation,Control.OutcomeKey outcome) { }
     public static <S,T,V> ObservationBatch<T,V> materialize(AnalysisSession session,DataflowResult<S> result,
             Direction direction,S unreachable,Iterable<PointQuery<T>> requests,Comparator<T> subjects,
             Transfer<S> transfer,Projection<S,T,V> projection) {
@@ -44,7 +50,7 @@ public final class BatchReplayer {
                 if(reason==null&&p.kind()!=ProgramPoint.Kind.ENTRY) {
                     if(site==null)reason=PointReason.UNKNOWN_OPERATION;
                     else if(!site.owner().id().equals(p.entry().unit()))reason=PointReason.FOREIGN_UNIT;
-                    else if(p.kind()==ProgramPoint.Kind.OUTCOME)reason=PointReason.OUTCOME_UNAVAILABLE;
+                    else if(p.kind()==ProgramPoint.Kind.OUTCOME && (!site.isTerminator()||!projection.supportsOutcome(q)))reason=PointReason.OUTCOME_UNAVAILABLE;
                     else if(p.kind()==ProgramPoint.Kind.AFTER) {
                         if(site.isTerminator())reason=PointReason.AFTER_TERMINATOR;
                         else if(p.outcome()!=Control.NormalOutcome.INSTANCE)reason=PointReason.OUTCOME_UNAVAILABLE;
@@ -69,6 +75,7 @@ public final class BatchReplayer {
                     continue;
                 }
                 S state=forward?result.in(context,node):result.out(context,node);
+                var outcomeStates=new HashMap<OutcomePoint,S>();
                 int cursor=forward?0:Math.incrementExact(sequence.instructions().size());
                 count.groups=Math.incrementExact(count.groups);
                 for(var q:selected) {
@@ -79,7 +86,16 @@ public final class BatchReplayer {
                         state=Objects.requireNonNull(transfer.apply(state,operation));
                         cursor+=forward?1:-1;
                     }
-                    answers.put(q.query(),value(q.query(),projection.project(q.query(),state)));
+                    S projected=state;
+                    if(q.query().point().kind()==ProgramPoint.Kind.OUTCOME) {
+                        var point=q.query().point();var key=new OutcomePoint(point.operation(),point.outcome());
+                        if(!outcomeStates.containsKey(key)) {
+                            outcomeStates.put(key,Objects.requireNonNull(projection.transferOutcome(q.query(),state)));
+                            count.operations=Math.incrementExact(count.operations);
+                        }
+                        projected=outcomeStates.get(key);
+                    }
+                    answers.put(q.query(),value(q.query(),projection.project(q.query(),projected)));
                 }
             }
             var output=new ArrayList<Observation<T,V>>();long answered=0,unsupported=0;

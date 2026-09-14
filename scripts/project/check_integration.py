@@ -28,6 +28,7 @@ SUITES = {
             "manyAssignsRemainOneSequenceNodeWithoutCopyingPayload",
         },
         "io.github.gustavo2358.analysis.cfg.adapters.TransportTest": {
+            "regionalFileCopyThenComputedCallPreservesControlAndCodec",
             "fileDecodePreservesExpectedAirFacts", "realBuildHasExactManualTopologyAndCorrelations",
             "writerMatchesIndependentGoldenBytesAndIsDeterministic", "readerPhysicalBoundAcceptsExactSizeAndRejectsOneExtra",
             "codecFailurePreservesCodePathAndIssues", "outputLimitPreservesExistingDestinationBeforeAnyTemp",

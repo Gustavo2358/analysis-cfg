@@ -22,7 +22,7 @@ def check(root=ROOT,refresh=False):
     def capture(args):return subprocess.check_output(args,cwd=root,text=True,stderr=subprocess.PIPE)
     edges=dependencies_from_jdeps(capture(['jdeps','--multi-release','21','-filter:none','-verbose:class','-cp',cp,str(classes)]))
     denied=('java.io.','java.nio.file.','java.net.','java.lang.reflect.','analysis.adapters.','analysis.launcher.','air.json.','cobolexplorer','org.antlr','lower.')
-    consumer_denied=('analysis.structure.','analysis.solver.','analysis.application.','analysis.query.BatchReplayer','analysis.values.PossibleValues','analysis.cfg.','air.model.Publication','air.model.Unit','air.model.Sequence')
+    consumer_denied=('analysis.structure.','analysis.solver.','analysis.application.','analysis.query.BatchReplayer','analysis.values.PossibleValues','analysis.values.RegionalValuesAnalysis','analysis.values.RegionalValuesProvider','analysis.cfg.','air.model.Publication','air.model.Unit','air.model.Sequence')
     for source,targets in edges.items():
         for target in targets:
             if any(x in target for x in denied):raise ValueError('W1D core outward dependency: '+source+' -> '+target)

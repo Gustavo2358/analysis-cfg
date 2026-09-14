@@ -1,5 +1,7 @@
 # Trabalho
 
+Campanha atual: [WORK-STORAGE-CFG-001 — Storage Semantics ST-W0..ST-W5](active/WORK-STORAGE-CFG-001.yaml), IN_PROGRESS; [contrato](../domain/storage-semantics.md). Promove somente os residuais de storage/RD/values do CP5 e preserva os marcos históricos abaixo.
+
 Atual: [WORK-CFG-039](active/WORK-CFG-039.yaml), full CardDemo baseline e análise consultiva. WORK-CFG-038: DONE / MERGED #24. [Invariantes permanentes](../architecture/compositional-partial-lowering.md).
 
 [WORK-CFG-033](history/WORK-CFG-033.md): CP6 W1D e CP6 W1 APPROVED / MERGED / CLOSED, PR #18. [Baseline W1 congelado](cp6-lifecycle.json) para a próxima wave. [WORK-CFG-034](history/WORK-CFG-034.md): CP6 W2D COMPLETED / MERGED, PR #20; W2 APPROVED / MERGED / CLOSED.
