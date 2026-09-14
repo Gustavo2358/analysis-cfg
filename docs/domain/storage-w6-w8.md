@@ -20,3 +20,12 @@ Algorithm: existing partition/index plus interval intersection of initialized
 spans, no per-byte layout materialization or all-object pairs. Work follows
 touched spans and retained support associations. Oracles include partial equal
 overlap/permutation, unknown gaps, overwrite/loop, copy and source contributions.
+
+W7.2 retains the established StatementEffects semantics. MAY preserves the old
+possibility; MUST kills only its exact outcome-specific range. A named union
+uses physical alias intersections and explicit disjoint-allocation premises.
+AllMemory includes private allocations; PRIVATE alone is not separation from
+external effects. A normal-outcome override replaces otherwise effects on that
+outcome; absent normal outcomes never create a normal continuation. CALL target
+reads are before effects. ExternalStorageScopeTest supplies six independent
+oracles for union/alias, private/all, outcome MUST, disjoint base and no known normal outcome. Explicit Diverge retains UNSUPPORTED_INPUT (existing control boundary); an open LabelsControl outcome creates only its allowed unknown destinations, never an invented normal edge.

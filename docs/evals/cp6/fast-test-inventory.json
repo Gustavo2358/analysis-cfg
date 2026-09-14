@@ -384,6 +384,14 @@
       "partialKillDropsOnlyCoveredInitialSupportsAndCopyRetainsTheRest",
       "unspecifiedBytesRemainUnknownWhileKnownChildCanBeRead",
       "overwriteKillsInitialDefinitionAcrossLoopAndInitialLabelBackedge"
+    ],
+    "io.github.gustavo2358.analysis.values.ExternalStorageScopeTest": [
+      "namedUnionMayAffectsOnlyProvedPrefixAndKeepsOldCandidate",
+      "privateStorageIsIncludedByAnExplicitAllMemoryEffect",
+      "normalOutcomeMustOverridesBroadOtherwiseAndKillsOnlyItsRange",
+      "noNormalOutcomeCannotInventContinuationOrEraseTheBeforeRead",
+      "explicitDivergenceKeepsTheExistingUnsupportedControlBoundary",
+      "aliasScopeUsesPhysicalIntersection"
     ]
   },
   "cfg-adapters": {
