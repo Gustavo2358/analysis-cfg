@@ -247,7 +247,7 @@
     ],
     "semantic_product_version": "2.15.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "58846a65a641c583387bc2dd4ae6c45306765611",
+    "commit": "c5d2bfe4319800e6b6c4c30ffe7e4a2c2451e892",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -258,12 +258,12 @@
       "scope": "local unconditional paragraph identity and explicit entry; G1-G5 and 1/2/5/40"
     },
     "storage_contract_version": "1.4.0",
-    "canonical_ref": "feat/declarative-value-inference"
+    "canonical_ref": "main"
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
-    "status": "DVI-W2 source proofs qualified locally; Draft PR #26; review pending",
-    "commit": "fbbf86dfcb1af9e4c41fbca13ce19798e423152b",
+    "status": "verified",
+    "commit": "c39ea3f88065a35e060e9f68fcd7bfbf05c48ff5",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -275,7 +275,7 @@
     "goto_validation": {
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
     },
-    "canonical_ref": "feat/declarative-value-inference"
+    "canonical_ref": "main"
   },
   "external": [
     {

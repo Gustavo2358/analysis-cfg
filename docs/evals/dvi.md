@@ -5,9 +5,9 @@ measured blockers. Handoff is ready for human review subject to Fast CI on the
 current Draft head. No merge or auto-merge. Work items remain IN_PROGRESS because
 repository DONE requires merge. Product completeness remains PARTIAL.
 
-Frontend Draft [#49](https://github.com/Gustavo2358/proleap-poc/pull/49),
-lower Draft [#26](https://github.com/Gustavo2358/cobol-lower/pull/26),
-CFG Draft [#35](https://github.com/Gustavo2358/analysis-cfg/pull/35).
+Frontend [#49](https://github.com/Gustavo2358/proleap-poc/pull/49) and lower
+[#26](https://github.com/Gustavo2358/cobol-lower/pull/26) are merged; CFG Draft
+[#35](https://github.com/Gustavo2358/analysis-cfg/pull/35) contains the equivalent-content repins.
 **CFG production Java is unchanged**, as are AIR model/codec/normative contracts.
 Existing Regional Values/RD and CALL/LINK/XCTL consumers use source-proved entry
 literals. There is no synthetic MOVE, second solver, or CICS logic in the solver.
@@ -16,8 +16,8 @@ literals. There is no synthetic MOVE, second solver, or CICS logic in the solver
 
 | Input | Integrated CICS baseline | DVI downstream pin |
 | --- | --- | --- |
-| frontend | be74bcb3cfe46357e6a692a45b130c4e0a61624b | 58846a65a641c583387bc2dd4ae6c45306765611 |
-| lower | 8b87818395a6e96978380c288ec1cbeb81bfa14a | fbbf86dfcb1af9e4c41fbca13ce19798e423152b |
+| frontend | be74bcb3cfe46357e6a692a45b130c4e0a61624b | c5d2bfe4319800e6b6c4c30ffe7e4a2c2451e892 |
+| lower | 8b87818395a6e96978380c288ec1cbeb81bfa14a | c39ea3f88065a35e060e9f68fcd7bfbf05c48ff5 |
 | CFG | 63c66d6a5cc1a7a9d30bbfc70ce4f12426242cfd | this Draft PR; no production delta |
 | AIR Java | eaf83c6233d347348a3927b5983de03cde62554a | unchanged |
 | normative AIR | 31893d1f4d203d19a61a750e2c4220120d9dab84 | unchanged |
