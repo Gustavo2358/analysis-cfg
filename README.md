@@ -1,5 +1,7 @@
 # Analysis CFG — consumer AIR
 
+Storage W6–W8: [qualified profile, tests and limits](docs/engineering/storage-w8-qualification.md). Human review pending; no merge.
+
 Desenvolvimento: `python3 -B scripts/harness/lean.py fast`.
 Antes de merge importante: `python3 -B scripts/harness/lean.py qualification-local` (local/on-demand).
 Abra PR, revisão humana, merge, DONE. [Política lean](docs/engineering/lean-harness.md).

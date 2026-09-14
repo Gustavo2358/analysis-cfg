@@ -1,5 +1,7 @@
 # Trabalho
 
+[WORK-STORAGE-W6-W8](WORK-STORAGE-W6-W8.json): W6/W7 G2 and W8 G3 qualified; IN_PROGRESS pending human review/merge. Extends the accepted W0–W5 work item without reopening it.
+
 Campanha atual: [WORK-STORAGE-CFG-001 — Storage Semantics ST-W0..ST-W5](active/WORK-STORAGE-CFG-001.yaml), IN_PROGRESS; [contrato](../domain/storage-semantics.md). Promove somente os residuais de storage/RD/values do CP5 e preserva os marcos históricos abaixo.
 
 Atual: [WORK-CFG-039](active/WORK-CFG-039.yaml), full CardDemo baseline e análise consultiva. WORK-CFG-038: DONE / MERGED #24. [Invariantes permanentes](../architecture/compositional-partial-lowering.md).
