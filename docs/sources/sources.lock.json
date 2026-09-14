@@ -128,8 +128,8 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "990619390bb61f2cc05d18bb98b506b2ea714475",
-    "canonical_ref": "feat/storage-semantics-st-w0-w5",
+    "commit": "acbe927023b6652ff5bb41a0aa5ef368f28bcc0e",
+    "canonical_ref": "main",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
     "analysis_ir": {
