@@ -29,6 +29,7 @@ public final class ProgramIndex {
     private final Map<StorageId, Memory.Storage> storage;
     private final Map<ObjectId, Memory.Cell> directCells;
     private final Map<OperandId, Memory.ObjectDeclaration> objectReferences;
+    private final Map<OperandId, Place> places;
     private final Map<EntryId, Entries.Entry> entries;
     private final IndexMetrics metrics;
 
@@ -48,7 +49,7 @@ public final class ProgramIndex {
         forwardHeads = b.forwardHeads; backwardHeads = b.backwardHeads;
         nodeIds = b.nodeIds; units = b.units; sequences = b.sequenceNodes;
         operations = b.operations; objects = b.objects; storage = b.storage;
-        directCells = b.directCells; objectReferences = b.objectReferences;
+        directCells = b.directCells; objectReferences = b.objectReferences;places=b.places;
         entries = b.entries; entryOrdinals = b.entryOrdinals;
         entryNodes = b.entryNodes; normalExits = b.normalExits;
         // Builder ownership is transferred. No builder or mutable collection escapes.
@@ -73,6 +74,7 @@ public final class ProgramIndex {
     public Memory.Storage storage(StorageId id) { return storage.get(id); }
     /** Direct whole Cell association only; null does not assert absence of indirect storage. */
     public Memory.Cell directCell(ObjectId id) { return directCells.get(id); }
+    public Place place(OperandId occurrence){return places.get(occurrence);}
     /** Pre-resolved ObjectPlace occurrence, including nested operands and Entry initial conditions. */
     public Memory.ObjectDeclaration referencedObject(OperandId occurrence) { return objectReferences.get(occurrence); }
 

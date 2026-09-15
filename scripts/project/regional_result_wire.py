@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Independent closed reader for regional-analysis-result 1.0.0; no Java/domain imports."""
+"""Independent closed reader for regional-analysis-result 1.0/1.1; no Java/domain imports."""
 from __future__ import annotations
 import argparse,json,re
 from pathlib import Path
@@ -59,8 +59,10 @@ class Reader:
         if k=='EXTENSION':string(c['name']);string(c['version']);self.type(c['logicalType'],check)
         if k=='UNKNOWN':self.ref(c['reason'],'uncertainty',check);self.type(c['logicalType'],check)
     def subject(self,s,check=True):
-        require(isinstance(s,dict) and s.get('kind') in {'NAMED_OBJECT','PHYSICAL_RANGE'},'subject kind')
-        if s['kind']=='NAMED_OBJECT':fields(s,'kind objectId','subject');self.ref(s['objectId'],'object',check)
+        require(isinstance(s,dict) and s.get('kind') in {'NAMED_OBJECT','PHYSICAL_RANGE','PLACE_OCCURRENCE'},'subject kind')
+        if s['kind']=='PLACE_OCCURRENCE':
+            require(self.r['version']=='1.1.0','place occurrence requires 1.1');fields(s,'kind operandId','subject');self.ref(s['operandId'],'operand',check)
+        elif s['kind']=='NAMED_OBJECT':fields(s,'kind objectId','subject');self.ref(s['objectId'],'object',check)
         else:
             fields(s,'kind storageId range codec','subject');self.ref(s['storageId'],'storage',check);self.codec(s['codec'],check);r=extent(s['range'])
             if check:
@@ -167,7 +169,7 @@ class Reader:
             require({token(p) for p in s['producers']}==support.get(s['candidate'],set()),'candidate support completeness')
         require(seen==known,'missing candidate supports')
     def validate(self):
-        r=self.r;require(r['schema']=='regional-analysis-result' and r['version']=='1.0.0' and r['profile']=='regional-text-images@2','schema/version/profile');string(r['resultId']);require(r['resultId'] and r['status']=='COMPLETE' and r['pathWitness']=='NOT_PROVIDED' and r['referenceAuthority']=='VALIDATED_AIR_PUBLICATION','result status/authority')
+        r=self.r;require(r['schema']=='regional-analysis-result' and r['version'] in {'1.0.0','1.1.0'} and r['profile']=='regional-text-images@2','schema/version/profile');string(r['resultId']);require(r['resultId'] and r['status']=='COMPLETE' and r['pathWitness']=='NOT_PROVIDED' and r['referenceAuthority']=='VALIDATED_AIR_PUBLICATION','result status/authority')
         inv=r['inventory'];fields(inv,'ids storages scopes','inventory');self.ids=distinct(inv['ids'],'inventory IDs')
         for i in inv['ids']:self.ref(i)
         self.ref(r['publicationId'],'publication')

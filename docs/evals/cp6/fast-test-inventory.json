@@ -252,6 +252,9 @@
       "memoryTenShapesPreserveTargetAndRemainder",
       "normalResultKillsOldValueButUnknownDestinationOnlyWidens",
       "jsonCliTenShapesRetainOperandsAndEqualMemory"
+    ],
+    "io.github.gustavo2358.analysis.launcher.PhysicalChoiceTargetTest": [
+      "physicalAlternativesSurviveMemoryAndCliWithoutResurrectingMustValues"
     ]
   },
   "analysis-values": {

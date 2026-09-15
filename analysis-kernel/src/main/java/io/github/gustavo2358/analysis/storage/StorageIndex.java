@@ -96,6 +96,8 @@ public final class StorageIndex {
         var unit=session.index().unit(atUnit);if(unit==null)return false;
         if(subject instanceof StorageSubject.NamedObject named)
             return declarations.containsKey(named.object())&&(named.object().unit().equals(atUnit)||unit.visibleObjects().contains(named.object()));
+        if(subject instanceof StorageSubject.PlaceOccurrence p)
+            return p.occurrence().owner().unit().equals(atUnit)&&session.index().place(p.occurrence())!=null;
         var range=(StorageSubject.PhysicalRange)subject;
         if(!codecReferences(range.codec())||!(bases.get(range.storage()) instanceof Memory.Region region)||!new StorageRange(BigInteger.ZERO,region.extent()).contains(range.range()))return false;
         var header=region.header();
@@ -118,13 +120,25 @@ public final class StorageIndex {
     }
     public Resolution resolve(StorageSubject subject) {
         if(subject instanceof StorageSubject.NamedObject named)return object(named.object());
+        if(subject instanceof StorageSubject.PlaceOccurrence p) {
+            var place=session.index().place(p.occurrence());if(place==null)throw new IllegalArgumentException("foreign place occurrence");
+            return resolve(place);
+        }
         var range=(StorageSubject.PhysicalRange)subject;
         if(!(bases.get(range.storage()) instanceof Memory.Region region)||!new StorageRange(BigInteger.ZERO,region.extent()).contains(range.range()))throw new IllegalArgumentException("query range outside storage snapshot");
         return new Resolution(List.of(new Candidate(new Location(region.header(),Optional.of(range.range())),Optional.of(range.codec()),List.of(region.header().origin()))),
             region.extent().isPresent()?Scopes.NoMemory.INSTANCE:within(range.storage()),region.extent().isPresent()?List.of():List.of("UNKNOWN_EXTENT"),region.extentUnknown().stream().toList());
     }
     public Set<OriginId> subjectOrigins(StorageSubject subject) {
-        return subject instanceof StorageSubject.NamedObject named?objectOrigins(named.object()):Set.of(whole(((StorageSubject.PhysicalRange)subject).storage()).base().origin());
+        if(subject instanceof StorageSubject.NamedObject named)return objectOrigins(named.object());
+        if(subject instanceof StorageSubject.PhysicalRange range)return Set.of(whole(range.storage()).base().origin());
+        var occurrence=(StorageSubject.PlaceOccurrence)subject;var root=session.index().place(occurrence.occurrence());
+        if(root==null)throw new IllegalArgumentException("foreign place occurrence");
+        var origins=new LinkedHashSet<OriginId>();var pending=new ArrayDeque<Operand>();pending.push(root);
+        while(!pending.isEmpty()) {var operand=pending.pop();origins.add(operand.header().origin());
+            if(operand instanceof Places.ObjectPlace object)origins.addAll(objectOrigins(object.object()));
+            pending.addAll(Operands.children(operand));}
+        return Set.copyOf(origins);
     }
     public Location whole(StorageId id) {
         var base=bases.get(id);if(base==null)throw new IllegalArgumentException("storage outside snapshot");

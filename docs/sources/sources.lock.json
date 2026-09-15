@@ -3,7 +3,7 @@
   "observed_on": "2026-09-14",
   "analysis_ir": {
     "repository": "Gustavo2358/analysis-ir",
-    "commit": "796d113f5a7afffdd421e0c2652e44e1de7bf49c",
+    "commit": "d9a1b28378ae0d948e18aba30b9355a3ec33a967",
     "semantic_version": "2.0.0",
     "role": "normative",
     "canonical_ref": "feat/recall-first-partial-semantics",
@@ -23,13 +23,13 @@
       "targets_air_version": "2.0.0",
       "path": "bindings/json-v1.md",
       "review_path": "bindings/revisao-json-v1.md",
-      "checked_commit": "796d113f5a7afffdd421e0c2652e44e1de7bf49c",
+      "checked_commit": "d9a1b28378ae0d948e18aba30b9355a3ec33a967",
       "implemented_in_analysis_cfg": false
     },
     "files": [
       {
         "path": "README.md",
-        "git_blob_sha1": "c1b1eb9a066f8caaff5d5c5f44f65b1a3a5346d8"
+        "git_blob_sha1": "dcc2412082c54dd5566fadcc23448d1ff62520bf"
       },
       {
         "path": "REFERENCIAS.md",
@@ -37,7 +37,7 @@
       },
       {
         "path": "bindings/json-v1.md",
-        "git_blob_sha1": "5a40c1f2147440a9ba5c5e2ebf5aa6d9e1351605"
+        "git_blob_sha1": "5a44553089ed316c1dc5196c43fe650b25c0e7ec"
       },
       {
         "path": "bindings/revisao-json-v1.md",
@@ -49,7 +49,7 @@
       },
       {
         "path": "conformidade/02-oraculos.md",
-        "git_blob_sha1": "2d74c72336be02f9645749d427b54fbff4940ced"
+        "git_blob_sha1": "d59f7fcc053f75cbb3a9bd5c3370586a938abbc8"
       },
       {
         "path": "especificacao/00-escopo-e-convencoes.md",
@@ -73,7 +73,7 @@
       },
       {
         "path": "especificacao/05-controle-e-invocacoes.md",
-        "git_blob_sha1": "3b585d0fdbae7c722497d9f64e6fe239333de7fc"
+        "git_blob_sha1": "a43dfdecd03660abe5ab04fd935f80acb14a4a17"
       },
       {
         "path": "especificacao/06-incompletude-e-proveniencia.md",
@@ -89,7 +89,7 @@
       },
       {
         "path": "especificacao/09-extensibilidade-e-compatibilidade.md",
-        "git_blob_sha1": "49cffa5f87e3f505a6e141b584ed7365dae47f14"
+        "git_blob_sha1": "9046a7438ea7418d96a4447d25896d31c5e4f0ef"
       },
       {
         "path": "especificacao/10-perfis-de-conformidade.md",
@@ -126,19 +126,23 @@
       {
         "path": "especificacao/13-possibilidades-de-entrada.md",
         "git_blob_sha1": "aa45890e421ee1fcd11d926bc5add1dcef2b126e"
+      },
+      {
+        "path": "especificacao/14-possibilidades-de-target.md",
+        "git_blob_sha1": "51f3be03c932478b699e80526d32fa1c78ca938e"
       }
     ],
     "baseline_assessment": "Merged W0\u2013W5 normative baseline; no normative change in W6."
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "2b0c7c336666265a423b1accaecbd2690fe0dcc7",
+    "commit": "6f06ecd504ebf9a0149e8110a1be17aa33e3fc01",
     "canonical_ref": "feat/recall-first-partial-semantics",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
     "analysis_ir": {
       "semantic_version": "2.0.0",
-      "commit": "796d113f5a7afffdd421e0c2652e44e1de7bf49c"
+      "commit": "d9a1b28378ae0d948e18aba30b9355a3ec33a967"
     },
     "maven": {
       "group_id": "io.github.gustavo2358",
@@ -195,7 +199,7 @@
         "path": "air-json/pom.xml",
         "artifact_id": "air-json",
         "role": "shared_codec_4B_scalar_assign_consumed_by_cfg_adapters",
-        "coverage": "ST-W1 regional constant bounds, Region/View/alias, bytes, CopyBytes and explicit IBM1047; historical scalar/control forms preserved; W6 generic fit_text roundtrip with explicit pad and exact length; RF-W3 Argument value/copy/reference and results Place[]"
+        "coverage": "ST-W1 regional constant bounds, Region/View/alias, bytes, CopyBytes and explicit IBM1047; historical scalar/control forms preserved; W6 generic fit_text roundtrip with explicit pad and exact length; RF-W3 Argument value/copy/reference and results Place[]; RF-W4 canonical Place.Choice and target.possibilities@1 with unknown target domain"
       }
     },
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -249,9 +253,9 @@
       "docs/work/history/WORK-SEMANTIC-PRODUCT-003.md",
       "docs/domain/declarative-value-inference.md"
     ],
-    "semantic_product_version": "2.16.0",
+    "semantic_product_version": "2.18.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "8ff3b03ca5694d7f5c50c3b0a9c31b4613ac23d2",
+    "commit": "c442baf9feaaff9fd81cf3d30dc50bd4cea47f0f",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -261,13 +265,13 @@
       "contract": "2.1.0",
       "scope": "local unconditional paragraph identity and explicit entry; G1-G5 and 1/2/5/40"
     },
-    "storage_contract_version": "1.4.0",
+    "storage_contract_version": "1.5.0",
     "canonical_ref": "fix/dvi-alias-aware-call-escape"
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "verified",
-    "commit": "bf42219d0600193dca2921768b739d99c4d7b085",
+    "commit": "ddf395a7afd4f1fdf4282447a1fe686e1b01900d",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -319,5 +323,13 @@
     "change": "entry.possibilities@1 boundary capability; no replacement solver",
     "air_java": "b34c4c575270cd7f4047a0ad10bda3303ea8c001",
     "analysis_ir": "796d113f5a7afffdd421e0c2652e44e1de7bf49c"
+  },
+  "rf_w4": {
+    "change": "Canonical physical target possibilities; scoped producer input/layout proof; existing regional solver reused",
+    "air_java": "6f06ecd504ebf9a0149e8110a1be17aa33e3fc01",
+    "analysis_ir": "d9a1b28378ae0d948e18aba30b9355a3ec33a967",
+    "proleap_poc": "c442baf9feaaff9fd81cf3d30dc50bd4cea47f0f",
+    "cobol_lower": "ddf395a7afd4f1fdf4282447a1fe686e1b01900d",
+    "evidence": "PhysicalChoiceTargetTest; StorageQueryTest; selected campaign verticals; FAST at wave closure"
   }
 }

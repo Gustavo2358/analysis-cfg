@@ -23,7 +23,7 @@ public final class CallDependencyPlan {
     }
     static boolean readable(Operations.Invoke i) {
         if(!(i.target() instanceof Interactions.ComputedTarget t&&t.name() instanceof Expressions.Read r))return false;
-        return r.place() instanceof Places.ObjectPlace||r.place() instanceof Places.RegionSlice slice
+        return r.place() instanceof Places.ObjectPlace||r.place() instanceof Places.Choice||r.place() instanceof Places.RegionSlice slice
             &&slice.offset() instanceof Expressions.Literal offset&&offset.value() instanceof Values.IntValue
             &&slice.length() instanceof Expressions.Literal length&&length.value() instanceof Values.IntValue;
     }
@@ -37,6 +37,7 @@ public final class CallDependencyPlan {
         var read=(Expressions.Read)((Interactions.ComputedTarget)((Operations.Invoke)site.operation()).target()).name();
         StorageSubject subject;
         if(read.place() instanceof Places.ObjectPlace object)subject=new StorageSubject.NamedObject(object.object());
+        else if(read.place() instanceof Places.Choice choice)subject=new StorageSubject.PlaceOccurrence(choice.header().id());
         else {
             var slice=(Places.RegionSlice)read.place();var offset=((Values.IntValue)((Expressions.Literal)slice.offset()).value()).value();
             var length=((Values.IntValue)((Expressions.Literal)slice.length()).value()).value();
@@ -58,7 +59,7 @@ public final class CallDependencyPlan {
                     if(CicsNameInterpreter.area(place,binding))cicsAreas.add(invoke.header().id());
                 }
                 groups.computeIfAbsent(site.owner().id(),ignored->new HashSet<>()).add(group(invoke));
-                if(readable(invoke)&&((Expressions.Read)((Interactions.ComputedTarget)invoke.target()).name()).place() instanceof Places.RegionSlice)slicedUnits.add(site.owner().id());
+                if(readable(invoke)&&!(((Expressions.Read)((Interactions.ComputedTarget)invoke.target()).name()).place() instanceof Places.ObjectPlace))slicedUnits.add(site.owner().id());
             }
         }
         var registrations=new ArrayList<ConsumerRegistration<DependencySiteFact>>();

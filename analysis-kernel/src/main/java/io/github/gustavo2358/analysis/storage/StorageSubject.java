@@ -5,7 +5,10 @@ import io.github.gustavo2358.air.model.Ids.*;
 import java.util.*;
 
 /** A query subject, never an invented AIR declaration or a proof of physical independence. */
-public sealed interface StorageSubject permits StorageSubject.NamedObject,StorageSubject.PhysicalRange {
+public sealed interface StorageSubject permits StorageSubject.NamedObject,StorageSubject.PhysicalRange,StorageSubject.PlaceOccurrence {
+    record PlaceOccurrence(OperandId occurrence) implements StorageSubject {
+        public PlaceOccurrence { Objects.requireNonNull(occurrence); }
+    }
     record NamedObject(ObjectId object) implements StorageSubject {
         public NamedObject { Objects.requireNonNull(object); }
     }
@@ -14,6 +17,11 @@ public sealed interface StorageSubject permits StorageSubject.NamedObject,Storag
     }
     Comparator<Memory.Codec> CODEC_ORDER=(a,b)->compare(codecParts(a),codecParts(b));
     Comparator<StorageSubject> ORDER=(left,right)->{
+        if(left instanceof PlaceOccurrence a) {
+            if(!(right instanceof PlaceOccurrence b))return 1;
+            return compare(occurrenceParts(a.occurrence()),occurrenceParts(b.occurrence()));
+        }
+        if(right instanceof PlaceOccurrence)return -1;
         if(left instanceof NamedObject a) {
             if(!(right instanceof NamedObject b))return -1;
             return compare(List.of(a.object().publication().localId(),a.object().unit().localId(),a.object().localId()),
@@ -27,6 +35,10 @@ public sealed interface StorageSubject permits StorageSubject.NamedObject,Storag
         if(a.range().end().isPresent()){result=a.range().end().get().compareTo(b.range().end().get());if(result!=0)return result;}
         return CODEC_ORDER.compare(a.codec(),b.codec());
     };
+    private static List<String> occurrenceParts(OperandId id) {
+        var owner=id.owner();var parent=owner instanceof OperationOwner op?op.operation().localId():((EntryOwner)owner).entry().localId();
+        return List.of(id.publication().localId(),owner.unit().localId(),owner instanceof OperationOwner?"operation":"entry",parent,id.localId());
+    }
     private static int compare(List<String> a,List<String> b) {
         for(int i=0;i<Math.min(a.size(),b.size());i++){int result=a.get(i).compareTo(b.get(i));if(result!=0)return result;}return Integer.compare(a.size(),b.size());
     }
