@@ -45,6 +45,10 @@ class PossibleEntryTest {
             var opaque=new Operations.Opaque(new Operations.Header(h.id(),h.origin(),h.coverage(),h.precision(),List.of(GAP)),"uninterpreted typed operation",List.of(),List.of(),envelope);
             var p=possible(List.of(new Sequence(new LabelId(U,"s0"),List.of(),opaque,origin(P)),returning(U,"exit",List.of())),"PGM00001");
             var value=at(run(p),"return-exit",WHOLE);assertEquals(List.of("PGM00001"),texts(value));assertTrue(value.modelValueRemainder());
+            var killed=possible(List.of(new Sequence(new LabelId(U,"s0"),List.of(),opaque,origin(P)),
+                returning(U,"exit",List.of(assign(U,"after-opaque",WHOLE,"OTHERPGM")))),"PGM00001");
+            var afterMust=at(run(killed),"return-exit",WHOLE);
+            assertEquals(List.of("OTHERPGM"),texts(afterMust));assertFalse(afterMust.modelValueRemainder(),"all modeled paths execute exact MUST after opaque");
         }
     }
     @Test void mustOverwriteKillsBothOldPossibilityAndOldLifecycleRemainder() {
