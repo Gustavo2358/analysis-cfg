@@ -16,14 +16,14 @@ import static io.github.gustavo2358.analysis.adapters.WireIds.id;
 
 /** Closed regional result v1. Facts are detached canonical projections; no AIR interpretation here. */
 public final class RegionalResultJson {
-    public static final String VERSION="1.0.0";
+    public static final String VERSION="1.1.0";
     public void write(RegionalAnalysisResult result,OutputStream output) throws IOException {
         var json=new JsonOutput(output);json.value(payload(result));json.finish();
     }
     private static Object payload(RegionalAnalysisResult r) {
         var inventory=r.inventory();
         var observations=r.observations().stream().sorted(Comparator.comparing((RegionalAnalysisResult.Observation o)->o.query().point(),ProgramPoint.ORDER).thenComparing(o->o.query().subject(),StorageSubject.ORDER)).toList();
-        return object("schema","regional-analysis-result","version",VERSION,"resultId",r.resultId(),"publicationId",id(r.publicationId()),"profile",RegionalValuesAnalysis.PROFILE,
+        return object("schema","regional-analysis-result","version",r.observations().stream().anyMatch(o->o.query().subject() instanceof StorageSubject.PlaceOccurrence)?VERSION:"1.0.0","resultId",r.resultId(),"publicationId",id(r.publicationId()),"profile",RegionalValuesAnalysis.PROFILE,
             "status","COMPLETE","pathWitness","NOT_PROVIDED","referenceAuthority","VALIDATED_AIR_PUBLICATION",
             "inventory",object("ids",ids(inventory.ids()),"storages",each(inventory.storages().stream().sorted(Comparator.comparing(s->s.header().id(),WireIds.ORDER)).toList(),RegionalResultJson::storage),
                 "scopes",each(inventory.scopes().stream().sorted(Comparator.comparing(RegionalAnalysisResult.SourceScope::entry,WireIds.ORDER)).toList(),RegionalResultJson::scope)),
@@ -44,6 +44,7 @@ public final class RegionalResultJson {
     private static Object subject(StorageSubject s) {
         return switch(s) {
             case StorageSubject.NamedObject named -> object("kind","NAMED_OBJECT","objectId",id(named.object()));
+            case StorageSubject.PlaceOccurrence occurrence -> object("kind","PLACE_OCCURRENCE","operandId",id(occurrence.occurrence()));
             case StorageSubject.PhysicalRange physical -> object("kind","PHYSICAL_RANGE","storageId",id(physical.storage()),"range",range(physical.range()),"codec",codec(physical.codec()));
         };
     }

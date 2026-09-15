@@ -32,9 +32,10 @@ final class CallDependencyConsumer implements FactConsumer<DependencySiteFact> {
         var evidence=new LinkedHashSet<Id>();var origins=new LinkedHashSet<OriginId>();var premises=new LinkedHashSet<PremiseId>();
         evidence.add(site.operationId());origins.add(site.origin());origins.add(targetOrigin);
         Boolean model=null;boolean source=reachable.sourceUnknownRemainder();boolean interpretation=policy instanceof Interactions.UnknownName||cics&&(command.equals("UNKNOWN")||!(policy instanceof Interactions.ExtensionName e&&e.name().equals("cics-ts.program")&&e.version().equals("1")));
+        if(invoke.target() instanceof Interactions.ComputedTarget t&&t.name() instanceof Expressions.Read read
+            &&read.place() instanceof Places.Choice choice&&choice.typeRef() instanceof Types.UnknownType)interpretation=true;
         ObjectId subject=null;ProgramPoint point=null;TargetStatus status;
         if(!reachable.reachable())status=TargetStatus.UNREACHABLE_IN_MODEL;
-        else if(!CallDependencyPlan.shape(invoke)){status=TargetStatus.UNSUPPORTED_INVOCATION_SHAPE;interpretation=true;}
         else if(computed&&(!CallDependencyPlan.readable(invoke)||cics&&!cicsAreas.contains(site.operationId()))){status=TargetStatus.UNSUPPORTED_TARGET_EXPRESSION;interpretation=true;}
         else {
             if(computed) {
@@ -63,7 +64,8 @@ final class CallDependencyConsumer implements FactConsumer<DependencySiteFact> {
             else {var query=CallDependencyPlan.valueQuery(site);subject=query.subject();point=query.point();}
         }
         raw.sort(Comparator.comparing(RawCandidate::rawValue));candidates.sort(Comparator.comparing(Candidate::referenceName).thenComparing(Candidate::rawValue));
-        var uncertainties=new LinkedHashSet<>(invoke.header().uncertainties());if(policy instanceof Interactions.UnknownName unknown)uncertainties.add(unknown.uncertainty());
+        var uncertainties=new LinkedHashSet<>(invoke.header().uncertainties());if(invoke.target() instanceof Interactions.ComputedTarget t&&t.name() instanceof Expressions.Read read
+            &&read.place() instanceof Places.Choice choice&&choice.typeRef() instanceof Types.UnknownType unknown)uncertainties.add(unknown.uncertainty());if(policy instanceof Interactions.UnknownName unknown)uncertainties.add(unknown.uncertainty());
         sink.emit(new DependencySiteFact(site.entry().unit(),site.entry(),site.sequence(),site.operationId(),site.offset(),site.origin(),targetOrigin,cics?"CICS":"COBOL",command,namespace,nameProfile,
             computed?TargetKind.COMPUTED:TargetKind.LITERAL,subject,point,reachable.reachable()?Reachability.REACHABLE:Reachability.UNREACHABLE_IN_MODEL,status,raw,candidates,
             model,source,interpretation,Boolean.TRUE.equals(model)||source||interpretation,reachable.controlUnknown()||invoke.outcomes().remainder() instanceof Scopes.WithinControl,

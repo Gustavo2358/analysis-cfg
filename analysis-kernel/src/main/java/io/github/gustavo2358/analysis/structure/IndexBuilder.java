@@ -25,6 +25,7 @@ final class IndexBuilder {
     final Map<ObjectId, Memory.ObjectDeclaration> objects = new HashMap<>();
     final Map<StorageId, Memory.Storage> storage = new HashMap<>();
     final Map<ObjectId, Memory.Cell> directCells = new HashMap<>();
+    final Map<OperandId, Place> places = new HashMap<>();
     final Map<OperandId, Memory.ObjectDeclaration> objectReferences = new HashMap<>();
     final LongIntDirectory forwardHeads = new LongIntDirectory(), backwardHeads = new LongIntDirectory();
     ProgramIndex.Node[] nodes;
@@ -64,7 +65,7 @@ final class IndexBuilder {
         var namePolicies = NamePolicies.extensions(snapshot);
         for (var capability : snapshot.capabilities().required()) {
             count.visit("requiredCapabilities");
-            supported(capability.equals(Capabilities.MEMORY_REGIONS) || capability.equals(Capabilities.IBM1047) || namePolicies.contains(capability), "unsupported control capability");
+            supported(capability.equals(Capabilities.TARGET_POSSIBILITIES) || capability.equals(Capabilities.MEMORY_REGIONS) || capability.equals(Capabilities.IBM1047) || capability.equals(Capabilities.ENTRY_POSSIBILITIES) || namePolicies.contains(capability), "unsupported control capability");
         }
         supported(policy.acceptsInventory(snapshot.coverage().inventory()), "unsupported publication inventory policy");
         declarations();
@@ -159,6 +160,8 @@ final class IndexBuilder {
                     operands(List.of(condition.place()), new EntryOwner(entry.id()));
                     if (condition.value() instanceof Entries.LiteralInitial initial)
                         operands(List.of(initial.value()), new EntryOwner(entry.id()));
+                    if (condition.value() instanceof Entries.PossibleLiterals possible)
+                        operands(new ArrayList<Operand>(possible.candidates()), new EntryOwner(entry.id()));
                 }
             }
             // Expected cardinality plus unique valid roles proves completeness without constructing
@@ -185,6 +188,7 @@ final class IndexBuilder {
             count.visit("operands");
             valid(operand.header().id().owner().equals(expectedOwner), "foreign Operand owner");
             valid(operandIds.add(operand.header().id()), "duplicate Operand occurrence");
+            if(operand instanceof Place place)places.put(place.header().id(),place);
             if (operand instanceof Places.ObjectPlace place) {
                 Memory.ObjectDeclaration declaration = resolveObject(place.object());
                 objectReferences.put(place.header().id(), declaration);

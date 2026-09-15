@@ -84,6 +84,13 @@ final class TextProfile {
                     // Conditions are simultaneous; equal literals on one Cell retain both supports.
                     if(previous!=null)value=seed.value(location.ordinal(),preparation).join(value,preparation);
                     seed=seed.assign(location.ordinal(),value,preparation);
+                } else if(condition.value() instanceof Entries.PossibleLiterals possible) {
+                    var value=Candidates.UNKNOWN;
+                    for(var literal:possible.candidates()) {
+                        if(!(literal.value() instanceof Values.TextValue text))throw new Refusal(false,"UNSUPPORTED_INITIAL_VALUE");
+                        value=value.join(universe.supported(text,literal.header().id(),condition.origin(),condition.premises(),preparation),preparation);
+                    }
+                    seed=seed.assign(location.ordinal(),value,preparation);
                 }
             }
             boundaries.put(context,seed);

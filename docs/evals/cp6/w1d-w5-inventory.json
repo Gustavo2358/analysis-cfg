@@ -922,6 +922,7 @@
         "io.github.gustavo2358.analysis.storage.StorageSubject",
         "io.github.gustavo2358.analysis.storage.StorageSubject$NamedObject",
         "io.github.gustavo2358.analysis.storage.StorageSubject$PhysicalRange",
+        "io.github.gustavo2358.analysis.storage.StorageSubject$PlaceOccurrence",
         "io.github.gustavo2358.analysis.values.RegionalValueFact",
         "io.github.gustavo2358.analysis.values.RegionalValueFact$Interpretation",
         "io.github.gustavo2358.analysis.values.RegionalValuesAnalysis",
@@ -962,6 +963,7 @@
         "java.util.Optional",
         "java.util.Set",
         "java.util.function.Function",
+        "java.util.function.Predicate",
         "java.util.stream.Stream"
       ],
       "io.github.gustavo2358.analysis.adapters.ResultJson": [

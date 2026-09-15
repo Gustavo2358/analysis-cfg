@@ -23,12 +23,11 @@ public final class CallDependencyPlan {
     }
     static boolean readable(Operations.Invoke i) {
         if(!(i.target() instanceof Interactions.ComputedTarget t&&t.name() instanceof Expressions.Read r))return false;
-        return r.place() instanceof Places.ObjectPlace||r.place() instanceof Places.RegionSlice slice
+        return r.place() instanceof Places.ObjectPlace||r.place() instanceof Places.Choice||r.place() instanceof Places.RegionSlice slice
             &&slice.offset() instanceof Expressions.Literal offset&&offset.value() instanceof Values.IntValue
             &&slice.length() instanceof Expressions.Literal length&&length.value() instanceof Values.IntValue;
     }
-    static boolean shape(Operations.Invoke i){return i.arguments().isEmpty()&&i.results().isEmpty();}
-    static int group(Operations.Invoke i){return !shape(i)?2:i.target() instanceof Interactions.LiteralTarget?0:readable(i)?1:2;}
+    static int group(Operations.Invoke i){return i.target() instanceof Interactions.LiteralTarget?0:readable(i)?1:2;}
     static PointQuery<ObjectId> valueQuery(SiteView site) {
         var target=(Interactions.ComputedTarget)((Operations.Invoke)site.operation()).target();
         var object=(Places.ObjectPlace)((Expressions.Read)target.name()).place();
@@ -38,6 +37,7 @@ public final class CallDependencyPlan {
         var read=(Expressions.Read)((Interactions.ComputedTarget)((Operations.Invoke)site.operation()).target()).name();
         StorageSubject subject;
         if(read.place() instanceof Places.ObjectPlace object)subject=new StorageSubject.NamedObject(object.object());
+        else if(read.place() instanceof Places.Choice choice)subject=new StorageSubject.PlaceOccurrence(choice.header().id());
         else {
             var slice=(Places.RegionSlice)read.place();var offset=((Values.IntValue)((Expressions.Literal)slice.offset()).value()).value();
             var length=((Values.IntValue)((Expressions.Literal)slice.length()).value()).value();
@@ -59,11 +59,14 @@ public final class CallDependencyPlan {
                     if(CicsNameInterpreter.area(place,binding))cicsAreas.add(invoke.header().id());
                 }
                 groups.computeIfAbsent(site.owner().id(),ignored->new HashSet<>()).add(group(invoke));
-                if(readable(invoke)&&((Expressions.Read)((Interactions.ComputedTarget)invoke.target()).name()).place() instanceof Places.RegionSlice)slicedUnits.add(site.owner().id());
+                if(readable(invoke)&&!(((Expressions.Read)((Interactions.ComputedTarget)invoke.target()).name()).place() instanceof Places.ObjectPlace))slicedUnits.add(site.owner().id());
             }
         }
         var registrations=new ArrayList<ConsumerRegistration<DependencySiteFact>>();
-        boolean regional=session.index().publication().storage().stream().anyMatch(Memory.Region.class::isInstance);
+        // Result assignments belong to normal-return edges. Select the existing regional
+        // provider that models those edges, including Cell storage, without changing solvers.
+        boolean regional=session.index().publication().storage().stream().anyMatch(Memory.Region.class::isInstance)
+            ||session.index().sites(Operations.Invoke.class).stream().anyMatch(s->!((Operations.Invoke)s.operation()).results().isEmpty());
         for(var context:session.contexts()) {
             var entry=context.entry().id();String id=part(entry.publication().localId())+part(entry.unit().localId())+part(entry.localId());
             var reach=ReachabilityProvider.batch("reach:"+id,entry);boolean physical=slicedUnits.contains(entry.unit());

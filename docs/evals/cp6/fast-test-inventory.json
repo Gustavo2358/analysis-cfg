@@ -247,6 +247,14 @@
       "missingInputAndBadQueryNeverReplaceOutput",
       "realRegionalFileHasStableOutputAndExplicitUnsupportedQuery",
       "malformedAirAndOutputFailurePreserveExistingContentAndCleanTemporary"
+    ],
+    "io.github.gustavo2358.analysis.launcher.InvocationIndependenceTest": [
+      "memoryTenShapesPreserveTargetAndRemainder",
+      "normalResultKillsOldValueButUnknownDestinationOnlyWidens",
+      "jsonCliTenShapesRetainOperandsAndEqualMemory"
+    ],
+    "io.github.gustavo2358.analysis.launcher.PhysicalChoiceTargetTest": [
+      "physicalAlternativesSurviveMemoryAndCliWithoutResurrectingMustValues"
     ]
   },
   "analysis-values": {

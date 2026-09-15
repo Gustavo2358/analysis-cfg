@@ -105,4 +105,13 @@ class RegionalWireContract(unittest.TestCase):
         validate(r) # Shape/decoder agreement is not enough to prove source semantics.
         self.assertNotEqual(golden(),actual_projection(r))
 
+    def test_canonical_place_occurrence_has_an_explicit_version_boundary(self):
+        r=read(ROOT/'analysis-launcher/target/recall-choice-result.json')
+        self.assertEqual('1.1.0',r['version'])
+        self.assertEqual('PLACE_OCCURRENCE',r['observations'][0]['subject']['kind'])
+        self.assertEqual(['PROGA   ','PROGB   '],r['observations'][0]['values']['fact']['candidates'])
+        self.assertTrue(r['observations'][0]['values']['fact']['effectiveUnknownRemainder'])
+        r['version']='1.0.0'
+        with self.assertRaises(WireError):validate(r)
+
 if __name__=='__main__':unittest.main()

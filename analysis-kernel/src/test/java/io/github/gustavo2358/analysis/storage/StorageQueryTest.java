@@ -49,9 +49,11 @@ class StorageQueryTest {
         var cell=new Memory.Cell(new Memory.StorageHeader(base("cell"),Optional.of(U),Memory.Lifetime.PERSISTENT,Memory.Visibility.PRIVATE,O),BYTES);
         var p=publication(List.of(region("r",8L,Memory.Lifetime.PERSISTENT),hidden,cell),List.of(view("whole","r",0,8)),List.of(sequence("s",List.of())),List.of());
         var requests=List.<StorageSubject>of(range("r",8,1),range("missing",0,1),range("hidden",0,1),range("cell",0,1),new StorageSubject.NamedObject(object("missing")),
+            new StorageSubject.PlaceOccurrence(new OperandId(new OperationOwner(new OperationId(U,"return-s")),"missing")),
+            new StorageSubject.PlaceOccurrence(new OperandId(new OperationOwner(new OperationId(new UnitId(new PublicationId("foreign"),U.localId()),"return-s")),"missing")),
             new StorageSubject.PhysicalRange(new StorageId(new PublicationId("foreign"),"r"),StorageRange.exact(BigInteger.ZERO,BigInteger.ONE),Memory.IdentityBytes.INSTANCE));
         var batch=execute(p).observeStorage(requests.stream().map(s->new PointQuery<>(point(),s)).toList());
-        assertEquals(ObservationBatch.Status.COMPLETE,batch.status());assertEquals(6,batch.metrics().unsupportedQueries());
+        assertEquals(ObservationBatch.Status.COMPLETE,batch.status());assertEquals(8,batch.metrics().unsupportedQueries());
         for(var q:batch.observations()){assertEquals(ObservationBatch.PointReason.UNSUPPORTED_SUBJECT,q.reason());assertNull(q.value());}
     }
     @Test void codecIsPartOfQueryIdentityAndDuplicateRequestsShareReplay() {

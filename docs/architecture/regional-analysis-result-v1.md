@@ -198,3 +198,17 @@ For several equal initial origins on an interval, observations publish complete
 fragment covers whose union retains every contribution. All covers describe the
 same byte image; their inventory order is not an execution order. The domain
 stores co-initial origins per span and does not enumerate initialization orders.
+
+
+## RF-W4 — query by canonical Place occurrence
+
+StorageSubject.PlaceOccurrence(OperandId) refers to an already indexed AIR Place,
+owned by the query Entry's unit. It is resolved through the existing StorageIndex;
+there is no invented object and no additional dataflow. Choices preserve all known
+physical alternatives and their memory bound. Foreign IDs are unsupported subjects.
+The result retains the OperandId, candidates, support, remainder and query point.
+
+The writer uses schema **1.1.0** only when a PLACE_OCCURRENCE subject is present:
+`{kind: "PLACE_OCCURRENCE", operandId: Id(operand)}`. Existing subjects retain the
+1.0.0 wire unchanged. The independent Python reader accepts both and rejects the
+new subject under 1.0.0. This does not change dependencies.json or CFG JSON.
