@@ -67,3 +67,7 @@ evidence:
 - Commit/pin exatos por fronteira; comandos/exit/results reais, testes novos vs REUSED vs NOT_RUN
 - Atualizar matriz somente com oracle/resultado; estado curto e PR persistente por repo, sem receipt obrigatório
 stop_condition: Parar ao qualificar C-FC; administração não abre escopo de configuração externa.
+depends_on:
+- FD-W3
+- FD-W4
+- FD-W7

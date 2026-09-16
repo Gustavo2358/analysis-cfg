@@ -1,6 +1,6 @@
 # FILE-DEPENDENCIES — entrada da campanha
 
-Estado: **FD-H0–H4 em preparação; FD-W0–W11 TODO, sem autorização de execução**.
+Estado: **FD-H0–H4 preparados para revisão humana; FD-W0–W11 TODO, sem autorização de execução**.
 O pedido desta sessão autoriza documentação/harness, commits e Draft PRs; termina
 em H4 para revisão humana. Nenhuma capability de arquivos está qualificada aqui.
 

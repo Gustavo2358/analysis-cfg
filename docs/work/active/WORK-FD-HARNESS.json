@@ -7,5 +7,5 @@
     "harness",
     "file-dependencies"
   ],
-  "notes": "Preparação somente. Waves futuras estão em analysis-cfg/docs/work/file-dependencies. Revisão humana após H4; sem produção, merge ou repin."
+  "notes": "FD-H0–H4 preparados e qualificados documentalmente para revisão humana. FD-W0–W11 TODO; sem produção, merge ou repin. Handoff canônico: analysis-cfg/docs/product/file-dependencies/state.md."
 }

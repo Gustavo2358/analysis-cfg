@@ -64,3 +64,7 @@ evidence:
 - Commit/pin exatos por fronteira; comandos/exit/results reais, testes novos vs REUSED vs NOT_RUN
 - Atualizar matriz somente com oracle/resultado; estado curto e PR persistente por repo, sem receipt obrigatório
 stop_condition: Parar após captura/query/unknown qualificados; handles de biblioteca ficam para W10.
+depends_on:
+- FD-W1
+- FD-W3
+- FD-W4

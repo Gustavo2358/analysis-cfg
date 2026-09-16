@@ -69,4 +69,7 @@ acceptance:
 evidence:
 - Commit/pin exatos por fronteira; comandos/exit/results reais, testes novos vs REUSED vs NOT_RUN
 - Atualizar matriz somente com oracle/resultado; estado curto e PR persistente por repo, sem receipt obrigatório
-stop_condition: Parar após vertical e contrato qualificados; perfil N ainda parcial, não iniciar W2.
+stop_condition: Parar após vertical e contrato qualificados; perfil N ainda parcial, avanço depende da autorização
+  vigente.
+depends_on:
+- FD-W0

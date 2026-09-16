@@ -62,3 +62,5 @@ evidence:
 - Commit/pin exatos por fronteira; comandos/exit/results reais, testes novos vs REUSED vs NOT_RUN
 - Atualizar matriz somente com oracle/resultado; estado curto e PR persistente por repo, sem receipt obrigatório
 stop_condition: Parar com inventário de operações completo e dimensões ainda parciais documentadas; W3 separada.
+depends_on:
+- FD-W1

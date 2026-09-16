@@ -63,3 +63,5 @@ evidence:
 - Atualizar matriz somente com oracle/resultado; estado curto e PR persistente por repo, sem receipt obrigatório
 stop_condition: Parar ao qualificar handler/retorno do perfil; falta de autoridade para regra USE exige bloqueio
   focal.
+depends_on:
+- FD-W3

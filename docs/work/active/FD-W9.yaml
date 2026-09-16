@@ -63,3 +63,10 @@ evidence:
 - Commit/pin exatos por fronteira; comandos/exit/results reais, testes novos vs REUSED vs NOT_RUN
 - Atualizar matriz somente com oracle/resultado; estado curto e PR persistente por repo, sem receipt obrigatório
 stop_condition: Parar após qualificação de escopo e agregação; wrappers interprograma permanecem fora do perfil.
+depends_on:
+- FD-W0
+- FD-W1
+- FD-W5
+- FD-W6
+- FD-W7
+- FD-W8

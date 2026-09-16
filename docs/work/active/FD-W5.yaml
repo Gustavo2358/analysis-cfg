@@ -62,3 +62,7 @@ evidence:
 - Commit/pin exatos por fronteira; comandos/exit/results reais, testes novos vs REUSED vs NOT_RUN
 - Atualizar matriz somente com oracle/resultado; estado curto e PR persistente por repo, sem receipt obrigatório
 stop_condition: Parar após família e regressões; cláusulas auxiliares ficam para W6.
+depends_on:
+- FD-W0
+- FD-W3
+- FD-W4

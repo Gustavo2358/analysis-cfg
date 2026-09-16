@@ -67,3 +67,5 @@ evidence:
 - Atualizar matriz somente com oracle/resultado; estado curto e PR persistente por repo, sem receipt obrigatório
 stop_condition: Parar após efeitos e regressões qualificados; dúvida sobre validade de buffer bloqueia a regra,
   não vira MUST.
+depends_on:
+- FD-W2

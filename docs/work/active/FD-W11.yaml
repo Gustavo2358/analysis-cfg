@@ -63,3 +63,15 @@ evidence:
 - Commit/pin exatos por fronteira; comandos/exit/results reais, testes novos vs REUSED vs NOT_RUN
 - Atualizar matriz somente com oracle/resultado; estado curto e PR persistente por repo, sem receipt obrigatório
 stop_condition: 'STOP: revisão humana final. Não fazer merge/auto-merge/repin pós-merge sem autorização.'
+depends_on:
+- FD-W0
+- FD-W1
+- FD-W2
+- FD-W3
+- FD-W4
+- FD-W5
+- FD-W6
+- FD-W7
+- FD-W8
+- FD-W9
+- FD-W10
