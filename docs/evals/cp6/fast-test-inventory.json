@@ -139,6 +139,14 @@
     ],
     "io.github.gustavo2358.analysis.adapters.EpR2DepthVerticalTest": [
       "manySegmentsPreserveMayMustBeforeAndCapturedSourceThroughJson"
+    ],
+    "io.github.gustavo2358.analysis.adapters.LeadingDollarProductTest": [
+      "regionalComputedDollarSurvivesBeforeSupportAndEdge",
+      "literalDollarSurvivesFactJsonAndEdge",
+      "computedDollarHasSupportedRawBeforeInterpretation",
+      "eightCharacterDollarNameKeepsFullLength",
+      "nondollarAndMiddleDollarControlsKeepSupportAndRemainders",
+      "rejectedNamesStillPublishRawWithoutEdges"
     ]
   },
   "analysis-dataflow": {
@@ -159,6 +167,16 @@
     "io.github.gustavo2358.analysis.dependencies.NameInterpreterTest": [
       "canonicalSubsetAndOnlyComputedTrailingSpaces",
       "unsupportedRuntimeTransformationsRemainOpen"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.LeadingDollarNameTest": [
+      "prereleaseCorrectionRetainsTheCurrentProfileIdentity",
+      "computedLeadingDollarPreservesNameAndOnlyDropsTrailingPadding",
+      "literalLeadingDollarPreservesName",
+      "syntheticAlphanumericLeadingDollarIsSupported",
+      "syntheticLeadingDollarWithPaddingIsSupported",
+      "syntheticNameUsesExactlyEightCharactersIncludingDollar",
+      "existingAcceptedFormsKeepTheirExactNames",
+      "existingRejectionsAndLiteralPaddingRemainOpen"
     ]
   },
   "analysis-kernel": {

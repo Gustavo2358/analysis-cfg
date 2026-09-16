@@ -15,12 +15,12 @@ remain unchanged. No confidential source or real AIR/product is versioned here.
 
 ## W0 — synthetic evidence before any production change
 
-The unchanged interpreter uses `[A-Z_][A-Z0-9_@#$]{0,7}`. It trims only final
+The W0 interpreter used `[A-Z_][A-Z0-9_@#$]{0,7}`. It trims only final
 U+0020 for computed values. CallDependencyConsumer first retains supported raw
 values, then adds interpreted candidates only when referenceName is non-null.
 The empty interpreted list produces OPEN_TARGET.
 
-New desired-behavior tests intentionally remain RED on the entry head:
+The frozen desired-behavior tests were RED on the entry head:
 
 - LeadingDollarNameTest: 7 tests, 5 semantic failures, zero errors/skips.
   `$PROGA   ` computed, `$PROGA` literal, `$ABC1`, `$TEST123   ` and `$ABCDEFG`
@@ -38,7 +38,7 @@ New desired-behavior tests intentionally remain RED on the entry head:
 synthetic site facts. Raw logs/XML and preserved AIR/JSON baseline are under
 `.harness-results/ep-r2/sanitization/`; synthetic-before must not be overwritten by
 later GREEN output. Temurin 21.0.12+1.1 / release 21; existing pinned AIR build.
-No FAST yet: this wave is deliberately before the authorized production fix.
+W0 did not run FAST: that wave intentionally stopped before production changes.
 
 ## W0B — real hypothesis is not yet audited
 
@@ -48,12 +48,13 @@ the matching AIR and expected nine-name set were supplied in the request.
 A local search did not identify the confidential incident artifacts. This is an
 artifact-location limitation, not evidence about the expected real-name set.
 
-Required input was requested: local paths for the existing real dependencies.json,
-its exact AIR and the expected nine-name set (or a local file containing it).
-Do not change the regex until all four missing names have supported raw facts
-and the loss is confirmed at name interpretation. If one is absent upstream,
-stop and report the first observable missing boundary; do not infer a boundary
-without the corresponding evidence.
+The product owner subsequently confirmed PRE-RELEASE status and authorized the
+leading-dollar capability independently of this audit. F2-W0B now means a later
+incident audit, not implementation permission. The existing real dependencies.json,
+matching AIR and exact expected nine-name set are still needed for that audit.
+Do not infer an upstream boundary or claim 9/9 without those artifacts. If a name
+remains absent after the same-AIR rerun, record the first observed loss and stop
+for review; do not invent another fix.
 
 For each missing site, keep the detailed incident audit local and confidential.
 Real identifiers must not be versioned. Git may retain only non-sensitive
@@ -62,43 +63,35 @@ identical AIR bytes, upstreams and parameters, with only analysis-cfg changed.
 Compare the exact expected set, all five prior names, all four new names,
 candidate-specific support/provenance, raw spelling and each remainder.
 
-## W1B — profile version decision before coding
+## W1B — explicit pre-release authority supersedes the earlier proposal
 
-`cobol-zos-dynamic-call-minimal@1` and its regex already exist in origin/main,
-introduced by `1ab16bdeae8d8af23e723d0b239ba191a695764a`.
-The original internal-contract statement in
-[dependency-result contract](../architecture/analysis-dependency-result-v1.md)
-and WORK-CFG-033 spec describes an explicit first version without speculative
-compatibility machinery. It does **not** expressly authorize changing @1's
-observable accepted language in-place.
+The initial W0 proposal of a new profile revision was superseded by the product
+owner's explicit PRE-RELEASE VERSIONING POLICY. The product has never had a
+production baseline or external consumer. Git main is development, not publication.
+The [canonical policy](../architecture/extensibility.md#política-de-versionamento-pré-release)
+requires correcting local semantic bugs in-place until the first actual bank
+baseline; cross-repository wires may still identify incompatible snapshots.
 
-Decision, conditional on W0B confirmation: introduce
-`cobol-zos-dynamic-call-minimal@2` with exactly `[A-Z_$][A-Z0-9_@#$]{0,7}`.
-No other new leading characters, normalization, truncation, callee lookup or
-real-name exceptions. Preserve raw text and supports; retain the existing
-computed/literal padding distinction and UnknownName/ExtensionName remainder.
+Decision: retain **cobol-zos-dynamic-call-minimal@1** and change only the initial
+character class from `[A-Z_]` to `[A-Z_$]`. No other character, length, padding,
+case, UnknownName/ExtensionName, evidence or remainder semantics changes. The
+[canonical name policy](../domain/cp6-call-name-policy.md), architectural authority
+and AGENTS reference are committed with the regex and assertions freezing @1.
 
-Current JSON uses top-level interpretationProfile=per-site; COBOL sites receive
-CallNameInterpreter.PROFILE as nameProfile. The mapper transports that string;
-DependencySiteFact and dependency_wire accept an explicit nonempty profile.
-No current test/validator freezes the old literal profile string. The older
-1.0.0 section of the dependency-result document predates per-site 1.1.0; the
-[current per-site contract](../domain/cics-program-control.md) and mapper govern.
-The change is local to analysis-cfg; it needs no AIR/frontend/lower version or
-new JSON field. Update the policy documentation and assert the @2 per-site
-identity when implementing, while retaining @1 as the historical language.
+Current JSON has top-level interpretationProfile=per-site and per-site nameProfile.
+Both the constant and emitted COBOL profile remain @1. No AIR/frontend/lower,
+new wire version, compatibility shim or legacy mode is introduced.
 
 ## Remaining qualification
 
 C2 local semantic rule plus its existing product boundary: desired REDs → minimal
-policy/profile delta → focused interpreter/consumer/wire tests → H2, representative
-F1/F-order and one existing computed regional case → same-AIR real rerun → one
-FAST after stabilization. The old/no-dollar JSON baseline must remain equivalent
-except for the intentional per-site profile revision. No automatic rerun of the
+in-place policy delta → focused interpreter/consumer/wire tests → H2, representative
+F1/F-order and one existing computed regional case → one FAST after stabilization → same-AIR manual real rerun. The old/no-dollar JSON baseline must remain equivalent
+byte-for-byte, with no profile revision. No automatic rerun of the
 whole EP-R2, upstream, FILE, CardDemo or CICS campaigns.
 
 EP-R2 ENTRY SEMANTICS: QUALIFIED (reused).
 EP-R2 FACTORIZED VALUES DOMAIN: QUALIFIED (reused).
 R2-REV-F1 DEPTH: QUALIFIED (reused).
-R2-REV-F2 LEADING-DOLLAR NAME POLICY: NOT QUALIFIED; W0B input pending.
+R2-REV-F2 LEADING-DOLLAR NAME POLICY: qualification in progress; implementation authorized.
 REAL CASE: NOT AUDITED; no 9/9 claim.

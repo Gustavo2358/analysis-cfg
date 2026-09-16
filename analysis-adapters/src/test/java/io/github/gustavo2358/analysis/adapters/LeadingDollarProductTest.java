@@ -4,6 +4,10 @@ import io.github.gustavo2358.air.json.AirJson;
 import io.github.gustavo2358.air.model.*;
 import io.github.gustavo2358.analysis.dependencies.*;
 import java.nio.file.*;
+import java.math.BigInteger;
+import io.github.gustavo2358.analysis.dataflow.RegionalAnalysis;
+import io.github.gustavo2358.analysis.query.PointQuery;
+import io.github.gustavo2358.analysis.storage.StorageSubject;
 import java.util.*;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,12 +29,34 @@ final class LeadingDollarProductTest {
             return i;
         }).toList(),s.terminator(),s.origin())).toList(),u.entries());
     }
+    static Publication regionalFixture(String raw) throws Exception {
+        var p=fixture(raw,true);var u=p.units().getFirst();var extent=BigInteger.valueOf(raw.length());
+        var objects=u.objects().stream().map(o->new Memory.ObjectDeclaration(o.id(),o.displayName(),o.typeRef(),
+            new Memory.ViewBinding(((Memory.CellBinding)o.storage()).storage(),BigInteger.ZERO,extent,
+                new Memory.ExtensionCodec("text.ebcdic.ibm1047","1",Types.known(Types.Builtin.TEXT))),
+            o.visibility(),o.origin(),o.coverage(),o.precision())).toList();
+        var unit=new io.github.gustavo2358.air.model.Unit(u.id(),u.containingUnit(),objects,u.visibleObjects(),u.entries(),u.sequences(),u.completionPorts(),u.body(),u.bodyUnavailable(),u.coverage(),u.origin());
+        var storage=p.storage().stream().map(s->(Memory.Storage)new Memory.Region(s.header(),Optional.of(extent),Optional.empty())).toList();
+        return new Publication(p.id(),p.airVersion(),new Capabilities.Manifest(List.of(Capabilities.MEMORY_REGIONS,Capabilities.IBM1047),List.of()),
+            p.artifacts(),List.of(unit),storage,p.resources(),p.artifactRelations(),p.origins(),p.coverage(),p.uncertainties(),p.premises());
+    }
     static DependencyResult product(String caseId,String raw,boolean computed,String expected) throws Exception {
-        var codec=new AirJson();var p=fixture(raw,computed);var bytes=codec.encode(p);p=codec.decode(bytes);
+        return product(caseId,raw,computed,expected,false);
+    }
+    static DependencyResult product(String caseId,String raw,boolean computed,String expected,boolean regional) throws Exception {
+        var codec=new AirJson();var p=regional?regionalFixture(raw):fixture(raw,computed);var bytes=codec.encode(p);p=codec.decode(bytes);
         var result=new DependencyAnalysis().prepare(p);var site=result.sites().getFirst();
+        assertEquals("cobol-zos-dynamic-call-minimal@1",site.nameProfile());
         assertEquals(List.of(raw),site.rawCandidates().stream().map(DependencySiteFact.RawCandidate::rawValue).toList());
         var supports=site.rawCandidates().getFirst().supports();assertFalse(supports.isEmpty());assertFalse(site.provenance().isEmpty());
-        if(computed) {
+        if(regional) {
+            var query=new PointQuery<StorageSubject>(before(p,invoke(p).header().id()).point(),new StorageSubject.NamedObject(subject(p)));
+            var source=new RegionalAnalysis().prepare(p,"f2-regional",List.of(query)).observations().getFirst().values().value();
+            assertEquals(List.of(new Values.TextValue(raw)),source.candidates());assertEquals(query.point(),site.valuePoint());
+            assertEquals(source.candidateSupports().getFirst().producers().getFirst().evidence(),supports.getFirst().producer());
+            assertEquals(source.candidateSupports().getFirst().producers().getFirst().origin(),supports.getFirst().origin());
+            assertFalse(source.provenance().isEmpty());
+        } else if(computed) {
             var source=value(p,invoke(p).header().id());assertEquals(List.of(new Values.TextValue(raw)),source.candidates());
             assertEquals(source.candidateSupports().getFirst().producers().getFirst().evidence(),supports.getFirst().producer());
             assertEquals(source.candidateSupports().getFirst().producers().getFirst().origin(),supports.getFirst().origin());
@@ -53,6 +79,7 @@ final class LeadingDollarProductTest {
         assertTrue(site.interpretationUnknownRemainder(),"UnknownName remains open even when lexical interpretation succeeds");
         assertTrue(site.effectiveUnknownRemainder());return result;
     }
+    @Test void regionalComputedDollarSurvivesBeforeSupportAndEdge() throws Exception {product("regional-dollar","$PROGA   ",true,"$PROGA",true);}
     @Test void literalDollarSurvivesFactJsonAndEdge() throws Exception {product("literal-dollar","$PROGA",false,"$PROGA");}
     @Test void computedDollarHasSupportedRawBeforeInterpretation() throws Exception {product("computed-dollar","$PROGA   ",true,"$PROGA");}
     @Test void eightCharacterDollarNameKeepsFullLength() throws Exception {product("eight-characters","$ABCDEFG",true,"$ABCDEFG");}

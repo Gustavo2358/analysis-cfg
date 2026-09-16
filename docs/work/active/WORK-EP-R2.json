@@ -5,6 +5,6 @@
   "scope": [
     "analysis-cfg: entry admission, regional values domain, dependency product, focused qualification"
   ],
-  "notes": "F2 focal remediation started on PR #39 from 3968e48. W0 synthetic mechanism confirmed: five interpreter REDs and three product REDs; supported raw dollar names are rejected only in interpretation. Production unchanged. W0B awaits real dependencies.json, identical AIR and exact expected nine-name set; do not alter regex before four-site confirmation. Proposed local profile @2 documented. Prior ENTRY/FACTORIZATION/F1 depth qualification remains historical; F2 and real 9/9 not yet qualified. No merge/auto-merge; no new PR.",
+  "notes": "R2-REV-F2 in progress on PR #39. Product owner authorized in-place PRE-RELEASE correction, retaining cobol-zos-dynamic-call-minimal@1; real audit no longer gates implementation. Regex and independent wire oracle accept only leading dollar as additional syntax. W0 REDs preserved; 14 name/product tests and 15 CLI/wire cases pass, with exact control/baseline evidence preservation. 69 focused regression tests and H2/F1/two representative F-order products pass. Final FAST pending. Real same-AIR nine-name audit awaits local artifact paths; not claimed confirmed. Prior ENTRY/FACTORIZATION/F1 qualified. No merge/auto-merge.",
   "pr": 39
 }

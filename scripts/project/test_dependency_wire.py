@@ -2,7 +2,7 @@
 """Adversarial tests of the independent dependency reader, including actual Java bytes."""
 import copy,json,tempfile,unittest
 from pathlib import Path
-from dependency_wire import read,validate,encode
+from dependency_wire import read,validate,encode,candidate
 ROOT=Path(__file__).resolve().parents[2]
 class DependencyWireTests(unittest.TestCase):
     def setUp(self):self.path=ROOT/'analysis-adapters/target/w1d/dynamic-x8.json';self.d=read(self.path)
@@ -39,6 +39,24 @@ class DependencyWireTests(unittest.TestCase):
             for malformed in (b'{"schema":"duplicate",'+raw[1:],raw+b'\n',raw.replace(b'"schema":',b'"schema" :',1),b'\xff'):
                 p.write_bytes(malformed)
                 with self.assertRaises((ValueError,UnicodeError)):read(p)
+
+class LeadingDollarWireTests(unittest.TestCase):
+    def test_actual_java_dollar_candidates_and_edges_keep_profile_one(self):
+        folder=ROOT/'analysis-adapters/target/ep-r2-f2'
+        for name,expected in [('literal-dollar','$PROGA'),('computed-dollar','$PROGA'),('regional-dollar','$PROGA'),('eight-characters','$ABCDEFG')]:
+            d=read(folder/(name+'.dependencies.json'));site=d['sites'][0]
+            self.assertEqual('cobol-zos-dynamic-call-minimal@1',site['nameProfile'])
+            self.assertEqual(expected,site['candidates'][0]['referenceName'])
+            self.assertEqual(site['rawCandidates'][0]['rawValue'],site['candidates'][0]['rawValue'])
+            self.assertEqual(site['rawCandidates'][0]['supports'],site['candidates'][0]['supports'])
+            self.assertEqual(site['candidates'][0],d['edges'][0]['candidate'])
+            self.assertTrue(site['interpretationUnknownRemainder']);self.assertTrue(site['effectiveUnknownRemainder'])
+
+    def test_only_the_leading_dollar_is_added_to_the_cobol_language(self):
+        source=read(ROOT/'analysis-adapters/target/ep-r2-f2/computed-control.dependencies.json')['sites'][0]['candidates'][0]
+        for name in ['1PROGA','@PROGA','#PROGA','$proga',' $PROGA','$PROG-A','$ABCDEFGH','$PROGA\t','$PROGA\u00a0']:
+            changed=copy.deepcopy(source);changed['referenceName']=name;changed['rawValue']=name
+            with self.assertRaises(ValueError):candidate(changed)
 
 class PartialDependencyWireTests(unittest.TestCase):
     def test_actual_partial_outputs_preserve_literal_and_open_computed(self):

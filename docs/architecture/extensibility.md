@@ -61,8 +61,43 @@ fallback único e uma representação executável sob seus oráculos upstream.
 Compatibilidade estrutural, semântica, conservadora, de precisão e de transporte
 são diferentes. Consumidor antigo pode aceitar uma extensão pelo envelope e perder
 precisão. Não prometer “zero quebra” apenas por adicionar um campo.
-Versionar contratos e correlacionar resultados com a publicação original.
+Versionar fronteiras que precisem detectar snapshots incompatíveis e correlacionar
+resultados com a publicação original. Correções locais pré-release seguem a
+política abaixo.
 Nova semântica exige contrato aprovado; o agente não altera a IR unilateralmente.
+
+## Política de versionamento pré-release
+
+Decisão explícita do responsável pelo produto em R2-REV-F2, 16/09/2026.
+O produto está em **PRE-RELEASE**: nunca foi usado em produção, não tem consumidor
+externo, contrato de compatibilidade publicado ou versão instalada no banco a
+preservar. O Git é o ambiente de desenvolvimento. A primeira entrega efetiva ao
+banco será um snapshot da main e constituirá o primeiro baseline publicado.
+
+Enquanto não houver baseline de produção ou consumidor externo, bugs semânticos
+de contratos/profiles locais são corrigidos **in-place**. Não criar nova versão,
+novo profile, compatibility shim ou legacy mode apenas para preservar comportamento
+incorreto que nunca foi publicado. Uma mudança no Git, inclusive merge em main,
+não equivale a uma entrega de produção. Documentação canônica, implementação e
+oráculos devem registrar a correção juntos, mantendo a evidência RED histórica.
+
+A partir do primeiro baseline efetivamente entregue ao banco, sua semântica fica
+congelada para compatibilidade futura; mudanças incompatíveis posteriores podem
+exigir nova versão. Registre o snapshot e a entrega quando ocorrerem. Esta decisão
+não afirma que tal baseline já existe nem redefine retrospectivamente versões de
+outros contratos.
+
+**Exceção:** wires entre repositórios independentes, como SP/AIR/storage, podem
+precisar de versões durante o desenvolvimento para detectar snapshots incompatíveis
+entre produtor e consumidor. Pins e validação dessas fronteiras continuam
+obrigatórios. Essa exceção não justifica versionar uma política local interna só
+porque seu comportamento foi corrigido antes do release; também não autoriza
+alterar a AIR unilateralmente.
+
+Aplicação: a [política CALL](../domain/cp6-call-name-policy.md) mantém
+`cobol-zos-dynamic-call-minimal@1` ao aceitar `$` inicial. Não há novo identificador
+nem modo legado para a rejeição incorreta. A auditoria posterior do incidente real
+mede o recall recuperado; não condiciona a autorização desse requisito de produto.
 
 ## Controle local futuro
 
