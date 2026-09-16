@@ -5,6 +5,6 @@
   "scope": [
     "analysis-cfg: entry admission, regional values domain, dependency product, focused qualification"
   ],
-  "notes": "READY FOR HUMAN RE-REVIEW: R2-REV-F1 remediated by stack-independent traversal of all five DAG operations. RED isolated and valid 8192-segment AIR vertical; GREEN through 32768 levels with 256 MiB/default stack, 1000 algebra scenarios/7000 checks, 111 focused tests, five deep CLI observations, eight selected products; final FAST 501 Java methods plus Python/architecture passed once. Same Draft PR; no merge/auto-merge. FILE/upstreams/pins unchanged. REAL CASE: AWAITING MANUAL RE-RUN after human review.",
+  "notes": "F2 focal remediation started on PR #39 from 3968e48. W0 synthetic mechanism confirmed: five interpreter REDs and three product REDs; supported raw dollar names are rejected only in interpretation. Production unchanged. W0B awaits real dependencies.json, identical AIR and exact expected nine-name set; do not alter regex before four-site confirmation. Proposed local profile @2 documented. Prior ENTRY/FACTORIZATION/F1 depth qualification remains historical; F2 and real 9/9 not yet qualified. No merge/auto-merge; no new PR.",
   "pr": 39
 }
