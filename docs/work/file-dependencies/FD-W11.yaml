@@ -55,7 +55,7 @@ commands_and_gates:
 - 'E-FINAL: comando e escopo em ../../product/file-dependencies/verification.md'
 - python3 -B scripts/harness/lean.py fast — uma vez por repo produtivo estabilizado, após focais
 acceptance:
-- Nenhuma regressão CALL inexplicada; candidates/supports/reaminders/alcance e provenance comparados
+- Nenhuma regressão CALL inexplicada; candidates/supports/remainders/alcance e provenance comparados
 - Todas as fronteiras qualificadas nos pins finais; JSON correto e determinístico; erro de entrega preservado
 - Limites reais/fora de perfil explícitos; ausência DSNAME nunca parcial; custos medidos sem inventar SLA
 - PRs persistentes em Draft para revisão final; DONE lean somente após merge autorizado e testes requeridos
