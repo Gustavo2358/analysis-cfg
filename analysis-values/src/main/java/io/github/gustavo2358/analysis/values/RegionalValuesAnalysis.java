@@ -24,6 +24,7 @@ public final class RegionalValuesAnalysis {
     private final List<List<Integer>> groups;
     private final int[] groupOf,groupSizes;
     private final List<List<StoragePartition.Segment>> groupSegments;
+    private final Map<StoragePartition.Segment,Integer> levels=new HashMap<>();
     private final Map<StatementEffects.Write,StorageIndex.Resolution> preparedReads=new IdentityHashMap<>();
     private final Map<Operation,List<Plan>> operations=new IdentityHashMap<>();
     private final Map<Operation,Map<Control.OutcomeKey,List<Plan>>> outcomes=new IdentityHashMap<>();
@@ -85,6 +86,9 @@ public final class RegionalValuesAnalysis {
         bases=effects.storage().bases().stream().map(b->effects.storage().whole(b.header().id()))
             .sorted(Comparator.comparing((StorageIndex.Location l)->l.base().id().localId())).toList();
         for(int i=0;i<bases.size();i++)ordinals.put(bases.get(i).base().id(),i);
+        // Partition ordinals follow the AIR storage inventory. DAG variable order must
+        // instead be canonical, including allocation/work metrics in the public wire.
+        for(var base:bases)for(var segment:partition.intersecting(base))levels.put(segment,levels.size());
         for(var statement:effects.statements()) {
             var op=statement.operation();operations.put(op,compile(statement.writes(),op.header().id(),op.header().origin(),List.of(),op,null,Optional.of(Control.NormalOutcome.INSTANCE)));
             otherwise.put(op,compile(statement.otherwise(),op.header().id(),op.header().origin(),List.of(),op,null,Optional.empty()));
@@ -155,7 +159,7 @@ public final class RegionalValuesAnalysis {
         groups=components.values().stream().map(List::copyOf).toList();groupOf=new int[bases.size()];groupSizes=groups.stream().mapToInt(List::size).toArray();
         for(int g=0;g<groups.size();g++)for(int ordinal:groups.get(g))groupOf[ordinal]=g;
         groupSegments=groups.stream().map(group->group.stream().flatMap(i->partition.intersecting(bases.get(i)).stream())
-            .sorted(Comparator.comparingInt(StoragePartition.Segment::ordinal)).toList()).toList();
+            .sorted(Comparator.comparingInt(levels::get)).toList()).toList();
     }
     private StorageIndex.Resolution readSource(StatementEffects.Write write) {
         if(write.source() instanceof StatementEffects.CapturedBytes copy)return copy.source();
@@ -218,7 +222,7 @@ public final class RegionalValuesAnalysis {
         private FactorizedAlternatives.Node<Content> value(State state,int group) {
             contentReads++;var present=state.bindings.get(group);
             return present!=null?present:defaults.computeIfAbsent(group,g->{
-                var values=new TreeMap<Integer,Content>();for(var segment:groupSegments.get(g))values.put(segment.ordinal(),unknown(segment.location(),"UNSPECIFIED_ENTRY_CONTENT"));
+                var values=new TreeMap<Integer,Content>();for(var segment:groupSegments.get(g))values.put(levels.get(segment),unknown(segment.location(),"UNSPECIFIED_ENTRY_CONTENT"));
                 return relations.singleton(values);
             });
         }
@@ -226,7 +230,7 @@ public final class RegionalValuesAnalysis {
         private Content content(Map<Integer,Content> selected,int ordinal) {
             var location=bases.get(ordinal);Content result=unknown(location,"UNSPECIFIED_ENTRY_CONTENT");
             for(var segment:partition.intersecting(location)) {
-                var piece=selected.get(segment.ordinal());if(piece==null)continue;
+                var piece=selected.get(levels.get(segment));if(piece==null)continue;
                 result=result instanceof Bytes bytes?new Bytes(bytes.image().write(segment.location().range().orElseThrow(),((Bytes)piece).image())):piece;
             }
             return result;
@@ -248,12 +252,12 @@ public final class RegionalValuesAnalysis {
         }
         private Set<Integer> readSegments(Map<StatementEffects.Write,Integer> choices) {
             var selected=new HashSet<Integer>();
-            choices.forEach((write,i)->{if(i>=0)for(var segment:partition.intersecting(readSource(write).candidates().get(i).location()))selected.add(segment.ordinal());});
+            choices.forEach((write,i)->{if(i>=0)for(var segment:partition.intersecting(readSource(write).candidates().get(i).location()))selected.add(levels.get(segment));});
             return Set.copyOf(selected);
         }
         private List<Content> contents(State state,StorageIndex.Location location) {
             int ordinal=ordinals.get(location.base().id());var selected=new HashSet<Integer>();
-            for(var segment:partition.intersecting(location))selected.add(segment.ordinal());
+            for(var segment:partition.intersecting(location))selected.add(levels.get(segment));
             return relations.selections(relations.project(value(state,groupOf[ordinal]),selected)).stream().map(c->content(c,ordinal)).toList();
         }
         @Override public Iterable<Boundary<State>> boundaries(AnalysisSession selected) {
@@ -367,7 +371,7 @@ public final class RegionalValuesAnalysis {
                         piece=new Bytes(bytes.image().slice(relative));
                     }
                     var supplied=piece;
-                    updates.put(segment.ordinal(),prior->{
+                    updates.put(levels.get(segment),prior->{
                         if(prior instanceof Bytes bytes&&eventDetails.get(plan.event).initial()!=null&&eventDetails.get(plan.event).initial().value() instanceof Entries.LiteralInitial)
                             return new Bytes(bytes.image().initialize(new StorageRange(BigInteger.ZERO,bytes.image().extent()),((Bytes)supplied).image()));
                         return supplied;
