@@ -256,7 +256,7 @@
     ],
     "semantic_product_version": "2.19.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "37c6f6911249478f6b43c1a5198a36c3c754319d",
+    "commit": "92eeb774f0c333c253a77148ca1dff7a4dc57edf",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -268,12 +268,13 @@
     },
     "storage_contract_version": "1.6.0",
     "canonical_ref": "feat/evidence-preserving-partial-analysis",
-    "observed_on": "2026-09-15"
+    "observed_on": "2026-09-15",
+    "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update."
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "EP-W1 focused vertical passed; FAST pending",
-    "commit": "748eb9466f5105d8a019acdb99c871fb10a2a899",
+    "commit": "ea3041a956150155d39bd94784e5744315f5d6bd",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -286,7 +287,8 @@
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
     },
     "canonical_ref": "feat/evidence-preserving-partial-analysis",
-    "observed_on": "2026-09-15"
+    "observed_on": "2026-09-15",
+    "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update."
   },
   "external": [
     {
