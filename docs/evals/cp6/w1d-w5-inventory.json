@@ -931,6 +931,7 @@
         "io.github.gustavo2358.analysis.values.StorageValueFact$Capture",
         "io.github.gustavo2358.analysis.values.StorageValueFact$Fragment",
         "io.github.gustavo2358.analysis.values.StorageValueFact$FragmentKind",
+        "io.github.gustavo2358.analysis.values.StorageValueFact$LogicalAlternative",
         "io.github.gustavo2358.analysis.values.StorageValueFact$Producer",
         "io.github.gustavo2358.analysis.values.StorageValueFact$SourceGap",
         "io.github.gustavo2358.analysis.values.ValueFact",
@@ -962,6 +963,8 @@
         "java.util.Objects",
         "java.util.Optional",
         "java.util.Set",
+        "java.util.TreeMap",
+        "java.util.function.Consumer",
         "java.util.function.Function",
         "java.util.function.Predicate",
         "java.util.stream.Stream"

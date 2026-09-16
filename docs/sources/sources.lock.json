@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "observed_on": "2026-09-14",
+  "observed_on": "2026-09-15",
   "analysis_ir": {
     "repository": "Gustavo2358/analysis-ir",
-    "commit": "d9a1b28378ae0d948e18aba30b9355a3ec33a967",
+    "commit": "56d7e76961e2892925da8bfab387707c306376bf",
     "semantic_version": "2.0.0",
     "role": "normative",
-    "canonical_ref": "feat/recall-first-partial-semantics",
+    "canonical_ref": "feat/evidence-preserving-partial-analysis",
     "upstream_review": {
       "pull_request": 2,
       "state": "merged",
@@ -23,7 +23,7 @@
       "targets_air_version": "2.0.0",
       "path": "bindings/json-v1.md",
       "review_path": "bindings/revisao-json-v1.md",
-      "checked_commit": "d9a1b28378ae0d948e18aba30b9355a3ec33a967",
+      "checked_commit": "56d7e76961e2892925da8bfab387707c306376bf",
       "implemented_in_analysis_cfg": false
     },
     "files": [
@@ -37,7 +37,7 @@
       },
       {
         "path": "bindings/json-v1.md",
-        "git_blob_sha1": "5a44553089ed316c1dc5196c43fe650b25c0e7ec"
+        "git_blob_sha1": "547d4c44d4efaa0dea806918b6a37309a1dc62ca"
       },
       {
         "path": "bindings/revisao-json-v1.md",
@@ -65,7 +65,7 @@
       },
       {
         "path": "especificacao/03-memoria-e-aliases.md",
-        "git_blob_sha1": "4c508d9fc8dbe6fd5089b6c71db9d8feccf188da"
+        "git_blob_sha1": "c30e4158e98f7cf4945bff7f84eb74f61ceee18b"
       },
       {
         "path": "especificacao/04-operacoes.md",
@@ -125,24 +125,25 @@
       },
       {
         "path": "especificacao/13-possibilidades-de-entrada.md",
-        "git_blob_sha1": "aa45890e421ee1fcd11d926bc5add1dcef2b126e"
+        "git_blob_sha1": "d3a551bfd24a6f292ec5d7b5805a051b3fcfe344"
       },
       {
         "path": "especificacao/14-possibilidades-de-target.md",
         "git_blob_sha1": "51f3be03c932478b699e80526d32fa1c78ca938e"
       }
     ],
-    "baseline_assessment": "Merged W0\u2013W5 normative baseline; no normative change in W6."
+    "baseline_assessment": "EP-W1 entry.possibilities@2; focused bilateral and selected CLI evidence; FAST pending",
+    "observed_on": "2026-09-15"
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "6f06ecd504ebf9a0149e8110a1be17aa33e3fc01",
-    "canonical_ref": "feat/recall-first-partial-semantics",
+    "commit": "1e06f2900b88a573d9bc1822b53ff7e5f7960e5c",
+    "canonical_ref": "feat/evidence-preserving-partial-analysis",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
     "analysis_ir": {
       "semantic_version": "2.0.0",
-      "commit": "d9a1b28378ae0d948e18aba30b9355a3ec33a967"
+      "commit": "56d7e76961e2892925da8bfab387707c306376bf"
     },
     "maven": {
       "group_id": "io.github.gustavo2358",
@@ -184,7 +185,7 @@
       "air-model/src/main/java/io/github/gustavo2358/air/model/MemoryCodecs.java",
       "air-json/src/test/resources/regional.canonical.json"
     ],
-    "observed_on": "2026-09-13",
+    "observed_on": "2026-09-15",
     "modules": {
       "parent": {
         "path": "pom.xml",
@@ -253,9 +254,9 @@
       "docs/work/history/WORK-SEMANTIC-PRODUCT-003.md",
       "docs/domain/declarative-value-inference.md"
     ],
-    "semantic_product_version": "2.18.0",
+    "semantic_product_version": "2.19.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "c442baf9feaaff9fd81cf3d30dc50bd4cea47f0f",
+    "commit": "37c6f6911249478f6b43c1a5198a36c3c754319d",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -265,13 +266,14 @@
       "contract": "2.1.0",
       "scope": "local unconditional paragraph identity and explicit entry; G1-G5 and 1/2/5/40"
     },
-    "storage_contract_version": "1.5.0",
-    "canonical_ref": "fix/dvi-alias-aware-call-escape"
+    "storage_contract_version": "1.6.0",
+    "canonical_ref": "feat/evidence-preserving-partial-analysis",
+    "observed_on": "2026-09-15"
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
-    "status": "verified",
-    "commit": "ddf395a7afd4f1fdf4282447a1fe686e1b01900d",
+    "status": "EP-W1 focused vertical passed; FAST pending",
+    "commit": "748eb9466f5105d8a019acdb99c871fb10a2a899",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -283,7 +285,8 @@
     "goto_validation": {
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
     },
-    "canonical_ref": "feat/recall-first-partial-semantics"
+    "canonical_ref": "feat/evidence-preserving-partial-analysis",
+    "observed_on": "2026-09-15"
   },
   "external": [
     {
