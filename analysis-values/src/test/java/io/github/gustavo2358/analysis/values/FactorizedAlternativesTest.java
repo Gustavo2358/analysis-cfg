@@ -5,6 +5,44 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FactorizedAlternativesTest {
+    /** Independent collecting relation oracle, with empty relations and skipped levels. */
+    @Test void thousandFiniteRelationsPreserveAlgebraAndCanonicality() {
+        var random=new Random(20260916);
+        for(int trial=0;trial<1000;trial++) {
+            var domain=new FactorizedAlternatives<Integer>();int dimensions=random.nextInt(6);
+            Set<Map<Integer,Integer>> a=randomRelation(random,dimensions),b=randomRelation(random,dimensions);
+            var left=relation(domain,a);var right=relation(domain,b);var joined=domain.union(left,right);
+            var union=new HashSet<>(a);union.addAll(b);assertEquals(union,tuples(domain,joined));
+            assertSame(joined,domain.union(right,left));assertSame(left,domain.union(left,left));
+            int changed=dimensions==0?0:2*random.nextInt(dimensions);
+            var image=new HashSet<Map<Integer,Integer>>();
+            for(var row:a) {var copy=new HashMap<>(row);if(copy.containsKey(changed))copy.put(changed,0);image.add(Map.copyOf(copy));}
+            var updated=domain.update(left,Map.of(changed,ignored->0));assertEquals(image,tuples(domain,updated));
+            var selected=new HashSet<Integer>();var restriction=new HashMap<Integer,Integer>();
+            for(int i=0;i<dimensions;i++)if(random.nextBoolean()){selected.add(2*i);restriction.put(2*i,random.nextInt(4));}
+            var projected=new HashSet<Map<Integer,Integer>>();var restricted=new HashSet<Map<Integer,Integer>>();
+            for(var row:a) {
+                var copy=new HashMap<Integer,Integer>();selected.forEach(i->copy.put(i,row.get(i)));projected.add(Map.copyOf(copy));
+                if(restriction.entrySet().stream().allMatch(e->e.getValue().equals(row.get(e.getKey()))))restricted.add(row);
+            }
+            assertEquals(projected,tuples(domain,domain.project(left,selected)));
+            assertEquals(restricted,tuples(domain,domain.restrict(left,restriction)));
+            image.addAll(a);assertEquals(image,tuples(domain,domain.union(left,updated)));
+        }
+        System.out.println("EP_R2_RELATION_ORACLE scenarios=1000 checks=7000 seed=20260916 PASS");
+    }
+    private static Set<Map<Integer,Integer>> randomRelation(Random random,int dimensions) {
+        var rows=new HashSet<Map<Integer,Integer>>();int count=random.nextInt(7);
+        for(int i=0;i<count;i++) {var row=new HashMap<Integer,Integer>();for(int j=0;j<dimensions;j++)row.put(2*j,random.nextInt(3));rows.add(Map.copyOf(row));}
+        return rows;
+    }
+    private static FactorizedAlternatives.Node<Integer> relation(FactorizedAlternatives<Integer> domain,Set<Map<Integer,Integer>> rows) {
+        FactorizedAlternatives.Node<Integer> root=null;
+        for(var row:rows)root=domain.union(root,domain.singleton(new TreeMap<>(row)));return root;
+    }
+    private static Set<Map<Integer,Integer>> tuples(FactorizedAlternatives<Integer> domain,FactorizedAlternatives.Node<Integer> root) {
+        return new HashSet<>(domain.selections(root));
+    }
     @Test void independentWeakChoicesShareSuffixesWithoutWorlds() {
         var domain=new FactorizedAlternatives<Integer>();var initial=new TreeMap<Integer,Integer>();
         for(int i=0;i<32;i++)initial.put(i,0);

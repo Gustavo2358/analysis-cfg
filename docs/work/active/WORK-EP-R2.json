@@ -5,6 +5,6 @@
   "scope": [
     "analysis-cfg: entry admission, regional values domain, dependency product, focused qualification"
   ],
-  "notes": "READY FOR HUMAN REVIEW: entry semantics, factorized values and synthetic incident class QUALIFIED. FAST passed (493 Java tests plus Python/architecture); 17 product verticals and 11 semantic mutants passed. Persistent Draft PR; no merge/auto-merge. FILE and upstreams unchanged. REAL CASE: AWAITING MANUAL RE-RUN after human review.",
+  "notes": "R2-REV-F1 remediation in progress on existing Draft PR: reviewed head 49472df has reproduced StackOverflowError in all five DAG traversals and a valid AIR vertical with 8192 segments. Entry and width qualification retained as historical evidence; depth blocks review readiness. No merge/auto-merge. FILE/upstreams unchanged; real case still awaits manual rerun after human review.",
   "pr": 39
 }
