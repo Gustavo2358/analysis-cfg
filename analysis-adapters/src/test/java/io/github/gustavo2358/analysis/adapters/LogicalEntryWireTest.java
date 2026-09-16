@@ -61,6 +61,19 @@ class LogicalEntryWireTest {
         }
         var copyBytes=encode(captured);assertArrayEquals(copyBytes,encode(new RegionalAnalysis().preparePartial(copied,"logical-copy",List.of(afterMust,afterSource,beforeCopy))));
         Files.write(out.resolve("logical-copy.result.json"),copyBytes);retained(captured);
+        var choice=new Places.Choice(operand(h.id(),"choice",Operand.Role.VALUE_READ),List.of(read.place()),Scopes.NoMemory.INSTANCE,Types.known(Types.Builtin.TEXT));
+        var choiceCopy=new Operations.Assign(h,copy.destination(),new Expressions.FitText(fit.header(),new Expressions.Read(read.header(),choice),fit.length(),fit.pad()));
+        var choiceSequences=List.of(returning(U,"body",List.of(choiceCopy,assign(U,"later-source",WHOLE,"NEWVALUE"),assign(U,"later-dest",DEST,"ONLYNEXT"))));
+        var choicePublication=new Publication(copied.id(),copied.airVersion(),copied.capabilities(),copied.artifacts(),List.of(unit(U,List.of(e),choiceSequences,List.of(object,dest))),copied.storage(),copied.resources(),copied.artifactRelations(),copied.origins(),copied.coverage(),copied.uncertainties(),copied.premises());
+        var occurrence=new PointQuery<StorageSubject>(ProgramPoint.before(e.id(),h.id()),new StorageSubject.PlaceOccurrence(choice.header().id()));
+        var choiceResult=new RegionalAnalysis().preparePartial(choicePublication,"logical-choice-copy",List.of(occurrence,beforeCopy,afterSource,afterMust));
+        for(var expected:captured.observations()) {
+            var actual=choiceResult.observations().stream().filter(o->o.query().equals(expected.query())).findFirst().orElseThrow();
+            assertEquals(expected.values(),actual.values(),"copy representation retains current evidence and source identity");
+            assertEquals(expected.rd(),actual.rd());
+        }
+        retained(choiceResult);Files.write(out.resolve("logical-choice-copy.result.json"),encode(choiceResult));
+
 
     }
 }

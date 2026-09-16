@@ -61,12 +61,21 @@ class Reader:
     def subject(self,s,check=True):
         require(isinstance(s,dict) and s.get('kind') in {'NAMED_OBJECT','PHYSICAL_RANGE','PLACE_OCCURRENCE'},'subject kind')
         if s['kind']=='PLACE_OCCURRENCE':
-            require(self.r['version'] in {'1.1.0','1.2.0'},'place occurrence requires 1.1');fields(s,'kind operandId','subject');self.ref(s['operandId'],'operand',check)
+            require(self.r['version'] in {'1.1.0','1.2.0','1.3.0','1.4.0'},'place occurrence requires 1.1')
+            explicit=self.r['version']=='1.4.0'
+            fields(s,'kind operandId'+(' explicitObjectIds' if explicit else ''),'subject');self.ref(s['operandId'],'operand',check)
+            if explicit:
+                distinct(s['explicitObjectIds'],'explicit objects')
+                for obj in s['explicitObjectIds']:self.ref(obj,'object',check)
         elif s['kind']=='NAMED_OBJECT':fields(s,'kind objectId','subject');self.ref(s['objectId'],'object',check)
         else:
             fields(s,'kind storageId range codec','subject');self.ref(s['storageId'],'storage',check);self.codec(s['codec'],check);r=extent(s['range'])
             if check:
                 b=self.bases[token(s['storageId'])];require(b['kind']=='REGION' and contains((0,None if b['extent'] is None else decimal(b['extent'])),r),'subject bounds')
+    def explicit_objects(self,s):
+        if s['kind']=='NAMED_OBJECT':return [s['objectId']]
+        if s['kind']=='PLACE_OCCURRENCE' and self.r['version']=='1.4.0':return s['explicitObjectIds']
+        return []
     def location(self,l):
         fields(l,'storageId activation kind range','location');self.ref(l['storageId'],'storage');b=self.bases[token(l['storageId'])]
         if b['lifetime']=='ACTIVATION':self.ref(l['activation'],'entry');require(l['activation']['unit']==b['owner']['localId'],'activation owner')
@@ -79,7 +88,7 @@ class Reader:
         else:self.codec(i['codec'])
     def event(self,e,entry):
         logical='logicalObjectId' in e
-        require(not logical or self.r['version'] in {'1.2.0','1.3.0'},'logical event requires 1.2')
+        require(not logical or self.r['version'] in {'1.2.0','1.3.0','1.4.0'},'logical event requires 1.2')
         fields(e,'entryId operationId destination slot outcome storageId kind unknown origin premiseRefs uncertaintyRefs reasons'+(' logicalObjectId' if logical else ''),'event')
         if logical:
             require(e['storageId'] is None,'logical event invents physical storage');self.ref(e['logicalObjectId'],'object')
@@ -117,7 +126,7 @@ class Reader:
         if f['producer'] is not None:
             p=f['producer'];fields(p,'definition contributedRange','producer');self.event(p['definition'],entry);self.contribution(p['contributedRange'],p['definition']);require(p['definition']['kind'] in {'ASSIGN','INITIAL_CONDITION','ENTRY_POSSIBILITY'} and (not p['definition']['unknown'] or 'logicalCapture' in f),'literal or supported capture producer')
         if 'logicalCapture' in f:
-            require(self.r['version']=='1.3.0','logical capture requires 1.3');c=f['logicalCapture'];fields(c,'objectId before producers','logical capture');self.ref(c['objectId'],'object');self.point(c['before'])
+            require(self.r['version'] in {'1.3.0','1.4.0'},'logical capture requires 1.3');c=f['logicalCapture'];fields(c,'objectId before producers','logical capture');self.ref(c['objectId'],'object');self.point(c['before'])
             require(f['producer'] is not None and k in {'KNOWN_BYTES','LOGICAL_VALUE','LOGICAL_CAPTURE'},'logical capture needs materialized producer')
             e=f['producer']['definition'];require(e['kind']=='ASSIGN' and e['operationId'] is not None and c['before']['entryId']==entry and c['before']['position']=='BEFORE' and c['before']['operationId']==e['operationId'] and c['objectId']['unit']==entry['unit'],'logical capture instant and owner')
             require(c['producers'],'logical capture without source support');distinct(c['producers'],'logical capture support')
@@ -142,7 +151,7 @@ class Reader:
         for g in f['sourceGaps']:fields(g,'affectedLocation origin uncertaintyRefs','source gap');self.location(g['affectedLocation']);self.ref(g['origin'],'origin');self.refs(g['uncertaintyRefs'],'uncertainty')
     def value(self,f,entry):
         logical=f.get('logicalAlternatives',[])
-        require(not logical or self.r['version'] in {'1.2.0','1.3.0'},'logical values require 1.2')
+        require(not logical or self.r['version'] in {'1.2.0','1.3.0','1.4.0'},'logical values require 1.2')
         fields(f,'reachability interpretations candidates modelValueRemainder sourceUnknownRemainder effectiveUnknownRemainder candidateSupports premiseRefs evidenceRefs provenanceRefs modelReasons alternatives'+(' logicalAlternatives' if 'logicalAlternatives' in f else ''),'value')
         require(f['reachability'] in {'REACHABLE','UNREACHABLE_IN_MODEL'},'value reachability');boolean(f['sourceUnknownRemainder']);boolean(f['effectiveUnknownRemainder']);strings(f['modelReasons']);self.refs(f['premiseRefs'],'premise');self.refs(f['evidenceRefs']);self.refs(f['provenanceRefs'],'origin')
         interpretations=distinct(f['interpretations'],'interpretations')
@@ -191,7 +200,7 @@ class Reader:
             require({token(p) for p in s['producers']}==support.get(s['candidate'],set()),'candidate support completeness')
         require(seen==known,'missing candidate supports')
     def validate(self):
-        r=self.r;require(r['schema']=='regional-analysis-result' and r['version'] in {'1.0.0','1.1.0','1.2.0','1.3.0'} and r['profile']=='regional-text-images@2','schema/version/profile');string(r['resultId']);require(r['resultId'] and r['status']=='COMPLETE' and r['pathWitness']=='NOT_PROVIDED' and r['referenceAuthority']=='VALIDATED_AIR_PUBLICATION','result status/authority')
+        r=self.r;require(r['schema']=='regional-analysis-result' and r['version'] in {'1.0.0','1.1.0','1.2.0','1.3.0','1.4.0'} and r['profile']=='regional-text-images@2','schema/version/profile');string(r['resultId']);require(r['resultId'] and r['status']=='COMPLETE' and r['pathWitness']=='NOT_PROVIDED' and r['referenceAuthority']=='VALIDATED_AIR_PUBLICATION','result status/authority')
         inv=r['inventory'];fields(inv,'ids storages scopes','inventory');self.ids=distinct(inv['ids'],'inventory IDs')
         for i in inv['ids']:self.ref(i)
         self.ref(r['publicationId'],'publication')
@@ -225,10 +234,10 @@ class Reader:
             if o['values']['fact'] is not None and o['subject']['kind']=='PHYSICAL_RANGE':
                 for i in o['values']['fact']['interpretations']:require(i['codec']==o['subject']['codec'] and i['location']['storageId']==o['subject']['storageId'] and i['location']['range']==o['subject']['range'],'physical query interpretation')
             if o['values']['fact'] is not None:
-                for a in o['values']['fact'].get('logicalAlternatives',[]):require(o['subject']['kind']=='NAMED_OBJECT' and a['objectId']==o['subject']['objectId'],'logical alternative subject')
+                for a in o['values']['fact'].get('logicalAlternatives',[]):require(a['objectId'] in self.explicit_objects(o['subject']),'logical alternative subject')
             if o['rd']['fact'] is not None:
                 for d in o['rd']['fact']['definitions']:
-                    if 'logicalObjectId' in d['definition']:require(o['subject']['kind']=='NAMED_OBJECT' and d['definition']['logicalObjectId']==o['subject']['objectId'],'logical definition subject')
+                    if 'logicalObjectId' in d['definition']:require(d['definition']['logicalObjectId'] in self.explicit_objects(o['subject']),'logical definition subject')
             require(o['rd']['status']==o['values']['status'] and o['rd']['reason']==o['values']['reason'],'shared query admission')
             if o['rd']['fact'] is not None:require(o['rd']['fact']['reachability']==o['values']['fact']['reachability'],'shared reachability')
         fields(r['statistics'],'composition rd values rdObservation valueObservation','statistics')

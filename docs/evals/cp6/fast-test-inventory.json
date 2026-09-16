@@ -281,6 +281,9 @@
     ],
     "io.github.gustavo2358.analysis.launcher.PhysicalChoiceTargetTest": [
       "physicalAlternativesSurviveMemoryAndCliWithoutResurrectingMustValues"
+    ],
+    "io.github.gustavo2358.analysis.launcher.LogicalChoiceTargetTest": [
+      "equivalentFormsAndMixedAlternativesRetainLogicalSupportInMemoryAndCli"
     ]
   },
   "analysis-values": {
@@ -461,6 +464,15 @@
       "multiplePossibleContributionsUnionTheirOwnSupportInEitherOrder",
       "unprovedSeparationBetweenPossibleEntriesDoesNotRejectEitherObject",
       "scalarAndRegionalCoexistenceAgreeWithoutOrderBasedKill"
+    ],
+    "io.github.gustavo2358.analysis.values.LogicalPlaceRepresentationTest": [
+      "objectOccurrenceValues",
+      "choiceOccurrenceValues",
+      "objectOccurrenceDefinitions",
+      "choiceOccurrenceDefinitions",
+      "mixedChoiceReadsCurrentLogicalAndPhysicalAlternativesThenMustKillsCopy",
+      "choiceCopyIntoLogicalDestinationUsesCurrentSupportAndWeakUpdates",
+      "explicitIdentityDoesNotFollowAliasBindingsOrRegionAddressOperands"
     ]
   },
   "cfg-adapters": {

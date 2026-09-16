@@ -34,7 +34,8 @@ public final class RegionalAnalysis {
         var admission=AnalysisSession.open(cfg,publication,options.projectionPolicy(),declarations);
         if(admission.status()!=AnalysisSession.Status.ACCEPTED)throw new AnalysisDataflow.PreparationException(admission.status()==AnalysisSession.Status.INVALID_INPUT?AnalysisDataflow.Failure.INVALID_INPUT:AnalysisDataflow.Failure.UNSUPPORTED_PROFILE,admission.reason());
         var session=admission.session().orElseThrow();
-        var rdAdmission=ReachingDefinitions.prepare(new StatementEffects(new StorageIndex(session)));
+        var storageIndex=new StorageIndex(session);
+        var rdAdmission=ReachingDefinitions.prepare(new StatementEffects(storageIndex));
         if(rdAdmission.status()!=ReachingDefinitions.Status.ACCEPTED)throw new AnalysisDataflow.PreparationException(rdAdmission.status()==ReachingDefinitions.Status.INVALID_INPUT?AnalysisDataflow.Failure.INVALID_INPUT:AnalysisDataflow.Failure.UNSUPPORTED_PROFILE,rdAdmission.reason());
         var valueAdmission=RegionalValuesAnalysis.prepare(session);
         if(valueAdmission.status()!=RegionalValuesAnalysis.Status.ACCEPTED)throw new AnalysisDataflow.PreparationException(valueAdmission.status()==RegionalValuesAnalysis.Status.INVALID_INPUT?AnalysisDataflow.Failure.INVALID_INPUT:AnalysisDataflow.Failure.UNSUPPORTED_PROFILE,valueAdmission.reason());
@@ -44,7 +45,7 @@ public final class RegionalAnalysis {
         var definitions=rd.observeStorage(queries);var projections=values.observeStorage(queries);
         if(definitions.status()!=ObservationBatch.Status.COMPLETE||projections.status()!=ObservationBatch.Status.COMPLETE)throw new IllegalStateException("regional observation failed");
         var byQuery=new HashMap<PointQuery<StorageSubject>,ObservationBatch.Observation<StorageSubject,DefinitionFact>>();definitions.observations().forEach(o->byQuery.put(o.query(),o));
-        var observations=projections.observations().stream().map(o->new RegionalAnalysisResult.Observation(o.query(),Objects.requireNonNull(byQuery.remove(o.query())),o)).toList();
+        var observations=projections.observations().stream().map(o->new RegionalAnalysisResult.Observation(o.query(),Objects.requireNonNull(byQuery.remove(o.query())),o,storageIndex.supports(o.query().subject(),o.query().point().entry().unit())?storageIndex.explicitObjects(o.query().subject()):List.of())).toList();
         if(!byQuery.isEmpty())throw new IllegalStateException("regional batch mismatch");
         return new RegionalAnalysisResult(resultId,publication.id(),inventory(publication,selected),observations,
             Map.of("composition",Map.of("cfgBuilds",1L,"rdRuns",1L,"valueRuns",1L,"selectedEntries",(long)selected.size()),
