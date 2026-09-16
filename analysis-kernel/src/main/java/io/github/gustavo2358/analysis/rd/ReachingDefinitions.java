@@ -30,14 +30,8 @@ public final class ReachingDefinitions {
     private record Initial(int slot,Entries.InitialCondition condition,StatementEffects.Target target,List<StoragePartition.Segment> segments) { }
     public enum Status { ACCEPTED, UNSUPPORTED, INVALID_INPUT }
     public record Admission(Status status,String reason,Optional<ReachingDefinitions> analysis) { }
-    private static final class Refusal extends IllegalArgumentException {
-        private static final long serialVersionUID=1L;
-        final Status status;
-        Refusal(Status status,String reason){super(reason);this.status=status;}
-    }
     public static Admission prepare(StatementEffects effects) {
-        try{return new Admission(Status.ACCEPTED,null,Optional.of(new ReachingDefinitions(effects)));}
-        catch(Refusal refusal){return new Admission(refusal.status,refusal.getMessage(),Optional.empty());}
+        return new Admission(Status.ACCEPTED,null,Optional.of(new ReachingDefinitions(effects)));
     }
     public ReachingDefinitions(StatementEffects effects) {
         this.effects=Objects.requireNonNull(effects);session=effects.storage().session();partition=new StoragePartition(effects);
@@ -64,26 +58,14 @@ public final class ReachingDefinitions {
             outcomes.put(op,Map.copyOf(choices));
         }
         for(var context:session.contexts()) {
-            var seeds=new ArrayList<Initial>();var logicalSeeds=new ArrayList<LogicalInitial>();var occupied=new HashMap<Integer,Initial>();int slot=0;
-            for(var condition:context.entry().state().conditions()) {
-                var resolution=effects.storage().resolve(condition.place());
+            var seeds=new ArrayList<Initial>();var logicalSeeds=new ArrayList<LogicalInitial>();int slot=0;
+            for(var fact:EntryFacts.admitted(effects.storage(),context.entry())) {
+                var condition=fact.condition();var resolution=fact.resolution();
                 if(condition.value() instanceof Entries.PossibleLiterals&&condition.place() instanceof Places.ObjectPlace object&&!resolution.exact()) {
                     logicalSeeds.add(new LogicalInitial(slot++,condition,object.object(),resolution));continue;
                 }
-                for(var target:effects.targets(resolution,condition.value() instanceof Entries.PossibleLiterals?StatementEffects.Strength.MAY:StatementEffects.Strength.MUST)) {
+                for(var target:effects.targets(resolution,fact.strength())) {
                     var seed=new Initial(slot,condition,target,List.copyOf(partition.intersecting(target.location())));
-                    for(var segment:seed.segments()) {
-                        var prior=occupied.putIfAbsent(segment.ordinal(),seed);
-                        if(prior!=null && prior.slot()!=slot) {
-                            // The session owns a fully validated AIR publication: I-17 has
-                            // already proved simultaneous literal consistency, including ranges.
-                            // This consumer check only excludes unresolved/mixed initial forms.
-                            boolean literal=condition.value() instanceof Entries.LiteralInitial&&prior.condition().value() instanceof Entries.LiteralInitial;
-                            boolean possible=condition.value() instanceof Entries.PossibleLiterals||prior.condition().value() instanceof Entries.PossibleLiterals;
-                            if(!possible&&!(literal&&resolution.exact()&&target.sourceApplicable()&&prior.target().sourceApplicable()))
-                                throw new Refusal(Status.UNSUPPORTED,"OVERLAPPING_INITIAL_CONDITIONS");
-                        }
-                    }
                     seeds.add(seed);
                 }
                 slot=Math.incrementExact(slot);

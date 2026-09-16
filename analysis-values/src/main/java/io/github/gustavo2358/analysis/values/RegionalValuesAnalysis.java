@@ -79,7 +79,7 @@ public final class RegionalValuesAnalysis {
     public record Admission(Status status,String reason,Optional<RegionalValuesAnalysis> analysis) { }
     public static Admission prepare(AnalysisSession session) {
         var effects=new StatementEffects(new StorageIndex(session));
-        // Share the established simultaneous-initial-condition admission, including alias conflicts.
+        // Share validated original entry facts; operational alias impacts never decide admission.
         var admission=ReachingDefinitions.prepare(effects);
         if(admission.status()!=ReachingDefinitions.Status.ACCEPTED)
             return new Admission(admission.status()==ReachingDefinitions.Status.INVALID_INPUT?Status.INVALID_INPUT:Status.UNSUPPORTED,admission.reason(),Optional.empty());
@@ -114,15 +114,14 @@ public final class RegionalValuesAnalysis {
             var seeds=new ArrayList<Plan>();int slot=0;var seededLocations=new HashSet<StorageIndex.Location>();
             // Simultaneous strong facts initialize first; possible support and open entry
             // content then widen that boundary. Input order is not overwrite authority.
-            var conditions=context.entry().state().conditions().stream().sorted(Comparator.comparingInt(c->c.value() instanceof Entries.LiteralInitial?0:1)).toList();
-            for(var condition:conditions) {
-                var resolution=effects.storage().resolve(condition.place());
+            for(var fact:EntryFacts.admitted(effects.storage(),context.entry())) {
+                var condition=fact.condition();var resolution=fact.resolution();
                 var sources=new ArrayList<StatementEffects.Source>();
                 boolean possible=condition.value() instanceof Entries.PossibleLiterals;
                 if(condition.value() instanceof Entries.PossibleLiterals p)
                     p.candidates().forEach(l->sources.add(new StatementEffects.ExpressionSource(l)));
                 else sources.add(condition.value() instanceof Entries.LiteralInitial l?new StatementEffects.ExpressionSource(l.value()):new StatementEffects.UnknownSource("ENTRY_CONTENT_NOT_LITERAL"));
-                var strength=condition.value() instanceof Entries.LiteralInitial?StatementEffects.Strength.MUST:StatementEffects.Strength.MAY;
+                var strength=fact.strength();
                 for(var source:sources) {
                     boolean logical=possible&&condition.place() instanceof Places.ObjectPlace&&!resolution.exact();
                     var write=new StatementEffects.Write(slot++,Optional.of(condition.place().header().id()),resolution,source,logical?List.of():effects.targets(resolution,strength),StatementEffects.Selection.SINGLE_DESTINATION,strength,

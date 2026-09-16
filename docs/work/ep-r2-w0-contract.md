@@ -84,3 +84,16 @@ W2 must document the domain before modifying it. Stop for human review if the
 design requires a second solver, AIR changes, unsupported candidates, weakened
 MUST/contradiction, arbitrary caps or removed provenance. Final status is review
 readiness, never merge; REAL CASE remains AWAITING MANUAL RE-RUN.
+
+## W1 result
+
+`EntryFacts` classifies original validated conditions/resolutions before projection.
+Only LiteralInitial is strong; Possible and open kinds widen. The occupied-target
+compatibility check is removed: AIR I-17 still controls strong consistency.
+Canonical slots only stabilize provenance; sorting is not the admission fix.
+Operational targets and unknown contributions are retained, including cross-base MAY.
+
+`w1-focused.log`: focused RD, KillAuthority, entry coexistence, EP-R2 entry and
+regional initial controls pass. All six P/X/X permutations have identical complete
+RegionalValueFact observations; H2 retains PROG0002, place-2 support and remainder.
+No production domain change yet. Factorization REDs remain pending. Draft PR #39.
