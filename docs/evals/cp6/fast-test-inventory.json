@@ -136,6 +136,9 @@
     ],
     "io.github.gustavo2358.analysis.adapters.PartialProjectionLawTest": [
       "unknownControlUsesSameSnapshotSolverAndBeforeEvidenceWithoutEntryBackedge"
+    ],
+    "io.github.gustavo2358.analysis.adapters.EpR2DepthVerticalTest": [
+      "manySegmentsPreserveMayMustBeforeAndCapturedSourceThroughJson"
     ]
   },
   "analysis-dataflow": {
@@ -491,11 +494,20 @@
     ],
     "io.github.gustavo2358.analysis.values.FactorizedAlternativesTest": [
       "independentWeakChoicesShareSuffixesWithoutWorlds",
-      "localImagesRestrictionsAndUnionMatchIndependentFiniteRelations"
+      "localImagesRestrictionsAndUnionMatchIndependentFiniteRelations",
+      "thousandFiniteRelationsPreserveAlgebraAndCanonicality"
     ],
     "io.github.gustavo2358.analysis.values.EpR2TransferTest": [
       "mayBeforeAndAfterExactWriteCannotEraseItsSupportedValue",
       "normalCallResultKillsOnlyAfterTheBeforeCaptureAndKeepsOpenAliasPeers"
+    ],
+    "io.github.gustavo2358.analysis.values.FactorizedDepthTest": [
+      "deepUpdatePreservesEveryUnchangedComponent",
+      "deepRestrictionPreservesTheSingleTuple",
+      "deepUnionKeepsBothSingletonsAndCanonicality",
+      "deepProjectionKeepsOnlyTheSelectedComponent",
+      "deepEnumerationReturnsTheOneCompleteTuple",
+      "deepProjectionAndCollidingUpdateCanUnionLongSuffixes"
     ]
   },
   "cfg-adapters": {

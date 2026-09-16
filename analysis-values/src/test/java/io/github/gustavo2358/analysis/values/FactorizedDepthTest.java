@@ -12,6 +12,18 @@ class FactorizedDepthTest {
     @Test void deepProjectionKeepsOnlyTheSelectedComponent() {assertDoesNotThrow(()->probe("project",8192));}
     @Test void deepEnumerationReturnsTheOneCompleteTuple() {assertDoesNotThrow(()->probe("selections",8192));}
 
+    @Test void deepProjectionAndCollidingUpdateCanUnionLongSuffixes() {
+        int depth=8192;var domain=new FactorizedAlternatives<Integer>();var a=new TreeMap<Integer,Integer>();
+        for(int i=0;i<depth;i++)a.put(i,0);
+        var b=new TreeMap<>(a);b.put(0,1);b.put(depth-1,1);
+        var input=domain.union(domain.singleton(a),domain.singleton(b));
+        var collapsed=new TreeMap<>(b);collapsed.put(0,0);
+        assertSame(domain.union(domain.singleton(a),domain.singleton(collapsed)),domain.update(input,Map.of(0,old->0)));
+        a.remove(0);b.remove(0);
+        assertSame(domain.union(domain.singleton(a),domain.singleton(b)),domain.project(input,a.keySet()));
+        assertEquals(Set.of(a,b),new HashSet<>(domain.selections(domain.project(input,a.keySet()))));
+    }
+
     public static void main(String[] args) {probe(args[0],Integer.parseInt(args[1]));}
     static void require(boolean value,String reason) {if(!value)throw new AssertionError(reason);}
     static void probe(String operation,int depth) {

@@ -1,7 +1,7 @@
 package io.github.gustavo2358.analysis.values;
 
 import java.util.*;
-import java.util.function.UnaryOperator;
+import java.util.function.*;
 
 /** Ordered finite relation with shared suffixes. No complete-world enumeration.
  * Null denotes the empty relation; terminal denotes the single empty tuple.
@@ -33,62 +33,111 @@ final class FactorizedAlternatives<T> {
         for(var entry:values.descendingMap().entrySet())result=node(entry.getKey(),Map.of(entry.getValue(),result));
         return result;
     }
-    Node<T> union(Node<T> a,Node<T> b){return union(a,b,new HashMap<>());}
-    private Node<T> union(Node<T> a,Node<T> b,Map<Pair<T>,Node<T>> memo) {
+    /** Suspended DFS cursor. Continuations live on the heap, never on the Java call stack. */
+    private static final class Frame<T> {
+        final Node<T> node;
+        final Iterator<Map.Entry<T,Node<T>>> remaining;
+        Frame(Node<T> node){this.node=node;this.remaining=node.edges.entrySet().iterator();}
+    }
+    private static final class UnionFrame<T> {
+        final Pair<T> pair;
+        final Map<T,Node<T>> edges;
+        final Iterator<Map.Entry<T,Node<T>>> remaining;
+        Map.Entry<T,Node<T>> current;
+        UnionFrame(Node<T> a,Node<T> b) {
+            if(a.level!=b.level)throw new IllegalArgumentException("different relation dimensions");
+            pair=new Pair<>(a,b);edges=new HashMap<>(a.edges);remaining=b.edges.entrySet().iterator();
+        }
+    }
+    Node<T> union(Node<T> a,Node<T> b) {
         if(a==b||b==null)return a;if(a==null)return b;
-        if(a.level!=b.level)throw new IllegalArgumentException("different relation dimensions");
-        var key=new Pair<>(a,b);var prior=memo.get(key);if(prior!=null)return prior;unionPairs++;
-        var edges=new HashMap<>(a.edges);
-        b.edges.forEach((value,next)->edges.put(value,union(edges.get(value),next,memo)));
-        var result=node(a.level,edges);memo.put(key,result);return result;
+        var memo=new HashMap<Pair<T>,Node<T>>();var pending=new ArrayDeque<UnionFrame<T>>();
+        var first=new UnionFrame<>(a,b);pending.push(first);unionPairs++;
+        while(!pending.isEmpty()) {
+            var frame=pending.peek();
+            if(frame.current==null&&frame.remaining.hasNext())frame.current=frame.remaining.next();
+            if(frame.current==null) {
+                memo.put(frame.pair,node(frame.pair.a().level,frame.edges));pending.pop();continue;
+            }
+            var left=frame.edges.get(frame.current.getKey());var right=frame.current.getValue();Node<T> joined;
+            if(left==right||right==null)joined=left;
+            else if(left==null)joined=right;
+            else {
+                joined=memo.get(new Pair<>(left,right));
+                if(joined==null) {
+                    pending.push(new UnionFrame<>(left,right));unionPairs++;continue;
+                }
+            }
+            frame.edges.put(frame.current.getKey(),joined);frame.current=null;
+        }
+        return memo.get(first.pair);
+    }
+    /** Memoized post-order image. Prune rejected edges before visiting their suffixes.
+     * A null image is memoized too (restriction can empty a shared suffix).
+     */
+    private Node<T> rewrite(Node<T> root,BiPredicate<Node<T>,T> include,
+            BiFunction<Node<T>,Map<Node<T>,Node<T>>,Node<T>> rebuild) {
+        if(root==null||root.terminal())return root;
+        var done=new IdentityHashMap<Node<T>,Node<T>>();var pending=new ArrayDeque<Frame<T>>();
+        pending.push(new Frame<>(root));
+        while(!pending.isEmpty()) {
+            var frame=pending.peek();
+            if(frame.remaining.hasNext()) {
+                var edge=frame.remaining.next();if(!include.test(frame.node,edge.getKey()))continue;
+                var child=edge.getValue();
+                if(child.terminal())done.put(child,child);
+                else if(!done.containsKey(child))pending.push(new Frame<>(child));
+            } else {
+                done.put(frame.node,rebuild.apply(frame.node,done));pending.pop();
+            }
+        }
+        return done.get(root);
     }
     /** Relational image under local updates. Colliding labels union their suffixes. */
     Node<T> update(Node<T> root,Map<Integer,UnaryOperator<T>> updates) {
-        return update(root,updates,new IdentityHashMap<>());
-    }
-    private Node<T> update(Node<T> root,Map<Integer,UnaryOperator<T>> updates,Map<Node<T>,Node<T>> memo) {
-        if(root==null||root.terminal())return root;
-        var cached=memo.get(root);if(cached!=null)return cached;
-        var edges=new HashMap<T,Node<T>>();var fn=updates.get(root.level);
-        root.edges.forEach((value,next)->{
-            var changed=fn==null?value:fn.apply(value);var suffix=update(next,updates,memo);
-            edges.put(changed,union(edges.get(changed),suffix));
+        return rewrite(root,(n,v)->true,(n,done)->{
+            var edges=new HashMap<T,Node<T>>();var fn=updates.get(n.level);
+            n.edges.forEach((value,next)->{
+                var changed=fn==null?value:fn.apply(value);
+                edges.put(changed,union(edges.get(changed),done.get(next)));
+            });
+            return node(n.level,edges);
         });
-        var result=node(root.level,edges);memo.put(root,result);return result;
     }
     /** Existentially forget unrequested components before enumerating a local read. */
     Node<T> project(Node<T> root,Set<Integer> selected) {
-        return project(root,selected,new IdentityHashMap<>());
-    }
-    private Node<T> project(Node<T> root,Set<Integer> selected,Map<Node<T>,Node<T>> memo) {
-        if(root==null||root.terminal())return root;
-        var cached=memo.get(root);if(cached!=null)return cached;
-        Node<T> result;
-        if(selected.contains(root.level)) {
-            var edges=new HashMap<T,Node<T>>();root.edges.forEach((v,n)->edges.put(v,project(n,selected,memo)));
-            result=node(root.level,edges);
-        } else {
-            result=null;for(var next:root.edges.values())result=union(result,project(next,selected,memo));
-        }
-        memo.put(root,result);return result;
+        return rewrite(root,(n,v)->true,(n,done)->{
+            if(selected.contains(n.level)) {
+                var edges=new HashMap<T,Node<T>>();n.edges.forEach((v,next)->edges.put(v,done.get(next)));
+                return node(n.level,edges);
+            }
+            Node<T> result=null;for(var next:n.edges.values())result=union(result,done.get(next));
+            return result;
+        });
     }
     /** Keep matching source edges in the original BEFORE relation, retaining other dimensions. */
     Node<T> restrict(Node<T> root,Map<Integer,T> selected) {
-        return restrict(root,selected,new IdentityHashMap<>());
-    }
-    private Node<T> restrict(Node<T> root,Map<Integer,T> selected,Map<Node<T>,Node<T>> memo) {
-        if(root==null||root.terminal())return root;
-        if(memo.containsKey(root))return memo.get(root);
-        var edges=new HashMap<T,Node<T>>();var chosen=selected.get(root.level);
-        root.edges.forEach((v,n)->{if(chosen==null||chosen.equals(v))edges.put(v,restrict(n,selected,memo));});
-        var result=node(root.level,edges);memo.put(root,result);return result;
+        BiPredicate<Node<T>,T> matches=(n,v)->selected.get(n.level)==null||selected.get(n.level).equals(v);
+        return rewrite(root,matches,(n,done)->{
+            var edges=new HashMap<T,Node<T>>();
+            n.edges.forEach((v,next)->{if(matches.test(n,v))edges.put(v,done.get(next));});
+            return node(n.level,edges);
+        });
     }
     List<Map<Integer,T>> selections(Node<T> projected) {
-        var result=new ArrayList<Map<Integer,T>>();selections(projected,new HashMap<>(),result);projectedAlternatives+=result.size();return List.copyOf(result);
-    }
-    private void selections(Node<T> node,Map<Integer,T> path,List<Map<Integer,T>> out) {
-        if(node==null)return;if(node.terminal()){out.add(Map.copyOf(path));return;}
-        node.edges.forEach((value,next)->{path.put(node.level,value);selections(next,path,out);});path.remove(node.level);
+        var result=new ArrayList<Map<Integer,T>>();var path=new HashMap<Integer,T>();
+        var pending=new ArrayDeque<Frame<T>>();
+        if(projected!=null) {
+            if(projected.terminal())result.add(Map.of());else pending.push(new Frame<>(projected));
+        }
+        while(!pending.isEmpty()) {
+            var frame=pending.peek();
+            if(!frame.remaining.hasNext()){path.remove(frame.node.level);pending.pop();continue;}
+            var edge=frame.remaining.next();path.put(frame.node.level,edge.getKey());
+            if(edge.getValue().terminal())result.add(Map.copyOf(path));
+            else pending.push(new Frame<>(edge.getValue()));
+        }
+        projectedAlternatives+=result.size();return List.copyOf(result);
     }
     static Size size(Collection<? extends Node<?>> roots) {
         var visited=Collections.newSetFromMap(new IdentityHashMap<Node<?>,Boolean>());var pending=new ArrayDeque<Node<?>>();

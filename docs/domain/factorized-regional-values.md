@@ -132,3 +132,18 @@ Values assigns its DAG levels by sorted base identity and increasing segment ran
 This affects graph sharing and measured allocations, not separation authority.
 The existing full-wire permutation oracle first failed on interned node counts,
 then passed after this correction; no serialization check was weakened.
+
+## Depth robustness — R2-REV-F1
+
+DAG depth is an independent scaling dimension. Every component remains present,
+including singleton components, but union now suspends node-pair continuations in
+explicit heap frames. Update, projection and restriction share an iterative,
+memoized post-order walk; rejected restriction edges are pruned before descent.
+Tuple enumeration uses explicit DFS cursors and one path, copying only returned
+tuples. None of these traversals consumes one Java call frame per segment.
+
+The relation, canonical interning, correlations and kill/evidence semantics are
+unchanged. Auxiliary heap scales with visited nodes/pairs and frontier depth;
+true correlated width and requested tuple output can still be expensive. This
+limit is distinct from the corrected linear-depth failure. See the
+[RED/GREEN qualification](../work/ep-r2-rev-f1.md).

@@ -340,10 +340,12 @@
       "io/github/gustavo2358/analysis/values/ByteImage.class",
       "io/github/gustavo2358/analysis/values/Candidates.class",
       "io/github/gustavo2358/analysis/values/ConservativeEffectTransfer.class",
+      "io/github/gustavo2358/analysis/values/FactorizedAlternatives$Frame.class",
       "io/github/gustavo2358/analysis/values/FactorizedAlternatives$Key.class",
       "io/github/gustavo2358/analysis/values/FactorizedAlternatives$Node.class",
       "io/github/gustavo2358/analysis/values/FactorizedAlternatives$Pair.class",
       "io/github/gustavo2358/analysis/values/FactorizedAlternatives$Size.class",
+      "io/github/gustavo2358/analysis/values/FactorizedAlternatives$UnionFrame.class",
       "io/github/gustavo2358/analysis/values/FactorizedAlternatives.class",
       "io/github/gustavo2358/analysis/values/ForeignEffectTransfer.class",
       "io/github/gustavo2358/analysis/values/PersistentBindings$Node.class",
@@ -619,10 +621,12 @@
         "java.util.stream.Stream"
       ],
       "io.github.gustavo2358.analysis.values.FactorizedAlternatives": [
+        "io.github.gustavo2358.analysis.values.FactorizedAlternatives$Frame",
         "io.github.gustavo2358.analysis.values.FactorizedAlternatives$Key",
         "io.github.gustavo2358.analysis.values.FactorizedAlternatives$Node",
         "io.github.gustavo2358.analysis.values.FactorizedAlternatives$Pair",
         "io.github.gustavo2358.analysis.values.FactorizedAlternatives$Size",
+        "io.github.gustavo2358.analysis.values.FactorizedAlternatives$UnionFrame",
         "java.lang.IllegalArgumentException",
         "java.lang.Integer",
         "java.lang.Long",
@@ -649,6 +653,8 @@
         "java.util.OptionalLong",
         "java.util.Set",
         "java.util.function.BiConsumer",
+        "java.util.function.BiFunction",
+        "java.util.function.BiPredicate",
         "java.util.function.Consumer",
         "java.util.function.Function",
         "java.util.function.Predicate",
@@ -656,6 +662,15 @@
         "java.util.function.UnaryOperator",
         "java.util.stream.LongStream",
         "java.util.stream.Stream"
+      ],
+      "io.github.gustavo2358.analysis.values.FactorizedAlternatives$Frame": [
+        "io.github.gustavo2358.analysis.values.FactorizedAlternatives",
+        "io.github.gustavo2358.analysis.values.FactorizedAlternatives$Node",
+        "java.lang.Object",
+        "java.util.Iterator",
+        "java.util.Map",
+        "java.util.Map$Entry",
+        "java.util.Set"
       ],
       "io.github.gustavo2358.analysis.values.FactorizedAlternatives$Key": [
         "io.github.gustavo2358.analysis.values.FactorizedAlternatives",
@@ -701,6 +716,19 @@
         "java.lang.invoke.MethodHandles$Lookup",
         "java.lang.invoke.TypeDescriptor",
         "java.lang.runtime.ObjectMethods"
+      ],
+      "io.github.gustavo2358.analysis.values.FactorizedAlternatives$UnionFrame": [
+        "io.github.gustavo2358.analysis.values.FactorizedAlternatives",
+        "io.github.gustavo2358.analysis.values.FactorizedAlternatives$Node",
+        "io.github.gustavo2358.analysis.values.FactorizedAlternatives$Pair",
+        "java.lang.IllegalArgumentException",
+        "java.lang.Object",
+        "java.lang.String",
+        "java.util.HashMap",
+        "java.util.Iterator",
+        "java.util.Map",
+        "java.util.Map$Entry",
+        "java.util.Set"
       ],
       "io.github.gustavo2358.analysis.values.ForeignEffectTransfer": [
         "io.github.gustavo2358.air.model.Interactions",
@@ -2302,10 +2330,12 @@
       "io.github.gustavo2358.analysis.values.ByteImage": "Compiled from \"ByteImage.java\"\nfinal class io.github.gustavo2358.analysis.values.ByteImage {\n  public boolean equals(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)Z\n\n  public int hashCode();\n    descriptor: ()I\n}\n",
       "io.github.gustavo2358.analysis.values.Candidates": "Compiled from \"Candidates.java\"\nfinal class io.github.gustavo2358.analysis.values.Candidates {\n}\n",
       "io.github.gustavo2358.analysis.values.ConservativeEffectTransfer": "Compiled from \"ConservativeEffectTransfer.java\"\nfinal class io.github.gustavo2358.analysis.values.ConservativeEffectTransfer {\n}\n",
+      "io.github.gustavo2358.analysis.values.FactorizedAlternatives$Frame": "Compiled from \"FactorizedAlternatives.java\"\nfinal class io.github.gustavo2358.analysis.values.FactorizedAlternatives$Frame<T> {\n}\n",
       "io.github.gustavo2358.analysis.values.FactorizedAlternatives$Key": "Compiled from \"FactorizedAlternatives.java\"\nfinal class io.github.gustavo2358.analysis.values.FactorizedAlternatives$Key<T> extends java.lang.Record {\n  public final java.lang.String toString();\n    descriptor: ()Ljava/lang/String;\n\n  public final int hashCode();\n    descriptor: ()I\n\n  public final boolean equals(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)Z\n\n  public int level();\n    descriptor: ()I\n\n  public java.util.Map<T, io.github.gustavo2358.analysis.values.FactorizedAlternatives$Node<T>> edges();\n    descriptor: ()Ljava/util/Map;\n}\n",
       "io.github.gustavo2358.analysis.values.FactorizedAlternatives$Node": "Compiled from \"FactorizedAlternatives.java\"\nfinal class io.github.gustavo2358.analysis.values.FactorizedAlternatives$Node<T> {\n}\n",
       "io.github.gustavo2358.analysis.values.FactorizedAlternatives$Pair": "Compiled from \"FactorizedAlternatives.java\"\nfinal class io.github.gustavo2358.analysis.values.FactorizedAlternatives$Pair<T> extends java.lang.Record {\n  public final java.lang.String toString();\n    descriptor: ()Ljava/lang/String;\n\n  public final int hashCode();\n    descriptor: ()I\n\n  public final boolean equals(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)Z\n\n  public io.github.gustavo2358.analysis.values.FactorizedAlternatives$Node<T> a();\n    descriptor: ()Lio/github/gustavo2358/analysis/values/FactorizedAlternatives$Node;\n\n  public io.github.gustavo2358.analysis.values.FactorizedAlternatives$Node<T> b();\n    descriptor: ()Lio/github/gustavo2358/analysis/values/FactorizedAlternatives$Node;\n}\n",
       "io.github.gustavo2358.analysis.values.FactorizedAlternatives$Size": "Compiled from \"FactorizedAlternatives.java\"\nfinal class io.github.gustavo2358.analysis.values.FactorizedAlternatives$Size extends java.lang.Record {\n  public final java.lang.String toString();\n    descriptor: ()Ljava/lang/String;\n\n  public final int hashCode();\n    descriptor: ()I\n\n  public final boolean equals(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)Z\n\n  public long nodes();\n    descriptor: ()J\n\n  public long alternatives();\n    descriptor: ()J\n\n  public long maxComponent();\n    descriptor: ()J\n}\n",
+      "io.github.gustavo2358.analysis.values.FactorizedAlternatives$UnionFrame": "Compiled from \"FactorizedAlternatives.java\"\nfinal class io.github.gustavo2358.analysis.values.FactorizedAlternatives$UnionFrame<T> {\n}\n",
       "io.github.gustavo2358.analysis.values.FactorizedAlternatives": "Compiled from \"FactorizedAlternatives.java\"\nfinal class io.github.gustavo2358.analysis.values.FactorizedAlternatives<T> {\n}\n",
       "io.github.gustavo2358.analysis.values.ForeignEffectTransfer": "Compiled from \"ForeignEffectTransfer.java\"\nfinal class io.github.gustavo2358.analysis.values.ForeignEffectTransfer {\n}\n",
       "io.github.gustavo2358.analysis.values.PersistentBindings$Node": "Compiled from \"PersistentBindings.java\"\nfinal class io.github.gustavo2358.analysis.values.PersistentBindings$Node {\n}\n",
