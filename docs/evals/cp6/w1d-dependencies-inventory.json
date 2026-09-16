@@ -119,6 +119,9 @@
       "java.util.stream.Stream"
     ],
     "io.github.gustavo2358.analysis.dependencies.CallDependencyPlan": [
+      "io.github.gustavo2358.air.model.Capabilities",
+      "io.github.gustavo2358.air.model.Capabilities$Capability",
+      "io.github.gustavo2358.air.model.Capabilities$Manifest",
       "io.github.gustavo2358.air.model.Entries",
       "io.github.gustavo2358.air.model.Entries$Entry",
       "io.github.gustavo2358.air.model.Expression",
