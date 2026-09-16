@@ -92,12 +92,12 @@ final class FactorizedAlternatives<T> {
     }
     static Size size(Collection<? extends Node<?>> roots) {
         var visited=Collections.newSetFromMap(new IdentityHashMap<Node<?>,Boolean>());var pending=new ArrayDeque<Node<?>>();
-        roots.forEach(n->{if(n!=null)pending.add(n);});long edges=0,max=0;
+        roots.forEach(n->{if(n!=null)pending.add(n);});long edges=0;var components=new HashMap<Integer,Set<Object>>();
         while(!pending.isEmpty()) {
             var node=pending.removeFirst();if(node.terminal()||!visited.add(node))continue;
-            edges+=node.edges.size();max=Math.max(max,node.edges.size());pending.addAll(node.edges.values());
+            edges+=node.edges.size();components.computeIfAbsent(node.level,ignored->new HashSet<>()).addAll(node.edges.keySet());pending.addAll(node.edges.values());
         }
-        return new Size(visited.size(),edges,max);
+        return new Size(visited.size(),edges,components.values().stream().mapToLong(Set::size).max().orElse(0));
     }
     Map<String,Long> metrics(){return Map.of("internedNodes",(long)interned.size(),"internedAlternatives",internedEdges,"relationUnionPairs",unionPairs,"projectedAlternatives",projectedAlternatives);}
 }

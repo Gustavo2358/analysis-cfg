@@ -48,6 +48,7 @@ public final class RegionalValuesAnalysis {
     private record CapturedGap(int gap,Optional<StorageRange> range) { }
     private sealed interface Content permits Bytes,Scalar { }
     private record Bytes(ByteImage image) implements Content { }
+    private record ReadCapture(Map<Integer,Content> contents,Map<StatementEffects.Write,Integer> choices) { }
     private record CapturedRead(StorageIndex.Location sourceRange,StorageIndex.Location sourceContribution,StorageIndex.Location destinationContribution) { }
     private record Trace(StorageIndex.Location observed,Optional<Values.BytesValue> bytes,int producer,Optional<StorageIndex.Location> original,
                          Map<Integer,Set<CapturedRead>> captures,Set<Integer> gaps,Set<String> reasons,Set<ByteImage.LogicalSupport> logicalSupports) {
@@ -230,12 +231,24 @@ public final class RegionalValuesAnalysis {
             }
             return result;
         }
-        private Set<Integer> readSegments(List<Plan> plans) {
-            var selected=new HashSet<Integer>();
-            for(var plan:plans)if(plan.logical==null&&plan.target.sourceApplicable()) {
-                var reads=readSource(plan.write);if(reads!=null)for(var candidate:reads.candidates())
-                    for(var segment:partition.intersecting(candidate.location()))selected.add(segment.ordinal());
+        private List<Map<StatementEffects.Write,Integer>> sourceSelections(List<Plan> plans) {
+            // An alternative place reads ONE candidate. Combining all candidates' components
+            // would enumerate unrelated worlds even though the expression is a choice.
+            var writes=new LinkedHashSet<StatementEffects.Write>();
+            for(var plan:plans)if(plan.logical==null&&plan.target.sourceApplicable()&&readSource(plan.write)!=null)writes.add(plan.write);
+            List<Map<StatementEffects.Write,Integer>> selections=List.of(Map.of());
+            for(var write:writes) {
+                var next=new ArrayList<Map<StatementEffects.Write,Integer>>();int count=readSource(write).candidates().size();
+                for(var prior:selections)for(int i=0;i<Math.max(1,count);i++) {
+                    var choice=new HashMap<>(prior);choice.put(write,count==0?-1:i);next.add(Map.copyOf(choice));
+                }
+                selections=List.copyOf(next);
             }
+            return selections;
+        }
+        private Set<Integer> readSegments(Map<StatementEffects.Write,Integer> choices) {
+            var selected=new HashSet<Integer>();
+            choices.forEach((write,i)->{if(i>=0)for(var segment:partition.intersecting(readSource(write).candidates().get(i).location()))selected.add(segment.ordinal());});
             return Set.copyOf(selected);
         }
         private List<Content> contents(State state,StorageIndex.Location location) {
@@ -277,12 +290,14 @@ public final class RegionalValuesAnalysis {
             for(var entry:grouped.entrySet()) {
                 int group=entry.getKey();FactorizedAlternatives.Node<Content> all=null;
                 var original=value(before,group);
-                var selected=readSegments(entry.getValue().values().stream().flatMap(List::stream).toList());
-                // Only the local read projection is enumerated; every unrelated factor remains a DAG.
-                for(var captured:relations.selections(relations.project(original,selected))) {
-                    var current=relations.restrict(original,captured);
-                    for(var occurrence:entry.getValue().entrySet())current=write(current,captured,occurrence.getKey(),occurrence.getValue(),forceMay,before.logical);
-                    all=relations.union(all,current);
+                for(var choices:sourceSelections(entry.getValue().values().stream().flatMap(List::stream).toList())) {
+                    var selected=readSegments(choices);
+                    // Enumerate only the chosen local read, retaining other factors symbolically.
+                    for(var parts:relations.selections(relations.project(original,selected))) {
+                        var captured=new ReadCapture(parts,choices);var current=relations.restrict(original,parts);
+                        for(var occurrence:entry.getValue().entrySet())current=write(current,captured,occurrence.getKey(),occurrence.getValue(),forceMay,before.logical);
+                        all=relations.union(all,current);
+                    }
                 }
                 var updated=root.put(group,all);if(updated!=root)contentUpdates++;root=updated;
             }
@@ -317,7 +332,7 @@ public final class RegionalValuesAnalysis {
             }
             return Set.of();
         }
-        private FactorizedAlternatives.Node<Content> write(FactorizedAlternatives.Node<Content> current,Map<Integer,Content> captured,StatementEffects.Write write,List<Plan> plans,boolean forceMay,Map<ObjectId,Set<LogicalValue>> logicalInputs) {
+        private FactorizedAlternatives.Node<Content> write(FactorizedAlternatives.Node<Content> current,ReadCapture captured,StatementEffects.Write write,List<Plan> plans,boolean forceMay,Map<ObjectId,Set<LogicalValue>> logicalInputs) {
             if(write.selection()==StatementEffects.Selection.MAY_SET) {
                 for(var plan:plans)current=weak(current,captured,plan,logicalInputs);return current;
             }
@@ -337,10 +352,10 @@ public final class RegionalValuesAnalysis {
             // Symbolic counterpart of KillAuthority.weakUpdate: both relations survive.
             return relations.union(old,supplied);
         }
-        private FactorizedAlternatives.Node<Content> weak(FactorizedAlternatives.Node<Content> current,Map<Integer,Content> captured,Plan plan,Map<ObjectId,Set<LogicalValue>> logicalInputs) {
+        private FactorizedAlternatives.Node<Content> weak(FactorizedAlternatives.Node<Content> current,ReadCapture captured,Plan plan,Map<ObjectId,Set<LogicalValue>> logicalInputs) {
             return weakUnion(current,replace(current,captured,plan,logicalInputs));
         }
-        private FactorizedAlternatives.Node<Content> replace(FactorizedAlternatives.Node<Content> old,Map<Integer,Content> captured,Plan plan,Map<ObjectId,Set<LogicalValue>> logicalInputs) {
+        private FactorizedAlternatives.Node<Content> replace(FactorizedAlternatives.Node<Content> old,ReadCapture captured,Plan plan,Map<ObjectId,Set<LogicalValue>> logicalInputs) {
             FactorizedAlternatives.Node<Content> result=null;
             for(var replacement:replacements(plan,captured,logicalInputs)) {
                 alternativeVisits++;var updates=new HashMap<Integer,java.util.function.UnaryOperator<Content>>();
@@ -362,14 +377,14 @@ public final class RegionalValuesAnalysis {
             }
             return result;
         }
-        private Set<Content> replacements(Plan plan,Map<Integer,Content> captured,Map<ObjectId,Set<LogicalValue>> logicalInputs) {
+        private Set<Content> replacements(Plan plan,ReadCapture captured,Map<ObjectId,Set<LogicalValue>> logicalInputs) {
             var target=plan.target.location();
             if(!plan.target.sourceApplicable())return Set.of(unknown(target,"UNPROVEN_WRITE_DESTINATION",plan.event));
             var source=plan.write.source();
             if(source instanceof StatementEffects.CapturedBytes copy) {
                 var c=copy.source().candidates().getFirst();int ordinal=ordinals.get(c.location().base().id());
                 var sourceRange=c.location().range().orElseThrow();
-                return Set.of(new Bytes(((Bytes)capture(content(captured,ordinal),c.location())).image().slice(sourceRange).copied(plan.event,sourceRange.start())));
+                return Set.of(new Bytes(((Bytes)capture(content(captured.contents(),ordinal),c.location())).image().slice(sourceRange).copied(plan.event,sourceRange.start())));
             }
             if(source instanceof StatementEffects.UnknownSource u)return Set.of(unknown(target,u.reason(),plan.event));
             var expression=((StatementEffects.ExpressionSource)source).value();
@@ -382,6 +397,7 @@ public final class RegionalValuesAnalysis {
                 // Keep each admitted physical alternative and its selected source range. A Choice
                 // remainder is not evidence against bytes already supported by another alternative.
                 for(int i=0;i<reads.candidates().size();i++) {
+                    if(captured.choices().get(plan.write)!=i)continue;
                     var candidate=reads.candidates().get(i);var range=candidate.location().range();
                     if(expression instanceof Expressions.FitText fit&&extent.filter(fit.length()::equals).isPresent()
                             &&codecs.size()==1&&codecs.getFirst().filter(MemoryCodecs::isIbm1047).isPresent()
@@ -389,7 +405,7 @@ public final class RegionalValuesAnalysis {
                         var pad=MemoryCodecs.encodeText(codecs.getFirst().orElseThrow(),new Values.TextValue(fit.pad()),BigInteger.ONE);
                         if(pad.status()==MemoryCodecs.Status.EXACT) {
                             int ordinal=ordinals.get(candidate.location().base().id());
-                            var image=((Bytes)capture(content(captured,ordinal),candidate.location())).image().slice(range.get()).copied(plan.event,range.get().start(),i);
+                            var image=((Bytes)capture(content(captured.contents(),ordinal),candidate.location())).image().slice(range.get()).copied(plan.event,range.get().start(),i);
                             result.add(new Bytes(image.fit(fit.length(),pad.value().orElseThrow().octets().getFirst(),plan.event)));continue;
                         }
                     }
@@ -433,9 +449,10 @@ public final class RegionalValuesAnalysis {
                     result.add(new Scalar(Optional.of(value.text()),Set.copyOf(List.of(value.event(),plan.event)),Set.of(),Set.of(),
                         List.of(new Trace(target,Optional.empty(),plan.event,Optional.of(target),Map.of(),Set.of(),Set.of(),Set.of(new ByteImage.LogicalSupport(object,value.event()))))));
 
-                for(var candidate:resolution.candidates()) {
-                    int ordinal=ordinals.get(candidate.location().base().id());
-                    result.add(project(capture(content(captured,ordinal),candidate.location()),candidate).captured(plan.event,candidate.location(),target));
+                for(int i=0;i<resolution.candidates().size();i++) {
+                    if(captured.choices().get(plan.write)!=i)continue;
+                    var candidate=resolution.candidates().get(i);int ordinal=ordinals.get(candidate.location().base().id());
+                    result.add(project(capture(content(captured.contents(),ordinal),candidate.location()),candidate).captured(plan.event,candidate.location(),target));
                 }
                 if(!result.isEmpty())return Set.copyOf(result);
             }

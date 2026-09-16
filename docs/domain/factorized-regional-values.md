@@ -116,3 +116,11 @@ concrete branch/copy/loop oracles. `w3-focused.log`, `w4-scale.log`,
 `domain-family.log` record this checkpoint (104 values-family tests, zero failures).
 The 17 selected product verticals in `product-01` pass real codec/CLI byte parity.
 Further W6 falsification and policy mutations remain pending; no final FAST yet.
+
+W6 found a local projection hazard: a Choice source must project one selected
+range, not the simultaneous product of every candidate's range. A focused oracle
+first needed explicit PARTIAL_ANALYSIS because AIR cannot discharge FitText over
+the Choice; that setup error is not a semantic RED. With the honest partial
+policy, `w6-choice-red-valid.log` fails the projected-alternative bound against
+3fc5ac1; `w6-choice-green-valid.log` passes after candidate-local capture.
+Source identity and the original candidate index still govern copy provenance.
