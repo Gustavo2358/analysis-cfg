@@ -49,15 +49,17 @@ public final class RegionalValuesAnalysis {
     private record Bytes(ByteImage image) implements Content { }
     private record CapturedRead(StorageIndex.Location sourceRange,StorageIndex.Location sourceContribution,StorageIndex.Location destinationContribution) { }
     private record Trace(StorageIndex.Location observed,Optional<Values.BytesValue> bytes,int producer,Optional<StorageIndex.Location> original,
-                         Map<Integer,Set<CapturedRead>> captures,Set<Integer> gaps,Set<String> reasons) {
+                         Map<Integer,Set<CapturedRead>> captures,Set<Integer> gaps,Set<String> reasons,Set<Integer> logicalSupports) {
+        Trace(StorageIndex.Location observed,Optional<Values.BytesValue> bytes,int producer,Optional<StorageIndex.Location> original,Map<Integer,Set<CapturedRead>> captures,Set<Integer> gaps,Set<String> reasons){this(observed,bytes,producer,original,captures,gaps,reasons,Set.of());}
         Trace {
+            logicalSupports=Set.copyOf(logicalSupports);
             var immutable=new HashMap<Integer,Set<CapturedRead>>();captures.forEach((key,value)->immutable.put(key,Set.copyOf(value)));captures=Map.copyOf(immutable);gaps=Set.copyOf(gaps);reasons=Set.copyOf(reasons);
         }
-        Trace withGap(int gap){var next=new HashSet<>(gaps);next.add(gap);return new Trace(observed,bytes,producer,original,captures,next,reasons);}
+        Trace withGap(int gap){var next=new HashSet<>(gaps);next.add(gap);return new Trace(observed,bytes,producer,original,captures,next,reasons,logicalSupports);}
         Trace captured(int event,StorageIndex.Location source,StorageIndex.Location destination) {
             var next=new HashMap<>(captures);var contributions=new HashSet<>(next.getOrDefault(event,Set.of()));
             contributions.add(new CapturedRead(source,observed,destination));next.put(event,Set.copyOf(contributions));
-            return new Trace(destination,bytes,producer,original,next,gaps,reasons);
+            return new Trace(destination,bytes,producer,original,next,gaps,reasons,logicalSupports);
         }
     }
     private record Store(List<Content> contents) {
@@ -341,6 +343,23 @@ public final class RegionalValuesAnalysis {
                     }
                 }
             }
+            var logicalRead=expression instanceof Expressions.Read r?r:expression instanceof Expressions.FitText f&&f.value() instanceof Expressions.Read r?r:null;
+            if(target.range().isPresent()&&logicalRead!=null&&logicalRead.place() instanceof Places.ObjectPlace object
+                    &&logicalInputs.containsKey(object.object())) {
+                var codecs=plan.write.destination().candidates().stream().filter(c->c.location().equals(target)).map(StorageIndex.Candidate::codec).distinct().toList();
+                var extent=target.range().get().end().map(e->e.subtract(target.range().get().start()));
+                var result=new HashSet<Content>();result.add(unknown(target,"LOGICAL_READ_REMAINDER",plan.event));
+                if(codecs.size()==1&&codecs.getFirst().isPresent()&&extent.isPresent())for(var value:logicalInputs.get(object.object())) {
+                    var text=value.text();
+                    if(expression instanceof Expressions.FitText fit) {
+                        int length=fit.length().intValueExact();var raw=text.value();int count=raw.codePointCount(0,raw.length());
+                        text=new Values.TextValue(count>length?raw.substring(0,raw.offsetByCodePoints(0,length)):raw+fit.pad().repeat(length-count));
+                    }
+                    var encoded=MemoryCodecs.encodeText(codecs.getFirst().get(),text,extent.get());
+                    if(encoded.status()==MemoryCodecs.Status.EXACT)result.add(new Bytes(ByteImage.literal(encoded.value().orElseThrow(),plan.event).withLogicalSupport(Set.of(value.event()))));
+                }
+                return Set.copyOf(result);
+            }
             if(expression instanceof Expressions.Literal literal) {
                 var v=literal.value();
                 if(target.range().isEmpty())return Set.of(v instanceof Values.TextValue t
@@ -363,7 +382,7 @@ public final class RegionalValuesAnalysis {
                 if(!(resolution.remainder() instanceof Scopes.NoMemory))result.add(unknown(target,"READ_LOCATION_REMAINDER",plan.event));
                 if(read.place() instanceof Places.ObjectPlace object)for(var value:logicalInputs.getOrDefault(object.object(),Set.of()))
                     result.add(new Scalar(Optional.of(value.text()),Set.copyOf(List.of(value.event(),plan.event)),Set.of(),Set.of(),
-                        List.of(new Trace(target,Optional.empty(),plan.event,Optional.of(target),Map.of(),Set.of(),Set.of()))));
+                        List.of(new Trace(target,Optional.empty(),plan.event,Optional.of(target),Map.of(),Set.of(),Set.of(),Set.of(value.event())))));
 
                 for(var candidate:resolution.candidates()) {
                     int ordinal=ordinals.get(candidate.location().base().id());
@@ -419,7 +438,7 @@ public final class RegionalValuesAnalysis {
         if(candidate.codec().isEmpty()||range.end().isEmpty())return new Scalar(Optional.empty(),Set.of(),Set.of("UNINTERPRETED_VIEW"),gaps,traces);
         var decoded=MemoryCodecs.decodeText(candidate.codec().get(),read.bytes().get(),range.end().get().subtract(range.start()));
         if(decoded.value().isEmpty())return new Scalar(Optional.empty(),Set.of(),Set.of(decoded.status().name()),gaps,traces);
-        var producers=new HashSet<Integer>();for(var part:read.parts())producers.addAll(part.contributors().keySet());
+        var producers=new HashSet<Integer>();for(var part:read.parts()){producers.addAll(part.contributors().keySet());producers.addAll(part.logicalSupports());}
         return new Scalar(decoded.value(),producers,Set.of(),gaps,traces);
     }
     private List<Trace> traces(ByteImage.Part part,StorageIndex.Location selected) {
@@ -447,7 +466,7 @@ public final class RegionalValuesAnalysis {
             }
             captures.put(entry.getKey(),Set.copyOf(portions));
         }
-        return new Trace(observed,bytes,part.producer(),original,captures,part.sourceGaps(),part.reasons());
+        return new Trace(observed,bytes,part.producer(),original,captures,part.sourceGaps(),part.reasons(),part.logicalSupports());
     }
     public Execution execute(){var engine=new Engine();return new Execution(engine,DataflowSolver.solve(session,engine));}
     public final class Execution {
@@ -560,7 +579,16 @@ public final class RegionalValuesAnalysis {
             var gaps=new HashSet<Integer>(trace.gaps());
             for(int i=0;i<sourceGaps.size();i++)if(!effects.storage().disjoint(trace.observed(),sourceGaps.get(i).location()))gaps.add(i);
             var publicGaps=gaps.stream().map(sourceGaps::get).map(g->new StorageValueFact.SourceGap(g.location().in(entry),g.origin(),g.uncertainties())).distinct().sorted(StorageValueOrder.GAP).toList();
-            return new StorageValueFact.Fragment(trace.observed().in(entry),kind,trace.bytes(),producer,unknownWriter,captures.stream().distinct().sorted(StorageValueOrder.CAPTURE).toList(),publicGaps,trace.reasons().stream().sorted().toList());
+            Optional<StorageValueFact.LogicalCapture> logicalCapture=Optional.empty();
+            if(!trace.logicalSupports().isEmpty()) {
+                var assign=(Operations.Assign)eventDetails.get(trace.producer()).operation();
+                var expression=assign.value();
+                var read=(Expressions.Read)(expression instanceof Expressions.FitText fit?fit.value():expression);
+                var object=((Places.ObjectPlace)read.place()).object();
+                var supports=trace.logicalSupports().stream().map(events::get).distinct().sorted(Comparator.comparing(ValueFact.Support::evidence,StorageValueOrder.ID).thenComparing(ValueFact.Support::origin,StorageValueOrder.ID)).toList();
+                logicalCapture=Optional.of(new StorageValueFact.LogicalCapture(object,ProgramPoint.before(entry,assign.header().id()),supports));
+            }
+            return new StorageValueFact.Fragment(trace.observed().in(entry),kind,trace.bytes(),producer,unknownWriter,captures.stream().distinct().sorted(StorageValueOrder.CAPTURE).toList(),publicGaps,trace.reasons().stream().sorted().toList(),logicalCapture);
         }
     }
     private boolean sourceOpen(PointQuery<StorageSubject> query) {

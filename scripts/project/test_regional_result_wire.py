@@ -140,4 +140,30 @@ class LogicalEntryWireContract(unittest.TestCase):
                 with self.assertRaises(WireError):validate(changed)
         print('EP_LOGICAL_WIRE_MUTANTS '+json.dumps({'killed':len(mutations),'total':len(mutations),'compileErrors':0}))
 
+class LogicalCaptureWireContract(unittest.TestCase):
+    def test_logical_capture_requires_instant_support_and_open_remainder(self):
+        path=PRODUCT.parent/'logical-copy.result.json';r=read(path)
+        self.assertEqual('1.3.0',r['version']);self.assertEqual(path.read_bytes(),canonical(r))
+        index=next(i for i,o in enumerate(r['observations']) if o['point']['operationId']['localId']=='later-source')
+        v=['observations',index,'values','fact'];fact=r['observations'][index]['values']['fact']
+        ai=next(i for i,a in enumerate(fact['alternatives']) if a['candidate']=='PROGA   ')
+        f=v+['alternatives',ai,'fragments',0];c=f+['logicalCapture']
+        mutations={
+            'old-version':field(['version'],'1.2.0'),
+            'missing-capture':lambda d:d['observations'][index]['values']['fact']['alternatives'][ai]['fragments'][0].pop('logicalCapture'),
+            'empty-support':field(c+['producers'],[]),
+            'wrong-instant':field(c+['before','position'],'AFTER'),
+            'wrong-operation':field(c+['before','operationId','localId'],'later-source'),
+            'invented-source':field(c+['objectId','localId'],'absent'),
+            'invented-range':lambda d:d['observations'][index]['values']['fact']['alternatives'][ai]['fragments'][0]['logicalCapture'].update(sourceRange={}),
+            'closed':field(v+['modelValueRemainder'],False),
+            'unsupported-byte':field(f+['bytes',0],66),
+            'producer-not-assign':field(f+['producer','definition','kind'],'ENTRY_POSSIBILITY'),
+        }
+        for name,mutate in mutations.items():
+            with self.subTest(name=name):
+                changed=copy.deepcopy(r);mutate(changed)
+                with self.assertRaises(WireError):validate(changed)
+        print('EP_LOGICAL_CAPTURE_WIRE_MUTANTS '+json.dumps({'killed':len(mutations),'total':len(mutations)}))
+
 if __name__=='__main__':unittest.main()

@@ -16,14 +16,14 @@ import static io.github.gustavo2358.analysis.adapters.WireIds.id;
 
 /** Closed regional result v1. Facts are detached canonical projections; no AIR interpretation here. */
 public final class RegionalResultJson {
-    public static final String VERSION="1.2.0";
+    public static final String VERSION="1.3.0";
     public void write(RegionalAnalysisResult result,OutputStream output) throws IOException {
         var json=new JsonOutput(output);json.value(payload(result));json.finish();
     }
     private static Object payload(RegionalAnalysisResult r) {
         var inventory=r.inventory();
         var observations=r.observations().stream().sorted(Comparator.comparing((RegionalAnalysisResult.Observation o)->o.query().point(),ProgramPoint.ORDER).thenComparing(o->o.query().subject(),StorageSubject.ORDER)).toList();
-        return object("schema","regional-analysis-result","version",r.observations().stream().anyMatch(o->o.rd().value()!=null&&o.rd().value().definitions().stream().anyMatch(d->d.definition().logicalObject().isPresent())||o.values().value()!=null&&!o.values().value().logicalAlternatives().isEmpty())?VERSION:r.observations().stream().anyMatch(o->o.query().subject() instanceof StorageSubject.PlaceOccurrence)?"1.1.0":"1.0.0","resultId",r.resultId(),"publicationId",id(r.publicationId()),"profile",RegionalValuesAnalysis.PROFILE,
+        return object("schema","regional-analysis-result","version",r.observations().stream().anyMatch(o->o.values().value()!=null&&o.values().value().alternatives().stream().flatMap(a->a.fragments().stream()).anyMatch(f->f.logicalCapture().isPresent()))?VERSION:r.observations().stream().anyMatch(o->o.rd().value()!=null&&o.rd().value().definitions().stream().anyMatch(d->d.definition().logicalObject().isPresent())||o.values().value()!=null&&!o.values().value().logicalAlternatives().isEmpty())?"1.2.0":r.observations().stream().anyMatch(o->o.query().subject() instanceof StorageSubject.PlaceOccurrence)?"1.1.0":"1.0.0","resultId",r.resultId(),"publicationId",id(r.publicationId()),"profile",RegionalValuesAnalysis.PROFILE,
             "status","COMPLETE","pathWitness","NOT_PROVIDED","referenceAuthority","VALIDATED_AIR_PUBLICATION",
             "inventory",object("ids",ids(inventory.ids()),"storages",each(inventory.storages().stream().sorted(Comparator.comparing(s->s.header().id(),WireIds.ORDER)).toList(),RegionalResultJson::storage),
                 "scopes",each(inventory.scopes().stream().sorted(Comparator.comparing(RegionalAnalysisResult.SourceScope::entry,WireIds.ORDER)).toList(),RegionalResultJson::scope)),
@@ -85,10 +85,12 @@ public final class RegionalResultJson {
         return result;
     }
     private static Object fragment(StorageValueFact.Fragment f) {
-        return object("location",location(f.location()),"kind",f.kind().name(),"bytes",f.bytes().map(Values.BytesValue::octets).orElse(null),
+        var result=new TreeMap<>(object("location",location(f.location()),"kind",f.kind().name(),"bytes",f.bytes().map(Values.BytesValue::octets).orElse(null),
             "producer",f.producer().map(p->object("definition",event(p.definition()),"contributedRange",location(p.contributedRange()))).orElse(null),
             "unknownWriter",f.unknownWriter().map(RegionalResultJson::event).orElse(null),"captures",each(f.captures(),RegionalResultJson::capture),
-            "sourceGaps",each(f.sourceGaps(),g->object("affectedLocation",location(g.affectedLocation()),"origin",id(g.origin()),"uncertaintyRefs",ids(g.uncertainties()))),"modelReasons",f.modelReasons());
+            "sourceGaps",each(f.sourceGaps(),g->object("affectedLocation",location(g.affectedLocation()),"origin",id(g.origin()),"uncertaintyRefs",ids(g.uncertainties()))),"modelReasons",f.modelReasons()));
+        f.logicalCapture().ifPresent(c->result.put("logicalCapture",object("objectId",id(c.object()),"before",ResultJson.point(c.before()),"producers",each(c.producers(),p->object("evidence",id(p.evidence()),"origin",id(p.origin()),"premiseRefs",ids(p.premises()))))));
+        return result;
     }
     private static Object capture(StorageValueFact.Capture c) {
         return object("definition",event(c.definition()),"before",ResultJson.point(c.before()),"sourceRange",location(c.sourceRange()),"destinationRange",location(c.destinationRange()),

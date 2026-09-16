@@ -61,10 +61,17 @@ class EvidencePreservingEntryTest {
             if(physical) {
                 var validation=io.github.gustavo2358.air.validation.AirValidator.validate(p);
                 assertEquals(io.github.gustavo2358.air.validation.ValidationResult.Status.INCOMPLETE_VALIDATION,validation.status(),
-                    "an unknown source repertoire cannot prove a total codec write; this is a separate admission limit, not a supported copy oracle");
-                continue;
+                    "an unknown source repertoire cannot prove a total codec write");
             }
-            var run=run(p);var before=at(run,"later-must",target);
+            RegionalValuesAnalysis.Execution run;
+            if(physical) {
+                var defaults=io.github.gustavo2358.analysis.cfg.application.BuildOptions.defaults();
+                var options=new io.github.gustavo2358.analysis.cfg.application.BuildOptions(defaults.validation(),io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy.PARTIAL_ANALYSIS);
+                var cfg=new io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator(io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry.empty()).build(p,options);
+                var session=io.github.gustavo2358.analysis.structure.AnalysisSession.open(cfg,p,options.projectionPolicy(),u.entries()).session().orElseThrow();
+                run=RegionalValuesAnalysis.prepare(session).analysis().orElseThrow().execute();
+            } else run=run(p);
+            var before=at(run,"later-must",target);
             assertEquals(List.of("PGM00001"),texts(before),"layout uncertainty cannot remove copied source evidence");
             assertTrue(before.modelValueRemainder());assertFalse(before.candidateSupports().getFirst().producers().isEmpty());
             assertEquals(List.of("OTHERPGM"),texts(at(run,"return-s0",target)),"a later proved overwrite removes the copy");

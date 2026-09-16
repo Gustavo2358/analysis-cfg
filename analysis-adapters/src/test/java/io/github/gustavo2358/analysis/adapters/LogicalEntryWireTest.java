@@ -36,5 +36,31 @@ class LogicalEntryWireTest {
         var bytes=encode(result);assertArrayEquals(bytes,encode(new RegionalAnalysis().prepare(p,"logical-source",List.of(query))));
         retained(result);
         var out=Path.of("target/regional-wire");Files.createDirectories(out);Files.write(out.resolve("logical.result.json"),bytes);
+        // Independent logical-to-physical counterproof: a possible source is captured once.
+        var h=header(U,"logical-copy");
+        var read=new Expressions.Read(operand(h.id(),"read",Operand.Role.VALUE_READ),new Places.ObjectPlace(operand(h.id(),"source",Operand.Role.VALUE_READ),WHOLE));
+        var fit=new Expressions.FitText(operand(h.id(),"fit",Operand.Role.VALUE_READ),read,java.math.BigInteger.valueOf(8)," ");
+        var copy=new Operations.Assign(h,new Places.ObjectPlace(operand(h.id(),"destination",Operand.Role.VALUE_WRITE),DEST),fit);
+        var dest=view(DEST,Y,0,8);var storage=fixture().storage().stream().filter(b->b.header().id().equals(Y)).toList();
+        var sequences=List.of(returning(U,"body",List.of(copy,assign(U,"later-source",WHOLE,"NEWVALUE"),assign(U,"later-dest",DEST,"ONLYNEXT"))));
+        var copied=new Publication(P,p.airVersion(),new Capabilities.Manifest(List.of(Capabilities.ENTRY_POSSIBILITIES_V2,Capabilities.MEMORY_REGIONS),List.of()),p.artifacts(),List.of(unit(U,List.of(e),sequences,List.of(object,dest))),storage,p.resources(),p.artifactRelations(),p.origins(),p.coverage(),p.uncertainties(),List.of());
+        var beforeCopy=new PointQuery<StorageSubject>(ProgramPoint.before(e.id(),new OperationId(U,"later-source")),new StorageSubject.NamedObject(DEST));
+        var afterSource=new PointQuery<StorageSubject>(ProgramPoint.before(e.id(),new OperationId(U,"later-dest")),new StorageSubject.NamedObject(DEST));
+        var afterMust=new PointQuery<StorageSubject>(ProgramPoint.before(e.id(),new OperationId(U,"return-body")),new StorageSubject.NamedObject(DEST));
+        var captured=new RegionalAnalysis().preparePartial(copied,"logical-copy",List.of(beforeCopy,afterSource,afterMust));
+        for(var o:captured.observations()) {
+            var f=o.values().value();
+            if(o.query().point().equals(afterMust.point()))assertEquals(List.of(new Values.TextValue("ONLYNEXT")),f.candidates());
+            else {
+                assertTrue(f.candidates().contains(new Values.TextValue("PROGA   ")));assertTrue(f.modelValueRemainder());
+                var fragment=f.alternatives().stream().filter(x->x.candidate().equals(Optional.of(new Values.TextValue("PROGA   ")))).findFirst().orElseThrow().fragments().getFirst();
+                assertEquals(WHOLE,fragment.logicalCapture().orElseThrow().object());
+                assertEquals(ProgramPoint.before(e.id(),h.id()),fragment.logicalCapture().orElseThrow().before());
+                assertTrue(fragment.captures().isEmpty(),"no invented physical source interval");
+            }
+        }
+        var copyBytes=encode(captured);assertArrayEquals(copyBytes,encode(new RegionalAnalysis().preparePartial(copied,"logical-copy",List.of(afterMust,afterSource,beforeCopy))));
+        Files.write(out.resolve("logical-copy.result.json"),copyBytes);retained(captured);
+
     }
 }

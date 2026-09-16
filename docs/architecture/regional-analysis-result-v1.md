@@ -230,3 +230,18 @@ The writer uses schema **1.1.0** only when a PLACE_OCCURRENCE subject is present
 `{kind: "PLACE_OCCURRENCE", operandId: Id(operand)}`. Existing subjects retain the
 1.0.0 wire unchanged. The independent Python reader accepts both and rejects the
 new subject under 1.0.0. This does not change dependencies.json or CFG JSON.
+
+## 1.3.0 — captured logical support without a physical source
+
+A known fragment may carry `logicalCapture`: `objectId`, `before`, and nonempty
+`producers` (evidence, origin, premiseRefs). It records the sending logical object
+and source support captured BEFORE the fragment producer Assign. It has no source
+storage or byte interval. The destination bytes still require successful explicit
+codec interpretation; they are one supported possibility. The original Assign
+event can remain unknown, and the value must retain model remainder. Source support
+participates in candidateSupports exactly, alongside the destination producer.
+Subsequent physical copies preserve this capture; later writes to the source do not
+re-evaluate it. Only documents using this field negotiate 1.3.0. Versions 1.0–1.2
+retain their closed shapes and existing producer requirements. Structural identities,
+BEFORE instant, ownership, support completeness and remainder are independently
+validated. This changes result transport only, not AIR or kill authority.
