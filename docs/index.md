@@ -1,5 +1,7 @@
 # Índice de conhecimento
 
+[FILE-DEPENDENCIES — FD-H0–H4 / waves futuras](product/file-dependencies/README.md): preparação source-only; STOP humano antes de W0.
+
 Comece por [AGENTS](../AGENTS.md) e pelo [trabalho](work/index.md).
 Esta página roteia leitura; não exige carregar todos os documentos.
 

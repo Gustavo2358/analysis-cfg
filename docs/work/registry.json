@@ -17,6 +17,11 @@
       "id": "WORK-CFG-040",
       "path": "docs/evals/cp6/carddemo-entry-start-discovery.md",
       "status": "IN_PROGRESS"
+    },
+    {
+      "id": "WORK-FD-HARNESS",
+      "status": "IN_PROGRESS",
+      "path": "docs/work/active/WORK-FD-HARNESS.json"
     }
   ],
   "history": [

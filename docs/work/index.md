@@ -1,5 +1,7 @@
 # Trabalho
 
+[FILE-DEPENDENCIES — FD-H0–H4 / waves futuras](../product/file-dependencies/README.md): preparação source-only; STOP humano antes de W0.
+
 [WORK-STORAGE-W6-W8](WORK-STORAGE-W6-W8.json): W6/W7 G2 and W8 G3 qualified; IN_PROGRESS pending human review/merge. Extends the accepted W0–W5 work item without reopening it.
 
 Campanha atual: [WORK-STORAGE-CFG-001 — Storage Semantics ST-W0..ST-W5](active/WORK-STORAGE-CFG-001.yaml), IN_PROGRESS; [contrato](../domain/storage-semantics.md). Promove somente os residuais de storage/RD/values do CP5 e preserva os marcos históricos abaixo.
@@ -31,3 +33,5 @@ CP5 = APPROVED / MERGED / CLOSED. The verified frozen component authorities are 
 - [WORK-CFG-038](active/WORK-CFG-038.md): CP6 compositionality and conservative partial lowering, DONE / MERGED #24 (`18a78a6599bfad2d983a4a32d7515d379a9bac60`).
 
 NEXT: **HUMAN PRIORITIZATION USING FULL CARDDEMO BASELINE**. O corpus fornece evidência consultiva; não seleciona nem determina a próxima capability. [Baseline](../evals/cp6/carddemo-full-baseline.md).
+
+[WORK-FD-HARNESS](active/WORK-FD-HARNESS.json): IN_PROGRESS; preparação para revisão, sem merge.

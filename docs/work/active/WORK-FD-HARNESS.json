@@ -1,0 +1,11 @@
+{
+  "id": "WORK-FD-HARNESS",
+  "title": "FD-H0–H4: preparar File Dependencies source-closed",
+  "status": "IN_PROGRESS",
+  "scope": [
+    "docs",
+    "harness",
+    "file-dependencies"
+  ],
+  "notes": "Preparação somente. Waves futuras estão em analysis-cfg/docs/work/file-dependencies. Revisão humana após H4; sem produção, merge ou repin."
+}

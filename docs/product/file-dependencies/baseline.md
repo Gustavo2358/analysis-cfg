@@ -77,3 +77,15 @@ não executar para FD. Reutilizar composição CLI/build e diretórios novos, co
 
 Decisões fechadas: [scope lock](brief.md) e [ADR](../../architecture/decisions/ADR-0015.md).
 Decisões abertas, donos e ondas bloqueadas: [contratos](contracts.md#decisoes-abertas).
+
+## Triagem de amostra local H1
+
+`proleap-poc/corpus/carddemo/cbl`, fixado pelo SHA frontend acima: 10 fontes
+.cbl/.CBL/.cob (extensão sem distinção de case). Triagem lexical de área 8–72,
+excluindo linhas de comentário fixo: SELECT: 4 arquivos, FD: 2 arquivos, SORT_MERGE: 0 arquivos, CICS_FILE: 2 arquivos, READ: 9 arquivos.
+São sinais para escolher fixtures, não contagens de dependências nem prevalência
+semântica: literal/SQL pode coincidir e a análise lexical não resolve binding.
+A amostra local não é o corpus completo. Corpus E2E adotado: aws-samples/
+aws-mainframe-modernization-carddemo em `59cc6c2fd7ebd7ef7925cad552a01a4b8b6e4d5e`,
+`docs/evals/cp6/carddemo-full-pins.json`; seus pins de analisadores são históricos,
+não os pins FD. Nenhuma fonte confidencial foi necessária ou presumida.

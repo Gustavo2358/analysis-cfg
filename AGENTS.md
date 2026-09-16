@@ -1,5 +1,7 @@
 # AGENTS.md
 
+[FILE-DEPENDENCIES — FD-H0–H4 / waves futuras](docs/product/file-dependencies/README.md): preparação source-only; STOP humano antes de W0.
+
 ## Política de engenharia vigente
 
 [LEAN HARNESS / GIT-IS-THE-RECORD](docs/engineering/lean-harness.md) governa o trabalho.
