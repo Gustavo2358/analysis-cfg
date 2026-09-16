@@ -45,4 +45,30 @@ class EvidencePreservingEntryTest {
         var value=at(run(logical(List.of(returning(U,"s0",List.of(havoc))))),"return-s0",WHOLE);
         assertEquals(List.of("PGM00001"),texts(value));assertTrue(value.modelValueRemainder());
     }
+    @Test void logicalSourceCopiesIntoKnownStorageAndLaterMustStillKillsIt() {
+        for(boolean physical:List.of(false,true)) {
+            var target=new ObjectId(U,"copy-target");var cell=new StorageId(P,"copy-cell");var h=header(U,"copy-logical");
+            var copy=new Operations.Assign(h,new Places.ObjectPlace(operand(h.id(),"destination",Operand.Role.VALUE_WRITE),target),
+                new Expressions.Read(operand(h.id(),"read",Operand.Role.VALUE_READ),new Places.ObjectPlace(operand(h.id(),"source",Operand.Role.VALUE_READ),WHOLE)));
+            var p=logical(List.of(returning(U,"s0",List.of(copy,assign(U,"later-must",target,"OTHERPGM")))));
+            var u=p.units().getFirst();var objects=new ArrayList<>(u.objects());var storage=new ArrayList<>(p.storage());
+            if(physical)objects.add(view(target,0,8,IBM));
+            else {
+                objects.add(new Memory.ObjectDeclaration(target,Optional.empty(),Types.known(Types.Builtin.TEXT),new Memory.CellBinding(cell),Memory.Visibility.PRIVATE,origin(P),Evidence.CoverageStatus.MODELED,h.precision()));
+                storage.add(new Memory.Cell(new Memory.StorageHeader(cell,Optional.of(U),Memory.Lifetime.PERSISTENT,Memory.Visibility.PRIVATE,origin(P)),Types.known(Types.Builtin.TEXT)));
+            }
+            p=new Publication(p.id(),p.airVersion(),p.capabilities(),p.artifacts(),List.of(unit(u.id(),u.entries(),u.sequences(),objects)),storage,p.resources(),p.artifactRelations(),p.origins(),p.coverage(),p.uncertainties(),p.premises());
+            if(physical) {
+                var validation=io.github.gustavo2358.air.validation.AirValidator.validate(p);
+                assertEquals(io.github.gustavo2358.air.validation.ValidationResult.Status.INCOMPLETE_VALIDATION,validation.status(),
+                    "an unknown source repertoire cannot prove a total codec write; this is a separate admission limit, not a supported copy oracle");
+                continue;
+            }
+            var run=run(p);var before=at(run,"later-must",target);
+            assertEquals(List.of("PGM00001"),texts(before),"layout uncertainty cannot remove copied source evidence");
+            assertTrue(before.modelValueRemainder());assertFalse(before.candidateSupports().getFirst().producers().isEmpty());
+            assertEquals(List.of("OTHERPGM"),texts(at(run,"return-s0",target)),"a later proved overwrite removes the copy");
+        }
+    }
+
 }

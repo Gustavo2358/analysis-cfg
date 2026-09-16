@@ -107,6 +107,7 @@ public final class RegionalValuesAnalysis {
             var resolution=effects.storage().object(object.id());var gaps=new LinkedHashSet<>(resolution.uncertainties());gaps.addAll(object.precision().storage().reasons());gaps.addAll(object.precision().values().reasons());
             for(var target:effects.targets(resolution,StatementEffects.Strength.MAY))sourceGaps.add(new SourceGap(target.location(),object.origin(),ordered(gaps)));
         }
+        for(var unit:session.index().publication().units())if(session.index().partialControl(unit.id()) || session.index().unprovedPreconditions(unit.id()))controlOpen.add(unit.id());
         for(var context:session.contexts()) {
             var seeds=new ArrayList<Plan>();int slot=0;var seededLocations=new HashSet<StorageIndex.Location>();
             // Simultaneous strong facts initialize first; possible support and open entry
@@ -243,7 +244,7 @@ public final class RegionalValuesAnalysis {
                 int group=entry.getKey();var all=new HashSet<Store>();
                 for(var original:value(before,group)) {
                     Set<Store> current=Set.of(original);
-                    for(var occurrence:entry.getValue().entrySet())current=write(current,original,group,occurrence.getKey(),occurrence.getValue(),forceMay);
+                    for(var occurrence:entry.getValue().entrySet())current=write(current,original,group,occurrence.getKey(),occurrence.getValue(),forceMay,before.logical);
                     all.addAll(current);
                 }
                 var updated=root.put(group,Set.copyOf(all));if(updated!=root)contentUpdates++;root=updated;
@@ -279,30 +280,30 @@ public final class RegionalValuesAnalysis {
             }
             return Set.of();
         }
-        private Set<Store> write(Set<Store> current,Store captured,int group,StatementEffects.Write write,List<Plan> plans,boolean forceMay) {
+        private Set<Store> write(Set<Store> current,Store captured,int group,StatementEffects.Write write,List<Plan> plans,boolean forceMay,Map<ObjectId,Set<LogicalValue>> logicalInputs) {
             if(write.selection()==StatementEffects.Selection.MAY_SET) {
-                for(var plan:plans)current=weak(current,captured,plan,true);return current;
+                for(var plan:plans)current=weak(current,captured,plan,true,logicalInputs);return current;
             }
             var next=new HashSet<Store>();
             var execution=forceMay?KillAuthority.Execution.POSSIBLE:KillAuthority.Execution.REQUIRED;
             if(!KillAuthority.exhaustive(write,plans.stream().map(Plan::target).toList(),execution))next.addAll(current);
             for(var plan:plans)if(plan.target.sourceApplicable())for(var old:current) {
-                var replacement=replace(old,captured,plan);var authority=KillAuthority.selected(write,plan.target,execution);
+                var replacement=replace(old,captured,plan,logicalInputs);var authority=KillAuthority.selected(write,plan.target,execution);
                 next.addAll(authority.isPresent()?KillAuthority.strongOverwrite(authority.get(),replacement):KillAuthority.weakUpdate(Set.of(old),replacement));
             }
             // No direct destination in this factor: only conservative possible alias/scope impacts.
             if(next.isEmpty())next.addAll(current);
             current=Set.copyOf(next);
-            for(var plan:plans)if(!plan.target.sourceApplicable())current=weak(current,captured,plan,true);
+            for(var plan:plans)if(!plan.target.sourceApplicable())current=weak(current,captured,plan,true,logicalInputs);
             return current;
         }
-        private Set<Store> weak(Set<Store> current,Store captured,Plan plan,boolean keep) {
+        private Set<Store> weak(Set<Store> current,Store captured,Plan plan,boolean keep,Map<ObjectId,Set<LogicalValue>> logicalInputs) {
             var next=new HashSet<Store>();if(keep)next.addAll(current);
-            for(var old:current)next.addAll(replace(old,captured,plan));return Set.copyOf(next);
+            for(var old:current)next.addAll(replace(old,captured,plan,logicalInputs));return Set.copyOf(next);
         }
-        private Set<Store> replace(Store old,Store captured,Plan plan) {
+        private Set<Store> replace(Store old,Store captured,Plan plan,Map<ObjectId,Set<LogicalValue>> logicalInputs) {
             int ordinal=ordinals.get(plan.target.location().base().id());var prior=content(old,ordinal);var result=new HashSet<Store>();
-            for(var replacement:replacements(plan,captured)) {
+            for(var replacement:replacements(plan,captured,logicalInputs)) {
                 alternativeVisits++;
                 Content updated=replacement;
                 if(prior instanceof Bytes b) {
@@ -314,7 +315,7 @@ public final class RegionalValuesAnalysis {
             }
             return result;
         }
-        private Set<Content> replacements(Plan plan,Store captured) {
+        private Set<Content> replacements(Plan plan,Store captured,Map<ObjectId,Set<LogicalValue>> logicalInputs) {
             var target=plan.target.location();
             if(!plan.target.sourceApplicable())return Set.of(unknown(target,"UNPROVEN_WRITE_DESTINATION",plan.event));
             var source=plan.write.source();
@@ -360,6 +361,10 @@ public final class RegionalValuesAnalysis {
             if(target.range().isEmpty()&&expression instanceof Expressions.Read read) {
                 var resolution=effects.storage().resolve(read.place());var result=new HashSet<Content>();
                 if(!(resolution.remainder() instanceof Scopes.NoMemory))result.add(unknown(target,"READ_LOCATION_REMAINDER",plan.event));
+                if(read.place() instanceof Places.ObjectPlace object)for(var value:logicalInputs.getOrDefault(object.object(),Set.of()))
+                    result.add(new Scalar(Optional.of(value.text()),Set.copyOf(List.of(value.event(),plan.event)),Set.of(),Set.of(),
+                        List.of(new Trace(target,Optional.empty(),plan.event,Optional.of(target),Map.of(),Set.of(),Set.of()))));
+
                 for(var candidate:resolution.candidates()) {
                     int ordinal=ordinals.get(candidate.location().base().id());
                     result.add(project(capture(content(captured,ordinal),candidate.location()),candidate).captured(plan.event,candidate.location(),target));
