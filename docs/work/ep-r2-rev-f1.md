@@ -18,10 +18,10 @@ No increased -Xss, segment/candidate caps, error-to-empty conversion or dropped
 evidence. Shared suffixes, canonical nodes, empty relation versus empty tuple,
 strong/weak updates and exact relational algebra retain their existing meanings.
 
-Union will use explicit frames over node pairs, with memoized results and the
-same identity/empty shortcuts. Update, projection and restriction will use a
+Union uses explicit frames over node pairs, with memoized results and the
+same identity/empty shortcuts. Update, projection and restriction use a
 memoized post-order node walk with explicit iterators; restriction prunes excluded
-edges before traversing them. Enumeration will use an explicit DFS cursor stack
+edges before traversing them. Enumeration uses an explicit DFS cursor stack
 and one mutable path, copying only the tuples the query actually returns.
 Singleton construction and structural size already use iteration. A rebuild may
 invoke iterative union; it must not re-enter the node traversal recursively.
@@ -71,4 +71,69 @@ fails in the original DAG restrict traversal with StackOverflowError
 (`vertical-red-02/03.log`) had undischarged codec preconditions and are setup
 failures, not depth evidence.
 
-Final results and current handoff will be recorded after the fix and qualification.
+## GREEN and handoff
+
+R2-REV-F1 is remediated; READY FOR HUMAN RE-REVIEW in the same Draft PR.
+RED commit: `9ada4e3`. Fixed production: `20caab18b3ac9882491da171aeb6350ed090c998`.
+Only FactorizedAlternatives changed in production. The compiled W3 inventory
+adds the two private frame classes and their standard-library dependencies; no
+public API, Maven dependency or architecture direction changes.
+
+[Machine-readable evidence](ep-r2/rev-f1-validation.json) records source hashes,
+raw log hashes, per-process outcomes and current metrics. The selected product
+run happened before the production commit with those exact source hashes; FAST
+and the five deep CLI invocations used the clean fixed production commit.
+
+- All five standalone operations pass at 1024, 2048, 8192 and 32768 levels:
+  20 separate JVMs, -Xmx256m, default stack. Update/union/restriction keep the
+  exact linear structure; projection returns its requested component and
+  enumeration returns the one complete tuple. No thresholds become caps.
+- The independent finite-relation oracle passes 1000 scenarios / 7000 checks,
+  including empty relations/tuples, skipped levels, colliding labels and weak
+  updates. Six depth JUnit methods also cover update/projection invoking union
+  on long suffixes, with two correlated tuples.
+- The AIR JSON → CFG → RD/RV → regional result vertical passes on 8192 segments.
+  MUST seed: OLDPROG1 closed. After MAY and BEFORE overwrite: OLDPROG1 open.
+  After MUST: only NEWPROG1 closed. Copied field: OLDPROG1 open, retaining seed
+  support and source/destination intervals captured BEFORE copy, after the source
+  has changed. Reversed query order produces byte-identical JSON.
+- Its maximum state has 16384 edges / 16383 nodes, maximum component cardinality
+  two; cumulative arena has 40963 nodes / 40966 edges. This is linear depth with
+  few alternatives, not a claim of zero transient allocations.
+- All five observations independently pass the real CLI with -Xmx256m and no
+  -Xss override; their complete JSON observations equal the memory result.
+  The independent Python wire validator passes both forms.
+- 111 focused tests across 25 suites pass, including copy/FitText/provenance,
+  composition, branch/loop convergence, strong/MAY controls and EP-R1 laws.
+- Eight selected dependency product verticals pass: H2, MUST, F1, F-order-012,
+  F-order-210, G-7, I and E3. G-7/E3 still have maximum 316 state edges; I, 528.
+  JSON, candidate support, honest remainder and BEFORE oracles pass. All six
+  order permutations also remain covered in the Java cohort.
+- Exactly one local final FAST passes in JDK 21: 501 Java methods, zero failures,
+  errors or skips; Python checks and all compiled architecture boundaries pass
+  (`fast.log`, 81.499 seconds observed). Eight new methods extend the original
+  493-method cohort. No production changes followed this gate.
+
+Reproduce after the normal pinned dependency build, on JDK 21:
+
+```sh
+mvn -pl analysis-adapters -am -Dtest=CfgPreflightTest,StorageRangeTest,FactorizedDepthTest,FactorizedAlternativesTest,RegionalAnalysisTest,NameInterpreterTest,EpR2DepthVerticalTest test
+java -Xmx256m -cp analysis-values/target/classes:analysis-values/target/test-classes io.github.gustavo2358.analysis.values.FactorizedDepthTest update 32768
+# Substitute restrict, union, project or selections for update; each runs separately.
+python3 -B scripts/project/regional_result_wire.py analysis-adapters/target/ep-r2-depth/result.json
+python3 -B scripts/harness/lean.py fast
+```
+
+The default FAST includes the new regressions. This remediation does not claim a
+rerun of the old eleven policy mutants or all seventeen product cases; their
+original results remain explicitly historical. The new oracle directly checks
+all changed operations against finite collecting semantics. No other-repository
+gates, CardDemo/CICS/FILE campaigns, broad corpus or confidential source were run.
+The original six checkouts, including frozen FILE, retain their SHAs and clean
+status. Pins remain unchanged.
+
+ENTRY SEMANTICS: QUALIFIED. FACTORIZED VALUES DOMAIN: QUALIFIED, including the
+new linear-depth obligation. SYNTHETIC INCIDENT CLASS: QUALIFIED.
+REAL CASE: AWAITING MANUAL RE-RUN. After human review of these synthetics, request
+a new manual real-program run recording only the already agreed non-sensitive
+aggregate metrics. No merge or auto-merge has been performed.

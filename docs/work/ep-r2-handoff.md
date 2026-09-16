@@ -4,6 +4,25 @@ Scope: analysis-cfg, branch `fix/ep-r2-entry-factorized-recall`, persistent
 [Draft PR #39](https://github.com/Gustavo2358/analysis-cfg/pull/39). No merge or
 auto-merge. Human semantic/architecture review remains required.
 
+## Current review remediation
+
+The review of head `49472df` found R2-REV-F1: recursive DAG traversal overflows
+on a long single-path relation. That head's depth qualification was blocked.
+The [bounded remediation](ep-r2-rev-f1.md) reproduces it in all five operations
+and in a valid 8192-segment AIR vertical, then replaces traversal recursion with
+explicit heap frames. Fixed production: `20caab18b3ac9882491da171aeb6350ed090c998`.
+
+Current local qualification: all five operations through 32768 levels at -Xmx256m,
+1000 finite-relation scenarios / 7000 checks, 111 focused tests, deep MAY/MUST/
+BEFORE/copy/provenance vertical plus five CLI observations, eight selected product
+cases and one final FAST with **501 Java methods**, Python and architecture PASS.
+[Current evidence](ep-r2/rev-f1-validation.json) records exact hashes and metrics.
+READY FOR HUMAN RE-REVIEW; PR remains Draft. Real case still awaits manual rerun.
+
+The sections below preserve the **original campaign evidence through 49472df**;
+their 493-test FAST, seventeen products and eleven mutant runs are historical,
+not claims that those exact runs were repeated by this remediation.
+
 ## Result and authority
 
 Entry admission uses original validated facts and their kind/resolution. AIR I-17
@@ -28,8 +47,9 @@ limits remain part of this handoff.
 Base after actual fetch: `194fac2af6cfc54053318164275e682feac5c750`. EP #37 is merged
 in that base. AIR pin `5b8a5c231958b62de34583d871cbb10b473d53e8` and analysis-ir pin
 `6b8ce96f5b1020199e3fcceedf81d931a3b8d2ff` remain unchanged. The final selected E2E
-run used clean commit `f8f0494e4ef0a1a8f8ef9e73f9ea103bcfe3dff2`, including the canonical-level fix. Later
-changes only record the final evidence and handoff. [Execution metadata](ep-r2/after-execution.json)
+run used clean commit `f8f0494e4ef0a1a8f8ef9e73f9ea103bcfe3dff2`, including the canonical-level fix. At the original handoff, later
+changes only recorded evidence and documentation; R2-REV-F1 above supersedes that
+production revision. [Execution metadata](ep-r2/after-execution.json)
 contains the exact production hashes and all dependency pins.
 
 ## Before / after evidence

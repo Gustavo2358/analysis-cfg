@@ -5,6 +5,6 @@
   "scope": [
     "analysis-cfg: entry admission, regional values domain, dependency product, focused qualification"
   ],
-  "notes": "R2-REV-F1 remediation in progress on existing Draft PR: reviewed head 49472df has reproduced StackOverflowError in all five DAG traversals and a valid AIR vertical with 8192 segments. Entry and width qualification retained as historical evidence; depth blocks review readiness. No merge/auto-merge. FILE/upstreams unchanged; real case still awaits manual rerun after human review.",
+  "notes": "READY FOR HUMAN RE-REVIEW: R2-REV-F1 remediated by stack-independent traversal of all five DAG operations. RED isolated and valid 8192-segment AIR vertical; GREEN through 32768 levels with 256 MiB/default stack, 1000 algebra scenarios/7000 checks, 111 focused tests, five deep CLI observations, eight selected products; final FAST 501 Java methods plus Python/architecture passed once. Same Draft PR; no merge/auto-merge. FILE/upstreams/pins unchanged. REAL CASE: AWAITING MANUAL RE-RUN after human review.",
   "pr": 39
 }
