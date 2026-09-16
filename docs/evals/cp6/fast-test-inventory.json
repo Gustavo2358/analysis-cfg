@@ -473,6 +473,29 @@
       "mixedChoiceReadsCurrentLogicalAndPhysicalAlternativesThenMustKillsCopy",
       "choiceCopyIntoLogicalDestinationUsesCurrentSupportAndWeakUpdates",
       "explicitIdentityDoesNotFollowAliasBindingsOrRegionAddressOperands"
+    ],
+    "io.github.gustavo2358.analysis.values.EpR2EntryTest": [
+      "openExternalPairIsAdmittedAndRemainsUnknown",
+      "allSixSimultaneousOrdersPreservePossibleSupport",
+      "h2StrongLiteralSurvivesOpenExternalEntryWithoutWrites",
+      "realStrongContradictionStillFailsI17",
+      "externalUnknownOnTheSamePlaceIsNotAFakeStrongAssignment",
+      "mixedPairsAreIndependentOfEntryOrder"
+    ],
+    "io.github.gustavo2358.analysis.values.EpR2FactorizationTest": [
+      "choiceReadProjectsOneSelectedSourceRatherThanTheirCartesianProduct",
+      "connectedEntryFactorsGrowBySum",
+      "independentSlicesWithinOneRegionAreAlsoFactored",
+      "emptyEntryWithThirtyTwoOpenWeakCopiesDoesNotBuildWorlds",
+      "connectedCopiesAndScaledJoinsPreserveRecall"
+    ],
+    "io.github.gustavo2358.analysis.values.FactorizedAlternativesTest": [
+      "independentWeakChoicesShareSuffixesWithoutWorlds",
+      "localImagesRestrictionsAndUnionMatchIndependentFiniteRelations"
+    ],
+    "io.github.gustavo2358.analysis.values.EpR2TransferTest": [
+      "mayBeforeAndAfterExactWriteCannotEraseItsSupportedValue",
+      "normalCallResultKillsOnlyAfterTheBeforeCaptureAndKeepsOpenAliasPeers"
     ]
   },
   "cfg-adapters": {

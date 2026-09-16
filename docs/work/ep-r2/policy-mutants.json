@@ -1,0 +1,253 @@
+[
+  {
+    "mutant": "external-fake-strong",
+    "status": "KILLED",
+    "executed": 6,
+    "failures": [
+      {
+        "test": "externalUnknownOnTheSamePlaceIsNotAFakeStrongAssignment",
+        "type": "org.opentest4j.AssertionFailedError",
+        "message": "expected: <[TextValue[value=PROG0001]]> but was: <[]>"
+      }
+    ],
+    "errors": [],
+    "restored_exit_code": 0,
+    "original_sha256": "34afb24c31a316c268623d787a4c81f9a758cf3527bf9621975b8b0b1b08f99c",
+    "run": "mutations-01"
+  },
+  {
+    "mutant": "cross-may-entry-conflict",
+    "status": "KILLED",
+    "executed": 6,
+    "failures": [
+      {
+        "test": "mixedPairsAreIndependentOfEntryOrder",
+        "type": "org.opentest4j.AssertionFailedError",
+        "message": "OVERLAPPING_INITIAL_CONDITIONS ==> expected: <ACCEPTED> but was: <UNSUPPORTED>"
+      },
+      {
+        "test": "allSixSimultaneousOrdersPreservePossibleSupport",
+        "type": "org.opentest4j.AssertionFailedError",
+        "message": "OVERLAPPING_INITIAL_CONDITIONS ==> expected: <ACCEPTED> but was: <UNSUPPORTED>"
+      },
+      {
+        "test": "externalUnknownOnTheSamePlaceIsNotAFakeStrongAssignment",
+        "type": "org.opentest4j.AssertionFailedError",
+        "message": "OVERLAPPING_INITIAL_CONDITIONS ==> expected: <ACCEPTED> but was: <UNSUPPORTED>"
+      },
+      {
+        "test": "h2StrongLiteralSurvivesOpenExternalEntryWithoutWrites",
+        "type": "org.opentest4j.AssertionFailedError",
+        "message": "OVERLAPPING_INITIAL_CONDITIONS ==> expected: <ACCEPTED> but was: <UNSUPPORTED>"
+      },
+      {
+        "test": "openExternalPairIsAdmittedAndRemainsUnknown",
+        "type": "org.opentest4j.AssertionFailedError",
+        "message": "OVERLAPPING_INITIAL_CONDITIONS ==> expected: <ACCEPTED> but was: <UNSUPPORTED>"
+      }
+    ],
+    "errors": [],
+    "restored_exit_code": 0,
+    "original_sha256": "f4fb2a151022ee222035b0c0e32bf891b9a7feb7b6283f55422d03a3b1e098f3",
+    "run": "mutations-01"
+  },
+  {
+    "mutant": "permutation-admission",
+    "status": "KILLED",
+    "executed": 6,
+    "failures": [
+      {
+        "test": "mixedPairsAreIndependentOfEntryOrder",
+        "type": "org.opentest4j.AssertionFailedError",
+        "message": "ORDER_DEPENDENT_ENTRY ==> expected: <ACCEPTED> but was: <UNSUPPORTED>"
+      },
+      {
+        "test": "allSixSimultaneousOrdersPreservePossibleSupport",
+        "type": "org.opentest4j.AssertionFailedError",
+        "message": "ORDER_DEPENDENT_ENTRY ==> expected: <ACCEPTED> but was: <UNSUPPORTED>"
+      },
+      {
+        "test": "externalUnknownOnTheSamePlaceIsNotAFakeStrongAssignment",
+        "type": "org.opentest4j.AssertionFailedError",
+        "message": "ORDER_DEPENDENT_ENTRY ==> expected: <ACCEPTED> but was: <UNSUPPORTED>"
+      },
+      {
+        "test": "h2StrongLiteralSurvivesOpenExternalEntryWithoutWrites",
+        "type": "org.opentest4j.AssertionFailedError",
+        "message": "ORDER_DEPENDENT_ENTRY ==> expected: <ACCEPTED> but was: <UNSUPPORTED>"
+      },
+      {
+        "test": "openExternalPairIsAdmittedAndRemainsUnknown",
+        "type": "org.opentest4j.AssertionFailedError",
+        "message": "ORDER_DEPENDENT_ENTRY ==> expected: <ACCEPTED> but was: <UNSUPPORTED>"
+      }
+    ],
+    "errors": [],
+    "restored_exit_code": 0,
+    "original_sha256": "f4fb2a151022ee222035b0c0e32bf891b9a7feb7b6283f55422d03a3b1e098f3",
+    "run": "mutations-01"
+  },
+  {
+    "mutant": "possible-plus-unknown-drop",
+    "status": "KILLED",
+    "executed": 6,
+    "failures": [
+      {
+        "test": "mixedPairsAreIndependentOfEntryOrder",
+        "type": "org.opentest4j.AssertionFailedError",
+        "message": "expected: <[TextValue[value=PROG0000]]> but was: <[]>"
+      },
+      {
+        "test": "allSixSimultaneousOrdersPreservePossibleSupport",
+        "type": "org.opentest4j.AssertionFailedError",
+        "message": "expected: <[TextValue[value=PROG0000]]> but was: <[]>"
+      },
+      {
+        "test": "externalUnknownOnTheSamePlaceIsNotAFakeStrongAssignment",
+        "type": "org.opentest4j.AssertionFailedError",
+        "message": "expected: <[TextValue[value=PROG0001]]> but was: <[]>"
+      },
+      {
+        "test": "h2StrongLiteralSurvivesOpenExternalEntryWithoutWrites",
+        "type": "org.opentest4j.AssertionFailedError",
+        "message": "expected: <[TextValue[value=PROG0002]]> but was: <[]>"
+      }
+    ],
+    "errors": [],
+    "restored_exit_code": 0,
+    "original_sha256": "330c0bf04a9a8489561a0bfb6c02ebb6ef4763692ae78cd84c648874f9792e70",
+    "run": "mutations-01"
+  },
+  {
+    "mutant": "may-becomes-kill",
+    "status": "KILLED",
+    "executed": 4,
+    "failures": [
+      {
+        "test": "unknownMayKeepsEntryCandidateAndItsOriginalSupport",
+        "type": "org.opentest4j.AssertionFailedError",
+        "message": "expected: <[PGM00001]> but was: <[]>"
+      }
+    ],
+    "errors": [],
+    "restored_exit_code": 0,
+    "original_sha256": "330c0bf04a9a8489561a0bfb6c02ebb6ef4763692ae78cd84c648874f9792e70",
+    "run": "mutations-01"
+  },
+  {
+    "mutant": "factorized-weak-drops-old",
+    "status": "KILLED",
+    "executed": 4,
+    "failures": [
+      {
+        "test": "missingAliasProofNeitherKillsNorCopiesTheOtherObjectsLiteral",
+        "type": "org.opentest4j.AssertionFailedError",
+        "message": "expected: <[PGM00001]> but was: <[]>"
+      },
+      {
+        "test": "unknownMayKeepsEntryCandidateAndItsOriginalSupport",
+        "type": "org.opentest4j.AssertionFailedError",
+        "message": "expected: <[PGM00001]> but was: <[]>"
+      }
+    ],
+    "errors": [],
+    "restored_exit_code": 0,
+    "original_sha256": "330c0bf04a9a8489561a0bfb6c02ebb6ef4763692ae78cd84c648874f9792e70",
+    "run": "mutations-01"
+  },
+  {
+    "mutant": "factorized-join-drops-candidate",
+    "status": "KILLED",
+    "executed": 8,
+    "failures": [
+      {
+        "test": "branchHalvesStayInTheirOriginalImage",
+        "type": "org.opentest4j.AssertionFailedError",
+        "message": "expected: <[AAAABBBB, CCCCDDDD]> but was: <[AAAABBBB]>"
+      },
+      {
+        "test": "jointStoreJoinLawsAndTransfersIncludeUnknownAndSupportOnlyChanges",
+        "type": "org.opentest4j.AssertionFailedError",
+        "message": "expected: <true> but was: <false>"
+      },
+      {
+        "test": "crossBasePartialCopyPreservesBranchPairs",
+        "type": "org.opentest4j.AssertionFailedError",
+        "message": "expected: <[CCCCAAAA, YYYYWWWW]> but was: <[CCCCAAAA]>"
+      },
+      {
+        "test": "overlappingCopyLoopHasExactlyTheFiniteConcreteImages",
+        "type": "org.opentest4j.AssertionFailedError",
+        "message": "expected: <[AAAAAAAA, AAAAAAAB, AAAAAABC, AAAAABCD, AAAABCDE, AAABCDEF, AABCDEFG, ABCDEFGH]> but was: <[ABCDEFGH]>"
+      }
+    ],
+    "errors": [],
+    "restored_exit_code": 0,
+    "original_sha256": "330c0bf04a9a8489561a0bfb6c02ebb6ef4763692ae78cd84c648874f9792e70",
+    "run": "mutations-01"
+  },
+  {
+    "mutant": "unknown-alias-becomes-disjoint",
+    "status": "KILLED",
+    "executed": 4,
+    "failures": [
+      {
+        "test": "missingAliasProofNeitherKillsNorCopiesTheOtherObjectsLiteral",
+        "type": "org.opentest4j.AssertionFailedError",
+        "message": "expected: <true> but was: <false>"
+      }
+    ],
+    "errors": [],
+    "restored_exit_code": 0,
+    "original_sha256": "d76f35b4b5e2cf03b43f6c981b3f1607e33e1f584ba494abf7ffcbee146e6a22",
+    "run": "mutations-02"
+  },
+  {
+    "mutant": "query-time-entry-reseed",
+    "status": "KILLED",
+    "executed": 4,
+    "failures": [
+      {
+        "test": "mustAndRepeatedQueriesCannotReseedEntryEvidence",
+        "type": "org.opentest4j.AssertionFailedError",
+        "message": "expected: <[OTHERPGM]> but was: <[OTHERPGM, PGM00001]>"
+      }
+    ],
+    "errors": [],
+    "restored_exit_code": 0,
+    "original_sha256": "330c0bf04a9a8489561a0bfb6c02ebb6ef4763692ae78cd84c648874f9792e70",
+    "run": "mutations-02"
+  },
+  {
+    "mutant": "must-cannot-kill",
+    "status": "KILLED",
+    "executed": 4,
+    "failures": [
+      {
+        "test": "mustAndRepeatedQueriesCannotReseedEntryEvidence",
+        "type": "org.opentest4j.AssertionFailedError",
+        "message": "expected: <[OTHERPGM]> but was: <[OTHERPGM, PGM00001]>"
+      }
+    ],
+    "errors": [],
+    "restored_exit_code": 0,
+    "original_sha256": "330c0bf04a9a8489561a0bfb6c02ebb6ef4763692ae78cd84c648874f9792e70",
+    "run": "mutations-02"
+  },
+  {
+    "mutant": "cartesian-unshared-suffixes",
+    "status": "KILLED",
+    "executed": 1,
+    "failures": [
+      {
+        "test": "connectedEntryFactorsGrowBySum",
+        "type": "org.opentest4j.AssertionFailedError",
+        "message": "G must store component alternatives, not complete worlds: P=1 ==> expected: <true> but was: <false>"
+      }
+    ],
+    "errors": [],
+    "restored_exit_code": 0,
+    "original_sha256": "96e9b44715e8cc80b1bbcd528efa15da8e61d76cea633f58296bdbeb4ef79eb1",
+    "run": "mutations-02"
+  }
+]

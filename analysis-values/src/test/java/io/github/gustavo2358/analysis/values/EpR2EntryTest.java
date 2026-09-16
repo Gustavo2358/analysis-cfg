@@ -61,4 +61,28 @@ class EpR2EntryTest {
         var result=AirValidator.validate(fixture(2,0,0,2,0,false,true,"control",true));
         assertEquals(ValidationResult.Status.INVALID_IR,result.status());assertTrue(result.issues().toString().contains("I-17"));
     }
+    @Test void externalUnknownOnTheSamePlaceIsNotAFakeStrongAssignment() {
+        var p=fixture(2,0,1,1,0,false,true,"control",false);var c=p.units().getFirst().entries().getFirst().state().conditions();
+        var open=c.getFirst();var place=(Places.ObjectPlace)open.place();
+        var same=new Entries.InitialCondition(new Places.ObjectPlace(place.header(),obj(1)),open.value(),open.origin(),open.premises());
+        for(var order:List.of(List.of(same,c.getLast()),List.of(c.getLast(),same))) {
+            var fact=at(analysis(conditions(p,order)).execute(),1);
+            assertEquals(List.of(new Values.TextValue("PROG0001")),fact.candidates());assertTrue(fact.modelValueRemainder());
+            assertFalse(fact.candidateSupports().getFirst().producers().isEmpty());
+        }
+    }
+    @Test void mixedPairsAreIndependentOfEntryOrder() {
+        for(int[] kinds:List.of(new int[]{0,2,0},new int[]{1,1,0},new int[]{2,0,0},new int[]{0,1,1})) {
+            var p=fixture(2,kinds[0],kinds[1],kinds[2],0,false,true,"control",false);
+            var c=p.units().getFirst().entries().getFirst().state().conditions();
+            var a=analysis(p).execute();var b=analysis(conditions(p,List.of(c.getLast(),c.getFirst()))).execute();
+            for(int i=0;i<2;i++) {
+                assertEquals(at(a,i),at(b,i));assertTrue(at(a,i).modelValueRemainder());
+                if(i<kinds[0]||i>=kinds[0]+kinds[1]) {
+                    assertEquals(List.of(new Values.TextValue(String.format(java.util.Locale.ROOT,"PROG%04d",i))),at(a,i).candidates());
+                    assertFalse(at(a,i).candidateSupports().getFirst().producers().isEmpty());
+                }
+            }
+        }
+    }
 }
