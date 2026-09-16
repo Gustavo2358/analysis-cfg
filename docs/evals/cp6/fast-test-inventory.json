@@ -231,6 +231,11 @@
       "foreignHiddenCellAndOutOfBoundsSubjectsAreExplicitlyUnsupported",
       "codecIsPartOfQueryIdentityAndDuplicateRequestsShareReplay",
       "queryCodecReferencesMustBelongToTheValidatedPublication"
+    ],
+    "io.github.gustavo2358.analysis.storage.KillAuthorityTest": [
+      "permitRequiresExecutionDestinationAndDirectTargetTogether",
+      "destinationRemainderAndIncompleteRepresentationForbidExclusion",
+      "genericUpdatesNeedAuthorityToForgetAndDoNotInventSupport"
     ]
   },
   "analysis-launcher": {
@@ -425,6 +430,12 @@
       "unknownBindingPreservesEntrySupportInBothAnalyses",
       "unprovedBindingNeverPromotesAssignmentToStrongKill",
       "genericUnknownEffectCannotClearLogicalEvidence"
+    ],
+    "io.github.gustavo2358.analysis.values.EvidencePreservingPolicyTest": [
+      "unknownMayKeepsEntryCandidateAndItsOriginalSupport",
+      "missingAliasProofNeitherKillsNorCopiesTheOtherObjectsLiteral",
+      "unknownBindingPreservesEvidenceWithoutInventingPhysicalRanges",
+      "mustAndRepeatedQueriesCannotReseedEntryEvidence"
     ]
   },
   "cfg-adapters": {

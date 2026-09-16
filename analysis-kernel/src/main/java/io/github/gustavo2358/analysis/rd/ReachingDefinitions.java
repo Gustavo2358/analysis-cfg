@@ -186,10 +186,11 @@ public final class ReachingDefinitions {
             if(!state.reached())return state;var root=state.bindings;var logical=new HashMap<>(state.logical);
             for(var plan:plans) {
                 var definition=event(state.entry,plan);
-                if(plan.logical!=null) {logical.merge(plan.logical.object(),Set.of(definition),this::union);continue;}
+                if(plan.logical!=null) {logical.merge(plan.logical.object(),Set.of(definition),KillAuthority::weakUpdate);continue;}
+                var authority=KillAuthority.exact(plan.write,plan.target,forceMay?KillAuthority.Execution.POSSIBLE:KillAuthority.Execution.REQUIRED);
                 for(var segment:plan.segments) {
                     var previous=root.get(segment.ordinal());if(previous==null)previous=Set.of(entryEvent(state.entry,segment));
-                    var next=!forceMay&&plan.target.strength()==StatementEffects.Strength.MUST?Set.of(definition):union(previous,Set.of(definition));
+                    var next=authority.isPresent()?KillAuthority.strongOverwrite(authority.get(),Set.of(definition)):union(previous,Set.of(definition));
                     var updated=root.put(segment.ordinal(),next);if(updated!=root)updates++;root=updated;
                 }
             }

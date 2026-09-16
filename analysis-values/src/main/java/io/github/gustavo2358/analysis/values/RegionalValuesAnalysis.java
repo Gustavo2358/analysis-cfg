@@ -248,7 +248,7 @@ public final class RegionalValuesAnalysis {
             var logical=new HashMap<>(before.logical);
             for(var plan:plans)if(plan.logical!=null&&plan.logical.sourceApplicable()) {
                 var supported=logicalReplacements(before,plan);
-                if(!supported.isEmpty())logical.merge(plan.logical.object(),supported,Engine::unionLogical);
+                if(!supported.isEmpty())logical.merge(plan.logical.object(),supported,KillAuthority::weakUpdate);
             }
             return root==before.bindings&&logical.equals(before.logical)?before:new State(before.entry,root,logical);
         }
@@ -281,10 +281,12 @@ public final class RegionalValuesAnalysis {
                 for(var plan:plans)current=weak(current,captured,plan,true);return current;
             }
             var next=new HashSet<Store>();
-            boolean outside=write.destination().candidates().stream().anyMatch(c->groupOf[ordinals.get(c.location().base().id())]!=group
-                ||c.location().range().filter(StorageRange::empty).isPresent());
-            if(forceMay||write.occurrenceStrength()==StatementEffects.Strength.MAY||!(write.destination().remainder() instanceof Scopes.NoMemory)||outside)next.addAll(current);
-            for(var plan:plans)if(plan.target.sourceApplicable())for(var old:current)next.addAll(replace(old,captured,plan));
+            var execution=forceMay?KillAuthority.Execution.POSSIBLE:KillAuthority.Execution.REQUIRED;
+            if(!KillAuthority.exhaustive(write,plans.stream().map(Plan::target).toList(),execution))next.addAll(current);
+            for(var plan:plans)if(plan.target.sourceApplicable())for(var old:current) {
+                var replacement=replace(old,captured,plan);var authority=KillAuthority.selected(write,plan.target,execution);
+                next.addAll(authority.isPresent()?KillAuthority.strongOverwrite(authority.get(),replacement):KillAuthority.weakUpdate(Set.of(old),replacement));
+            }
             // No direct destination in this factor: only conservative possible alias/scope impacts.
             if(next.isEmpty())next.addAll(current);
             current=Set.copyOf(next);

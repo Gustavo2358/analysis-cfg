@@ -22,9 +22,8 @@ final class ForeignEffectTransfer {
         if(!state.isReached())return state;
         var result=state;
         for(var location:affected) {
-            var previous=result.value(location.ordinal(),work);
             // May-write includes preservation. Retain each candidate and its own producers.
-            result=result.assign(location.ordinal(),previous.withOpen(work),work);
+            result=result.widenUnknown(location.ordinal(),work);
         }
         return result;
     }
