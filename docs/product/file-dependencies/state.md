@@ -53,7 +53,7 @@ O [baseline](baseline.md) contém os SHAs de entrada; o Git fornece os checkpoin
 | Aceitação W0? | [FD-W0](../../work/active/FD-W0.yaml), acceptance |
 | Comandos? | item → [verificação](verification.md), F-DECL/L-INPUT/B-SP |
 | Regressões? | CALL-X e tests/regressions do item; resolver FILE existente |
-| SELECT/ASSIGN/FD? | [matriz](coverage.md) N01–N10 e página local frontend |
+| SELECT/ASSIGN/FD? | [matriz](coverage.md) N01–N03/N05–N10 e página local frontend |
 | Decisões abertas? | [contratos](contracts.md#decisoes-abertas), dono e wave |
 | Preciso reler discovery para W0? | **Não**, salvo evidência histórica/detalhe adicional |
 

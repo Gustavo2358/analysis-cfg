@@ -20,7 +20,7 @@ read_first:
 - ../../product/file-dependencies/profiles.md
 - ../../product/file-dependencies/verification.md
 expected_product:
-- Tipar SELECT OPTIONAL, ASSIGN com variantes e original/interpretado, organização/acesso/keys/status; distinguir
+- Tipar SELECT OPTIONAL, ASSIGN do perfil N-LR com forma/original/interpretado, organização/acesso/keys/status; distinguir
   FD/SD
 - 'ASSIGN IBM: publicar external file name/sourceKind ASSIGNMENT_NAME conforme N-LR, sem inferir mecanismo DD/environment'
 - Publicar owner canônico, origens SELECT/FD/COPY, records e visibilidade; reutilizar SymbolTableBuilder.buildFileEntities
@@ -38,7 +38,7 @@ invariants:
 - Todos os invariantes do brief e guardrail COBOL_SOURCE_ONLY
 - Preservar CALL/evidência; literal não espera solver; mudanças normativas só bilaterais
 semantic_cases:
-- N01–N10 base declarativa; N11–N14 conservar cláusulas sem prometer efeitos
+- N01–N03/N05–N10 base declarativa; N11–N14 conservar cláusulas sem prometer efeitos
 - T01–T04/T15/T30/T46/T47; shadowing, COPY e declaração incompleta
 tests:
 - Oráculos independentes dos casos listados em test-catalog.md; positivos, negativos e adversariais antes do
