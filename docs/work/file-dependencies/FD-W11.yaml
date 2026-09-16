@@ -1,0 +1,65 @@
+id: FD-W11
+title: Qualificação transversal e handoff para revisão
+status: TODO
+scope:
+- file-dependencies
+- analysis-cfg
+- artefatos-e2e
+- repos produtores com remediações comprovadas
+objective: Qualificação transversal e handoff para revisão
+motivation: Fechar a campanha exige evidência transversal de semântica, wire, CALL e custo nos mesmos pins.
+repos:
+- analysis-cfg
+- artefatos-e2e
+- repos produtores com remediações comprovadas
+preconditions:
+- W0–W10 qualificadas no escopo obrigatório
+- D-AIR/D-WIRE/D-EFFECT/D-DYNAMIC/D-D-AUTH fechadas; pins finais imutáveis
+read_first:
+- ../../product/file-dependencies/brief.md
+- ../../product/file-dependencies/contracts.md
+- ../../product/file-dependencies/verification.md
+expected_product:
+- Matriz N/C/D com evidência por linha, sem PLANNED/BLOCKED obrigatório oculto
+- E2E por CLIs, corpus fixado, reader novo/legado/projeção CALL, adversariais/metamórficos/mutantes focais
+- Métricas de escala (arquivos/usos/layouts/candidatos/unidades/SORT), tempo/memória por etapa e comparação
+  CALL; handoff
+allowed_changes:
+- Tests/oracles/docs e correções mínimas de bugs demonstrados em repositórios próprios
+- Repins necessários com prova e gates proporcionais
+forbidden_changes:
+- Merge/auto-merge, pacote/release sem autorização, apagar falhas/outputs
+- Declarar completude por parser/crash-free/contagem ou cutoff; DSNAME como gap
+invariants:
+- Todos os invariantes do brief e guardrail COBOL_SOURCE_ONLY
+- Preservar CALL/evidência; literal não espera solver; mudanças normativas só bilaterais
+semantic_cases:
+- Todo catálogo obrigatório; scope guards e CALL-X1–X6
+- T51–T54, MR1–MR9 e mutantes focais; corpus com verdade de referência
+tests:
+- Oráculos independentes dos casos listados em test-catalog.md; positivos, negativos e adversariais antes do
+  código
+- Todo CALL/program-control existente pertinente
+- scope guards
+- corpus CALL+FILE
+regressions:
+- Todo CALL/program-control existente pertinente
+- scope guards
+- corpus CALL+FILE
+commands_and_gates:
+- 'B-SP: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'B-AIR: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'B-WIRE: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'E-SELECTED: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'Q-SHARED: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'E-FINAL: comando e escopo em ../../product/file-dependencies/verification.md'
+- python3 -B scripts/harness/lean.py fast — uma vez por repo produtivo estabilizado, após focais
+acceptance:
+- Nenhuma regressão CALL inexplicada; candidates/supports/reaminders/alcance e provenance comparados
+- Todas as fronteiras qualificadas nos pins finais; JSON correto e determinístico; erro de entrega preservado
+- Limites reais/fora de perfil explícitos; ausência DSNAME nunca parcial; custos medidos sem inventar SLA
+- PRs persistentes em Draft para revisão final; DONE lean somente após merge autorizado e testes requeridos
+evidence:
+- Commit/pin exatos por fronteira; comandos/exit/results reais, testes novos vs REUSED vs NOT_RUN
+- Atualizar matriz somente com oracle/resultado; estado curto e PR persistente por repo, sem receipt obrigatório
+stop_condition: 'STOP: revisão humana final. Não fazer merge/auto-merge/repin pós-merge sem autorização.'

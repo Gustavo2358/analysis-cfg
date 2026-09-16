@@ -1,0 +1,67 @@
+id: FD-W0
+title: Declarações, conectores e record ownership no SP
+status: TODO
+scope:
+- file-dependencies
+- proleap-poc
+- cobol-lower
+objective: Declarações, conectores e record ownership no SP
+motivation: ASSIGN textual e FD/SD indistintos impedem contrato de arquivo; associação nominal SELECT/FD já
+  existe e deve ser reutilizada.
+repos:
+- proleap-poc
+- cobol-lower
+preconditions:
+- H4 revisado e execução W0 autorizada
+- Perfil N-LR; resolução FILE existente e source lock H0 reconciliados
+read_first:
+- ../../product/file-dependencies/brief.md
+- ../../product/file-dependencies/contracts.md
+- ../../product/file-dependencies/verification.md
+expected_product:
+- Tipar SELECT OPTIONAL, ASSIGN com variantes e original/interpretado, organização/acesso/keys/status; distinguir
+  FD/SD
+- Publicar owner canônico, origens SELECT/FD/COPY, records e visibilidade; reutilizar SymbolTableBuilder.buildFileEntities
+  e resolução
+- Evoluir inventários SP/writer/integrity e SpInput/SpJsonDecoder/admission em conjunto, com versão corrente
+  explícita
+allowed_changes:
+- AST/semântica canônica/SP e testes frontend
+- Modelo de entrada, decoder/admission/testes/lock SP no lower após prova bilateral
+forbidden_changes:
+- Produzir invokes/resources AIR ou resultado FILE
+- Modificar AIR/CFG, calcular nomes dinâmicos, resolver arquivos por regex ou implementar waves W1+
+invariants:
+- Todos os invariantes do brief e guardrail COBOL_SOURCE_ONLY
+- Preservar CALL/evidência; literal não espera solver; mudanças normativas só bilaterais
+semantic_cases:
+- N01–N10 base declarativa; N11–N14 conservar cláusulas sem prometer efeitos
+- T01–T04/T15/T30/T46/T47; shadowing, COPY e declaração incompleta
+tests:
+- Oráculos independentes dos casos listados em test-catalog.md; positivos, negativos e adversariais antes do
+  código
+- ProcedureFileProgramReferenceResolverTest
+- SemanticProductIntegrityValidatorTest
+- SemanticProductStatementInventoryTest
+- SemanticProductMoveCallContractTest
+regressions:
+- ProcedureFileProgramReferenceResolverTest
+- SemanticProductIntegrityValidatorTest
+- SemanticProductStatementInventoryTest
+- SemanticProductMoveCallContractTest
+commands_and_gates:
+- 'F-DECL: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'L-INPUT: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'B-SP: comando e escopo em ../../product/file-dependencies/verification.md'
+- python3 -B scripts/harness/lean.py fast — uma vez por repo produtivo estabilizado, após focais
+acceptance:
+- Um SELECT e FD correspondentes = um conector com duas origens
+- FD/SD distinguíveis; cada record tem owner ou ambiguidade/gap explícito; WRITE nominal aponta ao owner sem
+  implementar execução
+- Declaração sem uso produz inventário, nunca leitura; writer→decoder conserva known empty versus unavailable
+- Contrato SP novo rejeita versão/formas superseded conforme política; frontend não importa lower
+evidence:
+- Commit/pin exatos por fronteira; comandos/exit/results reais, testes novos vs REUSED vs NOT_RUN
+- Atualizar matriz somente com oracle/resultado; estado curto e PR persistente por repo, sem receipt obrigatório
+stop_condition: Parar após contrato declarativo SP e decoder qualificados, diff/pins/limites e revisão da wave;
+  não iniciar W1.

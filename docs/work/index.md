@@ -35,3 +35,5 @@ CP5 = APPROVED / MERGED / CLOSED. The verified frozen component authorities are 
 NEXT: **HUMAN PRIORITIZATION USING FULL CARDDEMO BASELINE**. O corpus fornece evidência consultiva; não seleciona nem determina a próxima capability. [Baseline](../evals/cp6/carddemo-full-baseline.md).
 
 [WORK-FD-HARNESS](active/WORK-FD-HARNESS.json): IN_PROGRESS; preparação para revisão, sem merge.
+
+[FD-W0–W11 — itens TODO e dependências](../product/file-dependencies/waves.md): execução futura após revisão H4.

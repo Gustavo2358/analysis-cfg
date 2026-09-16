@@ -1,0 +1,65 @@
+id: FD-W4
+title: Condições locais, FILE STATUS e DECLARATIVES
+status: TODO
+scope:
+- file-dependencies
+- proleap-poc
+- cobol-lower
+- analysis-cfg (se representação de controle exigir)
+objective: Condições locais, FILE STATUS e DECLARATIVES
+motivation: Handlers invisíveis ou executados na entrada perdem dependências e falseiam possible-values.
+repos:
+- proleap-poc
+- cobol-lower
+- analysis-cfg (se representação de controle exigir)
+preconditions:
+- W3 efeitos/outcomes qualificados
+- Confirmar seleção/precedência/retorno USE na autoridade N-LR
+read_first:
+- ../../product/file-dependencies/brief.md
+- ../../product/file-dependencies/contracts.md
+- ../../product/file-dependencies/verification.md
+expected_product:
+- AT END/NOT AT END/INVALID KEY/NOT INVALID KEY/EOP, END-* e período nas formas admitidas
+- USE por arquivo/modo/evento com associação, disparo e continuação; status visível no ponto correto
+- CALL e I/O dentro de handlers; saídas não triviais conservadas ou gap localizado
+allowed_changes:
+- Facts/controle/assembler e representação geral existente
+- Outcome especializado só se norma/interpreter/negociação e testes comprovarem necessidade
+forbidden_changes:
+- Normal AIR = status 00, EOP = EOF, declaratives como prefixo incondicional
+- Suprimir handler porque não há PERFORM ou inventar fallthrough
+invariants:
+- Todos os invariantes do brief e guardrail COBOL_SOURCE_ONLY
+- Preservar CALL/evidência; literal não espera solver; mudanças normativas só bilaterais
+semantic_cases:
+- N07/N13/N31–N33; T10–T13/T21/T22; O1–O5
+- Success, EOF, invalid key, outro erro e outcome aberto; USE explícito vs por modo
+tests:
+- Oráculos independentes dos casos listados em test-catalog.md; positivos, negativos e adversariais antes do
+  código
+- CALL-X2
+- CALL-X5
+- controle PERFORM/GO TO/CICS existente
+regressions:
+- CALL-X2
+- CALL-X5
+- controle PERFORM/GO TO/CICS existente
+commands_and_gates:
+- 'F-DECL: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'L-INPUT: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'C-VALUES: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'C-DEP: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'B-AIR: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'E-SELECTED: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'Q-SHARED: comando e escopo em ../../product/file-dependencies/verification.md'
+- python3 -B scripts/harness/lean.py fast — uma vez por repo produtivo estabilizado, após focais
+acceptance:
+- Cinco AIRs manuais produzem sucessores/efeitos esperados sem tags ignoradas
+- CALL em handler tem site/owner/proveniência e alcance compatível; não roda incondicionalmente
+- Status observado por IF/EVALUATE produz candidatos/unknown conservadores, sem duplicar statements
+evidence:
+- Commit/pin exatos por fronteira; comandos/exit/results reais, testes novos vs REUSED vs NOT_RUN
+- Atualizar matriz somente com oracle/resultado; estado curto e PR persistente por repo, sem receipt obrigatório
+stop_condition: Parar ao qualificar handler/retorno do perfil; falta de autoridade para regra USE exige bloqueio
+  focal.

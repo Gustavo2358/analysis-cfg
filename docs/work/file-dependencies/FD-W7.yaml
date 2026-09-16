@@ -1,0 +1,66 @@
+id: FD-W7
+title: Nomes dinâmicos e vida de conexão
+status: TODO
+scope:
+- file-dependencies
+- proleap-poc
+- cobol-lower
+- analysis-cfg
+objective: Nomes dinâmicos e vida de conexão
+motivation: Resolver variável no READ pode trocar o alvo da conexão; reutilizar possible-values no ponto semântico
+  correto.
+repos:
+- proleap-poc
+- cobol-lower
+- analysis-cfg
+preconditions:
+- W1 ComputedTarget/inventário
+- W3–W4 efeitos e controle
+- D-DYNAMIC e revisão D-GC32 de ASSIGN fechadas
+read_first:
+- ../../product/file-dependencies/brief.md
+- ../../product/file-dependencies/contracts.md
+- ../../product/file-dependencies/verification.md
+expected_product:
+- Queries com MOVE, branches/joins/ciclos, aliases/refmod e supports individuais
+- Captura no OPEN, CLOSE/reabertura e aberturas alternativas pelo storage geral
+- 'Quatro estados: literal, conjunto fechado, conjunto parcial + remainder e desconhecido; política de nomes
+  por namespace'
+allowed_changes:
+- Typed assignment/profile, estado sintético explícito lower, providers gerais/consumer
+- A5 executável e métricas de sharing de queries
+forbidden_changes:
+- Consultar environment/JCL/filesystem; IBM assignment-name tratado como data item
+- Segundo solver para arquivos, cutoff de candidatos ou resolução no serializer
+invariants:
+- Todos os invariantes do brief e guardrail COBOL_SOURCE_ONLY
+- Preservar CALL/evidência; literal não espera solver; mudanças normativas só bilaterais
+semantic_cases:
+- N04/D01; T31–T35/A5
+- a→OPEN→b→READ→CLOSE→OPEN; entrada desconhecida; conjuntos por branches
+tests:
+- Oráculos independentes dos casos listados em test-catalog.md; positivos, negativos e adversariais antes do
+  código
+- CALL-X3/X5
+- literal zero-values
+- CICS timing existente
+regressions:
+- CALL-X3/X5
+- literal zero-values
+- CICS timing existente
+commands_and_gates:
+- 'C-VALUES: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'C-DEP: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'L-INPUT: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'B-AIR: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'E-SELECTED: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'Q-SHARED: comando e escopo em ../../product/file-dependencies/verification.md'
+- python3 -B scripts/harness/lean.py fast — uma vez por repo produtivo estabilizado, após focais
+acceptance:
+- Primeiro READ permanece a; reabertura b; joins preservam todos os candidatos/unknown
+- Closed set nunca é inferido de truncamento; casos estáticos têm zero execução de values
+- Path literal conserva semântica de perfil/case/espaços sem normalização da máquina
+evidence:
+- Commit/pin exatos por fronteira; comandos/exit/results reais, testes novos vs REUSED vs NOT_RUN
+- Atualizar matriz somente com oracle/resultado; estado curto e PR persistente por repo, sem receipt obrigatório
+stop_condition: Parar após captura/query/unknown qualificados; handles de biblioteca ficam para W10.

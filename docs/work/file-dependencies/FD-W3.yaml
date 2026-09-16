@@ -1,0 +1,69 @@
+id: FD-W3
+title: Efeitos de I/O, storage e preservação de CALL
+status: TODO
+scope:
+- file-dependencies
+- proleap-poc
+- cobol-lower
+- analysis-cfg (effects/values se necessário)
+objective: Efeitos de I/O, storage e preservação de CALL
+motivation: READ altera memória consultada por CALL; kill global e singleton antigo são ambos incorretos.
+repos:
+- proleap-poc
+- cobol-lower
+- analysis-cfg (effects/values se necessário)
+preconditions:
+- W2 operandos completos
+- Fechar D-EFFECT por autoridade N-LR e perfil storage
+read_first:
+- ../../product/file-dependencies/brief.md
+- ../../product/file-dependencies/contracts.md
+- ../../product/file-dependencies/verification.md
+expected_product:
+- Integrar buffers FD/SD, layouts/aliases/REDEFINES/RENAMES e intervalos variáveis no storage geral
+- Modelar READ INTO e WRITE/REWRITE FROM por ordem/outcome, status/keys/contadores e valores desconhecidos
+  tipados
+- Oráculos O1–O5 de effects em AIR manual e CALL antes/depois, disjunto/alias/MAY/MUST/UNKNOWN
+allowed_changes:
+- Storage/efeitos frontend e tradução regional lower; núcleo geral só por gap concreto
+- Testes concretos enumeráveis, metamórficos e E2E focal CALL+FILE
+forbidden_changes:
+- MUST inferido pelo verbo, strong kill de cauda não provada, kill global
+- Reescrever expected CALL para igualar produção sem prova semântica
+invariants:
+- Todos os invariantes do brief e guardrail COBOL_SOURCE_ONLY
+- Preservar CALL/evidência; literal não espera solver; mudanças normativas só bilaterais
+semantic_cases:
+- N07/N09/N11/N13/N15 memória; T12–T20; O1–O5
+- READ bem-sucedido/EOF; INTO indexado por campo afetado; FROM alias; branches sobre status
+tests:
+- Oráculos independentes dos casos listados em test-catalog.md; positivos, negativos e adversariais antes do
+  código
+- T18–T20
+- CALL-X1–X6
+- RegionalConcreteOracleTest
+- EvidencePreservingPolicyTest
+regressions:
+- T18–T20
+- CALL-X1–X6
+- RegionalConcreteOracleTest
+- EvidencePreservingPolicyTest
+commands_and_gates:
+- 'F-STORAGE: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'L-INPUT: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'C-VALUES: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'C-DEP: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'B-AIR: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'E-SELECTED: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'Q-SHARED: comando e escopo em ../../product/file-dependencies/verification.md'
+- python3 -B scripts/harness/lean.py fast — uma vez por repo produtivo estabilizado, após focais
+acceptance:
+- CALL em buffer sobrescrito não conserva singleton exato sem suporte; variável disjunta conserva evidência
+- MAY/UNKNOWN abrem possibilidades, MUST afeta somente bytes provados no outcome correto
+- Layouts compartilham área quando provado; alias não funde dependências; FROM não cria I/O de outro arquivo
+- Oráculo independente enumera valores/intervalos; regressão CALL+FILE e qualification-local pertinentes passam
+evidence:
+- Commit/pin exatos por fronteira; comandos/exit/results reais, testes novos vs REUSED vs NOT_RUN
+- Atualizar matriz somente com oracle/resultado; estado curto e PR persistente por repo, sem receipt obrigatório
+stop_condition: Parar após efeitos e regressões qualificados; dúvida sobre validade de buffer bloqueia a regra,
+  não vira MUST.

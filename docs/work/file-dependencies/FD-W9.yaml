@@ -1,0 +1,65 @@
+id: FD-W9
+title: Escopos, unidades contidas e bindings source-level
+status: TODO
+scope:
+- file-dependencies
+- proleap-poc
+- cobol-lower
+- analysis-cfg
+objective: Escopos, unidades contidas e bindings source-level
+motivation: Lower atual seleciona uma unidade; conjunto de arquivos de source inteiro não pode ser alegado
+  por PRIMARY_ONLY.
+repos:
+- proleap-poc
+- cobol-lower
+- analysis-cfg
+preconditions:
+- W0 owners/visibilidade
+- W1 associação AIR
+- W5–W8 pertinentes para integração de famílias
+read_first:
+- ../../product/file-dependencies/brief.md
+- ../../product/file-dependencies/contracts.md
+- ../../product/file-dependencies/verification.md
+expected_product:
+- Completar GLOBAL/EXTERNAL, qualificação/ambiguidade e shadowing usando resolver canônico
+- Compor análises por unidade com captures/declarações visíveis publicados pelo frontend e agregação explícita
+- COPY repetido/REPLACING, mesmo logical name e DD em contextos distintos, unidades com análise parcial
+allowed_changes:
+- Exportação/seleção por unidade, captura e agregação mantendo fronteiras
+- Alterar estratégia somente por contraexemplo documentado ao desenho aprovado
+forbidden_changes:
+- Fusão por grafia, atribuir tudo ao pai, varrer COBOL no motor
+- Assumir sharing EXTERNAL por nome sem prova ou exigir interproceduralidade universal
+invariants:
+- Todos os invariantes do brief e guardrail COBOL_SOURCE_ONLY
+- Preservar CALL/evidência; literal não espera solver; mudanças normativas só bilaterais
+semantic_cases:
+- N10; T04/T46/T47/T48; GLOBAL/EXTERNAL positivo/negativo
+- Pai/filho e irmãos homônimos; alias de memória separado de identidade FILE
+tests:
+- Oráculos independentes dos casos listados em test-catalog.md; positivos, negativos e adversariais antes do
+  código
+- CALL em programas contidos
+- GLOBAL/shadowing existente
+- storage por scope
+regressions:
+- CALL em programas contidos
+- GLOBAL/shadowing existente
+- storage por scope
+commands_and_gates:
+- 'F-DECL: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'L-INPUT: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'C-DEP: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'B-SP: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'B-AIR: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'E-SELECTED: comando e escopo em ../../product/file-dependencies/verification.md'
+- python3 -B scripts/harness/lean.py fast — uma vez por repo produtivo estabilizado, após focais
+acceptance:
+- Cada uso conserva owner correto e não cria dependência transitiva de CALL
+- PRIMARY_ONLY tem inventário limitado explícito; composição completa só se todas as unidades cobertas
+- Declarações/captures/records fecham refs, ambiguidades localizadas; inputs unitários continuam válidos
+evidence:
+- Commit/pin exatos por fronteira; comandos/exit/results reais, testes novos vs REUSED vs NOT_RUN
+- Atualizar matriz somente com oracle/resultado; estado curto e PR persistente por repo, sem receipt obrigatório
+stop_condition: Parar após qualificação de escopo e agregação; wrappers interprograma permanecem fora do perfil.
