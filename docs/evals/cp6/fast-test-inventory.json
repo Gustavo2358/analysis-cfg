@@ -116,6 +116,26 @@
     ],
     "io.github.gustavo2358.analysis.adapters.CicsTargetTimingTest": [
       "nameAndSupportsAreObservedBeforeForeignEffects"
+    ],
+    "io.github.gustavo2358.analysis.adapters.LogicalEntryWireTest": [
+      "sourcePossibilityRoundtripsWithoutPhysicalStorage"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PartialDependencyTest": [
+      "unsupportedComputedPreparationDoesNotDiscardIndependentLiteral",
+      "unmodeledControlCannotEraseAnInventoriedLiteralOccurrence",
+      "partialSchemaPreservesFactsReasonsAndExactWireForIndependentReader",
+      "structurallyInvalidReferenceStillRejectsTheWholePublication"
+    ],
+    "io.github.gustavo2358.analysis.adapters.EvidenceMonotonicityTest": [
+      "addingUnknownEffectCannotEraseIndependentBeforeValue",
+      "addingUnmodeledOutcomeCannotEraseBeforeSupport",
+      "addingUnknownDeclarationCannotEraseIndependentAssignedTarget",
+      "unrelatedUnavailableUnitCannotEraseIndependentComputedAndLiteralSites",
+      "unprovedCodecWriteCannotEraseIndependentBeforeCandidate",
+      "unprovedOwnOverwriteIsWeakButLaterProvenMustStillKills"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PartialProjectionLawTest": [
+      "unknownControlUsesSameSnapshotSolverAndBeforeEvidenceWithoutEntryBackedge"
     ]
   },
   "analysis-dataflow": {
@@ -228,6 +248,11 @@
       "foreignHiddenCellAndOutOfBoundsSubjectsAreExplicitlyUnsupported",
       "codecIsPartOfQueryIdentityAndDuplicateRequestsShareReplay",
       "queryCodecReferencesMustBelongToTheValidatedPublication"
+    ],
+    "io.github.gustavo2358.analysis.storage.KillAuthorityTest": [
+      "permitRequiresExecutionDestinationAndDirectTargetTogether",
+      "destinationRemainderAndIncompleteRepresentationForbidExclusion",
+      "genericUpdatesNeedAuthorityToForgetAndDoNotInventSupport"
     ]
   },
   "analysis-launcher": {
@@ -241,7 +266,8 @@
       "successReplacesExistingFileAndMatchesMemoryExactly",
       "inputAndOutputFailuresPreserveDestinationAndCleanupTemporaryFile",
       "realCodecOperationalLimitIsSevenAndProducesNoPartialResult",
-      "cfgAndAnalysisUnsupportedHaveDifferentExitsAndNoPartialOutput"
+      "semanticLimitsPublishExplicitPartialOutputWithoutExitFive",
+      "scopedPreconditionSurvivesRealCodecCliAndStructuralInvalidityStillRejects"
     ],
     "io.github.gustavo2358.analysis.launcher.RegionalCliTest": [
       "missingInputAndBadQueryNeverReplaceOutput",
@@ -255,6 +281,9 @@
     ],
     "io.github.gustavo2358.analysis.launcher.PhysicalChoiceTargetTest": [
       "physicalAlternativesSurviveMemoryAndCliWithoutResurrectingMustValues"
+    ],
+    "io.github.gustavo2358.analysis.launcher.LogicalChoiceTargetTest": [
+      "equivalentFormsAndMixedAlternativesRetainLogicalSupportInMemoryAndCli"
     ]
   },
   "analysis-values": {
@@ -417,6 +446,33 @@
     ],
     "io.github.gustavo2358.analysis.values.MixedStorageTest": [
       "unknownRegionAndCodecRetainInventoryAndInterfereOnlyWithoutSeparationProof"
+    ],
+    "io.github.gustavo2358.analysis.values.EvidencePreservingEntryTest": [
+      "unknownBindingPreservesEntrySupportInBothAnalyses",
+      "unprovedBindingNeverPromotesAssignmentToStrongKill",
+      "genericUnknownEffectCannotClearLogicalEvidence",
+      "logicalSourceCopiesIntoKnownStorageAndLaterMustStillKillsIt"
+    ],
+    "io.github.gustavo2358.analysis.values.EvidencePreservingPolicyTest": [
+      "unknownMayKeepsEntryCandidateAndItsOriginalSupport",
+      "missingAliasProofNeitherKillsNorCopiesTheOtherObjectsLiteral",
+      "unknownBindingPreservesEvidenceWithoutInventingPhysicalRanges",
+      "mustAndRepeatedQueriesCannotReseedEntryEvidence"
+    ],
+    "io.github.gustavo2358.analysis.values.EntryCoexistenceTest": [
+      "preserveAndExternalUnknownCannotErasePossibleSupportInEitherOrder",
+      "multiplePossibleContributionsUnionTheirOwnSupportInEitherOrder",
+      "unprovedSeparationBetweenPossibleEntriesDoesNotRejectEitherObject",
+      "scalarAndRegionalCoexistenceAgreeWithoutOrderBasedKill"
+    ],
+    "io.github.gustavo2358.analysis.values.LogicalPlaceRepresentationTest": [
+      "objectOccurrenceValues",
+      "choiceOccurrenceValues",
+      "objectOccurrenceDefinitions",
+      "choiceOccurrenceDefinitions",
+      "mixedChoiceReadsCurrentLogicalAndPhysicalAlternativesThenMustKillsCopy",
+      "choiceCopyIntoLogicalDestinationUsesCurrentSupportAndWeakUpdates",
+      "explicitIdentityDoesNotFollowAliasBindingsOrRegionAddressOperands"
     ]
   },
   "cfg-adapters": {
@@ -447,6 +503,7 @@
       "onlyProjectedDomainSelectsVersionAndWriterHasNoStickyState"
     ],
     "io.github.gustavo2358.analysis.cfg.adapters.WriterDomainTest": [
+      "partialAnalysisRequiresExplicitPartialResultWire",
       "memoryAndFileHaveEquivalentControlCoverageWire",
       "writerCoversEveryCurrentKindWithExactContextualTransitions",
       "utf8EscapingAndByteLimitAreExact",

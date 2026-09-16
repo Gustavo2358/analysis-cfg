@@ -7,7 +7,7 @@ from check_architecture import GateFailure
 from check_w1 import command
 
 PREFIX='io.github.gustavo2358.analysis.storage.'
-NAMES=('StorageRange','StorageSubject','StorageIndex','StatementEffects','StoragePartition','SegmentMap')
+NAMES=('StorageRange','StorageSubject','StorageIndex','StatementEffects','StoragePartition','SegmentMap','KillAuthority')
 STORAGE_SOURCES={f'analysis-kernel/src/main/java/io/github/gustavo2358/analysis/storage/{name}.java' for name in NAMES}
 RD_PREFIX='io.github.gustavo2358.analysis.rd.'
 RD_NAMES=('DefinitionEvent','DefinitionFact','ReachingDefinitions')

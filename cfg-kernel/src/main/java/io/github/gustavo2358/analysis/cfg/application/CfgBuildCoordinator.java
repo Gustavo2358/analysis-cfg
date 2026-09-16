@@ -47,6 +47,8 @@ public final class CfgBuildCoordinator implements BuildCfg {
                 .sorted(CAPABILITY_ORDER)
                 .toList();
 
+        boolean partialPreconditions=options.projectionPolicy()==io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy.PARTIAL_ANALYSIS
+            && preflight.unprovedOperationPreconditions().isPresent();
         CfgBuildResult.Status status;
         List<CfgProjectionIssue> issues = List.of();
         Optional<CfgGraph> graph = Optional.empty();
@@ -54,16 +56,16 @@ public final class CfgBuildCoordinator implements BuildCfg {
             status = CfgBuildResult.Status.INVALID_IR;
         } else if (has(preflight, ValidationIssue.Kind.RESOURCE_LIMIT)) {
             status = CfgBuildResult.Status.RESOURCE_LIMIT;
-        } else if (has(preflight, ValidationIssue.Kind.VALIDATION_LIMIT)) {
+        } else if (has(preflight, ValidationIssue.Kind.VALIDATION_LIMIT) && !partialPreconditions) {
             status = CfgBuildResult.Status.VALIDATION_LIMIT;
         } else if (has(preflight, ValidationIssue.Kind.UNSUPPORTED_CAPABILITY) || !unsupported.isEmpty()) {
             status = CfgBuildResult.Status.UNSUPPORTED_CAPABILITY;
-        } else if (preflight.status() == ValidationResult.Status.INCOMPLETE_VALIDATION) {
+        } else if (preflight.status() == ValidationResult.Status.INCOMPLETE_VALIDATION && !partialPreconditions) {
             status = CfgBuildResult.Status.INCOMPLETE_VALIDATION;
         } else {
             issues = CoreCfgProjection.unsupported(publication, options.projectionPolicy());
             if (issues.isEmpty()) {
-                graph = Optional.of(CoreCfgProjection.project(publication));
+                graph = Optional.of(CoreCfgProjection.project(publication, options.projectionPolicy()));
                 status = CfgBuildResult.Status.CFG_BUILT;
             } else {
                 status = CfgBuildResult.Status.UNSUPPORTED_INPUT;

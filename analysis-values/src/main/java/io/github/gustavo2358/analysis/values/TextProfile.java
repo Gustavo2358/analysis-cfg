@@ -3,6 +3,7 @@ package io.github.gustavo2358.analysis.values;
 import io.github.gustavo2358.air.model.*;
 import io.github.gustavo2358.air.model.Ids.*;
 import io.github.gustavo2358.analysis.structure.*;
+import io.github.gustavo2358.analysis.storage.KillAuthority;
 import java.util.*;
 
 /** Admission/preparation for scalar-text-direct@1. No effect is inferred from operation spelling. */
@@ -15,6 +16,7 @@ final class TextProfile {
     final Map<ObjectId,Location> subjects=new HashMap<>();
     private final Set<ObjectId> textSubjects=new HashSet<>();
     final IdentityHashMap<Operation,Write> writes=new IdentityHashMap<>();
+    private final IdentityHashMap<Operation,KillAuthority.Permit> overwrites=new IdentityHashMap<>();
     private final IdentityHashMap<Operation,ForeignEffectTransfer> effects=new IdentityHashMap<>();
     private final IdentityHashMap<Operation,ConservativeEffectTransfer> conservative=new IdentityHashMap<>();
     private final boolean effectAware;
@@ -67,31 +69,28 @@ final class TextProfile {
         }
         for(var context:session.contexts()) {
             if(!context.entry().state().uncertainties().isEmpty())sourceOpenEntries.add(context.entry().id());
-            var seed=PossibleValuesState.reached();var initial=new HashMap<Integer,Entries.InitialValue>();
-            for(var condition:context.entry().state().conditions()) {
+            var seed=PossibleValuesState.reached();var initial=new HashMap<Integer,Values.TextValue>();var initialized=new HashSet<Integer>();
+            for(var condition:context.entry().state().conditions().stream().sorted(Comparator.comparingInt(c->c.value() instanceof Entries.LiteralInitial?0:1)).toList()) {
                 if(!(condition.place() instanceof Places.ObjectPlace object))throw new Refusal(false,"UNSUPPORTED_INITIAL_PLACE");
                 var location=subjects.get(object.object());
                 if(location==null)throw new Refusal(false,"UNSUPPORTED_INITIAL_STORAGE");
-                var previous=initial.putIfAbsent(location.ordinal(),condition.value());
-                if(previous!=null&&!previous.equals(condition.value())) {
-                    if(previous instanceof Entries.LiteralInitial a&&condition.value() instanceof Entries.LiteralInitial b) {
-                        if(!a.value().value().equals(b.value().value()))throw new Refusal(true,"CONTRADICTORY_INITIAL_VALUES");
-                    } else throw new Refusal(false,"UNSUPPORTED_OVERLAPPING_INITIAL_CONDITIONS");
-                }
                 if(condition.value() instanceof Entries.LiteralInitial literal) {
                     if(!(literal.value().value() instanceof Values.TextValue text))throw new Refusal(false,"UNSUPPORTED_INITIAL_VALUE");
+                    var previous=initial.putIfAbsent(location.ordinal(),text);
+                    if(previous!=null&&!previous.equals(text))throw new Refusal(true,"CONTRADICTORY_INITIAL_VALUES");
                     var value=universe.supported(text,condition.place().header().id(),condition.origin(),condition.premises(),preparation);
-                    // Conditions are simultaneous; equal literals on one Cell retain both supports.
-                    if(previous!=null)value=seed.value(location.ordinal(),preparation).join(value,preparation);
-                    seed=seed.assign(location.ordinal(),value,preparation);
+                    // Simultaneous support is unioned; only the first strong fact can
+                    // replace unspecified default content at the invocation boundary.
+                    if(!initialized.add(location.ordinal()))value=seed.value(location.ordinal(),preparation).join(value,preparation);
+                    seed=seed.initialize(location.ordinal(),value,preparation);
                 } else if(condition.value() instanceof Entries.PossibleLiterals possible) {
                     var value=Candidates.UNKNOWN;
                     for(var literal:possible.candidates()) {
                         if(!(literal.value() instanceof Values.TextValue text))throw new Refusal(false,"UNSUPPORTED_INITIAL_VALUE");
                         value=value.join(universe.supported(text,literal.header().id(),condition.origin(),condition.premises(),preparation),preparation);
                     }
-                    seed=seed.assign(location.ordinal(),value,preparation);
-                }
+                    seed=seed.weakUpdate(location.ordinal(),value,preparation);initialized.add(location.ordinal());
+                } else seed=seed.widenUnknown(location.ordinal(),preparation);
             }
             boundaries.put(context,seed);
         }
@@ -122,6 +121,8 @@ final class TextProfile {
             effects.put(operation,ForeignEffectTransfer.prepare(invoke.effectBound(),modeledCells));
         } else if(!(operation instanceof Operations.Nop||operation instanceof Operations.Return||operation instanceof Operations.Jump||operation instanceof Operations.Branch||operation instanceof Operations.Halt))
             throw new Refusal(false,"UNSUPPORTED_EFFECT_PROFILE");
+        var write=writes.get(operation);
+        if(write!=null)overwrites.put(operation,KillAuthority.exactCell(session,operation,write.location().cell()).orElseThrow(()->new Refusal(false,"UNPROVED_STRONG_OVERWRITE")));
         admitted.add(operation);
     }
     PossibleValuesState transferOperation(PossibleValuesState state,Operation operation,ValuesWork work) {
@@ -138,7 +139,7 @@ final class TextProfile {
         // its open remainder and candidate supports without creating an alias.
         var value=write instanceof LiteralWrite literal ? literal.value()
             : state.value(((CopyWrite)write).source().ordinal(),work);
-        return state.assign(write.location().ordinal(),value,work);
+        return state.strongOverwrite(write.location().ordinal(),value,overwrites.get(operation),work);
     }
     boolean supports(ObjectId subject,EntryId entry) {
         if(!textSubjects.contains(subject))return false;

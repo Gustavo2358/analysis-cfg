@@ -98,7 +98,7 @@ def architecture(root:Path, update:bool=False)->None:
     for source,targets in edges.items():
         for target in targets:
             if any(d in target for d in DENIED): raise Failure('W1 forbidden bytecode dependency: '+source+' -> '+target)
-            if not target.startswith(('java.',PREFIX,'io.github.gustavo2358.air.model.','io.github.gustavo2358.air.validation.ValidationOptions','io.github.gustavo2358.analysis.cfg.')):
+            if not target.startswith(('java.',PREFIX,'io.github.gustavo2358.air.model.','io.github.gustavo2358.air.validation.ValidationOptions','io.github.gustavo2358.air.validation.ValidationResult','io.github.gustavo2358.analysis.cfg.')):
                 raise Failure('W1 dependency outside approved DAG: '+target)
     descriptors={}
     for path in paths:

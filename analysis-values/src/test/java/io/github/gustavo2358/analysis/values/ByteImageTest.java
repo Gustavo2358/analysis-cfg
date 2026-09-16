@@ -75,15 +75,15 @@ class ByteImageTest {
     @Test void captureOffsetsFollowCropsAndRetainEarlierCopyContributions() {
         var initial=ByteImage.literal(new Values.BytesValue(List.of(65,66,67,68,69,70,71,72)),1);
         var first=initial.slice(range(2,4)).copied(3,BigInteger.valueOf(2));
-        assertEquals(Map.of(3,Set.of(BigInteger.valueOf(2))),first.parts().getFirst().capturedOffsets());
+        assertEquals(Map.of(3,Set.of(new ByteImage.CaptureOffset(0,BigInteger.valueOf(2)))),first.parts().getFirst().capturedOffsets());
         var next=first.slice(range(1,2)).copied(4,BigInteger.valueOf(5));
-        assertEquals(Map.of(3,Set.of(BigInteger.valueOf(3)),4,Set.of(BigInteger.valueOf(5))),next.parts().getFirst().capturedOffsets());
+        assertEquals(Map.of(3,Set.of(new ByteImage.CaptureOffset(0,BigInteger.valueOf(3))),4,Set.of(new ByteImage.CaptureOffset(0,BigInteger.valueOf(5)))),next.parts().getFirst().capturedOffsets());
         assertEquals(BigInteger.valueOf(3),next.parts().getFirst().producerOffset());
         var placed=initial.write(range(6,2),next);var contribution=placed.parts().getLast();
         assertEquals(next.parts().getFirst().capturedOffsets(),contribution.capturedOffsets());
         assertEquals(BigInteger.valueOf(3),contribution.producerOffset());
         var unknown=ByteImage.unknown(Optional.of(BigInteger.valueOf(8)),"UNKNOWN").copied(8,BigInteger.valueOf(10)).slice(range(3,2));
-        assertEquals(Set.of(BigInteger.valueOf(13)),unknown.parts().getFirst().capturedOffsets().get(8));
+        assertEquals(Set.of(new ByteImage.CaptureOffset(0,BigInteger.valueOf(13))),unknown.parts().getFirst().capturedOffsets().get(8));
         assertEquals(BigInteger.ZERO,unknown.parts().getFirst().producerOffset());
     }
     @Test void hugeTextPaddingIsSparseAndTailReadsKeepExactProvenance() {
@@ -95,7 +95,7 @@ class ByteImageTest {
         var tail=fitted.slice(StorageRange.exact(start,BigInteger.valueOf(4))).copied(3,start);
         assertEquals(List.of(64,64,64,64),tail.read(range(0,4)).bytes().orElseThrow().octets());
         assertEquals(start,tail.parts().getFirst().producerOffset());
-        assertEquals(Map.of(3,Set.of(start)),tail.parts().getFirst().capturedOffsets());
+        assertEquals(Map.of(3,Set.of(new ByteImage.CaptureOffset(0,start))),tail.parts().getFirst().capturedOffsets());
         var patched=fitted.write(StorageRange.exact(huge.subtract(BigInteger.TWO),BigInteger.ONE),ByteImage.literal(new Values.BytesValue(List.of(240)),4));
         assertEquals(4,patched.parts().size());
         assertEquals(List.of(64,64,240,64),patched.read(StorageRange.exact(start,BigInteger.valueOf(4))).bytes().orElseThrow().octets());

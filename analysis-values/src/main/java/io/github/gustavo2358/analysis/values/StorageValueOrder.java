@@ -62,7 +62,7 @@ final class StorageValueOrder {
     private static final Comparator<DefinitionEvent> DEFINITION=Comparator.comparing(DefinitionEvent::entry,ID)
         .thenComparing(DefinitionEvent::operation,optional(ID)).thenComparing(DefinitionEvent::destination,optional(ID))
         .thenComparingInt(DefinitionEvent::slot).thenComparing(DefinitionEvent::outcome,optional(Comparator.comparing(StorageValueOrder::outcome,list(Comparator.naturalOrder()))))
-        .thenComparing(DefinitionEvent::storage,ID).thenComparing(DefinitionEvent::kind).thenComparing(DefinitionEvent::unknown)
+        .thenComparing(DefinitionEvent::storage,optional(ID)).thenComparing(DefinitionEvent::logicalObject,optional(ID)).thenComparing(DefinitionEvent::kind).thenComparing(DefinitionEvent::unknown)
         .thenComparing(DefinitionEvent::origin,ID).thenComparing(DefinitionEvent::premises,list(ID)).thenComparing(DefinitionEvent::uncertainties,list(ID))
         .thenComparing(DefinitionEvent::reasons,list(Comparator.naturalOrder()));
     static final Comparator<StorageValueFact.Capture> CAPTURE=Comparator.comparing(StorageValueFact.Capture::definition,DEFINITION)
@@ -73,11 +73,13 @@ final class StorageValueOrder {
         .thenComparing(StorageValueFact.SourceGap::origin,ID).thenComparing(StorageValueFact.SourceGap::uncertainties,list(ID));
     private static final Comparator<StorageValueFact.Producer> PRODUCER=Comparator.comparing(StorageValueFact.Producer::definition,DEFINITION)
         .thenComparing(StorageValueFact.Producer::contributedRange,LOCATION);
+    private static final Comparator<ValueFact.Support> SUPPORT=Comparator.comparing(ValueFact.Support::evidence,ID).thenComparing(ValueFact.Support::origin,ID).thenComparing(ValueFact.Support::premises,list(ID));
+    private static final Comparator<StorageValueFact.LogicalCapture> LOGICAL_CAPTURE=Comparator.comparing(StorageValueFact.LogicalCapture::object,ID).thenComparing(StorageValueFact.LogicalCapture::before,ProgramPoint.ORDER).thenComparing(StorageValueFact.LogicalCapture::producers,list(SUPPORT));
     static final Comparator<StorageValueFact.Fragment> FRAGMENT=Comparator.comparing(StorageValueFact.Fragment::location,LOCATION)
         .thenComparing(StorageValueFact.Fragment::kind).thenComparing(StorageValueFact.Fragment::bytes,optional(Comparator.comparing(Values.BytesValue::octets,list(Comparator.naturalOrder()))))
         .thenComparing(StorageValueFact.Fragment::producer,optional(PRODUCER)).thenComparing(StorageValueFact.Fragment::unknownWriter,optional(DEFINITION))
         .thenComparing(StorageValueFact.Fragment::captures,list(CAPTURE)).thenComparing(StorageValueFact.Fragment::sourceGaps,list(GAP))
-        .thenComparing(StorageValueFact.Fragment::modelReasons,list(Comparator.naturalOrder()));
+        .thenComparing(StorageValueFact.Fragment::modelReasons,list(Comparator.naturalOrder())).thenComparing(StorageValueFact.Fragment::logicalCapture,optional(LOGICAL_CAPTURE));
     static final Comparator<StorageValueFact.Alternative> ALTERNATIVE=Comparator.comparing(StorageValueFact.Alternative::interpretation,INTERPRETATION)
         .thenComparing(StorageValueFact.Alternative::candidate,optional(Comparator.comparing(Values.TextValue::value)))
         .thenComparing(StorageValueFact.Alternative::fragments,list(FRAGMENT));

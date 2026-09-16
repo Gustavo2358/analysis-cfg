@@ -77,7 +77,7 @@ class SupportSourceTest {
             assertTrue(x.join(x,w).equivalent(x));assertTrue(x.join(y,w).equivalent(y.join(x,w)));
             assertTrue(x.join(y,w).join(z,w).equivalent(x.join(y.join(z,w),w)));
         }
-        var first=PossibleValuesState.reached().assign(0,a,w);var second=first.assign(0,b,w);
+        var first=PossibleValuesState.reached().initialize(0,a,w);var second=first.initialize(0,b,w);
         assertFalse(first.equivalent(second,w),"support-only change is semantic change");
         assertEquals(1,second.value(0,w).supports.size());assertEquals(1,second.value(0,w).supports.at(0));
         assertEquals(0,first.value(0,w).supports.at(0),"old immutable support remains intact");

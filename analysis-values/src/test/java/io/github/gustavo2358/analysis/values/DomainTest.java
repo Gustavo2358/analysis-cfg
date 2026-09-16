@@ -9,8 +9,8 @@ class DomainTest {
         var w=new ValuesWork(); var u=PossibleValuesState.reached();
         assertTrue(u.value(0,w).open()); assertEquals(0,u.explicitBindings());
         assertFalse(PossibleValuesState.unreachable().isReached());
-        var a=u.assign(0,Candidates.singleton(0,w),w);
-        var b=a.assign(0,Candidates.singleton(1,w),w);
+        var a=u.initialize(0,Candidates.singleton(0,w),w);
+        var b=a.initialize(0,Candidates.singleton(1,w),w);
         assertArrayEquals(new int[]{1},b.value(0,w).ordinals());
         assertFalse(b.value(0,w).open());
         assertArrayEquals(new int[]{0},a.value(0,w).ordinals());
@@ -32,7 +32,7 @@ class DomainTest {
                     int mask=(choice+1)/2;
                     var c=mask==1?Candidates.singleton(0,w):mask==2?Candidates.singleton(1,w):Candidates.singleton(0,w).join(Candidates.singleton(1,w),w);
                     if(choice%2==0)c=c.withOpen(w);
-                    s=s.assign(k,c,w);
+                    s=s.initialize(k,c,w);
                 }
             }
             states.add(s);
@@ -41,7 +41,7 @@ class DomainTest {
             assertTrue(a.join(a,w).equivalent(a,w),"idempotence");
             assertTrue(a.join(b,w).equivalent(b.join(a,w),w),"commutativity");
             assertTrue(leq(a,a.join(b,w),w),"upper bound");
-            if(leq(a,b,w)) assertTrue(leq(a.assign(0,Candidates.singleton(1,w),w),b.assign(0,Candidates.singleton(1,w),w),w),"assignment monotonicity");
+            if(leq(a,b,w)) assertTrue(leq(a.initialize(0,Candidates.singleton(1,w),w),b.initialize(0,Candidates.singleton(1,w),w),w),"assignment monotonicity");
             for(var c:states) assertTrue(a.join(b,w).join(c,w).equivalent(a.join(b.join(c,w),w),w),"associativity");
         }
     }
@@ -56,9 +56,9 @@ class DomainTest {
     }
     @Test void persistentUpdatesShareAndRetainNoHistory() {
         var w=new ValuesWork();var s=PossibleValuesState.reached();
-        for(int i=0;i<10000;i++)s=s.assign(i,Candidates.singleton(i,w),w);
+        for(int i=0;i<10000;i++)s=s.initialize(i,Candidates.singleton(i,w),w);
         var before=s;long allocations=w.stateNodes;
-        s=s.assign(5000,Candidates.singleton(10001,w),w);
+        s=s.initialize(5000,Candidates.singleton(10001,w),w);
         assertTrue(w.stateNodes-allocations<64,"bounded update must not clone state");
         assertEquals(10000,s.explicitBindings());
         assertArrayEquals(new int[]{5000},before.value(5000,w).ordinals());

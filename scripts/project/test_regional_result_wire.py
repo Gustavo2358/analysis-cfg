@@ -114,4 +114,99 @@ class RegionalWireContract(unittest.TestCase):
         r['version']='1.0.0'
         with self.assertRaises(WireError):validate(r)
 
+class LogicalEntryWireContract(unittest.TestCase):
+    def test_logical_source_has_no_physical_authority(self):
+        path=PRODUCT.parent/'logical.result.json';r=read(path);o=r['observations'][0]
+        self.assertEqual('1.2.0',r['version']);self.assertEqual(path.read_bytes(),canonical(r))
+        self.assertEqual('BEFORE',o['point']['position']);self.assertEqual(['PROGA'],o['values']['fact']['candidates'])
+        self.assertTrue(o['values']['fact']['modelValueRemainder'])
+        self.assertEqual('ENTRY_POSSIBILITY',o['rd']['fact']['definitions'][0]['definition']['kind'])
+        self.assertEqual([],o['rd']['fact']['definitions'][0]['contributedRanges'])
+        v=['observations',0,'values','fact'];a=v+['logicalAlternatives',0]
+        e=['observations',0,'rd','fact','definitions',0,'definition']
+        mutations={
+            'unnegotiated-version':field(['version'],'1.1.0'),
+            'missing-support':field(a+['producers'],[]),
+            'wrong-candidate':field(a+['candidate'],'JOHNDOE'),
+            'unknown-object':field(a+['objectId','localId'],'absent'),
+            'unknown-producer':field(a+['producers',0,'evidence','localId'],'absent'),
+            'closed-remainder':field(v+['modelValueRemainder'],False),
+            'physical-id-from-logical':field(e+['storageId'],o['subject']['objectId']),
+            'forgotten-logical-object':lambda d:d['observations'][0]['rd']['fact']['definitions'][0]['definition'].pop('logicalObjectId'),
+        }
+        for name,mutation in mutations.items():
+            with self.subTest(name=name):
+                changed=copy.deepcopy(r);mutation(changed)
+                with self.assertRaises(WireError):validate(changed)
+        print('EP_LOGICAL_WIRE_MUTANTS '+json.dumps({'killed':len(mutations),'total':len(mutations),'compileErrors':0}))
+
+class LogicalCaptureWireContract(unittest.TestCase):
+    def test_logical_capture_requires_instant_support_and_open_remainder(self):
+        path=PRODUCT.parent/'logical-copy.result.json';r=read(path)
+        self.assertEqual('1.3.0',r['version']);self.assertEqual(path.read_bytes(),canonical(r))
+        index=next(i for i,o in enumerate(r['observations']) if o['point']['operationId']['localId']=='later-source')
+        v=['observations',index,'values','fact'];fact=r['observations'][index]['values']['fact']
+        ai=next(i for i,a in enumerate(fact['alternatives']) if a['candidate']=='PROGA   ')
+        f=v+['alternatives',ai,'fragments',0];c=f+['logicalCapture']
+        mutations={
+            'old-version':field(['version'],'1.2.0'),
+            'missing-capture':lambda d:d['observations'][index]['values']['fact']['alternatives'][ai]['fragments'][0].pop('logicalCapture'),
+            'empty-support':field(c+['producers'],[]),
+            'wrong-instant':field(c+['before','position'],'AFTER'),
+            'wrong-operation':field(c+['before','operationId','localId'],'later-source'),
+            'invented-source':field(c+['objectId','localId'],'absent'),
+            'invented-range':lambda d:d['observations'][index]['values']['fact']['alternatives'][ai]['fragments'][0]['logicalCapture'].update(sourceRange={}),
+            'closed':field(v+['modelValueRemainder'],False),
+            'unsupported-byte':field(f+['bytes',0],66),
+            'producer-not-assign':field(f+['producer','definition','kind'],'ENTRY_POSSIBILITY'),
+        }
+        for name,mutate in mutations.items():
+            with self.subTest(name=name):
+                changed=copy.deepcopy(r);mutate(changed)
+                with self.assertRaises(WireError):validate(changed)
+        print('EP_LOGICAL_CAPTURE_WIRE_MUTANTS '+json.dumps({'killed':len(mutations),'total':len(mutations)}))
+
+class LogicalOccurrenceWireContract(unittest.TestCase):
+    def test_choice_capture_keeps_source_identity_without_fabricated_range(self):
+        path=PRODUCT.parent/'logical-choice-copy.result.json';r=read(path)
+        self.assertEqual('1.4.0',r['version']);self.assertEqual(path.read_bytes(),canonical(r))
+        named=[o for o in r['observations'] if o['subject']['kind']=='NAMED_OBJECT']
+        old=read(PRODUCT.parent/'logical-copy.result.json')
+        self.assertEqual(old['observations'],named)
+        captured=[f['logicalCapture'] for o in named for a in o['values']['fact']['alternatives'] for f in a['fragments'] if 'logicalCapture' in f]
+        self.assertTrue(captured);self.assertTrue(all(c['before']['position']=='BEFORE' for c in captured))
+        self.assertTrue(all(c['objectId']['localId']=='whole' for c in captured))
+
+    def test_representation_law_and_explicit_identity_boundary(self):
+        for variant in ('direct','singleton','mixed','open'):
+            path=ROOT/f'analysis-launcher/target/ep-representation/{variant}.regional.json';r=read(path)
+            self.assertEqual('1.4.0',r['version']);self.assertEqual(path.read_bytes(),canonical(r))
+            index=next(i for i,o in enumerate(r['observations']) if o['subject']['kind']=='PLACE_OCCURRENCE')
+            o=r['observations'][index];v=o['values']['fact'];d=o['rd']['fact']
+            self.assertEqual('BEFORE',o['point']['position']);self.assertTrue(v['modelValueRemainder'])
+            self.assertEqual(['PROGA','PROGB'] if variant in ('mixed','open') else ['PROGA'],v['candidates'])
+            self.assertEqual(['PROGA'],[a['candidate'] for a in v['logicalAlternatives']])
+            self.assertTrue(all(a['producers'] for a in v['logicalAlternatives']))
+            self.assertTrue(any(x['definition'].get('logicalObjectId') for x in d['definitions']))
+            subject=['observations',index,'subject'];fact=['observations',index,'values','fact']
+            logical=fact+['logicalAlternatives',0]
+            wrong=next(x for x in r['inventory']['ids'] if x['domain']=='object' and x['localId']=='unknown')
+            mutations={
+                'old-version':field(['version'],'1.3.0'),
+                'missing-identity-projection':lambda r:r['observations'][index]['subject'].pop('explicitObjectIds'),
+                'empty-identity-projection':field(subject+['explicitObjectIds'],[]),
+                'duplicate-identities':field(subject+['explicitObjectIds'],o['subject']['explicitObjectIds']*2),
+                'dangling-object':field(subject+['explicitObjectIds',0,'localId'],'absent'),
+                'wrong-query-owner':field(subject+['operandId','owner','localId'],'absent'),
+                'no-logical-support':field(logical+['producers'],[]),
+                'closed-model':field(fact+['modelValueRemainder'],False),
+            }
+            # Known inventory identity is not enough: it must be explicit in this subject.
+            if variant!='open':mutations['unrelated-object']=field(logical+['objectId'],wrong)
+            for name,mutate in mutations.items():
+                with self.subTest(variant=variant,mutation=name):
+                    changed=copy.deepcopy(r);mutate(changed)
+                    with self.assertRaises(WireError):validate(changed)
+        print('EP_OCCURRENCE_WIRE_MUTANTS '+json.dumps({'killed':35,'total':35}))
+
 if __name__=='__main__':unittest.main()

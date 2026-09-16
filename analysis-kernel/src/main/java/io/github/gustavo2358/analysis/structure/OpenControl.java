@@ -3,6 +3,7 @@ package io.github.gustavo2358.analysis.structure;
 import io.github.gustavo2358.air.model.*;
 import io.github.gustavo2358.air.model.Ids.LabelId;
 import io.github.gustavo2358.analysis.cfg.domain.CfgNode;
+import io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy;
 
 /** AIR scope membership only. Open edges are enumerated lazily, never stored as a dense graph. */
 final class OpenControl {
@@ -24,16 +25,23 @@ final class OpenControl {
     }
 
     private OpenControl() { }
-    static Scopes.ControlBound bound(ProgramIndex.Node node) {
+    static boolean partial(ProgramIndex.Node node, ProjectionPolicy policy) {
+        if (policy != ProjectionPolicy.PARTIAL_ANALYSIS || !(node.source() instanceof CfgNode.SequenceNode s)) return false;
+        var term=s.source().terminator();
+        return !(term instanceof Operations.Return || term instanceof Operations.Jump || term instanceof Operations.Branch || term instanceof Operations.Halt
+            || term instanceof Operations.Invoke i && supportsInvoke(i) || term instanceof Operations.Opaque o && supportsOpaque(o));
+    }
+    static Scopes.ControlBound bound(ProgramIndex.Node node, ProjectionPolicy policy) {
+        if (partial(node,policy)) return new Scopes.WithinControl(new Scopes.UnitControl(node.owner().id(),true,true,true,true,true,true));
         if(node.source() instanceof CfgNode.SequenceNode s) {
             if(s.source().terminator() instanceof Operations.Opaque o)return o.envelope().control().remainder();
             if(s.source().terminator() instanceof Operations.Invoke i)return i.outcomes().remainder();
         }
         return Scopes.NoControl.INSTANCE;
     }
-    static boolean allows(ProgramIndex.Node source,ProgramIndex.Node target,Entries.Entry entry) {
+    static boolean allows(ProgramIndex.Node source,ProgramIndex.Node target,Entries.Entry entry, ProjectionPolicy policy) {
         if(!source.owner().id().equals(entry.id().unit())||!target.owner().id().equals(entry.id().unit()))return false;
-        return bound(source) instanceof Scopes.WithinControl w && contains(w.scope(),target,entry);
+        return bound(source,policy) instanceof Scopes.WithinControl w && contains(w.scope(),target,entry);
     }
     private static boolean contains(Scopes.ControlScope scope,ProgramIndex.Node target,Entries.Entry entry) {
         if(target.source() instanceof CfgNode.EntryNode)return false;

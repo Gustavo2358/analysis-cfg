@@ -208,7 +208,72 @@ there is no invented object and no additional dataflow. Choices preserve all kno
 physical alternatives and their memory bound. Foreign IDs are unsupported subjects.
 The result retains the OperandId, candidates, support, remainder and query point.
 
+## EP-W1 — logical source evidence (schema 1.2.0)
+
+The writer selects 1.2.0 when an observation contains logical source evidence.
+An Event with `logicalObjectId: Id(object)` has `storageId: null` and an empty
+`contributedRanges` list. It does not assert any physical allocation or range.
+Physical events keep their existing shape and mandatory storage ID.
+
+A ValueFact may additionally contain nonempty `logicalAlternatives`:
+`[{objectId: Id(object), candidate: string, producers: [Support]}]`, where Support
+has the existing `evidence`, `origin` and `premiseRefs` fields. Every alternative
+must have source/analysis support, match the queried named object (versions 1.2–1.3), and retain
+`modelValueRemainder: true`. Its text participates in `candidates` and its supports
+participate in `candidateSupports`. Physical alternatives remain unchanged.
+This representation does not invent a logical Cell or physical interpretation.
+
+The independent reader checks these obligations and rejects the added shapes
+under earlier versions. Existing physical-only output retains 1.0.0/1.1.0.
+
 The writer uses schema **1.1.0** only when a PLACE_OCCURRENCE subject is present:
 `{kind: "PLACE_OCCURRENCE", operandId: Id(operand)}`. Existing subjects retain the
 1.0.0 wire unchanged. The independent Python reader accepts both and rejects the
 new subject under 1.0.0. This does not change dependencies.json or CFG JSON.
+
+## 1.3.0 — captured logical support without a physical source
+
+A known fragment may carry `logicalCapture`: `objectId`, `before`, and nonempty
+`producers` (evidence, origin, premiseRefs). It records the sending logical object
+and source support captured BEFORE the fragment producer Assign. It has no source
+storage or byte interval. The destination bytes still require successful explicit
+codec interpretation; they are one supported possibility. The original Assign
+event can remain unknown, and the value must retain model remainder. Source support
+participates in candidateSupports exactly, alongside the destination producer.
+Subsequent physical copies preserve this capture; later writes to the source do not
+re-evaluate it. Only documents using this field negotiate 1.3.0. Versions 1.0–1.2
+retain their closed shapes and existing producer requirements. Structural identities,
+BEFORE instant, ownership, support completeness and remainder are independently
+validated. This changes result transport only, not AIR or kill authority.
+
+## 1.4.0 — explicit logical identities of canonical place occurrences
+
+A result with logical RD contributions or logical value alternatives queried through
+`PLACE_OCCURRENCE` negotiates 1.4.0. Every occurrence subject in that document has the
+closed shape `{kind, operandId, explicitObjectIds}`. The new array contains unique,
+canonically ordered full ObjectIds explicitly selected by the canonical Place:
+ObjectPlace contributes its object; Choice contributes the union of its alternatives;
+RegionSlice contributes none. Choice remainder, binding aliases, and address/length
+expressions do not contribute logical identities. An unsupported occurrence has no
+resolved identities. Named and physical-range subject shapes are unchanged.
+
+Preparation detaches this identity projection from the validated AIR, using the same
+shared projection as RD, Regional Values, and read/copy transfers. The writer does
+not inspect AIR or reconstruct source declarations. The independent reader validates
+object references, uniqueness, and membership: each `logicalAlternatives[].objectId`
+and each logical RD definition must belong to the subject's `explicitObjectIds` (or
+be the queried NamedObject). Physical ranges still cannot carry logical alternatives.
+As with physical interpretations, correspondence with the original canonical AIR is
+asserted by the validated-publication authority; a detached reader cannot reconstruct
+that source graph. Executable source-to-result contrasts check that correspondence.
+
+All previous requirements for current-state support, open remainder, BEFORE capture,
+origins, and absence of fabricated physical source intervals remain. Logical capture
+records the actual selected source object, including inside nested Choice; it does
+not attribute one alternative's support to all others. Mixed physical/logical reads
+preserve both forms and the existing per-alternative physical capture ranges.
+
+Versions 1.0–1.3 retain their closed shapes and logical-subject restrictions. A reader
+must reject a 1.4 occurrence shape under an older version and reject logical evidence
+outside its explicit subject identities. Existing physical-only occurrences retain
+1.1, and named logical/capture results retain 1.2/1.3 when no 1.4 feature is used.

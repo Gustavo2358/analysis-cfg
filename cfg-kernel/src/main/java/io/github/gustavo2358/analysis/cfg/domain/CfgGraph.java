@@ -87,9 +87,8 @@ public final class CfgGraph {
                 case OPAQUE_UNKNOWN -> false; // symbolic transitions exist only in the contextual cursor
                 case INVOKE_NORMAL -> from instanceof CfgNode.SequenceNode sequence
                         && sequence.source().terminator() instanceof Operations.Invoke invoke
-                        && CoreCfgProjection.supportsInvoke(invoke)
                         && to instanceof CfgNode.SequenceNode target
-                        && ((io.github.gustavo2358.air.model.Control.Normal) invoke.outcomes().known().getFirst()).label().equals(target.source().label())
+                        && invoke.outcomes().known().stream().anyMatch(o -> o instanceof io.github.gustavo2358.air.model.Control.Normal n && n.label().equals(target.source().label()))
                         && sequence.source().label().unit().equals(transition.activationEntry().unit())
                         && target.source().label().unit().equals(transition.activationEntry().unit());
                 case BRANCH_TRUE, BRANCH_FALSE -> from instanceof CfgNode.SequenceNode sequence

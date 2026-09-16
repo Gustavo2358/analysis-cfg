@@ -118,6 +118,26 @@ public final class StorageIndex {
             &&labels.labels().stream().allMatch(id->id.unit().equals(labels.unit())&&session.index().sequence(id)!=null);
         return true;
     }
+    /** Canonical value identities only: no alias expansion or address-expression traversal. */
+    public List<ObjectId> explicitObjects(StorageSubject subject) {
+        if(subject instanceof StorageSubject.NamedObject named)return List.of(named.object());
+        if(subject instanceof StorageSubject.PlaceOccurrence occurrence) {
+            var place=session.index().place(occurrence.occurrence());
+            if(place==null)throw new IllegalArgumentException("foreign place occurrence");
+            return explicitObjects(place);
+        }
+        return List.of();
+    }
+    public List<ObjectId> explicitObjects(Place root) {
+        var objects=new HashSet<ObjectId>();var pending=new ArrayDeque<Place>();pending.push(root);
+        while(!pending.isEmpty()) {
+            var place=pending.pop();
+            if(place instanceof Places.ObjectPlace object)objects.add(object.object());
+            else if(place instanceof Places.Choice choice)pending.addAll(choice.candidates());
+        }
+        return objects.stream().sorted(Comparator.comparing((ObjectId id)->id.publication().localId())
+            .thenComparing(id->id.unit().localId()).thenComparing(ObjectId::localId)).toList();
+    }
     public Resolution resolve(StorageSubject subject) {
         if(subject instanceof StorageSubject.NamedObject named)return object(named.object());
         if(subject instanceof StorageSubject.PlaceOccurrence p) {

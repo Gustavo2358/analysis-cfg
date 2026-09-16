@@ -3,10 +3,12 @@ package io.github.gustavo2358.analysis.values;
 import io.github.gustavo2358.air.model.*;
 import io.github.gustavo2358.air.model.Ids.*;
 import java.util.*;
+import io.github.gustavo2358.analysis.storage.KillAuthority;
 
 /** Generic mandatory/possible writes from AIR, using the unchanged candidate lattice. */
 final class ConservativeEffectTransfer {
     private final List<TextProfile.Location> may, must;
+    private final Map<TextProfile.Location,KillAuthority.Permit> authority=new HashMap<>();
     private ConservativeEffectTransfer(Set<TextProfile.Location> may,Set<TextProfile.Location> must) {this.may=may.stream().sorted(Comparator.comparingInt(TextProfile.Location::ordinal)).toList();this.must=must.stream().sorted(Comparator.comparingInt(TextProfile.Location::ordinal)).toList();}
     static ConservativeEffectTransfer prepare(Operation operation,TextProfile profile) {
         var may=new HashSet<TextProfile.Location>();var must=new HashSet<TextProfile.Location>();
@@ -18,7 +20,9 @@ final class ConservativeEffectTransfer {
             for(var id:m.knownWrites())may.add(occurrence(id,profile));
             for(var id:m.mustOverwrite())must.add(occurrence(id,profile));
         }
-        return new ConservativeEffectTransfer(may,must);
+        var result=new ConservativeEffectTransfer(may,must);
+        for(var location:must)result.authority.put(location,KillAuthority.exactCell(profile.session,operation,location.cell()).orElseThrow(()->new TextProfile.Refusal(false,"UNPROVED_STRONG_OVERWRITE")));
+        return result;
     }
     private static TextProfile.Location occurrence(OperandId id,TextProfile p) {
         var object=p.session.index().referencedObject(id);
@@ -42,8 +46,8 @@ final class ConservativeEffectTransfer {
     }
     PossibleValuesState apply(PossibleValuesState state,ValuesWork work) {
         if(!state.isReached())return state;var result=state;
-        for(var l:may)result=result.assign(l.ordinal(),result.value(l.ordinal(),work).withOpen(work),work);
-        for(var l:must)result=result.assign(l.ordinal(),Candidates.UNKNOWN,work);
+        for(var l:may)result=result.widenUnknown(l.ordinal(),work);
+        for(var l:must)result=result.strongOverwrite(l.ordinal(),Candidates.UNKNOWN,authority.get(l),work);
         return result;
     }
 }

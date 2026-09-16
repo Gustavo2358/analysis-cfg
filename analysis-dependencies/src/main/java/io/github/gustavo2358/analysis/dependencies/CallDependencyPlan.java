@@ -65,8 +65,13 @@ public final class CallDependencyPlan {
         var registrations=new ArrayList<ConsumerRegistration<DependencySiteFact>>();
         // Result assignments belong to normal-return edges. Select the existing regional
         // provider that models those edges, including Cell storage, without changing solvers.
-        boolean regional=session.index().publication().storage().stream().anyMatch(Memory.Region.class::isInstance)
+        boolean regional=session.index().hasUnprovedPreconditions() || session.index().publication().storage().stream().anyMatch(Memory.Region.class::isInstance)
+            ||session.index().publication().capabilities().required().contains(Capabilities.ENTRY_POSSIBILITIES_V2)
             ||session.index().sites(Operations.Invoke.class).stream().anyMatch(s->!((Operations.Invoke)s.operation()).results().isEmpty());
+        // Probe the optimization's semantic admission, not a keyword/feature list.
+        // This prepares no solver run. A wider existing domain retains evidence on refusal.
+        if(!regional && groups.values().stream().anyMatch(g->g.contains(1)))
+            regional=PossibleValuesAnalysis.prepare(session,PossibleValuesAnalysis.EFFECTS_PROFILE).status()==PossibleValuesAnalysis.Status.UNSUPPORTED;
         for(var context:session.contexts()) {
             var entry=context.entry().id();String id=part(entry.publication().localId())+part(entry.unit().localId())+part(entry.localId());
             var reach=ReachabilityProvider.batch("reach:"+id,entry);boolean physical=slicedUnits.contains(entry.unit());

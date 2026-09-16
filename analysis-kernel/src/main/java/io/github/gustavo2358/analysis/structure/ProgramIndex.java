@@ -13,6 +13,7 @@ import java.util.*;
 public final class ProgramIndex {
     final Map<UnitId,List<Node>> unitNodes = new HashMap<>(), openSources = new HashMap<>();
     final Object identity;
+    final ProjectionPolicy policy;
     final Node[] nodes;
     final CfgTransition[] edges;
     final int[] from, to, entry, forwardNext, backwardNext;
@@ -32,16 +33,25 @@ public final class ProgramIndex {
     private final Map<OperandId, Place> places;
     private final Map<EntryId, Entries.Entry> entries;
     private final IndexMetrics metrics;
+    private final Set<UnitId> partialControlUnits;
+    private final Set<OperationId> unprovedPreconditions;
+    private final Set<UnitId> unprovedPreconditionUnits;
 
     ProgramIndex(IndexBuilder b) {
         identity = b.identity;
+        policy = b.policy;
+        unprovedPreconditions=b.unprovedPreconditions;
+        unprovedPreconditionUnits=unprovedPreconditions.stream().map(OperationId::unit).collect(java.util.stream.Collectors.toUnmodifiableSet());
         publication = b.snapshot;
         nodes = b.nodes;
+        var partialUnits=new HashSet<UnitId>();
         for (var node : nodes) {
+            if(OpenControl.partial(node,policy))partialUnits.add(node.owner().id());
             unitNodes.computeIfAbsent(node.owner().id(), ignored -> new ArrayList<>()).add(node);
-            if (OpenControl.bound(node) instanceof Scopes.WithinControl)
+            if (OpenControl.bound(node,policy) instanceof Scopes.WithinControl)
                 openSources.computeIfAbsent(node.owner().id(), ignored -> new ArrayList<>()).add(node);
         }
+        partialControlUnits=Set.copyOf(partialUnits);
         unitNodes.replaceAll((u, list) -> List.copyOf(list)); openSources.replaceAll((u, list) -> List.copyOf(list));
         edges = b.edges;
         from = b.from; to = b.to; entry = b.edgeEntry;
@@ -61,6 +71,10 @@ public final class ProgramIndex {
         metrics = b.count.snapshot();
     }
 
+    public boolean unprovedPreconditions(OperationId operation) { return unprovedPreconditions.contains(operation); }
+    public boolean unprovedPreconditions(UnitId unit) { return unprovedPreconditionUnits.contains(unit); }
+    public boolean hasUnprovedPreconditions() { return !unprovedPreconditions.isEmpty(); }
+    public boolean partialControl(UnitId unit) { return partialControlUnits.contains(unit); }
     public Publication publication() { return publication; }
     public IndexMetrics metrics() { return metrics; }
     /** Null means ID absent from this snapshot; IDs always include their owners. */

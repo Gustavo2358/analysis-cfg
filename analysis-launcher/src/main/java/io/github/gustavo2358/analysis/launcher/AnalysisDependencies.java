@@ -11,7 +11,7 @@ public final class AnalysisDependencies {
     private AnalysisDependencies(){ }
     public static void main(String[] args){System.exit(run(args,System.err));}
     public static int run(String[] args,PrintStream err) {
-        return run(args,err,new DataflowAirReader());
+        return run(args,err,DataflowAirReader.forPartialAnalysis());
     }
     static int run(String[] args,PrintStream err,DataflowAirReader reader) {
         if(args.length!=2||args[0].isBlank()||args[1].isBlank()){err.println("usage: analysis-dependencies <input.air.json> <output.dependencies.json>");return 2;}

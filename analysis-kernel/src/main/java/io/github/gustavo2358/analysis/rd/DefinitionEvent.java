@@ -8,10 +8,24 @@ import java.util.*;
 
 /** Finite producer event, independent of the number of paths or solver visits. */
 public record DefinitionEvent(EntryId entry,Optional<OperationId> operation,Optional<OperandId> destination,
-                             int slot,Optional<Control.OutcomeKey> outcome,StorageId storage,
-                             Kind kind,boolean unknown,OriginId origin,List<PremiseId> premises,List<UncertaintyId> uncertainties,List<String> reasons) {
+                             int slot,Optional<Control.OutcomeKey> outcome,Optional<StorageId> storage,
+                             Kind kind,boolean unknown,OriginId origin,List<PremiseId> premises,List<UncertaintyId> uncertainties,List<String> reasons,Optional<ObjectId> logicalObject) {
     public enum Kind { ENTRY_UNKNOWN, INITIAL_CONDITION, ENTRY_POSSIBILITY, ENTRY_PRESERVE, ENTRY_UNINITIALIZED, ENTRY_PARAMETER, ENTRY_EXTERNAL, ASSIGN, COPY, UNKNOWN_WRITE }
-    public DefinitionEvent { Objects.requireNonNull(entry);Objects.requireNonNull(operation);Objects.requireNonNull(destination);Objects.requireNonNull(outcome);Objects.requireNonNull(storage);Objects.requireNonNull(kind);Objects.requireNonNull(origin);premises=ordered(premises);uncertainties=ordered(uncertainties);reasons=reasons.stream().distinct().sorted().toList(); }
+    public DefinitionEvent { Objects.requireNonNull(entry);Objects.requireNonNull(operation);Objects.requireNonNull(destination);Objects.requireNonNull(outcome);Objects.requireNonNull(storage);Objects.requireNonNull(logicalObject);if(storage.isPresent()==logicalObject.isPresent())throw new IllegalArgumentException("one physical or logical subject required");Objects.requireNonNull(kind);Objects.requireNonNull(origin);premises=ordered(premises);uncertainties=ordered(uncertainties);reasons=reasons.stream().distinct().sorted().toList(); }
+    public DefinitionEvent(EntryId entry,Optional<OperationId> operation,Optional<OperandId> destination,int slot,Optional<Control.OutcomeKey> outcome,StorageId storage,
+            Kind kind,boolean unknown,OriginId origin,List<PremiseId> premises,List<UncertaintyId> uncertainties,List<String> reasons) {
+        this(entry,operation,destination,slot,outcome,Optional.of(storage),kind,unknown,origin,premises,uncertainties,reasons,Optional.empty());
+    }
+    public static DefinitionEvent logicalInitial(EntryId entry,Entries.InitialCondition condition,int slot,ObjectId object,StorageIndex.Resolution resolution) {
+        var reasons=new LinkedHashSet<>(resolution.uncertainties());reasons.add(((Entries.PossibleLiterals)condition.value()).remainder());
+        return new DefinitionEvent(entry,Optional.empty(),Optional.of(condition.place().header().id()),slot,Optional.empty(),Optional.empty(),Kind.ENTRY_POSSIBILITY,false,
+            condition.origin(),condition.premises(),List.copyOf(reasons),List.of("LOGICAL_SOURCE_EVIDENCE"),Optional.of(object));
+    }
+    public static DefinitionEvent logicalWrite(EntryId entry,Operation operation,StatementEffects.Write write,StatementEffects.LogicalTarget target,Optional<Control.OutcomeKey> outcome) {
+        boolean literal=target.sourceApplicable()&&write.source() instanceof StatementEffects.ExpressionSource e&&e.value() instanceof Expressions.Literal;
+        return new DefinitionEvent(entry,Optional.of(operation.header().id()),write.occurrence(),write.slot(),outcome,Optional.empty(),literal?Kind.ASSIGN:Kind.UNKNOWN_WRITE,!literal,
+            operation.header().origin(),List.of(),operation.header().uncertainties(),List.of("LOGICAL_STORAGE_OPEN"),Optional.of(target.object()));
+    }
     /** Shared event materialization for RD and value provenance; no consumer reconstruction. */
     public static DefinitionEvent write(EntryId entry,Operation operation,StatementEffects.Write write,StatementEffects.Target target,Optional<Control.OutcomeKey> outcome) {
         var source=write.source();var unknown=source instanceof StatementEffects.UnknownSource||!target.sourceApplicable();
@@ -79,7 +93,7 @@ public record DefinitionEvent(EntryId entry,Optional<OperationId> operation,Opti
     static final Comparator<DefinitionEvent> ORDER=Comparator.comparing(DefinitionEvent::entry,ID)
         .thenComparing(DefinitionEvent::operation,optional(ID)).thenComparing(DefinitionEvent::destination,optional(ID))
         .thenComparingInt(DefinitionEvent::slot).thenComparing(DefinitionEvent::outcome,optional(Comparator.comparing(DefinitionEvent::outcome,list(Comparator.naturalOrder()))))
-        .thenComparing(DefinitionEvent::storage,ID).thenComparing(DefinitionEvent::kind).thenComparing(DefinitionEvent::unknown)
+        .thenComparing(DefinitionEvent::storage,optional(ID)).thenComparing(DefinitionEvent::logicalObject,optional(ID)).thenComparing(DefinitionEvent::kind).thenComparing(DefinitionEvent::unknown)
         .thenComparing(DefinitionEvent::origin,ID).thenComparing(DefinitionEvent::premises,list(ID)).thenComparing(DefinitionEvent::uncertainties,list(ID))
         .thenComparing(DefinitionEvent::reasons,list(Comparator.naturalOrder()));
 }

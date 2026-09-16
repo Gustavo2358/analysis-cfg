@@ -27,6 +27,10 @@ class WriterDomainTest {
         assertEquals(CfgBuildResult.Status.CFG_BUILT, result.status(), result.preflight().issues().toString());
         return result;
     }
+    @Test void partialAnalysisRequiresExplicitPartialResultWire() {
+        var cfg=build(MemoryFacts.goback(),ProjectionPolicy.PARTIAL_ANALYSIS);
+        assertThrows(CfgJsonException.class,()->new CfgJsonWriter().encode(cfg));
+    }
     @Test void memoryAndFileHaveEquivalentControlCoverageWire() throws Exception {
         var writer = new CfgJsonWriter();
         byte[] memory = writer.encode(build(MemoryFacts.goback(), ProjectionPolicy.KNOWN_SUBSET));

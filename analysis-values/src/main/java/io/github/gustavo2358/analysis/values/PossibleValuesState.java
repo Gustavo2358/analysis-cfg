@@ -1,5 +1,7 @@
 package io.github.gustavo2358.analysis.values;
 
+import io.github.gustavo2358.analysis.storage.KillAuthority;
+
 /** Immutable sparse root. Reached missing Cell is unknown, never bottom. Ordinals are internal. */
 public final class PossibleValuesState {
     private static final PossibleValuesState BOTTOM=new PossibleValuesState(false,null);
@@ -17,7 +19,13 @@ public final class PossibleValuesState {
         if(v==null) { w.unknownDefaults=Math.incrementExact(w.unknownDefaults);return Candidates.UNKNOWN; }
         return v;
     }
-    PossibleValuesState assign(int cell,Candidates value,ValuesWork w) {
+    PossibleValuesState initialize(int cell,Candidates value,ValuesWork w) { return store(cell,value,w); }
+    PossibleValuesState widenUnknown(int cell,ValuesWork w) { return !reached?this:store(cell,value(cell,w).withOpen(w),w); }
+    PossibleValuesState weakUpdate(int cell,Candidates supplied,ValuesWork w) { return !reached?this:store(cell,value(cell,w).join(supplied,w),w); }
+    PossibleValuesState strongOverwrite(int cell,Candidates replacement,KillAuthority.Permit authority,ValuesWork w) {
+        return store(cell,KillAuthority.strongOverwrite(authority,replacement),w);
+    }
+    private PossibleValuesState store(int cell,Candidates value,ValuesWork w) {
         if(!reached)return this;
         w.maxCandidates=Math.max(w.maxCandidates,value.size());
         var next=PersistentBindings.put(root,cell,value,w);
@@ -30,11 +38,11 @@ public final class PossibleValuesState {
         var accumulator=new Object(){PossibleValuesState state=PossibleValuesState.this;};
         PersistentBindings.each(root,(key,a)->{
             w.joinEntries=Math.incrementExact(w.joinEntries);
-            if(PersistentBindings.get(b.root,key,w)==null)accumulator.state=accumulator.state.assign(key,a.withOpen(w),w);
+            if(PersistentBindings.get(b.root,key,w)==null)accumulator.state=accumulator.state.widenUnknown(key,w);
         });
         PersistentBindings.each(b.root,(key,value)->{
             w.joinEntries=Math.incrementExact(w.joinEntries);
-            accumulator.state=accumulator.state.assign(key,value(key,w).join(value,w),w);
+            accumulator.state=accumulator.state.weakUpdate(key,value,w);
         });
         return accumulator.state;
     }

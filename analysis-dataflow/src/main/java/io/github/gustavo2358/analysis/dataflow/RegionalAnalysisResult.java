@@ -13,8 +13,12 @@ import java.util.*;
 public record RegionalAnalysisResult(String resultId,PublicationId publicationId,Inventory inventory,
         List<Observation> observations,Map<String,Map<String,Long>> statistics) {
     public record Observation(PointQuery<StorageSubject> query,ObservationBatch.Observation<StorageSubject,DefinitionFact> rd,
-            ObservationBatch.Observation<StorageSubject,StorageValueFact> values) {
-        public Observation { Objects.requireNonNull(query);Objects.requireNonNull(rd);Objects.requireNonNull(values);if(!query.equals(rd.query())||!query.equals(values.query()))throw new IllegalArgumentException("different observations"); }
+            ObservationBatch.Observation<StorageSubject,StorageValueFact> values,List<ObjectId> explicitObjects) {
+        public Observation(PointQuery<StorageSubject> query,ObservationBatch.Observation<StorageSubject,DefinitionFact> rd,
+                ObservationBatch.Observation<StorageSubject,StorageValueFact> values) {
+            this(query,rd,values,query.subject() instanceof StorageSubject.NamedObject named?List.of(named.object()):List.of());
+        }
+        public Observation { explicitObjects=List.copyOf(explicitObjects);Objects.requireNonNull(query);Objects.requireNonNull(rd);Objects.requireNonNull(values);if(!query.equals(rd.query())||!query.equals(values.query()))throw new IllegalArgumentException("different observations"); }
     }
     public record Storage(Memory.StorageHeader header,boolean region,Optional<BigInteger> extent,Optional<UncertaintyId> extentUnknown) {
         public Storage { Objects.requireNonNull(header);Objects.requireNonNull(extent);Objects.requireNonNull(extentUnknown);if(region?extent.isPresent()==extentUnknown.isPresent():extent.isPresent()||extentUnknown.isPresent())throw new IllegalArgumentException("storage extent shape"); }

@@ -12,7 +12,11 @@ public record StorageValueFact(ProgramPoint point,StorageSubject subject,List<Re
         ValueFact.Reachability reachability,List<Values.TextValue> candidates,Boolean modelValueRemainder,
         boolean sourceUnknownRemainder,boolean effectiveUnknownRemainder,List<PremiseId> premises,List<Id> evidence,
         List<OriginId> provenance,List<ValueFact.CandidateSupport> candidateSupports,List<String> modelReasons,
-        List<Alternative> alternatives) implements TextValueFact {
+        List<Alternative> alternatives,List<LogicalAlternative> logicalAlternatives) implements TextValueFact {
+    /** Supported logical values need no fabricated physical interpretation. */
+    public record LogicalAlternative(ObjectId object,Values.TextValue candidate,List<ValueFact.Support> producers) {
+        public LogicalAlternative {Objects.requireNonNull(object);Objects.requireNonNull(candidate);producers=List.copyOf(producers);if(producers.isEmpty())throw new IllegalArgumentException("logical value needs support");}
+    }
     public enum FragmentKind { KNOWN_BYTES, UNKNOWN_BYTES, LOGICAL_VALUE, UNKNOWN_LOGICAL, LOGICAL_CAPTURE }
     public record Producer(DefinitionEvent definition,StorageIndex.ContextualLocation contributedRange) {
         public Producer { Objects.requireNonNull(definition);Objects.requireNonNull(contributedRange); }
@@ -22,17 +26,23 @@ public record StorageValueFact(ProgramPoint point,StorageSubject subject,List<Re
             StorageIndex.ContextualLocation destinationContribution) {
         public Capture { Objects.requireNonNull(definition);Objects.requireNonNull(before);Objects.requireNonNull(sourceRange);Objects.requireNonNull(destinationRange);Objects.requireNonNull(sourceContribution);Objects.requireNonNull(destinationContribution); }
     }
+    public record LogicalCapture(ObjectId object,ProgramPoint before,List<ValueFact.Support> producers) {
+        public LogicalCapture {Objects.requireNonNull(object);Objects.requireNonNull(before);producers=List.copyOf(producers);if(producers.isEmpty())throw new IllegalArgumentException("capture needs source support");}
+    }
     public record SourceGap(StorageIndex.ContextualLocation affectedLocation,OriginId origin,List<UncertaintyId> uncertainties) {
         public SourceGap { Objects.requireNonNull(affectedLocation);Objects.requireNonNull(origin);uncertainties=List.copyOf(uncertainties); }
     }
     public record Fragment(StorageIndex.ContextualLocation location,FragmentKind kind,Optional<Values.BytesValue> bytes,
-            Optional<Producer> producer,Optional<DefinitionEvent> unknownWriter,List<Capture> captures,List<SourceGap> sourceGaps,List<String> modelReasons) {
-        public Fragment { Objects.requireNonNull(location);Objects.requireNonNull(kind);Objects.requireNonNull(bytes);Objects.requireNonNull(producer);Objects.requireNonNull(unknownWriter);captures=List.copyOf(captures);sourceGaps=List.copyOf(sourceGaps);modelReasons=List.copyOf(modelReasons); }
+            Optional<Producer> producer,Optional<DefinitionEvent> unknownWriter,List<Capture> captures,List<SourceGap> sourceGaps,List<String> modelReasons,Optional<LogicalCapture> logicalCapture) {
+        public Fragment(StorageIndex.ContextualLocation location,FragmentKind kind,Optional<Values.BytesValue> bytes,Optional<Producer> producer,Optional<DefinitionEvent> unknownWriter,List<Capture> captures,List<SourceGap> sourceGaps,List<String> modelReasons) {this(location,kind,bytes,producer,unknownWriter,captures,sourceGaps,modelReasons,Optional.empty());}
+        public Fragment { Objects.requireNonNull(logicalCapture);Objects.requireNonNull(location);Objects.requireNonNull(kind);Objects.requireNonNull(bytes);Objects.requireNonNull(producer);Objects.requireNonNull(unknownWriter);captures=List.copyOf(captures);sourceGaps=List.copyOf(sourceGaps);modelReasons=List.copyOf(modelReasons); }
     }
     public record Alternative(RegionalValueFact.Interpretation interpretation,Optional<Values.TextValue> candidate,List<Fragment> fragments) {
         public Alternative { Objects.requireNonNull(interpretation);Objects.requireNonNull(candidate);fragments=List.copyOf(fragments); }
     }
     public StorageValueFact {
+        logicalAlternatives=List.copyOf(logicalAlternatives);
+        if(!logicalAlternatives.isEmpty()&&(!Boolean.TRUE.equals(modelValueRemainder)||reachability!=ValueFact.Reachability.REACHABLE))throw new IllegalArgumentException("unbound logical evidence requires reachable open value");
         Objects.requireNonNull(point);Objects.requireNonNull(subject);Objects.requireNonNull(reachability);interpretations=List.copyOf(interpretations);
         if(reachability==ValueFact.Reachability.REACHABLE) {
             candidates=List.copyOf(candidates);Objects.requireNonNull(modelValueRemainder);
