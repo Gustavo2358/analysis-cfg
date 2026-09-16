@@ -2,6 +2,12 @@
   "schema_version": 1,
   "active": [
     {
+      "id": "WORK-EP-R2",
+      "path": "docs/work/active/WORK-EP-R2.json",
+      "status": "IN_PROGRESS",
+      "pr": 39
+    },
+    {
       "id": "WORK-CFG-038",
       "status": "DONE",
       "path": "docs/work/active/WORK-CFG-038.yaml",
