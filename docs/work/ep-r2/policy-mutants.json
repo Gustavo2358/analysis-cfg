@@ -1,6 +1,7 @@
 [
   {
     "mutant": "external-fake-strong",
+    "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/storage/EntryFacts.java",
     "status": "KILLED",
     "executed": 6,
     "failures": [
@@ -13,10 +14,11 @@
     "errors": [],
     "restored_exit_code": 0,
     "original_sha256": "34afb24c31a316c268623d787a4c81f9a758cf3527bf9621975b8b0b1b08f99c",
-    "run": "mutations-01"
+    "run": "mutations-final"
   },
   {
     "mutant": "cross-may-entry-conflict",
+    "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/rd/ReachingDefinitions.java",
     "status": "KILLED",
     "executed": 6,
     "failures": [
@@ -49,10 +51,11 @@
     "errors": [],
     "restored_exit_code": 0,
     "original_sha256": "f4fb2a151022ee222035b0c0e32bf891b9a7feb7b6283f55422d03a3b1e098f3",
-    "run": "mutations-01"
+    "run": "mutations-final"
   },
   {
     "mutant": "permutation-admission",
+    "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/rd/ReachingDefinitions.java",
     "status": "KILLED",
     "executed": 6,
     "failures": [
@@ -85,10 +88,11 @@
     "errors": [],
     "restored_exit_code": 0,
     "original_sha256": "f4fb2a151022ee222035b0c0e32bf891b9a7feb7b6283f55422d03a3b1e098f3",
-    "run": "mutations-01"
+    "run": "mutations-final"
   },
   {
     "mutant": "possible-plus-unknown-drop",
+    "path": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/RegionalValuesAnalysis.java",
     "status": "KILLED",
     "executed": 6,
     "failures": [
@@ -115,11 +119,12 @@
     ],
     "errors": [],
     "restored_exit_code": 0,
-    "original_sha256": "330c0bf04a9a8489561a0bfb6c02ebb6ef4763692ae78cd84c648874f9792e70",
-    "run": "mutations-01"
+    "original_sha256": "9e13ec1f9f1caafaf9038785182e1fcca84568151f1eafed45659d04603c7d63",
+    "run": "mutations-final"
   },
   {
     "mutant": "may-becomes-kill",
+    "path": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/RegionalValuesAnalysis.java",
     "status": "KILLED",
     "executed": 4,
     "failures": [
@@ -131,11 +136,12 @@
     ],
     "errors": [],
     "restored_exit_code": 0,
-    "original_sha256": "330c0bf04a9a8489561a0bfb6c02ebb6ef4763692ae78cd84c648874f9792e70",
-    "run": "mutations-01"
+    "original_sha256": "9e13ec1f9f1caafaf9038785182e1fcca84568151f1eafed45659d04603c7d63",
+    "run": "mutations-final"
   },
   {
     "mutant": "factorized-weak-drops-old",
+    "path": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/RegionalValuesAnalysis.java",
     "status": "KILLED",
     "executed": 4,
     "failures": [
@@ -152,11 +158,12 @@
     ],
     "errors": [],
     "restored_exit_code": 0,
-    "original_sha256": "330c0bf04a9a8489561a0bfb6c02ebb6ef4763692ae78cd84c648874f9792e70",
-    "run": "mutations-01"
+    "original_sha256": "9e13ec1f9f1caafaf9038785182e1fcca84568151f1eafed45659d04603c7d63",
+    "run": "mutations-final"
   },
   {
     "mutant": "factorized-join-drops-candidate",
+    "path": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/RegionalValuesAnalysis.java",
     "status": "KILLED",
     "executed": 8,
     "failures": [
@@ -183,11 +190,12 @@
     ],
     "errors": [],
     "restored_exit_code": 0,
-    "original_sha256": "330c0bf04a9a8489561a0bfb6c02ebb6ef4763692ae78cd84c648874f9792e70",
-    "run": "mutations-01"
+    "original_sha256": "9e13ec1f9f1caafaf9038785182e1fcca84568151f1eafed45659d04603c7d63",
+    "run": "mutations-final"
   },
   {
     "mutant": "unknown-alias-becomes-disjoint",
+    "path": "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/storage/StorageIndex.java",
     "status": "KILLED",
     "executed": 4,
     "failures": [
@@ -200,10 +208,11 @@
     "errors": [],
     "restored_exit_code": 0,
     "original_sha256": "d76f35b4b5e2cf03b43f6c981b3f1607e33e1f584ba494abf7ffcbee146e6a22",
-    "run": "mutations-02"
+    "run": "mutations-final"
   },
   {
     "mutant": "query-time-entry-reseed",
+    "path": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/RegionalValuesAnalysis.java",
     "status": "KILLED",
     "executed": 4,
     "failures": [
@@ -215,11 +224,12 @@
     ],
     "errors": [],
     "restored_exit_code": 0,
-    "original_sha256": "330c0bf04a9a8489561a0bfb6c02ebb6ef4763692ae78cd84c648874f9792e70",
-    "run": "mutations-02"
+    "original_sha256": "9e13ec1f9f1caafaf9038785182e1fcca84568151f1eafed45659d04603c7d63",
+    "run": "mutations-final"
   },
   {
     "mutant": "must-cannot-kill",
+    "path": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/RegionalValuesAnalysis.java",
     "status": "KILLED",
     "executed": 4,
     "failures": [
@@ -231,11 +241,12 @@
     ],
     "errors": [],
     "restored_exit_code": 0,
-    "original_sha256": "330c0bf04a9a8489561a0bfb6c02ebb6ef4763692ae78cd84c648874f9792e70",
-    "run": "mutations-02"
+    "original_sha256": "9e13ec1f9f1caafaf9038785182e1fcca84568151f1eafed45659d04603c7d63",
+    "run": "mutations-final"
   },
   {
     "mutant": "cartesian-unshared-suffixes",
+    "path": "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/FactorizedAlternatives.java",
     "status": "KILLED",
     "executed": 1,
     "failures": [
@@ -248,6 +259,6 @@
     "errors": [],
     "restored_exit_code": 0,
     "original_sha256": "96e9b44715e8cc80b1bbcd528efa15da8e61d76cea633f58296bdbeb4ef79eb1",
-    "run": "mutations-02"
+    "run": "mutations-final"
   }
 ]

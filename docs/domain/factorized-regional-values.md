@@ -115,7 +115,8 @@ the I weak-write regression, G/E scaled copies/joins and the unchanged independe
 concrete branch/copy/loop oracles. `w3-focused.log`, `w4-scale.log`,
 `domain-family.log` record this checkpoint (104 values-family tests, zero failures).
 The 17 selected product verticals in `product-01` pass real codec/CLI byte parity.
-Further W6 falsification and policy mutations remain pending; no final FAST yet.
+That checkpoint preceded W6 and the final gate; see the [final handoff](../work/ep-r2-handoff.md)
+for current qualification and preserved failures.
 
 W6 found a local projection hazard: a Choice source must project one selected
 range, not the simultaneous product of every candidate's range. A focused oracle
@@ -124,3 +125,10 @@ the Choice; that setup error is not a semantic RED. With the honest partial
 policy, `w6-choice-red-valid.log` fails the projected-alternative bound against
 3fc5ac1; `w6-choice-green-valid.log` passes after candidate-local capture.
 Source identity and the original candidate index still govern copy provenance.
+
+The final wire regression check also requires canonical variable levels independent
+of AIR inventory order. StoragePartition ordinals are traversal indexes; Regional
+Values assigns its DAG levels by sorted base identity and increasing segment range.
+This affects graph sharing and measured allocations, not separation authority.
+The existing full-wire permutation oracle first failed on interned node counts,
+then passed after this correction; no serialization check was weakened.
