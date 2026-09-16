@@ -36,6 +36,7 @@ SUITES = {
             "unsupportedCapabilityRemainsACodecFailure",
         },
         "io.github.gustavo2358.analysis.cfg.adapters.WriterDomainTest": {
+            "partialAnalysisRequiresExplicitPartialResultWire",
             "memoryAndFileHaveEquivalentControlCoverageWire", "writerCoversEveryCurrentKindWithExactContextualTransitions",
             "utf8EscapingAndByteLimitAreExact", "invalidUnicodeIsRejectedByOutputPrimitiveAndAirModel",
             "nonAtomicFallbackIsExplicitAndMovesCompleteBytes", "failedMoveCleansTemporaryAndDoesNotReportSuccess",

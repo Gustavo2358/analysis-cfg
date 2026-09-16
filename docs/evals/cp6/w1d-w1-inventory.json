@@ -114,6 +114,7 @@
       "io.github.gustavo2358.analysis.cfg.domain.CfgNodeId",
       "io.github.gustavo2358.analysis.cfg.domain.CfgTransition",
       "io.github.gustavo2358.analysis.cfg.domain.CfgTransition$Kind",
+      "io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy",
       "io.github.gustavo2358.analysis.structure.ContextView",
       "io.github.gustavo2358.analysis.structure.OpenControl",
       "io.github.gustavo2358.analysis.structure.ProgramIndex",
@@ -133,6 +134,7 @@
       "io.github.gustavo2358.air.model.Control",
       "io.github.gustavo2358.air.model.Control$ControlAlternative",
       "io.github.gustavo2358.air.model.Control$ControlEnvelope",
+      "io.github.gustavo2358.air.model.Control$InvocationAlternative",
       "io.github.gustavo2358.air.model.Control$InvocationOutcomes",
       "io.github.gustavo2358.air.model.Control$Normal",
       "io.github.gustavo2358.air.model.Control$ReturnAlternative",
@@ -192,6 +194,7 @@
       "io.github.gustavo2358.air.model.Terminator",
       "io.github.gustavo2358.air.model.Unit",
       "io.github.gustavo2358.air.model.Unit$BodyAvailability",
+      "io.github.gustavo2358.air.validation.ValidationResult",
       "io.github.gustavo2358.analysis.cfg.application.BuildOptions",
       "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult",
       "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult$Status",
@@ -243,6 +246,7 @@
       "java.util.Optional",
       "java.util.Set",
       "java.util.function.Function",
+      "java.util.function.Predicate",
       "java.util.stream.Stream"
     ],
     "io.github.gustavo2358.analysis.structure.IndexBuilder$1": [
@@ -317,8 +321,12 @@
       "io.github.gustavo2358.air.model.Ids$LabelId",
       "io.github.gustavo2358.air.model.Ids$UnitId",
       "io.github.gustavo2358.air.model.Operations",
+      "io.github.gustavo2358.air.model.Operations$Branch",
+      "io.github.gustavo2358.air.model.Operations$Halt",
       "io.github.gustavo2358.air.model.Operations$Invoke",
+      "io.github.gustavo2358.air.model.Operations$Jump",
       "io.github.gustavo2358.air.model.Operations$Opaque",
+      "io.github.gustavo2358.air.model.Operations$Return",
       "io.github.gustavo2358.air.model.Scopes",
       "io.github.gustavo2358.air.model.Scopes$AllControl",
       "io.github.gustavo2358.air.model.Scopes$ControlBound",
@@ -336,6 +344,7 @@
       "io.github.gustavo2358.analysis.cfg.domain.CfgNode$HaltExit",
       "io.github.gustavo2358.analysis.cfg.domain.CfgNode$NormalExit",
       "io.github.gustavo2358.analysis.cfg.domain.CfgNode$SequenceNode",
+      "io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy",
       "io.github.gustavo2358.analysis.structure.ProgramIndex",
       "io.github.gustavo2358.analysis.structure.ProgramIndex$Node",
       "java.lang.Class",
@@ -376,6 +385,7 @@
       "io.github.gustavo2358.air.model.Unit",
       "io.github.gustavo2358.analysis.cfg.domain.CfgNodeId",
       "io.github.gustavo2358.analysis.cfg.domain.CfgTransition",
+      "io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy",
       "io.github.gustavo2358.analysis.structure.IndexBuilder",
       "io.github.gustavo2358.analysis.structure.IndexMetrics",
       "io.github.gustavo2358.analysis.structure.IndexMetrics$Counter",
@@ -397,10 +407,15 @@
       "java.util.Collection",
       "java.util.Collections",
       "java.util.HashMap",
+      "java.util.HashSet",
       "java.util.List",
       "java.util.Map",
+      "java.util.Set",
       "java.util.function.BiFunction",
-      "java.util.function.Function"
+      "java.util.function.Function",
+      "java.util.stream.Collector",
+      "java.util.stream.Collectors",
+      "java.util.stream.Stream"
     ],
     "io.github.gustavo2358.analysis.structure.ProgramIndex$Node": [
       "io.github.gustavo2358.air.model.Unit",
@@ -433,7 +448,7 @@
     "io.github.gustavo2358.analysis.structure.OpenControl": "Compiled from \"OpenControl.java\"\nfinal class io.github.gustavo2358.analysis.structure.OpenControl {\n}\n",
     "io.github.gustavo2358.analysis.structure.ProgramIndex$Node": "Compiled from \"ProgramIndex.java\"\npublic final class io.github.gustavo2358.analysis.structure.ProgramIndex$Node {\n  public io.github.gustavo2358.analysis.cfg.domain.CfgNode source();\n    descriptor: ()Lio/github/gustavo2358/analysis/cfg/domain/CfgNode;\n\n  public io.github.gustavo2358.air.model.Unit owner();\n    descriptor: ()Lio/github/gustavo2358/air/model/Unit;\n}\n",
     "io.github.gustavo2358.analysis.structure.ProgramIndex$Site": "Compiled from \"ProgramIndex.java\"\npublic final class io.github.gustavo2358.analysis.structure.ProgramIndex$Site {\n  public io.github.gustavo2358.air.model.Sequence sequence();\n    descriptor: ()Lio/github/gustavo2358/air/model/Sequence;\n\n  public io.github.gustavo2358.air.model.Unit owner();\n    descriptor: ()Lio/github/gustavo2358/air/model/Unit;\n\n  public int offset();\n    descriptor: ()I\n\n  public boolean isTerminator();\n    descriptor: ()Z\n\n  public io.github.gustavo2358.air.model.Operation operation();\n    descriptor: ()Lio/github/gustavo2358/air/model/Operation;\n}\n",
-    "io.github.gustavo2358.analysis.structure.ProgramIndex": "Compiled from \"ProgramIndex.java\"\npublic final class io.github.gustavo2358.analysis.structure.ProgramIndex {\n  public io.github.gustavo2358.air.model.Publication publication();\n    descriptor: ()Lio/github/gustavo2358/air/model/Publication;\n\n  public io.github.gustavo2358.analysis.structure.IndexMetrics metrics();\n    descriptor: ()Lio/github/gustavo2358/analysis/structure/IndexMetrics;\n\n  public io.github.gustavo2358.analysis.structure.ProgramIndex$Node node(io.github.gustavo2358.analysis.cfg.domain.CfgNodeId);\n    descriptor: (Lio/github/gustavo2358/analysis/cfg/domain/CfgNodeId;)Lio/github/gustavo2358/analysis/structure/ProgramIndex$Node;\n\n  public io.github.gustavo2358.analysis.structure.ProgramIndex$Node sequence(io.github.gustavo2358.air.model.Ids$LabelId);\n    descriptor: (Lio/github/gustavo2358/air/model/Ids$LabelId;)Lio/github/gustavo2358/analysis/structure/ProgramIndex$Node;\n\n  public io.github.gustavo2358.air.model.Unit unit(io.github.gustavo2358.air.model.Ids$UnitId);\n    descriptor: (Lio/github/gustavo2358/air/model/Ids$UnitId;)Lio/github/gustavo2358/air/model/Unit;\n\n  public io.github.gustavo2358.air.model.Entries$Entry entry(io.github.gustavo2358.air.model.Ids$EntryId);\n    descriptor: (Lio/github/gustavo2358/air/model/Ids$EntryId;)Lio/github/gustavo2358/air/model/Entries$Entry;\n\n  public io.github.gustavo2358.analysis.structure.ProgramIndex$Site site(io.github.gustavo2358.air.model.Ids$OperationId);\n    descriptor: (Lio/github/gustavo2358/air/model/Ids$OperationId;)Lio/github/gustavo2358/analysis/structure/ProgramIndex$Site;\n\n  public java.util.List<io.github.gustavo2358.analysis.structure.ProgramIndex$Site> sites(java.lang.Class<? extends io.github.gustavo2358.air.model.Operation>);\n    descriptor: (Ljava/lang/Class;)Ljava/util/List;\n\n  public io.github.gustavo2358.air.model.Memory$ObjectDeclaration object(io.github.gustavo2358.air.model.Ids$ObjectId);\n    descriptor: (Lio/github/gustavo2358/air/model/Ids$ObjectId;)Lio/github/gustavo2358/air/model/Memory$ObjectDeclaration;\n\n  public io.github.gustavo2358.air.model.Memory$Storage storage(io.github.gustavo2358.air.model.Ids$StorageId);\n    descriptor: (Lio/github/gustavo2358/air/model/Ids$StorageId;)Lio/github/gustavo2358/air/model/Memory$Storage;\n\n  public io.github.gustavo2358.air.model.Memory$Cell directCell(io.github.gustavo2358.air.model.Ids$ObjectId);\n    descriptor: (Lio/github/gustavo2358/air/model/Ids$ObjectId;)Lio/github/gustavo2358/air/model/Memory$Cell;\n\n  public io.github.gustavo2358.air.model.Place place(io.github.gustavo2358.air.model.Ids$OperandId);\n    descriptor: (Lio/github/gustavo2358/air/model/Ids$OperandId;)Lio/github/gustavo2358/air/model/Place;\n\n  public io.github.gustavo2358.air.model.Memory$ObjectDeclaration referencedObject(io.github.gustavo2358.air.model.Ids$OperandId);\n    descriptor: (Lio/github/gustavo2358/air/model/Ids$OperandId;)Lio/github/gustavo2358/air/model/Memory$ObjectDeclaration;\n}\n"
+    "io.github.gustavo2358.analysis.structure.ProgramIndex": "Compiled from \"ProgramIndex.java\"\npublic final class io.github.gustavo2358.analysis.structure.ProgramIndex {\n  public boolean unprovedPreconditions(io.github.gustavo2358.air.model.Ids$OperationId);\n    descriptor: (Lio/github/gustavo2358/air/model/Ids$OperationId;)Z\n\n  public boolean unprovedPreconditions(io.github.gustavo2358.air.model.Ids$UnitId);\n    descriptor: (Lio/github/gustavo2358/air/model/Ids$UnitId;)Z\n\n  public boolean hasUnprovedPreconditions();\n    descriptor: ()Z\n\n  public boolean partialControl(io.github.gustavo2358.air.model.Ids$UnitId);\n    descriptor: (Lio/github/gustavo2358/air/model/Ids$UnitId;)Z\n\n  public io.github.gustavo2358.air.model.Publication publication();\n    descriptor: ()Lio/github/gustavo2358/air/model/Publication;\n\n  public io.github.gustavo2358.analysis.structure.IndexMetrics metrics();\n    descriptor: ()Lio/github/gustavo2358/analysis/structure/IndexMetrics;\n\n  public io.github.gustavo2358.analysis.structure.ProgramIndex$Node node(io.github.gustavo2358.analysis.cfg.domain.CfgNodeId);\n    descriptor: (Lio/github/gustavo2358/analysis/cfg/domain/CfgNodeId;)Lio/github/gustavo2358/analysis/structure/ProgramIndex$Node;\n\n  public io.github.gustavo2358.analysis.structure.ProgramIndex$Node sequence(io.github.gustavo2358.air.model.Ids$LabelId);\n    descriptor: (Lio/github/gustavo2358/air/model/Ids$LabelId;)Lio/github/gustavo2358/analysis/structure/ProgramIndex$Node;\n\n  public io.github.gustavo2358.air.model.Unit unit(io.github.gustavo2358.air.model.Ids$UnitId);\n    descriptor: (Lio/github/gustavo2358/air/model/Ids$UnitId;)Lio/github/gustavo2358/air/model/Unit;\n\n  public io.github.gustavo2358.air.model.Entries$Entry entry(io.github.gustavo2358.air.model.Ids$EntryId);\n    descriptor: (Lio/github/gustavo2358/air/model/Ids$EntryId;)Lio/github/gustavo2358/air/model/Entries$Entry;\n\n  public io.github.gustavo2358.analysis.structure.ProgramIndex$Site site(io.github.gustavo2358.air.model.Ids$OperationId);\n    descriptor: (Lio/github/gustavo2358/air/model/Ids$OperationId;)Lio/github/gustavo2358/analysis/structure/ProgramIndex$Site;\n\n  public java.util.List<io.github.gustavo2358.analysis.structure.ProgramIndex$Site> sites(java.lang.Class<? extends io.github.gustavo2358.air.model.Operation>);\n    descriptor: (Ljava/lang/Class;)Ljava/util/List;\n\n  public io.github.gustavo2358.air.model.Memory$ObjectDeclaration object(io.github.gustavo2358.air.model.Ids$ObjectId);\n    descriptor: (Lio/github/gustavo2358/air/model/Ids$ObjectId;)Lio/github/gustavo2358/air/model/Memory$ObjectDeclaration;\n\n  public io.github.gustavo2358.air.model.Memory$Storage storage(io.github.gustavo2358.air.model.Ids$StorageId);\n    descriptor: (Lio/github/gustavo2358/air/model/Ids$StorageId;)Lio/github/gustavo2358/air/model/Memory$Storage;\n\n  public io.github.gustavo2358.air.model.Memory$Cell directCell(io.github.gustavo2358.air.model.Ids$ObjectId);\n    descriptor: (Lio/github/gustavo2358/air/model/Ids$ObjectId;)Lio/github/gustavo2358/air/model/Memory$Cell;\n\n  public io.github.gustavo2358.air.model.Place place(io.github.gustavo2358.air.model.Ids$OperandId);\n    descriptor: (Lio/github/gustavo2358/air/model/Ids$OperandId;)Lio/github/gustavo2358/air/model/Place;\n\n  public io.github.gustavo2358.air.model.Memory$ObjectDeclaration referencedObject(io.github.gustavo2358.air.model.Ids$OperandId);\n    descriptor: (Lio/github/gustavo2358/air/model/Ids$OperandId;)Lio/github/gustavo2358/air/model/Memory$ObjectDeclaration;\n}\n"
   },
   "effective_maven": [
     "io.github.gustavo2358.analysis:analysis-kernel:jar:0.1.0-SNAPSHOT",

@@ -125,6 +125,17 @@
       "unmodeledControlCannotEraseAnInventoriedLiteralOccurrence",
       "partialSchemaPreservesFactsReasonsAndExactWireForIndependentReader",
       "structurallyInvalidReferenceStillRejectsTheWholePublication"
+    ],
+    "io.github.gustavo2358.analysis.adapters.EvidenceMonotonicityTest": [
+      "addingUnknownEffectCannotEraseIndependentBeforeValue",
+      "addingUnmodeledOutcomeCannotEraseBeforeSupport",
+      "addingUnknownDeclarationCannotEraseIndependentAssignedTarget",
+      "unrelatedUnavailableUnitCannotEraseIndependentComputedAndLiteralSites",
+      "unprovedCodecWriteCannotEraseIndependentBeforeCandidate",
+      "unprovedOwnOverwriteIsWeakButLaterProvenMustStillKills"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PartialProjectionLawTest": [
+      "unknownControlUsesSameSnapshotSolverAndBeforeEvidenceWithoutEntryBackedge"
     ]
   },
   "analysis-dataflow": {
@@ -255,7 +266,8 @@
       "successReplacesExistingFileAndMatchesMemoryExactly",
       "inputAndOutputFailuresPreserveDestinationAndCleanupTemporaryFile",
       "realCodecOperationalLimitIsSevenAndProducesNoPartialResult",
-      "semanticLimitsPublishExplicitPartialOutputWithoutExitFive"
+      "semanticLimitsPublishExplicitPartialOutputWithoutExitFive",
+      "scopedPreconditionSurvivesRealCodecCliAndStructuralInvalidityStillRejects"
     ],
     "io.github.gustavo2358.analysis.launcher.RegionalCliTest": [
       "missingInputAndBadQueryNeverReplaceOutput",
@@ -435,7 +447,8 @@
     "io.github.gustavo2358.analysis.values.EvidencePreservingEntryTest": [
       "unknownBindingPreservesEntrySupportInBothAnalyses",
       "unprovedBindingNeverPromotesAssignmentToStrongKill",
-      "genericUnknownEffectCannotClearLogicalEvidence"
+      "genericUnknownEffectCannotClearLogicalEvidence",
+      "logicalSourceCopiesIntoKnownStorageAndLaterMustStillKillsIt"
     ],
     "io.github.gustavo2358.analysis.values.EvidencePreservingPolicyTest": [
       "unknownMayKeepsEntryCandidateAndItsOriginalSupport",
@@ -478,6 +491,7 @@
       "onlyProjectedDomainSelectsVersionAndWriterHasNoStickyState"
     ],
     "io.github.gustavo2358.analysis.cfg.adapters.WriterDomainTest": [
+      "partialAnalysisRequiresExplicitPartialResultWire",
       "memoryAndFileHaveEquivalentControlCoverageWire",
       "writerCoversEveryCurrentKindWithExactContextualTransitions",
       "utf8EscapingAndByteLimitAreExact",

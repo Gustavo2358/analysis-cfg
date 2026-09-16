@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "observed_on": "2026-09-15",
+  "observed_on": "2026-09-16",
   "analysis_ir": {
     "repository": "Gustavo2358/analysis-ir",
-    "commit": "56d7e76961e2892925da8bfab387707c306376bf",
+    "commit": "6b8ce96f5b1020199e3fcceedf81d931a3b8d2ff",
     "semantic_version": "2.0.0",
     "role": "normative",
     "canonical_ref": "feat/evidence-preserving-partial-analysis",
@@ -23,7 +23,7 @@
       "targets_air_version": "2.0.0",
       "path": "bindings/json-v1.md",
       "review_path": "bindings/revisao-json-v1.md",
-      "checked_commit": "56d7e76961e2892925da8bfab387707c306376bf",
+      "checked_commit": "6b8ce96f5b1020199e3fcceedf81d931a3b8d2ff",
       "implemented_in_analysis_cfg": false
     },
     "files": [
@@ -49,7 +49,7 @@
       },
       {
         "path": "conformidade/02-oraculos.md",
-        "git_blob_sha1": "d59f7fcc053f75cbb3a9bd5c3370586a938abbc8"
+        "git_blob_sha1": "c9caca8d96993dae174e5b46b3e635bcd4a61bfd"
       },
       {
         "path": "especificacao/00-escopo-e-convencoes.md",
@@ -85,7 +85,7 @@
       },
       {
         "path": "especificacao/08-contrato-de-consumidores.md",
-        "git_blob_sha1": "dfc1658fe4d9f88f1190edc70e0e208c4da12288"
+        "git_blob_sha1": "7680fb95190314444a8097f6a4a8a6d247af7428"
       },
       {
         "path": "especificacao/09-extensibilidade-e-compatibilidade.md",
@@ -132,18 +132,19 @@
         "git_blob_sha1": "51f3be03c932478b699e80526d32fa1c78ca938e"
       }
     ],
-    "baseline_assessment": "EP-W1 entry.possibilities@2; focused bilateral and selected CLI evidence; FAST pending",
-    "observed_on": "2026-09-15"
+    "baseline_assessment": "EP-W5 entry.possibilities@2 and scoped partial consumer policy; AIR 2.0.0/binding 1.0.0.",
+    "observed_on": "2026-09-16",
+    "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5.md; REAL CASE unavailable."
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "1e06f2900b88a573d9bc1822b53ff7e5f7960e5c",
+    "commit": "5b8a5c231958b62de34583d871cbb10b473d53e8",
     "canonical_ref": "feat/evidence-preserving-partial-analysis",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
     "analysis_ir": {
       "semantic_version": "2.0.0",
-      "commit": "56d7e76961e2892925da8bfab387707c306376bf"
+      "commit": "566fe5822d6a1d7eb55d6f6321d530f9de548cdb"
     },
     "maven": {
       "group_id": "io.github.gustavo2358",
@@ -185,7 +186,7 @@
       "air-model/src/main/java/io/github/gustavo2358/air/model/MemoryCodecs.java",
       "air-json/src/test/resources/regional.canonical.json"
     ],
-    "observed_on": "2026-09-15",
+    "observed_on": "2026-09-16",
     "modules": {
       "parent": {
         "path": "pom.xml",
@@ -204,7 +205,8 @@
       }
     },
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "move_data_validation": "docs/work/history/WORK-CFG-035.md"
+    "move_data_validation": "docs/work/history/WORK-CFG-035.md",
+    "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5.md; REAL CASE unavailable."
   },
   "proleap_poc": {
     "repository": "Gustavo2358/proleap-poc",
@@ -256,7 +258,7 @@
     ],
     "semantic_product_version": "2.19.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "92eeb774f0c333c253a77148ca1dff7a4dc57edf",
+    "commit": "b5f626f5b42b5168af29a740aace60a1f0a993d1",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -268,13 +270,14 @@
     },
     "storage_contract_version": "1.6.0",
     "canonical_ref": "feat/evidence-preserving-partial-analysis",
-    "observed_on": "2026-09-15",
-    "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update."
+    "observed_on": "2026-09-16",
+    "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
+    "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5.md; REAL CASE unavailable."
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
-    "status": "EP-W1 focused vertical passed; FAST pending",
-    "commit": "ea3041a956150155d39bd94784e5744315f5d6bd",
+    "status": "EP-W5 FAST pass; explicit logical evidence and strict producer validation preserved",
+    "commit": "69c78c5f696e1351c514f16c1fdab0c9d6cca524",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -287,8 +290,9 @@
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
     },
     "canonical_ref": "feat/evidence-preserving-partial-analysis",
-    "observed_on": "2026-09-15",
-    "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update."
+    "observed_on": "2026-09-16",
+    "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
+    "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5.md; REAL CASE unavailable."
   },
   "external": [
     {
