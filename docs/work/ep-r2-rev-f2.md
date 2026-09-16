@@ -1,97 +1,126 @@
 # R2-REV-F2 — Leading-Dollar COBOL Program Names
 
-## Scope and hygiene
+## Scope and authority
 
-Existing Draft PR #39, branch `fix/ep-r2-entry-factorized-recall`.
-Entry head: `3968e4847a1dfe0526be649576822751a09e774d`.
-After successful fetch, origin/main remains
-`194fac2af6cfc54053318164275e682feac5c750`; the worktree was clean.
-The first sandboxed fetch failed on system SSH configuration permissions; the
-normal authorized fetch outside that sandbox succeeded. No merge/auto-merge.
+Same Draft [PR #39](https://github.com/Gustavo2358/analysis-cfg/pull/39), branch
+`fix/ep-r2-entry-factorized-recall`. No merge or auto-merge.
+F2 entry/base: `3968e4847a1dfe0526be649576822751a09e774d`.
+Main: `194fac2af6cfc54053318164275e682feac5c750`, untouched.
 
-Only the CALL name interpretation policy is in scope. CFG, RD, Regional Values,
-factorization, entry admission, KillAuthority, upstreams, pins, FILE and SYNC
-remain unchanged. No confidential source or real AIR/product is versioned here.
+The requirement is generic: a COBOL program name may start with `$`; the character
+is part of the name. Only `CallNameInterpreter` changes in Java production.
+CFG, RD, Regional Values, storage, KillAuthority, upstreams, pins and frozen FILE
+remain unchanged. The independent Python reader accepts the same language.
 
-## W0 — synthetic evidence before any production change
+The explicit [pre-release policy](../architecture/extensibility.md#política-de-versionamento-pré-release)
+requires correcting unpublished local semantic bugs in place. The profile stays
+**cobol-zos-dynamic-call-minimal@1**. No new profile, legacy mode or wire revision.
 
-The W0 interpreter used `[A-Z_][A-Z0-9_@#$]{0,7}`. It trims only final
-U+0020 for computed values. CallDependencyConsumer first retains supported raw
-values, then adds interpreted candidates only when referenceName is non-null.
-The empty interpreted list produces OPEN_TARGET.
+## Sanitized history
 
-The frozen desired-behavior tests were RED on the entry head:
+The F2 portion was rebuilt as three commits using synthetic data, including the
+RED commit itself. The base and all earlier EP-R2/F1 commits are preserved.
+The exhaustive search covers all 16 PR commit trees and the current 2,876
+tracked files, including recursive gzip/xz/tar/zip contents, filenames and commit
+metadata: zero occurrences of the locally supplied prohibited identifiers. The
+three rebuilt F2 commits are individually clean. The PR body has zero matches
+and the PR has no comments. The local denylist is not versioned.
+No real-to-synthetic mapping is retained. Production is byte-identical to the
+previously qualified F2 implementation; sanitation changes fixtures, method names,
+inventory, documentation and evidence, not analysis behavior.
 
-- LeadingDollarNameTest: 7 tests, 5 semantic failures, zero errors/skips.
-  `$PROGA   ` computed, `$PROGA` literal, `$ABC1`, `$TEST123   ` and `$ABCDEFG`
-  are rejected. Existing positive forms and all negative controls pass.
-- LeadingDollarProductTest: 5 tests, 3 semantic failures, zero errors/skips.
-  `$PROGA` literal, `$PROGA   ` computed and the eight-character `$ABCDEFG`
-  reach rawCandidates with nonempty support and provenance, but candidates and
-  edges are empty and targetStatus is OPEN_TARGET. The computed BEFORE value
-  and its producer/origin are verified before the failing candidate assertion.
-- Four positive control outputs and seven negative outputs preserve their
-  expected behavior. The independent dependency_wire reader accepts all 14
-  synthetic JSON outputs, including the three failure witnesses.
+The [canonical harness rule](../engineering/lean-harness.md#confidential-incident-data)
+prohibits promoting real/corporate incident identifiers into fixtures, tests,
+documentation, evidence, regression data, commit history or PR discussion.
+**Real identifiers must not be versioned.** Detailed real-case evidence stays
+local and confidential. Git may contain only non-sensitive aggregate observations.
+AGENTS.md links directly to this authority.
 
-[W0 evidence](ep-r2/rev-f2-w0.json) records the production hash, counts and
-synthetic site facts. Raw logs/XML and preserved AIR/JSON baseline are under
-`.harness-results/ep-r2/sanitization/`; synthetic-before must not be overwritten by
-later GREEN output. Temurin 21.0.12+1.1 / release 21; existing pinned AIR build.
-W0 did not run FAST: that wave intentionally stopped before production changes.
+## Rebuilt RED and unchanged correction
 
-## W0B — real hypothesis is not yet audited
+Synthetic RED commit: `249206dfa21e2cd1fd57b8de60aaa77f9248706c`.
+Production/policy/test commit: `058312e71d06cd9df5218ee4e6ba1d48aef83b92`.
+The fix retains the regex `[A-Z_$][A-Z0-9_@#$]{0,7}` in @1, replacing only the
+initial class of `[A-Z_][A-Z0-9_@#$]{0,7}`. `$PROGA` stays `$PROGA` in
+referenceName and in the edge. Computed `$PROGA   ` drops only trailing U+0020
+from referenceName; rawValue remains integral. Literal padding is still rejected.
 
-Synthetic mechanism: CONFIRMED. The four-site real-case hypothesis is
-**NOT YET CONFIRMED OR REJECTED**. Neither the real dependencies.json path nor
-the matching AIR and expected nine-name set were supplied in the request.
-A local search did not identify the confidential incident artifacts. This is an
-artifact-location limitation, not evidence about the expected real-name set.
+The [W0 evidence](ep-r2/rev-f2-w0.json) was regenerated against unchanged pre-fix
+production, using synthetic examples only:
 
-The product owner subsequently confirmed PRE-RELEASE status and authorized the
-leading-dollar capability independently of this audit. F2-W0B now means a later
-incident audit, not implementation permission. The existing real dependencies.json,
-matching AIR and exact expected nine-name set are still needed for that audit.
-Do not infer an upstream boundary or claim 9/9 without those artifacts. If a name
-remains absent after the same-AIR rerun, record the first observed loss and stop
-for review; do not invent another fix.
+- Seven interpreter tests: five semantic failures, zero errors/skips.
+- Five product tests: three semantic failures, zero errors/skips.
+- Fourteen baseline JSON products pass the independent reader. Their content
+  equals the previous synthetic baseline. The three leading-dollar witnesses
+  have supported raw values, empty candidates/edges and OPEN_TARGET.
 
-For each missing site, keep the detailed incident audit local and confidential.
-Real identifiers must not be versioned. Git may retain only non-sensitive
-aggregate observations, never real names or site/support identifier mappings. The rerun must reuse
-identical AIR bytes, upstreams and parameters, with only analysis-cfg changed.
-Compare the exact expected set, all five prior names, all four new names,
-candidate-specific support/provenance, raw spelling and each remainder.
+Examples include `$PROGA`, `$ABC1`, `$TEST123` and `$ABCDEFG`. They are synthetic
+representatives of the policy, not substitutions documented against real names.
+Existing positives, negative forms, eight-character limit, raw values,
+UnknownName remainder, support and provenance remain covered.
 
-## W1B — explicit pre-release authority supersedes the earlier proposal
+## Qualification after rebuilding
 
-The initial W0 proposal of a new profile revision was superseded by the product
-owner's explicit PRE-RELEASE VERSIONING POLICY. The product has never had a
-production baseline or external consumer. Git main is development, not publication.
-The [canonical policy](../architecture/extensibility.md#política-de-versionamento-pré-release)
-requires correcting local semantic bugs in-place until the first actual bank
-baseline; cross-repository wires may still identify incompatible snapshots.
+[Validation ledger](ep-r2/rev-f2-validation.json), JDK 21:
 
-Decision: retain **cobol-zos-dynamic-call-minimal@1** and change only the initial
-character class from `[A-Z_]` to `[A-Z_$]`. No other character, length, padding,
-case, UnknownName/ExtensionName, evidence or remainder semantics changes. The
-[canonical name policy](../domain/cp6-call-name-policy.md), architectural authority
-and AGENTS reference are committed with the regex and assertions freezing @1.
+- NEW: 28 focused Java tests across seven suites pass, including eight interpreter
+  and six product methods. Constant and emitted COBOL profiles are frozen at @1.
+- NEW: nine independent dependency JSON reader tests pass.
+- NEW: 15 AIR → production CLI → dependencies.json outputs are byte-identical
+  to in-memory output and pass the reader. The Regional Values case checks BEFORE,
+  supported raw value, provenance, candidate and edge.
+- NEW: all 14 reconstructed W0 AIR inputs remain byte-identical. Three corrected
+  products differ only in candidates/status/edges; all raw/support/provenance/
+  premises/remainder fields remain identical. Eleven controls are byte-identical
+  as entire products, including the unchanged profile.
+- NEW: one FAST after rebuilding passes 515 Java methods with zero failures,
+  errors or skips, plus Python and compiled architecture checks. Observed duration:
+  79.164 seconds; no production changes after the gate.
 
-Current JSON has top-level interpretationProfile=per-site and per-site nameProfile.
-Both the constant and emitted COBOL profile remain @1. No AIR/frontend/lower,
-new wire version, compatibility shim or legacy mode is introduced.
+REUSED: 69 neighboring Java regressions and H2/F1/two F-order product verticals
+from the preceding qualification, plus EP-R2 entry/domain/F1 evidence. Their
+production and pins are unchanged. The ledger labels these as reused, not rerun.
+NOT RERUN: historical campaigns, CardDemo, full CICS, FILE, other repositories or
+broad corpus. This sanitation does not invalidate their production boundaries.
 
-## Remaining qualification
+Raw logs, XML and reconstructed baseline stay in the ignored local directory
+`.harness-results/ep-r2/sanitization/`. The obsolete incident-bearing evidence
+is not promoted into the reconstructed history. No failed attempt is relabeled PASS.
 
-C2 local semantic rule plus its existing product boundary: desired REDs → minimal
-in-place policy delta → focused interpreter/consumer/wire tests → H2, representative
-F1/F-order and one existing computed regional case → one FAST after stabilization → same-AIR manual real rerun. The old/no-dollar JSON baseline must remain equivalent
-byte-for-byte, with no profile revision. No automatic rerun of the
-whole EP-R2, upstream, FILE, CardDemo or CICS campaigns.
+Reproduce after the pinned build, on JDK 21:
 
-EP-R2 ENTRY SEMANTICS: QUALIFIED (reused).
-EP-R2 FACTORIZED VALUES DOMAIN: QUALIFIED (reused).
-R2-REV-F1 DEPTH: QUALIFIED (reused).
-R2-REV-F2 LEADING-DOLLAR NAME POLICY: qualification in progress; implementation authorized.
-REAL CASE: NOT AUDITED; no 9/9 claim.
+```sh
+mvn -pl analysis-adapters -am -Dtest=CfgPreflightTest,StorageRangeTest,FactorizedAlternativesTest,RegionalAnalysisTest,NameInterpreterTest,LeadingDollarNameTest,LeadingDollarProductTest test
+python3 -B -m unittest discover -s scripts/project -p test_dependency_wire.py
+python3 -B scripts/project/ep_r2_names.py --maven-repo .harness-results/build/m2 --output .harness-results/f2-replay
+python3 -B scripts/harness/lean.py fast
+```
+
+For the historical comparison, supply the locally preserved synthetic baseline
+with `--before .harness-results/ep-r2/sanitization/synthetic-before`. The CLI oracle
+does not fabricate a baseline when absent.
+
+## Real-case handoff remains local and pending
+
+The four previously absent real names and the expected real-name set are not
+versioned. The exact prior AIR/result, parameters and expected set remain
+unavailable here. No X/9, 9/9 or first-loss claim is made.
+
+Feature work and incident reruns are paused for sanitation. A subsequent authorized
+manual rerun must use the same AIR/upstreams/parameters and compare the expected
+real-name set locally, preserving the five previously present names and checking
+supported raw/candidate/edge facts for the four previously absent real names.
+Keep names, site identifiers and detailed comparisons confidential. Publish only
+non-sensitive aggregate counts/status. If a name still disappears, record the
+first-loss boundary locally and stop for review without inventing a new fix.
+
+PRE-RELEASE POLICY: DOCUMENTED.
+LEADING-$ CAPABILITY: QUALIFIED.
+PROFILE: cobol-zos-dynamic-call-minimal@1.
+SYNTHETIC PRODUCT: QUALIFIED.
+REAL CASE: AWAITING MANUAL SAME-AIR RE-RUN; not executed by sanitation.
+FAST: PASS.
+PR: Draft, no merge, no auto-merge.
+
+EP-R2 ENTRY SEMANTICS, FACTORIZED VALUES DOMAIN and R2-REV-F1 DEPTH remain
+QUALIFIED on their recorded evidence.

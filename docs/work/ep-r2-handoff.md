@@ -4,7 +4,28 @@ Scope: analysis-cfg, branch `fix/ep-r2-entry-factorized-recall`, persistent
 [Draft PR #39](https://github.com/Gustavo2358/analysis-cfg/pull/39). No merge or
 auto-merge. Human semantic/architecture review remains required.
 
-## Current review remediation
+## Current remediation — leading-dollar program names
+
+[R2-REV-F2](ep-r2-rev-f2.md) corrects the CALL name policy in-place under the
+[explicit pre-release policy](../architecture/extensibility.md#política-de-versionamento-pré-release).
+The profile remains **cobol-zos-dynamic-call-minimal@1**; `$PROGA` remains `$PROGA`
+in candidates and edges, with unchanged raw/support/provenance/remainder facts.
+Fix commit: `058312e71d06cd9df5218ee4e6ba1d48aef83b92` includes the decision,
+canonical policy and tests with the production change.
+
+Sanitized F2 history uses synthetic fixtures only. Real identifiers must not be
+versioned; see the [canonical harness rule](../engineering/lean-harness.md#confidential-incident-data).
+Rebuilt RED: five interpreter and three product semantic failures. New GREEN:
+28 focused Java tests, nine reader tests and 15 CLI/memory equalities. One FAST after rebuilding passes 515 Java tests plus Python/architecture.
+Exhaustive current-tree and all-PR-history searches return zero occurrences. [Evidence](ep-r2/rev-f2-validation.json) separates new checks
+from reused neighboring regression/EP-R2/F1 evidence.
+
+The real-case nine-name recovery is **not yet measured**: exact prior AIR/result,
+parameters and expected name set remain unavailable. Request the manual same-AIR
+rerun and compare names/support/edges individually; do not equate count=9 with
+incident qualification. This audit no longer gates the authorized dollar capability.
+
+## Previous review remediation — DAG depth
 
 The review of head `49472df` found R2-REV-F1: recursive DAG traversal overflows
 on a long single-path relation. That head's depth qualification was blocked.
@@ -12,11 +33,11 @@ The [bounded remediation](ep-r2-rev-f1.md) reproduces it in all five operations
 and in a valid 8192-segment AIR vertical, then replaces traversal recursion with
 explicit heap frames. Fixed production: `20caab18b3ac9882491da171aeb6350ed090c998`.
 
-Current local qualification: all five operations through 32768 levels at -Xmx256m,
+F1 local qualification: all five operations through 32768 levels at -Xmx256m,
 1000 finite-relation scenarios / 7000 checks, 111 focused tests, deep MAY/MUST/
 BEFORE/copy/provenance vertical plus five CLI observations, eight selected product
 cases and one final FAST with **501 Java methods**, Python and architecture PASS.
-[Current evidence](ep-r2/rev-f1-validation.json) records exact hashes and metrics.
+[F1 evidence](ep-r2/rev-f1-validation.json) records exact hashes and metrics.
 READY FOR HUMAN RE-REVIEW; PR remains Draft. Real case still awaits manual rerun.
 
 The sections below preserve the **original campaign evidence through 49472df**;

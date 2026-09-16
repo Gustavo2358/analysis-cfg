@@ -1,10 +1,10 @@
 {
   "id": "WORK-EP-R2",
-  "title": "EP-R2 — Order-Independent Entry & Factorized Recall",
+  "title": "EP-R2 \u2014 Order-Independent Entry & Factorized Recall",
   "status": "IN_PROGRESS",
   "scope": [
     "analysis-cfg: entry admission, regional values domain, dependency product, focused qualification"
   ],
-  "notes": "R2-REV-F2 in progress on PR #39. Product owner authorized in-place PRE-RELEASE correction, retaining cobol-zos-dynamic-call-minimal@1; real audit no longer gates implementation. Regex and independent wire oracle accept only leading dollar as additional syntax. W0 REDs preserved; 14 name/product tests and 15 CLI/wire cases pass, with exact control/baseline evidence preservation. 69 focused regression tests and H2/F1/two representative F-order products pass. Final FAST pending. Real same-AIR nine-name audit awaits local artifact paths; not claimed confirmed. Prior ENTRY/FACTORIZATION/F1 qualified. No merge/auto-merge.",
+  "notes": "F2 history rebuilt with synthetic data only; no real/corporate identifiers or mappings may be versioned. Canonical confidentiality rule in lean-harness with AGENTS reference. Generic leading-dollar policy remains @1; production unchanged. RED replay confirms 5 interpreter / 3 product semantic failures; GREEN 28 focused Java, 9 reader, 15 CLI/memory equalities. One FAST after rebuilding: PASS (515 Java, Python, architecture). Exhaustive current-tree and all 16 PR commit-tree searches including archives: zero occurrences. Three F2 commits reconstructed; main/earlier history unchanged. Prior EP-R2/F1 evidence reused. Real case remains local/not rerun. Same Draft PR; no merge/auto-merge.",
   "pr": 39
 }
