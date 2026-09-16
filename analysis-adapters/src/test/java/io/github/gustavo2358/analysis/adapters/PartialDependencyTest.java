@@ -11,13 +11,16 @@ import static io.github.gustavo2358.analysis.adapters.ResultFixtures.*;
 
 class PartialDependencyTest {
     static Publication unsupportedValues() {
-        return W1dModelTest.model(1,u->{
+        var p=W1dModelTest.model(1,u->{
             var object=new ObjectId(u,"object-0");
             var call=W1dModelTest.call(u,"computed","end",object,false);var effects=call.effectBound().otherwise();
             call=W1dEffectsTest.replace(call,new Interactions.EffectBound(effects,List.of(new Interactions.OutcomeEffects(Control.NormalOutcome.INSTANCE,effects))),call.outcomes());
             return List.of(MultiCallModelTest.invoke(u,"start",List.of(),MultiCallModelTest.literal(u,"direct","DIRECT","second")),
                 MultiCallModelTest.invoke(u,"second",List.of(),call),returning(u,"end",List.of()));
         });
+        // W5 can now analyze partial effect profiles. This independent hard boundary
+        // is an unknown required semantic capability, never treated as harmless.
+        return new Publication(p.id(),p.airVersion(),new Capabilities.Manifest(List.of(new Capabilities.Capability("ep.unknown-semantics","1")),List.of()),p.artifacts(),p.units(),p.storage(),p.resources(),p.artifactRelations(),p.origins(),p.coverage(),p.uncertainties(),p.premises());
     }
     @Test void unsupportedComputedPreparationDoesNotDiscardIndependentLiteral() {
         var result=assertDoesNotThrow(()->new DependencyAnalysis().prepare(unsupportedValues()));

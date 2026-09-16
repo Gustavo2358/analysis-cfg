@@ -41,6 +41,26 @@ final class DependencyCliTest {
         assertNotEquals(raw,cfg);Files.writeString(in,cfg);assertEquals(0,AnalysisDependencies.run(new String[]{in.toString(),out.toString()},err()));assertTrue(Files.readString(out).contains("\"analysisStatus\":\"PARTIAL\""));
         String pub=new AirJson().decode(input()).id().localId();
         String analysis=raw.replace("\"includingEnvironment\":true,\"kind\":\"all\",\"publication\":{\"domain\":\"publication\",\"localId\":\""+pub+"\"}","\"includingExternal\":true,\"kind\":\"visible\",\"unit\":{\"domain\":\"unit\",\"localId\":\"unit\",\"publication\":\""+pub+"\"}");
-        assertNotEquals(raw,analysis);Files.writeString(in,analysis);assertEquals(0,AnalysisDependencies.run(new String[]{in.toString(),out.toString()},err()));assertTrue(Files.readString(out).contains("\"targetStatus\":\"ANALYSIS_INCOMPLETE\""));
+        assertNotEquals(raw,analysis);Files.writeString(in,analysis);assertEquals(0,AnalysisDependencies.run(new String[]{in.toString(),out.toString()},err()));assertTrue(Files.readString(out).contains("\"referenceName\":\"PROGA\""));
     }
+    @Test void scopedPreconditionSurvivesRealCodecCliAndStructuralInvalidityStillRejects() throws Exception {
+        var input=Path.of("../analysis-adapters/src/test/resources/ep/unproved-codec.air.json");var raw=Files.readAllBytes(input);
+        var codec=new AirJson();assertEquals(AirJsonException.Code.INCOMPLETE_VALIDATION,assertThrows(AirJsonException.class,()->codec.decode(raw)).code());
+        var decoded=codec.decodeForPartialAnalysis(raw);assertEquals(io.github.gustavo2358.air.validation.ValidationResult.Status.INCOMPLETE_VALIDATION,decoded.validation().status());
+        var output=dir.resolve("dependencies.json");var diagnostics=new ByteArrayOutputStream();
+        assertEquals(0,AnalysisDependencies.run(new String[]{input.toString(),output.toString()},new PrintStream(diagnostics)),diagnostics.toString());
+        var result=Files.readString(output);assertTrue(result.contains("\"referenceName\":\"PROGA\""));assertTrue(result.contains("UNPROVED_OPERATION_PRECONDITION"));
+        assertTrue(result.contains("\"analysisStatus\":\"PARTIAL\""));assertTrue(result.contains("\"effectiveUnknownRemainder\":true"));
+        var u=decoded.publication().units().getFirst();var regional=dir.resolve("regional.json");
+        assertEquals(0,RegionalAnalysis.run(new String[]{input.toString(),regional.toString(),"--result-id","ep-precondition","--unit",u.id().localId(),"--entry",u.entries().getFirst().id().localId(),"--before",u.sequences().getFirst().terminator().header().id().localId(),"--object",u.objects().getFirst().id().localId()},new PrintStream(diagnostics)),diagnostics.toString());
+        var wire=Files.readString(regional);assertTrue(wire.contains("PROGA"));assertTrue(wire.contains("\"sourceUnknownRemainder\":true"));
+        assertTrue(wire.contains(u.sequences().getFirst().instructions().getFirst().header().id().localId()));
+        var published=Path.of("target/ep-partial");Files.createDirectories(published);Files.copy(output,published.resolve("dependencies.json"),StandardCopyOption.REPLACE_EXISTING);Files.copy(regional,published.resolve("regional.json"),StandardCopyOption.REPLACE_EXISTING);
+        var broken=dir.resolve("invalid.air.json");var text=new String(raw,java.nio.charset.StandardCharsets.UTF_8);
+        var object="\"object\":{\"domain\":\"object\",\"localId\":\""+u.objects().getFirst().id().localId()+"\"";
+        assertTrue(text.contains(object));Files.writeString(broken,text.replace(object,"\"object\":{\"domain\":\"object\",\"localId\":\"missing\""));
+        assertEquals(AirJsonException.Code.INVALID_IR,assertThrows(AirJsonException.class,()->codec.decodeForPartialAnalysis(Files.readAllBytes(broken))).code());
+        assertEquals(3,AnalysisDependencies.run(new String[]{broken.toString(),output.toString()},err()));assertEquals(result,Files.readString(output));
+    }
+
 }

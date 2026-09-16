@@ -33,6 +33,8 @@ public final class CfgJsonWriter {
         Objects.requireNonNull(result, "result");
         if (result.status() != CfgBuildResult.Status.CFG_BUILT)
             throw new CfgJsonException("only CFG_BUILT can be serialized");
+        if (result.options().projectionPolicy() == ProjectionPolicy.PARTIAL_ANALYSIS)
+            throw new CfgJsonException("PARTIAL_ANALYSIS requires the partial analysis result contract; legacy CFG JSON cannot encode contextual uncertainty");
         var graph = result.graph().orElseThrow();
         var out = new CfgJsonBytes(maximumBytes);
         // Token mappings carry their contract requirement. Inspect the product, not its source text.
@@ -163,7 +165,7 @@ public final class CfgJsonWriter {
         return switch (status) { case COMPLETE -> "COMPLETE"; case PARTIAL -> "PARTIAL"; case UNAVAILABLE -> "UNAVAILABLE"; };
     }
     private static String policy(ProjectionPolicy policy) {
-        return switch (policy) { case KNOWN_SUBSET -> "KNOWN_SUBSET"; case STRICT -> "STRICT"; };
+        return switch (policy) { case KNOWN_SUBSET -> "KNOWN_SUBSET"; case STRICT -> "STRICT"; case PARTIAL_ANALYSIS -> "PARTIAL_ANALYSIS"; };
     }
     private static String haltKind(Operations.HaltKind kind) {
         return switch (kind) { case NORMAL -> "NORMAL"; case ABNORMAL -> "ABNORMAL"; };

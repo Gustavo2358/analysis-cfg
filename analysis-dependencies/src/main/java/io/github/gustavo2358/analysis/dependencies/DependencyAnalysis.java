@@ -18,7 +18,7 @@ import java.util.*;
 public final class DependencyAnalysis {
     public DependencyResult prepare(Publication publication) {
         Objects.requireNonNull(publication);
-        var options=BuildOptions.defaults();var cfg=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).build(publication,options);
+        var defaults=BuildOptions.defaults();var options=new BuildOptions(defaults.validation(),io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy.PARTIAL_ANALYSIS);var cfg=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).build(publication,options);
         switch(cfg.status()) {
             case CFG_BUILT -> { }
             case INVALID_IR -> throw new Failure(Kind.INVALID_INPUT,"INVALID_IR");
@@ -26,13 +26,17 @@ public final class DependencyAnalysis {
             case RESOURCE_LIMIT -> throw new Failure(Kind.RESOURCE_LIMIT,"RESOURCE_LIMIT");
             case VALIDATION_LIMIT,INCOMPLETE_VALIDATION -> throw new Failure(Kind.INPUT_INCOMPLETE,"INCOMPLETE_VALIDATION");
         }
-        var opened=AnalysisSession.open(cfg,publication,options.projectionPolicy(),publication.units().stream().flatMap(u->u.entries().stream()).toList());
+        var opened=AnalysisSession.open(cfg,publication,options.projectionPolicy(),publication.units().stream().flatMap(u->u.entries().stream()).filter(e->e.initialLabel().isPresent()).toList());
         if(opened.status()!=AnalysisSession.Status.ACCEPTED)return partialInventory(publication,opened.reason());
         var session=opened.session().orElseThrow();
         try(var execution=new PlanningExecution(session,new AnalysisRegistry(List.of(new PossibleValuesProvider(),new RegionalValuesProvider(),new StorageValuesProvider(),new ReachabilityProvider())))) {
             var plan=execution.plan(CallDependencyPlan.select(session));var result=execution.execute("dependencies@1",plan);
             for(var analysis:result.analyses())if(analysis.status()==AnalysisOutcome.Status.INVALID_INPUT)throw new Failure(Kind.INVALID_INPUT,analysis.reason());
-            var reasons=new TreeSet<String>();var entryReasons=new HashMap<EntryId,Set<String>>();
+            var reasons=new TreeSet<String>();
+            if(session.index().hasUnprovedPreconditions())reasons.add("UNPROVED_OPERATION_PRECONDITION");
+            if(publication.units().stream().anyMatch(u->u.body()!=Unit.BodyAvailability.AVAILABLE))reasons.add("UNIT_BODY_UNAVAILABLE");
+            if(publication.units().stream().anyMatch(u->session.index().partialControl(u.id())))reasons.add("PARTIAL_CONTROL_PROJECTION");
+            var entryReasons=new HashMap<EntryId,Set<String>>();
             for(var analysis:result.analyses())if(analysis.status()!=AnalysisOutcome.Status.STABLE) {
                 reasons.add(analysis.reason());entryReasons.computeIfAbsent(analysis.key().entry(),ignored->new TreeSet<>()).add(analysis.reason());
             }
@@ -48,7 +52,8 @@ public final class DependencyAnalysis {
                 if(!retained.containsKey(key))retained.put(key,CallDependencyConsumer.partial(site,Optional.ofNullable(reachability.get(key)),
                     List.copyOf(entryReasons.getOrDefault(site.entry(),Set.of("DEPENDENCY_PREPARATION_INCOMPLETE")))));
             }
-            var sites=retained.values().stream().sorted(Comparator.comparing(DependencySiteFact::entry,AnalysisKey.ENTRY_ORDER).thenComparing(f->f.operation().localId())).toList();
+            var sites=retained.values().stream().map(f->session.index().partialControl(f.caller())?f.withPartialAnalysis("PARTIAL_CONTROL_PROJECTION"):f)
+                .map(f->session.index().unprovedPreconditions(f.caller())?f.withPartialAnalysis("UNPROVED_OPERATION_PRECONDITION"):f).sorted(Comparator.comparing(DependencySiteFact::entry,AnalysisKey.ENTRY_ORDER).thenComparing(f->f.operation().localId())).toList();
             var edges=new ArrayList<DependencyResult.Edge>();
             for(var site:sites)if(site.reachability()!=DependencySiteFact.Reachability.UNREACHABLE_IN_MODEL)
                 for(var candidate:site.candidates())edges.add(new DependencyResult.Edge(site.caller(),site.entry(),site.operation(),candidate,site.effectiveUnknownRemainder()));

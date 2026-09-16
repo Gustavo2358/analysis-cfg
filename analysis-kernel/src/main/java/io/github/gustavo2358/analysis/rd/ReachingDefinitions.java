@@ -46,7 +46,7 @@ public final class ReachingDefinitions {
             for(var target:effects.targets(resolution,StatementEffects.Strength.MAY))sourceGaps.add(new SourceGap(target.location(),object.origin(),List.copyOf(uncertainty)));
         }
         for(var unit:session.index().publication().units()) {
-            boolean open=false;
+            boolean open=effects.storage().session().index().partialControl(unit.id()) || effects.storage().session().index().unprovedPreconditions(unit.id());
             for(var sequence:unit.sequences()) {
                 for(var instruction:sequence.instructions())open|=open(instruction.header().precision().control());
                 var terminator=sequence.terminator();open|=open(terminator.header().precision().control());

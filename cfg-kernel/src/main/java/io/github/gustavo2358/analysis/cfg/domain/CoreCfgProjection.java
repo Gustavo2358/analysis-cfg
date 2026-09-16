@@ -45,7 +45,7 @@ public final class CoreCfgProjection {
             issues.add(new CfgProjectionIssue(CfgProjectionIssue.Code.INCOMPLETE_INVENTORY, publication.id()));
         }
         for (Unit unit : orderedUnits(publication)) {
-            if (unit.body() != Unit.BodyAvailability.AVAILABLE) {
+            if (unit.body() != Unit.BodyAvailability.AVAILABLE && policy != ProjectionPolicy.PARTIAL_ANALYSIS) {
                 issues.add(new CfgProjectionIssue(CfgProjectionIssue.Code.BODY_UNAVAILABLE, unit.id()));
             }
             if (!policy.acceptsInventory(unit.coverage().inventory())) {
@@ -59,7 +59,7 @@ public final class CoreCfgProjection {
                         && !(sequence.terminator() instanceof Operations.Branch)
                         && !(sequence.terminator() instanceof Operations.Invoke invoke && supportsInvoke(invoke))
                         && !(sequence.terminator() instanceof Operations.Opaque opaque && supportsOpaque(opaque))
-                        && !(sequence.terminator() instanceof Operations.Halt)) {
+                        && !(sequence.terminator() instanceof Operations.Halt) && policy != ProjectionPolicy.PARTIAL_ANALYSIS) {
                     issues.add(new CfgProjectionIssue(CfgProjectionIssue.Code.UNSUPPORTED_TERMINATOR,
                             sequence.terminator().header().id()));
                 }
@@ -89,7 +89,9 @@ public final class CoreCfgProjection {
     }
 
     /** Requires successful AirValidator preflight and an empty unsupported inventory. */
-    public static CfgGraph project(Publication publication) {
+    public static CfgGraph project(Publication publication) { return project(publication, ProjectionPolicy.KNOWN_SUBSET); }
+
+    public static CfgGraph project(Publication publication, ProjectionPolicy policy) {
         List<CfgNode> nodes = new ArrayList<>();
         List<CfgTransition> transitions = new ArrayList<>();
         for (Unit unit : orderedUnits(publication)) {
@@ -111,6 +113,7 @@ public final class CoreCfgProjection {
             List<Entries.Entry> entries = unit.entries().stream()
                     .sorted(Comparator.comparing(entry -> entry.id().localId())).toList();
             for (Entries.Entry entry : entries) {
+                if (entry.initialLabel().isEmpty() && policy == ProjectionPolicy.PARTIAL_ANALYSIS) continue;
                 CfgNode.EntryNode entryNode = new CfgNode.EntryNode(
                         new CfgNodeId(publication.id(), nodes.size()), entry);
                 nodes.add(entryNode);
@@ -128,9 +131,9 @@ public final class CoreCfgProjection {
                     } else if (sequence.terminator() instanceof Operations.Jump jump) {
                         transitions.add(new CfgTransition(from, sequences.get(jump.destination()).id(),
                                 CfgTransition.Kind.JUMP, entry.id()));
-                    } else if (sequence.terminator() instanceof Operations.Invoke invoke && supportsInvoke(invoke)) {
+                    } else if (sequence.terminator() instanceof Operations.Invoke invoke) {
                         for (var outcome : invoke.outcomes().known()) {
-                        var normal = (Control.Normal) outcome;
+                        if (!(outcome instanceof Control.Normal normal)) continue;
                         transitions.add(new CfgTransition(from, sequences.get(normal.label()).id(),
                                 CfgTransition.Kind.INVOKE_NORMAL, entry.id()));
                         }
@@ -150,7 +153,7 @@ public final class CoreCfgProjection {
                                 CfgTransition.Kind.BRANCH_TRUE, entry.id()));
                         transitions.add(new CfgTransition(from, sequences.get(branch.falseDestination()).id(),
                                 CfgTransition.Kind.BRANCH_FALSE, entry.id()));
-                    } else {
+                    } else if (policy != ProjectionPolicy.PARTIAL_ANALYSIS) {
                         throw new IllegalArgumentException("projection requires a supported terminator");
                     }
                 }

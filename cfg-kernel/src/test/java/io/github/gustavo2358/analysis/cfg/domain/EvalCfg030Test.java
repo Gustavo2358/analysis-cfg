@@ -192,7 +192,7 @@ class EvalCfg030Test {
         Publication p = inventory(publication(List.of(unit(U, List.of(entry(E, L)),
                 List.of(returning(L), new Sequence(TAIL, List.of(),
                         new Operations.Raise(header(op), "failure", List.of()), ORIGIN))))), PARTIAL, PARTIAL);
-        for (var policy : ProjectionPolicy.values()) {
+        for (var policy : List.of(ProjectionPolicy.KNOWN_SUBSET,ProjectionPolicy.STRICT)) {
             var result = rejected(p, policy, CfgBuildResult.Status.UNSUPPORTED_INPUT);
             assertEquals(ValidationResult.Status.STRUCTURALLY_VALID, result.preflight().status());
             assertTrue(result.projectionIssues().contains(new CfgProjectionIssue(
@@ -267,7 +267,7 @@ class EvalCfg030Test {
                 List.of(), Unit.BodyAvailability.UNAVAILABLE, Optional.of(INVENTORY_GAP),
                 coverage(new Scopes.UnitScope(U)), ORIGIN);
         Publication p = inventory(publication(List.of(u)), PARTIAL, PARTIAL);
-        for (var policy : ProjectionPolicy.values()) {
+        for (var policy : List.of(ProjectionPolicy.KNOWN_SUBSET,ProjectionPolicy.STRICT)) {
             var result = rejected(p, policy, CfgBuildResult.Status.UNSUPPORTED_INPUT);
             assertEquals(ValidationResult.Status.STRUCTURALLY_VALID, result.preflight().status());
             assertTrue(result.projectionIssues().contains(new CfgProjectionIssue(

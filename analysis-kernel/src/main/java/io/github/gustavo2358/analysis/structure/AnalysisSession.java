@@ -64,6 +64,7 @@ public final class AnalysisSession {
             List<Entries.Entry> selected = new ArrayList<>();
             for (Entries.Entry entry : selectedEntries) {
                 IndexBuilder.valid(entry != null && index.entry(entry.id()) == entry, "foreign selected Entry");
+                if(index.entryNodes.get(entry.id())==null) throw new IndexBuilder.Rejection(Status.UNSUPPORTED,"selected Entry body unavailable");
                 selected.add(entry);
             }
             return new Admission(Status.ACCEPTED, "core structural inventory admitted", Optional.of(new AnalysisSession(index, selected)));

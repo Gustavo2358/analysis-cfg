@@ -34,7 +34,7 @@ public final class ReachabilityProvider implements AnalysisProvider<LabelId,Reac
             if(!(sequence.terminator() instanceof Operations.Opaque))open|=open(sequence.terminator().header());
             if(sequence.terminator() instanceof Operations.Invoke invoke)open|=invoke.outcomes().remainder() instanceof Scopes.WithinControl;
         }
-        final boolean sourceOpen=open;
+        final boolean sourceOpen=open || session.index().partialControl(unit.id()) || session.index().unprovedPreconditions(unit.id());
         return new Prepared<>() {
             public AnalysisKey key(){return key;}
             public AnalysisOutcome refusal(){return null;}

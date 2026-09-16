@@ -20,6 +20,12 @@ public final class RegionalAnalysis {
     public RegionalAnalysisResult prepare(Publication publication,String resultId,List<PointQuery<StorageSubject>> queries,List<EntryId> entries) {
         return prepare(publication,resultId,queries,entries,BuildOptions.defaults());
     }
+    /** Explicit partial admission retains open proof/control in both BEFORE observations. */
+    public RegionalAnalysisResult preparePartial(Publication publication,String resultId,List<PointQuery<StorageSubject>> queries) {
+        var defaults=BuildOptions.defaults();
+        return prepare(publication,resultId,queries,publication.units().stream().flatMap(u->u.entries().stream()).filter(e->e.initialLabel().isPresent()).map(Entries.Entry::id).toList(),
+            new BuildOptions(defaults.validation(),io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy.PARTIAL_ANALYSIS));
+    }
     RegionalAnalysisResult prepare(Publication publication,String resultId,List<PointQuery<StorageSubject>> queries,List<EntryId> entries,BuildOptions options) {
         Objects.requireNonNull(publication);Objects.requireNonNull(resultId);if(resultId.isBlank())throw new IllegalArgumentException("empty resultId");queries=List.copyOf(queries);
         var selected=new HashSet<>(entries);var declarations=publication.units().stream().flatMap(u->u.entries().stream()).filter(e->selected.contains(e.id())).toList();

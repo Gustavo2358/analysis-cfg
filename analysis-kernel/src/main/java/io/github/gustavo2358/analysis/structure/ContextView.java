@@ -43,7 +43,7 @@ public final class ContextView {
         EdgeCursor(ProgramIndex index, int[] next, int position, ProgramIndex.Node anchor, Entries.Entry entry, boolean forward) {
             this.index = index; this.next = next; this.position = position; this.anchor = anchor; this.entry = entry; this.forward = forward;
             var sources = index.openSources.getOrDefault(entry.id().unit(), java.util.List.of());
-            candidates = (sources.isEmpty() || forward && !(OpenControl.bound(anchor) instanceof io.github.gustavo2358.air.model.Scopes.WithinControl)
+            candidates = (sources.isEmpty() || forward && !(OpenControl.bound(anchor,index.policy) instanceof io.github.gustavo2358.air.model.Scopes.WithinControl)
                 ? java.util.List.<ProgramIndex.Node>of() : forward ? index.unitNodes.get(entry.id().unit()) : sources).iterator();
         }
         public boolean advance() {
@@ -51,7 +51,7 @@ public final class ContextView {
             if (current != -1) { position = next[current]; edgesVisited = Math.incrementExact(edgesVisited); return true; }
             while (candidates.hasNext()) {
                 var candidate = candidates.next(); var source = forward ? anchor : candidate; var target = forward ? candidate : anchor;
-                if (!OpenControl.allows(source, target, entry)) continue;
+                if (!OpenControl.allows(source, target, entry,index.policy)) continue;
                 symbolicSource = source; symbolicTarget = target;
                 symbolicEdge = new CfgTransition(source.source().id(), target.source().id(), CfgTransition.Kind.OPAQUE_UNKNOWN, entry.id());
                 edgesVisited = Math.incrementExact(edgesVisited); return true;

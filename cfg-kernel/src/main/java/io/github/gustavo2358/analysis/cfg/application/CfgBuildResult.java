@@ -39,7 +39,9 @@ public record CfgBuildResult(
         }
         if (graph.isPresent()) {
             CfgGraph product = graph.orElseThrow();
-            if (preflight.status() != ValidationResult.Status.STRUCTURALLY_VALID
+            if (!(preflight.status() == ValidationResult.Status.STRUCTURALLY_VALID
+                    || options.projectionPolicy() == io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy.PARTIAL_ANALYSIS
+                        && preflight.unprovedOperationPreconditions().isPresent())
                     || !unsupportedCapabilities.isEmpty() || !projectionIssues.isEmpty()
                     || !product.publication().id().equals(publicationId)
                     || !product.publication().airVersion().equals(airVersion)) {

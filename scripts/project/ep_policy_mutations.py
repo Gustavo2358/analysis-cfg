@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Five bounded EP policy mutations; semantic assertion failures are the oracle.
+"""Six bounded EP policy mutations; semantic assertion failures are the oracle.
 
 Run against a quiescent worktree. Each patch is restored in finally. Evidence is
 written to a new directory; no production flag or mutant remains installed.
@@ -16,14 +16,16 @@ ROOT = Path(__file__).resolve().parents[2]
 VALUES = Path('analysis-values/src/main/java/io/github/gustavo2358/analysis/values')
 REGIONAL = VALUES / 'RegionalValuesAnalysis.java'
 MUTANTS = [
+    ('unproved-precondition-kill', Path('analysis-kernel/src/main/java/io/github/gustavo2358/analysis/storage/StatementEffects.java'),
+     'if(storage.session().index().unprovedPreconditions(operation.header().id()))strength=Strength.MAY;', '', 'EvidenceMonotonicityTest'),
     ('unknown-clear', VALUES / 'PossibleValuesState.java',
      'store(cell,value(cell,w).withOpen(w),w)', 'store(cell,Candidates.UNKNOWN,w)',
      'ValuesTest'),
     ('may-kill', REGIONAL, 'if(keep)next.addAll(current);',
      'if(false)next.addAll(current);', 'EvidencePreservingPolicyTest'),
     ('unproved-alias-kill', REGIONAL,
-     'if(!plan.target.sourceApplicable())current=weak(current,captured,plan,true);',
-     'if(!plan.target.sourceApplicable())current=weak(current,captured,plan,false);',
+     'if(!plan.target.sourceApplicable())current=weak(current,captured,plan,true,logicalInputs);',
+     'if(!plan.target.sourceApplicable())current=weak(current,captured,plan,false,logicalInputs);',
      'EvidencePreservingPolicyTest'),
     ('query-reseed', REGIONAL,
      'subject.apply(query.subject())),state));}',
@@ -39,10 +41,12 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--evidence-dir', type=Path, required=True)
     parser.add_argument('--maven-repo', type=Path, required=True)
+    parser.add_argument('--only', nargs='+', choices=[m[0] for m in MUTANTS])
     args = parser.parse_args()
     args.evidence_dir.mkdir(parents=True, exist_ok=False)
     records = []
     for name, relative, old, new, oracle in MUTANTS:
+        if args.only and name not in args.only: continue
         path = ROOT / relative
         original = path.read_text()
         if original.count(old) != 1:
@@ -50,10 +54,11 @@ def main():
         changed = original.replace(old, new)
         (args.evidence_dir / (name + '.patch')).write_text(''.join(difflib.unified_diff(
             original.splitlines(True), changed.splitlines(True), str(relative), str(relative))))
+        module = 'analysis-adapters' if oracle == 'EvidenceMonotonicityTest' else 'analysis-values'
         command = ['mvn', '-o', '-B', '-ntp', f'-Dmaven.repo.local={args.maven_repo}',
-                   '-pl', 'analysis-values', '-am',
-                   f'-Dtest=CfgPreflightTest,KillAuthorityTest,{oracle}', 'test']
-        reports = ROOT / 'analysis-values/target/surefire-reports'
+                   '-pl', module, '-am',
+                   f'-Dtest=CfgPreflightTest,KillAuthorityTest,ValuesTest,RegionalAnalysisTest,NameInterpreterTest,{oracle}', 'test']
+        reports = ROOT / module / 'target/surefire-reports'
         for report in reports.glob(f'TEST-*.{oracle}.xml'):
             report.unlink()
         try:
@@ -81,7 +86,7 @@ def main():
                 raise RuntimeError(f'{name}: requires a semantic assertion failure, not a setup failure')
         finally:
             path.write_text(original)
-    print('PASS: five policy mutants killed; source restored; rebuild unmutated classes before reuse')
+    print(f'PASS: {len(records)} policy mutants killed; source restored; rebuild unmutated classes before reuse')
 
 
 if __name__ == '__main__':

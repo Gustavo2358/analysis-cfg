@@ -52,11 +52,13 @@ class PartialDependencyWireTests(unittest.TestCase):
                 unknown=next(s for s in d['sites'] if s['operation']['localId']=='computed')
                 self.assertEqual('ANALYSIS_INCOMPLETE',unknown['targetStatus']);self.assertTrue(unknown['effectiveUnknownRemainder'])
             else:
-                self.assertEqual('UNKNOWN',direct['reachability']);self.assertTrue(direct['openControlRemainder'])
-                self.assertEqual('STRUCTURAL_AIR_OCCURRENCES',d['modelScope'])
+                self.assertEqual('REACHABLE',direct['reachability']);self.assertTrue(direct['openControlRemainder'])
+                self.assertEqual('PARTIAL',direct['analysisStatus'])
+                self.assertEqual('KNOWN_GRAPH_ENTRY',d['modelScope'])
 
     def test_partial_contract_mutants_are_rejected(self):
-        source=read(ROOT/'analysis-adapters/target/ep-w4/unsupported-control.json')
+        source=read(ROOT/'analysis-adapters/target/ep-w4/unsupported-values.json')
+        direct=next(i for i,s in enumerate(source['sites']) if s['operation']['localId']=='direct')
         mutations=[
             lambda d:d.__setitem__('version','1.1.0'),
             lambda d:d.__setitem__('analysisStatus','COMPLETE'),
@@ -64,7 +66,7 @@ class PartialDependencyWireTests(unittest.TestCase):
             lambda d:d['sites'][0].__setitem__('analysisStatus','COMPLETE'),
             lambda d:d['sites'][0].__setitem__('openControlRemainder',False),
             lambda d:d.__setitem__('modelScope','KNOWN_GRAPH_ENTRY'),
-            lambda d:d['sites'][0]['candidates'][0].__setitem__('supports',[]),
+            lambda d:d['sites'][direct]['candidates'][0].__setitem__('supports',[]),
             lambda d:d['edges'][0].__setitem__('openSite',False),
         ]
         for mutation in mutations:

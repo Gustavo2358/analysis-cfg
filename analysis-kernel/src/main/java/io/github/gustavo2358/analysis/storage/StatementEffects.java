@@ -149,6 +149,7 @@ public final class StatementEffects {
         final Map<OperandId,Place> places=new HashMap<>();int nextSlot;
         Builder(Operation operation){this.operation=operation;}
         void write(List<Write> out,Optional<OperandId> occurrence,StorageIndex.Resolution destination,Strength strength,Source source) {
+            if(storage.session().index().unprovedPreconditions(operation.header().id()))strength=Strength.MAY;
             var place=occurrence.map(places::get).orElse(null);
             out.add(new Write(nextSlot++,occurrence,destination,source,targets(destination,strength),Selection.SINGLE_DESTINATION,strength,logicalTargets(place)));
         }

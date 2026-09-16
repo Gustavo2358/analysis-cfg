@@ -35,6 +35,12 @@ public record DependencySiteFact(UnitId caller,EntryId entry,LabelId sequence,Op
             reachability,targetStatus,rawCandidates,candidates,modelValueRemainder,sourceValueRemainder,interpretationUnknownRemainder,
             effectiveUnknownRemainder,openControlRemainder,evidence,provenance,premises,uncertaintyRefs,AnalysisStatus.COMPLETE,List.of());
     }
+    public DependencySiteFact withPartialAnalysis(String reason) {
+        var reasons=new TreeSet<>(analysisReasons);reasons.add(reason);
+        return new DependencySiteFact(caller,entry,sequence,operation,offset,siteOrigin,targetOrigin,technology,command,namespace,nameProfile,targetKind,subject,valuePoint,
+            reachability,targetStatus,rawCandidates,candidates,modelValueRemainder,sourceValueRemainder,interpretationUnknownRemainder,
+            effectiveUnknownRemainder,openControlRemainder,evidence,provenance,premises,uncertaintyRefs,AnalysisStatus.PARTIAL,List.copyOf(reasons));
+    }
     public DependencySiteFact {
         Objects.requireNonNull(caller);Objects.requireNonNull(entry);Objects.requireNonNull(sequence);Objects.requireNonNull(operation);
         Objects.requireNonNull(siteOrigin);Objects.requireNonNull(targetOrigin);Objects.requireNonNull(targetKind);

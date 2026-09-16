@@ -45,3 +45,7 @@ unknown scopes cannot turn into disjointness. Missing body plus multiple units
 must retain both computed support and literal DIRECT. Unknown control must widen
 execution, while exact executed writes on a modeled path remain the only kills.
 Existing strict CFG refusal controls and structural invalidity must still pass.
+
+Legacy CFG JSON 1–3 cannot encode the policy's contextual uncertainty. Its writer
+rejects PARTIAL_ANALYSIS explicitly; ordinary CFG CLI policies are unchanged.
+Partial dependency JSON 1.2.0 is the primary supported publication for this policy.

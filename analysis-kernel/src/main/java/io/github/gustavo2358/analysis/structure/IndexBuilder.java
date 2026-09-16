@@ -32,12 +32,14 @@ final class IndexBuilder {
     CfgTransition[] edges;
     int[] from, to, edgeEntry, forwardNext, backwardNext;
     private final CfgBuildResult result;
-    private final ProjectionPolicy policy;
+    final ProjectionPolicy policy;
+    final Set<OperationId> unprovedPreconditions;
     private final Set<OperandId> operandIds = new HashSet<>();
-    private long expectedEdges, expectedHalts;
+    private long expectedEdges, expectedHalts, expectedActiveEntries;
 
     IndexBuilder(CfgBuildResult result, Publication snapshot, ProjectionPolicy policy) {
         this.result = result; this.snapshot = snapshot; this.policy = policy;
+        unprovedPreconditions=result.preflight().unprovedOperationPreconditions().orElse(Set.of());
     }
     static final class Rejection extends RuntimeException {
         private static final long serialVersionUID = 1L;
@@ -80,7 +82,7 @@ final class IndexBuilder {
             count.visit("units.declarations");
             valid(unit.id().publication().equals(snapshot.id()), "foreign Unit owner");
             unique(units, unit.id(), unit, "duplicate Unit");
-            supported(unit.body() == Unit.BodyAvailability.AVAILABLE && policy.acceptsInventory(unit.coverage().inventory()), "unsupported Unit body/inventory");
+            supported((unit.body() == Unit.BodyAvailability.AVAILABLE || policy == ProjectionPolicy.PARTIAL_ANALYSIS) && policy.acceptsInventory(unit.coverage().inventory()), "unsupported Unit body/inventory");
             for (Memory.ObjectDeclaration object : unit.objects()) {
                 count.visit("objects");
                 valid(object.id().unit().equals(unit.id()), "foreign Object owner");
@@ -132,11 +134,11 @@ final class IndexBuilder {
                 Terminator term = sequence.terminator();
                 supported(term instanceof Operations.Jump || term instanceof Operations.Branch || term instanceof Operations.Return || term instanceof Operations.Halt
                     || term instanceof Operations.Invoke invoke && OpenControl.supportsInvoke(invoke)
-                    || term instanceof Operations.Opaque opaque && OpenControl.supportsOpaque(opaque), "unsupported control");
-                int degree = term instanceof Operations.Branch ? 2 : term instanceof Operations.Invoke invoke ? invoke.outcomes().known().size()
-                    : term instanceof Operations.Opaque opaque ? (int) opaque.envelope().control().known().stream().map(a -> {
+                    || term instanceof Operations.Opaque opaque && OpenControl.supportsOpaque(opaque) || policy == ProjectionPolicy.PARTIAL_ANALYSIS, "unsupported control");
+                int degree = term instanceof Operations.Branch ? 2 : term instanceof Operations.Invoke invoke ? (int) invoke.outcomes().known().stream().filter(Control.Normal.class::isInstance).count()
+                    : term instanceof Operations.Opaque opaque ? (int) opaque.envelope().control().known().stream().filter(a->OpenControl.alternativeLabel(a)!=null || a instanceof Control.ReturnAlternative).map(a -> {
                         var l = OpenControl.alternativeLabel(a); return l == null ? a : l;
-                    }).distinct().count() : 1;
+                    }).distinct().count() : term instanceof Operations.Return || term instanceof Operations.Jump || term instanceof Operations.Halt ? 1 : 0;
                 arity = Math.addExact(arity, degree);
                 if (term instanceof Operations.Halt) expectedHalts = Math.incrementExact(expectedHalts);
                 int offset = 0;
@@ -151,10 +153,13 @@ final class IndexBuilder {
                 valid(entry.id().unit().equals(unit.id()), "foreign Entry owner");
                 unique(entries, entry.id(), entry, "duplicate Entry");
                 entryOrdinals.put(entry.id(), entryOrdinals.size());
+                if(entry.initialLabel().isPresent() || policy != ProjectionPolicy.PARTIAL_ANALYSIS) {
+                expectedActiveEntries++;
                 valid(entry.initialLabel().isPresent(), "Entry has no initial Sequence");
                 count.reference("entry.initialLabel");
                 valid(entry.initialLabel().orElseThrow().unit().equals(unit.id())
                         && sequences.containsKey(entry.initialLabel().orElseThrow()), "foreign/missing Entry initial Sequence");
+                }
                 for (Entries.InitialCondition condition : entry.state().conditions()) {
                     count.visit("entry.conditions");
                     operands(List.of(condition.place()), new EntryOwner(entry.id()));
@@ -166,7 +171,7 @@ final class IndexBuilder {
             }
             // Expected cardinality plus unique valid roles proves completeness without constructing
             // expected edges, including on a severely truncated input. No Entries x Sequences pass.
-            expectedEdges = Math.addExact(expectedEdges, Math.multiplyExact((long) unit.entries().size(), Math.incrementExact(arity)));
+            expectedEdges = Math.addExact(expectedEdges, Math.multiplyExact(unit.entries().stream().filter(e->e.initialLabel().isPresent()).count(), Math.incrementExact(arity)));
         }
     }
 
@@ -244,8 +249,8 @@ final class IndexBuilder {
             count.nodes = Math.incrementExact(count.nodes);
         }
         valid(sequenceNodes.size() == sequences.size(), "missing required SequenceNode");
-        valid(entryNodes.size() == entries.size(), "missing required EntryNode");
-        valid(normalExits.size() == entries.size(), "missing required NormalExit");
+        valid(entryNodes.size() == expectedActiveEntries, "missing required EntryNode");
+        valid(normalExits.size() == expectedActiveEntries, "missing required NormalExit");
         valid(haltExits.size() == expectedHalts, "missing required HaltExit");
     }
 
@@ -295,8 +300,8 @@ final class IndexBuilder {
                 ? normalExits.get(activation.id()) : kind == CfgTransition.Kind.OPAQUE_JUMP && target.source() instanceof CfgNode.SequenceNode seq
                     && OpenControl.opaqueDestination(opaque, seq.source().label()) ? target : null;
             case Operations.Jump jump -> kind == CfgTransition.Kind.JUMP ? sequenceNodes.get(jump.destination()) : null;
-            case Operations.Invoke invoke -> kind == CfgTransition.Kind.INVOKE_NORMAL
-                    ? sequenceNodes.get(((Control.Normal) invoke.outcomes().known().getFirst()).label()) : null;
+            case Operations.Invoke invoke -> kind == CfgTransition.Kind.INVOKE_NORMAL && target.source() instanceof CfgNode.SequenceNode s
+                    && invoke.outcomes().known().stream().anyMatch(o -> o instanceof Control.Normal n && n.label().equals(s.source().label())) ? target : null;
             case Operations.Branch branch -> switch (kind) {
                 case BRANCH_TRUE -> sequenceNodes.get(branch.trueDestination());
                 case BRANCH_FALSE -> sequenceNodes.get(branch.falseDestination());
