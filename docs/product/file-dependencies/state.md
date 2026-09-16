@@ -14,6 +14,17 @@ WORK-FD-HARNESS permanece IN_PROGRESS enquanto os PRs não forem mergeados.
 | H3 | concluído: matriz N/C/D, T01–T54, CALL-X, scope guards e custo de gates |
 | H4 | concluído: auditoria estrutural e de escopo PASS; pacote pronto para revisão humana |
 
+## Correções da revisão humana H4
+
+Revisão recebida em 2026-09-16, sem autorização de iniciar W0. Corrigidos P0–P3:
+assignment-name prova external file name, nunca mecanismo DD/environment; nenhuma
+dimensão bindingMechanism. N-LR identificado por SC27-8713-03 + 2026-04-28 (PDF
+atual retornou HTTP 403; nenhum hash inventado). DELETE RECORD sozinho sustenta
+site/edge FILE, sem dataset deletion. Decisão humana explícita: N+C core, D posterior.
+W7 qualifica values do core CICS; captura D migra para W10, que não bloqueia W11.
+W8 inicia estáticos após W3/W4, com W7 condicional aos computados/fechamento completo.
+Nenhum schema produtivo, pin ou teste semântico mudou; itens W permanecem TODO.
+
 ## Retomada
 
 Worktrees: `<workspace>/.file-dependencies/worktrees/<repo>`.
@@ -51,6 +62,7 @@ O [baseline](baseline.md) contém os SHAs de entrada; o Git fornece os checkpoin
 Somente D-AIR, D-WIRE, D-EFFECT, D-DYNAMIC e D-D-AUTH, com prazo no documento de
 contratos. Nenhuma exige resolver JCL/DSNAME. Nenhuma bloqueia W0 declarativo SP;
 D-AIR/D-WIRE são pré-condições internas W1. H4 não afirma que já foram decididas.
+D-D-AUTH e captura D pertencem à extensão W10, sem bloquear qualificação N+C.
 
 ## Validation
 

@@ -55,6 +55,7 @@ commands_and_gates:
 - 'E-SELECTED: comando e escopo em ../../product/file-dependencies/verification.md'
 - python3 -B scripts/harness/lean.py fast — uma vez por repo produtivo estabilizado, após focais
 acceptance:
+- DELETE RECORD como único uso produz site FILE, dependência e operação DELETE_RECORD; nunca dataset deletion
 - Cada forma tem positivo/negativo e todos os usos têm recurso ou gap explícito
 - FROM com record de outro FD não produz leitura desse outro arquivo
 - Cada statement dentro de handler aparece uma vez; CALL preservado e efeitos parciais explícitos

@@ -24,7 +24,7 @@ read_first:
 expected_product:
 - Completar GLOBAL/EXTERNAL, qualificação/ambiguidade e shadowing usando resolver canônico
 - Compor análises por unidade com captures/declarações visíveis publicados pelo frontend e agregação explícita
-- COPY repetido/REPLACING, mesmo logical name e DD em contextos distintos, unidades com análise parcial
+- COPY repetido/REPLACING, mesmo logical name e external file name em contextos distintos, unidades com análise parcial
 allowed_changes:
 - Exportação/seleção por unidade, captura e agregação mantendo fronteiras
 - Alterar estratégia somente por contraexemplo documentado ao desenho aprovado

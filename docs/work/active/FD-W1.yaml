@@ -19,13 +19,13 @@ repos:
 - analysis-ir (condicional)
 preconditions:
 - W0 qualificado
-- Fechar D-AIR com A1–A6 antes de editar contrato; fechar D-WIRE após auditoria dos readers
+- Fechar D-AIR com A1–A4/A6 antes de editar contrato; fechar D-WIRE após auditoria dos readers; A5 não bloqueia core
 read_first:
 - ../../product/file-dependencies/brief.md
 - ../../product/file-dependencies/contracts.md
 - ../../product/file-dependencies/verification.md
 expected_product:
-- Implementar transporte do mínimo bilateral necessário e testes manuais A1–A4/A6; A5 smoke de representação
+- Implementar transporte do mínimo bilateral necessário e testes manuais A1–A4/A6; não antecipar A5/extensão D
 - OPEN/READ/CLOSE literal atravessa CLIs SP→AIR→dependency com effects/control explicitamente parciais até
   W3/W4
 - Consumer FILE independente compartilhando sessão/providers, inventário estrutural e nova seção/versionamento
@@ -40,7 +40,7 @@ invariants:
 - Todos os invariantes do brief e guardrail COBOL_SOURCE_ONLY
 - Preservar CALL/evidência; literal não espera solver; mudanças normativas só bilaterais
 semantic_cases:
-- A1–A6; T01/T02/T48/T49/T51–T53; SELECT F ASSIGN TO DD e OPEN/READ/CLOSE
+- A1–A4/A6; T01/T02/T45/T48/T49/T51–T53; SELECT F ASSIGN TO CLIENTDD e OPEN/READ/CLOSE; A5 fica para D/W10
 - Literal com CFG parcial, programa só CALL, sem arquivo, arquivo sem uso; CALL+FILE no mesmo input
 tests:
 - Oráculos independentes dos casos listados em test-catalog.md; positivos, negativos e adversariais antes do
@@ -62,7 +62,7 @@ commands_and_gates:
 - 'E-SELECTED: comando e escopo em ../../product/file-dependencies/verification.md'
 - python3 -B scripts/harness/lean.py fast — uma vez por repo produtivo estabilizado, após focais
 acceptance:
-- DDNAME é terminal exato sem campo/status DSNAME; logical file e origens conservados
+- External file name derivado de ASSIGN é terminal exato sem campo/status DSNAME ou bindingMechanism; logical file/sourceKind/origens conservados
 - Encode/decode/consumer preservam declaração/owner; negativo retirando campo indispensável falha
 - CALL-only conserva projeção semântica; reader antigo recusa versão nova; reader novo tem assertions independentes
 - Duas execuções iguais são determinísticas; falha de saída não deixa arquivo antigo passar por resultado novo

@@ -1,26 +1,26 @@
 id: FD-W11
-title: Qualificação transversal e handoff para revisão
+title: Qualificação transversal do core N+C e handoff para revisão
 status: TODO
 scope:
 - file-dependencies
 - analysis-cfg
 - artefatos-e2e
 - repos produtores com remediações comprovadas
-objective: Qualificação transversal e handoff para revisão
+objective: Qualificar core N+C sem condicionar sua entrega à extensão D posterior
 motivation: Fechar a campanha exige evidência transversal de semântica, wire, CALL e custo nos mesmos pins.
 repos:
 - analysis-cfg
 - artefatos-e2e
 - repos produtores com remediações comprovadas
 preconditions:
-- W0–W10 qualificadas no escopo obrigatório
-- D-AIR/D-WIRE/D-EFFECT/D-DYNAMIC/D-D-AUTH fechadas; pins finais imutáveis
+- W0–W9 qualificadas no escopo N+C; W8 inclui casos literais e computados
+- D-AIR/D-WIRE/D-EFFECT/D-DYNAMIC core fechadas; pins finais imutáveis; D-D-AUTH e captura D ficam para W10
 read_first:
 - ../../product/file-dependencies/brief.md
 - ../../product/file-dependencies/contracts.md
 - ../../product/file-dependencies/verification.md
 expected_product:
-- Matriz N/C/D com evidência por linha, sem PLANNED/BLOCKED obrigatório oculto
+- Matriz N+C com evidência por linha obrigatória; N04/N18 e D permanecem explicitamente PLANNED para extensão, sem bloquear DoD core
 - E2E por CLIs, corpus fixado, reader novo/legado/projeção CALL, adversariais/metamórficos/mutantes focais
 - Métricas de escala (arquivos/usos/layouts/candidatos/unidades/SORT), tempo/memória por etapa e comparação
   CALL; handoff
@@ -34,7 +34,7 @@ invariants:
 - Todos os invariantes do brief e guardrail COBOL_SOURCE_ONLY
 - Preservar CALL/evidência; literal não espera solver; mudanças normativas só bilaterais
 semantic_cases:
-- Todo catálogo obrigatório; scope guards e CALL-X1–X6
+- Catálogo core N+C obrigatório, scope guards e CALL-X1–X6; variantes D de CALL-X6/SG2 ficam para W10
 - T51–T54, MR1–MR9 e mutantes focais; corpus com verdade de referência
 tests:
 - Oráculos independentes dos casos listados em test-catalog.md; positivos, negativos e adversariais antes do
@@ -55,6 +55,7 @@ commands_and_gates:
 - 'E-FINAL: comando e escopo em ../../product/file-dependencies/verification.md'
 - python3 -B scripts/harness/lean.py fast — uma vez por repo produtivo estabilizado, após focais
 acceptance:
+- Core N+C qualificado sem exigir W10; nenhuma claim de suporte D por omissão de suas pendências
 - Nenhuma regressão CALL inexplicada; candidates/supports/remainders/alcance e provenance comparados
 - Todas as fronteiras qualificadas nos pins finais; JSON correto e determinístico; erro de entrega preservado
 - Limites reais/fora de perfil explícitos; ausência DSNAME nunca parcial; custos medidos sem inventar SLA
@@ -74,4 +75,3 @@ depends_on:
 - FD-W7
 - FD-W8
 - FD-W9
-- FD-W10

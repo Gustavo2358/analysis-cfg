@@ -10,16 +10,32 @@ para o escopo. Exemplos abaixo são manuais, independentes do futuro produtor;
 | --- | --- | --- |
 | owner/conector, SELECT e FD/SD, origens | nominal frontend → SP/lower → inventário FILE | remover owner funde homônimos; remover FD duplica entidade |
 | record ownership/visibilidade/captures | frontend → lower; consumer recebe associação explicativa | WRITE REC liga ao FD errado ao remover owner |
-| ASSIGN variante/nome/perfil | frontend → lower → File consumer | literal IBM tratado como variável falha; nenhum lookup externo |
+| ASSIGN variante/nome/perfil | frontend → lower → File consumer | assignment-name IBM tratada como data item ou DD allocation comprovada falha; nenhum lookup externo |
 | resource descriptor + uso/ação/papel | lower → AIR → consumer | remover participante SORT perde uma entrada |
 | storage, reads/writes, outcomes | frontend/lower → CFG/effects/values | MUST indevido perde CALL disjunto ou mantém valor velho |
-| estado capturado no OPEN | lower → providers gerais → consumer | nome alterado após OPEN não altera conexão antiga |
+| nome computado no ponto do uso | lower → providers gerais → consumer | CICS FILE(X) usa valor no comando, não de outra ocorrência |
+| estado capturado no OPEN (extensão D/W10) | lower → providers gerais → consumer | nome alterado após OPEN não altera conexão antiga |
 | inventário/coverage por dimensão | produtores → consumidores → JSON | CFG parcial não apaga literal/declaração conhecidos |
 | sites/supports/identidades/origens | consumer → serializer → reader independente | remoção de ref/dimensões quebra oracle, não só snapshot |
 
 W0 decide a shape tipada **SP**, alinhada a `INTERNAL-CONTRACT-DEV-001`: writer
 corrente + decoder/admission coordenados, rejeição explícita de versão superseded,
 sem dual writer por padrão. Extensão de SP não obriga alteração AIR em W0.
+
+### ASSIGN: nome externo conhecido, mecanismo fora do modelo
+
+Para `SELECT CLIENTES ASSIGN TO CLIENTDD`, conservar `logicalFile = CLIENTES`,
+assignment-name original e nome interpretado pela regra IBM. Representação
+conceitual do alvo: `namespace = cobol.external-file-name`, `name = CLIENTDD`,
+`sourceKind = ASSIGNMENT_NAME`. `sourceKind` é informação do SP/resultado de produto;
+não exige introduzir enum COBOL no núcleo AIR. O transporte final segue D-AIR.
+
+Esse nome é exato no domínio source-closed, embora possa designar ddname ou
+variável de ambiente no runtime. Não afirmar `namespace = zos.ddname`, mecanismo
+JCL DD ou environment, nem emitir `bindingMechanism = UNKNOWN`. Não há campo,
+remainder, PARTIAL ou redução de confiança por essa pergunta externa. Prefixos,
+case e nomes não interpretáveis continuam sujeitos à prova do perfil; nunca
+promover texto não interpretado a nome exato. Autoridade: [N-LR](profiles.md).
 
 ## Representação AIR: resultado da leitura H1/H2
 
@@ -35,7 +51,8 @@ usado; não chamar ausência de codec de ausência de conceito normativo.
 **D-AIR ainda aberta em W1:** menor transporte tipado da associação indispensável.
 Proposta preferida: extensão estrutural neutra, sem semântica COBOL no core,
 com owner, binding e refs de uso; só registrar em analysis-ir após demonstrar
-que as relações existentes não satisfazem A1–A6. Não implementar sidecar que o
+que as relações existentes não satisfazem A1–A4/A6 no core. A5 será reavaliada
+na extensão D, sem moldar preventivamente a AIR em W1. Não implementar sidecar que o
 consumer precise abrir junto com SP, nem serializar semântica em provenance.
 
 ## Seis exemplos bilaterais mínimos
@@ -45,15 +62,16 @@ origem. Campos abaixo indicam obrigações; não são nomes de API aprovados.
 
 | ID / entrada manual SP | AIR mínimo necessário / situação atual | Resultado esperado independente |
 | --- | --- | --- |
-| A1: unit U; SELECT F→DD; FD F; REC R; sem statements | Resource literal + associação U/F/R e origens SELECT/FD; sem invoke. Codec/owner bloqueiam transporte atual | uma declaração, alvo DD exato, zero usos/arestas operacionais |
-| A2: U/F/R; WRITE R FROM X | invoke(write,file,DD); ligação s→U/F; leitura X/transferência conforme regra; origem derivada | uso de F, não de X; record explica binding; CALL vazio |
-| A3: U1/F→DD e U2/F→DD | dois owners/conectores mesmo alvo; sem parsing de localId; D-AIR | declarações distintas; agregação conserva ambos os owners, não duplica entidade no mesmo owner |
-| A4: U/F, ASSIGN computado X sem prova | conector conservado; ComputedTarget + unknown tipado no ponto; D-AIR para estrutura | site FILE conhecido, zero candidatos, remainder true; não inventar DD nem apagar F |
-| A5: X='a'; OPEN F; X='b'; READ F; CLOSE; OPEN F | captura sintética no OPEN usando assign/read/storage gerais; uso lê estado capturado; join conservador | primeira conexão a; segunda b; abertura ambígua preserva conjunto e remainder correto |
-| A6: SORT S USING A B GIVING C | SD estrutural; usos derivados com papéis input A/B, output C, work S e mesma origem; fases apenas se provadas | três alvos fornecidos, sem DD inventado para S; procedimento local não cria CALL |
+| A1: unit U; SELECT F ASSIGN TO CLIENTDD; FD F; REC R; sem statements | Resource literal + associação U/F/R e origens SELECT/FD; sem invoke. Codec/owner bloqueiam transporte atual | uma declaração; external file name CLIENTDD exato, sourceKind ASSIGNMENT_NAME; zero usos/arestas operacionais; nenhum bindingMechanism |
+| A2: U/F/R; WRITE R FROM X | invoke(write,file,external-name CLIENTDD); ligação s→U/F; leitura X/transferência conforme regra; origem derivada | uso de F, não de X; record explica binding; CALL vazio |
+| A3: U1/F e U2/F com external-name CLIENTDD | dois owners/conectores mesmo alvo; sem parsing de localId; D-AIR | declarações distintas; agregação conserva ambos os owners, não duplica entidade no mesmo owner |
+| A4: U; CICS READ FILE(X), sem valor provado de X | ComputedTarget + unknown tipado no ponto; não exigir SELECT/FD ou conector nativo | site CICS FILE conhecido, zero candidatos, remainder true intraprograma; não inventar nome nem apagar uso |
+| A5 (D/W10): ASSIGN DYNAMIC X; X='a'; OPEN F; X='b'; READ F; CLOSE; OPEN F | captura sintética no OPEN usando assign/read/storage gerais; uso lê estado capturado; join conservador | primeira conexão a; segunda b; abertura ambígua preserva conjunto e remainder correto |
+| A6: SORT S USING A B GIVING C | SD estrutural; usos derivados com papéis input A/B, output C, work S e mesma origem; fases apenas se provadas | três alvos fornecidos, sem nome externo inventado para S; procedimento local não cria CALL |
 
 W1 transforma A1–A4 e A6 em Publication/model→validator→codec→consumer executáveis
-antes do slice produtivo. A5 tem smoke estrutural em W1 e oráculo de valores em W7.
+antes do slice produtivo. A4 recebe oráculo de valores em W7 e integração CICS em
+W8. A5 é obrigação da extensão D/W10, não bloqueia W1 ou a qualificação core W11.
 Incompatibilidade vira repro mínimo + decisão, não extensão especulativa em H.
 
 ## Cinco outcomes manuais obrigatórios de W3/W4
@@ -95,7 +113,8 @@ Forma conceitual mínima: declarations(owner, logicalFile, FD/SD, target, origin
 sites(owner, operation, role, declarationRef, valuePoint, candidates/supports,
 remainder, reachability, effects/control status, origins), edges derivadas dos
 sites e inventários conhecidos/indisponíveis. `artifacts` continua proveniência.
-Para DD literal, ausência de DSNAME não cria campo/reason code algum.
+Para external file name conhecido, ausência de DSNAME ou mecanismo externo não
+cria campo/reason code algum; a forma de ASSIGN não vira namespace `zos.ddname`.
 IDs/refs devem fechar no documento; ordenação determinística na mesma revisão.
 
 ## Decisoes abertas
@@ -105,10 +124,11 @@ IDs/refs devem fechar no documento; ordenação determinística na mesma revisã
 | D-AIR | associação tipada mínima; lower + AIR + consumer | W1 antes de alteração normativa/codec; não bloqueia W0 SP |
 | D-WIRE | número da versão nova e modo/projeção de reader legado; CFG/adapters | W1 antes de emissão; inspecionar todos os readers listados |
 | D-EFFECT | tabela bytes/ordem/status/validade por outcome e opções; frontend/lower | W3 antes de MUST; W4 antes de fechar USE/handlers |
-| D-DYNAMIC | captura/joins/ciclos de conexão no IR geral; lower/values | W7; sem solver separado |
-| D-D-AUTH | revisão 3.2 exata e assinaturas/efeitos do catálogo D-v1; frontend/lower | W7 para DYNAMIC, W10 para APIs; catálogo finito já selecionado |
+| D-DYNAMIC | ponto de consulta/joins/ciclos no motor geral; lower/values | W7 para core CICS; captura de conexão somente D/W10; sem solver separado |
+| D-D-AUTH | revisão 3.2 exata e assinaturas/efeitos do catálogo D-v1; frontend/lower | extensão W10, inclusive ASSIGN DYNAMIC; não bloqueia core W0–W9/W11 |
 
-Não estão abertas: scope source-only, CICS incluído, inventário separado de uso,
+Não estão abertas: scope source-only, nome externo sem mecanismo, N+C core e D
+posterior (decisão humana H4), CICS incluído, inventário separado de uso,
 reutilização do motor geral, ausência de execução W em H, e revisão humana em H4.
 Multi-unit seguirá composição selecionada; se captures exigirem outra estratégia,
 documentar contraexemplo antes de mudar, sem bloquear declaração local W0.

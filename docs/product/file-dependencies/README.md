@@ -3,6 +3,8 @@
 Estado: **FD-H0–H4 preparados para revisão humana; FD-W0–W11 TODO, sem autorização de execução**.
 O pedido desta sessão autoriza documentação/harness, commits e Draft PRs; termina
 em H4 para revisão humana. Nenhuma capability de arquivos está qualificada aqui.
+Revisão H4 incorporada: external file name sem mecanismo externo; **N+C core**,
+D extensão posterior; W8 estático não depende de W7. W0 permanece não iniciado.
 
 Leia somente [brief](brief.md), [estado](state.md) e a wave atual no
 [grafo de trabalho](waves.md). O discovery bruto de 16/09/2026 é referência

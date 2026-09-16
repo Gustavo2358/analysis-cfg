@@ -17,10 +17,12 @@ preconditions:
 read_first:
 - ../../product/file-dependencies/brief.md
 - ../../product/file-dependencies/contracts.md
+- ../../product/file-dependencies/profiles.md
 - ../../product/file-dependencies/verification.md
 expected_product:
 - Tipar SELECT OPTIONAL, ASSIGN com variantes e original/interpretado, organização/acesso/keys/status; distinguir
   FD/SD
+- 'ASSIGN IBM: publicar external file name/sourceKind ASSIGNMENT_NAME conforme N-LR, sem inferir mecanismo DD/environment'
 - Publicar owner canônico, origens SELECT/FD/COPY, records e visibilidade; reutilizar SymbolTableBuilder.buildFileEntities
   e resolução
 - Evoluir inventários SP/writer/integrity e SpInput/SpJsonDecoder/admission em conjunto, com versão corrente
@@ -31,6 +33,7 @@ allowed_changes:
 forbidden_changes:
 - Produzir invokes/resources AIR ou resultado FILE
 - Modificar AIR/CFG, calcular nomes dinâmicos, resolver arquivos por regex ou implementar waves W1+
+- Introduzir namespace zos.ddname universal ou bindingMechanism, inclusive UNKNOWN; exigir extensão D para fechar contrato N
 invariants:
 - Todos os invariantes do brief e guardrail COBOL_SOURCE_ONLY
 - Preservar CALL/evidência; literal não espera solver; mudanças normativas só bilaterais
@@ -56,6 +59,7 @@ commands_and_gates:
 - python3 -B scripts/harness/lean.py fast — uma vez por repo produtivo estabilizado, após focais
 acceptance:
 - Um SELECT e FD correspondentes = um conector com duas origens
+- 'SELECT CLIENTES ASSIGN TO CLIENTDD conserva logical file e external file name CLIENTDD exato; namespace conceitual cobol.external-file-name, sourceKind ASSIGNMENT_NAME; nenhum estado de mecanismo externo'
 - FD/SD distinguíveis; cada record tem owner ou ambiguidade/gap explícito; WRITE nominal aponta ao owner sem
   implementar execução
 - Declaração sem uso produz inventário, nunca leitura; writer→decoder conserva known empty versus unavailable

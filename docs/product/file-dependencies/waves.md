@@ -4,6 +4,8 @@
 Cada link abre o item lean executável. Os campos do item + brief + gate indicado
 são suficientes; discovery bruto é opcional. Não converter TODO em IN_PROGRESS
 por ter escrito o plano. Wave qualificada não é DONE lean antes de merge/testes.
+Escopo aprovado na revisão H4: **core N+C = W0–W9 → W11**; W10 conserva a
+extensão D para autorização posterior. A numeração histórica não impõe ordem.
 
 | Wave / produto | Depende de contrato/capability | Repos que provavelmente mudam |
 | --- | --- | --- |
@@ -14,16 +16,19 @@ por ter escrito o plano. Wave qualificada não é DONE lean antes de merge/teste
 | [W4](../../work/active/FD-W4.yaml) handlers/status | W3 outcome/storage | frontend + lower; CFG se controle atual insuficiente |
 | [W5](../../work/active/FD-W5.yaml) SORT/MERGE | W0 SD, W3 efeitos, W4 controle local | frontend + lower; consumer se papéis faltarem |
 | [W6](../../work/active/FD-W6.yaml) I-O-CONTROL/auxiliares | W0 declarações, W3 área, W5 sort | frontend + lower; sem dependência de W7/W8 |
-| [W7](../../work/active/FD-W7.yaml) nomes dinâmicos | W1 computed contract, W3–W4, D-DYNAMIC | frontend + lower + CFG; independe de W5/W6 |
-| [W8](../../work/active/FD-W8.yaml) CICS FILE | W3–W4 efeitos; W7 consultas; C-FC | frontend + lower + CFG; CICS literal não precisa esperar valores para desenvolvimento focal |
+| [W7](../../work/active/FD-W7.yaml) nomes computados do core | W1 computed contract, W3–W4, D-DYNAMIC/core | lower + CFG; frontend apenas se faltar fato tipado CICS; independe de D/W10 e W5/W6 |
+| [W8](../../work/active/FD-W8.yaml) CICS FILE | W3–W4 efeitos + C-FC para estáticos; W7 somente para computados | frontend + lower + CFG; pode iniciar/qualificar subset literal sem W7; fechamento completo exige computed |
 | [W9](../../work/active/FD-W9.yaml) escopos/multi-unit | W0 IDs; W1 associação; integração W5–W8 pertinentes | frontend + lower + agregação CFG |
-| [W10](../../work/active/FD-W10.yaml) extensões/APIs | W7–W9, autoridade D-v1 | frontend + lower + consumer; AIR só por necessidade |
-| [W11](../../work/active/FD-W11.yaml) qualificação final | W0–W10 obrigatórias qualificadas | testes/docs/integração; produção só remediar falha demonstrada |
+| [W10](../../work/active/FD-W10.yaml) extensão D posterior | core W11, autorização posterior, W7–W9 e D-D-AUTH | frontend + lower + consumer; AIR só por necessidade; ASSIGN DYNAMIC/captura, Report Writer e APIs |
+| [W11](../../work/active/FD-W11.yaml) qualificação final do core | W0–W9 no perfil N+C qualificadas; não depende de W10 | testes/docs/integração; produção só remediar falha demonstrada |
 
 Isto não é uma fila estritamente linear: W5/W6 e W7 formam ramos; W9 pode
 preparar testes de escopo logo após W0, mas só qualifica composição final após os
 consumers pertinentes. Não delegar ou editar worktrees alheios por causa do grafo.
 O agente executa apenas a wave autorizada, mesmo se houver ramo desbloqueado.
+`depends_on` registra pré-requisitos para iniciar; `conditional_dependencies` de
+W8 registra W7 para os casos computados e fechamento completo, sem bloquear o
+ramo estático. W11 não aceita um W8 somente literal como core completo.
 
 ## Política comum dos work items
 

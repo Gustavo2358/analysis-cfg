@@ -1,14 +1,13 @@
 id: FD-W7
-title: Nomes dinâmicos e vida de conexão
+title: Nomes computados do core pelo motor geral
 status: TODO
 scope:
 - file-dependencies
 - proleap-poc
 - cobol-lower
 - analysis-cfg
-objective: Nomes dinâmicos e vida de conexão
-motivation: Resolver variável no READ pode trocar o alvo da conexão; reutilizar possible-values no ponto semântico
-  correto.
+objective: Resolver alvos computados do core N+C no ponto semântico correto
+motivation: CICS FILE computado exige possible-values com supports e remainder; não depender de extensão GnuCOBOL para qualificar o core.
 repos:
 - proleap-poc
 - cobol-lower
@@ -16,28 +15,30 @@ repos:
 preconditions:
 - W1 ComputedTarget/inventário
 - W3–W4 efeitos e controle
-- D-DYNAMIC e revisão D-GC32 de ASSIGN fechadas
+- D-DYNAMIC fechado para consultas no ponto CICS; formas de FILE regidas por C-FC
+- AIR manual A4/T37 permite testar providers antes do transporte frontend de W8
 read_first:
 - ../../product/file-dependencies/brief.md
 - ../../product/file-dependencies/contracts.md
 - ../../product/file-dependencies/verification.md
 expected_product:
 - Queries com MOVE, branches/joins/ciclos, aliases/refmod e supports individuais
-- Captura no OPEN, CLOSE/reabertura e aberturas alternativas pelo storage geral
+- CICS FILE consulta no ponto do comando; mudanças entre comandos não reescrevem o resultado de usos anteriores
 - 'Quatro estados: literal, conjunto fechado, conjunto parcial + remainder e desconhecido; política de nomes
   por namespace'
 allowed_changes:
-- Typed assignment/profile, estado sintético explícito lower, providers gerais/consumer
-- A5 executável e métricas de sharing de queries
+- Providers gerais/consumer e ponto tipado lower; ajuste frontend apenas se faltar fato CICS indispensável
+- A4/T37 executáveis com AIR manual e métricas de sharing de queries; W8 integra SP/CICS
 forbidden_changes:
 - Consultar environment/JCL/filesystem; IBM assignment-name tratado como data item
 - Segundo solver para arquivos, cutoff de candidatos ou resolução no serializer
+- Implementar ASSIGN DYNAMIC, captura de conexão ou APIs D sem autorização da extensão W10
 invariants:
 - Todos os invariantes do brief e guardrail COBOL_SOURCE_ONLY
 - Preservar CALL/evidência; literal não espera solver; mudanças normativas só bilaterais
 semantic_cases:
-- N04/D01; T31–T35/A5
-- a→OPEN→b→READ→CLOSE→OPEN; entrada desconhecida; conjuntos por branches
+- A4/T37, SG5 e CALL-X3/X5; FILE computado CICS, sem depender de SELECT/FD
+- a→CICS FILE(X)→b→CICS FILE(X); entrada desconhecida; conjuntos por branches/joins/ciclos
 tests:
 - Oráculos independentes dos casos listados em test-catalog.md; positivos, negativos e adversariais antes do
   código
@@ -57,13 +58,13 @@ commands_and_gates:
 - 'Q-SHARED: comando e escopo em ../../product/file-dependencies/verification.md'
 - python3 -B scripts/harness/lean.py fast — uma vez por repo produtivo estabilizado, após focais
 acceptance:
-- Primeiro READ permanece a; reabertura b; joins preservam todos os candidatos/unknown
+- Primeiro comando FILE(X) vê a e segundo vê b; joins preservam todos os candidatos/unknown
 - Closed set nunca é inferido de truncamento; casos estáticos têm zero execução de values
-- Path literal conserva semântica de perfil/case/espaços sem normalização da máquina
+- Quatro estados testados com oráculo independente; política CICS não é normalização de CALL nem consulta de ambiente
 evidence:
 - Commit/pin exatos por fronteira; comandos/exit/results reais, testes novos vs REUSED vs NOT_RUN
 - Atualizar matriz somente com oracle/resultado; estado curto e PR persistente por repo, sem receipt obrigatório
-stop_condition: Parar após captura/query/unknown qualificados; handles de biblioteca ficam para W10.
+stop_condition: Parar após queries/unknown do core qualificados; ASSIGN DYNAMIC, captura de conexão e handles ficam para extensão W10.
 depends_on:
 - FD-W1
 - FD-W3

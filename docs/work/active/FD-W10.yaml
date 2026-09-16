@@ -1,13 +1,14 @@
 id: FD-W10
-title: Dialetos selecionados, Report Writer e catálogo de APIs
+title: Extensão posterior D — GnuCOBOL, Report Writer e APIs
 status: TODO
+delivery_profile: EXTENDED_PROFILE
 scope:
 - file-dependencies
 - proleap-poc
 - cobol-lower
 - analysis-cfg
 - air-java/analysis-ir somente por gap
-objective: Dialetos selecionados, Report Writer e catálogo de APIs
+objective: Implementar o subset D após o core N+C, mediante autorização posterior
 motivation: Cobertura ampla precisa de contratos finitos para extensões; nome de CALL não prova arquivo.
 repos:
 - proleap-poc
@@ -15,7 +16,8 @@ repos:
 - analysis-cfg
 - air-java/analysis-ir somente por gap
 preconditions:
-- W7 nomes/captura
+- Core N+C qualificado em W11 e autorização explícita posterior para extensão D
+- W7 consultas de valores gerais disponíveis; captura de conexão D será implementada nesta wave
 - W8–W9 consumers/escopo pertinentes
 - D-D-AUTH fechado para D-GC32 e D-v1
 read_first:
@@ -23,6 +25,7 @@ read_first:
 - ../../product/file-dependencies/contracts.md
 - ../../product/file-dependencies/verification.md
 expected_product:
+- N04/D01 e A5/T31–T35 com ASSIGN DYNAMIC, captura no OPEN, CLOSE/reabertura e joins de conexões; revisão D-GC32 exata
 - 'D01–D04/D08: variantes selecionadas de ASSIGN/lock/PREVIOUS/COMMIT/ROLLBACK/streams e Report Writer'
 - D-v1 dez APIs com assinatura/perfil/papéis/efeitos/outcomes/fonte/testes; FLUSH é negativo conforme GnuCOBOL
 - Nome→handle no OPEN, aliases/cópia/rebinding/close/unknown handle; COPY/RENAME origem/destino
@@ -36,7 +39,7 @@ invariants:
 - Todos os invariantes do brief e guardrail COBOL_SOURCE_ONLY
 - Preservar CALL/evidência; literal não espera solver; mudanças normativas só bilaterais
 semantic_cases:
-- N18/D01–D08 conforme profile; T34/T42–T45; D07 negativo
+- N04/N18/D01–D08 conforme profile; A5/T31–T35/T42–T45; D07 negativo
 - Report→arquivo; handle copiado/sobrescrito/desconhecido; CALL+FILE simultâneos
 tests:
 - Oráculos independentes dos casos listados em test-catalog.md; positivos, negativos e adversariais antes do
@@ -60,6 +63,7 @@ commands_and_gates:
 - 'Q-SHARED: comando e escopo em ../../product/file-dependencies/verification.md'
 - python3 -B scripts/harness/lean.py fast — uma vez por repo produtivo estabilizado, após focais
 acceptance:
+- ASSIGN DYNAMIC conserva captura no OPEN, alteração posterior não troca conexão, reabertura usa valor novo; joins preservam candidates/remainder
 - Todas as entradas D-v1 possuem assinatura e oráculos; APIs por nome e handle distinguíveis
 - Wrapper sem contrato não produz FILE; handle desconhecido em API comprovada preserva uso aberto
 - Report Writer gera usos corretos, sem CALL fictício; stub de compatibilidade não gera I/O inventado
@@ -67,8 +71,9 @@ acceptance:
 evidence:
 - Commit/pin exatos por fronteira; comandos/exit/results reais, testes novos vs REUSED vs NOT_RUN
 - Atualizar matriz somente com oracle/resultado; estado curto e PR persistente por repo, sem receipt obrigatório
-stop_condition: Parar com subset D selecionado qualificado; extensão/redução do escopo exige decisão explícita.
+stop_condition: Parar com subset D qualificado e handoff próprio para revisão; não reclassificar o core W11 como incompleto enquanto D estiver adiada.
 depends_on:
 - FD-W7
 - FD-W8
 - FD-W9
+- FD-W11

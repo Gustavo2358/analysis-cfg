@@ -11,19 +11,24 @@ G6 qualification-local/corpus nos marcos da [estratégia](verification.md).
 T focal por padrão; testes de alias/efeitos/handlers/dinâmicos/escopo ganham G4 no
 checkpoint. T51 é G3; T52/T53 G3+G4; T54 G6 final após witness pequeno G1.
 
+Core N+C: todos os casos pertinentes ao perfil, inclusive nomes computados CICS.
+T31–T35/T42–T44 e D-LOCK/TXN/RW/STREAM são da extensão D/W10 posterior; não
+bloqueiam W11. T45 é negativo anti-heurística obrigatório no core e reutilizado
+em W10; CALL-X6 usa CALL comum + FILE no core, acrescendo API derivada em D.
+
 ## T01–T54 — busca por ID ou família
 
 | Caso | Situação / classe | Oráculo semântico independente | Dona |
 | --- | --- | --- | --- |
 | T01 | SELECT/FD sem statement | Declaração, sem leitura/escrita inventada. | W0 |
-| T02 | SELECT e FD correspondentes | Um conector; duas origens conservadas. | W0 |
+| T02 | SELECT/FD correspondentes e ASSIGN TO CLIENTDD | Um conector/duas origens; external file name CLIENTDD exato com sourceKind ASSIGNMENT_NAME; nenhum mecanismo DD/environment afirmado ou marcado UNKNOWN. | W0 |
 | T03 | FD sem SELECT/uso sem declaração | Diagnóstico/lacuna localizada, não binding inventado. | W0 |
 | T04 | Dois FD com record-name homônimo | Resolução por qualificação/escopo; ambiguidade explícita. | W0 |
 | T05 | WRITE REC FROM WS | Arquivo proprietário de REC, não WS. | W2 |
 | T06 | FROM utiliza registro de outro arquivo | Nenhuma leitura desse outro arquivo inferida só pelo MOVE de buffer. | W2 |
 | T07 | OPEN de vários arquivos com modos diferentes | Modo correto por arquivo; todos os sites/papéis conservados. | W2 |
 | T08 | Apenas CLOSE/START | Uso presente, sem leitura de conteúdo fictícia. | W2 |
-| T09 | DELETE RECORD | Exclusão de registro; não inferir qualquer operação sobre DSNAME/dataset fora do fonte. | W2 |
+| T09 | DELETE RECORD como único uso do arquivo, com INVALID KEY | Site FILE e dependência presentes; operação DELETE_RECORD; handler preservado. Não inferir dataset deletion, DSNAME ou remoção física. | W2 |
 | T10 | READ chaveada com invalid key | Branch/efeitos/status coerentes. | W4 |
 | T11 | READ NEXT AT END com CALL no handler | CALL e arquivo conservados; handler não incondicional. | W4 |
 | T12 | READ INTO e EOF | Cópia não ocorre no caminho em que a regra a impede. | W3 |
@@ -45,13 +50,13 @@ checkpoint. T51 é G3; T52/T53 G3+G4; T54 G6 final após witness pequeno G1.
 | T28 | SORT de tabela | Não inventar arquivo. | W5 |
 | T29 | RERUN ON sem EVERY | Parse/perfil e recurso de checkpoint tratados. | W6 |
 | T30 | Assignment-name IBM com hífens | Normalização somente pela regra do perfil. | W0/W6 |
-| T31 | ASSIGN dinâmico, alteração após OPEN | Binding da conexão não acompanha automaticamente a variável. | W7 |
-| T32 | CLOSE e nova abertura com outro nome | Nova associação diferenciada. | W7 |
-| T33 | Duas aberturas alternativas antes do mesmo READ | Candidatos e resto abertos quando necessário. | W7 |
-| T34 | Path literal com case/espaços | Não aplicar normalização de programas ou DD. | W7 |
-| T35 | Campo dinâmico sem valor conhecido | Site conservado com alvo aberto. | W7 |
+| T31 | ASSIGN dinâmico, alteração após OPEN | Binding da conexão não acompanha automaticamente a variável. | W10 (D) |
+| T32 | CLOSE e nova abertura com outro nome | Nova associação diferenciada. | W10 (D) |
+| T33 | Duas aberturas alternativas antes do mesmo READ | Candidatos e resto abertos quando necessário. | W10 (D) |
+| T34 | Path literal com case/espaços | Não aplicar normalização de programas ou external names IBM. | W10 (D) |
+| T35 | Campo dinâmico sem valor conhecido | Site conservado com alvo aberto. | W10 (D) |
 | T36 | CICS FILE literal sem SELECT/FD | Dependência CICS correta. | W8 |
-| T37 | CICS FILE variável, REDEFINES/refmod | Query no ponto e área corretos. | W8 |
+| T37 | CICS FILE variável, REDEFINES/refmod, branches/joins/ciclos e input desconhecido | Query no comando/área corretos; conjunto fechado, parcial+remainder e unknown distintos. W7 usa AIR manual; W8 integra fonte→resultado; mudança entre comandos muda somente usos posteriores. | W7/W8 |
 | T38 | CICS SYSID distintos | Identidades/contextos não fundidos indevidamente. | W8 |
 | T39 | CICS INTO versus SET | Memória e ponteiro tratados distintamente. | W8 |
 | T40 | INQUIRE com operandos de saída | Saída não confundida com valor-alvo anterior ao comando. | W8 |
@@ -59,7 +64,7 @@ checkpoint. T51 é G3; T52/T53 G3+G4; T54 G6 final após witness pequeno G1.
 | T42 | API OPEN/READ/CLOSE com handle copiado | Associação rastreável, sem usar o handle como filename. | W10 |
 | T43 | Handle sobrescrito por chamada desconhecida | Resto aberto/lacuna; não reusar associação antiga como exata. | W10 |
 | T44 | API RENAME/COPY | Origem e destino separados; CALL conservado. | W10 |
-| T45 | Wrapper com nome FILE sem assinatura | Não produzir dependência por adivinhação. | W10 |
+| T45 | Wrapper com nome FILE sem assinatura | Preservar CALL; não produzir FILE por adivinhação. | W1/W10 |
 | T46 | Pai e filho com conector homônimo | Owners distintos; GLOBAL materializado quando aplicável. | W0/W9 |
 | T47 | COPY de FD com REPLACING | Nome final e proveniência de expansão coerentes. | W0 |
 | T48 | Programa com construção fora do CFG | Referências conhecidas sobrevivem; controle/inventário parcial explícito. | W1/W9 |
@@ -90,13 +95,13 @@ expected independente. CALL-only deve conservar a projeção semântica.
 
 | Caso | Negativo arquitetural / oracle |
 | --- | --- |
-| SG1 | SELECT F ASSIGN DD: alvo DD exato, sem motivo PARTIAL/UNKNOWN relacionado à falta de DSNAME |
+| SG1 | SELECT F ASSIGN TO CLIENTDD: external file name CLIENTDD exato, sourceKind ASSIGNMENT_NAME; namespace conceitual cobol.external-file-name. Sem zos.ddname universal, bindingMechanism (inclusive UNKNOWN), ou PARTIAL/UNKNOWN por falta de DSNAME/alocação |
 | SG2 | ASSIGN path literal: instrumentar fronteira de acesso para provar zero open/stat/canonicalização do arquivo de negócio; leitura de fonte autorizada separada |
 | SG3 | Mesmos fontes analisados sem JCL/variando ambiente do processo: mesmas identidades/candidates; nenhuma consulta externa por resolução FILE |
-| SG4 | Reader/schema não contém DSNAME/physicalResource/physicalResolution/runtimeAllocation/JCL resolution state nem substitutos equivalentes |
+| SG4 | Reader/schema não contém DSNAME/physicalResource/physicalResolution/runtimeAllocation/JCL resolution state nem bindingMechanism ou substitutos equivalentes |
 | SG5 | Dinâmico de input: conhecidos + remainder ou unknown; não consultar ambiente para fechar conjunto |
 
-## Casos adicionais de perfil D
+## Casos adicionais de perfil D — extensão posterior
 
 D-LOCK: variantes lock/SHARING/PREVIOUS/UNLOCK com target e efeitos/controle
 segundo perfil, mais forma fora do perfil como negativo. D-TXN: COMMIT/ROLLBACK
@@ -120,7 +125,8 @@ sem resolver redirecionamento. Cada um exige positivo/negativo e fonte D-GC32.
 | MR9 | adicionar construção desconhecida sem remover trecho conhecido | conhecido permanece; completude pode cair |
 
 Mutantes focais: remover record-owner/participante SORT; FD↔SD; MAY→MUST; INTO
-incondicional; apagar AT END; ASSIGN IBM→variável; query no READ em vez OPEN;
+incondicional; apagar AT END; ASSIGN IBM→variável ou mecanismo DD afirmado;
+apagar site DELETE_RECORD; query CICS em ponto errado; em D, query READ em vez OPEN;
 normalização CALL em path; fundir owners; eliminar site no CFG parcial. Executar
-junto ao grupo sensível e W11. Sobrevivente exige investigação, nunca rótulo
+junto ao grupo sensível e W11 para N+C; os específicos de D ficam para W10. Sobrevivente exige investigação, nunca rótulo
 equivalente automático. Não criar campanha full de mutação por edição.

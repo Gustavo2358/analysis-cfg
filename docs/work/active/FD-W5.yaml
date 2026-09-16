@@ -23,7 +23,7 @@ read_first:
 expected_product:
 - Todos os participantes USING/GIVING com papéis e mesma origem do statement
 - INPUT/OUTPUT PROCEDURE/ranges com controle local; MERGE respeita restrições próprias
-- RELEASE record FROM e RETURN sort-file INTO/AT END, sort-work sem DD inventado
+- RELEASE record FROM e RETURN sort-file INTO/AT END, sort-work sem nome externo inventado
 allowed_changes:
 - Facts/SP, tradução de fases e invocações locais; consumer se falta papel
 - Testes manuais multiparty e pipeline mínima sem I/O explícito
@@ -56,7 +56,7 @@ commands_and_gates:
 - python3 -B scripts/harness/lean.py fast — uma vez por repo produtivo estabilizado, após focais
 acceptance:
 - Programa só SORT/MERGE publica entradas/saídas completas com roles/site refs
-- Nenhum DD de sort-work inventado; RELEASE resolve owner SD; RETURN não colide com GOBACK/CICS RETURN
+- Nenhum nome externo de sort-work inventado; RELEASE resolve owner SD; RETURN não colide com GOBACK/CICS RETURN
 - Procedimentos locais preservam retorno/efeitos; negativos tabela/MERGE inválido passam
 evidence:
 - Commit/pin exatos por fronteira; comandos/exit/results reais, testes novos vs REUSED vs NOT_RUN

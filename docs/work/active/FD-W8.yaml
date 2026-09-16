@@ -15,7 +15,7 @@ repos:
 - analysis-cfg
 preconditions:
 - W3–W4 efeitos/handlers
-- W7 consultas para nomes calculados
+- W7 somente para implementar/qualificar casos computados e fechar W8 completo; não bloqueia início ou subset literal
 - Autoridade C-FC 5.6 e papéis SPI conferidos
 read_first:
 - ../../product/file-dependencies/brief.md
@@ -60,6 +60,8 @@ commands_and_gates:
 - 'Q-SHARED: comando e escopo em ../../product/file-dependencies/verification.md'
 - python3 -B scripts/harness/lean.py fast — uma vez por repo produtivo estabilizado, após focais
 acceptance:
+- Subset literal/static pode iniciar e ser qualificado após W3–W4 sem W7; registrar escopo parcial de W8, sem alegar core completo
+- Casos computados exigem FD-W7; W8 completo e W11 exigem ambos os subsets, com T37 integrado
 - Todos os dez comandos + dois SPI selecionados têm positivo/negativo, effects/control/target explícitos
 - SYSID qualifica sem lookup externo; INTO/SET são distintos; INQUIRE output não usa valor anterior como nome
 - CALL/LINK/XCTL e efeitos/retornos existentes preservados; nenhuma forma C obrigatória só UNSUPPORTED ao fechar
@@ -70,4 +72,6 @@ stop_condition: Parar ao qualificar C-FC; administração não abre escopo de co
 depends_on:
 - FD-W3
 - FD-W4
-- FD-W7
+conditional_dependencies:
+- work_item: FD-W7
+  applies_to: Casos FILE computados e fechamento completo de W8; não condiciona subset literal/static

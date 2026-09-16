@@ -13,7 +13,7 @@ checklist administrativo. Teste não executado nunca é PASS.
 | FAST / G3 | pequenos contratos SP/codec/reader nas duas pontas; retirada de campo necessário deve falhar |
 | FAST / G5 | `lean.py fast` fixo uma vez após estabilizar cada repo produtivo; não substituir por seleção ad hoc |
 | QUALIFICATION / G4+G6 | cross-repo selecionado; efeitos/storage/CFG/dataflow em W3/W4; CICS/APIs W8/W10 se alteram núcleo/contrato; adversariais/metamórficos |
-| FINAL / E2E / G6 | W11: pipeline real nos pins finais, corpus fixado, compatibilidade CALL+FILE e escala; qualification-local dos repos materiais |
+| FINAL / E2E / G6 | W11: core N+C nos pins finais, corpus fixado, compatibilidade CALL+FILE e escala; qualification-local dos repos materiais. D/W10 tem qualificação posterior própria |
 
 G6 se justifica por lei compartilhada alterada, consumers não delimitáveis,
 regressão fora da frontier ou qualificação global. Rodar full a cada commit não
@@ -71,7 +71,8 @@ B-SP: expected SP manual + writer frontend + decoder/admission in-memory/file
 lower; negativa de inventário ausente/variant/version inválidos; testar binding
 e origem, não só roundtrip. W0 não precisa construir CFG.
 
-B-AIR: A1–A6/O1–O5 em modelo manual; validator + codec compartilhado + consumer.
+B-AIR: A1–A4/A6 e O1–O5 em modelo manual; validator + codec compartilhado + consumer.
+A5/captura D pertence à extensão W10; não é requisito para fechar core.
 Testar owner/ref/capability inválidos e campo removido. Roundtrip sozinho não
 prova semântica. IR somente muda após D-AIR, sem falso green por ignorar extensão.
 
@@ -100,7 +101,8 @@ W1 acrescenta a coorte FILE ao padrão de driver em `scripts/project/` (fixtures
 em `analysis-adapters/src/test/resources/file-dependencies/`), com flags e comando
 documentados quando existirem. Isso é teste de integração da pipeline vigente,
 não outro harness. Executar CLIs reais, examinar exit code e produtos novos,
-validar semanticamente DD/owner/records/sites/roles/supports/remainders/CALL.
+validar external file name/sourceKind/owner/records/sites/roles/supports/remainders/CALL;
+SG1 rejeita mecanismo DD/environment afirmado ou bindingMechanism UNKNOWN.
 Repetir duas vezes para T52; induzir falha com output antigo para T53.
 
 **Não rodar cegamente scripts históricos:** `e2e_w1d.py` exige SP 1.3;
@@ -110,6 +112,11 @@ contratual comprovada, preservando assertions; não só trocar o número até pa
 `artefatos-e2e/run-e2e.sh` pertence ao CP3 e sobrescreve outputs antigos: não usar.
 
 ## E-FINAL / W11
+
+DoD core: N+C completos no escopo publicado; D permanece PLANNED/NOT_RUN para
+extensão posterior, sem bloquear W11. N04/N18 são D apesar dos IDs históricos.
+Não executar casos D como requisito core nem alegar suporte D. T37 cobre values
+no core; T31–T35/A5 e APIs/Report Writer qualificam-se em W10 após autorização.
 
 Coortes: fixtures autorais com expected manual → pequena amostra real da matriz
 → corpus CardDemo em `59cc6c2fd7ebd7ef7925cad552a01a4b8b6e4d5e` (origem em
