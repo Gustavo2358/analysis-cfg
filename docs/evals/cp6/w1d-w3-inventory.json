@@ -1094,7 +1094,6 @@
         "java.lang.Integer",
         "java.lang.Math",
         "java.lang.Object",
-        "java.lang.Record",
         "java.lang.String",
         "java.lang.invoke.CallSite",
         "java.lang.invoke.LambdaMetafactory",
