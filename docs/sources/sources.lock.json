@@ -144,7 +144,7 @@
     "library_version": "0.1.0-SNAPSHOT",
     "analysis_ir": {
       "semantic_version": "2.0.0",
-      "commit": "566fe5822d6a1d7eb55d6f6321d530f9de548cdb"
+      "commit": "6b8ce96f5b1020199e3fcceedf81d931a3b8d2ff"
     },
     "maven": {
       "group_id": "io.github.gustavo2358",
