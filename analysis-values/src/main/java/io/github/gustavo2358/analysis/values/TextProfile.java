@@ -69,22 +69,19 @@ final class TextProfile {
         }
         for(var context:session.contexts()) {
             if(!context.entry().state().uncertainties().isEmpty())sourceOpenEntries.add(context.entry().id());
-            var seed=PossibleValuesState.reached();var initial=new HashMap<Integer,Entries.InitialValue>();
-            for(var condition:context.entry().state().conditions()) {
+            var seed=PossibleValuesState.reached();var initial=new HashMap<Integer,Values.TextValue>();var initialized=new HashSet<Integer>();
+            for(var condition:context.entry().state().conditions().stream().sorted(Comparator.comparingInt(c->c.value() instanceof Entries.LiteralInitial?0:1)).toList()) {
                 if(!(condition.place() instanceof Places.ObjectPlace object))throw new Refusal(false,"UNSUPPORTED_INITIAL_PLACE");
                 var location=subjects.get(object.object());
                 if(location==null)throw new Refusal(false,"UNSUPPORTED_INITIAL_STORAGE");
-                var previous=initial.putIfAbsent(location.ordinal(),condition.value());
-                if(previous!=null&&!previous.equals(condition.value())) {
-                    if(previous instanceof Entries.LiteralInitial a&&condition.value() instanceof Entries.LiteralInitial b) {
-                        if(!a.value().value().equals(b.value().value()))throw new Refusal(true,"CONTRADICTORY_INITIAL_VALUES");
-                    } else throw new Refusal(false,"UNSUPPORTED_OVERLAPPING_INITIAL_CONDITIONS");
-                }
                 if(condition.value() instanceof Entries.LiteralInitial literal) {
                     if(!(literal.value().value() instanceof Values.TextValue text))throw new Refusal(false,"UNSUPPORTED_INITIAL_VALUE");
+                    var previous=initial.putIfAbsent(location.ordinal(),text);
+                    if(previous!=null&&!previous.equals(text))throw new Refusal(true,"CONTRADICTORY_INITIAL_VALUES");
                     var value=universe.supported(text,condition.place().header().id(),condition.origin(),condition.premises(),preparation);
-                    // Conditions are simultaneous; equal literals on one Cell retain both supports.
-                    if(previous!=null)value=seed.value(location.ordinal(),preparation).join(value,preparation);
+                    // Simultaneous support is unioned; only the first strong fact can
+                    // replace unspecified default content at the invocation boundary.
+                    if(!initialized.add(location.ordinal()))value=seed.value(location.ordinal(),preparation).join(value,preparation);
                     seed=seed.initialize(location.ordinal(),value,preparation);
                 } else if(condition.value() instanceof Entries.PossibleLiterals possible) {
                     var value=Candidates.UNKNOWN;
@@ -92,8 +89,8 @@ final class TextProfile {
                         if(!(literal.value() instanceof Values.TextValue text))throw new Refusal(false,"UNSUPPORTED_INITIAL_VALUE");
                         value=value.join(universe.supported(text,literal.header().id(),condition.origin(),condition.premises(),preparation),preparation);
                     }
-                    seed=seed.initialize(location.ordinal(),value,preparation);
-                }
+                    seed=seed.weakUpdate(location.ordinal(),value,preparation);initialized.add(location.ordinal());
+                } else seed=seed.widenUnknown(location.ordinal(),preparation);
             }
             boundaries.put(context,seed);
         }

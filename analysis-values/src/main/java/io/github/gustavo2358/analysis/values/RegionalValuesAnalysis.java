@@ -109,14 +109,17 @@ public final class RegionalValuesAnalysis {
         }
         for(var context:session.contexts()) {
             var seeds=new ArrayList<Plan>();int slot=0;var seededLocations=new HashSet<StorageIndex.Location>();
-            for(var condition:context.entry().state().conditions()) {
+            // Simultaneous strong facts initialize first; possible support and open entry
+            // content then widen that boundary. Input order is not overwrite authority.
+            var conditions=context.entry().state().conditions().stream().sorted(Comparator.comparingInt(c->c.value() instanceof Entries.LiteralInitial?0:1)).toList();
+            for(var condition:conditions) {
                 var resolution=effects.storage().resolve(condition.place());
                 var sources=new ArrayList<StatementEffects.Source>();
                 boolean possible=condition.value() instanceof Entries.PossibleLiterals;
                 if(condition.value() instanceof Entries.PossibleLiterals p)
                     p.candidates().forEach(l->sources.add(new StatementEffects.ExpressionSource(l)));
                 else sources.add(condition.value() instanceof Entries.LiteralInitial l?new StatementEffects.ExpressionSource(l.value()):new StatementEffects.UnknownSource("ENTRY_CONTENT_NOT_LITERAL"));
-                var strength=possible?StatementEffects.Strength.MAY:StatementEffects.Strength.MUST;
+                var strength=condition.value() instanceof Entries.LiteralInitial?StatementEffects.Strength.MUST:StatementEffects.Strength.MAY;
                 for(var source:sources) {
                     boolean logical=possible&&condition.place() instanceof Places.ObjectPlace&&!resolution.exact();
                     var write=new StatementEffects.Write(slot++,Optional.of(condition.place().header().id()),resolution,source,logical?List.of():effects.targets(resolution,strength),StatementEffects.Selection.SINGLE_DESTINATION,strength,

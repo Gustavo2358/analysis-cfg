@@ -39,4 +39,37 @@ class EntryCoexistenceTest {
             assertEquals(2,fact.candidateSupports().size());
         }
     }
+    @Test void unprovedSeparationBetweenPossibleEntriesDoesNotRejectEitherObject() {
+        var p=PossibleEntryTest.possible(List.of(returning(U,"s0",List.of())),"PGM00001");
+        var base=RegionalCompositionTest.twoBases(p.units().getFirst().sequences());
+        var first=p.units().getFirst().entries().getFirst().state().conditions().getFirst();
+        var seed=RegionalInitialTest.seed("other-base",0,"PGM00002");var slice=(Places.RegionSlice)seed.place();
+        var place=new Places.RegionSlice(slice.header(),RegionalCompositionTest.Y,slice.offset(),slice.length(),slice.codec(),slice.typeRef());
+        var second=new Entries.InitialCondition(place,new Entries.PossibleLiterals(List.of(((Entries.LiteralInitial)seed.value()).value()),PossibleEntryTest.GAP),seed.origin(),List.of());
+        var combined=new Publication(p.id(),p.airVersion(),p.capabilities(),p.artifacts(),base.units(),base.storage(),p.resources(),p.artifactRelations(),p.origins(),p.coverage(),p.uncertainties(),List.of());
+        for(var order:List.of(List.of(first,second),List.of(second,first))) {
+            var execution=run(conditions(combined,order));
+            assertEquals(List.of("PGM00001"),texts(at(execution,"return-s0",WHOLE)));
+            assertEquals(List.of("PGM00002"),texts(at(execution,"return-s0",RegionalCompositionTest.YWHOLE)));
+            assertTrue(at(execution,"return-s0",WHOLE).modelValueRemainder());
+        }
+    }
+    @Test void scalarAndRegionalCoexistenceAgreeWithoutOrderBasedKill() {
+        var p=graph(new String[]{null},new int[][]{{}},1,false,false);
+        var u=p.units().getFirst();var e=u.entries().getFirst();var owner=new EntryOwner(e.id());var origin=e.origin();
+        var gap=new UncertaintyId(p.id(),"lifecycle");
+        var place=new Places.ObjectPlace(new Operand.Header(new OperandId(owner,"source-place"),Operand.Role.VALUE_WRITE,origin),u.objects().getFirst().id());
+        var literal=new Expressions.Literal(new Operand.Header(new OperandId(owner,"source-value"),Operand.Role.VALUE_READ,origin),new Values.TextValue("PROGA"));
+        var possible=new Entries.InitialCondition(place,new Entries.PossibleLiterals(List.of(literal),gap),origin,List.of());
+        var otherPlace=new Places.ObjectPlace(new Operand.Header(new OperandId(owner,"preserve-place"),Operand.Role.VALUE_WRITE,origin),u.objects().getFirst().id());
+        var preserve=new Entries.InitialCondition(otherPlace,new Entries.ExternalUnknown(gap),origin,List.of());
+        p=new Publication(p.id(),p.airVersion(),p.capabilities(),p.artifacts(),p.units(),p.storage(),p.resources(),p.artifactRelations(),p.origins(),p.coverage(),
+            List.of(new Evidence.Uncertainty(gap,"EP_PARTIAL",List.of(Evidence.Dimension.VALUES),new Scopes.UnitScope(u.id()),"possible boundary",origin)),p.premises());
+        for(var order:List.of(List.of(possible,preserve),List.of(preserve,possible))) {
+            var combined=conditions(p,order);var query=ValuesTest.before(combined,0,0);
+            ValuesTest.expected(ValuesTest.fact(execute(combined),query),true,"PROGA");
+            assertEquals(List.of("PROGA"),texts(run(combined).observe(List.of(query)).observations().getFirst().value()));
+        }
+    }
+
 }
