@@ -106,3 +106,13 @@ Rejected: entry-only optimization (I still fails); per-base complete images (sli
 still multiply); unqualified nonrelational replacement (existing copy correlation
 contracts regress); caps/truncation; dropping provenance; second solver; frontend
 SYNC changes or invented separation. None is authorized by this decision.
+
+## First implementation checkpoint
+
+W3 and W4 share the same State/Engine representation and are implemented together;
+there is no temporary second domain/solver. Entry-only structural REDs pass, as do
+the I weak-write regression, G/E scaled copies/joins and the unchanged independent
+concrete branch/copy/loop oracles. `w3-focused.log`, `w4-scale.log`,
+`domain-family.log` record this checkpoint (104 values-family tests, zero failures).
+The 17 selected product verticals in `product-01` pass real codec/CLI byte parity.
+Further W6 falsification and policy mutations remain pending; no final FAST yet.
