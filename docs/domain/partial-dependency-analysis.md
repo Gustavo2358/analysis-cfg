@@ -15,13 +15,13 @@ computed candidate. Literal target evidence does not require a values solver.
 An unavailable observation must be localized before the consumer staging bundle
 is discarded. Genuine inconsistent provider data is still an error.
 
-CFG semantic/capability/validation limits can leave graph execution unknown while
+CFG semantic/capability limits can leave graph execution unknown while
 the AIR still inventories literal target occurrences. Such occurrences may be
 published as structural source evidence with UNKNOWN reachability and an open
 control remainder. They must never be labeled unreachable or graph-proved.
 This uses the same target interpreter and existing AIR occurrences, not a second
 solver or the separate observed-dependencies product. Invalid AIR remains a
-global failure; runtime/resource and I/O errors are not silently relabeled success.
+global failure; incomplete structural validation, runtime/resource and I/O errors are not silently relabeled success.
 
 ## Explicit result contract change
 

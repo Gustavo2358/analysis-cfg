@@ -39,4 +39,35 @@ class DependencyWireTests(unittest.TestCase):
             for malformed in (b'{"schema":"duplicate",'+raw[1:],raw+b'\n',raw.replace(b'"schema":',b'"schema" :',1),b'\xff'):
                 p.write_bytes(malformed)
                 with self.assertRaises((ValueError,UnicodeError)):read(p)
+
+class PartialDependencyWireTests(unittest.TestCase):
+    def test_actual_partial_outputs_preserve_literal_and_open_computed(self):
+        folder=ROOT/'analysis-adapters/target/ep-w4'
+        for name in ('unsupported-values','unsupported-control'):
+            d=read(folder/(name+'.json'))
+            self.assertEqual('1.2.0',d['version']);self.assertEqual('PARTIAL',d['analysisStatus'])
+            direct=next(s for s in d['sites'] if s['operation']['localId']=='direct')
+            self.assertEqual(['DIRECT'],[c['referenceName'] for c in direct['candidates']])
+            if name=='unsupported-values':
+                unknown=next(s for s in d['sites'] if s['operation']['localId']=='computed')
+                self.assertEqual('ANALYSIS_INCOMPLETE',unknown['targetStatus']);self.assertTrue(unknown['effectiveUnknownRemainder'])
+            else:
+                self.assertEqual('UNKNOWN',direct['reachability']);self.assertTrue(direct['openControlRemainder'])
+                self.assertEqual('STRUCTURAL_AIR_OCCURRENCES',d['modelScope'])
+
+    def test_partial_contract_mutants_are_rejected(self):
+        source=read(ROOT/'analysis-adapters/target/ep-w4/unsupported-control.json')
+        mutations=[
+            lambda d:d.__setitem__('version','1.1.0'),
+            lambda d:d.__setitem__('analysisStatus','COMPLETE'),
+            lambda d:d['sites'][0].__setitem__('analysisReasons',[]),
+            lambda d:d['sites'][0].__setitem__('analysisStatus','COMPLETE'),
+            lambda d:d['sites'][0].__setitem__('openControlRemainder',False),
+            lambda d:d.__setitem__('modelScope','KNOWN_GRAPH_ENTRY'),
+            lambda d:d['sites'][0]['candidates'][0].__setitem__('supports',[]),
+            lambda d:d['edges'][0].__setitem__('openSite',False),
+        ]
+        for mutation in mutations:
+            d=copy.deepcopy(source);mutation(d)
+            with self.assertRaises((ValueError,KeyError,TypeError)):validate(d)
 if __name__=='__main__':unittest.main()

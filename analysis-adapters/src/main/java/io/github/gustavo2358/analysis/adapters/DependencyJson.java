@@ -11,27 +11,30 @@ import static io.github.gustavo2358.analysis.dependencies.DependencySiteFact.*;
 public final class DependencyJson {
     public void write(DependencyResult result,OutputStream stream) throws IOException {
         var out=new JsonOutput(stream);
-        out.value(object("schema","analysis-dependency-result","version","1.1.0","airVersion",version(result.airVersion()),
+        var document=object("schema","analysis-dependency-result","version",result.partial()?"1.2.0":"1.1.0","airVersion",version(result.airVersion()),
             "publication",id(result.publication()),"interpretationProfile","per-site","valuesProfile","scalar-text-effects@1",
-            "modelScope","KNOWN_GRAPH_ENTRY","publicationInventory",inventory(result.publicationInventory()),
-            "sites",result.sites().stream().sorted(Comparator.comparing(DependencySiteFact::entry,io.github.gustavo2358.analysis.plan.AnalysisKey.ENTRY_ORDER).thenComparing(f->f.operation().localId())).map(DependencyJson::site).toList(),
+            "modelScope",result.structuralScope()?"STRUCTURAL_AIR_OCCURRENCES":"KNOWN_GRAPH_ENTRY","publicationInventory",inventory(result.publicationInventory()),
+            "sites",result.sites().stream().sorted(Comparator.comparing(DependencySiteFact::entry,io.github.gustavo2358.analysis.plan.AnalysisKey.ENTRY_ORDER).thenComparing(f->f.operation().localId())).map(s->site(s,result.partial())).toList(),
             "edges",result.edges().stream().sorted(Comparator.comparing(DependencyResult.Edge::entry,io.github.gustavo2358.analysis.plan.AnalysisKey.ENTRY_ORDER).thenComparing(e->e.site().localId()).thenComparing(e->e.candidate().referenceName()).thenComparing(e->e.candidate().rawValue())).map(e->object("caller",id(e.caller()),"entry",id(e.entry()),"site",id(e.site()),"candidate",candidate(e.candidate()),"openSite",e.openSite())).toList(),
             "metrics",result.metrics(),"origins",result.origins().stream().sorted(Comparator.comparing(o->o.id().localId())).map(DependencyJson::origin).toList(),
             "artifacts",result.artifacts().stream().sorted(Comparator.comparing(a->a.id().localId())).map(a->object("id",id(a.id()),"logicalName",a.logicalName(),"contentDigest",a.contentDigest().orElse(null))).toList(),
-            "sourceUncertaintyRefs",ids(result.sourceUncertaintyRefs())));
-        out.finish();
+            "sourceUncertaintyRefs",ids(result.sourceUncertaintyRefs()));
+        if(result.partial()) {document.put("analysisStatus","PARTIAL");document.put("analysisReasons",result.analysisReasons().stream().distinct().sorted().toList());}
+        out.value(document);out.finish();
     }
-    private static Object site(DependencySiteFact f) {
-        return object("caller",id(f.caller()),"entry",id(f.entry()),"sequence",id(f.sequence()),"operation",id(f.operation()),"offset",f.offset(),
+    private static Object site(DependencySiteFact f,boolean extended) {
+        var value=object("caller",id(f.caller()),"entry",id(f.entry()),"sequence",id(f.sequence()),"operation",id(f.operation()),"offset",f.offset(),
             "technology",f.technology(),"command",f.command(),"namespace",f.namespace(),"nameProfile",f.nameProfile(),
             "siteOrigin",id(f.siteOrigin()),"targetOrigin",id(f.targetOrigin()),"targetKind",switch(f.targetKind()){case LITERAL->"LITERAL";case COMPUTED->"COMPUTED";},
             "subject",id(f.subject()),"valuePoint",f.valuePoint()==null?null:ResultJson.point(f.valuePoint()),
-            "reachability",switch(f.reachability()){case REACHABLE->"REACHABLE";case UNREACHABLE_IN_MODEL->"UNREACHABLE_IN_MODEL";},
-            "targetStatus",switch(f.targetStatus()){case RESOLVED_CANDIDATES->"RESOLVED_CANDIDATES";case OPEN_TARGET->"OPEN_TARGET";case UNREACHABLE_IN_MODEL->"UNREACHABLE_IN_MODEL";case UNSUPPORTED_TARGET_EXPRESSION->"UNSUPPORTED_TARGET_EXPRESSION";case UNSUPPORTED_INVOCATION_SHAPE->"UNSUPPORTED_INVOCATION_SHAPE";},
+            "reachability",switch(f.reachability()){case REACHABLE->"REACHABLE";case UNREACHABLE_IN_MODEL->"UNREACHABLE_IN_MODEL";case UNKNOWN->"UNKNOWN";},
+            "targetStatus",switch(f.targetStatus()){case RESOLVED_CANDIDATES->"RESOLVED_CANDIDATES";case OPEN_TARGET->"OPEN_TARGET";case UNREACHABLE_IN_MODEL->"UNREACHABLE_IN_MODEL";case UNSUPPORTED_TARGET_EXPRESSION->"UNSUPPORTED_TARGET_EXPRESSION";case UNSUPPORTED_INVOCATION_SHAPE->"UNSUPPORTED_INVOCATION_SHAPE";case ANALYSIS_INCOMPLETE->"ANALYSIS_INCOMPLETE";},
             "rawCandidates",f.rawCandidates().stream().sorted(Comparator.comparing(RawCandidate::rawValue)).map(r->object("rawValue",r.rawValue(),"supports",supports(r.supports()))).toList(),
             "candidates",f.candidates().stream().sorted(Comparator.comparing(Candidate::referenceName).thenComparing(Candidate::rawValue)).map(DependencyJson::candidate).toList(),
             "modelValueRemainder",f.modelValueRemainder(),"sourceValueRemainder",f.sourceValueRemainder(),"interpretationUnknownRemainder",f.interpretationUnknownRemainder(),
             "effectiveUnknownRemainder",f.effectiveUnknownRemainder(),"openControlRemainder",f.openControlRemainder(),"evidence",ids(f.evidence()),"provenance",ids(f.provenance()),"premises",ids(f.premises()),"uncertaintyRefs",ids(f.uncertaintyRefs()));
+        if(extended) {value.put("analysisStatus",switch(f.analysisStatus()){case COMPLETE->"COMPLETE";case PARTIAL->"PARTIAL";});value.put("analysisReasons",f.analysisReasons().stream().distinct().sorted().toList());}
+        return value;
     }
     private static Object candidate(Candidate c){return object("referenceName",c.referenceName(),"rawValue",c.rawValue(),"supports",supports(c.supports()));}
     private static Object supports(List<Support> supports){return supports.stream().sorted(Comparator.comparing(Support::producer,WireIds.ORDER).thenComparing(Support::origin,WireIds.ORDER)).map(s->object("kind",switch(s.kind()){case VALUE_PRODUCER->"VALUE_PRODUCER";case CALL_LITERAL->"CALL_LITERAL";case CICS_LITERAL->"CICS_LITERAL";},"producer",id(s.producer()),"origin",id(s.origin()),"premises",ids(s.premises()))).toList();}

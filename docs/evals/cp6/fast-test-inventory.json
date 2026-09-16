@@ -119,6 +119,12 @@
     ],
     "io.github.gustavo2358.analysis.adapters.LogicalEntryWireTest": [
       "sourcePossibilityRoundtripsWithoutPhysicalStorage"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PartialDependencyTest": [
+      "unsupportedComputedPreparationDoesNotDiscardIndependentLiteral",
+      "unmodeledControlCannotEraseAnInventoriedLiteralOccurrence",
+      "partialSchemaPreservesFactsReasonsAndExactWireForIndependentReader",
+      "structurallyInvalidReferenceStillRejectsTheWholePublication"
     ]
   },
   "analysis-dataflow": {
@@ -249,7 +255,7 @@
       "successReplacesExistingFileAndMatchesMemoryExactly",
       "inputAndOutputFailuresPreserveDestinationAndCleanupTemporaryFile",
       "realCodecOperationalLimitIsSevenAndProducesNoPartialResult",
-      "cfgAndAnalysisUnsupportedHaveDifferentExitsAndNoPartialOutput"
+      "semanticLimitsPublishExplicitPartialOutputWithoutExitFive"
     ],
     "io.github.gustavo2358.analysis.launcher.RegionalCliTest": [
       "missingInputAndBadQueryNeverReplaceOutput",
@@ -436,6 +442,12 @@
       "missingAliasProofNeitherKillsNorCopiesTheOtherObjectsLiteral",
       "unknownBindingPreservesEvidenceWithoutInventingPhysicalRanges",
       "mustAndRepeatedQueriesCannotReseedEntryEvidence"
+    ],
+    "io.github.gustavo2358.analysis.values.EntryCoexistenceTest": [
+      "preserveAndExternalUnknownCannotErasePossibleSupportInEitherOrder",
+      "multiplePossibleContributionsUnionTheirOwnSupportInEitherOrder",
+      "unprovedSeparationBetweenPossibleEntriesDoesNotRejectEitherObject",
+      "scalarAndRegionalCoexistenceAgreeWithoutOrderBasedKill"
     ]
   },
   "cfg-adapters": {

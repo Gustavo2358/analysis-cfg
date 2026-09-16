@@ -34,13 +34,13 @@ final class DependencyCliTest {
         assertEquals(7,AnalysisDependencies.run(new String[]{in.toString(),out.toString()},err(),new DataflowAirReader(codec)));
         assertEquals("sentinel",Files.readString(out));assertEquals(0,AnalysisDependencies.run(new String[]{in.toString(),out.toString()},err()));
     }
-    @Test void cfgAndAnalysisUnsupportedHaveDifferentExitsAndNoPartialOutput() throws Exception {
+    @Test void semanticLimitsPublishExplicitPartialOutputWithoutExitFive() throws Exception {
         var in=dir.resolve("input");var out=dir.resolve("output");Files.writeString(out,"sentinel");
         String raw=new String(input(),java.nio.charset.StandardCharsets.UTF_8);
         String cfg=raw.replace("\"known\":[{\"kind\":\"normal\"","\"known\":[{\"kind\":\"diverge\"},{\"kind\":\"normal\"");
-        assertNotEquals(raw,cfg);Files.writeString(in,cfg);assertEquals(4,AnalysisDependencies.run(new String[]{in.toString(),out.toString()},err()));assertEquals("sentinel",Files.readString(out));
+        assertNotEquals(raw,cfg);Files.writeString(in,cfg);assertEquals(0,AnalysisDependencies.run(new String[]{in.toString(),out.toString()},err()));assertTrue(Files.readString(out).contains("\"analysisStatus\":\"PARTIAL\""));
         String pub=new AirJson().decode(input()).id().localId();
         String analysis=raw.replace("\"includingEnvironment\":true,\"kind\":\"all\",\"publication\":{\"domain\":\"publication\",\"localId\":\""+pub+"\"}","\"includingExternal\":true,\"kind\":\"visible\",\"unit\":{\"domain\":\"unit\",\"localId\":\"unit\",\"publication\":\""+pub+"\"}");
-        assertNotEquals(raw,analysis);Files.writeString(in,analysis);assertEquals(5,AnalysisDependencies.run(new String[]{in.toString(),out.toString()},err()));assertEquals("sentinel",Files.readString(out));
+        assertNotEquals(raw,analysis);Files.writeString(in,analysis);assertEquals(0,AnalysisDependencies.run(new String[]{in.toString(),out.toString()},err()));assertTrue(Files.readString(out).contains("\"targetStatus\":\"ANALYSIS_INCOMPLETE\""));
     }
 }

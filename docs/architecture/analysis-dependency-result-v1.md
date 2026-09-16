@@ -1,4 +1,31 @@
-# CP6 W1D — dependency site facts e transporte 1.0.0
+# Dependency site facts — transporte 1.1.0 e parcialidade 1.2.0
+
+## EP-W4 — contrato atual de parcialidade
+
+Resultados com preparação semântica incompleta usam `version=1.2.0`,
+`analysisStatus=PARTIAL` e `analysisReasons` (lista ordenada sem duplicatas).
+Todos os sites dessa versão têm `analysisStatus=COMPLETE|PARTIAL` e
+`analysisReasons`; COMPLETE exige lista vazia, PARTIAL exige motivo não vazio.
+Os fatos completos de outros sites conservam seus candidatos e suportes.
+Resultados sem essa limitação mantêm a representação 1.1.0 vigente.
+
+Um computed sem observação de valores disponível usa
+`targetStatus=ANALYSIS_INCOMPLETE`, nenhum candidato inventado e remainder aberto.
+Uma recusa de perfil/preparação deixa de causar exit 5 com perda global do produto.
+Erros estruturais reais da AIR e falhas operacionais continuam sendo falhas.
+
+Quando o CFG não pode ser projetado por limite semântico, o mesmo produto pode
+conservar ocorrências AIR de CALL literal com `reachability=UNKNOWN`,
+`openControlRemainder=true` e `modelScope=STRUCTURAL_AIR_OCCURRENCES`. Esses fatos
+não afirmam execução provada. Suas arestas são possibilidades com `openSite=true`.
+Um site provadamente inalcançável continua sem candidatos/arestas. Na ausência de
+um grafo, expressões computadas não são avaliadas e VALUE não é resemeado.
+
+O mapper e o leitor independente verificam status/motivos, suporte, projeção de
+arestas, escopo e remainder. Campos/valores novos sob versão antiga são rejeitados.
+As seções históricas abaixo descrevem a fundação; esta seção e as evoluções
+posteriores governam o comportamento atual. Ver também
+[decisão EP-W4](../domain/partial-dependency-analysis.md).
 
 Contrato interno autorizado por [WORK-CFG-033](../work/history/WORK-CFG-033/work-item.json).
 `INTERNAL-CONTRACT-DEV-001`: a primeira versão do produto é explícita; não há mecanismo

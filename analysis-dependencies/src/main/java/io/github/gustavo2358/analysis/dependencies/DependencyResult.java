@@ -4,12 +4,19 @@ import io.github.gustavo2358.air.model.*;
 import io.github.gustavo2358.air.model.Ids.*;
 import java.util.*;
 
-/** Separate dependency-result 1.0.0; no W5 result format change. */
+/** Detached dependency facts; 1.2.0 additionally represents semantic preparation limits. */
 public record DependencyResult(PublicationId publication,SemanticVersion airVersion,List<DependencySiteFact> sites,
         List<Edge> edges,Map<String,Long> metrics,Evidence.InventoryStatus publicationInventory,
-        List<Origins.Origin> origins,List<Origins.Artifact> artifacts,List<UncertaintyId> sourceUncertaintyRefs) {
+        List<Origins.Origin> origins,List<Origins.Artifact> artifacts,List<UncertaintyId> sourceUncertaintyRefs,List<String> analysisReasons) {
     public record Edge(UnitId caller,EntryId entry,OperationId site,DependencySiteFact.Candidate candidate,boolean openSite) { }
+    public DependencyResult(PublicationId publication,SemanticVersion airVersion,List<DependencySiteFact> sites,List<Edge> edges,Map<String,Long> metrics,
+            Evidence.InventoryStatus publicationInventory,List<Origins.Origin> origins,List<Origins.Artifact> artifacts,List<UncertaintyId> sourceUncertaintyRefs) {
+        this(publication,airVersion,sites,edges,metrics,publicationInventory,origins,artifacts,sourceUncertaintyRefs,List.of());
+    }
+    public boolean partial() { return !analysisReasons.isEmpty()||sites.stream().anyMatch(s->s.analysisStatus()==DependencySiteFact.AnalysisStatus.PARTIAL); }
+    public boolean structuralScope() { return sites.stream().anyMatch(s->s.reachability()==DependencySiteFact.Reachability.UNKNOWN)||sites.isEmpty()&&!analysisReasons.isEmpty(); }
     public DependencyResult {
+        analysisReasons=List.copyOf(analysisReasons);if(analysisReasons.stream().anyMatch(String::isBlank))throw new IllegalArgumentException("empty analysis reason");
         Objects.requireNonNull(publication);Objects.requireNonNull(airVersion);sites=List.copyOf(sites);edges=List.copyOf(edges);
         metrics=Map.copyOf(metrics);Objects.requireNonNull(publicationInventory);origins=List.copyOf(origins);artifacts=List.copyOf(artifacts);sourceUncertaintyRefs=List.copyOf(sourceUncertaintyRefs);
     }

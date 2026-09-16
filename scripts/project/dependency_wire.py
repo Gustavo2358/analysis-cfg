@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Independent strict parser/oracle for analysis-dependency-result 1.1.0."""
+"""Independent strict parser/oracle for analysis-dependency-result 1.1.0/1.2.0."""
 import argparse
 import json
 import re
@@ -105,8 +105,8 @@ def location(loc):
     boolean(loc['endExclusive'])
 
 
-def site(s):
-    fields(s, 'caller entry sequence operation offset siteOrigin targetOrigin technology command namespace nameProfile targetKind subject valuePoint reachability targetStatus rawCandidates candidates modelValueRemainder sourceValueRemainder interpretationUnknownRemainder effectiveUnknownRemainder openControlRemainder evidence provenance premises uncertaintyRefs')
+def site(s, extended=False):
+    fields(s, 'caller entry sequence operation offset siteOrigin targetOrigin technology command namespace nameProfile targetKind subject valuePoint reachability targetStatus rawCandidates candidates modelValueRemainder sourceValueRemainder interpretationUnknownRemainder effectiveUnknownRemainder openControlRemainder evidence provenance premises uncertaintyRefs' + (' analysisStatus analysisReasons' if extended else ''))
     for name, domain in [('caller', 'unit'), ('entry', 'entry'), ('sequence', 'label'), ('operation', 'operation'), ('siteOrigin', 'origin'), ('targetOrigin', 'origin')]:
         identity(s[name], domain)
     require((s['technology'],s['namespace']) in (('CICS','cics.program'),('COBOL','cobol.program')), 'technology namespace')
@@ -119,8 +119,14 @@ def site(s):
         boolean(s['modelValueRemainder'])
     require(s['effectiveUnknownRemainder'] == (s['modelValueRemainder'] is True or s['sourceValueRemainder'] or s['interpretationUnknownRemainder']), 'remainder OR')
     refs(s['evidence'], 'operation operand'); refs(s['provenance'], 'origin'); refs(s['premises'], 'premise'); refs(s['uncertaintyRefs'], 'uncertainty')
-    require(s['reachability'] in ('REACHABLE', 'UNREACHABLE_IN_MODEL'), 'reachability')
-    require(s['targetStatus'] in ('RESOLVED_CANDIDATES', 'OPEN_TARGET', 'UNREACHABLE_IN_MODEL', 'UNSUPPORTED_TARGET_EXPRESSION', 'UNSUPPORTED_INVOCATION_SHAPE'), 'target status')
+    if extended:
+        require(s['analysisStatus'] in ('COMPLETE', 'PARTIAL'), 'analysis status')
+        reasons(s['analysisReasons'])
+        require(bool(s['analysisReasons']) == (s['analysisStatus'] == 'PARTIAL'), 'site partial reasons')
+    require(s['reachability'] in (('REACHABLE', 'UNREACHABLE_IN_MODEL', 'UNKNOWN') if extended else ('REACHABLE', 'UNREACHABLE_IN_MODEL')), 'reachability')
+    if s['reachability'] == 'UNKNOWN':
+        require(s['analysisStatus'] == 'PARTIAL' and s['openControlRemainder'] and s['effectiveUnknownRemainder'], 'unknown execution must remain explicitly partial')
+    require(s['targetStatus'] in ('RESOLVED_CANDIDATES', 'OPEN_TARGET', 'UNREACHABLE_IN_MODEL', 'UNSUPPORTED_TARGET_EXPRESSION', 'UNSUPPORTED_INVOCATION_SHAPE') + (('ANALYSIS_INCOMPLETE',) if extended else ()), 'target status')
     for c in array(s['rawCandidates']):
         candidate(c, raw=True)
     ordered(s['rawCandidates'], lambda c: u16(c['rawValue']))
@@ -148,9 +154,11 @@ def site(s):
         p = s['valuePoint']
         fields(p, 'position entryId operationId outcome'); require(p == {'position': 'BEFORE', 'entryId': s['entry'], 'operationId': s['operation'], 'outcome': None}, 'BEFORE actual Invoke')
     else:
-        require(s['subject'] is None and s['targetStatus'] in ('UNSUPPORTED_TARGET_EXPRESSION', 'UNREACHABLE_IN_MODEL', 'UNSUPPORTED_INVOCATION_SHAPE'), 'missing computed subject')
+        require(s['subject'] is None and s['targetStatus'] in ('UNSUPPORTED_TARGET_EXPRESSION', 'UNREACHABLE_IN_MODEL', 'UNSUPPORTED_INVOCATION_SHAPE') + (('ANALYSIS_INCOMPLETE',) if extended else ()), 'missing computed subject')
     if s['reachability'] == 'UNREACHABLE_IN_MODEL':
         require(s['targetStatus'] == 'UNREACHABLE_IN_MODEL' and s['modelValueRemainder'] is None and not s['candidates'] and not s['rawCandidates'], 'unreachable shape')
+    elif s['targetStatus'] == 'ANALYSIS_INCOMPLETE':
+        require(extended and s['analysisStatus'] == 'PARTIAL' and s['targetKind'] == 'COMPUTED' and not s['candidates'] and not s['rawCandidates'] and s['modelValueRemainder'] is True and s['effectiveUnknownRemainder'], 'incomplete target must not invent or close values')
     elif s['targetStatus'] == 'RESOLVED_CANDIDATES':
         require(bool(s['candidates']) and s['modelValueRemainder'] is not None, 'resolved shape')
     elif s['targetStatus'] == 'OPEN_TARGET':
@@ -163,17 +171,30 @@ def site_order(s):
     return id_order(s['entry']), id_order(s['operation'])
 
 
+def reasons(values):
+    for reason in array(values):
+        text(reason); require(bool(reason.strip()), 'empty analysis reason')
+    ordered(values, u16)
+
+
 def validate(d):
-    fields(d, 'schema version airVersion publication interpretationProfile valuesProfile modelScope publicationInventory sites edges metrics origins artifacts sourceUncertaintyRefs')
-    require(d['schema'] == 'analysis-dependency-result' and d['version'] == '1.1.0' and d['airVersion'] == '2.0.0', 'schema/version')
+    extended = d.get('version') == '1.2.0'
+    fields(d, 'schema version airVersion publication interpretationProfile valuesProfile modelScope publicationInventory sites edges metrics origins artifacts sourceUncertaintyRefs' + (' analysisStatus analysisReasons' if extended else ''))
+    require(d['schema'] == 'analysis-dependency-result' and d['version'] in ('1.1.0', '1.2.0') and d['airVersion'] == '2.0.0', 'schema/version')
     identity(d['publication'], 'publication')
-    require(d['interpretationProfile'] == 'per-site' and d['valuesProfile'] == 'scalar-text-effects@1' and d['modelScope'] == 'KNOWN_GRAPH_ENTRY', 'profiles/scope')
+    require(d['interpretationProfile'] == 'per-site' and d['valuesProfile'] == 'scalar-text-effects@1' and d['modelScope'] in (('KNOWN_GRAPH_ENTRY', 'STRUCTURAL_AIR_OCCURRENCES') if extended else ('KNOWN_GRAPH_ENTRY',)), 'profiles/scope')
     require(d['publicationInventory'] in ('COMPLETE', 'PARTIAL', 'UNAVAILABLE'), 'inventory')
     for s in array(d['sites']):
-        site(s); require(s['caller']['publication'] == d['publication']['localId'], 'foreign site')
+        site(s, extended); require(s['caller']['publication'] == d['publication']['localId'], 'foreign site')
     ordered(d['sites'], site_order)
+    if extended:
+        require(d['analysisStatus'] == 'PARTIAL', 'extended result partial status')
+        reasons(d['analysisReasons'])
+        require(bool(d['analysisReasons']) or any(s['analysisStatus'] == 'PARTIAL' for s in d['sites']), 'partial result must expose its cause')
+        structural = any(s['reachability'] == 'UNKNOWN' for s in d['sites']) or not d['sites'] and bool(d['analysisReasons'])
+        require((d['modelScope'] == 'STRUCTURAL_AIR_OCCURRENCES') == structural, 'structural/graph scope mismatch')
     expected = [dict(caller=s['caller'], entry=s['entry'], site=s['operation'], candidate=c, openSite=s['effectiveUnknownRemainder'])
-                for s in d['sites'] if s['reachability'] == 'REACHABLE' for c in s['candidates']]
+                for s in d['sites'] if s['reachability'] != 'UNREACHABLE_IN_MODEL' for c in s['candidates']]
     require(d['edges'] == expected, 'edge projection differs from reachable candidates')
     require(type(d['metrics']) is dict, 'metrics')
     for name, value in d['metrics'].items():
