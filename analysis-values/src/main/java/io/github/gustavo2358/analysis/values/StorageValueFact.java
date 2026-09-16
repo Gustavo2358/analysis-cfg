@@ -12,7 +12,11 @@ public record StorageValueFact(ProgramPoint point,StorageSubject subject,List<Re
         ValueFact.Reachability reachability,List<Values.TextValue> candidates,Boolean modelValueRemainder,
         boolean sourceUnknownRemainder,boolean effectiveUnknownRemainder,List<PremiseId> premises,List<Id> evidence,
         List<OriginId> provenance,List<ValueFact.CandidateSupport> candidateSupports,List<String> modelReasons,
-        List<Alternative> alternatives) implements TextValueFact {
+        List<Alternative> alternatives,List<LogicalAlternative> logicalAlternatives) implements TextValueFact {
+    /** Supported logical values need no fabricated physical interpretation. */
+    public record LogicalAlternative(ObjectId object,Values.TextValue candidate,List<ValueFact.Support> producers) {
+        public LogicalAlternative {Objects.requireNonNull(object);Objects.requireNonNull(candidate);producers=List.copyOf(producers);if(producers.isEmpty())throw new IllegalArgumentException("logical value needs support");}
+    }
     public enum FragmentKind { KNOWN_BYTES, UNKNOWN_BYTES, LOGICAL_VALUE, UNKNOWN_LOGICAL, LOGICAL_CAPTURE }
     public record Producer(DefinitionEvent definition,StorageIndex.ContextualLocation contributedRange) {
         public Producer { Objects.requireNonNull(definition);Objects.requireNonNull(contributedRange); }
@@ -33,6 +37,8 @@ public record StorageValueFact(ProgramPoint point,StorageSubject subject,List<Re
         public Alternative { Objects.requireNonNull(interpretation);Objects.requireNonNull(candidate);fragments=List.copyOf(fragments); }
     }
     public StorageValueFact {
+        logicalAlternatives=List.copyOf(logicalAlternatives);
+        if(!logicalAlternatives.isEmpty()&&(!Boolean.TRUE.equals(modelValueRemainder)||reachability!=ValueFact.Reachability.REACHABLE))throw new IllegalArgumentException("unbound logical evidence requires reachable open value");
         Objects.requireNonNull(point);Objects.requireNonNull(subject);Objects.requireNonNull(reachability);interpretations=List.copyOf(interpretations);
         if(reachability==ValueFact.Reachability.REACHABLE) {
             candidates=List.copyOf(candidates);Objects.requireNonNull(modelValueRemainder);

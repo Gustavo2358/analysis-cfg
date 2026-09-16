@@ -116,6 +116,9 @@
     ],
     "io.github.gustavo2358.analysis.adapters.CicsTargetTimingTest": [
       "nameAndSupportsAreObservedBeforeForeignEffects"
+    ],
+    "io.github.gustavo2358.analysis.adapters.LogicalEntryWireTest": [
+      "sourcePossibilityRoundtripsWithoutPhysicalStorage"
     ]
   },
   "analysis-dataflow": {
@@ -417,6 +420,11 @@
     ],
     "io.github.gustavo2358.analysis.values.MixedStorageTest": [
       "unknownRegionAndCodecRetainInventoryAndInterfereOnlyWithoutSeparationProof"
+    ],
+    "io.github.gustavo2358.analysis.values.EvidencePreservingEntryTest": [
+      "unknownBindingPreservesEntrySupportInBothAnalyses",
+      "unprovedBindingNeverPromotesAssignmentToStrongKill",
+      "genericUnknownEffectCannotClearLogicalEvidence"
     ]
   },
   "cfg-adapters": {

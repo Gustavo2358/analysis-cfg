@@ -20,11 +20,13 @@ public final class ReachingDefinitions {
     private final Map<Operation,Map<Control.OutcomeKey,List<Plan>>> outcomes=new IdentityHashMap<>();
     private final Map<Operation,List<Plan>> otherwise=new IdentityHashMap<>();
     private final Map<EntryId,List<Initial>> initial=new HashMap<>();
+    private final Map<EntryId,List<LogicalInitial>> logicalInitial=new HashMap<>();
+    private record LogicalInitial(int slot,Entries.InitialCondition condition,ObjectId object,StorageIndex.Resolution resolution) { }
     private final List<SourceGap> sourceGaps=new ArrayList<>();
     private final Map<UnitId,Boolean> controlOpen=new HashMap<>();
     private record SourceGap(StorageIndex.Location location,OriginId origin,List<UncertaintyId> uncertainties) { }
     private record Plan(Operation operation,StatementEffects.Write write,StatementEffects.Target target,
-                        Optional<Control.OutcomeKey> outcome,List<StoragePartition.Segment> segments) { }
+                        Optional<Control.OutcomeKey> outcome,List<StoragePartition.Segment> segments,StatementEffects.LogicalTarget logical) { }
     private record Initial(int slot,Entries.InitialCondition condition,StatementEffects.Target target,List<StoragePartition.Segment> segments) { }
     public enum Status { ACCEPTED, UNSUPPORTED, INVALID_INPUT }
     public record Admission(Status status,String reason,Optional<ReachingDefinitions> analysis) { }
@@ -62,9 +64,12 @@ public final class ReachingDefinitions {
             outcomes.put(op,Map.copyOf(choices));
         }
         for(var context:session.contexts()) {
-            var seeds=new ArrayList<Initial>();var occupied=new HashMap<Integer,Initial>();int slot=0;
+            var seeds=new ArrayList<Initial>();var logicalSeeds=new ArrayList<LogicalInitial>();var occupied=new HashMap<Integer,Initial>();int slot=0;
             for(var condition:context.entry().state().conditions()) {
                 var resolution=effects.storage().resolve(condition.place());
+                if(condition.value() instanceof Entries.PossibleLiterals&&condition.place() instanceof Places.ObjectPlace object&&!resolution.exact()) {
+                    logicalSeeds.add(new LogicalInitial(slot++,condition,object.object(),resolution));continue;
+                }
                 for(var target:effects.targets(resolution,condition.value() instanceof Entries.PossibleLiterals?StatementEffects.Strength.MAY:StatementEffects.Strength.MUST)) {
                     var seed=new Initial(slot,condition,target,List.copyOf(partition.intersecting(target.location())));
                     for(var segment:seed.segments()) {
@@ -74,7 +79,8 @@ public final class ReachingDefinitions {
                             // already proved simultaneous literal consistency, including ranges.
                             // This consumer check only excludes unresolved/mixed initial forms.
                             boolean literal=condition.value() instanceof Entries.LiteralInitial&&prior.condition().value() instanceof Entries.LiteralInitial;
-                            if(!(literal&&resolution.exact()&&target.sourceApplicable()&&prior.target().sourceApplicable()))
+                            boolean possible=condition.value() instanceof Entries.PossibleLiterals||prior.condition().value() instanceof Entries.PossibleLiterals;
+                            if(!possible&&!(literal&&resolution.exact()&&target.sourceApplicable()&&prior.target().sourceApplicable()))
                                 throw new Refusal(Status.UNSUPPORTED,"OVERLAPPING_INITIAL_CONDITIONS");
                         }
                     }
@@ -82,12 +88,15 @@ public final class ReachingDefinitions {
                 }
                 slot=Math.incrementExact(slot);
             }
-            initial.put(context.entry().id(),List.copyOf(seeds));
+            initial.put(context.entry().id(),List.copyOf(seeds));logicalInitial.put(context.entry().id(),List.copyOf(logicalSeeds));
         }
     }
     private List<Plan> compile(Operation operation,List<StatementEffects.Write> writes,Optional<Control.OutcomeKey> outcome) {
         var result=new ArrayList<Plan>();
-        for(var write:writes)for(var target:write.targets())result.add(new Plan(operation,write,target,outcome,List.copyOf(partition.intersecting(target.location()))));
+        for(var write:writes) {
+            for(var target:write.targets())result.add(new Plan(operation,write,target,outcome,List.copyOf(partition.intersecting(target.location())),null));
+            for(var logical:write.logicalTargets())result.add(new Plan(operation,write,null,outcome,List.of(),logical));
+        }
         return List.copyOf(result);
     }
     public StoragePartition partition(){return partition;}
@@ -102,11 +111,12 @@ public final class ReachingDefinitions {
     public static final class State {
         private final EntryId entry;
         private final SegmentMap<Set<EventHandle>> bindings;
-        private State(EntryId entry,SegmentMap<Set<EventHandle>> bindings){this.entry=entry;this.bindings=bindings;}
+        private final Map<ObjectId,Set<EventHandle>> logical;
+        private State(EntryId entry,SegmentMap<Set<EventHandle>> bindings,Map<ObjectId,Set<EventHandle>> logical){this.entry=entry;this.bindings=bindings;this.logical=Map.copyOf(logical);}
         public boolean reached(){return entry!=null;}
         public int explicitSegments(){return bindings.size();}
     }
-    private static final State BOTTOM=new State(null,new SegmentMap<>());
+    private static final State BOTTOM=new State(null,new SegmentMap<>(),Map.of());
     private static final class Engine implements AnalysisDefinition<State> {
         private final ReachingDefinitions owner;
         private final Map<EntryId,Map<StorageId,EventHandle>> entryEvents=new HashMap<>();
@@ -145,7 +155,12 @@ public final class ReachingDefinitions {
                         root=root.put(segment.ordinal(),union(previous,Set.of(event)));
                     }
                 }
-                result.add(new Boundary<>(context,context.entryNode(),new State(entry,root)));
+                var logical=new HashMap<ObjectId,Set<EventHandle>>();
+                for(var seed:owner.logicalInitial.get(entry)) {
+                    var event=intern(DefinitionEvent.logicalInitial(entry,seed.condition(),seed.slot(),seed.object(),seed.resolution()));
+                    logical.merge(seed.object(),Set.of(event),this::union);
+                }
+                result.add(new Boundary<>(context,context.entryNode(),new State(entry,root,logical)));
             }
             return result;
         }
@@ -157,26 +172,28 @@ public final class ReachingDefinitions {
             var result=new Accumulator();
             b.bindings.forEach((ordinal,definitions)->{work.joinEntryVisited();var segment=owner.partition.segments().get(ordinal);result.root=result.root.put(ordinal,union(value(a,segment),definitions));});
             a.bindings.forEach((ordinal,definitions)->{if(b.bindings.get(ordinal)==null){work.joinEntryVisited();var segment=owner.partition.segments().get(ordinal);result.root=result.root.put(ordinal,union(definitions,value(b,segment)));}});
-            return result.root==a.bindings?new Join<>(a,false):new Join<>(new State(a.entry,result.root),true);
+            var logical=new HashMap<>(a.logical);b.logical.forEach((key,events)->{work.joinEntryVisited();logical.merge(key,events,this::union);});
+            return result.root==a.bindings&&logical.equals(a.logical)?new Join<>(a,false):new Join<>(new State(a.entry,result.root,logical),true);
         }
         @Override public boolean equivalent(State a,State b,DomainWork work) {
-            if(a==b)return true;if(!Objects.equals(a.entry,b.entry)||a.bindings.size()!=b.bindings.size())return false;
+            if(a==b)return true;if(!Objects.equals(a.entry,b.entry)||a.bindings.size()!=b.bindings.size()||!a.logical.equals(b.logical))return false;
             var equal=new boolean[]{true};a.bindings.forEach((key,value)->{work.stateCompareEntry();if(!value.equals(b.bindings.get(key)))equal[0]=false;});return equal[0];
         }
         private EventHandle event(EntryId entry,Plan plan) {
-            return events.computeIfAbsent(entry,ignored->new IdentityHashMap<>()).computeIfAbsent(plan,p->intern(DefinitionEvent.write(entry,p.operation,p.write,p.target,p.outcome)));
+            return events.computeIfAbsent(entry,ignored->new IdentityHashMap<>()).computeIfAbsent(plan,p->intern(p.logical==null?DefinitionEvent.write(entry,p.operation,p.write,p.target,p.outcome):DefinitionEvent.logicalWrite(entry,p.operation,p.write,p.logical,p.outcome)));
         }
         private State apply(State state,List<Plan> plans,boolean forceMay) {
-            if(!state.reached())return state;var root=state.bindings;
+            if(!state.reached())return state;var root=state.bindings;var logical=new HashMap<>(state.logical);
             for(var plan:plans) {
                 var definition=event(state.entry,plan);
+                if(plan.logical!=null) {logical.merge(plan.logical.object(),Set.of(definition),this::union);continue;}
                 for(var segment:plan.segments) {
                     var previous=root.get(segment.ordinal());if(previous==null)previous=Set.of(entryEvent(state.entry,segment));
                     var next=!forceMay&&plan.target.strength()==StatementEffects.Strength.MUST?Set.of(definition):union(previous,Set.of(definition));
                     var updated=root.put(segment.ordinal(),next);if(updated!=root)updates++;root=updated;
                 }
             }
-            return root==state.bindings?state:new State(state.entry,root);
+            return root==state.bindings&&logical.equals(state.logical)?state:new State(state.entry,root,logical);
         }
         private State operation(State state,Operation operation) {
             var plans=owner.operations.get(operation);
@@ -251,7 +268,10 @@ public final class ReachingDefinitions {
                     }
                 }
             }
-            var ordered=new ArrayList<>(contributions.keySet());ordered.sort(Comparator.comparing((DefinitionEvent e)->e.operation().map(OperationId::localId).orElse("")).thenComparingInt(DefinitionEvent::slot).thenComparing(e->e.storage().localId()).thenComparing(DefinitionEvent::unknown).thenComparing(DefinitionEvent.ORDER));
+            if(state.reached()&&query.subject() instanceof StorageSubject.NamedObject named)for(var handle:state.logical.getOrDefault(named.object(),Set.of())) {
+                var definition=handle.definition;contributions.putIfAbsent(definition,Set.of());origins.add(definition.origin());uncertainties.addAll(definition.uncertainties());
+            }
+            var ordered=new ArrayList<>(contributions.keySet());ordered.sort(Comparator.comparing((DefinitionEvent e)->e.operation().map(OperationId::localId).orElse("")).thenComparingInt(DefinitionEvent::slot).thenComparing(e->e.storage().map(StorageId::localId).orElse("")).thenComparing(DefinitionEvent::unknown).thenComparing(DefinitionEvent.ORDER));
             var output=new ArrayList<DefinitionFact.Contribution>();
             for(var event:ordered)output.add(new DefinitionFact.Contribution(event,coalesce(contributions.get(event)).stream().map(l->l.in(query.point().entry())).toList()));
             return new DefinitionFact(query.point(),state.reached()?DefinitionFact.Reachability.REACHABLE:DefinitionFact.Reachability.UNREACHABLE_IN_MODEL,output,state.reached()?unknown:null,!(resolution.remainder() instanceof Scopes.NoMemory),source,evidenceOrder(premises),evidenceOrder(origins),evidenceOrder(uncertainties));

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Independent closed reader for regional-analysis-result 1.0/1.1; no Java/domain imports."""
+"""Independent closed reader for regional-analysis-result 1.0/1.1/1.2; no Java/domain imports."""
 from __future__ import annotations
 import argparse,json,re
 from pathlib import Path
@@ -7,7 +7,7 @@ from result_wire import WireError,require,fields,load,identity,distinct,token
 
 DOMAINS=set('publication unit entry label object operation operand storage origin premise uncertainty'.split())
 REASONS=set('CONTEXT_NOT_SELECTED UNKNOWN_OPERATION FOREIGN_UNIT AFTER_TERMINATOR OUTCOME_UNAVAILABLE UNSUPPORTED_SUBJECT'.split())
-EVENTS=set('ENTRY_UNKNOWN INITIAL_CONDITION ENTRY_PRESERVE ENTRY_UNINITIALIZED ENTRY_PARAMETER ENTRY_EXTERNAL ASSIGN COPY UNKNOWN_WRITE'.split())
+EVENTS=set('ENTRY_UNKNOWN ENTRY_POSSIBILITY INITIAL_CONDITION ENTRY_PRESERVE ENTRY_UNINITIALIZED ENTRY_PARAMETER ENTRY_EXTERNAL ASSIGN COPY UNKNOWN_WRITE'.split())
 
 def string(v): require(isinstance(v,str),'string required')
 def boolean(v): require(type(v) is bool,'boolean required')
@@ -61,7 +61,7 @@ class Reader:
     def subject(self,s,check=True):
         require(isinstance(s,dict) and s.get('kind') in {'NAMED_OBJECT','PHYSICAL_RANGE','PLACE_OCCURRENCE'},'subject kind')
         if s['kind']=='PLACE_OCCURRENCE':
-            require(self.r['version']=='1.1.0','place occurrence requires 1.1');fields(s,'kind operandId','subject');self.ref(s['operandId'],'operand',check)
+            require(self.r['version'] in {'1.1.0','1.2.0'},'place occurrence requires 1.1');fields(s,'kind operandId','subject');self.ref(s['operandId'],'operand',check)
         elif s['kind']=='NAMED_OBJECT':fields(s,'kind objectId','subject');self.ref(s['objectId'],'object',check)
         else:
             fields(s,'kind storageId range codec','subject');self.ref(s['storageId'],'storage',check);self.codec(s['codec'],check);r=extent(s['range'])
@@ -78,14 +78,19 @@ class Reader:
         if i['location']['kind']=='WHOLE_CELL':require(i['codec'] is None,'logical interpretation codec')
         else:self.codec(i['codec'])
     def event(self,e,entry):
-        fields(e,'entryId operationId destination slot outcome storageId kind unknown origin premiseRefs uncertaintyRefs reasons','event')
-        require(e['entryId']==entry,'event Entry');self.ref(entry,'entry');self.ref(e['storageId'],'storage');self.ref(e['origin'],'origin');self.refs(e['premiseRefs'],'premise');self.refs(e['uncertaintyRefs'],'uncertainty');strings(e['reasons']);boolean(e['unknown']);outcome(e['outcome'])
+        logical='logicalObjectId' in e
+        require(not logical or self.r['version']=='1.2.0','logical event requires 1.2')
+        fields(e,'entryId operationId destination slot outcome storageId kind unknown origin premiseRefs uncertaintyRefs reasons'+(' logicalObjectId' if logical else ''),'event')
+        if logical:
+            require(e['storageId'] is None,'logical event invents physical storage');self.ref(e['logicalObjectId'],'object')
+        else:self.ref(e['storageId'],'storage')
+        require(e['entryId']==entry,'event Entry');self.ref(entry,'entry');self.ref(e['origin'],'origin');self.refs(e['premiseRefs'],'premise');self.refs(e['uncertaintyRefs'],'uncertainty');strings(e['reasons']);boolean(e['unknown']);outcome(e['outcome'])
         require(e['kind'] in EVENTS and type(e['slot']) is int,'event kind/slot')
         if e['kind']=='ENTRY_UNKNOWN':require(e['slot']==-1 and e['operationId'] is None and e['destination'] is None and e['outcome'] is None and e['unknown'],'entry unknown shape')
         else:
             require(e['slot']>=0,'write slot')
             if e['operationId'] is not None:self.ref(e['operationId'],'operation');require(e['operationId']['unit']==entry['unit'],'event operation owner')
-            else:require(e['kind'] in {'INITIAL_CONDITION','ENTRY_PRESERVE','ENTRY_UNINITIALIZED','ENTRY_PARAMETER','ENTRY_EXTERNAL'} and e['outcome'] is None,'initial event shape')
+            else:require(e['kind'] in {'INITIAL_CONDITION','ENTRY_POSSIBILITY','ENTRY_PRESERVE','ENTRY_UNINITIALIZED','ENTRY_PARAMETER','ENTRY_EXTERNAL'} and e['outcome'] is None,'initial event shape')
             if e['destination'] is not None:
                 self.ref(e['destination'],'operand');require(e['destination']['owner']==(e['operationId'] or entry),'destination occurrence owner')
     def contribution(self,l,e):self.location(l);require(l['storageId']==e['storageId'],'contribution event storage')
@@ -98,7 +103,7 @@ class Reader:
         if f['reachability']=='UNREACHABLE_IN_MODEL':require(f['unknownRemainder'] is None and not f['definitions'],'unreachable RD')
         else:boolean(f['unknownRemainder'])
         for d in f['definitions']:
-            fields(d,'definition contributedRanges','RD contribution');self.event(d['definition'],entry);distinct(d['contributedRanges'],'RD ranges');require(d['contributedRanges'],'empty RD contribution')
+            fields(d,'definition contributedRanges','RD contribution');self.event(d['definition'],entry);distinct(d['contributedRanges'],'RD ranges');require(bool(d['contributedRanges'])==('logicalObjectId' not in d['definition']),'physical/logical contribution shape')
             for l in d['contributedRanges']:self.contribution(l,d['definition'])
     def fragment(self,f,entry):
         fields(f,'location kind bytes producer unknownWriter captures sourceGaps modelReasons','fragment');self.location(f['location']);strings(f['modelReasons']);k=f['kind']
@@ -110,7 +115,7 @@ class Reader:
             if k=='KNOWN_BYTES':a,b=extent(f['location']['range']);require(b is not None and len(f['bytes'])==b-a,'byte count')
         else:require(k not in {'KNOWN_BYTES','LOGICAL_CAPTURE'},'missing bytes')
         if f['producer'] is not None:
-            p=f['producer'];fields(p,'definition contributedRange','producer');self.event(p['definition'],entry);self.contribution(p['contributedRange'],p['definition']);require(p['definition']['kind'] in {'ASSIGN','INITIAL_CONDITION'} and not p['definition']['unknown'],'literal producer')
+            p=f['producer'];fields(p,'definition contributedRange','producer');self.event(p['definition'],entry);self.contribution(p['contributedRange'],p['definition']);require(p['definition']['kind'] in {'ASSIGN','INITIAL_CONDITION','ENTRY_POSSIBILITY'} and not p['definition']['unknown'],'literal producer')
         if k in {'KNOWN_BYTES','LOGICAL_VALUE','LOGICAL_CAPTURE'}:require(f['producer'] is not None and f['unknownWriter'] is None,'known producer shape')
         if f['unknownWriter'] is not None:self.event(f['unknownWriter'],entry);require(f['producer'] is None,'producer vs unknown writer')
         distinct(f['captures'],'captures')
@@ -130,7 +135,9 @@ class Reader:
         distinct(f['sourceGaps'],'source gaps')
         for g in f['sourceGaps']:fields(g,'affectedLocation origin uncertaintyRefs','source gap');self.location(g['affectedLocation']);self.ref(g['origin'],'origin');self.refs(g['uncertaintyRefs'],'uncertainty')
     def value(self,f,entry):
-        fields(f,'reachability interpretations candidates modelValueRemainder sourceUnknownRemainder effectiveUnknownRemainder candidateSupports premiseRefs evidenceRefs provenanceRefs modelReasons alternatives','value')
+        logical=f.get('logicalAlternatives',[])
+        require(not logical or self.r['version']=='1.2.0','logical values require 1.2')
+        fields(f,'reachability interpretations candidates modelValueRemainder sourceUnknownRemainder effectiveUnknownRemainder candidateSupports premiseRefs evidenceRefs provenanceRefs modelReasons alternatives'+(' logicalAlternatives' if 'logicalAlternatives' in f else ''),'value')
         require(f['reachability'] in {'REACHABLE','UNREACHABLE_IN_MODEL'},'value reachability');boolean(f['sourceUnknownRemainder']);boolean(f['effectiveUnknownRemainder']);strings(f['modelReasons']);self.refs(f['premiseRefs'],'premise');self.refs(f['evidenceRefs']);self.refs(f['provenanceRefs'],'origin')
         interpretations=distinct(f['interpretations'],'interpretations')
         for i in f['interpretations']:self.interpretation(i)
@@ -162,6 +169,12 @@ class Reader:
             for fragment in a['fragments']:
                 if fragment['sourceGaps']:require(f['sourceUnknownRemainder'],'missing captured source remainder')
                 for capture in fragment['captures']:require(token(capture['definition']['operationId']) in {token(x) for x in f['evidenceRefs']},'missing capture evidence')
+        distinct(logical,'logical alternatives')
+        for a in logical:
+            fields(a,'objectId candidate producers','logical alternative');self.ref(a['objectId'],'object');string(a['candidate']);require(f['modelValueRemainder'] is True,'logical evidence needs open binding remainder')
+            require(a['producers'],'unsupported logical candidate');distinct(a['producers'],'logical producers');known.add(a['candidate'])
+            for p in a['producers']:
+                fields(p,'evidence origin premiseRefs','logical support');self.ref(p['evidence']);self.ref(p['origin'],'origin');self.refs(p['premiseRefs'],'premise');support.setdefault(a['candidate'],set()).add(token(p))
         require(known==set(f['candidates'] or []),'candidate alternatives mismatch');distinct(f['candidateSupports'],'candidate supports');seen=set()
         for s in f['candidateSupports']:
             fields(s,'candidate producers','candidate support');require(s['candidate'] in known and s['candidate'] not in seen,'candidate support key');seen.add(s['candidate']);distinct(s['producers'],'producers')
@@ -169,7 +182,7 @@ class Reader:
             require({token(p) for p in s['producers']}==support.get(s['candidate'],set()),'candidate support completeness')
         require(seen==known,'missing candidate supports')
     def validate(self):
-        r=self.r;require(r['schema']=='regional-analysis-result' and r['version'] in {'1.0.0','1.1.0'} and r['profile']=='regional-text-images@2','schema/version/profile');string(r['resultId']);require(r['resultId'] and r['status']=='COMPLETE' and r['pathWitness']=='NOT_PROVIDED' and r['referenceAuthority']=='VALIDATED_AIR_PUBLICATION','result status/authority')
+        r=self.r;require(r['schema']=='regional-analysis-result' and r['version'] in {'1.0.0','1.1.0','1.2.0'} and r['profile']=='regional-text-images@2','schema/version/profile');string(r['resultId']);require(r['resultId'] and r['status']=='COMPLETE' and r['pathWitness']=='NOT_PROVIDED' and r['referenceAuthority']=='VALIDATED_AIR_PUBLICATION','result status/authority')
         inv=r['inventory'];fields(inv,'ids storages scopes','inventory');self.ids=distinct(inv['ids'],'inventory IDs')
         for i in inv['ids']:self.ref(i)
         self.ref(r['publicationId'],'publication')
@@ -202,6 +215,11 @@ class Reader:
                 else:require(v['reason'] in REASONS and v['fact'] is None,'refused shape')
             if o['values']['fact'] is not None and o['subject']['kind']=='PHYSICAL_RANGE':
                 for i in o['values']['fact']['interpretations']:require(i['codec']==o['subject']['codec'] and i['location']['storageId']==o['subject']['storageId'] and i['location']['range']==o['subject']['range'],'physical query interpretation')
+            if o['values']['fact'] is not None:
+                for a in o['values']['fact'].get('logicalAlternatives',[]):require(o['subject']['kind']=='NAMED_OBJECT' and a['objectId']==o['subject']['objectId'],'logical alternative subject')
+            if o['rd']['fact'] is not None:
+                for d in o['rd']['fact']['definitions']:
+                    if 'logicalObjectId' in d['definition']:require(o['subject']['kind']=='NAMED_OBJECT' and d['definition']['logicalObjectId']==o['subject']['objectId'],'logical definition subject')
             require(o['rd']['status']==o['values']['status'] and o['rd']['reason']==o['values']['reason'],'shared query admission')
             if o['rd']['fact'] is not None:require(o['rd']['fact']['reachability']==o['values']['fact']['reachability'],'shared reachability')
         fields(r['statistics'],'composition rd values rdObservation valueObservation','statistics')

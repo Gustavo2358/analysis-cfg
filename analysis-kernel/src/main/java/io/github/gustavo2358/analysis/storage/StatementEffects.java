@@ -19,9 +19,14 @@ public final class StatementEffects {
     public record Target(StorageIndex.Location location,Strength strength,boolean sourceApplicable,List<PremiseId> premises,List<String> reasons) {
         public Target { premises=List.copyOf(premises);reasons=List.copyOf(reasons); }
     }
+    /** Logical identity is not a physical allocation or a disjointness proof. */
+    public record LogicalTarget(ObjectId object,boolean sourceApplicable) { }
     public record Write(int slot,Optional<OperandId> occurrence,StorageIndex.Resolution destination,Source source,List<Target> targets,
-                        Selection selection,Strength occurrenceStrength) {
-        public Write { targets=List.copyOf(targets);Objects.requireNonNull(selection);Objects.requireNonNull(occurrenceStrength); }
+                        Selection selection,Strength occurrenceStrength,List<LogicalTarget> logicalTargets) {
+        public Write { logicalTargets=List.copyOf(logicalTargets);targets=List.copyOf(targets);Objects.requireNonNull(selection);Objects.requireNonNull(occurrenceStrength); }
+        public Write(int slot,Optional<OperandId> occurrence,StorageIndex.Resolution destination,Source source,List<Target> targets,Selection selection,Strength occurrenceStrength) {
+            this(slot,occurrence,destination,source,targets,selection,occurrenceStrength,List.of());
+        }
         public Write(int slot,Optional<OperandId> occurrence,StorageIndex.Resolution destination,Source source,List<Target> targets) {
             this(slot,occurrence,destination,source,targets,Selection.SINGLE_DESTINATION,Strength.MUST);
         }
@@ -31,10 +36,12 @@ public final class StatementEffects {
         public Statement { reads=List.copyOf(reads);writes=List.copyOf(writes);outcomes=Map.copyOf(outcomes);otherwise=List.copyOf(otherwise); }
     }
     private final StorageIndex storage;
+    private final List<ObjectId> openObjects;
     private final Map<OperationId,Statement> statements=new LinkedHashMap<>();
     private long operandVisits,targetsPrepared,baseComparisons;
     public StatementEffects(StorageIndex storage) {
         this.storage=Objects.requireNonNull(storage);
+        openObjects=storage.declarations().stream().filter(o->!storage.object(o.id()).exact()).map(Memory.ObjectDeclaration::id).toList();
         for(var unit:storage.session().index().publication().units())for(var sequence:unit.sequences()) {
             for(var operation:sequence.instructions())statements.put(operation.header().id(),prepare(operation));
             var operation=sequence.terminator();statements.put(operation.header().id(),prepare(operation));
@@ -142,11 +149,17 @@ public final class StatementEffects {
         final Map<OperandId,Place> places=new HashMap<>();int nextSlot;
         Builder(Operation operation){this.operation=operation;}
         void write(List<Write> out,Optional<OperandId> occurrence,StorageIndex.Resolution destination,Strength strength,Source source) {
-            out.add(new Write(nextSlot++,occurrence,destination,source,targets(destination,strength),Selection.SINGLE_DESTINATION,strength));
+            var place=occurrence.map(places::get).orElse(null);
+            out.add(new Write(nextSlot++,occurrence,destination,source,targets(destination,strength),Selection.SINGLE_DESTINATION,strength,logicalTargets(place)));
+        }
+        List<LogicalTarget> logicalTargets(Place place) {
+            // Open bindings may alias a written location. Only an explicit object destination
+            // supplies a value; possible aliases receive uncertainty, never invented literals.
+            return openObjects.stream().map(id->new LogicalTarget(id,place instanceof Places.ObjectPlace p&&p.object().equals(id))).toList();
         }
         void scopeWrite(List<Write> out,Scopes.MemoryScope scope,String reason) {
             var destination=storage.select(scope);
-            out.add(new Write(nextSlot++,Optional.empty(),destination,new UnknownSource(reason),targets(destination,Strength.MAY),Selection.MAY_SET,Strength.MAY));
+            out.add(new Write(nextSlot++,Optional.empty(),destination,new UnknownSource(reason),targets(destination,Strength.MAY),Selection.MAY_SET,Strength.MAY,logicalTargets(null)));
         }
         void boundRead(Scopes.MemoryBound bound,ReadKind kind) { if(bound instanceof Scopes.WithinMemory w)reads.add(new Read(Optional.empty(),kind,storage.select(w.scope()))); }
         void foreign(Interactions.ForeignEffects e,List<Write> out) {

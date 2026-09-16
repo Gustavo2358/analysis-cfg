@@ -66,6 +66,7 @@ public final class CallDependencyPlan {
         // Result assignments belong to normal-return edges. Select the existing regional
         // provider that models those edges, including Cell storage, without changing solvers.
         boolean regional=session.index().publication().storage().stream().anyMatch(Memory.Region.class::isInstance)
+            ||session.index().publication().capabilities().required().contains(Capabilities.ENTRY_POSSIBILITIES_V2)
             ||session.index().sites(Operations.Invoke.class).stream().anyMatch(s->!((Operations.Invoke)s.operation()).results().isEmpty());
         for(var context:session.contexts()) {
             var entry=context.entry().id();String id=part(entry.publication().localId())+part(entry.unit().localId())+part(entry.localId());

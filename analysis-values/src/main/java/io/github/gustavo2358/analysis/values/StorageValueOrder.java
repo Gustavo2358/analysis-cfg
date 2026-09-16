@@ -62,7 +62,7 @@ final class StorageValueOrder {
     private static final Comparator<DefinitionEvent> DEFINITION=Comparator.comparing(DefinitionEvent::entry,ID)
         .thenComparing(DefinitionEvent::operation,optional(ID)).thenComparing(DefinitionEvent::destination,optional(ID))
         .thenComparingInt(DefinitionEvent::slot).thenComparing(DefinitionEvent::outcome,optional(Comparator.comparing(StorageValueOrder::outcome,list(Comparator.naturalOrder()))))
-        .thenComparing(DefinitionEvent::storage,ID).thenComparing(DefinitionEvent::kind).thenComparing(DefinitionEvent::unknown)
+        .thenComparing(DefinitionEvent::storage,optional(ID)).thenComparing(DefinitionEvent::logicalObject,optional(ID)).thenComparing(DefinitionEvent::kind).thenComparing(DefinitionEvent::unknown)
         .thenComparing(DefinitionEvent::origin,ID).thenComparing(DefinitionEvent::premises,list(ID)).thenComparing(DefinitionEvent::uncertainties,list(ID))
         .thenComparing(DefinitionEvent::reasons,list(Comparator.naturalOrder()));
     static final Comparator<StorageValueFact.Capture> CAPTURE=Comparator.comparing(StorageValueFact.Capture::definition,DEFINITION)

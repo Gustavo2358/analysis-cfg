@@ -114,4 +114,30 @@ class RegionalWireContract(unittest.TestCase):
         r['version']='1.0.0'
         with self.assertRaises(WireError):validate(r)
 
+class LogicalEntryWireContract(unittest.TestCase):
+    def test_logical_source_has_no_physical_authority(self):
+        path=PRODUCT.parent/'logical.result.json';r=read(path);o=r['observations'][0]
+        self.assertEqual('1.2.0',r['version']);self.assertEqual(path.read_bytes(),canonical(r))
+        self.assertEqual('BEFORE',o['point']['position']);self.assertEqual(['PROGA'],o['values']['fact']['candidates'])
+        self.assertTrue(o['values']['fact']['modelValueRemainder'])
+        self.assertEqual('ENTRY_POSSIBILITY',o['rd']['fact']['definitions'][0]['definition']['kind'])
+        self.assertEqual([],o['rd']['fact']['definitions'][0]['contributedRanges'])
+        v=['observations',0,'values','fact'];a=v+['logicalAlternatives',0]
+        e=['observations',0,'rd','fact','definitions',0,'definition']
+        mutations={
+            'unnegotiated-version':field(['version'],'1.1.0'),
+            'missing-support':field(a+['producers'],[]),
+            'wrong-candidate':field(a+['candidate'],'JOHNDOE'),
+            'unknown-object':field(a+['objectId','localId'],'absent'),
+            'unknown-producer':field(a+['producers',0,'evidence','localId'],'absent'),
+            'closed-remainder':field(v+['modelValueRemainder'],False),
+            'physical-id-from-logical':field(e+['storageId'],o['subject']['objectId']),
+            'forgotten-logical-object':lambda d:d['observations'][0]['rd']['fact']['definitions'][0]['definition'].pop('logicalObjectId'),
+        }
+        for name,mutation in mutations.items():
+            with self.subTest(name=name):
+                changed=copy.deepcopy(r);mutation(changed)
+                with self.assertRaises(WireError):validate(changed)
+        print('EP_LOGICAL_WIRE_MUTANTS '+json.dumps({'killed':len(mutations),'total':len(mutations),'compileErrors':0}))
+
 if __name__=='__main__':unittest.main()

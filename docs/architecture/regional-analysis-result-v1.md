@@ -208,6 +208,24 @@ there is no invented object and no additional dataflow. Choices preserve all kno
 physical alternatives and their memory bound. Foreign IDs are unsupported subjects.
 The result retains the OperandId, candidates, support, remainder and query point.
 
+## EP-W1 — logical source evidence (schema 1.2.0)
+
+The writer selects 1.2.0 when an observation contains logical source evidence.
+An Event with `logicalObjectId: Id(object)` has `storageId: null` and an empty
+`contributedRanges` list. It does not assert any physical allocation or range.
+Physical events keep their existing shape and mandatory storage ID.
+
+A ValueFact may additionally contain nonempty `logicalAlternatives`:
+`[{objectId: Id(object), candidate: string, producers: [Support]}]`, where Support
+has the existing `evidence`, `origin` and `premiseRefs` fields. Every alternative
+must have source/analysis support, match the queried named object, and retain
+`modelValueRemainder: true`. Its text participates in `candidates` and its supports
+participate in `candidateSupports`. Physical alternatives remain unchanged.
+This representation does not invent a logical Cell or physical interpretation.
+
+The independent reader checks these obligations and rejects the added shapes
+under earlier versions. Existing physical-only output retains 1.0.0/1.1.0.
+
 The writer uses schema **1.1.0** only when a PLACE_OCCURRENCE subject is present:
 `{kind: "PLACE_OCCURRENCE", operandId: Id(operand)}`. Existing subjects retain the
 1.0.0 wire unchanged. The independent Python reader accepts both and rejects the
