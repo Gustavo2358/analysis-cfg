@@ -17,8 +17,18 @@ WORK-FD-HARNESS permanece IN_PROGRESS enquanto os PRs não forem mergeados.
 ## Retomada
 
 Worktrees: `<workspace>/.file-dependencies/worktrees/<repo>`.
-Branch persistente: `feat/file-dependencies`. PRs/SHA finais serão registrados
-nesta revisão; nenhum merge, auto-merge ou repin em H. E2E exclusivamente local.
+Branch persistente em todos: `feat/file-dependencies`. Draft PRs abertos:
+
+| Repositório | PR persistente |
+| --- | --- |
+| proleap-poc | [#54](https://github.com/Gustavo2358/proleap-poc/pull/54) |
+| cobol-lower | [#30](https://github.com/Gustavo2358/cobol-lower/pull/30) |
+| air-java | [#19](https://github.com/Gustavo2358/air-java/pull/19) |
+| analysis-cfg | [#38](https://github.com/Gustavo2358/analysis-cfg/pull/38) |
+
+Nenhum merge, auto-merge ou repin em H. E2E exclusivamente local; SHAs finais,
+snapshot dos PRs e logs ficam em `artefatos-e2e/file-dependencies-20260916/HANDOFF.md`.
+`analysis-ir` permanece intacto e sem PR desta campanha.
 O [baseline](baseline.md) contém os SHAs de entrada; o Git fornece os checkpoints.
 
 ## Auditoria como próximo agente
@@ -46,7 +56,10 @@ D-AIR/D-WIRE são pré-condições internas W1. H4 não afirma que já foram dec
 
 Docs gates executados nos quatro produtos: 12 + 13 + 12 + 14 contracasos lean,
 todos PASS DOCS_ONLY. Contracasos usam stubs; suas mensagens CODE_CHANGE não são
-build/teste de produção. Auditoria final PASS: 59 links locais, 12 itens TODO/campos obrigatórios, grafo sem ciclos, 48 linhas N/C/D, 54 casos T, 6 CALL-X e 5 SG. Classificador dos quatro repos: DOCS_ONLY. CI remoto será observado após publicação dos Drafts.
+build/teste de produção. Auditoria final PASS: links locais, 12 itens TODO/campos
+obrigatórios, grafo sem ciclos, 48 linhas N/C/D, 54 casos T, 6 CALL-X e 5 SG.
+Classificador dos quatro repos: DOCS_ONLY. Fast CI remoto PASS nos quatro Drafts;
+heads e resultados observados são preservados na evidência E2E do handoff.
 NOT_RUN: testes semânticos, Maven, technical FAST, qualification-local, E2E/corpus,
 mutação/performance e exemplos AIR manuais. Delta H apenas docs/work items;
 nenhum pin, contrato wire, teste de aplicação ou produção mudou. Nenhum PASS
