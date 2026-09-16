@@ -49,7 +49,7 @@ public final class RegionalValuesAnalysis {
     private record Bytes(ByteImage image) implements Content { }
     private record CapturedRead(StorageIndex.Location sourceRange,StorageIndex.Location sourceContribution,StorageIndex.Location destinationContribution) { }
     private record Trace(StorageIndex.Location observed,Optional<Values.BytesValue> bytes,int producer,Optional<StorageIndex.Location> original,
-                         Map<Integer,Set<CapturedRead>> captures,Set<Integer> gaps,Set<String> reasons,Set<Integer> logicalSupports) {
+                         Map<Integer,Set<CapturedRead>> captures,Set<Integer> gaps,Set<String> reasons,Set<ByteImage.LogicalSupport> logicalSupports) {
         Trace(StorageIndex.Location observed,Optional<Values.BytesValue> bytes,int producer,Optional<StorageIndex.Location> original,Map<Integer,Set<CapturedRead>> captures,Set<Integer> gaps,Set<String> reasons){this(observed,bytes,producer,original,captures,gaps,reasons,Set.of());}
         Trace {
             logicalSupports=Set.copyOf(logicalSupports);
@@ -269,7 +269,7 @@ public final class RegionalValuesAnalysis {
                 return Set.of(new LogicalValue(text,plan.event));
             if(expression.value() instanceof Expressions.Read read) {
                 var result=new HashSet<LogicalValue>();
-                if(read.place() instanceof Places.ObjectPlace object)result.addAll(captured.logical.getOrDefault(object.object(),Set.of()));
+                for(var object:effects.storage().explicitObjects(read.place()))result.addAll(captured.logical.getOrDefault(object,Set.of()));
                 for(var candidate:effects.storage().resolve(read.place()).candidates()) {
                     int ordinal=ordinals.get(candidate.location().base().id());
                     for(var store:value(captured,groupOf[ordinal])) {
@@ -328,37 +328,41 @@ public final class RegionalValuesAnalysis {
             }
             if(source instanceof StatementEffects.UnknownSource u)return Set.of(unknown(target,u.reason(),plan.event));
             var expression=((StatementEffects.ExpressionSource)source).value();
-            if(expression instanceof Expressions.FitText fit&&fit.value() instanceof Expressions.Read
-                    &&target.range().isPresent()&&target.range().get().end().map(e->e.subtract(target.range().get().start())).filter(fit.length()::equals).isPresent()) {
-                var reads=readSource(plan.write);
-                var codecs=plan.write.destination().candidates().stream().filter(c->c.location().equals(target)).map(StorageIndex.Candidate::codec).distinct().toList();
-                if(reads.candidates().size()==1&&reads.remainder() instanceof Scopes.NoMemory
-                        &&codecs.size()==1&&codecs.getFirst().filter(MemoryCodecs::isIbm1047).isPresent()) {
-                    var candidate=reads.candidates().getFirst();var range=candidate.location().range();
-                    var pad=MemoryCodecs.encodeText(codecs.getFirst().orElseThrow(),new Values.TextValue(fit.pad()),BigInteger.ONE);
-                    if(range.isPresent()&&range.get().end().isPresent()&&candidate.codec().filter(MemoryCodecs::isIbm1047).isPresent()&&pad.status()==MemoryCodecs.Status.EXACT) {
-                        int ordinal=ordinals.get(candidate.location().base().id());
-                        var image=((Bytes)capture(content(captured,ordinal),candidate.location())).image().slice(range.get()).copied(plan.event,range.get().start());
-                        return Set.of(new Bytes(image.fit(fit.length(),pad.value().orElseThrow().octets().getFirst(),plan.event)));
-                    }
-                }
-            }
             var logicalRead=expression instanceof Expressions.Read r?r:expression instanceof Expressions.FitText f&&f.value() instanceof Expressions.Read r?r:null;
-            if(target.range().isPresent()&&logicalRead!=null&&logicalRead.place() instanceof Places.ObjectPlace object
-                    &&logicalInputs.containsKey(object.object())) {
+            if(target.range().isPresent()&&logicalRead!=null) {
+                var reads=readSource(plan.write);var result=new HashSet<Content>();
                 var codecs=plan.write.destination().candidates().stream().filter(c->c.location().equals(target)).map(StorageIndex.Candidate::codec).distinct().toList();
                 var extent=target.range().get().end().map(e->e.subtract(target.range().get().start()));
-                var result=new HashSet<Content>();result.add(unknown(target,"LOGICAL_READ_REMAINDER",plan.event));
-                if(codecs.size()==1&&codecs.getFirst().isPresent()&&extent.isPresent())for(var value:logicalInputs.get(object.object())) {
+                if(!(reads.remainder() instanceof Scopes.NoMemory))result.add(unknown(target,"READ_LOCATION_REMAINDER",plan.event));
+                // Keep each admitted physical alternative and its selected source range. A Choice
+                // remainder is not evidence against bytes already supported by another alternative.
+                for(int i=0;i<reads.candidates().size();i++) {
+                    var candidate=reads.candidates().get(i);var range=candidate.location().range();
+                    if(expression instanceof Expressions.FitText fit&&extent.filter(fit.length()::equals).isPresent()
+                            &&codecs.size()==1&&codecs.getFirst().filter(MemoryCodecs::isIbm1047).isPresent()
+                            &&range.isPresent()&&range.get().end().isPresent()&&candidate.codec().filter(MemoryCodecs::isIbm1047).isPresent()) {
+                        var pad=MemoryCodecs.encodeText(codecs.getFirst().orElseThrow(),new Values.TextValue(fit.pad()),BigInteger.ONE);
+                        if(pad.status()==MemoryCodecs.Status.EXACT) {
+                            int ordinal=ordinals.get(candidate.location().base().id());
+                            var image=((Bytes)capture(content(captured,ordinal),candidate.location())).image().slice(range.get()).copied(plan.event,range.get().start(),i);
+                            result.add(new Bytes(image.fit(fit.length(),pad.value().orElseThrow().octets().getFirst(),plan.event)));continue;
+                        }
+                    }
+                    result.add(unknown(target,"UNINTERPRETED_VALUE_EXPRESSION",plan.event));
+                }
+                for(var object:effects.storage().explicitObjects(logicalRead.place()))for(var value:logicalInputs.getOrDefault(object,Set.of())) {
+                    result.add(unknown(target,"LOGICAL_READ_REMAINDER",plan.event));
+                    if(codecs.size()!=1||codecs.getFirst().isEmpty()||extent.isEmpty())continue;
                     var text=value.text();
                     if(expression instanceof Expressions.FitText fit) {
                         int length=fit.length().intValueExact();var raw=text.value();int count=raw.codePointCount(0,raw.length());
                         text=new Values.TextValue(count>length?raw.substring(0,raw.offsetByCodePoints(0,length)):raw+fit.pad().repeat(length-count));
                     }
                     var encoded=MemoryCodecs.encodeText(codecs.getFirst().get(),text,extent.get());
-                    if(encoded.status()==MemoryCodecs.Status.EXACT)result.add(new Bytes(ByteImage.literal(encoded.value().orElseThrow(),plan.event).withLogicalSupport(Set.of(value.event()))));
+                    if(encoded.status()==MemoryCodecs.Status.EXACT)result.add(new Bytes(ByteImage.literal(encoded.value().orElseThrow(),plan.event)
+                        .withLogicalSupport(Set.of(new ByteImage.LogicalSupport(object,value.event())))));
                 }
-                return Set.copyOf(result);
+                if(!result.isEmpty())return Set.copyOf(result);
             }
             if(expression instanceof Expressions.Literal literal) {
                 var v=literal.value();
@@ -380,9 +384,9 @@ public final class RegionalValuesAnalysis {
             if(target.range().isEmpty()&&expression instanceof Expressions.Read read) {
                 var resolution=effects.storage().resolve(read.place());var result=new HashSet<Content>();
                 if(!(resolution.remainder() instanceof Scopes.NoMemory))result.add(unknown(target,"READ_LOCATION_REMAINDER",plan.event));
-                if(read.place() instanceof Places.ObjectPlace object)for(var value:logicalInputs.getOrDefault(object.object(),Set.of()))
+                for(var object:effects.storage().explicitObjects(read.place()))for(var value:logicalInputs.getOrDefault(object,Set.of()))
                     result.add(new Scalar(Optional.of(value.text()),Set.copyOf(List.of(value.event(),plan.event)),Set.of(),Set.of(),
-                        List.of(new Trace(target,Optional.empty(),plan.event,Optional.of(target),Map.of(),Set.of(),Set.of(),Set.of(value.event())))));
+                        List.of(new Trace(target,Optional.empty(),plan.event,Optional.of(target),Map.of(),Set.of(),Set.of(),Set.of(new ByteImage.LogicalSupport(object,value.event()))))));
 
                 for(var candidate:resolution.candidates()) {
                     int ordinal=ordinals.get(candidate.location().base().id());
@@ -438,7 +442,7 @@ public final class RegionalValuesAnalysis {
         if(candidate.codec().isEmpty()||range.end().isEmpty())return new Scalar(Optional.empty(),Set.of(),Set.of("UNINTERPRETED_VIEW"),gaps,traces);
         var decoded=MemoryCodecs.decodeText(candidate.codec().get(),read.bytes().get(),range.end().get().subtract(range.start()));
         if(decoded.value().isEmpty())return new Scalar(Optional.empty(),Set.of(),Set.of(decoded.status().name()),gaps,traces);
-        var producers=new HashSet<Integer>();for(var part:read.parts()){producers.addAll(part.contributors().keySet());producers.addAll(part.logicalSupports());}
+        var producers=new HashSet<Integer>();for(var part:read.parts()){producers.addAll(part.contributors().keySet());part.logicalSupports().forEach(support->producers.add(support.event()));}
         return new Scalar(decoded.value(),producers,Set.of(),gaps,traces);
     }
     private List<Trace> traces(ByteImage.Part part,StorageIndex.Location selected) {
@@ -457,9 +461,10 @@ public final class RegionalValuesAnalysis {
         }
         var captures=new HashMap<Integer,Set<CapturedRead>>();
         for(var entry:part.capturedOffsets().entrySet()) {
-            var event=eventDetails.get(entry.getKey());var source=readSource(event.write()).candidates().getFirst().location();
+            var event=eventDetails.get(entry.getKey());var sources=readSource(event.write()).candidates();
             var destination=event.target().location();var portions=new HashSet<CapturedRead>();
-            for(var offset:entry.getValue()) {
+            for(var position:entry.getValue()) {
+                var source=sources.get(position.alternative()).location();var offset=position.offset();
                 var src=new StorageIndex.Location(source.base(),Optional.of(StorageRange.exact(offset,length.orElseThrow())));
                 var dst=new StorageIndex.Location(destination.base(),Optional.of(StorageRange.exact(destination.range().orElseThrow().start().add(offset.subtract(source.range().orElseThrow().start())),length.orElseThrow())));
                 portions.add(new CapturedRead(source,src,dst));
@@ -514,7 +519,7 @@ public final class RegionalValuesAnalysis {
                     for(var gap:value.sourceGaps()){source=true;origins.add(sourceGaps.get(gap).origin());}
                     if(value.text().isEmpty()){model=true;reasons.addAll(value.reasons());}
                     else supports.computeIfAbsent(value.text().get().value(),ignored->new HashSet<>()).addAll(value.producers());
-                    var fragments=value.traces().stream().map(t->fragment(t,query.point().entry(),value.text().isPresent())).distinct().sorted(StorageValueOrder.FRAGMENT).toList();
+                    var fragments=value.traces().stream().flatMap(t->fragments(t,query.point().entry(),value.text().isPresent()).stream()).distinct().sorted(StorageValueOrder.FRAGMENT).toList();
                     var interpretation=new RegionalValueFact.Interpretation(candidate.location().in(query.point().entry()),candidate.codec());
                     if(candidate.location().range().isEmpty())alternatives.add(new StorageValueFact.Alternative(interpretation,value.text(),fragments));
                     else {
@@ -534,12 +539,12 @@ public final class RegionalValuesAnalysis {
                 }
             }
             var logicalAlternatives=new ArrayList<StorageValueFact.LogicalAlternative>();
-            if(state.reached()&&query.subject() instanceof StorageSubject.NamedObject named) {
+            if(state.reached())for(var object:storage.explicitObjects(query.subject())) {
                 var logicalSupport=new TreeMap<String,Set<Integer>>();
-                for(var value:state.logical.getOrDefault(named.object(),Set.of()))logicalSupport.computeIfAbsent(value.text().value(),ignored->new HashSet<>()).add(value.event());
+                for(var value:state.logical.getOrDefault(object,Set.of()))logicalSupport.computeIfAbsent(value.text().value(),ignored->new HashSet<>()).add(value.event());
                 logicalSupport.forEach((text,producers)->{
                     supports.computeIfAbsent(text,ignored->new HashSet<>()).addAll(producers);
-                    logicalAlternatives.add(new StorageValueFact.LogicalAlternative(named.object(),new Values.TextValue(text),producers.stream().map(events::get).distinct()
+                    logicalAlternatives.add(new StorageValueFact.LogicalAlternative(object,new Values.TextValue(text),producers.stream().map(events::get).distinct()
                         .sorted(Comparator.comparing(ValueFact.Support::evidence,StorageValueOrder.ID).thenComparing(ValueFact.Support::origin,StorageValueOrder.ID)).toList()));
                 });
             }
@@ -566,6 +571,12 @@ public final class RegionalValuesAnalysis {
                 state.reached()?ValueFact.Reachability.REACHABLE:ValueFact.Reachability.UNREACHABLE_IN_MODEL,state.reached()?candidates:null,state.reached()?model:null,
                 source,state.reached()&&model||source,ordered(premises),ordered(evidence),ordered(origins),associations,state.reached()?List.copyOf(reasons):List.of(),alternatives.stream().sorted(StorageValueOrder.ALTERNATIVE).toList(),logicalAlternatives);
         }
+        private List<StorageValueFact.Fragment> fragments(Trace trace,EntryId entry,boolean knownText) {
+            if(trace.logicalSupports().isEmpty())return List.of(fragment(trace,entry,knownText));
+            return trace.logicalSupports().stream().map(ByteImage.LogicalSupport::object).distinct().map(object->
+                fragment(new Trace(trace.observed(),trace.bytes(),trace.producer(),trace.original(),trace.captures(),trace.gaps(),trace.reasons(),
+                    trace.logicalSupports().stream().filter(s->s.object().equals(object)).collect(java.util.stream.Collectors.toSet())),entry,knownText)).toList();
+        }
         private StorageValueFact.Fragment fragment(Trace trace,EntryId entry,boolean knownText) {
             var kind=trace.observed().range().isPresent()?(trace.bytes().isPresent()?StorageValueFact.FragmentKind.KNOWN_BYTES:StorageValueFact.FragmentKind.UNKNOWN_BYTES)
                 :trace.bytes().isPresent()?StorageValueFact.FragmentKind.LOGICAL_CAPTURE:knownText?StorageValueFact.FragmentKind.LOGICAL_VALUE:StorageValueFact.FragmentKind.UNKNOWN_LOGICAL;
@@ -582,10 +593,8 @@ public final class RegionalValuesAnalysis {
             Optional<StorageValueFact.LogicalCapture> logicalCapture=Optional.empty();
             if(!trace.logicalSupports().isEmpty()) {
                 var assign=(Operations.Assign)eventDetails.get(trace.producer()).operation();
-                var expression=assign.value();
-                var read=(Expressions.Read)(expression instanceof Expressions.FitText fit?fit.value():expression);
-                var object=((Places.ObjectPlace)read.place()).object();
-                var supports=trace.logicalSupports().stream().map(events::get).distinct().sorted(Comparator.comparing(ValueFact.Support::evidence,StorageValueOrder.ID).thenComparing(ValueFact.Support::origin,StorageValueOrder.ID)).toList();
+                var object=trace.logicalSupports().iterator().next().object();
+                var supports=trace.logicalSupports().stream().map(s->events.get(s.event())).distinct().sorted(Comparator.comparing(ValueFact.Support::evidence,StorageValueOrder.ID).thenComparing(ValueFact.Support::origin,StorageValueOrder.ID)).toList();
                 logicalCapture=Optional.of(new StorageValueFact.LogicalCapture(object,ProgramPoint.before(entry,assign.header().id()),supports));
             }
             return new StorageValueFact.Fragment(trace.observed().in(entry),kind,trace.bytes(),producer,unknownWriter,captures.stream().distinct().sorted(StorageValueOrder.CAPTURE).toList(),publicGaps,trace.reasons().stream().sorted().toList(),logicalCapture);
@@ -593,11 +602,11 @@ public final class RegionalValuesAnalysis {
     }
     private boolean sourceOpen(PointQuery<StorageSubject> query) {
         var p=session.index().publication();var unit=session.index().unit(query.point().entry().unit());
-        var object=query.subject() instanceof StorageSubject.NamedObject named?session.index().object(named.object()):null;
         return p.coverage().inventory()!=Evidence.InventoryStatus.COMPLETE||!p.coverage().uncertainties().isEmpty()
             ||unit.coverage().inventory()!=Evidence.InventoryStatus.COMPLETE||!unit.coverage().uncertainties().isEmpty()||controlOpen.contains(unit.id())
             ||!session.context(query.point().entry()).entry().state().uncertainties().isEmpty()
-            ||object!=null&&(object.coverage()!=Evidence.CoverageStatus.MODELED||open(object.precision().storage())||open(object.precision().values()));
+            ||effects.storage().explicitObjects(query.subject()).stream().map(session.index()::object)
+                .anyMatch(object->object.coverage()!=Evidence.CoverageStatus.MODELED||open(object.precision().storage())||open(object.precision().values()));
     }
     private static boolean open(Evidence.Claim c){return c.status()!=Evidence.PrecisionStatus.EXACT&&c.status()!=Evidence.PrecisionStatus.NOT_APPLICABLE;}
     private static <T extends Id> List<T> ordered(Collection<T> ids){return ids.stream().distinct().sorted(StorageValueOrder.ID).toList();}

@@ -1,6 +1,7 @@
 package io.github.gustavo2358.analysis.values;
 
 import io.github.gustavo2358.air.model.Values;
+import io.github.gustavo2358.air.model.Ids.ObjectId;
 import io.github.gustavo2358.analysis.storage.StorageRange;
 import java.math.BigInteger;
 import java.util.*;
@@ -17,19 +18,24 @@ final class ByteImage {
             return new Values.BytesValue(repeated?Collections.nCopies(size,bytes.octets().getFirst()):bytes.octets().subList(offset,Math.addExact(offset,size)));
         }
     }
+    record LogicalSupport(ObjectId object,int event) { }
+    record CaptureOffset(int alternative,BigInteger offset) {
+        CaptureOffset { if(alternative<0||offset.signum()<0)throw new IllegalArgumentException("invalid capture position"); }
+        CaptureOffset add(BigInteger delta) {return new CaptureOffset(alternative,offset.add(delta));}
+    }
     record Part(StorageRange range,Optional<Payload> payload,int payloadOffset,int producer,
-                BigInteger producerOffset,Map<Integer,Set<BigInteger>> capturedOffsets,Set<String> reasons,Set<Integer> sourceGaps,Map<Integer,BigInteger> coInitial,Set<Integer> logicalSupports) {
+                BigInteger producerOffset,Map<Integer,Set<CaptureOffset>> capturedOffsets,Set<String> reasons,Set<Integer> sourceGaps,Map<Integer,BigInteger> coInitial,Set<LogicalSupport> logicalSupports) {
         Part {
             Objects.requireNonNull(range);Objects.requireNonNull(payload);Objects.requireNonNull(producerOffset);coInitial=Map.copyOf(coInitial);logicalSupports=Set.copyOf(logicalSupports);
-            var copies=new HashMap<Integer,Set<BigInteger>>();capturedOffsets.forEach((event,offsets)->{
-                if(event<0||offsets.isEmpty()||offsets.stream().anyMatch(o->o.signum()<0))throw new IllegalArgumentException("invalid capture contribution");
+            var copies=new HashMap<Integer,Set<CaptureOffset>>();capturedOffsets.forEach((event,offsets)->{
+                if(event<0||offsets.isEmpty()||offsets.stream().anyMatch(o->o.offset().signum()<0))throw new IllegalArgumentException("invalid capture contribution");
                 copies.put(event,Set.copyOf(offsets));
             });capturedOffsets=Map.copyOf(copies);reasons=Set.copyOf(reasons);sourceGaps=Set.copyOf(sourceGaps);
         }
-        Part(StorageRange range,Optional<Payload> payload,int payloadOffset,int producer,BigInteger producerOffset,Map<Integer,Set<BigInteger>> capturedOffsets,Set<String> reasons,Set<Integer> sourceGaps,Map<Integer,BigInteger> coInitial) {
+        Part(StorageRange range,Optional<Payload> payload,int payloadOffset,int producer,BigInteger producerOffset,Map<Integer,Set<CaptureOffset>> capturedOffsets,Set<String> reasons,Set<Integer> sourceGaps,Map<Integer,BigInteger> coInitial) {
             this(range,payload,payloadOffset,producer,producerOffset,capturedOffsets,reasons,sourceGaps,coInitial,Set.of());
         }
-        Part(StorageRange range,Optional<Payload> payload,int payloadOffset,int producer,BigInteger producerOffset,Map<Integer,Set<BigInteger>> capturedOffsets,Set<String> reasons,Set<Integer> sourceGaps) {
+        Part(StorageRange range,Optional<Payload> payload,int payloadOffset,int producer,BigInteger producerOffset,Map<Integer,Set<CaptureOffset>> capturedOffsets,Set<String> reasons,Set<Integer> sourceGaps) {
             this(range,payload,payloadOffset,producer,producerOffset,capturedOffsets,reasons,sourceGaps,Map.of());
         }
         Map<Integer,BigInteger> contributors() {
@@ -38,7 +44,7 @@ final class ByteImage {
         Part contributor(int event,BigInteger offset) {
             return new Part(range,payload,payloadOffset,event,offset,capturedOffsets,reasons,sourceGaps,Map.of(),logicalSupports);
         }
-        Part(StorageRange range,Optional<Payload> payload,int payloadOffset,int producer,BigInteger producerOffset,Map<Integer,Set<BigInteger>> capturedOffsets,Set<String> reasons) {
+        Part(StorageRange range,Optional<Payload> payload,int payloadOffset,int producer,BigInteger producerOffset,Map<Integer,Set<CaptureOffset>> capturedOffsets,Set<String> reasons) {
             this(range,payload,payloadOffset,producer,producerOffset,capturedOffsets,reasons,Set.of());
         }
         Optional<Values.BytesValue> materialize() {return payload.map(p->p.materialize(payloadOffset,range.end().orElseThrow().subtract(range.start())));}
@@ -82,11 +88,11 @@ final class ByteImage {
         var size=BigInteger.valueOf(bytes.octets().size());
         return new ByteImage(Optional.of(size),size.signum()==0?List.of():List.of(new Part(StorageRange.exact(BigInteger.ZERO,size),Optional.of(new Payload(bytes,false)),0,producer,BigInteger.ZERO,Map.of(),Set.of())));
     }
-    /** Logical support carries evidence IDs only, never a fabricated source byte range. */
-    ByteImage withLogicalSupport(Set<Integer> support) {
+    /** Logical support carries explicit object identity and evidence IDs, never a fabricated source byte range. */
+    ByteImage withLogicalSupport(Set<LogicalSupport> support) {
         return new ByteImage(extent,parts.stream().map(p->new Part(p.range(),p.payload(),p.payloadOffset(),p.producer(),p.producerOffset(),p.capturedOffsets(),p.reasons(),p.sourceGaps(),p.coInitial(),union(p.logicalSupports(),support))).toList());
     }
-    private static Set<Integer> union(Set<Integer> left,Set<Integer> right) { var all=new HashSet<>(left);all.addAll(right);return Set.copyOf(all); }
+    private static <T> Set<T> union(Set<T> left,Set<T> right) { var all=new HashSet<>(left);all.addAll(right);return Set.copyOf(all); }
     ByteImage slice(StorageRange selected) {
         requireBounds(selected);var result=new ArrayList<Part>();
         for(var part:parts)part.range().intersect(selected).ifPresent(r->result.add(part.crop(r).shift(selected.start().negate())));
@@ -104,11 +110,12 @@ final class ByteImage {
         return new ByteImage(Optional.of(length),result);
     }
     ByteImage copied(int event) {return copied(event,BigInteger.ZERO);}
-    ByteImage copied(int event,BigInteger sourceStart) {
+    ByteImage copied(int event,BigInteger sourceStart) {return copied(event,sourceStart,0);}
+    ByteImage copied(int event,BigInteger sourceStart,int alternative) {
         var result=new ArrayList<Part>();
         for(var part:parts) {
             var copies=new HashMap<>(part.capturedOffsets());var offsets=new HashSet<>(copies.getOrDefault(event,Set.of()));
-            offsets.add(sourceStart.add(part.range().start()));copies.put(event,Set.copyOf(offsets));
+            offsets.add(new CaptureOffset(alternative,sourceStart.add(part.range().start())));copies.put(event,Set.copyOf(offsets));
             result.add(new Part(part.range(),part.payload(),part.payloadOffset(),part.producer(),part.producerOffset(),copies,part.reasons(),part.sourceGaps(),part.coInitial(),part.logicalSupports()));
         }
         var next=new ByteImage(extent,result);return equals(next)?this:next;
@@ -175,9 +182,9 @@ final class ByteImage {
     private static Map<Integer,BigInteger> advanceInitial(Map<Integer,BigInteger> offsets,BigInteger delta) {
         if(delta.signum()==0||offsets.isEmpty())return offsets;var result=new HashMap<Integer,BigInteger>();offsets.forEach((k,v)->result.put(k,v.add(delta)));return Map.copyOf(result);
     }
-    private static Map<Integer,Set<BigInteger>> advance(Map<Integer,Set<BigInteger>> captures,BigInteger delta) {
-        if(delta.signum()==0||captures.isEmpty())return captures;var next=new HashMap<Integer,Set<BigInteger>>();
-        captures.forEach((event,offsets)->{var shifted=new HashSet<BigInteger>();offsets.forEach(o->shifted.add(o.add(delta)));next.put(event,Set.copyOf(shifted));});return Map.copyOf(next);
+    private static Map<Integer,Set<CaptureOffset>> advance(Map<Integer,Set<CaptureOffset>> captures,BigInteger delta) {
+        if(delta.signum()==0||captures.isEmpty())return captures;var next=new HashMap<Integer,Set<CaptureOffset>>();
+        captures.forEach((event,offsets)->{var shifted=new HashSet<CaptureOffset>();offsets.forEach(o->shifted.add(o.add(delta)));next.put(event,Set.copyOf(shifted));});return Map.copyOf(next);
     }
     private static List<Part> normalize(List<Part> parts) {
         var result=new ArrayList<Part>();

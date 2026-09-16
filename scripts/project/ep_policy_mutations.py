@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Six bounded EP policy mutations; semantic assertion failures are the oracle.
+"""Bounded EP policy mutations; semantic assertion failures are the oracle.
 
 Run against a quiescent worktree. Each patch is restored in finally. Evidence is
 written to a new directory; no production flag or mutant remains installed.
@@ -16,6 +16,11 @@ ROOT = Path(__file__).resolve().parents[2]
 VALUES = Path('analysis-values/src/main/java/io/github/gustavo2358/analysis/values')
 REGIONAL = VALUES / 'RegionalValuesAnalysis.java'
 MUTANTS = [
+    ('occurrence-hides-logical', Path('analysis-kernel/src/main/java/io/github/gustavo2358/analysis/storage/StorageIndex.java'),
+     'return explicitObjects(place);', 'return List.of();', 'LogicalPlaceRepresentationTest'),
+    ('choice-hides-logical', Path('analysis-kernel/src/main/java/io/github/gustavo2358/analysis/storage/StorageIndex.java'),
+     'else if(place instanceof Places.Choice choice)pending.addAll(choice.candidates());', '', 'LogicalPlaceRepresentationTest'),
+
     ('unproved-precondition-kill', Path('analysis-kernel/src/main/java/io/github/gustavo2358/analysis/storage/StatementEffects.java'),
      'if(storage.session().index().unprovedPreconditions(operation.header().id()))strength=Strength.MAY;', '', 'EvidenceMonotonicityTest'),
     ('unknown-clear', VALUES / 'PossibleValuesState.java',
@@ -32,7 +37,7 @@ MUTANTS = [
      'subject.apply(query.subject())),engine.apply(state,initial.getOrDefault(state.entry,List.of()),false)));}',
      'EvidencePreservingPolicyTest'),
     ('unknown-storage-empty', REGIONAL,
-     'for(var value:state.logical.getOrDefault(named.object(),Set.of()))',
+     'for(var value:state.logical.getOrDefault(object,Set.of()))',
      'for(var value:Set.<LogicalValue>of())', 'EvidencePreservingPolicyTest'),
 ]
 
@@ -45,6 +50,7 @@ def main():
     args = parser.parse_args()
     args.evidence_dir.mkdir(parents=True, exist_ok=False)
     records = []
+    baseline_oracles = set()
     for name, relative, old, new, oracle in MUTANTS:
         if args.only and name not in args.only: continue
         path = ROOT / relative
@@ -58,6 +64,12 @@ def main():
         command = ['mvn', '-o', '-B', '-ntp', f'-Dmaven.repo.local={args.maven_repo}',
                    '-pl', module, '-am',
                    f'-Dtest=CfgPreflightTest,KillAuthorityTest,ValuesTest,RegionalAnalysisTest,NameInterpreterTest,{oracle}', 'test']
+        if oracle not in baseline_oracles:
+            with (args.evidence_dir / (oracle + '-baseline.log')).open('x') as log:
+                baseline = subprocess.run(command, cwd=ROOT, stdout=log, stderr=subprocess.STDOUT)
+            if baseline.returncode != 0:
+                raise RuntimeError(f'{oracle}: unmutated baseline failed; no mutation is qualified')
+            baseline_oracles.add(oracle)
         reports = ROOT / module / 'target/surefire-reports'
         for report in reports.glob(f'TEST-*.{oracle}.xml'):
             report.unlink()

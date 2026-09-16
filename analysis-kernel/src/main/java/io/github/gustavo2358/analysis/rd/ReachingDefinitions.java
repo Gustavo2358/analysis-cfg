@@ -269,8 +269,8 @@ public final class ReachingDefinitions {
                     }
                 }
             }
-            if(state.reached()&&query.subject() instanceof StorageSubject.NamedObject named)for(var handle:state.logical.getOrDefault(named.object(),Set.of())) {
-                var definition=handle.definition;contributions.putIfAbsent(definition,Set.of());origins.add(definition.origin());uncertainties.addAll(definition.uncertainties());
+            if(state.reached())for(var object:storage.explicitObjects(query.subject()))for(var handle:state.logical.getOrDefault(object,Set.of())) {
+                var definition=handle.definition;contributions.putIfAbsent(definition,Set.of());origins.add(definition.origin());premises.addAll(definition.premises());uncertainties.addAll(definition.uncertainties());unknown|=definition.unknown();
             }
             var ordered=new ArrayList<>(contributions.keySet());ordered.sort(Comparator.comparing((DefinitionEvent e)->e.operation().map(OperationId::localId).orElse("")).thenComparingInt(DefinitionEvent::slot).thenComparing(e->e.storage().map(StorageId::localId).orElse("")).thenComparing(DefinitionEvent::unknown).thenComparing(DefinitionEvent.ORDER));
             var output=new ArrayList<DefinitionFact.Contribution>();
@@ -279,12 +279,12 @@ public final class ReachingDefinitions {
         }
         private boolean sourceOpen(PointQuery<StorageSubject> query) {
             var publication=owner.session.index().publication();var unit=owner.session.index().unit(query.point().entry().unit());
-            var object=query.subject() instanceof StorageSubject.NamedObject named?owner.session.index().object(named.object()):null;
             return publication.coverage().inventory()!=Evidence.InventoryStatus.COMPLETE||!publication.coverage().uncertainties().isEmpty()
                 ||unit.coverage().inventory()!=Evidence.InventoryStatus.COMPLETE||!unit.coverage().uncertainties().isEmpty()
                 ||owner.controlOpen.getOrDefault(unit.id(),false)
                 ||!owner.session.context(query.point().entry()).entry().state().uncertainties().isEmpty()
-                ||object!=null&&(object.coverage()!=Evidence.CoverageStatus.MODELED||open(object.precision().storage())||open(object.precision().values()));
+                ||owner.effects.storage().explicitObjects(query.subject()).stream().map(owner.session.index()::object)
+                    .anyMatch(object->object.coverage()!=Evidence.CoverageStatus.MODELED||open(object.precision().storage())||open(object.precision().values()));
         }
     }
     private static boolean open(Evidence.Claim claim){return claim.status()!=Evidence.PrecisionStatus.EXACT&&claim.status()!=Evidence.PrecisionStatus.NOT_APPLICABLE;}
