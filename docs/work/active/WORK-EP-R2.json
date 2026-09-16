@@ -1,0 +1,9 @@
+{
+  "id": "WORK-EP-R2",
+  "title": "EP-R2 — Order-Independent Entry & Factorized Recall",
+  "status": "IN_PROGRESS",
+  "scope": [
+    "analysis-cfg: entry admission, regional values domain, dependency product, focused qualification"
+  ],
+  "notes": "Single Draft PR; no merge. FILE frozen. Real program awaits manual rerun after human review."
+}
