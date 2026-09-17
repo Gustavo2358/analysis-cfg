@@ -1,29 +1,41 @@
-# Estado / handoff curto — FD-H0–H4
+# Estado / handoff curto — CORE N+C
 
-**Preparação para revisão humana. FD-W0–W11 TODO / NOT_STARTED.**
-O estado da implementação é separado da prontidão documental. O work item lean
-WORK-FD-HARNESS permanece IN_PROGRESS enquanto os PRs não forem mergeados.
+**H4 aprovado; W0 QUALIFIED_LOCAL; W1 IN_PROGRESS.**
+Core W0–W9/W11 autorizado em 2026-09-16, sem nova aprovação entre waves.
+W10 TODO / NOT_AUTHORIZED. Sem merge/auto-merge/release. STOP após W11.
+Waves qualificadas permanecem IN_PROGRESS lean enquanto os PRs estiverem unmerged.
 
-## Campaign state
+## Checkpoint confirmado
 
-| Checkpoint | Estado / evidência |
+Auditoria inicial dos cinco worktrees persistentes: limpos, branch
+`feat/file-dependencies`, HEADs exatamente nos anchors H4 fornecidos.
+Nenhum checkout original alterado. Detalhes em
+`artefatos-e2e/file-dependencies-20260916/w0/initial-audit.json`.
+
+| Wave | Estado técnico / evidência |
 | --- | --- |
-| H0 | concluído: baseline local/remota, pins, dirty trees e gaps de código reconciliados |
-| H1 | concluído: brief, fontes/perfis, contratos e rotas por camada |
-| H2 | concluído: 12 itens TODO; grafo, precondições, limites, aceitação e repins |
-| H3 | concluído: matriz N/C/D, T01–T54, CALL-X, scope guards e custo de gates |
-| H4 | concluído: auditoria estrutural e de escopo PASS; pacote pronto para revisão humana |
+| W0 | QUALIFIED_LOCAL; SP2.21.0/fileInventory1.0.0, decoder/admission bilateral |
+| W1 | IN_PROGRESS; prova D-AIR e auditoria D-WIRE antes de produção |
+| W2–W9, W11 | TODO |
+| W10 | TODO / NOT_AUTHORIZED |
 
-## Correções da revisão humana H4
+| Repo | Último commit produtivo / pin |
+| --- | --- |
+| proleap-poc | `9f9021fdf79854a1c097f3a06268824ca8aa489d` |
+| cobol-lower | `22753af9ab45572612542251f93bbd298d3912d3`; SP no commit acima; AIR `5b8a5c231958b62de34583d871cbb10b473d53e8` |
+| air-java | `baf848ab71a34f3dd666f60f5c59ae99cf95fb62`; sem delta W0 |
+| analysis-cfg | sem delta produtivo W0; checkpoint documental no Git |
 
-Revisão recebida em 2026-09-16, sem autorização de iniciar W0. Corrigidos P0–P3:
-assignment-name prova external file name, nunca mecanismo DD/environment; nenhuma
-dimensão bindingMechanism. N-LR identificado por SC27-8713-03 + 2026-04-28 (PDF
-atual retornou HTTP 403; nenhum hash inventado). DELETE RECORD sozinho sustenta
-site/edge FILE, sem dataset deletion. Decisão humana explícita: N+C core, D posterior.
-W7 qualifica values do core CICS; captura D migra para W10, que não bloqueia W11.
-W8 inicia estáticos após W3/W4, com W7 condicional aos computados/fechamento completo.
-Nenhum schema produtivo, pin ou teste semântico mudou; itens W permanecem TODO.
+W0: frontend focal 129 testes e FAST fixo 335 testes, sem falhas/skips;
+lower FAST fixo PASS (2340 checks core e suites adapter/FILE/CALL), quatro fixtures
+regenerados no pin frontend byte a byte iguais aos fixtures lower. CFG docs gate
+PASS (14 contracasos). Logs, comandos, exits, hashes e tentativas RED preservados em
+`artefatos-e2e/file-dependencies-20260916/w0/HANDOFF.md` e `w0/logs/`.
+NOT_RUN em W0: qualification-local, AIR FILE/consumer, E2E/corpus/performance.
+Nenhum blocker atual. Nenhum PASS histórico reutilizado como prova FILE.
+
+Autoridade N-LR obtida: SC27-8713-03, atualização 2026-04-28; hash e seções em
+[perfis](profiles.md). W0 não publica execução FILE, efeitos nem dataflow de nomes.
 
 ## Retomada
 
@@ -37,56 +49,16 @@ Branch persistente em todos: `feat/file-dependencies`. Draft PRs abertos:
 | air-java | [#19](https://github.com/Gustavo2358/air-java/pull/19) |
 | analysis-cfg | [#38](https://github.com/Gustavo2358/analysis-cfg/pull/38) |
 
-Nenhum merge, auto-merge ou repin em H. E2E exclusivamente local; SHAs finais,
-snapshot dos PRs e logs ficam em `artefatos-e2e/file-dependencies-20260916/HANDOFF.md`.
-`analysis-ir` permanece intacto e sem PR desta campanha.
-O [baseline](baseline.md) contém os SHAs de entrada; o Git fornece os checkpoints.
+Próximo percurso: AGENTS → página local → [brief](brief.md) →
+[FD-W1](../../work/active/FD-W1.yaml) → contratos/gates necessários.
+W1 materializa A1–A4/A6, fecha D-AIR/D-WIRE e executa slice estático com
+incompletude de efeitos/controle explícita até W3/W4. Não iniciar W10.
+`analysis-ir` ainda intacto/sem PR; extensão somente após prova D-AIR.
+E2E permanece local/sem remote. Handoff H4 histórico preservado no Git e em
+`artefatos-e2e/file-dependencies-20260916/HANDOFF.md`; não reler discovery.
 
-## Auditoria como próximo agente
+## Decisões
 
-| Pergunta | Resposta mínima |
-| --- | --- |
-| Filosofia da capability? | [brief](brief.md), scope lock e analogia CALL |
-| DSNAME fora de escopo? | brief, primeiro bloco; SG1–SG5 no [catálogo](test-catalog.md) |
-| Repos que mudam? | [baseline](baseline.md), [grafo](waves.md), campo repos do item |
-| Ordem/consumers/pins? | grafo, seção de pins e preconditions do item |
-| Aceitação W0? | [FD-W0](../../work/active/FD-W0.yaml), acceptance |
-| Comandos? | item → [verificação](verification.md), F-DECL/L-INPUT/B-SP |
-| Regressões? | CALL-X e tests/regressions do item; resolver FILE existente |
-| SELECT/ASSIGN/FD? | [matriz](coverage.md) N01–N03/N05–N10 e página local frontend |
-| Decisões abertas? | [contratos](contracts.md#decisoes-abertas), dono e wave |
-| Preciso reler discovery para W0? | **Não**, salvo evidência histórica/detalhe adicional |
-
-## Open decisions
-
-Somente D-AIR, D-WIRE, D-EFFECT, D-DYNAMIC e D-D-AUTH, com prazo no documento de
-contratos. Nenhuma exige resolver JCL/DSNAME. Nenhuma bloqueia W0 declarativo SP;
-D-AIR/D-WIRE são pré-condições internas W1. H4 não afirma que já foram decididas.
-D-D-AUTH e captura D pertencem à extensão W10, sem bloquear qualificação N+C.
-
-## Validation
-
-Docs gates executados nos quatro produtos: 12 + 13 + 12 + 14 contracasos lean,
-todos PASS DOCS_ONLY. Contracasos usam stubs; suas mensagens CODE_CHANGE não são
-build/teste de produção. Auditoria final PASS: links locais, 12 itens TODO/campos
-obrigatórios, grafo sem ciclos, 48 linhas N/C/D, 54 casos T, 6 CALL-X e 5 SG.
-Classificador dos quatro repos: DOCS_ONLY. Fast CI remoto PASS nos quatro Drafts;
-heads e resultados observados são preservados na evidência E2E do handoff.
-NOT_RUN: testes semânticos, Maven, technical FAST, qualification-local, E2E/corpus,
-mutação/performance e exemplos AIR manuais. Delta H apenas docs/work items;
-nenhum pin, contrato wire, teste de aplicação ou produção mudou. Nenhum PASS
-histórico foi reapresentado como execução FD.
-
-Achado H4 corrigido: mover os itens para `docs/work/active/`, conforme classificador
-vigente; nenhum gate foi relaxado. Corrigida também reserialização incidental de
-texto histórico no registry lower. Logs novos em
-`artefatos-e2e/file-dependencies-20260916/validation/`.
-
-## Readiness for FD-W0 / STOP
-
-Conteúdo suficiente para executar W0 **após revisão humana H4 e autorização de
-implementação**. O percurso é AGENTS frontend → página local → brief → FD-W0 →
-gates/perfil necessários, sem reconstruir discovery. Readiness não certifica
-nenhuma funcionalidade FILE e não dispensa as decisões das waves seguintes.
-
-**STOP — não iniciar FD-W0. Aguardar revisão humana.**
+D-AIR e D-WIRE abertas, prazo W1 antes de contrato/saída.
+D-EFFECT aberta para W3/W4; D-DYNAMIC/core aberta para W7.
+D-D-AUTH e captura D reservadas a W10. Nenhuma envolve JCL/DSNAME.

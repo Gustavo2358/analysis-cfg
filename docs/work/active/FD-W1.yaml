@@ -1,6 +1,6 @@
 id: FD-W1
 title: Slice vertical estático e saída pública
-status: TODO
+status: IN_PROGRESS
 scope:
 - file-dependencies
 - air-java

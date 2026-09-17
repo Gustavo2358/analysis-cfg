@@ -16,9 +16,12 @@ A [biblioteca oficial](https://www.ibm.com/support/pages/enterprise-cobol-zos-do
 identifica essa revisão e informa que o sufixo pode permanecer igual entre
 atualizações: publication number + data, não apenas SC27-8713-03.
 [PDF oficial corrente](https://www.ibm.com/docs/en/SS6SG3_6.4.0/pdf/lrmvs.pdf).
-O download retornou HTTP 403 nesta revisão: **sha256 indisponível**, sem atribuir
-hash de outro PDF à revisão 2026. A referência H1 a 28/06/2024 foi substituída;
-não reusar sua paginação como se fosse da revisão atual. Biblioteca registra HTML
+Em H4 o download retornou HTTP 403. Em W0 foi obtido o PDF oficial e conferida
+a página de edição: Seventh edition (28 April 2026 update), SC27-8713-03.
+SHA-256: `22b5b8875041300484ac48cd16d8db6191fe4f17424cfe2f3a93392fb2aac0f6`.
+Evidência: `artefatos-e2e/file-dependencies-20260916/w0/authority.json`.
+A referência H1 a 28/06/2024 foi substituída; não reusar sua paginação como se
+fosse da revisão atual. Biblioteca registra HTML
 6.4 atualizado em 2026-06-30; essa data não substitui a revisão do PDF.
 Escolha coerente com
 `StorageLayoutSemantics.PROFILE_ID=ibm-enterprise-6.4-fixed-display-1047@1`.

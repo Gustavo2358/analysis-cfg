@@ -1,6 +1,6 @@
 id: FD-W0
 title: Declarações, conectores e record ownership no SP
-status: TODO
+status: IN_PROGRESS
 scope:
 - file-dependencies
 - proleap-poc
@@ -65,6 +65,7 @@ acceptance:
 - Declaração sem uso produz inventário, nunca leitura; writer→decoder conserva known empty versus unavailable
 - Contrato SP novo rejeita versão/formas superseded conforme política; frontend não importa lower
 evidence:
+- W0 QUALIFIED_LOCAL em 2026-09-16; pins/gates/logs no state.md e artefatos-e2e/file-dependencies-20260916/w0/HANDOFF.md; IN_PROGRESS lean até merge
 - Commit/pin exatos por fronteira; comandos/exit/results reais, testes novos vs REUSED vs NOT_RUN
 - Atualizar matriz somente com oracle/resultado; estado curto e PR persistente por repo, sem receipt obrigatório
 stop_condition: Parar após contrato declarativo SP e decoder qualificados, diff/pins/limites e registro do

@@ -1,6 +1,6 @@
 # AGENTS.md
 
-[FILE-DEPENDENCIES — FD-H0–H4 / waves futuras](docs/product/file-dependencies/README.md): preparação source-only; STOP humano antes de W0.
+[FILE-DEPENDENCIES — CORE N+C](docs/product/file-dependencies/README.md): H4 aprovado; execução W0–W9/W11 autorizada; STOP após W11; W10 não autorizado.
 
 ## Política de engenharia vigente
 

@@ -1,10 +1,8 @@
 # FILE-DEPENDENCIES — entrada da campanha
 
-Estado: **FD-H0–H4 preparados para revisão humana; FD-W0–W11 TODO, sem autorização de execução**.
-O pedido desta sessão autoriza documentação/harness, commits e Draft PRs; termina
-em H4 para revisão humana. Nenhuma capability de arquivos está qualificada aqui.
-Revisão H4 incorporada: external file name sem mecanismo externo; **N+C core**,
-D extensão posterior; W8 estático não depende de W7. W0 permanece não iniciado.
+Estado: **H4 aprovado; execução core N+C autorizada; W0 QUALIFIED_LOCAL; W1 IN_PROGRESS.**
+W0–W9/W11 avançam pelos gates sem nova autorização. W10 TODO / NOT_AUTHORIZED.
+PRs persistentes permanecem Draft e unmerged. STOP final após W11.
 
 Leia somente [brief](brief.md), [estado](state.md) e a wave atual no
 [grafo de trabalho](waves.md). O discovery bruto de 16/09/2026 é referência
@@ -22,7 +20,7 @@ histórica opcional, fora do contexto obrigatório de W0.
 | Gates e regressão de CALL | [verificação](verification.md) |
 | Casos/oráculos | [catálogo](test-catalog.md) |
 | Decisões abertas com dono e prazo | [contratos: decisões abertas](contracts.md#decisoes-abertas) |
-| Retomada/revisão humana | [estado e handoff H4](state.md) |
+| Retomada/revisão humana | [estado e checkpoint atual](state.md) |
 
 Esta pasta usa a política [Lean Harness](../../engineering/lean-harness.md):
 documentos de produto, work items mínimos no índice existente e gates existentes.
