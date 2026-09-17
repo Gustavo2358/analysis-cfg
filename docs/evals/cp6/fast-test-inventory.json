@@ -145,6 +145,10 @@
       "sortParticipantsKeepRolesAndLocalWork",
       "callProjectionAndFileAbsenceRemainSeparate",
       "outputFailurePreservesActualPreviousFile"
+    ],
+    "io.github.gustavo2358.analysis.adapters.FileLocalUseOracleTest": [
+      "opaqueAndJumpUseTheAssociationNotOperationSpelling",
+      "localBindingOnCallDoesNotReclassifyItsExternalTarget"
     ]
   },
   "analysis-dataflow": {

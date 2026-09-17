@@ -1,6 +1,6 @@
 # Estado / handoff curto — CORE N+C
 
-**H4 aprovado; W0/W1/W2/W3/W4 QUALIFIED_LOCAL; próxima W5.**
+**H4 aprovado; W0/W1/W2/W3/W4/W5 QUALIFIED_LOCAL; próxima W6.**
 Core W0–W9/W11 autorizado em 2026-09-16, sem aprovação mecânica entre waves.
 W10 TODO / NOT_AUTHORIZED. Sem merge/auto-merge/release. STOP após W11.
 Waves qualificadas permanecem IN_PROGRESS lean enquanto PRs estiverem unmerged.
@@ -12,7 +12,8 @@ Waves qualificadas permanecem IN_PROGRESS lean enquanto PRs estiverem unmerged.
 | W2 | QUALIFIED_LOCAL; sete verbos nativos e operandos/handlers estruturais |
 | W3 | QUALIFIED_LOCAL; memória regional, D-EFFECT/memória e CALL |
 | W4 | QUALIFIED_LOCAL; handlers/status/USE, retorno delimitado |
-| W5–W9, W11 | TODO; próxima W5 |
+| W5 | QUALIFIED_LOCAL; fases SORT/MERGE, SD local, wire2.1; [limites/gates](w5-implementation.md) |
+| W6–W9, W11 | TODO |
 | W10 | TODO / NOT_AUTHORIZED |
 
 ## Checkpoint W2
@@ -75,6 +76,26 @@ Retorno compartilhado usa redução AIR com bound somente dos resumes reais e ga
 de contexto, sem duplicar CALL ou efeitos. Regras/limites em D-EFFECT; logs novos
 em `.harness-results/fd-w4`. PRs persistentes continuam Draft/unmerged.
 
+## Checkpoint W5
+
+Frontend `9d4de9b252cc67dfdce1def568ee9915318bec16` (SP2.26/fileInventory1.5),
+lower `e50b5e19231e4183bc0c2184a2e14f7bdca65ae1`; AIR/IR pins W1 sem delta.
+SORT/MERGE conservam participantes/papéis e fases; procedimentos/ranges locais,
+RELEASE FROM e RETURN INTO/AT END preservam buffers e CALL. SD associa operações
+locais e não cria nome/remainder externo. Consumer FILE genérico, wire2.1 fechado,
+CALL sites/edges preservados. Retorno compartilhado tem gap contextual explícito;
+ordem/contagem de participantes não é afirmada. OUTPUT vazio recebe gap normativo.
+
+Frontend focal13 + família156/FAST336 PASS; Q-SHARED910 PASS em8fd8faad, REUSED
+para semântica compartilhada inalterada após a restrição focal de saída vazia.
+Lower12 SPs/negativos wire+memory/grafo PASS; FAST2340+adapters/Q-SHARED244296/
+39215 PASS em88572c01, produção idêntica no pin final. CFG FAST487/reader12 PASS.
+E-SELECTED final44 fontes×2: 42 na coorte + MERGE OUTPUT PROCEDURE e múltiplos
+GIVING, mesmos pins, quatro produtos determinísticos. Tentativa com fixture RETURN
+inválida preservada; corrigida segundo IBMp436, sem relaxar regra/reader.
+[Contrato/evidência](w5-implementation.md); handoff bruto local E2E `w5/`.
+Sem blocker; próxima W6 autorizada. PRs continuam Draft/unmerged.
+
 ## Retomada
 
 Worktrees exclusivos: `<workspace>/.file-dependencies/worktrees/<repo>`.
@@ -92,12 +113,12 @@ Branch persistente em todos: `feat/file-dependencies`; PRs OPEN/DRAFT/UNMERGED:
 | analysis-ir | [#7](https://github.com/Gustavo2358/analysis-ir/pull/7) |
 
 Próximo: AGENTS → página local → [brief](brief.md) →
-[FD-W5](../../work/active/FD-W5.yaml) → perfil/casos/gates necessários.
+[FD-W6](../../work/active/FD-W6.yaml) → perfil/casos/gates necessários.
 E2E local/sem remote; não executar runner CP3 nem reler discovery bruto.
 
 ## Decisões
 
 D-AIR CLOSED: prova de perda do modelo, extensão neutra mínima e A1–A4/A6 PASS.
-D-WIRE CLOSED: writer2.0, reader novo fechado, rejeição antiga e projeção CALL PASS.
+D-WIRE CLOSED: writer2.1 (sites locais SD), reader novo fechado, rejeição antiga e projeção CALL PASS.
 D-EFFECT CLOSED (memória W3 e controle W4, aproximações explícitas); D-DYNAMIC/core aberta W7. D-D-AUTH/captura D reservadas W10.
 IBM N-LR: SC27-8713-03, atualização 2026-04-28; hash/seções em [perfis](profiles.md).

@@ -25,7 +25,7 @@ lower/consumer recebem descritores/efeitos, nunca esses nomes de regras.
 | N05 Organização e modo de acesso | PLANNED / N-LR | `organizationClause/accessModeClause` → SEQUENTIAL/LINE SEQUENTIAL/INDEXED/RELATIVE e modo; Não chamar todo arquivo indexed de VSAM sem autoridade de plataforma. | T07,T10 | W0 |
 | N06 `RECORD KEY`, `ALTERNATE RECORD KEY`, `RELATIVE KEY` | PLANNED / N-LR | `recordKeyClause/alternateRecordKeyClause/relativeKeyClause` → Referências resolvidas, duplicatas e papéis; Chave não vira arquivo nem alvo executável. | T10 | W0 |
 | N07 `FILE STATUS`, status adicional | PLANNED / N-LR | `fileStatusClause` → Destinos e tipos/áreas pertinentes; Efeitos sobre status chegam ao dataflow. | T10,T18 | W0/W3/W4 |
-| N08 FD versus SD | PLANNED / N-LR | `fileDescriptionEntry` → Espécie explícita e associação a SELECT; SD/sort-work não produz nome externo ou alvo persistente inventado quando o fonte não o fornece. | T01,T23 | W0/W5 |
+| N08 FD versus SD | QUALIFIED / N-LR ([W5](w5-implementation.md)) | `fileDescriptionEntry` → Espécie explícita e associação a SELECT; SD/sort-work não produz nome externo ou alvo persistente inventado quando o fonte não o fornece. | T01,T23 | W0/W5 |
 | N09 Registros 01, vários layouts, COPY | PLANNED / N-LR | `dataDescriptionEntry` → Relação registro–conector e áreas de memória; WRITE por registro resolve o arquivo proprietário. | T04,T05,T15 | W0/W3 |
 | N10 `GLOBAL`, `EXTERNAL`, programas contidos | PLANNED / N-LR | `globalClause/externalClause` → Visibilidade e identidade semântica; Mesma grafia não é prova de compartilhamento; captures explícitos. | T46 | W0/W9 |
 | N11 `RECORD CONTAINS`, `RECORD VARYING`, DEPENDING | PLANNED / N-LR | `recordContainsClause` → Comprimentos, dependências e desconhecimento localizado; Não sobrescrever bytes fora do intervalo provado. | T17 | W0/W3 |
@@ -43,11 +43,11 @@ lower/consumer recebem descritores/efeitos, nunca esses nomes de regras.
 | N23 `REWRITE` | PLANNED / N-LR | `rewriteStatement` → **Record-name**; Resolver proprietário; FROM; atualização de registro; estado e invalid key. | T05,T14 | W2/W3 |
 | N24 `DELETE ... RECORD` | PLANNED / N-LR | `deleteStatement` → File-name; site de uso que pode sustentar programa→arquivo, inclusive quando é o único uso; operação DELETE_RECORD. Exclusão de registro, nunca remoção de dataset/DSNAME/recurso físico. | T09 | W2 |
 | N25 `START` | PLANNED / N-LR | `startStatement` → File-name; Posicionamento/chave; não equivale a leitura de conteúdo. | T08 | W2 |
-| N26 `SORT ... USING ... GIVING ...` | PLANNED / N-LR | `sortStatement` → SD + arquivos de entrada e saída; Todos os recursos e papéis, inclusive I/O implícito. | T23 | W5 |
-| N27 `SORT ... INPUT/OUTPUT PROCEDURE` | PLANNED / N-LR | `sortStatement` → SD + procedimentos locais; Invocação/retorno de procedimentos locais; não criar dependência programa–programa fictícia. | T24 | W5 |
-| N28 `MERGE ... USING ... GIVING/OUTPUT PROCEDURE` | PLANNED / N-LR | `mergeStatement` → SD + entradas/saídas; Múltiplas entradas e restrições próprias; não copiar sintaxe de SORT indiscriminadamente. | T25 | W5 |
-| N29 `RELEASE [FROM]` | PLANNED / N-LR | `releaseStatement` → Sort record; Resolver SD proprietário; semântica de transferência e memória. | T26 | W5 |
-| N30 `RETURN sort-file [INTO]` | PLANNED / N-LR | `returnStatement` → SD; Próximo registro de sort; AT END; não é GOBACK. | T27 | W5 |
+| N26 `SORT ... USING ... GIVING ...` | QUALIFIED / N-LR ([W5](w5-implementation.md)) | `sortStatement` → SD + arquivos de entrada e saída; Todos os recursos e papéis, inclusive I/O implícito. | T23 | W5 |
+| N27 `SORT ... INPUT/OUTPUT PROCEDURE` | QUALIFIED / N-LR ([W5](w5-implementation.md)) | `sortStatement` → SD + procedimentos locais; Invocação/retorno de procedimentos locais; não criar dependência programa–programa fictícia. | T24 | W5 |
+| N28 `MERGE ... USING ... GIVING/OUTPUT PROCEDURE` | QUALIFIED / N-LR ([W5](w5-implementation.md)) | `mergeStatement` → SD + entradas/saídas; Múltiplas entradas e restrições próprias; não copiar sintaxe de SORT indiscriminadamente. | T25 | W5 |
+| N29 `RELEASE [FROM]` | QUALIFIED / N-LR ([W5](w5-implementation.md)) | `releaseStatement` → Sort record; Resolver SD proprietário; semântica de transferência e memória. | T26 | W5 |
+| N30 `RETURN sort-file [INTO]` | QUALIFIED / N-LR ([W5](w5-implementation.md)) | `returnStatement` → SD; Próximo registro de sort; AT END; não é GOBACK. | T27 | W5 |
 | N31 `USE AFTER ... ERROR/EXCEPTION` | PLANNED / N-LR | `useStatement` → Arquivo/modo conforme forma; Associação handler–evento; disparo, precedência e retorno. | T21,T22 | W4 |
 | N32 `AT END`, `INVALID KEY`, formas NOT, END-* | PLANNED / N-LR | `readStatement/writeStatement` → Operação envolvente; Sucessores corretos; statements internos visitados uma única vez. | T11,T12 | W2/W4 |
 | N33 Referências em IF/EVALUATE/PERFORM/GO TO | PLANNED / N-LR | `statement/IF/EVALUATE/PERFORM/GO TO` → Sites I/O dentro desses corpos; Reutilizar controle atual; não achatar todos os acessos em execução linear. | CALL-X5 | W2/W4 |

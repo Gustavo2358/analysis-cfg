@@ -217,8 +217,11 @@ def file_dependencies(f, document):
         ref(s['owner'],'unit')
         for k, domain in (('entry','entry'),('sequence','label'),('operation','operation')):
             ref(s[k],domain); require(s[k]['unit']==s['owner']['localId'], 'FILE site owner')
-        for k in ('action','namespace'):text(s[k]); require(bool(s[k]),'FILE site text')
-        require(s['targetKind'] in ('LITERAL','COMPUTED'), 'FILE target kind')
+        text(s['action']); require(bool(s['action']),'FILE action')
+        local = s['targetKind'] == 'LOCAL' and document['version'] == '2.1.0'
+        if local: require(s['namespace'] is None, 'local use has no external namespace')
+        else: text(s['namespace']); require(bool(s['namespace']), 'FILE namespace')
+        require(local or s['targetKind'] in ('LITERAL','COMPUTED'), 'FILE target kind')
         require(s['reachability'] in ('REACHABLE','UNREACHABLE_IN_MODEL','UNKNOWN'), 'FILE reachability')
         boolean(s['unknownRemainder']); reasons(s['analysisReasons'])
         for k in ('effects','control'):require(s[k] in ('EXACT','CONSERVATIVE','OPEN','UNAVAILABLE','NOT_APPLICABLE'), 'FILE precision')
@@ -229,7 +232,10 @@ def file_dependencies(f, document):
             fields(b,'declaration role origin'); ref(b['declaration'],'resource'); origin(b['origin']); text(b['role']); require(bool(b['role']), 'binding role')
             require(b['declaration'] in declarations, 'unresolved FILE declaration')
         ordered(s['bindings'],lambda b:(u16(b['declaration']['localId']),u16(b['role'])))
-        if s['targetKind']=='LITERAL':require(s['valuePoint'] is None, 'literal does not query values')
+        if local:
+            require(s['action']=='resource-use' and s['valuePoint'] is None and not s['candidates'] and not s['unknownRemainder'], 'local use is not an unknown external target')
+            require(any(b['declaration']==d['id'] and d['targetKind']=='LOCAL' for b in s['bindings'] for d in f['declarations']), 'local use needs local declaration')
+        elif s['targetKind']=='LITERAL':require(s['valuePoint'] is None, 'literal does not query values')
         else:
             require(s['valuePoint']==dict(position='BEFORE',entryId=s['entry'],operationId=s['operation'],outcome=None), 'FILE query point')
             require(s['unknownRemainder'] and not s['candidates'] and 'FILE_VALUES_NOT_YET_ANALYZED' in s['analysisReasons'], 'W1 computed value remains open')
@@ -241,7 +247,7 @@ def file_dependencies(f, document):
         ordered(s['candidates'],lambda c:(u16(c['referenceName']),u16(c['rawValue'])))
         require(len(s['candidates'])<=1,'W1 literal cardinality')
         if s['reachability']=='UNREACHABLE_IN_MODEL':require(not s['candidates'],'unreachable FILE candidates')
-        elif not s['unknownRemainder']:require(bool(s['candidates']),'empty closed FILE target')
+        elif not local and not s['unknownRemainder']:require(bool(s['candidates']),'empty closed FILE target')
     ordered(f['sites'],lambda s:(u16(s['entry']['unit']),u16(s['entry']['localId']),u16(s['operation']['localId'])))
     expected=[dict(owner=s['owner'],entry=s['entry'],site=s['operation'],candidate=c,openSite=s['unknownRemainder'])
               for s in f['sites'] if s['reachability']!='UNREACHABLE_IN_MODEL' for c in s['candidates']]
@@ -251,10 +257,10 @@ def file_dependencies(f, document):
 
 
 def validate(d):
-    files = d.get('version') == '2.0.0'
+    files = d.get('version') in ('2.0.0','2.1.0')
     extended = files or d.get('version') == '1.2.0'
     fields(d, 'schema version airVersion publication interpretationProfile valuesProfile modelScope publicationInventory sites edges metrics origins artifacts sourceUncertaintyRefs' + (' analysisStatus analysisReasons' if extended else '') + (' analysisBoundary fileDependencies' if files else ''))
-    require(d['schema'] == 'analysis-dependency-result' and d['version'] in ('1.1.0', '1.2.0', '2.0.0') and d['airVersion'] == '2.0.0', 'schema/version')
+    require(d['schema'] == 'analysis-dependency-result' and d['version'] in ('1.1.0', '1.2.0', '2.0.0', '2.1.0') and d['airVersion'] == '2.0.0', 'schema/version')
     identity(d['publication'], 'publication')
     require(d['interpretationProfile'] == 'per-site' and d['valuesProfile'] == 'scalar-text-effects@1' and d['modelScope'] in (('KNOWN_GRAPH_ENTRY', 'STRUCTURAL_AIR_OCCURRENCES') if extended else ('KNOWN_GRAPH_ENTRY',)), 'profiles/scope')
     require(d['publicationInventory'] in ('COMPLETE', 'PARTIAL', 'UNAVAILABLE'), 'inventory')

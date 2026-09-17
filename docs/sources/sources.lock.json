@@ -264,11 +264,13 @@
       "src/main/java/io/github/gustavo2358/cobolexplorer/FileIoEffects.java",
       "src/main/java/io/github/gustavo2358/cobolexplorer/FileStorageGroups.java",
       "src/main/java/io/github/gustavo2358/cobolexplorer/FileIoControl.java",
-      "src/test/java/io/github/gustavo2358/cobolexplorer/FileControlContractTest.java"
+      "src/test/java/io/github/gustavo2358/cobolexplorer/FileControlContractTest.java",
+      "src/main/java/io/github/gustavo2358/cobolexplorer/FileSortControl.java",
+      "src/test/java/io/github/gustavo2358/cobolexplorer/FileSortContractTest.java"
     ],
-    "semantic_product_version": "2.25.0",
+    "semantic_product_version": "2.26.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "1c21f21750aa3572e39fce71ccc156a357699d81",
+    "commit": "9d4de9b252cc67dfdce1def568ee9915318bec16",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -286,12 +288,13 @@
     "fd_w1_validation": "docs/work/active/FD-W1.yaml",
     "fd_w2_validation": "QUALIFIED_LOCAL: producer focal + fixed FAST; 14 real CLI fixtures twice; SP/AIR/CFG/dependency deterministic; file-dependencies/w2-implementation.md",
     "fd_w3_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED, B-SP memory effects, manual O1-O5 and 20 real CLI sources twice; file-dependencies/w3-implementation.md",
-    "fd_w4_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED producers, manual outcomes/USE and 28 real CLI sources twice; file-dependencies/w4-implementation.md"
+    "fd_w4_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED producers, manual outcomes/USE and 28 real CLI sources twice; file-dependencies/w4-implementation.md",
+    "fd_w5_validation": "QUALIFIED_LOCAL: focal/FAST, producer Q-SHARED with bounded final reuse, manual local AIR/wire and44 real CLI sources twice; file-dependencies/w5-implementation.md"
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
-    "status": "FD-W4 conditional handlers/USE, bounded context approximation, producer gates PASS",
-    "commit": "9f80a1ff4f25f23d8ff2088a638f5e0f4dcf1ffc",
+    "status": "FD-W5 SORT phases/local SD, bounded procedure returns, focal/FAST/Q-SHARED PASS",
+    "commit": "e50b5e19231e4183bc0c2184a2e14f7bdca65ae1",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -310,7 +313,8 @@
     "fd_w1_validation": "docs/work/active/FD-W1.yaml",
     "fd_w2_validation": "QUALIFIED_LOCAL: producer focal + fixed FAST; 14 real CLI fixtures twice; SP/AIR/CFG/dependency deterministic; file-dependencies/w2-implementation.md",
     "fd_w3_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED, B-SP memory effects, manual O1-O5 and 20 real CLI sources twice; file-dependencies/w3-implementation.md",
-    "fd_w4_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED producers, manual outcomes/USE and 28 real CLI sources twice; file-dependencies/w4-implementation.md"
+    "fd_w4_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED producers, manual outcomes/USE and 28 real CLI sources twice; file-dependencies/w4-implementation.md",
+    "fd_w5_validation": "QUALIFIED_LOCAL: focal/FAST, producer Q-SHARED with bounded final reuse, manual local AIR/wire and44 real CLI sources twice; file-dependencies/w5-implementation.md"
   },
   "external": [
     {

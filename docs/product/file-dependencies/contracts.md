@@ -155,3 +155,20 @@ sites/candidates CALL. Nenhum leitor adicional de dependency identificado no sit
 Testes devem verificar projeção CALL, rejeição antiga, fields/refs FILE, duas
 execuções determinísticas e falha de saída. Reader/negativos e coorte CLI selecionada passaram; FAST final/checkpoint
 registrados no estado da campanha. [Contrato executado](w1-implementation.md).
+
+
+## Checkpoint W5 — extensão aditiva do wire
+
+D-AIR permanece fechado no pin W1: usos SD locais associam operações gerais via
+ResourceDeclaration.uses; LocalResource continua somente declarativo. Não há
+ResourceUse executável local nem nome externo desconhecido inventado.
+
+D-WIRE estende o writer para **2.1.0**, com variante de site FILE `LOCAL`:
+action=resource-use, namespace/valuePoint=null, candidates=[], unknownRemainder=false.
+É obrigatório um vínculo com declaração LOCAL; roles/origins identificam participação,
+sem inferir ação executável pelo role ou observedKind. Não há edge externa para esse
+site. Uma interação FILE externa associada também a SD mantém seu site literal/
+computado e os vínculos de ambos. CALL conserva sua projeção sites/edges, inclusive
+quando sua operação possui vínculo nominal SD. Reader2.0 continua fechado e rejeita
+LOCAL; reader2.1 retém os ramos antigos sem relaxamento. Oráculos AIR manuais,
+codec/consumer e negativos wire cobrem a variante; histórico W1 permanece válido.

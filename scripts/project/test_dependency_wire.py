@@ -45,7 +45,7 @@ class PartialDependencyWireTests(unittest.TestCase):
         folder=ROOT/'analysis-adapters/target/ep-w4'
         for name in ('unsupported-values','unsupported-control'):
             d=read(folder/(name+'.json'))
-            self.assertEqual('2.0.0',d['version']);self.assertEqual('PARTIAL',d['analysisStatus'])
+            self.assertEqual('2.1.0',d['version']);self.assertEqual('PARTIAL',d['analysisStatus'])
             direct=next(s for s in d['sites'] if s['operation']['localId']=='direct')
             self.assertEqual(['DIRECT'],[c['referenceName'] for c in direct['candidates']])
             if name=='unsupported-values':
@@ -78,7 +78,7 @@ class FileDependencyWireTests(unittest.TestCase):
         old=runpy.run_path(str(ROOT/'scripts/project/fixtures/dependency_wire_v1.py'))['validate']
         for case in ('A1','A2','A3','A4','A6'):
             d=read(ROOT/('analysis-adapters/target/fd-w1/'+case+'.json'))
-            self.assertEqual('2.0.0',d['version'])
+            self.assertEqual('2.1.0',d['version'])
             self.assertEqual('COBOL_SOURCE_ONLY',d['analysisBoundary'])
             with self.assertRaises(ValueError):old(d)
         d=read(ROOT/'analysis-adapters/target/fd-w1/A1.json')['fileDependencies']
@@ -116,6 +116,26 @@ class FileDependencyWireTests(unittest.TestCase):
         for change in mutations:
             bad=copy.deepcopy(d);change(bad)
             with self.assertRaises((ValueError,KeyError,TypeError)):validate(bad)
+    def test_local_sd_is_not_unknown_external_name_and_is_closed_in_v21(self):
+        source=read(ROOT/'analysis-adapters/target/fd-w5/manual/local-true.json')
+        self.assertEqual('2.1.0',source['version'])
+        site=source['fileDependencies']['sites'][0]
+        self.assertEqual('LOCAL',site['targetKind']);self.assertIsNone(site['namespace'])
+        self.assertEqual([],site['candidates']);self.assertFalse(site['unknownRemainder'])
+        mutations=[
+            lambda d:d.__setitem__('version','2.0.0'),
+            lambda d:d['fileDependencies']['sites'][0].__setitem__('namespace','cobol.external-file-name'),
+            lambda d:d['fileDependencies']['sites'][0].__setitem__('unknownRemainder',True),
+            lambda d:d['fileDependencies']['sites'][0].__setitem__('bindings',[]),
+            lambda d:d['fileDependencies']['sites'][0].__setitem__('action','release'),
+            lambda d:d['fileDependencies']['sites'][0].__setitem__('targetKind','COMPUTED'),
+        ]
+        for mutate in mutations:
+            d=copy.deepcopy(source);mutate(d)
+            with self.assertRaises((ValueError,KeyError,TypeError)):validate(d)
+        # The old variant still admits its own vocabulary.
+        historical=read(ROOT/'analysis-adapters/target/fd-w1/A6.json');historical['version']='2.0.0';validate(historical)
+
     def test_unknown_computed_cannot_be_closed(self):
         d=read(ROOT/'analysis-adapters/target/fd-w1/A4.json')
         self.assertTrue(d['fileDependencies']['sites'][0]['unknownRemainder'])

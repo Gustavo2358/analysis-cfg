@@ -1,6 +1,6 @@
 id: FD-W5
 title: SORT/MERGE/RELEASE/RETURN e I/O implícito
-status: TODO
+status: IN_PROGRESS
 scope:
 - file-dependencies
 - proleap-poc
@@ -66,3 +66,11 @@ depends_on:
 - FD-W0
 - FD-W3
 - FD-W4
+
+checkpoint:
+  technical_status: QUALIFIED_LOCAL
+  producer_pins: frontend9d4de9b252cc67dfdce1def568ee9915318bec16 / lower e50b5e19231e4183bc0c2184a2e14f7bdca65ae1
+  validation: focal/B-SP/B-AIR/FAST/reader PASS; Q-SHARED producer implementation PASS with final localized reuse; E-SELECTED44 sources twice PASS
+  limitations: bounded shared procedure return; no total participant order/count; no normative AIR delta
+  next: FD-W6
+  detail: ../../product/file-dependencies/w5-implementation.md

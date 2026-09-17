@@ -19,8 +19,8 @@ EXPECTED={
  'eop':(['write'],['PAGEPGM','NOTPAGE','AFTER']),
  'escape-use':(['read'],['USEFILE','BETWEEN','AFTER']),
 }
-def oracle(name,sp,air,result,source):
-    require((sp['contractVersion'],sp['fileInventory']['version'])==CONTRACT,'SP dispatch contract')
+def oracle(name,sp,air,result,source,*,contract=CONTRACT):
+    require((sp['contractVersion'],sp['fileInventory']['version'])==contract,'SP dispatch contract')
     actions,calls=EXPECTED[name];files=result['fileDependencies']
     require(len(files['declarations'])==1 and files['declarations'][0]['name']=='INDD','terminal source file identity')
     require(sorted(s['action'] for s in files['sites'])==sorted(actions),'native/handler/USE file uses once')
