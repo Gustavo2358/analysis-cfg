@@ -127,3 +127,11 @@ EOF QUALIFIED; LINAGE/contadores completos continuam W6. O1–O5 + dois AIRs de
 controle manual PASS; E-SELECTED28 fontes×2 PASS. Retorno compartilhado tem
 sobreaproximação de contexto declarada; modo corrente não inferido lexicalmente.
 GLOBAL ancestral/captures W9. W10 permanece PLANNED/NOT_AUTHORIZED.
+
+## Checkpoint dimensional W7
+
+A4/T37 em AIR manual QUALIFIED: timing BEFORE, literal, conjunto fechado,
+parcial+remainder, unknown, ciclos, aliases/refmod, supports e sharing CALL/FILE.
+B-AIR/reader2.2, FAST e Q-SHARED PASS; [pins/gates](w7-implementation.md).
+C01–C07 continuam PLANNED até W8 integrar o catálogo C-FC desde o fonte. Não se
+promove parser/profile CICS por teste manual; ASSIGN DYNAMIC/N04 segue W10.

@@ -32,6 +32,23 @@ def runtime(producer):
     return os.pathsep.join([str(ROOT / m / 'target/classes') for m in modules] + [str(p) for p in air] + [cp])
 
 
+def locked_sp(sp):
+    version=json.loads((ROOT/'docs/sources/sources.lock.json').read_text())['proleap_poc']['semantic_product_version']
+    require(sp['contractVersion']==version, 'exact current locked SP contract')
+
+
+def open_call_model(invoke, site):
+    # Independent AIR law: an all-control remainder may revisit BEFORE this CALL
+    # after its all-memory may-write. Literal targets do not query that memory.
+    require(invoke['outcomes']['remainder']['kind']=='within' and
+            invoke['outcomes']['remainder']['scope']['kind']=='all', 'source CALL control bound')
+    effect=invoke['effectBound']['otherwise']
+    require(effect['writes']['kind']=='within' and effect['writes']['scope']['kind']=='all'
+            and not effect['mustOverwrite'], 'source CALL conservative write bound')
+    expected=invoke['target']['kind']=='computed'
+    require(site['modelValueRemainder'] is expected, 'open source CALL memory; literal independent')
+
+
 def source_spans(result, support, source):
     origins = {o['id']['localId']: o for o in result['origins']}
     artifacts = {a['id']['localId']: a['logicalName'] for a in result['artifacts']}
@@ -86,7 +103,7 @@ def dependency_oracle(result, air, source, opened):
     require(site['operation'] == invoke['header']['id'] and site['sequence'] == call['label'] and site['offset'] == 0, 'join Invoke identity')
     require(site['valuePoint']['position'] == 'BEFORE' and site['valuePoint']['operationId'] == site['operation'], 'BEFORE Invoke observation')
     require(site['targetKind'] == 'COMPUTED' and site['reachability'] == 'REACHABLE', 'reachable dynamic CALL')
-    require(site['modelValueRemainder'] is opened, 'natural model remainder')
+    open_call_model(invoke,site)
     # These are independent existing source/name-policy dimensions, not inferred from model closure.
     require(site['sourceValueRemainder'] and site['interpretationUnknownRemainder'] and site['effectiveUnknownRemainder'], 'preserve source/interpretation/effective remainders')
     require(site['openControlRemainder'], 'preserve real source open control')

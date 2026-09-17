@@ -1,6 +1,6 @@
 # FILE-DEPENDENCIES — entrada da campanha
 
-Estado: **H4 aprovado; execução core N+C autorizada; W0/W1/W2/W3/W4/W5 QUALIFIED_LOCAL; próxima W6.**
+Estado: **H4 aprovado; execução core N+C autorizada; W0–W7 QUALIFIED_LOCAL; próxima W8.**
 W0–W9/W11 avançam pelos gates sem nova autorização. W10 TODO / NOT_AUTHORIZED.
 PRs persistentes permanecem Draft e unmerged. STOP final após W11.
 

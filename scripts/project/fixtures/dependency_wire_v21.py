@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Independent strict parser/oracle for analysis-dependency-result 1.1 through 2.2."""
+"""Independent strict parser/oracle for analysis-dependency-result 1.1.0/1.2.0/2.0.0."""
 import argparse
 import json
 import re
@@ -179,8 +179,7 @@ def reasons(values):
 
 def file_dependencies(f, document):
     fields(f, 'valuesProfile declarationInventory declarations sites edges metrics')
-    computed_profile = document['version']=='2.2.0'
-    require(f['valuesProfile'] == ('file-values@1' if computed_profile else 'file-literal@1'), 'FILE values profile')
+    require(f['valuesProfile'] == 'file-literal@1', 'FILE values profile')
     require(f['declarationInventory'] in ('COMPLETE','PARTIAL','UNAVAILABLE'), 'FILE inventory')
     publication = document['publication']['localId']
     origins = [o['id'] for o in document['origins']]
@@ -219,7 +218,7 @@ def file_dependencies(f, document):
         for k, domain in (('entry','entry'),('sequence','label'),('operation','operation')):
             ref(s[k],domain); require(s[k]['unit']==s['owner']['localId'], 'FILE site owner')
         text(s['action']); require(bool(s['action']),'FILE action')
-        local = s['targetKind'] == 'LOCAL' and document['version'] in ('2.1.0','2.2.0')
+        local = s['targetKind'] == 'LOCAL' and document['version'] == '2.1.0'
         if local: require(s['namespace'] is None, 'local use has no external namespace')
         else: text(s['namespace']); require(bool(s['namespace']), 'FILE namespace')
         require(local or s['targetKind'] in ('LITERAL','COMPUTED'), 'FILE target kind')
@@ -239,25 +238,14 @@ def file_dependencies(f, document):
         elif s['targetKind']=='LITERAL':require(s['valuePoint'] is None, 'literal does not query values')
         else:
             require(s['valuePoint']==dict(position='BEFORE',entryId=s['entry'],operationId=s['operation'],outcome=None), 'FILE query point')
-            if not computed_profile:require(s['unknownRemainder'] and not s['candidates'] and 'FILE_VALUES_NOT_YET_ANALYZED' in s['analysisReasons'], 'W1 computed value remains open')
+            require(s['unknownRemainder'] and not s['candidates'] and 'FILE_VALUES_NOT_YET_ANALYZED' in s['analysisReasons'], 'W1 computed value remains open')
         for c in array(s['candidates']):
             fields(c,'referenceName rawValue supports');text(c['referenceName']);text(c['rawValue'])
-            require(bool(c['referenceName']), 'empty FILE name')
-            if computed_profile and s['namespace']=='cics.file':
-                require(c['referenceName']==c['rawValue'].rstrip(' '), 'FILE unauthorized name transformation')
-                require(1<=len(c['rawValue'])<=8 and 1<=len(c['referenceName'])<=8 and all(x in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$@#' for x in c['referenceName']), 'CICS filename alphabet and length')
-            else:require(c['referenceName']==c['rawValue'], 'FILE exact name transformed')
-            if s['targetKind']=='LITERAL':
-                require(not s['unknownRemainder'], 'literal interpretation closed')
-                require(c['supports']==[dict(kind='FILE_LITERAL',producer=s['operation'],origin=s['targetOrigin'],premises=[])], 'FILE literal support')
-            else:
-                require(computed_profile and s['namespace']=='cics.file' and len(c['rawValue'])==8, 'computed CICS name area')
-                require(bool(array(c['supports'])), 'computed candidate needs support')
-                for support in c['supports']:
-                    fields(support,'kind producer origin premises');require(support['kind']=='VALUE_PRODUCER', 'computed FILE support')
-                    identity(support['producer'],'operation operand');require(support['producer']['publication']==publication,'foreign producer');origin(support['origin']);refs(support['premises'],'premise')
+            require(c['referenceName']==c['rawValue'] and bool(c['referenceName']), 'FILE exact name transformed')
+            require(s['targetKind']=='LITERAL' and not s['unknownRemainder'], 'W1 literal evidence')
+            require(c['supports']==[dict(kind='FILE_LITERAL',producer=s['operation'],origin=s['targetOrigin'],premises=[])], 'FILE literal support')
         ordered(s['candidates'],lambda c:(u16(c['referenceName']),u16(c['rawValue'])))
-        if s['targetKind']=='LITERAL' or not computed_profile:require(len(s['candidates'])<=1,'literal cardinality')
+        require(len(s['candidates'])<=1,'W1 literal cardinality')
         if s['reachability']=='UNREACHABLE_IN_MODEL':require(not s['candidates'],'unreachable FILE candidates')
         elif not local and not s['unknownRemainder']:require(bool(s['candidates']),'empty closed FILE target')
     ordered(f['sites'],lambda s:(u16(s['entry']['unit']),u16(s['entry']['localId']),u16(s['operation']['localId'])))
@@ -269,10 +257,10 @@ def file_dependencies(f, document):
 
 
 def validate(d):
-    files = d.get('version') in ('2.0.0','2.1.0','2.2.0')
+    files = d.get('version') in ('2.0.0','2.1.0')
     extended = files or d.get('version') == '1.2.0'
     fields(d, 'schema version airVersion publication interpretationProfile valuesProfile modelScope publicationInventory sites edges metrics origins artifacts sourceUncertaintyRefs' + (' analysisStatus analysisReasons' if extended else '') + (' analysisBoundary fileDependencies' if files else ''))
-    require(d['schema'] == 'analysis-dependency-result' and d['version'] in ('1.1.0', '1.2.0', '2.0.0', '2.1.0', '2.2.0') and d['airVersion'] == '2.0.0', 'schema/version')
+    require(d['schema'] == 'analysis-dependency-result' and d['version'] in ('1.1.0', '1.2.0', '2.0.0', '2.1.0') and d['airVersion'] == '2.0.0', 'schema/version')
     identity(d['publication'], 'publication')
     require(d['interpretationProfile'] == 'per-site' and d['valuesProfile'] == 'scalar-text-effects@1' and d['modelScope'] in (('KNOWN_GRAPH_ENTRY', 'STRUCTURAL_AIR_OCCURRENCES') if extended else ('KNOWN_GRAPH_ENTRY',)), 'profiles/scope')
     require(d['publicationInventory'] in ('COMPLETE', 'PARTIAL', 'UNAVAILABLE'), 'inventory')

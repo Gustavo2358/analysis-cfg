@@ -149,6 +149,20 @@
     "io.github.gustavo2358.analysis.adapters.FileLocalUseOracleTest": [
       "opaqueAndJumpUseTheAssociationNotOperationSpelling",
       "localBindingOnCallDoesNotReclassifyItsExternalTarget"
+    ],
+    "io.github.gustavo2358.analysis.adapters.FileComputedOracleTest": [
+      "firstAndSecondCommandsObserveDifferentValuesAndShareOneProvider",
+      "joinsDistinguishClosedPartialAndUnknown",
+      "cyclesRetainFiniteCandidatesWithoutCutoff",
+      "aliasAndPhysicalRefmodUseTheSameStorageFacts",
+      "targetIsObservedBeforeOverlappingForeignWrites",
+      "literalDoesNotRunValuesAndUsesFilePolicy",
+      "invalidPolicySpellingAndShortAreaRemainOpen",
+      "physicalCallAndFileReuseTheSameGeneralAnalysisRun",
+      "literalCannotBorrowCallPolicyOrRunValues"
+    ],
+    "io.github.gustavo2358.analysis.adapters.FileCheckpointOracleTest": [
+      "optionalLoopPreservesExactValueUnlessWritesAreActuallyAllowed"
     ]
   },
   "analysis-dataflow": {

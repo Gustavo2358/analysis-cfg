@@ -1,6 +1,6 @@
 # Estado / handoff curto — CORE N+C
 
-**H4 aprovado; W0–W6 QUALIFIED_LOCAL; próxima W7.**
+**H4 aprovado; W0–W7 QUALIFIED_LOCAL; próxima W8.**
 Core W0–W9/W11 autorizado em 2026-09-16, sem aprovação mecânica entre waves.
 W10 TODO / NOT_AUTHORIZED. Sem merge/auto-merge/release. STOP após W11.
 Waves qualificadas permanecem IN_PROGRESS lean enquanto PRs estiverem unmerged.
@@ -14,7 +14,8 @@ Waves qualificadas permanecem IN_PROGRESS lean enquanto PRs estiverem unmerged.
 | W4 | QUALIFIED_LOCAL; handlers/status/USE, retorno delimitado |
 | W5 | QUALIFIED_LOCAL; fases SORT/MERGE, SD local, wire2.1; [limites/gates](w5-implementation.md) |
 | W6 | QUALIFIED_LOCAL; auxiliares N-LR/checkpoint/SAME, [gates/limites](w6-implementation.md) |
-| W7–W9, W11 | TODO |
+| W7 | QUALIFIED_LOCAL; CICS FILE computed no motor geral, [gates/limites](w7-implementation.md) |
+| W8–W9, W11 | TODO |
 | W10 | TODO / NOT_AUTHORIZED |
 
 ## Checkpoint W2
@@ -114,6 +115,21 @@ CFG FAST487, AIR manual15, reader12 e E-SELECTED33 fontes×2 PASS, quatro produt
 determinísticos. Tentativas/oracle corrigido registrados em [W6](w6-implementation.md).
 Sem blocker. Próxima W7: D-DYNAMIC/core e possible-values CICS no ponto do comando.
 
+## Checkpoint W7
+
+Somente CFG produtivo; upstream/pins W6 acima inalterados. CICS FILE literal ou
+computado consulta BEFORE; política cics-ts.file@1/IBM1047, quatro estados,
+joins/ciclos/alias/refmod e supports próprios. Reutiliza StorageValuesProvider;
+CALL+FILE compartilham execução quando a key coincide, literal não demanda values.
+D-DYNAMIC/core fechado; wire2.2/file-values@1, CALL sites/edges preservados.
+
+AIR manual9 testes/18 casos, C-VALUES17, reader15, FAST497 e qualification-local
+(suíte542 + gates semânticos/escala/integração/E2E) PASS. Manual CLI10×2 e fontes
+nativas33×2 determinísticos PASS. Falhas de harness/oracles antigos reproduzidas e
+corrigidas com contraprovas; produção CALL/solver/providers inalterada.
+[Decisões/evidência/limites](w7-implementation.md); SHA no handoff E2E `w7/`.
+Fonte→CICS FILE continua W8; W9/W11 pendentes. W10 NOT_AUTHORIZED. Sem blocker.
+
 ## Retomada
 
 Worktrees exclusivos: `<workspace>/.file-dependencies/worktrees/<repo>`.
@@ -131,12 +147,12 @@ Branch persistente em todos: `feat/file-dependencies`; PRs OPEN/DRAFT/UNMERGED:
 | analysis-ir | [#7](https://github.com/Gustavo2358/analysis-ir/pull/7) |
 
 Próximo: AGENTS → página local → [brief](brief.md) →
-[FD-W7](../../work/active/FD-W7.yaml) → perfil/casos/gates necessários.
+[FD-W8](../../work/active/FD-W8.yaml) → perfil/casos/gates necessários.
 E2E local/sem remote; não executar runner CP3 nem reler discovery bruto.
 
 ## Decisões
 
 D-AIR CLOSED: prova de perda do modelo, extensão neutra mínima e A1–A4/A6 PASS.
-D-WIRE CLOSED: writer2.1 (sites locais SD), reader novo fechado, rejeição antiga e projeção CALL PASS.
-D-EFFECT CLOSED (memória W3 e controle W4, aproximações explícitas); D-DYNAMIC/core aberta W7. D-D-AUTH/captura D reservadas W10.
+D-WIRE CLOSED: writer2.2/file-values@1, reader fechado, rejeição antiga e projeção CALL PASS.
+D-EFFECT CLOSED (memória W3 e controle W4, aproximações explícitas); D-DYNAMIC/core CLOSED W7; consulta BEFORE e política CICS FILE própria. D-D-AUTH/captura D reservadas W10.
 IBM N-LR: SC27-8713-03, atualização 2026-04-28; hash/seções em [perfis](profiles.md).

@@ -10,29 +10,29 @@ import sys
 
 from dependency_wire import read, require
 from cfg_wire_contract import verify as verify_cfg_wire
-from e2e_w2d import execute, runtime
+from e2e_w2d import locked_sp, open_call_model, execute, runtime
 from prepare_w2d_producers import ROOT, git, require_local
 
 FIXTURES = ROOT / 'analysis-adapters/src/test/resources/cp6/partial-program'
-# Hand-written point oracles. True means that a value can survive an interfering write.
+# Hand-written known candidates; computed CALL remainders follow the explicit AIR bounds.
 EXPECTED = {
-    'display-handler': [({'BEFORE'}, False), ({'AFTER'}, False)],
-    'control-body': [({'AFTER'}, False), ({'INNER'}, False)],
-    'p1': [({'PROGA'}, False)],
-    'p2': [({'PROGA'}, False), ({'PROGB'}, False)],
-    'p3': [({'PROGA'}, True)],
-    'p4': [({'PROGA'}, False)],
-    'must-write': [(set(), True)],
-    'read': [({'PROGA'}, True)],
-    'call-using': [({'PROGA'}, False)],
-    'call-returning': [({'PROGA'}, False)],
-    'perform-distinct': [({'PROGA'}, False), ({'PROGB'}, False)],
-    'perform-repeated': [({'PROGA'}, False), ({'PROGA'}, False)],
-    'if-arm': [({'PROGA', 'PROGB'}, True)],
-    'if-nested': [({'PROGA', 'PROGB', 'PROGC'}, False)],
-    'mixed-data': [({'PROGA'}, False), ({'PROGB'}, False)],
-    'entry-using': [({'PROGA'}, False)],
-    'stress': [({'PROGA'}, False)] * 20,
+    'display-handler': [{'BEFORE'}, {'AFTER'}],
+    'control-body': [{'AFTER'}, {'INNER'}],
+    'p1': [{'PROGA'}],
+    'p2': [{'PROGA'}, {'PROGB'}],
+    'p3': [{'PROGA'}],
+    'p4': [{'PROGA'}],
+    'must-write': [set()],
+    'read': [{'PROGA'}],
+    'call-using': [{'PROGA'}],
+    'call-returning': [{'PROGA'}],
+    'perform-distinct': [{'PROGA'}, {'PROGB'}],
+    'perform-repeated': [{'PROGA'}, {'PROGA'}],
+    'if-arm': [{'PROGA', 'PROGB'}],
+    'if-nested': [{'PROGA', 'PROGB', 'PROGC'}],
+    'mixed-data': [{'PROGA'}, {'PROGB'}],
+    'entry-using': [{'PROGA'}],
+    'stress': [{'PROGA'}] * 20,
 }
 
 
@@ -41,7 +41,7 @@ def source_calls(sp):
 
 
 def oracle(name, sp, air, result):
-    require(sp['contractVersion'] in ('1.8.0','1.9.0','2.0.0','2.1.0','2.2.0', '2.3.0', '2.4.0', '2.5.0', '2.6.0', '2.7.0','2.8.0'), 'current SP1.8')
+    locked_sp(sp)
     p = air['publication']; unit = p['units'][0]
     operations = {op['header']['id']['localId']: op for seq in unit['sequences'] for op in seq['instructions'] + [seq['terminator']]}
     links = {}
@@ -58,10 +58,11 @@ def oracle(name, sp, air, result):
         require(site['reachability'] == 'REACHABLE', 'known or conservatively reachable site')
     if name in EXPECTED:
         require(len(sites) == len(EXPECTED[name]), 'independent source site count')
-        for site, (values, opened) in zip(sites, EXPECTED[name]):
+        for site, values in zip(sites, EXPECTED[name]):
             actual = {c['referenceName'] for c in site['candidates']}
             require(actual == values, name + ': expected ' + repr(values) + ', got ' + repr(actual))
-            require(site['modelValueRemainder'] is opened, name + ': localized model remainder')
+            invoke=operations[site['operation']['localId']]
+            open_call_model(invoke,site)
     if name in ('p5', 'if-unknown'):
         require({c['referenceName'] for c in sites[0]['candidates']} == {'PROGA'}, 'literal before control frontier survives')
         require(sites[0]['modelValueRemainder'] is False, 'earlier value remains precise')

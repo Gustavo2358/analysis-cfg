@@ -172,3 +172,19 @@ computado e os vínculos de ambos. CALL conserva sua projeção sites/edges, inc
 quando sua operação possui vínculo nominal SD. Reader2.0 continua fechado e rejeita
 LOCAL; reader2.1 retém os ramos antigos sem relaxamento. Oráculos AIR manuais,
 codec/consumer e negativos wire cobrem a variante; histórico W1 permanece válido.
+
+## Checkpoint W7 — consulta CICS FILE e wire2.2
+
+D-DYNAMIC/core CLOSED: [autoridade e oráculos](w7-implementation.md). Consulta
+BEFORE Invoke e efeitos, em área física8bytes IBM1047, usando provider geral e
+supports por candidato; literal zero-values. Política `cics-ts.file@1` distinta
+de CALL: alfabeto C-FC e retirada somente de espaços finais, preservando raw.
+Conjunto fechado, parcial+remainder e desconhecido são distintos. Nenhuma captura
+ASSIGN DYNAMIC foi implementada; D-D-AUTH/captura permanecem W10.
+
+D-WIRE writer **2.2.0**, FILE `valuesProfile=file-values@1`: computed pode publicar
+múltiplos candidatos com supports VALUE_PRODUCER e ponto BEFORE obrigatório.
+Literal conserva FILE_LITERAL; LOCAL/declarações e projeção CALL mantêm shape.
+Reader2.1 congelado rejeita2.2; reader atual fecha todas as variantes, exige nomes,
+supports/origins/refs e conserva os ramos históricos. Nenhum writer legado novo.
+A4/T37 manual, codec/CLI/reader e sharing PASS; transporte CICS fonte fica W8.

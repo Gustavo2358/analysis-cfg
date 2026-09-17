@@ -10,7 +10,9 @@ import static io.github.gustavo2358.analysis.structure.StructuralFixtures.*;
 /** Real BuildCfg and product index; independent arithmetic oracles, never elapsed-time admission. */
 class ScaleTest {
     static AnalysisSession probe(String probe,int sequences,int instructions,int objects,int entries,int selected) throws Exception {
-        var p=linear(sequences,instructions,objects,entries); var b=build(p); var baseline=RetentionWalk.walk(p,b.graph().orElseThrow());
+        var p=linear(sequences,instructions,objects,entries); var b=build(p);
+        // The policy is an explicit input retained by reference, just like publication and graph.
+        var baseline=RetentionWalk.walk(p,b.graph().orElseThrow(),ProjectionPolicy.KNOWN_SUBSET);
         long start=System.nanoTime();
         var a=AnalysisSession.open(b,p,ProjectionPolicy.KNOWN_SUBSET,p.units().getFirst().entries().subList(0,selected));
         long elapsed=System.nanoTime()-start;
@@ -67,5 +69,15 @@ class ScaleTest {
         for(var row:expected.entrySet()) assertEquals(row.getValue().intValue(),map.get(row.getKey()));
         assertEquals(-1,map.get(Long.MAX_VALUE));
         assertEquals(0,map.put(0,99)); assertEquals(99,map.get(0));
+    }
+    @Test void retentionOracleCountsCopiedAirButNotSuppliedPolicy() throws Exception {
+        var p=linear(1,1,1,1); var b=build(p); var policy=ProjectionPolicy.KNOWN_SUBSET;
+        var baseline=RetentionWalk.walk(p,b.graph().orElseThrow(),policy);
+        var original=p.units().getFirst().sequences().getFirst();
+        var copy=new Sequence(original.label(),original.instructions(),original.terminator(),original.origin());
+        assertNotSame(original,copy);
+        assertTrue(RetentionWalk.additional(List.of(p,b.graph().orElseThrow(),policy),baseline).keySet()
+                .stream().noneMatch(k->k.startsWith("io.github.gustavo2358.")));
+        assertEquals(1L,RetentionWalk.additional(List.of(copy,policy),baseline).get(Sequence.class.getName()));
     }
 }

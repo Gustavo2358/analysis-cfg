@@ -30,7 +30,7 @@ EXPECTED={
 }
 def oracle(name,sp,air,result,source,*,contract=CONTRACT):
     require((sp['contractVersion'],sp['fileInventory']['version'])==contract,'current phase contract')
-    require(result['version']=='2.1.0','explicit local-site wire version')
+    require(result['version'] in ('2.1.0','2.2.0'),'explicit local-site wire version')
     names,roles,calls,count=EXPECTED[name];files=result['fileDependencies']
     local=[s for s in files['sites'] if s['targetKind']=='LOCAL'];external=[s for s in files['sites'] if s['targetKind']!='LOCAL']
     require(len(files['sites'])==len(names)+len(roles),'all implicit/local uses, no Cartesian product')

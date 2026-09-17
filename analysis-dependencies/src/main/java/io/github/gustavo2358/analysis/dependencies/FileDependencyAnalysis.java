@@ -8,6 +8,7 @@ import io.github.gustavo2358.analysis.plan.*;
 import io.github.gustavo2358.analysis.query.*;
 import io.github.gustavo2358.analysis.structure.AnalysisSession;
 import java.util.*;
+import io.github.gustavo2358.analysis.values.StorageValuesProvider;
 import static io.github.gustavo2358.analysis.dependencies.FileDependencyResult.*;
 
 /** FILE orchestration over the existing shared session and providers. No source access. */
@@ -31,19 +32,29 @@ final class FileDependencyAnalysis {
         var retained=new HashMap<Key,Site>();var metrics=new TreeMap<String,Long>();
         if(session!=null&&execution!=null){
             var registrations=new ArrayList<ConsumerRegistration<Site>>();
+            var computed=new HashSet<OperationId>();
+            for(var indexed:session.index().sites(Operations.Invoke.class))if(FileDependencyConsumer.externalFile((Operations.Invoke)indexed.operation())&&FileValueQuery.selected((Operations.Invoke)indexed.operation(),session))computed.add(indexed.operation().header().id());
             var kinds=new HashMap<UnitId,Set<Class<? extends Operation>>>();
             for(var indexed:session.index().sites(Operations.Invoke.class))if(FileDependencyConsumer.selected(indexed.operation(),locals))kinds.computeIfAbsent(indexed.owner().id(),k->new HashSet<>()).add(Operations.Invoke.class);
             for(var id:locals){var indexed=session.index().site(id);if(indexed!=null)kinds.computeIfAbsent(indexed.owner().id(),k->new HashSet<>()).add(indexed.operation().getClass());}
             for(var context:session.contexts()){
                 var entry=context.entry().id();if(!kinds.containsKey(entry.unit()))continue;
                 String key=part(entry.unit().localId())+part(entry.localId());var batch=ReachabilityProvider.batch("file-reach:"+key,entry);
-                var interests=kinds.get(entry.unit()).stream().sorted(Comparator.comparing(Class::getName)).map(kind->new SiteInterest(kind,entry,s->FileDependencyConsumer.selected(s.operation(),locals),List.of(new SiteInterest.SiteQuery<>(batch,FileDependencyConsumer::query)))).toList();
-                registrations.add(new ConsumerRegistration<>(new ConsumerPlan("file:"+key,List.of(batch.analysisKey()),List.of(batch.id())),interests,List.of(),new FileDependencyConsumer(bindings,batch)));
+                var values=StorageValuesProvider.batch("file-values:"+key,StorageValuesProvider.key(entry));
+                for(var kind:kinds.get(entry.unit()).stream().sorted(Comparator.comparing(Class::getName)).toList())for(boolean dynamic:List.of(false,true)) {
+                    if(dynamic&&(kind!=Operations.Invoke.class||computed.stream().noneMatch(id->id.unit().equals(entry.unit()))))continue;
+                    var queries=new ArrayList<SiteInterest.SiteQuery<?,?>>();queries.add(new SiteInterest.SiteQuery<>(batch,FileDependencyConsumer::query));
+                    if(dynamic)queries.add(new SiteInterest.SiteQuery<>(values,FileValueQuery::query));
+                    var interest=new SiteInterest(kind,entry,s->FileDependencyConsumer.selected(s.operation(),locals)&&computed.contains(s.operationId())==dynamic,queries);
+                    registrations.add(new ConsumerRegistration<>(new ConsumerPlan("file:"+key+":"+kind.getSimpleName()+":"+dynamic,dynamic?List.of(batch.analysisKey(),values.analysisKey()):List.of(batch.analysisKey()),dynamic?List.of(batch.id(),values.id()):List.of(batch.id())),List.of(interest),List.of(),new FileDependencyConsumer(bindings,batch,dynamic?values:null)));
+                }
             }
             var result=execution.execute("file-dependencies@1",execution.plan(registrations));
             for(var outcome:result.analyses())if(outcome.status()==AnalysisOutcome.Status.INVALID_INPUT)throw new DependencyAnalysis.Failure(DependencyAnalysis.Kind.INVALID_INPUT,outcome.reason());
             result.consumers().stream().flatMap(c->c.facts().stream()).forEach(s->retained.put(new Key(s.entry(),s.operation()),s));
             result.metrics().forEach((phase,counts)->counts.forEach((key,value)->metrics.put(phase+"."+key,value)));
+            metrics.put("possibleValuesPreparations",result.analyses().stream().filter(a->a.key().implementation().equals(StorageValuesProvider.IMPLEMENTATION)).count());
+            metrics.put("possibleValuesStable",result.analyses().stream().filter(a->a.key().implementation().equals(StorageValuesProvider.IMPLEMENTATION)&&a.status()==AnalysisOutcome.Status.STABLE).count());
         }
         for(var unit:p.units())for(var entry:unit.entries())for(var sequence:unit.sequences()) {
             var operations=new ArrayList<Operation>(sequence.instructions());operations.add(sequence.terminator());
@@ -53,6 +64,7 @@ final class FileDependencyAnalysis {
                 retained.computeIfAbsent(new Key(entry.id(),operation.header().id()),key->FileDependencyConsumer.site(view,bindings,Optional.empty(),List.of(unavailable==null?"FILE_REACHABILITY_UNAVAILABLE":unavailable)));
             }
         }
+        metrics.putIfAbsent("possibleValuesPreparations",0L);metrics.putIfAbsent("possibleValuesStable",0L);
         var sites=retained.values().stream().sorted(Comparator.comparing(Site::entry,AnalysisKey.ENTRY_ORDER).thenComparing(s->s.operation().localId())).toList();
         var edges=new ArrayList<Edge>();for(var site:sites)if(site.reachability()!=Reachability.UNREACHABLE_IN_MODEL)for(var c:site.candidates())edges.add(new Edge(site.owner(),site.entry(),site.operation(),c,site.unknownRemainder()));
         return new FileDependencyResult(p.capabilities().required().contains(Capabilities.RESOURCE_BINDINGS)?p.coverage().inventory():Evidence.InventoryStatus.UNAVAILABLE,declarations,sites,edges,metrics);
