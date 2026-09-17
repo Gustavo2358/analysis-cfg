@@ -85,7 +85,7 @@ def candidate(c, raw=False, technology="COBOL"):
     fields(c, 'rawValue supports' if raw else 'referenceName rawValue supports')
     text(c['rawValue']); supports(c['supports']); require(bool(c['supports']), 'candidate without support')
     if not raw:
-        text(c['referenceName']); require(re.fullmatch(r'[A-Z0-9$@#]{1,8}' if technology=='CICS' else r'[A-Z_][A-Z0-9_@#$]{0,7}', c['referenceName']) is not None, 'noncanonical reference')
+        text(c['referenceName']); require(re.fullmatch(r'[A-Z0-9$@#]{1,8}' if technology=='CICS' else r'[A-Z_$][A-Z0-9_@#$]{0,7}', c['referenceName']) is not None, 'noncanonical reference')
 
 
 def location(loc):

@@ -1,0 +1,10 @@
+{
+  "id": "WORK-EP-R2",
+  "title": "EP-R2 \u2014 Order-Independent Entry & Factorized Recall",
+  "status": "IN_PROGRESS",
+  "scope": [
+    "analysis-cfg: entry admission, regional values domain, dependency product, focused qualification"
+  ],
+  "notes": "Technical acceptance complete: ENTRY SEMANTICS, FACTORIZED VALUES DOMAIN, R2-REV-F1 DEPTH, LEADING-$ CAPABILITY and SYNTHETIC PRODUCT QUALIFIED; CORPORATE IDENTIFIER SANITIZATION PASS. Reviewed head 113a78c7ed03c9bff72d5363ade46474ed3537e7 on base 194fac2af6cfc54053318164275e682feac5c750: FAST LOCAL PASS (515 Java plus Python/architecture), FAST CI #265 PASS; profile cobol-zos-dynamic-call-minimal@1. Final human/product review APPROVED, 2026-09-17. REAL CASE: PASS \u2014 confidential manual rerun; expected set 9, recovered expected programs 9/9, missing 0. Authority: product-owner attestation, separate from synthetic/CI qualification. Corporate artifacts intentionally not retained or versioned; independent repository reproduction unavailable. Documentation-only closeout; merge is the remaining lifecycle transition after exact-head checks. No auto-merge. PR merged plus required technical tests passed establishes DONE.",
+  "pr": 39
+}

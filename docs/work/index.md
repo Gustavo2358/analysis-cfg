@@ -1,6 +1,8 @@
 # Trabalho
 
-[FILE-DEPENDENCIES — core N+C](../product/file-dependencies/README.md): W0–W8 QUALIFIED_LOCAL; próxima W9; STOP final W11, W10 não autorizado, sem merge.
+[FILE-DEPENDENCIES — core N+C](../product/file-dependencies/README.md): W0–W9/W11 QUALIFIED_LOCAL antes de EP-R2; checkpoint de reconciliação pós-main em execução; W10 não autorizado, PR #38 sem merge.
+
+[EP-R2 — Order-Independent Entry & Factorized Recall](ep-r2-handoff.md): aprovado e integrado em main pelo merge 6ef181d; semântica preservada como requisito da reconciliação File Dependencies.
 
 [WORK-STORAGE-W6-W8](WORK-STORAGE-W6-W8.json): W6/W7 G2 and W8 G3 qualified; IN_PROGRESS pending human review/merge. Extends the accepted W0–W5 work item without reopening it.
 

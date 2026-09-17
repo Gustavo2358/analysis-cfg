@@ -17,6 +17,13 @@ Preserve branches dedicadas, escopo, mudanças alheias e isolamento entre reposi
 Não faça merge/auto-merge sem autorização.
 
 
+Enquanto não houver baseline de produção, corrija bugs semânticos de contratos/profiles
+in-place; não versione comportamento nunca publicado. Ver a
+[política pré-release](docs/architecture/extensibility.md#política-de-versionamento-pré-release).
+
+Real/corporate incident identifiers must never be versioned; use synthetic fixtures
+and keep confidential evidence local. See [the harness rule](docs/engineering/lean-harness.md#confidential-incident-data).
+
 ## Propósito e fronteira
 
 Construir um consumidor Java da Analysis IR que publique CFGs rastreáveis,

@@ -1,0 +1,2168 @@
+[
+  {
+    "case": "F-order-False-False",
+    "analysisStatus": "FIELD_ABSENT",
+    "analysisReasons": [],
+    "siteCount": 4,
+    "sites": [
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-0",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [
+          {
+            "rawValue": "PROG0000",
+            "referenceName": "PROG0000",
+            "supports": [
+              {
+                "kind": "VALUE_PRODUCER",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "origin",
+                  "publication": "ep-lab-01"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operand",
+                  "localId": "place-0",
+                  "owner": {
+                    "domain": "entry",
+                    "localId": "entry",
+                    "publication": "ep-lab-01",
+                    "unit": "unit"
+                  },
+                  "publication": "ep-lab-01",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": null,
+        "analysisReasons": null,
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-0",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-0",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      },
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-1",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [
+          {
+            "rawValue": "PROG0000",
+            "referenceName": "PROG0000",
+            "supports": [
+              {
+                "kind": "VALUE_PRODUCER",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "origin",
+                  "publication": "ep-lab-01"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operand",
+                  "localId": "place-0",
+                  "owner": {
+                    "domain": "entry",
+                    "localId": "entry",
+                    "publication": "ep-lab-01",
+                    "unit": "unit"
+                  },
+                  "publication": "ep-lab-01",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": null,
+        "analysisReasons": null,
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-1",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-0",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      },
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-2",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [
+          {
+            "rawValue": "PROG0000",
+            "referenceName": "PROG0000",
+            "supports": [
+              {
+                "kind": "VALUE_PRODUCER",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "origin",
+                  "publication": "ep-lab-01"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operand",
+                  "localId": "place-0",
+                  "owner": {
+                    "domain": "entry",
+                    "localId": "entry",
+                    "publication": "ep-lab-01",
+                    "unit": "unit"
+                  },
+                  "publication": "ep-lab-01",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": null,
+        "analysisReasons": null,
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-2",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-0",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      },
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-3",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [
+          {
+            "rawValue": "PROG0000",
+            "referenceName": "PROG0000",
+            "supports": [
+              {
+                "kind": "VALUE_PRODUCER",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "origin",
+                  "publication": "ep-lab-01"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operand",
+                  "localId": "place-0",
+                  "owner": {
+                    "domain": "entry",
+                    "localId": "entry",
+                    "publication": "ep-lab-01",
+                    "unit": "unit"
+                  },
+                  "publication": "ep-lab-01",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": null,
+        "analysisReasons": null,
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-3",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-0",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      }
+    ],
+    "dependencyMs": 58.435124
+  },
+  {
+    "case": "F-order-False-True",
+    "analysisStatus": "PARTIAL",
+    "analysisReasons": [
+      "DEPENDENCY_PREPARATION_INCOMPLETE",
+      "OVERLAPPING_INITIAL_CONDITIONS"
+    ],
+    "siteCount": 4,
+    "sites": [
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-0",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": "PARTIAL",
+        "analysisReasons": [
+          "OVERLAPPING_INITIAL_CONDITIONS"
+        ],
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-0",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-0",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      },
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-1",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": "PARTIAL",
+        "analysisReasons": [
+          "OVERLAPPING_INITIAL_CONDITIONS"
+        ],
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-1",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-0",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      },
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-2",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": "PARTIAL",
+        "analysisReasons": [
+          "OVERLAPPING_INITIAL_CONDITIONS"
+        ],
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-2",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-0",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      },
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-3",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": "PARTIAL",
+        "analysisReasons": [
+          "OVERLAPPING_INITIAL_CONDITIONS"
+        ],
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-3",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-0",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      }
+    ],
+    "dependencyMs": 38.845454
+  },
+  {
+    "case": "F1-open",
+    "analysisStatus": "PARTIAL",
+    "analysisReasons": [
+      "DEPENDENCY_PREPARATION_INCOMPLETE",
+      "OVERLAPPING_INITIAL_CONDITIONS"
+    ],
+    "siteCount": 4,
+    "sites": [
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-0",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": "PARTIAL",
+        "analysisReasons": [
+          "OVERLAPPING_INITIAL_CONDITIONS"
+        ],
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-0",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-0",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      },
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-1",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": "PARTIAL",
+        "analysisReasons": [
+          "OVERLAPPING_INITIAL_CONDITIONS"
+        ],
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-1",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-0",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      },
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-2",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": "PARTIAL",
+        "analysisReasons": [
+          "OVERLAPPING_INITIAL_CONDITIONS"
+        ],
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-2",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-0",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      },
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-3",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": "PARTIAL",
+        "analysisReasons": [
+          "OVERLAPPING_INITIAL_CONDITIONS"
+        ],
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-3",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-0",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      }
+    ],
+    "dependencyMs": 37.308036
+  },
+  {
+    "case": "H2-recall-loss-open",
+    "analysisStatus": "PARTIAL",
+    "analysisReasons": [
+      "DEPENDENCY_PREPARATION_INCOMPLETE",
+      "OVERLAPPING_INITIAL_CONDITIONS"
+    ],
+    "siteCount": 4,
+    "sites": [
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-0",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": "PARTIAL",
+        "analysisReasons": [
+          "OVERLAPPING_INITIAL_CONDITIONS"
+        ],
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-0",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-2",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      },
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-1",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": "PARTIAL",
+        "analysisReasons": [
+          "OVERLAPPING_INITIAL_CONDITIONS"
+        ],
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-1",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-2",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      },
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-2",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": "PARTIAL",
+        "analysisReasons": [
+          "OVERLAPPING_INITIAL_CONDITIONS"
+        ],
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-2",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-2",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      },
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-3",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": "PARTIAL",
+        "analysisReasons": [
+          "OVERLAPPING_INITIAL_CONDITIONS"
+        ],
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-3",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-2",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      }
+    ],
+    "dependencyMs": 39.095407
+  },
+  {
+    "case": "V2-E1-scaled-diamonds",
+    "analysisStatus": "FIELD_ABSENT",
+    "analysisReasons": [],
+    "siteCount": 4,
+    "sites": [
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-0",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [
+          {
+            "rawValue": "PROG0000",
+            "referenceName": "PROG0000",
+            "supports": [
+              {
+                "kind": "VALUE_PRODUCER",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "origin",
+                  "publication": "ep-lab-01"
+                },
+                "premises": [
+                  {
+                    "domain": "premise",
+                    "localId": "separation",
+                    "publication": "ep-lab-01"
+                  }
+                ],
+                "producer": {
+                  "domain": "operand",
+                  "localId": "place-0",
+                  "owner": {
+                    "domain": "entry",
+                    "localId": "entry",
+                    "publication": "ep-lab-01",
+                    "unit": "unit"
+                  },
+                  "publication": "ep-lab-01",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": null,
+        "analysisReasons": null,
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-0",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-0",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      },
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-1",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [
+          {
+            "rawValue": "PROG0000",
+            "referenceName": "PROG0000",
+            "supports": [
+              {
+                "kind": "VALUE_PRODUCER",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "origin",
+                  "publication": "ep-lab-01"
+                },
+                "premises": [
+                  {
+                    "domain": "premise",
+                    "localId": "separation",
+                    "publication": "ep-lab-01"
+                  }
+                ],
+                "producer": {
+                  "domain": "operand",
+                  "localId": "place-0",
+                  "owner": {
+                    "domain": "entry",
+                    "localId": "entry",
+                    "publication": "ep-lab-01",
+                    "unit": "unit"
+                  },
+                  "publication": "ep-lab-01",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": null,
+        "analysisReasons": null,
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-1",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-1",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      },
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-2",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [
+          {
+            "rawValue": "PROG0000",
+            "referenceName": "PROG0000",
+            "supports": [
+              {
+                "kind": "VALUE_PRODUCER",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "origin",
+                  "publication": "ep-lab-01"
+                },
+                "premises": [
+                  {
+                    "domain": "premise",
+                    "localId": "separation",
+                    "publication": "ep-lab-01"
+                  }
+                ],
+                "producer": {
+                  "domain": "operand",
+                  "localId": "place-0",
+                  "owner": {
+                    "domain": "entry",
+                    "localId": "entry",
+                    "publication": "ep-lab-01",
+                    "unit": "unit"
+                  },
+                  "publication": "ep-lab-01",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": null,
+        "analysisReasons": null,
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-2",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-2",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      },
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-3",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [
+          {
+            "rawValue": "PROG0000",
+            "referenceName": "PROG0000",
+            "supports": [
+              {
+                "kind": "VALUE_PRODUCER",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "origin",
+                  "publication": "ep-lab-01"
+                },
+                "premises": [
+                  {
+                    "domain": "premise",
+                    "localId": "separation",
+                    "publication": "ep-lab-01"
+                  }
+                ],
+                "producer": {
+                  "domain": "operand",
+                  "localId": "place-0",
+                  "owner": {
+                    "domain": "entry",
+                    "localId": "entry",
+                    "publication": "ep-lab-01",
+                    "unit": "unit"
+                  },
+                  "publication": "ep-lab-01",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": null,
+        "analysisReasons": null,
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-3",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-3",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      }
+    ],
+    "dependencyMs": 107.725562
+  },
+  {
+    "case": "V2-G-p1-private",
+    "analysisStatus": "FIELD_ABSENT",
+    "analysisReasons": [],
+    "siteCount": 4,
+    "sites": [
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-0",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [
+          {
+            "rawValue": "PROG0000",
+            "referenceName": "PROG0000",
+            "supports": [
+              {
+                "kind": "VALUE_PRODUCER",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "origin",
+                  "publication": "ep-lab-01"
+                },
+                "premises": [
+                  {
+                    "domain": "premise",
+                    "localId": "separation",
+                    "publication": "ep-lab-01"
+                  }
+                ],
+                "producer": {
+                  "domain": "operand",
+                  "localId": "place-0",
+                  "owner": {
+                    "domain": "entry",
+                    "localId": "entry",
+                    "publication": "ep-lab-01",
+                    "unit": "unit"
+                  },
+                  "publication": "ep-lab-01",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": null,
+        "analysisReasons": null,
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-0",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-0",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      },
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-1",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [
+          {
+            "rawValue": "PROG0000",
+            "referenceName": "PROG0000",
+            "supports": [
+              {
+                "kind": "VALUE_PRODUCER",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "origin",
+                  "publication": "ep-lab-01"
+                },
+                "premises": [
+                  {
+                    "domain": "premise",
+                    "localId": "separation",
+                    "publication": "ep-lab-01"
+                  }
+                ],
+                "producer": {
+                  "domain": "operand",
+                  "localId": "place-0",
+                  "owner": {
+                    "domain": "entry",
+                    "localId": "entry",
+                    "publication": "ep-lab-01",
+                    "unit": "unit"
+                  },
+                  "publication": "ep-lab-01",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": null,
+        "analysisReasons": null,
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-1",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-0",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      },
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-2",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [
+          {
+            "rawValue": "PROG0000",
+            "referenceName": "PROG0000",
+            "supports": [
+              {
+                "kind": "VALUE_PRODUCER",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "origin",
+                  "publication": "ep-lab-01"
+                },
+                "premises": [
+                  {
+                    "domain": "premise",
+                    "localId": "separation",
+                    "publication": "ep-lab-01"
+                  }
+                ],
+                "producer": {
+                  "domain": "operand",
+                  "localId": "place-0",
+                  "owner": {
+                    "domain": "entry",
+                    "localId": "entry",
+                    "publication": "ep-lab-01",
+                    "unit": "unit"
+                  },
+                  "publication": "ep-lab-01",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": null,
+        "analysisReasons": null,
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-2",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-0",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      },
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-3",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [
+          {
+            "rawValue": "PROG0000",
+            "referenceName": "PROG0000",
+            "supports": [
+              {
+                "kind": "VALUE_PRODUCER",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "origin",
+                  "publication": "ep-lab-01"
+                },
+                "premises": [
+                  {
+                    "domain": "premise",
+                    "localId": "separation",
+                    "publication": "ep-lab-01"
+                  }
+                ],
+                "producer": {
+                  "domain": "operand",
+                  "localId": "place-0",
+                  "owner": {
+                    "domain": "entry",
+                    "localId": "entry",
+                    "publication": "ep-lab-01",
+                    "unit": "unit"
+                  },
+                  "publication": "ep-lab-01",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": null,
+        "analysisReasons": null,
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-3",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-0",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      }
+    ],
+    "dependencyMs": 59.942828
+  },
+  {
+    "case": "V2-G-p2-private",
+    "analysisStatus": "FIELD_ABSENT",
+    "analysisReasons": [],
+    "siteCount": 4,
+    "sites": [
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-0",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [
+          {
+            "rawValue": "PROG0000",
+            "referenceName": "PROG0000",
+            "supports": [
+              {
+                "kind": "VALUE_PRODUCER",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "origin",
+                  "publication": "ep-lab-01"
+                },
+                "premises": [
+                  {
+                    "domain": "premise",
+                    "localId": "separation",
+                    "publication": "ep-lab-01"
+                  }
+                ],
+                "producer": {
+                  "domain": "operand",
+                  "localId": "place-0",
+                  "owner": {
+                    "domain": "entry",
+                    "localId": "entry",
+                    "publication": "ep-lab-01",
+                    "unit": "unit"
+                  },
+                  "publication": "ep-lab-01",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": null,
+        "analysisReasons": null,
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-0",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-0",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      },
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-1",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [
+          {
+            "rawValue": "PROG0000",
+            "referenceName": "PROG0000",
+            "supports": [
+              {
+                "kind": "VALUE_PRODUCER",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "origin",
+                  "publication": "ep-lab-01"
+                },
+                "premises": [
+                  {
+                    "domain": "premise",
+                    "localId": "separation",
+                    "publication": "ep-lab-01"
+                  }
+                ],
+                "producer": {
+                  "domain": "operand",
+                  "localId": "place-0",
+                  "owner": {
+                    "domain": "entry",
+                    "localId": "entry",
+                    "publication": "ep-lab-01",
+                    "unit": "unit"
+                  },
+                  "publication": "ep-lab-01",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": null,
+        "analysisReasons": null,
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-1",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-1",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      },
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-2",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [
+          {
+            "rawValue": "PROG0000",
+            "referenceName": "PROG0000",
+            "supports": [
+              {
+                "kind": "VALUE_PRODUCER",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "origin",
+                  "publication": "ep-lab-01"
+                },
+                "premises": [
+                  {
+                    "domain": "premise",
+                    "localId": "separation",
+                    "publication": "ep-lab-01"
+                  }
+                ],
+                "producer": {
+                  "domain": "operand",
+                  "localId": "place-0",
+                  "owner": {
+                    "domain": "entry",
+                    "localId": "entry",
+                    "publication": "ep-lab-01",
+                    "unit": "unit"
+                  },
+                  "publication": "ep-lab-01",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": null,
+        "analysisReasons": null,
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-2",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-0",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      },
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-3",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [
+          {
+            "rawValue": "PROG0000",
+            "referenceName": "PROG0000",
+            "supports": [
+              {
+                "kind": "VALUE_PRODUCER",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "origin",
+                  "publication": "ep-lab-01"
+                },
+                "premises": [
+                  {
+                    "domain": "premise",
+                    "localId": "separation",
+                    "publication": "ep-lab-01"
+                  }
+                ],
+                "producer": {
+                  "domain": "operand",
+                  "localId": "place-0",
+                  "owner": {
+                    "domain": "entry",
+                    "localId": "entry",
+                    "publication": "ep-lab-01",
+                    "unit": "unit"
+                  },
+                  "publication": "ep-lab-01",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": null,
+        "analysisReasons": null,
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-3",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-1",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      }
+    ],
+    "dependencyMs": 68.428639
+  },
+  {
+    "case": "V2-G-p4-private",
+    "analysisStatus": "FIELD_ABSENT",
+    "analysisReasons": [],
+    "siteCount": 4,
+    "sites": [
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-0",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [
+          {
+            "rawValue": "PROG0000",
+            "referenceName": "PROG0000",
+            "supports": [
+              {
+                "kind": "VALUE_PRODUCER",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "origin",
+                  "publication": "ep-lab-01"
+                },
+                "premises": [
+                  {
+                    "domain": "premise",
+                    "localId": "separation",
+                    "publication": "ep-lab-01"
+                  }
+                ],
+                "producer": {
+                  "domain": "operand",
+                  "localId": "place-0",
+                  "owner": {
+                    "domain": "entry",
+                    "localId": "entry",
+                    "publication": "ep-lab-01",
+                    "unit": "unit"
+                  },
+                  "publication": "ep-lab-01",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": null,
+        "analysisReasons": null,
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-0",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-0",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      },
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-1",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [
+          {
+            "rawValue": "PROG0000",
+            "referenceName": "PROG0000",
+            "supports": [
+              {
+                "kind": "VALUE_PRODUCER",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "origin",
+                  "publication": "ep-lab-01"
+                },
+                "premises": [
+                  {
+                    "domain": "premise",
+                    "localId": "separation",
+                    "publication": "ep-lab-01"
+                  }
+                ],
+                "producer": {
+                  "domain": "operand",
+                  "localId": "place-0",
+                  "owner": {
+                    "domain": "entry",
+                    "localId": "entry",
+                    "publication": "ep-lab-01",
+                    "unit": "unit"
+                  },
+                  "publication": "ep-lab-01",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": null,
+        "analysisReasons": null,
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-1",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-1",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      },
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-2",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [
+          {
+            "rawValue": "PROG0000",
+            "referenceName": "PROG0000",
+            "supports": [
+              {
+                "kind": "VALUE_PRODUCER",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "origin",
+                  "publication": "ep-lab-01"
+                },
+                "premises": [
+                  {
+                    "domain": "premise",
+                    "localId": "separation",
+                    "publication": "ep-lab-01"
+                  }
+                ],
+                "producer": {
+                  "domain": "operand",
+                  "localId": "place-0",
+                  "owner": {
+                    "domain": "entry",
+                    "localId": "entry",
+                    "publication": "ep-lab-01",
+                    "unit": "unit"
+                  },
+                  "publication": "ep-lab-01",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": null,
+        "analysisReasons": null,
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-2",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-2",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      },
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-3",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [
+          {
+            "rawValue": "PROG0000",
+            "referenceName": "PROG0000",
+            "supports": [
+              {
+                "kind": "VALUE_PRODUCER",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "origin",
+                  "publication": "ep-lab-01"
+                },
+                "premises": [
+                  {
+                    "domain": "premise",
+                    "localId": "separation",
+                    "publication": "ep-lab-01"
+                  }
+                ],
+                "producer": {
+                  "domain": "operand",
+                  "localId": "place-0",
+                  "owner": {
+                    "domain": "entry",
+                    "localId": "entry",
+                    "publication": "ep-lab-01",
+                    "unit": "unit"
+                  },
+                  "publication": "ep-lab-01",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": null,
+        "analysisReasons": null,
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-3",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-3",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      }
+    ],
+    "dependencyMs": 64.449582
+  },
+  {
+    "case": "V2-G-p7-private",
+    "analysisStatus": "FIELD_ABSENT",
+    "analysisReasons": [],
+    "siteCount": 4,
+    "sites": [
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-0",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [
+          {
+            "rawValue": "PROG0000",
+            "referenceName": "PROG0000",
+            "supports": [
+              {
+                "kind": "VALUE_PRODUCER",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "origin",
+                  "publication": "ep-lab-01"
+                },
+                "premises": [
+                  {
+                    "domain": "premise",
+                    "localId": "separation",
+                    "publication": "ep-lab-01"
+                  }
+                ],
+                "producer": {
+                  "domain": "operand",
+                  "localId": "place-0",
+                  "owner": {
+                    "domain": "entry",
+                    "localId": "entry",
+                    "publication": "ep-lab-01",
+                    "unit": "unit"
+                  },
+                  "publication": "ep-lab-01",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": null,
+        "analysisReasons": null,
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-0",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-0",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      },
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-1",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [
+          {
+            "rawValue": "PROG0000",
+            "referenceName": "PROG0000",
+            "supports": [
+              {
+                "kind": "VALUE_PRODUCER",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "origin",
+                  "publication": "ep-lab-01"
+                },
+                "premises": [
+                  {
+                    "domain": "premise",
+                    "localId": "separation",
+                    "publication": "ep-lab-01"
+                  }
+                ],
+                "producer": {
+                  "domain": "operand",
+                  "localId": "place-0",
+                  "owner": {
+                    "domain": "entry",
+                    "localId": "entry",
+                    "publication": "ep-lab-01",
+                    "unit": "unit"
+                  },
+                  "publication": "ep-lab-01",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": null,
+        "analysisReasons": null,
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-1",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-1",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      },
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-2",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [
+          {
+            "rawValue": "PROG0000",
+            "referenceName": "PROG0000",
+            "supports": [
+              {
+                "kind": "VALUE_PRODUCER",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "origin",
+                  "publication": "ep-lab-01"
+                },
+                "premises": [
+                  {
+                    "domain": "premise",
+                    "localId": "separation",
+                    "publication": "ep-lab-01"
+                  }
+                ],
+                "producer": {
+                  "domain": "operand",
+                  "localId": "place-0",
+                  "owner": {
+                    "domain": "entry",
+                    "localId": "entry",
+                    "publication": "ep-lab-01",
+                    "unit": "unit"
+                  },
+                  "publication": "ep-lab-01",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": null,
+        "analysisReasons": null,
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-2",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-2",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      },
+      {
+        "operation": {
+          "domain": "operation",
+          "localId": "call-3",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "candidates": [
+          {
+            "rawValue": "PROG0000",
+            "referenceName": "PROG0000",
+            "supports": [
+              {
+                "kind": "VALUE_PRODUCER",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "origin",
+                  "publication": "ep-lab-01"
+                },
+                "premises": [
+                  {
+                    "domain": "premise",
+                    "localId": "separation",
+                    "publication": "ep-lab-01"
+                  }
+                ],
+                "producer": {
+                  "domain": "operand",
+                  "localId": "place-0",
+                  "owner": {
+                    "domain": "entry",
+                    "localId": "entry",
+                    "publication": "ep-lab-01",
+                    "unit": "unit"
+                  },
+                  "publication": "ep-lab-01",
+                  "unit": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "effectiveUnknownRemainder": true,
+        "analysisStatus": null,
+        "analysisReasons": null,
+        "valuePoint": {
+          "entryId": {
+            "domain": "entry",
+            "localId": "entry",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "operationId": {
+            "domain": "operation",
+            "localId": "call-3",
+            "publication": "ep-lab-01",
+            "unit": "unit"
+          },
+          "outcome": null,
+          "position": "BEFORE"
+        },
+        "subject": {
+          "domain": "object",
+          "localId": "object-3",
+          "publication": "ep-lab-01",
+          "unit": "unit"
+        },
+        "reachability": "REACHABLE"
+      }
+    ],
+    "dependencyMs": 84.644871
+  }
+]

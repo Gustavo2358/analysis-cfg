@@ -26,11 +26,11 @@ MUTANTS = [
     ('unknown-clear', VALUES / 'PossibleValuesState.java',
      'store(cell,value(cell,w).withOpen(w),w)', 'store(cell,Candidates.UNKNOWN,w)',
      'ValuesTest'),
-    ('may-kill', REGIONAL, 'if(keep)next.addAll(current);',
-     'if(false)next.addAll(current);', 'EvidencePreservingPolicyTest'),
+    ('may-kill', REGIONAL, 'return weakUnion(current,replace(current,captured,plan,logicalInputs));',
+     'return replace(current,captured,plan,logicalInputs);', 'EvidencePreservingPolicyTest'),
     ('unproved-alias-kill', REGIONAL,
-     'if(!plan.target.sourceApplicable())current=weak(current,captured,plan,true,logicalInputs);',
-     'if(!plan.target.sourceApplicable())current=weak(current,captured,plan,false,logicalInputs);',
+     'if(!plan.target.sourceApplicable())current=weak(current,captured,plan,logicalInputs);',
+     'if(!plan.target.sourceApplicable())current=replace(current,captured,plan,logicalInputs);',
      'EvidencePreservingPolicyTest'),
     ('query-reseed', REGIONAL,
      'subject.apply(query.subject())),state));}',
@@ -63,22 +63,23 @@ def main():
         module = 'analysis-adapters' if oracle == 'EvidenceMonotonicityTest' else 'analysis-values'
         command = ['mvn', '-o', '-B', '-ntp', f'-Dmaven.repo.local={args.maven_repo}',
                    '-pl', module, '-am',
-                   f'-Dtest=CfgPreflightTest,KillAuthorityTest,ValuesTest,RegionalAnalysisTest,NameInterpreterTest,{oracle}', 'test']
+                   f'-Dtest=CfgPreflightTest,StorageRangeTest,ValuesTest,RegionalAnalysisTest,NameInterpreterTest,{oracle}', 'test']
         if oracle not in baseline_oracles:
             with (args.evidence_dir / (oracle + '-baseline.log')).open('x') as log:
                 baseline = subprocess.run(command, cwd=ROOT, stdout=log, stderr=subprocess.STDOUT)
             if baseline.returncode != 0:
                 raise RuntimeError(f'{oracle}: unmutated baseline failed; no mutation is qualified')
             baseline_oracles.add(oracle)
+        oracle_class = oracle.split('#')[0]
         reports = ROOT / module / 'target/surefire-reports'
-        for report in reports.glob(f'TEST-*.{oracle}.xml'):
+        for report in reports.glob(f'TEST-*.{oracle_class}.xml'):
             report.unlink()
         try:
             path.write_text(changed)
             with (args.evidence_dir / (name + '.log')).open('x') as log:
                 run = subprocess.run(command, cwd=ROOT, stdout=log, stderr=subprocess.STDOUT)
             failures, errors, executed = [], [], 0
-            for report in reports.glob(f'TEST-*.{oracle}.xml'):
+            for report in reports.glob(f'TEST-*.{oracle_class}.xml'):
                 xml = ET.parse(report).getroot()
                 executed += int(xml.attrib['tests'])
                 for case in xml.findall('testcase'):
@@ -98,7 +99,14 @@ def main():
                 raise RuntimeError(f'{name}: requires a semantic assertion failure, not a setup failure')
         finally:
             path.write_text(original)
-    print(f'PASS: {len(records)} policy mutants killed; source restored; rebuild unmutated classes before reuse')
+            with (args.evidence_dir / (name + '-restored.log')).open('x') as log:
+                restored = subprocess.run(command, cwd=ROOT, stdout=log, stderr=subprocess.STDOUT)
+            if records and records[-1]['mutant'] == name:
+                records[-1]['restored_exit_code'] = restored.returncode
+                (args.evidence_dir / 'results.json').write_text(json.dumps(records, indent=2) + '\n')
+            if restored.returncode != 0:
+                raise RuntimeError(f'{name}: source restored but unmutated rebuild failed')
+    print(f'PASS: {len(records)} policy mutants killed; source restored and unmutated rebuilds passed')
 
 
 if __name__ == '__main__':

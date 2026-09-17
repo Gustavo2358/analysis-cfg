@@ -174,6 +174,17 @@
     "io.github.gustavo2358.analysis.adapters.FileScopeOracleTest": [
       "declarationOwnerAndUseOwnerDifferWithoutTransitiveCallOrFile",
       "enumerationOrderCannotReassignUses"
+    ],
+    "io.github.gustavo2358.analysis.adapters.EpR2DepthVerticalTest": [
+      "manySegmentsPreserveMayMustBeforeAndCapturedSourceThroughJson"
+    ],
+    "io.github.gustavo2358.analysis.adapters.LeadingDollarProductTest": [
+      "regionalComputedDollarSurvivesBeforeSupportAndEdge",
+      "literalDollarSurvivesFactJsonAndEdge",
+      "computedDollarHasSupportedRawBeforeInterpretation",
+      "eightCharacterDollarNameKeepsFullLength",
+      "nondollarAndMiddleDollarControlsKeepSupportAndRemainders",
+      "rejectedNamesStillPublishRawWithoutEdges"
     ]
   },
   "analysis-dataflow": {
@@ -194,6 +205,16 @@
     "io.github.gustavo2358.analysis.dependencies.NameInterpreterTest": [
       "canonicalSubsetAndOnlyComputedTrailingSpaces",
       "unsupportedRuntimeTransformationsRemainOpen"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.LeadingDollarNameTest": [
+      "prereleaseCorrectionRetainsTheCurrentProfileIdentity",
+      "computedLeadingDollarPreservesNameAndOnlyDropsTrailingPadding",
+      "literalLeadingDollarPreservesName",
+      "syntheticAlphanumericLeadingDollarIsSupported",
+      "syntheticLeadingDollarWithPaddingIsSupported",
+      "syntheticNameUsesExactlyEightCharactersIncludingDollar",
+      "existingAcceptedFormsKeepTheirExactNames",
+      "existingRejectionsAndLiteralPaddingRemainOpen"
     ]
   },
   "analysis-kernel": {
@@ -511,6 +532,38 @@
       "mixedChoiceReadsCurrentLogicalAndPhysicalAlternativesThenMustKillsCopy",
       "choiceCopyIntoLogicalDestinationUsesCurrentSupportAndWeakUpdates",
       "explicitIdentityDoesNotFollowAliasBindingsOrRegionAddressOperands"
+    ],
+    "io.github.gustavo2358.analysis.values.EpR2EntryTest": [
+      "openExternalPairIsAdmittedAndRemainsUnknown",
+      "allSixSimultaneousOrdersPreservePossibleSupport",
+      "h2StrongLiteralSurvivesOpenExternalEntryWithoutWrites",
+      "realStrongContradictionStillFailsI17",
+      "externalUnknownOnTheSamePlaceIsNotAFakeStrongAssignment",
+      "mixedPairsAreIndependentOfEntryOrder"
+    ],
+    "io.github.gustavo2358.analysis.values.EpR2FactorizationTest": [
+      "choiceReadProjectsOneSelectedSourceRatherThanTheirCartesianProduct",
+      "connectedEntryFactorsGrowBySum",
+      "independentSlicesWithinOneRegionAreAlsoFactored",
+      "emptyEntryWithThirtyTwoOpenWeakCopiesDoesNotBuildWorlds",
+      "connectedCopiesAndScaledJoinsPreserveRecall"
+    ],
+    "io.github.gustavo2358.analysis.values.FactorizedAlternativesTest": [
+      "independentWeakChoicesShareSuffixesWithoutWorlds",
+      "localImagesRestrictionsAndUnionMatchIndependentFiniteRelations",
+      "thousandFiniteRelationsPreserveAlgebraAndCanonicality"
+    ],
+    "io.github.gustavo2358.analysis.values.EpR2TransferTest": [
+      "mayBeforeAndAfterExactWriteCannotEraseItsSupportedValue",
+      "normalCallResultKillsOnlyAfterTheBeforeCaptureAndKeepsOpenAliasPeers"
+    ],
+    "io.github.gustavo2358.analysis.values.FactorizedDepthTest": [
+      "deepUpdatePreservesEveryUnchangedComponent",
+      "deepRestrictionPreservesTheSingleTuple",
+      "deepUnionKeepsBothSingletonsAndCanonicality",
+      "deepProjectionKeepsOnlyTheSelectedComponent",
+      "deepEnumerationReturnsTheOneCompleteTuple",
+      "deepProjectionAndCollidingUpdateCanUnionLongSuffixes"
     ]
   },
   "cfg-adapters": {
