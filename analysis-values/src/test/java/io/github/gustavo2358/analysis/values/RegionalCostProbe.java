@@ -41,15 +41,21 @@ public final class RegionalCostProbe {
                 regions,producers,repeats,nanos,cpuNanos,targets.size(),RegionalExplosionFixturesTest.unproven(targets),new TreeMap<>(execution.solveMetrics()));
             printCounters();
             var facts=new StringBuilder();
+            var typedFacts=new ArrayList<StorageValueFact>();
             for(int i=0;i<regions;i++) {
                 var query=new PointQuery<StorageSubject>(ProgramPoint.before(new EntryId(U,"entry"),new OperationId(U,"return-s0")),
                     new StorageSubject.NamedObject(RegionalExplosionFixturesTest.object(i)));
                 var batch=execution.observeStorage(List.of(query));
                 if(batch.status()!=ObservationBatch.Status.COMPLETE)throw new AssertionError(batch.status());
-                facts.append(batch.observations().getFirst().value()).append('\n');
+                var fact=batch.observations().getFirst().value();
+                typedFacts.add(fact);facts.append(fact).append('\n');
             }
-            // Full typed observations, including producers/supports/ranges/reasons, for exact before/after comparison.
+            // Keep the W2 text diagnostic; W3 freezes every typed field independently of toString.
             Files.writeString(output.resolve("facts.txt"),facts);
+            Files.writeString(output.resolve("facts.typed"),RegionalSemanticSnapshot.encode(typedFacts));
+            Files.writeString(output.resolve("targets.typed"),RegionalSemanticSnapshot.encode(targets));
+            System.out.println("W3_FACTS_SHA256 "+RegionalSemanticSnapshot.digest(typedFacts));
+            System.out.println("W3_TARGETS_SHA256 "+RegionalSemanticSnapshot.digest(targets));
             Files.writeString(output.resolve("metrics.txt"),new TreeMap<>(execution.solveMetrics()).toString()+"\n");
         }
     }

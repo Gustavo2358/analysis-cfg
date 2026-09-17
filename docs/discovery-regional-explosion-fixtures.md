@@ -1,6 +1,6 @@
 # Regional explosion campaign
 
-Current checkpoint: W1/W2 COMPLETE; W3/W4 PENDING. PR #40 remains Draft;
+Current checkpoint: W1/W2 COMPLETE; W3 INCOMPLETE (structural fix deferred); W4 PENDING. PR #40 remains Draft;
 merge only after W4 and final human review. The W1 sections below are historical
 reproduction evidence; production optimizations are documented under W2.
 
@@ -581,3 +581,350 @@ qualification is not relabeled as newly executed.
 **W2 COMPLETE — INCIDENTAL COST REDUCED.** Ready for human review of W2 and the
 next-wave plan, not for merge. W1/W2 remain in PR #40, Draft, with no auto-merge.
 W3/W4 are pending and are not started by this gate. No merge authorized.
+
+# W3 — structural explosion reduction
+
+**W3 INCOMPLETE — STRUCTURAL FIX DEFERRED.** Discovery/oracle checkpoint only;
+no structural reduction is claimed. Selected outcome **N**, permitted by the
+campaign's design/stop gate. W1/W2 remain complete; W4 remains pending. This is
+not evidence that exact factoring is impossible, nor authorization to start W4.
+
+## Hygiene and scope
+
+**FACT:** initial SHA `80104d65c79381dd58085ebacc2ec43b5b579aec`, clean worktree
+`.regional-explosion/analysis-cfg`, branch `discovery/regional-explosion-fixtures`.
+PR #40 was OPEN, Draft, with no auto-merge. Its description was updated to W3
+IN PROGRESS. No prior commit was rewritten. This checkpoint changes only tests,
+the manual probe, its required-test inventory and this report. No production,
+public API/wire, dependency pin or architecture inventory changes.
+
+## Residual baseline after W2
+
+**FACT:** the real W1 publication builder, `RegionalValuesAnalysis`,
+`FactorizedAlternatives` and solver were reused. The probe compiled the three
+measured production classes from the exact W2 SHA into an isolated classpath
+overlay; no checkout/reset was used. Java 21, `-Xms256m -Xmx1g`, ten warmups and
+100 measured solves per fork, 2 ms JFR execution samples. Observation/snapshot
+encoding occurs after the solve timer and after JFR stops.
+
+| Metric (one solve) | 16 regions / 50 writes | 32 regions / 100 writes |
+| --- | ---: | ---: |
+| Prepared targets | 800 | 3,200 |
+| UNPROVEN_BASE_SEPARATION targets | 750 | 3,100 |
+| Live edges (not complete worlds) | 766 | 3,132 |
+| Decision nodes | 16 | 32 |
+| Interned nodes | 1,566 | 6,332 |
+| Cumulative interned edges | 20,691 | 162,882 |
+| Max component cardinality | 51 | 101 |
+| Union pairs | 750 | 3,100 |
+| Projected alternatives | 800 | 3,200 |
+| Alternative visits / content reads / updates | 800 each | 3,200 each |
+
+**FACT:** residual JFR baseline has 241 regional execution samples at 16/50:
+129 interning, 46 hashing, 37 other representation, 13 union, 2 metrics,
+11 transfer, 3 solver/other. At 32/100 it has 2,416: 1,403 interning,
+384 hashing, 455 other representation, 114 union, 12 metrics, 46 transfer,
+2 solver/other. These are exclusive stack categories from the W2 classifier,
+not exact CPU attribution; inclusive categories overlap. Interning is about
+54%/58% and hashing 19%/16% of regional samples respectively.
+
+**STRONG EVIDENCE:** map construction/comparison remains significant as scale
+increases. The 32/100 leaf samples include `MapN.probe` (315), `HashMap.putVal`
+(257), `Objects.equals` (239) and `HashMap.resize` (175). This does not prove
+that all remaining cost is unavoidable semantic structure: copying cumulative
+maps also contributes. The target list itself is not shown to dominate CPU.
+
+## Semantic oracle frozen before a fix
+
+`RegionalSemanticSnapshot` walks typed record components recursively, including
+component names and types. It has explicit encodings for null, Optional, lists,
+sets, maps and scalar leaves; tokens are length-prefixed. It never uses record
+`toString()` or domain `hashCode()`. Unsupported types fail closed. Only Set/Map
+iteration order is normalized; lists keep their existing order. Thus comparisons
+are stricter than unordered semantic equivalence and cannot silently erase range,
+alternative, capture or producer associations. `ByteImage` is expanded to extent
+and every complete Part. SHA-256 below identifies the complete encoded content,
+not a Java hash-uniqueness requirement.
+
+The new mandatory `RegionalStructuralOracleTest` freezes B's ten complete images
+and C's four complete observed region facts for each disjoint/producer control.
+It also compares independent executions using typed `List<StorageValueFact>`
+equality. The field-retention negative test individually changes all eleven Part
+fields, checks collection-order policy and rejects unsupported classes.
+The existing W1 shape negative controls remain unchanged.
+
+| Frozen small oracle | SHA-256 |
+| --- | --- |
+| B, all 10 producers | `e98852005f7f4d49d1246c3d1c1ae860acab3b001d17c197067342a42132577e` |
+| C, 1 producer, no disjointness | `083a6aa0ff2826958698b32b42ffb6fafacad171b989d339f2e1d408c471e206` |
+| C, 5 producers, no disjointness | `3bf6ed5144cc53452781cca4809aee08a6eea32727697a092159400c9c5fcbbe` |
+| C, 1 producer, disjoint | `59eae5b3d2f41a5180c411c47ddc689ab4457517c361b79577d0f3e5ff8ea6e1` |
+| C, 5 producers, disjoint | `22d1216224174d58fb77291cf18e21ae45874c43032917c6bdc0153512072583` |
+
+The large probe additionally emits `facts.typed` and `targets.typed`;
+`--compare BASELINE_DIRECTORY` compares the **entire files**, not just their
+hashes. The old `facts.txt` remains a W2 diagnostic. Observation snapshots include
+all StorageValueFact fields: candidates, alternatives, unknownWriter, candidate
+supports, fragments/ranges/bytes, reasons, all remainder flags, captures, gaps,
+logical captures/alternatives, premises, evidence, origins and query identity.
+Target snapshots include location, strength, sourceApplicable, premises and
+reasons. These files are local diagnostic artifacts, reproducible from Git.
+
+| Frozen large oracle | Full typed facts SHA-256 | Full targets SHA-256 |
+| --- | --- | --- |
+| 16/50 | `e9b3792a76ffbd96d302075402c341701adfb9cbcb26c634af88cf8ea0656302` | `f6a26180cba8e0090c652faa8e3619889a1e3bcdbd64775c0b5b262151c538b5` |
+| 32/100 | `9e8437da4f81de7deb3b717f2fe78fe0c5244943c09b7e18e594f44c491ca496` | `027c14c2ea4b40906741282c18ecc736a057078ec6b1b882f7d8434b5d613983` |
+
+**Limit:** these straight-line scenarios do not exercise every nonempty capture,
+logical support or joined multi-Part combination. Field completeness is not a
+proof of transfer correctness on those inputs. Existing ByteImage,
+StorageValueObservation, RegionalInitial, RegionalProvenance and regional copy/
+composition tests cover those families; a future production design must add its
+own differential cases. Do not regenerate these snapshots to accept missing
+information. If internal representation changes, expand it to the same observable
+records; B's internal-image adapter may need explicit replacement, not weakening.
+
+## Provenance discovery
+
+**FACT:** `ByteImage.Part.producer` is an analysis-local event ordinal, not merely
+a globally interchangeable operation name. `RegionalValuesAnalysis.compile`
+creates a `PreparedEvent` for each write/target (and logical target). Its public
+`DefinitionEvent` also carries entry, destination/slot, outcome, storage, kind,
+origin, premises, uncertainties, reasons and optional logical object.
+
+`Bytes` embeds the entire image in a Content label. Image equality and cached
+hash include every Part field. DAG interning therefore distinguishes these
+labels. `restrict` compares full labels in the BEFORE relation; `selections`
+preserves their correlation with child relations. Read/copy transfer first
+projects source levels, restricts the original relation to that selection, then
+updates destinations. Removing identity without modifying those operations is
+not a transparent representation change.
+
+**FACT:** producer identity does not grant kill authority. `KillAuthority`
+checks execution, occurrence/selection, destination completeness and positive
+source-applicability/exhaustiveness. However, producer identity affects support
+construction and observation grouping. `project` collects contributors and
+logical supports; `trace` uses the event's destination plus producerOffset to
+reconstruct the original contributed range. Copy capture offsets contain the
+source-candidate alternative index, not just an offset. `fragment` reconstructs
+unknownWriter, copy DefinitionEvents, before points, source/destination ranges
+and logical capture support. `RegionalResultJson` emits these detached fields.
+RD independently consumes the same concrete targets; it does not consume
+ByteImage, but target aggregation would affect its plan construction.
+
+| Information | Can factor? | Required granularity | Risk |
+| --- | --- | --- | --- |
+| Extent, payload, reasons | Identical immutable values may share storage | Exact image/Part shape | Equating unknown reasons, repeated payload or extent changes meaning |
+| Producer + producerOffset | Only with exact association retained | Event × contributed Part/range × alternative | A global producer set loses which writer supplied which bytes |
+| Multiple Parts | Not as independent sets in general | Joint row/decision relation across ranges | Inventing combinations absent from the source relation |
+| capturedOffsets | Share only equal mappings or correlated rows | Copy event × source alternative × offset × range | Mixing captured source choices or before-store alternatives |
+| coInitial | Existing special factorization only | Simultaneous contributors to the same initial image/range | Treating disjunctive writers as simultaneous evidence |
+| sourceGaps | Keep affected range and alternative association | Gap origin/uncertainty × affected range | Moving a gap contaminates previously known bytes |
+| logicalSupports | Preserve object/event and capture context | Logical object × support event × alternative | Assigning support to a different candidate or capture |
+| DAG continuation | Equal shape is insufficient | Exact child relation or explicit support-to-child relation | Cartesian-product precision loss at a later read/copy |
+| DefinitionEvent/wire | Expand exact records at observation | Full event identity, ranges and correlations | Fewer detached alternatives can be an observable contract change |
+
+**FACT (executable counterexamples):** two 8-byte images containing identical
+bytes and the same producer set `{1,2}` differ when producers swap their 4-byte
+ranges. A two-level relation with only `(A,B)` and `(B,A)` has two selections;
+independent `{A,B}` sets admit four, adding `(A,A)` and `(B,B)`. The new tests
+check both using real ByteImage writes and FactorizedAlternatives operations.
+They refute *uncorrelated sets*, not all possible exact factoring designs.
+
+## Fan-out discovery
+
+**FACT:** `StatementEffects.targets` enumerates every other base and consults
+`StorageIndex.disjoint`. Unproved separation produces a whole-base MAY target
+with `sourceApplicable=false`; direct target proof premises and strength are
+kept separately. Scopes/remainders already describe unknown coverage, but there
+is no prepared Target variant for “all except this destination and positively
+separated bases”. `AllMemory` alone would lose this exclusion/proof distinction.
+
+Values compilation immediately creates per-target events/plans; RD compilation
+immediately intersects each target with StoragePartition segments. Regional
+transfer groups plans by correlation group. A lazy collection expanded at these
+same points would defer allocation, then produce the same state and event count.
+It would not solve label multiplication. It is unnecessary to materialize every
+base at the *IR scope* level, but the current prepared/domain APIs require it.
+
+**HYPOTHESIS:** an analysis-local default effect plus per-base exceptions could
+represent fan-out symbolically until a query/update intersects a base. This needs
+exact handling of partial disjoint proofs, selected destinations, unequal extents,
+MAY_SET versus SINGLE_DESTINATION, per-outcome evidence and source gaps. Reads
+would need lookup/intersection plus event reconstruction; connected read/copy
+groups still need joint correlation. Neither cheaper total projection cost nor
+smaller retained state has been demonstrated.
+
+A shared Target redesign affects StatementEffects, StoragePartition consumers,
+RD and Values. StorageIndex can remain the proof authority but needs a query path
+usable by the symbolic consumer. This does **not inherently require an AIR/wire
+change** if all exact records are expanded at the boundary. Publishing an aggregate
+in place of current concrete records *would* cross that boundary and must stop
+for compatibility review. No such change was made.
+
+## Candidate designs
+
+| Candidate | Expected structural effect | Contracts and risks | Effort / required tests | Decision |
+| --- | --- | --- | --- | --- |
+| P: shape + flat producer set | B may appear 10→1 | Loses range and joint-alternative associations; precision risk even with same bytes | Small implementation, but counterexamples fail | Rejected |
+| P: exact relational provenance, grouped only with compatible continuation | May share shape once while retaining 10 support rows; benefit for repeated unknown shapes | Internal label algebra changes; must keep source selections and support-to-child relation. Public wire could stay unchanged by expansion | Substantial: union/update/project/restrict laws, multi-Part join/copy/capture/initial/logical/gap differential oracles, scale/memory | Deferred, not disproved |
+| P: only single-Part unknown leaf labels | Could compress the W1 hot case | Smaller initial domain, but copies/partial overwrites can turn these into multi-Part/connected values; needs exact expansion and stable canonical joins at those transitions | Prototype plus transition laws and retained-memory comparison required; no benefit measured yet | Deferred; plausible follow-up, not declared unsafe |
+| F: lazy Target enumeration | Fewer early Target objects at most | Existing consumers immediately expand; no demonstrated domain reduction | Moderate, shared-consumer regression required | Not selected as W3 structural fix |
+| F: symbolic default effect with exceptions | Potentially reduces base × write state | Changes prepared/domain interfaces; must preserve all exclusions, proofs, evidence and group correlations | Large, RD/Values differential tests and API review; wire can stay concrete | Deferred |
+| H: provenance + symbolic fan-out | Potentially largest | Combines both unproved transfer changes, widest diagnosis surface | Largest; all P/F gates | Rejected for this checkpoint |
+| N: freeze oracles and defer production | None | No new semantic or public contract risk | Discovery + regression validation | Selected |
+
+## Selected design / gate decision
+
+**SELECTED DESIGN:** N — `STRUCTURAL FIX DEFERRED`. The small flat-set designs
+have concrete counterexamples. Exact relational P remains promising but has not
+been established as a small, correct change across transfer and observation.
+The smaller lazy F candidate does not remove the internal multiplication, and
+symbolic F broadens the shared domain interfaces. This is a bounded discovery
+result, not a claim that the campaign can never implement either design.
+
+**REJECTED ALTERNATIVES:** uncorrelated image/range producer sets, reusing
+coInitial to mean disjunction, shape-only equality, lazy targets presented as a
+domain reduction, simultaneous P+F implementation. No pruning, limits, new
+DisjointStorage proof, precision loss or scalar fallback was considered acceptable.
+
+**SEMANTIC INVARIANTS:** exact targets and strength; complete producer/range/
+capture/gap/logical-support associations; candidate supports; unchanged detached
+DefinitionEvents, reasons, premises and observations; exact relational choices.
+
+**EXPECTED STRUCTURAL EFFECT:** zero in this checkpoint. No production fix or
+structural RED was written because no implementable design passed this gate.
+The new negative tests protect against the rejected transformations; they are
+not mislabeled as a successful structural RED/GREEN. Historical W1 internal
+counts are retained, but they are not requirements for a future accepted W3 fix.
+
+## Implementation and structural before/after
+
+Only a complete typed snapshot encoder, frozen/adversarial tests, manual probe
+comparison/RSS options and the explicit FAST test inventory were added. No new
+instrumentation is installed in production; no global cache or semantic budget.
+The W2 cached int and component-size cache remain untouched.
+
+**FACT:** initial-W2 overlay and final checkpoint produce identical complete
+`facts.typed`, `targets.typed`, legacy `facts.txt` and all solve metrics at both
+scales. Every metric in the baseline table is unchanged; structural reduction
+is **zero**. This equivalence validates the oracle/checkpoint, not a fix.
+
+## Semantic reconciliation
+
+| W1/W2 property | Before W3 | Checkpoint after discovery |
+| --- | --- | --- |
+| A no-proof targets, 2/4/8 bases | 2/4/8; unproven 1/3/7 | Identical |
+| A with DisjointStorage | 1 target; 0 unproven | Identical |
+| B labels / shape / recovered producers | 10 / 1 / 10 | Identical |
+| C no-proof, 1/5 producers | 7 / 19 live edges | Identical |
+| C with proof, 1/5 producers | 1 / 1 live edge | Identical |
+| Repeat same event five times | 7 live edges | Identical |
+| C complete observed facts, all four controls | Frozen typed field snapshots | Identical |
+| 16/50 facts and targets | Complete typed snapshots above | Byte-for-byte equal |
+| 32/100 facts and targets | Complete typed snapshots above | Byte-for-byte equal |
+| Optional Entry incident reproduction | SKIPPED | SKIPPED |
+
+## Memory evidence
+
+`--rss` uses GNU time on the Java child process only (source-overlay compilation
+excluded). It includes JVM, warmups, solve, JFR and final observation/snapshot
+encoding. It is **peak RSS, not retained heap**, and uses a 256 MiB initial heap.
+Do not infer corporate memory needs or the size of the W2 caches from this number.
+JFR allocation sample weights measure allocation traffic, not retained objects.
+The 32/100 baseline's largest regional sample weights are KeyValueHolder about
+3.20 GB, HashMap.Node 2.17 GB and Object[] 1.54 GB across 100 solves. These can
+exceed peak RSS because objects are reclaimed between/during solves.
+
+Runtime/RSS results and final validation are recorded below. No memory-reduction
+claim is made, since the production implementation is identical.
+
+## Remaining risks and next decision
+
+**STRONG EVIDENCE:** repeated maps and label comparisons are still expensive;
+independent producer sets are an invalid replacement for the current relation.
+**HYPOTHESIS:** grouping equal-shape labels only under an exactly shared child,
+with complete correlated support rows and lossless transfer expansion, can reduce
+retained representation. Neither its gain nor correctness is certified here.
+A follow-up W3 design should prototype that bounded P candidate and challenge
+partial overwrites, copies into connected groups, joins/loops, co-initial values,
+logical capture and range-specific gaps before considering production acceptance.
+
+There is no expected improvement to the corporate incident from this checkpoint.
+W4 must eventually validate real E2E termination, memory, candidates/evidence,
+CALL/files/tables and all external outputs under the unchanged pinned pipeline.
+Synthetic timings alone cannot authorize that conclusion. W4 was not started.
+
+Final gate: structure reduced **NO**; provenance lost **NO**; targets lost **NO**;
+precision reduced **NO**; observable facts equivalent **YES for the frozen
+scenarios**; residual cost acceptable for corporate E2E **NOT ESTABLISHED**.
+
+W3 INCOMPLETE — STRUCTURAL FIX DEFERRED.
+W1/W2 remain in PR #40. W3 requires a reviewed follow-up design; W4 pending.
+No merge authorized.
+
+## Runtime evidence and reproduction
+
+Diagnostic only, 100 solves per row; both columns run the **same production
+implementation**. Different timing/sample/RSS values are run variation, not a W3
+gain. Selected comparison runs were executed without a concurrent test suite.
+Earlier exploratory `checkpoint-*` runs overlapped module validation and are not
+used for timing conclusions.
+
+| Measurement | W2 SHA overlay baseline | W3 discovery checkpoint |
+| --- | ---: | ---: |
+| 16/50 solve wall | 1.417 s | 1.461 s |
+| 16/50 thread CPU | 1.384 s | 1.424 s |
+| 16/50 peak RSS | 314,140 KiB | 311,432 KiB |
+| 16/50 regional JFR samples | 241 | 254 |
+| 16/50 interning / hashing samples | 129 / 46 | 144 / 35 |
+| 32/100 solve wall | 9.219 s | 8.922 s |
+| 32/100 thread CPU | 8.990 s | 8.689 s |
+| 32/100 peak RSS | 391,140 KiB | 398,644 KiB |
+| 32/100 regional JFR samples | 2,416 | 2,350 |
+| 32/100 interning / hashing samples | 1,403 / 384 | 1,331 / 353 |
+
+Reproduce after compiling tests with Java 21 and the existing pinned Maven cache:
+
+```sh
+# Run from the campaign worktree; JAVA_HOME/PATH must select Java 21.
+mvn -B -ntp -Dmaven.repo.local="$PWD/.harness-results/build/m2" \
+  -pl analysis-values -am test-compile
+python3 scripts/project/regional_cost_probe.py \
+  --regions 16 --producers 50 --warmups 10 --repeats 100 --jfr --rss \
+  --source-ref 80104d65c79381dd58085ebacc2ec43b5b579aec \
+  --output .harness-results/w3/baseline-16-50
+python3 scripts/project/regional_cost_probe.py \
+  --regions 16 --producers 50 --warmups 10 --repeats 100 --jfr --rss \
+  --compare .harness-results/w3/baseline-16-50 \
+  --output .harness-results/w3/verified-16-50
+# Repeat with --regions 32 --producers 100 and separate 32-100 output directories.
+```
+
+Keep the frozen baseline files when experimenting with a future design. The
+source-overlay approach assumes the probe remains binary-compatible with the
+three baseline classes; revise the test driver explicitly if that ceases to hold.
+No assertion uses elapsed time, memory consumption or Java hash uniqueness.
+
+## Validation at the W3 discovery checkpoint
+
+**FACT:** all validation used Java 21.0.12.1:
+
+- Focal `RegionalStructuralOracleTest`, `RegionalExplosionFixturesTest`,
+  `StorageIndexTest`, `CfgBuildCoordinatorTest`: PASS.
+- Complete `analysis-values -am test`: PASS; cfg-kernel 108, analysis-kernel 79,
+  analysis-values 195, total **382**, zero failures/errors/skips.
+- `python3 -B scripts/harness/lean.py fast`: **PASS CODE_CHANGE**, 85.221 s;
+  **556 required unit/contract methods, zero skips**, including the three new
+  methods explicitly registered in fast-test-inventory.json. Existing compiled
+  architecture, consumer and wire checks pass; no baseline regeneration.
+- Full typed file comparisons at 16/50 and 32/100: PASS. All solve metrics and
+  legacy observation snapshots match as well.
+- Comparison negative control: intentionally comparing 4/1 against the captured
+  4/5 baseline exits nonzero with `W3 semantic snapshot mismatch: facts.typed`.
+- No production change, so no per-optimization performance claim or new
+  structural acceptance result. Full corporate/E2E qualification not run (W4).
+
+Raw evidence: `.harness-results/w3/{baseline,verified}-{16-50,32-100}/`,
+`focal.log`, `modules.log`, `fast.log`, and `reject-mismatch.log`. The mandatory
+FAST check is new evidence; W1/W2's earlier historical results remain historical.

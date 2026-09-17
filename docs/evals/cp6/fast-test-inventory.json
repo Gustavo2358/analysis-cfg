@@ -582,6 +582,11 @@
     ],
     "io.github.gustavo2358.analysis.values.RegionalCostMetricsTest": [
       "trackedSummariesMatchFullStateTraversalForDisjointAndConnectedGroups"
+    ],
+    "io.github.gustavo2358.analysis.values.RegionalStructuralOracleTest": [
+      "frozenW1FactsRetainAllTypedFieldsAndProducerIdentities",
+      "snapshotRetainsEveryPartFieldAndRejectsUnsupportedTypes",
+      "producerSetsLoseRangeAssociationsAndIndependentSetsInventCorrelations"
     ]
   },
   "cfg-adapters": {

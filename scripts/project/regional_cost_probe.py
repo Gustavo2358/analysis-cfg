@@ -104,6 +104,8 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--jfr', action='store_true')
     parser.add_argument('--instrument', action='store_true')
+    parser.add_argument('--rss', action='store_true', help='GNU time peak RSS of the Java process, including observation/JFR (not retained heap)')
+    parser.add_argument('--compare', type=Path, help='Require exact complete typed facts and targets from a pre-fix probe directory')
     parser.add_argument('--source-ref', help='Compile the three measured production classes from an existing commit without switching the checkout')
     args = parser.parse_args(); args.output = args.output.resolve(); args.output.mkdir(parents=True, exist_ok=True)
     jars = ROOT / '.harness-results/build/m2'
@@ -115,9 +117,15 @@ def main():
     command = ['java', '-Xms256m', '-Xmx1g', '-XX:FlightRecorderOptions=stackdepth=256', '-cp', cp, PACKAGE + '.RegionalCostProbe',
         str(args.regions), str(args.producers), str(args.warmups), str(args.repeats), str(args.output)]
     if args.jfr: command.append('jfr')
+    if args.rss: command = ['/usr/bin/time', '-v', '-o', str(args.output / 'rss.txt'), *command]
     result = subprocess.run(command, check=True, text=True, stdout=subprocess.PIPE)
     (args.output / 'run.log').write_text(result.stdout); print(result.stdout, end='')
     if args.jfr: summarize_jfr(args.output / 'solve.jfr')
+    if args.compare:
+        for name in ('facts.typed', 'targets.typed'):
+            if (args.output / name).read_bytes() != (args.compare / name).read_bytes():
+                raise RuntimeError('W3 semantic snapshot mismatch: ' + name)
+        print('W3_SEMANTIC_COMPARE PASS: full typed facts and targets identical')
 
 
 if __name__ == '__main__':
