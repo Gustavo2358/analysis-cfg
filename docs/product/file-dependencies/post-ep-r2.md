@@ -93,7 +93,7 @@ São dados públicos CardDemo fixados e fixtures sintéticas, sem dados corporat
 estrutura retida iguais nos 17 witnesses; F5 continua INVALID_IR pelo oracle.
 Contagens cumulativas de interning variam também em repetição do próprio main G7;
 não indicam crescimento da estrutura retida. RV main/composição observado (ms):
-G7 262.3/310.3, I7 703.7/768.5, E3 229.0/261.8. Sem SLA inferido.
+G7 262.3/310.3, I 703.7/768.5, E3 229.0/261.8. Sem SLA inferido.
 Composição 1/8/32 verifica crescimento aditivo e compartilhamento de query,
 sem nova execução do provider por FILE. Nenhuma materialização de mundos Store.
 RSS máximo do corpus: dependency composto 1188556 KiB; main 913924 KiB;
