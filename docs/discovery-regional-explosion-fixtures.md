@@ -293,3 +293,62 @@ checkpoint, not the campaign or merge readiness. W1/W2/W3/W4 stay on branch
 the campaign. Merge may occur only after W4 and final human review. Stop for
 human review; this adjustment does not start W2. No merge or auto-merge is
 authorized.
+
+# W2 — accidental-cost reduction
+
+## Hygiene and measurement baseline
+
+W2 starts at `c23a44691004d244a2632c8f779ca7031b49a99a` on the same branch and
+Draft PR #40, with a clean working tree. W1 commits `107bbf4`, `dfa4893` and
+`c23a446` are preserved. W2 is IN PROGRESS; W3/W4 are pending. No merge.
+
+Before any optimization, `RegionalCostProbe` and
+`scripts/project/regional_cost_probe.py` were added as a manual diagnostic.
+They reuse W1's synthetic AIR, real preparation, `RegionalValuesAnalysis`,
+`FactorizedAlternatives` and the real solver. Preparation is outside the measured
+solve loop; complete typed observations are emitted afterwards to `facts.txt`.
+The observation file retains candidates, supports, producer definitions, ranges,
+codecs, gaps, premises and reasons, enabling exact before/after reconciliation.
+No benchmark duration is a CI assertion. No confidential input is used.
+
+Java 21, fixed 256 MiB initial / 1 GiB maximum heap, ten warmups and 100 measured
+solves are used for the selected JFR run. Exploratory cases 4 regions/10 writes,
+8/25 and 16/50 took 36/77/171 ms for three solves respectively (different warmup
+counts; selection evidence only). The 8/25 JFR probe yielded only 47 regional
+samples; 16/50 yielded 500 and is selected for comparison. Recording uses 2 ms
+execution sampling and 256-frame stacks; `jfr print` must also set
+`--stack-depth 256` (its default truncates to five frames).
+
+Baseline structural metrics for 16 regions/50 producers, one solve:
+
+| Metric | Baseline |
+| --- | --- |
+| Targets / unproven targets | 800 / 750 |
+| Maximum materialized alternatives / decision nodes | 766 / 16 |
+| Maximum component cardinality | 51 |
+| Interned nodes / edges | 1,566 / 20,691 |
+| Relation union pairs / projected alternatives | 750 / 800 |
+
+JFR baseline (`baseline-profile/solve.jfr`): 500 regional execution samples.
+Exclusive classification prioritizes size/track, then hashing, then interning,
+then union, other representation, other transfer, solver. It estimates sampled
+CPU distribution, not exact CPU accounting: hashing 239 (47.8%), interning
+without a hashing frame 168 (33.6%), size/track 10 (2.0%), union 18 (3.6%), other
+representation 51 (10.2%), other transfer 13 (2.6%), solver 1 (0.2%). Inclusive
+stacks overlap: node 320, hashing 240, union 174. Thus hashing/interning is
+reproduced as dominant; the incident's much larger track share is NOT reproduced.
+Allocation sampling shows object arrays, KeyValueHolder, HashMap nodes/tables,
+iterators and streams; sampled weights are estimates, not allocation counts.
+
+A separate diagnostic overlay compiles instrumented **copies** of three sources
+into an ignored output directory, placed first on the probe classpath. It never
+changes production sources or API and must not be used for timing comparisons.
+One measured solve: 2,366 node calls / Keys; 40,750 union calls, 750 nontrivial
+calls and 750 unique ordered identity pairs; 51 track calls; 52 size traversals,
+800 visited DAG nodes / 19,925 visited edges; 255,792 ByteImage hash calls.
+Instrumented track/size durations are retained in raw logs, not used as speedup
+claims. This proves repeated hashing and full-state metric work; a persistent
+union cache has zero cross-call nontrivial pair reuse in this baseline.
+
+All baseline records were obtained before production changes. Raw recordings,
+logs, instrumented copies and observations stay in `.harness-results/w2/`.
