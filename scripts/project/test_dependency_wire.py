@@ -40,6 +40,23 @@ class DependencyWireTests(unittest.TestCase):
                 p.write_bytes(malformed)
                 with self.assertRaises((ValueError,UnicodeError)):read(p)
 
+class FileEpR2CompositionWireTests(unittest.TestCase):
+    def test_cross_contract_entry_factorization_and_dollar_documents(self):
+        folder=ROOT/'analysis-adapters/target/fd-post-ep-r2'
+        for name in ['factors-1','factors-8','factors-32','entry-forward','entry-reverse','dollar-file','dollar-file-negative']:
+            d=read(folder/(name+'.json'))
+            self.assertEqual('2.3.0',d['version']);self.assertEqual('COBOL_SOURCE_ONLY',d['analysisBoundary'])
+            call=d['sites'][0];file=d['fileDependencies']['sites'][0]
+            self.assertEqual('cics.file',file['namespace'])
+            if name.startswith('dollar'):
+                self.assertEqual('$PROGA',call['candidates'][0]['referenceName'])
+                self.assertEqual([] if name.endswith('negative') else ['1FILE'],[c['referenceName'] for c in file['candidates']])
+            else:
+                self.assertEqual(['PROG0000'],[c['referenceName'] for c in call['candidates']])
+                self.assertEqual(['PROG0000'],[c['referenceName'] for c in file['candidates']])
+                self.assertTrue(call['modelValueRemainder']);self.assertTrue(file['unknownRemainder'])
+                self.assertEqual('BEFORE',file['valuePoint']['position'])
+
 class LeadingDollarWireTests(unittest.TestCase):
     def test_actual_java_dollar_candidates_and_edges_keep_profile_one(self):
         folder=ROOT/'analysis-adapters/target/ep-r2-f2'

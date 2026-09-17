@@ -185,6 +185,11 @@
       "eightCharacterDollarNameKeepsFullLength",
       "nondollarAndMiddleDollarControlsKeepSupportAndRemainders",
       "rejectedNamesStillPublishRawWithoutEdges"
+    ],
+    "io.github.gustavo2358.analysis.adapters.FileEpR2CompositionTest": [
+      "independentEntryFactorsShareOneGeneralRunForCallAndFile",
+      "simultaneousStrongAndOpenEntrySurvivesBothOrdersBeforeFile",
+      "leadingDollarCallAndIndependentCicsFilePolicyShareWire23"
     ]
   },
   "analysis-dataflow": {
