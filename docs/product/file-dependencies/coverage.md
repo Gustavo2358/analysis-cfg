@@ -98,3 +98,12 @@ Riscos críticos e oráculos: record confundido com arquivo (T05/T06), alias fun
 com recurso (T16), CALL incorreto após READ (T18–T20), handler perdido (T11/T21),
 participante SORT ausente (T23), conexão reavaliada (T31/T32), owner errado (T46),
 reader tolerante demais (T51), scope externo (SG1–SG5).
+
+## Checkpoint dimensional W2
+
+N19–N25: sintaxe, binding, owner, opções e operandos QUALIFIED; N32/N33:
+estrutura dos handlers e composição QUALIFIED. Efeitos/outcomes permanecem
+PLANNED W3/W4, portanto as linhas agregadas não são promovidas integralmente.
+[Oráculos, pins e resultados W2](w2-implementation.md): frontend12 novos,
+F-DECL147, três FASTs, admission bilateral, 14 fontes duas vezes. N04/N18 e D
+permanecem exclusivamente W10; não foram implementados.

@@ -1,6 +1,6 @@
 id: FD-W3
 title: Efeitos de I/O, storage e preservação de CALL
-status: TODO
+status: IN_PROGRESS
 scope:
 - file-dependencies
 - proleap-poc

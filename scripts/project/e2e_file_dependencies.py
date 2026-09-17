@@ -48,16 +48,16 @@ def oracle(name,sp,air,result,source):
     scope(result)
 
 
-def run(work,config_path):
+def run(work,config_path,*,fixtures=FIXTURES,expected=EXPECTED,check=oracle,label="FD-W1"):
     require_local();work.mkdir(parents=True,exist_ok=False)
     producer=config_path.parent;config=json.loads(config_path.read_text());lock=json.loads((ROOT/'docs/sources/sources.lock.json').read_text())
     for repo,key in (('air-java','air_java'),('proleap-poc','proleap_poc'),('cobol-lower','cobol_lower')):
         require(config['sources'][repo]==lock[key]['commit']==git(producer/repo,'rev-parse','HEAD') and not git(producer/repo,'status','--porcelain'),'immutable producer '+repo)
     cp=runtime(producer)
-    for name in EXPECTED:
+    for name in expected:
         outputs=[]
         for attempt in ('A','B'):
-            cwd=work/(name+'-'+attempt);cwd.mkdir();source=cwd/(name+'.cbl');shutil.copyfile(FIXTURES/source.name,source)
+            cwd=work/(name+'-'+attempt);cwd.mkdir();source=cwd/(name+'.cbl');shutil.copyfile(fixtures/source.name,source)
             web=cwd/'src/main/resources';web.mkdir(parents=True);(web/'web').symlink_to(producer/'proleap-poc/src/main/resources/web',target_is_directory=True)
             execute(cwd,'frontend',['java','-cp',os.pathsep.join(config['frontend']['classpath']),config['frontend']['main'],'--source',source.name,'--copybooks',str(producer/'proleap-poc/corpus/cpy'),'--output',str(cwd/'sp')])
             sp=cwd/'sp/cobol-semantic-product.json';air=cwd/'program.air.json';cfg=cwd/'cfg.json';dep=cwd/'dependencies.json'
@@ -66,7 +66,7 @@ def run(work,config_path):
             verify_cfg_wire(cfg.read_bytes())
             command=['java','-cp',cp,'io.github.gustavo2358.analysis.launcher.AnalysisDependencies',str(air)]
             execute(cwd,'dependency',command+[str(dep)])
-            oracle(name,json.loads(sp.read_text()),json.loads(air.read_text()),read(dep),source)
+            check(name,json.loads(sp.read_text()),json.loads(air.read_text()),read(dep),source)
             outputs.append([p.read_bytes() for p in (sp,air,cfg,dep)])
             if name=='static' and attempt=='A':
                 old=cwd/'old-output';old.mkdir();sentinel=old/'prior.dependencies.json';sentinel.write_bytes(dep.read_bytes())
@@ -75,9 +75,9 @@ def run(work,config_path):
                 require(failure.returncode==6 and b'OUTPUT_FAILURE' in failure.stderr,'explicit output failure')
                 require(sentinel.read_bytes()==dep.read_bytes() and sorted(p.name for p in old.iterdir())==['prior.dependencies.json'],'old output untouched; never new success')
                 require(not list(cwd.glob('.dependencies-*.tmp')),'no abandoned temp output')
-            print('PASS FD-W1 '+name+' '+attempt,flush=True)
+            print('PASS '+label+' '+name+' '+attempt,flush=True)
         require(outputs[0]==outputs[1],name+' deterministic SP/AIR/CFG/FILE+CALL bytes')
-    print('PASS E-SELECTED FD-W1 six fixtures twice, scope/supports/CALL/FILE/output failure',flush=True)
+    print('PASS E-SELECTED '+label+' '+str(len(expected))+' fixtures twice, deterministic SP/AIR/CFG/dependencies',flush=True)
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--work',type=Path,required=True);p.add_argument('--producers',type=Path,required=True);args=p.parse_args()
     try:run(args.work.resolve(),args.producers.resolve())

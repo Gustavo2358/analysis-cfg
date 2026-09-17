@@ -257,11 +257,13 @@
       "docs/architecture/semantic-product-air-v2-audit.md",
       "docs/domain/cobol-semantic-product.md",
       "docs/work/history/WORK-SEMANTIC-PRODUCT-003.md",
-      "docs/domain/declarative-value-inference.md"
+      "docs/domain/declarative-value-inference.md",
+      "src/main/java/io/github/gustavo2358/cobolexplorer/FileIoSyntax.java",
+      "src/test/java/io/github/gustavo2358/cobolexplorer/FileNativeOperationTest.java"
     ],
-    "semantic_product_version": "2.22.0",
+    "semantic_product_version": "2.23.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "0d1d84f8d5018ade6f97daed680b5da642ce113f",
+    "commit": "b559292c97e004504fb867c4724298dc1637b6f2",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -276,12 +278,13 @@
     "observed_on": "2026-09-16",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
-    "fd_w1_validation": "docs/work/active/FD-W1.yaml"
+    "fd_w1_validation": "docs/work/active/FD-W1.yaml",
+    "fd_w2_validation": "QUALIFIED_LOCAL: producer focal + fixed FAST; 14 real CLI fixtures twice; SP/AIR/CFG/dependency deterministic; file-dependencies/w2-implementation.md"
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "FD-W1 static file slice and fixed FAST pass; effects/control open pending W3/W4",
-    "commit": "70be551724e23faba2474dee8bd7a088e63af2ed",
+    "commit": "ee38519283a6b762b86704a6ee198748424b6825",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -297,7 +300,8 @@
     "observed_on": "2026-09-16",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
-    "fd_w1_validation": "docs/work/active/FD-W1.yaml"
+    "fd_w1_validation": "docs/work/active/FD-W1.yaml",
+    "fd_w2_validation": "QUALIFIED_LOCAL: producer focal + fixed FAST; 14 real CLI fixtures twice; SP/AIR/CFG/dependency deterministic; file-dependencies/w2-implementation.md"
   },
   "external": [
     {

@@ -1,6 +1,6 @@
 # Estado / handoff curto — CORE N+C
 
-**H4 aprovado; W0/W1 QUALIFIED_LOCAL; W2 IN_PROGRESS.**
+**H4 aprovado; W0/W1/W2 QUALIFIED_LOCAL; W3 IN_PROGRESS.**
 Core W0–W9/W11 autorizado em 2026-09-16, sem aprovação mecânica entre waves.
 W10 TODO / NOT_AUTHORIZED. Sem merge/auto-merge/release. STOP após W11.
 Waves qualificadas permanecem IN_PROGRESS lean enquanto PRs estiverem unmerged.
@@ -9,31 +9,31 @@ Waves qualificadas permanecem IN_PROGRESS lean enquanto PRs estiverem unmerged.
 | --- | --- |
 | W0 | QUALIFIED_LOCAL; declaração N-LR, SP/decoder/admission bilateral |
 | W1 | QUALIFIED_LOCAL; A1–A4/A6, OPEN/READ/CLOSE, consumer FILE e wire2.0 |
-| W2 | IN_PROGRESS; família nativa e operandos/handlers estruturais |
-| W3–W9, W11 | TODO |
+| W2 | QUALIFIED_LOCAL; sete verbos nativos e operandos/handlers estruturais |
+| W3 | IN_PROGRESS; D-EFFECT, buffers/status e CALL |
+| W4–W9, W11 | TODO |
 | W10 | TODO / NOT_AUTHORIZED |
 
-## Checkpoint W1
+## Checkpoint W2
 
 | Repo | Commit / pin qualificado |
 | --- | --- |
-| proleap-poc | `0d1d84f8d5018ade6f97daed680b5da642ce113f`; SP2.22/fileInventory1.1 |
-| cobol-lower | `70be551724e23faba2474dee8bd7a088e63af2ed`; SP acima, AIR abaixo |
-| air-java | `d215d2bafbbabc714a3e9d0f2ff9e8927e0bf8f4` |
-| analysis-ir | `fb153ae50f343022db45d20d627e1afac85de916`; resource.bindings@1 |
-| analysis-cfg | commit W1 no Git; SHA exato no handoff local E2E |
+| proleap-poc | `b559292c97e004504fb867c4724298dc1637b6f2`; SP2.23/fileInventory1.2 |
+| cobol-lower | `ee38519283a6b762b86704a6ee198748424b6825` |
+| air-java | `d215d2bafbbabc714a3e9d0f2ff9e8927e0bf8f4` (W1, inalterado) |
+| analysis-ir | `fb153ae50f343022db45d20d627e1afac85de916` (W1, inalterado) |
+| analysis-cfg | commit W2 no Git; SHA exato no handoff local E2E |
 
-W1: AIR model187/codec124 + FAST PASS; frontend focal135/FAST335 PASS; lower FAST
-PASS; CFG C-DEP31/FAST485, zero skips; reader11 PASS. E-SELECTED: seis fixtures
-fonte em duas execuções CLI reais, SP/AIR/CFG/dependency idênticos byte a byte.
-CALL+FILE, origens, owner/record/use, declaração sem uso, OPEN agrupado, scope e
-falha de saída provados. Logs RED/falhas/correções preservados, sem false PASS.
+W2: frontend focal147/FAST335; lower FAST core2340 + adapters; CFG C-DEP22 /
+FAST485 / reader11; zero skips inesperados. E-SELECTED14 fontes duas vezes,
+SP/AIR/CFG/dependency determinísticos. Record owner/FROM, sete ações, handlers
+sem duplicação, CALL+FILE e composição IF/EVALUATE/PERFORM/GO TO PASS.
 
-Evidência local: `artefatos-e2e/file-dependencies-20260916/w1/HANDOFF.md`.
-Contrato/algoritmo: [implementação W1](w1-implementation.md).
-Limites: efeitos/controle abertos até W3/W4; computed FILE aberto até W7;
-CICS completo W8, escopos W9. Qualification-local/corpus/performance NOT_RUN
-em W1, reservados aos checkpoints previstos. Nenhum blocker atual.
+Evidência: `artefatos-e2e/file-dependencies-20260916/w2/HANDOFF.md`.
+Contrato/limites: [W1](w1-implementation.md), [W2](w2-implementation.md).
+Efeitos/status/outcomes abertos W3/W4; computed W7; CICS W8; escopos W9.
+Qualification-local/corpus/performance NOT_RUN W2, previstos nos checkpoints.
+Sem blocker. Próximo: D-EFFECT com autoridade exata e oráculos O1–O5/CALL-X.
 
 ## Retomada
 
@@ -52,7 +52,7 @@ Branch persistente em todos: `feat/file-dependencies`; PRs OPEN/DRAFT/UNMERGED:
 | analysis-ir | [#7](https://github.com/Gustavo2358/analysis-ir/pull/7) |
 
 Próximo: AGENTS → página local → [brief](brief.md) →
-[FD-W2](../../work/active/FD-W2.yaml) → perfil/casos/gates necessários.
+[FD-W3](../../work/active/FD-W3.yaml) → perfil/casos/gates necessários.
 E2E local/sem remote; não executar runner CP3 nem reler discovery bruto.
 
 ## Decisões
