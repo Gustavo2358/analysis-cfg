@@ -27,7 +27,7 @@ lower/consumer recebem descritores/efeitos, nunca esses nomes de regras.
 | N07 `FILE STATUS`, status adicional | QUALIFIED / N-LR ([W6/auditoria e limites](w6-implementation.md)) | `fileStatusClause` → Destinos e tipos/áreas pertinentes; Efeitos sobre status chegam ao dataflow. | T10,T18 | W0/W3/W4 |
 | N08 FD versus SD | QUALIFIED / N-LR ([W5](w5-implementation.md)) | `fileDescriptionEntry` → Espécie explícita e associação a SELECT; SD/sort-work não produz nome externo ou alvo persistente inventado quando o fonte não o fornece. | T01,T23 | W0/W5 |
 | N09 Registros 01, vários layouts, COPY | QUALIFIED / N-LR ([W6/auditoria e limites](w6-implementation.md)) | `dataDescriptionEntry` → Relação registro–conector e áreas de memória; WRITE por registro resolve o arquivo proprietário. | T04,T05,T15 | W0/W3 |
-| N10 `GLOBAL`, `EXTERNAL`, programas contidos | DECLARATIVE QUALIFIED W0; scope/captures W9 TODO / N-LR | `globalClause/externalClause` → Visibilidade e identidade semântica; Mesma grafia não é prova de compartilhamento; captures explícitos. | T46 | W0/W9 |
+| N10 `GLOBAL`, `EXTERNAL`, programas contidos | QUALIFIED / N-LR ([W9/escopo](w9-implementation.md)) | `globalClause/externalClause` → Visibilidade e identidade semântica; Mesma grafia não é prova de compartilhamento; captures explícitos. | T46 | W0/W9 |
 | N11 `RECORD CONTAINS`, `RECORD VARYING`, DEPENDING | QUALIFIED / N-LR ([W6/auditoria e limites](w6-implementation.md)) | `recordContainsClause` → Comprimentos, dependências e desconhecimento localizado; Não sobrescrever bytes fora do intervalo provado. | T17 | W0/W3 |
 | N12 BLOCK/RECORDING MODE/LABEL/DATA RECORDS/CODE-SET | QUALIFIED / N-LR ([W6/auditoria e limites](w6-implementation.md)) | `fileDescriptionEntryClause` → Cláusulas conservadas; impacto classificado; Metadado sem efeito no alvo não bloqueia esse alvo; não apagar efeito real. | T51 | W0/W6 |
 | N13 `LINAGE`, contador, WRITE ADVANCING/EOP | QUALIFIED / N-LR ([W6/auditoria e limites](w6-implementation.md)) | `linageClause/writeStatement` → Metadados de impressão, estado e controle pertinente; EOP não confundido com EOF; operandos de paginação não são arquivos. | T10,T22 | W3/W4/W6 |
@@ -145,3 +145,13 @@ Cobertura fonte PRIMARY_ONLY/PARTIAL mantém remainder efetivo; fechado no model
 não é alegado como fechamento do fonte. Contraprova AIR COMPLETE/PARTIAL PASS.
 Oráculos completos manuais preservam os quatro estados; [gates/limites W8](w8-implementation.md).
 Sem lookup externo, DSNAME target ou ASSIGN DYNAMIC. W9/W11 pendentes.
+
+## Checkpoint W9 / N10, T04/T46/T47/T48
+
+Composição de todas as unidades publicadas, GLOBAL/capturas, EXTERNAL sem fusão,
+shadowing, qualificação e ambiguidade, COPY/REPLACING e unidade parcial: QUALIFIED.
+B-SP6+negativos, AIR manual de owners e E-SELECTED8 scope×2 nos pins de W9.
+CICS computed em filho com/sem CALL local prova valores e remainders por unidade;
+33native+38CICS×2 preservam famílias anteriores. PRIMARY_ONLY continua por unidade;
+inventário completo de unidades não é prova de cobertura completa dos corpos.
+Gates/limites: [W9](w9-implementation.md). W11 final pendente; W10 não autorizado.

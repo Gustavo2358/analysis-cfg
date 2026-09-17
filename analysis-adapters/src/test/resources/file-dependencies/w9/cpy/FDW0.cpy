@@ -1,0 +1,2 @@
+       FD FILE-TEMPLATE.
+       01 RECORD-TEMPLATE PIC X(8).

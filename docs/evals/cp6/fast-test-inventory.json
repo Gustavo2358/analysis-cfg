@@ -170,6 +170,10 @@
       "computedContextUsesBeforeAndSameGeneralProviderAsFile",
       "contextJoinsKeepIndependentCandidatesAndRemainder",
       "sourceInventoryGapOpensEvidenceWithoutInventingModelValues"
+    ],
+    "io.github.gustavo2358.analysis.adapters.FileScopeOracleTest": [
+      "declarationOwnerAndUseOwnerDifferWithoutTransitiveCallOrFile",
+      "enumerationOrderCannotReassignUses"
     ]
   },
   "analysis-dataflow": {

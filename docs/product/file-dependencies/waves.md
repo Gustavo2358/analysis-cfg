@@ -1,6 +1,6 @@
 # FD-W0–W11 — grafo e execução
 
-**H4 aprovado; core W0–W9/W11 autorizado. W0–W7 QUALIFIED_LOCAL; próxima W8; W10 NOT_AUTHORIZED.**
+**H4 aprovado; core W0–W9/W11 autorizado. W0–W9 QUALIFIED_LOCAL; próxima W11; W10 NOT_AUTHORIZED.**
 Cada link abre o item lean executável. Os campos do item + brief + gate indicado
 são suficientes; discovery bruto é opcional. Não converter TODO em IN_PROGRESS
 por ter escrito o plano. Wave qualificada não é DONE lean antes de merge/testes.

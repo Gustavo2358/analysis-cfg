@@ -1,6 +1,6 @@
 # Estado / handoff curto — CORE N+C
 
-**H4 aprovado; W0–W8 QUALIFIED_LOCAL; próxima W9.**
+**H4 aprovado; W0–W9 QUALIFIED_LOCAL; W11 TODO.**
 Core W0–W9/W11 autorizado em 2026-09-16, sem aprovação mecânica entre waves.
 W10 TODO / NOT_AUTHORIZED. Sem merge/auto-merge/release. STOP após W11.
 Waves qualificadas permanecem IN_PROGRESS lean enquanto PRs estiverem unmerged.
@@ -16,7 +16,8 @@ Waves qualificadas permanecem IN_PROGRESS lean enquanto PRs estiverem unmerged.
 | W6 | QUALIFIED_LOCAL; auxiliares N-LR/checkpoint/SAME, [gates/limites](w6-implementation.md) |
 | W7 | QUALIFIED_LOCAL; CICS FILE computed no motor geral, [gates/limites](w7-implementation.md) |
 | W8 | QUALIFIED_LOCAL; catálogo C-FC12, FILE/SYSID/REQID e efeitos; [gates/limites](w8-implementation.md) |
-| W9, W11 | TODO |
+| W9 | QUALIFIED_LOCAL; composição por unidade, owner/captures/escopo; [gates/limites](w9-implementation.md) |
+| W11 | TODO |
 | W10 | TODO / NOT_AUTHORIZED |
 
 ## Checkpoint W2
@@ -147,6 +148,28 @@ B-SP33, manual FILE/computed/contexto, reader18, E-SELECTED38 CICS+33native font
 quatro produtos determinísticos PASS. Logs/tentativas/pins no handoff E2E w8.
 Sem blocker; próxima W9. PRs persistentes Draft/unmerged, W10 NOT_AUTHORIZED.
 
+## Checkpoint W9
+
+Frontend d120036cb71f81ff3055ca1a47be32ac88dcad7a; lower código/pin
+9c4e7a340145f9031b7260616e4029f42c6cce91 (HEAD c31cd92 corrige somente docs);
+AIR5fe0224e5d2514286d6d23d486655334300383da; IRfb153ae inalterado.
+Envelope compilation1.0/SP2.28, parentage/capturas canônicas, GLOBAL/EXTERNAL,
+qualificação/ambiguidade, shadowing e COPY. Capturas aliasam objetos originais;
+FILE conserva declaration owner e use owner. Consumer produtivo sem delta.
+
+Frontend focal21/FAST352/Q945 (um skip histórico)+normalizer PASS; AIRFAST187/127/40;
+lower B-SP6/nove negativos/permutação, FAST2340+adapters e Q205081 semânticos+
+39215 performance/arquitetura PASS. CFG manual28/FAST504 zero skips/reader18 PASS.
+E-SELECTED8 scope+33native+38CICS fontes×2, quatro produtos determinísticos PASS.
+Par CICS contido com/sem CALL local mantém ACCOUNTS/R001; somente CALL local abre
+remainder do modelo, CALL do pai não interfere. Source remainder permanece real.
+
+Tentativas e contraprovas preservadas: COPY ID por unidade, codec visibleObjects,
+colisão de build, classpath ausente e oracle inicial que ignorava o CALL aberto.
+[W9](w9-implementation.md) registra limites PRIMARY_ONLY, view ancestral e entrada
+indisponível. Sem blocker; próxima W11 qualificação N+C pelo DAG autorizado.
+W10 NOT_AUTHORIZED, PRs Draft/unmerged.
+
 ## Retomada
 
 Worktrees exclusivos: `<workspace>/.file-dependencies/worktrees/<repo>`.
@@ -164,7 +187,7 @@ Branch persistente em todos: `feat/file-dependencies`; PRs OPEN/DRAFT/UNMERGED:
 | analysis-ir | [#7](https://github.com/Gustavo2358/analysis-ir/pull/7) |
 
 Próximo: AGENTS → página local → [brief](brief.md) →
-[FD-W9](../../work/active/FD-W9.yaml) → perfil/casos/gates necessários.
+[FD-W11](../../work/active/FD-W11.yaml) → perfil/casos/gates necessários.
 E2E local/sem remote; não executar runner CP3 nem reler discovery bruto.
 
 ## Decisões

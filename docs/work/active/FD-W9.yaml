@@ -1,6 +1,6 @@
 id: FD-W9
 title: Escopos, unidades contidas e bindings source-level
-status: TODO
+status: IN_PROGRESS
 scope:
 - file-dependencies
 - proleap-poc
@@ -60,6 +60,7 @@ acceptance:
 - PRIMARY_ONLY tem inventário limitado explícito; composição completa só se todas as unidades cobertas
 - Declarações/captures/records fecham refs, ambiguidades localizadas; inputs unitários continuam válidos
 evidence:
+- QUALIFIED_LOCAL; exact pins and commands in ../../product/file-dependencies/w9-implementation.md; lean IN_PROGRESS until authorized merge
 - Commit/pin exatos por fronteira; comandos/exit/results reais, testes novos vs REUSED vs NOT_RUN
 - Atualizar matriz somente com oracle/resultado; estado curto e PR persistente por repo, sem receipt obrigatório
 stop_condition: Parar após qualificação de escopo e agregação; wrappers interprograma permanecem fora do perfil.
