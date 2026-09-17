@@ -103,18 +103,21 @@ def main():
     parser.add_argument('--repeats', type=int, default=5)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--jfr', action='store_true')
+    parser.add_argument('--prototype', action='store_true', help='W3.2 test-only exact provenance probe; no production changes')
     parser.add_argument('--instrument', action='store_true')
     parser.add_argument('--rss', action='store_true', help='GNU time peak RSS of the Java process, including observation/JFR (not retained heap)')
     parser.add_argument('--compare', type=Path, help='Require exact complete typed facts and targets from a pre-fix probe directory')
     parser.add_argument('--source-ref', help='Compile the three measured production classes from an existing commit without switching the checkout')
     args = parser.parse_args(); args.output = args.output.resolve(); args.output.mkdir(parents=True, exist_ok=True)
+    if args.prototype and (args.jfr or args.instrument or args.source_ref):
+        parser.error('--prototype does not support JFR/instrument/source overlays; use the production probe for those')
     jars = ROOT / '.harness-results/build/m2'
     cp = os.pathsep.join([str(ROOT / module / 'target' / directory)
         for module in ('analysis-values', 'analysis-kernel', 'cfg-kernel') for directory in ('test-classes', 'classes')]
         + [str(p) for pattern in ('io/github/gustavo2358/air-java/*/*.jar', 'org/junit/jupiter/junit-jupiter-api/*/*.jar',
            'org/opentest4j/opentest4j/*/*.jar', 'org/apiguardian/apiguardian-api/*/*.jar', 'org/junit/platform/junit-platform-commons/*/*.jar') for p in jars.glob(pattern)])
     if args.instrument or args.source_ref: cp = overlay(args.output, cp, args.source_ref, args.instrument)
-    command = ['java', '-Xms256m', '-Xmx1g', '-XX:FlightRecorderOptions=stackdepth=256', '-cp', cp, PACKAGE + '.RegionalCostProbe',
+    command = ['java', '-Xms256m', '-Xmx1g', '-XX:FlightRecorderOptions=stackdepth=256', '-cp', cp, PACKAGE + ('.ExactProvenancePrototypeProbe' if args.prototype else '.RegionalCostProbe'),
         str(args.regions), str(args.producers), str(args.warmups), str(args.repeats), str(args.output)]
     if args.jfr: command.append('jfr')
     if args.rss: command = ['/usr/bin/time', '-v', '-o', str(args.output / 'rss.txt'), *command]

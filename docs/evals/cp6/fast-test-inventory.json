@@ -587,6 +587,15 @@
       "frozenW1FactsRetainAllTypedFieldsAndProducerIdentities",
       "snapshotRetainsEveryPartFieldAndRejectsUnsupportedTypes",
       "producerSetsLoseRangeAssociationsAndIndependentSetsInventCorrelations"
+    ],
+    "io.github.gustavo2358.analysis.values.ExactProvenancePrototypeTest": [
+      "fixtureBRoundTripCanonicalIdempotenceAndDuplicateProducer",
+      "exhaustiveTwoLevelUnionProjectRestrictAndAssociativity",
+      "differentShapesHashCollisionsAndLevelsNeverConflate",
+      "admissionRejectsEveryEnrichedProvenanceDimension",
+      "wholeWeakPartialCopyAndConnectedUpdateUseExactFallback",
+      "fixtureCAndLargerScalesKeepFrozenFactsWithFewerStructuralEdges",
+      "realConnectedCopyAndPartialCopyReplayKeepCompleteObservations"
     ]
   },
   "cfg-adapters": {
