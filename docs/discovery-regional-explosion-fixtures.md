@@ -1,9 +1,9 @@
 # Regional explosion campaign
 
 Current checkpoint: W1/W2 COMPLETE; W3.1 DISCOVERY COMPLETE; W3.2 BOUNDED
-FACTORING PROTOTYPE VALIDATED; W3.3 production implementation and W4 PENDING. PR #40 remains Draft;
+FACTORING PROTOTYPE VALIDATED; W3.3 production implementation IN PROGRESS; W4 PENDING. PR #40 remains Draft;
 merge only after W4 and final human review. The W1 sections below are historical
-reproduction evidence; production optimizations are documented under W2.
+reproduction evidence; production changes are documented under W2 and W3.3.
 
 # W1 — Regional explosion synthetic fixtures
 
@@ -1325,3 +1325,141 @@ historical; W3 production remains incomplete until the reviewed integration.
 Prototype/laws/probe commit: `e8a75a83bca7f7c3ec0a4b6ce11051de2de4fa5e`.
 The following documentation commit records this checkpoint; neither changes
 production. Final commit identities are recorded by Git and PR #40.
+
+# W3.3 — production bounded factoring
+
+W3.3_START_SHA: `b73d41bf644e102b36e5ab9d38609886e1632294`. Branch and PR #40
+match; working tree initially clean; PR OPEN/Draft, no auto-merge. Baseline W3.2
+focals PASS, including C 7/19, 16/50 766 edges with 800/750 targets, 32/100
+3,132 edges with 3,200/3,100 targets and all frozen semantic hashes. No drift.
+
+## Architecture decision before production implementation
+
+1. Add package-private `RegionalAlternatives` inside analysis-values. ByteImage,
+   StatementEffects and the generic FactorizedAlternatives remain unchanged.
+2. State.bindings holds regional canonical nodes at the existing fixed levels.
+3. Engine calls the regional adapter; only the adapter sees the concrete algebra.
+4. Admission, compact union/project/restrict, factor/expand and fallback are
+   centralized there. Observation expands only a selected projection, then uses
+   the existing fact construction. Arbitrary transforms use concrete fallback.
+5. Each fallback/observation creates a temporary concrete interner. An explicit
+   expand-into-interner overload supports exact canonical reference tests.
+6. Compact interner and immutable-root metric cache have Engine lifetime.
+7. Concrete interner and traversal memo maps have call lifetime; no field retains
+   expanded roots/history. Refactor recovers Engine-local compact identity.
+8. Compact edges retain shape and exact event IDs, not expanded images. Concrete
+   edges retain one ordinary Content. Use sorted immutable primitive int arrays
+   for events, with exact membership/union/equality and ordinary hash collision
+   handling. This avoids boxing but does not eliminate historical set copying.
+9. All graph traversals use explicit ArrayDeque frames/post-order work. Concrete
+   fallbacks use the existing iterative algebra. No recursive production DFS.
+10. Existing materialized/interned alternative metrics will explicitly count
+    structural edges; add event-row/expanded-equivalent counters. Immutable-node
+    summaries retain W2 caching and an O(1) leaf summary, without constructing
+    expanded labels to count them. No metric controls semantics or convergence.
+
+The admission predicate is exactly W3.2's thirteen conditions. The only additional
+native transform proposed is constant replacement with an admitted unknown label:
+replacing all outgoing labels at a level is equivalent to a single supplied label
+whose child is the exact union of the old children. This is the existing constant
+update semantics, proved separately against the concrete algebra before integration.
+General updates, initial merging, known/enriched replacements, partial/copy
+transforms remain concrete fallback. This narrow path prevents every weak unknown
+write from expanding the very set we are compacting.
+
+## Admission and exact canonical encoding
+
+**FACT:** The production predicate admits exactly one Part over `[0,extent)`,
+positive present extent, absent payload, payloadOffset=0, producerOffset=0,
+nonnegative producer, exactly one reason, and empty capturedOffsets, coInitial,
+sourceGaps and logicalSupports. Shape stores extent/reason; these plus the fixed
+admission fields and one event reconstruct the original ordinary ByteImage.
+No reason is special-cased. Every rejected label stays a concrete edge.
+
+The codec is internal to analysis-values: Bytes ↔ one ByteImage; Scalar has no
+image and remains concrete. Nodes are ordered immutable DAG nodes. Normalization
+partitions labels by exact shape and canonical child identity at the same level;
+the sorted unique `int[]` represents **disjunctive** producer alternatives, never
+simultaneous evidence. Equality compares every event, not hashes. There are no
+limits, probabilistic membership tests or dependencies.
+
+**STRONG EVIDENCE / proof argument:** An ordinary canonical relation maps each
+concrete label to one canonical child. The compact encoding partitions that map
+by `(shape, child identity)` and preserves the exact keys as events. This partition
+is unique and expansion is its inverse. Rebuilding bottom-up through the compact
+interner therefore restores the same root even after a temporary concrete
+interner has been discarded. Engine.equivalent and joinInto retain their existing
+identity checks and do not use sizes/events/hashes as semantic equality.
+
+## Semantic proof boundary
+
+| Operation | Native compact behavior | Concrete fallback boundary |
+| --- | --- | --- |
+| factor/expand | Iterative post-order exact encoding/decoding | Explicit concrete interner supplied by caller |
+| union | Same shape + same child merges exact event sets; concrete equal labels deduplicate | Overlapping concrete label/event under unequal children: expand this component, concrete union, refactor |
+| project | Keep selected levels; existential union of removed children | Only union conflicts need fallback |
+| restrict | Exact concrete equality or shape plus event membership; singleton selected event retains its child | No approximation or independent producer dimensions |
+| constant unknown replacement | Replace the label by the supplied admitted label over the union of old children | Non-admitted supplies use existing concrete update |
+| arbitrary update / initial merge | None | Expand component → unchanged concrete transformation → factor |
+| partial write / copy / capture / enriched metadata | No new transform semantics | Existing ByteImage/Engine logic plus local concrete update |
+| observation | Project selected levels | Expand only that projection and run existing selections/fact construction |
+
+All factor/expand/rewrite traversals use explicit ArrayDeque frames and identity
+memo tables. Union fallback and arbitrary update use the existing iterative
+FactorizedAlternatives implementation. No recursive prototype traversal was
+moved into production. Fallback is component-local: unrelated State bindings
+remain compact and unchanged. Within a connected component fallback can expand
+its entire DAG; this is an explicit residual cost, not a hidden guarantee of
+constant-time local edits.
+
+## Lifetime and metric meanings
+
+**FACT:** The compact interner and cached immutable-root summaries live with the
+Engine. Node ownership uses a separate opaque token, **not** a reference to the
+adapter/interner, so a retained State root does not itself retain interner history.
+There is no concrete-interner field, persistent expanded-root cache or global
+cache. Concrete interner, traversal memo and expanded nodes are call-local and
+eligible for collection after fallback/observation. Encoded concrete edges still
+retain their normal concrete Content when admission rejects them.
+
+Sorted primitive arrays avoid boxed Integer/HashSet event storage. Historical
+unions still copy event arrays and interned historical compact roots still retain
+those arrays until the Engine dies. This remains O(producers²) event-row history
+in these sequential fixtures, though each row is an int rather than a separate
+structural edge with a ByteImage. W3.3 does not claim to eliminate this history.
+
+| Metric after W3.3 | Meaning |
+| --- | --- |
+| materializedAlternatives / maxStateAlternatives | Current / maximum live **encoded structural edges**, not concrete labels or worlds |
+| decisionNodes / maxDecisionNodes | Distinct live encoded decision nodes |
+| maxComponentCardinality | Maximum distinct encoded labels at a level, not the count of expanded events |
+| internedNodes / internedAlternatives | Lifetime compact nodes / structural edges, excluding temporary concrete interners |
+| maxProvenanceRows | Maximum live admitted disjunctive event rows (not all evidence on concrete labels) |
+| maxExpandedAlternatives | Maximum live concrete-equivalent DAG edges, from cached counts, not world count |
+| internedProvenanceRows / internedExpandedAlternatives | Event rows / expanded-equivalent edges over compact interner history |
+| relationUnionPairs | Nontrivial compact union requests; temporary concrete recursive pair work is excluded |
+| concreteFallbacks / expandedLabels | Fallback calls / label reconstruction work; observation also contributes expandedLabels |
+| projectedAlternatives | Returned concrete selection tuples, unchanged meaning |
+
+solveMetrics captures these counters at solve completion, before later queries.
+No metric participates in fixed-point decisions. Leaf summaries are O(1), and
+non-leaf summaries are cached by immutable root, preserving the W2 strategy.
+Expanded-equivalent counts never construct ByteImages. Existing public method
+signatures and fact/wire schemas are unchanged; diagnostic metric meanings and
+additional map keys are documented here explicitly.
+
+## Implementation deltas and architecture inventory
+
+Production changes are confined to new RegionalAlternatives.java and private
+representation/calls in RegionalValuesAnalysis.java. ByteImage.java,
+FactorizedAlternatives.java, StatementEffects, target generation, AIR, public
+facts and wire code are unchanged. The generic concrete algebra remains domain
+agnostic and is the fallback/reference implementation.
+
+The exact architecture inventory was **not regenerated wholesale**. Its explicit
+source allowlist adds RegionalAlternatives; classfiles/jdeps/public descriptors
+add only that class and its nested types. Three existing private implementation
+dependency entries (Engine, its Accumulator and State) replace concrete relation
+types with regional relation types. Existing public descriptors, Maven edges and
+all unrelated inventory entries remain unchanged. FAST checks these deltas.
+The FAST test inventory explicitly adds the production laws and fallback stress.

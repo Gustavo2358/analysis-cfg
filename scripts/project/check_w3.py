@@ -8,7 +8,7 @@ from check_w1 import ROOT, Failure, command
 
 PREFIX='io.github.gustavo2358.analysis.values.'
 QUERY_PREFIX='io.github.gustavo2358.analysis.query.'
-VALUE_NAMES='Candidates SupportSet PersistentBindings PossibleValuesState ValuesWork ValueUniverse TextProfile ForeignEffectTransfer ConservativeEffectTransfer ValueFact PossibleValuesAnalysis ByteImage TextValueFact RegionalValueFact RegionalValuesAnalysis FactorizedAlternatives StorageValueFact StorageValueOrder'.split()
+VALUE_NAMES='Candidates SupportSet PersistentBindings PossibleValuesState ValuesWork ValueUniverse TextProfile ForeignEffectTransfer ConservativeEffectTransfer ValueFact PossibleValuesAnalysis ByteImage TextValueFact RegionalValueFact RegionalValuesAnalysis RegionalAlternatives FactorizedAlternatives StorageValueFact StorageValueOrder'.split()
 QUERY_NAMES='ProgramPoint PointQuery ObservationBatch BatchReplayer'.split()
 VALUE_SOURCES={f'analysis-values/src/main/java/io/github/gustavo2358/analysis/values/{n}.java' for n in VALUE_NAMES}
 QUERY_SOURCES={f'analysis-kernel/src/main/java/io/github/gustavo2358/analysis/query/{n}.java' for n in QUERY_NAMES}

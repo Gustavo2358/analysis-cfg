@@ -146,6 +146,8 @@ class ExactProvenancePrototypeTest {
             var result=ExactProvenanceFixtureBridge.check(RegionalExplosionFixturesTest.fixture(4,producers,disjoint),4);
             assertEquals(expected.get(producers+"/"+disjoint),RegionalSemanticSnapshot.digest(result.after()));
             assertEquals(result.concreteEdges(),result.compact().expandedEdges());
+            assertEquals(result.compact().structuralEdges(),result.solveMetrics().get("maxStateAlternatives"));
+            assertEquals(result.compact().provenanceRows(),result.solveMetrics().get("maxProvenanceRows"));
             if(!disjoint&&producers==5)assertTrue(result.compact().structuralEdges()<result.concreteEdges());
             System.out.printf("W32_C producers=%d disjoint=%s concrete=%d factored=%s%n",producers,disjoint,result.concreteEdges(),result.compact());
         }
@@ -158,6 +160,8 @@ class ExactProvenancePrototypeTest {
             assertEquals(regions==16?"f6a26180cba8e0090c652faa8e3619889a1e3bcdbd64775c0b5b262151c538b5":"027c14c2ea4b40906741282c18ecc736a057078ec6b1b882f7d8434b5d613983",
                 RegionalSemanticSnapshot.digest(RegionalExplosionFixturesTest.targets(publication)));
             assertEquals(result.concreteEdges(),result.compact().expandedEdges());
+            assertEquals(result.compact().structuralEdges(),result.solveMetrics().get("maxStateAlternatives"));
+            assertEquals(result.compact().provenanceRows(),result.solveMetrics().get("maxProvenanceRows"));
             assertEquals(result.unproven(),result.compact().provenanceRows());
             assertTrue(result.compact().structuralEdges()<result.concreteEdges()/2);
             System.out.printf("W32_SCALE regions=%d producers=%d targets=%d unproven=%d concrete=%d factored=%s facts=%s%n",

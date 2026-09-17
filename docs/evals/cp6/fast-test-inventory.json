@@ -596,6 +596,18 @@
       "wholeWeakPartialCopyAndConnectedUpdateUseExactFallback",
       "fixtureCAndLargerScalesKeepFrozenFactsWithFewerStructuralEdges",
       "realConnectedCopyAndPartialCopyReplayKeepCompleteObservations"
+    ],
+    "io.github.gustavo2358.analysis.values.RegionalAlternativesTest": [
+      "fixtureBRoundTripCanonicalIdempotenceAndDuplicateProducer",
+      "exhaustiveTwoLevelUnionProjectRestrictAndAssociativity",
+      "differentShapesHashCollisionsAndLevelsNeverConflate",
+      "admissionRejectsEveryEnrichedProvenanceDimension",
+      "wholeWeakPartialCopyAndConnectedUpdateUseExactFallback",
+      "constantOverwriteMatchesConcreteAndEventsHandleCollisionExactly",
+      "deepGraphOperationsAndTemporaryFallbackKeepCanonicalIdentity"
+    ],
+    "io.github.gustavo2358.analysis.values.RegionalFallbackStressTest": [
+      "repeatedPartialCopiesPreserveFullReplayAndActuallyUseFallback"
     ]
   },
   "cfg-adapters": {

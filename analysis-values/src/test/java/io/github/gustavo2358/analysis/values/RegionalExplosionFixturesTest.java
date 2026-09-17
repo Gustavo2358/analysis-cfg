@@ -149,6 +149,8 @@ class RegionalExplosionFixturesTest {
         var engine=analysis.new Engine();var state=engine.boundaries(selected).iterator().next().state();
         for(var write:p.units().getFirst().sequences().getFirst().instructions())state=engine.operation(state,write);
         assertEquals(state.materializedAlternatives(),metrics.get("maxStateAlternatives"));
+        assertEquals(disjoint?1:7,state.materializedAlternatives(),"production structural edges");
+        assertEquals(disjoint?0:3L*producers,metrics.get("maxProvenanceRows"));
         var labels=new HashSet<StorageValueFact.Alternative>();var shapes=new HashSet<StorageValueFact.Alternative>();
         var writerIds=new HashSet<String>();
         for(int base=1;base<4;base++) {
@@ -177,7 +179,7 @@ class RegionalExplosionFixturesTest {
         var own=at(execution,"return-s0",object(0));assertEquals(List.of("ABCDEFGH"),texts(own));
         assertEquals(List.of("synthetic-producer-"+(producers-1)),own.candidateSupports().getFirst().producers()
             .stream().map(support->support.evidence().localId()).toList());
-        var result=new Composition(preparedTargets.size(),unproven(preparedTargets),state.materializedAlternatives(),
+        var result=new Composition(preparedTargets.size(),unproven(preparedTargets),metrics.get("maxExpandedAlternatives"),
             state.decisionNodes(),labels.size(),shapes.size(),metrics.get("internedNodes"),metrics.get("internedAlternatives"));
         System.out.printf("W1_C disjoint=%s producers=%d %s%n",disjoint,producers,result);return result;
     }
