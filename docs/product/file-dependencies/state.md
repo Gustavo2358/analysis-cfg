@@ -1,7 +1,15 @@
 # Estado / handoff curto — CORE N+C
 
+**CLOSEOUT AUTORIZADO.** H0–H4 PREPARATION COMPLETE; W0–W9 QUALIFIED / PENDING_MERGE;
+W11 QUALIFIED_LOCAL_POST_EP_R2 / PENDING_MERGE. Sem feature work pendente no core N+C.
+W10 DEFERRED / OPTIONAL_EXTENSION / NOT_PART_OF_CORE; requer nova autorização de produto.
+Merges explícitos topológicos e smoke em main autorizados; sem auto-merge/release.
+[Fechamento](closeout.md) substitui o STOP de revisão anterior.
+
+## Qualificação anterior (histórico)
+
 **W0–W9 e W11 QUALIFIED_LOCAL_POST_EP_R2. STOP para revisão humana final.**
-H4 aprovado; execução core autorizada. W10 TODO / NOT_AUTHORIZED.
+H4 aprovado; execução core autorizada. W10 DEFERRED / OPTIONAL_EXTENSION.
 Nenhum merge/auto-merge/release. PRs Draft/unmerged; DONE lean não reivindicado.
 
 | Wave | Estado técnico |

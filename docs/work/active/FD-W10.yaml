@@ -1,6 +1,10 @@
 id: FD-W10
 title: Extensão posterior D — GnuCOBOL, Report Writer e APIs
-status: TODO
+status: TODO # Lean enum; classificação de produto DEFERRED, não pendência core
+product_status: DEFERRED
+classification: OPTIONAL_EXTENSION
+core_requirement: NOT_PART_OF_CORE
+authorization: REQUIRES_NEW_PRODUCT_AUTHORIZATION
 delivery_profile: EXTENDED_PROFILE
 scope:
 - file-dependencies

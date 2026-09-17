@@ -1,9 +1,17 @@
 # FILE-DEPENDENCIES — entrada da campanha
 
+**CLOSEOUT AUTORIZADO.** H0–H4 PREPARATION COMPLETE; W0–W9 QUALIFIED / PENDING_MERGE;
+W11 QUALIFIED_LOCAL_POST_EP_R2 / PENDING_MERGE. Sem feature work pendente no core N+C.
+W10 DEFERRED / OPTIONAL_EXTENSION / NOT_PART_OF_CORE; requer nova autorização de produto.
+Merges explícitos topológicos e smoke em main autorizados; sem auto-merge/release.
+[Fechamento](closeout.md) substitui o STOP de revisão anterior.
+
+## Qualificação anterior (histórico)
+
 [Checkpoint pós-EP-R2 qualificado](post-ep-r2.md): gates compartilhados e corpus73 reexecutados.
 
 Estado: **H4 aprovado; execução core N+C autorizada; W0–W9/W11 QUALIFIED_LOCAL_POST_EP_R2.**
-STOP para revisão humana final. W10 TODO / NOT_AUTHORIZED.
+STOP para revisão humana final. W10 DEFERRED / OPTIONAL_EXTENSION.
 [Resultado W11](w11-qualification.md), incluindo [C06 humano](c06-read-dataset.md) e reuso explícito dos gates anteriores.
 PRs persistentes permanecem Draft e unmerged. STOP final após W11.
 
