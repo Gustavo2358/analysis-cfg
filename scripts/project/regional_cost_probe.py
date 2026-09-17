@@ -51,7 +51,7 @@ def overlay(output, cp, source_ref=None, instrument=True):
         else:
             text = replace_once(text, 'public final class RegionalValuesAnalysis {', 'public final class RegionalValuesAnalysis {\n    static long w2TrackCalls,w2TrackNanos;')
             text = replace_once(text, 'private State track(State state) {', 'private State track(State state) { w2TrackCalls++;long w2Start=System.nanoTime();')
-            end = 'maxComponentCardinality=Math.max(maxComponentCardinality,' + ('totals[2]' if 'var totals=new long[3]' in text else 'size.maxComponent()') + ');'
+            end = 'maxComponentCardinality=Math.max(maxComponentCardinality,' + ('totals[2]' if 'var totals=new long[' in text else 'size.maxComponent()') + ');'
             text = replace_once(text, end+'return state;', end+'w2TrackNanos+=System.nanoTime()-w2Start;return state;')
         file = destination / (name + '.java'); file.write_text(text); files.append(str(file))
     subprocess.run(['javac', '--release', '21', '-cp', cp, '-d', str(destination), *files], check=True)
@@ -67,7 +67,7 @@ def summarize_jfr(path):
         values = event['values']
         frames = (values.get('stackTrace') or {}).get('frames', [])
         methods = [f['method']['type']['name'].replace('/', '.') + '.' + f['method']['name'] for f in frames]
-        regional = any(('RegionalValuesAnalysis' in m or 'FactorizedAlternatives' in m or 'ByteImage' in m) for m in methods)
+        regional = any(('RegionalValuesAnalysis' in m or 'FactorizedAlternatives' in m or 'RegionalAlternatives' in m or 'ByteImage' in m) for m in methods)
         if event['type'] == 'jdk.ObjectAllocationSample':
             if regional: allocations[values['objectClass']['name']] += values['weight']
             continue
@@ -76,11 +76,11 @@ def summarize_jfr(path):
         samples += 1
         if methods: leaves[methods[0]] += 1
         flags = {
-            'metrics_size_track': any(('FactorizedAlternatives.size' in m or 'RegionalValuesAnalysis$State.size' in m or 'RegionalValuesAnalysis$Engine.track' in m) for m in methods),
+            'metrics_size_track': any(('FactorizedAlternatives.size' in m or 'RegionalAlternatives.size' in m or 'RegionalValuesAnalysis$State.size' in m or 'RegionalValuesAnalysis$Engine.track' in m) for m in methods),
             'hashing': any('.hashCode' in m for m in methods),
-            'interning_node': any('FactorizedAlternatives.node' in m for m in methods),
-            'union': any('FactorizedAlternatives.union' in m for m in methods),
-            'representation_other': any(('FactorizedAlternatives.' in m or 'ByteImage.' in m) for m in methods),
+            'interning_node': any(('FactorizedAlternatives.node' in m or 'RegionalAlternatives.node' in m) for m in methods),
+            'union': any(('FactorizedAlternatives.union' in m or 'RegionalAlternatives.union' in m) for m in methods),
+            'representation_other': any(('FactorizedAlternatives.' in m or 'RegionalAlternatives.' in m or 'ByteImage.' in m) for m in methods),
         }
         for key, value in flags.items():
             if value: inclusive[key] += 1
@@ -90,6 +90,7 @@ def summarize_jfr(path):
         buckets[bucket] += 1
     result = {'regional_samples': samples, 'exclusive_samples': dict(buckets),
               'inclusive_samples_overlap': dict(inclusive), 'leaf_methods_top': leaves.most_common(15),
+              'regional_allocation_sample_weight_bytes': sum(allocations.values()),
               'regional_allocation_sample_weight_bytes_top': allocations.most_common(12)}
     path.with_suffix('.summary.json').write_text(json.dumps(result, indent=2) + '\n')
     print('W2_JFR ' + json.dumps(result, sort_keys=True))
@@ -103,6 +104,8 @@ def main():
     parser.add_argument('--repeats', type=int, default=5)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--jfr', action='store_true')
+    parser.add_argument('--disjoint', action='store_true')
+    parser.add_argument('--stress', action='store_true', help='Four-region alternating unknown writes and partial copies')
     parser.add_argument('--prototype', action='store_true', help='W3.2 test-only exact provenance probe; no production changes')
     parser.add_argument('--instrument', action='store_true')
     parser.add_argument('--rss', action='store_true', help='GNU time peak RSS of the Java process, including observation/JFR (not retained heap)')
@@ -120,6 +123,8 @@ def main():
     command = ['java', '-Xms256m', '-Xmx1g', '-XX:FlightRecorderOptions=stackdepth=256', '-cp', cp, PACKAGE + ('.ExactProvenancePrototypeProbe' if args.prototype else '.RegionalCostProbe'),
         str(args.regions), str(args.producers), str(args.warmups), str(args.repeats), str(args.output)]
     if args.jfr: command.append('jfr')
+    if args.disjoint: command.append('disjoint')
+    if args.stress: command.append('stress')
     if args.rss: command = ['/usr/bin/time', '-v', '-o', str(args.output / 'rss.txt'), *command]
     result = subprocess.run(command, check=True, text=True, stdout=subprocess.PIPE)
     (args.output / 'run.log').write_text(result.stdout); print(result.stdout, end='')

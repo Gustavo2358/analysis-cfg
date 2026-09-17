@@ -1,7 +1,7 @@
 # Regional explosion campaign
 
 Current checkpoint: W1/W2 COMPLETE; W3.1 DISCOVERY COMPLETE; W3.2 BOUNDED
-FACTORING PROTOTYPE VALIDATED; W3.3 production implementation IN PROGRESS; W4 PENDING. PR #40 remains Draft;
+FACTORING PROTOTYPE VALIDATED; W3.3 PRODUCTION IMPLEMENTATION COMPLETE / VALIDATED; W4 PENDING. PR #40 remains Draft;
 merge only after W4 and final human review. The W1 sections below are historical
 reproduction evidence; production changes are documented under W2 and W3.3.
 
@@ -1463,3 +1463,211 @@ dependency entries (Engine, its Accumulator and State) replace concrete relation
 types with regional relation types. Existing public descriptors, Maven edges and
 all unrelated inventory entries remain unchanged. FAST checks these deltas.
 The FAST test inventory explicitly adds the production laws and fallback stress.
+
+## W3.2 → W3.3 reconciliation
+
+**FACT (executed tests):** The production adapter, not only the prototype, passes:
+
+| Property | W3.2 prototype | W3.3 production |
+| --- | --- | --- |
+| Admission | Frozen bounded predicate | Same predicate; empty extent, partial/enriched forms rejected |
+| Canonical factor/expand | PASS | SAME concrete root in the supplied interner; SAME compact root after refactor |
+| Union | PASS | All 16 two-level relations, 256 pairs, 4,096 associativity triples; canonical commutativity/idempotence |
+| Project/restrict | PASS | Exact independent tuple oracle and concrete canonical identity; empty/all/single levels and mixed labels |
+| Deliberate collisions | PASS | Shape/ByteImage collision and primitive event-array collision; exact equality/membership |
+| Children/levels | Separate | Separate; foreign Engine ownership rejected |
+| Whole/weak updates | Exact | Exact; compatible constant unknown replacement also checked against concrete update |
+| Partial/copy/capture | Concrete fallback | Concrete fallback, full images and connected relation preserved |
+| Anti-correlation | Exactly 2 tuples | Exactly `(A,B)` and `(B,A)`, never 4 |
+| B producers | 10 | 10 expanded concrete labels, 1 structural edge, 10 event rows |
+| Real connected partial-copy replay | PASS | PASS against independent solver observation, including captures |
+| Depth | Recursive prototype, no production claim | 12,000 levels: factor, expand, project, restrict, update, conflicting-child union and selections PASS |
+
+The test replay bridge now expands actual production roots into its reference
+interner and refactors them into the original Engine. Its replay observation uses
+that replay Engine; roots from an unrelated Engine cannot be passed as if they
+belonged to its interner. This fixes the old test bridge's permissive ownership
+assumption without relaxing production ownership or semantic assertions.
+
+## Frozen snapshots — full comparison
+
+**FACT:** Complete typed facts **and** complete typed targets were compared as file
+bytes, using `RegionalSemanticSnapshot`'s field-by-field encoding, not only hashes.
+For C, the unchanged baseline classes were compiled from W3.3_START_SHA in a
+classpath overlay. For 16/50 and 32/100, both that overlay and final production
+were also compared with the already frozen W3.1 files. Only nonsemantic Set/Map
+ordering is normalized; record fields, lists, ranges, evidence and event metadata
+are retained. The six comparisons pass, including all C premise controls.
+
+| Case | Facts SHA-256, unchanged | Full typed targets |
+| --- | --- | --- |
+| C 1P no proof | `083a6aa0ff2826958698b32b42ffb6fafacad171b989d339f2e1d408c471e206` | byte-identical |
+| C 5P no proof | `3bf6ed5144cc53452781cca4809aee08a6eea32727697a092159400c9c5fcbbe` | byte-identical |
+| C 1P disjoint | `59eae5b3d2f41a5180c411c47ddc689ab4457517c361b79577d0f3e5ff8ea6e1` | byte-identical |
+| C 5P disjoint | `22d1216224174d58fb77291cf18e21ae45874c43032917c6bdc0153512072583` | byte-identical |
+| 16/50 | `e9b3792a76ffbd96d302075402c341701adfb9cbcb26c634af88cf8ea0656302` | byte-identical |
+| 32/100 | `9e8437da4f81de7deb3b717f2fe78fe0c5244943c09b7e18e594f44c491ca496` | byte-identical |
+
+The large target hashes remain respectively
+`f6a26180cba8e0090c652faa8e3619889a1e3bcdbd64775c0b5b262151c538b5` and
+`027c14c2ea4b40906741282c18ecc736a057078ec6b1b882f7d8434b5d613983`.
+Hashes identify evidence; successful full-file comparison is the actual gate.
+
+## Productive structure before/after
+
+**FACT:** These counts come from the real RegionalValuesAnalysis solver, not a
+post-solve prototype encoding. B is the isolated production relation law.
+
+| Case | Concrete baseline edges | Production structural edges | Expanded-equivalent edges | Live admitted event rows | Targets / unproven, unchanged |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| B | 10 | 1 | 10 | 10 | n/a |
+| C 1P no proof | 7 | 7 | 7 | 3 | 4 / 3 |
+| C 5P no proof | 19 | 7 | 19 | 15 | 20 / 15 |
+| C 1P disjoint | 1 | 1 | 1 | 0 | 1 / 0 |
+| C 5P disjoint | 1 | 1 | 1 | 0 | 5 / 0 |
+| 16/50 | 766 | 31 | 766 | 750 | 800 / 750 |
+| 32/100 | 3,132 | 63 | 3,132 | 3,100 | 3,200 / 3,100 |
+
+| Lifetime / work metric | 16/50 before → after | 32/100 before → after |
+| --- | ---: | ---: |
+| Live decision nodes | 16 → 16 | 32 → 32 |
+| Maximum component cardinality (old concrete → new structural) | 51 → 2 | 101 → 2 |
+| Interned nodes | 1,566 → 1,566 | 6,332 → 6,332 |
+| Interned edges (old concrete → new structural) | 20,691 → 2,316 | 162,882 → 9,432 |
+| Interned expanded-equivalent edges | 20,691 → 20,691 | 162,882 → 162,882 |
+| Interned admitted event rows after | 19,875 | 159,650 |
+| Union requests/pairs (see changed metric boundary above) | 750 → 750 | 3,100 → 3,100 |
+| Transfer visits / content reads / content updates | 800 → 800 each | 3,200 → 3,200 each |
+| Projected selections during solve | 800 → 800 | 3,200 → 3,200 |
+| Concrete fallback calls after | 50 | 100 |
+| Labels expanded during solve after | 50 | 100 |
+
+Live structural edges fall 96.0% and 98.0%; interned structural edges fall 88.8%
+and 94.2%. No targets or logical alternatives disappeared. Node/event history is
+still real and is not hidden in the structural-edge count.
+
+## Performance and memory evidence
+
+**STRONG EVIDENCE, diagnostic benchmark, not a semantic/CI clock contract.**
+Java 21.0.12+1.1-tem, same source pins, real solver, one JVM per fork,
+`-Xms256m -Xmx1g`, 20 warmups and 100 measured solves. Three baseline forks use
+START_SHA overlay; three final forks use production commit
+`7ab45503ee4764571d857e44bb5a689a5fa7ed42`. An earlier alternating before/after
+series produced the same direction; after the ownership-token lifetime fix,
+all final compact forks were rerun. No competing test suite ran during probes.
+JFR execution sampling is 2 ms; its recording covers only the measured solve
+loop. GNU time RSS covers the whole JVM, including warmup, JFR and observations.
+
+| Diagnostic median, 3 forks | 16/50 before → after | 32/100 before → after |
+| --- | ---: | ---: |
+| Wall, 100 solves | 1.490 s → 0.687 s | 9.107 s → 2.576 s |
+| Current thread CPU, 100 solves | 1.457 s → 0.671 s | 8.884 s → 2.515 s |
+| Peak RSS, KiB | 338,996 → 310,736 | 375,680 → 387,284 |
+| JFR estimated allocation weight in regional stacks, MiB | 1,293.6 → 433.8 | 9,141.9 → 2,138.8 |
+
+Wall reduction is approximately 54% / 72%. RSS shows no large process-memory
+regression in these scales, but 32/100's median is **3.1% higher**; this is not a
+claim of retained-heap reduction. Allocation samples estimate allocated traffic,
+not live objects/retained memory; JFR sample weights are not exact counters.
+
+JFR pooled execution samples across the three equal-work forks:
+
+| Category (exclusive priority: metrics, hashing, interning, union, other representation) | 16/50 before → after | 32/100 before → after |
+| --- | ---: | ---: |
+| Total regional samples | 777 → 182 | 7,427 → 1,491 |
+| Interning/node | 424 → 13 | 4,180 → 327 |
+| Hashing | 159 → 106 | 1,166 → 725 |
+| Other representation | 112 → 13 | 1,524 → 148 |
+| Union | 47 → 1 | 381 → 41 |
+| Metrics/track/size | 4 → 3 | 30 → 34 |
+| Other transfer | 27 → 43 | 142 → 210 |
+| Other solver | 4 → 3 | 4 → 6 |
+
+At 32/100, interning's approximate sample share falls 56.3% → 21.9%; hashing's
+share rises 15.7% → 48.6% while its absolute sampled work decreases. This is
+consistent with removing map/label representation work, not with removing
+transfers. Inclusive sample categories in the raw summaries overlap and must
+not be summed. CPU sample shares are diagnostic, not exact CPU attribution.
+
+### Frequent fallback stress
+
+The versioned RegionalFallbackStressTest fixture alternates direct writes with
+partial copies; the probe uses 32 rounds, four regions, no disjointness proof.
+Targets remain 256 / 192 unproven. Full typed facts and targets match START_SHA.
+Facts SHA: `46a6b9b07e682dfd910390564abe526a86887231c23be7f7020fe9e3d16ea56b`;
+targets SHA: `440e94134e0c659e3568c32d0c90d6716f93c9f072679d678bb001ca5e0bd393`.
+
+**FACT:** Per solve there are 96 concrete fallbacks and 5,453 reconstructed
+labels. Maximum live edges fall 235 → 109, while expanded equivalents remain
+235. Interned edges fall 6,776 → 2,744; nodes remain 1,528. Producer/range/capture
+correlations and complete observations are preserved.
+
+**STRONG EVIDENCE / explicit regression:** Three non-profiled timing forks with
+20 warmups/100 solves have median wall 0.972 → 1.328 s (**+36.6%**, approximately
+3.56 ms added per solve), thread CPU 0.950 → 1.299 s, and peak RSS
+307,180 → 318,168 KiB (+3.6%). A separate JFR diagnostic reports regional
+allocation sample weight 992.4 → 1,622.6 MiB; rewrite, interning and temporary
+map work remain visible. This workload pays repeated expand/concrete-update/
+refactor costs. Factoring is **not a universal runtime improvement**.
+
+The bounded prototype did not prove native complex updates; W3.3 intentionally
+keeps those exact fallbacks rather than broadening admission, adding a semantic
+threshold or independently combining producers/ranges. The stress has measurable
+overhead, not the multi-fold collapse warned about in the wave gate. Whether its
+frequency is acceptable on the corporate workload is a required W4 measurement,
+not a conclusion inferred from the compactable hot case.
+
+### Reproduction and raw evidence
+
+After compiling tests under Java 21, run (substitute 32/100 for the second scale):
+
+```sh
+python3 scripts/project/regional_cost_probe.py --regions 16 --producers 50 \
+  --warmups 20 --repeats 100 --jfr --rss \
+  --source-ref b73d41bf644e102b36e5ab9d38609886e1632294 --output /tmp/w33-before
+python3 scripts/project/regional_cost_probe.py --regions 16 --producers 50 \
+  --warmups 20 --repeats 100 --jfr --rss \
+  --output /tmp/w33-after --compare /tmp/w33-before
+```
+
+Repeat in separate JVMs. Use `--regions 4 --producers 1` / `5` with optional
+`--disjoint` for C; use `--regions 4 --producers 32 --stress` for fallback stress.
+The probe script now classifies RegionalAlternatives frames and reports total
+regional allocation sample weight, retaining old W2 diagnostics for comparison.
+Raw outputs are preserved locally under `.harness-results/w33/`: baseline-focals,
+module/FAST logs; `bench-before-*`, `final-after-*`, `C-before-*` / `C-after-*`,
+`stress-before-*` / `stress-after-*`, `stress-profile-*`. Each probe retains
+run.log, metrics, complete facts.typed/targets.typed, RSS and JFR/summary when
+requested. Build/toolchain/profiler binaries are not versioned.
+
+## Validation and remaining risks for W4
+
+**FACT:** Baseline W3.2 focals PASS before production edits; isolated production
+laws PASS before solver integration. After integration, complete
+`mvn -B -ntp -Dmaven.repo.local="$PWD/.harness-results/build/m2" -pl analysis-values -am test`
+passes 397 tests (108 cfg-kernel + 79 analysis-kernel + 210 analysis-values),
+zero failures/errors/skips. W1/W2/W3.1/W3.2 and new W3.3 laws/stress are included.
+The final FAST under Java 21 passes **571 required methods, zero skips**, all
+compiled architecture/pin/public descriptor checks and the remaining FAST gates.
+No architecture baseline was broadly regenerated, and no test was disabled.
+
+**STRONG EVIDENCE:** Productive factoring is exact within the frozen admission,
+full observations/targets match, anti-correlation is preserved, structure is
+smaller, and the two admitted hot-case scales have clear runtime/allocation gains
+without a large RSS regression. These support the W3.3 closeout; they do not prove
+the corporate program will finish or that every workload is faster.
+
+**HYPOTHESIS / W4 requirements:** Measure real admission coverage, connected-DAG
+size, fallback frequency and its +36.6% synthetic stress overhead, temporary
+expansion/observation cost, event-array history and actual retained memory/RSS.
+The non-leaf union conflict scan and complete component fallback can still cost
+substantial work on large connected relations. Targets/fan-out are unchanged;
+provenance rows and conservative alternatives still exist. Validate complete
+corporate facts/targets/evidence and the intended E2E outputs before any campaign
+merge decision. No pruning, widening, budget, limits or precision reduction were
+introduced. ByteImage equality/hash, AIR, wire and public fact APIs remain intact.
+
+W3.3 COMPLETE — PRODUCTION BOUNDED FACTORING VALIDATED
+
+READY FOR W4 E2E / CLOSEOUT — recommendation only; W4 has not started.
+PR #40 remains Draft. No merge authorized. Final human review remains required.

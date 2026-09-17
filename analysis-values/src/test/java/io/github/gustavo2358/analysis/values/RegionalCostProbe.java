@@ -19,7 +19,9 @@ public final class RegionalCostProbe {
         int regions=Integer.parseInt(args[0]),producers=Integer.parseInt(args[1]);
         int warmups=Integer.parseInt(args[2]),repeats=Integer.parseInt(args[3]);
         Path output=Path.of(args[4]);Files.createDirectories(output);
-        var p=RegionalExplosionFixturesTest.fixture(regions,producers,false);
+        var options=Arrays.asList(args);
+        var p=RegionalExplosionFixturesTest.fixture(regions,producers,options.contains("disjoint"));
+        if(options.contains("stress"))p=RegionalFallbackStressTest.fixture(producers);
         var selected=session(p);var admission=RegionalValuesAnalysis.prepare(selected);
         if(admission.status()!=RegionalValuesAnalysis.Status.ACCEPTED)throw new AssertionError(admission);
         var analysis=admission.analysis().orElseThrow();
@@ -28,7 +30,7 @@ public final class RegionalCostProbe {
         resetCounters();
         try(var recording=new Recording(Configuration.getConfiguration("profile"))) {
             recording.enable("jdk.ExecutionSample").withPeriod(Duration.ofMillis(2));
-            boolean profile=args.length>5&&args[5].equals("jfr");
+            boolean profile=options.contains("jfr");
             if(profile)recording.start();
             var bean=ManagementFactory.getThreadMXBean();
             long cpu=bean.getCurrentThreadCpuTime(),start=System.nanoTime();
