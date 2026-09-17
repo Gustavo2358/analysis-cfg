@@ -26,7 +26,7 @@ def check(root=ROOT,refresh=False):
     for source,targets in edges.items():
         for target in targets:
             if any(x in target for x in denied):raise ValueError('W1D core outward dependency: '+source+' -> '+target)
-            if source.endswith('CallDependencyConsumer') and any(x in target for x in consumer_denied):raise ValueError('W1D consumer acquired execution capability: '+target)
+            if source.endswith(('CallDependencyConsumer','FileDependencyConsumer')) and any(x in target for x in consumer_denied):raise ValueError('W1D consumer acquired execution capability: '+target)
     actual=dict(classfiles=paths,jdeps={k:sorted(v) for k,v in sorted(edges.items())},publicDescriptors={p:capture(['javap','-classpath',str(classes)+os.pathsep+cp,'-public','-s',p[:-6].replace('/','.')]) for p in paths})
     if refresh:(root/INVENTORY).write_text(json.dumps(actual,indent=2)+'\n')
     elif json.loads((root/INVENTORY).read_text())!=actual:raise ValueError('W1D compiled module inventory drift')

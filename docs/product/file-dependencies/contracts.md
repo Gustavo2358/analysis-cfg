@@ -1,8 +1,8 @@
 # Contratos, decisões e exemplos de intenção
 
-Este é desenho de harness, não schema implementado. [Brief](brief.md) é normativo
-para o escopo. Exemplos abaixo são manuais, independentes do futuro produtor;
-**NOT_RUN**, não Publications validadas nem fixtures GOLDEN copiadas da produção.
+[Brief](brief.md) é normativo para o escopo. As tabelas são oráculos manuais.
+A1–A4/A6 foram materializados em W1; A5 segue NOT_RUN/W10 e O1–O5 aguardam W3/W4.
+Estado implementado, transporte e gates: [W1](w1-implementation.md).
 
 ## Interfaces e consumo bilateral
 
@@ -48,7 +48,7 @@ sozinhos vínculo unit/conector/record/uso. `BindingWriter.empty(resources)` e
 
 **Decidido:** reutilizar invoke/efeitos/controle; completar codec existente se
 usado; não chamar ausência de codec de ausência de conceito normativo.
-**D-AIR ainda aberta em W1:** menor transporte tipado da associação indispensável.
+**D-AIR (desenho H, fechado em W1 abaixo):** menor transporte tipado da associação indispensável.
 Proposta preferida: extensão estrutural neutra, sem semântica COBOL no core,
 com owner, binding e refs de uso; só registrar em analysis-ir após demonstrar
 que as relações existentes não satisfazem A1–A4/A6 no core. A5 será reavaliada
@@ -132,3 +132,26 @@ posterior (decisão humana H4), CICS incluído, inventário separado de uso,
 reutilização do motor geral, ausência de execução W em H, e revisão humana em H4.
 Multi-unit seguirá composição selecionada; se captures exigirem outra estratégia,
 documentar contraexemplo antes de mudar, sem bloquear declaração local W0.
+
+## Checkpoint W1 — decisões em execução
+
+D-AIR: prova de perda executada contra air-java baf848ab, sem codec; oracle e log
+em `artefatos-e2e/file-dependencies-20260916/w1/`. Owner/record/use não são
+recuperáveis de Resource(id,description,origin) nem de ArtifactRelation.source.
+Extensão neutra escolhida: `resource.bindings@1`, declaração opcional dentro de
+Resource com owner/name/classification/nameSource, objetos por papel e usos
+(operation/role/origin). LocalResource distingue ausência de alvo externo de
+UnknownResource. Sem novo Target, Publication singleton ou payload livre.
+Norma em worktree dedicado analysis-ir, branch feat/file-dependencies. Model→validator→codec→consumer A1–A4/A6 PASS em W1; checkpoint/gates
+no estado e no handoff, sem promover A5/W10.
+
+D-WIRE: saída nova `analysis-dependency-result` **2.0.0**, sempre com
+`analysisBoundary=COBOL_SOURCE_ONLY` e `fileDependencies` tipado. Arrays sites/edges
+mantêm projeção CALL; não haverá writer legado paralelo. Reader independente
+conserva validação estrita dos arquivos históricos 1.1.0/1.2.0 e acrescenta ramo
+fechado 2.0.0. Cópia congelada do reader anterior demonstra rejeição de 2.0.0.
+Auditoria: scripts E2E/cohort/carddemo importam dependency_wire; métricas extraem
+sites/candidates CALL. Nenhum leitor adicional de dependency identificado no site.
+Testes devem verificar projeção CALL, rejeição antiga, fields/refs FILE, duas
+execuções determinísticas e falha de saída. Reader/negativos e coorte CLI selecionada passaram; FAST final/checkpoint
+registrados no estado da campanha. [Contrato executado](w1-implementation.md).

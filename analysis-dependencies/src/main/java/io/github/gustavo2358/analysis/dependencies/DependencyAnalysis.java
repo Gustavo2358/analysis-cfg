@@ -65,7 +65,7 @@ public final class DependencyAnalysis {
             metrics.put("reachabilityRuns",result.analyses().stream().filter(a->a.key().implementation().equals("Reachability")).count());
             metrics.put("indexedOperations",session.index().metrics().operationsIndexed());
             for(var analysis:result.analyses())analysis.metrics().forEach((name,value)->metrics.merge(analysis.key().implementation()+"."+name,value,Math::addExact));
-            return new DependencyResult(publication.id(),publication.airVersion(),sites,edges,metrics,publication.coverage().inventory(),publication.origins(),publication.artifacts(),publication.uncertainties().stream().map(Evidence.Uncertainty::id).toList(),List.copyOf(reasons));
+            return new DependencyResult(publication.id(),publication.airVersion(),sites,edges,metrics,publication.coverage().inventory(),publication.origins(),publication.artifacts(),publication.uncertainties().stream().map(Evidence.Uncertainty::id).toList(),List.copyOf(reasons),FileDependencyAnalysis.prepare(publication,session,execution,null));
         }
     }
     private record SiteKey(EntryId entry,OperationId operation) { }
@@ -83,7 +83,7 @@ public final class DependencyAnalysis {
         for(var site:sites)for(var candidate:site.candidates())edges.add(new DependencyResult.Edge(site.caller(),site.entry(),site.operation(),candidate,true));
         return new DependencyResult(publication.id(),publication.airVersion(),sites,edges,
             Map.of("possibleValuesPreparations",0L,"possibleValuesRuns",0L,"reachabilityRuns",0L,"partialSites",(long)sites.size()),
-            publication.coverage().inventory(),publication.origins(),publication.artifacts(),publication.uncertainties().stream().map(Evidence.Uncertainty::id).toList(),List.of(reason));
+            publication.coverage().inventory(),publication.origins(),publication.artifacts(),publication.uncertainties().stream().map(Evidence.Uncertainty::id).toList(),List.of(reason),FileDependencyAnalysis.prepare(publication,null,null,reason));
     }
     public enum Kind { INVALID_INPUT,INPUT_INCOMPLETE,CFG_UNSUPPORTED,ANALYSIS_UNSUPPORTED,RESOURCE_LIMIT,CONSUMER_FAILURE }
     public static final class Failure extends RuntimeException {

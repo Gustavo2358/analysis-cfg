@@ -3,16 +3,15 @@
   "observed_on": "2026-09-16",
   "analysis_ir": {
     "repository": "Gustavo2358/analysis-ir",
-    "commit": "6b8ce96f5b1020199e3fcceedf81d931a3b8d2ff",
+    "commit": "fb153ae50f343022db45d20d627e1afac85de916",
     "semantic_version": "2.0.0",
     "role": "normative",
-    "canonical_ref": "feat/evidence-preserving-partial-analysis",
+    "canonical_ref": "feat/file-dependencies",
     "upstream_review": {
-      "pull_request": 2,
-      "state": "merged",
-      "head_commit": "a6b771e03d143e1171cfc74448d51c2eabd8478c",
-      "merge_commit": "122ce54e1b9ef9b00646f93ece409ca8b63bc933",
-      "merged_at": "2026-09-06T14:29:50Z"
+      "pull_request": 7,
+      "state": "open",
+      "draft": true,
+      "head_commit": "fb153ae50f343022db45d20d627e1afac85de916"
     },
     "json_binding": {
       "owner": "Gustavo2358/analysis-ir",
@@ -23,13 +22,13 @@
       "targets_air_version": "2.0.0",
       "path": "bindings/json-v1.md",
       "review_path": "bindings/revisao-json-v1.md",
-      "checked_commit": "6b8ce96f5b1020199e3fcceedf81d931a3b8d2ff",
+      "checked_commit": "fb153ae50f343022db45d20d627e1afac85de916",
       "implemented_in_analysis_cfg": false
     },
     "files": [
       {
         "path": "README.md",
-        "git_blob_sha1": "dcc2412082c54dd5566fadcc23448d1ff62520bf"
+        "git_blob_sha1": "b7a34f838a71236880b65f28213a7b024fb53ef2"
       },
       {
         "path": "REFERENCIAS.md",
@@ -37,7 +36,7 @@
       },
       {
         "path": "bindings/json-v1.md",
-        "git_blob_sha1": "547d4c44d4efaa0dea806918b6a37309a1dc62ca"
+        "git_blob_sha1": "2d9c859be8f89465d57a68f8654dd107d44d2d07"
       },
       {
         "path": "bindings/revisao-json-v1.md",
@@ -85,11 +84,11 @@
       },
       {
         "path": "especificacao/08-contrato-de-consumidores.md",
-        "git_blob_sha1": "7680fb95190314444a8097f6a4a8a6d247af7428"
+        "git_blob_sha1": "5011c84a606c3d435b86edbf85546ce5a86253c5"
       },
       {
         "path": "especificacao/09-extensibilidade-e-compatibilidade.md",
-        "git_blob_sha1": "9046a7438ea7418d96a4447d25896d31c5e4f0ef"
+        "git_blob_sha1": "3055651af652070e2dc3d4ef397f53ba297e01b0"
       },
       {
         "path": "especificacao/10-perfis-de-conformidade.md",
@@ -130,21 +129,25 @@
       {
         "path": "especificacao/14-possibilidades-de-target.md",
         "git_blob_sha1": "51f3be03c932478b699e80526d32fa1c78ca938e"
+      },
+      {
+        "path": "especificacao/15-vinculos-de-recurso.md",
+        "git_blob_sha1": "6ac3a3856398c58af109164c29ff94a4ba746594"
       }
     ],
-    "baseline_assessment": "EP-W5 entry.possibilities@2 and scoped partial consumer policy; AIR 2.0.0/binding 1.0.0.",
+    "baseline_assessment": "FD-W1 resource.bindings@1 after model loss proof; AIR2.0.0/binding1.0.0.",
     "observed_on": "2026-09-16",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable."
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "5b8a5c231958b62de34583d871cbb10b473d53e8",
-    "canonical_ref": "feat/evidence-preserving-partial-analysis",
+    "commit": "d215d2bafbbabc714a3e9d0f2ff9e8927e0bf8f4",
+    "canonical_ref": "feat/file-dependencies",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
     "analysis_ir": {
       "semantic_version": "2.0.0",
-      "commit": "6b8ce96f5b1020199e3fcceedf81d931a3b8d2ff"
+      "commit": "fb153ae50f343022db45d20d627e1afac85de916"
     },
     "maven": {
       "group_id": "io.github.gustavo2358",
@@ -201,7 +204,7 @@
         "path": "air-json/pom.xml",
         "artifact_id": "air-json",
         "role": "shared_codec_4B_scalar_assign_consumed_by_cfg_adapters",
-        "coverage": "ST-W1 regional constant bounds, Region/View/alias, bytes, CopyBytes and explicit IBM1047; historical scalar/control forms preserved; W6 generic fit_text roundtrip with explicit pad and exact length; RF-W3 Argument value/copy/reference and results Place[]; RF-W4 canonical Place.Choice and target.possibilities@1 with unknown target domain"
+        "coverage": "ST-W1 regional constant bounds, Region/View/alias, bytes, CopyBytes and explicit IBM1047; historical scalar/control forms preserved; W6 generic fit_text roundtrip with explicit pad and exact length; RF-W3 Argument value/copy/reference and results Place[]; RF-W4 canonical Place.Choice and target.possibilities@1 with unknown target domain; FD-W1 ResourceDescription and resource.bindings@1 codec, owner/object/use validation"
       }
     },
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -256,9 +259,9 @@
       "docs/work/history/WORK-SEMANTIC-PRODUCT-003.md",
       "docs/domain/declarative-value-inference.md"
     ],
-    "semantic_product_version": "2.20.0",
+    "semantic_product_version": "2.22.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "b5f626f5b42b5168af29a740aace60a1f0a993d1",
+    "commit": "0d1d84f8d5018ade6f97daed680b5da642ce113f",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -269,15 +272,16 @@
       "scope": "local unconditional paragraph identity and explicit entry; G1-G5 and 1/2/5/40"
     },
     "storage_contract_version": "1.7.0",
-    "canonical_ref": "feat/evidence-preserving-partial-analysis",
+    "canonical_ref": "feat/file-dependencies",
     "observed_on": "2026-09-16",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
-    "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable."
+    "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
+    "fd_w1_validation": "docs/work/active/FD-W1.yaml"
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
-    "status": "EP-W5 FAST pass; explicit logical evidence and scoped PARTIAL publication; strict APIs retain structural rejection",
-    "commit": "69c78c5f696e1351c514f16c1fdab0c9d6cca524",
+    "status": "FD-W1 static file slice and fixed FAST pass; effects/control open pending W3/W4",
+    "commit": "70be551724e23faba2474dee8bd7a088e63af2ed",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -289,10 +293,11 @@
     "goto_validation": {
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
     },
-    "canonical_ref": "feat/evidence-preserving-partial-analysis",
+    "canonical_ref": "feat/file-dependencies",
     "observed_on": "2026-09-16",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
-    "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable."
+    "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
+    "fd_w1_validation": "docs/work/active/FD-W1.yaml"
   },
   "external": [
     {

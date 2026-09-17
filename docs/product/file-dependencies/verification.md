@@ -97,7 +97,7 @@ io.github.gustavo2358.analysis.cfg.launcher.AnalysisCfg <novo.air.json> <novo.cf
 io.github.gustavo2358.analysis.launcher.AnalysisDependencies <novo.air.json> <novo.dep.json>
 ```
 
-W1 acrescenta a coorte FILE ao padrão de driver em `scripts/project/` (fixtures
+W1 implementa `scripts/project/e2e_file_dependencies.py --work <novo-dir> --producers <producers.json>` no padrão de driver existente (fixtures
 em `analysis-adapters/src/test/resources/file-dependencies/`), com flags e comando
 documentados quando existirem. Isso é teste de integração da pipeline vigente,
 não outro harness. Executar CLIs reais, examinar exit code e produtos novos,
@@ -142,3 +142,8 @@ READ deve invalidar somente evidência afetada. Após falha: classificar RED esp
 bug, oracle antigo ou ambiente; corrigir, repetir o focal e as fronteiras invalidadas.
 Falha de recursos/infra não é unknown semântico (ADR-0014). Sem autorização de merge
 em H ou W11; parar para revisão humana com limitações explícitas.
+
+C-DEP em W1: o POM fixa failIfNoSpecifiedTests=true; `-am` com selector focal
+falha antes do módulo alvo. Construir o reactor atual (`mvn -DskipTests install`,
+sem alegar testes) e executar o selector em `-pl analysis-adapters` sem `-am`.
+O FAST fixo continua executando todos os módulos e verifica métodos/skips.

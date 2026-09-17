@@ -45,7 +45,7 @@ class PartialDependencyWireTests(unittest.TestCase):
         folder=ROOT/'analysis-adapters/target/ep-w4'
         for name in ('unsupported-values','unsupported-control'):
             d=read(folder/(name+'.json'))
-            self.assertEqual('1.2.0',d['version']);self.assertEqual('PARTIAL',d['analysisStatus'])
+            self.assertEqual('2.0.0',d['version']);self.assertEqual('PARTIAL',d['analysisStatus'])
             direct=next(s for s in d['sites'] if s['operation']['localId']=='direct')
             self.assertEqual(['DIRECT'],[c['referenceName'] for c in direct['candidates']])
             if name=='unsupported-values':
@@ -72,4 +72,54 @@ class PartialDependencyWireTests(unittest.TestCase):
         for mutation in mutations:
             d=copy.deepcopy(source);mutation(d)
             with self.assertRaises((ValueError,KeyError,TypeError)):validate(d)
+class FileDependencyWireTests(unittest.TestCase):
+    def test_manual_a1_a2_a3_a4_a6_and_old_reader_rejection(self):
+        import runpy
+        old=runpy.run_path(str(ROOT/'scripts/project/fixtures/dependency_wire_v1.py'))['validate']
+        for case in ('A1','A2','A3','A4','A6'):
+            d=read(ROOT/('analysis-adapters/target/fd-w1/'+case+'.json'))
+            self.assertEqual('2.0.0',d['version'])
+            self.assertEqual('COBOL_SOURCE_ONLY',d['analysisBoundary'])
+            with self.assertRaises(ValueError):old(d)
+        d=read(ROOT/'analysis-adapters/target/fd-w1/A1.json')['fileDependencies']
+        self.assertEqual('CLIENTDD',d['declarations'][0]['name'])
+        self.assertEqual('ASSIGNMENT_NAME',d['declarations'][0]['sourceKind'])
+        self.assertEqual([],d['sites']);self.assertEqual([],d['edges'])
+    def test_call_projection_still_satisfies_frozen_reader(self):
+        import runpy
+        old=runpy.run_path(str(ROOT/'scripts/project/fixtures/dependency_wire_v1.py'))['validate']
+        for name in ('dynamic-x8','literal','dynamic-no-move','orphan'):
+            d=read(ROOT/('analysis-adapters/target/w1d/'+name+'.json'))
+            projected=copy.deepcopy(d);projected.pop('fileDependencies');projected.pop('analysisBoundary')
+            if projected['analysisStatus']=='PARTIAL':projected['version']='1.2.0'
+            else:
+                projected['version']='1.1.0';projected.pop('analysisStatus');projected.pop('analysisReasons')
+                for site in projected['sites']:site.pop('analysisStatus');site.pop('analysisReasons')
+            self.assertEqual(projected,old(projected));self.assertEqual(projected,validate(projected))
+            self.assertEqual(d['edges'],projected['edges'])
+
+    def test_file_negatives_and_source_scope(self):
+        d=read(ROOT/'analysis-adapters/target/fd-w1/A2.json')
+        mutations=[
+            lambda d:d.pop('fileDependencies'),
+            lambda d:d.__setitem__('analysisBoundary','RUNTIME'),
+            lambda d:d['fileDependencies']['declarations'][0].pop('owner'),
+            lambda d:d['fileDependencies']['declarations'][0].__setitem__('bindingMechanism','UNKNOWN'),
+            lambda d:d['fileDependencies']['sites'][0]['bindings'][0]['declaration'].__setitem__('localId','absent'),
+            lambda d:d['fileDependencies']['sites'][0]['candidates'][0].__setitem__('referenceName','OTHER'),
+            lambda d:d['fileDependencies']['sites'][0]['candidates'][0].__setitem__('supports',[]),
+            lambda d:d['fileDependencies']['sites'][0].__setitem__('unknownRemainder',True),
+            lambda d:d['fileDependencies'].__setitem__('edges',[]),
+            lambda d:d['fileDependencies']['declarations'][0]['objects'][0]['object'].__setitem__('unit','foreign'),
+            lambda d:d['fileDependencies']['sites'][0]['origin'].__setitem__('localId','absent'),
+        ]
+        for change in mutations:
+            bad=copy.deepcopy(d);change(bad)
+            with self.assertRaises((ValueError,KeyError,TypeError)):validate(bad)
+    def test_unknown_computed_cannot_be_closed(self):
+        d=read(ROOT/'analysis-adapters/target/fd-w1/A4.json')
+        self.assertTrue(d['fileDependencies']['sites'][0]['unknownRemainder'])
+        d['fileDependencies']['sites'][0]['unknownRemainder']=False
+        with self.assertRaises(ValueError):validate(d)
+
 if __name__=='__main__':unittest.main()

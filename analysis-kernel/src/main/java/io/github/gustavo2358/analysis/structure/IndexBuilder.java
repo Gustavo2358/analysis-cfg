@@ -67,7 +67,7 @@ final class IndexBuilder {
         var namePolicies = NamePolicies.extensions(snapshot);
         for (var capability : snapshot.capabilities().required()) {
             count.visit("requiredCapabilities");
-            supported(capability.equals(Capabilities.TARGET_POSSIBILITIES) || capability.equals(Capabilities.MEMORY_REGIONS) || capability.equals(Capabilities.IBM1047) || capability.equals(Capabilities.ENTRY_POSSIBILITIES_V2) || capability.equals(Capabilities.ENTRY_POSSIBILITIES) || namePolicies.contains(capability), "unsupported control capability");
+            supported(capability.equals(Capabilities.RESOURCE_BINDINGS) || capability.equals(Capabilities.TARGET_POSSIBILITIES) || capability.equals(Capabilities.MEMORY_REGIONS) || capability.equals(Capabilities.IBM1047) || capability.equals(Capabilities.ENTRY_POSSIBILITIES_V2) || capability.equals(Capabilities.ENTRY_POSSIBILITIES) || namePolicies.contains(capability), "unsupported control capability");
         }
         supported(policy.acceptsInventory(snapshot.coverage().inventory()), "unsupported publication inventory policy");
         declarations();
