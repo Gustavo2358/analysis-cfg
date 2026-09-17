@@ -1,6 +1,6 @@
 id: FD-W6
 title: I-O-CONTROL e cláusulas auxiliares do perfil
-status: TODO
+status: IN_PROGRESS
 scope:
 - file-dependencies
 - proleap-poc

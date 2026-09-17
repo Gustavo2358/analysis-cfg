@@ -28,8 +28,8 @@ EXPECTED={
  'table-key':([],[],[],0), 'table-no-key':([],[],[],0),
  'release-disjoint':(['OUTC'],['work','release'],['SAFE0001'],1),
 }
-def oracle(name,sp,air,result,source):
-    require((sp['contractVersion'],sp['fileInventory']['version'])==CONTRACT,'current phase contract')
+def oracle(name,sp,air,result,source,*,contract=CONTRACT):
+    require((sp['contractVersion'],sp['fileInventory']['version'])==contract,'current phase contract')
     require(result['version']=='2.1.0','explicit local-site wire version')
     names,roles,calls,count=EXPECTED[name];files=result['fileDependencies']
     local=[s for s in files['sites'] if s['targetKind']=='LOCAL'];external=[s for s in files['sites'] if s['targetKind']!='LOCAL']

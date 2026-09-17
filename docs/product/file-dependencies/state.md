@@ -1,6 +1,6 @@
 # Estado / handoff curto — CORE N+C
 
-**H4 aprovado; W0/W1/W2/W3/W4/W5 QUALIFIED_LOCAL; próxima W6.**
+**H4 aprovado; W0–W6 QUALIFIED_LOCAL; próxima W7.**
 Core W0–W9/W11 autorizado em 2026-09-16, sem aprovação mecânica entre waves.
 W10 TODO / NOT_AUTHORIZED. Sem merge/auto-merge/release. STOP após W11.
 Waves qualificadas permanecem IN_PROGRESS lean enquanto PRs estiverem unmerged.
@@ -13,7 +13,8 @@ Waves qualificadas permanecem IN_PROGRESS lean enquanto PRs estiverem unmerged.
 | W3 | QUALIFIED_LOCAL; memória regional, D-EFFECT/memória e CALL |
 | W4 | QUALIFIED_LOCAL; handlers/status/USE, retorno delimitado |
 | W5 | QUALIFIED_LOCAL; fases SORT/MERGE, SD local, wire2.1; [limites/gates](w5-implementation.md) |
-| W6–W9, W11 | TODO |
+| W6 | QUALIFIED_LOCAL; auxiliares N-LR/checkpoint/SAME, [gates/limites](w6-implementation.md) |
+| W7–W9, W11 | TODO |
 | W10 | TODO / NOT_AUTHORIZED |
 
 ## Checkpoint W2
@@ -96,6 +97,23 @@ inválida preservada; corrigida segundo IBMp436, sem relaxar regra/reader.
 [Contrato/evidência](w5-implementation.md); handoff bruto local E2E `w5/`.
 Sem blocker; próxima W6 autorizada. PRs continuam Draft/unmerged.
 
+## Checkpoint W6
+
+Frontend `4f63f10c697feb76bf26ba8eb0fa663bb94b9b71` (SP2.27/fileInventory1.6),
+lower `4e8e1299314e965f0f0fc18de7acb9cd00f4652d`; AIR/IR pins W1 inalterados.
+RERUN sem EVERY/SELECT próprio conserva checkpoint/trigger; auxiliares têm papéis,
+efeitos/metadados e provenance. SAME QSAM documental, VSAM (incluindo AS-sequencial)
+alias de registros; LINE SEQUENTIAL IBM core. END_VOLUME ambíguo e métodos mistos
+mantêm limites locais, sem virar D. LINAGE counter desconhecido não preserva valor
+antigo após MOVE; CALL disjunto conserva suporte. Modelo fechado manual prova
+checkpoint read-only sem perda de valor; integração mantém controle CALL aberto.
+
+Frontend focal230/FAST336/Q-SHARED929 (um skip histórico) PASS. Lower19 SPs,
+negativos wire/memory/codec, FAST2340+adapters e Q-SHARED244296/39215 PASS.
+CFG FAST487, AIR manual15, reader12 e E-SELECTED33 fontes×2 PASS, quatro produtos
+determinísticos. Tentativas/oracle corrigido registrados em [W6](w6-implementation.md).
+Sem blocker. Próxima W7: D-DYNAMIC/core e possible-values CICS no ponto do comando.
+
 ## Retomada
 
 Worktrees exclusivos: `<workspace>/.file-dependencies/worktrees/<repo>`.
@@ -113,7 +131,7 @@ Branch persistente em todos: `feat/file-dependencies`; PRs OPEN/DRAFT/UNMERGED:
 | analysis-ir | [#7](https://github.com/Gustavo2358/analysis-ir/pull/7) |
 
 Próximo: AGENTS → página local → [brief](brief.md) →
-[FD-W6](../../work/active/FD-W6.yaml) → perfil/casos/gates necessários.
+[FD-W7](../../work/active/FD-W7.yaml) → perfil/casos/gates necessários.
 E2E local/sem remote; não executar runner CP3 nem reler discovery bruto.
 
 ## Decisões
