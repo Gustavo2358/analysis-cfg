@@ -1,6 +1,6 @@
 id: FD-W11
 title: Qualificação transversal do core N+C e handoff para revisão
-status: TODO
+status: IN_PROGRESS
 scope:
 - file-dependencies
 - analysis-cfg

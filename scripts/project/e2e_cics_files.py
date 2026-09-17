@@ -68,6 +68,6 @@ def oracle(name,sp,air,result,source):
     if name=='resp-call':require('OLD1' not in names(result['sites'][0]) and result['sites'][0]['modelValueRemainder'],'response write on return kills old response value')
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--work',type=Path,required=True);p.add_argument('--producers',type=Path,required=True);a=p.parse_args()
-    try:run(a.work.resolve(),a.producers.resolve(),fixtures=FIXTURES,expected=EXPECTED,check=oracle,label='FD-W8 C-FC',frontend_args=PROFILE)
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--work',type=Path,required=True);p.add_argument('--producers',type=Path,required=True);p.add_argument('--runtime',type=Path);a=p.parse_args()
+    try:run(a.work.resolve(),a.producers.resolve(),runtime_config=a.runtime,fixtures=FIXTURES,expected=EXPECTED,check=oracle,label='FD-W8 C-FC',frontend_args=PROFILE)
     except (ValueError,RuntimeError,OSError) as error:print('FAIL: '+str(error),file=sys.stderr);sys.exit(1)

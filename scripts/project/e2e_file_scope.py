@@ -61,6 +61,6 @@ def oracle(name,sp,air,result,source):
         require(all(s['caller']==({'PARENTPG':parent,'CHILDPG':child}[s['candidates'][0]['referenceName']]) for s in result['sites']),'CALL owners remain independent')
     require(all(u['product']['entryInventory']['scope']=='PRIMARY_ONLY' for u in sp['units']),'entry limitation remains explicit per unit')
 if __name__=='__main__':
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--work',type=Path,required=True);p.add_argument('--producers',type=Path,required=True);p.add_argument('--case',choices=EXPECTED,action='append');a=p.parse_args()
-    try:run(a.work.resolve(),a.producers.resolve(),fixtures=FIXTURES,expected={k:EXPECTED[k] for k in (a.case or EXPECTED)},check=oracle,label='FD-W9',frontend_args=PROFILE,sp_filename='cobol-semantic-compilation.json',copybooks=FIXTURES/'cpy')
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--work',type=Path,required=True);p.add_argument('--producers',type=Path,required=True);p.add_argument('--runtime',type=Path);p.add_argument('--case',choices=EXPECTED,action='append');a=p.parse_args()
+    try:run(a.work.resolve(),a.producers.resolve(),runtime_config=a.runtime,fixtures=FIXTURES,expected={k:EXPECTED[k] for k in (a.case or EXPECTED)},check=oracle,label='FD-W9',frontend_args=PROFILE,sp_filename='cobol-semantic-compilation.json',copybooks=FIXTURES/'cpy')
     except (ValueError,RuntimeError,OSError) as e:print('FAIL: '+str(e),file=sys.stderr);sys.exit(1)

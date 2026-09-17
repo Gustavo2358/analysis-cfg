@@ -1,6 +1,6 @@
 # Estado / handoff curto — CORE N+C
 
-**H4 aprovado; W0–W9 QUALIFIED_LOCAL; W11 TODO.**
+**H4 aprovado; W0–W9 QUALIFIED_LOCAL; W11 IN_PROGRESS.**
 Core W0–W9/W11 autorizado em 2026-09-16, sem aprovação mecânica entre waves.
 W10 TODO / NOT_AUTHORIZED. Sem merge/auto-merge/release. STOP após W11.
 Waves qualificadas permanecem IN_PROGRESS lean enquanto PRs estiverem unmerged.
@@ -17,7 +17,7 @@ Waves qualificadas permanecem IN_PROGRESS lean enquanto PRs estiverem unmerged.
 | W7 | QUALIFIED_LOCAL; CICS FILE computed no motor geral, [gates/limites](w7-implementation.md) |
 | W8 | QUALIFIED_LOCAL; catálogo C-FC12, FILE/SYSID/REQID e efeitos; [gates/limites](w8-implementation.md) |
 | W9 | QUALIFIED_LOCAL; composição por unidade, owner/captures/escopo; [gates/limites](w9-implementation.md) |
-| W11 | TODO |
+| W11 | IN_PROGRESS; pins limpos e qualificação final em DAG, [plano](w11-qualification.md) |
 | W10 | TODO / NOT_AUTHORIZED |
 
 ## Checkpoint W2

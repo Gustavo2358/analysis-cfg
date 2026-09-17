@@ -36,21 +36,21 @@ lower/consumer recebem descritores/efeitos, nunca esses nomes de regras.
 | N16 `RERUN`/checkpoint | QUALIFIED / N-LR ([W6/auditoria e limites](w6-implementation.md)) | `rerunClause` → Referência de checkpoint, arquivo gatilho quando aplicável, origem; Forma sem EVERY; dependência sem SELECT quando o perfil assim definir. | T29 | W6 |
 | N17 MULTIPLE FILE, APPLY/legado, commitment control | QUALIFIED / N-LR ([W6/auditoria e limites](w6-implementation.md)) | `ioControlClause` → Referências e classificação por dialeto; Não inventar um único alvo source-level quando a sintaxe representa múltiplos arquivos. | T51 | W6 |
 | N18 REPORT(S)/RD em dialetos com Report Writer | PLANNED / D-GC32 EXTENDED | `reportClause/reportSection` → Ligação relatório → arquivo; registros/controle pertinentes; Relatório não vira programa chamado. | D-RW | W10 |
-| N19 `OPEN INPUT/OUTPUT/I-O/EXTEND` | PLANNED / N-LR | `openStatement` → Um ou vários file-names agrupados por modo; Modo por arquivo; associação no OPEN; resultados/status; opções do perfil. | T07 | W2 |
-| N20 `CLOSE` e suas opções | PLANNED / N-LR | `closeStatement` → Um ou vários file-names; Cada uso; efeitos de fechamento; opções de mídia/lock, quando admitidas. | T08 | W2 |
-| N21 `READ` sequencial, NEXT e aleatório | PLANNED / N-LR | `readStatement` → File-name; Buffer, INTO, chave, lock, EOF/invalid key, delimitadores explícitos/implícitos. | T10–T14 | W2/W3/W4 |
-| N22 `WRITE` | PLANNED / N-LR | `writeStatement` → **Record-name**; Resolver proprietário; FROM; paginação; resultados/status e handlers. | T05,T06,T14 | W2/W3 |
-| N23 `REWRITE` | PLANNED / N-LR | `rewriteStatement` → **Record-name**; Resolver proprietário; FROM; atualização de registro; estado e invalid key. | T05,T14 | W2/W3 |
-| N24 `DELETE ... RECORD` | PLANNED / N-LR | `deleteStatement` → File-name; site de uso que pode sustentar programa→arquivo, inclusive quando é o único uso; operação DELETE_RECORD. Exclusão de registro, nunca remoção de dataset/DSNAME/recurso físico. | T09 | W2 |
-| N25 `START` | PLANNED / N-LR | `startStatement` → File-name; Posicionamento/chave; não equivale a leitura de conteúdo. | T08 | W2 |
+| N19 `OPEN INPUT/OUTPUT/I-O/EXTEND` | QUALIFIED / N-LR ([W2–W4](w4-implementation.md)) | `openStatement` → Um ou vários file-names agrupados por modo; Modo por arquivo; associação no OPEN; resultados/status; opções do perfil. | T07 | W2 |
+| N20 `CLOSE` e suas opções | QUALIFIED / N-LR ([W2–W4](w4-implementation.md)) | `closeStatement` → Um ou vários file-names; Cada uso; efeitos de fechamento; opções de mídia/lock, quando admitidas. | T08 | W2 |
+| N21 `READ` sequencial, NEXT e aleatório | QUALIFIED / N-LR ([W2–W4](w4-implementation.md)) | `readStatement` → File-name; Buffer, INTO, chave, lock, EOF/invalid key, delimitadores explícitos/implícitos. | T10–T14 | W2/W3/W4 |
+| N22 `WRITE` | QUALIFIED / N-LR ([W2–W4](w4-implementation.md)) | `writeStatement` → **Record-name**; Resolver proprietário; FROM; paginação; resultados/status e handlers. | T05,T06,T14 | W2/W3 |
+| N23 `REWRITE` | QUALIFIED / N-LR ([W2–W4](w4-implementation.md)) | `rewriteStatement` → **Record-name**; Resolver proprietário; FROM; atualização de registro; estado e invalid key. | T05,T14 | W2/W3 |
+| N24 `DELETE ... RECORD` | QUALIFIED / N-LR ([W2–W4](w4-implementation.md)) | `deleteStatement` → File-name; site de uso que pode sustentar programa→arquivo, inclusive quando é o único uso; operação DELETE_RECORD. Exclusão de registro, nunca remoção de dataset/DSNAME/recurso físico. | T09 | W2 |
+| N25 `START` | QUALIFIED / N-LR ([W2–W4](w4-implementation.md)) | `startStatement` → File-name; Posicionamento/chave; não equivale a leitura de conteúdo. | T08 | W2 |
 | N26 `SORT ... USING ... GIVING ...` | QUALIFIED / N-LR ([W5](w5-implementation.md)) | `sortStatement` → SD + arquivos de entrada e saída; Todos os recursos e papéis, inclusive I/O implícito. | T23 | W5 |
 | N27 `SORT ... INPUT/OUTPUT PROCEDURE` | QUALIFIED / N-LR ([W5](w5-implementation.md)) | `sortStatement` → SD + procedimentos locais; Invocação/retorno de procedimentos locais; não criar dependência programa–programa fictícia. | T24 | W5 |
 | N28 `MERGE ... USING ... GIVING/OUTPUT PROCEDURE` | QUALIFIED / N-LR ([W5](w5-implementation.md)) | `mergeStatement` → SD + entradas/saídas; Múltiplas entradas e restrições próprias; não copiar sintaxe de SORT indiscriminadamente. | T25 | W5 |
 | N29 `RELEASE [FROM]` | QUALIFIED / N-LR ([W5](w5-implementation.md)) | `releaseStatement` → Sort record; Resolver SD proprietário; semântica de transferência e memória. | T26 | W5 |
 | N30 `RETURN sort-file [INTO]` | QUALIFIED / N-LR ([W5](w5-implementation.md)) | `returnStatement` → SD; Próximo registro de sort; AT END; não é GOBACK. | T27 | W5 |
-| N31 `USE AFTER ... ERROR/EXCEPTION` | PLANNED / N-LR | `useStatement` → Arquivo/modo conforme forma; Associação handler–evento; disparo, precedência e retorno. | T21,T22 | W4 |
-| N32 `AT END`, `INVALID KEY`, formas NOT, END-* | PLANNED / N-LR | `readStatement/writeStatement` → Operação envolvente; Sucessores corretos; statements internos visitados uma única vez. | T11,T12 | W2/W4 |
-| N33 Referências em IF/EVALUATE/PERFORM/GO TO | PLANNED / N-LR | `statement/IF/EVALUATE/PERFORM/GO TO` → Sites I/O dentro desses corpos; Reutilizar controle atual; não achatar todos os acessos em execução linear. | CALL-X5 | W2/W4 |
+| N31 `USE AFTER ... ERROR/EXCEPTION` | QUALIFIED / N-LR ([W2–W4](w4-implementation.md)) | `useStatement` → Arquivo/modo conforme forma; Associação handler–evento; disparo, precedência e retorno. | T21,T22 | W4 |
+| N32 `AT END`, `INVALID KEY`, formas NOT, END-* | QUALIFIED / N-LR ([W2–W4](w4-implementation.md)) | `readStatement/writeStatement` → Operação envolvente; Sucessores corretos; statements internos visitados uma única vez. | T11,T12 | W2/W4 |
+| N33 Referências em IF/EVALUATE/PERFORM/GO TO | QUALIFIED / N-LR ([W2–W4](w4-implementation.md)) | `statement/IF/EVALUATE/PERFORM/GO TO` → Sites I/O dentro desses corpos; Reutilizar controle atual; não achatar todos os acessos em execução linear. | CALL-X5 | W2/W4 |
 
 ## C — CICS TS 5.6 confirmado
 
@@ -155,3 +155,19 @@ CICS computed em filho com/sem CALL local prova valores e remainders por unidade
 33native+38CICS×2 preservam famílias anteriores. PRIMARY_ONLY continua por unidade;
 inventário completo de unidades não é prova de cobertura completa dos corpos.
 Gates/limites: [W9](w9-implementation.md). W11 final pendente; W10 não autorizado.
+
+## Qualificação final W11 em curso
+
+N19–N25/N31–N33 agregam as dimensões W2/W3/W4 já qualificadas: native14,
+memory6 e control8 foram reexecutadas duas vezes no snapshot2 (SP2.28/lower
+ee876281/AIR5fe0224/CFG381f55a), incluindo DELETE-only, WRITE FROM, handlers/USE,
+status e IF/EVALUATE/GO TO. A remediação de continuação intrínseca em PERFORM ao
+fim de parágrafo foi demonstrada pelo corpus e tem RED/GREEN bilateral; seus
+pins finais/gates descendentes são registrados em [W11](w11-qualification.md).
+
+C06 qualifica os aliases selecionados/documentados na autoridade W8: SET DATASET
+→ FILE, OBJECTNAME → atributo DSNAME (nunca target). READ DATASET observado no
+corpus permanece **não qualificado**: falta autoridade API5.6 específica; não
+conta como FILE reconhecido, não é reclassificado como D e não recebe identidade
+inferida por grafia. Formas C-FC FILE literais/computed, com seus limites de
+storage/controle, são qualificadas separadamente. Nenhuma claim CICS universal.

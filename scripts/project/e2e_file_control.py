@@ -47,11 +47,11 @@ def oracle(name,sp,air,result,source,*,contract=CONTRACT):
                 require(all(s['role']!='INTO' for s in effect['steps']),'no INTO on failed read')
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--work',type=Path,required=True);parser.add_argument('--producers',type=Path,required=True);args=parser.parse_args()
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--work',type=Path,required=True);parser.add_argument('--producers',type=Path,required=True);parser.add_argument('--runtime',type=Path);parser.add_argument('--sp-version',default=CONTRACT[0]);parser.add_argument('--file-inventory-version',default=CONTRACT[1]);args=parser.parse_args();contract=(args.sp_version,args.file_inventory_version)
     try:
         for label,fixtures,expected,check,options in (
-            ('native',NATIVE_FIXTURES,NATIVE,lambda *a:native_oracle(*a,contract=CONTRACT),()),
-            ('memory',MEMORY_FIXTURES,MEMORY,lambda *a:memory_oracle(*a,contract=CONTRACT),PROFILE),
-            ('control',FIXTURES,EXPECTED,oracle,PROFILE)):
-            run(args.work.resolve()/label,args.producers.resolve(),fixtures=fixtures,expected=expected,check=check,label='FD-W4 '+label,frontend_args=options)
+            ('native',NATIVE_FIXTURES,NATIVE,lambda *a:native_oracle(*a,contract=contract),()),
+            ('memory',MEMORY_FIXTURES,MEMORY,lambda *a:memory_oracle(*a,contract=contract),PROFILE),
+            ('control',FIXTURES,EXPECTED,lambda *a:oracle(*a,contract=contract),PROFILE)):
+            run(args.work.resolve()/label,args.producers.resolve(),runtime_config=args.runtime,fixtures=fixtures,expected=expected,check=check,label='FD-W4 '+label,frontend_args=options)
     except (ValueError,RuntimeError,OSError) as error:print('FAIL: '+str(error),file=sys.stderr);sys.exit(1)

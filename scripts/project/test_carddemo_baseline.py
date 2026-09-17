@@ -14,6 +14,56 @@ import carddemo_entry_delta as entry_delta
 
 
 class BaselineTests(unittest.TestCase):
+    def test_file_dependency_branch_uses_air_when_strict_cfg_export_refuses_partial(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);upstream=root/'source';upstream.mkdir();(upstream/'one.cbl').write_text('source')
+            checkout=root/'frontend';(checkout/'src/main/resources/web').mkdir(parents=True)
+            work=root/'run';work.mkdir();visited=[]
+            config={'checkouts':{'proleap-poc':str(checkout)},'semanticProductVersion':'2.28.0','dependencyIndependentOfCfg':True,
+                    **{s:{'classpath':[],'main':s} for s in runner.STAGES}}
+            def execute(stage,command,cwd,timeout,**kwargs):
+                visited.append(stage)
+                if stage=='cfg':return {'state':'BLOCKED','reasonCategory':'CFG_ANALYSIS_GAP','reasonCode':'CFG_REJECTED','diagnostic':'strict unproved operation','exitCode':3,'elapsedMs':1}
+                if stage=='frontend':
+                    path=cwd/'sp/cobol-semantic-product.json';path.parent.mkdir()
+                    data={'contractVersion':'2.28.0','unit':{'canonicalProgramName':'ONE'},'gaps':[],
+                          'coverage':{'partialStatements':0,'unsupportedStatements':0,'inputMissingStatements':0}}
+                elif stage=='lower':path=cwd/'program.air.json';data={'publication':{'uncertainties':[{'code':'UNPROVED'}]}}
+                else:path=cwd/'dependencies.json';data={'publicationInventory':'PARTIAL','sites':[],'fileDependencies':{'sites':[]}}
+                path.write_text(json.dumps(data));return {'state':'PASS','exitCode':0,'elapsedMs':1}
+            with patch.object(runner,'libraries',return_value=([],[],[])),patch.object(runner,'execute_stage',side_effect=execute),patch('dependency_wire.read'):
+                result=runner.attempt_program({'path':'one.cbl'},upstream,work,config,5,[])
+            self.assertEqual(visited,list(runner.STAGES))
+            self.assertEqual(result['stages']['cfg']['state'],'BLOCKED')
+            self.assertEqual(result['stages']['dependency']['state'],'PARTIAL')
+            self.assertFalse(result['stages']['cfg']['artifactProduced'])
+
+    def test_file_campaign_compilation_preserves_every_unit_and_partial_child(self):
+        def unit(name, gaps):
+            return {'contractVersion':'2.28.0', 'unit':{'canonicalProgramName':name},
+                    'gaps':gaps, 'coverage':{'partialStatements':0,'unsupportedStatements':0,'inputMissingStatements':0}}
+        a,b=unit('PARENT',[]),unit('CHILD',[{'code':'INPUT_MISSING'}])
+        document={'schema':'cobol-semantic-compilation','contractVersion':'1.0.0',
+                  'inventoryStatus':'COMPLETE','unitInventory':[a['unit'],b['unit']],
+                  'units':[{'product':a},{'product':b}]}
+        config={'semanticProductVersion':'2.28.0','compilationProductVersion':'1.0.0'}
+        actual=runner.frontend_summary(document,config)
+        self.assertEqual(actual['programNames'],['PARENT','CHILD'])
+        self.assertTrue(actual['partial'])
+        self.assertFalse(runner.frontend_summary(a,config)['partial'])
+        self.assertTrue(runner.frontend_summary({**a,'entryInventory':{'status':'PARTIAL'}},config)['partial'])
+        with self.assertRaisesRegex(ValueError,'compilation version'):
+            runner.frontend_summary({**document,'contractVersion':'9'},config)
+
+    def test_file_campaign_resources_are_per_process_and_preserve_failure(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            result=runner.execute_stage('lower',[sys.executable,'-c','import sys; x=bytearray(2000000); sys.exit(4)'],Path(tmp),5,measure_resources=True)
+            self.assertEqual(result['exitCode'],4)
+            self.assertEqual(result['state'],'BLOCKED')
+            self.assertGreater(result['resources']['maximumResidentSetKiB'],0)
+            self.assertGreaterEqual(result['resources']['userSeconds'],0)
+            self.assertTrue((Path(tmp)/'lower.resources.json').is_file())
+
     def test_explicit_after_pins_keep_strict_runtime_admission(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp); pins = root / 'pins.json'; runtime = root / 'runtime.json'

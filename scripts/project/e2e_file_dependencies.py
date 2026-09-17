@@ -6,6 +6,7 @@ from dependency_wire import read,require
 from cfg_wire_contract import verify as verify_cfg_wire
 from e2e_w2d import execute,runtime,source_spans
 from prepare_w2d_producers import ROOT,git,require_local
+from carddemo_setup import check_snapshot
 FIXTURES=ROOT/'analysis-adapters/src/test/resources/file-dependencies/w1'
 EXPECTED={
     'static':(['F'],['open','read','close'],[]),
@@ -48,12 +49,17 @@ def oracle(name,sp,air,result,source):
     scope(result)
 
 
-def run(work,config_path,*,fixtures=FIXTURES,expected=EXPECTED,check=oracle,label="FD-W1",frontend_args=(),sp_filename="cobol-semantic-product.json",copybooks=None):
+def run(work,config_path,*,fixtures=FIXTURES,expected=EXPECTED,check=oracle,label="FD-W1",frontend_args=(),sp_filename="cobol-semantic-product.json",copybooks=None,runtime_config=None):
     require_local();work.mkdir(parents=True,exist_ok=False)
     producer=config_path.parent;config=json.loads(config_path.read_text());lock=json.loads((ROOT/'docs/sources/sources.lock.json').read_text())
     for repo,key in (('air-java','air_java'),('proleap-poc','proleap_poc'),('cobol-lower','cobol_lower')):
         require(config['sources'][repo]==lock[key]['commit']==git(producer/repo,'rev-parse','HEAD') and not git(producer/repo,'status','--porcelain'),'immutable producer '+repo)
-    cp=runtime(producer)
+    frozen=json.loads(runtime_config.read_text()) if runtime_config else None
+    if frozen:
+        require(all(frozen['sources'][repo]==pin for repo,pin in config['sources'].items()),'frozen runtime producer pins')
+        require(frozen['cfg']['classpath']==frozen['dependency']['classpath'],'shared frozen consumer runtime')
+        for repo,pin in frozen['sources'].items():check_snapshot(Path(frozen['checkouts'][repo]),pin)
+    cp=os.pathsep.join(frozen['dependency']['classpath']) if frozen else runtime(producer)
     for name in expected:
         outputs=[]
         for attempt in ('A','B'):
@@ -77,6 +83,8 @@ def run(work,config_path,*,fixtures=FIXTURES,expected=EXPECTED,check=oracle,labe
                 require(not list(cwd.glob('.dependencies-*.tmp')),'no abandoned temp output')
             print('PASS '+label+' '+name+' '+attempt,flush=True)
         require(outputs[0]==outputs[1],name+' deterministic SP/AIR/CFG/FILE+CALL bytes')
+    if frozen:
+        for repo,pin in frozen['sources'].items():check_snapshot(Path(frozen['checkouts'][repo]),pin)
     print('PASS E-SELECTED '+label+' '+str(len(expected))+' fixtures twice, deterministic SP/AIR/CFG/dependencies',flush=True)
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--work',type=Path,required=True);p.add_argument('--producers',type=Path,required=True);args=p.parse_args()

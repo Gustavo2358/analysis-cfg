@@ -57,11 +57,11 @@ def oracle(name,sp,air,result,source,*,contract=CONTRACT):
         require(operation['effectBound']['otherwise']['writes']['kind']=='none','checkpoint never kills COBOL memory')
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--work',type=Path,required=True);p.add_argument('--producers',type=Path,required=True);p.add_argument('--sp-version',default=CONTRACT[0]);a=p.parse_args();contract=(a.sp_version,CONTRACT[1])
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--work',type=Path,required=True);p.add_argument('--producers',type=Path,required=True);p.add_argument('--runtime',type=Path);p.add_argument('--sp-version',default=CONTRACT[0]);a=p.parse_args();contract=(a.sp_version,CONTRACT[1])
     try:
         for label,fixtures,expected,check in (
             ('auxiliary',FIXTURES,EXPECTED,lambda *x:oracle(*x,contract=contract)),
             ('memory',MEMORY_FIXTURES,MEMORY,lambda *x:memory_oracle(*x,contract=contract)),
             ('sort',SORT_FIXTURES,SORT,lambda *x:sort_oracle(*x,contract=contract))):
-            run(a.work.resolve()/label,a.producers.resolve(),fixtures=fixtures,expected=expected,check=check,label='FD-W6 '+label,frontend_args=PROFILE)
+            run(a.work.resolve()/label,a.producers.resolve(),runtime_config=a.runtime,fixtures=fixtures,expected=expected,check=check,label='FD-W6 '+label,frontend_args=PROFILE)
     except (ValueError,RuntimeError,OSError) as e:print('FAIL: '+str(e),file=sys.stderr);sys.exit(1)

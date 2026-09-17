@@ -276,7 +276,7 @@
     ],
     "semantic_product_version": "2.28.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "d120036cb71f81ff3055ca1a47be32ac88dcad7a",
+    "commit": "aaecf8c1b1851c03dc13b8120e07308079f7e679",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -304,7 +304,7 @@
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "FD-W9 typed compilation and canonical captures; producer focal/FAST/Q-SHARED PASS",
-    "commit": "9c4e7a340145f9031b7260616e4029f42c6cce91",
+    "commit": "24ee0ef933f8f9c6a49ee610d12ac822e8e7d8b6",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -327,7 +327,8 @@
     "fd_w5_validation": "QUALIFIED_LOCAL: focal/FAST, producer Q-SHARED with bounded final reuse, manual local AIR/wire and44 real CLI sources twice; file-dependencies/w5-implementation.md",
     "fd_w6_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED,19 B-SP fixtures,15 manual AIR tests and33 real CLI sources twice; file-dependencies/w6-implementation.md",
     "fd_w8_validation": "QUALIFIED_LOCAL: producer FAST/Q-SHARED, B-SP33, CFG FAST502/Q547, manual/wire and38CICS+33native source cases twice; docs/product/file-dependencies/w8-implementation.md",
-    "fd_w9_validation": "QUALIFIED_LOCAL: producer focal/FAST/Q, consumer manual/FAST/reader, 8 scope + 33 native + 38 CICS real CLI sources twice, deterministic four products; docs/product/file-dependencies/w9-implementation.md"
+    "fd_w9_validation": "QUALIFIED_LOCAL: producer focal/FAST/Q, consumer manual/FAST/reader, 8 scope + 33 native + 38 CICS real CLI sources twice, deterministic four products; docs/product/file-dependencies/w9-implementation.md",
+    "fd_w11_validation": "Current-version LOGICAL_SOURCE negotiation fixed; B-SP version21-28/legacy18, fixed FAST and qualification-local PASS; final CLI/corpus pending"
   },
   "external": [
     {

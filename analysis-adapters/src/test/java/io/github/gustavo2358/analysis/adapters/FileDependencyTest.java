@@ -38,6 +38,12 @@ final class FileDependencyTest {
     @Test void sortParticipantsKeepRolesAndLocalWork()throws Exception {
         var files=analyze("A6").fileDependencies();assertEquals(4,files.declarations().size());assertEquals(3,files.sites().size());assertEquals(Set.of("INA","INB","OUTC"),files.edges().stream().map(e->e.candidate().referenceName()).collect(java.util.stream.Collectors.toSet()));
         var work=files.declarations().stream().filter(d->d.logicalFile().equals("S")).findFirst().orElseThrow();assertEquals("LOCAL",work.targetKind());assertNull(work.name());assertTrue(files.sites().stream().flatMap(s->s.bindings().stream()).anyMatch(b->b.declaration().equals(work.id())&&b.role().equals("work")));
+        assertEquals(Set.of("resource-0", "resource-1"), files.sites().stream()
+            .flatMap(s -> s.bindings().stream()).filter(b -> b.role().equals("input"))
+            .map(b -> b.declaration().localId()).collect(java.util.stream.Collectors.toSet()));
+        assertEquals(List.of("resource-2"), files.sites().stream()
+            .flatMap(s -> s.bindings().stream()).filter(b -> b.role().equals("output"))
+            .map(b -> b.declaration().localId()).toList());
     }
     @Test void callProjectionAndFileAbsenceRemainSeparate()throws Exception {
         var result=new DependencyAnalysis().prepare(W1dBoundaryTest.input("literal"));assertEquals("PROGA",result.sites().getFirst().candidates().getFirst().referenceName());assertTrue(result.fileDependencies().sites().isEmpty());assertEquals(Evidence.InventoryStatus.UNAVAILABLE,result.fileDependencies().declarationInventory());
