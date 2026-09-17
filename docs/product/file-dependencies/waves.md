@@ -1,6 +1,8 @@
 # FD-W0–W11 — grafo e execução
 
-**H4 aprovado; core W0–W9/W11 autorizado. W0–W9/W11 QUALIFIED_LOCAL; C06 humano fechado; STOP para revisão final; W10 NOT_AUTHORIZED.**
+[Checkpoint pós-EP-R2 qualificado](post-ep-r2.md): gates compartilhados e corpus73 reexecutados.
+
+**H4 aprovado; core W0–W9/W11 autorizado. W0–W9/W11 QUALIFIED_LOCAL_POST_EP_R2; C06 humano fechado; STOP para revisão final; W10 NOT_AUTHORIZED.**
 Cada link abre o item lean executável. Os campos do item + brief + gate indicado
 são suficientes; discovery bruto é opcional. Não converter TODO em IN_PROGRESS
 por ter escrito o plano. Wave qualificada não é DONE lean antes de merge/testes.

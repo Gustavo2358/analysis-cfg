@@ -1,0 +1,401 @@
+{
+  "main": "6ef181d0b67ae1e93fdd635b348e4a70277dc15e",
+  "composed": "830d41a",
+  "cases": [
+    {
+      "case": "F1",
+      "semanticStructuralDifferences": [],
+      "mainRvSolveMs": 62.712515,
+      "composedRvSolveMs": 21.443704,
+      "mainProductMs": 97.352607,
+      "composedProductMs": 84.327801,
+      "domain": {
+        "contentUpdates": 2,
+        "relationUnionPairs": 6,
+        "alternativeVisits": 4,
+        "boundaryAlternatives": 6,
+        "contentReads": 4,
+        "maxStateAlternatives": 6,
+        "maxComponentCardinality": 3,
+        "internedNodes": 10,
+        "internedAlternatives": 16,
+        "projectedAlternatives": 2,
+        "maxDecisionNodes": 2
+      }
+    },
+    {
+      "case": "F-order-012",
+      "semanticStructuralDifferences": [],
+      "mainRvSolveMs": 63.7126,
+      "composedRvSolveMs": 42.033438,
+      "mainProductMs": 127.479298,
+      "composedProductMs": 124.766456,
+      "domain": {
+        "contentUpdates": 3,
+        "maxDecisionNodes": 3,
+        "projectedAlternatives": 3,
+        "internedAlternatives": 39,
+        "internedNodes": 21,
+        "maxComponentCardinality": 4,
+        "maxStateAlternatives": 12,
+        "contentReads": 6,
+        "boundaryAlternatives": 12,
+        "alternativeVisits": 9,
+        "relationUnionPairs": 12
+      }
+    },
+    {
+      "case": "F-order-021",
+      "semanticStructuralDifferences": [],
+      "mainRvSolveMs": 44.299922,
+      "composedRvSolveMs": 30.637709,
+      "mainProductMs": 108.416375,
+      "composedProductMs": 84.96139,
+      "domain": {
+        "maxDecisionNodes": 3,
+        "contentUpdates": 3,
+        "relationUnionPairs": 12,
+        "alternativeVisits": 9,
+        "boundaryAlternatives": 12,
+        "contentReads": 6,
+        "maxStateAlternatives": 12,
+        "maxComponentCardinality": 4,
+        "internedNodes": 21,
+        "internedAlternatives": 39,
+        "projectedAlternatives": 3
+      }
+    },
+    {
+      "case": "F-order-102",
+      "semanticStructuralDifferences": [],
+      "mainRvSolveMs": 64.246439,
+      "composedRvSolveMs": 25.438233,
+      "mainProductMs": 116.140642,
+      "composedProductMs": 72.338594,
+      "domain": {
+        "relationUnionPairs": 12,
+        "alternativeVisits": 9,
+        "boundaryAlternatives": 12,
+        "contentReads": 6,
+        "maxStateAlternatives": 12,
+        "maxComponentCardinality": 4,
+        "internedNodes": 21,
+        "internedAlternatives": 39,
+        "projectedAlternatives": 3,
+        "maxDecisionNodes": 3,
+        "contentUpdates": 3
+      }
+    },
+    {
+      "case": "F-order-120",
+      "semanticStructuralDifferences": [],
+      "mainRvSolveMs": 34.123204,
+      "composedRvSolveMs": 31.799948,
+      "mainProductMs": 142.876049,
+      "composedProductMs": 78.535549,
+      "domain": {
+        "maxStateAlternatives": 12,
+        "contentReads": 6,
+        "boundaryAlternatives": 12,
+        "alternativeVisits": 9,
+        "relationUnionPairs": 12,
+        "contentUpdates": 3,
+        "maxDecisionNodes": 3,
+        "projectedAlternatives": 3,
+        "internedAlternatives": 39,
+        "internedNodes": 21,
+        "maxComponentCardinality": 4
+      }
+    },
+    {
+      "case": "F-order-201",
+      "semanticStructuralDifferences": [],
+      "mainRvSolveMs": 53.621247,
+      "composedRvSolveMs": 28.804492,
+      "mainProductMs": 191.25905,
+      "composedProductMs": 84.506154,
+      "domain": {
+        "maxDecisionNodes": 3,
+        "contentUpdates": 3,
+        "relationUnionPairs": 12,
+        "alternativeVisits": 9,
+        "boundaryAlternatives": 12,
+        "contentReads": 6,
+        "maxStateAlternatives": 12,
+        "maxComponentCardinality": 4,
+        "internedNodes": 21,
+        "internedAlternatives": 39,
+        "projectedAlternatives": 3
+      }
+    },
+    {
+      "case": "F-order-210",
+      "semanticStructuralDifferences": [],
+      "mainRvSolveMs": 50.554612,
+      "composedRvSolveMs": 27.184022,
+      "mainProductMs": 110.183381,
+      "composedProductMs": 77.980021,
+      "domain": {
+        "maxStateAlternatives": 12,
+        "contentReads": 6,
+        "boundaryAlternatives": 12,
+        "alternativeVisits": 9,
+        "relationUnionPairs": 12,
+        "contentUpdates": 3,
+        "maxDecisionNodes": 3,
+        "projectedAlternatives": 3,
+        "internedAlternatives": 39,
+        "internedNodes": 21,
+        "maxComponentCardinality": 4
+      }
+    },
+    {
+      "case": "H2",
+      "semanticStructuralDifferences": [],
+      "mainRvSolveMs": 39.268902,
+      "composedRvSolveMs": 28.786269,
+      "mainProductMs": 109.740638,
+      "composedProductMs": 82.213634,
+      "domain": {
+        "contentUpdates": 3,
+        "maxDecisionNodes": 3,
+        "projectedAlternatives": 3,
+        "internedAlternatives": 35,
+        "internedNodes": 20,
+        "maxComponentCardinality": 4,
+        "maxStateAlternatives": 11,
+        "contentReads": 6,
+        "boundaryAlternatives": 11,
+        "alternativeVisits": 9,
+        "relationUnionPairs": 10
+      }
+    },
+    {
+      "case": "F5",
+      "semanticStructuralDifferences": [],
+      "mainRvSolveMs": null,
+      "composedRvSolveMs": null,
+      "mainProductMs": null,
+      "composedProductMs": null,
+      "domain": null
+    },
+    {
+      "case": "MUST",
+      "semanticStructuralDifferences": [],
+      "mainRvSolveMs": 50.347666,
+      "composedRvSolveMs": 26.605732,
+      "mainProductMs": 160.257881,
+      "composedProductMs": 69.532361,
+      "domain": {
+        "boundaryAlternatives": 2,
+        "contentReads": 3,
+        "maxStateAlternatives": 2,
+        "maxComponentCardinality": 2,
+        "internedNodes": 4,
+        "internedAlternatives": 5,
+        "projectedAlternatives": 2,
+        "maxDecisionNodes": 1,
+        "contentUpdates": 2,
+        "relationUnionPairs": 2,
+        "alternativeVisits": 2
+      }
+    },
+    {
+      "case": "G-1",
+      "semanticStructuralDifferences": [],
+      "mainRvSolveMs": 175.684647,
+      "composedRvSolveMs": 84.545576,
+      "mainProductMs": 230.933388,
+      "composedProductMs": 105.561795,
+      "domain": {
+        "contentUpdates": 8,
+        "relationUnionPairs": 545,
+        "alternativeVisits": 120,
+        "boundaryAlternatives": 16,
+        "contentReads": 9,
+        "maxStateAlternatives": 100,
+        "maxComponentCardinality": 9,
+        "internedNodes": 962,
+        "internedAlternatives": 3231,
+        "projectedAlternatives": 15,
+        "maxDecisionNodes": 22
+      }
+    },
+    {
+      "case": "G-2",
+      "semanticStructuralDifferences": [
+        "domain"
+      ],
+      "mainRvSolveMs": 139.437639,
+      "composedRvSolveMs": 149.069187,
+      "mainProductMs": 188.623206,
+      "composedProductMs": 150.49795,
+      "domain": {
+        "maxStateAlternatives": 136,
+        "contentReads": 9,
+        "boundaryAlternatives": 24,
+        "alternativeVisits": 184,
+        "relationUnionPairs": 856,
+        "contentUpdates": 8,
+        "maxDecisionNodes": 29,
+        "projectedAlternatives": 22,
+        "internedAlternatives": 4994,
+        "internedNodes": 1442,
+        "maxComponentCardinality": 10
+      }
+    },
+    {
+      "case": "G-4",
+      "semanticStructuralDifferences": [
+        "domain"
+      ],
+      "mainRvSolveMs": 230.329301,
+      "composedRvSolveMs": 164.739625,
+      "mainProductMs": 261.061661,
+      "composedProductMs": 160.761766,
+      "domain": {
+        "internedNodes": 2398,
+        "internedAlternatives": 8819,
+        "projectedAlternatives": 36,
+        "maxDecisionNodes": 43,
+        "contentUpdates": 8,
+        "relationUnionPairs": 1483,
+        "alternativeVisits": 312,
+        "boundaryAlternatives": 40,
+        "contentReads": 9,
+        "maxStateAlternatives": 208,
+        "maxComponentCardinality": 12
+      }
+    },
+    {
+      "case": "G-7",
+      "semanticStructuralDifferences": [
+        "domain"
+      ],
+      "mainRvSolveMs": 262.286244,
+      "composedRvSolveMs": 310.312338,
+      "mainProductMs": 238.984878,
+      "composedProductMs": 274.457631,
+      "domain": {
+        "contentUpdates": 8,
+        "relationUnionPairs": 2429,
+        "alternativeVisits": 504,
+        "boundaryAlternatives": 64,
+        "contentReads": 9,
+        "maxStateAlternatives": 316,
+        "maxComponentCardinality": 15,
+        "internedNodes": 3811,
+        "internedAlternatives": 15233,
+        "projectedAlternatives": 57,
+        "maxDecisionNodes": 64
+      }
+    },
+    {
+      "case": "I",
+      "semanticStructuralDifferences": [],
+      "mainRvSolveMs": 703.73158,
+      "composedRvSolveMs": 768.534399,
+      "mainProductMs": 481.00219,
+      "composedProductMs": 574.182696,
+      "domain": {
+        "contentReads": 33,
+        "boundaryAlternatives": 0,
+        "alternativeVisits": 1024,
+        "relationUnionPairs": 16368,
+        "contentUpdates": 32,
+        "maxDecisionNodes": 32,
+        "projectedAlternatives": 32,
+        "internedAlternatives": 356244,
+        "internedNodes": 33327,
+        "maxComponentCardinality": 32,
+        "maxStateAlternatives": 528
+      }
+    },
+    {
+      "case": "E1",
+      "semanticStructuralDifferences": [],
+      "mainRvSolveMs": 59.057683,
+      "composedRvSolveMs": 57.455866,
+      "mainProductMs": 191.245836,
+      "composedProductMs": 188.116868,
+      "domain": {
+        "maxComponentCardinality": 2,
+        "internedNodes": 162,
+        "internedAlternatives": 225,
+        "projectedAlternatives": 15,
+        "maxDecisionNodes": 15,
+        "contentUpdates": 8,
+        "relationUnionPairs": 69,
+        "alternativeVisits": 21,
+        "boundaryAlternatives": 15,
+        "contentReads": 339,
+        "maxStateAlternatives": 16
+      }
+    },
+    {
+      "case": "E3",
+      "semanticStructuralDifferences": [
+        "domain"
+      ],
+      "mainRvSolveMs": 228.98429,
+      "composedRvSolveMs": 261.754298,
+      "mainProductMs": 307.298839,
+      "composedProductMs": 258.11285,
+      "domain": {
+        "maxComponentCardinality": 15,
+        "internedNodes": 3830,
+        "internedAlternatives": 15305,
+        "projectedAlternatives": 57,
+        "maxDecisionNodes": 64,
+        "contentUpdates": 8,
+        "relationUnionPairs": 2429,
+        "alternativeVisits": 504,
+        "boundaryAlternatives": 64,
+        "contentReads": 339,
+        "maxStateAlternatives": 316
+      }
+    }
+  ],
+  "limits": "Fresh runs on shared host, startup and scheduling vary; no SLA; structural counters and semantic sites compared, full stores are not materialized.",
+  "result": "PASS",
+  "stableCounters": [
+    "boundaryAlternatives",
+    "maxStateAlternatives",
+    "maxDecisionNodes",
+    "maxComponentCardinality",
+    "projectedAlternatives",
+    "contentUpdates",
+    "contentReads",
+    "alternativeVisits"
+  ],
+  "mainRepeatG7": {
+    "domain": {
+      "alternativeVisits": 504,
+      "boundaryAlternatives": 64,
+      "contentReads": 9,
+      "maxStateAlternatives": 316,
+      "maxComponentCardinality": 15,
+      "internedNodes": 3849,
+      "internedAlternatives": 15402,
+      "projectedAlternatives": 57,
+      "maxDecisionNodes": 64,
+      "contentUpdates": 8,
+      "relationUnionPairs": 2426
+    },
+    "sameMainCumulativeVariance": {
+      "internedNodes": [
+        3825,
+        3849
+      ],
+      "internedAlternatives": [
+        15283,
+        15402
+      ],
+      "relationUnionPairs": [
+        2429,
+        2426
+      ]
+    }
+  },
+  "cumulativeExplanation": "Interned intermediates and union-pair counts vary between independent JVM runs of the same main. Repeated G7 proves within-main variation. Retained structural maxima/boundary/projection and semantic sites are identical across all17 cases; engine source blobs are identical. No combinatorial regression or new cutoff."
+}

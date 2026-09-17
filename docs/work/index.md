@@ -1,6 +1,6 @@
 # Trabalho
 
-[FILE-DEPENDENCIES — core N+C](../product/file-dependencies/README.md): W0–W9/W11 QUALIFIED_LOCAL antes de EP-R2; checkpoint de reconciliação pós-main em execução; W10 não autorizado, PR #38 sem merge.
+[FILE-DEPENDENCIES — core N+C](../product/file-dependencies/README.md): W0–W9/W11 QUALIFIED_LOCAL_POST_EP_R2; [handoff pós-main](../product/file-dependencies/post-ep-r2.md); STOP para revisão humana; W10 não autorizado, PR #38 sem merge.
 
 [EP-R2 — Order-Independent Entry & Factorized Recall](ep-r2-handoff.md): aprovado e integrado em main pelo merge 6ef181d; semântica preservada como requisito da reconciliação File Dependencies.
 

@@ -1,48 +1,37 @@
 # Estado / handoff curto — CORE N+C
 
-**W0–W9 e W11 QUALIFIED_LOCAL. STOP para revisão humana final.**
+**W0–W9 e W11 QUALIFIED_LOCAL_POST_EP_R2. STOP para revisão humana final.**
 H4 aprovado; execução core autorizada. W10 TODO / NOT_AUTHORIZED.
 Nenhum merge/auto-merge/release. PRs Draft/unmerged; DONE lean não reivindicado.
 
 | Wave | Estado técnico |
 | --- | --- |
-| W0 | QUALIFIED_LOCAL — declarativo N-LR e SP/decoder bilateral |
-| W1 | QUALIFIED_LOCAL — D-AIR/D-WIRE, slice FILE/CALL/JSON |
-| W2 | QUALIFIED_LOCAL — sete verbos nativos/operandos |
-| W3 | QUALIFIED_LOCAL — buffers/efeitos regionais e CALL |
-| W4 | QUALIFIED_LOCAL — handlers/status/USE |
-| W5 | QUALIFIED_LOCAL — SORT/MERGE/SD local |
-| W6 | QUALIFIED_LOCAL — auxiliares/checkpoint/SAME |
-| W7 | QUALIFIED_LOCAL — computed CICS FILE no motor geral |
-| W8 | QUALIFIED_LOCAL — C-FC literal/computed e C06 humano |
-| W9 | QUALIFIED_LOCAL — unidades/owners/capturas/COPY |
-| W11 | QUALIFIED_LOCAL — integração/corpus/CALL e reuso justificado |
+| W0 | QUALIFIED_LOCAL_POST_EP_R2 — declarativo N-LR e SP/decoder bilateral |
+| W1 | QUALIFIED_LOCAL_POST_EP_R2 — D-AIR/D-WIRE, slice FILE/CALL/JSON |
+| W2 | QUALIFIED_LOCAL_POST_EP_R2 — sete verbos nativos/operandos |
+| W3 | QUALIFIED_LOCAL_POST_EP_R2 — buffers/efeitos regionais e CALL |
+| W4 | QUALIFIED_LOCAL_POST_EP_R2 — handlers/status/USE |
+| W5 | QUALIFIED_LOCAL_POST_EP_R2 — SORT/MERGE/SD local |
+| W6 | QUALIFIED_LOCAL_POST_EP_R2 — auxiliares/checkpoint/SAME |
+| W7 | QUALIFIED_LOCAL_POST_EP_R2 — computed CICS FILE no motor geral |
+| W8 | QUALIFIED_LOCAL_POST_EP_R2 — C-FC literal/computed e C06 humano |
+| W9 | QUALIFIED_LOCAL_POST_EP_R2 — unidades/owners/capturas/COPY |
+| W11 | QUALIFIED_LOCAL_POST_EP_R2 — integração/corpus/CALL e reuso justificado |
 | W10 | TODO / NOT_AUTHORIZED |
 
-## Checkpoint final
+## Checkpoint pós-main atual
 
-[Resultado W11](w11-qualification.md), [pins materiais](w11-pins.json),
-[matriz](coverage.md), [decisão C06](c06-read-dataset.md). Handoff/evidência durável:
-`artefatos-e2e/file-dependencies-20260916/w11-c06/HANDOFF.md`.
-O diretório anterior `w11/` permanece histórico e imutável.
+[Handoff pós-EP-R2](post-ep-r2.md), [pins materiais](w11-pins.json).
+Main6ef181d integrado por mergeb67df76; código/testes830d41a.
+EP-R2 PRESERVED; C06 PASS. FAST544, qualification-local589, wire21,41CICS×2,
+73 corpus novos:133CALL iguais ao main EP-R2,411FILE/85declarations preservados,
+35READ DATASET incluindo3COACTVWC unknown. Duas recusas frontend/seis CFG e
+71 dependency PARTIAL permanecem explícitas. Nenhuma alteração produtiva adicional
+nem nos demais repos. PR #38 OPEN/DRAFT/MERGEABLE/UNMERGED; Fast CI código PASS.
 
-Bundle C06: frontend17323f4, lower5565e10, AIR5fe0224e, CFGe0e7559,
-IRfb153ae; SHAs completos nos pins. Commit final CFG contém somente
-harness/testes/docs/pins, sem alteração Java produtiva. SP2.28/compilation1.0,
-wire2.3 inalterados. READ DATASET canônico FILE conserva spelling/provenance.
-
-Novos gates PASS: F-CICS22, FAST frontend355/lower2340+adapters35, barreiras,
-41 fixtures CICS×2 e pares FILE/DATASET literal/computed. Corpus21 reexecutados
-(19 afetados+2 controles),52 REUSED:35 sites recuperados, incluindo os três de
-COACTVWC;41 vetores CALL comparados inalterados. Total combinado133CALL/411FILE.
-COACTVWC preserva nomes computados unknown, sem inferir inicializadores como
-valor no comando.52 aliases de outros comandos continuam NOT_QUALIFIED.
-
-Q anterior dos quatro repos, FAST AIR/CFG,101 fixtures×2, MR1–MR9/SG core,
-21 witnesses de escala,5 mutantes e wire/reader são REUSED por delta produtivo
-restrito aos aliases frontend/admission. Duas recusas frontend e seis CFG
-estrito do corpus original permanecem;71 produtos dependency PARTIAL.
-Nenhuma precisão/recall, completude de corpus ou SLA afirmados.
+[Resultado W11/C06 anterior](w11-qualification.md) e
+`artefatos-e2e/file-dependencies-20260916/w11-c06/HANDOFF.md` são históricos;
+a qualificação compartilhada e o corpus foram reexecutados neste checkpoint.
 
 ## Retomada
 

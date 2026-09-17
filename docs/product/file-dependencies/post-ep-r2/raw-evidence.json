@@ -1,0 +1,10 @@
+{
+  "result": "PASS",
+  "files": 4987,
+  "rawBytes": 2138900306,
+  "archiveBytes": 211394884,
+  "sha256": "0e816a1ad9b0332f8481e48480bb5f394bcb44de1aad9d93bcb9a84a0d77e8d7",
+  "manifestSha256": "08115cf7c261b4d2a9b038d9f1632861107c3eeaa0ef1b8219213dc7303be0e7",
+  "verification": "all entries decompressed and compared to size/SHA256; no cache/toolchain/classes/JAR; raw diagnostic attempts preserved",
+  "localPath": "/home/gustavo/workspace/teste-e2e/.file-dependencies/worktrees/analysis-cfg/.harness-results/fd-post-ep-r2/evidence/raw.tar.gz"
+}

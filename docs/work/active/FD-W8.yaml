@@ -77,8 +77,8 @@ conditional_dependencies:
   applies_to: Casos FILE computados e fechamento completo de W8; não condiciona subset literal/static
 
 qualification:
-  status: QUALIFIED_LOCAL
-  gates: C06 F-CICS22/FAST355, lower FAST2340+adapters35, B-SP/B-AIR/B-WIRE,41CICS x2 e21corpus PASS; demais gates W8/W11 REUSED por frontier documentada.
-  limits: Ver c06-read-dataset.md e w11-qualification.md;52 aliases de outros comandos NOT_QUALIFIED, valores/outcomes parciais explícitos.
-  next: STOP para revisão humana final; DONE lean somente após merge autorizado.
-resumption: C06-HUMAN-20260917 implementado e qualificado; READ DATASET equivale a READ FILE com spelling/provenance conservados.
+  status: QUALIFIED_LOCAL_POST_EP_R2
+  evidence: docs/product/file-dependencies/post-ep-r2.md
+  result: FAST544/Q589/wire21,41CICS x2,73corpus novos PASS;133CALL iguais ao main EP-R2;411FILE e35READ DATASET preservados.
+  next: STOP para revisão humana final; W10 TODO/NOT_AUTHORIZED; nenhum merge/auto-merge/release; IN_PROGRESS lean até merge autorizado.
+resumption: EP-R2 preservado; C06 restrito a READ DATASET e aliases já autorizados; demais aliases NOT_QUALIFIED.

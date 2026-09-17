@@ -1,6 +1,8 @@
 # FILE-DEPENDENCIES — entrada da campanha
 
-Estado: **H4 aprovado; execução core N+C autorizada; W0–W9/W11 QUALIFIED_LOCAL.**
+[Checkpoint pós-EP-R2 qualificado](post-ep-r2.md): gates compartilhados e corpus73 reexecutados.
+
+Estado: **H4 aprovado; execução core N+C autorizada; W0–W9/W11 QUALIFIED_LOCAL_POST_EP_R2.**
 STOP para revisão humana final. W10 TODO / NOT_AUTHORIZED.
 [Resultado W11](w11-qualification.md), incluindo [C06 humano](c06-read-dataset.md) e reuso explícito dos gates anteriores.
 PRs persistentes permanecem Draft e unmerged. STOP final após W11.

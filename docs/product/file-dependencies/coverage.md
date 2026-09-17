@@ -1,5 +1,8 @@
 # Matriz de cobertura N/C/D
 
+**Checkpoint atual: [QUALIFIED_LOCAL_POST_EP_R2](post-ep-r2.md).**
+A evidência C06 abaixo é histórica; gates compartilhados/corpus foram reexecutados no checkpoint atual.
+
 Todas as linhas implementáveis começam **PLANNED**. H0–H4 não promove nenhuma
 a QUALIFIED. Estados: PLANNED, QUALIFIED (testes/pins citados), BLOCKED (causa/dono),
 OUT_OF_PROFILE (autoridade/motivo; nunca usado para esconder obrigação pendente).

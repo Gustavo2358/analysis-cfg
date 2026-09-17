@@ -1,5 +1,8 @@
 # FD-W11 — qualificação final N+C
 
+**Checkpoint atual: [QUALIFIED_LOCAL_POST_EP_R2](post-ep-r2.md).**
+A evidência C06 abaixo é histórica; gates compartilhados/corpus foram reexecutados no checkpoint atual.
+
 **QUALIFIED_LOCAL; STOP para revisão humana final.** W0–W9/W11 qualificados.
 [C06-HUMAN-20260917](c06-read-dataset.md) resolve o blocker anterior e autoriza
 somente READ DATASET como alias de READ FILE, preservando os aliases SET já

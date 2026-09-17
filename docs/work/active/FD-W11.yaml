@@ -77,8 +77,8 @@ depends_on:
 - FD-W9
 
 qualification:
-  status: QUALIFIED_LOCAL
-  evidence: w11-qualification.md e artefatos-e2e/file-dependencies-20260916/w11-c06/HANDOFF.md
-  result: C06 fechado;35 sites recuperados incluindo3COACTVWC;41 vetores CALL inalterados;21 corpus novos+52 REUSED;133CALL/411FILE combinados.
-  next: STOP para revisão humana final; W10 TODO/NOT_AUTHORIZED; nenhum merge/auto-merge/release.
-resumption: C06-HUMAN-20260917 aplicado apenas a READ DATASET e aliases anteriormente autorizados; demais aliases observados NOT_QUALIFIED.
+  status: QUALIFIED_LOCAL_POST_EP_R2
+  evidence: docs/product/file-dependencies/post-ep-r2.md
+  result: FAST544/Q589/wire21,41CICS x2,73corpus novos PASS;133CALL iguais ao main EP-R2;411FILE e35READ DATASET preservados.
+  next: STOP para revisão humana final; W10 TODO/NOT_AUTHORIZED; nenhum merge/auto-merge/release; IN_PROGRESS lean até merge autorizado.
+resumption: EP-R2 preservado; C06 restrito a READ DATASET e aliases já autorizados; demais aliases NOT_QUALIFIED.
