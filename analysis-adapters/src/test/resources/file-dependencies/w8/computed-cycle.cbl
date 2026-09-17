@@ -1,0 +1,26 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. CFC.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 BUF PIC X(8).
+       01 KEEP-NAME PIC X(8).
+       01 FN PIC X(8).
+       01 SYS PIC X(4).
+       01 WS-KEY PIC X(8).
+       01 ST PIC X(4).
+       01 ST2 PIC X(4).
+       01 WS-LEN PIC X(2).
+       01 PTR USAGE POINTER.
+       01 FLAG PIC X.
+       01 INPUT-NAME PIC X(8).
+       PROCEDURE DIVISION.
+       MOVE 'ACCOUNTS' TO FN.
+       MOVE 'R001' TO SYS.
+       AGAIN-P.
+       IF FLAG = 'Y'
+           MOVE 'CUSTOMER' TO FN
+           GO TO AGAIN-P
+       END-IF.
+       EXEC CICS ENDBR FILE(FN) SYSID(SYS)
+       NOHANDLE END-EXEC.
+       GOBACK.

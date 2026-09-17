@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "observed_on": "2026-09-16",
+  "observed_on": "2026-09-17",
   "analysis_ir": {
     "repository": "Gustavo2358/analysis-ir",
     "commit": "fb153ae50f343022db45d20d627e1afac85de916",
@@ -136,12 +136,12 @@
       }
     ],
     "baseline_assessment": "FD-W1 resource.bindings@1 after model loss proof; AIR2.0.0/binding1.0.0.",
-    "observed_on": "2026-09-16",
+    "observed_on": "2026-09-17",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable."
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "d215d2bafbbabc714a3e9d0f2ff9e8927e0bf8f4",
+    "commit": "0035c5af165c90973a3645bae8a7e286511470e5",
     "canonical_ref": "feat/file-dependencies",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
@@ -189,7 +189,7 @@
       "air-model/src/main/java/io/github/gustavo2358/air/model/MemoryCodecs.java",
       "air-json/src/test/resources/regional.canonical.json"
     ],
-    "observed_on": "2026-09-16",
+    "observed_on": "2026-09-17",
     "modules": {
       "parent": {
         "path": "pom.xml",
@@ -204,7 +204,7 @@
         "path": "air-json/pom.xml",
         "artifact_id": "air-json",
         "role": "shared_codec_4B_scalar_assign_consumed_by_cfg_adapters",
-        "coverage": "ST-W1 regional constant bounds, Region/View/alias, bytes, CopyBytes and explicit IBM1047; historical scalar/control forms preserved; W6 generic fit_text roundtrip with explicit pad and exact length; RF-W3 Argument value/copy/reference and results Place[]; RF-W4 canonical Place.Choice and target.possibilities@1 with unknown target domain; FD-W1 ResourceDescription and resource.bindings@1 codec, owner/object/use validation"
+        "coverage": "ST-W1 regional constant bounds, Region/View/alias, bytes, CopyBytes and explicit IBM1047; historical scalar/control forms preserved; W6 generic fit_text roundtrip with explicit pad and exact length; RF-W3 Argument value/copy/reference and results Place[]; RF-W4 canonical Place.Choice and target.possibilities@1 with unknown target domain; FD-W1 ResourceDescription and resource.bindings@1 codec, owner/object/use validation; FD-W8 known external signature parameters"
       }
     },
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -269,11 +269,14 @@
       "src/test/java/io/github/gustavo2358/cobolexplorer/FileSortContractTest.java",
       "src/main/java/io/github/gustavo2358/cobolexplorer/FileAuxiliarySemantics.java",
       "src/main/java/io/github/gustavo2358/cobolexplorer/FileAuxiliarySyntax.java",
-      "src/test/java/io/github/gustavo2358/cobolexplorer/FileAuxiliaryContractTest.java"
+      "src/test/java/io/github/gustavo2358/cobolexplorer/FileAuxiliaryContractTest.java",
+      "src/main/java/io/github/gustavo2358/cobolexplorer/CicsFileControlAnalyzer.java",
+      "src/main/java/io/github/gustavo2358/cobolexplorer/CicsCommandSyntax.java",
+      "src/test/java/io/github/gustavo2358/cobolexplorer/CicsFileControlTest.java"
     ],
-    "semantic_product_version": "2.27.0",
+    "semantic_product_version": "2.28.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "4f63f10c697feb76bf26ba8eb0fa663bb94b9b71",
+    "commit": "4356722155b83966d716b47e1d8a918e4a7f9649",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -293,12 +296,14 @@
     "fd_w3_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED, B-SP memory effects, manual O1-O5 and 20 real CLI sources twice; file-dependencies/w3-implementation.md",
     "fd_w4_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED producers, manual outcomes/USE and 28 real CLI sources twice; file-dependencies/w4-implementation.md",
     "fd_w5_validation": "QUALIFIED_LOCAL: focal/FAST, producer Q-SHARED with bounded final reuse, manual local AIR/wire and44 real CLI sources twice; file-dependencies/w5-implementation.md",
-    "fd_w6_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED,19 B-SP fixtures,15 manual AIR tests and33 real CLI sources twice; file-dependencies/w6-implementation.md"
+    "fd_w6_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED,19 B-SP fixtures,15 manual AIR tests and33 real CLI sources twice; file-dependencies/w6-implementation.md",
+    "status": "FD-W8 CICS File Control canonical facts; focal/FAST/Q-SHARED PASS",
+    "fd_w8_validation": "QUALIFIED_LOCAL: producer FAST/Q-SHARED, B-SP33, CFG FAST502/Q547, manual/wire and38CICS+33native source cases twice; docs/product/file-dependencies/w8-implementation.md"
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
-    "status": "FD-W6 auxiliary metadata and checkpoint triggers; focal/FAST/Q-SHARED PASS",
-    "commit": "4e8e1299314e965f0f0fc18de7acb9cd00f4652d",
+    "status": "FD-W8 CICS source context and outcome effects; focal/FAST/Q-SHARED PASS",
+    "commit": "dcb6f49e5edc3e6b06e9ccb7fb35e4dd09bd5307",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -319,7 +324,8 @@
     "fd_w3_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED, B-SP memory effects, manual O1-O5 and 20 real CLI sources twice; file-dependencies/w3-implementation.md",
     "fd_w4_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED producers, manual outcomes/USE and 28 real CLI sources twice; file-dependencies/w4-implementation.md",
     "fd_w5_validation": "QUALIFIED_LOCAL: focal/FAST, producer Q-SHARED with bounded final reuse, manual local AIR/wire and44 real CLI sources twice; file-dependencies/w5-implementation.md",
-    "fd_w6_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED,19 B-SP fixtures,15 manual AIR tests and33 real CLI sources twice; file-dependencies/w6-implementation.md"
+    "fd_w6_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED,19 B-SP fixtures,15 manual AIR tests and33 real CLI sources twice; file-dependencies/w6-implementation.md",
+    "fd_w8_validation": "QUALIFIED_LOCAL: producer FAST/Q-SHARED, B-SP33, CFG FAST502/Q547, manual/wire and38CICS+33native source cases twice; docs/product/file-dependencies/w8-implementation.md"
   },
   "external": [
     {

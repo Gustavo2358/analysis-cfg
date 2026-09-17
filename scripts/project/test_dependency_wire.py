@@ -45,7 +45,7 @@ class PartialDependencyWireTests(unittest.TestCase):
         folder=ROOT/'analysis-adapters/target/ep-w4'
         for name in ('unsupported-values','unsupported-control'):
             d=read(folder/(name+'.json'))
-            self.assertEqual('2.2.0',d['version']);self.assertEqual('PARTIAL',d['analysisStatus'])
+            self.assertEqual('2.3.0',d['version']);self.assertEqual('PARTIAL',d['analysisStatus'])
             direct=next(s for s in d['sites'] if s['operation']['localId']=='direct')
             self.assertEqual(['DIRECT'],[c['referenceName'] for c in direct['candidates']])
             if name=='unsupported-values':
@@ -78,7 +78,7 @@ class FileDependencyWireTests(unittest.TestCase):
         old=runpy.run_path(str(ROOT/'scripts/project/fixtures/dependency_wire_v1.py'))['validate']
         for case in ('A1','A2','A3','A4','A6'):
             d=read(ROOT/('analysis-adapters/target/fd-w1/'+case+'.json'))
-            self.assertEqual('2.2.0',d['version'])
+            self.assertEqual('2.3.0',d['version'])
             self.assertEqual('COBOL_SOURCE_ONLY',d['analysisBoundary'])
             with self.assertRaises(ValueError):old(d)
         d=read(ROOT/'analysis-adapters/target/fd-w1/A1.json')['fileDependencies']
@@ -118,7 +118,7 @@ class FileDependencyWireTests(unittest.TestCase):
             with self.assertRaises((ValueError,KeyError,TypeError)):validate(bad)
     def test_local_sd_is_not_unknown_external_name_and_is_closed_in_v21(self):
         source=read(ROOT/'analysis-adapters/target/fd-w5/manual/local-true.json')
-        self.assertEqual('2.2.0',source['version'])
+        self.assertEqual('2.3.0',source['version'])
         site=source['fileDependencies']['sites'][0]
         self.assertEqual('LOCAL',site['targetKind']);self.assertIsNone(site['namespace'])
         self.assertEqual([],site['candidates']);self.assertFalse(site['unknownRemainder'])
@@ -134,7 +134,10 @@ class FileDependencyWireTests(unittest.TestCase):
             d=copy.deepcopy(source);mutate(d)
             with self.assertRaises((ValueError,KeyError,TypeError)):validate(d)
         # The old variant still admits its own vocabulary.
-        historical=read(ROOT/'analysis-adapters/target/fd-w1/A6.json');historical['version']='2.0.0';historical['fileDependencies']['valuesProfile']='file-literal@1';validate(historical)
+        historical=read(ROOT/'analysis-adapters/target/fd-w1/A6.json');historical['version']='2.0.0';historical['fileDependencies']['valuesProfile']='file-literal@1'
+        for group in ('sites','edges'):
+            for item in historical['fileDependencies'][group]:item.pop('context')
+        validate(historical)
 
     def test_unknown_computed_cannot_be_closed(self):
         d=read(ROOT/'analysis-adapters/target/fd-w1/A4.json')
@@ -149,7 +152,7 @@ class ComputedFileWireTests(unittest.TestCase):
         old=runpy.run_path(str(ROOT/'scripts/project/fixtures/dependency_wire_v21.py'))['validate']
         for name,expected,remainder in [('literal',['1FILE'],False),('closed',['ALPHA001','BETA0002'],False),('partial',['ALPHA001'],True),('unknown',[],True)]:
             d=read(ROOT/('analysis-adapters/target/fd-w7/manual/'+name+'.json'))
-            self.assertEqual('2.2.0',d['version']);s=d['fileDependencies']['sites'][0]
+            self.assertEqual('2.3.0',d['version']);s=d['fileDependencies']['sites'][0]
             self.assertEqual(expected,[c['referenceName'] for c in s['candidates']]);self.assertEqual(remainder,s['unknownRemainder'])
             with self.assertRaises(ValueError):old(d)
     def test_computed_support_point_and_remainder_mutants(self):
@@ -165,5 +168,39 @@ class ComputedFileWireTests(unittest.TestCase):
             candidate['rawValue']=raw;candidate['referenceName']=name
             d['fileDependencies']['edges'][0]['candidate']=copy.deepcopy(candidate)
             with self.assertRaises(ValueError):validate(d)
+
+class CicsContextWireTests(unittest.TestCase):
+    def test_context_roundtrip_and_old_reader_rejection(self):
+        import runpy
+        old=runpy.run_path(str(ROOT/'scripts/project/fixtures/dependency_wire_v22.py'))['validate']
+        for name in ('systems','invalid','computed-systems','systems-closed','systems-partial','systems-unknown'):
+            d=read(ROOT/('analysis-adapters/target/fd-w8/manual/'+name+'.json'))
+            self.assertEqual('2.3.0',d['version'])
+            with self.assertRaises(ValueError):old(d)
+        d=read(ROOT/'analysis-adapters/target/fd-w8/manual/systems.json')
+        contexts={s['operation']['localId']:s['context'] for s in d['fileDependencies']['sites']}
+        self.assertEqual('DEFAULT',contexts['default']['selection'])
+        self.assertEqual(['R001'],[c['referenceName'] for c in contexts['r1']['candidates']])
+        self.assertEqual(['R002'],[c['referenceName'] for c in contexts['r2']['candidates']])
+    def test_computed_context_before_supports_and_independent_remainder(self):
+        for name,expected,remainder in [('closed',['R001','R002'],False),('partial',['R001'],True),('unknown',[],True)]:
+            d=read(ROOT/('analysis-adapters/target/fd-w8/manual/systems-'+name+'.json'))
+            s=d['fileDependencies']['sites'][0];c=s['context']
+            self.assertEqual(expected,[x['referenceName'] for x in c['candidates']]);self.assertEqual(remainder,c['unknownRemainder'])
+            self.assertFalse(s['unknownRemainder']);self.assertEqual('BEFORE',c['valuePoint']['position'])
+        base=read(ROOT/'analysis-adapters/target/fd-w8/manual/systems-closed.json')
+        for change in [lambda c:c['valuePoint'].__setitem__('position','AFTER'),lambda c:c.__setitem__('valuePoint',None),lambda c:c['candidates'][0].__setitem__('supports',[]),lambda c:c['candidates'][0]['supports'][0].__setitem__('kind','CICS_SYSID_LITERAL')]:
+            d=copy.deepcopy(base);change(d['fileDependencies']['sites'][0]['context'])
+            with self.assertRaises((ValueError,KeyError,TypeError)):validate(d)
+    def test_context_cannot_be_removed_forged_or_detached_from_edge(self):
+        base=read(ROOT/'analysis-adapters/target/fd-w8/manual/systems.json')
+        changes=[lambda s:s.pop('context'),lambda s:s['context'].__setitem__('selection','LOCAL'),
+            lambda s:s['context'].__setitem__('candidates',[]),
+            lambda s:s['context']['candidates'][0].__setitem__('referenceName','OTHER'),
+            lambda s:s['context']['candidates'][0].__setitem__('supports',[]),
+            lambda s:s['context'].__setitem__('bindingMechanism','UNKNOWN')]
+        for change in changes:
+            d=copy.deepcopy(base);s=next(s for s in d['fileDependencies']['sites'] if s['operation']['localId']=='r1');change(s)
+            with self.assertRaises((ValueError,KeyError,TypeError)):validate(d)
 
 if __name__=='__main__':unittest.main()

@@ -26,7 +26,7 @@ def run(work,manual,producers):
         for attempt in ('A','B'):
             cwd=work/(name+'-'+attempt);cwd.mkdir();source=cwd/'input.air.json';shutil.copyfile(manual/(name+'.air.json'),source);dep=cwd/'dependencies.json'
             execute(cwd,'dependency',['java','-cp',cp,'io.github.gustavo2358.analysis.launcher.AnalysisDependencies',str(source),str(dep)])
-            d=read(dep);require(d['version']=='2.2.0','FILE values wire');sites=d['fileDependencies']['sites'];require(len(sites)==len(expected),'manual site count')
+            d=read(dep);require(d['version']=='2.3.0','FILE values wire');sites=d['fileDependencies']['sites'];require(len(sites)==len(expected),'manual site count')
             for id,names,remainder in expected:
                 s=next(s for s in sites if s['operation']['localId']==id);require([c['referenceName'] for c in s['candidates']]==names,'independent values');require(s['unknownRemainder']==remainder,'independent remainder')
             if name=='literal':require(d['fileDependencies']['metrics']['possibleValuesPreparations']==0,'literal zero-values')

@@ -32,8 +32,11 @@ final class FileDependencyAnalysis {
         var retained=new HashMap<Key,Site>();var metrics=new TreeMap<String,Long>();
         if(session!=null&&execution!=null){
             var registrations=new ArrayList<ConsumerRegistration<Site>>();
-            var computed=new HashSet<OperationId>();
-            for(var indexed:session.index().sites(Operations.Invoke.class))if(FileDependencyConsumer.externalFile((Operations.Invoke)indexed.operation())&&FileValueQuery.selected((Operations.Invoke)indexed.operation(),session))computed.add(indexed.operation().header().id());
+            var routes=new HashMap<OperationId,Integer>();
+            for(var indexed:session.index().sites(Operations.Invoke.class)) {
+                var invoke=(Operations.Invoke)indexed.operation();if(!FileDependencyConsumer.externalFile(invoke))continue;
+                routes.put(invoke.header().id(),(FileValueQuery.selected(invoke,session)?1:0)|(FileValueQuery.contextSelected(invoke,session)?2:0));
+            }
             var kinds=new HashMap<UnitId,Set<Class<? extends Operation>>>();
             for(var indexed:session.index().sites(Operations.Invoke.class))if(FileDependencyConsumer.selected(indexed.operation(),locals))kinds.computeIfAbsent(indexed.owner().id(),k->new HashSet<>()).add(Operations.Invoke.class);
             for(var id:locals){var indexed=session.index().site(id);if(indexed!=null)kinds.computeIfAbsent(indexed.owner().id(),k->new HashSet<>()).add(indexed.operation().getClass());}
@@ -41,12 +44,14 @@ final class FileDependencyAnalysis {
                 var entry=context.entry().id();if(!kinds.containsKey(entry.unit()))continue;
                 String key=part(entry.unit().localId())+part(entry.localId());var batch=ReachabilityProvider.batch("file-reach:"+key,entry);
                 var values=StorageValuesProvider.batch("file-values:"+key,StorageValuesProvider.key(entry));
-                for(var kind:kinds.get(entry.unit()).stream().sorted(Comparator.comparing(Class::getName)).toList())for(boolean dynamic:List.of(false,true)) {
-                    if(dynamic&&(kind!=Operations.Invoke.class||computed.stream().noneMatch(id->id.unit().equals(entry.unit()))))continue;
+                for(var kind:kinds.get(entry.unit()).stream().sorted(Comparator.comparing(Class::getName)).toList())for(int route:List.of(0,1,2,3)) {
+                    if(route!=0&&(kind!=Operations.Invoke.class||routes.entrySet().stream().noneMatch(e->e.getKey().unit().equals(entry.unit())&&e.getValue()==route)))continue;
+                    boolean dynamic=route!=0;
                     var queries=new ArrayList<SiteInterest.SiteQuery<?,?>>();queries.add(new SiteInterest.SiteQuery<>(batch,FileDependencyConsumer::query));
-                    if(dynamic)queries.add(new SiteInterest.SiteQuery<>(values,FileValueQuery::query));
-                    var interest=new SiteInterest(kind,entry,s->FileDependencyConsumer.selected(s.operation(),locals)&&computed.contains(s.operationId())==dynamic,queries);
-                    registrations.add(new ConsumerRegistration<>(new ConsumerPlan("file:"+key+":"+kind.getSimpleName()+":"+dynamic,dynamic?List.of(batch.analysisKey(),values.analysisKey()):List.of(batch.analysisKey()),dynamic?List.of(batch.id(),values.id()):List.of(batch.id())),List.of(interest),List.of(),new FileDependencyConsumer(bindings,batch,dynamic?values:null)));
+                    if((route&1)!=0)queries.add(new SiteInterest.SiteQuery<>(values,FileValueQuery::query));
+                    if((route&2)!=0)queries.add(new SiteInterest.SiteQuery<>(values,FileValueQuery::contextQuery));
+                    var interest=new SiteInterest(kind,entry,s->FileDependencyConsumer.selected(s.operation(),locals)&&routes.getOrDefault(s.operationId(),0)==route,queries);
+                    registrations.add(new ConsumerRegistration<>(new ConsumerPlan("file:"+key+":"+kind.getSimpleName()+":"+route,dynamic?List.of(batch.analysisKey(),values.analysisKey()):List.of(batch.analysisKey()),dynamic?List.of(batch.id(),values.id()):List.of(batch.id())),List.of(interest),List.of(),new FileDependencyConsumer(bindings,batch,dynamic?values:null,route)));
                 }
             }
             var result=execution.execute("file-dependencies@1",execution.plan(registrations));
@@ -66,7 +71,7 @@ final class FileDependencyAnalysis {
         }
         metrics.putIfAbsent("possibleValuesPreparations",0L);metrics.putIfAbsent("possibleValuesStable",0L);
         var sites=retained.values().stream().sorted(Comparator.comparing(Site::entry,AnalysisKey.ENTRY_ORDER).thenComparing(s->s.operation().localId())).toList();
-        var edges=new ArrayList<Edge>();for(var site:sites)if(site.reachability()!=Reachability.UNREACHABLE_IN_MODEL)for(var c:site.candidates())edges.add(new Edge(site.owner(),site.entry(),site.operation(),c,site.unknownRemainder()));
+        var edges=new ArrayList<Edge>();for(var site:sites)if(site.reachability()!=Reachability.UNREACHABLE_IN_MODEL)for(var c:site.candidates())edges.add(new Edge(site.owner(),site.entry(),site.operation(),c,site.unknownRemainder()||site.context()!=null&&site.context().unknownRemainder(),site.context()));
         return new FileDependencyResult(p.capabilities().required().contains(Capabilities.RESOURCE_BINDINGS)?p.coverage().inventory():Evidence.InventoryStatus.UNAVAILABLE,declarations,sites,edges,metrics);
     }
     private static boolean isFile(Interactions.ResourceDescription d){return switch(d){case Interactions.LiteralTarget t->t.category().equals("file");case Interactions.ComputedResource t->t.category().equals("file");case Interactions.LocalResource t->t.category().equals("file");case Interactions.UnknownResource t->t.category().equals("file");default->false;};}

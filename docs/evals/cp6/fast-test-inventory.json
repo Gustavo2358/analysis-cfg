@@ -163,6 +163,13 @@
     ],
     "io.github.gustavo2358.analysis.adapters.FileCheckpointOracleTest": [
       "optionalLoopPreservesExactValueUnlessWritesAreActuallyAllowed"
+    ],
+    "io.github.gustavo2358.analysis.adapters.FileCicsContextOracleTest": [
+      "sameFileKeepsDefaultAndTwoExplicitSystemsDistinct",
+      "badOrMissingContextCannotPretendToBeDefault",
+      "computedContextUsesBeforeAndSameGeneralProviderAsFile",
+      "contextJoinsKeepIndependentCandidatesAndRemainder",
+      "sourceInventoryGapOpensEvidenceWithoutInventingModelValues"
     ]
   },
   "analysis-dataflow": {

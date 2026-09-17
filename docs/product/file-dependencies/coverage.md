@@ -59,13 +59,13 @@ effects/conditions → consumer FILE. C-FC/autoridade SPI específica antes do c
 
 | ID / família | Estado | Contrato / efeito | Oráculo | Wave |
 | --- | --- | --- | --- | --- |
-| C01 Acesso direto | PLANNED | Todos os comandos da família acima, com recurso literal ou computado. | T36,T37 | W8 |
-| C02 Browse | PLANNED | Associação de contexto/REQID quando necessária à análise; não exigir FD/SELECT nativo. | T36,T38 | W8 |
-| C03 Operand roles | PLANNED | FILE, SYSID, INTO/SET, FROM, RIDFLD, LENGTH, TOKEN e demais opções por comando. | T38,T39 | W8 |
-| C04 Efeitos e resposta | PLANNED | Memória, ponteiros e códigos de resposta; não inventar sucesso nem ignorar controle de exceção. | T39,CALL-X1 | W8 |
-| C05 `INQUIRE FILE`, `SET FILE` | PLANNED | Uso administrativo distinto de leitura/escrita de registros; saída de INQUIRE não é nome de entrada. | T40 | W8 |
-| C06 Aliases e configurações | PLANNED | FILE/DATASET e demais aliases da própria sintaxe, quando admitidos pela autoridade exata | T40,T41 | W8 |
-| C07 Tratamento de condições | PLANNED | RESP/RESP2, NOHANDLE/HANDLE e escopos relevantes; preservar desconhecimento onde não houver contrato preciso. | CALL-X2,T41 | W8 |
+| C01 Acesso direto | QUALIFIED / C-FC ([W8](w8-implementation.md)) | Todos os comandos da família acima, com recurso literal ou computado. | T36,T37 | W8 |
+| C02 Browse | QUALIFIED / C-FC ([W8](w8-implementation.md)) | Associação de contexto/REQID quando necessária à análise; não exigir FD/SELECT nativo. | T36,T38 | W8 |
+| C03 Operand roles | QUALIFIED / C-FC ([W8](w8-implementation.md)) | FILE, SYSID, INTO/SET, FROM, RIDFLD, LENGTH, TOKEN e demais opções por comando. | T38,T39 | W8 |
+| C04 Efeitos e resposta | QUALIFIED / C-FC ([W8](w8-implementation.md)) | Memória, ponteiros e códigos de resposta; não inventar sucesso nem ignorar controle de exceção. | T39,CALL-X1 | W8 |
+| C05 `INQUIRE FILE`, `SET FILE` | QUALIFIED / C-FC ([W8](w8-implementation.md)) | Uso administrativo distinto de leitura/escrita de registros; saída de INQUIRE não é nome de entrada. | T40 | W8 |
+| C06 Aliases e configurações | QUALIFIED / C-FC ([W8](w8-implementation.md)) | FILE/DATASET e demais aliases da própria sintaxe, quando admitidos pela autoridade exata | T40,T41 | W8 |
+| C07 Tratamento de condições | QUALIFIED / C-FC ([W8](w8-implementation.md)) | RESP/RESP2, NOHANDLE/HANDLE e escopos relevantes; preservar desconhecimento onde não houver contrato preciso. | CALL-X2,T41 | W8 |
 
 ## D — EXTENDED PROFILE posterior, autoridade D-GC32/D-v1
 
@@ -135,3 +135,13 @@ parcial+remainder, unknown, ciclos, aliases/refmod, supports e sharing CALL/FILE
 B-AIR/reader2.2, FAST e Q-SHARED PASS; [pins/gates](w7-implementation.md).
 C01–C07 continuam PLANNED até W8 integrar o catálogo C-FC desde o fonte. Não se
 promove parser/profile CICS por teste manual; ASSIGN DYNAMIC/N04 segue W10.
+
+## Checkpoint dimensional W8
+
+C01–C07/T36–T41 QUALIFIED_LOCAL:12 comandos, contextos SYSID/REQID, output SPI,
+efeitos/controle e coexistência CALL;38 fontes CICS×2 +33 nativas×2 determinísticas.
+T37 integra candidatos/joins/ciclo/alias/refmod/timing e desconhecimento no modelo.
+Cobertura fonte PRIMARY_ONLY/PARTIAL mantém remainder efetivo; fechado no modelo
+não é alegado como fechamento do fonte. Contraprova AIR COMPLETE/PARTIAL PASS.
+Oráculos completos manuais preservam os quatro estados; [gates/limites W8](w8-implementation.md).
+Sem lookup externo, DSNAME target ou ASSIGN DYNAMIC. W9/W11 pendentes.

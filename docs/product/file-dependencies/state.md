@@ -1,6 +1,6 @@
 # Estado / handoff curto — CORE N+C
 
-**H4 aprovado; W0–W7 QUALIFIED_LOCAL; próxima W8.**
+**H4 aprovado; W0–W8 QUALIFIED_LOCAL; próxima W9.**
 Core W0–W9/W11 autorizado em 2026-09-16, sem aprovação mecânica entre waves.
 W10 TODO / NOT_AUTHORIZED. Sem merge/auto-merge/release. STOP após W11.
 Waves qualificadas permanecem IN_PROGRESS lean enquanto PRs estiverem unmerged.
@@ -15,7 +15,8 @@ Waves qualificadas permanecem IN_PROGRESS lean enquanto PRs estiverem unmerged.
 | W5 | QUALIFIED_LOCAL; fases SORT/MERGE, SD local, wire2.1; [limites/gates](w5-implementation.md) |
 | W6 | QUALIFIED_LOCAL; auxiliares N-LR/checkpoint/SAME, [gates/limites](w6-implementation.md) |
 | W7 | QUALIFIED_LOCAL; CICS FILE computed no motor geral, [gates/limites](w7-implementation.md) |
-| W8–W9, W11 | TODO |
+| W8 | QUALIFIED_LOCAL; catálogo C-FC12, FILE/SYSID/REQID e efeitos; [gates/limites](w8-implementation.md) |
+| W9, W11 | TODO |
 | W10 | TODO / NOT_AUTHORIZED |
 
 ## Checkpoint W2
@@ -130,6 +131,22 @@ corrigidas com contraprovas; produção CALL/solver/providers inalterada.
 [Decisões/evidência/limites](w7-implementation.md); SHA no handoff E2E `w7/`.
 Fonte→CICS FILE continua W8; W9/W11 pendentes. W10 NOT_AUTHORIZED. Sem blocker.
 
+## Checkpoint W8
+
+Frontend4356722155b83966d716b47e1d8a918e4a7f9649/SP2.28; lowerdcb6f49e5edc3e6b06e9ccb7fb35e4dd09bd5307;
+AIR0035c5af165c90973a3645bae8a7e286511470e5/codec parâmetros+outcomes; IRfb153ae
+inalterado. Doze comandos C-FC separados de Program Control, aliases por comando,
+FILE/SYSID/REQID, SPI output, efeitos/condições, nomes computed BEFORE e wire2.3.
+Nenhum solver/provider geral ou CALL produtivo alterado. Fonte com cobertura parcial
+mantém remainder efetivo mesmo com conjunto fechado no modelo; contraprova manual
+COMPLETE/PARTIAL preserva os mesmos candidatos. Limites em W8, sem dimensão externa.
+
+FrontendFAST345/Q938(um skip histórico); lowerFAST2340+adapters/Q244296/39215;
+AIRFAST187/126/40; CFGFAST502/Q547 zero skips + gates semânticos/escala/CLI PASS.
+B-SP33, manual FILE/computed/contexto, reader18, E-SELECTED38 CICS+33native fontes×2,
+quatro produtos determinísticos PASS. Logs/tentativas/pins no handoff E2E w8.
+Sem blocker; próxima W9. PRs persistentes Draft/unmerged, W10 NOT_AUTHORIZED.
+
 ## Retomada
 
 Worktrees exclusivos: `<workspace>/.file-dependencies/worktrees/<repo>`.
@@ -147,12 +164,12 @@ Branch persistente em todos: `feat/file-dependencies`; PRs OPEN/DRAFT/UNMERGED:
 | analysis-ir | [#7](https://github.com/Gustavo2358/analysis-ir/pull/7) |
 
 Próximo: AGENTS → página local → [brief](brief.md) →
-[FD-W8](../../work/active/FD-W8.yaml) → perfil/casos/gates necessários.
+[FD-W9](../../work/active/FD-W9.yaml) → perfil/casos/gates necessários.
 E2E local/sem remote; não executar runner CP3 nem reler discovery bruto.
 
 ## Decisões
 
 D-AIR CLOSED: prova de perda do modelo, extensão neutra mínima e A1–A4/A6 PASS.
-D-WIRE CLOSED: writer2.2/file-values@1, reader fechado, rejeição antiga e projeção CALL PASS.
+D-WIRE CLOSED: writer2.3/file-values-context@1, reader fechado, rejeição antiga e projeção CALL PASS.
 D-EFFECT CLOSED (memória W3 e controle W4, aproximações explícitas); D-DYNAMIC/core CLOSED W7; consulta BEFORE e política CICS FILE própria. D-D-AUTH/captura D reservadas W10.
 IBM N-LR: SC27-8713-03, atualização 2026-04-28; hash/seções em [perfis](profiles.md).

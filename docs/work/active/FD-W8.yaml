@@ -1,6 +1,6 @@
 id: FD-W8
 title: CICS File Control, browse e administração
-status: TODO
+status: IN_PROGRESS
 scope:
 - file-dependencies
 - proleap-poc
@@ -75,3 +75,9 @@ depends_on:
 conditional_dependencies:
 - work_item: FD-W7
   applies_to: Casos FILE computados e fechamento completo de W8; não condiciona subset literal/static
+
+qualification:
+  status: QUALIFIED_LOCAL
+  gates: F-CICS/L-INPUT/B-SP33/B-AIR/C-DEP35/C-VALUES17/reader18/FAST502/Q-SHARED547 e E-SELECTED38CICS+33native x2 PASS
+  limits: Ver w8-implementation.md; cobertura fonte parcial, outcomes/width e correlação FILE-SYSID não provados permanecem explícitos.
+  next: FD-W9

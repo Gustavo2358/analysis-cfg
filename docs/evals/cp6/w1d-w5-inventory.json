@@ -738,6 +738,7 @@
         "io.github.gustavo2358.analysis.dependencies.FileDependencyResult",
         "io.github.gustavo2358.analysis.dependencies.FileDependencyResult$Binding",
         "io.github.gustavo2358.analysis.dependencies.FileDependencyResult$Candidate",
+        "io.github.gustavo2358.analysis.dependencies.FileDependencyResult$Context",
         "io.github.gustavo2358.analysis.dependencies.FileDependencyResult$Declaration",
         "io.github.gustavo2358.analysis.dependencies.FileDependencyResult$Edge",
         "io.github.gustavo2358.analysis.dependencies.FileDependencyResult$Reachability",

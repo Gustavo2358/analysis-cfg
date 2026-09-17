@@ -18,11 +18,16 @@ public record FileDependencyResult(Evidence.InventoryStatus declarationInventory
     public record Support(String kind,Id producer,OriginId origin,List<PremiseId> premises) {public Support {premises=List.copyOf(premises);}}
     public record Candidate(String referenceName,String rawValue,List<Support> supports) {public Candidate {supports=List.copyOf(supports);}}
     public enum Reachability { REACHABLE, UNREACHABLE_IN_MODEL, UNKNOWN }
+    /** Name candidates and SYSID candidates are independent projections, never asserted correlated pairs. */
+    public record Context(String selection,String targetKind,ProgramPoint valuePoint,List<Candidate> candidates,
+            boolean unknownRemainder,OriginId origin,List<String> analysisReasons) {
+        public Context {candidates=List.copyOf(candidates);analysisReasons=List.copyOf(analysisReasons);}
+    }
     public record Site(UnitId owner,EntryId entry,LabelId sequence,OperationId operation,String action,String namespace,
             String targetKind,List<Binding> bindings,ProgramPoint valuePoint,List<Candidate> candidates,boolean unknownRemainder,
             Reachability reachability,Evidence.PrecisionStatus effects,Evidence.PrecisionStatus control,
-            OriginId origin,OriginId targetOrigin,List<UncertaintyId> uncertaintyRefs,List<String> analysisReasons) {
+            OriginId origin,OriginId targetOrigin,List<UncertaintyId> uncertaintyRefs,List<String> analysisReasons,Context context) {
         public Site {bindings=List.copyOf(bindings);candidates=List.copyOf(candidates);uncertaintyRefs=List.copyOf(uncertaintyRefs);analysisReasons=List.copyOf(analysisReasons);}
     }
-    public record Edge(UnitId owner,EntryId entry,OperationId site,Candidate candidate,boolean openSite) { }
+    public record Edge(UnitId owner,EntryId entry,OperationId site,Candidate candidate,boolean openSite,Context context) { }
 }

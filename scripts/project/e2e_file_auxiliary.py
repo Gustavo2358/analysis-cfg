@@ -22,8 +22,8 @@ EXPECTED={
  'password-read':(1,['open'],1,['SAFE0001']),
  'linage-parameters':(1,['open','write'],1,['SAFE0001']),
 }
-def oracle(name,sp,air,result,source):
-    require((sp['contractVersion'],sp['fileInventory']['version'])==CONTRACT,'auxiliary contract')
+def oracle(name,sp,air,result,source,*,contract=CONTRACT):
+    require((sp['contractVersion'],sp['fileInventory']['version'])==contract,'auxiliary contract')
     require(sp['fileInventory']['auxiliary']['availability']=='KNOWN','closed auxiliary inventory')
     n,actions,calls,required=EXPECTED[name];f=result['fileDependencies']
     require(len(f['declarations'])==n,'declaration source count')
@@ -57,11 +57,11 @@ def oracle(name,sp,air,result,source):
         require(operation['effectBound']['otherwise']['writes']['kind']=='none','checkpoint never kills COBOL memory')
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--work',type=Path,required=True);p.add_argument('--producers',type=Path,required=True);a=p.parse_args()
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--work',type=Path,required=True);p.add_argument('--producers',type=Path,required=True);p.add_argument('--sp-version',default=CONTRACT[0]);a=p.parse_args();contract=(a.sp_version,CONTRACT[1])
     try:
         for label,fixtures,expected,check in (
-            ('auxiliary',FIXTURES,EXPECTED,oracle),
-            ('memory',MEMORY_FIXTURES,MEMORY,lambda *x:memory_oracle(*x,contract=CONTRACT)),
-            ('sort',SORT_FIXTURES,SORT,lambda *x:sort_oracle(*x,contract=CONTRACT))):
+            ('auxiliary',FIXTURES,EXPECTED,lambda *x:oracle(*x,contract=contract)),
+            ('memory',MEMORY_FIXTURES,MEMORY,lambda *x:memory_oracle(*x,contract=contract)),
+            ('sort',SORT_FIXTURES,SORT,lambda *x:sort_oracle(*x,contract=contract))):
             run(a.work.resolve()/label,a.producers.resolve(),fixtures=fixtures,expected=expected,check=check,label='FD-W6 '+label,frontend_args=PROFILE)
     except (ValueError,RuntimeError,OSError) as e:print('FAIL: '+str(e),file=sys.stderr);sys.exit(1)
