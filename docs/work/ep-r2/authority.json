@@ -1,0 +1,15 @@
+{
+  "lab": "EP-LAB-01",
+  "read_sha256": {
+    "LAB-EP-SEPARATION.md": "9ec4f59d1861ac8d9405d8879d3be27a2aeefbbff93e8a5b410e9984f69cabb7",
+    "results/metrics.csv": "527a64d4bfff61c6d1b1582687fdc718ecdfc1bf51727b6d42c09fe388012dc0",
+    "results/source-summary.json": "6b0560e38e1f6d1bb8840bff932b695b4a661534f7ce915cbca73ea34e1abb11",
+    "results/product-summary.json": "0c8f68e0c48514a7c6a9d3fe402a3696567e6ef183f64aec7cdde62c5cf1e3a4",
+    "fixtures/matrix.json": "61ca727604a64731875b659fb4c7c373b52fe7f76c357b6a6bbc0b391169cde6",
+    "fixtures/supplement.json": "ef34bd3229e568f15868548e4ce3c060a92b96fa8f67067691d016a1340228de",
+    "logs/audit.json": "b5791f57a7d577c3f3cea911753bdded8aeea573144b59319279ac708785535e"
+  },
+  "baseline_reused": true,
+  "air_java_pin": "5b8a5c231958b62de34583d871cbb10b473d53e8",
+  "analysis_ir_pin": "6b8ce96f5b1020199e3fcceedf81d931a3b8d2ff"
+}

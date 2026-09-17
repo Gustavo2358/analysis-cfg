@@ -73,3 +73,12 @@ Logs temporários ficam em `.harness-results/`, `target/`, `build/` ou `tmp/`, i
 pelo Git. Uma falha importante pode merecer pequeno resumo Markdown escrito manualmente.
 Esta política substitui requisitos administrativos anteriores; evidência histórica
 não é instrução atual. Reporte somente testes realmente executados e seus limites.
+
+## Confidential incident data
+
+Real or corporate identifiers observed during local incident investigation must
+never become fixtures, tests, documentation, evidence or hardcoded regression
+data. Replace them with synthetic representatives before versioning; do not
+retain real-to-synthetic mappings. Confidential real-case evidence stays local.
+Git may contain only non-sensitive aggregate observations. Real identifiers must
+not be versioned, including in commit history or PR discussion.

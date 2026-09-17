@@ -1,0 +1,2184 @@
+[
+  {
+    "airCfgMs": 163.988104,
+    "case": "F1",
+    "domain": {
+      "projectedAlternatives": 2,
+      "internedAlternatives": 16,
+      "internedNodes": 10,
+      "maxComponentCardinality": 3,
+      "maxStateAlternatives": 6,
+      "contentReads": 4,
+      "boundaryAlternatives": 6,
+      "alternativeVisits": 4,
+      "relationUnionPairs": 6,
+      "contentUpdates": 2,
+      "maxDecisionNodes": 2
+    },
+    "preparation": {
+      "objectPairsMaterialized": 0,
+      "partitionSegments": 2,
+      "baseComparisons": 4,
+      "basesIndexed": 2,
+      "maxGroupBases": 1,
+      "premiseMemberships": 0,
+      "bindingVisits": 4,
+      "operandVisits": 9,
+      "objectsResolved": 2,
+      "eventsPrepared": 4,
+      "targetsPrepared": 8,
+      "correlationGroups": 2,
+      "statementsPrepared": 8
+    },
+    "productMs": 48.596264,
+    "qualified": true,
+    "rdPrepareMs": 11.208578,
+    "rdSolveMs": 13.505225,
+    "rdSolver": {
+      "accumulatorStatesChanged": 9,
+      "accumulatorStatesUnchanged": 1,
+      "analysisPoints": 10,
+      "boundaryJoins": 1,
+      "contextualEdges": 10,
+      "duplicatePushesSuppressed": 9,
+      "edgeContributionJoins": 10,
+      "edgeTransferInvocations": 10,
+      "firstPublications": 10,
+      "initializationAttempts": 10,
+      "joinEntriesVisited": 2,
+      "maxWorklistSize": 10,
+      "nodesPopped": 10,
+      "nodesTransferred": 10,
+      "operationsTransferred": 8,
+      "predecessorContributionReads": 0,
+      "publishedStatesChanged": 0,
+      "publishedStatesUnchanged": 0,
+      "stateCompareEntries": 0,
+      "successorContributionReads": 0,
+      "worklistAttempts": 19,
+      "worklistPushes": 10
+    },
+    "rdStatus": "ACCEPTED",
+    "rvPrepareMs": 15.808934,
+    "rvSolveMs": 16.619645,
+    "rvSolver": {
+      "accumulatorStatesChanged": 9,
+      "accumulatorStatesUnchanged": 1,
+      "analysisPoints": 10,
+      "boundaryJoins": 1,
+      "contextualEdges": 10,
+      "duplicatePushesSuppressed": 9,
+      "edgeContributionJoins": 10,
+      "edgeTransferInvocations": 10,
+      "firstPublications": 10,
+      "initializationAttempts": 10,
+      "joinEntriesVisited": 2,
+      "maxWorklistSize": 10,
+      "nodesPopped": 10,
+      "nodesTransferred": 10,
+      "operationsTransferred": 8,
+      "predecessorContributionReads": 0,
+      "publishedStatesChanged": 0,
+      "publishedStatesUnchanged": 0,
+      "stateCompareEntries": 0,
+      "successorContributionReads": 0,
+      "worklistAttempts": 19,
+      "worklistPushes": 10
+    },
+    "rvStatus": "ACCEPTED",
+    "sites": [
+      {
+        "candidates": [],
+        "operation": "call-0",
+        "remainder": true,
+        "supports": []
+      },
+      {
+        "candidates": [],
+        "operation": "call-1",
+        "remainder": true,
+        "supports": []
+      },
+      {
+        "candidates": [],
+        "operation": "call-2",
+        "remainder": true,
+        "supports": []
+      },
+      {
+        "candidates": [],
+        "operation": "call-3",
+        "remainder": true,
+        "supports": []
+      }
+    ],
+    "validation": "STRUCTURALLY_VALID"
+  },
+  {
+    "airCfgMs": 161.900887,
+    "case": "F-order-012",
+    "domain": {
+      "boundaryAlternatives": 12,
+      "contentReads": 6,
+      "maxStateAlternatives": 12,
+      "maxComponentCardinality": 4,
+      "internedNodes": 21,
+      "internedAlternatives": 39,
+      "projectedAlternatives": 3,
+      "maxDecisionNodes": 3,
+      "contentUpdates": 3,
+      "relationUnionPairs": 12,
+      "alternativeVisits": 9
+    },
+    "preparation": {
+      "premiseMemberships": 0,
+      "maxGroupBases": 1,
+      "basesIndexed": 3,
+      "baseComparisons": 12,
+      "partitionSegments": 3,
+      "objectPairsMaterialized": 0,
+      "statementsPrepared": 8,
+      "correlationGroups": 3,
+      "targetsPrepared": 18,
+      "eventsPrepared": 9,
+      "objectsResolved": 3,
+      "operandVisits": 9,
+      "bindingVisits": 6
+    },
+    "productMs": 52.162595,
+    "qualified": true,
+    "rdPrepareMs": 11.299222,
+    "rdSolveMs": 11.486501,
+    "rdSolver": {
+      "accumulatorStatesChanged": 9,
+      "accumulatorStatesUnchanged": 1,
+      "analysisPoints": 10,
+      "boundaryJoins": 1,
+      "contextualEdges": 10,
+      "duplicatePushesSuppressed": 9,
+      "edgeContributionJoins": 10,
+      "edgeTransferInvocations": 10,
+      "firstPublications": 10,
+      "initializationAttempts": 10,
+      "joinEntriesVisited": 3,
+      "maxWorklistSize": 10,
+      "nodesPopped": 10,
+      "nodesTransferred": 10,
+      "operationsTransferred": 8,
+      "predecessorContributionReads": 0,
+      "publishedStatesChanged": 0,
+      "publishedStatesUnchanged": 0,
+      "stateCompareEntries": 0,
+      "successorContributionReads": 0,
+      "worklistAttempts": 19,
+      "worklistPushes": 10
+    },
+    "rdStatus": "ACCEPTED",
+    "rvPrepareMs": 15.460862,
+    "rvSolveMs": 18.533207,
+    "rvSolver": {
+      "accumulatorStatesChanged": 9,
+      "accumulatorStatesUnchanged": 1,
+      "analysisPoints": 10,
+      "boundaryJoins": 1,
+      "contextualEdges": 10,
+      "duplicatePushesSuppressed": 9,
+      "edgeContributionJoins": 10,
+      "edgeTransferInvocations": 10,
+      "firstPublications": 10,
+      "initializationAttempts": 10,
+      "joinEntriesVisited": 3,
+      "maxWorklistSize": 10,
+      "nodesPopped": 10,
+      "nodesTransferred": 10,
+      "operationsTransferred": 8,
+      "predecessorContributionReads": 0,
+      "publishedStatesChanged": 0,
+      "publishedStatesUnchanged": 0,
+      "stateCompareEntries": 0,
+      "successorContributionReads": 0,
+      "worklistAttempts": 19,
+      "worklistPushes": 10
+    },
+    "rvStatus": "ACCEPTED",
+    "sites": [
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-0",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-1",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-2",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-3",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      }
+    ],
+    "validation": "STRUCTURALLY_VALID"
+  },
+  {
+    "airCfgMs": 159.301531,
+    "case": "F-order-021",
+    "domain": {
+      "alternativeVisits": 9,
+      "relationUnionPairs": 12,
+      "contentUpdates": 3,
+      "maxDecisionNodes": 3,
+      "projectedAlternatives": 3,
+      "internedAlternatives": 39,
+      "internedNodes": 21,
+      "maxComponentCardinality": 4,
+      "maxStateAlternatives": 12,
+      "contentReads": 6,
+      "boundaryAlternatives": 12
+    },
+    "preparation": {
+      "premiseMemberships": 0,
+      "bindingVisits": 6,
+      "operandVisits": 9,
+      "objectsResolved": 3,
+      "eventsPrepared": 9,
+      "targetsPrepared": 18,
+      "correlationGroups": 3,
+      "statementsPrepared": 8,
+      "objectPairsMaterialized": 0,
+      "partitionSegments": 3,
+      "baseComparisons": 12,
+      "basesIndexed": 3,
+      "maxGroupBases": 1
+    },
+    "productMs": 50.565107,
+    "qualified": true,
+    "rdPrepareMs": 10.570239,
+    "rdSolveMs": 11.805801,
+    "rdSolver": {
+      "accumulatorStatesChanged": 9,
+      "accumulatorStatesUnchanged": 1,
+      "analysisPoints": 10,
+      "boundaryJoins": 1,
+      "contextualEdges": 10,
+      "duplicatePushesSuppressed": 9,
+      "edgeContributionJoins": 10,
+      "edgeTransferInvocations": 10,
+      "firstPublications": 10,
+      "initializationAttempts": 10,
+      "joinEntriesVisited": 3,
+      "maxWorklistSize": 10,
+      "nodesPopped": 10,
+      "nodesTransferred": 10,
+      "operationsTransferred": 8,
+      "predecessorContributionReads": 0,
+      "publishedStatesChanged": 0,
+      "publishedStatesUnchanged": 0,
+      "stateCompareEntries": 0,
+      "successorContributionReads": 0,
+      "worklistAttempts": 19,
+      "worklistPushes": 10
+    },
+    "rdStatus": "ACCEPTED",
+    "rvPrepareMs": 15.468316,
+    "rvSolveMs": 18.258218,
+    "rvSolver": {
+      "accumulatorStatesChanged": 9,
+      "accumulatorStatesUnchanged": 1,
+      "analysisPoints": 10,
+      "boundaryJoins": 1,
+      "contextualEdges": 10,
+      "duplicatePushesSuppressed": 9,
+      "edgeContributionJoins": 10,
+      "edgeTransferInvocations": 10,
+      "firstPublications": 10,
+      "initializationAttempts": 10,
+      "joinEntriesVisited": 3,
+      "maxWorklistSize": 10,
+      "nodesPopped": 10,
+      "nodesTransferred": 10,
+      "operationsTransferred": 8,
+      "predecessorContributionReads": 0,
+      "publishedStatesChanged": 0,
+      "publishedStatesUnchanged": 0,
+      "stateCompareEntries": 0,
+      "successorContributionReads": 0,
+      "worklistAttempts": 19,
+      "worklistPushes": 10
+    },
+    "rvStatus": "ACCEPTED",
+    "sites": [
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-0",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-1",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-2",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-3",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      }
+    ],
+    "validation": "STRUCTURALLY_VALID"
+  },
+  {
+    "airCfgMs": 154.198531,
+    "case": "F-order-102",
+    "domain": {
+      "maxDecisionNodes": 3,
+      "projectedAlternatives": 3,
+      "internedAlternatives": 39,
+      "internedNodes": 21,
+      "maxComponentCardinality": 4,
+      "maxStateAlternatives": 12,
+      "contentReads": 6,
+      "boundaryAlternatives": 12,
+      "alternativeVisits": 9,
+      "relationUnionPairs": 12,
+      "contentUpdates": 3
+    },
+    "preparation": {
+      "statementsPrepared": 8,
+      "objectPairsMaterialized": 0,
+      "partitionSegments": 3,
+      "baseComparisons": 12,
+      "basesIndexed": 3,
+      "maxGroupBases": 1,
+      "premiseMemberships": 0,
+      "bindingVisits": 6,
+      "operandVisits": 9,
+      "objectsResolved": 3,
+      "eventsPrepared": 9,
+      "targetsPrepared": 18,
+      "correlationGroups": 3
+    },
+    "productMs": 51.701699,
+    "qualified": true,
+    "rdPrepareMs": 11.720215,
+    "rdSolveMs": 12.237343,
+    "rdSolver": {
+      "accumulatorStatesChanged": 9,
+      "accumulatorStatesUnchanged": 1,
+      "analysisPoints": 10,
+      "boundaryJoins": 1,
+      "contextualEdges": 10,
+      "duplicatePushesSuppressed": 9,
+      "edgeContributionJoins": 10,
+      "edgeTransferInvocations": 10,
+      "firstPublications": 10,
+      "initializationAttempts": 10,
+      "joinEntriesVisited": 3,
+      "maxWorklistSize": 10,
+      "nodesPopped": 10,
+      "nodesTransferred": 10,
+      "operationsTransferred": 8,
+      "predecessorContributionReads": 0,
+      "publishedStatesChanged": 0,
+      "publishedStatesUnchanged": 0,
+      "stateCompareEntries": 0,
+      "successorContributionReads": 0,
+      "worklistAttempts": 19,
+      "worklistPushes": 10
+    },
+    "rdStatus": "ACCEPTED",
+    "rvPrepareMs": 15.873371,
+    "rvSolveMs": 18.508121,
+    "rvSolver": {
+      "accumulatorStatesChanged": 9,
+      "accumulatorStatesUnchanged": 1,
+      "analysisPoints": 10,
+      "boundaryJoins": 1,
+      "contextualEdges": 10,
+      "duplicatePushesSuppressed": 9,
+      "edgeContributionJoins": 10,
+      "edgeTransferInvocations": 10,
+      "firstPublications": 10,
+      "initializationAttempts": 10,
+      "joinEntriesVisited": 3,
+      "maxWorklistSize": 10,
+      "nodesPopped": 10,
+      "nodesTransferred": 10,
+      "operationsTransferred": 8,
+      "predecessorContributionReads": 0,
+      "publishedStatesChanged": 0,
+      "publishedStatesUnchanged": 0,
+      "stateCompareEntries": 0,
+      "successorContributionReads": 0,
+      "worklistAttempts": 19,
+      "worklistPushes": 10
+    },
+    "rvStatus": "ACCEPTED",
+    "sites": [
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-0",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-1",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-2",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-3",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      }
+    ],
+    "validation": "STRUCTURALLY_VALID"
+  },
+  {
+    "airCfgMs": 160.753394,
+    "case": "F-order-120",
+    "domain": {
+      "maxStateAlternatives": 12,
+      "contentReads": 6,
+      "boundaryAlternatives": 12,
+      "alternativeVisits": 9,
+      "relationUnionPairs": 12,
+      "contentUpdates": 3,
+      "maxDecisionNodes": 3,
+      "projectedAlternatives": 3,
+      "internedAlternatives": 39,
+      "internedNodes": 21,
+      "maxComponentCardinality": 4
+    },
+    "preparation": {
+      "basesIndexed": 3,
+      "maxGroupBases": 1,
+      "premiseMemberships": 0,
+      "bindingVisits": 6,
+      "operandVisits": 9,
+      "objectsResolved": 3,
+      "eventsPrepared": 9,
+      "targetsPrepared": 18,
+      "correlationGroups": 3,
+      "statementsPrepared": 8,
+      "objectPairsMaterialized": 0,
+      "partitionSegments": 3,
+      "baseComparisons": 12
+    },
+    "productMs": 50.631406,
+    "qualified": true,
+    "rdPrepareMs": 10.456763,
+    "rdSolveMs": 12.059952,
+    "rdSolver": {
+      "accumulatorStatesChanged": 9,
+      "accumulatorStatesUnchanged": 1,
+      "analysisPoints": 10,
+      "boundaryJoins": 1,
+      "contextualEdges": 10,
+      "duplicatePushesSuppressed": 9,
+      "edgeContributionJoins": 10,
+      "edgeTransferInvocations": 10,
+      "firstPublications": 10,
+      "initializationAttempts": 10,
+      "joinEntriesVisited": 3,
+      "maxWorklistSize": 10,
+      "nodesPopped": 10,
+      "nodesTransferred": 10,
+      "operationsTransferred": 8,
+      "predecessorContributionReads": 0,
+      "publishedStatesChanged": 0,
+      "publishedStatesUnchanged": 0,
+      "stateCompareEntries": 0,
+      "successorContributionReads": 0,
+      "worklistAttempts": 19,
+      "worklistPushes": 10
+    },
+    "rdStatus": "ACCEPTED",
+    "rvPrepareMs": 15.593142,
+    "rvSolveMs": 18.62307,
+    "rvSolver": {
+      "accumulatorStatesChanged": 9,
+      "accumulatorStatesUnchanged": 1,
+      "analysisPoints": 10,
+      "boundaryJoins": 1,
+      "contextualEdges": 10,
+      "duplicatePushesSuppressed": 9,
+      "edgeContributionJoins": 10,
+      "edgeTransferInvocations": 10,
+      "firstPublications": 10,
+      "initializationAttempts": 10,
+      "joinEntriesVisited": 3,
+      "maxWorklistSize": 10,
+      "nodesPopped": 10,
+      "nodesTransferred": 10,
+      "operationsTransferred": 8,
+      "predecessorContributionReads": 0,
+      "publishedStatesChanged": 0,
+      "publishedStatesUnchanged": 0,
+      "stateCompareEntries": 0,
+      "successorContributionReads": 0,
+      "worklistAttempts": 19,
+      "worklistPushes": 10
+    },
+    "rvStatus": "ACCEPTED",
+    "sites": [
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-0",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-1",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-2",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-3",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      }
+    ],
+    "validation": "STRUCTURALLY_VALID"
+  },
+  {
+    "airCfgMs": 155.814854,
+    "case": "F-order-201",
+    "domain": {
+      "relationUnionPairs": 12,
+      "alternativeVisits": 9,
+      "boundaryAlternatives": 12,
+      "contentReads": 6,
+      "maxStateAlternatives": 12,
+      "maxComponentCardinality": 4,
+      "internedNodes": 21,
+      "internedAlternatives": 39,
+      "projectedAlternatives": 3,
+      "maxDecisionNodes": 3,
+      "contentUpdates": 3
+    },
+    "preparation": {
+      "eventsPrepared": 9,
+      "objectsResolved": 3,
+      "operandVisits": 9,
+      "bindingVisits": 6,
+      "premiseMemberships": 0,
+      "maxGroupBases": 1,
+      "basesIndexed": 3,
+      "baseComparisons": 12,
+      "partitionSegments": 3,
+      "objectPairsMaterialized": 0,
+      "statementsPrepared": 8,
+      "correlationGroups": 3,
+      "targetsPrepared": 18
+    },
+    "productMs": 50.047878,
+    "qualified": true,
+    "rdPrepareMs": 10.908553,
+    "rdSolveMs": 11.846354,
+    "rdSolver": {
+      "accumulatorStatesChanged": 9,
+      "accumulatorStatesUnchanged": 1,
+      "analysisPoints": 10,
+      "boundaryJoins": 1,
+      "contextualEdges": 10,
+      "duplicatePushesSuppressed": 9,
+      "edgeContributionJoins": 10,
+      "edgeTransferInvocations": 10,
+      "firstPublications": 10,
+      "initializationAttempts": 10,
+      "joinEntriesVisited": 3,
+      "maxWorklistSize": 10,
+      "nodesPopped": 10,
+      "nodesTransferred": 10,
+      "operationsTransferred": 8,
+      "predecessorContributionReads": 0,
+      "publishedStatesChanged": 0,
+      "publishedStatesUnchanged": 0,
+      "stateCompareEntries": 0,
+      "successorContributionReads": 0,
+      "worklistAttempts": 19,
+      "worklistPushes": 10
+    },
+    "rdStatus": "ACCEPTED",
+    "rvPrepareMs": 15.359389,
+    "rvSolveMs": 18.23195,
+    "rvSolver": {
+      "accumulatorStatesChanged": 9,
+      "accumulatorStatesUnchanged": 1,
+      "analysisPoints": 10,
+      "boundaryJoins": 1,
+      "contextualEdges": 10,
+      "duplicatePushesSuppressed": 9,
+      "edgeContributionJoins": 10,
+      "edgeTransferInvocations": 10,
+      "firstPublications": 10,
+      "initializationAttempts": 10,
+      "joinEntriesVisited": 3,
+      "maxWorklistSize": 10,
+      "nodesPopped": 10,
+      "nodesTransferred": 10,
+      "operationsTransferred": 8,
+      "predecessorContributionReads": 0,
+      "publishedStatesChanged": 0,
+      "publishedStatesUnchanged": 0,
+      "stateCompareEntries": 0,
+      "successorContributionReads": 0,
+      "worklistAttempts": 19,
+      "worklistPushes": 10
+    },
+    "rvStatus": "ACCEPTED",
+    "sites": [
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-0",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-1",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-2",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-3",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      }
+    ],
+    "validation": "STRUCTURALLY_VALID"
+  },
+  {
+    "airCfgMs": 153.549223,
+    "case": "F-order-210",
+    "domain": {
+      "maxDecisionNodes": 3,
+      "contentUpdates": 3,
+      "relationUnionPairs": 12,
+      "alternativeVisits": 9,
+      "boundaryAlternatives": 12,
+      "contentReads": 6,
+      "maxStateAlternatives": 12,
+      "maxComponentCardinality": 4,
+      "internedNodes": 21,
+      "internedAlternatives": 39,
+      "projectedAlternatives": 3
+    },
+    "preparation": {
+      "statementsPrepared": 8,
+      "correlationGroups": 3,
+      "targetsPrepared": 18,
+      "eventsPrepared": 9,
+      "objectsResolved": 3,
+      "operandVisits": 9,
+      "bindingVisits": 6,
+      "premiseMemberships": 0,
+      "maxGroupBases": 1,
+      "basesIndexed": 3,
+      "baseComparisons": 12,
+      "partitionSegments": 3,
+      "objectPairsMaterialized": 0
+    },
+    "productMs": 49.633296,
+    "qualified": true,
+    "rdPrepareMs": 10.549541,
+    "rdSolveMs": 11.916461,
+    "rdSolver": {
+      "accumulatorStatesChanged": 9,
+      "accumulatorStatesUnchanged": 1,
+      "analysisPoints": 10,
+      "boundaryJoins": 1,
+      "contextualEdges": 10,
+      "duplicatePushesSuppressed": 9,
+      "edgeContributionJoins": 10,
+      "edgeTransferInvocations": 10,
+      "firstPublications": 10,
+      "initializationAttempts": 10,
+      "joinEntriesVisited": 3,
+      "maxWorklistSize": 10,
+      "nodesPopped": 10,
+      "nodesTransferred": 10,
+      "operationsTransferred": 8,
+      "predecessorContributionReads": 0,
+      "publishedStatesChanged": 0,
+      "publishedStatesUnchanged": 0,
+      "stateCompareEntries": 0,
+      "successorContributionReads": 0,
+      "worklistAttempts": 19,
+      "worklistPushes": 10
+    },
+    "rdStatus": "ACCEPTED",
+    "rvPrepareMs": 15.347276,
+    "rvSolveMs": 18.43532,
+    "rvSolver": {
+      "accumulatorStatesChanged": 9,
+      "accumulatorStatesUnchanged": 1,
+      "analysisPoints": 10,
+      "boundaryJoins": 1,
+      "contextualEdges": 10,
+      "duplicatePushesSuppressed": 9,
+      "edgeContributionJoins": 10,
+      "edgeTransferInvocations": 10,
+      "firstPublications": 10,
+      "initializationAttempts": 10,
+      "joinEntriesVisited": 3,
+      "maxWorklistSize": 10,
+      "nodesPopped": 10,
+      "nodesTransferred": 10,
+      "operationsTransferred": 8,
+      "predecessorContributionReads": 0,
+      "publishedStatesChanged": 0,
+      "publishedStatesUnchanged": 0,
+      "stateCompareEntries": 0,
+      "successorContributionReads": 0,
+      "worklistAttempts": 19,
+      "worklistPushes": 10
+    },
+    "rvStatus": "ACCEPTED",
+    "sites": [
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-0",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-1",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-2",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-3",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      }
+    ],
+    "validation": "STRUCTURALLY_VALID"
+  },
+  {
+    "airCfgMs": 158.345336,
+    "case": "H2",
+    "domain": {
+      "contentUpdates": 3,
+      "maxDecisionNodes": 3,
+      "projectedAlternatives": 3,
+      "internedAlternatives": 35,
+      "internedNodes": 20,
+      "maxComponentCardinality": 4,
+      "maxStateAlternatives": 11,
+      "contentReads": 6,
+      "boundaryAlternatives": 11,
+      "alternativeVisits": 9,
+      "relationUnionPairs": 10
+    },
+    "preparation": {
+      "targetsPrepared": 18,
+      "correlationGroups": 3,
+      "statementsPrepared": 8,
+      "objectPairsMaterialized": 0,
+      "partitionSegments": 3,
+      "baseComparisons": 12,
+      "basesIndexed": 3,
+      "maxGroupBases": 1,
+      "premiseMemberships": 0,
+      "bindingVisits": 6,
+      "operandVisits": 9,
+      "objectsResolved": 3,
+      "eventsPrepared": 9
+    },
+    "productMs": 51.433963,
+    "qualified": true,
+    "rdPrepareMs": 11.153297,
+    "rdSolveMs": 11.350255,
+    "rdSolver": {
+      "accumulatorStatesChanged": 9,
+      "accumulatorStatesUnchanged": 1,
+      "analysisPoints": 10,
+      "boundaryJoins": 1,
+      "contextualEdges": 10,
+      "duplicatePushesSuppressed": 9,
+      "edgeContributionJoins": 10,
+      "edgeTransferInvocations": 10,
+      "firstPublications": 10,
+      "initializationAttempts": 10,
+      "joinEntriesVisited": 3,
+      "maxWorklistSize": 10,
+      "nodesPopped": 10,
+      "nodesTransferred": 10,
+      "operationsTransferred": 8,
+      "predecessorContributionReads": 0,
+      "publishedStatesChanged": 0,
+      "publishedStatesUnchanged": 0,
+      "stateCompareEntries": 0,
+      "successorContributionReads": 0,
+      "worklistAttempts": 19,
+      "worklistPushes": 10
+    },
+    "rdStatus": "ACCEPTED",
+    "rvPrepareMs": 15.704915,
+    "rvSolveMs": 20.463239,
+    "rvSolver": {
+      "accumulatorStatesChanged": 9,
+      "accumulatorStatesUnchanged": 1,
+      "analysisPoints": 10,
+      "boundaryJoins": 1,
+      "contextualEdges": 10,
+      "duplicatePushesSuppressed": 9,
+      "edgeContributionJoins": 10,
+      "edgeTransferInvocations": 10,
+      "firstPublications": 10,
+      "initializationAttempts": 10,
+      "joinEntriesVisited": 3,
+      "maxWorklistSize": 10,
+      "nodesPopped": 10,
+      "nodesTransferred": 10,
+      "operationsTransferred": 8,
+      "predecessorContributionReads": 0,
+      "publishedStatesChanged": 0,
+      "publishedStatesUnchanged": 0,
+      "stateCompareEntries": 0,
+      "successorContributionReads": 0,
+      "worklistAttempts": 19,
+      "worklistPushes": 10
+    },
+    "rvStatus": "ACCEPTED",
+    "sites": [
+      {
+        "candidates": [
+          "PROG0002"
+        ],
+        "operation": "call-0",
+        "remainder": true,
+        "supports": [
+          [
+            "place-2"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0002"
+        ],
+        "operation": "call-1",
+        "remainder": true,
+        "supports": [
+          [
+            "place-2"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0002"
+        ],
+        "operation": "call-2",
+        "remainder": true,
+        "supports": [
+          [
+            "place-2"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0002"
+        ],
+        "operation": "call-3",
+        "remainder": true,
+        "supports": [
+          [
+            "place-2"
+          ]
+        ]
+      }
+    ],
+    "validation": "STRUCTURALLY_VALID"
+  },
+  {
+    "case": "F5",
+    "issues": "[ValidationIssue[kind=SEMANTIC_OBLIGATION, rule=I-09, subject=Optional[OperandId[owner=OperationOwner[operation=OperationId[unit=UnitId[publication=PublicationId[localId=ep-lab-01], localId=unit], localId=branch]], localId=predicate]], detail=producer must substantiate that unknown expression dependencies and remaining reads are pure], ValidationIssue[kind=SEMANTIC_OBLIGATION, rule=I-56, subject=Optional[OperationId[unit=UnitId[publication=PublicationId[localId=ep-lab-01], localId=unit], localId=call-0]], detail=producer/authority must substantiate materialized signature, effects and outcomes; structural validation does not compare them with external semantics or a body], ValidationIssue[kind=SEMANTIC_OBLIGATION, rule=I-56, subject=Optional[OperationId[unit=UnitId[publication=PublicationId[localId=ep-lab-01], localId=unit], localId=call-1]], detail=producer/authority must substantiate materialized signature, effects and outcomes; structural validation does not compare them with external semantics or a body], ValidationIssue[kind=SEMANTIC_OBLIGATION, rule=I-56, subject=Optional[OperationId[unit=UnitId[publication=PublicationId[localId=ep-lab-01], localId=unit], localId=call-2]], detail=producer/authority must substantiate materialized signature, effects and outcomes; structural validation does not compare them with external semantics or a body], ValidationIssue[kind=SEMANTIC_OBLIGATION, rule=I-56, subject=Optional[OperationId[unit=UnitId[publication=PublicationId[localId=ep-lab-01], localId=unit], localId=call-3]], detail=producer/authority must substantiate materialized signature, effects and outcomes; structural validation does not compare them with external semantics or a body], ValidationIssue[kind=INVALID_IR, rule=I-17, subject=Optional[EntryId[unit=UnitId[publication=PublicationId[localId=ep-lab-01], localId=unit], localId=entry]], detail=contradictory literal bytes in overlapping initial conditions]]",
+    "qualified": true,
+    "validation": "INVALID_IR"
+  },
+  {
+    "airCfgMs": 152.50576,
+    "case": "MUST",
+    "domain": {
+      "maxStateAlternatives": 2,
+      "maxComponentCardinality": 2,
+      "internedNodes": 4,
+      "internedAlternatives": 5,
+      "projectedAlternatives": 2,
+      "maxDecisionNodes": 1,
+      "contentUpdates": 2,
+      "relationUnionPairs": 2,
+      "alternativeVisits": 2,
+      "boundaryAlternatives": 2,
+      "contentReads": 3
+    },
+    "preparation": {
+      "basesIndexed": 1,
+      "baseComparisons": 0,
+      "partitionSegments": 1,
+      "objectPairsMaterialized": 0,
+      "statementsPrepared": 9,
+      "correlationGroups": 1,
+      "targetsPrepared": 3,
+      "eventsPrepared": 2,
+      "objectsResolved": 1,
+      "operandVisits": 11,
+      "bindingVisits": 2,
+      "premiseMemberships": 0,
+      "maxGroupBases": 1
+    },
+    "productMs": 46.282406,
+    "qualified": true,
+    "rdPrepareMs": 11.233162,
+    "rdSolveMs": 11.832219,
+    "rdSolver": {
+      "accumulatorStatesChanged": 9,
+      "accumulatorStatesUnchanged": 1,
+      "analysisPoints": 10,
+      "boundaryJoins": 1,
+      "contextualEdges": 10,
+      "duplicatePushesSuppressed": 9,
+      "edgeContributionJoins": 10,
+      "edgeTransferInvocations": 10,
+      "firstPublications": 10,
+      "initializationAttempts": 10,
+      "joinEntriesVisited": 1,
+      "maxWorklistSize": 10,
+      "nodesPopped": 10,
+      "nodesTransferred": 10,
+      "operationsTransferred": 9,
+      "predecessorContributionReads": 0,
+      "publishedStatesChanged": 0,
+      "publishedStatesUnchanged": 0,
+      "stateCompareEntries": 0,
+      "successorContributionReads": 0,
+      "worklistAttempts": 19,
+      "worklistPushes": 10
+    },
+    "rdStatus": "ACCEPTED",
+    "rvPrepareMs": 14.471588,
+    "rvSolveMs": 15.94431,
+    "rvSolver": {
+      "accumulatorStatesChanged": 9,
+      "accumulatorStatesUnchanged": 1,
+      "analysisPoints": 10,
+      "boundaryJoins": 1,
+      "contextualEdges": 10,
+      "duplicatePushesSuppressed": 9,
+      "edgeContributionJoins": 10,
+      "edgeTransferInvocations": 10,
+      "firstPublications": 10,
+      "initializationAttempts": 10,
+      "joinEntriesVisited": 1,
+      "maxWorklistSize": 10,
+      "nodesPopped": 10,
+      "nodesTransferred": 10,
+      "operationsTransferred": 9,
+      "predecessorContributionReads": 0,
+      "publishedStatesChanged": 0,
+      "publishedStatesUnchanged": 0,
+      "stateCompareEntries": 0,
+      "successorContributionReads": 0,
+      "worklistAttempts": 19,
+      "worklistPushes": 10
+    },
+    "rvStatus": "ACCEPTED",
+    "sites": [
+      {
+        "candidates": [
+          "NEWPROG1"
+        ],
+        "operation": "call-0",
+        "remainder": false,
+        "supports": [
+          [
+            "overwrite"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "NEWPROG1"
+        ],
+        "operation": "call-1",
+        "remainder": false,
+        "supports": [
+          [
+            "overwrite"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "NEWPROG1"
+        ],
+        "operation": "call-2",
+        "remainder": false,
+        "supports": [
+          [
+            "overwrite"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "NEWPROG1"
+        ],
+        "operation": "call-3",
+        "remainder": false,
+        "supports": [
+          [
+            "overwrite"
+          ]
+        ]
+      }
+    ],
+    "validation": "STRUCTURALLY_VALID"
+  },
+  {
+    "airCfgMs": 171.785131,
+    "case": "G-1",
+    "domain": {
+      "alternativeVisits": 120,
+      "relationUnionPairs": 544,
+      "contentUpdates": 8,
+      "maxDecisionNodes": 22,
+      "projectedAlternatives": 15,
+      "internedAlternatives": 3231,
+      "internedNodes": 962,
+      "maxComponentCardinality": 9,
+      "maxStateAlternatives": 100,
+      "contentReads": 9,
+      "boundaryAlternatives": 16
+    },
+    "preparation": {
+      "premiseMemberships": 0,
+      "bindingVisits": 16,
+      "operandVisits": 37,
+      "objectsResolved": 8,
+      "eventsPrepared": 64,
+      "targetsPrepared": 72,
+      "correlationGroups": 1,
+      "statementsPrepared": 15,
+      "objectPairsMaterialized": 0,
+      "partitionSegments": 8,
+      "baseComparisons": 63,
+      "basesIndexed": 8,
+      "maxGroupBases": 8
+    },
+    "productMs": 72.448752,
+    "qualified": true,
+    "rdPrepareMs": 13.276469,
+    "rdSolveMs": 17.342276,
+    "rdSolver": {
+      "accumulatorStatesChanged": 9,
+      "accumulatorStatesUnchanged": 1,
+      "analysisPoints": 10,
+      "boundaryJoins": 1,
+      "contextualEdges": 10,
+      "duplicatePushesSuppressed": 9,
+      "edgeContributionJoins": 10,
+      "edgeTransferInvocations": 10,
+      "firstPublications": 10,
+      "initializationAttempts": 10,
+      "joinEntriesVisited": 8,
+      "maxWorklistSize": 10,
+      "nodesPopped": 10,
+      "nodesTransferred": 10,
+      "operationsTransferred": 15,
+      "predecessorContributionReads": 0,
+      "publishedStatesChanged": 0,
+      "publishedStatesUnchanged": 0,
+      "stateCompareEntries": 0,
+      "successorContributionReads": 0,
+      "worklistAttempts": 19,
+      "worklistPushes": 10
+    },
+    "rdStatus": "ACCEPTED",
+    "rvPrepareMs": 16.764919,
+    "rvSolveMs": 48.776181,
+    "rvSolver": {
+      "accumulatorStatesChanged": 9,
+      "accumulatorStatesUnchanged": 1,
+      "analysisPoints": 10,
+      "boundaryJoins": 1,
+      "contextualEdges": 10,
+      "duplicatePushesSuppressed": 9,
+      "edgeContributionJoins": 10,
+      "edgeTransferInvocations": 10,
+      "firstPublications": 10,
+      "initializationAttempts": 10,
+      "joinEntriesVisited": 1,
+      "maxWorklistSize": 10,
+      "nodesPopped": 10,
+      "nodesTransferred": 10,
+      "operationsTransferred": 15,
+      "predecessorContributionReads": 0,
+      "publishedStatesChanged": 0,
+      "publishedStatesUnchanged": 0,
+      "stateCompareEntries": 0,
+      "successorContributionReads": 0,
+      "worklistAttempts": 19,
+      "worklistPushes": 10
+    },
+    "rvStatus": "ACCEPTED",
+    "sites": [
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-0",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-1",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-2",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-3",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      }
+    ],
+    "validation": "STRUCTURALLY_VALID"
+  },
+  {
+    "airCfgMs": 174.239534,
+    "case": "G-2",
+    "domain": {
+      "projectedAlternatives": 22,
+      "internedAlternatives": 4986,
+      "internedNodes": 1438,
+      "maxComponentCardinality": 10,
+      "maxStateAlternatives": 136,
+      "contentReads": 9,
+      "boundaryAlternatives": 24,
+      "alternativeVisits": 184,
+      "relationUnionPairs": 856,
+      "contentUpdates": 8,
+      "maxDecisionNodes": 29
+    },
+    "preparation": {
+      "statementsPrepared": 15,
+      "objectPairsMaterialized": 0,
+      "partitionSegments": 8,
+      "baseComparisons": 77,
+      "basesIndexed": 8,
+      "maxGroupBases": 8,
+      "premiseMemberships": 0,
+      "bindingVisits": 16,
+      "operandVisits": 37,
+      "objectsResolved": 8,
+      "eventsPrepared": 72,
+      "targetsPrepared": 88,
+      "correlationGroups": 1
+    },
+    "productMs": 82.743802,
+    "qualified": true,
+    "rdPrepareMs": 13.835343,
+    "rdSolveMs": 16.951267,
+    "rdSolver": {
+      "accumulatorStatesChanged": 9,
+      "accumulatorStatesUnchanged": 1,
+      "analysisPoints": 10,
+      "boundaryJoins": 1,
+      "contextualEdges": 10,
+      "duplicatePushesSuppressed": 9,
+      "edgeContributionJoins": 10,
+      "edgeTransferInvocations": 10,
+      "firstPublications": 10,
+      "initializationAttempts": 10,
+      "joinEntriesVisited": 8,
+      "maxWorklistSize": 10,
+      "nodesPopped": 10,
+      "nodesTransferred": 10,
+      "operationsTransferred": 15,
+      "predecessorContributionReads": 0,
+      "publishedStatesChanged": 0,
+      "publishedStatesUnchanged": 0,
+      "stateCompareEntries": 0,
+      "successorContributionReads": 0,
+      "worklistAttempts": 19,
+      "worklistPushes": 10
+    },
+    "rdStatus": "ACCEPTED",
+    "rvPrepareMs": 17.004113,
+    "rvSolveMs": 59.183523,
+    "rvSolver": {
+      "accumulatorStatesChanged": 9,
+      "accumulatorStatesUnchanged": 1,
+      "analysisPoints": 10,
+      "boundaryJoins": 1,
+      "contextualEdges": 10,
+      "duplicatePushesSuppressed": 9,
+      "edgeContributionJoins": 10,
+      "edgeTransferInvocations": 10,
+      "firstPublications": 10,
+      "initializationAttempts": 10,
+      "joinEntriesVisited": 1,
+      "maxWorklistSize": 10,
+      "nodesPopped": 10,
+      "nodesTransferred": 10,
+      "operationsTransferred": 15,
+      "predecessorContributionReads": 0,
+      "publishedStatesChanged": 0,
+      "publishedStatesUnchanged": 0,
+      "stateCompareEntries": 0,
+      "successorContributionReads": 0,
+      "worklistAttempts": 19,
+      "worklistPushes": 10
+    },
+    "rvStatus": "ACCEPTED",
+    "sites": [
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-0",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-1",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-2",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-3",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      }
+    ],
+    "validation": "STRUCTURALLY_VALID"
+  },
+  {
+    "airCfgMs": 177.633933,
+    "case": "G-4",
+    "domain": {
+      "boundaryAlternatives": 40,
+      "alternativeVisits": 312,
+      "relationUnionPairs": 1480,
+      "contentUpdates": 8,
+      "maxDecisionNodes": 43,
+      "projectedAlternatives": 36,
+      "internedAlternatives": 8817,
+      "internedNodes": 2396,
+      "maxComponentCardinality": 12,
+      "maxStateAlternatives": 208,
+      "contentReads": 9
+    },
+    "preparation": {
+      "premiseMemberships": 0,
+      "bindingVisits": 16,
+      "operandVisits": 37,
+      "objectsResolved": 8,
+      "eventsPrepared": 88,
+      "targetsPrepared": 120,
+      "correlationGroups": 1,
+      "statementsPrepared": 15,
+      "objectPairsMaterialized": 0,
+      "partitionSegments": 8,
+      "baseComparisons": 105,
+      "basesIndexed": 8,
+      "maxGroupBases": 8
+    },
+    "productMs": 101.993709,
+    "qualified": true,
+    "rdPrepareMs": 13.520211,
+    "rdSolveMs": 17.20659,
+    "rdSolver": {
+      "accumulatorStatesChanged": 9,
+      "accumulatorStatesUnchanged": 1,
+      "analysisPoints": 10,
+      "boundaryJoins": 1,
+      "contextualEdges": 10,
+      "duplicatePushesSuppressed": 9,
+      "edgeContributionJoins": 10,
+      "edgeTransferInvocations": 10,
+      "firstPublications": 10,
+      "initializationAttempts": 10,
+      "joinEntriesVisited": 8,
+      "maxWorklistSize": 10,
+      "nodesPopped": 10,
+      "nodesTransferred": 10,
+      "operationsTransferred": 15,
+      "predecessorContributionReads": 0,
+      "publishedStatesChanged": 0,
+      "publishedStatesUnchanged": 0,
+      "stateCompareEntries": 0,
+      "successorContributionReads": 0,
+      "worklistAttempts": 19,
+      "worklistPushes": 10
+    },
+    "rdStatus": "ACCEPTED",
+    "rvPrepareMs": 17.01388,
+    "rvSolveMs": 76.364708,
+    "rvSolver": {
+      "accumulatorStatesChanged": 9,
+      "accumulatorStatesUnchanged": 1,
+      "analysisPoints": 10,
+      "boundaryJoins": 1,
+      "contextualEdges": 10,
+      "duplicatePushesSuppressed": 9,
+      "edgeContributionJoins": 10,
+      "edgeTransferInvocations": 10,
+      "firstPublications": 10,
+      "initializationAttempts": 10,
+      "joinEntriesVisited": 1,
+      "maxWorklistSize": 10,
+      "nodesPopped": 10,
+      "nodesTransferred": 10,
+      "operationsTransferred": 15,
+      "predecessorContributionReads": 0,
+      "publishedStatesChanged": 0,
+      "publishedStatesUnchanged": 0,
+      "stateCompareEntries": 0,
+      "successorContributionReads": 0,
+      "worklistAttempts": 19,
+      "worklistPushes": 10
+    },
+    "rvStatus": "ACCEPTED",
+    "sites": [
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-0",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-1",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-2",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-3",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      }
+    ],
+    "validation": "STRUCTURALLY_VALID"
+  },
+  {
+    "airCfgMs": 178.77288,
+    "case": "G-7",
+    "domain": {
+      "contentReads": 9,
+      "boundaryAlternatives": 64,
+      "alternativeVisits": 504,
+      "relationUnionPairs": 2429,
+      "contentUpdates": 8,
+      "maxDecisionNodes": 64,
+      "projectedAlternatives": 57,
+      "internedAlternatives": 15296,
+      "internedNodes": 3829,
+      "maxComponentCardinality": 15,
+      "maxStateAlternatives": 316
+    },
+    "preparation": {
+      "basesIndexed": 8,
+      "maxGroupBases": 8,
+      "premiseMemberships": 0,
+      "bindingVisits": 16,
+      "operandVisits": 37,
+      "objectsResolved": 8,
+      "eventsPrepared": 112,
+      "targetsPrepared": 168,
+      "correlationGroups": 1,
+      "statementsPrepared": 15,
+      "objectPairsMaterialized": 0,
+      "partitionSegments": 8,
+      "baseComparisons": 147
+    },
+    "productMs": 103.28339,
+    "qualified": true,
+    "rdPrepareMs": 13.498472,
+    "rdSolveMs": 20.010427,
+    "rdSolver": {
+      "accumulatorStatesChanged": 9,
+      "accumulatorStatesUnchanged": 1,
+      "analysisPoints": 10,
+      "boundaryJoins": 1,
+      "contextualEdges": 10,
+      "duplicatePushesSuppressed": 9,
+      "edgeContributionJoins": 10,
+      "edgeTransferInvocations": 10,
+      "firstPublications": 10,
+      "initializationAttempts": 10,
+      "joinEntriesVisited": 8,
+      "maxWorklistSize": 10,
+      "nodesPopped": 10,
+      "nodesTransferred": 10,
+      "operationsTransferred": 15,
+      "predecessorContributionReads": 0,
+      "publishedStatesChanged": 0,
+      "publishedStatesUnchanged": 0,
+      "stateCompareEntries": 0,
+      "successorContributionReads": 0,
+      "worklistAttempts": 19,
+      "worklistPushes": 10
+    },
+    "rdStatus": "ACCEPTED",
+    "rvPrepareMs": 17.496656,
+    "rvSolveMs": 108.296326,
+    "rvSolver": {
+      "accumulatorStatesChanged": 9,
+      "accumulatorStatesUnchanged": 1,
+      "analysisPoints": 10,
+      "boundaryJoins": 1,
+      "contextualEdges": 10,
+      "duplicatePushesSuppressed": 9,
+      "edgeContributionJoins": 10,
+      "edgeTransferInvocations": 10,
+      "firstPublications": 10,
+      "initializationAttempts": 10,
+      "joinEntriesVisited": 1,
+      "maxWorklistSize": 10,
+      "nodesPopped": 10,
+      "nodesTransferred": 10,
+      "operationsTransferred": 15,
+      "predecessorContributionReads": 0,
+      "publishedStatesChanged": 0,
+      "publishedStatesUnchanged": 0,
+      "stateCompareEntries": 0,
+      "successorContributionReads": 0,
+      "worklistAttempts": 19,
+      "worklistPushes": 10
+    },
+    "rvStatus": "ACCEPTED",
+    "sites": [
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-0",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-1",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-2",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-3",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      }
+    ],
+    "validation": "STRUCTURALLY_VALID"
+  },
+  {
+    "airCfgMs": 223.054395,
+    "case": "I",
+    "domain": {
+      "contentReads": 33,
+      "boundaryAlternatives": 0,
+      "alternativeVisits": 1024,
+      "relationUnionPairs": 16368,
+      "contentUpdates": 32,
+      "maxDecisionNodes": 32,
+      "projectedAlternatives": 32,
+      "internedAlternatives": 356244,
+      "internedNodes": 33327,
+      "maxComponentCardinality": 32,
+      "maxStateAlternatives": 528
+    },
+    "preparation": {
+      "maxGroupBases": 32,
+      "premiseMemberships": 0,
+      "bindingVisits": 64,
+      "operandVisits": 137,
+      "objectsResolved": 32,
+      "eventsPrepared": 1024,
+      "targetsPrepared": 1024,
+      "correlationGroups": 1,
+      "statementsPrepared": 40,
+      "objectPairsMaterialized": 0,
+      "partitionSegments": 32,
+      "baseComparisons": 992,
+      "basesIndexed": 32
+    },
+    "productMs": 323.161312,
+    "qualified": true,
+    "rdPrepareMs": 28.611062,
+    "rdSolveMs": 46.697439,
+    "rdSolver": {
+      "accumulatorStatesChanged": 9,
+      "accumulatorStatesUnchanged": 1,
+      "analysisPoints": 10,
+      "boundaryJoins": 1,
+      "contextualEdges": 10,
+      "duplicatePushesSuppressed": 9,
+      "edgeContributionJoins": 10,
+      "edgeTransferInvocations": 10,
+      "firstPublications": 10,
+      "initializationAttempts": 10,
+      "joinEntriesVisited": 32,
+      "maxWorklistSize": 10,
+      "nodesPopped": 10,
+      "nodesTransferred": 10,
+      "operationsTransferred": 40,
+      "predecessorContributionReads": 0,
+      "publishedStatesChanged": 0,
+      "publishedStatesUnchanged": 0,
+      "stateCompareEntries": 0,
+      "successorContributionReads": 0,
+      "worklistAttempts": 19,
+      "worklistPushes": 10
+    },
+    "rdStatus": "ACCEPTED",
+    "rvPrepareMs": 25.896777,
+    "rvSolveMs": 427.746743,
+    "rvSolver": {
+      "accumulatorStatesChanged": 9,
+      "accumulatorStatesUnchanged": 1,
+      "analysisPoints": 10,
+      "boundaryJoins": 1,
+      "contextualEdges": 10,
+      "duplicatePushesSuppressed": 9,
+      "edgeContributionJoins": 10,
+      "edgeTransferInvocations": 10,
+      "firstPublications": 10,
+      "initializationAttempts": 10,
+      "joinEntriesVisited": 1,
+      "maxWorklistSize": 10,
+      "nodesPopped": 10,
+      "nodesTransferred": 10,
+      "operationsTransferred": 40,
+      "predecessorContributionReads": 0,
+      "publishedStatesChanged": 0,
+      "publishedStatesUnchanged": 0,
+      "stateCompareEntries": 0,
+      "successorContributionReads": 0,
+      "worklistAttempts": 19,
+      "worklistPushes": 10
+    },
+    "rvStatus": "ACCEPTED",
+    "sites": [
+      {
+        "candidates": [],
+        "operation": "call-0",
+        "remainder": true,
+        "supports": []
+      },
+      {
+        "candidates": [],
+        "operation": "call-1",
+        "remainder": true,
+        "supports": []
+      },
+      {
+        "candidates": [],
+        "operation": "call-2",
+        "remainder": true,
+        "supports": []
+      },
+      {
+        "candidates": [],
+        "operation": "call-3",
+        "remainder": true,
+        "supports": []
+      }
+    ],
+    "validation": "STRUCTURALLY_VALID"
+  },
+  {
+    "airCfgMs": 503.631471,
+    "case": "E1",
+    "domain": {
+      "contentReads": 339,
+      "boundaryAlternatives": 15,
+      "alternativeVisits": 21,
+      "relationUnionPairs": 69,
+      "contentUpdates": 8,
+      "maxDecisionNodes": 15,
+      "projectedAlternatives": 15,
+      "internedAlternatives": 225,
+      "internedNodes": 162,
+      "maxComponentCardinality": 2,
+      "maxStateAlternatives": 16
+    },
+    "preparation": {
+      "maxGroupBases": 8,
+      "premiseMemberships": 8,
+      "bindingVisits": 16,
+      "operandVisits": 367,
+      "objectsResolved": 8,
+      "eventsPrepared": 14,
+      "targetsPrepared": 21,
+      "correlationGroups": 1,
+      "statementsPrepared": 1005,
+      "objectPairsMaterialized": 0,
+      "partitionSegments": 8,
+      "baseComparisons": 147,
+      "basesIndexed": 8
+    },
+    "productMs": 95.064047,
+    "qualified": true,
+    "rdPrepareMs": 20.747475,
+    "rdSolveMs": 20.958868,
+    "rdSolver": {
+      "accumulatorStatesChanged": 999,
+      "accumulatorStatesUnchanged": 331,
+      "analysisPoints": 1000,
+      "boundaryJoins": 1,
+      "contextualEdges": 1330,
+      "duplicatePushesSuppressed": 999,
+      "edgeContributionJoins": 1330,
+      "edgeTransferInvocations": 1330,
+      "firstPublications": 1000,
+      "initializationAttempts": 1000,
+      "joinEntriesVisited": 2648,
+      "maxWorklistSize": 1000,
+      "nodesPopped": 1000,
+      "nodesTransferred": 1000,
+      "operationsTransferred": 1005,
+      "predecessorContributionReads": 0,
+      "publishedStatesChanged": 0,
+      "publishedStatesUnchanged": 0,
+      "stateCompareEntries": 0,
+      "successorContributionReads": 0,
+      "worklistAttempts": 1999,
+      "worklistPushes": 1000
+    },
+    "rdStatus": "ACCEPTED",
+    "rvPrepareMs": 26.148795,
+    "rvSolveMs": 35.585287,
+    "rvSolver": {
+      "accumulatorStatesChanged": 999,
+      "accumulatorStatesUnchanged": 331,
+      "analysisPoints": 1000,
+      "boundaryJoins": 1,
+      "contextualEdges": 1330,
+      "duplicatePushesSuppressed": 999,
+      "edgeContributionJoins": 1330,
+      "edgeTransferInvocations": 1330,
+      "firstPublications": 1000,
+      "initializationAttempts": 1000,
+      "joinEntriesVisited": 331,
+      "maxWorklistSize": 1000,
+      "nodesPopped": 1000,
+      "nodesTransferred": 1000,
+      "operationsTransferred": 1005,
+      "predecessorContributionReads": 0,
+      "publishedStatesChanged": 0,
+      "publishedStatesUnchanged": 0,
+      "stateCompareEntries": 0,
+      "successorContributionReads": 0,
+      "worklistAttempts": 1999,
+      "worklistPushes": 1000
+    },
+    "rvStatus": "ACCEPTED",
+    "sites": [
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-0",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-1",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-2",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-3",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      }
+    ],
+    "validation": "STRUCTURALLY_VALID"
+  },
+  {
+    "airCfgMs": 492.171768,
+    "case": "E3",
+    "domain": {
+      "relationUnionPairs": 2428,
+      "contentUpdates": 8,
+      "maxDecisionNodes": 64,
+      "projectedAlternatives": 57,
+      "internedAlternatives": 15252,
+      "internedNodes": 3816,
+      "maxComponentCardinality": 15,
+      "maxStateAlternatives": 316,
+      "contentReads": 339,
+      "boundaryAlternatives": 64,
+      "alternativeVisits": 504
+    },
+    "preparation": {
+      "bindingVisits": 16,
+      "operandVisits": 367,
+      "objectsResolved": 8,
+      "eventsPrepared": 112,
+      "targetsPrepared": 168,
+      "correlationGroups": 1,
+      "statementsPrepared": 1005,
+      "objectPairsMaterialized": 0,
+      "partitionSegments": 8,
+      "baseComparisons": 147,
+      "basesIndexed": 8,
+      "maxGroupBases": 8,
+      "premiseMemberships": 0
+    },
+    "productMs": 152.524023,
+    "qualified": true,
+    "rdPrepareMs": 23.990068,
+    "rdSolveMs": 25.294846,
+    "rdSolver": {
+      "accumulatorStatesChanged": 999,
+      "accumulatorStatesUnchanged": 331,
+      "analysisPoints": 1000,
+      "boundaryJoins": 1,
+      "contextualEdges": 1330,
+      "duplicatePushesSuppressed": 999,
+      "edgeContributionJoins": 1330,
+      "edgeTransferInvocations": 1330,
+      "firstPublications": 1000,
+      "initializationAttempts": 1000,
+      "joinEntriesVisited": 2648,
+      "maxWorklistSize": 1000,
+      "nodesPopped": 1000,
+      "nodesTransferred": 1000,
+      "operationsTransferred": 1005,
+      "predecessorContributionReads": 0,
+      "publishedStatesChanged": 0,
+      "publishedStatesUnchanged": 0,
+      "stateCompareEntries": 0,
+      "successorContributionReads": 0,
+      "worklistAttempts": 1999,
+      "worklistPushes": 1000
+    },
+    "rdStatus": "ACCEPTED",
+    "rvPrepareMs": 25.849542,
+    "rvSolveMs": 114.24007,
+    "rvSolver": {
+      "accumulatorStatesChanged": 999,
+      "accumulatorStatesUnchanged": 331,
+      "analysisPoints": 1000,
+      "boundaryJoins": 1,
+      "contextualEdges": 1330,
+      "duplicatePushesSuppressed": 999,
+      "edgeContributionJoins": 1330,
+      "edgeTransferInvocations": 1330,
+      "firstPublications": 1000,
+      "initializationAttempts": 1000,
+      "joinEntriesVisited": 331,
+      "maxWorklistSize": 1000,
+      "nodesPopped": 1000,
+      "nodesTransferred": 1000,
+      "operationsTransferred": 1005,
+      "predecessorContributionReads": 0,
+      "publishedStatesChanged": 0,
+      "publishedStatesUnchanged": 0,
+      "stateCompareEntries": 0,
+      "successorContributionReads": 0,
+      "worklistAttempts": 1999,
+      "worklistPushes": 1000
+    },
+    "rvStatus": "ACCEPTED",
+    "sites": [
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-0",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-1",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-2",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      },
+      {
+        "candidates": [
+          "PROG0000"
+        ],
+        "operation": "call-3",
+        "remainder": true,
+        "supports": [
+          [
+            "place-0"
+          ]
+        ]
+      }
+    ],
+    "validation": "STRUCTURALLY_VALID"
+  }
+]

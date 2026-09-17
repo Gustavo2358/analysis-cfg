@@ -1,0 +1,629 @@
+{
+  "finding": "R2-REV-F2",
+  "capability": "QUALIFIED",
+  "profile": "cobol-zos-dynamic-call-minimal@1",
+  "preReleasePolicy": "DOCUMENTED in docs/architecture/extensibility.md",
+  "entryHead": "3968e4847a1dfe0526be649576822751a09e774d",
+  "redCommit": "249206dfa21e2cd1fd57b8de60aaa77f9248706c",
+  "productionCommit": "058312e71d06cd9df5218ee4e6ba1d48aef83b92",
+  "productionBlob": "7c1a05037940eb702abb021bde5fc1bfe4085b6a",
+  "productionSha256": "3a76240e0a31ebacfeafbed3425d091531a8dd2693ec832cb66f299b878dcad5",
+  "regexBefore": "[A-Z_][A-Z0-9_@#$]{0,7}",
+  "regexAfter": "[A-Z_$][A-Z0-9_@#$]{0,7}",
+  "runtime": "Temurin 21.0.12+1.1 / release 21",
+  "newJavaTests": {
+    "interpreter": 8,
+    "product": 6
+  },
+  "wireTests": {
+    "tests": 9,
+    "status": "PASS"
+  },
+  "scope": {
+    "javaProductionFilesChanged": [
+      "analysis-dependencies/src/main/java/io/github/gustavo2358/analysis/dependencies/CallNameInterpreter.java"
+    ],
+    "independentWireOracleCorrected": true,
+    "sourcePinsUnchanged": true,
+    "originalCheckoutsAndFILEUnchanged": true
+  },
+  "realCase": {
+    "status": "NOT_RUN",
+    "expectedCount": 9,
+    "observedCount": null,
+    "expectedNames": null,
+    "hypothesis": "NOT_AUDITED",
+    "reason": "Exact prior AIR, dependencies.json, execution parameters and expected nine-name set not provided or located; no claim of 9/9 or first-loss boundary",
+    "implementationBlocked": false
+  },
+  "sanitization": {
+    "status": "PASS",
+    "rule": "docs/engineering/lean-harness.md#confidential-incident-data",
+    "prohibitedTerms": "Local-only list; no identifiers or real-to-synthetic mappings versioned",
+    "rewrittenCommits": 3,
+    "scope": "Current tracked tree and each PR commit tree, paths, metadata; gzip/xz/tar/zip contents recursively inspected; PR body and comments",
+    "productionUnchanged": true,
+    "profileUnchanged": true,
+    "preF2CommitsInspected": 13,
+    "preF2Occurrences": 0,
+    "prBodyOccurrences": 0,
+    "prComments": 0,
+    "currentTreeFilesInspected": 2876,
+    "currentTreeOccurrences": 0,
+    "allPrCommitsInspected": 16,
+    "rewrittenF2CommitsInspected": 3,
+    "rewrittenF2HistoryOccurrences": 0,
+    "allPrHistoryOccurrences": 0,
+    "uniqueBlobsInspected": 2732,
+    "encodedArchives": "gzip/xz/tar/zip recursively inspected"
+  },
+  "focusedJava": {
+    "status": "PASS",
+    "tests": 28,
+    "suites": [
+      {
+        "name": "io.github.gustavo2358.analysis.cfg.application.CfgPreflightTest",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0
+      },
+      {
+        "name": "io.github.gustavo2358.analysis.values.FactorizedAlternativesTest",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0
+      },
+      {
+        "name": "io.github.gustavo2358.analysis.storage.StorageRangeTest",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0
+      },
+      {
+        "name": "io.github.gustavo2358.analysis.dataflow.RegionalAnalysisTest",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0
+      },
+      {
+        "name": "io.github.gustavo2358.analysis.dependencies.LeadingDollarNameTest",
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0
+      },
+      {
+        "name": "io.github.gustavo2358.analysis.dependencies.NameInterpreterTest",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0
+      },
+      {
+        "name": "io.github.gustavo2358.analysis.adapters.LeadingDollarProductTest",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0
+      }
+    ]
+  },
+  "cli": {
+    "status": "PASS",
+    "profile": "cobol-zos-dynamic-call-minimal@1",
+    "revision": "058312e71d06cd9df5218ee4e6ba1d48aef83b92",
+    "productionSha256": "3a76240e0a31ebacfeafbed3425d091531a8dd2693ec832cb66f299b878dcad5",
+    "cases": [
+      {
+        "case": "literal-dollar",
+        "expected": "$PROGA",
+        "baselineComparison": "ONLY_CANDIDATE_STATUS_EDGES_CHANGED",
+        "cliMemory": "BYTE_IDENTICAL",
+        "profile": "cobol-zos-dynamic-call-minimal@1",
+        "seconds": 0.2670946769940201,
+        "airSha256": "b24ccb74e7d3890e91e5f34a17483064215b9e9bf8b36a10b0a316890428bbef",
+        "command": [
+          "java",
+          "-Xmx256m",
+          "-cp",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/cfg-adapters/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-launcher/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar",
+          "io.github.gustavo2358.analysis.launcher.AnalysisDependencies",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-adapters/target/ep-r2-f2/literal-dollar.air.json",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/ep-r2/sanitization/cli-green/literal-dollar.dependencies.json"
+        ]
+      },
+      {
+        "case": "computed-dollar",
+        "expected": "$PROGA",
+        "baselineComparison": "ONLY_CANDIDATE_STATUS_EDGES_CHANGED",
+        "cliMemory": "BYTE_IDENTICAL",
+        "profile": "cobol-zos-dynamic-call-minimal@1",
+        "seconds": 0.31986719100677874,
+        "airSha256": "de3693d780828a9dea699aa15f4ec5a7934d81ccf5818778ab979010bf92620f",
+        "command": [
+          "java",
+          "-Xmx256m",
+          "-cp",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/cfg-adapters/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-launcher/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar",
+          "io.github.gustavo2358.analysis.launcher.AnalysisDependencies",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-adapters/target/ep-r2-f2/computed-dollar.air.json",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/ep-r2/sanitization/cli-green/computed-dollar.dependencies.json"
+        ]
+      },
+      {
+        "case": "regional-dollar",
+        "expected": "$PROGA",
+        "baselineComparison": "NOT_REQUESTED",
+        "cliMemory": "BYTE_IDENTICAL",
+        "profile": "cobol-zos-dynamic-call-minimal@1",
+        "seconds": 0.4171217330003856,
+        "airSha256": "5f5f68f6a090987b81f008d0b6ab55788bc20e762ef3e74bb154396e99653b2a",
+        "command": [
+          "java",
+          "-Xmx256m",
+          "-cp",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/cfg-adapters/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-launcher/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar",
+          "io.github.gustavo2358.analysis.launcher.AnalysisDependencies",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-adapters/target/ep-r2-f2/regional-dollar.air.json",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/ep-r2/sanitization/cli-green/regional-dollar.dependencies.json"
+        ]
+      },
+      {
+        "case": "eight-characters",
+        "expected": "$ABCDEFG",
+        "baselineComparison": "ONLY_CANDIDATE_STATUS_EDGES_CHANGED",
+        "cliMemory": "BYTE_IDENTICAL",
+        "profile": "cobol-zos-dynamic-call-minimal@1",
+        "seconds": 0.3201640790066449,
+        "airSha256": "b4d13dd4ca87923a1d556020ae3711184c50d0197b32567aa3babfa2c901c80a",
+        "command": [
+          "java",
+          "-Xmx256m",
+          "-cp",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/cfg-adapters/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-launcher/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar",
+          "io.github.gustavo2358.analysis.launcher.AnalysisDependencies",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-adapters/target/ep-r2-f2/eight-characters.air.json",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/ep-r2/sanitization/cli-green/eight-characters.dependencies.json"
+        ]
+      },
+      {
+        "case": "computed-control",
+        "expected": "PROGA",
+        "baselineComparison": "BYTE_IDENTICAL",
+        "cliMemory": "BYTE_IDENTICAL",
+        "profile": "cobol-zos-dynamic-call-minimal@1",
+        "seconds": 0.3192232619912829,
+        "airSha256": "bef5d8979c0ffd3fb96272dd405b18d7b873e4e4d9244eeeb9ac98587fb973d2",
+        "command": [
+          "java",
+          "-Xmx256m",
+          "-cp",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/cfg-adapters/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-launcher/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar",
+          "io.github.gustavo2358.analysis.launcher.AnalysisDependencies",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-adapters/target/ep-r2-f2/computed-control.air.json",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/ep-r2/sanitization/cli-green/computed-control.dependencies.json"
+        ]
+      },
+      {
+        "case": "literal-control",
+        "expected": "PROGA",
+        "baselineComparison": "BYTE_IDENTICAL",
+        "cliMemory": "BYTE_IDENTICAL",
+        "profile": "cobol-zos-dynamic-call-minimal@1",
+        "seconds": 0.26710825199552346,
+        "airSha256": "d532b89c074d3a3fe8672090cef5432d9b664e137f3ce1bd37058af5fc59e67d",
+        "command": [
+          "java",
+          "-Xmx256m",
+          "-cp",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/cfg-adapters/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-launcher/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar",
+          "io.github.gustavo2358.analysis.launcher.AnalysisDependencies",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-adapters/target/ep-r2-f2/literal-control.air.json",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/ep-r2/sanitization/cli-green/literal-control.dependencies.json"
+        ]
+      },
+      {
+        "case": "middle-dollar",
+        "expected": "A$PROG",
+        "baselineComparison": "BYTE_IDENTICAL",
+        "cliMemory": "BYTE_IDENTICAL",
+        "profile": "cobol-zos-dynamic-call-minimal@1",
+        "seconds": 0.3192758280056296,
+        "airSha256": "7f17a484b30690a99f8ed1437912e04bd380c1c86d4dfd7800a7a75d37171bb9",
+        "command": [
+          "java",
+          "-Xmx256m",
+          "-cp",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/cfg-adapters/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-launcher/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar",
+          "io.github.gustavo2358.analysis.launcher.AnalysisDependencies",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-adapters/target/ep-r2-f2/middle-dollar.air.json",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/ep-r2/sanitization/cli-green/middle-dollar.dependencies.json"
+        ]
+      },
+      {
+        "case": "underscore",
+        "expected": "_PROGA",
+        "baselineComparison": "BYTE_IDENTICAL",
+        "cliMemory": "BYTE_IDENTICAL",
+        "profile": "cobol-zos-dynamic-call-minimal@1",
+        "seconds": 0.31885801900352817,
+        "airSha256": "3c50e593c4ada595f479aa80f98df5f7df5aaffd499c105133fc6756f7144cea",
+        "command": [
+          "java",
+          "-Xmx256m",
+          "-cp",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/cfg-adapters/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-launcher/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar",
+          "io.github.gustavo2358.analysis.launcher.AnalysisDependencies",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-adapters/target/ep-r2-f2/underscore.air.json",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/ep-r2/sanitization/cli-green/underscore.dependencies.json"
+        ]
+      },
+      {
+        "case": "negative-0",
+        "expected": null,
+        "baselineComparison": "BYTE_IDENTICAL",
+        "cliMemory": "BYTE_IDENTICAL",
+        "profile": "cobol-zos-dynamic-call-minimal@1",
+        "seconds": 0.3691447019955376,
+        "airSha256": "2adb2bdff922485c9e8df096e46f7a1c99afd8462512a5e1e1831bdfa831cd80",
+        "command": [
+          "java",
+          "-Xmx256m",
+          "-cp",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/cfg-adapters/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-launcher/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar",
+          "io.github.gustavo2358.analysis.launcher.AnalysisDependencies",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-adapters/target/ep-r2-f2/negative-0.air.json",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/ep-r2/sanitization/cli-green/negative-0.dependencies.json"
+        ]
+      },
+      {
+        "case": "negative-1",
+        "expected": null,
+        "baselineComparison": "BYTE_IDENTICAL",
+        "cliMemory": "BYTE_IDENTICAL",
+        "profile": "cobol-zos-dynamic-call-minimal@1",
+        "seconds": 0.31946828700893093,
+        "airSha256": "c8d725ae85cf7a6b68f77f102bac2765e06b99eac534dff7e4ef9e000e10a39d",
+        "command": [
+          "java",
+          "-Xmx256m",
+          "-cp",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/cfg-adapters/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-launcher/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar",
+          "io.github.gustavo2358.analysis.launcher.AnalysisDependencies",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-adapters/target/ep-r2-f2/negative-1.air.json",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/ep-r2/sanitization/cli-green/negative-1.dependencies.json"
+        ]
+      },
+      {
+        "case": "negative-2",
+        "expected": null,
+        "baselineComparison": "BYTE_IDENTICAL",
+        "cliMemory": "BYTE_IDENTICAL",
+        "profile": "cobol-zos-dynamic-call-minimal@1",
+        "seconds": 0.31840795300377067,
+        "airSha256": "04d55099d3577eedd3c03d3f0ccf98e1f50a46cef53f8118878acda4fa6b9b87",
+        "command": [
+          "java",
+          "-Xmx256m",
+          "-cp",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/cfg-adapters/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-launcher/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar",
+          "io.github.gustavo2358.analysis.launcher.AnalysisDependencies",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-adapters/target/ep-r2-f2/negative-2.air.json",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/ep-r2/sanitization/cli-green/negative-2.dependencies.json"
+        ]
+      },
+      {
+        "case": "negative-3",
+        "expected": null,
+        "baselineComparison": "BYTE_IDENTICAL",
+        "cliMemory": "BYTE_IDENTICAL",
+        "profile": "cobol-zos-dynamic-call-minimal@1",
+        "seconds": 0.31876823598577175,
+        "airSha256": "4686bc1b834862734dfca6cf7993c79c5f8f90e69bdf86d1a9e46a2758e24603",
+        "command": [
+          "java",
+          "-Xmx256m",
+          "-cp",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/cfg-adapters/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-launcher/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar",
+          "io.github.gustavo2358.analysis.launcher.AnalysisDependencies",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-adapters/target/ep-r2-f2/negative-3.air.json",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/ep-r2/sanitization/cli-green/negative-3.dependencies.json"
+        ]
+      },
+      {
+        "case": "negative-4",
+        "expected": null,
+        "baselineComparison": "BYTE_IDENTICAL",
+        "cliMemory": "BYTE_IDENTICAL",
+        "profile": "cobol-zos-dynamic-call-minimal@1",
+        "seconds": 0.31868488500185777,
+        "airSha256": "ffa831ef26510589ade1dabd6c475790b288600f33b29c539b9555f75beb54ab",
+        "command": [
+          "java",
+          "-Xmx256m",
+          "-cp",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/cfg-adapters/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-launcher/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar",
+          "io.github.gustavo2358.analysis.launcher.AnalysisDependencies",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-adapters/target/ep-r2-f2/negative-4.air.json",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/ep-r2/sanitization/cli-green/negative-4.dependencies.json"
+        ]
+      },
+      {
+        "case": "negative-5",
+        "expected": null,
+        "baselineComparison": "BYTE_IDENTICAL",
+        "cliMemory": "BYTE_IDENTICAL",
+        "profile": "cobol-zos-dynamic-call-minimal@1",
+        "seconds": 0.3185904040001333,
+        "airSha256": "461e72350bfae500c78980e9274b54244feb0540dbe0d36ad7f95bc188cb51c8",
+        "command": [
+          "java",
+          "-Xmx256m",
+          "-cp",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/cfg-adapters/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-launcher/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar",
+          "io.github.gustavo2358.analysis.launcher.AnalysisDependencies",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-adapters/target/ep-r2-f2/negative-5.air.json",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/ep-r2/sanitization/cli-green/negative-5.dependencies.json"
+        ]
+      },
+      {
+        "case": "literal-padding",
+        "expected": null,
+        "baselineComparison": "BYTE_IDENTICAL",
+        "cliMemory": "BYTE_IDENTICAL",
+        "profile": "cobol-zos-dynamic-call-minimal@1",
+        "seconds": 0.26670725501026027,
+        "airSha256": "10ddcc060e00b5dbe7107695982033cc20ee0340ade444853efd9c2e92dffd68",
+        "command": [
+          "java",
+          "-Xmx256m",
+          "-cp",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/cfg-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/cfg-adapters/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-kernel/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-values/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-dataflow/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-dependencies/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-adapters/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-launcher/target/classes:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/io/github/gustavo2358/air-java/0.1.0-SNAPSHOT/air-java-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar:/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/build/m2/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar",
+          "io.github.gustavo2358.analysis.launcher.AnalysisDependencies",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/analysis-adapters/target/ep-r2-f2/literal-padding.air.json",
+          "/home/gustavo/workspace/teste-e2e/.ep-r2/analysis-cfg/.harness-results/ep-r2/sanitization/cli-green/literal-padding.dependencies.json"
+        ]
+      }
+    ],
+    "realCase": "NOT_RUN",
+    "allByteIdenticalToMemory": true
+  },
+  "fast": {
+    "status": "PASS",
+    "javaTests": 515,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "pythonAndArchitecture": "PASS",
+    "localRunsAfterSanitizedRebuild": 1,
+    "elapsedSeconds": 79.164,
+    "testedCommit": "ebb44964188d928c50d96edd1e2e5417d6d620fb",
+    "followingChanges": "Documentation/evidence only"
+  },
+  "reusedEvidence": {
+    "reason": "Identical production and pins; synthetic interpreter examples renamed without changing policy",
+    "priorNeighborRegressions": {
+      "javaTests": 69,
+      "suites": 13,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0
+    },
+    "priorSelectedProducts": [
+      {
+        "case": "H2",
+        "qualified": true,
+        "rdStatus": "ACCEPTED",
+        "rvStatus": "ACCEPTED",
+        "sites": [
+          {
+            "candidates": [
+              "PROG0002"
+            ],
+            "operation": "call-0",
+            "remainder": true,
+            "supports": [
+              [
+                "place-2"
+              ]
+            ]
+          },
+          {
+            "candidates": [
+              "PROG0002"
+            ],
+            "operation": "call-1",
+            "remainder": true,
+            "supports": [
+              [
+                "place-2"
+              ]
+            ]
+          },
+          {
+            "candidates": [
+              "PROG0002"
+            ],
+            "operation": "call-2",
+            "remainder": true,
+            "supports": [
+              [
+                "place-2"
+              ]
+            ]
+          },
+          {
+            "candidates": [
+              "PROG0002"
+            ],
+            "operation": "call-3",
+            "remainder": true,
+            "supports": [
+              [
+                "place-2"
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "case": "F1",
+        "qualified": true,
+        "rdStatus": "ACCEPTED",
+        "rvStatus": "ACCEPTED",
+        "sites": [
+          {
+            "candidates": [],
+            "operation": "call-0",
+            "remainder": true,
+            "supports": []
+          },
+          {
+            "candidates": [],
+            "operation": "call-1",
+            "remainder": true,
+            "supports": []
+          },
+          {
+            "candidates": [],
+            "operation": "call-2",
+            "remainder": true,
+            "supports": []
+          },
+          {
+            "candidates": [],
+            "operation": "call-3",
+            "remainder": true,
+            "supports": []
+          }
+        ]
+      },
+      {
+        "case": "F-order-012",
+        "qualified": true,
+        "rdStatus": "ACCEPTED",
+        "rvStatus": "ACCEPTED",
+        "sites": [
+          {
+            "candidates": [
+              "PROG0000"
+            ],
+            "operation": "call-0",
+            "remainder": true,
+            "supports": [
+              [
+                "place-0"
+              ]
+            ]
+          },
+          {
+            "candidates": [
+              "PROG0000"
+            ],
+            "operation": "call-1",
+            "remainder": true,
+            "supports": [
+              [
+                "place-0"
+              ]
+            ]
+          },
+          {
+            "candidates": [
+              "PROG0000"
+            ],
+            "operation": "call-2",
+            "remainder": true,
+            "supports": [
+              [
+                "place-0"
+              ]
+            ]
+          },
+          {
+            "candidates": [
+              "PROG0000"
+            ],
+            "operation": "call-3",
+            "remainder": true,
+            "supports": [
+              [
+                "place-0"
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "case": "F-order-210",
+        "qualified": true,
+        "rdStatus": "ACCEPTED",
+        "rvStatus": "ACCEPTED",
+        "sites": [
+          {
+            "candidates": [
+              "PROG0000"
+            ],
+            "operation": "call-0",
+            "remainder": true,
+            "supports": [
+              [
+                "place-0"
+              ]
+            ]
+          },
+          {
+            "candidates": [
+              "PROG0000"
+            ],
+            "operation": "call-1",
+            "remainder": true,
+            "supports": [
+              [
+                "place-0"
+              ]
+            ]
+          },
+          {
+            "candidates": [
+              "PROG0000"
+            ],
+            "operation": "call-2",
+            "remainder": true,
+            "supports": [
+              [
+                "place-0"
+              ]
+            ]
+          },
+          {
+            "candidates": [
+              "PROG0000"
+            ],
+            "operation": "call-3",
+            "remainder": true,
+            "supports": [
+              [
+                "place-0"
+              ]
+            ]
+          }
+        ]
+      }
+    ],
+    "epR2AndF1": "QUALIFIED on their recorded evidence; not repeated by this sanitation-only remediation"
+  },
+  "rawLogs": ".harness-results/ep-r2/sanitization",
+  "logSha256": {
+    "unit-red.log": "d69addf6823084bf2945af403b8a6873f6ca2bfdf1e4f35687c68bc3ec6cce44",
+    "product-red.log": "0f5bf5af64af8926e7c053343aaa49a6f25d6a0a3c3c1fac6a9d9508498cb6f5",
+    "focused-green.log": "b3d32d450d240b703fc36a0d351060af3d8cda03cf3de7937bd7e78588dde303",
+    "wire-green.log": "960da5fc1eb9cb5a2641bf51f826142d685bb57a0263278672f16391e5ced49c",
+    "cli-green.log": "c8f67c0150452513d2b06e4f0bfb6af1aab243a4c82f55840f195988f855e92a",
+    "fast.log": "ec61da9a28d21112c42ea0376c822e279d99a14efc589d855f00d037b957efdc"
+  }
+}

@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 /** Explicit consumer policy subset, not a universal COBOL/runtime name resolver. */
 public final class CallNameInterpreter {
     public static final String PROFILE="cobol-zos-dynamic-call-minimal@1";
-    private static final Pattern CANONICAL=Pattern.compile("[A-Z_][A-Z0-9_@#$]{0,7}");
+    private static final Pattern CANONICAL=Pattern.compile("[A-Z_$][A-Z0-9_@#$]{0,7}");
     private CallNameInterpreter(){ }
     public record Interpretation(String referenceName,boolean unknownRemainder) { }
     public static Interpretation interpret(String raw,boolean computed,Interactions.NamePolicy policy) {

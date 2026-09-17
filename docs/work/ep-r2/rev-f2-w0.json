@@ -1,0 +1,747 @@
+{
+  "head": "3968e4847a1dfe0526be649576822751a09e774d",
+  "originMain": "194fac2af6cfc54053318164275e682feac5c750",
+  "productionBlob": "89265e574f8462475c584c991fb7bbe00affa9f0",
+  "productionSha256": "4a5da527a0f5a8bd18922be955d9c66679533a5f20ccfe0b1d2388c03a7706db",
+  "unit": {
+    "tests": 7,
+    "expectedSemanticFailures": 5,
+    "errors": 0,
+    "skips": 0
+  },
+  "product": {
+    "tests": 5,
+    "expectedSemanticFailures": 3,
+    "errors": 0,
+    "skips": 0
+  },
+  "syntheticCases": [
+    {
+      "case": "computed-control",
+      "rawCandidates": [
+        {
+          "rawValue": "PROGA   ",
+          "supports": [
+            {
+              "kind": "VALUE_PRODUCER",
+              "origin": {
+                "domain": "origin",
+                "localId": "3c6963c67a2591c7d79e90cb27c95681",
+                "publication": "437c54421d9cd62278589ab67b6c7064"
+              },
+              "premises": [],
+              "producer": {
+                "domain": "operation",
+                "localId": "e52226b01b4afc8f6c6214aafd63e5ab",
+                "publication": "437c54421d9cd62278589ab67b6c7064",
+                "unit": "unit"
+              }
+            }
+          ]
+        }
+      ],
+      "candidates": [
+        {
+          "rawValue": "PROGA   ",
+          "referenceName": "PROGA",
+          "supports": [
+            {
+              "kind": "VALUE_PRODUCER",
+              "origin": {
+                "domain": "origin",
+                "localId": "3c6963c67a2591c7d79e90cb27c95681",
+                "publication": "437c54421d9cd62278589ab67b6c7064"
+              },
+              "premises": [],
+              "producer": {
+                "domain": "operation",
+                "localId": "e52226b01b4afc8f6c6214aafd63e5ab",
+                "publication": "437c54421d9cd62278589ab67b6c7064",
+                "unit": "unit"
+              }
+            }
+          ]
+        }
+      ],
+      "targetStatus": "RESOLVED_CANDIDATES",
+      "modelValueRemainder": false,
+      "sourceValueRemainder": true,
+      "interpretationUnknownRemainder": true,
+      "effectiveUnknownRemainder": true,
+      "nameProfile": "cobol-zos-dynamic-call-minimal@1",
+      "edges": [
+        {
+          "caller": {
+            "domain": "unit",
+            "localId": "unit",
+            "publication": "437c54421d9cd62278589ab67b6c7064"
+          },
+          "candidate": {
+            "rawValue": "PROGA   ",
+            "referenceName": "PROGA",
+            "supports": [
+              {
+                "kind": "VALUE_PRODUCER",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "3c6963c67a2591c7d79e90cb27c95681",
+                  "publication": "437c54421d9cd62278589ab67b6c7064"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "e52226b01b4afc8f6c6214aafd63e5ab",
+                  "publication": "437c54421d9cd62278589ab67b6c7064",
+                  "unit": "unit"
+                }
+              }
+            ]
+          },
+          "entry": {
+            "domain": "entry",
+            "localId": "c4de8a797697cb8ddf3012f2248da01f",
+            "publication": "437c54421d9cd62278589ab67b6c7064",
+            "unit": "unit"
+          },
+          "openSite": true,
+          "site": {
+            "domain": "operation",
+            "localId": "5357696c937658b9eac2d662086444cd",
+            "publication": "437c54421d9cd62278589ab67b6c7064",
+            "unit": "unit"
+          }
+        }
+      ]
+    },
+    {
+      "case": "computed-dollar",
+      "rawCandidates": [
+        {
+          "rawValue": "$PROGA   ",
+          "supports": [
+            {
+              "kind": "VALUE_PRODUCER",
+              "origin": {
+                "domain": "origin",
+                "localId": "3c6963c67a2591c7d79e90cb27c95681",
+                "publication": "437c54421d9cd62278589ab67b6c7064"
+              },
+              "premises": [],
+              "producer": {
+                "domain": "operation",
+                "localId": "e52226b01b4afc8f6c6214aafd63e5ab",
+                "publication": "437c54421d9cd62278589ab67b6c7064",
+                "unit": "unit"
+              }
+            }
+          ]
+        }
+      ],
+      "candidates": [],
+      "targetStatus": "OPEN_TARGET",
+      "modelValueRemainder": false,
+      "sourceValueRemainder": true,
+      "interpretationUnknownRemainder": true,
+      "effectiveUnknownRemainder": true,
+      "nameProfile": "cobol-zos-dynamic-call-minimal@1",
+      "edges": []
+    },
+    {
+      "case": "eight-characters",
+      "rawCandidates": [
+        {
+          "rawValue": "$ABCDEFG",
+          "supports": [
+            {
+              "kind": "VALUE_PRODUCER",
+              "origin": {
+                "domain": "origin",
+                "localId": "3c6963c67a2591c7d79e90cb27c95681",
+                "publication": "437c54421d9cd62278589ab67b6c7064"
+              },
+              "premises": [],
+              "producer": {
+                "domain": "operation",
+                "localId": "e52226b01b4afc8f6c6214aafd63e5ab",
+                "publication": "437c54421d9cd62278589ab67b6c7064",
+                "unit": "unit"
+              }
+            }
+          ]
+        }
+      ],
+      "candidates": [],
+      "targetStatus": "OPEN_TARGET",
+      "modelValueRemainder": false,
+      "sourceValueRemainder": true,
+      "interpretationUnknownRemainder": true,
+      "effectiveUnknownRemainder": true,
+      "nameProfile": "cobol-zos-dynamic-call-minimal@1",
+      "edges": []
+    },
+    {
+      "case": "literal-control",
+      "rawCandidates": [
+        {
+          "rawValue": "PROGA",
+          "supports": [
+            {
+              "kind": "CALL_LITERAL",
+              "origin": {
+                "domain": "origin",
+                "localId": "968e853966bf261e53d4f8c94a1d21c7",
+                "publication": "3e110705fa33dadb2ada6f675475f8d4"
+              },
+              "premises": [],
+              "producer": {
+                "domain": "operation",
+                "localId": "634d4a9c739693f77b9703bedae07d12",
+                "publication": "3e110705fa33dadb2ada6f675475f8d4",
+                "unit": "unit"
+              }
+            }
+          ]
+        }
+      ],
+      "candidates": [
+        {
+          "rawValue": "PROGA",
+          "referenceName": "PROGA",
+          "supports": [
+            {
+              "kind": "CALL_LITERAL",
+              "origin": {
+                "domain": "origin",
+                "localId": "968e853966bf261e53d4f8c94a1d21c7",
+                "publication": "3e110705fa33dadb2ada6f675475f8d4"
+              },
+              "premises": [],
+              "producer": {
+                "domain": "operation",
+                "localId": "634d4a9c739693f77b9703bedae07d12",
+                "publication": "3e110705fa33dadb2ada6f675475f8d4",
+                "unit": "unit"
+              }
+            }
+          ]
+        }
+      ],
+      "targetStatus": "RESOLVED_CANDIDATES",
+      "modelValueRemainder": false,
+      "sourceValueRemainder": true,
+      "interpretationUnknownRemainder": true,
+      "effectiveUnknownRemainder": true,
+      "nameProfile": "cobol-zos-dynamic-call-minimal@1",
+      "edges": [
+        {
+          "caller": {
+            "domain": "unit",
+            "localId": "unit",
+            "publication": "3e110705fa33dadb2ada6f675475f8d4"
+          },
+          "candidate": {
+            "rawValue": "PROGA",
+            "referenceName": "PROGA",
+            "supports": [
+              {
+                "kind": "CALL_LITERAL",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "968e853966bf261e53d4f8c94a1d21c7",
+                  "publication": "3e110705fa33dadb2ada6f675475f8d4"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "634d4a9c739693f77b9703bedae07d12",
+                  "publication": "3e110705fa33dadb2ada6f675475f8d4",
+                  "unit": "unit"
+                }
+              }
+            ]
+          },
+          "entry": {
+            "domain": "entry",
+            "localId": "c4de8a797697cb8ddf3012f2248da01f",
+            "publication": "3e110705fa33dadb2ada6f675475f8d4",
+            "unit": "unit"
+          },
+          "openSite": true,
+          "site": {
+            "domain": "operation",
+            "localId": "634d4a9c739693f77b9703bedae07d12",
+            "publication": "3e110705fa33dadb2ada6f675475f8d4",
+            "unit": "unit"
+          }
+        }
+      ]
+    },
+    {
+      "case": "literal-dollar",
+      "rawCandidates": [
+        {
+          "rawValue": "$PROGA",
+          "supports": [
+            {
+              "kind": "CALL_LITERAL",
+              "origin": {
+                "domain": "origin",
+                "localId": "968e853966bf261e53d4f8c94a1d21c7",
+                "publication": "3e110705fa33dadb2ada6f675475f8d4"
+              },
+              "premises": [],
+              "producer": {
+                "domain": "operation",
+                "localId": "634d4a9c739693f77b9703bedae07d12",
+                "publication": "3e110705fa33dadb2ada6f675475f8d4",
+                "unit": "unit"
+              }
+            }
+          ]
+        }
+      ],
+      "candidates": [],
+      "targetStatus": "OPEN_TARGET",
+      "modelValueRemainder": false,
+      "sourceValueRemainder": true,
+      "interpretationUnknownRemainder": true,
+      "effectiveUnknownRemainder": true,
+      "nameProfile": "cobol-zos-dynamic-call-minimal@1",
+      "edges": []
+    },
+    {
+      "case": "literal-padding",
+      "rawCandidates": [
+        {
+          "rawValue": "$PROGA   ",
+          "supports": [
+            {
+              "kind": "CALL_LITERAL",
+              "origin": {
+                "domain": "origin",
+                "localId": "968e853966bf261e53d4f8c94a1d21c7",
+                "publication": "3e110705fa33dadb2ada6f675475f8d4"
+              },
+              "premises": [],
+              "producer": {
+                "domain": "operation",
+                "localId": "634d4a9c739693f77b9703bedae07d12",
+                "publication": "3e110705fa33dadb2ada6f675475f8d4",
+                "unit": "unit"
+              }
+            }
+          ]
+        }
+      ],
+      "candidates": [],
+      "targetStatus": "OPEN_TARGET",
+      "modelValueRemainder": false,
+      "sourceValueRemainder": true,
+      "interpretationUnknownRemainder": true,
+      "effectiveUnknownRemainder": true,
+      "nameProfile": "cobol-zos-dynamic-call-minimal@1",
+      "edges": []
+    },
+    {
+      "case": "middle-dollar",
+      "rawCandidates": [
+        {
+          "rawValue": "A$PROG",
+          "supports": [
+            {
+              "kind": "VALUE_PRODUCER",
+              "origin": {
+                "domain": "origin",
+                "localId": "3c6963c67a2591c7d79e90cb27c95681",
+                "publication": "437c54421d9cd62278589ab67b6c7064"
+              },
+              "premises": [],
+              "producer": {
+                "domain": "operation",
+                "localId": "e52226b01b4afc8f6c6214aafd63e5ab",
+                "publication": "437c54421d9cd62278589ab67b6c7064",
+                "unit": "unit"
+              }
+            }
+          ]
+        }
+      ],
+      "candidates": [
+        {
+          "rawValue": "A$PROG",
+          "referenceName": "A$PROG",
+          "supports": [
+            {
+              "kind": "VALUE_PRODUCER",
+              "origin": {
+                "domain": "origin",
+                "localId": "3c6963c67a2591c7d79e90cb27c95681",
+                "publication": "437c54421d9cd62278589ab67b6c7064"
+              },
+              "premises": [],
+              "producer": {
+                "domain": "operation",
+                "localId": "e52226b01b4afc8f6c6214aafd63e5ab",
+                "publication": "437c54421d9cd62278589ab67b6c7064",
+                "unit": "unit"
+              }
+            }
+          ]
+        }
+      ],
+      "targetStatus": "RESOLVED_CANDIDATES",
+      "modelValueRemainder": false,
+      "sourceValueRemainder": true,
+      "interpretationUnknownRemainder": true,
+      "effectiveUnknownRemainder": true,
+      "nameProfile": "cobol-zos-dynamic-call-minimal@1",
+      "edges": [
+        {
+          "caller": {
+            "domain": "unit",
+            "localId": "unit",
+            "publication": "437c54421d9cd62278589ab67b6c7064"
+          },
+          "candidate": {
+            "rawValue": "A$PROG",
+            "referenceName": "A$PROG",
+            "supports": [
+              {
+                "kind": "VALUE_PRODUCER",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "3c6963c67a2591c7d79e90cb27c95681",
+                  "publication": "437c54421d9cd62278589ab67b6c7064"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "e52226b01b4afc8f6c6214aafd63e5ab",
+                  "publication": "437c54421d9cd62278589ab67b6c7064",
+                  "unit": "unit"
+                }
+              }
+            ]
+          },
+          "entry": {
+            "domain": "entry",
+            "localId": "c4de8a797697cb8ddf3012f2248da01f",
+            "publication": "437c54421d9cd62278589ab67b6c7064",
+            "unit": "unit"
+          },
+          "openSite": true,
+          "site": {
+            "domain": "operation",
+            "localId": "5357696c937658b9eac2d662086444cd",
+            "publication": "437c54421d9cd62278589ab67b6c7064",
+            "unit": "unit"
+          }
+        }
+      ]
+    },
+    {
+      "case": "negative-0",
+      "rawCandidates": [
+        {
+          "rawValue": " $PROGA",
+          "supports": [
+            {
+              "kind": "VALUE_PRODUCER",
+              "origin": {
+                "domain": "origin",
+                "localId": "3c6963c67a2591c7d79e90cb27c95681",
+                "publication": "437c54421d9cd62278589ab67b6c7064"
+              },
+              "premises": [],
+              "producer": {
+                "domain": "operation",
+                "localId": "e52226b01b4afc8f6c6214aafd63e5ab",
+                "publication": "437c54421d9cd62278589ab67b6c7064",
+                "unit": "unit"
+              }
+            }
+          ]
+        }
+      ],
+      "candidates": [],
+      "targetStatus": "OPEN_TARGET",
+      "modelValueRemainder": false,
+      "sourceValueRemainder": true,
+      "interpretationUnknownRemainder": true,
+      "effectiveUnknownRemainder": true,
+      "nameProfile": "cobol-zos-dynamic-call-minimal@1",
+      "edges": []
+    },
+    {
+      "case": "negative-1",
+      "rawCandidates": [
+        {
+          "rawValue": "$proga",
+          "supports": [
+            {
+              "kind": "VALUE_PRODUCER",
+              "origin": {
+                "domain": "origin",
+                "localId": "3c6963c67a2591c7d79e90cb27c95681",
+                "publication": "437c54421d9cd62278589ab67b6c7064"
+              },
+              "premises": [],
+              "producer": {
+                "domain": "operation",
+                "localId": "e52226b01b4afc8f6c6214aafd63e5ab",
+                "publication": "437c54421d9cd62278589ab67b6c7064",
+                "unit": "unit"
+              }
+            }
+          ]
+        }
+      ],
+      "candidates": [],
+      "targetStatus": "OPEN_TARGET",
+      "modelValueRemainder": false,
+      "sourceValueRemainder": true,
+      "interpretationUnknownRemainder": true,
+      "effectiveUnknownRemainder": true,
+      "nameProfile": "cobol-zos-dynamic-call-minimal@1",
+      "edges": []
+    },
+    {
+      "case": "negative-2",
+      "rawCandidates": [
+        {
+          "rawValue": "$PROG-A",
+          "supports": [
+            {
+              "kind": "VALUE_PRODUCER",
+              "origin": {
+                "domain": "origin",
+                "localId": "3c6963c67a2591c7d79e90cb27c95681",
+                "publication": "437c54421d9cd62278589ab67b6c7064"
+              },
+              "premises": [],
+              "producer": {
+                "domain": "operation",
+                "localId": "e52226b01b4afc8f6c6214aafd63e5ab",
+                "publication": "437c54421d9cd62278589ab67b6c7064",
+                "unit": "unit"
+              }
+            }
+          ]
+        }
+      ],
+      "candidates": [],
+      "targetStatus": "OPEN_TARGET",
+      "modelValueRemainder": false,
+      "sourceValueRemainder": true,
+      "interpretationUnknownRemainder": true,
+      "effectiveUnknownRemainder": true,
+      "nameProfile": "cobol-zos-dynamic-call-minimal@1",
+      "edges": []
+    },
+    {
+      "case": "negative-3",
+      "rawCandidates": [
+        {
+          "rawValue": "$ABCDEFGH",
+          "supports": [
+            {
+              "kind": "VALUE_PRODUCER",
+              "origin": {
+                "domain": "origin",
+                "localId": "3c6963c67a2591c7d79e90cb27c95681",
+                "publication": "437c54421d9cd62278589ab67b6c7064"
+              },
+              "premises": [],
+              "producer": {
+                "domain": "operation",
+                "localId": "e52226b01b4afc8f6c6214aafd63e5ab",
+                "publication": "437c54421d9cd62278589ab67b6c7064",
+                "unit": "unit"
+              }
+            }
+          ]
+        }
+      ],
+      "candidates": [],
+      "targetStatus": "OPEN_TARGET",
+      "modelValueRemainder": false,
+      "sourceValueRemainder": true,
+      "interpretationUnknownRemainder": true,
+      "effectiveUnknownRemainder": true,
+      "nameProfile": "cobol-zos-dynamic-call-minimal@1",
+      "edges": []
+    },
+    {
+      "case": "negative-4",
+      "rawCandidates": [
+        {
+          "rawValue": "",
+          "supports": [
+            {
+              "kind": "VALUE_PRODUCER",
+              "origin": {
+                "domain": "origin",
+                "localId": "3c6963c67a2591c7d79e90cb27c95681",
+                "publication": "437c54421d9cd62278589ab67b6c7064"
+              },
+              "premises": [],
+              "producer": {
+                "domain": "operation",
+                "localId": "e52226b01b4afc8f6c6214aafd63e5ab",
+                "publication": "437c54421d9cd62278589ab67b6c7064",
+                "unit": "unit"
+              }
+            }
+          ]
+        }
+      ],
+      "candidates": [],
+      "targetStatus": "OPEN_TARGET",
+      "modelValueRemainder": false,
+      "sourceValueRemainder": true,
+      "interpretationUnknownRemainder": true,
+      "effectiveUnknownRemainder": true,
+      "nameProfile": "cobol-zos-dynamic-call-minimal@1",
+      "edges": []
+    },
+    {
+      "case": "negative-5",
+      "rawCandidates": [
+        {
+          "rawValue": "   ",
+          "supports": [
+            {
+              "kind": "VALUE_PRODUCER",
+              "origin": {
+                "domain": "origin",
+                "localId": "3c6963c67a2591c7d79e90cb27c95681",
+                "publication": "437c54421d9cd62278589ab67b6c7064"
+              },
+              "premises": [],
+              "producer": {
+                "domain": "operation",
+                "localId": "e52226b01b4afc8f6c6214aafd63e5ab",
+                "publication": "437c54421d9cd62278589ab67b6c7064",
+                "unit": "unit"
+              }
+            }
+          ]
+        }
+      ],
+      "candidates": [],
+      "targetStatus": "OPEN_TARGET",
+      "modelValueRemainder": false,
+      "sourceValueRemainder": true,
+      "interpretationUnknownRemainder": true,
+      "effectiveUnknownRemainder": true,
+      "nameProfile": "cobol-zos-dynamic-call-minimal@1",
+      "edges": []
+    },
+    {
+      "case": "underscore",
+      "rawCandidates": [
+        {
+          "rawValue": "_PROGA",
+          "supports": [
+            {
+              "kind": "VALUE_PRODUCER",
+              "origin": {
+                "domain": "origin",
+                "localId": "3c6963c67a2591c7d79e90cb27c95681",
+                "publication": "437c54421d9cd62278589ab67b6c7064"
+              },
+              "premises": [],
+              "producer": {
+                "domain": "operation",
+                "localId": "e52226b01b4afc8f6c6214aafd63e5ab",
+                "publication": "437c54421d9cd62278589ab67b6c7064",
+                "unit": "unit"
+              }
+            }
+          ]
+        }
+      ],
+      "candidates": [
+        {
+          "rawValue": "_PROGA",
+          "referenceName": "_PROGA",
+          "supports": [
+            {
+              "kind": "VALUE_PRODUCER",
+              "origin": {
+                "domain": "origin",
+                "localId": "3c6963c67a2591c7d79e90cb27c95681",
+                "publication": "437c54421d9cd62278589ab67b6c7064"
+              },
+              "premises": [],
+              "producer": {
+                "domain": "operation",
+                "localId": "e52226b01b4afc8f6c6214aafd63e5ab",
+                "publication": "437c54421d9cd62278589ab67b6c7064",
+                "unit": "unit"
+              }
+            }
+          ]
+        }
+      ],
+      "targetStatus": "RESOLVED_CANDIDATES",
+      "modelValueRemainder": false,
+      "sourceValueRemainder": true,
+      "interpretationUnknownRemainder": true,
+      "effectiveUnknownRemainder": true,
+      "nameProfile": "cobol-zos-dynamic-call-minimal@1",
+      "edges": [
+        {
+          "caller": {
+            "domain": "unit",
+            "localId": "unit",
+            "publication": "437c54421d9cd62278589ab67b6c7064"
+          },
+          "candidate": {
+            "rawValue": "_PROGA",
+            "referenceName": "_PROGA",
+            "supports": [
+              {
+                "kind": "VALUE_PRODUCER",
+                "origin": {
+                  "domain": "origin",
+                  "localId": "3c6963c67a2591c7d79e90cb27c95681",
+                  "publication": "437c54421d9cd62278589ab67b6c7064"
+                },
+                "premises": [],
+                "producer": {
+                  "domain": "operation",
+                  "localId": "e52226b01b4afc8f6c6214aafd63e5ab",
+                  "publication": "437c54421d9cd62278589ab67b6c7064",
+                  "unit": "unit"
+                }
+              }
+            ]
+          },
+          "entry": {
+            "domain": "entry",
+            "localId": "c4de8a797697cb8ddf3012f2248da01f",
+            "publication": "437c54421d9cd62278589ab67b6c7064",
+            "unit": "unit"
+          },
+          "openSite": true,
+          "site": {
+            "domain": "operation",
+            "localId": "5357696c937658b9eac2d662086444cd",
+            "publication": "437c54421d9cd62278589ab67b6c7064",
+            "unit": "unit"
+          }
+        }
+      ]
+    }
+  ],
+  "realCase": "NOT_AUDITED: dependencies.json, matching AIR and expected nine-name set not provided or identified",
+  "logs": {
+    "unit-red.log": "d69addf6823084bf2945af403b8a6873f6ca2bfdf1e4f35687c68bc3ec6cce44",
+    "unit-red.xml": "09566b496d6e20f218082c99c02ce04ac88eae29e9b4dc8b5c6dcae934854bf0",
+    "product-red.log": "0f5bf5af64af8926e7c053343aaa49a6f25d6a0a3c3c1fac6a9d9508498cb6f5",
+    "product-red.xml": "ecd249317a89b1ed8f1be3f712312a7e99e2461200a1de0fd71ab847e7db037c"
+  },
+  "evidenceDirectory": ".harness-results/ep-r2/sanitization",
+  "evidenceNote": "Synthetic RED replay after confidential-identifier sanitization; five interpreter and three product semantic failures reproduced without setup errors. No real identifiers or mappings are versioned."
+}
