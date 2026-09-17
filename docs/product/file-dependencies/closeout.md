@@ -26,4 +26,6 @@ OUT OF PRODUCT; ausência não é UNKNOWN/PARTIAL/GAP.
 lower5565e10, AIR5fe0224e, IRfb153ae. Auditoria nova dos seis worktrees limpa;
 bases remotas ancestrais qualificadas; review threads zero. FAST remoto PASS
 nos quatro repos executáveis; IR sem workflow, qualificação bilateral registrada.
-Logs novos em `.harness-results/fd-closeout/`. Merges e smoke ainda NOT_RUN.
+Logs novos em `.harness-results/fd-closeout/`. IR #7, AIR #19, frontend #54 e lower #30 MERGED. CFG/smoke ainda pendentes.
+FAST AIR/lower/CFG e29 focais/21wire PASS. Repins somente docs/locks/checkout CI;
+produção equivalente às revisões qualificadas. Lower main9e746df; ver pins no lock.

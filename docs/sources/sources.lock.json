@@ -3,15 +3,15 @@
   "observed_on": "2026-09-17",
   "analysis_ir": {
     "repository": "Gustavo2358/analysis-ir",
-    "commit": "fb153ae50f343022db45d20d627e1afac85de916",
+    "commit": "3fff18e2c16663a3f599207457caa1946d2e0945",
     "semantic_version": "2.0.0",
     "role": "normative",
-    "canonical_ref": "feat/file-dependencies",
+    "canonical_ref": "main",
     "upstream_review": {
       "pull_request": 7,
-      "state": "open",
-      "draft": true,
-      "head_commit": "fb153ae50f343022db45d20d627e1afac85de916"
+      "state": "merged",
+      "draft": false,
+      "head_commit": "3fff18e2c16663a3f599207457caa1946d2e0945"
     },
     "json_binding": {
       "owner": "Gustavo2358/analysis-ir",
@@ -22,7 +22,7 @@
       "targets_air_version": "2.0.0",
       "path": "bindings/json-v1.md",
       "review_path": "bindings/revisao-json-v1.md",
-      "checked_commit": "fb153ae50f343022db45d20d627e1afac85de916",
+      "checked_commit": "3fff18e2c16663a3f599207457caa1946d2e0945",
       "implemented_in_analysis_cfg": false
     },
     "files": [
@@ -141,13 +141,13 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "5fe0224e5d2514286d6d23d486655334300383da",
-    "canonical_ref": "feat/file-dependencies",
+    "commit": "135d91f4d643c80eeb5d7bff9081fae229e9e62c",
+    "canonical_ref": "main",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
     "analysis_ir": {
       "semantic_version": "2.0.0",
-      "commit": "fb153ae50f343022db45d20d627e1afac85de916"
+      "commit": "3fff18e2c16663a3f599207457caa1946d2e0945"
     },
     "maven": {
       "group_id": "io.github.gustavo2358",
@@ -276,7 +276,7 @@
     ],
     "semantic_product_version": "2.28.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "17323f4718cbd957d7abe52e988b01ece6a9463f",
+    "commit": "fe88cc16f664c26d27e8f975476fc2dfc3e6eff8",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -287,7 +287,7 @@
       "scope": "local unconditional paragraph identity and explicit entry; G1-G5 and 1/2/5/40"
     },
     "storage_contract_version": "1.8.0",
-    "canonical_ref": "feat/file-dependencies",
+    "canonical_ref": "main",
     "observed_on": "2026-09-17",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
@@ -304,7 +304,7 @@
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "FD-W9 typed compilation and canonical captures; producer focal/FAST/Q-SHARED PASS",
-    "commit": "5565e10c23a8b023a16ddb8556604dc331ef89a4",
+    "commit": "9e746df89027de4aa0ec452f4e9a733d57eda866",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -316,7 +316,7 @@
     "goto_validation": {
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
     },
-    "canonical_ref": "feat/file-dependencies",
+    "canonical_ref": "main",
     "observed_on": "2026-09-17",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
