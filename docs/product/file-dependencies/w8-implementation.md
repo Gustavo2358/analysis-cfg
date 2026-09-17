@@ -1,5 +1,9 @@
 # FD-W8 — CICS File Control
 
+**Atualização W11:** a aceitação integral W8 foi reaberta por C06 READ DATASET.
+Demais casos abaixo permanecem qualificados; [bloqueio e evidência final](w11-qualification.md).
+
+
 **QUALIFIED_LOCAL**. Produtores, integração e Q-SHARED CFG PASS.
 W0–W8 qualificados; próxima W9. W10 NOT_AUTHORIZED; nenhum merge/release. Entrada: CFGbf8f8cd,
 frontend4f63f10/lower4e8e129/AIRd215d2ba; worktrees exclusivos conferidos.

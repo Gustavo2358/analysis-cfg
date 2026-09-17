@@ -1,6 +1,6 @@
 id: FD-W11
 title: Qualificação transversal do core N+C e handoff para revisão
-status: IN_PROGRESS
+status: BLOCKED
 scope:
 - file-dependencies
 - analysis-cfg
@@ -75,3 +75,6 @@ depends_on:
 - FD-W7
 - FD-W8
 - FD-W9
+
+blocker: C06 READ DATASET observado em COACTVWC; autoridade CICS TS5.6 não fechada. Não inferir alias nem reduzir requisito. Ver w11-qualification.md.
+qualification: Demais gates finais PASS nos pins w11-pins.json; corpus parcial e recusas preservados; handoff local w11/HANDOFF.md.

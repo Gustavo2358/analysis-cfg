@@ -1,174 +1,45 @@
 # Estado / handoff curto — CORE N+C
 
-**H4 aprovado; W0–W9 QUALIFIED_LOCAL; W11 IN_PROGRESS.**
-Core W0–W9/W11 autorizado em 2026-09-16, sem aprovação mecânica entre waves.
-W10 TODO / NOT_AUTHORIZED. Sem merge/auto-merge/release. STOP após W11.
-Waves qualificadas permanecem IN_PROGRESS lean enquanto PRs estiverem unmerged.
+**W11 BLOCKED por C06 READ DATASET; demais gates finais PASS.**
+H4 aprovado; execução core autorizada. W10 TODO / NOT_AUTHORIZED.
+Nenhum merge/auto-merge/release. PRs Draft/unmerged; DONE lean não reivindicado.
 
 | Wave | Estado técnico |
 | --- | --- |
-| W0 | QUALIFIED_LOCAL; declaração N-LR, SP/decoder/admission bilateral |
-| W1 | QUALIFIED_LOCAL; A1–A4/A6, OPEN/READ/CLOSE, consumer FILE e wire2.0 |
-| W2 | QUALIFIED_LOCAL; sete verbos nativos e operandos/handlers estruturais |
-| W3 | QUALIFIED_LOCAL; memória regional, D-EFFECT/memória e CALL |
-| W4 | QUALIFIED_LOCAL; handlers/status/USE, retorno delimitado |
-| W5 | QUALIFIED_LOCAL; fases SORT/MERGE, SD local, wire2.1; [limites/gates](w5-implementation.md) |
-| W6 | QUALIFIED_LOCAL; auxiliares N-LR/checkpoint/SAME, [gates/limites](w6-implementation.md) |
-| W7 | QUALIFIED_LOCAL; CICS FILE computed no motor geral, [gates/limites](w7-implementation.md) |
-| W8 | QUALIFIED_LOCAL; catálogo C-FC12, FILE/SYSID/REQID e efeitos; [gates/limites](w8-implementation.md) |
-| W9 | QUALIFIED_LOCAL; composição por unidade, owner/captures/escopo; [gates/limites](w9-implementation.md) |
-| W11 | IN_PROGRESS; pins limpos e qualificação final em DAG, [plano](w11-qualification.md) |
+| W0 | QUALIFIED_LOCAL — declarativo N-LR e SP/decoder bilateral |
+| W1 | QUALIFIED_LOCAL — D-AIR/D-WIRE, slice FILE/CALL/JSON |
+| W2 | QUALIFIED_LOCAL — sete verbos nativos/operandos |
+| W3 | QUALIFIED_LOCAL — buffers/efeitos regionais e CALL |
+| W4 | QUALIFIED_LOCAL — handlers/status/USE |
+| W5 | QUALIFIED_LOCAL — SORT/MERGE/SD local |
+| W6 | QUALIFIED_LOCAL — auxiliares/checkpoint/SAME |
+| W7 | QUALIFIED_LOCAL — computed CICS FILE no motor geral |
+| W8 | BLOCKED somente na aceitação C06 READ DATASET; demais casos qualificados |
+| W9 | QUALIFIED_LOCAL — unidades/owners/capturas/COPY |
+| W11 | BLOCKED C06; gates executáveis restantes PASS |
 | W10 | TODO / NOT_AUTHORIZED |
 
-## Checkpoint W2
+## Checkpoint final disponível
 
-| Repo | Commit / pin qualificado |
-| --- | --- |
-| proleap-poc | `b559292c97e004504fb867c4724298dc1637b6f2`; SP2.23/fileInventory1.2 |
-| cobol-lower | `ee38519283a6b762b86704a6ee198748424b6825` |
-| air-java | `d215d2bafbbabc714a3e9d0f2ff9e8927e0bf8f4` (W1, inalterado) |
-| analysis-ir | `fb153ae50f343022db45d20d627e1afac85de916` (W1, inalterado) |
-| analysis-cfg | commit W2 no Git; SHA exato no handoff local E2E |
+[Resultado W11](w11-qualification.md), [pins materiais](w11-pins.json),
+[matriz](coverage.md). Handoff/evidência bruta durável no repo local:
+`artefatos-e2e/file-dependencies-20260916/w11/HANDOFF.md`.
 
-W2: frontend focal147/FAST335; lower FAST core2340 + adapters; CFG C-DEP22 /
-FAST485 / reader11; zero skips inesperados. E-SELECTED14 fontes duas vezes,
-SP/AIR/CFG/dependency determinísticos. Record owner/FROM, sete ações, handlers
-sem duplicação, CALL+FILE e composição IF/EVALUATE/PERFORM/GO TO PASS.
+Bundle final: frontend aaecf8c1, lower24ee0ef9, AIR5fe0224e, CFG1ae5dfee,
+IRfb153ae; SHAs completos nos pins. Frontend52ea26c acrescenta harness/docs,
+sem delta src/pom. SP2.28/compilation1.0 e dependency wire2.3.
 
-Evidência: `artefatos-e2e/file-dependencies-20260916/w2/HANDOFF.md`.
-Contrato/limites: [W1](w1-implementation.md), [W2](w2-implementation.md).
-Efeitos/status/outcomes abertos W3/W4; computed W7; CICS W8; escopos W9.
-Qualification-local/corpus/performance NOT_RUN W2, previstos nos checkpoints.
-Sem blocker. Próximo: D-EFFECT com autoridade exata e oráculos O1–O5/CALL-X.
+FAST/qualification-local dos quatro repos, barreira B-SP/B-AIR/B-WIRE,
+101 fontes×2 determinísticas, MR1–MR9/SG core,21 witnesses de escala e5 mutantes
+mortos PASS. Corpus73 inputs →71 produtos dependency PARTIAL,133CALL/376FILE;
+vetores CALL comparáveis sem regressão. Duas recusas frontend e seis CFG estrito
+preservadas. Nenhuma precisão/recall ou SLA afirmados.
 
-## Checkpoint W3
-
-| Repo | Commit / pin qualificado |
-| --- | --- |
-| proleap-poc | `a9f8fbe4fb4f9e2097c01b1e8f6f992a5041ee5f`; SP2.24/fileInventory1.3/storage1.8 |
-| cobol-lower | `7165beb556b616287ea62ff58d65cc630bc9dab1` |
-| AIR / norma | pins W1 acima, sem alteração |
-| analysis-cfg | commit W3 no Git; SHA exato no handoff E2E |
-
-FD/SD e aliases no storage geral; efeitos antes/depois por outcome; FROM anterior,
-INTO após READ/status, MAY localizado e MUST somente com prova. B-SP fechado e
-O1–O5 AIR manual PASS; nenhuma mudança produtiva CFG/AIR/IR. CALL disjunto conserva
-suporte, READ não mantém singleton antigo exato; FROM não cria READ de outro FILE.
-
-Frontend focal final111/FAST336/Q-SHARED887 (um skip histórico previsto) PASS.
-Lower FAST core2340+adapters/Q-SHARED semântica244296/performance39215 PASS.
-CFG C-VALUES17/C-DEP27/FAST/reader11 PASS. E-SELECTED20 fontes ×2, SP/AIR/CFG/
-dependency determinísticos nos pins acima PASS. Logs/tentativas históricas e
-outputs brutos preservados em `artefatos-e2e/file-dependencies-20260916/w3/`.
-
-[D-EFFECT memória](d-effect.md) fechada; controle/status refinado/USE segue W4.
-Limite provisório: bound aberto repete entradas do fonte no wire O(FILE×statements).
-Corpus amplo NOT_RUN até W11; ausência de semântica W4 não é ocultada.
-[Implementação e limites](w3-implementation.md). Sem blocker. Próxima wave W4.
-
-## Checkpoint W4
-
-Produtores commitados/pushed: frontend `1c21f21750aa3572e39fce71ccc156a357699d81`
-(SP2.25/fileInventory1.4) e lower `9f80a1ff4f25f23d8ff2088a638f5e0f4dcf1ffc`.
-Focal frontend162 + GO TO7 + entrada20, FAST336, Q-SHARED898 (um skip previsto)
-PASS. Lower seis fixtures/negativos wire+memory, FAST2340+adapters, Q-SHARED
-semântica244296/performance39215 PASS. C-VALUES17 e O1–O5 + USE2 manuais PASS.
-AIR/IR e produção CFG inalterados. Clones imutáveis W4 preparados nos pins acima.
-FAST CFG, reader11 e E-SELECTED28 fontes×2 PASS; quatro produtos determinísticos,
-CALL+FILE/handler/USE/status/EOP nos pins exatos. [W4](w4-implementation.md).
-Retorno compartilhado usa redução AIR com bound somente dos resumes reais e gap
-de contexto, sem duplicar CALL ou efeitos. Regras/limites em D-EFFECT; logs novos
-em `.harness-results/fd-w4`. PRs persistentes continuam Draft/unmerged.
-
-## Checkpoint W5
-
-Frontend `9d4de9b252cc67dfdce1def568ee9915318bec16` (SP2.26/fileInventory1.5),
-lower `e50b5e19231e4183bc0c2184a2e14f7bdca65ae1`; AIR/IR pins W1 sem delta.
-SORT/MERGE conservam participantes/papéis e fases; procedimentos/ranges locais,
-RELEASE FROM e RETURN INTO/AT END preservam buffers e CALL. SD associa operações
-locais e não cria nome/remainder externo. Consumer FILE genérico, wire2.1 fechado,
-CALL sites/edges preservados. Retorno compartilhado tem gap contextual explícito;
-ordem/contagem de participantes não é afirmada. OUTPUT vazio recebe gap normativo.
-
-Frontend focal13 + família156/FAST336 PASS; Q-SHARED910 PASS em8fd8faad, REUSED
-para semântica compartilhada inalterada após a restrição focal de saída vazia.
-Lower12 SPs/negativos wire+memory/grafo PASS; FAST2340+adapters/Q-SHARED244296/
-39215 PASS em88572c01, produção idêntica no pin final. CFG FAST487/reader12 PASS.
-E-SELECTED final44 fontes×2: 42 na coorte + MERGE OUTPUT PROCEDURE e múltiplos
-GIVING, mesmos pins, quatro produtos determinísticos. Tentativa com fixture RETURN
-inválida preservada; corrigida segundo IBMp436, sem relaxar regra/reader.
-[Contrato/evidência](w5-implementation.md); handoff bruto local E2E `w5/`.
-Sem blocker; próxima W6 autorizada. PRs continuam Draft/unmerged.
-
-## Checkpoint W6
-
-Frontend `4f63f10c697feb76bf26ba8eb0fa663bb94b9b71` (SP2.27/fileInventory1.6),
-lower `4e8e1299314e965f0f0fc18de7acb9cd00f4652d`; AIR/IR pins W1 inalterados.
-RERUN sem EVERY/SELECT próprio conserva checkpoint/trigger; auxiliares têm papéis,
-efeitos/metadados e provenance. SAME QSAM documental, VSAM (incluindo AS-sequencial)
-alias de registros; LINE SEQUENTIAL IBM core. END_VOLUME ambíguo e métodos mistos
-mantêm limites locais, sem virar D. LINAGE counter desconhecido não preserva valor
-antigo após MOVE; CALL disjunto conserva suporte. Modelo fechado manual prova
-checkpoint read-only sem perda de valor; integração mantém controle CALL aberto.
-
-Frontend focal230/FAST336/Q-SHARED929 (um skip histórico) PASS. Lower19 SPs,
-negativos wire/memory/codec, FAST2340+adapters e Q-SHARED244296/39215 PASS.
-CFG FAST487, AIR manual15, reader12 e E-SELECTED33 fontes×2 PASS, quatro produtos
-determinísticos. Tentativas/oracle corrigido registrados em [W6](w6-implementation.md).
-Sem blocker. Próxima W7: D-DYNAMIC/core e possible-values CICS no ponto do comando.
-
-## Checkpoint W7
-
-Somente CFG produtivo; upstream/pins W6 acima inalterados. CICS FILE literal ou
-computado consulta BEFORE; política cics-ts.file@1/IBM1047, quatro estados,
-joins/ciclos/alias/refmod e supports próprios. Reutiliza StorageValuesProvider;
-CALL+FILE compartilham execução quando a key coincide, literal não demanda values.
-D-DYNAMIC/core fechado; wire2.2/file-values@1, CALL sites/edges preservados.
-
-AIR manual9 testes/18 casos, C-VALUES17, reader15, FAST497 e qualification-local
-(suíte542 + gates semânticos/escala/integração/E2E) PASS. Manual CLI10×2 e fontes
-nativas33×2 determinísticos PASS. Falhas de harness/oracles antigos reproduzidas e
-corrigidas com contraprovas; produção CALL/solver/providers inalterada.
-[Decisões/evidência/limites](w7-implementation.md); SHA no handoff E2E `w7/`.
-Fonte→CICS FILE continua W8; W9/W11 pendentes. W10 NOT_AUTHORIZED. Sem blocker.
-
-## Checkpoint W8
-
-Frontend4356722155b83966d716b47e1d8a918e4a7f9649/SP2.28; lowerdcb6f49e5edc3e6b06e9ccb7fb35e4dd09bd5307;
-AIR0035c5af165c90973a3645bae8a7e286511470e5/codec parâmetros+outcomes; IRfb153ae
-inalterado. Doze comandos C-FC separados de Program Control, aliases por comando,
-FILE/SYSID/REQID, SPI output, efeitos/condições, nomes computed BEFORE e wire2.3.
-Nenhum solver/provider geral ou CALL produtivo alterado. Fonte com cobertura parcial
-mantém remainder efetivo mesmo com conjunto fechado no modelo; contraprova manual
-COMPLETE/PARTIAL preserva os mesmos candidatos. Limites em W8, sem dimensão externa.
-
-FrontendFAST345/Q938(um skip histórico); lowerFAST2340+adapters/Q244296/39215;
-AIRFAST187/126/40; CFGFAST502/Q547 zero skips + gates semânticos/escala/CLI PASS.
-B-SP33, manual FILE/computed/contexto, reader18, E-SELECTED38 CICS+33native fontes×2,
-quatro produtos determinísticos PASS. Logs/tentativas/pins no handoff E2E w8.
-Sem blocker; próxima W9. PRs persistentes Draft/unmerged, W10 NOT_AUTHORIZED.
-
-## Checkpoint W9
-
-Frontend d120036cb71f81ff3055ca1a47be32ac88dcad7a; lower código/pin
-9c4e7a340145f9031b7260616e4029f42c6cce91 (HEAD c31cd92 corrige somente docs);
-AIR5fe0224e5d2514286d6d23d486655334300383da; IRfb153ae inalterado.
-Envelope compilation1.0/SP2.28, parentage/capturas canônicas, GLOBAL/EXTERNAL,
-qualificação/ambiguidade, shadowing e COPY. Capturas aliasam objetos originais;
-FILE conserva declaration owner e use owner. Consumer produtivo sem delta.
-
-Frontend focal21/FAST352/Q945 (um skip histórico)+normalizer PASS; AIRFAST187/127/40;
-lower B-SP6/nove negativos/permutação, FAST2340+adapters e Q205081 semânticos+
-39215 performance/arquitetura PASS. CFG manual28/FAST504 zero skips/reader18 PASS.
-E-SELECTED8 scope+33native+38CICS fontes×2, quatro produtos determinísticos PASS.
-Par CICS contido com/sem CALL local mantém ACCOUNTS/R001; somente CALL local abre
-remainder do modelo, CALL do pai não interfere. Source remainder permanece real.
-
-Tentativas e contraprovas preservadas: COPY ID por unidade, codec visibleObjects,
-colisão de build, classpath ausente e oracle inicial que ignorava o CALL aberto.
-[W9](w9-implementation.md) registra limites PRIMARY_ONLY, view ancestral e entrada
-indisponível. Sem blocker; próxima W11 qualificação N+C pelo DAG autorizado.
-W10 NOT_AUTHORIZED, PRs Draft/unmerged.
+C06: três READ DATASET em COACTVWC permanecem OBSERVED/EMBEDDED_LANGUAGE;
+a autoridade5.6 encontrada prova DATASET somente para SET. Qualificação integral
+W8 reaberta por esse achado W11; não mover para D, inferir o alias ou reduzir o
+requisito. Necessária autoridade exata ou decisão humana explícita sobre C06.
+Todo trabalho independente foi concluído. STOP por bloqueio material, sem W10.
 
 ## Retomada
 
@@ -186,7 +57,7 @@ Branch persistente em todos: `feat/file-dependencies`; PRs OPEN/DRAFT/UNMERGED:
 | analysis-cfg | [#38](https://github.com/Gustavo2358/analysis-cfg/pull/38) |
 | analysis-ir | [#7](https://github.com/Gustavo2358/analysis-ir/pull/7) |
 
-Próximo: AGENTS → página local → [brief](brief.md) →
+Retomada após resolver C06: AGENTS → página local → [brief](brief.md) →
 [FD-W11](../../work/active/FD-W11.yaml) → perfil/casos/gates necessários.
 E2E local/sem remote; não executar runner CP3 nem reler discovery bruto.
 

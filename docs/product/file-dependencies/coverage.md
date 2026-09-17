@@ -64,7 +64,7 @@ effects/conditions → consumer FILE. C-FC/autoridade SPI específica antes do c
 | C03 Operand roles | QUALIFIED / C-FC ([W8](w8-implementation.md)) | FILE, SYSID, INTO/SET, FROM, RIDFLD, LENGTH, TOKEN e demais opções por comando. | T38,T39 | W8 |
 | C04 Efeitos e resposta | QUALIFIED / C-FC ([W8](w8-implementation.md)) | Memória, ponteiros e códigos de resposta; não inventar sucesso nem ignorar controle de exceção. | T39,CALL-X1 | W8 |
 | C05 `INQUIRE FILE`, `SET FILE` | QUALIFIED / C-FC ([W8](w8-implementation.md)) | Uso administrativo distinto de leitura/escrita de registros; saída de INQUIRE não é nome de entrada. | T40 | W8 |
-| C06 Aliases e configurações | QUALIFIED / C-FC ([W8](w8-implementation.md)) | FILE/DATASET e demais aliases da própria sintaxe, quando admitidos pela autoridade exata | T40,T41 | W8 |
+| C06 Aliases e configurações | BLOCKED READ DATASET; SET alias QUALIFIED ([W11](w11-qualification.md)) | FILE/DATASET e demais aliases da própria sintaxe, quando admitidos pela autoridade exata | T40,T41 | W8 |
 | C07 Tratamento de condições | QUALIFIED / C-FC ([W8](w8-implementation.md)) | RESP/RESP2, NOHANDLE/HANDLE e escopos relevantes; preservar desconhecimento onde não houver contrato preciso. | CALL-X2,T41 | W8 |
 
 ## D — EXTENDED PROFILE posterior, autoridade D-GC32/D-v1
@@ -156,18 +156,15 @@ CICS computed em filho com/sem CALL local prova valores e remainders por unidade
 inventário completo de unidades não é prova de cobertura completa dos corpos.
 Gates/limites: [W9](w9-implementation.md). W11 final pendente; W10 não autorizado.
 
-## Qualificação final W11 em curso
+## Qualificação final W11 — C06 BLOCKED
 
-N19–N25/N31–N33 agregam as dimensões W2/W3/W4 já qualificadas: native14,
-memory6 e control8 foram reexecutadas duas vezes no snapshot2 (SP2.28/lower
-ee876281/AIR5fe0224/CFG381f55a), incluindo DELETE-only, WRITE FROM, handlers/USE,
-status e IF/EVALUATE/GO TO. A remediação de continuação intrínseca em PERFORM ao
-fim de parágrafo foi demonstrada pelo corpus e tem RED/GREEN bilateral; seus
-pins finais/gates descendentes são registrados em [W11](w11-qualification.md).
+N19–N25/N31–N33 e demais regras N+C previamente qualificadas foram exercitadas
+nos pins finais W11:101 fontes distintas×2, incluindo native14/memory6/control8,
+auxiliares/SORT,38CICS e8scope; quatro produtos determinísticos. Gates, corpus,
+CALL, mutantes e escala em [W11](w11-qualification.md).
 
-C06 qualifica os aliases selecionados/documentados na autoridade W8: SET DATASET
-→ FILE, OBJECTNAME → atributo DSNAME (nunca target). READ DATASET observado no
-corpus permanece **não qualificado**: falta autoridade API5.6 específica; não
-conta como FILE reconhecido, não é reclassificado como D e não recebe identidade
-inferida por grafia. Formas C-FC FILE literais/computed, com seus limites de
-storage/controle, são qualificadas separadamente. Nenhuma claim CICS universal.
+C06 mantém SET DATASET→FILE e OBJECTNAME→atributo DSNAME qualificados.
+READ DATASET observado no corpus permanece **BLOCKED / NOT_QUALIFIED**: falta
+fechar autoridade API5.6 específica. Não conta como FILE reconhecido, não é D e
+não recebe identidade por grafia. Essa pendência reabre a aceitação integral W8
+e bloqueia W11; não invalida os PASS das formas FILE literais/computed comprovadas.
