@@ -97,7 +97,7 @@ needed. Every property except `Part.producer` remains identical.
 | Property | Observed |
 | --- | --- |
 | Equality of different-producer images | false |
-| Distinct hashes for these ten images | 10 |
+| Distinct hashes observed (diagnostic only) | 10 |
 | Same image reconstructed with the same producer | same interned node |
 | Different producer | different interned node |
 | Union cardinality after each producer | 1, 2, ..., 10 |
@@ -109,8 +109,10 @@ needed. Every property except `Part.producer` remains identical.
 `producer`. `RegionalValuesAnalysis.Bytes` wraps the image and preserves this
 identity. The factorized interning key uses a map keyed by labels; union keeps
 both distinct keys. Reconstructing an equal label and unioning it again are
-idempotent controls. Different hash values here are an observation, not a
-universal guarantee against hash collisions.
+idempotent controls. The ten distinct hashes observed in this execution are
+diagnostic only, not a semantic requirement or a PASS/FAIL assertion. Hash
+collisions between unequal images are legal. Causal reproduction depends on
+equality, label identity, interning and union, not hash uniqueness.
 
 The test-only `ImageShape` preserves extent and every `Part` field, replacing
 only `producer` by a sentinel. Payload (including repeated flag), payload offset,
@@ -268,11 +270,26 @@ preserved; no architecture baseline was regenerated.
 Raw logs remain local in `.harness-results/w1/`; source pins above are unchanged. The reproduction gate is
 separate from repository lifecycle DONE, which still requires review and merge.
 
+Post-review hash assertion adjustment (base `dfa4893ec44ecc73257d042b94b72c29af684b87`):
+removed only the hash-cardinality regression assertion; all semantic assertions,
+shape helpers and negative controls are unchanged. Newly executed with Java 21:
+focused fixture plus parent smoke **23 PASS**; full analysis-values and parent
+modules **375 PASS**; repository FAST **PASS CODE_CHANGE**, 549 mandatory methods,
+zero skips (85.199 s observed). The same commands above were used with Java 21
+for all three runs. All eight structural A/B/C rows match the pre-adjustment W1
+run, excluding diagnostic `distinctHashes` from the comparison. A/B/C remain
+PASS and Entry remains SKIPPED. No production code changed. Raw logs and the
+comparison are preserved locally in `.harness-results/w1-review/`.
+
 **Temos RED suficiente para iniciar a campanha de correção? SIM.** A and B
 isolate both causes; C demonstrates their positive interaction, with controls
 for disjointness and repeated event identity. Tests are deterministic structural
 characterizations and contain no timing assertions. Entry initialization and
 large-case performance remain explicit limitations.
 
-**W1 COMPLETE — SYNTHETIC REPRODUCTION ACHIEVED.** Stop for human review.
-W2 is not started; no fix, merge or auto-merge is authorized by this closeout.
+**W1 COMPLETE — SYNTHETIC REPRODUCTION ACHIEVED.** This completes only the W1
+checkpoint, not the campaign or merge readiness. W1/W2/W3/W4 stay on branch
+`discovery/regional-explosion-fixtures` and PR #40, which remains Draft during
+the campaign. Merge may occur only after W4 and final human review. Stop for
+human review; this adjustment does not start W2. No merge or auto-merge is
+authorized.

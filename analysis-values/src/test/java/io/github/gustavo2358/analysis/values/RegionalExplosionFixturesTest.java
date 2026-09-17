@@ -97,9 +97,8 @@ class RegionalExplosionFixturesTest {
             assertSame(joined,domain.union(joined,node));
         }
         assertEquals(10,labels.size());assertEquals(1,shapes.size());
-        // Empirical property of these ten inputs, not a general no-hash-collisions contract.
-        assertEquals(10,hashes.size());
         assertEquals(labels,joined.edges.keySet());
+        // Hash cardinality is diagnostic only; collisions are legal and do not fail this test.
         System.out.printf("W1_B producers=10 labels=%d shapes=%d distinctHashes=%d alternatives=%d metrics=%s%n",
             labels.size(),shapes.size(),hashes.size(),FactorizedAlternatives.size(List.of(joined)).alternatives(),new TreeMap<>(domain.metrics()));
     }
