@@ -1,6 +1,7 @@
 # Regional explosion campaign
 
-Current checkpoint: W1/W2 COMPLETE; W3 INCOMPLETE (structural fix deferred); W4 PENDING. PR #40 remains Draft;
+Current checkpoint: W1/W2 COMPLETE; W3.1 DISCOVERY COMPLETE; W3.2 BOUNDED
+FACTORING PROTOTYPE VALIDATED; W3.3 production implementation and W4 PENDING. PR #40 remains Draft;
 merge only after W4 and final human review. The W1 sections below are historical
 reproduction evidence; production optimizations are documented under W2.
 
@@ -582,7 +583,7 @@ qualification is not relabeled as newly executed.
 next-wave plan, not for merge. W1/W2 remain in PR #40, Draft, with no auto-merge.
 W3/W4 are pending and are not started by this gate. No merge authorized.
 
-# W3 — structural explosion reduction
+# W3.1 — structural explosion discovery
 
 **W3 INCOMPLETE — STRUCTURAL FIX DEFERRED.** Discovery/oracle checkpoint only;
 no structural reduction is claimed. Selected outcome **N**, permitted by the
@@ -928,3 +929,399 @@ No assertion uses elapsed time, memory consumption or Java hash uniqueness.
 Raw evidence: `.harness-results/w3/{baseline,verified}-{16-50,32-100}/`,
 `focal.log`, `modules.log`, `fast.log`, and `reject-mismatch.log`. The mandatory
 FAST check is new evidence; W1/W2's earlier historical results remain historical.
+
+# W3.2 — exact correlated provenance factoring prototype
+
+Initial checkpoint: `7e88a636429936ec83c159debfbb0ced2568898f`, clean tree,
+branch `discovery/regional-explosion-fixtures`, PR #40 OPEN/Draft/no auto-merge.
+W3.1 is DISCOVERY COMPLETE / STRUCTURAL FIX DEFERRED. W3.2 is test-only
+PROTOTYPE / PROOF; no production implementation is authorized in this step.
+
+## Hypothesis
+
+A disjunction of simple whole-image unknown writers may share one shape when
+its continuation is identical. This is a bounded label encoding, not independent
+producer sets across Parts or ranges. Test expansion against the full current
+relation and the frozen observations before recommending production work.
+
+## Factorability predicate (defined before implementation)
+
+Admit only a ByteImage with exactly one Part; bounded positive extent; range
+exactly [0, extent); empty payload; payloadOffset=0 and producerOffset=0;
+producer>=0; exactly one reason (any spelling); empty capturedOffsets, coInitial,
+sourceGaps and logicalSupports. All other labels remain concrete. Pair grouping
+requires the same extent/range/reason, same level and identical canonical child.
+These stronger restrictions imply equality of **every** field except producer.
+No reason is hardcoded. Entry unknown (producer=-1), literals, open extent,
+multi-Part and enriched provenance are deliberately outside admission.
+
+Producer IDs are an immutable **disjunctive** set attached to (shape, child),
+never coInitial. A level names a fixed partition location; combining unrelated
+location spaces is outside the relation's API precondition. The prototype uses
+one canonical concrete domain per instance. Node keys include all grouped edges
+and children; hashes are lookup accelerators only, with full equality checks.
+
+## Planned expansion and operations
+
+Expansion reconstructs one complete ByteImage per producer and the exact same
+child relation. Null/terminal preserve their existing meanings. Native union
+may combine compatible groups; a producer shared by unequal children requires
+an exact concrete subtree union fallback. Project/restrict preserve child links;
+updates initially expand the selected component, use the existing concrete
+transform, then factor only the admitted result. Complex labels stay concrete.
+This intentionally bounds the proof and does not promise that every fallback
+will be cheap. No original concrete root is stored inside a factored node.
+
+## Prototype representation
+
+**FACT:** `ExactProvenancePrototype<T>` lives exclusively under tests. Its Codec
+recognizes ByteImage-backed labels; unsupported labels are opaque concrete
+singletons. A compact node has a fixed level and immutable edges. An edge is
+one concrete label or `(Shape, disjunctiveEvents, child)`. Shape stores bounded
+extent and the sole reason; all omitted fields are fixed by admission, including
+the whole-image range. The event set retains actual per-target event ordinals.
+A node never stores its original concrete root or ten complete images for a
+ten-event group. Canonical keys compare complete edge sets and child identities;
+Map/Set hash collisions remain ordinary equality-checked collisions.
+
+The prototype has its own instance-local interner. Its concrete interner is a
+reference/fallback engine, not part of the compact node. Benchmark and bridge
+retain both engines for comparison; compact edge counts are not total retained
+heap measurements. The implementation is recursive and deliberately not promoted
+to the production path or advertised as a new generic relation library.
+
+## Expansion law
+
+Let `L(s,p)` be the complete image reconstructed from an admitted shape and
+producer, and `R(c)` the relation denoted by a child. For a compatible edge group:
+
+```
+union over p in P of ({L(s,p)} × R(c)) = {L(s,p) | p in P} × R(c)
+```
+
+**STRONG EVIDENCE (design argument):** admission makes reconstruction injective
+in producer and exact in every other image field. The grouping partition includes
+child identity and level. Each original edge belongs to exactly one group; opaque
+labels are retained verbatim. Induction from terminal through the finite ordered
+DAG therefore gives `expand(factor(X)) = X` for the admitted relation schema,
+including mixed admitted/opaque labels. The relation retains fixed location levels
+and a common ordered schema, as required by the existing concrete algebra.
+No independence across unequal children is assumed.
+
+**FACT (execution):** expansion returns the same canonical concrete root, not
+merely equal bytes or counts. Re-factorization returns the same compact node.
+The Fixture B structural RED was observed before grouping was implemented:
+expected 1 structural edge, actual 10 (`.harness-results/w32/red.log`). The final
+round-trip compares complete images with the W3.1 typed encoder as well.
+
+The design review consulted Bryant's [Graph-Based Algorithms for Boolean
+Function Manipulation](https://www.cs.cmu.edu/~wklieber/15817-f08/ieeetc86.pdf),
+Definitions 3–5: ordered graph identity includes attributes and corresponding
+children; sharing subgraphs must preserve what the graph denotes. This is useful
+background, not a claim that a Boolean reduction theorem proves this multi-valued
+provenance encoding. The local distributive law above and explicit fallback are
+the argument for this prototype; no BDD variable-elimination rule was imported.
+
+## Union laws
+
+**FACT:** native union merges groups with equal shape and identical child, taking
+an exact union of event IDs. Different shapes/children remain separate. If the
+same concrete label occurs under unequal children in the operands, union expands
+that subtree, invokes the existing concrete union and factors its exact result.
+It does not combine an event set with a union of incompatible children.
+
+Tests cover repeated events, different reasons/extents, unequal children, null,
+terminal, reversed order and deliberate `Aa`/`BB` hash collisions. All 16
+relations over the four two-level tuples `{A,B}²` are generated. The test checks
+all 256 operand pairs against an independent tuple-set union oracle and all
+4,096 operand triples for associativity; idempotence, commutativity and canonical
+identity are also checked. The conflicting-child fallback is exercised, not dead
+code. No test assumes arbitrary unequal values have different hashes.
+
+## Project/restrict laws
+
+**FACT:** project recursively projects each child. It preserves selected levels;
+for an unselected level it unions the child relations existentially. Restrict
+filters an admitted group by the requested exact shape/event and recursively
+filters its child. It never replaces an exact source choice by a whole producer
+set. Opaque labels use ordinary full equality.
+
+For every one of the 16 relations, all four level subsets are projected and five
+restrictions are checked, including missing producer and both-level selection.
+Results match both the independent tuple-set oracle and the concrete operations.
+The `(A,B)/(B,A)` counterexample retains exactly two alternatives and two root
+edges under unequal children. `(A,A)` and `(B,B)` are never added. Empty relation
+and terminal retain their original meanings.
+
+## Update/fallback laws
+
+**FACT:** weak addition of a compatible unknown event uses native union and stays
+compact. The initial prototype routes every general update through exact concrete
+expansion of the supplied component, executes `FactorizedAlternatives.update`,
+and factors only the result admitted by the predicate. Thus a whole unknown
+replacement can become compact again; a literal replacement stays concrete.
+Partial writes and captures produce enriched/multi-Part labels and stay concrete.
+The old producer alternatives die on whole replacement exactly as in the concrete
+reference operation. Repeated weak insertion is idempotent.
+
+Tests compare complete results for whole replacement, weak union, partial bytes
+4..7 overwrite, capture with a nonzero source offset/alternative, and simultaneous
+partial/copy transforms in a connected two-level relation. After the partial
+write there are two concrete images; no independent head/tail producer sets are
+created. This fallback is an explicit delegation, not a new copy semantics.
+
+`ExactProvenanceFixtureBridge` reads actual private relation roots through a
+**test-only reflection adapter**. Before each real transfer it factors/expands the
+current bindings, reconstructs a State and verifies canonical root identity. It
+then runs the unchanged Engine transfer. At the final point, the unchanged real
+fact projector observes the reconstructed state; an independent real solver/
+public observation execution supplies the oracle. No production hook was added.
+An additional fixture connects bases with two partial copies and nonzero offsets;
+complete observations remain equal and contain nonempty capture evidence.
+
+## Adversarial counterexamples
+
+**FACT:** admission explicitly rejects multi-Part images, nonzero producerOffset
+or payloadOffset, nonempty capturedOffsets/coInitial/sourceGaps/logicalSupports,
+known payload, missing/open/zero extent and producer=-1. Tests exercise enriched
+images and verify exact opaque round-trip. Different reason/extent shapes do not
+merge. A valid single-Part ByteImage already covers its full extent; different
+partial ranges appear as different extents or multi-Part images and cannot bypass
+the whole-range guard. Unequal child relations and different levels do not merge.
+The W3.1 swapped producer/range and independent-set counterexamples remain in FAST.
+
+The negative admission cases are successful concrete fallbacks, not unsupported
+analysis inputs. No target or input acceptance rule changes. Connected groups are
+not declared independent: common-child grouping is still required within their
+ordered relation, with expansion before complex transfer.
+
+## Fixture B results
+
+**FACT:** 10 complete labels become **1 structural edge + 10 disjunctive event
+rows**. Expansion reconstructs the original ten images field for field. Same-event
+reinsertion leaves ten rows; factor/expand/factor is canonically idempotent.
+Producer identity remains observable through expansion. This does not substitute
+coInitial or change ByteImage equality/hash.
+
+## Fixture C results
+
+| Disjoint | Producers | Concrete live edges | Prototype structural edges | Event rows | Expanded edges |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| no | 1 | 7 | 7 | 3 | 7 |
+| no | 5 | 19 | 7 | 15 | 19 |
+| yes | 1 | 1 | 1 | 0 | 1 |
+| yes | 5 | 1 | 1 | 0 | 1 |
+
+**FACT:** every complete fact matches the corresponding frozen W3.1 SHA and typed
+record equality. The measured 19→7 result is 63.2% fewer structural edges; the
+15 per-target events are all retained. There is no reduction for single-producer
+or disjoint controls. The directly written literal remains an opaque label.
+
+## 16/50 results
+
+**FACT:** actual final solver/replay bindings measure **766→31 structural edges**
+(96.0% reduction), 16→16 decision nodes, 750 exact event rows, expansion back to
+766 edges. There are 15 admitted unknown shape/child groups, plus 15 entry-unknown
+concrete edges and one direct literal. Counts are per location/level, not a global
+shape count that erases which region is represented. Targets remain 800,
+unproven targets 750; production interned counts remain 1,566 nodes / 20,691 edges.
+
+Expanded facts SHA:
+`e9b3792a76ffbd96d302075402c341701adfb9cbcb26c634af88cf8ea0656302`.
+Targets SHA:
+`f6a26180cba8e0090c652faa8e3619889a1e3bcdbd64775c0b5b262151c538b5`.
+
+## 32/100 results
+
+**FACT:** actual final bindings measure **3,132→63 structural edges** (98.0%
+reduction), 32→32 decision nodes, 3,100 exact event rows, expansion back to 3,132
+edges. There are 31 admitted groups, 31 entry edges and one direct literal.
+Targets remain 3,200, unproven targets 3,100; production interned counts remain
+6,332 nodes / 162,882 edges. Fifty/one hundred source write operations must not be
+confused with the 750/3,100 per-target event rows retained by the representation.
+
+Expanded facts SHA:
+`9e8437da4f81de7deb3b717f2fe78fe0c5244943c09b7e18e594f44c491ca496`.
+Targets SHA:
+`027c14c2ea4b40906741282c18ecc736a057078ec6b1b882f7d8434b5d613983`.
+
+Both scales compare full `before.typed` / expanded `facts.typed`, and the full
+facts/targets files against the immutable W3.1 baseline. The hashes are additional
+identifiers, not replacements for the full-file equality check. All three final
+JVM forks passed these comparisons. The production solver still uses its original
+representation; there is no claim of a compact production solve here.
+
+## Cost of expansion and diagnostic measurements
+
+`ExactProvenancePrototypeProbe` separates the real-fixture bridge above from an
+isolated hot-case benchmark. The latter accumulates cross-base weak unknowns at
+R−1 independent levels, using the concrete union or the native compact union,
+then performs **one full compact expansion**. It checks every final complete label
+outside the timer. It omits the direct-base strong writes, target preparation,
+solver/worklist and public observation work. This is not an end-to-end speedup.
+
+Java 21, fixed `-Xms256m -Xmx1g`; three separate JVMs per scale; ten warmup pairs
+and 30 measured pairs each. Execution order alternates concrete/factored within
+each fork. Final timing runs did not overlap Maven validation. No timed CI assert.
+
+| Scale | Concrete total median per fork (ms) | Compact build + expansion median per fork (ms) | Expansion median per fork (ms) |
+| --- | --- | --- | --- |
+| 16/50 | 2.768 / 2.447 / 2.431 | 2.469 / 2.004 / 2.129 | 0.232 / 0.200 / 0.223 |
+| 32/100 | 16.639 / 17.072 / 16.560 | 10.428 / 10.704 / 10.380 | 0.785 / 0.754 / 0.786 |
+
+**STRONG EVIDENCE:** median-of-fork-medians is 2.447→2.129 ms (13.0%) and
+16.639→10.428 ms (37.3%) including expansion. In this workload expansion does not
+cancel the entire gain. Earlier 5-warmup/15-pair exploratory runs showed 16/50
+slightly slower (4.316→4.873 ms); the small-scale runtime result is warmup-sensitive.
+Neither result establishes a guaranteed performance contract or full-solver gain.
+
+Deterministic microbenchmark work: **zero** expansion labels and zero fallbacks
+during weak union; final expansion emits 765 / 3,131 complete labels exactly once
+per trial. Compact history contains 2,265 / 9,331 structural edges versus concrete
+20,640 / 162,781. These numbers intentionally exclude the direct-base work and
+are not the full solver's interning metrics. Event-set rows are still stored;
+repeated immutable set copies can still grow quadratically over history.
+
+Peak RSS of the **combined** benchmark/bridge JVMs is 332,320–337,888 KiB for
+16/50 and 385,664–393,280 KiB for 32/100. This includes both reference and compact
+representations, runtime, all trials and final snapshots. It is neither retained
+heap nor a before/after memory comparison; no production memory gain is claimed.
+Raw trials and exact equality checks are in `.harness-results/w32/final-*` and
+`comparison.json`. No diagnostic production counters were added.
+
+Reproduce after Java 21 test compilation using the existing probe runner:
+
+```sh
+mvn -B -ntp -Dmaven.repo.local="$PWD/.harness-results/build/m2" \
+  -pl analysis-values -am test-compile
+python3 scripts/project/regional_cost_probe.py --prototype \
+  --regions 16 --producers 50 --warmups 10 --repeats 30 --rss \
+  --compare .harness-results/w3/baseline-16-50 \
+  --output .harness-results/w32/reproduce-16-50
+# Repeat with 32/100 and its baseline directory; repeat in three separate JVMs.
+```
+
+The W3.1 section explains how to regenerate the frozen **reference** with its
+exact source SHA if local baseline files are absent. Prototype mode deliberately
+disallows source overlays, production instrumentation and the production JFR mode.
+
+## Proposed production architecture — proposal only
+
+| Location | Assessment |
+| --- | --- |
+| A: inside ByteImage | Reject: an image is one correlated span sequence; changing it to disjunction spreads complexity into every crop/copy/read and risks equality semantics |
+| B: new Content subtype alone | Insufficient: the generic DAG cannot merge unequal set-valued labels or split overlap based solely on Content equality; child compatibility belongs to the edge relation |
+| C: regional-specific relation/edge wrapper | **Recommended:** an internal analysis-values adapter owns compact nodes and disjunctive unknown edges; preserves the generic concrete algebra as fallback/reference |
+| D: generic FactorizedAlternatives feature | Not justified by this domain-specific admission rule; avoid teaching the generic interner about ByteImage or provenance |
+
+**HYPOTHESIS / implementation proposal**, not executed:
+
+1. Add an internal regional relation adapter (for example `RegionalAlternatives`)
+   with immutable compact nodes and concrete/disjunctive edges. Migrate private
+   Engine/State relation use to that adapter in a separate W3.3 change.
+2. Keep exactly this restrictive admission predicate initially. Broader metadata
+   support is a separate design, never an implicit extension.
+3. Store immutable event-ID disjunctions under (shape, level, canonical child),
+   with full equality. Do not reuse coInitial or use hash as identity.
+4. At observation, expand selected labels to the same ByteImages. Existing
+   eventDetails/DefinitionEvent and fragment construction preserve the public
+   records and their ordering; no new wire representation.
+5. Restrict selects exact event membership plus full shape/opaque-label equality
+   and preserves its child; never retain every event when selecting one source.
+6. Project preserves requested levels and existentially unions unrequested
+   children; recursive overlap must use exact union, not independent row sets.
+7. Union merges only identical shape/child groups; overlap under differing
+   children initially falls back on the exact concrete subtree algebra.
+8. Partial writes expand the affected correlation component before invoking the
+   existing concrete update/copy logic. Complex results remain concrete edges.
+9. General transforms, captures and conflicting child-overlap trigger fallback.
+   Unknown weak addition is the demonstrated compact fast path; other operations
+   may be optimized only with new equivalence evidence.
+10. Fallback is component/subtree-local. A connected component may contain many
+    bases; in that case the entire component can expand. Unrelated components
+    remain compact. It is not necessarily a single-label cost.
+11. ByteImage equality/hash remain unchanged. Expanded images are ordinary
+    ByteImages; their cached hash and collision handling continue unchanged.
+12. Keep AIR, shared StatementEffects, targets and public wire/API unchanged.
+    Public structural metrics must clearly count representation work; observable
+    facts/evidence must remain equal. Audit all consumers of State metrics.
+13. Compact interning/event sets have Engine/analysis lifetime, never global.
+    Historical compact roots can remain retained as current interned roots do.
+14. Canonicalize complete compact edge/child keys locally. Prefer a temporary
+    concrete fallback interner so expanded histories are not retained forever
+    alongside compact histories; prove re-factorization reaches the same compact
+    identity before relying on that lifetime change. The test reference interner
+    intentionally remains retained for canonical equality checks.
+15. Budget **no semantic limits**. Measure added group/shape/set objects, boxed
+    event IDs, historic set copies, scratch expansion and peak overlap. Structural
+    edge reduction alone is not evidence of a proportional retained-heap reduction.
+
+Production traversal must preserve the existing iterative/stack-safe behavior;
+the recursive test prototype is not suitable for direct promotion. This proposal
+changes only analysis-values internals but still needs integration tests for all
+operation paths, not just swapping the node type. It does not require an AIR/wire
+change; that is an architectural inference to verify during W3.3, not a completed
+production compatibility test.
+
+## Risks
+
+**FACT:** prototype admission is intentionally narrow; all events and targets are
+still present, and observation output size has not decreased. Frequent copies,
+partial updates or conflicting children may repeatedly expand large components.
+The benchmark with one final expansion does not quantify that worst case.
+
+**HYPOTHESIS:** reduced label/map structure will help the corporate workload.
+This still needs integrated production profiling and later W4 E2E evidence. The
+immutable event-set history may become the next allocation cost. Do not generalize
+to multi-Part provenance, change targets, introduce thresholds or claim precision
+loss is acceptable because a marginal candidate set still looks correct.
+
+## Decision
+
+**W3.2 COMPLETE — BOUNDED FACTORING VALIDATED**, subject to the explicit predicate
+and mandatory concrete fallback above. This is a proof-of-design checkpoint,
+not W3 production completion. The seven prototype/design tests are permanent
+FAST oracles because they prevent the exact correlation and metadata mistakes
+identified in W3.1; the clock-based probe remains manual.
+
+Gate answers: (1) round-trip **YES within admission**, (2) union **YES**, (3)
+project **YES**, (4) restrict **YES**, (5) partial write **YES via fallback**, (6)
+copy **YES via fallback**, (7) anti-correlated example stays two **YES**, (8) B
+retains ten producers **YES**, (9) C complete snapshots **YES**, (10) 16/50 complete
+snapshots **YES**, (11) 32/100 complete snapshots **YES**, (12) structural reduction
+**YES in the prototype**, (13) internal analysis-values/no wire or AIR change
+**YES as the proposed architecture, not yet implemented**.
+
+READY FOR W3.3 PRODUCTION IMPLEMENTATION — after human review. W3.3 was not
+started. W4 pending. PR #40 stays Draft. No merge authorized.
+
+## Validation and change boundary
+
+**FACT:** Java 21.0.12.1 validation:
+
+- Structural RED: Fixture B expected one compact edge and observed ten before
+  grouping; failure recorded, then fixed in the test-only representation.
+- Focals: W1, W2 ByteImage/relation/metrics tests, W3.1 oracle and all seven W3.2
+  methods PASS, including full-sized snapshots and connected partial-copy replay.
+- Complete `analysis-values -am test`: **389 tests PASS**, zero failures/errors/
+  skips (cfg-kernel 108, analysis-kernel 79, analysis-values 202).
+- Full `lean.py fast`: **PASS CODE_CHANGE**, 93.019 s; **563 required unit/contract
+  methods, zero skips**. The seven design oracles were explicitly added to the
+  required test inventory. Architecture inventories and source pins unchanged.
+- Six final manual JVM probes PASS full facts/targets comparisons against W3.1.
+  Benchmarks contain no wall-time assertions; no corporate input was used.
+
+Files: four new test-only prototype/bridge/law/probe classes, the existing manual
+probe runner, required-test inventory and this report. **Zero production changes**;
+ByteImage, RegionalValuesAnalysis, FactorizedAlternatives and StatementEffects
+remain byte-for-byte unchanged. No AIR/wire/API or target changes. All compact
+nodes passed to a prototype operation belong to that prototype instance; input
+concrete graphs belong to its fixed canonical reference domain. Mixed-lifetime
+or foreign-instance nodes are outside this test prototype's API preconditions.
+
+No W3.3 or W4 work was started. The earlier W3.1 deferred outcome above is
+historical; W3 production remains incomplete until the reviewed integration.
+
+Prototype/laws/probe commit: `e8a75a83bca7f7c3ec0a4b6ce11051de2de4fa5e`.
+The following documentation commit records this checkpoint; neither changes
+production. Final commit identities are recorded by Git and PR #40.
