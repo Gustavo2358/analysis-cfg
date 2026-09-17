@@ -1,133 +1,120 @@
-# FD-W11 — resultado da qualificação N+C
+# FD-W11 — qualificação final N+C
 
-**BLOCKED em C06: autoridade exata para READ DATASET não fechada.**
-Os gates executáveis restantes passaram. Isso não fecha a DoD integral de W8/W11.
-W10 permanece TODO / NOT_AUTHORIZED; nenhum merge, auto-merge ou release.
-Evidência local completa: `artefatos-e2e/file-dependencies-20260916/w11/HANDOFF.md`.
+**QUALIFIED_LOCAL; STOP para revisão humana final.** W0–W9/W11 qualificados.
+[C06-HUMAN-20260917](c06-read-dataset.md) resolve o blocker anterior e autoriza
+somente READ DATASET como alias de READ FILE, preservando os aliases SET já
+provados. W10 TODO / NOT_AUTHORIZED. Nenhum merge/auto-merge/release; os work
+items ficam IN_PROGRESS pela política lean, pois os PRs não foram mergeados.
 
-## Pins e execução
+Evidência nova: `artefatos-e2e/file-dependencies-20260916/w11-c06/HANDOFF.md`.
+O diretório anterior `w11/`, incluindo QUALIFICATION.md/logs/manifests, permanece
+imutável como evidência dos gates REUSED e das tentativas históricas.
 
-[pins materiais](w11-pins.json), bundle `fd-w11/pipeline-3`:
+## Pins e frontier
+
+[pins materiais](w11-pins.json), bundle isolado `fd-w11-c06/pipeline`:
 
 | Camada | Commit exercitado |
 | --- | --- |
-| frontend | `aaecf8c1b1851c03dc13b8120e07308079f7e679` |
-| lower | `24ee0ef933f8f9c6a49ee610d12ac822e8e7d8b6` |
+| frontend | `17323f4718cbd957d7abe52e988b01ece6a9463f` |
+| lower | `5565e10c23a8b023a16ddb8556604dc331ef89a4` |
 | AIR | `5fe0224e5d2514286d6d23d486655334300383da` |
-| consumer | `1ae5dfee9727d40481339a9f359ed4d7f4f7c5e4` |
+| consumer | `e0e7559d90692446b8fb7ecc8135432ffd44a018` |
 | norma AIR | `fb153ae50f343022db45d20d627e1afac85de916` |
 | CardDemo | `59cc6c2fd7ebd7ef7925cad552a01a4b8b6e4d5e` |
 
-SP2.28/fileInventory1.6/compilation1.0; wire dependencies2.3.
-Java21.0.12, frontend release17. Checkouts limpos e345 arquivos de runtime
-hasheados. Cache privado, barreira curta antes do fan-out, até três processos
-pesados; FAST→Q sequenciais por repo. Outputs de cada tentativa separados.
-Frontend HEAD52ea26c acrescenta somente harness/docs: `git diff aaecf8c1 HEAD --
-src pom.xml` vazio. Consumer posterior ao pin recebe somente documentação.
-Esses deltas não invalidam o bundle, a qualification-local ou o corpus.
+SP2.28/fileInventory1.6/compilation1.0 e wire2.3 inalterados. Java21.0.12,
+frontend release17. Checkouts de runtime limpos;345 arquivos hasheados antes e
+depois dos runs, sem substituição por build de outra campanha.
 
-## Gates e propriedades
+Delta produtivo restrito a duas regras: reconhecimento canônico READ/DATASET no
+frontend e admissão tipada do mesmo alias no lower. Scanner, efeitos, controle,
+solver, AIR, codec e consumer inalterados. `frontier.json` conserva os dois diffs.
+CFG final acrescenta somente testes/oráculos/docs/pins ao pin exercitado; a
+identidade produtiva é verificada. Não reexecutar Q amplo por esses deltas.
 
-Todos os comandos finais abaixo retornaram exit0. Caminhos `fd-w11/...` são
-relativos a `.harness-results/`; cópias duráveis e comandos completos no E2E.
+## Gates novos
 
-| Gate / comando | Resultado e propriedade |
+Todos os resultados PASS finais abaixo têm exit0. Comandos completos, pins,
+logs e tentativas substituídas constam de `w11-c06/gates.json` e `execution/`.
+
+| Comando / gate | Propriedade e resultado |
 | --- | --- |
-| frontend `lean.py fast` / `qualification-local` | PASS352 /946 testes, zero falhas; um skip histórico somente em Q, mais normalizer/naming. FAST repetido após fix de harness, naming8 PASS |
-| lower mesmos entrypoints | PASS FAST core2340+adapters; Q244296 semânticos+39215 performance/arquitetura |
-| AIR mesmos entrypoints | PASS FAST187model/127codec/40harness; Q clean verify187/127 |
-| CFG mesmos entrypoints | PASS FAST504 zero skips; Q Maven, semântica, performance, integração/CLI; runner26/métricas5/reader18 |
-| `python3 -B .../final-barrier-4.py` | PASS B-SP control/scope/entry, B-AIR41 manuais, B-WIRE18; reader antigo rejeita wire novo e projeção CALL preservada; hashes/pins intactos |
-| E-SELECTED drivers `e2e_file_*`, `resume-selected-2.py` | PASS101 fontes distintas ×2;8scope+55native+38CICS, quatro produtos determinísticos por fonte |
-| `e2e_file_laws.py --runtime .../runtime-file-3.json` | PASS MR1–MR9 e SG1–SG5 core; CALL-X pertinentes; tracing real sem acesso ao arquivo de negócio e invariância a ambiente |
-| `e2e_file_scale.py --runtime .../runtime-file-3.json` | PASS21 witnesses:1/8/32 arquivos, usos, layouts, aliases, candidatos, unidades e SORT; sem truncamento dos fatos esperados |
-| `file_focal_mutants.py --runtime ... --maven-repo .../m2-3` | PASS baseline18;5KILLED: BEFORE/AFTER, owner, record-object, SORT input, DDNAME |
-| `carddemo_baseline.py --runtime .../runtime-file-3.json --pins .../w11-pins.json` | PASS execução completa73 inputs; estados parciais e recusas abaixo preservados |
-| `file_corpus_oracles.py --corpus .../corpus-4` | PASS49 usos nativos em4 programas + inventário/binding de2READ FILE; READ DATASET NOT_QUALIFIED |
-| verificação dos arquivos de evidência | PASS manifests de9180 arquivos prévios e5324 finais, descompressão e comparação de todos os hashes |
+| frontend `mvn -B -ntp -Dtest=CicsFileControlTest,CicsProgramControlTest -Dcics.file.fixtures.dir=<output>/sp test` | PASS22/zero skips: literal/computed, spelling/offsets, duplicação/operand ausente, comando não autorizado, Program Control |
+| frontend `python3 -B scripts/harness/lean.py fast` | PASS355/zero skips |
+| lower mesmo FAST fixo | PASS core2340+adapters;35CICS, negativos DSNAME/READNEXT e arquitetura |
+| `carddemo_setup.py --work .../pipeline --maven-repo .../m2 --pins .../pins.json` | PASS bundle imutável/pins/345 hashes; barreira3 fontes×2, quatro produtos determinísticos |
+| `e2e_cics_files.py --runtime .../runtime.json --work .../selected --producers .../pipeline/producers/producers.json` | PASS41 fontes×2, FILE/CALL/Program Control; source-only e ausência de declarações físicas |
+| `compare-alias-pairs.py` | PASS literal/computed: mesmas projeções semânticas FILE e vetores CALL entre FILE e DATASET, normalizando somente o nome da fixture |
+| `run-affected-corpus.py` | PASS21 fontes,19 afetadas+2 controles, CLIs reais e reader independente; source/ZIP intactos |
+| `summarize-delta.py` | PASS35 sites recuperados,41 CALL inalterados;3COACTVWC bindings/provenance; controles com SP/AIR/CFG/dependency byte a byte iguais |
+| `python3 -B scripts/harness/lean.py docs` | PASS política/pins/links/14 testes lean; revisão final no handoff |
 
-Coortes têm seis fixtures memory em comum, contadas uma vez nas101. Pares completos
-anteriores à interrupção foram REUSED somente após oracle e igualdade A/B dos
-quatro produtos; arquivos interrompidos/vazios não foram aceitos. Logs das
-execuções finais: barrier-4, selected-native-4, selected-cics-4b, control-4,
-laws-4, scale-4, mutants-4, corpus-4, corpus-oracles-4.
+Frontend RED:12 testes/3 falhas semânticas anteriores à implementação. O log
+registra Maven BUILD FAILURE; exit1 é do wrapper que depois usou a variável zsh
+readonly `status`, não um exit Maven separado. Lower RED: admissão bilateral
+rejeitou o alias (FAST exit1). Oracle manual COACTVWC contra corpus anterior:
+exit1 por ausência dos três fatos. Todas as evidências RED permanecem brutas.
 
-Qualification-local é REUSED após deltas exclusivos de harness/docs por identidade
-produtiva. Reader do relatório final é REUSED dos71 artefatos admitidos pelo runner,
-com SHA exato verificado contra measurements; não se afirma nova execução do
-reader ao sumarizar. O relatório separa novos resultados e não comparáveis.
+Tentativas FAIL preservadas: oracle computed inicialmente exigia modelo fechado
+apesar de CALL local aberto; corrigido pela lei W9 e comparado ao FILE canônico.
+Relatório inicial comparou startLine string do wire com inteiro SP; corrigido
+no avaliador, sem alterar produtos ou relaxar a exigência de provenance.
 
-## Corpus e CALL
+## Evidência REUSED
 
-73 entradas tentadas, sem editar source/copybooks/ZIP. Frontend71PARTIAL/2BLOCKED;
-lower71PARTIAL/2NOT_REACHED; CFG65PARTIAL/6BLOCKED/2NOT_REACHED;
-dependency71PARTIAL/2NOT_REACHED.15973 statements,85 declarações,133CALL sites,
-376FILE sites:354 nativos com nome conhecido e22 CICS computed sem valor provado.
-CALL:81 conhecidos com remainder,52unknown. As três formas READ DATASET não
-entram na contagem FILE. Contagem não é oracle nem precisão/recall.
+Frontier restrita, pins exatos e dois controles byte idênticos justificam reuso,
+conforme verification.md; não confundir REUSED com nova execução.
 
-Comparação com tentativa2:70 programas/119 vetores CALL comparáveis inalterados;
-com baseline histórico:27 programas/36 vetores inalterados. Zero mudança, adição
-ou remoção nos conjuntos comparáveis.3 e46 programas respectivamente não
-comparáveis são explícitos. A correção CBSTM03A recuperou14CALL/99FILE; não se
-confunde recuperação de entrega com regressão ou prova de precisão global.
+| Evidência anterior | Reuso e limite |
+| --- | --- |
+| frontend qualification-local946 (um skip histórico somente Q); lower Q244296 semânticos/39215 performance | Regras de parsing geral, lowering/efeitos/arquitetura inalteradas; alias novo coberto focalmente e pelo FAST fixo |
+| AIR FAST187/127/40 e Q187/127; CFG FAST504 e Q completo | Código produtivo idêntico; novos bytes verificados por CLI/reader nas barreiras e corpus |
+| B-SP/B-AIR41/B-WIRE18 | Contratos/versionamento inalterados; admissão READ alias refeita bilateralmente; rejeição wire antigo e projeção CALL preservadas |
+|101 fontes×2; MR1–MR9/SG core;21 witnesses escala;5 mutantes KILLED | Native/storage/owner/BEFORE/SORT/naming/semântica de lookup inalterados; coorte CICS refeita41×2 e pares aliases acrescentados |
+| Corpus original73 / oráculos49 usos nativos e2READ FILE |52 entradas sem impacto REUSED;21 reexecutadas, sem alegar nova execução completa73 |
+| Arquivos prévios9180 e finais5324 | Manifests/hash/descompressão do checkpoint anterior preservados; novo archive separado |
 
-Duas recusas frontend: TAB em fonte fixed de COTRTLIC e normalização do CBSTM03A
-no ZIP. Seis recusas CFG estrito: logical-copy sem precondição física descarregada
-em CBTRN01C/02C/03C e cópias ZIP. O consumer dependency usa a porta partial-analysis
-já existente; o runner conserva CFG BLOCKED ao executar esse ramo independente.
+NOT_RUN: novo full local/qualification-local amplo, full remoto, W10/D, gates
+pós-merge e lookup externo. BLOCKED da campanha: nenhum; recusas de inputs e
+formas não qualificadas continuam explícitas abaixo. FAIL históricos têm run
+substituto identificado, sem serem apagados ou transformados em PASS.
 
-| Etapa | mediana / p95 / máximo (ms) | RSS máximo (KiB) |
+## Corpus, CALL e limites
+
+Inventário independente:35 READ DATASET em19 entradas físicas, incluindo cópias
+ZIP. Reexecução dessas19+2 controles recuperou exatamente35 dependências FILE.
+41 vetores CALL comparáveis permaneceram iguais (candidates/supports/remainders/
+provenance); nenhuma adição/remoção/mudança. Os três sites de COACTVWC nas linhas
+727/776/826 preservam os bindings LIT-CARDXREFNAME-ACCT-PATH, LIT-ACCTFILENAME e
+LIT-CUSTFILENAME, com namespace `cics.file`, ação read e provenance original.
+Os três nomes continuam computed com remainder unknown: inicializador declarado
+não prova o valor no ponto do comando. Sem DSNAME/JCL/physical resource/lookup.
+
+Observação combinada21 novos+52 REUSED:73 inputs,15973 statements,85 declarações,
+133CALL/411FILE. Frontend71PARTIAL/2BLOCKED; lower71PARTIAL/2NOT_REACHED;
+CFG65PARTIAL/6BLOCKED/2NOT_REACHED; dependency71PARTIAL/2NOT_REACHED.
+Duas recusas frontend: fonte fixed com TAB COTRTLIC e CBSTM03A do ZIP. Seis
+recusas CFG: logical-copy sem precondição física em CBTRN01C/02C/03C e cópias ZIP.
+O ramo dependency independente conserva esses estados; não mascara CFG BLOCKED.
+
+52 ocorrências DATASET em outros comandos continuam **NOT_QUALIFIED**:
+REWRITE4, STARTBR12, READPREV12, ENDBR8, WRITE6, READNEXT8, DELETE2. Registradas
+separadamente por instrução humana; sem generalizar o alias, mover para D ou
+alegar suporte completo a todas as formas do corpus. A qualificação de W8/W11
+cobre o catálogo selecionado e a decisão C06 explícita. Counts não são oracle
+nem precisão/recall; ausência de DSNAME/JCL não reduz confiança do produto.
+
+| Etapa /21 fontes novas | mediana / p95 / máximo (ms) | RSS máximo (KiB) |
 | --- | --- | --- |
-| frontend |2125.7 /4872.4 /7143.2|439420|
-| lower |1817.1 /3277.7 /5144.2|682396|
-| CFG |716.0 /1370.1 /2471.2|899616|
-| dependency |1020.0 /2022.9 /3225.3|1183424|
+| frontend |2318.2 /5624.7 /5874.4|410936|
+| lower |1768.6 /4024.0 /4072.0|644152|
+| CFG |765.4 /1970.8 /2123.3|988288|
+| dependency |1015.9 /2872.7 /2971.2|1110532|
 
-Medidas incluem startup JVM/carga compartilhada; não são SLA. O reader Python
-independente tem custo quadrático em origins e demorou minutos nos maiores
-produtos; o tempo total do runner inclui essa validação, stageMs mede somente CLI.
-Escala21: máximos por etapa5825.8/1620.4/767.6/1020.9ms e
-325340/216444/143600/153568KiB. Não há extrapolação assintótica nem teto semântico.
+Medição inclui startup JVM/carga compartilhada; sem SLA ou extrapolação. Reader
+Python independente tem custo quadrático em origins e leva minutos nos produtos
+maiores; stageMs mede CLI, tempo total do runner inclui validação.
 
-## Correções e tentativas preservadas
-
-- Lower ee876281: negociação LOGICAL_SOURCE omitida em SP2.21–2.28 causava53
-  recusas. Oracle independente das oito versões + negativo2.18 RED→GREEN.
-- Frontend aaecf8c1/lower24ee0ef9: WRITE ao fim de parágrafo confundia ordinary
-  com intrinsic. RED bilateral e negativo de aresta KNOWN cruzando parágrafo;
-  relação AST canônica e validação ajustadas, sem mudar o contrato PERFORM.
-- Frontend52ea26c: quatro falhas naming no CI reproduzidas sem ripgrep. Scan
-  Python remove dependência opcional e falso PASS de process substitution;
-  oito testes e FAST fixo verdes. Não se presume ambiente remoto sem prova.
-- Mutante SORT input inicialmente sobreviveu; oracle A6 fortalecido por papéis
-  independentes. Dependência JUnit ausente foi tentativa INVÁLIDA, não KILLED.
-- Erros mecânicos de cwd/classpath/barreira, rede Maven, ptrace e interrupção,
-  fixtures de escala com controle prévio não suportado e corpus1/2/3 permanecem
-  brutos. Escala final usa IF textual suportado, mantendo32 alternativas e
-  remainder de fonte; nenhum oracle foi relaxado para ocultar falha.
-
-FAIL históricos acima têm correção/execução substituta identificada. NOT_RUN:
-W10/D, full remoto, lookup externo e gates pós-merge. Nenhum deles é PASS.
-
-## Bloqueio material C06
-
-COACTVWC.cbl contém READ DATASET nas linhas727/776/826. O catálogo C06 inclui
-aliases conforme autoridade exata; não cabe promover nem excluir silenciosamente
-a forma observada. API CICS TS5.6 consultada documenta FILE; SPI5.6p672 fecha
-DATASET→FILE em SET. Não foi localizada autoridade5.6 que feche READ DATASET.
-Manuais históricos/CICS TX/6.x não foram usados como substitutos; tentativas de
-acesso exato adicionais retornaram403, registradas em authority-read-dataset.
-
-Fontes pinadas: API5.6 SHA256
-`3c3295d5b7f013a559b1cc742a7e810c0247bfc0bd3790b3545ab08327bc3c5b`;
-SPI5.6 `417fe5ed2dfb3c5c630919e3e9abbd1358ad3ed25f162f59b4b29a99c0021f4d`.
-URLs/seções da qualificação W8 em [perfis](profiles.md) e [W8](w8-implementation.md).
-Os três comandos permanecem OBSERVED/EMBEDDED_LANGUAGE, sem dependência FILE
-inventada. SET DATASET e demais casos comprovados conservam seus PASS.
-
-C06 e a aceitação integral W8/W11 ficam **BLOCKED**; demais regras mantêm sua
-qualificação. Desbloqueio: autoridade CICS TS5.6 para o alias READ (incluindo seus
-limites), ou decisão humana explícita sobre o requisito C06. Após isso executar
-oracle independente e apenas os gates materialmente invalidados. Não é pendência
-D nem falta de DSNAME/JCL. Sem essa decisão, não declarar o core integral concluído.
+D-AIR/D-WIRE/D-EFFECT/D-DYNAMIC core CLOSED; D-D-AUTH reservado W10.
+Cinco PRs persistentes OPEN/DRAFT/UNMERGED. STOP para revisão humana final.

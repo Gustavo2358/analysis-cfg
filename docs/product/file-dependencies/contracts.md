@@ -188,3 +188,9 @@ Literal conserva FILE_LITERAL; LOCAL/declarações e projeção CALL mantêm sha
 Reader2.1 congelado rejeita2.2; reader atual fecha todas as variantes, exige nomes,
 supports/origins/refs e conserva os ramos históricos. Nenhum writer legado novo.
 A4/T37 manual, codec/CLI/reader e sharing PASS; transporte CICS fonte fica W8.
+
+## C06 — decisão humana de compatibilidade (2026-09-17)
+
+[C06-HUMAN-20260917](c06-read-dataset.md) autoriza especificamente READ DATASET
+como READ FILE no perfil CICS TS5.6, preservando source spelling/provenance.
+Não generalizar a outros comandos nem interpretar DATASET como recurso físico.

@@ -5,14 +5,15 @@
   },
   "analysisRepositories": {
     "air-java": "5fe0224e5d2514286d6d23d486655334300383da",
-    "proleap-poc": "aaecf8c1b1851c03dc13b8120e07308079f7e679",
-    "cobol-lower": "24ee0ef933f8f9c6a49ee610d12ac822e8e7d8b6",
-    "analysis-cfg": "1ae5dfee9727d40481339a9f359ed4d7f4f7c5e4"
+    "proleap-poc": "17323f4718cbd957d7abe52e988b01ece6a9463f",
+    "cobol-lower": "5565e10c23a8b023a16ddb8556604dc331ef89a4",
+    "analysis-cfg": "e0e7559d90692446b8fb7ecc8135432ffd44a018"
   },
   "semanticProductVersion": "2.28.0",
   "decisionPolicy": "HUMAN",
   "rankingAuthority": "ADVISORY_ONLY",
   "campaign": "FD-W11 N+C",
   "compilationProductVersion": "1.0.0",
-  "normativeAir": "fb153ae50f343022db45d20d627e1afac85de916"
+  "normativeAir": "fb153ae50f343022db45d20d627e1afac85de916",
+  "checkpoint": "C06-HUMAN-20260917"
 }

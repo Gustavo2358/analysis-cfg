@@ -276,7 +276,7 @@
     ],
     "semantic_product_version": "2.28.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "aaecf8c1b1851c03dc13b8120e07308079f7e679",
+    "commit": "17323f4718cbd957d7abe52e988b01ece6a9463f",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -304,7 +304,7 @@
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "FD-W9 typed compilation and canonical captures; producer focal/FAST/Q-SHARED PASS",
-    "commit": "24ee0ef933f8f9c6a49ee610d12ac822e8e7d8b6",
+    "commit": "5565e10c23a8b023a16ddb8556604dc331ef89a4",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",

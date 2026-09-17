@@ -1,8 +1,8 @@
 # FILE-DEPENDENCIES — entrada da campanha
 
-Estado: **H4 aprovado; execução core N+C autorizada; W0–W7/W9 QUALIFIED_LOCAL; W8/C06 e W11 BLOCKED.**
-W0–W9/W11 avançam pelos gates sem nova autorização. W10 TODO / NOT_AUTHORIZED.
-[Resultado W11 e bloqueio C06](w11-qualification.md). Demais gates finais PASS.
+Estado: **H4 aprovado; execução core N+C autorizada; W0–W9/W11 QUALIFIED_LOCAL.**
+STOP para revisão humana final. W10 TODO / NOT_AUTHORIZED.
+[Resultado W11](w11-qualification.md), incluindo [C06 humano](c06-read-dataset.md) e reuso explícito dos gates anteriores.
 PRs persistentes permanecem Draft e unmerged. STOP final após W11.
 
 Leia somente [brief](brief.md), [estado](state.md) e a wave atual no

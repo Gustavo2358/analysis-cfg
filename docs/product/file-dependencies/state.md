@@ -1,6 +1,6 @@
 # Estado / handoff curto — CORE N+C
 
-**W11 BLOCKED por C06 READ DATASET; demais gates finais PASS.**
+**W0–W9 e W11 QUALIFIED_LOCAL. STOP para revisão humana final.**
 H4 aprovado; execução core autorizada. W10 TODO / NOT_AUTHORIZED.
 Nenhum merge/auto-merge/release. PRs Draft/unmerged; DONE lean não reivindicado.
 
@@ -14,32 +14,35 @@ Nenhum merge/auto-merge/release. PRs Draft/unmerged; DONE lean não reivindicado
 | W5 | QUALIFIED_LOCAL — SORT/MERGE/SD local |
 | W6 | QUALIFIED_LOCAL — auxiliares/checkpoint/SAME |
 | W7 | QUALIFIED_LOCAL — computed CICS FILE no motor geral |
-| W8 | BLOCKED somente na aceitação C06 READ DATASET; demais casos qualificados |
+| W8 | QUALIFIED_LOCAL — C-FC literal/computed e C06 humano |
 | W9 | QUALIFIED_LOCAL — unidades/owners/capturas/COPY |
-| W11 | BLOCKED C06; gates executáveis restantes PASS |
+| W11 | QUALIFIED_LOCAL — integração/corpus/CALL e reuso justificado |
 | W10 | TODO / NOT_AUTHORIZED |
 
-## Checkpoint final disponível
+## Checkpoint final
 
 [Resultado W11](w11-qualification.md), [pins materiais](w11-pins.json),
-[matriz](coverage.md). Handoff/evidência bruta durável no repo local:
-`artefatos-e2e/file-dependencies-20260916/w11/HANDOFF.md`.
+[matriz](coverage.md), [decisão C06](c06-read-dataset.md). Handoff/evidência durável:
+`artefatos-e2e/file-dependencies-20260916/w11-c06/HANDOFF.md`.
+O diretório anterior `w11/` permanece histórico e imutável.
 
-Bundle final: frontend aaecf8c1, lower24ee0ef9, AIR5fe0224e, CFG1ae5dfee,
-IRfb153ae; SHAs completos nos pins. Frontend52ea26c acrescenta harness/docs,
-sem delta src/pom. SP2.28/compilation1.0 e dependency wire2.3.
+Bundle C06: frontend17323f4, lower5565e10, AIR5fe0224e, CFGe0e7559,
+IRfb153ae; SHAs completos nos pins. Commit final CFG contém somente
+harness/testes/docs/pins, sem alteração Java produtiva. SP2.28/compilation1.0,
+wire2.3 inalterados. READ DATASET canônico FILE conserva spelling/provenance.
 
-FAST/qualification-local dos quatro repos, barreira B-SP/B-AIR/B-WIRE,
-101 fontes×2 determinísticas, MR1–MR9/SG core,21 witnesses de escala e5 mutantes
-mortos PASS. Corpus73 inputs →71 produtos dependency PARTIAL,133CALL/376FILE;
-vetores CALL comparáveis sem regressão. Duas recusas frontend e seis CFG estrito
-preservadas. Nenhuma precisão/recall ou SLA afirmados.
+Novos gates PASS: F-CICS22, FAST frontend355/lower2340+adapters35, barreiras,
+41 fixtures CICS×2 e pares FILE/DATASET literal/computed. Corpus21 reexecutados
+(19 afetados+2 controles),52 REUSED:35 sites recuperados, incluindo os três de
+COACTVWC;41 vetores CALL comparados inalterados. Total combinado133CALL/411FILE.
+COACTVWC preserva nomes computados unknown, sem inferir inicializadores como
+valor no comando.52 aliases de outros comandos continuam NOT_QUALIFIED.
 
-C06: três READ DATASET em COACTVWC permanecem OBSERVED/EMBEDDED_LANGUAGE;
-a autoridade5.6 encontrada prova DATASET somente para SET. Qualificação integral
-W8 reaberta por esse achado W11; não mover para D, inferir o alias ou reduzir o
-requisito. Necessária autoridade exata ou decisão humana explícita sobre C06.
-Todo trabalho independente foi concluído. STOP por bloqueio material, sem W10.
+Q anterior dos quatro repos, FAST AIR/CFG,101 fixtures×2, MR1–MR9/SG core,
+21 witnesses de escala,5 mutantes e wire/reader são REUSED por delta produtivo
+restrito aos aliases frontend/admission. Duas recusas frontend e seis CFG
+estrito do corpus original permanecem;71 produtos dependency PARTIAL.
+Nenhuma precisão/recall, completude de corpus ou SLA afirmados.
 
 ## Retomada
 
@@ -57,7 +60,7 @@ Branch persistente em todos: `feat/file-dependencies`; PRs OPEN/DRAFT/UNMERGED:
 | analysis-cfg | [#38](https://github.com/Gustavo2358/analysis-cfg/pull/38) |
 | analysis-ir | [#7](https://github.com/Gustavo2358/analysis-ir/pull/7) |
 
-Retomada após resolver C06: AGENTS → página local → [brief](brief.md) →
+Para revisão ou futura retomada autorizada: AGENTS → página local → [brief](brief.md) →
 [FD-W11](../../work/active/FD-W11.yaml) → perfil/casos/gates necessários.
 E2E local/sem remote; não executar runner CP3 nem reler discovery bruto.
 
@@ -67,3 +70,6 @@ D-AIR CLOSED: prova de perda do modelo, extensão neutra mínima e A1–A4/A6 PA
 D-WIRE CLOSED: writer2.3/file-values-context@1, reader fechado, rejeição antiga e projeção CALL PASS.
 D-EFFECT CLOSED (memória W3 e controle W4, aproximações explícitas); D-DYNAMIC/core CLOSED W7; consulta BEFORE e política CICS FILE própria. D-D-AUTH/captura D reservadas W10.
 IBM N-LR: SC27-8713-03, atualização 2026-04-28; hash/seções em [perfis](profiles.md).
+
+C06 CLOSED por C06-HUMAN-20260917 e RED→GREEN bilateral/E2E. W10 permanece
+TODO / NOT_AUTHORIZED. STOP; nenhuma próxima wave autorizada nesta sessão.

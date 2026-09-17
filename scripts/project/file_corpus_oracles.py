@@ -19,6 +19,28 @@ NATIVE={
                 'TCATBALF':['open','read','write','rewrite','close']},{'CEE3ABD'}),
 }
 
+def legacy_read_dataset(directory):
+    """C06-HUMAN-20260917; expected bindings transcribed from unmodified source."""
+    d=read(directory/'dependencies.json');f=d['fileDependencies'];resolve=origin_resolver(d)
+    sp=json.loads((directory/'sp/cobol-semantic-compilation.json').read_text())['units'][0]['product']
+    expected={727:'LIT-CARDXREFNAME-ACCT-PATH',776:'LIT-ACCTFILENAME',826:'LIT-CUSTFILENAME'}
+    facts=[s for s in sp['statements'] if s['variant']=='CICS_FILE_CONTROL' and s['header']['provenance']['original']['startLine'] in expected]
+    require(len(facts)==3,'three READ DATASET facts from independent source locations')
+    require({s['header']['provenance']['original']['startLine']:s['target']['reference']['binding']['candidates'][0]['canonicalName'] for s in facts}==expected,'legacy READ canonical host binding')
+    for fact in facts:
+        option=next(o for o in fact['options'] if o['canonicalName']=='FILE')
+        require(fact['command']=='READ' and option['name']=='DATASET' and option['role']=='READ','legacy spelling and canonical READ FILE')
+        require('DATASET' in fact['rawText'][option['start']:option['end']],'raw spelling/offsets retained')
+    sites=[s for s in f['sites'] if any(int(o['location']['startLine']) in expected for o in resolve(s['origin']))]
+    require(len(sites)==3,'three recovered FILE dependency sites')
+    require(all(s['namespace']=='cics.file' and s['action']=='read' and s['targetKind']=='COMPUTED' for s in sites),'source CICS resource, not DSNAME')
+    require(all(s['candidates'] or s['unknownRemainder'] and s['analysisReasons'] for s in sites),'unproved command-time values explicit')
+    require(not f['declarations'],'CICS does not invent physical dataset declarations')
+    return {'source':'app/cbl/COACTVWC.cbl','result':'PASS_INVENTORY_BINDING_AND_PROVENANCE','lines':sorted(expected),'fileOccurrences':len(sites),
+            'knownCandidates':[c['referenceName'] for s in sites for c in s['candidates']],
+            'unknownRemainders':[s['unknownRemainder'] for s in sites],'decision':'C06-HUMAN-20260917',
+            'limit':'READ DATASET denotes CICS FILE; declared initial values alone are not command-time proof; no physical dataset inference.'}
+
 def run(root,out):
     results=[]
     for filename,(expected,calls) in NATIVE.items():
@@ -42,10 +64,7 @@ def run(root,out):
         require(s['candidates'] or s['unknownRemainder'] and s['analysisReasons'],'unproved command-time value remains explicit')
     results.append({'source':'app/cbl/'+filename,'result':'PASS_INVENTORY_AND_BINDING','fileOccurrences':2,'knownCandidates':[c['referenceName'] for s in f['sites'] for c in s['candidates']],
                     'limit':'Initial PIC X(8) values CARDDAT/CARDAIX do not prove a value at the command across partial source/control/storage; report actual unknown remainder.'})
-    # This syntax is an explicit unresolved authority/coverage observation, not a passing FILE case.
-    results.append({'source':'app/cbl/COACTVWC.cbl','result':'NOT_QUALIFIED','lines':[727,776,826],
-                    'form':'READ DATASET','declaredValues':['CXACAIX','ACCTDAT','CUSTDAT'],
-                    'limit':'Selected C-FC authority confirms DATASET alias for SET only; these READs remain OBSERVED/opaque, never claimed recognized or moved to D.'})
+    results.append(legacy_read_dataset(root/'programs/app/cbl/COACTVWC.cbl'))
     with out.open('x') as f:json.dump(results,f,indent=2);f.write('\n')
     for r in results:print(r,flush=True)
 if __name__=='__main__':

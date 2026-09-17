@@ -9,7 +9,7 @@ FIXTURES=ROOT/'analysis-adapters/src/test/resources/file-dependencies/w8'
 BASIC=('read','write','rewrite','delete','startbr','readnext','readprev','resetbr','endbr','unlock','inquire','set')
 MIXED={'read-call':'read','write-call':'write','length-open':'read','response':'read','set-pointer':'read','browse-id':'startbr','system-two':'endbr','inquire-next':'inquire','inquire-start':'inquire','inquire-end':'inquire','set-alias':'set','handler-open':'read','sysid-short':'endbr','file-slice':'endbr'}
 COMPUTED={'computed-alias':(['ACCOUNTS'],False,['R001']), 'computed-cycle':(['ACCOUNTS','CUSTOMER'],False,['R001']), 'computed-exact':(['ACCOUNTS'],False,['R001']), 'computed-closed':(['ACCOUNTS','CUSTOMER'],False,['R001']), 'computed-partial':(['ACCOUNTS'],True,['R001']), 'computed-unknown':([],True,['R001']), 'computed-systems':(['ACCOUNTS'],False,['R001','R002']), 'computed-timing':([],False,[])}
-EXPECTED={name:None for name in (*BASIC,*MIXED,*COMPUTED,'host-and-output','resp-call','not-files','literal-systems')}
+EXPECTED={name:None for name in (*BASIC,*MIXED,*COMPUTED,'host-and-output','resp-call','not-files','literal-systems','read-dataset-literal','read-dataset-computed','read-file-computed')}
 def names(site):return sorted(c['referenceName'] for c in site['candidates'])
 def operation(site,air):return next(s['terminator'] for u in air['publication']['units'] for s in u['sequences'] if s['terminator']['header']['id']==site['operation'])
 def oracle(name,sp,air,result,source):
@@ -17,13 +17,38 @@ def oracle(name,sp,air,result,source):
     f=result['fileDependencies'];sites=f['sites'];require(not f['declarations'],'CICS needs no SELECT/FD')
     expected_count=0 if name=='not-files' else 3 if name=='literal-systems' else 2 if name in ('computed-timing','host-and-output') else 1
     require(len(sites)==expected_count,'source FILE occurrence inventory '+name)
-    expected_calls=1 if name in BASIC or name in ('host-and-output','resp-call') else 2 if name in MIXED else 0
+    expected_calls=1 if name in BASIC or name in ('host-and-output','resp-call') else 2 if name in MIXED or (name.startswith('read-dataset-') or name=='read-file-computed') else 0
     require(len(result['sites'])==expected_calls,'CALL/LINK inventory '+name)
     if name=='not-files':return
     for s in sites:
         require(s['namespace']=='cics.file' and not s['bindings'],'C-FC source namespace independent of native declarations')
         require(s['context'] is not None,'source system selection context')
         for c in s['candidates']:source_spans(result,c['supports'][0],source)
+    if name.startswith('read-dataset-') or name=='read-file-computed':
+        site=sites[0];fact=next(s for s in sp['statements'] if s['variant']=='CICS_FILE_CONTROL')
+        option=next(o for o in fact['options'] if o['canonicalName']=='FILE')
+        spelling='FILE' if name=='read-file-computed' else 'DATASET'
+        require(option['name']==spelling and option['role']=='READ','original spelling/canonical direction')
+        require(fact['rawText'][option['start']:option['end']].startswith(spelling+'('),'exact source spelling offsets')
+        require(site['action']=='read' and names(site)==['ACCOUNTS'],'independent READ DATASET target oracle')
+        require(site['targetKind']==('LITERAL' if name.endswith('literal') else 'COMPUTED'),'same literal/computed FILE contract')
+        if name.endswith('literal'):require(not site['unknownRemainder'],'literal source name does not need solver')
+        else:
+            require(site['valuePoint']['position']=='BEFORE','computed FILE sampled at command')
+            # This witness contains local open CALLs: W9's independent control oracle
+            # requires model remainder even when the MOVE candidate is retained.
+            require('FILE_MODEL_VALUE_REMAINDER' in site['analysisReasons'] and 'FILE_SOURCE_VALUE_REMAINDER' in site['analysisReasons'],'local open CALL and partial source remain explicit')
+        require(result['sites'][0]['modelValueRemainder'],'READ invalidates old buffer singleton')
+        require('KEEPNAME' in names(result['sites'][1]),'disjoint CALL evidence survives READ')
+        require(not f['declarations'] and all(x['namespace']=='cics.file' for x in f['sites']),'no physical or native declaration inferred')
+        forbidden={'bindingMechanism','physicalResource','physicalResolution','DSNAME','dsname'}
+        def guard(value):
+            if isinstance(value,dict):
+                require(not(set(value)&forbidden),'no external resolution field')
+                for v in value.values():guard(v)
+            elif isinstance(value,list):
+                for v in value:guard(v)
+        guard(result)
     if name in BASIC:
         require(sites[0]['action']==name and names(sites[0])==['ACCOUNTS'] and not sites[0]['unknownRemainder'],'literal C-FC '+name)
         require(names(result['sites'][0])==['AFTER'],'CALL remains independent')

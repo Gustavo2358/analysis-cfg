@@ -95,3 +95,9 @@ W6 discrimina cláusulas documentais/efetivas; W7 consulta de FILE computado CIC
 W8 operandos SPI/conditions 5.6; W10 DYNAMIC/captura e assinaturas 3.2.
 São pré-condições locais da wave, com
 parada se não houver prova, e não dependência de releitura do discovery.
+
+## C06 — decisão humana de compatibilidade (2026-09-17)
+
+[C06-HUMAN-20260917](c06-read-dataset.md) autoriza especificamente READ DATASET
+como READ FILE no perfil CICS TS5.6, preservando source spelling/provenance.
+Não generalizar a outros comandos nem interpretar DATASET como recurso físico.

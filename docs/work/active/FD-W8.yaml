@@ -1,6 +1,6 @@
 id: FD-W8
 title: CICS File Control, browse e administração
-status: BLOCKED
+status: IN_PROGRESS
 scope:
 - file-dependencies
 - proleap-poc
@@ -77,9 +77,8 @@ conditional_dependencies:
   applies_to: Casos FILE computados e fechamento completo de W8; não condiciona subset literal/static
 
 qualification:
-  status: BLOCKED
-  gates: F-CICS/L-INPUT/B-SP33/B-AIR/C-DEP35/C-VALUES17/reader18/FAST502/Q-SHARED547 e E-SELECTED38CICS+33native x2 PASS
-  limits: Ver w8-implementation.md; cobertura fonte parcial, outcomes/width e correlação FILE-SYSID não provados permanecem explícitos.
-  next: Resolver autoridade C06 READ DATASET; demais gates W8 preservados.
-
-blocker: C06 READ DATASET observado em COACTVWC; autoridade CICS TS5.6 não fechada. Não inferir alias nem reduzir requisito. Ver w11-qualification.md.
+  status: QUALIFIED_LOCAL
+  gates: C06 F-CICS22/FAST355, lower FAST2340+adapters35, B-SP/B-AIR/B-WIRE,41CICS x2 e21corpus PASS; demais gates W8/W11 REUSED por frontier documentada.
+  limits: Ver c06-read-dataset.md e w11-qualification.md;52 aliases de outros comandos NOT_QUALIFIED, valores/outcomes parciais explícitos.
+  next: STOP para revisão humana final; DONE lean somente após merge autorizado.
+resumption: C06-HUMAN-20260917 implementado e qualificado; READ DATASET equivale a READ FILE com spelling/provenance conservados.
