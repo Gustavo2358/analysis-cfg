@@ -432,7 +432,9 @@
       "unknownTailAndHugeExtentRemainSparseAndZeroIsIdentity",
       "copySupportsAloneChangeEqualityAndConvergeAsStaticSets",
       "capturedSourceGapSplitsOnlyItsRangeAndSurvivesUnknownIndependently",
-      "captureOffsetsFollowCropsAndRetainEarlierCopyContributions"
+      "captureOffsetsFollowCropsAndRetainEarlierCopyContributions",
+      "cachedHashPreservesOldStructuralValueAndImmutableSnapshots",
+      "collidingImageHashesKeepDistinctLabelsAndInternedNodes"
     ],
     "io.github.gustavo2358.analysis.values.RegionalValuesTest": [
       "missingStateIsUnknownAndUnreachableIsSeparate",

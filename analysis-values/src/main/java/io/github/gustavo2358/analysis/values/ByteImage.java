@@ -63,6 +63,7 @@ final class ByteImage {
     }
     private final Optional<BigInteger> extent;
     private final List<Part> parts;
+    private final int hash;
     private ByteImage(Optional<BigInteger> extent,List<Part> parts) {
         this.extent=Objects.requireNonNull(extent);this.parts=normalize(parts);
         extent.ifPresent(e->{if(e.signum()<0)throw new IllegalArgumentException("negative extent");});
@@ -77,6 +78,8 @@ final class ByteImage {
             } else if(part.reasons().isEmpty())throw new IllegalArgumentException("unknown fragment needs a reason");
         }
         if(!cursor.equals(extent))throw new IllegalArgumentException("image extent mismatch");
+        // Every reachable payload/part collection is immutable; retain the exact structural hash.
+        hash=Objects.hash(this.extent,this.parts);
     }
     Optional<BigInteger> extent(){return extent;}
     List<Part> parts(){return parts;}
@@ -205,5 +208,5 @@ final class ByteImage {
         return List.copyOf(result);
     }
     @Override public boolean equals(Object other){return this==other||other instanceof ByteImage image&&extent.equals(image.extent)&&parts.equals(image.parts);}
-    @Override public int hashCode(){return Objects.hash(extent,parts);}
+    @Override public int hashCode(){return hash;}
 }

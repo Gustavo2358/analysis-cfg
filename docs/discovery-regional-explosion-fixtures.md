@@ -1,6 +1,12 @@
+# Regional explosion campaign
+
+Current checkpoint: W1/W2 COMPLETE; W3/W4 PENDING. PR #40 remains Draft;
+merge only after W4 and final human review. The W1 sections below are historical
+reproduction evidence; production optimizations are documented under W2.
+
 # W1 — Regional explosion synthetic fixtures
 
-DISCOVERY / REPRODUCTION — NO PRODUCTION FIX.
+W1: DISCOVERY / REPRODUCTION — NO PRODUCTION FIX.
 
 ## Checkpoint 0 — hygiene and initial hypotheses
 
@@ -402,3 +408,176 @@ W2.1 validation (Java 21): focused W1/factorized plus parent smoke PASS; whole
 analysis-values and parents PASS (190 + 79 + 108 tests); full FAST PASS with
 551 required methods, zero skips, including wire/consumer and architectural
 checks. No compiled architecture inventory was changed or regenerated.
+
+## W2.2 — cache the unchanged immutable ByteImage hash
+
+**FACT:** `ByteImage` is immutable: extent is Optional/BigInteger, normalized
+parts are immutable records in an immutable list, Part collections are copied,
+and `Values.BytesValue` defensively copies its octets. Every transformation
+constructs a new image or returns an equal existing image. The constructor now
+computes the **same** `Objects.hash(extent, parts)` once into a final int;
+`hashCode()` returns that int. `equals` is unchanged. There is no sentinel hash,
+lazy race, global cache or substitution of equality by hashes.
+
+Tests preserve the pre-W2 structural hash across image transformations and
+attempted input mutation. A deliberately colliding pair (reasons `Aa` and `BB`)
+proves unequal images still produce distinct interned labels/nodes, union keeps
+both and equal reconstructed labels remain canonical. W1 still has ten
+producer-distinct labels and one shape; no uniqueness assertion was reintroduced.
+
+| Work per selected solve | Baseline | W2.1 | W2.2 |
+| --- | --- | --- | --- |
+| ByteImage hashCode calls | 255,792 | 235,867 | 235,867 |
+| Structural ByteImage hash computations | 255,792 | 235,867 | 1,616 |
+| Full size traversal edge visits | 19,925 | 0 | 0 |
+| Interned nodes / edges | 1,566 / 20,691 | same | same |
+| Targets / unproven | 800 / 750 | same | same |
+| State alternatives / nodes | 766 / 16 | same | same |
+
+The cache removes over 99% of structural hash computations in this scenario.
+It adds one int per ByteImage and computes hashes eagerly, including images
+that might never be hashed; this is a measured tradeoff, not a universal gain
+claim. JFR for 100 solves: wall 2.405 -> 2.182 -> 1.458 s; thread CPU
+2.352 -> 2.135 -> 1.422 s (baseline -> W2.1 -> W2.2). These are individual
+diagnostic recordings, not CI thresholds. Exclusive hashing samples drop
+239/500 -> 235/507 -> 37/238; size/track samples 10 -> 0 -> 1. The final
+profile is dominated by interning/map construction and equality checks
+(135/238 further interning samples), not by recomputing ByteImage structure.
+Complete `facts.txt` and solve metrics remain byte-identical to baseline.
+
+## Union / interning audit and rejected changes
+
+**FACT:** before and after both changes the selected solve makes 40,750 union
+calls, of which 750 are nontrivial; all 750 ordered identity pairs are distinct.
+Trivial null/same-node cases already return before memoization. A persistent
+union cache is **not implemented**: measured cross-call nontrivial reuse is zero,
+so it would add a lookup and pair retention without a demonstrated hit.
+An unordered pair could exploit commutativity in another workload; it is not
+justified by this one. Node identity is canonical only within one interner,
+so any such cache would have to remain analysis-local. Loop workloads might
+behave differently; no corporate conclusion follows from this probe.
+
+**FACT:** `Key(level, edges)` still hashes its map during lookup/insertion.
+`node()` still creates a live HashMap and immutable key map before knowing if a
+node is already interned (2,366 calls/Keys in the selected solve). The Node then
+receives an already-immutable map; on this JDK its `Map.copyOf` need not allocate
+another map. Nodes remain immutable and identity-canonical within each interner.
+A cached Key hash or alternate interning representation remains a possible
+accidental-cost improvement, but was **not implemented** in this wave: after
+two isolated gains, the remaining profile is mostly map construction, probes
+and equality over retained edges. This evidence does not prove all remaining
+accidental work has been eliminated. No speculative third cache is added.
+
+Deferred metrics retaining every historical state were rejected: exact maxima
+must include transient states and retaining them would create extra memory
+pressure. Summing arbitrary DAG child sizes was rejected because shared suffixes
+would be double-counted. Provenance factoring, disjointness inference, precision
+changes and limits are outside W2 and were not attempted.
+
+## Repeated runtime comparison and reproducibility
+
+**STRONG EVIDENCE:** three alternating, uninstrumented fresh-JVM trials,
+16 regions/50 writes, ten warmups/100 solves, no concurrent builds:
+
+| Trial | Baseline wall (s) | Final wall (s) |
+| --- | --- | --- |
+| 1 | 2.266 | 1.352 |
+| 2 | 2.353 | 1.441 |
+| 3 | 2.424 | 1.366 |
+| Median | 2.353 | 1.366 |
+
+Median wall decreased **42.0%** (~1.72× throughput for this workload). Median
+thread CPU decreased 2.322 -> 1.341 s. This is a diagnostic microbenchmark on
+this host, not a CI clock contract or corporate-speedup prediction.
+A separate 32-region/100-write check (three warmups/five solves) changed
+1.029 -> 0.668 s; all 3,200 targets, 3,100 unproven targets, 3,132 live edges,
+6,332 interned nodes and 162,882 interned edges remained identical. Both scales
+produce byte-identical complete facts and solve metrics before/after.
+Peak RSS was not measured; JFR sampled allocation weights must not be interpreted
+as RSS or exact allocated bytes. Per-image cached ints and per-root summaries
+are added memory costs; a retained-heap analysis of large workloads remains open.
+
+Reproduce from the campaign checkout with Java 21 and its unchanged pinned AIR:
+
+```sh
+export JAVA_HOME=/home/gustavo/.sdkman/candidates/java/21.0.12+1.1-tem
+export PATH="$JAVA_HOME/bin:$PATH"
+# Existing pin/bootstrap wrapper; installs into the ignored local build cache.
+python3 -B -c 'import sys; from pathlib import Path; sys.path.insert(0,"scripts/harness"); from lean_project import prepare; prepare(Path.cwd())'
+mvn -B -ntp -Dmaven.repo.local="$PWD/.harness-results/build/m2" \
+  -pl analysis-values -am \
+  -Dtest=RegionalExplosionFixturesTest,ByteImageTest,FactorizedAlternativesTest,RegionalCostMetricsTest,StorageIndexTest,CfgBuildCoordinatorTest test
+python3 -B scripts/project/regional_cost_probe.py --regions 16 --producers 50 \
+  --warmups 10 --repeats 100 --jfr --source-ref c23a446 \
+  --output .harness-results/w2/reproduce-before
+python3 -B scripts/project/regional_cost_probe.py --regions 16 --producers 50 \
+  --warmups 10 --repeats 100 --jfr --output .harness-results/w2/reproduce-after
+cmp .harness-results/w2/reproduce-before/facts.txt .harness-results/w2/reproduce-after/facts.txt
+cmp .harness-results/w2/reproduce-before/metrics.txt .harness-results/w2/reproduce-after/metrics.txt
+```
+
+For W2.1 alone use `--source-ref 8212584`; for deterministic work counters use
+`--instrument --warmups 2 --repeats 1` in a separate output directory. For plain
+runtime trials omit `--jfr` and `--instrument`. `--source-ref` compiles only the
+three changed production classes from Git into a temporary classpath overlay;
+it does not switch/reset the branch or change source files. All other production
+classes and pins are unchanged between these revisions. Overlay source copies
+are retained alongside output. The script fails if an instrumentation anchor is
+missing or ambiguous; it never silently omits a requested counter.
+
+## Semantic reconciliation and validation
+
+**FACT — newly executed**, Java 21 after each production change:
+
+| Check | W2.1 | W2.2 |
+| --- | --- | --- |
+| Focal W1 and directly affected tests + parent smoke | PASS | 38 PASS |
+| Entire analysis-values + analysis-kernel + cfg-kernel | 377 PASS | 379 PASS |
+| Complete repository FAST | 551 methods, PASS | 553 methods, PASS |
+| Architecture inventories | unchanged, PASS | unchanged, PASS |
+| Full typed observations / solve metrics vs baseline | identical | identical |
+
+FAST includes the existing regional wire/consumer regression checks; no wire
+format, contract, pin or serializer changed. Baseline tests ran before W2.1;
+W1's eight structural diagnostic rows match all six post-change focal/module/FAST
+runs. Hash cardinality remains diagnostic and was excluded from this comparison.
+Full producer/corpus/E2E campaign qualification is NOT RUN in W2: the changes
+are immutable-representation/observability optimizations with bounded regression
+coverage; W4 retains responsibility for E2E and real-case validation. Historical
+qualification is not relabeled as newly executed.
+
+| W1 invariant | Before W2 | After W2 |
+| --- | --- | --- |
+| A, 4 bases, no proof: targets / unproven | 4 / 3 | 4 / 3 |
+| A with proof: targets / unproven | 1 / 0 | 1 / 0 |
+| A maximum group size | 1 | 1 |
+| B labels / shapes | 10 / 1 | 10 / 1 |
+| Same producer re-interning / union reinsertion | idempotent | idempotent |
+| C no-disjoint, one producer | 7 | 7 |
+| C no-disjoint, five producers | 19 | 19 |
+| C disjoint, one/five producers | 1 / 1 | 1 / 1 |
+| C repeat same event five times | 7 | 7 |
+| C cross-base labels / shapes, five producers | 15 / 3 | 15 / 3 |
+| Relevant producers, supports and observation results | retained | exact match |
+| Entry reproduction | SKIPPED | SKIPPED |
+
+## W2 gate and remaining uncertainty
+
+1. **FACT — YES:** relevant incidental work was removed: repeated structural
+   hashing and complete metric traversals, with measured workload/profile gains.
+2. **FACT — YES:** W1 A/B/C and both larger-scale observation snapshots remain
+   semantically identical; equality/targets/strength/precision rules are unchanged.
+3. **FACT — NO:** no provenance was removed.
+4. **FACT — NO:** no target was removed.
+5. **FACT — NO:** no precision was reduced and no artificial limit was introduced.
+6. **STRONG EVIDENCE / HYPOTHESIS:** the next dominant sampled work is interning
+   maps and comparing retained labels. Those costs grow with the real alternative
+   inventory, but these experiments **do not prove the remainder is exclusively
+   structural**. Key hashing/map construction may contain further incidental
+   overhead. Provenance-distinct labels and cross-base fan-out remain the W3
+   structural questions. W2 stops after two measured, semantics-neutral changes;
+   it does not claim the corporate incident is solved or all optimization is done.
+
+**W2 COMPLETE — INCIDENTAL COST REDUCED.** Ready for human review of W2 and the
+next-wave plan, not for merge. W1/W2 remain in PR #40, Draft, with no auto-merge.
+W3/W4 are pending and are not started by this gate. No merge authorized.

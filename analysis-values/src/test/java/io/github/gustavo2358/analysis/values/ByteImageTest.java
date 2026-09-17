@@ -102,4 +102,32 @@ class ByteImageTest {
         assertEquals(fitted,fitted.withSourceGap(StorageRange.exact(start,BigInteger.ONE),9).write(StorageRange.exact(start,BigInteger.ONE),fitted.slice(StorageRange.exact(start,BigInteger.ONE))));
     }
 
+    @Test void cachedHashPreservesOldStructuralValueAndImmutableSnapshots() {
+        var input=new ArrayList<>(List.of(65,66,67,68));
+        var original=ByteImage.literal(new Values.BytesValue(input),1);int saved=original.hashCode();
+        input.set(0,90);
+        assertEquals(List.of(65,66,67,68),original.read(range(0,4)).bytes().orElseThrow().octets());
+        assertThrows(UnsupportedOperationException.class,()->original.parts().clear());
+        var images=List.of(original,original.slice(range(1,2)),original.copied(3),
+            original.withSourceGap(range(0,2),4),original.fit(BigInteger.valueOf(8),32,5),
+            original.write(range(1,2),ByteImage.literal(new Values.BytesValue(List.of(88,89)),6)),
+            ByteImage.unknown(Optional.empty(),"UNKNOWN",7),ByteImage.unknown(Optional.of(BigInteger.ZERO),"EMPTY",8));
+        for(var image:images)for(int repeat=0;repeat<5;repeat++)
+            assertEquals(Objects.hash(image.extent(),image.parts()),image.hashCode(),"exact pre-W2 structural hash, not hash uniqueness");
+        assertEquals(saved,original.hashCode());
+        assertEquals(original,ByteImage.literal(new Values.BytesValue(List.of(65,66,67,68)),1));
+    }
+    @Test void collidingImageHashesKeepDistinctLabelsAndInternedNodes() {
+        // Java String hashes for these two reasons deliberately collide.
+        var a=ByteImage.unknown(Optional.of(BigInteger.valueOf(8)),"Aa",1);
+        var b=ByteImage.unknown(a.extent(),"BB",1);
+        assertNotEquals(a,b);assertEquals(a.hashCode(),b.hashCode());
+        var domain=new FactorizedAlternatives<ByteImage>();
+        var left=domain.node(0,Map.of(a,domain.terminal));var right=domain.node(0,Map.of(b,domain.terminal));
+        assertNotSame(left,right);var joined=domain.union(left,right);
+        assertEquals(Set.of(a,b),joined.edges.keySet());assertEquals(2,domain.selections(joined).size());
+        assertSame(left,domain.node(0,Map.of(ByteImage.unknown(a.extent(),"Aa",1),domain.terminal)));
+        assertSame(joined,domain.union(joined,right));
+    }
+
 }

@@ -42,8 +42,12 @@ def overlay(output, cp, source_ref=None, instrument=True):
             text = replace_once(text, 'edges+=node.edges.size();', 'w2SizeNodeVisits++;w2SizeEdgeVisits+=node.edges.size();edges+=node.edges.size();')
             text = replace_once(text, 'return new Size(visited.size(),edges,components.values().stream().mapToLong(Set::size).max().orElse(0));', 'w2SizeNanos+=System.nanoTime()-w2Start;return new Size(visited.size(),edges,components.values().stream().mapToLong(Set::size).max().orElse(0));')
         elif name == 'ByteImage':
-            text = replace_once(text, 'final class ByteImage {', 'final class ByteImage {\n    static long w2HashCalls;')
+            text = replace_once(text, 'final class ByteImage {', 'final class ByteImage {\n    static long w2HashCalls,w2StructuralHashes;')
             text = replace_once(text, '@Override public int hashCode(){', '@Override public int hashCode(){w2HashCalls++;')
+            if 'hash=Objects.hash(this.extent,this.parts);' in text:
+                text = replace_once(text, 'hash=Objects.hash(this.extent,this.parts);', 'w2StructuralHashes++;hash=Objects.hash(this.extent,this.parts);')
+            else:
+                text = replace_once(text, 'return Objects.hash(extent,parts);', 'w2StructuralHashes++;return Objects.hash(extent,parts);')
         else:
             text = replace_once(text, 'public final class RegionalValuesAnalysis {', 'public final class RegionalValuesAnalysis {\n    static long w2TrackCalls,w2TrackNanos;')
             text = replace_once(text, 'private State track(State state) {', 'private State track(State state) { w2TrackCalls++;long w2Start=System.nanoTime();')
@@ -57,17 +61,20 @@ def overlay(output, cp, source_ref=None, instrument=True):
 def summarize_jfr(path):
     data = json.loads(subprocess.check_output(['jfr', 'print', '--json', '--stack-depth', '256', '--events',
         'jdk.ExecutionSample,jdk.ObjectAllocationSample', str(path)], text=True))
-    buckets, inclusive, allocations = Counter(), Counter(), Counter()
+    buckets, inclusive, allocations, leaves = Counter(), Counter(), Counter(), Counter()
     samples = 0
     for event in data['recording']['events']:
         values = event['values']
-        if event['type'] == 'jdk.ObjectAllocationSample':
-            allocations[values['objectClass']['name']] += values['weight']; continue
         frames = (values.get('stackTrace') or {}).get('frames', [])
         methods = [f['method']['type']['name'].replace('/', '.') + '.' + f['method']['name'] for f in frames]
-        if not any(('RegionalValuesAnalysis' in m or 'FactorizedAlternatives' in m or 'ByteImage' in m) for m in methods):
+        regional = any(('RegionalValuesAnalysis' in m or 'FactorizedAlternatives' in m or 'ByteImage' in m) for m in methods)
+        if event['type'] == 'jdk.ObjectAllocationSample':
+            if regional: allocations[values['objectClass']['name']] += values['weight']
+            continue
+        if not regional:
             buckets['outside_regional'] += 1; continue
         samples += 1
+        if methods: leaves[methods[0]] += 1
         flags = {
             'metrics_size_track': any(('FactorizedAlternatives.size' in m or 'RegionalValuesAnalysis$State.size' in m or 'RegionalValuesAnalysis$Engine.track' in m) for m in methods),
             'hashing': any('.hashCode' in m for m in methods),
@@ -82,7 +89,8 @@ def summarize_jfr(path):
             bucket = 'transfer_other' if any('RegionalValuesAnalysis$Engine.' in m for m in methods) else 'solver_other'
         buckets[bucket] += 1
     result = {'regional_samples': samples, 'exclusive_samples': dict(buckets),
-              'inclusive_samples_overlap': dict(inclusive), 'allocation_sample_weight_bytes_top': allocations.most_common(12)}
+              'inclusive_samples_overlap': dict(inclusive), 'leaf_methods_top': leaves.most_common(15),
+              'regional_allocation_sample_weight_bytes_top': allocations.most_common(12)}
     path.with_suffix('.summary.json').write_text(json.dumps(result, indent=2) + '\n')
     print('W2_JFR ' + json.dumps(result, sort_keys=True))
 
