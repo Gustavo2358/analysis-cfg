@@ -1,6 +1,6 @@
 id: FD-W5
 title: SORT/MERGE/RELEASE/RETURN e I/O implícito
-status: IN_PROGRESS
+status: DONE
 scope:
 - file-dependencies
 - proleap-poc
@@ -74,3 +74,5 @@ checkpoint:
   limitations: bounded shared procedure return; no total participant order/count; no normative AIR delta
   next: FD-W6
   detail: ../../product/file-dependencies/w5-implementation.md
+
+closeout: Merged and main smoke PASS; core complete; W10 optional/deferred.

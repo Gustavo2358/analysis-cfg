@@ -1,6 +1,6 @@
 id: FD-W8
 title: CICS File Control, browse e administração
-status: IN_PROGRESS
+status: DONE
 scope:
 - file-dependencies
 - proleap-poc
@@ -82,3 +82,5 @@ qualification:
   result: FAST544/Q589/wire21,41CICS x2,73corpus novos PASS;133CALL iguais ao main EP-R2;411FILE e35READ DATASET preservados.
   next: STOP para revisão humana final; W10 TODO/NOT_AUTHORIZED; nenhum merge/auto-merge/release; IN_PROGRESS lean até merge autorizado.
 resumption: EP-R2 preservado; C06 restrito a READ DATASET e aliases já autorizados; demais aliases NOT_QUALIFIED.
+
+closeout: Merged and main smoke PASS; core complete; W10 optional/deferred.

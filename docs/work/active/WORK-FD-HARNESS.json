@@ -1,11 +1,17 @@
 {
   "id": "WORK-FD-HARNESS",
   "title": "FD-H0–H4: preparar File Dependencies source-closed",
-  "status": "IN_PROGRESS",
+  "status": "DONE",
   "scope": [
     "docs",
     "harness",
     "file-dependencies"
   ],
-  "notes": "FD-H0–H4 preparados e qualificados documentalmente para revisão humana. FD-W0–W11 TODO; sem produção, merge ou repin. Handoff canônico: analysis-cfg/docs/product/file-dependencies/state.md."
+  "notes": "FD-H0–H4 preparados e qualificados documentalmente para revisão humana. FD-W0–W11 TODO; sem produção, merge ou repin. Handoff canônico: analysis-cfg/docs/product/file-dependencies/state.md.",
+  "closeout": {
+    "campaign": "File Dependencies CORE N+C",
+    "result": "MERGED / COMPLETE",
+    "smoke": "PASS",
+    "optional_extension": "W10 DEFERRED; not part of core"
+  }
 }

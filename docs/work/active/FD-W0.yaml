@@ -1,6 +1,6 @@
 id: FD-W0
 title: Declarações, conectores e record ownership no SP
-status: IN_PROGRESS
+status: DONE
 scope:
 - file-dependencies
 - proleap-poc
@@ -72,3 +72,5 @@ stop_condition: Parar após contrato declarativo SP e decoder qualificados, diff
   checkpoint; avanço depende da autorização vigente.
 depends_on:
 - FD-H4_REVIEWED
+
+closeout: Merged and main smoke PASS; core complete; W10 optional/deferred.

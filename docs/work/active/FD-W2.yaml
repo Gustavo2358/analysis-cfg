@@ -1,6 +1,6 @@
 id: FD-W2
 title: Família nativa OPEN/CLOSE/READ/WRITE/REWRITE/DELETE/START
-status: IN_PROGRESS
+status: DONE
 scope:
 - file-dependencies
 - proleap-poc
@@ -65,3 +65,5 @@ evidence:
 stop_condition: Parar com inventário de operações completo e dimensões ainda parciais documentadas; W3 separada.
 depends_on:
 - FD-W1
+
+closeout: Merged and main smoke PASS; core complete; W10 optional/deferred.

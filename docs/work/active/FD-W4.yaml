@@ -1,6 +1,6 @@
 id: FD-W4
 title: Condições locais, FILE STATUS e DECLARATIVES
-status: IN_PROGRESS
+status: DONE
 scope:
 - file-dependencies
 - proleap-poc
@@ -69,3 +69,5 @@ depends_on:
 checkpoint: QUALIFIED_LOCAL
 checkpoint_evidence: ../../product/file-dependencies/w4-implementation.md
 next_authorized_wave: FD-W5
+
+closeout: Merged and main smoke PASS; core complete; W10 optional/deferred.

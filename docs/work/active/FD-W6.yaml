@@ -1,6 +1,6 @@
 id: FD-W6
 title: I-O-CONTROL e cláusulas auxiliares do perfil
-status: IN_PROGRESS
+status: DONE
 scope:
 - file-dependencies
 - proleap-poc
@@ -61,3 +61,5 @@ depends_on:
 - FD-W0
 - FD-W3
 - FD-W5
+
+closeout: Merged and main smoke PASS; core complete; W10 optional/deferred.

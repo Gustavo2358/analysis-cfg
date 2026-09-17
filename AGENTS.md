@@ -1,6 +1,6 @@
 # AGENTS.md
 
-[FILE-DEPENDENCIES — CORE N+C](docs/product/file-dependencies/README.md): H4 aprovado; execução W0–W9/W11 autorizada; STOP após W11; W10 não autorizado.
+[FILE-DEPENDENCIES — CORE N+C concluído](docs/product/file-dependencies/closeout.md): MERGED / COMPLETE; W10 DEFERRED / OPTIONAL_EXTENSION, requer nova autorização.
 
 ## Política de engenharia vigente
 

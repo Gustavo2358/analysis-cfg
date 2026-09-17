@@ -1,6 +1,6 @@
 id: FD-W3
 title: Efeitos de I/O, storage e preservação de CALL
-status: IN_PROGRESS
+status: DONE
 scope:
 - file-dependencies
 - proleap-poc
@@ -69,3 +69,5 @@ stop_condition: Parar após efeitos e regressões qualificados; dúvida sobre va
   não vira MUST.
 depends_on:
 - FD-W2
+
+closeout: Merged and main smoke PASS; core complete; W10 optional/deferred.

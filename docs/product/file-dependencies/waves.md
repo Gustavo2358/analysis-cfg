@@ -1,16 +1,9 @@
-# FD-W0–W11 — grafo e execução
+# FD-W0–W11 — grafo e execução encerrada
 
-**CLOSEOUT AUTORIZADO.** H0–H4 PREPARATION COMPLETE; W0–W9 QUALIFIED / PENDING_MERGE;
-W11 QUALIFIED_LOCAL_POST_EP_R2 / PENDING_MERGE. Sem feature work pendente no core N+C.
-W10 DEFERRED / OPTIONAL_EXTENSION / NOT_PART_OF_CORE; requer nova autorização de produto.
-Merges explícitos topológicos e smoke em main autorizados; sem auto-merge/release.
-[Fechamento](closeout.md) substitui o STOP de revisão anterior.
+H0–H4 e core W0–W9/W11 DONE após merges e smoke PASS. [Closeout](closeout.md).
+W10 DEFERRED / OPTIONAL_EXTENSION / NOT_PART_OF_CORE; nova autorização necessária.
+O grafo abaixo conserva as dependências históricas; não autoriza nova execução.
 
-## Qualificação anterior (histórico)
-
-[Checkpoint pós-EP-R2 qualificado](post-ep-r2.md): gates compartilhados e corpus73 reexecutados.
-
-**H4 aprovado; core W0–W9/W11 autorizado. W0–W9/W11 QUALIFIED_LOCAL_POST_EP_R2; C06 humano fechado; STOP para revisão final; W10 DEFERRED / OPTIONAL_EXTENSION.**
 Cada link abre o item lean executável. Os campos do item + brief + gate indicado
 são suficientes; discovery bruto é opcional. Não converter TODO em IN_PROGRESS
 por ter escrito o plano. Wave qualificada não é DONE lean antes de merge/testes.

@@ -1,6 +1,6 @@
 id: FD-W1
 title: Slice vertical estático e saída pública
-status: IN_PROGRESS
+status: DONE
 scope:
 - file-dependencies
 - air-java
@@ -73,3 +73,5 @@ stop_condition: Parar após vertical e contrato qualificados; perfil N ainda par
   vigente.
 depends_on:
 - FD-W0
+
+closeout: Merged and main smoke PASS; core complete; W10 optional/deferred.
