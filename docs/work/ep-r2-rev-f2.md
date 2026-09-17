@@ -2,10 +2,12 @@
 
 ## Scope and authority
 
-Same Draft [PR #39](https://github.com/Gustavo2358/analysis-cfg/pull/39), branch
-`fix/ep-r2-entry-factorized-recall`. No merge or auto-merge.
+Same [PR #39](https://github.com/Gustavo2358/analysis-cfg/pull/39), branch
+`fix/ep-r2-entry-factorized-recall`. Final human/product review: APPROVED on
+`113a78c7ed03c9bff72d5363ade46474ed3537e7` plus this documentation-only closeout.
+Merge is authorized after final local/remote checks; no auto-merge.
 F2 entry/base: `3968e4847a1dfe0526be649576822751a09e774d`.
-Main: `194fac2af6cfc54053318164275e682feac5c750`, untouched.
+Reviewed main: `194fac2af6cfc54053318164275e682feac5c750`. Stop before merge if it moves.
 
 The requirement is generic: a COBOL program name may start with `$`; the character
 is part of the name. Only `CallNameInterpreter` changes in Java production.
@@ -100,27 +102,37 @@ For the historical comparison, supply the locally preserved synthetic baseline
 with `--before .harness-results/ep-r2/sanitization/synthetic-before`. The CLI oracle
 does not fabricate a baseline when absent.
 
-## Real-case handoff remains local and pending
+## Confidential manual product acceptance
 
-The four previously absent real names and the expected real-name set are not
-versioned. The exact prior AIR/result, parameters and expected set remain
-unavailable here. No X/9, 9/9 or first-loss claim is made.
+The product owner attested the final confidential rerun on 2026-09-17.
+Authority: **MANUAL PRODUCT-OWNER ACCEPTANCE**.
 
-Feature work and incident reruns are paused for sanitation. A subsequent authorized
-manual rerun must use the same AIR/upstreams/parameters and compare the expected
-real-name set locally, preserving the five previously present names and checking
-supported raw/candidate/edge facts for the four previously absent real names.
-Keep names, site identifiers and detailed comparisons confidential. Publish only
-non-sensitive aggregate counts/status. If a name still disappears, record the
-first-loss boundary locally and stop for review without inventing a new fix.
+REAL CASE: PASS — confidential manual rerun.
+Expected set: 9.
+Recovered expected programs: 9/9.
+Missing expected programs: 0.
+Evidence authority: product-owner attestation.
+Corporate artifacts were intentionally not retained or versioned.
+Independent reproduction from this repository is not available.
+
+This aggregate acceptance covers the expected real-name set; CI and the synthetic
+tests did not reproduce the confidential case. The earlier validation ledger's
+NOT_RUN entry remains an accurate historical record of that automated run, not
+the current product acceptance. Do not retrieve or retain names, corporate source,
+AIR, dependency JSON, operation/site IDs, screenshots, logs, paths or mappings.
+Real identifiers must not be versioned. No further corporate rerun is part of closeout.
 
 PRE-RELEASE POLICY: DOCUMENTED.
 LEADING-$ CAPABILITY: QUALIFIED.
 PROFILE: cobol-zos-dynamic-call-minimal@1.
 SYNTHETIC PRODUCT: QUALIFIED.
-REAL CASE: AWAITING MANUAL SAME-AIR RE-RUN; not executed by sanitation.
-FAST: PASS.
-PR: Draft, no merge, no auto-merge.
+CORPORATE IDENTIFIER SANITIZATION: PASS.
+REAL CASE: PASS — 9/9 confidential manual rerun; product-owner attestation.
+FAST LOCAL: PASS on the reviewed technical head.
+FAST CI: PASS — Fast CI #265 on the reviewed technical head.
+FINAL REVIEW: APPROVED.
+PR: merge is the remaining lifecycle transition; final closeout head checks required.
+No auto-merge.
 
 EP-R2 ENTRY SEMANTICS, FACTORIZED VALUES DOMAIN and R2-REV-F1 DEPTH remain
 QUALIFIED on their recorded evidence.

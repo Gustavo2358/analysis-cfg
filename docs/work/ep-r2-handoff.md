@@ -1,8 +1,13 @@
 # EP-R2 — Order-Independent Entry & Factorized Recall
 
 Scope: analysis-cfg, branch `fix/ep-r2-entry-factorized-recall`, persistent
-[Draft PR #39](https://github.com/Gustavo2358/analysis-cfg/pull/39). No merge or
-auto-merge. Human semantic/architecture review remains required.
+[PR #39](https://github.com/Gustavo2358/analysis-cfg/pull/39).
+Final human/product review: **APPROVED**, 2026-09-17, on technical head
+`113a78c7ed03c9bff72d5363ade46474ed3537e7` and base
+`194fac2af6cfc54053318164275e682feac5c750`, plus this documentation-only closeout.
+Technical and product acceptance are complete. Merge is the remaining lifecycle
+transition, authorized after the closeout head passes local FAST and required CI.
+Use a normal merge commit; no auto-merge or further technical changes.
 
 ## Current remediation — leading-dollar program names
 
@@ -20,10 +25,9 @@ Rebuilt RED: five interpreter and three product semantic failures. New GREEN:
 Exhaustive current-tree and all-PR-history searches return zero occurrences. [Evidence](ep-r2/rev-f2-validation.json) separates new checks
 from reused neighboring regression/EP-R2/F1 evidence.
 
-The real-case nine-name recovery is **not yet measured**: exact prior AIR/result,
-parameters and expected name set remain unavailable. Request the manual same-AIR
-rerun and compare names/support/edges individually; do not equate count=9 with
-incident qualification. This audit no longer gates the authorized dollar capability.
+REAL CASE: **PASS — 9/9 confidential manual rerun**, attested by the product owner.
+This acceptance is separate from synthetic/CI qualification; see the aggregate
+record below. No corporate artifact was retained or versioned for this acceptance.
 
 ## Previous review remediation — DAG depth
 
@@ -38,7 +42,8 @@ F1 local qualification: all five operations through 32768 levels at -Xmx256m,
 BEFORE/copy/provenance vertical plus five CLI observations, eight selected product
 cases and one final FAST with **501 Java methods**, Python and architecture PASS.
 [F1 evidence](ep-r2/rev-f1-validation.json) records exact hashes and metrics.
-READY FOR HUMAN RE-REVIEW; PR remains Draft. Real case still awaits manual rerun.
+Final human/product review now approves this remediation; its technical evidence
+is reused unchanged for the documentation-only closeout.
 
 The sections below preserve the **original campaign evidence through 49472df**;
 their 493-test FAST, seventeen products and eleven mutant runs are historical,
@@ -179,8 +184,9 @@ and incomplete runs are never counted as semantic successes or killed mutants.
 
 REUSED: selected pre-fix LAB measurements, unchanged upstream contracts and
 production hashes, earlier focused tests where subsequent deltas did not invalidate
-them. NOT RUN: real program, broad corpus, CardDemo E2E, CICS, FILE, full multi-repo
-or complete historical campaigns. The fixed FAST includes its existing small
+them. NOT RUN by automated qualification: the real program (manual acceptance
+is recorded separately below), broad corpus, CardDemo E2E, CICS, FILE, full
+multi-repo or complete historical campaigns. The fixed FAST includes its existing small
 CardDemo baseline harness unit test; no CardDemo campaign is launched.
 
 Genuinely correlated relations and a query/read requesting a composite value may
@@ -209,22 +215,28 @@ with that same compiler. Final selected E2Es and FAST use JDK 21; development
 and the final mutant run used JDK 25 with release 21. Source semantics did not
 change during compiler alignment. No failed gate is reported as PASS.
 
-## Human review and confidential real case
+## Final human review and confidential manual acceptance
 
-Review EntryFacts/I-17 authority, the shared relation and capture semantics, the
-unchanged strong/copy/loop oracles, and the structural/intermediate metrics in PR #39.
-Keep the PR Draft until the requested human review flow decides otherwise; do not
-merge or enable auto-merge as part of this campaign. The work registry stays
-IN_PROGRESS because this repository only calls merged work DONE.
+Final human/product review: **APPROVED**. Authority for the real case:
+**MANUAL PRODUCT-OWNER ACCEPTANCE**, supplied on 2026-09-17.
 
-After human review of the synthetics, **perform a new manual run of the real
-program**. Do not add or upload its source/AIR, names, literals, paths, logs or
-dependency details. Record only nonsensitive aggregate conditions by kind,
-regions/bases, targetsPrepared, admission status, site/candidate/remainder counts,
-runtime and domain cardinality (including cumulative interning). Real-case status
-remains AWAITING MANUAL RE-RUN regardless of synthetic PASS.
+REAL CASE: PASS — confidential manual rerun.
+Expected set: 9.
+Recovered expected programs: 9/9.
+Missing expected programs: 0.
+Evidence authority: product-owner attestation.
+Corporate artifacts were intentionally not retained or versioned.
+Independent reproduction from this repository is not available.
 
-To reproduce after selecting JDK 21 on PATH/JAVA_HOME, run:
+This attests recovery of the expected set, not merely an output count of nine.
+Synthetic tests and CI did not reproduce the corporate case. Do not request or
+recover real identifiers, source, AIR, dependency JSON, site IDs, screenshots,
+logs, paths or real-to-synthetic mappings. The confidentiality rule remains in force.
+The work item stays IN_PROGRESS before merge; merged PR plus required technical
+tests passed establishes DONE without an additional metadata-only lifecycle.
+
+Historical synthetic reproduction commands (not additional closeout gates),
+after selecting JDK 21 on PATH/JAVA_HOME:
 
 ```sh
 python3 -B scripts/harness/lean.py fast
@@ -242,27 +254,35 @@ execution temporarily edits tracked production and always restores/rebuilds it.
 
 ## Final disposition
 
-**READY FOR HUMAN REVIEW**, still a Draft PR, with no merge/auto-merge.
+**FINAL REVIEW APPROVED — READY FOR MERGE**, subject to the final closeout checks.
+Technical qualification below applies to the unchanged reviewed head. The final
+documentation-only head must pass local FAST and its own required CI before merge.
 
 | Area | Status |
 | --- | --- |
 | ENTRY SEMANTICS | QUALIFIED |
 | FACTORIZED VALUES DOMAIN | QUALIFIED |
-| SYNTHETIC INCIDENT CLASS | QUALIFIED |
-| REAL CASE | AWAITING MANUAL RE-RUN |
+| R2-REV-F1 DEPTH | QUALIFIED |
+| LEADING-$ CAPABILITY | QUALIFIED |
+| CORPORATE IDENTIFIER SANITIZATION | PASS |
+| SYNTHETIC PRODUCT | QUALIFIED |
+| REAL CASE | PASS — 9/9 confidential manual rerun; product-owner attestation |
+| FAST LOCAL | PASS — reviewed technical head, 515 Java tests plus Python/architecture |
+| FAST CI | PASS — [Fast CI #265](https://github.com/Gustavo2358/analysis-cfg/actions/runs/35163158183) on reviewed head |
+| PROFILE | cobol-zos-dynamic-call-minimal@1 |
 
-Final repository FAST: PASS CODE_CHANGE on JDK 21, 493 Java tests with zero
+Original campaign repository FAST: PASS CODE_CHANGE on JDK 21, 493 Java tests with zero
 failures/errors/skips, Python checks and all compiled architectural boundaries.
 Raw log: `.harness-results/ep-r2/fast-final-04.log` (80.219 seconds, observation
 only). No semantic code or gate changed after this PASS. The prior three attempts
 remain recorded: missing source inventory, real wire permutation regression, then
 compiler-only inventory drift. They are not counted as successful FAST runs.
 
-Final scope audit matches `.harness-results/ep-r2/hygiene-before.json` exactly:
+The original campaign scope audit matched `.harness-results/ep-r2/hygiene-before.json` exactly:
 original analysis-cfg and proleap-poc/cobol-lower/air-java/analysis-ir checkouts remain
 clean at their initial HEADs. FILE is still clean at
 `f78683d4fab9a52dcdd315d269d7ff9c488dfcdd`. All seven LAB input hashes still match.
 The final audit is `.harness-results/ep-r2/hygiene-final.json`. No real confidential
-source or reproducible build/cache is versioned. Human review and the subsequent
-manual real-case rerun are the remaining external steps, not completed campaign
-claims.
+source or reproducible build/cache is versioned. This historical audit does not
+replace the final closeout hygiene checks. Human review and confidential manual
+acceptance are now complete under the distinct authorities recorded above.
