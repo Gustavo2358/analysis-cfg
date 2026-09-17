@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Four real COBOL copy chains through the exact locked producers. Local only."""
 import argparse
+import copy
 import json
 import os
 from pathlib import Path
@@ -9,7 +10,7 @@ import sys
 
 from dependency_wire import read, require
 from cfg_wire_contract import verify as verify_cfg_wire
-from e2e_w2d import execute, runtime, source_spans
+from e2e_w2d import locked_sp, open_call_model, execute, runtime, source_spans
 from prepare_w2d_producers import ROOT, git, require_local
 
 FIXTURES = ROOT / 'analysis-adapters/src/test/resources/cp6/move-data'
@@ -23,7 +24,7 @@ CASES = {
 
 
 def source_oracle(sp, case, version):
-    require(sp['contractVersion'] == version and version in ('1.5.0', '1.6.0', '1.7.0', '1.8.0','1.9.0','2.0.0','2.1.0','2.2.0', '2.3.0', '2.4.0', '2.5.0', '2.6.0', '2.7.0','2.8.0'), 'locked typed MOVE source contract')
+    locked_sp(sp)
     require(sp['unit']['canonicalProgramName'] == 'CALLER', 'real caller identity')
     data = {d['canonicalName']: d['id'] for d in sp['dataDeclarations']}
     require(set(data) == ({'WS-A', 'WS-B', 'WS-PGM'} if case == 'multi-hop' else {'WS-A', 'WS-PGM'}), 'scalar declarations')
@@ -102,30 +103,33 @@ def air_oracle(air, data, moves, case):
     return unit, call, assigns, objects
 
 
-def dependency_oracle(result, model, source, case):
+def dependency_oracle(result, model, source, case, *, source_control=True):
     unit, call, assigns, objects = model
-    require(len(result['sites']) == 1 and len(result['edges']) == 1, 'one CALL and one known dependency')
+    names=['PROGA','PROGB'] if source_control and case=='snapshot' else ['PROGA']
+    require(len(result['sites']) == 1 and len(result['edges']) == len(names), 'one CALL and exact candidate edges')
     site = result['sites'][0]
     require(site['caller'] == unit['id'] and site['entry'] == unit['entries'][0]['id'], 'CALLER identity')
     require(site['operation'] == call['terminator']['header']['id'] and site['sequence'] == call['label']
             and site['offset'] == 0, 'real Invoke location after all MOVEs')
     require(site['valuePoint']['position'] == 'BEFORE' and site['valuePoint']['operationId'] == site['operation'], 'BEFORE Invoke')
     require(site['targetKind'] == 'COMPUTED' and site['reachability'] == 'REACHABLE' and site['subject'] == objects['WS-PGM'], 'computed reachable WS-PGM')
-    require(site['modelValueRemainder'] is False, 'closed model from forward propagation')
-    require([c['referenceName'] for c in site['candidates']] == ['PROGA'], 'PROGA only: OLDPROG and PROGB never leak')
-    require([c['rawValue'] for c in site['rawCandidates']] == ['PROGA   ']
-            and [c['rawValue'] for c in site['candidates']] == ['PROGA   '], 'padding retained through interpretation')
+    if source_control:open_call_model(call['terminator'],site)
+    else:require(site['modelValueRemainder'] is False, 'normal-only snapshot remains closed')
+    require([c['referenceName'] for c in site['candidates']] == names, 'independent source-control candidate set')
+    require([c['rawValue'] for c in site['rawCandidates']] == [n.ljust(8) for n in names]
+            and [c['rawValue'] for c in site['candidates']] == [n.ljust(8) for n in names], 'padding retained through interpretation')
     require(site['sourceValueRemainder'] and site['interpretationUnknownRemainder']
-            and site['effectiveUnknownRemainder'], 'real source remains PARTIAL with independent open dimensions')
-    candidate = site['candidates'][0]; support = candidate['supports']
-    producer = assigns[1 if case == 'overwrite' else 0]
-    require(len(support) == 1 and support[0]['kind'] == 'VALUE_PRODUCER'
-            and support[0]['producer'] == producer['header']['id'] and support[0]['origin'] == producer['header']['origin'], 'original PROGA literal support survives every copy')
-    require(site['rawCandidates'][0]['supports'] == support and result['edges'][0]['candidate'] == candidate
-            and result['edges'][0]['caller'] == site['caller'] and result['edges'][0]['site'] == site['operation'], 'edge and raw/interpreted support consistency')
-    spans = source_spans(result, support[0], source)
-    literal_line = next(i for i, line in enumerate(source.read_text().splitlines(), 1) if "MOVE 'PROGA'" in line)
-    require(all(int(s['startLine']) == literal_line == int(s['endLine']) for s in spans), 'support reaches original literal MOVE')
+            and site['effectiveUnknownRemainder'], 'real source independent open dimensions')
+    for index,name in enumerate(names):
+        candidate=site['candidates'][index];support=candidate['supports']
+        producer=assigns[2 if name=='PROGB' else 1 if case=='overwrite' else 0]
+        require(len(support)==1 and support[0]['kind']=='VALUE_PRODUCER'
+                and support[0]['producer']==producer['header']['id'] and support[0]['origin']==producer['header']['origin'], 'specific original literal support survives copy')
+        require(site['rawCandidates'][index]['supports']==support and result['edges'][index]['candidate']==candidate
+                and result['edges'][index]['caller']==site['caller'] and result['edges'][index]['site']==site['operation'], 'edge and raw/interpreted support consistency')
+        spans=source_spans(result,support[0],source)
+        literal_line=next(i for i,line in enumerate(source.read_text().splitlines(),1) if "MOVE '"+name+"'" in line)
+        require(all(int(span['startLine'])==literal_line==int(span['endLine']) for span in spans), 'support reaches original literal MOVE')
     require(result['metrics']['possibleValuesRuns'] == 1, 'normal forward fixed point runs once')
 
 
@@ -156,7 +160,16 @@ def run(work, config_path):
         contract = verify_cfg_wire(cfg.read_bytes()); require('INVOKE_NORMAL' in contract['transitions'], 'real CFG continuation')
         execute(cwd, 'dependency', ['java', '-cp', cp, 'io.github.gustavo2358.analysis.launcher.AnalysisDependencies', str(air), str(dep)])
         dependency_oracle(read(dep), model, source, case)
-        print('PASS real ' + case + ': CALLER -> PROGA; raw="PROGA   "; BEFORE Invoke modelValueRemainder=false; original literal support', flush=True)
+        if case=='snapshot':
+            # Counterfactual AIR oracle, not a stronger claim about the raw source:
+            # normal-only control cannot revisit the copy after the later WS-A write.
+            normal=copy.deepcopy(json.loads(air.read_text()))
+            for sequence in normal['publication']['units'][0]['sequences']:
+                if sequence['terminator']['kind']=='invoke':sequence['terminator']['outcomes']['remainder']={'kind':'none'}
+            normal_air=cwd/'normal-only.air.json';normal_air.write_text(json.dumps(normal));normal_dep=cwd/'normal-only.dependencies.json'
+            execute(cwd,'normal-only',['java','-cp',cp,'io.github.gustavo2358.analysis.launcher.AnalysisDependencies',str(normal_air),str(normal_dep)])
+            dependency_oracle(read(normal_dep),model,source,case,source_control=False)
+        print('PASS real '+case+': exact candidates/supports under source control; snapshot also checked with normal-only AIR',flush=True)
 
 
 if __name__ == '__main__':

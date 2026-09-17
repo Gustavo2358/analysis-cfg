@@ -10,7 +10,7 @@ final class WireIds {
         String domain=switch(id) {
             case PublicationId ignored -> "publication";case UnitId ignored -> "unit";case EntryId ignored -> "entry";
             case LabelId ignored -> "label";case ObjectId ignored -> "object";case OperationId ignored -> "operation";
-            case StorageId ignored -> "storage";case OriginId ignored -> "origin";case PremiseId ignored -> "premise";
+            case ResourceId ignored -> "resource";case StorageId ignored -> "storage";case OriginId ignored -> "origin";case PremiseId ignored -> "premise";
             case OperandId ignored -> "operand";case UncertaintyId ignored -> "uncertainty";
             default -> throw new IllegalArgumentException("ID outside result contract");
         };

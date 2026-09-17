@@ -1,0 +1,209 @@
+{
+  "result": "LOCAL_PASS",
+  "workingDirectory": "/home/gustavo/workspace/teste-e2e/.file-dependencies/worktrees/analysis-cfg",
+  "materialPin": "830d41ab10573f2c16bcfb3d8aa916ba88b19e45",
+  "environment": {
+    "JAVA_HOME": "/home/gustavo/.sdkman/candidates/java/21.0.12+1.1-tem",
+    "CFG_BUILD_ROOT": "/home/gustavo/workspace/teste-e2e/.file-dependencies/worktrees/analysis-cfg/.harness-results/fd-post-ep-r2/gates",
+    "MAVEN_OPTS": "-Dmaven.repo.local=/home/gustavo/workspace/teste-e2e/.file-dependencies/worktrees/analysis-cfg/.harness-results/fd-post-ep-r2/m2",
+    "W2D_MAVEN_REPO": "/home/gustavo/workspace/teste-e2e/.file-dependencies/worktrees/analysis-cfg/.harness-results/fd-post-ep-r2/m2"
+  },
+  "gates": [
+    {
+      "command": "mvn -B -ntp clean test",
+      "exitCode": 0,
+      "result": "PASS",
+      "log": "baseline-java.log",
+      "property": "Mechanical merge before new oracle changes:586 tests, no errors/failures/skips"
+    },
+    {
+      "command": "python3 -B scripts/project/test_dependency_wire.py",
+      "exitCode": 0,
+      "result": "PASS",
+      "log": "wire-composition.log",
+      "property": "21 tests; leading dollar, FILE2.3/resource/context/versioning/negative and cross-contract documents"
+    },
+    {
+      "command": "mvn -B -ntp -pl analysis-adapters -Dtest=FileEpR2CompositionTest test",
+      "exitCode": 0,
+      "result": "PASS",
+      "log": "composition-final.log",
+      "property": "3 methods /7 products;1/8/32 factors, simultaneous entry both orders, leading dollar and independent FILE policy"
+    },
+    {
+      "command": "python3 -B scripts/harness/lean.py fast",
+      "exitCode": 0,
+      "result": "PASS",
+      "log": "fast.log",
+      "property": "544 fixed required methods, zero skips; Python and architectural gates"
+    },
+    {
+      "command": "python3 -B scripts/harness/lean.py qualification-local",
+      "exitCode": 1,
+      "result": "FAIL_ENVIRONMENT",
+      "log": "qualification.log",
+      "property": "Late producer setup selected empty gates/m2; Maven plugin/DNS failure; prior phases not failed"
+    },
+    {
+      "command": "python3 -B scripts/harness/lean.py qualification-local",
+      "exitCode": 0,
+      "result": "PASS",
+      "log": "qualification-2.log",
+      "property": "Full rerun with explicit W2D_MAVEN_REPO;589 Java tests plus semantic/performance/integration/real CLI suites"
+    },
+    {
+      "command": "python3 -B scripts/project/e2e_cics_files.py --work .harness-results/fd-post-ep-r2/cics --producers .harness-results/fd-post-ep-r2/pipeline/producers/producers.json --runtime .harness-results/fd-post-ep-r2/runtime.json",
+      "exitCode": 0,
+      "result": "PASS",
+      "log": "cics.log",
+      "property": "41 fixtures twice, four products deterministic; CALL/FILE/context/BEFORE/C06"
+    },
+    {
+      "command": "python3 -B .harness-results/fd-post-ep-r2/compare-alias-pairs.py",
+      "exitCode": 0,
+      "result": "PASS",
+      "log": "alias-pairs.log",
+      "property": "FILE/DATASET literal and computed semantic/CALL vector equivalence"
+    },
+    {
+      "command": "mvn -B -ntp -f .harness-results/fd-post-ep-r2/pipeline/producers/proleap-poc/pom.xml -Dmaven.repo.local=.harness-results/fd-post-ep-r2/pipeline-m2 -Dtest=CicsFileControlTest,CicsProgramControlTest test",
+      "exitCode": 0,
+      "result": "PASS",
+      "log": "c06-front.log",
+      "property": "22 tests incl malformed, duplicate FILE+DATASET, other-command negatives and Program Control; unchanged producer"
+    },
+    {
+      "command": "python3 -B scripts/project/e2e_file_scope.py --work .harness-results/fd-post-ep-r2/scope --producers .harness-results/fd-post-ep-r2/pipeline/producers/producers.json --runtime .harness-results/fd-post-ep-r2/runtime.json",
+      "exitCode": 0,
+      "result": "PASS",
+      "log": "scope.log",
+      "property": "8 scope fixtures twice; owners/GLOBAL/COPY/contained FILE"
+    },
+    {
+      "command": "python3 -B scripts/project/e2e_file_laws.py --work .harness-results/fd-post-ep-r2/laws --runtime .harness-results/fd-post-ep-r2/runtime.json",
+      "exitCode": 1,
+      "result": "PARTIAL_RUN",
+      "log": "laws.log",
+      "property": "MR1-MR9 PASS before sandbox ptrace refusal at SG3; no semantic failure"
+    },
+    {
+      "command": "python3 -B scripts/project/e2e_file_laws.py --guards-only --work .harness-results/fd-post-ep-r2/guards --runtime .harness-results/fd-post-ep-r2/runtime.json",
+      "exitCode": 0,
+      "result": "PASS",
+      "log": "guards.log",
+      "property": "SG1-SG5 core with actual local tracing; zero business-resource lookup and environment invariance"
+    },
+    {
+      "command": "python3 -B scripts/project/e2e_file_scale.py --work .harness-results/fd-post-ep-r2/scale --runtime .harness-results/fd-post-ep-r2/runtime.json --dimension candidates --dimension aliases --dimension units",
+      "exitCode": 0,
+      "result": "PASS",
+      "log": "scale.log",
+      "property": "9 witnesses1/8/32; candidate growth, aliases, units; time/RSS recorded"
+    },
+    {
+      "command": "python3 -B .harness-results/fd-post-ep-r2/pipeline/analysis-cfg/scripts/project/ep_r2.py --output .harness-results/fd-post-ep-r2/ep-r2-composed --maven-repo .harness-results/fd-post-ep-r2/pipeline-m2",
+      "exitCode": 0,
+      "result": "PASS",
+      "log": "ep-r2-composed.log",
+      "property": "17 EP-R2 synthetic verticals; F5 intentional INVALID_IR; direct factorized counters and real CLI"
+    },
+    {
+      "command": "python3 -B .harness-results/fd-post-ep-r2/main/scripts/project/ep_r2.py --output .harness-results/fd-post-ep-r2/ep-r2-main --maven-repo .harness-results/fd-post-ep-r2/main-m2",
+      "exitCode": 0,
+      "result": "PASS",
+      "log": "ep-r2-main.log",
+      "property": "Same17 on unmodified main; semantic/retained structural parity"
+    },
+    {
+      "command": "python3 -B .harness-results/fd-post-ep-r2/main/scripts/project/ep_r2.py --only G-7 --output .harness-results/fd-post-ep-r2/ep-r2-main-repeat --maven-repo .harness-results/fd-post-ep-r2/main-m2",
+      "exitCode": 0,
+      "result": "PASS",
+      "log": "ep-r2-main-repeat.log",
+      "property": "Within-main cumulative arena variation corroborates nonsemantic interning-count differences"
+    },
+    {
+      "command": "python3 -B scripts/project/carddemo_baseline.py --upstream .harness-results/fd-w11/carddemo --work .harness-results/fd-post-ep-r2/corpus --runtime .harness-results/fd-post-ep-r2/runtime.json --pins .harness-results/fd-post-ep-r2/pins.json",
+      "exitCode": 0,
+      "result": "PASS",
+      "log": "corpus.log",
+      "property": "All73 inputs rerun; source/ZIP/pins immutable; partials/refusals preserved"
+    },
+    {
+      "command": "python3 -B .harness-results/fd-post-ep-r2/run-main-projected.py",
+      "exitCode": 0,
+      "result": "PASS",
+      "log": "main-projected.log",
+      "property": "71 main consumer runs plus2 no-AIR records; executable-identical AIR compatibility projection and strict reader"
+    },
+    {
+      "command": "python3 -B .harness-results/fd-post-ep-r2/summarize-reconciliation.py",
+      "exitCode": 0,
+      "result": "PASS",
+      "log": "corpus-reconciliation.log",
+      "property": "133 full CALL contracts identical to main;411FILE/85declarations exact C06 parity;35READ DATASET incl3COACTVWC unknown"
+    }
+  ],
+  "failureClassification": [
+    {
+      "attempt": "composition-build",
+      "class": "A",
+      "result": "FAIL",
+      "reason": "New test used ProgramPoint.position() instead of existing kind(); compile error, not production RED.",
+      "replacement": "composition-1.log"
+    },
+    {
+      "attempt": "composition-1",
+      "class": "E",
+      "result": "FAIL",
+      "reason": "New query-sharing fixture routed named CALL to RegionalValues and FILE to StorageValues; both correct general providers. Replaced CALL query with physical range to exercise intended shared provider, retaining the zero-extra-run assertion.",
+      "replacement": "composition-2.log"
+    },
+    {
+      "attempt": "baseline-java/wire",
+      "class": null,
+      "result": "PASS",
+      "reason": "586 Java/20 wire tests; no post-merge incompatibility observed before cross-test additions."
+    },
+    {
+      "attempt": "qualification.log",
+      "class": "A",
+      "result": "FAIL_ENVIRONMENT",
+      "reason": "Late W2D producer setup selected gates/m2 instead of populated isolated m2; install-plugin absent and sandbox DNS unavailable. Maven/semantic/performance/integration stages before this point passed. Set W2D_MAVEN_REPO explicitly; no source/test change.",
+      "replacement": "qualification-2.log"
+    },
+    {
+      "attempt": "main-corpus raw admission comparison",
+      "class": "A",
+      "result": "EXPLAINED_NOT_SEMANTIC_BASELINE",
+      "reason": "Unmodified main lacks resource.bindings capability admission; preserve raw output. Project only FILE declaration metadata and that capability into separate AIR copies; preserve every executable/entry/storage/uncertainty/origin/premise subtree. Compare CALL against projected main, normalizing only documented legacy wire implicit COMPLETE/empty analysisReasons."
+    },
+    {
+      "attempt": "laws.log",
+      "class": "A",
+      "result": "FAIL_ENVIRONMENT",
+      "reason": "Sandbox denies ptrace; all MR1-MR9 passed beforehand. Guards rerun with authorized local tracing outside sandbox.",
+      "replacement": "guards.log PASS"
+    },
+    {
+      "attempt": "performance report assembly",
+      "class": "A",
+      "result": "FAIL_REPORT",
+      "reason": "F5 is INVALID_IR by independent oracle, has no sites field. Compare absence on both sides; production and oracle unchanged.",
+      "replacement": "performance-comparison.json PASS"
+    }
+  ],
+  "notRun": [
+    {
+      "gate": "W10/D, release, PR merge/auto-merge",
+      "reason": "Not authorized"
+    },
+    {
+      "gate": "Confidential real incident",
+      "reason": "No private input used; only public CardDemo and synthetic fixtures"
+    },
+    {
+      "gate": "All unrelated historical producer/AIR qualifications or full11 EP policy mutants",
+      "reason": "No source change in those products; EP core code identical main, mandatory shared-kernel gates and actual consumer composition rerun."
+    }
+  ]
+}

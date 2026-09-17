@@ -1,0 +1,5 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. FILETEST.
+       PROCEDURE DIVISION.
+           CALL 'PROGA'.
+           GOBACK.

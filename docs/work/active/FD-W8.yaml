@@ -1,0 +1,84 @@
+id: FD-W8
+title: CICS File Control, browse e administração
+status: IN_PROGRESS
+scope:
+- file-dependencies
+- proleap-poc
+- cobol-lower
+- analysis-cfg
+objective: CICS File Control, browse e administração
+motivation: CICS FILE tem semântica própria e não necessita de SELECT/FD; infraestrutura LINK/XCTL não cobre
+  File Control.
+repos:
+- proleap-poc
+- cobol-lower
+- analysis-cfg
+preconditions:
+- W3–W4 efeitos/handlers
+- W7 somente para implementar/qualificar casos computados e fechar W8 completo; não bloqueia início ou subset literal
+- Autoridade C-FC 5.6 e papéis SPI conferidos
+read_first:
+- ../../product/file-dependencies/brief.md
+- ../../product/file-dependencies/contracts.md
+- ../../product/file-dependencies/verification.md
+expected_product:
+- READ/WRITE/REWRITE/DELETE/STARTBR/READNEXT/READPREV/RESETBR/ENDBR/UNLOCK
+- FILE/SYSID/REQID, INTO vs SET, FROM/RIDFLD/LENGTH/TOKEN/RESP/RESP2 e handlers por comando
+- INQUIRE FILE/SET FILE, aliases de sintaxe e operandos de saída distintos do target de entrada
+allowed_changes:
+- Parser embedded canônico/host binding e facts CICS separados de Program Control
+- Translation/effects/consumer por categoria e testes C01–C07
+forbidden_changes:
+- Reclassificar READQ/WRITEQ/journal/RETURN como arquivo ou fundir SYSID distintos
+- Promover atributos administrativos DSNAME a target; importar regra 6.x/TX para 5.6
+invariants:
+- Todos os invariantes do brief e guardrail COBOL_SOURCE_ONLY
+- Preservar CALL/evidência; literal não espera solver; mudanças normativas só bilaterais
+semantic_cases:
+- C01–C07; T36–T41; nomes literais/computados, sem FD/SELECT
+- NOHANDLE/HANDLE/RESP, browse, output INQUIRE
+tests:
+- Oráculos independentes dos casos listados em test-catalog.md; positivos, negativos e adversariais antes do
+  código
+- CicsProgramControlTest
+- CicsInvokeRouteTest
+- CicsTargetTimingTest
+- T41
+regressions:
+- CicsProgramControlTest
+- CicsInvokeRouteTest
+- CicsTargetTimingTest
+- T41
+commands_and_gates:
+- 'F-CICS: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'L-INPUT: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'C-DEP: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'C-VALUES: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'B-SP: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'B-AIR: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'E-SELECTED: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'Q-SHARED: comando e escopo em ../../product/file-dependencies/verification.md'
+- python3 -B scripts/harness/lean.py fast — uma vez por repo produtivo estabilizado, após focais
+acceptance:
+- Subset literal/static pode iniciar e ser qualificado após W3–W4 sem W7; registrar escopo parcial de W8, sem alegar core completo
+- Casos computados exigem FD-W7; W8 completo e W11 exigem ambos os subsets, com T37 integrado
+- Todos os dez comandos + dois SPI selecionados têm positivo/negativo, effects/control/target explícitos
+- SYSID qualifica sem lookup externo; INTO/SET são distintos; INQUIRE output não usa valor anterior como nome
+- CALL/LINK/XCTL e efeitos/retornos existentes preservados; nenhuma forma C obrigatória só UNSUPPORTED ao fechar
+evidence:
+- Commit/pin exatos por fronteira; comandos/exit/results reais, testes novos vs REUSED vs NOT_RUN
+- Atualizar matriz somente com oracle/resultado; estado curto e PR persistente por repo, sem receipt obrigatório
+stop_condition: Parar ao qualificar C-FC; administração não abre escopo de configuração externa.
+depends_on:
+- FD-W3
+- FD-W4
+conditional_dependencies:
+- work_item: FD-W7
+  applies_to: Casos FILE computados e fechamento completo de W8; não condiciona subset literal/static
+
+qualification:
+  status: QUALIFIED_LOCAL_POST_EP_R2
+  evidence: docs/product/file-dependencies/post-ep-r2.md
+  result: FAST544/Q589/wire21,41CICS x2,73corpus novos PASS;133CALL iguais ao main EP-R2;411FILE e35READ DATASET preservados.
+  next: STOP para revisão humana final; W10 TODO/NOT_AUTHORIZED; nenhum merge/auto-merge/release; IN_PROGRESS lean até merge autorizado.
+resumption: EP-R2 preservado; C06 restrito a READ DATASET e aliases já autorizados; demais aliases NOT_QUALIFIED.

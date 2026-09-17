@@ -1,0 +1,76 @@
+id: FD-W5
+title: SORT/MERGE/RELEASE/RETURN e I/O implícito
+status: IN_PROGRESS
+scope:
+- file-dependencies
+- proleap-poc
+- cobol-lower
+- analysis-cfg (papéis se necessário)
+objective: SORT/MERGE/RELEASE/RETURN e I/O implícito
+motivation: USING/GIVING provam uso mesmo sem READ/WRITE; SD e procedimentos não são programa externo.
+repos:
+- proleap-poc
+- cobol-lower
+- analysis-cfg (papéis se necessário)
+preconditions:
+- W0 SD
+- W3 transferências/storage
+- W4 handlers/controle; A6 transporte
+read_first:
+- ../../product/file-dependencies/brief.md
+- ../../product/file-dependencies/contracts.md
+- ../../product/file-dependencies/verification.md
+expected_product:
+- Todos os participantes USING/GIVING com papéis e mesma origem do statement
+- INPUT/OUTPUT PROCEDURE/ranges com controle local; MERGE respeita restrições próprias
+- RELEASE record FROM e RETURN sort-file INTO/AT END, sort-work sem nome externo inventado
+allowed_changes:
+- Facts/SP, tradução de fases e invocações locais; consumer se falta papel
+- Testes manuais multiparty e pipeline mínima sem I/O explícito
+forbidden_changes:
+- Ordem total inventada, produto cartesiano indevido, procedural name como CALL externo
+- Aplicar INPUT PROCEDURE de SORT a MERGE ou SORT de tabela como arquivo
+invariants:
+- Todos os invariantes do brief e guardrail COBOL_SOURCE_ONLY
+- Preservar CALL/evidência; literal não espera solver; mudanças normativas só bilaterais
+semantic_cases:
+- N08/N26–N30; T23–T28; A6
+- Mesmo arquivo em mais de um papel; SD sem alvo; entradas múltiplas
+tests:
+- Oráculos independentes dos casos listados em test-catalog.md; positivos, negativos e adversariais antes do
+  código
+- CALL em INPUT/OUTPUT PROCEDURE
+- PERFORM ranges
+- T28
+regressions:
+- CALL em INPUT/OUTPUT PROCEDURE
+- PERFORM ranges
+- T28
+commands_and_gates:
+- 'F-DECL: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'L-INPUT: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'C-DEP: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'B-SP: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'B-AIR: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'E-SELECTED: comando e escopo em ../../product/file-dependencies/verification.md'
+- python3 -B scripts/harness/lean.py fast — uma vez por repo produtivo estabilizado, após focais
+acceptance:
+- Programa só SORT/MERGE publica entradas/saídas completas com roles/site refs
+- Nenhum nome externo de sort-work inventado; RELEASE resolve owner SD; RETURN não colide com GOBACK/CICS RETURN
+- Procedimentos locais preservam retorno/efeitos; negativos tabela/MERGE inválido passam
+evidence:
+- Commit/pin exatos por fronteira; comandos/exit/results reais, testes novos vs REUSED vs NOT_RUN
+- Atualizar matriz somente com oracle/resultado; estado curto e PR persistente por repo, sem receipt obrigatório
+stop_condition: Parar após família e regressões; cláusulas auxiliares ficam para W6.
+depends_on:
+- FD-W0
+- FD-W3
+- FD-W4
+
+checkpoint:
+  technical_status: QUALIFIED_LOCAL
+  producer_pins: frontend9d4de9b252cc67dfdce1def568ee9915318bec16 / lower e50b5e19231e4183bc0c2184a2e14f7bdca65ae1
+  validation: focal/B-SP/B-AIR/FAST/reader PASS; Q-SHARED producer implementation PASS with final localized reuse; E-SELECTED44 sources twice PASS
+  limitations: bounded shared procedure return; no total participant order/count; no normative AIR delta
+  next: FD-W6
+  detail: ../../product/file-dependencies/w5-implementation.md

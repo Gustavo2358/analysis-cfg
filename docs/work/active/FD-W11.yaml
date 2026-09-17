@@ -1,0 +1,84 @@
+id: FD-W11
+title: Qualificação transversal do core N+C e handoff para revisão
+status: IN_PROGRESS
+scope:
+- file-dependencies
+- analysis-cfg
+- artefatos-e2e
+- repos produtores com remediações comprovadas
+objective: Qualificar core N+C sem condicionar sua entrega à extensão D posterior
+motivation: Fechar a campanha exige evidência transversal de semântica, wire, CALL e custo nos mesmos pins.
+repos:
+- analysis-cfg
+- artefatos-e2e
+- repos produtores com remediações comprovadas
+preconditions:
+- W0–W9 qualificadas no escopo N+C; W8 inclui casos literais e computados
+- D-AIR/D-WIRE/D-EFFECT/D-DYNAMIC core fechadas; pins finais imutáveis; D-D-AUTH e captura D ficam para W10
+read_first:
+- ../../product/file-dependencies/brief.md
+- ../../product/file-dependencies/contracts.md
+- ../../product/file-dependencies/verification.md
+expected_product:
+- Matriz N+C com evidência por linha obrigatória; N04/N18 e D permanecem explicitamente PLANNED para extensão, sem bloquear DoD core
+- E2E por CLIs, corpus fixado, reader novo/legado/projeção CALL, adversariais/metamórficos/mutantes focais
+- Métricas de escala (arquivos/usos/layouts/candidatos/unidades/SORT), tempo/memória por etapa e comparação
+  CALL; handoff
+allowed_changes:
+- Tests/oracles/docs e correções mínimas de bugs demonstrados em repositórios próprios
+- Repins necessários com prova e gates proporcionais
+forbidden_changes:
+- Merge/auto-merge, pacote/release sem autorização, apagar falhas/outputs
+- Declarar completude por parser/crash-free/contagem ou cutoff; DSNAME como gap
+invariants:
+- Todos os invariantes do brief e guardrail COBOL_SOURCE_ONLY
+- Preservar CALL/evidência; literal não espera solver; mudanças normativas só bilaterais
+semantic_cases:
+- Catálogo core N+C obrigatório, scope guards e CALL-X1–X6; variantes D de CALL-X6/SG2 ficam para W10
+- T51–T54, MR1–MR9 e mutantes focais; corpus com verdade de referência
+tests:
+- Oráculos independentes dos casos listados em test-catalog.md; positivos, negativos e adversariais antes do
+  código
+- Todo CALL/program-control existente pertinente
+- scope guards
+- corpus CALL+FILE
+regressions:
+- Todo CALL/program-control existente pertinente
+- scope guards
+- corpus CALL+FILE
+commands_and_gates:
+- 'B-SP: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'B-AIR: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'B-WIRE: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'E-SELECTED: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'Q-SHARED: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'E-FINAL: comando e escopo em ../../product/file-dependencies/verification.md'
+- python3 -B scripts/harness/lean.py fast — uma vez por repo produtivo estabilizado, após focais
+acceptance:
+- Core N+C qualificado sem exigir W10; nenhuma claim de suporte D por omissão de suas pendências
+- Nenhuma regressão CALL inexplicada; candidates/supports/remainders/alcance e provenance comparados
+- Todas as fronteiras qualificadas nos pins finais; JSON correto e determinístico; erro de entrega preservado
+- Limites reais/fora de perfil explícitos; ausência DSNAME nunca parcial; custos medidos sem inventar SLA
+- PRs persistentes em Draft para revisão final; DONE lean somente após merge autorizado e testes requeridos
+evidence:
+- Commit/pin exatos por fronteira; comandos/exit/results reais, testes novos vs REUSED vs NOT_RUN
+- Atualizar matriz somente com oracle/resultado; estado curto e PR persistente por repo, sem receipt obrigatório
+stop_condition: 'STOP: revisão humana final. Não fazer merge/auto-merge/repin pós-merge sem autorização.'
+depends_on:
+- FD-W0
+- FD-W1
+- FD-W2
+- FD-W3
+- FD-W4
+- FD-W5
+- FD-W6
+- FD-W7
+- FD-W8
+- FD-W9
+
+qualification:
+  status: QUALIFIED_LOCAL_POST_EP_R2
+  evidence: docs/product/file-dependencies/post-ep-r2.md
+  result: FAST544/Q589/wire21,41CICS x2,73corpus novos PASS;133CALL iguais ao main EP-R2;411FILE e35READ DATASET preservados.
+  next: STOP para revisão humana final; W10 TODO/NOT_AUTHORIZED; nenhum merge/auto-merge/release; IN_PROGRESS lean até merge autorizado.
+resumption: EP-R2 preservado; C06 restrito a READ DATASET e aliases já autorizados; demais aliases NOT_QUALIFIED.

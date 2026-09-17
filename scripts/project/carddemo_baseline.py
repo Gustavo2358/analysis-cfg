@@ -156,14 +156,21 @@ def classify_failure(stage, code, diagnostic):
     return 'FAILED', 'INTERNAL_FAILURE', 'PROCESS_FAILED'
 
 
-def execute_stage(stage, command, cwd, timeout):
+def execute_stage(stage, command, cwd, timeout, *, measure_resources=False):
     start = time.monotonic_ns()
     result = {'state': 'PASS', 'reasonCategory': None, 'reasonCode': None, 'diagnostic': None,
               'configuredTimeoutSeconds': timeout, 'command': command,
               'stdout': stage + '.stdout', 'stderr': stage + '.stderr'}
+    launched = command
+    resources_path = cwd / (stage + '.resources.json')
+    if measure_resources:
+        launched = ['/usr/bin/time', '-q', '-f',
+                    '{"maximumResidentSetKiB":%M,"userSeconds":%U,"systemSeconds":%S,"wallSeconds":%e}',
+                    '-o', str(resources_path.resolve()), *command]
+        result['resourceMeasurementCommand'] = launched
     with (cwd / result['stdout']).open('wb') as out, (cwd / result['stderr']).open('wb') as err:
         try:
-            process = subprocess.Popen(command, cwd=cwd, stdout=out, stderr=err, start_new_session=True)
+            process = subprocess.Popen(launched, cwd=cwd, stdout=out, stderr=err, start_new_session=True)
             try:
                 result['exitCode'] = process.wait(timeout=timeout)
             except subprocess.TimeoutExpired:
@@ -178,11 +185,31 @@ def execute_stage(stage, command, cwd, timeout):
             result.update(state='FAILED', reasonCategory='INTERNAL_FAILURE', reasonCode='PROCESS_START_FAILED',
                           diagnostic=str(error), exitCode=None)
     result['elapsedMs'] = elapsed(start)
+    if measure_resources:
+        result['resources'] = json.loads(resources_path.read_text()) if resources_path.exists() and resources_path.stat().st_size else None
     if result['state'] == 'PASS' and result['exitCode'] != 0:
         diagnostic = (cwd / result['stderr']).read_text(errors='replace')
         state, category, reason = classify_failure(stage, result['exitCode'], diagnostic)
         result.update(state=state, reasonCategory=category, reasonCode=reason, diagnostic=diagnostic[-16000:])
     return result
+
+
+def frontend_summary(data, config):
+    if data.get('schema') == 'cobol-semantic-compilation':
+        if data['contractVersion'] != config.get('compilationProductVersion'):
+            raise ValueError('unexpected compilation version')
+        products = [u['product'] for u in data['units']]
+        partial = data['inventoryStatus'] != 'COMPLETE'
+    else:
+        products, partial = [data], False
+    for product in products:
+        if product['contractVersion'] != config['semanticProductVersion']:
+            raise ValueError('unexpected SP version')
+        partial |= bool(product['gaps']) or any(product['coverage'][key] for key in
+                    ('partialStatements', 'unsupportedStatements', 'inputMissingStatements'))
+        partial |= product.get('entryInventory', {}).get('status', 'COMPLETE') != 'COMPLETE'
+    return {'programNames': [p['unit']['canonicalProgramName'] for p in products],
+            'units': [p['unit'] for p in products], 'partial': bool(partial)}
 
 
 def empty_program(source):
@@ -224,16 +251,16 @@ def attempt_program(source_record, upstream, work, config, timeout, jvm_args):
         web = run_dir / 'src/main/resources'
         web.mkdir(parents=True)
         (web / 'web').symlink_to(Path(config['checkouts']['proleap-poc']) / 'src/main/resources/web', target_is_directory=True)
-        outputs = {'frontend': run_dir / 'sp/cobol-semantic-product.json', 'lower': run_dir / 'program.air.json',
+        outputs = {'frontend': run_dir / 'sp' / config.get('semanticProductFile', 'cobol-semantic-product.json'), 'lower': run_dir / 'program.air.json',
                    'cfg': run_dir / 'cfg.json', 'dependency': run_dir / 'dependencies.json'}
         args = {'frontend': ['--source', str(source), '--copybooks', ','.join(str(r) for r in physical_roots),
-                             '--output', str(run_dir / 'sp')],
+                             '--output', str(run_dir / 'sp'), *config.get('frontendArguments', [])],
                 'lower': [str(outputs['frontend']), str(outputs['lower'])],
                 'cfg': [str(outputs['lower']), str(outputs['cfg'])],
                 'dependency': [str(outputs['lower']), str(outputs['dependency'])]}
         for stage, time_key in zip(STAGES, TIMING_KEYS):
             command = ['java', *jvm_args, '-cp', os.pathsep.join(config[stage]['classpath']), config[stage]['main'], *args[stage]]
-            outcome = execute_stage(stage, command, run_dir, timeout)
+            outcome = execute_stage(stage, command, run_dir, timeout, measure_resources=config.get('measureResources', False))
             record['stages'][stage] = outcome
             record['timings'][time_key] = outcome['elapsedMs']
             path = outputs[stage]
@@ -243,7 +270,12 @@ def attempt_program(source_record, upstream, work, config, timeout, jvm_args):
             if path.is_file():
                 record['artifacts'][stage] = {'path': path.relative_to(work).as_posix(), 'sha256': digest(path), 'bytes': path.stat().st_size}
             # Nonzero exit remains a failure even if a stale/partial output exists; dirs are fresh.
-            if outcome['state'] != 'PASS': break
+            if outcome['state'] != 'PASS':
+                # Dependency analysis reads AIR directly through its explicit partial-analysis
+                # admission; a strict CFG export refusal is a separate observed branch.
+                if stage == 'cfg' and config.get('dependencyIndependentOfCfg', False):
+                    continue
+                break
             if not path.is_file():
                 outcome.update(state='FAILED', reasonCategory='INTERNAL_FAILURE', reasonCode='OUTPUT_MISSING',
                                diagnostic='Process returned zero without producing its output')
@@ -251,10 +283,11 @@ def attempt_program(source_record, upstream, work, config, timeout, jvm_args):
             try:
                 data = json.loads(path.read_bytes())
                 if stage == 'frontend':
-                    if data['contractVersion'] != config['semanticProductVersion']:
-                        raise ValueError('unexpected SP version')
-                    record['programName'] = data['unit']['canonicalProgramName']
-                    partial = data['gaps'] or any(data['coverage'][key] for key in ('partialStatements', 'unsupportedStatements', 'inputMissingStatements'))
+                    summary = frontend_summary(data, config)
+                    record['programName'] = summary['programNames'][0] if summary['programNames'] else None
+                    record['programNames'] = summary['programNames']
+                    record['unitInventory'] = summary['units']
+                    partial = summary['partial']
                 elif stage == 'lower':
                     partial = bool(data['publication'].get('uncertainties'))
                 elif stage == 'dependency':
@@ -262,6 +295,7 @@ def attempt_program(source_record, upstream, work, config, timeout, jvm_args):
                     read(path)
                     partial = data['publicationInventory'] != 'COMPLETE' or any(
                         s['effectiveUnknownRemainder'] or s['openControlRemainder'] for s in data['sites'])
+                    partial |= any(s['unknownRemainder'] for s in data.get('fileDependencies', {}).get('sites', []))
                 else:
                     from cfg_wire_contract import verify
                     verify(path.read_bytes())

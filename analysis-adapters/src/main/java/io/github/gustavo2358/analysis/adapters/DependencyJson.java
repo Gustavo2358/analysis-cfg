@@ -11,15 +11,16 @@ import static io.github.gustavo2358.analysis.dependencies.DependencySiteFact.*;
 public final class DependencyJson {
     public void write(DependencyResult result,OutputStream stream) throws IOException {
         var out=new JsonOutput(stream);
-        var document=object("schema","analysis-dependency-result","version",result.partial()?"1.2.0":"1.1.0","airVersion",version(result.airVersion()),
+        var document=object("schema","analysis-dependency-result","version","2.3.0","airVersion",version(result.airVersion()),
             "publication",id(result.publication()),"interpretationProfile","per-site","valuesProfile","scalar-text-effects@1",
             "modelScope",result.structuralScope()?"STRUCTURAL_AIR_OCCURRENCES":"KNOWN_GRAPH_ENTRY","publicationInventory",inventory(result.publicationInventory()),
-            "sites",result.sites().stream().sorted(Comparator.comparing(DependencySiteFact::entry,io.github.gustavo2358.analysis.plan.AnalysisKey.ENTRY_ORDER).thenComparing(f->f.operation().localId())).map(s->site(s,result.partial())).toList(),
+            "sites",result.sites().stream().sorted(Comparator.comparing(DependencySiteFact::entry,io.github.gustavo2358.analysis.plan.AnalysisKey.ENTRY_ORDER).thenComparing(f->f.operation().localId())).map(s->site(s,true)).toList(),
             "edges",result.edges().stream().sorted(Comparator.comparing(DependencyResult.Edge::entry,io.github.gustavo2358.analysis.plan.AnalysisKey.ENTRY_ORDER).thenComparing(e->e.site().localId()).thenComparing(e->e.candidate().referenceName()).thenComparing(e->e.candidate().rawValue())).map(e->object("caller",id(e.caller()),"entry",id(e.entry()),"site",id(e.site()),"candidate",candidate(e.candidate()),"openSite",e.openSite())).toList(),
             "metrics",result.metrics(),"origins",result.origins().stream().sorted(Comparator.comparing(o->o.id().localId())).map(DependencyJson::origin).toList(),
             "artifacts",result.artifacts().stream().sorted(Comparator.comparing(a->a.id().localId())).map(a->object("id",id(a.id()),"logicalName",a.logicalName(),"contentDigest",a.contentDigest().orElse(null))).toList(),
             "sourceUncertaintyRefs",ids(result.sourceUncertaintyRefs()));
-        if(result.partial()) {document.put("analysisStatus","PARTIAL");document.put("analysisReasons",result.analysisReasons().stream().distinct().sorted().toList());}
+        document.put("analysisStatus",result.partial()?"PARTIAL":"COMPLETE");document.put("analysisReasons",result.analysisReasons().stream().distinct().sorted().toList());
+        document.put("analysisBoundary","COBOL_SOURCE_ONLY");document.put("fileDependencies",FileDependencyJson.value(result.fileDependencies()));
         out.value(document);out.finish();
     }
     private static Object site(DependencySiteFact f,boolean extended) {

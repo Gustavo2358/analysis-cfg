@@ -137,6 +137,44 @@
     "io.github.gustavo2358.analysis.adapters.PartialProjectionLawTest": [
       "unknownControlUsesSameSnapshotSolverAndBeforeEvidenceWithoutEntryBackedge"
     ],
+    "io.github.gustavo2358.analysis.adapters.FileDependencyTest": [
+      "declarationWithoutUseIsNotOperationalEdge",
+      "writeFromDoesNotReadFileOwningFromRecord",
+      "equalNamesKeepDistinctOwners",
+      "computedCicsIsRetainedWithoutInventedName",
+      "sortParticipantsKeepRolesAndLocalWork",
+      "callProjectionAndFileAbsenceRemainSeparate",
+      "outputFailurePreservesActualPreviousFile"
+    ],
+    "io.github.gustavo2358.analysis.adapters.FileLocalUseOracleTest": [
+      "opaqueAndJumpUseTheAssociationNotOperationSpelling",
+      "localBindingOnCallDoesNotReclassifyItsExternalTarget"
+    ],
+    "io.github.gustavo2358.analysis.adapters.FileComputedOracleTest": [
+      "firstAndSecondCommandsObserveDifferentValuesAndShareOneProvider",
+      "joinsDistinguishClosedPartialAndUnknown",
+      "cyclesRetainFiniteCandidatesWithoutCutoff",
+      "aliasAndPhysicalRefmodUseTheSameStorageFacts",
+      "targetIsObservedBeforeOverlappingForeignWrites",
+      "literalDoesNotRunValuesAndUsesFilePolicy",
+      "invalidPolicySpellingAndShortAreaRemainOpen",
+      "physicalCallAndFileReuseTheSameGeneralAnalysisRun",
+      "literalCannotBorrowCallPolicyOrRunValues"
+    ],
+    "io.github.gustavo2358.analysis.adapters.FileCheckpointOracleTest": [
+      "optionalLoopPreservesExactValueUnlessWritesAreActuallyAllowed"
+    ],
+    "io.github.gustavo2358.analysis.adapters.FileCicsContextOracleTest": [
+      "sameFileKeepsDefaultAndTwoExplicitSystemsDistinct",
+      "badOrMissingContextCannotPretendToBeDefault",
+      "computedContextUsesBeforeAndSameGeneralProviderAsFile",
+      "contextJoinsKeepIndependentCandidatesAndRemainder",
+      "sourceInventoryGapOpensEvidenceWithoutInventingModelValues"
+    ],
+    "io.github.gustavo2358.analysis.adapters.FileScopeOracleTest": [
+      "declarationOwnerAndUseOwnerDifferWithoutTransitiveCallOrFile",
+      "enumerationOrderCannotReassignUses"
+    ],
     "io.github.gustavo2358.analysis.adapters.EpR2DepthVerticalTest": [
       "manySegmentsPreserveMayMustBeforeAndCapturedSourceThroughJson"
     ],
@@ -147,6 +185,11 @@
       "eightCharacterDollarNameKeepsFullLength",
       "nondollarAndMiddleDollarControlsKeepSupportAndRemainders",
       "rejectedNamesStillPublishRawWithoutEdges"
+    ],
+    "io.github.gustavo2358.analysis.adapters.FileEpR2CompositionTest": [
+      "independentEntryFactorsShareOneGeneralRunForCallAndFile",
+      "simultaneousStrongAndOpenEntrySurvivesBothOrdersBeforeFile",
+      "leadingDollarCallAndIndependentCicsFilePolicyShareWire23"
     ]
   },
   "analysis-dataflow": {

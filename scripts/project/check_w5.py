@@ -20,6 +20,10 @@ TESTS={
 TESTS['analysis-dataflow']['RegionalAnalysisTest']=set(['rdAndValuesShareSelectedEntriesAndOneBatchPerExecution', 'unselectedAndMissingQueriesAreExplicitWithoutDiscardingValidResults', 'resourcePreflightFailsBeforeAnySemanticResultAndRecovers'])
 TESTS['analysis-adapters']['RegionalWireTest']=set(['fileProductCarriesIndependentCompositionAndCopyIntervals', 'inventoryAndQueryPermutationPreserveTheEntireWire', 'hugeUnknownTailZeroAndLogicalCellsRetainTheirDistinctWireShapes','detachedResultRetentionContainsOnlyValuesMetadataAndReferenceIds','regionalLiteralSeedsKeepEntryIdentityAndNonoverlappingWireCovers','distinctEntryPathsKeepRegionalContentsAndReachabilitySeparate'])
 TESTS['analysis-launcher']['RegionalCliTest']=set(['missingInputAndBadQueryNeverReplaceOutput', 'realRegionalFileHasStableOutputAndExplicitUnsupportedQuery', 'malformedAirAndOutputFailurePreserveExistingContentAndCleanTemporary'])
+# The independent reader consumes these logical/choice products after this gate's clean.
+TESTS['analysis-adapters']['LogicalEntryWireTest']={'sourcePossibilityRoundtripsWithoutPhysicalStorage'}
+TESTS['analysis-launcher']['LogicalChoiceTargetTest']={'equivalentFormsAndMixedAlternativesRetainLogicalSupportInMemoryAndCli'}
+TESTS['analysis-launcher']['PhysicalChoiceTargetTest']={'physicalAlternativesSurviveMemoryAndCliWithoutResurrectingMustValues'}
 DENIED=('java.lang.reflect','java.util.ServiceLoader','cobolexplorer','org.antlr','lower.adapters','CallResolver','FileResolver','Db2Resolver','CicsResolver','GrbeResolver','ProgramDependency','CfgJsonWriter','CfgJsonBytes')
 POM_ADDITION=b'    <module>analysis-dataflow</module>\n    <module>analysis-adapters</module>\n    <module>analysis-launcher</module>\n'
 def original_pom(data):

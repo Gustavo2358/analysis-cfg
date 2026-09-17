@@ -24,7 +24,7 @@ public final class CoreCfgProjection {
     /** Regional operations and the pure IBM1047 codec preserve sequential control after AIR preflight.
      * This role does not calculate storage, bytes or possible values. */
     public static boolean supportsControlCapability(Capabilities.Capability capability) {
-        return Capabilities.TARGET_POSSIBILITIES.equals(capability) || Capabilities.MEMORY_REGIONS.equals(capability) || Capabilities.IBM1047.equals(capability) || Capabilities.ENTRY_POSSIBILITIES_V2.equals(capability) || Capabilities.ENTRY_POSSIBILITIES.equals(capability);
+        return Capabilities.RESOURCE_BINDINGS.equals(capability) || Capabilities.TARGET_POSSIBILITIES.equals(capability) || Capabilities.MEMORY_REGIONS.equals(capability) || Capabilities.IBM1047.equals(capability) || Capabilities.ENTRY_POSSIBILITIES_V2.equals(capability) || Capabilities.ENTRY_POSSIBILITIES.equals(capability);
     }
 
     /** Default admission of the known subset; requires the same preflight as explicit policy admission. */

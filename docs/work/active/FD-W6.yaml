@@ -1,0 +1,63 @@
+id: FD-W6
+title: I-O-CONTROL e cláusulas auxiliares do perfil
+status: IN_PROGRESS
+scope:
+- file-dependencies
+- proleap-poc
+- cobol-lower
+objective: I-O-CONTROL e cláusulas auxiliares do perfil
+motivation: A gramática exige EVERY em RERUN e mistura cláusulas de dialetos; cobertura não pode sumir silenciosamente.
+repos:
+- proleap-poc
+- cobol-lower
+preconditions:
+- W0 declarações
+- W3 alias/área
+- W5 SORT/MERGE
+read_first:
+- ../../product/file-dependencies/brief.md
+- ../../product/file-dependencies/contracts.md
+- ../../product/file-dependencies/verification.md
+expected_product:
+- Corrigir RERUN sort/merge sem EVERY com referência e fixture; checkpoint/gatilho source-level
+- SAME variants, MULTIPLE FILE e cláusulas N11–N17 classificadas efetivas/documentais/fora do perfil com fonte
+- Conservar metadata e efeitos reais; fechar auditoria N01–N03/N05–N17; N04 e N18 permanecem no perfil D/W10
+allowed_changes:
+- Correção focal gramática, facts/cláusulas, alias/efeitos conforme autoridade
+- Matriz atualizada somente com evidência de teste
+forbidden_changes:
+- Resolver checkpoint dataset externo ou publicar DSNAME
+- Tratar toda SAME como alias universal, apagar cláusulas obrigatórias para fechar perfil
+invariants:
+- Todos os invariantes do brief e guardrail COBOL_SOURCE_ONLY
+- Preservar CALL/evidência; literal não espera solver; mudanças normativas só bilaterais
+semantic_cases:
+- N11–N17; T16/T17/T29/T30; negativos de legado/dialeto
+- RERUN sem SELECT próprio quando admitido; aliases não unem recursos
+tests:
+- Oráculos independentes dos casos listados em test-catalog.md; positivos, negativos e adversariais antes do
+  código
+- CALL-X1–X6 se storage muda
+- parser de statements anteriores
+regressions:
+- CALL-X1–X6 se storage muda
+- parser de statements anteriores
+commands_and_gates:
+- 'F-DECL: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'F-STORAGE: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'L-INPUT: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'B-SP: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'E-SELECTED: comando e escopo em ../../product/file-dependencies/verification.md'
+- python3 -B scripts/harness/lean.py fast — uma vez por repo produtivo estabilizado, após focais
+acceptance:
+- RERUN correto parseia e publica identidade source-level com origem; negativo de perfil recusado/localizado
+- Cada cláusula tem decisão de efeito/metadado e teste, sem inventar alias
+- Nenhuma linha N obrigatória pendente escondida por OUT_OF_PROFILE sem autoridade
+evidence:
+- Commit/pin exatos por fronteira; comandos/exit/results reais, testes novos vs REUSED vs NOT_RUN
+- Atualizar matriz somente com oracle/resultado; estado curto e PR persistente por repo, sem receipt obrigatório
+stop_condition: Parar com auditoria de cláusulas registrada; não estender dialectos não selecionados.
+depends_on:
+- FD-W0
+- FD-W3
+- FD-W5

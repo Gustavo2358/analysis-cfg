@@ -10,7 +10,7 @@ import sys
 
 from dependency_wire import read, require
 from cfg_wire_contract import verify as verify_cfg_wire
-from e2e_w2d import execute, runtime, source_spans
+from e2e_w2d import locked_sp, open_call_model, execute, runtime, source_spans
 from e2e_move_data import reference
 from prepare_w2d_producers import ROOT, git, require_local
 
@@ -18,7 +18,7 @@ FIXTURES = ROOT / 'analysis-adapters/src/test/resources/cp6/perform-basic'
 
 
 def source_oracle(sp, case):
-    require(sp['contractVersion'] in ('1.8.0','1.9.0','2.0.0','2.1.0','2.2.0', '2.3.0', '2.4.0', '2.5.0', '2.6.0', '2.7.0','2.8.0') and sp['unit']['canonicalProgramName'] == 'CALLER', 'real CALLER at SP1.8')
+    locked_sp(sp); require(sp['unit']['canonicalProgramName']=='CALLER', 'real CALLER')
     statements = {s['header']['id']: s for s in sp['statements']}
     performs = [s for s in statements.values() if s['variant'] == 'PERFORM']
     require(len(performs) == 1, 'one typed PERFORM')
@@ -105,7 +105,7 @@ def dependency_oracle(result, model, source):
     require(site['reachability'] == 'REACHABLE' and site['valuePoint']['position'] == 'BEFORE', 'reachable BEFORE Invoke query')
     require([c['referenceName'] for c in site['candidates']] == ['PROGA'], 'PROGA only; OLDPROG killed')
     require([c['rawValue'] for c in site['rawCandidates']] == ['PROGA   '] and site['candidates'][0]['rawValue'] == 'PROGA   ', 'raw padding retained')
-    require(site['modelValueRemainder'] is False, 'closed model')
+    open_call_model(call['terminator'],site)
     require(site['sourceValueRemainder'] and site['interpretationUnknownRemainder'] and site['effectiveUnknownRemainder'], 'other real-source remainders remain explicit')
     supports = site['candidates'][0]['supports']
     require(len(supports) == 1 and supports[0]['producer'] == producer['header']['id'] and supports[0]['origin'] == producer['header']['origin'], 'original literal supports copied candidate')
@@ -148,7 +148,7 @@ def run(work, config_path):
             other = read(perm_dep); dependency_oracle(other, air_oracle(permuted, semantic, case, source), source)
             require(result['sites'] == other['sites'] and result['edges'] == other['edges'], 'sequence permutation preserves result')
             outputs.append([path.read_bytes() for path in (sp, air, cfg, dep)])
-            print(f'PASS PERFORM {case} {attempt}: CALLER -> PROGA; raw="PROGA   "; modelValueRemainder=false; original literal support; permutation PASS', flush=True)
+            print(f'PASS PERFORM {case} {attempt}: CALLER -> PROGA; raw="PROGA   "; explicit source CALL remainder; original literal support; permutation PASS', flush=True)
         require(outputs[0] == outputs[1], case + ' A/B bytes differ')
         print('PASS PERFORM ' + case + ' A/B: SP, AIR, CFG, dependency bytes identical', flush=True)
 

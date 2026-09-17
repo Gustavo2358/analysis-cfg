@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Independent strict parser/oracle for analysis-dependency-result 1.1.0/1.2.0."""
+"""Independent strict parser/oracle for analysis-dependency-result 1.1 through 2.3."""
 import argparse
 import json
 import re
@@ -39,7 +39,7 @@ def u16(value):
 def identity(value, domain=None):
     require(type(value) is dict, 'ID object')
     d = value.get('domain')
-    require(d in ('publication', 'unit', 'entry', 'label', 'operation', 'object', 'storage', 'origin', 'premise', 'uncertainty', 'operand', 'artifact'), 'ID domain')
+    require(d in ('publication', 'unit', 'entry', 'label', 'operation', 'object', 'storage', 'origin', 'premise', 'uncertainty', 'operand', 'artifact', 'resource'), 'ID domain')
     if domain:
         require(d in domain.split(), 'wrong ID domain')
     names = 'domain localId' + ('' if d == 'publication' else ' publication')
@@ -177,10 +177,133 @@ def reasons(values):
     ordered(values, u16)
 
 
+def file_dependencies(f, document):
+    fields(f, 'valuesProfile declarationInventory declarations sites edges metrics')
+    context_profile = document['version']=='2.3.0'
+    computed_profile = document['version'] in ('2.2.0','2.3.0')
+    require(f['valuesProfile'] == ('file-values-context@1' if context_profile else 'file-values@1' if computed_profile else 'file-literal@1'), 'FILE values profile')
+    require(f['declarationInventory'] in ('COMPLETE','PARTIAL','UNAVAILABLE'), 'FILE inventory')
+    publication = document['publication']['localId']
+    origins = [o['id'] for o in document['origins']]
+    uncertainties = document['sourceUncertaintyRefs']
+    def ref(value, domain):
+        identity(value, domain); require(value['publication'] == publication, 'foreign FILE identity')
+    def origin(value):
+        ref(value, 'origin'); require(value in origins, 'unresolved FILE origin')
+    def context(c, site):
+        if site['namespace'] != 'cics.file':
+            require(c is None, 'non-CICS context is not inferred'); return
+        fields(c, 'selection targetKind valuePoint candidates unknownRemainder origin analysisReasons')
+        require(c['selection'] in ('DEFAULT','EXPLICIT','UNAVAILABLE'), 'CICS source selection')
+        boolean(c['unknownRemainder']); origin(c['origin']); reasons(c['analysisReasons']); array(c['candidates'])
+        if c['selection'] != 'EXPLICIT':
+            require(c['targetKind']==('ABSENT' if c['selection']=='DEFAULT' else 'UNKNOWN'), 'selection kind')
+            require(not c['candidates'] and c['valuePoint'] is None, 'no fabricated system name')
+            require(c['unknownRemainder']==(c['selection']=='UNAVAILABLE'), 'default selection is known without lookup')
+            require(bool(c['analysisReasons'])==(c['selection']=='UNAVAILABLE'), 'context reason')
+            return
+        require(c['targetKind'] in ('LITERAL','COMPUTED'), 'SYSID target kind')
+        if c['targetKind']=='LITERAL':require(c['valuePoint'] is None and len(c['candidates'])<=1, 'literal SYSID')
+        else:require(c['valuePoint']==dict(position='BEFORE',entryId=site['entry'],operationId=site['operation'],outcome=None), 'SYSID query point')
+        for candidate in c['candidates']:
+            fields(candidate,'referenceName rawValue supports');text(candidate['referenceName']);text(candidate['rawValue'])
+            raw=candidate['rawValue'];name=candidate['referenceName']
+            require(name==raw.rstrip(' ') and 1<=len(raw)<=4 and 1<=len(name)<=4 and all(x in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$@#' for x in name), 'SYSID source name policy')
+            require(bool(array(candidate['supports'])), 'SYSID support required')
+            for support in candidate['supports']:
+                fields(support,'kind producer origin premises');ref(support['producer'],'operation operand');origin(support['origin']);refs(support['premises'],'premise')
+                if c['targetKind']=='LITERAL':
+                    require(support['kind']=='CICS_SYSID_LITERAL' and support['producer']['domain']=='operand' and support['producer']['owner']==site['operation'] and support['origin']==c['origin'] and not support['premises'], 'SYSID literal support')
+                else:require(support['kind']=='VALUE_PRODUCER' and len(raw)==4, 'SYSID computed support and extent')
+            if c['targetKind']=='LITERAL':require(len(candidate['supports'])==1 and not c['unknownRemainder'], 'SYSID literal interpretation closed')
+        ordered(c['candidates'],lambda candidate:(u16(candidate['referenceName']),u16(candidate['rawValue'])))
+        if site['reachability']=='UNREACHABLE_IN_MODEL':require(not c['candidates'], 'unreachable SYSID candidates')
+        elif not c['unknownRemainder']:require(bool(c['candidates']), 'empty closed explicit SYSID')
+    for d in array(f['declarations']):
+        fields(d, 'id owner logicalFile classification sourceKind targetKind namespace name objects origin')
+        ref(d['id'], 'resource'); origin(d['origin'])
+        for k in ('classification','sourceKind'):
+            text(d[k]); require(bool(d[k]), 'empty declaration classification')
+        if d['owner'] is None:
+            require(d['logicalFile'] is None and not d['objects'], 'unavailable owner association')
+        else:
+            ref(d['owner'], 'unit'); text(d['logicalFile']); require(bool(d['logicalFile']), 'logical file')
+        require(d['targetKind'] in ('LITERAL','LOCAL','COMPUTED','UNKNOWN'), 'declaration target kind')
+        if d['targetKind'] == 'LOCAL':
+            require(d['namespace'] is None and d['name'] is None, 'local work has no external target')
+        else:
+            text(d['namespace']); require(bool(d['namespace']), 'target namespace')
+            require(d['name'] is not None if d['targetKind'] == 'LITERAL' else d['name'] is None, 'declaration name status')
+            if d['name'] is not None: text(d['name']); require(bool(d['name']), 'empty external name')
+        if d['sourceKind'] == 'ASSIGNMENT_NAME':
+            require(d['targetKind'] == 'LITERAL' and d['namespace'] == 'cobol.external-file-name', 'ASSIGN source name domain')
+        for obj in array(d['objects']):
+            fields(obj, 'object role'); ref(obj['object'], 'object'); text(obj['role']); require(bool(obj['role']), 'object role')
+            require(d['owner'] is not None and obj['object']['unit'] == d['owner']['localId'], 'record owner')
+        ordered(d['objects'], lambda o:(id_order(o['object']),u16(o['role'])))
+    ordered(f['declarations'], lambda d: u16(d['id']['localId']))
+    declarations = [d['id'] for d in f['declarations']]
+    for s in array(f['sites']):
+        fields(s, 'owner entry sequence operation action namespace targetKind bindings valuePoint candidates unknownRemainder reachability effects control origin targetOrigin uncertaintyRefs analysisReasons' + (' context' if context_profile else ''))
+        ref(s['owner'],'unit')
+        for k, domain in (('entry','entry'),('sequence','label'),('operation','operation')):
+            ref(s[k],domain); require(s[k]['unit']==s['owner']['localId'], 'FILE site owner')
+        text(s['action']); require(bool(s['action']),'FILE action')
+        local = s['targetKind'] == 'LOCAL' and document['version'] in ('2.1.0','2.2.0','2.3.0')
+        if local: require(s['namespace'] is None, 'local use has no external namespace')
+        else: text(s['namespace']); require(bool(s['namespace']), 'FILE namespace')
+        require(local or s['targetKind'] in ('LITERAL','COMPUTED'), 'FILE target kind')
+        require(s['reachability'] in ('REACHABLE','UNREACHABLE_IN_MODEL','UNKNOWN'), 'FILE reachability')
+        boolean(s['unknownRemainder']); reasons(s['analysisReasons'])
+        for k in ('effects','control'):require(s[k] in ('EXACT','CONSERVATIVE','OPEN','UNAVAILABLE','NOT_APPLICABLE'), 'FILE precision')
+        origin(s['origin']); origin(s['targetOrigin']); refs(s['uncertaintyRefs'],'uncertainty')
+        require(all(u in uncertainties for u in s['uncertaintyRefs']), 'FILE uncertainty closure')
+        if s['reachability']=='UNKNOWN':require(bool(s['analysisReasons']), 'unknown reachability reason')
+        for b in array(s['bindings']):
+            fields(b,'declaration role origin'); ref(b['declaration'],'resource'); origin(b['origin']); text(b['role']); require(bool(b['role']), 'binding role')
+            require(b['declaration'] in declarations, 'unresolved FILE declaration')
+        ordered(s['bindings'],lambda b:(u16(b['declaration']['localId']),u16(b['role'])))
+        if local:
+            require(s['action']=='resource-use' and s['valuePoint'] is None and not s['candidates'] and not s['unknownRemainder'], 'local use is not an unknown external target')
+            require(any(b['declaration']==d['id'] and d['targetKind']=='LOCAL' for b in s['bindings'] for d in f['declarations']), 'local use needs local declaration')
+        elif s['targetKind']=='LITERAL':require(s['valuePoint'] is None, 'literal does not query values')
+        else:
+            require(s['valuePoint']==dict(position='BEFORE',entryId=s['entry'],operationId=s['operation'],outcome=None), 'FILE query point')
+            if not computed_profile:require(s['unknownRemainder'] and not s['candidates'] and 'FILE_VALUES_NOT_YET_ANALYZED' in s['analysisReasons'], 'W1 computed value remains open')
+        for c in array(s['candidates']):
+            fields(c,'referenceName rawValue supports');text(c['referenceName']);text(c['rawValue'])
+            require(bool(c['referenceName']), 'empty FILE name')
+            if computed_profile and s['namespace']=='cics.file':
+                require(c['referenceName']==c['rawValue'].rstrip(' '), 'FILE unauthorized name transformation')
+                require(1<=len(c['rawValue'])<=8 and 1<=len(c['referenceName'])<=8 and all(x in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$@#' for x in c['referenceName']), 'CICS filename alphabet and length')
+            else:require(c['referenceName']==c['rawValue'], 'FILE exact name transformed')
+            if s['targetKind']=='LITERAL':
+                require(not s['unknownRemainder'], 'literal interpretation closed')
+                require(c['supports']==[dict(kind='FILE_LITERAL',producer=s['operation'],origin=s['targetOrigin'],premises=[])], 'FILE literal support')
+            else:
+                require(computed_profile and s['namespace']=='cics.file' and len(c['rawValue'])==8, 'computed CICS name area')
+                require(bool(array(c['supports'])), 'computed candidate needs support')
+                for support in c['supports']:
+                    fields(support,'kind producer origin premises');require(support['kind']=='VALUE_PRODUCER', 'computed FILE support')
+                    identity(support['producer'],'operation operand');require(support['producer']['publication']==publication,'foreign producer');origin(support['origin']);refs(support['premises'],'premise')
+        ordered(s['candidates'],lambda c:(u16(c['referenceName']),u16(c['rawValue'])))
+        if s['targetKind']=='LITERAL' or not computed_profile:require(len(s['candidates'])<=1,'literal cardinality')
+        if s['reachability']=='UNREACHABLE_IN_MODEL':require(not s['candidates'],'unreachable FILE candidates')
+        elif not local and not s['unknownRemainder']:require(bool(s['candidates']),'empty closed FILE target')
+        if context_profile:context(s['context'],s)
+    ordered(f['sites'],lambda s:(u16(s['entry']['unit']),u16(s['entry']['localId']),u16(s['operation']['localId'])))
+    expected=[dict(owner=s['owner'],entry=s['entry'],site=s['operation'],candidate=c,openSite=s['unknownRemainder'] or bool(context_profile and s['context'] and s['context']['unknownRemainder']),**({'context':s['context']} if context_profile else {}))
+              for s in f['sites'] if s['reachability']!='UNREACHABLE_IN_MODEL' for c in s['candidates']]
+    require(f['edges']==expected,'FILE edge projection')
+    require(type(f['metrics']) is dict,'FILE metrics')
+    for k,v in f['metrics'].items():text(k);integer(v)
+
+
 def validate(d):
-    extended = d.get('version') == '1.2.0'
-    fields(d, 'schema version airVersion publication interpretationProfile valuesProfile modelScope publicationInventory sites edges metrics origins artifacts sourceUncertaintyRefs' + (' analysisStatus analysisReasons' if extended else ''))
-    require(d['schema'] == 'analysis-dependency-result' and d['version'] in ('1.1.0', '1.2.0') and d['airVersion'] == '2.0.0', 'schema/version')
+    files = d.get('version') in ('2.0.0','2.1.0','2.2.0','2.3.0')
+    extended = files or d.get('version') == '1.2.0'
+    fields(d, 'schema version airVersion publication interpretationProfile valuesProfile modelScope publicationInventory sites edges metrics origins artifacts sourceUncertaintyRefs' + (' analysisStatus analysisReasons' if extended else '') + (' analysisBoundary fileDependencies' if files else ''))
+    require(d['schema'] == 'analysis-dependency-result' and d['version'] in ('1.1.0', '1.2.0', '2.0.0', '2.1.0', '2.2.0', '2.3.0') and d['airVersion'] == '2.0.0', 'schema/version')
     identity(d['publication'], 'publication')
     require(d['interpretationProfile'] == 'per-site' and d['valuesProfile'] == 'scalar-text-effects@1' and d['modelScope'] in (('KNOWN_GRAPH_ENTRY', 'STRUCTURAL_AIR_OCCURRENCES') if extended else ('KNOWN_GRAPH_ENTRY',)), 'profiles/scope')
     require(d['publicationInventory'] in ('COMPLETE', 'PARTIAL', 'UNAVAILABLE'), 'inventory')
@@ -188,9 +311,9 @@ def validate(d):
         site(s, extended); require(s['caller']['publication'] == d['publication']['localId'], 'foreign site')
     ordered(d['sites'], site_order)
     if extended:
-        require(d['analysisStatus'] == 'PARTIAL', 'extended result partial status')
+        require(d['analysisStatus'] in (('COMPLETE','PARTIAL') if files else ('PARTIAL',)), 'extended result partial status')
         reasons(d['analysisReasons'])
-        require(bool(d['analysisReasons']) or any(s['analysisStatus'] == 'PARTIAL' for s in d['sites']), 'partial result must expose its cause')
+        require((d['analysisStatus']=='PARTIAL') == (bool(d['analysisReasons']) or any(s['analysisStatus'] == 'PARTIAL' for s in d['sites'])), 'partial result must expose its cause')
         structural = any(s['reachability'] == 'UNKNOWN' for s in d['sites']) or not d['sites'] and bool(d['analysisReasons'])
         require((d['modelScope'] == 'STRUCTURAL_AIR_OCCURRENCES') == structural, 'structural/graph scope mismatch')
     expected = [dict(caller=s['caller'], entry=s['entry'], site=s['operation'], candidate=c, openSite=s['effectiveUnknownRemainder'])
@@ -228,6 +351,9 @@ def validate(d):
     ordered(d['artifacts'], lambda a: u16(a['id']['localId']))
     artifacts = [a['id'] for a in d['artifacts']]
     require(all(o['artifact'] in artifacts for o in d['origins'] if o['kind'] == 'WRITTEN'), 'unresolved artifact')
+    if files:
+        require(d['analysisBoundary']=='COBOL_SOURCE_ONLY','source-only boundary')
+        file_dependencies(d['fileDependencies'],d)
     return d
 
 

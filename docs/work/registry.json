@@ -23,6 +23,75 @@
       "id": "WORK-CFG-040",
       "path": "docs/evals/cp6/carddemo-entry-start-discovery.md",
       "status": "IN_PROGRESS"
+    },
+    {
+      "id": "WORK-FD-HARNESS",
+      "status": "IN_PROGRESS",
+      "path": "docs/work/active/WORK-FD-HARNESS.json"
+    },
+    {
+      "id": "FD-W0",
+      "status": "IN_PROGRESS",
+      "path": "docs/work/active/FD-W0.yaml"
+    },
+    {
+      "id": "FD-W1",
+      "status": "IN_PROGRESS",
+      "path": "docs/work/active/FD-W1.yaml"
+    },
+    {
+      "id": "FD-W2",
+      "status": "IN_PROGRESS",
+      "path": "docs/work/active/FD-W2.yaml"
+    },
+    {
+      "id": "FD-W3",
+      "status": "IN_PROGRESS",
+      "path": "docs/work/active/FD-W3.yaml"
+    },
+    {
+      "id": "FD-W4",
+      "status": "IN_PROGRESS",
+      "path": "docs/work/active/FD-W4.yaml"
+    },
+    {
+      "id": "FD-W5",
+      "status": "IN_PROGRESS",
+      "path": "docs/work/active/FD-W5.yaml"
+    },
+    {
+      "id": "FD-W6",
+      "status": "IN_PROGRESS",
+      "path": "docs/work/active/FD-W6.yaml"
+    },
+    {
+      "id": "FD-W7",
+      "status": "IN_PROGRESS",
+      "path": "docs/work/active/FD-W7.yaml"
+    },
+    {
+      "id": "FD-W8",
+      "status": "IN_PROGRESS",
+      "path": "docs/work/active/FD-W8.yaml"
+    },
+    {
+      "id": "FD-W9",
+      "status": "IN_PROGRESS",
+      "path": "docs/work/active/FD-W9.yaml"
+    },
+    {
+      "id": "FD-W10",
+      "status": "TODO",
+      "path": "docs/work/active/FD-W10.yaml",
+      "product_status": "DEFERRED",
+      "classification": "OPTIONAL_EXTENSION",
+      "core_requirement": "NOT_PART_OF_CORE",
+      "authorization": "REQUIRES_NEW_PRODUCT_AUTHORIZATION"
+    },
+    {
+      "id": "FD-W11",
+      "status": "IN_PROGRESS",
+      "path": "docs/work/active/FD-W11.yaml"
     }
   ],
   "history": [

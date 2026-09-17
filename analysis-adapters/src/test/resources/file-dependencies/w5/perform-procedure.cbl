@@ -1,0 +1,41 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. SORTIO.
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+       SELECT S ASSIGN TO SORTWK.
+       SELECT A ASSIGN TO INA.
+       SELECT B ASSIGN TO INB.
+       SELECT C ASSIGN TO OUTC.
+       DATA DIVISION.
+       FILE SECTION.
+       SD S.
+       01 SR.
+        02 SK PIC X(4).
+        02 SK2 PIC X(4).
+       FD A.
+       01 AR PIC X(8).
+       FD B.
+       01 BR PIC X(8).
+       FD C.
+       01 CR PIC X(8).
+       WORKING-STORAGE SECTION.
+       01 BUF PIC X(8).
+       PROCEDURE DIVISION.
+       MAIN.
+       SORT S ON ASCENDING KEY SK
+        INPUT PROCEDURE FEED
+        OUTPUT PROCEDURE DRAIN.
+       CALL 'AFTER'.
+       GOBACK.
+       FEED.
+       PERFORM FILL THRU FILL-END.
+       RELEASE SR.
+       DRAIN.
+       RETURN S AT END CONTINUE END-RETURN.
+       FILL.
+       MOVE 'SAFE0001' TO SR.
+       FILL-END.
+       CALL 'FILLPGM'.
+       EXIT.
+       END PROGRAM SORTIO.

@@ -1,0 +1,67 @@
+id: FD-W2
+title: Família nativa OPEN/CLOSE/READ/WRITE/REWRITE/DELETE/START
+status: IN_PROGRESS
+scope:
+- file-dependencies
+- proleap-poc
+- cobol-lower
+- analysis-cfg (se consumer exigir)
+objective: Família nativa OPEN/CLOSE/READ/WRITE/REWRITE/DELETE/START
+motivation: Referências e operandos devem cobrir a família inteira sem confundir filename com record-name.
+repos:
+- proleap-poc
+- cobol-lower
+- analysis-cfg (se consumer exigir)
+preconditions:
+- W1 contratos/consumer qualificados
+- W0 record ownership consumível
+read_first:
+- ../../product/file-dependencies/brief.md
+- ../../product/file-dependencies/contracts.md
+- ../../product/file-dependencies/verification.md
+expected_product:
+- Facts e handlers composicionais para N19–N25, modos agrupados, keys/locks/INTO/FROM por papel
+- Preservar corpos AT END/INVALID KEY/NOT e terminações sem achatar nem executar em duplicidade
+- Compor I/O com MOVE/CALL/IF/EVALUATE/PERFORM/GO TO
+allowed_changes:
+- Gramática apenas por diferença comprovada, AST/binding/SP, admission/assembler/handlers e testes
+- Consumer só se representação do site exigir; reusar AIR atual
+forbidden_changes:
+- Implementar solver exclusivo, inferir arquivo a partir de FROM
+- Declarar efeitos/handlers completos antes W3/W4; limitar quantidade de statements/arquivos
+invariants:
+- Todos os invariantes do brief e guardrail COBOL_SOURCE_ONLY
+- Preservar CALL/evidência; literal não espera solver; mudanças normativas só bilaterais
+semantic_cases:
+- N19–N25/N32–N33 estrutura; T05–T11/T50/T54
+- Múltiplos arquivos/modes, WRITE record qualificado, CLOSE/START isolados, DELETE RECORD
+tests:
+- Oráculos independentes dos casos listados em test-catalog.md; positivos, negativos e adversariais antes do
+  código
+- CALL/MOVE/control existentes
+- T06
+- T11
+- T50
+regressions:
+- CALL/MOVE/control existentes
+- T06
+- T11
+- T50
+commands_and_gates:
+- 'F-DECL: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'L-INPUT: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'C-DEP: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'B-SP: comando e escopo em ../../product/file-dependencies/verification.md'
+- 'E-SELECTED: comando e escopo em ../../product/file-dependencies/verification.md'
+- python3 -B scripts/harness/lean.py fast — uma vez por repo produtivo estabilizado, após focais
+acceptance:
+- DELETE RECORD como único uso produz site FILE, dependência e operação DELETE_RECORD; nunca dataset deletion
+- Cada forma tem positivo/negativo e todos os usos têm recurso ou gap explícito
+- FROM com record de outro FD não produz leitura desse outro arquivo
+- Cada statement dentro de handler aparece uma vez; CALL preservado e efeitos parciais explícitos
+evidence:
+- Commit/pin exatos por fronteira; comandos/exit/results reais, testes novos vs REUSED vs NOT_RUN
+- Atualizar matriz somente com oracle/resultado; estado curto e PR persistente por repo, sem receipt obrigatório
+stop_condition: Parar com inventário de operações completo e dimensões ainda parciais documentadas; W3 separada.
+depends_on:
+- FD-W1

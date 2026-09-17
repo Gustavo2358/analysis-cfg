@@ -10,7 +10,7 @@ import sys
 
 from dependency_wire import read, require
 from cfg_wire_contract import verify as verify_cfg_wire
-from e2e_w2d import execute, runtime, source_spans
+from e2e_w2d import locked_sp, open_call_model, execute, runtime, source_spans
 from prepare_w2d_producers import ROOT, git, require_local
 
 FIXTURES = ROOT / 'analysis-adapters/src/test/resources/cp6/multi-call'
@@ -21,8 +21,9 @@ SITES = {
     3: [{'PROGA', 'PROGB'}, {'PROGC', 'PROGD'}, {'PROGE'}],
     4: [{'PROGA'}, {'PROGB'}, {'PROGC'}],
     5: [{'PROGA'}, {'PROGB', 'PROGC'}, {'PROGD'}],
-    6: [{'PROGA', 'PROGB'}, {'PROGC'}],
-    7: [{'PROGA'}, {'PROGB'}, {'PROGA'}],
+    # AllControl may revisit either CALL after FORCE-C, or the WS-A -> WS-B copy.
+    6: [{'PROGA', 'PROGB', 'PROGC'}, {'PROGA', 'PROGB', 'PROGC'}],
+    7: [{'PROGA', 'PROGB'}, {'PROGA', 'PROGB'}, {'PROGA', 'PROGB'}],
 }
 GLOBAL = {1: {'PROGA', 'PROGB', 'PROGC'}, 2: {'PROGA', 'PROGB', 'PROGC'},
           3: {'PROGA', 'PROGB', 'PROGC', 'PROGD', 'PROGE'}, 4: {'PROGA', 'PROGB', 'PROGC'},
@@ -35,7 +36,7 @@ def program_candidates(result):
 
 
 def source_oracle(sp, case):
-    require(sp['contractVersion'] in ('1.8.0','1.9.0','2.0.0','2.1.0','2.2.0', '2.3.0', '2.4.0', '2.5.0', '2.6.0', '2.7.0','2.8.0') and sp['unit']['canonicalProgramName'] == 'CALLER', 'SP1.8 real CALLER')
+    locked_sp(sp); require(sp['unit']['canonicalProgramName']=='CALLER', 'real CALLER')
     facts = {s['header']['id']: s for s in sp['statements']}
     require(len(facts) == len(sp['statements']) and all(s['header']['coverage'] == 'MODELED' for s in facts.values()), 'complete typed source facts')
     require(all(s['variant'] in {'MOVE', 'CALL', 'IF', 'PERFORM', 'GOBACK'} for s in facts.values()), 'no unknown statement filtering')
@@ -123,10 +124,7 @@ def dependency_oracle(result, air, sp, case, source):
             require(site['valuePoint'] == {'entryId': site['entry'], 'operationId': site['operation'], 'outcome': None, 'position': 'BEFORE'}, 'point-sensitive value query')
             require(site['subject'] == invoke['target']['name']['place']['object'], 'query subject is this CALL target')
         else: require(site['valuePoint'] is None and site['subject'] is None, 'literal has no value query')
-        # Real CALL effects remain conservative. Fixture7 retains a snapshot known value
-        # across intervening external calls, with model remainder opened by may-write.
-        expected_model_open = case == 7 and call == calls[-1]
-        require(site['modelValueRemainder'] is expected_model_open, 'per-site model remainder is preserved')
+        open_call_model(invoke,site)
         require(site['sourceValueRemainder'] and site['interpretationUnknownRemainder'] and site['effectiveUnknownRemainder'], 'source/interpretation/effective remainders remain per-site')
         require(site['openControlRemainder'], 'external control remains open')
         edges = [e for e in result['edges'] if e['site'] == site['operation']]
@@ -175,7 +173,7 @@ def w1_regressions(work, producer, config, cp):
             require(site['operation'] == invoke['header']['id'] and site['sequence'] == sequence['label'] and site['offset'] == len(sequence['instructions']), 'W1 exact site identity')
             expected = [] if name == 'dynamic-no-move' else ['PROGA']
             require(program_candidates(result) == expected and [c['referenceName'] for c in site['candidates']] == expected, 'W1 known target/open empty regression')
-            require(site['modelValueRemainder'] is (name == 'dynamic-no-move'), 'W1 per-site model remainder')
+            open_call_model(invoke,site)
             require(site['sourceValueRemainder'] and site['interpretationUnknownRemainder'] and site['effectiveUnknownRemainder'], 'W1 remainders retained')
             require(result['metrics']['possibleValuesRuns'] == (0 if name == 'literal' else 1), 'W1 literal zero values analyses')
             if name == 'dynamic-x8':
