@@ -65,3 +65,7 @@ stop_condition: Parar ao qualificar handler/retorno do perfil; falta de autorida
   focal.
 depends_on:
 - FD-W3
+
+checkpoint: QUALIFIED_LOCAL
+checkpoint_evidence: ../../product/file-dependencies/w4-implementation.md
+next_authorized_wave: FD-W5

@@ -20,8 +20,8 @@ EXPECTED={
 CONTRACT=('2.24.0','1.3.0')
 PROFILE=('--storage-profile','ibm-enterprise-6.4-fixed-display-1047@1')
 
-def oracle(name,sp,air,result,source):
-    require((sp['contractVersion'],sp['fileInventory']['version'])==CONTRACT,'SP memory contract')
+def oracle(name,sp,air,result,source,*,contract=CONTRACT):
+    require((sp['contractVersion'],sp['fileInventory']['version'])==contract,'SP memory contract')
     require(sp['storage']['version']=='1.8.0','general source allocation contract')
     names,actions,expected=EXPECTED[name];files=result['fileDependencies']
     require(sorted(d['logicalFile'] for d in files['declarations'])==sorted(names),'source file ownership')

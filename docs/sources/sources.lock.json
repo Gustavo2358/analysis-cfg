@@ -262,11 +262,13 @@
       "src/test/java/io/github/gustavo2358/cobolexplorer/FileNativeOperationTest.java",
       "src/main/java/io/github/gustavo2358/cobolexplorer/FileIoMemory.java",
       "src/main/java/io/github/gustavo2358/cobolexplorer/FileIoEffects.java",
-      "src/main/java/io/github/gustavo2358/cobolexplorer/FileStorageGroups.java"
+      "src/main/java/io/github/gustavo2358/cobolexplorer/FileStorageGroups.java",
+      "src/main/java/io/github/gustavo2358/cobolexplorer/FileIoControl.java",
+      "src/test/java/io/github/gustavo2358/cobolexplorer/FileControlContractTest.java"
     ],
-    "semantic_product_version": "2.24.0",
+    "semantic_product_version": "2.25.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "a9f8fbe4fb4f9e2097c01b1e8f6f992a5041ee5f",
+    "commit": "1c21f21750aa3572e39fce71ccc156a357699d81",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -283,12 +285,13 @@
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "fd_w1_validation": "docs/work/active/FD-W1.yaml",
     "fd_w2_validation": "QUALIFIED_LOCAL: producer focal + fixed FAST; 14 real CLI fixtures twice; SP/AIR/CFG/dependency deterministic; file-dependencies/w2-implementation.md",
-    "fd_w3_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED, B-SP memory effects, manual O1-O5 and 20 real CLI sources twice; file-dependencies/w3-implementation.md"
+    "fd_w3_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED, B-SP memory effects, manual O1-O5 and 20 real CLI sources twice; file-dependencies/w3-implementation.md",
+    "fd_w4_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED producers, manual outcomes/USE and 28 real CLI sources twice; file-dependencies/w4-implementation.md"
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
-    "status": "FD-W3 conditional regional effects; producer gates PASS; exact handlers/control remain W4",
-    "commit": "7165beb556b616287ea62ff58d65cc630bc9dab1",
+    "status": "FD-W4 conditional handlers/USE, bounded context approximation, producer gates PASS",
+    "commit": "9f80a1ff4f25f23d8ff2088a638f5e0f4dcf1ffc",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -306,7 +309,8 @@
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "fd_w1_validation": "docs/work/active/FD-W1.yaml",
     "fd_w2_validation": "QUALIFIED_LOCAL: producer focal + fixed FAST; 14 real CLI fixtures twice; SP/AIR/CFG/dependency deterministic; file-dependencies/w2-implementation.md",
-    "fd_w3_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED, B-SP memory effects, manual O1-O5 and 20 real CLI sources twice; file-dependencies/w3-implementation.md"
+    "fd_w3_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED, B-SP memory effects, manual O1-O5 and 20 real CLI sources twice; file-dependencies/w3-implementation.md",
+    "fd_w4_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED producers, manual outcomes/USE and 28 real CLI sources twice; file-dependencies/w4-implementation.md"
   },
   "external": [
     {

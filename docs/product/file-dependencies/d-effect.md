@@ -1,6 +1,6 @@
 # D-EFFECT — autoridade e plano de prova W3/W4
 
-MEMÓRIA W3 CLOSED / CONTROLE W4 IN_PROGRESS. Esta tabela fixou as regras
+MEMÓRIA W3 CLOSED / CONTROLE W4 CLOSED. Esta tabela fixou as regras
 antes de produção W3; O1–O5, CALL-X pertinentes, Q-SHARED e E-SELECTED passaram. Não confundir retorno Normal AIR com
 status 00 de COBOL. AIR existente admite status/selector e branches explícitos;
 nenhuma extensão de outcome ou interpretation por string é necessária.
@@ -52,3 +52,51 @@ Classe C3/C4: fronteira SP e storage compartilhado. Oráculos antes da produçã
 FD layouts/alias/negativos, O1–O5 AIR manual, CALL-X1–6; focais F-STORAGE/L-INPUT,
 C-VALUES/C-DEP, B-AIR/E-SELECTED, FAST fixos e Q-SHARED obrigatório W3. Corpus
 amplo permanece W11 salvo falha que invalide a fronteira prevista.
+
+## W4 — regras de seleção/retorno (antes da implementação)
+
+Autoridade adicional no mesmo PDF/revisão/hash: Declaratives pp264–265; status
+p299; INVALID KEY pp303–304; READ AT END p432; WRITE EOP p480; USE pp714–715.
+USE é declaração, nunca statement executado; seus corpos entram no inventário,
+mas a entrada primária continua no corpo não declarativo. Handler explícito END/
+INVALID KEY suprime USE nesse evento. USE por arquivo tem precedência sobre modo;
+seleção entre programas segue busca lexical GLOBAL (integração de captures W9).
+OPEN fornece seu modo; outros sites não ganham modo corrente por ordem textual:
+sem prova geral de estado, manter alternativas de USE por modo e remainder.
+
+Status precede qualquer handler/USE. No READ sem USE aplicável, NOT AT END pode
+receber outro erro; nesse caminho não há INTO. EOP é condição de WRITE executado,
+não EOF/READ unsuccessful. USE retorna ao sistema I/O e, sem erro crítico, ao
+próximo statement; erro crítico conserva possibilidade de saída. GO TO/PERFORM
+ou saída do handler seguem seu próprio controle, sem impor fallthrough.
+
+Plano mínimo: AST tipada conserva USE e corpos; análise canônica publica rotas por
+evento/outcome, associação e completions. Lower usa branches/jumps/local.invoke/
+local.boundary existentes, sem extensão AIR nem duplicação recursiva de corpos.
+Status não vira00 por Normal; valores não provados continuam unknown tipado.
+Complexidade alvo linear em statements/rotas + associação por índice, sem limites
+por quantidade. Oráculos FileControlPlanTest (precedência, erros, inventário,
+EOP e negativos) precedem código; B-SP/B-AIR/E-SELECTED e Q-SHARED fecham W4.
+
+### W4 — representação mínima de retorno compartilhado
+
+A investigação bilateral confirmou modelo local.invoke/local.resume já normativo,
+mas transporte e CFG ainda sem consumo dessa extensão nos pins core. Os oráculos
+codec ficaram preservados como investigação, sem promover suporte downstream.
+Para esta wave, a redução publicada usa jumps para a entrada do corpo compartilhado
+e um opaque de retorno com conjunto **somente** das continuações de seus sites USE.
+Memória do corpo é executada em suas operações, sem aplicar envelope global também
+na entrada/saída. O retorno recebe razão LOCAL_RETURN_CONTEXT_NOT_PROVEN: união dos
+resumes do mesmo corpo, sem alegar pilha/matching preciso. Caso recursivo permanece
+finito e conservador, sem clonagem nem limite. Corpo sem chamadores conserva saída
+excepcional potencial; saídas explícitas seguem controle próprio. Não requer novo
+codec, kernel, modelo ou norma; O1–O5 e CALL-X verificam a composição existente.
+Custo do inventário O(statements + rotas + chamadas USE); associação de retornos
+O(chamadas USE), serialização proporcional aos resumes realmente publicados.
+
+
+Checkpoint W4: frontend1c21f217/lower9f80a1ff, SP2.25/fileInventory1.4;
+focais, FAST, Q-SHARED produtores, O1–O5/USE manuais e 28 fontes reais ×2 PASS.
+Decisão de representação/força de efeitos fechada; modo corrente/contexto de retorno
+sem prova continuam parciais declarados, não MUST nem precisão fictícia. Nenhuma
+extensão normativa/modelo/codec/produção CFG foi necessária. Próxima W5.

@@ -116,3 +116,14 @@ T12–T20: oráculos de EOF/INTO variável/alias/cauda/MAY/MUST e CALL disjunto 
 O1–O5 AIR manual PASS. N13 LINAGE permanece W6; seleção/status/handlers N31–N33
 permanece W4. Não promover linhas agregadas antes dessas dimensões.
 E-SELECTED20 fontes ×2 PASS; efeitos não comprovados permanecem MAY/unknown local.
+
+
+## Checkpoint dimensional W4
+
+N07/N21/N31–N33: status/outcomes, handlers e USE QUALIFIED nos limites de [W4](w4-implementation.md).
+T10/T11/T21/T22: READ chaveada/NEXT, erro explícito/USE por arquivo/modo, IF/EVALUATE,
+período, I/O em handler/USE e saídas GO TO/GOBACK PASS. N13 EOP/NOT EOP separado de
+EOF QUALIFIED; LINAGE/contadores completos continuam W6. O1–O5 + dois AIRs de
+controle manual PASS; E-SELECTED28 fontes×2 PASS. Retorno compartilhado tem
+sobreaproximação de contexto declarada; modo corrente não inferido lexicalmente.
+GLOBAL ancestral/captures W9. W10 permanece PLANNED/NOT_AUTHORIZED.
