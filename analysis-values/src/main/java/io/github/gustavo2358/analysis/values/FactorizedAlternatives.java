@@ -20,6 +20,7 @@ final class FactorizedAlternatives<T> {
     final Node<T> terminal=new Node<>(Integer.MAX_VALUE,Map.of());
     private final Map<Key<T>,Node<T>> interned=new HashMap<>();
     private long internedEdges,unionPairs,projectedAlternatives;
+    private final Map<Node<T>,Size> componentSizes=new IdentityHashMap<>();
 
     Node<T> node(int level,Map<T,Node<T>> edges) {
         var live=new HashMap<T,Node<T>>();edges.forEach((value,next)->{if(next!=null)live.put(value,next);});
@@ -138,6 +139,18 @@ final class FactorizedAlternatives<T> {
             else pending.push(new Frame<>(edge.getValue()));
         }
         projectedAlternatives+=result.size();return List.copyOf(result);
+    }
+    /** Exact immutable-root summary, scoped to this interner's existing node lifetime.
+     * Single-level groups need no label hashing or DAG traversal. Other groups are
+     * traversed once per distinct queried root, preserving shared-suffix counting.
+     */
+    Size componentSize(Node<T> root) {
+        if(root==null||root.terminal())return new Size(0,0,0);
+        return componentSizes.computeIfAbsent(root,node->{
+            if(node.edges.values().stream().allMatch(Node::terminal))
+                return new Size(1,node.edges.size(),node.edges.size());
+            return size(List.of(node));
+        });
     }
     static Size size(Collection<? extends Node<?>> roots) {
         var visited=Collections.newSetFromMap(new IdentityHashMap<Node<?>,Boolean>());var pending=new ArrayDeque<Node<?>>();

@@ -556,7 +556,8 @@
     "io.github.gustavo2358.analysis.values.FactorizedAlternativesTest": [
       "independentWeakChoicesShareSuffixesWithoutWorlds",
       "localImagesRestrictionsAndUnionMatchIndependentFiniteRelations",
-      "thousandFiniteRelationsPreserveAlgebraAndCanonicality"
+      "thousandFiniteRelationsPreserveAlgebraAndCanonicality",
+      "cachedComponentSizesMatchFullDagTraversalWithoutLosingSharedSuffixes"
     ],
     "io.github.gustavo2358.analysis.values.EpR2TransferTest": [
       "mayBeforeAndAfterExactWriteCannotEraseItsSupportedValue",
@@ -576,6 +577,9 @@
       "shapePreservesPayloadExtentReasonAndAllNonProducerMetadata",
       "fanOutAndProvenanceComposeThroughRealWeakTransfersAndSolver",
       "repeatingOneEventDoesNotMimicFiveDistinctProducers"
+    ],
+    "io.github.gustavo2358.analysis.values.RegionalCostMetricsTest": [
+      "trackedSummariesMatchFullStateTraversalForDisjointAndConnectedGroups"
     ]
   },
   "cfg-adapters": {

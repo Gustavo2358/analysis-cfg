@@ -21,11 +21,15 @@ def replace_once(text, old, new):
     return text.replace(old, new)
 
 
-def overlay(output, cp):
-    destination = output / 'instrumented'; destination.mkdir(parents=True, exist_ok=True)
+def overlay(output, cp, source_ref=None, instrument=True):
+    destination = output / ('instrumented' if instrument else 'source-overlay'); destination.mkdir(parents=True, exist_ok=True)
     files = []
     for name in ('FactorizedAlternatives', 'ByteImage', 'RegionalValuesAnalysis'):
-        text = (SOURCE / (name + '.java')).read_text()
+        source = SOURCE / (name + '.java')
+        text = (subprocess.check_output(['git', '-C', str(ROOT), 'show', source_ref + ':' + source.relative_to(ROOT).as_posix()], text=True)
+                if source_ref else source.read_text())
+        if not instrument:
+            file = destination / (name + '.java'); file.write_text(text); files.append(str(file)); continue
         if name == 'FactorizedAlternatives':
             text = replace_once(text, 'final class FactorizedAlternatives<T> {', '''final class FactorizedAlternatives<T> {
     static long w2NodeCalls,w2UnionCalls,w2UnionNontrivial,w2SizeCalls,w2SizeNanos,w2SizeNodeVisits,w2SizeEdgeVisits,w2Keys;
@@ -43,7 +47,8 @@ def overlay(output, cp):
         else:
             text = replace_once(text, 'public final class RegionalValuesAnalysis {', 'public final class RegionalValuesAnalysis {\n    static long w2TrackCalls,w2TrackNanos;')
             text = replace_once(text, 'private State track(State state) {', 'private State track(State state) { w2TrackCalls++;long w2Start=System.nanoTime();')
-            text = replace_once(text, 'maxComponentCardinality=Math.max(maxComponentCardinality,size.maxComponent());return state;', 'maxComponentCardinality=Math.max(maxComponentCardinality,size.maxComponent());w2TrackNanos+=System.nanoTime()-w2Start;return state;')
+            end = 'maxComponentCardinality=Math.max(maxComponentCardinality,' + ('totals[2]' if 'var totals=new long[3]' in text else 'size.maxComponent()') + ');'
+            text = replace_once(text, end+'return state;', end+'w2TrackNanos+=System.nanoTime()-w2Start;return state;')
         file = destination / (name + '.java'); file.write_text(text); files.append(str(file))
     subprocess.run(['javac', '--release', '21', '-cp', cp, '-d', str(destination), *files], check=True)
     return str(destination) + os.pathsep + cp
@@ -91,13 +96,14 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--jfr', action='store_true')
     parser.add_argument('--instrument', action='store_true')
+    parser.add_argument('--source-ref', help='Compile the three measured production classes from an existing commit without switching the checkout')
     args = parser.parse_args(); args.output = args.output.resolve(); args.output.mkdir(parents=True, exist_ok=True)
     jars = ROOT / '.harness-results/build/m2'
     cp = os.pathsep.join([str(ROOT / module / 'target' / directory)
         for module in ('analysis-values', 'analysis-kernel', 'cfg-kernel') for directory in ('test-classes', 'classes')]
         + [str(p) for pattern in ('io/github/gustavo2358/air-java/*/*.jar', 'org/junit/jupiter/junit-jupiter-api/*/*.jar',
            'org/opentest4j/opentest4j/*/*.jar', 'org/apiguardian/apiguardian-api/*/*.jar', 'org/junit/platform/junit-platform-commons/*/*.jar') for p in jars.glob(pattern)])
-    if args.instrument: cp = overlay(args.output, cp)
+    if args.instrument or args.source_ref: cp = overlay(args.output, cp, args.source_ref, args.instrument)
     command = ['java', '-Xms256m', '-Xmx1g', '-XX:FlightRecorderOptions=stackdepth=256', '-cp', cp, PACKAGE + '.RegionalCostProbe',
         str(args.regions), str(args.producers), str(args.warmups), str(args.repeats), str(args.output)]
     if args.jfr: command.append('jfr')

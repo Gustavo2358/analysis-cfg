@@ -216,8 +216,15 @@ public final class RegionalValuesAnalysis {
         private final Map<Integer,FactorizedAlternatives.Node<Content>> defaults=new HashMap<>();
         private long maxStateAlternatives,maxDecisionNodes,maxComponentCardinality,boundaryAlternatives;
         private State track(State state) {
-            var size=state.size();maxStateAlternatives=Math.max(maxStateAlternatives,size.alternatives());
-            maxDecisionNodes=Math.max(maxDecisionNodes,size.nodes());maxComponentCardinality=Math.max(maxComponentCardinality,size.maxComponent());return state;
+            // Correlation groups partition segment levels: nodes/edges cannot overlap
+            // across groups and each component's distinct labels belong to one group.
+            var totals=new long[3];
+            state.bindings.forEach((group,root)->{
+                var size=relations.componentSize(root);
+                totals[0]+=size.nodes();totals[1]+=size.alternatives();totals[2]=Math.max(totals[2],size.maxComponent());
+            });
+            maxStateAlternatives=Math.max(maxStateAlternatives,totals[1]);
+            maxDecisionNodes=Math.max(maxDecisionNodes,totals[0]);maxComponentCardinality=Math.max(maxComponentCardinality,totals[2]);return state;
         }
         private FactorizedAlternatives.Node<Content> value(State state,int group) {
             contentReads++;var present=state.bindings.get(group);

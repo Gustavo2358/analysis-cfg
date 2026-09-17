@@ -352,3 +352,53 @@ union cache has zero cross-call nontrivial pair reuse in this baseline.
 
 All baseline records were obtained before production changes. Raw recordings,
 logs, instrumented copies and observations stay in `.harness-results/w2/`.
+
+## W2.1 — exact per-component size summaries
+
+**FACT:** `track` only updates `maxStateAlternatives`, `maxDecisionNodes` and
+`maxComponentCardinality`. These counters are exported as diagnostics; no
+transfer, join, equivalence, worklist decision or precision rule reads them.
+Previously each call gathered all state roots and traversed their DAG, hashing
+labels into per-level sets. The state accessors still provide the original full
+traversal as a reference.
+
+The implementation caches exact size summaries per queried immutable group root,
+inside the existing analysis-local interner. Singleton-level groups use edge
+cardinality directly; multi-level roots retain the original shared-suffix-aware
+traversal once per root. `track` sums nodes/edges and takes maximum label width
+across correlation groups: this is valid because groups partition segment
+levels. It does not sum overlapping DAG subtrees, retain state histories, or
+approximate the maxima. The cache lives no longer than the interner that already
+retains these roots, at the cost of an extra entry/Size per queried root.
+Worst-case new multi-level roots still require traversal; no universal O(1)
+claim is made. Singleton leaf detection inspects child references once per root,
+but does not hash labels or build visited/label sets.
+
+Selected-scenario before/after (one measured solve, temporary counters):
+
+| Work | Baseline | W2.1 |
+| --- | --- | --- |
+| track calls | 51 | 51 |
+| full DAG size traversals | 52 | 1 (empty entry boundary) |
+| DAG node / edge visits in size | 800 / 19,925 | 0 / 0 |
+| ByteImage hash calls | 255,792 | 235,867 |
+| node calls / Keys | 2,366 / 2,366 | 2,366 / 2,366 |
+| nontrivial union calls / distinct pairs | 750 / 750 | 750 / 750 |
+
+**STRONG EVIDENCE:** JFR's track/size stack samples go from 10/500 to 0/507;
+total profiled solve wall for 100 repeats changes 2.405 s -> 2.182 s, thread CPU
+2.352 s -> 2.135 s. Timing is diagnostic, not a guarantee. Hashing/interning
+remains dominant (235 hashing samples, 186 further interning samples).
+
+**FACT:** `facts.txt` and the complete solve-metrics map are byte-identical to
+baseline. The facts SHA-256 is
+`ddcee1f4599b5e8cfe24c41f1dbbd08752ad50ebe79ae24def0a629d6d03ed5f`.
+W1 A/B/C rows match, excluding the diagnostic hash-count field. New tests compare
+cached summaries with the original traversal over 1,000 finite relations,
+shared-suffix diamonds and retained old roots, and compare tracked maxima with
+full-state traversal for singleton and copy-connected groups.
+
+W2.1 validation (Java 21): focused W1/factorized plus parent smoke PASS; whole
+analysis-values and parents PASS (190 + 79 + 108 tests); full FAST PASS with
+551 required methods, zero skips, including wire/consumer and architectural
+checks. No compiled architecture inventory was changed or regenerated.
