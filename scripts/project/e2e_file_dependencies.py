@@ -48,7 +48,7 @@ def oracle(name,sp,air,result,source):
     scope(result)
 
 
-def run(work,config_path,*,fixtures=FIXTURES,expected=EXPECTED,check=oracle,label="FD-W1"):
+def run(work,config_path,*,fixtures=FIXTURES,expected=EXPECTED,check=oracle,label="FD-W1",frontend_args=()):
     require_local();work.mkdir(parents=True,exist_ok=False)
     producer=config_path.parent;config=json.loads(config_path.read_text());lock=json.loads((ROOT/'docs/sources/sources.lock.json').read_text())
     for repo,key in (('air-java','air_java'),('proleap-poc','proleap_poc'),('cobol-lower','cobol_lower')):
@@ -59,7 +59,7 @@ def run(work,config_path,*,fixtures=FIXTURES,expected=EXPECTED,check=oracle,labe
         for attempt in ('A','B'):
             cwd=work/(name+'-'+attempt);cwd.mkdir();source=cwd/(name+'.cbl');shutil.copyfile(fixtures/source.name,source)
             web=cwd/'src/main/resources';web.mkdir(parents=True);(web/'web').symlink_to(producer/'proleap-poc/src/main/resources/web',target_is_directory=True)
-            execute(cwd,'frontend',['java','-cp',os.pathsep.join(config['frontend']['classpath']),config['frontend']['main'],'--source',source.name,'--copybooks',str(producer/'proleap-poc/corpus/cpy'),'--output',str(cwd/'sp')])
+            execute(cwd,'frontend',['java','-cp',os.pathsep.join(config['frontend']['classpath']),config['frontend']['main'],'--source',source.name,'--copybooks',str(producer/'proleap-poc/corpus/cpy'),'--output',str(cwd/'sp'),*frontend_args])
             sp=cwd/'sp/cobol-semantic-product.json';air=cwd/'program.air.json';cfg=cwd/'cfg.json';dep=cwd/'dependencies.json'
             execute(cwd,'lower',['java','-cp',os.pathsep.join(config['lower']['classpath']),config['lower']['main'],str(sp),str(air)])
             execute(cwd,'cfg',['java','-cp',cp,'io.github.gustavo2358.analysis.cfg.launcher.AnalysisCfg',str(air),str(cfg)])

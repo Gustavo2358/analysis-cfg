@@ -1,6 +1,6 @@
 id: FD-W4
 title: Condições locais, FILE STATUS e DECLARATIVES
-status: TODO
+status: IN_PROGRESS
 scope:
 - file-dependencies
 - proleap-poc

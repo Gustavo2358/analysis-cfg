@@ -259,11 +259,14 @@
       "docs/work/history/WORK-SEMANTIC-PRODUCT-003.md",
       "docs/domain/declarative-value-inference.md",
       "src/main/java/io/github/gustavo2358/cobolexplorer/FileIoSyntax.java",
-      "src/test/java/io/github/gustavo2358/cobolexplorer/FileNativeOperationTest.java"
+      "src/test/java/io/github/gustavo2358/cobolexplorer/FileNativeOperationTest.java",
+      "src/main/java/io/github/gustavo2358/cobolexplorer/FileIoMemory.java",
+      "src/main/java/io/github/gustavo2358/cobolexplorer/FileIoEffects.java",
+      "src/main/java/io/github/gustavo2358/cobolexplorer/FileStorageGroups.java"
     ],
-    "semantic_product_version": "2.23.0",
+    "semantic_product_version": "2.24.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "b559292c97e004504fb867c4724298dc1637b6f2",
+    "commit": "a9f8fbe4fb4f9e2097c01b1e8f6f992a5041ee5f",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -273,18 +276,19 @@
       "contract": "2.1.0",
       "scope": "local unconditional paragraph identity and explicit entry; G1-G5 and 1/2/5/40"
     },
-    "storage_contract_version": "1.7.0",
+    "storage_contract_version": "1.8.0",
     "canonical_ref": "feat/file-dependencies",
-    "observed_on": "2026-09-16",
+    "observed_on": "2026-09-17",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "fd_w1_validation": "docs/work/active/FD-W1.yaml",
-    "fd_w2_validation": "QUALIFIED_LOCAL: producer focal + fixed FAST; 14 real CLI fixtures twice; SP/AIR/CFG/dependency deterministic; file-dependencies/w2-implementation.md"
+    "fd_w2_validation": "QUALIFIED_LOCAL: producer focal + fixed FAST; 14 real CLI fixtures twice; SP/AIR/CFG/dependency deterministic; file-dependencies/w2-implementation.md",
+    "fd_w3_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED, B-SP memory effects, manual O1-O5 and 20 real CLI sources twice; file-dependencies/w3-implementation.md"
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
-    "status": "FD-W1 static file slice and fixed FAST pass; effects/control open pending W3/W4",
-    "commit": "ee38519283a6b762b86704a6ee198748424b6825",
+    "status": "FD-W3 conditional regional effects; producer gates PASS; exact handlers/control remain W4",
+    "commit": "7165beb556b616287ea62ff58d65cc630bc9dab1",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -297,11 +301,12 @@
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
     },
     "canonical_ref": "feat/file-dependencies",
-    "observed_on": "2026-09-16",
+    "observed_on": "2026-09-17",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "fd_w1_validation": "docs/work/active/FD-W1.yaml",
-    "fd_w2_validation": "QUALIFIED_LOCAL: producer focal + fixed FAST; 14 real CLI fixtures twice; SP/AIR/CFG/dependency deterministic; file-dependencies/w2-implementation.md"
+    "fd_w2_validation": "QUALIFIED_LOCAL: producer focal + fixed FAST; 14 real CLI fixtures twice; SP/AIR/CFG/dependency deterministic; file-dependencies/w2-implementation.md",
+    "fd_w3_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED, B-SP memory effects, manual O1-O5 and 20 real CLI sources twice; file-dependencies/w3-implementation.md"
   },
   "external": [
     {

@@ -1,7 +1,7 @@
 # Contratos, decisões e exemplos de intenção
 
 [Brief](brief.md) é normativo para o escopo. As tabelas são oráculos manuais.
-A1–A4/A6 foram materializados em W1; A5 segue NOT_RUN/W10 e O1–O5 aguardam W3/W4.
+A1–A4/A6 foram materializados em W1; A5 segue NOT_RUN/W10; O1–O5 memória qualificados W3, handlers/USE seguem W4.
 Estado implementado, transporte e gates: [W1](w1-implementation.md).
 
 ## Interfaces e consumo bilateral

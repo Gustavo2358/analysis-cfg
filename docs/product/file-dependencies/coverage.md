@@ -107,3 +107,12 @@ PLANNED W3/W4, portanto as linhas agregadas não são promovidas integralmente.
 [Oráculos, pins e resultados W2](w2-implementation.md): frontend12 novos,
 F-DECL147, três FASTs, admission bilateral, 14 fontes duas vezes. N04/N18 e D
 permanecem exclusivamente W10; não foram implementados.
+
+## Checkpoint dimensional W3
+
+N07/N09/N11/N15: storage/áreas e memória condicional QUALIFIED nos limites
+explicitados em [W3](w3-implementation.md), com pins em [estado](state.md).
+T12–T20: oráculos de EOF/INTO variável/alias/cauda/MAY/MUST e CALL disjunto PASS;
+O1–O5 AIR manual PASS. N13 LINAGE permanece W6; seleção/status/handlers N31–N33
+permanece W4. Não promover linhas agregadas antes dessas dimensões.
+E-SELECTED20 fontes ×2 PASS; efeitos não comprovados permanecem MAY/unknown local.

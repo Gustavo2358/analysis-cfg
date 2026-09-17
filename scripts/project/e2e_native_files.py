@@ -15,8 +15,8 @@ EXPECTED={**W1,
     'procedure':(['F'],['read'],['LOCAL']),
     'evaluate':(['F','G'],['read','start'],['AFTER']),
 }
-def oracle(name,sp,air,result,source):
-    require((sp['contractVersion'],sp['fileInventory']['version'])==('2.23.0','1.2.0'),'current SP/file contract')
+def oracle(name,sp,air,result,source,*,contract=('2.23.0','1.2.0')):
+    require((sp['contractVersion'],sp['fileInventory']['version'])==contract,'current SP/file contract')
     names,actions,calls=EXPECTED[name];files=result['fileDependencies']
     require(sorted(d['logicalFile'] for d in files['declarations'])==sorted(names),'manual declaration oracle')
     require(sorted(s['action'] for s in files['sites'])==sorted(actions),'manual operation oracle')
