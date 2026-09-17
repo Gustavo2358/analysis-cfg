@@ -569,6 +569,13 @@
       "deepProjectionKeepsOnlyTheSelectedComponent",
       "deepEnumerationReturnsTheOneCompleteTuple",
       "deepProjectionAndCollidingUpdateCanUnionLongSuffixes"
+    ],
+    "io.github.gustavo2358.analysis.values.RegionalExplosionFixturesTest": [
+      "fanOutOccursAcrossSingletonGroupsAndOnlyDisjointnessRemovesIt",
+      "producerAlonePreventsInterningAndUnionCanonicalization",
+      "shapePreservesPayloadExtentReasonAndAllNonProducerMetadata",
+      "fanOutAndProvenanceComposeThroughRealWeakTransfersAndSolver",
+      "repeatingOneEventDoesNotMimicFiveDistinctProducers"
     ]
   },
   "cfg-adapters": {
