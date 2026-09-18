@@ -66,4 +66,24 @@ class FactorizedAlternativesTest {
         assertEquals(Set.of(Map.of(0,"A",2,"C"),Map.of(0,"X",2,"Z")),new HashSet<>(domain.selections(domain.project(join,Set.of(0,2)))));
         assertNull(domain.restrict(join,Map.of(0,"absent")));
     }
+    @Test void cachedComponentSizesMatchFullDagTraversalWithoutLosingSharedSuffixes() {
+        var random=new Random(20260917);
+        var domain=new FactorizedAlternatives<Integer>();
+        assertEquals(new FactorizedAlternatives.Size(0,0,0),domain.componentSize(null));
+        assertEquals(new FactorizedAlternatives.Size(0,0,0),domain.componentSize(domain.terminal));
+        for(int trial=0;trial<1000;trial++) {
+            var root=relation(domain,randomRelation(random,1+random.nextInt(6)));
+            if(root==null)continue;
+            var expected=FactorizedAlternatives.size(List.of(root));
+            var measured=domain.componentSize(root);assertEquals(expected,measured);
+            if(!root.terminal())assertSame(measured,domain.componentSize(root));
+            var changed=domain.update(root,Map.of(0,ignored->99));
+            assertEquals(FactorizedAlternatives.size(List.of(changed)),domain.componentSize(changed));
+            assertEquals(expected,domain.componentSize(root),"old immutable snapshot remains exact");
+        }
+        var suffix=domain.node(3,Map.of(10,domain.terminal,20,domain.terminal));
+        var diamond=domain.node(1,Map.of(1,suffix,2,suffix));
+        assertEquals(new FactorizedAlternatives.Size(2,4,2),domain.componentSize(diamond));
+    }
+
 }

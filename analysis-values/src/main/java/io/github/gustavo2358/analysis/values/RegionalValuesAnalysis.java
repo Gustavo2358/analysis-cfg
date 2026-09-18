@@ -190,12 +190,12 @@ public final class RegionalValuesAnalysis {
     }
     public static final class State {
         private final EntryId entry;
-        private final SegmentMap<FactorizedAlternatives.Node<Content>> bindings;
+        private final SegmentMap<RegionalAlternatives.Node<Content>> bindings;
         private final Map<ObjectId,Set<LogicalValue>> logical;
         private final int[] groupSizes;
-        private State(EntryId entry,SegmentMap<FactorizedAlternatives.Node<Content>> bindings,Map<ObjectId,Set<LogicalValue>> logical,int[] groupSizes){this.entry=entry;this.bindings=bindings;this.logical=Map.copyOf(logical);this.groupSizes=groupSizes;}
-        private FactorizedAlternatives.Size size(){var roots=new ArrayList<FactorizedAlternatives.Node<Content>>();bindings.forEach((g,node)->roots.add(node));return FactorizedAlternatives.size(roots);}
-        /** Materialized edges, not the (possibly exponential) number of represented worlds. */
+        private State(EntryId entry,SegmentMap<RegionalAlternatives.Node<Content>> bindings,Map<ObjectId,Set<LogicalValue>> logical,int[] groupSizes){this.entry=entry;this.bindings=bindings;this.logical=Map.copyOf(logical);this.groupSizes=groupSizes;}
+        private RegionalAlternatives.Size size(){var roots=new ArrayList<RegionalAlternatives.Node<Content>>();bindings.forEach((g,node)->roots.add(node));return RegionalAlternatives.size(roots);}
+        /** Encoded structural edges (one compact edge may carry multiple events), not worlds. */
         public long materializedAlternatives(){return size().alternatives();}
         public long decisionNodes(){return size().nodes();}
         public long maxComponentCardinality(){return size().maxComponent();}
@@ -212,14 +212,21 @@ public final class RegionalValuesAnalysis {
         long contentReads,contentUpdates,alternativeVisits;
         @Override public Direction direction(){return Direction.FORWARD;}
         @Override public State bottom(){return BOTTOM;}
-        private final FactorizedAlternatives<Content> relations=new FactorizedAlternatives<>();
-        private final Map<Integer,FactorizedAlternatives.Node<Content>> defaults=new HashMap<>();
-        private long maxStateAlternatives,maxDecisionNodes,maxComponentCardinality,boundaryAlternatives;
+        private final RegionalAlternatives<Content> relations=new RegionalAlternatives<>(content -> content instanceof Bytes bytes ? bytes.image() : null,Bytes::new);
+        private final Map<Integer,RegionalAlternatives.Node<Content>> defaults=new HashMap<>();
+        private long maxStateAlternatives,maxDecisionNodes,maxComponentCardinality,maxProvenanceRows,maxExpandedAlternatives,boundaryAlternatives;
         private State track(State state) {
-            var size=state.size();maxStateAlternatives=Math.max(maxStateAlternatives,size.alternatives());
-            maxDecisionNodes=Math.max(maxDecisionNodes,size.nodes());maxComponentCardinality=Math.max(maxComponentCardinality,size.maxComponent());return state;
+            // Correlation groups partition segment levels: nodes/edges cannot overlap
+            // across groups and each component's distinct labels belong to one group.
+            var totals=new long[5];
+            state.bindings.forEach((group,root)->{
+                var size=relations.componentSize(root);
+                totals[0]+=size.nodes();totals[1]+=size.alternatives();totals[2]=Math.max(totals[2],size.maxComponent());totals[3]+=size.provenanceRows();totals[4]+=size.expandedAlternatives();
+            });
+            maxStateAlternatives=Math.max(maxStateAlternatives,totals[1]);maxProvenanceRows=Math.max(maxProvenanceRows,totals[3]);maxExpandedAlternatives=Math.max(maxExpandedAlternatives,totals[4]);
+            maxDecisionNodes=Math.max(maxDecisionNodes,totals[0]);maxComponentCardinality=Math.max(maxComponentCardinality,totals[2]);return state;
         }
-        private FactorizedAlternatives.Node<Content> value(State state,int group) {
+        private RegionalAlternatives.Node<Content> value(State state,int group) {
             contentReads++;var present=state.bindings.get(group);
             return present!=null?present:defaults.computeIfAbsent(group,g->{
                 var values=new TreeMap<Integer,Content>();for(var segment:groupSegments.get(g))values.put(levels.get(segment),unknown(segment.location(),"UNSPECIFIED_ENTRY_CONTENT"));
@@ -273,7 +280,7 @@ public final class RegionalValuesAnalysis {
         @Override public Join<State> joinInto(State a,State b,DomainWork work) {
             if(!b.reached())return new Join<>(a,false);if(!a.reached())return new Join<>(b,true);
             if(!a.entry.equals(b.entry))throw new IllegalArgumentException("different entries");
-            final class Accumulator { SegmentMap<FactorizedAlternatives.Node<Content>> root=a.bindings; }
+            final class Accumulator { SegmentMap<RegionalAlternatives.Node<Content>> root=a.bindings; }
             var acc=new Accumulator();
             b.bindings.forEach((key,v)->{work.joinEntryVisited();acc.root=acc.root.put(key,relations.union(value(a,key),v));});
             a.bindings.forEach((key,v)->{if(b.bindings.get(key)==null){work.joinEntryVisited();acc.root=acc.root.put(key,relations.union(v,value(b,key)));}});
@@ -292,7 +299,7 @@ public final class RegionalValuesAnalysis {
                 .computeIfAbsent(plan.write,ignored->new ArrayList<>()).add(plan);
             var root=before.bindings;
             for(var entry:grouped.entrySet()) {
-                int group=entry.getKey();FactorizedAlternatives.Node<Content> all=null;
+                int group=entry.getKey();RegionalAlternatives.Node<Content> all=null;
                 var original=value(before,group);
                 for(var choices:sourceSelections(entry.getValue().values().stream().flatMap(List::stream).toList())) {
                     var selected=readSegments(choices);
@@ -336,11 +343,11 @@ public final class RegionalValuesAnalysis {
             }
             return Set.of();
         }
-        private FactorizedAlternatives.Node<Content> write(FactorizedAlternatives.Node<Content> current,ReadCapture captured,StatementEffects.Write write,List<Plan> plans,boolean forceMay,Map<ObjectId,Set<LogicalValue>> logicalInputs) {
+        private RegionalAlternatives.Node<Content> write(RegionalAlternatives.Node<Content> current,ReadCapture captured,StatementEffects.Write write,List<Plan> plans,boolean forceMay,Map<ObjectId,Set<LogicalValue>> logicalInputs) {
             if(write.selection()==StatementEffects.Selection.MAY_SET) {
                 for(var plan:plans)current=weak(current,captured,plan,logicalInputs);return current;
             }
-            FactorizedAlternatives.Node<Content> next=null;
+            RegionalAlternatives.Node<Content> next=null;
             var execution=forceMay?KillAuthority.Execution.POSSIBLE:KillAuthority.Execution.REQUIRED;
             if(!KillAuthority.exhaustive(write,plans.stream().map(Plan::target).toList(),execution))next=current;
             for(var plan:plans)if(plan.target.sourceApplicable()) {
@@ -352,17 +359,17 @@ public final class RegionalValuesAnalysis {
             for(var plan:plans)if(!plan.target.sourceApplicable())current=weak(current,captured,plan,logicalInputs);
             return current;
         }
-        private FactorizedAlternatives.Node<Content> weakUnion(FactorizedAlternatives.Node<Content> old,FactorizedAlternatives.Node<Content> supplied) {
+        private RegionalAlternatives.Node<Content> weakUnion(RegionalAlternatives.Node<Content> old,RegionalAlternatives.Node<Content> supplied) {
             // Symbolic counterpart of KillAuthority.weakUpdate: both relations survive.
             return relations.union(old,supplied);
         }
-        private FactorizedAlternatives.Node<Content> weak(FactorizedAlternatives.Node<Content> current,ReadCapture captured,Plan plan,Map<ObjectId,Set<LogicalValue>> logicalInputs) {
+        private RegionalAlternatives.Node<Content> weak(RegionalAlternatives.Node<Content> current,ReadCapture captured,Plan plan,Map<ObjectId,Set<LogicalValue>> logicalInputs) {
             return weakUnion(current,replace(current,captured,plan,logicalInputs));
         }
-        private FactorizedAlternatives.Node<Content> replace(FactorizedAlternatives.Node<Content> old,ReadCapture captured,Plan plan,Map<ObjectId,Set<LogicalValue>> logicalInputs) {
-            FactorizedAlternatives.Node<Content> result=null;
+        private RegionalAlternatives.Node<Content> replace(RegionalAlternatives.Node<Content> old,ReadCapture captured,Plan plan,Map<ObjectId,Set<LogicalValue>> logicalInputs) {
+            RegionalAlternatives.Node<Content> result=null;
             for(var replacement:replacements(plan,captured,logicalInputs)) {
-                alternativeVisits++;var updates=new HashMap<Integer,java.util.function.UnaryOperator<Content>>();
+                alternativeVisits++;var suppliedValues=new HashMap<Integer,Content>();var updates=new HashMap<Integer,java.util.function.UnaryOperator<Content>>();
                 for(var segment:partition.intersecting(plan.target.location())) {
                     Content piece=replacement;
                     if(replacement instanceof Bytes bytes) {
@@ -370,14 +377,15 @@ public final class RegionalValuesAnalysis {
                         var relative=new StorageRange(range.start().subtract(destination.start()),range.end().map(e->e.subtract(destination.start())));
                         piece=new Bytes(bytes.image().slice(relative));
                     }
-                    var supplied=piece;
+                    var supplied=piece;suppliedValues.put(levels.get(segment),supplied);
                     updates.put(levels.get(segment),prior->{
                         if(prior instanceof Bytes bytes&&eventDetails.get(plan.event).initial()!=null&&eventDetails.get(plan.event).initial().value() instanceof Entries.LiteralInitial)
                             return new Bytes(bytes.image().initialize(new StorageRange(BigInteger.ZERO,bytes.image().extent()),((Bytes)supplied).image()));
                         return supplied;
                     });
                 }
-                result=relations.union(result,relations.update(old,updates));
+                boolean initialLiteral=eventDetails.get(plan.event).initial()!=null&&eventDetails.get(plan.event).initial().value() instanceof Entries.LiteralInitial;
+                result=relations.union(result,initialLiteral?relations.update(old,updates):relations.overwrite(old,suppliedValues));
             }
             return result;
         }
@@ -475,7 +483,7 @@ public final class RegionalValuesAnalysis {
             if(edge.kind()==CfgTransition.Kind.INVOKE_NORMAL)return apply(state,outcomes.get(invoke).get(Control.NormalOutcome.INSTANCE),false);
             state=apply(state,otherwise.get(invoke),true);for(var plans:outcomes.get(invoke).values())state=apply(state,plans,true);return state;
         }
-        private Map<String,Long> metrics(){var result=new TreeMap<>(relations.metrics());result.put("contentReads",contentReads);result.put("contentUpdates",contentUpdates);result.put("alternativeVisits",alternativeVisits);result.put("maxStateAlternatives",maxStateAlternatives);result.put("maxDecisionNodes",maxDecisionNodes);result.put("maxComponentCardinality",maxComponentCardinality);result.put("boundaryAlternatives",boundaryAlternatives);return Map.copyOf(result);}
+        private Map<String,Long> metrics(){var result=new TreeMap<>(relations.metrics());result.put("contentReads",contentReads);result.put("contentUpdates",contentUpdates);result.put("alternativeVisits",alternativeVisits);result.put("maxStateAlternatives",maxStateAlternatives);result.put("maxDecisionNodes",maxDecisionNodes);result.put("maxComponentCardinality",maxComponentCardinality);result.put("boundaryAlternatives",boundaryAlternatives);result.put("maxProvenanceRows",maxProvenanceRows);result.put("maxExpandedAlternatives",maxExpandedAlternatives);return Map.copyOf(result);}
     }
     private List<CapturedGap> captureGaps(StorageIndex.Location selected) {
         var result=new ArrayList<CapturedGap>();

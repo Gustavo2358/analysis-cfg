@@ -432,7 +432,9 @@
       "unknownTailAndHugeExtentRemainSparseAndZeroIsIdentity",
       "copySupportsAloneChangeEqualityAndConvergeAsStaticSets",
       "capturedSourceGapSplitsOnlyItsRangeAndSurvivesUnknownIndependently",
-      "captureOffsetsFollowCropsAndRetainEarlierCopyContributions"
+      "captureOffsetsFollowCropsAndRetainEarlierCopyContributions",
+      "cachedHashPreservesOldStructuralValueAndImmutableSnapshots",
+      "collidingImageHashesKeepDistinctLabelsAndInternedNodes"
     ],
     "io.github.gustavo2358.analysis.values.RegionalValuesTest": [
       "missingStateIsUnknownAndUnreachableIsSeparate",
@@ -556,7 +558,8 @@
     "io.github.gustavo2358.analysis.values.FactorizedAlternativesTest": [
       "independentWeakChoicesShareSuffixesWithoutWorlds",
       "localImagesRestrictionsAndUnionMatchIndependentFiniteRelations",
-      "thousandFiniteRelationsPreserveAlgebraAndCanonicality"
+      "thousandFiniteRelationsPreserveAlgebraAndCanonicality",
+      "cachedComponentSizesMatchFullDagTraversalWithoutLosingSharedSuffixes"
     ],
     "io.github.gustavo2358.analysis.values.EpR2TransferTest": [
       "mayBeforeAndAfterExactWriteCannotEraseItsSupportedValue",
@@ -569,6 +572,42 @@
       "deepProjectionKeepsOnlyTheSelectedComponent",
       "deepEnumerationReturnsTheOneCompleteTuple",
       "deepProjectionAndCollidingUpdateCanUnionLongSuffixes"
+    ],
+    "io.github.gustavo2358.analysis.values.RegionalExplosionFixturesTest": [
+      "fanOutOccursAcrossSingletonGroupsAndOnlyDisjointnessRemovesIt",
+      "producerAlonePreventsInterningAndUnionCanonicalization",
+      "shapePreservesPayloadExtentReasonAndAllNonProducerMetadata",
+      "fanOutAndProvenanceComposeThroughRealWeakTransfersAndSolver",
+      "repeatingOneEventDoesNotMimicFiveDistinctProducers"
+    ],
+    "io.github.gustavo2358.analysis.values.RegionalCostMetricsTest": [
+      "trackedSummariesMatchFullStateTraversalForDisjointAndConnectedGroups"
+    ],
+    "io.github.gustavo2358.analysis.values.RegionalStructuralOracleTest": [
+      "frozenW1FactsRetainAllTypedFieldsAndProducerIdentities",
+      "snapshotRetainsEveryPartFieldAndRejectsUnsupportedTypes",
+      "producerSetsLoseRangeAssociationsAndIndependentSetsInventCorrelations"
+    ],
+    "io.github.gustavo2358.analysis.values.ExactProvenancePrototypeTest": [
+      "fixtureBRoundTripCanonicalIdempotenceAndDuplicateProducer",
+      "exhaustiveTwoLevelUnionProjectRestrictAndAssociativity",
+      "differentShapesHashCollisionsAndLevelsNeverConflate",
+      "admissionRejectsEveryEnrichedProvenanceDimension",
+      "wholeWeakPartialCopyAndConnectedUpdateUseExactFallback",
+      "fixtureCAndLargerScalesKeepFrozenFactsWithFewerStructuralEdges",
+      "realConnectedCopyAndPartialCopyReplayKeepCompleteObservations"
+    ],
+    "io.github.gustavo2358.analysis.values.RegionalAlternativesTest": [
+      "fixtureBRoundTripCanonicalIdempotenceAndDuplicateProducer",
+      "exhaustiveTwoLevelUnionProjectRestrictAndAssociativity",
+      "differentShapesHashCollisionsAndLevelsNeverConflate",
+      "admissionRejectsEveryEnrichedProvenanceDimension",
+      "wholeWeakPartialCopyAndConnectedUpdateUseExactFallback",
+      "constantOverwriteMatchesConcreteAndEventsHandleCollisionExactly",
+      "deepGraphOperationsAndTemporaryFallbackKeepCanonicalIdentity"
+    ],
+    "io.github.gustavo2358.analysis.values.RegionalFallbackStressTest": [
+      "repeatedPartialCopiesPreserveFullReplayAndActuallyUseFallback"
     ]
   },
   "cfg-adapters": {
