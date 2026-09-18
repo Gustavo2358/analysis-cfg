@@ -622,6 +622,14 @@
       "unknownBindingRetainsSourceEvidenceWithoutCompletenessOrPhysicalFallback",
       "scalarCopyIsASnapshotEvenWhenSourceChangesLater",
       "sharedCellIdentityDoesNotRequirePhysicalAliasing"
+    ],
+    "io.github.gustavo2358.analysis.values.LogicalExpressionsTest": [
+      "partialRootSnapshotAndDemand",
+      "branchAlternativesStayWholeThroughRepeatedRootReads"
+    ],
+    "io.github.gustavo2358.analysis.values.LogicalTextTest": [
+      "unknownSiblingDoesNotEraseKnownProjection",
+      "immutableSnapshotAndFit"
     ]
   },
   "cfg-adapters": {

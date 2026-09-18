@@ -80,6 +80,11 @@ public final class DependencyAnalysis {
                     .filter(e->e.getKey().endsWith("solve_"+counter)||e.getKey().endsWith("replay_"+counter)).mapToLong(Map.Entry::getValue).sum();
                 metrics.put(counter,count);
             }
+            for(var counter:List.of("physicalPlansPrepared","baseComparisons","targetsPrepared")) {
+                long count=java.util.stream.Stream.concat(metrics.entrySet().stream(),fileResult.metrics().entrySet().stream())
+                    .filter(e->e.getKey().endsWith("prepare_"+counter)).mapToLong(Map.Entry::getValue).sum();
+                metrics.put(counter,count);
+            }
             return new DependencyResult(publication.id(),publication.airVersion(),sites,edges,metrics,publication.coverage().inventory(),publication.origins(),publication.artifacts(),publication.uncertainties().stream().map(Evidence.Uncertainty::id).toList(),List.copyOf(reasons),fileResult);
         }
     }

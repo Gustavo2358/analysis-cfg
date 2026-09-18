@@ -9,9 +9,10 @@ import java.util.*;
 /** Admission/preparation for scalar-text-direct@1. No effect is inferred from operation spelling. */
 final class TextProfile {
     record Location(int ordinal,Memory.Cell cell) { }
-    sealed interface Write permits LiteralWrite, CopyWrite { Location location(); }
+    sealed interface Write permits LiteralWrite, CopyWrite, ExpressionWrite { Location location(); }
     record LiteralWrite(Location location,Candidates value) implements Write { }
     record CopyWrite(Location location,Location source) implements Write { }
+    record ExpressionWrite(Location location,Operations.Assign operation) implements Write { }
     final AnalysisSession session;
     final Map<ObjectId,Location> subjects=new HashMap<>();
     private final Set<ObjectId> textSubjects=new HashSet<>();
@@ -74,8 +75,11 @@ final class TextProfile {
             var sources=new HashMap<Location,Set<Location>>();
             for(var site:index.sites(Operations.Assign.class)) {
                 var assign=(Operations.Assign)site.operation();
-                if(assign.destination() instanceof Places.ObjectPlace to&&assign.value() instanceof Expressions.Read read&&read.place() instanceof Places.ObjectPlace from)
-                    sources.computeIfAbsent(subjects.get(to.object()),k->new HashSet<>()).add(subjects.get(from.object()));
+                if(assign.destination() instanceof Places.ObjectPlace to) {
+                    // Only relevant expressions require admission; unrelated unsupported effects still use existing guards.
+                    try {for(var from:TextExpressions.reads(assign.value()))sources.computeIfAbsent(subjects.get(to.object()),k->new HashSet<>()).add(subjects.get(from));}
+                    catch(Refusal ignored) { }
+                }
             }
             var pending=new ArrayDeque<Location>(selected);
             while(!pending.isEmpty())for(var source:sources.getOrDefault(pending.removeFirst(),Set.of())) {
@@ -144,6 +148,9 @@ final class TextProfile {
                 var sourceLocation=subjects.get(source.object());
                 if(sourceLocation==null)throw new Refusal(false,"UNSUPPORTED_STORAGE_PROFILE");
                 writes.put(operation,new CopyWrite(location,sourceLocation));
+            } else if(assign.value() instanceof Expressions.FitText||assign.value() instanceof Expressions.SliceText) {
+                for(var source:TextExpressions.reads(assign.value()))if(!subjects.containsKey(source))throw new Refusal(false,"UNSUPPORTED_STORAGE_PROFILE");
+                writes.put(operation,new ExpressionWrite(location,assign));
             } else throw new Refusal(false,"UNSUPPORTED_EFFECT_PROFILE");
         } else if(operation instanceof Operations.HavocMust || operation instanceof Operations.HavocMay || operation instanceof Operations.Opaque) {
             conservative.put(operation,ConservativeEffectTransfer.prepare(operation,this));
@@ -169,7 +176,8 @@ final class TextProfile {
         // Capture the immutable source value before the strong update, preserving
         // its open remainder and candidate supports without creating an alias.
         var value=write instanceof LiteralWrite literal ? literal.value()
-            : state.value(((CopyWrite)write).source().ordinal(),work);
+            : write instanceof CopyWrite copy ? state.value(copy.source().ordinal(),work)
+            : TextExpressions.evaluate(((ExpressionWrite)write).operation(),state,subjects,universe,work);
         return state.strongOverwrite(write.location().ordinal(),value,overwrites.get(operation),work);
     }
     boolean supports(ObjectId subject,EntryId entry) {

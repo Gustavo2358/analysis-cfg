@@ -159,7 +159,7 @@ class ValueToCallEvidenceTest {
         });
         var s=session(p);var u=p.units().getFirst();var e=u.entries().getFirst().id();var object=u.objects().getLast().id();
         var key=PossibleValuesProvider.key(e,PossibleValuesAnalysis.EFFECTS_PROFILE);
-        assertTrue(CallDependencyPlan.select(s).stream().flatMap(r->r.dependencies().requiredAnalysisKeys().stream()).anyMatch(key::equals));
+        assertTrue(CallDependencyPlan.select(s).stream().flatMap(r->r.dependencies().requiredAnalysisKeys().stream()).anyMatch(k->k.implementation().equals(key.implementation())&&k.profile().equals(key.profile())));
         var prepared=new PossibleValuesProvider().prepare(s,key);assertNull(prepared.refusal());
         var f=prepared.execute().observe(List.of(new PointQuery<>(ProgramPoint.before(e,new OperationId(u.id(),"invoke")),object))).batch().observations().getFirst().value();
         assertEquals(List.of(new Values.TextValue(RAW)),f.candidates());assertFalse(f.effectiveUnknownRemainder());

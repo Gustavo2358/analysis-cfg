@@ -71,7 +71,6 @@ public final class CallDependencyPlan {
         // provider that models those edges, including Cell storage, under the explicit policy.
         // Wider logical admission is never permission to enable physical propagation.
         boolean regional=session.index().hasUnprovedPreconditions() || session.index().publication().storage().stream().anyMatch(Memory.Region.class::isInstance)
-            ||session.index().publication().capabilities().required().contains(Capabilities.ENTRY_POSSIBILITIES_V2)
             ||session.index().sites(Operations.Invoke.class).stream().anyMatch(s->!((Operations.Invoke)s.operation()).results().isEmpty());
         // Probe the optimization's semantic admission, not a keyword/feature list.
         // This prepares no solver run. A wider existing domain retains evidence on refusal.

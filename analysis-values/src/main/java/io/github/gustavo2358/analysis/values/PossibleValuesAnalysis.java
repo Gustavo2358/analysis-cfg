@@ -86,7 +86,7 @@ public final class PossibleValuesAnalysis implements AnalysisDefinition<Possible
                         for(var candidate:supports)for(var producer:candidate.producers()) {
                             evidence.add(producer.evidence());provenance.add(producer.origin());premises.addAll(producer.premises());
                         }
-                        boolean model=state.isReached()&&state.value(cell.ordinal(),replayWork).open();
+                        boolean model=state.isReached()&&(state.value(cell.ordinal(),replayWork).open()||profile.universe.partial(state.value(cell.ordinal(),replayWork)));
                         return new ValueFact(cell.cell().header().id(),state.isReached()?ValueFact.Reachability.REACHABLE:ValueFact.Reachability.UNREACHABLE_IN_MODEL,
                             state.isReached()?profile.universe.materialize(state.value(cell.ordinal(),replayWork)):null,state.isReached()?model:null,
                             source,model||source,List.copyOf(premises),List.copyOf(evidence),List.copyOf(provenance),supports);

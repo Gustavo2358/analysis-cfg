@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "observed_on": "2026-09-17",
+  "observed_on": "2026-09-18",
   "analysis_ir": {
     "repository": "Gustavo2358/analysis-ir",
     "commit": "3fff18e2c16663a3f599207457caa1946d2e0945",
@@ -141,8 +141,8 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "135d91f4d643c80eeb5d7bff9081fae229e9e62c",
-    "canonical_ref": "main",
+    "commit": "646ca3ab1687d43f7d2063fc2a8f3837ab3cf9fa",
+    "canonical_ref": "feat/logical-text-w1",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
     "analysis_ir": {
@@ -189,7 +189,7 @@
       "air-model/src/main/java/io/github/gustavo2358/air/model/MemoryCodecs.java",
       "air-json/src/test/resources/regional.canonical.json"
     ],
-    "observed_on": "2026-09-17",
+    "observed_on": "2026-09-18",
     "modules": {
       "parent": {
         "path": "pom.xml",
@@ -209,7 +209,8 @@
     },
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
-    "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable."
+    "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
+    "logical_text_w2": "Local producer FAST PASS; fixed logical ranges and expression transport. Selected source E2E qualification in docs/product/logical-text-w2.md."
   },
   "proleap_poc": {
     "repository": "Gustavo2358/proleap-poc",
@@ -276,7 +277,7 @@
     ],
     "semantic_product_version": "2.28.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "7a2050b2d5f14472d372ea59aca8e3114a9e64bd",
+    "commit": "84845762c58ba0f64199bf01db9afce4c97a939b",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -302,12 +303,13 @@
     "fd_w9_validation": "QUALIFIED_LOCAL: producer focal/FAST/Q, consumer manual/FAST/reader, 8 scope + 33 native + 38 CICS real CLI sources twice, deterministic four products; docs/product/file-dependencies/w9-implementation.md",
     "logical_text_w1": "Source E2E A-D twice deterministic; scale 10/100/1000; no physical profile. Corporate rerun not required by revised user acceptance.",
     "logical_text_semantic_product_version": "2.29.0",
-    "logical_text_storage_contract_version": "1.9.0"
+    "logical_text_storage_contract_version": "1.9.0",
+    "logical_text_w2": "Local producer FAST PASS; fixed logical ranges and expression transport. Selected source E2E qualification in docs/product/logical-text-w2.md."
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "W1 locally qualified; ready for human review, not merged",
-    "commit": "8965012ed335f075e94f04ce3adfcb0d7f2ad631",
+    "commit": "557693a1184ddd2bd61886ceaa1176a78c0aa162",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -332,7 +334,8 @@
     "fd_w8_validation": "QUALIFIED_LOCAL: producer FAST/Q-SHARED, B-SP33, CFG FAST502/Q547, manual/wire and38CICS+33native source cases twice; docs/product/file-dependencies/w8-implementation.md",
     "fd_w9_validation": "QUALIFIED_LOCAL: producer focal/FAST/Q, consumer manual/FAST/reader, 8 scope + 33 native + 38 CICS real CLI sources twice, deterministic four products; docs/product/file-dependencies/w9-implementation.md",
     "fd_w11_validation": "Current-version LOGICAL_SOURCE negotiation fixed; B-SP version21-28/legacy18, fixed FAST and qualification-local PASS; final CLI/corpus pending",
-    "logical_text_w1": "Source E2E A-D twice deterministic; scale 10/100/1000; no physical profile. Corporate rerun not required by revised user acceptance."
+    "logical_text_w1": "Source E2E A-D twice deterministic; scale 10/100/1000; no physical profile. Corporate rerun not required by revised user acceptance.",
+    "logical_text_w2": "Local producer FAST PASS; fixed logical ranges and expression transport. Selected source E2E qualification in docs/product/logical-text-w2.md."
   },
   "external": [
     {

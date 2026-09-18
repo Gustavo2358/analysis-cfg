@@ -1,0 +1,228 @@
+{
+  "group": {
+    "caller": "W2-GROUP",
+    "targets": [
+      "ABCD"
+    ],
+    "remainder": true,
+    "rawTargets": [
+      "ABCD"
+    ]
+  },
+  "padding": {
+    "caller": "W2-PADDING",
+    "targets": [
+      "PROGA"
+    ],
+    "remainder": true,
+    "rawTargets": [
+      "PROGA   "
+    ]
+  },
+  "truncation": {
+    "caller": "W2-TRUNCATION",
+    "targets": [
+      "PROGA"
+    ],
+    "remainder": true,
+    "rawTargets": [
+      "PROGA   "
+    ]
+  },
+  "snapshot": {
+    "caller": "W2-SNAPSHOT",
+    "targets": [
+      "ABCD"
+    ],
+    "remainder": true,
+    "rawTargets": [
+      "ABCD"
+    ]
+  },
+  "overlay-forward": {
+    "caller": "W2-OVERLAY-FORWARD",
+    "targets": [
+      "PROGA"
+    ],
+    "remainder": true,
+    "rawTargets": [
+      "PROGA   "
+    ]
+  },
+  "overlay-reverse": {
+    "caller": "W2-OVERLAY-REVERSE",
+    "targets": [
+      "PROGB"
+    ],
+    "remainder": true,
+    "rawTargets": [
+      "PROGB   "
+    ]
+  },
+  "overlay-split": {
+    "caller": "W2-OVERLAY-SPLIT",
+    "targets": [
+      "PROGA"
+    ],
+    "remainder": true,
+    "rawTargets": [
+      "PROGA   "
+    ]
+  },
+  "overlay-partial": {
+    "caller": "W2-OVERLAY-PARTIAL",
+    "targets": [
+      "PROGA"
+    ],
+    "remainder": true,
+    "rawTargets": [
+      "PROGA   "
+    ]
+  },
+  "renames": {
+    "caller": "W2-RENAMES",
+    "targets": [
+      "PROGA001"
+    ],
+    "remainder": true,
+    "rawTargets": [
+      "PROGA001"
+    ]
+  },
+  "renames-filler": {
+    "caller": "W2-RENAMES-FILLER",
+    "targets": [
+      "PROGA001"
+    ],
+    "remainder": true,
+    "rawTargets": [
+      "PROGA001"
+    ]
+  },
+  "correlation": {
+    "caller": "W2-CORRELATION",
+    "targets": [
+      "MODU0002",
+      "PROG0001"
+    ],
+    "remainder": true,
+    "rawTargets": [
+      "MODU0002",
+      "PROG0001"
+    ]
+  },
+  "value-child": {
+    "caller": "W2-VALUE-CHILD",
+    "targets": [
+      "PROGA001"
+    ],
+    "remainder": true,
+    "rawTargets": [
+      "PROGA001"
+    ]
+  },
+  "composition": {
+    "caller": "W2-COMPOSITION",
+    "targets": [
+      "PROGA"
+    ],
+    "remainder": true,
+    "rawTargets": [
+      "PROGA   "
+    ]
+  },
+  "known-open": {
+    "caller": "W2-KNOWN-OPEN",
+    "targets": [
+      "PROGA"
+    ],
+    "remainder": true,
+    "rawTargets": [
+      "PROGA   "
+    ]
+  },
+  "unsupported": {
+    "caller": "W2-UNSUPPORTED",
+    "targets": [],
+    "remainder": true,
+    "rawTargets": []
+  },
+  "invalid-renames": {
+    "caller": "W2-INVALID-RENAMES",
+    "targets": [],
+    "remainder": true,
+    "rawTargets": []
+  },
+  "overlap-refused": {
+    "caller": "W2-OVERLAP-REFUSED",
+    "targets": [],
+    "remainder": true,
+    "rawTargets": []
+  },
+  "w1-a": {
+    "caller": "W2-W1-A",
+    "targets": [
+      "PROGA"
+    ],
+    "remainder": true,
+    "rawTargets": [
+      "PROGA   "
+    ]
+  },
+  "w1-b": {
+    "caller": "W2-W1-B",
+    "targets": [
+      "PROGA"
+    ],
+    "remainder": true,
+    "rawTargets": [
+      "PROGA   "
+    ]
+  },
+  "w1-c": {
+    "caller": "W2-W1-C",
+    "targets": [
+      "PROGB"
+    ],
+    "remainder": true,
+    "rawTargets": [
+      "PROGB   "
+    ]
+  },
+  "w1-d": {
+    "caller": "W2-W1-D",
+    "targets": [
+      "PROGA",
+      "PROGB"
+    ],
+    "remainder": true,
+    "rawTargets": [
+      "PROGA   ",
+      "PROGB   "
+    ]
+  },
+  "overlay-branch": {
+    "caller": "W2-OVERLAY-BRANCH",
+    "targets": [
+      "PROGA",
+      "PROGB"
+    ],
+    "rawTargets": [
+      "PROGA   ",
+      "PROGB   "
+    ],
+    "remainder": true
+  },
+  "overlay-open-root": {
+    "caller": "W2-OVERLAY-OPEN-ROOT",
+    "targets": [],
+    "rawTargets": [],
+    "remainder": true
+  },
+  "unequal-overlay-unknown": {
+    "caller": "W2-UNEQUAL-OVERLAY-UNKNOWN",
+    "targets": [],
+    "rawTargets": [],
+    "remainder": true
+  }
+}

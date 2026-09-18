@@ -1,6 +1,6 @@
 # Logical-only — operational dependency discovery
 
-id: logical-text-w1; status: IN_PROGRESS; scope: W1 logical text and explicit physical boundary. Locally qualified, ready for human review; no merge or W2. By user decision on 2026-09-18, corporate execution is not a blocking W1 acceptance gate: synthetic source E2E proves the new property. The corporate ON/OFF observation is user-reported; no corporate rerun or nine-target measurement is claimed.
+id: logical-text-w1; status: IN_PROGRESS; scope: W1 logical text and explicit physical boundary. Historical W1 checkpoint, continued by [W2](logical-text-w2.md) in the same PR; no merge. By user decision on 2026-09-18, corporate execution is not a blocking W1 acceptance gate: synthetic source E2E proves the new property. The corporate ON/OFF observation is user-reported; no corporate rerun or nine-target measurement is claimed.
 
 Dependency discovery defaults to `StorageAnalysisMode.LOGICAL_ONLY`. Logical/scalar source facts, existing CFG/reaching definitions and possible-values infrastructure supply supported candidates. Completeness is a separate claim. Physical/regional propagation is **EXPERIMENTAL / NOT PRODUCTION QUALIFIED**, default **OFF**, with automatic physical fallback **FORBIDDEN**. The limitation is operational scalability/convergence, not a finding that physical semantics are incorrect.
 

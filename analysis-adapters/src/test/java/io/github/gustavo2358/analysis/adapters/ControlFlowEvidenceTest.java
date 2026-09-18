@@ -89,7 +89,7 @@ class ControlFlowEvidenceTest {
     static void check(String scenario,String seed,String left,String right,Expected l,Expected r,Expected joined,boolean nested) {
         for(boolean regional:List.of(false,true)) {
             var p=diamond(regional,seed,left,right,nested);topology(p,nested);var s=ValueToCallEvidenceTest.session(p);
-            var key=regional?RegionalValuesProvider.key(E):PossibleValuesProvider.key(E,PossibleValuesAnalysis.EFFECTS_PROFILE);
+            var key=regional?RegionalValuesProvider.key(E,StorageAnalysisMode.EXPERIMENTAL_PHYSICAL):PossibleValuesProvider.key(E,PossibleValuesAnalysis.EFFECTS_PROFILE);
             AnalysisProvider<ObjectId,? extends TextValueFact> provider=regional?new RegionalValuesProvider():new PossibleValuesProvider();
             var prepared=provider.prepare(s,key);assertNull(prepared.refusal());var run=prepared.execute();assertEquals(AnalysisOutcome.Status.STABLE,run.outcome().status());
             var queries=List.of(new PointQuery<>(ProgramPoint.before(E,new OperationId(U,nested?"jump-inner-a":"jump-left")),B),
@@ -99,7 +99,7 @@ class ControlFlowEvidenceTest {
             for(int i=0;i<3;i++) {final var q=queries.get(i);var o=batch.observations().stream().filter(x->x.query().equals(q)).findFirst().orElseThrow();assertEquals(ObservationBatch.QueryStatus.VALUE,o.status());observation(o.value(),expected.get(i));}
             var keys=CallDependencyPlan.select(s).stream().flatMap(x->x.dependencies().requiredAnalysisKeys().stream()).collect(java.util.stream.Collectors.toSet());
             assertEquals(Set.of(key.implementation(),"Reachability"),keys.stream().map(x->x.implementation()).collect(java.util.stream.Collectors.toSet()));
-            var result=new DependencyAnalysis().prepare(p);assertEquals(1,result.sites().size());var call=result.sites().getFirst();
+            var result=new DependencyAnalysis(regional?StorageAnalysisMode.EXPERIMENTAL_PHYSICAL:StorageAnalysisMode.LOGICAL_ONLY).prepare(p);assertEquals(1,result.sites().size());var call=result.sites().getFirst();
             assertEquals(joined.supports().keySet().stream().sorted().toList(),call.candidates().stream().map(DependencySiteFact.Candidate::referenceName).toList());
             var finalSupports=new TreeMap<String,Set<String>>();
             for(var candidate:call.candidates())finalSupports.put(candidate.referenceName(),new TreeSet<>(candidate.supports().stream().map(x->x.producer().localId()).toList()));

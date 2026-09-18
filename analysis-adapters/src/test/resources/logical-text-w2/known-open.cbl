@@ -1,0 +1,13 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. W2-KNOWN-OPEN.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 REC-A.
+       05 WS-PGM PIC X(8).
+       05 CODE-A PIC X(4).
+       01 FLAG PIC X.
+       PROCEDURE DIVISION.
+       MOVE 'PROGA' TO WS-PGM.
+       ACCEPT WS-PGM.
+       CALL WS-PGM.
+       GOBACK.
