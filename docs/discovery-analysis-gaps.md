@@ -1,15 +1,20 @@
 # Analysis gaps campaign
 
-## Dependency on PR #40
+## Relationship to PR #40
 
-STACKED ON PR #40. Temporary parent/base: `discovery/regional-explosion-fixtures`.
-Parent validated SHA / G0_BASELINE_SHA: `f0efa4a76984781e09c26b92d4f6ee9cb2591f8f`.
-New branch: `discovery/analysis-gaps`; isolated worktree: `.analysis-gaps/analysis-cfg`.
-Draft PR will target the parent, never main while #40 is open. No auto-merge.
-After #40 merges: incorporate its final head, rebase/update from main and retarget.
-If W4 adds only documentation/evidence, continue normally. If W4 adds production
-changes, incorporate the FINAL #40 head before closing dependent implementation.
-No synchronization is performed by G0/W1. Corporate E2E is not run.
+Parent PR #40 has been merged by merge commit
+`f002af81cc241548041583b5aee0375c49242979`. Its final head is
+`dd6737e94b66dd2ad9723b4578622937c455a13e`; the change after the inherited
+G0_BASELINE_SHA `f0efa4a76984781e09c26b92d4f6ee9cb2591f8f` is W4
+documentation/evidence only. No semantic synchronization is required.
+
+PR #41 is now based directly on `main`. Its branch remains
+`discovery/analysis-gaps` in the isolated worktree
+`.analysis-gaps/analysis-cfg`. The retargeted diff contains only this campaign's
+consumer-plan change, tests, source fixtures, probes, inventory delta and this
+report; it does not duplicate `RegionalAlternatives` or the
+`RegionalValuesAnalysis` factoring implementation. Corporate E2E is not run by
+this campaign.
 
 ## G0
 
@@ -48,8 +53,9 @@ W2 NOT STARTED. W3 NOT STARTED.
 ### Pipeline map (discovery before any production change)
 
 W1 start SHA: `7739c94` (G0 documentation only; same production tree as parent).
-Draft stacked PR: https://github.com/Gustavo2358/analysis-cfg/pull/41.
-Fresh GitHub read confirmed #40 OPEN/Draft at the exact parent SHA.
+Historical W1 checkpoint: Draft stacked PR
+https://github.com/Gustavo2358/analysis-cfg/pull/41. A fresh GitHub read at that
+time confirmed #40 OPEN/Draft at the exact parent SHA.
 
 Pinned producer code inspected read-only, using `git show`/`git grep` at the
 locked commits (not the possibly older sibling working directories):
@@ -266,24 +272,26 @@ Commits: `7739c94` establishes G0; `f4b1c59` characterizes the nine W1 fixtures;
 final documentation commit records these results. Productive files changed: none.
 Only the new test and this report differ from the validated parent. The parent
 worktree remains clean at `f0efa4a76984781e09c26b92d4f6ee9cb2591f8f`.
-Draft review is pending; campaign wave completion is not repository work-item
-DONE/merge. No merge or auto-merge is authorized/performed.
+At this historical W1 checkpoint, Draft review was pending; campaign wave
+completion was not repository work-item DONE/merge and no merge or auto-merge
+had been authorized or performed.
 
 G0 COMPLETE — STACKED CAMPAIGN FOUNDATION READY.
 
 W1 COMPLETE — SIMPLE PATH ALREADY SUPPORTED; FIRST GAP IS INLINE TARGET-EXPRESSION QUERY ADMISSION (G4).
 
-W2 NOT STARTED. W3 NOT STARTED. Await human review.
+Historical W1 checkpoint: W2 NOT STARTED; W3 NOT STARTED.
 
 # W2 — control-flow composition
 
 ## Hygiene and scope
 
 W2_START_SHA: `8d008354433e39e5b98986a6341e29dc96eaa390`.
-Same clean worktree `.analysis-gaps/analysis-cfg`, same branch
-`discovery/analysis-gaps`, same Draft PR #41; base
-`discovery/regional-explosion-fixtures`, auto-merge null. Fresh GitHub read at
-start: #40 OPEN/Draft at `f0efa4a76984781e09c26b92d4f6ee9cb2591f8f`.
+At W2 start, the same clean worktree `.analysis-gaps/analysis-cfg`, branch
+`discovery/analysis-gaps` and Draft PR #41 still used the historical base
+`discovery/regional-explosion-fixtures`, with auto-merge null. The fresh GitHub
+read at that time found #40 OPEN/Draft at
+`f0efa4a76984781e09c26b92d4f6ee9cb2591f8f`.
 No reset/rebase, no new PR, no change to #40. W1's earlier NOT STARTED statements
 above record the W1 checkpoint; this section records the newly authorized W2.
 W1 cheap gate ran before W2 edits: 41 tests, zero failures/errors/skips
@@ -538,7 +546,8 @@ Results and commands are recorded at W2 closeout below.
   control/effects uncertainty. No claim of corporate impact or candidate gain
   follows from these three synthetic sources.
 
-W3 NOT STARTED. PR #41 remains Draft; no merge authorized.
+Historical W2 checkpoint: W3 NOT STARTED; PR #41 remained Draft and no merge was
+authorized at that point.
 
 ## W2 closeout — validation and reproducibility
 
@@ -607,26 +616,27 @@ These are small concrete fixtures; zero interned provenance rows here does not
 claim absent evidence. Exact producer supports are independently asserted.
 Structural factoring/stress properties remain covered by inherited tests.
 
-Final parent check before publication: #40 still OPEN/Draft at the original
-validated `f0efa4a76984781e09c26b92d4f6ee9cb2591f8f`; no synchronization needed.
-Future parent-production synchronization rule in G0 still applies.
+Historical final W2 parent check: #40 was still OPEN/Draft at the original
+validated `f0efa4a76984781e09c26b92d4f6ee9cb2591f8f`; no synchronization was
+needed at that checkpoint.
 
 **RESULT B**
 
 **W2 COMPLETE — ANALYSIS SUPPORTS CONTROL FLOW; FIRST GAP IS UPSTREAM IF
 ADMISSION (G3).**
 
-**W3 NOT STARTED.** Same PR #41, Draft, temporary parent base, no auto-merge,
-no merge. Await human review. Per repository lifecycle, this is a validated
-campaign wave, not a claim that the unmerged work item is DONE.
+Historical W2 checkpoint: **W3 NOT STARTED.** PR #41 was Draft on its temporary
+parent base, with no auto-merge or merge. Per repository lifecycle, this was a
+validated campaign wave, not a claim that the unmerged work item was DONE.
 
 # W3 — final consumer coverage
 
 ## Hygiene and discovery before production changes
 
-W3_START_SHA `992bf21d111b66ad5583cad0412ca859acd0243a`; same clean
-`.analysis-gaps/analysis-cfg` worktree, branch and Draft PR #41. Parent #40
-OPEN/Draft, unchanged at `f0efa4a76984781e09c26b92d4f6ee9cb2591f8f`.
+W3_START_SHA `992bf21d111b66ad5583cad0412ca859acd0243a`; at W3 start the
+same clean `.analysis-gaps/analysis-cfg` worktree, branch and Draft PR #41 were
+still stacked on parent #40, then OPEN/Draft and unchanged at
+`f0efa4a76984781e09c26b92d4f6ee9cb2591f8f`.
 No reset/rebase. Baseline W1/W2/regional passed before edits
 (`.harness-results/w3-baseline-final.log`). Two initial test selections failed
 because intermediate reactor modules had no matching test; the corrected
@@ -885,7 +895,9 @@ PASS means a named oracle above, not universal language coverage.
 
 No additional wave is technically required to finish this discovery map.
 Residual implementation decisions require explicit authorization; none starts
-automatically. PR #41 remains Draft, stacked on #40, awaiting human review.
+automatically. Parent #40 is merged, PR #41 is based directly on `main`, and
+human review of this campaign is complete. Final qualification against the real
+post-#40 `main` remains the merge gate.
 
 ## Validation and closeout
 
@@ -944,16 +956,22 @@ PERFORM/GO TO/SQL/dynamic-FILE campaigns. The local change consumes a query
 already planned; focal/full-module, public-wire, selected source and FAST gates
 cover its invalidated evidence without requalifying unchanged shared solvers.
 
-Implementation commit `a3edcd4`; source-probe commit `ecfe566`. Final report commit
-and exact final HEAD are recorded in PR #41/Git. Parent #40 was rechecked before
-final qualification and is still at the original validated SHA; no synchronization
-is needed. If parent production later changes, incorporate its final head before
-closing dependent implementation; after #40 merges update/rebase from main and
-retarget #41 to main. No merge or auto-merge authorized.
+Implementation commit `a3edcd4`; source-probe commit `ecfe566`; pre-retarget head
+`6db90ceea259a2d0756e2a5af40fa31fa3401279`. Parent #40 merged with ancestry
+preserved. Its W4 delta after the inherited parent was documentation/evidence
+only, so #41 required no semantic replay or production synchronization. PR #41
+was retargeted directly to `main`; the resulting diff is limited to this campaign
+and contains no duplicate #40 regional implementation.
+
+The pinned upstream producer SHAs and source fixtures are unchanged by the base
+transition. Therefore the earlier 12-case source-probe products remain applicable;
+the final post-retarget qualification reruns analyzer focal/module/wire/FAST gates
+against real post-#40 `main` and distinguishes that new evidence from the reused
+source run.
 
 **W3 COMPLETE — CONSUMER COVERAGE MAPPED; RESIDUAL GAPS CLASSIFIED.**
 
-The discovery campaign is technically closed, subject to parent dependency /
-retarget and final human review. This is not repository lifecycle DONE while
-PR #41 remains unmerged. No upstream G3 campaign or inline G4 implementation
-has been started. Await human review.
+The discovery campaign is technically closed. Parent dependency, retarget and
+human review are complete; repository lifecycle DONE still requires the final
+post-retarget gates and merge of PR #41. No upstream G3 campaign or inline G4
+implementation has been started.
