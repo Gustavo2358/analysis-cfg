@@ -190,6 +190,11 @@
       "independentEntryFactorsShareOneGeneralRunForCallAndFile",
       "simultaneousStrongAndOpenEntrySurvivesBothOrdersBeforeFile",
       "leadingDollarCallAndIndependentCicsFilePolicyShareWire23"
+    ],
+    "io.github.gustavo2358.analysis.adapters.LogicalOnlyDependencyTest": [
+      "nominalCopyPreservesSnapshotCandidateAndPublishesPartialReason",
+      "unresolvedPhysicalSliceDoesNotEnablePhysicalFallback",
+      "nominalCicsCallAndFileConsumersKeepCandidatesWithOpenCompleteness"
     ]
   },
   "analysis-dataflow": {
@@ -608,6 +613,23 @@
     ],
     "io.github.gustavo2358.analysis.values.RegionalFallbackStressTest": [
       "repeatedPartialCopiesPreserveFullReplayAndActuallyUseFallback"
+    ],
+    "io.github.gustavo2358.analysis.values.LogicalOnlyBoundaryTest": [
+      "defaultDisablesPhysicalWorkAndRetainsNamedCandidateWithOpenCompleteness",
+      "physicalProjectionRemainsUnknownWithoutAutomaticFallback",
+      "physicalProjectionRequiresExplicitExperimentalOptIn",
+      "policySeparatesProviderCacheIdentityAndDefaultKeys",
+      "unknownBindingRetainsSourceEvidenceWithoutCompletenessOrPhysicalFallback",
+      "scalarCopyIsASnapshotEvenWhenSourceChangesLater",
+      "sharedCellIdentityDoesNotRequirePhysicalAliasing"
+    ],
+    "io.github.gustavo2358.analysis.values.LogicalExpressionsTest": [
+      "partialRootSnapshotAndDemand",
+      "branchAlternativesStayWholeThroughRepeatedRootReads"
+    ],
+    "io.github.gustavo2358.analysis.values.LogicalTextTest": [
+      "unknownSiblingDoesNotEraseKnownProjection",
+      "immutableSnapshotAndFit"
     ]
   },
   "cfg-adapters": {

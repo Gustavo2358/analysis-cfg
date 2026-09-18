@@ -127,7 +127,7 @@ class LogicalPlaceRepresentationTest {
         var options=new io.github.gustavo2358.analysis.cfg.application.BuildOptions(defaults.validation(),io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy.PARTIAL_ANALYSIS);
         var cfg=new io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator(io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry.empty()).build(p,options);
         var session=io.github.gustavo2358.analysis.structure.AnalysisSession.open(cfg,p,options.projectionPolicy(),p.units().getFirst().entries()).session().orElseThrow();
-        return RegionalValuesAnalysis.prepare(session).analysis().orElseThrow().execute();
+        return RegionalValuesAnalysis.prepare(session,StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).analysis().orElseThrow().execute();
     }
     @Test void explicitIdentityDoesNotFollowAliasBindingsOrRegionAddressOperands() {
         var p=EvidencePreservingEntryTest.logical(List.of(returning(U,"s0",List.of())));var u=p.units().getFirst();

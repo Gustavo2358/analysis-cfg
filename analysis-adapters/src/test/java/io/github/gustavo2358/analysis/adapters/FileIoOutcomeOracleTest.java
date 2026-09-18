@@ -89,7 +89,7 @@ final class FileIoOutcomeOracleTest {
         var p=manual(outcome,must);var validation=AirValidator.validate(p);
         assertEquals(ValidationResult.Status.STRUCTURALLY_VALID,validation.status(),validation.issues().toString());
         var codec=new AirJson();var wire=codec.encode(p);var decoded=codec.decode(wire);assertEquals(p,decoded);assertArrayEquals(wire,codec.encode(decoded));
-        var result=new DependencyAnalysis().prepare(decoded);assertFalse(result.analysisReasons().contains("CFG_UNSUPPORTED"));
+        var result=new DependencyAnalysis(io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).prepare(decoded);assertFalse(result.analysisReasons().contains("CFG_UNSUPPORTED"));
         assertEquals(1,result.fileDependencies().sites().size());assertEquals(List.of("INDD"),result.fileDependencies().sites().getFirst().candidates().stream().map(FileDependencyResult.Candidate::referenceName).toList());
         var dir=Path.of("target/fd-w3/manual");Files.createDirectories(dir);Files.write(dir.resolve(outcome+"-"+must+".air.json"),wire);
         return result;

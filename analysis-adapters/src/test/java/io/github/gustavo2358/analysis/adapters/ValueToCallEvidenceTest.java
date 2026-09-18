@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import static io.github.gustavo2358.analysis.adapters.ResultFixtures.*;
 
-/** W1: independent AIR oracles at producer/provider/consumer boundaries; no source parsing. */
+/** Experimental physical observation/consumer oracle; default product mode has separate boundary tests. W1: independent AIR oracles at producer/provider/consumer boundaries; no source parsing. */
 class ValueToCallEvidenceTest {
     static final PublicationId P=new PublicationId("value-to-call-evidence");
     static final UnitId U=new UnitId(P,"unit");
@@ -61,7 +61,7 @@ class ValueToCallEvidenceTest {
         return AnalysisSession.open(cfg,p,ProjectionPolicy.KNOWN_SUBSET,p.units().getFirst().entries()).session().orElseThrow();
     }
     static RegionalValueFact fact(AnalysisSession s,String operation,ObjectId object) {
-        var prepared=new RegionalValuesProvider().prepare(s,RegionalValuesProvider.key(E));assertNull(prepared.refusal());
+        var prepared=new RegionalValuesProvider().prepare(s,RegionalValuesProvider.key(E,io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL));assertNull(prepared.refusal());
         var run=prepared.execute();
         var observed=run.observe(List.of(new PointQuery<>(ProgramPoint.before(E,new OperationId(U,operation)),object)));
         assertEquals(ObservationBatch.Status.COMPLETE,observed.batch().status());
@@ -71,7 +71,7 @@ class ValueToCallEvidenceTest {
     static Set<String> supports(TextValueFact f) {
         return new TreeSet<>(f.candidateSupports().stream().flatMap(c->c.producers().stream()).map(s->s.evidence().localId()).toList());
     }
-    static DependencySiteFact call(Publication p) { return new DependencyAnalysis().prepare(p).sites().getFirst(); }
+    static DependencySiteFact call(Publication p) { return new DependencyAnalysis(io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).prepare(p).sites().getFirst(); }
     static void resolved(DependencySiteFact c,String... names) {
         assertEquals(DependencySiteFact.TargetStatus.RESOLVED_CANDIDATES,c.targetStatus());
         assertEquals(List.of(names),c.candidates().stream().map(DependencySiteFact.Candidate::referenceName).toList());
@@ -118,7 +118,7 @@ class ValueToCallEvidenceTest {
                 new Places.ObjectPlace(operand(op,"choice-a",Operand.Role.VALUE_READ),A),new Places.ObjectPlace(operand(op,"choice-b",Operand.Role.VALUE_READ),B)),Scopes.NoMemory.INSTANCE,Types.known(Types.Builtin.TEXT))));});
         var s=session(p);assertTrue(CallDependencyPlan.select(s).stream().flatMap(r->r.dependencies().requiredAnalysisKeys().stream()).anyMatch(k->k.implementation().equals(StorageValuesProvider.IMPLEMENTATION)));
         var read=(Expressions.Read)((Interactions.ComputedTarget)((Operations.Invoke)p.units().getFirst().sequences().getFirst().terminator()).target()).name();
-        var prepared=new StorageValuesProvider().prepare(s,StorageValuesProvider.key(E));assertNull(prepared.refusal());
+        var prepared=new StorageValuesProvider().prepare(s,StorageValuesProvider.key(E,io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL));assertNull(prepared.refusal());
         var f=prepared.execute().observe(List.of(new PointQuery<StorageSubject>(ProgramPoint.before(E,new OperationId(U,"invoke")),new StorageSubject.PlaceOccurrence(read.place().header().id())))).batch().observations().getFirst().value();
         assertEquals(List.of(new Values.TextValue(RAW),new Values.TextValue("PROGB   ")),f.candidates());
         var c=call(p);resolved(c,"PROGA","PROGB");
@@ -133,7 +133,7 @@ class ValueToCallEvidenceTest {
             new Control.ControlEnvelope(List.of(Control.ContinueAlternative.INSTANCE),Scopes.NoControl.INSTANCE),new Envelopes.DependencyEnvelope(List.of(),Scopes.NoResources.INSTANCE));
         var copy=new Operations.CopyBytes(h,new Memory.ByteRange(R,eight,length),new Memory.ByteRange(R,zero,new Expressions.Literal(operand(h.id(),"source-length",Operand.Role.VALUE_READ),new Values.IntValue(BigInteger.valueOf(8)))),BigInteger.valueOf(8),fallback);
         var p=fixture(List.of(assign(U,"literal",A,RAW),copy),false);var s=session(p);
-        var run=new StorageValuesProvider().prepare(s,StorageValuesProvider.key(E)).execute();
+        var run=new StorageValuesProvider().prepare(s,StorageValuesProvider.key(E,io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL)).execute();
         var f=run.observe(List.of(new PointQuery<StorageSubject>(ProgramPoint.before(E,new OperationId(U,"invoke")),new StorageSubject.NamedObject(B)))).batch().observations().getFirst().value();
         assertEquals(List.of(new Values.TextValue(RAW)),f.candidates());
         assertTrue(f.alternatives().stream().flatMap(a->a.fragments().stream()).flatMap(x->x.captures().stream()).anyMatch(c->c.definition().operation().equals(Optional.of(h.id()))));
@@ -159,7 +159,7 @@ class ValueToCallEvidenceTest {
         });
         var s=session(p);var u=p.units().getFirst();var e=u.entries().getFirst().id();var object=u.objects().getLast().id();
         var key=PossibleValuesProvider.key(e,PossibleValuesAnalysis.EFFECTS_PROFILE);
-        assertTrue(CallDependencyPlan.select(s).stream().flatMap(r->r.dependencies().requiredAnalysisKeys().stream()).anyMatch(key::equals));
+        assertTrue(CallDependencyPlan.select(s).stream().flatMap(r->r.dependencies().requiredAnalysisKeys().stream()).anyMatch(k->k.implementation().equals(key.implementation())&&k.profile().equals(key.profile())));
         var prepared=new PossibleValuesProvider().prepare(s,key);assertNull(prepared.refusal());
         var f=prepared.execute().observe(List.of(new PointQuery<>(ProgramPoint.before(e,new OperationId(u.id(),"invoke")),object))).batch().observations().getFirst().value();
         assertEquals(List.of(new Values.TextValue(RAW)),f.candidates());assertFalse(f.effectiveUnknownRemainder());

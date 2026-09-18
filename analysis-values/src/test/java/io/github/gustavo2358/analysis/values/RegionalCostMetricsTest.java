@@ -15,7 +15,7 @@ class RegionalCostMetricsTest {
             if(connected)for(int i:List.of(0,2))instructions.add(RegionalCompositionTest.copy("connect-"+i,
                 p.storage().get(i).header().id(),0,p.storage().get(i+1).header().id(),0,8));
             p=replace(p,List.of(unit(U,u.entries(),List.of(returning(U,"s0",instructions)),u.objects())),p.coverage(),p.uncertainties(),p.premises());
-            var selected=session(p);var analysis=RegionalValuesAnalysis.prepare(selected).analysis().orElseThrow();
+            var selected=session(p);var analysis=RegionalValuesAnalysis.prepare(selected,StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).analysis().orElseThrow();
             var engine=analysis.new Engine();var state=engine.boundaries(selected).iterator().next().state();
             long edges=state.materializedAlternatives(),nodes=state.decisionNodes(),component=state.maxComponentCardinality();
             for(var operation:instructions) {

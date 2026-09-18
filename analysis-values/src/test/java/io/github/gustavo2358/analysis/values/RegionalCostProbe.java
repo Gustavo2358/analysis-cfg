@@ -22,7 +22,7 @@ public final class RegionalCostProbe {
         var options=Arrays.asList(args);
         var p=RegionalExplosionFixturesTest.fixture(regions,producers,options.contains("disjoint"));
         if(options.contains("stress"))p=RegionalFallbackStressTest.fixture(producers);
-        var selected=session(p);var admission=RegionalValuesAnalysis.prepare(selected);
+        var selected=session(p);var admission=RegionalValuesAnalysis.prepare(selected,StorageAnalysisMode.EXPERIMENTAL_PHYSICAL);
         if(admission.status()!=RegionalValuesAnalysis.Status.ACCEPTED)throw new AssertionError(admission);
         var analysis=admission.analysis().orElseThrow();
         var targets=RegionalExplosionFixturesTest.targets(p);

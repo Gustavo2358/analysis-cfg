@@ -1,0 +1,21 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. W2-CORRELATION.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 REC-A.
+       05 PART-A PIC X(4).
+       05 PART-B PIC X(4).
+       66 RANGE-A RENAMES PART-A THRU PART-B.
+       01 WS-PGM PIC X(8).
+       01 FLAG PIC X.
+       PROCEDURE DIVISION.
+       IF FLAG = 'A'
+       MOVE 'PROG' TO PART-A
+       MOVE '0001' TO PART-B
+       ELSE
+       MOVE 'MODU' TO PART-A
+       MOVE '0002' TO PART-B
+       END-IF.
+       MOVE RANGE-A TO WS-PGM.
+       CALL WS-PGM.
+       GOBACK.

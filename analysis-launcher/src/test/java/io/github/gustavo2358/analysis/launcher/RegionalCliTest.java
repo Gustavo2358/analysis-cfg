@@ -19,7 +19,7 @@ class RegionalCliTest {
         // The adapter contract test writes the AIR fixture during the same reactor test run.
         var source=Path.of("../analysis-adapters/target/regional-wire/manual.air.json").toAbsolutePath();assertTrue(Files.exists(source));
         var result=directory.resolve("result.json");var err=new ByteArrayOutputStream();
-        var args=new String[]{source.toString(),result.toString(),"--result-id","cli-regional","--unit","unit","--entry","entry","--before","return-body","--range","copy-region","0","8","ascii"};
+        var args=new String[]{source.toString(),result.toString(),"--result-id","cli-regional","--unit","unit","--entry","entry","--before","return-body","--range","copy-region","0","8","ascii","--experimental-physical"};
         assertEquals(0,RegionalAnalysis.run(args,new PrintStream(err)),err.toString());var bytes=Files.readAllBytes(result);assertTrue(new String(bytes,java.nio.charset.StandardCharsets.UTF_8).contains("WXYZEFGH"));
         assertEquals(0,RegionalAnalysis.run(args,new PrintStream(err)),err.toString());assertArrayEquals(bytes,Files.readAllBytes(result));
         args[9]="absent";assertEquals(0,RegionalAnalysis.run(args,new PrintStream(err)),err.toString());assertTrue(Files.readString(result).contains("UNKNOWN_OPERATION"));

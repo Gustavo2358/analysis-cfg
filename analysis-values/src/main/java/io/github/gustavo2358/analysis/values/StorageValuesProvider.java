@@ -15,8 +15,9 @@ public final class StorageValuesProvider implements AnalysisProvider<StorageSubj
     public static final String VERSION = "1";
     public static final String PRECISION = "FINITE_CORRELATED_STORAGE_IMAGES";
     public static final String PROJECTION = "StorageValueFact@1";
-    public static AnalysisKey key(EntryId entry) {
-        return new AnalysisKey(IMPLEMENTATION,VERSION,RegionalValuesAnalysis.PROFILE,Direction.FORWARD,PRECISION,Map.of(),entry);
+    public static AnalysisKey key(EntryId entry) { return key(entry,StorageAnalysisMode.LOGICAL_ONLY); }
+    public static AnalysisKey key(EntryId entry,StorageAnalysisMode mode) {
+        return new AnalysisKey(IMPLEMENTATION,VERSION,mode.profile(),Direction.FORWARD,mode.precision(),Map.of(),entry);
     }
     public static ObservationBatchId<StorageSubject,StorageValueFact> batch(String id, AnalysisKey key) {
         return new ObservationBatchId<>(id,key,PROJECTION,StorageSubject.class,StorageValueFact.class);
@@ -26,8 +27,8 @@ public final class StorageValuesProvider implements AnalysisProvider<StorageSubj
     public Set<String> semanticOptionNames() { return Set.of(); }
     public boolean supports(AnalysisKey key) {
         return key.implementation().equals(IMPLEMENTATION) && key.version().equals(VERSION)
-            && key.profile().equals(RegionalValuesAnalysis.PROFILE) && key.direction() == Direction.FORWARD
-            && key.precisionPolicy().equals(PRECISION) && key.options().isEmpty();
+            && Arrays.stream(StorageAnalysisMode.values()).anyMatch(mode->key.profile().equals(mode.profile())&&key.precisionPolicy().equals(mode.precision()))
+            && key.direction() == Direction.FORWARD && key.options().isEmpty();
     }
     public String projection() { return PROJECTION; }
     public Class<StorageSubject> subjectType() { return StorageSubject.class; }

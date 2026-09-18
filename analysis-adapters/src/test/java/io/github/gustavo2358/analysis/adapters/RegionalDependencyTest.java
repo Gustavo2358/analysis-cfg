@@ -41,7 +41,7 @@ class RegionalDependencyTest {
     }
     @Test void wholeWriteFeedsDisplacedCallViewBeforeForeignMayEffects() {
         var p=group(false);var codec=new AirJson();var restored=codec.decode(codec.encode(p));assertEquals(p,restored);
-        var result=new DependencyAnalysis().prepare(restored);
+        var result=new DependencyAnalysis(io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).prepare(restored);
         assertEquals(2,result.sites().size());assertEquals(1L,result.metrics().get("possibleValuesRuns"));
         var first=result.sites().stream().filter(s->s.operation().localId().equals("first-call")).findFirst().orElseThrow();
         assertEquals(List.of("PGM00001"),first.candidates().stream().map(DependencySiteFact.Candidate::referenceName).toList());
@@ -62,12 +62,12 @@ class RegionalDependencyTest {
         var sequences=new ArrayList<>(u.sequences());sequences.set(0,new Sequence(first.label(),first.instructions(),changed,first.origin()));
         var unit=new io.github.gustavo2358.air.model.Unit(u.id(),u.containingUnit(),u.objects(),u.visibleObjects(),u.entries(),sequences,u.completionPorts(),u.body(),u.bodyUnavailable(),u.coverage(),u.origin());
         p=new Publication(p.id(),p.airVersion(),p.capabilities(),p.artifacts(),List.of(unit),p.storage(),p.resources(),p.artifactRelations(),p.origins(),p.coverage(),p.uncertainties(),p.premises());
-        var result=new DependencyAnalysis().prepare(p);var site=result.sites().stream().filter(x->x.operation().equals(call.header().id())).findFirst().orElseThrow();
+        var result=new DependencyAnalysis(io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).prepare(p);var site=result.sites().stream().filter(x->x.operation().equals(call.header().id())).findFirst().orElseThrow();
         assertEquals(List.of("PGM"),site.candidates().stream().map(DependencySiteFact.Candidate::referenceName).toList());assertFalse(site.modelValueRemainder());
         assertEquals(1L,result.metrics().get("possibleValuesRuns"));assertNull(site.subject());assertNotNull(site.valuePoint());
     }
     @Test void literalOnlySitesDoNotDemandRegionalValues() {
-        var result=new DependencyAnalysis().prepare(group(true));assertEquals(2,result.sites().size());assertEquals(0L,result.metrics().get("possibleValuesRuns"));
+        var result=new DependencyAnalysis(io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).prepare(group(true));assertEquals(2,result.sites().size());assertEquals(0L,result.metrics().get("possibleValuesRuns"));
     }
     @Test void literalCallsSurviveUnknownMixedStorageWithoutDemandingValueAnalysis() {
         var p=group(true);var u=p.units().getFirst();var o=origin(p.id());var gap=new UncertaintyId(p.id(),"unknown-storage");var typeGap=new UncertaintyId(p.id(),"unknown-type");var open=new StorageId(p.id(),"open-storage");var cell=new StorageId(p.id(),"legacy-cell");
@@ -77,7 +77,7 @@ class RegionalDependencyTest {
         var uncertainties=List.of(new Evidence.Uncertainty(gap,"UNSUPPORTED_STORAGE",List.of(Evidence.Dimension.STORAGE),new Scopes.UnitScope(u.id()),"unknown physical representation",o),new Evidence.Uncertainty(typeGap,"TYPE_UNKNOWN",List.of(Evidence.Dimension.VALUES),new Scopes.UnitScope(u.id()),"unknown declaration type",o));
         p=new Publication(p.id(),p.airVersion(),p.capabilities(),p.artifacts(),List.of(unit(u.id(),u.entries(),u.sequences(),objects)),storage,p.resources(),p.artifactRelations(),p.origins(),p.coverage(),uncertainties,p.premises());
         var validation=io.github.gustavo2358.air.validation.AirValidator.validate(p);assertEquals(io.github.gustavo2358.air.validation.ValidationResult.Status.STRUCTURALLY_VALID,validation.status(),validation.issues().toString());
-        var result=new DependencyAnalysis().prepare(p);assertEquals(2,result.sites().size());assertEquals(0L,result.metrics().get("possibleValuesRuns"));
+        var result=new DependencyAnalysis(io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).prepare(p);assertEquals(2,result.sites().size());assertEquals(0L,result.metrics().get("possibleValuesRuns"));
         for(var site:result.sites())assertFalse(site.candidates().isEmpty());
     }
     @Test void historicalScalarProfilesContinueToRefuseRegions() {

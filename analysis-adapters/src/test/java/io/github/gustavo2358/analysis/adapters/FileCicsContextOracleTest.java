@@ -35,10 +35,11 @@ final class FileCicsContextOracleTest {
         var p=new Publication(P,base.airVersion(),new Capabilities.Manifest(List.of(new Capabilities.Capability("cics-ts.file","1")),List.of()),List.of(artifact),base.units(),base.storage(),base.resources(),base.artifactRelations(),List.of(written),base.coverage(),base.uncertainties(),base.premises());
         return analyzePublication(name,p);
     }
-    static Map<String,Object> analyzePublication(String name,Publication p)throws Exception {
+    static Map<String,Object> analyzePublication(String name,Publication p)throws Exception {return analyzePublication(name,p,io.github.gustavo2358.analysis.values.StorageAnalysisMode.LOGICAL_ONLY);}
+    static Map<String,Object> analyzePublication(String name,Publication p,io.github.gustavo2358.analysis.values.StorageAnalysisMode mode)throws Exception {
         var validity=AirValidator.validate(p);assertEquals(ValidationResult.Status.STRUCTURALLY_VALID,validity.status(),validity.issues().toString());
         var codec=new AirJson();var air=codec.encode(p);assertEquals(p,codec.decode(air));
-        var result=new DependencyAnalysis().prepare(codec.decode(air));var out=new ByteArrayOutputStream();new DependencyJson().write(result,out);
+        var result=new DependencyAnalysis(mode).prepare(codec.decode(air));var out=new ByteArrayOutputStream();new DependencyJson().write(result,out);
         var dir=Path.of("target/fd-w8/manual");Files.createDirectories(dir);Files.write(dir.resolve(name+".air.json"),air);Files.write(dir.resolve(name+".json"),out.toByteArray());
         return map(FileDependencyJson.value(result.fileDependencies()));
     }
@@ -82,7 +83,7 @@ final class FileCicsContextOracleTest {
             seq("start",List.of(assign(U,"file-seed",F,"ACCOUNTS"),assign(U,"sysid-first",S,"R001")),jumpTo("start","one")),
             seq("one",List.of(),computed("one","change")),seq("change",List.of(assign(U,"sysid-second",S,"R002")),jumpTo("change","two")),seq("two",List.of(),computed("two","end")),returning(U,"end",List.of())),4));
         for(var id:List.of("one","two")) {
-            var c=map(site(doc,id).get("context"));assertEquals("COMPUTED",c.get("targetKind"));assertEquals(false,c.get("unknownRemainder"));
+            var c=map(site(doc,id).get("context"));assertEquals("COMPUTED",c.get("targetKind"));assertEquals(true,c.get("unknownRemainder"));
             var candidate=list(c.get("candidates")).getFirst();assertEquals(id.equals("one")?"R001":"R002",candidate.get("referenceName"));
             assertEquals(id.equals("one")?"sysid-first":"sysid-second",map(list(candidate.get("supports")).getFirst().get("producer")).get("localId"));
             assertEquals("BEFORE",map(c.get("valuePoint")).get("position"));assertEquals("ACCOUNTS",list(site(doc,id).get("candidates")).getFirst().get("referenceName"));
@@ -95,18 +96,18 @@ final class FileCicsContextOracleTest {
             var doc=analyzePublication("systems-"+mode,names(List.of(seq("start",List.of(assign(U,"file-seed",F,"ACCOUNTS")),branch),
                 seq("a",mode.equals("unknown")?List.of():List.of(assign(U,"seed-a",S,"R001")),jumpTo("a","file")),
                 seq("b",mode.equals("closed")?List.of(assign(U,"seed-b",S,"R002")):List.of(),jumpTo("b","file")),seq("file",List.of(),computed("file","end")),returning(U,"end",List.of())),4));
-            var c=map(site(doc,"file").get("context"));assertEquals(!mode.equals("closed"),c.get("unknownRemainder"));
+            var c=map(site(doc,"file").get("context"));assertEquals(true,c.get("unknownRemainder"));
             assertEquals(mode.equals("closed")?List.of("R001","R002"):mode.equals("partial")?List.of("R001"):List.of(),list(c.get("candidates")).stream().map(x->x.get("referenceName")).toList());
-            assertEquals(false,site(doc,"file").get("unknownRemainder"),"context incompleteness does not falsify independently exact FILE name");
+            assertEquals(true,site(doc,"file").get("unknownRemainder"),"physical completeness remains open, independently of context candidates");
         }
     }
     @Test void sourceInventoryGapOpensEvidenceWithoutInventingModelValues()throws Exception {
         var base=names(List.of(seq("start",List.of(assign(U,"file-seed",F,"ACCOUNTS"),assign(U,"system-seed",S,"R001")),jumpTo("start","file")),seq("file",List.of(),computed("file","end")),returning(U,"end",List.of())),4);
-        var closed=analyzePublication("source-closed-counterproof",base);
+        var closed=analyzePublication("source-closed-counterproof",base,io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL);
         var gap=new UncertaintyId(P,"inventory");var gaps=new ArrayList<>(base.uncertainties());
         gaps.add(new Evidence.Uncertainty(gap,"MANUAL_INVENTORY_GAP",List.of(Evidence.Dimension.CONTROL),new Scopes.PublicationScope(P),"source inventory has an unrepresented remainder",O));
         var partial=new Publication(base.id(),base.airVersion(),base.capabilities(),base.artifacts(),base.units(),base.storage(),base.resources(),base.artifactRelations(),base.origins(),new Evidence.Coverage(Evidence.InventoryStatus.PARTIAL,new Scopes.PublicationScope(P),List.of(),List.of(gap)),gaps,base.premises());
-        var opened=analyzePublication("source-partial-counterproof",partial);
+        var opened=analyzePublication("source-partial-counterproof",partial,io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL);
         assertEquals(site(closed,"file").get("candidates"),site(opened,"file").get("candidates"));
         assertEquals(false,site(closed,"file").get("unknownRemainder"));assertEquals(true,site(opened,"file").get("unknownRemainder"));
         assertEquals(List.of("FILE_SOURCE_VALUE_REMAINDER"),site(opened,"file").get("analysisReasons"));

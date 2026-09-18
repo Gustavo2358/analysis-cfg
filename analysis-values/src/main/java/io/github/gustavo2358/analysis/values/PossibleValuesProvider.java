@@ -20,16 +20,32 @@ public final class PossibleValuesProvider implements AnalysisProvider<ObjectId,V
     public static AnalysisKey key(EntryId entry,String profile) {
         return new AnalysisKey(IMPLEMENTATION,VERSION,profile,Direction.FORWARD,PRECISION,Map.of(),entry);
     }
+    /** Demand participates in cache identity; different query sets never reuse a narrower run. */
+    public static AnalysisKey key(EntryId entry,String profile,Collection<ObjectId> demand) {
+        var encoded=demand.stream().map(o->encode(o.unit().publication().localId())+"."+encode(o.unit().localId())+"."+encode(o.localId())).distinct().sorted().toList();
+        return new AnalysisKey(IMPLEMENTATION,VERSION,profile,Direction.FORWARD,PRECISION,Map.of("demandObjects",String.join(";",encoded)),entry);
+    }
+    private static String encode(String s){return Base64.getUrlEncoder().withoutPadding().encodeToString(s.getBytes(java.nio.charset.StandardCharsets.UTF_8));}
+    private static String decode(String s){return new String(Base64.getUrlDecoder().decode(s),java.nio.charset.StandardCharsets.UTF_8);}
+    private Set<ObjectId> demand(AnalysisKey key) {
+        if(!key.options().containsKey("demandObjects"))return null;
+        var result=new HashSet<ObjectId>();var text=key.options().get("demandObjects");
+        if(!text.isEmpty())for(var item:text.split(";")) {
+            var parts=item.split("\\.",-1);if(parts.length!=3)throw new IllegalArgumentException("invalid demand identity");
+            result.add(new ObjectId(new UnitId(new PublicationId(decode(parts[0])),decode(parts[1])),decode(parts[2])));
+        }
+        return Set.copyOf(result);
+    }
     public static ObservationBatchId<ObjectId,ValueFact> batch(String id, AnalysisKey key) {
         return new ObservationBatchId<>(id,key,PROJECTION,ObjectId.class,ValueFact.class);
     }
     public String implementation() { return IMPLEMENTATION; }
     public String version() { return VERSION; }
-    public Set<String> semanticOptionNames() { return Set.of(); }
+    public Set<String> semanticOptionNames() { return Set.of("demandObjects"); }
     public boolean supports(AnalysisKey key) {
         return key.implementation().equals(IMPLEMENTATION) && key.version().equals(VERSION)
             && (key.profile().equals(PossibleValuesAnalysis.PROFILE)||key.profile().equals(PossibleValuesAnalysis.EFFECTS_PROFILE)) && key.direction() == Direction.FORWARD
-            && key.precisionPolicy().equals(PRECISION) && key.options().isEmpty();
+            && key.precisionPolicy().equals(PRECISION) && semanticOptionNames().containsAll(key.options().keySet());
     }
     public String projection() { return PROJECTION; }
     public Class<ObjectId> subjectType() { return ObjectId.class; }
@@ -40,7 +56,7 @@ public final class PossibleValuesProvider implements AnalysisProvider<ObjectId,V
     public Prepared<ObjectId,ValueFact> prepare(AnalysisSession owner, AnalysisKey key) {
         if (!supports(key)) throw new IllegalArgumentException("unsupported PossibleValues key");
         var scoped = owner.selectEntries(List.of(key.entry()));
-        var admission = PossibleValuesAnalysis.prepare(scoped,key.profile());
+        var admission = PossibleValuesAnalysis.prepare(scoped,key.profile(),demand(key));
         return new Prepared<>() {
             public AnalysisKey key() { return key; }
             public AnalysisOutcome refusal() {

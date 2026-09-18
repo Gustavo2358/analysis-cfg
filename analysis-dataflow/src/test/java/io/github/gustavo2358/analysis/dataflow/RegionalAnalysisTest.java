@@ -14,7 +14,7 @@ class RegionalAnalysisTest {
     }
     @Test void rdAndValuesShareSelectedEntriesAndOneBatchPerExecution() {
         var p=FlowFixtures.linear(1,2,1,2);var q=query(p,0,"return-seq-0");var q2=query(p,1,"return-seq-0");
-        var result=new RegionalAnalysis().prepare(p,"regional",List.of(q,q2,q));assertEquals(2,result.observations().size());
+        var result=new RegionalAnalysis(io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).prepare(p,"regional",List.of(q,q2,q));assertEquals(2,result.observations().size());
         assertEquals(1L,result.statistics().get("composition").get("cfgBuilds"));assertEquals(1L,result.statistics().get("composition").get("rdRuns"));assertEquals(1L,result.statistics().get("composition").get("valueRuns"));
         assertEquals(3L,result.statistics().get("valueObservation").get("queryRequests"));assertEquals(2L,result.statistics().get("valueObservation").get("uniqueQueries"));
         for(var observation:result.observations()) {

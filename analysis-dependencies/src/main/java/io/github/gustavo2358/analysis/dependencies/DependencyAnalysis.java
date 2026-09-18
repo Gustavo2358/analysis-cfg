@@ -13,9 +13,13 @@ import io.github.gustavo2358.analysis.values.PossibleValuesProvider;
 import io.github.gustavo2358.analysis.values.RegionalValuesProvider;
 import io.github.gustavo2358.analysis.values.StorageValuesProvider;
 import java.util.*;
+import io.github.gustavo2358.analysis.values.StorageAnalysisMode;
 
 /** CP6 W1D application boundary. */
 public final class DependencyAnalysis {
+    private final StorageAnalysisMode mode;
+    public DependencyAnalysis(){this(StorageAnalysisMode.LOGICAL_ONLY);}
+    public DependencyAnalysis(StorageAnalysisMode mode){this.mode=Objects.requireNonNull(mode);}
     public DependencyResult prepare(Publication publication) {
         Objects.requireNonNull(publication);
         var defaults=BuildOptions.defaults();var options=new BuildOptions(defaults.validation(),io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy.PARTIAL_ANALYSIS);var cfg=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).build(publication,options);
@@ -30,7 +34,7 @@ public final class DependencyAnalysis {
         if(opened.status()!=AnalysisSession.Status.ACCEPTED)return partialInventory(publication,opened.reason());
         var session=opened.session().orElseThrow();
         try(var execution=new PlanningExecution(session,new AnalysisRegistry(List.of(new PossibleValuesProvider(),new RegionalValuesProvider(),new StorageValuesProvider(),new ReachabilityProvider())))) {
-            var plan=execution.plan(CallDependencyPlan.select(session));var result=execution.execute("dependencies@1",plan);
+            var plan=execution.plan(CallDependencyPlan.select(session,mode));var result=execution.execute("dependencies@1",plan);
             for(var analysis:result.analyses())if(analysis.status()==AnalysisOutcome.Status.INVALID_INPUT)throw new Failure(Kind.INVALID_INPUT,analysis.reason());
             var reasons=new TreeSet<String>();
             if(session.index().hasUnprovedPreconditions())reasons.add("UNPROVED_OPERATION_PRECONDITION");
@@ -52,7 +56,10 @@ public final class DependencyAnalysis {
                 if(!retained.containsKey(key))retained.put(key,CallDependencyConsumer.partial(site,Optional.ofNullable(reachability.get(key)),
                     List.copyOf(entryReasons.getOrDefault(site.entry(),Set.of("DEPENDENCY_PREPARATION_INCOMPLETE")))));
             }
-            var sites=retained.values().stream().map(f->session.index().partialControl(f.caller())?f.withPartialAnalysis("PARTIAL_CONTROL_PROJECTION"):f)
+            var physicalNotAnalyzed=result.analyses().stream().filter(a->!mode.physical()&&(a.key().implementation().equals(RegionalValuesProvider.IMPLEMENTATION)||a.key().implementation().equals(StorageValuesProvider.IMPLEMENTATION)))
+                .map(a->a.key().entry()).collect(java.util.stream.Collectors.toSet());
+            var sites=retained.values().stream()
+                .map(f->f.targetKind()==DependencySiteFact.TargetKind.COMPUTED&&physicalNotAnalyzed.contains(f.entry())?f.withPartialAnalysis("PHYSICAL_PROPAGATION_DISABLED"):f).map(f->session.index().partialControl(f.caller())?f.withPartialAnalysis("PARTIAL_CONTROL_PROJECTION"):f)
                 .map(f->session.index().unprovedPreconditions(f.caller())?f.withPartialAnalysis("UNPROVED_OPERATION_PRECONDITION"):f).sorted(Comparator.comparing(DependencySiteFact::entry,AnalysisKey.ENTRY_ORDER).thenComparing(f->f.operation().localId())).toList();
             var edges=new ArrayList<DependencyResult.Edge>();
             for(var site:sites)if(site.reachability()!=DependencySiteFact.Reachability.UNREACHABLE_IN_MODEL)
@@ -65,7 +72,20 @@ public final class DependencyAnalysis {
             metrics.put("reachabilityRuns",result.analyses().stream().filter(a->a.key().implementation().equals("Reachability")).count());
             metrics.put("indexedOperations",session.index().metrics().operationsIndexed());
             for(var analysis:result.analyses())analysis.metrics().forEach((name,value)->metrics.merge(analysis.key().implementation()+"."+name,value,Math::addExact));
-            return new DependencyResult(publication.id(),publication.airVersion(),sites,edges,metrics,publication.coverage().inventory(),publication.origins(),publication.artifacts(),publication.uncertainties().stream().map(Evidence.Uncertainty::id).toList(),List.copyOf(reasons),FileDependencyAnalysis.prepare(publication,session,execution,null));
+            var fileResult=FileDependencyAnalysis.prepare(publication,session,execution,null,mode);
+            metrics.put("logicalOnlyMode",mode.physical()?0L:1L);
+            metrics.put("experimentalPhysicalMode",mode.physical()?1L:0L);
+            for(var counter:List.of("physicalGroupsApplied","physicalWritesApplied")) {
+                long count=java.util.stream.Stream.concat(metrics.entrySet().stream(),fileResult.metrics().entrySet().stream())
+                    .filter(e->e.getKey().endsWith("solve_"+counter)||e.getKey().endsWith("replay_"+counter)).mapToLong(Map.Entry::getValue).sum();
+                metrics.put(counter,count);
+            }
+            for(var counter:List.of("physicalPlansPrepared","baseComparisons","targetsPrepared")) {
+                long count=java.util.stream.Stream.concat(metrics.entrySet().stream(),fileResult.metrics().entrySet().stream())
+                    .filter(e->e.getKey().endsWith("prepare_"+counter)).mapToLong(Map.Entry::getValue).sum();
+                metrics.put(counter,count);
+            }
+            return new DependencyResult(publication.id(),publication.airVersion(),sites,edges,metrics,publication.coverage().inventory(),publication.origins(),publication.artifacts(),publication.uncertainties().stream().map(Evidence.Uncertainty::id).toList(),List.copyOf(reasons),fileResult);
         }
     }
     private record SiteKey(EntryId entry,OperationId operation) { }
@@ -76,14 +96,14 @@ public final class DependencyAnalysis {
                 result.add(new SiteView(entry.id(),sequence.label(),sequence.instructions().size(),invoke));
         return List.copyOf(result);
     }
-    private static DependencyResult partialInventory(Publication publication,String reason) {
+    private DependencyResult partialInventory(Publication publication,String reason) {
         var sites=inventory(publication).stream().map(s->CallDependencyConsumer.partial(s,Optional.empty(),List.of(reason)))
             .sorted(Comparator.comparing(DependencySiteFact::entry,AnalysisKey.ENTRY_ORDER).thenComparing(f->f.operation().localId())).toList();
         var edges=new ArrayList<DependencyResult.Edge>();
         for(var site:sites)for(var candidate:site.candidates())edges.add(new DependencyResult.Edge(site.caller(),site.entry(),site.operation(),candidate,true));
         return new DependencyResult(publication.id(),publication.airVersion(),sites,edges,
-            Map.of("possibleValuesPreparations",0L,"possibleValuesRuns",0L,"reachabilityRuns",0L,"partialSites",(long)sites.size()),
-            publication.coverage().inventory(),publication.origins(),publication.artifacts(),publication.uncertainties().stream().map(Evidence.Uncertainty::id).toList(),List.of(reason),FileDependencyAnalysis.prepare(publication,null,null,reason));
+            Map.of("possibleValuesPreparations",0L,"possibleValuesRuns",0L,"reachabilityRuns",0L,"partialSites",(long)sites.size(),"logicalOnlyMode",mode.physical()?0L:1L,"experimentalPhysicalMode",mode.physical()?1L:0L,"physicalGroupsApplied",0L,"physicalWritesApplied",0L),
+            publication.coverage().inventory(),publication.origins(),publication.artifacts(),publication.uncertainties().stream().map(Evidence.Uncertainty::id).toList(),List.of(reason),FileDependencyAnalysis.prepare(publication,null,null,reason,mode));
     }
     public enum Kind { INVALID_INPUT,INPUT_INCOMPLETE,CFG_UNSUPPORTED,ANALYSIS_UNSUPPORTED,RESOURCE_LIMIT,CONSUMER_FAILURE }
     public static final class Failure extends RuntimeException {

@@ -8,6 +8,7 @@ import io.github.gustavo2358.analysis.dataflow.RegionalAnalysisResult;
 import io.github.gustavo2358.analysis.query.*;
 import io.github.gustavo2358.analysis.storage.*;
 import java.io.*;
+import io.github.gustavo2358.analysis.values.StorageAnalysisMode;
 import java.math.BigInteger;
 import java.nio.file.*;
 import java.util.*;
@@ -17,6 +18,8 @@ public final class RegionalAnalysis {
     private RegionalAnalysis() { }
     public static void main(String[] args){System.exit(run(args,System.err));}
     public static int run(String[] args,PrintStream err) {
+        boolean physical=(args.length==13||args.length==16)&&args[args.length-1].equals("--experimental-physical");
+        if(physical)args=Arrays.copyOf(args,args.length-1);
         Path input,destination;StorageRange range=null;Memory.Codec codec=null;
         try {
             if((args.length!=12&&args.length!=15)||!args[2].equals("--result-id")||!args[4].equals("--unit")||!args[6].equals("--entry"))throw new IllegalArgumentException();
@@ -29,7 +32,7 @@ public final class RegionalAnalysis {
             }
             input=Path.of(args[0]).toAbsolutePath().normalize();destination=Path.of(args[1]).toAbsolutePath().normalize();if(input.equals(destination))throw new IllegalArgumentException();
         } catch(IllegalArgumentException failure) {
-            err.println("usage: regional-analysis <air.json> <result.json> --result-id <id> --unit <unit> --entry <entry> <--before|--after|--outcome-normal|--at-entry> <operation|-> <--object <object>|--range <storage> <start> <end|open> <ascii|ibm1047|identity>>");return 2;
+            err.println("usage: regional-analysis <air.json> <result.json> --result-id <id> --unit <unit> --entry <entry> <--before|--after|--outcome-normal|--at-entry> <operation|-> <--object <object>|--range <storage> <start> <end|open> <ascii|ibm1047|identity>> [--experimental-physical]");return 2;
         }
         Publication publication;
         try {publication=DataflowAirReader.forPartialAnalysis().read(input).publication();}
@@ -40,7 +43,7 @@ public final class RegionalAnalysis {
             var unit=new UnitId(publication.id(),args[5]);var entry=new EntryId(unit,args[7]);var operation=new OperationId(unit,args[9]);
             var point=switch(args[8]){case "--before"->ProgramPoint.before(entry,operation);case "--after"->ProgramPoint.after(entry,operation);case "--outcome-normal"->new ProgramPoint(entry,ProgramPoint.Kind.OUTCOME,operation,Control.NormalOutcome.INSTANCE);default->ProgramPoint.entry(entry);};
             StorageSubject subject=args.length==12?new StorageSubject.NamedObject(new ObjectId(unit,args[11])):new StorageSubject.PhysicalRange(new StorageId(publication.id(),args[11]),range,codec);
-            result=new io.github.gustavo2358.analysis.dataflow.RegionalAnalysis().preparePartial(publication,args[3],List.of(new PointQuery<>(point,subject)));
+            result=new io.github.gustavo2358.analysis.dataflow.RegionalAnalysis(physical?StorageAnalysisMode.EXPERIMENTAL_PHYSICAL:StorageAnalysisMode.LOGICAL_ONLY).preparePartial(publication,args[3],List.of(new PointQuery<>(point,subject)));
         } catch(io.github.gustavo2358.analysis.dataflow.AnalysisDataflow.PreparationException failure) {
             err.println("PREPARATION: "+failure.failure());return switch(failure.failure()){case INVALID_INPUT,UNSUPPORTED_PROFILE->4;case EXTERNAL_SIZE_CAP_DEBT,EXTERNAL_RESOURCE_LIMIT,INCOMPLETE_VALIDATION->7;};
         } catch(RuntimeException failure){err.println("ANALYSIS_EXECUTION_FAILED: "+failure.getClass().getSimpleName());return 5;}
