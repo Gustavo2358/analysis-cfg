@@ -1,8 +1,9 @@
 # Regional explosion campaign
 
 Current checkpoint: W1/W2 COMPLETE; W3.1 DISCOVERY COMPLETE; W3.2 BOUNDED
-FACTORING PROTOTYPE VALIDATED; W3.3 PRODUCTION IMPLEMENTATION COMPLETE / VALIDATED; W4 PENDING. PR #40 remains Draft;
-merge only after W4 and final human review. The W1 sections below are historical
+FACTORING PROTOTYPE VALIDATED; W3.3 PRODUCTION IMPLEMENTATION COMPLETE / VALIDATED;
+W4 COMPLETE — CORPORATE IMPROVEMENT OBSERVED / NON-CONVERGENCE REMAINS. Campaign
+outcome: PARTIAL PERFORMANCE SUCCESS / ORIGINAL INCIDENT UNRESOLVED. The W1 sections below are historical
 reproduction evidence; production changes are documented under W2 and W3.3.
 
 # W1 — Regional explosion synthetic fixtures
@@ -1669,5 +1670,138 @@ introduced. ByteImage equality/hash, AIR, wire and public fact APIs remain intac
 
 W3.3 COMPLETE — PRODUCTION BOUNDED FACTORING VALIDATED
 
-READY FOR W4 E2E / CLOSEOUT — recommendation only; W4 has not started.
-PR #40 remains Draft. No merge authorized. Final human review remains required.
+READY FOR W4 E2E / CLOSEOUT — recommendation only; this is the historical W3.3
+checkpoint. The final W4 outcome follows.
+
+# W4 — corporate E2E / closeout
+
+## Corporate configuration
+
+W4 used the existing anonymized identifier **corporate program**. The real input
+identifier and any real-to-synthetic mapping are intentionally absent under the
+repository's confidential-incident policy. The tested analysis-cfg revision was
+`f0efa4a76984781e09c26b92d4f6ee9cb2591f8f`, the final W3.3 head. The operator
+ran the official corporate input with the storage/physical profile enabled.
+
+The retained closeout evidence does not contain the exact profile identifier,
+command line, upstream input hashes or configuration file, so those fields are
+**NOT RETAINED**. No corporate source, output, log, timing file, snapshot or JFR
+was copied into Git. The evidence authority for this section is the product-owner
+manual-run attestation supplied at closeout; the local W1–W3.3 raw evidence under
+`.harness-results/` remains preserved and must not be represented as corporate W4
+evidence.
+
+## Baseline/reference if available
+
+The reference is the original corporate non-convergence incident. The operator
+reports that productive bounded factoring delivered measurable improvement on
+the same corporate workload. An exact raw before/after timing or counter set was
+not retained, so the corporate gain is not quantified here. Synthetic W3.3
+before/after values above remain supporting mechanism evidence only; they are not
+substituted for a corporate baseline.
+
+## Final W3.3 run
+
+| Field | Corporate W4 result |
+| --- | --- |
+| Input | `corporate program` (confidential anonymized convention) |
+| analysis-cfg commit | `f0efa4a76984781e09c26b92d4f6ee9cb2591f8f` |
+| Profile | storage/physical profile enabled; exact identifier **NOT RETAINED** |
+| Command/configuration | official corporate run; exact command and configuration **NOT RETAINED** |
+| Observed duration | almost 30 minutes, operator-reported |
+| Completed | NO |
+| Termination | manually aborted by the operator after continued non-convergence |
+| External time/resource kill | NO; no automated time or resource limit was reported |
+| CPU | **NOT MEASURED** |
+| Peak/retained RSS | **NOT MEASURED** |
+| Corporate JFR | **NOT MEASURED / NOT RETAINED** |
+| Complete facts/targets | **NOT AVAILABLE** because the run did not converge |
+
+The corporate solver/structure counters requested for closeout were not collected
+or retained. They are recorded explicitly rather than inferred from synthetic
+fixtures:
+
+| Metric | Corporate W4 value |
+| --- | --- |
+| `concreteFallbacks` | **NOT MEASURED** |
+| `expandedLabels` | **NOT MEASURED** |
+| `maxStateAlternatives` | **NOT MEASURED** |
+| `maxExpandedAlternatives` | **NOT MEASURED** |
+| `maxProvenanceRows` | **NOT MEASURED** |
+| `internedAlternatives` / structural equivalents | **NOT MEASURED** |
+| `internedProvenanceRows` | **NOT MEASURED** |
+| connected-DAG/admission/fallback proportions | **NOT MEASURED** |
+
+## Observed gains
+
+**FACT / operator attestation:** W4 observed measurable improvement on the
+corporate workload after productive bounded factoring. This agrees with the
+mechanism established independently in W3.3: admitted repeated-unknown structure
+is represented with materially fewer structural edges while exact event
+membership and complete synthetic/frozen facts and targets remain unchanged.
+
+The absence of retained corporate counters limits the strength of the numeric
+claim: W4 proves an observed real-workload improvement, but this report cannot
+state a percentage, CPU reduction, RSS reduction, fallback rate or corporate
+before/after edge count.
+
+## Non-convergence
+
+**FACT:** The corporate program still did not converge within the observed run.
+It was manually aborted after almost 30 minutes. Therefore the campaign improved
+the implementation but did **NOT** resolve the original corporate
+non-convergence incident.
+
+The corporate workload is orders of magnitude larger than the validating
+fixtures. Fixture correctness and synthetic speedups did not establish full
+corporate termination. No complete corporate facts, targets or dependency output
+exists for semantic comparison because the final run did not finish.
+
+## Residual bottleneck evidence
+
+The residual evidence is the continued non-convergence after the validated
+factorization was present. W3.3 already identified exact component fallback,
+temporary expansion/observation work, provenance history and large connected
+relations as residual costs. Corporate W4 did not collect the counters needed to
+attribute the remaining bottleneck to one of them, so no causal selection is
+claimed. The next investigation must begin with:
+
+> What remaining mechanism prevents convergence after the validated regional
+> factoring improvement?
+
+It must not repeat the already answered question of whether factoring works as an
+optimization.
+
+## What W4 does NOT prove
+
+W4 does not prove corporate convergence, incident resolution, a universal speedup,
+bounded memory, an acceptable fallback frequency, complete corporate semantic
+equivalence, or a specific remaining root cause. No precision loss, truncation,
+budget, widening or artificial semantic termination was introduced to obtain the
+observed improvement.
+
+Failure to converge does not invalidate the retained optimization:
+
+1. semantic equivalence was extensively validated;
+2. complete facts and targets on synthetic/frozen cases remained identical;
+3. production structural work was reduced materially;
+4. corporate execution showed real improvement;
+5. no precision loss, truncation, budget or artificial termination was added; and
+6. the remaining corporate bottleneck is a separate unresolved problem.
+
+## Campaign decision
+
+**PARTIAL PERFORMANCE SUCCESS / ORIGINAL INCIDENT UNRESOLVED.** Regional
+factoring is retained as a semantic-safe validated optimization. The corporate
+program still did not converge, so the original incident remains open as a
+separate future investigation. No additional implementation is planned in this
+campaign.
+
+W4 COMPLETE — CORPORATE E2E IMPROVED BUT REMAINS NON-CONVERGENT
+
+Regional factoring is retained as a validated optimization. The original
+corporate convergence incident remains open as a separate future investigation.
+
+No additional implementation is planned in this campaign. Human review and merge
+authorization are complete; final technical and remote checks remain the merge
+gate.
