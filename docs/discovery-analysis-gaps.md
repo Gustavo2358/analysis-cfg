@@ -274,3 +274,348 @@ G0 COMPLETE — STACKED CAMPAIGN FOUNDATION READY.
 W1 COMPLETE — SIMPLE PATH ALREADY SUPPORTED; FIRST GAP IS INLINE TARGET-EXPRESSION QUERY ADMISSION (G4).
 
 W2 NOT STARTED. W3 NOT STARTED. Await human review.
+
+# W2 — control-flow composition
+
+## Hygiene and scope
+
+W2_START_SHA: `8d008354433e39e5b98986a6341e29dc96eaa390`.
+Same clean worktree `.analysis-gaps/analysis-cfg`, same branch
+`discovery/analysis-gaps`, same Draft PR #41; base
+`discovery/regional-explosion-fixtures`, auto-merge null. Fresh GitHub read at
+start: #40 OPEN/Draft at `f0efa4a76984781e09c26b92d4f6ee9cb2591f8f`.
+No reset/rebase, no new PR, no change to #40. W1's earlier NOT STARTED statements
+above record the W1 checkpoint; this section records the newly authorized W2.
+W1 cheap gate ran before W2 edits: 41 tests, zero failures/errors/skips
+(`.harness-results/w2-baseline.log`). G0/W1 implementation tree preserved.
+Inline computed CALL expressions, EVALUATE, PERFORM/GO TO implementations,
+CICS/FILE/SQL and W3 are excluded. No production or source-pin changes.
+
+## Hypotheses
+
+1. A correct AIR diamond may already propagate/join all values. **FACT: confirmed**
+   for A–E in both scalar and regional domains, plus one nested diamond.
+2. IF over a regional-only declaration may fail scalar predicate admission.
+   **FACT: confirmed for the selected synthetic source**, with the first
+   difference already at frontend predicate proof, before lower/CFG.
+3. A solver/RD bug may explain lost targets. **Refuted for these fixtures**; no
+   RD run is demanded, and no candidate is lost between provider and CALL.
+
+## Pipeline and admission map
+
+```text
+COBOL IF / canonical binding / storage view
+  -> frontend IfSemantics.predicate (complete scalar inventory)
+  -> CobolSemanticProductProjector (IF projection) / PredicateGuarantee
+  -> lower PartialProgramAdmission -> IfAdmission.admitPredicate
+       -> CallAdmission.admitReference (wholeItemAccess + scalar TEXT)
+  -> IfPredicate.translateReads -> Unknown BOOL with explicit Read dependencies
+  -> IfSequenceAssembler.branch -> Operations.Branch(trueLabel,falseLabel)
+     OR PartialProgramAssembler.opaque -> open control/effects envelope
+  -> CoreCfgProjection -> BRANCH_TRUE/FALSE + arm JUMPs
+  -> AnalysisSession / ContextView -> DataflowSolver
+  -> RegionalValuesAnalysis.Engine.joinInto -> RegionalAlternatives.union
+     OR PossibleValuesAnalysis.joinInto -> PossibleValuesState.join
+  -> before-Invoke provider query -> TextValueFact
+  -> CallDependencyConsumer -> candidate-specific supports
+```
+
+All upstream paths were inspected at the same immutable pins recorded in W1,
+then built in isolated `.harness-results/w2-producers` using the existing
+`prepare_w2d_producers.py`. The original sibling checkouts were not modified.
+SP contract is **2.28.0**, storage profile explicitly
+`ibm-enterprise-6.4-fixed-display-1047@1`. Default unspecified storage is not
+used to establish the final regional finding.
+
+| Boundary | Input → output | Admission / preserved information | Refusal or fallback |
+| --- | --- | --- | --- |
+| source → predicate proof | bound text equality + declarations → IfSemantics.Predicate | exact modeled relation, one uniquely resolved value read, member of complete scalar map | regional view alone does not satisfy `scalars.containsKey(selected)`; PARTIAL predicate |
+| frontend → SP | proof → PredicateGuarantee, references, arm/continuation facts | known scalar: BOOLEAN/PURE/TOTAL/COMPLETE, truth UNKNOWN; regionalAccess independently retained | PREDICATE_NOT_PROVEN; wholeItemAccess absent; IF_OUTSIDE_SIMPLE_PROFILE |
+| SP → lower selection | IfFact → precise set | KNOWN predicate, explicit arm/continuation destinations, all reads map via wholeItemAccess | IfFact not marked precise; no fabricated proof |
+| lower admission → Branch | admitted predicate → Unknown BOOL + read dependencies, true/false labels | `IfAdmission.admitPredicate` checks SCALAR_TEXT_EQUALITY; `CallAdmission.admitReference` requires unique scalar whole-item; `IfPredicate` dereferences this proof | `PartialProgramAssembler.opaque`: PRECISE_SEMANTICS_UNAVAILABLE, no known branch successors, WithinControl(UnitControl), open memory effects |
+| AIR → CFG | Operations.Branch + Jumps → typed transitions | CoreCfgProjection preserves labels and activation Entry; no guessed fallthrough | Opaque remains open; CFG does not synthesize BRANCH_TRUE/FALSE |
+| CFG → fixed point | contextual edges and predecessor publications → joined roots | DataflowSolver propagates every edge contribution, joins into destination anchor, republishes changed states until worklist empty | no new cap/widening/pruning; open-control scopes remain conservative |
+| regional join | reached predecessor stores → union of relations | joinInto includes missing bindings' default unknown; RegionalAlternatives.union preserves disjunction/support labels | no strong update across unrelated predecessor stores |
+| scalar join | reached sparse Cells → candidate/support unions | PossibleValuesState.join retains unknown when a binding is absent in one reached root | unreachable bottom is distinct from reached unknown |
+| provider → CALL | BEFORE Invoke ObjectId query → candidates | provider chosen by existing plan; values, evidence, origins, premises preserved | no inline-expression query added |
+
+## AIR control matrix
+
+`ControlFlowEvidenceTest` contains six tests, each run for Cell/PossibleValues
+and Region/RegionalValues (12 domain/scenario combinations). It reuses W1's
+identities/ranges. Predicate is a typed equality reading uninitialized A; CALL
+reads B directly. No source parser/lower is involved in this independent oracle.
+Control A is W1's straight-line literal-to-B test, freshly rerun in both baseline
+and focal gates. The optional nested fixture has an inner diamond on the outer
+true arm and two joins, not a loop/stress test.
+
+Notation: `value{producer}` denotes exact candidate-specific support. `?` is
+reached/model-unknown, not unreachable/bottom. Tables describe BOTH domains.
+
+| Fixture | Branch A before join | Branch B before join | Post-join provider | CALL |
+| --- | --- | --- | --- | --- |
+| straight | PROGA{move-literal} | n/a | PROGA | PROGA, closed |
+| A, same value | PROGA{write-left} | PROGA{write-right} | one PROGA candidate, both producers | one PROGA, both supports, closed |
+| B, different | PROGA{write-left} | PROGB{write-right} | PROGA + PROGB, separate supports | same two, closed |
+| C, unknown arm | PROGA{write-left} | ? | PROGA + model remainder | RESOLVED_CANDIDATES, effectiveUnknownRemainder=true |
+| D, seed OLD / one overwrite | NEW{write-left}, no OLD | OLD{seed} | NEW + OLD | same two, closed |
+| E, seed OLD / both overwrite | PROGA{write-left}, no OLD | PROGB{write-right}, no OLD | PROGA + PROGB; no OLD or seed support | same two, closed |
+| nested | inner PROGA{write-inner-a} | inner PROGB{write-inner-b} | PROGA{write-inner-a,write-right} + PROGB{write-inner-b} | same two, closed; killed inner OLD absent |
+
+Same-value support union describes alternative producers of one value; it does
+not claim that both assignments executed together. All closed manual fixtures
+have model/source/effective remainder false. C has model/effective true and
+source false. Every final CALL remains reachable; `RESOLVED_CANDIDATES` means
+known candidates exist, not that unknown possibilities are absent.
+
+## CFG topology
+
+The A–E expected edge set is asserted independently, including edge kinds,
+sequence labels, activation E, exact cardinality and BFS reachability of all
+nodes (7 nodes, 7 edges). The join sequence's terminator is CALL; therefore
+there is no invented extra edge from JOIN to a separate CALL node.
+
+```text
+ENTRY --ENTRY--> start
+start --BRANCH_TRUE--> left --JUMP--> join[CALL B]
+start --BRANCH_FALSE-> right --JUMP--> join[CALL B]
+join --INVOKE_NORMAL--> end --RETURN--> EXIT
+```
+
+Nested adds a Branch on left; inner-a and inner-b JUMP to middle, middle JUMPs
+to join, right JUMPs directly to join (10 nodes, 11 edges). Every node is
+reachable. No predecessor is missing. Closed model topology is distinguished
+from the open source model below.
+
+## Provider observations and join/convergence audit
+
+For each domain/scenario, one explicitly selected provider run observes before
+`jump-left` / `jump-right` and before `invoke`; nested observes its inner arm
+jumps and final Invoke. Query and batch status are VALUE/COMPLETE; execution
+outcome is STABLE. Assertions inspect candidates, exact support associations,
+model/source/effective remainder. Aggregate evidence/provenance/premises from
+the post-join provider must be contained in the final dependency fact.
+
+**FACT:** both predecessor facts are correct, union preserves both, unknown
+survives a missing reached binding, and strong overwrite eliminates seed only
+on its path. `RegionalValuesAnalysis.Engine.joinInto` unions both roots using
+`RegionalAlternatives.union`; `equivalent` compares entry, bindings and logical
+facts. Scalar join unions candidates and supports and distinguishes missing
+binding from bottom. `DataflowSolver` calls joinInto for each edge contribution,
+queues changed anchors and exposes a result only after an empty worklist.
+
+`KillAuthority.selected/exhaustive` authorize only required, exact closed writes;
+regional `write` performs local replacement before joins. Scalar strong updates
+use `exactCell` permits. D/E prove KILL is path-local and the implementation is
+not merely accumulating historical literals. Existing solver law/schedule and
+regional factoring suites supplement these finite acyclic probes; no claim of
+new arbitrary-loop qualification is made.
+
+## CALL observations
+
+The registered implementations are asserted to be exactly Reachability plus
+PossibleValues or RegionalValues, depending on storage. `possibleValuesRuns=1`.
+CALL receives the post-join values unchanged except existing name-policy padding
+normalization. No G4 post-join consumer loss was observed. No changes to
+`CallDependencyPlan.readable()` or the W1 inline FitText boundary.
+
+## Lowering/admission investigation
+
+Three new sources in `analysis-adapters/src/test/resources/analysis-gaps/w2`
+were actually run through frontend → SP → lower → AIR → CFG → dependency CLI,
+with the existing pinned producer build wrapper. The selected source probe
+`scripts/project/probe_analysis_gaps_w2.py` asserts public products and preserves
+all raw products/stdout/stderr locally. This IS selected synthetic CLI E2E;
+it is not corporate/corpus qualification or newly run full producer suites.
+
+| Source | Predicate SP | Regional storage evidence | AIR IF / CFG | Post-IF CALL |
+| --- | --- | --- | --- | --- |
+| scalar-control: standalone FLAG, standalone WS-PGM | KNOWN SCALAR_TEXT_EQUALITY, PURE/TOTAL/COMPLETE, wholeItemAccess present | profile also publishes physical views | Branch Unknown BOOL with Read dependency; true/false edges enter their own Assign and Jump to CALL | PROGA + PROGB with original per-arm supports, open remainders |
+| regional-predicate: FLAG nested under FLAGS, standalone WS-PGM | PARTIAL / UNAVAILABLE / PREDICATE_NOT_PROVEN; wholeItemAccess null | resolved DATA; regionalAccess points to exact offset 0, extent 1, IBM1047 view; no storage gap | Opaque IF, control.known empty, WithinControl(UnitControl), broad MAY effects; no BRANCH_TRUE/FALSE in known CFG | PROGA + PROGB survive conservatively, open remainders |
+| regional-target: standalone FLAG, WS-PGM nested under TARGET-AREA | KNOWN scalar predicate even though overall IF profile is OUTSIDE_SLICE | regional target and fitted byte MOVEs valid | Branch + both regional Assigns + JUMPs to CALL | PROGA + PROGB, original per-arm supports, open remainders |
+
+The scalar control label refers to predicate declaration proof; with the
+explicit storage profile even these source products may use Regions. Cell-only
+provider selection is proved separately by the independent AIR matrix.
+
+**First differing layer = frontend predicate-proof admission**, specifically
+`IfSemantics.predicate`: the uniquely bound read must appear in the complete
+scalar map (`scalars.containsKey(selected)`). The SP projector publishes
+PREDICATE_NOT_PROVEN, UNKNOWN evaluation/completion/domain, PARTIAL read
+completeness, and missing wholeItemAccess even while retaining regionalAccess.
+This is not lost nominal identity or absent storage layout.
+
+The lower faithfully enforces that narrower proof surface:
+`PartialProgramAdmission` requires KNOWN plus mapped wholeItemAccess;
+`IfAdmission.admitPredicate` requires BOOLEAN/PURE/TOTAL/COMPLETE and calls
+`CallAdmission.admitReference`; that requires scalar whole-item TEXT proof.
+`IfPredicate.translateReads` consumes exactly that proof. The regional case
+therefore falls through to `PartialProgramAssembler.opaque`, with reason
+`cobol-lower:PRECISE_SEMANTICS_UNAVAILABLE`; it does NOT return a fake Branch.
+
+**FACT:** the W1 suspicion is confirmed for regional-only predicate reads,
+but must be refined: the first refusal is already upstream of cobol-lower.
+**FACT:** merely having a regional target/arm does not force IF fallback;
+the regional-target control refutes that broader claim.
+
+**No fabricated loss of candidate names:** all three source cases still expose
+PROGA and PROGB. The regional IF loses typed two-way topology and effects
+precision, not these particular candidates. `ContextView`/`OpenControl` expand
+published conservative control scopes for analysis; arm reachability in that
+model is not a reconstructed exact IF. All source cases have model, source,
+interpretation and control remainder true because real external CALL also
+publishes broad control/MAY-write/name-policy uncertainty. Hence source remainder
+flags alone cannot measure the additional IF imprecision. The differential
+oracle is predicate proof / Branch / typed edges, with candidate preservation
+checked separately. Candidate support origins resolve to the corresponding
+original COBOL MOVE lines, never the other arm.
+
+An initial exploratory run omitted the storage profile and produced unrelated
+storage gaps. It is preserved in `.harness-results/w2-source`, not used for the
+regional conclusion. Final oracle results use the explicit profile in
+`.harness-results/w2-source-verified/summary.json`; exploratory profiled products
+are separately retained. No AIR/SP output was edited to obtain PASS.
+
+## Reaching Definitions decision
+
+1. No W2 fixture requires an RD run; the plan's exact implementation set is
+   tested, and `DependencyAnalysis` registers values and reachability providers.
+2. RegionalValues already propagates values, unknowns and provenance through its
+   own fixed point. PossibleValues does the same for admitted scalar Cells.
+3. `RegionalAnalysis` can compose RD and values in a separate diagnostic path;
+   shared `StatementEffects`/`DefinitionEvent` types do not imply RD execution.
+4. Adding RD here would duplicate information and cannot restore a missing
+   source predicate proof/Branch. No new RD implementation was added.
+
+**FACT: RD não é o mecanismo que compõe este caminho.**
+
+## Gap classification — discovery before any production fix
+
+| Layer | Straight | Same-value IF | Different-value IF | Unknown branch | Kill/join |
+| --- | --- | --- | --- | --- | --- |
+| Independent AIR → CFG | supported (W1 rerun) | exact | exact | exact | exact |
+| Scalar/regional provider | exact | one value, both supports | both values/supports | known + model open | path-local kill, correct union |
+| CALL consumer | matches provider | matches provider | matches provider | matches provider/remainder | matches provider |
+| Real source admission | W1 evidence only | not source-executed in W2 | scalar proof → Branch; regional-only predicate → Opaque | not source-executed | not source-executed |
+
+| Failure | First differing layer | Classification | Existing capability | Missing connection |
+| --- | --- | --- | --- | --- |
+| regional predicate not represented as Branch | frontend IfSemantics predicate proof; then lower precise selection | G3 representation/precondition gap upstream | canonical read binding + exact regional view + working generic CFG joins/values | regional predicate proof/admission shared with producer/lower; BOOLEAN/PURE/TOTAL/COMPLETE obligations must actually be established |
+| values/join corruption | none in A–E/nested | no G5 found | generic dataflow and regional union | none |
+| post-join CALL loses a value | none | no G4 found for plain CALL B | existing TextValueFact consumer | none |
+
+## Fix, if any
+
+**ANALYSIS ALREADY SUPPORTS THIS CONTROL FLOW.** No production fix is necessary
+in analysis-cfg. Do not reinterpret Opaque as Branch or weaken upstream
+preconditions. The next producer decision belongs to proleap-poc predicate
+semantics/SP proof and cobol-lower IF admission/translation, with explicit
+contract review. No new expression evaluator, lattice, heuristic, wire or pin.
+Before/after production behavior is identical; this wave supplies test evidence
+and a source-reproduced location of the first gap.
+
+## Regional regression gate
+
+Tests/docs/probe-only delta. Mandatory focal, complete changed module reactor,
+Java 21 FAST and selected three-source probe are run. No production values/solver
+change invalidates corporate W3.3 qualification. Explosion, alternatives,
+fallback, anti-correlation, provenance and stack-safety tests remain mandatory
+regression evidence, not a reason to rerun a corporate program unavailable here.
+Results and commands are recorded at W2 closeout below.
+
+## Remaining gaps for W3
+
+- Decide whether/how to publish a regional text predicate proof and consume it
+  upstream without inventing purity, totality or complete reads.
+- Measure remaining precision/coverage at final consumers separately from the
+  deliberately open real-CALL contract. No coverage percentages inferred here.
+- W1 inline FitText CALL G4 remains separate and unimplemented.
+- Generic solver joins operate on contextual CFG edges, not on a Branch-specific
+  lattice. **STRONG EVIDENCE** that already admitted PERFORM/GO TO edges use the
+  same join machinery; no new family coverage claim without dedicated fixtures,
+  and no automatic implementation/qualification of those families.
+- **HYPOTHESIS:** establishing regional predicate proofs could narrow some real
+  control/effects uncertainty. No claim of corporate impact or candidate gain
+  follows from these three synthetic sources.
+
+W3 NOT STARTED. PR #41 remains Draft; no merge authorized.
+
+## W2 closeout — validation and reproducibility
+
+Test/probe commit: `65f5955` (`test: characterize value flow across cfg joins`).
+Production files changed: **none**. Versioned additions are the independent
+`ControlFlowEvidenceTest`, three synthetic COBOL fixtures and a local selected
+source probe; this report is the only documentation change. No baseline rewrite.
+
+All analyzer gates use Temurin **21.0.12** and the isolated Maven repository
+`.harness-results/build/m2`. Every Java test count below has **zero failures,
+errors and skips**:
+
+| Gate | Result | Local raw log |
+| --- | --- | --- |
+| W1 baseline before edits | PASS, 41 tests | `.harness-results/w2-baseline.log` |
+| W2 final focal incl. W1/CALL/CFG/solver/regional | PASS, 254 tests | `.harness-results/w2-focal.log` |
+| Complete analysis-adapters reactor + dependencies | PASS, 570 tests | `.harness-results/w2-modules.log` |
+| FAST | PASS CODE_CHANGE, 571 Java tests + architecture/Python checks | `.harness-results/w2-fast.log` |
+| Pinned selected source CLI probe | PASS, 3 cases | `.harness-results/w2-source-verified.log` and `w2-source-verified/summary.json` |
+
+The module reactor includes cfg-kernel, analysis-kernel, analysis-values,
+analysis-dataflow, analysis-dependencies and analysis-adapters. Focal selection
+includes RegionalExplosionFixturesTest, RegionalAlternativesTest and
+RegionalFallbackStressTest as well as CFG and solver oracles. No regional
+regression observed. FAST uses its existing fixed selection; new W2 tests are
+covered by the focal and complete-module gates, without claiming they were
+added to that selection. Fresh upstream wrapper compilation is build-only; it is
+not represented as execution of upstream test suites.
+
+Reproduction from this worktree (the `--work` directories must be fresh):
+
+```sh
+export JAVA_HOME=/home/gustavo/.sdkman/candidates/java/21.0.12+1.1-tem
+export PATH="$JAVA_HOME/bin:$PATH"
+mvn -B -ntp -Dmaven.repo.local="$PWD/.harness-results/build/m2" \
+  -pl analysis-adapters -am \
+  '-Dtest=ControlFlowEvidenceTest,ValueToCallEvidenceTest,W1d*Test,Regional*Test,*Solver*Test,*Join*Test,*Cfg*Test,StorageIndexTest,NameInterpreterTest' test
+mvn -B -ntp -Dmaven.repo.local="$PWD/.harness-results/build/m2" \
+  -pl analysis-adapters -am test
+python3 -B scripts/harness/lean.py fast
+W2D_SOURCE_ROOT=/home/gustavo/workspace/teste-e2e \
+  W2D_MAVEN_REPO="$PWD/.harness-results/build/m2" \
+  python3 -B scripts/project/prepare_w2d_producers.py \
+  --work "$PWD/.harness-results/w2-producers"
+# Ensure both CLI modules and their reactor dependencies are compiled.
+mvn -B -ntp -Dmaven.repo.local="$PWD/.harness-results/build/m2" compile
+python3 -B scripts/project/probe_analysis_gaps_w2.py \
+  --producers "$PWD/.harness-results/w2-producers/producers.json" \
+  --work "$PWD/.harness-results/w2-source-verified"
+```
+
+No expanded RegionalValues usage was introduced. The final focal log also
+retains raw run metrics for each AIR scenario. For scale context (not new
+performance thresholds):
+
+| Regional fixture | Contextual edges | Prepared events | Concrete fallbacks | Expanded labels |
+| --- | --- | --- | --- | --- |
+| A | 7 | 2 | 3 | 8 |
+| B | 7 | 2 | 3 | 8 |
+| C | 7 | 1 | 2 | 6 |
+| D | 7 | 2 | 3 | 8 |
+| E | 7 | 3 | 4 | 10 |
+| nested | 11 | 4 | 8 | 29 |
+
+These are small concrete fixtures; zero interned provenance rows here does not
+claim absent evidence. Exact producer supports are independently asserted.
+Structural factoring/stress properties remain covered by inherited tests.
+
+Final parent check before publication: #40 still OPEN/Draft at the original
+validated `f0efa4a76984781e09c26b92d4f6ee9cb2591f8f`; no synchronization needed.
+Future parent-production synchronization rule in G0 still applies.
+
+**RESULT B**
+
+**W2 COMPLETE — ANALYSIS SUPPORTS CONTROL FLOW; FIRST GAP IS UPSTREAM IF
+ADMISSION (G3).**
+
+**W3 NOT STARTED.** Same PR #41, Draft, temporary parent base, no auto-merge,
+no merge. Await human review. Per repository lifecycle, this is a validated
+campaign wave, not a claim that the unmerged work item is DONE.
