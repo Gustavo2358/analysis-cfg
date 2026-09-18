@@ -619,3 +619,341 @@ ADMISSION (G3).**
 **W3 NOT STARTED.** Same PR #41, Draft, temporary parent base, no auto-merge,
 no merge. Await human review. Per repository lifecycle, this is a validated
 campaign wave, not a claim that the unmerged work item is DONE.
+
+# W3 — final consumer coverage
+
+## Hygiene and discovery before production changes
+
+W3_START_SHA `992bf21d111b66ad5583cad0412ca859acd0243a`; same clean
+`.analysis-gaps/analysis-cfg` worktree, branch and Draft PR #41. Parent #40
+OPEN/Draft, unchanged at `f0efa4a76984781e09c26b92d4f6ee9cb2591f8f`.
+No reset/rebase. Baseline W1/W2/regional passed before edits
+(`.harness-results/w3-baseline-final.log`). Two initial test selections failed
+because intermediate reactor modules had no matching test; the corrected
+selection includes their smoke tests. No test-skipping flag was introduced.
+
+Initial AIR characterization and independent public-wire oracle pass (34 cases).
+Discovery before any production fix:
+
+| Gap | Existing capability | Missing connection | Candidate fix | Risk | Scope |
+| --- | --- | --- | --- | --- | --- |
+| CICS PROGRAM closed Choice | StorageValues returns both values with exact supports; plan already selects that provider; each leaf is an 8-byte IBM1047 view | CicsNameInterpreter.area only accepts ObjectPlace/RegionSlice; consumer rejects the outer Choice before reading the prepared fact | prove every leaf of a closed, typed Choice with the existing leaf-area rule | admitting an unproved/unknown area; reject open/empty/unknown-type or invalid leaf choices | local plan admission, no evaluator or wire change |
+| native computed FILE | standalone storage query can know the text | FileValueQuery deliberately selects only cics.file; native source ASSIGN DYNAMIC is outside N-LR | new native dialect/profile semantics plus source and query work | treating assignment-name as runtime filename/DSNAME | deferred; not a local forgotten query |
+| inline CALL FitText | transfer supports fitting assigned values | no whole-expression query | extend query surface only with explicit semantic design | unwrapping would return the wrong target | W1 G4 deferred |
+| regional IF | valid binding/layout | frontend scalar predicate proof | upstream predicate proof/admission | fabricated purity/totality | W2 G3 deferred |
+
+The CICS Choice case is a **G4 local consumer admission gap** for a closed set
+of individually proven areas. It is distinct from an unproved Cell/short area
+(G3) and the excluded inline expression G4. A positive regression must fail
+before the local admission fix; open/invalid alternatives must stay refused.
+
+## Consumer architecture inventory
+
+| Consumer | Site type | Literal path | Computed path | Provider/query | Output |
+| --- | --- | --- | --- | --- | --- |
+| COBOL CALL | Invoke, category program, namespace cobol.program | LiteralTarget → CallNameInterpreter, no values run | Read(ObjectPlace/Choice/exact RegionSlice); name policy applied after values | BEFORE ObjectId → PossibleValues or RegionalValues; any non-object target in unit routes through StorageValues/NamedObject, PlaceOccurrence or PhysicalRange; always Reachability | DependencySiteFact → sites/edges, technology COBOL |
+| CICS LINK | Invoke action call, program/cics.program | CICS literal support + cics-ts.program@1 | same query routing, additional physical 8-byte IBM1047 proof | CallDependencyPlan/Consumer plus CicsNameInterpreter; no separate CICS solver | DependencySiteFact, command LINK |
+| CICS XCTL | Invoke action execute, program/cics.program | same program name policy | same values route; outcomes do not invent a normal return | same plan/provider, BEFORE observation | DependencySiteFact, command XCTL |
+| native FILE | file/cobol.external-file-name Invoke + resource declarations/uses | ExactName external assignment-name; resource ID binds uses to declarations | not admitted by FileValueQuery | Reachability only; static semantic identity, not a CALL value query | FileDependencyResult → fileDependencies declarations/sites/edges |
+| CICS FILE/DATASET | file/cics.file Invoke with typed action | cics-ts.file@1, FILE_LITERAL support | Read of 8-byte IBM1047 object, slice or Choice | FileDependencyAnalysis → FileValueQuery → StorageValues BEFORE → FileDependencyConsumer/FileNamePolicy | fileDependencies, no invented native SELECT/FD |
+
+Source boundaries: frontend publishes CICS_PROGRAM_CONTROL/CICS_FILE_CONTROL or
+native fileInventory and operation/resource association. `CicsInvokeHandler`
+checks the name area before generating Read; `CicsFileInvokeHandler.Context.name`
+checks extent/codec before Read; neither guesses a target. `FileResourceLowering`
+uses known assignment-name as LiteralTarget, otherwise UnknownResource plus an
+unknown computed target. All consumers use AIR IDs, never display-name matching.
+
+CICS FILE additionally projects default/explicit system selection through
+`FileSystemContext`. Computed SYSID is a separate 4-byte IBM1047 storage query.
+FILE and SYSID candidates are independent projections, not asserted correlated
+pairs. Existing FileCicsContextOracleTest is rerun; no context contract change.
+
+## CALL
+
+W1/W2 controls are rerun rather than duplicated: ValueToCallEvidenceTest proves
+literal/no values run, simple initialized/copied value, StorageValues Choice,
+unknown and candidate supports. ControlFlowEvidenceTest proves post-join
+PossibleValues/RegionalValues. The known inline FitText negative remains
+UNSUPPORTED_TARGET_EXPRESSION. No change to `readable()` or COBOL interpretation.
+Within the admitted contract, no provider-to-plain-CALL loss was observed.
+
+## CICS
+
+`ConsumerCoverageTest` separately executes LINK and XCTL literal and computed
+object/slice/Choice for simple, multiple, unknown and partial values. The
+provider facts are observed before Invoke, with exact candidate/producer
+associations; final facts must preserve them. Object routes select RegionalValues;
+slice/Choice routes select StorageValues. Literal routes request no values.
+The independent Python wire oracle checks the serialized candidates, status,
+namespace, command, support association and remainder.
+
+For the closed Choice fix, the independent StorageValues query was already
+`{PROGA{seed-a}, PROGB{seed-b}}` while final CICS was unsupported. The positive
+regression then failed exactly as expected in `w3-choice-red.log`:
+`RESOLVED_CANDIDATES` expected, `UNSUPPORTED_TARGET_EXPRESSION` actual.
+After the fix it publishes both candidates with their own supports. No extra
+provider is selected; the same values query was already planned before the fix.
+
+A short leaf remains unsupported. A typed open Choice has a valid SameDomain
+premise proving TEXT, but that does not prove the width/codec of the remainder;
+it remains unsupported. This negative uses the public in-memory AIR API because
+the pinned AIR JSON codec cannot encode SameDomain (see transport ledger below).
+The final dependency JSON for it is still generated and independently checked.
+Unknown-type computed targets do not establish the required TEXT contract; they
+are not falsely treated as valid transported source fixtures.
+
+XCTL's explicit external control remainder makes the manual publication's
+source closure open even with a known name. Therefore `RESOLVED_CANDIDATES`
+is compatible with source/effective unknown. For LINK's closed manual models,
+only the unknown/partial value cases have a value remainder. We preserve the
+observed contract rather than forcing all known names to mean closed-world.
+
+## FILE
+
+Native exact names reuse ResourceBindingOracle A2: declaration ResourceId,
+operation binding/role, owner and external name are distinct from storage IDs
+and display labels. The wire preserves CLIENTDD and the exact use association.
+No storage analysis runs merely to publish a native literal file name.
+
+CICS FILE tests use the existing FileComputedOracleTest abstractions and actual
+StorageValues facts. Objects, physical slices and Choice all preserve simple,
+multiple, partial and unknown results through the FILE consumer and JSON.
+Multiple names retain separate seed-a/seed-b supports. Unknown produces no
+invented file. Existing timing, alias, FILE/SYSID context and shared-run tests
+are rerun. No claim of general alias/OCCURS qualification is added.
+
+The artificial native computed AIR control has a provider fact PROGA but
+FileValueQuery does not select it outside cics.file. This is a deliberate query
+contract boundary, not sufficient evidence to implement dynamic ASSIGN semantics.
+The real source witness locates the earlier refusal: ASSIGN DYNAMIC publishes
+UNAVAILABLE, externalFileName=null, `ASSIGN_OUTSIDE_N_LR`. Its OPEN/READ/CLOSE sites
+remain present and unknown, even though data item X has VALUE 'CLIENTDD'.
+Do not conflate X, logical file F, external assignment-name, DD allocation or
+physical dataset identity. JCL/DSNAME resolution is outside the product, not a
+missing promised field or an unknown dependency to fabricate.
+
+## AIR-level matrix
+
+All rows refer to freshly run tests. `CCT` = ConsumerCoverageTest; `W1` =
+ValueToCallEvidenceTest; `W2` = ControlFlowEvidenceTest. CCT's computed positives
+compare producer supports in provider → consumer; the independent
+check_analysis_gaps_w3_wire.py validates **44** final JSON documents.
+
+| Fixture | Producer | Provider/query | Consumer | Final |
+| --- | --- | --- | --- | --- |
+| CALL literal/simple/multiple/unknown | W1 assignments/initial/copy; W2 branches | W1/W2 exact provider or none for literal | unchanged | PASS W1/W2 |
+| LINK/XCTL literal (CCT) | LiteralTarget PROGA | no values requested | CICS_LITERAL, correct command | PROGA |
+| LINK/XCTL simple (CCT) | seed-a | PROGA from NamedObject/PhysicalRange/PlaceOccurrence | same support/origin/premises | PROGA |
+| LINK/XCTL multiple (CCT) | seed-a / seed-b on distinct paths | PROGA / PROGB, separate producers | same two | both, no cross-association |
+| LINK/XCTL unknown/partial (CCT) | no write / one branch writes | empty+unknown / PROGA+unknown | same remainder | conservative |
+| CICS closed Choice (CCT) | both branch values, proven leaf areas | already correct before fix | formerly unsupported; now both | RECONCILED G4 |
+| CICS short/open area (CCT, CicsInvokeRouteTest) | value may exist | proof insufficient for whole area | unsupported | no candidate invented |
+| native FILE exact (CCT/FileDependencyTest) | semantic resource identity | no value query | CLIENTDD, resource association | exact source-level file |
+| native computed AIR (CCT) | seed-a PROGA | standalone query knows; plan makes no value request | FILE_VALUES_UNAVAILABLE | empty/open |
+| CICS FILE literal (CCT) | literal PROGA | no values requested | FILE_LITERAL | PROGA |
+| CICS FILE computed (CCT/FileComputedOracleTest) | seed-a / seed-b | StorageValues: simple/multiple/partial/unknown | exact supports and remainder | unchanged PASS |
+
+## Source-level matrix
+
+Fresh W3 source probe: **12 cases** with unchanged pinned producers and the final
+consumer code. Full raw SP/AIR/CFG/dependencies and stdout/stderr are under
+`.harness-results/w3-source-final`; the earlier pre-fix run is retained separately.
+No intermediate product is edited. Builds/classpaths are reused from W2 after
+checking clean immutable pins against sources.lock.json. This is selected
+synthetic E2E, not corpus/corporate qualification or new upstream full suites.
+
+| Source | Classification | Result / first boundary |
+| --- | --- | --- |
+| CALL W2 scalar/regional-target controls | SOURCE PROVEN, reused W2 evidence | both known candidates; no relevant source/query change; new FILE controls also exercise downstream CALL preservation |
+| link-literal / link-computed | SOURCE PROVEN, new | PROGA, model closed, source/effective open |
+| xctl-literal / xctl-computed | SOURCE PROVEN, new | PROGA; no invented normal success outcome; source/effective open |
+| link-multiple | SOURCE PROVEN, new | PROGA + PROGB, supports point to their corresponding source MOVEs |
+| link-unknown | SOURCE PROVEN, new | no candidate; model/source/effective open |
+| native-static (existing fixture rerun) | SOURCE PROVEN, new | OPEN/READ/CLOSE → CLIENTDD, exact declaration/use IDs |
+| native-dynamic | SOURCE UNSUPPORTED, refusal proven by new run | ASSIGN_OUTSIDE_N_LR upstream; all three sites retained unknown |
+| read-dataset-literal (existing fixture rerun) | SOURCE PROVEN, new | READ → ACCOUNTS, literal closed; DATASET spelling retained, canonical FILE |
+| read-dataset-computed / read-file-computed | SOURCE PROVEN, new | ACCOUNTS; model/source remainders remain open in these mixed CALL sources |
+| computed-unknown (existing fixture rerun) | SOURCE PROVEN, new | no CICS FILE candidate; unknown explicit |
+| source-generated closed CICS PROGRAM Choice | NOT TESTED | fix is AIR PROVEN; source probe uses uniquely bound objects |
+| source XCTL multiple / CICS FILE multiple | NOT TESTED in W3 | AIR PROVEN; no relabeling of prior campaigns' source runs |
+
+The scalar IF in link-multiple is admitted. No new probe depends on regional IF
+predicate proof, so W2 G3 does not block this suite and remains untouched.
+
+## Provenance/support matrix
+
+| Consumer | Internal information | Contractually exposed information | Observation |
+| --- | --- | --- | --- |
+| CALL/CICS program | TextValueFact candidate supports, aggregate evidence/provenance/premises; regional capture/logical facts can exist below projection | per-candidate kind/producer/origin/premises plus site evidence/provenance/premises and raw names | exact equality/subset checks in W1/W2/CCT; source CICS supports map to source MOVE operations |
+| CICS FILE | StorageValueFact candidates/supports and richer storage/capture facts | per-candidate kind/producer/origin/premises, valuePoint, uncertainty/reasons; no aggregate storage-fact/capture graph promised | CCT compares every producer record to the corresponding fact; independent wire validates associations |
+| native FILE | declaration/use/resource identity and origins | declaration objects, use roles/bindings, literal support and origins | direct identity checks and source-span traces |
+
+No candidate-support loss was found in the admitted paths. Empty premise lists
+in synthetic fixtures are not described as a proof of nonempty-premise transport;
+existing W1/regional provenance regressions remain the broader oracle. Capture
+relations/logical-source graphs are richer internal analysis data: dependencies
+JSON does not promise to serialize that entire graph. No wire expansion here.
+
+## Known inline-expression G4
+
+No other inspected consumer exposes a reusable arbitrary Expression query.
+All use ObjectId or StorageSubject (NamedObject/PhysicalRange/PlaceOccurrence).
+Regional transfer evaluates FitText while applying an assignment; it is not a
+provider query for the value of an arbitrary target expression at a point.
+This is a potential implementation building block, not an already complete
+query abstraction. W1-G4 stays UNSUPPORTED_TARGET_EXPRESSION and deferred.
+
+## Known upstream G3
+
+Regional IF predicate proof remains the W2 upstream G3 with source-reproduced
+PREDICATE_NOT_PROVEN. No producer pin, predicate proof, lower admission or CFG
+solver was changed. No new RD run or implementation was added.
+
+## Gap ledger
+
+| ID | Consumer | Scenario | Result | First boundary | Gap class | Fix now? |
+| --- | --- | --- | --- | --- | --- | --- |
+| W1-G4 | CALL | inline FitText(Read(B),4) | unsupported, known B insufficient to evaluate expression | whole-expression query admission | G4 consumer/query extension | no, explicitly deferred |
+| W2-G3 | all post-IF consumers | regional-only predicate | precise Branch absent | frontend predicate proof, then lower admission | G3 upstream | no |
+| W3-CICS-CHOICE | LINK/XCTL | closed typed Choice, all areas proven | provider already correct; now consumer correct | CICS area proof collection | G4 local consumer | YES, narrow reconciliation |
+| W3-CICS-AREA | LINK/XCTL | Cell-only, short area, open choice | conservative unsupported | required physical 8-byte IBM1047 proof | G3 precondition | no; valid refusal |
+| W3-CICS-POLICY | CICS programs/files | wrong policy/version or invalid spelling | no arbitrary normalized target | name-policy profile | G3 profile/precondition | no; existing negative tests |
+| W3-NATIVE-DYNAMIC | native FILE | ASSIGN DYNAMIC X | source target unavailable even with VALUE X | frontend N-LR profile: ASSIGN_OUTSIDE_N_LR | G6 unsupported profile semantics | no, optional separate campaign |
+| W3-NATIVE-QUERY | native FILE | manually supplied computed Read target | storage knows; FILE plan does not query | FileValueQuery namespace/policy contract | G4 query extension, dependent on native semantics | no, not a dynamic-FILE shortcut |
+| W3-OPEN-CHOICE-TRANSPORT | AIR transport / CICS negative control | typed open Choice requires SameDomain | in-memory structurally valid; pinned JSON writer rejects assertion | air-json BindingWriter.premise supports only DisjointStorage | G3 upstream representation/transport | no; not a consumer loss |
+
+No new G1 missing value producer, G2 identity mismatch or G5 join corruption was
+found in the selected fixtures. This is not a proof that those gap classes are
+absent everywhere. SQL/DB2, copybook expansion changes, PERFORM/GO TO/EVALUATE,
+interprocedural parameters, general aliases/OCCURS and JCL/DSNAME are unqualified
+or excluded; no invented per-feature failure result is assigned without a probe.
+
+## Fixes, if any
+
+Only production change: `CallDependencyPlan.cicsArea`. It walks the canonical
+place alternatives iteratively; every closed Choice must have known TEXT and
+nonempty candidates, and every leaf must pass the existing CicsNameInterpreter
+area check. No string heuristic, scalar fallback, new provider, solver, lattice,
+name-policy change, pruning or budget. Complexity is linear in place occurrences;
+iteration avoids recursive stack growth. `readable()` is unchanged.
+
+RED precedes the fix; after-fix closed Choice resolves both names. Short/open
+alternatives remain refused. Before/after source probes agree for the 12 tested
+source shapes. FILE and COBOL CALL implementation paths are unchanged.
+
+## Performance and regional regression
+
+The formerly rejected CICS Choice already requested StorageValues before the
+fix. The change consumes its prepared result, with `possibleValuesRuns=1` asserted.
+For the two-path positive witness: contextual edges 7, concreteFallbacks 3,
+expandedLabels 16, maxStateAlternatives 6, maxProvenanceRows 0. Raw metrics for
+all observed Choice variants are retained in w3-focal-pass.log. Zero rows in
+this small concrete witness does not mean no candidate evidence.
+RegionalExplosionFixturesTest, RegionalAlternativesTest and
+RegionalFallbackStressTest are rerun, along with regional provenance/factoring,
+CICS/FILE/CALL and W1/W2 tests. No semantic values implementation changed.
+
+## Remaining campaigns
+
+- Regional predicate proof/admission: separate upstream design and qualification.
+- Inline target-expression query: separate authorization; possible transfer-code
+  reuse does not establish the query contract.
+- Native dynamic FILE dialect/profile: optional extension, not core N+C debt.
+- SameDomain AIR transport: separate upstream contract implementation decision.
+- Open/unknown physical CICS areas remain unsupported until proof is available.
+
+**FACT:** selected admitted paths preserve candidates, support and unknowns;
+one local G4 was reconciled. **STRONG EVIDENCE:** remaining named failures above
+are at explicit upstream/query/profile boundaries, not a generic value solver
+failure. **HYPOTHESIS:** future upstream/query work could improve real-world
+coverage; no percentage or corporate impact is inferred here.
+
+## Final capability matrix
+
+PASS means a named oracle above, not universal language coverage.
+
+| Capability | CALL | CICS LINK | CICS XCTL | Native FILE | CICS FILE/DATASET |
+| --- | --- | --- | --- | --- | --- |
+| Literal/exact | PASS W1 | PASS CCT/source | PASS CCT/source | PASS resource/source | PASS CCT/source |
+| Simple computed | PASS W1 | PASS CCT/source | PASS CCT/source | outside current profile/query | PASS CCT/source |
+| Multiple values | PASS W1/W2 | PASS CCT/source | PASS CCT; source NOT TESTED | computed N/A | PASS CCT; source NOT TESTED in W3 |
+| Unknown conservative | PASS W1/W2 | PASS CCT/source | PASS CCT | PASS unsupported-source witness | PASS CCT/source |
+| Candidate supports | PASS W1/W2 | PASS CCT/wire/source | PASS CCT/wire/source | PASS literal/resource origin | PASS CCT/wire/source |
+| Physical Choice | PASS W1 | PASS after local fix, AIR only | PASS after local fix, AIR only | N/A | PASS existing path |
+| Selected source pipeline | W2 reused + mixed W3 controls | PASS new | PASS new | exact PASS; dynamic refused | selected READ FILE/DATASET PASS |
+
+No additional wave is technically required to finish this discovery map.
+Residual implementation decisions require explicit authorization; none starts
+automatically. PR #41 remains Draft, stacked on #40, awaiting human review.
+
+## Validation and closeout
+
+Change frontier: one local consumer-plan admission helper; no values transfer,
+solver, storage identity, provider, public API/wire, source producer or pin change.
+The compiled inventory update is exactly nine additional dependency edges for
+CallDependencyPlan (Scopes/NoMemory/MemoryBound, Types/Known/Builtin/Type/TypeRef,
+ArrayDeque); no class/public-descriptor drift and no broad baseline regeneration.
+The first FAST correctly rejected that unrecorded compiled delta; it is retained
+in w3-fast.log and the corrected gate is w3-fast-final.log.
+
+| Newly executed gate | Result | Raw evidence |
+| --- | --- | --- |
+| W1/W2 + inherited regional baseline | PASS 60 tests, zero failures/errors/skips | w3-baseline-final.log |
+| Positive CICS Choice before production fix | expected RED, one status mismatch | w3-choice-red.log |
+| Final focal CALL/CICS/FILE/W1/W2/regional | PASS 202 tests, zero failures/errors/skips | w3-focal-pass.log |
+| Complete changed-module reactor + dependencies | PASS 577 tests, zero failures/errors/skips | w3-modules.log |
+| Independent dependency wire | PASS 44 cases | w3-wire.log |
+| FAST Java 21 | PASS CODE_CHANGE, 571 Java tests, zero failures/errors/skips; architecture/Python PASS | w3-fast-final.log |
+| Final pinned source CLI probe | PASS 12 cases, including expected native refusal | w3-source-final.log and w3-source-final/summary.json |
+
+Logs are relative to `.harness-results/`. FAST retains its fixed selection; the new W3 cases are covered by focal and
+complete-module gates, not falsely counted as new FAST selections.
+The new 7 JUnit tests execute many scenario combinations; do not add those combinations to the Maven test count.
+The open Choice negative is in-memory AIR plus dependency JSON, explicitly not
+AIR JSON round-trip. The other new AIR fixtures round-trip the pinned codec.
+Initial fixture-authoring compile/validation failures remain in local logs:
+no additional JSON parser dependency was added; a known open TEXT Choice needs
+SameDomain, whose serialization is outside the pinned AIR codec. These are
+separate from the one intentional production RED above.
+
+Reproduction (Temurin Java 21.0.12; fresh source output directory):
+
+```sh
+export JAVA_HOME=/home/gustavo/.sdkman/candidates/java/21.0.12+1.1-tem
+export PATH="$JAVA_HOME/bin:$PATH"
+mvn -B -ntp -Dmaven.repo.local="$PWD/.harness-results/build/m2" \
+  -pl analysis-adapters -am \
+  '-Dtest=ConsumerCoverageTest,ValueToCallEvidenceTest,ControlFlowEvidenceTest,Cics*Test,File*Test,W1d*Test,Regional*Test,StorageIndexTest,CfgBuildCoordinatorTest,NameInterpreterTest' test
+mvn -B -ntp -Dmaven.repo.local="$PWD/.harness-results/build/m2" \
+  -pl analysis-adapters -am test
+python3 -B scripts/project/check_analysis_gaps_w3_wire.py
+python3 -B scripts/harness/lean.py fast
+# Pinned producer build preparation is documented in W2 above; reuse only if pins/trees match.
+mvn -B -ntp -Dmaven.repo.local="$PWD/.harness-results/build/m2" compile
+python3 -B scripts/project/probe_analysis_gaps_w3.py \
+  --producers "$PWD/.harness-results/w2-producers/producers.json" \
+  --work "$PWD/.harness-results/w3-source-final"
+```
+
+Reused: immutable producer builds from W2; W2 source CALL controls explicitly
+marked historical; earlier corporate W3.3 factoring qualification is not rerun
+or relabeled. Newly run inherited regression oracles supplement that evidence.
+Not run: full corporate/corpus qualification, full upstream suites, unrelated
+PERFORM/GO TO/SQL/dynamic-FILE campaigns. The local change consumes a query
+already planned; focal/full-module, public-wire, selected source and FAST gates
+cover its invalidated evidence without requalifying unchanged shared solvers.
+
+Implementation commit `a3edcd4`; source-probe commit `ecfe566`. Final report commit
+and exact final HEAD are recorded in PR #41/Git. Parent #40 was rechecked before
+final qualification and is still at the original validated SHA; no synchronization
+is needed. If parent production later changes, incorporate its final head before
+closing dependent implementation; after #40 merges update/rebase from main and
+retarget #41 to main. No merge or auto-merge authorized.
+
+**W3 COMPLETE — CONSUMER COVERAGE MAPPED; RESIDUAL GAPS CLASSIFIED.**
+
+The discovery campaign is technically closed, subject to parent dependency /
+retarget and final human review. This is not repository lifecycle DONE while
+PR #41 remains unmerged. No upstream G3 campaign or inline G4 implementation
+has been started. Await human review.
