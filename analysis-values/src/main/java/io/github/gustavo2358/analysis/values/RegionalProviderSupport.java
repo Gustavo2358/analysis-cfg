@@ -15,7 +15,7 @@ final class RegionalProviderSupport {
     private RegionalProviderSupport() { }
     static <T,V extends TextValueFact> AnalysisProvider.Prepared<T,V> prepare(AnalysisSession owner,AnalysisKey key,java.util.function.BiFunction<RegionalValuesAnalysis.Execution,List<PointQuery<T>>,ObservationBatch<T,V>> observer) {
         var scoped = owner.selectEntries(List.of(key.entry()));
-        var admission = RegionalValuesAnalysis.prepare(scoped);
+        var admission = RegionalValuesAnalysis.prepare(scoped,StorageAnalysisMode.fromPrecision(key.precisionPolicy()));
         return new AnalysisProvider.Prepared<>() {
             public AnalysisKey key() { return key; }
             public AnalysisOutcome refusal() {

@@ -185,7 +185,7 @@ class ComputedFileWireTests(unittest.TestCase):
     def test_four_states_and_frozen_reader_rejection(self):
         import runpy
         old=runpy.run_path(str(ROOT/'scripts/project/fixtures/dependency_wire_v21.py'))['validate']
-        for name,expected,remainder in [('literal',['1FILE'],False),('closed',['ALPHA001','BETA0002'],False),('partial',['ALPHA001'],True),('unknown',[],True)]:
+        for name,expected,remainder in [('literal',['1FILE'],False),('closed',['ALPHA001','BETA0002'],True),('partial',['ALPHA001'],True),('unknown',[],True)]:
             d=read(ROOT/('analysis-adapters/target/fd-w7/manual/'+name+'.json'))
             self.assertEqual('2.3.0',d['version']);s=d['fileDependencies']['sites'][0]
             self.assertEqual(expected,[c['referenceName'] for c in s['candidates']]);self.assertEqual(remainder,s['unknownRemainder'])
@@ -218,11 +218,11 @@ class CicsContextWireTests(unittest.TestCase):
         self.assertEqual(['R001'],[c['referenceName'] for c in contexts['r1']['candidates']])
         self.assertEqual(['R002'],[c['referenceName'] for c in contexts['r2']['candidates']])
     def test_computed_context_before_supports_and_independent_remainder(self):
-        for name,expected,remainder in [('closed',['R001','R002'],False),('partial',['R001'],True),('unknown',[],True)]:
+        for name,expected,remainder in [('closed',['R001','R002'],True),('partial',['R001'],True),('unknown',[],True)]:
             d=read(ROOT/('analysis-adapters/target/fd-w8/manual/systems-'+name+'.json'))
             s=d['fileDependencies']['sites'][0];c=s['context']
             self.assertEqual(expected,[x['referenceName'] for x in c['candidates']]);self.assertEqual(remainder,c['unknownRemainder'])
-            self.assertFalse(s['unknownRemainder']);self.assertEqual('BEFORE',c['valuePoint']['position'])
+            self.assertTrue(s['unknownRemainder']);self.assertEqual(0,d['metrics']['physicalGroupsApplied']);self.assertEqual('BEFORE',c['valuePoint']['position'])
         base=read(ROOT/'analysis-adapters/target/fd-w8/manual/systems-closed.json')
         for change in [lambda c:c['valuePoint'].__setitem__('position','AFTER'),lambda c:c.__setitem__('valuePoint',None),lambda c:c['candidates'][0].__setitem__('supports',[]),lambda c:c['candidates'][0]['supports'][0].__setitem__('kind','CICS_SYSID_LITERAL')]:
             d=copy.deepcopy(base);change(d['fileDependencies']['sites'][0]['context'])

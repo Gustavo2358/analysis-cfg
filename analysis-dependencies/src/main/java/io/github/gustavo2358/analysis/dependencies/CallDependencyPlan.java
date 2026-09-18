@@ -46,15 +46,20 @@ public final class CallDependencyPlan {
         return new PointQuery<>(ProgramPoint.before(site.entry(),site.operationId()),subject);
     }
     static PointQuery<LabelId> reachQuery(SiteView site){return new PointQuery<>(ProgramPoint.before(site.entry(),site.operationId()),site.sequence());}
-    public static List<ConsumerRegistration<DependencySiteFact>> select(AnalysisSession session){return select(session,"call",false);}
+    public static List<ConsumerRegistration<DependencySiteFact>> select(AnalysisSession session){return select(session,StorageAnalysisMode.LOGICAL_ONLY);}
+    public static List<ConsumerRegistration<DependencySiteFact>> select(AnalysisSession session,StorageAnalysisMode mode){return select(session,"call",false,mode);}
     /** Explicit registration namespace and duplicate requests support composition/testing of shared W4 batches. */
-    public static List<ConsumerRegistration<DependencySiteFact>> select(AnalysisSession session,String namespace,boolean duplicateQuery) {
+    public static List<ConsumerRegistration<DependencySiteFact>> select(AnalysisSession session,String namespace,boolean duplicateQuery) { return select(session,namespace,duplicateQuery,StorageAnalysisMode.LOGICAL_ONLY); }
+    public static List<ConsumerRegistration<DependencySiteFact>> select(AnalysisSession session,String namespace,boolean duplicateQuery,StorageAnalysisMode mode) {
+        Objects.requireNonNull(mode);
         // Only the indexed Invoke bucket is inspected, once, to avoid demanding values for literal-only units.
+        var demand=new HashMap<UnitId,Set<ObjectId>>();
         var cicsAreas=new HashSet<OperationId>();var groups=new HashMap<UnitId,Set<Integer>>();var slicedUnits=new HashSet<UnitId>();
         for(var site:session.index().sites(Operations.Invoke.class)) {
             var invoke=(Operations.Invoke)site.operation();if(selected(invoke)) {
                 if(readable(invoke)) {
                     var place=((Expressions.Read)((Interactions.ComputedTarget)invoke.target()).name()).place();
+                    if(place instanceof Places.ObjectPlace object)demand.computeIfAbsent(site.owner().id(),k->new HashSet<>()).add(object.object());
                     if(cicsArea(place,session))cicsAreas.add(invoke.header().id());
                 }
                 groups.computeIfAbsent(site.owner().id(),ignored->new HashSet<>()).add(group(invoke));
@@ -63,21 +68,22 @@ public final class CallDependencyPlan {
         }
         var registrations=new ArrayList<ConsumerRegistration<DependencySiteFact>>();
         // Result assignments belong to normal-return edges. Select the existing regional
-        // provider that models those edges, including Cell storage, without changing solvers.
+        // provider that models those edges, including Cell storage, under the explicit policy.
+        // Wider logical admission is never permission to enable physical propagation.
         boolean regional=session.index().hasUnprovedPreconditions() || session.index().publication().storage().stream().anyMatch(Memory.Region.class::isInstance)
             ||session.index().publication().capabilities().required().contains(Capabilities.ENTRY_POSSIBILITIES_V2)
             ||session.index().sites(Operations.Invoke.class).stream().anyMatch(s->!((Operations.Invoke)s.operation()).results().isEmpty());
         // Probe the optimization's semantic admission, not a keyword/feature list.
         // This prepares no solver run. A wider existing domain retains evidence on refusal.
         if(!regional && groups.values().stream().anyMatch(g->g.contains(1)))
-            regional=PossibleValuesAnalysis.prepare(session,PossibleValuesAnalysis.EFFECTS_PROFILE).status()==PossibleValuesAnalysis.Status.UNSUPPORTED;
+            regional=PossibleValuesAnalysis.prepare(session,PossibleValuesAnalysis.EFFECTS_PROFILE,demand.values().stream().flatMap(Set::stream).collect(java.util.stream.Collectors.toSet())).status()==PossibleValuesAnalysis.Status.UNSUPPORTED;
         for(var context:session.contexts()) {
             var entry=context.entry().id();String id=part(entry.publication().localId())+part(entry.unit().localId())+part(entry.localId());
             var reach=ReachabilityProvider.batch("reach:"+id,entry);boolean physical=slicedUnits.contains(entry.unit());
-            var storageValues=StorageValuesProvider.batch("call-values:"+id,StorageValuesProvider.key(entry));
+            var storageValues=StorageValuesProvider.batch("call-values:"+id,StorageValuesProvider.key(entry,mode));
             ObservationBatchId<ObjectId,? extends TextValueFact> values=regional
-                ?RegionalValuesProvider.batch("call-values:"+id,RegionalValuesProvider.key(entry))
-                :PossibleValuesProvider.batch("call-values:"+id,PossibleValuesProvider.key(entry,PossibleValuesAnalysis.EFFECTS_PROFILE));
+                ?RegionalValuesProvider.batch("call-values:"+id,RegionalValuesProvider.key(entry,mode))
+                :PossibleValuesProvider.batch("call-values:"+id,PossibleValuesProvider.key(entry,PossibleValuesAnalysis.EFFECTS_PROFILE,demand.getOrDefault(entry.unit(),Set.of())));
             for(int group:groups.getOrDefault(entry.unit(),Set.of())) {
                 var keys=new ArrayList<AnalysisKey>();keys.add(reach.analysisKey());var batches=new ArrayList<String>();batches.add(reach.id());
                 List<SiteInterest.SiteQuery<?,?>> queries=new ArrayList<>();queries.add(new SiteInterest.SiteQuery<>(reach,CallDependencyPlan::reachQuery));

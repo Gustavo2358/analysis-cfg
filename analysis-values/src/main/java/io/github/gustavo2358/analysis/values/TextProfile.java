@@ -21,6 +21,10 @@ final class TextProfile {
     private final IdentityHashMap<Operation,ConservativeEffectTransfer> conservative=new IdentityHashMap<>();
     private final boolean effectAware;
     private final List<Location> modeledCells;
+    private final Set<Location> selected;
+    final long requestedObjects;
+    boolean selected(Location location){return selected.contains(location);}
+    int preparedCellCount(){return selected.size();}
     final IdentityHashMap<ContextView,PossibleValuesState> boundaries=new IdentityHashMap<>();
     private final Map<UnitId,Set<ObjectId>> visible=new HashMap<>();
     final Map<UnitId,Boolean> sourceOpen=new HashMap<>();
@@ -30,7 +34,9 @@ final class TextProfile {
     final List<PremiseId> premises=new ArrayList<>();
     final ValuesWork preparation=new ValuesWork();
     private final Set<Operation> admitted=Collections.newSetFromMap(new IdentityHashMap<>());
-    TextProfile(AnalysisSession session,boolean effectAware) {
+    TextProfile(AnalysisSession session,boolean effectAware) {this(session,effectAware,null);}
+    TextProfile(AnalysisSession session,boolean effectAware,Set<ObjectId> demand) {
+        requestedObjects=demand==null?-1:demand.size();
         this.effectAware=effectAware;
         this.session=Objects.requireNonNull(session);
         var index=session.index();var publication=index.publication();
@@ -46,7 +52,7 @@ final class TextProfile {
             if(object.coverage()!=Evidence.CoverageStatus.MODELED||open(object.precision().storage())||open(object.precision().values()))
                 sourceOpenCells.add(location.ordinal());
         }
-        modeledCells=cells.values().stream().sorted(Comparator.comparingInt(Location::ordinal)).toList();
+
         // A single premise must cover all admitted bases. Scan premise members once, not pairs.
         if(cells.size()>1) {
             boolean covered=false;
@@ -57,6 +63,28 @@ final class TextProfile {
             }
             if(!covered)throw new Refusal(false,"UNSUPPORTED_STORAGE_DISJOINTNESS");
         }
+        var selected=new HashSet<Location>();
+        if(demand==null)selected.addAll(cells.values());
+        else {
+            for(var object:demand) {
+                var location=subjects.get(object);if(location==null)throw new Refusal(false,"UNSUPPORTED_DEMAND_STORAGE");selected.add(location);
+            }
+            // Backwards closure of possible reaching copies. No control/path pruning;
+            // every write to a selected cell is retained, including MAY/unknown effects.
+            var sources=new HashMap<Location,Set<Location>>();
+            for(var site:index.sites(Operations.Assign.class)) {
+                var assign=(Operations.Assign)site.operation();
+                if(assign.destination() instanceof Places.ObjectPlace to&&assign.value() instanceof Expressions.Read read&&read.place() instanceof Places.ObjectPlace from)
+                    sources.computeIfAbsent(subjects.get(to.object()),k->new HashSet<>()).add(subjects.get(from.object()));
+            }
+            var pending=new ArrayDeque<Location>(selected);
+            while(!pending.isEmpty())for(var source:sources.getOrDefault(pending.removeFirst(),Set.of())) {
+                if(source==null)throw new Refusal(false,"UNSUPPORTED_DEMAND_SOURCE");
+                if(selected.add(source))pending.addLast(source);
+            }
+        }
+        this.selected=Set.copyOf(selected);
+        modeledCells=selected.stream().sorted(Comparator.comparingInt(Location::ordinal)).toList();
         for(var unit:publication.units()) {
             boolean open=open(publication.coverage())||open(unit.coverage());
             for(var sequence:unit.sequences()) {
@@ -78,19 +106,21 @@ final class TextProfile {
                     if(!(literal.value().value() instanceof Values.TextValue text))throw new Refusal(false,"UNSUPPORTED_INITIAL_VALUE");
                     var previous=initial.putIfAbsent(location.ordinal(),text);
                     if(previous!=null&&!previous.equals(text))throw new Refusal(true,"CONTRADICTORY_INITIAL_VALUES");
+                    if(!selected(location))continue;
                     var value=universe.supported(text,condition.place().header().id(),condition.origin(),condition.premises(),preparation);
                     // Simultaneous support is unioned; only the first strong fact can
                     // replace unspecified default content at the invocation boundary.
                     if(!initialized.add(location.ordinal()))value=seed.value(location.ordinal(),preparation).join(value,preparation);
                     seed=seed.initialize(location.ordinal(),value,preparation);
                 } else if(condition.value() instanceof Entries.PossibleLiterals possible) {
+                    if(!selected(location))continue;
                     var value=Candidates.UNKNOWN;
                     for(var literal:possible.candidates()) {
                         if(!(literal.value() instanceof Values.TextValue text))throw new Refusal(false,"UNSUPPORTED_INITIAL_VALUE");
                         value=value.join(universe.supported(text,literal.header().id(),condition.origin(),condition.premises(),preparation),preparation);
                     }
                     seed=seed.weakUpdate(location.ordinal(),value,preparation);initialized.add(location.ordinal());
-                } else seed=seed.widenUnknown(location.ordinal(),preparation);
+                } else if(selected(location))seed=seed.widenUnknown(location.ordinal(),preparation);
             }
             boundaries.put(context,seed);
         }
@@ -107,6 +137,7 @@ final class TextProfile {
                 throw new Refusal(false,"UNSUPPORTED_EFFECT_PROFILE");
             var location=subjects.get(destination.object());
             if(location==null)throw new Refusal(false,"UNSUPPORTED_STORAGE_PROFILE");
+            if(!selected(location)){admitted.add(operation);return;}
             if(assign.value() instanceof Expressions.Literal literal && literal.value() instanceof Values.TextValue text)
                 writes.put(operation,new LiteralWrite(location,universe.supported(text,assign.header().id(),assign.header().origin(),List.of(),preparation)));
             else if(assign.value() instanceof Expressions.Read read && read.place() instanceof Places.ObjectPlace source) {
@@ -142,7 +173,7 @@ final class TextProfile {
         return state.strongOverwrite(write.location().ordinal(),value,overwrites.get(operation),work);
     }
     boolean supports(ObjectId subject,EntryId entry) {
-        if(!textSubjects.contains(subject))return false;
+        if(!textSubjects.contains(subject)||!selected(subjects.get(subject)))return false;
         return subject.unit().equals(entry.unit())||visible.get(entry.unit()).contains(subject);
     }
     boolean sourceOpen(ObjectId subject,EntryId entry) {

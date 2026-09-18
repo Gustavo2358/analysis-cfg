@@ -19,7 +19,7 @@ public final class RegionalE2eProbe {
         for(var unit:publication.units())for(var entry:unit.entries())for(var sequence:unit.sequences())
             if(sequence.terminator() instanceof Operations.Invoke||sequence.terminator() instanceof Operations.Opaque)for(var object:unit.objects())
                 queries.add(new PointQuery<>(ProgramPoint.before(entry.id(),sequence.terminator().header().id()),new StorageSubject.NamedObject(object.id())));
-        var result=new RegionalAnalysis().prepare(publication,"storage-w5-e2e",queries);
+        var result=new RegionalAnalysis(io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).prepare(publication,"storage-w5-e2e",queries);
         try(var out=Files.newOutputStream(Path.of(args[1]))) {new RegionalResultJson().write(result,out);}
     }
 }

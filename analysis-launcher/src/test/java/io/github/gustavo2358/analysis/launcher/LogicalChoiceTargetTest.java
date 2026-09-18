@@ -60,7 +60,7 @@ class LogicalChoiceTargetTest {
             var observed=regional.observations().stream().filter(o->o.query().subject().equals(occurrence)).findFirst().orElseThrow();
             var expected=mixed?List.of("PROGA","PROGB"):List.of("PROGA");
             assertEquals(expected,observed.values().value().candidates().stream().map(Values.TextValue::value).toList());
-            assertTrue(observed.values().value().modelValueRemainder());assertEquals(List.of(source.id()),observed.values().value().logicalAlternatives().stream().map(a->a.object()).toList());
+            assertTrue(observed.values().value().modelValueRemainder());assertEquals(mixed?Set.of(source.id(),physical):Set.of(source.id()),new HashSet<>(observed.values().value().logicalAlternatives().stream().map(a->a.object()).toList()));
             assertTrue(observed.rd().value().definitions().stream().anyMatch(d->d.definition().logicalObject().equals(Optional.of(source.id()))));
             var dependencies=new DependencyAnalysis().prepare(p);var site=dependencies.sites().getFirst();
             assertEquals(expected,site.candidates().stream().map(DependencySiteFact.Candidate::referenceName).toList());assertEquals(point,site.valuePoint());assertTrue(site.effectiveUnknownRemainder());

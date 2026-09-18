@@ -1,5 +1,8 @@
 # Dependency site facts — transporte 1.1.0 e parcialidade 1.2.0
 
+W1 operational policy: logical-only by default; physical propagation requires explicit experimental opt-in. The wire shape and historical profile label below are unchanged. `metrics.logicalOnlyMode` / `metrics.experimentalPhysicalMode` identify the dependency execution policy; regional observation `statistics.values.logicalOnlyMode` identifies its policy. Zero physical work is observable in physicalGroupsApplied/physicalWritesApplied counters. Existing remainder/analysisReasons/logicalAlternatives express candidate support without physical completeness. See [logical-only](../product/logical-text-w1.md).
+
+
 ## EP-W4 — contrato atual de parcialidade
 
 Resultados com preparação semântica incompleta usam `version=1.2.0`,

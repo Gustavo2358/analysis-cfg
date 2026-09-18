@@ -75,7 +75,7 @@ final class LeadingDollarProductTest {
             assertEquals(List.of(expected),result.edges().stream().map(e->e.candidate().referenceName()).toList());
             assertEquals(DependencySiteFact.TargetStatus.RESOLVED_CANDIDATES,site.targetStatus());
         }
-        assertFalse(site.modelValueRemainder());assertTrue(site.sourceValueRemainder());
+        assertEquals(regional,site.modelValueRemainder());assertTrue(site.sourceValueRemainder());
         assertTrue(site.interpretationUnknownRemainder(),"UnknownName remains open even when lexical interpretation succeeds");
         assertTrue(site.effectiveUnknownRemainder());return result;
     }

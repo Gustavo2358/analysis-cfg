@@ -82,7 +82,7 @@ class RegionalCompositionTest {
         var a=assign(U,"producer-a",WHOLE,"ABCDEFGH");var b=assign(U,"producer-b",WHOLE,"ABCDEFGH");
         var y=assign(U,"producer-y",YWHOLE,"XXXXXXXX");var prefix=assign(U,"prefix",PREFIX,"WXYZ");var copy=copy("copy",R,0,Y,4,4);
         var p=twoBases(List.of(returning(U,"s0",List.of(a,b,y,prefix,copy))));var session=session(p);
-        var analysis=RegionalValuesAnalysis.prepare(session).analysis().orElseThrow();var engine=analysis.new Engine();
+        var analysis=RegionalValuesAnalysis.prepare(session,StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).analysis().orElseThrow();var engine=analysis.new Engine();
         var work=new io.github.gustavo2358.analysis.solver.DomainWork();var seed=engine.boundaries(session).iterator().next().state();
         var left=engine.operation(engine.operation(seed,y),a);var right=engine.operation(engine.operation(seed,y),b);
         assertFalse(engine.equivalent(left,right,work),"equal bytes with different supports are different states");

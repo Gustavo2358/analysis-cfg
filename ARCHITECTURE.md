@@ -1,5 +1,7 @@
 # Arquitetura — mapa curto
 
+Current W1 product policy: [logical-only dependency discovery](docs/product/logical-text-w1.md). Physical propagation is experimental, default OFF, and forbidden as automatic fallback. This policy supersedes historical physical qualification claims below; the corporate gate is still pending.
+
 Estado vigente: CP5 APPROVED / MERGED / CLOSED; CP6 discovery e W1A–W1C APPROVED / MERGED. W1D é a implementação autorizada em validação, com [contrato de dependências](docs/architecture/analysis-dependency-result-v1.md). Pins atuais: frontend53d7740, air-java2a37f5e, lower9de3825, AIR51b4d9a. W2 NOT_STARTED / NOT_AUTHORIZED. Os checkpoints abaixo conservam seu contexto histórico.
 
 

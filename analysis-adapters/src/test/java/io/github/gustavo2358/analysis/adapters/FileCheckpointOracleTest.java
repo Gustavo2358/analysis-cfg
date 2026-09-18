@@ -28,7 +28,7 @@ final class FileCheckpointOracleTest {
             var p=new Publication(model.id(),model.airVersion(),model.capabilities(),List.of(new Origins.Artifact(artifact,"FileCheckpointOracleTest.java",Optional.empty())),List.of(unit(u.id(),u.entries(),sequences,u.objects())),model.storage(),model.resources(),model.artifactRelations(),List.of(new Origins.Written(origin(model.id()),artifact,Optional.empty(),List.of(),true)),model.coverage(),List.of(new Evidence.Uncertainty(gap,"CHECKPOINT_COUNT_NOT_PROVEN",List.of(Evidence.Dimension.CONTROL),new Scopes.UnitScope(u.id()),"zero or more checkpoints",origin(model.id()))),model.premises());
             var codec=new AirJson();var bytes=codec.encode(p);assertEquals(p,codec.decode(bytes));
             var result=new DependencyAnalysis().prepare(codec.decode(bytes));var call=result.sites().getFirst();
-            assertEquals(List.of("SAFE0001"),call.candidates().stream().map(DependencySiteFact.Candidate::referenceName).toList());assertEquals(writes,call.modelValueRemainder());
+            assertEquals(List.of("SAFE0001"),call.candidates().stream().map(DependencySiteFact.Candidate::referenceName).toList());assertTrue(call.modelValueRemainder());assertEquals(0L,result.metrics().get("physicalGroupsApplied"));
             assertEquals(List.of("seed"),call.candidates().getFirst().supports().stream().map(s->s.producer().localId()).toList());
             assertEquals("CHKPT",result.fileDependencies().sites().getFirst().candidates().getFirst().referenceName());
             var dir=java.nio.file.Path.of("target/fd-w6/manual");java.nio.file.Files.createDirectories(dir);java.nio.file.Files.write(dir.resolve("checkpoint-writes-"+writes+".air.json"),bytes);

@@ -26,7 +26,7 @@ class RegionalValuesTest {
         return new Publication(P,base.airVersion(),new Capabilities.Manifest(List.of(Capabilities.MEMORY_REGIONS,Capabilities.IBM1047),List.of()),base.artifacts(),base.units(),base.storage(),base.resources(),base.artifactRelations(),base.origins(),base.coverage(),base.uncertainties(),base.premises());
     }
     static RegionalValuesAnalysis.Execution run(Publication p) {
-        var admission=RegionalValuesAnalysis.prepare(session(p));assertEquals(RegionalValuesAnalysis.Status.ACCEPTED,admission.status(),admission.reason());
+        var admission=RegionalValuesAnalysis.prepare(session(p),StorageAnalysisMode.EXPERIMENTAL_PHYSICAL);assertEquals(RegionalValuesAnalysis.Status.ACCEPTED,admission.status(),admission.reason());
         return admission.analysis().orElseThrow().execute();
     }
     static RegionalValueFact at(RegionalValuesAnalysis.Execution execution,String operation,ObjectId object) {

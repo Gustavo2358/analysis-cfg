@@ -21,9 +21,12 @@ public final class PossibleValuesAnalysis implements AnalysisDefinition<Possible
         return prepare(session,PROFILE);
     }
     public static Admission prepare(AnalysisSession session,String profile) {
+        return prepare(session,profile,null);
+    }
+    public static Admission prepare(AnalysisSession session,String profile,Set<ObjectId> demand) {
         if(!PROFILE.equals(profile)&&!EFFECTS_PROFILE.equals(profile))
             return new Admission(Status.UNSUPPORTED,"UNSUPPORTED_EFFECT_PROFILE",Optional.empty(),0,1);
-        try { return new Admission(Status.ACCEPTED,null,Optional.of(new PossibleValuesAnalysis(new TextProfile(session,EFFECTS_PROFILE.equals(profile)))),0,0); }
+        try { return new Admission(Status.ACCEPTED,null,Optional.of(new PossibleValuesAnalysis(new TextProfile(session,EFFECTS_PROFILE.equals(profile),demand))),0,0); }
         catch(TextProfile.Refusal refusal) {
             return new Admission(refusal.invalid?Status.INVALID_INPUT:Status.UNSUPPORTED,refusal.getMessage(),Optional.empty(),
                 refusal.getMessage().contains("STORAGE")?1:0,refusal.getMessage().contains("EFFECT")?1:0);
@@ -67,7 +70,7 @@ public final class PossibleValuesAnalysis implements AnalysisDefinition<Possible
         private Execution(TextProfile profile,DataflowResult<PossibleValuesState> dataflow,Map<String,Long> metrics){this.profile=profile;this.dataflow=dataflow;this.solveMetrics=metrics;}
         public DataflowResult<PossibleValuesState> dataflow(){return dataflow;}
         public Map<String,Long> solveMetrics(){return solveMetrics;}
-        public Map<String,Long> preparationMetrics(){var m=new HashMap<>(profile.preparation.snapshot());m.put("valuesInterned",(long)profile.universe.size());m.put("producersPrepared",(long)profile.universe.producerCount());m.put("poolHits",profile.universe.poolHits);m.put("unicodeScalarsHashed",profile.universe.scalarsHashed);return Map.copyOf(m);}
+        public Map<String,Long> preparationMetrics(){var m=new HashMap<>(profile.preparation.snapshot());m.put("demandCellsPrepared",(long)profile.preparedCellCount());m.put("demandWritesPrepared",(long)profile.writes.size());m.put("demandObjectsRequested",profile.requestedObjects);m.put("valuesInterned",(long)profile.universe.size());m.put("producersPrepared",(long)profile.universe.producerCount());m.put("poolHits",profile.universe.poolHits);m.put("unicodeScalarsHashed",profile.universe.scalarsHashed);return Map.copyOf(m);}
         public record Observations(ObservationBatch<ObjectId,ValueFact> batch,Map<String,Long> stateMetrics,Map<String,Long> quality) { }
         public Observations observe(Iterable<PointQuery<ObjectId>> queries) {
             var replayWork=new ValuesWork();

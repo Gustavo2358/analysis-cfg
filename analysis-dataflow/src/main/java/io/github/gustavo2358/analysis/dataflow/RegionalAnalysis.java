@@ -11,9 +11,13 @@ import io.github.gustavo2358.analysis.storage.*;
 import io.github.gustavo2358.analysis.structure.AnalysisSession;
 import io.github.gustavo2358.analysis.values.RegionalValuesAnalysis;
 import java.util.*;
+import io.github.gustavo2358.analysis.values.StorageAnalysisMode;
 
 /** Generic regional observation composition over the existing CFG, solver and replay. */
 public final class RegionalAnalysis {
+    private final StorageAnalysisMode mode;
+    public RegionalAnalysis(){this(StorageAnalysisMode.LOGICAL_ONLY);}
+    public RegionalAnalysis(StorageAnalysisMode mode){this.mode=Objects.requireNonNull(mode);}
     public RegionalAnalysisResult prepare(Publication publication,String resultId,List<PointQuery<StorageSubject>> queries) {
         return prepare(publication,resultId,queries,publication.units().stream().flatMap(u->u.entries().stream()).map(Entries.Entry::id).toList());
     }
@@ -37,7 +41,7 @@ public final class RegionalAnalysis {
         var storageIndex=new StorageIndex(session);
         var rdAdmission=ReachingDefinitions.prepare(new StatementEffects(storageIndex));
         if(rdAdmission.status()!=ReachingDefinitions.Status.ACCEPTED)throw new AnalysisDataflow.PreparationException(rdAdmission.status()==ReachingDefinitions.Status.INVALID_INPUT?AnalysisDataflow.Failure.INVALID_INPUT:AnalysisDataflow.Failure.UNSUPPORTED_PROFILE,rdAdmission.reason());
-        var valueAdmission=RegionalValuesAnalysis.prepare(session);
+        var valueAdmission=RegionalValuesAnalysis.prepare(session,mode);
         if(valueAdmission.status()!=RegionalValuesAnalysis.Status.ACCEPTED)throw new AnalysisDataflow.PreparationException(valueAdmission.status()==RegionalValuesAnalysis.Status.INVALID_INPUT?AnalysisDataflow.Failure.INVALID_INPUT:AnalysisDataflow.Failure.UNSUPPORTED_PROFILE,valueAdmission.reason());
         var rd=rdAdmission.analysis().orElseThrow().execute();var values=valueAdmission.analysis().orElseThrow().execute();
         var rdSolve=new TreeMap<>(rd.metrics());rdSolve.putAll(solver(rd.dataflow().metrics()));

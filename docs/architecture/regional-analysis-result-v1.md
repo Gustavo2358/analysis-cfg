@@ -1,5 +1,8 @@
 # Regional analysis result — ST-W5.3
 
+W1 operational policy: logical-only by default; physical propagation requires explicit experimental opt-in. The wire shape and historical profile label below are unchanged. `metrics.logicalOnlyMode` / `metrics.experimentalPhysicalMode` identify the dependency execution policy; regional observation `statistics.values.logicalOnlyMode` identifies its policy. Zero physical work is observable in physicalGroupsApplied/physicalWritesApplied counters. Existing remainder/analysisReasons/logicalAlternatives express candidate support without physical completeness. See [logical-only](../product/logical-text-w1.md).
+
+
 Status: API, composição e wire implementados; FAST de ST-W5.3 aprovado; qualificação W5/M3 pendente. Esta rota é separada do
 resultado escalar [1.1.0](analysis-dataflow-result-v1.md), que permanece intacto.
 O schema regional será fechado e testado por reader independente antes da

@@ -185,7 +185,7 @@ class LogicalOccurrenceWireContract(unittest.TestCase):
             o=r['observations'][index];v=o['values']['fact'];d=o['rd']['fact']
             self.assertEqual('BEFORE',o['point']['position']);self.assertTrue(v['modelValueRemainder'])
             self.assertEqual(['PROGA','PROGB'] if variant in ('mixed','open') else ['PROGA'],v['candidates'])
-            self.assertEqual(['PROGA'],[a['candidate'] for a in v['logicalAlternatives']])
+            self.assertEqual(['PROGA','PROGB'] if variant in ('mixed','open') else ['PROGA'],[a['candidate'] for a in v['logicalAlternatives']])
             self.assertTrue(all(a['producers'] for a in v['logicalAlternatives']))
             self.assertTrue(any(x['definition'].get('logicalObjectId') for x in d['definitions']))
             subject=['observations',index,'subject'];fact=['observations',index,'values','fact']
