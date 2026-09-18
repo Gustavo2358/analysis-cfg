@@ -55,8 +55,7 @@ public final class CallDependencyPlan {
             var invoke=(Operations.Invoke)site.operation();if(selected(invoke)) {
                 if(readable(invoke)) {
                     var place=((Expressions.Read)((Interactions.ComputedTarget)invoke.target()).name()).place();
-                    var binding=place instanceof Places.ObjectPlace object?session.index().object(object.object()).storage():null;
-                    if(CicsNameInterpreter.area(place,binding))cicsAreas.add(invoke.header().id());
+                    if(cicsArea(place,session))cicsAreas.add(invoke.header().id());
                 }
                 groups.computeIfAbsent(site.owner().id(),ignored->new HashSet<>()).add(group(invoke));
                 if(readable(invoke)&&!(((Expressions.Read)((Interactions.ComputedTarget)invoke.target()).name()).place() instanceof Places.ObjectPlace))slicedUnits.add(site.owner().id());
@@ -96,6 +95,22 @@ public final class CallDependencyPlan {
             }
         }
         return List.copyOf(registrations);
+    }
+    /** A closed Choice adds no area semantics: every alternative must satisfy the existing leaf proof. */
+    private static boolean cicsArea(Place place,AnalysisSession session) {
+        var pending=new ArrayDeque<Place>();pending.add(place);
+        while(!pending.isEmpty()) {
+            var current=pending.removeLast();
+            if(current instanceof Places.Choice choice) {
+                if(!(choice.typeRef() instanceof Types.Known type&&type.type()==Types.Builtin.TEXT)
+                    ||!(choice.remainder() instanceof Scopes.NoMemory)||choice.candidates().isEmpty())return false;
+                pending.addAll(choice.candidates());
+            } else {
+                var binding=current instanceof Places.ObjectPlace object?session.index().object(object.object()).storage():null;
+                if(!CicsNameInterpreter.area(current,binding))return false;
+            }
+        }
+        return true;
     }
     private static String part(String text){return text.length()+":"+text;}
 }
