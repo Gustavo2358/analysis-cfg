@@ -43,9 +43,10 @@ final class CallDependencyConsumer implements FactConsumer<DependencySiteFact> {
         Boolean model=null;boolean source=reachable.sourceUnknownRemainder();boolean interpretation=policy instanceof Interactions.UnknownName||cics&&(command.equals("UNKNOWN")||!(policy instanceof Interactions.ExtensionName e&&e.name().equals("cics-ts.program")&&e.version().equals("1")));
         if(invoke.target() instanceof Interactions.ComputedTarget t&&t.name() instanceof Expressions.Read read
             &&read.place() instanceof Places.Choice choice&&choice.typeRef() instanceof Types.UnknownType)interpretation=true;
+        if(cics&&computed&&!cicsAreas.contains(site.operationId()))interpretation=true;
         ObjectId subject=null;ProgramPoint point=null;TargetStatus status;
         if(!reachable.reachable())status=TargetStatus.UNREACHABLE_IN_MODEL;
-        else if(computed&&(!CallDependencyPlan.readable(invoke)||cics&&!cicsAreas.contains(site.operationId()))){status=TargetStatus.UNSUPPORTED_TARGET_EXPRESSION;interpretation=true;}
+        else if(computed&&(!CallDependencyPlan.readable(invoke))){status=TargetStatus.UNSUPPORTED_TARGET_EXPRESSION;interpretation=true;}
         else {
             if(computed) {
                 // Reconstruct the same immutable lookup key; PreparedFacts cannot request or execute work.

@@ -36,7 +36,7 @@ final class FileDependencyAnalysis {
             var routes=new HashMap<OperationId,Integer>();
             for(var indexed:session.index().sites(Operations.Invoke.class)) {
                 var invoke=(Operations.Invoke)indexed.operation();if(!FileDependencyConsumer.externalFile(invoke))continue;
-                routes.put(invoke.header().id(),(FileValueQuery.selected(invoke,session)?1:0)|(FileValueQuery.contextSelected(invoke,session)?2:0));
+                routes.put(invoke.header().id(),(FileValueQuery.selected(invoke,session)?1:0)|(FileValueQuery.contextSelected(invoke,session)?2:0)|(FileValueQuery.selected(invoke,session)&&!FileValueQuery.exactNameArea(invoke,session)?4:0));
             }
             var kinds=new HashMap<UnitId,Set<Class<? extends Operation>>>();
             for(var indexed:session.index().sites(Operations.Invoke.class))if(FileDependencyConsumer.selected(indexed.operation(),locals))kinds.computeIfAbsent(indexed.owner().id(),k->new HashSet<>()).add(Operations.Invoke.class);
@@ -45,7 +45,7 @@ final class FileDependencyAnalysis {
                 var entry=context.entry().id();if(!kinds.containsKey(entry.unit()))continue;
                 String key=part(entry.unit().localId())+part(entry.localId());var batch=ReachabilityProvider.batch("file-reach:"+key,entry);
                 var values=StorageValuesProvider.batch("file-values:"+key,StorageValuesProvider.key(entry,mode));
-                for(var kind:kinds.get(entry.unit()).stream().sorted(Comparator.comparing(Class::getName)).toList())for(int route:List.of(0,1,2,3)) {
+                for(var kind:kinds.get(entry.unit()).stream().sorted(Comparator.comparing(Class::getName)).toList())for(int route:List.of(0,1,2,3,5,7)) {
                     if(route!=0&&(kind!=Operations.Invoke.class||routes.entrySet().stream().noneMatch(e->e.getKey().unit().equals(entry.unit())&&e.getValue()==route)))continue;
                     boolean dynamic=route!=0;
                     var queries=new ArrayList<SiteInterest.SiteQuery<?,?>>();queries.add(new SiteInterest.SiteQuery<>(batch,FileDependencyConsumer::query));
