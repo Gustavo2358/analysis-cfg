@@ -56,3 +56,12 @@ proof permits closure; a must-overwrite removes BAD; an unreachable definition c
 contribute; truly unknown stays empty/open; FILE known/runtime remains enumerable.
 `CicsInvokeRouteTest` and `TargetTimingTest` preserve the BEFORE-site query and supports.
 No shared CFG, RD, storage lattice or solver implementation changed.
+
+## Unknown layout and REDEFINES
+
+For B REDEFINES A, MOVE PROGA to B followed by MOVE PROGB to A does not give the
+nominal fallback physical alias/overwrite authority. With unavailable layout, B's
+PROGA remains a possibility with remainder; PROGB is not copied to B merely because
+of source names or a REDEFINES clause. UnknownBinding retains the unenumerated
+alias effect. Strong physical proof may refine this result, but is not invented.
+The frontend and lower-produced AIR consumer fixture freeze this boundary.

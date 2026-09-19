@@ -209,7 +209,9 @@
       "trulyUnknownRemainsEmptyOpen",
       "positiveOverwriteCanRemoveAnEarlierCandidate",
       "weakeningPhysicalProofPreservesNominalCandidateAndOpensRemainder",
-      "fileConsumerAlsoPreservesKnownPlusRuntime"
+      "fileConsumerAlsoPreservesKnownPlusRuntime",
+      "lowerAreaUncertaintyReachesSiteAndWire",
+      "redefinesUnknownBindingCannotInventAliasOverwrite"
     ]
   },
   "analysis-dataflow": {

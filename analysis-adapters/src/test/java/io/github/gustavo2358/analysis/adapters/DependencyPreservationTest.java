@@ -69,4 +69,31 @@ class DependencyPreservationTest {
             assertTrue(f.unknownRemainder());assertNotNull(f.valuePoint());
         }
     }
+    private static Publication lowerProducedRedefines() throws Exception {
+        try(var in=DependencyPreservationTest.class.getResourceAsStream("/dependency-preservation/redefines-unknown.air.json")) {
+            return new io.github.gustavo2358.air.json.AirJson().decode(in.readAllBytes());
+        }
+    }
+    @Test void lowerAreaUncertaintyReachesSiteAndWire() throws Exception {
+        var p=lowerProducedRedefines();
+        var gap=p.uncertainties().stream().filter(u->u.code().equals("cobol-lower:CICS_PHYSICAL_NAME_AREA_UNPROVEN")).findFirst().orElseThrow();
+        var result=new DependencyAnalysis().prepare(p);var site=result.sites().getFirst();
+        assertTrue(site.uncertaintyRefs().contains(gap.id()),"specific physical-area cause must reach site");
+        assertEquals(List.of("PROGA"),names(site));assertTrue(site.effectiveUnknownRemainder());
+        var bytes=new java.io.ByteArrayOutputStream();new DependencyJson().write(result,bytes);
+        var json=bytes.toString(java.nio.charset.StandardCharsets.UTF_8);
+        int start=json.indexOf("\"uncertaintyRefs\"");assertTrue(start>=0);
+        var refs=json.substring(start,json.indexOf(']',start)+1);
+        assertTrue(refs.contains(gap.id().localId()),"specific ref must survive dependency JSON");
+    }
+    @Test void redefinesUnknownBindingCannotInventAliasOverwrite() throws Exception {
+        var p=lowerProducedRedefines();
+        var objects=p.units().getFirst().objects().stream().filter(o->o.displayName().filter(n->n.equals("A")||n.equals("B")).isPresent()).toList();
+        assertEquals(2,objects.size());assertNotEquals(objects.get(0).id(),objects.get(1).id());
+        assertTrue(objects.stream().allMatch(o->o.storage() instanceof Memory.UnknownBinding));
+        var site=new DependencyAnalysis().prepare(p).sites().getFirst();
+        assertEquals(List.of("PROGA"),names(site));assertTrue(site.modelValueRemainder());
+        assertTrue(site.interpretationUnknownRemainder());assertTrue(site.effectiveUnknownRemainder());
+    }
+
 }

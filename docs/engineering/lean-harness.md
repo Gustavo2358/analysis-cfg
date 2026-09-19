@@ -110,3 +110,20 @@ Consumer/review checklist:
 
 The executable regression and boundary contract are described in
 [dependency preservation](../domain/dependency-preservation.md).
+
+### VALUE under ordinary UNKNOWN entry
+
+A WORKING-STORAGE VALUE declaration alone does not prove the current value at a
+call site, persistent storage reinitialization, or a closed candidate set. It MUST
+NOT be collected directly by a dependency consumer. The current RF/EP contract
+nevertheless admits a recognized declarative value as an entry possibility
+(`DECLARATIVE_POSSIBILITY`, `POSSIBLE_LITERAL_BYTES`/`POSSIBLE_LOGICAL_TEXT`) with
+mandatory lifecycle remainder, without requiring invariance. Only the existing
+entry/value solver can propagate that evidence to BEFORE(site); positive overwrite
+or unreachability may exclude it. A provider must support the published representation;
+byte evidence does not silently enable physical propagation in logical-only mode.
+INITIAL or valid entry/invariance proof can strengthen precision under its own
+preconditions; it is not required for a supported entry possibility. The historical
+DVI “ordinary UNKNOWN has no VALUE candidate” restriction is superseded by RF/EP;
+it must not be reintroduced as a blanket gate. See the producer's
+`docs/domain/evidence-preserving-entry.md` and `RecallFirstEntryTest`.
