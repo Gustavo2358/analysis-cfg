@@ -1,6 +1,6 @@
 # W3 — COPYBOOK and DCLGEN source dependencies
 
-Status: IN_PROGRESS. STACKED ON W2 #42, base
+Status: DB2 implementation present; current integrated qualification status is recorded in the existing stacked PR. STACKED ON W2 #42, base
 `337196db14157037f91c15aae1f1baa96e6cbf1f`. Do not merge before W2.
 
 ## Architecture and discovery
@@ -13,7 +13,7 @@ The W3 producer captures syntax before expansion and uses explicit configured
 artifact inventory for positive DCLGEN classification. SQLCA, SQLDA and generic
 includes are never promoted based on INCLUDE syntax.
 
-Minimal path: source fact -> SP 2.30 -> existing AIR nominal resources ->
+Minimal path: source fact -> SP 2.31 -> existing AIR nominal resources ->
 SourceDependencyAnalysis -> dependencies.json. Frontend/lower/analysis-cfg change.
 AIR Java remains W2 `646ca3ab1687d43f7d2063fc2a8f3837ab3cf9fa`; no AIR-JAVA W3 PR.
 AIR ResourceDescription, ResourceDeclaration and original provenance suffice;
@@ -23,7 +23,7 @@ program association/resolution/authority fields. No new operation/schema/solver.
 
 ## Product contract
 
-`analysis-dependency-result` version **2.4.0** adds required `sourceDependencies`:
+`analysis-dependency-result` version **2.5.0** extends required `sourceDependencies`:
 
 * profile `source-dependencies@1`, available, remainder, gapCodes, occurrences;
 * dependencies keyed by program UnitId + kind + canonical name + qualification;
@@ -53,7 +53,7 @@ occurrence never erases another occurrence's remainder.
 
 `DependencyJson` orders dependency keys and supports canonically. Time measurements
 are outside the product; equal publication bytes produce byte-identical JSON.
-The strict Python reader accepts 2.4.0 and validates closed shapes, enums,
+The strict Python reader accepts 2.5.0 and 2.4.0 and validates closed shapes, enums,
 references, original ownership, support cardinality and remainder consistency.
 The W2 reader rejects 2.4.0 explicitly. Old supported versions retain their rules.
 
@@ -74,7 +74,7 @@ DEFAULT OFF and NO AUTOMATIC FALLBACK. W3 does not change the physical engine.
 
 SQL INCLUDE supports a syntactically proved single unquoted member; other
 INCLUDE-shaped payloads open a gap without fabricated candidate. DCLGEN contents
-and DB2 tables are out of scope. Qualified COPY names are retained, but flat
+are not inspected for implicit tables. Qualified COPY names are retained, but flat
 library resolution cannot prove qualified artifact identity. Cyclic COPY facts
 are retained in SP; when preprocessing invalidates the primary entry, existing
 lower admission blocks the entire runtime publication. This cycle probe remains
@@ -88,8 +88,7 @@ The source E2E fixture set lives in the pinned frontend. Local scale probes repo
 frontend/lower/aggregation timing and AIR/JSON sizes, with no runtime timing fields.
 
 Corporate: NOT EXECUTED; NOT AN ACCEPTANCE GATE; NO CORPORATE SOURCE USED.
-W4 recommendation: define a separate positively proved DB2 table reference contract
-before parsing SQL statements. W3 does not implement table extraction.
+DB2 TABLE continuation is implemented in the same W3 source contract, described below.
 
 ## Synthetic qualification
 
@@ -149,3 +148,87 @@ are recorded in the stacked PR closeout; no pending gate is represented as PASS 
 
 Reproduce using `scripts/project/source_dependencies_w3.py matrix|scale --runtime runtime.json --output new-directory`.
 The runtime file supplies exact checkout and classpath/main entries; it is local execution configuration, not product data.
+
+## DB2 TABLE continuation
+
+The previous COPYBOOK/DCLGEN/SQL_INCLUDE qualification remains a completed checkpoint.
+DB2 TABLE qualification is now required before the campaign returns to READY_FOR_REVIEW.
+Same branch and PR; no new administrative W4, no AIR/runtime/physical engine changes.
+
+## DB2 TABLE source dependencies
+
+Static SQL is extracted before embedded-language framing, from the normalized original EXEC SQL region and its existing SourceMap span. A lightweight tokenizer neutralizes SQL strings, host variables, `--` and `/* */` comments; paired parentheses are indexed once. A deterministic structural scanner recognizes table positions and scoped CTEs without constructing SQL grammar/AST/IR or evaluating expressions. Each region has independent state. Unsupported/malformed supported structure rejects all tentative table facts for that region and opens a gap.
+
+Supported: SELECT FROM/JOIN (including multiple and comma joins), schema qualification, INSERT target and INSERT SELECT, UPDATE/DELETE targets and nested SELECT, MERGE target and nominal/derived USING, CTE definitions, derived SELECT, UNION/EXCEPT/INTERSECT branches, and simple DECLARE name CURSOR FOR SELECT. Aliases are consumed at relation boundaries. Local CTE names are indexed before traversing definitions; recursive/forward CTE references conservatively open DB2_RECURSIVE_CTE_UNSUPPORTED. SQL expression validity, column binding and catalog object kinds are not certified: DB2_TABLE denotes a syntactic relation reference, which a catalog could resolve to a table/view/alias. No catalog resolution is attempted.
+
+Identity: uppercase ordinary identifier name plus explicit qualification; CLIENTE and DBPROD.CLIENTE remain distinct. Delimited identifiers are tokenized but conservatively rejected with DB2_DELIMITED_IDENTIFIER_UNSUPPORTED because the current source identity contract folds case. Table functions, VALUES-derived relations, DDL, stored procedures, unfamiliar relation constructs, and unsupported cursor options open explicit gaps. Nesting beyond 128 levels opens a gap. No inference from DCLGEN or INCLUDE names/content.
+
+SP 2.31.0 adds DB2_TABLE and typed operation/access per occurrence. Non-DB2 occurrences use NONE/NONE. SELECT uses READ; INSERT/UPDATE/DELETE use WRITE; MERGE target uses MERGE/READ_WRITE and nominal USING uses MERGE/READ (derived SELECT uses SELECT/READ). Authority STATIC_SQL_TABLE_POSITION is required. Resolution NOT_APPLICABLE is exclusive to DB2_TABLE: catalog lookup is outside this product and no physical artifact identity is fabricated. This nominal completeness is separate from source artifact resolution.
+
+PREPARE and EXECUTE, including EXECUTE IMMEDIATE literals, emit DYNAMIC_SQL_NOT_ANALYZED with remainder=true and no invented table. PossibleValues is never invoked. Other unsupported SQL shapes remain open. Existing source gap transport is conservative at compilation scope; no statement-level SQL gap provenance type is introduced in this continuation.
+
+Each support retains original EXEC SQL span, program association, sourceOwner and include chain. SQL in A.cpy is TRANSITIVE to the program and points into A.cpy. Repeated SELECT/UPDATE of the same qualified table aggregate into one dependency with separate usage-bearing supports. Source aggregation uses maps and canonical sorting, no CFG/reachability/RD/values/physical inputs. Runtime SQL stays opaque in its existing path.
+
+AIR stays unchanged at 646ca3ab1687d43f7d2063fc2a8f3837ab3cf9fa. Existing LiteralTarget category source-db2_table and ResourceDeclaration classification source.NOT_APPLICABLE carry nominal references; nameSource source.STATIC_SQL_<operation>_<access>@1 carries a closed usage profile. No runtime uses, objects or operations are added. The dependency wire is 2.5.0, with operation/access on every source support; 2.4.0 readers reject it. The new reader retains explicit support for older wires; lower upgrades legacy SP2.30 NONE usage only after rejecting DB2/new fields in that old envelope.
+
+Scope remains source-only, physical default OFF with NO AUTOMATIC FALLBACK. Existing cyclic COPY primary-entry admission limitation remains unchanged. Corporate NOT EXECUTED / NOT AN ACCEPTANCE GATE / NO CORPORATE SOURCE USED.
+
+Primary language references: [IBM CTE](https://www.ibm.com/docs/en/db2-for-zos/12.0.0?topic=statement-common-table-expression), [identifiers](https://www.ibm.com/docs/en/db2/12.1.x?topic=elements-identifiers), [tokens/comments](https://www.ibm.com/docs/en/db2-as-a-service?topic=elements-tokens). Scope is deliberately smaller than the SQL language.
+
+### DB2 synthetic scale
+
+| SQL statements | Table occurrences | Unique | Frontend ms | Extraction ms | Lower ms | Aggregation ms | AIR bytes | JSON bytes |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 10 | 10 | 10 | 865.6 | 0.132 | 665.2 | 0.214 | 123727 | 58560 |
+| 100 | 100 | 100 | 915.5 | 0.376 | 865.7 | 0.669 | 1108189 | 517514 |
+| 1000 | 1000 | 1000 | 1266.0 | 1.937 | 1767.1 | 5.690 | 10965001 | 5117428 |
+| 1000 | 1000 | 100 | 1266.0 | 2.007 | 1767.2 | 4.694 | 10965001 | 4954527 |
+
+Extraction and source aggregation are medians of 11 samples after 5 warmups; no runtime consumers/decoding included in those two timings. Frontend and lower include JVM startup, parsing and serialization. Same frozen runtime, no concurrent task builds.
+Counts exactly match all four oracles. Linear payload growth; map/index lookups and canonical O(N log N) sorting, no table pairwise loop. Small sizes are dominated by fixed/JIT cost. The repeated case retains 1000 supports with 100 unique identities.
+Memory bounded at -Xmx1g; peak/RSS not measured. Combined output includes existing opaque runtime SQL operations, explaining its size relative to empty-member COPY scale.
+
+DB2 final producer pins: frontend `b5e83974717b21f92b66069137b973ea4afcb8e8`; lower `4314c37198db57570f83c5ecfb63fec11bb796ca`. Earlier qualification and pins above remain historical checkpoint evidence.
+
+### DB2 acceptance — real source pipeline
+
+| Fixture | Expected tables | Actual tables | Operations/access | Source owner | Remainder |
+| --- | --- | --- | --- | --- | --- |
+| db2-alias-not-table | CLIENTE, CONTA | CLIENTE, CONTA | SELECT/READ | program.cbl | false |
+| db2-case | CLIENTE | CLIENTE | SELECT/READ | program.cbl | false |
+| db2-comment-negative | CLIENTE | CLIENTE | SELECT/READ | program.cbl | false |
+| db2-composition | DBPROD.CLIENTE, DBPROD.CONTA | DBPROD.CLIENTE, DBPROD.CONTA | SELECT/READ | program.cbl | false |
+| db2-cte | CLIENTE | CLIENTE | SELECT/READ | program.cbl | false |
+| db2-cte-name-not-table | CLIENTE | CLIENTE | SELECT/READ | program.cbl | false |
+| db2-cursor | CLIENTE | CLIENTE | SELECT/READ | program.cbl | false |
+| db2-delete | CLIENTE, HISTORICO | CLIENTE, HISTORICO | DELETE/WRITE, SELECT/READ | program.cbl | false |
+| db2-delimited-name | none | none | — | — | true |
+| db2-derived-table | CLIENTE, CONTA | CLIENTE, CONTA | SELECT/READ | program.cbl | false |
+| db2-dynamic-execute-immediate | none | none | — | — | true |
+| db2-dynamic-prepare | none | none | — | — | true |
+| db2-host-variable-negative | CLIENTE | CLIENTE | SELECT/READ | program.cbl | false |
+| db2-insert | CLIENTE | CLIENTE | INSERT/WRITE | program.cbl | false |
+| db2-insert-select | DESTINO, ORIGEM | DESTINO, ORIGEM | INSERT/WRITE, SELECT/READ | program.cbl | false |
+| db2-inside-copybook | CLIENTE | CLIENTE | SELECT/READ | A.cpy | false |
+| db2-malformed-static-sql | none | none | — | — | true |
+| db2-merge | AJUSTE, CONTA | AJUSTE, CONTA | MERGE/READ, MERGE/READ_WRITE | program.cbl | false |
+| db2-merge-derived | AJUSTE, CONTA | AJUSTE, CONTA | MERGE/READ_WRITE, SELECT/READ | program.cbl | false |
+| db2-multiple-ctes | CLIENTE, CONTA | CLIENTE, CONTA | SELECT/READ | program.cbl | false |
+| db2-recursive-cte | none | none | — | — | true |
+| db2-repeated-mixed-access | CLIENTE | CLIENTE | SELECT/READ, UPDATE/WRITE | program.cbl | false |
+| db2-schema-qualified | CLIENTE, DBPROD.CLIENTE | CLIENTE, DBPROD.CLIENTE | SELECT/READ | program.cbl | false |
+| db2-select-join | CLIENTE, CONTA, MOVIMENTO, SALDO | CLIENTE, CONTA, MOVIMENTO, SALDO | SELECT/READ | program.cbl | false |
+| db2-select-one | CLIENTE | CLIENTE | SELECT/READ | program.cbl | false |
+| db2-statement-scope | A, CLIENTE | A, CLIENTE | SELECT/READ | program.cbl | false |
+| db2-string-from-negative | CLIENTE | CLIENTE | SELECT/READ | program.cbl | false |
+| db2-union | CLIENTE, CONTA | CLIENTE, CONTA | SELECT/READ | program.cbl | false |
+| db2-unsupported-sql-shape | none | none | — | — | true |
+| db2-update | CONTA | CONTA | UPDATE/WRITE | program.cbl | false |
+| db2-update-subquery | CLIENTE, CONTA | CLIENTE, CONTA | SELECT/READ, UPDATE/WRITE | program.cbl | false |
+
+31/31 PASS in two independent runs; final dependencies.json byte-identical. Expectations are authored separately from extractor output.
+Original EXEC SQL span and column 7 checked for every support. Nested table owner is A.cpy:1, TRANSITIVE; the main program association is retained. Repeated mixed-access CLIENTE is one identity with 3 supports at distinct original statements (SELECT/UPDATE/SELECT).
+Dynamic PREPARE/EXECUTE IMMEDIATE produce no tables and DYNAMIC_SQL_NOT_ANALYZED. Delimited names, recursive CTEs and unsupported relation shapes intentionally pass as explicit partial negatives.
+Composition proves COPYBOOK CPY001, DCLGEN DCLCLI, generic SQL_INCLUDE GENERIC, DB2_TABLE DBPROD.CLIENTE/DBPROD.CONTA, CALL SUBA and FILE DD001. Physical metrics are 1/0/0/0 (logical/experimental/groups/writes).
+
+The prior 21 W3 source cases also PASS in two executions on the final DB2 runtime, with byte-identical 2.5.0 products and unchanged nominal behavior. The extra cyclic COPY case remains explicitly BLOCKED at existing lower primary-entry admission.

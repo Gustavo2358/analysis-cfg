@@ -112,12 +112,72 @@ def scale(runtime,work):
     return rows
 
 
+def db2_matrix(runtime, fixtures, work):
+    rows=[]
+    for case in sorted(fixtures.iterdir()):
+        if not (case/'expected.json').exists():continue
+        expected=json.loads((case/'expected.json').read_text());out=work/case.name;out.mkdir();phases={}
+        for stage,args in [('frontend',['--source',case/'program.cbl','--copybooks',case/'copybooks','--source-inventory',case/'inventory.json','--output',out/'front']),('lower',[out/'front/cobol-semantic-product.json',out/'air.json']),('cfg',[out/'air.json',out/'cfg.json']),('dependency',[out/'air.json',out/'dependencies.json'])]:
+            phases[stage]=execute(runtime,stage,args,out)
+            assert phases[stage]['exit']==0,(case.name,stage,phases[stage])
+        d=read(out/'dependencies.json');source=d['sourceDependencies'];facts=[f for f in source['dependencies'] if f['kind']=='DB2_TABLE'];actual=[];supports=[]
+        origins={o['id']['localId']:o for o in d['origins']};artifacts={a['id']['localId']:a['logicalName'] for a in d['artifacts']}
+        for fact in facts:
+            identity=(fact['qualification']+'.' if fact['qualification'] else '')+fact['name']
+            for support in fact['supports']:
+                actual.append(identity+':'+support['operation']+':'+support['access'])
+                assert support['classificationAuthority']=='STATIC_SQL_TABLE_POSITION' and support['resolution']=='NOT_APPLICABLE' and support['resolvedArtifact']==''
+                original=origins[support['origin']['localId']]
+                if original['kind']=='DERIVED':
+                    matches=[origins[i['localId']] for i in original['inputs'] if origins[i['localId']]['kind']=='WRITTEN' and origins[i['localId']]['artifact']==support['sourceOwner']]
+                    assert len(matches)==1;original=matches[0]
+                location={'file':artifacts[support['sourceOwner']['localId']],'line':int(original['location']['startLine']),'relationship':support['relationship']}
+                assert location in expected['locations'],(case.name,location,expected['locations'])
+                assert int(original['location']['startColumn'])==7
+                supports.append(dict(table=identity,operation=support['operation'],access=support['access'],**location))
+        assert sorted(actual)==sorted(expected['tables']),(case.name,actual,expected)
+        assert source['remainder']==expected['remainder'],(case.name,source)
+        if case.name.startswith('db2-dynamic'):assert 'DYNAMIC_SQL_NOT_ANALYZED' in source['gapCodes']
+        if case.name=='db2-repeated-mixed-access':assert len(facts)==1 and sorted(s['line'] for s in supports)==[x['line'] for x in expected['locations']]
+        if case.name=='db2-composition':
+            assert {x['kind'] for x in source['dependencies']}=={'COPYBOOK','DCLGEN','SQL_INCLUDE','DB2_TABLE'}
+            assert {x['referenceName'] for site in d['sites'] for x in site['candidates']}=={'SUBA'}
+            assert any(x['name']=='DD001' for x in d['fileDependencies']['declarations'])
+        assert [d['metrics'][k] for k in ('logicalOnlyMode','experimentalPhysicalMode','physicalGroupsApplied','physicalWritesApplied')]==[1,0,0,0]
+        row=dict(fixture=case.name,status='PASS',expected=expected['tables'],actual=actual,supports=supports,remainder=source['remainder'],gapCodes=source['gapCodes'],phases=phases,sha256=hashlib.sha256((out/'dependencies.json').read_bytes()).hexdigest())
+        rows.append(row);(work/'results.json').write_text(json.dumps(rows,indent=2)+'\n');print(case.name,'PASS',flush=True)
+    return rows
+
+
+def db2_scale(runtime,work):
+    rows=[]
+    for count,unique in ((10,10),(100,100),(1000,1000),(1000,100)):
+        out=work/(str(count)+'-'+str(unique));out.mkdir();(out/'copybooks').mkdir();names=['T'+str(i).zfill(5) for i in range(unique)]
+        lines=['IDENTIFICATION DIVISION.','PROGRAM-ID. SCALEDB2.','PROCEDURE DIVISION.']
+        for i in range(count):lines+=['EXEC SQL SELECT * FROM '+names[i%unique]+' END-EXEC.']
+        lines+=['GOBACK.'];(out/'program.cbl').write_text(''.join('       '+x+'\n' for x in lines));row=dict(sqlStatements=count,occurrences=count,unique=unique,phases={})
+        for stage,args in [('frontend',['--source',out/'program.cbl','--copybooks',out/'copybooks','--output',out/'front']),('lower',[out/'front/cobol-semantic-product.json',out/'air.json']),('dependency',[out/'air.json',out/'dependencies.json']),('sourceTiming',[out/'air.json'])]:
+            row['phases'][stage]=execute(runtime,stage,args,out);assert row['phases'][stage]['exit']==0,(stage,row)
+        d=read(out/'dependencies.json');facts=d['sourceDependencies'];assert len(facts['dependencies'])==unique and facts['occurrences']==count and not facts['remainder']
+        assert all(f['kind']=='DB2_TABLE' for f in facts['dependencies'])
+        assert [d['metrics'][k] for k in ('logicalOnlyMode','experimentalPhysicalMode','physicalGroupsApplied','physicalWritesApplied')]==[1,0,0,0]
+        row.update(json.loads((out/'sourceTiming.log').read_text()));row.update(airBytes=(out/'air.json').stat().st_size,jsonBytes=(out/'dependencies.json').stat().st_size)
+        if 'db2ExtractionTiming' in runtime:
+            phase=execute(runtime,'db2ExtractionTiming',[count,unique],out);assert phase['exit']==0;row.update(json.loads((out/'db2ExtractionTiming.log').read_text()))
+        rows.append(row);(work/'results.json').write_text(json.dumps(rows,indent=2)+'\n');print(count,unique,'PASS',flush=True)
+    return rows
+
+
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('mode',choices=['matrix','scale']);parser.add_argument('--runtime',type=Path,required=True)
+    parser.add_argument('mode',choices=['matrix','scale','db2-matrix','db2-scale']);parser.add_argument('--runtime',type=Path,required=True)
     parser.add_argument('--fixtures',type=Path);parser.add_argument('--output',type=Path,required=True)
     args=parser.parse_args();runtime=json.loads(args.runtime.read_text());work=args.output.resolve();work.mkdir(parents=True,exist_ok=False)
-    if args.mode=='matrix':
+    if args.mode=='db2-matrix':
+        fixtures=args.fixtures or Path(runtime['checkouts']['proleap-poc'])/'src/test/resources/cobol/source-dependencies-w3-db2'
+        db2_matrix(runtime,fixtures.resolve(),work)
+    elif args.mode=='db2-scale':db2_scale(runtime,work)
+    elif args.mode=='matrix':
         fixtures=args.fixtures or Path(runtime['checkouts']['proleap-poc'])/'src/test/resources/cobol/source-dependencies-w3'
         matrix(runtime,fixtures.resolve(),work)
     else:scale(runtime,work)

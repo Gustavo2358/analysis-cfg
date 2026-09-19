@@ -11,7 +11,7 @@ import static io.github.gustavo2358.analysis.dependencies.DependencySiteFact.*;
 public final class DependencyJson {
     public void write(DependencyResult result,OutputStream stream) throws IOException {
         var out=new JsonOutput(stream);
-        var document=object("schema","analysis-dependency-result","version","2.4.0","airVersion",version(result.airVersion()),
+        var document=object("schema","analysis-dependency-result","version","2.5.0","airVersion",version(result.airVersion()),
             "publication",id(result.publication()),"interpretationProfile","per-site","valuesProfile","scalar-text-effects@1",
             "modelScope",result.structuralScope()?"STRUCTURAL_AIR_OCCURRENCES":"KNOWN_GRAPH_ENTRY","publicationInventory",inventory(result.publicationInventory()),
             "sites",result.sites().stream().sorted(Comparator.comparing(DependencySiteFact::entry,io.github.gustavo2358.analysis.plan.AnalysisKey.ENTRY_ORDER).thenComparing(f->f.operation().localId())).map(s->site(s,true)).toList(),

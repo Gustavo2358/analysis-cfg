@@ -62,4 +62,18 @@ final class SourceDependencyTest {
         var result=new SourceDependencyAnalysis().prepare(publication("source-copybook","source.COPY_SYNTAX@1","source.RESOLVED",1000,false));
         assertEquals(1000,result.occurrences());assertEquals(1,result.dependencies().size());assertEquals(1000,result.dependencies().getFirst().supports().size());
     }
+    @Test void db2UsageRemainsOnSupportsWithoutNominalSolver() throws Exception {
+        var p=publication("source-db2_table","source.STATIC_SQL_SELECT_READ@1","source.NOT_APPLICABLE",2,true);
+        var resources=new ArrayList<>(p.resources());
+        for(int i=0;i<resources.size();i++) {
+            var r=resources.get(i);if(!r.id().localId().equals("source-occurrence-1"))continue;
+            var d=r.declaration().orElseThrow();resources.set(i,new Interactions.Resource(r.id(),r.description(),r.origin(),Optional.of(new Interactions.ResourceDeclaration(d.owner(),d.name(),d.classification(),"source.STATIC_SQL_UPDATE_WRITE@1",d.objects(),d.uses()))));
+        }
+        var mixed=new Publication(p.id(),p.airVersion(),p.capabilities(),p.artifacts(),p.units(),p.storage(),resources,p.artifactRelations(),p.origins(),p.coverage(),p.uncertainties(),p.premises());
+        var facts=new SourceDependencyAnalysis().prepare(mixed);assertEquals(1,facts.dependencies().size());assertFalse(facts.partial());
+        var supports=facts.dependencies().getFirst().supports();assertEquals(Set.of("SELECT","UPDATE"),new HashSet<>(supports.stream().map(s->s.operation().name()).toList()));assertTrue(supports.stream().allMatch(SourceDependencyResult.Support::transitive));
+        assertEquals(mixed,new AirJson().decode(new AirJson().encode(mixed)));
+        assertThrows(IllegalArgumentException.class,()->new SourceDependencyAnalysis().prepare(publication("source-db2_table","source.STATIC_SQL_SELECT_WRITE@1","source.NOT_APPLICABLE",1,false)));
+        assertThrows(IllegalArgumentException.class,()->new SourceDependencyAnalysis().prepare(publication("source-db2_table","source.UNKNOWN@1","source.NOT_APPLICABLE",1,false)));
+    }
 }

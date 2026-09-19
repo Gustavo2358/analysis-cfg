@@ -275,9 +275,9 @@
       "src/main/java/io/github/gustavo2358/cobolexplorer/CicsCommandSyntax.java",
       "src/test/java/io/github/gustavo2358/cobolexplorer/CicsFileControlTest.java"
     ],
-    "semantic_product_version": "2.30.0",
+    "semantic_product_version": "2.31.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "1d20897965db55fca39a6a654c0386229f1e5232",
+    "commit": "b5e83974717b21f92b66069137b973ea4afcb8e8",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -309,7 +309,7 @@
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "W1 locally qualified; ready for human review, not merged",
-    "commit": "c55c9ca13afa46e053c53491c2af3f1cc3ed1423",
+    "commit": "4314c37198db57570f83c5ecfb63fec11bb796ca",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -386,8 +386,9 @@
   },
   "source_dependencies_w3": {
     "profile": "source-dependencies@1",
-    "wire": "analysis-dependency-result/2.4.0",
+    "wire": "analysis-dependency-result/2.5.0",
     "air_model_changed": false,
-    "physical_fallback": false
+    "physical_fallback": false,
+    "db2_authority": "STATIC_SQL_TABLE_POSITION"
   }
 }

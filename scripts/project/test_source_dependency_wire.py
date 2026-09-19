@@ -8,9 +8,10 @@ from dependency_wire import read, validate
 
 def exercise(path):
     document=read(path)
-    for mutation in ('missing','unavailable','unknown','kind','authority','no-support','origin','owner','resolution','count','remainder','old-version'):
+    for mutation in ('usage','missing','unavailable','unknown','kind','authority','no-support','origin','owner','resolution','count','remainder','old-version'):
         d=copy.deepcopy(document); value=d['sourceDependencies']; fact=value['dependencies'][0]; support=fact['supports'][0]
-        if mutation=='missing': del d['sourceDependencies']
+        if mutation=='usage':support['operation']='SELECT';support['access']='WRITE'
+        elif mutation=='missing': del d['sourceDependencies']
         elif mutation=='unavailable':value['available']=False;value['remainder']=True;d['analysisStatus']='PARTIAL'
         elif mutation=='unknown':value['unknown']=True
         elif mutation=='kind':fact['kind']='TABLE'
@@ -25,7 +26,7 @@ def exercise(path):
         try:validate(d)
         except (ValueError,KeyError,TypeError):pass
         else:raise AssertionError('accepted malformed source product: '+mutation)
-    print('PASS: W3 writer/reader and 12 negative wire cases')
+    print('PASS: W3 writer/reader and 13 negative wire cases')
 
 
 if __name__=='__main__':

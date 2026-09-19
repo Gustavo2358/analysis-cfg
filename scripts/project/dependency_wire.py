@@ -179,8 +179,8 @@ def reasons(values):
 
 def file_dependencies(f, document):
     fields(f, 'valuesProfile declarationInventory declarations sites edges metrics')
-    context_profile = document['version'] in ('2.3.0','2.4.0')
-    computed_profile = document['version'] in ('2.2.0','2.3.0','2.4.0')
+    context_profile = document['version'] in ('2.3.0','2.4.0','2.5.0')
+    computed_profile = document['version'] in ('2.2.0','2.3.0','2.4.0','2.5.0')
     require(f['valuesProfile'] == ('file-values-context@1' if context_profile else 'file-values@1' if computed_profile else 'file-literal@1'), 'FILE values profile')
     require(f['declarationInventory'] in ('COMPLETE','PARTIAL','UNAVAILABLE'), 'FILE inventory')
     publication = document['publication']['localId']
@@ -249,7 +249,7 @@ def file_dependencies(f, document):
         for k, domain in (('entry','entry'),('sequence','label'),('operation','operation')):
             ref(s[k],domain); require(s[k]['unit']==s['owner']['localId'], 'FILE site owner')
         text(s['action']); require(bool(s['action']),'FILE action')
-        local = s['targetKind'] == 'LOCAL' and document['version'] in ('2.1.0','2.2.0','2.3.0','2.4.0')
+        local = s['targetKind'] == 'LOCAL' and document['version'] in ('2.1.0','2.2.0','2.3.0','2.4.0','2.5.0')
         if local: require(s['namespace'] is None, 'local use has no external namespace')
         else: text(s['namespace']); require(bool(s['namespace']), 'FILE namespace')
         require(local or s['targetKind'] in ('LITERAL','COMPUTED'), 'FILE target kind')
@@ -312,14 +312,14 @@ def source_dependencies(value, document):
     for d in dependencies:
         fields(d,'program kind name qualification remainder supports')
         identity(d['program'],'unit'); require(d['program']['publication']==publication,'foreign source owner')
-        require(d['kind'] in ('COPYBOOK','DCLGEN','SQL_INCLUDE'),'source kind')
+        require(d['kind'] in (('COPYBOOK','DCLGEN','SQL_INCLUDE','DB2_TABLE') if document['version']=='2.5.0' else ('COPYBOOK','DCLGEN','SQL_INCLUDE')),'source kind')
         text(d['name']); text(d['qualification']); boolean(d['remainder'])
         require(d['name'] and d['name']==d['name'].upper() and d['qualification']==d['qualification'].upper(),'canonical source name')
         array(d['supports']); require(bool(d['supports']),'source evidence absent')
         ordered(d['supports'],lambda s:u16(s['occurrence']['localId']))
         incomplete=False
         for support in d['supports']:
-            fields(support,'occurrence origin sourceOwner relationship resolution resolvedArtifact classificationAuthority')
+            fields(support,'occurrence origin sourceOwner relationship resolution resolvedArtifact classificationAuthority'+(' operation access' if document['version']=='2.5.0' else ''))
             for name,domain in [('occurrence','resource'),('origin','origin'),('sourceOwner','artifact')]:
                 identity(support[name],domain); require(support[name]['publication']==publication,'foreign source reference')
             occurrence=support['occurrence']['localId']; require(occurrence not in seen,'duplicate source occurrence'); seen.add(occurrence)
@@ -330,14 +330,18 @@ def source_dependencies(value, document):
                 require(len(written)==1,'original source evidence ambiguous'); origin=written[0]
             require(origin['kind']=='WRITTEN' and origin['artifact']==support['sourceOwner'] and origin['location'] is not None,'written original source evidence')
             require(support['relationship']==('TRANSITIVE' if origin['includes'] else 'DIRECT'),'nested source ownership')
-            require(support['resolution'] in ('RESOLVED','UNRESOLVED','CYCLIC','IO_ERROR'),'source resolution')
+            require(support['resolution'] in ('RESOLVED','UNRESOLVED','CYCLIC','IO_ERROR','NOT_APPLICABLE'),'source resolution')
             text(support['resolvedArtifact']); require(bool(support['resolvedArtifact'])==(support['resolution']=='RESOLVED'),'resolved artifact presence')
             authority=support['classificationAuthority']
-            require(authority in ('COPY_SYNTAX','CONFIGURED_DCLGEN','CONFIGURED_SQL_INCLUDE','BUILTIN_SQL_INCLUDE','UNKNOWN'),'source authority')
+            require(authority in ('COPY_SYNTAX','CONFIGURED_DCLGEN','CONFIGURED_SQL_INCLUDE','BUILTIN_SQL_INCLUDE','UNKNOWN','STATIC_SQL_TABLE_POSITION'),'source authority')
             require((d['kind']=='COPYBOOK')==(authority=='COPY_SYNTAX'),'COPY authority')
             require((d['kind']=='DCLGEN')==(authority=='CONFIGURED_DCLGEN'),'DCLGEN authority')
             require(d['kind']!='DCLGEN' or d['name'] not in ('SQLCA','SQLDA'),'builtins not DCLGEN')
-            incomplete |= support['resolution']!='RESOLVED' or authority=='UNKNOWN'
+            require((d['kind']=='DB2_TABLE')==(authority=='STATIC_SQL_TABLE_POSITION')==(support['resolution']=='NOT_APPLICABLE'),'DB2 authority/resolution')
+            if document['version']=='2.5.0':
+                usage=(support['operation'],support['access'])
+                require(usage in {('SELECT','READ'),('INSERT','WRITE'),('UPDATE','WRITE'),('DELETE','WRITE'),('MERGE','READ'),('MERGE','READ_WRITE')} if d['kind']=='DB2_TABLE' else usage==('NONE','NONE'),'source usage')
+            incomplete |= support['resolution'] not in ('RESOLVED','NOT_APPLICABLE') or authority=='UNKNOWN'
             count+=1
         require(d['remainder']==incomplete,'source remainder')
     require(value['occurrences']==count,'source occurrence count')
@@ -345,10 +349,10 @@ def source_dependencies(value, document):
 
 
 def validate(d):
-    files = d.get('version') in ('2.0.0','2.1.0','2.2.0','2.3.0','2.4.0')
+    files = d.get('version') in ('2.0.0','2.1.0','2.2.0','2.3.0','2.4.0','2.5.0')
     extended = files or d.get('version') == '1.2.0'
-    fields(d, 'schema version airVersion publication interpretationProfile valuesProfile modelScope publicationInventory sites edges metrics origins artifacts sourceUncertaintyRefs' + (' analysisStatus analysisReasons' if extended else '') + (' analysisBoundary fileDependencies' if files else '') + (' sourceDependencies' if d.get('version')=='2.4.0' else ''))
-    require(d['schema'] == 'analysis-dependency-result' and d['version'] in ('1.1.0', '1.2.0', '2.0.0', '2.1.0', '2.2.0', '2.3.0', '2.4.0') and d['airVersion'] == '2.0.0', 'schema/version')
+    fields(d, 'schema version airVersion publication interpretationProfile valuesProfile modelScope publicationInventory sites edges metrics origins artifacts sourceUncertaintyRefs' + (' analysisStatus analysisReasons' if extended else '') + (' analysisBoundary fileDependencies' if files else '') + (' sourceDependencies' if d.get('version') in ('2.4.0','2.5.0') else ''))
+    require(d['schema'] == 'analysis-dependency-result' and d['version'] in ('1.1.0', '1.2.0', '2.0.0', '2.1.0', '2.2.0', '2.3.0', '2.4.0', '2.5.0') and d['airVersion'] == '2.0.0', 'schema/version')
     identity(d['publication'], 'publication')
     require(d['interpretationProfile'] == 'per-site' and d['valuesProfile'] == 'scalar-text-effects@1' and d['modelScope'] in (('KNOWN_GRAPH_ENTRY', 'STRUCTURAL_AIR_OCCURRENCES') if extended else ('KNOWN_GRAPH_ENTRY',)), 'profiles/scope')
     require(d['publicationInventory'] in ('COMPLETE', 'PARTIAL', 'UNAVAILABLE'), 'inventory')
@@ -358,7 +362,7 @@ def validate(d):
     if extended:
         require(d['analysisStatus'] in (('COMPLETE','PARTIAL') if files else ('PARTIAL',)), 'extended result partial status')
         reasons(d['analysisReasons'])
-        require((d['analysisStatus']=='PARTIAL') == (bool(d['analysisReasons']) or any(s['analysisStatus'] == 'PARTIAL' for s in d['sites']) or d.get('version')=='2.4.0' and d['sourceDependencies']['available'] and d['sourceDependencies']['remainder']), 'partial result must expose its cause')
+        require((d['analysisStatus']=='PARTIAL') == (bool(d['analysisReasons']) or any(s['analysisStatus'] == 'PARTIAL' for s in d['sites']) or d.get('version') in ('2.4.0','2.5.0') and d['sourceDependencies']['available'] and d['sourceDependencies']['remainder']), 'partial result must expose its cause')
         structural = any(s['reachability'] == 'UNKNOWN' for s in d['sites']) or not d['sites'] and bool(d['analysisReasons'])
         require((d['modelScope'] == 'STRUCTURAL_AIR_OCCURRENCES') == structural, 'structural/graph scope mismatch')
     expected = [dict(caller=s['caller'], entry=s['entry'], site=s['operation'], candidate=c, openSite=s['effectiveUnknownRemainder'])
@@ -399,7 +403,7 @@ def validate(d):
     if files:
         require(d['analysisBoundary']=='COBOL_SOURCE_ONLY','source-only boundary')
         file_dependencies(d['fileDependencies'],d)
-    if d['version']=='2.4.0':
+    if d['version'] in ('2.4.0','2.5.0'):
         source_dependencies(d['sourceDependencies'],d)
     return d
 

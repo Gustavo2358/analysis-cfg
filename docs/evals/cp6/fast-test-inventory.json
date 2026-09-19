@@ -200,7 +200,8 @@
       "deduplicatesWithoutDiscardingOriginalOwnersAndSupports",
       "retainsNominalUnresolvedAndUnknownSqlIncludes",
       "requiresPositiveDclgenAuthorityAndClosedProfile",
-      "aggregatesThousandOccurrencesWithoutRuntimeAnalysis"
+      "aggregatesThousandOccurrencesWithoutRuntimeAnalysis",
+      "db2UsageRemainsOnSupportsWithoutNominalSolver"
     ]
   },
   "analysis-dataflow": {
