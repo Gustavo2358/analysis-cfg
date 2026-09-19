@@ -179,16 +179,16 @@ Primary language references: [IBM CTE](https://www.ibm.com/docs/en/db2-for-zos/1
 
 | SQL statements | Table occurrences | Unique | Frontend ms | Extraction ms | Lower ms | Aggregation ms | AIR bytes | JSON bytes |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 10 | 10 | 10 | 865.6 | 0.132 | 665.2 | 0.214 | 123727 | 58560 |
-| 100 | 100 | 100 | 915.5 | 0.376 | 865.7 | 0.669 | 1108189 | 517514 |
-| 1000 | 1000 | 1000 | 1266.0 | 1.937 | 1767.1 | 5.690 | 10965001 | 5117428 |
-| 1000 | 1000 | 100 | 1266.0 | 2.007 | 1767.2 | 4.694 | 10965001 | 4954527 |
+| 10 | 10 | 10 | 865.4 | 0.206 | 665.1 | 0.292 | 123727 | 58560 |
+| 100 | 100 | 100 | 915.5 | 0.624 | 865.5 | 0.640 | 1108189 | 517514 |
+| 1000 | 1000 | 1000 | 1266.1 | 2.493 | 1767.0 | 4.708 | 10965001 | 5117428 |
+| 1000 | 1000 | 100 | 1266.0 | 2.299 | 1767.1 | 4.459 | 10965001 | 4954527 |
 
 Extraction and source aggregation are medians of 11 samples after 5 warmups; no runtime consumers/decoding included in those two timings. Frontend and lower include JVM startup, parsing and serialization. Same frozen runtime, no concurrent task builds.
 Counts exactly match all four oracles. Linear payload growth; map/index lookups and canonical O(N log N) sorting, no table pairwise loop. Small sizes are dominated by fixed/JIT cost. The repeated case retains 1000 supports with 100 unique identities.
 Memory bounded at -Xmx1g; peak/RSS not measured. Combined output includes existing opaque runtime SQL operations, explaining its size relative to empty-member COPY scale.
 
-DB2 final producer pins: frontend `b5e83974717b21f92b66069137b973ea4afcb8e8`; lower `4314c37198db57570f83c5ecfb63fec11bb796ca`. Earlier qualification and pins above remain historical checkpoint evidence.
+DB2 final producer pins: frontend `49ce9a7e727ad0c3301cc1fdbb6da9828439b9ce`; lower `3a2c9751c6b15239a5c63812038c77bf472e9b37`. Earlier qualification and pins above remain historical checkpoint evidence.
 
 ### DB2 acceptance — real source pipeline
 
@@ -214,6 +214,8 @@ DB2 final producer pins: frontend `b5e83974717b21f92b66069137b973ea4afcb8e8`; lo
 | db2-merge | AJUSTE, CONTA | AJUSTE, CONTA | MERGE/READ, MERGE/READ_WRITE | program.cbl | false |
 | db2-merge-derived | AJUSTE, CONTA | AJUSTE, CONTA | MERGE/READ_WRITE, SELECT/READ | program.cbl | false |
 | db2-multiple-ctes | CLIENTE, CONTA | CLIENTE, CONTA | SELECT/READ | program.cbl | false |
+| db2-multiple-statements-negative | none | none | — | — | true |
+| db2-nested-comment-negative | none | none | — | — | true |
 | db2-recursive-cte | none | none | — | — | true |
 | db2-repeated-mixed-access | CLIENTE | CLIENTE | SELECT/READ, UPDATE/WRITE | program.cbl | false |
 | db2-schema-qualified | CLIENTE, DBPROD.CLIENTE | CLIENTE, DBPROD.CLIENTE | SELECT/READ | program.cbl | false |
@@ -226,9 +228,11 @@ DB2 final producer pins: frontend `b5e83974717b21f92b66069137b973ea4afcb8e8`; lo
 | db2-update | CONTA | CONTA | UPDATE/WRITE | program.cbl | false |
 | db2-update-subquery | CLIENTE, CONTA | CLIENTE, CONTA | SELECT/READ, UPDATE/WRITE | program.cbl | false |
 
-31/31 PASS in two independent runs; final dependencies.json byte-identical. Expectations are authored separately from extractor output.
+33/33 PASS in two independent runs; final dependencies.json byte-identical. Expectations are authored separately from extractor output.
 Original EXEC SQL span and column 7 checked for every support. Nested table owner is A.cpy:1, TRANSITIVE; the main program association is retained. Repeated mixed-access CLIENTE is one identity with 3 supports at distinct original statements (SELECT/UPDATE/SELECT).
 Dynamic PREPARE/EXECUTE IMMEDIATE produce no tables and DYNAMIC_SQL_NOT_ANALYZED. Delimited names, recursive CTEs and unsupported relation shapes intentionally pass as explicit partial negatives.
 Composition proves COPYBOOK CPY001, DCLGEN DCLCLI, generic SQL_INCLUDE GENERIC, DB2_TABLE DBPROD.CLIENTE/DBPROD.CONTA, CALL SUBA and FILE DD001. Physical metrics are 1/0/0/0 (logical/experimental/groups/writes).
+
+Nested bracketed comments and multi-statement regions are additional explicit partial negatives, with zero invented tables.
 
 The prior 21 W3 source cases also PASS in two executions on the final DB2 runtime, with byte-identical 2.5.0 products and unchanged nominal behavior. The extra cyclic COPY case remains explicitly BLOCKED at existing lower primary-entry admission.
