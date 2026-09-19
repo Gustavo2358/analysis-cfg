@@ -195,6 +195,12 @@
       "nominalCopyPreservesSnapshotCandidateAndPublishesPartialReason",
       "unresolvedPhysicalSliceDoesNotEnablePhysicalFallback",
       "nominalCicsCallAndFileConsumersKeepCandidatesWithOpenCompleteness"
+    ],
+    "io.github.gustavo2358.analysis.adapters.SourceDependencyTest": [
+      "deduplicatesWithoutDiscardingOriginalOwnersAndSupports",
+      "retainsNominalUnresolvedAndUnknownSqlIncludes",
+      "requiresPositiveDclgenAuthorityAndClosedProfile",
+      "aggregatesThousandOccurrencesWithoutRuntimeAnalysis"
     ]
   },
   "analysis-dataflow": {

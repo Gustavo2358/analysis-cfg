@@ -7,7 +7,11 @@ import java.util.*;
 /** Detached dependency facts; 1.2.0 additionally represents semantic preparation limits. */
 public record DependencyResult(PublicationId publication,SemanticVersion airVersion,List<DependencySiteFact> sites,
         List<Edge> edges,Map<String,Long> metrics,Evidence.InventoryStatus publicationInventory,
-        List<Origins.Origin> origins,List<Origins.Artifact> artifacts,List<UncertaintyId> sourceUncertaintyRefs,List<String> analysisReasons,FileDependencyResult fileDependencies) {
+        List<Origins.Origin> origins,List<Origins.Artifact> artifacts,List<UncertaintyId> sourceUncertaintyRefs,List<String> analysisReasons,FileDependencyResult fileDependencies,SourceDependencyResult sourceDependencies) {
+    public DependencyResult(PublicationId publication,SemanticVersion airVersion,List<DependencySiteFact> sites,List<Edge> edges,Map<String,Long> metrics,
+            Evidence.InventoryStatus publicationInventory,List<Origins.Origin> origins,List<Origins.Artifact> artifacts,List<UncertaintyId> sourceUncertaintyRefs,List<String> analysisReasons,FileDependencyResult fileDependencies) {
+        this(publication,airVersion,sites,edges,metrics,publicationInventory,origins,artifacts,sourceUncertaintyRefs,analysisReasons,fileDependencies,SourceDependencyResult.unavailable());
+    }
     public record Edge(UnitId caller,EntryId entry,OperationId site,DependencySiteFact.Candidate candidate,boolean openSite) { }
     public DependencyResult(PublicationId publication,SemanticVersion airVersion,List<DependencySiteFact> sites,List<Edge> edges,Map<String,Long> metrics,
             Evidence.InventoryStatus publicationInventory,List<Origins.Origin> origins,List<Origins.Artifact> artifacts,List<UncertaintyId> sourceUncertaintyRefs) {
@@ -17,10 +21,10 @@ public record DependencyResult(PublicationId publication,SemanticVersion airVers
             Evidence.InventoryStatus publicationInventory,List<Origins.Origin> origins,List<Origins.Artifact> artifacts,List<UncertaintyId> sourceUncertaintyRefs,List<String> analysisReasons) {
         this(publication,airVersion,sites,edges,metrics,publicationInventory,origins,artifacts,sourceUncertaintyRefs,analysisReasons,FileDependencyResult.unavailable());
     }
-    public boolean partial() { return !analysisReasons.isEmpty()||sites.stream().anyMatch(s->s.analysisStatus()==DependencySiteFact.AnalysisStatus.PARTIAL); }
+    public boolean partial() { return sourceDependencies.available()&&sourceDependencies.partial()||!analysisReasons.isEmpty()||sites.stream().anyMatch(s->s.analysisStatus()==DependencySiteFact.AnalysisStatus.PARTIAL); }
     public boolean structuralScope() { return sites.stream().anyMatch(s->s.reachability()==DependencySiteFact.Reachability.UNKNOWN)||sites.isEmpty()&&!analysisReasons.isEmpty(); }
     public DependencyResult {
-        Objects.requireNonNull(fileDependencies);analysisReasons=List.copyOf(analysisReasons);if(analysisReasons.stream().anyMatch(String::isBlank))throw new IllegalArgumentException("empty analysis reason");
+        Objects.requireNonNull(sourceDependencies);Objects.requireNonNull(fileDependencies);analysisReasons=List.copyOf(analysisReasons);if(analysisReasons.stream().anyMatch(String::isBlank))throw new IllegalArgumentException("empty analysis reason");
         Objects.requireNonNull(publication);Objects.requireNonNull(airVersion);sites=List.copyOf(sites);edges=List.copyOf(edges);
         metrics=Map.copyOf(metrics);Objects.requireNonNull(publicationInventory);origins=List.copyOf(origins);artifacts=List.copyOf(artifacts);sourceUncertaintyRefs=List.copyOf(sourceUncertaintyRefs);
     }

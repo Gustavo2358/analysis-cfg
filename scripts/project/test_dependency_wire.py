@@ -45,7 +45,7 @@ class FileEpR2CompositionWireTests(unittest.TestCase):
         folder=ROOT/'analysis-adapters/target/fd-post-ep-r2'
         for name in ['factors-1','factors-8','factors-32','entry-forward','entry-reverse','dollar-file','dollar-file-negative']:
             d=read(folder/(name+'.json'))
-            self.assertEqual('2.3.0',d['version']);self.assertEqual('COBOL_SOURCE_ONLY',d['analysisBoundary'])
+            self.assertEqual('2.4.0',d['version']);self.assertEqual('COBOL_SOURCE_ONLY',d['analysisBoundary'])
             call=d['sites'][0];file=d['fileDependencies']['sites'][0]
             self.assertEqual('cics.file',file['namespace'])
             if name.startswith('dollar'):
@@ -80,7 +80,7 @@ class PartialDependencyWireTests(unittest.TestCase):
         folder=ROOT/'analysis-adapters/target/ep-w4'
         for name in ('unsupported-values','unsupported-control'):
             d=read(folder/(name+'.json'))
-            self.assertEqual('2.3.0',d['version']);self.assertEqual('PARTIAL',d['analysisStatus'])
+            self.assertEqual('2.4.0',d['version']);self.assertEqual('PARTIAL',d['analysisStatus'])
             direct=next(s for s in d['sites'] if s['operation']['localId']=='direct')
             self.assertEqual(['DIRECT'],[c['referenceName'] for c in direct['candidates']])
             if name=='unsupported-values':
@@ -113,7 +113,7 @@ class FileDependencyWireTests(unittest.TestCase):
         old=runpy.run_path(str(ROOT/'scripts/project/fixtures/dependency_wire_v1.py'))['validate']
         for case in ('A1','A2','A3','A4','A6'):
             d=read(ROOT/('analysis-adapters/target/fd-w1/'+case+'.json'))
-            self.assertEqual('2.3.0',d['version'])
+            self.assertEqual('2.4.0',d['version'])
             self.assertEqual('COBOL_SOURCE_ONLY',d['analysisBoundary'])
             with self.assertRaises(ValueError):old(d)
         d=read(ROOT/'analysis-adapters/target/fd-w1/A1.json')['fileDependencies']
@@ -125,7 +125,7 @@ class FileDependencyWireTests(unittest.TestCase):
         old=runpy.run_path(str(ROOT/'scripts/project/fixtures/dependency_wire_v1.py'))['validate']
         for name in ('dynamic-x8','literal','dynamic-no-move','orphan'):
             d=read(ROOT/('analysis-adapters/target/w1d/'+name+'.json'))
-            projected=copy.deepcopy(d);projected.pop('fileDependencies');projected.pop('analysisBoundary')
+            projected=copy.deepcopy(d);projected.pop('fileDependencies');projected.pop('analysisBoundary');projected.pop('sourceDependencies')
             if projected['analysisStatus']=='PARTIAL':projected['version']='1.2.0'
             else:
                 projected['version']='1.1.0';projected.pop('analysisStatus');projected.pop('analysisReasons')
@@ -153,7 +153,7 @@ class FileDependencyWireTests(unittest.TestCase):
             with self.assertRaises((ValueError,KeyError,TypeError)):validate(bad)
     def test_local_sd_is_not_unknown_external_name_and_is_closed_in_v21(self):
         source=read(ROOT/'analysis-adapters/target/fd-w5/manual/local-true.json')
-        self.assertEqual('2.3.0',source['version'])
+        self.assertEqual('2.4.0',source['version'])
         site=source['fileDependencies']['sites'][0]
         self.assertEqual('LOCAL',site['targetKind']);self.assertIsNone(site['namespace'])
         self.assertEqual([],site['candidates']);self.assertFalse(site['unknownRemainder'])
@@ -169,7 +169,7 @@ class FileDependencyWireTests(unittest.TestCase):
             d=copy.deepcopy(source);mutate(d)
             with self.assertRaises((ValueError,KeyError,TypeError)):validate(d)
         # The old variant still admits its own vocabulary.
-        historical=read(ROOT/'analysis-adapters/target/fd-w1/A6.json');historical['version']='2.0.0';historical['fileDependencies']['valuesProfile']='file-literal@1'
+        historical=read(ROOT/'analysis-adapters/target/fd-w1/A6.json');historical['version']='2.0.0';historical.pop('sourceDependencies');historical['fileDependencies']['valuesProfile']='file-literal@1'
         for group in ('sites','edges'):
             for item in historical['fileDependencies'][group]:item.pop('context')
         validate(historical)
@@ -187,7 +187,7 @@ class ComputedFileWireTests(unittest.TestCase):
         old=runpy.run_path(str(ROOT/'scripts/project/fixtures/dependency_wire_v21.py'))['validate']
         for name,expected,remainder in [('literal',['1FILE'],False),('closed',['ALPHA001','BETA0002'],True),('partial',['ALPHA001'],True),('unknown',[],True)]:
             d=read(ROOT/('analysis-adapters/target/fd-w7/manual/'+name+'.json'))
-            self.assertEqual('2.3.0',d['version']);s=d['fileDependencies']['sites'][0]
+            self.assertEqual('2.4.0',d['version']);s=d['fileDependencies']['sites'][0]
             self.assertEqual(expected,[c['referenceName'] for c in s['candidates']]);self.assertEqual(remainder,s['unknownRemainder'])
             with self.assertRaises(ValueError):old(d)
     def test_computed_support_point_and_remainder_mutants(self):
@@ -210,7 +210,7 @@ class CicsContextWireTests(unittest.TestCase):
         old=runpy.run_path(str(ROOT/'scripts/project/fixtures/dependency_wire_v22.py'))['validate']
         for name in ('systems','invalid','computed-systems','systems-closed','systems-partial','systems-unknown'):
             d=read(ROOT/('analysis-adapters/target/fd-w8/manual/'+name+'.json'))
-            self.assertEqual('2.3.0',d['version'])
+            self.assertEqual('2.4.0',d['version'])
             with self.assertRaises(ValueError):old(d)
         d=read(ROOT/'analysis-adapters/target/fd-w8/manual/systems.json')
         contexts={s['operation']['localId']:s['context'] for s in d['fileDependencies']['sites']}
