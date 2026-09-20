@@ -8,6 +8,16 @@ import static io.github.gustavo2358.analysis.storage.StorageFixtures.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class StatementEffectsTest {
+    @Test void boundedOpenObjectDoesNotReceiveUnrelatedLogicalWrite() {
+        var write=assign("write-q","q",1,2,3,4,5,6,7,8);
+        var bases=List.of(region("r1",8L,Memory.Lifetime.PERSISTENT),region("r2",8L,Memory.Lifetime.PERSISTENT));
+        var objects=List.of(declaration("u",new Memory.UnknownBinding(new Scopes.StorageMemory(List.of(base("r1"))),UNKNOWN)),view("q","r2",0,8));
+        var effects=new StatementEffects(new StorageIndex(session(publication(bases,objects,List.of(sequence("s",List.of(write))),List.of()))));
+        var result=effects.statement(write.header().id()).writes().getFirst();
+        assertEquals(1,result.targets().size());
+        assertTrue(result.logicalTargets().stream().noneMatch(t->t.object().equals(object("u"))),
+            "R1-bounded U cannot receive a logical Event from an R2-only write");
+    }
     @Test void partialMustWriteDoesNotTouchIndependentBase() {
         var assignment=assign("d1","left",1,2,3,4);
         var bases=List.of(region("r",8L,Memory.Lifetime.ACTIVATION),region("other",8L,Memory.Lifetime.ACTIVATION));
