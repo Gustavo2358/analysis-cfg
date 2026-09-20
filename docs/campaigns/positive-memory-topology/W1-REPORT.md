@@ -1,6 +1,8 @@
 # POSITIVE_MEMORY_TOPOLOGY — W1
 
-Status: IN_PROGRESS — final aggregate gates pending; pins synchronized. W1 only; W2/W3 not started.
+Status: READY_FOR_REVIEW — W1 implementation and required local gates complete;
+review lifecycle remains IN_PROGRESS until human review/merge. Exact-head remote
+closure checks are linked in PR #45. W2/W3 not started.
 [Plan](W1-PLAN.md); accepted historical [W0-R1](W0-DISCOVERY.md).
 
 ## Rule delivered and operational boundary
@@ -24,9 +26,9 @@ QUALIFIED; controlled synthetic tests are not operational authorization.
 | cobol-lower | f8e181f95929c650181c989318f8ba23d1e68a1a (#32) | 6c0317ceb5e64c11f437e027a17dd55fba85df52 | #34 DRAFT |
 | air-java | 646ca3ab1687d43f7d2063fc2a8f3837ab3cf9fa (#20) | 26016f10460336f237a33b2ed126a6a1427f0207 | #21 DRAFT |
 | analysis-ir | 3fff18e2c16663a3f599207457caa1946d2e0945 (main/#7 merged) | b26465964fe75f944f6324df63330d69f33d77cd | #8 DRAFT |
-| analysis-cfg | 98fa57c3db2edf9f70bb7a99bb667dbf36d28104 (#43); W0-R1 a2bd04b9d106c3abe0250edccc1aad7e9e386ca8 | implementation ae69dc9ab9b613aacbe8e6e1b6ffc4e49def7210; this report commits closure | #45 DRAFT |
+| analysis-cfg | 98fa57c3db2edf9f70bb7a99bb667dbf36d28104 (#43); W0-R1 a2bd04b9d106c3abe0250edccc1aad7e9e386ca8 | implementation ae69dc9ab9b613aacbe8e6e1b6ffc4e49def7210 + scalar-output correction 7b0a25f30cc221c960e6de8f0ac0fedb0d9b18b4; closure is documentation only | #45 DRAFT |
 
-Parent remote heads were unchanged at CP0; isolated campaign worktrees were created
+Parent remote heads were unchanged at CP0 and reconfirmed on 2026-09-20 at CP4; isolated campaign worktrees were created
 at these exact baselines. No reset/stash/force push or parent edits. Existing E2E
 workspace was preserved. Dependency locks are updated only to immutable companion
 commits; AIR pins the final IR. Final checks are recorded below, never inherited
@@ -157,7 +159,7 @@ claim is made. Final B reproduces 95 outputs and the same COPY-cycle failure. Th
 classified deltas: no candidate/support/timing loss or unexplained difference.
 All 95 B outputs execute zero physical groups/writes. FILE semantic inventories and
 COPYBOOK/DCLGEN/SQL_INCLUDE/DB2 source resources are preserved. Changes include 32
-control remainders,34 premise lists, five model remainders and four productive
+control remainders, 34 premise lists, five model remainders and four productive
 admissions; exact per-field changes and producer mappings remain in the raw audit.
 
 Manual review of the four republished producer bodies confirms more than origin
@@ -201,11 +203,11 @@ supports. Per-consumer pre/post hashes prove C/D did not modify their shared AIR
 Development attempts are retained honestly: initial runs lacked new AIR class dirs;
 a concurrent lower rebuild interrupted one B case. Neither is final qualification.
 Final execution uses 22 frozen classpath entries, individually hashed in runtime-final2.json.
-AIR00373→26016 changes harness/docs only; production source equivalence retains the
-compiled runtime evidence. Lower8adc→6c0317c is likewise a pin-only change. A later scalar output correction
+AIR 00373→26016 changes harness/docs only; production source equivalence retains the
+compiled runtime evidence. Lower 8adc→6c0317c is likewise a pin-only change. A later scalar output correction
 replaces the negative all-object demand metric sentinel with the actual object count.
 Only TextProfile.class changed; no transfer changed. Final frozen consumers were
-re-executed over the unchanged W1 SP/AIR artifacts:95cohort+4logical vertical+8C/D+6CICS
+re-executed over the unchanged W1 SP/AIR artifacts: 95 cohort + 4 logical vertical + 8 C/D + 6 CICS
 outputs are byte-identical to their preceding run. The driver records reused producer
 artifacts explicitly; the pre-replay runs remain intact.
 
@@ -233,17 +235,17 @@ Separate phases include index/prepare, solve and replay. Full typed facts are ch
 | 16/50 | 50/50 | 7.494 / 7.012 / 10.570 | 0 |
 | 32/100 | 100/100 | 7.815 / 9.954 / 15.297 | 0 |
 
-Bases retained:4/16/32. Physical groups/writes:5/50/100. Unique producer IDs:5/50/100;
-unique compact Events objects:0. Interner nodes after solve6/51/101 and after replay
+Bases retained: 4/16/32. Physical groups/writes: 5/50/100. Unique producer IDs: 5/50/100;
+unique compact Events objects: 0. Interner nodes after solve 6/51/101 and after replay
 9/66/132 remain legitimate work. These counts are not memory bytes. Raw invocation,
 phase samples, full metrics and typed facts are in ignored evidence/w1/metrics.
-The W0 3200→100 targets and159650→0 positions are historical disjoint-premise controls;
+The W0 3200→100 targets and 159650→0 positions are historical disjoint-premise controls;
 this new run removes the premise requirement itself. No corporate performance claim,
 constant total-time claim or proof that legitimate combinations/copies become cheap.
 
 ## Gates, limitations and handoff
 
-Frontend FAST389/0fail/0skip; additional Maven983/0fail/1 conditional skip. Its wider
+Frontend FAST: 389 tests, zero failures/skips; additional Maven: 983 tests, zero failures, one conditional skip. Its wider
 qualification did not complete: a later corpus normalizer/ownership stage failed.
 No validator was relaxed and no corpus source/output was modified. Further corpus
 execution was stopped; this gate is FAIL, not PASS or a proved pre-existing failure.
@@ -253,14 +255,17 @@ local/on-demand, never a closure requirement; the user also excludes unauthorize
 corporate execution. Required synthetic W1/FAST evidence is complete; broader corpus
 qualification remains pending. Later normalizer checks were not reached in that run.
 AIR final FAST: 188 model + 129 codec, 41 harness + 12 lean and architecture passed;
-qualification-local Maven clean verify also passed. Lower final FAST passed in 201.661s, and qualification-local semantic/performance/
-architecture passed at6c0317c.
-Anchor full Maven reactor passed673tests, zero failures/errors/skips; independent
+qualification-local Maven clean verify also passed. Lower final FAST passed in
+201.661s, and qualification-local semantic/performance/architecture passed at 6c0317c.
+Anchor full Maven reactor passed 673 tests, zero failures/errors/skips; independent
 wire checks passed; architecture inventory changes are limited to two
 removed diagnostic records and 67 removed dependency edges, with no new API/Maven
-dependency. Final aggregate FAST/full and exact-head anchor checks remain pending.
+dependency. Final aggregate qualification-local passed, including semantic/performance/integration,
+W5 source file/memory equivalence, W2D, MOVE, PERFORM, multi-CALL and partial-program
+E2Es. These historical harness names do not authorize campaign W2/W3. Final local FAST passed 605 fixed test methods with zero failures/errors/skips,
+architecture, wire and harness checks in 92.848s. CP4 below records remote evidence.
 
-A stale AIR harness literal rejected the synchronized normative pin at 00373;26016
+A stale AIR harness literal rejected the synchronized normative pin at 00373; 26016
 replaces it with strict comparison to the active immutable lock, with a RED/GREEN
 test that also rejects missing/moving pins. Both remote checks pass at 26016.
 Local cache/DNS failures and superseded-oracle failures remain in the raw logs;
@@ -281,6 +286,33 @@ A feature não modelada permanece na cobertura, não ganha efeitos de pior caso.
 As partes modeladas continuam produtivas nos dois caminhos.
 O lógico continua sendo o produto padrão; o físico é qualificado em laboratório
 por opt-in, sem desinterdição automática.
+
+## CP4 review handoff
+
+Implementation commits are ae69dc9 and 7b0a25f; the final closure commit changes
+only this report, plan/navigation and evidence indexing. All five campaign worktrees
+were checked against their expected ancestors and published heads; no concurrent
+commits were discarded. Parent PRs #56/#32/#20/#43 remain open at the baseline SHAs,
+and analysis-ir main remains 3fff18e. All campaign PRs remain DRAFT.
+
+| Repository | Final local evidence | Remote evidence at recorded code HEAD |
+|---|---|---|
+| proleap-poc cfcf0ab | FAST PASS; wider qualification FAIL as limited above | [Fast CI PASS](https://github.com/Gustavo2358/proleap-poc/actions/runs/35520926565) |
+| cobol-lower 6c0317c | FAST and qualification-local PASS | [Fast CI PASS](https://github.com/Gustavo2358/cobol-lower/actions/runs/35522322213) |
+| air-java 26016f1 | FAST and qualification-local PASS | [Fast CI PASS](https://github.com/Gustavo2358/air-java/actions/runs/35522064586) |
+| analysis-ir b264659 | normative review and pinned AIR validation | no configured remote checks; not reported as an executed PASS |
+| analysis-cfg 7b0a25f | FAST 605 methods / 92.848s and qualification-local PASS | [code Fast CI PASS](https://github.com/Gustavo2358/analysis-cfg/actions/runs/35523587244) |
+
+Both push/PR checks succeeded at each code HEAD where configured. The closing
+report commit has its exact-head check receipt in PR #45; confirm that receipt
+when reviewing the final HEAD. A docs-only remote pass does not replace the code execution
+above. Required gates are not replaced by the optional failed frontend corpus run.
+
+Stop for human review after publication. W2/W3 require new authorization; do not
+merge, mark ready, change operational mode or retry corporate qualification. Review
+can begin with the partial-group-copy C/D witness, scalar/regional isolation tests,
+M01–M21 scope table and per-case regression ledger. Raw logs and phase artifacts
+remain in ignored evidence/w1; the ledger hashes them. No corpus data is versioned.
 
 ## Reproduction and evidence locations
 

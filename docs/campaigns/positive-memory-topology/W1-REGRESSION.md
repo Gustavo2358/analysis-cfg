@@ -139,3 +139,19 @@ retains REVIEW for those differences.
 - `CICS-A/results.json`: `4c2eb63b935ac55e1bf8f0e3aa3b7e50cba043e30a7ce66ef1c4b851853c8059`
 - `CICS-B/results.json`: `ed4894d97f31f77f2005dfb4ec2a9e759be4c5608dace9cebf76ad8437b9e458`
 - `compare-cics-v1.json`: `4ed94d8cdf32ee04894ee3882423b2b02633999ec51d2047acf2d60b2e82eef9`
+
+## Final gate log index
+
+Logs are local under ignored `evidence/w1/gates`; the frontend broader qualification
+is **FAIL**, as explained in W1-REPORT, not a closure gate reported as PASS.
+
+| Log | SHA-256 |
+|---|---|
+| pmt-cfg-qualification-final4.log | `5ddeb8466b3ca2636aeb4b5a2360e2949788c02922cd5cb3b74f0b68e025c29e` |
+| pmt-frontend-fast.log | `61dd64f67ca700e3e067ab4c85116313db82d4b46070048ca1ad0346070df94e` |
+| pmt-frontend-qualification.log | `d1ac565ba1d8bf0dbe36838fcda568de12f929d5d6b5e55b2e850ec25639abb8` |
+| pmt-air-final-fast.log | `8d0fd7182fc513fc73f0b4be0b9574870acb22837e111989d2ac9c2339b08707` |
+| pmt-air-qualification-local-network.log | `35773833a90e52c291c7ad6e75bb5e40ebc709ce8204181eb566a14f79b1c6ca` |
+| lower-w1-fast-final.log | `f5cfaf0e76aea5ab5a2bb021900eb074257ba4736bd7f68b97907ac25ee5550d` |
+| lower-w1-qualification-final.log | `39b7f72dd974da4ea7c0628a81fa3afbc35ca2889eec854ef91e111df22d057e` |
+| pmt-cfg-fast-final.log | `fe4164ed77c3cd68342c49dd9717dcce588490f4429562c8d6c154b22fca8d03` |

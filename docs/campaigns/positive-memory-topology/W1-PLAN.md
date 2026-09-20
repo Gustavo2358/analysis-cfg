@@ -1,6 +1,8 @@
 # POSITIVE_MEMORY_TOPOLOGY — W1 plan
 
-Status: IN_PROGRESS. W1 authorized after accepted W0-R1. W2/W3 not started.
+Status: CP0–CP4 complete / READY_FOR_REVIEW in DRAFT. Review lifecycle remains
+IN_PROGRESS; no merge. W1 authorized after accepted W0-R1. W2/W3 not started.
+Final results and remaining limits: [W1-REPORT](W1-REPORT.md).
 
 ## CP0 and invariant
 
