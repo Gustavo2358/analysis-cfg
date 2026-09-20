@@ -1,6 +1,6 @@
 # POSITIVE_MEMORY_TOPOLOGY — W1
 
-Status: IN_PROGRESS — final gates/pins pending. W1 only; W2/W3 not started.
+Status: IN_PROGRESS — final aggregate gates pending; pins synchronized. W1 only; W2/W3 not started.
 [Plan](W1-PLAN.md); accepted historical [W0-R1](W0-DISCOVERY.md).
 
 ## Rule delivered and operational boundary
@@ -24,7 +24,7 @@ QUALIFIED; controlled synthetic tests are not operational authorization.
 | cobol-lower | f8e181f95929c650181c989318f8ba23d1e68a1a (#32) | 6c0317ceb5e64c11f437e027a17dd55fba85df52 | #34 DRAFT |
 | air-java | 646ca3ab1687d43f7d2063fc2a8f3837ab3cf9fa (#20) | 26016f10460336f237a33b2ed126a6a1427f0207 | #21 DRAFT |
 | analysis-ir | 3fff18e2c16663a3f599207457caa1946d2e0945 (main/#7 merged) | b26465964fe75f944f6324df63330d69f33d77cd | #8 DRAFT |
-| analysis-cfg | 98fa57c3db2edf9f70bb7a99bb667dbf36d28104 (#43); W0-R1 a2bd04b9d106c3abe0250edccc1aad7e9e386ca8 | current report commit | #45 DRAFT |
+| analysis-cfg | 98fa57c3db2edf9f70bb7a99bb667dbf36d28104 (#43); W0-R1 a2bd04b9d106c3abe0250edccc1aad7e9e386ca8 | implementation ae69dc9ab9b613aacbe8e6e1b6ffc4e49def7210; this report commits closure | #45 DRAFT |
 
 Parent remote heads were unchanged at CP0; isolated campaign worktrees were created
 at these exact baselines. No reset/stash/force push or parent edits. Existing E2E
@@ -112,6 +112,12 @@ Values effective remainder now equals model remainder. CALL effective remainder 
 only genuine name interpretation remainder (unknown configured/runtime name policy,
 uninterpretable raw name); sourceValueRemainder remains separately visible. CICS
 supported text-name interpretation does not require a source physical area proof.
+The four COBOL verticals publish PGMNAME/DYNAM/DLL=UNSPECIFIED in SP policy3.0.0.
+Their remaining UnknownName denotes the open runtime naming parameter in the
+published abstraction; it is not inferred from a representation diagnostic. Known
+text values close while that naming-policy remainder remains independently visible.
+This does not certify every historical producer UnknownName as legitimate; transport
+of other configured source naming policies remains outside this slice/M13 audit.
 Diagnostics remain in publication/output metadata. Operational/validation failures
 are distinct from source coverage and never become a successful logical fallback.
 
@@ -194,9 +200,14 @@ supports. Per-consumer pre/post hashes prove C/D did not modify their shared AIR
 
 Development attempts are retained honestly: initial runs lacked new AIR class dirs;
 a concurrent lower rebuild interrupted one B case. Neither is final qualification.
-Final execution uses 22 frozen classpath entries, individually hashed in runtime-final.json.
+Final execution uses 22 frozen classpath entries, individually hashed in runtime-final2.json.
 AIR00373→26016 changes harness/docs only; production source equivalence retains the
-compiled runtime evidence. Later lower repins are checked for the same equivalence.
+compiled runtime evidence. Lower8adc→6c0317c is likewise a pin-only change. A later scalar output correction
+replaces the negative all-object demand metric sentinel with the actual object count.
+Only TextProfile.class changed; no transfer changed. Final frozen consumers were
+re-executed over the unchanged W1 SP/AIR artifacts:95cohort+4logical vertical+8C/D+6CICS
+outputs are byte-identical to their preceding run. The driver records reused producer
+artifacts explicitly; the pre-replay runs remain intact.
 
 Additional real source CICS regression uses the six existing analysis-gaps/w3
 LINK/XCTL fixtures, executed through both baseline and final frozen runtimes. All
@@ -235,7 +246,12 @@ constant total-time claim or proof that legitimate combinations/copies become ch
 Frontend FAST389/0fail/0skip; additional Maven983/0fail/1 conditional skip. Its wider
 qualification did not complete: a later corpus normalizer/ownership stage failed.
 No validator was relaxed and no corpus source/output was modified. Further corpus
-execution was stopped; do not call that gate PASS or claim baseline reproduction.
+execution was stopped; this gate is FAIL, not PASS or a proved pre-existing failure.
+The unchanged owner validator consumes AST/provenance and preprocessed source facts,
+not the storage projection changed here. Frontend AGENTS.md explicitly makes full
+local/on-demand, never a closure requirement; the user also excludes unauthorized
+corporate execution. Required synthetic W1/FAST evidence is complete; broader corpus
+qualification remains pending. Later normalizer checks were not reached in that run.
 AIR final FAST: 188 model + 129 codec, 41 harness + 12 lean and architecture passed;
 qualification-local Maven clean verify also passed. Lower final FAST passed in 201.661s, and qualification-local semantic/performance/
 architecture passed at6c0317c.
@@ -248,7 +264,12 @@ A stale AIR harness literal rejected the synchronized normative pin at 00373;260
 replaces it with strict comparison to the active immutable lock, with a RED/GREEN
 test that also rejects missing/moving pins. Both remote checks pass at 26016.
 Local cache/DNS failures and superseded-oracle failures remain in the raw logs;
-none is hidden as PASS. Full E2E wrappers are reconciled to the active producer
+none is hidden as PASS. The scalar wire reader now enforces effective=model. Its historical snapshot stays
+unchanged; the reader test explicitly constructs the new single-PROGA oracle by
+changing only effective=false and effectiveOpenResults=0, and rejects the old coupling.
+The new all-object counter assertion rejects the negative sentinel. W5 real-source
+file/memory equivalence passed after both corrections.
+Full E2E wrappers are reconciled to the active producer
 pins and supported contracts, rather than building historical lower revisions
 or requiring the removed disjoint premise/foreign compensation.
 
@@ -269,9 +290,9 @@ JVM argv, classpath and main class) and `frontendCheckout`. The ignored final ru
 also records each frozen classpath entry's original path, file count and tree hash.
 
 ```sh
-python3 -B scripts/project/positive_memory_e2e.py --runtime ../evidence/w1/runtime-final.json --cohort ../evidence/w1/cohort --out ../evidence/w1/B-final
-python3 -B scripts/project/positive_memory_e2e.py --runtime ../evidence/w1/runtime-final.json --cohort analysis-adapters/src/test/resources/positive-memory-topology --out ../evidence/w1/B-vertical-final
-python3 -B scripts/project/positive_memory_e2e.py --runtime ../evidence/w1/runtime-final.json --cohort analysis-adapters/src/test/resources/positive-memory-topology --out ../evidence/w1/CD-final --physical
+python3 -B scripts/project/positive_memory_e2e.py --runtime ../evidence/w1/runtime-final2.json --cohort ../evidence/w1/cohort --out ../evidence/w1/B-final2
+python3 -B scripts/project/positive_memory_e2e.py --runtime ../evidence/w1/runtime-final2.json --cohort analysis-adapters/src/test/resources/positive-memory-topology --out ../evidence/w1/B-vertical-final2
+python3 -B scripts/project/positive_memory_e2e.py --runtime ../evidence/w1/runtime-final2.json --cohort analysis-adapters/src/test/resources/positive-memory-topology --out ../evidence/w1/CD-final2 --physical
 ```
 
 The physical driver adds `--storage-profile ibm-enterprise-6.4-fixed-display-1047@1`
@@ -286,3 +307,13 @@ analysis-values test/main, analysis-kernel, cfg-kernel and locked AIR classpath.
 `metrics/invocation.json` records exact JVM/argv/heap/timeout/warmup/repetitions;
 `measurements.json` records samples and `facts.typed` full independent typed facts.
 No production class was replaced, and no hidden semantic flag was introduced.
+
+For the final incremental consumer check, `--replay-from` reuses exact producer
+artifacts, verifies their AIR hash and executes both C/D consumers where present:
+
+```sh
+python3 -B scripts/project/positive_memory_e2e.py --runtime ../evidence/w1/runtime-final2.json --replay-from ../evidence/w1/B-final --out ../evidence/w1/B-final2
+python3 -B scripts/project/positive_memory_compare.py --before ../evidence/w1/A --after ../evidence/w1/B-final2 --out ../evidence/w1/compare-final3.json --self-check
+```
+
+The historical full pipeline captures remain indexed alongside the final replays.

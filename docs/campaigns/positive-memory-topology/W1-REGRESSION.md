@@ -14,7 +14,7 @@ they are not normalized before execution. Nine adverse mutants and one unchanged
 control exercise the comparison; no golden was regenerated.
 
 Run `scripts/project/positive_memory_compare.py --before ../evidence/w1/A --after
-../evidence/w1/B-final --out ../evidence/w1/compare-final-v2.json --self-check`.
+../evidence/w1/B-final2 --out ../evidence/w1/compare-final3.json --self-check`.
 Raw per-case artifacts and exact commands remain under those ignored directories.
 
 | Case | Result | Classified differences |
@@ -122,11 +122,11 @@ Raw per-case artifacts and exact commands remain under those ignored directories
 |---|---|
 | cohort-manifest.json | `1a81733fae4161bb10199447ef1f65d901e5de683d62c07643b8c54486682678` |
 | runtime-A.json | `3df91263cf7bd540f2528a3ae1dfe040dfe17b5e2e4110d4358c957fcc018f9b` |
-| runtime-final.json | `15a399a640bae717e38cd639b6b0cbdadc6ca4996c8444038f6ff97dc43642d9` |
+| runtime-final2.json | `3b8cd1c4447b762cb0c8f87bd1ab1289cf79d9e5cc3cb063194e495baa29e397` |
 | A/results.json | `b4297cd6c4c2f443f8a460514ff6b637f35886634ef3d40ed945aaa9ef8fd022` |
-| B-final/results.json | `e7b8c2e5254811b6e356cd74a9ae2b5ce8e6819c98c6745b1d0ba667ad03c918` |
-| vertical-final-verified.json | `47159ae77a2ecc17cb9339abb97de713e783a58d6f003d68a2db4e896c1d55b5` |
-| compare-final-v2.json | `0ee2b84aa0db9aca59db9d726fcd25fc425a8000c8c3ea9b7b912f4a28c08f81` |
+| B-final2/results.json | `8846a2e99e507f0123fd6e974bed65799b6f63351a9c874126b714e262f45885` |
+| vertical-final2-verified.json | `47159ae77a2ecc17cb9339abb97de713e783a58d6f003d68a2db4e896c1d55b5` |
+| compare-final3.json | `b2c795b9f91bbb4a54f33d0651ced7278900a703e521366f0ad75643f5939d1f` |
 | metrics/measurements.json | `df4efe6912c220aff0d4a85b80f8c1678b7a01a63d9368e3525b81902d540f1c` |
 | metrics/invocation.json | `2ba22e3e36fe818f1e119f8e489cd41e2252bb91e0cd8b369f455ce7906831fc` |
 

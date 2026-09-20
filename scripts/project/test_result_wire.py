@@ -7,14 +7,22 @@ from e2e_w5 import verify_stage, execute_stage
 ROOT=Path(__file__).resolve().parents[2]
 
 class ResultReaderTest(unittest.TestCase):
-    def setUp(self):self.report=load(ROOT/'docs/evals/cp5/w5-prepared.snapshot.json')
+    def setUp(self):
+        self.report=load(ROOT/'docs/evals/cp5/w5-prepared.snapshot.json')
+        # Historical bytes remain untouched. This single known PROGA observation
+        # has model=false/source=true: W1 changes only effective=false and its count.
+        result=self.report['results'][0]['result'];observation=result['observations'][0]
+        self.assertEqual(['PROGA'],observation['value']['enumerated'])
+        self.assertFalse(observation['value']['modelValueRemainder']);self.assertTrue(observation['sourceUnknownRemainder'])
+        observation['effectiveUnknownRemainder']=False
+        result['statistics']['observation']['effectiveOpenResults']=0
     def test_real_refused_profile_preserves_batch_reason(self):
         report=read_result(ROOT/'docs/evals/cp5/w5-unsupported.snapshot.json')
         self.assertEqual('INCOMPLETE',report['preparationStatus'])
         self.assertEqual('DEPENDENCY_UNAVAILABLE',report['results'][0]['result']['completion']['observation']['reason'])
         report['results'][0]['result']['completion']['observation']['reason']=None
         with self.assertRaises(WireError):validate(report)
-    def test_production_snapshot_is_valid(self):self.assertIs(self.report,validate(self.report))
+    def test_supported_projection_snapshot_is_valid(self):self.assertIs(self.report,validate(self.report))
     def test_missing_schema_version_and_unknown_status_are_rejected(self):
         for field in ('schema','version'):
             r=copy.deepcopy(self.report);del r[field]
@@ -35,9 +43,9 @@ class ResultReaderTest(unittest.TestCase):
             elif mutation=='wrong-producer':o['candidateSupports'][0]['producers'][0]['evidence']['localId']='wrong'
             else:del o['candidateSupports'][0]['producers'][0]['origin']
             with self.assertRaises(WireError):validate(r)
-    def test_source_partial_and_effective_remainder_are_not_promoted(self):
-        for field in ('sourceUnknownRemainder','effectiveUnknownRemainder'):
-            r=copy.deepcopy(self.report);r['results'][0]['result']['observations'][0][field]=False
+    def test_source_diagnostics_and_effective_semantics_are_independent(self):
+        for field,invalid in (('sourceUnknownRemainder',False),('effectiveUnknownRemainder',True)):
+            r=copy.deepcopy(self.report);r['results'][0]['result']['observations'][0][field]=invalid
             with self.assertRaises(WireError):validate(r)
     def test_consumer_dependencies_and_outcomes_are_checked(self):
         for mutate in (lambda r:r['consumerPlan'][0]['requiredObservationBatchIds'].append('missing'),lambda r:r['consumers'].clear(),lambda r:r['consumers'][0].update(status='FAILED',reason='CONSUMER_ERROR')):

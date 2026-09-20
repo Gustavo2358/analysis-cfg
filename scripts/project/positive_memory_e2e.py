@@ -37,9 +37,39 @@ def execute(runtime, cohort, out, physical=False):
         rows.append(row); (out/'results.json').write_text(json.dumps(rows,indent=2)+'\n');print(case.name,row['status'],flush=True)
     return rows
 
+def replay_consumers(runtime, before, out):
+    """Reuse immutable producer artifacts when only consumer code changes."""
+    out.mkdir(parents=True, exist_ok=False); rows=[]
+    for previous in json.loads((before/'results.json').read_text()):
+        name=previous['case']; source=before/name; dest=out/name
+        shutil.copytree(source,dest); row=dict(previous); row['reusedProducerArtifactsFrom']=str(source)
+        row['phases']=dict(previous['phases'])
+        if previous['status']=='OBSERVED':
+            for stage,suffix in [('dependency','')]+([('dependencyPhysical','-physical')] if 'dependencyPhysical' in previous['phases'] else []):
+                air=dest/'air.json'; before_hash=sha(air)
+                command=runtime['commands']['dependency']+[str(air),str(dest/('dependencies'+suffix+'.json'))]+(['--experimental-physical'] if suffix else [])
+                begin=time.monotonic()
+                with (dest/(stage+'.log')).open('w') as log:
+                    try:code=subprocess.run(command,cwd=runtime['frontendCheckout'],stdout=log,stderr=subprocess.STDOUT,timeout=120).returncode
+                    except subprocess.TimeoutExpired:code='TIMEOUT'
+                row['phases'][stage]={'command':command,'exitCode':code,'seconds':time.monotonic()-begin,'airSha256':before_hash}
+                assert sha(air)==before_hash==sha(source/'air.json')
+                if code:row['status']='PIPELINE_FAILURE';break
+                result=json.loads((dest/('dependencies'+suffix+'.json')).read_text())
+                for site in result['sites']:
+                    for key in ('sourceValueRemainder','modelValueRemainder','effectiveUnknownRemainder'):assert key in site
+                row['metrics'+suffix]=result['metrics']
+        row['hashes']={str(p.relative_to(dest)):sha(p) for p in dest.rglob('*') if p.is_file()}
+        rows.append(row);(out/'results.json').write_text(json.dumps(rows,indent=2)+'\n');print(name,row['status'],flush=True)
+    return rows
+
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--runtime',required=True,type=pathlib.Path);p.add_argument('--cohort',required=True,type=pathlib.Path);p.add_argument('--out',required=True,type=pathlib.Path);p.add_argument('--physical',action='store_true');a=p.parse_args()
-    execute(json.loads(a.runtime.read_text()),a.cohort.resolve(),a.out.resolve(),a.physical)
+    p=argparse.ArgumentParser();p.add_argument('--runtime',required=True,type=pathlib.Path)
+    selection=p.add_mutually_exclusive_group(required=True);selection.add_argument('--cohort',type=pathlib.Path);selection.add_argument('--replay-from',type=pathlib.Path)
+    p.add_argument('--out',required=True,type=pathlib.Path);p.add_argument('--physical',action='store_true');a=p.parse_args()
+    runtime=json.loads(a.runtime.read_text())
+    if a.replay_from:replay_consumers(runtime,a.replay_from.resolve(),a.out.resolve())
+    else:execute(runtime,a.cohort.resolve(),a.out.resolve(),a.physical)
 
 # Deliberately retain full candidate supports, timing and semantic IDs. Coverage is
 # compared separately, never stripped from the calculation before it executes.

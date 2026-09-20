@@ -119,7 +119,7 @@ def observation(o,run):
         require(v['domain']=='known(text)' and v['kind']=='Candidates','value domain')
         vals=v['enumerated'];distinct(vals,'candidates');require(all(isinstance(x,str) for x in vals),'text candidates')
         model=v['modelValueRemainder'];require(type(model) is bool and (bool(vals) or model),'reached empty closed value')
-    require(type(o['effectiveUnknownRemainder']) is bool and o['effectiveUnknownRemainder']==(model or source),'effective remainder inconsistent')
+    require(type(o['effectiveUnknownRemainder']) is bool and o['effectiveUnknownRemainder']==model,'effective remainder inconsistent')
     precision=o['precision'];fields(precision,'model source pathWitness','precision')
     require(precision['pathWitness']=='NOT_PROVIDED','invented path witness')
     require(precision['source']==('OPEN' if source else 'CLOSED'),'source precision')

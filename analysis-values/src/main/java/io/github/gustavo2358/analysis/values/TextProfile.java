@@ -37,7 +37,6 @@ final class TextProfile {
     private final Set<Operation> admitted=Collections.newSetFromMap(new IdentityHashMap<>());
     TextProfile(AnalysisSession session,boolean effectAware) {this(session,effectAware,null);}
     TextProfile(AnalysisSession session,boolean effectAware,Set<ObjectId> demand) {
-        requestedObjects=demand==null?-1:demand.size();
         this.effectAware=effectAware;
         this.session=Objects.requireNonNull(session);
         var index=session.index();var publication=index.publication();
@@ -78,6 +77,7 @@ final class TextProfile {
                 if(selected.add(source))pending.addLast(source);
             }
         }
+        requestedObjects=demand==null?subjects.size():demand.size();
         this.selected=Set.copyOf(selected);
         modeledCells=selected.stream().sorted(Comparator.comparingInt(Location::ordinal)).toList();
         for(var unit:publication.units()) {

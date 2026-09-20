@@ -72,6 +72,7 @@ class PositiveMemoryTopologyTest {
         var p=linear(1,2,1,1);var u=p.units().getFirst();
         var q=new PointQuery<ObjectId>(ProgramPoint.before(u.entries().getFirst().id(),u.sequences().getFirst().terminator().header().id()),u.objects().getFirst().id());
         var baseline=execute(p);var value=baseline.observe(List.of(q)).batch().observations().getFirst().value();
+        assertEquals((long)u.objects().size(),baseline.preparationMetrics().get("demandObjectsRequested"),"all-object preparation reports a count, never a negative sentinel");
         for(int count:List.of(1,50)) {
             var result=execute(diagnostics(p,count));var observed=result.observe(List.of(q)).batch().observations().getFirst().value();
             assertEquals(value.candidates(),observed.candidates());assertEquals(value.candidateSupports(),observed.candidateSupports());
