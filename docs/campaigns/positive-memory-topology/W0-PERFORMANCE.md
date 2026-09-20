@@ -1,6 +1,6 @@
-# W0 — current-behavior sensitivity and performance evidence
+# W0 / W0-R1 — current-behavior sensitivity and performance evidence
 
-Campaign: POSITIVE_MEMORY_TOPOLOGY. **CURRENT_BEHAVIOR; no proposed semantic change implemented.**
+Campaign: POSITIVE_MEMORY_TOPOLOGY. Original W0 measurements below are historical and reused unchanged in W0-R1; the new R1 experiments are separated at the end. **CURRENT_BEHAVIOR; no proposed semantic change implemented.**
 
 ## Reproducible scope
 
@@ -151,3 +151,206 @@ SHA-256 of actual typed snapshot file bytes; original and neutral diagnostic rep
 | Parent source/logical/file/dependency qualification | **REUSED context**, parent exact SHAs/CI, not W0 executions |
 
 No baseline output was edited to obtain PASS. No thresholds, hidden caps, arbitrary precision loss or new solver were used. The exact permanent campaign PR/commit and remote checks are recorded in GitHub and the final handoff.
+
+
+## W0-R1 — novas caracterizações, sem implementação
+
+**CURRENT_BEHAVIOR / OBSERVED**, 17 fontes pequenas criadas nesta complementação, quatro CLIs reais, Java 21, timeout 120 s/JVM, `-Xmx2g`, sem `--storage-profile` físico ou flag de experimento semântico. Todas as 68 etapas concluíram com exit 0. Uma execução por fonte; latências são apenas custos observados de processo, não benchmark estatístico. Nenhuma fonte/corpus corporativa executada ou publicada.
+
+O runtime de frontend/lower/AIR está nas baselines de discovery §2. Classpath teve hashes conferidos contra o build anterior, sem discrepâncias. O build CFG a6d703ac66341ccd046f3f2e33e4c3bc13388d54 tem fontes produtivas/POMs idênticos a 98fa57c3db2edf9f70bb7a99bb667dbf36d28104. Não se usou uma classe sobreposta de produção. O arquivo local `runtime.json` captura os comandos e os hashes; o teste FAST R1 também recompilou/verificou a baseline do worktree da campanha.
+
+### Resultado por percurso
+
+V/O/S = vistas lógicas no SP / objetos AIR / storages AIR. Targets = contador de **preparação**; coluna E/P contém Events preparados no provider regional ou producers preparados no escalar, conceitos distintos. Nenhum desses números mede bytes de memória nem posições históricas de Events. Nodes/ops = transferências durante solve.
+
+| Caso | V/O/S | Candidatos por site | Model remainder | Estado do site | Targets / E ou P | Solve nodes / ops |
+| --- | --- | --- | --- | --- | --- | --- |
+| base | 2 / 2 / 2 | OLDPGM | false | COMPLETE | 0 / 1 | 5 / 4 |
+| layout-independent | 0 / 3 / 0 | OLDPGM | true | PARTIAL | 0 / 1 | 5 / 4 |
+| layout-family | 0 / 4 / 0 | OLDPGM | true | PARTIAL | 0 / 1 | 5 / 4 |
+| if-equality | 2 / 2 / 2 | NEWPGM, OLDPGM | false | COMPLETE | 0 / 2 | 7 / 7 |
+| if-class | 2 / 2 / 2 | NEWPGM, OLDPGM | true | COMPLETE | 0 / 2 | 12 / 12 |
+| evaluate-no-other | 2 / 2 / 2 | NEWPGM, OLDPGM | false | COMPLETE | 0 / 2 | 7 / 7 |
+| evaluate-condition | 2 / 2 / 2 | NEWPGM, OLDPGM | true | COMPLETE | 0 / 2 | 12 / 12 |
+| perform-until | 2 / 2 / 2 | NEWPGM, OLDPGM | true | COMPLETE | 0 / 2 | 10 / 12 |
+| perform-times | 2 / 2 / 2 | NEWPGM | false | COMPLETE | 0 / 2 | 9 / 10 |
+| goto | 2 / 2 / 2 | OLDPGM | false | COMPLETE | 0 / 1 | 6 / 5 |
+| alter | 2 / 2 / 2 | OLDPGM | true | COMPLETE | 0 / 2 | 14 / 13 |
+| display | 2 / 2 / 2 | OLDPGM | false | COMPLETE | 0 / 1 | 6 / 5 |
+| compute | 2 / 3 / 2 | OLDPGM | true | PARTIAL | 17 / 1 | 7 / 7 |
+| accept | 2 / 2 / 2 | OLDPGM | true | COMPLETE | 0 / 1 | 8 / 8 |
+| call-before | 2 / 2 / 2 | EXTERNAL / OLDPGM | false/true | COMPLETE/COMPLETE | 0 / 1 | 6 / 5 |
+| layout-scale-10 | 0 / 12 / 0 | OLDPGM | true | PARTIAL | 0 / 1 | 5 / 4 |
+| layout-scale-50 | 0 / 52 / 0 | OLDPGM | true | PARTIAL | 0 / 1 | 5 / 4 |
+
+Todos os casos têm `sourceValueRemainder=true`, `interpretationUnknownRemainder=true` e `openControlRemainder=true` na saída corrente. O `analysisStatus=COMPLETE` significa que o cálculo solicitado terminou; não significa fonte completa nem modelValueRemainder=false. Nos casos layout/compute, `analysisReasons=[PHYSICAL_PROPAGATION_DISABLED]`; não foi reaberto o modo físico para escondê-lo. Todos preservam ao menos o candidato sustentado, de modo que a observação **não** demonstra perda universal de nomes. Demonstra perda de estrutura/projeção, mudança de provider e abertura/estado PARTIAL, mesmo com nome recuperado.
+
+- **Nasce no producer:** SYNC preservado remove todas as vistas lógicas desses exemplos; UnknownBinding/global bounds continuam explícitos na AIR. IF class/EVALUATE TRUE/UNTIL parcial viram Opaque; assinatura CALL desconhecida publica writes/read ALL. A matriz M01–M15 aponta o local de cada causa.
+- **Ampliação/consumo:** `compute` prepara 17 targets com apenas 2 bases materializadas e 1 Event lógico, zero planos/escritas físicas. Atribuição por motivo de cada target não foi instrumentada nesse probe; não chamar os 17 de Events nem atribuí-los todos a uma única causa. A leitura de C2 mostra amplificações independentes de resolver/scopes.
+- **Trabalho legítimo:** IF equality e EVALUATE literal sem OTHER mantêm OLD/NEW e model fechado; PERFORM TIMES possui Branch de repetição e candidato NEW. Esse trabalho estrutural não será eliminado porque há diagnóstico.
+- **Recusa sem fan-out:** layout com 1/10/50 SYNC tem 0 targets porque as bases nem foram materializadas. Contar zero como sucesso seria errado: todas as variantes perdem vistas, acionam provider mais amplo e ficam PARTIAL/model aberto.
+- **Escala pequena:** base sem SYNC tem 2 vistas/2 storage; com 1/10/50 declarações SYNC fica 0/0, objetos 3/12/52, ocorrências de `AllMemory` no JSON 5/14/54. O solve regional fica em 5 nodes/4 ops e 1 Event lógico nos três casos. Isso mede publicação/recusa atual, não garante custo constante nem conformidade futura.
+
+Replay separado: todos os 17 casos publicaram `observation.sequencesReplayed=1`, `observation.operationsReplayed=0`; o ponto BEFORE é atendido no limite de sequência. Esses contadores não incluem solve. Tempos finos de preparação, solve e replay não foram medidos separadamente; os respectivos **contadores** foram preservados no JSON bruto. Latência de dependency CLI inclui todas essas fases, bootstrap JVM e serialização.
+
+### Latência observada de processo (segundos, uma execução)
+
+| Caso | Frontend | Lower | CFG | Dependencies total |
+| --- | ---: | ---: | ---: | ---: |
+| base | 1.116 | 0.715 | 0.264 | 0.365 |
+| layout-independent | 1.116 | 0.665 | 0.264 | 0.365 |
+| layout-family | 1.116 | 0.715 | 0.264 | 0.415 |
+| if-equality | 1.116 | 0.715 | 0.264 | 0.364 |
+| if-class | 1.220 | 0.715 | 0.264 | 0.364 |
+| evaluate-no-other | 1.116 | 0.665 | 0.264 | 0.364 |
+| evaluate-condition | 1.216 | 0.665 | 0.264 | 0.364 |
+| perform-until | 1.166 | 0.715 | 0.264 | 0.364 |
+| perform-times | 1.116 | 0.715 | 0.264 | 0.364 |
+| goto | 1.116 | 0.715 | 0.264 | 0.364 |
+| alter | 1.166 | 0.665 | 0.264 | 0.365 |
+| display | 1.116 | 0.665 | 0.264 | 0.365 |
+| compute | 1.116 | 0.715 | 0.264 | 0.415 |
+| accept | 1.116 | 0.715 | 0.265 | 0.365 |
+| call-before | 1.066 | 0.665 | 0.264 | 0.365 |
+| layout-scale-10 | 1.116 | 0.715 | 0.314 | 0.415 |
+| layout-scale-50 | 1.166 | 0.865 | 0.365 | 0.515 |
+
+### Metadados isolados e controle positivo de Unknown
+
+Driver novo em pacote de teste usa `ValuesFixtures.graph`, sem alterar produção. Mantém literalmente mesmos objetos, bases, operações e consulta BEFORE. Primeiro adiciona somente registros Uncertainty não referenciados; depois varia Coverage/Uncertainty de publicação (0/1/50). Compara candidatos, model remainder, alcance, base, query, premissas, evidence, provenance e candidateSupports; compara mapas completos de preparação, solve e replay, não apenas duração.
+
+| Gaps | Candidato | Model | Source / effective atuais | Producers | Ops solve / replay | Projeção semântica e trabalho |
+| --- | --- | --- | --- | ---: | --- | --- |
+| 0 | PROGA | fechado | false / false | 1 | 2 / 1 | referência |
+| 1 | PROGA | fechado | true / true | 1 | 2 / 1 | iguais à referência |
+| 50 | PROGA | fechado | true / true | 1 | 2 / 1 | iguais à referência |
+
+No modo REGISTRY_ONLY, os três tamanhos também mantêm `source=false/effective=false`: são registros diagnósticos sem consumidor semântico nesse percurso. A tabela acima é do modo COVERAGE_PARTIAL. A versão inicial do probe e seus logs foram preservados antes de acrescentar esse segundo controle.
+
+**Conclusão limitada:** o caminho escalar já separa parte de source/model e não cria producers nesse exemplo; a agregação `effective` ainda muda por cobertura. Não foram medidos metadados de objeto/operation precision nem ByteImage regional. A leitura de C3/C14 mostra que estes entram em capture/igualdade; o oráculo de isolamento completo O9 continua NOT_IMPLEMENTED.
+
+O mesmo driver executou o teste existente de HavocMust/HavocMay: MUST elimina A e deixa unknown; MAY retém A+unknown. PASS do comportamento semântico legítimo, não da nova regra de gaps. Houve uma tentativa de compilação do driver sem AIR no classpath (falha de setup); logs mantidos. Com as classes AIR fixadas, compilação e execução passaram. Nenhum resultado de fonte foi reescrito.
+
+### Reprodução da caracterização R1
+
+Instrumentos neutros locais: `.positive-memory-topology/evidence/w0-r1/characterize.py`, `GapMetadataProbe.java`, `runtime.json`, `probe-commands-fixed.json`, `observations.json`, logs e subpastas. Os scripts abaixo ficam aqui para revisão/reprodução sem versionar runtime/cache/outputs. O driver Python espera o runtime local da baseline já qualificado e verifica hashes; em outro checkout, preparar o runtime nesses SHAs e adaptar **somente caminhos/classpath**, sem mudar defaults semânticos. Não executar o script histórico de corpus ao importar/configurar comandos.
+
+```python
+"""Neutral CURRENT_BEHAVIOR source probes; no production overlays or semantic flags."""
+import pathlib,json,subprocess,hashlib,time,collections
+R=pathlib.Path('/home/gustavo/workspace/teste-e2e'); E=pathlib.Path(__file__).resolve().parent
+J='/home/gustavo/.sdkman/candidates/java/21.0.12+1.1-tem/bin/java'
+old=R/'artefatos-e2e/dependency-preservation-20260919/baseline'
+commands={}
+for stage in ['frontend','lower','cfg','dependency']:
+    c=json.loads((old/f'{stage}.command.json').read_text()); i=c.index('-cp')
+    commands[stage]=[J,'-Xmx2g','-cp',c[i+1].replace('.source-dependencies-w3','.dependency-preservation'),c[i+2]]
+manifest=json.loads((R/'artefatos-e2e/dependency-preservation-closeout-20260919/e2e/build-manifest.json').read_text())
+for name,expected in manifest['classpathSha256'].items():
+    p=pathlib.Path(name);h=hashlib.sha256()
+    if p.is_dir():
+        for f in sorted(x for x in p.rglob('*') if x.is_file()):
+            h.update(str(f.relative_to(p)).encode()+b'\0');h.update(hashlib.sha256(f.read_bytes()).digest())
+    else:h.update(p.read_bytes())
+    assert h.hexdigest()==expected,name
+(E/'runtime.json').write_text(json.dumps({'commands':commands,'classpathSha256':manifest['classpathSha256'],'baselinePins':{'frontend':'edb64520a6269be9fa6d71cd47e6974112fbfece','lower':'f8e181f95929c650181c989318f8ba23d1e68a1a','cfg':'98fa57c3db2edf9f70bb7a99bb667dbf36d28104','air':'646ca3ab1687d43f7d2063fc2a8f3837ab3cf9fa'},'cfgBuildEquivalence':'a6d703ac66341ccd046f3f2e33e4c3bc13388d54 has identical production sources/poms to CFG baseline'},indent=2)+'\n')
+data='01 PGM PIC X(8).\n01 FLAG PIC X.'
+pre='MOVE "OLDPGM" TO PGM\n'
+post='CALL PGM\nGOBACK.'
+cases={
+ 'base':(data,pre+post),
+ 'layout-independent':(data+'\n01 ODD PIC X SYNC.',pre+post),
+ 'layout-family':('01 FAMILY.\n 05 PGM PIC X(8).\n 05 ODD PIC X SYNC.\n01 FLAG PIC X.',pre+post),
+ 'if-equality':(data,pre+'IF FLAG = "Y"\n MOVE "NEWPGM" TO PGM\nEND-IF\n'+post),
+ 'if-class':(data,pre+'IF FLAG IS NUMERIC\n MOVE "NEWPGM" TO PGM\nEND-IF\n'+post),
+ 'evaluate-no-other':(data,pre+'EVALUATE FLAG\n WHEN "Y" MOVE "NEWPGM" TO PGM\nEND-EVALUATE\n'+post),
+ 'evaluate-condition':(data,pre+'EVALUATE TRUE\n WHEN FLAG IS NUMERIC MOVE "NEWPGM" TO PGM\nEND-EVALUATE\n'+post),
+ 'perform-until':(data,pre+'PERFORM BODY UNTIL FLAG IS NUMERIC\n'+post+'\nBODY.\n MOVE "NEWPGM" TO PGM.'),
+ 'perform-times':(data,pre+'PERFORM BODY 2 TIMES\n'+post+'\nBODY.\n MOVE "NEWPGM" TO PGM.'),
+ 'goto':(data,'GO TO DEST.\nOTHER-P.\n MOVE "BADPGM" TO PGM\n GOBACK.\nDEST.\n'+pre+post),
+ 'alter':(data,'ALTER START-P TO PROCEED TO OTHER-P.\nSTART-P.\n GO TO DEST.\nOTHER-P.\n MOVE "BADPGM" TO PGM\n GOBACK.\nDEST.\n'+pre+post),
+ 'display':(data,pre+'DISPLAY PGM\n'+post),
+ 'compute':(data+'\n01 N PIC 9.',pre+'COMPUTE N = 1 + 2\n'+post),
+ 'accept':(data,pre+'ACCEPT PGM\n'+post),
+ 'call-before':(data,pre+'CALL "EXTERNAL"\n'+post),
+}
+for n in [10,50]:cases[f'layout-scale-{n}']=(data+'\n'+'\n'.join(f'01 ODD-{i} PIC X SYNC.' for i in range(n)),pre+post)
+def walk(x):
+    if isinstance(x,dict):
+        yield x
+        for v in x.values():yield from walk(v)
+    elif isinstance(x,list):
+        for v in x:yield from walk(v)
+rows=[]
+for name,(declarations,body) in cases.items():
+    p=E/name;p.mkdir(exist_ok=False)
+    src='IDENTIFICATION DIVISION.\nPROGRAM-ID. PROBE.\nDATA DIVISION.\nWORKING-STORAGE SECTION.\n'+declarations+'\nPROCEDURE DIVISION.\n'+body+'\n'
+    (p/'input.cbl').write_text(''.join('       '+line+'\n' for line in src.splitlines()))
+    row={'case':name,'status':'OBSERVED','phases':{}}
+    for stage,args in [('frontend',['--source',p/'input.cbl','--copybooks',p,'--output',p/'sp']),('lower',[p/'sp/cobol-semantic-product.json',p/'air.json']),('cfg',[p/'air.json',p/'cfg.json']),('dependency',[p/'air.json',p/'dependencies.json'])]:
+        cmd=commands[stage]+list(map(str,args));(p/f'{stage}.command.json').write_text(json.dumps(cmd,indent=2))
+        start=time.monotonic()
+        with (p/f'{stage}.log').open('w') as log:
+            try:code=subprocess.run(cmd,cwd=R/'.dependency-preservation'/('proleap-poc' if stage=='frontend' else 'cobol-lower' if stage=='lower' else 'analysis-cfg'),stdout=log,stderr=subprocess.STDOUT,timeout=120).returncode
+            except subprocess.TimeoutExpired:code='TIMEOUT'
+        row['phases'][stage]={'exitCode':code,'seconds':round(time.monotonic()-start,6)}
+        if code:row['status']='PIPELINE_FAILURE';break
+    if (p/'sp/cobol-semantic-product.json').exists():
+        sp=json.loads((p/'sp/cobol-semantic-product.json').read_text());row['logicalViews']=len(sp.get('storage',{}).get('logicalTextViews',[]))
+        row['spGapCodes']=dict(collections.Counter(code for x in walk(sp) for code in x.get('gapCodes',[])))
+    if (p/'air.json').exists():
+        air=json.loads((p/'air.json').read_text())['publication'];row['airKinds']=dict(collections.Counter(x['kind'] for x in walk(air) if 'kind' in x));row['airGapCodes']=dict(collections.Counter(x['code'] for x in air.get('uncertainties',[])))
+        row['objects']=sum(len(u['objects']) for u in air['units']);row['storage']=len(air['storage'])
+    if (p/'dependencies.json').exists():
+        dep=json.loads((p/'dependencies.json').read_text());row['sites']=[{k:s.get(k) for k in ['command','targetKind','targetStatus','analysisStatus','analysisReasons','modelValueRemainder','sourceUnknownRemainder','interpretationUnknownRemainder','effectiveUnknownRemainder','controlUnknown','candidates']} for s in dep['sites']];row['metrics']=dep['metrics']
+    row['sha256']={str(f.relative_to(p)):hashlib.sha256(f.read_bytes()).hexdigest() for f in p.rglob('*') if f.is_file()}
+    (p/'observation.json').write_text(json.dumps(row,indent=2)+'\n');rows.append(row)
+    print(name,row['status'],row.get('logicalViews'),[[c['referenceName'] for c in s['candidates']] for s in row.get('sites',[])],flush=True)
+(E/'observations.json').write_text(json.dumps(rows,indent=2)+'\n')
+```
+
+```java
+package io.github.gustavo2358.analysis.values;
+import java.util.*;
+import io.github.gustavo2358.air.model.*;
+import io.github.gustavo2358.air.model.Ids.*;
+import static io.github.gustavo2358.analysis.values.ValuesFixtures.*;
+/** CURRENT_BEHAVIOR only. New driver, no overlaid production class. */
+public final class GapMetadataProbe {
+    public static void main(String[] args) {
+        var original=graph(new String[]{"PROGA"},new int[][]{{}},1,false,false);
+        Object projection=null, preparation=null, solve=null, replay=null;
+        for(String mode:List.of("REGISTRY_ONLY","COVERAGE_PARTIAL")) for(int n:List.of(0,1,50)) {
+            var gaps=new ArrayList<Evidence.Uncertainty>();
+            for(int i=0;i<n;i++)gaps.add(new Evidence.Uncertainty(new UncertaintyId(original.id(),"diagnostic-"+i),"MODELING_GAP_PROBE",List.of(Evidence.Dimension.VALUES),new Scopes.PublicationScope(original.id()),"Diagnostic fixture only",origin(original.id())));
+            var coverage=new Evidence.Coverage(n==0?Evidence.InventoryStatus.COMPLETE:Evidence.InventoryStatus.PARTIAL,new Scopes.PublicationScope(original.id()),List.of(),gaps.stream().map(Evidence.Uncertainty::id).toList());
+            var p=replace(original,original.units(),mode.equals("REGISTRY_ONLY")?original.coverage():coverage,gaps,original.premises());
+            var q=ValuesTest.before(p,0,0);var run=execute(p);var prep=run.preparationMetrics();var obs=run.observe(List.of(q));var f=obs.batch().observations().getFirst().value();
+            var semantic=List.of(q,f.cell(),f.reachability(),f.candidates(),f.modelValueRemainder(),f.premises(),f.evidence(),f.provenance(),f.candidateSupports());
+            if(n==0){projection=semantic;preparation=prep;solve=run.solveMetrics();replay=obs.stateMetrics();}
+            else if(!projection.equals(semantic)||!preparation.equals(prep)||!solve.equals(run.solveMetrics())||!replay.equals(obs.stateMetrics()))throw new AssertionError("semantic/work projection differs");
+            System.out.println("mode="+mode+" gaps="+n+" candidates="+f.candidates()+" model="+f.modelValueRemainder()+" source="+f.sourceUnknownRemainder()+" effective="+f.effectiveUnknownRemainder()+" prepare="+prep.get("producersPrepared")+" operations="+run.dataflow().metrics().operationsTransferred()+" replay="+obs.batch().metrics().operationsReplayed()+" semanticAndWorkProjectionEqual=true");
+        }
+        new ValuesTest().directReadIsCopyWhileOtherEffectsAndIndirectStorageRemainUnsupported();
+        System.out.println("Existing HavocMust versus HavocMay positive control PASS (MUST kills A; MAY retains A plus unknown)");
+    }
+}
+```
+
+Compilar o driver em diretório isolado usando `javac -cp <classes-produto-e-teste-CFG>:<air-model>:<air-json>:<junit-api-e-dependências> -d <probe-classes> GapMetadataProbe.java`; executar seu main `io.github.gustavo2358.analysis.values.GapMetadataProbe` com o mesmo classpath mais `<probe-classes>`. As classes produtivas são as classes normais; o novo nome só é o driver. Os comandos exatos desta execução estão no registro local referido acima.
+
+### Gates e limites de inferência
+
+FAST obrigatório: `PASS CODE_CHANGE elapsed_seconds=95.738`, 598 métodos requeridos, zero skips. Higiene DOCS_ONLY e verificação de referências/blobs conferem o diff documental final; checks remotos no SHA publicado constam do PR45. Full/corpus não repetidos porque produção/pins/contratos não mudaram.
+
+As medidas históricas 32/100 (3.200→100 targets; 159.650→0 posições históricas compactas) são **reutilizadas**, não R1. Os probes R1 caracterizam gaps atuais e não implementam a política, não estimam heap por contagem de Events e não provam desempenho corporativo. Persistent Events só será reavaliado após medir trabalho legítimo residual; combinações, cópias e saída podem continuar grandes.
+
+Hashes de reprodução (SHA-256, sem fonte corporativa):
+
+| Arquivo local | SHA-256 |
+| --- | --- |
+| `characterize.py` | `d354833d74e13b045de8f2afeef8ff4e39d81b150d38f1faf8e5464348073049` |
+| `GapMetadataProbe.java` | `34063164e03ff20a58dc5d98fa74c4375f68653275d30fd8285e37ed99becb55` |
+| `runtime.json` | `c97e3f5f02c966b95b03214ec46f245c69371fd7490931e96d1d30e81b8f1f82` |
+| `observations.json` | `93c73b23039f76c953aba8e89419385adaabde2a374b090bfb3300d036b6a06f` |
+| `probe.log` | `7bcc297032e5578c0f6bd565924ad8af896282f5df11430b5d46eedfd663827d` |
