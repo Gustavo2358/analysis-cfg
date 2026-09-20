@@ -248,9 +248,12 @@ constant total-time claim or proof that legitimate combinations/copies become ch
 Frontend FAST: 389 tests, zero failures/skips; additional Maven: 983 tests, zero failures, one conditional skip. Its wider
 qualification did not complete: a later corpus normalizer/ownership stage failed.
 No validator was relaxed and no corpus source/output was modified. Further corpus
-execution was stopped; this gate is FAIL, not PASS or a proved pre-existing failure.
-The unchanged owner validator consumes AST/provenance and preprocessed source facts,
-not the storage projection changed here. Frontend AGENTS.md explicitly makes full
+execution was stopped; this gate remains FAIL. The owner failure is
+**proved pre-existing by a focal A/B witness** at frontend baseline `edb64520`
+and W1 `cfcf0abf`: both fail at the same source fact, owner containment check,
+and Semantic Product stage, with byte-identical preprocessing/AST output.
+The [focal reconciliation](W1-SOURCE-DEPENDENCY-OWNER-RECONCILIATION.md)
+records commands, environment, hashes and the unchanged harness. Frontend AGENTS.md explicitly makes full
 local/on-demand, never a closure requirement; the user also excludes unauthorized
 corporate execution. Required synthetic W1/FAST evidence is complete; broader corpus
 qualification remains pending. Later normalizer checks were not reached in that run.
