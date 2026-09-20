@@ -11,7 +11,15 @@ import java.math.BigInteger;
 final class FileValueQuery {
     private FileValueQuery() { }
     static boolean selected(Operations.Invoke i,AnalysisSession session){
-        return i.target() instanceof Interactions.ComputedTarget t&&t.namespace().equals("cics.file")&&FileNamePolicy.supported(t.namePolicy())&&t.name() instanceof Expressions.Read r&&area(r.place(),session,8);
+        return i.target() instanceof Interactions.ComputedTarget t&&t.namespace().equals("cics.file")&&FileNamePolicy.supported(t.namePolicy())&&t.name() instanceof Expressions.Read r&&readable(r.place());
+    }
+    static boolean readable(Place place) {
+        return place instanceof Places.ObjectPlace||place instanceof Places.Choice
+            ||place instanceof Places.RegionSlice s&&s.offset() instanceof Expressions.Literal o&&o.value() instanceof Values.IntValue
+                &&s.length() instanceof Expressions.Literal l&&l.value() instanceof Values.IntValue;
+    }
+    static boolean exactNameArea(Operations.Invoke i,AnalysisSession session) {
+        return i.target() instanceof Interactions.ComputedTarget t&&t.name() instanceof Expressions.Read read&&area(read.place(),session,8);
     }
     static boolean contextSelected(Operations.Invoke i,AnalysisSession session){
         return "EXPLICIT".equals(FileSystemContext.selection(i))&&FileSystemContext.expression(i) instanceof Expressions.Read r&&area(r.place(),session,4);

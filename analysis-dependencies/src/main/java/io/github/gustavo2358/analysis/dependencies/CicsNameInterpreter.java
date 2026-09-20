@@ -18,7 +18,8 @@ public final class CicsNameInterpreter {
     }
     public static CallNameInterpreter.Interpretation interpret(String raw,boolean computed,Interactions.NamePolicy policy) {
         if(!(policy instanceof Interactions.ExtensionName e&&e.name().equals("cics-ts.program")&&e.version().equals("1")))return new CallNameInterpreter.Interpretation(null,true);
-        // The producer must establish the physical 8-byte area. This length check is additional, not a storage proof.
+        // Length validates a name possibility, not physical storage. The consumer opens
+        // interpretation remainder when the physical 8-byte area is unproved.
         if(computed&&raw.length()!=8)return new CallNameInterpreter.Interpretation(null,true);
         int end=raw.length();while(end>0&&raw.charAt(end-1)==' ')end--;
         var name=raw.substring(0,end);

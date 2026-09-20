@@ -1,5 +1,11 @@
 # DVI — Declarative Value Inference
 
+Historical SP2.15 qualification snapshot. RF/EP supersede the no-possibility
+restrictions here (including D02 and PRESERVED): recognized VALUE may supply an
+entry possibility with remainder, without lifetime invariance. D02 is not a
+current blanket no-VALUE rule. See [the current harness policy](../engineering/lean-harness.md#value-under-ordinary-unknown-entry).
+The recorded historical outcomes below remain unchanged.
+
 DVI-W0–W3 selected qualification complete. D01–D17 PASS; D18 NO_REAL_GAIN with
 measured blockers. Handoff is ready for human review subject to Fast CI on the
 current Draft head. No merge or auto-merge. Work items remain IN_PROGRESS because

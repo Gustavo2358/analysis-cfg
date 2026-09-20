@@ -65,7 +65,7 @@ class CicsInvokeRouteTest {
         assertNull(CicsNameInterpreter.interpret("SHORT",true,p).referenceName());
         assertNull(CicsNameInterpreter.interpret("ABCDEFGH",true,new Interactions.ExtensionName("cics-ts.program","2")).referenceName());
     }
-    @Test void eightCharactersWithoutPhysicalNameAreaRemainUnsupported() {
+    @Test void eightCharactersWithoutPhysicalNameAreaPreserveCandidates() {
         var p=route(false,false,true);var u=p.units().getFirst();var s=u.sequences().get(1);var i=(Operations.Invoke)s.terminator();
         var original=(Interactions.ComputedTarget)i.target();
         var target=new Interactions.ComputedTarget("program","cics.program",original.name(),new Interactions.ExtensionName("cics-ts.program","1"),original.origin());
@@ -74,8 +74,9 @@ class CicsInvokeRouteTest {
         p=W1dEffectsTest.sequences(p,seq,u.entries());
         p=new Publication(p.id(),p.airVersion(),new Capabilities.Manifest(List.of(new Capabilities.Capability("cics-ts.program","1")),List.of()),p.artifacts(),p.units(),p.storage(),p.resources(),p.artifactRelations(),p.origins(),p.coverage(),p.uncertainties(),p.premises());
         var fact=downstream(p);assertEquals(DependencySiteFact.Reachability.REACHABLE,fact.reachability());
-        assertEquals(DependencySiteFact.TargetStatus.UNSUPPORTED_TARGET_EXPRESSION,fact.targetStatus());
-        assertTrue(fact.candidates().isEmpty());assertTrue(fact.interpretationUnknownRemainder());
+        assertEquals(DependencySiteFact.TargetStatus.RESOLVED_CANDIDATES,fact.targetStatus());
+        assertEquals(List.of("BEFORE"),fact.candidates().stream().map(DependencySiteFact.Candidate::referenceName).toList());
+        assertNotNull(fact.subject());assertNotNull(fact.valuePoint());assertTrue(fact.interpretationUnknownRemainder());
     }
 
 }

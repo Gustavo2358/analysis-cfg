@@ -82,3 +82,48 @@ data. Replace them with synthetic representatives before versioning; do not
 retain real-to-synthetic mappings. Confidential real-case evidence stays local.
 Git may contain only non-sensitive aggregate observations. Real identifiers must
 not be versioned, including in commit history or PR discussion.
+
+## Dependency Preservation Principle
+
+A failure to prove completeness, physical identity, exact value, or exact reachability
+MUST NOT by itself remove dependency candidates supported by weaker valid evidence.
+Unknown augments known information. Represent uncertainty through remainder, precision,
+coverage, gaps, or analysis status. Remove a candidate only with positive evidence
+that excludes it from the modeled site. Empty candidates plus unknown remainder is
+appropriate only when no supported candidate is known.
+
+Forbidden when semantic support exists: `if strongProofFails: return emptyUnknown()`;
+also forbidden: replacing a known semantic target with an unstructured Unknown that
+prevents fallback. A nominal Read does not assert physical allocation or independence.
+Physical/dataflow proof may refine weaker evidence; unavailable proof opens remainder.
+This rule does not authorize lexical candidate scans, invented transfers, or closure.
+
+Consumer/review checklist:
+
+- [ ] Known candidates survive an open set and PARTIAL analysis.
+- [ ] Unknown remainder complements candidates instead of replacing them.
+- [ ] An unsupported local feature removes only the precision it invalidates.
+- [ ] Candidate removal has positive exclusion evidence.
+- [ ] Tests cover known + unknown and weakened physical metadata.
+- [ ] Tests exclude a syntactic literal that cannot reach the site.
+- [ ] Tests cover truly unknown → empty + remainder.
+
+The executable regression and boundary contract are described in
+[dependency preservation](../domain/dependency-preservation.md).
+
+### VALUE under ordinary UNKNOWN entry
+
+A WORKING-STORAGE VALUE declaration alone does not prove the current value at a
+call site, persistent storage reinitialization, or a closed candidate set. It MUST
+NOT be collected directly by a dependency consumer. The current RF/EP contract
+nevertheless admits a recognized declarative value as an entry possibility
+(`DECLARATIVE_POSSIBILITY`, `POSSIBLE_LITERAL_BYTES`/`POSSIBLE_LOGICAL_TEXT`) with
+mandatory lifecycle remainder, without requiring invariance. Only the existing
+entry/value solver can propagate that evidence to BEFORE(site); positive overwrite
+or unreachability may exclude it. A provider must support the published representation;
+byte evidence does not silently enable physical propagation in logical-only mode.
+INITIAL or valid entry/invariance proof can strengthen precision under its own
+preconditions; it is not required for a supported entry possibility. The historical
+DVI “ordinary UNKNOWN has no VALUE candidate” restriction is superseded by RF/EP;
+it must not be reintroduced as a blanket gate. See the producer's
+`docs/domain/evidence-preserving-entry.md` and `RecallFirstEntryTest`.
