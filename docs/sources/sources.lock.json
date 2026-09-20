@@ -275,9 +275,9 @@
       "src/main/java/io/github/gustavo2358/cobolexplorer/CicsCommandSyntax.java",
       "src/test/java/io/github/gustavo2358/cobolexplorer/CicsFileControlTest.java"
     ],
-    "semantic_product_version": "2.32.0",
+    "semantic_product_version": "2.33.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "cfcf0abf06a3b6186e157957bb301077fcb6f0bc",
+    "commit": "138d93c794ec3682bc9324021d9125ea5ea9d6a8",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -310,7 +310,7 @@
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "Dependency preservation reviewed and integrated into source-dependencies-w3",
-    "commit": "6c0317ceb5e64c11f437e027a17dd55fba85df52",
+    "commit": "ba4f36c7b131f0db48c480187f6a9638e46f0477",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -394,9 +394,9 @@
     "db2_authority": "STATIC_SQL_TABLE_POSITION"
   },
   "positive_memory_topology": {
-    "wave": "W1",
+    "wave": "W2",
     "mode_default": "LOGICAL_ONLY",
     "physical": "EXPERIMENTAL_EXPLICIT_OPT_IN_ONLY",
-    "report": "docs/campaigns/positive-memory-topology/W1-REPORT.md"
+    "report": "docs/campaigns/positive-memory-topology/W2-REPORT.md"
   }
 }
