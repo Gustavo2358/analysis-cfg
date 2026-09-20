@@ -277,7 +277,7 @@
     ],
     "semantic_product_version": "2.32.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "e16fed3fb71b06f3eb800d556a9279eeeb117a45",
+    "commit": "edb64520a6269be9fa6d71cd47e6974112fbfece",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -288,7 +288,7 @@
       "scope": "local unconditional paragraph identity and explicit entry; G1-G5 and 1/2/5/40"
     },
     "storage_contract_version": "1.8.0",
-    "canonical_ref": "feat/dependency-preservation",
+    "canonical_ref": "feat/source-dependencies-w3",
     "observed_on": "2026-09-19",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
@@ -298,7 +298,7 @@
     "fd_w4_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED producers, manual outcomes/USE and 28 real CLI sources twice; file-dependencies/w4-implementation.md",
     "fd_w5_validation": "QUALIFIED_LOCAL: focal/FAST, producer Q-SHARED with bounded final reuse, manual local AIR/wire and44 real CLI sources twice; file-dependencies/w5-implementation.md",
     "fd_w6_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED,19 B-SP fixtures,15 manual AIR tests and33 real CLI sources twice; file-dependencies/w6-implementation.md",
-    "status": "Dependency preservation locally qualified; review pending, not merged",
+    "status": "Dependency preservation reviewed and integrated into source-dependencies-w3",
     "fd_w8_validation": "QUALIFIED_LOCAL: producer FAST/Q-SHARED, B-SP33, CFG FAST502/Q547, manual/wire and38CICS+33native source cases twice; docs/product/file-dependencies/w8-implementation.md",
     "fd_w9_validation": "QUALIFIED_LOCAL: producer focal/FAST/Q, consumer manual/FAST/reader, 8 scope + 33 native + 38 CICS real CLI sources twice, deterministic four products; docs/product/file-dependencies/w9-implementation.md",
     "logical_text_w1": "Source E2E A-D twice deterministic; scale 10/100/1000; no physical profile. Corporate rerun not required by revised user acceptance.",
@@ -309,8 +309,8 @@
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
-    "status": "Dependency preservation locally qualified; review pending, not merged",
-    "commit": "fdcaf221e08db060be343c082b8fc6622f1a5a24",
+    "status": "Dependency preservation reviewed and integrated into source-dependencies-w3",
+    "commit": "f8e181f95929c650181c989318f8ba23d1e68a1a",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -322,7 +322,7 @@
     "goto_validation": {
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
     },
-    "canonical_ref": "feat/dependency-preservation",
+    "canonical_ref": "feat/source-dependencies-w3",
     "observed_on": "2026-09-19",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
