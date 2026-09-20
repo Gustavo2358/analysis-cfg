@@ -118,7 +118,7 @@ final class W2dModelTest {
         var exact=new Interactions.ComputedTarget(old.category(),old.namespace(),old.name(),Interactions.ExactName.INSTANCE,old.origin());
         var fact=new DependencyAnalysis().prepare(target(real,exact)).sites().getFirst();
         assertFalse(fact.modelValueRemainder());assertTrue(fact.sourceValueRemainder());
-        assertFalse(fact.interpretationUnknownRemainder());assertTrue(fact.effectiveUnknownRemainder());
+        assertFalse(fact.interpretationUnknownRemainder());assertFalse(fact.effectiveUnknownRemainder());
     }
     @Test void w1SingletonAndLiteralKeepTheirCandidatesAndSupports() throws Exception {
         for(String name:List.of("dynamic-x8","literal")) {

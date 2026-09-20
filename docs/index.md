@@ -1,5 +1,7 @@
 # Índice de conhecimento
 
+[POSITIVE_MEMORY_TOPOLOGY — W1](campaigns/positive-memory-topology/W1-REPORT.md): IN_PROGRESS / revisão em DRAFT #45; W2/W3 não iniciadas.
+
 [FILE-DEPENDENCIES — FD-H0–H4 / waves futuras](product/file-dependencies/README.md): preparação source-only; STOP humano antes de W0.
 
 Comece por [AGENTS](../AGENTS.md) e pelo [trabalho](work/index.md).

@@ -109,15 +109,7 @@ public final class StatementEffects {
         var result=new LinkedHashSet<Target>();var direct=new ArrayList<StorageIndex.Candidate>(destination.candidates());
         for(var candidate:direct) {
             var location=candidate.location();if(location.range().isPresent()&&location.range().get().empty())continue;
-            var proof=new LinkedHashSet<PremiseId>();
-            for(var base:storage.bases()) {
-                var other=storage.whole(base.header().id());
-                if(other.base().id().equals(location.base().id()))continue;
-                baseComparisons++;
-                if(storage.disjoint(location,other))proof.addAll(storage.separationPremises(location,other));
-                else result.add(new Target(other,Strength.MAY,false,List.of(),List.of("UNPROVEN_BASE_SEPARATION")));
-            }
-            result.add(new Target(location,requested==Strength.MUST&&destination.exact()?Strength.MUST:Strength.MAY,true,List.copyOf(proof),destination.reasons()));
+            result.add(new Target(location,requested==Strength.MUST&&destination.exact()?Strength.MUST:Strength.MAY,true,List.of(),destination.reasons()));
         }
         if(destination.remainder() instanceof Scopes.WithinMemory remainder) {
             var scopes=new ArrayDeque<Scopes.MemoryScope>();var visited=new HashSet<Scopes.MemoryScope>();scopes.add(remainder.scope());
@@ -131,11 +123,7 @@ public final class StatementEffects {
                 var selected=storage.select(scope);
                 for(var candidate:selected.candidates()) {
                     var location=candidate.location();result.add(new Target(location,Strength.MAY,false,List.of(),destination.reasons()));
-                    for(var base:storage.bases()) {
-                        var other=storage.whole(base.header().id());
-                        if(!other.base().id().equals(location.base().id())&&!storage.disjoint(location,other))
-                            result.add(new Target(other,Strength.MAY,false,List.of(),List.of("UNPROVEN_BASE_SEPARATION")));
-                    }
+
                 }
                 if(selected.remainder() instanceof Scopes.WithinMemory w && !(scope instanceof Scopes.AllMemory))scopes.add(w.scope());
             }

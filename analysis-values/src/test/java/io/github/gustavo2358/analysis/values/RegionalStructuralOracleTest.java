@@ -1,6 +1,9 @@
 package io.github.gustavo2358.analysis.values;
 
 import io.github.gustavo2358.air.model.Values;
+import io.github.gustavo2358.air.model.Memory;
+import io.github.gustavo2358.air.model.Control;
+import io.github.gustavo2358.analysis.rd.DefinitionEvent;
 import io.github.gustavo2358.air.model.Ids.*;
 import io.github.gustavo2358.analysis.query.*;
 import io.github.gustavo2358.analysis.storage.*;
@@ -11,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static io.github.gustavo2358.analysis.values.ValuesFixtures.*;
 import static io.github.gustavo2358.analysis.values.RegionalValuesTest.*;
 
-/** W3 pre-fix semantic freeze and counterexamples to uncorrelated producer sets. */
+/** Positive-topology typed oracle and counterexamples to uncorrelated producer sets. */
 class RegionalStructuralOracleTest {
     static List<StorageValueFact> facts(int producers,boolean disjoint) {
         var execution=run(RegionalExplosionFixturesTest.fixture(4,producers,disjoint));
@@ -24,22 +27,48 @@ class RegionalStructuralOracleTest {
         }
         return List.copyOf(result);
     }
-    @Test void frozenW1FactsRetainAllTypedFieldsAndProducerIdentities() {
+    /** Independently specified oracle: one strong assignment on base zero, untouched
+     * entry contents on every other base. No output-derived digest or solver helper.
+     * Historical pre-positive hashes included compensating cross-base unknown writers
+     * and redundant separation premises, both intentionally removed by this contract. */
+    static List<StorageValueFact> expectedFacts(int regions,int producers) {
+        var result=new ArrayList<StorageValueFact>();
+        var entry=new EntryId(U,"entry");var point=ProgramPoint.before(entry,new OperationId(U,"return-s0"));
+        for(int base=0;base<regions;base++) {
+            var id=new StorageId(P,"synthetic-region-"+base);
+            var header=new Memory.StorageHeader(id,Optional.of(U),Memory.Lifetime.PERSISTENT,Memory.Visibility.PRIVATE,origin(P));
+            var location=new StorageIndex.ContextualLocation(new StorageIndex.Location(header,
+                Optional.of(StorageRange.exact(BigInteger.ZERO,BigInteger.valueOf(8)))),Optional.empty());
+            var interpretation=new RegionalValueFact.Interpretation(location,Optional.of(IBM));
+            var candidate=base==0?Optional.of(new Values.TextValue("ABCDEFGH")):Optional.<Values.TextValue>empty();
+            var op=new OperationId(U,"synthetic-producer-"+(producers-1));
+            var definition=new DefinitionEvent(entry,Optional.of(op),Optional.of(new OperandId(new OperationOwner(op),"destination")),
+                0,Optional.of(Control.NormalOutcome.INSTANCE),id,DefinitionEvent.Kind.ASSIGN,false,origin(P),List.of(),List.of(),List.of());
+            var fragment=new StorageValueFact.Fragment(location,
+                base==0?StorageValueFact.FragmentKind.KNOWN_BYTES:StorageValueFact.FragmentKind.UNKNOWN_BYTES,
+                base==0?Optional.of(new Values.BytesValue(List.of(193,194,195,196,197,198,199,200))):Optional.empty(),
+                base==0?Optional.of(new StorageValueFact.Producer(definition,location)):Optional.empty(),Optional.empty(),List.of(),List.of(),
+                base==0?List.of():List.of("UNSPECIFIED_ENTRY_CONTENT"));
+            var support=new ValueFact.Support(op,origin(P),List.of());
+            result.add(new StorageValueFact(point,new StorageSubject.NamedObject(RegionalExplosionFixturesTest.object(base)),List.of(interpretation),
+                ValueFact.Reachability.REACHABLE,candidate.stream().toList(),base!=0,false,base!=0,List.of(),base==0?List.of(op):List.of(),
+                List.of(origin(P)),base==0?List.of(new ValueFact.CandidateSupport(candidate.orElseThrow(),List.of(support))):List.of(),
+                base==0?List.of():List.of("NO_KNOWN_TEXT_PROJECTION","UNSPECIFIED_ENTRY_CONTENT"),
+                List.of(new StorageValueFact.Alternative(interpretation,candidate,List.of(fragment))),List.of()));
+        }
+        return List.copyOf(result);
+    }
+    @Test void positiveFactsRetainAllTypedFieldsAndProducerIdentities() {
         var images=new ArrayList<ByteImage>();
         for(int i=0;i<10;i++)images.add(ByteImage.unknown(Optional.of(BigInteger.valueOf(8)),"UNPROVEN_WRITE_DESTINATION",i));
         assertEquals(new TreeSet<>(java.util.stream.IntStream.range(0,10).boxed().toList()),
             images.stream().flatMap(i->i.parts().stream()).map(ByteImage.Part::producer).collect(java.util.stream.Collectors.toCollection(TreeSet::new)));
+        // Standalone ByteImage provenance semantics are unchanged by the producer policy.
         assertEquals("e98852005f7f4d49d1246c3d1c1ae860acab3b001d17c197067342a42132577e",RegionalSemanticSnapshot.digest(images));
-        // Frozen on 80104d6 before any W3 production change. This records observations,
-        // not internal DAG cardinality. Never regenerate to accommodate missing evidence.
-        var expected=Map.of("1/false","083a6aa0ff2826958698b32b42ffb6fafacad171b989d339f2e1d408c471e206",
-            "5/false","3bf6ed5144cc53452781cca4809aee08a6eea32727697a092159400c9c5fcbbe",
-            "1/true","59eae5b3d2f41a5180c411c47ddc689ab4457517c361b79577d0f3e5ff8ea6e1",
-            "5/true","22d1216224174d58fb77291cf18e21ae45874c43032917c6bdc0153512072583");
         for(boolean disjoint:List.of(false,true))for(int producers:List.of(1,5)) {
             var observed=facts(producers,disjoint);
+            assertEquals(expectedFacts(4,producers),observed);
             assertEquals(observed,facts(producers,disjoint),"typed repeatability, independently executed solver");
-            assertEquals(expected.get(producers+"/"+disjoint),RegionalSemanticSnapshot.digest(observed));
         }
     }
     @Test void snapshotRetainsEveryPartFieldAndRejectsUnsupportedTypes() throws Exception {

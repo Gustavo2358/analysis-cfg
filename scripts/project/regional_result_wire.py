@@ -159,7 +159,7 @@ class Reader:
         if f['reachability']=='UNREACHABLE_IN_MODEL':require(f['candidates'] is None and f['modelValueRemainder'] is None and not f['candidateSupports'] and not f['alternatives'],'unreachable value')
         else:
             strings(f['candidates']);boolean(f['modelValueRemainder']);require(f['candidates'] or f['modelValueRemainder'],'empty closed reached')
-        require(f['effectiveUnknownRemainder']==(f['modelValueRemainder'] is True or f['sourceUnknownRemainder']),'effective remainder')
+        require(f['effectiveUnknownRemainder']==(f['modelValueRemainder'] is True),'effective remainder')
         distinct(f['alternatives'],'alternatives');known=set();support={}
         for a in f['alternatives']:
             fields(a,'interpretation candidate fragments','alternative');require(token(a['interpretation']) in interpretations,'foreign interpretation');distinct(a['fragments'],'fragments')

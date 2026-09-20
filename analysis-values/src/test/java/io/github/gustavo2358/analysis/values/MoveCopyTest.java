@@ -42,11 +42,11 @@ class MoveCopyTest {
         var answer = fact(execute(p),before(p,0,2)); expected(answer,false,"PROGA   ");
         assertEquals(List.of(new OperationId(p.units().getFirst().id(),"producer")),answer.evidence());
     }
-    @Test void copiesDoNotCreateStorageIndependence() {
+    @Test void copiesUsePositiveStorageIndependence() {
         var p = linear(u -> List.of(copy(u,"copy",object(u,0),object(u,1))));
         var missing = replace(p,p.units(),p.coverage(),p.uncertainties(),List.of());
         var admission = PossibleValuesAnalysis.prepare(session(missing));
-        assertEquals(PossibleValuesAnalysis.Status.UNSUPPORTED,admission.status());
-        assertEquals("UNSUPPORTED_STORAGE_DISJOINTNESS",admission.reason());
+        assertEquals(PossibleValuesAnalysis.Status.ACCEPTED,admission.status());
+        assertNull(admission.reason());
     }
 }

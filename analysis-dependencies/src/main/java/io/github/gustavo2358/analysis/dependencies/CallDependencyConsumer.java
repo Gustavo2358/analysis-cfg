@@ -14,11 +14,10 @@ import static io.github.gustavo2358.analysis.dependencies.DependencySiteFact.*;
 
 /** Lookup-only consumer of the observations declared by CallDependencyPlan before execution. */
 final class CallDependencyConsumer implements FactConsumer<DependencySiteFact> {
-    private final Set<OperationId> cicsAreas;
     private final ObservationBatchId<LabelId,ReachabilityProvider.Fact> reach;
     private final ObservationBatchId<ObjectId,? extends TextValueFact> values;
     private final ObservationBatchId<StorageSubject,StorageValueFact> storageValues;
-    CallDependencyConsumer(Set<OperationId> cicsAreas,ObservationBatchId<LabelId,ReachabilityProvider.Fact> reach,ObservationBatchId<ObjectId,? extends TextValueFact> values,ObservationBatchId<StorageSubject,StorageValueFact> storageValues){this.cicsAreas=cicsAreas;this.reach=reach;this.values=values;this.storageValues=storageValues;}
+    CallDependencyConsumer(ObservationBatchId<LabelId,ReachabilityProvider.Fact> reach,ObservationBatchId<ObjectId,? extends TextValueFact> values,ObservationBatchId<StorageSubject,StorageValueFact> storageValues){this.reach=reach;this.values=values;this.storageValues=storageValues;}
     public void consume(SiteView site,PreparedFacts facts,FactSink<DependencySiteFact> sink) {
         try { consumePrepared(site,facts,sink); }
         catch(ConsumerException incomplete) {
@@ -43,7 +42,6 @@ final class CallDependencyConsumer implements FactConsumer<DependencySiteFact> {
         Boolean model=null;boolean source=reachable.sourceUnknownRemainder();boolean interpretation=policy instanceof Interactions.UnknownName||cics&&(command.equals("UNKNOWN")||!(policy instanceof Interactions.ExtensionName e&&e.name().equals("cics-ts.program")&&e.version().equals("1")));
         if(invoke.target() instanceof Interactions.ComputedTarget t&&t.name() instanceof Expressions.Read read
             &&read.place() instanceof Places.Choice choice&&choice.typeRef() instanceof Types.UnknownType)interpretation=true;
-        if(cics&&computed&&!cicsAreas.contains(site.operationId()))interpretation=true;
         ObjectId subject=null;ProgramPoint point=null;TargetStatus status;
         if(!reachable.reachable())status=TargetStatus.UNREACHABLE_IN_MODEL;
         else if(computed&&(!CallDependencyPlan.readable(invoke))){status=TargetStatus.UNSUPPORTED_TARGET_EXPRESSION;interpretation=true;}
@@ -78,7 +76,7 @@ final class CallDependencyConsumer implements FactConsumer<DependencySiteFact> {
             &&read.place() instanceof Places.Choice choice&&choice.typeRef() instanceof Types.UnknownType unknown)uncertainties.add(unknown.uncertainty());if(policy instanceof Interactions.UnknownName unknown)uncertainties.add(unknown.uncertainty());
         sink.emit(new DependencySiteFact(site.entry().unit(),site.entry(),site.sequence(),site.operationId(),site.offset(),site.origin(),targetOrigin,cics?"CICS":"COBOL",command,namespace,nameProfile,
             computed?TargetKind.COMPUTED:TargetKind.LITERAL,subject,point,reachable.reachable()?Reachability.REACHABLE:Reachability.UNREACHABLE_IN_MODEL,status,raw,candidates,
-            model,source,interpretation,Boolean.TRUE.equals(model)||source||interpretation,reachable.controlUnknown()||invoke.outcomes().remainder() instanceof Scopes.WithinControl,
+            model,source,interpretation,Boolean.TRUE.equals(model)||interpretation,reachable.controlUnknown()||invoke.outcomes().remainder() instanceof Scopes.WithinControl,
             List.copyOf(evidence),List.copyOf(origins),List.copyOf(premises),List.copyOf(uncertainties)));
     }
     /** Inventoried evidence with explicit missing analysis; never evaluates a computed expression. */
@@ -112,7 +110,7 @@ final class CallDependencyConsumer implements FactConsumer<DependencySiteFact> {
         if(policy instanceof Interactions.UnknownName unknown)uncertainties.add(unknown.uncertainty());
         return new DependencySiteFact(site.entry().unit(),site.entry(),site.sequence(),site.operationId(),site.offset(),site.origin(),targetOrigin,
             cics?"CICS":"COBOL",command,namespace,profile,literal?TargetKind.LITERAL:TargetKind.COMPUTED,subject,point,reachable,status,raw,candidates,
-            reachable==Reachability.UNREACHABLE_IN_MODEL?null:!literal,true,interpretation,true,
+            reachable==Reachability.UNREACHABLE_IN_MODEL?null:!literal,true,interpretation,reachable!=Reachability.UNREACHABLE_IN_MODEL&&!literal||interpretation,
             known.isEmpty()||known.get().controlUnknown()||invoke.outcomes().remainder() instanceof Scopes.WithinControl,
             List.of(site.operationId()),new ArrayList<>(new LinkedHashSet<>(List.of(site.origin(),targetOrigin))),List.of(),List.copyOf(uncertainties),AnalysisStatus.PARTIAL,
             reasons.stream().distinct().sorted().toList());

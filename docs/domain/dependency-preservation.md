@@ -1,15 +1,20 @@
 # Dependency preservation under incomplete physical evidence
 
-Status: implemented for review; stacked dependency-preservation campaign, no merge.
+Status: historical dependency-preservation foundation, revised by
+[POSITIVE_MEMORY_TOPOLOGY W1](positive-memory-topology.md), pending review.
+For supported textual CALL/CICS PROGRAM interpretation, omitted physical area proof
+is coverage only: it neither opens interpretation nor effective remainder. Real
+unknown values/name policies still do. General FILE/helper projection remains W2.
 The [harness principle](../engineering/lean-harness.md#dependency-preservation-principle)
 is normative. Evidence hierarchy: exact physical/dataflow proof; semantic nominal/value
 support; source-supported possibilities; no usable evidence. Lower levels keep supported
-candidates with remainder. They cannot invent storage, aliases, control edges, or values.
+candidates; a remainder requires uncertainty inside the published model. They cannot invent storage, aliases, control edges, or values.
 
 The change reuses AIR 2.0.0 ObjectPlace/Read, logical Assign, UnknownBinding and
 `target.possibilities@1`; no AIR schema or solver change. Possibilities are attached to
 specific definitions and queried BEFORE the dependency site through existing CFG/RD
-and values services. A failed physical name-area check opens interpretation remainder.
+and values services. The supported CICS PROGRAM text interpreter validates the eight-character text,
+without demanding physical source-layout proof.
 Runtime paths and missing source keep their existing uncertainty.
 
 ## Contract and limits
@@ -40,7 +45,8 @@ No claim of globally complete dependencies is made.
 provides left alignment/right space padding for the admitted alphanumeric case.
 [IBM CICS XCTL](https://www.ibm.com/docs/en/cics-ts/5.5.0?topic=summary-xctl)
 requires the computed program data area to be 8 bytes; lack of that physical proof
-therefore prevents closure, but does not delete supported logical name possibilities.
+does not prevent closure of the supported textual abstraction. This projection
+does not claim full source physical fidelity.
 AIR pinned specification 14 governs target possibilities and unknown domains.
 
 Producer declaration and resolution indexes are built once; local transfer recognition
@@ -51,11 +57,10 @@ is unchanged; there is no new dataflow, path enumeration, or global MOVE collect
 ## Regression
 
 `DependencyPreservationTest` is listed in the FAST inventory: adding runtime uncertainty
-preserves A; weakening physical metadata preserves A with remainder; strong physical
-proof permits closure; a must-overwrite removes BAD; an unreachable definition cannot
+preserves A; omitting physical proof preserves a closed supported text result; a must-overwrite removes BAD; an unreachable definition cannot
 contribute; truly unknown stays empty/open; FILE known/runtime remains enumerable.
 `CicsInvokeRouteTest` and `TargetTimingTest` preserve the BEFORE-site query and supports.
-No shared CFG, RD, storage lattice or solver implementation changed.
+That earlier campaign did not change the solver; W1 changes are listed in its report.
 
 ## Unknown layout and REDEFINES
 

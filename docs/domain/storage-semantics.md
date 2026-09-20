@@ -19,8 +19,9 @@ and constant RegionSlice; alternatives retain every candidate and an independent
 remainder. Unknown binding/extent has an explicit reason and safe scope.
 
 Equality of physical location is distinct from equality of interpretation.
-Different StorageIds never prove separation. Use disjoint_storage premises for
-different bases and interval separation within a base. Cyclic aliases fail
+Different StorageIds identify independent state bases in the supported abstraction.
+Within one base, interval intersection determines sharing; explicit aliases and choices
+retain their modeled relations. DisjointStorage is redundant, not required. Cyclic aliases fail
 validation; unresolved/open alternatives cannot produce simultaneous strong
 updates. Activation storage is context-qualified; persistent/external storage
 is not reseeded at a local return or loop backedge.
@@ -30,7 +31,8 @@ point/outcome, reads of value/address, writes MUST/MAY, location resolution and
 the proof supporting update strength. Assign/CopyBytes evaluate source before
 destination writes. HavocMust creates an unknown definition over exactly its
 proven footprint. HavocMay preserves prior possibilities. Opaque and Invoke
-consume declared envelopes; unknown effect is never empty. Invoke target is
+consume declared semantic envelopes. An omitted source effect may be absent from
+the executable projection with coverage; a published unknown effect is still executed. Invoke target is
 observed BEFORE interaction effects; outcome writes belong to that outcome.
 RD and values share these effects; dependency consumers do not reinterpret them.
 

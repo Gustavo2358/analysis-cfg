@@ -34,7 +34,7 @@ class DependencyPreservationTest {
         for(boolean open:List.of(false,true)) {
             var f=new DependencyAnalysis().prepare(cics(W2dModelTest.diamond(open,true),false)).sites().getFirst();
             assertEquals(open?List.of("PROGA"):List.of("PROGA","PROGB"),names(f));
-            assertTrue(f.effectiveUnknownRemainder());assertTrue(f.interpretationUnknownRemainder());
+            assertEquals(open,f.effectiveUnknownRemainder());assertFalse(f.interpretationUnknownRemainder());
             assertTrue(f.candidates().stream().flatMap(c->c.supports().stream()).noneMatch(s->s.producer().localId().equals("assign-bad")));
         }
     }
@@ -51,7 +51,7 @@ class DependencyPreservationTest {
         var f=new DependencyAnalysis().prepare(cics(linear(true,true),false)).sites().getFirst();
         assertEquals(List.of("PROGB"),names(f));assertEquals("replace",f.candidates().getFirst().supports().getFirst().producer().localId());
     }
-    @Test void weakeningPhysicalProofPreservesNominalCandidateAndOpensRemainder() {
+    @Test void omittedPhysicalProofPreservesClosedSupportedText() {
         var weak=cics(linear(true,false),false);var u=weak.units().getFirst();var object=u.objects().getFirst();var storage=weak.storage().getFirst();
         var view=new Memory.ViewBinding(storage.header().id(),BigInteger.ZERO,BigInteger.valueOf(8),new Memory.ExtensionCodec("text.ebcdic.ibm1047","1",Types.known(Types.Builtin.TEXT)));
         var declaration=new Memory.ObjectDeclaration(object.id(),object.displayName(),object.typeRef(),view,object.visibility(),object.origin(),object.coverage(),object.precision());
@@ -59,7 +59,7 @@ class DependencyPreservationTest {
         var precise=new DependencyAnalysis(StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).prepare(strong).sites().getFirst();
         var partial=new DependencyAnalysis().prepare(weak).sites().getFirst();
         assertEquals(List.of("PROGA"),names(precise));assertFalse(precise.effectiveUnknownRemainder());
-        assertEquals(names(precise),names(partial));assertTrue(partial.effectiveUnknownRemainder());
+        assertEquals(names(precise),names(partial));assertFalse(partial.effectiveUnknownRemainder());
     }
     @Test void fileConsumerAlsoPreservesKnownPlusRuntime() {
         for(boolean open:List.of(false,true)) {
@@ -93,7 +93,7 @@ class DependencyPreservationTest {
         assertTrue(objects.stream().allMatch(o->o.storage() instanceof Memory.UnknownBinding));
         var site=new DependencyAnalysis().prepare(p).sites().getFirst();
         assertEquals(List.of("PROGA"),names(site));assertTrue(site.modelValueRemainder());
-        assertTrue(site.interpretationUnknownRemainder());assertTrue(site.effectiveUnknownRemainder());
+        assertFalse(site.interpretationUnknownRemainder());assertTrue(site.effectiveUnknownRemainder());
     }
 
 }

@@ -54,16 +54,7 @@ final class TextProfile {
                 sourceOpenCells.add(location.ordinal());
         }
 
-        // A single premise must cover all admitted bases. Scan premise members once, not pairs.
-        if(cells.size()>1) {
-            boolean covered=false;
-            for(var premise:publication.premises())if(premise.assertion() instanceof Proofs.DisjointStorage disjoint) {
-                var members=new HashSet<StorageId>();
-                for(var id:disjoint.storage())if(cells.containsKey(id))members.add(id);
-                if(members.size()==cells.size()){premises.add(premise.id());covered=true;break;}
-            }
-            if(!covered)throw new Refusal(false,"UNSUPPORTED_STORAGE_DISJOINTNESS");
-        }
+        // Each Cell StorageId is an independent slot; aliases share a CellBinding.
         var selected=new HashSet<Location>();
         if(demand==null)selected.addAll(cells.values());
         else {

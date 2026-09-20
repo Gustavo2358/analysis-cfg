@@ -17,7 +17,8 @@ class KillAuthorityTest {
         var write=write();var direct=write.targets().stream().filter(StatementEffects.Target::sourceApplicable).findFirst().orElseThrow();
         assertTrue(KillAuthority.exact(write,direct,KillAuthority.Execution.REQUIRED).isPresent());
         assertTrue(KillAuthority.exact(write,direct,KillAuthority.Execution.POSSIBLE).isEmpty());
-        var alias=write.targets().stream().filter(t->!t.sourceApplicable()).findFirst().orElseThrow();
+        // Deliberately modeled possible target remains unable to kill.
+        var alias=new StatementEffects.Target(direct.location(),StatementEffects.Strength.MAY,false,List.of(),List.of("MODELED_ALTERNATIVE"));
         assertTrue(KillAuthority.exact(write,alias,KillAuthority.Execution.REQUIRED).isEmpty());
         for(var strength:StatementEffects.Strength.values())for(var selection:StatementEffects.Selection.values()) {
             var changed=new StatementEffects.Write(write.slot(),write.occurrence(),write.destination(),write.source(),write.targets(),selection,strength);

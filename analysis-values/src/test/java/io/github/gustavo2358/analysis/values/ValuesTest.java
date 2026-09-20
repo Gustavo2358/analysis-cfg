@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static io.github.gustavo2358.analysis.values.ValuesFixtures.*;
 
 class ValuesTest {
-    @Test void auxiliaryIntegerCellsPreserveTextCandidatesAndRequireDisjointness() {
+    @Test void auxiliaryIntegerCellsPreserveTextCandidatesWithoutPremises() {
         var p=graph(new String[]{"PROGA"},new int[][]{{}},2,true,true);var u=p.units().getFirst();var old=u.objects().get(1);
         var objects=new ArrayList<>(u.objects());var integer=Types.known(Types.Builtin.INT);
         objects.set(1,new Memory.ObjectDeclaration(old.id(),old.displayName(),integer,old.storage(),old.visibility(),old.origin(),old.coverage(),old.precision()));
@@ -27,7 +27,7 @@ class ValuesTest {
             var run=execute(changed);expected(fact(run,before(changed,0,0)),all,"PROGA");
             assertEquals(ObservationBatch.PointReason.UNSUPPORTED_SUBJECT,run.observe(List.of(before(changed,0,1))).batch().observations().getFirst().reason());
             var noProof=replace(changed,changed.units(),changed.coverage(),changed.uncertainties(),List.of());
-            assertEquals(PossibleValuesAnalysis.Status.UNSUPPORTED,PossibleValuesAnalysis.prepare(session(noProof)).status(),"auxiliary numeric storage still needs disjointness");
+            assertEquals(PossibleValuesAnalysis.Status.ACCEPTED,PossibleValuesAnalysis.prepare(session(noProof)).status(),"independent auxiliary numeric slot");
         }
     }
     static PointQuery<ObjectId> before(Publication p,int seq,int object) {
@@ -71,7 +71,7 @@ class ValuesTest {
         var p=graph(new String[]{"PROGA"},new int[][]{{}},1,false,false);var q=before(p,0,0);
         var full=fact(execute(p),q);var partial=fact(execute(partial(p)),q);
         expected(full,false,"PROGA");expected(partial,false,"PROGA");
-        assertFalse(full.sourceUnknownRemainder());assertTrue(partial.sourceUnknownRemainder());assertTrue(partial.effectiveUnknownRemainder());
+        assertFalse(full.sourceUnknownRemainder());assertTrue(partial.sourceUnknownRemainder());assertFalse(partial.effectiveUnknownRemainder());
         var unknown=graph(new String[]{null},new int[][]{{}},1,false,false);
         expected(fact(execute(unknown),before(unknown,0,0)),true);
     }
@@ -85,16 +85,16 @@ class ValuesTest {
         p=graph(new String[]{"A","B","C"},new int[][]{{1},{2},{}},2,true,true);
         var run=execute(p);expected(fact(run,before(p,2,0)),false,"C");expected(fact(run,before(p,2,1)),false,"B");
     }
-    @Test void sameCellAliasesAndDisjointnessAreSemanticAdmission() {
+    @Test void sameCellAliasesAndIndependentBasesAreSemanticAdmission() {
         var p=graph(new String[]{"A","B"},new int[][]{{1},{}},2,false,false);var run=execute(p);
         expected(fact(run,before(p,1,0)),false,"B");expected(fact(run,before(p,1,1)),false,"B");
         var noProof=graph(new String[]{"A","B"},new int[][]{{1},{}},2,true,false);
-        var refused=PossibleValuesAnalysis.prepare(session(noProof));assertEquals(PossibleValuesAnalysis.Status.UNSUPPORTED,refused.status(),"storage IDs do not prove disjointness");assertEquals(1,refused.unsupportedStorageProfiles());
+        var refused=PossibleValuesAnalysis.prepare(session(noProof));assertEquals(PossibleValuesAnalysis.Status.ACCEPTED,refused.status(),"positive state identities need no premise");assertEquals(0,refused.unsupportedStorageProfiles());
         var three=graph(new String[]{"A","B","C"},new int[][]{{1},{2},{}},3,true,false);
         var cells=three.storage();var proofs=new ArrayList<Proofs.Premise>();
         for(int i=0;i<2;i++)proofs.add(new Proofs.Premise(new PremiseId(three.id(),"pair"+i),"fixture","pair only",origin(three.id()),new Proofs.DisjointStorage(List.of(cells.get(i).header().id(),cells.get(i+1).header().id()))));
         var fragmented=replace(three,three.units(),three.coverage(),three.uncertainties(),proofs);
-        assertEquals(PossibleValuesAnalysis.Status.UNSUPPORTED,PossibleValuesAnalysis.prepare(session(fragmented)).status());
+        assertEquals(PossibleValuesAnalysis.Status.ACCEPTED,PossibleValuesAnalysis.prepare(session(fragmented)).status());
     }
     @Test void directReadIsCopyWhileOtherEffectsAndIndirectStorageRemainUnsupported() {
         var p=graph(new String[]{"A"},new int[][]{{}},1,false,false);var u=p.units().getFirst();var seq=u.sequences().getFirst();var assign=(Operations.Assign)seq.instructions().getFirst();

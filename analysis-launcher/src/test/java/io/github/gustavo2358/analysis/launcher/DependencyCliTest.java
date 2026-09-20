@@ -34,6 +34,15 @@ final class DependencyCliTest {
         assertEquals(7,AnalysisDependencies.run(new String[]{in.toString(),out.toString()},err(),new DataflowAirReader(codec)));
         assertEquals("sentinel",Files.readString(out));assertEquals(0,AnalysisDependencies.run(new String[]{in.toString(),out.toString()},err()));
     }
+    @Test void explicitPhysicalOperationalFailureNeverPublishesLogicalFallback() throws Exception {
+        var in=dir.resolve("input");var out=dir.resolve("output");Files.write(in,input());Files.writeString(out,"sentinel");
+        var codec=new AirJson(new AirJson.Limits(1,128),io.github.gustavo2358.air.validation.ValidationOptions.defaults());
+        assertEquals(7,AnalysisDependencies.run(new String[]{in.toString(),out.toString(),"--experimental-physical"},err(),new DataflowAirReader(codec)));
+        assertEquals("sentinel",Files.readString(out));
+        Files.writeString(in,"{");
+        assertEquals(3,AnalysisDependencies.run(new String[]{in.toString(),out.toString(),"--experimental-physical"},err()));
+        assertEquals("sentinel",Files.readString(out));
+    }
     @Test void semanticLimitsPublishExplicitPartialOutputWithoutExitFive() throws Exception {
         var in=dir.resolve("input");var out=dir.resolve("output");Files.writeString(out,"sentinel");
         String raw=new String(input(),java.nio.charset.StandardCharsets.UTF_8);

@@ -117,7 +117,7 @@ def site(s, extended=False):
         boolean(s[name])
     if s['modelValueRemainder'] is not None:
         boolean(s['modelValueRemainder'])
-    require(s['effectiveUnknownRemainder'] == (s['modelValueRemainder'] is True or s['sourceValueRemainder'] or s['interpretationUnknownRemainder']), 'remainder OR')
+    require(s['effectiveUnknownRemainder'] == (s['modelValueRemainder'] is True or s['interpretationUnknownRemainder']), 'remainder OR')
     refs(s['evidence'], 'operation operand'); refs(s['provenance'], 'origin'); refs(s['premises'], 'premise'); refs(s['uncertaintyRefs'], 'uncertainty')
     if extended:
         require(s['analysisStatus'] in ('COMPLETE', 'PARTIAL'), 'analysis status')
@@ -125,7 +125,7 @@ def site(s, extended=False):
         require(bool(s['analysisReasons']) == (s['analysisStatus'] == 'PARTIAL'), 'site partial reasons')
     require(s['reachability'] in (('REACHABLE', 'UNREACHABLE_IN_MODEL', 'UNKNOWN') if extended else ('REACHABLE', 'UNREACHABLE_IN_MODEL')), 'reachability')
     if s['reachability'] == 'UNKNOWN':
-        require(s['analysisStatus'] == 'PARTIAL' and s['openControlRemainder'] and s['effectiveUnknownRemainder'], 'unknown execution must remain explicitly partial')
+        require(s['analysisStatus'] == 'PARTIAL' and s['openControlRemainder'], 'unknown execution must remain explicitly partial')
     require(s['targetStatus'] in ('RESOLVED_CANDIDATES', 'OPEN_TARGET', 'UNREACHABLE_IN_MODEL', 'UNSUPPORTED_TARGET_EXPRESSION', 'UNSUPPORTED_INVOCATION_SHAPE') + (('ANALYSIS_INCOMPLETE',) if extended else ()), 'target status')
     for c in array(s['rawCandidates']):
         candidate(c, raw=True)
@@ -365,7 +365,7 @@ def validate(d):
         require((d['analysisStatus']=='PARTIAL') == (bool(d['analysisReasons']) or any(s['analysisStatus'] == 'PARTIAL' for s in d['sites']) or d.get('version') in ('2.4.0','2.5.0') and d['sourceDependencies']['available'] and d['sourceDependencies']['remainder']), 'partial result must expose its cause')
         structural = any(s['reachability'] == 'UNKNOWN' for s in d['sites']) or not d['sites'] and bool(d['analysisReasons'])
         require((d['modelScope'] == 'STRUCTURAL_AIR_OCCURRENCES') == structural, 'structural/graph scope mismatch')
-    expected = [dict(caller=s['caller'], entry=s['entry'], site=s['operation'], candidate=c, openSite=s['effectiveUnknownRemainder'])
+    expected = [dict(caller=s['caller'], entry=s['entry'], site=s['operation'], candidate=c, openSite=s['effectiveUnknownRemainder'] or s['reachability']=='UNKNOWN')
                 for s in d['sites'] if s['reachability'] != 'UNREACHABLE_IN_MODEL' for c in s['candidates']]
     require(d['edges'] == expected, 'edge projection differs from reachable candidates')
     require(type(d['metrics']) is dict, 'metrics')

@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static io.github.gustavo2358.analysis.values.ValuesFixtures.*;
 import static io.github.gustavo2358.analysis.values.RegionalValuesTest.*;
 
-/** W1 characterization: synthetic witnesses, deliberately no production fix. */
+/** Historical fan-out witnesses migrated to the positive-base contract. */
 class RegionalExplosionFixturesTest {
     static ObjectId object(int i) { return new ObjectId(U,"synthetic-object-"+i); }
 
@@ -46,13 +46,14 @@ class RegionalExplosionFixturesTest {
         return targets.stream().filter(t->t.reasons().contains("UNPROVEN_BASE_SEPARATION")).count();
     }
 
-    @Test void fanOutOccursAcrossSingletonGroupsAndOnlyDisjointnessRemovesIt() {
+    @Test void independentSingletonGroupsNeverFanOutWithOrWithoutRedundantPremise() {
         for(int n:List.of(2,4,8)) {
             var open=fixture(n,1,false);var closed=fixture(n,1,true);
             // The entire AIR publication is equal after removing the sole causal premise.
             assertEquals(open,replace(closed,closed.units(),closed.coverage(),closed.uncertainties(),List.of()));
             var openTargets=targets(open);var closedTargets=targets(closed);
-            assertEquals(n,openTargets.size());assertEquals(n-1,unproven(openTargets));
+            assertEquals(1,openTargets.size());assertEquals(0,unproven(openTargets));
+            assertEquals(openTargets,closedTargets,"redundant separation does not become semantic evidence");
             assertEquals(1,closedTargets.size());assertEquals(0,unproven(closedTargets));
             for(var target:openTargets) {
                 boolean direct=target.location().base().id().localId().equals("synthetic-region-0");
@@ -149,8 +150,8 @@ class RegionalExplosionFixturesTest {
         var engine=analysis.new Engine();var state=engine.boundaries(selected).iterator().next().state();
         for(var write:p.units().getFirst().sequences().getFirst().instructions())state=engine.operation(state,write);
         assertEquals(state.materializedAlternatives(),metrics.get("maxStateAlternatives"));
-        assertEquals(disjoint?1:7,state.materializedAlternatives(),"production structural edges");
-        assertEquals(disjoint?0:3L*producers,metrics.get("maxProvenanceRows"));
+        assertEquals(1,state.materializedAlternatives(),"only the written independent group changes");
+        assertEquals(0L,metrics.get("maxProvenanceRows"));
         var labels=new HashSet<StorageValueFact.Alternative>();var shapes=new HashSet<StorageValueFact.Alternative>();
         var writerIds=new HashSet<String>();
         for(int base=1;base<4;base++) {
@@ -161,7 +162,7 @@ class RegionalExplosionFixturesTest {
             assertEquals(io.github.gustavo2358.analysis.query.ObservationBatch.Status.COMPLETE,batch.status());
             var fact=batch.observations().getFirst().value();
             assertTrue(fact.modelValueRemainder());assertTrue(fact.candidates().isEmpty());
-            assertEquals(disjoint?1:producers+1,fact.alternatives().size(),"weak update retains the unspecified entry alternative");
+            assertEquals(1,fact.alternatives().size(),"untouched bases retain only their unspecified entry content");
             for(var alternative:fact.alternatives()) {
                 assertEquals(1,alternative.fragments().size());
                 var fragment=alternative.fragments().getFirst();
@@ -173,8 +174,8 @@ class RegionalExplosionFixturesTest {
                 labels.add(alternative);shapes.add(crossShape(alternative));
             }
         }
-        assertEquals(disjoint?0:producers,writerIds.size());
-        assertEquals(disjoint?0:3*producers,labels.size());assertEquals(disjoint?0:3,shapes.size());
+        assertEquals(0,writerIds.size());
+        assertEquals(0,labels.size());assertEquals(0,shapes.size());
         // Strong own-base writes keep only the last literal producer.
         var own=at(execution,"return-s0",object(0));assertEquals(List.of("ABCDEFGH"),texts(own));
         assertEquals(List.of("synthetic-producer-"+(producers-1)),own.candidateSupports().getFirst().producers()
@@ -184,17 +185,15 @@ class RegionalExplosionFixturesTest {
         System.out.printf("W1_C disjoint=%s producers=%d %s%n",disjoint,producers,result);return result;
     }
 
-    @Test void fanOutAndProvenanceComposeThroughRealWeakTransfersAndSolver() {
+    @Test void repeatedIndependentWritesDoNotCreateCompensatingAlternatives() {
         var a=composition(1,true);var b=composition(1,false);
         var c=composition(5,true);var d=composition(5,false);
-        assertEquals(0,a.unproven());assertEquals(3,b.unproven());
-        assertEquals(0,c.unproven());assertEquals(15,d.unproven());
-        assertEquals(1,a.alternatives());assertEquals(7,b.alternatives());
-        assertEquals(1,c.alternatives());assertEquals(19,d.alternatives());
-        // Interaction term: 3 cross-base targets × 4 additional producers = 12 edges.
-        assertEquals(12,(d.alternatives()-b.alternatives())-(c.alternatives()-a.alternatives()));
-        assertEquals(b.crossShapes(),d.crossShapes());assertTrue(d.crossLabels()>d.crossShapes());
-        assertTrue(d.internedEdges()>b.internedEdges());
+        assertEquals(a,b);assertEquals(c,d);
+        for(var result:List.of(a,b,c,d)) {
+            assertEquals(0,result.unproven());assertEquals(1,result.alternatives());
+            assertEquals(0,result.crossLabels());assertEquals(0,result.crossShapes());
+        }
+        assertEquals(1,a.targets());assertEquals(5,c.targets());
     }
 
     @Test void repeatingOneEventDoesNotMimicFiveDistinctProducers() {
@@ -205,7 +204,7 @@ class RegionalExplosionFixturesTest {
         state=engine.operation(state,operation);var once=state;
         for(int i=1;i<5;i++)state=engine.operation(state,operation);
         assertTrue(engine.equivalent(once,state,new io.github.gustavo2358.analysis.solver.DomainWork()));
-        assertEquals(7,state.materializedAlternatives());
+        assertEquals(1,state.materializedAlternatives());
     }
 
 }

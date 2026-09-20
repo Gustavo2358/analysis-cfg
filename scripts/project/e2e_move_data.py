@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Four real COBOL copy chains through the exact locked producers. Local only."""
 import argparse
-import copy
 import json
 import os
 from pathlib import Path
@@ -10,7 +9,7 @@ import sys
 
 from dependency_wire import read, require
 from cfg_wire_contract import verify as verify_cfg_wire
-from e2e_w2d import locked_sp, open_call_model, execute, runtime, source_spans
+from e2e_w2d import locked_sp, open_call_model, execute, runtime, source_spans, text_leaf, literal_text
 from prepare_w2d_producers import ROOT, git, require_local
 
 FIXTURES = ROOT / 'analysis-adapters/src/test/resources/cp6/move-data'
@@ -28,9 +27,6 @@ def source_oracle(sp, case, version):
     require(sp['unit']['canonicalProgramName'] == 'CALLER', 'real caller identity')
     data = {d['canonicalName']: d['id'] for d in sp['dataDeclarations']}
     require(set(data) == ({'WS-A', 'WS-B', 'WS-PGM'} if case == 'multi-hop' else {'WS-A', 'WS-PGM'}), 'scalar declarations')
-    proof = sp['storageIndependence']
-    require(proof['availability'] == 'KNOWN' and set(proof['members']) == set(data.values())
-            and proof['provenance']['exact'], 'source-derived storage evidence for linear program')
     moves = [s for s in sp['statements'] if s['variant'] == 'MOVE']
     require(len(moves) == len(CASES[case]), 'all real MOVEs represented')
     for move, (kind, value, target) in zip(moves, CASES[case]):
@@ -65,9 +61,9 @@ def air_oracle(air, data, moves, case):
         item = next(i for i in p['coverage']['items'] if i['sourceKey'].endswith('/data/' + identity))
         objects[name] = next(o for o in item['outputs'] if o['domain'] == 'object')
     cells = [o['storage']['storage'] for o in unit['objects']]
-    require(len(cells) == len(data) and len(p['premises']) == 1, 'multiple cells require published premise')
-    premise = p['premises'][0]['assertion']
-    require(premise['kind'] == 'disjoint_storage' and all(c in premise['storage'] for c in cells), 'translated DisjointStorage covers cells')
+    require(len(cells) == len(data) and len({json.dumps(c, sort_keys=True) for c in cells}) == len(data),
+            'distinct positive bases for independent scalar declarations')
+    require(not p['premises'], 'positive bases need no generated negative premise')
     labels = {s['label']['localId']: s for s in unit['sequences']}
     current=labels[unit['entries'][0]['initialLabel']['localId']]; assigns=[]
     for move in moves:
@@ -79,33 +75,38 @@ def air_oracle(air, data, moves, case):
                 and assign['destination']['header']['role'] == 'VALUE_WRITE', 'exact destination and write role')
         expression = assign['value']; require(expression['header']['role'] == 'VALUE_READ', 'source value read role')
         if kind == 'LITERAL':
-            require(expression['kind'] == 'literal' and expression['value']['value'] == value.ljust(8), 'padded literal in AIR')
+            require(literal_text(expression) == value.ljust(8), 'padded literal in AIR')
         else:
+            expression = text_leaf(expression)
             require(expression['kind'] == 'read' and expression['place']['kind'] == 'object'
                     and expression['place']['object'] == objects[value]
                     and expression['place']['header']['role'] == 'VALUE_READ', 'data MOVE is Read of source object')
-            # Direct copy preserves statement and both operand origins independently.
-            for header, provenance in ((assign['header'], move['header']['provenance']),
-                                       (expression['header'], move['source']['reference']['provenance']),
-                                       (expression['place']['header'], move['source']['reference']['provenance']),
-                                       (assign['destination']['header'], move['target']['provenance'])):
-                # The lower retains original + expanded spans through a Derived origin.
-                spans = source_spans(p, {'origin': header['origin']}, Path(provenance['original']['file']))
-                require(len(spans) == 1, 'copy retains one exact original source occurrence')
-                span = spans[0]['span']
-                require(span['lineBase'] == '1' and span['columnBase'] == '0'
-                        and span['columnUnit'] == 'UNICODE_SCALAR' and span['endExclusive'] is False, 'SP coordinate conventions')
-                require(all(int(span[side][axis]) == provenance['original'][side + axis.title()]
-                            for side in ('start', 'end') for axis in ('line', 'column')), 'exact copy occurrence span')
+            # Logical copy origins correlate statement and both operand occurrences.
+            # Check the complete exact set; unrelated source statements must not leak in.
+            provenance = [move['header']['provenance'], move['source']['reference']['provenance'], move['target']['provenance']]
+            def coordinates(span):
+                return tuple(int(span[side][axis]) for side in ('start', 'end') for axis in ('line', 'column'))
+            expected = {tuple(p['original'][side + axis.title()] for side in ('start', 'end') for axis in ('line', 'column')) for p in provenance}
+            for header in (assign['header'], expression['header'], expression['place']['header'], assign['destination']['header']):
+                locations = source_spans(p, {'origin': header['origin']}, Path(provenance[0]['original']['file']))
+                spans = [location['span'] for location in locations]
+                require(all(span['lineBase'] == '1' and span['columnBase'] == '0'
+                            and span['columnUnit'] == 'UNICODE_SCALAR' and span['endExclusive'] is False
+                            for span in spans), 'SP coordinate conventions')
+                wanted = ({tuple(move['target']['provenance']['original'][side + axis.title()]
+                                 for side in ('start', 'end') for axis in ('line', 'column'))}
+                          if header is assign['destination']['header'] else expected)
+                require(len(spans) == len(wanted) and {coordinates(span) for span in spans} == wanted,
+                        'exact copy statement/source/receiver occurrences, no unrelated origin')
     invoke = call['terminator']
     require(invoke['target']['name']['kind'] == 'read'
             and invoke['target']['name']['place']['object'] == objects['WS-PGM'], 'dynamic CALL reads final receiver')
     return unit, call, assigns, objects
 
 
-def dependency_oracle(result, model, source, case, *, source_control=True):
+def dependency_oracle(result, model, source, case):
     unit, call, assigns, objects = model
-    names=['PROGA','PROGB'] if source_control and case=='snapshot' else ['PROGA']
+    names = ['PROGA']
     require(len(result['sites']) == 1 and len(result['edges']) == len(names), 'one CALL and exact candidate edges')
     site = result['sites'][0]
     require(site['caller'] == unit['id'] and site['entry'] == unit['entries'][0]['id'], 'CALLER identity')
@@ -113,8 +114,8 @@ def dependency_oracle(result, model, source, case, *, source_control=True):
             and site['offset'] == 0, 'real Invoke location after all MOVEs')
     require(site['valuePoint']['position'] == 'BEFORE' and site['valuePoint']['operationId'] == site['operation'], 'BEFORE Invoke')
     require(site['targetKind'] == 'COMPUTED' and site['reachability'] == 'REACHABLE' and site['subject'] == objects['WS-PGM'], 'computed reachable WS-PGM')
-    if source_control:open_call_model(call['terminator'],site)
-    else:require(site['modelValueRemainder'] is False, 'normal-only snapshot remains closed')
+    open_call_model(call['terminator'], site)
+    require(not site['openControlRemainder'], 'supported linear sequence stays closed')
     require([c['referenceName'] for c in site['candidates']] == names, 'independent source-control candidate set')
     require([c['rawValue'] for c in site['rawCandidates']] == [n.ljust(8) for n in names]
             and [c['rawValue'] for c in site['candidates']] == [n.ljust(8) for n in names], 'padding retained through interpretation')
@@ -122,14 +123,17 @@ def dependency_oracle(result, model, source, case, *, source_control=True):
             and site['effectiveUnknownRemainder'], 'real source independent open dimensions')
     for index,name in enumerate(names):
         candidate=site['candidates'][index];support=candidate['supports']
-        producer=assigns[2 if name=='PROGB' else 1 if case=='overwrite' else 0]
+        producer_index = max(i for i, (_, _, target) in enumerate(CASES[case]) if target == 'WS-PGM')
+        producer = assigns[producer_index]
         require(len(support)==1 and support[0]['kind']=='VALUE_PRODUCER'
-                and support[0]['producer']==producer['header']['id'] and support[0]['origin']==producer['header']['origin'], 'specific original literal support survives copy')
+                and support[0]['producer']==producer['header']['id'] and support[0]['origin']==producer['header']['origin'], 'exact final FitText copy produces the supported snapshot')
         require(site['rawCandidates'][index]['supports']==support and result['edges'][index]['candidate']==candidate
                 and result['edges'][index]['caller']==site['caller'] and result['edges'][index]['site']==site['operation'], 'edge and raw/interpreted support consistency')
         spans=source_spans(result,support[0],source)
-        literal_line=next(i for i,line in enumerate(source.read_text().splitlines(),1) if "MOVE '"+name+"'" in line)
-        require(all(int(span['startLine'])==literal_line==int(span['endLine']) for span in spans), 'support reaches original literal MOVE')
+        copy_source = CASES[case][producer_index][1]
+        literal_line = next(i for i, line in enumerate(source.read_text().splitlines(), 1)
+                            if 'MOVE ' + copy_source + ' TO WS-PGM' in line)
+        require(all(int(span['startLine']) == literal_line == int(span['endLine']) for span in spans), 'support reaches exact transforming MOVE occurrence')
     require(result['metrics']['possibleValuesRuns'] == 1, 'normal forward fixed point runs once')
 
 
@@ -160,16 +164,7 @@ def run(work, config_path):
         contract = verify_cfg_wire(cfg.read_bytes()); require('INVOKE_NORMAL' in contract['transitions'], 'real CFG continuation')
         execute(cwd, 'dependency', ['java', '-cp', cp, 'io.github.gustavo2358.analysis.launcher.AnalysisDependencies', str(air), str(dep)])
         dependency_oracle(read(dep), model, source, case)
-        if case=='snapshot':
-            # Counterfactual AIR oracle, not a stronger claim about the raw source:
-            # normal-only control cannot revisit the copy after the later WS-A write.
-            normal=copy.deepcopy(json.loads(air.read_text()))
-            for sequence in normal['publication']['units'][0]['sequences']:
-                if sequence['terminator']['kind']=='invoke':sequence['terminator']['outcomes']['remainder']={'kind':'none'}
-            normal_air=cwd/'normal-only.air.json';normal_air.write_text(json.dumps(normal));normal_dep=cwd/'normal-only.dependencies.json'
-            execute(cwd,'normal-only',['java','-cp',cp,'io.github.gustavo2358.analysis.launcher.AnalysisDependencies',str(normal_air),str(normal_dep)])
-            dependency_oracle(read(normal_dep),model,source,case,source_control=False)
-        print('PASS real '+case+': exact candidates/supports under source control; snapshot also checked with normal-only AIR',flush=True)
+        print('PASS real ' + case + ': exact candidates, snapshot, copies and original supports', flush=True)
 
 
 if __name__ == '__main__':

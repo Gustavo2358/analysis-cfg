@@ -208,10 +208,14 @@
       "addingRuntimeUncertaintyNeverRemovesExistingCandidate",
       "trulyUnknownRemainsEmptyOpen",
       "positiveOverwriteCanRemoveAnEarlierCandidate",
-      "weakeningPhysicalProofPreservesNominalCandidateAndOpensRemainder",
+      "omittedPhysicalProofPreservesClosedSupportedText",
       "fileConsumerAlsoPreservesKnownPlusRuntime",
       "lowerAreaUncertaintyReachesSiteAndWire",
       "redefinesUnknownBindingCannotInventAliasOverwrite"
+    ],
+    "io.github.gustavo2358.analysis.adapters.ConsumerCoverageTest": [
+      "cicsProgramClosedChoiceConsumesAlreadyPreparedStorageEvidence",
+      "cicsChoiceCannotBorrowProofFromOnlyOneAlternative"
     ]
   },
   "analysis-dataflow": {
@@ -295,15 +299,15 @@
       "unboundedTailAndArbitraryIntegerRemainDistinctFromZero"
     ],
     "io.github.gustavo2358.analysis.storage.StorageIndexTest": [
-      "disjointPremisesAreNotTransitiveAndCodecDoesNotChangePhysicalOverlap",
+      "positiveBasesAndCodecDoesNotChangePhysicalOverlap",
       "cyclicAndDanglingAssociationsFailBeforeAnalysis",
       "snapshotIsolationAndPreparationCountFollowObjectsNotPairs",
       "physicalAliasesAndAdjacentRangesDoNotDependOnNames",
-      "distinctBasesRequirePremiseAndLifetimeQualifiesActivationOnly",
+      "distinctBasesIndependentAndLifetimeQualifiesActivationOnly",
       "alternativesAndUnknownExtentRetainIndependentRemainder"
     ],
     "io.github.gustavo2358.analysis.storage.StatementEffectsTest": [
-      "mustIsPartialAndUnprovedForeignBaseReceivesMayEffect",
+      "partialMustWriteDoesNotTouchIndependentBase",
       "ambiguousMustAndScopedMayNeverBecomeSimultaneousStrongWrites",
       "copyCapturesSourceAndOpaqueUnknownWritesAreExplicit"
     ],
@@ -322,11 +326,11 @@
     "io.github.gustavo2358.analysis.storage.RegionalDefinitionAdversarialTest": [
       "differentBasesAndAlternativeDestinationsKeepPossibleOldDefinitions",
       "opaqueEffectIsNotNopAndBeforePointStaysIndependent",
-      "sourceGapFollowsPhysicalAliasButNotAdjacentInterval",
+      "sourceGapIsDiagnosticOnDeclaredSubject",
       "seededCellIsNotReinitializedOnLoopOrNextSequence",
       "hugeBoundsUnknownTailAndZeroLengthNeverAllocatePerByte",
       "wideDefinitionsAndDuplicateQueriesHaveNoCandidateCapOrRepeatedReplay",
-      "openEnvironmentDefinitionsKeepDistinctPremisesInCanonicalOrder"
+      "openEnvironmentDefinitionsDeduplicateRedundantSeparation"
     ],
     "io.github.gustavo2358.analysis.storage.StorageQueryTest": [
       "namedViewAndPhysicalRangeShareTheSameDefinitionProduct",
@@ -353,7 +357,8 @@
       "inputAndOutputFailuresPreserveDestinationAndCleanupTemporaryFile",
       "realCodecOperationalLimitIsSevenAndProducesNoPartialResult",
       "semanticLimitsPublishExplicitPartialOutputWithoutExitFive",
-      "scopedPreconditionSurvivesRealCodecCliAndStructuralInvalidityStillRejects"
+      "scopedPreconditionSurvivesRealCodecCliAndStructuralInvalidityStillRejects",
+      "explicitPhysicalOperationalFailureNeverPublishesLogicalFallback"
     ],
     "io.github.gustavo2358.analysis.launcher.RegionalCliTest": [
       "missingInputAndBadQueryNeverReplaceOutput",
@@ -437,7 +442,7 @@
       "realVerticalMixedBatchHasOneObservationPerLogicalQuery",
       "partialSourceIsSeparateFromExactModelAndUnknownWitness",
       "diamondsMissingPathsStrongUpdatesAndOtherCells",
-      "sameCellAliasesAndDisjointnessAreSemanticAdmission",
+      "sameCellAliasesAndIndependentBasesAreSemanticAdmission",
       "directReadIsCopyWhileOtherEffectsAndIndirectStorageRemainUnsupported",
       "entrySeedsContextsUnreachableAndUnicodeKeepTheirIdentity"
     ],
@@ -445,7 +450,7 @@
       "copyOverwritesAndRetainsSnapshotAndOriginalSupport",
       "missingSourceStronglyReplacesKnownDestinationWithOpenEmpty",
       "repeatedForwardCopiesHaveNoHopLimit",
-      "copiesDoNotCreateStorageIndependence"
+      "copiesUsePositiveStorageIndependence"
     ],
     "io.github.gustavo2358.analysis.values.ByteImageTest": [
       "unknownIsNotEmptyAndKnownSliceUsesItsOriginalOffset",
@@ -465,7 +470,7 @@
       "branchAndLoopSupportsConvergeWithoutPathHistories",
       "sameBytesDifferentCodecsProduceDifferentText",
       "identicalInitialConditionsRetainBothSupportsAndConflictsAreRefused",
-      "scalarAndRegionCoexistOnlyExplicitSeparationClosesTheOtherBase",
+      "scalarAndRegionAreIndependentWithoutSeparationPremise",
       "wholeAreaCopyCapturesItsSourceBeforeLaterAssignment",
       "finiteConcreteOracleChecksFullWritesJoinsLoopsAndMissingBranches"
     ],
@@ -493,8 +498,8 @@
       "logicalReadCapturesAComposedRegionalValueBeforeLaterWrite"
     ],
     "io.github.gustavo2358.analysis.values.RegionalProvenanceTest": [
-      "copiedSourceRemainderSurvivesDisjointDestinationAndDiesOnOverwrite",
-      "sourceGapIsCroppedWithItsFragmentAndDoesNotContaminateCopiedSuffix"
+      "sourceDiagnosticDoesNotTravelThroughCopiesOrOverwrite",
+      "sourceDiagnosticDoesNotSplitFragmentsOrContaminateCopies"
     ],
     "io.github.gustavo2358.analysis.values.StorageValueObservationTest": [
       "composedCandidateExposesBothSurvivingProducerIntervalsAndMatchingRdEvents",
@@ -502,7 +507,7 @@
       "copyOfCopyRetainsCroppedIntermediateAndOriginalContributions",
       "unknownPrefixExposesItsWriterAndKeepsOnlyTheSurvivingLiteralSuffix",
       "branchSupportsRemainSeparateAlternativesAndInventoryOrderIsIrrelevant",
-      "sourceGapMetadataFollowsOnlyTheCapturedPrefix",
+      "sourceGapMetadataDoesNotCreateCapturedFragments",
       "zeroLengthUnreachableAndUninterpretedBytesHaveDistinctProducts",
       "logicalCaptureReportsWholeCellDestinationWithoutInventedByteOffsets"
     ],
@@ -533,7 +538,7 @@
       "aliasScopeUsesPhysicalIntersection"
     ],
     "io.github.gustavo2358.analysis.values.MixedStorageTest": [
-      "unknownRegionAndCodecRetainInventoryAndInterfereOnlyWithoutSeparationProof"
+      "unknownRegionAndCodecRetainInventoryWithoutCrossBaseInterference"
     ],
     "io.github.gustavo2358.analysis.values.EvidencePreservingEntryTest": [
       "unknownBindingPreservesEntrySupportInBothAnalyses",
@@ -543,7 +548,7 @@
     ],
     "io.github.gustavo2358.analysis.values.EvidencePreservingPolicyTest": [
       "unknownMayKeepsEntryCandidateAndItsOriginalSupport",
-      "missingAliasProofNeitherKillsNorCopiesTheOtherObjectsLiteral",
+      "independentBaseNeitherKillsNorCopiesOtherLiteral",
       "unknownBindingPreservesEvidenceWithoutInventingPhysicalRanges",
       "mustAndRepeatedQueriesCannotReseedEntryEvidence"
     ],
@@ -596,17 +601,17 @@
       "deepProjectionAndCollidingUpdateCanUnionLongSuffixes"
     ],
     "io.github.gustavo2358.analysis.values.RegionalExplosionFixturesTest": [
-      "fanOutOccursAcrossSingletonGroupsAndOnlyDisjointnessRemovesIt",
+      "independentSingletonGroupsNeverFanOutWithOrWithoutRedundantPremise",
       "producerAlonePreventsInterningAndUnionCanonicalization",
       "shapePreservesPayloadExtentReasonAndAllNonProducerMetadata",
-      "fanOutAndProvenanceComposeThroughRealWeakTransfersAndSolver",
+      "repeatedIndependentWritesDoNotCreateCompensatingAlternatives",
       "repeatingOneEventDoesNotMimicFiveDistinctProducers"
     ],
     "io.github.gustavo2358.analysis.values.RegionalCostMetricsTest": [
       "trackedSummariesMatchFullStateTraversalForDisjointAndConnectedGroups"
     ],
     "io.github.gustavo2358.analysis.values.RegionalStructuralOracleTest": [
-      "frozenW1FactsRetainAllTypedFieldsAndProducerIdentities",
+      "positiveFactsRetainAllTypedFieldsAndProducerIdentities",
       "snapshotRetainsEveryPartFieldAndRejectsUnsupportedTypes",
       "producerSetsLoseRangeAssociationsAndIndependentSetsInventCorrelations"
     ],
@@ -616,7 +621,7 @@
       "differentShapesHashCollisionsAndLevelsNeverConflate",
       "admissionRejectsEveryEnrichedProvenanceDimension",
       "wholeWeakPartialCopyAndConnectedUpdateUseExactFallback",
-      "fixtureCAndLargerScalesKeepFrozenFactsWithFewerStructuralEdges",
+      "positiveFixtureAndLargerScalesHaveNoCompensatingProvenance",
       "realConnectedCopyAndPartialCopyReplayKeepCompleteObservations"
     ],
     "io.github.gustavo2358.analysis.values.RegionalAlternativesTest": [
@@ -647,6 +652,12 @@
     "io.github.gustavo2358.analysis.values.LogicalTextTest": [
       "unknownSiblingDoesNotEraseKnownProjection",
       "immutableSnapshotAndFit"
+    ],
+    "io.github.gustavo2358.analysis.values.PositiveMemoryTopologyTest": [
+      "distinctBasesNeedNoNegativePremisesOrCrossBaseEvents",
+      "regionalDiagnosticMutationCannotChangeCopyCapturesSupportsOrWork",
+      "scalarDiagnosticMutationKeepsClosedModelAndSupports",
+      "diagnosticsAndRegionsNeverActivatePhysicalDefault"
     ]
   },
   "cfg-adapters": {

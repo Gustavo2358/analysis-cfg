@@ -109,10 +109,10 @@ final class FileCicsContextOracleTest {
         var partial=new Publication(base.id(),base.airVersion(),base.capabilities(),base.artifacts(),base.units(),base.storage(),base.resources(),base.artifactRelations(),base.origins(),new Evidence.Coverage(Evidence.InventoryStatus.PARTIAL,new Scopes.PublicationScope(P),List.of(),List.of(gap)),gaps,base.premises());
         var opened=analyzePublication("source-partial-counterproof",partial,io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL);
         assertEquals(site(closed,"file").get("candidates"),site(opened,"file").get("candidates"));
-        assertEquals(false,site(closed,"file").get("unknownRemainder"));assertEquals(true,site(opened,"file").get("unknownRemainder"));
+        assertEquals(false,site(closed,"file").get("unknownRemainder"));assertEquals(false,site(opened,"file").get("unknownRemainder"));
         assertEquals(List.of("FILE_SOURCE_VALUE_REMAINDER"),site(opened,"file").get("analysisReasons"));
         var a=map(site(closed,"file").get("context"));var b=map(site(opened,"file").get("context"));
-        assertEquals(a.get("candidates"),b.get("candidates"));assertEquals(false,a.get("unknownRemainder"));assertEquals(true,b.get("unknownRemainder"));
+        assertEquals(a.get("candidates"),b.get("candidates"));assertEquals(false,a.get("unknownRemainder"));assertEquals(false,b.get("unknownRemainder"));
         assertEquals(List.of("CICS_SYSID_SOURCE_VALUE_REMAINDER"),b.get("analysisReasons"));
     }
 

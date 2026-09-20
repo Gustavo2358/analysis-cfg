@@ -8,20 +8,17 @@ import static io.github.gustavo2358.analysis.storage.StorageFixtures.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class StatementEffectsTest {
-    @Test void mustIsPartialAndUnprovedForeignBaseReceivesMayEffect() {
+    @Test void partialMustWriteDoesNotTouchIndependentBase() {
         var assignment=assign("d1","left",1,2,3,4);
         var bases=List.of(region("r",8L,Memory.Lifetime.ACTIVATION),region("other",8L,Memory.Lifetime.ACTIVATION));
         var objects=List.of(view("left","r",0,4),view("right","r",4,4),view("foreign","other",0,8));
         for(boolean proof:List.of(false,true)) {
             var index=new StorageIndex(session(publication(bases,objects,List.of(sequence("s",List.of(assignment))),proof?List.of(disjoint("r","other")):List.of())));
             var effects=new StatementEffects(index).statement(assignment.header().id());
-            var write=effects.writes().getFirst();assertEquals(proof?1:2,write.targets().size());
+            var write=effects.writes().getFirst();assertEquals(1,write.targets().size());
             var exact=write.targets().stream().filter(t->t.location().base().id().equals(base("r"))).findFirst().orElseThrow();
             assertEquals(StatementEffects.Strength.MUST,exact.strength());assertEquals(Optional.of(StorageRangeTest.range(0,4)),exact.location().range());
-            if(!proof) {
-                var may=write.targets().stream().filter(t->t.location().base().id().equals(base("other"))).findFirst().orElseThrow();
-                assertEquals(StatementEffects.Strength.MAY,may.strength());assertFalse(may.sourceApplicable());
-            }
+            assertTrue(write.targets().stream().allMatch(StatementEffects.Target::sourceApplicable));
         }
     }
     @Test void ambiguousMustAndScopedMayNeverBecomeSimultaneousStrongWrites() {

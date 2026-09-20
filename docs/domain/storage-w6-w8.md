@@ -23,7 +23,7 @@ overlap/permutation, unknown gaps, overwrite/loop, copy and source contributions
 
 W7.2 retains the established StatementEffects semantics. MAY preserves the old
 possibility; MUST kills only its exact outcome-specific range. A named union
-uses physical alias intersections and explicit disjoint-allocation premises.
+uses physical alias intersections and positive independent StorageId bases.
 AllMemory includes private allocations; PRIVATE alone is not separation from
 external effects. A normal-outcome override replaces otherwise effects on that
 outcome; absent normal outcomes never create a normal continuation. CALL target
@@ -32,7 +32,7 @@ oracles for union/alias, private/all, outcome MUST, disjoint base and no known n
 
 W7.3: o mesmo snapshot comporta Cell, Region conhecida, Region sem extensão e
 codec desconhecido. O havoc no componente opaco propaga interferência possível
-para bases sem separação provada; com DisjointStorage a precisão local permanece.
+somente para relações de alias positivamente publicadas; bases distintas são independentes (W1 PMT).
 O oracle AIR independente testa os dois casos, incluindo PRIVATE sem prova.
 CALL literal preserva candidatos e dispensa a execução de values mesmo nesse
 inventário misto. Declarações não suportadas continuam explícitas no produtor.

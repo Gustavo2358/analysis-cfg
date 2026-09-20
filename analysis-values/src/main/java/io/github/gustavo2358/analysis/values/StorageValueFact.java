@@ -49,7 +49,7 @@ public record StorageValueFact(ProgramPoint point,StorageSubject subject,List<Re
             if(candidates.isEmpty()&&!modelValueRemainder)throw new IllegalArgumentException("empty closed reached value");
         } else if(candidates!=null||modelValueRemainder!=null||!alternatives.isEmpty())throw new IllegalArgumentException("unreachable has no read alternatives");
         premises=List.copyOf(premises);evidence=List.copyOf(evidence);provenance=List.copyOf(provenance);candidateSupports=List.copyOf(candidateSupports);modelReasons=List.copyOf(modelReasons);alternatives=List.copyOf(alternatives);
-        if(effectiveUnknownRemainder!=(Boolean.TRUE.equals(modelValueRemainder)||sourceUnknownRemainder))throw new IllegalArgumentException("effective remainder");
+        if(effectiveUnknownRemainder!=Boolean.TRUE.equals(modelValueRemainder))throw new IllegalArgumentException("effective remainder");
     }
     public RegionalValueFact asObjectFact() {
         if(!(subject instanceof StorageSubject.NamedObject named))throw new IllegalArgumentException("physical range has no synthetic ObjectId");

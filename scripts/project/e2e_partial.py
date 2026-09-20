@@ -22,7 +22,7 @@ EXPECTED = {
     'p2': [{'PROGA'}, {'PROGB'}],
     'p3': [{'PROGA'}],
     'p4': [{'PROGA'}],
-    'must-write': [set()],
+    'must-write': [{'PROGA'}],
     'read': [{'PROGA'}],
     'call-using': [{'PROGA'}],
     'call-returning': [{'PROGA'}],
@@ -62,15 +62,27 @@ def oracle(name, sp, air, result):
             actual = {c['referenceName'] for c in site['candidates']}
             require(actual == values, name + ': expected ' + repr(values) + ', got ' + repr(actual))
             invoke=operations[site['operation']['localId']]
-            open_call_model(invoke,site)
+            # Nominal unsupported PIC/linkage bindings are outside this W1 slice;
+            # their published AllMemory binding still opens the model (W2 pending).
+            open_call_model(invoke, site, model_open=name in ('mixed-data', 'entry-using'),
+                            normal_continuation=not (name == 'control-body' and values == {'INNER'}))
     if name in ('p5', 'if-unknown'):
         require({c['referenceName'] for c in sites[0]['candidates']} == {'PROGA'}, 'literal before control frontier survives')
         require(sites[0]['modelValueRemainder'] is False, 'earlier value remains precise')
-        require(all(s['openControlRemainder'] for s in sites[1:]), 'later sites retain control uncertainty')
+        if name == 'if-unknown':
+            require(all(s['openControlRemainder'] and s['modelValueRemainder'] for s in sites[1:]), 'unsupported predicate frontier remains W2 pending')
+        else:
+            require({c['referenceName'] for c in sites[1]['candidates']} == {'PROGB', 'PROGC'}, 'supported EVALUATE arms preserve both values')
+            require(all(not s['openControlRemainder'] and not s['modelValueRemainder'] for s in sites), 'supported EVALUATE and CALL are closed')
     if name == 'call-unknown':
         require(len(sites) == 1 and not sites[0]['candidates'] and sites[0]['effectiveUnknownRemainder'], 'unavailable name preserves open dependency site')
     if name == 'call-handlers':
         require('PROGA' in {c['referenceName'] for c in sites[0]['candidates']} and sites[0]['openControlRemainder'], 'CALL target survives unknown handler control')
+    if name == 'must-write':
+        moves = [s for s in sp['statements'] if s['variant'] == 'MOVE']
+        require(len(moves) == 2 and operations[links[moves[0]['header']['id']][0]['localId']]['kind'] == 'assign'
+                and operations[links[moves[1]['header']['id']][0]['localId']]['kind'] == 'nop',
+                'unimplemented oversized transform retains diagnostic Nop and prior supported Assign')
     if name == 'body-gap':
         require(any(o['kind'] == 'opaque' for o in operations.values()), 'semantic body gap remains conservative')
     precise = name.startswith('perform-') or name in ('if-nested', 'stress')

@@ -137,35 +137,30 @@ class ExactProvenancePrototypeTest {
         assertTrue(p.fallbackCalls>=6);
     }
 
-    @Test void fixtureCAndLargerScalesKeepFrozenFactsWithFewerStructuralEdges() throws Exception {
-        var expected=Map.of("1/false","083a6aa0ff2826958698b32b42ffb6fafacad171b989d339f2e1d408c471e206",
-            "5/false","3bf6ed5144cc53452781cca4809aee08a6eea32727697a092159400c9c5fcbbe",
-            "1/true","59eae5b3d2f41a5180c411c47ddc689ab4457517c361b79577d0f3e5ff8ea6e1",
-            "5/true","22d1216224174d58fb77291cf18e21ae45874c43032917c6bdc0153512072583");
-        for(boolean disjoint:List.of(false,true))for(int producers:List.of(1,5)) {
-            var result=ExactProvenanceFixtureBridge.check(RegionalExplosionFixturesTest.fixture(4,producers,disjoint),4);
-            assertEquals(expected.get(producers+"/"+disjoint),RegionalSemanticSnapshot.digest(result.after()));
-            assertEquals(result.concreteEdges(),result.compact().expandedEdges());
-            assertEquals(result.compact().structuralEdges(),result.solveMetrics().get("maxStateAlternatives"));
-            assertEquals(result.compact().provenanceRows(),result.solveMetrics().get("maxProvenanceRows"));
-            if(!disjoint&&producers==5)assertTrue(result.compact().structuralEdges()<result.concreteEdges());
-            System.out.printf("W32_C producers=%d disjoint=%s concrete=%d factored=%s%n",producers,disjoint,result.concreteEdges(),result.compact());
-        }
-        for(int regions:List.of(16,32)) {
-            int producers=regions==16?50:100;
-            var publication=RegionalExplosionFixturesTest.fixture(regions,producers,false);
-            var result=ExactProvenanceFixtureBridge.check(publication,regions);
-            String expectedHash=regions==16?"e9b3792a76ffbd96d302075402c341701adfb9cbcb26c634af88cf8ea0656302":"9e8437da4f81de7deb3b717f2fe78fe0c5244943c09b7e18e594f44c491ca496";
-            assertEquals(expectedHash,RegionalSemanticSnapshot.digest(result.after()));
-            assertEquals(regions==16?"f6a26180cba8e0090c652faa8e3619889a1e3bcdbd64775c0b5b262151c538b5":"027c14c2ea4b40906741282c18ecc736a057078ec6b1b882f7d8434b5d613983",
-                RegionalSemanticSnapshot.digest(RegionalExplosionFixturesTest.targets(publication)));
-            assertEquals(result.concreteEdges(),result.compact().expandedEdges());
-            assertEquals(result.compact().structuralEdges(),result.solveMetrics().get("maxStateAlternatives"));
-            assertEquals(result.compact().provenanceRows(),result.solveMetrics().get("maxProvenanceRows"));
-            assertEquals(result.unproven(),result.compact().provenanceRows());
-            assertTrue(result.compact().structuralEdges()<result.concreteEdges()/2);
-            System.out.printf("W32_SCALE regions=%d producers=%d targets=%d unproven=%d concrete=%d factored=%s facts=%s%n",
-                regions,producers,result.targets(),result.unproven(),result.concreteEdges(),result.compact(),expectedHash);
+    @Test void positiveFixtureAndLargerScalesHaveNoCompensatingProvenance() throws Exception {
+        for(int regions:List.of(4,16,32))for(int producers:regions==4?List.of(1,5):List.of(regions==16?50:100)) {
+            for(boolean disjoint:List.of(false,true)) {
+                var publication=RegionalExplosionFixturesTest.fixture(regions,producers,disjoint);
+                var result=ExactProvenanceFixtureBridge.check(publication,regions);
+                assertEquals(RegionalStructuralOracleTest.expectedFacts(regions,producers),result.after());
+                assertEquals(producers,result.targets());assertEquals(0,result.unproven());
+                assertEquals(result.concreteEdges(),result.compact().expandedEdges());
+                assertEquals(1,result.compact().structuralEdges());assertEquals(0,result.compact().provenanceRows());
+                assertEquals(result.compact().structuralEdges(),result.solveMetrics().get("maxStateAlternatives"));
+                assertEquals(0L,result.solveMetrics().get("maxProvenanceRows"));
+                // Each published write targets only the same precise base. This replaces
+                // obsolete target digests with an independently constructed typed target.
+                var id=new io.github.gustavo2358.air.model.Ids.StorageId(RegionalValuesTest.P,"synthetic-region-0");
+                var header=new io.github.gustavo2358.air.model.Memory.StorageHeader(id,Optional.of(RegionalValuesTest.U),
+                    io.github.gustavo2358.air.model.Memory.Lifetime.PERSISTENT,io.github.gustavo2358.air.model.Memory.Visibility.PRIVATE,
+                    ValuesFixtures.origin(RegionalValuesTest.P));
+                var target=new io.github.gustavo2358.analysis.storage.StatementEffects.Target(
+                    new io.github.gustavo2358.analysis.storage.StorageIndex.Location(header,Optional.of(StorageRange.exact(BigInteger.ZERO,BigInteger.valueOf(8)))),
+                    io.github.gustavo2358.analysis.storage.StatementEffects.Strength.MUST,true,List.of(),List.of());
+                assertEquals(Collections.nCopies(producers,target),RegionalExplosionFixturesTest.targets(publication));
+                System.out.printf("PMT_SCALE regions=%d producers=%d redundantPremise=%s targets=%d structural=%d provenance=%d%n",
+                    regions,producers,disjoint,result.targets(),result.compact().structuralEdges(),result.compact().provenanceRows());
+            }
         }
     }
     @Test void realConnectedCopyAndPartialCopyReplayKeepCompleteObservations() throws Exception {

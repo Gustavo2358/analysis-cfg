@@ -89,12 +89,18 @@ class StorageValueObservationTest {
         var permuted=new Publication(P,p.airVersion(),p.capabilities(),p.artifacts(),List.of(unit(U,u.entries(),sequences,objects)),storage,p.resources(),p.artifactRelations(),p.origins(),p.coverage(),p.uncertainties(),p.premises());
         assertEquals(expected,run(permuted).observeStorage(List.of(q)).observations().getFirst().value());
     }
-    @Test void sourceGapMetadataFollowsOnlyTheCapturedPrefix() {
-        var p=RegionalProvenanceTest.sourceGap(twoBases(List.of(returning(U,"s0",List.of(assign(U,"source",WHOLE,"ABCDEFGH"),copy("copy",R,0,Y,0,8))))),PREFIX);
-        var fact=run(p).observeStorage(List.of(query("return-s0",Y,0,8))).observations().getFirst().value();assertTrue(fact.sourceUnknownRemainder());assertFalse(fact.modelValueRemainder());
-        var fragments=fact.alternatives().getFirst().fragments();assertEquals(2,fragments.size());
-        var gap=fragments.getFirst().sourceGaps().getFirst();assertEquals(R,gap.affectedLocation().location().base().id());assertEquals(range(0,4),gap.affectedLocation().location().range().orElseThrow());
-        assertEquals(List.of(RegionalProvenanceTest.GAP),gap.uncertainties());assertEquals(RegionalProvenanceTest.GAP_ORIGIN,gap.origin());assertTrue(fragments.getLast().sourceGaps().isEmpty());
+    @Test void sourceGapMetadataDoesNotCreateCapturedFragments() {
+        var baseline=twoBases(List.of(returning(U,"s0",List.of(assign(U,"source",WHOLE,"ABCDEFGH"),copy("copy",R,0,Y,0,8)))));
+        var diagnostic=RegionalProvenanceTest.sourceGap(baseline,PREFIX);
+        var query=query("return-s0",Y,0,8);
+        var expected=run(baseline).observeStorage(List.of(query)).observations().getFirst().value();
+        var fact=run(diagnostic).observeStorage(List.of(query)).observations().getFirst().value();
+        assertEquals(expected,fact,"entire detached result including capture ranges and producer evidence is unchanged");
+        assertFalse(fact.sourceUnknownRemainder());assertFalse(fact.modelValueRemainder());
+        var fragments=fact.alternatives().getFirst().fragments();assertEquals(1,fragments.size());
+        assertTrue(fragments.getFirst().sourceGaps().isEmpty());
+        assertEquals(1,fragments.getFirst().captures().size());
+        assertEquals("source",fragments.getFirst().producer().orElseThrow().definition().operation().orElseThrow().localId());
     }
     @Test void zeroLengthUnreachableAndUninterpretedBytesHaveDistinctProducts() {
         var p=regional(List.of(returning(U,"s0",List.of(assign(U,"write",WHOLE,"ABCDEFGH"))),returning(U,"dead",List.of())));var execution=run(p);

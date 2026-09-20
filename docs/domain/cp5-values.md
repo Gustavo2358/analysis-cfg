@@ -23,16 +23,11 @@ sem agregação retroativa sobre valores independentes. O lattice não mudou.
 
 Location = Cell inteira no contexto da Entry/run. Object é declaração/subject de
 query, Storage é base; OperandId é ocorrência. Dois Objects com a mesma Cell
-compartilham estado. Bases distintas não provam disjunção. Uma base dispensa prova
-entre pares; múltiplas bases admitidas exigem **uma** DisjointStorage cobrindo todo
-seu conjunto, verificada em O(D+P) membros, sem materializar pares. A⊥B e B⊥C não
-implica A⊥C. Provas fragmentadas podem ser recusadas por limitação do profile,
-sem chamar a AIR de inválida. Premissas assumidas/obrigações estruturais ficam
-rastreáveis e não se tornam prova de verdade do produtor.
+compartilham estado. Na W1 POSITIVE_MEMORY_TOPOLOGY, bases StorageId distintas são
+independentes no modelo. Não há premissa negativa obrigatória nem varredura entre
+pares. Aliases compartilham a mesma Cell. DisjointStorage explícita é redundante e
+não cria suporte de valor; premissas de InitialCondition continuam rastreáveis.
 
-O lower traduz a evidência source-derived IndependentStorageSet para essa premissa
-multi-Cell nos profiles admitidos; não a fabrica por IDs distintos. Corpus sintético
-pode declarar premissa explicitamente.
 [Backlog e ownership](../work/cp5-follow-ups.md).
 
 ## Domínio e boundary
@@ -129,7 +124,7 @@ qualidade ao custo, sem domains relacionais, regions ou Liveness de produto.
 O profile efetivo `scalar-text-direct@1`, AVL persistente, sets finitos sem cap e
 replay contextual estão detalhados no [ledger W3](../engineering/cp5-w3-values-ledger.md).
 O texto conceitual acima não amplia as formas admitidas: storage direto textual,
-premissa única cobrindo bases distintas e effects explicitamente enumerados.
+bases positivas independentes e effects explicitamente enumerados.
 Outcomes de query reutilizam Control.OutcomeKey da AIR fixada; after terminator e
 outcomes não materializáveis produzem UNSUPPORTED_POINT. A camada wire continua W5.
 
@@ -147,3 +142,7 @@ Cell participa da abertura da fonte. Dimensão apenas dependencies, mantendo
 storage/values EXACT e coverage MODELED, não abre values; outra Cell não contamina
 a consulta. Nenhuma decisão usa o texto informal do gap. Evidência focal e limites
 ficam no ledger W3 e em wave-3/review-f1-f2.
+
+W1: sourceUnknownRemainder é cobertura apresentada. effectiveUnknownRemainder
+considera somente abertura do modelo; os dois campos não são OR. Gaps não entram
+no lattice nem em produtores/capturas. Ver [contrato W1](positive-memory-topology.md).

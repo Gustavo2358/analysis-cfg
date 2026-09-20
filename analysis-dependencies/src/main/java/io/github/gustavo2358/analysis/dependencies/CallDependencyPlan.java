@@ -54,13 +54,12 @@ public final class CallDependencyPlan {
         Objects.requireNonNull(mode);
         // Only the indexed Invoke bucket is inspected, once, to avoid demanding values for literal-only units.
         var demand=new HashMap<UnitId,Set<ObjectId>>();
-        var cicsAreas=new HashSet<OperationId>();var groups=new HashMap<UnitId,Set<Integer>>();var slicedUnits=new HashSet<UnitId>();
+        var groups=new HashMap<UnitId,Set<Integer>>();var slicedUnits=new HashSet<UnitId>();
         for(var site:session.index().sites(Operations.Invoke.class)) {
             var invoke=(Operations.Invoke)site.operation();if(selected(invoke)) {
                 if(readable(invoke)) {
                     var place=((Expressions.Read)((Interactions.ComputedTarget)invoke.target()).name()).place();
                     if(place instanceof Places.ObjectPlace object)demand.computeIfAbsent(site.owner().id(),k->new HashSet<>()).add(object.object());
-                    if(cicsArea(place,session))cicsAreas.add(invoke.header().id());
                 }
                 groups.computeIfAbsent(site.owner().id(),ignored->new HashSet<>()).add(group(invoke));
                 if(readable(invoke)&&!(((Expressions.Read)((Interactions.ComputedTarget)invoke.target()).name()).place() instanceof Places.ObjectPlace))slicedUnits.add(site.owner().id());
@@ -96,26 +95,10 @@ public final class CallDependencyPlan {
                     }
                 }
                 var interest=new SiteInterest(Operations.Invoke.class,entry,s->selected((Operations.Invoke)s.operation())&&group((Operations.Invoke)s.operation())==group,queries);
-                registrations.add(new ConsumerRegistration<>(new ConsumerPlan(namespace+":"+id+":"+group,keys,batches),List.of(interest),List.of(),new CallDependencyConsumer(Set.copyOf(cicsAreas),reach,group==1&&!physical?values:null,group==1&&physical?storageValues:null)));
+                registrations.add(new ConsumerRegistration<>(new ConsumerPlan(namespace+":"+id+":"+group,keys,batches),List.of(interest),List.of(),new CallDependencyConsumer(reach,group==1&&!physical?values:null,group==1&&physical?storageValues:null)));
             }
         }
         return List.copyOf(registrations);
-    }
-    /** A closed Choice adds no area semantics: every alternative must satisfy the existing leaf proof. */
-    private static boolean cicsArea(Place place,AnalysisSession session) {
-        var pending=new ArrayDeque<Place>();pending.add(place);
-        while(!pending.isEmpty()) {
-            var current=pending.removeLast();
-            if(current instanceof Places.Choice choice) {
-                if(!(choice.typeRef() instanceof Types.Known type&&type.type()==Types.Builtin.TEXT)
-                    ||!(choice.remainder() instanceof Scopes.NoMemory)||choice.candidates().isEmpty())return false;
-                pending.addAll(choice.candidates());
-            } else {
-                var binding=current instanceof Places.ObjectPlace object?session.index().object(object.object()).storage():null;
-                if(!CicsNameInterpreter.area(current,binding))return false;
-            }
-        }
-        return true;
     }
     private static String part(String text){return text.length()+":"+text;}
 }

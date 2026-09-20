@@ -24,11 +24,11 @@ class EvidencePreservingPolicyTest {
         var fact=rd.observe(List.of(new PointQuery<>(ProgramPoint.before(new EntryId(U,"entry"),new OperationId(U,"return-s0")),WHOLE))).observations().getFirst().value();
         assertTrue(fact.definitions().stream().anyMatch(d->d.definition().kind()==DefinitionEvent.Kind.ENTRY_POSSIBILITY));
     }
-    @Test void missingAliasProofNeitherKillsNorCopiesTheOtherObjectsLiteral() {
+    @Test void independentBaseNeitherKillsNorCopiesOtherLiteral() {
         var p=twoBases(List.of(returning(U,"s0",List.of(assign(U,"supported",WHOLE,"PGM00001"),assign(U,"other-write",YWHOLE,"OTHERPGM")))));
         p=replace(p,p.units(),p.coverage(),p.uncertainties(),List.of());
         var value=at(run(p),"return-s0",WHOLE);
-        assertEquals(List.of("PGM00001"),texts(value));assertTrue(value.modelValueRemainder());
+        assertEquals(List.of("PGM00001"),texts(value));assertFalse(value.modelValueRemainder());
         assertEquals(List.of("supported"),value.candidateSupports().getFirst().producers().stream().map(s->s.evidence().localId()).toList());
     }
     @Test void unknownBindingPreservesEvidenceWithoutInventingPhysicalRanges() {

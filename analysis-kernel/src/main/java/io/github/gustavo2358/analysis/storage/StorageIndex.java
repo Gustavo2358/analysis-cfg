@@ -217,7 +217,7 @@ public final class StorageIndex {
     public boolean disjoint(Location a,Location b) {
         if(a.range().isPresent()&&a.range().get().empty()||b.range().isPresent()&&b.range().get().empty())return true;
         if(a.base().id().equals(b.base().id()))return a.range().isPresent()&&b.range().isPresent()&&a.range().get().intersect(b.range().get()).isEmpty();
-        return !separationPremises(a,b).isEmpty();
+        return true; // Distinct StorageIds are independent state bases in the supported model.
     }
     public Resolution select(Scopes.MemoryScope scope) {
         var result=new Accumulator();var pending=new ArrayDeque<Scopes.MemoryScope>();pending.push(scope);

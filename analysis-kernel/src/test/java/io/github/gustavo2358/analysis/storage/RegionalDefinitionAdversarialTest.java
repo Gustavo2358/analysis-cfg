@@ -17,8 +17,8 @@ class RegionalDefinitionAdversarialTest {
         for(boolean proof:List.of(false,true)) {
             var p=publication(bases,List.of(view("a","a",0,8),view("b","b",0,8)),List.of(sequence("s",List.of(assign("d1","a",65,66,67,68,69,70,71,72),assign("d2","b",49,50,51,52,53,54,55,56)))),proof?List.of(disjoint("a","b")):List.of());
             var run=new ReachingDefinitions(new StatementEffects(new StorageIndex(session(p)))).execute();var result=fact(run,after("d2","a"));
-            assertEquals(proof?Set.of("d1:0..8"):Set.of("d1:0..8","d2:0..8"),contributions(result));assertEquals(!proof,result.unknownRemainder());
-            if(proof)assertTrue(result.premises().contains(new PremiseId(P,"disjoint")));
+            assertEquals(Set.of("d1:0..8"),contributions(result));assertFalse(result.unknownRemainder());
+            assertTrue(result.premises().isEmpty());
         }
         var choice=new Memory.AlternativesBinding(List.of(new Memory.AliasBinding(object("left")),new Memory.AliasBinding(object("right"))),Scopes.NoMemory.INSTANCE);
         var effect=new Operations.HavocMust(header("effect"),place("effect","choice"),UNKNOWN);
@@ -30,15 +30,16 @@ class RegionalDefinitionAdversarialTest {
         var p=publication(List.of(region("r",8L,Memory.Lifetime.ACTIVATION)),List.of(view("all","r",0,8)),List.of(new Sequence(new LabelId(U,"s"),List.of(assign("d1","all",65,66,67,68,69,70,71,72)),opaque,O),sequence("done",List.of())),List.of());
         var run=new ReachingDefinitions(new StatementEffects(new StorageIndex(session(p)))).execute();
         var before=fact(run,before("opaque","all"));assertEquals(Set.of("d1:0..8"),contributions(before));assertFalse(before.unknownRemainder());
-        var after=fact(run,before("return-done","all"));assertEquals(Set.of("d1:0..8","opaque:0..8"),contributions(after));assertTrue(after.unknownRemainder());assertTrue(after.uncertainties().contains(UNKNOWN));
+        var after=fact(run,before("return-done","all"));assertEquals(Set.of("d1:0..8","opaque:0..8"),contributions(after));assertTrue(after.unknownRemainder());assertTrue(after.uncertainties().isEmpty(),"header diagnostics are not definition identity");
     }
-    @Test void sourceGapFollowsPhysicalAliasButNotAdjacentInterval() {
+    @Test void sourceGapIsDiagnosticOnDeclaredSubject() {
         var original=view("left","r",0,4);var precision=original.precision();
         var gap=new Evidence.Claim(new Scopes.EntityScope(List.of(original.id())),Evidence.PrecisionStatus.OPEN,List.of(UNKNOWN));
         var partial=new Memory.ObjectDeclaration(original.id(),original.displayName(),original.typeRef(),original.storage(),original.visibility(),original.origin(),Evidence.CoverageStatus.MODELED,new Evidence.Precision(precision.control(),gap,precision.effects(),precision.values(),precision.dependencies()));
         var p=publication(List.of(region("r",8L,Memory.Lifetime.ACTIVATION)),List.of(view("all","r",0,8),partial,view("right","r",4,4),declaration("alias",new Memory.AliasBinding(object("left")))),List.of(sequence("s",List.of(assign("d1","all",65,66,67,68,69,70,71,72)))),List.of());
         var run=new ReachingDefinitions(new StatementEffects(new StorageIndex(session(p)))).execute();
-        var alias=fact(run,after("d1","alias"));assertFalse(alias.unknownRemainder());assertTrue(alias.sourceUnknownRemainder());
+        var alias=fact(run,after("d1","alias"));assertFalse(alias.unknownRemainder());assertFalse(alias.sourceUnknownRemainder());
+        assertTrue(fact(run,after("d1","left")).sourceUnknownRemainder());
         assertFalse(fact(run,after("d1","right")).sourceUnknownRemainder());
     }
     @Test void seededCellIsNotReinitializedOnLoopOrNextSequence() {
@@ -82,7 +83,7 @@ class RegionalDefinitionAdversarialTest {
         }
     }
 
-    @Test void openEnvironmentDefinitionsKeepDistinctPremisesInCanonicalOrder() {
+    @Test void openEnvironmentDefinitionsDeduplicateRedundantSeparation() {
         for(int attempt=0;attempt<32;attempt++) {
             var effect=new Operations.HavocMay(header("effect"),new Scopes.AllMemory(P,true),UNKNOWN);
             var p=publication(List.of(region("a",8L,Memory.Lifetime.ACTIVATION),region("b",8L,Memory.Lifetime.ACTIVATION)),
@@ -90,8 +91,8 @@ class RegionalDefinitionAdversarialTest {
             var run=new ReachingDefinitions(new StatementEffects(new StorageIndex(session(p)))).execute();
             var result=fact(run,after("effect","a"));
             var events=result.definitions().stream().map(DefinitionFact.Contribution::definition).filter(e->e.operation().isPresent()).toList();
-            assertEquals(2,events.size(),"direct and environment remainder events remain distinct");
-            assertEquals(List.of(List.of(),List.of(new PremiseId(P,"disjoint"))),events.stream().map(DefinitionEvent::premises).toList(),"full event metadata has canonical order");
+            assertEquals(1,events.size(),"the same semantic target is not duplicated by a redundant separation assertion");
+            assertEquals(List.of(List.of()),events.stream().map(DefinitionEvent::premises).toList(),"full event metadata has canonical order");
             assertTrue(result.unknownRemainder());
             assertEquals(Set.of("ENTRY:0..8","effect:0..8"),contributions(result));
         }
