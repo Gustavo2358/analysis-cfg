@@ -125,3 +125,29 @@ Residual source-language variants and physical operational policy remain the
 original W3 future scope. No W4 work started. Logical-only remains default;
 physical remains explicit opt-in and operationally interdicted. No merge was
 performed.
+
+## W3-R1 gate handoff — READY_FOR_REVIEW
+
+The W3-R1 code head `5c53b3fe0f50533047c22698303d5019129511a1`
+passed local CFG FAST (`PASS CODE_CHANGE`, 92.325 s), focal
+`StatementEffectsTest`/`StorageIndexTest`, `W3R1CellSemanticsTest`, hardened
+`W3LegitimateWorkTest`, and the frozen integrated E2E described above. The
+later documentation closeout does not change executable code. Producer FAST
+passed 392 tests; its qualification-local stopped only at the previously
+confirmed `SOURCE_DEPENDENCY_OWNER_UNPROVED` after Maven semantic success.
+Lower FAST and qualification-local passed. AIR FAST passed; IR #8 is a normative
+documentation clarification with no CI checks configured on its branch.
+
+Exact-SHA remote checks completed successfully:
+
+| Repository | Validated SHA | Remote result |
+|---|---|---|
+| air-java #21 | `fa2487306366acfba8124fd6403f940f1b1a98aa` | [contracts PASS](https://github.com/Gustavo2358/air-java/actions/runs/35544266225) |
+| proleap-poc #58 | `1e7af863823a693fe9d36f6b6551e8c586170f50` | [harness PASS](https://github.com/Gustavo2358/proleap-poc/actions/runs/35544532817) |
+| cobol-lower #34 | `27d1cf6dbd4450dc157e40424fc91ac63fe35be7` | [checkpoint PASS](https://github.com/Gustavo2358/cobol-lower/actions/runs/35545370177) |
+| analysis-cfg #45 code head | `5c53b3fe0f50533047c22698303d5019129511a1` | [fast PASS](https://github.com/Gustavo2358/analysis-cfg/actions/runs/35546346033) |
+
+All five worktrees and remote campaign branches matched at closeout; all five
+PRs remained open and DRAFT. PR #45 has the W0–W3 campaign title. This is
+`POSITIVE_MEMORY_TOPOLOGY_W3_R1_READY_FOR_REVIEW`, subject to human review and
+merge only. W4 and operational physical unbanning were not started.
