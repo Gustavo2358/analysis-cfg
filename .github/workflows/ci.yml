@@ -1,159 +1,78 @@
-name: COACTUPC owner regression diagnosis
+name: COACTUPC owner minimal endpoint matrix
 "on":
   push:
     branches: [test/coactupc-physical-smoke-20260921]
 permissions:
   contents: read
 jobs:
-  diagnosis:
+  minimal:
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
-    env:
-      MAVEN_OPTS: -Xmx2g -Dfile.encoding=UTF-8
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
           repository: Gustavo2358/proleap-poc
           ref: 93a42de83da823e69514cdefe2a9aa0ef0182ce2
-          path: frontend-history
-          fetch-depth: 0
+          path: frontend
           persist-credentials: false
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
-      - name: Compare unchanged snapshots and trace source-map endpoints
+      - name: Build unchanged frontend
+        working-directory: frontend
         run: |
-          cat > diagnose.py <<'PY'
-          import hashlib, json, os, pathlib, signal, subprocess, sys, time
-          R=pathlib.Path(os.environ['GITHUB_WORKSPACE'])
-          H=R/'frontend-history'
-          E=R/'diagnostic-evidence';E.mkdir()
-          PINS={
-            'before_source_dependencies':'84845762c58ba0f64199bf01db9afce4c97a939b',
-            'first_source_dependencies':'8e7889658fe63f89d33bad1d0542a7a484fec1f1',
-            'before_positive_memory':'edb64520a6269be9fa6d71cd47e6974112fbfece',
-            'current':'93a42de83da823e69514cdefe2a9aa0ef0182ce2'}
-          report={'pins':PINS,'commands':[],'cases':[],'revisions':{},'scope':'Frontend diagnosis only; no lower, solver or production fix.'}
-          def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
-          def save():(E/'summary.json').write_text(json.dumps(report,indent=2)+'\n')
-          def run(name,args,cwd,timeout=300,required=False):
-            args=list(map(str,args));row={'name':name,'args':args,'cwd':str(cwd)}
-            report['commands'].append(row);save();print('START',name,flush=True)
-            start=time.monotonic()
-            with (E/(name+'.stdout.log')).open('wb') as out,(E/(name+'.stderr.log')).open('wb') as err:
-              p=subprocess.Popen(args,cwd=cwd,stdout=out,stderr=err,start_new_session=True)
-              try:code=p.wait(timeout=timeout);row['timeout']=False
-              except subprocess.TimeoutExpired:
-                row['timeout']=True;os.killpg(p.pid,signal.SIGKILL);p.wait();code=124
-            row.update(exit_code=code,seconds=round(time.monotonic()-start,3));save()
-            print('END',name,code,row['seconds'],flush=True)
-            if required and code:
-              print((E/(name+'.stderr.log')).read_text(errors='replace')[-5000:])
-              print((E/(name+'.stdout.log')).read_text(errors='replace')[-5000:])
-              raise RuntimeError(name+' failed '+str(code))
-            return row
-          def git(*args,cwd=H):return subprocess.check_output(['git',*args],cwd=cwd,text=True).strip()
-          PKG='src/main/java/io/github/gustavo2358/cobolexplorer'
-          cps={};repos={}
-          def case(name,repo,cp,mode,source=None,copybooks=None):
-            out=R/'products'/name;out.mkdir(parents=True)
-            args=['java','-Xmx3g','-Xss4m','-cp',cp,'io.github.gustavo2358.cobolexplorer.ExplorerMain','--output',str(out)]
+          mvn -B -ntp -DskipTests package
+          mvn -B -ntp org.apache.maven.plugins:maven-dependency-plugin:3.8.1:build-classpath -DincludeScope=runtime -Dmdep.outputFile=classpath.txt
+      - name: Execute endpoint matrix
+        run: |
+          cat > minimize.py <<'PY'
+          import json,pathlib,subprocess,os,hashlib,itertools
+          R=pathlib.Path(os.environ['GITHUB_WORKSPACE']);F=R/'frontend';E=R/'minimal-evidence';E.mkdir()
+          cp=str(F/'target/classes')+':'+(F/'classpath.txt').read_text().strip()
+          src=F/'src/main/java/io/github/gustavo2358/cobolexplorer/SourceDependencySemantics.java'
+          text=src.read_text();marker='for(var fact:facts) {'
+          assert text.count(marker)==1
+          text=text.replace(marker,'for(var unit:units) System.err.println("DIAG_UNIT "+unit.id()+" "+unit.program().meta().provenance());\n        for(var f:facts) System.err.println("DIAG_FACT "+f.name()+" root="+f.rootSite());\n        '+marker)
+          (E/'SourceDependencySemantics.java').write_text(text);classes=E/'classes';classes.mkdir()
+          subprocess.run(['javac','--release','21','-cp',cp,'-d',str(classes),str(E/'SourceDependencySemantics.java')],check=True)
+          traced=str(classes)+':'+cp
+          prefix='       IDENTIFICATION DIVISION.\n       PROGRAM-ID. TINY.\n       PROCEDURE DIVISION.\n'
+          bodies={'display':"           DISPLAY 'OK'.\n",'paragraph':'       BODY-PARA.\n           EXIT\n           .\n'}
+          directives={'inline':'           COPY BODY.\n','split':'           COPY BODY\n           .\n'}
+          rows=[]
+          def run_case(name,source,body,mode='logical'):
+            d=E/name;d.mkdir();cpy=d/'copybooks';cpy.mkdir();(cpy/'BODY.cpy').write_text(body);p=d/'main.cbl';p.write_text(source)
+            args=['java','-Xmx2g','-cp',traced,'io.github.gustavo2358.cobolexplorer.ExplorerMain','--source',str(p),'--copybooks',str(cpy),'--output',str(d/'out')]
             if mode=='physical':args+=['--storage-profile','ibm-enterprise-6.4-fixed-display-1047@1','--logical-text','disabled']
-            if source is not None:args+=['--source',str(source)]
-            if copybooks is not None:args+=['--copybooks',str(copybooks)]
-            row=run(name,args,repo,120)
-            err=(E/(name+'.stderr.log')).read_text(errors='replace')
-            rec={'name':name,'mode':mode,'exit_code':row['exit_code'],'seconds':row['seconds'],
-                 'owner_exception':'SOURCE_DEPENDENCY_OWNER_UNPROVED' in err,
-                 'semantic_product_exists':(out/'cobol-semantic-product.json').exists(),
-                 'diagnostic_lines':[x for x in err.splitlines() if x.startswith('DIAG_')],
-                 'files':{p.name:{'sha256':sha(p),'bytes':p.stat().st_size} for p in out.iterdir() if p.is_file()}}
-            for filename,assignment in [('ast-data.js','window.AST_DATA='),('tree-data.js','window.TREE_DATA=')]:
-              path=out/filename
-              if path.exists():
-                text=path.read_text()
-                try:
-                  obj=json.loads(text[text.index('=')+1:].strip().rstrip(';'))
-                  rec[filename+'_meta']=obj.get('meta')
-                  if filename=='ast-data.js':
-                    nodes=obj.get('nodes',[])
-                    rec['ast_first_node']=nodes[0] if isinstance(nodes,list) and nodes else None
-                except Exception as ex:rec[filename+'_read_error']=str(ex)
-            report['cases'].append(rec);save()
-            print('CASE',json.dumps({k:v for k,v in rec.items() if k not in ('files','diagnostic_lines','ast_first_node')}),flush=True)
-            return out
-          try:
-            for label,pin in PINS.items():
-              repo=R/label;run('checkout-'+label,['git','worktree','add','--detach',repo,pin],H,60,True);repos[label]=repo
-              assert git('rev-parse','HEAD',cwd=repo)==pin
-              files=['SourceMap.java','AstBuilder.java','SourceDependencySemantics.java','ExplorerMain.java','PreprocessorEngine.java','SourceNormalizer.java']
-              report['revisions'][label]={'commit':git('show','-s','--format=%H %cI %s',pin),
-                'source_sha256':sha(repo/'corpus/cbl/COACTUPC.cbl'),
-                'cpy_tree':git('rev-parse',pin+':corpus/cpy'),
-                'cpy_bms_tree':git('rev-parse',pin+':corpus/cpy-bms'),
-                'code_hashes':{f:sha(repo/PKG/f) if (repo/PKG/f).exists() else None for f in files}}
-              run('build-'+label,['mvn','-B','-ntp','-DskipTests','package'],repo,420,True)
-              cpfile=E/(label+'-classpath.txt')
-              run('classpath-'+label,['mvn','-B','-ntp','org.apache.maven.plugins:maven-dependency-plugin:3.8.1:build-classpath','-DincludeScope=runtime','-Dmdep.outputFile='+str(cpfile)],repo,180,True)
-              cp=str(repo/'target/classes')+':'+cpfile.read_text().strip();cps[label]=cp
-              case(label+'-logical',repo,cp,'logical')
-              case(label+'-physical',repo,cp,'physical')
-              report['revisions'][label]['tracked_changes']=git('diff','--name-only','HEAD',cwd=repo).splitlines();save()
-            repo=repos['current'];cp=cps['current'];diag=E/'instrumentation';diag.mkdir()
-            # Compile logging-only shadows outside each unchanged repository.
-            for filename in ['SourceMap.java','SourceDependencySemantics.java']:
-              text=(repo/PKG/filename).read_text()
-              if filename=='SourceMap.java':
-                marker='return new Ast.SourceProvenance(expanded, original, first.includeChain(), exact);'
-                assert text.count(marker)==1
-                text=text.replace(marker,'if (expanded.endLine()-expanded.startLine()>1000) System.err.println("DIAG_MAP expanded="+expanded+" original="+original+" compatible="+compatible+" first="+first+" last="+last+" exact="+exact);\n        '+marker)
-              else:
-                marker='for(var fact:facts) {';assert text.count(marker)==1
-                text=text.replace(marker,'for(var unit:units) System.err.println("DIAG_UNIT "+unit.id()+" "+unit.program().meta().provenance());\n        for(var f:facts) System.err.println("DIAG_FACT "+f.name()+" root="+f.rootSite()+" provenance="+f.provenance());\n        '+marker)
-              (diag/filename).write_text(text)
-            classes=diag/'classes';classes.mkdir()
-            run('compile-logging-probe',['javac','--release','21','-cp',cp,'-d',classes,diag/'SourceMap.java',diag/'SourceDependencySemantics.java'],repo,60,True)
-            tracecp=str(classes)+':'+cp
-            case('current-physical-traced',repo,tracecp,'physical')
-            # Endpoint-only diagnostic control: source variant, not a repository modification or proposed fix.
-            variant=E/'end-program-control';variant.mkdir()
-            source=variant/'COACTUPC.cbl'
-            source.write_text((repo/'corpus/cbl/COACTUPC.cbl').read_text().rstrip()+'\n       END PROGRAM COACTUPC.\n')
-            case('current-explicit-end-program',repo,tracecp,'physical',source)
-            # Fully available, tiny fixtures isolate the mapping boundary from size and missing COPY.
-            tiny=E/'minimal';tiny.mkdir();copies=tiny/'copybooks';copies.mkdir()
-            (copies/'BODY.cpy').write_text("           DISPLAY 'OK'.\n")
-            prefix='       IDENTIFICATION DIVISION.\n       PROGRAM-ID. TINY.\n       PROCEDURE DIVISION.\n'
-            variants={
-              'copy-at-eof':prefix+'           COPY BODY.\n',
-              'copy-with-end-program':prefix+'           COPY BODY.\n       END PROGRAM TINY.\n',
-              'copy-with-following-code':prefix+'           COPY BODY.\n           GOBACK.\n',
-              'no-copy':prefix+"           DISPLAY 'OK'.\n"}
-            for name,text in variants.items():
-              src=tiny/(name+'.cbl');src.write_text(text)
-              case('minimal-'+name,repo,tracecp,'logical',src,copies)
-            report['final_tracked_changes']={label:git('diff','--name-only','HEAD',cwd=repo).splitlines() for label,repo in repos.items()}
-            report['status']='DIAGNOSIS_COMPLETED'
-          except Exception as ex:
-            report['status']='DIAGNOSIS_INTERRUPTED';report['failure']=repr(ex)
-          finally:
-            save()
-            compact={'status':report.get('status'),'failure':report.get('failure'),'revisions':report['revisions'],
-              'cases':[{k:v for k,v in x.items() if k not in ('files','diagnostic_lines','ast_first_node')} for x in report['cases']],
-              'traces':{x['name']:[l for l in x['diagnostic_lines'] if l.startswith(('DIAG_UNIT','DIAG_MAP'))]+[l for l in x['diagnostic_lines'] if l.startswith('DIAG_FACT')][:2] for x in report['cases'] if x['diagnostic_lines']},
-              'tracked_changes':report.get('final_tracked_changes')}
-            (E/'compact.json').write_text(json.dumps(compact,indent=2)+'\n')
-            print('DIAGNOSIS_RESULT_BEGIN',flush=True);print(json.dumps(compact,indent=2),flush=True);print('DIAGNOSIS_RESULT_END',flush=True)
-            sys.exit(0 if report.get('status')=='DIAGNOSIS_COMPLETED' else 1)
+            with (d/'stdout.log').open('w') as out,(d/'stderr.log').open('w') as err:
+              result=subprocess.run(args,cwd=F,stdout=out,stderr=err,timeout=60)
+            err=(d/'stderr.log').read_text();tree=d/'out/tree-data.js';meta=None
+            if tree.exists():
+              t=tree.read_text();meta=json.loads(t[t.index('=')+1:].strip().rstrip(';'))['meta']
+            row={'name':name,'mode':mode,'exit_code':result.returncode,'owner_exception':'SOURCE_DEPENDENCY_OWNER_UNPROVED' in err,'sp_exists':(d/'out/cobol-semantic-product.json').exists(),'meta':meta,'source':source,'body':body,'diagnostics':[l for l in err.splitlines() if l.startswith('DIAG_')],'argv':args}
+            rows.append(row);print('RESULT',json.dumps(row),flush=True);(E/'results.json').write_text(json.dumps(rows,indent=2)+'\n')
+          for bodykey,directivekey,copycomment,rootcomment in itertools.product(bodies,directives,[False,True],[False,True]):
+            name=f'{bodykey}-{directivekey}-copycomment{int(copycomment)}-rootcomment{int(rootcomment)}'
+            body=bodies[bodykey]+('      * trailing comment in copybook\n' if copycomment else '')
+            source=prefix+directives[directivekey]+('      * trailing comment in root\n' if rootcomment else '')
+            run_case(name,source,body)
+          failures=[r for r in rows if r['owner_exception']]
+          if failures:
+            first=failures[0]
+            run_case('witness-physical',first['source'],first['body'],'physical')
+            run_case('witness-end-program-control',first['source']+'       END PROGRAM TINY.\n',first['body'])
+            run_case('witness-code-after-copy-control',first['source']+'           GOBACK.\n',first['body'])
+          else:print('NO_MINIMAL_OWNER_FAILURE_OBSERVED',flush=True)
+          status={'pin':subprocess.check_output(['git','rev-parse','HEAD'],cwd=F,text=True).strip(),'cases':len(rows),'owner_failures':len([r for r in rows if r['owner_exception']]),'tracked_changes':subprocess.check_output(['git','diff','--name-only','HEAD'],cwd=F,text=True).splitlines()}
+          (E/'receipt.json').write_text(json.dumps(status,indent=2)+'\n');print('MATRIX_RECEIPT',json.dumps(status),flush=True)
           PY
-          python3 -u diagnose.py
-      - name: Preserve diagnosis evidence
+          python3 -u minimize.py
+      - uses: actions/upload-artifact@v4
         if: always()
-        uses: actions/upload-artifact@v4
         with:
-          name: coactupc-owner-diagnosis-${{ github.run_id }}
+          name: coactupc-owner-minimal-${{ github.run_id }}
           path: |
-            diagnostic-evidence/
-            diagnose.py
+            minimal-evidence/
+            minimize.py
           retention-days: 7
