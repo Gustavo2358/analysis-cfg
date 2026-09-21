@@ -91,3 +91,25 @@ final validator because five executable FILE write scopes reach only a
 self-scoped UnknownBinding. Its prior query result is retained as historical
 evidence, not accepted as a final-validator regression PASS. The other 47
 frozen AIRs kept their prior validation status and issue count.
+
+## FILE record grounding replacement
+
+The invalid frozen AIR above remains a negative witness with five I-13 issues.
+The final producer/lower regenerated only `source-dependencies-w3--composition`
+from its original source, yielding AIR SHA-256
+`d9a1cce6f9d1304168f2764636e55cdf8e2f23d10f6b31cd4ab0ad3848139319`.
+The final validator accepts it; CFG builds; the existing source-dependency
+oracle confirms COPYBOOK/DCLGEN supports, F/DD001 and `SUBA`. The separate
+`file-dependencies/w2/composition.cbl` R/K witness is AIR SHA-256
+`a19ea77c0c04caff339591f4ac8f0277482e60faeb467a92abe6f4dd0cc45b36`:
+R/K have distinct ObjectIds, one TEXT Cell, and retain F/CLIENTDD,
+READ/WRITE and `EOF`/`BAD`/`OK`. Split children, partial REDEFINES,
+independent equal-sized roots, forged length and absent new-contract proof
+remain negative controls. FILE MAY writes were not promoted.
+
+The validation-only audit checks SHA and status for all 48 entries: 39 frozen
+logical and eight frozen physical entries are byte-identical with identical
+validator results; the one replacement is structurally valid with zero I-13.
+No other E2E, physical C/D, indep80/160, solver or performance result was
+relabeled as a new run. Default CLI metrics remain LOGICAL_ONLY with no
+physical groups or writes.

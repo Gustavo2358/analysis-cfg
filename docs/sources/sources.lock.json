@@ -275,9 +275,9 @@
       "src/main/java/io/github/gustavo2358/cobolexplorer/CicsCommandSyntax.java",
       "src/test/java/io/github/gustavo2358/cobolexplorer/CicsFileControlTest.java"
     ],
-    "semantic_product_version": "2.34.0",
+    "semantic_product_version": "2.35.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "1e7af863823a693fe9d36f6b6551e8c586170f50",
+    "commit": "93a42de83da823e69514cdefe2a9aa0ef0182ce2",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -287,7 +287,7 @@
       "contract": "2.1.0",
       "scope": "local unconditional paragraph identity and explicit entry; G1-G5 and 1/2/5/40"
     },
-    "storage_contract_version": "1.10.0",
+    "storage_contract_version": "1.11.0",
     "canonical_ref": "feat/positive-memory-topology",
     "observed_on": "2026-09-20",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
@@ -305,12 +305,12 @@
     "logical_text_semantic_product_version": "2.29.0",
     "logical_text_storage_contract_version": "1.9.0",
     "logical_text_w2": "Local producer FAST PASS; fixed logical ranges and expression transport. Selected source E2E qualification in docs/product/logical-text-w2.md.",
-    "dependency_preservation": "W3-R1 exact local logical TEXT view identity in SP 2.34/storage 1.10; missing physical layout remains coverage."
+    "dependency_preservation": "W3-R1 local complete logical TEXT view identity in SP 2.35/storage 1.11, including record/child and standalone roots; physical gaps remain coverage."
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "Dependency preservation reviewed and integrated into source-dependencies-w3",
-    "commit": "eccf5c63116a09771d57255c872725b4434c0dcc",
+    "commit": "94941b3e262cd1c452f5e9ea505a264dd2093557",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -337,7 +337,7 @@
     "fd_w11_validation": "Current-version LOGICAL_SOURCE negotiation fixed; B-SP version21-28/legacy18, fixed FAST and qualification-local PASS; final CLI/corpus pending",
     "logical_text_w1": "Source E2E A-D twice deterministic; scale 10/100/1000; no physical profile. Corporate rerun not required by revised user acceptance.",
     "logical_text_w2": "Local producer FAST PASS; fixed logical ranges and expression transport. Selected source E2E qualification in docs/product/logical-text-w2.md.",
-    "dependency_preservation": "W3-R1 positive logical Cell/Region projection and bounded captures; see docs/domain/dependency-preservation.md."
+    "dependency_preservation": "W3-R1 positive logical Cell projection for complete record/child and standalone TEXT views; FILE effects retain published strength."
   },
   "external": [
     {

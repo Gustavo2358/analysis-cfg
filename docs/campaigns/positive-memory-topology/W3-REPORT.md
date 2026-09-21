@@ -197,3 +197,72 @@ producer/lower publication defect revealed by the stricter validator. The
 earlier READY_FOR_REVIEW handoff is historical; W3-R1 is **HOLD before merge**
 until this one case is reconciled. The AIR validator fix and its checks remain
 approved. No frozen AIR was changed and no solver/E2E/canary was rerun.
+
+## Final addendum — FILE record grounding closure
+
+The HOLD above remains the historical discovery. Its rejected AIR is preserved
+unaltered at SHA-256 `d62a73d0feca84e8bc6b4a9ed87e7021f55d550f200562446755ac232681af92`.
+The final validator correctly reports five `INVALID_IR/I-13` issues for its
+five executable FILE scopes through `UnknownBinding(ObjectsMemory(FILE-RECORD))`.
+No AIR or Analysis IR change was made for this closure.
+
+The review's `file-dependencies/w2/composition.cbl` (`R` with sole child
+`K PIC X(8)`) and the actual frozen `source-dependencies-w3--composition`
+source (`FILE-RECORD PIC X(10)`) are different synthetic programs. Both were
+qualified explicitly. Their common missing boundary was a complete supported
+logical TEXT view without byte layout. Producer #58 at `93a42de83da823e69514cdefe2a9aa0ef0182ce2`
+publishes SP 2.35.0/storage 1.11.0 `logicalExactViews` for a locally complete
+group-to-descendant chain or a standalone complete elementary root. A singleton
+establishes TEXT domain without claiming an alias. The declaration proof
+does not depend on FILE statements, literals, global input completeness or
+physical bytes. Split children and partial REDEFINES are excluded; the
+0/1/50 missing-input diagnostic metamorphic test leaves R/K topology intact.
+
+Lower #34 at `94941b3e262cd1c452f5e9ea505a264dd2093557` accepts the new
+version alongside historical SP 2.34, validates exact-view hierarchy and
+closes the group's members. Distinct AIR Objects `R` and `K` bind to one TEXT
+Cell (unit owner, `PERSISTENT`, `PRIVATE`); same-sized `BUF` remains independent.
+The standalone `FILE-RECORD` also binds to a TEXT Cell. DataLink storage lets
+the existing FILE lowering change the affected scope from
+`WithinMemory(ObjectsMemory(FILE-RECORD))` to
+`WithinMemory(StorageMemory(Cell))`. The five
+`published-memory-may-write` effects remain five; no FILE strength, physical
+extent, Region, codec, AllMemory or VisibleMemory was invented. The old AIR
+remains invalid; the replacement AIR SHA-256 is
+`d9a1cce6f9d1304168f2764636e55cdf8e2f23d10f6b31cd4ab0ad3848139319`
+and is `STRUCTURALLY_VALID` with zero I-13. The separate R/K AIR SHA-256 is
+`a19ea77c0c04caff339591f4ac8f0277482e60faeb467a92abe6f4dd0cc45b36`;
+it is also structurally valid.
+
+The replacement source was regenerated from the original `program.cbl` fixture
+whose bytes equal the frozen `input.cbl`. CFG and dependency CLI builds pass.
+Its COPYBOOK `CPY001` and DCLGEN `DCLCLI` each retain one resolved support;
+FILE F/DD001 and CALL `SUBA` remain. The R/K source retains F/CLIENTDD,
+READ/WRITE sites, resource bindings and `EOF`, `BAD`, `OK` calls under the
+existing native FILE oracle. Neither CLI activated physical: `logicalOnlyMode=1`,
+`experimentalPhysicalMode=0`, applied groups/writes zero. A Cell-only case
+does not require artificial physical work; the earlier real-Region C/D
+evidence remains unchanged.
+
+The validation-only mixed manifest replaces only this composition publication.
+`scripts/project/w3_r1_file_record_sweep.py` verifies every AIR hash and final
+validator status: **39/39 frozen logical unchanged + 1/1 regenerated logical
+valid + 8/8 frozen physical unchanged**. Thus 40 logical and eight physical
+cases have final-contract validation evidence; this is not a claim that all
+48 source E2Es, solver runs or canaries were repeated. The local raw manifest,
+old/new validator outputs and focal CLI artifacts remain in ignored
+`evidence/w3-r1/file-record-closure/`. Partial group overlap without a
+supported Region remains outside this exact-Cell proof. The separate
+`SOURCE_DEPENDENCY_OWNER_UNPROVED` qualification blocker remains
+`PREEXISTING_CONFIRMED`. Logical remains default; physical remains experimental
+and explicit; no W4 work, operational unbanning or merge occurred.
+
+Local closure gates: frontend focal tests and FAST (392 tests) PASS; lower
+`FileRecordGroundingSuite`, historical dependency preservation suite and FAST
+PASS; CFG focal native FILE and source dependency oracles, mixed sweep audit,
+and FAST (`91.568 s`) PASS. The final AIR validator was rebuilt unchanged at
+`980d4989a18f876996390cc61af41419a595eb7b` and its prior FAST remains
+valid. Producer #58 remote Fast CI passed at its exact head
+([run](https://github.com/Gustavo2358/proleap-poc/actions/runs/35551987507));
+lower #34 remote Fast CI passed at its exact head
+([run](https://github.com/Gustavo2358/cobol-lower/actions/runs/35552192346)).
