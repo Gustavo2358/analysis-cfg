@@ -47,6 +47,7 @@ jobs:
           ref: b628e4c1a62de61a157cac85ae71ba4cd111052e
           path: snapshot/analysis-ir
           persist-credentials: false
+          token: ${{ secrets.AIR_JAVA_READ_TOKEN || github.token }}
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
