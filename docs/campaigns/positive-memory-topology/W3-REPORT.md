@@ -271,3 +271,30 @@ valid. Producer #58 remote Fast CI passed at its exact head
 ([run](https://github.com/Gustavo2358/proleap-poc/actions/runs/35551987507));
 lower #34 remote Fast CI passed at its final exact head
 ([run](https://github.com/Gustavo2358/cobol-lower/actions/runs/35552848701)).
+
+## Final evidence addendum — producer/lower regeneration
+
+Human review identified a remaining evidence question after FILE grounding:
+validity of old AIRs under the final validator did not establish what the
+generalized final producer and lower would publish from the same sources.
+The [regeneration-only sweep](W3-REGENERATION-SWEEP.md) closed that link without
+repeating CFG, solver, dependency queries, physical C/D or performance canaries.
+It regenerated the other 39 logical and all eight physical cases with producer
+`93a42de83da823e69514cdefe2a9aa0ef0182ce2`, lower
+`2beb5f8329885c7f5921d9a5d50f172901624b55` and AIR
+`980d4989a18f876996390cc61af41419a595eb7b`.
+
+Of 47 AIRs, 10 are byte-identical (two logical, eight physical), 36 logical
+retain the same executable publication after deterministic ObjectId/StorageId
+normalization, and one (`logical--padding`) gains exactly the authorized
+complete group↔sole-child Cell relation. No operation, operand, control,
+effect scope, resource or premise changed beyond that inspected storage
+identity. All 47 are structurally valid with unchanged validator issue counts.
+The 107 changed object coverage statuses and 107 new physical-declaration
+diagnostics were classified separately; precision statuses and operation
+origins remain stable. The old FILE composition AIR remains invalid; its
+regenerated replacement remains separately qualified. The complete
+[case/hash manifest](W3-REGENERATION-SWEEP.tsv) makes this mixed evidence
+explicit. The regeneration audit and CFG FAST passed under the campaign's
+JDK 21; no producer, lower, AIR or IR code changed in this evidence closure.
+No unexpected executable delta remains in this publication gate.
