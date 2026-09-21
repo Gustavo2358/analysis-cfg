@@ -8,6 +8,17 @@ import static io.github.gustavo2358.analysis.storage.StorageFixtures.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class StorageIndexTest {
+    @Test void boundedObjectScopesResolveOnlyTheirPublishedGrounding() {
+        var scope=new Scopes.StorageMemory(List.of(base("r1")));
+        var u=declaration("u",new Memory.UnknownBinding(scope,UNKNOWN));
+        var grounded=declaration("grounded",new Memory.UnknownBinding(new Scopes.ObjectsMemory(List.of(object("q"))),UNKNOWN));
+        var index=new StorageIndex(session(publication(List.of(region("r1",8L,Memory.Lifetime.PERSISTENT),region("r2",8L,Memory.Lifetime.PERSISTENT)),
+            List.of(u,grounded,view("q","r1",0,8)),List.of(sequence("s",List.of())),List.of())));
+        assertEquals(List.of(base("r1")),index.select(scope).candidates().stream().map(c->c.location().base().id()).toList());
+        assertEquals(List.of(base("r1")),index.select(new Scopes.ObjectsMemory(List.of(object("grounded")))).candidates().stream().map(c->c.location().base().id()).toList());
+        var repeated=new Scopes.MemoryUnion(List.of(scope,new Scopes.ObjectsMemory(List.of(object("grounded"))),scope));
+        assertEquals(Set.of(base("r1")),index.select(repeated).candidates().stream().map(c->c.location().base().id()).collect(java.util.stream.Collectors.toSet()));
+    }
     @Test void positiveBasesAndCodecDoesNotChangePhysicalOverlap() {
         var bases=List.of(region("a",8L,Memory.Lifetime.ACTIVATION),region("b",8L,Memory.Lifetime.ACTIVATION),region("c",8L,Memory.Lifetime.ACTIVATION));
         var ab=disjoint("a","b");var bc=new Proofs.Premise(new PremiseId(P,"bc"),"manual","b apart from c",O,new Proofs.DisjointStorage(List.of(base("b"),base("c"))));

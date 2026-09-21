@@ -50,3 +50,30 @@ These counts match W2 structurally. Events equal the supported targets, with no 
 EVALUATE40 and W3 control20 were rerun on the final stack. They have 241/62 sequences and 80/20 branches respectively, with no Opaque, AllControl or AllMemory compensation and zero physical work in default mode. EVALUATE40 retains all 40 sites; W3 control20 retains both CALL candidates. Raw data: `evidence/w3/control-final2`.
 
 The eight legitimate-work witnesses are deliberately bounded but exercise real overlap, alternatives, correlated copy, MAY and history. Real choice 2/4/8 increases relation union pairs 1/3/7, and state alternatives 4/8/16, along with the real candidate multiplicity. Copy correlation requires two bases and four union pairs. Explicit MAY has three provenance rows and a model remainder. These costs are causal to published AIR work; no duplicated cross-base work was found in this measured set. The lower local `qualification-local` performance/capacity suite passed (`PERFORMANCE_TEST_COUNT=39207`), and the integrated physical opt-in runs passed. Producer qualification reached only the separately proved preexisting `SOURCE_DEPENDENCY_OWNER_UNPROVED` blocker after its Maven tests passed. These local canaries do not establish production performance or operational physical readiness.
+
+## W3-R1 structural canaries
+
+The final frozen runtime repeats the W3 controls after the Cell and relational
+target fixes. Times are observational; target, Event and relation counts are
+the oracle.
+
+| Case | Positive work | Targets / Events | Physical groups | Unrelated-base work |
+|---|---:|---:|---:|---:|
+| REDEFINES + 32 / 100 / 160 independent Regions | 2 complete writes to shared Cell | 2 / 2 at every size | 2 | none |
+| nominal-cell-160 | 320 writes to one logical Cell | 320 / 320 | 320 | no 320 × 160 expansion |
+| bounded-open-objects | 160 individually bounded opens, 160 localized writes | 160 LogicalTargets | bounded per relation | no write × 160 broadcast |
+| explicit AllMemory | one published broad MAY over 32 bases | 32 targets | broad work retained | intentional |
+| indep80 | 160 independent writes plus target | 161 / 161 | 161 | 0 base comparisons / 0 object pairs |
+| indep160 | 320 independent writes plus target | 321 / 321 | 321 | 0 base comparisons / 0 object pairs |
+
+The indep80/160 candidate and structural counts match W3. All eight legitimate
+work cases pass their strengthened support/remainder/correlation/history
+assertions on the final consumer. Preparation counters now distinguish direct,
+bounded and explicit broad targets; indep80/160 record 161/321 direct targets,
+zero bounded and zero explicit broad. The Cell-only unaugmented A/B witness
+resolves logically in both modes and applies zero physical groups, as allowed
+by the experimental contract. The 0/1/50 diagnostic variants have identical
+work metrics. Raw outputs: local `evidence/w3-r1/{nominal-cell-160-final,
+redefines-160-final,canary-final,diagnostic-final}/` and focal JUnit logs.
+No general Big-O claim or physical operational readiness follows from these
+finite canaries.

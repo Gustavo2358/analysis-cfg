@@ -26,6 +26,25 @@ class W3LegitimateWorkTest {
         assertEquals(ObservationBatch.Status.COMPLETE,batch.status());
         var value=batch.observations().getFirst().value();
         assertEquals(candidates,value.candidates().size(),shape);
+        int expectedSupports=switch(shape) {
+            case "same-base-overlap","event-history" -> 2;
+            case "control-join","copy-correlation" -> 4;
+            case "may-effect" -> 1;
+            default -> candidates;
+        };
+        assertEquals(expectedSupports,value.candidateSupports().stream().mapToInt(s->s.producers().size()).sum(),shape+" supported producers");
+        if(shape.equals("may-effect"))assertTrue(value.modelValueRemainder(),"published MAY retains an open model remainder");
+        if(shape.equals("copy-correlation")) {
+            var supports=new HashMap<String,Set<String>>();
+            for(var candidate:value.candidateSupports())supports.put(candidate.candidate().value(),candidate.producers().stream()
+                .map(s->((OperationId)s.evidence()).localId()).collect(java.util.stream.Collectors.toSet()));
+            assertEquals(Map.of("CCCCAAAA",Set.of("a-x","a-y"),"YYYYWWWW",Set.of("b-x","b-y")),supports);
+        }
+        if(shape.equals("event-history")) {
+            assertEquals(List.of(new Values.TextValue("55556666")),value.candidates());
+            assertEquals(Set.of("p3","s3"),value.candidateSupports().getFirst().producers().stream()
+                .map(s->((OperationId)s.evidence()).localId()).collect(java.util.stream.Collectors.toSet()));
+        }
         var targets=new StatementEffects(new StorageIndex(session)).statements().stream()
             .flatMap(statement->statement.writes().stream()).flatMap(write->write.targets().stream()).count();
         assertTrue(execution.preparationMetrics().get("eventsPrepared")>0,shape);

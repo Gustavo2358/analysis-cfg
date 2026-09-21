@@ -9,6 +9,10 @@ import java.util.*;
 /** Physical storage facet prepared once and shared by analyses of an immutable session. */
 public final class StorageIndex {
     public static final String PROFILE="regional-storage@1";
+    public static final class UngroundedBound extends IllegalArgumentException {
+        private static final long serialVersionUID=1L;
+        public UngroundedBound(){super("ungrounded circular location bound");}
+    }
     /** Empty range means a whole logical Cell, not zero bytes. */
     public record Location(Memory.StorageHeader base, Optional<StorageRange> range) {
         public Location { Objects.requireNonNull(base);Objects.requireNonNull(range); }
@@ -220,22 +224,34 @@ public final class StorageIndex {
         return true; // Distinct StorageIds are independent state bases in the supported model.
     }
     public Resolution select(Scopes.MemoryScope scope) {
-        var result=new Accumulator();var pending=new ArrayDeque<Scopes.MemoryScope>();pending.push(scope);
+        var result=new Accumulator();
+        record Frame(Scopes.MemoryScope scope,boolean exit) { }
+        var pending=new ArrayDeque<Frame>();var visiting=new HashSet<Scopes.MemoryScope>();var resolved=new HashSet<Scopes.MemoryScope>();
+        pending.push(new Frame(scope,false));boolean cycle=false;
         while(!pending.isEmpty()) {
-            var s=pending.pop();
-            if(s instanceof Scopes.MemoryUnion u){for(var member:u.members())pending.push(member);}
-            else if(s instanceof Scopes.ObjectsMemory o){for(var id:o.objects())result.add(object(id));}
+            var frame=pending.pop();var s=frame.scope();
+            if(frame.exit()){visiting.remove(s);resolved.add(s);continue;}
+            if(resolved.contains(s))continue;
+            if(!visiting.add(s)){cycle=true;continue;}
+            pending.push(new Frame(s,true));
+            if(s instanceof Scopes.MemoryUnion u){for(var member:u.members())pending.push(new Frame(member,false));}
+            else if(s instanceof Scopes.ObjectsMemory o){for(var id:o.objects()) {
+                var target=object(id);result.candidates.addAll(target.candidates());result.reasons.addAll(target.reasons());result.uncertainties.addAll(target.uncertainties());
+                if(target.remainder() instanceof Scopes.WithinMemory w)pending.push(new Frame(w.scope(),false));
+            }}
             else if(s instanceof Scopes.StorageMemory m){for(var id:m.storage())result.candidates.add(wholeCandidate(id));}
             else if(s instanceof Scopes.AllMemory a) {
                 for(var id:bases.keySet())result.candidates.add(wholeCandidate(id));
                 if(a.includingEnvironment()){result.bound(new Scopes.WithinMemory(a));result.reasons.add("ENVIRONMENT_STORAGE");}
             } else if(s instanceof Scopes.VisibleMemory v) {
                 var unit=session.index().unit(v.unit());if(unit==null)throw new IllegalArgumentException("foreign visible scope");
-                for(var object:unit.objects())result.add(object(object.id()));
-                for(var id:unit.visibleObjects())result.add(object(id));
+                var ids=new LinkedHashSet<ObjectId>();unit.objects().forEach(o->ids.add(o.id()));ids.addAll(unit.visibleObjects());
+                for(var id:ids){var target=object(id);result.candidates.addAll(target.candidates());result.reasons.addAll(target.reasons());result.uncertainties.addAll(target.uncertainties());
+                    if(target.remainder() instanceof Scopes.WithinMemory w)pending.push(new Frame(w.scope(),false));}
                 if(v.includingExternal())for(var base:bases.values())if(base.header().visibility()!=Memory.Visibility.PRIVATE || base.header().lifetime()==Memory.Lifetime.EXTERNAL)result.candidates.add(wholeCandidate(base.header().id()));
             }
         }
+        if(cycle&&result.candidates.isEmpty()&&result.scopes.isEmpty())throw new UngroundedBound();
         return result.finish();
     }
     private Candidate wholeCandidate(StorageId id) { var location=whole(id);return new Candidate(location,Optional.empty(),List.of(location.base().origin())); }

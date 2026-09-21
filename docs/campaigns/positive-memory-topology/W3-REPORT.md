@@ -54,3 +54,74 @@ The CICS FILE 1/50 diagnostic mutations and FILE profile gap controls preserve t
 M04, M10, M13, M14 and M15 remain **PARTIALLY TREATED** where other unrepresented language-family variants lack positive facts; their exact W3 represented paths are closed as above. Further PERFORM variants, CICS FILE option families, FILE assignment/resource names without typed targets and other source coverage belong to a future separately authorized wave. They are not W3 regressions. W4 was not started, no PR was merged, and all campaign PRs remain draft.
 
 Recommendation: review the five permanent draft PRs as the W0–W3 campaign result, with W3 changes confined to #58, #34 and #45. The supported abstraction has no remaining known C-only global compensation in the W3 treated paths. Human merge and any operational policy change remain separate decisions; physical analysis stays experimental and explicit opt-in.
+
+## W3-R1 addendum — human review resolved and implemented
+
+The READY status above records the first W3 closeout. Human review then found the
+composition bug documented in [W3-ARCHITECTURE-RESOLUTION.md](W3-ARCHITECTURE-RESOLUTION.md):
+a physical materialization gap became self-scoped UnknownBinding, the consumer
+widened its cycle to all bases, and every write was broadcast to open objects.
+The approved resolution is now implemented in the same draft PRs. The final
+upstream pins are IR #8 `b628e4c1a62de61a157cac85ae71ba4cd111052e`, AIR
+#21 `fa2487306366acfba8124fd6403f940f1b1a98aa`, producer #58
+`1e7af863823a693fe9d36f6b6551e8c586170f50`, and lower #34
+`27d1cf6dbd4450dc157e40424fc91ac63fe35be7`. The CFG source lock and CI
+checkout use these immutable pins. The anchor's final HEAD is reported by Git
+and PR #45 rather than self-referencing this file.
+
+CP0 preserved the RED 32-base witness and bounded-open-object counterexample.
+CP1 clarified Cell/UnknownBinding scope and AIR validation without a new AIR
+kind. CP2 introduced SP 2.34/storage 1.10 `logicalExactViews`, regenerated the
+real partial/REDEFINES fixtures, and lowered the partial A/B pair to distinct
+ObjectIds sharing one unit-owned persistent private TEXT Cell. A complete
+physical version keeps two views of one Region. Captured logical targets use
+their declaring unit's Cell and a child AliasBinding. CP3 removed all-base
+cycle retry and write × openObjects broadcast, using bounded DFS and a
+base-to-open-object relation index. CP4 added exact/bounded/broad controls,
+shared-Cell strong/MUST/MAY/snapshot tests, and diagnostic isolation. CP5
+repeated the frozen cohorts and canaries recorded below.
+
+The two mandatory MOVEs through B then A leave only `PROGB   ` at XCTL. A true
+MUST Unknown kills an older literal; MAY retains it with a remainder. Copying
+to another Cell is a snapshot. Missing COPY, absent physical layout and 0/1/50
+orthogonal diagnostics do not alter the executable topology. A/B identity is
+derived from declarations and a positive overlay relation, not the MOVE
+literals. Partial overlap and independent equal-sized bases do not get a shared
+Cell. Explicit AllMemory and VisibleMemory still expand according to their
+published scopes. Executable ungrounded cycles are invalid; grounded object
+bounds and repeated resolved members are valid.
+
+The final 40-case logical cohort is 40/40 observed; eight same-AIR C/D pairs
+are 8/8 observed, with zero physical work in C and positive physical work in D.
+W3-to-W3-R1 logical comparison has 37 preserved cases, two classified
+cost/diagnostic deltas and one manually classified intentional Cell delta:
+`logical--unsupported` moves from `UNSUPPORTED_TARGET_EXPRESSION` to a
+known Cell subject at BEFORE with `OPEN_TARGET`, still zero candidates and the
+same source/interpretation remainder. Its raw old/new fields and invariant
+checks are in `evidence/w3-r1/logical-unsupported-delta-classification.json`.
+All eight physical query site projections retain command, candidate/support
+multiplicity, BEFORE, and remainders. No unexplained semantic delta remains.
+
+The 32/100/160-base REDEFINES witness always prepares two targets and two
+Events for two writes and yields only PROGB. `nominal-cell-160` has 320 writes,
+320 targets and 320 Events, rather than a 320 × 160 product. The 160 bounded
+open objects test produces 160 LogicalTargets for 160 localized writes; the
+explicit AllMemory control still expands 32 bases. indep80/160 preserve their
+161/321 targets and Events, zero base comparisons and zero materialized object
+pairs. EVALUATE40 retains 40 sites and control20 retains both CALL candidates.
+The hardened eight-case legitimate-work test asserts support multiplicity,
+MAY remainder, correlated copy candidates/supports and last relevant supports.
+
+Producer FAST passed (392 tests); producer qualification passed its Maven
+semantic portion, then met only the A/B-proved preexisting
+`SOURCE_DEPENDENCY_OWNER_UNPROVED` blocker. Lower FAST and qualification-local
+passed (`SEMANTIC_TEST_COUNT=244391`, `PERFORMANCE_TEST_COUNT=39207`). AIR FAST,
+CFG FAST, focal Cell/StorageIndex/StatementEffects/legitimate-work suites and
+integrated E2E passed. The IR clarification is documentation and contract
+wording; no Analysis IR 2.1 or wire kind was added. Remote checks and final
+PR draft/head verification are recorded in the final handoff.
+
+Residual source-language variants and physical operational policy remain the
+original W3 future scope. No W4 work started. Logical-only remains default;
+physical remains explicit opt-in and operationally interdicted. No merge was
+performed.

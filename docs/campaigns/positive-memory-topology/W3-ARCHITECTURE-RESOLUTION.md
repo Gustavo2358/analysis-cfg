@@ -19,4 +19,54 @@ The script deliberately exits RED on the positive Cell, target and candidate pro
 
 ## Checkpoints
 
-CP0 RED captured above. CP1 AIR/IR contract reconciliation, CP2 lower Cell publication, CP3 consumer bounded resolution/target selection, CP4 executable oracles and CP5 W0–W3 regression will be recorded here and in the W3 report/regression/performance documents as they complete.
+CP0 RED captured above. CP1 AIR/IR contract reconciliation, CP2 lower Cell publication, CP3 consumer bounded resolution/target selection, CP4 executable oracles and CP5 W0–W3 regression are complete. The W3 report/regression/performance addenda retain their final evidence.
+
+## Human review of CP2 and resolved architecture
+
+The first CP2 attempt exposed a second ambiguity in the historical REDEFINES
+fixture: A and B shared a physical source component, but the SP did not publish
+their complete logical-view identity. Human review chose a local producer proof,
+not two disconnected Cells, a symbolic Region, or loss of the supported MOVEs.
+The old SP snapshots remain under the lower's
+`docs/campaigns/positive-memory-topology/evidence/` directory.
+
+The frontend now emits SP 2.34/storage 1.10 `logicalExactViews` for equivalent
+complete TEXT views. Each record carries `node`, `representative` and logical
+character `length`. Recognition requires one positive component, proved overlay
+relations, equal locally modeled elementary TEXT extents, no unrepresented third
+view, and ordinary local WORKING-STORAGE context. Missing COPY remains coverage.
+The lower validates this fact and binds A/B to one persistent private TEXT Cell
+owned by the unit. It does not parse COBOL pictures or derive this identity from
+MOVE literals. Independent same-size bases and partial overlap do not get the
+shared Cell. Parsed MOVE continuations are now retained under missing COPY;
+the historical fixture's unavailable edges were regenerated from the frontend.
+
+On the integrated REDEFINES witness, `MOVE PROGA→B; MOVE PROGB→A; XCTL B`
+produces one Cell, two ObjectIds, two Assigns with explicit jumps and only
+`PROGB` as target. Default and physical opt-in agree. With 32/100/160 unrelated
+Regions, both modes prepare exactly two targets and the physical run prepares
+two Events and two applied groups; those counts are independent of unrelated
+bases. The original partial witness moves from 32 false targets and 33 Events
+to one target and one Event at 32 unrelated bases. These are structural
+measurements on the recorded fixtures, not a general complexity claim.
+
+## W3-R1 implementation closeout
+
+The producer's `logicalExactViews` proof is local to a supported WORKING-STORAGE
+component: equal complete elementary TEXT extents, same positive overlay chain,
+same owner/context and no omitted partial third view. Its `length` is logical
+characters, not physical bytes. The lower verifies this typed SP fact without
+parsing a picture and shares one persistent private Cell for A/B under missing
+COPY. With complete physical proof it retains two views of the same Region.
+The missing COPY changes coverage; it does not change the local identity proof.
+MOVE continuations come from the parsed control structure, never array order.
+
+`StorageIndex.select` traverses bounds with visiting/resolved states and no
+all-base retry. AIR validation rejects executable ungrounded self and two-object
+cycles; repeated resolved union members and independently grounded bounds remain
+valid. `StatementEffects` indexes open objects by candidate storage base once,
+then selects only intersecting objects for each write. Direct, bounded and
+explicitly broad target work have distinct preparation counters. Explicit
+AllMemory/VisibleMemory remain effective. The consumer has no COBOL gap-code
+branch. Raw RED evidence above and final GREEN evidence are retained under local
+`evidence/w3-r1/`.

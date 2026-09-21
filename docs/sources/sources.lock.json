@@ -3,7 +3,7 @@
   "observed_on": "2026-09-20",
   "analysis_ir": {
     "repository": "Gustavo2358/analysis-ir",
-    "commit": "b26465964fe75f944f6324df63330d69f33d77cd",
+    "commit": "b628e4c1a62de61a157cac85ae71ba4cd111052e",
     "semantic_version": "2.0.0",
     "role": "normative",
     "canonical_ref": "feat/positive-memory-topology",
@@ -11,7 +11,7 @@
       "pull_request": 8,
       "state": "open",
       "draft": true,
-      "head_commit": "b26465964fe75f944f6324df63330d69f33d77cd"
+      "head_commit": "b628e4c1a62de61a157cac85ae71ba4cd111052e"
     },
     "json_binding": {
       "owner": "Gustavo2358/analysis-ir",
@@ -22,7 +22,7 @@
       "targets_air_version": "2.0.0",
       "path": "bindings/json-v1.md",
       "review_path": "bindings/revisao-json-v1.md",
-      "checked_commit": "b26465964fe75f944f6324df63330d69f33d77cd",
+      "checked_commit": "b628e4c1a62de61a157cac85ae71ba4cd111052e",
       "implemented_in_analysis_cfg": false
     },
     "files": [
@@ -64,7 +64,7 @@
       },
       {
         "path": "especificacao/03-memoria-e-aliases.md",
-        "git_blob_sha1": "57aaaf2e7fc8b3ae903485210d90247788642ca0"
+        "git_blob_sha1": "12e7861148dfd9fa8e865e0add0e13c2f9b8dc0a"
       },
       {
         "path": "especificacao/04-operacoes.md",
@@ -84,7 +84,7 @@
       },
       {
         "path": "especificacao/08-contrato-de-consumidores.md",
-        "git_blob_sha1": "149feb6f8173ca7066375a5dd2fb09f80e5c9ad9"
+        "git_blob_sha1": "a772bf83209d08725ac2a53fbbe5d50b0e839d22"
       },
       {
         "path": "especificacao/09-extensibilidade-e-compatibilidade.md",
@@ -124,7 +124,7 @@
       },
       {
         "path": "especificacao/13-possibilidades-de-entrada.md",
-        "git_blob_sha1": "55db5e39abb8363f0e04bd5134bbb974a3c50a1d"
+        "git_blob_sha1": "5ee9768b47cd0c9de92716b0486bf776219cfcbf"
       },
       {
         "path": "especificacao/14-possibilidades-de-target.md",
@@ -141,13 +141,13 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "26016f10460336f237a33b2ed126a6a1427f0207",
+    "commit": "fa2487306366acfba8124fd6403f940f1b1a98aa",
     "canonical_ref": "feat/positive-memory-topology",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
     "analysis_ir": {
       "semantic_version": "2.0.0",
-      "commit": "b26465964fe75f944f6324df63330d69f33d77cd"
+      "commit": "b628e4c1a62de61a157cac85ae71ba4cd111052e"
     },
     "maven": {
       "group_id": "io.github.gustavo2358",
@@ -275,9 +275,9 @@
       "src/main/java/io/github/gustavo2358/cobolexplorer/CicsCommandSyntax.java",
       "src/test/java/io/github/gustavo2358/cobolexplorer/CicsFileControlTest.java"
     ],
-    "semantic_product_version": "2.33.0",
+    "semantic_product_version": "2.34.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "da84bfc3eca555d7d74b0a85b73819a75d1f48c7",
+    "commit": "1e7af863823a693fe9d36f6b6551e8c586170f50",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -287,7 +287,7 @@
       "contract": "2.1.0",
       "scope": "local unconditional paragraph identity and explicit entry; G1-G5 and 1/2/5/40"
     },
-    "storage_contract_version": "1.8.0",
+    "storage_contract_version": "1.10.0",
     "canonical_ref": "feat/positive-memory-topology",
     "observed_on": "2026-09-20",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
@@ -305,12 +305,12 @@
     "logical_text_semantic_product_version": "2.29.0",
     "logical_text_storage_contract_version": "1.9.0",
     "logical_text_w2": "Local producer FAST PASS; fixed logical ranges and expression transport. Selected source E2E qualification in docs/product/logical-text-w2.md.",
-    "dependency_preservation": "Bounded nominal/value preservation; see docs/domain/dependency-preservation.md; AIR/IR unchanged."
+    "dependency_preservation": "W3-R1 exact local logical TEXT view identity in SP 2.34/storage 1.10; missing physical layout remains coverage."
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "Dependency preservation reviewed and integrated into source-dependencies-w3",
-    "commit": "9ed53b6af6590101aeb9f9d27912718f0383c444",
+    "commit": "27d1cf6dbd4450dc157e40424fc91ac63fe35be7",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -337,7 +337,7 @@
     "fd_w11_validation": "Current-version LOGICAL_SOURCE negotiation fixed; B-SP version21-28/legacy18, fixed FAST and qualification-local PASS; final CLI/corpus pending",
     "logical_text_w1": "Source E2E A-D twice deterministic; scale 10/100/1000; no physical profile. Corporate rerun not required by revised user acceptance.",
     "logical_text_w2": "Local producer FAST PASS; fixed logical ranges and expression transport. Selected source E2E qualification in docs/product/logical-text-w2.md.",
-    "dependency_preservation": "Bounded nominal/value preservation; see docs/domain/dependency-preservation.md; AIR/IR unchanged."
+    "dependency_preservation": "W3-R1 positive logical Cell/Region projection and bounded captures; see docs/domain/dependency-preservation.md."
   },
   "external": [
     {
@@ -394,7 +394,7 @@
     "db2_authority": "STATIC_SQL_TABLE_POSITION"
   },
   "positive_memory_topology": {
-    "wave": "W2",
+    "wave": "W3-R1",
     "mode_default": "LOGICAL_ONLY",
     "physical": "EXPERIMENTAL_EXPLICIT_OPT_IN_ONLY",
     "report": "docs/campaigns/positive-memory-topology/W2-REPORT.md"

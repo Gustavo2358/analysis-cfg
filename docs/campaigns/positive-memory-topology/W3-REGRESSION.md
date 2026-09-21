@@ -32,3 +32,38 @@ The eight physical pairs are **8/8 OBSERVED**. C has `logicalOnlyMode=1` and zer
 Control stress was rerun on the final stack: EVALUATE40 has 241 sequences and 80 branches; W3 control20 has 62 sequences and 20 branches. Both are `OBSERVED`, have zero Opaque/AllControl/AllMemory compensation and zero physical groups/writes by default. W3 control20 retains both CALL candidates. Raw outputs: `evidence/w3/control-final2`.
 
 Producer FAST passed with 391 tests. Producer `qualification-local` passed its Maven 986 tests (one skipped) and reached the known `SOURCE_DEPENDENCY_OWNER_UNPROVED` source-normalizer blocker, proved preexisting in W1 A/B. Lower FAST and `qualification-local` passed with Java 21; the qualification included semantic, capacity and architecture suites. Analysis-cfg FAST and `W3LegitimateWorkTest` passed. No AIR/IR source change or W3 gate is required there. No unexplained semantic delta remains.
+
+## W3-R1 final regression (after human architectural resolution)
+
+The preceding section is the historical W3 result. W3-R1 runs from a frozen
+runtime in local `evidence/w3-r1/runtime-final/` with the final producer,
+lower, AIR and CFG classes. The earlier four `PIPELINE_FAILURE` physical cases
+were caused by concurrent Maven clean of a live classpath; the raw failed run
+is retained. On the frozen runtime all 40 logical and eight physical cases
+are `OBSERVED`. DB2_TABLE, COPYBOOK, DCLGEN, SQL_INCLUDE, FILE, CICS, CALL and
+altered control remain in the 40-case cohort.
+
+| Oracle | Final observation |
+|---|---|
+| Local REDEFINES with/without missing COPY | SP publishes the same two complete logical TEXT views; physical proof may differ |
+| Distinct names, shared storage | Missing-COPY A/B have distinct ObjectIds and one TEXT Cell; complete physical A/B share one Region |
+| Strong overwrite | MOVE B=PROGA then A=PROGB reaches XCTL(B) with PROGB only |
+| Literal mutation | Frontend test changes/removes/reorders MOVEs without changing `logicalExactViews` |
+| Independent equal size / partial overlap | Frontend and lower do not create false full-Cell alias |
+| Real MUST / MAY / snapshot | `W3R1CellSemanticsTest` preserves strong kill, weak alternative and copied old value |
+| Bounded / broad scopes | `StatementEffectsTest` excludes R2 from R1 bound, includes intersection, preserves AllMemory32 and VisibleMemory |
+| Circular / revisit | AIR validation rejects executable ungrounded one/two-object cycles; grounded and repeated union cases pass |
+| Diagnostic isolation | 0/1/50 extra diagnostics yield identical logical and physical sites and metrics |
+| Physical mode | C has zero applied groups/writes in all eight pairs; D has positive work in all eight; Cell-only unaugmented witness needs zero physical work in either mode |
+
+The W3-to-W3-R1 classifier reports 37 `PRESERVED`, two `CLASSIFIED_DELTA`
+cost/diagnostic cases and one `REQUIRES_REVIEW` by its generic policy. The last
+case is manually classified `INTENTIONAL_POSITIVE_LOGICAL_CELL` with raw old/new
+site fields and invariant assertions in local
+`evidence/w3-r1/logical-unsupported-delta-classification.json`: CALL remains
+without a candidate or supported write; a known Cell subject at BEFORE now
+allows the query to report OPEN_TARGET and real model value remainder. The
+source and interpretation remainders remain true. All eight physical site
+projections (candidate names/support multiplicity, timing and remainders) are
+identical to W3. `evidence/w3-r1/compare-final.json` retains the unmodified
+classifier result; `compare-physical-final.json` retains the cost-only deltas.
