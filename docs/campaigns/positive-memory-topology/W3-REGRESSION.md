@@ -67,3 +67,20 @@ source and interpretation remainders remain true. All eight physical site
 projections (candidate names/support multiplicity, timing and remainders) are
 identical to W3. `evidence/w3-r1/compare-final.json` retains the unmodified
 classifier result; `compare-physical-final.json` retains the cost-only deltas.
+
+## Final validator review regression
+
+The first W3-R1 closeout checked executable cycles through `ObjectPlace` but
+missed scopes used directly by `HavocMay`. The AIR contract suite now asserts
+`INVALID_IR/I-13` for scope-only self and two-object cycles, plus cycles in
+opaque reads/writes, foreign writes, `Unknown.remainingReads` and
+`Choice.remainder`. It keeps a nominal unused cycle valid and accepts grounded
+object scopes, explicit AllMemory/VisibleMemory and repeated resolved union
+members. `StorageIndexTest.executableScopeOnlyCycleFailsAtAirPreflight`
+checks the composed CFG boundary: no graph is built and the validator reports
+I-13 before `StorageIndex` can select the invalid scope.
+
+This AIR validator change alters rejection of invalid publications only. The
+previous 40-case logical, eight same-AIR C/D, scale, and physical canary
+evidence remains evidence from the prior code head; it has not been relabeled
+as a new run. The new AIR pin is exercised by the affected FAST gates.

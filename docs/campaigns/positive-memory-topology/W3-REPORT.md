@@ -151,3 +151,35 @@ All five worktrees and remote campaign branches matched at closeout; all five
 PRs remained open and DRAFT. PR #45 has the W0–W3 campaign title. This is
 `POSITIVE_MEMORY_TOPOLOGY_W3_R1_READY_FOR_REVIEW`, subject to human review and
 merge only. W4 and operational physical unbanning were not started.
+
+## Final human review: AIR validator scope roots
+
+Human review approved the W3-R1 Cell, bounded resolution, relation-aware
+LogicalTarget selection and regression evidence, but held closeout on one
+validator gap. `X -> UnknownBinding(ObjectsMemory(X))` plus
+`HavocMay(ObjectsMemory(X))` was accepted because the original grounding check
+started only at `ObjectPlace`. The old consumer then raised `UngroundedBound`.
+The AIR test reproduced this as RED: validation returned
+`STRUCTURALLY_VALID` with zero operands and no issues.
+
+AIR #21 now checks every executable memory scope/bound with the existing DFS
+grounding proof: `HavocMay`, opaque other reads/writes, foreign effects,
+`Unknown.remainingReads` and `Choice.remainder`, as well as ObjectPlace.
+The self-cycle and two-object scope-only cycle now return `INVALID_IR/I-13`.
+Nominal unused cycles, independently grounded object bounds, explicit
+AllMemory/VisibleMemory and repeated resolved union members remain valid.
+CFG preflight tests that a scope-only cycle yields `INVALID_IR` and no graph,
+before StorageIndex is reached. No AIR kind, binding kind, wire schema or
+solver semantics changed.
+
+AIR final validator commit is `980d4989a18f876996390cc61af41419a595eb7b`;
+lower #34 repins it at `eccf5c63116a09771d57255c872725b4434c0dcc`.
+AIR local FAST passed (`25.273 s`) and its exact-SHA remote contracts check
+passed. Lower local FAST passed (`188.138 s`). CFG local FAST passed
+(`101.042 s`) with the new preflight method included in the fixed Fast
+inventory; its Surefire report records the method executing. The lower
+revision changes only its AIR lock/workflow pin, so prior lower/CFG semantic
+cohort and physical canary evidence remains historical and materially valid
+for supported publications. The final CFG remote FAST will validate the
+repinned code head. No producer or Analysis IR commit was needed for this
+mechanical validator closure.

@@ -70,3 +70,22 @@ explicitly broad target work have distinct preparation counters. Explicit
 AllMemory/VisibleMemory remain effective. The consumer has no COBOL gap-code
 branch. Raw RED evidence above and final GREEN evidence are retained under local
 `evidence/w3-r1/`.
+
+## Final human review: executable scope roots
+
+Review of the first W3-R1 closeout found that the AIR validator checked
+grounding for executable `ObjectPlace` operands but missed executable memory
+scopes without a place. The minimal AIR had
+`X -> UnknownBinding(ObjectsMemory(X))` and
+`HavocMay(ObjectsMemory(X))`. Before the fix, validation returned
+`STRUCTURALLY_VALID`; the consumer then raised `UngroundedBound` when selecting
+the scope. This was a validator implementation gap under the already approved
+contract, with no new AIR kind or semantic decision.
+
+The same grounding traversal now checks executable scope roots in `HavocMay`,
+opaque memory envelopes, foreign effects, `Unknown.remainingReads` and
+`Choice.remainder`. Nominal cycles without executable use remain valid.
+Grounded object bounds, explicit AllMemory/VisibleMemory and repeated resolved
+union members remain valid. The AIR contract suite records RED for the
+scope-only self-cycle before the fix and GREEN `INVALID_IR/I-13` afterward;
+the CFG test verifies `INVALID_IR` at preflight, before graph construction.

@@ -301,6 +301,7 @@
     "io.github.gustavo2358.analysis.storage.StorageIndexTest": [
       "positiveBasesAndCodecDoesNotChangePhysicalOverlap",
       "cyclicAndDanglingAssociationsFailBeforeAnalysis",
+      "executableScopeOnlyCycleFailsAtAirPreflight",
       "snapshotIsolationAndPreparationCountFollowObjectsNotPairs",
       "physicalAliasesAndAdjacentRangesDoNotDependOnNames",
       "distinctBasesIndependentAndLifetimeQualifiesActivationOnly",

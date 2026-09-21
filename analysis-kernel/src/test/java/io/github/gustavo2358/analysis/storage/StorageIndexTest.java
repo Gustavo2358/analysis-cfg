@@ -35,6 +35,19 @@ class StorageIndexTest {
             assertEquals(io.github.gustavo2358.analysis.cfg.application.CfgBuildResult.Status.INVALID_IR,build.status());
         }
     }
+    @Test void executableScopeOnlyCycleFailsAtAirPreflight() {
+        var x=object("cycle");
+        var scope=new Scopes.ObjectsMemory(List.of(x));
+        var p=publication(List.of(region("unrelated",8L,Memory.Lifetime.ACTIVATION)),
+                List.of(declaration("cycle",new Memory.UnknownBinding(scope,UNKNOWN))),
+                List.of(sequence("s",List.of(new Operations.HavocMay(header("may"),scope,UNKNOWN)))),List.of());
+        var build=new io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator(
+                io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry.empty())
+                .build(p,io.github.gustavo2358.analysis.cfg.application.BuildOptions.defaults());
+        assertEquals(io.github.gustavo2358.analysis.cfg.application.CfgBuildResult.Status.INVALID_IR,build.status());
+        assertTrue(build.graph().isEmpty());
+        assertTrue(build.preflight().issues().stream().anyMatch(issue->issue.rule().equals("I-13")));
+    }
     @Test void snapshotIsolationAndPreparationCountFollowObjectsNotPairs() {
         for(int count:List.of(1,2,5,40,1000,4000)) {
             var objects=new ArrayList<Memory.ObjectDeclaration>();
