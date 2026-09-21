@@ -218,7 +218,9 @@ does not depend on FILE statements, literals, global input completeness or
 physical bytes. Split children and partial REDEFINES are excluded; the
 0/1/50 missing-input diagnostic metamorphic test leaves R/K topology intact.
 
-Lower #34 at `94941b3e262cd1c452f5e9ea505a264dd2093557` accepts the new
+Lower #34 implemented this at `94941b3e262cd1c452f5e9ea505a264dd2093557`
+and added generated partial/independent controls at final head
+`2beb5f8329885c7f5921d9a5d50f172901624b55`. It accepts the new
 version alongside historical SP 2.34, validates exact-view hierarchy and
 closes the group's members. Distinct AIR Objects `R` and `K` bind to one TEXT
 Cell (unit owner, `PERSISTENT`, `PRIVATE`); same-sized `BUF` remains independent.
@@ -242,7 +244,9 @@ READ/WRITE sites, resource bindings and `EOF`, `BAD`, `OK` calls under the
 existing native FILE oracle. Neither CLI activated physical: `logicalOnlyMode=1`,
 `experimentalPhysicalMode=0`, applied groups/writes zero. A Cell-only case
 does not require artificial physical work; the earlier real-Region C/D
-evidence remains unchanged.
+evidence remains unchanged. The same two new AIRs also complete with explicit
+`--experimental-physical`: mode metric 1, applied groups/writes zero, and the
+same supported CALL candidates. This does not activate physical by default.
 
 The validation-only mixed manifest replaces only this composition publication.
 `scripts/project/w3_r1_file_record_sweep.py` verifies every AIR hash and final
@@ -258,11 +262,12 @@ supported Region remains outside this exact-Cell proof. The separate
 and explicit; no W4 work, operational unbanning or merge occurred.
 
 Local closure gates: frontend focal tests and FAST (392 tests) PASS; lower
-`FileRecordGroundingSuite`, historical dependency preservation suite and FAST
-PASS; CFG focal native FILE and source dependency oracles, mixed sweep audit,
+`FileRecordGroundingSuite`, historical dependency preservation suite and final
+FAST (`161.884 s`) PASS; CFG focal native FILE and source dependency oracles,
+mixed sweep audit,
 and FAST (`91.568 s`) PASS. The final AIR validator was rebuilt unchanged at
 `980d4989a18f876996390cc61af41419a595eb7b` and its prior FAST remains
 valid. Producer #58 remote Fast CI passed at its exact head
 ([run](https://github.com/Gustavo2358/proleap-poc/actions/runs/35551987507));
-lower #34 remote Fast CI passed at its exact head
-([run](https://github.com/Gustavo2358/cobol-lower/actions/runs/35552192346)).
+lower #34 remote Fast CI passed at its final exact head
+([run](https://github.com/Gustavo2358/cobol-lower/actions/runs/35552848701)).
