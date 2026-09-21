@@ -84,3 +84,10 @@ This AIR validator change alters rejection of invalid publications only. The
 previous 40-case logical, eight same-AIR C/D, scale, and physical canary
 evidence remains evidence from the prior code head; it has not been relabeled
 as a new run. The new AIR pin is exercised by the affected FAST gates.
+
+The later [validation-only sweep](W3-VALIDATION-SWEEP.md) found one exception
+to evidence reuse: `source-dependencies-w3--composition` is invalid under the
+final validator because five executable FILE write scopes reach only a
+self-scoped UnknownBinding. Its prior query result is retained as historical
+evidence, not accepted as a final-validator regression PASS. The other 47
+frozen AIRs kept their prior validation status and issue count.

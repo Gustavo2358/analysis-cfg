@@ -183,3 +183,17 @@ cohort and physical canary evidence remains historical and materially valid
 for supported publications. The final CFG remote FAST will validate the
 repinned code head. No producer or Analysis IR commit was needed for this
 mechanical validator closure.
+
+## Validation-only reuse audit — HOLD
+
+The subsequent [frozen AIR sweep](W3-VALIDATION-SWEEP.md) checked the actual
+40 logical and eight physical publications against the final validator.
+Thirty-nine logical and all eight physical cases kept their prior validation
+status and issue count. `source-dependencies-w3--composition` changed from
+`STRUCTURALLY_VALID` to `INVALID_IR/I-13`: five FILE effect Opaque writes use
+`ObjectsMemory(FILE-RECORD)`, while that object has a self-scoped
+`UnknownBinding` with no independent storage grounding. This is a real
+producer/lower publication defect revealed by the stricter validator. The
+earlier READY_FOR_REVIEW handoff is historical; W3-R1 is **HOLD before merge**
+until this one case is reconciled. The AIR validator fix and its checks remain
+approved. No frozen AIR was changed and no solver/E2E/canary was rerun.
