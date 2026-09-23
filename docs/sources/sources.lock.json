@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "observed_on": "2026-09-20",
+  "observed_on": "2026-09-23",
   "analysis_ir": {
     "repository": "Gustavo2358/analysis-ir",
     "commit": "b628e4c1a62de61a157cac85ae71ba4cd111052e",
@@ -136,7 +136,7 @@
       }
     ],
     "baseline_assessment": "FD-W1 resource.bindings@1 after model loss proof; AIR2.0.0/binding1.0.0.",
-    "observed_on": "2026-09-20",
+    "observed_on": "2026-09-23",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable."
   },
   "air_java": {
@@ -189,7 +189,7 @@
       "air-model/src/main/java/io/github/gustavo2358/air/model/MemoryCodecs.java",
       "air-json/src/test/resources/regional.canonical.json"
     ],
-    "observed_on": "2026-09-20",
+    "observed_on": "2026-09-23",
     "modules": {
       "parent": {
         "path": "pom.xml",
@@ -275,9 +275,9 @@
       "src/main/java/io/github/gustavo2358/cobolexplorer/CicsCommandSyntax.java",
       "src/test/java/io/github/gustavo2358/cobolexplorer/CicsFileControlTest.java"
     ],
-    "semantic_product_version": "2.35.0",
+    "semantic_product_version": "2.38.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "93a42de83da823e69514cdefe2a9aa0ef0182ce2",
+    "commit": "5d8cad6b8d1e4be12720e852ce1d56eb47e969bf",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -289,7 +289,7 @@
     },
     "storage_contract_version": "1.11.0",
     "canonical_ref": "feat/positive-memory-topology",
-    "observed_on": "2026-09-20",
+    "observed_on": "2026-09-23",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "fd_w1_validation": "docs/work/active/FD-W1.yaml",
@@ -310,7 +310,7 @@
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "Dependency preservation reviewed and integrated into source-dependencies-w3",
-    "commit": "2beb5f8329885c7f5921d9a5d50f172901624b55",
+    "commit": "cc5226e744da0048d0c3064b402bae1123a0be45",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -323,7 +323,7 @@
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
     },
     "canonical_ref": "feat/positive-memory-topology",
-    "observed_on": "2026-09-20",
+    "observed_on": "2026-09-23",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "fd_w1_validation": "docs/work/active/FD-W1.yaml",
