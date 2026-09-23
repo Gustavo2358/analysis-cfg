@@ -34,12 +34,13 @@ def runtime(producer):
 
 def locked_sp(sp):
     version=json.loads((ROOT/'docs/sources/sources.lock.json').read_text())['proleap_poc']['semantic_product_version']
-    # Locked writer2.32 selects2.31 when no dependency-preservation extension is used.
+    # Locked writer2.35 selects2.35 for logical exact views, otherwise2.31 for source dependencies.
     # These fixed W2D fixtures contain neither POSSIBLE_TEXT nor CICS host extensions.
-    require(version == '2.32.0' and sp.get('sourceDependencies') is not None, 'locked source-dependency generation')
+    require(version == '2.35.0' and sp.get('sourceDependencies') is not None, 'locked source-dependency generation')
     require(not any(s.get('copySemantics') == 'POSSIBLE_TEXT' or s['variant'].startswith('CICS')
                     for s in sp['statements']), 'fixture stays within SP2.31 evidence')
-    require(sp['contractVersion'] == '2.31.0', 'exact evidence-selected SP contract')
+    expected = '2.35.0' if sp.get('storage', {}).get('logicalExactViews') else '2.31.0'
+    require(sp['contractVersion'] == expected, 'exact evidence-selected SP contract')
 
 
 def text_leaf(expression):

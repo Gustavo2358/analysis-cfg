@@ -33,7 +33,7 @@
       "explicitNoMemoryDoesNotOpenLoopValue",
       "profilesAreDistinctAndUnknownProfileIsRejected",
       "perOutcomeEffectsAreExplicitlyUnsupported",
-      "narrowerMemoryScopeIsRefusedRatherThanSilentlyIgnored",
+      "narrowerMemoryScopeIsAppliedRatherThanSilentlyIgnored",
       "mustOverwriteOutsideSliceHasExplicitRefusal"
     ],
     "io.github.gustavo2358.analysis.adapters.W1dModelTest": [
