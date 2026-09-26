@@ -309,8 +309,8 @@
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
-    "status": "R9 qualified source evidence contract; same Draft PR34; no merge",
-    "commit": "7bab3e9e8f7048afae235e8fcdb975840cfe1614",
+    "status": "R7 final corpus blocker closeout; R9 contract preserved; same Draft PR34; no merge",
+    "commit": "fd6581fe60b366f8661fd3b31e346f17d2f44509",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -323,7 +323,7 @@
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
     },
     "canonical_ref": "feat/positive-memory-topology",
-    "observed_on": "2026-09-25",
+    "observed_on": "2026-09-26",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "fd_w1_validation": "docs/work/active/FD-W1.yaml",
