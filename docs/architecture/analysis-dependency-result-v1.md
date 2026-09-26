@@ -244,3 +244,8 @@ incompatíveis podem desaparecer quando chegam informações que resolvem a dúv
 Uma cópia nominal explícita respeita o valor anterior da origem e sobrescreve o
 receptor no modelo nominal. Condições usam os fatos publicados, sem nova análise
 de controle. Veja [requisito e limites](conditional-dependency-candidates.md).
+
+Motivos `CONDITIONAL_*` tornam a análise parcial, mas pertencem à fonte.
+Eles preservam o `modelScope` da análise AIR, inclusive quando não há sites AIR.
+O escopo estrutural continua sendo determinado pelas ocorrências e limitações
+da análise executável; hipóteses de valores não alteram esse escopo.

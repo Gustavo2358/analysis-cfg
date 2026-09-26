@@ -42,3 +42,11 @@ for mutation in ('closed','no-assumption','foreign-origin','foreign-null-origin'
     except (ValueError,KeyError,TypeError):pass
     else:raise AssertionError('conditional '+mutation)
 print('CONDITIONAL_SOURCE_WIRE: producer result + seven rejections PASS')
+
+empty=read(FIX.parents[3]/'target/conditional-source/empty-executable.dependencies.json')
+result(empty)
+wrong=copy.deepcopy(empty);wrong['modelScope']='STRUCTURAL_AIR_OCCURRENCES'
+try:result(wrong)
+except ValueError:pass
+else:raise AssertionError('source uncertainty changed executable scope')
+print('CONDITIONAL_SOURCE_SCOPE: independent PARTIAL and executable scope PASS')

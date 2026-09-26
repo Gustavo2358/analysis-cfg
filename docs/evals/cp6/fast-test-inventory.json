@@ -241,7 +241,8 @@
     "io.github.gustavo2358.analysis.adapters.ConditionalSourceContractTest": [
       "conditionalFactsRoundTripAndRejectInvalidReferences",
       "sourceCandidateReachesUnifiedInventoryWithExplicitAssumptions",
-      "executableValueEvidenceRefinesAndReplacesNominalHypothesis"
+      "executableValueEvidenceRefinesAndReplacesNominalHypothesis",
+      "conditionalUncertaintyDoesNotChangeExecutableScope"
     ]
   },
   "analysis-dataflow": {

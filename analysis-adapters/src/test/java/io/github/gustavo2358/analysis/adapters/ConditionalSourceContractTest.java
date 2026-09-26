@@ -43,4 +43,15 @@ class ConditionalSourceContractTest {
         assertEquals(List.of("PROGA"),result.programDependencies().getFirst().candidates().stream().map(TargetResolver.Candidate::referenceName).toList());
         assertEquals(0L,result.metrics().get("conditionalSourceValueRuns"));
     }
+    @Test void conditionalUncertaintyDoesNotChangeExecutableScope()throws Exception {
+        var p=W1dModelTest.model(1,u->List.of(ResultFixtures.returning(u,"start",List.of())));
+        var before=new DependencyAnalysis().prepare(p);assertTrue(before.sites().isEmpty());assertFalse(before.structuralScope());
+        var result=new DependencyAnalysis().prepare(new DependencyInput(p,Optional.of(source(p.id().localId())),List.of()));
+        assertTrue(result.partial());assertFalse(result.structuralScope());
+        assertEquals(List.of("MAYBE001"),result.programDependencies().getFirst().candidates().stream().map(TargetResolver.Candidate::referenceName).toList());
+        var out=new java.io.ByteArrayOutputStream();new DependencyJson().write(result,out);
+        var wire=new ObjectMapper().readTree(out.toByteArray());assertEquals("KNOWN_GRAPH_ENTRY",wire.path("modelScope").asText());assertEquals("PARTIAL",wire.path("analysisStatus").asText());
+        var target=java.nio.file.Path.of("target/conditional-source");java.nio.file.Files.createDirectories(target);java.nio.file.Files.write(target.resolve("empty-executable.dependencies.json"),out.toByteArray());
+    }
+
 }

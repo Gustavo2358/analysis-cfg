@@ -39,7 +39,7 @@ public record DependencyResult(PublicationId publication,SemanticVersion airVers
         this(publication,airVersion,sites,edges,metrics,publicationInventory,origins,artifacts,sourceUncertaintyRefs,analysisReasons,FileDependencyResult.unavailable());
     }
     public boolean partial() { return sourceDependencies.available()&&sourceDependencies.partial()||!analysisReasons.isEmpty()||sites.stream().anyMatch(s->s.analysisStatus()==DependencySiteFact.AnalysisStatus.PARTIAL); }
-    public boolean structuralScope() { return sites.stream().anyMatch(s->s.reachability()==DependencySiteFact.Reachability.UNKNOWN)||sites.isEmpty()&&!analysisReasons.isEmpty(); }
+    public boolean structuralScope() { return sites.stream().anyMatch(s->s.reachability()==DependencySiteFact.Reachability.UNKNOWN)||sites.isEmpty()&&analysisReasons.stream().anyMatch(r->!r.startsWith("CONDITIONAL_")); }
     public DependencyResult {
         programDependencies=List.copyOf(programDependencies);
         Objects.requireNonNull(sourceQualifiedDependencies);sourceQualifiedDependencies.ifPresent(s->{if(s.evidence().air().size()!=1 || !s.evidence().air().getFirst().publication().equals(publication.localId()))throw new IllegalArgumentException("source/AIR identity mismatch");});
