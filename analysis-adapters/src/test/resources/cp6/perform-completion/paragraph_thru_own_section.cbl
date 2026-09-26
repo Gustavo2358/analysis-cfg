@@ -1,0 +1,19 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. SECTION-ENDPOINT.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 PGM PIC X(8).
+       PROCEDURE DIVISION.
+       MAIN.
+       PERFORM P THRU S
+       CALL PGM
+       GOBACK.
+       S SECTION.
+       EARLIER-P.
+       CALL 'DEAD0001'.
+       P.
+       MOVE 'LIVE0001' TO PGM.
+       Q.
+       MOVE 'LIVE0002' TO PGM.
+       OUTSIDE-S SECTION.
+       CALL 'DEAD0001'.

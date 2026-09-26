@@ -727,6 +727,34 @@
           "reachable": false
         }
       }
+    },
+    {
+      "id": "paragraph_thru_own_section",
+      "source": "paragraph_thru_own_section.cbl",
+      "sha256": "1023dca4c6bc0440ff0f7bc2cfd2be77d973f91eaeda7234a44190d60c589f77",
+      "calls": {
+        "return": {
+          "line": 9,
+          "required": [
+            "LIVE0002"
+          ],
+          "allowed": [
+            "LIVE0002"
+          ]
+        },
+        "earlier": {
+          "line": 13,
+          "required": [],
+          "allowed": [],
+          "reachable": false
+        },
+        "outside": {
+          "line": 19,
+          "required": [],
+          "allowed": [],
+          "reachable": false
+        }
+      }
     }
   ]
 }

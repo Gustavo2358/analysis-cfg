@@ -26,7 +26,7 @@ retain explicit limitations; existing legacy profile gaps remain historical fact
 ## Reproduction
 
 `analysis-adapters/src/test/resources/cp6/perform-completion/expected.json` contains
-24 reviewed synthetic source oracles with SHA-256 hashes. The oracle compares
+25 reviewed synthetic source oracles with SHA-256 hashes. The oracle compares
 candidate sets AND materialized edges at each CALL, requires source-backed supports,
 and rejects reachable dead calls or forbidden targets. It never rewrites expected.
 
@@ -44,7 +44,7 @@ PERFORM suite without copying or changing its expected results.
 
 Cases cover paragraph dead tails and ordinary completion, IF/EVALUATE, nested inline
 exits, CYCLE, ignored EXIT PERFORM outside inline, repeated callers, external GO TO,
-empty SECTION/paragraph, preambles, section bounds, mixed THRU endpoints, ordinary
+empty SECTION/paragraph, preambles, section bounds, mixed THRU endpoints (including a start paragraph inside its ending section), ordinary
 section transitions, two/three VARYING levels, nested PERFORM, body and continuation.
 The lower's FAST suite separately checks actual AIR phase edges, memory reads and
 writes, codec roundtrip, inventory permutations and malformed contract rejection.
