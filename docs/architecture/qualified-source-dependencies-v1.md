@@ -111,3 +111,15 @@ composition; codec roundtrip; invalid versions, identities, proofs, guards and
 candidate references; file correlation and rejection without destination mutation.
 R7 state suites and both repository FAST gates remain required. The real corpus
 is an external source of evidence, never a fixture-specific product rule.
+
+
+## Evidência nominal opcional de valores
+
+A unidade pode incluir `nominalValues`, conforme
+[candidatos condicionais](conditional-dependency-candidates.md). O bloco leva
+fatos, não valores finais calculados pelo projector. Os campos `occurrences.values`
+e `valueRemainder` conservam a semântica histórica. O TargetResolver escolhe o
+provider nominal quando a consulta executável é insuficiente. Ele publica no
+inventário unificado; não altera o grafo certificado, a AIR ou o CFG.
+Referências, formato fechado e correlação das branches são validados tanto pela
+porta em memória quanto pelo codec. Bloco ausente mantém o comportamento anterior.

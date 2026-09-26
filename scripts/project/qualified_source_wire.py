@@ -21,14 +21,18 @@ def schema():
 def shape(value, spec):
     if '$ref' in spec: return shape(value, schema()['$defs'][spec['$ref'].rsplit('/', 1)[1]])
     if 'const' in spec: require(type(value) is str and value == spec['const'], 'contract version/constant'); return
+    if 'enum' in spec: require(value in spec['enum'], 'source enum')
     kind=spec['type']
     require(type(value) is {'object':dict,'array':list,'string':str,'integer':int,'boolean':bool}[kind], 'wire type')
     if kind=='object':
-        require(set(value)==set(spec['properties']), 'closed source fields')
+        require(set(spec.get('required', spec['properties'])) <= set(value) <= set(spec['properties']), 'closed source fields')
         for name, item in value.items(): shape(item, spec['properties'][name])
     elif kind=='array':
         for item in value: shape(item, spec['items'])
-    elif kind=='string': require(not any(0xD800<=ord(c)<=0xDFFF for c in value), 'Unicode scalar')
+    elif kind=='string':
+        require(not any(0xD800<=ord(c)<=0xDFFF for c in value), 'Unicode scalar')
+        require(len(value)>=spec.get('minLength',0), 'source text length')
+    elif kind=='integer' and 'minimum' in spec: require(value>=spec['minimum'], 'source integer minimum')
 
 
 def index(values, identity='id'):
@@ -96,8 +100,39 @@ def validate(evidence):
             require(len(o['values'])<=1 and len(o['operands'])<=1 and o['valueRemainder']==(not o['values']), 'value remainder')
             if o['values']: require(o['targetKind']=='LITERAL' and bool(o['operands']), 'literal value authority')
             for v in o['values']: require(v['logicalDomain']=='TEXT' and len(v['value'])==v['logicalExtent'], 'logical value')
+        if 'nominalValues' in u: nominal(u)
         if not u['controlAvailable']: require(not u['nodes'] and not u['derivations'] and not u['selections'], 'no unavailable authority')
     return evidence
+
+
+def nominal(unit):
+    value=unit['nominalValues']; facts=value['facts']
+    symbols=index(facts['symbols'],'node'); declarations=index(value['declarations'],'node')
+    require(set(symbols)==set(declarations), 'nominal declaration provenance')
+    statements={s['id']['handle']:s for s in unit['statements']}
+    def term(t):
+        if t['kind']=='READ': require(key(t['value']) in symbols, 'nominal read reference')
+        elif t['kind']!='LITERAL': require(t['value']=='', 'nonliteral payload')
+    def predicate(p):
+        kind=p['kind'];terms=p['terms'];children=p['children']
+        require((kind=='EQ' and len(terms)==2 and not children) or (kind=='NOT' and not terms and len(children)==1) or (kind in ('AND','OR') and not terms and len(children)>=2), 'nominal predicate shape')
+        for t in terms: term(t)
+        for child in children: predicate(child)
+    seen=set()
+    for a in facts['assignments']:
+        ident=(a['statement'],a['target']);require(ident not in seen, 'duplicate nominal write');seen.add(ident)
+        require(a['statement'] in statements and key(a['target']) in symbols, 'nominal assignment owner');term(a['source'])
+    index(facts['conditions'],'statement')
+    for c in facts['conditions']:
+        require(c['statement'] in statements, 'nominal condition owner');predicate(c['predicate'])
+    for seed in value['seeds']: require(key(seed['node']) in symbols, 'nominal seed owner')
+    index(value['seeds'],'node');index(value['branches'],'derivation');index(value['uncertainties'])
+    nodes={n['id']:n for n in unit['nodes']};derivations={d['id']:d for d in unit['derivations']};predicates={c['statement'] for c in facts['conditions']}
+    for b in value['branches']:
+        d=derivations.get(b['derivation']);require(d is not None and len(d['source'])==1 and not d['selection'] and not d['callerPremise'], 'nominal branch derivation')
+        require(nodes[d['source'][0]]['location'] in predicates, 'nominal branch predicate owner')
+    occurrences={o['id']['handle']:o for o in unit['occurrences']};index(facts['queries'],'statement')
+    for q in facts['queries']: require(key(q['node']) in symbols and q['statement'] in occurrences and occurrences[q['statement']]['targetKind']=='COMPUTED', 'nominal query owner')
 
 
 def publication(section, publication_id):

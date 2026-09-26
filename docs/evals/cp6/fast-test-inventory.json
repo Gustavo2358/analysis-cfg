@@ -237,6 +237,11 @@
     ],
     "io.github.gustavo2358.analysis.adapters.LogicalTargetRoutingTest": [
       "logicalRootCopyResolvesWithRealProducerChainInBothModes"
+    ],
+    "io.github.gustavo2358.analysis.adapters.ConditionalSourceContractTest": [
+      "conditionalFactsRoundTripAndRejectInvalidReferences",
+      "sourceCandidateReachesUnifiedInventoryWithExplicitAssumptions",
+      "executableValueEvidenceRefinesAndReplacesNominalHypothesis"
     ]
   },
   "analysis-dataflow": {
@@ -267,6 +272,14 @@
       "syntheticNameUsesExactlyEightCharactersIncludingDollar",
       "existingAcceptedFormsKeepTheirExactNames",
       "existingRejectionsAndLiteralPaddingRemainOpen"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.SourceValuesProviderTest": [
+      "overwriteDoesNotRetainOldSeed",
+      "copyCapturesSnapshot",
+      "branchExcludesKnownNameWithOpenStoragePremises",
+      "retainedNameCarriesCopySeedAndMissingInput",
+      "lowValuesCannotMatchATextWithDifferentCharacters",
+      "unknownCollatingCharacterAndUnicodeRemainExplicit"
     ]
   },
   "analysis-kernel": {

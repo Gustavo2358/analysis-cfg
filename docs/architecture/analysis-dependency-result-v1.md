@@ -225,3 +225,22 @@ canonical inventory. No separate source value solver populates either view.
 
 See [unified target resolution](unified-target-resolution.md) and
 [explicit input](dependency-input-v1.md) for correlation and provider admission.
+
+
+## Candidatos condicionais no inventário unificado
+
+`dependencies.programs[].candidates[].conditionalSupports` é opcional. Contém
+`provider=nominal-source-text@1`, `analysisBoundary=NON_EXECUTABLE_SOURCE`,
+`evidence` (tipo, referência e proveniência), `assumptions` e `uncertainties`.
+As premissas `NOMINAL_DECLARATIONS_PRESERVE_MEANING`,
+`NO_UNMODELED_STORAGE_INTERFERENCE` e `DECLARATIVE_INITIAL_VALUES_APPLY` descrevem
+hipóteses, não garantias. Cada candidato mantém `referenceName` e `rawValue`;
+`valueRemainder=true` indica que o conjunto permanece aberto. A autoridade
+`CONDITIONAL_SOURCE_VALUES` e o motivo `CONDITIONAL_NOMINAL_VALUE_EVIDENCE`
+identificam essa contribuição. O estado agregado permanece PARTIAL.
+
+Uma consulta executável fechada substitui essa aproximação; dependências
+incompatíveis podem desaparecer quando chegam informações que resolvem a dúvida.
+Uma cópia nominal explícita respeita o valor anterior da origem e sobrescreve o
+receptor no modelo nominal. Condições usam os fatos publicados, sem nova análise
+de controle. Veja [requisito e limites](conditional-dependency-candidates.md).

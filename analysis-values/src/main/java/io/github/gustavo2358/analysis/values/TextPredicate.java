@@ -6,9 +6,9 @@ import java.util.*;
 import java.util.function.Function;
 
 /** Conservative Boolean image of the supported logical text expressions. */
-final class TextPredicate {
+public final class TextPredicate {
     private TextPredicate() { }
-    static final int FALSE=1, TRUE=2, BOTH=3;
+    public static final int FALSE=1, TRUE=2, BOTH=3;
     record Text(Set<LogicalText> values,boolean open) {
         Text { values=Set.copyOf(values); }
         static Text unknown(){return new Text(Set.of(),true);}
@@ -18,10 +18,7 @@ final class TextPredicate {
             return negate(truth(unary.argument(),read));
         if(!(expression instanceof Expressions.Binary binary))return BOTH;
         if(binary.operator()==Expressions.BinaryOperator.AND||binary.operator()==Expressions.BinaryOperator.OR) {
-            int a=truth(binary.left(),read),b=truth(binary.right(),read),result=0;
-            for(int x:new int[]{FALSE,TRUE})for(int y:new int[]{FALSE,TRUE})if((a&x)!=0&&(b&y)!=0)
-                result|=(binary.operator()==Expressions.BinaryOperator.AND?(x==TRUE&&y==TRUE):(x==TRUE||y==TRUE))?TRUE:FALSE;
-            return result;
+            return combine(binary.operator()==Expressions.BinaryOperator.AND,truth(binary.left(),read),truth(binary.right(),read));
         }
         if(binary.operator()!=Expressions.BinaryOperator.EQ&&binary.operator()!=Expressions.BinaryOperator.NE)return BOTH;
         var a=text(binary.left(),read);var b=text(binary.right(),read);
@@ -31,7 +28,32 @@ final class TextPredicate {
         int equal=(same?TRUE:0)|(a.values.size()==1&&a.values.equals(b.values)?0:FALSE);
         return binary.operator()==Expressions.BinaryOperator.EQ?equal:negate(equal);
     }
-    private static int negate(int value){return ((value&FALSE)!=0?TRUE:0)|((value&TRUE)!=0?FALSE:0);}
+    public static int negate(int value){return ((value&FALSE)!=0?TRUE:0)|((value&TRUE)!=0?FALSE:0);}
+    /** Shared Boolean and logical text operations for independent value providers. */
+    public static int combine(boolean and,int a,int b) {
+        int result=0;
+        for(int x:new int[]{FALSE,TRUE})for(int y:new int[]{FALSE,TRUE})if((a&x)!=0&&(b&y)!=0)
+            result|=(and?(x==TRUE&&y==TRUE):(x==TRUE||y==TRUE))?TRUE:FALSE;
+        return result;
+    }
+    public static String fit(String value,int extent){return LogicalText.of(value).fit(extent,' ').text();}
+    /** LOW/HIGH fill every position with the same character, whatever its encoding/order. */
+    public static int sourceFigurativeEquality(Collection<String> values,boolean open) {
+        if(open||values.isEmpty())return BOTH;
+        int result=0;
+        for(var value:values) {
+            var text=LogicalText.of(value);
+            result|=text.length()==0||text.equals(text.slice(0,1).fit(text.length(),value.codePointAt(0)))?BOTH:FALSE;
+        }
+        return result;
+    }
+    /** Equality pads the shorter logical text with spaces; it assumes no collating order. */
+    public static int sourceEquality(Collection<String> left,boolean leftOpen,Collection<String> right,boolean rightOpen) {
+        if(leftOpen||rightOpen||left.isEmpty()||right.isEmpty())return BOTH;
+        int result=0;
+        for(var a:left)for(var b:right){int length=Math.max(a.codePointCount(0,a.length()),b.codePointCount(0,b.length()));result|=fit(a,length).equals(fit(b,length))?TRUE:FALSE;}
+        return result;
+    }
     static Text text(Expression expression,Function<Place,Text> read) {
         if(expression instanceof Expressions.Literal literal&&literal.value() instanceof Values.TextValue value)
             return new Text(Set.of(LogicalText.of(value.value())),false);

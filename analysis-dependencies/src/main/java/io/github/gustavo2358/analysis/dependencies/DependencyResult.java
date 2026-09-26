@@ -13,7 +13,10 @@ public record DependencyResult(PublicationId publication,SemanticVersion airVers
         this(publication,airVersion,sites,edges,metrics,publicationInventory,origins,artifacts,sourceUncertaintyRefs,analysisReasons,fileDependencies,sourceDependencies,sourceQualifiedDependencies,List.of());
     }
     public DependencyResult withProgramInventory(List<TargetResolver.Resolution> inventory,Map<String,Long> counts) {
-        return new DependencyResult(publication,airVersion,sites,edges,counts,publicationInventory,origins,artifacts,sourceUncertaintyRefs,analysisReasons,fileDependencies,sourceDependencies,sourceQualifiedDependencies,inventory);
+        var reasons=new TreeSet<>(analysisReasons);
+        for(var resolution:inventory)for(var reason:resolution.analysisReasons())if(reason.startsWith("CONDITIONAL_"))reasons.add(reason);
+        if(counts.getOrDefault("conditionalSourceResourceLimits",0L)>0)reasons.add("CONDITIONAL_SOURCE_RESOURCE_LIMIT");
+        return new DependencyResult(publication,airVersion,sites,edges,counts,publicationInventory,origins,artifacts,sourceUncertaintyRefs,List.copyOf(reasons),fileDependencies,sourceDependencies,sourceQualifiedDependencies,inventory);
     }
     public DependencyResult(PublicationId publication,SemanticVersion airVersion,List<DependencySiteFact> sites,List<Edge> edges,Map<String,Long> metrics,
             Evidence.InventoryStatus publicationInventory,List<Origins.Origin> origins,List<Origins.Artifact> artifacts,List<UncertaintyId> sourceUncertaintyRefs,List<String> analysisReasons,FileDependencyResult fileDependencies,SourceDependencyResult sourceDependencies) {

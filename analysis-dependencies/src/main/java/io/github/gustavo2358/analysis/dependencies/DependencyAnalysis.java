@@ -29,14 +29,29 @@ public final class DependencyAnalysis {
         if(input.source().isPresent())result=result.withSourceEvidence(input.source().get());
         var byOperation=new HashMap<OperationId,List<DependencySiteFact>>();
         for(var site:result.sites())byOperation.computeIfAbsent(site.operation(),ignored->new ArrayList<>()).add(site);
+        var sourceValues=new HashMap<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies.StatementId,List<SourceValuesProvider.Candidate>>();
+        long conditionalRuns=0,conditionalQueries=0,conditionalWork=0,conditionalLimited=0;
+        if(input.source().isPresent())for(var unit:input.source().get().units())if(unit.nominalValues().isPresent()) {
+            var requested=new TreeSet<String>();
+            for(var occurrence:occurrences)if(occurrence.source().filter(s->s.unit().equals(unit.unit())).isPresent()) {
+                var sites=occurrence.executableOperations().stream().flatMap(op->byOperation.getOrDefault(op,List.of()).stream()).toList();
+                if(TargetResolver.requiresSourceValues(occurrence,sites))requested.add(occurrence.source().orElseThrow().handle());
+            }
+            requested.retainAll(unit.nominalValues().get().facts().queries().stream().map(q->q.statement()).collect(java.util.stream.Collectors.toSet()));
+            if(!requested.isEmpty()) {
+                var provider=new SourceValuesProvider(unit,requested);conditionalRuns++;conditionalQueries+=requested.size();conditionalWork+=provider.workItems();if(provider.limited())conditionalLimited++;
+                for(var statement:requested)sourceValues.put(new io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies.StatementId(unit.unit(),statement),provider.candidates(statement));
+            }
+        }
         var inventory=new ArrayList<TargetResolver.Resolution>();long reused=0;
         for(var occurrence:occurrences) {
             var sites=occurrence.executableOperations().stream().flatMap(op->byOperation.getOrDefault(op,List.of()).stream()).toList();
-            var resolved=TargetResolver.resolve(occurrence,sites);inventory.add(resolved);
-            if(occurrence.source().isPresent()&&!occurrence.qualifications().isEmpty()&&occurrence.targetKind().equals("COMPUTED")&&!resolved.candidates().isEmpty())reused++;
+            var resolved=TargetResolver.resolve(occurrence,sites,occurrence.source().map(s->sourceValues.getOrDefault(s,List.of())).orElse(List.of()));inventory.add(resolved);
+            if(occurrence.source().isPresent()&&!occurrence.qualifications().isEmpty()&&occurrence.targetKind().equals("COMPUTED")&&resolved.candidates().stream().anyMatch(c->!c.executableSupports().isEmpty()))reused++;
         }
         var metrics=new TreeMap<>(result.metrics());metrics.put("sourceQualifiedResolvedByExistingQuery",reused);
         metrics.put("qualifiedComputedOccurrences",occurrences.stream().filter(o->o.targetKind().equals("COMPUTED")&&(!o.qualifications().isEmpty()||!o.executableOperations().isEmpty())).count());
+        metrics.put("conditionalSourceValueRuns",conditionalRuns);metrics.put("conditionalSourceValueQueries",conditionalQueries);metrics.put("conditionalSourceWorkItems",conditionalWork);metrics.put("conditionalSourceResourceLimits",conditionalLimited);
         metrics.put("targetResolutionRequests",(long)occurrences.size());
         return result.withProgramInventory(inventory,metrics);
     }
