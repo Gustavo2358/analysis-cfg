@@ -25,7 +25,10 @@ final class FileDependencyConsumer implements FactConsumer<Site> {
         var known=result.status()==PreparedFacts.LookupStatus.AVAILABLE&&result.observation().status()==ObservationBatch.QueryStatus.VALUE?Optional.of(result.observation().value()):Optional.<ReachabilityProvider.Fact>empty();
         var value=(route&1)!=0?lookup(facts,FileValueQuery.query(view)):Optional.<StorageValueFact>empty();
         var context=(route&2)!=0?lookup(facts,FileValueQuery.contextQuery(view)):Optional.<StorageValueFact>empty();
-        sink.emit(site(view,bindings,known,known.isEmpty()?List.of("FILE_REACHABILITY_UNAVAILABLE"):List.of(),value,context));
+        var missing=new ArrayList<String>();
+        if(known.isEmpty())missing.add("FILE_REACHABILITY_UNAVAILABLE");
+        if((route&4)!=0)missing.add("CICS_NAME_AREA_INTERPRETATION_OPEN");
+        sink.emit(site(view,bindings,known,missing,value,context));
     }
     private Optional<StorageValueFact> lookup(PreparedFacts facts,PointQuery<StorageSubject> query){
         var answer=facts.lookup(values,query);
@@ -51,6 +54,8 @@ final class FileDependencyConsumer implements FactConsumer<Site> {
             if(name==null)reasons.add("FILE_NAME_POLICY_UNSUPPORTED");
         } else if(value.isPresent()&&value.get().reachability()==io.github.gustavo2358.analysis.values.ValueFact.Reachability.REACHABLE&&reachable==Reachability.REACHABLE){
             var fact=value.get();remainder=fact.effectiveUnknownRemainder();
+            // General logical evidence is useful without certifying the CICS physical area.
+            if(reasons.contains("CICS_NAME_AREA_INTERPRETATION_OPEN"))remainder=true;
             if(Boolean.TRUE.equals(fact.modelValueRemainder()))reasons.add("FILE_MODEL_VALUE_REMAINDER");if(fact.sourceUnknownRemainder())reasons.add("FILE_SOURCE_VALUE_REMAINDER");
             for(var c:fact.candidateSupports()){var raw=c.candidate().value();var name=FileNamePolicy.name(namespace,raw,true,policy);
                 if(name==null){remainder=true;reasons.add("FILE_NAME_POLICY_UNSUPPORTED");continue;}

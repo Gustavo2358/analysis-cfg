@@ -112,7 +112,7 @@
       "conditionCanContinueWithoutNormalSuccess",
       "extensionPolicySurvivesTransportWithoutCobolSubstitution",
       "platformProfileAcceptsDigitAndPreservesUnsupportedSpelling",
-      "eightCharactersWithoutPhysicalNameAreaRemainUnsupported"
+      "eightCharactersWithoutPhysicalNameAreaPreserveCandidates"
     ],
     "io.github.gustavo2358.analysis.adapters.CicsTargetTimingTest": [
       "nameAndSupportsAreObservedBeforeForeignEffects"
@@ -195,6 +195,23 @@
       "nominalCopyPreservesSnapshotCandidateAndPublishesPartialReason",
       "unresolvedPhysicalSliceDoesNotEnablePhysicalFallback",
       "nominalCicsCallAndFileConsumersKeepCandidatesWithOpenCompleteness"
+    ],
+    "io.github.gustavo2358.analysis.adapters.SourceDependencyTest": [
+      "deduplicatesWithoutDiscardingOriginalOwnersAndSupports",
+      "retainsNominalUnresolvedAndUnknownSqlIncludes",
+      "requiresPositiveDclgenAuthorityAndClosedProfile",
+      "aggregatesThousandOccurrencesWithoutRuntimeAnalysis",
+      "db2UsageRemainsOnSupportsWithoutNominalSolver"
+    ],
+    "io.github.gustavo2358.analysis.adapters.DependencyPreservationTest": [
+      "knownRuntimeAndOrphanPreserveOnlyReachingEvidence",
+      "addingRuntimeUncertaintyNeverRemovesExistingCandidate",
+      "trulyUnknownRemainsEmptyOpen",
+      "positiveOverwriteCanRemoveAnEarlierCandidate",
+      "weakeningPhysicalProofPreservesNominalCandidateAndOpensRemainder",
+      "fileConsumerAlsoPreservesKnownPlusRuntime",
+      "lowerAreaUncertaintyReachesSiteAndWire",
+      "redefinesUnknownBindingCannotInventAliasOverwrite"
     ]
   },
   "analysis-dataflow": {

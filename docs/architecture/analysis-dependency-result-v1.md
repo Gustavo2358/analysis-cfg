@@ -184,3 +184,10 @@ NOT_AUTHORIZED.
 A versão do CFG correlacionado segue [CFG JSON 2.0.0](cfg-json-v2.md) quando há Invoke. Isso não muda a versão nem os bytes deste produto de dependência.
 
 WORK-CFG-038 preserva este wire. O CFG correlacionado usa [v3](cfg-json-v3.md) quando há Opaque; a incerteza localizada chega pelos campos de remainder existentes.
+
+
+## W3 source dependencies — current wire 2.4.0
+
+The additive closed source inventory and compatibility policy are defined in
+[source dependencies W3](../product/source-dependencies-w3.md). CALL/FILE fields
+retain their 2.3 semantics; source dependencies do not invoke their solvers.

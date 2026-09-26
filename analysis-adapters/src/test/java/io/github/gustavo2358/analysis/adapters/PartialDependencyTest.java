@@ -51,7 +51,7 @@ class PartialDependencyTest {
             assertFalse(result.analysisReasons().isEmpty());
             assertTrue(result.sites().stream().filter(f->f.analysisStatus()==DependencySiteFact.AnalysisStatus.PARTIAL).allMatch(f->!f.analysisReasons().isEmpty()));
             var wire=W1dAdversarialTest.wire(result);assertArrayEquals(wire,W1dAdversarialTest.wire(result));
-            assertTrue(new String(wire,java.nio.charset.StandardCharsets.UTF_8).contains("\"version\":\"2.3.0\""));
+            assertTrue(new String(wire,java.nio.charset.StandardCharsets.UTF_8).contains("\"version\":\"2.5.0\""));
             Files.write(output.resolve(entry.getKey()+".json"),wire);
         }
     }
