@@ -216,6 +216,12 @@
     "io.github.gustavo2358.analysis.adapters.ConsumerCoverageTest": [
       "cicsProgramClosedChoiceConsumesAlreadyPreparedStorageEvidence",
       "cicsChoiceCannotBorrowProofFromOnlyOneAlternative"
+    ],
+    "io.github.gustavo2358.analysis.adapters.QualifiedSourceContractTest": [
+      "producerRoundtripAndCandidateOccurrenceSelectionCorrelation",
+      "ordinaryAndConditionalAlternativesKeepGuardsSeparate",
+      "inactiveDeactivatedAndComputedRemainBounded",
+      "versionsIdentitiesAndReferencesAreClosed"
     ]
   },
   "analysis-dataflow": {
@@ -376,6 +382,9 @@
     ],
     "io.github.gustavo2358.analysis.launcher.LogicalChoiceTargetTest": [
       "equivalentFormsAndMixedAlternativesRetainLogicalSupportInMemoryAndCli"
+    ],
+    "io.github.gustavo2358.analysis.launcher.QualifiedSourceCliTest": [
+      "correlatedSourcePublishesAndInvalidInputsPreserveDestination"
     ]
   },
   "analysis-values": {

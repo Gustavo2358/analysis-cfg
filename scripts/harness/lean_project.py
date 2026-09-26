@@ -49,6 +49,7 @@ def technical_fast(root):
     prepare(root)
     for command in ([sys.executable, '-B', 'scripts/project/check_architecture.py', '--test-profile', 'fast'],
                     [sys.executable, '-B', 'scripts/project/test_dependency_wire.py'],
+                    [sys.executable, '-B', 'scripts/project/test_qualified_source_wire.py'],
                     [sys.executable, '-B', 'scripts/project/test_source_dependency_wire.py', 'analysis-adapters/target/source-dependencies-w3/dependencies.json'],
                     [sys.executable, '-B', 'scripts/project/test_lean_boundary.py'],
                     [sys.executable, '-B', 'scripts/project/test_carddemo_baseline.py'],

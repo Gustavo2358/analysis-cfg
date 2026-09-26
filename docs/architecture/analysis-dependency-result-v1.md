@@ -194,3 +194,11 @@ The additive closed source inventory and compatibility policy are defined in
 retain their 2.3 semantics; source dependencies do not invoke their solvers.
 
 W8 possible TEXT values treat foreign read scopes as independent of stored-value transfer: even a visible-memory read bound leaves cells unchanged when the write bound is `NoMemory`. Finite object/storage write scopes affect only matching cells. Per-outcome effects and `mustOverwrite` outside the current profile still require explicit admission rather than silent approximation.
+
+## R9 qualified source evidence — explicit wire 2.6.0
+
+The optional source-evidence input adds a separate `sourceQualifiedDependencies`
+section under result version 2.6.0. Without this input the result remains 2.5.0.
+See the [non-executable contract](qualified-source-dependencies-v1.md) for typed
+source identities, correlated alternatives, guards/proofs and version rejection.
+This section neither uses nor changes executable `DependencySiteFact` reachability.

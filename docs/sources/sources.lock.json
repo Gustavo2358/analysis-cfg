@@ -309,8 +309,8 @@
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
-    "status": "Dependency preservation reviewed and integrated into source-dependencies-w3",
-    "commit": "cc5226e744da0048d0c3064b402bae1123a0be45",
+    "status": "R9 qualified source evidence contract; same Draft PR34; no merge",
+    "commit": "7bab3e9e8f7048afae235e8fcdb975840cfe1614",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -323,7 +323,7 @@
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
     },
     "canonical_ref": "feat/positive-memory-topology",
-    "observed_on": "2026-09-23",
+    "observed_on": "2026-09-25",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "fd_w1_validation": "docs/work/active/FD-W1.yaml",
@@ -337,7 +337,16 @@
     "fd_w11_validation": "Current-version LOGICAL_SOURCE negotiation fixed; B-SP version21-28/legacy18, fixed FAST and qualification-local PASS; final CLI/corpus pending",
     "logical_text_w1": "Source E2E A-D twice deterministic; scale 10/100/1000; no physical profile. Corporate rerun not required by revised user acceptance.",
     "logical_text_w2": "Local producer FAST PASS; fixed logical ranges and expression transport. Selected source E2E qualification in docs/product/logical-text-w2.md.",
-    "dependency_preservation": "W3-R1 positive logical Cell projection for complete record/child and standalone TEXT views; FILE effects retain published strength."
+    "dependency_preservation": "W3-R1 positive logical Cell projection for complete record/child and standalone TEXT views; FILE effects retain published strength.",
+    "qualified_source_dependencies": {
+      "schema": "qualified-source-dependencies",
+      "version": "1.0.0",
+      "producer_api": "io.github.gustavo2358.lower.application.QualifiedSourceProjection",
+      "source_state_checkpoint": "0fa8e6942c7233adb5fa30cf8e19eabdc3fb9f17",
+      "approved_sp_producer": "fbbf61d1840eb92dca804c53d8e9b6e60538318a",
+      "schema_sha256": "09a2e40d0743a9a9978aa8a0a6e18e3e41e91c32202478635dbf741b8e83c646",
+      "review": 34
+    }
   },
   "external": [
     {
