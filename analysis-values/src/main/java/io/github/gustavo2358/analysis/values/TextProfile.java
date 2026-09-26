@@ -65,6 +65,10 @@ final class TextProfile {
             for(var object:demand) {
                 var location=subjects.get(object);if(location==null)throw new Refusal(false,"UNSUPPORTED_DEMAND_STORAGE");selected.add(location);
             }
+            for(var site:index.sites(Operations.Branch.class))if(entryUnits.contains(site.owner().id()))
+                for(var object:TextPredicate.reads(((Operations.Branch)site.operation()).predicate())) {
+                    var location=subjects.get(object);if(location!=null)selected.add(location);
+                }
             // Backwards closure of possible reaching copies. No control/path pruning;
             // every write to a selected cell is retained, including MAY/unknown effects.
             var sources=new HashMap<Location,Set<Location>>();

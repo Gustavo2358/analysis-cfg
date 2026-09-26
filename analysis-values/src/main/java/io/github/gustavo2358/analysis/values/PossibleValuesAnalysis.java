@@ -1,6 +1,7 @@
 package io.github.gustavo2358.analysis.values;
 
 import io.github.gustavo2358.air.model.Ids.*;
+import io.github.gustavo2358.air.model.*;
 import io.github.gustavo2358.analysis.cfg.domain.*;
 import io.github.gustavo2358.analysis.query.*;
 import io.github.gustavo2358.analysis.solver.*;
@@ -56,7 +57,19 @@ public final class PossibleValuesAnalysis implements AnalysisDefinition<Possible
         for(var operation:node.source().instructions()){domainWork.operationTransferred();state=profile.transferOperation(state,operation,work);}
         domainWork.operationTransferred();return profile.transferOperation(state,node.source().terminator(),work);
     }
-    @Override public PossibleValuesState transferEdge(AnalysisPoint point,CfgTransition edge,PossibleValuesState state,DomainWork domainWork){return state;}
+    @Override public PossibleValuesState transferEdge(AnalysisPoint point,CfgTransition edge,PossibleValuesState state,DomainWork domainWork){
+        if(!state.isReached()||!(point.node().source() instanceof CfgNode.SequenceNode node)
+                ||!(node.source().terminator() instanceof Operations.Branch branch))return state;
+        int requested=edge.kind()==CfgTransition.Kind.BRANCH_TRUE?TextPredicate.TRUE:edge.kind()==CfgTransition.Kind.BRANCH_FALSE?TextPredicate.FALSE:TextPredicate.BOTH;
+        int possible=TextPredicate.truth(branch.predicate(),place->{
+            if(!(place instanceof Places.ObjectPlace named))return TextPredicate.Text.unknown();
+            var location=profile.subjects.get(named.object());if(location==null||!profile.selected(location))return TextPredicate.Text.unknown();
+            var value=state.value(location.ordinal(),work);var texts=new HashSet<LogicalText>();
+            for(int i=0;i<value.size();i++)texts.add(profile.universe.value(value.at(i)));
+            return new TextPredicate.Text(texts,value.open());
+        });
+        return (possible&requested)==0?bottom():state;
+    }
     /** Each explicit execution solves once. Batches reuse the returned stable execution. */
     public Execution execute() {
         var definition=new PossibleValuesAnalysis(profile);

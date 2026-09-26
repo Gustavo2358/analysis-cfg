@@ -141,8 +141,8 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "825b80d964fd289f4fad9cbeef946a71278ee1f3",
-    "canonical_ref": "main",
+    "commit": "d760b07b0fac42a106d09342ee9d5b8445ccf630",
+    "canonical_ref": "feat/carddemo-predicate-transport",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
     "analysis_ir": {
@@ -277,7 +277,7 @@
     ],
     "semantic_product_version": "2.45.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "26db42a40976e930749c869a6f2dfbcce37ed878",
+    "commit": "e44b53d883d77c94b96e7f35730ace055ce2cf83",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -288,7 +288,7 @@
       "scope": "local unconditional paragraph identity and explicit entry; G1-G5 and 1/2/5/40"
     },
     "storage_contract_version": "1.11.0",
-    "canonical_ref": "main",
+    "canonical_ref": "feat/carddemo-recall",
     "observed_on": "2026-09-26",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
@@ -310,7 +310,7 @@
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "Draft dependency-input adapter; R9 1.0.0 and AIR bytes preserved",
-    "commit": "8b646b2fae4da10937d4feeb8cb8db13dab984bc",
+    "commit": "0336458ddb692535542e6d735cb9538ecb0fd4e8",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -352,7 +352,8 @@
       "version": "1.0.0",
       "producer_api": "io.github.gustavo2358.lower.adapters.cli.CobolDependencyInput",
       "schema_sha256": "5f751464dee36a993d9238a32e25d68d396ce8ca3fa2e0198f29b4e6a7f505c0"
-    }
+    },
+    "evidence_level": "SP 2.46 recall facts and typed predicates; local FAST PASS; draft review pending."
   },
   "external": [
     {
