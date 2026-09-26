@@ -141,8 +141,8 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "825b80d964fd289f4fad9cbeef946a71278ee1f3",
-    "canonical_ref": "main",
+    "commit": "d760b07b0fac42a106d09342ee9d5b8445ccf630",
+    "canonical_ref": "feat/carddemo-predicate-transport",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
     "analysis_ir": {
@@ -275,9 +275,9 @@
       "src/main/java/io/github/gustavo2358/cobolexplorer/CicsCommandSyntax.java",
       "src/test/java/io/github/gustavo2358/cobolexplorer/CicsFileControlTest.java"
     ],
-    "semantic_product_version": "2.45.0",
+    "semantic_product_version": "2.47.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "26db42a40976e930749c869a6f2dfbcce37ed878",
+    "commit": "cef8e728857467a283f77d9b6b1f2f870eda57d5",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -288,7 +288,7 @@
       "scope": "local unconditional paragraph identity and explicit entry; G1-G5 and 1/2/5/40"
     },
     "storage_contract_version": "1.11.0",
-    "canonical_ref": "main",
+    "canonical_ref": "feat/carddemo-recall",
     "observed_on": "2026-09-26",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
@@ -298,7 +298,7 @@
     "fd_w4_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED producers, manual outcomes/USE and 28 real CLI sources twice; file-dependencies/w4-implementation.md",
     "fd_w5_validation": "QUALIFIED_LOCAL: focal/FAST, producer Q-SHARED with bounded final reuse, manual local AIR/wire and44 real CLI sources twice; file-dependencies/w5-implementation.md",
     "fd_w6_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED,19 B-SP fixtures,15 manual AIR tests and33 real CLI sources twice; file-dependencies/w6-implementation.md",
-    "status": "Approved R7/R9 producer integrated into main; semantic implementation unchanged by consolidation",
+    "status": "Conditional source dependency evidence implemented; local FAST passed; draft review pending.",
     "fd_w8_validation": "QUALIFIED_LOCAL: producer FAST/Q-SHARED, B-SP33, CFG FAST502/Q547, manual/wire and38CICS+33native source cases twice; docs/product/file-dependencies/w8-implementation.md",
     "fd_w9_validation": "QUALIFIED_LOCAL: producer focal/FAST/Q, consumer manual/FAST/reader, 8 scope + 33 native + 38 CICS real CLI sources twice, deterministic four products; docs/product/file-dependencies/w9-implementation.md",
     "logical_text_w1": "Source E2E A-D twice deterministic; scale 10/100/1000; no physical profile. Corporate rerun not required by revised user acceptance.",
@@ -309,8 +309,8 @@
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
-    "status": "R7 final corpus closeout and R9 integrated into main; qualified-source-dependencies 1.0.0 preserved",
-    "commit": "9cfdd015367eae03b21e4632bcd2119b601624cd",
+    "status": "Conditional source dependency evidence implemented; local FAST passed; draft review pending.",
+    "commit": "090296d51a5eb33ac5c337c45ee62de8fd27c296",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -322,7 +322,7 @@
     "goto_validation": {
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
     },
-    "canonical_ref": "main",
+    "canonical_ref": "feat/unified-target-resolution",
     "observed_on": "2026-09-26",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
@@ -342,11 +342,18 @@
       "schema": "qualified-source-dependencies",
       "version": "1.0.0",
       "producer_api": "io.github.gustavo2358.lower.application.QualifiedSourceProjection",
-      "source_state_checkpoint": "0fa8e6942c7233adb5fa30cf8e19eabdc3fb9f17",
-      "approved_sp_producer": "26db42a40976e930749c869a6f2dfbcce37ed878",
-      "schema_sha256": "09a2e40d0743a9a9978aa8a0a6e18e3e41e91c32202478635dbf741b8e83c646",
+      "source_state_checkpoint": "090296d51a5eb33ac5c337c45ee62de8fd27c296",
+      "approved_sp_producer": "cef8e728857467a283f77d9b6b1f2f870eda57d5",
+      "schema_sha256": "20e77d21af64e4d762639f6d6ebddab79567f08eaa8929e65fe767f60f1a463c",
       "review": 34
-    }
+    },
+    "dependency_input": {
+      "schema": "dependency-input",
+      "version": "1.0.0",
+      "producer_api": "io.github.gustavo2358.lower.adapters.cli.CobolDependencyInput",
+      "schema_sha256": "5f751464dee36a993d9238a32e25d68d396ce8ca3fa2e0198f29b4e6a7f505c0"
+    },
+    "evidence_level": "SP 2.47 nominal facts preserved independently of executable AIR; consumer admission and roundtrip PASS; local FAST PASS; draft review pending."
   },
   "external": [
     {

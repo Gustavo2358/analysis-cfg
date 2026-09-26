@@ -1,0 +1,7 @@
+id: UNIFIED-TARGET-RESOLUTION
+title: Shared dependency input and target resolution
+status: IN_PROGRESS
+scope:
+  - dependency-input 1.0.0
+  - query-local provider admission and unified program inventory
+notes: Draft review required; no merge authorized.

@@ -71,6 +71,6 @@ final class ExactProvenanceFixtureBridge {
             result.set(0,result.getFirst().put(key,factored));
         });
         var constructor=RegionalValuesAnalysis.State.class.getDeclaredConstructors()[0];constructor.setAccessible(true);
-        return (RegionalValuesAnalysis.State)constructor.newInstance(field(state,"entry"),result.getFirst(),field(state,"logical"),field(state,"groupSizes"));
+        return (RegionalValuesAnalysis.State)constructor.newInstance(field(state,"entry"),result.getFirst(),field(state,"logical"),field(state,"closed"),field(state,"groupSizes"));
     }
 }

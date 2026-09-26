@@ -28,6 +28,9 @@ public final class RegionalValuesAnalysis {
     private final List<List<StoragePartition.Segment>> groupSegments;
     private final Map<StoragePartition.Segment,Integer> levels=new HashMap<>();
     private final Map<StatementEffects.Write,StorageIndex.Resolution> preparedReads=new IdentityHashMap<>();
+    // Each compiled batch retains all writes, including scoped writes without logical candidates.
+    private final Map<List<Plan>,List<StatementEffects.Write>> batchWrites=new IdentityHashMap<>();
+    private final Map<StatementEffects.Write,Set<ObjectId>> closureImpacts=new IdentityHashMap<>();
     private final Map<Operation,List<Plan>> operations=new IdentityHashMap<>();
     private final Map<Operation,Map<Control.OutcomeKey,List<Plan>>> outcomes=new IdentityHashMap<>();
     private final Map<Operation,List<Plan>> otherwise=new IdentityHashMap<>();
@@ -132,7 +135,9 @@ public final class RegionalValuesAnalysis {
                     }
                 }
             }
-            initial.put(context.entry().id(),List.copyOf(seeds));
+            var batch=Collections.unmodifiableList(new ArrayList<>(seeds));
+            batchWrites.put(batch,seeds.stream().map(Plan::write).distinct().toList());
+            initial.put(context.entry().id(),batch);
         }
         // Static read/write connectivity preserves branch correlations before the first copy executes.
         int[] parent=new int[bases.size()];for(int i=0;i<parent.length;i++)parent[i]=i;
@@ -167,6 +172,11 @@ public final class RegionalValuesAnalysis {
     }
     private List<Plan> compile(List<StatementEffects.Write> writes,Id evidence,OriginId origin,List<PremiseId> initialPremises,Operation operation,Entries.InitialCondition initial,Optional<Control.OutcomeKey> outcome) {
         var result=new ArrayList<Plan>();
+        for(var write:writes)closureImpacts.computeIfAbsent(write,w->{
+            var impacted=new HashSet<ObjectId>();
+            for(var target:w.targets())impacted.addAll(logicalCellAliases.getOrDefault(target.location().base().id(),List.of()));
+            return Set.copyOf(impacted);
+        });
         if(mode.physical())for(var write:writes)for(var target:write.targets()) {
             var premises=new LinkedHashSet<>(initialPremises);premises.addAll(target.premises());
             var event=events.size();events.add(new ValueFact.Support(evidence,origin,ordered(premises)));
@@ -178,7 +188,8 @@ public final class RegionalValuesAnalysis {
             eventDetails.add(new PreparedEvent(operation,initial,write,null,outcome,logical));
             result.add(new Plan(write,null,event,logical));
         }
-        return List.copyOf(result);
+        var batch=Collections.unmodifiableList(new ArrayList<>(result));
+        batchWrites.put(batch,List.copyOf(writes));return batch;
     }
     private List<StatementEffects.LogicalTarget> logicalTargets(StatementEffects.Write write) {
         if(mode.physical())return write.logicalTargets();
@@ -196,8 +207,9 @@ public final class RegionalValuesAnalysis {
         private final EntryId entry;
         private final SegmentMap<RegionalAlternatives.Node<Content>> bindings;
         private final Map<ObjectId,Set<LogicalValue>> logical;
+        private final Set<ObjectId> closed;
         private final int[] groupSizes;
-        private State(EntryId entry,SegmentMap<RegionalAlternatives.Node<Content>> bindings,Map<ObjectId,Set<LogicalValue>> logical,int[] groupSizes){this.entry=entry;this.bindings=bindings;this.logical=Map.copyOf(logical);this.groupSizes=groupSizes;}
+        private State(EntryId entry,SegmentMap<RegionalAlternatives.Node<Content>> bindings,Map<ObjectId,Set<LogicalValue>> logical,Set<ObjectId> closed,int[] groupSizes){this.entry=entry;this.bindings=bindings;this.logical=Map.copyOf(logical);this.closed=Set.copyOf(closed);this.groupSizes=groupSizes;}
         private RegionalAlternatives.Size size(){var roots=new ArrayList<RegionalAlternatives.Node<Content>>();bindings.forEach((g,node)->roots.add(node));return RegionalAlternatives.size(roots);}
         /** Encoded structural edges (one compact edge may carry multiple events), not worlds. */
         public long materializedAlternatives(){return size().alternatives();}
@@ -206,7 +218,7 @@ public final class RegionalValuesAnalysis {
         public boolean reached(){return entry!=null;}
         public int explicitBases(){int[] count={0};bindings.forEach((g,node)->count[0]+=groupSizes[g]);return count[0];}
     }
-    private static final State BOTTOM=new State(null,new SegmentMap<>(),Map.of(),new int[0]);
+    private static final State BOTTOM=new State(null,new SegmentMap<>(),Map.of(),Set.of(),new int[0]);
     private Content unknown(StorageIndex.Location location,String reason) {return unknown(location,reason,-1);}
     private Content unknown(StorageIndex.Location location,String reason,int event) {
         return location.range().isPresent()?new Bytes(ByteImage.unknown(location.range().get().end().map(e->e.subtract(location.range().get().start())),reason,event))
@@ -277,7 +289,7 @@ public final class RegionalValuesAnalysis {
             if(session!=selected)throw new IllegalArgumentException("foreign session");
             var result=new ArrayList<Boundary<State>>();
             for(var context:session.contexts()) {
-                var seed=new State(context.entry().id(),new SegmentMap<>(),Map.of(),groupSizes);
+                var seed=new State(context.entry().id(),new SegmentMap<>(),Map.of(),Set.of(),groupSizes);
                 var boundary=track(apply(seed,initial.get(seed.entry),false));boundaryAlternatives=Math.max(boundaryAlternatives,boundary.materializedAlternatives());
                 result.add(new Boundary<>(context,context.entryNode(),boundary));
             }
@@ -291,14 +303,17 @@ public final class RegionalValuesAnalysis {
             b.bindings.forEach((key,v)->{work.joinEntryVisited();acc.root=acc.root.put(key,relations.union(value(a,key),v));});
             a.bindings.forEach((key,v)->{if(b.bindings.get(key)==null){work.joinEntryVisited();acc.root=acc.root.put(key,relations.union(v,value(b,key)));}});
             var logical=new HashMap<>(a.logical);b.logical.forEach((key,v)->{work.joinEntryVisited();logical.merge(key,v,Engine::unionLogical);});
-            return acc.root==a.bindings&&logical.equals(a.logical)?new Join<>(a,false):new Join<>(track(new State(a.entry,acc.root,logical,groupSizes)),true);
+            var closed=new HashSet<>(a.closed);closed.retainAll(b.closed);
+            return acc.root==a.bindings&&logical.equals(a.logical)&&closed.equals(a.closed)?new Join<>(a,false):new Join<>(track(new State(a.entry,acc.root,logical,closed,groupSizes)),true);
         }
         @Override public boolean equivalent(State a,State b,DomainWork work) {
-            if(a==b)return true;if(!Objects.equals(a.entry,b.entry)||a.bindings.size()!=b.bindings.size()||!a.logical.equals(b.logical))return false;
+            if(a==b)return true;if(!Objects.equals(a.entry,b.entry)||a.bindings.size()!=b.bindings.size()||!a.logical.equals(b.logical)||!a.closed.equals(b.closed))return false;
             var same=new boolean[]{true};a.bindings.forEach((key,v)->{work.stateCompareEntry();if(!v.equals(b.bindings.get(key)))same[0]=false;});return same[0];
         }
         private State apply(State before,List<Plan> plans,boolean forceMay) {
-            if(!before.reached()||plans.isEmpty())return before;
+            if(!before.reached())return before;
+            var writes=batchWrites.getOrDefault(plans,List.of());
+            if(plans.isEmpty()&&writes.isEmpty())return before;
             // Preserve write occurrence grouping; each source is captured in the same pre-operation store.
             var grouped=new LinkedHashMap<Integer,LinkedHashMap<StatementEffects.Write,List<Plan>>>();
             for(var plan:plans)if(plan.logical==null)grouped.computeIfAbsent(groupOf[ordinals.get(plan.target.location().base().id())],ignored->new LinkedHashMap<>())
@@ -330,7 +345,34 @@ public final class RegionalValuesAnalysis {
                     if(supported.isEmpty())logical.remove(plan.logical.object());else logical.put(plan.logical.object(),supported);
                 } else if(!supported.isEmpty())logical.merge(plan.logical.object(),supported,KillAuthority::weakUpdate);
             }
-            return root==before.bindings&&logical.equals(before.logical)?before:track(new State(before.entry,root,logical,groupSizes));
+            var closed=new HashSet<>(before.closed);var invalidated=new HashSet<ObjectId>();
+            var supplied=new IdentityHashMap<StatementEffects.Write,Set<ObjectId>>();
+            if(!mode.physical())for(var plan:plans)if(plan.logical!=null&&plan.logical.sourceApplicable()
+                    &&plan.write.destination().exact()&&plan.write.selection()==StatementEffects.Selection.SINGLE_DESTINATION
+                    &&plan.write.occurrence().map(session.index()::place).orElse(null) instanceof Places.ObjectPlace
+                    &&session.index().object(plan.logical.object()).storage() instanceof Memory.CellBinding
+                    &&session.index().object(plan.logical.object()).typeRef().equals(Types.known(Types.Builtin.TEXT))
+                    &&closedSource(before,plan.write))
+                supplied.computeIfAbsent(plan.write,w->new HashSet<>()).add(plan.logical.object());
+            for(var write:writes)for(var object:closureImpacts.getOrDefault(write,Set.of())) {
+                if(!supplied.getOrDefault(write,Set.of()).contains(object))invalidated.add(object);
+                else if(!forceMay&&write.occurrenceStrength()==StatementEffects.Strength.MUST)closed.add(object);
+            }
+            closed.removeAll(invalidated);
+            return root==before.bindings&&logical.equals(before.logical)&&closed.equals(before.closed)?before:track(new State(before.entry,root,logical,closed,groupSizes));
+        }
+        private TextPredicate.Text predicateRead(State state,Place place) {
+            if(!(place instanceof Places.ObjectPlace named)||!state.closed.contains(named.object()))return TextPredicate.Text.unknown();
+            var values=new HashSet<LogicalText>();for(var value:state.logical.getOrDefault(named.object(),Set.of()))values.add(LogicalText.of(value.text().value()));
+            return new TextPredicate.Text(values,false);
+        }
+        private boolean closedSource(State before,StatementEffects.Write write) {
+            if(!(write.source() instanceof StatementEffects.ExpressionSource source))return false;
+            // This proof covers exactly the expressions supported by logicalReplacements.
+            Expression value=source.value();while(value instanceof Expressions.FitText fit)value=fit.value();
+            if(!(value instanceof Expressions.Read||value instanceof Expressions.Literal literal&&literal.value() instanceof Values.TextValue))return false;
+            var result=TextPredicate.text(source.value(),place->predicateRead(before,place));
+            return !result.open()&&!result.values().isEmpty();
         }
         private static Set<LogicalValue> unionLogical(Set<LogicalValue> a,Set<LogicalValue> b) {
             if(a.containsAll(b))return a;var result=new HashSet<>(a);result.addAll(b);return Set.copyOf(result);
@@ -504,7 +546,14 @@ public final class RegionalValuesAnalysis {
             work.operationTransferred();return operation(state,node.source().terminator());
         }
         @Override public State transferEdge(AnalysisPoint point,CfgTransition edge,State state,DomainWork work) {
-            if(!(point.node().source() instanceof CfgNode.SequenceNode node)||!(node.source().terminator() instanceof Operations.Invoke invoke))return state;
+            if(!state.reached()||!(point.node().source() instanceof CfgNode.SequenceNode node))return state;
+            if(node.source().terminator() instanceof Operations.Branch branch) {
+                if(session.index().unprovedPreconditions(branch.header().id()))return state;
+                int requested=edge.kind()==CfgTransition.Kind.BRANCH_TRUE?TextPredicate.TRUE:edge.kind()==CfgTransition.Kind.BRANCH_FALSE?TextPredicate.FALSE:TextPredicate.BOTH;
+                var at=state;int possible=TextPredicate.truth(branch.predicate(),place->predicateRead(at,place));
+                return (possible&requested)==0?BOTTOM:state;
+            }
+            if(!(node.source().terminator() instanceof Operations.Invoke invoke))return state;
             if(edge.kind()==CfgTransition.Kind.INVOKE_NORMAL)return apply(state,outcomes.get(invoke).get(Control.NormalOutcome.INSTANCE),false);
             state=apply(state,otherwise.get(invoke),true);for(var plans:outcomes.get(invoke).values())state=apply(state,plans,true);return state;
         }

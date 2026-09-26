@@ -62,7 +62,7 @@ final class CallDependencyConsumer implements FactConsumer<DependencySiteFact> {
                 if(raw.size()!=value.candidates().size())throw new ConsumerException("candidate support association missing");
             } else {model=false;raw.add(new RawCandidate(literal,List.of(new Support(cics?SupportKind.CICS_LITERAL:SupportKind.CALL_LITERAL,site.operationId(),targetOrigin,List.of()))));}
             for(var candidate:raw) {
-                var interpreted=cics?CicsNameInterpreter.interpret(candidate.rawValue(),computed,policy):CallNameInterpreter.interpret(candidate.rawValue(),computed,policy);interpretation|=interpreted.unknownRemainder();
+                var interpreted=TargetResolver.interpret(cics,candidate.rawValue(),computed,policy);interpretation|=interpreted.unknownRemainder();
                 if(interpreted.referenceName()!=null)candidates.add(new Candidate(interpreted.referenceName(),candidate.rawValue(),candidate.supports()));
             }
             status=candidates.isEmpty()?TargetStatus.OPEN_TARGET:TargetStatus.RESOLVED_CANDIDATES;
@@ -94,7 +94,7 @@ final class CallDependencyConsumer implements FactConsumer<DependencySiteFact> {
             var name=((Interactions.LiteralTarget)invoke.target()).name();
             var support=List.of(new Support(cics?SupportKind.CICS_LITERAL:SupportKind.CALL_LITERAL,site.operationId(),targetOrigin,List.of()));
             raw.add(new RawCandidate(name,support));
-            var interpreted=cics?CicsNameInterpreter.interpret(name,false,policy):CallNameInterpreter.interpret(name,false,policy);
+            var interpreted=TargetResolver.interpret(cics,name,false,policy);
             interpretation|=interpreted.unknownRemainder();
             if(interpreted.referenceName()!=null)candidates.add(new Candidate(interpreted.referenceName(),name,support));
         }

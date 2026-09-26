@@ -769,6 +769,310 @@
           "items": {
             "$ref": "#/$defs/Frontier"
           }
+        },
+        "nominalValues": {
+          "$ref": "#/$defs/NominalValueEvidence"
+        }
+      }
+    },
+    "NominalTerm": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "value"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "READ",
+            "LITERAL",
+            "SPACES",
+            "LOW_VALUES",
+            "HIGH_VALUES",
+            "UNKNOWN"
+          ]
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "NominalPredicate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "terms",
+        "children"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "EQ",
+            "NOT",
+            "AND",
+            "OR"
+          ]
+        },
+        "terms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NominalTerm"
+          }
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NominalPredicate"
+          }
+        }
+      }
+    },
+    "NominalSymbol": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "node",
+        "extent"
+      ],
+      "properties": {
+        "node": {
+          "type": "string",
+          "minLength": 1
+        },
+        "extent": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "NominalAssignment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "statement",
+        "target",
+        "source"
+      ],
+      "properties": {
+        "statement": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "$ref": "#/$defs/NominalTerm"
+        }
+      }
+    },
+    "NominalCondition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "statement",
+        "predicate"
+      ],
+      "properties": {
+        "statement": {
+          "type": "string",
+          "minLength": 1
+        },
+        "predicate": {
+          "$ref": "#/$defs/NominalPredicate"
+        }
+      }
+    },
+    "NominalQuery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "statement",
+        "node"
+      ],
+      "properties": {
+        "statement": {
+          "type": "string",
+          "minLength": 1
+        },
+        "node": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "NominalValues": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "authority",
+        "symbols",
+        "assignments",
+        "conditions",
+        "queries"
+      ],
+      "properties": {
+        "authority": {
+          "const": "NOMINAL_TEXT_SOURCE_V1"
+        },
+        "symbols": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NominalSymbol"
+          }
+        },
+        "assignments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NominalAssignment"
+          }
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NominalCondition"
+          }
+        },
+        "queries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NominalQuery"
+          }
+        }
+      }
+    },
+    "NominalDeclaration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "node",
+        "provenance"
+      ],
+      "properties": {
+        "node": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        }
+      }
+    },
+    "NominalSeed": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "node",
+        "value",
+        "authority",
+        "provenance"
+      ],
+      "properties": {
+        "node": {
+          "type": "string",
+          "minLength": 1
+        },
+        "value": {
+          "type": "string"
+        },
+        "authority": {
+          "type": "string",
+          "enum": [
+            "DECLARATIVE_POSSIBILITY",
+            "DECLARATIVE_INVARIANT",
+            "DECLARATIVE_VALUE"
+          ]
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        }
+      }
+    },
+    "NominalBranch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "derivation",
+        "whenTrue"
+      ],
+      "properties": {
+        "derivation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "whenTrue": {
+          "type": "boolean"
+        }
+      }
+    },
+    "NominalUncertainty": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "provenance"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "MISSING_COPY",
+            "OPAQUE_INCLUDE",
+            "UNLOCATED_INPUT"
+          ]
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        }
+      }
+    },
+    "NominalValueEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "facts",
+        "declarations",
+        "seeds",
+        "branches",
+        "uncertainties"
+      ],
+      "properties": {
+        "facts": {
+          "$ref": "#/$defs/NominalValues"
+        },
+        "declarations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NominalDeclaration"
+          }
+        },
+        "seeds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NominalSeed"
+          }
+        },
+        "branches": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NominalBranch"
+          }
+        },
+        "uncertainties": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NominalUncertainty"
+          }
         }
       }
     }

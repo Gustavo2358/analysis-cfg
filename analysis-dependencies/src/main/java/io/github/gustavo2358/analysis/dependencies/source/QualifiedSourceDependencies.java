@@ -212,8 +212,13 @@ public record QualifiedSourceDependencies(String schema, String version, String 
             proofs=List.copyOf(proofs);
         }
     }
-    public record UnitEvidence(UnitId unit, boolean controlAvailable, List<Statement> statements, List<Occurrence> occurrences, List<Target> targets, List<Node> nodes, List<Derivation> derivations, List<Selection> selections, List<Event> events, List<Guard> guards, List<Proof> proofs, List<Frontier> frontiers) {
+    public record UnitEvidence(UnitId unit, boolean controlAvailable, List<Statement> statements, List<Occurrence> occurrences, List<Target> targets, List<Node> nodes, List<Derivation> derivations, List<Selection> selections, List<Event> events, List<Guard> guards, List<Proof> proofs, List<Frontier> frontiers, Optional<NominalValueEvidence> nominalValues) {
+        public UnitEvidence(UnitId unit,boolean controlAvailable,List<Statement> statements,List<Occurrence> occurrences,List<Target> targets,List<Node> nodes,List<Derivation> derivations,List<Selection> selections,List<Event> events,List<Guard> guards,List<Proof> proofs,List<Frontier> frontiers) {
+            this(unit,controlAvailable,statements,occurrences,targets,nodes,derivations,selections,events,guards,proofs,frontiers,Optional.empty());
+        }
         public UnitEvidence {
+            Objects.requireNonNull(nominalValues);
+            if(nominalValues.isPresent())nominalValues.get().validate(statements,occurrences,nodes,derivations);
             Objects.requireNonNull(unit);
             statements=List.copyOf(statements);
             occurrences=List.copyOf(occurrences);

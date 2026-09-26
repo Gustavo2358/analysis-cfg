@@ -348,10 +348,73 @@ def source_dependencies(value, document):
     require(value['remainder']==(not value['available'] or bool(value['gapCodes']) or any(d['remainder'] for d in dependencies)),'source inventory remainder')
 
 
+def conditional_supports(candidate, occurrence, source, document):
+    from qualified_source_wire import key
+    require(occurrence['sourceOccurrence'] is not None and occurrence['targetKind']=='COMPUTED' and occurrence['qualifications'], 'conditional occurrence authority')
+    unit=next(u for u in source['units'] if u['unit']==occurrence['sourceOccurrence']['unit'])
+    nominal=unit.get('nominalValues'); require(nominal is not None, 'conditional nominal facts')
+    require(any(q['statement']==occurrence['sourceOccurrence']['handle'] for q in nominal['facts']['queries']), 'conditional query')
+    require(occurrence['valueRemainder'] and 'CONDITIONAL_SOURCE_VALUES' in occurrence['authorities'] and 'CONDITIONAL_NOMINAL_VALUE_EVIDENCE' in occurrence['analysisReasons'], 'conditional uncertainty')
+    require(document['analysisStatus']=='PARTIAL' and 'CONDITIONAL_NOMINAL_VALUE_EVIDENCE' in document['analysisReasons'], 'conditional publication status')
+    available={('DECLARATION_VALUE',s['node']):s['provenance'] for s in nominal['seeds']}
+    statements={s['id']['handle']:s['provenance'] for s in unit['statements']}
+    available.update({('ASSIGNMENT',a['statement']):statements[a['statement']] for a in nominal['facts']['assignments']})
+    values=array(candidate['conditionalSupports']);require(bool(values), 'empty conditional evidence')
+    for support in values:
+        fields(support,'provider analysisBoundary assumptions evidence uncertainties')
+        require(support['provider']=='nominal-source-text@1' and support['analysisBoundary']=='NON_EXECUTABLE_SOURCE', 'conditional provider boundary')
+        assumptions=support['assumptions'];require(len(assumptions)==len(set(assumptions)) and {'NOMINAL_DECLARATIONS_PRESERVE_MEANING','NO_UNMODELED_STORAGE_INTERFERENCE'}<=set(assumptions)<={'NOMINAL_DECLARATIONS_PRESERVE_MEANING','NO_UNMODELED_STORAGE_INTERFERENCE','DECLARATIVE_INITIAL_VALUES_APPLY'}, 'conditional assumptions')
+        require(support['uncertainties']==nominal['uncertainties'], 'conditional missing input provenance')
+        evidence=array(support['evidence']);require(bool(evidence) and len({key(e) for e in evidence})==len(evidence), 'conditional source contributions')
+        for e in evidence:
+            fields(e,'kind reference provenance');require((e['kind'],e['reference']) in available and available[(e['kind'],e['reference'])]==e['provenance'], 'conditional evidence provenance')
+        require(('DECLARATIVE_INITIAL_VALUES_APPLY' in assumptions)==any(e['kind']=='DECLARATION_VALUE' for e in evidence), 'conditional entry premise')
+    return True
+
+
+def program_inventory(value, document):
+    fields(value, 'programs')
+    seen = set()
+    source = document.get('sourceQualifiedDependencies', {}).get('evidence', {})
+    source_occurrences = {json.dumps(o['id'],sort_keys=True): o for u in source.get('units', []) for o in u['occurrences']}
+    for p in array(value['programs']):
+        fields(p, 'sourceOccurrence caller technology nameProfile targetKind authorities qualifications executableOperations executableSites candidates valueRemainder interpretationRemainder analysisReasons')
+        text(p['caller']); text(p['nameProfile'])
+        require(p['targetKind'] in ('LITERAL','COMPUTED','UNAVAILABLE'), 'program target kind')
+        require(p['technology'] in ('COBOL','CICS'), 'program technology')
+        boolean(p['valueRemainder']); boolean(p['interpretationRemainder']); reasons(p['analysisReasons'])
+        require(set(p['authorities']) <= {'EXECUTABLE_FLOW','EXECUTABLE_OCCURRENCE','SOURCE_QUALIFIED','CONDITIONAL_SOURCE_VALUES'}, 'program authority')
+        refs(p['executableOperations'], 'operation')
+        key=json.dumps(p['sourceOccurrence'] if p['sourceOccurrence'] is not None else p['executableOperations'],sort_keys=True)
+        require(key not in seen, 'duplicate unified occurrence'); seen.add(key)
+        if p['sourceOccurrence'] is not None:
+            occurrence=source_occurrences.get(json.dumps(p['sourceOccurrence'],sort_keys=True))
+            require(occurrence is not None, 'unknown source occurrence')
+            require(all(q in occurrence['qualifications'] for q in p['qualifications']), 'source qualification correlation')
+        else:
+            require(not p['qualifications'], 'source authority without occurrence')
+        require(('SOURCE_QUALIFIED' in p['authorities']) == bool(p['qualifications']), 'source authority status')
+        for site in array(p['executableSites']):
+            fields(site, 'entry operation reachability valuePoint premises provenance')
+            require(site['operation'] in p['executableOperations'], 'unified operation ownership')
+            match=next((s for s in document['sites'] if s['entry']==site['entry'] and s['operation']==site['operation']),None)
+            require(match is not None and all(site[k]==match[k] for k in ('reachability','valuePoint','premises','provenance')), 'unified executable evidence')
+        for c in array(p['candidates']):
+            fields(c, 'referenceName rawValue supports qualifications' + (' conditionalSupports' if 'conditionalSupports' in c else '')); text(c['referenceName']); text(c['rawValue']); supports(c['supports'])
+            require(all(q in p['qualifications'] for q in c['qualifications']), 'candidate qualification')
+            executable=[s for s in document['sites'] if s['operation'] in p['executableOperations'] and s['reachability']!='UNREACHABLE_IN_MODEL']
+            known=[v for s in executable for v in s['candidates'] if v['referenceName']==c['referenceName'] and v['rawValue']==c['rawValue']]
+            literal=p['sourceOccurrence'] is not None and p['targetKind']=='LITERAL' and c['qualifications'] and any(v['value']==c['rawValue'] for v in source_occurrences[json.dumps(p['sourceOccurrence'],sort_keys=True)]['values'])
+            conditional=conditional_supports(c,p,source,document) if 'conditionalSupports' in c else False
+            require(known or literal or conditional, 'candidate requires queried values, qualified literal or conditional source evidence')
+            require(all(support in [s for v in known for s in v['supports']] for support in c['supports']), 'invented producer')
+            require(bool(c['supports'] or c['qualifications']), 'candidate without support')
+
+
 def validate(d):
     files = d.get('version') in ('2.0.0','2.1.0','2.2.0','2.3.0','2.4.0','2.5.0','2.6.0')
     extended = files or d.get('version') == '1.2.0'
-    fields(d, 'schema version airVersion publication interpretationProfile valuesProfile modelScope publicationInventory sites edges metrics origins artifacts sourceUncertaintyRefs' + (' analysisStatus analysisReasons' if extended else '') + (' analysisBoundary fileDependencies' if files else '') + (' sourceDependencies' if d.get('version') in ('2.4.0','2.5.0','2.6.0') else '') + (' sourceQualifiedDependencies' if d.get('version')=='2.6.0' else ''))
+    fields(d, 'schema version airVersion publication interpretationProfile valuesProfile modelScope publicationInventory sites edges metrics origins artifacts sourceUncertaintyRefs' + (' analysisStatus analysisReasons' if extended else '') + (' analysisBoundary fileDependencies' if files else '') + (' sourceDependencies' if d.get('version') in ('2.4.0','2.5.0','2.6.0') else '') + (' sourceQualifiedDependencies' if d.get('version')=='2.6.0' else '') + (' dependencies' if 'dependencies' in d else ''))
     require(d['schema'] == 'analysis-dependency-result' and d['version'] in ('1.1.0', '1.2.0', '2.0.0', '2.1.0', '2.2.0', '2.3.0', '2.4.0', '2.5.0','2.6.0') and d['airVersion'] == '2.0.0', 'schema/version')
     identity(d['publication'], 'publication')
     require(d['interpretationProfile'] == 'per-site' and d['valuesProfile'] == 'scalar-text-effects@1' and d['modelScope'] in (('KNOWN_GRAPH_ENTRY', 'STRUCTURAL_AIR_OCCURRENCES') if extended else ('KNOWN_GRAPH_ENTRY',)), 'profiles/scope')
@@ -363,7 +426,7 @@ def validate(d):
         require(d['analysisStatus'] in (('COMPLETE','PARTIAL') if files else ('PARTIAL',)), 'extended result partial status')
         reasons(d['analysisReasons'])
         require((d['analysisStatus']=='PARTIAL') == (bool(d['analysisReasons']) or any(s['analysisStatus'] == 'PARTIAL' for s in d['sites']) or d.get('version') in ('2.4.0','2.5.0','2.6.0') and d['sourceDependencies']['available'] and d['sourceDependencies']['remainder']), 'partial result must expose its cause')
-        structural = any(s['reachability'] == 'UNKNOWN' for s in d['sites']) or not d['sites'] and bool(d['analysisReasons'])
+        structural = any(s['reachability'] == 'UNKNOWN' for s in d['sites']) or not d['sites'] and any(not r.startswith('CONDITIONAL_') for r in d['analysisReasons'])
         require((d['modelScope'] == 'STRUCTURAL_AIR_OCCURRENCES') == structural, 'structural/graph scope mismatch')
     expected = [dict(caller=s['caller'], entry=s['entry'], site=s['operation'], candidate=c, openSite=s['effectiveUnknownRemainder'] or s['reachability']=='UNKNOWN')
                 for s in d['sites'] if s['reachability'] != 'UNREACHABLE_IN_MODEL' for c in s['candidates']]
@@ -408,6 +471,8 @@ def validate(d):
     if d['version']=='2.6.0':
         from qualified_source_wire import publication
         publication(d['sourceQualifiedDependencies'],d['publication']['localId'])
+    if 'dependencies' in d:
+        program_inventory(d['dependencies'],d)
     return d
 
 

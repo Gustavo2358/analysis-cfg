@@ -222,6 +222,27 @@
       "ordinaryAndConditionalAlternativesKeepGuardsSeparate",
       "inactiveDeactivatedAndComputedRemainBounded",
       "versionsIdentitiesAndReferencesAreClosed"
+    ],
+    "io.github.gustavo2358.analysis.adapters.QueryLocalProviderTest": [
+      "unrelatedRegionsCannotChangeScalarProviderCandidateOrSupports",
+      "unusedPhysicalViewDoesNotRefuseLogicalDemand",
+      "anotherUnitCannotRefuseThisEntryDemand",
+      "anIndirectMayWriteCannotBeDiscardedAsAnUnusedDeclaration",
+      "literalNeverRequestsValueAdmission"
+    ],
+    "io.github.gustavo2358.analysis.adapters.UnifiedTargetResolutionTest": [
+      "twoAuthoritiesReuseOneQueryAndOneOccurrence",
+      "sourceOnlyComputedStaysOpenAndDoesNotRunAnotherSolver",
+      "rejectForeignAndDuplicatedCorrelations"
+    ],
+    "io.github.gustavo2358.analysis.adapters.LogicalTargetRoutingTest": [
+      "logicalRootCopyResolvesWithRealProducerChainInBothModes"
+    ],
+    "io.github.gustavo2358.analysis.adapters.ConditionalSourceContractTest": [
+      "conditionalFactsRoundTripAndRejectInvalidReferences",
+      "sourceCandidateReachesUnifiedInventoryWithExplicitAssumptions",
+      "executableValueEvidenceRefinesAndReplacesNominalHypothesis",
+      "conditionalUncertaintyDoesNotChangeExecutableScope"
     ]
   },
   "analysis-dataflow": {
@@ -252,6 +273,14 @@
       "syntheticNameUsesExactlyEightCharactersIncludingDollar",
       "existingAcceptedFormsKeepTheirExactNames",
       "existingRejectionsAndLiteralPaddingRemainOpen"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.SourceValuesProviderTest": [
+      "overwriteDoesNotRetainOldSeed",
+      "copyCapturesSnapshot",
+      "branchExcludesKnownNameWithOpenStoragePremises",
+      "retainedNameCarriesCopySeedAndMissingInput",
+      "lowValuesCannotMatchATextWithDifferentCharacters",
+      "unknownCollatingCharacterAndUnicodeRemainExplicit"
     ]
   },
   "analysis-kernel": {
@@ -385,6 +414,10 @@
     ],
     "io.github.gustavo2358.analysis.launcher.QualifiedSourceCliTest": [
       "correlatedSourcePublishesAndInvalidInputsPreserveDestination"
+    ],
+    "io.github.gustavo2358.analysis.launcher.DependencyInputCliTest": [
+      "normalEntryPointUsesSourceAndExecutableEvidenceWithoutFlags",
+      "corruptBundleCannotReplaceDestination"
     ]
   },
   "analysis-values": {

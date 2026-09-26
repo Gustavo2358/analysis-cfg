@@ -40,11 +40,16 @@ final class TextProfile {
         this.effectAware=effectAware;
         this.session=Objects.requireNonNull(session);
         var index=session.index();var publication=index.publication();
+        var entryUnits=session.contexts().stream().map(c->c.entry().id().unit()).collect(java.util.stream.Collectors.toSet());
         var cells=new HashMap<StorageId,Location>();
         for(var unit:publication.units())for(var object:unit.objects()) {
             var cell=index.directCell(object.id());
-            if(!(object.storage() instanceof Memory.CellBinding)||cell==null||!cellDomain(object.typeRef())||!cellDomain(cell.typeRef()))
-                throw new Refusal(false,"UNSUPPORTED_STORAGE_PROFILE");
+            if(!(object.storage() instanceof Memory.CellBinding)||cell==null||!cellDomain(object.typeRef())||!cellDomain(cell.typeRef())) {
+                // A declaration alone has no transfer effect. Demand closure and every
+                // actual effect below still require supported storage; none is discarded.
+                if(demand==null)throw new Refusal(false,"UNSUPPORTED_STORAGE_PROFILE");
+                continue;
+            }
             var location=cells.get(cell.header().id());
             if(location==null){int ordinal=cells.size();Math.incrementExact(ordinal);location=new Location(ordinal,cell);cells.put(cell.header().id(),location);}
             subjects.put(object.id(),location);
@@ -60,10 +65,15 @@ final class TextProfile {
             for(var object:demand) {
                 var location=subjects.get(object);if(location==null)throw new Refusal(false,"UNSUPPORTED_DEMAND_STORAGE");selected.add(location);
             }
+            for(var site:index.sites(Operations.Branch.class))if(entryUnits.contains(site.owner().id()))
+                for(var object:TextPredicate.reads(((Operations.Branch)site.operation()).predicate())) {
+                    var location=subjects.get(object);if(location!=null)selected.add(location);
+                }
             // Backwards closure of possible reaching copies. No control/path pruning;
             // every write to a selected cell is retained, including MAY/unknown effects.
             var sources=new HashMap<Location,Set<Location>>();
             for(var site:index.sites(Operations.Assign.class)) {
+                if(!entryUnits.contains(site.owner().id()))continue;
                 var assign=(Operations.Assign)site.operation();
                 if(assign.destination() instanceof Places.ObjectPlace to) {
                     // Only relevant expressions require admission; unrelated unsupported effects still use existing guards.
@@ -81,6 +91,7 @@ final class TextProfile {
         this.selected=Set.copyOf(selected);
         modeledCells=selected.stream().sorted(Comparator.comparingInt(Location::ordinal)).toList();
         for(var unit:publication.units()) {
+            if(!entryUnits.contains(unit.id()))continue;
             boolean open=open(publication.coverage())||open(unit.coverage());
             for(var sequence:unit.sequences()) {
                 for(var instruction:sequence.instructions()){prepare(instruction);open|=!(instruction instanceof Operations.HavocMust||instruction instanceof Operations.HavocMay)&&open(instruction.header());}
@@ -97,6 +108,7 @@ final class TextProfile {
                 if(!(condition.place() instanceof Places.ObjectPlace object))throw new Refusal(false,"UNSUPPORTED_INITIAL_PLACE");
                 var location=subjects.get(object.object());
                 if(location==null)throw new Refusal(false,"UNSUPPORTED_INITIAL_STORAGE");
+                if(!selected(location))continue;
                 if(condition.value() instanceof Entries.LiteralInitial literal) {
                     if(!(literal.value().value() instanceof Values.TextValue text))throw new Refusal(false,"UNSUPPORTED_INITIAL_VALUE");
                     var previous=initial.putIfAbsent(location.ordinal(),text);
@@ -150,6 +162,8 @@ final class TextProfile {
             effects.put(operation,ForeignEffectTransfer.prepare(invoke.effectBound(),modeledCells,subjects));
         } else if(!(operation instanceof Operations.Nop||operation instanceof Operations.Return||operation instanceof Operations.Jump||operation instanceof Operations.Branch||operation instanceof Operations.Halt))
             throw new Refusal(false,"UNSUPPORTED_EFFECT_PROFILE");
+        if(session.index().unprovedPreconditions(operation.header().id()))
+            throw new Refusal(false,"UNPROVED_SCALAR_OPERATION_PRECONDITION");
         var write=writes.get(operation);
         if(write!=null)overwrites.put(operation,KillAuthority.exactCell(session,operation,write.location().cell()).orElseThrow(()->new Refusal(false,"UNPROVED_STRONG_OVERWRITE")));
         admitted.add(operation);

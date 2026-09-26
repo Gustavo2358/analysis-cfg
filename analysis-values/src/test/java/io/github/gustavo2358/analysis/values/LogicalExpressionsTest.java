@@ -22,7 +22,7 @@ class LogicalExpressionsTest {
   Expression read(ObjectId o){return new Expressions.Read(next(),new Places.ObjectPlace(next(),o));}
   Expression text(String s){return new Expressions.Literal(next(),new Values.TextValue(s));}
   Expression integer(int n){return new Expressions.Literal(next(),new Values.IntValue(BigInteger.valueOf(n)));}
-  Expression slice(Expression e,int start,int length){return new Expressions.SliceText(next(),e,integer(start),integer(length));}
+  Expression slice(Expression e,int start,int length){return new Expressions.SliceText(next(),new Expressions.FitText(next(),e,BigInteger.valueOf(start+length)," "),integer(start),integer(length));}
   Expression concat(Expression a,Expression b){return new Expressions.Binary(next(),Expressions.BinaryOperator.CONCAT,a,b);}
   Instruction set(ObjectId o,Expression e,int size){return new Operations.Assign(h,new Places.ObjectPlace(operand(h.id(),"dst",Operand.Role.VALUE_WRITE),o),new Expressions.FitText(next(),e,BigInteger.valueOf(size)," "));}
  }
@@ -33,6 +33,8 @@ class LogicalExpressionsTest {
   var q=replace(p,List.of(unit(u.id(),u.entries(),List.of(new Sequence(s.label(),instructions,s.terminator(),s.origin())),u.objects())),p.coverage(),p.uncertainties(),p.premises());
   var admission=PossibleValuesAnalysis.prepare(partialSession(q),PossibleValuesAnalysis.EFFECTS_PROFILE,Set.of(dest));assertEquals(PossibleValuesAnalysis.Status.ACCEPTED,admission.status(),admission.reason());
   var run=admission.analysis().orElseThrow().execute();expected(fact(run,before(q,0,1)),false,"PROGA   ");assertEquals(2L,run.preparationMetrics().get("demandCellsPrepared"));
+  var supports=fact(run,before(q,0,1)).candidateSupports().getFirst().producers().stream().map(x->x.evidence().localId()).toList();
+  assertEquals(List.of("capture","partial"),supports,"retain the actual expression chain; later overwrite is not a producer");
  }
  @Test void branchAlternativesStayWholeThroughRepeatedRootReads(){
   var p=graph(new String[]{null,null,null,null},new int[][]{{1,2},{3},{3},{}},2,true,true);var u=p.units().getFirst();var root=u.objects().get(0).id();var dest=u.objects().get(1).id();var sequences=new ArrayList<>(u.sequences());

@@ -22,7 +22,7 @@ MUTABLE = {
     'docs/sources/sources.lock.json',
 }
 NEW_VALUES = 'analysis-values/src/main/java/io/github/gustavo2358/analysis/values/ForeignEffectTransfer.java'
-NEW_W5 = {'analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/'+n+'.java' for n in ('DependencyJson','DependencyFileWriter','FileDependencyJson','SourceDependencyJson','QualifiedSourceJson')} | {'analysis-launcher/src/main/java/io/github/gustavo2358/analysis/launcher/AnalysisDependencies.java'}
+NEW_W5 = {'analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/'+n+'.java' for n in ('DependencyJson','DependencyFileWriter','FileDependencyJson','SourceDependencyJson','QualifiedSourceJson','DependencyInputJson')} | {'analysis-launcher/src/main/java/io/github/gustavo2358/analysis/launcher/AnalysisDependencies.java'}
 NEW_CFG_TEST = 'cfg-adapters/src/test/java/io/github/gustavo2358/analysis/cfg/adapters/W1dInvokeWireTest.java'
 
 

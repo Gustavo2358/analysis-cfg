@@ -127,13 +127,27 @@ class FileDependencyWireTests(unittest.TestCase):
         old=runpy.run_path(str(ROOT/'scripts/project/fixtures/dependency_wire_v1.py'))['validate']
         for name in ('dynamic-x8','literal','dynamic-no-move','orphan'):
             d=read(ROOT/('analysis-adapters/target/w1d/'+name+'.json'))
-            projected=copy.deepcopy(d);projected.pop('fileDependencies');projected.pop('analysisBoundary');projected.pop('sourceDependencies')
+            projected=copy.deepcopy(d);projected.pop('fileDependencies');projected.pop('analysisBoundary');projected.pop('sourceDependencies');projected.pop('dependencies')
             if projected['analysisStatus']=='PARTIAL':projected['version']='1.2.0'
             else:
                 projected['version']='1.1.0';projected.pop('analysisStatus');projected.pop('analysisReasons')
                 for site in projected['sites']:site.pop('analysisStatus');site.pop('analysisReasons')
             self.assertEqual(projected,old(projected));self.assertEqual(projected,validate(projected))
             self.assertEqual(d['edges'],projected['edges'])
+
+    def test_unified_inventory_rejects_duplicate_or_invented_evidence(self):
+        source=read(ROOT/'analysis-adapters/target/w1d/dynamic-x8.json')
+        self.assertTrue(source['dependencies']['programs'][0]['candidates'])
+        mutations=[
+            lambda d:d['dependencies']['programs'].append(copy.deepcopy(d['dependencies']['programs'][0])),
+            lambda d:d['dependencies']['programs'][0]['authorities'].append('INVENTED'),
+            lambda d:d['dependencies']['programs'][0]['candidates'][0].__setitem__('referenceName','FORGED'),
+            lambda d:d['dependencies']['programs'][0]['candidates'][0]['supports'][0]['producer'].__setitem__('localId','absent'),
+            lambda d:d['dependencies']['programs'][0].__setitem__('valueRemainder',1),
+        ]
+        for mutate in mutations:
+            d=copy.deepcopy(source);mutate(d)
+            with self.assertRaises((ValueError,KeyError,TypeError)):validate(d)
 
     def test_file_negatives_and_source_scope(self):
         d=read(ROOT/'analysis-adapters/target/fd-w1/A2.json')

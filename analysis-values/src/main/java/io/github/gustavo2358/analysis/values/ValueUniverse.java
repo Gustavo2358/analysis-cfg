@@ -22,6 +22,18 @@ final class ValueUniverse {
         if(ordinal==null){ordinal=producers.size();Math.incrementExact(ordinal);producers.add(producer);producerIds.put(producer,ordinal);}
         return singleton.supportedBy(ordinal,work);
     }
+    /** Remap only supports of the captured input alternative onto the derived value. */
+    Candidates derived(Candidates result,LogicalText output,LogicalText input,Candidates captured,ValuesWork work) {
+        var ordinal=ordinals.get(input);if(ordinal==null)return result;
+        for(int i=0;i<captured.supports.size();i++) {
+            var producer=producers.get(captured.supports.at(i));
+            if(producer.candidate()==ordinal) {
+                var support=producer.support();
+                result=result.join(supported(output,support.evidence(),support.origin(),support.premises(),work),work);
+            }
+        }
+        return result;
+    }
     LogicalText value(int ordinal){return values.get(ordinal);}
     boolean partial(Candidates candidates){for(int i=0;i<candidates.size();i++)if(!values.get(candidates.at(i)).complete())return true;return false;}
     private static String supportUnit(Id id){return id instanceof OperationId op?op.unit().localId():((OperandId)id).owner().unit().localId();}
