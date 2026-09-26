@@ -275,9 +275,9 @@
       "src/main/java/io/github/gustavo2358/cobolexplorer/CicsCommandSyntax.java",
       "src/test/java/io/github/gustavo2358/cobolexplorer/CicsFileControlTest.java"
     ],
-    "semantic_product_version": "2.47.0",
+    "semantic_product_version": "2.48.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "cef8e728857467a283f77d9b6b1f2f870eda57d5",
+    "commit": "333e1f72b0e746f417e1a44cde1cfd7d2226b78c",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -288,7 +288,7 @@
       "scope": "local unconditional paragraph identity and explicit entry; G1-G5 and 1/2/5/40"
     },
     "storage_contract_version": "1.11.0",
-    "canonical_ref": "feat/carddemo-recall",
+    "canonical_ref": "feat/perform-control-completion",
     "observed_on": "2026-09-26",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
@@ -305,12 +305,13 @@
     "logical_text_semantic_product_version": "2.29.0",
     "logical_text_storage_contract_version": "1.9.0",
     "logical_text_w2": "Local producer FAST PASS; fixed logical ranges and expression transport. Selected source E2E qualification in docs/product/logical-text-w2.md.",
-    "dependency_preservation": "W3-R1 local complete logical TEXT view identity in SP 2.35/storage 1.11, including record/child and standalone roots; physical gaps remain coverage."
+    "dependency_preservation": "W3-R1 local complete logical TEXT view identity in SP 2.35/storage 1.11, including record/child and standalone roots; physical gaps remain coverage.",
+    "perform_completion": "Scoped exits, SECTION boundaries, typed VARYING levels; Draft review. See docs/domain/perform-control-completion.md."
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
-    "status": "Conditional source dependency evidence implemented; local FAST passed; draft review pending.",
-    "commit": "090296d51a5eb33ac5c337c45ee62de8fd27c296",
+    "status": "PERFORM control completion implemented; Draft review pending.",
+    "commit": "e72cd2d3fd3d7769ecf2315f5571018ebe00260a",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -322,7 +323,7 @@
     "goto_validation": {
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
     },
-    "canonical_ref": "feat/unified-target-resolution",
+    "canonical_ref": "feat/perform-control-completion",
     "observed_on": "2026-09-26",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
@@ -353,7 +354,8 @@
       "producer_api": "io.github.gustavo2358.lower.adapters.cli.CobolDependencyInput",
       "schema_sha256": "5f751464dee36a993d9238a32e25d68d396ce8ca3fa2e0198f29b4e6a7f505c0"
     },
-    "evidence_level": "SP 2.47 nominal facts preserved independently of executable AIR; consumer admission and roundtrip PASS; local FAST PASS; draft review pending."
+    "evidence_level": "SP 2.47 nominal facts preserved independently of executable AIR; consumer admission and roundtrip PASS; local FAST PASS; draft review pending.",
+    "perform_completion": "Scoped exits, SECTION boundaries, typed VARYING levels; Draft review. See docs/domain/perform-control-completion.md."
   },
   "external": [
     {

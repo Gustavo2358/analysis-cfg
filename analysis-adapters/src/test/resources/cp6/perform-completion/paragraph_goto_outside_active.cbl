@@ -1,0 +1,20 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. PERFORM-EXPLICIT-ESCAPE.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 PGM PIC X(8).
+       PROCEDURE DIVISION.
+       MAIN.
+       PERFORM P THRU END-P
+       CALL PGM
+       GOBACK.
+       P.
+       GO TO OUT-P.
+       END-P.
+       EXIT.
+       OUT-P.
+       MOVE 'LIVE0001' TO PGM
+       EXIT PARAGRAPH
+       CALL 'DEAD0001'.
+       AFTER-OUT.
+       GO TO END-P.
