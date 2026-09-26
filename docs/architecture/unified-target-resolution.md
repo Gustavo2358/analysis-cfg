@@ -1,6 +1,6 @@
 # Unified target resolution
 
-IN_PROGRESS. User approved the dependency-input expansion after CP0 discovery.
+Implementation reviewed and approved on 2026-09-26; integration: [PR](https://github.com/Gustavo2358/analysis-cfg/pull/46).
 Baseline bbf53aa164bb9708aa18d31f12d7aa1f2c098f9b; no automatic merge.
 
 Rule: qualification establishes whether an occurrence contributes; target resolution
@@ -57,11 +57,11 @@ The physical-disabled diagnostic is attached only to a selected wider query whos
 resolved storage bounds include a Region. A scalar query or an unsupported logical
 Cell does not inherit the diagnostic from another query in the same Entry.
 
-## Review evidence
+## Initial manifest and routing evidence (historical)
 
 Both changed repositories passed FAST. The producer also passed local qualification.
 The consumer's complete Maven suite and architecture boundaries passed; local
-cross-repository qualification is recorded in the Draft review.
+cross-repository qualification is recorded in the PR history.
 
 The 73-source default bundle run produced all outputs twice with identical bytes.
 All 74 baseline program relations remain; none of the five known scanner false
@@ -94,3 +94,12 @@ requires a producer lock of 2.38.0, but baseline main already locks 2.45.0. Comp
 Maven, architecture, semantic, performance and W5 integration checks passed before
 that failure. Four later E2E scripts share the same stale predicate and were not run.
 The predicate was preserved; full consumer qualification is not reported as PASS.
+
+## Final integrated validation
+
+The subsequent source and value corrections recovered all 47 proven CardDemo false
+negatives (including the original 36), taking program relations from 74 to 121
+without losing prior relations or adding the five known scanner false positives.
+The earlier zero-gain result above describes only the initial manifest/routing
+stage. See [conditional candidates](conditional-dependency-candidates.md) for
+the final policy, validation, remaining uncertainty and PERFORM limitations.

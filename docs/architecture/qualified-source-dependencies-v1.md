@@ -1,6 +1,8 @@
 # R9 — qualified source dependency evidence
 
-Status: IN_PROGRESS. Scope: lower → dependency source contract only.
+Implementation reviewed and approved on 2026-09-26; integration: [PR](https://github.com/Gustavo2358/analysis-cfg/pull/46).
+
+Scope: lower → dependency source contract only.
 
 The authorized contract is `qualified-source-dependencies` 1.0.0. It transports
 validated source occurrence identities, literal value authority and the existing

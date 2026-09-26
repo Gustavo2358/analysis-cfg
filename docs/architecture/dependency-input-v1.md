@@ -1,6 +1,6 @@
 # Explicit dependency input 1.0.0
 
-Status: IN_PROGRESS; approved scope, Draft review required.
+Implementation reviewed and approved on 2026-09-26; integration: [PR](https://github.com/Gustavo2358/analysis-cfg/pull/46).
 
 The normal dependency entrypoint consumes an explicit manifest. It binds the existing
 AIR bytes, qualified-source-dependencies 1.0.0 bytes and typed StatementLinks from the
