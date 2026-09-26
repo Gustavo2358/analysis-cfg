@@ -202,3 +202,26 @@ section under result version 2.6.0. Without this input the result remains 2.5.0.
 See the [non-executable contract](qualified-source-dependencies-v1.md) for typed
 source identities, correlated alternatives, guards/proofs and version rejection.
 This section neither uses nor changes executable `DependencySiteFact` reachability.
+
+## Unified program projection (pre-release additive field)
+
+Current writers add `dependencies.programs`, the canonical program occurrence
+inventory. Existing `sites`, `edges`, files, DB2 and source certificate fields keep
+their contracts. Historical 2.5/2.6 documents may omit this additive field; this is
+an in-place pre-release extension, not a new semantic version for old behavior.
+
+Each row carries a full optional source occurrence identity, caller, technology,
+name profile, target kind (LITERAL, COMPUTED or UNAVAILABLE), qualification refs,
+existing executable operation IDs and site evidence. Candidates retain raw and
+interpreted names, real value/literal producer supports and source qualifications.
+One occurrence can have EXECUTABLE_FLOW and SOURCE_QUALIFIED authorities; an
+unproved executable reachability is labeled EXECUTABLE_OCCURRENCE instead.
+
+`valueRemainder`, `interpretationRemainder` and `analysisReasons` stay explicit.
+Unreachable executable queries cannot manufacture values for source-only execution.
+The legacy `sourceQualifiedDependencies` field remains the unmodified R9 certificate
+and its literal-only certificate view; computed results belong to the shared
+canonical inventory. No separate source value solver populates either view.
+
+See [unified target resolution](unified-target-resolution.md) and
+[explicit input](dependency-input-v1.md) for correlation and provider admission.

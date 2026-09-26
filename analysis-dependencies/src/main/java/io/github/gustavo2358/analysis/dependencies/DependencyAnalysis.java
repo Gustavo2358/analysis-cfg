@@ -21,6 +21,26 @@ public final class DependencyAnalysis {
     public DependencyAnalysis(){this(StorageAnalysisMode.LOGICAL_ONLY);}
     public DependencyAnalysis(StorageAnalysisMode mode){this.mode=Objects.requireNonNull(mode);}
     public DependencyResult prepare(Publication publication) {
+        return prepare(new DependencyInput(publication,Optional.empty(),List.of()));
+    }
+    public DependencyResult prepare(DependencyInput input) {
+        var occurrences=input.occurrences();
+        var result=prepareExecutable(input.publication());
+        if(input.source().isPresent())result=result.withSourceEvidence(input.source().get());
+        var byOperation=new HashMap<OperationId,List<DependencySiteFact>>();
+        for(var site:result.sites())byOperation.computeIfAbsent(site.operation(),ignored->new ArrayList<>()).add(site);
+        var inventory=new ArrayList<TargetResolver.Resolution>();long reused=0;
+        for(var occurrence:occurrences) {
+            var sites=occurrence.executableOperations().stream().flatMap(op->byOperation.getOrDefault(op,List.of()).stream()).toList();
+            var resolved=TargetResolver.resolve(occurrence,sites);inventory.add(resolved);
+            if(occurrence.source().isPresent()&&!occurrence.qualifications().isEmpty()&&occurrence.targetKind().equals("COMPUTED")&&!resolved.candidates().isEmpty())reused++;
+        }
+        var metrics=new TreeMap<>(result.metrics());metrics.put("sourceQualifiedResolvedByExistingQuery",reused);
+        metrics.put("qualifiedComputedOccurrences",occurrences.stream().filter(o->o.targetKind().equals("COMPUTED")&&(!o.qualifications().isEmpty()||!o.executableOperations().isEmpty())).count());
+        metrics.put("targetResolutionRequests",(long)occurrences.size());
+        return result.withProgramInventory(inventory,metrics);
+    }
+    private DependencyResult prepareExecutable(Publication publication) {
         Objects.requireNonNull(publication);
         var defaults=BuildOptions.defaults();var options=new BuildOptions(defaults.validation(),io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy.PARTIAL_ANALYSIS);var cfg=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).build(publication,options);
         switch(cfg.status()) {
@@ -34,7 +54,8 @@ public final class DependencyAnalysis {
         if(opened.status()!=AnalysisSession.Status.ACCEPTED)return partialInventory(publication,opened.reason());
         var session=opened.session().orElseThrow();
         try(var execution=new PlanningExecution(session,new AnalysisRegistry(List.of(new PossibleValuesProvider(),new RegionalValuesProvider(),new StorageValuesProvider(),new ReachabilityProvider())))) {
-            var plan=execution.plan(CallDependencyPlan.select(session,mode));var result=execution.execute("dependencies@1",plan);
+            var selection=CallDependencyPlan.choose(session,"call",false,mode);
+            var plan=execution.plan(selection.registrations());var result=execution.execute("dependencies@1",plan);
             for(var analysis:result.analyses())if(analysis.status()==AnalysisOutcome.Status.INVALID_INPUT)throw new Failure(Kind.INVALID_INPUT,analysis.reason());
             var reasons=new TreeSet<String>();
             if(session.index().hasUnprovedPreconditions())reasons.add("UNPROVED_OPERATION_PRECONDITION");
@@ -56,15 +77,14 @@ public final class DependencyAnalysis {
                 if(!retained.containsKey(key))retained.put(key,CallDependencyConsumer.partial(site,Optional.ofNullable(reachability.get(key)),
                     List.copyOf(entryReasons.getOrDefault(site.entry(),Set.of("DEPENDENCY_PREPARATION_INCOMPLETE")))));
             }
-            var physicalNotAnalyzed=result.analyses().stream().filter(a->!mode.physical()&&(a.key().implementation().equals(RegionalValuesProvider.IMPLEMENTATION)||a.key().implementation().equals(StorageValuesProvider.IMPLEMENTATION)))
-                .map(a->a.key().entry()).collect(java.util.stream.Collectors.toSet());
+            var physicalNotAnalyzed=physicalDemands(session,selection);
             var sites=retained.values().stream()
-                .map(f->f.targetKind()==DependencySiteFact.TargetKind.COMPUTED&&physicalNotAnalyzed.contains(f.entry())?f.withPartialAnalysis("PHYSICAL_PROPAGATION_DISABLED"):f).map(f->session.index().partialControl(f.caller())?f.withPartialAnalysis("PARTIAL_CONTROL_PROJECTION"):f)
+                .map(f->f.targetKind()==DependencySiteFact.TargetKind.COMPUTED&&physicalNotAnalyzed.contains(new CallDependencyPlan.SiteKey(f.entry(),f.operation()))?f.withPartialAnalysis("PHYSICAL_PROPAGATION_DISABLED"):f).map(f->session.index().partialControl(f.caller())?f.withPartialAnalysis("PARTIAL_CONTROL_PROJECTION"):f)
                 .map(f->session.index().unprovedPreconditions(f.caller())?f.withPartialAnalysis("UNPROVED_OPERATION_PRECONDITION"):f).sorted(Comparator.comparing(DependencySiteFact::entry,AnalysisKey.ENTRY_ORDER).thenComparing(f->f.operation().localId())).toList();
             var edges=new ArrayList<DependencyResult.Edge>();
             for(var site:sites)if(site.reachability()!=DependencySiteFact.Reachability.UNREACHABLE_IN_MODEL)
                 for(var candidate:site.candidates())edges.add(new DependencyResult.Edge(site.caller(),site.entry(),site.operation(),candidate,site.effectiveUnknownRemainder()));
-            var metrics=new TreeMap<String,Long>();
+            var metrics=new TreeMap<String,Long>(selection.metrics());
             result.metrics().forEach((phase,counts)->counts.forEach((name,value)->metrics.put(phase+"."+name,value)));
             long values=result.analyses().stream().filter(a->a.key().implementation().equals(PossibleValuesProvider.IMPLEMENTATION)||a.key().implementation().equals(RegionalValuesProvider.IMPLEMENTATION)||a.key().implementation().equals(StorageValuesProvider.IMPLEMENTATION)).count();
             metrics.put("possibleValuesPreparations",values);metrics.put("possibleValuesRuns",result.analyses().stream().filter(a->a.status()==AnalysisOutcome.Status.STABLE&&(a.key().implementation().equals(PossibleValuesProvider.IMPLEMENTATION)||a.key().implementation().equals(RegionalValuesProvider.IMPLEMENTATION)||a.key().implementation().equals(StorageValuesProvider.IMPLEMENTATION))).count());
@@ -90,6 +110,25 @@ public final class DependencyAnalysis {
             }
             return new DependencyResult(publication.id(),publication.airVersion(),sites,edges,metrics,publication.coverage().inventory(),publication.origins(),publication.artifacts(),publication.uncertainties().stream().map(Evidence.Uncertainty::id).toList(),List.copyOf(reasons),fileResult,sourceResult);
         }
+    }
+    private Set<CallDependencyPlan.SiteKey> physicalDemands(AnalysisSession session,CallDependencyPlan.Selection selection) {
+        var result=new HashSet<CallDependencyPlan.SiteKey>();
+        if(mode.physical()||selection.providers().values().stream().noneMatch(p->p==CallDependencyPlan.Provider.REGIONAL||p==CallDependencyPlan.Provider.STORAGE))return result;
+        try {
+            var storage=new io.github.gustavo2358.analysis.storage.StorageIndex(session);
+            for(var selected:selection.providers().entrySet()) {
+                if(selected.getValue()!=CallDependencyPlan.Provider.REGIONAL&&selected.getValue()!=CallDependencyPlan.Provider.STORAGE)continue;
+                var invoke=(Operations.Invoke)session.index().site(selected.getKey().operation()).operation();
+                var place=((Expressions.Read)((Interactions.ComputedTarget)invoke.target()).name()).place();
+                var resolution=storage.resolve(place);var locations=new ArrayList<>(resolution.candidates());
+                if(resolution.remainder() instanceof Scopes.WithinMemory remainder)locations.addAll(storage.select(remainder.scope()).candidates());
+                if(locations.stream().anyMatch(c->session.index().storage(c.location().base().id()) instanceof Memory.Region))result.add(selected.getKey());
+            }
+        } catch(io.github.gustavo2358.analysis.storage.StorageIndex.UngroundedBound unsupported) {
+            // The provider's refusal remains explicit; an ungrounded bound is not
+            // evidence that this query needs physical propagation.
+        }
+        return result;
     }
     private record SiteKey(EntryId entry,OperationId operation) { }
     private static List<SiteView> inventory(Publication publication) {

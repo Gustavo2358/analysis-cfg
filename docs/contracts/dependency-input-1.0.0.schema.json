@@ -1,0 +1,195 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Explicit dependency input 1.0.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "version",
+    "air",
+    "qualifiedSource",
+    "sourceSha256",
+    "correlations"
+  ],
+  "properties": {
+    "schema": {
+      "const": "dependency-input"
+    },
+    "version": {
+      "const": "1.0.0"
+    },
+    "air": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "qualifiedSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "sourceSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "correlations": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source",
+          "operation",
+          "label",
+          "origin"
+        ],
+        "properties": {
+          "source": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "unit",
+              "handle"
+            ],
+            "properties": {
+              "unit": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "compilationUnitId",
+                  "structuralPath",
+                  "canonicalProgramName"
+                ],
+                "properties": {
+                  "compilationUnitId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "structuralPath": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  },
+                  "canonicalProgramName": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              "handle": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "operation": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "domain",
+              "publication",
+              "localId",
+              "unit"
+            ],
+            "properties": {
+              "domain": {
+                "const": "operation"
+              },
+              "publication": {
+                "type": "string",
+                "minLength": 1
+              },
+              "localId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "unit": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "label": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "domain",
+              "publication",
+              "localId",
+              "unit"
+            ],
+            "properties": {
+              "domain": {
+                "const": "label"
+              },
+              "publication": {
+                "type": "string",
+                "minLength": 1
+              },
+              "localId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "unit": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "origin": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "domain",
+              "publication",
+              "localId"
+            ],
+            "properties": {
+              "domain": {
+                "const": "origin"
+              },
+              "publication": {
+                "type": "string",
+                "minLength": 1
+              },
+              "localId": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

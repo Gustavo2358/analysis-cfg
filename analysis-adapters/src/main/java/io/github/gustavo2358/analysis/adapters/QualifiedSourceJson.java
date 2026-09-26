@@ -24,7 +24,7 @@ public final class QualifiedSourceJson {
     public static Map<String,Object> value(UnitId v) {return object("compilationUnitId", v.compilationUnitId(), "structuralPath", v.structuralPath(), "canonicalProgramName", v.canonicalProgramName());}
     private static UnitId readUnitId(JsonNode n) {keys(n, "compilationUnitId", "structuralPath", "canonicalProgramName");return new UnitId(text(n.get("compilationUnitId")), list(n.get("structuralPath"), QualifiedSourceJson::integer), text(n.get("canonicalProgramName")));}
     public static Map<String,Object> value(StatementId v) {return object("unit", value(v.unit()), "handle", v.handle());}
-    private static StatementId readStatementId(JsonNode n) {keys(n, "unit", "handle");return new StatementId(readUnitId(n.get("unit")), text(n.get("handle")));}
+    static StatementId readStatementId(JsonNode n) {keys(n, "unit", "handle");return new StatementId(readUnitId(n.get("unit")), text(n.get("handle")));}
     public static Map<String,Object> value(OperandId v) {return object("statement", value(v.statement()), "handle", v.handle());}
     private static OperandId readOperandId(JsonNode n) {keys(n, "statement", "handle");return new OperandId(readStatementId(n.get("statement")), text(n.get("handle")));}
     public static Map<String,Object> value(Location v) {return object("file", v.file(), "startLine", v.startLine(), "startColumn", v.startColumn(), "endLine", v.endLine(), "endColumn", v.endColumn());}

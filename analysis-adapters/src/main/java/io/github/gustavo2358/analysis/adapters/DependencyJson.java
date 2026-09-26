@@ -26,7 +26,17 @@ public final class DependencyJson {
             "analysisBoundary","NON_EXECUTABLE_SOURCE","evidence",QualifiedSourceJson.value(source.evidence()),
             "occurrences",source.occurrences().stream().map(o->object("occurrence",QualifiedSourceJson.value(o.occurrence()),"status",o.status().name(),"valueRemainder",o.valueRemainder(),"interpretationRemainder",o.interpretationRemainder(),
                 "candidates",o.candidates().stream().map(c->object("referenceName",c.referenceName(),"rawValue",c.rawValue(),"occurrence",QualifiedSourceJson.value(c.occurrence()),"qualifications",c.qualifications())).toList())).toList())));
+        document.put("dependencies",object("programs",result.programDependencies().stream().map(DependencyJson::program).toList()));
         out.value(document);out.finish();
+    }
+    private static Object program(TargetResolver.Resolution resolved) {
+        var o=resolved.occurrence();
+        return object("sourceOccurrence",o.source().map(QualifiedSourceJson::value).orElse(null),"caller",o.caller(),
+            "technology",o.technology(),"nameProfile",o.nameProfile(),"targetKind",o.targetKind(),"authorities",resolved.authorities(),
+            "qualifications",o.qualifications(),"executableOperations",ids(o.executableOperations()),
+            "executableSites",resolved.executableSites().stream().map(s->object("entry",id(s.entry()),"operation",id(s.operation()),"reachability",s.reachability().name(),"valuePoint",s.valuePoint()==null?null:ResultJson.point(s.valuePoint()),"premises",ids(s.premises()),"provenance",ids(s.provenance()))).toList(),
+            "candidates",resolved.candidates().stream().map(c->object("referenceName",c.referenceName(),"rawValue",c.rawValue(),"supports",supports(c.executableSupports()),"qualifications",c.sourceQualifications())).toList(),
+            "valueRemainder",resolved.valueRemainder(),"interpretationRemainder",resolved.interpretationRemainder(),"analysisReasons",resolved.analysisReasons());
     }
     private static Object site(DependencySiteFact f,boolean extended) {
         var value=object("caller",id(f.caller()),"entry",id(f.entry()),"sequence",id(f.sequence()),"operation",id(f.operation()),"offset",f.offset(),

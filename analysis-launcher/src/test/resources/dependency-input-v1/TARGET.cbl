@@ -1,0 +1,9 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. TARGET.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 PGM PIC X(8).
+       PROCEDURE DIVISION.
+           MOVE 'PROGA' TO PGM
+           CALL PGM
+           GOBACK.

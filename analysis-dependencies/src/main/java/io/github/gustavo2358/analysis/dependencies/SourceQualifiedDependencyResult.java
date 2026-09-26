@@ -30,15 +30,13 @@ public record SourceQualifiedDependencyResult(QualifiedSourceDependencies eviden
         for(var u:evidence.units())for(var o:u.occurrences()) {
             var candidates=new ArrayList<Candidate>();boolean open=false;
             var status=!u.controlAvailable()?Status.CONTROL_UNAVAILABLE:o.qualifications().isEmpty()?Status.NOT_QUALIFIED_IN_SOURCE_MODEL:Status.QUALIFIED_POSSIBLE;
-            if(status==Status.QUALIFIED_POSSIBLE)for(var value:o.values()) {
+            if(o.namespace().equals("PROGRAM")) {
+                var occurrence=new QualifiedDependencyOccurrence(Optional.of(o.id()),o.id().unit().canonicalProgramName(),o.technology(),o.nameProfile(),o.targetKind(),o.values().stream().map(Value::value).toList(),status==Status.QUALIFIED_POSSIBLE?o.qualifications():List.of(),List.of(),o.valueRemainder());
+                var resolved=TargetResolver.resolve(occurrence,List.of());open=resolved.interpretationRemainder();
+                for(var candidate:resolved.candidates())candidates.add(new Candidate(candidate.referenceName(),candidate.rawValue(),o.id(),candidate.sourceQualifications()));
+            } else if(status==Status.QUALIFIED_POSSIBLE)for(var value:o.values()) {
                 String name=null;
-                if(o.technology().equals("COBOL") && o.nameProfile().equals(CallNameInterpreter.PROFILE)) {
-                    // R7 supplies the literal, not runtime linker certainty. Preserve
-                    // the same open name-policy qualification as executable CALL.
-                    var i=CallNameInterpreter.interpret(value.value(),false,Interactions.ExactName.INSTANCE);name=i.referenceName();open=true;
-                } else if(o.namespace().equals("PROGRAM") && o.nameProfile().equals(CicsNameInterpreter.PROFILE)) {
-                    var i=CicsNameInterpreter.interpret(value.value(),false,new Interactions.ExtensionName("cics-ts.program","1"));name=i.referenceName();open|=i.unknownRemainder();
-                } else if(o.namespace().equals("FILE") && o.nameProfile().equals("cics-ts.file@1")) {
+                if(o.namespace().equals("FILE") && o.nameProfile().equals("cics-ts.file@1")) {
                     name=FileNamePolicy.name("cics.file",value.value(),false,new Interactions.ExtensionName("cics-ts.file","1"));open|=name==null;
                 } else open=true;
                 if(name!=null)candidates.add(new Candidate(name,value.value(),o.id(),o.qualifications()));

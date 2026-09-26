@@ -309,8 +309,8 @@
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
-    "status": "R7 final corpus closeout and R9 integrated into main; qualified-source-dependencies 1.0.0 preserved",
-    "commit": "9cfdd015367eae03b21e4632bcd2119b601624cd",
+    "status": "Draft dependency-input adapter; R9 1.0.0 and AIR bytes preserved",
+    "commit": "8b646b2fae4da10937d4feeb8cb8db13dab984bc",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -322,7 +322,7 @@
     "goto_validation": {
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
     },
-    "canonical_ref": "main",
+    "canonical_ref": "feat/unified-target-resolution",
     "observed_on": "2026-09-26",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
@@ -346,6 +346,12 @@
       "approved_sp_producer": "26db42a40976e930749c869a6f2dfbcce37ed878",
       "schema_sha256": "09a2e40d0743a9a9978aa8a0a6e18e3e41e91c32202478635dbf741b8e83c646",
       "review": 34
+    },
+    "dependency_input": {
+      "schema": "dependency-input",
+      "version": "1.0.0",
+      "producer_api": "io.github.gustavo2358.lower.adapters.cli.CobolDependencyInput",
+      "schema_sha256": "5f751464dee36a993d9238a32e25d68d396ce8ca3fa2e0198f29b4e6a7f505c0"
     }
   },
   "external": [

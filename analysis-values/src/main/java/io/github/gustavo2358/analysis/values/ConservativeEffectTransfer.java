@@ -35,6 +35,22 @@ final class ConservativeEffectTransfer {
         return p.subjects.get(o.object());
     }
     private static void select(Scopes.MemoryScope scope,TextProfile p,Set<TextProfile.Location> out) {
+        // Unmodeled declarations may alias a demanded Cell. Never interpret their
+        // absence from the scalar table as proof that an effect is disjoint.
+        var pending=new ArrayDeque<Scopes.MemoryScope>();pending.add(scope);
+        while(!pending.isEmpty()) {
+            var current=pending.removeFirst();
+            if(current instanceof Scopes.ObjectsMemory objects) {
+                if(objects.objects().stream().anyMatch(o->!p.subjects.containsKey(o)))throw new TextProfile.Refusal(false,"UNSUPPORTED_EFFECT_PLACE");
+            } else if(current instanceof Scopes.VisibleMemory visible) {
+                var unit=p.session.index().unit(visible.unit());
+                for(var owner:p.session.index().publication().units())for(var object:owner.objects()) {
+                    boolean included=owner.id().equals(visible.unit())||unit.visibleObjects().contains(object.id())
+                        ||visible.includingExternal()&&object.visibility()!=Memory.Visibility.PRIVATE;
+                    if(included&&!p.subjects.containsKey(object.id()))throw new TextProfile.Refusal(false,"UNSUPPORTED_EFFECT_PLACE");
+                }
+            } else if(current instanceof Scopes.MemoryUnion union)pending.addAll(union.members());
+        }
         for(var item:p.subjects.entrySet())if(p.selected(item.getValue())&&contains(scope,item.getKey(),item.getValue(),p))out.add(item.getValue());
     }
     private static boolean contains(Scopes.MemoryScope s,ObjectId id,TextProfile.Location l,TextProfile p) {

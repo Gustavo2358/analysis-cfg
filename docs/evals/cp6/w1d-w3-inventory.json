@@ -595,6 +595,7 @@
         "io.github.gustavo2358.air.model.Place",
         "io.github.gustavo2358.air.model.Places",
         "io.github.gustavo2358.air.model.Places$ObjectPlace",
+        "io.github.gustavo2358.air.model.Publication",
         "io.github.gustavo2358.air.model.Scopes",
         "io.github.gustavo2358.air.model.Scopes$AllMemory",
         "io.github.gustavo2358.air.model.Scopes$MemoryBound",
@@ -623,6 +624,8 @@
         "java.lang.invoke.MethodHandles",
         "java.lang.invoke.MethodHandles$Lookup",
         "java.lang.invoke.MethodType",
+        "java.util.ArrayDeque",
+        "java.util.Collection",
         "java.util.Comparator",
         "java.util.HashMap",
         "java.util.HashSet",
@@ -2398,6 +2401,8 @@
         "java.util.function.Function",
         "java.util.function.Supplier",
         "java.util.function.ToIntFunction",
+        "java.util.stream.Collector",
+        "java.util.stream.Collectors",
         "java.util.stream.Stream"
       ],
       "io.github.gustavo2358.analysis.values.TextProfile$CopyWrite": [

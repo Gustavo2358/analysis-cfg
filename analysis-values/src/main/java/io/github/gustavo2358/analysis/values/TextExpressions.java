@@ -26,9 +26,10 @@ final class TextExpressions {
     }
     static Candidates evaluate(Operations.Assign operation,PossibleValuesState state,Map<ObjectId,TextProfile.Location> subjects,ValueUniverse universe,ValuesWork work){
         var inputs=new LinkedHashMap<TextProfile.Location,List<LogicalText>>();
+        var captured=new HashMap<TextProfile.Location,Candidates>();
         for(var object:reads(operation.value())){
             var location=subjects.get(object);if(inputs.containsKey(location))continue;
-            var candidates=state.value(location.ordinal(),work);var values=new ArrayList<LogicalText>();
+            var candidates=state.value(location.ordinal(),work);captured.put(location,candidates);var values=new ArrayList<LogicalText>();
             for(int i=0;i<candidates.size();i++)values.add(universe.value(candidates.at(i)));
             if(candidates.open()||values.isEmpty())values.add(null);
             inputs.put(location,values);
@@ -43,6 +44,8 @@ final class TextExpressions {
         for(var snapshot:snapshots){
             var value=evaluate(operation.value(),o->snapshot.get(subjects.get(o)));
             var candidate=value==null?Candidates.UNKNOWN:universe.supported(value,operation.header().id(),operation.header().origin(),List.of(),work);
+            if(value!=null)for(var input:snapshot.entrySet())if(input.getValue()!=null)
+                candidate=universe.derived(candidate,value,input.getValue(),captured.get(input.getKey()),work);
             result=result==null?candidate:result.join(candidate,work);
         }
         return result==null?Candidates.UNKNOWN:result;

@@ -222,6 +222,21 @@
       "ordinaryAndConditionalAlternativesKeepGuardsSeparate",
       "inactiveDeactivatedAndComputedRemainBounded",
       "versionsIdentitiesAndReferencesAreClosed"
+    ],
+    "io.github.gustavo2358.analysis.adapters.QueryLocalProviderTest": [
+      "unrelatedRegionsCannotChangeScalarProviderCandidateOrSupports",
+      "unusedPhysicalViewDoesNotRefuseLogicalDemand",
+      "anotherUnitCannotRefuseThisEntryDemand",
+      "anIndirectMayWriteCannotBeDiscardedAsAnUnusedDeclaration",
+      "literalNeverRequestsValueAdmission"
+    ],
+    "io.github.gustavo2358.analysis.adapters.UnifiedTargetResolutionTest": [
+      "twoAuthoritiesReuseOneQueryAndOneOccurrence",
+      "sourceOnlyComputedStaysOpenAndDoesNotRunAnotherSolver",
+      "rejectForeignAndDuplicatedCorrelations"
+    ],
+    "io.github.gustavo2358.analysis.adapters.LogicalTargetRoutingTest": [
+      "logicalRootCopyResolvesWithRealProducerChainInBothModes"
     ]
   },
   "analysis-dataflow": {
@@ -385,6 +400,10 @@
     ],
     "io.github.gustavo2358.analysis.launcher.QualifiedSourceCliTest": [
       "correlatedSourcePublishesAndInvalidInputsPreserveDestination"
+    ],
+    "io.github.gustavo2358.analysis.launcher.DependencyInputCliTest": [
+      "normalEntryPointUsesSourceAndExecutableEvidenceWithoutFlags",
+      "corruptBundleCannotReplaceDestination"
     ]
   },
   "analysis-values": {

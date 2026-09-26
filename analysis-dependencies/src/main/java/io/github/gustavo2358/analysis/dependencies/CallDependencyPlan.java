@@ -50,55 +50,93 @@ public final class CallDependencyPlan {
     public static List<ConsumerRegistration<DependencySiteFact>> select(AnalysisSession session,StorageAnalysisMode mode){return select(session,"call",false,mode);}
     /** Explicit registration namespace and duplicate requests support composition/testing of shared W4 batches. */
     public static List<ConsumerRegistration<DependencySiteFact>> select(AnalysisSession session,String namespace,boolean duplicateQuery) { return select(session,namespace,duplicateQuery,StorageAnalysisMode.LOGICAL_ONLY); }
+    public enum Provider { LITERAL, SCALAR, REGIONAL, STORAGE, UNRESOLVED }
+    public record SiteKey(EntryId entry,OperationId operation) { }
+    public record Selection(List<ConsumerRegistration<DependencySiteFact>> registrations,
+                            Map<SiteKey,Provider> providers,Map<String,Long> metrics) {
+        public Selection { registrations=List.copyOf(registrations);providers=Map.copyOf(providers);metrics=Map.copyOf(metrics); }
+    }
     public static List<ConsumerRegistration<DependencySiteFact>> select(AnalysisSession session,String namespace,boolean duplicateQuery,StorageAnalysisMode mode) {
+        return choose(session,namespace,duplicateQuery,mode).registrations();
+    }
+    /** Admission belongs to the exact Entry/subject. Accepted demands share one execution per Entry. */
+    public static Selection choose(AnalysisSession session,String namespace,boolean duplicateQuery,StorageAnalysisMode mode) {
         Objects.requireNonNull(mode);
-        // Only the indexed Invoke bucket is inspected, once, to avoid demanding values for literal-only units.
-        var demand=new HashMap<UnitId,Set<ObjectId>>();
-        var groups=new HashMap<UnitId,Set<Integer>>();var slicedUnits=new HashSet<UnitId>();
-        for(var site:session.index().sites(Operations.Invoke.class)) {
-            var invoke=(Operations.Invoke)site.operation();if(selected(invoke)) {
-                if(readable(invoke)) {
-                    var place=((Expressions.Read)((Interactions.ComputedTarget)invoke.target()).name()).place();
-                    if(place instanceof Places.ObjectPlace object)demand.computeIfAbsent(site.owner().id(),k->new HashSet<>()).add(object.object());
-                }
-                groups.computeIfAbsent(site.owner().id(),ignored->new HashSet<>()).add(group(invoke));
-                if(readable(invoke)&&!(((Expressions.Read)((Interactions.ComputedTarget)invoke.target()).name()).place() instanceof Places.ObjectPlace))slicedUnits.add(site.owner().id());
-            }
-        }
         var registrations=new ArrayList<ConsumerRegistration<DependencySiteFact>>();
-        // Result assignments belong to normal-return edges. Select the existing regional
-        // provider that models those edges, including Cell storage, under the explicit policy.
-        // Wider logical admission is never permission to enable physical propagation.
-        boolean regional=session.index().hasUnprovedPreconditions() || session.index().publication().storage().stream().anyMatch(Memory.Region.class::isInstance)
-            ||session.index().sites(Operations.Invoke.class).stream().anyMatch(s->!((Operations.Invoke)s.operation()).results().isEmpty());
-        // Probe the optimization's semantic admission, not a keyword/feature list.
-        // This prepares no solver run. A wider existing domain retains evidence on refusal.
-        if(!regional && groups.values().stream().anyMatch(g->g.contains(1)))
-            regional=PossibleValuesAnalysis.prepare(session,PossibleValuesAnalysis.EFFECTS_PROFILE,demand.values().stream().flatMap(Set::stream).collect(java.util.stream.Collectors.toSet())).status()==PossibleValuesAnalysis.Status.UNSUPPORTED;
+        var providers=new HashMap<SiteKey,Provider>();var metrics=new TreeMap<String,Long>();
+        for(var key:List.of("qualifiedComputedOccurrences","targetResolutionRequests","scalarAdmissionAttempts",
+                "scalarAdmissionAccepted","scalarAdmissionRefused","regionalAdmissionAttempts","regionalSelections",
+                "scalarSelections","possibleValuesQueries","deduplicatedValueQueries","sourceQualifiedResolvedByExistingQuery"))metrics.put(key,0L);
+        var invokes=session.index().sites(Operations.Invoke.class).stream().filter(s->selected((Operations.Invoke)s.operation())).toList();
         for(var context:session.contexts()) {
             var entry=context.entry().id();String id=part(entry.publication().localId())+part(entry.unit().localId())+part(entry.localId());
-            var reach=ReachabilityProvider.batch("reach:"+id,entry);boolean physical=slicedUnits.contains(entry.unit());
-            var storageValues=StorageValuesProvider.batch("call-values:"+id,StorageValuesProvider.key(entry,mode));
-            ObservationBatchId<ObjectId,? extends TextValueFact> values=regional
-                ?RegionalValuesProvider.batch("call-values:"+id,RegionalValuesProvider.key(entry,mode))
-                :PossibleValuesProvider.batch("call-values:"+id,PossibleValuesProvider.key(entry,PossibleValuesAnalysis.EFFECTS_PROFILE,demand.getOrDefault(entry.unit(),Set.of())));
-            for(int group:groups.getOrDefault(entry.unit(),Set.of())) {
-                var keys=new ArrayList<AnalysisKey>();keys.add(reach.analysisKey());var batches=new ArrayList<String>();batches.add(reach.id());
-                List<SiteInterest.SiteQuery<?,?>> queries=new ArrayList<>();queries.add(new SiteInterest.SiteQuery<>(reach,CallDependencyPlan::reachQuery));
-                if(group==1) {
-                    if(physical) {
-                        keys.add(storageValues.analysisKey());batches.add(storageValues.id());
-                        var query=new SiteInterest.SiteQuery<>(storageValues,CallDependencyPlan::storageQuery);queries.add(query);if(duplicateQuery)queries.add(query);
-                    } else {
-                        keys.add(values.analysisKey());batches.add(values.id());
-                        var query=new SiteInterest.SiteQuery<>(values,CallDependencyPlan::valueQuery);queries.add(query);if(duplicateQuery)queries.add(query);
-                    }
+            var admission=new HashMap<ObjectId,Boolean>();var demand=new HashSet<ObjectId>();
+            var selected=new EnumMap<Provider,Set<OperationId>>(Provider.class);
+            var queries=new HashSet<PointQuery<ObjectId>>();
+            var scoped=session.selectEntries(List.of(entry));
+            for(var indexed:invokes) {
+                if(!indexed.owner().id().equals(entry.unit()))continue;
+                var invoke=(Operations.Invoke)indexed.operation();Provider provider;
+                metrics.merge("targetResolutionRequests",1L,Long::sum);
+                if(invoke.target() instanceof Interactions.LiteralTarget)provider=Provider.LITERAL;
+                else {
+                    metrics.merge("qualifiedComputedOccurrences",1L,Long::sum);
+                    if(!readable(invoke))provider=Provider.UNRESOLVED;
+                    else if(((Expressions.Read)((Interactions.ComputedTarget)invoke.target()).name()).place() instanceof Places.ObjectPlace object) {
+                        boolean accepted=admission.computeIfAbsent(object.object(),subject->{
+                            metrics.merge("scalarAdmissionAttempts",1L,Long::sum);
+                            var probe=PossibleValuesAnalysis.prepare(scoped,PossibleValuesAnalysis.EFFECTS_PROFILE,Set.of(subject));
+                            if(probe.status()==PossibleValuesAnalysis.Status.INVALID_INPUT)throw new DependencyAnalysis.Failure(DependencyAnalysis.Kind.INVALID_INPUT,probe.reason());
+                            boolean ok=probe.status()==PossibleValuesAnalysis.Status.ACCEPTED;
+                            metrics.merge(ok?"scalarAdmissionAccepted":"scalarAdmissionRefused",1L,Long::sum);return ok;
+                        });
+                        provider=accepted?Provider.SCALAR:Provider.REGIONAL;
+                        if(accepted)demand.add(object.object());
+                        queries.add(new PointQuery<>(ProgramPoint.before(entry,invoke.header().id()),object.object()));
+                    } else provider=Provider.STORAGE;
                 }
-                var interest=new SiteInterest(Operations.Invoke.class,entry,s->selected((Operations.Invoke)s.operation())&&group((Operations.Invoke)s.operation())==group,queries);
-                registrations.add(new ConsumerRegistration<>(new ConsumerPlan(namespace+":"+id+":"+group,keys,batches),List.of(interest),List.of(),new CallDependencyConsumer(reach,group==1&&!physical?values:null,group==1&&physical?storageValues:null)));
+                providers.put(new SiteKey(entry,invoke.header().id()),provider);
+                selected.computeIfAbsent(provider,k->new HashSet<>()).add(invoke.header().id());
+                if(provider==Provider.SCALAR)metrics.merge("scalarSelections",1L,Long::sum);
+                if(provider==Provider.REGIONAL||provider==Provider.STORAGE)metrics.merge("regionalSelections",1L,Long::sum);
+            }
+            // Both wider projections use the same regional engine. After scalar
+            // admission, combine wider-only demands into its storage projection.
+            // This never changes an accepted scalar selection.
+            if(selected.containsKey(Provider.STORAGE)&&selected.containsKey(Provider.REGIONAL)) {
+                for(var operation:selected.remove(Provider.REGIONAL)) {
+                    selected.get(Provider.STORAGE).add(operation);
+                    providers.put(new SiteKey(entry,operation),Provider.STORAGE);
+                }
+            }
+            metrics.merge("possibleValuesQueries",(long)queries.size(),Long::sum);
+            metrics.merge("deduplicatedValueQueries",(long)queries.size(),Long::sum);
+            var reach=ReachabilityProvider.batch("reach:"+id,entry);
+            for(var selection:selected.entrySet()) {
+                var provider=selection.getKey();var operations=Set.copyOf(selection.getValue());
+                String batchId="call-values:"+id+":"+provider;
+                ObservationBatchId<ObjectId,? extends TextValueFact> values=switch(provider) {
+                    case SCALAR -> PossibleValuesProvider.batch(batchId,PossibleValuesProvider.key(entry,PossibleValuesAnalysis.EFFECTS_PROFILE,demand));
+                    case REGIONAL -> RegionalValuesProvider.batch(batchId,RegionalValuesProvider.key(entry,mode));
+                    default -> null;
+                };
+                var storage=provider==Provider.STORAGE?StorageValuesProvider.batch(batchId,StorageValuesProvider.key(entry,mode)):null;
+                if(provider==Provider.REGIONAL||provider==Provider.STORAGE)metrics.merge("regionalAdmissionAttempts",1L,Long::sum);
+                var keys=new ArrayList<AnalysisKey>();keys.add(reach.analysisKey());var batches=new ArrayList<String>();batches.add(reach.id());
+                List<SiteInterest.SiteQuery<?,?>> requests=new ArrayList<>();requests.add(new SiteInterest.SiteQuery<>(reach,CallDependencyPlan::reachQuery));
+                if(values!=null) {
+                    keys.add(values.analysisKey());batches.add(values.id());
+                    var query=new SiteInterest.SiteQuery<>(values,CallDependencyPlan::valueQuery);requests.add(query);if(duplicateQuery)requests.add(query);
+                }
+                if(storage!=null) {
+                    keys.add(storage.analysisKey());batches.add(storage.id());
+                    var query=new SiteInterest.SiteQuery<>(storage,CallDependencyPlan::storageQuery);requests.add(query);if(duplicateQuery)requests.add(query);
+                }
+                var interest=new SiteInterest(Operations.Invoke.class,entry,s->operations.contains(s.operationId()),requests);
+                registrations.add(new ConsumerRegistration<>(new ConsumerPlan(namespace+":"+id+":"+provider,keys,batches),List.of(interest),List.of(),new CallDependencyConsumer(reach,values,storage)));
             }
         }
-        return List.copyOf(registrations);
+        return new Selection(registrations,providers,metrics);
     }
     private static String part(String text){return text.length()+":"+text;}
 }
