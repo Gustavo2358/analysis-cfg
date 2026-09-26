@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static io.github.gustavo2358.analysis.adapters.ResultFixtures.*;
 import static io.github.gustavo2358.analysis.adapters.FileComputedOracleTest.*;
 
-/** W3: independent expectations at storage query, consumer and public wire boundaries. */
+/** Experimental physical observation/consumer oracle; default product mode has separate boundary tests. W3: independent expectations at storage query, consumer and public wire boundaries. */
 class ConsumerCoverageTest {
     static Operations.Invoke invoke(String family,String shape,String literal) {
         var base=file("consumer","end",shape.equals("choice")?"name":shape,literal,POLICY,false);
@@ -44,7 +44,7 @@ class ConsumerCoverageTest {
     }
     static StorageValueFact provider(Publication p,String shape) {
         var session=ValueToCallEvidenceTest.session(p);var e=p.units().getFirst().entries().getFirst().id();
-        var prepared=new StorageValuesProvider().prepare(session,StorageValuesProvider.key(e));assertNull(prepared.refusal());
+        var prepared=new StorageValuesProvider().prepare(session,StorageValuesProvider.key(e,io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL));assertNull(prepared.refusal());
         StorageSubject subject=switch(shape) {
             case "slice" -> new StorageSubject.PhysicalRange(BASE,StorageRange.exact(BigInteger.valueOf(4),BigInteger.valueOf(8)),CODEC);
             case "choice" -> new StorageSubject.PlaceOccurrence(new OperandId(new OperationOwner(new OperationId(U,"consumer")),"choice"));
@@ -61,7 +61,7 @@ class ConsumerCoverageTest {
         var dir=Path.of("target/analysis-gaps-w3");Files.createDirectories(dir);Files.write(dir.resolve(name+".json"),out.toByteArray());
     }
     static DependencyResult analyze(Publication p) {
-        var codec=new AirJson();assertEquals(p,codec.decode(codec.encode(p)));return new DependencyAnalysis().prepare(p);
+        var codec=new AirJson();assertEquals(p,codec.decode(codec.encode(p)));return new DependencyAnalysis(io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).prepare(p);
     }
     static List<String> expected(String mode) {return mode.equals("unknown")?List.of():mode.equals("multiple")?List.of("PROGA","PROGB"):List.of("PROGA");}
     static void providerExpected(StorageValueFact f,String mode) {providerExpected(f,mode,false);}
@@ -134,7 +134,7 @@ class ConsumerCoverageTest {
                     new Proofs.SameDomain(new Proofs.OperandDomain(choice.header().id()),new Proofs.ObjectDomain(obj("name")),new Proofs.OperationDomain(invoke.header().id())))));
             var validation=io.github.gustavo2358.air.validation.AirValidator.validate(p);assertEquals(io.github.gustavo2358.air.validation.ValidationResult.Status.STRUCTURALLY_VALID,validation.status(),mode+": "+validation.issues());
             // SameDomain is valid in-memory AIR but the pinned AIR codec does not encode it.
-            var result=mode.equals("open")?new DependencyAnalysis().prepare(p):analyze(p);var site=result.sites().getFirst();
+            var result=mode.equals("open")?new DependencyAnalysis(io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).prepare(p):analyze(p);var site=result.sites().getFirst();
             assertEquals(DependencySiteFact.TargetStatus.UNSUPPORTED_TARGET_EXPRESSION,site.targetStatus());assertTrue(site.candidates().isEmpty());assertTrue(site.effectiveUnknownRemainder());
             wire("program-choice-"+mode,result);
         }

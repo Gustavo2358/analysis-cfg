@@ -20,7 +20,7 @@ class StorageValueObservationTest {
     }
     @Test void composedCandidateExposesBothSurvivingProducerIntervalsAndMatchingRdEvents() {
         var p=regional(List.of(returning(U,"s0",List.of(assign(U,"old",WHOLE,"ABCDEFGH"),assign(U,"new",PREFIX,"WXYZ")))));
-        var session=session(p);var values=RegionalValuesAnalysis.prepare(session).analysis().orElseThrow().execute();var q=query("return-s0",R,0,8);
+        var session=session(p);var values=RegionalValuesAnalysis.prepare(session,StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).analysis().orElseThrow().execute();var q=query("return-s0",R,0,8);
         var batch=values.observeStorage(List.of(q,q));assertEquals(ObservationBatch.Status.COMPLETE,batch.status());assertEquals(1,batch.metrics().uniqueQueries());
         var fact=batch.observations().getFirst().value();assertEquals(List.of(new Values.TextValue("WXYZEFGH")),fact.candidates());assertFalse(fact.modelValueRemainder());
         assertEquals(1,fact.alternatives().size());var fragments=fact.alternatives().getFirst().fragments();assertEquals(2,fragments.size());

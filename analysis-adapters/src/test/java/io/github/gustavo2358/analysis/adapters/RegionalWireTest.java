@@ -38,17 +38,17 @@ class RegionalWireTest {
     static byte[] encode(RegionalAnalysisResult result) throws IOException {var out=new ByteArrayOutputStream();new RegionalResultJson().write(result,out);return out.toByteArray();}
     @Test void fileProductCarriesIndependentCompositionAndCopyIntervals() throws Exception {
         var p=fixture();var codec=new AirJson();var restored=codec.decode(codec.encode(p));assertEquals(p,restored);
-        var result=new RegionalAnalysis().prepare(restored,"manual-regional",queries());var bytes=encode(result);
+        var result=new RegionalAnalysis(io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).prepare(restored,"manual-regional",queries());var bytes=encode(result);
         var out=Path.of("target/regional-wire");Files.createDirectories(out);Files.write(out.resolve("manual.air.json"),codec.encode(p));Files.write(out.resolve("manual.result.json"),bytes);
         var fact=result.observations().stream().filter(o->o.query().point().operation().localId().equals("return-body")&&o.values().value()!=null).findFirst().orElseThrow().values().value();
         assertEquals(List.of(new Values.TextValue("WXYZEFGH")),fact.candidates());assertFalse(fact.evidence().contains(new OperationId(U,"late")));
-        assertArrayEquals(bytes,encode(new RegionalAnalysis().prepare(restored,"manual-regional",queries())));
+        assertArrayEquals(bytes,encode(new RegionalAnalysis(io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).prepare(restored,"manual-regional",queries())));
     }
     @Test void inventoryAndQueryPermutationPreserveTheEntireWire() throws Exception {
         var p=fixture();var u=p.units().getFirst();var objects=new ArrayList<>(u.objects());Collections.reverse(objects);var sequences=new ArrayList<>(u.sequences());Collections.reverse(sequences);var storage=new ArrayList<>(p.storage());Collections.reverse(storage);
         var permuted=new Publication(P,p.airVersion(),p.capabilities(),p.artifacts(),List.of(unit(U,u.entries(),sequences,objects)),storage,p.resources(),p.artifactRelations(),p.origins(),p.coverage(),p.uncertainties(),p.premises());
         var queries=new ArrayList<>(queries());Collections.reverse(queries);
-        assertArrayEquals(encode(new RegionalAnalysis().prepare(p,"stable",queries())),encode(new RegionalAnalysis().prepare(permuted,"stable",queries)));
+        assertArrayEquals(encode(new RegionalAnalysis(io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).prepare(p,"stable",queries())),encode(new RegionalAnalysis(io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).prepare(permuted,"stable",queries)));
     }
     @Test void hugeUnknownTailZeroAndLogicalCellsRetainTheirDistinctWireShapes() throws Exception {
         var huge=new StorageId(P,"huge");var open=new StorageId(P,"open");var cell=new StorageId(P,"cell");var gap=new UncertaintyId(P,"extent-gap");var logical=new ObjectId(U,"logical");
@@ -63,7 +63,7 @@ class RegionalWireTest {
         var queries=List.<StorageSubject>of(new StorageSubject.PhysicalRange(huge,StorageRange.exact(BigInteger.ONE.shiftLeft(90),BigInteger.valueOf(3)),Memory.AsciiText.INSTANCE),
             new StorageSubject.PhysicalRange(open,new StorageRange(BigInteger.ZERO,Optional.empty()),Memory.IdentityBytes.INSTANCE),
             new StorageSubject.PhysicalRange(huge,StorageRange.exact(BigInteger.ZERO,BigInteger.ZERO),Memory.AsciiText.INSTANCE),new StorageSubject.NamedObject(logical));
-        var result=new RegionalAnalysis().prepare(p,"limits",queries.stream().map(s->new PointQuery<>(point,s)).toList());
+        var result=new RegionalAnalysis(io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).prepare(p,"limits",queries.stream().map(s->new PointQuery<>(point,s)).toList());
         assertEquals(4,result.observations().size());assertEquals(1,result.observations().stream().filter(o->Boolean.FALSE.equals(o.values().value().modelValueRemainder())).count());
         var out=Path.of("target/regional-wire");Files.createDirectories(out);Files.write(out.resolve("limits.result.json"),encode(result));
     }
@@ -85,10 +85,10 @@ class RegionalWireTest {
         return seen;
     }
     @Test void detachedResultRetentionContainsOnlyValuesMetadataAndReferenceIds() throws Exception {
-        var p=fixture();var result=new RegionalAnalysis().prepare(p,"retention",queries());var graph=retained(result);
+        var p=fixture();var result=new RegionalAnalysis(io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).prepare(p,"retention",queries());var graph=retained(result);
         assertFalse(graph.contains(p));assertTrue(graph.stream().anyMatch(v->v instanceof io.github.gustavo2358.analysis.values.StorageValueFact.Capture));
         assertThrows(AssertionError.class,()->retained(List.of(result,p)),"detector must reject a deliberately retained publication");
-        var before=encode(result);new RegionalAnalysis().prepare(fixture(),"unrelated",queries());assertArrayEquals(before,encode(result));
+        var before=encode(result);new RegionalAnalysis(io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).prepare(fixture(),"unrelated",queries());assertArrayEquals(before,encode(result));
         System.out.println("W5_RETENTION resultObjects="+graph.size()+" forbiddenRoots=0 wireBytes="+before.length);
     }
     @Test void regionalLiteralSeedsKeepEntryIdentityAndNonoverlappingWireCovers() throws Exception {
@@ -103,7 +103,7 @@ class RegionalWireTest {
         }
         p=new Publication(P,p.airVersion(),p.capabilities(),p.artifacts(),List.of(unit(U,entries,unit.sequences(),unit.objects())),p.storage(),p.resources(),p.artifactRelations(),p.origins(),p.coverage(),p.uncertainties(),p.premises());
         var queries=entries.stream().map(e->new PointQuery<StorageSubject>(ProgramPoint.entry(e.id()),new StorageSubject.NamedObject(WHOLE))).toList();
-        var result=new RegionalAnalysis().prepare(p,"seeds",queries);
+        var result=new RegionalAnalysis(io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).prepare(p,"seeds",queries);
         for(var observation:result.observations()) {
             var value=observation.values().value();assertEquals(List.of(new Values.TextValue(observation.query().point().entry().localId().equals("seed-0")?"AAAABBBB":"CCCCDDDD")),value.candidates());
             assertFalse(value.modelValueRemainder());assertEquals(2,value.candidateSupports().getFirst().producers().size());
@@ -122,7 +122,7 @@ class RegionalWireTest {
         p=new Publication(P,p.airVersion(),p.capabilities(),p.artifacts(),List.of(unit(U,entries,sequences,unit.objects())),p.storage(),p.resources(),p.artifactRelations(),p.origins(),p.coverage(),p.uncertainties(),p.premises());
         var queries=new ArrayList<PointQuery<StorageSubject>>();
         for(var e:entries)for(var operation:List.of("old","write-seed-a","write-seed-b"))queries.add(new PointQuery<>(ProgramPoint.before(e.id(),new OperationId(U,operation)),new StorageSubject.NamedObject(WHOLE)));
-        var result=new RegionalAnalysis().prepare(p,"entry-paths",queries);
+        var result=new RegionalAnalysis(io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).prepare(p,"entry-paths",queries);
         for(var o:result.observations()) {
             var e=o.query().point().entry();var op=o.query().point().operation().localId();
             if(op.equals("old")) {

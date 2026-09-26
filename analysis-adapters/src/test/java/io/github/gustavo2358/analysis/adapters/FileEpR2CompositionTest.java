@@ -57,7 +57,7 @@ final class FileEpR2CompositionTest {
     }
     static DependencyResult product(String name,Publication p)throws Exception {
         var valid=AirValidator.validate(p);assertEquals(ValidationResult.Status.STRUCTURALLY_VALID,valid.status(),valid.issues().toString());
-        var codec=new AirJson();var bytes=codec.encode(p);var result=new DependencyAnalysis().prepare(codec.decode(bytes));
+        var codec=new AirJson();var bytes=codec.encode(p);var result=new DependencyAnalysis(io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).prepare(codec.decode(bytes));
         var out=Path.of("target/fd-post-ep-r2");Files.createDirectories(out);Files.write(out.resolve(name+".air.json"),bytes);
         var wire=new ByteArrayOutputStream();new DependencyJson().write(result,wire);Files.write(out.resolve(name+".json"),wire.toByteArray());
         return result;

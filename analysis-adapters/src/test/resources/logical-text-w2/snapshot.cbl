@@ -1,0 +1,17 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. W2-SNAPSHOT.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 SRC-REC.
+       05 SRC-A PIC X(3).
+       05 SRC-B PIC X(5).
+       01 DST-REC.
+       05 WS-PGM PIC X(4).
+       05 REST-A PIC X(4).
+       01 FLAG PIC X.
+       PROCEDURE DIVISION.
+       MOVE 'ABCDEFGH' TO SRC-REC.
+       MOVE SRC-REC TO DST-REC.
+       MOVE 'ZZZ' TO SRC-A.
+       CALL WS-PGM.
+       GOBACK.

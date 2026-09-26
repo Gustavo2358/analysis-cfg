@@ -22,7 +22,7 @@ final class ExactProvenanceFixtureBridge {
     }
     @SuppressWarnings("unchecked")
     static Result check(Publication publication,int regions) throws ReflectiveOperationException {
-        var selected=session(publication);var analysis=RegionalValuesAnalysis.prepare(selected).analysis().orElseThrow();
+        var selected=session(publication);var analysis=RegionalValuesAnalysis.prepare(selected,StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).analysis().orElseThrow();
         var execution=analysis.execute();var engine=analysis.new Engine();
         var production=(RegionalAlternatives<Object>)field(engine,"relations");
         var domain=new FactorizedAlternatives<Object>();

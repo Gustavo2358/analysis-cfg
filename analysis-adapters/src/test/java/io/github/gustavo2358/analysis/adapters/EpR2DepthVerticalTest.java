@@ -51,7 +51,7 @@ class EpR2DepthVerticalTest {
     @Test void manySegmentsPreserveMayMustBeforeAndCapturedSourceThroughJson() throws Exception {
         int n=8192;var codec=new AirJson();var original=fixture(n);assertTrue(io.github.gustavo2358.air.validation.AirValidator.validate(original).issues().isEmpty());var input=codec.encode(original);var p=codec.decode(input);
         var last=field(n-1);var queries=List.of(before("may",last),before("copy",last),before("must",last),before("return-body",last),before("return-body",field(0)));
-        var result=new RegionalAnalysis().prepare(p,"deep-regional",queries);
+        var result=new RegionalAnalysis(io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).prepare(p,"deep-regional",queries);
         fact(result,queries.get(0),"OLDPROG1",false,"seed");
         fact(result,queries.get(1),"OLDPROG1",true,"seed");
         fact(result,queries.get(2),"OLDPROG1",true,"seed");
@@ -69,7 +69,7 @@ class EpR2DepthVerticalTest {
         assertTrue(metrics.get("maxStateAlternatives")<=2L*n+4,"two local alternatives, not combinatorial growth");
         var output=new ByteArrayOutputStream();new RegionalResultJson().write(result,output);
         var reversed=new ArrayList<>(queries);Collections.reverse(reversed);var second=new ByteArrayOutputStream();
-        new RegionalResultJson().write(new RegionalAnalysis().prepare(p,"deep-regional",reversed),second);
+        new RegionalResultJson().write(new RegionalAnalysis(io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).prepare(p,"deep-regional",reversed),second);
         assertArrayEquals(output.toByteArray(),second.toByteArray());
         var dir=Path.of("target/ep-r2-depth");Files.createDirectories(dir);Files.write(dir.resolve("input.air.json"),input);Files.write(dir.resolve("result.json"),output.toByteArray());
         System.out.println("EP_R2_DEPTH_VERTICAL segments="+n+" "+metrics);

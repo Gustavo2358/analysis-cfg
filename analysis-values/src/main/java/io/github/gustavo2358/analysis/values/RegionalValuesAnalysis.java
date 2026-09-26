@@ -17,6 +17,8 @@ public final class RegionalValuesAnalysis {
     public static final String PROFILE="regional-text-images@2";
     static final Comparator<ObjectId> OBJECT_ORDER=Comparator.comparing((ObjectId id)->id.unit().publication().localId()).thenComparing(id->id.unit().localId()).thenComparing(ObjectId::localId);
     private final AnalysisSession session;
+    private final StorageAnalysisMode mode;
+    private final Map<StorageId,List<ObjectId>> logicalCellAliases;
     private final StatementEffects effects;
     private final StoragePartition partition;
     private final List<StorageIndex.Location> bases;
@@ -73,18 +75,24 @@ public final class RegionalValuesAnalysis {
     }
     public enum Status { ACCEPTED, UNSUPPORTED, INVALID_INPUT }
     public record Admission(Status status,String reason,Optional<RegionalValuesAnalysis> analysis) { }
-    public static Admission prepare(AnalysisSession session) {
+    public static Admission prepare(AnalysisSession session) { return prepare(session,StorageAnalysisMode.LOGICAL_ONLY); }
+    public static Admission prepare(AnalysisSession session,StorageAnalysisMode mode) {
+        Objects.requireNonNull(mode);
         var effects=new StatementEffects(new StorageIndex(session));
         // Share validated original entry facts; operational alias impacts never decide admission.
         var admission=ReachingDefinitions.prepare(effects);
         if(admission.status()!=ReachingDefinitions.Status.ACCEPTED)
             return new Admission(admission.status()==ReachingDefinitions.Status.INVALID_INPUT?Status.INVALID_INPUT:Status.UNSUPPORTED,admission.reason(),Optional.empty());
-        return new Admission(Status.ACCEPTED,null,Optional.of(new RegionalValuesAnalysis(effects,admission.analysis().orElseThrow().partition())));
+        return new Admission(Status.ACCEPTED,null,Optional.of(new RegionalValuesAnalysis(effects,admission.analysis().orElseThrow().partition(),mode)));
     }
-    private RegionalValuesAnalysis(StatementEffects effects,StoragePartition partition) {
+    private RegionalValuesAnalysis(StatementEffects effects,StoragePartition partition,StorageAnalysisMode mode) {
+        this.mode=mode;
         this.effects=effects;this.partition=partition;session=effects.storage().session();
-        bases=effects.storage().bases().stream().map(b->effects.storage().whole(b.header().id()))
-            .sorted(Comparator.comparing((StorageIndex.Location l)->l.base().id().localId())).toList();
+        logicalCellAliases=effects.storage().declarations().stream().filter(o->o.storage() instanceof Memory.CellBinding)
+            .collect(java.util.stream.Collectors.groupingBy(o->((Memory.CellBinding)o.storage()).storage(),
+                java.util.stream.Collectors.mapping(Memory.ObjectDeclaration::id,java.util.stream.Collectors.toList())));
+        bases=mode.physical()?effects.storage().bases().stream().map(b->effects.storage().whole(b.header().id()))
+            .sorted(Comparator.comparing((StorageIndex.Location l)->l.base().id().localId())).toList():List.of();
         for(int i=0;i<bases.size();i++)ordinals.put(bases.get(i).base().id(),i);
         // Partition ordinals follow the AIR storage inventory. DAG variable order must
         // instead be canonical, including allocation/work metrics in the public wire.
@@ -175,18 +183,30 @@ public final class RegionalValuesAnalysis {
     }
     private List<Plan> compile(List<StatementEffects.Write> writes,Id evidence,OriginId origin,List<PremiseId> initialPremises,Operation operation,Entries.InitialCondition initial,Optional<Control.OutcomeKey> outcome) {
         var result=new ArrayList<Plan>();
-        for(var write:writes)for(var target:write.targets()) {
+        if(mode.physical())for(var write:writes)for(var target:write.targets()) {
             var premises=new LinkedHashSet<>(initialPremises);premises.addAll(target.premises());
             var event=events.size();events.add(new ValueFact.Support(evidence,origin,ordered(premises)));
             eventDetails.add(new PreparedEvent(operation,initial,write,target,outcome,null));
             result.add(new Plan(write,target,event,null));
         }
-        for(var write:writes)for(var logical:write.logicalTargets()) {
+        for(var write:writes)for(var logical:logicalTargets(write)) {
             int event=events.size();events.add(new ValueFact.Support(evidence,origin,ordered(initialPremises)));
             eventDetails.add(new PreparedEvent(operation,initial,write,null,outcome,logical));
             result.add(new Plan(write,null,event,logical));
         }
         return List.copyOf(result);
+    }
+    private List<StatementEffects.LogicalTarget> logicalTargets(StatementEffects.Write write) {
+        if(mode.physical())return write.logicalTargets();
+        // Only explicit named writes supply logical candidates; alias scopes never invent text.
+        var place=write.occurrence().map(session.index()::place).orElse(null);
+        if(place==null)return List.of();
+        var ids=new TreeSet<ObjectId>(OBJECT_ORDER);
+        for(var id:effects.storage().explicitObjects(place)) {
+            var binding=session.index().object(id).storage();
+            if(binding instanceof Memory.CellBinding cell)ids.addAll(logicalCellAliases.get(cell.storage()));else ids.add(id);
+        }
+        return ids.stream().map(id->new StatementEffects.LogicalTarget(id,true)).toList();
     }
     public static final class State {
         private final EntryId entry;
@@ -209,13 +229,15 @@ public final class RegionalValuesAnalysis {
             :new Scalar(Optional.empty(),Set.of(),Set.of(reason),Set.of(),List.of(new Trace(location,Optional.empty(),event,Optional.empty(),Map.of(),Set.of(),Set.of(reason))));
     }
     final class Engine implements AnalysisDefinition<State> {
-        long contentReads,contentUpdates,alternativeVisits;
+        long contentReads,contentUpdates,alternativeVisits,physicalGroupsApplied,physicalWritesApplied,maxLogicalCells,maxLogicalValues;
         @Override public Direction direction(){return Direction.FORWARD;}
         @Override public State bottom(){return BOTTOM;}
         private final RegionalAlternatives<Content> relations=new RegionalAlternatives<>(content -> content instanceof Bytes bytes ? bytes.image() : null,Bytes::new);
         private final Map<Integer,RegionalAlternatives.Node<Content>> defaults=new HashMap<>();
         private long maxStateAlternatives,maxDecisionNodes,maxComponentCardinality,maxProvenanceRows,maxExpandedAlternatives,boundaryAlternatives;
         private State track(State state) {
+            maxLogicalCells=Math.max(maxLogicalCells,state.logical.size());
+            maxLogicalValues=Math.max(maxLogicalValues,state.logical.values().stream().mapToLong(Set::size).sum());
             // Correlation groups partition segment levels: nodes/edges cannot overlap
             // across groups and each component's distinct labels belong to one group.
             var totals=new long[5];
@@ -298,7 +320,8 @@ public final class RegionalValuesAnalysis {
             for(var plan:plans)if(plan.logical==null)grouped.computeIfAbsent(groupOf[ordinals.get(plan.target.location().base().id())],ignored->new LinkedHashMap<>())
                 .computeIfAbsent(plan.write,ignored->new ArrayList<>()).add(plan);
             var root=before.bindings;
-            for(var entry:grouped.entrySet()) {
+            if(mode.physical())for(var entry:grouped.entrySet()) {
+                physicalGroupsApplied++;physicalWritesApplied+=entry.getValue().values().stream().mapToLong(List::size).sum();
                 int group=entry.getKey();RegionalAlternatives.Node<Content> all=null;
                 var original=value(before,group);
                 for(var choices:sourceSelections(entry.getValue().values().stream().flatMap(List::stream).toList())) {
@@ -315,7 +338,13 @@ public final class RegionalValuesAnalysis {
             var logical=new HashMap<>(before.logical);
             for(var plan:plans)if(plan.logical!=null&&plan.logical.sourceApplicable()) {
                 var supported=logicalReplacements(before,plan);
-                if(!supported.isEmpty())logical.merge(plan.logical.object(),supported,KillAuthority::weakUpdate);
+                boolean strong=!forceMay&&plan.write.destination().exact()
+                    &&plan.write.occurrenceStrength()==StatementEffects.Strength.MUST
+                    &&plan.write.selection()==StatementEffects.Selection.SINGLE_DESTINATION
+                    &&plan.write.occurrence().map(session.index()::place).orElse(null) instanceof Places.ObjectPlace;
+                if(!mode.physical()&&strong) {
+                    if(supported.isEmpty())logical.remove(plan.logical.object());else logical.put(plan.logical.object(),supported);
+                } else if(!supported.isEmpty())logical.merge(plan.logical.object(),supported,KillAuthority::weakUpdate);
             }
             return root==before.bindings&&logical.equals(before.logical)?before:track(new State(before.entry,root,logical,groupSizes));
         }
@@ -326,12 +355,24 @@ public final class RegionalValuesAnalysis {
             // Open physical binding gives no authority to kill. Unknown widens the already-open
             // domain; only explicit supported expression values add logical candidates.
             if(!(plan.write.source() instanceof StatementEffects.ExpressionSource expression))return Set.of();
-            if(expression.value() instanceof Expressions.Literal literal&&literal.value() instanceof Values.TextValue text)
+            return logicalExpression(captured,plan,expression.value());
+        }
+        private Set<LogicalValue> logicalExpression(State captured,Plan plan,Expression expression) {
+            if(expression instanceof Expressions.FitText fit) {
+                var result=new HashSet<LogicalValue>();
+                for(var value:logicalExpression(captured,plan,fit.value())) {
+                    int length=fit.length().intValueExact();String raw=value.text().value();int count=raw.codePointCount(0,raw.length());
+                    String fitted=count>length?raw.substring(0,raw.offsetByCodePoints(0,length)):raw+fit.pad().repeat(length-count);
+                    result.add(new LogicalValue(new Values.TextValue(fitted),value.event()));
+                }
+                return Set.copyOf(result);
+            }
+            if(expression instanceof Expressions.Literal literal&&literal.value() instanceof Values.TextValue text)
                 return Set.of(new LogicalValue(text,plan.event));
-            if(expression.value() instanceof Expressions.Read read) {
+            if(expression instanceof Expressions.Read read) {
                 var result=new HashSet<LogicalValue>();
                 for(var object:effects.storage().explicitObjects(read.place()))result.addAll(captured.logical.getOrDefault(object,Set.of()));
-                for(var candidate:effects.storage().resolve(read.place()).candidates()) {
+                if(mode.physical())for(var candidate:effects.storage().resolve(read.place()).candidates()) {
                     int ordinal=ordinals.get(candidate.location().base().id());
                     for(var contents:contents(captured,candidate.location())) {
                         var value=RegionalValuesAnalysis.this.project(contents,candidate);
@@ -483,7 +524,7 @@ public final class RegionalValuesAnalysis {
             if(edge.kind()==CfgTransition.Kind.INVOKE_NORMAL)return apply(state,outcomes.get(invoke).get(Control.NormalOutcome.INSTANCE),false);
             state=apply(state,otherwise.get(invoke),true);for(var plans:outcomes.get(invoke).values())state=apply(state,plans,true);return state;
         }
-        private Map<String,Long> metrics(){var result=new TreeMap<>(relations.metrics());result.put("contentReads",contentReads);result.put("contentUpdates",contentUpdates);result.put("alternativeVisits",alternativeVisits);result.put("maxStateAlternatives",maxStateAlternatives);result.put("maxDecisionNodes",maxDecisionNodes);result.put("maxComponentCardinality",maxComponentCardinality);result.put("boundaryAlternatives",boundaryAlternatives);result.put("maxProvenanceRows",maxProvenanceRows);result.put("maxExpandedAlternatives",maxExpandedAlternatives);return Map.copyOf(result);}
+        private Map<String,Long> metrics(){var result=new TreeMap<>(relations.metrics());result.put("maxLogicalCells",maxLogicalCells);result.put("maxLogicalValues",maxLogicalValues);result.put("physicalGroupsApplied",physicalGroupsApplied);result.put("physicalWritesApplied",physicalWritesApplied);result.put("logicalOnlyMode",mode.physical()?0L:1L);result.put("contentReads",contentReads);result.put("contentUpdates",contentUpdates);result.put("alternativeVisits",alternativeVisits);result.put("maxStateAlternatives",maxStateAlternatives);result.put("maxDecisionNodes",maxDecisionNodes);result.put("maxComponentCardinality",maxComponentCardinality);result.put("boundaryAlternatives",boundaryAlternatives);result.put("maxProvenanceRows",maxProvenanceRows);result.put("maxExpandedAlternatives",maxExpandedAlternatives);return Map.copyOf(result);}
     }
     private List<CapturedGap> captureGaps(StorageIndex.Location selected) {
         var result=new ArrayList<CapturedGap>();
@@ -555,7 +596,7 @@ public final class RegionalValuesAnalysis {
         public Map<String,Long> solveMetrics(){return solveMetrics;}
         /** Cumulative domain work, including observed replay; no semantic budget. */
         public Map<String,Long> metrics(){return engine.metrics();}
-        public Map<String,Long> preparationMetrics(){var result=new TreeMap<>(effects.preparationMetrics());result.putAll(effects.storage().preparationMetrics());result.put("partitionSegments",(long)partition.segments().size());result.put("eventsPrepared",(long)events.size());result.put("correlationGroups",(long)groups.size());result.put("maxGroupBases",groups.stream().mapToLong(List::size).max().orElse(0));return Map.copyOf(result);}
+        public Map<String,Long> preparationMetrics(){var result=new TreeMap<>(effects.preparationMetrics());result.putAll(effects.storage().preparationMetrics());result.put("partitionSegments",(long)partition.segments().size());result.put("eventsPrepared",(long)events.size());result.put("physicalPlansPrepared",eventDetails.stream().filter(e->e.logical()==null).count());result.put("logicalPlansPrepared",eventDetails.stream().filter(e->e.logical()!=null).count());result.put("correlationGroups",(long)groups.size());result.put("maxGroupBases",groups.stream().mapToLong(List::size).max().orElse(0));return Map.copyOf(result);}
         public ObservationBatch<ObjectId,RegionalValueFact> observe(Iterable<PointQuery<ObjectId>> requests) {
             return observe(requests,OBJECT_ORDER,StorageSubject.NamedObject::new,StorageValueFact::asObjectFact,true);
         }
@@ -585,7 +626,8 @@ public final class RegionalValuesAnalysis {
             var alternatives=new HashSet<StorageValueFact.Alternative>();
             boolean source=sourceOpen(query);
             for(var gap:sourceGaps)if(resolution.candidates().stream().anyMatch(c->!storage.disjoint(c.location(),gap.location()))) {source=true;origins.add(gap.origin());}
-            if(state.reached())for(var candidate:resolution.candidates()) {
+            if(!mode.physical()){model=true;reasons.add("PHYSICAL_PROPAGATION_DISABLED");}
+            if(mode.physical()&&state.reached())for(var candidate:resolution.candidates()) {
                 origins.addAll(candidate.origins());
                 int ordinal=ordinals.get(candidate.location().base().id());
                 for(var contents:engine.contents(state,candidate.location())) {

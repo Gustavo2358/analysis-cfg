@@ -9,13 +9,14 @@ import io.github.gustavo2358.analysis.query.*;
 import io.github.gustavo2358.analysis.structure.AnalysisSession;
 import java.util.*;
 import io.github.gustavo2358.analysis.values.StorageValuesProvider;
+import io.github.gustavo2358.analysis.values.StorageAnalysisMode;
 import static io.github.gustavo2358.analysis.dependencies.FileDependencyResult.*;
 
 /** FILE orchestration over the existing shared session and providers. No source access. */
 final class FileDependencyAnalysis {
     private FileDependencyAnalysis() { }
     private record Key(EntryId entry,OperationId operation) { }
-    static FileDependencyResult prepare(Publication p,AnalysisSession session,PlanningExecution execution,String unavailable){
+    static FileDependencyResult prepare(Publication p,AnalysisSession session,PlanningExecution execution,String unavailable,StorageAnalysisMode mode){
         var bindings=new HashMap<OperationId,List<Binding>>();var declarations=new ArrayList<Declaration>();var locals=new HashSet<OperationId>();
         for(var r:p.resources()){
             if(!isFile(r.description()))continue;
@@ -43,7 +44,7 @@ final class FileDependencyAnalysis {
             for(var context:session.contexts()){
                 var entry=context.entry().id();if(!kinds.containsKey(entry.unit()))continue;
                 String key=part(entry.unit().localId())+part(entry.localId());var batch=ReachabilityProvider.batch("file-reach:"+key,entry);
-                var values=StorageValuesProvider.batch("file-values:"+key,StorageValuesProvider.key(entry));
+                var values=StorageValuesProvider.batch("file-values:"+key,StorageValuesProvider.key(entry,mode));
                 for(var kind:kinds.get(entry.unit()).stream().sorted(Comparator.comparing(Class::getName)).toList())for(int route:List.of(0,1,2,3)) {
                     if(route!=0&&(kind!=Operations.Invoke.class||routes.entrySet().stream().noneMatch(e->e.getKey().unit().equals(entry.unit())&&e.getValue()==route)))continue;
                     boolean dynamic=route!=0;
@@ -58,6 +59,7 @@ final class FileDependencyAnalysis {
             for(var outcome:result.analyses())if(outcome.status()==AnalysisOutcome.Status.INVALID_INPUT)throw new DependencyAnalysis.Failure(DependencyAnalysis.Kind.INVALID_INPUT,outcome.reason());
             result.consumers().stream().flatMap(c->c.facts().stream()).forEach(s->retained.put(new Key(s.entry(),s.operation()),s));
             result.metrics().forEach((phase,counts)->counts.forEach((key,value)->metrics.put(phase+"."+key,value)));
+            for(var outcome:result.analyses())outcome.metrics().forEach((key,value)->metrics.merge(outcome.key().implementation()+"."+key,value,Math::addExact));
             metrics.put("possibleValuesPreparations",result.analyses().stream().filter(a->a.key().implementation().equals(StorageValuesProvider.IMPLEMENTATION)).count());
             metrics.put("possibleValuesStable",result.analyses().stream().filter(a->a.key().implementation().equals(StorageValuesProvider.IMPLEMENTATION)&&a.status()==AnalysisOutcome.Status.STABLE).count());
         }

@@ -40,32 +40,33 @@ final class FileComputedOracleTest {
         seq.stream().map(Sequence::terminator).filter(Operations.Invoke.class::isInstance).map(Operations.Invoke.class::cast).map(i->i.target() instanceof Interactions.LiteralTarget t?t.namePolicy():((Interactions.ComputedTarget)i.target()).namePolicy()).filter(Interactions.ExtensionName.class::isInstance).map(Interactions.ExtensionName.class::cast).map(e->new Capabilities.Capability(e.name(),e.version())).distinct().forEach(caps::add);
         return new Publication(P,SemanticVersion.AIR_2_0_0,new Capabilities.Manifest(caps,List.of()),List.of(new Origins.Artifact(artifact,"FileComputedOracleTest.java",Optional.empty())),List.of(unit(U,List.of(entry(U,"entry","start")),seq,objects)),List.of(new Memory.Region(new Memory.StorageHeader(BASE,Optional.of(U),Memory.Lifetime.PERSISTENT,Memory.Visibility.PRIVATE,O),Optional.of(BigInteger.valueOf(16)),Optional.empty())),List.of(),List.of(),List.of(new Origins.Written(O,artifact,Optional.empty(),List.of(),true)),coverage(new Scopes.PublicationScope(P)),List.of(new Evidence.Uncertainty(GAP,"UNPROVED_INPUT",List.of(Evidence.Dimension.VALUES),new Scopes.UnitScope(U),"unknown selector",O)),List.of());
     }
-    static DependencyResult analyze(String name,List<Sequence> seq)throws Exception {
+    static DependencyResult analyze(String name,List<Sequence> seq)throws Exception {return analyze(name,seq,io.github.gustavo2358.analysis.values.StorageAnalysisMode.LOGICAL_ONLY);}
+    static DependencyResult analyze(String name,List<Sequence> seq,io.github.gustavo2358.analysis.values.StorageAnalysisMode mode)throws Exception {
         var p=publication(seq);var valid=AirValidator.validate(p);assertEquals(ValidationResult.Status.STRUCTURALLY_VALID,valid.status(),valid.issues().toString());
-        var codec=new AirJson();var air=codec.encode(p);assertEquals(p,codec.decode(air));var r=new DependencyAnalysis().prepare(codec.decode(air));
+        var codec=new AirJson();var air=codec.encode(p);assertEquals(p,codec.decode(air));var r=new DependencyAnalysis(mode).prepare(codec.decode(air));
         var dir=Path.of("target/fd-w7/manual");Files.createDirectories(dir);Files.write(dir.resolve(name+".air.json"),air);var out=new ByteArrayOutputStream();new DependencyJson().write(r,out);Files.write(dir.resolve(name+".json"),out.toByteArray());return r;
     }
     static FileDependencyResult.Site site(DependencyResult r,String id){return r.fileDependencies().sites().stream().filter(s->s.operation().localId().equals(id)).findFirst().orElseThrow();}
     static void expect(DependencyResult r,String id,boolean remainder,String...names){var s=site(r,id);assertEquals(List.of(names),s.candidates().stream().map(FileDependencyResult.Candidate::referenceName).toList());assertEquals(remainder,s.unknownRemainder());}
     @Test void firstAndSecondCommandsObserveDifferentValuesAndShareOneProvider()throws Exception {
         var r=analyze("timing",List.of(move("start","seed-a","FIRST001","name","one"),seq("one",List.of(),file("file1","change","name",null,POLICY,false)),move("change","seed-b","SECOND02","name","two"),seq("two",List.of(),file("file2","call","name",null,POLICY,false)),seq("call",List.of(),W1dModelTest.call(U,"call","end",obj("name"),false)),returning(U,"end",List.of())));
-        expect(r,"file1",false,"FIRST001");expect(r,"file2",false,"SECOND02");assertEquals("seed-a",site(r,"file1").candidates().getFirst().supports().getFirst().producer().localId());assertEquals("seed-b",site(r,"file2").candidates().getFirst().supports().getFirst().producer().localId());assertEquals(1L,r.fileDependencies().metrics().get("possibleValuesPreparations"));assertEquals("SECOND02",r.sites().getFirst().candidates().getFirst().referenceName());assertFalse(r.sites().getFirst().modelValueRemainder());
+        expect(r,"file1",true,"FIRST001");expect(r,"file2",true,"SECOND02");assertEquals("seed-a",site(r,"file1").candidates().getFirst().supports().getFirst().producer().localId());assertEquals("seed-b",site(r,"file2").candidates().getFirst().supports().getFirst().producer().localId());assertEquals(1L,r.fileDependencies().metrics().get("possibleValuesPreparations"));assertEquals("SECOND02",r.sites().getFirst().candidates().getFirst().referenceName());assertTrue(r.sites().getFirst().modelValueRemainder());
     }
     @Test void joinsDistinguishClosedPartialAndUnknown()throws Exception {
         for(String mode:List.of("closed","partial","unknown")){
             var seq=new ArrayList<Sequence>();seq.add(choose("start","a","b"));seq.add(mode.equals("unknown")?jump(U,"a","file"):move("a","seed-a","ALPHA001","name","file"));seq.add(mode.equals("closed")?move("b","seed-b","BETA0002","name","file"):jump(U,"b","file"));seq.add(seq("file",List.of(),file("file","end","name",null,POLICY,false)));seq.add(returning(U,"end",List.of()));
-            var r=analyze(mode,seq);expect(r,"file",!mode.equals("closed"),mode.equals("closed")?new String[]{"ALPHA001","BETA0002"}:mode.equals("partial")?new String[]{"ALPHA001"}:new String[]{});
+            var r=analyze(mode,seq);expect(r,"file",true,mode.equals("closed")?new String[]{"ALPHA001","BETA0002"}:mode.equals("partial")?new String[]{"ALPHA001"}:new String[]{});
             for(var c:site(r,"file").candidates())assertEquals(List.of(c.referenceName().equals("ALPHA001")?"seed-a":"seed-b"),c.supports().stream().map(s->s.producer().localId()).toList());
         }
     }
     @Test void cyclesRetainFiniteCandidatesWithoutCutoff()throws Exception {
-        var r=analyze("cycle",List.of(move("start","seed-a","ALPHA001","name","choose"),choose("choose","b","file"),move("b","seed-b","BETA0002","name","choose"),seq("file",List.of(),file("file","end","name",null,POLICY,false)),returning(U,"end",List.of())));expect(r,"file",false,"ALPHA001","BETA0002");
+        var r=analyze("cycle",List.of(move("start","seed-a","ALPHA001","name","choose"),choose("choose","b","file"),move("b","seed-b","BETA0002","name","choose"),seq("file",List.of(),file("file","end","name",null,POLICY,false)),returning(U,"end",List.of())));expect(r,"file",true,"ALPHA001","BETA0002");
     }
     @Test void aliasAndPhysicalRefmodUseTheSameStorageFacts()throws Exception {
-        for(var shape:List.of("alias","slice")){var r=analyze(shape,List.of(move("start","seed","PREFFILE0001TAIL","whole","file"),seq("file",List.of(),file("file","end",shape,null,POLICY,false)),returning(U,"end",List.of())));expect(r,"file",false,"FILE0001");}
+        for(var shape:List.of("alias","slice")){var r=analyze(shape,List.of(move("start","seed","PREFFILE0001TAIL","whole","file"),seq("file",List.of(),file("file","end",shape,null,POLICY,false)),returning(U,"end",List.of())), io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL);expect(r,"file",false,"FILE0001");}
     }
     @Test void targetIsObservedBeforeOverlappingForeignWrites()throws Exception {
-        var r=analyze("effects",List.of(move("start","seed","BEFORE01","name","one"),seq("one",List.of(),file("first","two","name",null,POLICY,true)),seq("two",List.of(),file("second","end","name",null,POLICY,false)),returning(U,"end",List.of())));expect(r,"first",false,"BEFORE01");expect(r,"second",true,"BEFORE01");
+        var r=analyze("effects",List.of(move("start","seed","BEFORE01","name","one"),seq("one",List.of(),file("first","two","name",null,POLICY,true)),seq("two",List.of(),file("second","end","name",null,POLICY,false)),returning(U,"end",List.of())));expect(r,"first",true,"BEFORE01");expect(r,"second",true,"BEFORE01");
     }
     @Test void literalDoesNotRunValuesAndUsesFilePolicy()throws Exception {
         var r=analyze("literal",List.of(seq("start",List.of(),file("file","end","name","1FILE   ",POLICY,false)),returning(U,"end",List.of())));expect(r,"file",false,"1FILE");assertEquals(0L,r.fileDependencies().metrics().get("possibleValuesPreparations"));assertEquals("1FILE   ",site(r,"file").candidates().getFirst().rawValue());
@@ -78,12 +79,12 @@ final class FileComputedOracleTest {
         var call=W1dModelTest.call(U,"call","end",obj("name"),false);
         var target=new Interactions.ComputedTarget("program","cobol.program",new Expressions.Read(operand(call.header().id(),"name",Operand.Role.CALL_TARGET),place(call.header().id(),"slice")),Interactions.ExactName.INSTANCE,O);
         var physical=new Operations.Invoke(call.header(),call.action(),target,call.arguments(),call.results(),call.signature(),call.effectOperands(),call.effectBound(),call.outcomes(),call.contract());
-        var r=analyze("shared",List.of(move("start","seed","SHARED01","name","file"),seq("file",List.of(),file("file","call","slice",null,POLICY,false)),seq("call",List.of(),physical),returning(U,"end",List.of())));
+        var r=analyze("shared",List.of(move("start","seed","SHARED01","name","file"),seq("file",List.of(),file("file","call","slice",null,POLICY,false)),seq("call",List.of(),physical),returning(U,"end",List.of())), io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL);
         expect(r,"file",false,"SHARED01");assertEquals("SHARED01",r.sites().getFirst().candidates().getFirst().referenceName());assertEquals(1L,r.metrics().get("possibleValuesPreparations"));assertEquals(0L,r.fileDependencies().metrics().get("analysis.analysisRuns"));assertTrue(r.fileDependencies().metrics().get("analysis.analysisCacheHits")>=2);
     }
     @Test void literalCannotBorrowCallPolicyOrRunValues()throws Exception {
         for(var policy:List.of(Interactions.ExactName.INSTANCE,new Interactions.ExtensionName("cics-ts.program","1"))){
-            var r=analyze("wrong-literal-"+policy.getClass().getSimpleName(),List.of(seq("start",List.of(),file("file","end","name","VALID001",policy,false)),returning(U,"end",List.of())));expect(r,"file",true);assertEquals(0L,r.fileDependencies().metrics().get("possibleValuesPreparations"));
+            var r=analyze("wrong-literal-"+policy.getClass().getSimpleName(),List.of(seq("start",List.of(),file("file","end","name","VALID001",policy,false)),returning(U,"end",List.of())), io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL);expect(r,"file",true);assertEquals(0L,r.fileDependencies().metrics().get("possibleValuesPreparations"));
         }
     }
 

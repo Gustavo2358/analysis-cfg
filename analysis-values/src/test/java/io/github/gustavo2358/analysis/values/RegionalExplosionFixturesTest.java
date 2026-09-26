@@ -138,7 +138,7 @@ class RegionalExplosionFixturesTest {
     }
     static Composition composition(int producers,boolean disjoint) {
         var p=fixture(4,producers,disjoint);var preparedTargets=targets(p);
-        var selected=session(p);var admission=RegionalValuesAnalysis.prepare(selected);
+        var selected=session(p);var admission=RegionalValuesAnalysis.prepare(selected,StorageAnalysisMode.EXPERIMENTAL_PHYSICAL);
         assertEquals(RegionalValuesAnalysis.Status.ACCEPTED,admission.status());
         var analysis=admission.analysis().orElseThrow();var execution=analysis.execute();
         assertEquals(io.github.gustavo2358.analysis.solver.DataflowResult.Status.STABLE,execution.dataflow().status());
@@ -199,7 +199,7 @@ class RegionalExplosionFixturesTest {
 
     @Test void repeatingOneEventDoesNotMimicFiveDistinctProducers() {
         var p=fixture(4,1,false);var selected=session(p);
-        var analysis=RegionalValuesAnalysis.prepare(selected).analysis().orElseThrow();var engine=analysis.new Engine();
+        var analysis=RegionalValuesAnalysis.prepare(selected,StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).analysis().orElseThrow();var engine=analysis.new Engine();
         var state=engine.boundaries(selected).iterator().next().state();
         var operation=p.units().getFirst().sequences().getFirst().instructions().getFirst();
         state=engine.operation(state,operation);var once=state;

@@ -1,6 +1,8 @@
 # Analysis CFG — consumer AIR
 
-Storage W6–W8: [qualified profile, tests and limits](docs/engineering/storage-w8-qualification.md). Human review pending; no merge.
+Dependency discovery defaults to [logical-only](docs/product/logical-text-w1.md): supported candidates plus explicit completeness. Physical/regional propagation is EXPERIMENTAL / NOT PRODUCTION QUALIFIED, opt-in only; automatic fallback is forbidden.
+
+Storage W6–W8 [historical tests and limits](docs/engineering/storage-w8-qualification.md) do not qualify the physical engine for the operational product path. Corporate W1 qualification and human review remain pending; no merge.
 
 Desenvolvimento: `python3 -B scripts/harness/lean.py fast`.
 Antes de merge importante: `python3 -B scripts/harness/lean.py qualification-local` (local/on-demand).

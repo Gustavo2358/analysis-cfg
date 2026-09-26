@@ -20,6 +20,7 @@ final class ConservativeEffectTransfer {
             for(var id:m.knownWrites())may.add(occurrence(id,profile));
             for(var id:m.mustOverwrite())must.add(occurrence(id,profile));
         }
+        may.removeIf(l->!profile.selected(l));must.removeIf(l->!profile.selected(l));
         var result=new ConservativeEffectTransfer(may,must);
         for(var location:must)result.authority.put(location,KillAuthority.exactCell(profile.session,operation,location.cell()).orElseThrow(()->new TextProfile.Refusal(false,"UNPROVED_STRONG_OVERWRITE")));
         return result;
@@ -34,7 +35,7 @@ final class ConservativeEffectTransfer {
         return p.subjects.get(o.object());
     }
     private static void select(Scopes.MemoryScope scope,TextProfile p,Set<TextProfile.Location> out) {
-        for(var item:p.subjects.entrySet())if(contains(scope,item.getKey(),item.getValue(),p))out.add(item.getValue());
+        for(var item:p.subjects.entrySet())if(p.selected(item.getValue())&&contains(scope,item.getKey(),item.getValue(),p))out.add(item.getValue());
     }
     private static boolean contains(Scopes.MemoryScope s,ObjectId id,TextProfile.Location l,TextProfile p) {
         if(s instanceof Scopes.AllMemory)return true;
