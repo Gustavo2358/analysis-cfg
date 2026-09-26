@@ -1,6 +1,7 @@
 # Candidatos condicionais de dependência
 
-Status: IN_PROGRESS; revisão humana pelos PRs; sem merge.
+Implementação aprovada em 26/09/2026. Revisão e integração são registradas nos PRs
+listados na validação abaixo.
 
 ## Requisito de produto
 
@@ -104,3 +105,29 @@ quando depende da ordenação de caracteres ausente.
 das contribuições de cada candidato estão em `evidence`; a lista de inputs
 permite identificar o que está faltando, sem atribuir causalidade individual
 a cada inclusão. As premissas de interpretação nominal são explícitas.
+
+## Validação integrada aprovada em 26/09/2026
+
+No CardDemo, os 47 falsos negativos comprovados foram recuperados: relações entre
+programas de 74 para 121, sem perder relações anteriores e sem incluir os cinco
+falsos positivos conhecidos do scanner. O resultado mantém as incertezas de fonte
+e interpretação. As 19 diferenças adicionais do scanner não são falsos negativos
+comprovados e continuam explicitamente separadas.
+
+A reexecução do indep160 publicou PROGC nos modos padrão e físico; o físico
+preservou 321 escritas e a origem do valor, a cópia e a chamada. O modo padrão
+agora resolve o destino por texto lógico, sem trabalho físico. O PERFORM manteve
+35/39 casos originais aprovados e as mesmas quatro limitações: EXIT PARAGRAPH,
+EXIT PERFORM, PERFORM de seção e VARYING com AFTER adicional. Os 42 checks
+qualificados passaram: 31 de dependências e 11 de preservação de cobertura;
+isso não significa 42 dependências resolvidas. Não houve falha de pipeline ou
+candidato fora dos permitidos pelos testes. Oráculos e fontes ficaram intactos.
+
+O fechamento altera somente documentação. FAST e corpus dos commits aprovados
+são reutilizados porque implementação, contratos, testes e pins permanecem
+inalterados. Os merges preservam os commits exatos consumidos pelos locks;
+não é necessário substituir um pin validado apenas para apontar ao merge.
+Revisão e integração estão registradas nos PRs abaixo; os resultados brutos e
+os SHAs permanecem no repositório local de evidências.
+
+[frontend #60](https://github.com/Gustavo2358/proleap-poc/pull/60), [AIR #22](https://github.com/Gustavo2358/air-java/pull/22), [lower #35](https://github.com/Gustavo2358/cobol-lower/pull/35) e [análise #46](https://github.com/Gustavo2358/analysis-cfg/pull/46).
