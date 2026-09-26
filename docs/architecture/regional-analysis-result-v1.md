@@ -1,5 +1,11 @@
 # Regional analysis result — ST-W5.3
 
+W1 positive-memory clarification: `effectiveUnknownRemainder` equals the modeled
+value remainder; `sourceUnknownRemainder` is separate coverage presentation.
+Coverage metadata does not create `SourceGap` fragments or alter captures/Events.
+The existing fragment field remains wire-compatible and is empty in this projection.
+See [positive memory](../domain/positive-memory-topology.md).
+
 W1 operational policy: logical-only by default; physical propagation requires explicit experimental opt-in. The wire shape and historical profile label below are unchanged. `metrics.logicalOnlyMode` / `metrics.experimentalPhysicalMode` identify the dependency execution policy; regional observation `statistics.values.logicalOnlyMode` identifies its policy. Zero physical work is observable in physicalGroupsApplied/physicalWritesApplied counters. Existing remainder/analysisReasons/logicalAlternatives express candidate support without physical completeness. See [logical-only](../product/logical-text-w1.md).
 
 

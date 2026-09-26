@@ -51,7 +51,7 @@ public record DependencySiteFact(UnitId caller,EntryId entry,LabelId sequence,Op
         if(targetStatus==TargetStatus.ANALYSIS_INCOMPLETE&&(analysisStatus!=AnalysisStatus.PARTIAL||!candidates.isEmpty()||!rawCandidates.isEmpty()||!effectiveUnknownRemainder))throw new IllegalArgumentException("incomplete target shape");
         rawCandidates=List.copyOf(rawCandidates);candidates=List.copyOf(candidates);evidence=List.copyOf(evidence);
         provenance=List.copyOf(provenance);premises=List.copyOf(premises);uncertaintyRefs=List.copyOf(uncertaintyRefs);
-        if(effectiveUnknownRemainder!=(Boolean.TRUE.equals(modelValueRemainder)||sourceValueRemainder||interpretationUnknownRemainder))throw new IllegalArgumentException("effective remainder");
+        if(effectiveUnknownRemainder!=(Boolean.TRUE.equals(modelValueRemainder)||interpretationUnknownRemainder))throw new IllegalArgumentException("effective remainder");
         if(reachability==Reachability.UNREACHABLE_IN_MODEL&&(!candidates.isEmpty()||targetStatus!=TargetStatus.UNREACHABLE_IN_MODEL||modelValueRemainder!=null))throw new IllegalArgumentException("unreachable shape");
         if(offset<0||!caller.equals(entry.unit())||!caller.equals(sequence.unit())||!caller.equals(operation.unit()))throw new IllegalArgumentException("site identity");
     }

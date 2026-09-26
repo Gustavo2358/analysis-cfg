@@ -76,7 +76,7 @@ class CicsInvokeRouteTest {
         var fact=downstream(p);assertEquals(DependencySiteFact.Reachability.REACHABLE,fact.reachability());
         assertEquals(DependencySiteFact.TargetStatus.RESOLVED_CANDIDATES,fact.targetStatus());
         assertEquals(List.of("BEFORE"),fact.candidates().stream().map(DependencySiteFact.Candidate::referenceName).toList());
-        assertNotNull(fact.subject());assertNotNull(fact.valuePoint());assertTrue(fact.interpretationUnknownRemainder());
+        assertNotNull(fact.subject());assertNotNull(fact.valuePoint());assertFalse(fact.interpretationUnknownRemainder());
     }
 
 }

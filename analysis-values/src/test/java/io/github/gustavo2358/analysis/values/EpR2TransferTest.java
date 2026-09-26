@@ -29,7 +29,7 @@ class EpR2TransferTest {
         var p=ExternalStorageScopeTest.program(call);p=replace(p,p.units(),p.coverage(),p.uncertainties(),List.of());
         var ex=run(p);assertEquals(List.of("PGM00001"),texts(at(ex,"external",WHOLE)));
         assertEquals(List.of(),texts(at(ex,"return-done",WHOLE)));assertTrue(at(ex,"return-done",WHOLE).modelValueRemainder());
-        var peer=at(ex,"return-done",RegionalCompositionTest.YWHOLE);assertEquals(List.of("OTHERPGM"),texts(peer));assertTrue(peer.modelValueRemainder());
+        var peer=at(ex,"return-done",RegionalCompositionTest.YWHOLE);assertEquals(List.of("OTHERPGM"),texts(peer));assertFalse(peer.modelValueRemainder());
         var outcome=new PointQuery<>(new ProgramPoint(new EntryId(U,"entry"),ProgramPoint.Kind.OUTCOME,h.id(),Control.NormalOutcome.INSTANCE),WHOLE);
         assertEquals(List.of(),ex.observe(List.of(outcome)).observations().getFirst().value().candidates());
     }

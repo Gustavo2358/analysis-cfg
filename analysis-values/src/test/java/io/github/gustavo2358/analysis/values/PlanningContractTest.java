@@ -136,7 +136,7 @@ class PlanningContractTest {
             var result=runtime.execute("premises",runtime.plan(List.of(queryConsumer("A",key,batch,List.of(q)))));
             var fact=result.consumers().getFirst().facts().getFirst().observation().value();
             assertEquals(List.of(new Values.TextValue("B")),fact.candidates());assertTrue(fact.modelValueRemainder(),"missing other path remains open");
-            assertEquals(List.of(new PremiseId(p.id(),"disjoint")),fact.premises());assertEquals(new OperationId(key.entry().unit(),"assign-2"),fact.candidateSupports().getFirst().producers().getFirst().evidence());
+            assertTrue(fact.premises().isEmpty());assertEquals(new OperationId(key.entry().unit(),"assign-2"),fact.candidateSupports().getFirst().producers().getFirst().evidence());
         }
     }
 }

@@ -34,21 +34,15 @@ public final class RegionalValuesAnalysis {
     private final Map<EntryId,List<Plan>> initial=new HashMap<>();
     private final List<ValueFact.Support> events=new ArrayList<>();
     private final List<PreparedEvent> eventDetails=new ArrayList<>();
-    private final List<SourceGap> sourceGaps=new ArrayList<>();
-    private final Map<StorageIndex.Location,List<CapturedGap>> capturedGaps=new HashMap<>();
     private final Set<UnitId> controlOpen=new HashSet<>();
     private record Plan(StatementEffects.Write write,StatementEffects.Target target,int event,StatementEffects.LogicalTarget logical) { }
     private record LogicalValue(Values.TextValue text,int event) { }
-    private record SourceGap(StorageIndex.Location location,OriginId origin,List<UncertaintyId> uncertainties) {
-        SourceGap { uncertainties=List.copyOf(uncertainties); }
-    }
     private record PreparedEvent(Operation operation,Entries.InitialCondition initial,StatementEffects.Write write,StatementEffects.Target target,Optional<Control.OutcomeKey> outcome,StatementEffects.LogicalTarget logical) {
         DefinitionEvent definition(EntryId entry) {
             if(logical!=null)return operation==null?DefinitionEvent.logicalInitial(entry,initial,write.slot(),logical.object(),write.destination()):DefinitionEvent.logicalWrite(entry,operation,write,logical,outcome);
             return operation==null?DefinitionEvent.initial(entry,initial,write.slot(),target,write.destination()):DefinitionEvent.write(entry,operation,write,target,outcome);
         }
     }
-    private record CapturedGap(int gap,Optional<StorageRange> range) { }
     private sealed interface Content permits Bytes,Scalar { }
     private record Bytes(ByteImage image) implements Content { }
     private record ReadCapture(Map<Integer,Content> contents,Map<StatementEffects.Write,Integer> choices) { }
@@ -103,19 +97,10 @@ public final class RegionalValuesAnalysis {
             var choices=new HashMap<Control.OutcomeKey,List<Plan>>();
             statement.outcomes().forEach((key,writes)->choices.put(key,compile(writes,op.header().id(),op.header().origin(),List.of(),op,null,Optional.of(key))));
             outcomes.put(op,Map.copyOf(choices));
-            if(open(op.header().precision().control())||op instanceof Operations.Invoke i&&i.outcomes().remainder() instanceof Scopes.WithinControl)
+            if(op instanceof Operations.Invoke i&&i.outcomes().remainder() instanceof Scopes.WithinControl)
                 controlOpen.add(op.header().id().unit());
-            if(open(op.header().precision().storage())||open(op.header().precision().values())||open(op.header().precision().effects())) {
-                var writes=new ArrayList<>(statement.writes());writes.addAll(statement.otherwise());statement.outcomes().values().forEach(writes::addAll);
-                if(writes.isEmpty())controlOpen.add(op.header().id().unit());
-                var gaps=new LinkedHashSet<>(op.header().uncertainties());gaps.addAll(op.header().precision().storage().reasons());gaps.addAll(op.header().precision().values().reasons());gaps.addAll(op.header().precision().effects().reasons());
-                for(var write:writes)for(var target:write.targets())sourceGaps.add(new SourceGap(target.location(),op.header().origin(),ordered(gaps)));
-            }
         }
-        for(var object:effects.storage().declarations())if(object.coverage()!=Evidence.CoverageStatus.MODELED||open(object.precision().storage())||open(object.precision().values())) {
-            var resolution=effects.storage().object(object.id());var gaps=new LinkedHashSet<>(resolution.uncertainties());gaps.addAll(object.precision().storage().reasons());gaps.addAll(object.precision().values().reasons());
-            for(var target:effects.targets(resolution,StatementEffects.Strength.MAY))sourceGaps.add(new SourceGap(target.location(),object.origin(),ordered(gaps)));
-        }
+        // Coverage describes the projection, never a write, target, or propagated image.
         for(var unit:session.index().publication().units())if(session.index().partialControl(unit.id()) || session.index().unprovedPreconditions(unit.id()))controlOpen.add(unit.id());
         for(var context:session.contexts()) {
             var seeds=new ArrayList<Plan>();int slot=0;var seededLocations=new HashSet<StorageIndex.Location>();
@@ -156,7 +141,6 @@ public final class RegionalValuesAnalysis {
         for(var plan:allPlans)if(plan.logical==null&&plan.target.sourceApplicable()) {
             var reads=readSource(plan.write);
             if(reads!=null)for(var source:reads.candidates()) {
-                capturedGaps.computeIfAbsent(source.location(),this::captureGaps);
                 int a=representative(parent,ordinals.get(source.location().base().id()));
                 int b=representative(parent,ordinals.get(plan.target.location().base().id()));
                 parent[Math.max(a,b)]=Math.min(a,b);
@@ -526,27 +510,8 @@ public final class RegionalValuesAnalysis {
         }
         private Map<String,Long> metrics(){var result=new TreeMap<>(relations.metrics());result.put("maxLogicalCells",maxLogicalCells);result.put("maxLogicalValues",maxLogicalValues);result.put("physicalGroupsApplied",physicalGroupsApplied);result.put("physicalWritesApplied",physicalWritesApplied);result.put("logicalOnlyMode",mode.physical()?0L:1L);result.put("contentReads",contentReads);result.put("contentUpdates",contentUpdates);result.put("alternativeVisits",alternativeVisits);result.put("maxStateAlternatives",maxStateAlternatives);result.put("maxDecisionNodes",maxDecisionNodes);result.put("maxComponentCardinality",maxComponentCardinality);result.put("boundaryAlternatives",boundaryAlternatives);result.put("maxProvenanceRows",maxProvenanceRows);result.put("maxExpandedAlternatives",maxExpandedAlternatives);return Map.copyOf(result);}
     }
-    private List<CapturedGap> captureGaps(StorageIndex.Location selected) {
-        var result=new ArrayList<CapturedGap>();
-        for(int i=0;i<sourceGaps.size();i++) {
-            var gap=sourceGaps.get(i);if(effects.storage().disjoint(selected,gap.location()))continue;
-            var affected=selected.range();
-            if(affected.isPresent()&&selected.base().id().equals(gap.location().base().id()))affected=affected.get().intersect(gap.location().range().orElseThrow());
-            result.add(new CapturedGap(i,affected));
-        }
-        return List.copyOf(result);
-    }
     private Content capture(Content content,StorageIndex.Location selected) {
-        // Prepared intersections: transfer/replay do not scan source inventories.
-        for(var gap:Objects.requireNonNull(capturedGaps.get(selected),"unprepared captured read")) {
-            if(content instanceof Bytes bytes) {
-                content=new Bytes(bytes.image().withSourceGap(gap.range().orElseThrow(),gap.gap()));
-            } else {
-                var scalar=(Scalar)content;var gaps=new HashSet<>(scalar.sourceGaps());gaps.add(gap.gap());
-                content=new Scalar(scalar.text(),scalar.producers(),scalar.reasons(),gaps,scalar.traces().stream().map(t->t.withGap(gap.gap())).toList());
-            }
-        }
-        return content;
+        return content; // Only executable writes and copies contribute to content.
     }
     private Scalar project(Content content,StorageIndex.Candidate candidate) {
         if(content instanceof Scalar scalar)return scalar;
@@ -625,14 +590,12 @@ public final class RegionalValuesAnalysis {
             var supports=new TreeMap<String,Set<Integer>>();var origins=new LinkedHashSet<>(storage.subjectOrigins(query.subject()));
             var alternatives=new HashSet<StorageValueFact.Alternative>();
             boolean source=sourceOpen(query);
-            for(var gap:sourceGaps)if(resolution.candidates().stream().anyMatch(c->!storage.disjoint(c.location(),gap.location()))) {source=true;origins.add(gap.origin());}
             if(!mode.physical()){model=true;reasons.add("PHYSICAL_PROPAGATION_DISABLED");}
             if(mode.physical()&&state.reached())for(var candidate:resolution.candidates()) {
                 origins.addAll(candidate.origins());
                 int ordinal=ordinals.get(candidate.location().base().id());
                 for(var contents:engine.contents(state,candidate.location())) {
                     var value=RegionalValuesAnalysis.this.project(contents,candidate);
-                    for(var gap:value.sourceGaps()){source=true;origins.add(sourceGaps.get(gap).origin());}
                     if(value.text().isEmpty()){model=true;reasons.addAll(value.reasons());}
                     else supports.computeIfAbsent(value.text().get().value(),ignored->new HashSet<>()).addAll(value.producers());
                     var fragments=value.traces().stream().flatMap(t->fragments(t,query.point().entry(),value.text().isPresent()).stream()).distinct().sorted(StorageValueOrder.FRAGMENT).toList();
@@ -685,7 +648,7 @@ public final class RegionalValuesAnalysis {
             }
             return new StorageValueFact(query.point(),query.subject(),resolution.candidates().stream().map(c->new RegionalValueFact.Interpretation(c.location().in(query.point().entry()),c.codec())).distinct().sorted(StorageValueOrder.INTERPRETATION).toList(),
                 state.reached()?ValueFact.Reachability.REACHABLE:ValueFact.Reachability.UNREACHABLE_IN_MODEL,state.reached()?candidates:null,state.reached()?model:null,
-                source,state.reached()&&model||source,ordered(premises),ordered(evidence),ordered(origins),associations,state.reached()?List.copyOf(reasons):List.of(),alternatives.stream().sorted(StorageValueOrder.ALTERNATIVE).toList(),logicalAlternatives);
+                source,state.reached()&&model,ordered(premises),ordered(evidence),ordered(origins),associations,state.reached()?List.copyOf(reasons):List.of(),alternatives.stream().sorted(StorageValueOrder.ALTERNATIVE).toList(),logicalAlternatives);
         }
         private List<StorageValueFact.Fragment> fragments(Trace trace,EntryId entry,boolean knownText) {
             if(trace.logicalSupports().isEmpty())return List.of(fragment(trace,entry,knownText));
@@ -703,9 +666,7 @@ public final class RegionalValuesAnalysis {
                 var prepared=eventDetails.get(event);var definition=prepared.definition(entry);
                 for(var read:reads)captures.add(new StorageValueFact.Capture(definition,ProgramPoint.before(entry,prepared.operation().header().id()),read.sourceRange().in(entry),prepared.target().location().in(entry),read.sourceContribution().in(entry),read.destinationContribution().in(entry)));
             });
-            var gaps=new HashSet<Integer>(trace.gaps());
-            for(int i=0;i<sourceGaps.size();i++)if(!effects.storage().disjoint(trace.observed(),sourceGaps.get(i).location()))gaps.add(i);
-            var publicGaps=gaps.stream().map(sourceGaps::get).map(g->new StorageValueFact.SourceGap(g.location().in(entry),g.origin(),g.uncertainties())).distinct().sorted(StorageValueOrder.GAP).toList();
+            var publicGaps=List.<StorageValueFact.SourceGap>of();
             Optional<StorageValueFact.LogicalCapture> logicalCapture=Optional.empty();
             if(!trace.logicalSupports().isEmpty()) {
                 var assign=(Operations.Assign)eventDetails.get(trace.producer()).operation();

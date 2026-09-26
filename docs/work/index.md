@@ -1,5 +1,7 @@
 # Trabalho
 
+[POSITIVE_MEMORY_TOPOLOGY — W1](../campaigns/positive-memory-topology/W1-REPORT.md): IN_PROGRESS / W1 READY_FOR_REVIEW em DRAFT #45; W2/W3 não iniciadas.
+
 [FILE-DEPENDENCIES — CORE N+C CLOSED](../product/file-dependencies/closeout.md): H0–H4/W0–W9/W11 DONE; merges e main smoke PASS; W10 opcional/deferred, não faz parte do core.
 
 [EP-R2 — Order-Independent Entry & Factorized Recall](ep-r2-handoff.md): aprovado e integrado em main pelo merge 6ef181d; semântica preservada como requisito da reconciliação File Dependencies.

@@ -75,10 +75,13 @@ final class W1dEffectsTest {
         var p=input("dynamic-x8");var f=invoke(p).effectBound().otherwise();p=effect(p,new Interactions.EffectBound(f,List.of(new Interactions.OutcomeEffects(Control.NormalOutcome.INSTANCE,f))));
         var provider=new PossibleValuesProvider();assertTrue(provider.supports(key(p)));var prepared=provider.prepare(session(p),key(p));assertNotNull(prepared.refusal());assertEquals("UNSUPPORTED_EFFECT_PROFILE",prepared.refusal().reason());
     }
-    @Test void narrowerMemoryScopeIsRefusedRatherThanSilentlyIgnored() throws Exception {
+    @Test void narrowerMemoryScopeIsAppliedRatherThanSilentlyIgnored() throws Exception {
         var p=input("dynamic-x8");var f=invoke(p).effectBound().otherwise();
         p=effect(p,new Interactions.EffectBound(new Interactions.ForeignEffects(f.reads(),new Scopes.WithinMemory(new Scopes.ObjectsMemory(List.of(subject(p)))),List.of()),List.of()));
-        assertEquals("UNSUPPORTED_EFFECT_PROFILE",new PossibleValuesProvider().prepare(session(p),key(p)).refusal().reason());
+        var after=p.units().getFirst().sequences().stream().filter(s->s.terminator() instanceof Operations.Return).findFirst().orElseThrow().terminator();
+        var fact=value(p,after.header().id());
+        assertEquals(List.of(new Values.TextValue("PROGA   ")),fact.candidates());
+        assertTrue(fact.modelValueRemainder());
     }
     @Test void mustOverwriteOutsideSliceHasExplicitRefusal() throws Exception {
         var p=input("dynamic-x8");var i=invoke(p);var f=i.effectBound().otherwise();

@@ -30,7 +30,7 @@ class PlanningRuntimeTest {
             var producer=p.units().getFirst().sequences().getFirst().instructions().getFirst().header();
             assertEquals(List.of(producer.id()),fact.evidence(),"producer Assign survives to FactSink");
             assertEquals(List.of(producer.origin()),fact.provenance());assertEquals(1,fact.candidateSupports().size(),"candidate support preserved at consumer boundary");assertEquals(producer.id(),fact.candidateSupports().getFirst().producers().getFirst().evidence());
-            assertFalse(fact.modelValueRemainder());assertTrue(fact.sourceUnknownRemainder(),"source remainder survives consumer");assertTrue(fact.effectiveUnknownRemainder());
+            assertFalse(fact.modelValueRemainder());assertTrue(fact.sourceUnknownRemainder(),"source remainder survives consumer");assertFalse(fact.effectiveUnknownRemainder());
             assertEquals(1,metric(result,"observation","sourceOpenResults"));assertEquals(1,metric(result,"observation","closedInModelResults"));
             assertThrows(UnsupportedOperationException.class,()->fact.candidateSupports().clear());
         }

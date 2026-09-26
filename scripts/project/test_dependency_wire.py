@@ -83,6 +83,8 @@ class PartialDependencyWireTests(unittest.TestCase):
             self.assertEqual('2.5.0',d['version']);self.assertEqual('PARTIAL',d['analysisStatus'])
             direct=next(s for s in d['sites'] if s['operation']['localId']=='direct')
             self.assertEqual(['DIRECT'],[c['referenceName'] for c in direct['candidates']])
+            self.assertFalse(direct['effectiveUnknownRemainder'])
+            self.assertFalse(direct['interpretationUnknownRemainder'])
             if name=='unsupported-values':
                 unknown=next(s for s in d['sites'] if s['operation']['localId']=='computed')
                 self.assertEqual('ANALYSIS_INCOMPLETE',unknown['targetStatus']);self.assertTrue(unknown['effectiveUnknownRemainder'])

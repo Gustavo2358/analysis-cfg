@@ -10,7 +10,7 @@ import sys
 
 from dependency_wire import read, require
 from cfg_wire_contract import verify as verify_cfg_wire
-from e2e_w2d import locked_sp, open_call_model, execute, runtime, source_spans
+from e2e_w2d import locked_sp, open_call_model, execute, runtime, source_spans, text_leaf, literal_text
 from e2e_move_data import reference
 from prepare_w2d_producers import ROOT, git, require_local
 
@@ -48,8 +48,6 @@ def source_oracle(sp, case):
     if case == 'copy':
         require(body[1]['source']['variant'] == 'DATA', 'typed MOVE-to-MOVE composition')
         reference(body[1]['source']['reference'], 'READ', data['WS-A']); reference(body[1]['target'], 'WRITE', data['WS-PGM'])
-        proof = sp['storageIndependence']
-        require(proof['availability'] == 'KNOWN' and set(proof['members']) == set(data.values()), 'original independent storage proof')
     require(all(origin['exact'] for origin in [p['header']['provenance'], p['target']['referenceOrigin'], p['target']['paragraphOrigin'], p['normalContinuation']['provenance']]), 'exact control origins')
     return p, data, body
 
@@ -63,7 +61,7 @@ def air_oracle(air, semantic, case, source):
     labels={s['label']['localId']:s for s in seq}
     main=labels[unit['entries'][0]['initialLabel']['localId']]
     if case=='overwrite':
-        require(len(main['instructions'])==1 and main['instructions'][0]['value']['value']['value']=='OLDPROG ','old value precedes activation')
+        require(len(main['instructions'])==1 and literal_text(main['instructions'][0]['value']) == 'OLDPROG ','old value precedes activation')
         main=labels[main['terminator']['destination']['localId']]
     require(not main['instructions'] and main['terminator']['kind']=='jump','PERFORM is an explicit Jump')
     target=labels[main['terminator']['destination']['localId']]; current=target; assigns=[]
@@ -75,17 +73,17 @@ def air_oracle(air, semantic, case, source):
     returns=[s for s in seq if s['terminator']['kind']=='return'];require(len(returns)==1,'GOBACK Return')
     require(call['terminator']['outcomes']['known']==[{'kind':'normal','label':returns[0]['label']}],'CALL return')
     require(sum(s['terminator']['kind']=='invoke' for s in seq)==1,'PERFORM creates no dependency site')
-    require(assigns[0]['value']['kind'] == 'literal' and assigns[0]['value']['value']['value'] == 'PROGA   ', 'literal body value')
+    require(literal_text(assigns[0]['value']) == 'PROGA   ', 'literal body value')
     objects = {}
     for name, identity in data.items():
         item = next(i for i in p['coverage']['items'] if i['sourceKey'].endswith('/data/' + identity))
         objects[name] = next(o for o in item['outputs'] if o['domain'] == 'object')
     require(assigns[0]['destination']['object'] == objects['WS-A' if case == 'copy' else 'WS-PGM'], 'body writes correct target')
     if case == 'copy':
-        expression = assigns[1]['value']
+        expression = text_leaf(assigns[1]['value'])
         require(expression['kind'] == 'read' and expression['place']['object'] == objects['WS-A']
                 and assigns[1]['destination']['object'] == objects['WS-PGM'], 'Read copy, not constant folding')
-        require(len(p['premises']) == 1 and p['premises'][0]['assertion']['kind'] == 'disjoint_storage', 'preserved storage premise')
+        require(not p['premises'] and len({json.dumps(o['storage']['storage'], sort_keys=True) for o in unit['objects']}) == len(data), 'positive scalar bases without negative proof')
     require(call['terminator']['target']['name']['place']['object'] == objects['WS-PGM'], 'CALL reads receiver')
     for assign, fact in zip(assigns, source_body):
         spans = source_spans(p, {'origin': assign['header']['origin']}, source)
@@ -93,7 +91,7 @@ def air_oracle(air, semantic, case, source):
     control_spans = source_spans(p, {'origin': last['terminator']['header']['origin']}, source)
     required_lines = {perform['header']['provenance']['original']['startLine'], perform['target']['paragraphOrigin']['original']['startLine'], perform['normalContinuation']['provenance']['original']['startLine']}
     require(required_lines <= {int(s['span']['start']['line']) for s in control_spans}, 'return preserves callsite/paragraph/resume provenance')
-    return unit, call, assigns[0], objects['WS-PGM']
+    return unit, call, assigns[-1], objects['WS-PGM']
 
 
 def dependency_oracle(result, model, source):
@@ -108,10 +106,11 @@ def dependency_oracle(result, model, source):
     open_call_model(call['terminator'],site)
     require(site['sourceValueRemainder'] and site['interpretationUnknownRemainder'] and site['effectiveUnknownRemainder'], 'other real-source remainders remain explicit')
     supports = site['candidates'][0]['supports']
-    require(len(supports) == 1 and supports[0]['producer'] == producer['header']['id'] and supports[0]['origin'] == producer['header']['origin'], 'original literal supports copied candidate')
+    require(len(supports) == 1 and supports[0]['producer'] == producer['header']['id'] and supports[0]['origin'] == producer['header']['origin'], 'exact body producer supports resumed candidate')
     require(site['rawCandidates'][0]['supports'] == supports and result['edges'][0]['candidate'] == site['candidates'][0], 'edge/raw support consistency')
-    line = next(i for i, text in enumerate(source.read_text().splitlines(), 1) if "MOVE 'PROGA'" in text)
-    require(all(int(s['startLine']) == line == int(s['endLine']) for s in source_spans(result, supports[0], source)), 'support reaches original MOVE literal')
+    move = 'MOVE WS-A TO WS-PGM' if source.stem == 'copy' else "MOVE 'PROGA'"
+    line = next(i for i, text in enumerate(source.read_text().splitlines(), 1) if move in text)
+    require(all(int(s['startLine']) == line == int(s['endLine']) for s in source_spans(result, supports[0], source)), 'support reaches exact body value-producing MOVE')
     require(result['metrics']['possibleValuesRuns'] == 1, 'ordinary forward solver')
 
 

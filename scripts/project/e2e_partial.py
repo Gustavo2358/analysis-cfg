@@ -16,13 +16,13 @@ from prepare_w2d_producers import ROOT, git, require_local
 FIXTURES = ROOT / 'analysis-adapters/src/test/resources/cp6/partial-program'
 # Hand-written known candidates; computed CALL remainders follow the explicit AIR bounds.
 EXPECTED = {
-    'display-handler': [{'BEFORE'}, {'AFTER'}],
+    'display-handler': [{'BEFORE'}, set()],
     'control-body': [{'AFTER'}, {'INNER'}],
     'p1': [{'PROGA'}],
     'p2': [{'PROGA'}, {'PROGB'}],
     'p3': [{'PROGA'}],
     'p4': [{'PROGA'}],
-    'must-write': [set()],
+    'must-write': [{'PROGA'}],
     'read': [{'PROGA'}],
     'call-using': [{'PROGA'}],
     'call-returning': [{'PROGA'}],
@@ -52,25 +52,85 @@ def oracle(name, sp, air, result):
         require(links[ident], 'no silent source elision: ' + ident)
     by_op = {s['operation']['localId']: s for s in result['sites']}
     calls = source_calls(sp)
-    require(len(by_op) == len(calls), 'every CALL produces one distinct dependency site')
-    sites = [by_op[links[c['header']['id']][0]['localId']] for c in calls]
-    for site in sites:
-        require(site['reachability'] == 'REACHABLE', 'known or conservatively reachable site')
+    # A contextual PERFORM may publish an inactive lexical shadow alongside the
+    # executable CALL. Require every published site to trace to source and prove
+    # that exactly one site per lexical CALL is reachable in these fixtures.
+    sites = []; linked = set(); inactive = []
+    for call_index, call in enumerate(calls):
+        ids = {o['localId'] for o in links[call['header']['id']]}
+        require(ids and ids <= by_op.keys(), 'every CALL output has a dependency site')
+        linked.update(ids)
+        active = [by_op[i] for i in ids if by_op[i]['reachability'] == 'REACHABLE']
+        if name == 'display-handler' and call_index == 1:
+            require(not active and len(ids) == 1, 'post-DISPLAY CALL is behind an unproved handler completion')
+            sites.append(by_op[next(iter(ids))])
+        else:
+            require(len(active) == 1, 'one reachable site per source CALL')
+            sites.extend(active)
+        for i in ids:
+            site = by_op[i]
+            if site['reachability'] != 'REACHABLE':
+                require(site['reachability'] == 'UNREACHABLE_IN_MODEL' and not site['candidates'],
+                        'inactive lexical shadow has no invented candidate')
+                inactive.append(site)
+    require(linked == by_op.keys(), 'no dependency site without a source CALL')
+    if name == 'display-handler':
+        observed = [s for s in sp['statements'] if s['variant'] == 'OBSERVED']
+        require(len(observed) == 1 and observed[0]['normalContinuation']['availability'] == 'UNAVAILABLE',
+                'DISPLAY handler completion is not published')
+        boundary = operations[links[observed[0]['header']['id']][0]['localId']]
+        require(boundary['kind'] == 'opaque' and not boundary['envelope']['control']['known']
+                and boundary['envelope']['control']['remainder'] ==
+                {'kind': 'within', 'scope': {'kind': 'labels', 'labels': []}},
+                'DISPLAY handler retains explicit open control frontier')
+    if name == 'mixed-data':
+        numeric = [d for d in sp['dataDeclarations'] if d['canonicalName'] == 'UNMODELED-NUMBER']
+        require(len(numeric) == 1 and numeric[0]['picture'] == '9(4)'
+                and numeric[0]['scalarText'] is None and all(not s['modelValueRemainder'] for s in sites),
+                'unsupported numeric layout does not erase independent local TEXT values')
+    if name == 'entry-using':
+        signature = unit['entries'][0]['signature']
+        require(signature['parameters']['remainder']['kind'] == 'unknown'
+                and not sites[0]['modelValueRemainder'],
+                'unknown linkage input does not erase independent local CALL value')
+    if name == 'control-body':
+        require(len(inactive) == 1, 'one inactive contextual body shadow')
+        shadow = operations[inactive[0]['operation']['localId']]
+        require(not shadow['outcomes']['known'] and shadow['outcomes']['remainder'] ==
+                {'kind': 'within', 'scope': {'kind': 'labels', 'labels': []}},
+                'inactive body shadow retains its explicit open boundary')
     if name in EXPECTED:
         require(len(sites) == len(EXPECTED[name]), 'independent source site count')
         for site, values in zip(sites, EXPECTED[name]):
             actual = {c['referenceName'] for c in site['candidates']}
             require(actual == values, name + ': expected ' + repr(values) + ', got ' + repr(actual))
             invoke=operations[site['operation']['localId']]
-            open_call_model(invoke,site)
+            # Local exact values survive unrelated unknown linkage and numeric layout.
+            if site['reachability'] == 'REACHABLE':
+                open_call_model(invoke, site)
     if name in ('p5', 'if-unknown'):
         require({c['referenceName'] for c in sites[0]['candidates']} == {'PROGA'}, 'literal before control frontier survives')
         require(sites[0]['modelValueRemainder'] is False, 'earlier value remains precise')
-        require(all(s['openControlRemainder'] for s in sites[1:]), 'later sites retain control uncertainty')
+        if name == 'if-unknown':
+            branch = next(o for o in operations.values() if o['kind'] == 'branch')
+            require(branch['predicate']['kind'] == 'unknown'
+                    and branch['trueDestination'] != branch['falseDestination'],
+                    'unknown predicate retains both proved IF arms')
+            require({c['referenceName'] for c in sites[1]['candidates']} == {'PROGB', 'PROGC'}
+                    and not sites[1]['openControlRemainder'] and not sites[1]['modelValueRemainder'],
+                    'unknown predicate does not erase modeled branch values')
+        else:
+            require({c['referenceName'] for c in sites[1]['candidates']} == {'PROGB', 'PROGC'}, 'supported EVALUATE arms preserve both values')
+            require(all(not s['openControlRemainder'] and not s['modelValueRemainder'] for s in sites), 'supported EVALUATE and CALL are closed')
     if name == 'call-unknown':
         require(len(sites) == 1 and not sites[0]['candidates'] and sites[0]['effectiveUnknownRemainder'], 'unavailable name preserves open dependency site')
     if name == 'call-handlers':
         require('PROGA' in {c['referenceName'] for c in sites[0]['candidates']} and sites[0]['openControlRemainder'], 'CALL target survives unknown handler control')
+    if name == 'must-write':
+        moves = [s for s in sp['statements'] if s['variant'] == 'MOVE']
+        require(len(moves) == 2 and operations[links[moves[0]['header']['id']][0]['localId']]['kind'] == 'assign'
+                and operations[links[moves[1]['header']['id']][0]['localId']]['kind'] == 'nop',
+                'unimplemented oversized transform retains diagnostic Nop and prior supported Assign')
     if name == 'body-gap':
         require(any(o['kind'] == 'opaque' for o in operations.values()), 'semantic body gap remains conservative')
     precise = name.startswith('perform-') or name in ('if-nested', 'stress')

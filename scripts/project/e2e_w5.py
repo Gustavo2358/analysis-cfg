@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse, copy, json, os, subprocess, time
 from pathlib import Path
 from prepare_w5_producers import ROOT, digest, snapshot
+from e2e_w2d import literal_text
 from result_wire import read_result, load, verify_receipt, require, token
 
 MAIN='io.github.gustavo2358.analysis.launcher.AnalysisDataflow'
@@ -79,8 +80,8 @@ def semantic_air_oracle(air,report,expected_candidate):
         require(o['point']['position']=='BEFORE' and o['queryStatus']=='VALUE' and o['reachability']=='REACHABLE','expected point value')
         facts=[f for c in report['consumers'] for f in c['facts'] if f['query']['point']==o['point'] and f['query']['objectId']==o['subject']['objectId']]
         require(len(facts)==1 and facts[0]['sequenceId']==seq['label'],'generic fact Sequence binding')
-        literal=op['value']['value']['value'];require(o['value']['enumerated']==[literal] and literal in ({'OLDER','NEWER'} if expected_candidate=='NEWER' else {expected_candidate}),'literal/overwrite oracle')
-        require(o['value']['modelValueRemainder'] is False and o['sourceUnknownRemainder'] is True and o['effectiveUnknownRemainder'] is True,'PARTIAL source remainder preserved')
+        literal=literal_text(op['value']);require(o['value']['enumerated']==[literal] and literal in ({'OLDER','NEWER'} if expected_candidate=='NEWER' else {expected_candidate}),'literal/overwrite oracle')
+        require(o['value']['modelValueRemainder'] is False and o['sourceUnknownRemainder'] is True and o['effectiveUnknownRemainder'] is False,'known modeled value remains closed while PARTIAL source coverage stays visible')
         supports=o['candidateSupports'];require(len(supports)==1 and supports[0]['candidate']==literal,'candidate support retained')
         require(supports[0]['producers']==[dict(evidence=op['header']['id'],origin=op['header']['origin'],premiseRefs=[])],'real Assign producer/origin association')
     if not expected:require(report['analyses']==report['results']==report['consumerPlan']==report['consumers']==[],'zero-write fabricated run/fact')

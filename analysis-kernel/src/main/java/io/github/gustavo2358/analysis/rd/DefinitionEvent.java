@@ -24,14 +24,14 @@ public record DefinitionEvent(EntryId entry,Optional<OperationId> operation,Opti
     public static DefinitionEvent logicalWrite(EntryId entry,Operation operation,StatementEffects.Write write,StatementEffects.LogicalTarget target,Optional<Control.OutcomeKey> outcome) {
         boolean literal=target.sourceApplicable()&&write.source() instanceof StatementEffects.ExpressionSource e&&e.value() instanceof Expressions.Literal;
         return new DefinitionEvent(entry,Optional.of(operation.header().id()),write.occurrence(),write.slot(),outcome,Optional.empty(),literal?Kind.ASSIGN:Kind.UNKNOWN_WRITE,!literal,
-            operation.header().origin(),List.of(),operation.header().uncertainties(),List.of("LOGICAL_STORAGE_OPEN"),Optional.of(target.object()));
+            operation.header().origin(),List.of(),write.destination().uncertainties(),List.of("LOGICAL_STORAGE_OPEN"),Optional.of(target.object()));
     }
     /** Shared event materialization for RD and value provenance; no consumer reconstruction. */
     public static DefinitionEvent write(EntryId entry,Operation operation,StatementEffects.Write write,StatementEffects.Target target,Optional<Control.OutcomeKey> outcome) {
         var source=write.source();var unknown=source instanceof StatementEffects.UnknownSource||!target.sourceApplicable();
         if(source instanceof StatementEffects.ExpressionSource expression&&!(expression.value() instanceof Expressions.Literal))unknown=true;
         var kind=source instanceof StatementEffects.CapturedBytes?Kind.COPY:source instanceof StatementEffects.ExpressionSource?Kind.ASSIGN:Kind.UNKNOWN_WRITE;
-        var uncertainty=new LinkedHashSet<>(operation.header().uncertainties());uncertainty.addAll(write.destination().uncertainties());
+        var uncertainty=new LinkedHashSet<>(write.destination().uncertainties());
         if(operation instanceof Operations.HavocMust h)uncertainty.add(h.reason());
         if(operation instanceof Operations.HavocMay h)uncertainty.add(h.reason());
         var reasons=new LinkedHashSet<>(target.reasons());if(source instanceof StatementEffects.UnknownSource u)reasons.add(u.reason());

@@ -14,10 +14,13 @@ public final class DataflowAirReader {
     public DataflowAirReader(AirJson codec) { this(codec,false); }
     private DataflowAirReader(AirJson codec,boolean partialAnalysis) { this.codec=java.util.Objects.requireNonNull(codec);this.partialAnalysis=partialAnalysis; }
     public static DataflowAirReader forPartialAnalysis() { return new DataflowAirReader(new AirJson(),true); }
-    public record Read(Publication publication,long airReads,long airBytesObserved) { }
+    public record Read(Publication publication,long airReads,long airBytesObserved,String sha256) {
+        public Read(Publication publication,long airReads,long airBytesObserved){this(publication,airReads,airBytesObserved,"");}
+    }
     public Read read(Path path) throws IOException {
         byte[] bytes;
         try(var input=Files.newInputStream(path)) {bytes=input.readAllBytes();}
-        return new Read(partialAnalysis?codec.decodeForPartialAnalysis(bytes).publication():codec.decode(bytes),1,bytes.length);
+        return new Read(partialAnalysis?codec.decodeForPartialAnalysis(bytes).publication():codec.decode(bytes),1,bytes.length,sha(bytes));
     }
+    private static String sha(byte[] bytes){try{return java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(bytes));}catch(java.security.NoSuchAlgorithmException ex){throw new IllegalStateException(ex);}}
 }

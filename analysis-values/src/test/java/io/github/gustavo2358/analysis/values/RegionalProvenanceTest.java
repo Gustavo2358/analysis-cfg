@@ -25,22 +25,23 @@ class RegionalProvenanceTest {
         var gap=new Evidence.Uncertainty(GAP,"NOT_A_WHITELIST",List.of(Evidence.Dimension.VALUES),new Scopes.EntityScope(List.of(subject)),"source value not fully modeled",GAP_ORIGIN);
         return new Publication(P,p.airVersion(),p.capabilities(),p.artifacts(),List.of(unit(U,u.entries(),u.sequences(),objects)),p.storage(),p.resources(),p.artifactRelations(),origins,p.coverage(),List.of(gap),p.premises());
     }
-    @Test void copiedSourceRemainderSurvivesDisjointDestinationAndDiesOnOverwrite() {
+    @Test void sourceDiagnosticDoesNotTravelThroughCopiesOrOverwrite() {
         var p=sourceGap(twoBases(List.of(returning(U,"s0",List.of(assign(U,"x",WHOLE,"ABCDEFGH"),assign(U,"y",YWHOLE,"12345678"),
             copy("copy",R,0,Y,0,8),assign(U,"repair",YWHOLE,"WXYZWXYZ"))))),WHOLE);
         assertEquals(Evidence.InventoryStatus.COMPLETE,p.coverage().inventory());assertEquals(Evidence.InventoryStatus.COMPLETE,p.units().getFirst().coverage().inventory());
         var execution=run(p);assertFalse(at(execution,"copy",YWHOLE).sourceUnknownRemainder());
         var captured=at(execution,"repair",YWHOLE);assertEquals(List.of("ABCDEFGH"),texts(captured));assertFalse(captured.modelValueRemainder());
-        assertTrue(captured.sourceUnknownRemainder(),"captured source uncertainty must follow the copied bytes");assertTrue(captured.provenance().contains(GAP_ORIGIN));
+        assertFalse(captured.sourceUnknownRemainder(),"source coverage is not captured value uncertainty");assertFalse(captured.provenance().contains(GAP_ORIGIN));
+        assertTrue(at(execution,"copy",WHOLE).sourceUnknownRemainder(),"coverage remains visible on its diagnosed subject");
         var repaired=at(execution,"return-s0",YWHOLE);assertFalse(repaired.sourceUnknownRemainder());assertFalse(repaired.modelValueRemainder());
         assertEquals(List.of("WXYZWXYZ"),texts(repaired));
     }
-    @Test void sourceGapIsCroppedWithItsFragmentAndDoesNotContaminateCopiedSuffix() {
+    @Test void sourceDiagnosticDoesNotSplitFragmentsOrContaminateCopies() {
         var p=sourceGap(twoBases(List.of(returning(U,"s0",List.of(assign(U,"x",WHOLE,"ABCDEFGH"),assign(U,"y",YWHOLE,"12345678"),
             copy("clean-suffix",R,4,Y,0,4),copy("whole-copy",R,0,Y,0,8),slice("repair-prefix",Y,0,"WXYZ"))))),PREFIX);
         var execution=run(p);var clean=at(execution,"whole-copy",YWHOLE);
         assertEquals(List.of("EFGH5678"),texts(clean));assertFalse(clean.sourceUnknownRemainder());
-        var copied=at(execution,"repair-prefix",YWHOLE);assertTrue(copied.sourceUnknownRemainder());assertFalse(copied.modelValueRemainder());
+        var copied=at(execution,"repair-prefix",YWHOLE);assertFalse(copied.sourceUnknownRemainder());assertFalse(copied.modelValueRemainder());
         var repaired=at(execution,"return-s0",YWHOLE);assertEquals(List.of("WXYZEFGH"),texts(repaired));assertFalse(repaired.sourceUnknownRemainder());
     }
 }

@@ -19,12 +19,12 @@ class ValuesDemandTest {
         var run=PossibleValuesAnalysis.prepare(session(changed),PossibleValuesAnalysis.EFFECTS_PROFILE,Set.of(target)).analysis().orElseThrow().execute();
         expected(fact(run,before(changed,0,0)),false,"v1");assertEquals(2L,run.preparationMetrics().get("demandCellsPrepared"));
     }
-    @Test void sameCellAliasesRemainRelevantAndUnprovedDisjointnessStillRefuses() {
+    @Test void sameCellAliasesRemainRelevantAndIndependentBasesAreAdmitted() {
         var p=ValuesScaleTest.longSequence(3,3,false,true);var query=before(p,0,2);
         var run=PossibleValuesAnalysis.prepare(session(p),PossibleValuesAnalysis.EFFECTS_PROFILE,Set.of(query.subject())).analysis().orElseThrow().execute();
         expected(fact(run,query),false,"v2");assertEquals(3L,run.preparationMetrics().get("demandWritesPrepared"));
         var unproved=graph(new String[]{"A"},new int[][]{{}},3,true,false);
-        assertEquals(PossibleValuesAnalysis.Status.UNSUPPORTED,PossibleValuesAnalysis.prepare(session(unproved),PossibleValuesAnalysis.EFFECTS_PROFILE,Set.of(unproved.units().getFirst().objects().getFirst().id())).status());
+        assertEquals(PossibleValuesAnalysis.Status.ACCEPTED,PossibleValuesAnalysis.prepare(session(unproved),PossibleValuesAnalysis.EFFECTS_PROFILE,Set.of(unproved.units().getFirst().objects().getFirst().id())).status());
     }
     @Test void irrelevantWritesDoNotPrepareCandidatesOrDetailedState() {
         for(int n:new int[]{10,100,1000}) {

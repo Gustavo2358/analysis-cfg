@@ -93,7 +93,7 @@ class RegionalValuesTest {
         p=replace(p,List.of(unit(unit.id(),List.of(seeded),unit.sequences(),unit.objects())),p.coverage(),p.uncertainties(),p.premises());
         assertEquals(CfgBuildResult.Status.INVALID_IR,new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).build(p,BuildOptions.defaults()).status());
     }
-    @Test void scalarAndRegionCoexistOnlyExplicitSeparationClosesTheOtherBase() {
+    @Test void scalarAndRegionAreIndependentWithoutSeparationPremise() {
         for(boolean separated:List.of(false,true)) {
             var cellId=new StorageId(P,"logical-cell");var object=new ObjectId(U,"cell-object");
             var p=regional(List.of(returning(U,"s0",List.of(assign(U,"cell-write",object,"CELL"),assign(U,"regional-write",WHOLE,"ABCDEFGH")))));
@@ -102,9 +102,9 @@ class RegionalValuesTest {
             var storage=new ArrayList<>(p.storage());storage.add(new Memory.Cell(new Memory.StorageHeader(cellId,Optional.of(U),Memory.Lifetime.PERSISTENT,Memory.Visibility.PRIVATE,origin(P)),Types.known(Types.Builtin.TEXT)));
             var premises=separated?List.of(new Proofs.Premise(new PremiseId(P,"separate"),"manual contract","independent allocations",origin(P),new Proofs.DisjointStorage(List.of(R,cellId)))):List.<Proofs.Premise>of();
             p=new Publication(P,p.airVersion(),p.capabilities(),p.artifacts(),List.of(unit(U,unit.entries(),unit.sequences(),objects)),storage,p.resources(),p.artifactRelations(),p.origins(),p.coverage(),p.uncertainties(),premises);
-            var execution=run(p);var logical=at(execution,"return-s0",object);assertEquals(List.of("CELL"),texts(logical));assertEquals(!separated,logical.modelValueRemainder());
+            var execution=run(p);var logical=at(execution,"return-s0",object);assertEquals(List.of("CELL"),texts(logical));assertFalse(logical.modelValueRemainder());
             var regional=at(execution,"return-s0",WHOLE);assertEquals(List.of("ABCDEFGH"),texts(regional));assertFalse(regional.modelValueRemainder());
-            assertEquals(separated,regional.premises().contains(new PremiseId(P,"separate")));
+            assertTrue(regional.premises().isEmpty());
         }
     }
     @Test void wholeAreaCopyCapturesItsSourceBeforeLaterAssignment() {

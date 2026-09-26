@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "observed_on": "2026-09-19",
+  "observed_on": "2026-09-26",
   "analysis_ir": {
     "repository": "Gustavo2358/analysis-ir",
-    "commit": "3fff18e2c16663a3f599207457caa1946d2e0945",
+    "commit": "2c7f31f19efbe3211a2aea5bbda90173a9666fe2",
     "semantic_version": "2.0.0",
     "role": "normative",
     "canonical_ref": "main",
     "upstream_review": {
-      "pull_request": 7,
+      "pull_request": 8,
       "state": "merged",
       "draft": false,
-      "head_commit": "3fff18e2c16663a3f599207457caa1946d2e0945"
+      "head_commit": "b628e4c1a62de61a157cac85ae71ba4cd111052e"
     },
     "json_binding": {
       "owner": "Gustavo2358/analysis-ir",
@@ -22,13 +22,13 @@
       "targets_air_version": "2.0.0",
       "path": "bindings/json-v1.md",
       "review_path": "bindings/revisao-json-v1.md",
-      "checked_commit": "3fff18e2c16663a3f599207457caa1946d2e0945",
+      "checked_commit": "b628e4c1a62de61a157cac85ae71ba4cd111052e",
       "implemented_in_analysis_cfg": false
     },
     "files": [
       {
         "path": "README.md",
-        "git_blob_sha1": "b7a34f838a71236880b65f28213a7b024fb53ef2"
+        "git_blob_sha1": "833016987cc2e01017bf22d291a8389b4ef3ac9b"
       },
       {
         "path": "REFERENCIAS.md",
@@ -36,7 +36,7 @@
       },
       {
         "path": "bindings/json-v1.md",
-        "git_blob_sha1": "2d9c859be8f89465d57a68f8654dd107d44d2d07"
+        "git_blob_sha1": "7747afbb32931c6445f9174c20d11fb1b36b6d7a"
       },
       {
         "path": "bindings/revisao-json-v1.md",
@@ -44,19 +44,19 @@
       },
       {
         "path": "conformidade/01-invariantes.md",
-        "git_blob_sha1": "fa1309ff20fe5e2f49fb22c58aa824d606d65053"
+        "git_blob_sha1": "bbd2b2f4ab873ad57aa8874e1fce4870496de349"
       },
       {
         "path": "conformidade/02-oraculos.md",
-        "git_blob_sha1": "c9caca8d96993dae174e5b46b3e635bcd4a61bfd"
+        "git_blob_sha1": "463c1ff8c2ae671d8103e0cb69efe7e91301dc53"
       },
       {
         "path": "especificacao/00-escopo-e-convencoes.md",
-        "git_blob_sha1": "931ef7c8e748e9ba23eb4a31c6f5158911773995"
+        "git_blob_sha1": "e67074ff07265e5d5023c66e69ddb18577315ca0"
       },
       {
         "path": "especificacao/01-modelo-e-identidades.md",
-        "git_blob_sha1": "4802a29f7be3f976becbad3881399c77aa254874"
+        "git_blob_sha1": "b7713f07f9f920153356885ffb4f33af0b986a31"
       },
       {
         "path": "especificacao/02-tipos-valores-e-operandos.md",
@@ -64,31 +64,31 @@
       },
       {
         "path": "especificacao/03-memoria-e-aliases.md",
-        "git_blob_sha1": "c30e4158e98f7cf4945bff7f84eb74f61ceee18b"
+        "git_blob_sha1": "12e7861148dfd9fa8e865e0add0e13c2f9b8dc0a"
       },
       {
         "path": "especificacao/04-operacoes.md",
-        "git_blob_sha1": "5ff3486d056a6483e6c71e1003f8599b506c0464"
+        "git_blob_sha1": "185670a771e508f428851bb4bccdca934de23add"
       },
       {
         "path": "especificacao/05-controle-e-invocacoes.md",
-        "git_blob_sha1": "a43dfdecd03660abe5ab04fd935f80acb14a4a17"
+        "git_blob_sha1": "cf0a3e73555e4f0655f53b31497bfdce13f96169"
       },
       {
         "path": "especificacao/06-incompletude-e-proveniencia.md",
-        "git_blob_sha1": "79263e59a6bbb6d3189d63869a79c395947568a5"
+        "git_blob_sha1": "4db717dbbdf716a92ca7a052555c4255b69593c6"
       },
       {
         "path": "especificacao/07-contrato-de-produtores.md",
-        "git_blob_sha1": "3b4d013adbe460b5f5257ec206ab41c29c62b47f"
+        "git_blob_sha1": "4f0aa2eacf506dd2af1cd20cc2196740f19d0783"
       },
       {
         "path": "especificacao/08-contrato-de-consumidores.md",
-        "git_blob_sha1": "5011c84a606c3d435b86edbf85546ce5a86253c5"
+        "git_blob_sha1": "a772bf83209d08725ac2a53fbbe5d50b0e839d22"
       },
       {
         "path": "especificacao/09-extensibilidade-e-compatibilidade.md",
-        "git_blob_sha1": "3055651af652070e2dc3d4ef397f53ba297e01b0"
+        "git_blob_sha1": "4660faa82ad8cc84636e130f18207313da47b66a"
       },
       {
         "path": "especificacao/10-perfis-de-conformidade.md",
@@ -96,11 +96,11 @@
       },
       {
         "path": "especificacao/11-rastreabilidade-bilateral.md",
-        "git_blob_sha1": "1b00a33a241268a3e83d93552a2d3d48d32c583a"
+        "git_blob_sha1": "145c2cb056a7e8484a9b89e5f20b26b0a52a335f"
       },
       {
         "path": "exemplos/00-notacao.md",
-        "git_blob_sha1": "8705f0ea2d2e61f20ab4ece8982d18ca4f913fc2"
+        "git_blob_sha1": "5eb9f938af5f96abcdf159a3bd847d9b72769183"
       },
       {
         "path": "exemplos/01-fluxo-e-valores.md",
@@ -108,7 +108,7 @@
       },
       {
         "path": "exemplos/02-memoria-e-chamadas.md",
-        "git_blob_sha1": "5d224e45a4b1189c9a861dd451abdf30fb1dac04"
+        "git_blob_sha1": "cffdbc99b4af4667b9fcddaa9cc9636e115f922d"
       },
       {
         "path": "exemplos/03-extensoes-e-parcialidade.md",
@@ -124,7 +124,7 @@
       },
       {
         "path": "especificacao/13-possibilidades-de-entrada.md",
-        "git_blob_sha1": "d3a551bfd24a6f292ec5d7b5805a051b3fcfe344"
+        "git_blob_sha1": "5ee9768b47cd0c9de92716b0486bf776219cfcbf"
       },
       {
         "path": "especificacao/14-possibilidades-de-target.md",
@@ -136,18 +136,18 @@
       }
     ],
     "baseline_assessment": "FD-W1 resource.bindings@1 after model loss proof; AIR2.0.0/binding1.0.0.",
-    "observed_on": "2026-09-17",
+    "observed_on": "2026-09-26",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable."
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "646ca3ab1687d43f7d2063fc2a8f3837ab3cf9fa",
-    "canonical_ref": "feat/logical-text-w1",
+    "commit": "825b80d964fd289f4fad9cbeef946a71278ee1f3",
+    "canonical_ref": "main",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
     "analysis_ir": {
       "semantic_version": "2.0.0",
-      "commit": "3fff18e2c16663a3f599207457caa1946d2e0945"
+      "commit": "2c7f31f19efbe3211a2aea5bbda90173a9666fe2"
     },
     "maven": {
       "group_id": "io.github.gustavo2358",
@@ -189,7 +189,7 @@
       "air-model/src/main/java/io/github/gustavo2358/air/model/MemoryCodecs.java",
       "air-json/src/test/resources/regional.canonical.json"
     ],
-    "observed_on": "2026-09-18",
+    "observed_on": "2026-09-26",
     "modules": {
       "parent": {
         "path": "pom.xml",
@@ -275,9 +275,9 @@
       "src/main/java/io/github/gustavo2358/cobolexplorer/CicsCommandSyntax.java",
       "src/test/java/io/github/gustavo2358/cobolexplorer/CicsFileControlTest.java"
     ],
-    "semantic_product_version": "2.32.0",
+    "semantic_product_version": "2.45.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "edb64520a6269be9fa6d71cd47e6974112fbfece",
+    "commit": "26db42a40976e930749c869a6f2dfbcce37ed878",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -287,9 +287,9 @@
       "contract": "2.1.0",
       "scope": "local unconditional paragraph identity and explicit entry; G1-G5 and 1/2/5/40"
     },
-    "storage_contract_version": "1.8.0",
-    "canonical_ref": "feat/source-dependencies-w3",
-    "observed_on": "2026-09-19",
+    "storage_contract_version": "1.11.0",
+    "canonical_ref": "main",
+    "observed_on": "2026-09-26",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "fd_w1_validation": "docs/work/active/FD-W1.yaml",
@@ -298,19 +298,19 @@
     "fd_w4_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED producers, manual outcomes/USE and 28 real CLI sources twice; file-dependencies/w4-implementation.md",
     "fd_w5_validation": "QUALIFIED_LOCAL: focal/FAST, producer Q-SHARED with bounded final reuse, manual local AIR/wire and44 real CLI sources twice; file-dependencies/w5-implementation.md",
     "fd_w6_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED,19 B-SP fixtures,15 manual AIR tests and33 real CLI sources twice; file-dependencies/w6-implementation.md",
-    "status": "Dependency preservation reviewed and integrated into source-dependencies-w3",
+    "status": "Approved R7/R9 producer integrated into main; semantic implementation unchanged by consolidation",
     "fd_w8_validation": "QUALIFIED_LOCAL: producer FAST/Q-SHARED, B-SP33, CFG FAST502/Q547, manual/wire and38CICS+33native source cases twice; docs/product/file-dependencies/w8-implementation.md",
     "fd_w9_validation": "QUALIFIED_LOCAL: producer focal/FAST/Q, consumer manual/FAST/reader, 8 scope + 33 native + 38 CICS real CLI sources twice, deterministic four products; docs/product/file-dependencies/w9-implementation.md",
     "logical_text_w1": "Source E2E A-D twice deterministic; scale 10/100/1000; no physical profile. Corporate rerun not required by revised user acceptance.",
     "logical_text_semantic_product_version": "2.29.0",
     "logical_text_storage_contract_version": "1.9.0",
     "logical_text_w2": "Local producer FAST PASS; fixed logical ranges and expression transport. Selected source E2E qualification in docs/product/logical-text-w2.md.",
-    "dependency_preservation": "Bounded nominal/value preservation; see docs/domain/dependency-preservation.md; AIR/IR unchanged."
+    "dependency_preservation": "W3-R1 local complete logical TEXT view identity in SP 2.35/storage 1.11, including record/child and standalone roots; physical gaps remain coverage."
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
-    "status": "Dependency preservation reviewed and integrated into source-dependencies-w3",
-    "commit": "f8e181f95929c650181c989318f8ba23d1e68a1a",
+    "status": "R7 final corpus closeout and R9 integrated into main; qualified-source-dependencies 1.0.0 preserved",
+    "commit": "9cfdd015367eae03b21e4632bcd2119b601624cd",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -322,8 +322,8 @@
     "goto_validation": {
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
     },
-    "canonical_ref": "feat/source-dependencies-w3",
-    "observed_on": "2026-09-19",
+    "canonical_ref": "main",
+    "observed_on": "2026-09-26",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "fd_w1_validation": "docs/work/active/FD-W1.yaml",
@@ -337,7 +337,16 @@
     "fd_w11_validation": "Current-version LOGICAL_SOURCE negotiation fixed; B-SP version21-28/legacy18, fixed FAST and qualification-local PASS; final CLI/corpus pending",
     "logical_text_w1": "Source E2E A-D twice deterministic; scale 10/100/1000; no physical profile. Corporate rerun not required by revised user acceptance.",
     "logical_text_w2": "Local producer FAST PASS; fixed logical ranges and expression transport. Selected source E2E qualification in docs/product/logical-text-w2.md.",
-    "dependency_preservation": "Bounded nominal/value preservation; see docs/domain/dependency-preservation.md; AIR/IR unchanged."
+    "dependency_preservation": "W3-R1 positive logical Cell projection for complete record/child and standalone TEXT views; FILE effects retain published strength.",
+    "qualified_source_dependencies": {
+      "schema": "qualified-source-dependencies",
+      "version": "1.0.0",
+      "producer_api": "io.github.gustavo2358.lower.application.QualifiedSourceProjection",
+      "source_state_checkpoint": "0fa8e6942c7233adb5fa30cf8e19eabdc3fb9f17",
+      "approved_sp_producer": "26db42a40976e930749c869a6f2dfbcce37ed878",
+      "schema_sha256": "09a2e40d0743a9a9978aa8a0a6e18e3e41e91c32202478635dbf741b8e83c646",
+      "review": 34
+    }
   },
   "external": [
     {
@@ -392,5 +401,11 @@
     "air_model_changed": false,
     "physical_fallback": false,
     "db2_authority": "STATIC_SQL_TABLE_POSITION"
+  },
+  "positive_memory_topology": {
+    "wave": "W3-R1",
+    "mode_default": "LOGICAL_ONLY",
+    "physical": "EXPERIMENTAL_EXPLICIT_OPT_IN_ONLY",
+    "report": "docs/campaigns/positive-memory-topology/W2-REPORT.md"
   }
 }

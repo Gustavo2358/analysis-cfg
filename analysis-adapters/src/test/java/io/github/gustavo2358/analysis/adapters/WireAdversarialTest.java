@@ -33,7 +33,7 @@ final class WireAdversarialTest {
     @Test void distinctCandidatesKeepTheirOwnProducerSupport()throws Exception {
         var p=WireTest.fixture();var o=p.result().results().getFirst().observations().getFirst();var old=(ValueFact)o.value();var u=o.query().point().entry().unit();
         var a=new OperationId(u,"producer-a");var b=new OperationId(u,"producer-b");var origin=new OriginId(u.publication(),"origin");
-        var f=new ValueFact(old.cell(),ValueFact.Reachability.REACHABLE,List.of(new TextValue("A"),new TextValue("B")),false,true,true,List.of(),List.of(a,b),List.of(origin),List.of(new ValueFact.CandidateSupport(new TextValue("A"),List.of(new ValueFact.Support(a,origin,List.of()))),new ValueFact.CandidateSupport(new TextValue("B"),List.of(new ValueFact.Support(b,origin,List.of())))));
+        var f=new ValueFact(old.cell(),ValueFact.Reachability.REACHABLE,List.of(new TextValue("A"),new TextValue("B")),false,true,false,List.of(),List.of(a,b),List.of(origin),List.of(new ValueFact.CandidateSupport(new TextValue("A"),List.of(new ValueFact.Support(a,origin,List.of()))),new ValueFact.CandidateSupport(new TextValue("B"),List.of(new ValueFact.Support(b,origin,List.of())))));
         var out=new ByteArrayOutputStream();var json=new JsonOutput(out);json.value(ResultJson.observation(p,new ObservationBatch.Observation<>(o.query(),o.status(),null,f)));json.finish();var text=out.toString(StandardCharsets.UTF_8);
         assertTrue(text.contains("\"candidate\":\"A\",\"producers\":[{\"evidence\":{\"domain\":\"operation\",\"localId\":\"producer-a\""));
         assertTrue(text.contains("\"candidate\":\"B\",\"producers\":[{\"evidence\":{\"domain\":\"operation\",\"localId\":\"producer-b\""));
@@ -77,7 +77,7 @@ final class WireAdversarialTest {
         var p=WireTest.fixture();var q=p.result().results().getFirst().observations().getFirst().query();var out=new ByteArrayOutputStream();var json=new JsonOutput(out);
         json.value(ResultJson.observation(p,new ObservationBatch.Observation<>(q,ObservationBatch.QueryStatus.UNSUPPORTED_POINT,ObservationBatch.PointReason.AFTER_TERMINATOR,null)));json.finish();String refused=out.toString(StandardCharsets.UTF_8);
         for(String f:List.of("value","reachability","precision","sourceUnknownRemainder","effectiveUnknownRemainder"))assertTrue(refused.contains("\""+f+"\":null"));
-        var cell=p.subjectCells().values().iterator().next();var value=new ValueFact(cell,ValueFact.Reachability.UNREACHABLE_IN_MODEL,null,null,true,true,List.of(),List.of(),List.of(),List.of());out.reset();json=new JsonOutput(out);json.value(ResultJson.observation(p,new ObservationBatch.Observation<>(q,ObservationBatch.QueryStatus.VALUE,null,value)));json.finish();
+        var cell=p.subjectCells().values().iterator().next();var value=new ValueFact(cell,ValueFact.Reachability.UNREACHABLE_IN_MODEL,null,null,true,false,List.of(),List.of(),List.of(),List.of());out.reset();json=new JsonOutput(out);json.value(ResultJson.observation(p,new ObservationBatch.Observation<>(q,ObservationBatch.QueryStatus.VALUE,null,value)));json.finish();
         String unreachable=out.toString(StandardCharsets.UTF_8);assertTrue(unreachable.contains("\"value\":null"));assertTrue(unreachable.contains("UNREACHABLE_IN_MODEL"));assertTrue(unreachable.contains("\"sourceUnknownRemainder\":true"));
     }
     @Test void invalidUnicodeIsEncodingFailureAndDoesNotCertifyDelivery()throws Exception {

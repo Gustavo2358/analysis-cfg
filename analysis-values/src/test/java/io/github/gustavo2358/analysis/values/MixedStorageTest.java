@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static io.github.gustavo2358.analysis.values.ValuesFixtures.*;
 import static io.github.gustavo2358.analysis.values.RegionalValuesTest.*;
 class MixedStorageTest {
-    @Test void unknownRegionAndCodecRetainInventoryAndInterfereOnlyWithoutSeparationProof() {
+    @Test void unknownRegionAndCodecRetainInventoryWithoutCrossBaseInterference() {
         for(boolean separated:List.of(false,true)) {
             var cell=new StorageId(P,"cell");var open=new StorageId(P,"open-region");var logical=new ObjectId(U,"logical");var opaque=new ObjectId(U,"opaque");var reason=new UncertaintyId(P,"unsupported-storage");
             var h=header(U,"opaque-write");var havoc=new Operations.HavocMay(h,new Scopes.ObjectsMemory(List.of(opaque)),reason);
@@ -23,7 +23,7 @@ class MixedStorageTest {
             p=new Publication(P,p.airVersion(),p.capabilities(),p.artifacts(),List.of(unit(U,u.entries(),u.sequences(),objects)),storage,p.resources(),p.artifactRelations(),p.origins(),p.coverage(),uncertainties,premises);
             assertEquals(3,p.storage().size());assertEquals(5,p.units().getFirst().objects().size());
             var execution=run(p);
-            for(var object:List.of(logical,WHOLE)) {var fact=at(execution,"return-s0",object);assertEquals(List.of(object.equals(logical)?"CELL":"PGM00001"),texts(fact));assertEquals(!separated,fact.modelValueRemainder());}
+            for(var object:List.of(logical,WHOLE)) {var fact=at(execution,"return-s0",object);assertEquals(List.of(object.equals(logical)?"CELL":"PGM00001"),texts(fact));assertFalse(fact.modelValueRemainder());}
             var query=new io.github.gustavo2358.analysis.query.PointQuery<>(io.github.gustavo2358.analysis.query.ProgramPoint.before(new EntryId(U,"entry"),new OperationId(U,"return-s0")),opaque);
             var observation=execution.observe(List.of(query)).observations().getFirst();
             assertTrue(observation.status()!=io.github.gustavo2358.analysis.query.ObservationBatch.QueryStatus.VALUE||observation.value().modelValueRemainder(),"unknown codec never becomes a closed empty value");

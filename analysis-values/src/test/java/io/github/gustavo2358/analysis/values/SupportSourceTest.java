@@ -40,12 +40,12 @@ class SupportSourceTest {
             var f=fact(run,new PointQuery<>(point,u.objects().getFirst().id()));expected(f,false,"BOOT");
             boolean open=entry==u.entries().getFirst();
             assertEquals(open,f.sourceUnknownRemainder(),"W3-F2 EntryState uncertainty independent of complete publication/unit/object");
-            assertEquals(open,f.effectiveUnknownRemainder());
+            assertFalse(f.effectiveUnknownRemainder());
         }
     }
     @Test void relevantAliasSourceGapCannotDisappearByQueryingExactAlias() {
         var p=aliasGap(false,Evidence.Dimension.VALUES);var f=fact(execute(p),before(p,1,0));expected(f,false,"PROGA");
-        assertTrue(f.sourceUnknownRemainder(),"W3-F2 same-Cell alias value gap");assertTrue(f.effectiveUnknownRemainder());
+        assertTrue(f.sourceUnknownRemainder(),"W3-F2 same-Cell alias value gap");assertFalse(f.effectiveUnknownRemainder());
         p=aliasGap(false,Evidence.Dimension.STORAGE);f=fact(execute(p),before(p,1,0));assertTrue(f.sourceUnknownRemainder(),"same-Cell storage gap");
     }
     @Test void sourceGapDoesNotLeakFromOtherCellOrDependencyDimension() {

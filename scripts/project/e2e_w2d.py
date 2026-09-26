@@ -34,19 +34,58 @@ def runtime(producer):
 
 def locked_sp(sp):
     version=json.loads((ROOT/'docs/sources/sources.lock.json').read_text())['proleap_poc']['semantic_product_version']
-    require(sp['contractVersion']==version, 'exact current locked SP contract')
+    # The producer pin is SP2.38. Each historical fixture may publish an earlier
+    # contract version according to its own public features, including structural
+    # PERFORM and ordinary continuations in the current producer.
+    require(version == '2.38.0' and sp.get('sourceDependencies') is not None, 'locked source-dependency generation')
+    require(not any(s.get('copySemantics') == 'POSSIBLE_TEXT' or s['variant'].startswith('CICS')
+                    for s in sp['statements']), 'fixture stays within scoped source-dependency evidence')
+    published = tuple(map(int, sp['contractVersion'].split('.')))
+    floor = (2, 31, 0)
+    if sp.get('storage', {}).get('logicalExactViews'):
+        floor = (2, 35, 0)
+    if any(s.get('publicationKind') == 'STRUCTURAL_FACTS' for s in sp['statements']):
+        floor = max(floor, (2, 36, 0))
+    if sp.get('ordinaryContinuations'):
+        floor = max(floor, (2, 37, 0))
+    if any(s.get('logicalTransfers') for s in sp['statements']):
+        floor = max(floor, (2, 38, 0))
+    require(floor <= published <= (2, 38, 0), 'published SP contract covers fixture features')
 
 
-def open_call_model(invoke, site):
-    # Independent AIR law: an all-control remainder may revisit BEFORE this CALL
-    # after its all-memory may-write. Literal targets do not query that memory.
-    require(invoke['outcomes']['remainder']['kind']=='within' and
-            invoke['outcomes']['remainder']['scope']['kind']=='all', 'source CALL control bound')
-    effect=invoke['effectBound']['otherwise']
-    require(effect['writes']['kind']=='within' and effect['writes']['scope']['kind']=='all'
-            and not effect['mustOverwrite'], 'source CALL conservative write bound')
-    expected=invoke['target']['kind']=='computed'
-    require(site['modelValueRemainder'] is expected, 'open source CALL memory; literal independent')
+def text_leaf(expression):
+    """Verify the public logical fitting envelope and retain the original operand."""
+    while expression['kind'] == 'fit_text':
+        require(int(expression['length']) > 0 and expression['pad'] == ' ', 'supported space-padded logical fit')
+        require(expression['header']['role'] == 'VALUE_READ', 'fit retains value-read role')
+        expression = expression['value']
+    return expression
+
+
+def literal_text(expression):
+    if expression['kind'] == 'fit_text':
+        text_leaf(expression)  # Check each public operation, never skip an unknown transform.
+        length = int(expression['length'])
+        return literal_text(expression['value'])[:length].ljust(length)
+    require(expression['kind'] == 'literal' and expression['value']['kind'] == 'text', 'actual TEXT literal')
+    return expression['value']['value']
+
+
+def open_call_model(invoke, site, *, model_open=False, normal_continuation=True):
+    # W1: missing external implementation does not publish memory/control effects.
+    # Value openness is asserted independently from each fixture's BEFORE path.
+    if normal_continuation:
+        require(invoke['outcomes']['remainder']['kind'] == 'none', 'modeled normal CALL has closed outcomes')
+        require(len(invoke['outcomes']['known']) == 1 and invoke['outcomes']['known'][0]['kind'] == 'normal',
+                'preserve modeled normal continuation')
+    else:
+        # Explicit W2/M13 boundary: no materialized completion is still an open frontier.
+        require(not invoke['outcomes']['known'] and invoke['outcomes']['remainder']['kind'] == 'within'
+                and invoke['outcomes']['remainder']['scope']['kind'] == 'all', 'unmodeled completion remains explicit')
+    effect = invoke['effectBound']['otherwise']
+    require(effect['reads']['kind'] == 'none' and effect['writes']['kind'] == 'none'
+            and not effect['mustOverwrite'], 'missing external body creates no memory effect')
+    require(site['modelValueRemainder'] is model_open, 'BEFORE target openness follows supported path')
 
 
 def source_spans(result, support, source):
@@ -86,10 +125,10 @@ def air_oracle(air, opened):
     assignments = [i for s in seq for i in s['instructions']]
     require(all(i['kind'] == 'assign' for i in assignments), 'only actual assignments, no havoc')
     expected = ['PROGA   '] if opened else ['PROGA   ', 'PROGB   ']
-    require(sorted(i['value']['value']['value'] for i in assignments) == expected, 'exact padded AIR assignments')
-    require(yes['instructions'][0]['value']['value']['value'] == 'PROGA   ', 'true arm assignment')
+    require(sorted(literal_text(i['value']) for i in assignments) == expected, 'exact padded AIR assignments')
+    require(literal_text(yes['instructions'][0]['value']) == 'PROGA   ', 'true arm assignment')
     if not opened:
-        require(no['instructions'][0]['value']['value']['value'] == 'PROGB   ', 'false arm assignment')
+        require(literal_text(no['instructions'][0]['value']) == 'PROGB   ', 'false arm assignment')
     invoke = call['terminator']
     require(invoke['outcomes']['known'] == [{'kind': 'normal', 'label': ret['label']}], 'normal Invoke continuation')
     return unit, call, assignments
@@ -103,10 +142,10 @@ def dependency_oracle(result, air, source, opened):
     require(site['operation'] == invoke['header']['id'] and site['sequence'] == call['label'] and site['offset'] == 0, 'join Invoke identity')
     require(site['valuePoint']['position'] == 'BEFORE' and site['valuePoint']['operationId'] == site['operation'], 'BEFORE Invoke observation')
     require(site['targetKind'] == 'COMPUTED' and site['reachability'] == 'REACHABLE', 'reachable dynamic CALL')
-    open_call_model(invoke,site)
+    open_call_model(invoke, site, model_open=opened)
     # These are independent existing source/name-policy dimensions, not inferred from model closure.
     require(site['sourceValueRemainder'] and site['interpretationUnknownRemainder'] and site['effectiveUnknownRemainder'], 'preserve source/interpretation/effective remainders')
-    require(site['openControlRemainder'], 'preserve real source open control')
+    require(not site['openControlRemainder'], 'supported diamond and normal continuation stay closed')
     names = ['PROGA'] if opened else ['PROGA', 'PROGB']
     raw = [name.ljust(8) for name in names]
     require([c['referenceName'] for c in site['candidates']] == names, 'exact known dependencies')
@@ -121,12 +160,12 @@ def dependency_oracle(result, air, source, opened):
         require(len(candidate['supports']) == 1, 'candidate-specific single support')
         support = candidate['supports'][0]
         require(site['rawCandidates'][index]['supports'] == candidate['supports'], 'same raw/interpreted supports')
-        assign = next(a for a in assignments if a['value']['value']['value'] == raw[index])
+        assign = next(a for a in assignments if literal_text(a['value']) == raw[index])
         require(support['kind'] == 'VALUE_PRODUCER' and support['producer'] == assign['header']['id'] and support['origin'] == assign['header']['origin'], 'candidate supports only its own Assign')
         require(site['subject'] == assign['destination']['object'] == invoke['target']['name']['place']['object'], 'real WS-PGM object identity')
         line = 11 if name == 'PROGA' else 13
         spans = source_spans(result, support, source)
-        require(all(s['startLine'] == str(line) and s['endLine'] == str(line) for s in spans), 'support must not cross source arms')
+        require(all(int(s['startLine']) == line == int(s['endLine']) for s in spans), 'support must not cross source arms')
         require("MOVE '" + name + "' TO WS-PGM" in source.read_text().splitlines()[line - 1], 'manual COBOL MOVE oracle')
 
 
@@ -151,8 +190,8 @@ def run(work, config_path):
             sp = cwd / 'sp/cobol-semantic-product.json'
             semantic = json.loads(sp.read_text())
             version = semantic['contractVersion']
-            require(version == config['semanticProductVersion'] == lock['proleap_poc']['semantic_product_version'],
-                    'W2D must consume the exact locked SP version; actual producer emitted ' + version)
+            require(config['semanticProductVersion'] == lock['proleap_poc']['semantic_product_version'], 'locked producer contract generation')
+            locked_sp(semantic)
             require(semantic['unit']['canonicalProgramName'] == 'CALLER', 'real caller program identity')
             air = cwd / 'program.air.json'
             execute(cwd, 'lower', ['java', '-cp', os.pathsep.join(config['lower']['classpath']), config['lower']['main'], str(sp), str(air)])

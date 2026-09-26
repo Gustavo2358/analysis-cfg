@@ -36,12 +36,26 @@ public final class StatementEffects {
         public Statement { reads=List.copyOf(reads);writes=List.copyOf(writes);outcomes=Map.copyOf(outcomes);otherwise=List.copyOf(otherwise); }
     }
     private final StorageIndex storage;
-    private final List<ObjectId> openObjects;
+    private record OpenLocation(ObjectId object,StorageIndex.Location location) { }
+    private final Map<StorageId,List<OpenLocation>> openByBase;
     private final Map<OperationId,Statement> statements=new LinkedHashMap<>();
-    private long operandVisits,targetsPrepared,baseComparisons;
+    private long operandVisits,targetsPrepared,directTargetsPrepared,boundTargetsPrepared,explicitBroadTargetsPrepared,baseComparisons;
     public StatementEffects(StorageIndex storage) {
         this.storage=Objects.requireNonNull(storage);
-        openObjects=storage.declarations().stream().filter(o->!storage.object(o.id()).exact()).map(Memory.ObjectDeclaration::id).toList();
+        var byBase=new HashMap<StorageId,List<OpenLocation>>();
+        for(var object:storage.declarations()) {
+            var resolution=storage.object(object.id());if(resolution.exact())continue;
+            var locations=new LinkedHashSet<StorageIndex.Location>();
+            resolution.candidates().forEach(c->locations.add(c.location()));
+            if(resolution.remainder() instanceof Scopes.WithinMemory w) {
+                try { storage.select(w.scope()).candidates().forEach(c->locations.add(c.location())); }
+                catch(StorageIndex.UngroundedBound unusedNominalBound) {
+                    // Admission checks executable uses; a nominal, unused cycle has no indexable scope.
+                }
+            }
+            for(var location:locations)byBase.computeIfAbsent(location.base().id(),ignored->new ArrayList<>()).add(new OpenLocation(object.id(),location));
+        }
+        byBase.replaceAll((id,values)->List.copyOf(values));openByBase=Map.copyOf(byBase);
         for(var unit:storage.session().index().publication().units())for(var sequence:unit.sequences()) {
             for(var operation:sequence.instructions())statements.put(operation.header().id(),prepare(operation));
             var operation=sequence.terminator();statements.put(operation.header().id(),prepare(operation));
@@ -49,7 +63,9 @@ public final class StatementEffects {
     }
     public StorageIndex storage() { return storage; }
     public Collection<Statement> statements() { return Collections.unmodifiableCollection(statements.values()); }
-    public Map<String,Long> preparationMetrics() { return Map.of("statementsPrepared",(long)statements.size(),"operandVisits",operandVisits,"targetsPrepared",targetsPrepared,"baseComparisons",baseComparisons); }
+    public Map<String,Long> preparationMetrics() { return Map.of("statementsPrepared",(long)statements.size(),"operandVisits",operandVisits,
+        "targetsPrepared",targetsPrepared,"directTargetsPrepared",directTargetsPrepared,"boundTargetsPrepared",boundTargetsPrepared,
+        "explicitBroadTargetsPrepared",explicitBroadTargetsPrepared,"baseComparisons",baseComparisons); }
     public Statement statement(OperationId operation) {
         var result=statements.get(operation);if(result==null)throw new IllegalArgumentException("operation outside prepared snapshot");return result;
     }
@@ -106,41 +122,28 @@ public final class StatementEffects {
     }
     /** Normalized finite targets; only a proved singleton can replace old contributors. */
     public List<Target> targets(StorageIndex.Resolution destination,Strength requested) {
+        return targets(destination,requested,false,false);
+    }
+    private List<Target> targets(StorageIndex.Resolution destination,Strength requested,boolean scoped,boolean broad) {
         var result=new LinkedHashSet<Target>();var direct=new ArrayList<StorageIndex.Candidate>(destination.candidates());
         for(var candidate:direct) {
             var location=candidate.location();if(location.range().isPresent()&&location.range().get().empty())continue;
-            var proof=new LinkedHashSet<PremiseId>();
-            for(var base:storage.bases()) {
-                var other=storage.whole(base.header().id());
-                if(other.base().id().equals(location.base().id()))continue;
-                baseComparisons++;
-                if(storage.disjoint(location,other))proof.addAll(storage.separationPremises(location,other));
-                else result.add(new Target(other,Strength.MAY,false,List.of(),List.of("UNPROVEN_BASE_SEPARATION")));
+            if(result.add(new Target(location,requested==Strength.MUST&&destination.exact()?Strength.MUST:Strength.MAY,true,List.of(),destination.reasons()))) {
+                if(broad)explicitBroadTargetsPrepared++;else if(scoped)boundTargetsPrepared++;else directTargetsPrepared++;
             }
-            result.add(new Target(location,requested==Strength.MUST&&destination.exact()?Strength.MUST:Strength.MAY,true,List.copyOf(proof),destination.reasons()));
         }
         if(destination.remainder() instanceof Scopes.WithinMemory remainder) {
-            var scopes=new ArrayDeque<Scopes.MemoryScope>();var visited=new HashSet<Scopes.MemoryScope>();scopes.add(remainder.scope());
-            while(!scopes.isEmpty()) {
-                var scope=scopes.remove();
-                if(!visited.add(scope)) {
-                    // Self-referential safe scopes carry no usable base bound. Retain an all-base MAY effect.
-                    for(var base:storage.bases())result.add(new Target(storage.whole(base.header().id()),Strength.MAY,false,List.of(),List.of("UNRESOLVED_SCOPE")));
-                    continue;
-                }
-                var selected=storage.select(scope);
-                for(var candidate:selected.candidates()) {
-                    var location=candidate.location();result.add(new Target(location,Strength.MAY,false,List.of(),destination.reasons()));
-                    for(var base:storage.bases()) {
-                        var other=storage.whole(base.header().id());
-                        if(!other.base().id().equals(location.base().id())&&!storage.disjoint(location,other))
-                            result.add(new Target(other,Strength.MAY,false,List.of(),List.of("UNPROVEN_BASE_SEPARATION")));
-                    }
-                }
-                if(selected.remainder() instanceof Scopes.WithinMemory w && !(scope instanceof Scopes.AllMemory))scopes.add(w.scope());
+            var selected=storage.select(remainder.scope());
+            boolean remainderBroad=broad||explicitBroad(remainder.scope());
+            for(var candidate:selected.candidates())if(result.add(new Target(candidate.location(),Strength.MAY,false,List.of(),destination.reasons()))) {
+                if(remainderBroad)explicitBroadTargetsPrepared++;else boundTargetsPrepared++;
             }
         }
         targetsPrepared+=result.size();return List.copyOf(result);
+    }
+    private static boolean explicitBroad(Scopes.MemoryScope scope) {
+        if(scope instanceof Scopes.AllMemory||scope instanceof Scopes.VisibleMemory)return true;
+        return scope instanceof Scopes.MemoryUnion union&&union.members().stream().anyMatch(StatementEffects::explicitBroad);
     }
     private final class Builder {
         final Operation operation;
@@ -151,16 +154,22 @@ public final class StatementEffects {
         void write(List<Write> out,Optional<OperandId> occurrence,StorageIndex.Resolution destination,Strength strength,Source source) {
             if(storage.session().index().unprovedPreconditions(operation.header().id()))strength=Strength.MAY;
             var place=occurrence.map(places::get).orElse(null);
-            out.add(new Write(nextSlot++,occurrence,destination,source,targets(destination,strength),Selection.SINGLE_DESTINATION,strength,logicalTargets(place)));
+            var targets=targets(destination,strength);
+            out.add(new Write(nextSlot++,occurrence,destination,source,targets,Selection.SINGLE_DESTINATION,strength,logicalTargets(place,targets)));
         }
-        List<LogicalTarget> logicalTargets(Place place) {
-            // Open bindings may alias a written location. Only an explicit object destination
-            // supplies a value; possible aliases receive uncertainty, never invented literals.
-            return openObjects.stream().map(id->new LogicalTarget(id,place instanceof Places.ObjectPlace p&&p.object().equals(id))).toList();
+        List<LogicalTarget> logicalTargets(Place place,List<Target> targets) {
+            // Index once by positive storage scope; no write scans unrelated open objects.
+            var explicit=place==null?List.<ObjectId>of():storage.explicitObjects(place);
+            var result=new LinkedHashMap<ObjectId,Boolean>();
+            for(var id:explicit)if(!storage.object(id).exact())result.put(id,true);
+            for(var target:targets)for(var open:openByBase.getOrDefault(target.location().base().id(),List.of()))
+                if(!storage.disjoint(target.location(),open.location()))result.putIfAbsent(open.object(),false);
+            return result.entrySet().stream().map(e->new LogicalTarget(e.getKey(),e.getValue())).toList();
         }
         void scopeWrite(List<Write> out,Scopes.MemoryScope scope,String reason) {
             var destination=storage.select(scope);
-            out.add(new Write(nextSlot++,Optional.empty(),destination,new UnknownSource(reason),targets(destination,Strength.MAY),Selection.MAY_SET,Strength.MAY,logicalTargets(null)));
+            var targets=targets(destination,Strength.MAY,true,explicitBroad(scope));
+            out.add(new Write(nextSlot++,Optional.empty(),destination,new UnknownSource(reason),targets,Selection.MAY_SET,Strength.MAY,logicalTargets(null,targets)));
         }
         void boundRead(Scopes.MemoryBound bound,ReadKind kind) { if(bound instanceof Scopes.WithinMemory w)reads.add(new Read(Optional.empty(),kind,storage.select(w.scope()))); }
         void foreign(Interactions.ForeignEffects e,List<Write> out) {

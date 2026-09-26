@@ -8,13 +8,24 @@ import static io.github.gustavo2358.analysis.storage.StorageFixtures.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class StorageIndexTest {
-    @Test void disjointPremisesAreNotTransitiveAndCodecDoesNotChangePhysicalOverlap() {
+    @Test void boundedObjectScopesResolveOnlyTheirPublishedGrounding() {
+        var scope=new Scopes.StorageMemory(List.of(base("r1")));
+        var u=declaration("u",new Memory.UnknownBinding(scope,UNKNOWN));
+        var grounded=declaration("grounded",new Memory.UnknownBinding(new Scopes.ObjectsMemory(List.of(object("q"))),UNKNOWN));
+        var index=new StorageIndex(session(publication(List.of(region("r1",8L,Memory.Lifetime.PERSISTENT),region("r2",8L,Memory.Lifetime.PERSISTENT)),
+            List.of(u,grounded,view("q","r1",0,8)),List.of(sequence("s",List.of())),List.of())));
+        assertEquals(List.of(base("r1")),index.select(scope).candidates().stream().map(c->c.location().base().id()).toList());
+        assertEquals(List.of(base("r1")),index.select(new Scopes.ObjectsMemory(List.of(object("grounded")))).candidates().stream().map(c->c.location().base().id()).toList());
+        var repeated=new Scopes.MemoryUnion(List.of(scope,new Scopes.ObjectsMemory(List.of(object("grounded"))),scope));
+        assertEquals(Set.of(base("r1")),index.select(repeated).candidates().stream().map(c->c.location().base().id()).collect(java.util.stream.Collectors.toSet()));
+    }
+    @Test void positiveBasesAndCodecDoesNotChangePhysicalOverlap() {
         var bases=List.of(region("a",8L,Memory.Lifetime.ACTIVATION),region("b",8L,Memory.Lifetime.ACTIVATION),region("c",8L,Memory.Lifetime.ACTIVATION));
         var ab=disjoint("a","b");var bc=new Proofs.Premise(new PremiseId(P,"bc"),"manual","b apart from c",O,new Proofs.DisjointStorage(List.of(base("b"),base("c"))));
         var text=new Memory.ObjectDeclaration(object("text"),Optional.empty(),Types.known(Types.Builtin.TEXT),new Memory.ViewBinding(base("a"),java.math.BigInteger.ZERO,java.math.BigInteger.valueOf(8),Memory.AsciiText.INSTANCE),Memory.Visibility.PRIVATE,O,Evidence.CoverageStatus.MODELED,header("m").precision());
         var index=new StorageIndex(session(publication(bases,List.of(view("a","a",0,8),view("b","b",0,8),view("c","c",0,8),text),List.of(sequence("s",List.of())),List.of(ab,bc))));
         var a=index.object(object("a")).candidates().getFirst();var b=index.object(object("b")).candidates().getFirst();var c=index.object(object("c")).candidates().getFirst();var t=index.object(object("text")).candidates().getFirst();
-        assertTrue(index.disjoint(a.location(),b.location()));assertTrue(index.disjoint(b.location(),c.location()));assertFalse(index.disjoint(a.location(),c.location()));
+        assertTrue(index.disjoint(a.location(),b.location()));assertTrue(index.disjoint(b.location(),c.location()));assertTrue(index.disjoint(a.location(),c.location()));
         assertEquals(a.location(),t.location());assertNotEquals(a.codec(),t.codec());
     }
     @Test void cyclicAndDanglingAssociationsFailBeforeAnalysis() {
@@ -23,6 +34,19 @@ class StorageIndexTest {
             var build=new io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator(io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry.empty()).build(p,io.github.gustavo2358.analysis.cfg.application.BuildOptions.defaults());
             assertEquals(io.github.gustavo2358.analysis.cfg.application.CfgBuildResult.Status.INVALID_IR,build.status());
         }
+    }
+    @Test void executableScopeOnlyCycleFailsAtAirPreflight() {
+        var x=object("cycle");
+        var scope=new Scopes.ObjectsMemory(List.of(x));
+        var p=publication(List.of(region("unrelated",8L,Memory.Lifetime.ACTIVATION)),
+                List.of(declaration("cycle",new Memory.UnknownBinding(scope,UNKNOWN))),
+                List.of(sequence("s",List.of(new Operations.HavocMay(header("may"),scope,UNKNOWN)))),List.of());
+        var build=new io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator(
+                io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry.empty())
+                .build(p,io.github.gustavo2358.analysis.cfg.application.BuildOptions.defaults());
+        assertEquals(io.github.gustavo2358.analysis.cfg.application.CfgBuildResult.Status.INVALID_IR,build.status());
+        assertTrue(build.graph().isEmpty());
+        assertTrue(build.preflight().issues().stream().anyMatch(issue->issue.rule().equals("I-13")));
     }
     @Test void snapshotIsolationAndPreparationCountFollowObjectsNotPairs() {
         for(int count:List.of(1,2,5,40,1000,4000)) {
@@ -48,13 +72,13 @@ class StorageIndexTest {
         assertFalse(index.disjoint(a.candidates().getFirst().location(),index.object(object("all")).candidates().getFirst().location()));
         assertEquals(a,index.resolve(place("unused","left")));
     }
-    @Test void distinctBasesRequirePremiseAndLifetimeQualifiesActivationOnly() {
+    @Test void distinctBasesIndependentAndLifetimeQualifiesActivationOnly() {
         var bases=List.of(region("r",8L,Memory.Lifetime.ACTIVATION),region("p",8L,Memory.Lifetime.PERSISTENT));
         var objects=List.of(view("a","r",0,8),view("b","p",0,8));
         for(boolean proof:List.of(false,true)) {
             var index=new StorageIndex(session(publication(bases,objects,List.of(sequence("s",List.of())),proof?List.of(disjoint("r","p")):List.of())));
             var a=index.object(object("a")).candidates().getFirst().location();var b=index.object(object("b")).candidates().getFirst().location();
-            assertEquals(proof,index.disjoint(a,b));
+            assertTrue(index.disjoint(a,b));
             assertNotEquals(a.in(new EntryId(U,"one")),a.in(new EntryId(U,"two")));
             assertEquals(b.in(new EntryId(U,"one")),b.in(new EntryId(U,"two")));
         }

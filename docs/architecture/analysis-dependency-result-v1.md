@@ -75,13 +75,14 @@ originais. Halt, Diverge, handlers e outros conjuntos finitos são recusados na
 admissão dessa slice, inclusive em órfãos.
 
 `scalar-text-direct@1` conserva a recusa de Invoke. O novo
-`scalar-text-effects@1` admite `reads/writes` NoMemory ou AllMemory, sem
-`mustOverwrite`, `perOutcome` ou results. Escopos menores não recebem tratamento
-implícito: retornam `UNSUPPORTED_EFFECT_PROFILE`. `ForeignEffectTransfer` interpreta
+`scalar-text-effects@1` admite `reads/writes` NoMemory, AllMemory,
+ObjectsMemory, StorageMemory ou uma união finita desses escopos, sem
+`mustOverwrite`, `perOutcome` ou results. VisibleMemory e formas não suportadas
+continuam com `UNSUPPORTED_EFFECT_PROFILE`. `ForeignEffectTransfer` interpreta
 somente `EffectBound` e o índice imutável de Cells preparado uma vez. NoMemory
-preserva o estado. AllMemory may-write preserva cada candidato e seus produtores,
-abrindo o remainder das Cells modeladas. Não faz strong kill nem varredura de
-objetos por Cell. O mesmo transfer é usado no solver e no replay, de modo que um
+preserva o estado. Um may-write abre o remainder apenas das Cells selecionadas
+pelo escopo, preservando cada candidato e seus produtores. Não faz strong kill
+nem promove automaticamente ObjectsMemory a AllMemory. O mesmo transfer é usado no solver e no replay, de modo que um
 loop pode abrir o valor BEFORE no fixpoint por efeito da iteração anterior.
 
 O domínio, lattice, `ValueUniverse`, `Candidates`, `PossibleValuesState`, solver
@@ -191,3 +192,13 @@ WORK-CFG-038 preserva este wire. O CFG correlacionado usa [v3](cfg-json-v3.md) q
 The additive closed source inventory and compatibility policy are defined in
 [source dependencies W3](../product/source-dependencies-w3.md). CALL/FILE fields
 retain their 2.3 semantics; source dependencies do not invoke their solvers.
+
+W8 possible TEXT values treat foreign read scopes as independent of stored-value transfer: even a visible-memory read bound leaves cells unchanged when the write bound is `NoMemory`. Finite object/storage write scopes affect only matching cells. Per-outcome effects and `mustOverwrite` outside the current profile still require explicit admission rather than silent approximation.
+
+## R9 qualified source evidence — explicit wire 2.6.0
+
+The optional source-evidence input adds a separate `sourceQualifiedDependencies`
+section under result version 2.6.0. Without this input the result remains 2.5.0.
+See the [non-executable contract](qualified-source-dependencies-v1.md) for typed
+source identities, correlated alternatives, guards/proofs and version rejection.
+This section neither uses nor changes executable `DependencySiteFact` reachability.

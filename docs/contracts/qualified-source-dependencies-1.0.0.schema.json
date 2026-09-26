@@ -1,0 +1,776 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:qualified-source-dependencies:1.0.0",
+  "$ref": "#/$defs/QualifiedSourceDependencies",
+  "$defs": {
+    "QualifiedSourceDependencies": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "version",
+        "producer",
+        "source",
+        "air",
+        "units"
+      ],
+      "properties": {
+        "schema": {
+          "const": "qualified-source-dependencies"
+        },
+        "version": {
+          "const": "1.0.0"
+        },
+        "producer": {
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/Document"
+        },
+        "air": {
+          "type": "array",
+          "maxItems": 1,
+          "items": {
+            "$ref": "#/$defs/AirCorrelation"
+          }
+        },
+        "units": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/UnitEvidence"
+          }
+        }
+      }
+    },
+    "Document": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "version",
+        "sha256"
+      ],
+      "properties": {
+        "schema": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string"
+        }
+      }
+    },
+    "AirCorrelation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "publication",
+        "sha256"
+      ],
+      "properties": {
+        "publication": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string"
+        }
+      }
+    },
+    "UnitId": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "compilationUnitId",
+        "structuralPath",
+        "canonicalProgramName"
+      ],
+      "properties": {
+        "compilationUnitId": {
+          "type": "string"
+        },
+        "structuralPath": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "canonicalProgramName": {
+          "type": "string"
+        }
+      }
+    },
+    "StatementId": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "unit",
+        "handle"
+      ],
+      "properties": {
+        "unit": {
+          "$ref": "#/$defs/UnitId"
+        },
+        "handle": {
+          "type": "string"
+        }
+      }
+    },
+    "OperandId": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "statement",
+        "handle"
+      ],
+      "properties": {
+        "statement": {
+          "$ref": "#/$defs/StatementId"
+        },
+        "handle": {
+          "type": "string"
+        }
+      }
+    },
+    "Location": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "file",
+        "startLine",
+        "startColumn",
+        "endLine",
+        "endColumn"
+      ],
+      "properties": {
+        "file": {
+          "type": "string"
+        },
+        "startLine": {
+          "type": "integer"
+        },
+        "startColumn": {
+          "type": "integer"
+        },
+        "endLine": {
+          "type": "integer"
+        },
+        "endColumn": {
+          "type": "integer"
+        }
+      }
+    },
+    "Include": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "includingFile",
+        "requestedName",
+        "includedFile",
+        "includeLine"
+      ],
+      "properties": {
+        "includingFile": {
+          "type": "string"
+        },
+        "requestedName": {
+          "type": "string"
+        },
+        "includedFile": {
+          "type": "string"
+        },
+        "includeLine": {
+          "type": "integer"
+        }
+      }
+    },
+    "Provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "expanded",
+        "original",
+        "includeChain",
+        "exact"
+      ],
+      "properties": {
+        "expanded": {
+          "$ref": "#/$defs/Location"
+        },
+        "original": {
+          "$ref": "#/$defs/Location"
+        },
+        "includeChain": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Include"
+          }
+        },
+        "exact": {
+          "type": "boolean"
+        }
+      }
+    },
+    "Statement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "provenance"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/StatementId"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        }
+      }
+    },
+    "Operand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "provenance"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/OperandId"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        }
+      }
+    },
+    "Value": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "logicalDomain",
+        "value",
+        "logicalExtent"
+      ],
+      "properties": {
+        "logicalDomain": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        },
+        "logicalExtent": {
+          "type": "integer"
+        }
+      }
+    },
+    "Occurrence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "technology",
+        "command",
+        "namespace",
+        "nameProfile",
+        "targetKind",
+        "operands",
+        "values",
+        "valueRemainder",
+        "qualifications"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/StatementId"
+        },
+        "technology": {
+          "type": "string"
+        },
+        "command": {
+          "type": "string"
+        },
+        "namespace": {
+          "type": "string"
+        },
+        "nameProfile": {
+          "type": "string"
+        },
+        "targetKind": {
+          "type": "string"
+        },
+        "operands": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Operand"
+          }
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Value"
+          }
+        },
+        "valueRemainder": {
+          "type": "boolean"
+        },
+        "qualifications": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Support": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "target",
+        "activation",
+        "cause"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string"
+        },
+        "target": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "activation": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/StatementId"
+          }
+        },
+        "cause": {
+          "type": "string"
+        }
+      }
+    },
+    "Node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "context",
+        "location",
+        "support"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "context": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        },
+        "support": {
+          "$ref": "#/$defs/Support"
+        }
+      }
+    },
+    "Registration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "statement",
+        "statementOrigin",
+        "operandOrigin"
+      ],
+      "properties": {
+        "statement": {
+          "$ref": "#/$defs/StatementId"
+        },
+        "statementOrigin": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "operandOrigin": {
+          "$ref": "#/$defs/Provenance"
+        }
+      }
+    },
+    "Target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "form",
+        "entry",
+        "registrations",
+        "programOperands",
+        "programValues"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "form": {
+          "type": "string"
+        },
+        "entry": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/StatementId"
+          }
+        },
+        "registrations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Registration"
+          }
+        },
+        "programOperands": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Operand"
+          }
+        },
+        "programValues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Value"
+          }
+        }
+      }
+    },
+    "Proof": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "rule",
+        "provenance",
+        "dependencies"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "rule": {
+          "type": "string"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "dependencies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Guard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "event",
+        "kind"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "event": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        }
+      }
+    },
+    "Event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "statement",
+        "origin",
+        "disposition",
+        "eligibility",
+        "scope",
+        "runtimeIdentity",
+        "guards",
+        "proofs"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "statement": {
+          "$ref": "#/$defs/StatementId"
+        },
+        "origin": {
+          "type": "string"
+        },
+        "disposition": {
+          "type": "string"
+        },
+        "eligibility": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "string"
+        },
+        "runtimeIdentity": {
+          "type": "string"
+        },
+        "guards": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "proofs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "event",
+        "source",
+        "target",
+        "stateOnEntry",
+        "localEntry",
+        "guards",
+        "proofs",
+        "unknownLocalRemainder",
+        "localInactivePossible",
+        "outerLevelRemainder",
+        "bypassed"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "event": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "target": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "stateOnEntry": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Support"
+          }
+        },
+        "localEntry": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "guards": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "proofs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "unknownLocalRemainder": {
+          "type": "boolean"
+        },
+        "localInactivePossible": {
+          "type": "boolean"
+        },
+        "outerLevelRemainder": {
+          "type": "boolean"
+        },
+        "bypassed": {
+          "type": "boolean"
+        }
+      }
+    },
+    "Derivation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "source",
+        "destination",
+        "callerPremise",
+        "authority",
+        "proofs",
+        "selection"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "source": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "destination": {
+          "type": "string"
+        },
+        "callerPremise": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "authority": {
+          "type": "string"
+        },
+        "proofs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "selection": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Frontier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "authority",
+        "reference",
+        "proofs"
+      ],
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "authority": {
+          "type": "string"
+        },
+        "reference": {
+          "type": "string"
+        },
+        "proofs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "UnitEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "unit",
+        "controlAvailable",
+        "statements",
+        "occurrences",
+        "targets",
+        "nodes",
+        "derivations",
+        "selections",
+        "events",
+        "guards",
+        "proofs",
+        "frontiers"
+      ],
+      "properties": {
+        "unit": {
+          "$ref": "#/$defs/UnitId"
+        },
+        "controlAvailable": {
+          "type": "boolean"
+        },
+        "statements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Statement"
+          }
+        },
+        "occurrences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Occurrence"
+          }
+        },
+        "targets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Target"
+          }
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Node"
+          }
+        },
+        "derivations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Derivation"
+          }
+        },
+        "selections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Selection"
+          }
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Event"
+          }
+        },
+        "guards": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Guard"
+          }
+        },
+        "proofs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Proof"
+          }
+        },
+        "frontiers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Frontier"
+          }
+        }
+      }
+    }
+  }
+}

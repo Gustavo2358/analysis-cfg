@@ -37,7 +37,6 @@ final class TextProfile {
     private final Set<Operation> admitted=Collections.newSetFromMap(new IdentityHashMap<>());
     TextProfile(AnalysisSession session,boolean effectAware) {this(session,effectAware,null);}
     TextProfile(AnalysisSession session,boolean effectAware,Set<ObjectId> demand) {
-        requestedObjects=demand==null?-1:demand.size();
         this.effectAware=effectAware;
         this.session=Objects.requireNonNull(session);
         var index=session.index();var publication=index.publication();
@@ -54,16 +53,7 @@ final class TextProfile {
                 sourceOpenCells.add(location.ordinal());
         }
 
-        // A single premise must cover all admitted bases. Scan premise members once, not pairs.
-        if(cells.size()>1) {
-            boolean covered=false;
-            for(var premise:publication.premises())if(premise.assertion() instanceof Proofs.DisjointStorage disjoint) {
-                var members=new HashSet<StorageId>();
-                for(var id:disjoint.storage())if(cells.containsKey(id))members.add(id);
-                if(members.size()==cells.size()){premises.add(premise.id());covered=true;break;}
-            }
-            if(!covered)throw new Refusal(false,"UNSUPPORTED_STORAGE_DISJOINTNESS");
-        }
+        // Each Cell StorageId is an independent slot; aliases share a CellBinding.
         var selected=new HashSet<Location>();
         if(demand==null)selected.addAll(cells.values());
         else {
@@ -87,6 +77,7 @@ final class TextProfile {
                 if(selected.add(source))pending.addLast(source);
             }
         }
+        requestedObjects=demand==null?subjects.size():demand.size();
         this.selected=Set.copyOf(selected);
         modeledCells=selected.stream().sorted(Comparator.comparingInt(Location::ordinal)).toList();
         for(var unit:publication.units()) {
@@ -156,7 +147,7 @@ final class TextProfile {
             conservative.put(operation,ConservativeEffectTransfer.prepare(operation,this));
         } else if(effectAware && operation instanceof Operations.Invoke invoke) {
             if(!invoke.results().isEmpty())throw new Refusal(false,"UNSUPPORTED_EFFECT_PROFILE");
-            effects.put(operation,ForeignEffectTransfer.prepare(invoke.effectBound(),modeledCells));
+            effects.put(operation,ForeignEffectTransfer.prepare(invoke.effectBound(),modeledCells,subjects));
         } else if(!(operation instanceof Operations.Nop||operation instanceof Operations.Return||operation instanceof Operations.Jump||operation instanceof Operations.Branch||operation instanceof Operations.Halt))
             throw new Refusal(false,"UNSUPPORTED_EFFECT_PROFILE");
         var write=writes.get(operation);

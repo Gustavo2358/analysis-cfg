@@ -24,6 +24,6 @@ public record ValueFact(StorageId cell,Reachability reachability,List<TextValue>
             if(candidates.isEmpty()&&!modelValueRemainder)throw new IllegalArgumentException("empty closed reached value");
         } else if(candidates!=null||modelValueRemainder!=null)throw new IllegalArgumentException("unreachable has no value");
         premises=List.copyOf(premises);evidence=List.copyOf(evidence);provenance=List.copyOf(provenance);candidateSupports=List.copyOf(candidateSupports);
-        if(effectiveUnknownRemainder!=(Boolean.TRUE.equals(modelValueRemainder)||sourceUnknownRemainder))throw new IllegalArgumentException("effective remainder");
+        if(effectiveUnknownRemainder!=Boolean.TRUE.equals(modelValueRemainder))throw new IllegalArgumentException("effective remainder");
     }
 }

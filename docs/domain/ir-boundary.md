@@ -34,8 +34,8 @@ owner completo de operação ou entry. `Signature` mantém inventários/restante
 parâmetros e resultados independentes, enquanto `InvocationOutcomes` permanece
 distinto de `ControlEnvelope`.
 
-`DisjointStorage` representa a premissa normativa universal entre bases, não um
-certificado privado nem fato com escopo seletivo. Naturais sem teto AIR são
+`DisjointStorage` é uma asserção redundante entre bases positivas independentes;
+não é condição de admissão nem autoridade de kill. Naturais sem teto AIR são
 `BigInteger`. Proveniência escrita pode usar linha/coluna ou offsets com unidade
 explícita; o consumer não fabrica coordenadas ausentes.
 

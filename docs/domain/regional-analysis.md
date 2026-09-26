@@ -16,14 +16,13 @@ unbounded abstract tail, never a zero extent or an asserted concrete allocation.
 
 Ranges are half-open BigInteger intervals. Their finite partition uses observed
 constant boundaries and an optional unknown tail, never one state per byte.
-Whole Cells have their own non-byte footprint. A DisjointStorage premise proves
-only the pairs it actually contains; pairwise transitive closure is invalid.
-Preparation indexes premise memberships without a matrix of object pairs.
+Whole Cells have their own non-byte footprint. Distinct StorageIds are independent;
+DisjointStorage is redundant. Preparation never needs a matrix of object pairs.
 
 Effects record ordered reads before writes, operand occurrences, operation/outcome,
 MUST/MAY strength and evidence. Exact destinations permit strong update on their
-own covered interval. Possible aliases in another base without separation proof
-receive weak unknown writes over their safe footprint. Ambiguous destinations never
+own covered interval. No effect is added in other bases for missing source proof.
+Explicitly modeled scoped effects and ambiguous destinations never
 strong-update all alternatives. CopyBytes reads capture the source before updates;
 fallback is used only when its precise ranges cannot be interpreted. Invoke target
 reads precede foreign effects; per-outcome bounds replace the default for that outcome.
@@ -63,11 +62,10 @@ materializes an explicit OUTCOME only when the CFG supports it. Generic batch re
 computes its subject-independent transfer once for that point/outcome; all legacy
 profiles retain their existing refusal via the default optional hook.
 
-Source gaps are indexed by physical scope and follow aliases, while an adjacent
-proved-disjoint interval stays precise. Source remainder is distinct from unknown
-model definitions. Origin, uncertainty and premise lists use explicit deterministic
-ordering. Contributed ranges joined from different alternatives express potential
-contributions, never a claim that every range is simultaneously written on a path.
+Coverage diagnostics stay outside targets, definitions, ByteImage content, captures
+and state equality. They can annotate the queried subject in presentation, but do
+not travel with copied fragments. Semantic unknown writes and entry contents still
+contribute typed definitions. Origins and premises of actual effects are preserved.
 
 AIR currently refuses literal regional initializers with VALIDATION_LIMIT, including
 a singleton, because byte/codec initializer consistency is outside its validator
@@ -76,7 +74,7 @@ entry conditions have events. Unsupported overlapping conditions are classified
 before the solve. This is not general VALUE/layout initialization support (W7).
 
 Required independent witnesses include D1[0,8), D2[0,4) yielding D2[0,4) and
-D1[4,8); unknown partial MUST/MAY, aliases, unproved cross-base overlap, alternatives,
+D1[4,8); unknown partial MUST/MAY, aliases, positive same-base overlap, alternatives,
 branch without write, loops, separate Entries, unknown tail, zero length, before/
 after and Invoke target-before-effects. Concrete per-octet test interpretation is
 independent of interval transfer/join and the solver, with explicit finite fixtures.

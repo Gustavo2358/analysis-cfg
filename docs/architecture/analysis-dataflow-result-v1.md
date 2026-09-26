@@ -1,5 +1,10 @@
 # Production result wire — 1.1.0
 
+The W1 supported projection keeps source coverage separate from computed values:
+`effectiveUnknownRemainder` for values follows only `modelValueRemainder`. CALL
+interpretation adds its genuine name-policy remainder, not source coverage.
+See [positive memory](../domain/positive-memory-topology.md).
+
 W5 implements analysis-dataflow-result and prepared-analysis-result 1.1.0; the
 external analysis-delivery-receipt is 1.0.0. The [machine contract](../evals/cp5/result-contract.json)
 and [nominal reader](../../scripts/project/result_wire.py) define closed shapes.

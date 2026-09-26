@@ -23,6 +23,6 @@ public record RegionalValueFact(ProgramPoint point,ObjectId subject,List<Interpr
         } else if(candidates!=null||modelValueRemainder!=null)throw new IllegalArgumentException("unreachable has no value");
         premises=List.copyOf(premises);evidence=List.copyOf(evidence);provenance=List.copyOf(provenance);
         candidateSupports=List.copyOf(candidateSupports);modelReasons=List.copyOf(modelReasons);
-        if(effectiveUnknownRemainder!=(Boolean.TRUE.equals(modelValueRemainder)||sourceUnknownRemainder))throw new IllegalArgumentException("effective remainder");
+        if(effectiveUnknownRemainder!=Boolean.TRUE.equals(modelValueRemainder))throw new IllegalArgumentException("effective remainder");
     }
 }

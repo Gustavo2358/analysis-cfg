@@ -21,9 +21,9 @@ SITES = {
     3: [{'PROGA', 'PROGB'}, {'PROGC', 'PROGD'}, {'PROGE'}],
     4: [{'PROGA'}, {'PROGB'}, {'PROGC'}],
     5: [{'PROGA'}, {'PROGB', 'PROGC'}, {'PROGD'}],
-    # AllControl may revisit either CALL after FORCE-C, or the WS-A -> WS-B copy.
-    6: [{'PROGA', 'PROGB', 'PROGC'}, {'PROGA', 'PROGB', 'PROGC'}],
-    7: [{'PROGA', 'PROGB'}, {'PROGA', 'PROGB'}, {'PROGA', 'PROGB'}],
+    # BEFORE each CALL: FORCE-C overwrites; a copy retains its earlier snapshot.
+    6: [{'PROGA', 'PROGB'}, {'PROGC'}],
+    7: [{'PROGA'}, {'PROGB'}, {'PROGA'}],
 }
 GLOBAL = {1: {'PROGA', 'PROGB', 'PROGC'}, 2: {'PROGA', 'PROGB', 'PROGC'},
           3: {'PROGA', 'PROGB', 'PROGC', 'PROGD', 'PROGE'}, 4: {'PROGA', 'PROGB', 'PROGC'},
@@ -126,17 +126,20 @@ def dependency_oracle(result, air, sp, case, source):
         else: require(site['valuePoint'] is None and site['subject'] is None, 'literal has no value query')
         open_call_model(invoke,site)
         require(site['sourceValueRemainder'] and site['interpretationUnknownRemainder'] and site['effectiveUnknownRemainder'], 'source/interpretation/effective remainders remain per-site')
-        require(site['openControlRemainder'], 'external control remains open')
+        require(not site['openControlRemainder'], 'supported structure and normal CALL stay closed')
         edges = [e for e in result['edges'] if e['site'] == site['operation']]
         require([e['candidate'] for e in edges] == site['candidates'] and all(e['caller'] == site['caller'] for e in edges), 'edges retain each site and its supports')
         for candidate in site['candidates']:
             name = candidate['referenceName']; require(candidate['rawValue'] == (name.ljust(8) if computed else name), 'raw literal/padded value')
             producers = [s for s in facts.values() if s['variant'] == 'MOVE' and s['source']['variant'] == 'LITERAL' and s['source']['logicalValue']['value'] == name] if computed else [call]
+            if computed and ((case == 4 and name == 'PROGB') or (case in (5, 7) and name == 'PROGA')):
+                # FitText(Read) is a value-producing transformation in the pinned baseline.
+                producers = [s for s in facts.values() if s['variant'] == 'MOVE' and s['source']['variant'] == 'DATA']
             require(len(producers) == 1, 'independent fixture producer identity')
             producer = links[producers[0]['header']['id']][2]; support = candidate['supports']
             require(len(support) == 1 and support[0]['producer'] == producer['header']['id'], 'support cannot cross sites/diamonds')
             require(support[0]['kind'] == ('VALUE_PRODUCER' if computed else 'CALL_LITERAL'), 'specific provenance kind')
-            if computed: require(support[0]['origin'] == producer['header']['origin'], 'original literal MOVE support even through copy/PERFORM')
+            if computed: require(support[0]['origin'] == producer['header']['origin'], 'exact literal or FitText copy producer through PERFORM')
             expected_line = producers[0]['header']['provenance']['original']['startLine']
             spans = source_spans(result, support[0], source)
             require(spans and all(int(s['startLine']) == expected_line == int(s['endLine']) for s in spans), 'support exact source occurrence')
@@ -162,7 +165,7 @@ def w1_regressions(work, producer, config, cp):
             (web / 'web').symlink_to(producer / 'proleap-poc/src/main/resources/web', target_is_directory=True)
             execute(cwd, 'frontend', ['java', '-cp', os.pathsep.join(config['frontend']['classpath']), config['frontend']['main'], '--source', source.name, '--copybooks', str(producer / 'proleap-poc/corpus/cpy'), '--output', str(cwd / 'sp')])
             sp = cwd / 'sp/cobol-semantic-product.json'; air = cwd / 'program.air.json'; cfg = cwd / 'cfg.json'; dep = cwd / 'dependencies.json'
-            require(json.loads(sp.read_text())['contractVersion'] == config['semanticProductVersion'], 'current pinned W1 SP')
+            locked_sp(json.loads(sp.read_text()))
             execute(cwd, 'lower', ['java', '-cp', os.pathsep.join(config['lower']['classpath']), config['lower']['main'], str(sp), str(air)])
             execute(cwd, 'cfg', ['java', '-cp', cp, 'io.github.gustavo2358.analysis.cfg.launcher.AnalysisCfg', str(air), str(cfg)])
             verify_cfg_wire(cfg.read_bytes())
@@ -173,7 +176,7 @@ def w1_regressions(work, producer, config, cp):
             require(site['operation'] == invoke['header']['id'] and site['sequence'] == sequence['label'] and site['offset'] == len(sequence['instructions']), 'W1 exact site identity')
             expected = [] if name == 'dynamic-no-move' else ['PROGA']
             require(program_candidates(result) == expected and [c['referenceName'] for c in site['candidates']] == expected, 'W1 known target/open empty regression')
-            open_call_model(invoke,site)
+            open_call_model(invoke, site, model_open=name == 'dynamic-no-move')
             require(site['sourceValueRemainder'] and site['interpretationUnknownRemainder'] and site['effectiveUnknownRemainder'], 'W1 remainders retained')
             require(result['metrics']['possibleValuesRuns'] == (0 if name == 'literal' else 1), 'W1 literal zero values analyses')
             if name == 'dynamic-x8':

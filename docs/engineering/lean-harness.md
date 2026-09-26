@@ -95,7 +95,9 @@ appropriate only when no supported candidate is known.
 Forbidden when semantic support exists: `if strongProofFails: return emptyUnknown()`;
 also forbidden: replacing a known semantic target with an unstructured Unknown that
 prevents fallback. A nominal Read does not assert physical allocation or independence.
-Physical/dataflow proof may refine weaker evidence; unavailable proof opens remainder.
+Physical/dataflow proof may refine weaker evidence. Under
+[positive-memory W1](../domain/positive-memory-topology.md), missing source-fidelity
+proof is coverage; only uncertainty inside the supported model opens remainder.
 This rule does not authorize lexical candidate scans, invented transfers, or closure.
 
 Consumer/review checklist:

@@ -22,9 +22,7 @@ public final class ReachingDefinitions {
     private final Map<EntryId,List<Initial>> initial=new HashMap<>();
     private final Map<EntryId,List<LogicalInitial>> logicalInitial=new HashMap<>();
     private record LogicalInitial(int slot,Entries.InitialCondition condition,ObjectId object,StorageIndex.Resolution resolution) { }
-    private final List<SourceGap> sourceGaps=new ArrayList<>();
     private final Map<UnitId,Boolean> controlOpen=new HashMap<>();
-    private record SourceGap(StorageIndex.Location location,OriginId origin,List<UncertaintyId> uncertainties) { }
     private record Plan(Operation operation,StatementEffects.Write write,StatementEffects.Target target,
                         Optional<Control.OutcomeKey> outcome,List<StoragePartition.Segment> segments,StatementEffects.LogicalTarget logical) { }
     private record Initial(int slot,Entries.InitialCondition condition,StatementEffects.Target target,List<StoragePartition.Segment> segments) { }
@@ -35,15 +33,10 @@ public final class ReachingDefinitions {
     }
     public ReachingDefinitions(StatementEffects effects) {
         this.effects=Objects.requireNonNull(effects);session=effects.storage().session();partition=new StoragePartition(effects);
-        for(var object:effects.storage().declarations())if(object.coverage()!=Evidence.CoverageStatus.MODELED||open(object.precision().storage())||open(object.precision().values())) {
-            var resolution=effects.storage().object(object.id());var uncertainty=new LinkedHashSet<>(object.precision().storage().reasons());uncertainty.addAll(object.precision().values().reasons());uncertainty.addAll(resolution.uncertainties());
-            for(var target:effects.targets(resolution,StatementEffects.Strength.MAY))sourceGaps.add(new SourceGap(target.location(),object.origin(),List.copyOf(uncertainty)));
-        }
         for(var unit:session.index().publication().units()) {
             boolean open=effects.storage().session().index().partialControl(unit.id()) || effects.storage().session().index().unprovedPreconditions(unit.id());
             for(var sequence:unit.sequences()) {
-                for(var instruction:sequence.instructions())open|=open(instruction.header().precision().control());
-                var terminator=sequence.terminator();open|=open(terminator.header().precision().control());
+                var terminator=sequence.terminator();
                 if(terminator instanceof Operations.Invoke i)open|=i.outcomes().remainder() instanceof Scopes.WithinControl;
                 if(terminator instanceof Operations.Opaque o)open|=o.envelope().control().remainder() instanceof Scopes.WithinControl;
             }
@@ -237,9 +230,6 @@ public final class ReachingDefinitions {
             var contributions=new LinkedHashMap<DefinitionEvent,Set<StorageIndex.Location>>();
             boolean unknown=!(resolution.remainder() instanceof Scopes.NoMemory);
             boolean source=sourceOpen(query);
-            for(var gap:owner.sourceGaps)if(resolution.candidates().stream().anyMatch(c->!storage.disjoint(c.location(),gap.location()))) {
-                source=true;origins.add(gap.origin());uncertainties.addAll(gap.uncertainties());
-            }
             if(state.reached())for(var candidate:resolution.candidates()) {
                 origins.addAll(candidate.origins());
                 for(var segment:owner.partition.intersecting(candidate.location())) {

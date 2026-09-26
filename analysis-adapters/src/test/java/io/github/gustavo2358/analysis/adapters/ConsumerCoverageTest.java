@@ -76,7 +76,7 @@ class ConsumerCoverageTest {
             assertEquals(command,site.command());assertEquals("CICS",site.technology());assertEquals("cics.program",site.namespace());
             assertEquals("cics-ts.program@1",site.nameProfile());assertEquals(DependencySiteFact.TargetStatus.RESOLVED_CANDIDATES,site.targetStatus());
             assertEquals(DependencySiteFact.SupportKind.CICS_LITERAL,site.candidates().getFirst().supports().getFirst().kind());
-            assertEquals(new OperationId(U,"consumer"),site.candidates().getFirst().supports().getFirst().producer());assertEquals(command.equals("XCTL"),site.sourceValueRemainder());assertEquals(command.equals("XCTL"),site.effectiveUnknownRemainder());
+            assertEquals(new OperationId(U,"consumer"),site.candidates().getFirst().supports().getFirst().producer());assertEquals(command.equals("XCTL"),site.sourceValueRemainder());assertFalse(site.effectiveUnknownRemainder());
             assertTrue(CallDependencyPlan.select(ValueToCallEvidenceTest.session(p)).stream().flatMap(r->r.dependencies().requiredAnalysisKeys().stream()).noneMatch(k->k.implementation().contains("Values")));
             wire(command+"-literal",result);
         }
@@ -135,7 +135,10 @@ class ConsumerCoverageTest {
             var validation=io.github.gustavo2358.air.validation.AirValidator.validate(p);assertEquals(io.github.gustavo2358.air.validation.ValidationResult.Status.STRUCTURALLY_VALID,validation.status(),mode+": "+validation.issues());
             // SameDomain is valid in-memory AIR but the pinned AIR codec does not encode it.
             var result=mode.equals("open")?new DependencyAnalysis(io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).prepare(p):analyze(p);var site=result.sites().getFirst();
-            assertEquals(DependencySiteFact.TargetStatus.UNSUPPORTED_TARGET_EXPRESSION,site.targetStatus());assertTrue(site.candidates().isEmpty());assertTrue(site.effectiveUnknownRemainder());
+            assertEquals(DependencySiteFact.TargetStatus.RESOLVED_CANDIDATES,site.targetStatus());
+            assertEquals(List.of("PROGA"),site.candidates().stream().map(DependencySiteFact.Candidate::referenceName).toList());
+            assertEquals(mode.equals("short-leaf"),site.interpretationUnknownRemainder(),"a short raw name remains uninterpretable; missing physical proof alone does not");
+            assertEquals(mode.equals("open"),site.modelValueRemainder(),"an open Choice retains its semantic remainder");assertTrue(site.effectiveUnknownRemainder());
             wire("program-choice-"+mode,result);
         }
     }
