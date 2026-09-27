@@ -141,3 +141,11 @@ specific VALIDATION_LIMIT and generic INCOMPLETE_VALIDATION. Historical CP5 evid
 above retains its original pins/defaults. The new default codec no longer has a
 16 MiB ceiling; explicit operational budgets still fail without any semantic result.
 See [the current preflight contract](../architecture/resource-limit-preflight.md).
+
+
+## Complete CardDemo IBM catalogue — 2026-09-27
+
+Producer `f8170f513eef29adfff5a94f418e1c6481ee2365`, lower `be09905ca5a8d01f26a7e57afa9bc2697fe2df98`.
+Nine observed IBM members modeled; 73/73 full production CLI runs preserve
+dependency candidates and evidence. No consumer implementation delta in this
+expansion. [Validation and equivalent-content repins](../work/carddemo-ibm-copybooks.md).
