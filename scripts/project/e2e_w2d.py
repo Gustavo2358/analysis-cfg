@@ -3,6 +3,7 @@
 import argparse
 import json
 import os
+import re
 from pathlib import Path
 import shutil
 import subprocess
@@ -34,13 +35,18 @@ def runtime(producer):
 
 def locked_sp(sp):
     version=json.loads((ROOT/'docs/sources/sources.lock.json').read_text())['proleap_poc']['semantic_product_version']
-    # The producer pin is SP2.38. Each historical fixture may publish an earlier
-    # contract version according to its own public features, including structural
-    # PERFORM and ordinary continuations in the current producer.
-    require(version == '2.38.0' and sp.get('sourceDependencies') is not None, 'locked source-dependency generation')
+    # The exact producer SHA is checked by run(). Its lock supplies the ceiling;
+    # feature-selected historical publications can be older than that ceiling.
+    def parsed(value):
+        require(isinstance(value, str) and re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", value),
+                'three-part SP contract version')
+        return tuple(map(int, value.split('.')))
+    ceiling = parsed(version)
+    require(ceiling[0] == 2 and ceiling >= (2, 31, 0)
+            and sp.get('sourceDependencies') is not None, 'locked source-dependency generation')
     require(not any(s.get('copySemantics') == 'POSSIBLE_TEXT' or s['variant'].startswith('CICS')
                     for s in sp['statements']), 'fixture stays within scoped source-dependency evidence')
-    published = tuple(map(int, sp['contractVersion'].split('.')))
+    published = parsed(sp['contractVersion'])
     floor = (2, 31, 0)
     if sp.get('storage', {}).get('logicalExactViews'):
         floor = (2, 35, 0)
@@ -50,7 +56,7 @@ def locked_sp(sp):
         floor = max(floor, (2, 37, 0))
     if any(s.get('logicalTransfers') for s in sp['statements']):
         floor = max(floor, (2, 38, 0))
-    require(floor <= published <= (2, 38, 0), 'published SP contract covers fixture features')
+    require(floor <= published <= ceiling, 'published SP contract covers fixture features')
 
 
 def text_leaf(expression):
