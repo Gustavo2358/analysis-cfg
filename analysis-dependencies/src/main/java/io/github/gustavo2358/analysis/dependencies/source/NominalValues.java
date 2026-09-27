@@ -4,7 +4,8 @@ import java.util.*;
 /** Nominal source facts. These do not assert storage allocation or executable control. */
 public record NominalValues(String authority,List<Symbol> symbols,List<Assignment> assignments,
         List<Condition> conditions,List<Query> queries) {
-    public record Symbol(String node,int extent) {
+    public record Symbol(String node,int extent,boolean modelAssumed) {
+        public Symbol(String node,int extent){this(node,extent,false);}
         public Symbol { text(node);require(extent>0,"positive nominal text extent"); }
     }
     public record Term(String kind,String value) {
@@ -26,7 +27,8 @@ public record NominalValues(String authority,List<Symbol> symbols,List<Assignmen
         public Query {text(statement);text(node);}
     }
     public NominalValues {
-        require("NOMINAL_TEXT_SOURCE_V1".equals(authority),"nominal value authority");
+        require(Set.of("NOMINAL_TEXT_SOURCE_V1","NOMINAL_TEXT_SOURCE_V2").contains(authority),"nominal value authority");
+        require(authority.equals("NOMINAL_TEXT_SOURCE_V2")||symbols.stream().noneMatch(Symbol::modelAssumed),"model marker requires V2");
         symbols=List.copyOf(symbols);assignments=List.copyOf(assignments);conditions=List.copyOf(conditions);queries=List.copyOf(queries);
         var nodes=new HashSet<String>();for(var s:symbols)require(nodes.add(s.node()),"duplicate nominal symbol");
         var writes=new HashSet<String>();for(var a:assignments){require(nodes.contains(a.target()),"nominal receiver reference");term(a.source(),nodes);require(writes.add(a.statement()+"/"+a.target()),"duplicate nominal assignment");}

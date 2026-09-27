@@ -249,3 +249,18 @@ Motivos `CONDITIONAL_*` tornam a análise parcial, mas pertencem à fonte.
 Eles preservam o `modelScope` da análise AIR, inclusive quando não há sites AIR.
 O escopo estrutural continua sendo determinado pelas ocorrências e limitações
 da análise executável; hipóteses de valores não alteram esse escopo.
+
+
+### Synthetic model assumptions
+
+Qualified source facts with `NOMINAL_TEXT_SOURCE_V2` add required boolean
+`modelAssumed` to every symbol. Model initial values are ignored. Copy/join
+propagate this authority; an influenced assignment joins prior candidates and keeps
+unknown remainder. Both raw observed text and the model-width interpretation remain
+possible. Conditions reading influenced values retain both branches. A later
+independent ordinary write can still prove a kill.
+
+Such conditional supports add `SYNTHETIC_MODEL_IS_NOT_KILL_PROOF`; evidence still
+points to original program assignments. V1 wire and ordinary semantics remain
+unchanged. These facts never synthesize AIR storage or executable CFG edges.
+See [design and oracles](../work/synthetic-dfh-structure.md).

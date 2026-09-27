@@ -54,4 +54,19 @@ class ConditionalSourceContractTest {
         var target=java.nio.file.Path.of("target/conditional-source");java.nio.file.Files.createDirectories(target);java.nio.file.Files.write(target.resolve("empty-executable.dependencies.json"),out.toByteArray());
     }
 
+
+    @Test void syntheticAuthorityRoundTripsAndCannotBeSilentlyDowngraded() throws Exception {
+        var codec=new QualifiedSourceJson();var mapper=new ObjectMapper();
+        var wire=(ObjectNode)mapper.readTree(codec.encode(source("publication")));
+        var facts=(ObjectNode)wire.path("units").get(0).path("nominalValues").path("facts");
+        facts.put("authority","NOMINAL_TEXT_SOURCE_V2");
+        var symbol=(ObjectNode)facts.path("symbols").get(0);symbol.put("modelAssumed",true);
+        var q=codec.decode(mapper.writeValueAsBytes(wire));
+        assertTrue(q.units().getFirst().nominalValues().orElseThrow().facts().symbols().getFirst().modelAssumed());
+        assertEquals(q,codec.decode(codec.encode(q)));
+        symbol.remove("modelAssumed");assertThrows(IllegalArgumentException.class,()->codec.decode(mapper.writeValueAsBytes(wire)));
+        symbol.put("modelAssumed","true");assertThrows(IllegalArgumentException.class,()->codec.decode(mapper.writeValueAsBytes(wire)));
+        symbol.put("modelAssumed",true);facts.put("authority","NOMINAL_TEXT_SOURCE_V1");
+        assertThrows(IllegalArgumentException.class,()->codec.decode(mapper.writeValueAsBytes(wire)));
+    }
 }

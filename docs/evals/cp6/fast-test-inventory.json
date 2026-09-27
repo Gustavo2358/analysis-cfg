@@ -242,7 +242,8 @@
       "conditionalFactsRoundTripAndRejectInvalidReferences",
       "sourceCandidateReachesUnifiedInventoryWithExplicitAssumptions",
       "executableValueEvidenceRefinesAndReplacesNominalHypothesis",
-      "conditionalUncertaintyDoesNotChangeExecutableScope"
+      "conditionalUncertaintyDoesNotChangeExecutableScope",
+      "syntheticAuthorityRoundTripsAndCannotBeSilentlyDowngraded"
     ]
   },
   "analysis-dataflow": {
@@ -280,7 +281,12 @@
       "branchExcludesKnownNameWithOpenStoragePremises",
       "retainedNameCarriesCopySeedAndMissingInput",
       "lowValuesCannotMatchATextWithDifferentCharacters",
-      "unknownCollatingCharacterAndUnicodeRemainExplicit"
+      "unknownCollatingCharacterAndUnicodeRemainExplicit",
+      "modelValuesAreNotSeeds",
+      "unknownModelCopyCannotKillAnObservedName",
+      "modelWidthAndUnknownOverwriteCannotEraseSourceText",
+      "modelInfluenceSurvivesACopyAndCannotFilterEitherBranch",
+      "ordinaryKnownWriteAfterModelCopyStillProvesKill"
     ]
   },
   "analysis-kernel": {

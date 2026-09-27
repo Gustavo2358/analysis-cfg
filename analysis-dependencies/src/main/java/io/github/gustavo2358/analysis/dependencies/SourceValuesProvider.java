@@ -13,10 +13,12 @@ public final class SourceValuesProvider {
         public Support {evidence=List.copyOf(evidence);assumptions=List.copyOf(assumptions);uncertainties=List.copyOf(uncertainties);}
     }
     public record Candidate(String rawValue,Support support) { }
-    private record Values(Map<String,Set<String>> candidates,boolean open) {
+    private record Values(Map<String,Set<String>> candidates,boolean open,boolean modelAssumed) {
+        Values(Map<String,Set<String>> candidates,boolean open){this(candidates,open,false);}
+        static final Values MODEL_UNKNOWN=new Values(Map.of(),true,true);
         static final Values UNKNOWN=new Values(Map.of(),true);
         Values {var copy=new TreeMap<String,Set<String>>();candidates.forEach((k,v)->copy.put(k,Set.copyOf(v)));candidates=Collections.unmodifiableMap(copy);}
-        Values join(Values other){var out=new TreeMap<>(candidates);other.candidates.forEach((k,v)->out.merge(k,v,SourceValuesProvider::union));return new Values(out,open||other.open);}
+        Values join(Values other){var out=new TreeMap<>(candidates);other.candidates.forEach((k,v)->out.merge(k,v,SourceValuesProvider::union));return new Values(out,open||other.open,modelAssumed||other.modelAssumed);}
     }
     private final UnitEvidence unit;
     private final NominalValueEvidence source;
@@ -27,6 +29,7 @@ public final class SourceValuesProvider {
     private final Map<String,NominalValues.Predicate> predicates=new HashMap<>();
     private final Map<String,Boolean> branches=new HashMap<>();
     private final Map<String,Integer> extents=new TreeMap<>();
+    private final Set<String> modelSymbols=new HashSet<>();
     private final Map<String,String> queries=new HashMap<>();
     private final Map<String,Evidence> evidence=new HashMap<>();
     private final Map<String,Map<String,Values>> before=new HashMap<>();
@@ -45,15 +48,17 @@ public final class SourceValuesProvider {
             for(var a:source.facts().assignments())if(demand.contains(a.target())&&a.source().kind().equals("READ"))changed|=demand.add(a.source().value());
             for(var c:source.facts().conditions()){var reads=reads(c.predicate());if(reads.stream().anyMatch(demand::contains))changed|=demand.addAll(reads);}
         }while(changed);
-        source.facts().symbols().stream().filter(s->demand.contains(s.node())).forEach(s->extents.put(s.node(),s.extent()));
+        source.facts().symbols().stream().filter(s->demand.contains(s.node())).forEach(s->{
+            extents.put(s.node(),s.extent());if(s.modelAssumed())modelSymbols.add(s.node());
+        });
         for(var a:source.facts().assignments())if(demand.contains(a.target())) {
             assignments.computeIfAbsent(a.statement(),k->new ArrayList<>()).add(a);
             evidence.put(writeKey(a),new Evidence("ASSIGNMENT",a.statement(),statements.get(a.statement()).provenance()));
         }
         source.facts().conditions().forEach(c->predicates.put(c.statement(),c.predicate()));
         source.branches().forEach(b->branches.put(b.derivation(),b.whenTrue()));
-        var initial=new TreeMap<String,Values>();extents.keySet().forEach(k->initial.put(k,Values.UNKNOWN));
-        for(var seed:source.seeds())if(demand.contains(seed.node())) {
+        var initial=new TreeMap<String,Values>();extents.keySet().forEach(k->initial.put(k,modelSymbols.contains(k)?Values.MODEL_UNKNOWN:Values.UNKNOWN));
+        for(var seed:source.seeds())if(demand.contains(seed.node())&&!modelSymbols.contains(seed.node())) {
             String key="seed/"+seed.node();evidence.put(key,new Evidence("DECLARATION_VALUE",seed.node(),seed.provenance()));
             initial.put(seed.node(),new Values(Map.of(TextPredicate.fit(seed.value(),extents.get(seed.node())),Set.of(key)),false));
         }
@@ -83,6 +88,7 @@ public final class SourceValuesProvider {
         for(var value:values.candidates().entrySet()) {
             var supports=value.getValue().stream().sorted().map(evidence::get).filter(Objects::nonNull).distinct().toList();
             var assumptions=new ArrayList<>(List.of("NOMINAL_DECLARATIONS_PRESERVE_MEANING","NO_UNMODELED_STORAGE_INTERFERENCE"));
+            if(values.modelAssumed())assumptions.add("SYNTHETIC_MODEL_IS_NOT_KILL_PROOF");
             if(supports.stream().anyMatch(e->e.kind().equals("DECLARATION_VALUE")))assumptions.add("DECLARATIVE_INITIAL_VALUES_APPLY");
             out.add(new Candidate(value.getKey(),new Support(PROFILE,supports,assumptions,source.uncertainties())));
         }
@@ -102,8 +108,16 @@ public final class SourceValuesProvider {
     }
     private Values assigned(NominalValues.Assignment a,Map<String,Values> state) {
         var input=term(a.source(),state);var out=new TreeMap<String,Set<String>>();
-        for(var value:input.candidates().entrySet())out.merge(TextPredicate.fit(value.getKey(),extents.get(a.target())),union(value.getValue(),Set.of(writeKey(a))),SourceValuesProvider::union);
-        return new Values(out,input.open());
+        boolean model=modelSymbols.contains(a.target())||input.modelAssumed();
+        for(var value:input.candidates().entrySet()) {
+            var support=union(value.getValue(),Set.of(writeKey(a)));
+            out.merge(TextPredicate.fit(value.getKey(),extents.get(a.target())),support,SourceValuesProvider::union);
+            // A model's width cannot disprove a name explicitly observed in the program.
+            if(model)out.merge(value.getKey(),support,SourceValuesProvider::union);
+        }
+        var assigned=new Values(out,input.open()||model,model);
+        // Model assumptions supply possibilities, never a strong-update/kill proof.
+        return model?state.getOrDefault(a.target(),Values.UNKNOWN).join(assigned):assigned;
     }
     private static String writeKey(NominalValues.Assignment a){return "write/"+a.statement()+"/"+a.target();}
     private Values term(NominalValues.Term t,Map<String,Values> state) {
@@ -115,7 +129,7 @@ public final class SourceValuesProvider {
         };
     }
     private Map<String,Values> filter(Map<String,Values> state,NominalValues.Predicate p,boolean whenTrue) {
-        if(p==null)return state;int wanted=whenTrue?TextPredicate.TRUE:TextPredicate.FALSE;
+        if(p==null||reads(p).stream().anyMatch(s->state.getOrDefault(s,Values.UNKNOWN).modelAssumed()))return state;int wanted=whenTrue?TextPredicate.TRUE:TextPredicate.FALSE;
         if((truth(p,state)&wanted)==0)return null;
         var result=new TreeMap<>(state);
         for(var symbol:reads(p)) {
