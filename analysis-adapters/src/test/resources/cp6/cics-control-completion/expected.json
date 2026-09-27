@@ -247,6 +247,98 @@
           "writes": 0
         }
       ]
+    },
+    {
+      "id": "rollback_plain",
+      "source": "rollback_plain.cbl",
+      "sha256": "46e5c63d0ea623f4a63e5938a4222e7bbdc94c3f32358ce71704e6d1a7183e33",
+      "calls": {
+        "after": {
+          "line": 9,
+          "required": [
+            "BEFORE01"
+          ],
+          "allowed": [
+            "BEFORE01"
+          ]
+        }
+      },
+      "hostMemory": [
+        {
+          "command": "SYNCPOINT_ROLLBACK",
+          "reads": 0,
+          "writes": 0
+        }
+      ]
+    },
+    {
+      "id": "rollback_nohandle",
+      "source": "rollback_nohandle.cbl",
+      "sha256": "2b0bb21f369fd7ab1f765c330ee5df453ee3e314e1b07ddab04c6bb612ee3f89",
+      "calls": {
+        "after": {
+          "line": 9,
+          "required": [
+            "BEFORE01"
+          ],
+          "allowed": [
+            "BEFORE01"
+          ]
+        }
+      },
+      "hostMemory": [
+        {
+          "command": "SYNCPOINT_ROLLBACK",
+          "reads": 0,
+          "writes": 0
+        }
+      ]
+    },
+    {
+      "id": "rollback_resp",
+      "source": "rollback_resp.cbl",
+      "sha256": "3e7dd38b69a9f4141401990061ef6b84e08488833a5f4fae9f0aabcc112fc2f6",
+      "calls": {
+        "after": {
+          "line": 9,
+          "required": [
+            "BEFORE01"
+          ],
+          "allowed": [
+            "BEFORE01"
+          ]
+        }
+      },
+      "hostMemory": [
+        {
+          "command": "SYNCPOINT_ROLLBACK",
+          "reads": 0,
+          "writes": 1
+        }
+      ]
+    },
+    {
+      "id": "rollback_resp2",
+      "source": "rollback_resp2.cbl",
+      "sha256": "33cd78ebeebd53b88c9ecb193b21edfbacf241916945bfa9eedfb180d376d9f1",
+      "calls": {
+        "after": {
+          "line": 9,
+          "required": [
+            "BEFORE01"
+          ],
+          "allowed": [
+            "BEFORE01"
+          ]
+        }
+      },
+      "hostMemory": [
+        {
+          "command": "SYNCPOINT_ROLLBACK",
+          "reads": 0,
+          "writes": 1
+        }
+      ]
     }
   ]
 }

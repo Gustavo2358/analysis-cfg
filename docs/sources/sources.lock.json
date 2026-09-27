@@ -277,7 +277,7 @@
     ],
     "semantic_product_version": "2.49.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "5b192e6c3135c37686f4b95d0bc8d052df6b57d2",
+    "commit": "40624ec7db1da304a5eac3256159e99e22836486",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -316,7 +316,7 @@
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "Merged cobol-lower PR #39; SP 2.49 / NOMINAL_TEXT_SOURCE_V2 modelAssumed transport qualified. The lower pins the merged frontend PR #64; docs/work/carddemo-ibm-copybooks.md.",
-    "commit": "dc744a311e2d82d0d071b5a2433ed7162995ab70",
+    "commit": "f5a216743756195349278e240969e04f9bc7608c",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",

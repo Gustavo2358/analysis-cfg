@@ -74,3 +74,13 @@ restores the positive allocation proof required by the existing translator.
 The first temporary runs exposed invalid fixed-format probe wrapping (column 72
 and splitting a hyphenated token). Corrected sources preserve the semantic oracle;
 raw failed runs remain separate. Valid run: d2-focal-valid, 7/7, all 28 stages zero.
+
+## D3 checkpoint
+
+SYNCPOINT_ROLLBACK is a separate SP2.50 command. Closed syntax, source continuation
+and bounded MAY response writes are implemented. Producer red test reproduced the
+unsupported command; green CicsCompletionTest/CicsCommandContractTest/CicsHostEffectsTest
+passed. Four producer wire variants passed the new consumer suite. Four four-stage
+PERFORM/rollback cases passed with prior value and supports preserved. Historical
+unsupported-ROLLBACK tests now use ROLLBACK MYSTERY; the new positive/invalid-option
+tests explicitly cover the capability that changed. Final corpus is pending.
