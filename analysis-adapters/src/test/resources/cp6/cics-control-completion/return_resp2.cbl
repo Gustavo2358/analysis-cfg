@@ -1,0 +1,22 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. RETURN-PROBE.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       COPY DFHAID.
+       01 TRAN-ID PIC X(4).
+       01 WS-AREA PIC X(80).
+       01 RC PIC S9(8) COMP.
+       01 SENTINEL PIC X.
+       PROCEDURE DIVISION.
+       MAIN.
+           PERFORM OUTER-P.
+           CALL 'RESUME01'.
+           GOBACK.
+       OUTER-P.
+           PERFORM EXIT-P THRU EXIT-X.
+           CALL 'RESUME02'.
+       EXIT-P.
+           EXEC CICS RETURN TRANSID(TRAN-ID) RESP2(RC) END-EXEC.
+           CALL 'AFTER001'.
+       EXIT-X.
+           EXIT.

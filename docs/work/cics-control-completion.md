@@ -84,3 +84,33 @@ passed. Four producer wire variants passed the new consumer suite. Four four-sta
 PERFORM/rollback cases passed with prior value and supports preserved. Historical
 unsupported-ROLLBACK tests now use ROLLBACK MYSTERY; the new positive/invalid-option
 tests explicitly cover the capability that changed. Final corpus is pending.
+
+## D4 algorithm and oracle (before implementation)
+
+RETURN success exits the current CICS program level, including inside PERFORM; it
+does not resume a local activation. Qualify the plain, TRANSID, COMMAREA/LENGTH and
+IMMEDIATE subset plus response options. Host roles are READ for passed data and
+WRITE for response areas. A locally handled error has its own source continuation
+only when a condition-bearing option is present. Unhandled conditions stay open;
+no value predicate proves success. Unsupported options remain a frontier.
+
+ABEND CANCEL bypasses exits and has a task-halt outcome. Other explicit ABEND
+events are completed with the context-sensitive dispatch in D5. A halt/return
+never acquires a textual successor. Existing AIR return/halt alternatives suffice.
+Oracles: RETURN within nested/range PERFORM, independent successful exit and local
+error route, invalid options, RESP2 alone, LENGTH OF and passed-memory roles, and
+ABEND CANCEL with an active handler. Linear option classification, finite topology.
+
+## D4 RETURN checkpoint
+
+RETURN has an explicit PROGRAM_RETURN success outcome; supported locally handled
+errors use a separate condition-return outcome. Typed host operands and LENGTH
+expressions feed the existing bounded memory translator. Four four-stage probes
+pass, including nested/range PERFORM with no false resume and a positive local
+error route. AIR host read/write and no-kill assertions pass. Producer completion,
+command, host-effect and terminal-send tests pass (25 tests).
+
+A preliminary probe used the reserved word AREA as a data-name and degraded parsing;
+corrected WS-AREA fixtures preserve the oracle. Final probes have zero parser errors,
+and the permanent runner now rejects parser degradation even when a dead-site oracle
+happens to pass. Explicit ABEND exit and dispatch are integrated together in D5.

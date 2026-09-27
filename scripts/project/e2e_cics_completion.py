@@ -23,6 +23,8 @@ original_run=stages.run_case
 
 def run_case(case,config,out,timeout,java,heap):
     row=original_run(case,config,out,timeout,java,heap)
+    if 'parse_degraded' in (out/case['id']/'frontend.stderr').read_text():
+        row['status']='PARSER_ERROR'
     air=out/case['id']/'program.air.json'
     if air.exists():
         row['memoryFailures']=memory_oracle(case,json.loads(air.read_text()))

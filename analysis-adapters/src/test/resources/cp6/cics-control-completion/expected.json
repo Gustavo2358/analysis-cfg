@@ -339,6 +339,164 @@
           "writes": 1
         }
       ]
+    },
+    {
+      "id": "return_plain",
+      "source": "return_plain.cbl",
+      "sha256": "790bb8bd16291621a92b591ef562fa924904e1b5ebe1e021d38a970133612268",
+      "calls": {
+        "RESUME01": {
+          "line": 13,
+          "required": [],
+          "allowed": [
+            "RESUME01"
+          ],
+          "reachable": false
+        },
+        "RESUME02": {
+          "line": 17,
+          "required": [],
+          "allowed": [
+            "RESUME02"
+          ],
+          "reachable": false
+        },
+        "AFTER001": {
+          "line": 20,
+          "required": [],
+          "allowed": [
+            "AFTER001"
+          ],
+          "reachable": false
+        }
+      },
+      "hostMemory": [
+        {
+          "command": "RETURN",
+          "reads": 0,
+          "writes": 0
+        }
+      ]
+    },
+    {
+      "id": "return_commarea",
+      "source": "return_commarea.cbl",
+      "sha256": "966b2de18f0ac0bcdbd04b9dcca91d2e9b9eb2d52f7563c41b8c477e2847d146",
+      "calls": {
+        "RESUME01": {
+          "line": 13,
+          "required": [],
+          "allowed": [
+            "RESUME01"
+          ],
+          "reachable": false
+        },
+        "RESUME02": {
+          "line": 17,
+          "required": [],
+          "allowed": [
+            "RESUME02"
+          ],
+          "reachable": false
+        },
+        "AFTER001": {
+          "line": 21,
+          "required": [],
+          "allowed": [
+            "AFTER001"
+          ],
+          "reachable": false
+        }
+      },
+      "hostMemory": [
+        {
+          "command": "RETURN",
+          "reads": 2,
+          "writes": 0
+        }
+      ]
+    },
+    {
+      "id": "return_error",
+      "source": "return_error.cbl",
+      "sha256": "7a0bdd7c4300dce90ae203b2434e9123f2186d879fe6c504bb1624a05ef249f5",
+      "calls": {
+        "RESUME01": {
+          "line": 13,
+          "required": [
+            "RESUME01"
+          ],
+          "allowed": [
+            "RESUME01"
+          ],
+          "reachable": true
+        },
+        "RESUME02": {
+          "line": 17,
+          "required": [
+            "RESUME02"
+          ],
+          "allowed": [
+            "RESUME02"
+          ],
+          "reachable": true
+        },
+        "AFTER001": {
+          "line": 20,
+          "required": [
+            "AFTER001"
+          ],
+          "allowed": [
+            "AFTER001"
+          ],
+          "reachable": true
+        }
+      },
+      "hostMemory": [
+        {
+          "command": "RETURN",
+          "reads": 1,
+          "writes": 1
+        }
+      ]
+    },
+    {
+      "id": "return_resp2",
+      "source": "return_resp2.cbl",
+      "sha256": "e3ed0bc2beef478d453fecff28cbe09323c222d7e3e9a2db0b9a4d283dc52a36",
+      "calls": {
+        "RESUME01": {
+          "line": 13,
+          "required": [],
+          "allowed": [
+            "RESUME01"
+          ],
+          "reachable": false
+        },
+        "RESUME02": {
+          "line": 17,
+          "required": [],
+          "allowed": [
+            "RESUME02"
+          ],
+          "reachable": false
+        },
+        "AFTER001": {
+          "line": 20,
+          "required": [],
+          "allowed": [
+            "AFTER001"
+          ],
+          "reachable": false
+        }
+      },
+      "hostMemory": [
+        {
+          "command": "RETURN",
+          "reads": 1,
+          "writes": 1
+        }
+      ]
     }
   ]
 }
