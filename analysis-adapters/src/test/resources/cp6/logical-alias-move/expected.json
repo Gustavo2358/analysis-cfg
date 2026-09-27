@@ -1,0 +1,275 @@
+{
+  "cases": [
+    {
+      "id": "nested_forward",
+      "source": "nested_forward.cbl",
+      "sha256": "18181afedb84f2a8a8b3bf4e7a538052339dca6066d06fde34ba3c6fbb23ff51",
+      "calls": {
+        "C1": {
+          "line": 11,
+          "required": [
+            "PROGA001"
+          ],
+          "allowed": [
+            "PROGA001"
+          ],
+          "forbidden": [],
+          "reachable": true
+        }
+      }
+    },
+    {
+      "id": "nested_reverse",
+      "source": "nested_reverse.cbl",
+      "sha256": "2df79621f357b8a0f9ee3744b6c9d830ee92c607edacaea613f683e7c1da1d19",
+      "calls": {
+        "C1": {
+          "line": 11,
+          "required": [
+            "PROGA001"
+          ],
+          "allowed": [
+            "PROGA001"
+          ],
+          "forbidden": [],
+          "reachable": true
+        }
+      }
+    },
+    {
+      "id": "alias_overwrite",
+      "source": "alias_overwrite.cbl",
+      "sha256": "bbeb6b0252c4d2d274d8c85a5617ff95e39e30e45ab100df09fcac76afc35c0a",
+      "calls": {
+        "C1": {
+          "line": 12,
+          "required": [
+            "PROGB001"
+          ],
+          "allowed": [
+            "PROGB001"
+          ],
+          "forbidden": [
+            "DEAD0001"
+          ],
+          "reachable": true
+        }
+      }
+    },
+    {
+      "id": "perform_neighbor",
+      "source": "perform_neighbor.cbl",
+      "sha256": "b651ae02a67e893046dde23d14abae9bccddede9dcf885c3a73bafe4c614ed4b",
+      "calls": {
+        "C1": {
+          "line": 13,
+          "required": [
+            "PROGA001"
+          ],
+          "allowed": [
+            "PROGA001"
+          ],
+          "forbidden": [],
+          "reachable": true
+        }
+      }
+    },
+    {
+      "id": "perform_writes_alias",
+      "source": "perform_writes_alias.cbl",
+      "sha256": "5482395d478ca1b873a90288de8699a5239564b85e1d60decc4c71b2e32b579c",
+      "calls": {
+        "C1": {
+          "line": 11,
+          "required": [
+            "PROGA001"
+          ],
+          "allowed": [
+            "PROGA001"
+          ],
+          "forbidden": [],
+          "reachable": true
+        }
+      }
+    },
+    {
+      "id": "copy_snapshot",
+      "source": "copy_snapshot.cbl",
+      "sha256": "5fea95f22327ff6872db126f4d3afa3309d8722ced29ac7d2c1889d4d474b1b4",
+      "calls": {
+        "C1": {
+          "line": 14,
+          "required": [
+            "PROGA001"
+          ],
+          "allowed": [
+            "PROGA001"
+          ],
+          "forbidden": [
+            "PROGB001"
+          ],
+          "reachable": true
+        }
+      }
+    },
+    {
+      "id": "partial_overlay",
+      "source": "partial_overlay.cbl",
+      "sha256": "82a9d7be51d6cf74c73342a23392044e77928ddd8b96cc3ac2192989f7503012",
+      "calls": {
+        "C1": {
+          "line": 14,
+          "required": [
+            "PROGB001"
+          ],
+          "allowed": [
+            "PROGB001"
+          ],
+          "forbidden": [
+            "PROGA001"
+          ],
+          "reachable": true
+        }
+      }
+    },
+    {
+      "id": "branch_correlation",
+      "source": "branch_correlation.cbl",
+      "sha256": "9569689f10a19dbb441d43faa803b7de695db37aebde1877cf614ed20616baf7",
+      "calls": {
+        "C1": {
+          "line": 16,
+          "required": [
+            "PROGA001",
+            "PROGB002"
+          ],
+          "allowed": [
+            "PROGA001",
+            "PROGB002"
+          ],
+          "forbidden": [
+            "PROGA002",
+            "PROGB001"
+          ],
+          "reachable": true
+        }
+      }
+    },
+    {
+      "id": "dead_overwrite",
+      "source": "dead_overwrite.cbl",
+      "sha256": "f53cc8f6124522a1b984732af4f9bc6717342d54ed5ce4774ec352468c0bec0b",
+      "calls": {
+        "C1": {
+          "line": 15,
+          "required": [
+            "PROGA001"
+          ],
+          "allowed": [
+            "PROGA001"
+          ],
+          "forbidden": [
+            "DEAD0001"
+          ],
+          "reachable": true
+        }
+      }
+    },
+    {
+      "id": "independent_family",
+      "source": "independent_family.cbl",
+      "sha256": "612e9c8335509e8c011a41dd798d4bf58659f31f9eb29ea6618f8d953737f153",
+      "calls": {
+        "C1": {
+          "line": 15,
+          "required": [
+            "PROGA001"
+          ],
+          "allowed": [
+            "PROGA001"
+          ],
+          "forbidden": [
+            "DEAD0001"
+          ],
+          "reachable": true
+        }
+      }
+    },
+    {
+      "id": "alias_chain",
+      "source": "alias_chain.cbl",
+      "sha256": "acb275994ff1447d9a765ea3e9423cdcfb1c530fc3df663e83e76ab2f23eaf2b",
+      "calls": {
+        "C1": {
+          "line": 12,
+          "required": [
+            "PROGA001"
+          ],
+          "allowed": [
+            "PROGA001"
+          ],
+          "forbidden": [],
+          "reachable": true
+        }
+      }
+    },
+    {
+      "id": "literal_fit",
+      "source": "literal_fit.cbl",
+      "sha256": "e7956ce5586ccb27df0416d994132f199b193114aff9b1f19bf9b9d8af188b80",
+      "calls": {
+        "C1": {
+          "line": 11,
+          "required": [
+            "PROGA001"
+          ],
+          "allowed": [
+            "PROGA001"
+          ],
+          "forbidden": [
+            "PROGA001TAIL"
+          ],
+          "reachable": true
+        }
+      }
+    },
+    {
+      "id": "renames_overlay",
+      "source": "renames_overlay.cbl",
+      "sha256": "c71dcc56076f0ffe294921cd1fb5d79f0f47011ccdb8d49c515ecdff1e739f7e",
+      "calls": {
+        "C1": {
+          "line": 14,
+          "required": [
+            "PROGA001"
+          ],
+          "allowed": [
+            "PROGA001"
+          ],
+          "forbidden": [],
+          "reachable": true
+        }
+      }
+    },
+    {
+      "id": "copy_into_alias",
+      "source": "copy_into_alias.cbl",
+      "sha256": "b52ff9b7502bcba259c9e5863e99134fa61740202dd32642908c54940f63d34e",
+      "calls": {
+        "C1": {
+          "line": 14,
+          "required": [
+            "PROGA001"
+          ],
+          "allowed": [
+            "PROGA001"
+          ],
+          "forbidden": [
+            "PROGB001"
+          ],
+          "reachable": true
+        }
+      }
+    }
+  ]
+}

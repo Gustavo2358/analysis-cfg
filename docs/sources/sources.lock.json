@@ -310,8 +310,8 @@
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
-    "status": "PERFORM control completion implemented; Draft review pending.",
-    "commit": "f26ca42d0aef45bf708acdd143fc617311129946",
+    "status": "Logical alias MOVE correction implemented; Draft review pending.",
+    "commit": "bcb5b2b885258cb86fbf5aa320d40c07f522f1a7",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -323,7 +323,7 @@
     "goto_validation": {
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
     },
-    "canonical_ref": "feat/perform-control-completion",
+    "canonical_ref": "fix/logical-alias-move",
     "observed_on": "2026-09-26",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
@@ -355,7 +355,8 @@
       "schema_sha256": "5f751464dee36a993d9238a32e25d68d396ce8ca3fa2e0198f29b4e6a7f505c0"
     },
     "evidence_level": "SP 2.47 nominal facts preserved independently of executable AIR; consumer admission and roundtrip PASS; local FAST PASS; draft review pending.",
-    "perform_completion": "Scoped exits, SECTION boundaries, typed VARYING levels; Draft review. See docs/domain/perform-control-completion.md."
+    "perform_completion": "Scoped exits, SECTION boundaries, typed VARYING levels; Draft review. See docs/domain/perform-control-completion.md.",
+    "logical_alias_move": "Logical family translation precedes scalar shortcuts; 14 source adversaries, PERFORM 39/39; see docs/product/logical-alias-move.md."
   },
   "external": [
     {
