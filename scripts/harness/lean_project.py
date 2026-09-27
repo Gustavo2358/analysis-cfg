@@ -91,3 +91,6 @@ def full_local(root):
                     '--producers', str(w2d / 'producers/producers.json')], cwd=root, check=True)
     subprocess.run([sys.executable, '-B', 'scripts/project/e2e_partial.py', '--work', str(w2d / 'partial'),
                     '--producers', str(w2d / 'producers/producers.json')], cwd=root, check=True)
+
+    subprocess.run([sys.executable, '-B', 'scripts/project/e2e_file_composite.py', '--work', str(w2d / 'file-composite'),
+                    '--producers', str(w2d / 'producers/producers.json')], cwd=root, check=True)
