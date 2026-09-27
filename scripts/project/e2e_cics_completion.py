@@ -3,6 +3,7 @@
 from pathlib import Path
 import json
 import e2e_perform_completion as stages
+from cfg_wire_contract import verify as verify_cfg
 
 def memory_oracle(case, air):
     failures=[]
@@ -25,6 +26,15 @@ def run_case(case,config,out,timeout,java,heap):
     row=original_run(case,config,out,timeout,java,heap)
     if 'parse_degraded' in (out/case['id']/'frontend.stderr').read_text():
         row['status']='PARSER_ERROR'
+    cfg=out/case['id']/'cfg.json'
+    if cfg.exists():
+        doc=json.loads(cfg.read_text());verify_cfg(cfg.read_bytes())
+        oracle=case.get('exceptionalControl')
+        if oracle:
+            row['controlFailures']=[]
+            if sum(t['kind']=='EXCEPTION' for t in doc['transitions'])!=oracle['localEdges']:row['controlFailures'].append('EXCEPTION_SELECTION_CHANGED')
+            if len(doc['nodes'])>oracle['maximumNodes']:row['controlFailures'].append('REENTRY_GRAPH_UNBOUNDED')
+            if row['controlFailures']:row['status']='FAIL'
     air=out/case['id']/'program.air.json'
     if air.exists():
         row['memoryFailures']=memory_oracle(case,json.loads(air.read_text()))

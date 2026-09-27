@@ -80,6 +80,7 @@ class StructureTest {
             case CfgNode.SequenceNode q -> (CfgNode)new CfgNode.SequenceNode(ids.get(n.id()),q.source());
             case CfgNode.EntryNode e -> new CfgNode.EntryNode(ids.get(n.id()),e.source());
             case CfgNode.NormalExit e -> new CfgNode.NormalExit(ids.get(n.id()),e.publicationId(),e.unitId(),e.entryId());
+            case CfgNode.OutcomeExit e -> new CfgNode.OutcomeExit(ids.get(n.id()),e.source(),e.outcome());
             case CfgNode.HaltExit h -> new CfgNode.HaltExit(ids.get(n.id()),h.source());
         }).toList();
         var graph=new CfgGraph(p,nodes,g.transitions().stream().map(e->new CfgTransition(ids.get(e.from()),ids.get(e.to()),e.kind(),e.activationEntry())).toList());

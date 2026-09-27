@@ -38,6 +38,8 @@ public final class CfgJsonWriter {
         var graph = result.graph().orElseThrow();
         var out = new CfgJsonBytes(maximumBytes);
         // Token mappings carry their contract requirement. Inspect the product, not its source text.
+        boolean requiresV4=graph.nodes().stream().anyMatch(CfgNode.OutcomeExit.class::isInstance)
+            ||graph.transitions().stream().anyMatch(t->t.kind()==CfgTransition.Kind.EXCEPTION);
         boolean requiresV2 = false;
         boolean requiresV3 = graph.nodes().stream().anyMatch(n -> n instanceof CfgNode.SequenceNode q && q.source().terminator() instanceof Operations.Opaque);
         for (var node : graph.nodes()) {
@@ -47,7 +49,7 @@ public final class CfgJsonWriter {
         for (var transition : graph.transitions())
             requiresV2 |= transitionKind(transition.kind()).requiresV2;
         out.raw("{\"schema\":\"analysis-cfg-json\",\"schemaVersion\":");
-        out.string(requiresV3 ? "3.0.0" : requiresV2 ? "2.0.0" : "1.0.0");
+        out.string(requiresV4 ? "4.0.0" : requiresV3 ? "3.0.0" : requiresV2 ? "2.0.0" : "1.0.0");
         out.raw(",\"airVersion\":");
         var version = result.airVersion();
         out.string(version.major() + "." + version.minor() + "." + version.patch());
@@ -65,7 +67,7 @@ public final class CfgJsonWriter {
         out.raw("]},\"nodes\":["); comma = false;
         for (var node : graph.nodes()) {
             if (comma) out.raw(","); comma = true;
-            node(out, node, requiresV3);
+            node(out, node, requiresV3||requiresV4);
         }
         out.raw("],\"transitions\":["); comma = false;
         for (var transition : graph.transitions()) {
@@ -127,6 +129,12 @@ public final class CfgJsonWriter {
                 out.raw(",\"kind\":\"NORMAL_EXIT\",\"unit\":"); airId(out, exit.unitId());
                 out.raw(",\"entry\":"); airId(out, exit.entryId());
             }
+            case CfgNode.OutcomeExit exit -> {
+                out.raw(",\"kind\":\"OUTCOME_EXIT\",\"operation\":");airId(out,exit.source().header().id());
+                out.raw(",\"outcome\":");
+                out.string(exit.outcome() instanceof io.github.gustavo2358.air.model.Control.HaltAlternative?"HALT":exit.outcome() instanceof io.github.gustavo2358.air.model.Control.Exceptional?"EXCEPTION":"ANY_EXCEPTION");
+                if(exit.outcome() instanceof io.github.gustavo2358.air.model.Control.Exceptional e){out.raw(",\"tag\":");out.string(e.tag());}
+            }
             case CfgNode.HaltExit exit -> {
                 out.raw(",\"kind\":\"HALT_EXIT\",\"operation\":"); airId(out, exit.source().header().id());
                 out.raw(",\"haltKind\":"); out.string(haltKind(exit.source().haltKind()));
@@ -176,6 +184,7 @@ public final class CfgJsonWriter {
         BRANCH_TRUE("BRANCH_TRUE", false), BRANCH_FALSE("BRANCH_FALSE", false),
         RETURN("RETURN", false), HALT("HALT", false),
         OPAQUE("OPAQUE", true), OPAQUE_JUMP("OPAQUE_JUMP", true), OPAQUE_RETURN("OPAQUE_RETURN", true),
+        EXCEPTION("EXCEPTION", true), CONTROL_EXIT("CONTROL_EXIT", true),
         INVOKE("INVOKE", true), INVOKE_NORMAL("INVOKE_NORMAL", true);
 
         private final String token;
@@ -190,6 +199,7 @@ public final class CfgJsonWriter {
         return switch (kind) {
             case ENTRY -> WireKind.ENTRY; case JUMP -> WireKind.JUMP; case BRANCH_TRUE -> WireKind.BRANCH_TRUE;
             case BRANCH_FALSE -> WireKind.BRANCH_FALSE; case RETURN -> WireKind.RETURN; case HALT -> WireKind.HALT;
+            case EXCEPTION -> WireKind.EXCEPTION; case CONTROL_EXIT -> WireKind.CONTROL_EXIT;
             case INVOKE_NORMAL -> WireKind.INVOKE_NORMAL;
             case OPAQUE_JUMP -> WireKind.OPAQUE_JUMP; case OPAQUE_RETURN -> WireKind.OPAQUE_RETURN;
             case OPAQUE_UNKNOWN -> throw new IllegalArgumentException("symbolic control is retained on AIR");

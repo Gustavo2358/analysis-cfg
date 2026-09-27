@@ -68,6 +68,7 @@ class EvalCfg025Test {
                 case CfgNode.SequenceNode sequence -> sequenceNode(sequence.source().label());
                 case CfgNode.NormalExit exit -> new NodeObservation(Role.NORMAL_EXIT,
                         exit.publicationId(), exit.unitId(), exit.entryId());
+                case CfgNode.OutcomeExit ignored -> throw new AssertionError("outside outcomes belong to exceptional control tests");
                 case CfgNode.HaltExit ignored -> throw new AssertionError("CF1 observation contains a Halt exit");
             };
             assertNull(nodes.put(node.id(), observation), "CFG IDs must be unique");

@@ -8,8 +8,8 @@ namespace cics.program, ExtensionName cics-ts.program@1. Name capabilities are
 structurally checked upstream and do not change CFG control. Unknown policies
 must keep an interpretation remainder in the dependency consumer.
 
-Named exception edges are outside the current CFG surface. The selected lean
-route preserves local command conditions as a bounded control remainder: union
+Qualified exceptional alternatives now use the generic AIR [v4 projection](../architecture/cfg-json-v4.md).
+Unqualified local command conditions retain the existing bounded control remainder: union
 of explicit local labels and external unit control. It never calls an error a
 normal return. LINK has an explicit normal continuation plus its remainder.
 XCTL successful transfer has external control, no normal exit, halt or invented

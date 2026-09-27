@@ -114,3 +114,70 @@ A preliminary probe used the reserved word AREA as a data-name and degraded pars
 corrected WS-AREA fixtures preserve the oracle. Final probes have zero parser errors,
 and the permanent runner now rejects parser degradation even when a dead-site oracle
 happens to pass. Explicit ABEND exit and dispatch are integrated together in D5.
+
+## D5 algorithm and oracle (before implementation)
+
+Executable specialization adds one existing HandlerStateAnalysis.Support to each
+matched PERFORM activation. It reuses source handler transfer/selection rules and
+validated exceptional event descriptors. Support is a finite reaching definition,
+not a trace or a runtime CICS level. Phase, body, escape and resume labels carry the
+current support; a completed body returns its outgoing state only to its own caller.
+Native CALL retains the existing unknown-handler-effect transfer.
+
+Project a selected local LABEL as a possible exceptional destination, with event
+proofs, activation provenance and runtime premises retained. The handler starts
+deactivated in a separate ingress context. It cannot restore the interrupted
+PERFORM stack; unproved handler paragraph completion remains a frontier. Nested
+PERFORM invoked by the handler has its own matched continuations. CANCEL, RESET,
+replacement and bypass use the same source transfer rules. ABEND CANCEL halts the
+task. Inactive/unknown local state retains propagation/open local uncertainty;
+unknown state does not license an arbitrary catalogued label. XCTL keeps its
+external successful transfer and never gains a normal local return.
+
+The admitted event inventory is explicit ABEND and guarded XCTL PGMIDERR, as already
+published by the frontend. Other command-condition frontiers are preserved. No
+source graph derivation is copied into AIR as an unconditional edge: in particular,
+source summary callerPremise relations cannot join executable return contexts.
+
+Work is finite over nonrecursive activation paths × source locations/phases ×
+finite supports plus finite handler ingresses. Recursion retains the existing
+bounded frontier. Each specialized label is emitted once; complexity is linear
+in the resulting product graph. Oracles cover activation/cancellation/reset,
+replacement, two callers with distinct values, transfer out of interrupted PERFORM,
+handler completion bounds, nested handler PERFORM and conditional XCTL dispatch.
+
+### D5 AIR consumer boundary discovered by the adversaries
+
+AIR already defines Exceptional/AnyException destinations and HaltAlternative.
+The CFG known subset and the independent analysis index accepted only ordinary
+invocation outcomes. PARTIAL_ANALYSIS therefore widened these otherwise explicit
+outcomes to unit-wide unknown control. This caused both export refusal and the
+observed two-caller contamination. Extend these consumers by AIR type only.
+
+A local exception has an EXCEPTION edge to its explicit Handler label. Propagation
+and alternative halt have an occurrence-owned OutcomeExit and CONTROL_EXIT edge;
+normal exit stays distinct. Deduplicate equal local destinations within each role,
+retain every distinct outside outcome and the original AIR as authority. The index
+independently validates endpoints, outcome membership, source identity and complete
+cardinality. No synthetic entry backedge or general local-label expansion follows
+from a supported exceptional alternative. Known-subset JSON with these roles uses
+4.0.0; existing products keep their previous version. O(nodes + explicit outcomes).
+
+## D5 checkpoint
+
+Qualified ABEND/guarded XCTL events now carry correlated handler state through
+matched PERFORM activations. Generic AIR exceptions/alternative halt are projected
+by CFG and independently validated by the analysis index. Source selection proofs,
+activation origins and runtime premises survive; no handler-state name heuristic
+or textual fallthrough was added. Unqualified ABEND still has a NOT_READY frontier.
+
+29 four-stage adversaries pass, including two callers, CANCEL/RESET/replacement,
+handler deactivation, finite RESET reentry, nested PERFORM and interrupted-stack
+isolation. Lower FAST passed. The CFG generic model test covers Invoke/Opaque ×
+local/propagated typed/any exceptions and halt, plus missing/forged graph outcomes.
+Final broad qualification is in progress.
+
+The independent qualified-source schema was stale even against the merged IBM
+baseline (COACTUPC V2 fails its old V1 constant). It now mirrors the existing
+producer's closed V1/V2 shapes and D1 MODEL_STORAGE, with negative checks for
+missing or malformed modelAssumed. No corpus expectation was relaxed.

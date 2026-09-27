@@ -907,44 +907,14 @@
       }
     },
     "NominalValues": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "authority",
-        "symbols",
-        "assignments",
-        "conditions",
-        "queries"
-      ],
-      "properties": {
-        "authority": {
-          "const": "NOMINAL_TEXT_SOURCE_V1"
+      "oneOf": [
+        {
+          "$ref": "#/$defs/NominalValuesV1"
         },
-        "symbols": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/NominalSymbol"
-          }
-        },
-        "assignments": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/NominalAssignment"
-          }
-        },
-        "conditions": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/NominalCondition"
-          }
-        },
-        "queries": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/NominalQuery"
-          }
+        {
+          "$ref": "#/$defs/NominalValuesV2"
         }
-      }
+      ]
     },
     "NominalDeclaration": {
       "type": "object",
@@ -1028,7 +998,8 @@
           "enum": [
             "MISSING_COPY",
             "OPAQUE_INCLUDE",
-            "UNLOCATED_INPUT"
+            "UNLOCATED_INPUT",
+            "MODEL_STORAGE"
           ]
         },
         "provenance": {
@@ -1073,6 +1044,108 @@
           "items": {
             "$ref": "#/$defs/NominalUncertainty"
           }
+        }
+      }
+    },
+    "NominalValuesV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "authority",
+        "symbols",
+        "assignments",
+        "conditions",
+        "queries"
+      ],
+      "properties": {
+        "authority": {
+          "const": "NOMINAL_TEXT_SOURCE_V1"
+        },
+        "symbols": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NominalSymbol"
+          }
+        },
+        "assignments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NominalAssignment"
+          }
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NominalCondition"
+          }
+        },
+        "queries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NominalQuery"
+          }
+        }
+      }
+    },
+    "NominalValuesV2": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "authority",
+        "symbols",
+        "assignments",
+        "conditions",
+        "queries"
+      ],
+      "properties": {
+        "authority": {
+          "const": "NOMINAL_TEXT_SOURCE_V2"
+        },
+        "symbols": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NominalSymbolV2"
+          }
+        },
+        "assignments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NominalAssignment"
+          }
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NominalCondition"
+          }
+        },
+        "queries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NominalQuery"
+          }
+        }
+      }
+    },
+    "NominalSymbolV2": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "node",
+        "extent",
+        "modelAssumed"
+      ],
+      "properties": {
+        "node": {
+          "type": "string",
+          "minLength": 1
+        },
+        "extent": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "modelAssumed": {
+          "type": "boolean"
         }
       }
     }

@@ -50,3 +50,18 @@ try:result(wrong)
 except ValueError:pass
 else:raise AssertionError('source uncertainty changed executable scope')
 print('CONDITIONAL_SOURCE_SCOPE: independent PARTIAL and executable scope PASS')
+
+# Authority determines the closed symbol shape; model confidence cannot disappear.
+from qualified_source_wire import shape
+facts=dict(authority='NOMINAL_TEXT_SOURCE_V2',symbols=[dict(node='node',extent=1,modelAssumed=True)],assignments=[],conditions=[],queries=[])
+shape(facts,{'$ref':'#/$defs/NominalValues'})
+for mutation in ('missing-confidence','v1-with-confidence','unknown-authority','wrong-confidence'):
+    x=copy.deepcopy(facts)
+    if mutation=='missing-confidence':del x['symbols'][0]['modelAssumed']
+    elif mutation=='v1-with-confidence':x['authority']='NOMINAL_TEXT_SOURCE_V1'
+    elif mutation=='unknown-authority':x['authority']='NOMINAL_TEXT_SOURCE_V3'
+    else:x['symbols'][0]['modelAssumed']='true'
+    try:shape(x,{'$ref':'#/$defs/NominalValues'})
+    except ValueError:pass
+    else:raise AssertionError(mutation)
+print('MODEL_SOURCE_WIRE: V2 confidence and four rejections PASS')

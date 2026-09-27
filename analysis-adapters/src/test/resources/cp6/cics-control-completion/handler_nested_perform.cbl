@@ -1,0 +1,21 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. DISPATCH-PROBE.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 TARGET PIC X(8) VALUE 'INITIAL1'.
+       01 FLAG-VALUE PIC X.
+       PROCEDURE DIVISION.
+       MAIN.
+           EXEC CICS HANDLE ABEND LABEL(ERR-P) END-EXEC.
+           EXEC CICS ABEND END-EXEC.
+       ERR-P.
+           PERFORM WORK-P THRU WORK-X.
+           CALL 'HANDLER1'.
+           EXEC CICS RETURN END-EXEC.
+       WORK-P.
+           MOVE 'NESTED01' TO TARGET.
+       WORK-X.
+           EXIT.
+       OUTSIDE-P.
+           CALL 'OUTSIDE1'.
+           GOBACK.

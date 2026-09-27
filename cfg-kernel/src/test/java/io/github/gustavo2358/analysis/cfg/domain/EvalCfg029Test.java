@@ -68,6 +68,7 @@ class EvalCfg029Test {
                 case CfgNode.EntryNode n -> en(n.source().id());
                 case CfgNode.SequenceNode n -> seq(n.source().label());
                 case CfgNode.NormalExit n -> normal(n.entryId());
+                case CfgNode.OutcomeExit ignored -> throw new AssertionError("outside outcomes belong to exceptional control tests");
                 case CfgNode.HaltExit n -> stopped(n.source().header().id());
             };
             assertNull(nodes.put(node.id(), seen));
@@ -78,7 +79,7 @@ class EvalCfg029Test {
             assertTrue(nodes.containsKey(t.from()));
             assertTrue(nodes.containsKey(t.to()));
             Arm arm = switch (t.kind()) {
-                case OPAQUE_JUMP, OPAQUE_RETURN, OPAQUE_UNKNOWN -> throw new AssertionError("Opaque belongs to WORK-CFG-038");
+                case EXCEPTION, CONTROL_EXIT, OPAQUE_JUMP, OPAQUE_RETURN, OPAQUE_UNKNOWN -> throw new AssertionError("Opaque belongs to WORK-CFG-038");
                 case INVOKE_NORMAL -> throw new AssertionError("Invoke belongs to CP6 W1D");
                 case ENTRY -> Arm.ENTRY;
                 case BRANCH_TRUE -> Arm.TRUE;

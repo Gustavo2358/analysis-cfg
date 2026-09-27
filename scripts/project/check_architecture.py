@@ -150,7 +150,7 @@ EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CoreCfgProjection.java"].add(
     "io.github.gustavo2358.air.model.Capabilities")
 EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CoreCfgProjection.java"].update({"io.github.gustavo2358.air.model.Control", "io.github.gustavo2358.air.model.Scopes"})
 CFG_CLASS_NAMES = {
-    "CfgNodeId", "CfgNode", "CfgNode$EntryNode", "CfgNode$SequenceNode", "CfgNode$NormalExit", "CfgNode$HaltExit",
+    "CfgNodeId", "CfgNode", "CfgNode$EntryNode", "CfgNode$SequenceNode", "CfgNode$NormalExit", "CfgNode$HaltExit", "CfgNode$OutcomeExit",
     "CfgTransition", "CfgTransition$Kind", "CfgGraph", "CfgGraph$1",
     "CfgProjectionIssue", "CfgProjectionIssue$Code", "CoreCfgProjection", "ProjectionPolicy",
 }
@@ -679,6 +679,13 @@ def verify_javap(javap: str, root: Path, classes: Path, air_jar: Path) -> None:
         root, capture=True,
     ).stdout or ""
     require_descriptor(halt, "()Lio/github/gustavo2358/air/model/Operations$Halt;", "HaltExit.source")
+
+    outside = run(
+        [javap, "-classpath", classpath, "-p", "-s", DOMAIN_CLASS + "CfgNode$OutcomeExit"],
+        root, capture=True,
+    ).stdout or ""
+    require_descriptor(outside, "()Lio/github/gustavo2358/air/model/Terminator;", "OutcomeExit.source")
+    require_descriptor(outside, "()Lio/github/gustavo2358/air/model/Control$InvocationAlternative;", "OutcomeExit.outcome")
 
     graph = run(
         [javap, "-classpath", classpath, "-p", "-s", DOMAIN_CLASS + "CfgGraph"],
