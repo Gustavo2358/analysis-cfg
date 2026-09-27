@@ -13,7 +13,7 @@ public record NominalValueEvidence(NominalValues facts,List<Declaration> declara
     }
     public record Branch(String derivation,boolean whenTrue) { public Branch {text(derivation);} }
     public record Uncertainty(String id,String kind,Provenance provenance) {
-        public Uncertainty {text(id);require(Set.of("MISSING_COPY","OPAQUE_INCLUDE","UNLOCATED_INPUT").contains(kind),"source uncertainty kind");Objects.requireNonNull(provenance);}
+        public Uncertainty {text(id);require(Set.of("MISSING_COPY","MODEL_STORAGE","OPAQUE_INCLUDE","UNLOCATED_INPUT").contains(kind),"source uncertainty kind");Objects.requireNonNull(provenance);}
     }
     public NominalValueEvidence {
         Objects.requireNonNull(facts);declarations=List.copyOf(declarations);seeds=List.copyOf(seeds);branches=List.copyOf(branches);uncertainties=List.copyOf(uncertainties);

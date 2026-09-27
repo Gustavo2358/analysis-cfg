@@ -277,7 +277,7 @@
     ],
     "semantic_product_version": "2.49.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "22d37233373b9db691ba170d898b7523bfea5746",
+    "commit": "5b192e6c3135c37686f4b95d0bc8d052df6b57d2",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -288,7 +288,7 @@
       "scope": "local unconditional paragraph identity and explicit entry; G1-G5 and 1/2/5/40"
     },
     "storage_contract_version": "1.11.0",
-    "canonical_ref": "main",
+    "canonical_ref": "feat/cics-control-completion",
     "observed_on": "2026-09-27",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
@@ -310,12 +310,13 @@
     "synthetic_model_assumptions": {
       "contract": "SP2.49 / NOMINAL_TEXT_SOURCE_V2",
       "review": "docs/work/synthetic-dfh-structure.md"
-    }
+    },
+    "evidence_level": "CICS control completion D1–D5 review branch; SP 2.50 typed model locality. Per-checkpoint checks and final qualification: docs/work/cics-control-completion.md. Not merged."
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "Merged cobol-lower PR #39; SP 2.49 / NOMINAL_TEXT_SOURCE_V2 modelAssumed transport qualified. The lower pins the merged frontend PR #64; docs/work/carddemo-ibm-copybooks.md.",
-    "commit": "83f11f13dd5e521382e4903c2d8bf9e92832f11a",
+    "commit": "dc744a311e2d82d0d071b5a2433ed7162995ab70",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -327,7 +328,7 @@
     "goto_validation": {
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
     },
-    "canonical_ref": "main",
+    "canonical_ref": "feat/cics-control-completion",
     "observed_on": "2026-09-27",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
@@ -358,7 +359,7 @@
       "producer_api": "io.github.gustavo2358.lower.adapters.cli.CobolDependencyInput",
       "schema_sha256": "5f751464dee36a993d9238a32e25d68d396ce8ca3fa2e0198f29b4e6a7f505c0"
     },
-    "evidence_level": "SP 2.49 modelAssumed preserved independently of executable AIR; conditional dependencies retain model uncertainty. Admission/roundtrip and FAST qualified; CardDemo 73/73 and structural adversaries 21/21. Merged PR #39 has the reviewed production content plus exact merged producer pins. Execution versus evidence reuse is detailed in docs/work/carddemo-ibm-copybooks.md.",
+    "evidence_level": "CICS control completion D1–D5 review branch; SP 2.50 typed model locality. Per-checkpoint checks and final qualification: docs/work/cics-control-completion.md. Not merged.",
     "perform_completion": "Scoped exits, SECTION boundaries, typed VARYING levels; Integration authorized; qualified original 39/39 and adversaries 25/25. See docs/domain/perform-control-completion.md.",
     "logical_alias_move": "Logical family translation precedes scalar shortcuts; 14/14 adversaries, PERFORM 39/39, reviewed chaos 48/48 with six explicit abstraction-policy cases; see docs/product/logical-alias-move.md.",
     "synthetic_model_assumptions": {

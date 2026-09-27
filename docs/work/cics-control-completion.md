@@ -31,3 +31,20 @@ Evaluation remains a finite proof DAG; input classification O(inputs × declarat
 Impact classes C3/C4: producer/consumer contract plus shared storage/control. Each checkpoint runs focal RED/GREEN, family and boundary tests; stable repo FAST and final broad qualification. Preserve baseline outputs and support provenance. Run all 73 CardDemo programs and PERFORM39, Chaos48, aliases14, PERFORM adversarial25, frontend fixture matrix310 and relevant local qualification. Compare dependencies/supports and classify every loss; graph size alone is not an oracle. New tests must reject false continuations, cross-caller returns, canceled handler dispatch, synthetic kill and lost MAY writes.
 
 Historical evidence is read-only; final tests are reported separately from reused baseline/runtime artifacts. The discovery's five-component count is descriptive, not a target assertion.
+
+## D1 checkpoint
+
+Implemented typed MODEL_STORAGE scope and SP 2.50 transport. Real records following
+a known structural model recover independent local allocation; model storage and
+aliases remain unavailable. The source uncertainty channel retains MODEL_STORAGE.
+No control edges or runtime synthetic values were introduced.
+
+Focal producer tests passed (ModelInputLocalityTest, FactDependencyLocalityTest,
+NominalCopybookTest); the initial red run reproduced the lost real-record proof.
+Frontend FAST: 603 tests, zero failures. Consumer wire suite: 61 checks, including
+old-version and available-model rejection. Seven new locality tests cover ordering,
+real missing text, LINKAGE, model aliases and open record boundaries. The existing
+SQLCA negative oracle still forbids an exact cell; only its input kind changed.
+
+Raw evidence: workspace .cics-completion/evidence/d1-*. This checkpoint has not
+run the final whole-corpus qualification.
