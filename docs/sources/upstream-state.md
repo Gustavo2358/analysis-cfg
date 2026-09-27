@@ -9,6 +9,10 @@ qualificado de ABEND/XCTL com contextos de PERFORM e estado de handler separados
 O CFG projeta alternativas excepcionais AIR explícitas e publica CFG JSON4 quando
 necessário. modelAssumed e NOMINAL_TEXT_SOURCE_V2 continuam sem prova de kill.
 
+A revisão também corrige provenance de operandos DLI e preserva CALL com
+continuação desconhecida, sem criar sucessores. Os gates históricos foram
+atualizados contra os contratos correntes; detalhes no relatório abaixo.
+
 Qualificação, reuso e limites: [CICS D1–D5](../work/cics-control-qualification.md).
 A integração IBM anterior é baseline histórica; os SHAs do lock são a autoridade
 para esta revisão. Não interpretar os checkpoints abaixo como estado atual.

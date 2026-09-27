@@ -52,3 +52,10 @@ normal outcome; it no longer requires an unused lexical shadow. `display-handler
 requires the following CALL to remain inventory-only beyond the unknown DISPLAY
 completion. Its previously expected empty unreachable site was a representation
 artifact; the BEFORE candidate and the prohibition on AFTER execution are unchanged.
+
+## Review handoff
+
+Implementation and historical gate repair are complete for review. The work item
+remains IN_PROGRESS until merge. Final results, exact reuse boundaries, remaining
+opt-in skip and corpus deltas are in [campaign qualification](cics-control-qualification.md).
+No merge was performed. Current source locks identify the review commits.

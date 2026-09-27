@@ -277,7 +277,7 @@
     ],
     "semantic_product_version": "2.50.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "b542ed8190005373be5fa318a6a1ba528ba84d73",
+    "commit": "5d9f646370a41c1e6b33266dd69c9acb2b028e67",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -311,12 +311,12 @@
       "contract": "SP2.50 / NOMINAL_TEXT_SOURCE_V2; MODEL_STORAGE remains unavailable",
       "review": "docs/work/cics-control-qualification.md"
     },
-    "evidence_level": "CICS control completion D1–D5 review branch; SP 2.50 model locality, rollback/RETURN and qualified exceptional control. Per-checkpoint checks and final qualification: docs/work/cics-control-completion.md. Not merged."
+    "evidence_level": "CICS control completion D1–D5 review branch; SP 2.50 model locality, rollback/RETURN and qualified exceptional control. Historical gate repair includes DLI provenance and CALL frontier payload; current qualification: docs/work/cics-control-qualification.md. Not merged."
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "Review branch for CICS control completion D1–D5, SP 2.50. Not merged; qualification and repaired historical full-gate failures are documented in docs/work/cics-control-qualification.md.",
-    "commit": "08eeb943611a8f5ebaa06b7c230a6c43a517a699",
+    "commit": "452f0506731e58237eb486a2665c994c87705019",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -360,7 +360,7 @@
       "producer_api": "io.github.gustavo2358.lower.adapters.cli.CobolDependencyInput",
       "schema_sha256": "5f751464dee36a993d9238a32e25d68d396ce8ca3fa2e0198f29b4e6a7f505c0"
     },
-    "evidence_level": "CICS control completion D1–D5 review branch; SP 2.50 model locality, rollback/RETURN and qualified exceptional control. Per-checkpoint checks and final qualification: docs/work/cics-control-completion.md. Not merged.",
+    "evidence_level": "CICS control completion D1–D5 review branch; SP 2.50 model locality, rollback/RETURN and qualified exceptional control. Historical gate repair includes DLI provenance and CALL frontier payload; current qualification: docs/work/cics-control-qualification.md. Not merged.",
     "perform_completion": "Scoped exits, SECTION boundaries, typed VARYING levels; Integration authorized; qualified original 39/39 and adversaries 25/25. See docs/domain/perform-control-completion.md.",
     "logical_alias_move": "Logical family translation precedes scalar shortcuts; 14/14 adversaries, PERFORM 39/39, reviewed chaos 48/48 with six explicit abstraction-policy cases; see docs/product/logical-alias-move.md.",
     "synthetic_model_assumptions": {

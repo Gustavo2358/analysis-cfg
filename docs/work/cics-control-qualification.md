@@ -4,7 +4,84 @@ The D1–D5 implementation is ready for review. Product work stays in isolated
 `feat/cics-control-completion` worktrees, with separate checkpoint commits.
 No merge is part of this campaign. Exact consumer pins are in sources.lock.json.
 
-## Results
+## Current qualification — historical failures repaired
+
+The historical blockers below have been investigated and repaired. Two production
+defects were found: retained DLI operand provenance was lost during framing/COPY
+replacement, and a CALL target disappeared from executable AIR when topology
+completion was unknown. The first is fixed in the frontend SourceMap/preprocessor;
+the second reuses the lower's existing Invoke translator with an empty open local
+frontier. A negative test forbids executing the CALL again at a post-call boundary.
+No CFG solver, AIR contract, synthetic confidence or kill authority was changed.
+
+| Current check | Result |
+| --- | --- |
+| Frontend full local | PASS; 1192 Java tests, zero failures/errors, one existing opt-in discovery test skipped; artifact and naming gates PASS |
+| Frontend FAST | PASS; 618 Java tests, zero failures/errors/skips |
+| Lower full local | PASS after CALL payload repair; final narrowing guard covered by FAST and the complete replay below |
+| Lower final FAST | PASS, including computed/literal frontiers, no duplicate CALL and permutation adversaries |
+| CFG FAST | PASS; version/predicate/coverage mutation tests also PASS |
+| CFG full phases | All phases passed through resumption: architecture, semantic, performance, W5 integration, W2D, MOVE-data, PERFORM-basic, multi-CALL and partial-program |
+| Partial-program E2E | 22/22; A/B products and sequence permutation checked for every fixture |
+| Final W5 producer integration | PASS; CP4E twice, CP3 and generic overwrite, memory/file equivalence |
+| Final corpus and suite replay | 560/560: frontend fixtures 331, CardDemo 73, PERFORM 39, Chaos 48, aliases 14, PERFORM adversaries 25, CICS adversaries 30 |
+
+The CFG full command's original failed log is preserved. Successful architecture,
+semantic, performance and W5 test phases were reused because CFG production code
+did not change during this repair. Its previously blocked E2E stages were executed
+with the final producer code, and W5 source integration was repeated. Partial cases
+were run individually through the unchanged gate entrypoint to collect every
+failure; all 22 now pass. This is a completed set of full phases, not a claim that
+the original monolithic command exited zero.
+
+Lower full passed before the final payload guard was narrowed to source occurrence
+frontiers. Final FAST covers that guard and its RED/GREEN counterexample; the full
+performance/architecture evidence is reused because no algorithm or boundary changed.
+The final lowering replay covers every corpus input. Documentation/pin commits after
+these runs do not change production code.
+
+### Regressions and exact deltas
+
+The frontend correction was run through all four stages for 331 fixtures and all
+73 CardDemo programs. Only four CardDemo SPs changed, correcting DLI coordinates;
+normalized control/data products and all prior dependency/support/provenance facts
+were preserved. The other 69 CardDemo SPs and all 331 fixture SPs were byte-identical.
+All 156 suite frontends were also replayed with identical SP bytes.
+
+After the final lower correction, all 560 products were replayed again. Bundles,
+AIR and qualified source are byte-identical in 559/560 cases. The only delta is
+`partial-program/call-handlers.cbl`: one executable CALL site is restored with
+PROGA, without a fabricated continuation. No previous candidate, support or written
+provenance is lost. CFG/dependencies were rerun for this delta. For equal products,
+downstream evidence is reused only after byte equality and consumer bytecode
+identity checks. All 73 CardDemo products and all PERFORM/Chaos/alias/CICS suite
+products remain identical at this final step. No unexplained regression remains.
+
+### Gate corrections and authority
+
+The obsolete SQLCA, missing-COPY, DLI-host and inline-PERFORM characterizations now
+assert current typed facts, including negative cases. HTML artifact checks retain
+incomplete coverage and model provenance. Naming checks allow only the exact
+repository identity in documentary JSON; product/source naming restrictions remain.
+
+The W2D version ceiling comes from the exact source lock, with independent feature
+floors and malformed/future-version rejection. Typed text predicates, declaration
+coverage identities, Assign plus completion Jump, retained copy supports and
+context-specific PERFORM are checked directly. Literal truncation now requires its
+exact raw value and overriding producer. This corrects an obsolete no-kill oracle
+only where a complete typed write proves the kill. Source inventory beyond unknown
+control is preserved without requiring an invented executable occurrence.
+
+Raw local evidence is preserved in `.cics-completion/evidence/historical-repair/`:
+`frontend-full-green.log`, `frontend-fast.log`, `lower-full-final.log`,
+`lower-fast-release.log`, `cfg-full.log`, `cfg-fast-final.log`, `*-release.log`,
+`partial-all/results.json`, `release-audit.json`, `product-comparison.json` and
+`support-preservation.json`. Compiler-version mismatch and a concurrent rebuild
+interruption have separate failed attempt logs; neither is reported as a semantic
+failure or a passing gate. Review details are in
+[historical repair](historical-qualification-repair.md).
+
+## Initial D1–D5 qualification (historical, superseded above)
 
 | Qualification | Result |
 | --- | --- |
