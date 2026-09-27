@@ -277,7 +277,7 @@
     ],
     "semantic_product_version": "2.49.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "15a37dac4592ce1387907ea97bb9b04640e8432a",
+    "commit": "ec83262bd65752f785f7d4df37a1310732e23a7b",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -315,7 +315,7 @@
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "PERFORM and logical alias MOVE qualified; integration tracked in cobol-lower PRs #36 and #37.",
-    "commit": "652bdfc915d4684c199c0cc125792fb2bebbd4a8",
+    "commit": "91d2cfeb9392ce7563f5f02da3b28bb6164ca2bb",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",

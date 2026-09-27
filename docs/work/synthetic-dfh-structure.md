@@ -54,3 +54,56 @@ local-cell proof. Its result is retained as the historical executable probe. The
 new product oracle independently requires dependencies.programs to contain PROGA001
 and P, supported by the written assignment, with unknown remainder and no fabricated
 executable edges. Three additional probes cover DFHSTRF, DFHOPAQ and DFHBMFLG.
+
+## Qualification — 2026-09-27
+
+Ready for Draft review; status remains IN_PROGRESS until a separately authorized merge.
+
+| Check | Result |
+| --- | --- |
+| Documented elementary names and nominal shapes | 105/105, plus both groups and both 88 names |
+| Structural pilot E2E | 14/14 |
+| PERFORM | 39/39 |
+| Chaos | 48/48 |
+| Logical aliases | 14/14 |
+| PERFORM adversaries | 25/25 |
+| CardDemo real programs | 73/73 |
+| Frontend FAST | 597 tests, zero failures/skips |
+| Lower FAST | PASS, including contract/architecture/integration checks |
+| CFG/dependencies FAST | 638 methods, zero failures/skips; architecture PASS |
+
+CardDemo retained all candidate sets, reachability, prior executable supports and
+original source operand provenance in 73/73 programs. 67 outputs were identical
+under the provenance-aware comparison. Six program variants gained eight valid
+MOVE supports: COACTVWC line 336, COCRDLIC lines 526/554 and COCRDSLC line 318,
+plus their migrated .cl2 variants. Their original declaration supports remained;
+no candidate or support was removed. Both COACTUPC variants matched the frozen
+baseline, including seven FILE sites marked UNREACHABLE_IN_MODEL and the two
+source-qualified program targets. That baseline has no FILE candidates.
+
+The final V1 writer refinement only restores canonical key order. All 73 CardDemo
+and 14 structural frontend products were reexecuted and were byte-identical to the
+previous qualified structural products; downstream binaries were unchanged, so
+that downstream evidence was reused explicitly. PERFORM, Chaos, aliases and PERFORM
+adversaries were executed again with the final writer. PERFORM's 39 SP products
+also match the previous pilot byte-for-byte. The initial writer ordering delta,
+102/105 inventory RED, four confidence REDs and final outputs remain available.
+
+The lower's future-version probes now use 2.50 because 2.49 is admitted; their
+rejection assertions remain intact. The CFG API inventory change is confined to
+modelAssumed accessors/constructors and the corresponding Java Stream/Predicate
+references. No architecture restriction or dependency oracle was relaxed.
+
+Full qualification and the older 310-fixture matrix were not rerun. The selected
+FAST gates, source/transport adversaries and full CardDemo corpus cover this change.
+Other DFH members, qualified/replaced missing COPY and authoritative physical/runtime
+modeling remain outside this pilot. No ALTER or merge was performed.
+
+Raw logs, immutable jars, hashes and products remain under `.synthetic-dfh/revision/`.
+The frontend's `docs/work/synthetic-dfh-validation.json` records counts, binary hashes,
+implementation SHAs, limitations and the exact scope of evidence reuse.
+
+Chaos has two expected SP additions: WS-BOOL in case 28 and WS-STATE in case 42
+now enter the nominal text inventory despite their level-88 children. Neither loses
+a fact or changes its dependency oracle. The other 46 Chaos products, all 14 alias
+products and all 25 PERFORM adversarial products match the previous pilot byte-for-byte.
