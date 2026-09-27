@@ -37,10 +37,13 @@ python3 scripts/project/e2e_perform_completion.py \
 The lower FAST gate contains three real-producer SP regressions and validates AIR
 and codec roundtrip. Existing malformed logical-coordinate cases remain unchanged.
 The original PERFORM corpus remains 39/39. In realistic chaos, cases 30 and 39
-now resolve PROGA001 with reachable CALLs; the unchanged oracle reports 47/48.
-Case 44 is the already-reviewed requirement for a dead CALL to exist in executable
-`sites`; its source inventory remains present and no dead target is emitted.
-No fixture expectation is changed to hide that remaining oracle discrepancy.
+now resolve PROGA001 with reachable CALLs. Before the separate oracle review,
+the unchanged runner reported 47/48 because it required an executable site for
+the dead CALL in case 44. The user authorized correcting that contradiction:
+absence of the dead executable site is valid, while source inventory must retain
+the occurrence with no candidates. The corrected and strengthened runner passes
+48/48 in a new complete execution; all 48 product documents are byte-identical
+to the previous run. Required/allowed/forbidden target sets remain unchanged.
 
 ## Limits
 
@@ -79,3 +82,23 @@ The frozen E2E binaries were executed before committing the fix. Their 486 lower
 core and 707 adapter class entries are byte-identical to the final FAST rebuild.
 Raw outputs, runtime hashes, baseline comparisons, the legacy W2 results and the
 metadata audit remain in the local workspace under `.alias-move/`.
+
+
+## Oracle review and integration
+
+The workspace chaos audit reviewed all 48 sources / 53 written CALLs and added
+19 evaluator/integrity tests with 27 negative mutations. All 19 corruptions that
+the old evaluator accepted are now rejected. The harness verifies the canonical
+program inventory, exact producer provenance, raw values, activation identity,
+BEFORE queries and PERFORM caller/value correlation. It uses the existing
+consumer wire validator. This audit changes no consumer production code.
+
+Six chaos cases are explicitly ABSTRACTION_POLICY: ALTER cases 09/11/12/37,
+INITIALIZE case 20 (no published logical receiver effect), and loop case 32
+(predicate correlation loss). Passing these cases does not prove concrete COBOL
+equivalence. The remaining 42 are source value/control oracles.
+
+Integration is recorded in [lower #37](https://github.com/Gustavo2358/cobol-lower/pull/37)
+and [CFG #48](https://github.com/Gustavo2358/analysis-cfg/pull/48), following the
+PERFORM bases. The user authorized the merges. Exact qualified source pins remain
+fixed; documentation does not invalidate the frozen execution evidence.
