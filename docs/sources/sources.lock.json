@@ -277,7 +277,7 @@
     ],
     "semantic_product_version": "2.49.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "f8170f513eef29adfff5a94f418e1c6481ee2365",
+    "commit": "e2d825b1551dd7a730ae79c4a1b7141586c23fc9",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -298,7 +298,7 @@
     "fd_w4_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED producers, manual outcomes/USE and 28 real CLI sources twice; file-dependencies/w4-implementation.md",
     "fd_w5_validation": "QUALIFIED_LOCAL: focal/FAST, producer Q-SHARED with bounded final reuse, manual local AIR/wire and44 real CLI sources twice; file-dependencies/w5-implementation.md",
     "fd_w6_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED,19 B-SP fixtures,15 manual AIR tests and33 real CLI sources twice; file-dependencies/w6-implementation.md",
-    "status": "PERFORM implementation and qualification complete; integration tracked in proleap-poc PR #62.",
+    "status": "SP 2.49 / NOMINAL_TEXT_SOURCE_V2 structural IBM catalogue; SQLCA model admitted only through EXEC SQL INCLUDE. Current integration: proleap-poc Draft PR #64; docs/work/carddemo-ibm-copybooks.md.",
     "fd_w8_validation": "QUALIFIED_LOCAL: producer FAST/Q-SHARED, B-SP33, CFG FAST502/Q547, manual/wire and38CICS+33native source cases twice; docs/product/file-dependencies/w8-implementation.md",
     "fd_w9_validation": "QUALIFIED_LOCAL: producer focal/FAST/Q, consumer manual/FAST/reader, 8 scope + 33 native + 38 CICS real CLI sources twice, deterministic four products; docs/product/file-dependencies/w9-implementation.md",
     "logical_text_w1": "Source E2E A-D twice deterministic; scale 10/100/1000; no physical profile. Corporate rerun not required by revised user acceptance.",
@@ -314,8 +314,8 @@
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
-    "status": "PERFORM and logical alias MOVE qualified; integration tracked in cobol-lower PRs #36 and #37.",
-    "commit": "be09905ca5a8d01f26a7e57afa9bc2697fe2df98",
+    "status": "SP 2.49 / NOMINAL_TEXT_SOURCE_V2 modelAssumed transport qualified; current integration: cobol-lower Draft PR #39; docs/work/carddemo-ibm-copybooks.md.",
+    "commit": "6860a052878ea7f1718490fbe48f884eb630cd77",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -358,7 +358,7 @@
       "producer_api": "io.github.gustavo2358.lower.adapters.cli.CobolDependencyInput",
       "schema_sha256": "5f751464dee36a993d9238a32e25d68d396ce8ca3fa2e0198f29b4e6a7f505c0"
     },
-    "evidence_level": "SP 2.47 nominal facts preserved independently of executable AIR; consumer admission and roundtrip PASS; local FAST PASS; draft review pending.",
+    "evidence_level": "SP 2.49 modelAssumed preserved independently of executable AIR; conditional dependencies retain model uncertainty. Admission/roundtrip and FAST qualified; CardDemo 73/73 and structural adversaries 21/21. Execution versus evidence reuse is detailed in docs/work/carddemo-ibm-copybooks.md; Draft review pending.",
     "perform_completion": "Scoped exits, SECTION boundaries, typed VARYING levels; Integration authorized; qualified original 39/39 and adversaries 25/25. See docs/domain/perform-control-completion.md.",
     "logical_alias_move": "Logical family translation precedes scalar shortcuts; 14/14 adversaries, PERFORM 39/39, reviewed chaos 48/48 with six explicit abstraction-policy cases; see docs/product/logical-alias-move.md.",
     "synthetic_model_assumptions": {
@@ -395,7 +395,7 @@
   ],
   "storage_campaign": {
     "id": "ST-W6-W8",
-    "status": "W6 development; local feature checkpoints, no merge; G2 and W7/W8 pending",
+    "status": "Historical ST-W6-W8 checkpoint: W6 development; local feature checkpoints, no merge; G2 and W7/W8 pending",
     "profile": "ibm-enterprise-6.4-fixed-display-1047@1",
     "authority": "Existing AIR 2.0.0 plus optional IBM1047; source semantic facts owned by frontend, translated by lower"
   },
@@ -425,5 +425,6 @@
     "mode_default": "LOGICAL_ONLY",
     "physical": "EXPERIMENTAL_EXPLICIT_OPT_IN_ONLY",
     "report": "docs/campaigns/positive-memory-topology/W2-REPORT.md"
-  }
+  },
+  "metadata_scope": "Top-level producer/consumer commits, contract versions and status describe the current pins. Named wave fields, merged_reviews and source_state_checkpoint/approved_sp_producer retain historical evidence and do not override current pins; current IBM qualification is in docs/work/carddemo-ibm-copybooks.md."
 }

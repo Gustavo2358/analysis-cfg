@@ -25,7 +25,7 @@ Evidence: frontend `docs/work/carddemo-ibm-validation.json` and local
 `.synthetic-dfh/carddemo-expansion/`. Synthetic inputs remain PARTIAL. No physical
 layout/initial-byte proof, invented CFG edges or merge.
 
-## Final gate and pins
+## Expansion gate and pins
 
 CFG/dependencies FAST PASS, including contract tests and compiled architecture boundaries.
 Final producer `f8170f513eef29adfff5a94f418e1c6481ee2365`; lower `be09905ca5a8d01f26a7e57afa9bc2697fe2df98`.
@@ -35,3 +35,31 @@ Git comparison proves all consumed production code unchanged. The 12 rebuilt
 producer/consumer JARs have byte-identical production classes/model resources
 to the frozen E2E runtime. Final docs/pin checks PASS; FAST evidence is reused
 for these equivalent-content repins, with no repeated semantic run.
+
+## Review follow-up — current authority and exact pins
+
+Current frontend: `e2d825b1551dd7a730ae79c4a1b7141586c23fc9`; lower: `6860a052878ea7f1718490fbe48f884eb630cd77`.
+The producer restricts synthetic SQLCA to EXEC SQL INCLUDE; real COPY SQLCA
+continues normally and missing COPY SQLCA stays unresolved. No consumer code
+changes. Lock descriptions now identify SP 2.49 / NOMINAL_TEXT_SOURCE_V2,
+modelAssumed and Drafts #64/#39; stale PERFORM PR and SP 2.47 descriptions were
+replaced. Historical authority pins are unchanged. Wave-specific evidence and
+storage checkpoints are explicitly historical; upstream-state separates current
+integration from the chronological record.
+
+Review validation newly executed: frontend focal 28/28 and FAST 603/603;
+lower FAST and CFG/dependencies FAST PASS, including contract/architecture checks
+(CFG: 638 required methods, zero skips). All 73 CardDemo, 21 structural
+adversaries, 39 PERFORM, 48 Chaos, 14 aliases and 25 PERFORM adversaries reran
+the frontend: all 220 SP/compilation pairs are byte-identical. Downstream corpus
+stages were not rerun; their evidence is reused with identical inputs and consumer
+binaries, preserving candidates, supports and provenance. Twelve rebuilt JARs
+have the same production classes/model resources as the immutable runtime.
+
+The consumer FAST gates used frontend implementation
+`3a4d9e9cbbce4d481eaf58db9e4ef8463e635914` and the prior lower HEAD
+`be09905ca5a8d01f26a7e57afa9bc2697fe2df98` plus metadata edits. Final frontend and
+lower commits differ only in docs/pins. Final docs and pin checks pass. Raw logs,
+result hashes and compiled equivalence: `.synthetic-dfh/carddemo-review-fixes/`;
+producer report: `docs/work/carddemo-ibm-review-validation.json`. Full qualification
+and the historical 310 matrix were not executed. Draft #49 remains open; no merge.

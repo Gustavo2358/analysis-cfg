@@ -1,6 +1,20 @@
 # Baseline factual dos repositórios
 
-Estado vigente: CP5 e CP6 W1 integrados. CP6 W2D autorizado em [WORK-CFG-034](../work/active/WORK-CFG-034.md), consumindo SP 1.4.0 / W2A `4a29b7b`, lower W2B `a8fbffd`, air-java W2C `760593b`; AIR normativa permanece `51b4d9a` (2.0.0; JSON binding 1.0.0 DRAFT). O [source lock](sources.lock.json) contém os SHAs completos. Os checkpoints abaixo conservam seu contexto histórico.
+## Estado vigente — catálogo IBM estrutural
+
+Os pins atuais estão em [sources.lock.json](sources.lock.json): frontend SP 2.49 /
+NOMINAL_TEXT_SOURCE_V2, com modelAssumed e nove membros IBM; fallback sintético
+SQLCA autorizado somente por EXEC SQL INCLUDE. Arquivos reais mantêm precedência.
+A revisão atual está nos Drafts proleap-poc #64, cobol-lower #39 e analysis-cfg #49.
+Evidência executada e reuso estão em [CardDemo IBM](../work/carddemo-ibm-copybooks.md).
+
+As seções abaixo preservam a sequência histórica de checkpoints. Versões, pins,
+estados e pendências nelas registrados pertencem à época de cada observação;
+não substituem os campos atuais do lock nem descrevem o estado de merge atual.
+
+## Checkpoints históricos
+
+Estado histórico desse checkpoint: CP5 e CP6 W1 integrados. CP6 W2D autorizado em [WORK-CFG-034](../work/active/WORK-CFG-034.md), consumindo SP 1.4.0 / W2A `4a29b7b`, lower W2B `a8fbffd`, air-java W2C `760593b`; AIR normativa permanece `51b4d9a` (2.0.0; JSON binding 1.0.0 DRAFT). O [source lock](sources.lock.json) contém os SHAs completos. Os checkpoints abaixo conservam seu contexto histórico.
 
 
 Observada em 06/09/2026; apenas air-java revalidado em 08/09/2026. Este documento é contexto de integração, não contrato CFG.
