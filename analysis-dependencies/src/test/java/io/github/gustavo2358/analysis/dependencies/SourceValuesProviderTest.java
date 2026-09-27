@@ -47,4 +47,39 @@ class SourceValuesProviderTest {
         assertEquals(io.github.gustavo2358.analysis.values.TextPredicate.FALSE,io.github.gustavo2358.analysis.values.TextPredicate.sourceFigurativeEquality(List.of("A😀A😀"),false));
         assertEquals("😀   ",io.github.gustavo2358.analysis.values.TextPredicate.fit("😀",4));
     }
+
+    static UnitEvidence model(UnitEvidence u, String symbol, int extent) {
+        var old=u.nominalValues().orElseThrow();var f=old.facts();
+        var symbols=f.symbols().stream().map(s->new NominalValues.Symbol(s.node(),s.node().equals(symbol)?extent:s.extent(),s.node().equals(symbol))).toList();
+        var facts=new NominalValues("NOMINAL_TEXT_SOURCE_V2",symbols,f.assignments(),f.conditions(),f.queries());
+        var evidence=new NominalValueEvidence(facts,old.declarations(),old.seeds(),old.branches(),old.uncertainties());
+        return new UnitEvidence(u.unit(),u.controlAvailable(),u.statements(),u.occurrences(),u.targets(),u.nodes(),u.derivations(),u.selections(),u.events(),u.guards(),u.proofs(),u.frontiers(),Optional.of(evidence));
+    }
+    @Test void modelValuesAreNotSeeds() {
+        assertTrue(values(model(fixture(List.of(),List.of(),List.of()),"P",1)).isEmpty());
+    }
+    @Test void unknownModelCopyCannotKillAnObservedName() {
+        var u=model(fixture(List.of(new NominalValues.Assignment("s0","P",read("Q"))),List.of(),List.of()),"Q",1);
+        assertEquals(List.of("SELF0001"),values(u));
+    }
+    @Test void modelWidthAndUnknownOverwriteCannotEraseSourceText() {
+        var u=model(fixture(List.of(new NominalValues.Assignment("s0","P",literal("PROGA001")),
+            new NominalValues.Assignment("s1","P",new NominalValues.Term("UNKNOWN",""))),List.of(),List.of()),"P",1);
+        assertEquals(List.of("P","PROGA001"),values(u));
+        var candidates=new SourceValuesProvider(u,Set.of("s2")).candidates("s2");
+        assertTrue(candidates.stream().allMatch(c->c.support().evidence().stream().anyMatch(e->e.reference().equals("s0"))));
+        assertTrue(candidates.stream().noneMatch(c->c.support().evidence().stream().anyMatch(e->e.kind().equals("DECLARATION_VALUE"))));
+    }
+    @Test void modelInfluenceSurvivesACopyAndCannotFilterEitherBranch() {
+        var condition=new NominalValues.Condition("s1",new NominalValues.Predicate("EQ",List.of(read("P"),literal("SELF0001")),List.of()));
+        for(boolean branch:List.of(true,false)) {
+            var u=model(fixture(List.of(new NominalValues.Assignment("s0","P",read("Q"))),List.of(condition),List.of(new NominalValueEvidence.Branch("d2",branch))),"Q",1);
+            assertEquals(List.of("SELF0001"),values(u));
+        }
+    }
+    @Test void ordinaryKnownWriteAfterModelCopyStillProvesKill() {
+        var u=model(fixture(List.of(new NominalValues.Assignment("s0","P",read("Q")),
+            new NominalValues.Assignment("s1","P",literal("REAL0001"))),List.of(),List.of()),"Q",1);
+        assertEquals(List.of("REAL0001"),values(u));
+    }
 }

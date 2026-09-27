@@ -275,9 +275,9 @@
       "src/main/java/io/github/gustavo2358/cobolexplorer/CicsCommandSyntax.java",
       "src/test/java/io/github/gustavo2358/cobolexplorer/CicsFileControlTest.java"
     ],
-    "semantic_product_version": "2.48.0",
+    "semantic_product_version": "2.49.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "c5f914cb6b7cea4995e4fa045644d77f4da283fd",
+    "commit": "15a37dac4592ce1387907ea97bb9b04640e8432a",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -288,8 +288,8 @@
       "scope": "local unconditional paragraph identity and explicit entry; G1-G5 and 1/2/5/40"
     },
     "storage_contract_version": "1.11.0",
-    "canonical_ref": "feat/perform-control-completion",
-    "observed_on": "2026-09-26",
+    "canonical_ref": "feat/dfh-nominal-copybooks",
+    "observed_on": "2026-09-27",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "fd_w1_validation": "docs/work/active/FD-W1.yaml",
@@ -306,12 +306,16 @@
     "logical_text_storage_contract_version": "1.9.0",
     "logical_text_w2": "Local producer FAST PASS; fixed logical ranges and expression transport. Selected source E2E qualification in docs/product/logical-text-w2.md.",
     "dependency_preservation": "W3-R1 local complete logical TEXT view identity in SP 2.35/storage 1.11, including record/child and standalone roots; physical gaps remain coverage.",
-    "perform_completion": "Scoped exits, SECTION boundaries, typed VARYING levels; Integration authorized; qualified original 39/39 and adversaries 25/25. See docs/domain/perform-control-completion.md."
+    "perform_completion": "Scoped exits, SECTION boundaries, typed VARYING levels; Integration authorized; qualified original 39/39 and adversaries 25/25. See docs/domain/perform-control-completion.md.",
+    "synthetic_model_assumptions": {
+      "contract": "SP2.49 / NOMINAL_TEXT_SOURCE_V2",
+      "review": "docs/work/synthetic-dfh-structure.md"
+    }
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "PERFORM and logical alias MOVE qualified; integration tracked in cobol-lower PRs #36 and #37.",
-    "commit": "bcb5b2b885258cb86fbf5aa320d40c07f522f1a7",
+    "commit": "652bdfc915d4684c199c0cc125792fb2bebbd4a8",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -323,8 +327,8 @@
     "goto_validation": {
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
     },
-    "canonical_ref": "fix/logical-alias-move",
-    "observed_on": "2026-09-26",
+    "canonical_ref": "feat/dfh-structural-models",
+    "observed_on": "2026-09-27",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "fd_w1_validation": "docs/work/active/FD-W1.yaml",
@@ -356,7 +360,11 @@
     },
     "evidence_level": "SP 2.47 nominal facts preserved independently of executable AIR; consumer admission and roundtrip PASS; local FAST PASS; draft review pending.",
     "perform_completion": "Scoped exits, SECTION boundaries, typed VARYING levels; Integration authorized; qualified original 39/39 and adversaries 25/25. See docs/domain/perform-control-completion.md.",
-    "logical_alias_move": "Logical family translation precedes scalar shortcuts; 14/14 adversaries, PERFORM 39/39, reviewed chaos 48/48 with six explicit abstraction-policy cases; see docs/product/logical-alias-move.md."
+    "logical_alias_move": "Logical family translation precedes scalar shortcuts; 14/14 adversaries, PERFORM 39/39, reviewed chaos 48/48 with six explicit abstraction-policy cases; see docs/product/logical-alias-move.md.",
+    "synthetic_model_assumptions": {
+      "contract": "SP2.49 / NOMINAL_TEXT_SOURCE_V2",
+      "review": "docs/work/synthetic-dfh-structure.md"
+    }
   },
   "external": [
     {
