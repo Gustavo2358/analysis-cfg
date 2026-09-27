@@ -275,9 +275,9 @@
       "src/main/java/io/github/gustavo2358/cobolexplorer/CicsCommandSyntax.java",
       "src/test/java/io/github/gustavo2358/cobolexplorer/CicsFileControlTest.java"
     ],
-    "semantic_product_version": "2.49.0",
+    "semantic_product_version": "2.50.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "30605f0a009df4cdf49663c688431215912bbfa8",
+    "commit": "3e89cc39ef58f8092dd2a6ada1ed57686c6312b0",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -298,7 +298,7 @@
     "fd_w4_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED producers, manual outcomes/USE and 28 real CLI sources twice; file-dependencies/w4-implementation.md",
     "fd_w5_validation": "QUALIFIED_LOCAL: focal/FAST, producer Q-SHARED with bounded final reuse, manual local AIR/wire and44 real CLI sources twice; file-dependencies/w5-implementation.md",
     "fd_w6_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED,19 B-SP fixtures,15 manual AIR tests and33 real CLI sources twice; file-dependencies/w6-implementation.md",
-    "status": "Merged proleap-poc PR #64; SP 2.49 / NOMINAL_TEXT_SOURCE_V2 structural IBM catalogue with modelAssumed. SQLCA model admitted only through EXEC SQL INCLUDE. See docs/work/carddemo-ibm-copybooks.md.",
+    "status": "Review branch for CICS control completion D1–D5, SP 2.50. Not merged; qualification and historical full-gate failures are documented in docs/work/cics-control-qualification.md.",
     "fd_w8_validation": "QUALIFIED_LOCAL: producer FAST/Q-SHARED, B-SP33, CFG FAST502/Q547, manual/wire and38CICS+33native source cases twice; docs/product/file-dependencies/w8-implementation.md",
     "fd_w9_validation": "QUALIFIED_LOCAL: producer focal/FAST/Q, consumer manual/FAST/reader, 8 scope + 33 native + 38 CICS real CLI sources twice, deterministic four products; docs/product/file-dependencies/w9-implementation.md",
     "logical_text_w1": "Source E2E A-D twice deterministic; scale 10/100/1000; no physical profile. Corporate rerun not required by revised user acceptance.",
@@ -308,15 +308,15 @@
     "dependency_preservation": "W3-R1 local complete logical TEXT view identity in SP 2.35/storage 1.11, including record/child and standalone roots; physical gaps remain coverage.",
     "perform_completion": "Scoped exits, SECTION boundaries, typed VARYING levels; Integration authorized; qualified original 39/39 and adversaries 25/25. See docs/domain/perform-control-completion.md.",
     "synthetic_model_assumptions": {
-      "contract": "SP2.49 / NOMINAL_TEXT_SOURCE_V2",
-      "review": "docs/work/synthetic-dfh-structure.md"
+      "contract": "SP2.50 / NOMINAL_TEXT_SOURCE_V2; MODEL_STORAGE remains unavailable",
+      "review": "docs/work/cics-control-qualification.md"
     },
-    "evidence_level": "CICS control completion D1–D5 review branch; SP 2.50 typed model locality. Per-checkpoint checks and final qualification: docs/work/cics-control-completion.md. Not merged."
+    "evidence_level": "CICS control completion D1–D5 review branch; SP 2.50 model locality, rollback/RETURN and qualified exceptional control. Per-checkpoint checks and final qualification: docs/work/cics-control-completion.md. Not merged."
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
-    "status": "Merged cobol-lower PR #39; SP 2.49 / NOMINAL_TEXT_SOURCE_V2 modelAssumed transport qualified. The lower pins the merged frontend PR #64; docs/work/carddemo-ibm-copybooks.md.",
-    "commit": "f579c7f3d5019cffb1530ad4a75f1cd962ab2f4d",
+    "status": "Review branch for CICS control completion D1–D5, SP 2.50. Not merged; qualification and historical full-gate failures are documented in docs/work/cics-control-qualification.md.",
+    "commit": "42dc0d83e44a9c1b58b93d356e8de3c8cd2bdb8c",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -350,8 +350,9 @@
       "producer_api": "io.github.gustavo2358.lower.application.QualifiedSourceProjection",
       "source_state_checkpoint": "090296d51a5eb33ac5c337c45ee62de8fd27c296",
       "approved_sp_producer": "cef8e728857467a283f77d9b6b1f2f870eda57d5",
-      "schema_sha256": "20e77d21af64e4d762639f6d6ebddab79567f08eaa8929e65fe767f60f1a463c",
-      "review": 34
+      "schema_sha256": "0e4af91e4e43b8d7e43c8f0d1c8caaa35a288a9650b7322558a31b23b60a3a8f",
+      "review": 34,
+      "checkpoint_note": "source_state_checkpoint, approved_sp_producer and review identify the historical certificate baseline; commit above is the current producer pin."
     },
     "dependency_input": {
       "schema": "dependency-input",
@@ -359,12 +360,12 @@
       "producer_api": "io.github.gustavo2358.lower.adapters.cli.CobolDependencyInput",
       "schema_sha256": "5f751464dee36a993d9238a32e25d68d396ce8ca3fa2e0198f29b4e6a7f505c0"
     },
-    "evidence_level": "CICS control completion D1–D5 review branch; SP 2.50 typed model locality. Per-checkpoint checks and final qualification: docs/work/cics-control-completion.md. Not merged.",
+    "evidence_level": "CICS control completion D1–D5 review branch; SP 2.50 model locality, rollback/RETURN and qualified exceptional control. Per-checkpoint checks and final qualification: docs/work/cics-control-completion.md. Not merged.",
     "perform_completion": "Scoped exits, SECTION boundaries, typed VARYING levels; Integration authorized; qualified original 39/39 and adversaries 25/25. See docs/domain/perform-control-completion.md.",
     "logical_alias_move": "Logical family translation precedes scalar shortcuts; 14/14 adversaries, PERFORM 39/39, reviewed chaos 48/48 with six explicit abstraction-policy cases; see docs/product/logical-alias-move.md.",
     "synthetic_model_assumptions": {
-      "contract": "SP2.49 / NOMINAL_TEXT_SOURCE_V2",
-      "review": "docs/work/synthetic-dfh-structure.md"
+      "contract": "SP2.50 / NOMINAL_TEXT_SOURCE_V2; MODEL_STORAGE remains unavailable",
+      "review": "docs/work/cics-control-qualification.md"
     }
   },
   "external": [

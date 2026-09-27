@@ -194,3 +194,10 @@ and their explicit AIR exception types/standard collection dependencies. Existin
 public structural descriptors, source inventory, Maven DAG and forbidden-package
 checks are unchanged. The Class reference in the writer is the static
 OutcomeExit.class::isInstance predicate, without textual discovery or loading.
+
+## Review handoff
+
+Implementation checkpoints D1–D5 are complete. Status stays IN_PROGRESS until
+review/merge; no merge is authorized by this work item. See the
+[qualification report](cics-control-qualification.md) for corpus results, the
+regression found and corrected, reused evidence and remaining limits.

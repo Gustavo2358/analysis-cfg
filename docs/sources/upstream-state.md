@@ -1,14 +1,17 @@
 # Baseline factual dos repositórios
 
-## Estado vigente — catálogo IBM estrutural
+## Estado vigente — revisão CICS D1–D5
 
-Os pins atuais estão em [sources.lock.json](sources.lock.json): frontend SP 2.49 /
-NOMINAL_TEXT_SOURCE_V2, com modelAssumed e nove membros IBM; fallback sintético
-SQLCA autorizado somente por EXEC SQL INCLUDE. Arquivos reais mantêm precedência.
-Frontend #64 (`22d37233373b9db691ba170d898b7523bfea5746`) e
-lower #39 (`83f11f13dd5e521382e4903c2d8bf9e92832f11a`) estão mergeados.
-A integração do consumidor final segue no PR analysis-cfg #49.
-Evidência executada e reuso estão em [CardDemo IBM](../work/carddemo-ibm-copybooks.md).
+Os pins exatos estão em [sources.lock.json](sources.lock.json), na branch
+`feat/cics-control-completion`, ainda sem merge. O frontend publica SP2.50 com
+MODEL_STORAGE, SYNCPOINT_ROLLBACK e RETURN tipados. O lower admite o controle
+qualificado de ABEND/XCTL com contextos de PERFORM e estado de handler separados.
+O CFG projeta alternativas excepcionais AIR explícitas e publica CFG JSON4 quando
+necessário. modelAssumed e NOMINAL_TEXT_SOURCE_V2 continuam sem prova de kill.
+
+Qualificação, reuso e limites: [CICS D1–D5](../work/cics-control-qualification.md).
+A integração IBM anterior é baseline histórica; os SHAs do lock são a autoridade
+para esta revisão. Não interpretar os checkpoints abaixo como estado atual.
 
 As seções abaixo preservam a sequência histórica de checkpoints. Versões, pins,
 estados e pendências nelas registrados pertencem à época de cada observação;
