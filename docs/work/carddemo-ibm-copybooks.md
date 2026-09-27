@@ -63,3 +63,18 @@ lower commits differ only in docs/pins. Final docs and pin checks pass. Raw logs
 result hashes and compiled equivalence: `.synthetic-dfh/carddemo-review-fixes/`;
 producer report: `docs/work/carddemo-ibm-review-validation.json`. Full qualification
 and the historical 310 matrix were not executed. Draft #49 remains open; no merge.
+
+## Integration — actual merged producer pins
+
+User authorized frontend #64 → lower #39 → CFG #49 integration.
+Frontend #64 merged at `22d37233373b9db691ba170d898b7523bfea5746`; lower #39 merged at
+`83f11f13dd5e521382e4903c2d8bf9e92832f11a`. Both current consumer pins identify these actual
+merge commits on main. Lower itself pins the same frontend merge. Each merge
+has exactly the tree of its reviewed/qualified head; lower and CFG integration
+deltas contain documentation/pins only. SP 2.49 / nominal V2, AIR and production
+semantics are unchanged, so qualified corpus/suite evidence is reused.
+
+Frontend main FAST and merged-pin lower CI passed. Final main gates, merge SHAs
+and CI outcomes are recorded by Git/CI and the integration report. Earlier
+Draft/no-merge statements are historical qualification checkpoints and are
+superseded by this integration authorization and merged upstream pins.

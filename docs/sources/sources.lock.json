@@ -277,7 +277,7 @@
     ],
     "semantic_product_version": "2.49.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "e2d825b1551dd7a730ae79c4a1b7141586c23fc9",
+    "commit": "22d37233373b9db691ba170d898b7523bfea5746",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -288,7 +288,7 @@
       "scope": "local unconditional paragraph identity and explicit entry; G1-G5 and 1/2/5/40"
     },
     "storage_contract_version": "1.11.0",
-    "canonical_ref": "feat/dfh-nominal-copybooks",
+    "canonical_ref": "main",
     "observed_on": "2026-09-27",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
@@ -298,7 +298,7 @@
     "fd_w4_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED producers, manual outcomes/USE and 28 real CLI sources twice; file-dependencies/w4-implementation.md",
     "fd_w5_validation": "QUALIFIED_LOCAL: focal/FAST, producer Q-SHARED with bounded final reuse, manual local AIR/wire and44 real CLI sources twice; file-dependencies/w5-implementation.md",
     "fd_w6_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED,19 B-SP fixtures,15 manual AIR tests and33 real CLI sources twice; file-dependencies/w6-implementation.md",
-    "status": "SP 2.49 / NOMINAL_TEXT_SOURCE_V2 structural IBM catalogue; SQLCA model admitted only through EXEC SQL INCLUDE. Current integration: proleap-poc Draft PR #64; docs/work/carddemo-ibm-copybooks.md.",
+    "status": "Merged proleap-poc PR #64; SP 2.49 / NOMINAL_TEXT_SOURCE_V2 structural IBM catalogue with modelAssumed. SQLCA model admitted only through EXEC SQL INCLUDE. See docs/work/carddemo-ibm-copybooks.md.",
     "fd_w8_validation": "QUALIFIED_LOCAL: producer FAST/Q-SHARED, B-SP33, CFG FAST502/Q547, manual/wire and38CICS+33native source cases twice; docs/product/file-dependencies/w8-implementation.md",
     "fd_w9_validation": "QUALIFIED_LOCAL: producer focal/FAST/Q, consumer manual/FAST/reader, 8 scope + 33 native + 38 CICS real CLI sources twice, deterministic four products; docs/product/file-dependencies/w9-implementation.md",
     "logical_text_w1": "Source E2E A-D twice deterministic; scale 10/100/1000; no physical profile. Corporate rerun not required by revised user acceptance.",
@@ -314,8 +314,8 @@
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
-    "status": "SP 2.49 / NOMINAL_TEXT_SOURCE_V2 modelAssumed transport qualified; current integration: cobol-lower Draft PR #39; docs/work/carddemo-ibm-copybooks.md.",
-    "commit": "6860a052878ea7f1718490fbe48f884eb630cd77",
+    "status": "Merged cobol-lower PR #39; SP 2.49 / NOMINAL_TEXT_SOURCE_V2 modelAssumed transport qualified. The lower pins the merged frontend PR #64; docs/work/carddemo-ibm-copybooks.md.",
+    "commit": "83f11f13dd5e521382e4903c2d8bf9e92832f11a",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -327,7 +327,7 @@
     "goto_validation": {
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
     },
-    "canonical_ref": "feat/dfh-structural-models",
+    "canonical_ref": "main",
     "observed_on": "2026-09-27",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
@@ -358,7 +358,7 @@
       "producer_api": "io.github.gustavo2358.lower.adapters.cli.CobolDependencyInput",
       "schema_sha256": "5f751464dee36a993d9238a32e25d68d396ce8ca3fa2e0198f29b4e6a7f505c0"
     },
-    "evidence_level": "SP 2.49 modelAssumed preserved independently of executable AIR; conditional dependencies retain model uncertainty. Admission/roundtrip and FAST qualified; CardDemo 73/73 and structural adversaries 21/21. Execution versus evidence reuse is detailed in docs/work/carddemo-ibm-copybooks.md; Draft review pending.",
+    "evidence_level": "SP 2.49 modelAssumed preserved independently of executable AIR; conditional dependencies retain model uncertainty. Admission/roundtrip and FAST qualified; CardDemo 73/73 and structural adversaries 21/21. Merged PR #39 has the reviewed production content plus exact merged producer pins. Execution versus evidence reuse is detailed in docs/work/carddemo-ibm-copybooks.md.",
     "perform_completion": "Scoped exits, SECTION boundaries, typed VARYING levels; Integration authorized; qualified original 39/39 and adversaries 25/25. See docs/domain/perform-control-completion.md.",
     "logical_alias_move": "Logical family translation precedes scalar shortcuts; 14/14 adversaries, PERFORM 39/39, reviewed chaos 48/48 with six explicit abstraction-policy cases; see docs/product/logical-alias-move.md.",
     "synthetic_model_assumptions": {
