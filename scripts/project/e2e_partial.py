@@ -16,7 +16,7 @@ from prepare_w2d_producers import ROOT, git, require_local
 FIXTURES = ROOT / 'analysis-adapters/src/test/resources/cp6/partial-program'
 # Hand-written known candidates; computed CALL remainders follow the explicit AIR bounds.
 EXPECTED = {
-    'display-handler': [{'BEFORE'}, set()],
+    'display-handler': [{'BEFORE'}],
     'control-body': [{'AFTER'}, {'INNER'}],
     'p1': [{'PROGA'}],
     'p2': [{'PROGA'}, {'PROGB'}],
@@ -61,15 +61,14 @@ def oracle(name, sp, air, result):
     sites = []; linked = set(); inactive = []
     for call_index, call in enumerate(calls):
         ids = {o['localId'] for o in links[call['header']['id']]}
-        require(ids and ids <= by_op.keys(), 'every CALL output has a dependency site')
+        if name == 'display-handler' and call_index == 1:
+            require(not ids, 'post-DISPLAY CALL remains source inventory beyond an unproved completion')
+            continue
+        require(ids and ids <= by_op.keys(), 'every projected CALL output has a dependency site')
         linked.update(ids)
         active = [by_op[i] for i in ids if by_op[i]['reachability'] == 'REACHABLE']
-        if name == 'display-handler' and call_index == 1:
-            require(not active and len(ids) == 1, 'post-DISPLAY CALL is behind an unproved handler completion')
-            sites.append(by_op[next(iter(ids))])
-        else:
-            require(len(active) == 1, 'one reachable site per source CALL')
-            sites.extend(active)
+        require(len(active) == 1, 'one reachable site per projected source CALL')
+        sites.extend(active)
         for i in ids:
             site = by_op[i]
             if site['reachability'] != 'REACHABLE':
@@ -97,11 +96,11 @@ def oracle(name, sp, air, result):
                 and not sites[0]['modelValueRemainder'],
                 'unknown linkage input does not erase independent local CALL value')
     if name == 'control-body':
-        require(len(inactive) == 1, 'one inactive contextual body shadow')
-        shadow = operations[inactive[0]['operation']['localId']]
-        require(not shadow['outcomes']['known'] and shadow['outcomes']['remainder'] ==
-                {'kind': 'within', 'scope': {'kind': 'labels', 'labels': []}},
-                'inactive body shadow retains its explicit open boundary')
+        require(not inactive and len(sites) == 2, 'only the demanded body activation and resumed CALL are published')
+        inner = operations[sites[1]['operation']['localId']]
+        require(inner['outcomes']['known'] == [{'kind': 'normal', 'label': sites[0]['sequence']}]
+                and inner['outcomes']['remainder'] == {'kind': 'none'},
+                'body CALL returns only to its activation resume')
     if name in EXPECTED:
         require(len(sites) == len(EXPECTED[name]), 'independent source site count')
         for site, values in zip(sites, EXPECTED[name]):

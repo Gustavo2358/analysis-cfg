@@ -45,3 +45,10 @@ The partial-program gate uncovered a **real lower defect**: CALL with only
 UNKNOWN_LOCAL outcomes lost its target when replaced by Opaque. The lower fix
 preserves Invoke target/signature and leaves an empty open local frontier.
 The original `call-handlers` candidate expectation remains mandatory.
+
+The current topology projects demanded execution contexts only. `control-body`
+therefore requires exactly the body CALL and its resumed CALL, with the correct
+normal outcome; it no longer requires an unused lexical shadow. `display-handler`
+requires the following CALL to remain inventory-only beyond the unknown DISPLAY
+completion. Its previously expected empty unreachable site was a representation
+artifact; the BEFORE candidate and the prohibition on AFTER execution are unchanged.
