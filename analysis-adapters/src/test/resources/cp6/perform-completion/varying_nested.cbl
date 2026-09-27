@@ -1,0 +1,26 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. PERFORM-ADVERSARY.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 PGM PIC X(8).
+       01 FLAG PIC X.
+       01 I PIC 9(4).
+       01 J PIC 9(4).
+       01 K PIC 9(4).
+       01 N PIC 9(4).
+       PROCEDURE DIVISION.
+       MAIN.
+       PERFORM P WITH TEST AFTER
+       VARYING I FROM 1 BY 1 UNTIL I > 2
+       AFTER J FROM 1 BY 1 UNTIL J > 2
+       CALL PGM
+       GOBACK.
+       P.
+       PERFORM 2 TIMES
+       MOVE 'LIVE0001' TO PGM
+       EXIT PERFORM
+       END-PERFORM
+       CALL PGM
+       MOVE 'LIVE0002' TO PGM
+       EXIT PARAGRAPH
+       MOVE 'DEAD0001' TO PGM.
