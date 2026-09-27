@@ -48,3 +48,29 @@ SQLCA negative oracle still forbids an exact cell; only its input kind changed.
 
 Raw evidence: workspace .cics-completion/evidence/d1-*. This checkpoint has not
 run the final whole-corpus qualification.
+
+## D3 algorithm and oracle (before implementation)
+
+IBM SYNCPOINT ROLLBACK backs out recoverable resources and can complete normally.
+Publish SYNCPOINT_ROLLBACK as a distinct command kind with a required operand-free
+ROLLBACK option. Its application host footprint contains only explicit RESP/RESP2
+writes; external transactional state stays open. No host-memory rollback or kill
+is inferred. Ordinary source completion uses the existing contextual topology;
+unsuppressed INVREQ retains exceptional uncertainty. RESP/NOHANDLE permits local
+error completion, RESP2 alone does not suppress default processing. Closed option
+validation rejects duplicate/value-bearing ROLLBACK and unsupported options.
+This is a finite command classification and existing lowering, linear in options.
+SP 2.50 is required for the distinct kind, including unavailable syntax facts.
+
+## D2 checkpoint
+
+Seven new four-stage adversaries pass with D1. They exercise RECEIVE/SEND MAP and
+SEND FROM/LENGTH OF in nested PERFORM, two callers, real aliases, actual missing
+COPY and model storage operands. Independent AIR assertions check the expected
+read/write operands, bounded scopes and absence of mustOverwrite. RECEIVE retains
+the prior candidate after MAY writes. No lower admission guard was removed: D1
+restores the positive allocation proof required by the existing translator.
+
+The first temporary runs exposed invalid fixed-format probe wrapping (column 72
+and splitting a hyphenated token). Corrected sources preserve the semantic oracle;
+raw failed runs remain separate. Valid run: d2-focal-valid, 7/7, all 28 stages zero.

@@ -1,0 +1,252 @@
+{
+  "cases": [
+    {
+      "id": "receive_nested_model",
+      "source": "receive_nested_model.cbl",
+      "sha256": "8fdc3e328cf8d36c8913df86d235fb219e713ff5dc0674de2048ccde0f8b9900",
+      "calls": {
+        "root": {
+          "line": 16,
+          "required": [
+            "RESUMED1"
+          ],
+          "allowed": [
+            "RESUMED1"
+          ],
+          "reachable": true
+        },
+        "outer": {
+          "line": 20,
+          "required": [
+            "RESUMED2"
+          ],
+          "allowed": [
+            "RESUMED2"
+          ],
+          "reachable": true
+        },
+        "memory": {
+          "line": 24,
+          "required": [
+            "BEFORE01"
+          ],
+          "allowed": [
+            "BEFORE01"
+          ],
+          "reachable": true
+        },
+        "outside": {
+          "line": 28,
+          "required": [],
+          "allowed": [
+            "OUTSIDE1"
+          ],
+          "reachable": false
+        }
+      },
+      "hostMemory": [
+        {
+          "command": "RECEIVE_MAP",
+          "reads": 1,
+          "writes": 3
+        }
+      ]
+    },
+    {
+      "id": "send_map_nested_model",
+      "source": "send_map_nested_model.cbl",
+      "sha256": "fbbbe4984014170f0856a90cadd222b78fc1820a81369dae222e4eff5817f2a2",
+      "calls": {
+        "root": {
+          "line": 16,
+          "required": [
+            "RESUMED1"
+          ],
+          "allowed": [
+            "RESUMED1"
+          ],
+          "reachable": true
+        },
+        "outer": {
+          "line": 20,
+          "required": [
+            "RESUMED2"
+          ],
+          "allowed": [
+            "RESUMED2"
+          ],
+          "reachable": true
+        },
+        "memory": {
+          "line": 24,
+          "required": [
+            "BEFORE01"
+          ],
+          "allowed": [
+            "BEFORE01"
+          ],
+          "reachable": true
+        },
+        "outside": {
+          "line": 28,
+          "required": [],
+          "allowed": [
+            "OUTSIDE1"
+          ],
+          "reachable": false
+        }
+      },
+      "hostMemory": [
+        {
+          "command": "SEND_MAP",
+          "reads": 2,
+          "writes": 1
+        }
+      ]
+    },
+    {
+      "id": "send_terminal_nested_model",
+      "source": "send_terminal_nested_model.cbl",
+      "sha256": "2009885d1d8806fe8cc3d6d1455cf4aa0758b6f0cf003a2b6a72eed53878ba10",
+      "calls": {
+        "root": {
+          "line": 16,
+          "required": [
+            "RESUMED1"
+          ],
+          "allowed": [
+            "RESUMED1"
+          ],
+          "reachable": true
+        },
+        "outer": {
+          "line": 20,
+          "required": [
+            "RESUMED2"
+          ],
+          "allowed": [
+            "RESUMED2"
+          ],
+          "reachable": true
+        },
+        "memory": {
+          "line": 25,
+          "required": [
+            "BEFORE01"
+          ],
+          "allowed": [
+            "BEFORE01"
+          ],
+          "reachable": true
+        },
+        "outside": {
+          "line": 29,
+          "required": [],
+          "allowed": [
+            "OUTSIDE1"
+          ],
+          "reachable": false
+        }
+      },
+      "hostMemory": [
+        {
+          "command": "SEND_TERMINAL",
+          "reads": 1,
+          "writes": 0
+        }
+      ]
+    },
+    {
+      "id": "receive_real_alias",
+      "source": "receive_real_alias.cbl",
+      "sha256": "0075e90152bd43b32736c16ce15e8e4f0c500dd7996be1e9e8d25f0d6b062989",
+      "calls": {
+        "memory": {
+          "line": 19,
+          "required": [
+            "BEFORE01"
+          ],
+          "allowed": [
+            "BEFORE01"
+          ],
+          "reachable": true
+        }
+      },
+      "hostMemory": [
+        {
+          "command": "RECEIVE_MAP",
+          "reads": 0,
+          "writes": 2
+        }
+      ]
+    },
+    {
+      "id": "missing_copy_still_blocked",
+      "source": "missing_copy_still_blocked.cbl",
+      "sha256": "377f6a58fa46bbb0676028c747558d13f5c3293ca516116b80fa5e3891509fcc",
+      "calls": {
+        "after": {
+          "line": 18,
+          "required": [],
+          "allowed": [
+            "AFTER001"
+          ],
+          "reachable": false
+        }
+      },
+      "hostMemory": [],
+      "blockedHost": true
+    },
+    {
+      "id": "model_buffer_still_blocked",
+      "source": "model_buffer_still_blocked.cbl",
+      "sha256": "43d7ae726ff52a44392b3731c1281f9941216b57d68d662f5d4dec0bce6391b1",
+      "calls": {
+        "after": {
+          "line": 17,
+          "required": [],
+          "allowed": [
+            "AFTER001"
+          ],
+          "reachable": false
+        }
+      },
+      "hostMemory": [],
+      "blockedHost": true
+    },
+    {
+      "id": "two_callers",
+      "source": "two_callers.cbl",
+      "sha256": "8783471b61020f773865b9b6d223e60106364833fc06583796e3851778605677",
+      "calls": {
+        "first": {
+          "line": 17,
+          "required": [
+            "FIRST001"
+          ],
+          "allowed": [
+            "FIRST001"
+          ],
+          "reachable": true
+        },
+        "second": {
+          "line": 20,
+          "required": [
+            "SECOND02"
+          ],
+          "allowed": [
+            "SECOND02"
+          ],
+          "reachable": true
+        }
+      },
+      "hostMemory": [
+        {
+          "command": "SEND_MAP",
+          "reads": 1,
+          "writes": 0
+        }
+      ]
+    }
+  ]
+}
