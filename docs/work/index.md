@@ -41,3 +41,9 @@ NEXT: **HUMAN PRIORITIZATION USING FULL CARDDEMO BASELINE**. O corpus fornece ev
 [WORK-FD-HARNESS](active/WORK-FD-HARNESS.json): IN_PROGRESS; preparação para revisão, sem merge.
 
 [FD-W0–W11 — itens TODO e dependências](../product/file-dependencies/waves.md): execução futura após revisão H4.
+
+## Composite FILE control — review
+
+[Scope and contract](file-composite-control.md); [qualification](file-composite-qualification.md).
+SP2.51 per-use control for OPEN/CLOSE and SORT/MERGE without procedure callbacks.
+IN_PROGRESS: implemented and qualified locally, awaiting review; no merge.

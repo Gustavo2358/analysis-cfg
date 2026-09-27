@@ -1,0 +1,87 @@
+{
+  "cases": 560,
+  "groups": {
+    "fixtures": 331,
+    "carddemo": 73,
+    "perform": 39,
+    "chaos": 48,
+    "aliases": 14,
+    "perform-adversarial": 25,
+    "final-focal-contracts": 29,
+    "frontier-payload-green": 1
+  },
+  "byteIdentical": 556,
+  "losses": 0,
+  "failures": 0,
+  "oracleCounts": {
+    "perform": 39,
+    "chaos": 48,
+    "aliases": 14,
+    "perform-adversarial": 25
+  },
+  "oracleFailures": 0,
+  "evidenceHashes": {
+    "final-audit.json": "815d3e2ab09cdd0a2a06e1b0930826ecc8f4178add6ba0e3c48d394a6adba9c5",
+    "final-oracles.json": "a008209b4f7054dc2c4bde1be7c46d0055508f68d3f74e07bde0e0165f971462",
+    "final-replay/results.json": "ad18415fa486ce9d554d196822f267b989c83832869581054ed5f3912567eca0",
+    "e2e-final/results.json": "3c5d7b570312891831261cbdac0ab0faa797d2a6b2768b938834017932e27780",
+    "frontend-fast-final.log": "3eb18c38908460da93b67c10cf64e4fc29ec9e1a5b9866f07b9047843abde5ef",
+    "frontend-full-final.log": "5baf13793ba961cd3ed2b2009943dc713cfbcc2633b2ccc0c3c19ffce9714e53",
+    "lower-fast-final.log": "52fa67b814866f04811740060e7bbc88c372bd22155c48260edea9593c4ff96e",
+    "lower-semantic-performance-final.log": "c98a9b0a15a5b46af633f0d95d277349fc5c7e8205894ec7fb50e27776b0ca99",
+    "cfg-fast-final.log": "dedc350de773e51149eeb1f27efaad6ce8cd1d8502f1166ad1ed79d408b690bf"
+  },
+  "deltas": [
+    {
+      "group": "fixtures",
+      "source": "cobol/resolution/file-binding.cbl",
+      "candidateAdditions": [
+        [
+          "file",
+          "('open', (('file-binding.cbl', '{\"columnBase\":\"0\",\"columnUnit\":\"UNICODE_SCALAR\",\"endColumn\":\"42\",\"endExclusive\":false,\"endLine\":\"15\",\"kind\":\"LINE_COLUMNS\",\"lineBase\":\"1\",\"startColumn\":\"32\",\"startLine\":\"15\"}', True, '[]'),))",
+          [
+            "SELECTDD",
+            "SELECTDD"
+          ]
+        ]
+      ],
+      "losses": []
+    },
+    {
+      "group": "fixtures",
+      "source": "cobol/semantic/statements.cbl",
+      "candidateAdditions": [],
+      "losses": []
+    },
+    {
+      "group": "carddemo",
+      "source": "app/cbl/CBSTM03A.CBL",
+      "candidateAdditions": [
+        [
+          "file",
+          "('open', (('CBSTM03A.CBL', '{\"columnBase\":\"0\",\"columnUnit\":\"UNICODE_SCALAR\",\"endColumn\":\"41\",\"endExclusive\":false,\"endLine\":\"293\",\"kind\":\"LINE_COLUMNS\",\"lineBase\":\"1\",\"startColumn\":\"33\",\"startLine\":\"293\"}', True, '[]'),))",
+          [
+            "HTMLFILE",
+            "HTMLFILE"
+          ]
+        ]
+      ],
+      "losses": []
+    },
+    {
+      "group": "carddemo",
+      "source": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/CBSTM03A.cbl",
+      "candidateAdditions": [
+        [
+          "file",
+          "('open', (('CBSTM03A.cbl', '{\"columnBase\":\"0\",\"columnUnit\":\"UNICODE_SCALAR\",\"endColumn\":\"41\",\"endExclusive\":false,\"endLine\":\"293\",\"kind\":\"LINE_COLUMNS\",\"lineBase\":\"1\",\"startColumn\":\"33\",\"startLine\":\"293\"}', True, '[]'),))",
+          [
+            "HTMLFILE",
+            "HTMLFILE"
+          ]
+        ]
+      ],
+      "losses": []
+    }
+  ]
+}

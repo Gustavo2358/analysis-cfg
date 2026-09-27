@@ -1,24 +1,19 @@
 # Baseline factual dos repositórios
 
-## Estado vigente — integração aprovada CICS D1–D5
+## Estado vigente — revisão FILE composite control
 
-Os produtores abaixo estão mergeados em main. O lock contém seus SHAs reais de
-merge; os checkpoints históricos seguintes não substituem esses pins.
+Os pins abaixo apontam para a branch de revisão `fix/file-composite-flow`, ainda
+sem merge. SP2.51 publica pontos internos de FILE; lower os materializa no contexto
+ativo. AIR, CFG e solver mantêm os contratos existentes. Os campos históricos do
+lock não substituem estes pins.
 
-- proleap-poc: `313236603815cd8c4d7299ae366310a4292bc5ee`.
-- cobol-lower: `da3325caa059a4beb7bd01f1fee262f9844725f2`.
+- proleap-poc: `8790072a64df8c5e5dcc85c9ac26c7a6d5435bb9`.
+- cobol-lower: `113580fb7eabac3077b752fa89a890bf5ff67193`.
 
-SP2.50 conserva MODEL_STORAGE, SYNCPOINT_ROLLBACK, RETURN e controle excepcional
-qualificado. O reparo DLI preserva provenance; CALL com conclusão desconhecida
-conserva seu target sem sucessores inventados. modelAssumed não concede prova
-física, pruning ou kill. CFG JSON4 transporta os novos papéis quando necessário.
-
-Qualificação, reuso e limites: [CICS D1–D5](../work/cics-control-qualification.md).
-Os repins desta integração não alteram código, testes ou contratos qualificados.
-
-As seções abaixo preservam a sequência histórica de checkpoints. Versões, pins,
-estados e pendências nelas registrados pertencem à época de cada observação;
-não substituem os campos atuais do lock nem descrevem o estado de merge atual.
+Qualificação e limites: [FILE composite control](../work/file-composite-qualification.md).
+O fluxo cobre OPEN/CLOSE e SORT/MERGE sem callbacks. Provas de memória, retornos
+indisponíveis e remainders de erro crítico não são fortalecidos por esta mudança.
+As seções seguintes preservam evidência histórica de suas respectivas campanhas.
 
 ## Checkpoints históricos
 
