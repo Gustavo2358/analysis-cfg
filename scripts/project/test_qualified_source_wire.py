@@ -65,3 +65,13 @@ for mutation in ('missing-confidence','v1-with-confidence','unknown-authority','
     except ValueError:pass
     else:raise AssertionError(mutation)
 print('MODEL_SOURCE_WIRE: V2 confidence and four rejections PASS')
+
+from dependency_wire import conditional_assumptions
+base=['NOMINAL_DECLARATIONS_PRESERVE_MEANING','NO_UNMODELED_STORAGE_INTERFERENCE']
+model=base+['SYNTHETIC_MODEL_IS_NOT_KILL_PROOF']
+conditional_assumptions(model,facts)
+for assumptions,f in [(model+['INVENTED'],facts),(model+model,facts),(model,{**facts,'authority':'NOMINAL_TEXT_SOURCE_V1'}),(model,{**facts,'symbols':[]})]:
+    try:conditional_assumptions(assumptions,f)
+    except ValueError:pass
+    else:raise AssertionError('unproved or malformed model assumption')
+print('MODEL_ASSUMPTIONS_WIRE: producer assumption and four rejections PASS')

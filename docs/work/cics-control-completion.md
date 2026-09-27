@@ -181,3 +181,16 @@ The independent qualified-source schema was stale even against the merged IBM
 baseline (COACTUPC V2 fails its old V1 constant). It now mirrors the existing
 producer's closed V1/V2 shapes and D1 MODEL_STORAGE, with negative checks for
 missing or malformed modelAssumed. No corpus expectation was relaxed.
+
+RESET cycle oracle clarification: the initial graph-count expectation omitted the
+transition from the first handler ingress to the recurring ingress. Running the
+unchanged pre-D5 source analyzer independently proves all three selections (ROOT
+to initial ingress, initial to recurring, recurring to itself). The expected
+count is three; dead calls, destination identity and bounded-node checks remain.
+Raw independent evidence: reset-cycle-before-d5/handler_reset_cycle/source.json.
+
+The compiled architecture inventory adds only OutcomeExit, IndexBuilder.OutsideKey
+and their explicit AIR exception types/standard collection dependencies. Existing
+public structural descriptors, source inventory, Maven DAG and forbidden-package
+checks are unchanged. The Class reference in the writer is the static
+OutcomeExit.class::isInstance predicate, without textual discovery or loading.

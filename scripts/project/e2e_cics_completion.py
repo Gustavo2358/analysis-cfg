@@ -26,6 +26,14 @@ def run_case(case,config,out,timeout,java,heap):
     row=original_run(case,config,out,timeout,java,heap)
     if 'parse_degraded' in (out/case['id']/'frontend.stderr').read_text():
         row['status']='PARSER_ERROR'
+    dependency=out/case['id']/'dependencies.json'
+    if dependency.exists():
+        dependencies=json.loads(dependency.read_text())
+        row['supportFailures']=[]
+        for name in case.get('programSupports',[]):
+            candidates=[c for p in dependencies['dependencies']['programs'] for c in p['candidates'] if c['referenceName']==name]
+            if not candidates or not any(c.get('supports') for c in candidates):row['supportFailures'].append('EXECUTABLE_TARGET_SUPPORT_LOST:'+name)
+        if row['supportFailures']:row['status']='FAIL'
     cfg=out/case['id']/'cfg.json'
     if cfg.exists():
         doc=json.loads(cfg.read_text());verify_cfg(cfg.read_bytes())

@@ -866,9 +866,36 @@
         }
       },
       "exceptionalControl": {
-        "localEdges": 2,
+        "localEdges": 3,
         "maximumNodes": 200
-      }
+      },
+      "oracleNote": "The unchanged pre-D5 source analyzer independently proves three selections: ROOT -> first handler ingress; first handler ingress -> recurring ingress; recurring ingress -> itself. Every selection targets ERR-P after RESET. Calls after ABEND remain unreachable."
+    },
+    {
+      "id": "handler_unqualified_xctl",
+      "source": "handler_unqualified_xctl.cbl",
+      "sha256": "4d9b0081811dd1f7d228378534e03dd597b0fd2e59bc80265268e1b2e640708c",
+      "calls": {
+        "after": {
+          "line": 6,
+          "required": [],
+          "allowed": [
+            "AFTER001"
+          ],
+          "reachable": false
+        },
+        "handler": {
+          "line": 10,
+          "required": [],
+          "allowed": [
+            "HANDLER1"
+          ],
+          "reachable": false
+        }
+      },
+      "programSupports": [
+        "TARGET01"
+      ]
     }
   ]
 }

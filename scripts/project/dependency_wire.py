@@ -348,6 +348,13 @@ def source_dependencies(value, document):
     require(value['remainder']==(not value['available'] or bool(value['gapCodes']) or any(d['remainder'] for d in dependencies)),'source inventory remainder')
 
 
+def conditional_assumptions(assumptions, facts):
+    required={'NOMINAL_DECLARATIONS_PRESERVE_MEANING','NO_UNMODELED_STORAGE_INTERFERENCE'}
+    model='SYNTHETIC_MODEL_IS_NOT_KILL_PROOF'
+    require(len(assumptions)==len(set(assumptions)) and required<=set(assumptions)<=required|{'DECLARATIVE_INITIAL_VALUES_APPLY',model}, 'conditional assumptions')
+    if model in assumptions:
+        require(facts['authority']=='NOMINAL_TEXT_SOURCE_V2' and any(s.get('modelAssumed') is True for s in facts['symbols']), 'model assumption authority')
+
 def conditional_supports(candidate, occurrence, source, document):
     from qualified_source_wire import key
     require(occurrence['sourceOccurrence'] is not None and occurrence['targetKind']=='COMPUTED' and occurrence['qualifications'], 'conditional occurrence authority')
@@ -363,7 +370,7 @@ def conditional_supports(candidate, occurrence, source, document):
     for support in values:
         fields(support,'provider analysisBoundary assumptions evidence uncertainties')
         require(support['provider']=='nominal-source-text@1' and support['analysisBoundary']=='NON_EXECUTABLE_SOURCE', 'conditional provider boundary')
-        assumptions=support['assumptions'];require(len(assumptions)==len(set(assumptions)) and {'NOMINAL_DECLARATIONS_PRESERVE_MEANING','NO_UNMODELED_STORAGE_INTERFERENCE'}<=set(assumptions)<={'NOMINAL_DECLARATIONS_PRESERVE_MEANING','NO_UNMODELED_STORAGE_INTERFERENCE','DECLARATIVE_INITIAL_VALUES_APPLY'}, 'conditional assumptions')
+        assumptions=support['assumptions'];conditional_assumptions(assumptions,nominal['facts'])
         require(support['uncertainties']==nominal['uncertainties'], 'conditional missing input provenance')
         evidence=array(support['evidence']);require(bool(evidence) and len({key(e) for e in evidence})==len(evidence), 'conditional source contributions')
         for e in evidence:
