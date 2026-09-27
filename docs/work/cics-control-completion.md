@@ -1,6 +1,6 @@
 # CICS control completion — D1–D5
 
-Status: IN_PROGRESS. User-authorized implementation following COACTUPC discovery (2026-09-27). One review PR per repository; progressive commits; no merge.
+Status: IN_PROGRESS before merge; DONE once [PR #50](https://github.com/Gustavo2358/analysis-cfg/pull/50) is MERGED with required checks passing. Implementation and qualification are complete; human review approved integration on 2026-09-27.
 
 ## Checkpoints
 
@@ -201,3 +201,16 @@ Implementation checkpoints D1–D5 are complete. Status stays IN_PROGRESS until
 review/merge; no merge is authorized by this work item. See the
 [qualification report](cics-control-qualification.md) for corpus results, the
 regression found and corrected, reused evidence and remaining limits.
+
+## Approved integration
+
+The user approved D1–D5 and the historical gate repairs. Integration order is
+frontend #65 → lower #40 → CFG #50. Each consumer pins the actual upstream merge
+commit before its own merge. Git and these PRs record completion; qualification
+and limits are in [the qualification report](cics-control-qualification.md).
+
+Integration changes only documentation and equivalent-content pins. Required FAST
+runs on each integrated main, with merge-tree and source-pin checks. Existing full,
+560-input replay and support-preservation evidence can be reused only after
+production, tests, contracts and build inputs are proved unchanged. No full/corpus
+rerun is claimed for this documentary integration.

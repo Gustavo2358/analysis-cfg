@@ -1,21 +1,20 @@
 # Baseline factual dos repositórios
 
-## Estado vigente — revisão CICS D1–D5
+## Estado vigente — integração aprovada CICS D1–D5
 
-Os pins exatos estão em [sources.lock.json](sources.lock.json), na branch
-`feat/cics-control-completion`, ainda sem merge. O frontend publica SP2.50 com
-MODEL_STORAGE, SYNCPOINT_ROLLBACK e RETURN tipados. O lower admite o controle
-qualificado de ABEND/XCTL com contextos de PERFORM e estado de handler separados.
-O CFG projeta alternativas excepcionais AIR explícitas e publica CFG JSON4 quando
-necessário. modelAssumed e NOMINAL_TEXT_SOURCE_V2 continuam sem prova de kill.
+Os produtores abaixo estão mergeados em main. O lock contém seus SHAs reais de
+merge; os checkpoints históricos seguintes não substituem esses pins.
 
-A revisão também corrige provenance de operandos DLI e preserva CALL com
-continuação desconhecida, sem criar sucessores. Os gates históricos foram
-atualizados contra os contratos correntes; detalhes no relatório abaixo.
+- proleap-poc: `313236603815cd8c4d7299ae366310a4292bc5ee`.
+- cobol-lower: `da3325caa059a4beb7bd01f1fee262f9844725f2`.
+
+SP2.50 conserva MODEL_STORAGE, SYNCPOINT_ROLLBACK, RETURN e controle excepcional
+qualificado. O reparo DLI preserva provenance; CALL com conclusão desconhecida
+conserva seu target sem sucessores inventados. modelAssumed não concede prova
+física, pruning ou kill. CFG JSON4 transporta os novos papéis quando necessário.
 
 Qualificação, reuso e limites: [CICS D1–D5](../work/cics-control-qualification.md).
-A integração IBM anterior é baseline histórica; os SHAs do lock são a autoridade
-para esta revisão. Não interpretar os checkpoints abaixo como estado atual.
+Os repins desta integração não alteram código, testes ou contratos qualificados.
 
 As seções abaixo preservam a sequência histórica de checkpoints. Versões, pins,
 estados e pendências nelas registrados pertencem à época de cada observação;

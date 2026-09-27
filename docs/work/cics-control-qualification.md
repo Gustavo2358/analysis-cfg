@@ -1,8 +1,10 @@
 # CICS control completion — qualification
 
-The D1–D5 implementation is ready for review. Product work stays in isolated
-`feat/cics-control-completion` worktrees, with separate checkpoint commits.
-No merge is part of this campaign. Exact consumer pins are in sources.lock.json.
+Implementation and qualification are complete and human review approved integration
+on 2026-09-27. [PR #50](https://github.com/Gustavo2358/analysis-cfg/pull/50) records the merge status.
+Integration follows frontend #65 → lower #40 → CFG #50, with each consumer pinned
+to the actual upstream merge SHA. The results below are the qualified campaign
+evidence; new main FAST and integration checks are recorded separately.
 
 ## Current qualification — historical failures repaired
 
