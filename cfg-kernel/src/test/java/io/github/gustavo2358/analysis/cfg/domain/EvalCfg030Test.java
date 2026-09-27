@@ -48,6 +48,7 @@ class EvalCfg030Test {
                 case CfgNode.EntryNode v -> en(v.source().id());
                 case CfgNode.SequenceNode v -> seq(v.source().label());
                 case CfgNode.NormalExit v -> exit(v.entryId());
+                case CfgNode.OutcomeExit ignored -> throw new AssertionError("outside outcomes belong to exceptional control tests");
                 case CfgNode.HaltExit v -> haltExit(v.source().header().id());
             };
             assertNull(nodes.put(n.id(), seen));
@@ -55,7 +56,7 @@ class EvalCfg030Test {
         Set<Edge> edges = new HashSet<>();
         for (CfgTransition t : graph.transitions()) {
             Arm arm = switch (t.kind()) {
-                case OPAQUE_JUMP, OPAQUE_RETURN, OPAQUE_UNKNOWN -> throw new AssertionError("Opaque belongs to WORK-CFG-038");
+                case EXCEPTION, CONTROL_EXIT, OPAQUE_JUMP, OPAQUE_RETURN, OPAQUE_UNKNOWN -> throw new AssertionError("Opaque belongs to WORK-CFG-038");
                 case INVOKE_NORMAL -> throw new AssertionError("Invoke belongs to CP6 W1D");
                 case ENTRY -> Arm.ENTRY;
                 case RETURN -> Arm.RETURN;

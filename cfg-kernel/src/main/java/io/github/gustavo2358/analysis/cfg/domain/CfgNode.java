@@ -44,6 +44,17 @@ public sealed interface CfgNode {
         }
     }
 
+    /** A published outside outcome, owned by its exact AIR occurrence. */
+    record OutcomeExit(CfgNodeId id, io.github.gustavo2358.air.model.Terminator source,
+            io.github.gustavo2358.air.model.Control.InvocationAlternative outcome) implements CfgNode {
+        public OutcomeExit {
+            Objects.requireNonNull(id);Objects.requireNonNull(source);Objects.requireNonNull(outcome);
+            if(!id.publicationId().equals(source.header().id().publication())
+                    ||!CoreCfgProjection.outside(outcome)||!CoreCfgProjection.alternatives(source).contains(outcome))
+                throw new IllegalArgumentException("outside outcome requires its actual AIR occurrence");
+        }
+    }
+
     /** Synthetic normal completion of the activation identified by Entry, with no fabricated origin. */
     record NormalExit(CfgNodeId id, PublicationId publicationId, UnitId unitId, EntryId entryId)
             implements CfgNode {

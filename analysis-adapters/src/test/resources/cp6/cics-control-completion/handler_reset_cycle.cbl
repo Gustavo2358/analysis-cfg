@@ -1,0 +1,20 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. REENTRY-PROBE.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 FLAG-VALUE PIC X.
+       PROCEDURE DIVISION.
+       MAIN.
+           EXEC CICS HANDLE ABEND LABEL(ERR-P) END-EXEC.
+           EXEC CICS ABEND END-EXEC.
+           CALL 'AFTER001'.
+           GOBACK.
+       ERR-P.
+           IF FLAG-VALUE = 'Y'
+               CALL 'HANDLER1'
+               EXEC CICS RETURN END-EXEC
+           END-IF.
+           EXEC CICS HANDLE ABEND RESET END-EXEC.
+           EXEC CICS ABEND END-EXEC.
+           CALL 'REENTRY1'.
+           GOBACK.

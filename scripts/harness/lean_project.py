@@ -48,6 +48,7 @@ def prepare(root):
 def technical_fast(root):
     prepare(root)
     for command in ([sys.executable, '-B', 'scripts/project/check_architecture.py', '--test-profile', 'fast'],
+                    [sys.executable, '-B', 'scripts/project/test_w2d_contract.py'],
                     [sys.executable, '-B', 'scripts/project/test_dependency_wire.py'],
                     [sys.executable, '-B', 'scripts/project/test_qualified_source_wire.py'],
                     [sys.executable, '-B', 'scripts/project/test_source_dependency_wire.py', 'analysis-adapters/target/source-dependencies-w3/dependencies.json'],
@@ -61,6 +62,7 @@ def technical_fast(root):
 
 def full_local(root):
     require_local()
+    subprocess.run([sys.executable, '-B', 'scripts/project/test_w2d_contract.py'], cwd=root, check=True)
     prepare(root)
     # Entire Maven test suite and every architecture boundary; additional probes below.
     subprocess.run([sys.executable, '-B', 'scripts/project/check_architecture.py'], cwd=root, check=True)

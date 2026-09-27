@@ -52,9 +52,9 @@ final class W1dAdversarialTest {
         var r=new DependencyAnalysis().prepare(target(p,new Interactions.ComputedTarget(t.category(),t.namespace(),expression,t.namePolicy(),t.origin())));
         assertEquals(DependencySiteFact.TargetStatus.UNSUPPORTED_TARGET_EXPRESSION,r.sites().getFirst().targetStatus());assertTrue(r.edges().isEmpty());assertEquals(0L,r.metrics().get("possibleValuesRuns"));
     }
-    @Test void finiteNonNormalOutcomesAreExplicitlyRefused() throws Exception {
+    @Test void divergenceOutsideTheSliceIsExplicitlyRefused() throws Exception {
         var p=input("literal");var i=invoke(p);var u=p.units().getFirst();
-        for(var extra:List.<Control.InvocationAlternative>of(Control.Diverge.INSTANCE,Control.HaltAlternative.INSTANCE,new Control.AnyException(Control.Propagate.INSTANCE),new Control.Exceptional("error",new Control.Handler(((Control.Normal)i.outcomes().known().getFirst()).label())))) {
+        for(var extra:List.<Control.InvocationAlternative>of(Control.Diverge.INSTANCE)) {
             var next=replace(i,i.effectBound(),new Control.InvocationOutcomes(List.of(i.outcomes().known().getFirst(),extra),i.outcomes().remainder()));
             var changed=sequences(p,u.sequences().stream().map(s->s.terminator()==i?new Sequence(s.label(),s.instructions(),next,s.origin()):s).toList(),u.entries());
             assertEquals(CfgBuildResult.Status.UNSUPPORTED_INPUT,build(changed).status());assertTrue(build(changed).graph().isEmpty());

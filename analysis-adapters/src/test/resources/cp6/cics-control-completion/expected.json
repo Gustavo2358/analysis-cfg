@@ -1,0 +1,901 @@
+{
+  "cases": [
+    {
+      "id": "receive_nested_model",
+      "source": "receive_nested_model.cbl",
+      "sha256": "8fdc3e328cf8d36c8913df86d235fb219e713ff5dc0674de2048ccde0f8b9900",
+      "calls": {
+        "root": {
+          "line": 16,
+          "required": [
+            "RESUMED1"
+          ],
+          "allowed": [
+            "RESUMED1"
+          ],
+          "reachable": true
+        },
+        "outer": {
+          "line": 20,
+          "required": [
+            "RESUMED2"
+          ],
+          "allowed": [
+            "RESUMED2"
+          ],
+          "reachable": true
+        },
+        "memory": {
+          "line": 24,
+          "required": [
+            "BEFORE01"
+          ],
+          "allowed": [
+            "BEFORE01"
+          ],
+          "reachable": true
+        },
+        "outside": {
+          "line": 28,
+          "required": [],
+          "allowed": [
+            "OUTSIDE1"
+          ],
+          "reachable": false
+        }
+      },
+      "hostMemory": [
+        {
+          "command": "RECEIVE_MAP",
+          "reads": 1,
+          "writes": 3
+        }
+      ]
+    },
+    {
+      "id": "send_map_nested_model",
+      "source": "send_map_nested_model.cbl",
+      "sha256": "fbbbe4984014170f0856a90cadd222b78fc1820a81369dae222e4eff5817f2a2",
+      "calls": {
+        "root": {
+          "line": 16,
+          "required": [
+            "RESUMED1"
+          ],
+          "allowed": [
+            "RESUMED1"
+          ],
+          "reachable": true
+        },
+        "outer": {
+          "line": 20,
+          "required": [
+            "RESUMED2"
+          ],
+          "allowed": [
+            "RESUMED2"
+          ],
+          "reachable": true
+        },
+        "memory": {
+          "line": 24,
+          "required": [
+            "BEFORE01"
+          ],
+          "allowed": [
+            "BEFORE01"
+          ],
+          "reachable": true
+        },
+        "outside": {
+          "line": 28,
+          "required": [],
+          "allowed": [
+            "OUTSIDE1"
+          ],
+          "reachable": false
+        }
+      },
+      "hostMemory": [
+        {
+          "command": "SEND_MAP",
+          "reads": 2,
+          "writes": 1
+        }
+      ]
+    },
+    {
+      "id": "send_terminal_nested_model",
+      "source": "send_terminal_nested_model.cbl",
+      "sha256": "2009885d1d8806fe8cc3d6d1455cf4aa0758b6f0cf003a2b6a72eed53878ba10",
+      "calls": {
+        "root": {
+          "line": 16,
+          "required": [
+            "RESUMED1"
+          ],
+          "allowed": [
+            "RESUMED1"
+          ],
+          "reachable": true
+        },
+        "outer": {
+          "line": 20,
+          "required": [
+            "RESUMED2"
+          ],
+          "allowed": [
+            "RESUMED2"
+          ],
+          "reachable": true
+        },
+        "memory": {
+          "line": 25,
+          "required": [
+            "BEFORE01"
+          ],
+          "allowed": [
+            "BEFORE01"
+          ],
+          "reachable": true
+        },
+        "outside": {
+          "line": 29,
+          "required": [],
+          "allowed": [
+            "OUTSIDE1"
+          ],
+          "reachable": false
+        }
+      },
+      "hostMemory": [
+        {
+          "command": "SEND_TERMINAL",
+          "reads": 1,
+          "writes": 0
+        }
+      ]
+    },
+    {
+      "id": "receive_real_alias",
+      "source": "receive_real_alias.cbl",
+      "sha256": "0075e90152bd43b32736c16ce15e8e4f0c500dd7996be1e9e8d25f0d6b062989",
+      "calls": {
+        "memory": {
+          "line": 19,
+          "required": [
+            "BEFORE01"
+          ],
+          "allowed": [
+            "BEFORE01"
+          ],
+          "reachable": true
+        }
+      },
+      "hostMemory": [
+        {
+          "command": "RECEIVE_MAP",
+          "reads": 0,
+          "writes": 2
+        }
+      ]
+    },
+    {
+      "id": "missing_copy_still_blocked",
+      "source": "missing_copy_still_blocked.cbl",
+      "sha256": "377f6a58fa46bbb0676028c747558d13f5c3293ca516116b80fa5e3891509fcc",
+      "calls": {
+        "after": {
+          "line": 18,
+          "required": [],
+          "allowed": [
+            "AFTER001"
+          ],
+          "reachable": false
+        }
+      },
+      "hostMemory": [],
+      "blockedHost": true
+    },
+    {
+      "id": "model_buffer_still_blocked",
+      "source": "model_buffer_still_blocked.cbl",
+      "sha256": "43d7ae726ff52a44392b3731c1281f9941216b57d68d662f5d4dec0bce6391b1",
+      "calls": {
+        "after": {
+          "line": 17,
+          "required": [],
+          "allowed": [
+            "AFTER001"
+          ],
+          "reachable": false
+        }
+      },
+      "hostMemory": [],
+      "blockedHost": true
+    },
+    {
+      "id": "two_callers",
+      "source": "two_callers.cbl",
+      "sha256": "8783471b61020f773865b9b6d223e60106364833fc06583796e3851778605677",
+      "calls": {
+        "first": {
+          "line": 17,
+          "required": [
+            "FIRST001"
+          ],
+          "allowed": [
+            "FIRST001"
+          ],
+          "reachable": true
+        },
+        "second": {
+          "line": 20,
+          "required": [
+            "SECOND02"
+          ],
+          "allowed": [
+            "SECOND02"
+          ],
+          "reachable": true
+        }
+      },
+      "hostMemory": [
+        {
+          "command": "SEND_MAP",
+          "reads": 1,
+          "writes": 0
+        }
+      ]
+    },
+    {
+      "id": "rollback_plain",
+      "source": "rollback_plain.cbl",
+      "sha256": "46e5c63d0ea623f4a63e5938a4222e7bbdc94c3f32358ce71704e6d1a7183e33",
+      "calls": {
+        "after": {
+          "line": 9,
+          "required": [
+            "BEFORE01"
+          ],
+          "allowed": [
+            "BEFORE01"
+          ]
+        }
+      },
+      "hostMemory": [
+        {
+          "command": "SYNCPOINT_ROLLBACK",
+          "reads": 0,
+          "writes": 0
+        }
+      ]
+    },
+    {
+      "id": "rollback_nohandle",
+      "source": "rollback_nohandle.cbl",
+      "sha256": "2b0bb21f369fd7ab1f765c330ee5df453ee3e314e1b07ddab04c6bb612ee3f89",
+      "calls": {
+        "after": {
+          "line": 9,
+          "required": [
+            "BEFORE01"
+          ],
+          "allowed": [
+            "BEFORE01"
+          ]
+        }
+      },
+      "hostMemory": [
+        {
+          "command": "SYNCPOINT_ROLLBACK",
+          "reads": 0,
+          "writes": 0
+        }
+      ]
+    },
+    {
+      "id": "rollback_resp",
+      "source": "rollback_resp.cbl",
+      "sha256": "3e7dd38b69a9f4141401990061ef6b84e08488833a5f4fae9f0aabcc112fc2f6",
+      "calls": {
+        "after": {
+          "line": 9,
+          "required": [
+            "BEFORE01"
+          ],
+          "allowed": [
+            "BEFORE01"
+          ]
+        }
+      },
+      "hostMemory": [
+        {
+          "command": "SYNCPOINT_ROLLBACK",
+          "reads": 0,
+          "writes": 1
+        }
+      ]
+    },
+    {
+      "id": "rollback_resp2",
+      "source": "rollback_resp2.cbl",
+      "sha256": "33cd78ebeebd53b88c9ecb193b21edfbacf241916945bfa9eedfb180d376d9f1",
+      "calls": {
+        "after": {
+          "line": 9,
+          "required": [
+            "BEFORE01"
+          ],
+          "allowed": [
+            "BEFORE01"
+          ]
+        }
+      },
+      "hostMemory": [
+        {
+          "command": "SYNCPOINT_ROLLBACK",
+          "reads": 0,
+          "writes": 1
+        }
+      ]
+    },
+    {
+      "id": "return_plain",
+      "source": "return_plain.cbl",
+      "sha256": "790bb8bd16291621a92b591ef562fa924904e1b5ebe1e021d38a970133612268",
+      "calls": {
+        "RESUME01": {
+          "line": 13,
+          "required": [],
+          "allowed": [
+            "RESUME01"
+          ],
+          "reachable": false
+        },
+        "RESUME02": {
+          "line": 17,
+          "required": [],
+          "allowed": [
+            "RESUME02"
+          ],
+          "reachable": false
+        },
+        "AFTER001": {
+          "line": 20,
+          "required": [],
+          "allowed": [
+            "AFTER001"
+          ],
+          "reachable": false
+        }
+      },
+      "hostMemory": [
+        {
+          "command": "RETURN",
+          "reads": 0,
+          "writes": 0
+        }
+      ]
+    },
+    {
+      "id": "return_commarea",
+      "source": "return_commarea.cbl",
+      "sha256": "966b2de18f0ac0bcdbd04b9dcca91d2e9b9eb2d52f7563c41b8c477e2847d146",
+      "calls": {
+        "RESUME01": {
+          "line": 13,
+          "required": [],
+          "allowed": [
+            "RESUME01"
+          ],
+          "reachable": false
+        },
+        "RESUME02": {
+          "line": 17,
+          "required": [],
+          "allowed": [
+            "RESUME02"
+          ],
+          "reachable": false
+        },
+        "AFTER001": {
+          "line": 21,
+          "required": [],
+          "allowed": [
+            "AFTER001"
+          ],
+          "reachable": false
+        }
+      },
+      "hostMemory": [
+        {
+          "command": "RETURN",
+          "reads": 2,
+          "writes": 0
+        }
+      ]
+    },
+    {
+      "id": "return_error",
+      "source": "return_error.cbl",
+      "sha256": "7a0bdd7c4300dce90ae203b2434e9123f2186d879fe6c504bb1624a05ef249f5",
+      "calls": {
+        "RESUME01": {
+          "line": 13,
+          "required": [
+            "RESUME01"
+          ],
+          "allowed": [
+            "RESUME01"
+          ],
+          "reachable": true
+        },
+        "RESUME02": {
+          "line": 17,
+          "required": [
+            "RESUME02"
+          ],
+          "allowed": [
+            "RESUME02"
+          ],
+          "reachable": true
+        },
+        "AFTER001": {
+          "line": 20,
+          "required": [
+            "AFTER001"
+          ],
+          "allowed": [
+            "AFTER001"
+          ],
+          "reachable": true
+        }
+      },
+      "hostMemory": [
+        {
+          "command": "RETURN",
+          "reads": 1,
+          "writes": 1
+        }
+      ]
+    },
+    {
+      "id": "return_resp2",
+      "source": "return_resp2.cbl",
+      "sha256": "e3ed0bc2beef478d453fecff28cbe09323c222d7e3e9a2db0b9a4d283dc52a36",
+      "calls": {
+        "RESUME01": {
+          "line": 13,
+          "required": [],
+          "allowed": [
+            "RESUME01"
+          ],
+          "reachable": false
+        },
+        "RESUME02": {
+          "line": 17,
+          "required": [],
+          "allowed": [
+            "RESUME02"
+          ],
+          "reachable": false
+        },
+        "AFTER001": {
+          "line": 20,
+          "required": [],
+          "allowed": [
+            "AFTER001"
+          ],
+          "reachable": false
+        }
+      },
+      "hostMemory": [
+        {
+          "command": "RETURN",
+          "reads": 1,
+          "writes": 1
+        }
+      ]
+    },
+    {
+      "id": "handler_active",
+      "source": "handler_active.cbl",
+      "sha256": "b635b114664b9eed7b8b225a7495d5d13c049e47f2273fa2886ae92cddebbc37",
+      "calls": {
+        "after": {
+          "line": 11,
+          "required": [],
+          "allowed": [
+            "AFTER001"
+          ],
+          "reachable": false
+        },
+        "handler": {
+          "line": 14,
+          "required": [
+            "HANDLER1"
+          ],
+          "allowed": [
+            "HANDLER1"
+          ],
+          "reachable": true
+        }
+      }
+    },
+    {
+      "id": "handler_cancel",
+      "source": "handler_cancel.cbl",
+      "sha256": "ab21da82ff6d5fd51a3b9245fc6e9cda31f79227a49c7cdf44a2c928c6e8fc7f",
+      "calls": {
+        "after": {
+          "line": 12,
+          "required": [],
+          "allowed": [
+            "AFTER001"
+          ],
+          "reachable": false
+        },
+        "handler": {
+          "line": 15,
+          "required": [],
+          "allowed": [
+            "HANDLER1"
+          ],
+          "reachable": false
+        }
+      }
+    },
+    {
+      "id": "handler_reset",
+      "source": "handler_reset.cbl",
+      "sha256": "b865fab7b2b8a8693563790afba6bf449d7b578385f9e3c58bc73211a90b3fec",
+      "calls": {
+        "after": {
+          "line": 13,
+          "required": [],
+          "allowed": [
+            "AFTER001"
+          ],
+          "reachable": false
+        },
+        "handler": {
+          "line": 16,
+          "required": [
+            "HANDLER1"
+          ],
+          "allowed": [
+            "HANDLER1"
+          ],
+          "reachable": true
+        }
+      }
+    },
+    {
+      "id": "handler_bypassed",
+      "source": "handler_bypassed.cbl",
+      "sha256": "3ded9128c84f52ee9c5c6d0ec92177afb738630f66a609f0c20ac1b6c5d5b73d",
+      "calls": {
+        "after": {
+          "line": 11,
+          "required": [],
+          "allowed": [
+            "AFTER001"
+          ],
+          "reachable": false
+        },
+        "handler": {
+          "line": 14,
+          "required": [],
+          "allowed": [
+            "HANDLER1"
+          ],
+          "reachable": false
+        }
+      }
+    },
+    {
+      "id": "handler_no_event",
+      "source": "handler_no_event.cbl",
+      "sha256": "5a7aa8b4ac3595652e5d50955c91326b2666f1d00e20354584833a7767a45a6d",
+      "calls": {
+        "after": {
+          "line": 11,
+          "required": [],
+          "allowed": [
+            "AFTER001"
+          ],
+          "reachable": false
+        },
+        "handler": {
+          "line": 14,
+          "required": [],
+          "allowed": [
+            "HANDLER1"
+          ],
+          "reachable": false
+        }
+      }
+    },
+    {
+      "id": "handler_replace",
+      "source": "handler_replace.cbl",
+      "sha256": "8bcbf1ed986142444f1ae3a815abe74a004c91c715bf5893a22878cdbce89f70",
+      "calls": {
+        "a": {
+          "line": 13,
+          "required": [],
+          "allowed": [
+            "HANDLERA"
+          ],
+          "reachable": false
+        },
+        "b": {
+          "line": 16,
+          "required": [
+            "HANDLERB"
+          ],
+          "allowed": [
+            "HANDLERB"
+          ],
+          "reachable": true
+        }
+      }
+    },
+    {
+      "id": "handler_perform_register",
+      "source": "handler_perform_register.cbl",
+      "sha256": "977fa5f7277cb5f98cec9985d3900f88cb1f146ac0599135ce5c16e2c3ec68cf",
+      "calls": {
+        "after": {
+          "line": 11,
+          "required": [],
+          "allowed": [
+            "AFTER001"
+          ],
+          "reachable": false
+        },
+        "handler": {
+          "line": 16,
+          "required": [
+            "HANDLER1"
+          ],
+          "allowed": [
+            "HANDLER1"
+          ],
+          "reachable": true
+        }
+      }
+    },
+    {
+      "id": "handler_perform_cancel",
+      "source": "handler_perform_cancel.cbl",
+      "sha256": "a897b414d3c82da285a919fe6c62b5c03297a6d16cdcac9671fc8d03e26acaba",
+      "calls": {
+        "handler": {
+          "line": 16,
+          "required": [],
+          "allowed": [
+            "HANDLER1"
+          ],
+          "reachable": false
+        }
+      }
+    },
+    {
+      "id": "handler_interrupted_perform",
+      "source": "handler_interrupted_perform.cbl",
+      "sha256": "1bd3e36fb3dc50adc5c71f08851eb754230500c3ffdbbc6e036a3757f02fab82",
+      "calls": {
+        "resume": {
+          "line": 11,
+          "required": [],
+          "allowed": [
+            "RESUME01"
+          ],
+          "reachable": false
+        },
+        "after": {
+          "line": 15,
+          "required": [],
+          "allowed": [
+            "AFTER001"
+          ],
+          "reachable": false
+        },
+        "handler": {
+          "line": 17,
+          "required": [
+            "HANDLER1"
+          ],
+          "allowed": [
+            "HANDLER1"
+          ],
+          "reachable": true
+        },
+        "outside": {
+          "line": 20,
+          "required": [],
+          "allowed": [
+            "OUTSIDE1"
+          ],
+          "reachable": false
+        }
+      }
+    },
+    {
+      "id": "handler_two_callers",
+      "source": "handler_two_callers.cbl",
+      "sha256": "28eec7429922881ecaddc72b4aa9ed037b2eb8216523e18362a7fc1fadcd1897",
+      "calls": {
+        "resume": {
+          "line": 18,
+          "required": [],
+          "allowed": [
+            "RESUME01"
+          ],
+          "reachable": false
+        },
+        "a": {
+          "line": 23,
+          "required": [
+            "FIRST001"
+          ],
+          "allowed": [
+            "FIRST001"
+          ]
+        },
+        "b": {
+          "line": 26,
+          "required": [
+            "SECOND02"
+          ],
+          "allowed": [
+            "SECOND02"
+          ]
+        }
+      }
+    },
+    {
+      "id": "handler_xctl",
+      "source": "handler_xctl.cbl",
+      "sha256": "41adaec4c150f6dec1cd68b9e5181a04c73aaad9da08f91694229d89c674ef2c",
+      "calls": {
+        "after": {
+          "line": 11,
+          "required": [],
+          "allowed": [
+            "AFTER001"
+          ],
+          "reachable": false
+        },
+        "handler": {
+          "line": 14,
+          "required": [
+            "HANDLER1"
+          ],
+          "allowed": [
+            "HANDLER1"
+          ],
+          "reachable": true
+        }
+      }
+    },
+    {
+      "id": "handler_nested_perform",
+      "source": "handler_nested_perform.cbl",
+      "sha256": "adfc3a5a8259b05e02fbeb9a1b06a1fcfabf9ea17df6cc2d80fba3d34c87c86c",
+      "calls": {
+        "handler": {
+          "line": 13,
+          "required": [
+            "HANDLER1"
+          ],
+          "allowed": [
+            "HANDLER1"
+          ],
+          "reachable": true
+        },
+        "outside": {
+          "line": 20,
+          "required": [],
+          "allowed": [
+            "OUTSIDE1"
+          ],
+          "reachable": false
+        }
+      }
+    },
+    {
+      "id": "handler_deactivated",
+      "source": "handler_deactivated.cbl",
+      "sha256": "07a6c366d6382c724eaad1dc4ff663d0163b40ce3a3d1320e69f603541a3b59a",
+      "calls": {
+        "AFTER001": {
+          "line": 10,
+          "required": [],
+          "allowed": [
+            "AFTER001"
+          ],
+          "reachable": false
+        },
+        "REENTRY1": {
+          "line": 14,
+          "required": [],
+          "allowed": [
+            "REENTRY1"
+          ],
+          "reachable": false
+        }
+      },
+      "exceptionalControl": {
+        "localEdges": 1,
+        "maximumNodes": 200
+      }
+    },
+    {
+      "id": "handler_reset_cycle",
+      "source": "handler_reset_cycle.cbl",
+      "sha256": "1a9cd6cfa0e7c3098cffad356d8973d3e938994360a7ccb610d85e6ebbff2edc",
+      "calls": {
+        "AFTER001": {
+          "line": 10,
+          "required": [],
+          "allowed": [
+            "AFTER001"
+          ],
+          "reachable": false
+        },
+        "HANDLER1": {
+          "line": 14,
+          "required": [
+            "HANDLER1"
+          ],
+          "allowed": [
+            "HANDLER1"
+          ],
+          "reachable": true
+        },
+        "REENTRY1": {
+          "line": 19,
+          "required": [],
+          "allowed": [
+            "REENTRY1"
+          ],
+          "reachable": false
+        }
+      },
+      "exceptionalControl": {
+        "localEdges": 3,
+        "maximumNodes": 200
+      },
+      "oracleNote": "The unchanged pre-D5 source analyzer independently proves three selections: ROOT -> first handler ingress; first handler ingress -> recurring ingress; recurring ingress -> itself. Every selection targets ERR-P after RESET. Calls after ABEND remain unreachable."
+    },
+    {
+      "id": "handler_unqualified_xctl",
+      "source": "handler_unqualified_xctl.cbl",
+      "sha256": "4d9b0081811dd1f7d228378534e03dd597b0fd2e59bc80265268e1b2e640708c",
+      "calls": {
+        "after": {
+          "line": 6,
+          "required": [],
+          "allowed": [
+            "AFTER001"
+          ],
+          "reachable": false
+        },
+        "handler": {
+          "line": 10,
+          "required": [],
+          "allowed": [
+            "HANDLER1"
+          ],
+          "reachable": false
+        }
+      },
+      "programSupports": [
+        "TARGET01"
+      ]
+    }
+  ]
+}

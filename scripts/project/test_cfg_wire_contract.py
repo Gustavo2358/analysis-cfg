@@ -31,6 +31,25 @@ class CfgWireContractTest(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError,'incompatible'):
                     verify(self.document(version,term,edge))
 
+    def test_each_exception_token_requires_v4_independently(self):
+        for edge in ('EXCEPTION','CONTROL_EXIT'):
+            self.assertEqual('4.0.0',verify(self.document('4.0.0','RETURN',edge))['schemaVersion'])
+            for version in ('1.0.0','2.0.0','3.0.0'):
+                with self.assertRaisesRegex(ValueError,'incompatible'):
+                    verify(self.document(version,'RETURN',edge))
+        for outcome in ('HALT','EXCEPTION','ANY_EXCEPTION'):
+            doc=json.loads(self.document('4.0.0','RETURN','RETURN'))
+            node=dict(kind='OUTCOME_EXIT',outcome=outcome)
+            if outcome=='EXCEPTION':node['tag']='vendor-specific'
+            doc['nodes'].append(node)
+            self.assertEqual('4.0.0',verify(json.dumps(doc))['schemaVersion'])
+            doc['schemaVersion']='3.0.0'
+            with self.assertRaisesRegex(ValueError,'incompatible'):verify(json.dumps(doc))
+        for outcome in ('RETURN','UNKNOWN'):
+            doc=json.loads(self.document('4.0.0','RETURN','CONTROL_EXIT'))
+            doc['nodes'].append(dict(kind='OUTCOME_EXIT',outcome=outcome))
+            with self.assertRaisesRegex(ValueError,'invalid outside outcome'):verify(json.dumps(doc))
+
     def test_rejects_unknown_versions_tokens_and_unnecessary_upgrade(self):
         for version, term, edge in (('1.1.0', 'INVOKE', 'INVOKE_NORMAL'), ('2.0.0', 'CALL', 'INVOKE_NORMAL'),
                                     ('2.0.0', 'INVOKE', 'CALL'), ('2.0.0', 'RETURN', 'RETURN')):

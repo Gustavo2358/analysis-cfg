@@ -9,7 +9,7 @@ import sys
 
 from dependency_wire import read, require
 from cfg_wire_contract import verify as verify_cfg_wire
-from e2e_w2d import locked_sp, open_call_model, execute, runtime, source_spans, text_leaf, literal_text
+from e2e_w2d import declaration_object, locked_sp, open_call_model, execute, runtime, source_spans, text_leaf, literal_text
 from prepare_w2d_producers import ROOT, git, require_local
 
 FIXTURES = ROOT / 'analysis-adapters/src/test/resources/cp6/move-data'
@@ -58,8 +58,7 @@ def air_oracle(air, data, moves, case):
     require(call['terminator']['outcomes']['known'] == [{'kind': 'normal', 'label': ret['label']}], 'normal return continuation')
     objects = {}
     for name, identity in data.items():
-        item = next(i for i in p['coverage']['items'] if i['sourceKey'].endswith('/data/' + identity))
-        objects[name] = next(o for o in item['outputs'] if o['domain'] == 'object')
+        objects[name] = declaration_object(p, identity)
     cells = [o['storage']['storage'] for o in unit['objects']]
     require(len(cells) == len(data) and len({json.dumps(c, sort_keys=True) for c in cells}) == len(data),
             'distinct positive bases for independent scalar declarations')
@@ -123,17 +122,25 @@ def dependency_oracle(result, model, source, case):
             and site['effectiveUnknownRemainder'], 'real source independent open dimensions')
     for index,name in enumerate(names):
         candidate=site['candidates'][index];support=candidate['supports']
-        producer_index = max(i for i, (_, _, target) in enumerate(CASES[case]) if target == 'WS-PGM')
-        producer = assigns[producer_index]
-        require(len(support)==1 and support[0]['kind']=='VALUE_PRODUCER'
-                and support[0]['producer']==producer['header']['id'] and support[0]['origin']==producer['header']['origin'], 'exact final FitText copy produces the supported snapshot')
+        producer_indices = {'one-hop': [0, 1], 'multi-hop': [0, 1, 2],
+                            'overwrite': [1, 2], 'snapshot': [0, 1]}[case]
+        producers = [assigns[i] for i in producer_indices]
+        require(len(support) == len(producers)
+                and {s['producer']['localId'] for s in support} == {p['header']['id']['localId'] for p in producers},
+                'exact literal and captured copy contributions; no overwritten producer')
+        for evidence in support:
+            producer = next(p for p in producers if p['header']['id'] == evidence['producer'])
+            require(evidence['kind'] == 'VALUE_PRODUCER' and evidence['origin'] == producer['header']['origin'],
+                    'each contribution retains its own producer origin')
+            spans = source_spans(result, evidence, source)
+            producer_index = assigns.index(producer)
+            kind, value, target = CASES[case][producer_index]
+            phrase = "MOVE '" + value + "' TO " + target if kind == 'LITERAL' else 'MOVE ' + value + ' TO ' + target
+            line = next(i for i, text in enumerate(source.read_text().splitlines(), 1) if phrase in text)
+            require(all(int(span['startLine']) == line == int(span['endLine']) for span in spans),
+                    'support reaches its exact literal/copy occurrence')
         require(site['rawCandidates'][index]['supports']==support and result['edges'][index]['candidate']==candidate
                 and result['edges'][index]['caller']==site['caller'] and result['edges'][index]['site']==site['operation'], 'edge and raw/interpreted support consistency')
-        spans=source_spans(result,support[0],source)
-        copy_source = CASES[case][producer_index][1]
-        literal_line = next(i for i, line in enumerate(source.read_text().splitlines(), 1)
-                            if 'MOVE ' + copy_source + ' TO WS-PGM' in line)
-        require(all(int(span['startLine']) == literal_line == int(span['endLine']) for span in spans), 'support reaches exact transforming MOVE occurrence')
     require(result['metrics']['possibleValuesRuns'] == 1, 'normal forward fixed point runs once')
 
 

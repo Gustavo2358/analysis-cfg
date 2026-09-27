@@ -19,6 +19,12 @@ def schema():
 
 
 def shape(value, spec):
+    if 'oneOf' in spec:
+        matches=0
+        for alternative in spec['oneOf']:
+            try: shape(value,alternative);matches+=1
+            except (ValueError,KeyError,TypeError): pass
+        require(matches==1,'closed source authority variant');return
     if '$ref' in spec: return shape(value, schema()['$defs'][spec['$ref'].rsplit('/', 1)[1]])
     if 'const' in spec: require(type(value) is str and value == spec['const'], 'contract version/constant'); return
     if 'enum' in spec: require(value in spec['enum'], 'source enum')

@@ -20,6 +20,9 @@ final class IndexBuilder {
     final Map<EntryId, ProgramIndex.Node> entryNodes = new HashMap<>();
     final Map<EntryId, ProgramIndex.Node> normalExits = new HashMap<>();
     final Map<OperationId, ProgramIndex.Node> haltExits = new HashMap<>();
+    private record OutsideKey(OperationId operation,Control.InvocationAlternative outcome) { }
+    private final Map<OutsideKey,ProgramIndex.Node> outcomeExits=new HashMap<>();
+    private long expectedOutside;
     final Map<OperationId, ProgramIndex.Site> operations = new HashMap<>();
     final Map<Class<? extends Operation>, List<ProgramIndex.Site>> buckets = new HashMap<>();
     final Map<ObjectId, Memory.ObjectDeclaration> objects = new HashMap<>();
@@ -139,6 +142,10 @@ final class IndexBuilder {
                     : term instanceof Operations.Opaque opaque ? (int) opaque.envelope().control().known().stream().filter(a->OpenControl.alternativeLabel(a)!=null || a instanceof Control.ReturnAlternative).map(a -> {
                         var l = OpenControl.alternativeLabel(a); return l == null ? a : l;
                     }).distinct().count() : term instanceof Operations.Return || term instanceof Operations.Jump || term instanceof Operations.Halt ? 1 : 0;
+                var known=OpenControl.alternatives(term);
+                degree+=Math.toIntExact(known.stream().map(OpenControl::exceptionLabel).filter(Objects::nonNull).distinct().count());
+                long outside=known.stream().filter(OpenControl::outside).distinct().count();
+                degree+=Math.toIntExact(outside);expectedOutside=Math.addExact(expectedOutside,outside);
                 arity = Math.addExact(arity, degree);
                 if (term instanceof Operations.Halt) expectedHalts = Math.incrementExact(expectedHalts);
                 int offset = 0;
@@ -219,6 +226,7 @@ final class IndexBuilder {
                 case CfgNode.EntryNode n -> n.source().id().unit();
                 case CfgNode.NormalExit n -> n.unitId();
                 case CfgNode.HaltExit n -> n.source().header().id().unit();
+                case CfgNode.OutcomeExit n -> n.source().header().id().unit();
             };
             Unit unit = units.get(owner);
             valid(unit != null, "foreign CFG node Unit");
@@ -240,6 +248,12 @@ final class IndexBuilder {
                             && n.publicationId().equals(snapshot.id()), "foreign NormalExit");
                     unique(normalExits, n.entryId(), node, "duplicate NormalExit");
                 }
+                case CfgNode.OutcomeExit n -> {
+                    ProgramIndex.Site site=operations.get(n.source().header().id());
+                    valid(site!=null&&site.isTerminator()&&site.operation()==n.source(),"foreign/replaced outside outcome occurrence");
+                    valid(OpenControl.outside(n.outcome())&&OpenControl.alternatives(n.source()).contains(n.outcome()),"unpublished outside outcome");
+                    unique(outcomeExits,new OutsideKey(n.source().header().id(),n.outcome()),node,"duplicate outside outcome");
+                }
                 case CfgNode.HaltExit n -> {
                     ProgramIndex.Site site = operations.get(n.source().header().id());
                     valid(site != null && site.isTerminator() && site.operation() == n.source(), "foreign/replaced Halt occurrence");
@@ -251,6 +265,7 @@ final class IndexBuilder {
         valid(sequenceNodes.size() == sequences.size(), "missing required SequenceNode");
         valid(entryNodes.size() == expectedActiveEntries, "missing required EntryNode");
         valid(normalExits.size() == expectedActiveEntries, "missing required NormalExit");
+        valid(outcomeExits.size()==expectedOutside,"missing required outside outcome");
         valid(haltExits.size() == expectedHalts, "missing required HaltExit");
     }
 
@@ -274,7 +289,7 @@ final class IndexBuilder {
             int roles = seenRoles.get(key);
             if (roles < 0) roles = 0;
             int bit = 1 << edge.kind().ordinal();
-            valid(edge.kind() == CfgTransition.Kind.OPAQUE_JUMP || (roles & bit) == 0, "duplicate semantic contextual edge");
+            valid(edge.kind() == CfgTransition.Kind.OPAQUE_JUMP || edge.kind()==CfgTransition.Kind.EXCEPTION || edge.kind()==CfgTransition.Kind.CONTROL_EXIT || (roles & bit) == 0, "duplicate semantic contextual edge");
             seenRoles.put(key, roles | bit);
             edges[ordinal] = edge; from[ordinal] = source.ordinal; to[ordinal] = target.ordinal; edgeEntry[ordinal] = context;
             ordinal = Math.incrementExact(ordinal);
@@ -295,6 +310,11 @@ final class IndexBuilder {
                     ? sequenceNodes.get(activation.initialLabel().orElseThrow()) : null;
         }
         if (!(source.source() instanceof CfgNode.SequenceNode node)) return null;
+        if(kind==CfgTransition.Kind.EXCEPTION&&target.source() instanceof CfgNode.SequenceNode destination)
+            return OpenControl.alternatives(node.source().terminator()).stream().anyMatch(a->destination.source().label().equals(OpenControl.exceptionLabel(a)))?target:null;
+        if(kind==CfgTransition.Kind.CONTROL_EXIT&&target.source() instanceof CfgNode.OutcomeExit outside)
+            return outside.source()==node.source().terminator()&&OpenControl.outside(outside.outcome())
+                &&OpenControl.alternatives(outside.source()).contains(outside.outcome())?target:null;
         return switch (node.source().terminator()) {
             case Operations.Opaque opaque -> kind == CfgTransition.Kind.OPAQUE_RETURN && opaque.envelope().control().known().contains(Control.ReturnAlternative.INSTANCE)
                 ? normalExits.get(activation.id()) : kind == CfgTransition.Kind.OPAQUE_JUMP && target.source() instanceof CfgNode.SequenceNode seq

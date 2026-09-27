@@ -10,7 +10,7 @@
       "wrongNamespaceAndCategoryAreNotProgramDependencies",
       "noncanonicalLiteralPreservesRawAndOpensInterpretation",
       "unsupportedComputedExpressionIsDiagnosticNotInventedLiteral",
-      "finiteNonNormalOutcomesAreExplicitlyRefused",
+      "divergenceOutsideTheSliceIsExplicitlyRefused",
       "explicitContinuationSurvivesPhysicalPermutationAndDecoy",
       "sharedAndRepeatedQueriesExecuteOneValuesRun",
       "literalPlannerHasZeroValuesDependenciesAndNoValuesProviderInstalled",
@@ -244,6 +244,9 @@
       "executableValueEvidenceRefinesAndReplacesNominalHypothesis",
       "conditionalUncertaintyDoesNotChangeExecutableScope",
       "syntheticAuthorityRoundTripsAndCannotBeSilentlyDowngraded"
+    ],
+    "io.github.gustavo2358.analysis.adapters.ExceptionalControlProjectionTest": [
+      "explicitExceptionDoesNotBecomeUnitWideUnknownControl"
     ]
   },
   "analysis-dataflow": {

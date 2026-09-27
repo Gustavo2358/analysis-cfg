@@ -68,10 +68,10 @@ public final class CoreCfgProjection {
         return List.copyOf(issues);
     }
 
-    /** First neutral invocation slice: one explicit local Normal, with closed or open AllControl remainder.
+    /** Explicit normal/exceptional/halt alternatives with closed or bounded open control.
      * Open remainder remains on the original AIR; this projection enumerates known control only. */
     public static boolean supportsInvoke(Operations.Invoke invoke) {
-        return invoke.outcomes().known().stream().allMatch(Control.Normal.class::isInstance)
+        return invoke.outcomes().known().stream().allMatch(a->a instanceof Control.Normal||a instanceof Control.Exceptional||a instanceof Control.AnyException||a instanceof Control.HaltAlternative)
                 && (invoke.outcomes().remainder() instanceof Scopes.NoControl
                     || invoke.outcomes().remainder() instanceof Scopes.WithinControl bound
                         && (bound.scope() instanceof Scopes.AllControl || bound.scope() instanceof Scopes.UnitControl || bound.scope() instanceof Scopes.LabelsControl || bound.scope() instanceof Scopes.ControlUnion));
@@ -79,7 +79,18 @@ public final class CoreCfgProjection {
 
     public static boolean supportsOpaque(Operations.Opaque opaque) {
         return opaque.envelope().control().known().stream().allMatch(a -> a instanceof Control.JumpAlternative
-            || a instanceof Control.Normal || a instanceof Control.ReturnAlternative);
+            || a instanceof Control.Normal || a instanceof Control.ReturnAlternative || a instanceof Control.Exceptional || a instanceof Control.AnyException || a instanceof Control.HaltAlternative);
+    }
+    public static java.util.List<Control.ControlAlternative> alternatives(io.github.gustavo2358.air.model.Terminator t) {
+        return t instanceof Operations.Invoke i?new java.util.ArrayList<>(i.outcomes().known()):t instanceof Operations.Opaque o?o.envelope().control().known():java.util.List.of();
+    }
+    public static LabelId exceptionLabel(Control.ControlAlternative a) {
+        var destination=a instanceof Control.Exceptional e?e.destination():a instanceof Control.AnyException e?e.destination():null;
+        return destination instanceof Control.Handler h?h.label():null;
+    }
+    public static boolean outside(Control.ControlAlternative a) {
+        return a instanceof Control.HaltAlternative||a instanceof Control.Exceptional e&&e.destination() instanceof Control.Propagate
+            ||a instanceof Control.AnyException e&&e.destination() instanceof Control.Propagate;
     }
     public static LabelId alternativeLabel(Control.ControlAlternative a) {
         return a instanceof Control.JumpAlternative j ? j.label() : a instanceof Control.Normal n ? n.label() : null;
@@ -97,12 +108,19 @@ public final class CoreCfgProjection {
         for (Unit unit : orderedUnits(publication)) {
             Map<LabelId, CfgNode.SequenceNode> sequences = new HashMap<>();
             Map<LabelId, CfgNode.HaltExit> halts = new HashMap<>();
+            var outsideNodes=new HashMap<LabelId,java.util.List<CfgNode.OutcomeExit>>();
             List<Sequence> orderedSequences = orderedSequences(unit);
             for (Sequence sequence : orderedSequences) {
                 CfgNode.SequenceNode node = new CfgNode.SequenceNode(
                         new CfgNodeId(publication.id(), nodes.size()), sequence);
                 sequences.put(sequence.label(), node);
                 nodes.add(node);
+                var exits=new ArrayList<CfgNode.OutcomeExit>();
+                for(var alternative:alternatives(sequence.terminator()).stream().filter(CoreCfgProjection::outside).distinct().toList()) {
+                    var end=new CfgNode.OutcomeExit(new CfgNodeId(publication.id(),nodes.size()),sequence.terminator(),(Control.InvocationAlternative)alternative);
+                    nodes.add(end);exits.add(end);
+                }
+                outsideNodes.put(sequence.label(),exits);
                 if (sequence.terminator() instanceof Operations.Halt halt) {
                     CfgNode.HaltExit termination = new CfgNode.HaltExit(
                             new CfgNodeId(publication.id(), nodes.size()), halt);
@@ -125,6 +143,12 @@ public final class CoreCfgProjection {
                         CfgTransition.Kind.ENTRY, entry.id()));
                 for (Sequence sequence : orderedSequences) {
                     CfgNodeId from = sequences.get(sequence.label()).id();
+                    var exceptionalLabels=new java.util.HashSet<LabelId>();
+                    for(var alternative:alternatives(sequence.terminator())) {
+                        var handler=exceptionLabel(alternative);
+                        if(handler!=null&&exceptionalLabels.add(handler))transitions.add(new CfgTransition(from,sequences.get(handler).id(),CfgTransition.Kind.EXCEPTION,entry.id()));
+                    }
+                    for(var end:outsideNodes.get(sequence.label()))transitions.add(new CfgTransition(from,end.id(),CfgTransition.Kind.CONTROL_EXIT,entry.id()));
                     // Contextual rules include orphans; they do not assert reachability from this Entry.
                     if (sequence.terminator() instanceof Operations.Return) {
                         transitions.add(new CfgTransition(from, exit.id(), CfgTransition.Kind.RETURN, entry.id()));

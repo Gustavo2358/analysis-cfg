@@ -3,6 +3,7 @@
 import argparse
 import json
 import os
+import re
 from pathlib import Path
 import shutil
 import subprocess
@@ -34,13 +35,18 @@ def runtime(producer):
 
 def locked_sp(sp):
     version=json.loads((ROOT/'docs/sources/sources.lock.json').read_text())['proleap_poc']['semantic_product_version']
-    # The producer pin is SP2.38. Each historical fixture may publish an earlier
-    # contract version according to its own public features, including structural
-    # PERFORM and ordinary continuations in the current producer.
-    require(version == '2.38.0' and sp.get('sourceDependencies') is not None, 'locked source-dependency generation')
+    # The exact producer SHA is checked by run(). Its lock supplies the ceiling;
+    # feature-selected historical publications can be older than that ceiling.
+    def parsed(value):
+        require(isinstance(value, str) and re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", value),
+                'three-part SP contract version')
+        return tuple(map(int, value.split('.')))
+    ceiling = parsed(version)
+    require(ceiling[0] == 2 and ceiling >= (2, 31, 0)
+            and sp.get('sourceDependencies') is not None, 'locked source-dependency generation')
     require(not any(s.get('copySemantics') == 'POSSIBLE_TEXT' or s['variant'].startswith('CICS')
                     for s in sp['statements']), 'fixture stays within scoped source-dependency evidence')
-    published = tuple(map(int, sp['contractVersion'].split('.')))
+    published = parsed(sp['contractVersion'])
     floor = (2, 31, 0)
     if sp.get('storage', {}).get('logicalExactViews'):
         floor = (2, 35, 0)
@@ -48,9 +54,11 @@ def locked_sp(sp):
         floor = max(floor, (2, 36, 0))
     if sp.get('ordinaryContinuations'):
         floor = max(floor, (2, 37, 0))
+    if any(s.get('condition', {}).get('textPredicate') for s in sp['statements']):
+        floor = max(floor, (2, 46, 0))
     if any(s.get('logicalTransfers') for s in sp['statements']):
         floor = max(floor, (2, 38, 0))
-    require(floor <= published <= (2, 38, 0), 'published SP contract covers fixture features')
+    require(floor <= published <= ceiling, 'published SP contract covers fixture features')
 
 
 def text_leaf(expression):
@@ -106,7 +114,50 @@ def source_spans(result, support, source):
     return spans
 
 
-def air_oracle(air, opened):
+def declaration_object(publication, identity):
+    # The final component is the producer's source identity. Profile namespaces
+    # are allowed to change; an object must still have exactly one source owner.
+    items = [i for i in publication['coverage']['items']
+             if i['sourceKey'].rsplit('/', 1)[-1] == identity
+             and any(o['domain'] == 'object' for o in i['outputs'])]
+    require(len(items) == 1, 'one declaration-owned object: ' + identity)
+    outputs = [o for o in items[0]['outputs'] if o['domain'] == 'object']
+    require(len(outputs) == 1, 'one object output per declaration: ' + identity)
+    return outputs[0]
+
+
+def statement_operation(publication, operations, identity, kind):
+    outputs = [o for i in publication['coverage']['items']
+               if i['sourceKey'].rsplit('/', 1)[-1] == identity
+               for o in i['outputs'] if o['domain'] == 'operation']
+    require(len({o['localId'] for o in outputs}) == len(outputs), 'unique coverage outputs')
+    linked = [operations[o['localId']] for o in outputs]
+    principal = [record for record in linked if record[2]['kind'] == kind]
+    require(len(principal) == 1, 'one typed source operation: ' + identity)
+    seq, offset, op = principal[0]
+    extras = [record for record in linked if record is not principal[0]]
+    # A MOVE publishes its Assign and explicit completion Jump. No arbitrary
+    # extra operation or extra execution context is accepted by this oracle.
+    require(not extras or (kind == 'assign' and len(extras) == 1
+            and extras[0][0] == seq and extras[0][1] == len(seq['instructions'])
+            and extras[0][2] == seq['terminator'] and extras[0][2]['kind'] == 'jump'),
+            'only the source MOVE completion may accompany its Assign')
+    return principal[0]
+
+
+def text_equality_predicate(predicate, subject, value, extent):
+    require(predicate['kind'] == 'binary' and predicate['operator'] == 'eq'
+            and predicate['header']['role'] == 'PREDICATE', 'typed text equality predicate')
+    for side in ('left', 'right'):
+        require(predicate[side]['kind'] == 'fit_text' and int(predicate[side]['length']) == extent,
+                'comparison uses declared logical extent')
+    left = text_leaf(predicate['left'])
+    require(left['kind'] == 'read' and left['place']['kind'] == 'object'
+            and left['place']['object'] == subject, 'predicate reads the source condition subject')
+    require(literal_text(predicate['right']) == value, 'predicate preserves the source literal')
+
+
+def air_oracle(air, opened, semantic):
     p = air['publication']; require(air['airVersion'] == '2.0.0', 'AIR version')
     require(len(p['units']) == 1, 'one caller unit')
     unit = p['units'][0]; seq = unit['sequences']
@@ -116,8 +167,10 @@ def air_oracle(air, opened):
     call = next(s for s in seq if s['terminator']['kind'] == 'invoke')
     ret = next(s for s in seq if s['terminator']['kind'] == 'return')
     require(unit['entries'][0]['initialLabel'] == branch['label'], 'explicit AIR entry is branch')
-    b = branch['terminator']; require(b['predicate']['kind'] == 'unknown', 'real IF is Unknown BOOL')
-    require(b['predicate']['typeRef'] == {'kind': 'known', 'type': {'kind': 'bool'}}, 'predicate is BOOL')
+    b = branch['terminator']
+    flag = next(d for d in semantic['dataDeclarations'] if d['canonicalName'] == 'FLAG')
+    subject = declaration_object(p, flag['id'])
+    text_equality_predicate(b['predicate'], subject, 'Y', flag['scalarText']['logicalExtent'])
     yes = by_label[b['trueDestination']['localId']]; no = by_label[b['falseDestination']['localId']]
     require(yes['terminator']['kind'] == 'jump' and yes['terminator']['destination'] == call['label'], 'true jumps to join')
     require(no == call if opened else no['terminator']['kind'] == 'jump' and no['terminator']['destination'] == call['label'], 'false open bypass / closed assignment')
@@ -134,8 +187,8 @@ def air_oracle(air, opened):
     return unit, call, assignments
 
 
-def dependency_oracle(result, air, source, opened):
-    unit, call, assignments = air_oracle(air, opened)
+def dependency_oracle(result, air, source, opened, semantic):
+    unit, call, assignments = air_oracle(air, opened, semantic)
     require(len(result['sites']) == 1, 'one CALL site')
     site = result['sites'][0]; invoke = call['terminator']
     require(site['caller'] == unit['id'] and site['entry'] == unit['entries'][0]['id'], 'caller/entry identity')
@@ -195,20 +248,20 @@ def run(work, config_path):
             require(semantic['unit']['canonicalProgramName'] == 'CALLER', 'real caller program identity')
             air = cwd / 'program.air.json'
             execute(cwd, 'lower', ['java', '-cp', os.pathsep.join(config['lower']['classpath']), config['lower']['main'], str(sp), str(air)])
-            publication = json.loads(air.read_text()); air_oracle(publication, name == 'open')
+            publication = json.loads(air.read_text()); air_oracle(publication, name == 'open', semantic)
             cp = runtime(producer); cfg = cwd / 'cfg.json'; dep = cwd / 'dependencies.json'
             execute(cwd, 'cfg', ['java', '-cp', cp, 'io.github.gustavo2358.analysis.cfg.launcher.AnalysisCfg', str(air), str(cfg)])
             contract = verify_cfg_wire(cfg.read_bytes())
             require({'BRANCH_TRUE', 'BRANCH_FALSE', 'JUMP', 'INVOKE_NORMAL'} <= set(contract['transitions']), 'real CFG labeled diamond')
             execute(cwd, 'dependency', ['java', '-cp', cp, 'io.github.gustavo2358.analysis.launcher.AnalysisDependencies', str(air), str(dep)])
-            result = read(dep); dependency_oracle(result, publication, source, name == 'open')
+            result = read(dep); dependency_oracle(result, publication, source, name == 'open', semantic)
             # Public transport metamorphism: change physical order only, keep every identity/destination.
             for unit in publication['publication']['units']:
                 unit['sequences'].reverse()
             permuted = cwd / 'permuted.air.json'; permuted.write_text(json.dumps(publication))
             permdep = cwd / 'permuted.dependencies.json'
             execute(cwd, 'permuted', ['java', '-cp', cp, 'io.github.gustavo2358.analysis.launcher.AnalysisDependencies', str(permuted), str(permdep)])
-            other = read(permdep); dependency_oracle(other, publication, source, name == 'open')
+            other = read(permdep); dependency_oracle(other, publication, source, name == 'open', semantic)
             require(result['sites'] == other['sites'] and result['edges'] == other['edges'], 'physical sequence order must not affect semantics')
             outputs.append([p.read_bytes() for p in (source, sp, air, cfg, dep)])
             print('PASS real ' + name + ' ' + attempt + ': candidates=' + str([c['referenceName'] for c in result['sites'][0]['candidates']])

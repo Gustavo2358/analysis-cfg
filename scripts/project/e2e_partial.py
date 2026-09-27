@@ -16,13 +16,13 @@ from prepare_w2d_producers import ROOT, git, require_local
 FIXTURES = ROOT / 'analysis-adapters/src/test/resources/cp6/partial-program'
 # Hand-written known candidates; computed CALL remainders follow the explicit AIR bounds.
 EXPECTED = {
-    'display-handler': [{'BEFORE'}, set()],
+    'display-handler': [{'BEFORE'}],
     'control-body': [{'AFTER'}, {'INNER'}],
     'p1': [{'PROGA'}],
     'p2': [{'PROGA'}, {'PROGB'}],
     'p3': [{'PROGA'}],
     'p4': [{'PROGA'}],
-    'must-write': [{'PROGA'}],
+    'must-write': [set()],
     'read': [{'PROGA'}],
     'call-using': [{'PROGA'}],
     'call-returning': [{'PROGA'}],
@@ -47,9 +47,12 @@ def oracle(name, sp, air, result):
     links = {}
     for fact in sp['statements']:
         ident = fact['header']['id']
-        links[ident] = [o for i in p['coverage']['items'] if i['sourceKey'].endswith('/' + ident)
-                       for o in i['outputs'] if o['domain'] == 'operation']
-        require(links[ident], 'no silent source elision: ' + ident)
+        items = [i for i in p['coverage']['items'] if i['sourceKey'].endswith('/' + ident)]
+        links[ident] = [o for i in items for o in i['outputs'] if o['domain'] == 'operation']
+        require(items, 'no silent source elision: ' + ident)
+        if not links[ident]:
+            require(all(i['status'] == 'ABSTRACTED' and i['uncertainties'] for i in items),
+                    'unprojected source occurrence retains explicit coverage gaps: ' + ident)
     by_op = {s['operation']['localId']: s for s in result['sites']}
     calls = source_calls(sp)
     # A contextual PERFORM may publish an inactive lexical shadow alongside the
@@ -58,15 +61,14 @@ def oracle(name, sp, air, result):
     sites = []; linked = set(); inactive = []
     for call_index, call in enumerate(calls):
         ids = {o['localId'] for o in links[call['header']['id']]}
-        require(ids and ids <= by_op.keys(), 'every CALL output has a dependency site')
+        if name == 'display-handler' and call_index == 1:
+            require(not ids, 'post-DISPLAY CALL remains source inventory beyond an unproved completion')
+            continue
+        require(ids and ids <= by_op.keys(), 'every projected CALL output has a dependency site')
         linked.update(ids)
         active = [by_op[i] for i in ids if by_op[i]['reachability'] == 'REACHABLE']
-        if name == 'display-handler' and call_index == 1:
-            require(not active and len(ids) == 1, 'post-DISPLAY CALL is behind an unproved handler completion')
-            sites.append(by_op[next(iter(ids))])
-        else:
-            require(len(active) == 1, 'one reachable site per source CALL')
-            sites.extend(active)
+        require(len(active) == 1, 'one reachable site per projected source CALL')
+        sites.extend(active)
         for i in ids:
             site = by_op[i]
             if site['reachability'] != 'REACHABLE':
@@ -94,11 +96,11 @@ def oracle(name, sp, air, result):
                 and not sites[0]['modelValueRemainder'],
                 'unknown linkage input does not erase independent local CALL value')
     if name == 'control-body':
-        require(len(inactive) == 1, 'one inactive contextual body shadow')
-        shadow = operations[inactive[0]['operation']['localId']]
-        require(not shadow['outcomes']['known'] and shadow['outcomes']['remainder'] ==
-                {'kind': 'within', 'scope': {'kind': 'labels', 'labels': []}},
-                'inactive body shadow retains its explicit open boundary')
+        require(not inactive and len(sites) == 2, 'only the demanded body activation and resumed CALL are published')
+        inner = operations[sites[1]['operation']['localId']]
+        require(inner['outcomes']['known'] == [{'kind': 'normal', 'label': sites[0]['sequence']}]
+                and inner['outcomes']['remainder'] == {'kind': 'none'},
+                'body CALL returns only to its activation resume')
     if name in EXPECTED:
         require(len(sites) == len(EXPECTED[name]), 'independent source site count')
         for site, values in zip(sites, EXPECTED[name]):
@@ -128,11 +130,32 @@ def oracle(name, sp, air, result):
         require('PROGA' in {c['referenceName'] for c in sites[0]['candidates']} and sites[0]['openControlRemainder'], 'CALL target survives unknown handler control')
     if name == 'must-write':
         moves = [s for s in sp['statements'] if s['variant'] == 'MOVE']
-        require(len(moves) == 2 and operations[links[moves[0]['header']['id']][0]['localId']]['kind'] == 'assign'
-                and operations[links[moves[1]['header']['id']][0]['localId']]['kind'] == 'nop',
-                'unimplemented oversized transform retains diagnostic Nop and prior supported Assign')
+        require(len(moves) == 2 and all(any(operations[o['localId']]['kind'] == 'assign'
+                for o in links[m['header']['id']]) for m in moves), 'both literal writes are modeled')
+        site = sites[0]
+        require([c['rawValue'] for c in site['rawCandidates']] == ['LONG-PRO']
+                and not site['modelValueRemainder'] and site['interpretationUnknownRemainder'],
+                'proved truncating overwrite kills PROGA but keeps uninterpreted raw text')
+        support = site['rawCandidates'][0]['supports']
+        require(len(support) == 1 and support[0]['producer'] in links[moves[1]['header']['id']],
+                'only the overriding MOVE supports the truncated result')
     if name == 'body-gap':
-        require(any(o['kind'] == 'opaque' for o in operations.values()), 'semantic body gap remains conservative')
+        # Literal fitting and repeated contextual PERFORM are now supported.
+        # LONG-PRO is the exact eight-character result, outside the existing
+        # program-name profile. Do not invent an interpreted candidate.
+        require(len(sites) == 2 and all(not site['candidates']
+                and [c['rawValue'] for c in site['rawCandidates']] == ['LONG-PRO']
+                and not site['modelValueRemainder'] and not site['openControlRemainder']
+                and site['interpretationUnknownRemainder'] for site in sites),
+                'both activations overwrite OLD with exact truncated text')
+        producers = [site['rawCandidates'][0]['supports'] for site in sites]
+        require(all(len(support) == 1 and support[0]['kind'] == 'VALUE_PRODUCER'
+                    and operations[support[0]['producer']['localId']]['kind'] == 'assign'
+                    for support in producers)
+                and producers[0][0]['producer'] != producers[1][0]['producer'],
+                'separate activation producers support each fitted value')
+        require(all(o['kind'] != 'opaque' for o in operations.values()),
+                'supported body and repeated activation have no opaque frontier')
     precise = name.startswith('perform-') or name in ('if-nested', 'stress')
     if precise:
         require(all(o['kind'] != 'opaque' for o in operations.values()), 'supported composition needs no fallback')

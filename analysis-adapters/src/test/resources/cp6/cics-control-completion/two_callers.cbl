@@ -1,0 +1,25 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. CICS-CONTROL.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       COPY DFHAID.
+       01 BUFFER-AREA.
+         05 PART-A PIC X(8) VALUE 'BEFORE01'.
+         05 PART-B PIC X(8).
+       01 RC PIC S9(8) COMP.
+       01 RC2 PIC S9(8) COMP.
+       01 MAP-NAME PIC X(8) VALUE 'TESTMAP'.
+       01 SENTINEL PIC X.
+       PROCEDURE DIVISION.
+       MAIN.
+           MOVE 'FIRST001' TO PART-A.
+           PERFORM IO-P.
+           CALL PART-A.
+           MOVE 'SECOND02' TO PART-A.
+           PERFORM IO-P.
+           CALL PART-B.
+           GOBACK.
+       IO-P.
+           EXEC CICS SEND MAP('M') FROM(BUFFER-AREA)
+                NOHANDLE END-EXEC.
+           MOVE PART-A TO PART-B.

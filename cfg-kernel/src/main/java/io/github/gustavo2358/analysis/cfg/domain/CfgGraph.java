@@ -65,6 +65,15 @@ public final class CfgGraph {
                 throw new IllegalArgumentException("transition requires an inventoried activation Entry");
             }
             boolean valid = switch (transition.kind()) {
+                case EXCEPTION -> from instanceof CfgNode.SequenceNode sequence
+                    &&to instanceof CfgNode.SequenceNode target
+                    &&sequence.source().label().unit().equals(transition.activationEntry().unit())
+                    &&target.source().label().unit().equals(transition.activationEntry().unit())
+                    &&CoreCfgProjection.alternatives(sequence.source().terminator()).stream()
+                        .anyMatch(a->target.source().label().equals(CoreCfgProjection.exceptionLabel(a)));
+                case CONTROL_EXIT -> from instanceof CfgNode.SequenceNode sequence
+                    &&to instanceof CfgNode.OutcomeExit exit&&sequence.source().terminator().equals(exit.source())
+                    &&sequence.source().label().unit().equals(transition.activationEntry().unit());
                 case ENTRY -> from instanceof CfgNode.EntryNode entry
                         && to instanceof CfgNode.SequenceNode sequence
                         && entry.source().id().equals(transition.activationEntry())

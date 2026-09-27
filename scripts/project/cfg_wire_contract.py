@@ -9,6 +9,8 @@ TRANSITIONS = {'1.0.0': {'ENTRY', 'JUMP', 'BRANCH_TRUE', 'BRANCH_FALSE', 'RETURN
 
 TERMINATORS['3.0.0'] = TERMINATORS['2.0.0'] | {'OPAQUE'}
 TRANSITIONS['3.0.0'] = TRANSITIONS['2.0.0'] | {'OPAQUE_JUMP', 'OPAQUE_RETURN'}
+TERMINATORS['4.0.0'] = TERMINATORS['3.0.0']
+TRANSITIONS['4.0.0'] = TRANSITIONS['3.0.0'] | {'EXCEPTION', 'CONTROL_EXIT'}
 
 def pairs(items):
     result = {}
@@ -28,7 +30,13 @@ def verify(data):
     transitions = {t['kind'] for t in doc['transitions']}
     if not terminators <= TERMINATORS[version] or not transitions <= TRANSITIONS[version]:
         raise ValueError('CFG tokens incompatible with declared version')
-    minimum = '3.0.0' if 'OPAQUE' in terminators or transitions & {'OPAQUE_JUMP', 'OPAQUE_RETURN'} else '2.0.0' if 'INVOKE' in terminators or 'INVOKE_NORMAL' in transitions else '1.0.0'
+    outside = [n for n in doc['nodes'] if n['kind'] == 'OUTCOME_EXIT']
+    if outside and version != '4.0.0':
+        raise ValueError('CFG tokens incompatible with declared version')
+    for node in outside:
+        if node.get('outcome') not in {'HALT', 'EXCEPTION', 'ANY_EXCEPTION'} or ('tag' in node) != (node.get('outcome') == 'EXCEPTION'):
+            raise ValueError('invalid outside outcome')
+    minimum = '4.0.0' if outside or transitions & {'EXCEPTION', 'CONTROL_EXIT'} else '3.0.0' if 'OPAQUE' in terminators or transitions & {'OPAQUE_JUMP', 'OPAQUE_RETURN'} else '2.0.0' if 'INVOKE' in terminators or 'INVOKE_NORMAL' in transitions else '1.0.0'
     if version != minimum:
         raise ValueError('writer did not select the minimum required CFG contract')
     return dict(schemaVersion=version, terminators=sorted(terminators), transitions=sorted(transitions))

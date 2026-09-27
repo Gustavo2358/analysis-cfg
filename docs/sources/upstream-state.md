@@ -1,14 +1,20 @@
 # Baseline factual dos repositórios
 
-## Estado vigente — catálogo IBM estrutural
+## Estado vigente — integração aprovada CICS D1–D5
 
-Os pins atuais estão em [sources.lock.json](sources.lock.json): frontend SP 2.49 /
-NOMINAL_TEXT_SOURCE_V2, com modelAssumed e nove membros IBM; fallback sintético
-SQLCA autorizado somente por EXEC SQL INCLUDE. Arquivos reais mantêm precedência.
-Frontend #64 (`22d37233373b9db691ba170d898b7523bfea5746`) e
-lower #39 (`83f11f13dd5e521382e4903c2d8bf9e92832f11a`) estão mergeados.
-A integração do consumidor final segue no PR analysis-cfg #49.
-Evidência executada e reuso estão em [CardDemo IBM](../work/carddemo-ibm-copybooks.md).
+Os produtores abaixo estão mergeados em main. O lock contém seus SHAs reais de
+merge; os checkpoints históricos seguintes não substituem esses pins.
+
+- proleap-poc: `313236603815cd8c4d7299ae366310a4292bc5ee`.
+- cobol-lower: `da3325caa059a4beb7bd01f1fee262f9844725f2`.
+
+SP2.50 conserva MODEL_STORAGE, SYNCPOINT_ROLLBACK, RETURN e controle excepcional
+qualificado. O reparo DLI preserva provenance; CALL com conclusão desconhecida
+conserva seu target sem sucessores inventados. modelAssumed não concede prova
+física, pruning ou kill. CFG JSON4 transporta os novos papéis quando necessário.
+
+Qualificação, reuso e limites: [CICS D1–D5](../work/cics-control-qualification.md).
+Os repins desta integração não alteram código, testes ou contratos qualificados.
 
 As seções abaixo preservam a sequência histórica de checkpoints. Versões, pins,
 estados e pendências nelas registrados pertencem à época de cada observação;
