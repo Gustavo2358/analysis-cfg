@@ -31,7 +31,8 @@ class LockedSourceContractTest(unittest.TestCase):
                 e2e_w2d.locked_sp(self.sample(version))
 
     def test_feature_floors_are_independent_of_the_pinned_ceiling(self):
-        features = [({'storage': {'logicalExactViews': [{}]}}, '2.35.0'),
+        features = [({'statements': [{'variant': 'IF', 'condition': {'textPredicate': {'kind': 'EQUAL_TEXT'}}}]}, '2.46.0'),
+                    ({'storage': {'logicalExactViews': [{}]}}, '2.35.0'),
                     ({'statements': [{'variant': 'PROCEDURE_PERFORM', 'publicationKind': 'STRUCTURAL_FACTS'}]}, '2.36.0'),
                     ({'ordinaryContinuations': [{}]}, '2.37.0'),
                     ({'statements': [{'variant': 'MOVE', 'logicalTransfers': [{}]}]}, '2.38.0')]
@@ -64,6 +65,66 @@ class LockedSourceContractTest(unittest.TestCase):
                       {'statements': [{'variant': 'CICS_RETURN'}]}):
             with self.subTest(extra=extra), self.assertRaises(ValueError):
                 e2e_w2d.locked_sp(self.sample() | extra)
+
+
+class TextPredicateOracleTest(unittest.TestCase):
+    def predicate(self):
+        def fit(value):
+            return {'kind': 'fit_text', 'length': '1', 'pad': ' ',
+                    'header': {'role': 'VALUE_READ'}, 'value': value}
+        return {'kind': 'binary', 'operator': 'eq', 'header': {'role': 'PREDICATE'},
+                'left': fit({'kind': 'read', 'place': {'kind': 'object', 'object': 'flag'}}),
+                'right': fit({'kind': 'literal', 'value': {'kind': 'text', 'value': 'Y'}})}
+
+    def test_actual_text_equality_is_required_without_accepting_unknown_or_wrong_operands(self):
+        e2e_w2d.text_equality_predicate(self.predicate(), 'flag', 'Y', 1)
+        for mutate in (lambda p: p.update(kind='unknown'), lambda p: p.update(operator='ne'),
+                       lambda p: p['header'].update(role='VALUE_READ'),
+                       lambda p: p['left'].update(length='8'),
+                       lambda p: p['right'].update(pad='X'),
+                       lambda p: p['left']['value']['place'].update(object='target'),
+                       lambda p: p['right']['value']['value'].update(value='N')):
+            predicate = self.predicate(); mutate(predicate)
+            with self.assertRaises(ValueError):
+                e2e_w2d.text_equality_predicate(predicate, 'flag', 'Y', 1)
+
+
+
+
+class SourceCoverageOracleTest(unittest.TestCase):
+    def test_object_owner_is_profile_independent_but_unique(self):
+        obj = {'domain': 'object', 'localId': 'flag'}
+        item = {'sourceKey': 'storage@1/STORAGE_DECLARATION_UNKNOWN/data:0', 'outputs': [obj]}
+        publication = {'coverage': {'items': [item]}}
+        self.assertEqual(obj, e2e_w2d.declaration_object(publication, 'data:0'))
+        for items in ([], [item, item], [item | {'outputs': [obj, obj]}],
+                      [item | {'sourceKey': 'storage@1/data:01'}],
+                      [item | {'outputs': [{'domain': 'operation', 'localId': 'flag'}]}]):
+            with self.subTest(items=items), self.assertRaises(ValueError):
+                e2e_w2d.declaration_object({'coverage': {'items': items}}, 'data:0')
+
+    def test_move_accepts_only_its_own_explicit_completion(self):
+        assign = {'kind': 'assign'}
+        jump = {'kind': 'jump'}
+        seq = {'instructions': [assign], 'terminator': jump}
+        operations = {'assign': (seq, 0, assign), 'jump': (seq, 1, jump)}
+        def publication(ids):
+            return {'coverage': {'items': [{'sourceKey': 'sp-partial@1/' + ident + '/statement:0',
+                     'outputs': [{'domain': 'operation', 'localId': ident}]} for ident in ids]}}
+        for ids in (['assign'], ['assign', 'jump']):
+            self.assertEqual(operations['assign'], e2e_w2d.statement_operation(
+                publication(ids), operations, 'statement:0', 'assign'))
+        for ids in ([], ['jump'], ['assign', 'assign'], ['assign', 'jump', 'jump']):
+            with self.subTest(ids=ids), self.assertRaises(ValueError):
+                e2e_w2d.statement_operation(publication(ids), operations, 'statement:0', 'assign')
+        for extra in ((seq, 0, jump), (seq, 1, {'kind': 'opaque'}),
+                      ({'instructions': [], 'terminator': jump}, 0, jump)):
+            with self.subTest(extra=extra), self.assertRaises(ValueError):
+                e2e_w2d.statement_operation(publication(['assign', 'jump']),
+                    operations | {'jump': extra}, 'statement:0', 'assign')
+        with self.assertRaises(ValueError):
+            e2e_w2d.statement_operation(publication(['assign', 'jump']), operations,
+                                      'statement:0', 'jump')
 
 
 if __name__ == '__main__':

@@ -10,7 +10,7 @@ import sys
 
 from dependency_wire import read, require
 from cfg_wire_contract import verify as verify_cfg_wire
-from e2e_w2d import locked_sp, open_call_model, execute, runtime, source_spans
+from e2e_w2d import statement_operation, locked_sp, open_call_model, execute, runtime, source_spans
 from prepare_w2d_producers import ROOT, git, require_local
 
 FIXTURES = ROOT / 'analysis-adapters/src/test/resources/cp6/multi-call'
@@ -73,10 +73,8 @@ def air_oracle(air, sp, semantic):
             operations[key] = seq, offset, op
     links = {}
     for ident, fact in facts.items():
-        items = [i for i in p['coverage']['items'] if i['sourceKey'].endswith('/' + ident)]
-        outputs = [o for i in items for o in i['outputs'] if o['domain'] == 'operation']
-        require(len(outputs) == 1, 'one correlated source operation: ' + ident)
-        links[ident] = operations[outputs[0]['localId']]
+        kind = {'MOVE': 'assign', 'CALL': 'invoke', 'IF': 'branch', 'PERFORM': 'jump', 'GOBACK': 'return'}[fact['variant']]
+        links[ident] = statement_operation(p, operations, ident, kind)
     entry = sp['entryInventory']['entries'][0]['start']['statement']
     require(unit['entries'][0]['initialLabel'] == links[entry][0]['label'], 'explicit entry preserved')
     for ident, fact in facts.items():
@@ -134,15 +132,19 @@ def dependency_oracle(result, air, sp, case, source):
             producers = [s for s in facts.values() if s['variant'] == 'MOVE' and s['source']['variant'] == 'LITERAL' and s['source']['logicalValue']['value'] == name] if computed else [call]
             if computed and ((case == 4 and name == 'PROGB') or (case in (5, 7) and name == 'PROGA')):
                 # FitText(Read) is a value-producing transformation in the pinned baseline.
-                producers = [s for s in facts.values() if s['variant'] == 'MOVE' and s['source']['variant'] == 'DATA']
-            require(len(producers) == 1, 'independent fixture producer identity')
-            producer = links[producers[0]['header']['id']][2]; support = candidate['supports']
-            require(len(support) == 1 and support[0]['producer'] == producer['header']['id'], 'support cannot cross sites/diamonds')
-            require(support[0]['kind'] == ('VALUE_PRODUCER' if computed else 'CALL_LITERAL'), 'specific provenance kind')
-            if computed: require(support[0]['origin'] == producer['header']['origin'], 'exact literal or FitText copy producer through PERFORM')
-            expected_line = producers[0]['header']['provenance']['original']['startLine']
-            spans = source_spans(result, support[0], source)
-            require(spans and all(int(s['startLine']) == expected_line == int(s['endLine']) for s in spans), 'support exact source occurrence')
+                producers += [s for s in facts.values() if s['variant'] == 'MOVE' and s['source']['variant'] == 'DATA']
+            support = candidate['supports']
+            producer_ops = [links[p['header']['id']][2] for p in producers]
+            require(len(support) == len(producers) and {s['producer']['localId'] for s in support}
+                    == {p['header']['id']['localId'] for p in producer_ops}, 'support cannot cross sites/diamonds')
+            for evidence in support:
+                index = next(i for i, op in enumerate(producer_ops) if op['header']['id'] == evidence['producer'])
+                producer = producer_ops[index]
+                require(evidence['kind'] == ('VALUE_PRODUCER' if computed else 'CALL_LITERAL'), 'specific provenance kind')
+                if computed: require(evidence['origin'] == producer['header']['origin'], 'exact literal and captured copy origins')
+                expected_line = producers[index]['header']['provenance']['original']['startLine']
+                spans = source_spans(result, evidence, source)
+                require(spans and all(int(s['startLine']) == expected_line == int(s['endLine']) for s in spans), 'support exact source occurrence')
             if computed:
                 raw = next(c for c in site['rawCandidates'] if c['rawValue'] == candidate['rawValue'])
                 require(raw['supports'] == support, 'raw/interpreted support identity')

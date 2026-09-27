@@ -9,3 +9,39 @@ Scope: repair application defects if proved; otherwise replace obsolete expectat
 Validation: targeted RED/GREEN; complete frontend and CFG qualification to exercise stages previously blocked; FAST in changed repositories. Reuse corpus evidence only if production inputs/code remain identical. If any production change is needed, rerun the affected corpus and investigate deltas.
 
 Checkpoint H1: obsolete characterization expectations replaced with explicit current SQLCA, copybook, DLI and PERFORM assertions; missing SQL INCLUDE stays opaque. W2D reads its version ceiling from the exact producer lock, keeps feature floors, and has five positive/negative guard tests. DLI retained provenance is corrected through framing and replacements; whole-command provenance and confidence remain unchanged.
+
+## Current integration oracles
+
+- W2D's Boolean placeholder predates typed EQUAL_TEXT. The oracle now checks the
+  exact read subject, literal, fitting extent/padding, operator and predicate role.
+- Storage coverage uses the source identity within a profile namespace; the old
+  `/data/<id>` path no longer exists. The gate requires exactly one declaration
+  owner/object output and rejects missing, duplicate and mismatched identities.
+- A source MOVE owns an Assign and its explicit completion Jump. Multi-CALL now
+  accepts exactly that pair in the same sequence; arbitrary extra operations or
+  activations still fail. Every continuation is checked against the SP.
+- Logical copy supports contain the literal and retained copy contributions. The
+  gates require the exact independently specified producer set and exact written
+  provenance for each contribution, including exclusion of overwritten values.
+- PERFORM return origins follow the current topology proof DAG: callsite,
+  paragraph frontier and body completion. The destination is checked separately
+  against the published resume. The old oracle required a legacy resume-source
+  span that is not a premise in this topology contract.
+- `body-gap` and `must-write` use the now-supported literal truncation profile.
+  Their exact result is LONG-PRO, with the overriding producer; OLD/PROGA are
+  killed by a proved complete write. The program-name interpretation remains
+  open and publishes no invented valid program name. The oracle asserts raw
+  values, supports, openness and activation separation explicitly.
+- An unprojected source occurrence is represented by ABSTRACTED inventory
+  coverage with uncertainty, not necessarily an executable operation. Unknown
+  control still cannot license a handler or following statement.
+
+Eight focal test methods exercise the pin, predicate and coverage rules, including
+negative mutations. Existing positive candidate sets in W2D, MOVE-data,
+PERFORM-basic and multi-CALL are unchanged. The truncating overwrite expectation
+is corrected only because the current typed write proves the kill.
+
+The partial-program gate uncovered a **real lower defect**: CALL with only
+UNKNOWN_LOCAL outcomes lost its target when replaced by Opaque. The lower fix
+preserves Invoke target/signature and leaves an empty open local frontier.
+The original `call-handlers` candidate expectation remains mandatory.

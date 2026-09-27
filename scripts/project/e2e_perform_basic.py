@@ -10,7 +10,7 @@ import sys
 
 from dependency_wire import read, require
 from cfg_wire_contract import verify as verify_cfg_wire
-from e2e_w2d import locked_sp, open_call_model, execute, runtime, source_spans, text_leaf, literal_text
+from e2e_w2d import declaration_object, locked_sp, open_call_model, execute, runtime, source_spans, text_leaf, literal_text
 from e2e_move_data import reference
 from prepare_w2d_producers import ROOT, git, require_local
 
@@ -76,8 +76,7 @@ def air_oracle(air, semantic, case, source):
     require(literal_text(assigns[0]['value']) == 'PROGA   ', 'literal body value')
     objects = {}
     for name, identity in data.items():
-        item = next(i for i in p['coverage']['items'] if i['sourceKey'].endswith('/data/' + identity))
-        objects[name] = next(o for o in item['outputs'] if o['domain'] == 'object')
+        objects[name] = declaration_object(p, identity)
     require(assigns[0]['destination']['object'] == objects['WS-A' if case == 'copy' else 'WS-PGM'], 'body writes correct target')
     if case == 'copy':
         expression = text_leaf(assigns[1]['value'])
@@ -89,13 +88,13 @@ def air_oracle(air, semantic, case, source):
         spans = source_spans(p, {'origin': assign['header']['origin']}, source)
         require(all(int(s['span']['start']['line']) == fact['header']['provenance']['original']['startLine'] for s in spans), 'body origins preserved')
     control_spans = source_spans(p, {'origin': last['terminator']['header']['origin']}, source)
-    required_lines = {perform['header']['provenance']['original']['startLine'], perform['target']['paragraphOrigin']['original']['startLine'], perform['normalContinuation']['provenance']['original']['startLine']}
-    require(required_lines <= {int(s['span']['start']['line']) for s in control_spans}, 'return preserves callsite/paragraph/resume provenance')
-    return unit, call, assigns[-1], objects['WS-PGM']
+    required_lines = {perform['header']['provenance']['original']['startLine'], perform['target']['paragraphOrigin']['original']['startLine'], source_body[-1]['header']['provenance']['original']['startLine']}
+    require(required_lines <= {int(s['span']['start']['line']) for s in control_spans}, 'topology return preserves callsite/paragraph/body completion proofs')
+    return unit, call, assigns, objects['WS-PGM']
 
 
 def dependency_oracle(result, model, source):
-    unit, call, producer, subject = model
+    unit, call, producers, subject = model
     require(len(result['sites']) == 1 and len(result['edges']) == 1, 'CALL is the only dependency site/edge')
     site = result['sites'][0]
     require(site['caller'] == unit['id'] and site['entry'] == unit['entries'][0]['id'] and site['subject'] == subject, 'CALLER and receiver identity')
@@ -106,11 +105,15 @@ def dependency_oracle(result, model, source):
     open_call_model(call['terminator'],site)
     require(site['sourceValueRemainder'] and site['interpretationUnknownRemainder'] and site['effectiveUnknownRemainder'], 'other real-source remainders remain explicit')
     supports = site['candidates'][0]['supports']
-    require(len(supports) == 1 and supports[0]['producer'] == producer['header']['id'] and supports[0]['origin'] == producer['header']['origin'], 'exact body producer supports resumed candidate')
+    require(len(supports) == len(producers) and {s['producer']['localId'] for s in supports}
+            == {p['header']['id']['localId'] for p in producers}, 'exact body literal and copy contributions')
     require(site['rawCandidates'][0]['supports'] == supports and result['edges'][0]['candidate'] == site['candidates'][0], 'edge/raw support consistency')
-    move = 'MOVE WS-A TO WS-PGM' if source.stem == 'copy' else "MOVE 'PROGA'"
-    line = next(i for i, text in enumerate(source.read_text().splitlines(), 1) if move in text)
-    require(all(int(s['startLine']) == line == int(s['endLine']) for s in source_spans(result, supports[0], source)), 'support reaches exact body value-producing MOVE')
+    for support in supports:
+        producer = next(p for p in producers if p['header']['id'] == support['producer'])
+        require(support['origin'] == producer['header']['origin'], 'body producer origin preserved')
+        move = 'MOVE WS-A TO WS-PGM' if producers.index(producer) == 1 else "MOVE 'PROGA'"
+        line = next(i for i, text in enumerate(source.read_text().splitlines(), 1) if move in text)
+        require(all(int(s['startLine']) == line == int(s['endLine']) for s in source_spans(result, support, source)), 'support reaches exact body value-producing MOVE')
     require(result['metrics']['possibleValuesRuns'] == 1, 'ordinary forward solver')
 
 

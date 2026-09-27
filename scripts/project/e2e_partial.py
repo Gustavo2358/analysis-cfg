@@ -22,7 +22,7 @@ EXPECTED = {
     'p2': [{'PROGA'}, {'PROGB'}],
     'p3': [{'PROGA'}],
     'p4': [{'PROGA'}],
-    'must-write': [{'PROGA'}],
+    'must-write': [set()],
     'read': [{'PROGA'}],
     'call-using': [{'PROGA'}],
     'call-returning': [{'PROGA'}],
@@ -47,9 +47,12 @@ def oracle(name, sp, air, result):
     links = {}
     for fact in sp['statements']:
         ident = fact['header']['id']
-        links[ident] = [o for i in p['coverage']['items'] if i['sourceKey'].endswith('/' + ident)
-                       for o in i['outputs'] if o['domain'] == 'operation']
-        require(links[ident], 'no silent source elision: ' + ident)
+        items = [i for i in p['coverage']['items'] if i['sourceKey'].endswith('/' + ident)]
+        links[ident] = [o for i in items for o in i['outputs'] if o['domain'] == 'operation']
+        require(items, 'no silent source elision: ' + ident)
+        if not links[ident]:
+            require(all(i['status'] == 'ABSTRACTED' and i['uncertainties'] for i in items),
+                    'unprojected source occurrence retains explicit coverage gaps: ' + ident)
     by_op = {s['operation']['localId']: s for s in result['sites']}
     calls = source_calls(sp)
     # A contextual PERFORM may publish an inactive lexical shadow alongside the
@@ -128,11 +131,32 @@ def oracle(name, sp, air, result):
         require('PROGA' in {c['referenceName'] for c in sites[0]['candidates']} and sites[0]['openControlRemainder'], 'CALL target survives unknown handler control')
     if name == 'must-write':
         moves = [s for s in sp['statements'] if s['variant'] == 'MOVE']
-        require(len(moves) == 2 and operations[links[moves[0]['header']['id']][0]['localId']]['kind'] == 'assign'
-                and operations[links[moves[1]['header']['id']][0]['localId']]['kind'] == 'nop',
-                'unimplemented oversized transform retains diagnostic Nop and prior supported Assign')
+        require(len(moves) == 2 and all(any(operations[o['localId']]['kind'] == 'assign'
+                for o in links[m['header']['id']]) for m in moves), 'both literal writes are modeled')
+        site = sites[0]
+        require([c['rawValue'] for c in site['rawCandidates']] == ['LONG-PRO']
+                and not site['modelValueRemainder'] and site['interpretationUnknownRemainder'],
+                'proved truncating overwrite kills PROGA but keeps uninterpreted raw text')
+        support = site['rawCandidates'][0]['supports']
+        require(len(support) == 1 and support[0]['producer'] in links[moves[1]['header']['id']],
+                'only the overriding MOVE supports the truncated result')
     if name == 'body-gap':
-        require(any(o['kind'] == 'opaque' for o in operations.values()), 'semantic body gap remains conservative')
+        # Literal fitting and repeated contextual PERFORM are now supported.
+        # LONG-PRO is the exact eight-character result, outside the existing
+        # program-name profile. Do not invent an interpreted candidate.
+        require(len(sites) == 2 and all(not site['candidates']
+                and [c['rawValue'] for c in site['rawCandidates']] == ['LONG-PRO']
+                and not site['modelValueRemainder'] and not site['openControlRemainder']
+                and site['interpretationUnknownRemainder'] for site in sites),
+                'both activations overwrite OLD with exact truncated text')
+        producers = [site['rawCandidates'][0]['supports'] for site in sites]
+        require(all(len(support) == 1 and support[0]['kind'] == 'VALUE_PRODUCER'
+                    and operations[support[0]['producer']['localId']]['kind'] == 'assign'
+                    for support in producers)
+                and producers[0][0]['producer'] != producers[1][0]['producer'],
+                'separate activation producers support each fitted value')
+        require(all(o['kind'] != 'opaque' for o in operations.values()),
+                'supported body and repeated activation have no opaque frontier')
     precise = name.startswith('perform-') or name in ('if-nested', 'stress')
     if precise:
         require(all(o['kind'] != 'opaque' for o in operations.values()), 'supported composition needs no fallback')
