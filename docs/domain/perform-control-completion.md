@@ -1,6 +1,7 @@
 # PERFORM control completion
 
-Status: IN_PROGRESS — Draft review; no merge authorized.
+Implementation and qualification complete. Integration is recorded in
+[PR #47](https://github.com/Gustavo2358/analysis-cfg/pull/47); merge authorized by the user.
 Scope: integrate SP 2.48 and its lower producer; add source regression oracles.
 CFG construction and dependency analysis use their existing AIR contracts.
 
@@ -63,8 +64,17 @@ new relation or loss and none of the five known false-positive regressions. All
 candidate supports retain their producer, kind and written provenance. Namespace
 IDs and additional source evidence change in 38 products because inline repetition
 now publishes typed facts; normalized dependency semantics and support paths agree.
-Final exact pins, gate and rerun results are recorded in the Draft PR description.
+Exact qualification pins, gates and rerun results are recorded in PR #47 and the alias follow-up #48.
 
 No ALTER implementation or unrelated correction is included. No AIR model or
 normative IR change is required. Numeric evaluation and existing unrelated corpus
 gaps are not claimed as complete.
+
+## Qualification closeout
+
+The original PERFORM suite passes 39/39 and the source adversaries pass 25/25.
+The later alias MOVE correction retains both results and adds 14/14 alias
+adversaries. Required local and remote FAST gates passed. The 73-program CardDemo
+comparison retains 121 program, 271 file and 523 source relations and their
+supports; existing PARTIAL states and numeric/recursion limits remain explicit.
+The final documentation changes no production, contract, fixture or build input.

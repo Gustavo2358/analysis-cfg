@@ -1,0 +1,17 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. ALIAS-8.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 WS-GROUP.
+          05 WS-TARGET PIC X(8).
+          05 WS-ALIAS REDEFINES WS-TARGET PIC X(8).
+       01 WS-FLAG PIC X.
+       PROCEDURE DIVISION.
+       MAIN.
+       IF WS-FLAG = 'Y'
+           MOVE 'PROGA001' TO WS-TARGET
+       ELSE
+           MOVE 'PROGB002' TO WS-ALIAS
+       END-IF
+       CALL WS-TARGET
+       GOBACK.
