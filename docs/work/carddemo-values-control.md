@@ -1,8 +1,20 @@
 # CardDemo values and remaining entry/control semantics
 
 - id: CARDDEMO-VALUES-CONTROL
-- status: IN_PROGRESS (implementation qualified; review/merge pending)
-- scope: the four capability families authorized after W8; separate review PRs, no merge authorization.
+- status: DONE (implementation merged; required technical checks passed)
+- scope: the four capability families authorized after W8, including causal restoration and level-88 corrections.
+
+## Current status — integration authorized and implementation merged
+
+Implementation [PR #55](https://github.com/Gustavo2358/analysis-cfg/pull/55) merged as `bcc3471f259e019199deebfea138939aba3d1ab7`.
+The qualified behavior, tests and limits are retained. See the
+[integration closeout](carddemo-values-control-integration.md) for current pins,
+validation reuse and the separate scope of point 5.
+
+## Historical implementation and review checkpoints
+
+The following sections preserve the evidence and pending states of earlier
+checkpoints. They do not override the DONE status above.
 
 ## Checkpoints
 
