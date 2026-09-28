@@ -286,7 +286,7 @@
     ],
     "semantic_product_version": "2.57.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "afd29b423efa2be0fd896519ed548bfe424dc851",
+    "commit": "2a6cd9a43b26c04fada1f3f1cd4c8ccf01bc6b3d",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -297,7 +297,7 @@
       "scope": "local unconditional paragraph identity and explicit entry; G1-G5 and 1/2/5/40"
     },
     "storage_contract_version": "1.11.0",
-    "canonical_ref": "fix/carddemo-w7-recursion",
+    "canonical_ref": "main",
     "observed_on": "2026-09-28",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
@@ -307,7 +307,7 @@
     "fd_w4_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED producers, manual outcomes/USE and 28 real CLI sources twice; file-dependencies/w4-implementation.md",
     "fd_w5_validation": "QUALIFIED_LOCAL: focal/FAST, producer Q-SHARED with bounded final reuse, manual local AIR/wire and44 real CLI sources twice; file-dependencies/w5-implementation.md",
     "fd_w6_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED,19 B-SP fixtures,15 manual AIR tests and33 real CLI sources twice; file-dependencies/w6-implementation.md",
-    "status": "Review branch; source possibilities and native FILE evidence, SP 2.57. Not merged. See docs/work/carddemo-control-w7.md.",
+    "status": "MERGED / DONE for the qualified CardDemo W0-W8 scope; coverage remains PARTIAL. Current authority is this exact main commit; docs/work/carddemo-control-integration.md.",
     "fd_w8_validation": "QUALIFIED_LOCAL: producer FAST/Q-SHARED, B-SP33, CFG FAST502/Q547, manual/wire and38CICS+33native source cases twice; docs/product/file-dependencies/w8-implementation.md",
     "fd_w9_validation": "QUALIFIED_LOCAL: producer focal/FAST/Q, consumer manual/FAST/reader, 8 scope + 33 native + 38 CICS real CLI sources twice, deterministic four products; docs/product/file-dependencies/w9-implementation.md",
     "logical_text_w1": "Source E2E A-D twice deterministic; scale 10/100/1000; no physical profile. Corporate rerun not required by revised user acceptance.",
@@ -320,12 +320,12 @@
       "contract": "SP2.50 / NOMINAL_TEXT_SOURCE_V2; MODEL_STORAGE remains unavailable",
       "qualification": "docs/work/cics-control-qualification.md"
     },
-    "evidence_level": "W7/W8 qualified PERFORM reentry and source preservation review branch; SP 2.57 publishes the active binding reentry policy; source evidence 1.2 retains conditional completion hypotheses. Qualification: 560 cases, zero candidate/support loss, 22 focal adversaries; limits in docs/work/carddemo-control-w7-w8.md. Not merged."
+    "evidence_level": "Merged main after CardDemo W0-W8 qualification and documentary closeout. SP 2.57 / source evidence 1.2; 560 qualified cases, 73 CardDemo, zero candidate/support loss and 22 focal adversaries. Integration preserves production/test/contract content; docs/work/carddemo-control-integration.md records merged PRs, evidence reuse and remaining limits."
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
-    "status": "Review branch; source possibilities and native FILE evidence, SP 2.57. Not merged. See docs/work/carddemo-control-w7.md.",
-    "commit": "d41636e50e8c712d43e7d24f88a7a942442b657c",
+    "status": "MERGED / DONE for the qualified CardDemo W0-W8 scope; coverage remains PARTIAL. Current authority is this exact main commit; docs/work/carddemo-control-integration.md.",
+    "commit": "6ce7d13bff4b048112c49f205281f3bf56c2858a",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -337,7 +337,7 @@
     "goto_validation": {
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
     },
-    "canonical_ref": "fix/carddemo-w7-recursion",
+    "canonical_ref": "main",
     "observed_on": "2026-09-28",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
@@ -361,7 +361,7 @@
       "approved_sp_producer": "cef8e728857467a283f77d9b6b1f2f870eda57d5",
       "schema_sha256": "0c474808c68e07a45496c70794bd7096bf1d00f7d5c083dc54cc1b565d5b1341",
       "review": 34,
-      "checkpoint_note": "source_state_checkpoint, approved_sp_producer and review describe historical qualification; commit above is the current W7 PERFORM reentry policy review pin."
+      "checkpoint_note": "source_state_checkpoint, approved_sp_producer and review are historical qualification metadata. The top-level commit is the current merged main authority for source evidence 1.2; see docs/work/carddemo-control-integration.md."
     },
     "dependency_input": {
       "schema": "dependency-input",
@@ -369,7 +369,7 @@
       "producer_api": "io.github.gustavo2358.lower.adapters.cli.CobolDependencyInput",
       "schema_sha256": "5f751464dee36a993d9238a32e25d68d396ce8ca3fa2e0198f29b4e6a7f505c0"
     },
-    "evidence_level": "W7/W8 qualified PERFORM reentry and source preservation review branch; SP 2.57 publishes the active binding reentry policy; source evidence 1.2 retains conditional completion hypotheses. Qualification: 560 cases, zero candidate/support loss, 22 focal adversaries; limits in docs/work/carddemo-control-w7-w8.md. Not merged.",
+    "evidence_level": "Merged main after CardDemo W0-W8 qualification and documentary closeout. SP 2.57 / source evidence 1.2; 560 qualified cases, 73 CardDemo, zero candidate/support loss and 22 focal adversaries. Integration preserves production/test/contract content; docs/work/carddemo-control-integration.md records merged PRs, evidence reuse and remaining limits.",
     "perform_completion": "Scoped exits, SECTION boundaries, typed VARYING levels; Integration authorized; qualified original 39/39 and adversaries 25/25. See docs/domain/perform-control-completion.md.",
     "logical_alias_move": "Logical family translation precedes scalar shortcuts; 14/14 adversaries, PERFORM 39/39, reviewed chaos 48/48 with six explicit abstraction-policy cases; see docs/product/logical-alias-move.md.",
     "synthetic_model_assumptions": {
@@ -437,5 +437,5 @@
     "physical": "EXPERIMENTAL_EXPLICIT_OPT_IN_ONLY",
     "report": "docs/campaigns/positive-memory-topology/W2-REPORT.md"
   },
-  "metadata_scope": "Top-level producer/consumer commits, contract versions and status describe current W7 PERFORM reentry policy review pins. Named wave fields, merged_reviews and source_state_checkpoint/approved_sp_producer retain historical evidence and do not override current pins. Qualification: docs/work/carddemo-control-w7-w8.md."
+  "metadata_scope": "Top-level commits, contract versions, canonical_ref and status identify merged main authorities after CardDemo W0-W8. Named wave fields, merged_reviews and source_state_checkpoint/approved_sp_producer/review retain historical evidence and do not override current pins. Integration/evidence reuse/limits: docs/work/carddemo-control-integration.md."
 }

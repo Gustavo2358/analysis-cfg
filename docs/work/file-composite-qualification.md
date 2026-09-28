@@ -1,5 +1,8 @@
 # FILE composite control — qualification
 
+> Registro histórico de qualificação, preservado. O trabalho deste repositório está DONE / MERGED; consulte o [fechamento da integração](carddemo-control-integration.md). Os estados de Draft/parada/sem merge abaixo descrevem o checkpoint original.
+
+
 Status: implemented and qualified locally; awaiting review; not merged.
 Scope and contract: [FILE composite control](file-composite-control.md).
 

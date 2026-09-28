@@ -1,8 +1,10 @@
 # CARDDEMO-CONTROL-W7 — precondição de reentrada local
 
-Status: IN_PROGRESS / implementação qualificada, aguardando revisão. Escopo autorizado: W7/W8, sem merge.
+Status: DONE — implementação deste repositório mergeada em 28/09/2026; [fechamento da integração](carddemo-control-integration.md).
 
 Resultado, gates, deltas e limites: [fechamento W7/W8](carddemo-control-w7-w8.md).
+
+Os checkpoints abaixo registram a qualificação da onda na data em que foi executada. Seus estados de revisão e paradas são históricos; o estado vigente está no [fechamento da integração](carddemo-control-integration.md).
 
 ## Descoberta que revisa o plano
 

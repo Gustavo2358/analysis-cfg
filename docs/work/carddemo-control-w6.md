@@ -1,6 +1,10 @@
 # CARDDEMO-CONTROL-W6 — sentenças, busca e terminações
 
-Status: IN_PROGRESS. Escopo W6; parar antes de W7. Recursão/ALTER executável e UI permanecem fora.
+Status: DONE — implementação deste repositório mergeada em 28/09/2026; [fechamento da integração](carddemo-control-integration.md).
+
+Escopo W6. Recursão/ALTER executável e UI permanecem fora.
+
+Os checkpoints abaixo registram a qualificação da onda na data em que foi executada. Seus estados de revisão e paradas são históricos; o estado vigente está no [fechamento da integração](carddemo-control-integration.md).
 
 ## Regra e desenho antes do código
 
