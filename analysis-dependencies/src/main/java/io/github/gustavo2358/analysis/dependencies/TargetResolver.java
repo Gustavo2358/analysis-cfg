@@ -21,7 +21,8 @@ public final class TargetResolver {
     }
     public static boolean requiresSourceValues(QualifiedDependencyOccurrence occurrence,List<DependencySiteFact> sites) {
         if(!occurrence.targetKind().equals("COMPUTED")||occurrence.qualifications().isEmpty())return false;
-        if(sites.isEmpty())return true;
+        // A closed query over the executable subset cannot refute an additional source possibility.
+        if(occurrence.sourceControlRemainder()||sites.isEmpty())return true;
         // A closed executable result (including a refutation) takes priority.
         return sites.stream().anyMatch(s->s.reachability()!=DependencySiteFact.Reachability.UNREACHABLE_IN_MODEL
             &&!Boolean.FALSE.equals(s.modelValueRemainder()));
@@ -32,7 +33,8 @@ public final class TargetResolver {
     public static Resolution resolve(QualifiedDependencyOccurrence occurrence,List<DependencySiteFact> sites,List<SourceValuesProvider.Candidate> conditional) {
         var authorities=new ArrayList<String>();var candidates=new TreeMap<String,Candidate>();var reasons=new TreeSet<String>();
         boolean qualified=!occurrence.qualifications().isEmpty();
-        if(qualified)authorities.add("SOURCE_QUALIFIED");
+        if(qualified)authorities.add(occurrence.sourceControlRemainder()?"SOURCE_CONTROL_POSSIBLE":"SOURCE_QUALIFIED");
+        if(occurrence.sourceControlRemainder())reasons.add("SOURCE_CONTROL_UNAVAILABLE");
         boolean observed=false,valueOpen=false,interpretationOpen=false;
         for(var site:sites) {
             reasons.addAll(site.analysisReasons());

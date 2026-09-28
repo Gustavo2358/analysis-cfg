@@ -1,0 +1,926 @@
+{
+  "air": [
+    {
+      "publication": "9d2b9a5e30569c0204b3df6c592cf542",
+      "sha256": "f49e001fc46c74996489d0a50329bdc7d1e9e9622a184158d046d7f92653d44d"
+    }
+  ],
+  "producer": "cobol-lower/r7-source-state@1",
+  "schema": "qualified-source-dependencies",
+  "source": {
+    "schema": "cobol-semantic-product",
+    "sha256": "f24ce49db77c55160584188e0ecdb1f48d1595923a915e20ddf33cc1205b5c29",
+    "version": "2.52.0"
+  },
+  "units": [
+    {
+      "controlAvailable": true,
+      "derivations": [
+        {
+          "authority": "PRIMARY_ENTRY",
+          "callerPremise": [],
+          "destination": "node:0",
+          "id": "derivation:0",
+          "proofs": [
+            "proof:region:procedure:8"
+          ],
+          "selection": [],
+          "source": []
+        },
+        {
+          "authority": "statement:5/SOURCE_POSSIBILITY",
+          "callerPremise": [],
+          "destination": "node:1",
+          "id": "derivation:1",
+          "proofs": [
+            "proof:statement:5",
+            "proof:statement:5/source-completion"
+          ],
+          "selection": [],
+          "source": [
+            "node:5"
+          ]
+        },
+        {
+          "authority": "outcome:statement:1/normal",
+          "callerPremise": [],
+          "destination": "node:2",
+          "id": "derivation:2",
+          "proofs": [
+            "proof:statement:1"
+          ],
+          "selection": [],
+          "source": [
+            "node:1"
+          ]
+        },
+        {
+          "authority": "outcome:statement:2/normal",
+          "callerPremise": [],
+          "destination": "node:3",
+          "id": "derivation:3",
+          "proofs": [
+            "proof:statement:2"
+          ],
+          "selection": [],
+          "source": [
+            "node:2"
+          ]
+        },
+        {
+          "authority": "outcome:statement:3/normal",
+          "callerPremise": [],
+          "destination": "node:4",
+          "id": "derivation:4",
+          "proofs": [
+            "proof:statement:3"
+          ],
+          "selection": [],
+          "source": [
+            "node:3"
+          ]
+        },
+        {
+          "authority": "outcome:statement:0/normal",
+          "callerPremise": [],
+          "destination": "node:5",
+          "id": "derivation:5",
+          "proofs": [
+            "proof:statement:0"
+          ],
+          "selection": [],
+          "source": [
+            "node:0"
+          ]
+        },
+        {
+          "authority": "outcome:statement:4/normal",
+          "callerPremise": [],
+          "destination": "node:6",
+          "id": "derivation:6",
+          "proofs": [
+            "proof:statement:4"
+          ],
+          "selection": [],
+          "source": [
+            "node:4"
+          ]
+        }
+      ],
+      "events": [],
+      "frontiers": [
+        {
+          "authority": "outcome:statement:5/unknown",
+          "proofs": [
+            "proof:statement:5"
+          ],
+          "reference": "region:paragraph:9",
+          "source": "node:5"
+        }
+      ],
+      "guards": [],
+      "nodes": [
+        {
+          "context": "ROOT",
+          "id": "node:0",
+          "location": "statement:0",
+          "support": {
+            "activation": [],
+            "cause": "NONE",
+            "kind": "ENTRY_UNKNOWN",
+            "target": []
+          }
+        },
+        {
+          "context": "ROOT",
+          "id": "node:1",
+          "location": "statement:1",
+          "support": {
+            "activation": [],
+            "cause": "NONE",
+            "kind": "ENTRY_UNKNOWN",
+            "target": []
+          }
+        },
+        {
+          "context": "ROOT",
+          "id": "node:2",
+          "location": "statement:2",
+          "support": {
+            "activation": [],
+            "cause": "NONE",
+            "kind": "ENTRY_UNKNOWN",
+            "target": []
+          }
+        },
+        {
+          "context": "ROOT",
+          "id": "node:3",
+          "location": "statement:3",
+          "support": {
+            "activation": [],
+            "cause": "NONE",
+            "kind": "ENTRY_UNKNOWN",
+            "target": []
+          }
+        },
+        {
+          "context": "ROOT",
+          "id": "node:4",
+          "location": "statement:4",
+          "support": {
+            "activation": [],
+            "cause": "CALL_EFFECT_UNAVAILABLE",
+            "kind": "UNKNOWN",
+            "target": []
+          }
+        },
+        {
+          "context": "ROOT",
+          "id": "node:5",
+          "location": "statement:5",
+          "support": {
+            "activation": [],
+            "cause": "NONE",
+            "kind": "ENTRY_UNKNOWN",
+            "target": []
+          }
+        },
+        {
+          "context": "ROOT",
+          "id": "node:6",
+          "location": "statement:6",
+          "support": {
+            "activation": [],
+            "cause": "CALL_EFFECT_UNAVAILABLE",
+            "kind": "UNKNOWN",
+            "target": []
+          }
+        }
+      ],
+      "nominalValues": {
+        "branches": [],
+        "declarations": [
+          {
+            "node": "storage-node:4",
+            "provenance": {
+              "exact": true,
+              "expanded": {
+                "endColumn": 16,
+                "endLine": 5,
+                "file": "<preprocessed>",
+                "startColumn": 0,
+                "startLine": 5
+              },
+              "includeChain": [],
+              "original": {
+                "endColumn": 23,
+                "endLine": 5,
+                "file": "probe.cbl",
+                "startColumn": 7,
+                "startLine": 5
+              }
+            }
+          },
+          {
+            "node": "storage-node:6",
+            "provenance": {
+              "exact": true,
+              "expanded": {
+                "endColumn": 17,
+                "endLine": 6,
+                "file": "<preprocessed>",
+                "startColumn": 0,
+                "startLine": 6
+              },
+              "includeChain": [],
+              "original": {
+                "endColumn": 24,
+                "endLine": 6,
+                "file": "probe.cbl",
+                "startColumn": 7,
+                "startLine": 6
+              }
+            }
+          }
+        ],
+        "facts": {
+          "assignments": [
+            {
+              "source": {
+                "kind": "LITERAL",
+                "value": "FIRST"
+              },
+              "statement": "statement:0",
+              "target": "storage-node:4"
+            },
+            {
+              "source": {
+                "kind": "READ",
+                "value": "storage-node:4"
+              },
+              "statement": "statement:1",
+              "target": "storage-node:6"
+            },
+            {
+              "source": {
+                "kind": "LITERAL",
+                "value": "SECOND"
+              },
+              "statement": "statement:2",
+              "target": "storage-node:4"
+            }
+          ],
+          "authority": "NOMINAL_TEXT_SOURCE_V1",
+          "conditions": [],
+          "queries": [
+            {
+              "node": "storage-node:4",
+              "statement": "statement:3"
+            },
+            {
+              "node": "storage-node:6",
+              "statement": "statement:4"
+            }
+          ],
+          "symbols": [
+            {
+              "extent": 8,
+              "node": "storage-node:4"
+            },
+            {
+              "extent": 8,
+              "node": "storage-node:6"
+            }
+          ]
+        },
+        "seeds": [],
+        "uncertainties": []
+      },
+      "occurrences": [
+        {
+          "command": "CALL",
+          "id": {
+            "handle": "statement:3",
+            "unit": {
+              "canonicalProgramName": "PROBE",
+              "compilationUnitId": "PROBE.CBL",
+              "structuralPath": [
+                0
+              ]
+            }
+          },
+          "nameProfile": "cobol-zos-dynamic-call-minimal@1",
+          "namespace": "PROGRAM",
+          "operands": [
+            {
+              "id": {
+                "handle": "operand:3:0",
+                "statement": {
+                  "handle": "statement:3",
+                  "unit": {
+                    "canonicalProgramName": "PROBE",
+                    "compilationUnitId": "PROBE.CBL",
+                    "structuralPath": [
+                      0
+                    ]
+                  }
+                }
+              },
+              "provenance": {
+                "exact": true,
+                "expanded": {
+                  "endColumn": 11,
+                  "endLine": 13,
+                  "file": "<preprocessed>",
+                  "startColumn": 9,
+                  "startLine": 13
+                },
+                "includeChain": [],
+                "original": {
+                  "endColumn": 18,
+                  "endLine": 12,
+                  "file": "probe.cbl",
+                  "startColumn": 16,
+                  "startLine": 12
+                }
+              }
+            }
+          ],
+          "qualifications": [
+            "node:3"
+          ],
+          "targetKind": "COMPUTED",
+          "technology": "COBOL",
+          "valueRemainder": true,
+          "values": []
+        },
+        {
+          "command": "CALL",
+          "id": {
+            "handle": "statement:4",
+            "unit": {
+              "canonicalProgramName": "PROBE",
+              "compilationUnitId": "PROBE.CBL",
+              "structuralPath": [
+                0
+              ]
+            }
+          },
+          "nameProfile": "cobol-zos-dynamic-call-minimal@1",
+          "namespace": "PROGRAM",
+          "operands": [
+            {
+              "id": {
+                "handle": "operand:4:0",
+                "statement": {
+                  "handle": "statement:4",
+                  "unit": {
+                    "canonicalProgramName": "PROBE",
+                    "compilationUnitId": "PROBE.CBL",
+                    "structuralPath": [
+                      0
+                    ]
+                  }
+                }
+              },
+              "provenance": {
+                "exact": true,
+                "expanded": {
+                  "endColumn": 12,
+                  "endLine": 14,
+                  "file": "<preprocessed>",
+                  "startColumn": 9,
+                  "startLine": 14
+                },
+                "includeChain": [],
+                "original": {
+                  "endColumn": 19,
+                  "endLine": 13,
+                  "file": "probe.cbl",
+                  "startColumn": 16,
+                  "startLine": 13
+                }
+              }
+            }
+          ],
+          "qualifications": [
+            "node:4"
+          ],
+          "targetKind": "COMPUTED",
+          "technology": "COBOL",
+          "valueRemainder": true,
+          "values": []
+        }
+      ],
+      "proofs": [
+        {
+          "dependencies": [
+            "proof:region:procedure:8/input"
+          ],
+          "id": "proof:region:paragraph:9",
+          "kind": "LOCAL_GRAMMAR",
+          "provenance": {
+            "exact": false,
+            "expanded": {
+              "endColumn": 11,
+              "endLine": 15,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 8
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 18,
+              "endLine": 14,
+              "file": "probe.cbl",
+              "startColumn": 11,
+              "startLine": 8
+            }
+          },
+          "rule": "paragraph-boundary"
+        },
+        {
+          "dependencies": [],
+          "id": "proof:region:procedure:8",
+          "kind": "LOCAL_GRAMMAR",
+          "provenance": {
+            "exact": false,
+            "expanded": {
+              "endColumn": 11,
+              "endLine": 15,
+              "file": "<preprocessed>",
+              "startColumn": 0,
+              "startLine": 7
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 18,
+              "endLine": 14,
+              "file": "probe.cbl",
+              "startColumn": 7,
+              "startLine": 7
+            }
+          },
+          "rule": "procedure-region"
+        },
+        {
+          "dependencies": [
+            "proof:region:procedure:8"
+          ],
+          "id": "proof:region:procedure:8/input",
+          "kind": "INPUT_REGION_ISOLATION",
+          "provenance": {
+            "exact": false,
+            "expanded": {
+              "endColumn": 11,
+              "endLine": 15,
+              "file": "<preprocessed>",
+              "startColumn": 0,
+              "startLine": 7
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 18,
+              "endLine": 14,
+              "file": "probe.cbl",
+              "startColumn": 7,
+              "startLine": 7
+            }
+          },
+          "rule": "procedure-syntax-independent-of-missing-data-input"
+        },
+        {
+          "dependencies": [
+            "proof:region:procedure:8/input"
+          ],
+          "id": "proof:statement:0",
+          "kind": "LOCAL_GRAMMAR",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 22,
+              "endLine": 8,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 8
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 29,
+              "endLine": 8,
+              "file": "probe.cbl",
+              "startColumn": 11,
+              "startLine": 8
+            }
+          },
+          "rule": "statement-scope"
+        },
+        {
+          "dependencies": [
+            "proof:region:procedure:8/input"
+          ],
+          "id": "proof:statement:1",
+          "kind": "LOCAL_GRAMMAR",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 19,
+              "endLine": 11,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 11
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 26,
+              "endLine": 10,
+              "file": "probe.cbl",
+              "startColumn": 11,
+              "startLine": 10
+            }
+          },
+          "rule": "statement-scope"
+        },
+        {
+          "dependencies": [
+            "proof:region:procedure:8/input"
+          ],
+          "id": "proof:statement:2",
+          "kind": "LOCAL_GRAMMAR",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 23,
+              "endLine": 12,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 12
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 30,
+              "endLine": 11,
+              "file": "probe.cbl",
+              "startColumn": 11,
+              "startLine": 11
+            }
+          },
+          "rule": "statement-scope"
+        },
+        {
+          "dependencies": [
+            "proof:region:procedure:8/input"
+          ],
+          "id": "proof:statement:3",
+          "kind": "LOCAL_GRAMMAR",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 11,
+              "endLine": 13,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 13
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 18,
+              "endLine": 12,
+              "file": "probe.cbl",
+              "startColumn": 11,
+              "startLine": 12
+            }
+          },
+          "rule": "statement-scope"
+        },
+        {
+          "dependencies": [
+            "proof:region:procedure:8/input"
+          ],
+          "id": "proof:statement:4",
+          "kind": "LOCAL_GRAMMAR",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 12,
+              "endLine": 14,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 14
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 19,
+              "endLine": 13,
+              "file": "probe.cbl",
+              "startColumn": 11,
+              "startLine": 13
+            }
+          },
+          "rule": "statement-scope"
+        },
+        {
+          "dependencies": [
+            "proof:region:procedure:8/input"
+          ],
+          "id": "proof:statement:5",
+          "kind": "LOCAL_GRAMMAR",
+          "provenance": {
+            "exact": false,
+            "expanded": {
+              "endColumn": 50,
+              "endLine": 9,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 9
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 46,
+              "endLine": 9,
+              "file": "probe.cbl",
+              "startColumn": 11,
+              "startLine": 9
+            }
+          },
+          "rule": "statement-scope"
+        },
+        {
+          "dependencies": [
+            "proof:statement:5"
+          ],
+          "id": "proof:statement:5/source-completion",
+          "kind": "CONTROL_POSSIBILITY",
+          "provenance": {
+            "exact": false,
+            "expanded": {
+              "endColumn": 50,
+              "endLine": 9,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 9
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 46,
+              "endLine": 9,
+              "file": "probe.cbl",
+              "startColumn": 11,
+              "startLine": 9
+            }
+          },
+          "rule": "completion-not-refuted-in-source"
+        },
+        {
+          "dependencies": [
+            "proof:region:procedure:8/input"
+          ],
+          "id": "proof:statement:6",
+          "kind": "LOCAL_GRAMMAR",
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 9,
+              "endLine": 15,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 15
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 16,
+              "endLine": 14,
+              "file": "probe.cbl",
+              "startColumn": 11,
+              "startLine": 14
+            }
+          },
+          "rule": "statement-scope"
+        }
+      ],
+      "selections": [],
+      "statements": [
+        {
+          "id": {
+            "handle": "statement:0",
+            "unit": {
+              "canonicalProgramName": "PROBE",
+              "compilationUnitId": "PROBE.CBL",
+              "structuralPath": [
+                0
+              ]
+            }
+          },
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 22,
+              "endLine": 8,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 8
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 29,
+              "endLine": 8,
+              "file": "probe.cbl",
+              "startColumn": 11,
+              "startLine": 8
+            }
+          }
+        },
+        {
+          "id": {
+            "handle": "statement:1",
+            "unit": {
+              "canonicalProgramName": "PROBE",
+              "compilationUnitId": "PROBE.CBL",
+              "structuralPath": [
+                0
+              ]
+            }
+          },
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 19,
+              "endLine": 11,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 11
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 26,
+              "endLine": 10,
+              "file": "probe.cbl",
+              "startColumn": 11,
+              "startLine": 10
+            }
+          }
+        },
+        {
+          "id": {
+            "handle": "statement:2",
+            "unit": {
+              "canonicalProgramName": "PROBE",
+              "compilationUnitId": "PROBE.CBL",
+              "structuralPath": [
+                0
+              ]
+            }
+          },
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 23,
+              "endLine": 12,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 12
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 30,
+              "endLine": 11,
+              "file": "probe.cbl",
+              "startColumn": 11,
+              "startLine": 11
+            }
+          }
+        },
+        {
+          "id": {
+            "handle": "statement:3",
+            "unit": {
+              "canonicalProgramName": "PROBE",
+              "compilationUnitId": "PROBE.CBL",
+              "structuralPath": [
+                0
+              ]
+            }
+          },
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 11,
+              "endLine": 13,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 13
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 18,
+              "endLine": 12,
+              "file": "probe.cbl",
+              "startColumn": 11,
+              "startLine": 12
+            }
+          }
+        },
+        {
+          "id": {
+            "handle": "statement:4",
+            "unit": {
+              "canonicalProgramName": "PROBE",
+              "compilationUnitId": "PROBE.CBL",
+              "structuralPath": [
+                0
+              ]
+            }
+          },
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 12,
+              "endLine": 14,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 14
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 19,
+              "endLine": 13,
+              "file": "probe.cbl",
+              "startColumn": 11,
+              "startLine": 13
+            }
+          }
+        },
+        {
+          "id": {
+            "handle": "statement:5",
+            "unit": {
+              "canonicalProgramName": "PROBE",
+              "compilationUnitId": "PROBE.CBL",
+              "structuralPath": [
+                0
+              ]
+            }
+          },
+          "provenance": {
+            "exact": false,
+            "expanded": {
+              "endColumn": 50,
+              "endLine": 9,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 9
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 46,
+              "endLine": 9,
+              "file": "probe.cbl",
+              "startColumn": 11,
+              "startLine": 9
+            }
+          }
+        },
+        {
+          "id": {
+            "handle": "statement:6",
+            "unit": {
+              "canonicalProgramName": "PROBE",
+              "compilationUnitId": "PROBE.CBL",
+              "structuralPath": [
+                0
+              ]
+            }
+          },
+          "provenance": {
+            "exact": true,
+            "expanded": {
+              "endColumn": 9,
+              "endLine": 15,
+              "file": "<preprocessed>",
+              "startColumn": 4,
+              "startLine": 15
+            },
+            "includeChain": [],
+            "original": {
+              "endColumn": 16,
+              "endLine": 14,
+              "file": "probe.cbl",
+              "startColumn": 11,
+              "startLine": 14
+            }
+          }
+        }
+      ],
+      "targets": [],
+      "unit": {
+        "canonicalProgramName": "PROBE",
+        "compilationUnitId": "PROBE.CBL",
+        "structuralPath": [
+          0
+        ]
+      }
+    }
+  ],
+  "version": "1.1.0"
+}

@@ -279,11 +279,12 @@
       "docs/work/file-composite-qualification.md",
       "src/main/java/io/github/gustavo2358/cobolexplorer/semanticproduct/ControlTopology.java",
       "src/main/java/io/github/gustavo2358/cobolexplorer/semanticproduct/transport/CompilationSemanticProductJsonWriter.java",
-      "src/test/java/io/github/gustavo2358/cobolexplorer/FileCompositeTopologyTest.java"
+      "src/test/java/io/github/gustavo2358/cobolexplorer/FileCompositeTopologyTest.java",
+      "docs/work/carddemo-control-w1.md"
     ],
-    "semantic_product_version": "2.51.0",
+    "semantic_product_version": "2.52.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "8790072a64df8c5e5dcc85c9ac26c7a6d5435bb9",
+    "commit": "42d8873e3660acdc581794f5a9c206d4212990f3",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -294,7 +295,7 @@
       "scope": "local unconditional paragraph identity and explicit entry; G1-G5 and 1/2/5/40"
     },
     "storage_contract_version": "1.11.0",
-    "canonical_ref": "fix/file-composite-flow",
+    "canonical_ref": "fix/carddemo-w1-preservation",
     "observed_on": "2026-09-27",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
@@ -304,7 +305,7 @@
     "fd_w4_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED producers, manual outcomes/USE and 28 real CLI sources twice; file-dependencies/w4-implementation.md",
     "fd_w5_validation": "QUALIFIED_LOCAL: focal/FAST, producer Q-SHARED with bounded final reuse, manual local AIR/wire and44 real CLI sources twice; file-dependencies/w5-implementation.md",
     "fd_w6_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED,19 B-SP fixtures,15 manual AIR tests and33 real CLI sources twice; file-dependencies/w6-implementation.md",
-    "status": "Review branch; composite FILE control and qualified-source traversal, SP 2.51. Not merged. See docs/work/file-composite-qualification.md.",
+    "status": "Review branch; source possibilities and native FILE evidence, SP 2.52. Not merged. See docs/work/carddemo-control-w1.md.",
     "fd_w8_validation": "QUALIFIED_LOCAL: producer FAST/Q-SHARED, B-SP33, CFG FAST502/Q547, manual/wire and38CICS+33native source cases twice; docs/product/file-dependencies/w8-implementation.md",
     "fd_w9_validation": "QUALIFIED_LOCAL: producer focal/FAST/Q, consumer manual/FAST/reader, 8 scope + 33 native + 38 CICS real CLI sources twice, deterministic four products; docs/product/file-dependencies/w9-implementation.md",
     "logical_text_w1": "Source E2E A-D twice deterministic; scale 10/100/1000; no physical profile. Corporate rerun not required by revised user acceptance.",
@@ -317,12 +318,12 @@
       "contract": "SP2.50 / NOMINAL_TEXT_SOURCE_V2; MODEL_STORAGE remains unavailable",
       "qualification": "docs/work/cics-control-qualification.md"
     },
-    "evidence_level": "FILE composite control review branch; SP 2.51 / FRONTEND_CONTROL_TOPOLOGY_R2 publishes per-use progression. Qualification and remaining limits: docs/work/file-composite-qualification.md. Not merged."
+    "evidence_level": "W1 source possibility review branch; SP 2.52 keeps hypotheses separate from executable topology. Qualification and remaining limits: docs/work/carddemo-control-w1.md. Not merged."
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
-    "status": "Review branch; composite FILE control and qualified-source traversal, SP 2.51. Not merged. See docs/work/file-composite-qualification.md.",
-    "commit": "113580fb7eabac3077b752fa89a890bf5ff67193",
+    "status": "Review branch; source possibilities and native FILE evidence, SP 2.52. Not merged. See docs/work/carddemo-control-w1.md.",
+    "commit": "0adf521d201daebe4747210221928577bdfc5a55",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -334,7 +335,7 @@
     "goto_validation": {
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
     },
-    "canonical_ref": "fix/file-composite-flow",
+    "canonical_ref": "fix/carddemo-w1-preservation",
     "observed_on": "2026-09-27",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
@@ -352,13 +353,13 @@
     "dependency_preservation": "W3-R1 positive logical Cell projection for complete record/child and standalone TEXT views; FILE effects retain published strength.",
     "qualified_source_dependencies": {
       "schema": "qualified-source-dependencies",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "producer_api": "io.github.gustavo2358.lower.application.QualifiedSourceProjection",
       "source_state_checkpoint": "090296d51a5eb33ac5c337c45ee62de8fd27c296",
       "approved_sp_producer": "cef8e728857467a283f77d9b6b1f2f870eda57d5",
-      "schema_sha256": "0e4af91e4e43b8d7e43c8f0d1c8caaa35a288a9650b7322558a31b23b60a3a8f",
+      "schema_sha256": "4a84a81bf21b8afe420c72704e3dd6007f72e0e0295d4c52515e7c739ecfdf87",
       "review": 34,
-      "checkpoint_note": "source_state_checkpoint, approved_sp_producer and review describe historical qualification; commit above is the current FILE-composite review pin."
+      "checkpoint_note": "source_state_checkpoint, approved_sp_producer and review describe historical qualification; commit above is the current W1 source-possibility review pin."
     },
     "dependency_input": {
       "schema": "dependency-input",
@@ -366,7 +367,7 @@
       "producer_api": "io.github.gustavo2358.lower.adapters.cli.CobolDependencyInput",
       "schema_sha256": "5f751464dee36a993d9238a32e25d68d396ce8ca3fa2e0198f29b4e6a7f505c0"
     },
-    "evidence_level": "FILE composite control review branch; SP 2.51 / FRONTEND_CONTROL_TOPOLOGY_R2 publishes per-use progression. Qualification and remaining limits: docs/work/file-composite-qualification.md. Not merged.",
+    "evidence_level": "W1 source possibility review branch; SP 2.52 keeps hypotheses separate from executable topology. Qualification and remaining limits: docs/work/carddemo-control-w1.md. Not merged.",
     "perform_completion": "Scoped exits, SECTION boundaries, typed VARYING levels; Integration authorized; qualified original 39/39 and adversaries 25/25. See docs/domain/perform-control-completion.md.",
     "logical_alias_move": "Logical family translation precedes scalar shortcuts; 14/14 adversaries, PERFORM 39/39, reviewed chaos 48/48 with six explicit abstraction-policy cases; see docs/product/logical-alias-move.md.",
     "synthetic_model_assumptions": {
@@ -434,5 +435,5 @@
     "physical": "EXPERIMENTAL_EXPLICIT_OPT_IN_ONLY",
     "report": "docs/campaigns/positive-memory-topology/W2-REPORT.md"
   },
-  "metadata_scope": "Top-level producer/consumer commits, contract versions and status describe current FILE-composite review pins. Named wave fields, merged_reviews and source_state_checkpoint/approved_sp_producer retain historical evidence and do not override current pins. Qualification: docs/work/file-composite-qualification.md."
+  "metadata_scope": "Top-level producer/consumer commits, contract versions and status describe current W1 source-possibility review pins. Named wave fields, merged_reviews and source_state_checkpoint/approved_sp_producer retain historical evidence and do not override current pins. Qualification: docs/work/carddemo-control-w1.md."
 }

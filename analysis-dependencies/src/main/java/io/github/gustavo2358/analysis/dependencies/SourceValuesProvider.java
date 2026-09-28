@@ -20,6 +20,7 @@ public final class SourceValuesProvider {
         Values {var copy=new TreeMap<String,Set<String>>();candidates.forEach((k,v)->copy.put(k,Set.copyOf(v)));candidates=Collections.unmodifiableMap(copy);}
         Values join(Values other){var out=new TreeMap<>(candidates);other.candidates.forEach((k,v)->out.merge(k,v,SourceValuesProvider::union));return new Values(out,open||other.open,modelAssumed||other.modelAssumed);}
     }
+    private final Set<String> controlAffected;
     private final UnitEvidence unit;
     private final NominalValueEvidence source;
     private final Map<String,Node> nodes=new HashMap<>();
@@ -39,7 +40,7 @@ public final class SourceValuesProvider {
     private boolean limited;
 
     public SourceValuesProvider(UnitEvidence unit,Set<String> requested) {
-        this.unit=unit;source=unit.nominalValues().orElseThrow();
+        this.unit=unit;source=unit.nominalValues().orElseThrow();controlAffected=SourceControlEvidence.affected(unit);
         unit.nodes().forEach(n->nodes.put(n.id(),n));unit.statements().forEach(s->statements.put(s.id().handle(),s));
         source.facts().queries().stream().filter(q->requested.contains(q.statement())).forEach(q->queries.put(q.statement(),q.node()));
         var demand=new HashSet<>(queries.values());boolean changed;
@@ -88,6 +89,7 @@ public final class SourceValuesProvider {
         for(var value:values.candidates().entrySet()) {
             var supports=value.getValue().stream().sorted().map(evidence::get).filter(Objects::nonNull).distinct().toList();
             var assumptions=new ArrayList<>(List.of("NOMINAL_DECLARATIONS_PRESERVE_MEANING","NO_UNMODELED_STORAGE_INTERFERENCE"));
+            if(unit.nodes().stream().anyMatch(n->n.location().equals(statement)&&controlAffected.contains(n.id())))assumptions.add("UNKNOWN_CONTROL_CAN_COMPLETE");
             if(values.modelAssumed())assumptions.add("SYNTHETIC_MODEL_IS_NOT_KILL_PROOF");
             if(supports.stream().anyMatch(e->e.kind().equals("DECLARATION_VALUE")))assumptions.add("DECLARATIVE_INITIAL_VALUES_APPLY");
             out.add(new Candidate(value.getKey(),new Support(PROFILE,supports,assumptions,source.uncertainties())));

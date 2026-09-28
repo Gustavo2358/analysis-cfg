@@ -55,11 +55,11 @@ public record DependencyInput(Publication publication,Optional<QualifiedSourceDe
         var invokes=new LinkedHashMap<OperationId,Operations.Invoke>();
         for(var unit:publication.units())for(var sequence:unit.sequences())if(sequence.terminator() instanceof Operations.Invoke i&&CallDependencyPlan.selected(i))invokes.put(i.header().id(),i);
         var mapped=new HashSet<OperationId>();var result=new ArrayList<QualifiedDependencyOccurrence>();
-        source.ifPresent(e->e.units().forEach(u->u.occurrences().stream().filter(o->o.namespace().equals("PROGRAM")).forEach(o->{
+        source.ifPresent(e->e.units().forEach(u->{var assumed=SourceControlEvidence.affected(u);u.occurrences().stream().filter(o->o.namespace().equals("PROGRAM")).forEach(o->{
             var sites=correlations.stream().filter(l->l.source().equals(o.id())&&invokes.containsKey(l.operation())).map(StatementCorrelation::operation).distinct().sorted(Comparator.comparing(OperationId::localId)).toList();
             mapped.addAll(sites);
-            result.add(new QualifiedDependencyOccurrence(Optional.of(o.id()),o.id().unit().canonicalProgramName(),o.technology(),o.nameProfile(),o.targetKind(),o.values().stream().map(QualifiedSourceDependencies.Value::value).toList(),u.controlAvailable()?o.qualifications():List.of(),sites,o.valueRemainder()));
-        })));
+            result.add(new QualifiedDependencyOccurrence(Optional.of(o.id()),o.id().unit().canonicalProgramName(),o.technology(),o.nameProfile(),o.targetKind(),o.values().stream().map(QualifiedSourceDependencies.Value::value).toList(),u.controlAvailable()?o.qualifications():List.of(),sites,o.valueRemainder(),o.qualifications().stream().anyMatch(assumed::contains)));
+        });}));
         invokes.forEach((id,i)->{if(!mapped.contains(id)) {
             boolean literal=i.target() instanceof Interactions.LiteralTarget;
             var namespace=literal?((Interactions.LiteralTarget)i.target()).namespace():((Interactions.ComputedTarget)i.target()).namespace();

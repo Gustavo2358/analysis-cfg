@@ -1,0 +1,12 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. PROBE.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 AREA-X PIC X(80).
+       01 RESP-CD PIC S9(9) COMP.
+       01 TRANS-ID PIC X(4).
+       01 FLAG-X PIC X.
+       PROCEDURE DIVISION.
+           EXEC SQL UPDATE T SET C = 1 END-EXEC
+           GOBACK.
+           CALL 'DEAD'.

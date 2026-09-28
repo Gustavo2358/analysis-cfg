@@ -125,3 +125,48 @@ provider nominal quando a consulta executável é insuficiente. Ele publica no
 inventário unificado; não altera o grafo certificado, a AIR ou o CFG.
 Referências, formato fechado e correlação das branches são validados tanto pela
 porta em memória quanto pelo codec. Bloco ausente mantém o comportamento anterior.
+
+## W1 evolution: source possibility, version 1.1
+
+The current extension is `qualified-source-dependencies` 1.1.0 and dependency
+result 2.7.0. The R9 description above records the compatible 1.0/2.6 baseline.
+SP 2.52 supplies separate `sourceContinuations` carrying `CONTROL_POSSIBILITY`.
+The source traversal consumes these hypotheses while executable AIR, admission
+and CFG continue to consume only executable topology. Unknown control retains
+its frontier. Known termination, dead paragraphs and unsupported transfers do
+not gain an ordinary executable continuation.
+
+The consumer computes a least fixed point of certificates without hypothesis
+proofs. Proof dependencies propagate hypothetical status; caller premises use
+AND and alternative derivations use OR. A qualified node without a grounded
+hypothesis-free derivation contributes `POSSIBLE_UNDER_UNKNOWN_CONTROL`.
+Program results expose `SOURCE_CONTROL_POSSIBLE`, `controlRemainder: true` and
+`SOURCE_CONTROL_UNAVAILABLE`. These are source uncertainty, not a change to
+executable `modelScope`. Literal and conditional nominal candidates retain their
+qualification references and existing value provenance. Precise valid kills
+remain valid; no new runtime values are granted by this extension.
+
+Optional `units.nativeFiles` records each native FILE use by statement + ordinal,
+its opaque source control location, declaration identity/owner and provenance,
+external name, qualifications and gaps. Each use qualifies at its own FILE point
+when composite topology exists, including callback/control distinctions. A
+statement-level qualifier is used only for legacy input without composite points.
+The consumer never parses the control location to infer edges. Qualified FILE
+candidates appear under `dependencies.files`, with `NON_EXECUTABLE_SOURCE`,
+status and remainder. Existing executable `fileDependencies` sites are untouched.
+Unresolved declarations retain `SOURCE_FILE_TARGET_UNAVAILABLE`; local SD work
+never becomes an external file. Full statement/declaration provenance remains in
+`source`; no executable operation ID is invented.
+
+[Schema 1.1](../contracts/qualified-source-dependencies-1.1.0.schema.json) extends
+1.0 without changing its schema. Version 1.0 rejects hypotheses/native FILE;
+old producer snapshots and their executable products retain their interpretation.
+Version, shape, complete qualification alternatives, owner and proof references
+are checked in memory, wire and an independent Python oracle.
+
+Validation lives in SourcePossibilityTest (producer), SourcePossibilitySuite
+(lower), QualifiedSourceContractTest and test_qualified_source_wire.py (consumer).
+The synthetic source-possibility fixtures prove literal, copied/computed target,
+exact overwrite, PERFORM completion, terminal and unused-paragraph exclusions,
+and distinct OPEN/CLOSE FILE points. W1 does not implement ALTER or recursive
+executable PERFORM; neither can be claimed complete from candidate preservation.

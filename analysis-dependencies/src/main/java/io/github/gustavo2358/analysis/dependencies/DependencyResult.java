@@ -14,7 +14,7 @@ public record DependencyResult(PublicationId publication,SemanticVersion airVers
     }
     public DependencyResult withProgramInventory(List<TargetResolver.Resolution> inventory,Map<String,Long> counts) {
         var reasons=new TreeSet<>(analysisReasons);
-        for(var resolution:inventory)for(var reason:resolution.analysisReasons())if(reason.startsWith("CONDITIONAL_"))reasons.add(reason);
+        for(var resolution:inventory)for(var reason:resolution.analysisReasons())if(reason.startsWith("CONDITIONAL_")||reason.equals("SOURCE_CONTROL_UNAVAILABLE"))reasons.add(reason);
         if(counts.getOrDefault("conditionalSourceResourceLimits",0L)>0)reasons.add("CONDITIONAL_SOURCE_RESOURCE_LIMIT");
         return new DependencyResult(publication,airVersion,sites,edges,counts,publicationInventory,origins,artifacts,sourceUncertaintyRefs,List.copyOf(reasons),fileDependencies,sourceDependencies,sourceQualifiedDependencies,inventory);
     }
@@ -23,7 +23,10 @@ public record DependencyResult(PublicationId publication,SemanticVersion airVers
         this(publication,airVersion,sites,edges,metrics,publicationInventory,origins,artifacts,sourceUncertaintyRefs,analysisReasons,fileDependencies,sourceDependencies,Optional.empty());
     }
     public DependencyResult withSourceEvidence(io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies evidence) {
-        return new DependencyResult(publication,airVersion,sites,edges,metrics,publicationInventory,origins,artifacts,sourceUncertaintyRefs,analysisReasons,fileDependencies,sourceDependencies,Optional.of(SourceQualifiedDependencyResult.admit(evidence,publication.localId())),programDependencies);
+        var source=SourceQualifiedDependencyResult.admit(evidence,publication.localId());
+        var reasons=new TreeSet<>(analysisReasons);
+        if(source.nativeFiles().stream().anyMatch(SourceQualifiedDependencyResult.NativeFileResult::remainder))reasons.add("SOURCE_NATIVE_FILE_REMAINDER");
+        return new DependencyResult(publication,airVersion,sites,edges,metrics,publicationInventory,origins,artifacts,sourceUncertaintyRefs,List.copyOf(reasons),fileDependencies,sourceDependencies,Optional.of(source),programDependencies);
     }
     public DependencyResult(PublicationId publication,SemanticVersion airVersion,List<DependencySiteFact> sites,List<Edge> edges,Map<String,Long> metrics,
             Evidence.InventoryStatus publicationInventory,List<Origins.Origin> origins,List<Origins.Artifact> artifacts,List<UncertaintyId> sourceUncertaintyRefs,List<String> analysisReasons,FileDependencyResult fileDependencies) {
@@ -38,8 +41,8 @@ public record DependencyResult(PublicationId publication,SemanticVersion airVers
             Evidence.InventoryStatus publicationInventory,List<Origins.Origin> origins,List<Origins.Artifact> artifacts,List<UncertaintyId> sourceUncertaintyRefs,List<String> analysisReasons) {
         this(publication,airVersion,sites,edges,metrics,publicationInventory,origins,artifacts,sourceUncertaintyRefs,analysisReasons,FileDependencyResult.unavailable());
     }
-    public boolean partial() { return sourceDependencies.available()&&sourceDependencies.partial()||!analysisReasons.isEmpty()||sites.stream().anyMatch(s->s.analysisStatus()==DependencySiteFact.AnalysisStatus.PARTIAL); }
-    public boolean structuralScope() { return sites.stream().anyMatch(s->s.reachability()==DependencySiteFact.Reachability.UNKNOWN)||sites.isEmpty()&&analysisReasons.stream().anyMatch(r->!r.startsWith("CONDITIONAL_")); }
+    public boolean partial() { return sourceQualifiedDependencies.stream().anyMatch(s->s.nativeFiles().stream().anyMatch(SourceQualifiedDependencyResult.NativeFileResult::remainder))||sourceDependencies.available()&&sourceDependencies.partial()||!analysisReasons.isEmpty()||sites.stream().anyMatch(s->s.analysisStatus()==DependencySiteFact.AnalysisStatus.PARTIAL); }
+    public boolean structuralScope() { return sites.stream().anyMatch(s->s.reachability()==DependencySiteFact.Reachability.UNKNOWN)||sites.isEmpty()&&analysisReasons.stream().anyMatch(r->!r.startsWith("CONDITIONAL_")&&!Set.of("SOURCE_CONTROL_UNAVAILABLE","SOURCE_NATIVE_FILE_REMAINDER").contains(r)); }
     public DependencyResult {
         programDependencies=List.copyOf(programDependencies);
         Objects.requireNonNull(sourceQualifiedDependencies);sourceQualifiedDependencies.ifPresent(s->{if(s.evidence().air().size()!=1 || !s.evidence().air().getFirst().publication().equals(publication.localId()))throw new IllegalArgumentException("source/AIR identity mismatch");});

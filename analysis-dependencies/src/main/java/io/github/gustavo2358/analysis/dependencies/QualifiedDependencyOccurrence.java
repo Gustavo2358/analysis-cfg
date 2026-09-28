@@ -7,7 +7,10 @@ import io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDepende
 /** One occurrence, its target descriptor and independent qualification authorities. No value algorithm. */
 public record QualifiedDependencyOccurrence(Optional<StatementId> source,String caller,String technology,
         String nameProfile,String targetKind,List<String> literals,List<String> qualifications,
-        List<OperationId> executableOperations,boolean sourceValueRemainder) {
+        List<OperationId> executableOperations,boolean sourceValueRemainder,boolean sourceControlRemainder) {
+    public QualifiedDependencyOccurrence(Optional<StatementId> source,String caller,String technology,String nameProfile,String targetKind,List<String> literals,List<String> qualifications,List<OperationId> executableOperations,boolean sourceValueRemainder) {
+        this(source,caller,technology,nameProfile,targetKind,literals,qualifications,executableOperations,sourceValueRemainder,false);
+    }
     public QualifiedDependencyOccurrence {
         Objects.requireNonNull(source);Objects.requireNonNull(caller);Objects.requireNonNull(technology);Objects.requireNonNull(nameProfile);
         if(!Set.of("LITERAL","COMPUTED","UNAVAILABLE").contains(targetKind))throw new IllegalArgumentException("target kind");
