@@ -225,3 +225,62 @@ The earlier CardDemo replay on runtime-02 passed 73/73 x four stages with zero
 candidate/support losses; the 43 cumulative additions are the already explained
 VC2/VC3 additions. The final unbound-LINKAGE fix and all future CICS changes still
 require the final campaign replay. No merge is authorized.
+
+## VC4 condition dispatch — rule and bounded design
+
+IBM CICS HANDLE CONDITION establishes a runtime registration, distinct from
+lexical Db2 WHENEVER and from HANDLE ABEND. A subsequent registration replaces
+only its condition. An omitted label requests the system default and suppresses
+ERROR fallback for that condition. IGNORE requests continuation. RESP/NOHANDLE
+suppress handlers for that command; a LINK callee does not inherit registrations.
+The selected label branches in the current COBOL activation and keeps the
+registration active; it does not manufacture a PERFORM return or deactivate like
+an ABEND handler. PGMIDERR on LINK/XCTL has default task-abend disposition.
+
+The producer publishes typed registration updates and condition events with
+resolved topology targets, condition continuation and grammar/resolution proofs.
+SP 2.62 and qualified source 1.6 carry these new facts. The existing finite
+state tabulation will track reaching definitions for event-relevant conditions
+plus ERROR, preserving each registration origin. Replacement is a positive kill
+of that registration only. Unknown external calls open the current definitions,
+retaining their possible targets. The initial state remains unknown.
+
+This capability admits PGMIDERR events on structurally supported LINK/XCTL and
+HANDLE/IGNORE registrations. Other condition event families and PUSH/POP HANDLE
+stacks remain explicit gaps, with no invented stack restoration. Only PGMIDERR
+and ERROR state components are demanded, so the finite product has at most
+O((P+1)(E+1)(A+1)) support states before bounded context tabulation, where P/E/A
+are distinct specific/general/ABEND registrations. No runtime path enumeration.
+
+Independent oracles must challenge registration without event, dead registration,
+replacement, omitted label, ERROR fallback, IGNORE, RESP/NOHANDLE, two event
+occurrences, PERFORM continuation, ordinary label reachability, ABEND coexistence
+and unknown external calls. Positive branch selection remains a possibility;
+no test may pretend a PGMIDERR necessarily occurs.
+
+Authorities: [HANDLE CONDITION](https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-handle-condition),
+[IBM CICS command reference](https://publibfp.boulder.ibm.com/epubs/pdf/dfhp400.pdf),
+[CICS Primer](https://www.ibm.com/docs/SSJL4D_6.x/pdf/cics-primer.pdf).
+
+LINK ordinary completion is independent of handler disposition: a successful
+LINK can return even when PGMIDERR would branch or abend. The producer publishes
+that normal route for the same bounded command surface as the condition event.
+Lowering consumes the route and retains partial target/signature/effect facts.
+An event-only test exposed that retaining the old handler-unknown cut would
+otherwise publish the exceptional path while losing the successful return.
+
+Adversarial boundary: an unmodeled POP HANDLE can restore an earlier condition
+registration. Treating the latest known registration as a proved kill after that
+boundary is invalid. The producer therefore publishes only CONTROL_POSSIBILITY
+relations from eligible events to locally resolved condition labels and the error
+continuation, conditional on a reachable POP HANDLE occurrence. The ordinary
+source hypothesis opens the current condition state. This deliberately does not
+model a stack or add AIR/CFG edges; candidates remain possible with their source
+assumptions. Dead POP and RESP/NOHANDLE must not activate these relations. The
+finite publication is O(events × POP occurrences × local condition targets).
+
+Consumer contract: qualified source 1.6 retains the condition registration
+identity, uncertainty and grammar provenance on each state support. No CFG
+construction rule changes. Old versions, forged registration identities, absent
+proofs and non-boolean uncertainty are rejected. Exact source oracles cover
+ordinary/error coexistence, unknown calls and unsupported restoration.

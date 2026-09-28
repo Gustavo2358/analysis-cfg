@@ -222,7 +222,9 @@
       "ordinaryAndConditionalAlternativesKeepGuardsSeparate",
       "inactiveDeactivatedAndComputedRemainBounded",
       "versionsIdentitiesAndReferencesAreClosed",
-      "alternateRootsRequireVersionAndGrammarProof"
+      "alternateRootsRequireVersionAndGrammarProof",
+      "conditionStateRequiresVersionRegistrationProofAndIdentity",
+      "unmodeledConditionRestorationCannotProvePriorRegistrationDead"
     ],
     "io.github.gustavo2358.analysis.adapters.QueryLocalProviderTest": [
       "unrelatedRegionsCannotChangeScalarProviderCandidateOrSupports",
