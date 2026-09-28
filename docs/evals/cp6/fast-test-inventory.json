@@ -243,7 +243,8 @@
       "sourceCandidateReachesUnifiedInventoryWithExplicitAssumptions",
       "executableValueEvidenceRefinesAndReplacesNominalHypothesis",
       "conditionalUncertaintyDoesNotChangeExecutableScope",
-      "syntheticAuthorityRoundTripsAndCannotBeSilentlyDowngraded"
+      "syntheticAuthorityRoundTripsAndCannotBeSilentlyDowngraded",
+      "dependencyVersionPreservesNewerSourceControlCapabilities"
     ],
     "io.github.gustavo2358.analysis.adapters.ExceptionalControlProjectionTest": [
       "explicitExceptionDoesNotBecomeUnitWideUnknownControl"

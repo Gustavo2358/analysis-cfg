@@ -55,6 +55,16 @@ class ConditionalSourceContractTest {
     }
 
 
+    @Test void dependencyVersionPreservesNewerSourceControlCapabilities() throws Exception {
+        var p=DependencyPreservationTest.linear(true,false);var original=source(p.id().localId());
+        for(var entry:Map.of("1.0.0","2.6.0","1.1.0","2.7.0","1.2.0","2.7.0").entrySet()) {
+            var q=new QualifiedSourceDependencies(original.schema(),entry.getKey(),original.producer(),original.source(),original.air(),original.units());
+            var result=new DependencyAnalysis().prepare(new DependencyInput(p,Optional.of(q),List.of()));
+            var out=new java.io.ByteArrayOutputStream();new DependencyJson().write(result,out);
+            assertEquals(entry.getValue(),new ObjectMapper().readTree(out.toByteArray()).path("version").asText(),entry.getKey());
+        }
+    }
+
     @Test void syntheticAuthorityRoundTripsAndCannotBeSilentlyDowngraded() throws Exception {
         var codec=new QualifiedSourceJson();var mapper=new ObjectMapper();
         var wire=(ObjectNode)mapper.readTree(codec.encode(source("publication")));
