@@ -1,0 +1,27 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. FILEPROBE.
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+       SELECT F ASSIGN TO CLIENTDD.
+       SELECT G ASSIGN TO OTHERDD.
+       DATA DIVISION.
+       FILE SECTION.
+       FD F.
+       01 FR PIC X(8).
+       FD G.
+       01 GR PIC X(8).
+       PROCEDURE DIVISION.
+       MAIN.
+       PERFORM WRAPPER THRU WRAP-END.
+       CALL 'BETWEEN'.
+       PERFORM IO-P.
+       CALL 'AFTER'.
+       GOBACK.
+       WRAPPER.
+           PERFORM IO-P.
+       WRAP-END.
+           EXIT.
+       IO-P.
+       OPEN INPUT F OUTPUT G.
+       CLOSE F G.
