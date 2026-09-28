@@ -1,8 +1,10 @@
 # FILE composite control — SP 2.51
 
 - id: FILE-COMPOSITE-CONTROL
-- status: IN_PROGRESS
+- status: DONE
 - scope: published intra-statement FILE control; OPEN/CLOSE operands and SORT/MERGE phases without procedure callbacks.
+
+Merged and qualified: [fechamento da integração](carddemo-control-integration.md).
 
 ## Rule and authority
 

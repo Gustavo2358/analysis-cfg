@@ -1,15 +1,13 @@
 # Baseline factual dos repositórios
 
-## Estado vigente — W7/W8, reentrada e qualificação
+## Estado vigente — CardDemo W0–W8 integrado
 
-SP2.57 e qualified-source-dependencies1.2 preservam candidatos condicionais sem
-acrescentar transições executáveis. Branch de revisão empilhada sobre FILE; sem merge.
+Os produtores abaixo estão mergeados em main. SP 2.57 e qualified-source-dependencies 1.2 preservam possibilidades condicionais, sem conceder arestas executáveis à reentrada indefinida. Dependencies publica 2.7 quando recebe a evidência 1.2.
 
-- proleap-poc: `afd29b423efa2be0fd896519ed548bfe424dc851`.
-- cobol-lower: `d41636e50e8c712d43e7d24f88a7a942442b657c`.
+- proleap-poc: `2a6cd9a43b26c04fada1f3f1cd4c8ccf01bc6b3d`.
+- cobol-lower: `6ce7d13bff4b048112c49f205281f3bf56c2858a`.
 
-Regra: [W7](../work/carddemo-control-w7.md). Qualificação e limites: [W7/W8](../work/carddemo-control-w7-w8.md).
-Os campos e as seções históricas não substituem estes pins.
+[Fechamento e limites](../work/carddemo-control-integration.md). Produção, testes e contratos equivalentes aos heads qualificados W8; a integração atualiza documentação e pins. Campos e seções históricas não substituem estes commits.
 
 ## Checkpoints históricos
 

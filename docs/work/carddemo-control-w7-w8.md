@@ -1,5 +1,8 @@
 # CARDDEMO-CONTROL — W7 e W8
 
+> Registro histórico de qualificação, preservado. O trabalho deste repositório está DONE / MERGED; consulte o [fechamento da integração](carddemo-control-integration.md). Os estados de Draft/parada/sem merge abaixo descrevem o checkpoint original.
+
+
 Status: IN_PROGRESS / implementação e qualificação concluídas, aguardando revisão dos Drafts. Nenhum merge. Worktrees próprios por repositório. Este relatório complementa o checkpoint W1–W6 preservado no histórico.
 
 ## Resultado e revisão de autoridade

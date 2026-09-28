@@ -1,8 +1,10 @@
 # CARDDEMO-CONTROL-DEPENDENCIES — W0/W1
 
 ID: CARDDEMO-CONTROL-DEPENDENCIES-W1
-Status: IN_PROGRESS
-Scope: W0 through W6 authorized; stop before W7. No merge.
+Status: DONE — implementação deste repositório mergeada em 28/09/2026; [fechamento da integração](carddemo-control-integration.md).
+Scope: W0/W1; W2–W6 and the subsequently authorized W7/W8 retain their own records.
+
+Os checkpoints abaixo registram a qualificação da onda na data em que foi executada. Seus estados de revisão e paradas são históricos; o estado vigente está no [fechamento da integração](carddemo-control-integration.md).
 
 ## W0 baseline
 
