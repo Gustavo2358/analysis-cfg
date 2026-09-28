@@ -55,7 +55,7 @@ class QualifiedSourceContractTest {
         }
     }
     @Test void versionsIdentitiesAndReferencesAreClosed()throws Exception {
-        for(var version:List.of("0.9.0","1.2.0","2.0.0")){var w=wire("conditional");w.put("version",version);reject(w);}
+        for(var version:List.of("0.9.0","1.3.0","2.0.0")){var w=wire("conditional");w.put("version",version);reject(w);}
         var standalone=wire("conditional");standalone.putArray("air");
         var detached=codec.decode(json.writeValueAsBytes(standalone));assertFalse(SourceQualifiedDependencyResult.admit(detached).occurrences().isEmpty());
         assertThrows(IllegalArgumentException.class,()->SourceQualifiedDependencyResult.admit(detached,"uncorrelated-air"));
@@ -125,4 +125,33 @@ class QualifiedSourceContractTest {
         assertEquals(Set.of("A","C","E","F"),SourceControlEvidence.assumedOnly(unit));
         assertEquals(Set.of("A","C","D","E","F"),SourceControlEvidence.affected(unit));
     }
+    @Test void sourceUndefinedReentryIsConditionalAndVersioned()throws Exception {
+        var names=List.of("reentry-direct","reentry-mutual","reentry-direct-handler","reentry-direct-callers",
+            "reentry-callers","reentry-callers-handler","reentry-conditional","reentry-conditional-handler",
+            "reentry-range","reentry-section","reentry-values","reentry-file","reentry-file-unconditional",
+            "sequential-callers","sequential-callers-handler","sequential-loop","terminal-before","terminal-before-handler","halt-before","goto-before");
+        for(var name:names) {
+            ObjectNode wire;try(var in=getClass().getResourceAsStream("/perform-reentry/"+name+".source.json")) {wire=(ObjectNode)json.readTree(Objects.requireNonNull(in,name));}
+            var q=codec.decode(json.writeValueAsBytes(wire));assertEquals(q,codec.decode(codec.encode(q)));
+            var result=SourceQualifiedDependencyResult.admit(q);var candidates=result.occurrences().stream().flatMap(o->o.candidates().stream()).map(SourceQualifiedDependencyResult.Candidate::referenceName).toList();
+            assertTrue(candidates.stream().noneMatch(c->c.startsWith("DEAD")),name);
+            if(name.startsWith("reentry-")) {
+                assertEquals("1.2.0",q.version());
+                var proofs=q.units().getFirst().proofs();assertTrue(proofs.stream().anyMatch(p->p.kind().equals("CONTROL_POSSIBILITY")&&p.rule().equals("undefined-active-reentry-may-complete")));
+                for(var version:List.of("1.0.0","1.1.0")){var copy=wire.deepCopy();copy.put("version",version);reject(copy);}
+                var copy=wire.deepCopy();for(var n:copy.path("units").get(0).path("nodes"))if(n.path("support").path("cause").asText().equals("SOURCE_REENTRY_UNDEFINED")) {((ObjectNode)n.path("support")).put("cause","INVENTED_CAUSE");break;}reject(copy);
+            } else assertNotEquals("1.2.0",q.version(),"ordinary and dead cycles require no new uncertainty");
+            if(name.equals("reentry-direct")||name.equals("reentry-mutual")||name.equals("reentry-direct-handler")) {
+                var after=result.occurrences().stream().filter(o->o.candidates().stream().anyMatch(c->c.referenceName().equals("AFTERP"))).findFirst().orElseThrow();
+                assertEquals(SourceQualifiedDependencyResult.Status.POSSIBLE_UNDER_UNKNOWN_CONTROL,after.status());
+                assertFalse(after.candidates().getFirst().qualifications().isEmpty());
+            }
+            if(name.equals("reentry-direct-callers"))assertTrue(candidates.containsAll(List.of("FIRST","SECOND")));
+            if(name.equals("reentry-file-unconditional")) {
+                assertEquals(2,result.nativeFiles().size());
+                assertTrue(result.nativeFiles().stream().allMatch(f->f.status()==SourceQualifiedDependencyResult.Status.POSSIBLE_UNDER_UNKNOWN_CONTROL&&f.candidates().stream().anyMatch(c->c.referenceName().equals("CLIENTDD"))));
+            }
+        }
+    }
+
 }

@@ -12,8 +12,9 @@ public record QualifiedSourceDependencies(String schema, String version, String 
             Objects.requireNonNull(source);
             air=List.copyOf(air);
             units=List.copyOf(units);
-            require(schema.equals("qualified-source-dependencies") && Set.of("1.0.0","1.1.0").contains(version), "unsupported source contract"); one(air); unique(units, UnitEvidence::unit);
+            require(schema.equals("qualified-source-dependencies") && Set.of("1.0.0","1.1.0","1.2.0").contains(version), "unsupported source contract"); one(air); unique(units, UnitEvidence::unit);
             require(!version.equals("1.0.0")||units.stream().allMatch(u->u.nativeFiles().isEmpty()&&u.proofs().stream().noneMatch(p->p.kind().equals("CONTROL_POSSIBILITY"))),"source possibility requires version 1.1.0");
+            require(version.equals("1.2.0")||units.stream().allMatch(u->u.nodes().stream().noneMatch(n->n.support().cause().equals("SOURCE_REENTRY_UNDEFINED"))),"source reentry requires version 1.2.0");
         }
     public record Document(String schema, String version, String sha256) {
         public Document {
@@ -115,7 +116,7 @@ public record QualifiedSourceDependencies(String schema, String version, String 
             activation=List.copyOf(activation);
             text(cause);
             one(target); one(activation); require(Set.of("ENTRY_UNKNOWN","ACTIVE","CANCELED","DEACTIVATED","CANCELED_UNKNOWN","UNKNOWN").contains(kind), "support kind");
-            require(Set.of("NONE","RESET_HISTORY_UNAVAILABLE","RESET_WITHOUT_CANCELED_EVIDENCE","CALL_EFFECT_UNAVAILABLE","HANDLER_OPERATION_UNAVAILABLE").contains(cause), "support cause");
+            require(Set.of("NONE","RESET_HISTORY_UNAVAILABLE","RESET_WITHOUT_CANCELED_EVIDENCE","CALL_EFFECT_UNAVAILABLE","HANDLER_OPERATION_UNAVAILABLE","SOURCE_REENTRY_UNDEFINED").contains(cause), "support cause");
             require(Set.of("ACTIVE","CANCELED","DEACTIVATED").contains(kind) == !target.isEmpty() && target.size()==activation.size(), "support correlation");
             require(kind.equals("UNKNOWN") != cause.equals("NONE"), "unknown cause");
         }

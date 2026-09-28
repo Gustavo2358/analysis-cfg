@@ -1,0 +1,19 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. PROBE.
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT F ASSIGN TO CLIENTDD.
+       DATA DIVISION.
+       FILE SECTION.
+       FD F.
+       01 REC PIC X(8).
+       WORKING-STORAGE SECTION.
+       01 FLAG-X PIC X.
+       PROCEDURE DIVISION.
+           PERFORM P
+           GOBACK.
+       P.
+           PERFORM P
+           OPEN INPUT F
+           CLOSE F.
