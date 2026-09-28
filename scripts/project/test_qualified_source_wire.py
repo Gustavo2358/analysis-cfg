@@ -59,7 +59,7 @@ for mutation in ('missing-confidence','v1-with-confidence','unknown-authority','
     x=copy.deepcopy(facts)
     if mutation=='missing-confidence':del x['symbols'][0]['modelAssumed']
     elif mutation=='v1-with-confidence':x['authority']='NOMINAL_TEXT_SOURCE_V1'
-    elif mutation=='unknown-authority':x['authority']='NOMINAL_TEXT_SOURCE_V3'
+    elif mutation=='unknown-authority':x['authority']='NOMINAL_TEXT_SOURCE_V99'
     else:x['symbols'][0]['modelAssumed']='true'
     try:shape(x,{'$ref':'#/$defs/NominalValues'})
     except ValueError:pass
@@ -116,7 +116,9 @@ reentry=FIX.parent/'perform-reentry'
 for path in reentry.glob('*.source.json'):
     value=json.loads(path.read_text());validate(value)
     if value['version']=='1.2.0':
-        for version in ('1.0.0','1.1.0','1.3.0'):
+        for version in ('1.3.0','1.4.0','1.5.0','1.6.0'):
+            compatible=copy.deepcopy(value);compatible['version']=version;validate(compatible)
+        for version in ('1.0.0','1.1.0','1.7.0'):
             changed=copy.deepcopy(value);changed['version']=version
             try:validate(changed)
             except (ValueError,KeyError,TypeError):pass

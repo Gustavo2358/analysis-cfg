@@ -1,0 +1,49 @@
+{
+  "cases": 560,
+  "candidateLosses": 0,
+  "supportChanges": 0,
+  "candidateAdditions": 43,
+  "corpus": {
+    "frontendFixtures": 331,
+    "carddemo": 73,
+    "perform": 39,
+    "chaos": 48,
+    "aliases": 14,
+    "performAdversarial": 25,
+    "cics": 30
+  },
+  "oracles": {
+    "controlAndAliases": 78,
+    "chaos": 48,
+    "chaosRejectedMutations": 28,
+    "conditionDispatch": 20,
+    "alternateEntries": 8,
+    "tableAndSql": 17,
+    "moveAndFunctions": 14,
+    "unknownRestoration": 3
+  },
+  "productionCheckpoints": {
+    "proleap-poc": "08558a05570c65a2e2c36ae38c64b27ffeaebd78",
+    "cobol-lower": "03a7cfb48874326e4f9872a005a3c86a5ef7c802",
+    "analysis-cfg": "0bb27727fe9a88bcda7f4f8e28ed7a2e0f4eaed7"
+  },
+  "sourceTreeHash": "dbcdd04acffbb15b05a5330199568654c8b305666e059757efa7fef73c884278",
+  "reuse": {
+    "runtime05to06ChangedClasses": [
+      "io/github/gustavo2358/cobolexplorer/ControlTopologySemantics.class"
+    ],
+    "finalDelta": "retain resolved target proof on source-only unknown-restoration relation",
+    "casesWithThatRelation": [],
+    "reusedCorpusCases": 560,
+    "finalRuntimeProbes": "vc-final-probes, including eligible/dead/bypassed restoration"
+  },
+  "evidenceSha256": {
+    "vc-final-qualification/results.json": "7fd134e89d647350a3848b1c8e839de8705e9e4d3f5678886e9103ac8a6f41db",
+    "vc-final-qualification/comparison.json": "b9e45446ba8d1cb6c46f9e8ef5d73a19e3a5d79c2b678580341f7da194c2e30a",
+    "vc-final-qualification/control-oracles.json": "0d64411ad3b68d969e6de7be76eaf7bed579883c206cbf02d5b24d9b013b80f2",
+    "vc-final-qualification/chaos-oracle.json": "7d928376ae9ace8d3b24875bedee4724c5f27e90dd6025a014dcbe5d8dd3b4a2",
+    "vc-final-carddemo-graphs.json": "741309ba9e56742ca1388f5bc98b65ce1ad79130d0c8b9dd1d8d9bcf2100e3f6",
+    "vc-final-other-probes/oracle.json": "8998d6e743828af6bff2916ca3d09d2297fefd124d4b78f2d06ac3c6cf7e774d",
+    "vc-final-other-probes/value-oracle.json": "79add35d75f398889ad50430524555f54089aea82ef920fa855f2d2f90ddb8fc"
+  }
+}

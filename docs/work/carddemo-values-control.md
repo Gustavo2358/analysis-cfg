@@ -1,7 +1,7 @@
 # CardDemo values and remaining entry/control semantics
 
 - id: CARDDEMO-VALUES-CONTROL
-- status: IN_PROGRESS
+- status: IN_PROGRESS (implementation qualified; review/merge pending)
 - scope: the four capability families authorized after W8; separate review PRs, no merge authorization.
 
 ## Checkpoints
@@ -284,3 +284,92 @@ identity, uncertainty and grammar provenance on each state support. No CFG
 construction rule changes. Old versions, forged registration identities, absent
 proofs and non-boolean uncertainty are rejected. Exact source oracles cover
 ordinary/error coexistence, unknown calls and unsupported restoration.
+
+## Review qualification — 2026-09-28
+
+VC1–VC4 are implemented and qualified in separate worktrees with progressive
+commits. Review/integration remains IN_PROGRESS; this campaign has no merge
+permission. Point 5 (sharing routine bodies) remains a separate campaign.
+
+### Causes and delivered behavior
+
+| Family | Cause | Change |
+| --- | --- | --- |
+| MOVE receivers | Logical transfer admission and alias updates did not compose the receiver sequence | Typed per-receiver facts, captured sender and ordered coherent alias updates |
+| Indexed targets | Source values did not represent table fields or declaration slices | Producer-owned fixed table geometry, index-insensitive text unions and weak table/alias writes |
+| Functions/registers | Unsupported sender forms opened excessive memory/control uncertainty | Receiver-bounded MAY effects; typed UPPER-CASE/TRIM source expressions; runtime registers stay unknown |
+| External control/entries | SQL directives/dynamic forms, alternate roots and condition state were absent or conflated with ordinary completion | Lexical WHENEVER, dynamic SQL continuation, isolated ENTRY roots, runtime PGMIDERR/ERROR dispatch and independent LINK success |
+
+### Executed qualification
+
+- 560/560 sources completed SP → AIR → CFG → dependencies: 331 frontend
+  fixtures, all 73 CardDemo programs, PERFORM 39, Chaos 48, aliases 14,
+  PERFORM adversaries 25 and CICS 30.
+- Existing exact semantic oracles: PERFORM 39/39, Chaos 48/48 and 28 rejected
+  negative mutations, aliases 14/14, PERFORM adversaries 25/25.
+- Preservation comparison across all 560: **zero candidate losses and zero
+  support/provenance losses**. 43 additions: 42 menu candidates at five indexed
+  occurrences, plus COSGN00C in COPAUS0C from its existing literal MOVE becoming
+  visible after bounded MOVE effect admission. No name-table injection.
+- Final runtime focal oracles: 20 condition dispatch, eight entry isolation,
+  ten table and seven SQL, 14 MOVE/function/register, and three unknown-stack
+  restoration cases. Java gates also reject forged versions, identities,
+  proofs and bypass facts. Four physical table adversaries from VC2 are reused:
+  later changes affect entry/CICS control, absent from those sources.
+- Frontend FAST passed; final qualification-local passed 1,257 Maven tests,
+  source-normalizer full regression and naming. One future semantic-condition
+  oracle is guarded by the pre-existing absent system property
+  semantic.condition.required (1,258 discovered, one skipped).
+- Lower mandatory FAST passed: 2,481 core checks, fixed adapter families,
+  architecture and harness checks.
+- CFG FAST components passed 653 required methods (zero skipped), architecture,
+  strict transport readers and remaining Python gates. The wrapper found
+  an obsolete future-version test using 1.3; it now explicitly accepts 1.3–1.6
+  and rejects incompatible downgrades and future 1.7. That reader and every
+  remaining gate were rerun successfully. Exact-head remote FAST is reported
+  in the PR; an unexecuted local full gate is not reported as passed.
+
+The compiled architecture inventories changed only for the new ConditionState
+record, Support constructor/getter and their references. A read-only diff was
+reviewed before the official refresh. No denied dependency, existing class or
+semantic oracle was removed. Historical capability tests now require the new
+entry/event facts; their primary-flow and PARTIAL assertions remain.
+
+### Graphs and evidence reuse
+
+All 73 graphs were traversed by published identities. Total unreachable nodes
+remain 27,661 and zero-incoming non-entry nodes remain seven; no program gained
+either category. The five changed graphs add 512 reachable nodes and 1,429
+transitions. COACTUPC remains 5,037/5,037 reachable with one component; its UniKix
+variant remains 4,968/4,968. These observations do not claim that every unreachable
+context is erroneous or that point 5 has been implemented.
+
+Raw evidence stays in workspace .carddemo-values-control/evidence: vc-final-01,
+vc-final-02, vc-final-qualification, vc-final-probes, vc-final-other-probes and
+the gate logs. The checked-in qualification JSON records exact production
+checkpoints, source-tree hash and report hashes.
+The corpus used frozen runtime 05. Runtime 06 changes only one compiled producer
+class, adding resolution provenance to unknown-restoration hypotheses. None of
+the 560 products contains that rule, so their evidence is reused for this final
+delta; all restoration adversaries were rerun on runtime 06. Previous W8 products
+are retained only as the historical comparison baseline.
+
+Full lower/CFG qualification wrappers were not run: fixed FAST, admission/wire
+adversaries, source-value laws and the complete 560-case cross-repo corpus cover
+the changed boundary. Frontend full was run because shared grammar/AST ownership
+changed. AIR, CFG construction, UI and ALTER semantics are unchanged.
+
+### Remaining bounds
+
+- Same-family MOVE overlap without language proof and unsupported conversions
+  remain open. Functions add ASCII UPPER-CASE and TRIM; arbitrary functions and
+  runtime registers do not acquire invented values or MUST kills.
+- Tables summarize fixed OCCURS and supported DISPLAY text geometry. Dynamic
+  bounds, arbitrary physical overlays and exact per-index dataflow remain open.
+- Alternate entry parameters/linkage state remain partial; invalid/trailing roots
+  do not acquire invented executable starts.
+- SQL runtime text is not parsed into dependencies; procedure-level WHENEVER
+  scope is supported, with missing targets and external effects kept explicit.
+- PGMIDERR on LINK/XCTL and ERROR fallback are admitted. Other CICS event families
+  and exact PUSH/POP stack execution remain outside this capability. Unknown
+  restoration preserves source candidates with assumptions, never fake AIR edges.

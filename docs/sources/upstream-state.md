@@ -1,13 +1,13 @@
 # Baseline factual dos repositórios
 
-## Estado vigente — CardDemo W0–W8 integrado
+## Estado vigente — valores e controle após W8 (revisão pendente)
 
-Os produtores abaixo estão mergeados em main. SP 2.57 e qualified-source-dependencies 1.2 preservam possibilidades condicionais, sem conceder arestas executáveis à reentrada indefinida. Dependencies publica 2.7 quando recebe a evidência 1.2.
+SP 2.62 e qualified-source-dependencies 1.6 estão qualificados nesta branch. Os pins abaixo são commits exatos de revisão; não são mains mergeadas. Dependencies mantém a versão 2.7.
 
-- proleap-poc: `2a6cd9a43b26c04fada1f3f1cd4c8ccf01bc6b3d`.
-- cobol-lower: `6ce7d13bff4b048112c49f205281f3bf56c2858a`.
+- proleap-poc: `6f90e40ff8cce243e8e46a157cb87a1b2dbcfb15`.
+- cobol-lower: `8d59390e63d482274ab0f1fb52e02b2588e2b9f2`.
 
-[Fechamento e limites](../work/carddemo-control-integration.md). Produção, testes e contratos equivalentes aos heads qualificados W8; a integração atualiza documentação e pins. Campos e seções históricas não substituem estes commits.
+[Qualificação, causas e limites](../work/carddemo-values-control.md). 560 execuções, todos os 73 programas CardDemo, zero perda de candidatos/supports e 43 adições explicadas. O ponto 5 permanece separado. As seções seguintes preservam contexto histórico e não substituem estes pins.
 
 ## Checkpoints históricos
 
