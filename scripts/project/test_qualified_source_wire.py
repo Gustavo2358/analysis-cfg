@@ -110,3 +110,22 @@ for name,expected in [('unknown-branch-query',{'FIRST','SECOND'}),('unknown-bran
     assert {c['referenceName'] for p in rows for c in p['candidates']}==expected,name
     assert all(p['controlRemainder'] for p in rows),name
 print('SOURCE_JOIN_VALUES: open branch survives closed executable query; exact overwrite retained PASS')
+
+# W7 uses conditional source summaries; source-undefined effects are not executable returns.
+reentry=FIX.parent/'perform-reentry'
+for path in reentry.glob('*.source.json'):
+    value=json.loads(path.read_text());validate(value)
+    if value['version']=='1.2.0':
+        for version in ('1.0.0','1.1.0','1.3.0'):
+            changed=copy.deepcopy(value);changed['version']=version
+            try:validate(changed)
+            except (ValueError,KeyError,TypeError):pass
+            else:raise AssertionError('reentry downgrade/future '+version)
+        changed=copy.deepcopy(value)
+        support=next(n['support'] for u in changed['units'] for n in u['nodes'] if n['support']['cause']=='SOURCE_REENTRY_UNDEFINED')
+        support['cause']='INVENTED_CAUSE'
+        try:validate(changed)
+        except ValueError:pass
+        else:raise AssertionError('unknown support cause')
+assert len(list(reentry.glob('*.source.json')))==22
+print('REENTRY_SOURCE_WIRE: 22 producer outputs and version/cause rejection PASS')

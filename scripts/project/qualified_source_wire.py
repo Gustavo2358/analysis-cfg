@@ -13,7 +13,7 @@ def key(value):
     return json.dumps(value, sort_keys=True, separators=(',', ':'))
 
 
-@lru_cache(maxsize=2)
+@lru_cache(maxsize=3)
 def schema(version="1.0.0"):
     return json.loads((Path(__file__).resolve().parents[2] / f'docs/contracts/qualified-source-dependencies-{version}.schema.json').read_text())
 
@@ -52,7 +52,7 @@ def refs(values, inventory):
 
 
 def validate(evidence):
-    require(evidence.get('version') in ('1.0.0','1.1.0'), 'source version')
+    require(evidence.get('version') in ('1.0.0','1.1.0','1.2.0'), 'source version')
     shape(evidence, {'$ref':'#/$defs/QualifiedSourceDependencies'},evidence['version'])
     require(len(evidence['air'])<=1 and all(re.fullmatch('[0-9a-f]{64}', d['sha256']) for d in [evidence['source']]+evidence['air']), 'digest')
     require(evidence['source']['schema'] in ('cobol-semantic-product','cobol-semantic-compilation'), 'source schema')
@@ -63,7 +63,7 @@ def validate(evidence):
         for s in u['statements']: require(s['id']['unit']==unit and bool(s['id']['handle']), 'statement identity')
         for p in u['proofs']:
             refs(p['dependencies'],ps)
-            require(p['kind'] in {'LOCAL_GRAMMAR','RESOLVED_TARGET','EXPANDED_INCLUDE','INPUT_REGION_ISOLATION','PARTIAL_UNKNOWN'} | ({'CONTROL_POSSIBILITY'} if evidence['version']=='1.1.0' else set()), 'proof kind/version')
+            require(p['kind'] in {'LOCAL_GRAMMAR','RESOLVED_TARGET','EXPANDED_INCLUDE','INPUT_REGION_ISOLATION','PARTIAL_UNKNOWN'} | ({'CONTROL_POSSIBILITY'} if evidence['version'] in ('1.1.0','1.2.0') else set()), 'proof kind/version')
         pending_proofs=list(u['proofs']); grounded_proofs=set()
         while pending_proofs:
             ready=[p for p in pending_proofs if set(p['dependencies'])<=grounded_proofs]
@@ -74,6 +74,9 @@ def validate(evidence):
             refs(t['entry'],ss); require(len(t['entry'])<=1 and bool(t['registrations']), 'target registration')
             for r in t['registrations']: refs([r['statement']],ss); require(r['statementOrigin']==ss[key(r['statement'])]['provenance'], 'registration origin')
         def support(s):
+            causes={'NONE','RESET_HISTORY_UNAVAILABLE','RESET_WITHOUT_CANCELED_EVIDENCE','CALL_EFFECT_UNAVAILABLE','HANDLER_OPERATION_UNAVAILABLE'}
+            if evidence['version']=='1.2.0':causes.add('SOURCE_REENTRY_UNDEFINED')
+            require(s['cause'] in causes and (s['kind']=='UNKNOWN') == (s['cause']!='NONE'),'support cause/version')
             refs(s['target'],ts);refs(s['activation'],ss)
             require(len(s['target'])==len(s['activation'])<=1, 'state target/activation')
             require((s['kind'] in ('ACTIVE','CANCELED','DEACTIVATED'))==bool(s['target']), 'state target')

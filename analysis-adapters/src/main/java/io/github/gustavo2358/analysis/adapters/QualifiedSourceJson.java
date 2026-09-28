@@ -13,7 +13,7 @@ public final class QualifiedSourceJson {
     private final ObjectMapper mapper=JsonMapper.builder(JsonFactory.builder().enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION).build()).enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS).build();
     public QualifiedSourceDependencies decode(byte[] bytes) throws IOException {
         var n=mapper.readTree(bytes);
-        if(n==null || !n.path("schema").asText().equals("qualified-source-dependencies") || !Set.of("1.0.0","1.1.0").contains(n.path("version").asText()))throw new IllegalArgumentException("unsupported source contract");
+        if(n==null || !n.path("schema").asText().equals("qualified-source-dependencies") || !Set.of("1.0.0","1.1.0","1.2.0").contains(n.path("version").asText()))throw new IllegalArgumentException("unsupported source contract");
         return readQualifiedSourceDependencies(n);
     }
     public byte[] encode(QualifiedSourceDependencies value) throws IOException {return mapper.writeValueAsBytes(value(value));}

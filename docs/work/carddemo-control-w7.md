@@ -1,6 +1,8 @@
 # CARDDEMO-CONTROL-W7 — precondição de reentrada local
 
-Status: IN_PROGRESS. Escopo autorizado: W7/W8, sem merge.
+Status: IN_PROGRESS / implementação qualificada, aguardando revisão. Escopo autorizado: W7/W8, sem merge.
+
+Resultado, gates, deltas e limites: [fechamento W7/W8](carddemo-control-w7-w8.md).
 
 ## Descoberta que revisa o plano
 
@@ -29,3 +31,32 @@ RED: publicação da política tipada/wire; versão nova; política ausente hist
 ## Refinamento confirmado por RED
 
 O frontier antigo usa o footprint da operação PERFORM isolada e pode declarar memória/dependências vazias. Isso não é autoridade para os efeitos da reentrada indefinida. O teste `undefined source cannot close memory or prove kills` falhou antes do ajuste. SOURCE_UNDEFINED conserva leituras/escritas possíveis em toda a memória (incluindo ambiente), recursos abertos, zero MUST-overwrite e zero retorno conhecido. A política histórica UNSPECIFIED mantém a tradução anterior. Este delta de precisão exige nova qualificação dos produtos afetados; não é somente renomear o diagnóstico.
+
+## Preservação da continuação fonte — desenho anterior ao ajuste
+
+O teste de recursão incondicional expôs uma segunda fronteira: a qualificação fonte por menor ponto fixo não produz summary de retorno e deixa vazio o candidato escrito depois do PERFORM. Recursão com semântica indefinida não prova não retorno. O CFG continuará sem sucessor conhecido; a evidência fonte deve preservar a continuação como CONTROL_POSSIBILITY.
+
+O tabulador fonte mantém grafo finito de dependências entre contextos de invocação (binding + estado abstrato + ingresso de handler). Quando uma aresta fecha ciclo, a política SOURCE_UNDEFINED autoriza uma hipótese de conclusão com estado de handler desconhecido. A hipótese entra como summary do callee e usa os subscribers e callerPremise existentes para associar cada continuação ao seu chamador. Nenhuma ligação global entre todos os retornos/callers; o domínio é de possibilidades, não pilha IBM executável. A prova derivada referencia o binding publicado e a ocorrência, com rule undefined-active-reentry-may-complete e kind CONTROL_POSSIBILITY. O consumer transporta a nova causa de incerteza sob versão própria.
+
+Terminação: número finito de bindings, estados de handler e ingressos; cada contexto/ponto/support entra uma única vez. A detecção de ciclos usa alcançabilidade do grafo finito, sem enumerar profundidades nem impor cutoff. O materializador AIR permanece separado, com sua limitação exponencial. A hipótese não fecha memória, não concede MUST e não pode ser promovida a reachability executável. Oráculos RED: candidato AFTERP sobrevive à recursão direta/mútua, com support condicional; término anterior ao ciclo permanece negativo; ordem de worklist não muda resultado; loops sequenciais não geram hipótese.
+
+## Qualified source evidence 1.2
+
+The finite source tabulator detects cycles between invocation contexts. For an
+active binding whose published policy is SOURCE_UNDEFINED, it may derive a
+conditional completion summary. `SOURCE_REENTRY_UNDEFINED` is an unknown handler
+state cause, admitted in qualified-source-dependencies 1.2 only. The derived proof
+uses CONTROL_POSSIBILITY and references the source binding's proofs and caller
+provenance. Existing callerPremise conjunctions attach summaries to their own
+subscribers; summaries are never AIR or CFG edges. Absence of a known completion
+is not a non-return proof under undefined source semantics. Literal candidates
+retain source qualifications; computed candidates retain conditional value
+evidence and uncertainty. GOBACK/STOP/GO TO before a cycle grant no such summary.
+
+The executable analyzer still uses the original state tabulation. Only source
+qualification enables these hypotheses. The domain is finite (bindings, finite
+handler support, handler ingress and program points); insertion is monotonic.
+Each cycle check traverses the context dependency graph per callee, O(C(C+E))
+per saturation round. No recursion-depth cutoff, source-name dispatch or global
+return-to-all-callers graph is used. Materialized AIR context growth remains a
+separate limitation.
