@@ -1,6 +1,8 @@
 # CARDDEMO-CONTROL-W7 — precondição de reentrada local
 
-Status: IN_PROGRESS. Escopo autorizado: W7/W8, sem merge.
+Status: IN_PROGRESS / implementação qualificada, aguardando revisão. Escopo autorizado: W7/W8, sem merge.
+
+Resultado, gates, deltas e limites: [fechamento W7/W8](carddemo-control-w7-w8.md).
 
 ## Descoberta que revisa o plano
 
