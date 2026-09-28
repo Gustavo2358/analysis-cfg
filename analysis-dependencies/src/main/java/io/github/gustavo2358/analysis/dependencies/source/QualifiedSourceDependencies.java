@@ -12,9 +12,11 @@ public record QualifiedSourceDependencies(String schema, String version, String 
             Objects.requireNonNull(source);
             air=List.copyOf(air);
             units=List.copyOf(units);
-            require(schema.equals("qualified-source-dependencies") && Set.of("1.0.0","1.1.0","1.2.0").contains(version), "unsupported source contract"); one(air); unique(units, UnitEvidence::unit);
+            require(schema.equals("qualified-source-dependencies") && Set.of("1.0.0","1.1.0","1.2.0","1.3.0","1.4.0","1.5.0","1.6.0").contains(version), "unsupported source contract"); require(Set.of("1.4.0","1.5.0","1.6.0").contains(version)||units.stream().noneMatch(u->u.nominalValues().filter(n->n.facts().authority().equals("NOMINAL_TEXT_SOURCE_V4")).isPresent()),"source tables require version 1.4.0"); require(Set.of("1.3.0","1.4.0","1.5.0","1.6.0").contains(version)||units.stream().noneMatch(u->u.nominalValues().filter(n->n.facts().authority().equals("NOMINAL_TEXT_SOURCE_V3")).isPresent()),"source expressions require version 1.3.0"); one(air); unique(units, UnitEvidence::unit);
+            require(Set.of("1.5.0","1.6.0").contains(version)||units.stream().allMatch(u->u.derivations().stream().noneMatch(d->d.authority().equals("ALTERNATE_ENTRY"))),"alternate roots require version 1.5.0");
+            require(version.equals("1.6.0")||units.stream().allMatch(u->u.nodes().stream().allMatch(n->n.support().conditions().isEmpty())&&u.events().stream().noneMatch(e->e.origin().equals("LINK_PGMIDERR"))&&u.proofs().stream().noneMatch(p->Set.of("cics-pgmiderr-condition-event","cics-condition-registration").contains(p.rule()))),"condition state requires version 1.6.0");
             require(!version.equals("1.0.0")||units.stream().allMatch(u->u.nativeFiles().isEmpty()&&u.proofs().stream().noneMatch(p->p.kind().equals("CONTROL_POSSIBILITY"))),"source possibility requires version 1.1.0");
-            require(version.equals("1.2.0")||units.stream().allMatch(u->u.nodes().stream().noneMatch(n->n.support().cause().equals("SOURCE_REENTRY_UNDEFINED"))),"source reentry requires version 1.2.0");
+            require(Set.of("1.2.0","1.3.0","1.4.0","1.5.0","1.6.0").contains(version)||units.stream().allMatch(u->u.nodes().stream().noneMatch(n->n.support().cause().equals("SOURCE_REENTRY_UNDEFINED"))),"source reentry requires version 1.2.0");
         }
     public record Document(String schema, String version, String sha256) {
         public Document {
@@ -109,8 +111,13 @@ public record QualifiedSourceDependencies(String schema, String version, String 
             require(technology.equals("COBOL") ? command.equals("CALL") && namespace.equals("PROGRAM") : technology.equals("CICS") && Set.of("PROGRAM","FILE").contains(namespace), "dependency family");
         }
     }
-    public record Support(String kind, List<String> target, List<StatementId> activation, String cause) {
+    public record ConditionState(String condition,StatementId registration,boolean uncertain,List<String> proofs) {
+        public ConditionState{text(condition);Objects.requireNonNull(registration);proofs=List.copyOf(proofs);require(Set.of("PGMIDERR","ERROR").contains(condition)&&!proofs.isEmpty(),"supported condition state");}
+    }
+    public record Support(String kind, List<String> target, List<StatementId> activation, String cause,List<ConditionState> conditions) {
+        public Support(String kind,List<String> target,List<StatementId> activation,String cause){this(kind,target,activation,cause,List.of());}
         public Support {
+            conditions=List.copyOf(conditions);unique(conditions,ConditionState::condition);
             text(kind);
             target=List.copyOf(target);
             activation=List.copyOf(activation);
@@ -176,7 +183,7 @@ public record QualifiedSourceDependencies(String schema, String version, String 
             text(runtimeIdentity);
             guards=List.copyOf(guards);
             proofs=List.copyOf(proofs);
-            require(Set.of("EXPLICIT_ABEND","XCTL_PGMIDERR").contains(origin), "event origin");
+            require(Set.of("EXPLICIT_ABEND","XCTL_PGMIDERR","LINK_PGMIDERR").contains(origin), "event origin");
             require(disposition.equals("TASK_ABEND") && scope.equals("CURRENT_EXECUTION_LOGICAL_LEVEL") && runtimeIdentity.equals("UNAVAILABLE"), "event scope");
             require(Set.of("HANDLER_ELIGIBLE","HANDLERS_BYPASSED").contains(eligibility) && !proofs.isEmpty(), "event authority");
         }
@@ -279,13 +286,13 @@ public record QualifiedSourceDependencies(String schema, String version, String 
         for(var p:proofs){counts.put(p.id(),p.dependencies().size());if(p.dependencies().isEmpty())queue.add(p.id());for(var ref:p.dependencies())proofWait.computeIfAbsent(ref,k->new ArrayList<>()).add(p.id());}
         while(!queue.isEmpty()){var id=queue.removeFirst();proofReady.add(id);for(var dest:proofWait.getOrDefault(id,List.of()))if(counts.merge(dest,-1,Integer::sum)==0)queue.add(dest);}
         require(proofReady.size()==proofs.size(),"proof cycle");
-        for(var n:nodes)checkSupport(n.support(),ts,ss);
+        for(var n:nodes)checkSupport(n.support(),ts,ss,ps);
         for(var g:guards)require(es.containsKey(g.event()),"guard event reference");
         for(var e:events){require(ss.containsKey(e.statement()),"event statement");refs(e.guards(),gs);refs(e.proofs(),ps);
             for(var ref:e.guards())require(gs.get(ref).event().equals(e.id()),"guard owner");
             var kinds=e.guards().stream().map(ref->gs.get(ref).kind()).toList();
             require(e.origin().equals("EXPLICIT_ABEND")?kinds.isEmpty():kinds.equals(List.of("CONDITION_RAISED","DEFAULT_DISPOSITION_APPLIES")) && e.eligibility().equals("HANDLER_ELIGIBLE"),"origin guard correlation");
-            var rule=e.origin().equals("EXPLICIT_ABEND")?"cics-explicit-abend-event":"cics-xctl-pgmiderr-default-abend-event";
+            var rule=e.origin().equals("EXPLICIT_ABEND")?"cics-explicit-abend-event":e.origin().equals("LINK_PGMIDERR")?"cics-link-pgmiderr-default-abend-event":"cics-xctl-pgmiderr-default-abend-event";
             require(e.proofs().stream().anyMatch(ref->ps.get(ref).kind().equals("LOCAL_GRAMMAR") && ps.get(ref).rule().equals(rule)),"event proof authority");
         }
         for(var s:selections){require(es.containsKey(s.event()) && ns.containsKey(s.source()),"selection reference");refs(s.target(),ts);refs(s.localEntry(),ns);refs(s.guards(),gs);refs(s.proofs(),ps);
@@ -295,7 +302,7 @@ public record QualifiedSourceDependencies(String schema, String version, String 
             require(s.bypassed()==e.eligibility().equals("HANDLERS_BYPASSED"),"bypass qualification");
             if(!s.target().isEmpty()) {
                 require(!s.bypassed() && source.support().kind().equals("ACTIVE") && source.support().target().equals(s.target()),"selected ACTIVE target");
-                var entry=s.stateOnEntry().getFirst();checkSupport(entry,ts,ss);
+                var entry=s.stateOnEntry().getFirst();checkSupport(entry,ts,ss,ps);
                 require(entry.kind().equals("DEACTIVATED") && entry.target().equals(s.target()) && entry.activation().equals(source.support().activation()),"deactivated entry support");
                 if(!s.localEntry().isEmpty()) {
                     var n=ns.get(s.localEntry().getFirst());var t=ts.get(s.target().getFirst());
@@ -308,7 +315,11 @@ public record QualifiedSourceDependencies(String schema, String version, String 
         // incoming derivations remain OR; each source/caller pair remains AND.
         var pending=new HashMap<String,Integer>();var waiting=new HashMap<String,List<Derivation>>();var ready=new ArrayDeque<String>();var reached=new HashSet<String>();
         for(var d:derivations){refs(d.source(),ns);refs(d.callerPremise(),ns);refs(d.selection(),sels);refs(d.proofs(),ps);require(ns.containsKey(d.destination()),"derivation destination");
-            if(d.source().isEmpty())require(d.callerPremise().isEmpty() && d.selection().isEmpty() && d.authority().equals("PRIMARY_ENTRY"),"ordinary root authority");
+            if(d.source().isEmpty())require(d.callerPremise().isEmpty() && d.selection().isEmpty() && Set.of("PRIMARY_ENTRY","ALTERNATE_ENTRY").contains(d.authority()),"ordinary root authority");
+            if(d.source().isEmpty()&&d.authority().equals("ALTERNATE_ENTRY")) {
+                require(d.proofs().stream().map(ps::get).anyMatch(p->p.kind().equals("LOCAL_GRAMMAR")&&p.rule().equals("alternate-entry-start")),"alternate root requires entry proof");
+                require(ns.get(d.destination()).context().startsWith("ENTRY/"),"alternate root context");
+            }
             if(!d.selection().isEmpty()) {var s=sels.get(d.selection().getFirst());require(d.source().equals(List.of(s.source())) && d.callerPremise().isEmpty() && s.localEntry().equals(List.of(d.destination())) && d.proofs().equals(s.proofs()),"selection derivation correlation");}
             var premises=new HashSet<String>(d.source());premises.addAll(d.callerPremise());pending.put(d.id(),premises.size());
             if(premises.isEmpty())ready.add(d.destination());for(var p:premises)waiting.computeIfAbsent(p,k->new ArrayList<>()).add(d);
@@ -323,7 +334,11 @@ public record QualifiedSourceDependencies(String schema, String version, String 
         for(var f:frontiers){require(ns.containsKey(f.source()),"frontier source");refs(f.proofs(),ps);}
         require(available || nodes.isEmpty() && derivations.isEmpty() && selections.isEmpty() && events.isEmpty() && proofs.isEmpty() && frontiers.isEmpty(),"unavailable control has no authority");
     }
-    private static void checkSupport(Support s,Map<String,Target> targets,Map<StatementId,Statement> statements) {
+    private static void checkSupport(Support s,Map<String,Target> targets,Map<StatementId,Statement> statements,Map<String,Proof> proofs) {
+        for(var condition:s.conditions()) {
+            require(statements.containsKey(condition.registration()),"condition registration reference");refs(condition.proofs(),proofs);
+            require(condition.proofs().stream().map(proofs::get).anyMatch(p->p.kind().equals("LOCAL_GRAMMAR")&&p.rule().equals("cics-condition-registration")&&p.provenance().equals(statements.get(condition.registration()).provenance())),"condition registration proof/origin");
+        }
         refs(s.target(),targets);refs(s.activation(),statements);
         if(!s.target().isEmpty())require(targets.get(s.target().getFirst()).registrations().stream().anyMatch(r->r.statement().equals(s.activation().getFirst())),"support activation/target");
     }

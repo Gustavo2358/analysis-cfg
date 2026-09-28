@@ -1,0 +1,111 @@
+{
+  "cases": 560,
+  "comparisonBaseline": "W8; unchanged cumulative candidates, supports and provenance after the review corrections",
+  "candidateLosses": 0,
+  "supportChanges": 0,
+  "candidateAdditions": 43,
+  "corpus": {
+    "frontendFixtures": 331,
+    "carddemo": 73,
+    "perform": 39,
+    "chaos": 48,
+    "aliases": 14,
+    "performAdversarial": 25,
+    "cics": 30
+  },
+  "productionCheckpoints": {
+    "proleap-poc": "7ee701a4a4bf8fca1269064ab9d268f1b89e8d7b",
+    "cobol-lower": "4b8c679e383bb12ff85476f19bae2710275ab891",
+    "analysis-cfg": "fa55e2e016837e0c974356ae14dd098ec845144b"
+  },
+  "sourceTreeHash": "75372b347a70cfcca27bc1b353efe9c9f9cd45b9505924c2dad469c0d8906e02",
+  "reviewCorrections": {
+    "comparedHeads": {
+      "proleap-poc": "6f90e40ff8cce243e8e46a157cb87a1b2dbcfb15",
+      "cobol-lower": "8d59390e63d482274ab0f1fb52e02b2588e2b9f2",
+      "analysis-cfg": "fa55e2e016837e0c974356ae14dd098ec845144b"
+    },
+    "candidateLosses": 0,
+    "supportChanges": 0,
+    "candidateAdditions": 0,
+    "changedProducts": {
+      "sp/cobol-semantic-product.json": 2,
+      "source.json": 2,
+      "dependencies.json": 2
+    },
+    "newCases": 18,
+    "logicalProfilePass": 18,
+    "ibmProfilePass": 18,
+    "previousRestorationPass": 3,
+    "red": {
+      "cases": 15,
+      "incorrectHandlerCandidates": 7,
+      "lostTableCandidates": 3,
+      "passingControls": 5
+    },
+    "previousOraclesRerun": {
+      "conditionDispatch": 20,
+      "alternateEntries": 8,
+      "tableAndSql": 17,
+      "moveAndFunctions": 14
+    },
+    "newVersionedCoverage": {
+      "frontendTableTests": 2,
+      "lowerRestorationProducts": 13,
+      "lowerTableProducts": 5,
+      "restorationScheduleAndCodecChecks": 13
+    }
+  },
+  "oracles": {
+    "controlAndAliases": 78,
+    "chaos": 48,
+    "chaosRejectedMutations": 28
+  },
+  "gates": {
+    "frontendFast": "PASS: 686 tests, zero skipped",
+    "lowerFast": "PASS: 2481 core checks, adapters, architecture, harness",
+    "cfgFast": "PASS: 653 Java methods plus architecture, wire and Python checks",
+    "fullWrappersThisReview": "NOT RUN; frontend prior qualification-local retained as historical evidence, not a new run"
+  },
+  "reuse": {
+    "reviewCorpus": "All 560 four-stage pipelines newly executed. Interrupted batch kept 195 completed results; remaining cases ran in a fresh directory. No prior execution was counted as a new run.",
+    "airJava": {
+      "runtimeCommit": "59df1f7d6f3523b21b172a3ea4b5a0dc95128faa",
+      "lockedCommit": "d760b07b0fac42a106d09342ee9d5b8445ccf630",
+      "equalSourceAndBuildTrees": {
+        "air-model": {
+          "runtime": "270665d9cb55bb11431fdf2167e81f3190c15fdd",
+          "lock": "270665d9cb55bb11431fdf2167e81f3190c15fdd"
+        },
+        "air-json": {
+          "runtime": "633def279c77a04aab417b7ab0837647a117b0ce",
+          "lock": "633def279c77a04aab417b7ab0837647a117b0ce"
+        }
+      },
+      "allChangedPaths": [
+        "docs/engineering/air-json.md"
+      ]
+    },
+    "w8Comparison": "Previous qualification supplies only the historical W8 comparison; the new products are compared with the reviewed-head products."
+  },
+  "evidenceSha256": {
+    "review-qualification/results.json": "117820beef46f788356916539e9882437ff76ce3e546b15d47bed34f0a34f08a",
+    "review-qualification/comparison.json": "b006b2ece94e4a136bfd8eb40c1b1ec1eff7a4f0c02f0ed84190b94e98b19aa1",
+    "review-qualification/control-oracles.json": "0d64411ad3b68d969e6de7be76eaf7bed579883c206cbf02d5b24d9b013b80f2",
+    "review-qualification/chaos-oracle.json": "7d928376ae9ace8d3b24875bedee4724c5f27e90dd6025a014dcbe5d8dd3b4a2",
+    "review-qualification/product-deltas.json": "c3017e2c58ea126a40946f0140a455c0cc63998702d9d30cfa81973ae1770ba8",
+    "review-focal-oracle.json": "8d58a9deb6d2c17a78185141acba4cac36317a3e2d12b8c0df5401043584b23b",
+    "review-red-01/oracle.json": "958eb2cc4dd89b82fbb4e02f396a3a61454ece2a5e4b507135864a4257edca2a",
+    "review-oracles.json": "29919f691b313ec6630c16777f99fb2fcd630086ca6ffa895dc31cfb0173e974",
+    "review-previous-probes-01/condition-oracle.json": "6843f898f260c0e5a710a8eadd40b7578af9d0b05e393c11da46c644e3f834a7",
+    "review-previous-probes-01/entry-oracle.json": "fe6fe773c308b345297e51c1bbc13c786492e981b6938965ea0965e853eee3cd",
+    "review-previous-probes-01/table-sql-oracle.json": "8998d6e743828af6bff2916ca3d09d2297fefd124d4b78f2d06ac3c6cf7e774d",
+    "review-previous-probes-01/value-oracle.json": "79add35d75f398889ad50430524555f54089aea82ef920fa855f2d2f90ddb8fc",
+    "review-air-pin-equivalence.json": "f759a5553991d197d02b444279d311fa9ad76277b57250ff7fa301b613759715",
+    "review-frontend-fast-01.log": "977fa59aed46d769b67aea51e6ce28d5151a1eed19f384a22c14dae631588ba7",
+    "review-lower-fast-01.log": "7065098ae08eac318fabf0f84aa32d400431a73367802ba485484c691aaaae2e",
+    "review-cfg-fast-01.log": "a3587098f4105a7c3beb900cc8d16e4eb2164a735eacd3988fab649373d59602",
+    "review-corpus-02-interruption.json": "9bf87ec39e450cfc1cbd26bf70825ab40a028aaf8ce9162c5d33cc3d6cae6ecd",
+    "review-corpus-postflight.json": "54972d65b1dbcd7ca7a664a2f71cbe4a2f41ed693bfc0fc206991ded9a9d4738"
+  }
+}

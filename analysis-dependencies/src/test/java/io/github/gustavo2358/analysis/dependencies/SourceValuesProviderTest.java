@@ -19,7 +19,7 @@ class SourceValuesProviderTest {
             derivations.add(new Derivation("d"+i,i==0?List.of():List.of("n"+(i-1)),"n"+i,List.of(),i==0?"PRIMARY_ENTRY":"flow"+i,List.of("p"),List.of()));
         }
         var call=new StatementId(UNIT,"s2");var occurrences=List.of(new Occurrence(call,"COBOL","CALL","PROGRAM","cobol-zos-dynamic-call-minimal@1","COMPUTED",List.of(new Operand(new OperandId(call,"o"),ORIGIN)),List.of(),true,List.of("n2")));
-        var facts=new NominalValues("NOMINAL_TEXT_SOURCE_V1",List.of(new NominalValues.Symbol("P",8),new NominalValues.Symbol("Q",8)),assignments,conditions,List.of(new NominalValues.Query("s2","P")));
+        var facts=new NominalValues(assignments.stream().anyMatch(a->a.source().extended())?"NOMINAL_TEXT_SOURCE_V3":"NOMINAL_TEXT_SOURCE_V1",List.of(new NominalValues.Symbol("P",8),new NominalValues.Symbol("Q",8)),assignments,conditions,List.of(new NominalValues.Query("s2","P")));
         var evidence=new NominalValueEvidence(facts,List.of(new NominalValueEvidence.Declaration("P",ORIGIN),new NominalValueEvidence.Declaration("Q",ORIGIN)),List.of(new NominalValueEvidence.Seed("P","SELF0001","DECLARATIVE_POSSIBILITY",ORIGIN),new NominalValueEvidence.Seed("Q","OLD00001","DECLARATIVE_POSSIBILITY",ORIGIN)),branches,List.of(new NominalValueEvidence.Uncertainty("missing","MISSING_COPY",ORIGIN)));
         return new UnitEvidence(UNIT,true,statements,occurrences,List.of(),nodes,derivations,List.of(),List.of(),List.of(),List.of(new Proof("p","LOCAL_GRAMMAR","fixture",ORIGIN,List.of())),List.of(),Optional.of(evidence));
     }
@@ -51,7 +51,7 @@ class SourceValuesProviderTest {
     static UnitEvidence model(UnitEvidence u, String symbol, int extent) {
         var old=u.nominalValues().orElseThrow();var f=old.facts();
         var symbols=f.symbols().stream().map(s->new NominalValues.Symbol(s.node(),s.node().equals(symbol)?extent:s.extent(),s.node().equals(symbol))).toList();
-        var facts=new NominalValues("NOMINAL_TEXT_SOURCE_V2",symbols,f.assignments(),f.conditions(),f.queries());
+        var facts=new NominalValues(f.authority().equals("NOMINAL_TEXT_SOURCE_V3")?f.authority():"NOMINAL_TEXT_SOURCE_V2",symbols,f.assignments(),f.conditions(),f.queries());
         var evidence=new NominalValueEvidence(facts,old.declarations(),old.seeds(),old.branches(),old.uncertainties());
         return new UnitEvidence(u.unit(),u.controlAvailable(),u.statements(),u.occurrences(),u.targets(),u.nodes(),u.derivations(),u.selections(),u.events(),u.guards(),u.proofs(),u.frontiers(),Optional.of(evidence));
     }
@@ -81,5 +81,67 @@ class SourceValuesProviderTest {
         var u=model(fixture(List.of(new NominalValues.Assignment("s0","P",read("Q")),
             new NominalValues.Assignment("s1","P",literal("REAL0001"))),List.of(),List.of()),"Q",1);
         assertEquals(List.of("REAL0001"),values(u));
+    }
+    static NominalValues.Term unary(String kind,NominalValues.Term argument){return new NominalValues.Term(kind,"",List.of(argument));}
+    @Test void nestedTextTransformsRunBeforeReceivingFit() {
+        var expression=unary("UPPER_ASCII",unary("TRIM_SPACES",literal("  progb001  ")));
+        assertEquals(List.of("PROGB001"),values(fixture(List.of(new NominalValues.Assignment("s0","P",expression)),List.of(),List.of())));
+        assertEquals(List.of("        "),values(fixture(List.of(new NominalValues.Assignment("s0","P",unary("TRIM_SPACES",literal("   ")))),List.of(),List.of())));
+    }
+    @Test void trimOnlyRemovesTheSpaceCharacter() {
+        assertEquals(List.of("\tA\t     "),values(fixture(List.of(new NominalValues.Assignment("s0","P",unary("TRIM_SPACES",literal(" \tA\t ")))),List.of(),List.of())));
+    }
+    @Test void textTransformReadsRetainTheirDeclarationAndAssignmentSupports() {
+        var unit=fixture(List.of(new NominalValues.Assignment("s0","Q",literal("new00001")),new NominalValues.Assignment("s1","P",unary("UPPER_ASCII",read("Q")))),List.of(),List.of());
+        var result=new SourceValuesProvider(unit,Set.of("s2")).candidates("s2").getFirst();assertEquals("NEW00001",result.rawValue());
+        assertTrue(result.support().evidence().stream().anyMatch(e->e.reference().equals("s0")));
+        assertTrue(result.support().evidence().stream().anyMatch(e->e.reference().equals("s1")));
+    }
+    @Test void modelInfluenceSurvivesTextTransforms() {
+        var unit=model(fixture(List.of(new NominalValues.Assignment("s0","P",unary("UPPER_ASCII",read("Q")))),List.of(),List.of()),"Q",8);
+        assertEquals(List.of("SELF0001"),values(unit));
+    }
+    @Test void nonAsciiDoesNotUseTheJvmLocaleAsACobolCaseTable() {
+        assertTrue(values(fixture(List.of(new NominalValues.Assignment("s0","P",unary("UPPER_ASCII",literal("éprog001")))),List.of(),List.of())).isEmpty());
+    }
+    @Test void malformedExpressionOperatorsArityAndReferencesAreRejected() {
+        assertThrows(IllegalArgumentException.class,()->new NominalValues.Term("UPPER_ASCII",""));
+        assertThrows(IllegalArgumentException.class,()->unary("READ",literal("x")));
+        assertThrows(IllegalArgumentException.class,()->unary("COBOL_FUNCTION",literal("x")));
+        assertThrows(IllegalArgumentException.class,()->fixture(List.of(new NominalValues.Assignment("s0","P",unary("TRIM_SPACES",read("missing")))),List.of(),List.of()));
+    }
+
+    static UnitEvidence table(UnitEvidence u, boolean modeledOrigin) {
+        var old=u.nominalValues().orElseThrow();var f=old.facts();
+        var symbols=f.symbols().stream().map(s->new NominalValues.Symbol(s.node(),s.extent(),modeledOrigin&&s.node().equals("Q"))).toList();
+        var fields=List.of(new NominalValues.TableField("P",List.of(new NominalValues.Initial("Q","PROGA001"),new NominalValues.Initial("Q","PROGB001"))));
+        var facts=new NominalValues("NOMINAL_TEXT_SOURCE_V4",symbols,f.assignments(),f.conditions(),f.queries(),fields);
+        var e=new NominalValueEvidence(facts,old.declarations(),List.of(),old.branches(),old.uncertainties());
+        return new UnitEvidence(u.unit(),u.controlAvailable(),u.statements(),u.occurrences(),u.targets(),u.nodes(),u.derivations(),u.selections(),u.events(),u.guards(),u.proofs(),u.frontiers(),Optional.of(e));
+    }
+    @Test void tableWriteCannotKillOtherOccurrencesOrLoseInitializerSupports() {
+        var u=table(fixture(List.of(new NominalValues.Assignment("s0","P",literal("PROGC001"))),List.of(),List.of()),false);
+        assertEquals(List.of("PROGA001","PROGB001","PROGC001"),values(u));
+        var candidates=new SourceValuesProvider(u,Set.of("s2")).candidates("s2");
+        assertTrue(candidates.stream().allMatch(c->c.support().assumptions().contains("TABLE_INDEX_NOT_REFINED")));
+        for(var c:candidates)assertTrue(c.support().evidence().stream().anyMatch(e->e.reference().equals(c.rawValue().equals("PROGC001")?"s0":"Q")));
+    }
+    @Test void unknownTableWriteAndPredicateRetainPossibleElements() {
+        var c=new NominalValues.Condition("s1",new NominalValues.Predicate("EQ",List.of(read("P"),literal("PROGA001")),List.of()));
+        for(boolean branch:List.of(true,false))assertEquals(List.of("PROGA001","PROGB001"),values(table(fixture(List.of(new NominalValues.Assignment("s0","P",new NominalValues.Term("UNKNOWN",""))),List.of(c),List.of(new NominalValueEvidence.Branch("d2",branch))),false)));
+    }
+    @Test void modelTableInitializerNeverBecomesRuntimeEvidence() {
+        assertTrue(values(table(fixture(List.of(),List.of(),List.of()),true)).isEmpty());
+        assertEquals(List.of("PROGC001"),values(table(fixture(List.of(new NominalValues.Assignment("s0","P",literal("PROGC001"))),List.of(),List.of()),true)));
+    }
+    @Test void choiceKeepsEveryAlternativeAndRejectsOldAuthority() {
+        var choice=new NominalValues.Term("CHOICE","",List.of(literal("PROGC001"),literal("PROGD001")));
+        var base=fixture(List.of(),List.of(),List.of());var f=base.nominalValues().orElseThrow().facts();
+        assertThrows(IllegalArgumentException.class,()->new NominalValues("NOMINAL_TEXT_SOURCE_V3",f.symbols(),List.of(new NominalValues.Assignment("s0","P",choice)),f.conditions(),f.queries()));
+        var u=table(base,false);var old=u.nominalValues().orElseThrow();
+        var changed=new NominalValues("NOMINAL_TEXT_SOURCE_V4",old.facts().symbols(),List.of(new NominalValues.Assignment("s0","P",choice)),List.of(),old.facts().queries(),old.facts().tableFields());
+        var e=new NominalValueEvidence(changed,old.declarations(),old.seeds(),old.branches(),old.uncertainties());
+        var selected=new UnitEvidence(u.unit(),u.controlAvailable(),u.statements(),u.occurrences(),u.targets(),u.nodes(),u.derivations(),u.selections(),u.events(),u.guards(),u.proofs(),u.frontiers(),Optional.of(e));
+        assertEquals(List.of("PROGA001","PROGB001","PROGC001","PROGD001"),values(selected));
     }
 }

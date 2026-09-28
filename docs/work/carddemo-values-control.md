@@ -1,0 +1,481 @@
+# CardDemo values and remaining entry/control semantics
+
+- id: CARDDEMO-VALUES-CONTROL
+- status: IN_PROGRESS (implementation qualified; review/merge pending)
+- scope: the four capability families authorized after W8; separate review PRs, no merge authorization.
+
+## Checkpoints
+
+1. **VC0 — discovery and independent oracles.** Reproduce each family through
+   frontend → SP → lower → AIR → CFG → dependencies, under both unspecified
+   logical storage and the explicit IBM physical profile. Distinguish missing
+   value facts, admission, control and source qualification. Successful process
+   exits are not semantic PASS.
+2. **VC1 — MOVE receiver sequences.** Preserve receiving order, sending operand
+   evaluation, alias-family coherence, fitting and unaffected data. Cover
+   literals, figuratives and data sources; retain explicit limits for conversions
+   and overlap whose result the language does not define.
+3. **VC2 — indexed text.** Publish source-proved table selection and initial text
+   slices with identities and uncertainty. Unknown index is a set of possible
+   in-range elements plus an open remainder, never arbitrary neighboring data.
+4. **VC3 — expressions and special registers.** Separate pure text transforms
+   from runtime inputs and implicit runtime state. Known receiver effects must
+   not poison unrelated data. Do not invent CURRENT-DATE values or treat a
+   compiler register as a user storage declaration.
+5. **VC4 — external control and entries.** Model lexical SQL WHENEVER directives,
+   dynamic SQL completion/effects, CICS condition dispatch and alternate entries
+   at their canonical owners. An alternate entry is not an edge from the primary
+   entry. Preserve handler/caller context and unavailable external effects.
+6. **VC5 — qualification and review.** All 73 CardDemo programs, PERFORM 39,
+   Chaos 48, aliases 14, PERFORM adversaries 25, frontend fixture corpus and CICS
+   qualification; changed-repository FAST and impact-selected local full gates.
+   Investigate each lost candidate/support using positive kill/exclusion evidence.
+
+Each implementation checkpoint records its contract, tests, exact pins and known
+limits. Commit checkpoints progressively. No shared routine bodies (point 5),
+ALTER, UI changes, fabricated CFG edges, candidate injection or weakened oracle.
+
+## Rule and ownership
+
+IBM Enterprise COBOL 6.4 [MOVE](https://www.ibm.com/docs/en/cobol-zos/6.4.0?topic=statements-move-statement)
+requires receiving order and evaluates sending subscripts/reference modification
+and functions before the first receiving transfer. Receivers evaluate their own
+selection immediately before their transfer. Overlap does not grant a defined
+copy result. These are LANGUAGE_GUARANTEED premises, not corpus observations.
+
+The frontend owns binding, source layout, expression classification and COBOL
+control. SP transports typed canonical facts. Lowering composes existing generic
+AIR operations where sufficient; CFG projects actual AIR terminators. Source
+qualification may preserve possibilities but cannot manufacture executable flow.
+Synthetic IBM declarations remain modelAssumed and never prove runtime values,
+physical layout, branch exclusion or a strong kill.
+
+## Validation design
+
+Derive focal expected behavior from language rules before implementation. Assert
+values, ordering, reachability and provenance rather than operation counts alone.
+Challenge aliasing, unknown values, missing inputs, nesting and alternate routes.
+Preserve raw RED outputs and use separate directories for GREEN runs. Reuse W8
+baseline evidence only while its assumptions remain valid; mark reused evidence
+explicitly. Whole-corpus counts are telemetry, not a replacement for the oracle.
+
+Discovery records and raw products: workspace `.carddemo-values-control/evidence`.
+VC0 starts from the merged W8 mains; the baseline manifest and runtime are frozen
+in `.carddemo-values-control/baseline.json`.
+
+## VC2/VC3 source expression rule
+
+Source-qualified text facts will carry a closed expression tree rather than
+COBOL function names interpreted downstream. The initial operators are ASCII
+uppercase and SPACE trimming. The frontend selects these operators from typed
+function syntax; unsupported functions remain UNKNOWN. The evaluator preserves
+each input support and modelAssumed confidence and applies receiving fitting
+after expression evaluation. Current date and RETURN-CODE stay runtime unknown.
+
+IBM [TRIM](https://www.ibm.com/docs/en/cobol-zos/6.4.0?topic=functions-trim)
+and [case conversion](https://www.ibm.com/docs/en/cobol-zos/6.4.0?topic=strings-converting-data-items-intrinsic-functions)
+are the language authority. ASCII-only uppercase is an explicitly bounded
+implementation domain; other characters retain an open remainder. This is
+source conditional evidence, not permission to infer physical storage or prune
+a branch based on synthetic declarations. Evaluation walks a finite expression
+tree and transforms finite candidate sets; existing work limits remain explicit.
+
+Adversaries cover nested transforms, all spaces, non-ASCII input, unknown input,
+model assumptions, fitting after TRIM, provenance through reads, and forged
+operators/arity. The pre-change TRIM and UPPER-CASE four-stage probes expose the
+missing new candidate independently of the contract representation.
+
+## VC3 checkpoint — bounded MOVE effects and source expressions
+
+SP 2.58 adds MOVE_TARGETS: known data reads and receiving MAY effects, no MUST,
+exposure proof or known runtime result. Missing receiving bindings retain ALL.
+CURRENT-DATE and RETURN-CODE are runtime input/output, never fabricated names.
+SP 2.59 adds NOMINAL_TEXT_SOURCE_V3 expression trees; qualified-source 1.3 carries
+them unchanged. Dependencies remains 2.7 with the versioned nested certificate.
+V1/V2 leaf wire shapes are unchanged. Typed ports, JSON adapters and independent
+schema checks reject unknown operators, bad arity, foreign reads and downgrades.
+
+TRIM has typed LEADING/TRAILING modifiers in the AST. Previously those valid
+forms produced two parser errors and lost subsequent statements. New witnesses
+require zero parser errors and preserve the following CALL. Uppercase is bounded
+to ASCII; non-ASCII and unsupported functions retain uncertainty. Transforms run
+before receiving fit and preserve transitive supports and modelAssumed. Source
+conditional candidates do not grant executable AIR values or synthetic kills.
+
+Focused frontend tests passed (14: six effects, five receiver sequences, three
+expression tests). Four-stage probes recovered PROGB001 for TRIM, UPPER-CASE,
+and nested transforms. TRIM TRAILING deliberately does not remove a leading
+space; after fitting the witness does not gain PROGB001. Strict independent
+qualified-source 1.3 checks passed all three direction/nesting products.
+
+Validation records: vc3-direction-front-01.log, vc3-expression-probes-02,
+vc3-direction-green. The first lower FAST exposed a future-version oracle using
+2.58 as unsupported; it now tests known 2.58/2.59 and unsupported 2.60. CFG FAST
+exposed the corresponding 1.3 future-version assumption (now 1.4) and a compiled
+public API inventory delta. The refreshed inventory contains the intended Term
+arguments API and no forbidden dependency. Rerun results are recorded separately.
+
+One VC1 overlap adversary used the reserved word SAME and was invalid COBOL. It
+now uses SRC-ALIAS and asserts valid grammar before publication; the corrected
+overlap test passes. This fixes test evidence, not the production overlap rule.
+
+The 73-program VC1 CardDemo replay passed all four stages with no candidate loss,
+no support loss/change and no additions versus W8. This evidence predates VC3;
+final campaign-wide qualification remains pending.
+
+VC3 validation update: frontend FAST passed 662 tests, zero failures/skips
+(vc3-front-fast-02.log). Its first run caught a real dynamic-slice invariant
+regression; MOVE_TARGETS is now restricted to whole receiving references, keeping
+the pre-existing conservative path for indexed/refmodified receivers. The JSON
+writer now uses closed typed transport records, as required by the architecture
+oracle. Existing expected values were preserved. Lower fast focal suites passed
+(vc3-lower-focal-03.log), including new MOVE proof forgery and expression wire
+round trips. CFG architecture FAST passed after refreshing the reviewed compiled
+API inventory (vc3-expression-cfg-fast-03.log). Final full/corpus and pin gates
+remain campaign obligations.
+
+## Source table text — SP 2.60 / qualified source 1.4
+
+NOMINAL_TEXT_SOURCE_V4 adds `tableFields`. Each field has a real storage node
+identity and initializer values linked to real declaration origins. The frontend
+uses typed DISPLAY character extents, fixed OCCURS bounds and proved REDEFINES
+components. Numeric DISPLAY columns participate in offsets; their contents are
+not program names. No physical memory capability is asserted.
+
+This is an index-insensitive summary of each textual field and its overlapping
+textual aliases. Valid constant indices and unknown indices admit the field's
+possible occurrences, with an open remainder. An invalid constant index does not
+publish a query. Every update to a summary is weak; conditions over the summary
+cannot eliminate elements. Copying a table value preserves the predecessor
+snapshot, initializer/assignment supports and index uncertainty. Model VALUEs
+cannot initialize this analysis or grant a kill proof.
+
+Only typed literal group writes are sliced in the producer. Unsupported partial
+writes, ODO, non-DISPLAY geometry and unproved overlays remain unknown. A bounded
+summary can retain obsolete names; it cannot certify an occurrence-specific kill.
+No lower or CFG code reads declaration syntax, member names or statement text.
+
+The wire uses a closed V4 variant; old nominal authorities reject table fields
+and CHOICE terms. Source evidence 1.4 is required, preserving older envelopes and
+requiring full declaration provenance. These facts do not change AIR or CFG.
+
+IBM authorities: [OCCURS](https://www.ibm.com/docs/en/cobol-zos/6.3.0?topic=entry-occurs-clause),
+[subscripting](https://www.ibm.com/docs/en/cobol-zos/6.3.0?topic=table-subscripting),
+[REDEFINES](https://www.ibm.com/docs/en/cobol-zos/6.3.0?topic=entry-redefines-clause).
+
+
+VC2 checkpoint evidence: 73/73 CardDemo programs completed all four stages
+(vc2-carddemo-02). Preservation audit: zero lost candidates, zero support
+losses/changes, 42 new menu candidates across the five indexed occurrences.
+The separate COSGN00C addition in COPAUS0C predates VC2 and is explained by its
+existing literal MOVE at source line 669 becoming visible after bounded MOVE
+effect admission; control topology, storage and nominal facts were unchanged.
+The raw support traces this candidate to the existing AIR value producer.
+
+Ten table probes passed exact candidate and strict source-wire oracles, including
+before/after writes, dead writes, cross-root isolation, nested OCCURS, aliases and
+the uninitialized occurrence. Every result retains valueRemainder. Seven focused
+frontend tests include an alias sharing synthetic model geometry. Five real SPs
+pass lower round trips, identity/version forgeries and byte-equal AIR with source
+facts removed. Four new source evaluator adversaries pass; CFG architecture FAST
+passed 650 tests. Frontend FAST passed 672 tests before the final model-propagation
+adversary; focused tests were rerun afterward. Lower FAST focal suites pass.
+Compiled API inventories were refreshed only for the typed table records/codec.
+Final campaign qualification remains pending, including CICS/ENTRY changes.
+
+
+## VC4 alternate entries — rule and implementation plan
+
+IBM Enterprise COBOL 6.4 [ENTRY](https://www.ibm.com/docs/en/cobol-zos/6.4.0?topic=statements-entry-statement)
+starts an external activation at the next executable statement after the named
+declaration. Sequential execution treats the declaration as neutral. Alternate
+entries are prohibited in nested programs and with PROCEDURE DIVISION RETURNING;
+USING does not supply actual runtime values or an exact parameter contract.
+
+The producer will retain the declaration's typed literal/parameter surface and
+publish each valid alternate root in controlTopology.entryPoints, linked by entry
+identity and proof. Entry inventory owns names/signatures; topology owns starts.
+Unresolved/invalid surfaces retain entry gaps. These are separate external roots,
+not primary-entry successors. Lowering will create one AIR entry per supported
+root, with separate activation IDs and bootstrap/state. PERFORM completion still
+binds to the invoking activation. The source state graph will seed each entry
+independently and identify its root authority; CFG continues to project AIR only.
+
+Independent oracles: a primary GOBACK cannot reach an alternate body; alternate
+activation cannot execute pre-ENTRY statements; sequential flow can cross ENTRY;
+consecutive declarations share the next executable start; USING stays unknown;
+nested/invalid declarations cannot fabricate entries; separate PERFORM callers
+return to their own continuations. New contracts and negative wire tests will
+reject old-version, missing-proof, foreign-entry and metadata/topology conflicts.
+
+VC4 ENTRY checkpoint: SP 2.61 carries typed alternate declarations and proved
+external starts; qualified source 1.5 carries independent alternate root authority.
+Lowering emits distinct activation contexts with their own bootstrap and entry
+state. Sequential ENTRY remains neutral, parameters stay unknown, and explicit
+absence of RETURNING is preserved separately from parameter uncertainty. Known
+unsupported/invalid declarations remain inventoried with gaps; a trailing ENTRY
+without an admitted executable start retains an explicit coverage limitation.
+
+Six frontend tests and eight real-SP lower oracles cover root isolation,
+consecutive declarations, sequential flow, USING, independent values and PERFORM
+returns. Six wire/in-memory forgeries challenge version, entry identity,
+declaration, start and grammar proof. Eight CFG/dependency oracles pass on
+vc4-entry-runtime-03, including a real LINKAGE argument with no proved address.
+The earlier CardDemo replay on runtime-02 passed 73/73 x four stages with zero
+candidate/support losses; the 43 cumulative additions are the already explained
+VC2/VC3 additions. The final unbound-LINKAGE fix and all future CICS changes still
+require the final campaign replay. No merge is authorized.
+
+## VC4 condition dispatch — rule and bounded design
+
+IBM CICS HANDLE CONDITION establishes a runtime registration, distinct from
+lexical Db2 WHENEVER and from HANDLE ABEND. A subsequent registration replaces
+only its condition. An omitted label requests the system default and suppresses
+ERROR fallback for that condition. IGNORE requests continuation. RESP/NOHANDLE
+suppress handlers for that command; a LINK callee does not inherit registrations.
+The selected label branches in the current COBOL activation and keeps the
+registration active; it does not manufacture a PERFORM return or deactivate like
+an ABEND handler. PGMIDERR on LINK/XCTL has default task-abend disposition.
+
+The producer publishes typed registration updates and condition events with
+resolved topology targets, condition continuation and grammar/resolution proofs.
+SP 2.62 and qualified source 1.6 carry these new facts. The existing finite
+state tabulation will track reaching definitions for event-relevant conditions
+plus ERROR, preserving each registration origin. Replacement is a positive kill
+of that registration only. Unknown external calls open the current definitions,
+retaining their possible targets. The initial state remains unknown.
+
+This capability admits PGMIDERR events on structurally supported LINK/XCTL and
+HANDLE/IGNORE registrations. Other condition event families and PUSH/POP HANDLE
+stacks remain explicit gaps, with no invented stack restoration. Only PGMIDERR
+and ERROR state components are demanded, so the finite product has at most
+O((P+1)(E+1)(A+1)) support states before bounded context tabulation, where P/E/A
+are distinct specific/general/ABEND registrations. No runtime path enumeration.
+
+Independent oracles must challenge registration without event, dead registration,
+replacement, omitted label, ERROR fallback, IGNORE, RESP/NOHANDLE, two event
+occurrences, PERFORM continuation, ordinary label reachability, ABEND coexistence
+and unknown external calls. Positive branch selection remains a possibility;
+no test may pretend a PGMIDERR necessarily occurs.
+
+Authorities: [HANDLE CONDITION](https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-handle-condition),
+[IBM CICS command reference](https://publibfp.boulder.ibm.com/epubs/pdf/dfhp400.pdf),
+[CICS Primer](https://www.ibm.com/docs/SSJL4D_6.x/pdf/cics-primer.pdf).
+
+LINK ordinary completion is independent of handler disposition: a successful
+LINK can return even when PGMIDERR would branch or abend. The producer publishes
+that normal route for the same bounded command surface as the condition event.
+Lowering consumes the route and retains partial target/signature/effect facts.
+An event-only test exposed that retaining the old handler-unknown cut would
+otherwise publish the exceptional path while losing the successful return.
+
+Adversarial boundary: an unmodeled POP HANDLE can restore an earlier condition
+registration. Treating the latest known registration as a proved kill after that
+boundary is invalid. The producer therefore publishes only CONTROL_POSSIBILITY
+relations from eligible events to locally resolved condition labels and the error
+continuation, conditional on a reachable POP HANDLE occurrence. The ordinary
+source hypothesis opens the current condition state. This deliberately does not
+model a stack or add AIR/CFG edges; candidates remain possible with their source
+assumptions. Dead POP and RESP/NOHANDLE must not activate these relations. The
+finite publication is O(events × POP occurrences × local condition targets).
+
+Consumer contract: qualified source 1.6 retains the condition registration
+identity, uncertainty and grammar provenance on each state support. No CFG
+construction rule changes. Old versions, forged registration identities, absent
+proofs and non-boolean uncertainty are rejected. Exact source oracles cover
+ordinary/error coexistence, unknown calls and unsupported restoration.
+
+## Review qualification — 2026-09-28
+
+VC1–VC4 are implemented and qualified in separate worktrees with progressive
+commits. Review/integration remains IN_PROGRESS; this campaign has no merge
+permission. Point 5 (sharing routine bodies) remains a separate campaign.
+
+### Causes and delivered behavior
+
+| Family | Cause | Change |
+| --- | --- | --- |
+| MOVE receivers | Logical transfer admission and alias updates did not compose the receiver sequence | Typed per-receiver facts, captured sender and ordered coherent alias updates |
+| Indexed targets | Source values did not represent table fields or declaration slices | Producer-owned fixed table geometry, index-insensitive text unions and weak table/alias writes |
+| Functions/registers | Unsupported sender forms opened excessive memory/control uncertainty | Receiver-bounded MAY effects; typed UPPER-CASE/TRIM source expressions; runtime registers stay unknown |
+| External control/entries | SQL directives/dynamic forms, alternate roots and condition state were absent or conflated with ordinary completion | Lexical WHENEVER, dynamic SQL continuation, isolated ENTRY roots, runtime PGMIDERR/ERROR dispatch and independent LINK success |
+
+### Executed qualification
+
+- 560/560 sources completed SP → AIR → CFG → dependencies: 331 frontend
+  fixtures, all 73 CardDemo programs, PERFORM 39, Chaos 48, aliases 14,
+  PERFORM adversaries 25 and CICS 30.
+- Existing exact semantic oracles: PERFORM 39/39, Chaos 48/48 and 28 rejected
+  negative mutations, aliases 14/14, PERFORM adversaries 25/25.
+- Preservation comparison across all 560: **zero candidate losses and zero
+  support/provenance losses**. 43 additions: 42 menu candidates at five indexed
+  occurrences, plus COSGN00C in COPAUS0C from its existing literal MOVE becoming
+  visible after bounded MOVE effect admission. No name-table injection.
+- Final runtime focal oracles: 20 condition dispatch, eight entry isolation,
+  ten table and seven SQL, 14 MOVE/function/register, and three unknown-stack
+  restoration cases. Java gates also reject forged versions, identities,
+  proofs and bypass facts. Four physical table adversaries from VC2 are reused:
+  later changes affect entry/CICS control, absent from those sources.
+- Frontend FAST passed; final qualification-local passed 1,257 Maven tests,
+  source-normalizer full regression and naming. One future semantic-condition
+  oracle is guarded by the pre-existing absent system property
+  semantic.condition.required (1,258 discovered, one skipped).
+- Lower mandatory FAST passed: 2,481 core checks, fixed adapter families,
+  architecture and harness checks.
+- CFG FAST components passed 653 required methods (zero skipped), architecture,
+  strict transport readers and remaining Python gates. The wrapper found
+  an obsolete future-version test using 1.3; it now explicitly accepts 1.3–1.6
+  and rejects incompatible downgrades and future 1.7. That reader and every
+  remaining gate were rerun successfully. Exact-head remote FAST is reported
+  in the PR; an unexecuted local full gate is not reported as passed.
+
+The compiled architecture inventories changed only for the new ConditionState
+record, Support constructor/getter and their references. A read-only diff was
+reviewed before the official refresh. No denied dependency, existing class or
+semantic oracle was removed. Historical capability tests now require the new
+entry/event facts; their primary-flow and PARTIAL assertions remain.
+
+### Graphs and evidence reuse
+
+All 73 graphs were traversed by published identities. Total unreachable nodes
+remain 27,661 and zero-incoming non-entry nodes remain seven; no program gained
+either category. The five changed graphs add 512 reachable nodes and 1,429
+transitions. COACTUPC remains 5,037/5,037 reachable with one component; its UniKix
+variant remains 4,968/4,968. These observations do not claim that every unreachable
+context is erroneous or that point 5 has been implemented.
+
+Raw evidence stays in workspace .carddemo-values-control/evidence: vc-final-01,
+vc-final-02, vc-final-qualification, vc-final-probes, vc-final-other-probes and
+the gate logs. The checked-in qualification JSON records exact production
+checkpoints, source-tree hash and report hashes.
+The corpus used frozen runtime 05. Runtime 06 changes only one compiled producer
+class, adding resolution provenance to unknown-restoration hypotheses. None of
+the 560 products contains that rule, so their evidence is reused for this final
+delta; all restoration adversaries were rerun on runtime 06. Previous W8 products
+are retained only as the historical comparison baseline.
+
+Full lower/CFG qualification wrappers were not run: fixed FAST, admission/wire
+adversaries, source-value laws and the complete 560-case cross-repo corpus cover
+the changed boundary. Frontend full was run because shared grammar/AST ownership
+changed. AIR, CFG construction, UI and ALTER semantics are unchanged.
+
+### Remaining bounds
+
+- Same-family MOVE overlap without language proof and unsupported conversions
+  remain open. Functions add ASCII UPPER-CASE and TRIM; arbitrary functions and
+  runtime registers do not acquire invented values or MUST kills.
+- Tables summarize fixed OCCURS and supported DISPLAY text geometry. Dynamic
+  bounds, arbitrary physical overlays and exact per-index dataflow remain open.
+- Alternate entry parameters/linkage state remain partial; invalid/trailing roots
+  do not acquire invented executable starts.
+- SQL runtime text is not parsed into dependencies; procedure-level WHENEVER
+  scope is supported, with missing targets and external effects kept explicit.
+- PGMIDERR on LINK/XCTL and ERROR fallback are admitted. Other CICS event families
+  and exact PUSH/POP stack execution remain outside this capability. Unknown
+  restoration preserves source candidates with assumptions, never fake AIR edges.
+
+## Review corrections — causal restoration and condition names (IN_PROGRESS)
+
+The review witnesses reproduce seven incorrect restored-handler candidates and
+three losses of table candidates on the reviewed heads. All fifteen probes parse
+without errors and complete all four stages; five controls already pass.
+
+IBM HANDLE CONDITION replaces the previous disposition for the same condition;
+POP can influence only subsequent execution in the same activation. We
+keep the existing source-only hypothesis catalogue and carry its eligibility
+forward as finite reaching facts inside the existing contextual state engine.
+The POP completion introduces a fact. A proved later specific disposition kills
+all hypotheses for that event condition; an ERROR update kills only restored
+ERROR targets, preserving possible specific dispositions. Joins keep alternatives,
+PERFORM passes facts through matched calls/returns, and alternate entries start
+independently. No exact stack or executable edge is introduced.
+
+The internal reaching facts identify existing published continuations. They are
+not a new source wire capability: the published derivation graph retains the
+causal path and CONTROL_POSSIBILITY proof. Their inclusion in context/state keys
+prevents merging different restoration histories. The finite domain has at most
+one bit per eligible published restoration relation; ordinary products have none.
+No change to ALTER or its separate prerequisite logic is authorized.
+
+Level 88 declares condition names without storage. The table geometry traversal
+and field inventory must both ignore these annotations, including when they are
+children of a sibling field. No 88 VALUE is an initializer of another declaration.
+IBM authority: [special level-numbers](https://www.ibm.com/docs/en/cobol-zos/6.3.0?topic=relationships-special-level-numbers) and [condition-name VALUE](https://www.ibm.com/docs/en/cobol-zos/6.3?topic=vc-format-2).
+Existing bounded table geometry, weak updates and modelAssumed remain unchanged.
+
+New oracles: post-POP LABEL/IGNORE/DEFAULT and ERROR replacement, later POP,
+independent ENTRY, PERFORM kill and positive return, backward GO TO and branch
+join positives; direct/sibling 88 and weak writes. Existing restoration positives
+and wire/reachability oracles remain mandatory. FAST on affected repos plus the
+73-program CardDemo replay and neighboring PERFORM/Chaos/alias suites will check
+regressions; all deltas must be traced before updating the Drafts.
+
+Authority: [IBM HANDLE CONDITION](https://www.ibm.com/docs/en/cics-ts/5.6.0?topic=conditions-using-handle-condition-command)
+and [PUSH/POP HANDLE](https://www.ibm.com/docs/en/cics-ts/5.5.0?topic=conditions-using-push-handle-pop-handle-commands).
+
+### Corrections implemented and requalified — 2026-09-28
+
+Both review counterexamples were confirmed before editing production code. The
+first 15 probes had seven invalid restored-handler candidates, three lost table
+candidate sets and five passing controls. Three further positive independence
+cases were added after that RED run. No existing oracle was reduced.
+
+- **Restoration:** lower carries eligibility for existing typed source hypotheses
+  along contextual control paths. A completed prerequisite introduces the fact;
+  a proved later registration removes the affected possibilities. LABEL, IGNORE
+  and DEFAULT replace the specific condition. Replacing ERROR preserves an
+  independent specific handler, including a shared label. An unrelated condition
+  does not kill it. Separate ENTRY roots and matched PERFORM returns retain their
+  own reaching states. FIFO/LIFO scheduling yields identical facts.
+- **Level 88:** frontend excludes condition names from storage members, shape,
+  placement and elementary-field classification. Their VALUE clauses never seed
+  table storage. Direct OCCURS, sibling offsets and weak indexed writes preserve
+  the known target values. The shared AST/storage inventory is unchanged.
+- **Boundaries:** no source or SP wire version changed; causal derivations and
+  CONTROL_POSSIBILITY proofs remain published. No new executable AIR/CFG edges,
+  exact stack, ALTER semantics or point-5 representation work was introduced.
+
+New validation: 18/18 exact candidate oracles under unspecified logical storage
+and 18/18 under the IBM physical profile, plus the three existing restoration
+cases. Lower versions 13 restoration SP/source pairs with exact AIR/source,
+schedule-invariance and codec checks, and five table SP/source pairs. Frontend
+adds two contrast tests, including a differing 88 VALUE that must not contaminate
+initializers. Existing focal oracles pass again: CICS 20, ENTRY 8, table/SQL 17,
+MOVE/functions/registers 14. Strict source-wire validation passes.
+
+All **560 four-stage pipelines were reexecuted**, including every one of the 73
+CardDemo programs. Compared with the reviewed heads: **zero candidate additions,
+zero candidate losses, zero support/provenance losses**. PERFORM 39/39, Chaos
+48/48 plus 28 rejected oracle mutations, aliases 14/14 and PERFORM adversaries
+25/25 pass. The cumulative W8 result remains 43 explained additions: 42 bounded
+table-summary menu candidates and COSGN00C from an existing MOVE. These are MAY
+candidates, not proof of runtime index feasibility.
+
+The only corpus product deltas are COCRDLIC and its migrated copy. Removing the
+88 obstruction restores four field summaries in their enclosing storage group:
+WS-ALL-ROWS, WS-ROW-ACCTNO, WS-ROW-CARD-NUM and WS-ROW-CARD-STATUS, plus their
+known reads/writes. They have no literal initializers. SP, source facts and the
+embedded source evidence change; dependency candidates and supports do not.
+All 560 AIR and CFG products are byte-identical to the reviewed-head baseline;
+the other 558 SP/source/dependencies products are also byte-identical.
+
+Local FAST passes in all three repositories: frontend 686 tests with no skips;
+lower 2,481 core checks plus its adapter/architecture/harness families; CFG 653
+Java methods plus architecture, wire and Python gates. Full qualification wrappers
+were not rerun for these localized corrections: new RED/GREEN counterexamples,
+required FAST, existing focal oracles and the complete corpus exercise the changed
+boundaries. The earlier frontend full run remains historical evidence only.
+
+The first fixture batch ended with exit 143 after 195 completed cases; these
+results were preserved. All 166 remaining cases completed in a fresh directory,
+whose wrapper also exited 143 after recording the results. All 560 distinct cases
+and their four successful stages were verified, and runtime artifact hashes were
+checked again explicitly. The frozen runtime uses AIR 59df1f7; the locks use d760b07. Their
+complete air-model and air-json Git trees are identical; only an AIR documentation
+file differs. FAST builds the locked revision. The equivalence record, exact
+production source hash, product comparisons and evidence hashes are in
+[qualification JSON](carddemo-values-control-qualification.json). Raw evidence
+is under workspace `.carddemo-values-control/evidence/review-*`.
+
+Drafts remain pending human review; no merge or auto-merge. Review frontend #75 →
+lower #50 → analysis-cfg #55. The consumer locks identify exact review commits.

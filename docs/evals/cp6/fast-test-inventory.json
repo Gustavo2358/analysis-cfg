@@ -221,7 +221,10 @@
       "producerRoundtripAndCandidateOccurrenceSelectionCorrelation",
       "ordinaryAndConditionalAlternativesKeepGuardsSeparate",
       "inactiveDeactivatedAndComputedRemainBounded",
-      "versionsIdentitiesAndReferencesAreClosed"
+      "versionsIdentitiesAndReferencesAreClosed",
+      "alternateRootsRequireVersionAndGrammarProof",
+      "conditionStateRequiresVersionRegistrationProofAndIdentity",
+      "unmodeledConditionRestorationCannotProvePriorRegistrationDead"
     ],
     "io.github.gustavo2358.analysis.adapters.QueryLocalProviderTest": [
       "unrelatedRegionsCannotChangeScalarProviderCandidateOrSupports",
@@ -280,17 +283,27 @@
       "existingRejectionsAndLiteralPaddingRemainOpen"
     ],
     "io.github.gustavo2358.analysis.dependencies.SourceValuesProviderTest": [
-      "overwriteDoesNotRetainOldSeed",
-      "copyCapturesSnapshot",
       "branchExcludesKnownNameWithOpenStoragePremises",
-      "retainedNameCarriesCopySeedAndMissingInput",
+      "choiceKeepsEveryAlternativeAndRejectsOldAuthority",
+      "copyCapturesSnapshot",
       "lowValuesCannotMatchATextWithDifferentCharacters",
-      "unknownCollatingCharacterAndUnicodeRemainExplicit",
-      "modelValuesAreNotSeeds",
-      "unknownModelCopyCannotKillAnObservedName",
-      "modelWidthAndUnknownOverwriteCannotEraseSourceText",
+      "malformedExpressionOperatorsArityAndReferencesAreRejected",
       "modelInfluenceSurvivesACopyAndCannotFilterEitherBranch",
-      "ordinaryKnownWriteAfterModelCopyStillProvesKill"
+      "modelInfluenceSurvivesTextTransforms",
+      "modelTableInitializerNeverBecomesRuntimeEvidence",
+      "modelValuesAreNotSeeds",
+      "modelWidthAndUnknownOverwriteCannotEraseSourceText",
+      "nestedTextTransformsRunBeforeReceivingFit",
+      "nonAsciiDoesNotUseTheJvmLocaleAsACobolCaseTable",
+      "ordinaryKnownWriteAfterModelCopyStillProvesKill",
+      "overwriteDoesNotRetainOldSeed",
+      "retainedNameCarriesCopySeedAndMissingInput",
+      "tableWriteCannotKillOtherOccurrencesOrLoseInitializerSupports",
+      "textTransformReadsRetainTheirDeclarationAndAssignmentSupports",
+      "trimOnlyRemovesTheSpaceCharacter",
+      "unknownCollatingCharacterAndUnicodeRemainExplicit",
+      "unknownModelCopyCannotKillAnObservedName",
+      "unknownTableWriteAndPredicateRetainPossibleElements"
     ]
   },
   "analysis-kernel": {

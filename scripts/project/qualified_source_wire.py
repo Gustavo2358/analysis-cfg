@@ -34,6 +34,7 @@ def shape(value, spec, version="1.0.0"):
         require(set(spec.get('required', spec['properties'])) <= set(value) <= set(spec['properties']), 'closed source fields')
         for name, item in value.items(): shape(item, spec['properties'][name],version)
     elif kind=='array':
+        require(spec.get('minItems',0)<=len(value)<=spec.get('maxItems',len(value)), 'source array cardinality')
         for item in value: shape(item, spec['items'],version)
     elif kind=='string':
         require(not any(0xD800<=ord(c)<=0xDFFF for c in value), 'Unicode scalar')
@@ -52,7 +53,7 @@ def refs(values, inventory):
 
 
 def validate(evidence):
-    require(evidence.get('version') in ('1.0.0','1.1.0','1.2.0'), 'source version')
+    require(evidence.get('version') in ('1.0.0','1.1.0','1.2.0','1.3.0','1.4.0','1.5.0','1.6.0'), 'source version')
     shape(evidence, {'$ref':'#/$defs/QualifiedSourceDependencies'},evidence['version'])
     require(len(evidence['air'])<=1 and all(re.fullmatch('[0-9a-f]{64}', d['sha256']) for d in [evidence['source']]+evidence['air']), 'digest')
     require(evidence['source']['schema'] in ('cobol-semantic-product','cobol-semantic-compilation'), 'source schema')
@@ -63,7 +64,7 @@ def validate(evidence):
         for s in u['statements']: require(s['id']['unit']==unit and bool(s['id']['handle']), 'statement identity')
         for p in u['proofs']:
             refs(p['dependencies'],ps)
-            require(p['kind'] in {'LOCAL_GRAMMAR','RESOLVED_TARGET','EXPANDED_INCLUDE','INPUT_REGION_ISOLATION','PARTIAL_UNKNOWN'} | ({'CONTROL_POSSIBILITY'} if evidence['version'] in ('1.1.0','1.2.0') else set()), 'proof kind/version')
+            require(p['kind'] in {'LOCAL_GRAMMAR','RESOLVED_TARGET','EXPANDED_INCLUDE','INPUT_REGION_ISOLATION','PARTIAL_UNKNOWN'} | ({'CONTROL_POSSIBILITY'} if evidence['version'] in ('1.1.0','1.2.0','1.3.0','1.4.0','1.5.0','1.6.0') else set()), 'proof kind/version')
         pending_proofs=list(u['proofs']); grounded_proofs=set()
         while pending_proofs:
             ready=[p for p in pending_proofs if set(p['dependencies'])<=grounded_proofs]
@@ -75,8 +76,15 @@ def validate(evidence):
             for r in t['registrations']: refs([r['statement']],ss); require(r['statementOrigin']==ss[key(r['statement'])]['provenance'], 'registration origin')
         def support(s):
             causes={'NONE','RESET_HISTORY_UNAVAILABLE','RESET_WITHOUT_CANCELED_EVIDENCE','CALL_EFFECT_UNAVAILABLE','HANDLER_OPERATION_UNAVAILABLE'}
-            if evidence['version']=='1.2.0':causes.add('SOURCE_REENTRY_UNDEFINED')
+            if evidence['version'] in ('1.2.0','1.3.0','1.4.0','1.5.0','1.6.0'):causes.add('SOURCE_REENTRY_UNDEFINED')
             require(s['cause'] in causes and (s['kind']=='UNKNOWN') == (s['cause']!='NONE'),'support cause/version')
+            conditions=s.get('conditions',[])
+            require(not conditions or evidence['version']=='1.6.0','condition state version')
+            require(len({c['condition'] for c in conditions})==len(conditions),'condition state keys')
+            for c in conditions:
+                refs([c['registration']],ss);refs(c['proofs'],ps)
+                require(c['condition'] in ('PGMIDERR','ERROR') and type(c['uncertain']) is bool,'condition state domain')
+                require(any(ps[key(p)]['kind']=='LOCAL_GRAMMAR' and ps[key(p)]['rule']=='cics-condition-registration' and ps[key(p)]['provenance']==ss[key(c['registration'])]['provenance'] for p in c['proofs']),'condition registration proof')
             refs(s['target'],ts);refs(s['activation'],ss)
             require(len(s['target'])==len(s['activation'])<=1, 'state target/activation')
             require((s['kind'] in ('ACTIVE','CANCELED','DEACTIVATED'))==bool(s['target']), 'state target')
@@ -84,7 +92,7 @@ def validate(evidence):
         for n in u['nodes']: support(n['support'])
         for e in u['events']:
             refs([e['statement']],ss);refs(e['proofs'],ps);refs(e['guards'],gs)
-            require(e['origin'] in ('EXPLICIT_ABEND','XCTL_PGMIDERR'), 'event origin')
+            require(e['origin'] in ({'EXPLICIT_ABEND','XCTL_PGMIDERR','LINK_PGMIDERR'} if evidence['version']=='1.6.0' else {'EXPLICIT_ABEND','XCTL_PGMIDERR'}), 'event origin')
             kinds=[gs[key(g)]['kind'] for g in e['guards']]
             require(all(gs[key(g)]['event']==e['id'] for g in e['guards']), 'guard owner')
             require(kinds==([] if e['origin']=='EXPLICIT_ABEND' else ['CONDITION_RAISED','DEFAULT_DISPOSITION_APPLIES']), 'event guards')
@@ -104,7 +112,11 @@ def validate(evidence):
             if d['selection']:
                 require(len(d['selection'])==1, 'selection alternatives');s=sels[key(d['selection'][0])]
                 require(d['source']==[s['source']] and d['destination'] in s['localEntry'] and d['proofs']==s['proofs'] and not d['callerPremise'], 'selection derivation')
-            if not d['source']: require(d['authority']=='PRIMARY_ENTRY' and not d['selection'] and not d['callerPremise'], 'root authority')
+            if not d['source']: require(d['authority'] in ({'PRIMARY_ENTRY','ALTERNATE_ENTRY'} if evidence['version'] in ('1.5.0','1.6.0') else {'PRIMARY_ENTRY'}) and not d['selection'] and not d['callerPremise'], 'root authority')
+            if not d['source'] and d['authority']=='ALTERNATE_ENTRY':
+                require(any(ps[key(p)]['kind']=='LOCAL_GRAMMAR' and ps[key(p)]['rule']=='alternate-entry-start' for p in d['proofs']), 'alternate entry proof')
+                require(ns[key(d['destination'])]['context'].startswith('ENTRY/'), 'alternate entry context')
+
         while pending:
             ready=[d for d in pending if set(d['source']+d['callerPremise'])<=reached]
             if not ready: break
@@ -136,6 +148,11 @@ def nominal(unit):
     require(set(symbols)==set(declarations), 'nominal declaration provenance')
     statements={s['id']['handle']:s for s in unit['statements']}
     def term(t):
+        if t.get('arguments'):
+            require(facts['authority'] in ('NOMINAL_TEXT_SOURCE_V3','NOMINAL_TEXT_SOURCE_V4'), 'source expression authority')
+            require(len(t['arguments'])>=2 if t['kind']=='CHOICE' else len(t['arguments'])==1, 'source expression arity')
+            require(t['kind']!='CHOICE' or facts['authority']=='NOMINAL_TEXT_SOURCE_V4','choice authority')
+            for argument in t['arguments']:term(argument)
         if t['kind']=='READ': require(key(t['value']) in symbols, 'nominal read reference')
         elif t['kind']!='LITERAL': require(t['value']=='', 'nonliteral payload')
     def predicate(p):
@@ -143,6 +160,10 @@ def nominal(unit):
         require((kind=='EQ' and len(terms)==2 and not children) or (kind=='NOT' and not terms and len(children)==1) or (kind in ('AND','OR') and not terms and len(children)>=2), 'nominal predicate shape')
         for t in terms: term(t)
         for child in children: predicate(child)
+    index(facts.get('tableFields',[]),'node')
+    for field in facts.get('tableFields',[]):
+        require(key(field['node']) in symbols,'table field owner')
+        for seed in field['initial']: require(key(seed['origin']) in symbols,'table initializer origin')
     seen=set()
     for a in facts['assignments']:
         ident=(a['statement'],a['target']);require(ident not in seen, 'duplicate nominal write');seen.add(ident)

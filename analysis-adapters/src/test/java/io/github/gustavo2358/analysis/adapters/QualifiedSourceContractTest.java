@@ -55,7 +55,7 @@ class QualifiedSourceContractTest {
         }
     }
     @Test void versionsIdentitiesAndReferencesAreClosed()throws Exception {
-        for(var version:List.of("0.9.0","1.3.0","2.0.0")){var w=wire("conditional");w.put("version",version);reject(w);}
+        for(var version:List.of("0.9.0","1.7.0","2.0.0")){var w=wire("conditional");w.put("version",version);reject(w);}
         var standalone=wire("conditional");standalone.putArray("air");
         var detached=codec.decode(json.writeValueAsBytes(standalone));assertFalse(SourceQualifiedDependencyResult.admit(detached).occurrences().isEmpty());
         assertThrows(IllegalArgumentException.class,()->SourceQualifiedDependencyResult.admit(detached,"uncorrelated-air"));
@@ -155,4 +155,42 @@ class QualifiedSourceContractTest {
         }
     }
 
+    @Test void alternateRootsRequireVersionAndGrammarProof()throws Exception {
+        var w=wire("alternate-entry");var evidence=codec.decode(json.writeValueAsBytes(w));
+        assertEquals("1.5.0",evidence.version());assertEquals(evidence,codec.decode(codec.encode(evidence)));
+        var roots=evidence.units().getFirst().derivations().stream().filter(d->d.source().isEmpty()).toList();
+        assertEquals(Set.of("PRIMARY_ENTRY","ALTERNATE_ENTRY"),roots.stream().map(QualifiedSourceDependencies.Derivation::authority).collect(java.util.stream.Collectors.toSet()));
+        var old=w.deepCopy();old.put("version","1.4.0");reject(old);
+        var forged=w.deepCopy();
+        for(var d:unit(forged).path("derivations"))if(d.path("authority").asText().equals("ALTERNATE_ENTRY"))((ObjectNode)d).putArray("proofs");
+        reject(forged);
+    }
+    @Test void conditionStateRequiresVersionRegistrationProofAndIdentity()throws Exception {
+        for(var name:List.of("condition-link","condition-unknown-two")) {
+            var w=wire(name);var q=codec.decode(json.writeValueAsBytes(w));assertEquals("1.6.0",q.version());assertEquals(q,codec.decode(codec.encode(q)));
+            var result=SourceQualifiedDependencyResult.admit(q);var names=result.occurrences().stream().flatMap(o->o.candidates().stream()).map(SourceQualifiedDependencyResult.Candidate::referenceName).collect(java.util.stream.Collectors.toSet());
+            assertEquals(name.equals("condition-link")?Set.of("TARGET","AFTER","HANDLER"):Set.of("TARGET","HANDLER","GENERAL","FOREIGN"),names);
+            for(var mutation:List.of("old","condition","registration","proof","uncertain")) {
+                var copy=w.deepCopy();ObjectNode state=null;
+                for(var n:unit(copy).path("nodes"))if(!n.path("support").path("conditions").isEmpty()){state=(ObjectNode)n.path("support").path("conditions").get(0);break;}
+                assertNotNull(state);
+                switch(mutation) {
+                    case "old" -> copy.put("version","1.5.0");
+                    case "condition" -> state.put("condition","NOT_A_CONDITION");
+                    case "registration" -> ((ObjectNode)state.path("registration")).put("handle","foreign");
+                    case "proof" -> state.putArray("proofs");
+                    case "uncertain" -> state.put("uncertain","false");
+                }
+                reject(copy);
+            }
+        }
+    }
+    @Test void unmodeledConditionRestorationCannotProvePriorRegistrationDead()throws Exception {
+        var expected=Map.of("condition-stack-open",Set.of("AFTER","HANDLER","NEWHAND","TARGET"),"condition-stack-dead",Set.of("HANDLER","TARGET"),"condition-stack-bypass",Set.of("AFTER","TARGET"));
+        for(var entry:expected.entrySet()) {
+            var q=read(entry.getKey());assertEquals(q,codec.decode(codec.encode(q)));var result=SourceQualifiedDependencyResult.admit(q);
+            var names=result.occurrences().stream().flatMap(o->o.candidates().stream()).map(SourceQualifiedDependencyResult.Candidate::referenceName).collect(java.util.stream.Collectors.toSet());assertEquals(entry.getValue(),names);
+            if(entry.getKey().equals("condition-stack-open"))assertTrue(result.occurrences().stream().filter(o->!o.candidates().isEmpty()).allMatch(o->o.status()==SourceQualifiedDependencyResult.Status.POSSIBLE_UNDER_UNKNOWN_CONTROL));
+        }
+    }
 }

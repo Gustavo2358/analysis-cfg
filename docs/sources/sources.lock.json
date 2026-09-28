@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "observed_on": "2026-09-26",
+  "observed_on": "2026-09-28",
   "analysis_ir": {
     "repository": "Gustavo2358/analysis-ir",
     "commit": "2c7f31f19efbe3211a2aea5bbda90173a9666fe2",
@@ -282,11 +282,20 @@
       "src/test/java/io/github/gustavo2358/cobolexplorer/FileCompositeTopologyTest.java",
       "docs/work/carddemo-control-w1.md",
       "docs/work/carddemo-control-w6.md",
-      "docs/work/carddemo-control-w7.md"
+      "docs/work/carddemo-control-w7.md",
+      "docs/work/carddemo-values-control.md",
+      "src/main/java/io/github/gustavo2358/cobolexplorer/LogicalMoveSemantics.java",
+      "src/main/java/io/github/gustavo2358/cobolexplorer/NominalValueSemantics.java",
+      "src/main/java/io/github/gustavo2358/cobolexplorer/AlternateEntrySemantics.java",
+      "src/main/java/io/github/gustavo2358/cobolexplorer/SqlCommandSyntax.java",
+      "src/main/java/io/github/gustavo2358/cobolexplorer/SqlWheneverSemantics.java",
+      "src/main/java/io/github/gustavo2358/cobolexplorer/CicsConditionSyntax.java",
+      "src/main/java/io/github/gustavo2358/cobolexplorer/ControlTopologySemantics.java",
+      "src/main/java/io/github/gustavo2358/cobolexplorer/TableTextSemantics.java"
     ],
-    "semantic_product_version": "2.57.0",
+    "semantic_product_version": "2.62.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "2a6cd9a43b26c04fada1f3f1cd4c8ccf01bc6b3d",
+    "commit": "4c00dea2a6bad1ba21076e55681f6038b80f8a47",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -307,7 +316,7 @@
     "fd_w4_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED producers, manual outcomes/USE and 28 real CLI sources twice; file-dependencies/w4-implementation.md",
     "fd_w5_validation": "QUALIFIED_LOCAL: focal/FAST, producer Q-SHARED with bounded final reuse, manual local AIR/wire and44 real CLI sources twice; file-dependencies/w5-implementation.md",
     "fd_w6_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED,19 B-SP fixtures,15 manual AIR tests and33 real CLI sources twice; file-dependencies/w6-implementation.md",
-    "status": "MERGED / DONE for the qualified CardDemo W0-W8 scope; coverage remains PARTIAL. Current authority is this exact main commit; docs/work/carddemo-control-integration.md.",
+    "status": "DONE / MERGED; coverage remains PARTIAL",
     "fd_w8_validation": "QUALIFIED_LOCAL: producer FAST/Q-SHARED, B-SP33, CFG FAST502/Q547, manual/wire and38CICS+33native source cases twice; docs/product/file-dependencies/w8-implementation.md",
     "fd_w9_validation": "QUALIFIED_LOCAL: producer focal/FAST/Q, consumer manual/FAST/reader, 8 scope + 33 native + 38 CICS real CLI sources twice, deterministic four products; docs/product/file-dependencies/w9-implementation.md",
     "logical_text_w1": "Source E2E A-D twice deterministic; scale 10/100/1000; no physical profile. Corporate rerun not required by revised user acceptance.",
@@ -317,15 +326,15 @@
     "dependency_preservation": "W3-R1 local complete logical TEXT view identity in SP 2.35/storage 1.11, including record/child and standalone roots; physical gaps remain coverage.",
     "perform_completion": "Scoped exits, SECTION boundaries, typed VARYING levels; Integration authorized; qualified original 39/39 and adversaries 25/25. See docs/domain/perform-control-completion.md.",
     "synthetic_model_assumptions": {
-      "contract": "SP2.50 / NOMINAL_TEXT_SOURCE_V2; MODEL_STORAGE remains unavailable",
-      "qualification": "docs/work/cics-control-qualification.md"
+      "contract": "SP 2.62 / NOMINAL_TEXT_SOURCE_V4; modelAssumed remains unavailable as physical storage, runtime VALUE or kill proof",
+      "qualification": "docs/work/carddemo-values-control.md"
     },
-    "evidence_level": "Merged main after CardDemo W0-W8 qualification and documentary closeout. SP 2.57 / source evidence 1.2; 560 qualified cases, 73 CardDemo, zero candidate/support loss and 22 focal adversaries. Integration preserves production/test/contract content; docs/work/carddemo-control-integration.md records merged PRs, evidence reuse and remaining limits."
+    "evidence_level": "Merged CardDemo values/control and review corrections. SP 2.62 / qualified source 1.6. Upstream pin is the actual merged main including documentation closure; production/tests/contracts are equivalent to the qualified review head. Qualification: 560 pipelines including CardDemo 73, PERFORM 39, Chaos 48, aliases 14, PERFORM adversaries 25; 18 new oracles in logical and IBM profiles. Zero candidate/support/provenance loss. Point 5 remains separate. See docs/work/carddemo-values-control.md."
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
-    "status": "MERGED / DONE for the qualified CardDemo W0-W8 scope; coverage remains PARTIAL. Current authority is this exact main commit; docs/work/carddemo-control-integration.md.",
-    "commit": "6ce7d13bff4b048112c49f205281f3bf56c2858a",
+    "status": "DONE / MERGED; coverage remains PARTIAL",
+    "commit": "c98ff4821fdbd89a472792f02f11aa00d5b3583d",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -355,13 +364,13 @@
     "dependency_preservation": "W3-R1 positive logical Cell projection for complete record/child and standalone TEXT views; FILE effects retain published strength.",
     "qualified_source_dependencies": {
       "schema": "qualified-source-dependencies",
-      "version": "1.2.0",
+      "version": "1.6.0",
       "producer_api": "io.github.gustavo2358.lower.application.QualifiedSourceProjection",
-      "source_state_checkpoint": "090296d51a5eb33ac5c337c45ee62de8fd27c296",
-      "approved_sp_producer": "cef8e728857467a283f77d9b6b1f2f870eda57d5",
-      "schema_sha256": "0c474808c68e07a45496c70794bd7096bf1d00f7d5c083dc54cc1b565d5b1341",
-      "review": 34,
-      "checkpoint_note": "source_state_checkpoint, approved_sp_producer and review are historical qualification metadata. The top-level commit is the current merged main authority for source evidence 1.2; see docs/work/carddemo-control-integration.md."
+      "source_state_checkpoint": "c98ff4821fdbd89a472792f02f11aa00d5b3583d",
+      "approved_sp_producer": "4c00dea2a6bad1ba21076e55681f6038b80f8a47",
+      "schema_sha256": "e17edf598fba9c32d60cbe36a6006bcd7892bef0271cc2bad456163cfe9e7ad5",
+      "checkpoint_note": "Current merged source evidence 1.6. Historical review fields describe earlier campaigns. The current authority and limits are in docs/work/carddemo-values-control.md.",
+      "historical_review": 34
     },
     "dependency_input": {
       "schema": "dependency-input",
@@ -369,12 +378,12 @@
       "producer_api": "io.github.gustavo2358.lower.adapters.cli.CobolDependencyInput",
       "schema_sha256": "5f751464dee36a993d9238a32e25d68d396ce8ca3fa2e0198f29b4e6a7f505c0"
     },
-    "evidence_level": "Merged main after CardDemo W0-W8 qualification and documentary closeout. SP 2.57 / source evidence 1.2; 560 qualified cases, 73 CardDemo, zero candidate/support loss and 22 focal adversaries. Integration preserves production/test/contract content; docs/work/carddemo-control-integration.md records merged PRs, evidence reuse and remaining limits.",
+    "evidence_level": "Merged CardDemo values/control and review corrections. SP 2.62 / qualified source 1.6. Upstream pin is the actual merged main including documentation closure; production/tests/contracts are equivalent to the qualified review head. Qualification: 560 pipelines including CardDemo 73, PERFORM 39, Chaos 48, aliases 14, PERFORM adversaries 25; 18 new oracles in logical and IBM profiles. Zero candidate/support/provenance loss. Point 5 remains separate. See docs/work/carddemo-values-control.md.",
     "perform_completion": "Scoped exits, SECTION boundaries, typed VARYING levels; Integration authorized; qualified original 39/39 and adversaries 25/25. See docs/domain/perform-control-completion.md.",
     "logical_alias_move": "Logical family translation precedes scalar shortcuts; 14/14 adversaries, PERFORM 39/39, reviewed chaos 48/48 with six explicit abstraction-policy cases; see docs/product/logical-alias-move.md.",
     "synthetic_model_assumptions": {
-      "contract": "SP2.50 / NOMINAL_TEXT_SOURCE_V2; MODEL_STORAGE remains unavailable",
-      "qualification": "docs/work/cics-control-qualification.md"
+      "contract": "SP 2.62 / NOMINAL_TEXT_SOURCE_V4; modelAssumed remains unavailable as physical storage, runtime VALUE or kill proof",
+      "qualification": "docs/work/carddemo-values-control.md"
     }
   },
   "external": [
