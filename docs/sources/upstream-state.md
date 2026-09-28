@@ -4,10 +4,10 @@
 
 SP 2.62 e qualified-source-dependencies 1.6 estão qualificados nesta branch. Os pins abaixo são commits exatos de revisão; não são mains mergeadas. Dependencies mantém a versão 2.7.
 
-- proleap-poc: `6f90e40ff8cce243e8e46a157cb87a1b2dbcfb15`.
-- cobol-lower: `8d59390e63d482274ab0f1fb52e02b2588e2b9f2`.
+- proleap-poc: `73cca8e59045355c3b5e45ac147c29a8f9d865b9`.
+- cobol-lower: `5fe0d684ca763b8c60542b9dc621f8f80c705651`.
 
-[Qualificação, causas e limites](../work/carddemo-values-control.md). 560 execuções, todos os 73 programas CardDemo, zero perda de candidatos/supports e 43 adições explicadas. O ponto 5 permanece separado. As seções seguintes preservam contexto histórico e não substituem estes pins.
+[Qualificação, causas e limites](../work/carddemo-values-control.md). 560 execuções novas após as correções de POP causal e nível 88; todos os 73 programas CardDemo, zero alteração de candidatos/supports/provenance contra os HEADs revisados. Os 18 novos casos passam nos perfis lógico e IBM. Permanecem 43 adições cumulativas explicadas contra W8. FAST local passou nos três repositórios; wrappers full não foram reexecutados. O ponto 5 permanece separado. As seções seguintes preservam contexto histórico e não substituem estes pins.
 
 ## Checkpoints históricos
 

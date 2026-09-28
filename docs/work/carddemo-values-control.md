@@ -373,3 +373,109 @@ changed. AIR, CFG construction, UI and ALTER semantics are unchanged.
 - PGMIDERR on LINK/XCTL and ERROR fallback are admitted. Other CICS event families
   and exact PUSH/POP stack execution remain outside this capability. Unknown
   restoration preserves source candidates with assumptions, never fake AIR edges.
+
+## Review corrections — causal restoration and condition names (IN_PROGRESS)
+
+The review witnesses reproduce seven incorrect restored-handler candidates and
+three losses of table candidates on the reviewed heads. All fifteen probes parse
+without errors and complete all four stages; five controls already pass.
+
+IBM HANDLE CONDITION replaces the previous disposition for the same condition;
+POP can influence only subsequent execution in the same activation. We
+keep the existing source-only hypothesis catalogue and carry its eligibility
+forward as finite reaching facts inside the existing contextual state engine.
+The POP completion introduces a fact. A proved later specific disposition kills
+all hypotheses for that event condition; an ERROR update kills only restored
+ERROR targets, preserving possible specific dispositions. Joins keep alternatives,
+PERFORM passes facts through matched calls/returns, and alternate entries start
+independently. No exact stack or executable edge is introduced.
+
+The internal reaching facts identify existing published continuations. They are
+not a new source wire capability: the published derivation graph retains the
+causal path and CONTROL_POSSIBILITY proof. Their inclusion in context/state keys
+prevents merging different restoration histories. The finite domain has at most
+one bit per eligible published restoration relation; ordinary products have none.
+No change to ALTER or its separate prerequisite logic is authorized.
+
+Level 88 declares condition names without storage. The table geometry traversal
+and field inventory must both ignore these annotations, including when they are
+children of a sibling field. No 88 VALUE is an initializer of another declaration.
+IBM authority: [special level-numbers](https://www.ibm.com/docs/en/cobol-zos/6.3.0?topic=relationships-special-level-numbers) and [condition-name VALUE](https://www.ibm.com/docs/en/cobol-zos/6.3?topic=vc-format-2).
+Existing bounded table geometry, weak updates and modelAssumed remain unchanged.
+
+New oracles: post-POP LABEL/IGNORE/DEFAULT and ERROR replacement, later POP,
+independent ENTRY, PERFORM kill and positive return, backward GO TO and branch
+join positives; direct/sibling 88 and weak writes. Existing restoration positives
+and wire/reachability oracles remain mandatory. FAST on affected repos plus the
+73-program CardDemo replay and neighboring PERFORM/Chaos/alias suites will check
+regressions; all deltas must be traced before updating the Drafts.
+
+Authority: [IBM HANDLE CONDITION](https://www.ibm.com/docs/en/cics-ts/5.6.0?topic=conditions-using-handle-condition-command)
+and [PUSH/POP HANDLE](https://www.ibm.com/docs/en/cics-ts/5.5.0?topic=conditions-using-push-handle-pop-handle-commands).
+
+### Corrections implemented and requalified — 2026-09-28
+
+Both review counterexamples were confirmed before editing production code. The
+first 15 probes had seven invalid restored-handler candidates, three lost table
+candidate sets and five passing controls. Three further positive independence
+cases were added after that RED run. No existing oracle was reduced.
+
+- **Restoration:** lower carries eligibility for existing typed source hypotheses
+  along contextual control paths. A completed prerequisite introduces the fact;
+  a proved later registration removes the affected possibilities. LABEL, IGNORE
+  and DEFAULT replace the specific condition. Replacing ERROR preserves an
+  independent specific handler, including a shared label. An unrelated condition
+  does not kill it. Separate ENTRY roots and matched PERFORM returns retain their
+  own reaching states. FIFO/LIFO scheduling yields identical facts.
+- **Level 88:** frontend excludes condition names from storage members, shape,
+  placement and elementary-field classification. Their VALUE clauses never seed
+  table storage. Direct OCCURS, sibling offsets and weak indexed writes preserve
+  the known target values. The shared AST/storage inventory is unchanged.
+- **Boundaries:** no source or SP wire version changed; causal derivations and
+  CONTROL_POSSIBILITY proofs remain published. No new executable AIR/CFG edges,
+  exact stack, ALTER semantics or point-5 representation work was introduced.
+
+New validation: 18/18 exact candidate oracles under unspecified logical storage
+and 18/18 under the IBM physical profile, plus the three existing restoration
+cases. Lower versions 13 restoration SP/source pairs with exact AIR/source,
+schedule-invariance and codec checks, and five table SP/source pairs. Frontend
+adds two contrast tests, including a differing 88 VALUE that must not contaminate
+initializers. Existing focal oracles pass again: CICS 20, ENTRY 8, table/SQL 17,
+MOVE/functions/registers 14. Strict source-wire validation passes.
+
+All **560 four-stage pipelines were reexecuted**, including every one of the 73
+CardDemo programs. Compared with the reviewed heads: **zero candidate additions,
+zero candidate losses, zero support/provenance losses**. PERFORM 39/39, Chaos
+48/48 plus 28 rejected oracle mutations, aliases 14/14 and PERFORM adversaries
+25/25 pass. The cumulative W8 result remains 43 explained additions: 42 bounded
+table-summary menu candidates and COSGN00C from an existing MOVE. These are MAY
+candidates, not proof of runtime index feasibility.
+
+The only corpus product deltas are COCRDLIC and its migrated copy. Removing the
+88 obstruction restores four field summaries in their enclosing storage group:
+WS-ALL-ROWS, WS-ROW-ACCTNO, WS-ROW-CARD-NUM and WS-ROW-CARD-STATUS, plus their
+known reads/writes. They have no literal initializers. SP, source facts and the
+embedded source evidence change; dependency candidates and supports do not.
+All 560 AIR and CFG products are byte-identical to the reviewed-head baseline;
+the other 558 SP/source/dependencies products are also byte-identical.
+
+Local FAST passes in all three repositories: frontend 686 tests with no skips;
+lower 2,481 core checks plus its adapter/architecture/harness families; CFG 653
+Java methods plus architecture, wire and Python gates. Full qualification wrappers
+were not rerun for these localized corrections: new RED/GREEN counterexamples,
+required FAST, existing focal oracles and the complete corpus exercise the changed
+boundaries. The earlier frontend full run remains historical evidence only.
+
+The first fixture batch ended with exit 143 after 195 completed cases; these
+results were preserved. All 166 remaining cases completed in a fresh directory,
+whose wrapper also exited 143 after recording the results. All 560 distinct cases
+and their four successful stages were verified, and runtime artifact hashes were
+checked again explicitly. The frozen runtime uses AIR 59df1f7; the locks use d760b07. Their
+complete air-model and air-json Git trees are identical; only an AIR documentation
+file differs. FAST builds the locked revision. The equivalence record, exact
+production source hash, product comparisons and evidence hashes are in
+[qualification JSON](carddemo-values-control-qualification.json). Raw evidence
+is under workspace `.carddemo-values-control/evidence/review-*`.
+
+Drafts remain pending human review; no merge or auto-merge. Review frontend #75 →
+lower #50 → analysis-cfg #55. The consumer locks identify exact review commits.

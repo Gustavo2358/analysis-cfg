@@ -290,11 +290,12 @@
       "src/main/java/io/github/gustavo2358/cobolexplorer/SqlCommandSyntax.java",
       "src/main/java/io/github/gustavo2358/cobolexplorer/SqlWheneverSemantics.java",
       "src/main/java/io/github/gustavo2358/cobolexplorer/CicsConditionSyntax.java",
-      "src/main/java/io/github/gustavo2358/cobolexplorer/ControlTopologySemantics.java"
+      "src/main/java/io/github/gustavo2358/cobolexplorer/ControlTopologySemantics.java",
+      "src/main/java/io/github/gustavo2358/cobolexplorer/TableTextSemantics.java"
     ],
     "semantic_product_version": "2.62.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "6f90e40ff8cce243e8e46a157cb87a1b2dbcfb15",
+    "commit": "73cca8e59045355c3b5e45ac147c29a8f9d865b9",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -328,12 +329,12 @@
       "contract": "SP 2.62 / NOMINAL_TEXT_SOURCE_V4; modelAssumed remains unavailable as physical storage, runtime VALUE or kill proof",
       "qualification": "docs/work/carddemo-values-control.md"
     },
-    "evidence_level": "Review branch qualified locally for CardDemo values/control VC1-VC4. SP 2.62 / qualified source 1.6; all 560 pipelines completed, PERFORM 39/39, Chaos 48/48 + 28 negative mutants, aliases 14/14, PERFORM adversaries 25/25. Zero candidate/support loss, 43 explained additions. No merge authorization; see docs/work/carddemo-values-control.md and qualification JSON."
+    "evidence_level": "Review corrections qualified: causal POP HANDLE hypotheses respect later dispositions; level 88 preserves table geometry and initializers. SP 2.62 / qualified source 1.6 unchanged. All 560 pipelines rerun; 18 new oracles pass under logical and IBM profiles. Zero candidate/support/provenance changes versus reviewed heads; 43 cumulative explained additions versus W8. FAST passed in all three repos. Full wrappers not rerun. Draft review pending; see docs/work/carddemo-values-control.md and qualification JSON."
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "IN_PROGRESS / review branch qualified; coverage remains PARTIAL; merge not authorized",
-    "commit": "8d59390e63d482274ab0f1fb52e02b2588e2b9f2",
+    "commit": "5fe0d684ca763b8c60542b9dc621f8f80c705651",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -365,8 +366,8 @@
       "schema": "qualified-source-dependencies",
       "version": "1.6.0",
       "producer_api": "io.github.gustavo2358.lower.application.QualifiedSourceProjection",
-      "source_state_checkpoint": "8d59390e63d482274ab0f1fb52e02b2588e2b9f2",
-      "approved_sp_producer": "6f90e40ff8cce243e8e46a157cb87a1b2dbcfb15",
+      "source_state_checkpoint": "5fe0d684ca763b8c60542b9dc621f8f80c705651",
+      "approved_sp_producer": "73cca8e59045355c3b5e45ac147c29a8f9d865b9",
       "schema_sha256": "e17edf598fba9c32d60cbe36a6006bcd7892bef0271cc2bad456163cfe9e7ad5",
       "checkpoint_note": "Current branch snapshot for source evidence 1.6. historical_review refers only to the earlier source-state campaign. This campaign is pending Draft review; docs/work/carddemo-values-control.md.",
       "historical_review": 34
@@ -377,7 +378,7 @@
       "producer_api": "io.github.gustavo2358.lower.adapters.cli.CobolDependencyInput",
       "schema_sha256": "5f751464dee36a993d9238a32e25d68d396ce8ca3fa2e0198f29b4e6a7f505c0"
     },
-    "evidence_level": "Review branch qualified locally for CardDemo values/control VC1-VC4. SP 2.62 / qualified source 1.6; all 560 pipelines completed, PERFORM 39/39, Chaos 48/48 + 28 negative mutants, aliases 14/14, PERFORM adversaries 25/25. Zero candidate/support loss, 43 explained additions. No merge authorization; see docs/work/carddemo-values-control.md and qualification JSON.",
+    "evidence_level": "Review corrections qualified: causal POP HANDLE hypotheses respect later dispositions; level 88 preserves table geometry and initializers. SP 2.62 / qualified source 1.6 unchanged. All 560 pipelines rerun; 18 new oracles pass under logical and IBM profiles. Zero candidate/support/provenance changes versus reviewed heads; 43 cumulative explained additions versus W8. FAST passed in all three repos. Full wrappers not rerun. Draft review pending; see docs/work/carddemo-values-control.md and qualification JSON.",
     "perform_completion": "Scoped exits, SECTION boundaries, typed VARYING levels; Integration authorized; qualified original 39/39 and adversaries 25/25. See docs/domain/perform-control-completion.md.",
     "logical_alias_move": "Logical family translation precedes scalar shortcuts; 14/14 adversaries, PERFORM 39/39, reviewed chaos 48/48 with six explicit abstraction-policy cases; see docs/product/logical-alias-move.md.",
     "synthetic_model_assumptions": {
