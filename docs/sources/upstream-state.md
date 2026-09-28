@@ -1,14 +1,14 @@
 # Baseline factual dos repositórios
 
-## Estado vigente — W6, controle e memória
+## Estado vigente — W7, precondição de reentrada
 
-SP2.56 e qualified-source-dependencies1.1 preservam candidatos condicionais sem
+SP2.57 e qualified-source-dependencies1.1 preservam candidatos condicionais sem
 acrescentar transições executáveis. Branch de revisão empilhada sobre FILE; sem merge.
 
-- proleap-poc: `7bbe184e6c71237ce9bc5b865ae94d006c7bafb2`.
-- cobol-lower: `e0930a5474aad75cdd5a0f74ed16cc25391aaebd`.
+- proleap-poc: `66f7a37f68e3432101d0bfaa2c1667bfa040ca8d`.
+- cobol-lower: `0b9e64e919b91ff0b4ef3c488b33af3788f39197`.
 
-Regra, testes e limites: [W6](../work/carddemo-control-w6.md).
+Regra, testes e limites: [W7](../work/carddemo-control-w7.md).
 Os campos e as seções históricas não substituem estes pins.
 
 ## Checkpoints históricos
