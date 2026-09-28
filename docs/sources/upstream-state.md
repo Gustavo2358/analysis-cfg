@@ -1,13 +1,21 @@
 # Baseline factual dos repositórios
 
-## Estado vigente — valores e controle após W8 (revisão pendente)
+## Estado vigente — valores e controle após W8 integrados
 
-SP 2.62 e qualified-source-dependencies 1.6 estão qualificados nesta branch. Os pins abaixo são commits exatos de revisão; não são mains mergeadas. Dependencies mantém a versão 2.7.
+SP 2.62 e qualified-source-dependencies 1.6 estão integrados. Dependencies mantém
+a versão 2.7. Os pins abaixo são SHAs reais de main, incluindo fechamento documental.
 
-- proleap-poc: `73cca8e59045355c3b5e45ac147c29a8f9d865b9`.
-- cobol-lower: `5fe0d684ca763b8c60542b9dc621f8f80c705651`.
+- proleap-poc: `4c00dea2a6bad1ba21076e55681f6038b80f8a47`.
+- cobol-lower: `c98ff4821fdbd89a472792f02f11aa00d5b3583d`.
 
-[Qualificação, causas e limites](../work/carddemo-values-control.md). 560 execuções novas após as correções de POP causal e nível 88; todos os 73 programas CardDemo, zero alteração de candidatos/supports/provenance contra os HEADs revisados. Os 18 novos casos passam nos perfis lógico e IBM. Permanecem 43 adições cumulativas explicadas contra W8. FAST local passou nos três repositórios; wrappers full não foram reexecutados. O ponto 5 permanece separado. As seções seguintes preservam contexto histórico e não substituem estes pins.
+[Integração e limites](../work/carddemo-values-control.md). Produção,
+testes e contratos equivalentes aos heads qualificados; 560 execuções anteriores,
+incluindo todos os 73 programas CardDemo e os 18 novos casos nos dois perfis,
+permanecem evidência válida. Zero perdas de candidatos/supports/provenance; 43
+adições cumulativas explicadas contra W8. Corpus/full não são reexecutados por
+uma alteração documental ou pin equivalente. Gates finais de main e SHAs constam
+no relatório de integração. O ponto 5 permanece em campanha separada. As seções
+seguintes são históricas e não substituem estes pins.
 
 ## Checkpoints históricos
 

@@ -295,7 +295,7 @@
     ],
     "semantic_product_version": "2.62.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "73cca8e59045355c3b5e45ac147c29a8f9d865b9",
+    "commit": "4c00dea2a6bad1ba21076e55681f6038b80f8a47",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -306,7 +306,7 @@
       "scope": "local unconditional paragraph identity and explicit entry; G1-G5 and 1/2/5/40"
     },
     "storage_contract_version": "1.11.0",
-    "canonical_ref": "fix/carddemo-values-control",
+    "canonical_ref": "main",
     "observed_on": "2026-09-28",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
@@ -316,7 +316,7 @@
     "fd_w4_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED producers, manual outcomes/USE and 28 real CLI sources twice; file-dependencies/w4-implementation.md",
     "fd_w5_validation": "QUALIFIED_LOCAL: focal/FAST, producer Q-SHARED with bounded final reuse, manual local AIR/wire and44 real CLI sources twice; file-dependencies/w5-implementation.md",
     "fd_w6_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED,19 B-SP fixtures,15 manual AIR tests and33 real CLI sources twice; file-dependencies/w6-implementation.md",
-    "status": "IN_PROGRESS / review branch qualified; coverage remains PARTIAL; merge not authorized",
+    "status": "DONE / MERGED; coverage remains PARTIAL",
     "fd_w8_validation": "QUALIFIED_LOCAL: producer FAST/Q-SHARED, B-SP33, CFG FAST502/Q547, manual/wire and38CICS+33native source cases twice; docs/product/file-dependencies/w8-implementation.md",
     "fd_w9_validation": "QUALIFIED_LOCAL: producer focal/FAST/Q, consumer manual/FAST/reader, 8 scope + 33 native + 38 CICS real CLI sources twice, deterministic four products; docs/product/file-dependencies/w9-implementation.md",
     "logical_text_w1": "Source E2E A-D twice deterministic; scale 10/100/1000; no physical profile. Corporate rerun not required by revised user acceptance.",
@@ -329,12 +329,12 @@
       "contract": "SP 2.62 / NOMINAL_TEXT_SOURCE_V4; modelAssumed remains unavailable as physical storage, runtime VALUE or kill proof",
       "qualification": "docs/work/carddemo-values-control.md"
     },
-    "evidence_level": "Review corrections qualified: causal POP HANDLE hypotheses respect later dispositions; level 88 preserves table geometry and initializers. SP 2.62 / qualified source 1.6 unchanged. All 560 pipelines rerun; 18 new oracles pass under logical and IBM profiles. Zero candidate/support/provenance changes versus reviewed heads; 43 cumulative explained additions versus W8. FAST passed in all three repos. Full wrappers not rerun. Draft review pending; see docs/work/carddemo-values-control.md and qualification JSON."
+    "evidence_level": "Merged CardDemo values/control and review corrections. SP 2.62 / qualified source 1.6. Upstream pin is the actual merged main including documentation closure; production/tests/contracts are equivalent to the qualified review head. Qualification: 560 pipelines including CardDemo 73, PERFORM 39, Chaos 48, aliases 14, PERFORM adversaries 25; 18 new oracles in logical and IBM profiles. Zero candidate/support/provenance loss. Point 5 remains separate. See docs/work/carddemo-values-control.md."
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
-    "status": "IN_PROGRESS / review branch qualified; coverage remains PARTIAL; merge not authorized",
-    "commit": "5fe0d684ca763b8c60542b9dc621f8f80c705651",
+    "status": "DONE / MERGED; coverage remains PARTIAL",
+    "commit": "c98ff4821fdbd89a472792f02f11aa00d5b3583d",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -346,7 +346,7 @@
     "goto_validation": {
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
     },
-    "canonical_ref": "fix/carddemo-values-control",
+    "canonical_ref": "main",
     "observed_on": "2026-09-28",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
@@ -366,10 +366,10 @@
       "schema": "qualified-source-dependencies",
       "version": "1.6.0",
       "producer_api": "io.github.gustavo2358.lower.application.QualifiedSourceProjection",
-      "source_state_checkpoint": "5fe0d684ca763b8c60542b9dc621f8f80c705651",
-      "approved_sp_producer": "73cca8e59045355c3b5e45ac147c29a8f9d865b9",
+      "source_state_checkpoint": "c98ff4821fdbd89a472792f02f11aa00d5b3583d",
+      "approved_sp_producer": "4c00dea2a6bad1ba21076e55681f6038b80f8a47",
       "schema_sha256": "e17edf598fba9c32d60cbe36a6006bcd7892bef0271cc2bad456163cfe9e7ad5",
-      "checkpoint_note": "Current branch snapshot for source evidence 1.6. historical_review refers only to the earlier source-state campaign. This campaign is pending Draft review; docs/work/carddemo-values-control.md.",
+      "checkpoint_note": "Current merged source evidence 1.6. Historical review fields describe earlier campaigns. The current authority and limits are in docs/work/carddemo-values-control.md.",
       "historical_review": 34
     },
     "dependency_input": {
@@ -378,7 +378,7 @@
       "producer_api": "io.github.gustavo2358.lower.adapters.cli.CobolDependencyInput",
       "schema_sha256": "5f751464dee36a993d9238a32e25d68d396ce8ca3fa2e0198f29b4e6a7f505c0"
     },
-    "evidence_level": "Review corrections qualified: causal POP HANDLE hypotheses respect later dispositions; level 88 preserves table geometry and initializers. SP 2.62 / qualified source 1.6 unchanged. All 560 pipelines rerun; 18 new oracles pass under logical and IBM profiles. Zero candidate/support/provenance changes versus reviewed heads; 43 cumulative explained additions versus W8. FAST passed in all three repos. Full wrappers not rerun. Draft review pending; see docs/work/carddemo-values-control.md and qualification JSON.",
+    "evidence_level": "Merged CardDemo values/control and review corrections. SP 2.62 / qualified source 1.6. Upstream pin is the actual merged main including documentation closure; production/tests/contracts are equivalent to the qualified review head. Qualification: 560 pipelines including CardDemo 73, PERFORM 39, Chaos 48, aliases 14, PERFORM adversaries 25; 18 new oracles in logical and IBM profiles. Zero candidate/support/provenance loss. Point 5 remains separate. See docs/work/carddemo-values-control.md.",
     "perform_completion": "Scoped exits, SECTION boundaries, typed VARYING levels; Integration authorized; qualified original 39/39 and adversaries 25/25. See docs/domain/perform-control-completion.md.",
     "logical_alias_move": "Logical family translation precedes scalar shortcuts; 14/14 adversaries, PERFORM 39/39, reviewed chaos 48/48 with six explicit abstraction-policy cases; see docs/product/logical-alias-move.md.",
     "synthetic_model_assumptions": {
