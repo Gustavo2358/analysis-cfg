@@ -62,3 +62,74 @@ explicitly. Whole-corpus counts are telemetry, not a replacement for the oracle.
 Discovery records and raw products: workspace `.carddemo-values-control/evidence`.
 VC0 starts from the merged W8 mains; the baseline manifest and runtime are frozen
 in `.carddemo-values-control/baseline.json`.
+
+## VC2/VC3 source expression rule
+
+Source-qualified text facts will carry a closed expression tree rather than
+COBOL function names interpreted downstream. The initial operators are ASCII
+uppercase and SPACE trimming. The frontend selects these operators from typed
+function syntax; unsupported functions remain UNKNOWN. The evaluator preserves
+each input support and modelAssumed confidence and applies receiving fitting
+after expression evaluation. Current date and RETURN-CODE stay runtime unknown.
+
+IBM [TRIM](https://www.ibm.com/docs/en/cobol-zos/6.4.0?topic=functions-trim)
+and [case conversion](https://www.ibm.com/docs/en/cobol-zos/6.4.0?topic=strings-converting-data-items-intrinsic-functions)
+are the language authority. ASCII-only uppercase is an explicitly bounded
+implementation domain; other characters retain an open remainder. This is
+source conditional evidence, not permission to infer physical storage or prune
+a branch based on synthetic declarations. Evaluation walks a finite expression
+tree and transforms finite candidate sets; existing work limits remain explicit.
+
+Adversaries cover nested transforms, all spaces, non-ASCII input, unknown input,
+model assumptions, fitting after TRIM, provenance through reads, and forged
+operators/arity. The pre-change TRIM and UPPER-CASE four-stage probes expose the
+missing new candidate independently of the contract representation.
+
+## VC3 checkpoint — bounded MOVE effects and source expressions
+
+SP 2.58 adds MOVE_TARGETS: known data reads and receiving MAY effects, no MUST,
+exposure proof or known runtime result. Missing receiving bindings retain ALL.
+CURRENT-DATE and RETURN-CODE are runtime input/output, never fabricated names.
+SP 2.59 adds NOMINAL_TEXT_SOURCE_V3 expression trees; qualified-source 1.3 carries
+them unchanged. Dependencies remains 2.7 with the versioned nested certificate.
+V1/V2 leaf wire shapes are unchanged. Typed ports, JSON adapters and independent
+schema checks reject unknown operators, bad arity, foreign reads and downgrades.
+
+TRIM has typed LEADING/TRAILING modifiers in the AST. Previously those valid
+forms produced two parser errors and lost subsequent statements. New witnesses
+require zero parser errors and preserve the following CALL. Uppercase is bounded
+to ASCII; non-ASCII and unsupported functions retain uncertainty. Transforms run
+before receiving fit and preserve transitive supports and modelAssumed. Source
+conditional candidates do not grant executable AIR values or synthetic kills.
+
+Focused frontend tests passed (14: six effects, five receiver sequences, three
+expression tests). Four-stage probes recovered PROGB001 for TRIM, UPPER-CASE,
+and nested transforms. TRIM TRAILING deliberately does not remove a leading
+space; after fitting the witness does not gain PROGB001. Strict independent
+qualified-source 1.3 checks passed all three direction/nesting products.
+
+Validation records: vc3-direction-front-01.log, vc3-expression-probes-02,
+vc3-direction-green. The first lower FAST exposed a future-version oracle using
+2.58 as unsupported; it now tests known 2.58/2.59 and unsupported 2.60. CFG FAST
+exposed the corresponding 1.3 future-version assumption (now 1.4) and a compiled
+public API inventory delta. The refreshed inventory contains the intended Term
+arguments API and no forbidden dependency. Rerun results are recorded separately.
+
+One VC1 overlap adversary used the reserved word SAME and was invalid COBOL. It
+now uses SRC-ALIAS and asserts valid grammar before publication; the corrected
+overlap test passes. This fixes test evidence, not the production overlap rule.
+
+The 73-program VC1 CardDemo replay passed all four stages with no candidate loss,
+no support loss/change and no additions versus W8. This evidence predates VC3;
+final campaign-wide qualification remains pending.
+
+VC3 validation update: frontend FAST passed 662 tests, zero failures/skips
+(vc3-front-fast-02.log). Its first run caught a real dynamic-slice invariant
+regression; MOVE_TARGETS is now restricted to whole receiving references, keeping
+the pre-existing conservative path for indexed/refmodified receivers. The JSON
+writer now uses closed typed transport records, as required by the architecture
+oracle. Existing expected values were preserved. Lower fast focal suites passed
+(vc3-lower-focal-03.log), including new MOVE proof forgery and expression wire
+round trips. CFG architecture FAST passed after refreshing the reviewed compiled
+API inventory (vc3-expression-cfg-fast-03.log). Final full/corpus and pin gates
+remain campaign obligations.

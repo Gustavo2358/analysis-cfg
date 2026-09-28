@@ -290,7 +290,13 @@
       "unknownModelCopyCannotKillAnObservedName",
       "modelWidthAndUnknownOverwriteCannotEraseSourceText",
       "modelInfluenceSurvivesACopyAndCannotFilterEitherBranch",
-      "ordinaryKnownWriteAfterModelCopyStillProvesKill"
+      "ordinaryKnownWriteAfterModelCopyStillProvesKill",
+      "nestedTextTransformsRunBeforeReceivingFit",
+      "trimOnlyRemovesTheSpaceCharacter",
+      "textTransformReadsRetainTheirDeclarationAndAssignmentSupports",
+      "modelInfluenceSurvivesTextTransforms",
+      "nonAsciiDoesNotUseTheJvmLocaleAsACobolCaseTable",
+      "malformedExpressionOperatorsArityAndReferencesAreRejected"
     ]
   },
   "analysis-kernel": {

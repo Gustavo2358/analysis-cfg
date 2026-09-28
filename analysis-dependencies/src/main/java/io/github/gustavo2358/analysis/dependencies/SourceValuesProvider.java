@@ -46,7 +46,7 @@ public final class SourceValuesProvider {
         var demand=new HashSet<>(queries.values());boolean changed;
         do {
             changed=false;
-            for(var a:source.facts().assignments())if(demand.contains(a.target())&&a.source().kind().equals("READ"))changed|=demand.add(a.source().value());
+            for(var a:source.facts().assignments())if(demand.contains(a.target()))changed|=demand.addAll(reads(a.source()));
             for(var c:source.facts().conditions()){var reads=reads(c.predicate());if(reads.stream().anyMatch(demand::contains))changed|=demand.addAll(reads);}
         }while(changed);
         source.facts().symbols().stream().filter(s->demand.contains(s.node())).forEach(s->{
@@ -123,6 +123,24 @@ public final class SourceValuesProvider {
     }
     private static String writeKey(NominalValues.Assignment a){return "write/"+a.statement()+"/"+a.target();}
     private Values term(NominalValues.Term t,Map<String,Values> state) {
+        if(t.extended()) {
+            var input=term(t.arguments().getFirst(),state);var values=new TreeMap<String,Set<String>>();boolean open=input.open();
+            for(var value:input.candidates().entrySet()) {
+                String text=value.getKey(),result;
+                if(t.kind().equals("UPPER_ASCII")) {
+                    if(text.codePoints().anyMatch(c->c>127)){open=true;continue;}
+                    var transformed=new StringBuilder(text.length());
+                    for(int i=0;i<text.length();i++){char c=text.charAt(i);transformed.append(c>='a'&&c<='z'?(char)(c-'a'+'A'):c);}result=transformed.toString();
+                } else {
+                    int start=0,end=text.length();
+                    if(!t.kind().equals("TRIM_TRAILING_SPACES"))while(start<end&&text.charAt(start)==' ')start++;
+                    if(!t.kind().equals("TRIM_LEADING_SPACES"))while(end>start&&text.charAt(end-1)==' ')end--;
+                    result=text.substring(start,end);
+                }
+                values.merge(result,value.getValue(),SourceValuesProvider::union);
+            }
+            return new Values(values,open,input.modelAssumed());
+        }
         return switch(t.kind()) {
             case "READ"->state.getOrDefault(t.value(),Values.UNKNOWN);
             case "LITERAL"->new Values(Map.of(t.value(),Set.of()),false);
@@ -163,7 +181,11 @@ public final class SourceValuesProvider {
     }
     private static Set<String> reads(NominalValues.Predicate p) {
         var out=new HashSet<String>();var todo=new ArrayDeque<NominalValues.Predicate>();todo.add(p);
-        while(!todo.isEmpty()){var next=todo.removeFirst();for(var t:next.terms())if(t.kind().equals("READ"))out.add(t.value());todo.addAll(next.children());}return out;
+        while(!todo.isEmpty()){var next=todo.removeFirst();for(var t:next.terms())out.addAll(reads(t));todo.addAll(next.children());}return out;
+    }
+    private static Set<String> reads(NominalValues.Term root) {
+        var out=new HashSet<String>();var todo=new ArrayDeque<NominalValues.Term>();todo.add(root);
+        while(!todo.isEmpty()){var t=todo.removeFirst();if(t.kind().equals("READ"))out.add(t.value());todo.addAll(t.arguments());}return out;
     }
     private static <T> Set<T> union(Set<T> a,Set<T> b){var out=new HashSet<>(a);out.addAll(b);return Set.copyOf(out);}
 }

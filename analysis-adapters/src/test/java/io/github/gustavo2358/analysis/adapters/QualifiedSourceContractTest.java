@@ -55,7 +55,7 @@ class QualifiedSourceContractTest {
         }
     }
     @Test void versionsIdentitiesAndReferencesAreClosed()throws Exception {
-        for(var version:List.of("0.9.0","1.3.0","2.0.0")){var w=wire("conditional");w.put("version",version);reject(w);}
+        for(var version:List.of("0.9.0","1.4.0","2.0.0")){var w=wire("conditional");w.put("version",version);reject(w);}
         var standalone=wire("conditional");standalone.putArray("air");
         var detached=codec.decode(json.writeValueAsBytes(standalone));assertFalse(SourceQualifiedDependencyResult.admit(detached).occurrences().isEmpty());
         assertThrows(IllegalArgumentException.class,()->SourceQualifiedDependencyResult.admit(detached,"uncorrelated-air"));

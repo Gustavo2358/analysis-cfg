@@ -8,8 +8,16 @@ public record NominalValues(String authority,List<Symbol> symbols,List<Assignmen
         public Symbol(String node,int extent){this(node,extent,false);}
         public Symbol { text(node);require(extent>0,"positive nominal text extent"); }
     }
-    public record Term(String kind,String value) {
-        public Term { Objects.requireNonNull(value);require(Set.of("READ","LITERAL","SPACES","LOW_VALUES","HIGH_VALUES","UNKNOWN").contains(kind),"nominal term kind");if(kind.equals("READ"))text(value);else if(!kind.equals("LITERAL"))require(value.isEmpty(),"nonliteral payload"); }
+    public record Term(String kind,String value,List<Term> arguments) {
+        public Term(String kind,String value){this(kind,value,List.of());}
+        public Term {
+            Objects.requireNonNull(value);arguments=arguments==null?List.of():List.copyOf(arguments);
+            boolean unary=Set.of("UPPER_ASCII","TRIM_SPACES","TRIM_LEADING_SPACES","TRIM_TRAILING_SPACES").contains(kind);
+            require(unary?arguments.size()==1:arguments.isEmpty(),"nominal expression arity");
+            require(unary||Set.of("READ","LITERAL","SPACES","LOW_VALUES","HIGH_VALUES","UNKNOWN").contains(kind),"nominal term kind");
+            if(kind.equals("READ"))text(value);else if(!kind.equals("LITERAL"))require(value.isEmpty(),"nonliteral payload");
+        }
+        public boolean extended(){return !arguments.isEmpty();}
     }
     public record Assignment(String statement,String target,Term source) {
         public Assignment { text(statement);text(target);Objects.requireNonNull(source); }
@@ -27,12 +35,12 @@ public record NominalValues(String authority,List<Symbol> symbols,List<Assignmen
         public Query {text(statement);text(node);}
     }
     public NominalValues {
-        require(Set.of("NOMINAL_TEXT_SOURCE_V1","NOMINAL_TEXT_SOURCE_V2").contains(authority),"nominal value authority");
-        require(authority.equals("NOMINAL_TEXT_SOURCE_V2")||symbols.stream().noneMatch(Symbol::modelAssumed),"model marker requires V2");
+        require(Set.of("NOMINAL_TEXT_SOURCE_V1","NOMINAL_TEXT_SOURCE_V2","NOMINAL_TEXT_SOURCE_V3").contains(authority),"nominal value authority");
+        require(!authority.equals("NOMINAL_TEXT_SOURCE_V1")||symbols.stream().noneMatch(Symbol::modelAssumed),"model marker requires V2");
         symbols=List.copyOf(symbols);assignments=List.copyOf(assignments);conditions=List.copyOf(conditions);queries=List.copyOf(queries);
         var nodes=new HashSet<String>();for(var s:symbols)require(nodes.add(s.node()),"duplicate nominal symbol");
-        var writes=new HashSet<String>();for(var a:assignments){require(nodes.contains(a.target()),"nominal receiver reference");term(a.source(),nodes);require(writes.add(a.statement()+"/"+a.target()),"duplicate nominal assignment");}
-        var branches=new HashSet<String>();for(var c:conditions){require(branches.add(c.statement()),"duplicate nominal condition");var todo=new ArrayDeque<Predicate>();todo.add(c.predicate());while(!todo.isEmpty()){var p=todo.removeFirst();p.terms().forEach(t->term(t,nodes));todo.addAll(p.children());}}
+        var writes=new HashSet<String>();for(var a:assignments){require(nodes.contains(a.target()),"nominal receiver reference");term(a.source(),nodes);require(authority.equals("NOMINAL_TEXT_SOURCE_V3")||!a.source().extended(),"expression requires V3");require(writes.add(a.statement()+"/"+a.target()),"duplicate nominal assignment");}
+        var branches=new HashSet<String>();for(var c:conditions){require(branches.add(c.statement()),"duplicate nominal condition");var todo=new ArrayDeque<Predicate>();todo.add(c.predicate());while(!todo.isEmpty()){var p=todo.removeFirst();p.terms().forEach(t->{term(t,nodes);require(authority.equals("NOMINAL_TEXT_SOURCE_V3")||!t.extended(),"expression requires V3");});todo.addAll(p.children());}}
         var sinks=new HashSet<String>();for(var q:queries)require(nodes.contains(q.node())&&sinks.add(q.statement()),"nominal query reference/identity");
     }
     /** Validate references in every typed consumer, including the in-memory port. */
@@ -42,7 +50,10 @@ public record NominalValues(String authority,List<Symbol> symbols,List<Assignmen
         for(var c:conditions)require(statements.contains(c.statement()),"nominal condition owner");
         for(var q:queries)require(statements.contains(q.statement()),"nominal query owner");
     }
-    private static void term(Term t,Set<String> nodes){if(t.kind().equals("READ"))require(nodes.contains(t.value()),"nominal read reference");}
+    private static void term(Term root,Set<String> nodes){
+        var pending=new ArrayDeque<Term>();pending.add(root);
+        while(!pending.isEmpty()){var t=pending.removeFirst();if(t.kind().equals("READ"))require(nodes.contains(t.value()),"nominal read reference");pending.addAll(t.arguments());}
+    }
     private static void text(String x){require(x!=null&&!x.isBlank(),"nominal identity");}
     private static void require(boolean yes,String message){if(!yes)throw new IllegalArgumentException(message);}
 }
