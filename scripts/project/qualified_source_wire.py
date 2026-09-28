@@ -53,7 +53,7 @@ def refs(values, inventory):
 
 
 def validate(evidence):
-    require(evidence.get('version') in ('1.0.0','1.1.0','1.2.0','1.3.0','1.4.0'), 'source version')
+    require(evidence.get('version') in ('1.0.0','1.1.0','1.2.0','1.3.0','1.4.0','1.5.0'), 'source version')
     shape(evidence, {'$ref':'#/$defs/QualifiedSourceDependencies'},evidence['version'])
     require(len(evidence['air'])<=1 and all(re.fullmatch('[0-9a-f]{64}', d['sha256']) for d in [evidence['source']]+evidence['air']), 'digest')
     require(evidence['source']['schema'] in ('cobol-semantic-product','cobol-semantic-compilation'), 'source schema')
@@ -64,7 +64,7 @@ def validate(evidence):
         for s in u['statements']: require(s['id']['unit']==unit and bool(s['id']['handle']), 'statement identity')
         for p in u['proofs']:
             refs(p['dependencies'],ps)
-            require(p['kind'] in {'LOCAL_GRAMMAR','RESOLVED_TARGET','EXPANDED_INCLUDE','INPUT_REGION_ISOLATION','PARTIAL_UNKNOWN'} | ({'CONTROL_POSSIBILITY'} if evidence['version'] in ('1.1.0','1.2.0','1.3.0','1.4.0') else set()), 'proof kind/version')
+            require(p['kind'] in {'LOCAL_GRAMMAR','RESOLVED_TARGET','EXPANDED_INCLUDE','INPUT_REGION_ISOLATION','PARTIAL_UNKNOWN'} | ({'CONTROL_POSSIBILITY'} if evidence['version'] in ('1.1.0','1.2.0','1.3.0','1.4.0','1.5.0') else set()), 'proof kind/version')
         pending_proofs=list(u['proofs']); grounded_proofs=set()
         while pending_proofs:
             ready=[p for p in pending_proofs if set(p['dependencies'])<=grounded_proofs]
@@ -76,7 +76,7 @@ def validate(evidence):
             for r in t['registrations']: refs([r['statement']],ss); require(r['statementOrigin']==ss[key(r['statement'])]['provenance'], 'registration origin')
         def support(s):
             causes={'NONE','RESET_HISTORY_UNAVAILABLE','RESET_WITHOUT_CANCELED_EVIDENCE','CALL_EFFECT_UNAVAILABLE','HANDLER_OPERATION_UNAVAILABLE'}
-            if evidence['version'] in ('1.2.0','1.3.0','1.4.0'):causes.add('SOURCE_REENTRY_UNDEFINED')
+            if evidence['version'] in ('1.2.0','1.3.0','1.4.0','1.5.0'):causes.add('SOURCE_REENTRY_UNDEFINED')
             require(s['cause'] in causes and (s['kind']=='UNKNOWN') == (s['cause']!='NONE'),'support cause/version')
             refs(s['target'],ts);refs(s['activation'],ss)
             require(len(s['target'])==len(s['activation'])<=1, 'state target/activation')
@@ -105,7 +105,11 @@ def validate(evidence):
             if d['selection']:
                 require(len(d['selection'])==1, 'selection alternatives');s=sels[key(d['selection'][0])]
                 require(d['source']==[s['source']] and d['destination'] in s['localEntry'] and d['proofs']==s['proofs'] and not d['callerPremise'], 'selection derivation')
-            if not d['source']: require(d['authority']=='PRIMARY_ENTRY' and not d['selection'] and not d['callerPremise'], 'root authority')
+            if not d['source']: require(d['authority'] in ({'PRIMARY_ENTRY','ALTERNATE_ENTRY'} if evidence['version']=='1.5.0' else {'PRIMARY_ENTRY'}) and not d['selection'] and not d['callerPremise'], 'root authority')
+            if not d['source'] and d['authority']=='ALTERNATE_ENTRY':
+                require(any(ps[key(p)]['kind']=='LOCAL_GRAMMAR' and ps[key(p)]['rule']=='alternate-entry-start' for p in d['proofs']), 'alternate entry proof')
+                require(ns[key(d['destination'])]['context'].startswith('ENTRY/'), 'alternate entry context')
+
         while pending:
             ready=[d for d in pending if set(d['source']+d['callerPremise'])<=reached]
             if not ready: break

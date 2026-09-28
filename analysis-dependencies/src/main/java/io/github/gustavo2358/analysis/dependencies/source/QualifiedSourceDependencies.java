@@ -12,9 +12,10 @@ public record QualifiedSourceDependencies(String schema, String version, String 
             Objects.requireNonNull(source);
             air=List.copyOf(air);
             units=List.copyOf(units);
-            require(schema.equals("qualified-source-dependencies") && Set.of("1.0.0","1.1.0","1.2.0","1.3.0","1.4.0").contains(version), "unsupported source contract"); require(version.equals("1.4.0")||units.stream().noneMatch(u->u.nominalValues().filter(n->n.facts().authority().equals("NOMINAL_TEXT_SOURCE_V4")).isPresent()),"source tables require version 1.4.0"); require(Set.of("1.3.0","1.4.0").contains(version)||units.stream().noneMatch(u->u.nominalValues().filter(n->n.facts().authority().equals("NOMINAL_TEXT_SOURCE_V3")).isPresent()),"source expressions require version 1.3.0"); one(air); unique(units, UnitEvidence::unit);
+            require(schema.equals("qualified-source-dependencies") && Set.of("1.0.0","1.1.0","1.2.0","1.3.0","1.4.0","1.5.0").contains(version), "unsupported source contract"); require(Set.of("1.4.0","1.5.0").contains(version)||units.stream().noneMatch(u->u.nominalValues().filter(n->n.facts().authority().equals("NOMINAL_TEXT_SOURCE_V4")).isPresent()),"source tables require version 1.4.0"); require(Set.of("1.3.0","1.4.0","1.5.0").contains(version)||units.stream().noneMatch(u->u.nominalValues().filter(n->n.facts().authority().equals("NOMINAL_TEXT_SOURCE_V3")).isPresent()),"source expressions require version 1.3.0"); one(air); unique(units, UnitEvidence::unit);
+            require(version.equals("1.5.0")||units.stream().allMatch(u->u.derivations().stream().noneMatch(d->d.authority().equals("ALTERNATE_ENTRY"))),"alternate roots require version 1.5.0");
             require(!version.equals("1.0.0")||units.stream().allMatch(u->u.nativeFiles().isEmpty()&&u.proofs().stream().noneMatch(p->p.kind().equals("CONTROL_POSSIBILITY"))),"source possibility requires version 1.1.0");
-            require(Set.of("1.2.0","1.3.0","1.4.0").contains(version)||units.stream().allMatch(u->u.nodes().stream().noneMatch(n->n.support().cause().equals("SOURCE_REENTRY_UNDEFINED"))),"source reentry requires version 1.2.0");
+            require(Set.of("1.2.0","1.3.0","1.4.0","1.5.0").contains(version)||units.stream().allMatch(u->u.nodes().stream().noneMatch(n->n.support().cause().equals("SOURCE_REENTRY_UNDEFINED"))),"source reentry requires version 1.2.0");
         }
     public record Document(String schema, String version, String sha256) {
         public Document {
@@ -308,7 +309,11 @@ public record QualifiedSourceDependencies(String schema, String version, String 
         // incoming derivations remain OR; each source/caller pair remains AND.
         var pending=new HashMap<String,Integer>();var waiting=new HashMap<String,List<Derivation>>();var ready=new ArrayDeque<String>();var reached=new HashSet<String>();
         for(var d:derivations){refs(d.source(),ns);refs(d.callerPremise(),ns);refs(d.selection(),sels);refs(d.proofs(),ps);require(ns.containsKey(d.destination()),"derivation destination");
-            if(d.source().isEmpty())require(d.callerPremise().isEmpty() && d.selection().isEmpty() && d.authority().equals("PRIMARY_ENTRY"),"ordinary root authority");
+            if(d.source().isEmpty())require(d.callerPremise().isEmpty() && d.selection().isEmpty() && Set.of("PRIMARY_ENTRY","ALTERNATE_ENTRY").contains(d.authority()),"ordinary root authority");
+            if(d.source().isEmpty()&&d.authority().equals("ALTERNATE_ENTRY")) {
+                require(d.proofs().stream().map(ps::get).anyMatch(p->p.kind().equals("LOCAL_GRAMMAR")&&p.rule().equals("alternate-entry-start")),"alternate root requires entry proof");
+                require(ns.get(d.destination()).context().startsWith("ENTRY/"),"alternate root context");
+            }
             if(!d.selection().isEmpty()) {var s=sels.get(d.selection().getFirst());require(d.source().equals(List.of(s.source())) && d.callerPremise().isEmpty() && s.localEntry().equals(List.of(d.destination())) && d.proofs().equals(s.proofs()),"selection derivation correlation");}
             var premises=new HashSet<String>(d.source());premises.addAll(d.callerPremise());pending.put(d.id(),premises.size());
             if(premises.isEmpty())ready.add(d.destination());for(var p:premises)waiting.computeIfAbsent(p,k->new ArrayList<>()).add(d);

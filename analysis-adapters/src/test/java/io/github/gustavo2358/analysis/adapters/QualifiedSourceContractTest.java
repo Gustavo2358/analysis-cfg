@@ -55,7 +55,7 @@ class QualifiedSourceContractTest {
         }
     }
     @Test void versionsIdentitiesAndReferencesAreClosed()throws Exception {
-        for(var version:List.of("0.9.0","1.5.0","2.0.0")){var w=wire("conditional");w.put("version",version);reject(w);}
+        for(var version:List.of("0.9.0","1.6.0","2.0.0")){var w=wire("conditional");w.put("version",version);reject(w);}
         var standalone=wire("conditional");standalone.putArray("air");
         var detached=codec.decode(json.writeValueAsBytes(standalone));assertFalse(SourceQualifiedDependencyResult.admit(detached).occurrences().isEmpty());
         assertThrows(IllegalArgumentException.class,()->SourceQualifiedDependencyResult.admit(detached,"uncorrelated-air"));
@@ -155,4 +155,14 @@ class QualifiedSourceContractTest {
         }
     }
 
+    @Test void alternateRootsRequireVersionAndGrammarProof()throws Exception {
+        var w=wire("alternate-entry");var evidence=codec.decode(json.writeValueAsBytes(w));
+        assertEquals("1.5.0",evidence.version());assertEquals(evidence,codec.decode(codec.encode(evidence)));
+        var roots=evidence.units().getFirst().derivations().stream().filter(d->d.source().isEmpty()).toList();
+        assertEquals(Set.of("PRIMARY_ENTRY","ALTERNATE_ENTRY"),roots.stream().map(QualifiedSourceDependencies.Derivation::authority).collect(java.util.stream.Collectors.toSet()));
+        var old=w.deepCopy();old.put("version","1.4.0");reject(old);
+        var forged=w.deepCopy();
+        for(var d:unit(forged).path("derivations"))if(d.path("authority").asText().equals("ALTERNATE_ENTRY"))((ObjectNode)d).putArray("proofs");
+        reject(forged);
+    }
 }

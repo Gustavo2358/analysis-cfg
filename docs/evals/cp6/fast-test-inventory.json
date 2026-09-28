@@ -221,7 +221,8 @@
       "producerRoundtripAndCandidateOccurrenceSelectionCorrelation",
       "ordinaryAndConditionalAlternativesKeepGuardsSeparate",
       "inactiveDeactivatedAndComputedRemainBounded",
-      "versionsIdentitiesAndReferencesAreClosed"
+      "versionsIdentitiesAndReferencesAreClosed",
+      "alternateRootsRequireVersionAndGrammarProof"
     ],
     "io.github.gustavo2358.analysis.adapters.QueryLocalProviderTest": [
       "unrelatedRegionsCannotChangeScalarProviderCandidateOrSupports",

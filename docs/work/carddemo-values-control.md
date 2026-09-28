@@ -182,3 +182,46 @@ passed 650 tests. Frontend FAST passed 672 tests before the final model-propagat
 adversary; focused tests were rerun afterward. Lower FAST focal suites pass.
 Compiled API inventories were refreshed only for the typed table records/codec.
 Final campaign qualification remains pending, including CICS/ENTRY changes.
+
+
+## VC4 alternate entries — rule and implementation plan
+
+IBM Enterprise COBOL 6.4 [ENTRY](https://www.ibm.com/docs/en/cobol-zos/6.4.0?topic=statements-entry-statement)
+starts an external activation at the next executable statement after the named
+declaration. Sequential execution treats the declaration as neutral. Alternate
+entries are prohibited in nested programs and with PROCEDURE DIVISION RETURNING;
+USING does not supply actual runtime values or an exact parameter contract.
+
+The producer will retain the declaration's typed literal/parameter surface and
+publish each valid alternate root in controlTopology.entryPoints, linked by entry
+identity and proof. Entry inventory owns names/signatures; topology owns starts.
+Unresolved/invalid surfaces retain entry gaps. These are separate external roots,
+not primary-entry successors. Lowering will create one AIR entry per supported
+root, with separate activation IDs and bootstrap/state. PERFORM completion still
+binds to the invoking activation. The source state graph will seed each entry
+independently and identify its root authority; CFG continues to project AIR only.
+
+Independent oracles: a primary GOBACK cannot reach an alternate body; alternate
+activation cannot execute pre-ENTRY statements; sequential flow can cross ENTRY;
+consecutive declarations share the next executable start; USING stays unknown;
+nested/invalid declarations cannot fabricate entries; separate PERFORM callers
+return to their own continuations. New contracts and negative wire tests will
+reject old-version, missing-proof, foreign-entry and metadata/topology conflicts.
+
+VC4 ENTRY checkpoint: SP 2.61 carries typed alternate declarations and proved
+external starts; qualified source 1.5 carries independent alternate root authority.
+Lowering emits distinct activation contexts with their own bootstrap and entry
+state. Sequential ENTRY remains neutral, parameters stay unknown, and explicit
+absence of RETURNING is preserved separately from parameter uncertainty. Known
+unsupported/invalid declarations remain inventoried with gaps; a trailing ENTRY
+without an admitted executable start retains an explicit coverage limitation.
+
+Six frontend tests and eight real-SP lower oracles cover root isolation,
+consecutive declarations, sequential flow, USING, independent values and PERFORM
+returns. Six wire/in-memory forgeries challenge version, entry identity,
+declaration, start and grammar proof. Eight CFG/dependency oracles pass on
+vc4-entry-runtime-03, including a real LINKAGE argument with no proved address.
+The earlier CardDemo replay on runtime-02 passed 73/73 x four stages with zero
+candidate/support losses; the 43 cumulative additions are the already explained
+VC2/VC3 additions. The final unbound-LINKAGE fix and all future CICS changes still
+require the final campaign replay. No merge is authorized.
