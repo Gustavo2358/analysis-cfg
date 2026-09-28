@@ -13,28 +13,28 @@ def key(value):
     return json.dumps(value, sort_keys=True, separators=(',', ':'))
 
 
-@lru_cache(maxsize=1)
-def schema():
-    return json.loads((Path(__file__).resolve().parents[2] / 'docs/contracts/qualified-source-dependencies-1.0.0.schema.json').read_text())
+@lru_cache(maxsize=2)
+def schema(version="1.0.0"):
+    return json.loads((Path(__file__).resolve().parents[2] / f'docs/contracts/qualified-source-dependencies-{version}.schema.json').read_text())
 
 
-def shape(value, spec):
+def shape(value, spec, version="1.0.0"):
     if 'oneOf' in spec:
         matches=0
         for alternative in spec['oneOf']:
-            try: shape(value,alternative);matches+=1
+            try: shape(value,alternative,version);matches+=1
             except (ValueError,KeyError,TypeError): pass
         require(matches==1,'closed source authority variant');return
-    if '$ref' in spec: return shape(value, schema()['$defs'][spec['$ref'].rsplit('/', 1)[1]])
+    if '$ref' in spec: return shape(value, schema(version)['$defs'][spec['$ref'].rsplit('/', 1)[1]],version)
     if 'const' in spec: require(type(value) is str and value == spec['const'], 'contract version/constant'); return
     if 'enum' in spec: require(value in spec['enum'], 'source enum')
     kind=spec['type']
     require(type(value) is {'object':dict,'array':list,'string':str,'integer':int,'boolean':bool}[kind], 'wire type')
     if kind=='object':
         require(set(spec.get('required', spec['properties'])) <= set(value) <= set(spec['properties']), 'closed source fields')
-        for name, item in value.items(): shape(item, spec['properties'][name])
+        for name, item in value.items(): shape(item, spec['properties'][name],version)
     elif kind=='array':
-        for item in value: shape(item, spec['items'])
+        for item in value: shape(item, spec['items'],version)
     elif kind=='string':
         require(not any(0xD800<=ord(c)<=0xDFFF for c in value), 'Unicode scalar')
         require(len(value)>=spec.get('minLength',0), 'source text length')
@@ -52,7 +52,8 @@ def refs(values, inventory):
 
 
 def validate(evidence):
-    shape(evidence, {'$ref':'#/$defs/QualifiedSourceDependencies'})
+    require(evidence.get('version') in ('1.0.0','1.1.0'), 'source version')
+    shape(evidence, {'$ref':'#/$defs/QualifiedSourceDependencies'},evidence['version'])
     require(len(evidence['air'])<=1 and all(re.fullmatch('[0-9a-f]{64}', d['sha256']) for d in [evidence['source']]+evidence['air']), 'digest')
     require(evidence['source']['schema'] in ('cobol-semantic-product','cobol-semantic-compilation'), 'source schema')
     require(len({key(u['unit']) for u in evidence['units']})==len(evidence['units']), 'duplicate source unit')
@@ -60,7 +61,14 @@ def validate(evidence):
         unit=u['unit']; require(bool(unit['compilationUnitId']) and bool(unit['structuralPath']) and all(n>=0 for n in unit['structuralPath']), 'unit identity')
         ss=index(u['statements']); ns=index(u['nodes']); ps=index(u['proofs']); es=index(u['events']); gs=index(u['guards']); sels=index(u['selections']); ts=index(u['targets']); index(u['derivations']); index(u['occurrences'])
         for s in u['statements']: require(s['id']['unit']==unit and bool(s['id']['handle']), 'statement identity')
-        for p in u['proofs']: refs(p['dependencies'],ps)
+        for p in u['proofs']:
+            refs(p['dependencies'],ps)
+            require(p['kind'] in {'LOCAL_GRAMMAR','RESOLVED_TARGET','EXPANDED_INCLUDE','INPUT_REGION_ISOLATION','PARTIAL_UNKNOWN'} | ({'CONTROL_POSSIBILITY'} if evidence['version']=='1.1.0' else set()), 'proof kind/version')
+        pending_proofs=list(u['proofs']); grounded_proofs=set()
+        while pending_proofs:
+            ready=[p for p in pending_proofs if set(p['dependencies'])<=grounded_proofs]
+            require(bool(ready),'cyclic proof authority')
+            ready_ids={p['id'] for p in ready};grounded_proofs.update(ready_ids);pending_proofs=[p for p in pending_proofs if p['id'] not in ready_ids]
         for g in u['guards']: refs([g['event']],es);require(g['kind'] in ('CONDITION_RAISED','DEFAULT_DISPOSITION_APPLIES'), 'guard kind')
         for t in u['targets']:
             refs(t['entry'],ss); require(len(t['entry'])<=1 and bool(t['registrations']), 'target registration')
@@ -97,7 +105,7 @@ def validate(evidence):
         while pending:
             ready=[d for d in pending if set(d['source']+d['callerPremise'])<=reached]
             if not ready: break
-            reached.update(d['destination'] for d in ready);pending=[d for d in pending if d not in ready]
+            reached.update(d['destination'] for d in ready);ready_ids={d['id'] for d in ready};pending=[d for d in pending if d['id'] not in ready_ids]
         require(reached=={n['id'] for n in u['nodes']}, 'grounded source nodes')
         for o in u['occurrences']:
             refs([o['id']],ss);refs(o['qualifications'],ns)
@@ -106,6 +114,14 @@ def validate(evidence):
             require(len(o['values'])<=1 and len(o['operands'])<=1 and o['valueRemainder']==(not o['values']), 'value remainder')
             if o['values']: require(o['targetKind']=='LITERAL' and bool(o['operands']), 'literal value authority')
             for v in o['values']: require(v['logicalDomain']=='TEXT' and len(v['value'])==v['logicalExtent'], 'logical value')
+        file_uses=set()
+        for f in u.get('nativeFiles',[]):
+            refs([f['statement']],ss);refs(f['qualifications'],ns)
+            ident=(key(f['statement']),f['ordinal']);require(ident not in file_uses,'duplicate native file use');file_uses.add(ident)
+            require(f['statement']['unit']==unit and f['command'] in {'OPEN','READ','WRITE','REWRITE','DELETE_RECORD','START','CLOSE','RELEASE','RETURN','SORT','MERGE'},'native file owner/command')
+            require(set(f['qualifications'])=={n['id'] for n in u['nodes'] if n['location']==f['controlLocation']},'native file control point alternatives')
+            require(len(f['names'])<=1 and (not f['local'] or not f['names']),'native file binding/locality')
+            require(all(n['declarationOrigins'] for n in f['names']),'native file declaration provenance')
         if 'nominalValues' in u: nominal(u)
         if not u['controlAvailable']: require(not u['nodes'] and not u['derivations'] and not u['selections'], 'no unavailable authority')
     return evidence
@@ -141,19 +157,54 @@ def nominal(unit):
     for q in facts['queries']: require(key(q['node']) in symbols and q['statement'] in occurrences and occurrences[q['statement']]['targetKind']=='COMPUTED', 'nominal query owner')
 
 
+def assumed_only(unit):
+    # Independent least fixed point: alternatives are OR; source/caller premises are AND.
+    assumed={p['id'] for p in unit['proofs'] if p['kind']=='CONTROL_POSSIBILITY'}
+    if not assumed:return set()
+    while True:
+        expanded=assumed | {p['id'] for p in unit['proofs'] if set(p['dependencies']) & assumed}
+        if expanded==assumed:break
+        assumed=expanded
+    ground=set()
+    while True:
+        expanded=ground | {d['destination'] for d in unit['derivations'] if not set(d['proofs']) & assumed and set(d['source']+d['callerPremise'])<=ground}
+        if expanded==ground:break
+        ground=expanded
+    return {n['id'] for n in unit['nodes']}-ground
+
+
+def control_affected(unit):
+    hypothetical={p['id'] for p in unit['proofs'] if p['kind']=='CONTROL_POSSIBILITY'}
+    while True:
+        expanded=hypothetical|{p['id'] for p in unit['proofs'] if set(p['dependencies'])&hypothetical}
+        if expanded==hypothetical:break
+        hypothetical=expanded
+    affected=set()
+    while True:
+        expanded=affected|{d['destination'] for d in unit['derivations'] if set(d['proofs'])&hypothetical or set(d['source']+d['callerPremise'])&affected}
+        if expanded==affected:return affected
+        affected=expanded
+
+
+def status(unit, qualifications, assumptions=None):
+    if assumptions is None: assumptions=control_affected(unit)
+    return 'CONTROL_UNAVAILABLE' if not unit['controlAvailable'] else 'NOT_QUALIFIED_IN_SOURCE_MODEL' if not qualifications else 'POSSIBLE_UNDER_UNKNOWN_CONTROL' if set(qualifications)&assumptions else 'QUALIFIED_POSSIBLE'
+
+
 def publication(section, publication_id):
     require(set(section)=={'analysisBoundary','evidence','occurrences'} and section['analysisBoundary']=='NON_EXECUTABLE_SOURCE', 'source publication boundary')
     e=validate(section['evidence']);require(len(e['air'])==1 and e['air'][0]['publication']==publication_id, 'AIR correlation')
+    assumptions={key(u['unit']):control_affected(u) for u in e['units']}
     source={key(o['id']):(u,o) for u in e['units'] for o in u['occurrences']}
     require(len(source)==len(section['occurrences']), 'occurrence preservation')
     seen=set()
     for o in section['occurrences']:
         require(set(o)=={'occurrence','status','valueRemainder','interpretationRemainder','candidates'}, 'source occurrence result')
         k=key(o['occurrence']);require(k in source and k not in seen, 'result occurrence identity');seen.add(k);u,s=source[k]
-        status='CONTROL_UNAVAILABLE' if not u['controlAvailable'] else 'QUALIFIED_POSSIBLE' if s['qualifications'] else 'NOT_QUALIFIED_IN_SOURCE_MODEL'
-        require(o['status']==status and o['valueRemainder']==s['valueRemainder'], 'source status/value remainder')
+        state=status(u,s['qualifications'],assumptions[key(u['unit'])])
+        require(o['status']==state and o['valueRemainder']==s['valueRemainder'], 'source status/value remainder')
         for c in o['candidates']:
             require(set(c)=={'referenceName','rawValue','occurrence','qualifications'}, 'candidate fields')
-            require(status=='QUALIFIED_POSSIBLE' and c['occurrence']==o['occurrence'] and c['qualifications']==s['qualifications'], 'candidate qualification')
+            require(state in ('QUALIFIED_POSSIBLE','POSSIBLE_UNDER_UNKNOWN_CONTROL') and c['occurrence']==o['occurrence'] and c['qualifications']==s['qualifications'], 'candidate qualification')
             require(c['rawValue'] in [v['value'] for v in s['values']], 'candidate value authority')
             require(re.fullmatch(r'[A-Z_$][A-Z0-9_@#$]{0,7}' if s['technology']=='COBOL' else r'[A-Z0-9$@#]{1,8}',c['referenceName']) is not None, 'candidate name')

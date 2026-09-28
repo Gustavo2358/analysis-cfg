@@ -1,0 +1,19 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. PROBE.
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT F ASSIGN TO FIRSTDD.
+           SELECT G ASSIGN TO SECONDDD.
+       DATA DIVISION.
+       FILE SECTION.
+       FD F.
+       01 REC-F PIC X(8).
+       FD G.
+       01 REC-G PIC X(8).
+       PROCEDURE DIVISION.
+           EXEC SQL UPDATE T SET C = 1 END-EXEC
+           GOBACK.
+           OPEN INPUT F OUTPUT G
+           CLOSE F G
+           GOBACK.

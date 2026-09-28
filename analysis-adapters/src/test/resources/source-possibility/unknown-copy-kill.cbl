@@ -1,0 +1,14 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. PROBE.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 PGM PIC X(8).
+       01 SNAP PIC X(8).
+       PROCEDURE DIVISION.
+           MOVE 'FIRST' TO PGM
+           EXEC SQL UPDATE T SET C = 1 END-EXEC
+           MOVE PGM TO SNAP
+           MOVE 'SECOND' TO PGM
+           CALL PGM
+           CALL SNAP
+           GOBACK.

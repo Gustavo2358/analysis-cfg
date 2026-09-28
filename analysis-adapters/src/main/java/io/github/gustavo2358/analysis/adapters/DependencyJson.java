@@ -11,7 +11,7 @@ import static io.github.gustavo2358.analysis.dependencies.DependencySiteFact.*;
 public final class DependencyJson {
     public void write(DependencyResult result,OutputStream stream) throws IOException {
         var out=new JsonOutput(stream);
-        var document=object("schema","analysis-dependency-result","version",result.sourceQualifiedDependencies().isPresent()?"2.6.0":"2.5.0","airVersion",version(result.airVersion()),
+        var document=object("schema","analysis-dependency-result","version",result.sourceQualifiedDependencies().map(s->s.evidence().version().equals("1.1.0")?"2.7.0":"2.6.0").orElse("2.5.0"),"airVersion",version(result.airVersion()),
             "publication",id(result.publication()),"interpretationProfile","per-site","valuesProfile","scalar-text-effects@1",
             "modelScope",result.structuralScope()?"STRUCTURAL_AIR_OCCURRENCES":"KNOWN_GRAPH_ENTRY","publicationInventory",inventory(result.publicationInventory()),
             "sites",result.sites().stream().sorted(Comparator.comparing(DependencySiteFact::entry,io.github.gustavo2358.analysis.plan.AnalysisKey.ENTRY_ORDER).thenComparing(f->f.operation().localId())).map(s->site(s,true)).toList(),
@@ -26,17 +26,23 @@ public final class DependencyJson {
             "analysisBoundary","NON_EXECUTABLE_SOURCE","evidence",QualifiedSourceJson.value(source.evidence()),
             "occurrences",source.occurrences().stream().map(o->object("occurrence",QualifiedSourceJson.value(o.occurrence()),"status",o.status().name(),"valueRemainder",o.valueRemainder(),"interpretationRemainder",o.interpretationRemainder(),
                 "candidates",o.candidates().stream().map(c->object("referenceName",c.referenceName(),"rawValue",c.rawValue(),"occurrence",QualifiedSourceJson.value(c.occurrence()),"qualifications",c.qualifications())).toList())).toList())));
-        document.put("dependencies",object("programs",result.programDependencies().stream().map(DependencyJson::program).toList()));
+        var dependencies=object("programs",result.programDependencies().stream().map(DependencyJson::program).toList());
+        result.sourceQualifiedDependencies().filter(s->!s.nativeFiles().isEmpty()).ifPresent(s->dependencies.put("files",s.nativeFiles().stream().map(f->object(
+            "analysisBoundary","NON_EXECUTABLE_SOURCE","source",QualifiedSourceJson.value(f.source()),"status",f.status().name(),"remainder",f.remainder(),
+            "candidates",f.candidates().stream().map(c->object("referenceName",c.referenceName(),"rawValue",c.rawValue(),"qualifications",c.qualifications())).toList())).toList()));
+        document.put("dependencies",dependencies);
         out.value(document);out.finish();
     }
     private static Object program(TargetResolver.Resolution resolved) {
         var o=resolved.occurrence();
-        return object("sourceOccurrence",o.source().map(QualifiedSourceJson::value).orElse(null),"caller",o.caller(),
+        var result=object("sourceOccurrence",o.source().map(QualifiedSourceJson::value).orElse(null),"caller",o.caller(),
             "technology",o.technology(),"nameProfile",o.nameProfile(),"targetKind",o.targetKind(),"authorities",resolved.authorities(),
             "qualifications",o.qualifications(),"executableOperations",ids(o.executableOperations()),
             "executableSites",resolved.executableSites().stream().map(s->object("entry",id(s.entry()),"operation",id(s.operation()),"reachability",s.reachability().name(),"valuePoint",s.valuePoint()==null?null:ResultJson.point(s.valuePoint()),"premises",ids(s.premises()),"provenance",ids(s.provenance()))).toList(),
             "candidates",resolved.candidates().stream().map(DependencyJson::programCandidate).toList(),
             "valueRemainder",resolved.valueRemainder(),"interpretationRemainder",resolved.interpretationRemainder(),"analysisReasons",resolved.analysisReasons());
+        if(o.sourceControlRemainder())result.put("controlRemainder",true);
+        return result;
     }
     private static Object programCandidate(TargetResolver.Candidate c) {
         var out=object("referenceName",c.referenceName(),"rawValue",c.rawValue(),"supports",supports(c.executableSupports()),"qualifications",c.sourceQualifications());

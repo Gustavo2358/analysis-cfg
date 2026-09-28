@@ -179,8 +179,8 @@ def reasons(values):
 
 def file_dependencies(f, document):
     fields(f, 'valuesProfile declarationInventory declarations sites edges metrics')
-    context_profile = document['version'] in ('2.3.0','2.4.0','2.5.0','2.6.0')
-    computed_profile = document['version'] in ('2.2.0','2.3.0','2.4.0','2.5.0','2.6.0')
+    context_profile = document['version'] in ('2.3.0','2.4.0','2.5.0','2.6.0','2.7.0')
+    computed_profile = document['version'] in ('2.2.0','2.3.0','2.4.0','2.5.0','2.6.0','2.7.0')
     require(f['valuesProfile'] == ('file-values-context@1' if context_profile else 'file-values@1' if computed_profile else 'file-literal@1'), 'FILE values profile')
     require(f['declarationInventory'] in ('COMPLETE','PARTIAL','UNAVAILABLE'), 'FILE inventory')
     publication = document['publication']['localId']
@@ -249,7 +249,7 @@ def file_dependencies(f, document):
         for k, domain in (('entry','entry'),('sequence','label'),('operation','operation')):
             ref(s[k],domain); require(s[k]['unit']==s['owner']['localId'], 'FILE site owner')
         text(s['action']); require(bool(s['action']),'FILE action')
-        local = s['targetKind'] == 'LOCAL' and document['version'] in ('2.1.0','2.2.0','2.3.0','2.4.0','2.5.0','2.6.0')
+        local = s['targetKind'] == 'LOCAL' and document['version'] in ('2.1.0','2.2.0','2.3.0','2.4.0','2.5.0','2.6.0','2.7.0')
         if local: require(s['namespace'] is None, 'local use has no external namespace')
         else: text(s['namespace']); require(bool(s['namespace']), 'FILE namespace')
         require(local or s['targetKind'] in ('LITERAL','COMPUTED'), 'FILE target kind')
@@ -312,14 +312,14 @@ def source_dependencies(value, document):
     for d in dependencies:
         fields(d,'program kind name qualification remainder supports')
         identity(d['program'],'unit'); require(d['program']['publication']==publication,'foreign source owner')
-        require(d['kind'] in (('COPYBOOK','DCLGEN','SQL_INCLUDE','DB2_TABLE') if document['version'] in ('2.5.0','2.6.0') else ('COPYBOOK','DCLGEN','SQL_INCLUDE')),'source kind')
+        require(d['kind'] in (('COPYBOOK','DCLGEN','SQL_INCLUDE','DB2_TABLE') if document['version'] in ('2.5.0','2.6.0','2.7.0') else ('COPYBOOK','DCLGEN','SQL_INCLUDE')),'source kind')
         text(d['name']); text(d['qualification']); boolean(d['remainder'])
         require(d['name'] and d['name']==d['name'].upper() and d['qualification']==d['qualification'].upper(),'canonical source name')
         array(d['supports']); require(bool(d['supports']),'source evidence absent')
         ordered(d['supports'],lambda s:u16(s['occurrence']['localId']))
         incomplete=False
         for support in d['supports']:
-            fields(support,'occurrence origin sourceOwner relationship resolution resolvedArtifact classificationAuthority'+(' operation access' if document['version'] in ('2.5.0','2.6.0') else ''))
+            fields(support,'occurrence origin sourceOwner relationship resolution resolvedArtifact classificationAuthority'+(' operation access' if document['version'] in ('2.5.0','2.6.0','2.7.0') else ''))
             for name,domain in [('occurrence','resource'),('origin','origin'),('sourceOwner','artifact')]:
                 identity(support[name],domain); require(support[name]['publication']==publication,'foreign source reference')
             occurrence=support['occurrence']['localId']; require(occurrence not in seen,'duplicate source occurrence'); seen.add(occurrence)
@@ -338,7 +338,7 @@ def source_dependencies(value, document):
             require((d['kind']=='DCLGEN')==(authority=='CONFIGURED_DCLGEN'),'DCLGEN authority')
             require(d['kind']!='DCLGEN' or d['name'] not in ('SQLCA','SQLDA'),'builtins not DCLGEN')
             require((d['kind']=='DB2_TABLE')==(authority=='STATIC_SQL_TABLE_POSITION')==(support['resolution']=='NOT_APPLICABLE'),'DB2 authority/resolution')
-            if document['version'] in ('2.5.0','2.6.0'):
+            if document['version'] in ('2.5.0','2.6.0','2.7.0'):
                 usage=(support['operation'],support['access'])
                 require(usage in {('SELECT','READ'),('INSERT','WRITE'),('UPDATE','WRITE'),('DELETE','WRITE'),('MERGE','READ'),('MERGE','READ_WRITE')} if d['kind']=='DB2_TABLE' else usage==('NONE','NONE'),'source usage')
             incomplete |= support['resolution'] not in ('RESOLVED','NOT_APPLICABLE') or authority=='UNKNOWN'
@@ -351,7 +351,7 @@ def source_dependencies(value, document):
 def conditional_assumptions(assumptions, facts):
     required={'NOMINAL_DECLARATIONS_PRESERVE_MEANING','NO_UNMODELED_STORAGE_INTERFERENCE'}
     model='SYNTHETIC_MODEL_IS_NOT_KILL_PROOF'
-    require(len(assumptions)==len(set(assumptions)) and required<=set(assumptions)<=required|{'DECLARATIVE_INITIAL_VALUES_APPLY',model}, 'conditional assumptions')
+    require(len(assumptions)==len(set(assumptions)) and required<=set(assumptions)<=required|{'DECLARATIVE_INITIAL_VALUES_APPLY','UNKNOWN_CONTROL_CAN_COMPLETE',model}, 'conditional assumptions')
     if model in assumptions:
         require(facts['authority']=='NOMINAL_TEXT_SOURCE_V2' and any(s.get('modelAssumed') is True for s in facts['symbols']), 'model assumption authority')
 
@@ -371,6 +371,7 @@ def conditional_supports(candidate, occurrence, source, document):
         fields(support,'provider analysisBoundary assumptions evidence uncertainties')
         require(support['provider']=='nominal-source-text@1' and support['analysisBoundary']=='NON_EXECUTABLE_SOURCE', 'conditional provider boundary')
         assumptions=support['assumptions'];conditional_assumptions(assumptions,nominal['facts'])
+        require(('UNKNOWN_CONTROL_CAN_COMPLETE' in assumptions)==occurrence.get('controlRemainder',False),'conditional control assumption')
         require(support['uncertainties']==nominal['uncertainties'], 'conditional missing input provenance')
         evidence=array(support['evidence']);require(bool(evidence) and len({key(e) for e in evidence})==len(evidence), 'conditional source contributions')
         for e in evidence:
@@ -380,17 +381,19 @@ def conditional_supports(candidate, occurrence, source, document):
 
 
 def program_inventory(value, document):
-    fields(value, 'programs')
+    fields(value, 'programs' + (' files' if 'files' in value and document['version']=='2.7.0' else ''))
     seen = set()
     source = document.get('sourceQualifiedDependencies', {}).get('evidence', {})
+    from qualified_source_wire import control_affected
+    assumptions={json.dumps(u['unit'],sort_keys=True):control_affected(u) for u in source.get('units',[])}
     source_occurrences = {json.dumps(o['id'],sort_keys=True): o for u in source.get('units', []) for o in u['occurrences']}
     for p in array(value['programs']):
-        fields(p, 'sourceOccurrence caller technology nameProfile targetKind authorities qualifications executableOperations executableSites candidates valueRemainder interpretationRemainder analysisReasons')
+        fields(p, 'sourceOccurrence caller technology nameProfile targetKind authorities qualifications executableOperations executableSites candidates valueRemainder interpretationRemainder analysisReasons' + (' controlRemainder' if 'controlRemainder' in p and document['version']=='2.7.0' else ''))
         text(p['caller']); text(p['nameProfile'])
         require(p['targetKind'] in ('LITERAL','COMPUTED','UNAVAILABLE'), 'program target kind')
         require(p['technology'] in ('COBOL','CICS'), 'program technology')
         boolean(p['valueRemainder']); boolean(p['interpretationRemainder']); reasons(p['analysisReasons'])
-        require(set(p['authorities']) <= {'EXECUTABLE_FLOW','EXECUTABLE_OCCURRENCE','SOURCE_QUALIFIED','CONDITIONAL_SOURCE_VALUES'}, 'program authority')
+        require(set(p['authorities']) <= {'EXECUTABLE_FLOW','EXECUTABLE_OCCURRENCE','SOURCE_QUALIFIED','CONDITIONAL_SOURCE_VALUES'} | ({'SOURCE_CONTROL_POSSIBLE'} if document['version']=='2.7.0' else set()), 'program authority')
         refs(p['executableOperations'], 'operation')
         key=json.dumps(p['sourceOccurrence'] if p['sourceOccurrence'] is not None else p['executableOperations'],sort_keys=True)
         require(key not in seen, 'duplicate unified occurrence'); seen.add(key)
@@ -400,7 +403,13 @@ def program_inventory(value, document):
             require(all(q in occurrence['qualifications'] for q in p['qualifications']), 'source qualification correlation')
         else:
             require(not p['qualifications'], 'source authority without occurrence')
-        require(('SOURCE_QUALIFIED' in p['authorities']) == bool(p['qualifications']), 'source authority status')
+        from qualified_source_wire import control_affected
+        unit=next((u for u in source.get('units',[]) if p['sourceOccurrence'] is not None and u['unit']==p['sourceOccurrence']['unit']),None)
+        uncertain=bool(unit is not None and set(p['qualifications'])&assumptions[json.dumps(unit['unit'],sort_keys=True)])
+        require(p.get('controlRemainder',False)==uncertain and ('controlRemainder' not in p or p['controlRemainder'] is True),'source control remainder')
+        require(('SOURCE_CONTROL_POSSIBLE' in p['authorities'])==uncertain, 'source possibility authority')
+        require(('SOURCE_QUALIFIED' in p['authorities']) == (bool(p['qualifications']) and not uncertain), 'source authority status')
+        require(('SOURCE_CONTROL_UNAVAILABLE' in p['analysisReasons'])==uncertain, 'source control reason')
         for site in array(p['executableSites']):
             fields(site, 'entry operation reachability valuePoint premises provenance')
             require(site['operation'] in p['executableOperations'], 'unified operation ownership')
@@ -417,12 +426,40 @@ def program_inventory(value, document):
             require(all(support in [s for v in known for s in v['supports']] for support in c['supports']), 'invented producer')
             require(bool(c['supports'] or c['qualifications']), 'candidate without support')
 
+    if 'files' in value:
+        native_file_inventory(value['files'],source,document)
+    else:require(not any(u.get('nativeFiles') for u in source.get('units',[])),'missing native file results')
+
+
+def native_file_inventory(results,source,document):
+    from qualified_source_wire import key,status
+    expected={(key(f['statement']),f['ordinal']):(u,f) for u in source['units'] for f in u.get('nativeFiles',[])}
+    seen=set();remainder=False
+    from qualified_source_wire import control_affected
+    assumptions={key(u['unit']):control_affected(u) for u in source['units']}
+    for r in array(results):
+        fields(r,'analysisBoundary source status remainder candidates')
+        require(r['analysisBoundary']=='NON_EXECUTABLE_SOURCE','native source boundary')
+        f=r['source'];ident=(key(f['statement']),f['ordinal'])
+        require(ident in expected and ident not in seen,'native source identity');seen.add(ident)
+        u,original=expected[ident];require(f==original,'native source evidence correlation')
+        state=status(u,f['qualifications'],assumptions[key(u['unit'])]);require(r['status']==state,'native source status')
+        expected_candidates=[]
+        for n in f['names'] if f['qualifications'] else []:
+            # COBOL external file names use the exact declared spelling.
+            expected_candidates.append(dict(referenceName=n['rawValue'],rawValue=n['rawValue'],qualifications=f['qualifications']))
+        require(r['candidates']==expected_candidates,'native source candidates/provenance')
+        open_value=(not f['local'] and not f['names']) or bool(f['gaps']) or state=='POSSIBLE_UNDER_UNKNOWN_CONTROL'
+        require(r['remainder']==open_value,'native source remainder');remainder|=open_value
+    require(seen==set(expected),'native use preservation')
+    require(('SOURCE_NATIVE_FILE_REMAINDER' in document['analysisReasons'])==remainder,'native source reason')
+
 
 def validate(d):
-    files = d.get('version') in ('2.0.0','2.1.0','2.2.0','2.3.0','2.4.0','2.5.0','2.6.0')
+    files = d.get('version') in ('2.0.0','2.1.0','2.2.0','2.3.0','2.4.0','2.5.0','2.6.0','2.7.0')
     extended = files or d.get('version') == '1.2.0'
-    fields(d, 'schema version airVersion publication interpretationProfile valuesProfile modelScope publicationInventory sites edges metrics origins artifacts sourceUncertaintyRefs' + (' analysisStatus analysisReasons' if extended else '') + (' analysisBoundary fileDependencies' if files else '') + (' sourceDependencies' if d.get('version') in ('2.4.0','2.5.0','2.6.0') else '') + (' sourceQualifiedDependencies' if d.get('version')=='2.6.0' else '') + (' dependencies' if 'dependencies' in d else ''))
-    require(d['schema'] == 'analysis-dependency-result' and d['version'] in ('1.1.0', '1.2.0', '2.0.0', '2.1.0', '2.2.0', '2.3.0', '2.4.0', '2.5.0','2.6.0') and d['airVersion'] == '2.0.0', 'schema/version')
+    fields(d, 'schema version airVersion publication interpretationProfile valuesProfile modelScope publicationInventory sites edges metrics origins artifacts sourceUncertaintyRefs' + (' analysisStatus analysisReasons' if extended else '') + (' analysisBoundary fileDependencies' if files else '') + (' sourceDependencies' if d.get('version') in ('2.4.0','2.5.0','2.6.0','2.7.0') else '') + (' sourceQualifiedDependencies' if d.get('version') in ('2.6.0','2.7.0') else '') + (' dependencies' if 'dependencies' in d else ''))
+    require(d['schema'] == 'analysis-dependency-result' and d['version'] in ('1.1.0', '1.2.0', '2.0.0', '2.1.0', '2.2.0', '2.3.0', '2.4.0', '2.5.0','2.6.0','2.7.0') and d['airVersion'] == '2.0.0', 'schema/version')
     identity(d['publication'], 'publication')
     require(d['interpretationProfile'] == 'per-site' and d['valuesProfile'] == 'scalar-text-effects@1' and d['modelScope'] in (('KNOWN_GRAPH_ENTRY', 'STRUCTURAL_AIR_OCCURRENCES') if extended else ('KNOWN_GRAPH_ENTRY',)), 'profiles/scope')
     require(d['publicationInventory'] in ('COMPLETE', 'PARTIAL', 'UNAVAILABLE'), 'inventory')
@@ -432,8 +469,8 @@ def validate(d):
     if extended:
         require(d['analysisStatus'] in (('COMPLETE','PARTIAL') if files else ('PARTIAL',)), 'extended result partial status')
         reasons(d['analysisReasons'])
-        require((d['analysisStatus']=='PARTIAL') == (bool(d['analysisReasons']) or any(s['analysisStatus'] == 'PARTIAL' for s in d['sites']) or d.get('version') in ('2.4.0','2.5.0','2.6.0') and d['sourceDependencies']['available'] and d['sourceDependencies']['remainder']), 'partial result must expose its cause')
-        structural = any(s['reachability'] == 'UNKNOWN' for s in d['sites']) or not d['sites'] and any(not r.startswith('CONDITIONAL_') for r in d['analysisReasons'])
+        require((d['analysisStatus']=='PARTIAL') == (bool(d['analysisReasons']) or any(s['analysisStatus'] == 'PARTIAL' for s in d['sites']) or d.get('version') in ('2.4.0','2.5.0','2.6.0','2.7.0') and d['sourceDependencies']['available'] and d['sourceDependencies']['remainder']), 'partial result must expose its cause')
+        structural = any(s['reachability'] == 'UNKNOWN' for s in d['sites']) or not d['sites'] and any(not r.startswith('CONDITIONAL_') and r not in ('SOURCE_CONTROL_UNAVAILABLE','SOURCE_NATIVE_FILE_REMAINDER') for r in d['analysisReasons'])
         require((d['modelScope'] == 'STRUCTURAL_AIR_OCCURRENCES') == structural, 'structural/graph scope mismatch')
     expected = [dict(caller=s['caller'], entry=s['entry'], site=s['operation'], candidate=c, openSite=s['effectiveUnknownRemainder'] or s['reachability']=='UNKNOWN')
                 for s in d['sites'] if s['reachability'] != 'UNREACHABLE_IN_MODEL' for c in s['candidates']]
@@ -457,25 +494,25 @@ def validate(d):
             for f in array(o['includes']):
                 fields(f, 'including included requestedName site'); identity(f['including'], 'artifact'); identity(f['included'], 'artifact'); text(f['requestedName']); location(f['site'])
     ordered(d['origins'], lambda o: u16(o['id']['localId']))
-    origins = [o['id'] for o in d['origins']]
+    origins = {json.dumps(o['id'],sort_keys=True) for o in d['origins']}
     for s in d['sites']:
-        require(all(ref in origins for ref in [s['siteOrigin'], s['targetOrigin'], *s['provenance']]), 'unresolved source origin')
+        require(all(json.dumps(ref,sort_keys=True) in origins for ref in [s['siteOrigin'], s['targetOrigin'], *s['provenance']]), 'unresolved source origin')
     for o in d['origins']:
         if o['kind'] == 'DERIVED':
-            require(all(ref in origins for ref in o['inputs']), 'unresolved derivation origin')
+            require(all(json.dumps(ref,sort_keys=True) in origins for ref in o['inputs']), 'unresolved derivation origin')
     for a in array(d['artifacts']):
         fields(a, 'id logicalName contentDigest'); identity(a['id'], 'artifact'); text(a['logicalName'])
         if a['contentDigest'] is not None:
             text(a['contentDigest'])
     ordered(d['artifacts'], lambda a: u16(a['id']['localId']))
-    artifacts = [a['id'] for a in d['artifacts']]
-    require(all(o['artifact'] in artifacts for o in d['origins'] if o['kind'] == 'WRITTEN'), 'unresolved artifact')
+    artifacts = {json.dumps(a['id'],sort_keys=True) for a in d['artifacts']}
+    require(all(json.dumps(o['artifact'],sort_keys=True) in artifacts for o in d['origins'] if o['kind'] == 'WRITTEN'), 'unresolved artifact')
     if files:
         require(d['analysisBoundary']=='COBOL_SOURCE_ONLY','source-only boundary')
         file_dependencies(d['fileDependencies'],d)
-    if d['version'] in ('2.4.0','2.5.0','2.6.0'):
+    if d['version'] in ('2.4.0','2.5.0','2.6.0','2.7.0'):
         source_dependencies(d['sourceDependencies'],d)
-    if d['version']=='2.6.0':
+    if d['version'] in ('2.6.0','2.7.0'):
         from qualified_source_wire import publication
         publication(d['sourceQualifiedDependencies'],d['publication']['localId'])
     if 'dependencies' in d:

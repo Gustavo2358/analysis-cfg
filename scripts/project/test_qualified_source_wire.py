@@ -10,7 +10,7 @@ d=read(FIX/'ordinary.dependencies.json')
 for mutate in ['old-version','newer-version','dangling-node','operand','guards','proof','candidate','fake-air']:
     x=copy.deepcopy(d)
     if mutate=='old-version':x['version']='2.5.0'
-    elif mutate=='newer-version':x['version']='2.7.0'
+    elif mutate=='newer-version':x['version']='2.8.0'
     elif mutate=='candidate':x['sourceQualifiedDependencies']['occurrences'][0]['candidates'][0]['qualifications']=[]
     else:
         u=x['sourceQualifiedDependencies']['evidence']['units'][0]
@@ -75,3 +75,38 @@ for assumptions,f in [(model+['INVENTED'],facts),(model+model,facts),(model,{**f
     except ValueError:pass
     else:raise AssertionError('unproved or malformed model assumption')
 print('MODEL_ASSUMPTIONS_WIRE: producer assumption and four rejections PASS')
+
+# W1 producer outputs retain uncertainty and declaration evidence independently of AIR.
+W1=FIX.parent/'source-possibility'
+for path in W1.glob('*.dependencies.json'):result(json.loads(path.read_text()))
+base=json.loads((W1/'sql-update.dependencies.json').read_text())
+for mutation in ('old-version','old-source-version','closed-control','false-status','lost-reason','false-authority'):
+    x=copy.deepcopy(base);p=x['dependencies']['programs'][0]
+    if mutation=='old-version':x['version']='2.6.0'
+    elif mutation=='old-source-version':x['sourceQualifiedDependencies']['evidence']['version']='1.0.0'
+    elif mutation=='closed-control':p.pop('controlRemainder')
+    elif mutation=='false-status':x['sourceQualifiedDependencies']['occurrences'][0]['status']='QUALIFIED_POSSIBLE'
+    elif mutation=='lost-reason':p['analysisReasons']=[]
+    elif mutation=='false-authority':p['authorities']=['SOURCE_QUALIFIED']
+    try:result(x)
+    except (ValueError,KeyError,TypeError):pass
+    else:raise AssertionError(mutation)
+native=json.loads((W1/'unknown-native.dependencies.json').read_text())
+for mutation in ('lost-use','fake-name','lost-origin','wrong-point','false-status','closed-remainder'):
+    x=copy.deepcopy(native);f=x['dependencies']['files'][0]
+    if mutation=='lost-use':x['dependencies']['files'].pop()
+    elif mutation=='fake-name':f['candidates'][0]['referenceName']='INVENTED'
+    elif mutation=='lost-origin':f['source']['names'][0]['declarationOrigins']=[]
+    elif mutation=='wrong-point':f['source']['controlLocation']='wrong'
+    elif mutation=='false-status':f['status']='QUALIFIED_POSSIBLE'
+    else:f['remainder']=False
+    try:result(x)
+    except (ValueError,KeyError,TypeError):pass
+    else:raise AssertionError(mutation)
+print('SOURCE_POSSIBILITY_WIRE: fourteen producer outputs + twelve rejections PASS')
+
+for name,expected in [('unknown-branch-query',{'FIRST','SECOND'}),('unknown-branch-kill',{'FINAL'}),('unknown-copy-kill',{'FIRST','SECOND'})]:
+    d=read(W1/(name+'.dependencies.json'));rows=d['dependencies']['programs']
+    assert {c['referenceName'] for p in rows for c in p['candidates']}==expected,name
+    assert all(p['controlRemainder'] for p in rows),name
+print('SOURCE_JOIN_VALUES: open branch survives closed executable query; exact overwrite retained PASS')

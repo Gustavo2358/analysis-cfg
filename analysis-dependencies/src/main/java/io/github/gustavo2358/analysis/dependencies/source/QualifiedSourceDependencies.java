@@ -12,7 +12,8 @@ public record QualifiedSourceDependencies(String schema, String version, String 
             Objects.requireNonNull(source);
             air=List.copyOf(air);
             units=List.copyOf(units);
-            require(schema.equals("qualified-source-dependencies") && version.equals("1.0.0"), "unsupported source contract"); one(air); unique(units, UnitEvidence::unit);
+            require(schema.equals("qualified-source-dependencies") && Set.of("1.0.0","1.1.0").contains(version), "unsupported source contract"); one(air); unique(units, UnitEvidence::unit);
+            require(!version.equals("1.0.0")||units.stream().allMatch(u->u.nativeFiles().isEmpty()&&u.proofs().stream().noneMatch(p->p.kind().equals("CONTROL_POSSIBILITY"))),"source possibility requires version 1.1.0");
         }
     public record Document(String schema, String version, String sha256) {
         public Document {
@@ -152,7 +153,7 @@ public record QualifiedSourceDependencies(String schema, String version, String 
             text(rule);
             Objects.requireNonNull(provenance);
             dependencies=List.copyOf(dependencies);
-            require(Set.of("LOCAL_GRAMMAR","RESOLVED_TARGET","EXPANDED_INCLUDE","INPUT_REGION_ISOLATION","PARTIAL_UNKNOWN").contains(kind), "proof kind");
+            require(Set.of("LOCAL_GRAMMAR","RESOLVED_TARGET","EXPANDED_INCLUDE","INPUT_REGION_ISOLATION","PARTIAL_UNKNOWN","CONTROL_POSSIBILITY").contains(kind), "proof kind");
         }
     }
     public record Guard(String id, String event, String kind) {
@@ -212,11 +213,35 @@ public record QualifiedSourceDependencies(String schema, String version, String 
             proofs=List.copyOf(proofs);
         }
     }
-    public record UnitEvidence(UnitId unit, boolean controlAvailable, List<Statement> statements, List<Occurrence> occurrences, List<Target> targets, List<Node> nodes, List<Derivation> derivations, List<Selection> selections, List<Event> events, List<Guard> guards, List<Proof> proofs, List<Frontier> frontiers, Optional<NominalValueEvidence> nominalValues) {
+    public record NativeFileName(String declaration,UnitId owner,String logicalFile,String rawValue,List<Provenance> declarationOrigins) {
+        public NativeFileName {text(declaration);Objects.requireNonNull(owner);text(logicalFile);text(rawValue);declarationOrigins=List.copyOf(declarationOrigins);require(!declarationOrigins.isEmpty(),"native file declaration provenance");}
+    }
+    /** Source identity is (statement, ordinal); never an invented AIR operation. */
+    public record NativeFileUse(StatementId statement,int ordinal,String controlLocation,String command,boolean local,List<NativeFileName> names,Provenance provenance,List<String> qualifications,List<String> gaps) {
+        public NativeFileUse {
+            Objects.requireNonNull(statement);text(controlLocation);require(ordinal>=0,"native file ordinal");
+            require(Set.of("OPEN","READ","WRITE","REWRITE","DELETE_RECORD","START","CLOSE","RELEASE","RETURN","SORT","MERGE").contains(command),"native file command");
+            names=List.copyOf(names);one(names);Objects.requireNonNull(provenance);qualifications=List.copyOf(qualifications);gaps=List.copyOf(gaps);
+            require(!local||names.isEmpty(),"local sort work is not an external file");
+        }
+    }
+    public record UnitEvidence(UnitId unit, boolean controlAvailable, List<Statement> statements, List<Occurrence> occurrences, List<Target> targets, List<Node> nodes, List<Derivation> derivations, List<Selection> selections, List<Event> events, List<Guard> guards, List<Proof> proofs, List<Frontier> frontiers, Optional<NominalValueEvidence> nominalValues,List<NativeFileUse> nativeFiles) {
+        public UnitEvidence(UnitId unit,boolean controlAvailable,List<Statement> statements,List<Occurrence> occurrences,List<Target> targets,List<Node> nodes,List<Derivation> derivations,List<Selection> selections,List<Event> events,List<Guard> guards,List<Proof> proofs,List<Frontier> frontiers,Optional<NominalValueEvidence> nominalValues) {
+            this(unit,controlAvailable,statements,occurrences,targets,nodes,derivations,selections,events,guards,proofs,frontiers,nominalValues,List.of());
+        }
         public UnitEvidence(UnitId unit,boolean controlAvailable,List<Statement> statements,List<Occurrence> occurrences,List<Target> targets,List<Node> nodes,List<Derivation> derivations,List<Selection> selections,List<Event> events,List<Guard> guards,List<Proof> proofs,List<Frontier> frontiers) {
             this(unit,controlAvailable,statements,occurrences,targets,nodes,derivations,selections,events,guards,proofs,frontiers,Optional.empty());
         }
         public UnitEvidence {
+            nativeFiles=List.copyOf(nativeFiles);
+            var sourceStatements=unique(statements,Statement::id);var sourceNodes=unique(nodes,Node::id);var uses=new HashSet<String>();
+            for(var f:nativeFiles) {
+                require(f.statement().unit().equals(unit)&&sourceStatements.containsKey(f.statement()),"native file statement");
+                require(uses.add(f.statement().handle()+"/"+f.ordinal()),"duplicate native file use");refs(f.qualifications(),sourceNodes);
+                for(var q:f.qualifications())require(sourceNodes.get(q).location().equals(f.controlLocation()),"native file qualification owner");
+                require(new HashSet<>(f.qualifications()).equals(nodes.stream().filter(n->n.location().equals(f.controlLocation())).map(Node::id).collect(java.util.stream.Collectors.toSet())),"complete native file alternatives");
+                require(controlAvailable||f.qualifications().isEmpty(),"native file control availability");
+            }
             Objects.requireNonNull(nominalValues);
             if(nominalValues.isPresent())nominalValues.get().validate(statements,occurrences,nodes,derivations);
             Objects.requireNonNull(unit);

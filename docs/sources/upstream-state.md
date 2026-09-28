@@ -1,19 +1,15 @@
 # Baseline factual dos repositórios
 
-## Estado vigente — revisão FILE composite control
+## Estado vigente — W7, precondição de reentrada
 
-Os pins abaixo apontam para a branch de revisão `fix/file-composite-flow`, ainda
-sem merge. SP2.51 publica pontos internos de FILE; lower os materializa no contexto
-ativo. AIR, CFG e solver mantêm os contratos existentes. Os campos históricos do
-lock não substituem estes pins.
+SP2.57 e qualified-source-dependencies1.1 preservam candidatos condicionais sem
+acrescentar transições executáveis. Branch de revisão empilhada sobre FILE; sem merge.
 
-- proleap-poc: `8790072a64df8c5e5dcc85c9ac26c7a6d5435bb9`.
-- cobol-lower: `113580fb7eabac3077b752fa89a890bf5ff67193`.
+- proleap-poc: `66f7a37f68e3432101d0bfaa2c1667bfa040ca8d`.
+- cobol-lower: `0b9e64e919b91ff0b4ef3c488b33af3788f39197`.
 
-Qualificação e limites: [FILE composite control](../work/file-composite-qualification.md).
-O fluxo cobre OPEN/CLOSE e SORT/MERGE sem callbacks. Provas de memória, retornos
-indisponíveis e remainders de erro crítico não são fortalecidos por esta mudança.
-As seções seguintes preservam evidência histórica de suas respectivas campanhas.
+Regra, testes e limites: [W7](../work/carddemo-control-w7.md).
+Os campos e as seções históricas não substituem estes pins.
 
 ## Checkpoints históricos
 

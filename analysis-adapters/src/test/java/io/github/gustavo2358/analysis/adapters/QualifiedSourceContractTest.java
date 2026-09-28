@@ -55,7 +55,7 @@ class QualifiedSourceContractTest {
         }
     }
     @Test void versionsIdentitiesAndReferencesAreClosed()throws Exception {
-        for(var version:List.of("0.9.0","1.1.0","2.0.0")){var w=wire("conditional");w.put("version",version);reject(w);}
+        for(var version:List.of("0.9.0","1.2.0","2.0.0")){var w=wire("conditional");w.put("version",version);reject(w);}
         var standalone=wire("conditional");standalone.putArray("air");
         var detached=codec.decode(json.writeValueAsBytes(standalone));assertFalse(SourceQualifiedDependencyResult.admit(detached).occurrences().isEmpty());
         assertThrows(IllegalArgumentException.class,()->SourceQualifiedDependencyResult.admit(detached,"uncorrelated-air"));
@@ -72,5 +72,57 @@ class QualifiedSourceContractTest {
         var selected=read("conditional");assertThrows(IllegalArgumentException.class,()->SourceQualifiedDependencyResult.admit(selected,"another-publication"));
         var candidate=SourceQualifiedDependencyResult.admit(selected,selected.air().getFirst().publication());assertThrows(IllegalArgumentException.class,()->new SourceQualifiedDependencyResult(selected,List.of()));
         assertFalse(candidate.occurrences().isEmpty());
+    }
+
+    private ObjectNode possibility(String name)throws Exception {try(var in=getClass().getResourceAsStream("/source-possibility/"+name+".source.json")){return (ObjectNode)json.readTree(Objects.requireNonNull(in));}}
+    @Test void sourcePossibilityPreservesCandidatesAndProvenExclusions()throws Exception {
+        for(var name:List.of("sql-update","unknown-perform","unknown-before-terminal","unknown-unused","unknown-copy-kill","unknown-native","unknown-native-dead","next-sentence","mutable-transfer","mutable-unreachable","mutable-no-transfer","mutable-perform","unknown-branch-query","unknown-branch-kill")) {
+            var e=codec.decode(json.writeValueAsBytes(possibility(name)));assertEquals(e,codec.decode(codec.encode(e)));
+            var r=SourceQualifiedDependencyResult.admit(e);var expected=name.equals("sql-update")?List.of("AFTERIO"):name.equals("unknown-perform")?List.of("AFTERP"):Set.of("mutable-transfer","mutable-perform").contains(name)?List.of("POSSIBLE"):List.of();
+            assertEquals(expected,r.occurrences().stream().flatMap(o->o.candidates().stream()).map(SourceQualifiedDependencyResult.Candidate::referenceName).toList(),name);
+            if(!expected.isEmpty())assertTrue(r.occurrences().stream().filter(o->!o.candidates().isEmpty()).allMatch(o->o.status()==SourceQualifiedDependencyResult.Status.POSSIBLE_UNDER_UNKNOWN_CONTROL));
+            if(name.equals("unknown-native")) {
+                assertEquals(4,r.nativeFiles().size());
+                assertEquals(Set.of("FIRSTDD","SECONDDD"),r.nativeFiles().stream().flatMap(o->o.candidates().stream()).map(SourceQualifiedDependencyResult.Candidate::referenceName).collect(java.util.stream.Collectors.toSet()));
+                assertTrue(r.nativeFiles().stream().allMatch(o->o.remainder()&&o.status()==SourceQualifiedDependencyResult.Status.POSSIBLE_UNDER_UNKNOWN_CONTROL));
+            }
+            if(name.equals("unknown-native-dead"))assertTrue(r.nativeFiles().stream().allMatch(o->o.candidates().isEmpty()&&o.status()==SourceQualifiedDependencyResult.Status.NOT_QUALIFIED_IN_SOURCE_MODEL));
+        }
+    }
+    @Test void sourcePossibilityVersionAndNativeProvenanceAreClosed()throws Exception {
+        var old=possibility("sql-update");old.put("version","1.0.0");reject(old);
+        for(var mutation:List.of("foreign-node","negative-ordinal","duplicate-use","empty-origin","wrong-point","missing-alternative")) {
+            var w=possibility("unknown-native");var files=(ArrayNode)unit(w).path("nativeFiles");var f=(ObjectNode)files.get(0);
+            switch(mutation) {
+                case "foreign-node" -> f.putArray("qualifications").add("foreign");
+                case "negative-ordinal" -> f.put("ordinal",-1);
+                case "duplicate-use" -> files.add(f.deepCopy());
+                case "empty-origin" -> ((ObjectNode)f.path("names").get(0)).putArray("declarationOrigins");
+                case "wrong-point" -> f.put("controlLocation",files.get(1).path("controlLocation").asText());
+                case "missing-alternative" -> f.putArray("qualifications");
+            }
+            reject(w);
+        }
+    }
+
+    @Test void possibilityCertificateUsesAndForCallersAndOrForAlternatives()throws Exception {
+        var base=read("ordinary").units().getFirst();var origin=base.proofs().getFirst().provenance();
+        var nodes=new ArrayList<QualifiedSourceDependencies.Node>();
+        for(var name:List.of("R","A","B","C","D","E","F"))nodes.add(new QualifiedSourceDependencies.Node(name,"context",base.statements().getFirst().id().handle(),base.nodes().getFirst().support()));
+        var proofs=List.of(new QualifiedSourceDependencies.Proof("certain","LOCAL_GRAMMAR","test",origin,List.of()),
+            new QualifiedSourceDependencies.Proof("assume","CONTROL_POSSIBILITY","test",origin,List.of()),
+            new QualifiedSourceDependencies.Proof("alias","LOCAL_GRAMMAR","test",origin,List.of("assume")));
+        var ds=List.of(new QualifiedSourceDependencies.Derivation("root",List.of(),"R",List.of(),"PRIMARY_ENTRY",List.of("certain"),List.of()),
+            new QualifiedSourceDependencies.Derivation("a",List.of("R"),"A",List.of(),"possible",List.of("assume"),List.of()),
+            new QualifiedSourceDependencies.Derivation("b",List.of("R"),"B",List.of(),"normal",List.of("certain"),List.of()),
+            new QualifiedSourceDependencies.Derivation("c",List.of("B"),"C",List.of("A"),"return",List.of("certain"),List.of()),
+            new QualifiedSourceDependencies.Derivation("d1",List.of("C"),"D",List.of(),"alternative",List.of("certain"),List.of()),
+            new QualifiedSourceDependencies.Derivation("d2",List.of("B"),"D",List.of(),"alternative",List.of("certain"),List.of()),
+            new QualifiedSourceDependencies.Derivation("e",List.of("D"),"E",List.of(),"alias",List.of("alias"),List.of()),
+            new QualifiedSourceDependencies.Derivation("f",List.of("E"),"F",List.of(),"cycle",List.of("certain"),List.of()),
+            new QualifiedSourceDependencies.Derivation("back",List.of("F"),"E",List.of(),"cycle",List.of("certain"),List.of()));
+        var unit=new QualifiedSourceDependencies.UnitEvidence(base.unit(),true,base.statements(),List.of(),List.of(),nodes,ds,List.of(),List.of(),List.of(),proofs,List.of());
+        assertEquals(Set.of("A","C","E","F"),SourceControlEvidence.assumedOnly(unit));
+        assertEquals(Set.of("A","C","D","E","F"),SourceControlEvidence.affected(unit));
     }
 }
