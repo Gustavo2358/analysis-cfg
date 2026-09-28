@@ -1,3 +1,5 @@
+[CardDemo values/control — DONE / MERGED](carddemo-values-control-integration.md): capabilities 1–4 and review corrections integrated; point 5 is a separate campaign.
+
 # Trabalho
 
 [CardDemo FILE e W0–W8 — DONE / MERGED](carddemo-control-integration.md): implementação qualificada e integrada; limites e campanhas futuras separados.
