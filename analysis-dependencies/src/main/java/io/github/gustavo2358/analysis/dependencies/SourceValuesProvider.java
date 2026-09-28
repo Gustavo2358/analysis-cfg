@@ -13,12 +13,13 @@ public final class SourceValuesProvider {
         public Support {evidence=List.copyOf(evidence);assumptions=List.copyOf(assumptions);uncertainties=List.copyOf(uncertainties);}
     }
     public record Candidate(String rawValue,Support support) { }
-    private record Values(Map<String,Set<String>> candidates,boolean open,boolean modelAssumed) {
+    private record Values(Map<String,Set<String>> candidates,boolean open,boolean modelAssumed,boolean tableAssumed) {
+        Values(Map<String,Set<String>> candidates,boolean open,boolean modelAssumed){this(candidates,open,modelAssumed,false);}
         Values(Map<String,Set<String>> candidates,boolean open){this(candidates,open,false);}
         static final Values MODEL_UNKNOWN=new Values(Map.of(),true,true);
         static final Values UNKNOWN=new Values(Map.of(),true);
         Values {var copy=new TreeMap<String,Set<String>>();candidates.forEach((k,v)->copy.put(k,Set.copyOf(v)));candidates=Collections.unmodifiableMap(copy);}
-        Values join(Values other){var out=new TreeMap<>(candidates);other.candidates.forEach((k,v)->out.merge(k,v,SourceValuesProvider::union));return new Values(out,open||other.open,modelAssumed||other.modelAssumed);}
+        Values join(Values other){var out=new TreeMap<>(candidates);other.candidates.forEach((k,v)->out.merge(k,v,SourceValuesProvider::union));return new Values(out,open||other.open,modelAssumed||other.modelAssumed,tableAssumed||other.tableAssumed);}
     }
     private final Set<String> controlAffected;
     private final UnitEvidence unit;
@@ -31,6 +32,7 @@ public final class SourceValuesProvider {
     private final Map<String,Boolean> branches=new HashMap<>();
     private final Map<String,Integer> extents=new TreeMap<>();
     private final Set<String> modelSymbols=new HashSet<>();
+    private final Set<String> summarySymbols=new HashSet<>();
     private final Map<String,String> queries=new HashMap<>();
     private final Map<String,Evidence> evidence=new HashMap<>();
     private final Map<String,Map<String,Values>> before=new HashMap<>();
@@ -56,12 +58,19 @@ public final class SourceValuesProvider {
             assignments.computeIfAbsent(a.statement(),k->new ArrayList<>()).add(a);
             evidence.put(writeKey(a),new Evidence("ASSIGNMENT",a.statement(),statements.get(a.statement()).provenance()));
         }
+        source.facts().tableFields().forEach(f->summarySymbols.add(f.node()));
         source.facts().conditions().forEach(c->predicates.put(c.statement(),c.predicate()));
         source.branches().forEach(b->branches.put(b.derivation(),b.whenTrue()));
         var initial=new TreeMap<String,Values>();extents.keySet().forEach(k->initial.put(k,modelSymbols.contains(k)?Values.MODEL_UNKNOWN:Values.UNKNOWN));
         for(var seed:source.seeds())if(demand.contains(seed.node())&&!modelSymbols.contains(seed.node())) {
             String key="seed/"+seed.node();evidence.put(key,new Evidence("DECLARATION_VALUE",seed.node(),seed.provenance()));
             initial.put(seed.node(),new Values(Map.of(TextPredicate.fit(seed.value(),extents.get(seed.node())),Set.of(key)),false));
+        }
+        var origins=new HashMap<String,Provenance>();source.declarations().forEach(d->origins.put(d.node(),d.provenance()));
+        var assumed=new HashSet<String>();source.facts().symbols().stream().filter(NominalValues.Symbol::modelAssumed).forEach(s->assumed.add(s.node()));
+        for(var field:source.facts().tableFields())if(demand.contains(field.node())&&!modelSymbols.contains(field.node()))for(var seed:field.initial())if(!assumed.contains(seed.origin())) {
+            String key="table-seed/"+field.node()+"/"+seed.origin();evidence.put(key,new Evidence("DECLARATION_VALUE",seed.origin(),origins.get(seed.origin())));
+            initial.merge(field.node(),new Values(Map.of(TextPredicate.fit(seed.value(),extents.get(field.node())),Set.of(key)),true,false,true),Values::join);
         }
         for(var d:unit.derivations()) {
             var premises=new TreeSet<>(d.source());premises.addAll(d.callerPremise());
@@ -90,6 +99,7 @@ public final class SourceValuesProvider {
             var supports=value.getValue().stream().sorted().map(evidence::get).filter(Objects::nonNull).distinct().toList();
             var assumptions=new ArrayList<>(List.of("NOMINAL_DECLARATIONS_PRESERVE_MEANING","NO_UNMODELED_STORAGE_INTERFERENCE"));
             if(unit.nodes().stream().anyMatch(n->n.location().equals(statement)&&controlAffected.contains(n.id())))assumptions.add("UNKNOWN_CONTROL_CAN_COMPLETE");
+            if(values.tableAssumed()||summarySymbols.contains(query))assumptions.add("TABLE_INDEX_NOT_REFINED");
             if(values.modelAssumed())assumptions.add("SYNTHETIC_MODEL_IS_NOT_KILL_PROOF");
             if(supports.stream().anyMatch(e->e.kind().equals("DECLARATION_VALUE")))assumptions.add("DECLARATIVE_INITIAL_VALUES_APPLY");
             out.add(new Candidate(value.getKey(),new Support(PROFILE,supports,assumptions,source.uncertainties())));
@@ -117,12 +127,13 @@ public final class SourceValuesProvider {
             // A model's width cannot disprove a name explicitly observed in the program.
             if(model)out.merge(value.getKey(),support,SourceValuesProvider::union);
         }
-        var assigned=new Values(out,input.open()||model,model);
+        var assigned=new Values(out,input.open()||model,model,input.tableAssumed()||summarySymbols.contains(a.target()));
         // Model assumptions supply possibilities, never a strong-update/kill proof.
-        return model?state.getOrDefault(a.target(),Values.UNKNOWN).join(assigned):assigned;
+        return model||summarySymbols.contains(a.target())?state.getOrDefault(a.target(),Values.UNKNOWN).join(assigned):assigned;
     }
     private static String writeKey(NominalValues.Assignment a){return "write/"+a.statement()+"/"+a.target();}
     private Values term(NominalValues.Term t,Map<String,Values> state) {
+        if(t.kind().equals("CHOICE")){Values result=null;for(var arg:t.arguments()){var value=term(arg,state);result=result==null?value:result.join(value);}return result;}
         if(t.extended()) {
             var input=term(t.arguments().getFirst(),state);var values=new TreeMap<String,Set<String>>();boolean open=input.open();
             for(var value:input.candidates().entrySet()) {
@@ -139,7 +150,7 @@ public final class SourceValuesProvider {
                 }
                 values.merge(result,value.getValue(),SourceValuesProvider::union);
             }
-            return new Values(values,open,input.modelAssumed());
+            return new Values(values,open,input.modelAssumed(),input.tableAssumed());
         }
         return switch(t.kind()) {
             case "READ"->state.getOrDefault(t.value(),Values.UNKNOWN);
@@ -149,7 +160,7 @@ public final class SourceValuesProvider {
         };
     }
     private Map<String,Values> filter(Map<String,Values> state,NominalValues.Predicate p,boolean whenTrue) {
-        if(p==null||reads(p).stream().anyMatch(s->state.getOrDefault(s,Values.UNKNOWN).modelAssumed()))return state;int wanted=whenTrue?TextPredicate.TRUE:TextPredicate.FALSE;
+        if(p==null||reads(p).stream().anyMatch(summarySymbols::contains)||reads(p).stream().anyMatch(s->state.getOrDefault(s,Values.UNKNOWN).modelAssumed()))return state;int wanted=whenTrue?TextPredicate.TRUE:TextPredicate.FALSE;
         if((truth(p,state)&wanted)==0)return null;
         var result=new TreeMap<>(state);
         for(var symbol:reads(p)) {
@@ -159,7 +170,7 @@ public final class SourceValuesProvider {
                 if((truth(p,snapshot)&wanted)!=0)kept.put(value.getKey(),value.getValue());
             }
             if(kept.isEmpty()&&!old.open())return null;
-            result.put(symbol,new Values(kept,old.open()));
+            result.put(symbol,new Values(kept,old.open(),old.modelAssumed(),old.tableAssumed()));
         }
         return result;
     }
