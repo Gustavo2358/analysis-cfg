@@ -129,7 +129,7 @@ class QualifiedSourceContractTest {
         var names=List.of("reentry-direct","reentry-mutual","reentry-direct-handler","reentry-direct-callers",
             "reentry-callers","reentry-callers-handler","reentry-conditional","reentry-conditional-handler",
             "reentry-range","reentry-section","reentry-values","reentry-file","reentry-file-unconditional",
-            "sequential-callers","sequential-callers-handler","sequential-loop","terminal-before","terminal-before-handler","halt-before","goto-before");
+            "reentry-handler-ingress","handler-terminal-before","sequential-callers","sequential-callers-handler","sequential-loop","terminal-before","terminal-before-handler","halt-before","goto-before");
         for(var name:names) {
             ObjectNode wire;try(var in=getClass().getResourceAsStream("/perform-reentry/"+name+".source.json")) {wire=(ObjectNode)json.readTree(Objects.requireNonNull(in,name));}
             var q=codec.decode(json.writeValueAsBytes(wire));assertEquals(q,codec.decode(codec.encode(q)));
@@ -146,6 +146,7 @@ class QualifiedSourceContractTest {
                 assertEquals(SourceQualifiedDependencyResult.Status.POSSIBLE_UNDER_UNKNOWN_CONTROL,after.status());
                 assertFalse(after.candidates().getFirst().qualifications().isEmpty());
             }
+            if(name.equals("reentry-handler-ingress"))assertEquals(SourceQualifiedDependencyResult.Status.POSSIBLE_UNDER_UNKNOWN_CONTROL,result.occurrences().stream().filter(o->o.candidates().stream().anyMatch(c->c.referenceName().equals("AFTERHP"))).findFirst().orElseThrow().status());
             if(name.equals("reentry-direct-callers"))assertTrue(candidates.containsAll(List.of("FIRST","SECOND")));
             if(name.equals("reentry-file-unconditional")) {
                 assertEquals(2,result.nativeFiles().size());

@@ -127,5 +127,5 @@ for path in reentry.glob('*.source.json'):
         try:validate(changed)
         except ValueError:pass
         else:raise AssertionError('unknown support cause')
-assert len(list(reentry.glob('*.source.json')))==20
-print('REENTRY_SOURCE_WIRE: 20 producer outputs and version/cause rejection PASS')
+assert len(list(reentry.glob('*.source.json')))==22
+print('REENTRY_SOURCE_WIRE: 22 producer outputs and version/cause rejection PASS')
