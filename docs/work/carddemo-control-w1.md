@@ -109,3 +109,32 @@ listed in chaos_source_possibility_oracle.py. The original executable result and
 physical supports remain required, with exact extra names, provenance, open
 control and 28 negative mutations checked by the evolved source oracle. This
 evolves the source-only abstraction; it does not implement ALTER execution.
+
+## W1 qualification checkpoint
+
+New execution: frontend FAST (628 tests), lower FAST and consumer FAST; fourteen
+producer/typed-wire witnesses, 30 vertical probes; CardDemo 73/73 in all four
+stages, PERFORM 39/39, PERFORM adversarial 25/25, aliases 14/14. Chaos original
+executable oracle remains unchanged; its former unified-source equality fails
+in four deliberate policy changes. The explicit 2.7 source oracle passes 48/48
+and rejects 28 altered products. No suppressed failure or changed manifest.
+
+Full product/support audit: 135 cases (73 CardDemo, 48 Chaos, 14 aliases), zero
+candidate losses, zero support/provenance losses, zero wire failures. Complete
+AIR, CFG, executable FILE results and executable program sites are equal after
+publication-namespace normalization. Source candidates add 21 CardDemo
+occurrences (20 CBSTM03A in two variants and MQPUT in CODATE01), plus five
+conditional values across four Chaos occurrences. Five unresolved CardDemo
+targets remain unknown; no names are fabricated. Native FILE evidence retains
+its own source-only boundary, exact control points and declaration provenance.
+
+Evidence: `.carddemo-control/evidence/w1-development-06/runtime.json`,
+`w1-carddemo-03/results.json`, `w1-audit-03-wire.json`,
+`w1-chaos-source-oracle.json` in the aggregate workspace. Previous immutable
+FILE corpus products are the comparison baseline. Full historical qualification
+was not rerun in W1; shared-topology waves through W6 require a new final replay.
+
+Review heads: frontend 42d8873e3660acdc581794f5a9c206d4212990f3,
+lower 0adf521d201daebe4747210221928577bdfc5a55, consumer semantic checkpoint
+3128c56127f6017154db4970d39ebd7f787ebb93. Drafts #67/#42/#52, respectively.
+No merge, ALTER execution or recursive PERFORM implementation.
