@@ -297,7 +297,7 @@
     ],
     "semantic_product_version": "2.62.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "ea545f5a597731a6738bdc1ee9446a208e8da840",
+    "commit": "1ee71b74f391dfc174d018b92b35b84c34bc7290",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -308,8 +308,8 @@
       "scope": "local unconditional paragraph identity and explicit entry; G1-G5 and 1/2/5/40"
     },
     "storage_contract_version": "1.11.0",
-    "canonical_ref": "main",
-    "observed_on": "2026-09-28",
+    "canonical_ref": "fix/stage5-source-continuation",
+    "observed_on": "2026-09-30",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "fd_w1_validation": "docs/work/active/FD-W1.yaml",
@@ -318,7 +318,7 @@
     "fd_w4_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED producers, manual outcomes/USE and 28 real CLI sources twice; file-dependencies/w4-implementation.md",
     "fd_w5_validation": "QUALIFIED_LOCAL: focal/FAST, producer Q-SHARED with bounded final reuse, manual local AIR/wire and44 real CLI sources twice; file-dependencies/w5-implementation.md",
     "fd_w6_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED,19 B-SP fixtures,15 manual AIR tests and33 real CLI sources twice; file-dependencies/w6-implementation.md",
-    "status": "DONE / MERGED; coverage remains PARTIAL",
+    "status": "IN_PROGRESS / DRAFT PR #77; partial input remains explicit",
     "fd_w8_validation": "QUALIFIED_LOCAL: producer FAST/Q-SHARED, B-SP33, CFG FAST502/Q547, manual/wire and38CICS+33native source cases twice; docs/product/file-dependencies/w8-implementation.md",
     "fd_w9_validation": "QUALIFIED_LOCAL: producer focal/FAST/Q, consumer manual/FAST/reader, 8 scope + 33 native + 38 CICS real CLI sources twice, deterministic four products; docs/product/file-dependencies/w9-implementation.md",
     "logical_text_w1": "Source E2E A-D twice deterministic; scale 10/100/1000; no physical profile. Corporate rerun not required by revised user acceptance.",
@@ -331,12 +331,12 @@
       "contract": "SP 2.62 / NOMINAL_TEXT_SOURCE_V4; modelAssumed remains unavailable as physical storage, runtime VALUE or kill proof",
       "qualification": "docs/work/carddemo-values-control.md"
     },
-    "evidence_level": "Stage-5 PR #77: normalization and partial FILE route recovery; explicit UNKNOWN_LOCAL roles on unproved statement control, unchanged SP schema. New focal tests and frontend FAST PASS. Integrated qualification in docs/work/stage5-partial-file-routes.md."
+    "evidence_level": "Stage-5 PR #77: normalization and partial FILE route recovery; 24 four-stage witnesses PASS, 18 baseline aborts removed. Fresh 560 SPs (all CardDemo 73) byte-identical; unchanged consumers justify downstream reuse. Frontend FAST PASS; see docs/work/stage5-partial-file-routes.md. No SP schema change."
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "IN_PROGRESS / DRAFT PR #52; coverage remains PARTIAL",
-    "commit": "6623bbe316cacf0afd9c643bf566c6e389f01134",
+    "commit": "bfbec0fb0a9c76e8bce258dbe43896da50bee4de",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -368,8 +368,8 @@
       "schema": "qualified-source-dependencies",
       "version": "1.6.0",
       "producer_api": "io.github.gustavo2358.lower.application.QualifiedSourceProjection",
-      "source_state_checkpoint": "6623bbe316cacf0afd9c643bf566c6e389f01134",
-      "approved_sp_producer": "ea545f5a597731a6738bdc1ee9446a208e8da840",
+      "source_state_checkpoint": "bfbec0fb0a9c76e8bce258dbe43896da50bee4de",
+      "approved_sp_producer": "1ee71b74f391dfc174d018b92b35b84c34bc7290",
       "schema_sha256": "e17edf598fba9c32d60cbe36a6006bcd7892bef0271cc2bad456163cfe9e7ad5",
       "checkpoint_note": "Stage-5 PR #52: unchanged production, repinned to the partial FILE control recovery producer; source frontiers and native FILE evidence preserved.",
       "historical_review": 34
@@ -380,7 +380,7 @@
       "producer_api": "io.github.gustavo2358.lower.adapters.cli.CobolDependencyInput",
       "schema_sha256": "5f751464dee36a993d9238a32e25d68d396ce8ca3fa2e0198f29b4e6a7f505c0"
     },
-    "evidence_level": "Stage-5 PR #52: shared PERFORM bodies plus internal TEXT cells for anonymous logical roots. FAST PASS, nine real-SP controls and 25/25 four-stage adversaries. Fresh 560/560 replay: SP/AIR/CFG/dependencies/qualified source byte-identical to prior stage-5 products. Full-wrapper reuse/limits in docs/work/stage5-preexisting-fixes.md.",
+    "evidence_level": "Stage-5 PR #52: shared PERFORM bodies and anonymous logical roots; production unchanged for the new partial FILE producer fix. FAST PASS (407.577 s); 24 new and 22 FILE-composite four-stage cases PASS. 560 downstream corpus products explicitly reused by SP/bytecode equivalence; no new full-wrapper claim. See docs/work/stage5-partial-file-routes.md.",
     "perform_completion": "Scoped exits, SECTION boundaries, typed VARYING levels; Integration authorized; qualified original 39/39 and adversaries 25/25. See docs/domain/perform-control-completion.md.",
     "logical_alias_move": "Logical family translation precedes scalar shortcuts; 14/14 adversaries, PERFORM 39/39, reviewed chaos 48/48 with six explicit abstraction-policy cases; see docs/product/logical-alias-move.md.",
     "synthetic_model_assumptions": {
@@ -448,5 +448,5 @@
     "physical": "EXPERIMENTAL_EXPLICIT_OPT_IN_ONLY",
     "report": "docs/campaigns/positive-memory-topology/W2-REPORT.md"
   },
-  "metadata_scope": "Top-level repository commits and evidence_level fields are the current stage-5 review authority, including continuation and anonymous-root fixes. Named historical campaigns and merged_reviews remain historical evidence."
+  "metadata_scope": "Top-level repository commits, canonical_ref, status and evidence_level describe the current stage-5 review pins, including continuation, anonymous-root and partial FILE recovery fixes. Named historical campaigns and merged_reviews remain historical evidence; these PRs are not merged main."
 }

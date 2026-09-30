@@ -97,3 +97,8 @@ normalizer's existing policy for short records in open literals remains unchange
 (no implicit padding to column 72). This fix does not claim complete continuation
 syntax or full physical-memory analysis. UI import of CFG v5 remains outside this
 producer campaign, as documented in the original stage-5 work item.
+
+A later, separately qualified recovery defect is documented in
+[partial FILE routes](stage5-partial-file-routes.md). That addition uses fresh
+frontend replay and explicit downstream equivalence, and does not relabel the
+full four-stage replay recorded above.
