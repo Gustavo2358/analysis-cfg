@@ -1,0 +1,145 @@
+{
+  "anonymous-initial": {
+    "targets": [
+      "PROGA001"
+    ],
+    "roots": 1
+  },
+  "anonymous-write": {
+    "targets": [
+      "PROGB001"
+    ],
+    "roots": 1
+  },
+  "named-initial": {
+    "targets": [
+      "PROGA001"
+    ],
+    "roots": 0
+  },
+  "named-write": {
+    "targets": [
+      "PROGB001"
+    ],
+    "roots": 0
+  },
+  "anonymous-empty": {
+    "targets": [],
+    "roots": 1
+  },
+  "two-roots": {
+    "targets": [
+      "PROGB001",
+      "PROGC001"
+    ],
+    "roots": 2
+  },
+  "nested-alias": {
+    "targets": [
+      "PROGB001"
+    ],
+    "roots": 1
+  },
+  "unknown-filler": {
+    "targets": [
+      "PROGB001"
+    ],
+    "roots": 1,
+    "unknownRootRead": true
+  },
+  "unknown-sibling": {
+    "targets": [
+      "PROGA001"
+    ],
+    "roots": 1,
+    "unknownRootRead": true
+  },
+  "multiple-receivers": {
+    "targets": [
+      "PROGB001"
+    ],
+    "roots": 2
+  },
+  "perform-write": {
+    "targets": [
+      "PROGB001"
+    ],
+    "roots": 1
+  },
+  "unknown-initial": {
+    "targets": [],
+    "roots": 1,
+    "remainder": true
+  },
+  "disabled": {
+    "targets": [
+      "PROGA001"
+    ],
+    "flags": [
+      "--logical-text",
+      "disabled"
+    ],
+    "roots": 0
+  },
+  "physical": {
+    "targets": [
+      "PROGA001"
+    ],
+    "flags": [
+      "--storage-profile",
+      "ibm-enterprise-6.4-fixed-display-1047@1"
+    ],
+    "roots": 0,
+    "dependencyFlags": [
+      "--experimental-physical"
+    ]
+  },
+  "literals-single-lf": {
+    "targets": [
+      "AFTER001"
+    ],
+    "roots": 0
+  },
+  "literals-single-crlf": {
+    "targets": [
+      "AFTER001"
+    ],
+    "roots": 0
+  },
+  "literals-single-cr": {
+    "targets": [
+      "AFTER001"
+    ],
+    "roots": 0
+  },
+  "literals-double-lf": {
+    "targets": [
+      "AFTER001"
+    ],
+    "roots": 0
+  },
+  "literals-double-crlf": {
+    "targets": [
+      "AFTER001"
+    ],
+    "roots": 0
+  },
+  "literals-double-cr": {
+    "targets": [
+      "AFTER001"
+    ],
+    "roots": 0
+  },
+  "word-to-literal": {
+    "targets": [
+      "AFTER001"
+    ],
+    "roots": 0
+  },
+  "split-word": {
+    "targets": [
+      "AFTER001"
+    ],
+    "roots": 0
+  }
+}

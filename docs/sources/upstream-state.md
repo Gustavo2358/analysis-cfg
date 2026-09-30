@@ -1,3 +1,10 @@
+## Stage-5 pre-existing defect fixes — review pins
+
+Frontend PR #77: `0f82608401e34b7e44b2efadd4cea7a79a4e5ead`.
+Lower PR #52: `dbcf377c56b97b3888e432c8fd6e61a3490ec137`.
+AIR PR #23 is unchanged. The source lock above historical entries is the current
+authority. [Qualification and limits](../work/stage5-preexisting-fixes.md).
+
 # Baseline factual dos repositórios
 
 ## Estado vigente — etapa 5 em revisão

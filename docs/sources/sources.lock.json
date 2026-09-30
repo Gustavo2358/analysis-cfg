@@ -297,7 +297,7 @@
     ],
     "semantic_product_version": "2.62.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "4c00dea2a6bad1ba21076e55681f6038b80f8a47",
+    "commit": "0f82608401e34b7e44b2efadd4cea7a79a4e5ead",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -331,12 +331,12 @@
       "contract": "SP 2.62 / NOMINAL_TEXT_SOURCE_V4; modelAssumed remains unavailable as physical storage, runtime VALUE or kill proof",
       "qualification": "docs/work/carddemo-values-control.md"
     },
-    "evidence_level": "Merged CardDemo values/control and review corrections. SP 2.62 / qualified source 1.6. Upstream pin is the actual merged main including documentation closure; production/tests/contracts are equivalent to the qualified review head. Qualification: 560 pipelines including CardDemo 73, PERFORM 39, Chaos 48, aliases 14, PERFORM adversaries 25; 18 new oracles in logical and IBM profiles. Zero candidate/support/provenance loss. Point 5 remains separate. See docs/work/carddemo-values-control.md."
+    "evidence_level": "Stage-5 frontend PR #77: complete operands in fixed-format continuation. SP 2.62 unchanged; FAST and focused provenance tests passed. See docs/work/stage5-preexisting-fixes.md for campaign regression."
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "IN_PROGRESS / DRAFT PR #52; coverage remains PARTIAL",
-    "commit": "85abf8e0e3f601e9c56b322bc1dcf8a055e7c75a",
+    "commit": "dbcf377c56b97b3888e432c8fd6e61a3490ec137",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -368,10 +368,10 @@
       "schema": "qualified-source-dependencies",
       "version": "1.6.0",
       "producer_api": "io.github.gustavo2358.lower.application.QualifiedSourceProjection",
-      "source_state_checkpoint": "c98ff4821fdbd89a472792f02f11aa00d5b3583d",
-      "approved_sp_producer": "4c00dea2a6bad1ba21076e55681f6038b80f8a47",
+      "source_state_checkpoint": "dbcf377c56b97b3888e432c8fd6e61a3490ec137",
+      "approved_sp_producer": "0f82608401e34b7e44b2efadd4cea7a79a4e5ead",
       "schema_sha256": "e17edf598fba9c32d60cbe36a6006bcd7892bef0271cc2bad456163cfe9e7ad5",
-      "checkpoint_note": "Current merged source evidence 1.6. Historical review fields describe earlier campaigns. The current authority and limits are in docs/work/carddemo-values-control.md.",
+      "checkpoint_note": "Stage-5 review pins including normalization/anonymous-root fixes. Source evidence 1.6 unchanged; no merge yet. Historical review fields are not the current pin.",
       "historical_review": 34
     },
     "dependency_input": {
@@ -380,7 +380,7 @@
       "producer_api": "io.github.gustavo2358.lower.adapters.cli.CobolDependencyInput",
       "schema_sha256": "5f751464dee36a993d9238a32e25d68d396ce8ca3fa2e0198f29b4e6a7f505c0"
     },
-    "evidence_level": "Stage 5 shared PERFORM bodies under entry/completion/handler-state equivalence proof. Draft PR #52; AIR PR #23 pin. FAST and qualification-local passed; 560 four-stage replays preserve candidates/supports/provenance. See docs/work/shared-routine-bodies.md; historical named-wave fields are not current evidence.",
+    "evidence_level": "Stage-5 PR #52: shared PERFORM bodies plus structural cells for anonymous logical group roots. AIR control.local@1 and source evidence 1.6 unchanged. Focused E2E 22/22; current qualification recorded in docs/work/stage5-preexisting-fixes.md.",
     "perform_completion": "Scoped exits, SECTION boundaries, typed VARYING levels; Integration authorized; qualified original 39/39 and adversaries 25/25. See docs/domain/perform-control-completion.md.",
     "logical_alias_move": "Logical family translation precedes scalar shortcuts; 14/14 adversaries, PERFORM 39/39, reviewed chaos 48/48 with six explicit abstraction-policy cases; see docs/product/logical-alias-move.md.",
     "synthetic_model_assumptions": {
