@@ -824,7 +824,7 @@ def architecture_gate(root: Path, test_profile: str = "full") -> None:
     print("[architecture] PASS: BuildCfg(Publication, BuildOptions) -> CfgBuildResult and direct "
           "AirValidator preflight", flush=True)
     print("[architecture] PASS: explicit capability/version registry; no transport, reflection, "
-          "frontend, AIR shadow, or control primitives beyond Jump/Branch/Return/Halt/Invoke-Normal and conservative Opaque envelopes", flush=True)
+          "frontend, AIR shadow, or control primitives beyond Jump/Branch/Return/Halt/Invoke-Normal conservative Opaque envelopes and typed Local control rules", flush=True)
 
 
 def main() -> int:

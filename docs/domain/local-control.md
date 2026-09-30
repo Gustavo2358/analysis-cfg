@@ -1,4 +1,4 @@
-# Controle local: preparar agora, implementar em slice próprio
+# Controle local e contextos de retorno
 
 ## Contrato já existente
 
@@ -47,7 +47,7 @@ Não mapear `EXIT PARAGRAPH` indiscriminadamente para unwind, nem mudar a regra 
 topo do consumidor para acomodar um programa-fonte. Tal problema pertence ao
 produtor/contrato; o CFG deve continuar independente de COBOL.
 
-## Limite inicial
+## Limite inicial histórico
 
 O MVP anuncia `control.local@1` como não suportado. O seam e os oráculos já constam
 do harness; implementá-los não é pré-requisito para demonstrar diamond em arquivo.

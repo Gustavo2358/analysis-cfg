@@ -136,6 +136,14 @@ def statement_operation(publication, operations, identity, kind):
     require(len(principal) == 1, 'one typed source operation: ' + identity)
     seq, offset, op = principal[0]
     extras = [record for record in linked if record is not principal[0]]
+    # Stage 5 may additionally correlate the body's single completion operation
+    # with its first source fact, or the PERFORM's wrapper with its source jump.
+    local=[r for r in extras if (kind=='assign' and r[2]['kind']=='local.resume')
+           or (kind=='jump' and r[2]['kind']=='local.invoke')]
+    require(len(local)<=1 and all(not r[0]['instructions'] and r[2] is r[0]['terminator'] for r in local),
+            'one explicit empty local-control auxiliary per source fact')
+    if kind=='jump' and local:require(op['destination']==local[0][0]['label'],'source PERFORM enters its own local wrapper')
+    extras=[r for r in extras if r not in local]
     # A MOVE publishes its Assign and explicit completion Jump. No arbitrary
     # extra operation or extra execution context is accepted by this oracle.
     require(not extras or (kind == 'assign' and len(extras) == 1

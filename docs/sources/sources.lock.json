@@ -189,7 +189,7 @@
       "air-model/src/main/java/io/github/gustavo2358/air/model/MemoryCodecs.java",
       "air-json/src/test/resources/regional.canonical.json"
     ],
-    "observed_on": "2026-09-26",
+    "observed_on": "2026-09-30",
     "modules": {
       "parent": {
         "path": "pom.xml",
@@ -211,7 +211,8 @@
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "logical_text_w2": "Local producer FAST PASS; fixed logical ranges and expression transport. Selected source E2E qualification in docs/product/logical-text-w2.md.",
-    "evidence_level": "AIR PR #23: codec admits existing control.local@1, unchanged AIR 2.0/JSON 1.0 semantics; exact pinned commit, legacy transport replay and focal tests qualified."
+    "evidence_level": "AIR PR #23: codec admits existing control.local@1, unchanged AIR 2.0/JSON 1.0 semantics; exact pinned commit, legacy transport replay and focal tests qualified.",
+    "status": "IN_PROGRESS / DRAFT PR #23"
   },
   "proleap_poc": {
     "repository": "Gustavo2358/proleap-poc",
@@ -334,8 +335,8 @@
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
-    "status": "DONE / MERGED; coverage remains PARTIAL",
-    "commit": "4fe50e298009f1fd474bc897bd3c5e70998ac962",
+    "status": "IN_PROGRESS / DRAFT PR #52; coverage remains PARTIAL",
+    "commit": "85abf8e0e3f601e9c56b322bc1dcf8a055e7c75a",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -348,7 +349,7 @@
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
     },
     "canonical_ref": "feat/shared-routine-bodies",
-    "observed_on": "2026-09-28",
+    "observed_on": "2026-09-30",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "fd_w1_validation": "docs/work/active/FD-W1.yaml",
@@ -379,7 +380,7 @@
       "producer_api": "io.github.gustavo2358.lower.adapters.cli.CobolDependencyInput",
       "schema_sha256": "5f751464dee36a993d9238a32e25d68d396ce8ca3fa2e0198f29b4e6a7f505c0"
     },
-    "evidence_level": "Stage 5 shared PERFORM bodies; entry/completion/handler-state proof; local-control capability. Depends on air-java PR #23. Current qualification: docs/work/shared-routine-bodies.md. Historical named-wave fields do not describe this pin.",
+    "evidence_level": "Stage 5 shared PERFORM bodies under entry/completion/handler-state equivalence proof. Draft PR #52; AIR PR #23 pin. FAST and qualification-local passed; 560 four-stage replays preserve candidates/supports/provenance. See docs/work/shared-routine-bodies.md; historical named-wave fields are not current evidence.",
     "perform_completion": "Scoped exits, SECTION boundaries, typed VARYING levels; Integration authorized; qualified original 39/39 and adversaries 25/25. See docs/domain/perform-control-completion.md.",
     "logical_alias_move": "Logical family translation precedes scalar shortcuts; 14/14 adversaries, PERFORM 39/39, reviewed chaos 48/48 with six explicit abstraction-policy cases; see docs/product/logical-alias-move.md.",
     "synthetic_model_assumptions": {

@@ -48,6 +48,7 @@ def prepare(root):
 def technical_fast(root):
     prepare(root)
     for command in ([sys.executable, '-B', 'scripts/project/check_architecture.py', '--test-profile', 'fast'],
+                    [sys.executable, '-B', 'scripts/project/test_local_control_oracles.py'],
                     [sys.executable, '-B', 'scripts/project/test_cfg_wire_contract.py'],
                     [sys.executable, '-B', 'scripts/project/test_w2d_contract.py'],
                     [sys.executable, '-B', 'scripts/project/test_dependency_wire.py'],
@@ -67,6 +68,7 @@ def full_local(root):
     prepare(root)
     # Entire Maven test suite and every architecture boundary; additional probes below.
     subprocess.run([sys.executable, '-B', 'scripts/project/check_architecture.py'], cwd=root, check=True)
+    subprocess.run([sys.executable, '-B', 'scripts/project/test_local_control_oracles.py'], cwd=root, check=True)
     subprocess.run([sys.executable, '-B', 'scripts/project/test_cfg_wire_contract.py'], cwd=root, check=True)
     # W5 E2E consumes real producer outputs; prepare their pinned isolated builds locally.
     build = Path(os.environ.get('CFG_BUILD_ROOT', str(root / '.harness-results/build'))).resolve()

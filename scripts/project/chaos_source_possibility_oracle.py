@@ -2,7 +2,8 @@
 """Chaos contract 2.7 oracle. Original executable manifest remains authoritative.
 
 Source-only uncertainty has its own exact oracle, reviewed against assignments.
-No change to executable names, contexts, kills, edges or physical supports.
+No change to executable names, context expectations, kills, edges or physical supports.
+Shared bodies require an independent per-frame AIR oracle for context expectations.
 The legacy evaluator/helpers are loaded from --corpus; original files are untouched.
 """
 import argparse,importlib.util,json,copy,sys
@@ -19,7 +20,7 @@ def configure(corpus):
     module.WIRE_ROOT=Path(__file__).resolve().parent
     for name in ('wire_validator','key','site_source_line','written_files','exact_source_lines','written_spans'):globals()[name]=getattr(module,name)
     return module
-def evaluate(case:dict[str,Any],doc:dict[str,Any]) -> dict[str,Any]:
+def evaluate(case:dict[str,Any],doc:dict[str,Any],local_contexts=None) -> dict[str,Any]:
     """Check executable activations and the canonical source occurrence inventory.
 
     Dead CALLs may have no executable site, but remain in source inventory. Every
@@ -87,10 +88,23 @@ def evaluate(case:dict[str,Any],doc:dict[str,Any]) -> dict[str,Any]:
             if (site.get('targetKind')!='COMPUTED' or point.get('position')!='BEFORE'
                     or point.get('entryId')!=site['entry'] or point.get('operationId')!=site['operation']):
                 failures.append('WRONG_VALUE_QUERY_POINT')
+        context_sites=reachable_sites
+        if local_contexts is not None and 'activationContexts' in expect:
+            # Shared operations deliberately aggregate public candidates. Preserve
+            # the original per-caller oracle using independent AIR execution.
+            context_sites=[]
+            for site in reachable_sites:
+                observations=[r for r in local_contexts if r['operation']==site['operation'] and r['entry']==site['entry']]
+                union={v for r in observations for v in r['values']}
+                if union!={c['referenceName'] for c in site['candidates']}:
+                    failures.append('SHARED_CONTEXT_CANDIDATES_DIFFER')
+                for observation in observations:
+                    context_sites.append({'contextLines':observation['performLines'],
+                        'candidates':[{'referenceName':v} for v in observation['values']]})
         if 'activationContexts' in expect:
             contexts=expect['activationContexts'];matched=[]
-            for site in reachable_sites:
-                lines=exact_source_lines(site['siteOrigin'],origins,artifacts,source_name)
+            for site in context_sites:
+                lines=site['contextLines'] if 'contextLines' in site else exact_source_lines(site['siteOrigin'],origins,artifacts,source_name)
                 contexts_here=[c for c in contexts if c['performLine'] in lines]
                 if len(contexts_here)!=1:
                     failures.append('ACTIVATION_CONTEXT_MISSING_OR_AMBIGUOUS')
@@ -100,7 +114,7 @@ def evaluate(case:dict[str,Any],doc:dict[str,Any]) -> dict[str,Any]:
                     failures.append('WRONG_CANDIDATES_FOR_PERFORM_CONTEXT')
             if sorted(matched)!=sorted(c['performLine'] for c in contexts):failures.append('ACTIVATION_CONTEXT_COVERAGE')
         if 'activationCandidateSets' in expect:
-            actual_sets=sorted(sorted(c['referenceName'] for c in site['candidates']) for site in reachable_sites)
+            actual_sets=sorted(sorted(c['referenceName'] for c in site['candidates']) for site in context_sites)
             if actual_sets!=sorted(sorted(v) for v in expect['activationCandidateSets']):
                 failures.append('WRONG_ACTIVATION_CANDIDATE_SETS')
         actual_activations={(key(site['entry']),key(site['operation'])) for site in sites}
@@ -168,7 +182,20 @@ def main():
     p=argparse.ArgumentParser();p.add_argument('--corpus',type=Path,required=True);p.add_argument('--results',type=Path,required=True);p.add_argument('--out',type=Path,required=True);p.add_argument('--mutation-tests',action='store_true');a=p.parse_args();configure(a.corpus)
     rows=[];mutations=0
     for case in json.loads((a.corpus/'manifest.json').read_text())['cases']:
-        doc=json.loads((a.results/case['id']/'dependencies.json').read_text());result=evaluate(case,doc);rows.append({'id':case['id'],'oracle':result});print(case['id'],result['status'],flush=True)
+        doc=json.loads((a.results/case['id']/'dependencies.json').read_text());local_contexts=None
+        if any('activationContexts' in expect for expect in case['calls'].values()):
+            air=json.loads((a.results/case['id']/'program.air.json').read_text())
+            if any(s['terminator']['kind']=='local.invoke' for u in air['publication']['units'] for s in u['sequences']):
+                from local_context_oracle import evaluate as execute_local
+                local_contexts=execute_local(air,Path(case['source']).name)
+        result=evaluate(case,doc,local_contexts);rows.append({'id':case['id'],'oracle':result});print(case['id'],result['status'],flush=True)
+        if a.mutation_tests and local_contexts is not None:
+            for mutation in ('drop-context','swap-values','fake-value'):
+                bad=copy.deepcopy(local_contexts)
+                if mutation=='drop-context':bad.pop()
+                elif mutation=='swap-values':bad[0]['values'],bad[1]['values']=bad[1]['values'],bad[0]['values']
+                else:bad[0]['values'].append('INVENTED')
+                assert evaluate(case,doc,bad)['status']=='FAIL',(case['id'],mutation);mutations+=1
         if a.mutation_tests and case['id'] in SOURCE_POSSIBILITIES:
             for mutation in ('drop-original','drop-possible','fake-name','drop-assumption','false-producer','drop-physical','fake-executable'):
                 bad=copy.deepcopy(doc);row=bad['dependencies']['programs'][0];old=next(c for c in row['candidates'] if c['referenceName']=='PROGA001');new=next(c for c in row['candidates'] if c['referenceName']=='PROGB001')

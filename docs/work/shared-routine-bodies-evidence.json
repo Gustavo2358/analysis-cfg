@@ -1,0 +1,1453 @@
+{
+  "campaign": "shared-routine-bodies-stage-5",
+  "status": "IMPLEMENTED_AND_QUALIFIED_DRAFT_REVIEW_NO_MERGE",
+  "date": "2026-09-30",
+  "authority": {
+    "analysisIr": "2c7f31f19efbe3211a2aea5bbda90173a9666fe2",
+    "frontend": "4c00dea2a6bad1ba21076e55681f6038b80f8a47",
+    "airJava": "e0aef0e1928d88a74fe66b7a4d0af84556b84b19",
+    "cobolLower": "85abf8e0e3f601e9c56b322bc1dcf8a055e7c75a"
+  },
+  "productionEquivalence": {
+    "sources": 481,
+    "sourceTreeHash": "dcddb92af11c32cc53768fa304cdd20b495ea8b147cdae3cc783973342cd8749",
+    "matchesQualifiedRuntime": true,
+    "runtimeArtifactsUnchanged": true
+  },
+  "corpus": {
+    "cases": 560,
+    "groups": {
+      "carddemo": 73,
+      "perform": 39,
+      "chaos": 48,
+      "aliases": 14,
+      "perform-adversarial": 25,
+      "fixtures": 331,
+      "final-focal-contracts": 29,
+      "frontier-payload-green": 1
+    },
+    "semanticProductsByteIdentical": 560,
+    "losses": 0,
+    "additions": 0,
+    "supportLosses": 0
+  },
+  "oracles": {
+    "perform": 39,
+    "aliases": 14,
+    "performAdversarial": 25,
+    "chaos": 48,
+    "chaosRejectedMutations": 31,
+    "wire": 560,
+    "localRulesCorrelated": 3600,
+    "fileComposition": 22,
+    "compiledContextMutantsRejected": 3,
+    "compiledTransportMutantsRejected": 3
+  },
+  "gates": {
+    "airJava": {
+      "fast": "PASS",
+      "qualificationLocal": "PASS"
+    },
+    "cobolLower": {
+      "fast": "PASS",
+      "qualificationLocal": "PASS"
+    },
+    "analysisCfg": {
+      "fast": "PASS",
+      "qualificationLocal": "PASS"
+    }
+  },
+  "metadata": {
+    "sourceDependenciesIdentical": 560,
+    "qualifiedSourceEvidenceIdenticalExceptAirHash": 560,
+    "globalStatusesIdentical": 560,
+    "affectedCases": 15,
+    "newlyMaterializedOccurrences": 263,
+    "meaningChanges": 73,
+    "property": "All removed topology inventory gaps have concrete AIR operations correlated to the same complete source identity. All other prior uncertainty meanings/written origins survive. No unreachability or completeness is inferred."
+  },
+  "carddemoTotals": {
+    "baseline": {
+      "nodes": 110570,
+      "transitions": 124356,
+      "localRules": 0,
+      "airBytes": 1338048740,
+      "cfgBytes": 80302820
+    },
+    "candidate": {
+      "nodes": 79176,
+      "transitions": 84504,
+      "localRules": 3063,
+      "airBytes": 1122289870,
+      "cfgBytes": 57186388
+    }
+  },
+  "carddemo": [
+    {
+      "source": "app/app-authorization-ims-db2-mq/cbl/CBPAUP0C.cbl",
+      "baseline": {
+        "nodes": 180,
+        "transitions": 210,
+        "localRules": 0,
+        "cfgBytes": 132359,
+        "airBytes": 3685022
+      },
+      "candidate": {
+        "nodes": 157,
+        "transitions": 142,
+        "localRules": 27,
+        "cfgBytes": 111735,
+        "airBytes": 3415841
+      }
+    },
+    {
+      "source": "app/app-authorization-ims-db2-mq/cbl/COPAUA0C.cbl",
+      "baseline": {
+        "nodes": 959,
+        "transitions": 1057,
+        "localRules": 0,
+        "cfgBytes": 686814,
+        "airBytes": 26995840
+      },
+      "candidate": {
+        "nodes": 968,
+        "transitions": 1057,
+        "localRules": 6,
+        "cfgBytes": 692081,
+        "airBytes": 27021623
+      }
+    },
+    {
+      "source": "app/app-authorization-ims-db2-mq/cbl/COPAUS0C.cbl",
+      "baseline": {
+        "nodes": 2292,
+        "transitions": 2524,
+        "localRules": 0,
+        "cfgBytes": 1647359,
+        "airBytes": 33276571
+      },
+      "candidate": {
+        "nodes": 474,
+        "transitions": 449,
+        "localRules": 62,
+        "cfgBytes": 338265,
+        "airBytes": 20899010
+      }
+    },
+    {
+      "source": "app/app-authorization-ims-db2-mq/cbl/COPAUS1C.cbl",
+      "baseline": {
+        "nodes": 1088,
+        "transitions": 1169,
+        "localRules": 0,
+        "cfgBytes": 770904,
+        "airBytes": 16894532
+      },
+      "candidate": {
+        "nodes": 252,
+        "transitions": 221,
+        "localRules": 43,
+        "cfgBytes": 177722,
+        "airBytes": 11144218
+      }
+    },
+    {
+      "source": "app/app-authorization-ims-db2-mq/cbl/COPAUS2C.cbl",
+      "baseline": {
+        "nodes": 61,
+        "transitions": 63,
+        "localRules": 0,
+        "cfgBytes": 42479,
+        "airBytes": 1983451
+      },
+      "candidate": {
+        "nodes": 64,
+        "transitions": 63,
+        "localRules": 2,
+        "cfgBytes": 44241,
+        "airBytes": 1993021
+      }
+    },
+    {
+      "source": "app/app-authorization-ims-db2-mq/cbl/DBUNLDGS.CBL",
+      "baseline": {
+        "nodes": 158,
+        "transitions": 354,
+        "localRules": 0,
+        "cfgBytes": 165620,
+        "airBytes": 3587455
+      },
+      "candidate": {
+        "nodes": 105,
+        "transitions": 174,
+        "localRules": 20,
+        "cfgBytes": 98123,
+        "airBytes": 3133685
+      }
+    },
+    {
+      "source": "app/app-authorization-ims-db2-mq/cbl/PAUDBLOD.CBL",
+      "baseline": {
+        "nodes": 298,
+        "transitions": 698,
+        "localRules": 0,
+        "cfgBytes": 322262,
+        "airBytes": 4833103
+      },
+      "candidate": {
+        "nodes": 180,
+        "transitions": 348,
+        "localRules": 24,
+        "cfgBytes": 180265,
+        "airBytes": 3917525
+      }
+    },
+    {
+      "source": "app/app-authorization-ims-db2-mq/cbl/PAUDBUNL.CBL",
+      "baseline": {
+        "nodes": 262,
+        "transitions": 602,
+        "localRules": 0,
+        "cfgBytes": 279838,
+        "airBytes": 4306090
+      },
+      "candidate": {
+        "nodes": 151,
+        "transitions": 298,
+        "localRules": 16,
+        "cfgBytes": 151695,
+        "airBytes": 3461792
+      }
+    },
+    {
+      "source": "app/app-transaction-type-db2/cbl/COBTUPDT.cbl",
+      "baseline": {
+        "nodes": 121,
+        "transitions": 141,
+        "localRules": 0,
+        "cfgBytes": 88548,
+        "airBytes": 1912686
+      },
+      "candidate": {
+        "nodes": 119,
+        "transitions": 106,
+        "localRules": 22,
+        "cfgBytes": 84424,
+        "airBytes": 1810297
+      }
+    },
+    {
+      "source": "app/app-transaction-type-db2/cbl/COTRTLIC.cbl",
+      "baseline": {
+        "nodes": 5656,
+        "transitions": 6918,
+        "localRules": 0,
+        "cfgBytes": 4271458,
+        "airBytes": 55535912
+      },
+      "candidate": {
+        "nodes": 2943,
+        "transitions": 3308,
+        "localRules": 154,
+        "cfgBytes": 2185155,
+        "airBytes": 38584291
+      }
+    },
+    {
+      "source": "app/app-transaction-type-db2/cbl/COTRTUPC.cbl",
+      "baseline": {
+        "nodes": 1600,
+        "transitions": 1984,
+        "localRules": 0,
+        "cfgBytes": 1211968,
+        "airBytes": 21119012
+      },
+      "candidate": {
+        "nodes": 598,
+        "transitions": 649,
+        "localRules": 67,
+        "cfgBytes": 445292,
+        "airBytes": 14789705
+      }
+    },
+    {
+      "source": "app/app-vsam-mq/cbl/COACCT01.cbl",
+      "baseline": {
+        "nodes": 32145,
+        "transitions": 34750,
+        "localRules": 0,
+        "cfgBytes": 23018107,
+        "airBytes": 264215626
+      },
+      "candidate": {
+        "nodes": 32145,
+        "transitions": 34750,
+        "localRules": 0,
+        "cfgBytes": 23018107,
+        "airBytes": 264215626
+      }
+    },
+    {
+      "source": "app/app-vsam-mq/cbl/CODATE01.cbl",
+      "baseline": {
+        "nodes": 17440,
+        "transitions": 18850,
+        "localRules": 0,
+        "cfgBytes": 12471546,
+        "airBytes": 149943399
+      },
+      "candidate": {
+        "nodes": 17440,
+        "transitions": 18850,
+        "localRules": 0,
+        "cfgBytes": 12471546,
+        "airBytes": 149943399
+      }
+    },
+    {
+      "source": "app/cbl/CBACT01C.cbl",
+      "baseline": {
+        "nodes": 403,
+        "transitions": 449,
+        "localRules": 0,
+        "cfgBytes": 290238,
+        "airBytes": 6585888
+      },
+      "candidate": {
+        "nodes": 346,
+        "transitions": 314,
+        "localRules": 52,
+        "cfgBytes": 244693,
+        "airBytes": 5977213
+      }
+    },
+    {
+      "source": "app/cbl/CBACT02C.cbl",
+      "baseline": {
+        "nodes": 119,
+        "transitions": 136,
+        "localRules": 0,
+        "cfgBytes": 86539,
+        "airBytes": 1935792
+      },
+      "candidate": {
+        "nodes": 113,
+        "transitions": 106,
+        "localRules": 16,
+        "cfgBytes": 80321,
+        "airBytes": 1821375
+      }
+    },
+    {
+      "source": "app/cbl/CBACT03C.cbl",
+      "baseline": {
+        "nodes": 120,
+        "transitions": 137,
+        "localRules": 0,
+        "cfgBytes": 87223,
+        "airBytes": 1910076
+      },
+      "candidate": {
+        "nodes": 114,
+        "transitions": 107,
+        "localRules": 16,
+        "cfgBytes": 81013,
+        "airBytes": 1795659
+      }
+    },
+    {
+      "source": "app/cbl/CBACT04C.cbl",
+      "baseline": {
+        "nodes": 704,
+        "transitions": 792,
+        "localRules": 0,
+        "cfgBytes": 509530,
+        "airBytes": 10254924
+      },
+      "candidate": {
+        "nodes": 543,
+        "transitions": 508,
+        "localRules": 79,
+        "cfgBytes": 388362,
+        "airBytes": 8848161
+      }
+    },
+    {
+      "source": "app/cbl/CBCUS01C.cbl",
+      "baseline": {
+        "nodes": 120,
+        "transitions": 137,
+        "localRules": 0,
+        "cfgBytes": 87223,
+        "airBytes": 2117461
+      },
+      "candidate": {
+        "nodes": 114,
+        "transitions": 107,
+        "localRules": 16,
+        "cfgBytes": 81011,
+        "airBytes": 2003044
+      }
+    },
+    {
+      "source": "app/cbl/CBEXPORT.cbl",
+      "baseline": {
+        "nodes": 533,
+        "transitions": 600,
+        "localRules": 0,
+        "cfgBytes": 386033,
+        "airBytes": 8710854
+      },
+      "candidate": {
+        "nodes": 513,
+        "transitions": 470,
+        "localRules": 70,
+        "cfgBytes": 361883,
+        "airBytes": 8186677
+      }
+    },
+    {
+      "source": "app/cbl/CBIMPORT.cbl",
+      "baseline": {
+        "nodes": 388,
+        "transitions": 438,
+        "localRules": 0,
+        "cfgBytes": 281437,
+        "airBytes": 7031488
+      },
+      "candidate": {
+        "nodes": 407,
+        "transitions": 393,
+        "localRules": 45,
+        "cfgBytes": 289829,
+        "airBytes": 6911096
+      }
+    },
+    {
+      "source": "app/cbl/CBSTM03A.CBL",
+      "baseline": {
+        "nodes": 100,
+        "transitions": 114,
+        "localRules": 0,
+        "cfgBytes": 72535,
+        "airBytes": 6047915
+      },
+      "candidate": {
+        "nodes": 104,
+        "transitions": 110,
+        "localRules": 6,
+        "cfgBytes": 74857,
+        "airBytes": 6083563
+      }
+    },
+    {
+      "source": "app/cbl/CBSTM03B.CBL",
+      "baseline": {
+        "nodes": 152,
+        "transitions": 183,
+        "localRules": 0,
+        "cfgBytes": 113340,
+        "airBytes": 1966908
+      },
+      "candidate": {
+        "nodes": 164,
+        "transitions": 183,
+        "localRules": 8,
+        "cfgBytes": 120373,
+        "airBytes": 2006115
+      }
+    },
+    {
+      "source": "app/cbl/CBTRN01C.cbl",
+      "baseline": {
+        "nodes": 496,
+        "transitions": 559,
+        "localRules": 0,
+        "cfgBytes": 359248,
+        "airBytes": 7645334
+      },
+      "candidate": {
+        "nodes": 406,
+        "transitions": 379,
+        "localRules": 60,
+        "cfgBytes": 290312,
+        "airBytes": 6783950
+      }
+    },
+    {
+      "source": "app/cbl/CBTRN02C.cbl",
+      "baseline": {
+        "nodes": 759,
+        "transitions": 854,
+        "localRules": 0,
+        "cfgBytes": 549305,
+        "airBytes": 11060050
+      },
+      "candidate": {
+        "nodes": 636,
+        "transitions": 599,
+        "localRules": 88,
+        "cfgBytes": 454290,
+        "airBytes": 9863627
+      }
+    },
+    {
+      "source": "app/cbl/CBTRN03C.cbl",
+      "baseline": {
+        "nodes": 1265,
+        "transitions": 1423,
+        "localRules": 0,
+        "cfgBytes": 916497,
+        "airBytes": 14490621
+      },
+      "candidate": {
+        "nodes": 587,
+        "transitions": 530,
+        "localRules": 97,
+        "cfgBytes": 418368,
+        "airBytes": 9315195
+      }
+    },
+    {
+      "source": "app/cbl/COACTUPC.cbl",
+      "baseline": {
+        "nodes": 5037,
+        "transitions": 6293,
+        "localRules": 0,
+        "cfgBytes": 3846388,
+        "airBytes": 65973383
+      },
+      "candidate": {
+        "nodes": 3132,
+        "transitions": 3625,
+        "localRules": 169,
+        "cfgBytes": 2357314,
+        "airBytes": 53227175
+      }
+    },
+    {
+      "source": "app/cbl/COACTVWC.cbl",
+      "baseline": {
+        "nodes": 484,
+        "transitions": 565,
+        "localRules": 0,
+        "cfgBytes": 355966,
+        "airBytes": 15579988
+      },
+      "candidate": {
+        "nodes": 325,
+        "transitions": 341,
+        "localRules": 33,
+        "cfgBytes": 237568,
+        "airBytes": 14454291
+      }
+    },
+    {
+      "source": "app/cbl/COADM01C.cbl",
+      "baseline": {
+        "nodes": 397,
+        "transitions": 483,
+        "localRules": 0,
+        "cfgBytes": 297702,
+        "airBytes": 8913655
+      },
+      "candidate": {
+        "nodes": 138,
+        "transitions": 137,
+        "localRules": 16,
+        "cfgBytes": 99449,
+        "airBytes": 7189868
+      }
+    },
+    {
+      "source": "app/cbl/COBIL00C.cbl",
+      "baseline": {
+        "nodes": 972,
+        "transitions": 1014,
+        "localRules": 0,
+        "cfgBytes": 678723,
+        "airBytes": 12824700
+      },
+      "candidate": {
+        "nodes": 272,
+        "transitions": 234,
+        "localRules": 50,
+        "cfgBytes": 191443,
+        "airBytes": 8242724
+      }
+    },
+    {
+      "source": "app/cbl/COBSWAIT.cbl",
+      "baseline": {
+        "nodes": 7,
+        "transitions": 5,
+        "localRules": 0,
+        "cfgBytes": 4130,
+        "airBytes": 133516
+      },
+      "candidate": {
+        "nodes": 7,
+        "transitions": 5,
+        "localRules": 0,
+        "cfgBytes": 4130,
+        "airBytes": 133516
+      }
+    },
+    {
+      "source": "app/cbl/COCRDLIC.cbl",
+      "baseline": {
+        "nodes": 836,
+        "transitions": 1007,
+        "localRules": 0,
+        "cfgBytes": 623760,
+        "airBytes": 21046402
+      },
+      "candidate": {
+        "nodes": 577,
+        "transitions": 606,
+        "localRules": 57,
+        "cfgBytes": 422207,
+        "airBytes": 19019106
+      }
+    },
+    {
+      "source": "app/cbl/COCRDSLC.cbl",
+      "baseline": {
+        "nodes": 545,
+        "transitions": 657,
+        "localRules": 0,
+        "cfgBytes": 406958,
+        "airBytes": 12060578
+      },
+      "candidate": {
+        "nodes": 299,
+        "transitions": 319,
+        "localRules": 33,
+        "cfgBytes": 220988,
+        "airBytes": 10364774
+      }
+    },
+    {
+      "source": "app/cbl/COCRDUPC.cbl",
+      "baseline": {
+        "nodes": 984,
+        "transitions": 1244,
+        "localRules": 0,
+        "cfgBytes": 752388,
+        "airBytes": 18232656
+      },
+      "candidate": {
+        "nodes": 568,
+        "transitions": 639,
+        "localRules": 44,
+        "cfgBytes": 423944,
+        "airBytes": 15229070
+      }
+    },
+    {
+      "source": "app/cbl/COMEN01C.cbl",
+      "baseline": {
+        "nodes": 314,
+        "transitions": 387,
+        "localRules": 0,
+        "cfgBytes": 236403,
+        "airBytes": 8761092
+      },
+      "candidate": {
+        "nodes": 135,
+        "transitions": 137,
+        "localRules": 14,
+        "cfgBytes": 96976,
+        "airBytes": 7556245
+      }
+    },
+    {
+      "source": "app/cbl/CORPT00C.cbl",
+      "baseline": {
+        "nodes": 1230,
+        "transitions": 1308,
+        "localRules": 0,
+        "cfgBytes": 867785,
+        "airBytes": 16279211
+      },
+      "candidate": {
+        "nodes": 382,
+        "transitions": 357,
+        "localRules": 54,
+        "cfgBytes": 272615,
+        "airBytes": 10623570
+      }
+    },
+    {
+      "source": "app/cbl/COSGN00C.cbl",
+      "baseline": {
+        "nodes": 248,
+        "transitions": 255,
+        "localRules": 0,
+        "cfgBytes": 171846,
+        "airBytes": 6138379
+      },
+      "candidate": {
+        "nodes": 102,
+        "transitions": 94,
+        "localRules": 12,
+        "cfgBytes": 71197,
+        "airBytes": 5137018
+      }
+    },
+    {
+      "source": "app/cbl/COTRN00C.cbl",
+      "baseline": {
+        "nodes": 1910,
+        "transitions": 2129,
+        "localRules": 0,
+        "cfgBytes": 1378832,
+        "airBytes": 27594594
+      },
+      "candidate": {
+        "nodes": 445,
+        "transitions": 452,
+        "localRules": 57,
+        "cfgBytes": 325886,
+        "airBytes": 17609129
+      }
+    },
+    {
+      "source": "app/cbl/COTRN01C.cbl",
+      "baseline": {
+        "nodes": 396,
+        "transitions": 413,
+        "localRules": 0,
+        "cfgBytes": 276148,
+        "airBytes": 9218563
+      },
+      "candidate": {
+        "nodes": 147,
+        "transitions": 131,
+        "localRules": 21,
+        "cfgBytes": 102291,
+        "airBytes": 7519662
+      }
+    },
+    {
+      "source": "app/cbl/COTRN02C.cbl",
+      "baseline": {
+        "nodes": 2353,
+        "transitions": 2441,
+        "localRules": 0,
+        "cfgBytes": 1644748,
+        "airBytes": 25345154
+      },
+      "candidate": {
+        "nodes": 760,
+        "transitions": 713,
+        "localRules": 124,
+        "cfgBytes": 550651,
+        "airBytes": 14888303
+      }
+    },
+    {
+      "source": "app/cbl/COUSR00C.cbl",
+      "baseline": {
+        "nodes": 1836,
+        "transitions": 2051,
+        "localRules": 0,
+        "cfgBytes": 1326300,
+        "airBytes": 27014214
+      },
+      "candidate": {
+        "nodes": 439,
+        "transitions": 446,
+        "localRules": 55,
+        "cfgBytes": 320691,
+        "airBytes": 17484669
+      }
+    },
+    {
+      "source": "app/cbl/COUSR01C.cbl",
+      "baseline": {
+        "nodes": 348,
+        "transitions": 360,
+        "localRules": 0,
+        "cfgBytes": 241796,
+        "airBytes": 7223773
+      },
+      "candidate": {
+        "nodes": 142,
+        "transitions": 122,
+        "localRules": 25,
+        "cfgBytes": 99305,
+        "airBytes": 5836094
+      }
+    },
+    {
+      "source": "app/cbl/COUSR02C.cbl",
+      "baseline": {
+        "nodes": 1114,
+        "transitions": 1162,
+        "localRules": 0,
+        "cfgBytes": 778362,
+        "airBytes": 13152746
+      },
+      "candidate": {
+        "nodes": 218,
+        "transitions": 198,
+        "localRules": 37,
+        "cfgBytes": 155568,
+        "airBytes": 7118511
+      }
+    },
+    {
+      "source": "app/cbl/COUSR03C.cbl",
+      "baseline": {
+        "nodes": 631,
+        "transitions": 655,
+        "localRules": 0,
+        "cfgBytes": 439400,
+        "airBytes": 9377798
+      },
+      "candidate": {
+        "nodes": 180,
+        "transitions": 156,
+        "localRules": 32,
+        "cfgBytes": 126392,
+        "airBytes": 6329070
+      }
+    },
+    {
+      "source": "app/cbl/CSUTLDTC.cbl",
+      "baseline": {
+        "nodes": 69,
+        "transitions": 85,
+        "localRules": 0,
+        "cfgBytes": 51920,
+        "airBytes": 1330929
+      },
+      "candidate": {
+        "nodes": 72,
+        "transitions": 85,
+        "localRules": 2,
+        "cfgBytes": 53674,
+        "airBytes": 1341483
+      }
+    },
+    {
+      "source": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/CBACT01C.cbl",
+      "baseline": {
+        "nodes": 133,
+        "transitions": 150,
+        "localRules": 0,
+        "cfgBytes": 96163,
+        "airBytes": 2239012
+      },
+      "candidate": {
+        "nodes": 130,
+        "transitions": 120,
+        "localRules": 18,
+        "cfgBytes": 91705,
+        "airBytes": 2134922
+      }
+    },
+    {
+      "source": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/CBACT02C.cbl",
+      "baseline": {
+        "nodes": 119,
+        "transitions": 136,
+        "localRules": 0,
+        "cfgBytes": 86539,
+        "airBytes": 1930324
+      },
+      "candidate": {
+        "nodes": 113,
+        "transitions": 106,
+        "localRules": 16,
+        "cfgBytes": 80322,
+        "airBytes": 1816703
+      }
+    },
+    {
+      "source": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/CBACT03C.cbl",
+      "baseline": {
+        "nodes": 120,
+        "transitions": 137,
+        "localRules": 0,
+        "cfgBytes": 87223,
+        "airBytes": 1904608
+      },
+      "candidate": {
+        "nodes": 114,
+        "transitions": 107,
+        "localRules": 16,
+        "cfgBytes": 81009,
+        "airBytes": 1790987
+      }
+    },
+    {
+      "source": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/CBACT04C.cbl",
+      "baseline": {
+        "nodes": 704,
+        "transitions": 792,
+        "localRules": 0,
+        "cfgBytes": 509530,
+        "airBytes": 10243454
+      },
+      "candidate": {
+        "nodes": 543,
+        "transitions": 508,
+        "localRules": 79,
+        "cfgBytes": 388378,
+        "airBytes": 8843457
+      }
+    },
+    {
+      "source": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/CBCUS01C.cbl",
+      "baseline": {
+        "nodes": 120,
+        "transitions": 137,
+        "localRules": 0,
+        "cfgBytes": 87223,
+        "airBytes": 2111993
+      },
+      "candidate": {
+        "nodes": 114,
+        "transitions": 107,
+        "localRules": 16,
+        "cfgBytes": 81012,
+        "airBytes": 1998372
+      }
+    },
+    {
+      "source": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/CBSTM03A.cbl",
+      "baseline": {
+        "nodes": 82,
+        "transitions": 93,
+        "localRules": 0,
+        "cfgBytes": 59311,
+        "airBytes": 5639132
+      },
+      "candidate": {
+        "nodes": 83,
+        "transitions": 89,
+        "localRules": 4,
+        "cfgBytes": 59880,
+        "airBytes": 5665082
+      }
+    },
+    {
+      "source": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/CBSTM03B.cbl",
+      "baseline": {
+        "nodes": 152,
+        "transitions": 183,
+        "localRules": 0,
+        "cfgBytes": 113340,
+        "airBytes": 1966908
+      },
+      "candidate": {
+        "nodes": 164,
+        "transitions": 183,
+        "localRules": 8,
+        "cfgBytes": 120373,
+        "airBytes": 2006115
+      }
+    },
+    {
+      "source": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/CBTRN01C.cbl",
+      "baseline": {
+        "nodes": 496,
+        "transitions": 559,
+        "localRules": 0,
+        "cfgBytes": 359248,
+        "airBytes": 7635846
+      },
+      "candidate": {
+        "nodes": 406,
+        "transitions": 379,
+        "localRules": 60,
+        "cfgBytes": 290325,
+        "airBytes": 6779238
+      }
+    },
+    {
+      "source": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/CBTRN02C.cbl",
+      "baseline": {
+        "nodes": 759,
+        "transitions": 854,
+        "localRules": 0,
+        "cfgBytes": 549305,
+        "airBytes": 11048580
+      },
+      "candidate": {
+        "nodes": 636,
+        "transitions": 599,
+        "localRules": 88,
+        "cfgBytes": 454290,
+        "airBytes": 9858923
+      }
+    },
+    {
+      "source": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/CBTRN03C.cbl",
+      "baseline": {
+        "nodes": 1265,
+        "transitions": 1423,
+        "localRules": 0,
+        "cfgBytes": 916497,
+        "airBytes": 14473181
+      },
+      "candidate": {
+        "nodes": 587,
+        "transitions": 530,
+        "localRules": 97,
+        "cfgBytes": 418369,
+        "airBytes": 9310491
+      }
+    },
+    {
+      "source": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COACTUPC.cl2",
+      "baseline": {
+        "nodes": 4968,
+        "transitions": 6199,
+        "localRules": 0,
+        "cfgBytes": 3791272,
+        "airBytes": 65615693
+      },
+      "candidate": {
+        "nodes": 3118,
+        "transitions": 3602,
+        "localRules": 169,
+        "cfgBytes": 2345081,
+        "airBytes": 53158183
+      }
+    },
+    {
+      "source": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COACTVWC.cl2",
+      "baseline": {
+        "nodes": 484,
+        "transitions": 565,
+        "localRules": 0,
+        "cfgBytes": 355966,
+        "airBytes": 15579884
+      },
+      "candidate": {
+        "nodes": 325,
+        "transitions": 341,
+        "localRules": 33,
+        "cfgBytes": 237568,
+        "airBytes": 14454187
+      }
+    },
+    {
+      "source": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COADM01C.cl2",
+      "baseline": {
+        "nodes": 243,
+        "transitions": 293,
+        "localRules": 0,
+        "cfgBytes": 180925,
+        "airBytes": 7769697
+      },
+      "candidate": {
+        "nodes": 116,
+        "transitions": 115,
+        "localRules": 13,
+        "cfgBytes": 82772,
+        "airBytes": 6912052
+      }
+    },
+    {
+      "source": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COBIL00C.cl2",
+      "baseline": {
+        "nodes": 972,
+        "transitions": 1014,
+        "localRules": 0,
+        "cfgBytes": 678723,
+        "airBytes": 12824636
+      },
+      "candidate": {
+        "nodes": 272,
+        "transitions": 234,
+        "localRules": 50,
+        "cfgBytes": 191443,
+        "airBytes": 8242660
+      }
+    },
+    {
+      "source": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COCRDLIC.cl2",
+      "baseline": {
+        "nodes": 836,
+        "transitions": 1007,
+        "localRules": 0,
+        "cfgBytes": 623760,
+        "airBytes": 21046330
+      },
+      "candidate": {
+        "nodes": 577,
+        "transitions": 606,
+        "localRules": 57,
+        "cfgBytes": 422207,
+        "airBytes": 19019034
+      }
+    },
+    {
+      "source": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COCRDSLC.cl2",
+      "baseline": {
+        "nodes": 545,
+        "transitions": 657,
+        "localRules": 0,
+        "cfgBytes": 406958,
+        "airBytes": 12060490
+      },
+      "candidate": {
+        "nodes": 299,
+        "transitions": 319,
+        "localRules": 33,
+        "cfgBytes": 220988,
+        "airBytes": 10364686
+      }
+    },
+    {
+      "source": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COCRDUPC.cl2",
+      "baseline": {
+        "nodes": 984,
+        "transitions": 1244,
+        "localRules": 0,
+        "cfgBytes": 752388,
+        "airBytes": 18242302
+      },
+      "candidate": {
+        "nodes": 568,
+        "transitions": 639,
+        "localRules": 44,
+        "cfgBytes": 423985,
+        "airBytes": 15238716
+      }
+    },
+    {
+      "source": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COMEN01C.cl2",
+      "baseline": {
+        "nodes": 303,
+        "transitions": 375,
+        "localRules": 0,
+        "cfgBytes": 228700,
+        "airBytes": 8523625
+      },
+      "candidate": {
+        "nodes": 124,
+        "transitions": 125,
+        "localRules": 14,
+        "cfgBytes": 89266,
+        "airBytes": 7318778
+      }
+    },
+    {
+      "source": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/CORPT00C.cl2",
+      "baseline": {
+        "nodes": 1230,
+        "transitions": 1308,
+        "localRules": 0,
+        "cfgBytes": 867785,
+        "airBytes": 16279163
+      },
+      "candidate": {
+        "nodes": 382,
+        "transitions": 357,
+        "localRules": 54,
+        "cfgBytes": 272615,
+        "airBytes": 10623522
+      }
+    },
+    {
+      "source": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COSGN00C.cl2",
+      "baseline": {
+        "nodes": 248,
+        "transitions": 255,
+        "localRules": 0,
+        "cfgBytes": 171846,
+        "airBytes": 6138331
+      },
+      "candidate": {
+        "nodes": 102,
+        "transitions": 94,
+        "localRules": 12,
+        "cfgBytes": 71197,
+        "airBytes": 5136970
+      }
+    },
+    {
+      "source": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COTRN00C.cl2",
+      "baseline": {
+        "nodes": 1910,
+        "transitions": 2129,
+        "localRules": 0,
+        "cfgBytes": 1378832,
+        "airBytes": 27594546
+      },
+      "candidate": {
+        "nodes": 445,
+        "transitions": 452,
+        "localRules": 57,
+        "cfgBytes": 325886,
+        "airBytes": 17609081
+      }
+    },
+    {
+      "source": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COTRN01C.cl2",
+      "baseline": {
+        "nodes": 396,
+        "transitions": 413,
+        "localRules": 0,
+        "cfgBytes": 276148,
+        "airBytes": 9218515
+      },
+      "candidate": {
+        "nodes": 147,
+        "transitions": 131,
+        "localRules": 21,
+        "cfgBytes": 102291,
+        "airBytes": 7519614
+      }
+    },
+    {
+      "source": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COTRN02C.cl2",
+      "baseline": {
+        "nodes": 2353,
+        "transitions": 2441,
+        "localRules": 0,
+        "cfgBytes": 1644748,
+        "airBytes": 25345090
+      },
+      "candidate": {
+        "nodes": 760,
+        "transitions": 713,
+        "localRules": 124,
+        "cfgBytes": 550651,
+        "airBytes": 14888239
+      }
+    },
+    {
+      "source": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COUSR00C.cl2",
+      "baseline": {
+        "nodes": 1836,
+        "transitions": 2051,
+        "localRules": 0,
+        "cfgBytes": 1326300,
+        "airBytes": 27014166
+      },
+      "candidate": {
+        "nodes": 439,
+        "transitions": 446,
+        "localRules": 55,
+        "cfgBytes": 320691,
+        "airBytes": 17484621
+      }
+    },
+    {
+      "source": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COUSR01C.cl2",
+      "baseline": {
+        "nodes": 348,
+        "transitions": 360,
+        "localRules": 0,
+        "cfgBytes": 241796,
+        "airBytes": 7223725
+      },
+      "candidate": {
+        "nodes": 142,
+        "transitions": 122,
+        "localRules": 25,
+        "cfgBytes": 99305,
+        "airBytes": 5836046
+      }
+    },
+    {
+      "source": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COUSR02C.cl2",
+      "baseline": {
+        "nodes": 1114,
+        "transitions": 1162,
+        "localRules": 0,
+        "cfgBytes": 778362,
+        "airBytes": 13152698
+      },
+      "candidate": {
+        "nodes": 218,
+        "transitions": 198,
+        "localRules": 37,
+        "cfgBytes": 155568,
+        "airBytes": 7118463
+      }
+    },
+    {
+      "source": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/COUSR03C.cl2",
+      "baseline": {
+        "nodes": 631,
+        "transitions": 655,
+        "localRules": 0,
+        "cfgBytes": 439400,
+        "airBytes": 9377750
+      },
+      "candidate": {
+        "nodes": 180,
+        "transitions": 156,
+        "localRules": 32,
+        "cfgBytes": 126392,
+        "airBytes": 6329022
+      }
+    },
+    {
+      "source": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/CSUTLDTC.cbl",
+      "baseline": {
+        "nodes": 85,
+        "transitions": 105,
+        "localRules": 0,
+        "cfgBytes": 64044,
+        "airBytes": 1574492
+      },
+      "candidate": {
+        "nodes": 85,
+        "transitions": 105,
+        "localRules": 0,
+        "cfgBytes": 64044,
+        "airBytes": 1574492
+      }
+    },
+    {
+      "source": "samples/m2/unikix/UniKix_CardDemo_runtime_v1.zip!/migrated_app/cbl/SDSF.cbl",
+      "baseline": {
+        "nodes": 4,
+        "transitions": 3,
+        "localRules": 0,
+        "cfgBytes": 2523,
+        "airBytes": 27228
+      },
+      "candidate": {
+        "nodes": 4,
+        "transitions": 3,
+        "localRules": 0,
+        "cfgBytes": 2523,
+        "airBytes": 27228
+      }
+    }
+  ],
+  "measurements": {
+    "baseline": {
+      "seconds": 242.57,
+      "maximumRssKiB": 2562472
+    },
+    "candidate": {
+      "seconds": 221.28,
+      "maximumRssKiB": 2556092
+    }
+  },
+  "limits": [
+    "Sharing only under typed body/state equivalence proof",
+    "Explicit finite contextual execution; recursive active invocation refused",
+    "Context states still multiply; no solver-complexity or universal speedup claim",
+    "PARTIAL and modelAssumed retained; no new kill proof",
+    "CFG v5 requires a separate rule-aware visualizer update; UI not changed or qualified",
+    "Draft review only; no merge"
+  ],
+  "evidence": [
+    {
+      "path": ".shared-routine-bodies/evidence/runtime-02/runtime.json",
+      "sha256": "9925f411094621a1854b5ca109cfd78e0584f7963f77e221d5bd6e04760df101",
+      "bytes": 8547
+    },
+    {
+      "path": ".shared-routine-bodies/evidence/production-equivalence-final.json",
+      "sha256": "5f1b90e3974e946532233586b644ba3fa711b17e11d4528ad8381847fe8b7e75",
+      "bytes": 181
+    },
+    {
+      "path": ".shared-routine-bodies/evidence/final-replay/results.json",
+      "sha256": "a5aa6289f2ae7490bd74db8d039ae8d8e93859767eb25d0e43c82546a22b6c42",
+      "bytes": 4407175
+    },
+    {
+      "path": ".shared-routine-bodies/evidence/final-qualification-02/comparison.json",
+      "sha256": "778a96f02a816b562fb6494be97ee4cc5a1670a20326524eedbe5b9e39793029",
+      "bytes": 145426
+    },
+    {
+      "path": ".shared-routine-bodies/evidence/final-qualification-02/control-oracles.json",
+      "sha256": "05dac4f87e38109149cdf6d28aea273c61caeacba82b94cd6b197077ab3c732b",
+      "bytes": 209466
+    },
+    {
+      "path": ".shared-routine-bodies/evidence/final-qualification-02/chaos-oracle.json",
+      "sha256": "eb857f266345d6db146dc39cf44fda8e83dc0107d92ebcc5d50d11b042ea5659",
+      "bytes": 137668
+    },
+    {
+      "path": ".shared-routine-bodies/evidence/final-qualification-02/wire-oracle.json",
+      "sha256": "8a6325ccadbc84186b2a96a7fc1d9d3f13319bc9eebe475a74dabec6040360ad",
+      "bytes": 148
+    },
+    {
+      "path": ".shared-routine-bodies/evidence/final-qualification/rule-correlations.json",
+      "sha256": "168141a6ee71167c823b23cf3db544773c53ef9787f5953bcf0f7cf65ddfe340",
+      "bytes": 167
+    },
+    {
+      "path": ".shared-routine-bodies/evidence/focal-final-03/oracles.json",
+      "sha256": "7f2a9d647cee63091157894aa7bf9888411c1734f50436a3804cbb7e829f726a",
+      "bytes": 769
+    },
+    {
+      "path": ".shared-routine-bodies/evidence/focal-final-03/shared-caller-values/caller-matching-oracle.json",
+      "sha256": "4ecd055add6f41d3cf5ccbd2561a6c15a4633783b81712af38f49cd15f8e7b06",
+      "bytes": 550
+    },
+    {
+      "path": ".shared-routine-bodies/evidence/context-mutations/summary.json",
+      "sha256": "886f3500e69efb88891a96da2ddadcd811c07c80329d033d2992261ac9f52173",
+      "bytes": 437
+    },
+    {
+      "path": ".shared-routine-bodies/evidence/measurements/summary.json",
+      "sha256": "8dfb318b841900817474c444947cece184fd5ad98b0c95c80472d0825272a692",
+      "bytes": 150
+    },
+    {
+      "path": ".shared-routine-bodies/evidence/measurements/results.json",
+      "sha256": "7d5fc18716aa33607f2becf752fce5c6267e6fde6c954ed125deeca0e79cb6d6",
+      "bytes": 88800
+    },
+    {
+      "path": ".shared-routine-bodies/evidence/metadata-audit.json",
+      "sha256": "fce55afdfe6ddd7d6b3761804496999aee7195695f3690b5a375e168b846c55e",
+      "bytes": 168171
+    },
+    {
+      "path": ".shared-routine-bodies/evidence/metadata-classification.json",
+      "sha256": "d9c74fb84b49a0d9b85c66dbdad5aec40365ddacf7ede28500b5dc2ea809d864",
+      "bytes": 228573
+    },
+    {
+      "path": ".shared-routine-bodies/evidence/fast-02.log",
+      "sha256": "6747ceb74cd40d27507488bb5f7978ec2fd7c764c15c725bb7e22b04a160d95b",
+      "bytes": 31920
+    },
+    {
+      "path": ".shared-routine-bodies/evidence/qualification-01.log",
+      "sha256": "80bdb1a242d35ea6ba1be09c3b0da572a123e2ba7cf73d1b6cdbc199f0ccf9d7",
+      "bytes": 84
+    },
+    {
+      "path": ".shared-routine-bodies/evidence/lower-fast-06.log",
+      "sha256": "585b314c6dcd52cb1c8981c97e3dc24fdbc8f5000ead1b99c40fbbf40bb416da",
+      "bytes": 39514
+    },
+    {
+      "path": ".shared-routine-bodies/evidence/lower-qualification-03.log",
+      "sha256": "a316700edf7a1743e4a9b66ae3cf812d2a56151e1bc57c2f0db3c01404da0007",
+      "bytes": 51287
+    },
+    {
+      "path": ".shared-routine-bodies/evidence/cfg-fast-07.log",
+      "sha256": "0aed578853a2507cc38f386415335d5c29cefff7a85de88705c9db5dcc5cb6fd",
+      "bytes": 3723853
+    },
+    {
+      "path": ".shared-routine-bodies/evidence/cfg-qualification-03.log",
+      "sha256": "117244d1bedc220c3d8cd4e6d34c5db111bb32cc4f391562a6fde37a9be290bf",
+      "bytes": 5696376
+    }
+  ]
+}

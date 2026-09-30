@@ -45,10 +45,15 @@ por Entry mesmo quando nenhum Return os utiliza; isso não afirma alcançabilida
 
 A slice [W1D](../architecture/analysis-dependency-result-v1.md) admite Invoke com um Normal conhecido e remainder NoControl/AllControl, por aresta INVOKE_NORMAL. Outros outcomes continuam fora.
 
-Dispatch, Raise e Local*/IndirectJump permanecem fora
+Dispatch, Raise e IndirectJump permanecem fora
 do slice, inclusive em órfãs. Recusa é explícita e correlacionada, sem produto que omita
 essas ocorrências. Isso é distinto de projetar fatos suportados de inventário PARTIAL.
 As demais linhas da tabela são direção futura.
+
+Stage 5 admite `LocalInvoke`, `LocalBoundary`, `LocalResume` e `LocalUnwind` como
+regras tipadas sobre nós compartilhados. Elas exigem travessia com frames e não
+viram arestas ordinárias. Ver [controle local](local-control.md) e
+[CFG JSON v5](cfg-local-wire.md), incluindo o limite de recursão do perfil atual.
 
 WORK-CFG-038 consome Opaque com alternativas Jump/Normal/Return conhecidas e
 remainder de controle. O CFG conserva o terminador original e suas arestas

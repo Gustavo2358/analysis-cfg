@@ -88,7 +88,14 @@ def air_oracle(air, sp, semantic):
             target_seq, target_offset, _ = links[next_id]
             require(offset < len(seq['instructions']), 'MOVE is instruction')
             if target_seq == seq: require(target_offset == offset + 1, 'MOVE next instruction/terminator')
-            else: require(seq['terminator']['kind'] == 'jump' and seq['terminator']['destination'] == target_seq['label'], 'MOVE arm/body explicit completion')
+            else:
+                require(seq['terminator']['kind']=='jump','MOVE has explicit completion')
+                if fact['normalContinuation']['statement'] is None:
+                    completion=labels[seq['terminator']['destination']['localId']]
+                    require(not completion['instructions'] and completion['terminator']['kind']=='local.resume','body MOVE completes through matched return')
+                    wrapper=labels[links[owner['header']['id']][2]['destination']['localId']]
+                    require(wrapper['terminator']['resume']==target_seq['label'],'MOVE returns to its actual caller')
+                else:require(seq['terminator']['destination']==target_seq['label'],'MOVE arm explicit completion')
         elif kind == 'CALL':
             require(offset == len(seq['instructions']) and op is seq['terminator'], 'one Invoke terminates each CALL sequence')
             require(op['outcomes']['known'] == [{'kind': 'normal', 'label': links[fact['normalContinuation']['statement']][0]['label']}], 'published CALL continuation')
@@ -98,10 +105,12 @@ def air_oracle(air, sp, semantic):
                 require(op[destination] == links[entry][0]['label'], 'independent IF arm destination')
         elif kind == 'PERFORM':
             body = links[fact['targetEntry']][0]
-            require(op['destination'] == body['label'], 'PERFORM enters target')
+            wrapper=labels[op['destination']['localId']]
+            require(not wrapper['instructions'] and wrapper['terminator']['kind']=='local.invoke' and wrapper['terminator']['entry']==body['label'],'PERFORM enters target through a local frame')
+            require(wrapper['terminator']['resume']==links[fact['normalContinuation']['statement']][0]['label'],'PERFORM exact caller continuation')
             require(all(links[s][2]['kind'] == 'assign' for s in fact['targetStatements']), 'entire target body represented')
             body = links[fact['targetExit']][0]
-            require(body['terminator']['kind'] == 'jump' and body['terminator']['destination'] == links[fact['normalContinuation']['statement']][0]['label'], 'PERFORM unique resume')
+            require(body['terminator']['kind']=='jump' and labels[body['terminator']['destination']['localId']]['terminator']['kind']=='local.resume','PERFORM completes by popping its frame')
     require(sum(s['terminator']['kind'] == 'invoke' for s in unit['sequences']) == len(calls), 'all CALLs and no synthetic dependency sites')
     return unit, links
 
