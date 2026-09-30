@@ -331,7 +331,7 @@
       "contract": "SP 2.62 / NOMINAL_TEXT_SOURCE_V4; modelAssumed remains unavailable as physical storage, runtime VALUE or kill proof",
       "qualification": "docs/work/carddemo-values-control.md"
     },
-    "evidence_level": "Stage-5 frontend PR #77: complete operands in fixed-format continuation. SP 2.62 unchanged; FAST and focused provenance tests passed. See docs/work/stage5-preexisting-fixes.md for campaign regression."
+    "evidence_level": "Stage-5 frontend PR #77: complete operand continuation, SP 2.62 unchanged. FAST and qualification-local PASS; fresh 560/560 population and 25/25 adversaries qualified. See docs/work/stage5-preexisting-fixes.md."
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
@@ -380,7 +380,7 @@
       "producer_api": "io.github.gustavo2358.lower.adapters.cli.CobolDependencyInput",
       "schema_sha256": "5f751464dee36a993d9238a32e25d68d396ce8ca3fa2e0198f29b4e6a7f505c0"
     },
-    "evidence_level": "Stage-5 PR #52: shared PERFORM bodies plus structural cells for anonymous logical group roots. AIR control.local@1 and source evidence 1.6 unchanged. Focused E2E 22/22; current qualification recorded in docs/work/stage5-preexisting-fixes.md.",
+    "evidence_level": "Stage-5 PR #52: shared PERFORM bodies plus internal TEXT cells for anonymous logical roots. FAST PASS, nine real-SP controls and 25/25 four-stage adversaries. Fresh 560/560 replay: SP/AIR/CFG/dependencies/qualified source byte-identical to prior stage-5 products. Full-wrapper reuse/limits in docs/work/stage5-preexisting-fixes.md.",
     "perform_completion": "Scoped exits, SECTION boundaries, typed VARYING levels; Integration authorized; qualified original 39/39 and adversaries 25/25. See docs/domain/perform-control-completion.md.",
     "logical_alias_move": "Logical family translation precedes scalar shortcuts; 14/14 adversaries, PERFORM 39/39, reviewed chaos 48/48 with six explicit abstraction-policy cases; see docs/product/logical-alias-move.md.",
     "synthetic_model_assumptions": {

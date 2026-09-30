@@ -135,3 +135,13 @@ passed; exact final commit CI is tracked on Draft #57.
 [Compact evidence, all 73 CardDemo measurements and SHA-256 index](shared-routine-bodies-evidence.json).
 Implementation and qualification are complete; repository lifecycle remains
 IN_PROGRESS until review and a separately authorized merge.
+
+
+## Corrections found during stage-5 review
+
+The same Draft now pins frontend #77 and the anonymous logical-root correction
+in lower #52. [Additional causes, tests and qualification](stage5-preexisting-fixes.md)
+record 25 new adversaries and a fresh 560/560 replay against this stage's original
+qualified products. All five compared products are byte-identical on that existing
+population. This does not change the original sharing measurements or the CFG v5
+UI-import limitation above.
