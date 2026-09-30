@@ -297,7 +297,7 @@
     ],
     "semantic_product_version": "2.62.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "0f82608401e34b7e44b2efadd4cea7a79a4e5ead",
+    "commit": "7d4d6e93919bf65f2a9223551af7e592fdcf0ad9",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -336,7 +336,7 @@
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "IN_PROGRESS / DRAFT PR #52; coverage remains PARTIAL",
-    "commit": "dbcf377c56b97b3888e432c8fd6e61a3490ec137",
+    "commit": "c68b384a397fb52eef97bfcace9d94a0d936c6a2",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -368,8 +368,8 @@
       "schema": "qualified-source-dependencies",
       "version": "1.6.0",
       "producer_api": "io.github.gustavo2358.lower.application.QualifiedSourceProjection",
-      "source_state_checkpoint": "dbcf377c56b97b3888e432c8fd6e61a3490ec137",
-      "approved_sp_producer": "0f82608401e34b7e44b2efadd4cea7a79a4e5ead",
+      "source_state_checkpoint": "c68b384a397fb52eef97bfcace9d94a0d936c6a2",
+      "approved_sp_producer": "7d4d6e93919bf65f2a9223551af7e592fdcf0ad9",
       "schema_sha256": "e17edf598fba9c32d60cbe36a6006bcd7892bef0271cc2bad456163cfe9e7ad5",
       "checkpoint_note": "Stage-5 review pins including normalization/anonymous-root fixes. Source evidence 1.6 unchanged; no merge yet. Historical review fields are not the current pin.",
       "historical_review": 34
@@ -448,5 +448,5 @@
     "physical": "EXPERIMENTAL_EXPLICIT_OPT_IN_ONLY",
     "report": "docs/campaigns/positive-memory-topology/W2-REPORT.md"
   },
-  "metadata_scope": "Top-level pins are stage 5 review branches, not merged main. Named historical wave fields remain historical. Current contracts, evidence and limitations: docs/work/shared-routine-bodies.md."
+  "metadata_scope": "Top-level repository commits and evidence_level fields are the current stage-5 review authority, including continuation and anonymous-root fixes. Named historical campaigns and merged_reviews remain historical evidence."
 }

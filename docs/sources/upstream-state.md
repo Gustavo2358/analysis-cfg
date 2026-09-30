@@ -1,21 +1,16 @@
-## Stage-5 pre-existing defect fixes — review pins
-
-Frontend PR #77: `0f82608401e34b7e44b2efadd4cea7a79a4e5ead`.
-Lower PR #52: `dbcf377c56b97b3888e432c8fd6e61a3490ec137`.
-AIR PR #23 is unchanged. The source lock above historical entries is the current
-authority. [Qualification and limits](../work/stage5-preexisting-fixes.md).
-
 # Baseline factual dos repositórios
 
 ## Estado vigente — etapa 5 em revisão
 
 - AIR: `e0aef0e1928d88a74fe66b7a4d0af84556b84b19`, PR #23, transporte `control.local@1`.
-- lower: `85abf8e0e3f601e9c56b322bc1dcf8a055e7c75a`, PR #52, branch `feat/shared-routine-bodies`, corpos PERFORM compartilhados sob prova de equivalência.
-- frontend: `4c00dea2a6bad1ba21076e55681f6038b80f8a47`, SP 2.62 inalterado.
+- lower: `c68b384a397fb52eef97bfcace9d94a0d936c6a2`, PR #52, branch `feat/shared-routine-bodies`, corpos PERFORM compartilhados sob prova de equivalência e raízes lógicas anônimas.
+- frontend: `7d4d6e93919bf65f2a9223551af7e592fdcf0ad9`, PR #77, continuação entre operandos completos; SP 2.62 inalterado.
 - IR: `2c7f31f19efbe3211a2aea5bbda90173a9666fe2`, AIR 2.0 / binding 1.0 inalterados.
 
 São pins de revisão, sem merge. CFG JSON v5 e contextos de retorno estão descritos
-na [campanha atual](../work/shared-routine-bodies.md). A qualificação anterior não
+na [campanha atual](../work/shared-routine-bodies.md). As correções preexistentes
+e sua nova comparação com o baseline da etapa 5 constam da
+[qualificação complementar](../work/stage5-preexisting-fixes.md). A qualificação anterior não
 certifica a nova representação. O novo replay 560/560 preserva candidatos, supports
 e provenance; os gates próprios e limites estão na campanha atual.
 
