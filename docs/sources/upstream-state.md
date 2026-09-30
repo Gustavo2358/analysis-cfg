@@ -3,8 +3,8 @@
 ## Estado vigente — etapa 5 em revisão
 
 - AIR: `e0aef0e1928d88a74fe66b7a4d0af84556b84b19`, PR #23, transporte `control.local@1`.
-- lower: `c68b384a397fb52eef97bfcace9d94a0d936c6a2`, PR #52, branch `feat/shared-routine-bodies`, corpos PERFORM compartilhados sob prova de equivalência e raízes lógicas anônimas.
-- frontend: `7d4d6e93919bf65f2a9223551af7e592fdcf0ad9`, PR #77, continuação entre operandos completos; SP 2.62 inalterado.
+- lower: `6623bbe316cacf0afd9c643bf566c6e389f01134`, PR #52, branch `feat/shared-routine-bodies`, corpos PERFORM compartilhados sob prova de equivalência e raízes lógicas anônimas.
+- frontend: `ea545f5a597731a6738bdc1ee9446a208e8da840`, PR #77, continuação entre operandos completos e rotas FILE parciais; SP 2.62 inalterado.
 - IR: `2c7f31f19efbe3211a2aea5bbda90173a9666fe2`, AIR 2.0 / binding 1.0 inalterados.
 
 São pins de revisão, sem merge. CFG JSON v5 e contextos de retorno estão descritos

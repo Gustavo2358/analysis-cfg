@@ -297,7 +297,7 @@
     ],
     "semantic_product_version": "2.62.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "7d4d6e93919bf65f2a9223551af7e592fdcf0ad9",
+    "commit": "ea545f5a597731a6738bdc1ee9446a208e8da840",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -331,12 +331,12 @@
       "contract": "SP 2.62 / NOMINAL_TEXT_SOURCE_V4; modelAssumed remains unavailable as physical storage, runtime VALUE or kill proof",
       "qualification": "docs/work/carddemo-values-control.md"
     },
-    "evidence_level": "Stage-5 frontend PR #77: complete operand continuation, SP 2.62 unchanged. FAST and qualification-local PASS; fresh 560/560 population and 25/25 adversaries qualified. See docs/work/stage5-preexisting-fixes.md."
+    "evidence_level": "Stage-5 PR #77: normalization and partial FILE route recovery; explicit UNKNOWN_LOCAL roles on unproved statement control, unchanged SP schema. New focal tests and frontend FAST PASS. Integrated qualification in docs/work/stage5-partial-file-routes.md."
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "IN_PROGRESS / DRAFT PR #52; coverage remains PARTIAL",
-    "commit": "c68b384a397fb52eef97bfcace9d94a0d936c6a2",
+    "commit": "6623bbe316cacf0afd9c643bf566c6e389f01134",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -368,10 +368,10 @@
       "schema": "qualified-source-dependencies",
       "version": "1.6.0",
       "producer_api": "io.github.gustavo2358.lower.application.QualifiedSourceProjection",
-      "source_state_checkpoint": "c68b384a397fb52eef97bfcace9d94a0d936c6a2",
-      "approved_sp_producer": "7d4d6e93919bf65f2a9223551af7e592fdcf0ad9",
+      "source_state_checkpoint": "6623bbe316cacf0afd9c643bf566c6e389f01134",
+      "approved_sp_producer": "ea545f5a597731a6738bdc1ee9446a208e8da840",
       "schema_sha256": "e17edf598fba9c32d60cbe36a6006bcd7892bef0271cc2bad456163cfe9e7ad5",
-      "checkpoint_note": "Stage-5 review pins including normalization/anonymous-root fixes. Source evidence 1.6 unchanged; no merge yet. Historical review fields are not the current pin.",
+      "checkpoint_note": "Stage-5 PR #52: unchanged production, repinned to the partial FILE control recovery producer; source frontiers and native FILE evidence preserved.",
       "historical_review": 34
     },
     "dependency_input": {
