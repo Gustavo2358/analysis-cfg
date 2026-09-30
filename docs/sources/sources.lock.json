@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "observed_on": "2026-09-28",
+  "observed_on": "2026-09-30",
   "analysis_ir": {
     "repository": "Gustavo2358/analysis-ir",
     "commit": "2c7f31f19efbe3211a2aea5bbda90173a9666fe2",
@@ -142,7 +142,7 @@
   "air_java": {
     "repository": "Gustavo2358/air-java",
     "commit": "e0aef0e1928d88a74fe66b7a4d0af84556b84b19",
-    "canonical_ref": "feat/carddemo-predicate-transport",
+    "canonical_ref": "feat/shared-routine-bodies",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
     "analysis_ir": {
@@ -210,7 +210,8 @@
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
-    "logical_text_w2": "Local producer FAST PASS; fixed logical ranges and expression transport. Selected source E2E qualification in docs/product/logical-text-w2.md."
+    "logical_text_w2": "Local producer FAST PASS; fixed logical ranges and expression transport. Selected source E2E qualification in docs/product/logical-text-w2.md.",
+    "evidence_level": "AIR PR #23: codec admits existing control.local@1, unchanged AIR 2.0/JSON 1.0 semantics; exact pinned commit, legacy transport replay and focal tests qualified."
   },
   "proleap_poc": {
     "repository": "Gustavo2358/proleap-poc",
@@ -334,7 +335,7 @@
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "DONE / MERGED; coverage remains PARTIAL",
-    "commit": "c98ff4821fdbd89a472792f02f11aa00d5b3583d",
+    "commit": "4fe50e298009f1fd474bc897bd3c5e70998ac962",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -346,7 +347,7 @@
     "goto_validation": {
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
     },
-    "canonical_ref": "main",
+    "canonical_ref": "feat/shared-routine-bodies",
     "observed_on": "2026-09-28",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
@@ -378,7 +379,7 @@
       "producer_api": "io.github.gustavo2358.lower.adapters.cli.CobolDependencyInput",
       "schema_sha256": "5f751464dee36a993d9238a32e25d68d396ce8ca3fa2e0198f29b4e6a7f505c0"
     },
-    "evidence_level": "Merged CardDemo values/control and review corrections. SP 2.62 / qualified source 1.6. Upstream pin is the actual merged main including documentation closure; production/tests/contracts are equivalent to the qualified review head. Qualification: 560 pipelines including CardDemo 73, PERFORM 39, Chaos 48, aliases 14, PERFORM adversaries 25; 18 new oracles in logical and IBM profiles. Zero candidate/support/provenance loss. Point 5 remains separate. See docs/work/carddemo-values-control.md.",
+    "evidence_level": "Stage 5 shared PERFORM bodies; entry/completion/handler-state proof; local-control capability. Depends on air-java PR #23. Current qualification: docs/work/shared-routine-bodies.md. Historical named-wave fields do not describe this pin.",
     "perform_completion": "Scoped exits, SECTION boundaries, typed VARYING levels; Integration authorized; qualified original 39/39 and adversaries 25/25. See docs/domain/perform-control-completion.md.",
     "logical_alias_move": "Logical family translation precedes scalar shortcuts; 14/14 adversaries, PERFORM 39/39, reviewed chaos 48/48 with six explicit abstraction-policy cases; see docs/product/logical-alias-move.md.",
     "synthetic_model_assumptions": {
@@ -446,5 +447,5 @@
     "physical": "EXPERIMENTAL_EXPLICIT_OPT_IN_ONLY",
     "report": "docs/campaigns/positive-memory-topology/W2-REPORT.md"
   },
-  "metadata_scope": "Top-level commits, contract versions, canonical_ref and status identify merged main authorities after CardDemo W0-W8. Named wave fields, merged_reviews and source_state_checkpoint/approved_sp_producer/review retain historical evidence and do not override current pins. Integration/evidence reuse/limits: docs/work/carddemo-control-integration.md."
+  "metadata_scope": "Top-level pins are stage 5 review branches, not merged main. Named historical wave fields remain historical. Current contracts, evidence and limitations: docs/work/shared-routine-bodies.md."
 }

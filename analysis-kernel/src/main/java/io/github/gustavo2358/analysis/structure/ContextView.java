@@ -28,7 +28,12 @@ public final class ContextView {
     public record Point(ProgramIndex.Node node,LocalControlRules.Stack stack,io.github.gustavo2358.air.model.Ids.EntryId activation) {
         public Point { Objects.requireNonNull(node);Objects.requireNonNull(stack);Objects.requireNonNull(activation); }
     }
-    public Point initialPoint(){return new Point(entryNode(),LocalControlRules.Stack.EMPTY,entry.id());}
+    /** An explicit empty-stack point, including for generic solver test boundaries. */
+    public Point emptyStackPoint(ProgramIndex.Node node) {
+        if(node.identity!=index.identity||!node.owner().id().equals(entry.id().unit()))throw new IllegalArgumentException("foreign node");
+        return new Point(node,LocalControlRules.Stack.EMPTY,entry.id());
+    }
+    public Point initialPoint(){return emptyStackPoint(entryNode());}
     public Successors successors(Point point) {
         if(!point.activation().equals(entry.id())||point.node().identity!=index.identity||!point.node().owner().id().equals(entry.id().unit()))
             throw new IllegalArgumentException("point outside selected activation");

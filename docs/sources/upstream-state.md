@@ -1,6 +1,17 @@
 # Baseline factual dos repositórios
 
-## Estado vigente — valores e controle após W8 integrados
+## Estado vigente — etapa 5 em revisão
+
+- AIR: `e0aef0e1928d88a74fe66b7a4d0af84556b84b19`, PR #23, transporte `control.local@1`.
+- lower: `4fe50e298009f1fd474bc897bd3c5e70998ac962`, branch `feat/shared-routine-bodies`, corpos PERFORM compartilhados sob prova de equivalência.
+- frontend: `4c00dea2a6bad1ba21076e55681f6038b80f8a47`, SP 2.62 inalterado.
+- IR: `2c7f31f19efbe3211a2aea5bbda90173a9666fe2`, AIR 2.0 / binding 1.0 inalterados.
+
+São pins de revisão, sem merge. CFG JSON v5 e contextos de retorno estão descritos
+na [campanha atual](../work/shared-routine-bodies.md). A qualificação anterior não
+certifica a nova representação; novos gates e replay estão sendo executados.
+
+## Baseline anterior — valores e controle após W8 integrados
 
 SP 2.62 e qualified-source-dependencies 1.6 estão integrados. Dependencies mantém
 a versão 2.7. Os pins abaixo são SHAs reais de main, incluindo fechamento documental.

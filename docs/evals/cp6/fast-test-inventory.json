@@ -772,6 +772,9 @@
       "invalidUnicodeIsRejectedByOutputPrimitiveAndAirModel",
       "nonAtomicFallbackIsExplicitAndMovesCompleteBytes",
       "failedMoveCleansTemporaryAndDoesNotReportSuccess"
+    ],
+    "io.github.gustavo2358.analysis.cfg.adapters.LocalControlWireTest": [
+      "symbolicRulesRequireV5AndKeepOperationIdentity"
     ]
   },
   "cfg-kernel": {

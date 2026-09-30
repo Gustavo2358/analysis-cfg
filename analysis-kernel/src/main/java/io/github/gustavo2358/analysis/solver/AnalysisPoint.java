@@ -13,7 +13,7 @@ public final class AnalysisPoint {
         this.ordinal = ordinal; this.context = context; this.node = traversal.node(); this.traversal = traversal;
     }
     AnalysisPoint(int ordinal, ContextView context, ProgramIndex.Node node) {
-        this(ordinal,context,new ContextView.Point(node,io.github.gustavo2358.analysis.cfg.domain.LocalControlRules.Stack.EMPTY,context.entry().id()));
+        this(ordinal,context,context.emptyStackPoint(node));
     }
     public ContextView.Point traversal() { return traversal; }
     public ContextView context() { return context; }

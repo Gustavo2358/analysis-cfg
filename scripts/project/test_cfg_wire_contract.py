@@ -50,6 +50,40 @@ class CfgWireContractTest(unittest.TestCase):
             doc['nodes'].append(dict(kind='OUTCOME_EXIT',outcome=outcome))
             with self.assertRaisesRegex(ValueError,'invalid outside outcome'):verify(json.dumps(doc))
 
+    def local_document(self):
+        cfg=lambda n:dict(publication='p',ordinal=str(n))
+        op=lambda n:dict(publication='p',unit='u',localId=n)
+        return dict(schema='analysis-cfg-json',schemaVersion='5.0.0',nodes=[
+            dict(id=cfg(0),kind='SEQUENCE',terminator=dict(kind='LOCAL_INVOKE',operation=op('call'))),
+            dict(id=cfg(1),kind='SEQUENCE',terminator=dict(kind='LOCAL_RESUME',operation=op('done'))),
+            dict(id=cfg(2),kind='SEQUENCE',terminator=dict(kind='RETURN',operation=op('return'))),
+            dict(id=cfg(3),kind='OUTCOME_EXIT',outcome='EXCEPTION',tag='invalid_local_return',operation=op('done'))],
+            transitions=[],localControl=[dict(source=cfg(0),operation=op('call'),kind='LOCAL_INVOKE',entry=cfg(1),resume=cfg(2),ports=[]),
+                dict(source=cfg(1),operation=op('done'),kind='LOCAL_RESUME',invalidExit=cfg(3))])
+
+    def test_local_rules_require_v5_and_are_not_unconditional_edges(self):
+        d=self.local_document();self.assertEqual('5.0.0',verify(json.dumps(d))['schemaVersion'])
+        d['transitions']=[dict(kind='JUMP',**{'from':d['nodes'][0]['id'],'to':d['nodes'][2]['id']})]
+        with self.assertRaisesRegex(ValueError,'unconditional'):verify(json.dumps(d))
+        for mutation in ('missing','duplicate','foreign','correlation','version'):
+            d=self.local_document()
+            if mutation=='missing':d['localControl'].pop()
+            elif mutation=='duplicate':d['localControl'].append(d['localControl'][0])
+            elif mutation=='foreign':d['localControl'][0]['entry']['publication']='other'
+            elif mutation=='correlation':d['localControl'][0]['operation']['localId']='other'
+            else:d['schemaVersion']='4.0.0'
+            with self.assertRaises(ValueError,msg=mutation):verify(json.dumps(d))
+
+    def test_writer_local_product_matches_independent_wire_oracle(self):
+        path=ROOT/'cfg-adapters/target/local-control-wire/cfg.json'
+        self.assertTrue(path.exists(),'run LocalControlWireTest first')
+        data=path.read_bytes();self.assertEqual('5.0.0',verify(data)['schemaVersion'])
+        for value in ('-1','01',1):
+            d=json.loads(data)
+            for rule in d['localControl']:
+                if rule['kind']=='LOCAL_UNWIND':rule['count']=value
+            with self.assertRaisesRegex(ValueError,'count'):verify(json.dumps(d))
+
     def test_rejects_unknown_versions_tokens_and_unnecessary_upgrade(self):
         for version, term, edge in (('1.1.0', 'INVOKE', 'INVOKE_NORMAL'), ('2.0.0', 'CALL', 'INVOKE_NORMAL'),
                                     ('2.0.0', 'INVOKE', 'CALL'), ('2.0.0', 'RETURN', 'RETURN')):
