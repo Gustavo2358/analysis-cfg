@@ -1,0 +1,2 @@
+# Physical line endings are the subject of these normalization regressions.
+*.cbl -text

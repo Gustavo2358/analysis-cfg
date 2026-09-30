@@ -45,6 +45,10 @@ def main():
   if a.cases and name not in a.cases:continue
   case=out/name;case.mkdir();(case/'copybooks').mkdir();web=case/'src/main/resources/web';web.parent.mkdir(parents=True);web.symlink_to(Path(config['checkouts']['proleap-poc'])/'src/main/resources/web')
   source=FIXTURES/(name+'.cbl')
+  physical=source.read_bytes()
+  if name.startswith('literals-'):
+   ending={'lf':b'\n','crlf':b'\r\n','cr':b'\r'}[name.rsplit('-',1)[1]]
+   require(ending in physical and b'\r' not in physical.replace(ending,b'') and b'\n' not in physical.replace(ending,b''),'physical record endings preserved')
   args={'frontend':['--source',source,'--output',case/'sp','--copybooks',case/'copybooks',*expected.get('flags',[])],
         'lower':[case/'sp/cobol-semantic-product.json',case/'dependency-input.json'],'cfg':[case/'program.air.json',case/'cfg.json'],'dependency':[case/'dependency-input.json',case/'dependencies.json',*expected.get('dependencyFlags',[])]}
   execution={'sourceSha256':sha(source),'stages':{}}
