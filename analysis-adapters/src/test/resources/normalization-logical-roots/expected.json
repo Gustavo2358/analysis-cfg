@@ -141,5 +141,24 @@
       "AFTER001"
     ],
     "roots": 0
+  },
+  "unknown-group": {
+    "targets": [],
+    "roots": 1,
+    "unknownRootRead": true,
+    "remainder": true
+  },
+  "data-source": {
+    "targets": [
+      "PROGB001"
+    ],
+    "roots": 1
+  },
+  "branch-writes": {
+    "targets": [
+      "PROGB001",
+      "PROGC001"
+    ],
+    "roots": 1
   }
 }
