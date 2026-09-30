@@ -117,6 +117,7 @@ class SolverScaleTest {
             Object value=todo.remove(); if(!visited.add(value)) continue;
             if(value instanceof Object[] a) { arrays++; slots+=a.length; continue; } // roots are opaque, domain-owned
             if(value instanceof AnalysisPoint) { points++; continue; } // W1 references are borrowed baseline
+            if(value instanceof Collection<?> collection) { todo.addAll(collection); continue; }
             if(value instanceof Map<?,?> map) { todo.addAll(map.values()); continue; }
             String name=value.getClass().getName();
             assertFalse(value instanceof SolverTopology || value instanceof IntWorklist || name.contains("DataflowSolver$Run"),"scratch topology/worklist/history released");

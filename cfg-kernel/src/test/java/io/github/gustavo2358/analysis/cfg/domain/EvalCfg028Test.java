@@ -86,6 +86,7 @@ class EvalCfg028Test {
             assertTrue(nodes.containsKey(t.from()));
             assertTrue(nodes.containsKey(t.to()));
             EdgeKind kind = switch (t.kind()) {
+                case LOCAL -> throw new AssertionError("local rules are not ordinary edges");
                 case INVOKE_NORMAL -> throw new AssertionError("Invoke belongs to CP6 W1D");
                 case EXCEPTION, CONTROL_EXIT, OPAQUE_JUMP, OPAQUE_RETURN, OPAQUE_UNKNOWN -> throw new AssertionError("Opaque belongs to WORK-CFG-038");
                 case ENTRY -> EdgeKind.ENTRY;
@@ -434,7 +435,7 @@ class EvalCfg028Test {
 
     @Test
     void memorySupportDoesNotAbsorbControlOrUnknownCapabilities() {
-        for (var unsupported : List.of(Capabilities.LOCAL_CONTROL, Capabilities.INDIRECT_CONTROL,
+        for (var unsupported : List.of(Capabilities.INDIRECT_CONTROL,
                 new Capabilities.Capability("vendor.control", "1"))) {
             var result = build(requiring(minimal(), List.of(Capabilities.MEMORY_REGIONS, unsupported)));
             assertEquals(CfgBuildResult.Status.UNSUPPORTED_CAPABILITY, result.status());

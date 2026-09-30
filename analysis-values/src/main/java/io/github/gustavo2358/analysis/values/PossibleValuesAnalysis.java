@@ -90,6 +90,7 @@ public final class PossibleValuesAnalysis implements AnalysisDefinition<Possible
             var comparator=Comparator.comparing((ObjectId id)->id.unit().publication().localId()).thenComparing(id->id.unit().localId()).thenComparing(ObjectId::localId);
             var batch=BatchReplayer.materialize(profile.session,dataflow,Direction.FORWARD,PossibleValuesState.unreachable(),queries,comparator,
                 (state,operation)->profile.transferOperation(state,operation,replayWork),new BatchReplayer.Projection<PossibleValuesState,ObjectId,ValueFact>() {
+                    @Override public PossibleValuesState mergeStates(PossibleValuesState a,PossibleValuesState b){return a.join(b,replayWork);}
                     @Override public boolean supports(PointQuery<ObjectId> query){return profile.supports(query.subject(),query.point().entry());}
                     @Override public ValueFact project(PointQuery<ObjectId> query,PossibleValuesState state) {
                         var cell=profile.subjects.get(query.subject());boolean source=profile.sourceOpen(query.subject(),query.point().entry());

@@ -12,6 +12,7 @@ import java.util.*;
  */
 public final class ProgramIndex {
     final Map<UnitId,List<Node>> unitNodes = new HashMap<>(), openSources = new HashMap<>();
+    final Map<CfgNodeId,LocalControlRules.Rule> localRules;
     final Object identity;
     final ProjectionPolicy policy;
     final Node[] nodes;
@@ -39,6 +40,7 @@ public final class ProgramIndex {
 
     ProgramIndex(IndexBuilder b) {
         identity = b.identity;
+        localRules = b.localRules;
         policy = b.policy;
         unprovedPreconditions=b.unprovedPreconditions;
         unprovedPreconditionUnits=unprovedPreconditions.stream().map(OperationId::unit).collect(java.util.stream.Collectors.toUnmodifiableSet());

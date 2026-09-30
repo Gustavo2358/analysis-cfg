@@ -141,7 +141,7 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "d760b07b0fac42a106d09342ee9d5b8445ccf630",
+    "commit": "e0aef0e1928d88a74fe66b7a4d0af84556b84b19",
     "canonical_ref": "feat/carddemo-predicate-transport",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",

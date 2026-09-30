@@ -79,7 +79,7 @@ class EvalCfg029Test {
             assertTrue(nodes.containsKey(t.from()));
             assertTrue(nodes.containsKey(t.to()));
             Arm arm = switch (t.kind()) {
-                case EXCEPTION, CONTROL_EXIT, OPAQUE_JUMP, OPAQUE_RETURN, OPAQUE_UNKNOWN -> throw new AssertionError("Opaque belongs to WORK-CFG-038");
+                case LOCAL, EXCEPTION, CONTROL_EXIT, OPAQUE_JUMP, OPAQUE_RETURN, OPAQUE_UNKNOWN -> throw new AssertionError("Opaque belongs to WORK-CFG-038");
                 case INVOKE_NORMAL -> throw new AssertionError("Invoke belongs to CP6 W1D");
                 case ENTRY -> Arm.ENTRY;
                 case BRANCH_TRUE -> Arm.TRUE;

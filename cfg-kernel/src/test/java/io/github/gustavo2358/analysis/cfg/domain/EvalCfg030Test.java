@@ -56,7 +56,7 @@ class EvalCfg030Test {
         Set<Edge> edges = new HashSet<>();
         for (CfgTransition t : graph.transitions()) {
             Arm arm = switch (t.kind()) {
-                case EXCEPTION, CONTROL_EXIT, OPAQUE_JUMP, OPAQUE_RETURN, OPAQUE_UNKNOWN -> throw new AssertionError("Opaque belongs to WORK-CFG-038");
+                case LOCAL, EXCEPTION, CONTROL_EXIT, OPAQUE_JUMP, OPAQUE_RETURN, OPAQUE_UNKNOWN -> throw new AssertionError("Opaque belongs to WORK-CFG-038");
                 case INVOKE_NORMAL -> throw new AssertionError("Invoke belongs to CP6 W1D");
                 case ENTRY -> Arm.ENTRY;
                 case RETURN -> Arm.RETURN;
@@ -214,7 +214,7 @@ class EvalCfg030Test {
 
     @Test
     void registeredKnownCapabilityStillRequiresImplementedSemantics() {
-        var capability = Capabilities.LOCAL_CONTROL;
+        var capability = Capabilities.INDIRECT_CONTROL;
         Publication p = requiring(inventory(minimal(), PARTIAL, PARTIAL), List.of(capability));
         for (var policy : ProjectionPolicy.values()) {
             var result = new CfgBuildCoordinator(SemanticInterpreterRegistry.of(List.of(() -> capability)))

@@ -17,6 +17,7 @@ import java.util.Objects;
  * provenance, operands and gaps. Missing nodes/edges do not prove absence when that inventory is partial.
  */
 public final class CfgGraph {
+    private final Map<CfgNodeId,LocalControlRules.Rule> localRules;
     private final Publication publication;
     private final List<CfgNode> nodes;
     private final List<CfgTransition> transitions;
@@ -50,6 +51,7 @@ public final class CfgGraph {
                 haltNodes.add(halt);
             }
         }
+        localRules = LocalControlRules.project(this.nodes);
         entries = List.copyOf(entryNodes);
         normalExits = List.copyOf(exitNodes);
         haltExits = List.copyOf(haltNodes);
@@ -93,7 +95,7 @@ public final class CfgGraph {
                         && sequence.source().terminator() instanceof Operations.Opaque opaque
                         && opaque.envelope().control().known().contains(io.github.gustavo2358.air.model.Control.ReturnAlternative.INSTANCE)
                         && to instanceof CfgNode.NormalExit exit && exit.entryId().equals(transition.activationEntry());
-                case OPAQUE_UNKNOWN -> false; // symbolic transitions exist only in the contextual cursor
+                case OPAQUE_UNKNOWN, LOCAL -> false; // symbolic transitions exist only in the contextual cursor
                 case INVOKE_NORMAL -> from instanceof CfgNode.SequenceNode sequence
                         && sequence.source().terminator() instanceof Operations.Invoke invoke
                         && to instanceof CfgNode.SequenceNode target
@@ -123,6 +125,8 @@ public final class CfgGraph {
             }
         }
     }
+
+    public Map<CfgNodeId,LocalControlRules.Rule> localRules() { return localRules; }
 
     public Publication publication() {
         return publication;

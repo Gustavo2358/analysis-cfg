@@ -160,7 +160,7 @@ final class TextProfile {
         } else if(effectAware && operation instanceof Operations.Invoke invoke) {
             if(!invoke.results().isEmpty())throw new Refusal(false,"UNSUPPORTED_EFFECT_PROFILE");
             effects.put(operation,ForeignEffectTransfer.prepare(invoke.effectBound(),modeledCells,subjects));
-        } else if(!(operation instanceof Operations.Nop||operation instanceof Operations.Return||operation instanceof Operations.Jump||operation instanceof Operations.Branch||operation instanceof Operations.Halt))
+        } else if(!(operation instanceof Operations.LocalInvoke||operation instanceof Operations.LocalBoundary||operation instanceof Operations.LocalResume||operation instanceof Operations.LocalUnwind||operation instanceof Operations.Nop||operation instanceof Operations.Return||operation instanceof Operations.Jump||operation instanceof Operations.Branch||operation instanceof Operations.Halt))
             throw new Refusal(false,"UNSUPPORTED_EFFECT_PROFILE");
         if(session.index().unprovedPreconditions(operation.header().id()))
             throw new Refusal(false,"UNPROVED_SCALAR_OPERATION_PRECONDITION");

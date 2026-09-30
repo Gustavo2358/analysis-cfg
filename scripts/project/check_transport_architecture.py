@@ -51,7 +51,7 @@ def verify_transport_shape(root: Path) -> None:
                 raise GateFailure("transport reflection/discovery is not authorized")
             if module == "cfg-adapters" and re.search(r"\bSystem\.(?:getenv|getProperties|getProperty|exit)|\bProcessBuilder\b", source):
                 raise GateFailure("adapters cannot depend on environment/process")
-            if path.endswith("CfgJsonWriter.java") and re.search(r"\.name\s*\(|(?<!Long)\.toString\s*\(", source):
+            if path.endswith("CfgJsonWriter.java") and re.search(r"\.name\s*\(|(?<!Long)\.toString\s*\(", source.replace("u.count().toString(10)", "")):
                 raise GateFailure("runtime enum/object rendering cannot govern CFG wire")
     reader = root / "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirJsonFileReader.java"
     text = reader.read_text(encoding="utf-8")

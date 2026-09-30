@@ -3,6 +3,7 @@ package io.github.gustavo2358.analysis.structure;
 import io.github.gustavo2358.air.model.*;
 import io.github.gustavo2358.air.model.Ids.LabelId;
 import io.github.gustavo2358.analysis.cfg.domain.CfgNode;
+import io.github.gustavo2358.analysis.cfg.domain.LocalControlRules;
 import io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy;
 
 /** AIR scope membership only. Open edges are enumerated lazily, never stored as a dense graph. */
@@ -18,6 +19,8 @@ final class OpenControl {
         return opaque.envelope().control().known().stream().allMatch(a -> a instanceof Control.JumpAlternative || a instanceof Control.Normal || a instanceof Control.ReturnAlternative || a instanceof Control.Exceptional || a instanceof Control.AnyException || a instanceof Control.HaltAlternative);
     }
     static java.util.List<Control.ControlAlternative> alternatives(io.github.gustavo2358.air.model.Terminator t) {
+        if(t instanceof Operations.LocalResume)return java.util.List.of(new Control.Exceptional("invalid_local_return",Control.Propagate.INSTANCE));
+        if(t instanceof Operations.LocalUnwind)return java.util.List.of(new Control.Exceptional("invalid_local_unwind",Control.Propagate.INSTANCE));
         return t instanceof Operations.Invoke i?new java.util.ArrayList<>(i.outcomes().known()):t instanceof Operations.Opaque o?o.envelope().control().known():java.util.List.of();
     }
     static LabelId exceptionLabel(Control.ControlAlternative a) {
@@ -39,7 +42,7 @@ final class OpenControl {
     static boolean partial(ProgramIndex.Node node, ProjectionPolicy policy) {
         if (policy != ProjectionPolicy.PARTIAL_ANALYSIS || !(node.source() instanceof CfgNode.SequenceNode s)) return false;
         var term=s.source().terminator();
-        return !(term instanceof Operations.Return || term instanceof Operations.Jump || term instanceof Operations.Branch || term instanceof Operations.Halt
+        return !(LocalControlRules.local(term) || term instanceof Operations.Return || term instanceof Operations.Jump || term instanceof Operations.Branch || term instanceof Operations.Halt
             || term instanceof Operations.Invoke i && supportsInvoke(i) || term instanceof Operations.Opaque o && supportsOpaque(o));
     }
     static Scopes.ControlBound bound(ProgramIndex.Node node, ProjectionPolicy policy) {

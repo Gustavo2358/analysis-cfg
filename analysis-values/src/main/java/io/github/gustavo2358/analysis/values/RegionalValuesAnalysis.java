@@ -620,6 +620,7 @@ public final class RegionalValuesAnalysis {
         private <T,V> ObservationBatch<T,V> observe(Iterable<PointQuery<T>> requests,Comparator<T> order,
                 java.util.function.Function<T,StorageSubject> subject,java.util.function.Function<StorageValueFact,V> projection,boolean textOnly) {
             return BatchReplayer.materialize(session,stable,Direction.FORWARD,BOTTOM,requests,order,engine::operation,new BatchReplayer.Projection<State,T,V>() {
+                @Override public State mergeStates(State a,State b){return engine.joinInto(a,b,new DomainWork()).state();}
                 @Override public boolean supports(PointQuery<T> query) {
                     var selected=subject.apply(query.subject());
                     if(!effects.storage().supports(selected,query.point().entry().unit()))return false;

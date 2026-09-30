@@ -24,7 +24,7 @@ public final class CoreCfgProjection {
     /** Regional operations and the pure IBM1047 codec preserve sequential control after AIR preflight.
      * This role does not calculate storage, bytes or possible values. */
     public static boolean supportsControlCapability(Capabilities.Capability capability) {
-        return Capabilities.RESOURCE_BINDINGS.equals(capability) || Capabilities.TARGET_POSSIBILITIES.equals(capability) || Capabilities.MEMORY_REGIONS.equals(capability) || Capabilities.IBM1047.equals(capability) || Capabilities.ENTRY_POSSIBILITIES_V2.equals(capability) || Capabilities.ENTRY_POSSIBILITIES.equals(capability);
+        return Capabilities.LOCAL_CONTROL.equals(capability) || Capabilities.RESOURCE_BINDINGS.equals(capability) || Capabilities.TARGET_POSSIBILITIES.equals(capability) || Capabilities.MEMORY_REGIONS.equals(capability) || Capabilities.IBM1047.equals(capability) || Capabilities.ENTRY_POSSIBILITIES_V2.equals(capability) || Capabilities.ENTRY_POSSIBILITIES.equals(capability);
     }
 
     /** Default admission of the known subset; requires the same preflight as explicit policy admission. */
@@ -59,6 +59,7 @@ public final class CoreCfgProjection {
                         && !(sequence.terminator() instanceof Operations.Branch)
                         && !(sequence.terminator() instanceof Operations.Invoke invoke && supportsInvoke(invoke))
                         && !(sequence.terminator() instanceof Operations.Opaque opaque && supportsOpaque(opaque))
+                        && !LocalControlRules.local(sequence.terminator())
                         && !(sequence.terminator() instanceof Operations.Halt) && policy != ProjectionPolicy.PARTIAL_ANALYSIS) {
                     issues.add(new CfgProjectionIssue(CfgProjectionIssue.Code.UNSUPPORTED_TERMINATOR,
                             sequence.terminator().header().id()));
@@ -82,6 +83,7 @@ public final class CoreCfgProjection {
             || a instanceof Control.Normal || a instanceof Control.ReturnAlternative || a instanceof Control.Exceptional || a instanceof Control.AnyException || a instanceof Control.HaltAlternative);
     }
     public static java.util.List<Control.ControlAlternative> alternatives(io.github.gustavo2358.air.model.Terminator t) {
+        if(LocalControlRules.invalid(t)!=null)return List.of(LocalControlRules.invalid(t));
         return t instanceof Operations.Invoke i?new java.util.ArrayList<>(i.outcomes().known()):t instanceof Operations.Opaque o?o.envelope().control().known():java.util.List.of();
     }
     public static LabelId exceptionLabel(Control.ControlAlternative a) {
@@ -148,7 +150,7 @@ public final class CoreCfgProjection {
                         var handler=exceptionLabel(alternative);
                         if(handler!=null&&exceptionalLabels.add(handler))transitions.add(new CfgTransition(from,sequences.get(handler).id(),CfgTransition.Kind.EXCEPTION,entry.id()));
                     }
-                    for(var end:outsideNodes.get(sequence.label()))transitions.add(new CfgTransition(from,end.id(),CfgTransition.Kind.CONTROL_EXIT,entry.id()));
+                    if(!LocalControlRules.local(sequence.terminator()))for(var end:outsideNodes.get(sequence.label()))transitions.add(new CfgTransition(from,end.id(),CfgTransition.Kind.CONTROL_EXIT,entry.id()));
                     // Contextual rules include orphans; they do not assert reachability from this Entry.
                     if (sequence.terminator() instanceof Operations.Return) {
                         transitions.add(new CfgTransition(from, exit.id(), CfgTransition.Kind.RETURN, entry.id()));
@@ -177,7 +179,7 @@ public final class CoreCfgProjection {
                                 CfgTransition.Kind.BRANCH_TRUE, entry.id()));
                         transitions.add(new CfgTransition(from, sequences.get(branch.falseDestination()).id(),
                                 CfgTransition.Kind.BRANCH_FALSE, entry.id()));
-                    } else if (policy != ProjectionPolicy.PARTIAL_ANALYSIS) {
+                    } else if (!LocalControlRules.local(sequence.terminator()) && policy != ProjectionPolicy.PARTIAL_ANALYSIS) {
                         throw new IllegalArgumentException("projection requires a supported terminator");
                     }
                 }
