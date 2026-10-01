@@ -1,4 +1,4 @@
-# Controle local: preparar agora, implementar em slice próprio
+# Controle local e contextos de retorno
 
 ## Contrato já existente
 
@@ -47,8 +47,31 @@ Não mapear `EXIT PARAGRAPH` indiscriminadamente para unwind, nem mudar a regra 
 topo do consumidor para acomodar um programa-fonte. Tal problema pertence ao
 produtor/contrato; o CFG deve continuar independente de COBOL.
 
-## Limite inicial
+## Limite inicial histórico
 
 O MVP anuncia `control.local@1` como não suportado. O seam e os oráculos já constam
 do harness; implementá-los não é pré-requisito para demonstrar diamond em arquivo.
 Essa postergação não autoriza tratar local.invoke como invoke externo normal.
+
+## Implementação stage 5 (2026-09-30)
+
+O limite inicial acima é histórico. `CoreProjection` admite as quatro operações e
+publica uma regra tipada por ocorrência, mantendo os corpos compartilhados.
+`ContextView.Point` seleciona Entry, nó e pilha de retornos. A travessia aplica as
+regras da tabela; a API antiga que recebe somente um nó recusa grafos com controle
+local. Retornos dinâmicos não integram a lista de arestas ordinárias.
+
+O solver explora contextos finitos, mantendo raízes de estado separadas por pilha.
+Consultas a um corpo compartilhado executam as instruções de cada contexto antes
+de juntar os resultados; juntar antes do replay inventaria combinações em domínios
+não distributivos. O consumidor de dependências não interpreta os frames.
+
+Uma invocação já ativa encontrada novamente recusa a exploração com
+`LocalControlRules.RecursiveActivation`. Não há truncamento por profundidade nem
+resultado estável parcial nessa situação. Recursão geral exige outro algoritmo;
+o lowering mantém suas fronteiras e especializações existentes para esses casos.
+Loops que concluem uma chamada antes de repetir continuam admitidos.
+
+CFG JSON v5 publica `localControl` separadamente das transições ordinárias. O
+consumidor precisa manter a pilha descrita aqui para calcular caminhos realizáveis.
+Ver [contrato de transporte](cfg-local-wire.md) e [qualificação](../work/shared-routine-bodies.md).

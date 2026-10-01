@@ -2,6 +2,8 @@ package io.github.gustavo2358.analysis.structure;
 
 import io.github.gustavo2358.air.model.Entries;
 import io.github.gustavo2358.analysis.cfg.domain.CfgTransition;
+import io.github.gustavo2358.analysis.cfg.domain.CfgNode;
+import io.github.gustavo2358.analysis.cfg.domain.LocalControlRules;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
@@ -16,8 +18,56 @@ public final class ContextView {
     public Entries.Entry entry() { return entry; }
     public ProgramIndex.Node entryNode() { return index.entryNodes.get(entry.id()); }
     public ProgramIndex.Node normalExit() { return index.normalExits.get(entry.id()); }
-    public EdgeCursor successors(ProgramIndex.Node node) { return cursor(node, true); }
-    public EdgeCursor predecessors(ProgramIndex.Node node) { return cursor(node, false); }
+    public EdgeCursor successors(ProgramIndex.Node node) { requireOrdinary(); return cursor(node, true); }
+    public EdgeCursor predecessors(ProgramIndex.Node node) { requireOrdinary(); return cursor(node, false); }
+
+    private void requireOrdinary() {
+        if(!index.localRules.isEmpty())throw new IllegalArgumentException("local control requires a traversal point with its stack");
+    }
+    /** A shared node plus the exact pending return frames. Entry selection is owned by this view. */
+    public record Point(ProgramIndex.Node node,LocalControlRules.Stack stack,io.github.gustavo2358.air.model.Ids.EntryId activation) {
+        public Point { Objects.requireNonNull(node);Objects.requireNonNull(stack);Objects.requireNonNull(activation); }
+    }
+    /** An explicit empty-stack point, including for generic solver test boundaries. */
+    public Point emptyStackPoint(ProgramIndex.Node node) {
+        if(node.identity!=index.identity||!node.owner().id().equals(entry.id().unit()))throw new IllegalArgumentException("foreign node");
+        return new Point(node,LocalControlRules.Stack.EMPTY,entry.id());
+    }
+    public Point initialPoint(){return emptyStackPoint(entryNode());}
+    public Successors successors(Point point) {
+        if(!point.activation().equals(entry.id())||point.node().identity!=index.identity||!point.node().owner().id().equals(entry.id().unit()))
+            throw new IllegalArgumentException("point outside selected activation");
+        return new Successors(point);
+    }
+    public final class Successors {
+        private final Point source;
+        private final EdgeCursor ordinary;
+        private final LocalControlRules.Rule rule;
+        private boolean localVisited;
+        private Point target;
+        private CfgTransition transition;
+        private Successors(Point point) {
+            source=point;rule=index.localRules.get(point.node().source().id());
+            ordinary=rule==null?cursor(point.node(),true):null;
+        }
+        public boolean advance() {
+            target=null;transition=null;
+            if(rule!=null) {
+                if(localVisited)return false;localVisited=true;
+                var step=LocalControlRules.step(rule,source.stack());
+                target=new Point(index.node(step.destination()),step.stack(),entry.id());
+                transition=new CfgTransition(source.node().source().id(),step.destination(),CfgTransition.Kind.LOCAL,entry.id());
+                return true;
+            }
+            if(!ordinary.advance())return false;
+            var node=ordinary.target();
+            // Leaving the activation discards all local frames (AIR 05.7).
+            var stack=node.source() instanceof CfgNode.SequenceNode?source.stack():LocalControlRules.Stack.EMPTY;
+            target=new Point(node,stack,entry.id());transition=ordinary.transition();return true;
+        }
+        public Point target(){if(target==null)throw new NoSuchElementException();return target;}
+        public CfgTransition transition(){if(transition==null)throw new NoSuchElementException();return transition;}
+    }
 
     private EdgeCursor cursor(ProgramIndex.Node node, boolean forward) {
         Objects.requireNonNull(node, "node");

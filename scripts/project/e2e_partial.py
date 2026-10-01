@@ -53,6 +53,10 @@ def oracle(name, sp, air, result):
         if not links[ident]:
             require(all(i['status'] == 'ABSTRACTED' and i['uncertainties'] for i in items),
                     'unprojected source occurrence retains explicit coverage gaps: ' + ident)
+    sequences = {json.dumps(s['label'], sort_keys=True): s for s in unit['sequences']}
+    def sequence(label):
+        return sequences[json.dumps(label, sort_keys=True)]
+    local_invokes = [o for o in operations.values() if o['kind'] == 'local.invoke']
     by_op = {s['operation']['localId']: s for s in result['sites']}
     calls = source_calls(sp)
     # A contextual PERFORM may publish an inactive lexical shadow alongside the
@@ -64,7 +68,19 @@ def oracle(name, sp, air, result):
         if name == 'display-handler' and call_index == 1:
             require(not ids, 'post-DISPLAY CALL remains source inventory beyond an unproved completion')
             continue
-        require(ids and ids <= by_op.keys(), 'every projected CALL output has a dependency site')
+        auxiliaries = ids - by_op.keys()
+        require(len(auxiliaries) <= 1, 'at most one shared body completion per source CALL')
+        for auxiliary in auxiliaries:
+            completion = next(s for s in unit['sequences']
+                              if s['terminator']['header']['id']['localId'] == auxiliary)
+            require(not completion['instructions'] and completion['terminator']['kind'] == 'local.resume'
+                    and any(operations[i]['kind'] == 'invoke'
+                            and operations[i]['outcomes'] == {'known': [{'kind': 'normal', 'label': completion['label']}],
+                                                              'remainder': {'kind': 'none'}}
+                            for i in ids & by_op.keys()),
+                    'extra CALL coverage is its closed shared body completion')
+        ids -= auxiliaries
+        require(ids and ids <= by_op.keys(), 'every projected CALL invocation has a dependency site')
         linked.update(ids)
         active = [by_op[i] for i in ids if by_op[i]['reachability'] == 'REACHABLE']
         require(len(active) == 1, 'one reachable site per projected source CALL')
@@ -98,9 +114,17 @@ def oracle(name, sp, air, result):
     if name == 'control-body':
         require(not inactive and len(sites) == 2, 'only the demanded body activation and resumed CALL are published')
         inner = operations[sites[1]['operation']['localId']]
-        require(inner['outcomes']['known'] == [{'kind': 'normal', 'label': sites[0]['sequence']}]
-                and inner['outcomes']['remainder'] == {'kind': 'none'},
-                'body CALL returns only to its activation resume')
+        require(len(local_invokes) == 1
+                and local_invokes[0]['entry'] == sites[1]['sequence']
+                and local_invokes[0]['resume'] == sites[0]['sequence'],
+                'body invocation records exactly the caller continuation')
+        outcomes = inner['outcomes']
+        require(len(outcomes['known']) == 1 and outcomes['known'][0]['kind'] == 'normal'
+                and outcomes['remainder'] == {'kind': 'none'},
+                'body CALL has one closed normal continuation')
+        completion = sequence(outcomes['known'][0]['label'])
+        require(not completion['instructions'] and completion['terminator']['kind'] == 'local.resume',
+                'body CALL returns through the active caller frame')
     if name in EXPECTED:
         require(len(sites) == len(EXPECTED[name]), 'independent source site count')
         for site, values in zip(sites, EXPECTED[name]):
@@ -152,8 +176,21 @@ def oracle(name, sp, air, result):
         require(all(len(support) == 1 and support[0]['kind'] == 'VALUE_PRODUCER'
                     and operations[support[0]['producer']['localId']]['kind'] == 'assign'
                     for support in producers)
-                and producers[0][0]['producer'] != producers[1][0]['producer'],
-                'separate activation producers support each fitted value')
+                and producers[0][0]['producer'] == producers[1][0]['producer'],
+                'the shared body assignment supports both fitted values')
+        require(len(local_invokes) == 2
+                and local_invokes[0]['entry'] == local_invokes[1]['entry']
+                and {json.dumps(o['resume'], sort_keys=True) for o in local_invokes}
+                    == {json.dumps(site['sequence'], sort_keys=True) for site in sites},
+                'two caller frames share a body and retain distinct exact CALL continuations')
+        body = sequence(local_invokes[0]['entry'])
+        require(len(body['instructions']) == 1
+                and body['instructions'][0]['header']['id'] == producers[0][0]['producer']
+                and body['terminator']['kind'] == 'jump',
+                'both supports identify the assignment inside the invoked body')
+        completion = sequence(body['terminator']['destination'])
+        require(not completion['instructions'] and completion['terminator']['kind'] == 'local.resume',
+                'the producer completes through the caller frame without a cross-return edge')
         require(all(o['kind'] != 'opaque' for o in operations.values()),
                 'supported body and repeated activation have no opaque frontier')
     precise = name.startswith('perform-') or name in ('if-nested', 'stress')

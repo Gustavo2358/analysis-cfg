@@ -95,8 +95,9 @@ validado pelo preflight e retido pela Sequence, sem avaliar valores nem detectar
 `MVP-CFG-01` local está implementado, com CF1 e M1–M5 provados.
 WORK-CFG-026 implementa CLI/arquivo GOBACK via codec pinado;
 o writer cobre todos os tipos atuais do CFG. `invoke`, `raise`, `dispatch`, demais cenários cíclicos,
-controle aberto, `control.local@1` e
-`control.indirect@1` entram em slices próprios. Nenhum subset recebe claim
+controle aberto e `control.indirect@1` foram separados em slices próprios.
+Stage 5 implementa `control.local@1` com regras locais, pilhas de retorno e raízes
+de dataflow por contexto; ver [domínio e limites](docs/domain/local-control.md). Nenhum subset recebe claim
 `AIR-STRUCTURE@2/PRECISE_FOR_PROFILE` antes de todos os seus oráculos.
 
 ## Produto e lifetime

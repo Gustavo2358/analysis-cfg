@@ -39,20 +39,20 @@ public final class ReachabilityProvider implements AnalysisProvider<LabelId,Reac
             public AnalysisKey key(){return key;}
             public AnalysisOutcome refusal(){return null;}
             public Run<LabelId,Fact> execute() {
-                Set<ProgramIndex.Node> seen=Collections.newSetFromMap(new IdentityHashMap<>());
-                var pending=new ArrayDeque<ProgramIndex.Node>();var labels=new HashSet<LabelId>();
-                var uncertain=Collections.newSetFromMap(new IdentityHashMap<ProgramIndex.Node,Boolean>());var openLabels=new HashSet<LabelId>();
-                seen.add(context.entryNode());pending.add(context.entryNode());long edges=0;
+                Set<ContextView.Point> seen=new HashSet<>();
+                var pending=new ArrayDeque<ContextView.Point>();var labels=new HashSet<LabelId>();
+                var uncertain=new HashSet<ContextView.Point>();var openLabels=new HashSet<LabelId>();
+                seen.add(context.initialPoint());pending.add(context.initialPoint());long edges=0;
                 while(!pending.isEmpty()) {
-                    var node=pending.removeFirst();if(node.source() instanceof CfgNode.SequenceNode sequence)labels.add(sequence.source().label());
-                    var cursor=context.successors(node);
+                    var point=pending.removeFirst();var node=point.node();if(node.source() instanceof CfgNode.SequenceNode sequence)labels.add(sequence.source().label());
+                    var cursor=context.successors(point);
                     while(cursor.advance()){
                         edges=Math.incrementExact(edges);boolean newOpen=false;
-                        if(uncertain.contains(node)||node.source() instanceof CfgNode.SequenceNode region && region.source().terminator() instanceof Operations.Opaque opaque && opaque.envelope().control().remainder() instanceof Scopes.WithinControl||cursor.transition().kind()==io.github.gustavo2358.analysis.cfg.domain.CfgTransition.Kind.OPAQUE_UNKNOWN)newOpen=uncertain.add(cursor.target());
+                        if(uncertain.contains(point)||node.source() instanceof CfgNode.SequenceNode region && region.source().terminator() instanceof Operations.Opaque opaque && opaque.envelope().control().remainder() instanceof Scopes.WithinControl||cursor.transition().kind()==io.github.gustavo2358.analysis.cfg.domain.CfgTransition.Kind.OPAQUE_UNKNOWN)newOpen=uncertain.add(cursor.target());
                         if(seen.add(cursor.target())||newOpen)pending.addLast(cursor.target());
                     }
                 }
-                for(var node:uncertain)if(node.source() instanceof CfgNode.SequenceNode sequence)openLabels.add(sequence.source().label());
+                for(var point:uncertain)if(point.node().source() instanceof CfgNode.SequenceNode sequence)openLabels.add(sequence.source().label());
                 var reached=Set.copyOf(labels);
                 var outcome=new AnalysisOutcome(key,AnalysisOutcome.Status.STABLE,null,Map.of("nodesVisited",(long)seen.size(),"edgesVisited",edges,"reachabilityRuns",1L));
                 return new Run<>() {

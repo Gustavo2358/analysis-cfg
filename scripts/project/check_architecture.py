@@ -149,7 +149,16 @@ EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CfgGraph.java"].update({
 EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CoreCfgProjection.java"].add(
     "io.github.gustavo2358.air.model.Capabilities")
 EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CoreCfgProjection.java"].update({"io.github.gustavo2358.air.model.Control", "io.github.gustavo2358.air.model.Scopes"})
+EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/LocalControlRules.java"] = {
+    "io.github.gustavo2358.air.model.Control", "io.github.gustavo2358.air.model.Operations",
+    "io.github.gustavo2358.air.model.Terminator", "io.github.gustavo2358.air.model.Ids.OperationId",
+    "io.github.gustavo2358.air.model.Ids.LabelId", "io.github.gustavo2358.air.model.Ids.CompletionPortId",
+    "java.math.BigInteger", "java.util.Collections", "java.util.HashMap", "java.util.LinkedHashMap",
+    "java.util.List", "java.util.Map", "java.util.Objects",
+}
 CFG_CLASS_NAMES = {
+    "LocalControlRules", "LocalControlRules$Rule", "LocalControlRules$Invoke", "LocalControlRules$Boundary",
+    "LocalControlRules$Resume", "LocalControlRules$Unwind", "LocalControlRules$Stack", "LocalControlRules$Step", "LocalControlRules$RecursiveActivation",
     "CfgNodeId", "CfgNode", "CfgNode$EntryNode", "CfgNode$SequenceNode", "CfgNode$NormalExit", "CfgNode$HaltExit", "CfgNode$OutcomeExit",
     "CfgTransition", "CfgTransition$Kind", "CfgGraph", "CfgGraph$1",
     "CfgProjectionIssue", "CfgProjectionIssue$Code", "CoreCfgProjection", "ProjectionPolicy",
@@ -170,6 +179,7 @@ EXPECTED_TEST_CASES = {
     "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinatorTest": 12,
     "io.github.gustavo2358.analysis.cfg.application.CfgPreflightTest": 4,
     "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistryTest": 4,
+    DOMAIN_CLASS + "LocalControlProjectionTest": 1,
     DOMAIN_CLASS + "EvalCfg025Test": 17,
     DOMAIN_CLASS + "EvalCfg028Test": 22,
     DOMAIN_CLASS + "EvalCfg029Test": 25,
@@ -188,6 +198,7 @@ ALLOWED_BYTECODE_PREFIXES = (
     "io.github.gustavo2358.analysis.cfg.application.",
     "io.github.gustavo2358.analysis.cfg.extension.",
     DOMAIN_CLASS,
+    "java.math.BigInteger",
     "java.lang.",
     "java.util.",
 )
@@ -204,6 +215,10 @@ FORBIDDEN_BYTECODE_TYPES = {
 }
 # Exact inventory for the authorized structural slice; no wildcard operation support.
 ALLOWED_OPERATION_TYPES = {
+    "io.github.gustavo2358.air.model.Operations$LocalUnwind",
+    "io.github.gustavo2358.air.model.Operations$LocalResume",
+    "io.github.gustavo2358.air.model.Operations$LocalBoundary",
+    "io.github.gustavo2358.air.model.Operations$LocalInvoke",
     "io.github.gustavo2358.air.model.Operations$Invoke",
     "io.github.gustavo2358.air.model.Operations$Opaque",
     "io.github.gustavo2358.air.model.Operations$Return",
@@ -266,10 +281,6 @@ def detector_self_test() -> None:
         "local.BuildCfgInput",
         "io.github.gustavo2358.air.model.Operations$Dispatch",
         "io.github.gustavo2358.air.model.Operations$Raise",
-        "io.github.gustavo2358.air.model.Operations$LocalInvoke",
-        "io.github.gustavo2358.air.model.Operations$LocalBoundary",
-        "io.github.gustavo2358.air.model.Operations$LocalResume",
-        "io.github.gustavo2358.air.model.Operations$LocalUnwind",
         "io.github.gustavo2358.air.model.Operations$IndirectJump",
     }
     verify_bytecode_dependencies({DOMAIN_CLASS + "CoreCfgProjection": {
@@ -813,7 +824,7 @@ def architecture_gate(root: Path, test_profile: str = "full") -> None:
     print("[architecture] PASS: BuildCfg(Publication, BuildOptions) -> CfgBuildResult and direct "
           "AirValidator preflight", flush=True)
     print("[architecture] PASS: explicit capability/version registry; no transport, reflection, "
-          "frontend, AIR shadow, or control primitives beyond Jump/Branch/Return/Halt/Invoke-Normal and conservative Opaque envelopes", flush=True)
+          "frontend, AIR shadow, or control primitives beyond Jump/Branch/Return/Halt/Invoke-Normal conservative Opaque envelopes and typed Local control rules", flush=True)
 
 
 def main() -> int:

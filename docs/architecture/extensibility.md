@@ -101,11 +101,12 @@ Aplicação: a [política CALL](../domain/cp6-call-name-policy.md) mantém
 nem modo legado para a rejeição incorreta. A auditoria posterior do incidente real
 mede o recall recuperado; não condiciona a autorização desse requisito de produto.
 
-## Controle local futuro
+## Controle local e limite de recursão
 
 Um grafo finito de nós/transições pode carregar regras de push/pop/guard e uma
 consulta contextual. Isso não torna todo caminho da projeção plana realizável.
 Precisão para recursão não pode depender de enumerar infinitas pilhas. A escolha de
-representação/algoritmo é discovery separado com literatura, adversariais e limite
-operacional explícito. Registrar metadado de frame sem usá-lo nas consultas não
+representação/algoritmo exige literatura, adversariais e limite operacional explícito.
+Stage 5 usa exploração de contextos finitos e recusa repetição de uma invocação
+simultaneamente ativa; não há limite arbitrário de profundidade. Registrar metadado de frame sem usá-lo nas consultas não
 satisfaz matching preciso. Ver [controle local](../domain/local-control.md).

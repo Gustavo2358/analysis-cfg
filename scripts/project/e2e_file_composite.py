@@ -4,6 +4,8 @@ Hand-written oracles inspect graph paths and dependency supports, not graph size
 Use an immutable runtime.json from a qualified producer build; --inspect can also
 challenge already generated artifacts (e.g. the historical RED witness).
 """
+from cfg_local_paths import Paths
+from cfg_wire_contract import verify as verify_cfg_wire
 import argparse,collections,hashlib,json,os,shutil,subprocess,time
 from pathlib import Path
 from dependency_wire import read,require
@@ -50,6 +52,7 @@ def labelrefs(value):
  elif isinstance(value,list):
   for v in value:yield from labelrefs(v)
 def reachable(start,adj,blocked=frozenset()):
+ if isinstance(adj,Paths):return adj.reachable(start,blocked)
  seen=set();todo=collections.deque(start)
  while todo:
   at=todo.popleft()
@@ -64,9 +67,15 @@ def oracle(name,folder):
  byop={entity(n['terminator']['operation']):vertex(n['id']) for n in cfg['nodes'] if 'terminator' in n}
  bylabel={entity(n['label'],'label'):vertex(n['id']) for n in cfg['nodes'] if 'label' in n}
  starts=[vertex(n['id']) for n in cfg['nodes'] if n['kind']=='ENTRY'];require(len(starts)==1,'one source entry')
- adj=collections.defaultdict(list)
- for e in cfg['transitions']:adj[vertex(e['from'])].append(vertex(e['to']))
- air_edges={(bylabel[entity(s['label'],'label')],bylabel[l]) for s in seqs for l in labelrefs(s['terminator'])}
+ adj=Paths(cfg);verify_cfg_wire((folder/'cfg.json').read_bytes())
+ local={oid:t for oid,t in terms.items() if t['kind'].startswith('local.')}
+ rules={entity(r['operation']):r for r in cfg.get('localControl',[])}
+ require(set(local)==set(rules),'all AIR local rules have exactly one CFG rule')
+ for oid,t in local.items():
+  r=rules[oid];require(vertex(r['source'])==byop[oid],'local rule source identity')
+  for field in {'local.invoke':['entry','resume'],'local.boundary':['defaultDestination'],'local.resume':[],'local.unwind':['destination']}[t['kind']]:
+   require(vertex(r[field])==bylabel[entity(t[field],'label')],'exact AIR local destination '+field)
+ air_edges={(bylabel[entity(s['label'],'label')],bylabel[l]) for s in seqs if not s['terminator']['kind'].startswith('local.') for l in labelrefs(s['terminator'])}
  cfg_edges={(vertex(e['from']),vertex(e['to'])) for e in cfg['transitions'] if vertex(e['from']) in bylabel.values() and vertex(e['to']) in bylabel.values()}
  require(air_edges==cfg_edges,'CFG preserves every explicit AIR destination, adds no FILE edge')
  if name=='sort-callback':
@@ -110,14 +119,14 @@ def oracle(name,folder):
  if expected is not None:
   # Check all normal paths using (node, trace) states, so merged branch histories
   # and distinct PERFORM returns cannot hide a skipped operand.
-  exits={vertex(n['id']) for n in cfg['nodes'] if n['kind']=='NORMAL_EXIT'};todo=collections.deque((s,()) for s in starts);visited=set();traces=set()
+  exits={vertex(n['id']) for n in cfg['nodes'] if n['kind']=='NORMAL_EXIT'};todo=collections.deque((s,(),()) for s in starts);visited=set();traces=set()
   while todo:
-   at,trace=todo.popleft()
-   if at in blocked or (at,trace) in visited:continue
-   visited.add((at,trace));trace=trace+((actions[at],) if at in actions else ())
+   at,stack,trace=todo.popleft()
+   if at in blocked or (at,stack,trace) in visited:continue
+   visited.add((at,stack,trace));trace=trace+((actions[at],) if at in actions else ())
    require(any(tuple(path[:len(trace)])==trace for path in expected),name+' forbidden success trace '+str(trace))
    if at in exits:require(list(trace) in expected,name+' early completion');traces.add(trace)
-   for dst in adj[at]:todo.append((dst,trace))
+   for dst,frames in adj.successors(at,stack):todo.append((dst,frames,trace))
   require(traces=={tuple(x) for x in expected},name+' all source alternatives survive')
  else:
   require(len(files['sites'])==4 and len(files['edges'])==3,'three external participants and one local SD')
@@ -125,7 +134,7 @@ def oracle(name,folder):
   require(not (reachable(starts,adj,blocked|{work}) & roles['output']),'output cannot precede work')
   require(not (reachable([work],adj,blocked) & roles['input']),'input cannot restart after work')
   require(roles['input']|roles['output']<=normal,'all aggregate participants reachable normally')
-  for at in roles['input']|roles['output']:require(at in reachable(adj[at],adj,blocked),'aggregate count remains unbounded')
+  for at in roles['input']|roles['output']:require(at in reachable(adj.ordinary[at],adj,blocked),'aggregate count remains unbounded')
   require(any(g['code']=='FILE_AGGREGATE_ORDER_COUNT_NOT_PROVEN' for g in air['uncertainties']),'unknown aggregate order/count explicit')
  if name=='use-error':require('IOERROR' not in {c['referenceName'] for s in dep['sites'] for c in s['candidates']},'unknown USE callback not invented')
  return {'name':name,'fileSites':len(files['sites']),'fileEdges':len(files['edges']),'spVersion':sp['contractVersion'],'cfgMatchesAir':True,'status':'PASS'}

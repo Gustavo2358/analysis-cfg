@@ -402,6 +402,17 @@
       "permitRequiresExecutionDestinationAndDirectTargetTogether",
       "destinationRemainderAndIncompleteRepresentationForbidExclusion",
       "genericUpdatesNeedAuthorityToForgetAndDoNotInventSupport"
+    ],
+    "io.github.gustavo2358.analysis.structure.LocalControlTest": [
+      "callersReturnOnlyToTheirOwnContinuation",
+      "boundaryMatchesOnlyTopFrameAndEmptyStackUsesDefault",
+      "emptyResumeAndExcessiveUnwindAreExceptional",
+      "jumpAndZeroUnwindPreserveFrameAndExactUnwindPopsOnlyItsCount",
+      "returnDiscardsPendingFramesAndCannotResumeAnotherEntry",
+      "loopReusesCompletedFramesAndRecursiveActivationRefusesWithoutTruncation",
+      "dataflowKeepsEachCallerRootSeparateInsideSharedBody",
+      "observationReplaysEachFrameBeforeJoiningNonDistributiveTransfers",
+      "traversalHandleCannotMoveToAnotherActivationEntry"
     ]
   },
   "analysis-launcher": {
@@ -761,6 +772,9 @@
       "invalidUnicodeIsRejectedByOutputPrimitiveAndAirModel",
       "nonAtomicFallbackIsExplicitAndMovesCompleteBytes",
       "failedMoveCleansTemporaryAndDoesNotReportSuccess"
+    ],
+    "io.github.gustavo2358.analysis.cfg.adapters.LocalControlWireTest": [
+      "symbolicRulesRequireV5AndKeepOperationIdentity"
     ]
   },
   "cfg-kernel": {
@@ -887,6 +901,9 @@
       "duplicateOrConflictingRegistrationFailsExplicitly",
       "registrationOrderCreatesNoPriorityAndVersionsRemainDistinct",
       "missingCapabilityIsNotResolvedAsANop"
+    ],
+    "io.github.gustavo2358.analysis.cfg.domain.LocalControlProjectionTest": [
+      "sharedBodyIsProjectedOnceWithoutUnconditionalReturns"
     ]
   },
   "cfg-launcher": {

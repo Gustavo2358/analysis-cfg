@@ -6,6 +6,7 @@ import io.github.gustavo2358.air.model.Operations;
 import io.github.gustavo2358.air.model.Terminator;
 import io.github.gustavo2358.analysis.cfg.application.CfgBuildResult;
 import io.github.gustavo2358.analysis.cfg.domain.CfgNode;
+import io.github.gustavo2358.analysis.cfg.domain.LocalControlRules;
 import io.github.gustavo2358.analysis.cfg.domain.CfgNodeId;
 import io.github.gustavo2358.analysis.cfg.domain.CfgTransition;
 import io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy;
@@ -38,6 +39,7 @@ public final class CfgJsonWriter {
         var graph = result.graph().orElseThrow();
         var out = new CfgJsonBytes(maximumBytes);
         // Token mappings carry their contract requirement. Inspect the product, not its source text.
+        boolean requiresV5=!graph.localRules().isEmpty();
         boolean requiresV4=graph.nodes().stream().anyMatch(CfgNode.OutcomeExit.class::isInstance)
             ||graph.transitions().stream().anyMatch(t->t.kind()==CfgTransition.Kind.EXCEPTION);
         boolean requiresV2 = false;
@@ -49,7 +51,7 @@ public final class CfgJsonWriter {
         for (var transition : graph.transitions())
             requiresV2 |= transitionKind(transition.kind()).requiresV2;
         out.raw("{\"schema\":\"analysis-cfg-json\",\"schemaVersion\":");
-        out.string(requiresV4 ? "4.0.0" : requiresV3 ? "3.0.0" : requiresV2 ? "2.0.0" : "1.0.0");
+        out.string(requiresV5 ? "5.0.0" : requiresV4 ? "4.0.0" : requiresV3 ? "3.0.0" : requiresV2 ? "2.0.0" : "1.0.0");
         out.raw(",\"airVersion\":");
         var version = result.airVersion();
         out.string(version.major() + "." + version.minor() + "." + version.patch());
@@ -67,7 +69,7 @@ public final class CfgJsonWriter {
         out.raw("]},\"nodes\":["); comma = false;
         for (var node : graph.nodes()) {
             if (comma) out.raw(","); comma = true;
-            node(out, node, requiresV3||requiresV4);
+            node(out, node, requiresV3||requiresV4||requiresV5);
         }
         out.raw("],\"transitions\":["); comma = false;
         for (var transition : graph.transitions()) {
@@ -77,7 +79,15 @@ public final class CfgJsonWriter {
             out.raw(",\"to\":"); cfgId(out, transition.to());
             out.raw(",\"activationEntry\":"); airId(out, transition.activationEntry()); out.raw("}");
         }
-        out.raw("]}");
+        out.raw("]");
+        if(requiresV5) {
+            out.raw(",\"localControl\":[");comma=false;
+            for(var rule:graph.localRules().values()) {
+                if(comma)out.raw(",");comma=true;localRule(out,rule);
+            }
+            out.raw("]");
+        }
+        out.raw("}");
         return out.bytes();
     }
 
@@ -143,6 +153,29 @@ public final class CfgJsonWriter {
         out.raw("}");
     }
 
+    private static void localRule(CfgJsonBytes out,LocalControlRules.Rule rule) throws CfgJsonException {
+        out.raw("{\"source\":");cfgId(out,rule.source());out.raw(",\"operation\":");airId(out,rule.operation());
+        switch(rule) {
+            case LocalControlRules.Invoke i -> {
+                out.raw(",\"kind\":\"LOCAL_INVOKE\",\"entry\":");cfgId(out,i.entry());
+                out.raw(",\"resume\":");cfgId(out,i.resume());out.raw(",\"ports\":[");
+                boolean comma=false;for(var port:i.ports()){if(comma)out.raw(",");comma=true;airId(out,port);}out.raw("]");
+            }
+            case LocalControlRules.Boundary b -> {
+                out.raw(",\"kind\":\"LOCAL_BOUNDARY\",\"port\":");airId(out,b.port());
+                out.raw(",\"defaultDestination\":");cfgId(out,b.defaultDestination());
+            }
+            case LocalControlRules.Resume r -> {
+                out.raw(",\"kind\":\"LOCAL_RESUME\",\"invalidExit\":");cfgId(out,r.invalidExit());
+            }
+            case LocalControlRules.Unwind u -> {
+                out.raw(",\"kind\":\"LOCAL_UNWIND\",\"count\":");out.string(u.count().toString(10));
+                out.raw(",\"destination\":");cfgId(out,u.destination());out.raw(",\"invalidExit\":");cfgId(out,u.invalidExit());
+            }
+        }
+        out.raw("}");
+    }
+
     private static void cfgId(CfgJsonBytes out, CfgNodeId id) throws CfgJsonException {
         out.raw("{\"publication\":"); out.string(id.publicationId().localId());
         out.raw(",\"ordinal\":"); out.string(Long.toString(id.ordinal())); out.raw("}");
@@ -155,6 +188,7 @@ public final class CfgJsonWriter {
                 out.raw("{\"publication\":"); out.string(unit.publication().localId());
                 out.raw(",\"localId\":"); out.string(unit.localId());
             }
+            case Ids.CompletionPortId port -> scopedId(out,port.unit(),port.localId());
             case Ids.EntryId entry -> scopedId(out, entry.unit(), entry.localId());
             case Ids.LabelId label -> scopedId(out, label.unit(), label.localId());
             case Ids.OperationId operation -> scopedId(out, operation.unit(), operation.localId());
@@ -185,6 +219,8 @@ public final class CfgJsonWriter {
         RETURN("RETURN", false), HALT("HALT", false),
         OPAQUE("OPAQUE", true), OPAQUE_JUMP("OPAQUE_JUMP", true), OPAQUE_RETURN("OPAQUE_RETURN", true),
         EXCEPTION("EXCEPTION", true), CONTROL_EXIT("CONTROL_EXIT", true),
+        LOCAL_INVOKE("LOCAL_INVOKE",true), LOCAL_BOUNDARY("LOCAL_BOUNDARY",true),
+        LOCAL_RESUME("LOCAL_RESUME",true), LOCAL_UNWIND("LOCAL_UNWIND",true),
         INVOKE("INVOKE", true), INVOKE_NORMAL("INVOKE_NORMAL", true);
 
         private final String token;
@@ -202,11 +238,15 @@ public final class CfgJsonWriter {
             case EXCEPTION -> WireKind.EXCEPTION; case CONTROL_EXIT -> WireKind.CONTROL_EXIT;
             case INVOKE_NORMAL -> WireKind.INVOKE_NORMAL;
             case OPAQUE_JUMP -> WireKind.OPAQUE_JUMP; case OPAQUE_RETURN -> WireKind.OPAQUE_RETURN;
-            case OPAQUE_UNKNOWN -> throw new IllegalArgumentException("symbolic control is retained on AIR");
+            case OPAQUE_UNKNOWN, LOCAL -> throw new IllegalArgumentException("symbolic control is retained on AIR");
         };
     }
     private static WireKind terminatorKind(Terminator terminator) throws CfgJsonException {
         return switch (terminator) {
+            case Operations.LocalInvoke ignored -> WireKind.LOCAL_INVOKE;
+            case Operations.LocalBoundary ignored -> WireKind.LOCAL_BOUNDARY;
+            case Operations.LocalResume ignored -> WireKind.LOCAL_RESUME;
+            case Operations.LocalUnwind ignored -> WireKind.LOCAL_UNWIND;
             case Operations.Opaque ignored -> WireKind.OPAQUE;
             case Operations.Jump ignored -> WireKind.JUMP;
             case Operations.Branch ignored -> WireKind.BRANCH;

@@ -111,11 +111,8 @@ public final class StatementEffects {
         else if(operation instanceof Operations.Return r)for(var value:r.values())b.visit(value,ReadKind.VALUE);
         else if(operation instanceof Operations.Raise r)for(var value:r.values())b.visit(value,ReadKind.VALUE);
         else if(operation instanceof Operations.IndirectJump j){b.visit(j.target(),ReadKind.VALUE);b.envelope(j.fallback().memory(),b.writes);}
-        else if(operation instanceof Operations.LocalInvoke l)b.envelope(l.fallback().memory(),b.writes);
-        else if(operation instanceof Operations.LocalBoundary l)b.envelope(l.fallback().memory(),b.writes);
-        else if(operation instanceof Operations.LocalResume l)b.envelope(l.fallback().memory(),b.writes);
-        else if(operation instanceof Operations.LocalUnwind l)b.envelope(l.fallback().memory(),b.writes);
-        else if(!(operation instanceof Operations.Nop||operation instanceof Operations.Jump||operation instanceof Operations.Halt))
+        // Interpreted local control preserves memory; body operations account for its effects.
+        else if(!(operation instanceof Operations.LocalInvoke||operation instanceof Operations.LocalBoundary||operation instanceof Operations.LocalResume||operation instanceof Operations.LocalUnwind||operation instanceof Operations.Nop||operation instanceof Operations.Jump||operation instanceof Operations.Halt))
             throw new IllegalArgumentException("unsupported operation effect");
         b.outcomes.replaceAll((key,value)->List.copyOf(value));
         return new Statement(operation,b.reads,b.writes,b.outcomes,b.otherwise);

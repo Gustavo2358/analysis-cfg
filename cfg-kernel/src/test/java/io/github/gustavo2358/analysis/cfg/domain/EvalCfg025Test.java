@@ -353,7 +353,7 @@ class EvalCfg025Test {
     @Test
     void registeredCapabilityIdentityAloneDoesNotImplementItsSemantics() {
         Publication base = minimal();
-        var capability = Capabilities.LOCAL_CONTROL;
+        var capability = Capabilities.INDIRECT_CONTROL;
         Publication publication = new Publication(P, base.airVersion(),
                 new Capabilities.Manifest(List.of(capability), List.of(capability)), base.artifacts(), base.units(),
                 base.storage(), base.resources(), base.artifactRelations(), base.origins(),

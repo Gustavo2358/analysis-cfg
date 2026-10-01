@@ -16,6 +16,8 @@ public final class BatchReplayer {
     private BatchReplayer() { }
     @FunctionalInterface public interface Transfer<S> { S apply(S state,Operation operation); }
     public interface Projection<S,T,V> {
+        /** Join only after replay to the observation point; roots must remain immutable. */
+        default S mergeStates(S a,S b) { throw new ObservationException("local-context state join unavailable"); }
         boolean supports(PointQuery<T> query);
         V project(PointQuery<T> query,S state);
         /** Optional domain extension for a materializable terminator outcome. */
@@ -74,28 +76,36 @@ public final class BatchReplayer {
                     for(var q:selected)answers.put(q.query(),value(q.query(),projection.project(q.query(),unreachable)));
                     continue;
                 }
-                S state=forward?result.in(context,node):result.out(context,node);
-                var outcomeStates=new HashMap<OutcomePoint,S>();
+                var states=new ArrayList<>(result.states(context,node,forward));
+                var outcomeStates=new HashMap<OutcomePoint,List<S>>();
                 int cursor=forward?0:Math.incrementExact(sequence.instructions().size());
-                count.groups=Math.incrementExact(count.groups);
+                count.groups=Math.addExact(count.groups,states.size());
                 for(var q:selected) {
                     while(cursor!=q.boundary()) {
                         int offset=forward?cursor:cursor-1;
                         Operation operation=offset==sequence.instructions().size()?sequence.terminator():sequence.instructions().get(offset);
-                        count.operations=Math.incrementExact(count.operations);
-                        state=Objects.requireNonNull(transfer.apply(state,operation));
+                        for(int root=0;root<states.size();root++) {
+                            count.operations=Math.incrementExact(count.operations);
+                            states.set(root,Objects.requireNonNull(transfer.apply(states.get(root),operation)));
+                        }
                         cursor+=forward?1:-1;
                     }
-                    S projected=state;
+                    List<S> projected=states;
                     if(q.query().point().kind()==ProgramPoint.Kind.OUTCOME) {
                         var point=q.query().point();var key=new OutcomePoint(point.operation(),point.outcome());
                         if(!outcomeStates.containsKey(key)) {
-                            outcomeStates.put(key,Objects.requireNonNull(projection.transferOutcome(q.query(),state)));
-                            count.operations=Math.incrementExact(count.operations);
+                            var roots=new ArrayList<S>();
+                            for(var state:states) {
+                                roots.add(Objects.requireNonNull(projection.transferOutcome(q.query(),state)));
+                                count.operations=Math.incrementExact(count.operations);
+                            }
+                            outcomeStates.put(key,List.copyOf(roots));
                         }
                         projected=outcomeStates.get(key);
                     }
-                    answers.put(q.query(),value(q.query(),projection.project(q.query(),projected)));
+                    S observed=projected.getFirst();
+                    for(int root=1;root<projected.size();root++)observed=projection.mergeStates(observed,projected.get(root));
+                    answers.put(q.query(),value(q.query(),projection.project(q.query(),observed)));
                 }
             }
             var output=new ArrayList<Observation<T,V>>();long answered=0,unsupported=0;

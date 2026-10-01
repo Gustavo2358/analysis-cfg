@@ -52,3 +52,5 @@ NEXT: **HUMAN PRIORITIZATION USING FULL CARDDEMO BASELINE**. O corpus fornece ev
 [Scope and contract](file-composite-control.md); [qualification](file-composite-qualification.md).
 SP2.51 per-use control for OPEN/CLOSE and SORT/MERGE without procedure callbacks.
 IN_PROGRESS: implemented and qualified locally, awaiting review; no merge.
+
+- [Stage5 JSON GENERATE — checkpoint 4](stage5-json-generate.md): authority repin, source alternatives and qualification.

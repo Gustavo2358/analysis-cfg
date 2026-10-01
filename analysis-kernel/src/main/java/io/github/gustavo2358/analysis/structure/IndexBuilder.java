@@ -8,6 +8,7 @@ import java.util.*;
 
 /** One construction lifetime. Temporary membership/role maps are released after ownership transfer. */
 final class IndexBuilder {
+    Map<CfgNodeId,LocalControlRules.Rule> localRules;
     final Object identity = new Object();
     final Publication snapshot;
     final IndexMetrics.Counter count = new IndexMetrics.Counter();
@@ -70,13 +71,14 @@ final class IndexBuilder {
         var namePolicies = NamePolicies.extensions(snapshot);
         for (var capability : snapshot.capabilities().required()) {
             count.visit("requiredCapabilities");
-            supported(capability.equals(Capabilities.RESOURCE_BINDINGS) || capability.equals(Capabilities.TARGET_POSSIBILITIES) || capability.equals(Capabilities.MEMORY_REGIONS) || capability.equals(Capabilities.IBM1047) || capability.equals(Capabilities.ENTRY_POSSIBILITIES_V2) || capability.equals(Capabilities.ENTRY_POSSIBILITIES) || namePolicies.contains(capability), "unsupported control capability");
+            supported(capability.equals(Capabilities.LOCAL_CONTROL) || capability.equals(Capabilities.RESOURCE_BINDINGS) || capability.equals(Capabilities.TARGET_POSSIBILITIES) || capability.equals(Capabilities.MEMORY_REGIONS) || capability.equals(Capabilities.IBM1047) || capability.equals(Capabilities.ENTRY_POSSIBILITIES_V2) || capability.equals(Capabilities.ENTRY_POSSIBILITIES) || namePolicies.contains(capability), "unsupported control capability");
         }
         supported(policy.acceptsInventory(snapshot.coverage().inventory()), "unsupported publication inventory policy");
         declarations();
         payload();
         nodes(graph);
         edges(graph);
+        localRules=graph.localRules();
         return new ProgramIndex(this);
     }
 
@@ -135,7 +137,7 @@ final class IndexBuilder {
                 valid(sequence.label().unit().equals(unit.id()), "foreign Sequence owner");
                 unique(sequences, sequence.label(), sequence, "duplicate Sequence label");
                 Terminator term = sequence.terminator();
-                supported(term instanceof Operations.Jump || term instanceof Operations.Branch || term instanceof Operations.Return || term instanceof Operations.Halt
+                supported(LocalControlRules.local(term) || term instanceof Operations.Jump || term instanceof Operations.Branch || term instanceof Operations.Return || term instanceof Operations.Halt
                     || term instanceof Operations.Invoke invoke && OpenControl.supportsInvoke(invoke)
                     || term instanceof Operations.Opaque opaque && OpenControl.supportsOpaque(opaque) || policy == ProjectionPolicy.PARTIAL_ANALYSIS, "unsupported control");
                 int degree = term instanceof Operations.Branch ? 2 : term instanceof Operations.Invoke invoke ? (int) invoke.outcomes().known().stream().filter(Control.Normal.class::isInstance).count()
@@ -145,7 +147,7 @@ final class IndexBuilder {
                 var known=OpenControl.alternatives(term);
                 degree+=Math.toIntExact(known.stream().map(OpenControl::exceptionLabel).filter(Objects::nonNull).distinct().count());
                 long outside=known.stream().filter(OpenControl::outside).distinct().count();
-                degree+=Math.toIntExact(outside);expectedOutside=Math.addExact(expectedOutside,outside);
+                if(!LocalControlRules.local(term))degree+=Math.toIntExact(outside);expectedOutside=Math.addExact(expectedOutside,outside);
                 arity = Math.addExact(arity, degree);
                 if (term instanceof Operations.Halt) expectedHalts = Math.incrementExact(expectedHalts);
                 int offset = 0;
@@ -312,7 +314,7 @@ final class IndexBuilder {
         if (!(source.source() instanceof CfgNode.SequenceNode node)) return null;
         if(kind==CfgTransition.Kind.EXCEPTION&&target.source() instanceof CfgNode.SequenceNode destination)
             return OpenControl.alternatives(node.source().terminator()).stream().anyMatch(a->destination.source().label().equals(OpenControl.exceptionLabel(a)))?target:null;
-        if(kind==CfgTransition.Kind.CONTROL_EXIT&&target.source() instanceof CfgNode.OutcomeExit outside)
+        if(kind==CfgTransition.Kind.CONTROL_EXIT&&!LocalControlRules.local(node.source().terminator())&&target.source() instanceof CfgNode.OutcomeExit outside)
             return outside.source()==node.source().terminator()&&OpenControl.outside(outside.outcome())
                 &&OpenControl.alternatives(outside.source()).contains(outside.outcome())?target:null;
         return switch (node.source().terminator()) {

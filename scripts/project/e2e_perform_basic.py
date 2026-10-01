@@ -57,18 +57,23 @@ def air_oracle(air, semantic, case, source):
     require(air['airVersion'] == '2.0.0' and air['bindingVersion'] == '1.0.0', 'unchanged AIR contracts')
     p = air['publication']; require(len(p['units']) == 1, 'one unit')
     unit = p['units'][0]; seq = unit['sequences']
-    require(len(seq)==len(source_body)+3+(case=='overwrite'),'one sequence per source occurrence')
+    require(len(seq)==len(source_body)+5+(case=='overwrite'),'source sequences plus one local invocation and one resume')
     labels={s['label']['localId']:s for s in seq}
     main=labels[unit['entries'][0]['initialLabel']['localId']]
     if case=='overwrite':
         require(len(main['instructions'])==1 and literal_text(main['instructions'][0]['value']) == 'OLDPROG ','old value precedes activation')
         main=labels[main['terminator']['destination']['localId']]
     require(not main['instructions'] and main['terminator']['kind']=='jump','PERFORM is an explicit Jump')
-    target=labels[main['terminator']['destination']['localId']]; current=target; assigns=[]
+    wrapper=labels[main['terminator']['destination']['localId']]
+    require(not wrapper['instructions'] and wrapper['terminator']['kind']=='local.invoke','PERFORM pushes an explicit frame')
+    require(not wrapper['terminator']['completionPorts'],'isolated body uses explicit resume')
+    target=labels[wrapper['terminator']['entry']['localId']]; current=target; assigns=[]
     for fact in source_body:
         require(len(current['instructions'])==1 and current['terminator']['kind']=='jump','each intrinsic body MOVE has a precise continuation')
         assigns.extend(current['instructions']); last=current; current=labels[current['terminator']['destination']['localId']]
-    call=current
+    require(not current['instructions'] and current['terminator']['kind']=='local.resume','body completion pops its caller frame')
+    require(sum(s['terminator']['kind']=='local.invoke' for s in seq)==1 and sum(s['terminator']['kind']=='local.resume' for s in seq)==1,'exact local control inventory')
+    call=labels[wrapper['terminator']['resume']['localId']]
     require(call['terminator']['kind']=='invoke' and not call['instructions'],'activation resumes at CALL')
     returns=[s for s in seq if s['terminator']['kind']=='return'];require(len(returns)==1,'GOBACK Return')
     require(call['terminator']['outcomes']['known']==[{'kind':'normal','label':returns[0]['label']}],'CALL return')

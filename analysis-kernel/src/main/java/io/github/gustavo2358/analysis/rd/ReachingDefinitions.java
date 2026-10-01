@@ -209,6 +209,7 @@ public final class ReachingDefinitions {
         }
         private <T> ObservationBatch<T,DefinitionFact> observe(Iterable<PointQuery<T>> requests,Comparator<T> comparator,java.util.function.Function<T,StorageSubject> subject) {
             return BatchReplayer.materialize(owner.session,stable,Direction.FORWARD,BOTTOM,requests,comparator,engine::operation,new BatchReplayer.Projection<State,T,DefinitionFact>() {
+                @Override public State mergeStates(State a,State b){return engine.joinInto(a,b,new DomainWork()).state();}
                 @Override public boolean supports(PointQuery<T> query) {
                     return owner.effects.storage().supports(subject.apply(query.subject()),query.point().entry().unit());
                 }

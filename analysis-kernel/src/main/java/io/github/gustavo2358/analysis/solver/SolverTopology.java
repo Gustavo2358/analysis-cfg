@@ -11,23 +11,24 @@ final class SolverTopology {
     final AnalysisPoint[] points;
     final CfgTransition[] edges;
     final int[] from, to, forwardHead, backwardHead, forwardNext, backwardNext;
-    final IdentityHashMap<ContextView, IdentityHashMap<ProgramIndex.Node, AnalysisPoint>> lookup = new IdentityHashMap<>();
+    final IdentityHashMap<ContextView, IdentityHashMap<ProgramIndex.Node, List<AnalysisPoint>>> lookup = new IdentityHashMap<>();
 
     SolverTopology(AnalysisSession session) {
         List<AnalysisPoint> ps = new ArrayList<>();
         List<CfgTransition> es = new ArrayList<>();
         List<Integer> sources = new ArrayList<>(), targets = new ArrayList<>();
         for (ContextView context : session.contexts()) {
-            var nodes = new IdentityHashMap<ProgramIndex.Node, AnalysisPoint>();
+            var nodes = new IdentityHashMap<ProgramIndex.Node, List<AnalysisPoint>>();
+            var traversals = new HashMap<ContextView.Point,AnalysisPoint>();
             lookup.put(context, nodes);
             int begin = ps.size();
-            add(ps, nodes, context, context.entryNode());
+            add(ps, nodes, traversals, context, context.initialPoint());
             // Reachability is always program-forward, including for a backward analysis.
             for (int p = begin; p < ps.size(); p++) {
                 AnalysisPoint point = ps.get(p);
-                var cursor = context.successors(point.node());
+                var cursor = context.successors(point.traversal());
                 while (cursor.advance()) {
-                    AnalysisPoint target = add(ps, nodes, context, cursor.target());
+                    AnalysisPoint target = add(ps, nodes, traversals, context, cursor.target());
                     Math.incrementExact(es.size());
                     es.add(cursor.transition()); sources.add(point.ordinal); targets.add(target.ordinal);
                 }
@@ -44,16 +45,19 @@ final class SolverTopology {
             backwardNext[e] = backwardHead[to[e]]; backwardHead[to[e]] = e;
         }
     }
-    private static AnalysisPoint add(List<AnalysisPoint> points, IdentityHashMap<ProgramIndex.Node, AnalysisPoint> nodes,
-                                     ContextView context, ProgramIndex.Node node) {
-        AnalysisPoint existing = nodes.get(node);
+    private static AnalysisPoint add(List<AnalysisPoint> points, IdentityHashMap<ProgramIndex.Node, List<AnalysisPoint>> nodes,
+                                     Map<ContextView.Point,AnalysisPoint> traversals, ContextView context, ContextView.Point traversal) {
+        AnalysisPoint existing = traversals.get(traversal);
         if (existing != null) return existing;
         int ordinal = points.size(); Math.incrementExact(ordinal);
-        AnalysisPoint point = new AnalysisPoint(ordinal, context, node);
-        nodes.put(node, point); points.add(point); return point;
+        AnalysisPoint point = new AnalysisPoint(ordinal, context, traversal);
+        traversals.put(traversal,point); nodes.computeIfAbsent(traversal.node(),ignored->new ArrayList<>()).add(point); points.add(point); return point;
     }
     AnalysisPoint find(ContextView context, ProgramIndex.Node node) {
-        var nodes = lookup.get(context); return nodes == null ? null : nodes.get(node);
+        var nodes = lookup.get(context); var matches=nodes==null?null:nodes.get(node);
+        if(matches==null)return null;
+        if(matches.size()!=1)throw new IllegalArgumentException("boundary requires a unique local context");
+        return matches.getFirst();
     }
     AnalysisPoint require(ContextView context, ProgramIndex.Node node) {
         AnalysisPoint p = find(context, node);
