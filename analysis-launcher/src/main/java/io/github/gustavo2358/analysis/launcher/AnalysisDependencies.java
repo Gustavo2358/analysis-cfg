@@ -39,7 +39,7 @@ public final class AnalysisDependencies {
                     if(value.air().size()!=1||!value.air().getFirst().sha256().equals(read.sha256()))throw new IllegalArgumentException("AIR digest mismatch");
                     evidence=java.util.Optional.of(value);
                 }
-                admitted=new DependencyInput(read.publication(),evidence,java.util.List.of());
+                admitted=new DependencyInput(read.publication(),evidence,java.util.List.of(),read.checked());
             }
         }
         catch(AirJsonException failure){err.println("INPUT_CODEC: "+failure.code());return failure.code()==AirJsonException.Code.RESOURCE_LIMIT?7:3;}

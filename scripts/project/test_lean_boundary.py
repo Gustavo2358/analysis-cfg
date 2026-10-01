@@ -22,6 +22,57 @@ class PlanBoundary(unittest.TestCase):
                 check_w1d_boundary.source_boundaries(ROOT)
 
 
+class CheckedTransportBoundary(unittest.TestCase):
+    def javap(self, module, cls, *options):
+        return subprocess.check_output(['javap', '-classpath', str(ROOT / module / 'target/classes'),
+                                        *options, cls], text=True)
+
+    def test_build_port_accepts_current_bytecode_and_rejects_contract_drift(self):
+        from check_architecture import (verify_build_port, GateFailure, BUILD_CFG_CLASS,
+                                        CHECKED_BUILD_DESCRIPTOR)
+        port = self.javap('cfg-kernel', BUILD_CFG_CLASS, '-verbose', '-p', '-s')
+        verify_build_port(port)
+        mutations = [
+            port.replace('public default ', 'public abstract '),
+            port.replace(' buildChecked(', ' unchecked('),
+            port.replace(CHECKED_BUILD_DESCRIPTOR, '(Llocal/CheckedPublication;)V'),
+            port.replace('methods: 2', 'methods: 1'),
+            port.replace('methods: 2', 'methods: 3'),
+        ]
+        for mutated in mutations:
+            with self.subTest(mutated=mutated[-100:]), self.assertRaises(GateFailure):
+                verify_build_port(mutated)
+
+    def test_reader_uses_checked_decoder_and_cannot_synthesize_air(self):
+        from check_transport_architecture import verify_reader_bytecode, PREFIX
+        from check_architecture import GateFailure
+        reader = self.javap('cfg-adapters', PREFIX + 'adapters.AirJsonFileReader', '-c', '-p')
+        verify_reader_bytecode(reader)
+        for mutated in [reader.replace('AirJson.decodeChecked:', 'AirJson.decode:'),
+                        reader.replace('AirValidator$CheckedPublication;', 'ValidationResult;'),
+                        reader + '\n// air/json/AirJson.encode']:
+            with self.subTest(mutated=mutated[-100:]), self.assertRaises(GateFailure):
+                verify_reader_bytecode(mutated)
+
+    def test_source_requires_bounded_shared_checked_decode_and_legacy_delegation(self):
+        from check_transport_architecture import verify_transport_shape
+        from check_architecture import GateFailure
+        verify_transport_shape(ROOT)
+        original = Path.read_text
+        mutations = [
+            ('codec.decodeChecked(bytes)', 'codec.decode(bytes)'),
+            ('readNBytes(limits.maximumDocumentBytes())', 'readAllBytes()'),
+            ('readChecked(path).publication()', 'null'),
+        ]
+        for old, new in mutations:
+            def mutated_source(path, *args, **kwargs):
+                text = original(path, *args, **kwargs)
+                return text.replace(old, new) if path.name == 'AirJsonFileReader.java' else text
+            with self.subTest(change=old), patch.object(Path, 'read_text', mutated_source):
+                with self.assertRaises(GateFailure):
+                    verify_transport_shape(ROOT)
+
+
 class PinnedFixtureBoundary(unittest.TestCase):
     def test_scalar_goldens_use_verified_build_when_sibling_lacks_pin(self):
         from check_scalar_contract import verify_scalar_contract, SCALAR, GOBACK

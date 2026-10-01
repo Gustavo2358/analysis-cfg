@@ -31,8 +31,8 @@ def main() -> int:
     architecture = ["bash", "scripts/harness/check-architecture.sh"]
     tests = ["mvn", "-B", "-ntp", "test"]
     cases = [
-        ("01-local-air-parser", ADAPTER + "AirJsonFileReader.java", "return codec.decode(bytes);",
-         'return java.util.regex.Pattern.compile("publication").matcher(new String(bytes, java.nio.charset.StandardCharsets.UTF_8)).find() ? null : null;', shape, "shared AirJson.decode"),
+        ("01-local-air-parser", ADAPTER + "AirJsonFileReader.java", "return codec.decodeChecked(bytes);",
+         'return java.util.regex.Pattern.compile("publication").matcher(new String(bytes, java.nio.charset.StandardCharsets.UTF_8)).find() ? null : null;', shape, "shared AirJson.decodeChecked"),
         ("02-kernel-air-json", "cfg-kernel/pom.xml", "  <dependencies>",
          '  <dependencies>\n    <dependency><groupId>io.github.gustavo2358</groupId><artifactId>air-json</artifactId><version>0.1.0-SNAPSHOT</version></dependency>', shape, "cfg-kernel dependencies"),
         ("03a-kernel-filesystem-bytecode", KERNEL.replace("BuildCfg.java", "CfgPreflight.java"), "public final class CfgPreflight {",

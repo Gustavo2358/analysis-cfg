@@ -30,11 +30,23 @@ public final class RegionalAnalysis {
         return prepare(publication,resultId,queries,publication.units().stream().flatMap(u->u.entries().stream()).filter(e->e.initialLabel().isPresent()).map(Entries.Entry::id).toList(),
             new BuildOptions(defaults.validation(),io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy.PARTIAL_ANALYSIS));
     }
+    public RegionalAnalysisResult preparePartialChecked(io.github.gustavo2358.air.validation.AirValidator.CheckedPublication checked,
+            String resultId,List<PointQuery<StorageSubject>> queries) {
+        var publication=checked.publication();var defaults=BuildOptions.defaults();
+        return prepare(publication,resultId,queries,publication.units().stream().flatMap(u->u.entries().stream())
+                .filter(e->e.initialLabel().isPresent()).map(Entries.Entry::id).toList(),
+                new BuildOptions(defaults.validation(),io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy.PARTIAL_ANALYSIS),checked);
+    }
     RegionalAnalysisResult prepare(Publication publication,String resultId,List<PointQuery<StorageSubject>> queries,List<EntryId> entries,BuildOptions options) {
+        return prepare(publication,resultId,queries,entries,options,null);
+    }
+    private RegionalAnalysisResult prepare(Publication publication,String resultId,List<PointQuery<StorageSubject>> queries,List<EntryId> entries,BuildOptions options,
+            io.github.gustavo2358.air.validation.AirValidator.CheckedPublication checked) {
         Objects.requireNonNull(publication);Objects.requireNonNull(resultId);if(resultId.isBlank())throw new IllegalArgumentException("empty resultId");queries=List.copyOf(queries);
         var selected=new HashSet<>(entries);var declarations=publication.units().stream().flatMap(u->u.entries().stream()).filter(e->selected.contains(e.id())).toList();
         if(declarations.size()!=selected.size())throw new IllegalArgumentException("entry outside publication");
-        var cfg=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).build(publication,options);AnalysisDataflow.requireBuilt(cfg);
+        var builder=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty());
+        var cfg=checked==null?builder.build(publication,options):builder.buildChecked(checked,options);AnalysisDataflow.requireBuilt(cfg);
         var admission=AnalysisSession.open(cfg,publication,options.projectionPolicy(),declarations);
         if(admission.status()!=AnalysisSession.Status.ACCEPTED)throw new AnalysisDataflow.PreparationException(admission.status()==AnalysisSession.Status.INVALID_INPUT?AnalysisDataflow.Failure.INVALID_INPUT:AnalysisDataflow.Failure.UNSUPPORTED_PROFILE,admission.reason());
         var session=admission.session().orElseThrow();

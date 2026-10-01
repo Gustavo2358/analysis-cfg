@@ -14,22 +14,22 @@ public final class DependencyJson {
         var document=object("schema","analysis-dependency-result","version",result.sourceQualifiedDependencies().map(s->Set.of("1.1.0","1.2.0","1.3.0","1.4.0","1.5.0","1.6.0").contains(s.evidence().version())?"2.7.0":"2.6.0").orElse("2.5.0"),"airVersion",version(result.airVersion()),
             "publication",id(result.publication()),"interpretationProfile","per-site","valuesProfile","scalar-text-effects@1",
             "modelScope",result.structuralScope()?"STRUCTURAL_AIR_OCCURRENCES":"KNOWN_GRAPH_ENTRY","publicationInventory",inventory(result.publicationInventory()),
-            "sites",result.sites().stream().sorted(Comparator.comparing(DependencySiteFact::entry,io.github.gustavo2358.analysis.plan.AnalysisKey.ENTRY_ORDER).thenComparing(f->f.operation().localId())).map(s->site(s,true)).toList(),
-            "edges",result.edges().stream().sorted(Comparator.comparing(DependencyResult.Edge::entry,io.github.gustavo2358.analysis.plan.AnalysisKey.ENTRY_ORDER).thenComparing(e->e.site().localId()).thenComparing(e->e.candidate().referenceName()).thenComparing(e->e.candidate().rawValue())).map(e->object("caller",id(e.caller()),"entry",id(e.entry()),"site",id(e.site()),"candidate",candidate(e.candidate()),"openSite",e.openSite())).toList(),
-            "metrics",result.metrics(),"origins",result.origins().stream().sorted(Comparator.comparing(o->o.id().localId())).map(DependencyJson::origin).toList(),
-            "artifacts",result.artifacts().stream().sorted(Comparator.comparing(a->a.id().localId())).map(a->object("id",id(a.id()),"logicalName",a.logicalName(),"contentDigest",a.contentDigest().orElse(null))).toList(),
+            "sites",result.sites().stream().sorted(Comparator.comparing(DependencySiteFact::entry,io.github.gustavo2358.analysis.plan.AnalysisKey.ENTRY_ORDER).thenComparing(f->f.operation().localId())).map(s->site(s,true)),
+            "edges",result.edges().stream().sorted(Comparator.comparing(DependencyResult.Edge::entry,io.github.gustavo2358.analysis.plan.AnalysisKey.ENTRY_ORDER).thenComparing(e->e.site().localId()).thenComparing(e->e.candidate().referenceName()).thenComparing(e->e.candidate().rawValue())).map(e->object("caller",id(e.caller()),"entry",id(e.entry()),"site",id(e.site()),"candidate",candidate(e.candidate()),"openSite",e.openSite())),
+            "metrics",result.metrics(),"origins",result.origins().stream().sorted(Comparator.comparing(o->o.id().localId())).map(DependencyJson::origin),
+            "artifacts",result.artifacts().stream().sorted(Comparator.comparing(a->a.id().localId())).map(a->object("id",id(a.id()),"logicalName",a.logicalName(),"contentDigest",a.contentDigest().orElse(null))),
             "sourceUncertaintyRefs",ids(result.sourceUncertaintyRefs()));
-        document.put("analysisStatus",result.partial()?"PARTIAL":"COMPLETE");document.put("analysisReasons",result.analysisReasons().stream().distinct().sorted().toList());
+        document.put("analysisStatus",result.partial()?"PARTIAL":"COMPLETE");document.put("analysisReasons",result.analysisReasons().stream().distinct().sorted());
         document.put("analysisBoundary","COBOL_SOURCE_ONLY");document.put("fileDependencies",FileDependencyJson.value(result.fileDependencies()));
         document.put("sourceDependencies",SourceDependencyJson.value(result.sourceDependencies()));
         result.sourceQualifiedDependencies().ifPresent(source->document.put("sourceQualifiedDependencies",object(
             "analysisBoundary","NON_EXECUTABLE_SOURCE","evidence",QualifiedSourceJson.value(source.evidence()),
             "occurrences",source.occurrences().stream().map(o->object("occurrence",QualifiedSourceJson.value(o.occurrence()),"status",o.status().name(),"valueRemainder",o.valueRemainder(),"interpretationRemainder",o.interpretationRemainder(),
-                "candidates",o.candidates().stream().map(c->object("referenceName",c.referenceName(),"rawValue",c.rawValue(),"occurrence",QualifiedSourceJson.value(c.occurrence()),"qualifications",c.qualifications())).toList())).toList())));
-        var dependencies=object("programs",result.programDependencies().stream().map(DependencyJson::program).toList());
+                "candidates",o.candidates().stream().map(c->object("referenceName",c.referenceName(),"rawValue",c.rawValue(),"occurrence",QualifiedSourceJson.value(c.occurrence()),"qualifications",c.qualifications())))))));
+        var dependencies=object("programs",result.programDependencies().stream().map(DependencyJson::program));
         result.sourceQualifiedDependencies().filter(s->!s.nativeFiles().isEmpty()).ifPresent(s->dependencies.put("files",s.nativeFiles().stream().map(f->object(
             "analysisBoundary","NON_EXECUTABLE_SOURCE","source",QualifiedSourceJson.value(f.source()),"status",f.status().name(),"remainder",f.remainder(),
-            "candidates",f.candidates().stream().map(c->object("referenceName",c.referenceName(),"rawValue",c.rawValue(),"qualifications",c.qualifications())).toList())).toList()));
+            "candidates",f.candidates().stream().map(c->object("referenceName",c.referenceName(),"rawValue",c.rawValue(),"qualifications",c.qualifications()))))));
         document.put("dependencies",dependencies);
         out.value(document);out.finish();
     }
@@ -38,8 +38,8 @@ public final class DependencyJson {
         var result=object("sourceOccurrence",o.source().map(QualifiedSourceJson::value).orElse(null),"caller",o.caller(),
             "technology",o.technology(),"nameProfile",o.nameProfile(),"targetKind",o.targetKind(),"authorities",resolved.authorities(),
             "qualifications",o.qualifications(),"executableOperations",ids(o.executableOperations()),
-            "executableSites",resolved.executableSites().stream().map(s->object("entry",id(s.entry()),"operation",id(s.operation()),"reachability",s.reachability().name(),"valuePoint",s.valuePoint()==null?null:ResultJson.point(s.valuePoint()),"premises",ids(s.premises()),"provenance",ids(s.provenance()))).toList(),
-            "candidates",resolved.candidates().stream().map(DependencyJson::programCandidate).toList(),
+            "executableSites",resolved.executableSites().stream().map(s->object("entry",id(s.entry()),"operation",id(s.operation()),"reachability",s.reachability().name(),"valuePoint",s.valuePoint()==null?null:ResultJson.point(s.valuePoint()),"premises",ids(s.premises()),"provenance",ids(s.provenance()))),
+            "candidates",resolved.candidates().stream().map(DependencyJson::programCandidate),
             "valueRemainder",resolved.valueRemainder(),"interpretationRemainder",resolved.interpretationRemainder(),"analysisReasons",resolved.analysisReasons());
         if(o.sourceControlRemainder())result.put("controlRemainder",true);
         return result;
@@ -48,8 +48,8 @@ public final class DependencyJson {
         var out=object("referenceName",c.referenceName(),"rawValue",c.rawValue(),"supports",supports(c.executableSupports()),"qualifications",c.sourceQualifications());
         if(!c.conditionalSupports().isEmpty())out.put("conditionalSupports",c.conditionalSupports().stream().map(s->object(
             "provider",s.provider(),"analysisBoundary","NON_EXECUTABLE_SOURCE","assumptions",s.assumptions(),
-            "evidence",s.evidence().stream().map(e->object("kind",e.kind(),"reference",e.reference(),"provenance",QualifiedSourceJson.value(e.provenance()))).toList(),
-            "uncertainties",s.uncertainties().stream().map(u->object("id",u.id(),"kind",u.kind(),"provenance",QualifiedSourceJson.value(u.provenance()))).toList())).toList());
+            "evidence",s.evidence().stream().map(e->object("kind",e.kind(),"reference",e.reference(),"provenance",QualifiedSourceJson.value(e.provenance()))),
+            "uncertainties",s.uncertainties().stream().map(u->object("id",u.id(),"kind",u.kind(),"provenance",QualifiedSourceJson.value(u.provenance()))))));
         return out;
     }
     private static Object site(DependencySiteFact f,boolean extended) {
@@ -59,16 +59,16 @@ public final class DependencyJson {
             "subject",id(f.subject()),"valuePoint",f.valuePoint()==null?null:ResultJson.point(f.valuePoint()),
             "reachability",switch(f.reachability()){case REACHABLE->"REACHABLE";case UNREACHABLE_IN_MODEL->"UNREACHABLE_IN_MODEL";case UNKNOWN->"UNKNOWN";},
             "targetStatus",switch(f.targetStatus()){case RESOLVED_CANDIDATES->"RESOLVED_CANDIDATES";case OPEN_TARGET->"OPEN_TARGET";case UNREACHABLE_IN_MODEL->"UNREACHABLE_IN_MODEL";case UNSUPPORTED_TARGET_EXPRESSION->"UNSUPPORTED_TARGET_EXPRESSION";case UNSUPPORTED_INVOCATION_SHAPE->"UNSUPPORTED_INVOCATION_SHAPE";case ANALYSIS_INCOMPLETE->"ANALYSIS_INCOMPLETE";},
-            "rawCandidates",f.rawCandidates().stream().sorted(Comparator.comparing(RawCandidate::rawValue)).map(r->object("rawValue",r.rawValue(),"supports",supports(r.supports()))).toList(),
-            "candidates",f.candidates().stream().sorted(Comparator.comparing(Candidate::referenceName).thenComparing(Candidate::rawValue)).map(DependencyJson::candidate).toList(),
+            "rawCandidates",f.rawCandidates().stream().sorted(Comparator.comparing(RawCandidate::rawValue)).map(r->object("rawValue",r.rawValue(),"supports",supports(r.supports()))),
+            "candidates",f.candidates().stream().sorted(Comparator.comparing(Candidate::referenceName).thenComparing(Candidate::rawValue)).map(DependencyJson::candidate),
             "modelValueRemainder",f.modelValueRemainder(),"sourceValueRemainder",f.sourceValueRemainder(),"interpretationUnknownRemainder",f.interpretationUnknownRemainder(),
             "effectiveUnknownRemainder",f.effectiveUnknownRemainder(),"openControlRemainder",f.openControlRemainder(),"evidence",ids(f.evidence()),"provenance",ids(f.provenance()),"premises",ids(f.premises()),"uncertaintyRefs",ids(f.uncertaintyRefs()));
-        if(extended) {value.put("analysisStatus",switch(f.analysisStatus()){case COMPLETE->"COMPLETE";case PARTIAL->"PARTIAL";});value.put("analysisReasons",f.analysisReasons().stream().distinct().sorted().toList());}
+        if(extended) {value.put("analysisStatus",switch(f.analysisStatus()){case COMPLETE->"COMPLETE";case PARTIAL->"PARTIAL";});value.put("analysisReasons",f.analysisReasons().stream().distinct().sorted());}
         return value;
     }
     private static Object candidate(Candidate c){return object("referenceName",c.referenceName(),"rawValue",c.rawValue(),"supports",supports(c.supports()));}
-    private static Object supports(List<Support> supports){return supports.stream().sorted(Comparator.comparing(Support::producer,WireIds.ORDER).thenComparing(Support::origin,WireIds.ORDER)).map(s->object("kind",switch(s.kind()){case VALUE_PRODUCER->"VALUE_PRODUCER";case CALL_LITERAL->"CALL_LITERAL";case CICS_LITERAL->"CICS_LITERAL";},"producer",id(s.producer()),"origin",id(s.origin()),"premises",ids(s.premises()))).toList();}
-    private static Object ids(List<? extends Id> ids){return ids.stream().sorted(WireIds.ORDER).map(DependencyJson::id).toList();}
+    private static Object supports(List<Support> supports){return supports.stream().sorted(Comparator.comparing(Support::producer,WireIds.ORDER).thenComparing(Support::origin,WireIds.ORDER)).map(s->object("kind",switch(s.kind()){case VALUE_PRODUCER->"VALUE_PRODUCER";case CALL_LITERAL->"CALL_LITERAL";case CICS_LITERAL->"CICS_LITERAL";},"producer",id(s.producer()),"origin",id(s.origin()),"premises",ids(s.premises())));}
+    private static Object ids(List<? extends Id> ids){return ids.stream().sorted(WireIds.ORDER).map(DependencyJson::id);}
     private static Object id(Id id){return id instanceof ArtifactId a?object("domain","artifact","localId",a.localId(),"publication",a.publication().localId()):WireIds.id(id);}
     private static String version(SemanticVersion v){return v.major()+"."+v.minor()+"."+v.patch();}
     private static String inventory(Evidence.InventoryStatus s){return switch(s){case COMPLETE->"COMPLETE";case PARTIAL->"PARTIAL";case UNAVAILABLE->"UNAVAILABLE";};}
@@ -78,7 +78,7 @@ public final class DependencyJson {
             case Origins.Unavailable u -> object("id",id(u.id()),"kind","UNAVAILABLE","reason",u.reason());
             case Origins.Contractual c -> object("id",id(c.id()),"kind","CONTRACTUAL","authority",c.authority(),"version",c.version());
             case Origins.Written w -> object("id",id(w.id()),"kind","WRITTEN","artifact",id(w.artifact()),"location",w.location().map(DependencyJson::location).orElse(null),"exact",w.exact(),
-                "includes",w.includes().stream().map(i->object("including",id(i.including()),"included",id(i.included()),"requestedName",i.requestedName(),"site",i.site().map(DependencyJson::location).orElse(null))).toList());
+                "includes",w.includes().stream().map(i->object("including",id(i.including()),"included",id(i.included()),"requestedName",i.requestedName(),"site",i.site().map(DependencyJson::location).orElse(null))));
         };
     }
     private static Object location(Origins.Location l) {
@@ -90,5 +90,5 @@ public final class DependencyJson {
             }
         };
     }
-    private static Map<String,Object> object(Object... fields){var result=new TreeMap<String,Object>();for(int i=0;i<fields.length;i+=2)result.put((String)fields[i],fields[i+1]);return result;}
+    private static JsonOutput.Fields object(Object... fields){return new JsonOutput.Fields(fields);}
 }

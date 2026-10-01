@@ -51,6 +51,7 @@ class BuildCfgContractTest {
 
         assertEquals(Set.of(
                 "io.github.gustavo2358.air.model.Publication",
+                "io.github.gustavo2358.air.validation.AirValidator$CheckedPublication",
                 "io.github.gustavo2358.analysis.cfg.application.BuildOptions",
                 "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult"), signatureTypes);
         assertFalse(signatureTypes.stream().anyMatch(type ->

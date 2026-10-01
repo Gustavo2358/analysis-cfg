@@ -13,6 +13,7 @@ import java.util.*;
 public final class ProgramIndex {
     final Map<UnitId,List<Node>> unitNodes = new HashMap<>(), openSources = new HashMap<>();
     final Map<CfgNodeId,LocalControlRules.Rule> localRules;
+    final Map<Node,List<Node>> labelTargets = new HashMap<>();
     final Object identity;
     final ProjectionPolicy policy;
     final Node[] nodes;
@@ -60,6 +61,15 @@ public final class ProgramIndex {
         forwardNext = b.forwardNext; backwardNext = b.backwardNext;
         forwardHeads = b.forwardHeads; backwardHeads = b.backwardHeads;
         nodeIds = b.nodeIds; units = b.units; sequences = b.sequenceNodes;
+        // Resolve finite label bounds once. Preserve the original CFG node order and set semantics.
+        for (var sources : openSources.values()) for (var source : sources) {
+            if (OpenControl.bound(source,policy) instanceof Scopes.WithinControl within
+                    && within.scope() instanceof Scopes.LabelsControl labels) {
+                labelTargets.put(source, labels.labels().stream().map(sequences::get).filter(Objects::nonNull)
+                        .filter(n -> n.owner().id().equals(source.owner().id())).distinct()
+                        .sorted(Comparator.comparingInt(n -> n.ordinal)).toList());
+            }
+        }
         operations = b.operations; objects = b.objects; storage = b.storage;
         directCells = b.directCells; objectReferences = b.objectReferences;places=b.places;
         entries = b.entries; entryOrdinals = b.entryOrdinals;

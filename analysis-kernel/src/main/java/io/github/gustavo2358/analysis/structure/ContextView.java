@@ -87,21 +87,26 @@ public final class ContextView {
         private final ProgramIndex.Node anchor;
         private final Entries.Entry entry;
         private final boolean forward;
+        private final boolean exactLabels;
         private final java.util.Iterator<ProgramIndex.Node> candidates;
         private ProgramIndex.Node symbolicSource, symbolicTarget;
         private CfgTransition symbolicEdge;
         EdgeCursor(ProgramIndex index, int[] next, int position, ProgramIndex.Node anchor, Entries.Entry entry, boolean forward) {
             this.index = index; this.next = next; this.position = position; this.anchor = anchor; this.entry = entry; this.forward = forward;
             var sources = index.openSources.getOrDefault(entry.id().unit(), java.util.List.of());
-            candidates = (sources.isEmpty() || forward && !(OpenControl.bound(anchor,index.policy) instanceof io.github.gustavo2358.air.model.Scopes.WithinControl)
-                ? java.util.List.<ProgramIndex.Node>of() : forward ? index.unitNodes.get(entry.id().unit()) : sources).iterator();
+            var labels=forward ? index.labelTargets.get(anchor) : null;
+            exactLabels=labels!=null;
+            candidates=(exactLabels
+                ? anchor.owner().id().equals(entry.id().unit()) ? labels : java.util.List.<ProgramIndex.Node>of()
+                : sources.isEmpty() || forward && !(OpenControl.bound(anchor,index.policy) instanceof io.github.gustavo2358.air.model.Scopes.WithinControl)
+                    ? java.util.List.<ProgramIndex.Node>of() : forward ? index.unitNodes.get(entry.id().unit()) : sources).iterator();
         }
         public boolean advance() {
             symbolicEdge = null; current = position;
             if (current != -1) { position = next[current]; edgesVisited = Math.incrementExact(edgesVisited); return true; }
             while (candidates.hasNext()) {
                 var candidate = candidates.next(); var source = forward ? anchor : candidate; var target = forward ? candidate : anchor;
-                if (!OpenControl.allows(source, target, entry,index.policy)) continue;
+                if (!exactLabels && !OpenControl.allows(source, target, entry,index.policy)) continue;
                 symbolicSource = source; symbolicTarget = target;
                 symbolicEdge = new CfgTransition(source.source().id(), target.source().id(), CfgTransition.Kind.OPAQUE_UNKNOWN, entry.id());
                 edgesVisited = Math.incrementExact(edgesVisited); return true;

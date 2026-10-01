@@ -16,11 +16,18 @@ public final class AnalysisDataflow {
     public PreparedDataflowResult prepare(Publication publication, String resultId) {
         return prepare(publication, resultId, BuildOptions.defaults());
     }
+    public PreparedDataflowResult prepareChecked(io.github.gustavo2358.air.validation.AirValidator.CheckedPublication checked, String resultId) {
+        return prepare(checked.publication(), resultId, BuildOptions.defaults(), checked);
+    }
     PreparedDataflowResult prepare(Publication publication, String resultId, BuildOptions options) {
+        return prepare(publication,resultId,options,null);
+    }
+    private PreparedDataflowResult prepare(Publication publication, String resultId, BuildOptions options,
+            io.github.gustavo2358.air.validation.AirValidator.CheckedPublication checked) {
         Objects.requireNonNull(publication); Objects.requireNonNull(resultId);
         if(resultId.isBlank()) throw new IllegalArgumentException("caller must supply a stable resultId");
         BuildCfg builder=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty());
-        var cfg=builder.build(publication,options);
+        var cfg=checked==null?builder.build(publication,options):builder.buildChecked(checked,options);
         requireBuilt(cfg);
         var entries=publication.units().stream().flatMap(u->u.entries().stream()).toList();
         var admission=AnalysisSession.open(cfg,publication,options.projectionPolicy(),entries);

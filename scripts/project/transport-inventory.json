@@ -60,6 +60,8 @@
         "io.github.gustavo2358.air.json.AirJson",
         "io.github.gustavo2358.air.json.AirJson$Limits",
         "io.github.gustavo2358.air.model.Publication",
+        "io.github.gustavo2358.air.validation.AirValidator",
+        "io.github.gustavo2358.air.validation.AirValidator$CheckedPublication",
         "io.github.gustavo2358.air.validation.ValidationOptions",
         "io.github.gustavo2358.analysis.cfg.adapters.AirInputLimitException",
         "java.io.IOException",
@@ -186,7 +188,7 @@
     "sources": {
       "cfg-launcher/src/main/java/io/github/gustavo2358/analysis/cfg/launcher/AnalysisCfg.java": [
         "io.github.gustavo2358.air.json.AirJsonException",
-        "io.github.gustavo2358.air.model.Publication",
+        "io.github.gustavo2358.air.validation.AirValidator.CheckedPublication",
         "io.github.gustavo2358.analysis.cfg.adapters.AirInputLimitException",
         "io.github.gustavo2358.analysis.cfg.adapters.AirJsonFileReader",
         "io.github.gustavo2358.analysis.cfg.adapters.CfgJsonException",
@@ -213,7 +215,8 @@
         "io.github.gustavo2358.air.model.Capabilities$Capability",
         "io.github.gustavo2358.air.model.Ids",
         "io.github.gustavo2358.air.model.Ids$Id",
-        "io.github.gustavo2358.air.model.Publication",
+        "io.github.gustavo2358.air.validation.AirValidator",
+        "io.github.gustavo2358.air.validation.AirValidator$CheckedPublication",
         "io.github.gustavo2358.air.validation.ValidationIssue",
         "io.github.gustavo2358.air.validation.ValidationIssue$Kind",
         "io.github.gustavo2358.air.validation.ValidationResult",

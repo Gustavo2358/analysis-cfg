@@ -42,7 +42,7 @@ public final class DependencyInputJson {
             links.add(new DependencyInput.StatementCorrelation(QualifiedSourceJson.readStatementId(link.get("source")),
                 new OperationId(unit(operation),text(operation,"localId")),new LabelId(unit(label),text(label,"localId")),new OriginId(new PublicationId(text(origin,"publication")),text(origin,"localId"))));
         }
-        return new DependencyInput(read.publication(),Optional.of(evidence),links);
+        return new DependencyInput(read.publication(),Optional.of(evidence),links,read.checked());
     }
     private static UnitId unit(JsonNode n){return new UnitId(new PublicationId(text(n,"publication")),text(n,"unit"));}
     private static void id(JsonNode n,String domain,boolean unit){if(unit)keys(n,"domain","publication","unit","localId");else keys(n,"domain","publication","localId");if(!text(n,"domain").equals(domain))throw new IllegalArgumentException("identity domain");}
