@@ -56,6 +56,9 @@ BUILD_DESCRIPTOR = (
     "Lio/github/gustavo2358/analysis/cfg/application/BuildOptions;)"
     "Lio/github/gustavo2358/analysis/cfg/application/CfgBuildResult;"
 )
+CHECKED_PUBLICATION = AIR_VALIDATOR + "$CheckedPublication"
+CHECKED_BUILD_DESCRIPTOR = BUILD_DESCRIPTOR.replace(
+    PUBLICATION.replace(".", "/"), CHECKED_PUBLICATION.replace(".", "/"))
 DEPENDENCY_PLUGIN = "org.apache.maven.plugins:maven-dependency-plugin:3.8.1"
 DOMAIN_CLASS = "io.github.gustavo2358.analysis.cfg.domain."
 SOURCE_ROOT = "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/"
@@ -178,6 +181,7 @@ EXPECTED_TEST_CASES = {
     "io.github.gustavo2358.analysis.cfg.application.BuildCfgContractTest": 4,
     "io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinatorTest": 12,
     "io.github.gustavo2358.analysis.cfg.application.CfgPreflightTest": 4,
+    "io.github.gustavo2358.analysis.cfg.application.CheckedPreflightTest": 3,
     "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistryTest": 4,
     DOMAIN_CLASS + "LocalControlProjectionTest": 1,
     DOMAIN_CLASS + "EvalCfg025Test": 17,
@@ -599,6 +603,7 @@ def read_air_classpath(path: Path) -> Path:
         PUBLICATION.replace(".", "/") + ".class",
         VALIDATION_RESULT.replace(".", "/") + ".class",
         AIR_VALIDATOR.replace(".", "/") + ".class",
+        CHECKED_PUBLICATION.replace(".", "/") + ".class",
     }
     if not required <= members:
         raise GateFailure("resolved JAR is missing required air-java classes")
@@ -630,6 +635,22 @@ def verify_class_inventory(kernel: Path) -> Path:
     return classes
 
 
+def verify_build_port(port: str) -> None:
+    if "minor version: 0" not in port or "major version: 65" not in port:
+        raise GateFailure("javap did not confirm BuildCfg Java 21 bytecode without preview")
+    if "public interface " + BUILD_CFG_CLASS not in port or "interfaces: 0, fields: 0, methods: 2" not in port:
+        raise GateFailure("BuildCfg must expose only build and its checked default adapter")
+    result = BUILD_RESULT_CLASS
+    options = BUILD_OPTIONS_CLASS
+    expected = {
+        f"public abstract {result} build({PUBLICATION}, {options});": BUILD_DESCRIPTOR,
+        f"public default {result} buildChecked({CHECKED_PUBLICATION}, {options});": CHECKED_BUILD_DESCRIPTOR,
+    }
+    for signature, descriptor in expected.items():
+        if not re.search(re.escape(signature) + r"\s+descriptor: " + re.escape(descriptor), port):
+            raise GateFailure("BuildCfg method signature/descriptor mismatch: " + signature)
+
+
 def verify_javap(javap: str, root: Path, classes: Path, air_jar: Path) -> None:
     classpath = os.pathsep.join((str(classes), str(air_jar)))
     port = run(
@@ -637,11 +658,7 @@ def verify_javap(javap: str, root: Path, classes: Path, air_jar: Path) -> None:
         root,
         capture=True,
     ).stdout or ""
-    if "minor version: 0" not in port or "major version: 65" not in port:
-        raise GateFailure("javap did not confirm BuildCfg Java 21 bytecode without preview")
-    if "public interface " + BUILD_CFG_CLASS not in port or "interfaces: 0, fields: 0, methods: 1" not in port:
-        raise GateFailure("BuildCfg must be a single-method public input port")
-    require_descriptor(port, BUILD_DESCRIPTOR, "BuildCfg")
+    verify_build_port(port)
 
     coordinator = run(
         [javap, "-classpath", classpath, "-p", "-s", COORDINATOR_CLASS],
@@ -651,6 +668,7 @@ def verify_javap(javap: str, root: Path, classes: Path, air_jar: Path) -> None:
     if "implements " + BUILD_CFG_CLASS not in coordinator:
         raise GateFailure("CfgBuildCoordinator must implement BuildCfg")
     require_descriptor(coordinator, BUILD_DESCRIPTOR, "CfgBuildCoordinator.build")
+    require_descriptor(coordinator, CHECKED_BUILD_DESCRIPTOR, "CfgBuildCoordinator.buildChecked")
 
     interpreter = run(
         [javap, "-classpath", classpath, "-p", "-s", INTERPRETER_CLASS],
@@ -822,7 +840,7 @@ def architecture_gate(root: Path, test_profile: str = "full") -> None:
           "and JDK module java.base only", flush=True)
     print(f"[architecture] PASS: CI source pin {AIR_REPOSITORY}@{air_sha}", flush=True)
     print("[architecture] PASS: BuildCfg(Publication, BuildOptions) -> CfgBuildResult and direct "
-          "AirValidator preflight", flush=True)
+          "AirValidator preflight, with a CheckedPublication default adapter", flush=True)
     print("[architecture] PASS: explicit capability/version registry; no transport, reflection, "
           "frontend, AIR shadow, or control primitives beyond Jump/Branch/Return/Halt/Invoke-Normal conservative Opaque envelopes and typed Local control rules", flush=True)
 

@@ -55,8 +55,10 @@ def verify_transport_shape(root: Path) -> None:
                 raise GateFailure("runtime enum/object rendering cannot govern CFG wire")
     reader = root / "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirJsonFileReader.java"
     text = reader.read_text(encoding="utf-8")
-    if "return codec.decode(bytes);" not in text or "readNBytes(limits.maximumDocumentBytes())" not in text:
-        raise GateFailure("AIR file input must be bounded and delegated directly to shared AirJson.decode")
+    if ("return codec.decodeChecked(bytes);" not in text
+            or "return readChecked(path).publication();" not in text
+            or "readNBytes(limits.maximumDocumentBytes())" not in text):
+        raise GateFailure("AIR file input must be bounded and delegated directly to shared AirJson.decodeChecked")
     if re.search(r"readAllBytes|ObjectMapper|JsonParser|BindingReader|\.encode\(", text):
         raise GateFailure("parallel/unbounded AIR reader forbidden")
 
@@ -81,6 +83,14 @@ def verify_dependencies(module: str, actual: dict[str, set[str]], expected: dict
                                    "java.net.", "java.lang.reflect."))
                     or (module == "cfg-adapters" and target.startswith(PREFIX + "launcher."))):
                 raise GateFailure("forbidden transport dependency " + source + " -> " + target)
+
+
+def verify_reader_bytecode(reader: str) -> None:
+    checked = "air/json/AirJson.decodeChecked:([B)Lio/github/gustavo2358/air/validation/AirValidator$CheckedPublication;"
+    if checked not in reader:
+        raise GateFailure("compiled file reader does not invoke shared AirJson.decodeChecked(byte[])")
+    if "air/json/AirJson.encode" in reader:
+        raise GateFailure("AIR reader must not synthesize input with shared encoder")
 
 
 def transport_gate(root: Path, maven: str, repository: list[str], javap: str, jdeps: str, air_jar: Path) -> None:
@@ -112,10 +122,7 @@ def transport_gate(root: Path, maven: str, repository: list[str], javap: str, jd
         verify_dependencies(module, actual, expected["bytecode_dependencies"])
         if module == "cfg-adapters":
             reader = run([javap, "-classpath", full_cp, "-c", "-p", PREFIX + "adapters.AirJsonFileReader"], root, capture=True).stdout
-            if "air/json/AirJson.decode:([B)Lio/github/gustavo2358/air/model/Publication;" not in reader:
-                raise GateFailure("compiled file reader does not invoke shared AirJson.decode(byte[])")
-            if "air/json/AirJson.encode" in reader:
-                raise GateFailure("AIR reader must not synthesize input with shared encoder")
+            verify_reader_bytecode(reader)
     # Model itself must not point back to CFG, codec, frontend or I/O; only standard JDK inspection.
     output = run([jdeps, "--multi-release", "21", "-filter:none", "-verbose:class", str(air_jar)], root, capture=True).stdout
     model = dependencies_from_jdeps(output)

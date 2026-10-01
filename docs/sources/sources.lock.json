@@ -141,8 +141,8 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "e0aef0e1928d88a74fe66b7a4d0af84556b84b19",
-    "canonical_ref": "feat/shared-routine-bodies",
+    "commit": "13518a709908eb3824ccd83d5c52d26cf83c1aac",
+    "canonical_ref": "perf/air-codec-latency",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
     "analysis_ir": {
@@ -189,7 +189,7 @@
       "air-model/src/main/java/io/github/gustavo2358/air/model/MemoryCodecs.java",
       "air-json/src/test/resources/regional.canonical.json"
     ],
-    "observed_on": "2026-09-30",
+    "observed_on": "2026-10-01",
     "modules": {
       "parent": {
         "path": "pom.xml",
@@ -211,8 +211,8 @@
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "logical_text_w2": "Local producer FAST PASS; fixed logical ranges and expression transport. Selected source E2E qualification in docs/product/logical-text-w2.md.",
-    "evidence_level": "AIR PR #23: codec admits existing control.local@1, unchanged AIR 2.0/JSON 1.0 semantics; exact pinned commit, legacy transport replay and focal tests qualified.",
-    "status": "IN_PROGRESS / DRAFT PR #23"
+    "evidence_level": "AIR PR #24: UTF-8 indexed decoding, ordered block scheduling and validator-owned CheckedPublication; exact producer commit required by the consumer checked APIs. AIR 2.0/JSON 1.0 semantics unchanged.",
+    "status": "IN_PROGRESS / DRAFT PR #24"
   },
   "proleap_poc": {
     "repository": "Gustavo2358/proleap-poc",

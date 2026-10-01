@@ -251,6 +251,12 @@
     ],
     "io.github.gustavo2358.analysis.adapters.ExceptionalControlProjectionTest": [
       "explicitExceptionDoesNotBecomeUnitWideUnknownControl"
+    ],
+    "io.github.gustavo2358.analysis.adapters.Utf8OutputTest": [
+      "canonicalEscapingAndFieldOrderHaveLiteralOracles",
+      "independentParserRecoversScalarsAcrossByteBufferBoundaries",
+      "arraysMapDuringEmissionAndPropagateIoFailures",
+      "validationCannotBeAttachedToAnotherSnapshot"
     ]
   },
   "analysis-dataflow": {
@@ -413,6 +419,9 @@
       "dataflowKeepsEachCallerRootSeparateInsideSharedBody",
       "observationReplaysEachFrameBeforeJoiningNonDistributiveTransfers",
       "traversalHandleCannotMoveToAnotherActivationEntry"
+    ],
+    "io.github.gustavo2358.analysis.structure.OpenLabelIndexTest": [
+      "indexedBoundsKeepScanOrderDuplicatesAndEntryOwnership"
     ]
   },
   "analysis-launcher": {
@@ -904,6 +913,11 @@
     ],
     "io.github.gustavo2358.analysis.cfg.domain.LocalControlProjectionTest": [
       "sharedBodyIsProjectedOnceWithoutUnconditionalReturns"
+    ],
+    "io.github.gustavo2358.analysis.cfg.application.CheckedPreflightTest": [
+      "preservesSuccessfulInvalidUnsupportedAndLimitedRuns",
+      "differentBudgetsMustRevalidateInBothDirections",
+      "clientsCannotSupplyInventedResultsAndCustomBuildersRemainCompatible"
     ]
   },
   "cfg-launcher": {
