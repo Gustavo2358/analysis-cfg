@@ -35,8 +35,18 @@ public final class CfgBuildCoordinator implements BuildCfg {
         return buildAfterPreflight(publication, options, preflight);
     }
 
+    /** Reuse only a validator-owned run with identical options; changed budgets run preflight again. */
+    @Override
+    public CfgBuildResult buildChecked(io.github.gustavo2358.air.validation.AirValidator.CheckedPublication checked,
+                                BuildOptions options) {
+        Objects.requireNonNull(checked, "checked");
+        Objects.requireNonNull(options, "options");
+        return checked.options().equals(options.validation())
+                ? buildAfterPreflight(checked.publication(), options, checked.result())
+                : build(checked.publication(), options);
+    }
+
     // Package seam for upstream outcomes without a natural Publication fixture.
-    // The public boundary always runs the real validator above.
     CfgBuildResult buildAfterPreflight(Publication publication, BuildOptions options,
                                        ValidationResult preflight) {
         var namePolicies = io.github.gustavo2358.air.model.NamePolicies.extensions(publication);

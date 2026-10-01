@@ -6,4 +6,8 @@ import io.github.gustavo2358.air.model.Publication;
 @FunctionalInterface
 public interface BuildCfg {
     CfgBuildResult build(Publication publication, BuildOptions options);
+    /** Existing implementations remain valid; coordinators may reuse the validator-owned run. */
+    default CfgBuildResult buildChecked(io.github.gustavo2358.air.validation.AirValidator.CheckedPublication checked, BuildOptions options) {
+        return build(checked.publication(), options);
+    }
 }

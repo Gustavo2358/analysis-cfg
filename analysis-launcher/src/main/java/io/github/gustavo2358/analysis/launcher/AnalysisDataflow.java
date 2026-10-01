@@ -28,7 +28,10 @@ public final class AnalysisDataflow {
             err.println(category+": "+line(failure.path()));return code;
         }catch(IOException failure){err.println("INPUT_IO: "+line(failure.getMessage()));return 3;}
         PreparedDataflowResult result;
-        try {result=new io.github.gustavo2358.analysis.dataflow.AnalysisDataflow().prepare(read.publication(),args[3]);}
+        try {
+            var analysis=new io.github.gustavo2358.analysis.dataflow.AnalysisDataflow();
+            result=read.checked().isPresent()?analysis.prepareChecked(read.checked().get(),args[3]):analysis.prepare(read.publication(),args[3]);
+        }
         catch(io.github.gustavo2358.analysis.dataflow.AnalysisDataflow.PreparationException failure) {
             err.println(line(failure.getMessage()));return switch(failure.failure()){case INVALID_INPUT,UNSUPPORTED_PROFILE->4;case EXTERNAL_SIZE_CAP_DEBT,EXTERNAL_RESOURCE_LIMIT,INCOMPLETE_VALIDATION->7;};
         }catch(RuntimeException failure){err.println("ANALYSIS_EXECUTION_FAILED: "+failure.getClass().getSimpleName());return 5;}

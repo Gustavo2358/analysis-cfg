@@ -34,16 +34,19 @@ public final class RegionalAnalysis {
         } catch(IllegalArgumentException failure) {
             err.println("usage: regional-analysis <air.json> <result.json> --result-id <id> --unit <unit> --entry <entry> <--before|--after|--outcome-normal|--at-entry> <operation|-> <--object <object>|--range <storage> <start> <end|open> <ascii|ibm1047|identity>> [--experimental-physical]");return 2;
         }
-        Publication publication;
-        try {publication=DataflowAirReader.forPartialAnalysis().read(input).publication();}
+        DataflowAirReader.Read read;
+        try {read=DataflowAirReader.forPartialAnalysis().read(input);}
         catch(AirJsonException failure){err.println("AIR_INPUT: "+failure.code());return switch(failure.code()){case INPUT_ERROR,VERSION_MISMATCH->3;case INVALID_IR,UNSUPPORTED_CAPABILITY->4;case IMPLEMENTATION_LIMIT,INCOMPLETE_VALIDATION,RESOURCE_LIMIT->7;};}
         catch(IOException failure){err.println("INPUT_IO");return 3;}
+        Publication publication=read.publication();
         RegionalAnalysisResult result;
         try {
             var unit=new UnitId(publication.id(),args[5]);var entry=new EntryId(unit,args[7]);var operation=new OperationId(unit,args[9]);
             var point=switch(args[8]){case "--before"->ProgramPoint.before(entry,operation);case "--after"->ProgramPoint.after(entry,operation);case "--outcome-normal"->new ProgramPoint(entry,ProgramPoint.Kind.OUTCOME,operation,Control.NormalOutcome.INSTANCE);default->ProgramPoint.entry(entry);};
             StorageSubject subject=args.length==12?new StorageSubject.NamedObject(new ObjectId(unit,args[11])):new StorageSubject.PhysicalRange(new StorageId(publication.id(),args[11]),range,codec);
-            result=new io.github.gustavo2358.analysis.dataflow.RegionalAnalysis(physical?StorageAnalysisMode.EXPERIMENTAL_PHYSICAL:StorageAnalysisMode.LOGICAL_ONLY).preparePartial(publication,args[3],List.of(new PointQuery<>(point,subject)));
+            var analysis=new io.github.gustavo2358.analysis.dataflow.RegionalAnalysis(physical?StorageAnalysisMode.EXPERIMENTAL_PHYSICAL:StorageAnalysisMode.LOGICAL_ONLY);
+            result=read.checked().isPresent()?analysis.preparePartialChecked(read.checked().get(),args[3],List.of(new PointQuery<>(point,subject)))
+                :analysis.preparePartial(publication,args[3],List.of(new PointQuery<>(point,subject)));
         } catch(io.github.gustavo2358.analysis.dataflow.AnalysisDataflow.PreparationException failure) {
             err.println("PREPARATION: "+failure.failure());return switch(failure.failure()){case INVALID_INPUT,UNSUPPORTED_PROFILE->4;case EXTERNAL_SIZE_CAP_DEBT,EXTERNAL_RESOURCE_LIMIT,INCOMPLETE_VALIDATION->7;};
         } catch(RuntimeException failure){err.println("ANALYSIS_EXECUTION_FAILED: "+failure.getClass().getSimpleName());return 5;}

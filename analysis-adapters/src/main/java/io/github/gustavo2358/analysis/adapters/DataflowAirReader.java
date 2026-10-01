@@ -14,13 +14,22 @@ public final class DataflowAirReader {
     public DataflowAirReader(AirJson codec) { this(codec,false); }
     private DataflowAirReader(AirJson codec,boolean partialAnalysis) { this.codec=java.util.Objects.requireNonNull(codec);this.partialAnalysis=partialAnalysis; }
     public static DataflowAirReader forPartialAnalysis() { return new DataflowAirReader(new AirJson(),true); }
-    public record Read(Publication publication,long airReads,long airBytesObserved,String sha256) {
+    public record Read(Publication publication,long airReads,long airBytesObserved,String sha256,
+                       java.util.Optional<io.github.gustavo2358.air.validation.AirValidator.CheckedPublication> checked) {
+        public Read {
+            java.util.Objects.requireNonNull(checked);
+            checked.ifPresent(c -> { if (c.publication() != publication) throw new IllegalArgumentException("validation snapshot mismatch"); });
+        }
+        public Read(Publication publication,long airReads,long airBytesObserved,String sha256) {
+            this(publication,airReads,airBytesObserved,sha256,java.util.Optional.empty());
+        }
         public Read(Publication publication,long airReads,long airBytesObserved){this(publication,airReads,airBytesObserved,"");}
     }
     public Read read(Path path) throws IOException {
         byte[] bytes;
         try(var input=Files.newInputStream(path)) {bytes=input.readAllBytes();}
-        return new Read(partialAnalysis?codec.decodeForPartialAnalysis(bytes).publication():codec.decode(bytes),1,bytes.length,sha(bytes));
+        var checked=partialAnalysis?codec.decodeCheckedForPartialAnalysis(bytes):codec.decodeChecked(bytes);
+        return new Read(checked.publication(),1,bytes.length,sha(bytes),java.util.Optional.of(checked));
     }
     private static String sha(byte[] bytes){try{return java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(bytes));}catch(java.security.NoSuchAlgorithmException ex){throw new IllegalStateException(ex);}}
 }

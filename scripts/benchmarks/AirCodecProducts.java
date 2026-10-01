@@ -35,8 +35,10 @@ public final class AirCodecProducts {
                 long analysis = System.nanoTime();
                 var dependencies = new DependencyAnalysis().prepare(bundle);
                 row.put("dependencyMs", elapsed(analysis));
+                long encode = System.nanoTime();
                 var bytes = new ByteArrayOutputStream();
                 new DependencyJson().write(dependencies, bytes);
+                row.put("dependencyEncodeMs", elapsed(encode));
                 save(output, "dependencies.json", bytes.toByteArray(), row);
             } else {
                 byte[] inputBytes = Files.readAllBytes(input.resolve("program.air.json"));

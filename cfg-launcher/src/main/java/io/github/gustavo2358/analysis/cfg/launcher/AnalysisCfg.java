@@ -1,7 +1,7 @@
 package io.github.gustavo2358.analysis.cfg.launcher;
 
 import io.github.gustavo2358.air.json.AirJsonException;
-import io.github.gustavo2358.air.model.Publication;
+import io.github.gustavo2358.air.validation.AirValidator.CheckedPublication;
 import io.github.gustavo2358.analysis.cfg.adapters.AirInputLimitException;
 import io.github.gustavo2358.analysis.cfg.adapters.AirJsonFileReader;
 import io.github.gustavo2358.analysis.cfg.adapters.CfgJsonException;
@@ -33,8 +33,8 @@ public final class AnalysisCfg {
         Path output;
         try { input = Path.of(args[0]); output = Path.of(args[1]); }
         catch (InvalidPathException invalid) { return usage(err); }
-        Publication publication;
-        try { publication = reader.read(input); }
+        CheckedPublication publication;
+        try { publication = reader.readChecked(input); }
         catch (AirInputLimitException limit) {
             err.println("AIR IMPLEMENTATION_LIMIT path=$ maximumDocumentBytes=" + limit.maximumDocumentBytes());
             return 3;
@@ -47,7 +47,7 @@ public final class AnalysisCfg {
             err.println("AIR INPUT_IO: " + line(failure.getMessage()));
             return 3;
         }
-        CfgBuildResult result = builder.build(publication, BuildOptions.defaults());
+        CfgBuildResult result = builder.buildChecked(publication, BuildOptions.defaults());
         if (result.status() != CfgBuildResult.Status.CFG_BUILT) {
             err.println("CFG " + result.status());
             for (var issue : result.projectionIssues())

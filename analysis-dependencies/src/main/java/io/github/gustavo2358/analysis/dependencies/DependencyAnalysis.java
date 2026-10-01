@@ -25,7 +25,7 @@ public final class DependencyAnalysis {
     }
     public DependencyResult prepare(DependencyInput input) {
         var occurrences=input.occurrences();
-        var result=prepareExecutable(input.publication());
+        var result=prepareExecutable(input);
         if(input.source().isPresent())result=result.withSourceEvidence(input.source().get());
         var byOperation=new HashMap<OperationId,List<DependencySiteFact>>();
         for(var site:result.sites())byOperation.computeIfAbsent(site.operation(),ignored->new ArrayList<>()).add(site);
@@ -55,9 +55,11 @@ public final class DependencyAnalysis {
         metrics.put("targetResolutionRequests",(long)occurrences.size());
         return result.withProgramInventory(inventory,metrics);
     }
-    private DependencyResult prepareExecutable(Publication publication) {
+    private DependencyResult prepareExecutable(DependencyInput input) {
+        var publication=input.publication();
         Objects.requireNonNull(publication);
-        var defaults=BuildOptions.defaults();var options=new BuildOptions(defaults.validation(),io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy.PARTIAL_ANALYSIS);var cfg=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).build(publication,options);
+        var defaults=BuildOptions.defaults();var options=new BuildOptions(defaults.validation(),io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy.PARTIAL_ANALYSIS);var coordinator=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty());
+        var cfg=input.checked().map(checked->coordinator.buildChecked(checked,options)).orElseGet(()->coordinator.build(publication,options));
         switch(cfg.status()) {
             case CFG_BUILT -> { }
             case INVALID_IR -> throw new Failure(Kind.INVALID_INPUT,"INVALID_IR");

@@ -7,13 +7,19 @@ import java.util.*;
 
 /** Explicit memory port. Physical adapters verify the snapshot digests before construction. */
 public record DependencyInput(Publication publication,Optional<QualifiedSourceDependencies> source,
-                              List<StatementCorrelation> correlations) {
+                              List<StatementCorrelation> correlations,
+                              Optional<io.github.gustavo2358.air.validation.AirValidator.CheckedPublication> checked) {
+    public DependencyInput(Publication publication,Optional<QualifiedSourceDependencies> source,List<StatementCorrelation> correlations) {
+        this(publication,source,correlations,Optional.empty());
+    }
     public record StatementCorrelation(QualifiedSourceDependencies.StatementId source,OperationId operation,
                                        LabelId label,OriginId origin) {
         public StatementCorrelation { Objects.requireNonNull(source);Objects.requireNonNull(operation);Objects.requireNonNull(label);Objects.requireNonNull(origin); }
     }
     public DependencyInput {
         Objects.requireNonNull(publication);Objects.requireNonNull(source);correlations=List.copyOf(correlations);
+        Objects.requireNonNull(checked);
+        checked.ifPresent(c -> { if (c.publication() != publication) throw new IllegalArgumentException("validation snapshot mismatch"); });
         source.ifPresent(s->{if(s.air().size()!=1||!s.air().getFirst().publication().equals(publication.id().localId()))throw new IllegalArgumentException("AIR publication mismatch");});
         var occurrences=new HashMap<QualifiedSourceDependencies.StatementId,QualifiedSourceDependencies.Occurrence>();
         source.ifPresent(s->s.units().forEach(u->u.occurrences().forEach(o->occurrences.put(o.id(),o))));

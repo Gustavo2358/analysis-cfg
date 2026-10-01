@@ -4,6 +4,7 @@ import argparse
 import json
 import statistics
 import subprocess
+import time
 from pathlib import Path
 
 
@@ -42,14 +43,16 @@ def main():
                                str(classes) + ':' + classpath,
                                'io.github.gustavo2358.analysis.cfg.application.AirCodecProducts',
                                str(input_dir), str(output), mode, '1']
+                    started = time.perf_counter()
                     run = subprocess.run(command, capture_output=True, text=True)
+                    wall_seconds = time.perf_counter() - started
                     (output / 'stdout.log').write_text(run.stdout)
                     (output / 'stderr.log').write_text(run.stderr)
                     if run.returncode:
                         raise RuntimeError(f'{variant} failed: {output / "stderr.log"}')
                     measured = json.loads(run.stdout.splitlines()[-1])
                     row = dict(input=str(input_dir), mode=mode, repetition=repetition,
-                               variant=variant, command=command, measured=measured)
+                               variant=variant, command=command, wallSeconds=wall_seconds, measured=measured)
                     results.append(row)
                     (args.output / 'results.json').write_text(json.dumps(results, indent=2) + '\n')
                     pair[variant] = output
