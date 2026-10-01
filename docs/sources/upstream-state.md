@@ -3,11 +3,11 @@
 ## Estado vigente — etapa 5 em revisão
 
 - AIR: `e0aef0e1928d88a74fe66b7a4d0af84556b84b19`, PR #23, transporte `control.local@1`.
-- lower: `6c591e74f471329c48ded934b0625f91c69ffe5f`, PR #52, branch `feat/shared-routine-bodies`, corpos PERFORM compartilhados sob prova de equivalência e raízes lógicas anônimas.
-- frontend: `64904d0ca55c72435fb1ebb4ba4bbd97cd9ca939`, PR #77, continuações físicas/FILE e os três checkpoints de SUPPRESS, EVALUATE parcial e gaps nominais CICS; SP 2.62 inalterado.
+- lower: `fcadfc91fdeb393eca3d2ed3734e701f17edf37d`, PR #52, branch `feat/shared-routine-bodies`, corpos PERFORM compartilhados sob prova de equivalência e raízes lógicas anônimas.
+- frontend: `188300e78c792b8f39db0c4f04c03f4b1716273e`, PR #77, continuações físicas/FILE e os checkpoints de SUPPRESS, EVALUATE parcial, gaps nominais CICS e JSON GENERATE; SP 2.62 inalterado.
 - IR: `2c7f31f19efbe3211a2aea5bbda90173a9666fe2`, AIR 2.0 / binding 1.0 inalterados.
 
-São pins de revisão, sem merge. A [qualificação dos três checkpoints](../work/stage5-photo-publication-fixes.md) distingue novos testes e evidência reutilizada. CFG JSON v5 e contextos de retorno estão descritos
+São pins de revisão, sem merge. A [qualificação do checkpoint 4](../work/stage5-json-generate.md) distingue novos testes e evidência reutilizada. CFG JSON v5 e contextos de retorno estão descritos
 na [campanha atual](../work/shared-routine-bodies.md). A recuperação de rotas FILE
 após parsing parcial está na [qualificação mais recente](../work/stage5-partial-file-routes.md). As correções preexistentes
 e sua nova comparação com o baseline da etapa 5 constam da

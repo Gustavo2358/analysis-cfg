@@ -22,3 +22,7 @@ The three frontend implementation checkpoints are a83853c, ca2cc2d and b087a93;
 the authority pin also includes their documentation-only qualification commit.
 Consumer FAST is executed on this pin; final results and exact review SHAs are
 recorded in the aggregate publication-fixes report. No merge.
+
+Historical checkpoints 1–3: the JSON parser limitation recorded above is now
+addressed by [checkpoint 4](stage5-json-generate.md). These older runs and their
+observed results are preserved; new qualification is recorded separately.

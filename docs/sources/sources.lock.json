@@ -297,7 +297,7 @@
     ],
     "semantic_product_version": "2.62.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "64904d0ca55c72435fb1ebb4ba4bbd97cd9ca939",
+    "commit": "188300e78c792b8f39db0c4f04c03f4b1716273e",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -331,12 +331,12 @@
       "contract": "SP 2.62 / NOMINAL_TEXT_SOURCE_V4; modelAssumed remains unavailable as physical storage, runtime VALUE or kill proof",
       "qualification": "docs/work/carddemo-values-control.md"
     },
-    "evidence_level": "Stage-5 PR #77 checkpoints 1-3: SUPPRESS preservation, partial EVALUATE arm isolation/canonical IF completion, CICS nominal gaps. FAST716 and qualification-local PASS. Twelve photo/control runs and 22 extra adversarial runs PASS; two extra JSON grammar probes remain OPEN. Fresh 560 SPs: 542 identical and 18 explained CardDemo deltas, zero candidate/support/provenance losses. See docs/work/stage5-photo-publication-fixes.md."
+    "evidence_level": "Stage-5 PR #77 checkpoint 4: JSON GENERATE grammar, operands and qualified source alternatives. FAST 725 and qualification-local 1296 (one existing opt-in skip) PASS. Twenty-eight new full pipeline runs pass; four oracle mutations rejected. Fresh 560 SPs identical; 2240 downstream products reused with byte-identical consumers. See docs/work/stage5-json-generate.md. Runtime generation/effects remain unknown."
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "IN_PROGRESS / DRAFT PR #52; coverage remains PARTIAL",
-    "commit": "6c591e74f471329c48ded934b0625f91c69ffe5f",
+    "commit": "fcadfc91fdeb393eca3d2ed3734e701f17edf37d",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -368,10 +368,10 @@
       "schema": "qualified-source-dependencies",
       "version": "1.6.0",
       "producer_api": "io.github.gustavo2358.lower.application.QualifiedSourceProjection",
-      "source_state_checkpoint": "6c591e74f471329c48ded934b0625f91c69ffe5f",
-      "approved_sp_producer": "64904d0ca55c72435fb1ebb4ba4bbd97cd9ca939",
+      "source_state_checkpoint": "fcadfc91fdeb393eca3d2ed3734e701f17edf37d",
+      "approved_sp_producer": "188300e78c792b8f39db0c4f04c03f4b1716273e",
       "schema_sha256": "e17edf598fba9c32d60cbe36a6006bcd7892bef0271cc2bad456163cfe9e7ad5",
-      "checkpoint_note": "Stage-5 PR #52 production unchanged; repinned to three frontend publication fixes. Canonical source/FILE uncertainty and provenance are preserved.",
+      "checkpoint_note": "Stage-5 PR #52 production unchanged; repinned to JSON GENERATE grammar/source alternatives. Canonical uncertainty, qualifications and provenance remain intact.",
       "historical_review": 34
     },
     "dependency_input": {
@@ -380,7 +380,7 @@
       "producer_api": "io.github.gustavo2358.lower.adapters.cli.CobolDependencyInput",
       "schema_sha256": "5f751464dee36a993d9238a32e25d68d396ce8ca3fa2e0198f29b4e6a7f505c0"
     },
-    "evidence_level": "Stage-5 PR #52: unchanged lower production, authority repin for frontend checkpoints 1-3. Fresh consumers for 18 changed CardDemo SPs preserve candidates/supports/provenance and CFG semantics; 542 downstream executions reused by SP and consumer bytecode equivalence. Local consumer FAST follows final pins; aggregate report records results. No new full-wrapper claim.",
+    "evidence_level": "Stage-5 PR #52 checkpoint 4: unchanged production, JSON GENERATE frontend authority repin. Fresh JSON inputs cross the actual consumer CLIs with source qualifications/provenance preserved. Existing 560 SPs and 2036 consumer/runtime classes are byte-identical; 2240 downstream products are reused. Consumer FAST runs after final pins; no new full-wrapper claim.",
     "perform_completion": "Scoped exits, SECTION boundaries, typed VARYING levels; Integration authorized; qualified original 39/39 and adversaries 25/25. See docs/domain/perform-control-completion.md.",
     "logical_alias_move": "Logical family translation precedes scalar shortcuts; 14/14 adversaries, PERFORM 39/39, reviewed chaos 48/48 with six explicit abstraction-policy cases; see docs/product/logical-alias-move.md.",
     "synthetic_model_assumptions": {
@@ -448,5 +448,5 @@
     "physical": "EXPERIMENTAL_EXPLICIT_OPT_IN_ONLY",
     "report": "docs/campaigns/positive-memory-topology/W2-REPORT.md"
   },
-  "metadata_scope": "Current repository commits, canonical_ref, status and evidence_level include the stage-5 shared-body campaign and three frontend publication fixes. Named historical campaigns and merged_reviews remain historical; these Draft PRs are not merged main."
+  "metadata_scope": "Current commits, canonical_ref, status and evidence_level include stage-5 body sharing and frontend checkpoints 1\u20134 (JSON GENERATE latest). Named historical campaigns and merged_reviews remain historical; these Draft PRs are not merged main."
 }
