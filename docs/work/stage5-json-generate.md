@@ -1,6 +1,8 @@
 # STAGE5-JSON-GENERATE — checkpoint 4
 
-Status: IN_PROGRESS
+[Current integration and qualification](air-codec-latency.md). The checkpoint scope below is historical.
+
+Status: DONE / MERGED
 
 This consumer only repins the frontend/lower authorities; production and wire contracts
 are unchanged. Frontend PR #77 admits the documented IBM JSON GENERATE grammar,

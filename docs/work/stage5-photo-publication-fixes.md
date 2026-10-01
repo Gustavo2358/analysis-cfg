@@ -1,6 +1,8 @@
 # STAGE5-PHOTO-PUBLICATION-FIXES
 
-Status: IN_PROGRESS
+[Current integration and qualification](air-codec-latency.md). The checkpoint scope below is historical.
+
+Status: DONE / MERGED
 
 Draft #57 authority repins only; CFG, solver, dependency consumers and wire contracts unchanged.
 Frontend #77 now preserves SUPPRESS outside COPY, distinct WHEN groups under

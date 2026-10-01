@@ -1,3 +1,5 @@
+[Integração atual — DONE / MERGED](air-codec-latency.md): corpos compartilhados #57 e latência #58, com produtores em main. As entradas anteriores abaixo são históricas.
+
 [CardDemo values/control — DONE / MERGED](carddemo-values-control-integration.md): capabilities 1–4 and review corrections integrated; point 5 is a separate campaign.
 
 # Trabalho
