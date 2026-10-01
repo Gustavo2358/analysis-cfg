@@ -1,6 +1,8 @@
 # SHARED-ROUTINE-BODIES — stage 5 consumer
 
-- status: IN_PROGRESS
+[Current integration and qualification](air-codec-latency.md). The checkpoint scope below is historical.
+
+- status: DONE
 - scope: User authorized all remaining checkpoints through stage 5 completion on 2026-09-30, without intermediate approval stops. Dedicated worktree/PR; no merge.
 
 ## Rules and design before implementation

@@ -7,6 +7,7 @@ Contrato Java implementado no package
 
 ```text
 BuildCfg.build(air-java Publication, BuildOptions) → CfgBuildResult
+BuildCfg.buildChecked(AirValidator.CheckedPublication, BuildOptions) → CfgBuildResult
 ```
 
 `Publication` é exatamente `io.github.gustavo2358.air.model.Publication`, do
@@ -19,6 +20,13 @@ de dialeto, inferência, fallthrough ou suporte presumido. A Publication
 inteira cruza a porta, sem pressupor Entry única. Seleção de entries só será
 adicionada quando um caso de uso concreto exigir. O resultado é tipado, imutável e
 não contém callback para completar fatos.
+
+`build` continua sendo o único método abstrato. O método default `buildChecked`
+preserva implementações existentes; o coordenador reutiliza a execução do
+Validator apenas para a mesma publicação e opções. Mudanças no budget exigem
+revalidação. O wrapper é criado pelo próprio `AirValidator` e retém também
+resultados inválidos/incompletos; capability negotiation e admissão do consumidor
+continuam obrigatórias. [Qualificação e limites](../work/air-codec-latency.md).
 
 `CfgBuildResult` registra `PublicationId`, versão AIR, options, o
 `ValidationResult` integral, capabilities requeridas sem intérprete, issues tipados
@@ -118,15 +126,16 @@ A preservação dos bytes Java nesta remediação não aprova esses caps para a 
 composição. Permanecem a validação de corretude e a autoridade única do codec AIR.
 
 ```text
-AIR JSON/file → infrastructure reader → air-java Publication → BuildCfg
-memory caller ────────────────────────────────────────────────┘
+AIR JSON/file → bounded reader → CheckedPublication → BuildCfg.buildChecked
+memory caller → Publication → BuildCfg.build
 ```
 
 O binding JSON normativo pertence e é versionado pelo `analysis-ir`, de modo
 independente da linguagem. O Analysis IR JSON Binding 1.0.0 existe no commit
 fixado, targets AIR 2.0.0 e permanece DRAFT. A decisão humana do WORK-CFG-026 autoriza
 consumir esse snapshot experimental sem promoção. `cfg-adapters::AirJsonFileReader`
-usa um único AirJson.Limits para leitura física limitada e shared AirJson.decode.
+usa um único AirJson.Limits para leitura física limitada e shared AirJson.decodeChecked.
+O método legado `read` devolve a publicação da mesma leitura checked.
 Não há parser AIR/DTO concorrente. `air-java` modelo continua sem JSON/filesystem.
 
 Falhas AirJsonException mantêm code/path/issues intactos; limite físico próprio

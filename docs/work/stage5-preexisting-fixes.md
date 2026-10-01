@@ -1,6 +1,8 @@
 # STAGE5-PREEXISTING-FIXES
 
-Status: IN_PROGRESS — implementation and qualification complete; Draft review,
+[Current integration and qualification](air-codec-latency.md). The checkpoint scope below is historical.
+
+Status: DONE / MERGED — implementation and qualification complete; Draft review,
 no merge. User authorized both pre-existing fixes in the stage-5 campaign.
 
 ## Causes and model

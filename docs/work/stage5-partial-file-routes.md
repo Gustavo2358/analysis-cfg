@@ -1,6 +1,8 @@
 # STAGE5-PARTIAL-FILE-ROUTES
 
-Status: IN_PROGRESS
+[Current integration and qualification](air-codec-latency.md). The checkpoint scope below is historical.
+
+Status: DONE / MERGED
 
 Frontend PR #77 fixes a publication abort after partial parsing. Every retained
 FILE destination has an authoritative UNKNOWN_LOCAL outcome when statement
