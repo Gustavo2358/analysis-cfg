@@ -49,7 +49,7 @@ def main():
   if name.startswith('literals-'):
    ending={'lf':b'\n','crlf':b'\r\n','cr':b'\r'}[name.rsplit('-',1)[1]]
    require(ending in physical and b'\r' not in physical.replace(ending,b'') and b'\n' not in physical.replace(ending,b''),'physical record endings preserved')
-  args={'frontend':['--source',source,'--output',case/'sp','--copybooks',case/'copybooks',*expected.get('flags',[])],
+  args={'frontend':['--json-compression', 'none', '--source',source,'--output',case/'sp','--copybooks',case/'copybooks',*expected.get('flags',[])],
         'lower':[case/'sp/cobol-semantic-product.json',case/'dependency-input.json'],'cfg':[case/'program.air.json',case/'cfg.json'],'dependency':[case/'dependency-input.json',case/'dependencies.json',*expected.get('dependencyFlags',[])]}
   execution={'sourceSha256':sha(source),'stages':{}}
   for stage,arguments in args.items():

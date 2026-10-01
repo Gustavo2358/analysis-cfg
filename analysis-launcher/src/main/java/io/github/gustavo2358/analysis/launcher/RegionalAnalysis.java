@@ -53,7 +53,7 @@ public final class RegionalAnalysis {
         Path temporary=null;
         try {
             temporary=Files.createTempFile(destination.getParent(),".regional-result-",".tmp");
-            try(var out=Files.newOutputStream(temporary)){new RegionalResultJson().write(result,out);}
+            try(var out=io.github.gustavo2358.analysis.adapters.JsonFiles.output(Files.newOutputStream(temporary),destination)){new RegionalResultJson().write(result,out);}
             Files.move(temporary,destination,StandardCopyOption.ATOMIC_MOVE,StandardCopyOption.REPLACE_EXISTING);temporary=null;return 0;
         } catch(IOException|IllegalArgumentException|IllegalStateException failure){err.println("RESULT_OUTPUT_FAILED");return 6;}
         finally {if(temporary!=null)try{Files.deleteIfExists(temporary);}catch(IOException failure){err.println("TEMPORARY_CLEANUP_FAILED");}}

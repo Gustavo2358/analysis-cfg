@@ -35,7 +35,7 @@ public final class LocalResultWriter {
             try {temporary=files.temporary(destination);output=new CountingOutput(files.open(temporary));}
             catch(IOException failure) {reason=DeliveryReceipt.Reason.WRITE_FAILED;}
             if(reason==null) {
-                try(var stream=output) {encoder.encode(result,stream);}
+                try(var stream=JsonFiles.output(output,destination)) {encoder.encode(result,stream);}
                 catch(IOException failure) {reason=output.failed?DeliveryReceipt.Reason.WRITE_FAILED:DeliveryReceipt.Reason.ENCODING_FAILED;}
                 catch(IllegalArgumentException|IllegalStateException failure) {reason=DeliveryReceipt.Reason.ENCODING_FAILED;}
                 if(reason==null) {hash=HexFormat.of().formatHex(output.digest.digest());metrics.put("resultSha256Computed",1L);}

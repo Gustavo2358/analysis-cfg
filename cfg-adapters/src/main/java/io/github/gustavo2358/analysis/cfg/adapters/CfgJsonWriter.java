@@ -106,7 +106,7 @@ public final class CfgJsonWriter {
         if (parent == null) throw new IOException("destination must name a file");
         Path temporary = Files.createTempFile(parent, ".analysis-cfg-", ".tmp");
         try {
-            Files.write(temporary, bytes);
+            JsonFiles.write(temporary,destination,bytes);
             try {
                 mover.move(temporary, absolute, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
             } catch (AtomicMoveNotSupportedException unsupported) {

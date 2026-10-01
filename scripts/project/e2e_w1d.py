@@ -26,7 +26,7 @@ def run(work,config):
         for attempt in (1,2):
             cwd=work/(name+'-'+str(attempt));cwd.mkdir();fixture=producer/'cobol-lower/adapters/src/test/resources/sp/cp6'/(name+'.cbl');source=cwd/fixture.name;shutil.copyfile(fixture,source)
             web=cwd/'src/main/resources';web.mkdir(parents=True);(web/'web').symlink_to(producer/'proleap-poc/src/main/resources/web',target_is_directory=True)
-            out=cwd/'sp';front=['java','-cp',os.pathsep.join(config['frontend']['classpath']),config['frontend']['main'],'--source',source.name,'--copybooks',str(producer/'proleap-poc/corpus/cpy'),'--output',str(out)]
+            out=cwd/'sp';front=['java','-cp',os.pathsep.join(config['frontend']['classpath']),config['frontend']['main'],'--json-compression', 'none', '--source',source.name,'--copybooks',str(producer/'proleap-poc/corpus/cpy'),'--output',str(out)]
             require(execute(cwd,'frontend',front)==0,'frontend failed')
             sp=out/'cobol-semantic-product.json';require(json.loads(sp.read_text())['contractVersion']=='1.3.0','SP contract version')
             air=cwd/'program.air.json';rc=execute(cwd,'lower',['java','-cp',os.pathsep.join(config['lower']['classpath']),config['lower']['main'],str(sp),str(air)])

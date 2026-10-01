@@ -88,7 +88,7 @@ def run(args):
     for name,case in selected.items():
         folder=args.work/name;folder.mkdir();source=folder/(name+'.cbl');source.write_text(case['source'])
         for filename,content in case['books'].items():(folder/filename).write_text(content)
-        execute(['java','-Xmx1g','-cp',paths['frontend'],'io.github.gustavo2358.cobolexplorer.ExplorerMain','--source',source,'--copybooks',folder,'--output',folder/'frontend','--storage-profile','ibm-enterprise-6.4-fixed-display-1047@1','--cics-entry-mode',case['mode']],args.frontend,folder/'frontend.log')
+        execute(['java','-Xmx1g','-cp',paths['frontend'],'io.github.gustavo2358.cobolexplorer.ExplorerMain','--json-compression', 'none', '--source',source,'--copybooks',folder,'--output',folder/'frontend','--storage-profile','ibm-enterprise-6.4-fixed-display-1047@1','--cics-entry-mode',case['mode']],args.frontend,folder/'frontend.log')
         sp=folder/'frontend/cobol-semantic-product.json';air=folder/'air.json';cfg=folder/'cfg.json';deps=folder/'dependencies.json'
         if case.get('missing_return'):
             document=json.loads(sp.read_text())

@@ -131,7 +131,7 @@ def run_case(case:dict[str,Any],config:dict[str,Any],out:Path,timeout:float,java
            'lower':work/'program.air.json','cfg':work/'cfg.json','dependency':work/'dependencies.json'}
     # Deliberately no physical-storage profile and no experimental physical flag.
     # Synthetic fixtures are single-program fixed-format sources with no COPY.
-    arguments={'frontend':['--source',str(source),'--copybooks',str(cpy),'--output',str(work/'sp')],
+    arguments={'frontend':['--json-compression', 'none', '--source',str(source),'--copybooks',str(cpy),'--output',str(work/'sp')],
                'lower':[str(paths['frontend']),str(work/'dependency-input.json')],
                'cfg':[str(paths['lower']),str(paths['cfg'])],
                'dependency':[str(work/'dependency-input.json'),str(paths['dependency'])]}

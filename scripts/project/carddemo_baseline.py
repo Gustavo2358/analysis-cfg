@@ -253,7 +253,7 @@ def attempt_program(source_record, upstream, work, config, timeout, jvm_args):
         (web / 'web').symlink_to(Path(config['checkouts']['proleap-poc']) / 'src/main/resources/web', target_is_directory=True)
         outputs = {'frontend': run_dir / 'sp' / config.get('semanticProductFile', 'cobol-semantic-product.json'), 'lower': run_dir / 'program.air.json',
                    'cfg': run_dir / 'cfg.json', 'dependency': run_dir / 'dependencies.json'}
-        args = {'frontend': ['--source', str(source), '--copybooks', ','.join(str(r) for r in physical_roots),
+        args = {'frontend': ['--json-compression', 'none', '--source', str(source), '--copybooks', ','.join(str(r) for r in physical_roots),
                              '--output', str(run_dir / 'sp'), *config.get('frontendArguments', [])],
                 'lower': [str(outputs['frontend']), str(outputs['lower'])],
                 'cfg': [str(outputs['lower']), str(outputs['cfg'])],

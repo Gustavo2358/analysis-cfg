@@ -65,7 +65,7 @@ def run(work,config_path,*,fixtures=FIXTURES,expected=EXPECTED,check=oracle,labe
         for attempt in ('A','B'):
             cwd=work/(name+'-'+attempt);cwd.mkdir();source=cwd/(name+'.cbl');shutil.copyfile(fixtures/source.name,source)
             web=cwd/'src/main/resources';web.mkdir(parents=True);(web/'web').symlink_to(producer/'proleap-poc/src/main/resources/web',target_is_directory=True)
-            execute(cwd,'frontend',['java','-cp',os.pathsep.join(config['frontend']['classpath']),config['frontend']['main'],'--source',source.name,'--copybooks',str(copybooks or producer/'proleap-poc/corpus/cpy'),'--output',str(cwd/'sp'),*frontend_args])
+            execute(cwd,'frontend',['java','-cp',os.pathsep.join(config['frontend']['classpath']),config['frontend']['main'],'--json-compression', 'none', '--source',source.name,'--copybooks',str(copybooks or producer/'proleap-poc/corpus/cpy'),'--output',str(cwd/'sp'),*frontend_args])
             sp=cwd/'sp'/sp_filename;air=cwd/'program.air.json';cfg=cwd/'cfg.json';dep=cwd/'dependencies.json'
             execute(cwd,'lower',['java','-cp',os.pathsep.join(config['lower']['classpath']),config['lower']['main'],str(sp),str(air)])
             execute(cwd,'cfg',['java','-cp',cp,'io.github.gustavo2358.analysis.cfg.launcher.AnalysisCfg',str(air),str(cfg)])

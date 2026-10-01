@@ -1,0 +1,6 @@
+id: WORK-JSON-ZSTD-001
+title: Artefatos JSON comprimidos com Zstandard
+status: IN_PROGRESS
+scope:
+  - Transporte físico dos artefatos gerados
+  - Compatibilidade, regressões, tamanho e tempo

@@ -13,6 +13,7 @@ from check_architecture import GateFailure, GateConfigurationError, command_path
 # Reviewed nominal obligations. Never derive this inventory from reports or Java source at runtime.
 SUITES = {
     "cfg-adapters": {
+        "io.github.gustavo2358.analysis.cfg.adapters.ZstdCfgTest": {"realAirToCfgPreservesCanonicalBytesAndRejectsBrokenFrames"},
         "io.github.gustavo2358.analysis.cfg.adapters.LocalControlWireTest": {"symbolicRulesRequireV5AndKeepOperationIdentity"},
         "io.github.gustavo2358.analysis.cfg.adapters.W1dInvokeWireTest": {
             "realInvokeRetainsDistinctTerminatorAndTransitionInExistingCfgWire",

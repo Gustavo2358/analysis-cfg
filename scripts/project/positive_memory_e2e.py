@@ -9,7 +9,7 @@ def sha(p): return hashlib.sha256(p.read_bytes()).hexdigest()
 def execute(runtime, cohort, out, physical=False):
     out.mkdir(parents=True,exist_ok=False); rows=[]
     for case in sorted(p for p in cohort.iterdir() if p.is_dir()):
-        dest=out/case.name; dest.mkdir(); front=['--source',case/'input.cbl','--copybooks',case/'copybooks','--output',dest/'sp']
+        dest=out/case.name; dest.mkdir(); front=['--json-compression', 'none', '--source',case/'input.cbl','--copybooks',case/'copybooks','--output',dest/'sp']
         if (case/'inventory.json').exists():front+=['--source-inventory',case/'inventory.json']
         if physical:front+=['--storage-profile','ibm-enterprise-6.4-fixed-display-1047@1']
         row={'case':case.name,'phases':{},'status':'OBSERVED','producerProfile':'ibm-enterprise-6.4-fixed-display-1047@1' if physical else 'UNSPECIFIED'}

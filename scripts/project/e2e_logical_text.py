@@ -15,7 +15,7 @@ def run(config, work, name, source, expected):
     web=work/'src/main/resources';web.mkdir(parents=True)
     (web/'web').symlink_to(pathlib.Path(config['checkouts']['proleap-poc'])/'src/main/resources/web')
     result={'fixture':name,'expected':expected,'status':'NOT_RUN','phases':{}}
-    stages=[('frontend',['--source',work/'input.cbl','--copybooks',work,'--output',work/'sp']),
+    stages=[('frontend',['--json-compression', 'none', '--source',work/'input.cbl','--copybooks',work,'--output',work/'sp']),
             ('lower',[work/'sp/cobol-semantic-product.json',work/'air.json']),
             ('cfg',[work/'air.json',work/'cfg.json']),('dependency',[work/'air.json',work/'dependencies.json'])]
     for stage,args in stages:

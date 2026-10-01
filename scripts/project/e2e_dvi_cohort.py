@@ -19,7 +19,7 @@ def run(a):
     for name in ['COACTUPC','COCRDSLC','COUSR01C']:
         source=corpus/'cbl'/(name+'.cbl');require(hashlib.sha256(source.read_bytes()).hexdigest()==SOURCES[name],'unchanged CardDemo input')
         folder=a.work/name;folder.mkdir();before=snapshot(read(a.before/name/'dependencies.json'))
-        execute(['java','-Xmx2g','-cp',cp['frontend'],'io.github.gustavo2358.cobolexplorer.ExplorerMain','--source',source,'--copybooks',str(corpus/'cpy')+','+str(corpus/'cpy-bms'),'--output',folder/'frontend','--storage-profile','ibm-enterprise-6.4-fixed-display-1047@1'],a.frontend,folder/'frontend.log')
+        execute(['java','-Xmx2g','-cp',cp['frontend'],'io.github.gustavo2358.cobolexplorer.ExplorerMain','--json-compression', 'none', '--source',source,'--copybooks',str(corpus/'cpy')+','+str(corpus/'cpy-bms'),'--output',folder/'frontend','--storage-profile','ibm-enterprise-6.4-fixed-display-1047@1'],a.frontend,folder/'frontend.log')
         sp=folder/'frontend/cobol-semantic-product.json';air=folder/'air.json';dep=folder/'dependencies.json'
         execute(['java','-Xmx2g','-cp',cp['lower'],'io.github.gustavo2358.lower.adapters.cli.CobolLower',sp,air],a.lower,folder/'lower.log')
         execute(['java','-Xmx2g','-cp',cp['cfg'],'io.github.gustavo2358.analysis.launcher.AnalysisDependencies',air,dep],ROOT,folder/'dependencies.log')

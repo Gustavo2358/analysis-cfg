@@ -26,7 +26,7 @@ def run(work,runtime):
         outputs=[]
         for attempt in ('a','b'):
             out=cwd/attempt;out.mkdir()
-            execute(cwd,'frontend-'+attempt,config,'frontend',['--source',source.name,'--copybooks',fixture.parent,'--output',out/'sp'])
+            execute(cwd,'frontend-'+attempt,config,'frontend',['--json-compression', 'none', '--source',source.name,'--copybooks',fixture.parent,'--output',out/'sp'])
             sp=out/'sp/cobol-semantic-product.json';air=out/'air.json';cfg=out/'cfg.json';dep=out/'dependency.json'
             for stage,paths in (('lower',[sp,air]),('cfg',[air,cfg]),('dependency',[air,dep])):execute(cwd,stage+'-'+attempt,config,stage,paths)
             s=json.loads(sp.read_text());a=json.loads(air.read_text());d=read(dep);verify_cfg_wire(cfg.read_bytes());control_oracle(a,json.loads(cfg.read_text()))

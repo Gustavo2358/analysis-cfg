@@ -102,7 +102,7 @@ def run(root,work,config):
         source.write_text(text)
         frontend=directory/'frontend';sp=frontend/'cobol-semantic-product.json';air=directory/'air.json';result=directory/'result.json'
         f=config['frontend'];l=config['lower'];stages=[]
-        commands=[('frontend',[java,'-cp',os.pathsep.join(f['classpath']),f['main'],'--source',str(source),'--copybooks',str(directory),'--output',str(frontend)],Path(f['cwd']),source,sp),('lower',[java,'-cp',os.pathsep.join(l['classpath']),l['main'],str(sp),str(air)],Path(l['cwd']),sp,air),('analysis',[java,'-cp',os.pathsep.join(cp),MAIN,str(air),str(result),'--result-id','canonical-'+('cp3' if candidate is None else 'generic' if name=='generic-overwrite' else 'cp4e')],root,air,result)]
+        commands=[('frontend',[java,'-cp',os.pathsep.join(f['classpath']),f['main'],'--json-compression', 'none', '--source',str(source),'--copybooks',str(directory),'--output',str(frontend)],Path(f['cwd']),source,sp),('lower',[java,'-cp',os.pathsep.join(l['classpath']),l['main'],str(sp),str(air)],Path(l['cwd']),sp,air),('analysis',[java,'-cp',os.pathsep.join(cp),MAIN,str(air),str(result),'--result-id','canonical-'+('cp3' if candidate is None else 'generic' if name=='generic-overwrite' else 'cp4e')],root,air,result)]
         for stage,argv,cwd,input_path,output_path in commands:
             receipt=execute_stage(stage,argv,cwd,input_path,output_path,directory)
             verify_stage(receipt,argv,input_path,output_path);stages.append(receipt)

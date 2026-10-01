@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "observed_on": "2026-09-30",
+  "observed_on": "2026-10-01",
   "analysis_ir": {
     "repository": "Gustavo2358/analysis-ir",
     "commit": "2c7f31f19efbe3211a2aea5bbda90173a9666fe2",
@@ -297,7 +297,7 @@
     ],
     "semantic_product_version": "2.62.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "cc1fb20a0e19284b8b97b44628403a74630bd466",
+    "commit": "e6d1fa7f54bee07469bdb7ebd4a98701ca68419b",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -331,12 +331,13 @@
       "contract": "SP 2.62 / NOMINAL_TEXT_SOURCE_V4; modelAssumed remains unavailable as physical storage, runtime VALUE or kill proof",
       "qualification": "docs/work/carddemo-values-control.md"
     },
-    "evidence_level": "Frontend #77/#78 merged. Product/grammar/test/build sources equal qualified 188300e78c792b8f39db0c4f04c03f4b1716273e. Checkpoint-4 Fast/full, 28 JSON runs and 560-SP preservation reused; runtime generation/effects remain unknown."
+    "evidence_level": "Frontend #77/#78 merged. Product/grammar/test/build sources equal qualified 188300e78c792b8f39db0c4f04c03f4b1716273e. Checkpoint-4 Fast/full, 28 JSON runs and 560-SP preservation reused; runtime generation/effects remain unknown.",
+    "json_artifact_transport": "Zstandard .json.zst; logical JSON hashes and semantic contracts unchanged"
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "DONE / MERGED; existing PARTIAL and runtime limits preserved",
-    "commit": "f0ddfc8641b643998a92b4744142e41de0c7a113",
+    "commit": "4d7c7f29ae3c0824402f8fa18f32a3f36bd43101",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -386,7 +387,8 @@
     "synthetic_model_assumptions": {
       "contract": "SP 2.62 / NOMINAL_TEXT_SOURCE_V4; modelAssumed remains unavailable as physical storage, runtime VALUE or kill proof",
       "qualification": "docs/work/carddemo-values-control.md"
-    }
+    },
+    "json_artifact_transport": "Zstandard .json.zst; logical JSON hashes and semantic contracts unchanged"
   },
   "external": [
     {

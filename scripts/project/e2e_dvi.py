@@ -43,7 +43,7 @@ def run(a):
     for name,case in fixtures().items():
         if a.cases and name not in a.cases:continue
         folder=a.work/name;folder.mkdir();source=folder/(name+'.cbl');source.write_text(case['source'])
-        execute(['java','-Xmx1g','-cp',cp['frontend'],'io.github.gustavo2358.cobolexplorer.ExplorerMain','--source',source,'--copybooks',folder,'--output',folder/'frontend','--storage-profile','ibm-enterprise-6.4-fixed-display-1047@1','--entry-storage-state',case['mode']],a.frontend,folder/'frontend.log')
+        execute(['java','-Xmx1g','-cp',cp['frontend'],'io.github.gustavo2358.cobolexplorer.ExplorerMain','--json-compression', 'none', '--source',source,'--copybooks',folder,'--output',folder/'frontend','--storage-profile','ibm-enterprise-6.4-fixed-display-1047@1','--entry-storage-state',case['mode']],a.frontend,folder/'frontend.log')
         sp=folder/'frontend/cobol-semantic-product.json';air=folder/'air.json';cfg=folder/'cfg.json';dep=folder/'dependencies.json'
         sp_hash=hashlib.sha256(sp.read_bytes()).hexdigest()
         execute(['java','-Xmx1g','-cp',cp['lower'],'io.github.gustavo2358.lower.adapters.cli.CobolLower',sp,air],a.lower,folder/'lower.log')

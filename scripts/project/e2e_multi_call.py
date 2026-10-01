@@ -174,7 +174,7 @@ def w1_regressions(work, producer, config, cp):
             shutil.copyfile(producer / 'cobol-lower/adapters/src/test/resources/sp/cp6' / source.name, source)
             web = cwd / 'src/main/resources'; web.mkdir(parents=True)
             (web / 'web').symlink_to(producer / 'proleap-poc/src/main/resources/web', target_is_directory=True)
-            execute(cwd, 'frontend', ['java', '-cp', os.pathsep.join(config['frontend']['classpath']), config['frontend']['main'], '--source', source.name, '--copybooks', str(producer / 'proleap-poc/corpus/cpy'), '--output', str(cwd / 'sp')])
+            execute(cwd, 'frontend', ['java', '-cp', os.pathsep.join(config['frontend']['classpath']), config['frontend']['main'], '--json-compression', 'none', '--source', source.name, '--copybooks', str(producer / 'proleap-poc/corpus/cpy'), '--output', str(cwd / 'sp')])
             sp = cwd / 'sp/cobol-semantic-product.json'; air = cwd / 'program.air.json'; cfg = cwd / 'cfg.json'; dep = cwd / 'dependencies.json'
             locked_sp(json.loads(sp.read_text()))
             execute(cwd, 'lower', ['java', '-cp', os.pathsep.join(config['lower']['classpath']), config['lower']['main'], str(sp), str(air)])
@@ -212,7 +212,7 @@ def run(work, config_path):
         for attempt in ('A', 'B'):
             cwd = work / f'fixture-{case}-{attempt}'; cwd.mkdir(); source = cwd / f'fixture-{case}.cbl'; shutil.copyfile(FIXTURES / source.name, source)
             web = cwd / 'src/main/resources'; web.mkdir(parents=True); (web / 'web').symlink_to(producer / 'proleap-poc/src/main/resources/web', target_is_directory=True)
-            execute(cwd, 'frontend', ['java', '-cp', os.pathsep.join(config['frontend']['classpath']), config['frontend']['main'], '--source', source.name, '--copybooks', str(producer / 'proleap-poc/corpus/cpy'), '--output', str(cwd / 'sp')])
+            execute(cwd, 'frontend', ['java', '-cp', os.pathsep.join(config['frontend']['classpath']), config['frontend']['main'], '--json-compression', 'none', '--source', source.name, '--copybooks', str(producer / 'proleap-poc/corpus/cpy'), '--output', str(cwd / 'sp')])
             sp_path = cwd / 'sp/cobol-semantic-product.json'; sp = json.loads(sp_path.read_text()); source_oracle(sp, case)
             air_path = cwd / 'program.air.json'; execute(cwd, 'lower', ['java', '-cp', os.pathsep.join(config['lower']['classpath']), config['lower']['main'], str(sp_path), str(air_path)])
             air = json.loads(air_path.read_text()); cfg = cwd / 'cfg.json'; dep = cwd / 'dependencies.json'
