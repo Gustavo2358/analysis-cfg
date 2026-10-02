@@ -331,7 +331,7 @@
       "contract": "SP 2.62 / NOMINAL_TEXT_SOURCE_V4; modelAssumed remains unavailable as physical storage, runtime VALUE or kill proof",
       "qualification": "docs/work/carddemo-values-control.md"
     },
-    "evidence_level": "Frontend #77/#78 merged. Product/grammar/test/build sources equal qualified 188300e78c792b8f39db0c4f04c03f4b1716273e. Checkpoint-4 Fast/full, 28 JSON runs and 560-SP preservation reused; runtime generation/effects remain unknown.",
+    "evidence_level": "JSON Zstandard qualification: fixed FAST, 14 integrated cases, 12 adversarial/auxiliary CLI checks and 73 CardDemo variants twice per format. Logical products preserved; PARTIAL and runtime limits remain. See docs/engineering/json-zstd.md. Earlier named campaign evidence remains historical.",
     "json_artifact_transport": "Zstandard .json.zst; logical JSON hashes and semantic contracts unchanged"
   },
   "cobol_lower": {
@@ -381,7 +381,7 @@
       "producer_api": "io.github.gustavo2358.lower.adapters.cli.CobolDependencyInput",
       "schema_sha256": "5f751464dee36a993d9238a32e25d68d396ce8ca3fa2e0198f29b4e6a7f505c0"
     },
-    "evidence_level": "Lower #52/#53 merged. Product/test/build sources equal qualified fcadfc91fdeb393eca3d2ed3734e701f17edf37d. Source lock pins integrated frontend/AIR; local Fast264.167s and final PR Fast CI passed. Corpus/support/provenance evidence reused; coverage remains PARTIAL.",
+    "evidence_level": "JSON Zstandard qualification: fixed FAST, 14 integrated cases, 12 adversarial/auxiliary CLI checks and 73 CardDemo variants twice per format. Logical products preserved; PARTIAL and runtime limits remain. See docs/engineering/json-zstd.md. Earlier named campaign evidence remains historical.",
     "perform_completion": "Scoped exits, SECTION boundaries, typed VARYING levels; Integration authorized; qualified original 39/39 and adversaries 25/25. See docs/domain/perform-control-completion.md.",
     "logical_alias_move": "Logical family translation precedes scalar shortcuts; 14/14 adversaries, PERFORM 39/39, reviewed chaos 48/48 with six explicit abstraction-policy cases; see docs/product/logical-alias-move.md.",
     "synthetic_model_assumptions": {
@@ -450,5 +450,5 @@
     "physical": "EXPERIMENTAL_EXPLICIT_OPT_IN_ONLY",
     "report": "docs/campaigns/positive-memory-topology/W2-REPORT.md"
   },
-  "metadata_scope": "Current AIR/frontend/lower commits and canonical_ref identify actual merged mains for stage 5 and codec performance. Named historical campaigns and merged_reviews remain historical evidence. See docs/work/air-codec-latency.md."
+  "metadata_scope": "Current producer commits are immutable JSON Zstandard qualification pins, integrated in frontend #80 and lower #54 in producer-first order. They need not equal the later documentation/merge HEAD. Earlier named campaigns, file URLs and reference snapshots remain historical. See docs/engineering/json-zstd.md."
 }

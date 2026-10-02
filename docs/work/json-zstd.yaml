@@ -1,6 +1,8 @@
 id: WORK-JSON-ZSTD-001
 title: Artefatos JSON comprimidos com Zstandard
-status: IN_PROGRESS
+status: DONE
 scope:
   - Transporte físico dos artefatos gerados
   - Compatibilidade, regressões, tamanho e tempo
+pr: https://github.com/Gustavo2358/analysis-cfg/pull/60
+notes: "Estado de fechamento a incorporar à main pelo PR aprovado; conclusão efetiva requer merge e Fast CI verde. Evidência e limites em docs/engineering/json-zstd.md."

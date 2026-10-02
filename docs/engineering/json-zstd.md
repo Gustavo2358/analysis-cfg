@@ -52,3 +52,35 @@ zstd -d -c out/dependencies.json.zst | python3 -m json.tool
 A biblioteca inclui as bibliotecas nativas das plataformas suportadas pelo
 [zstd-jni](https://github.com/luben/zstd-jni). O CLI `zstd` é útil para inspeção e
 validação independente, mas não é invocado pelas aplicações Java.
+
+## Qualificação e fechamento
+
+Fechamento e merge autorizados em 2026-10-02 pelo
+[PR #60](https://github.com/Gustavo2358/analysis-cfg/pull/60).
+A ordem de integração é [frontend #80](https://github.com/Gustavo2358/proleap-poc/pull/80)
+→ [lower #54](https://github.com/Gustavo2358/cobol-lower/pull/54)
+→ [CFG #60](https://github.com/Gustavo2358/analysis-cfg/pull/60).
+O estado efetivo da integração, o HEAD final e o merge SHA são registrados nos PRs.
+
+FAST local: 675 métodos obrigatórios, zero skips; contratos wire e arquitetura passaram. A qualificação anterior é reutilizada neste fechamento documental;
+código, testes, configuração de build e pins executáveis permanecem iguais.
+Os checks documentais locais e o Fast CI nos HEADs finais validam o fechamento.
+
+O [CardDemo completo](https://github.com/Gustavo2358/analysis-cfg/blob/4c1b8552e4368aac0254e2079dd8088b40f8fbc8/docs/evals/carddemo-full.md) cobre 73 variantes, duas execuções por formato:
+657 artefatos por processamento, **2.690,967 MB → 164,341 MB (−93,89%)**.
+Tempo médio do corpus: **543,655 s → 546,195 s (+0,47%)**. São medições locais
+com duas repetições, sem garantia estatística de tempo em outras máquinas.
+Os 146 pares preservaram **1.168 produtos byte a byte** após descompressão
+independente e 146 manifests após retirar apenas `.zst` dos caminhos de snapshots.
+
+A campanha também inclui 14 casos integrados e 12 verificações adversariais e de
+relatórios auxiliares. `PARTIAL`, gaps, candidates, supports e provenance foram
+preservados. O corpus completo de 560 casos e o full não foram executados nesta
+campanha; a mudança de transporte foi coberta pelos FASTs e comparações diretas.
+A evidência bruta permanece em `artefatos-e2e/json-zstd-20261001/`, somente local.
+
+Os locks mantêm os commits completos usados na qualificação: frontend
+`e6d1fa7f54bee07469bdb7ebd4a98701ca68419b` e lower
+`4d7c7f29ae3c0824402f8fa18f32a3f36bd43101`, conforme a dependência de cada produto.
+Esses commits são incorporados à main pelos merges, sem trocar o código medido.
+AIR e sua especificação permanecem nos pins anteriores; não há publicação Maven.
