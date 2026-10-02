@@ -42,7 +42,7 @@ class LocalControlTest {
         for(String start:starts)entries.add(new Entries.Entry(new EntryId(U,start),Optional.of(label(start)),
             new Interactions.Signature(new Interactions.ParameterInventory(List.of(),Interactions.NoRemainder.INSTANCE),new Interactions.ResultInventory(List.of(),Interactions.NoRemainder.INSTANCE),O),new Entries.EntryState(List.of(),List.of()),O));
         var unit=new Unit(U,Optional.empty(),List.of(),List.of(),entries,sequences,List.of(new Entries.CompletionPort(A,O),new Entries.CompletionPort(B,O)),Unit.BodyAvailability.AVAILABLE,Optional.empty(),coverage(new Scopes.UnitScope(U)),O);
-        var pub=new Publication(P,SemanticVersion.AIR_2_0_0,new Capabilities.Manifest(List.of(Capabilities.LOCAL_CONTROL),List.of()),List.of(),List.of(unit),List.of(),List.of(),List.of(),List.of(new Origins.Unavailable(O,"independent fixture")),coverage(new Scopes.PublicationScope(P)),List.of(),List.of());
+        var pub=new Publication(P,SemanticVersion.AIR_2_0_0,new Capabilities.Manifest(sequences.stream().anyMatch(s->s.terminator() instanceof Operations.LocalInvoke i&&i.reentryGuard().isPresent()) ? List.of(Capabilities.LOCAL_CONTROL,Capabilities.LOCAL_REENTRY_GUARD) : List.of(Capabilities.LOCAL_CONTROL),List.of()),List.of(),List.of(unit),List.of(),List.of(),List.of(),List.of(new Origins.Unavailable(O,"independent fixture")),coverage(new Scopes.PublicationScope(P)),List.of(),List.of());
         var built=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).build(pub,BuildOptions.defaults());
         assertEquals(CfgBuildResult.Status.CFG_BUILT,built.status(),built.toString());
         var admission=AnalysisSession.open(built,pub,ProjectionPolicy.KNOWN_SUBSET,entries);

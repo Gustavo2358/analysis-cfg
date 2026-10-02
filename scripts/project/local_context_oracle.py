@@ -48,9 +48,13 @@ def evaluate(air,source_name):
                 term=seq['terminator'];kind=term['kind'];destinations=[];next_stack=stack
                 if kind=='local.invoke':
                     op=key(term['header']['id'])
-                    if any(f[0]==op for f in stack):raise ValueError('recursive local oracle activation')
-                    next_stack=stack+((op,key(term['resume']),tuple(key(x) for x in term['completionPorts']),tuple(lines(term['header']['origin']))),)
-                    destinations=[key(term['entry'])]
+                    guard=term.get('reentryGuard');activation=None
+                    if guard:activation=(term['header']['id']['publication'],term['header']['id']['unit'],guard['activationKey'])
+                    if activation is not None and any(f[4]==activation for f in stack):destinations=[key(guard['destination'])]
+                    else:
+                        if any(f[0]==op for f in stack):raise ValueError('recursive local oracle activation')
+                        next_stack=stack+((op,key(term['resume']),tuple(key(x) for x in term['completionPorts']),tuple(lines(term['header']['origin'])),activation),)
+                        destinations=[key(term['entry'])]
                 elif kind=='local.resume':
                     if not stack:raise ValueError('invalid local return in oracle')
                     destinations=[stack[-1][1]];next_stack=stack[:-1]

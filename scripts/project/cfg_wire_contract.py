@@ -15,6 +15,8 @@ TRANSITIONS['4.0.0'] = TRANSITIONS['3.0.0'] | {'EXCEPTION', 'CONTROL_EXIT'}
 LOCAL = {'LOCAL_INVOKE', 'LOCAL_BOUNDARY', 'LOCAL_RESUME', 'LOCAL_UNWIND'}
 TERMINATORS['5.0.0'] = TERMINATORS['4.0.0'] | LOCAL
 TRANSITIONS['5.0.0'] = TRANSITIONS['4.0.0']
+TERMINATORS['6.0.0'] = TERMINATORS['5.0.0']
+TRANSITIONS['6.0.0'] = TRANSITIONS['5.0.0']
 
 def verify_local(doc):
     def identity(ref):
@@ -33,8 +35,17 @@ def verify_local(doc):
         kind = rule['kind']
         fields = {'LOCAL_INVOKE': {'entry', 'resume', 'ports'}, 'LOCAL_BOUNDARY': {'port', 'defaultDestination'},
                   'LOCAL_RESUME': {'invalidExit'}, 'LOCAL_UNWIND': {'count', 'destination', 'invalidExit'}}[kind]
+        if 'reentryGuard' in rule and kind=='LOCAL_INVOKE' and doc['schemaVersion']=='6.0.0': fields=fields | {'reentryGuard'}
         if set(rule) != fields | {'source', 'operation', 'kind'}: raise ValueError('local rule fields')
-        targets = fields - {'ports', 'port', 'count'}
+        if 'reentryGuard' in fields:
+            guard=rule['reentryGuard']
+            if not isinstance(guard,dict) or set(guard)!={'activationKey','destination'}:raise ValueError('invalid reentry guard')
+            if not isinstance(guard['activationKey'],str) or not guard['activationKey'].strip():raise ValueError('invalid activation key')
+            target=nodes.get(identity(guard['destination']))
+            if target is None or target.get('kind')!='SEQUENCE':raise ValueError('missing guard target')
+            op=target['terminator']['operation']
+            if any(op.get(k)!=rule['operation'].get(k) for k in ('publication','unit')):raise ValueError('cross-owner guard target')
+        targets = fields - {'ports', 'port', 'count', 'reentryGuard'}
         for field in targets:
             target = nodes.get(identity(rule[field]))
             if target is None: raise ValueError('missing local rule target')
@@ -71,16 +82,16 @@ def verify(data):
     if not terminators <= TERMINATORS[version] or not transitions <= TRANSITIONS[version]:
         raise ValueError('CFG tokens incompatible with declared version')
     outside = [n for n in doc['nodes'] if n['kind'] == 'OUTCOME_EXIT']
-    if outside and version not in {'4.0.0', '5.0.0'}:
+    if outside and version not in {'4.0.0', '5.0.0', '6.0.0'}:
         raise ValueError('CFG tokens incompatible with declared version')
     for node in outside:
         if node.get('outcome') not in {'HALT', 'EXCEPTION', 'ANY_EXCEPTION'} or ('tag' in node) != (node.get('outcome') == 'EXCEPTION'):
             raise ValueError('invalid outside outcome')
-    if version == '5.0.0':
+    if version in {'5.0.0','6.0.0'}:
         verify_local(doc)
     elif 'localControl' in doc:
         raise ValueError('local rules incompatible with declared version')
-    minimum = '5.0.0' if terminators & LOCAL else '4.0.0' if outside or transitions & {'EXCEPTION', 'CONTROL_EXIT'} else '3.0.0' if 'OPAQUE' in terminators or transitions & {'OPAQUE_JUMP', 'OPAQUE_RETURN'} else '2.0.0' if 'INVOKE' in terminators or 'INVOKE_NORMAL' in transitions else '1.0.0'
+    minimum = '6.0.0' if any('reentryGuard' in r for r in doc.get('localControl',[])) else '5.0.0' if terminators & LOCAL else '4.0.0' if outside or transitions & {'EXCEPTION', 'CONTROL_EXIT'} else '3.0.0' if 'OPAQUE' in terminators or transitions & {'OPAQUE_JUMP', 'OPAQUE_RETURN'} else '2.0.0' if 'INVOKE' in terminators or 'INVOKE_NORMAL' in transitions else '1.0.0'
     if version != minimum:
         raise ValueError('writer did not select the minimum required CFG contract')
     return dict(schemaVersion=version, terminators=sorted(terminators), transitions=sorted(transitions))

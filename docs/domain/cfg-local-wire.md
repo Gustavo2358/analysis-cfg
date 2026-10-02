@@ -30,3 +30,15 @@ A representação do grafo admite regras recursivas; o perfil atual de travessia
 solver recusa repetição de invocação simultaneamente ativa. O writer não certifica
 terminação do programa ou completude da análise. Inventários PARTIAL e controle
 aberto conservam suas qualificações.
+
+## CFG JSON 6.0.0: guarda explícita
+
+Somente produtos que contêm guardas usam 6.0.0. LOCAL_INVOKE admite então o
+campo `reentryGuard: {activationKey: string, destination: CfgNodeId}`. A chave
+não vazia é comparada exatamente no escopo publication/Unit da operation.
+Se estiver presente em qualquer frame pendente, seguir destination mantendo
+a pilha; caso contrário, empilhar com a chave e seguir entry. Destino é uma
+Sequence da mesma Unit. Pop e unwind removem a chave com o frame. Invocações
+sem guarda preservam sua regra e continuam sujeitas ao limite de recursão do
+solver existente. Guardas não autorizam achatar retornos ou enumerar todas as
+pilhas em tamanho polinomial. A representação do CFG continua compacta.

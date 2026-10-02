@@ -13,6 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 /** AIR 05.7 rules over shared CFG nodes. Dynamic returns never become ordinary graph edges. */
 public final class LocalControlRules {
@@ -20,8 +21,14 @@ public final class LocalControlRules {
     public sealed interface Rule permits Invoke, Boundary, Resume, Unwind {
         CfgNodeId source(); OperationId operation();
     }
-    public record Invoke(CfgNodeId source,OperationId operation,CfgNodeId entry,List<CompletionPortId> ports,CfgNodeId resume) implements Rule {
-        public Invoke { ports=List.copyOf(ports); }
+    public record ReentryGuard(String activationKey,CfgNodeId destination) {
+        public ReentryGuard { Objects.requireNonNull(activationKey);Objects.requireNonNull(destination); }
+    }
+    public record Invoke(CfgNodeId source,OperationId operation,CfgNodeId entry,List<CompletionPortId> ports,CfgNodeId resume,Optional<ReentryGuard> reentryGuard) implements Rule {
+        public Invoke { ports=List.copyOf(ports);reentryGuard=Objects.requireNonNull(reentryGuard); }
+        public Invoke(CfgNodeId source,OperationId operation,CfgNodeId entry,List<CompletionPortId> ports,CfgNodeId resume) {
+            this(source,operation,entry,ports,resume,Optional.empty());
+        }
     }
     public record Boundary(CfgNodeId source,OperationId operation,CompletionPortId port,CfgNodeId defaultDestination) implements Rule { }
     public record Resume(CfgNodeId source,OperationId operation,CfgNodeId invalidExit) implements Rule { }
@@ -45,7 +52,8 @@ public final class LocalControlRules {
         for(var n:nodes) if(n instanceof CfgNode.SequenceNode s) {
             var t=s.source().terminator(); var id=t.header().id();
             Rule rule=switch(t) {
-                case Operations.LocalInvoke i -> new Invoke(s.id(),id,required(labels.get(i.entry())),i.completionPorts(),required(labels.get(i.resume())));
+                case Operations.LocalInvoke i -> new Invoke(s.id(),id,required(labels.get(i.entry())),i.completionPorts(),required(labels.get(i.resume())),
+                    i.reentryGuard().map(g->new ReentryGuard(g.activationKey(),required(labels.get(g.destination())))));
                 case Operations.LocalBoundary b -> new Boundary(s.id(),id,b.port(),required(labels.get(b.defaultDestination())));
                 case Operations.LocalResume ignored -> new Resume(s.id(),id,required(invalid.get(id)));
                 case Operations.LocalUnwind u -> new Unwind(s.id(),id,u.count(),required(labels.get(u.destination())),required(invalid.get(id)));
@@ -68,6 +76,16 @@ public final class LocalControlRules {
         private Stack(){top=null;parent=null;depth=0;hash=1;}
         private Stack(Invoke top,Stack parent){this.top=top;this.parent=parent;depth=Math.incrementExact(parent.depth);hash=31*parent.hash+top.hashCode();}
         public int depth(){return depth;}
+        private boolean guarded(Invoke call) {
+            if(call.reentryGuard().isEmpty())return false;
+            var key=call.reentryGuard().orElseThrow().activationKey();
+            for(var cursor=this;cursor.top!=null;cursor=cursor.parent) {
+                var frame=cursor.top;
+                if(frame.operation().unit().equals(call.operation().unit())
+                        &&frame.reentryGuard().isPresent()&&frame.reentryGuard().orElseThrow().activationKey().equals(key))return true;
+            }
+            return false;
+        }
         private Stack push(Invoke call) {
             for(var cursor=this;cursor.top!=null;cursor=cursor.parent)
                 if(cursor.top.operation().equals(call.operation()))throw new RecursiveActivation(call.operation());
@@ -91,7 +109,7 @@ public final class LocalControlRules {
     public static Step step(Rule rule,Stack stack) {
         Objects.requireNonNull(rule);Objects.requireNonNull(stack);
         return switch(rule) {
-            case Invoke i -> new Step(i.entry(),stack.push(i));
+            case Invoke i -> stack.guarded(i) ? new Step(i.reentryGuard().orElseThrow().destination(),stack) : new Step(i.entry(),stack.push(i));
             case Boundary b -> stack.top!=null&&stack.top.ports().contains(b.port())
                 ? new Step(stack.top.resume(),stack.parent):new Step(b.defaultDestination(),stack);
             case Resume r -> stack.top==null?new Step(r.invalidExit(),Stack.EMPTY):new Step(stack.top.resume(),stack.parent);

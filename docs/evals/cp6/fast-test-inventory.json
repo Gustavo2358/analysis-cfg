@@ -426,6 +426,13 @@
     ],
     "io.github.gustavo2358.analysis.structure.OpenLabelIndexTest": [
       "indexedBoundsKeepScanOrderDuplicatesAndEntryOwnership"
+    ],
+    "io.github.gustavo2358.analysis.structure.GuardedLocalControlTest": [
+      "logicalKeyFindsAnOlderFrameAcrossDistinctOperations",
+      "returningReleasesGuardAndRetainsEachCallersContinuation",
+      "unwindReleasesOnlyRemovedKeys",
+      "selfGuardRunsBeforeRecursiveFrameRejection",
+      "dataflowPreservesValuesAcrossGuardedReentryAndMatchedReturns"
     ]
   },
   "analysis-launcher": {
@@ -787,7 +794,8 @@
       "failedMoveCleansTemporaryAndDoesNotReportSuccess"
     ],
     "io.github.gustavo2358.analysis.cfg.adapters.LocalControlWireTest": [
-      "symbolicRulesRequireV5AndKeepOperationIdentity"
+      "symbolicRulesRequireV5AndKeepOperationIdentity",
+      "guardedRulesRequireV6AndKeepGuardIdentity"
     ],
     "io.github.gustavo2358.analysis.cfg.adapters.ZstdCfgTest": [
       "realAirToCfgPreservesCanonicalBytesAndRejectsBrokenFrames"

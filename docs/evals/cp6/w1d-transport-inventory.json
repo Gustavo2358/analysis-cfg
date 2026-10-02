@@ -165,6 +165,7 @@
         "io.github.gustavo2358.analysis.cfg.domain.LocalControlRules",
         "io.github.gustavo2358.analysis.cfg.domain.LocalControlRules$Boundary",
         "io.github.gustavo2358.analysis.cfg.domain.LocalControlRules$Invoke",
+        "io.github.gustavo2358.analysis.cfg.domain.LocalControlRules$ReentryGuard",
         "io.github.gustavo2358.analysis.cfg.domain.LocalControlRules$Resume",
         "io.github.gustavo2358.analysis.cfg.domain.LocalControlRules$Rule",
         "io.github.gustavo2358.analysis.cfg.domain.LocalControlRules$Unwind",

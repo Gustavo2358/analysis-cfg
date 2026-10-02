@@ -75,3 +75,19 @@ Loops que concluem uma chamada antes de repetir continuam admitidos.
 CFG JSON v5 publica `localControl` separadamente das transições ordinárias. O
 consumidor precisa manter a pilha descrita aqui para calcular caminhos realizáveis.
 Ver [contrato de transporte](cfg-local-wire.md) e [qualificação](../work/shared-routine-bodies.md).
+
+## Guarda explícita de ativação
+
+`control.local.reentry_guard@1` é interpretada junto com control.local@1. Antes
+do push, uma chave lógica na mesma Unit é procurada em todos os frames pendentes.
+Uma correspondência segue o destino publicado da guarda sem alterar a pilha.
+Caso contrário, a invocação registra a chave no frame. Resume, boundary e unwind
+liberam a chave com o frame; jump a conserva. Invocações sem guarda mantêm a
+recusa de recursão do perfil finito existente.
+
+A projeção conserva nós compartilhados e uma regra por operação. Os oracles
+GuardedLocalControlTest e LocalControlWireTest cobrem identidade lógica em
+operações físicas distintas, correspondência abaixo do topo, retorno/unwind,
+reentrada direta, fechamento do wire e valores separados por chamador.
+Não foi substituído o solver: enumerar pilhas ainda pode ser combinatório.
+O formato guardado está documentado em [CFG local wire](cfg-local-wire.md).

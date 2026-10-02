@@ -15,8 +15,12 @@ class Paths:
         kind=r['kind']
         if kind=='LOCAL_INVOKE':
             ident=key(r['operation'])
+            guard=r.get('reentryGuard');activation=None
+            if guard:
+                activation=(r['operation']['publication'],r['operation']['unit'],guard['activationKey'])
+                if any(f[3]==activation for f in stack):return [(vertex(guard['destination']),stack)]
             if any(f[0]==ident for f in stack):raise ValueError('recursive test traversal requires another oracle')
-            return [(vertex(r['entry']),stack+((ident,vertex(r['resume']),tuple(key(p) for p in r['ports'])),))]
+            return [(vertex(r['entry']),stack+((ident,vertex(r['resume']),tuple(key(p) for p in r['ports']),activation),))]
         if kind=='LOCAL_BOUNDARY':return [(stack[-1][1],stack[:-1])] if stack and key(r['port']) in stack[-1][2] else [(vertex(r['defaultDestination']),stack)]
         if kind=='LOCAL_RESUME':return [(stack[-1][1],stack[:-1])] if stack else [(vertex(r['invalidExit']),())]
         if kind=='LOCAL_UNWIND':

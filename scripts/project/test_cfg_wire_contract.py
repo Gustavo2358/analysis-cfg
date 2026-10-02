@@ -74,10 +74,26 @@ class CfgWireContractTest(unittest.TestCase):
             else:d['schemaVersion']='4.0.0'
             with self.assertRaises(ValueError,msg=mutation):verify(json.dumps(d))
 
+    def test_guard_requires_v6_and_closed_destination(self):
+        d=self.local_document();d['schemaVersion']='6.0.0'
+        d['localControl'][0]['reentryGuard']=dict(activationKey='binding-A',destination=d['nodes'][2]['id'])
+        self.assertEqual('6.0.0',verify(json.dumps(d))['schemaVersion'])
+        for mutation in ('version','blank','foreign','extra','null'):
+            import copy
+            bad=copy.deepcopy(d);guard=bad['localControl'][0]['reentryGuard']
+            if mutation=='version':bad['schemaVersion']='5.0.0'
+            elif mutation=='blank':guard['activationKey']=''
+            elif mutation=='foreign':guard['destination']['publication']='other'
+            elif mutation=='extra':guard['extra']=True
+            else:bad['localControl'][0]['reentryGuard']=None
+            with self.assertRaises(ValueError,msg=mutation):verify(json.dumps(bad))
+
     def test_writer_local_product_matches_independent_wire_oracle(self):
         path=ROOT/'cfg-adapters/target/local-control-wire/cfg.json'
         self.assertTrue(path.exists(),'run LocalControlWireTest first')
         data=path.read_bytes();self.assertEqual('5.0.0',verify(data)['schemaVersion'])
+        guarded=ROOT/'cfg-adapters/target/local-control-wire/guarded-cfg.json'
+        self.assertEqual('6.0.0',verify(guarded.read_bytes())['schemaVersion'])
         for value in ('-1','01',1):
             d=json.loads(data)
             for rule in d['localControl']:

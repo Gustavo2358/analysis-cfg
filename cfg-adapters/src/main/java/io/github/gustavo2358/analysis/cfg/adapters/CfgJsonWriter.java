@@ -40,6 +40,7 @@ public final class CfgJsonWriter {
         var out = new CfgJsonBytes(maximumBytes);
         // Token mappings carry their contract requirement. Inspect the product, not its source text.
         boolean requiresV5=!graph.localRules().isEmpty();
+        boolean requiresV6=graph.localRules().values().stream().anyMatch(r->r instanceof LocalControlRules.Invoke i&&i.reentryGuard().isPresent());
         boolean requiresV4=graph.nodes().stream().anyMatch(CfgNode.OutcomeExit.class::isInstance)
             ||graph.transitions().stream().anyMatch(t->t.kind()==CfgTransition.Kind.EXCEPTION);
         boolean requiresV2 = false;
@@ -51,7 +52,7 @@ public final class CfgJsonWriter {
         for (var transition : graph.transitions())
             requiresV2 |= transitionKind(transition.kind()).requiresV2;
         out.raw("{\"schema\":\"analysis-cfg-json\",\"schemaVersion\":");
-        out.string(requiresV5 ? "5.0.0" : requiresV4 ? "4.0.0" : requiresV3 ? "3.0.0" : requiresV2 ? "2.0.0" : "1.0.0");
+        out.string(requiresV6 ? "6.0.0" : requiresV5 ? "5.0.0" : requiresV4 ? "4.0.0" : requiresV3 ? "3.0.0" : requiresV2 ? "2.0.0" : "1.0.0");
         out.raw(",\"airVersion\":");
         var version = result.airVersion();
         out.string(version.major() + "." + version.minor() + "." + version.patch());
@@ -160,6 +161,11 @@ public final class CfgJsonWriter {
                 out.raw(",\"kind\":\"LOCAL_INVOKE\",\"entry\":");cfgId(out,i.entry());
                 out.raw(",\"resume\":");cfgId(out,i.resume());out.raw(",\"ports\":[");
                 boolean comma=false;for(var port:i.ports()){if(comma)out.raw(",");comma=true;airId(out,port);}out.raw("]");
+                if(i.reentryGuard().isPresent()) {
+                    var guard=i.reentryGuard().orElseThrow();
+                    out.raw(",\"reentryGuard\":{\"activationKey\":");out.string(guard.activationKey());
+                    out.raw(",\"destination\":");cfgId(out,guard.destination());out.raw("}");
+                }
             }
             case LocalControlRules.Boundary b -> {
                 out.raw(",\"kind\":\"LOCAL_BOUNDARY\",\"port\":");airId(out,b.port());
