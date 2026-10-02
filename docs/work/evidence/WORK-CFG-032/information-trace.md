@@ -37,5 +37,5 @@ Oracle: `MOVE 'PROGA' TO WS-PGM`, `WS-PGM PIC X(8)`, `CALL WS-PGM`, `GOBACK`.
 | using-modes | AST tem REFERENCE X/CONTENT Y/VALUE Z e returning; SP gaps de arguments/returning/exception | Exit 4, slice recusada |
 | multi-path | IF/THEN/ELSE e bindings; condição parcial; child MOVEs sem continuação e sem fitting X8 | Exit 4, IF/CALL/shape/proof fora de perfil |
 
-Logs e bytes originais estão no [arquivo de probes](raw/frontend-lower-probes.tar.gz).
+Logs e bytes originais estão no [arquivo de probes](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-032/raw/frontend-lower-probes.tar.gz).
 Nenhuma AIR CALL nem dependency fact foi injetada após o lower para simular E2E.

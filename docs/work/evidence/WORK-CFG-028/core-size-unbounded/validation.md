@@ -39,7 +39,7 @@ timeout/disco externo ficam na fronteira de execução, sem framework ou retry.
 ## Provas locais e limites
 
 [Recibos e logs](gates.json) incluem comando, exit, SHA-256 raw/gzip e logs íntegros
-comprimidos sem perda. [Ambiente](environment.log): Temurin 21.0.12.1+1,
+comprimidos sem perda. [Ambiente](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-028/core-size-unbounded/environment.log): Temurin 21.0.12.1+1,
 Maven 3.9.16, Python 3.14.4; [dependência isolada e pin](dependency-environment.json).
 Nenhum cache/toolchain/build foi versionado.
 

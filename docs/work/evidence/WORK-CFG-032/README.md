@@ -21,12 +21,12 @@ evidência `.java.txt`, compilados fora do produto.
 
 | Evidência | Resultado factual | O que não prova |
 | --- | --- | --- |
-| [frontend/lower raw](raw/frontend-lower-probes.tar.gz) | 5 frontend exits 0; 5 lower exits 4 UNSUPPORTED_SLICE | Não existe CP6 E2E PASS nem AIR CALL |
+| [frontend/lower raw](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-032/raw/frontend-lower-probes.tar.gz) | 5 frontend exits 0; 5 lower exits 4 UNSUPPORTED_SLICE | Não existe CP6 E2E PASS nem AIR CALL |
 | [inventário dos bytes extraídos](raw/frontend-lower-files.json) | Hashes de cada COBOL, SP, AST/resolution, expanded source e logs | Não reescreve outputs para um oracle esperado |
-| [PointProbe source](raw/PointProbe.java.txt), [log](raw/point-probe.log.gz) | BEFORE middle=A; AFTER middle=B; BEFORE Return=C; supports first/middle/last; uma Sequence replayed | Não é CALL lowering; só APIs genéricas existentes |
-| [InvokeProbe source](raw/InvokeProbe.java.txt), [log](raw/invoke-probe.log.gz) | Fixture frozen KnownContract: validator STRUCTURALLY_VALID + I-56; codec IMPLEMENTATION_LIMIT; política interna isolada recusa INCOMPLETE_VALIDATION; CFG UNSUPPORTED_INPUT | Não valida semântica COBOL da fixture nem simula transporte implementado |
-| [Probe executions](raw/probe-executions.json), [compilação](raw/probe-compilation.log.gz) | javac --release 21 e os dois probes exit 0; frozen air-java test sources compilados fora do produto | Reflection é ferramenta diagnóstica temporária, não dependência do produto |
-| [Regressões existentes](raw/existing-regression-tests.log.gz), [contagens](raw/existing-tests-summary.json) | mvn offline -pl analysis-values -am test: 212 testes, zero failure/error/skip; cfg-kernel 108, analysis-kernel 44, analysis-values 60 | Subset local não substitui CI W1–W5 nem prova Invoke |
+| [PointProbe source](raw/PointProbe.java.txt), [log](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-032/raw/point-probe.log.gz) | BEFORE middle=A; AFTER middle=B; BEFORE Return=C; supports first/middle/last; uma Sequence replayed | Não é CALL lowering; só APIs genéricas existentes |
+| [InvokeProbe source](raw/InvokeProbe.java.txt), [log](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-032/raw/invoke-probe.log.gz) | Fixture frozen KnownContract: validator STRUCTURALLY_VALID + I-56; codec IMPLEMENTATION_LIMIT; política interna isolada recusa INCOMPLETE_VALIDATION; CFG UNSUPPORTED_INPUT | Não valida semântica COBOL da fixture nem simula transporte implementado |
+| [Probe executions](raw/probe-executions.json), [compilação](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-032/raw/probe-compilation.log.gz) | javac --release 21 e os dois probes exit 0; frozen air-java test sources compilados fora do produto | Reflection é ferramenta diagnóstica temporária, não dependência do produto |
+| [Regressões existentes](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-032/raw/existing-regression-tests.log.gz), [contagens](raw/existing-tests-summary.json) | mvn offline -pl analysis-values -am test: 212 testes, zero failure/error/skip; cfg-kernel 108, analysis-kernel 44, analysis-values 60 | Subset local não substitui CI W1–W5 nem prova Invoke |
 
 O tar conserva também tentativas iniciais falhas: `failed-jar-launch.json` registra
 `java -jar` recusado por ausência de Main-Class; logs stdout/stderr correspondentes
@@ -36,7 +36,7 @@ semântica do produto nem apagá-la.
 
 Uma seleção inicial de testes por `-Dtest` falhou no módulo cfg-kernel porque não
 havia teste com os nomes escolhidos e o POM exige failIfNoSpecifiedTests. O
-[log dessa tentativa](raw/existing-values-tests.log.gz) é preservado. O rerun válido
+[log dessa tentativa](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-032/raw/existing-values-tests.log.gz) é preservado. O rerun válido
 executou o reactor até analysis-values sem filtro de nomes, com Maven repo isolado
 copiado do cache congelado. Nenhum cache, JAR ou classfile é versionado aqui.
 
@@ -49,7 +49,7 @@ perdas do SP; `multi-path` verifica controle/bindings e lacunas antes do lower.
 
 Trace, gaps, contrato de dependency, efeitos, waves e oráculos são propostas para
 review, não cobertura nova. Gates e identidade final da entrega ficam no
-[estado ativo](../../history/WORK-CFG-032/state.md) e no PR draft. Os logs de [docs](raw/docs-gate.log.gz) e [fast](raw/fast-gate.log.gz), com
+[estado ativo](../../history/WORK-CFG-032/state.md) e no PR draft. Os logs de [docs](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-032/raw/docs-gate.log.gz) e [fast](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-032/raw/fast-gate.log.gz), com
 [comandos e exits](raw/gate-executions.json), registram PASS; CI deve ser lida pelo HEAD exato publicado.
 Nenhum merge, auto-merge ou início de W1 está autorizado.
 
@@ -61,6 +61,6 @@ O gate scope usa seu closeout histórico como base e imprime “no CP6”. Essa 
 continua significando ausência de implementação CP6; o work item de discovery
 ativo é validado pelo harness. Nenhum checker foi enfraquecido.
 
-Após o adendo factual de caller identity, [docs](raw/correlation-docs-gate.log.gz)
-e [fast](raw/correlation-fast-gate.log.gz) foram executados novamente com exit 0
+Após o adendo factual de caller identity, [docs](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-032/raw/correlation-docs-gate.log.gz)
+e [fast](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-032/raw/correlation-fast-gate.log.gz) foram executados novamente com exit 0
 ([comandos](raw/correlation-gate-executions.json)); os logs anteriores permanecem intactos.

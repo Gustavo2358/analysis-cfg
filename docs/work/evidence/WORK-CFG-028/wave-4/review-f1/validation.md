@@ -33,10 +33,10 @@ gate de scope. A validação de lifecycle exige o review e seu blocker explícit
 
 ## TDD e oracles
 
-[RED inicial compilado](development/initial-red.log.gz): três testes falharam antes
+[RED inicial compilado](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-028/wave-4/review-f1/development/initial-red.log.gz): três testes falharam antes
 da correção. Os dois casos positivos falharam com a exceção original de dependência
 sem batch. O terceiro detectou que o filtro era chamado antes de rejeitar a
-declaração inválida. [GREEN focal](development/focal-green.log.gz): os três passaram
+declaração inválida. [GREEN focal](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-028/wave-4/review-f1/development/focal-green.log.gz): os três passaram
 sem mudar suas expectativas.
 
 | Oracle | Input/seleção | Resultado verificado |

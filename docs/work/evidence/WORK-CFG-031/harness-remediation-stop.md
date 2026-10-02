@@ -34,7 +34,7 @@ The extra line is:
 [0.001s][warning][perf,memops] Cannot use file /tmp/hsperfdata_gustavo/4248 because it is locked by another process (errno = 11)
 ```
 
-[Exact focused diff](HARNESS-REGISTRY-DRIFT-001/validation/candidate/architecture/focal-diff.patch), [full expected/actual comparison](HARNESS-REGISTRY-DRIFT-001/validation/candidate/architecture/inventory-diff.json), [first blocker receipt](HARNESS-REGISTRY-DRIFT-001/first-blocker.json), and [raw architecture log](HARNESS-REGISTRY-DRIFT-001/validation/candidate/architecture/run.log.gz). The uncompressed log SHA-256 is `d312efecd2a53c2c7c2c62e3fbb539b33600252cccc4bc7234e9589733d38d93`. The receipt includes exact tool paths/versions, environment, changed descriptor strings and retained build-state archive path/hash. Generated build products remain outside the deliverable in persistent workspace storage.
+[Exact focused diff](HARNESS-REGISTRY-DRIFT-001/validation/candidate/architecture/focal-diff.patch), [full expected/actual comparison](HARNESS-REGISTRY-DRIFT-001/validation/candidate/architecture/inventory-diff.json), [first blocker receipt](HARNESS-REGISTRY-DRIFT-001/first-blocker.json), and [raw architecture log](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-031/HARNESS-REGISTRY-DRIFT-001/validation/candidate/architecture/run.log.gz). The uncompressed log SHA-256 is `d312efecd2a53c2c7c2c62e3fbb539b33600252cccc4bc7234e9589733d38d93`. The receipt includes exact tool paths/versions, environment, changed descriptor strings and retained build-state archive path/hash. Generated build products remain outside the deliverable in persistent workspace storage.
 
 Relevant unchanged authorities are `scripts/project/check_w5.py`, `docs/evals/resource-limit-w5-inventory.json` and the compiled LocalResultWriter$Attempt class. A read-only external trace captured the original gate's actual value; it did not replace the calculation or its verdict. No warning filtering, environment workaround, inventory regeneration or code correction was attempted. **NO REMEDIATION ATTEMPTED.**
 
@@ -72,7 +72,7 @@ Two controlled copies of base `15bd3afe1affdcb5ec49956960f884bde8c89498` receive
 
 ## Frozen candidate and preservation
 
-The candidate is the same uncommitted overlay on base 15bd3afe, from the original blocked `chore/cp6-baseline-sync` tree. Its [frozen snapshot](HARNESS-REGISTRY-DRIFT-001/frozen-sync-snapshot.tar.gz) preserves the exact tracked/staged patches, all untracked bytes and context. Manifest SHA-256: `c88ac70d20be2eb1707d95e3a4535d9b999f7663b7a743e9d16bf0f05ed9cb4d`, identical to the previous frozen candidate. No latest-sibling refresh occurred.
+The candidate is the same uncommitted overlay on base 15bd3afe, from the original blocked `chore/cp6-baseline-sync` tree. Its [frozen snapshot](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-031/HARNESS-REGISTRY-DRIFT-001/frozen-sync-snapshot.tar.gz) preserves the exact tracked/staged patches, all untracked bytes and context. Manifest SHA-256: `c88ac70d20be2eb1707d95e3a4535d9b999f7663b7a743e9d16bf0f05ed9cb4d`, identical to the previous frozen candidate. No latest-sibling refresh occurred.
 
 | Authority | Frozen SHA |
 | --- | --- |

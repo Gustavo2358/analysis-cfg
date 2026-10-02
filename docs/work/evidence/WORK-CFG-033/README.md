@@ -30,16 +30,16 @@ byte-exact.
 
 O [RED vertical original](raw/red-vertical-commands.json) executou frontend e
 lower reais com sucesso e obteve CFG exit 4, `UNSUPPORTED_TERMINATOR`, para o
-Invoke. O [RED CFG nominal](raw/cfg-red-tests.xml) falhou nos três testes antes da
-projeção tipada. O [RED values](raw/effects-red.xml) recusava o perfil solicitado;
+Invoke. O [RED CFG nominal](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-033/raw/cfg-red-tests.xml) falhou nos três testes antes da
+projeção tipada. O [RED values](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-033/raw/effects-red.xml) recusava o perfil solicitado;
 os oracles de BEFORE, continuação, NoMemory e loop definiram o comportamento
 esperado. O RED inicial do loop não foi um resultado incorreto fechado: foi
 ausência de suporte. As mutações posteriores de Nop e replay-only demonstram a
 necessidade do efeito no fixpoint.
 
-O [RED dependency](raw/dependency-red.xml) confirmou que o ValueFact bruto já
+O [RED dependency](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-033/raw/dependency-red.xml) confirmou que o ValueFact bruto já
 existia e falhou na ausência do produto de dependência. Houve ainda um
-[RED real do CFG JSON](raw/cfg-wire-red.log.gz): a projeção tipada já funcionava,
+[RED real do CFG JSON](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-033/raw/cfg-wire-red.log.gz): a projeção tipada já funcionava,
 mas o serializer ainda recusava Invoke. O mapper explícito e o teste nominal
 `W1dInvokeWireTest` fecham essa fronteira.
 
@@ -113,7 +113,7 @@ Literal não passa por trim. Fora da política mínima, o raw permanece disponí
 sem candidato exato inventado. A política autorizada e o alcance das autoridades
 IBM estão em [name policy](../../../domain/cp6-call-name-policy.md).
 
-[E2E receipt](e2e-receipt.json) e [bytes e logs](raw/w1d-real-e2e-final.tar.gz)
+[E2E receipt](e2e-receipt.json) e [bytes e logs](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-033/raw/w1d-real-e2e-final.tar.gz)
 registram duas execuções frescas de COBOL → SP 1.3.0 → AIR → CFG → query BEFORE →
 ValueFact → dependency, sem injections. Os bytes das duas execuções são idênticos
 em cada fronteira. No literal real, o target AIR é LiteralTarget PROGA, há um

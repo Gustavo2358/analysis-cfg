@@ -12,9 +12,9 @@ Exact upstream air-java 17029898fd0ee8fabcaaae89f7260148633d4b12, tree
 and installed JARs with build outputs. Local runtime Temurin 25.0.4, release 21 bytecode;
 CI uses Temurin 21. No pre-existing air-java/air-json SNAPSHOT was trusted.
 
-[Baseline RED](baseline-red-network.log.gz): exactly the two reported tests fail with
+[Baseline RED](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-029/baseline-red-network.log.gz): exactly the two reported tests fail with
 VALIDATION_LIMIT expected, INCOMPLETE_VALIDATION observed; 2 failures, zero errors/skips,
-exit 1. [Independent new oracle RED](oracle-red.log.gz) first proves actual upstream
+exit 1. [Independent new oracle RED](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-029/oracle-red.log.gz) first proves actual upstream
 RESOURCE_LIMIT, incomplete status and traversalCompleted=false, then fails because
 CfgBuildResult loses the category. This predates production changes.
 
@@ -30,14 +30,14 @@ The configurable reader runs real AirJson; byte/validator exhaustion exits 7 wit
 EXTERNAL_RESOURCE_LIMIT, no output and no receipt or delivery attempt. Generic incomplete
 and IMPLEMENTATION_LIMIT keep separate historical diagnostics. No wire version changes.
 
-[Full run](full-first.log.gz) passed fast, architecture, semantic, performance and
+[Full run](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-029/full-first.log.gz) passed fast, architecture, semantic, performance and
 integration, including all W1–W5 runtime hooks. [Summary](local-validation.json).
 Fast: 47 legacy harness + 101 CP5 harness + 5 focal guard tests + 14 result-reader tests.
 Architecture: 108 kernel tests, exact sources/classfiles/DAG and Java 21 bytecode.
 Source preservation guards compare focal changes with both historical and current hashes;
 all earlier source inventories and wave evidence remain intact.
 
-[Fresh E2E receipt](e2e-receipt.json), [raw outputs](e2e-raw.tar.gz),
+[Fresh E2E receipt](e2e-receipt.json), [raw outputs](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-029/e2e-raw.tar.gz),
 [raw file hashes](e2e-raw-sha256.json): CP4E A/B each executes COBOL → SP → AIR →
 BuildCfg → W1–W5. Candidate PROGA, real Assign producer and original OriginId;
 modelValueRemainder=false, sourceUnknownRemainder=true, effectiveUnknownRemainder=true.
