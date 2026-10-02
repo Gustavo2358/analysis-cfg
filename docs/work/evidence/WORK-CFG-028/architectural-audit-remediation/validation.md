@@ -49,7 +49,7 @@ TDD: suite anterior com dois novos testes executou 49 testes e falhou em 10 asse
 nominais (ausência A–I e completion). Após implementação, 59 testes CP5 passaram,
 incluindo remoção individual/restauração de obrigações e Git temporário para recibos.
 [Recibos locais](gates.json) guardam comandos/exits, logs brutos comprimidos sem
-perda e hashes raw/gzip. [Ambiente](environment.log): Temurin 21.0.12.1+1, Maven
+perda e hashes raw/gzip. [Ambiente](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-028/architectural-audit-remediation/environment.log): Temurin 21.0.12.1+1, Maven
 3.9.16, Python 3.14.4, repositório Maven isolado com air-java pinado já instalado.
 
 | Gate | Resultado observado |

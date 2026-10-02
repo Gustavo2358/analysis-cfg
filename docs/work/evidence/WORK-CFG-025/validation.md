@@ -11,7 +11,7 @@ head `b8d0d953024dceb37782944886ac02d5ec6d16f6`, merge conforme o pin.
 
 ## Prova física e autoridade
 
-[audit-provenance.py](audit-provenance.py) consulta blobs diretamente no objeto Git; [resultado completo](provenance.log)
+[audit-provenance.py](audit-provenance.py) consulta blobs diretamente no objeto Git; [resultado completo](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-025/provenance.log)
 lista todos os 21 paths do lock com SHA do blob e SHA-256. Também verifica 17 URLs ativas,
 POMs parent/model/codec, pins CI, blocos normativos inalterados e 8 arquivos históricos intactos.
 O SHA antigo no ADR-0007 continua explicitamente como evidência histórica da decisão original.
@@ -35,12 +35,12 @@ Comandos abaixo exit 0; logs contêm os marcadores do output real e SHA-256 do l
 
 | Comando / diretório | Resultado | Evidência |
 | --- | --- | --- |
-| `mvn -B -ntp -Dmaven.repo.local=/tmp/consumer-pinning/cfg-m2 clean install`, raiz upstream | Reactor completo BUILD SUCCESS | [upstream](upstream-install.log) |
-| `python3 scripts/harness/cache_ir.py --from-dir /tmp/work-cfg-005-analysis-ir`, CFG | Cache dos blobs normativos verificado | [cache](cache.log) |
-| `bash scripts/harness/check-fast.sh`, CFG | Docs + 41 testes do harness | [fast](fast.log) |
-| `bash scripts/harness/check-architecture.sh`, CFG | 102 testes, zero skips; 22 classfiles Java 21; somente air-java/java.base | [architecture](architecture.log) |
-| `bash scripts/harness/check-semantic.sh`, CFG | 84 métodos obrigatórios; zero skips | [semantic](semantic.log) |
-| `mvn -B -ntp clean verify`, CFG | 102 testes; BUILD SUCCESS | [verify](verify.log) |
+| `mvn -B -ntp -Dmaven.repo.local=/tmp/consumer-pinning/cfg-m2 clean install`, raiz upstream | Reactor completo BUILD SUCCESS | [upstream](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-025/upstream-install.log) |
+| `python3 scripts/harness/cache_ir.py --from-dir /tmp/work-cfg-005-analysis-ir`, CFG | Cache dos blobs normativos verificado | [cache](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-025/cache.log) |
+| `bash scripts/harness/check-fast.sh`, CFG | Docs + 41 testes do harness | [fast](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-025/fast.log) |
+| `bash scripts/harness/check-architecture.sh`, CFG | 102 testes, zero skips; 22 classfiles Java 21; somente air-java/java.base | [architecture](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-025/architecture.log) |
+| `bash scripts/harness/check-semantic.sh`, CFG | 84 métodos obrigatórios; zero skips | [semantic](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-025/semantic.log) |
+| `mvn -B -ntp clean verify`, CFG | 102 testes; BUILD SUCCESS | [verify](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-025/verify.log) |
 
 Os três últimos builds usam `MAVEN_OPTS=-Dmaven.repo.local=/tmp/consumer-pinning/cfg-m2`.
 Performance/integration/full continuam indisponíveis pelo contrato do harness e não são gates deste checkpoint.

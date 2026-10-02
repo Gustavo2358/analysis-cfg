@@ -36,9 +36,9 @@ executadas neste fechamento.
 
 [Fast CIs revisados](reviewed-fast-ci.json): ambos PASS no source HEAD qualificado.
 [Smoke pós-merge](postmerge-fast-receipt.json): somente `check-fast.sh`,
-docs/harness, PASS em 166.255 s; [log bruto comprimido](postmerge-fast.log.gz).
+docs/harness, PASS em 166.255 s; [log bruto comprimido](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-033/closeout/postmerge-fast.log.gz).
 Após o arquivamento, a [mesma suíte documental/harness](archive-fast-receipt.json)
-passou novamente sobre o diff administrativo; [log](archive-fast.log.gz). FAST_CI remoto é uma
+passou novamente sobre o diff administrativo; [log](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-033/closeout/archive-fast.log.gz). FAST_CI remoto é uma
 autoridade diferente da qualificação local; continua automático em push/PR.
 A full continua explícita via `check-qualification.sh` ou `qualification.yml`
 (`workflow_dispatch`), com a mesma lógica e todos os gates pesados preservados.

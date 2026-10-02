@@ -281,15 +281,15 @@ Todos os comandos/tempos/hashes estão no [recibo local](local-gates/receipt.jso
 
 | Gate | Exit | Tempo ns | Log bruto |
 | --- | --- | --- | --- |
-| scope | 0 | 1021933702 | [scope.log.gz](local-gates/scope.log.gz) |
-| fast | 0 | 111375777487 | [fast.log.gz](local-gates/fast.log.gz) |
-| architecture | 0 | 67491564688 | [architecture.log.gz](local-gates/architecture.log.gz) |
-| semantic | 0 | 35313154548 | [semantic.log.gz](local-gates/semantic.log.gz) |
-| integration | 0 | 47136045242 | [integration.log.gz](local-gates/integration.log.gz) |
-| performance | 0 | 56709956729 | [performance.log.gz](local-gates/performance.log.gz) |
-| maven-clean-verify | 0 | 30525836574 | [maven-clean-verify.log.gz](local-gates/maven-clean-verify.log.gz) |
-| diff | 0 | 15972763 | [diff.log.gz](local-gates/diff.log.gz) |
-| full | 0 | 314638394529 | [full.log.gz](local-gates/full.log.gz) |
+| scope | 0 | 1021933702 | [scope.log.gz](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-028/wave-5/local-gates/scope.log.gz) |
+| fast | 0 | 111375777487 | [fast.log.gz](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-028/wave-5/local-gates/fast.log.gz) |
+| architecture | 0 | 67491564688 | [architecture.log.gz](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-028/wave-5/local-gates/architecture.log.gz) |
+| semantic | 0 | 35313154548 | [semantic.log.gz](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-028/wave-5/local-gates/semantic.log.gz) |
+| integration | 0 | 47136045242 | [integration.log.gz](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-028/wave-5/local-gates/integration.log.gz) |
+| performance | 0 | 56709956729 | [performance.log.gz](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-028/wave-5/local-gates/performance.log.gz) |
+| maven-clean-verify | 0 | 30525836574 | [maven-clean-verify.log.gz](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-028/wave-5/local-gates/maven-clean-verify.log.gz) |
+| diff | 0 | 15972763 | [diff.log.gz](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-028/wave-5/local-gates/diff.log.gz) |
+| full | 0 | 314638394529 | [full.log.gz](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-028/wave-5/local-gates/full.log.gz) |
 
 O full consolidado rodou sobre o source working tree ligado por hashes à campanha
 final/source inventory; o HEAD Git então ainda era o commit de autorização.

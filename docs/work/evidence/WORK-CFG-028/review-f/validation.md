@@ -36,7 +36,7 @@ TDD inicial: 62 testes, 3 failures nominais para F1/F2/F3. A suite corrigida con
 global, além de identidades/dependências estrangeiras, omissões, writer failure,
 structural-only e batches independentes. Testes de harness não executam engine/writer.
 [Recibos](gates.json) preservam comandos/exits e logs raw comprimidos sem perda,
-com hashes raw/gzip. [Ambiente](environment.log): Temurin 21.0.12.1+1, Maven 3.9.16,
+com hashes raw/gzip. [Ambiente](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-028/review-f/environment.log): Temurin 21.0.12.1+1, Maven 3.9.16,
 Python 3.14.4; Maven isolado com air-java pinado ce530a7e17ab12b23c48f29425f503ff920b09fb.
 
 | Gate | Resultado observado |

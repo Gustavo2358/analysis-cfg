@@ -45,7 +45,7 @@ abre values. Coverage de Publication/Unit/operations mantém a regra anterior.
 O primeiro RED compilável contém seis testes, cinco falhas comportamentais e zero
 erros: produtor/origem, join de suporte, premissa do seed, Entry gap e alias gap.
 O controle negativo já passava. O log original está em
-[development/w3-f12-red.log.gz](development/w3-f12-red.log.gz); os GREEN subsequentes
+[development/w3-f12-red.log.gz](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-028/wave-3/review-f1-f2/development/w3-f12-red.log.gz); os GREEN subsequentes
 ficam preservados. Nenhum erro de compilação é contado como RED semântico.
 
 SupportSourceTest acrescenta 11 métodos aos 22 W3 existentes. Há witnesses de

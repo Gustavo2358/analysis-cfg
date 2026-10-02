@@ -171,7 +171,7 @@ oráculo de estado final do loop. Nenhuma compilação inválida foi contada com
 [Recibo local dos gates](local-gates-attempt-2/receipt.json): architecture, semantic,
 integration e mvn clean verify PASS/0. Maven: 240 testes, zero falhas/erros/skips:
 139 CFG/transporte, 26 W1, 18 W2, 33 W3 e 24 W4. Fast passou com 47 + 97 testes
-([log bruto](development/fast-attempt-3.log.gz)). Performance retorna UNAVAILABLE/3
+([log bruto](https://github.com/Gustavo2358/analysis-cfg/blob/f0dbece6ef63679efbbba54df43741b5673fad98/docs/work/evidence/WORK-CFG-028/wave-4/development/fast-attempt-3.log.gz)). Performance retorna UNAVAILABLE/3
 após W1/W2/W3/W4 PASS; W5 não existe. A primeira tentativa de architecture detectou
 o contador antigo de etapas Maven isoladas em CI (7 em vez de 8); guard ajustado
 para exigir também a etapa W4. Sem mudança de código de produto para obter PASS.
