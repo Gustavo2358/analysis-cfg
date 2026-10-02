@@ -14,7 +14,7 @@ import io.github.gustavo2358.analysis.dependencies.DependencyInput;
 public final class DependencyInputJson {
     private final ObjectMapper mapper=JsonMapper.builder(JsonFactory.builder().enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION).build()).enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS).build();
     public boolean isBundle(Path path)throws IOException {
-        try(var parser=mapper.getFactory().createParser(path.toFile())) {
+        try(var input=JsonFiles.input(path);var parser=mapper.getFactory().createParser(input)) {
             if(parser.nextToken()!=JsonToken.START_OBJECT)return false;
             while(parser.nextToken()==JsonToken.FIELD_NAME) {
                 String name=parser.currentName();parser.nextToken();
@@ -25,12 +25,12 @@ public final class DependencyInputJson {
         }
     }
     public DependencyInput read(Path path,DataflowAirReader reader)throws IOException {
-        var root=mapper.readTree(Files.readAllBytes(path));keys(root,"schema","version","air","qualifiedSource","sourceSha256","correlations");
+        var root=mapper.readTree(JsonFiles.read(path));keys(root,"schema","version","air","qualifiedSource","sourceSha256","correlations");
         if(!text(root,"schema").equals("dependency-input")||!text(root,"version").equals("1.0.0"))throw new IllegalArgumentException("unsupported dependency input");
         var base=path.toAbsolutePath().getParent();var air=root.get("air");keys(air,"path","sha256");
         var read=reader.read(base.resolve(text(air,"path")));
         if(!read.sha256().equals(text(air,"sha256")))throw new IllegalArgumentException("AIR digest mismatch");
-        var source=root.get("qualifiedSource");keys(source,"path","sha256");var bytes=Files.readAllBytes(base.resolve(text(source,"path")));
+        var source=root.get("qualifiedSource");keys(source,"path","sha256");var bytes=JsonFiles.read(base.resolve(text(source,"path")));
         if(!sha(bytes).equals(text(source,"sha256")))throw new IllegalArgumentException("source evidence digest mismatch");
         var evidence=new QualifiedSourceJson().decode(bytes);
         if(!evidence.source().sha256().equals(text(root,"sourceSha256"))||evidence.air().size()!=1||!evidence.air().getFirst().sha256().equals(read.sha256()))throw new IllegalArgumentException("source/AIR snapshot mismatch");

@@ -40,7 +40,7 @@ def main():
         'io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar',
         'com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar',
         'com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar',
-        'com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar']]
+        'com/github/luben/zstd-jni/1.5.7-20/zstd-jni-1.5.7-20.jar', 'com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar']]
     require(all(p.is_file() for p in jars), 'missing pinned runtime prerequisite')
     cp = ':'.join(map(str, [*[ROOT / m / 'target/classes' for m in modules], *jars]))
     require({p.name.removesuffix('.air.json') for p in args.fixtures.glob('*.air.json')} == set(EXPECTED),

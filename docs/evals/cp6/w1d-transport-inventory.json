@@ -35,6 +35,12 @@
         "java.nio.file.StandardCopyOption",
         "java.util.Objects",
         "io.github.gustavo2358.analysis.cfg.domain.LocalControlRules"
+      ],
+      "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/JsonFiles.java": [
+        "com.github.luben.zstd.ZstdInputStream",
+        "com.github.luben.zstd.ZstdOutputStream",
+        "java.io.*",
+        "java.nio.file.*"
       ]
     },
     "classfiles": [
@@ -45,7 +51,8 @@
       "io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter$1.class",
       "io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter$MoveOperation.class",
       "io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter$WireKind.class",
-      "io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter.class"
+      "io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter.class",
+      "io/github/gustavo2358/analysis/cfg/adapters/JsonFiles.class"
     ],
     "bytecode_dependencies": {
       "io.github.gustavo2358.analysis.cfg.adapters.AirInputLimitException": [
@@ -66,13 +73,12 @@
         "io.github.gustavo2358.air.validation.AirValidator$CheckedPublication",
         "io.github.gustavo2358.air.validation.ValidationOptions",
         "io.github.gustavo2358.analysis.cfg.adapters.AirInputLimitException",
+        "io.github.gustavo2358.analysis.cfg.adapters.JsonFiles",
         "java.io.IOException",
         "java.io.InputStream",
         "java.lang.Object",
         "java.lang.String",
         "java.lang.Throwable",
-        "java.nio.file.Files",
-        "java.nio.file.OpenOption",
         "java.nio.file.Path",
         "java.util.Objects"
       ],
@@ -142,6 +148,7 @@
         "io.github.gustavo2358.analysis.cfg.adapters.CfgJsonWriter$1",
         "io.github.gustavo2358.analysis.cfg.adapters.CfgJsonWriter$MoveOperation",
         "io.github.gustavo2358.analysis.cfg.adapters.CfgJsonWriter$WireKind",
+        "io.github.gustavo2358.analysis.cfg.adapters.JsonFiles",
         "io.github.gustavo2358.analysis.cfg.application.BuildOptions",
         "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult",
         "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult$Status",
@@ -182,7 +189,6 @@
         "java.nio.file.AtomicMoveNotSupportedException",
         "java.nio.file.CopyOption",
         "java.nio.file.Files",
-        "java.nio.file.OpenOption",
         "java.nio.file.Path",
         "java.nio.file.StandardCopyOption",
         "java.nio.file.attribute.FileAttribute",
@@ -221,6 +227,27 @@
         "java.lang.Enum",
         "java.lang.Object",
         "java.lang.String"
+      ],
+      "io.github.gustavo2358.analysis.cfg.adapters.JsonFiles": [
+        "com.github.luben.zstd.ZstdInputStream",
+        "com.github.luben.zstd.ZstdOutputStream",
+        "java.io.BufferedInputStream",
+        "java.io.IOException",
+        "java.io.InputStream",
+        "java.io.OutputStream",
+        "java.lang.Error",
+        "java.lang.Object",
+        "java.lang.RuntimeException",
+        "java.lang.String",
+        "java.lang.Throwable",
+        "java.lang.invoke.CallSite",
+        "java.lang.invoke.MethodHandles",
+        "java.lang.invoke.MethodHandles$Lookup",
+        "java.lang.invoke.MethodType",
+        "java.lang.invoke.StringConcatFactory",
+        "java.nio.file.Files",
+        "java.nio.file.OpenOption",
+        "java.nio.file.Path"
       ]
     }
   },

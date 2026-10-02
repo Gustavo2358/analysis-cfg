@@ -88,7 +88,7 @@ def one(work, config, source, copybooks, *, env=None, trace=False):
     (web/'web').symlink_to(Path(config['checkouts']['proleap-poc'])/'src/main/resources/web',target_is_directory=True)
     outputs={'frontend':work/'sp/cobol-semantic-compilation.json','lower':work/'program.air.json',
              'cfg':work/'cfg.json','dependency':work/'dependencies.json'}
-    args={'frontend':['--source','program.cbl','--copybooks',str(copybooks),'--output',str(work/'sp'),*config['frontendArguments']],
+    args={'frontend':['--json-compression', 'none', '--source','program.cbl','--copybooks',str(copybooks),'--output',str(work/'sp'),*config['frontendArguments']],
           'lower':[str(outputs['frontend']),str(outputs['lower'])],
           'cfg':[str(outputs['lower']),str(outputs['cfg'])],
           'dependency':[str(outputs['lower']),str(outputs['dependency'])]}

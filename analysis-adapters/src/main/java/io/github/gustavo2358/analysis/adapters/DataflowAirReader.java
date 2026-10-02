@@ -27,7 +27,7 @@ public final class DataflowAirReader {
     }
     public Read read(Path path) throws IOException {
         byte[] bytes;
-        try(var input=Files.newInputStream(path)) {bytes=input.readAllBytes();}
+        try(var input=JsonFiles.input(path)) {bytes=input.readAllBytes();}
         var checked=partialAnalysis?codec.decodeCheckedForPartialAnalysis(bytes):codec.decodeChecked(bytes);
         return new Read(checked.publication(),1,bytes.length,sha(bytes),java.util.Optional.of(checked));
     }

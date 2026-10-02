@@ -257,6 +257,10 @@
       "independentParserRecoversScalarsAcrossByteBufferBoundaries",
       "arraysMapDuringEmissionAndPropagateIoFailures",
       "validationCannotBeAttachedToAnotherSnapshot"
+    ],
+    "io.github.gustavo2358.analysis.adapters.ZstdDataflowTest": [
+      "airDigestRemainsLogicalAndCorruptionCannotPassAdmission",
+      "compressedDeliveryHashesPhysicalBytesAndPreservesExistingOnFailure"
     ]
   },
   "analysis-dataflow": {
@@ -784,6 +788,9 @@
     ],
     "io.github.gustavo2358.analysis.cfg.adapters.LocalControlWireTest": [
       "symbolicRulesRequireV5AndKeepOperationIdentity"
+    ],
+    "io.github.gustavo2358.analysis.cfg.adapters.ZstdCfgTest": [
+      "realAirToCfgPreservesCanonicalBytesAndRejectsBrokenFrames"
     ]
   },
   "cfg-kernel": {

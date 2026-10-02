@@ -1,3 +1,5 @@
+[JSON Zstandard — fechamento aprovado](../engineering/json-zstd.md#qualificação-e-fechamento): PR #60; qualificação, compatibilidade e benchmark completo. O PR registra a integração.
+
 [Integração atual — DONE / MERGED](air-codec-latency.md): corpos compartilhados #57 e latência #58, com produtores em main. As entradas anteriores abaixo são históricas.
 
 [CardDemo values/control — DONE / MERGED](carddemo-values-control-integration.md): capabilities 1–4 and review corrections integrated; point 5 is a separate campaign.

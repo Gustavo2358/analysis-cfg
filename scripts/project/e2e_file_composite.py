@@ -148,7 +148,7 @@ def main():
  for name in ([args.case] if args.case else EXPECTED):
   case=out/name;case.mkdir();source=FIXTURES/(name+'.cbl');(case/'empty-copybooks').mkdir();stages={}
   web=case/'src/main/resources/web';web.parent.mkdir(parents=True);web.symlink_to(Path(config['checkouts']['proleap-poc'])/'src/main/resources/web',target_is_directory=True)
-  arguments={'frontend':['--source',source,'--copybooks',case/'empty-copybooks','--output',case/'sp','--storage-profile','ibm-enterprise-6.4-fixed-display-1047@1','--entry-storage-state','initial','--cics-entry-mode','new-logical-level','--logical-text','disabled'],
+  arguments={'frontend':['--json-compression', 'none', '--source',source,'--copybooks',case/'empty-copybooks','--output',case/'sp','--storage-profile','ibm-enterprise-6.4-fixed-display-1047@1','--entry-storage-state','initial','--cics-entry-mode','new-logical-level','--logical-text','disabled'],
    'lower':[case/'sp/cobol-semantic-product.json',case/'dependency-input.json'],'cfg':[case/'program.air.json',case/'cfg.json'],'dependency':[case/'dependency-input.json',case/'dependencies.json']}
   for stage in arguments:
    command=[os.environ.get('JAVA','java'),'-Xmx2g','-cp',os.pathsep.join(config[stage]['classpath']),config[stage]['main'],*map(str,arguments[stage])];start=time.monotonic()

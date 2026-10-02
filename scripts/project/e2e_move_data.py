@@ -160,7 +160,7 @@ def run(work, config_path):
         web = cwd / 'src/main/resources'; web.mkdir(parents=True)
         (web / 'web').symlink_to(producer / 'proleap-poc/src/main/resources/web', target_is_directory=True)
         execute(cwd, 'frontend', ['java', '-cp', os.pathsep.join(config['frontend']['classpath']), config['frontend']['main'],
-                '--source', source.name, '--copybooks', str(producer / 'proleap-poc/corpus/cpy'), '--output', str(cwd / 'sp')])
+                '--json-compression', 'none', '--source', source.name, '--copybooks', str(producer / 'proleap-poc/corpus/cpy'), '--output', str(cwd / 'sp')])
         sp = cwd / 'sp/cobol-semantic-product.json'
         data, moves = source_oracle(json.loads(sp.read_text()), case, config['semanticProductVersion'])
         air = cwd / 'program.air.json'

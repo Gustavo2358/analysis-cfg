@@ -9,7 +9,7 @@ public final class DependencyFileWriter {
     public void write(DependencyResult result,Path destination) throws IOException {
         Path target=destination.toAbsolutePath();Path temporary=Files.createTempFile(target.getParent(),".dependencies-",".tmp");
         try {
-            try(var stream=Files.newOutputStream(temporary)){new DependencyJson().write(result,stream);}
+            try(var stream=JsonFiles.output(Files.newOutputStream(temporary),destination)){new DependencyJson().write(result,stream);}
             Files.move(temporary,target,StandardCopyOption.ATOMIC_MOVE,StandardCopyOption.REPLACE_EXISTING);
         } finally {Files.deleteIfExists(temporary);}
     }

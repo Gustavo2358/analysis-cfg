@@ -41,7 +41,7 @@ def main():
         'io/github/gustavo2358/air-json/0.1.0-SNAPSHOT/air-json-0.1.0-SNAPSHOT.jar',
         'com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar',
         'com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar',
-        'com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar']]
+        'com/github/luben/zstd-jni/1.5.7-20/zstd-jni-1.5.7-20.jar', 'com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar']]
     for path in jars:
         if not path.is_file():
             raise RuntimeError('missing build prerequisite: ' + str(path))

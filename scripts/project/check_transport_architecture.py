@@ -15,7 +15,8 @@ JSON = "io.github.gustavo2358:air-json:jar:0.1.0-SNAPSHOT:compile"
 KERNEL = "io.github.gustavo2358.analysis:cfg-kernel:jar:0.1.0-SNAPSHOT:compile"
 ADAPTERS = "io.github.gustavo2358.analysis:cfg-adapters:jar:0.1.0-SNAPSHOT:compile"
 DIRECT_DEPENDENCIES = {
-    "cfg-adapters": [("io.github.gustavo2358.analysis", "cfg-kernel", "compile"),
+    "cfg-adapters": [("com.github.luben", "zstd-jni", "compile"),
+                     ("io.github.gustavo2358.analysis", "cfg-kernel", "compile"),
                      ("io.github.gustavo2358", "air-java", "compile"),
                      ("io.github.gustavo2358", "air-json", "compile"),
                      ("org.junit.jupiter", "junit-jupiter", "test")],
@@ -113,7 +114,7 @@ def transport_gate(root: Path, maven: str, repository: list[str], javap: str, jd
             raise GateFailure("tests cannot shadow AIR classes")
         tree = parse_tgf(root / module / "target/architecture-dependencies.tgf")
         actual_deps = [c for c in tree if not c.startswith("io.github.gustavo2358.analysis:" + module + ":")]
-        expected_deps = {AIR, JSON, KERNEL} | ({ADAPTERS} if module == "cfg-launcher" else set())
+        expected_deps = {AIR, JSON, KERNEL, "com.github.luben:zstd-jni:jar:1.5.7-20:compile"} | ({ADAPTERS} if module == "cfg-launcher" else set())
         exact(actual_deps, expected_deps, module + " effective compile dependency graph")
         cp = (root / module / "target/architecture-classpath.txt").read_text().strip()
         full_cp = str(classes) + os.pathsep + cp

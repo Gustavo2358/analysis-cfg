@@ -68,7 +68,7 @@ def matrix(runtime, fixtures, work):
     for case in sorted(fixtures.iterdir()):
         if not (case/'expected.json').exists():continue
         output=work/case.name;output.mkdir();phases={}
-        stages=[('frontend',['--source',case/'program.cbl','--copybooks',case/'copybooks','--source-inventory',case/'inventory.json','--output',output/'front']),
+        stages=[('frontend',['--json-compression', 'none', '--source',case/'program.cbl','--copybooks',case/'copybooks','--source-inventory',case/'inventory.json','--output',output/'front']),
                 ('lower',[output/'front/cobol-semantic-product.json',output/'air.json']),
                 ('cfg',[output/'air.json',output/'cfg.json']),('dependency',[output/'air.json',output/'dependencies.json'])]
         for stage,args in stages:
@@ -101,7 +101,7 @@ def scale(runtime,work):
             (output/'program.cbl').write_text(''.join('       '+line+'\n' for line in source))
             (output/'inventory.json').write_text(json.dumps({'version':'1.0.0','artifacts':[] if kind=='COPYBOOK' else [{'name':n,'kind':'DCLGEN','artifact':'copybooks/'+n+'.cpy'} for n in names]}))
             row=dict(kind=kind,occurrences=count,unique=count,phases={})
-            for stage,args in [('frontend',['--source',output/'program.cbl','--copybooks',output/'copybooks','--source-inventory',output/'inventory.json','--output',output/'front']),('lower',[output/'front/cobol-semantic-product.json',output/'air.json']),('dependency',[output/'air.json',output/'dependencies.json']),('sourceTiming',[output/'air.json'])]:
+            for stage,args in [('frontend',['--json-compression', 'none', '--source',output/'program.cbl','--copybooks',output/'copybooks','--source-inventory',output/'inventory.json','--output',output/'front']),('lower',[output/'front/cobol-semantic-product.json',output/'air.json']),('dependency',[output/'air.json',output/'dependencies.json']),('sourceTiming',[output/'air.json'])]:
                 phase=execute(runtime,stage,args,output);row['phases'][stage]=phase;assert phase['exit']==0,row
             product=read(output/'dependencies.json');facts=product['sourceDependencies']
             assert {d['name'] for d in facts['dependencies']}==set(names) and facts['occurrences']==count and not facts['remainder']
@@ -117,7 +117,7 @@ def db2_matrix(runtime, fixtures, work):
     for case in sorted(fixtures.iterdir()):
         if not (case/'expected.json').exists():continue
         expected=json.loads((case/'expected.json').read_text());out=work/case.name;out.mkdir();phases={}
-        for stage,args in [('frontend',['--source',case/'program.cbl','--copybooks',case/'copybooks','--source-inventory',case/'inventory.json','--output',out/'front']),('lower',[out/'front/cobol-semantic-product.json',out/'air.json']),('cfg',[out/'air.json',out/'cfg.json']),('dependency',[out/'air.json',out/'dependencies.json'])]:
+        for stage,args in [('frontend',['--json-compression', 'none', '--source',case/'program.cbl','--copybooks',case/'copybooks','--source-inventory',case/'inventory.json','--output',out/'front']),('lower',[out/'front/cobol-semantic-product.json',out/'air.json']),('cfg',[out/'air.json',out/'cfg.json']),('dependency',[out/'air.json',out/'dependencies.json'])]:
             phases[stage]=execute(runtime,stage,args,out)
             assert phases[stage]['exit']==0,(case.name,stage,phases[stage])
         d=read(out/'dependencies.json');source=d['sourceDependencies'];facts=[f for f in source['dependencies'] if f['kind']=='DB2_TABLE'];actual=[];supports=[]
@@ -156,7 +156,7 @@ def db2_scale(runtime,work):
         lines=['IDENTIFICATION DIVISION.','PROGRAM-ID. SCALEDB2.','PROCEDURE DIVISION.']
         for i in range(count):lines+=['EXEC SQL SELECT * FROM '+names[i%unique]+' END-EXEC.']
         lines+=['GOBACK.'];(out/'program.cbl').write_text(''.join('       '+x+'\n' for x in lines));row=dict(sqlStatements=count,occurrences=count,unique=unique,phases={})
-        for stage,args in [('frontend',['--source',out/'program.cbl','--copybooks',out/'copybooks','--output',out/'front']),('lower',[out/'front/cobol-semantic-product.json',out/'air.json']),('dependency',[out/'air.json',out/'dependencies.json']),('sourceTiming',[out/'air.json'])]:
+        for stage,args in [('frontend',['--json-compression', 'none', '--source',out/'program.cbl','--copybooks',out/'copybooks','--output',out/'front']),('lower',[out/'front/cobol-semantic-product.json',out/'air.json']),('dependency',[out/'air.json',out/'dependencies.json']),('sourceTiming',[out/'air.json'])]:
             row['phases'][stage]=execute(runtime,stage,args,out);assert row['phases'][stage]['exit']==0,(stage,row)
         d=read(out/'dependencies.json');facts=d['sourceDependencies'];assert len(facts['dependencies'])==unique and facts['occurrences']==count and not facts['remainder']
         assert all(f['kind']=='DB2_TABLE' for f in facts['dependencies'])

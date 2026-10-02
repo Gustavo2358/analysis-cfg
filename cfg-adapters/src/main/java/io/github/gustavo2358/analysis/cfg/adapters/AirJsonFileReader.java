@@ -24,7 +24,7 @@ public final class AirJsonFileReader {
     public Publication read(Path path) throws IOException { return readChecked(path).publication(); }
     public io.github.gustavo2358.air.validation.AirValidator.CheckedPublication readChecked(Path path) throws IOException {
         byte[] bytes;
-        try (var input = Files.newInputStream(path)) {
+        try (var input = JsonFiles.input(path)) {
             bytes = input.readNBytes(limits.maximumDocumentBytes());
             // Separate extra read avoids max + 1 integer overflow and bounds even a growing file.
             if (input.read() != -1) throw new AirInputLimitException(limits.maximumDocumentBytes());

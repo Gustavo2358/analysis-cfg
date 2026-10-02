@@ -96,7 +96,7 @@ def run(work, runtime, names=None):
         snapshots = []
         for attempt in ('a', 'b'):
             out = cwd / attempt; out.mkdir()
-            execute(cwd, 'frontend-' + attempt, config, 'frontend', ['--source', source.name, '--copybooks', str(FIXTURES), '--output', str(out / 'sp')])
+            execute(cwd, 'frontend-' + attempt, config, 'frontend', ['--json-compression', 'none', '--source', source.name, '--copybooks', str(FIXTURES), '--output', str(out / 'sp')])
             sp = out / 'sp/cobol-semantic-product.json'; air = out / 'air.json'; cfg = out / 'cfg.json'; dep = out / 'dependency.json'
             execute(cwd, 'lower-' + attempt, config, 'lower', [sp, air])
             execute(cwd, 'cfg-' + attempt, config, 'cfg', [air, cfg])

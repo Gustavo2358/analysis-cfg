@@ -121,7 +121,7 @@ def run(work,runtime,names=None,attempts=2,permutations=True,*,cases=None,inspec
         snapshots=[];started=time.monotonic()
         for attempt in range(attempts):
             label=chr(ord('a')+attempt);out=cwd/label;out.mkdir()
-            execute(cwd,'frontend-'+label,config,'frontend',['--source',source.name,'--copybooks',cwd,'--output',out/'sp','--storage-profile',PROFILE])
+            execute(cwd,'frontend-'+label,config,'frontend',['--json-compression', 'none', '--source',source.name,'--copybooks',cwd,'--output',out/'sp','--storage-profile',PROFILE])
             sp=out/'sp/cobol-semantic-product.json';air=out/'air.json';cfg=out/'cfg.json';dependency=out/'dependency.json';probe=out/'probe.json'
             for stage,paths in [('lower',[sp,air]),('cfg',[air,cfg]),('dependency',[air,dependency]),('probe',[air,probe])]:execute(cwd,stage+'-'+label,config,stage,paths)
             results[name]=inspect(name,case,json.loads(sp.read_text()),json.loads(air.read_text()),json.loads(cfg.read_text()),read(dependency),json.loads(probe.read_text()))

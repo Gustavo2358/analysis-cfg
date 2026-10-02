@@ -19,7 +19,7 @@ def run(a):
         for mode in ['disabled','unknown']:
             folder=a.work/(name+'-'+mode);folder.mkdir();row={'program':name,'mode':mode,'sourceSha256':digest};stage='frontend'
             try:
-                execute(['java','-Xmx2g','-cp',cp['frontend'],'io.github.gustavo2358.cobolexplorer.ExplorerMain','--source',source,'--copybooks',str(corpus/'cpy')+','+str(corpus/'cpy-bms'),'--output',folder/'frontend','--storage-profile','ibm-enterprise-6.4-fixed-display-1047@1','--cics-entry-mode',mode],a.frontend,folder/'frontend.log')
+                execute(['java','-Xmx2g','-cp',cp['frontend'],'io.github.gustavo2358.cobolexplorer.ExplorerMain','--json-compression', 'none', '--source',source,'--copybooks',str(corpus/'cpy')+','+str(corpus/'cpy-bms'),'--output',folder/'frontend','--storage-profile','ibm-enterprise-6.4-fixed-display-1047@1','--cics-entry-mode',mode],a.frontend,folder/'frontend.log')
                 sp=folder/'frontend/cobol-semantic-product.json';doc=json.loads(sp.read_text());cics=[s for s in doc['statements'] if s['variant']=='CICS_PROGRAM_CONTROL'];row.update(spCics=len(cics),spCalls=sum(s['variant']=='CALL' for s in doc['statements']),inventory=doc['coverage']['inventoryStatus'],inputGaps=[g['code'] for e in doc['entryInventory']['entries'] for g in e['gaps'] if g['scope']=='ANALYSIS_INPUT'])
                 require(sorted(s['command'] for s in cics)==sorted(EXPECTED[name] if mode=='unknown' else []),'handwritten command inventory')
                 row['targets']=[{'command':s['command'],'binding':s['target'].get('reference',{}).get('binding') if s.get('target') else None,'gaps':s['gapCodes']} for s in cics]

@@ -90,7 +90,7 @@ def run(work,runtime,names=None,attempts=2,permutations=True):
         snapshots=[];started=time.monotonic()
         for i in range(attempts):
             out=cwd/chr(97+i);out.mkdir()
-            execute(cwd,'frontend-'+str(i),config,'frontend',['--source',src.name,'--copybooks',cwd,'--output',out/'sp'])
+            execute(cwd,'frontend-'+str(i),config,'frontend',['--json-compression', 'none', '--source',src.name,'--copybooks',cwd,'--output',out/'sp'])
             sp=out/'sp/cobol-semantic-product.json';air=out/'air.json';cfg=out/'cfg.json';dep=out/'dependency.json'
             for stage,paths in [('lower',[sp,air]),('cfg',[air,cfg]),('dependency',[air,dep])]:execute(cwd,stage+'-'+str(i),config,stage,paths)
             verify_cfg_wire(cfg.read_bytes())

@@ -150,7 +150,7 @@ def run(work,runtime,names=None):
         snapshots=[]
         for attempt in ('a','b'):
             out=cwd/attempt;out.mkdir()
-            execute(cwd,'frontend-'+attempt,config,'frontend',['--source',source.name,'--copybooks',FIXTURES,'--output',out/'sp'])
+            execute(cwd,'frontend-'+attempt,config,'frontend',['--json-compression', 'none', '--source',source.name,'--copybooks',FIXTURES,'--output',out/'sp'])
             sp=out/'sp/cobol-semantic-product.json';air=out/'air.json';cfg=out/'cfg.json';dep=out/'dependency.json'
             for stage,paths in (('lower',[sp,air]),('cfg',[air,cfg]),('dependency',[air,dep])):execute(cwd,stage+'-'+attempt,config,stage,paths)
             verify_cfg_wire(cfg.read_bytes());control_oracle(json.loads(air.read_text()),json.loads(cfg.read_text()))

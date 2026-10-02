@@ -9,6 +9,7 @@
   </parent>
   <artifactId>cfg-adapters</artifactId>
   <dependencies>
+    <dependency><groupId>com.github.luben</groupId><artifactId>zstd-jni</artifactId><version>1.5.7-20</version></dependency>
     <dependency>
       <groupId>io.github.gustavo2358.analysis</groupId>
       <artifactId>cfg-kernel</artifactId>

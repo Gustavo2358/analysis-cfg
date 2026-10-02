@@ -1,5 +1,7 @@
 # Analysis CFG — consumer AIR
 
+[Artefatos `.json.zst`: uso, identidade e compatibilidade](docs/engineering/json-zstd.md).
+
 Dependency discovery defaults to [logical-only](docs/product/logical-text-w1.md): supported candidates plus explicit completeness. Physical/regional propagation is EXPERIMENTAL / NOT PRODUCTION QUALIFIED, opt-in only; automatic fallback is forbidden.
 
 Storage W6–W8 [historical tests and limits](docs/engineering/storage-w8-qualification.md) do not qualify the physical engine for the operational product path. Corporate W1 qualification and human review remain pending; no merge.
@@ -120,7 +122,7 @@ Após instalar o upstream pinado no repositório Maven isolado conforme a
 mvn -B -ntp package dependency:copy-dependencies -DincludeScope=runtime
 bash scripts/analysis-cfg \
   cfg-adapters/src/test/resources/air/goback.canonical.json \
-  /tmp/goback.cfg.json
+  /tmp/goback.cfg.json.zst
 ```
 
 A preparação copia as dependências runtime para target/dependency, sem fat JAR.
@@ -129,7 +131,7 @@ arquivo relativos são relativos ao caller. Java deve estar no PATH. Equivalente
 
 ```bash
 java -cp 'cfg-launcher/target/classes:cfg-launcher/target/dependency/*' \
-  io.github.gustavo2358.analysis.cfg.launcher.AnalysisCfg input.air.json output.cfg.json
+  io.github.gustavo2358.analysis.cfg.launcher.AnalysisCfg input.air.json.zst output.cfg.json.zst
 ```
 
 Dois argumentos posicionais, sem flags de policy. `run` é testável sem sair da JVM;
