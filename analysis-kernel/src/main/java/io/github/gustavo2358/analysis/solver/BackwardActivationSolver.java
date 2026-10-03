@@ -261,26 +261,41 @@ final class BackwardActivationSolver<S> {
         if(deferredCache.size()>1024)deferredCache.remove(deferredCache.keySet().iterator().next());
     }
     private final class Witness {
-        final Region region;final int condition;final Witness child;
-        Witness(Region region,int condition,Witness child){this.region=region;this.condition=condition;this.child=child;}
+        final Region region;final int condition;final Witness child;final boolean requiredSeen;
+        Witness(Region region,int condition,Witness child,boolean requiredSeen){this.region=region;this.condition=condition;this.child=child;this.requiredSeen=requiredSeen;}
+    }
+    private final Map<EntryRun,CallerWitnesses<Region>> finalWitnesses=new IdentityHashMap<>();
+    private CallerWitnesses<Region> finalWitnesses(EntryRun entry) {
+        var successors=new IdentityHashMap<Region,List<CallerWitnesses.Edge<Region>>>();
+        for(var child:entry.regions)for(var link:child.incoming.entrySet())
+            successors.computeIfAbsent(link.getKey().region,r->new ArrayList<>()).add(new CallerWitnesses.Edge<>(child,link.getValue()));
+        return new CallerWitnesses<>(entry.bdd,entry.model.control().variables(),entry.root,successors,r->r.frame==null?-1:r.frame.variable());
     }
     private boolean feasible(Region region,int condition) {return feasible(region,condition,null);}
     private boolean feasible(Region region,int condition,Slot subscriber) {
         if(condition==0)return false;var key=new Need(region,condition);var known=feasibleCache.get(key);if(known!=null)return known;
+        if(subscriber==null&&finalWitnesses.computeIfAbsent(region.entry,this::finalWitnesses).matches(region,condition))
+            {feasibleCache.put(key,true);return true;}
         var deferred=deferredCache.get(key);
         if(deferred!=null&&deferred.valid()){deferred.subscribe(subscriber);return false;}
 
         // First try a shortest caller path. Evaluating its concrete valuation
         // needs no BDD construction. Cyclic dispatchers usually have a short
         // witness even when saturation of all alternative predicates is costly.
-        if(subscriber!=null) {
+        {
             var seen=Collections.newSetFromMap(new IdentityHashMap<Region,Boolean>());
-            var coarse=new ArrayDeque<Witness>();coarse.add(new Witness(region,1,null));seen.add(region);Witness root=null;
+            int required=region.entry.bdd.requiredPresent(condition);
+            var visited=new HashSet<Need>();visited.add(new Need(region,required<0?1:0));
+            var coarse=new ArrayDeque<Witness>();coarse.add(new Witness(region,1,null,required<0));seen.add(region);Witness root=null;
             while(!coarse.isEmpty()) {
                 var current=coarse.removeFirst();
-                if(current.region.frame==null){root=current;break;}
-                for(var link:current.region.incoming.entrySet())if(seen.add(link.getKey().region))
-                    coarse.addLast(new Witness(link.getKey().region,link.getValue(),current));
+                if(current.region.frame==null&&current.requiredSeen){root=current;break;}
+                for(var link:current.region.incoming.entrySet()) {
+                    var parent=link.getKey().region;boolean requiredSeen=current.requiredSeen||parent.frame!=null&&parent.frame.variable()==required;
+                    if(visited.add(new Need(parent,requiredSeen?1:0))) {
+                        seen.add(parent);coarse.addLast(new Witness(parent,link.getValue(),current,requiredSeen));
+                    }
+                }
             }
             if(root==null){defer(key,seen,subscriber);return false;}
             var active=new BitSet();var path=root;boolean valid=true;

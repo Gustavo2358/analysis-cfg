@@ -134,6 +134,18 @@ class ActivationScaleTest {
         assertTrue(result.states(context,context.entryNode(),true).contains(true));
         assertTrue(result.metrics().analysisPoints()<6000,"tabulated points="+result.metrics().analysisPoints());
     }
+    @Test void hundredWayDispatchFinishesFinalQueriesInBothDirections() {
+        org.junit.jupiter.api.Assertions.assertTimeout(java.time.Duration.ofSeconds(30),()->{
+            for(var direction:Direction.values()) {
+                var session=dispatcher(100);var result=DataflowSolver.solve(session,reach(session,direction));
+                var context=session.contexts().iterator().next();
+                assertTrue(result.states(context,context.entryNode(),true).contains(true));
+                assertTrue(result.contains(context,session.index().sequence(label("done"))));
+                assertTrue(result.contains(context,session.index().sequence(label("rejected"))));
+                assertTrue(result.metrics().analysisPoints()<100000);
+            }
+        });
+    }
     @Test void acyclicCallDiamondsDoNotEnumerateCallStrings() {
         int n=14;var sequences=new ArrayList<Sequence>();
         for(int i=0;i<n;i++) {

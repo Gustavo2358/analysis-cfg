@@ -40,7 +40,7 @@ def source_calls(sp):
     return sorted((s for s in sp['statements'] if s['variant'] == 'CALL'), key=lambda s: s['header']['programPoint'])
 
 
-def oracle(name, sp, air, result):
+def oracle(name, sp, air, result, cfg):
     locked_sp(sp)
     p = air['publication']; unit = p['units'][0]
     operations = {op['header']['id']['localId']: op for seq in unit['sequences'] for op in seq['instructions'] + [seq['terminator']]}
@@ -57,6 +57,22 @@ def oracle(name, sp, air, result):
     def sequence(label):
         return sequences[json.dumps(label, sort_keys=True)]
     local_invokes = [o for o in operations.values() if o['kind'] == 'local.invoke']
+    activations = [o for o in local_invokes if 'reentryGuard' in o]
+    def body_frame(activation):
+        phase=sequence(activation['entry'])
+        require(not phase['instructions'] and phase['terminator']['kind']=='jump','activation body phase')
+        body=sequence(phase['terminator']['destination'])
+        require(not body['instructions'] and body['terminator']['kind']=='local.invoke','activation invokes its shared body')
+        completion=sequence(body['terminator']['resume'])
+        require(not completion['instructions'] and completion['terminator']['kind']=='local.resume','body completion returns through its activation')
+        return body['terminator']
+    def only_unreachable_guards():
+        from cfg_local_paths import Paths, vertex
+        reached=Paths(cfg).reachable([vertex(n['id']) for n in cfg['nodes'] if n['kind']=='ENTRY'])
+        vertices={json.dumps(dict(n['label'],domain='label'),sort_keys=True):vertex(n['id']) for n in cfg['nodes'] if 'label' in n}
+        guards={json.dumps(o['reentryGuard']['destination'],sort_keys=True) for o in activations}
+        opaque={k for k,s in sequences.items() if s['terminator']['kind']=='opaque'}
+        require(opaque<=guards and all(vertices[k] not in reached for k in opaque),'supported execution cannot reach an opaque operation; reentry guards remain explicit')
     by_op = {s['operation']['localId']: s for s in result['sites']}
     calls = source_calls(sp)
     # A contextual PERFORM may publish an inactive lexical shadow alongside the
@@ -114,9 +130,9 @@ def oracle(name, sp, air, result):
     if name == 'control-body':
         require(not inactive and len(sites) == 2, 'only the demanded body activation and resumed CALL are published')
         inner = operations[sites[1]['operation']['localId']]
-        require(len(local_invokes) == 1
-                and local_invokes[0]['entry'] == sites[1]['sequence']
-                and local_invokes[0]['resume'] == sites[0]['sequence'],
+        require(len(local_invokes) == 2 and len(activations)==1
+                and body_frame(activations[0])['entry'] == sites[1]['sequence']
+                and activations[0]['resume'] == sites[0]['sequence'],
                 'body invocation records exactly the caller continuation')
         outcomes = inner['outcomes']
         require(len(outcomes['known']) == 1 and outcomes['known'][0]['kind'] == 'normal'
@@ -178,12 +194,12 @@ def oracle(name, sp, air, result):
                     for support in producers)
                 and producers[0][0]['producer'] == producers[1][0]['producer'],
                 'the shared body assignment supports both fitted values')
-        require(len(local_invokes) == 2
-                and local_invokes[0]['entry'] == local_invokes[1]['entry']
-                and {json.dumps(o['resume'], sort_keys=True) for o in local_invokes}
+        require(len(local_invokes) == 4 and len(activations)==2
+                and body_frame(activations[0])['entry'] == body_frame(activations[1])['entry']
+                and {json.dumps(o['resume'], sort_keys=True) for o in activations}
                     == {json.dumps(site['sequence'], sort_keys=True) for site in sites},
                 'two caller frames share a body and retain distinct exact CALL continuations')
-        body = sequence(local_invokes[0]['entry'])
+        body = sequence(body_frame(activations[0])['entry'])
         require(len(body['instructions']) == 1
                 and body['instructions'][0]['header']['id'] == producers[0][0]['producer']
                 and body['terminator']['kind'] == 'jump',
@@ -191,11 +207,10 @@ def oracle(name, sp, air, result):
         completion = sequence(body['terminator']['destination'])
         require(not completion['instructions'] and completion['terminator']['kind'] == 'local.resume',
                 'the producer completes through the caller frame without a cross-return edge')
-        require(all(o['kind'] != 'opaque' for o in operations.values()),
-                'supported body and repeated activation have no opaque frontier')
+        only_unreachable_guards()
     precise = name.startswith('perform-') or name in ('if-nested', 'stress')
     if precise:
-        require(all(o['kind'] != 'opaque' for o in operations.values()), 'supported composition needs no fallback')
+        only_unreachable_guards()
     else:
         require(p['uncertainties'] if 'uncertainties' in p else False, 'partial source gaps retained')
     if name == 'stress':
@@ -228,12 +243,12 @@ def run(work, config_path):
             verify_cfg_wire(cfg.read_bytes())
             execute(cwd, 'dependency', ['java', '-cp', cp, 'io.github.gustavo2358.analysis.launcher.AnalysisDependencies', str(air_path), str(dep)])
             sp = json.loads(sp_path.read_text()); air = json.loads(air_path.read_text()); result = read(dep)
-            sites = oracle(name, sp, air, result)
+            sites = oracle(name, sp, air, result, json.loads(cfg.read_text()))
             if attempt == 'A':
                 shuffled = copy.deepcopy(air); shuffled['publication']['units'][0]['sequences'].reverse()
                 perm_air = cwd / 'permuted.air.json'; perm_air.write_text(json.dumps(shuffled)); perm_dep = cwd / 'permuted.dependencies.json'
                 execute(cwd, 'permuted', ['java', '-cp', cp, 'io.github.gustavo2358.analysis.launcher.AnalysisDependencies', str(perm_air), str(perm_dep)])
-                other = read(perm_dep); oracle(name, sp, shuffled, other)
+                other = read(perm_dep); oracle(name, sp, shuffled, other, json.loads(cfg.read_text()))
                 require(result['sites'] == other['sites'] and result['edges'] == other['edges'], 'physical array order cannot determine control')
             outputs.append([p.read_bytes() for p in (sp_path, air_path, cfg, dep)])
             print('PASS partial ' + name + ' ' + attempt + ': ' + repr([([c['referenceName'] for c in s['candidates']], s['modelValueRemainder']) for s in sites]), flush=True)

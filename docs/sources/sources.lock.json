@@ -340,7 +340,7 @@
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "LOCAL_VALIDATED / HUMAN_REVIEW_PENDING",
-    "commit": "cb1b87250f133535ab26a3056be0d6da144d81bf",
+    "commit": "6dae2889d74377f82857b38e19599429cd76ea93",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -353,7 +353,7 @@
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
     },
     "canonical_ref": "fix/compact-perform-contexts",
-    "observed_on": "2026-10-02",
+    "observed_on": "2026-10-03",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "fd_w1_validation": "docs/work/active/FD-W1.yaml",
@@ -384,7 +384,7 @@
       "producer_api": "io.github.gustavo2358.lower.adapters.cli.CobolDependencyInput",
       "schema_sha256": "5f751464dee36a993d9238a32e25d68d396ce8ca3fa2e0198f29b4e6a7f505c0"
     },
-    "evidence_level": "CICS/ESCAPE compact contexts: producer FAST and qualification-local passed; focal oracle equivalence, state and frame mutations passed. Current consumer qualification is recorded in the context-modes-fix evidence, not historical campaign entries.",
+    "evidence_level": "Unified PERFORM frames for published/historical/mixed policies, CICS/ESCAPE, inline and structural inputs. Lower and consumer FAST/full passed; 560 fresh pipeline runs and 560 final consumer reexecutions preserved all source dependencies with auditable correspondences. See docs/engineering/lower-unification.md.",
     "perform_completion": "Scoped exits, SECTION boundaries, typed VARYING levels; Integration authorized; qualified original 39/39 and adversaries 25/25. See docs/domain/perform-control-completion.md.",
     "logical_alias_move": "Logical family translation precedes scalar shortcuts; 14/14 adversaries, PERFORM 39/39, reviewed chaos 48/48 with six explicit abstraction-policy cases; see docs/product/logical-alias-move.md.",
     "synthetic_model_assumptions": {

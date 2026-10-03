@@ -6,3 +6,7 @@ scope:
   - analysis-dependencies preservation
   - synthetic scale and exact differential oracles
   - full source corpus E2E qualification
+  - bounded final feasibility witnesses and required-key caller paths
+  - unified lower pin and source-audited dependency preservation
+notes:
+  - Local FAST/full and 560-case corpus qualification passed; human review and merge pending.

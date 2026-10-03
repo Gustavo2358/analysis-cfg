@@ -49,6 +49,20 @@ class BooleanConditionsTest {
             b.discardAfter(checkpoint);assertEquals(checkpoint,b.size());
         }
     }
+    @Test void requiredPresentIsNecessaryForEverySatisfyingAssignment() {
+        var b=new BooleanConditions();int x=b.variable(0),y=b.variable(1),z=b.variable(2);
+        assertEquals(1,b.requiredPresent(b.and(b.not(x),y)));
+        assertEquals(-1,b.requiredPresent(b.or(x,y)));assertEquals(-1,b.requiredPresent(b.not(x)));
+        for(int table=0;table<256;table++) {
+            int formula=0;
+            for(int bits=0;bits<8;bits++)if((table&(1<<bits))!=0) {
+                int term=1;for(int key=0;key<3;key++)term=b.and(term,(bits&(1<<key))==0?b.not(b.variable(key)):b.variable(key));
+                formula=b.or(formula,term);
+            }
+            int required=b.requiredPresent(formula);
+            if(required>=0)for(int bits=0;bits<8;bits++)if((table&(1<<bits))!=0)assertTrue((bits&(1<<required))!=0);
+        }
+    }
     @Test void deepGuardConditionsDoNotUseTheJavaCallStack() {
         var b=new BooleanConditions();int all=1;
         for(int i=19999;i>=0;i--)all=b.node(i,0,all);

@@ -77,6 +77,16 @@ final class BooleanConditions {
         }
         return remember(root,variable,operation,memo.get(root));
     }
+    /** One necessarily present key from the forced prefix, or -1 if none exists. */
+    int requiredPresent(int value) {
+        while(value>=2) {
+            var node=nodes.get(value);
+            if(node.low==FALSE)return node.variable;
+            if(node.high!=FALSE)break;
+            value=node.low;
+        }
+        return -1;
+    }
     boolean test(int value,BitSet assignment) {
         while(value>=2){var n=nodes.get(value);value=assignment.get(n.variable)?n.high:n.low;}
         return value==TRUE;

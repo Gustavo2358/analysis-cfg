@@ -227,3 +227,45 @@ The workspace evidence is in `artefatos-e2e/dataflow-context-fix-20261003/`.
 `comparison-qualified.json` records each source identity and semantic comparison.
 The corporate program was unavailable. This is local qualification of the frozen
 corpus and synthetic cases, not a claim that the corporate program was executed.
+
+## Final feasibility queries after lower unification
+
+The 100-destination CICS fixture finished lowering but exceeded 90 seconds during
+`ActivationSolver.result`. Many final predicates asked whether an activation key
+could be present in an ancestor. A shortest caller path often omitted that key,
+so each observation repeated symbolic search over the same stabilized graph.
+Backward analysis had the same final-query path.
+
+`CallerWitnesses` records concrete active-key valuations reached from the Entry.
+An edge contributes a valuation only after its full predicate is true; the parent
+frame's key is then marked present. Each retained valuation adds a previously
+unwitnessed positive or negative literal in that region. With V guard variables,
+at most 2V+1 valuations survive per region. Every accepted valuation is a complete
+witness; their bits are never combined into an invented path. Positive and negative
+literal masks control cache admission only, and cannot answer a semantic query.
+The cache is built once after subscriptions stabilize. Transfer-time queries keep
+the existing invalidation and subscriptions.
+
+A cache hit proves existence by evaluating the entire requested predicate on one
+verified path. A miss continues through the shortest-path check and exact symbolic
+search. When the BDD's forced prefix requires an ancestor key to be present,
+the shortest-path search uses the product of the caller graph with a two-state
+monitor (key not yet seen / key seen). It visits at most 2R states and 2E edges;
+all edge predicates and the full query are still verified on the resulting path.
+This avoids repeatedly choosing a short path which cannot satisfy the query.
+No path through the product implies no feasible path, because that key is necessary.
+Other predicates continue through the exact search. It never proves absence or drops a context. This is bounded memoization;
+no threshold changes semantic results. Induction over accepted caller edges proves
+that every cached valuation is reachable. The independent finite bit-mask oracle
+checks this property on 80 cyclic graphs, including correlated keys. The full
+solver oracle compares exact IN/OUT roots in both directions.
+
+For R regions, E caller edges and V variables, cache construction processes at most
+(2V+1)E edge candidates. BDD evaluation and bit-set operations are polynomial in V;
+stored witnesses use O(R V²) bits. The exact fallback and abstract-domain fixed point
+retain their intrinsic worst-case complexity. This is not a claim that arbitrary
+Boolean predicates or user-supplied domains admit a universal polynomial bound.
+
+Qualification for the unified lower is recorded in
+[lower-unification.md](../engineering/lower-unification.md). Earlier qualification
+above remains evidence for its original producer and solver pins.

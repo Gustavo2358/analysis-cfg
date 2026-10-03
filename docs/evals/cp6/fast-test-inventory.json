@@ -461,7 +461,12 @@
       "operationsMatchIndependentTruthTablesAndCanonicalize",
       "computedTableCollisionsPreserveEveryTruthAssignment",
       "deepGuardConditionsDoNotUseTheJavaCallStack",
-      "scratchQueriesReleaseNodesWithoutReusingStaleComputedEntries"
+      "scratchQueriesReleaseNodesWithoutReusingStaleComputedEntries",
+      "requiredPresentIsNecessaryForEverySatisfyingAssignment"
+    ],
+    "io.github.gustavo2358.analysis.solver.CallerWitnessesTest": [
+      "separateWitnessesNeverInventACombinedCaller",
+      "cachedValuationsHaveExplicitPathsAndStayBoundedInCyclicGraphs"
     ]
   },
   "analysis-launcher": {

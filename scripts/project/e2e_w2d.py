@@ -132,6 +132,22 @@ def statement_operation(publication, operations, identity, kind):
                for o in i['outputs'] if o['domain'] == 'operation']
     require(len({o['localId'] for o in outputs}) == len(outputs), 'unique coverage outputs')
     linked = [operations[o['localId']] for o in outputs]
+    if kind == 'local.invoke':
+        principal = [r for r in linked if r[2]['kind']=='local.invoke' and 'reentryGuard' in r[2]]
+        require(len(principal)==1,'one guarded source activation')
+        seq, offset, op = principal[0]
+        labels={r[0]['label']['localId']:r for r in linked}
+        require(all(not r[0]['instructions'] and r[2] is r[0]['terminator'] for r in linked),'activation auxiliaries are empty control sequences')
+        require(bool(op['reentryGuard']['activationKey']),'activation guard key')
+        frontier=labels[op['reentryGuard']['destination']['localId']]
+        phase=labels[op['entry']['localId']]
+        require(frontier[2]['kind']=='opaque' and phase[2]['kind']=='jump','explicit reentry frontier and body phase')
+        body=labels[phase[2]['destination']['localId']]
+        require(body[2]['kind']=='local.invoke' and not body[2]['completionPorts'],'explicit body frame')
+        completion=labels[body[2]['resume']['localId']]
+        require(completion[2]['kind']=='local.resume','body returns to activation completion')
+        require(len(linked)==5 and {id(r) for r in linked}=={id(r) for r in (principal[0],frontier,phase,body,completion)},'exact activation control inventory')
+        return principal[0]
     principal = [record for record in linked if record[2]['kind'] == kind]
     require(len(principal) == 1, 'one typed source operation: ' + identity)
     seq, offset, op = principal[0]
