@@ -1,6 +1,6 @@
 id: WORK-CFG-DATAFLOW-CONTEXTS
 title: Tabulate local control and dataflow without enumerating call strings
-status: IN_PROGRESS
+status: DONE
 scope:
   - analysis-kernel contextual solver and reachability
   - analysis-dependencies preservation
@@ -9,4 +9,8 @@ scope:
   - bounded final feasibility witnesses and required-key caller paths
   - unified lower pin and source-audited dependency preservation
 notes:
-  - Local FAST/full and 560-case corpus qualification passed; human review and merge pending.
+  - Local FAST/full and 560-case corpus qualification passed; approved by the user and merged on 2026-10-03.
+  - Qualified and merge trees match exactly; immutable dependency pins preserved.
+  - Closeout and limits in docs/engineering/lower-unification.md.
+pr: https://github.com/Gustavo2358/analysis-cfg/pull/62
+merge_commit: 8103d945977a4a3b3a73808996264091641f705b

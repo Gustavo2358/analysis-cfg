@@ -453,5 +453,5 @@
     "physical": "EXPERIMENTAL_EXPLICIT_OPT_IN_ONLY",
     "report": "docs/campaigns/positive-memory-topology/W2-REPORT.md"
   },
-  "metadata_scope": "Active AIR/spec/lower pins are local compact-PERFORM checkpoints awaiting human merge review. Earlier named campaign evidence and review records remain historical."
+  "metadata_scope": "Active AIR/spec/lower pins are immutable qualified checkpoints integrated by analysis-ir #9, air-java #26 and cobol-lower #56 on 2026-10-03. Their commits are retained in main; pins need not equal later merge/documentation heads. See docs/engineering/lower-unification.md. Earlier named campaign evidence and review records remain historical."
 }
