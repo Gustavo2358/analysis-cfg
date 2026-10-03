@@ -1,6 +1,6 @@
 # Consumo do lower unificado
 
-Status: qualificado localmente; revisão humana e merge pendentes.
+Status: **DONE / MERGED** — aprovação do usuário e integração em 2026-10-03; ver fechamento abaixo.
 
 O produtor cobol-lower está fixado em `6dae2889d74377f82857b38e19599429cd76ea93`.
 O lower eliminou a expansão de cadeias em entradas históricas, CICS, ESCAPE,
@@ -57,6 +57,34 @@ registra hashes dos 154 arquivos de produção do consumidor. Experimentos e fal
 intermediárias são preservados separadamente, sem serem apresentados como PASS.
 
 O programa corporativo original não estava disponível. BDDs e domínios abstratos
-mantêm sua complexidade intrínseca; não há garantia polinomial universal. Não houve
-merge. AIR #26 e analysis-ir #9 continuam sendo pré-requisitos dos PRs lower #56 e
-CFG #62. O frontend permanece em `e6d1fa7f54bee07469bdb7ebd4a98701ca68419b`.
+mantêm sua complexidade intrínseca; não há garantia polinomial universal. AIR #26 e
+analysis-ir #9 foram integrados antes dos PRs lower #56 e CFG #62. O frontend
+permanece em `e6d1fa7f54bee07469bdb7ebd4a98701ca68419b`.
+
+
+## Fechamento aprovado — 2026-10-03
+
+O usuário aprovou o resultado e autorizou o fechamento documental e a integração.
+Os quatro PRs foram mergeados na ordem especificação → AIR → lower → CFG.
+
+| Repositório | PR | Merge |
+| --- | --- | --- |
+| analysis-ir | [9](https://github.com/Gustavo2358/analysis-ir/pull/9) | `fc229ef64eadf26c9ca093a544dad2928ae17dc2` |
+| air-java | [26](https://github.com/Gustavo2358/air-java/pull/26) | `7d77330099f46117281fdcbb08304e20d68f5672` |
+| cobol-lower | [56](https://github.com/Gustavo2358/cobol-lower/pull/56) | `d90fdcaf6a21fafb845dd36344ee216a616d4186` |
+| analysis-cfg | [62](https://github.com/Gustavo2358/analysis-cfg/pull/62) | `8103d945977a4a3b3a73808996264091641f705b` |
+
+O Git confirmou que a árvore completa de cada merge é idêntica à do head
+qualificado. Os pins imutáveis foram preservados e os commits fixados pertencem
+agora ao histórico de main. Não houve repin, alteração de código, fixture ou
+contrato neste fechamento. FAST/full e corpus citados acima são evidências
+reutilizadas dessa mesma produção; não são apresentados como novas execuções.
+As alterações de fechamento passam pelos checks documentais/FAST aplicáveis.
+
+O resultado elimina os mecanismos de expansão de cadeias reproduzidos e preserva
+as dependências do corpus qualificado. Permanecem 439 COMPLETE e 121 PARTIAL.
+A campanha não executou o programa corporativo indisponível nem comparou a cobertura
+com um scanner linear independente. Preservação do que já era encontrado não prova
+ausência de omissões preexistentes. Candidatos sustentados por evidência válida
+continuam sujeitos ao princípio de preservação de dependências; incerteza não
+justifica sua remoção. BDDs e estados abstratos mantêm os limites já documentados.

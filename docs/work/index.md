@@ -1,3 +1,5 @@
+[Tabulação de ativações e lower unificado — DONE / MERGED](../engineering/lower-unification.md#fechamento-aprovado--2026-10-03): CFG #62; 560 casos com correspondência auditável e sem diferenças inexplicadas.
+
 [Limpeza do snapshot de fontes](../engineering/source-snapshot.md): evidência bruta histórica preservada no Git; fixtures e baselines executáveis mantidos.
 
 [JSON Zstandard — fechamento aprovado](../engineering/json-zstd.md#qualificação-e-fechamento): PR #60; qualificação, compatibilidade e benchmark completo. O PR registra a integração.
