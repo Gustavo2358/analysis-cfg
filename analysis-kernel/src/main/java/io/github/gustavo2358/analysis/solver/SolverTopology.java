@@ -14,6 +14,7 @@ final class SolverTopology {
     final IdentityHashMap<ContextView, IdentityHashMap<ProgramIndex.Node, List<AnalysisPoint>>> lookup = new IdentityHashMap<>();
 
     SolverTopology(AnalysisSession session) {
+        if(session.hasLocalControl())throw new IllegalArgumentException("local control requires activation tabulation");
         List<AnalysisPoint> ps = new ArrayList<>();
         List<CfgTransition> es = new ArrayList<>();
         List<Integer> sources = new ArrayList<>(), targets = new ArrayList<>();

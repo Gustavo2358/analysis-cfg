@@ -1,0 +1,8 @@
+id: WORK-CFG-DATAFLOW-CONTEXTS
+title: Tabulate local control and dataflow without enumerating call strings
+status: IN_PROGRESS
+scope:
+  - analysis-kernel contextual solver and reachability
+  - analysis-dependencies preservation
+  - synthetic scale and exact differential oracles
+  - full source corpus E2E qualification

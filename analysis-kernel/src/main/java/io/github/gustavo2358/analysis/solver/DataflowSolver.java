@@ -19,8 +19,11 @@ public final class DataflowSolver {
     static <S> DataflowResult<S> solve(AnalysisSession session, AnalysisDefinition<S> definition,
                                      Function<SolverTopology, IntWorklist> schedule) {
         Objects.requireNonNull(session, "session"); Objects.requireNonNull(definition, "definition");
+        var direction=Objects.requireNonNull(definition.direction(), "direction");
+        if(session.hasLocalControl())return direction==Direction.FORWARD
+            ?new ActivationSolver<>(session,definition).solve():new BackwardActivationSolver<>(session,definition).solve();
         SolverTopology graph = new SolverTopology(session);
-        boolean forward = Objects.requireNonNull(definition.direction(), "direction") == Direction.FORWARD;
+        boolean forward = direction == Direction.FORWARD;
         DomainWork work = new DomainWork();
         Run<S> run = new Run<>(graph, definition, schedule.apply(graph), forward, work);
         for (var boundary : definition.boundaries(session)) {

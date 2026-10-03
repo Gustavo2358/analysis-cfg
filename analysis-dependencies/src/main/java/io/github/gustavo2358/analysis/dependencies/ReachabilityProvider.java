@@ -6,11 +6,11 @@ import io.github.gustavo2358.analysis.application.AnalysisProvider;
 import io.github.gustavo2358.analysis.cfg.domain.CfgNode;
 import io.github.gustavo2358.analysis.plan.*;
 import io.github.gustavo2358.analysis.query.*;
-import io.github.gustavo2358.analysis.solver.Direction;
+import io.github.gustavo2358.analysis.solver.*;
 import io.github.gustavo2358.analysis.structure.*;
 import java.util.*;
 
-/** Generic forward BFS over the existing contextual graph. Does not execute a values solver. */
+/** Structural reachability through the shared activation tabulator; no value-domain transfer. */
 public final class ReachabilityProvider implements AnalysisProvider<LabelId,ReachabilityProvider.Fact> {
     public record Fact(boolean reachable,boolean sourceUnknownRemainder,boolean controlUnknown) {
         public Fact(boolean reachable,boolean sourceUnknownRemainder){this(reachable,sourceUnknownRemainder,false);}
@@ -39,22 +39,31 @@ public final class ReachabilityProvider implements AnalysisProvider<LabelId,Reac
             public AnalysisKey key(){return key;}
             public AnalysisOutcome refusal(){return null;}
             public Run<LabelId,Fact> execute() {
-                Set<ContextView.Point> seen=new HashSet<>();
-                var pending=new ArrayDeque<ContextView.Point>();var labels=new HashSet<LabelId>();
-                var uncertain=new HashSet<ContextView.Point>();var openLabels=new HashSet<LabelId>();
-                seen.add(context.initialPoint());pending.add(context.initialPoint());long edges=0;
-                while(!pending.isEmpty()) {
-                    var point=pending.removeFirst();var node=point.node();if(node.source() instanceof CfgNode.SequenceNode sequence)labels.add(sequence.source().label());
-                    var cursor=context.successors(point);
-                    while(cursor.advance()){
-                        edges=Math.incrementExact(edges);boolean newOpen=false;
-                        if(uncertain.contains(point)||node.source() instanceof CfgNode.SequenceNode region && region.source().terminator() instanceof Operations.Opaque opaque && opaque.envelope().control().remainder() instanceof Scopes.WithinControl||cursor.transition().kind()==io.github.gustavo2358.analysis.cfg.domain.CfgTransition.Kind.OPAQUE_UNKNOWN)newOpen=uncertain.add(cursor.target());
-                        if(seen.add(cursor.target())||newOpen)pending.addLast(cursor.target());
+                var selected=session.selectEntries(List.of(key.entry()));
+                var selectedContext=selected.context(key.entry());
+                var definition=new AnalysisDefinition<Integer>() {
+                    public Direction direction(){return Direction.FORWARD;}
+                    public Integer bottom(){return 0;}
+                    public Iterable<Boundary<Integer>> boundaries(AnalysisSession ignored){return List.of(new Boundary<>(selectedContext,selectedContext.entryNode(),1));}
+                    public Join<Integer> joinInto(Integer a,Integer b,DomainWork work){int union=a|b;return new Join<>(union,union!=a);}
+                    public boolean equivalent(Integer a,Integer b,DomainWork work){return a.equals(b);}
+                    public Integer transferBlock(AnalysisPoint point,Integer state,DomainWork work){return state;}
+                    public Integer transferEdge(AnalysisPoint point,io.github.gustavo2358.analysis.cfg.domain.CfgTransition edge,Integer state,DomainWork work) {
+                        if(state==0)return 0;
+                        boolean unknown=point.node().source() instanceof CfgNode.SequenceNode sequence
+                            && sequence.source().terminator() instanceof Operations.Opaque opaque
+                            && opaque.envelope().control().remainder() instanceof Scopes.WithinControl
+                            ||edge.kind()==io.github.gustavo2358.analysis.cfg.domain.CfgTransition.Kind.OPAQUE_UNKNOWN;
+                        return unknown?state|2:state;
                     }
+                };
+                var solved=DataflowSolver.solve(selected,definition);
+                var reached=new HashSet<LabelId>();var openLabels=new HashSet<LabelId>();
+                for(var sequence:unit.sequences())for(int state:solved.states(selectedContext,session.index().sequence(sequence.label()),true)) {
+                    if((state&1)!=0)reached.add(sequence.label());
+                    if((state&2)!=0)openLabels.add(sequence.label());
                 }
-                for(var point:uncertain)if(point.node().source() instanceof CfgNode.SequenceNode sequence)openLabels.add(sequence.source().label());
-                var reached=Set.copyOf(labels);
-                var outcome=new AnalysisOutcome(key,AnalysisOutcome.Status.STABLE,null,Map.of("nodesVisited",(long)seen.size(),"edgesVisited",edges,"reachabilityRuns",1L));
+                var outcome=new AnalysisOutcome(key,AnalysisOutcome.Status.STABLE,null,Map.of("nodesVisited",solved.metrics().analysisPoints(),"edgesVisited",solved.metrics().contextualEdges(),"reachabilityRuns",1L));
                 return new Run<>() {
                     public AnalysisOutcome outcome(){return outcome;}
                     public Materialized<LabelId,Fact> observe(List<PointQuery<LabelId>> queries) {

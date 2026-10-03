@@ -437,6 +437,31 @@
       "missingKeyDoesNotSearchBelowTheTopOrUseOrdinaryResume",
       "unwindAllDiscardsEveryGuardAndWorksAtEmptyStack",
       "selectedReturnsPreserveValuesWithoutOrdinaryBypass"
+    ],
+    "io.github.gustavo2358.analysis.structure.ActivationBoundaryTest": [
+      "arbitraryUniqueBoundariesMatchConcreteStacksInBothDirections",
+      "differentStacksWithIdenticalGuardSetsStillRejectAmbiguousBoundary",
+      "unguardedRecursionIsRefusedInBothDirections",
+      "aSingleConcreteContextDoesNotExposeObsoleteInputVersions"
+    ],
+    "io.github.gustavo2358.analysis.structure.ActivationOracleTest": [
+      "generatedGuardsPortsRoutesAndUnwindsMatchExplicitStacks"
+    ],
+    "io.github.gustavo2358.analysis.structure.ActivationScaleTest": [
+      "cyclicDispatchDoesNotEnumeratePermutations",
+      "acyclicCallDiamondsDoNotEnumerateCallStrings",
+      "backwardDispatchUsesContinuationValuesWithoutEnumeratingStacks",
+      "impossibleAncestorGuardsCannotMultiplyValueSummaries",
+      "infeasibleGuardedCyclesCannotEnumerateChangingInputs",
+      "infeasibleOrdinaryCyclesDoNotTransferValues",
+      "infeasibleOrdinaryEdgeCyclesDoNotTransferValues",
+      "localControlRejectsMissingAnalysisDirection"
+    ],
+    "io.github.gustavo2358.analysis.solver.BooleanConditionsTest": [
+      "operationsMatchIndependentTruthTablesAndCanonicalize",
+      "computedTableCollisionsPreserveEveryTruthAssignment",
+      "deepGuardConditionsDoNotUseTheJavaCallStack",
+      "scratchQueriesReleaseNodesWithoutReusingStaleComputedEntries"
     ]
   },
   "analysis-launcher": {
