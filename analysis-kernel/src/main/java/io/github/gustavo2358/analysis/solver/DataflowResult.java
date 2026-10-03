@@ -10,7 +10,10 @@ public final class DataflowResult<S> {
     private final Object[] in, out;
     private final SolverMetrics metrics;
     DataflowResult(SolverTopology topology, Object[] in, Object[] out, SolverMetrics metrics) {
-        this.lookup = topology.lookup; this.in = in; this.out = out; this.metrics = metrics;
+        this(topology.lookup,in,out,metrics);
+    }
+    DataflowResult(IdentityHashMap<ContextView,IdentityHashMap<ProgramIndex.Node,List<AnalysisPoint>>> lookup,Object[] in,Object[] out,SolverMetrics metrics) {
+        this.lookup=lookup;this.in=in;this.out=out;this.metrics=metrics;
     }
     public enum Status { STABLE }
     public Status status() { return Status.STABLE; }

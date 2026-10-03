@@ -10,6 +10,9 @@ import java.util.Objects;
  * Fixed configuration for a solve. Join must be associative, commutative, idempotent and an
  * upper bound; equivalence must agree with its order. Both transfers must be monotone.
  * The domain must have finite height or an explicitly justified convergence guarantee.
+ * Local activation tabulation requires finitely many reachable input values (finite height
+ * alone is insufficient) and transfers that depend on node/Entry and state, not a concrete
+ * traversal stack or point identity. A summarized point has no concrete traversal handle.
  * Graph, boundaries and semantic configuration cannot change during execution.
  *
  * All returned states are non-null, isolated roots: callbacks must never mutate any supplied

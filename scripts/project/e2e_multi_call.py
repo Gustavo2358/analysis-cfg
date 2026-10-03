@@ -73,13 +73,13 @@ def air_oracle(air, sp, semantic):
             operations[key] = seq, offset, op
     links = {}
     for ident, fact in facts.items():
-        kind = {'MOVE': 'assign', 'CALL': 'invoke', 'IF': 'branch', 'PERFORM': 'jump', 'GOBACK': 'return'}[fact['variant']]
+        kind = {'MOVE': 'assign', 'CALL': 'invoke', 'IF': 'branch', 'PERFORM': 'local.invoke', 'GOBACK': 'return'}[fact['variant']]
         links[ident] = statement_operation(p, operations, ident, kind)
     entry = sp['entryInventory']['entries'][0]['start']['statement']
     require(unit['entries'][0]['initialLabel'] == links[entry][0]['label'], 'explicit entry preserved')
     for ident, fact in facts.items():
         seq, offset, op = links[ident]; kind = fact['variant']
-        require(op['kind'] == {'MOVE': 'assign', 'CALL': 'invoke', 'IF': 'branch', 'PERFORM': 'jump', 'GOBACK': 'return'}[kind], 'existing AIR operation per typed statement')
+        require(op['kind'] == {'MOVE': 'assign', 'CALL': 'invoke', 'IF': 'branch', 'PERFORM': 'local.invoke', 'GOBACK': 'return'}[kind], 'existing AIR operation per typed statement')
         if kind == 'MOVE':
             next_id = fact['normalContinuation']['statement']
             if next_id is None:
@@ -93,8 +93,8 @@ def air_oracle(air, sp, semantic):
                 if fact['normalContinuation']['statement'] is None:
                     completion=labels[seq['terminator']['destination']['localId']]
                     require(not completion['instructions'] and completion['terminator']['kind']=='local.resume','body MOVE completes through matched return')
-                    wrapper=labels[links[owner['header']['id']][2]['destination']['localId']]
-                    require(wrapper['terminator']['resume']==target_seq['label'],'MOVE returns to its actual caller')
+                    activation=links[owner['header']['id']][2]
+                    require(activation['resume']==target_seq['label'],'MOVE returns through its activation to its actual caller')
                 else:require(seq['terminator']['destination']==target_seq['label'],'MOVE arm explicit completion')
         elif kind == 'CALL':
             require(offset == len(seq['instructions']) and op is seq['terminator'], 'one Invoke terminates each CALL sequence')
@@ -105,9 +105,11 @@ def air_oracle(air, sp, semantic):
                 require(op[destination] == links[entry][0]['label'], 'independent IF arm destination')
         elif kind == 'PERFORM':
             body = links[fact['targetEntry']][0]
-            wrapper=labels[op['destination']['localId']]
-            require(not wrapper['instructions'] and wrapper['terminator']['kind']=='local.invoke' and wrapper['terminator']['entry']==body['label'],'PERFORM enters target through a local frame')
-            require(wrapper['terminator']['resume']==links[fact['normalContinuation']['statement']][0]['label'],'PERFORM exact caller continuation')
+            phase=labels[op['entry']['localId']]
+            wrapper=labels[phase['terminator']['destination']['localId']]
+            require(not wrapper['instructions'] and wrapper['terminator']['kind']=='local.invoke' and wrapper['terminator']['entry']==body['label'],'PERFORM enters target through its body frame')
+            require(labels[wrapper['terminator']['resume']['localId']]['terminator']['kind']=='local.resume','body completion pops the activation')
+            require(op['resume']==links[fact['normalContinuation']['statement']][0]['label'],'PERFORM exact caller continuation')
             require(all(links[s][2]['kind'] == 'assign' for s in fact['targetStatements']), 'entire target body represented')
             body = links[fact['targetExit']][0]
             require(body['terminator']['kind']=='jump' and labels[body['terminator']['destination']['localId']]['terminator']['kind']=='local.resume','PERFORM completes by popping its frame')

@@ -24,6 +24,7 @@ public final class AnalysisSession {
             if ((status == Status.ACCEPTED) != session.isPresent()) throw new IllegalArgumentException("admission/session mismatch");
         }
     }
+    public boolean hasLocalControl() { return !index.localRules.isEmpty(); }
     public ProgramIndex index() { return index; }
     /** Null means this Entry was not selected. Selection order is retained; duplicate selections share a view. */
     public ContextView context(EntryId entry) { return contexts.get(entry); }

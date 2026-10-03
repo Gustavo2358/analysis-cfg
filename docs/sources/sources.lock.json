@@ -3,15 +3,16 @@
   "observed_on": "2026-10-01",
   "analysis_ir": {
     "repository": "Gustavo2358/analysis-ir",
-    "commit": "2c7f31f19efbe3211a2aea5bbda90173a9666fe2",
+    "commit": "f8c723e5f023cde92a6f4650e3be9334ebbaba1a",
     "semantic_version": "2.0.0",
     "role": "normative",
-    "canonical_ref": "main",
+    "canonical_ref": "fix/compact-perform-contexts",
     "upstream_review": {
       "pull_request": 8,
       "state": "merged",
       "draft": false,
-      "head_commit": "b628e4c1a62de61a157cac85ae71ba4cd111052e"
+      "head_commit": "b628e4c1a62de61a157cac85ae71ba4cd111052e",
+      "scope": "Historical merged baseline; current commit still requires human review."
     },
     "json_binding": {
       "owner": "Gustavo2358/analysis-ir",
@@ -36,7 +37,7 @@
       },
       {
         "path": "bindings/json-v1.md",
-        "git_blob_sha1": "7747afbb32931c6445f9174c20d11fb1b36b6d7a"
+        "git_blob_sha1": "71f53edad6b97d85b00bc153a8ba4718999c3760"
       },
       {
         "path": "bindings/revisao-json-v1.md",
@@ -48,7 +49,7 @@
       },
       {
         "path": "conformidade/02-oraculos.md",
-        "git_blob_sha1": "463c1ff8c2ae671d8103e0cb69efe7e91301dc53"
+        "git_blob_sha1": "0c14b1b7aecdec51bdbea9aa6ee418afdcf9d266"
       },
       {
         "path": "especificacao/00-escopo-e-convencoes.md",
@@ -72,7 +73,7 @@
       },
       {
         "path": "especificacao/05-controle-e-invocacoes.md",
-        "git_blob_sha1": "cf0a3e73555e4f0655f53b31497bfdce13f96169"
+        "git_blob_sha1": "69dec37c1399a5794b872475bb4b77499663fa08"
       },
       {
         "path": "especificacao/06-incompletude-e-proveniencia.md",
@@ -88,7 +89,7 @@
       },
       {
         "path": "especificacao/09-extensibilidade-e-compatibilidade.md",
-        "git_blob_sha1": "4660faa82ad8cc84636e130f18207313da47b66a"
+        "git_blob_sha1": "c20e01a2ce65ab56c379d2664f9b366d76bcff2f"
       },
       {
         "path": "especificacao/10-perfis-de-conformidade.md",
@@ -136,18 +137,20 @@
       }
     ],
     "baseline_assessment": "FD-W1 resource.bindings@1 after model loss proof; AIR2.0.0/binding1.0.0.",
-    "observed_on": "2026-09-26",
-    "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable."
+    "observed_on": "2026-10-02",
+    "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
+    "evidence_level": "Selected local returns and complete unwind: local checkpoint; AIR FAST and qualification passed. Human merge review pending.",
+    "status": "LOCAL_VALIDATED / HUMAN_REVIEW_PENDING"
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "6c4a6eb225fb4bb4fdc5871bc5232f03387ef099",
-    "canonical_ref": "main",
+    "commit": "851931b68f420cba09fdcaca1cbdebffeba7189a",
+    "canonical_ref": "fix/compact-perform-contexts",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
     "analysis_ir": {
       "semantic_version": "2.0.0",
-      "commit": "2c7f31f19efbe3211a2aea5bbda90173a9666fe2"
+      "commit": "f8c723e5f023cde92a6f4650e3be9334ebbaba1a"
     },
     "maven": {
       "group_id": "io.github.gustavo2358",
@@ -189,7 +192,7 @@
       "air-model/src/main/java/io/github/gustavo2358/air/model/MemoryCodecs.java",
       "air-json/src/test/resources/regional.canonical.json"
     ],
-    "observed_on": "2026-10-01",
+    "observed_on": "2026-10-02",
     "modules": {
       "parent": {
         "path": "pom.xml",
@@ -211,8 +214,8 @@
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "logical_text_w2": "Local producer FAST PASS; fixed logical ranges and expression transport. Selected source E2E qualification in docs/product/logical-text-w2.md.",
-    "evidence_level": "AIR #23/#24/#25 merged. Product/test/build sources equal qualified 13518a709908eb3824ccd83d5c52d26cf83c1aac; checked APIs, UTF-8 codec, prior 560-case preservation and Fast evidence retained. Exact merged source SHA, AIR 2.0/JSON 1.0 unchanged.",
-    "status": "DONE / MERGED; existing PARTIAL and runtime limits preserved"
+    "evidence_level": "Selected local returns and complete unwind: local checkpoint; AIR FAST and qualification passed. Human merge review pending.",
+    "status": "LOCAL_VALIDATED / HUMAN_REVIEW_PENDING"
   },
   "proleap_poc": {
     "repository": "Gustavo2358/proleap-poc",
@@ -336,8 +339,8 @@
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
-    "status": "DONE / MERGED; existing PARTIAL and runtime limits preserved",
-    "commit": "4d7c7f29ae3c0824402f8fa18f32a3f36bd43101",
+    "status": "LOCAL_VALIDATED / HUMAN_REVIEW_PENDING",
+    "commit": "6dae2889d74377f82857b38e19599429cd76ea93",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -349,8 +352,8 @@
     "goto_validation": {
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
     },
-    "canonical_ref": "main",
-    "observed_on": "2026-10-01",
+    "canonical_ref": "fix/compact-perform-contexts",
+    "observed_on": "2026-10-03",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "fd_w1_validation": "docs/work/active/FD-W1.yaml",
@@ -381,7 +384,7 @@
       "producer_api": "io.github.gustavo2358.lower.adapters.cli.CobolDependencyInput",
       "schema_sha256": "5f751464dee36a993d9238a32e25d68d396ce8ca3fa2e0198f29b4e6a7f505c0"
     },
-    "evidence_level": "JSON Zstandard qualification: fixed FAST, 14 integrated cases, 12 adversarial/auxiliary CLI checks and 73 CardDemo variants twice per format. Logical products preserved; PARTIAL and runtime limits remain. See docs/engineering/json-zstd.md. Earlier named campaign evidence remains historical.",
+    "evidence_level": "Unified PERFORM frames for published/historical/mixed policies, CICS/ESCAPE, inline and structural inputs. Lower and consumer FAST/full passed; 560 fresh pipeline runs and 560 final consumer reexecutions preserved all source dependencies with auditable correspondences. See docs/engineering/lower-unification.md.",
     "perform_completion": "Scoped exits, SECTION boundaries, typed VARYING levels; Integration authorized; qualified original 39/39 and adversaries 25/25. See docs/domain/perform-control-completion.md.",
     "logical_alias_move": "Logical family translation precedes scalar shortcuts; 14/14 adversaries, PERFORM 39/39, reviewed chaos 48/48 with six explicit abstraction-policy cases; see docs/product/logical-alias-move.md.",
     "synthetic_model_assumptions": {
@@ -450,5 +453,5 @@
     "physical": "EXPERIMENTAL_EXPLICIT_OPT_IN_ONLY",
     "report": "docs/campaigns/positive-memory-topology/W2-REPORT.md"
   },
-  "metadata_scope": "Current producer commits are immutable JSON Zstandard qualification pins, integrated in frontend #80 and lower #54 in producer-first order. They need not equal the later documentation/merge HEAD. Earlier named campaigns, file URLs and reference snapshots remain historical. See docs/engineering/json-zstd.md."
+  "metadata_scope": "Active AIR/spec/lower pins are local compact-PERFORM checkpoints awaiting human merge review. Earlier named campaign evidence and review records remain historical."
 }

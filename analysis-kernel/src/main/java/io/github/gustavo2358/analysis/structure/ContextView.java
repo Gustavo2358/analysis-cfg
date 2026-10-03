@@ -69,6 +69,12 @@ public final class ContextView {
         public CfgTransition transition(){if(transition==null)throw new NoSuchElementException();return transition;}
     }
 
+    /** Ordinary edges for the activation tabulator; local rules are handled separately. */
+    EdgeCursor ordinarySuccessors(ProgramIndex.Node node) {
+        if(index.localRules.containsKey(node.source().id()))throw new IllegalArgumentException("local rule has no ordinary successors");
+        return cursor(node,true);
+    }
+
     private EdgeCursor cursor(ProgramIndex.Node node, boolean forward) {
         Objects.requireNonNull(node, "node");
         if (node.identity != index.identity) throw new IllegalArgumentException("node from another index");

@@ -158,9 +158,10 @@ EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/LocalControlRules.java"] = {
     "io.github.gustavo2358.air.model.Ids.LabelId", "io.github.gustavo2358.air.model.Ids.CompletionPortId",
     "java.math.BigInteger", "java.util.Collections", "java.util.HashMap", "java.util.LinkedHashMap",
     "java.util.List", "java.util.Map", "java.util.Objects",
+    "java.util.Optional",
 }
 CFG_CLASS_NAMES = {
-    "LocalControlRules", "LocalControlRules$Rule", "LocalControlRules$Invoke", "LocalControlRules$Boundary",
+    "LocalControlRules", "LocalControlRules$ReentryGuard", "LocalControlRules$Rule", "LocalControlRules$Invoke", "LocalControlRules$Boundary",
     "LocalControlRules$Resume", "LocalControlRules$Unwind", "LocalControlRules$Stack", "LocalControlRules$Step", "LocalControlRules$RecursiveActivation",
     "CfgNodeId", "CfgNode", "CfgNode$EntryNode", "CfgNode$SequenceNode", "CfgNode$NormalExit", "CfgNode$HaltExit", "CfgNode$OutcomeExit",
     "CfgTransition", "CfgTransition$Kind", "CfgGraph", "CfgGraph$1",
@@ -223,6 +224,8 @@ ALLOWED_OPERATION_TYPES = {
     "io.github.gustavo2358.air.model.Operations$LocalResume",
     "io.github.gustavo2358.air.model.Operations$LocalBoundary",
     "io.github.gustavo2358.air.model.Operations$LocalInvoke",
+        "io.github.gustavo2358.air.model.Operations$ResumeRoute",
+    "io.github.gustavo2358.air.model.Operations$ReentryGuard",
     "io.github.gustavo2358.air.model.Operations$Invoke",
     "io.github.gustavo2358.air.model.Operations$Opaque",
     "io.github.gustavo2358.air.model.Operations$Return",

@@ -30,3 +30,33 @@ A representação do grafo admite regras recursivas; o perfil atual de travessia
 solver recusa repetição de invocação simultaneamente ativa. O writer não certifica
 terminação do programa ou completude da análise. Inventários PARTIAL e controle
 aberto conservam suas qualificações.
+
+## CFG JSON 6.0.0: guarda explícita
+
+Somente produtos que contêm guardas usam 6.0.0. LOCAL_INVOKE admite então o
+campo `reentryGuard: {activationKey: string, destination: CfgNodeId}`. A chave
+não vazia é comparada exatamente no escopo publication/Unit da operation.
+Se estiver presente em qualquer frame pendente, seguir destination mantendo
+a pilha; caso contrário, empilhar com a chave e seguir entry. Destino é uma
+Sequence da mesma Unit. Pop e unwind removem a chave com o frame. Invocações
+sem guarda preservam sua regra e continuam sujeitas ao limite de recursão do
+solver existente. Guardas não autorizam achatar retornos ou enumerar todas as
+pilhas em tamanho polinomial. A representação do CFG continua compacta.
+
+## CFG JSON 7.0.0: rotas e abandono completo
+
+Produtos que usam ao menos uma das formas abaixo exigem 7.0.0. Sem elas, a seleção
+de versões 1–6 permanece igual. Campos opcionais ausentes conservam a semântica
+anterior; versões anteriores rejeitam os campos novos.
+
+- LOCAL_INVOKE admite `resumeRoutes: [{key: string, destination: CfgNodeId}]`.
+  Chaves não vazias são únicas por regra; destinos pertencem à mesma Unit.
+- LOCAL_RESUME admite `resumeKey: string`. Seleciona a rota do topo, desempilha
+  e segue o destino. Chave ausente ou pilha vazia seguem `invalidExit`.
+- LOCAL_UNWIND admite `all: true`, somente com `count: "0"`. Remove todos os
+  frames e segue `destination`; pilha vazia também é válida.
+
+Writer omite lista vazia, chave ausente e all=false. Rotas são ordenadas por chave
+para publicação determinística. O oracle de wire verifica forma, fechamento,
+versão mínima e unicidade. O interpretador independente conserva rotas em cada
+frame; não mistura destinos entre invocações.

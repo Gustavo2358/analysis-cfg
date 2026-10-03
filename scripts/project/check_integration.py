@@ -14,7 +14,7 @@ from check_architecture import GateFailure, GateConfigurationError, command_path
 SUITES = {
     "cfg-adapters": {
         "io.github.gustavo2358.analysis.cfg.adapters.ZstdCfgTest": {"realAirToCfgPreservesCanonicalBytesAndRejectsBrokenFrames"},
-        "io.github.gustavo2358.analysis.cfg.adapters.LocalControlWireTest": {"symbolicRulesRequireV5AndKeepOperationIdentity"},
+        "io.github.gustavo2358.analysis.cfg.adapters.LocalControlWireTest": {"symbolicRulesRequireV5AndKeepOperationIdentity","guardedRulesRequireV6AndKeepGuardIdentity","selectedReturnsAndUnwindAllRequireV7"},
         "io.github.gustavo2358.analysis.cfg.adapters.W1dInvokeWireTest": {
             "realInvokeRetainsDistinctTerminatorAndTransitionInExistingCfgWire",
             "historicalGoldensRemainExactlyV1",

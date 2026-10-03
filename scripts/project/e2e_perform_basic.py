@@ -57,22 +57,30 @@ def air_oracle(air, semantic, case, source):
     require(air['airVersion'] == '2.0.0' and air['bindingVersion'] == '1.0.0', 'unchanged AIR contracts')
     p = air['publication']; require(len(p['units']) == 1, 'one unit')
     unit = p['units'][0]; seq = unit['sequences']
-    require(len(seq)==len(source_body)+5+(case=='overwrite'),'source sequences plus one local invocation and one resume')
+    require(len(seq)==len(source_body)+8+(case=='overwrite'),'source sequences plus guarded activation, body frame, two resumes and reentry frontier')
     labels={s['label']['localId']:s for s in seq}
     main=labels[unit['entries'][0]['initialLabel']['localId']]
     if case=='overwrite':
         require(len(main['instructions'])==1 and literal_text(main['instructions'][0]['value']) == 'OLDPROG ','old value precedes activation')
         main=labels[main['terminator']['destination']['localId']]
-    require(not main['instructions'] and main['terminator']['kind']=='jump','PERFORM is an explicit Jump')
-    wrapper=labels[main['terminator']['destination']['localId']]
-    require(not wrapper['instructions'] and wrapper['terminator']['kind']=='local.invoke','PERFORM pushes an explicit frame')
+    wrapper=main
+    require(not wrapper['instructions'] and wrapper['terminator']['kind']=='local.invoke','PERFORM pushes its activation frame')
+    guard=wrapper['terminator']['reentryGuard']
+    frontier=labels[guard['destination']['localId']]
+    require(bool(guard['activationKey']) and not frontier['instructions'] and frontier['terminator']['kind']=='opaque','reentry has an explicit opaque frontier')
     require(not wrapper['terminator']['completionPorts'],'isolated body uses explicit resume')
-    target=labels[wrapper['terminator']['entry']['localId']]; current=target; assigns=[]
+    phase=labels[wrapper['terminator']['entry']['localId']]
+    require(not phase['instructions'] and phase['terminator']['kind']=='jump','activation enters its published body phase')
+    body_frame=labels[phase['terminator']['destination']['localId']]
+    require(not body_frame['instructions'] and body_frame['terminator']['kind']=='local.invoke' and not body_frame['terminator']['completionPorts'],'body pushes its own return frame')
+    target=labels[body_frame['terminator']['entry']['localId']]; current=target; assigns=[]
     for fact in source_body:
         require(len(current['instructions'])==1 and current['terminator']['kind']=='jump','each intrinsic body MOVE has a precise continuation')
         assigns.extend(current['instructions']); last=current; current=labels[current['terminator']['destination']['localId']]
     require(not current['instructions'] and current['terminator']['kind']=='local.resume','body completion pops its caller frame')
-    require(sum(s['terminator']['kind']=='local.invoke' for s in seq)==1 and sum(s['terminator']['kind']=='local.resume' for s in seq)==1,'exact local control inventory')
+    activation_resume=labels[body_frame['terminator']['resume']['localId']]
+    require(not activation_resume['instructions'] and activation_resume['terminator']['kind']=='local.resume','body returns to activation completion, which pops the original caller frame')
+    require(sum(s['terminator']['kind']=='local.invoke' for s in seq)==2 and sum(s['terminator']['kind']=='local.resume' for s in seq)==2,'exact activation/body control inventory')
     call=labels[wrapper['terminator']['resume']['localId']]
     require(call['terminator']['kind']=='invoke' and not call['instructions'],'activation resumes at CALL')
     returns=[s for s in seq if s['terminator']['kind']=='return'];require(len(returns)==1,'GOBACK Return')

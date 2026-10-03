@@ -1,6 +1,8 @@
 package io.github.gustavo2358.analysis.cfg.adapters;
 
 import io.github.gustavo2358.air.json.AirJson;
+import io.github.gustavo2358.air.model.*;
+import java.util.*;
 import io.github.gustavo2358.analysis.cfg.application.*;
 import io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry;
 import java.nio.charset.StandardCharsets;
@@ -9,6 +11,48 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 final class LocalControlWireTest {
+    @Test void guardedRulesRequireV6AndKeepGuardIdentity() throws Exception {
+        var codec=new AirJson();var base=codec.decode(getClass().getResourceAsStream("/air/local-control.canonical.json").readAllBytes());
+        var unit=base.units().getFirst();var sequences=new ArrayList<>(unit.sequences());var first=sequences.getFirst();
+        var call=(Operations.LocalInvoke)first.terminator();
+        sequences.set(0,new Sequence(first.label(),first.instructions(),new Operations.LocalInvoke(call.header(),call.entry(),call.completionPorts(),call.resume(),call.fallback(),
+            Optional.of(new Operations.ReentryGuard("same-binding/α",call.resume()))),first.origin()));
+        var changed=new Unit(unit.id(),unit.containingUnit(),unit.objects(),unit.visibleObjects(),unit.entries(),sequences,unit.completionPorts(),unit.body(),unit.bodyUnavailable(),unit.coverage(),unit.origin());
+        var caps=List.of(Capabilities.LOCAL_CONTROL,Capabilities.LOCAL_REENTRY_GUARD);
+        var p=new Publication(base.id(),base.airVersion(),new Capabilities.Manifest(caps,caps),base.artifacts(),List.of(changed),base.storage(),base.resources(),base.artifactRelations(),base.origins(),base.coverage(),base.uncertainties(),base.premises());
+        assertEquals(p,codec.decode(codec.encode(p)));
+        var result=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).build(p,BuildOptions.defaults());
+        assertEquals(CfgBuildResult.Status.CFG_BUILT,result.status());
+        var bytes=new CfgJsonWriter().encode(result);var json=new String(bytes,StandardCharsets.UTF_8);
+        assertTrue(json.contains("\"schemaVersion\":\"6.0.0\""));
+        assertTrue(json.contains("\"activationKey\":\"same-binding/α\""));
+        assertArrayEquals(bytes,new CfgJsonWriter().encode(result));
+        Files.createDirectories(Path.of("target/local-control-wire"));Files.write(Path.of("target/local-control-wire/guarded-cfg.json"),bytes);
+    }
+    @Test void selectedReturnsAndUnwindAllRequireV7() throws Exception {
+        var codec=new AirJson();var base=codec.decode(getClass().getResourceAsStream("/air/local-control.canonical.json").readAllBytes());
+        var unit=base.units().getFirst();var sequences=new ArrayList<>(unit.sequences());var first=sequences.getFirst();
+        var call=(Operations.LocalInvoke)first.terminator();
+        sequences.set(0,new Sequence(first.label(),first.instructions(),new Operations.LocalInvoke(call.header(),call.entry(),call.completionPorts(),call.resume(),call.fallback(),
+            Optional.of(new Operations.ReentryGuard("binding-A",call.resume())),List.of(new Operations.ResumeRoute("state-B",call.resume()))),first.origin()));
+        for(int i=0;i<sequences.size();i++) {
+            var old=sequences.get(i);Terminator term=old.terminator();
+            if(term instanceof Operations.LocalResume x)term=new Operations.LocalResume(x.header(),x.fallback(),Optional.of("state-B"));
+            if(term instanceof Operations.LocalUnwind x)term=new Operations.LocalUnwind(x.header(),java.math.BigInteger.ZERO,x.destination(),x.fallback(),true);
+            sequences.set(i,new Sequence(old.label(),old.instructions(),term,old.origin()));
+        }
+        var changed=new Unit(unit.id(),unit.containingUnit(),unit.objects(),unit.visibleObjects(),unit.entries(),sequences,unit.completionPorts(),unit.body(),unit.bodyUnavailable(),unit.coverage(),unit.origin());
+        var caps=List.of(Capabilities.LOCAL_CONTROL,Capabilities.LOCAL_REENTRY_GUARD,Capabilities.LOCAL_RESUME_ROUTES,Capabilities.LOCAL_UNWIND_ALL);
+        var p=new Publication(base.id(),base.airVersion(),new Capabilities.Manifest(caps,caps),base.artifacts(),List.of(changed),base.storage(),base.resources(),base.artifactRelations(),base.origins(),base.coverage(),base.uncertainties(),base.premises());
+        assertEquals(p,codec.decode(codec.encode(p)));
+        var result=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).build(p,BuildOptions.defaults());
+        assertEquals(CfgBuildResult.Status.CFG_BUILT,result.status());
+        var bytes=new CfgJsonWriter().encode(result);var json=new String(bytes,StandardCharsets.UTF_8);
+        assertTrue(json.contains("\"schemaVersion\":\"7.0.0\""));assertTrue(json.contains("\"resumeRoutes\":[{"));
+        assertTrue(json.contains("\"resumeKey\":\"state-B\""));assertTrue(json.contains("\"all\":true"));
+        assertArrayEquals(bytes,new CfgJsonWriter().encode(result));
+        Files.createDirectories(Path.of("target/local-control-wire"));Files.write(Path.of("target/local-control-wire/selected-cfg.json"),bytes);
+    }
     @Test void symbolicRulesRequireV5AndKeepOperationIdentity() throws Exception {
         var p=new AirJson().decode(getClass().getResourceAsStream("/air/local-control.canonical.json").readAllBytes());
         var result=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).build(p,BuildOptions.defaults());
