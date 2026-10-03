@@ -42,3 +42,21 @@ Sequence da mesma Unit. Pop e unwind removem a chave com o frame. Invocações
 sem guarda preservam sua regra e continuam sujeitas ao limite de recursão do
 solver existente. Guardas não autorizam achatar retornos ou enumerar todas as
 pilhas em tamanho polinomial. A representação do CFG continua compacta.
+
+## CFG JSON 7.0.0: rotas e abandono completo
+
+Produtos que usam ao menos uma das formas abaixo exigem 7.0.0. Sem elas, a seleção
+de versões 1–6 permanece igual. Campos opcionais ausentes conservam a semântica
+anterior; versões anteriores rejeitam os campos novos.
+
+- LOCAL_INVOKE admite `resumeRoutes: [{key: string, destination: CfgNodeId}]`.
+  Chaves não vazias são únicas por regra; destinos pertencem à mesma Unit.
+- LOCAL_RESUME admite `resumeKey: string`. Seleciona a rota do topo, desempilha
+  e segue o destino. Chave ausente ou pilha vazia seguem `invalidExit`.
+- LOCAL_UNWIND admite `all: true`, somente com `count: "0"`. Remove todos os
+  frames e segue `destination`; pilha vazia também é válida.
+
+Writer omite lista vazia, chave ausente e all=false. Rotas são ordenadas por chave
+para publicação determinística. O oracle de wire verifica forma, fechamento,
+versão mínima e unicidade. O interpretador independente conserva rotas em cada
+frame; não mistura destinos entre invocações.

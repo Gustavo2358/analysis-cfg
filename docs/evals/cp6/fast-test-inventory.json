@@ -432,7 +432,11 @@
       "returningReleasesGuardAndRetainsEachCallersContinuation",
       "unwindReleasesOnlyRemovedKeys",
       "selfGuardRunsBeforeRecursiveFrameRejection",
-      "dataflowPreservesValuesAcrossGuardedReentryAndMatchedReturns"
+      "dataflowPreservesValuesAcrossGuardedReentryAndMatchedReturns",
+      "selectedReturnUsesOnlyItsOwnFrameRoute",
+      "missingKeyDoesNotSearchBelowTheTopOrUseOrdinaryResume",
+      "unwindAllDiscardsEveryGuardAndWorksAtEmptyStack",
+      "selectedReturnsPreserveValuesWithoutOrdinaryBypass"
     ]
   },
   "analysis-launcher": {
@@ -795,7 +799,8 @@
     ],
     "io.github.gustavo2358.analysis.cfg.adapters.LocalControlWireTest": [
       "symbolicRulesRequireV5AndKeepOperationIdentity",
-      "guardedRulesRequireV6AndKeepGuardIdentity"
+      "guardedRulesRequireV6AndKeepGuardIdentity",
+      "selectedReturnsAndUnwindAllRequireV7"
     ],
     "io.github.gustavo2358.analysis.cfg.adapters.ZstdCfgTest": [
       "realAirToCfgPreservesCanonicalBytesAndRejectsBrokenFrames"

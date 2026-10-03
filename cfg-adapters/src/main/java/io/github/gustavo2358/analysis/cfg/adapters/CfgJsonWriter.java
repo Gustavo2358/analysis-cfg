@@ -40,6 +40,8 @@ public final class CfgJsonWriter {
         var out = new CfgJsonBytes(maximumBytes);
         // Token mappings carry their contract requirement. Inspect the product, not its source text.
         boolean requiresV5=!graph.localRules().isEmpty();
+        boolean requiresV7=graph.localRules().values().stream().anyMatch(r->r instanceof LocalControlRules.Invoke i&&!i.resumeRoutes().isEmpty()
+            ||r instanceof LocalControlRules.Resume x&&x.resumeKey().isPresent()||r instanceof LocalControlRules.Unwind u&&u.all());
         boolean requiresV6=graph.localRules().values().stream().anyMatch(r->r instanceof LocalControlRules.Invoke i&&i.reentryGuard().isPresent());
         boolean requiresV4=graph.nodes().stream().anyMatch(CfgNode.OutcomeExit.class::isInstance)
             ||graph.transitions().stream().anyMatch(t->t.kind()==CfgTransition.Kind.EXCEPTION);
@@ -52,7 +54,7 @@ public final class CfgJsonWriter {
         for (var transition : graph.transitions())
             requiresV2 |= transitionKind(transition.kind()).requiresV2;
         out.raw("{\"schema\":\"analysis-cfg-json\",\"schemaVersion\":");
-        out.string(requiresV6 ? "6.0.0" : requiresV5 ? "5.0.0" : requiresV4 ? "4.0.0" : requiresV3 ? "3.0.0" : requiresV2 ? "2.0.0" : "1.0.0");
+        out.string(requiresV7 ? "7.0.0" : requiresV6 ? "6.0.0" : requiresV5 ? "5.0.0" : requiresV4 ? "4.0.0" : requiresV3 ? "3.0.0" : requiresV2 ? "2.0.0" : "1.0.0");
         out.raw(",\"airVersion\":");
         var version = result.airVersion();
         out.string(version.major() + "." + version.minor() + "." + version.patch());
@@ -166,6 +168,14 @@ public final class CfgJsonWriter {
                     out.raw(",\"reentryGuard\":{\"activationKey\":");out.string(guard.activationKey());
                     out.raw(",\"destination\":");cfgId(out,guard.destination());out.raw("}");
                 }
+                if(!i.resumeRoutes().isEmpty()) {
+                    out.raw(",\"resumeRoutes\":[");boolean routeComma=false;
+                    for(var entry:i.resumeRoutes().entrySet().stream().sorted(java.util.Map.Entry.comparingByKey()).toList()) {
+                        if(routeComma)out.raw(",");routeComma=true;out.raw("{\"key\":");out.string(entry.getKey());
+                        out.raw(",\"destination\":");cfgId(out,entry.getValue());out.raw("}");
+                    }
+                    out.raw("]");
+                }
             }
             case LocalControlRules.Boundary b -> {
                 out.raw(",\"kind\":\"LOCAL_BOUNDARY\",\"port\":");airId(out,b.port());
@@ -173,10 +183,12 @@ public final class CfgJsonWriter {
             }
             case LocalControlRules.Resume r -> {
                 out.raw(",\"kind\":\"LOCAL_RESUME\",\"invalidExit\":");cfgId(out,r.invalidExit());
+                if(r.resumeKey().isPresent()){out.raw(",\"resumeKey\":");out.string(r.resumeKey().orElseThrow());}
             }
             case LocalControlRules.Unwind u -> {
                 out.raw(",\"kind\":\"LOCAL_UNWIND\",\"count\":");out.string(u.count().toString(10));
                 out.raw(",\"destination\":");cfgId(out,u.destination());out.raw(",\"invalidExit\":");cfgId(out,u.invalidExit());
+                if(u.all())out.raw(",\"all\":true");
             }
         }
         out.raw("}");

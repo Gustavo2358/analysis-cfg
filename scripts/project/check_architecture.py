@@ -224,6 +224,7 @@ ALLOWED_OPERATION_TYPES = {
     "io.github.gustavo2358.air.model.Operations$LocalResume",
     "io.github.gustavo2358.air.model.Operations$LocalBoundary",
     "io.github.gustavo2358.air.model.Operations$LocalInvoke",
+        "io.github.gustavo2358.air.model.Operations$ResumeRoute",
     "io.github.gustavo2358.air.model.Operations$ReentryGuard",
     "io.github.gustavo2358.air.model.Operations$Invoke",
     "io.github.gustavo2358.air.model.Operations$Opaque",

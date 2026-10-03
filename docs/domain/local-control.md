@@ -91,3 +91,23 @@ operações físicas distintas, correspondência abaixo do topo, retorno/unwind,
 reentrada direta, fechamento do wire e valores separados por chamador.
 Não foi substituído o solver: enumerar pilhas ainda pode ser combinatório.
 O formato guardado está documentado em [CFG local wire](cfg-local-wire.md).
+
+## Retorno selecionado e abandono completo
+
+`control.local.resume_routes@1` conserva no frame as rotas `(key,destination)` da
+invocação. `local.resume(resumeKey)` seleciona exclusivamente a rota do topo,
+remove esse frame e segue seu destino. Pilha vazia ou chave ausente seguem
+`invalid_local_return`; não há busca externa nem fallback ao resume ordinário.
+Boundary e resume sem chave mantêm a regra anterior. Os destinos selecionáveis
+são retornos dinâmicos e não viram arestas ordinárias.
+
+`control.local.unwind_all@1` permite `local.unwind(count=0,all=true,destination)`.
+A transição descarta toda a pilha, incluindo guardas e rotas, e segue o destino.
+Pilha já vazia é válida; memória não é restaurada. Fixed-count unwind permanece
+igual. A especificação fixada no lock é a autoridade para ambas as extensões.
+
+`GuardedLocalControlTest` cobre dois chamadores, chave ausente no topo apesar
+de existir abaixo, liberação de guardas, pilha vazia, ausência de bypass e valores
+observados após retorno. O transporte e seu interpretador independente exercitam
+as mesmas formas. O solver continua enumerando contextos: esta mudança não
+resolve seu custo combinatório em grafos com muitas pilhas realizáveis.

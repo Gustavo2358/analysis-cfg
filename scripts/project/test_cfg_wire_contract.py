@@ -88,12 +88,36 @@ class CfgWireContractTest(unittest.TestCase):
             else:bad['localControl'][0]['reentryGuard']=None
             with self.assertRaises(ValueError,msg=mutation):verify(json.dumps(bad))
 
+    def test_selected_routes_require_v7_and_unique_closed_keys(self):
+        import copy
+        d=self.local_document();d['schemaVersion']='7.0.0'
+        route=dict(key='state-B',destination=d['nodes'][2]['id'])
+        d['localControl'][0]['resumeRoutes']=[route];d['localControl'][1]['resumeKey']='state-B'
+        self.assertEqual('7.0.0',verify(json.dumps(d))['schemaVersion'])
+        for mutation in ('version','duplicate','blank','null','foreign','extra','bad-key'):
+            bad=copy.deepcopy(d);routes=bad['localControl'][0]['resumeRoutes']
+            if mutation=='version':bad['schemaVersion']='6.0.0'
+            elif mutation=='duplicate':routes.append(copy.deepcopy(routes[0]))
+            elif mutation=='blank':routes[0]['key']=' '
+            elif mutation=='null':bad['localControl'][0]['resumeRoutes']=None
+            elif mutation=='foreign':routes[0]['destination']['publication']='foreign'
+            elif mutation=='extra':routes[0]['extra']=False
+            else:bad['localControl'][1]['resumeKey']=''
+            with self.assertRaises(ValueError,msg=mutation):verify(json.dumps(bad))
+
     def test_writer_local_product_matches_independent_wire_oracle(self):
         path=ROOT/'cfg-adapters/target/local-control-wire/cfg.json'
         self.assertTrue(path.exists(),'run LocalControlWireTest first')
         data=path.read_bytes();self.assertEqual('5.0.0',verify(data)['schemaVersion'])
         guarded=ROOT/'cfg-adapters/target/local-control-wire/guarded-cfg.json'
         self.assertEqual('6.0.0',verify(guarded.read_bytes())['schemaVersion'])
+        selected=ROOT/'cfg-adapters/target/local-control-wire/selected-cfg.json'
+        self.assertEqual('7.0.0',verify(selected.read_bytes())['schemaVersion'])
+        for value in (False,'true',1,None):
+            bad=json.loads(selected.read_bytes())
+            for rule in bad['localControl']:
+                if rule['kind']=='LOCAL_UNWIND':rule['all']=value
+            with self.assertRaises(ValueError):verify(json.dumps(bad))
         for value in ('-1','01',1):
             d=json.loads(data)
             for rule in d['localControl']:
