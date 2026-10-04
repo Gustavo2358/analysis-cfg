@@ -1,6 +1,6 @@
 # Valores textuais das conversões numéricas
 
-Status: IN_PROGRESS. Escopo: conservar a estrutura dos valores de fit_text e
+Implementação qualificada e pronta para review; work item IN_PROGRESS até merge. Escopo: conservar a estrutura dos valores de fit_text e
 slice_text sem alocar as posições implícitas da PICTURE.
 
 A regra é a sequência de escalares Unicode da AIR 02: fitting preserva o prefixo,
@@ -31,7 +31,7 @@ PROGA, com análise COMPLETE no fixture. Evidência bruta em priority2-evidence/
 huge-fitting-call-proof. Isso não altera o estado PARTIAL do corpus CardDemo.
 
 O caminho regional usa a mesma representação comprimida. A conversão explícita
-para IBM1047 codifica uma vez cada run e mantém spans de bytes; caracteres sem
+para ASCII/IBM1047 codifica uma vez cada run e mantém spans de bytes; caracteres sem
 codificação exata, tamanho divergente e codec não provado permanecem abertos.
 O oracle verifica C1 seguido de 40 para A + espaços, inclusive offsets de
 provenance no final de um bilhão de posições. Não há inferência de CCSID.
@@ -97,3 +97,35 @@ Os oracles existentes com duas posições forçam colisões; os de descarte exer
 reuso de IDs e tabelas de verdade independentes. O FAST usa também a capacidade
 default nova. A qualificação posterior repete apenas dependencies nos 73 inputs
 congelados e compara todos os bytes; SP, AIR e CFG são materialmente inalterados.
+
+
+## Qualificação final
+
+FAST final PASS (114,741 s). Corpus completo: 73 fontes / 292 etapas PASS.
+O ajuste de cache foi seguido de 73 reexecuções de dependencies com AIR/CFG
+congelados: 71 JSONs byte-idênticos; COTRTLIC e COACCT01 diferem somente em
+contadores de trabalho. Todos os 73 resultados semânticos são idênticos.
+
+Soma dos tempos por processo: wave10 223,611 s; antes do ajuste de cache
+290,596 s; final 216,852 s. COTRN02C: 36,760 → 34,085 s; variante CL2:
+30,381 → 23,579 s. Três workers e uma rodada medida, sem claim estatístico
+universal. O cache elimina recomputações e não altera os bounds publicados.
+
+A qualificação compara todas as categorias de dependências, supports,
+qualificações, remainders e provas de fonte. Permanecem 65 PARTIAL/8 COMPLETE,
+150/208 sites/candidatos de programa, 391/378 de arquivo e 259/95 qualificados.
+A exclusão de COSGN00C em COPAUS0C desde CP2.1 foi investigada e coberta por
+oracles menu/spaces/unknown. Cinco sites explicitam openControlRemainder de
+representações inválidas; nenhum candidato ou support é removido por isso.
+
+UnknownTransferCausalityTest e o probe COBOL → AIR → effects/RD verificam
+origem→destino desconhecido, overwrite MUST, MAY/aliases e vizinhos. Os oracles
+de condições booleanas incluem tabelas de verdade, colisões e pilhas explícitas;
+o teste de escala não enumera caminhos. Textos de um bilhão de posições passam
+com 256 MB usando runs, incluindo ASCII/IBM1047 e preservação de captura/overwrite.
+
+Evidência: diretório irmão priority2-evidence, final-scope-pipeline,
+final-cache-dependencies, final-causal-trunc e cfg-cache-final-fast.log.
+Relatório integrado local: artefatos-e2e/priority2-move-20261004/REPORT.md.
+Os pins correspondem aos produtores coordenados: IR #10, AIR #27, frontend #86,
+lower #58. Este PR #64 não implementa AP/exporter nem outro solver.

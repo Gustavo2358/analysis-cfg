@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "observed_on": "2026-10-01",
+  "observed_on": "2026-10-04",
   "analysis_ir": {
     "repository": "Gustavo2358/analysis-ir",
     "commit": "61e13365f09bf3fff951ae6f0c63b0d64e2698e1",
@@ -8,11 +8,11 @@
     "role": "normative",
     "canonical_ref": "feat/numeric-value-transforms",
     "upstream_review": {
-      "pull_request": 8,
-      "state": "merged",
-      "draft": false,
-      "head_commit": "b628e4c1a62de61a157cac85ae71ba4cd111052e",
-      "scope": "Historical merged baseline; current commit still requires human review."
+      "pull_request": 10,
+      "state": "open",
+      "draft": true,
+      "head_commit": "61e13365f09bf3fff951ae6f0c63b0d64e2698e1",
+      "scope": "Priority 2 numeric conversion and symbolic text contract; human review pending."
     },
     "json_binding": {
       "owner": "Gustavo2358/analysis-ir",
@@ -150,7 +150,7 @@
     "library_version": "0.1.0-SNAPSHOT",
     "analysis_ir": {
       "semantic_version": "2.0.0",
-      "commit": "f8c723e5f023cde92a6f4650e3be9334ebbaba1a"
+      "commit": "61e13365f09bf3fff951ae6f0c63b0d64e2698e1"
     },
     "maven": {
       "group_id": "io.github.gustavo2358",
