@@ -12,7 +12,7 @@ final class ValueUniverse {
     private record Producer(int candidate,ValueFact.Support support) { }
     private final List<Producer> producers=new ArrayList<>();
     private final Map<Producer,Integer> producerIds=new HashMap<>();
-    long poolHits,scalarsHashed;
+    long poolHits,runsHashed;
     Candidates supported(TextValue value,Id evidence,OriginId origin,List<PremiseId> premises,ValuesWork work) {
         return supported(LogicalText.of(value.value()),evidence,origin,premises,work);
     }
@@ -62,7 +62,7 @@ final class ValueUniverse {
     int producerCount(){return producers.size();}
     Candidates intern(TextValue value,ValuesWork work) {return intern(LogicalText.of(value.value()),work);}
     private Candidates intern(LogicalText value,ValuesWork work) {
-        scalarsHashed=Math.addExact(scalarsHashed,value.length());
+        runsHashed=Math.addExact(runsHashed,value.runCount());
         var existing=ordinals.get(value);
         if(existing!=null){poolHits=Math.incrementExact(poolHits);return singletons.get(existing);}
         int ordinal=values.size();Math.incrementExact(ordinal);

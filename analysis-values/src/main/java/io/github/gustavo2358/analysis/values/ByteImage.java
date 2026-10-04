@@ -91,6 +91,19 @@ final class ByteImage {
         var size=BigInteger.valueOf(bytes.octets().size());
         return new ByteImage(Optional.of(size),size.signum()==0?List.of():List.of(new Part(StorageRange.exact(BigInteger.ZERO,size),Optional.of(new Payload(bytes,false)),0,producer,BigInteger.ZERO,Map.of(),Set.of())));
     }
+    record Repeat(int octet,int count) {
+        Repeat {if(octet<0||octet>255||count<=0)throw new IllegalArgumentException("invalid byte run");}
+    }
+    static ByteImage repeated(List<Repeat> values,int producer) {
+        var parts=new ArrayList<Part>();var cursor=BigInteger.ZERO;
+        for(var run:values) {
+            var count=BigInteger.valueOf(run.count());
+            var payload=new Payload(new Values.BytesValue(List.of(run.octet())),true);
+            parts.add(new Part(StorageRange.exact(cursor,count),Optional.of(payload),0,producer,cursor,Map.of(),Set.of()));
+            cursor=cursor.add(count);
+        }
+        return new ByteImage(Optional.of(cursor),parts);
+    }
     /** Logical support carries explicit object identity and evidence IDs, never a fabricated source byte range. */
     ByteImage withLogicalSupport(Set<LogicalSupport> support) {
         return new ByteImage(extent,parts.stream().map(p->new Part(p.range(),p.payload(),p.payloadOffset(),p.producer(),p.producerOffset(),p.capturedOffsets(),p.reasons(),p.sourceGaps(),p.coInitial(),union(p.logicalSupports(),support))).toList());

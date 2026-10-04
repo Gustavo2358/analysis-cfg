@@ -39,7 +39,9 @@ public final class RegionalValuesAnalysis {
     private final List<PreparedEvent> eventDetails=new ArrayList<>();
     private final Set<UnitId> controlOpen=new HashSet<>();
     private record Plan(StatementEffects.Write write,StatementEffects.Target target,int event,StatementEffects.LogicalTarget logical) { }
-    private record LogicalValue(Values.TextValue text,int event) { }
+    private record LogicalValue(LogicalText text,int event) {
+        LogicalValue(Values.TextValue text,int event){this(LogicalText.of(text.value()),event);}
+    }
     private record PreparedEvent(Operation operation,Entries.InitialCondition initial,StatementEffects.Write write,StatementEffects.Target target,Optional<Control.OutcomeKey> outcome,StatementEffects.LogicalTarget logical) {
         DefinitionEvent definition(EntryId entry) {
             if(logical!=null)return operation==null?DefinitionEvent.logicalInitial(entry,initial,write.slot(),logical.object(),write.destination()):DefinitionEvent.logicalWrite(entry,operation,write,logical,outcome);
@@ -64,7 +66,7 @@ public final class RegionalValuesAnalysis {
             return new Trace(destination,bytes,producer,original,next,gaps,reasons,logicalSupports);
         }
     }
-    private record Scalar(Optional<Values.TextValue> text,Set<Integer> producers,Set<String> reasons,Set<Integer> sourceGaps,List<Trace> traces) implements Content {
+    private record Scalar(Optional<LogicalText> text,Set<Integer> producers,Set<String> reasons,Set<Integer> sourceGaps,List<Trace> traces) implements Content {
         Scalar { producers=Set.copyOf(producers);reasons=Set.copyOf(reasons);sourceGaps=Set.copyOf(sourceGaps);traces=List.copyOf(traces); }
         Scalar captured(int event,StorageIndex.Location source,StorageIndex.Location destination) {
             return new Scalar(text,producers,reasons,sourceGaps,traces.stream().map(t->t.captured(event,source,destination)).toList());
@@ -363,7 +365,7 @@ public final class RegionalValuesAnalysis {
         }
         private TextPredicate.Text predicateRead(State state,Place place) {
             if(!(place instanceof Places.ObjectPlace named)||!state.closed.contains(named.object()))return TextPredicate.Text.unknown();
-            var values=new HashSet<LogicalText>();for(var value:state.logical.getOrDefault(named.object(),Set.of()))values.add(LogicalText.of(value.text().value()));
+            var values=new HashSet<LogicalText>();for(var value:state.logical.getOrDefault(named.object(),Set.of()))values.add(value.text());
             return new TextPredicate.Text(values,false);
         }
         private boolean closedSource(State before,StatementEffects.Write write) {
@@ -387,9 +389,7 @@ public final class RegionalValuesAnalysis {
             if(expression instanceof Expressions.FitText fit) {
                 var result=new HashSet<LogicalValue>();
                 for(var value:logicalExpression(captured,plan,fit.value())) {
-                    int length=fit.length().intValueExact();String raw=value.text().value();int count=raw.codePointCount(0,raw.length());
-                    String fitted=count>length?raw.substring(0,raw.offsetByCodePoints(0,length)):raw+fit.pad().repeat(length-count);
-                    result.add(new LogicalValue(new Values.TextValue(fitted),value.event()));
+                    result.add(new LogicalValue(value.text().fit(fit.length().intValueExact(),fit.pad().codePointAt(0)),value.event()));
                 }
                 return Set.copyOf(result);
             }
@@ -494,20 +494,16 @@ public final class RegionalValuesAnalysis {
                     result.add(unknown(target,"LOGICAL_READ_REMAINDER",plan.event));
                     if(codecs.size()!=1||codecs.getFirst().isEmpty()||extent.isEmpty())continue;
                     var text=value.text();
-                    if(expression instanceof Expressions.FitText fit) {
-                        int length=fit.length().intValueExact();var raw=text.value();int count=raw.codePointCount(0,raw.length());
-                        text=new Values.TextValue(count>length?raw.substring(0,raw.offsetByCodePoints(0,length)):raw+fit.pad().repeat(length-count));
-                    }
-                    var encoded=MemoryCodecs.encodeText(codecs.getFirst().get(),text,extent.get());
-                    if(encoded.status()==MemoryCodecs.Status.EXACT)result.add(new Bytes(ByteImage.literal(encoded.value().orElseThrow(),plan.event)
-                        .withLogicalSupport(Set.of(new ByteImage.LogicalSupport(object,value.event())))));
+                    if(expression instanceof Expressions.FitText fit)text=text.fit(fit.length().intValueExact(),fit.pad().codePointAt(0));
+                    LogicalTextEncoding.encode(text,codecs.getFirst().get(),extent.get(),plan.event).ifPresent(image->
+                        result.add(new Bytes(image.withLogicalSupport(Set.of(new ByteImage.LogicalSupport(object,value.event()))))));
                 }
                 if(!result.isEmpty())return Set.copyOf(result);
             }
             if(expression instanceof Expressions.Literal literal) {
                 var v=literal.value();
                 if(target.range().isEmpty())return Set.of(v instanceof Values.TextValue t
-                    ?new Scalar(Optional.of(t),Set.of(plan.event),Set.of(),Set.of(),List.of(new Trace(target,Optional.empty(),plan.event,Optional.of(target),Map.of(),Set.of(),Set.of())))
+                    ?new Scalar(Optional.of(LogicalText.of(t.value())),Set.of(plan.event),Set.of(),Set.of(),List.of(new Trace(target,Optional.empty(),plan.event,Optional.of(target),Map.of(),Set.of(),Set.of())))
                     :unknown(target,"NON_TEXT_LOGICAL_VALUE",plan.event));
                 var range=target.range().get();var extent=range.end().map(e->e.subtract(range.start()));
                 if(v instanceof Values.BytesValue bytes&&extent.equals(Optional.of(BigInteger.valueOf(bytes.octets().size()))))
@@ -572,7 +568,7 @@ public final class RegionalValuesAnalysis {
         var decoded=MemoryCodecs.decodeText(candidate.codec().get(),read.bytes().get(),range.end().get().subtract(range.start()));
         if(decoded.value().isEmpty())return new Scalar(Optional.empty(),Set.of(),Set.of(decoded.status().name()),gaps,traces);
         var producers=new HashSet<Integer>();for(var part:read.parts()){producers.addAll(part.contributors().keySet());part.logicalSupports().forEach(support->producers.add(support.event()));}
-        return new Scalar(decoded.value(),producers,Set.of(),gaps,traces);
+        return new Scalar(decoded.value().map(v->LogicalText.of(v.value())),producers,Set.of(),gaps,traces);
     }
     private List<Trace> traces(ByteImage.Part part,StorageIndex.Location selected) {
         if(part.payload().isEmpty()||part.coInitial().isEmpty())return List.of(trace(part,selected));
@@ -647,10 +643,10 @@ public final class RegionalValuesAnalysis {
                 for(var contents:engine.contents(state,candidate.location())) {
                     var value=RegionalValuesAnalysis.this.project(contents,candidate);
                     if(value.text().isEmpty()){model=true;reasons.addAll(value.reasons());}
-                    else supports.computeIfAbsent(value.text().get().value(),ignored->new HashSet<>()).addAll(value.producers());
+                    else supports.computeIfAbsent(value.text().get().text(),ignored->new HashSet<>()).addAll(value.producers());
                     var fragments=value.traces().stream().flatMap(t->fragments(t,query.point().entry(),value.text().isPresent()).stream()).distinct().sorted(StorageValueOrder.FRAGMENT).toList();
                     var interpretation=new RegionalValueFact.Interpretation(candidate.location().in(query.point().entry()),candidate.codec());
-                    if(candidate.location().range().isEmpty())alternatives.add(new StorageValueFact.Alternative(interpretation,value.text(),fragments));
+                    if(candidate.location().range().isEmpty())alternatives.add(new StorageValueFact.Alternative(interpretation,value.text().map(t->new Values.TextValue(t.text())),fragments));
                     else {
                         // Co-initial contributors prove the same image, not alternative byte values.
                         // Keep the established nonoverlapping-fragment wire: a canonical complete
@@ -659,10 +655,10 @@ public final class RegionalValuesAnalysis {
                         var byRange=new LinkedHashMap<StorageIndex.ContextualLocation,List<StorageValueFact.Fragment>>();
                         for(var fragment:fragments)byRange.computeIfAbsent(fragment.location(),ignored->new ArrayList<>()).add(fragment);
                         var groups=new ArrayList<>(byRange.values());var cover=groups.stream().map(List::getFirst).toList();
-                        alternatives.add(new StorageValueFact.Alternative(interpretation,value.text(),cover));
+                        alternatives.add(new StorageValueFact.Alternative(interpretation,value.text().map(t->new Values.TextValue(t.text())),cover));
                         for(int i=0;i<groups.size();i++)for(int j=1;j<groups.get(i).size();j++) {
                             var variant=new ArrayList<>(cover);variant.set(i,groups.get(i).get(j));
-                            alternatives.add(new StorageValueFact.Alternative(interpretation,value.text(),variant));
+                            alternatives.add(new StorageValueFact.Alternative(interpretation,value.text().map(t->new Values.TextValue(t.text())),variant));
                         }
                     }
                 }
@@ -670,7 +666,7 @@ public final class RegionalValuesAnalysis {
             var logicalAlternatives=new ArrayList<StorageValueFact.LogicalAlternative>();
             if(state.reached())for(var object:storage.explicitObjects(query.subject())) {
                 var logicalSupport=new TreeMap<String,Set<Integer>>();
-                for(var value:state.logical.getOrDefault(object,Set.of()))logicalSupport.computeIfAbsent(value.text().value(),ignored->new HashSet<>()).add(value.event());
+                for(var value:state.logical.getOrDefault(object,Set.of()))logicalSupport.computeIfAbsent(value.text().text(),ignored->new HashSet<>()).add(value.event());
                 logicalSupport.forEach((text,producers)->{
                     supports.computeIfAbsent(text,ignored->new HashSet<>()).addAll(producers);
                     logicalAlternatives.add(new StorageValueFact.LogicalAlternative(object,new Values.TextValue(text),producers.stream().map(events::get).distinct()

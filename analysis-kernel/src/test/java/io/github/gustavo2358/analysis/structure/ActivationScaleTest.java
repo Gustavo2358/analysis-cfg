@@ -158,6 +158,28 @@ class ActivationScaleTest {
         var session=session(sequences,"level-0");var result=DataflowSolver.solve(session,reach(session));
         assertTrue(result.metrics().analysisPoints()<1000,"tabulated points="+result.metrics().analysisPoints());
     }
+    @Test void equalStatesAcrossSharedFailureExitsPreserveEveryContext() {
+        for(int n:new int[]{5,18}) {
+            var sequences=new ArrayList<Sequence>();
+            for(int i=0;i<n;i++) {
+                sequences.add(StructuralFixtures.branch(U,"level-"+i,"left-"+i,"right-"+i));
+                sequences.add(call("left-"+i,"level-"+(i+1),"end-"+i));
+                sequences.add(call("right-"+i,"level-"+(i+1),"end-"+i));
+                sequences.add(StructuralFixtures.branch(U,"end-"+i,"return-"+i,"abort"));
+                sequences.add(i==0?ret("return-"+i):resume("return-"+i));
+            }
+            sequences.add(resume("level-"+n));sequences.add(ret("abort"));
+            var session=session(sequences,"level-0");var definition=reach(session);
+            var result=DataflowSolver.solve(session,definition);var context=session.contexts().iterator().next();
+            assertEquals(Set.of(true),new HashSet<>(result.states(context,session.index().sequence(label("abort")),true)));
+            assertEquals(Set.of(true),new HashSet<>(result.states(context,context.normalExit(),true)));
+            assertTrue(result.metrics().analysisPoints()<5000);
+            if(n==5)for(var expected:ExplicitActivationOracle.solve(session,definition)) {
+                assertEquals(Set.of(expected.in()),new HashSet<>(result.states(expected.context(),expected.node(),true)));
+                assertEquals(Set.of(expected.out()),new HashSet<>(result.states(expected.context(),expected.node(),false)));
+            }
+        }
+    }
     public static void main(String[] args) {
         var t=new ActivationScaleTest();if(args.length==0||args[0].equals("cycle"))t.cyclicDispatchDoesNotEnumeratePermutations();
         if(args.length==0||args[0].equals("diamond"))t.acyclicCallDiamondsDoNotEnumerateCallStrings();

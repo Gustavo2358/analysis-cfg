@@ -83,7 +83,7 @@ public final class PossibleValuesAnalysis implements AnalysisDefinition<Possible
         private Execution(TextProfile profile,DataflowResult<PossibleValuesState> dataflow,Map<String,Long> metrics){this.profile=profile;this.dataflow=dataflow;this.solveMetrics=metrics;}
         public DataflowResult<PossibleValuesState> dataflow(){return dataflow;}
         public Map<String,Long> solveMetrics(){return solveMetrics;}
-        public Map<String,Long> preparationMetrics(){var m=new HashMap<>(profile.preparation.snapshot());m.put("demandCellsPrepared",(long)profile.preparedCellCount());m.put("demandWritesPrepared",(long)profile.writes.size());m.put("demandObjectsRequested",profile.requestedObjects);m.put("valuesInterned",(long)profile.universe.size());m.put("producersPrepared",(long)profile.universe.producerCount());m.put("poolHits",profile.universe.poolHits);m.put("unicodeScalarsHashed",profile.universe.scalarsHashed);return Map.copyOf(m);}
+        public Map<String,Long> preparationMetrics(){var m=new HashMap<>(profile.preparation.snapshot());m.put("demandCellsPrepared",(long)profile.preparedCellCount());m.put("demandWritesPrepared",(long)profile.writes.size());m.put("demandObjectsRequested",profile.requestedObjects);m.put("valuesInterned",(long)profile.universe.size());m.put("producersPrepared",(long)profile.universe.producerCount());m.put("poolHits",profile.universe.poolHits);m.put("textRunsHashed",profile.universe.runsHashed);return Map.copyOf(m);}
         public record Observations(ObservationBatch<ObjectId,ValueFact> batch,Map<String,Long> stateMetrics,Map<String,Long> quality) { }
         public Observations observe(Iterable<PointQuery<ObjectId>> queries) {
             var replayWork=new ValuesWork();

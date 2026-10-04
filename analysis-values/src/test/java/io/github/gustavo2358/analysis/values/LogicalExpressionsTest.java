@@ -26,6 +26,43 @@ class LogicalExpressionsTest {
   Expression concat(Expression a,Expression b){return new Expressions.Binary(next(),Expressions.BinaryOperator.CONCAT,a,b);}
   Instruction set(ObjectId o,Expression e,int size){return new Operations.Assign(h,new Places.ObjectPlace(operand(h.id(),"dst",Operand.Role.VALUE_WRITE),o),new Expressions.FitText(next(),e,BigInteger.valueOf(size)," "));}
  }
+ @Test void hugeIntermediateRetainsSmallProjectedValueAndItsProducers(){
+  var p=graph(new String[]{null},new int[][]{{}},2,true,true);var u=p.units().getFirst();var root=u.objects().get(0).id();var dest=u.objects().get(1).id();var s=u.sequences().getFirst();
+  var a=new E(u.id(),"huge-fill");var b=new E(u.id(),"small-projection");
+  var instructions=List.of(a.set(root,a.text("PROGA"),1000000000),b.set(dest,b.slice(b.read(root),0,8),8));
+  var q=replace(p,List.of(unit(u.id(),u.entries(),List.of(new Sequence(s.label(),instructions,s.terminator(),s.origin())),u.objects())),p.coverage(),p.uncertainties(),p.premises());
+  var run=logicalRun(q);var observed=fact(run,before(q,0,1));expected(observed,false,"PROGA   ");
+  assertEquals(List.of("huge-fill","small-projection"),observed.candidateSupports().getFirst().producers().stream().map(x->x.evidence().localId()).toList());
+ }
+ @Test void repeatedCharacterUsesConstantStorageAndPreservesNeighbors(){
+  var p=graph(new String[]{null},new int[][]{{}},2,true,true);var u=p.units().getFirst();var root=u.objects().get(0).id();var dest=u.objects().get(1).id();var s=u.sequences().getFirst();
+  var a=new E(u.id(),"repeat");var b=new E(u.id(),"tail");
+  var repeated=new Expressions.FillText(a.next(),a.text("😀"),BigInteger.valueOf(1000000000));
+  var instructions=List.of(a.set(root,a.concat(a.text("AB"),repeated),1000000002),b.set(dest,b.slice(b.read(root),0,4),4));
+  var q=replace(p,List.of(unit(u.id(),u.entries(),List.of(new Sequence(s.label(),instructions,s.terminator(),s.origin())),u.objects())),p.coverage(),p.uncertainties(),p.premises());
+  expected(fact(logicalRun(q),before(q,0,1)),false,"AB😀😀");
+ }
+ @Test void unknownCharacterDoesNotEraseKnownNeighboringPositions(){
+  var p=graph(new String[]{null},new int[][]{{}},2,true,true);var u=p.units().getFirst();var root=u.objects().get(0).id();var dest=u.objects().get(1).id();var s=u.sequences().getFirst();
+  var a=new E(u.id(),"open-fill");var b=new E(u.id(),"known-neighbor");
+  var reason=new UncertaintyId(p.id(),"character");
+  var character=new Expressions.Unknown(a.next(),Types.known(Types.Builtin.TEXT),List.of(),Scopes.NoMemory.INSTANCE,reason);
+  var one=new Expressions.FitText(a.next(),character,BigInteger.ONE," ");
+  var repeated=new Expressions.FillText(a.next(),one,BigInteger.valueOf(1000000000));
+  var instructions=List.of(a.set(root,a.concat(a.text("AB"),repeated),1000000002),b.set(dest,b.slice(b.read(root),0,2),2));
+  var uncertainties=new ArrayList<>(p.uncertainties());uncertainties.add(new Evidence.Uncertainty(reason,"CHARACTER",List.of(Evidence.Dimension.VALUES),new Scopes.UnitScope(u.id()),"unspecified character",s.origin()));
+  var q=replace(p,List.of(unit(u.id(),u.entries(),List.of(new Sequence(s.label(),instructions,s.terminator(),s.origin())),u.objects())),p.coverage(),uncertainties,p.premises());
+  expected(fact(logicalRun(q),before(q,0,1)),false,"AB");
+ }
+ @Test void regionalFittingAlsoKeepsCompressedIntermediates(){
+  var p=graph(new String[]{null},new int[][]{{}},2,true,true);var u=p.units().getFirst();var root=u.objects().get(0).id();var dest=u.objects().get(1).id();var s=u.sequences().getFirst();
+  var a=new E(u.id(),"huge-fill");var b=new E(u.id(),"small-fitting");
+  var instructions=List.of(a.set(root,a.text("PROGA"),1000000000),b.set(dest,b.read(root),8));
+  var q=replace(p,List.of(unit(u.id(),u.entries(),List.of(new Sequence(s.label(),instructions,s.terminator(),s.origin())),u.objects())),p.coverage(),p.uncertainties(),p.premises());
+  var run=RegionalValuesAnalysis.prepare(partialSession(q)).analysis().orElseThrow().execute();
+  var observed=run.observe(List.of(before(q,0,1))).observations().getFirst().value();
+  assertEquals(List.of("PROGA   "),RegionalValuesTest.texts(observed));
+ }
  @Test void partialRootSnapshotAndDemand(){
   var p=graph(new String[]{null},new int[][]{{}},20,true,true);var u=p.units().getFirst();var root=u.objects().get(0).id();var dest=u.objects().get(1).id();var s=u.sequences().getFirst();
   var a=new E(u.id(),"partial");var b=new E(u.id(),"capture");
