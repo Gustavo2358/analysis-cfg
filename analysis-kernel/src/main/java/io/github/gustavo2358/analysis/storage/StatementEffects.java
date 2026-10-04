@@ -197,13 +197,10 @@ public final class StatementEffects {
                     reads.add(new Read(Optional.of(r.header().id()),role,storage.resolve(r.place())));pending.push(new Visit(r.place(),ReadKind.ADDRESS));
                 } else if(operand instanceof Expressions.Unknown u) {
                     boundRead(u.remainingReads(),role);for(int i=u.dependencies().size()-1;i>=0;i--)pending.push(new Visit(u.dependencies().get(i),role));
-                } else if(operand instanceof Expressions.Binary b) {pending.push(new Visit(b.right(),role));pending.push(new Visit(b.left(),role));}
-                else if(operand instanceof Expressions.Unary u)pending.push(new Visit(u.argument(),role));
-                else if(operand instanceof Expressions.Quantize q)pending.push(new Visit(q.value(),role));
-                else if(operand instanceof Expressions.FitText f)pending.push(new Visit(f.value(),role));
-                else if(operand instanceof Expressions.SliceText s){pending.push(new Visit(s.count(),role));pending.push(new Visit(s.start(),role));pending.push(new Visit(s.value(),role));}
-                else if(operand instanceof Expressions.TrimRight t)pending.push(new Visit(t.value(),role));
-                else if(!(operand instanceof Expressions.Literal))throw new IllegalArgumentException("unsupported operand effect");
+                } else {
+                    var children=Operands.children(operand);
+                    for(int i=children.size()-1;i>=0;i--)pending.push(new Visit(children.get(i),role));
+                }
             }
         }
     }

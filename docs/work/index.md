@@ -62,3 +62,5 @@ SP2.51 per-use control for OPEN/CLOSE and SORT/MERGE without procedure callbacks
 IN_PROGRESS: implemented and qualified locally, awaiting review; no merge.
 
 - [Stage5 JSON GENERATE — checkpoint 4](stage5-json-generate.md): authority repin, source alternatives and qualification.
+
+[Prioridade 2 — valores numéricos e texto](numeric-text-values.md): revisão aprovada; o merge do PR #64 efetiva DONE. [Integração](priority2-integration.md).

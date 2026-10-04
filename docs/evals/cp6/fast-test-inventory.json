@@ -455,7 +455,9 @@
       "infeasibleGuardedCyclesCannotEnumerateChangingInputs",
       "infeasibleOrdinaryCyclesDoNotTransferValues",
       "infeasibleOrdinaryEdgeCyclesDoNotTransferValues",
-      "localControlRejectsMissingAnalysisDirection"
+      "localControlRejectsMissingAnalysisDirection",
+      "hundredWayDispatchFinishesFinalQueriesInBothDirections",
+      "equalStatesAcrossSharedFailureExitsPreserveEveryContext"
     ],
     "io.github.gustavo2358.analysis.solver.BooleanConditionsTest": [
       "operationsMatchIndependentTruthTablesAndCanonicalize",
@@ -467,6 +469,15 @@
     "io.github.gustavo2358.analysis.solver.CallerWitnessesTest": [
       "separateWitnessesNeverInventACombinedCaller",
       "cachedValuationsHaveExplicitPathsAndStayBoundedInCyclicGraphs"
+    ],
+    "io.github.gustavo2358.analysis.storage.NumericExpressionEffectsTest": [
+      "explicitParseRetainsTextAndInvalidFallbackReads",
+      "decimalFitBinaryWrapAndFormattingRetainTheSingleSourceRead"
+    ],
+    "io.github.gustavo2358.analysis.storage.UnknownTransferCausalityTest": [
+      "unknownValueKeepsCauseAndMustOverwriteAcrossSequentialReceivers",
+      "unknownValueAtAlternativeDestinationCannotKillEitherOldDefinition",
+      "unknownTransformPreservesIndexReadSeparatelyFromValueRead"
     ]
   },
   "analysis-launcher": {
@@ -789,6 +800,11 @@
       "regionalDiagnosticMutationCannotChangeCopyCapturesSupportsOrWork",
       "scalarDiagnosticMutationKeepsClosedModelAndSupports",
       "diagnosticsAndRegionsNeverActivatePhysicalDefault"
+    ],
+    "io.github.gustavo2358.analysis.values.LogicalTextEncodingTest": [
+      "billionPositionsUseTwoSpansWithExactOffsets",
+      "asciiBillionPositionsRetainTheExistingCodec",
+      "noImplicitEncodingOrReplacementForUnknownScalars"
     ]
   },
   "cfg-adapters": {

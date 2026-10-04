@@ -12,7 +12,8 @@ final class BooleanConditions {
     // Direct-mapped computed table: collisions only evict memoized work. They never
     // identify semantic nodes or truncate conditions. Memory is fixed per manager.
     private final int[] cacheA,cacheB,cacheOperation,cacheResult;
-    BooleanConditions(){this(16384);}
+    // Four int arrays: a fixed 1 MiB computed table per execution manager.
+    BooleanConditions(){this(65536);}
     BooleanConditions(int cacheSlots){
         if(cacheSlots<1||Integer.bitCount(cacheSlots)!=1)throw new IllegalArgumentException("cache size must be a power of two");
         cacheA=new int[cacheSlots];cacheB=new int[cacheSlots];cacheOperation=new int[cacheSlots];cacheResult=new int[cacheSlots];

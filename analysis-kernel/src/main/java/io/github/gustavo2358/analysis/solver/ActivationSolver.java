@@ -277,7 +277,15 @@ final class ActivationSolver<S> {
         Partition(EntryRun entry){this.entry=entry;}
         boolean add(int condition,S contribution) {
             if(condition==0)return false;
-            var b=entry.bdd;var next=new ArrayList<Piece>();int remaining=condition;boolean modified=false;
+            var b=entry.bdd;
+            // Equal states require only union of their guards. Computing C \ P first
+            // can build a large intermediate BDD that the union immediately discards.
+            if(pieces.size()==1 && definition.equivalent(pieces.getFirst().state,contribution,work)) {
+                var old=pieces.getFirst();int combined=b.or(old.condition,condition);
+                if(combined==old.condition)return false;
+                pieces=List.of(new Piece(combined,old.state));return true;
+            }
+            var next=new ArrayList<Piece>();int remaining=condition;boolean modified=false;
             for(var piece:pieces) {
                 int overlap=b.and(piece.condition,condition);
                 if(overlap==0){put(next,piece.condition,piece.state);continue;}

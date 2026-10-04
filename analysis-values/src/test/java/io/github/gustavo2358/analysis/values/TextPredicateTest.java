@@ -31,6 +31,23 @@ class TextPredicateTest {
         assertEquals(oracle,new TreeSet<>(b.candidates().stream().map(Values.TextValue::value).toList()),"regional");
     }
     @Test void closedEqualityAndUnknownInput(){check(program("OTHER"),"NO");check(program("MATCH"),"YES");check(program(null),"NO","YES");}
+    @Test void digitsPredicateSelectsValidAndInvalidControlWithoutTrimming() {
+        for(var input:Arrays.asList("00052"," 0052","A0052","-0052","5.200","", "５２", null)) {
+            var p=program(input);var u=p.units().getFirst();var seq=new ArrayList<>(u.sequences());var first=seq.getFirst();var b=(Operations.Branch)first.terminator();
+            var comparison=(Expressions.Binary)b.predicate();
+            var predicate=new Expressions.Unary(comparison.header(),Expressions.UnaryOperator.IS_DIGITS,comparison.left());
+            seq.set(0,new Sequence(first.label(),first.instructions(),new Operations.Branch(b.header(),predicate,b.trueDestination(),b.falseDestination()),first.origin()));
+            check(replace(p,List.of(unit(u.id(),u.entries(),seq,u.objects())),p.coverage(),p.uncertainties(),p.premises()),
+                input==null?new String[]{"NO","YES"}:new String[]{input.equals("00052")?"YES":"NO"});
+        }
+    }
+    @Test void compressedDigitsDoNotRequireExpandedCharacters() {
+        var p=program(null);var h=p.units().getFirst().sequences().getFirst().terminator().header();
+        var zero=new Expressions.Literal(operand(h.id(),"zero",Operand.Role.VALUE_READ),new Values.TextValue("0"));
+        var billion=new Expressions.FitText(operand(h.id(),"billion",Operand.Role.VALUE_READ),zero,java.math.BigInteger.valueOf(1000000000),"0");
+        var predicate=new Expressions.Unary(operand(h.id(),"digits",Operand.Role.PREDICATE),Expressions.UnaryOperator.IS_DIGITS,billion);
+        assertEquals(TextPredicate.TRUE,TextPredicate.truth(predicate,place->TextPredicate.Text.unknown()));
+    }
     @Test void mayScopedWriteInvalidatesClosure(){
         var p=program("OTHER");var u=p.units().getFirst();var s=u.sequences().getFirst();
         var gap=new UncertaintyId(p.id(),"write");var uncertainty=new Evidence.Uncertainty(gap,"UNKNOWN_WRITE",List.of(Evidence.Dimension.EFFECTS,Evidence.Dimension.VALUES),new Scopes.UnitScope(u.id()),"input may change",origin(p.id()));

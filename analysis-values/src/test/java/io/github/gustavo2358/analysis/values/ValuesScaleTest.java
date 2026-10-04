@@ -118,11 +118,11 @@ class ValuesScaleTest {
             assertEquals(n,batch.quality().get("closedInModelResults"));report("S6-S16",n,measurements(run,batch),System.nanoTime()-start);
         }
     }
-    @Test void unicodePoolCostFollowsBoundaryTextAndRetainsNoGlobalInterning() {
+    @Test void unicodePoolCostFollowsRunsAndRetainsNoGlobalInterning() {
         for(int n:new int[]{1000,2000,4000}) {
             long start=System.nanoTime();String text="😀".repeat(n);var p=graph(new String[]{text,text},new int[][]{{1},{}},1,false,false);var run=execute(p);var batch=run.observe(List.of(before(p,1,0)));
             expected(batch.batch().observations().getFirst().value(),false,text);
-            assertEquals(1,run.preparationMetrics().get("valuesInterned"));assertEquals(1,run.preparationMetrics().get("poolHits"));assertEquals(2L*n,run.preparationMetrics().get("unicodeScalarsHashed"));
+            assertEquals(1,run.preparationMetrics().get("valuesInterned"));assertEquals(1,run.preparationMetrics().get("poolHits"));assertEquals(2L,run.preparationMetrics().get("textRunsHashed"));
             assertEquals(0,RetentionAudit.count(batch).getOrDefault("ValueUniverse",0L));report("S9",n,measurements(run,batch),System.nanoTime()-start);
         }
     }

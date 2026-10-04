@@ -13,6 +13,9 @@ final class TextExpressions {
             var e=pending.pop();
             if(e instanceof Expressions.Read r&&r.place() instanceof Places.ObjectPlace p)out.add(p.object());
             else if(e instanceof Expressions.Literal l&&l.value() instanceof Values.TextValue) { }
+            else if(e instanceof Expressions.Unknown u&&u.typeRef().equals(Types.known(Types.Builtin.TEXT))
+                    &&u.remainingReads() instanceof Scopes.NoMemory&&u.dependencies().isEmpty()) { }
+            else if(e instanceof Expressions.FillText f){f.length().intValueExact();pending.push(f.character());}
             else if(e instanceof Expressions.FitText f){f.length().intValueExact();pending.push(f.value());}
             else if(e instanceof Expressions.SliceText slice){integer(slice.start());integer(slice.count());pending.push(slice.value());}
             else if(e instanceof Expressions.Binary b&&b.operator()==Expressions.BinaryOperator.CONCAT){pending.push(b.right());pending.push(b.left());}
@@ -57,7 +60,8 @@ final class TextExpressions {
             var frame=pending.pop();var e=frame.expression();
             if(!frame.expanded()) {
                 pending.push(new Frame(e,true));
-                if(e instanceof Expressions.FitText f)pending.push(new Frame(f.value(),false));
+                if(e instanceof Expressions.FillText f)pending.push(new Frame(f.character(),false));
+                else if(e instanceof Expressions.FitText f)pending.push(new Frame(f.value(),false));
                 else if(e instanceof Expressions.SliceText s)pending.push(new Frame(s.value(),false));
                 else if(e instanceof Expressions.Binary b){pending.push(new Frame(b.right(),false));pending.push(new Frame(b.left(),false));}
                 continue;
@@ -65,6 +69,8 @@ final class TextExpressions {
             LogicalText result;
             if(e instanceof Expressions.Read r)result=input.apply(((Places.ObjectPlace)r.place()).object());
             else if(e instanceof Expressions.Literal l)result=LogicalText.of(((Values.TextValue)l.value()).value());
+            else if(e instanceof Expressions.Unknown)result=null;
+            else if(e instanceof Expressions.FillText f){var value=values.get(f.character());int length=f.length().intValueExact();result=value==null||value.length()!=1?LogicalText.unknown(length):value.fill(length);}
             else if(e instanceof Expressions.FitText f){var value=values.get(f.value());int length=f.length().intValueExact();result=value==null?LogicalText.unknown(length):value.fit(length,f.pad().codePointAt(0));}
             else if(e instanceof Expressions.SliceText s){var value=values.get(s.value());int start=integer(s.start()),count=integer(s.count());result=value==null||start>value.length()-count?LogicalText.unknown(count):value.slice(start,count);}
             else {var b=(Expressions.Binary)e;var left=values.get(b.left());var right=values.get(b.right());result=left==null||right==null?null:left.concat(right);}

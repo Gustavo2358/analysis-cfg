@@ -1,18 +1,19 @@
 {
   "schema_version": 1,
-  "observed_on": "2026-10-01",
+  "observed_on": "2026-10-04",
   "analysis_ir": {
     "repository": "Gustavo2358/analysis-ir",
-    "commit": "f8c723e5f023cde92a6f4650e3be9334ebbaba1a",
+    "commit": "09dd8ea1d5deb2ef4b1d16115ea953585752cfdf",
     "semantic_version": "2.0.0",
     "role": "normative",
-    "canonical_ref": "fix/compact-perform-contexts",
+    "canonical_ref": "main",
     "upstream_review": {
-      "pull_request": 8,
+      "pull_request": 10,
       "state": "merged",
       "draft": false,
-      "head_commit": "b628e4c1a62de61a157cac85ae71ba4cd111052e",
-      "scope": "Historical merged baseline; current commit still requires human review."
+      "head_commit": "84d3de37299a9582eb83f2d360e17c86615b29bd",
+      "scope": "Priority 2 numeric conversion and symbolic text contract; approved and merged.",
+      "merge_commit": "09dd8ea1d5deb2ef4b1d16115ea953585752cfdf"
     },
     "json_binding": {
       "owner": "Gustavo2358/analysis-ir",
@@ -23,7 +24,7 @@
       "targets_air_version": "2.0.0",
       "path": "bindings/json-v1.md",
       "review_path": "bindings/revisao-json-v1.md",
-      "checked_commit": "b628e4c1a62de61a157cac85ae71ba4cd111052e",
+      "checked_commit": "09dd8ea1d5deb2ef4b1d16115ea953585752cfdf",
       "implemented_in_analysis_cfg": false
     },
     "files": [
@@ -37,7 +38,7 @@
       },
       {
         "path": "bindings/json-v1.md",
-        "git_blob_sha1": "71f53edad6b97d85b00bc153a8ba4718999c3760"
+        "git_blob_sha1": "236ad380eb52fd6c435df8dac6c5bc6428656ef3"
       },
       {
         "path": "bindings/revisao-json-v1.md",
@@ -49,7 +50,7 @@
       },
       {
         "path": "conformidade/02-oraculos.md",
-        "git_blob_sha1": "0c14b1b7aecdec51bdbea9aa6ee418afdcf9d266"
+        "git_blob_sha1": "3e39e8d493c2414b46aebe15da77d86cc64153cb"
       },
       {
         "path": "especificacao/00-escopo-e-convencoes.md",
@@ -61,7 +62,7 @@
       },
       {
         "path": "especificacao/02-tipos-valores-e-operandos.md",
-        "git_blob_sha1": "bab3f66ff0f40c428195cb734bff7a7629f33b4e"
+        "git_blob_sha1": "785d28f2cbf256143dd15fb5d1123b1e075ec2ee"
       },
       {
         "path": "especificacao/03-memoria-e-aliases.md",
@@ -137,20 +138,20 @@
       }
     ],
     "baseline_assessment": "FD-W1 resource.bindings@1 after model loss proof; AIR2.0.0/binding1.0.0.",
-    "observed_on": "2026-10-02",
+    "observed_on": "2026-10-04",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
-    "evidence_level": "Selected local returns and complete unwind: local checkpoint; AIR FAST and qualification passed. Human merge review pending.",
-    "status": "LOCAL_VALIDATED / HUMAN_REVIEW_PENDING"
+    "evidence_level": "Priority2 canonical MOVE and numeric/text expressions; local producer FAST passed. Consumer and final frozen73 qualification recorded in docs/work/numeric-text-values.md. Earlier named evidence remains historical.",
+    "status": "MERGED / VALIDATED"
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "851931b68f420cba09fdcaca1cbdebffeba7189a",
-    "canonical_ref": "fix/compact-perform-contexts",
+    "commit": "b00e90d2fb9f38f7b0c8773fe432f9c6d6f88e23",
+    "canonical_ref": "main",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
     "analysis_ir": {
       "semantic_version": "2.0.0",
-      "commit": "f8c723e5f023cde92a6f4650e3be9334ebbaba1a"
+      "commit": "09dd8ea1d5deb2ef4b1d16115ea953585752cfdf"
     },
     "maven": {
       "group_id": "io.github.gustavo2358",
@@ -192,7 +193,7 @@
       "air-model/src/main/java/io/github/gustavo2358/air/model/MemoryCodecs.java",
       "air-json/src/test/resources/regional.canonical.json"
     ],
-    "observed_on": "2026-10-02",
+    "observed_on": "2026-10-04",
     "modules": {
       "parent": {
         "path": "pom.xml",
@@ -214,8 +215,8 @@
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "logical_text_w2": "Local producer FAST PASS; fixed logical ranges and expression transport. Selected source E2E qualification in docs/product/logical-text-w2.md.",
-    "evidence_level": "Selected local returns and complete unwind: local checkpoint; AIR FAST and qualification passed. Human merge review pending.",
-    "status": "LOCAL_VALIDATED / HUMAN_REVIEW_PENDING"
+    "evidence_level": "Priority2 canonical MOVE and numeric/text expressions; local producer FAST passed. Consumer and final frozen73 qualification recorded in docs/work/numeric-text-values.md. Earlier named evidence remains historical.",
+    "status": "MERGED / VALIDATED"
   },
   "proleap_poc": {
     "repository": "Gustavo2358/proleap-poc",
@@ -298,9 +299,9 @@
       "src/main/java/io/github/gustavo2358/cobolexplorer/ControlTopologySemantics.java",
       "src/main/java/io/github/gustavo2358/cobolexplorer/TableTextSemantics.java"
     ],
-    "semantic_product_version": "2.62.0",
+    "semantic_product_version": "2.66.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "e6d1fa7f54bee07469bdb7ebd4a98701ca68419b",
+    "commit": "21065f83e2a3c01c1429068dd3e199666ccbe17e",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -312,7 +313,7 @@
     },
     "storage_contract_version": "1.11.0",
     "canonical_ref": "main",
-    "observed_on": "2026-10-01",
+    "observed_on": "2026-10-04",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "fd_w1_validation": "docs/work/active/FD-W1.yaml",
@@ -334,13 +335,13 @@
       "contract": "SP 2.62 / NOMINAL_TEXT_SOURCE_V4; modelAssumed remains unavailable as physical storage, runtime VALUE or kill proof",
       "qualification": "docs/work/carddemo-values-control.md"
     },
-    "evidence_level": "JSON Zstandard qualification: fixed FAST, 14 integrated cases, 12 adversarial/auxiliary CLI checks and 73 CardDemo variants twice per format. Logical products preserved; PARTIAL and runtime limits remain. See docs/engineering/json-zstd.md. Earlier named campaign evidence remains historical.",
+    "evidence_level": "Priority2 canonical MOVE and numeric/text expressions; local producer FAST passed. Consumer and final frozen73 qualification recorded in docs/work/numeric-text-values.md. Earlier named evidence remains historical.",
     "json_artifact_transport": "Zstandard .json.zst; logical JSON hashes and semantic contracts unchanged"
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
-    "status": "LOCAL_VALIDATED / HUMAN_REVIEW_PENDING",
-    "commit": "6dae2889d74377f82857b38e19599429cd76ea93",
+    "status": "MERGED / VALIDATED",
+    "commit": "b4551bec673957a73ca1d2533e830b0584f2088b",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -352,8 +353,8 @@
     "goto_validation": {
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
     },
-    "canonical_ref": "fix/compact-perform-contexts",
-    "observed_on": "2026-10-03",
+    "canonical_ref": "main",
+    "observed_on": "2026-10-04",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "fd_w1_validation": "docs/work/active/FD-W1.yaml",
@@ -384,7 +385,7 @@
       "producer_api": "io.github.gustavo2358.lower.adapters.cli.CobolDependencyInput",
       "schema_sha256": "5f751464dee36a993d9238a32e25d68d396ce8ca3fa2e0198f29b4e6a7f505c0"
     },
-    "evidence_level": "Unified PERFORM frames for published/historical/mixed policies, CICS/ESCAPE, inline and structural inputs. Lower and consumer FAST/full passed; 560 fresh pipeline runs and 560 final consumer reexecutions preserved all source dependencies with auditable correspondences. See docs/engineering/lower-unification.md.",
+    "evidence_level": "Priority2 canonical MOVE and numeric/text expressions; local producer FAST passed. Consumer and final frozen73 qualification recorded in docs/work/numeric-text-values.md. Earlier named evidence remains historical.",
     "perform_completion": "Scoped exits, SECTION boundaries, typed VARYING levels; Integration authorized; qualified original 39/39 and adversaries 25/25. See docs/domain/perform-control-completion.md.",
     "logical_alias_move": "Logical family translation precedes scalar shortcuts; 14/14 adversaries, PERFORM 39/39, reviewed chaos 48/48 with six explicit abstraction-policy cases; see docs/product/logical-alias-move.md.",
     "synthetic_model_assumptions": {
@@ -453,5 +454,5 @@
     "physical": "EXPERIMENTAL_EXPLICIT_OPT_IN_ONLY",
     "report": "docs/campaigns/positive-memory-topology/W2-REPORT.md"
   },
-  "metadata_scope": "Active AIR/spec/lower pins are immutable qualified checkpoints integrated by analysis-ir #9, air-java #26 and cobol-lower #56 on 2026-10-03. Their commits are retained in main; pins need not equal later merge/documentation heads. See docs/engineering/lower-unification.md. Earlier named campaign evidence and review records remain historical."
+  "metadata_scope": "Active pins are immutable priority2 review commits. Earlier campaign records remain historical. No merge; see docs/work/numeric-text-values.md."
 }
