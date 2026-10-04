@@ -3,7 +3,7 @@
   "observed_on": "2026-10-04",
   "analysis_ir": {
     "repository": "Gustavo2358/analysis-ir",
-    "commit": "61e13365f09bf3fff951ae6f0c63b0d64e2698e1",
+    "commit": "84d3de37299a9582eb83f2d360e17c86615b29bd",
     "semantic_version": "2.0.0",
     "role": "normative",
     "canonical_ref": "feat/numeric-value-transforms",
@@ -11,7 +11,7 @@
       "pull_request": 10,
       "state": "open",
       "draft": true,
-      "head_commit": "61e13365f09bf3fff951ae6f0c63b0d64e2698e1",
+      "head_commit": "84d3de37299a9582eb83f2d360e17c86615b29bd",
       "scope": "Priority 2 numeric conversion and symbolic text contract; human review pending."
     },
     "json_binding": {
@@ -23,7 +23,7 @@
       "targets_air_version": "2.0.0",
       "path": "bindings/json-v1.md",
       "review_path": "bindings/revisao-json-v1.md",
-      "checked_commit": "61e13365f09bf3fff951ae6f0c63b0d64e2698e1",
+      "checked_commit": "84d3de37299a9582eb83f2d360e17c86615b29bd",
       "implemented_in_analysis_cfg": false
     },
     "files": [
@@ -37,7 +37,7 @@
       },
       {
         "path": "bindings/json-v1.md",
-        "git_blob_sha1": "4c43edf9ec608f6b7124c5e8e79e66676c5647e6"
+        "git_blob_sha1": "236ad380eb52fd6c435df8dac6c5bc6428656ef3"
       },
       {
         "path": "bindings/revisao-json-v1.md",
@@ -49,7 +49,7 @@
       },
       {
         "path": "conformidade/02-oraculos.md",
-        "git_blob_sha1": "8f4a5bb00c882f7c9b51a05586b42c4a3db963f1"
+        "git_blob_sha1": "3e39e8d493c2414b46aebe15da77d86cc64153cb"
       },
       {
         "path": "especificacao/00-escopo-e-convencoes.md",
@@ -144,13 +144,13 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "73091007d068ef4a163376062183a9753864be14",
+    "commit": "ae1b69f36d4abd44c452124ef92406e52c6a2751",
     "canonical_ref": "feat/condition-range-json",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
     "analysis_ir": {
       "semantic_version": "2.0.0",
-      "commit": "61e13365f09bf3fff951ae6f0c63b0d64e2698e1"
+      "commit": "84d3de37299a9582eb83f2d360e17c86615b29bd"
     },
     "maven": {
       "group_id": "io.github.gustavo2358",
@@ -340,7 +340,7 @@
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "LOCAL_VALIDATED / HUMAN_REVIEW_PENDING",
-    "commit": "e2eea3fdd25c90988aca328705eb6ddd5018370a",
+    "commit": "02945c4117e38266134fdb47650f0c35fae8bbe8",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
