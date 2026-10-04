@@ -3,16 +3,17 @@
   "observed_on": "2026-10-04",
   "analysis_ir": {
     "repository": "Gustavo2358/analysis-ir",
-    "commit": "84d3de37299a9582eb83f2d360e17c86615b29bd",
+    "commit": "09dd8ea1d5deb2ef4b1d16115ea953585752cfdf",
     "semantic_version": "2.0.0",
     "role": "normative",
-    "canonical_ref": "feat/numeric-value-transforms",
+    "canonical_ref": "main",
     "upstream_review": {
       "pull_request": 10,
-      "state": "open",
-      "draft": true,
+      "state": "merged",
+      "draft": false,
       "head_commit": "84d3de37299a9582eb83f2d360e17c86615b29bd",
-      "scope": "Priority 2 numeric conversion and symbolic text contract; human review pending."
+      "scope": "Priority 2 numeric conversion and symbolic text contract; approved and merged.",
+      "merge_commit": "09dd8ea1d5deb2ef4b1d16115ea953585752cfdf"
     },
     "json_binding": {
       "owner": "Gustavo2358/analysis-ir",
@@ -23,7 +24,7 @@
       "targets_air_version": "2.0.0",
       "path": "bindings/json-v1.md",
       "review_path": "bindings/revisao-json-v1.md",
-      "checked_commit": "84d3de37299a9582eb83f2d360e17c86615b29bd",
+      "checked_commit": "09dd8ea1d5deb2ef4b1d16115ea953585752cfdf",
       "implemented_in_analysis_cfg": false
     },
     "files": [
@@ -140,17 +141,17 @@
     "observed_on": "2026-10-04",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "evidence_level": "Priority2 canonical MOVE and numeric/text expressions; local producer FAST passed. Consumer and final frozen73 qualification recorded in docs/work/numeric-text-values.md. Earlier named evidence remains historical.",
-    "status": "LOCAL_VALIDATED / HUMAN_REVIEW_PENDING"
+    "status": "MERGED / VALIDATED"
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "ae1b69f36d4abd44c452124ef92406e52c6a2751",
-    "canonical_ref": "feat/condition-range-json",
+    "commit": "b00e90d2fb9f38f7b0c8773fe432f9c6d6f88e23",
+    "canonical_ref": "main",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
     "analysis_ir": {
       "semantic_version": "2.0.0",
-      "commit": "84d3de37299a9582eb83f2d360e17c86615b29bd"
+      "commit": "09dd8ea1d5deb2ef4b1d16115ea953585752cfdf"
     },
     "maven": {
       "group_id": "io.github.gustavo2358",
@@ -215,7 +216,7 @@
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "logical_text_w2": "Local producer FAST PASS; fixed logical ranges and expression transport. Selected source E2E qualification in docs/product/logical-text-w2.md.",
     "evidence_level": "Priority2 canonical MOVE and numeric/text expressions; local producer FAST passed. Consumer and final frozen73 qualification recorded in docs/work/numeric-text-values.md. Earlier named evidence remains historical.",
-    "status": "LOCAL_VALIDATED / HUMAN_REVIEW_PENDING"
+    "status": "MERGED / VALIDATED"
   },
   "proleap_poc": {
     "repository": "Gustavo2358/proleap-poc",
@@ -300,7 +301,7 @@
     ],
     "semantic_product_version": "2.66.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "baef7485e3b6625f0e5e57535332b429017da2bd",
+    "commit": "21065f83e2a3c01c1429068dd3e199666ccbe17e",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -311,7 +312,7 @@
       "scope": "local unconditional paragraph identity and explicit entry; G1-G5 and 1/2/5/40"
     },
     "storage_contract_version": "1.11.0",
-    "canonical_ref": "fix/reconcile-semantic-gap-diagnostics",
+    "canonical_ref": "main",
     "observed_on": "2026-10-04",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
@@ -339,8 +340,8 @@
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
-    "status": "LOCAL_VALIDATED / HUMAN_REVIEW_PENDING",
-    "commit": "02945c4117e38266134fdb47650f0c35fae8bbe8",
+    "status": "MERGED / VALIDATED",
+    "commit": "b4551bec673957a73ca1d2533e830b0584f2088b",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -352,7 +353,7 @@
     "goto_validation": {
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
     },
-    "canonical_ref": "fix/active-semantic-gap-admission",
+    "canonical_ref": "main",
     "observed_on": "2026-10-04",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",

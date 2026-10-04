@@ -1,6 +1,6 @@
 # Valores textuais das conversões numéricas
 
-Implementação qualificada e pronta para review; work item IN_PROGRESS até merge. Escopo: conservar a estrutura dos valores de fit_text e
+Revisão aprovada em 2026-10-04. O merge do [PR #64](https://github.com/Gustavo2358/analysis-cfg/pull/64) efetiva DONE com os testes aprovados. Escopo: conservar a estrutura dos valores de fit_text e
 slice_text sem alocar as posições implícitas da PICTURE.
 
 A regra é a sequência de escalares Unicode da AIR 02: fitting preserva o prefixo,
