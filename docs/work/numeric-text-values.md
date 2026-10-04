@@ -82,3 +82,18 @@ A mesma rotina comprimida deve aceitar ambos, consultar MemoryCodecs por run e
 recusar escalares não representáveis. Nenhuma codificação implícita é permitida.
 Oracle: A + padding em um bilhão de posições usa 41/20 em ASCII e C1/40 em IBM1047;
 o teste integrado existente conserva candidato, captura lógica e overwrite.
+
+## Cache limitado das operações booleanas
+
+A qualificação detectou 78,72/57,18 s nas duas variantes COTRN02C, contra
+36,76/30,38 s na wave10. Um experimento isolado com a mesma AIR e a mesma análise,
+alterando apenas o cache direto de 16.384 para 65.536 slots, concluiu o primeiro
+caso em 18,55 s e produziu dependencies JSON integralmente idêntico. O cache de
+quatro vetores int passa de 256 KiB para 1 MiB por manager. É memória fixa;
+colisões continuam descartando somente memoização e jamais fatos/condições.
+Não há cache global, orçamento semântico, novo solver ou limite de candidatos.
+
+Os oracles existentes com duas posições forçam colisões; os de descarte exercitam
+reuso de IDs e tabelas de verdade independentes. O FAST usa também a capacidade
+default nova. A qualificação posterior repete apenas dependencies nos 73 inputs
+congelados e compara todos os bytes; SP, AIR e CFG são materialmente inalterados.
