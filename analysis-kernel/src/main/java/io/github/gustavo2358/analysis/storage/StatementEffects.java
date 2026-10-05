@@ -87,7 +87,7 @@ public final class StatementEffects {
                 b.write(b.writes,Optional.empty(),destination,Strength.MUST,new CapturedBytes(source,c.length()));
             } else b.envelope(c.fallback().memory(),b.writes);
         } else if(operation instanceof Operations.Opaque o) {
-            for(var operand:o.knownOperands())b.visit(operand,ReadKind.ADDRESS);
+            for(var operand:o.knownOperands())b.visit(operand,operand instanceof Expression&&operand.header().role()==Operand.Role.VALUE_READ?ReadKind.VALUE:ReadKind.ADDRESS);
             b.envelope(o.envelope().memory(),b.writes);
         } else if(operation instanceof Operations.Invoke invoke) {
             if(invoke.target() instanceof Interactions.ComputedTarget target)b.visit(target.name(),ReadKind.TARGET);
@@ -188,7 +188,8 @@ public final class StatementEffects {
             record Visit(Operand operand,ReadKind kind) { }
             var pending=new ArrayDeque<Visit>();pending.push(new Visit(root,kind));
             while(!pending.isEmpty()) {
-                var item=pending.pop();var operand=item.operand();var role=item.kind();operandVisits++;
+                var item=pending.pop();var operand=item.operand();var role=operand.header().role()==Operand.Role.ADDRESS_READ?ReadKind.ADDRESS:
+                    item.kind();operandVisits++;
                 if(operand instanceof Place p) {
                     places.put(p.header().id(),p);
                     if(p instanceof Places.RegionSlice s){pending.push(new Visit(s.length(),ReadKind.ADDRESS));pending.push(new Visit(s.offset(),ReadKind.ADDRESS));}

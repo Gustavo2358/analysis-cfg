@@ -299,9 +299,9 @@
       "src/main/java/io/github/gustavo2358/cobolexplorer/ControlTopologySemantics.java",
       "src/main/java/io/github/gustavo2358/cobolexplorer/TableTextSemantics.java"
     ],
-    "semantic_product_version": "2.66.0",
+    "semantic_product_version": "2.67.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "21065f83e2a3c01c1429068dd3e199666ccbe17e",
+    "commit": "79908ed5c80a7ae5ecc2c85bb6592f4600c512de",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -312,7 +312,7 @@
       "scope": "local unconditional paragraph identity and explicit entry; G1-G5 and 1/2/5/40"
     },
     "storage_contract_version": "1.11.0",
-    "canonical_ref": "main",
+    "canonical_ref": "feat/checkpoint3-predicates",
     "observed_on": "2026-10-04",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
@@ -322,7 +322,7 @@
     "fd_w4_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED producers, manual outcomes/USE and 28 real CLI sources twice; file-dependencies/w4-implementation.md",
     "fd_w5_validation": "QUALIFIED_LOCAL: focal/FAST, producer Q-SHARED with bounded final reuse, manual local AIR/wire and44 real CLI sources twice; file-dependencies/w5-implementation.md",
     "fd_w6_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED,19 B-SP fixtures,15 manual AIR tests and33 real CLI sources twice; file-dependencies/w6-implementation.md",
-    "status": "DONE / MERGED; existing PARTIAL and runtime limits preserved",
+    "status": "checkpoint3 review pin; integrated CP1/CP2 preserved",
     "fd_w8_validation": "QUALIFIED_LOCAL: producer FAST/Q-SHARED, B-SP33, CFG FAST502/Q547, manual/wire and38CICS+33native source cases twice; docs/product/file-dependencies/w8-implementation.md",
     "fd_w9_validation": "QUALIFIED_LOCAL: producer focal/FAST/Q, consumer manual/FAST/reader, 8 scope + 33 native + 38 CICS real CLI sources twice, deterministic four products; docs/product/file-dependencies/w9-implementation.md",
     "logical_text_w1": "Source E2E A-D twice deterministic; scale 10/100/1000; no physical profile. Corporate rerun not required by revised user acceptance.",
@@ -336,12 +336,13 @@
       "qualification": "docs/work/carddemo-values-control.md"
     },
     "evidence_level": "Priority2 canonical MOVE and numeric/text expressions; local producer FAST passed. Consumer and final frozen73 qualification recorded in docs/work/numeric-text-values.md. Earlier named evidence remains historical.",
-    "json_artifact_transport": "Zstandard .json.zst; logical JSON hashes and semantic contracts unchanged"
+    "json_artifact_transport": "Zstandard .json.zst; logical JSON hashes and semantic contracts unchanged",
+    "checkpoint3_predicates": "Shared scalar predicates; source facts and executable frontiers kept distinct; no AP engine."
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
-    "status": "MERGED / VALIDATED",
-    "commit": "b4551bec673957a73ca1d2533e830b0584f2088b",
+    "status": "checkpoint3 review pin; integrated CP1/CP2 preserved",
+    "commit": "7fd040cdc7a6d4bb7c6d3197779cc1d54e504719",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -353,7 +354,7 @@
     "goto_validation": {
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
     },
-    "canonical_ref": "main",
+    "canonical_ref": "feat/checkpoint3-predicates",
     "observed_on": "2026-10-04",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
@@ -392,7 +393,8 @@
       "contract": "SP 2.62 / NOMINAL_TEXT_SOURCE_V4; modelAssumed remains unavailable as physical storage, runtime VALUE or kill proof",
       "qualification": "docs/work/carddemo-values-control.md"
     },
-    "json_artifact_transport": "Zstandard .json.zst; logical JSON hashes and semantic contracts unchanged"
+    "json_artifact_transport": "Zstandard .json.zst; logical JSON hashes and semantic contracts unchanged",
+    "checkpoint3_predicates": "Shared scalar predicates; source facts and executable frontiers kept distinct; no AP engine."
   },
   "external": [
     {
@@ -454,5 +456,5 @@
     "physical": "EXPERIMENTAL_EXPLICIT_OPT_IN_ONLY",
     "report": "docs/campaigns/positive-memory-topology/W2-REPORT.md"
   },
-  "metadata_scope": "Active pins are immutable priority2 review commits. Earlier campaign records remain historical. No merge; see docs/work/numeric-text-values.md."
+  "metadata_scope": "Active pins are checkpoint3 review commits based on integrated CP1/CP2. AIR and normative IR remain unchanged; earlier campaign records are historical."
 }

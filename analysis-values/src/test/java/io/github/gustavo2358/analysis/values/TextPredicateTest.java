@@ -98,4 +98,21 @@ class TextPredicateTest {
         assertEquals(TextPredicate.BOTH,TextPredicate.truth(comparison,x->TextPredicate.Text.unknown()));
     }
 
+    @Test void exactScalarConstantsCanPruneButUnknownNumericReadsCannot() {
+        var h=program(null).units().getFirst().sequences().getFirst().terminator().header();
+        var a=new Expressions.Literal(operand(h.id(),"one",Operand.Role.VALUE_READ),new Values.IntValue(java.math.BigInteger.ONE));
+        var decimal=new Expressions.Unary(operand(h.id(),"decimal",Operand.Role.VALUE_READ),Expressions.UnaryOperator.TO_DECIMAL,a);
+        var b=new Expressions.Literal(operand(h.id(),"one25",Operand.Role.VALUE_READ),new Values.DecimalValue(java.math.BigInteger.valueOf(125),java.math.BigInteger.valueOf(2)));
+        for(var op:List.of(Expressions.BinaryOperator.EQ,Expressions.BinaryOperator.NE,Expressions.BinaryOperator.LT,Expressions.BinaryOperator.LE,Expressions.BinaryOperator.GT,Expressions.BinaryOperator.GE)) {
+            var expression=new Expressions.Binary(operand(h.id(),"compare",Operand.Role.PREDICATE),op,decimal,b);
+            assertEquals(Set.of(Expressions.BinaryOperator.NE,Expressions.BinaryOperator.LT,Expressions.BinaryOperator.LE).contains(op)?TextPredicate.TRUE:TextPredicate.FALSE,
+                TextPredicate.truth(expression,x->TextPredicate.Text.unknown()),op.toString());
+        }
+        var unknown=new Expressions.Unknown(operand(h.id(),"input",Operand.Role.VALUE_READ),Types.known(Types.Builtin.DECIMAL),List.of(),Scopes.NoMemory.INSTANCE,new UncertaintyId(h.id().publication(),"input"));
+        var expression=new Expressions.Binary(operand(h.id(),"unknown-eq",Operand.Role.PREDICATE),Expressions.BinaryOperator.EQ,unknown,b);
+        assertEquals(TextPredicate.BOTH,TextPredicate.truth(expression,x->TextPredicate.Text.unknown()));
+        var text=new Expressions.Literal(operand(h.id(),"text",Operand.Role.VALUE_READ),new Values.TextValue("A"));
+        assertEquals(TextPredicate.BOTH,TextPredicate.truth(new Expressions.Binary(operand(h.id(),"order",Operand.Role.PREDICATE),Expressions.BinaryOperator.LT,text,text),x->TextPredicate.Text.unknown()));
+    }
+
 }

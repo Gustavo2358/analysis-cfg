@@ -378,7 +378,8 @@
     "io.github.gustavo2358.analysis.storage.StatementEffectsTest": [
       "partialMustWriteDoesNotTouchIndependentBase",
       "ambiguousMustAndScopedMayNeverBecomeSimultaneousStrongWrites",
-      "copyCapturesSourceAndOpaqueUnknownWritesAreExplicit"
+      "copyCapturesSourceAndOpaqueUnknownWritesAreExplicit",
+      "addressDependenciesOfUnknownPredicateRemainAddressReads"
     ],
     "io.github.gustavo2358.analysis.storage.ReachingDefinitionsTest": [
       "invocationTargetIsObservedBeforeNormalEffectsAndOutcomeReplay",
@@ -805,6 +806,16 @@
       "billionPositionsUseTwoSpansWithExactOffsets",
       "asciiBillionPositionsRetainTheExistingCodec",
       "noImplicitEncodingOrReplacementForUnknownScalars"
+    ],
+    "io.github.gustavo2358.analysis.values.TextPredicateTest": [
+      "closedEqualityAndUnknownInput",
+      "digitsPredicateSelectsValidAndInvalidControlWithoutTrimming",
+      "compressedDigitsDoNotRequireExpandedCharacters",
+      "mayScopedWriteInvalidatesClosure",
+      "openEntryPossibilityNeverClosesAPredicate",
+      "anOpenPredecessorSurvivesAJoinWithAClosedPredecessor",
+      "predicateImagesRespectBooleanCompositionUnicodeAndRepresentableExtents",
+      "exactScalarConstantsCanPruneButUnknownNumericReadsCannot"
     ]
   },
   "cfg-adapters": {

@@ -8,6 +8,17 @@ import static io.github.gustavo2358.analysis.storage.StorageFixtures.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class StatementEffectsTest {
+
+    @Test void addressDependenciesOfUnknownPredicateRemainAddressReads() {
+        var h=header("decision");var read=new Expressions.Read(operand("decision","index-read",Operand.Role.ADDRESS_READ),place("decision","index"));
+        var predicate=new Expressions.Unknown(operand("decision","predicate",Operand.Role.PREDICATE),Types.known(Types.Builtin.BOOL),List.of(read),Scopes.NoMemory.INSTANCE,UNKNOWN);
+        var branch=new Operations.Branch(h,predicate,new LabelId(U,"yes"),new LabelId(U,"no"));
+        var sequences=List.of(new Sequence(new LabelId(U,"entry"),List.of(),branch,O),sequence("yes",List.of()),sequence("no",List.of()));
+        var object=declaration("index",new Memory.UnknownBinding(new Scopes.StorageMemory(List.of(base("r1"))),UNKNOWN));
+        var effects=new StatementEffects(new StorageIndex(session(publication(List.of(region("r1",8L,Memory.Lifetime.PERSISTENT)),List.of(object),sequences,List.of()))));
+        var fact=effects.statement(h.id());assertTrue(fact.writes().isEmpty());
+        assertEquals(StatementEffects.ReadKind.ADDRESS,fact.reads().getFirst().kind());
+    }
     @Test void boundedOpenObjectDoesNotReceiveUnrelatedLogicalWrite() {
         var write=assign("write-q","q",1,2,3,4,5,6,7,8);
         var bases=List.of(region("r1",8L,Memory.Lifetime.PERSISTENT),region("r2",8L,Memory.Lifetime.PERSISTENT));
