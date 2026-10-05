@@ -1,0 +1,10 @@
+{
+  "id": "WORK-CHECKPOINT3-PREDICATES",
+  "title": "Predicados escalares compartilhados de IF, EVALUATE e PERFORM",
+  "status": "IN_PROGRESS",
+  "scope": [
+    "Scalar relations and Boolean composition; preserve level-88 and MOVE",
+    "Single-subject EVALUATE and UNTIL; existing control topology",
+    "Cross-boundary read/evidence preservation and conservative precision; no AP or slicing engine"
+  ]
+}

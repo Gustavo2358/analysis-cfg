@@ -30,6 +30,12 @@ public final class TextPredicate {
         if(binary.operator()==Expressions.BinaryOperator.AND||binary.operator()==Expressions.BinaryOperator.OR) {
             return combine(binary.operator()==Expressions.BinaryOperator.AND,truth(binary.left(),read),truth(binary.right(),read));
         }
+        var numericLeft=number(binary.left());var numericRight=number(binary.right());
+        if(numericLeft.isPresent()&&numericRight.isPresent()) {
+            int order=numericLeft.get().compareTo(numericRight.get());
+            Boolean result=switch(binary.operator()){case EQ->order==0;case NE->order!=0;case LT->order<0;case LE->order<=0;case GT->order>0;case GE->order>=0;default->null;};
+            if(result!=null)return result?TRUE:FALSE;
+        }
         if(binary.operator()!=Expressions.BinaryOperator.EQ&&binary.operator()!=Expressions.BinaryOperator.NE)return BOTH;
         var a=text(binary.left(),read);var b=text(binary.right(),read);
         if(a.open||b.open||a.values.isEmpty()||b.values.isEmpty()
@@ -37,6 +43,15 @@ public final class TextPredicate {
         boolean same=a.values.stream().anyMatch(b.values::contains);
         int equal=(same?TRUE:0)|(a.values.size()==1&&a.values.equals(b.values)?0:FALSE);
         return binary.operator()==Expressions.BinaryOperator.EQ?equal:negate(equal);
+    }
+    /** Literal-only image: no runtime numeric propagation or feasibility solver. */
+    private static Optional<java.math.BigDecimal> number(Expression expression) {
+        if(expression instanceof Expressions.Unary unary&&unary.operator()==Expressions.UnaryOperator.TO_DECIMAL)return number(unary.argument());
+        if(expression instanceof Expressions.Literal literal) {
+            if(literal.value() instanceof Values.IntValue value)return Optional.of(new java.math.BigDecimal(value.value()));
+            if(literal.value() instanceof Values.DecimalValue value)try{return Optional.of(new java.math.BigDecimal(value.coefficient(),value.scale().intValueExact()));}catch(ArithmeticException outside){return Optional.empty();}
+        }
+        return Optional.empty();
     }
     public static int negate(int value){return ((value&FALSE)!=0?TRUE:0)|((value&TRUE)!=0?FALSE:0);}
     /** Shared Boolean and logical text operations for independent value providers. */
