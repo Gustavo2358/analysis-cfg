@@ -1,5 +1,7 @@
 # Checkpoint 3 — predicados escalares
 
+Estado: **MERGED / DONE**, [PR #65](https://github.com/Gustavo2358/analysis-cfg/pull/65), merge `6c41ebdfcb43ee4a910fde05bd4f5f006ca82308`. FAST remoto do head com pins integrados passou. A árvore mergeada é idêntica ao head `11dcd32a1fb00cb3355435e37bd3c36b84232793`; código/testes/build permanecem iguais ao head qualificado `016ec260609451b411257eacadca7e1e4f70c6b0`. Evidências full73 e oito E2Es/codec são reutilizadas por equivalência, sem nova execução documental.
+
 Pins integrados: frontend `3bb653a62161626f804aa7ae90f5c9c24f2d581c` (PRs #88/#89), lower `c4d48991b88ef6d13eef659859b23d801684093b` (PRs #60/#61). Desde os heads qualificados, apenas documentação e pins equivalentes mudaram; código, testes, recursos e build estão preservados.
 
 Autorização: implementação solicitada em 2026-10-04; fechamento documental e merge autorizados em seguida.
