@@ -50,6 +50,21 @@ em combinações. A terminação decorre do percurso de árvores finitas. Oracle
 relações por família, abreviações/NOT/grouping, mixed 88, first match/no match,
 reads/aliases/índices, round-trip/rejeição de payload e dependencies E2E.
 
+### Revisão P2 — constantes booleanas e codec pinado
+
+SP 2.67 publica BOOL, mas o codec AIR pinado não transporta BoolValue. Uma árvore
+inteiramente formada por BOOL/NOT/AND/OR tem verdade conhecida e nenhuma leitura
+ou efeito: o lower calcula sua álgebra booleana e publica Jump ao destino correto,
+com o mesmo ID, origem e vínculo da decisão. O percurso é iterativo, O(n) tempo e
+memória, sem avaliação de valores de runtime. Não se usa short-circuit para provar
+constância de árvores que contenham READ/TEST/UNKNOWN ou relações escalares.
+
+Em árvores mistas, BOOL usa uma igualdade entre constantes INT (0 = 0 ou 0 = 1),
+já admitida pelo modelo/codec. Isso mantém a composição, todos os reads, efeitos e
+fronteiras, sem ampliar o codec nem deixar BoolValue escapar na publicação. Oracles
+incluem o dual EVALUATE TRUE/FALSE pelo frontend real, round-trip AIR e dependencies,
+NOT/AND/OR constantes e negativos com reads e UNKNOWN READS_OPEN.
+
 ## Limites e evidência de qualificação
 
 A árvore registra significado e causalidade de origem, não garante endereço válido
@@ -62,8 +77,9 @@ continuam input real, diferente de capacidade não implementada.
 O provedor condicional nominal legado não consome toda a nova árvore de WHEN/UNTIL.
 O dependencies pode conservar candidatos sustentados por hipóteses de fonte mesmo
 quando os valores executáveis já restringem um alvo. Leituras numéricas de runtime
-e BOOL constante isolado não recebem nova propagação no consumidor; relações
-numéricas entre constantes são a precisão adicional delimitada desta mudança.
+não recebem nova propagação no consumidor. BOOL fonte inteiramente constante é
+reduzido no lower; relações numéricas entre constantes mantêm a precisão adicional
+delimitada deste checkpoint.
 
 Testes cobrem as seis relações, abreviação/distribuição e NOT, mistura com 88,
 seleção ordenada e PERFORM BEFORE/AFTER, fitting textual, índices, tipos abertos,
