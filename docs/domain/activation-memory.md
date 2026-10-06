@@ -70,9 +70,14 @@ its member frames, then propagate bitsets once along the condensation DAG in
 topological order. Root has no variable and does not become a caller vertex.
 This computes exactly the previous transitive closure, not a new approximation.
 Duplicate edges are idempotent; equal activation keys remain equal bits.
-Time is O(F+P+(C+Pc)*ceil(K/word)), where P caller edges, C components, Pc
-condensed edges, K activation variables. Space is O(F+P+C*ceil(K/word)); output
-arrays share read-only component bitsets until returned frame snapshots are made.
+Including independently owned returned frame snapshots, time is
+O(F+P+(C+Pc+F)*ceil(K/word)), where P caller edges, C components, Pc condensed
+edges and K activation-variable ordinal span. Peak space is
+O(F+P+(C+F)*ceil(K/word)). Condensation shares computation, then clones each
+frame's mutable BitSet result so downstream mutation cannot change another frame.
+Dense returned support can still require quadratic space. The preceding typed
+control traversal is separate and can cost O(F*(V+E)); SCC does not make that
+whole stage linear.
 Finite DFS stacks and decreasing DAG indegrees establish termination.
 Independent seeded random graphs use scalar Floyd reachability as the oracle;
 cycles, disconnected vertices, duplicate edges and shared variables are covered.
