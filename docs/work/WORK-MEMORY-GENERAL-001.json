@@ -1,7 +1,7 @@
 {
   "id": "WORK-MEMORY-GENERAL-001",
   "title": "General memory correction: activation support, rooted BDD lifetime and consumers",
-  "status": "IN_PROGRESS",
+  "status": "DONE",
   "scope": [
     "analysis-kernel",
     "analysis-values",
@@ -10,5 +10,13 @@
     "regression and performance qualification",
     "shared admitted AIR outer pipeline composition"
   ],
-  "notes": "Authorized by the user on 2026-10-05. Checkpoint commits allowed; no merge or dependency loss. Full implementation and qualification required. Final local qualification is in progress. Human review and merge remain pending; source checkpoints do not mark DONE. Review F1: selected LOCAL_BOUNDARY wire must retain resumeKey and invalidExit and independently require v7; independent JSON consumption covers top-port/key/default/legacy behavior. Lower F2 requires coordinated exact repin and local qualification."
+  "notes": "Implementation approved by the user on 2026-10-06, required technical qualification passed, and product PR merged. Complete facts/dependencies and explicit partial states remain preserved. Performance claims stay limited to the measured operational controls; no universal corpus or OOM guarantee.",
+  "closure": {
+    "pull_request": "https://github.com/Gustavo2358/analysis-cfg/pull/67",
+    "approved_head": "59df7a1461c704284bad4d6a7fdf668feca9120e",
+    "merge_commit": "6a85dea1656403e77765b513ae0b6f0d6c130177",
+    "approval": "Explicit user approval and merge authorization, 2026-10-06",
+    "validation": "Reused qualified approved content; merged tree exactly equals approved head. Documentary closeout validated separately.",
+    "evidence": "artefatos-e2e/memory-general-fix-20261005/review-f1-f2-20261006/REVIEW-REMEDIATION.md"
+  }
 }
