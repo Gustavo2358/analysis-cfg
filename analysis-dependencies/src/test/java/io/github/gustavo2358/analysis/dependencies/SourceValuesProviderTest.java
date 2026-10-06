@@ -62,6 +62,17 @@ class SourceValuesProviderTest {
         assertEquals(0,new SourceValuesProvider(larger,Set.of()).workItems());
     }
 
+    @Test void noRequestedObservationRetainsNoPrivateControlOrStatementIndex() throws Exception {
+        var base=fixture(List.of(),List.of(),List.of());
+        var provider=new SourceValuesProvider(base,Set.of());
+        assertEquals(List.of(),provider.candidates("s2"));assertEquals(0,provider.workItems());
+        for(String name:List.of("controlAffected","statements","nodes","waiting","before")) {
+            var field=SourceValuesProvider.class.getDeclaredField(name);field.setAccessible(true);var value=field.get(provider);
+            assertTrue(value instanceof Map<?,?> map?map.isEmpty():((Set<?>)value).isEmpty(),"unobserved private index retained: "+name);
+        }
+        assertEquals(3,base.statements().size());assertEquals(3,base.nodes().size());assertEquals(1,base.proofs().size());
+    }
+
     static UnitEvidence model(UnitEvidence u, String symbol, int extent) {
         var old=u.nominalValues().orElseThrow();var f=old.facts();
         var symbols=f.symbols().stream().map(s->new NominalValues.Symbol(s.node(),s.node().equals(symbol)?extent:s.extent(),s.node().equals(symbol))).toList();

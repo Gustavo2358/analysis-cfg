@@ -50,10 +50,11 @@ public final class SourceValuesProvider {
     private boolean limited;
 
     public SourceValuesProvider(UnitEvidence unit,Set<String> requested) {
-        this.unit=unit;source=unit.nominalValues().orElseThrow();controlAffected=SourceControlEvidence.affected(unit);
-        unit.statements().forEach(s->statements.put(s.id().handle(),s));
+        this.unit=unit;source=unit.nominalValues().orElseThrow();
         source.facts().queries().stream().filter(q->requested.contains(q.statement())).forEach(q->queries.put(q.statement(),q.node()));
-        if(queries.isEmpty())return;
+        if(queries.isEmpty()){controlAffected=Set.of();return;}
+        controlAffected=SourceControlEvidence.affected(unit);
+        unit.statements().forEach(s->statements.put(s.id().handle(),s));
         var needed=neededNodes(unit,queries.keySet());
         for(var node:unit.nodes())if(needed.contains(node.id())) {
             nodes.put(node.id(),node);

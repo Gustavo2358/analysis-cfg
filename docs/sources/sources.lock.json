@@ -150,7 +150,7 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "c6730d32daebb628a92bedb39b7c953b94437188",
+    "commit": "c2f80b59b7c38fa6efb9a20f0fa79644c697d8a4",
     "canonical_ref": "fix/general-memory-20261005",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
@@ -198,7 +198,7 @@
       "air-model/src/main/java/io/github/gustavo2358/air/model/MemoryCodecs.java",
       "air-json/src/test/resources/regional.canonical.json"
     ],
-    "observed_on": "2026-10-04",
+    "observed_on": "2026-10-06",
     "modules": {
       "parent": {
         "path": "pom.xml",
@@ -223,7 +223,7 @@
     "evidence_level": "General memory model/codec implementation: local FAST and complete local qualification, with final documentation-only commit proven bytecode identical. Remote CI not dispatched; human review pending.",
     "status": "LOCAL_CHECKPOINT / HUMAN_REVIEW_PENDING",
     "ci": {
-      "checked_commit": "c6730d32daebb628a92bedb39b7c953b94437188",
+      "checked_commit": "c2f80b59b7c38fa6efb9a20f0fa79644c697d8a4",
       "status": "NOT_RUN",
       "context": "local qualification only"
     }
@@ -311,7 +311,7 @@
     ],
     "semantic_product_version": "2.67.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "12dec47dffc291cc14c0eff079bfc3ee8865ee42",
+    "commit": "35f9c732ab8a44d644077acad771e322ebc5def6",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -323,7 +323,7 @@
     },
     "storage_contract_version": "1.11.0",
     "canonical_ref": "fix/general-memory-20261005",
-    "observed_on": "2026-10-04",
+    "observed_on": "2026-10-06",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "fd_w1_validation": "docs/work/active/FD-W1.yaml",
@@ -352,7 +352,7 @@
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
     "status": "LOCAL_CHECKPOINT / HUMAN_REVIEW_PENDING",
-    "commit": "1d71d29a3fb625104a2374a006ac167020bdf23e",
+    "commit": "30be071fb59b2c1abf06d78e6d064fcd8f902ca4",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -365,7 +365,7 @@
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
     },
     "canonical_ref": "fix/general-memory-20261005",
-    "observed_on": "2026-10-04",
+    "observed_on": "2026-10-06",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "fd_w1_validation": "docs/work/active/FD-W1.yaml",

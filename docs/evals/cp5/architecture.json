@@ -74,6 +74,8 @@
     "analysis-launcher": {
       "wave": 5,
       "direct": [
+        "cfg-kernel",
+        "cfg-adapters",
         "analysis-dataflow",
         "analysis-adapters",
         "analysis-kernel",

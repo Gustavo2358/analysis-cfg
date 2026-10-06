@@ -5,7 +5,7 @@ METRICS=set('compositionRuns airReads airBytesObserved cfgBuilds defaultPlanDest
 CHALLENGES={n:5 for n in 'drop-batch-dependency-reason-in-wire drop-candidate-support-in-wire swap-candidate-support-in-wire source-partial-promoted-to-exact-in-wire full-id-owner-loss wrong-result-id-receipt wrong-result-hash-receipt wrong-result-destination-receipt writer-failure-reported-complete partial-final-file-after-write-failure nondeterministic-result-order local-input-size-cap-used-as-semantic-admission resource-cap-on-result-facts-queries legacy-cfg-writer-used-for-analysis-result golden-substituted-for-real-stage'.split()}
 MODULES={'analysis-dataflow':dict(wave=5,direct=['cfg-kernel','analysis-kernel','analysis-values','air-java'],forbidden=['analysis-adapters','analysis-launcher','air-json']),
  'analysis-adapters':dict(wave=5,direct=['analysis-dataflow','analysis-kernel','analysis-values','air-java','air-json'],forbidden=['analysis-launcher','cfg-adapters','cfg-launcher']),
- 'analysis-launcher':dict(wave=5,direct=['analysis-dataflow','analysis-adapters','analysis-kernel','air-java','air-json'],forbidden=['cfg-launcher'])}
+ 'analysis-launcher':dict(wave=5,direct=['cfg-kernel','cfg-adapters','analysis-dataflow','analysis-adapters','analysis-kernel','air-java','air-json'],forbidden=['cfg-launcher'])}
 def validate(root):
     errors=[]
     def require(ok,reason):

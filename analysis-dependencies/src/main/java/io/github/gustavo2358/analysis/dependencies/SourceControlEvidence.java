@@ -6,11 +6,26 @@ import io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDepende
 /** Grounded source certificates without an unknown-control premise. No executable reachability. */
 public final class SourceControlEvidence {
     private SourceControlEvidence() { }
+    record ProofClosure(Set<String> ids,long proofVisits,long edgeVisits) { }
+    /** Exact seeded proof reachability; no index is retained when there is no seed. */
+    static ProofClosure hypotheticalProofs(List<Proof> proofs) {
+        var hypothetical=new HashSet<String>();long proofVisits=0,edgeVisits=0;
+        for(var proof:proofs){proofVisits++;if(proof.kind().equals("CONTROL_POSSIBILITY"))hypothetical.add(proof.id());}
+        if(hypothetical.isEmpty())return new ProofClosure(Set.of(),proofVisits,0);
+        var dependents=new HashMap<String,List<String>>();
+        for(var proof:proofs) {
+            proofVisits++;
+            for(var dependency:proof.dependencies()){edgeVisits++;dependents.computeIfAbsent(dependency,k->new ArrayList<>()).add(proof.id());}
+        }
+        var queue=new ArrayDeque<>(hypothetical);
+        while(!queue.isEmpty())for(var id:dependents.getOrDefault(queue.removeFirst(),List.of())) {
+            edgeVisits++;if(hypothetical.add(id))queue.addLast(id);
+        }
+        return new ProofClosure(Collections.unmodifiableSet(hypothetical),proofVisits,edgeVisits);
+    }
     /** Nodes with at least one qualified alternative carrying an unknown-control premise. */
     public static Set<String> affected(UnitEvidence unit) {
-        var hypothetical=new HashSet<String>();boolean changed;
-        unit.proofs().stream().filter(p->p.kind().equals("CONTROL_POSSIBILITY")).forEach(p->hypothetical.add(p.id()));
-        do{changed=false;for(var p:unit.proofs())if(p.dependencies().stream().anyMatch(hypothetical::contains))changed|=hypothetical.add(p.id());}while(changed);
+        var hypothetical=hypotheticalProofs(unit.proofs()).ids();
         if(hypothetical.isEmpty())return Set.of();
         var waiting=new HashMap<String,List<String>>();var result=new HashSet<String>();var queue=new ArrayDeque<String>();
         for(var d:unit.derivations()) {
@@ -22,12 +37,8 @@ public final class SourceControlEvidence {
         return Set.copyOf(result);
     }
     public static Set<String> assumedOnly(UnitEvidence unit) {
-        var dependentProofs=new HashMap<String,List<String>>();var hypothetical=new HashSet<String>();var queue=new ArrayDeque<String>();
-        for(var p:unit.proofs()) {
-            if(p.kind().equals("CONTROL_POSSIBILITY")&&hypothetical.add(p.id()))queue.add(p.id());
-            for(var dependency:p.dependencies())dependentProofs.computeIfAbsent(dependency,k->new ArrayList<>()).add(p.id());
-        }
-        while(!queue.isEmpty())for(var id:dependentProofs.getOrDefault(queue.removeFirst(),List.of()))if(hypothetical.add(id))queue.addLast(id);
+        var hypothetical=hypotheticalProofs(unit.proofs()).ids();
+        var queue=new ArrayDeque<String>();
         if(hypothetical.isEmpty())return Set.of();
         var waiting=new HashMap<String,List<Derivation>>();var remaining=new HashMap<String,Integer>();var proved=new HashSet<String>();
         for(var d:unit.derivations()) {

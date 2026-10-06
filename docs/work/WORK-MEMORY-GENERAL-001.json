@@ -2,6 +2,13 @@
   "id": "WORK-MEMORY-GENERAL-001",
   "title": "General memory correction: activation support, rooted BDD lifetime and consumers",
   "status": "IN_PROGRESS",
-  "scope": ["analysis-kernel", "analysis-values", "typed local control", "transport adapters", "regression and performance qualification"],
-  "notes": "Authorized by the user on 2026-10-05. Checkpoint commits allowed; no merge or dependency loss. Full implementation and qualification required."
+  "scope": [
+    "analysis-kernel",
+    "analysis-values",
+    "typed local control",
+    "transport adapters",
+    "regression and performance qualification",
+    "shared admitted AIR outer pipeline composition"
+  ],
+  "notes": "Authorized by the user on 2026-10-05. Checkpoint commits allowed; no merge or dependency loss. Full implementation and qualification required. Final local qualification is in progress. Human review and merge remain pending; source checkpoints do not mark DONE."
 }

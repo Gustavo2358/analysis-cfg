@@ -15,6 +15,12 @@ final class BooleanConditions {
     private boolean scratch;
     private int scratchFloor;
     private long scratchAllocations;
+    private final BitSet scratchDirty=new BitSet();
+    private int[] scratchSlots=new int[0];
+    private int scratchSlotCount;
+    private long scratchCacheVisits;
+    long scratchCacheVisits(){return scratchCacheVisits;}
+
     // Direct-mapped computed table: collisions only evict memoized work. They never
     // identify semantic nodes or truncate conditions. Memory is fixed per manager.
     private final int[] cacheA,cacheB,cacheOperation,cacheResult;
@@ -27,7 +33,15 @@ final class BooleanConditions {
     }
     private int cacheSlot(int a,int b,int operation){int hash=a*0x9e3779b9+b*0x85ebca6b+operation;hash^=hash>>>16;return hash&(cacheA.length-1);}
     private int cached(int a,int b,int operation){int slot=cacheSlot(a,b,operation);return cacheA[slot]==a&&cacheB[slot]==b&&cacheOperation[slot]==operation?cacheResult[slot]:-1;}
-    private int remember(int a,int b,int operation,int result){int slot=cacheSlot(a,b,operation);cacheA[slot]=a;cacheB[slot]=b;cacheOperation[slot]=operation;cacheResult[slot]=result;return result;}
+    private int remember(int a,int b,int operation,int result){
+        int slot=cacheSlot(a,b,operation);cacheA[slot]=a;cacheB[slot]=b;cacheOperation[slot]=operation;cacheResult[slot]=result;
+        if(scratch&&(a>=scratchFloor||result>=scratchFloor||operation<2&&b>=scratchFloor)&&!scratchDirty.get(slot)) {
+            scratchDirty.set(slot);
+            if(scratchSlotCount==scratchSlots.length)scratchSlots=Arrays.copyOf(scratchSlots,Math.min(cacheA.length,Math.max(16,scratchSlots.length*2)));
+            scratchSlots[scratchSlotCount++]=slot;
+        }
+        return result;
+    }
     int variable(int variable){return node(variable,FALSE,TRUE);}
     int node(int variable,int low,int high) {
         if(low==high)return low;
@@ -110,7 +124,20 @@ final class BooleanConditions {
         for(int id=nodes.size()-1;id>=checkpoint;id--)unique.remove(nodes.remove(id));
         // IDs can be reused. Invalidate every computed entry referring to scratch
         // operands/results, while retaining all computations on surviving nodes.
-        for(int i=0;i<cacheOperation.length;i++)if(cacheA[i]>=checkpoint||cacheResult[i]>=checkpoint||cacheOperation[i]<2&&cacheB[i]>=checkpoint)cacheOperation[i]=-1;
+        if(scratch) {
+            for(int j=0;j<scratchSlotCount;j++) {
+                int i=scratchSlots[j];scratchCacheVisits++;
+                if(cacheA[i]>=checkpoint||cacheResult[i]>=checkpoint||cacheOperation[i]<2&&cacheB[i]>=checkpoint)cacheOperation[i]=-1;
+                scratchDirty.clear(i);
+            }
+            scratchSlotCount=0;
+        } else if(removed>0) {
+            // Retain the unmanaged test/diagnostic seam, whose writes had no journal.
+            for(int i=0;i<cacheOperation.length;i++) {
+                scratchCacheVisits++;
+                if(cacheA[i]>=checkpoint||cacheResult[i]>=checkpoint||cacheOperation[i]<2&&cacheB[i]>=checkpoint)cacheOperation[i]=-1;
+            }
+        }
         allocationsSinceCollection=scratch?scratchAllocations:Math.max(0,allocationsSinceCollection-removed);scratch=false;
     }
     /** Scratch allocations append; they cannot reuse an older collected slot. */

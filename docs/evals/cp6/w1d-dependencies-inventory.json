@@ -47,6 +47,7 @@
     "io/github/gustavo2358/analysis/dependencies/ReachabilityProvider$1.class",
     "io/github/gustavo2358/analysis/dependencies/ReachabilityProvider$Fact.class",
     "io/github/gustavo2358/analysis/dependencies/ReachabilityProvider.class",
+    "io/github/gustavo2358/analysis/dependencies/SourceControlEvidence$ProofClosure.class",
     "io/github/gustavo2358/analysis/dependencies/SourceControlEvidence.class",
     "io/github/gustavo2358/analysis/dependencies/SourceDependencyAnalysis$Key.class",
     "io/github/gustavo2358/analysis/dependencies/SourceDependencyAnalysis.class",
@@ -1559,6 +1560,7 @@
       "java.lang.runtime.ObjectMethods"
     ],
     "io.github.gustavo2358.analysis.dependencies.SourceControlEvidence": [
+      "io.github.gustavo2358.analysis.dependencies.SourceControlEvidence$ProofClosure",
       "io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies",
       "io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Derivation",
       "io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Node",
@@ -1576,6 +1578,7 @@
       "java.util.ArrayDeque",
       "java.util.ArrayList",
       "java.util.Collection",
+      "java.util.Collections",
       "java.util.HashMap",
       "java.util.HashSet",
       "java.util.Iterator",
@@ -1583,10 +1586,22 @@
       "java.util.Objects",
       "java.util.Set",
       "java.util.function.BiFunction",
-      "java.util.function.Consumer",
       "java.util.function.Function",
       "java.util.function.Predicate",
       "java.util.stream.Stream"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.SourceControlEvidence$ProofClosure": [
+      "io.github.gustavo2358.analysis.dependencies.SourceControlEvidence",
+      "java.lang.Class",
+      "java.lang.Object",
+      "java.lang.Record",
+      "java.lang.String",
+      "java.lang.invoke.MethodHandle",
+      "java.lang.invoke.MethodHandles",
+      "java.lang.invoke.MethodHandles$Lookup",
+      "java.lang.invoke.TypeDescriptor",
+      "java.lang.runtime.ObjectMethods",
+      "java.util.Set"
     ],
     "io.github.gustavo2358.analysis.dependencies.SourceDependencyAnalysis": [
       "io.github.gustavo2358.air.model.Ids",
@@ -2906,6 +2921,7 @@
       "java.lang.invoke.MethodHandles",
       "java.lang.invoke.MethodHandles$Lookup",
       "java.lang.invoke.MethodType",
+      "java.util.Collection",
       "java.util.List",
       "java.util.Objects",
       "java.util.function.IntFunction"
@@ -3015,6 +3031,7 @@
     "io/github/gustavo2358/analysis/dependencies/ReachabilityProvider$1.class": "Compiled from \"ReachabilityProvider.java\"\nclass io.github.gustavo2358.analysis.dependencies.ReachabilityProvider$1 implements io.github.gustavo2358.analysis.application.AnalysisProvider$Prepared<io.github.gustavo2358.air.model.Ids$LabelId, io.github.gustavo2358.analysis.dependencies.ReachabilityProvider$Fact> {\n  public io.github.gustavo2358.analysis.plan.AnalysisKey key();\n    descriptor: ()Lio/github/gustavo2358/analysis/plan/AnalysisKey;\n\n  public io.github.gustavo2358.analysis.plan.AnalysisOutcome refusal();\n    descriptor: ()Lio/github/gustavo2358/analysis/plan/AnalysisOutcome;\n\n  public io.github.gustavo2358.analysis.application.AnalysisProvider$Run<io.github.gustavo2358.air.model.Ids$LabelId, io.github.gustavo2358.analysis.dependencies.ReachabilityProvider$Fact> execute();\n    descriptor: ()Lio/github/gustavo2358/analysis/application/AnalysisProvider$Run;\n}\n",
     "io/github/gustavo2358/analysis/dependencies/ReachabilityProvider$Fact.class": "Compiled from \"ReachabilityProvider.java\"\npublic final class io.github.gustavo2358.analysis.dependencies.ReachabilityProvider$Fact extends java.lang.Record {\n  public io.github.gustavo2358.analysis.dependencies.ReachabilityProvider$Fact(boolean, boolean);\n    descriptor: (ZZ)V\n\n  public io.github.gustavo2358.analysis.dependencies.ReachabilityProvider$Fact(boolean, boolean, boolean);\n    descriptor: (ZZZ)V\n\n  public final java.lang.String toString();\n    descriptor: ()Ljava/lang/String;\n\n  public final int hashCode();\n    descriptor: ()I\n\n  public final boolean equals(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)Z\n\n  public boolean reachable();\n    descriptor: ()Z\n\n  public boolean sourceUnknownRemainder();\n    descriptor: ()Z\n\n  public boolean controlUnknown();\n    descriptor: ()Z\n}\n",
     "io/github/gustavo2358/analysis/dependencies/ReachabilityProvider.class": "Compiled from \"ReachabilityProvider.java\"\npublic final class io.github.gustavo2358.analysis.dependencies.ReachabilityProvider implements io.github.gustavo2358.analysis.application.AnalysisProvider<io.github.gustavo2358.air.model.Ids$LabelId, io.github.gustavo2358.analysis.dependencies.ReachabilityProvider$Fact> {\n  public io.github.gustavo2358.analysis.dependencies.ReachabilityProvider();\n    descriptor: ()V\n\n  public static io.github.gustavo2358.analysis.plan.AnalysisKey key(io.github.gustavo2358.air.model.Ids$EntryId);\n    descriptor: (Lio/github/gustavo2358/air/model/Ids$EntryId;)Lio/github/gustavo2358/analysis/plan/AnalysisKey;\n\n  public static io.github.gustavo2358.analysis.plan.ObservationBatchId<io.github.gustavo2358.air.model.Ids$LabelId, io.github.gustavo2358.analysis.dependencies.ReachabilityProvider$Fact> batch(java.lang.String, io.github.gustavo2358.air.model.Ids$EntryId);\n    descriptor: (Ljava/lang/String;Lio/github/gustavo2358/air/model/Ids$EntryId;)Lio/github/gustavo2358/analysis/plan/ObservationBatchId;\n\n  public java.lang.String implementation();\n    descriptor: ()Ljava/lang/String;\n\n  public java.lang.String version();\n    descriptor: ()Ljava/lang/String;\n\n  public java.lang.String projection();\n    descriptor: ()Ljava/lang/String;\n\n  public java.util.Set<java.lang.String> semanticOptionNames();\n    descriptor: ()Ljava/util/Set;\n\n  public java.lang.Class<io.github.gustavo2358.air.model.Ids$LabelId> subjectType();\n    descriptor: ()Ljava/lang/Class;\n\n  public java.lang.Class<io.github.gustavo2358.analysis.dependencies.ReachabilityProvider$Fact> factType();\n    descriptor: ()Ljava/lang/Class;\n\n  public boolean supports(io.github.gustavo2358.analysis.plan.AnalysisKey);\n    descriptor: (Lio/github/gustavo2358/analysis/plan/AnalysisKey;)Z\n\n  public java.util.Comparator<io.github.gustavo2358.air.model.Ids$LabelId> subjectOrder();\n    descriptor: ()Ljava/util/Comparator;\n\n  public io.github.gustavo2358.analysis.application.AnalysisProvider$Prepared<io.github.gustavo2358.air.model.Ids$LabelId, io.github.gustavo2358.analysis.dependencies.ReachabilityProvider$Fact> prepare(io.github.gustavo2358.analysis.structure.AnalysisSession, io.github.gustavo2358.analysis.plan.AnalysisKey);\n    descriptor: (Lio/github/gustavo2358/analysis/structure/AnalysisSession;Lio/github/gustavo2358/analysis/plan/AnalysisKey;)Lio/github/gustavo2358/analysis/application/AnalysisProvider$Prepared;\n}\n",
+    "io/github/gustavo2358/analysis/dependencies/SourceControlEvidence$ProofClosure.class": "Compiled from \"SourceControlEvidence.java\"\nfinal class io.github.gustavo2358.analysis.dependencies.SourceControlEvidence$ProofClosure extends java.lang.Record {\n  public final java.lang.String toString();\n    descriptor: ()Ljava/lang/String;\n\n  public final int hashCode();\n    descriptor: ()I\n\n  public final boolean equals(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)Z\n\n  public java.util.Set<java.lang.String> ids();\n    descriptor: ()Ljava/util/Set;\n\n  public long proofVisits();\n    descriptor: ()J\n\n  public long edgeVisits();\n    descriptor: ()J\n}\n",
     "io/github/gustavo2358/analysis/dependencies/SourceControlEvidence.class": "Compiled from \"SourceControlEvidence.java\"\npublic final class io.github.gustavo2358.analysis.dependencies.SourceControlEvidence {\n  public static java.util.Set<java.lang.String> affected(io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$UnitEvidence);\n    descriptor: (Lio/github/gustavo2358/analysis/dependencies/source/QualifiedSourceDependencies$UnitEvidence;)Ljava/util/Set;\n\n  public static java.util.Set<java.lang.String> assumedOnly(io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$UnitEvidence);\n    descriptor: (Lio/github/gustavo2358/analysis/dependencies/source/QualifiedSourceDependencies$UnitEvidence;)Ljava/util/Set;\n}\n",
     "io/github/gustavo2358/analysis/dependencies/SourceDependencyAnalysis$Key.class": "Compiled from \"SourceDependencyAnalysis.java\"\nfinal class io.github.gustavo2358.analysis.dependencies.SourceDependencyAnalysis$Key extends java.lang.Record {\n  public final java.lang.String toString();\n    descriptor: ()Ljava/lang/String;\n\n  public final int hashCode();\n    descriptor: ()I\n\n  public final boolean equals(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)Z\n\n  public io.github.gustavo2358.air.model.Ids$UnitId program();\n    descriptor: ()Lio/github/gustavo2358/air/model/Ids$UnitId;\n\n  public io.github.gustavo2358.analysis.dependencies.SourceDependencyResult$Kind kind();\n    descriptor: ()Lio/github/gustavo2358/analysis/dependencies/SourceDependencyResult$Kind;\n\n  public java.lang.String name();\n    descriptor: ()Ljava/lang/String;\n\n  public java.lang.String qualification();\n    descriptor: ()Ljava/lang/String;\n}\n",
     "io/github/gustavo2358/analysis/dependencies/SourceDependencyAnalysis.class": "Compiled from \"SourceDependencyAnalysis.java\"\npublic final class io.github.gustavo2358.analysis.dependencies.SourceDependencyAnalysis {\n  public io.github.gustavo2358.analysis.dependencies.SourceDependencyAnalysis();\n    descriptor: ()V\n\n  public io.github.gustavo2358.analysis.dependencies.SourceDependencyResult prepare(io.github.gustavo2358.air.model.Publication);\n    descriptor: (Lio/github/gustavo2358/air/model/Publication;)Lio/github/gustavo2358/analysis/dependencies/SourceDependencyResult;\n}\n",

@@ -6,6 +6,7 @@ import static io.github.gustavo2358.analysis.dependencies.source.QualifiedSource
 /** Lossless unit-owned immutable tuple columns. No context or proof alternative is merged. */
 public final class SourceInventories {
     private SourceInventories() { }
+    private static final int INLINE_ROWS=4096;
     public record Snapshot(List<Node> nodes,List<Derivation> derivations) {
         public Snapshot {nodes=copyNodes(nodes);derivations=copyDerivations(derivations);}
     }
@@ -32,7 +33,12 @@ public final class SourceInventories {
         public Snapshot build() {
             writable();frozen=true;
             var text=strings.freeze().toArray(String[]::new);var support=supports.freeze().toArray(Support[]::new);var proof=proofs.freeze();
-            return new Snapshot(new Nodes(text,support,nodes.freeze()),new Steps(text,proof,steps.freeze()));
+            var nodeRows=new Nodes(text,support,nodes.freeze());var stepRows=new Steps(text,proof,steps.freeze());
+            // Expand bounded small snapshots once, preserving canonical dictionary payloads.
+            // Large snapshots retain only columns, never a cache of expanded historical rows.
+            if((long)nodeRows.size()+stepRows.size()<=INLINE_ROWS)
+                return new Snapshot(List.copyOf(nodeRows),List.copyOf(stepRows));
+            return new Snapshot(nodeRows,stepRows);
         }
     }
     private static final class Pool<T> {

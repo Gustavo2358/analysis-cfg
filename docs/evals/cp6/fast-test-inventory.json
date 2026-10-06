@@ -525,6 +525,13 @@
     "io.github.gustavo2358.analysis.launcher.DependencyInputCliTest": [
       "normalEntryPointUsesSourceAndExecutableEvidenceWithoutFlags",
       "corruptBundleCannotReplaceDestination"
+    ],
+    "io.github.gustavo2358.analysis.launcher.PipelineCliTest": [
+      "oneReadAndCompleteProductsEqualIndependentSeparateRoutes",
+      "invalidIncompleteDigestAndAliasesRejectBeforeAnyDestination",
+      "fullCorrelatedSourceAndDigestMismatchPreserveProducts",
+      "writerFailuresKeepCompletedProductsAndCleanStaging",
+      "explicitCodecLimitNeverStartsExportOrPublishesFallback"
     ]
   },
   "analysis-values": {
