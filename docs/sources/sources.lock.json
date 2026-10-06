@@ -1,20 +1,12 @@
 {
   "schema_version": 1,
-  "observed_on": "2026-10-04",
+  "observed_on": "2026-10-05",
   "analysis_ir": {
     "repository": "Gustavo2358/analysis-ir",
-    "commit": "09dd8ea1d5deb2ef4b1d16115ea953585752cfdf",
+    "commit": "4f09e8b1b496bf8de2e0fb62532e7aa0b97b9c6e",
     "semantic_version": "2.0.0",
     "role": "normative",
-    "canonical_ref": "main",
-    "upstream_review": {
-      "pull_request": 10,
-      "state": "merged",
-      "draft": false,
-      "head_commit": "84d3de37299a9582eb83f2d360e17c86615b29bd",
-      "scope": "Priority 2 numeric conversion and symbolic text contract; approved and merged.",
-      "merge_commit": "09dd8ea1d5deb2ef4b1d16115ea953585752cfdf"
-    },
+    "canonical_ref": "fix/general-memory-20261005",
     "json_binding": {
       "owner": "Gustavo2358/analysis-ir",
       "identifier": "Analysis IR JSON Binding",
@@ -24,7 +16,7 @@
       "targets_air_version": "2.0.0",
       "path": "bindings/json-v1.md",
       "review_path": "bindings/revisao-json-v1.md",
-      "checked_commit": "09dd8ea1d5deb2ef4b1d16115ea953585752cfdf",
+      "checked_commit": "4f09e8b1b496bf8de2e0fb62532e7aa0b97b9c6e",
       "implemented_in_analysis_cfg": false
     },
     "files": [
@@ -38,7 +30,7 @@
       },
       {
         "path": "bindings/json-v1.md",
-        "git_blob_sha1": "236ad380eb52fd6c435df8dac6c5bc6428656ef3"
+        "git_blob_sha1": "1e5412bf6b0d606d4168ce575f79de2d4069f7e4"
       },
       {
         "path": "bindings/revisao-json-v1.md",
@@ -50,7 +42,7 @@
       },
       {
         "path": "conformidade/02-oraculos.md",
-        "git_blob_sha1": "3e39e8d493c2414b46aebe15da77d86cc64153cb"
+        "git_blob_sha1": "0886ea2462f8e6d801902230c27e749f72fba931"
       },
       {
         "path": "especificacao/00-escopo-e-convencoes.md",
@@ -74,7 +66,7 @@
       },
       {
         "path": "especificacao/05-controle-e-invocacoes.md",
-        "git_blob_sha1": "69dec37c1399a5794b872475bb4b77499663fa08"
+        "git_blob_sha1": "c949da39f4946512d7d311ab87d16dfe106c9548"
       },
       {
         "path": "especificacao/06-incompletude-e-proveniencia.md",
@@ -90,7 +82,7 @@
       },
       {
         "path": "especificacao/09-extensibilidade-e-compatibilidade.md",
-        "git_blob_sha1": "c20e01a2ce65ab56c379d2664f9b366d76bcff2f"
+        "git_blob_sha1": "f1943a93fc268a791bfd16fa109c0d96206cb85c"
       },
       {
         "path": "especificacao/10-perfis-de-conformidade.md",
@@ -141,17 +133,30 @@
     "observed_on": "2026-10-04",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "evidence_level": "Priority2 canonical MOVE and numeric/text expressions; local producer FAST passed. Consumer and final frozen73 qualification recorded in docs/work/numeric-text-values.md. Earlier named evidence remains historical.",
-    "status": "MERGED / VALIDATED"
+    "status": "MERGED / VALIDATED",
+    "previous_upstream_review": {
+      "pull_request": 10,
+      "state": "merged",
+      "draft": false,
+      "head_commit": "84d3de37299a9582eb83f2d360e17c86615b29bd",
+      "scope": "Priority 2 numeric conversion and symbolic text contract; approved and merged.",
+      "merge_commit": "09dd8ea1d5deb2ef4b1d16115ea953585752cfdf"
+    },
+    "upstream_review": {
+      "state": "local_checkpoint_pending_human_review",
+      "head_commit": "4f09e8b1b496bf8de2e0fb62532e7aa0b97b9c6e",
+      "scope": "General memory implementation: selected completion boundary routes"
+    }
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "b00e90d2fb9f38f7b0c8773fe432f9c6d6f88e23",
-    "canonical_ref": "main",
+    "commit": "1414f579030353c7384e6e0ec9ffb2aead0ccc8c",
+    "canonical_ref": "fix/general-memory-20261005",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
     "analysis_ir": {
       "semantic_version": "2.0.0",
-      "commit": "09dd8ea1d5deb2ef4b1d16115ea953585752cfdf"
+      "commit": "4f09e8b1b496bf8de2e0fb62532e7aa0b97b9c6e"
     },
     "maven": {
       "group_id": "io.github.gustavo2358",
@@ -215,8 +220,13 @@
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "logical_text_w2": "Local producer FAST PASS; fixed logical ranges and expression transport. Selected source E2E qualification in docs/product/logical-text-w2.md.",
-    "evidence_level": "Priority2 canonical MOVE and numeric/text expressions; local producer FAST passed. Consumer and final frozen73 qualification recorded in docs/work/numeric-text-values.md. Earlier named evidence remains historical.",
-    "status": "MERGED / VALIDATED"
+    "evidence_level": "Local FAST and complete Maven qualification of selected boundary routes; remote CI not dispatched.",
+    "status": "LOCAL_CHECKPOINT / HUMAN_REVIEW_PENDING",
+    "ci": {
+      "checked_commit": "1414f579030353c7384e6e0ec9ffb2aead0ccc8c",
+      "status": "NOT_RUN",
+      "context": "local qualification only"
+    }
   },
   "proleap_poc": {
     "repository": "Gustavo2358/proleap-poc",

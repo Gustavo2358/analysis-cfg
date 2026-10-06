@@ -45,6 +45,10 @@ class LocalControlTest {
         var caps=new ArrayList<Capabilities.Capability>();caps.add(Capabilities.LOCAL_CONTROL);
         if(sequences.stream().anyMatch(s->s.terminator() instanceof Operations.LocalInvoke i&&i.reentryGuard().isPresent()))caps.add(Capabilities.LOCAL_REENTRY_GUARD);
         if(sequences.stream().anyMatch(s->s.terminator() instanceof Operations.LocalInvoke i&&!i.resumeRoutes().isEmpty()||s.terminator() instanceof Operations.LocalResume x&&x.resumeKey().isPresent()))caps.add(Capabilities.LOCAL_RESUME_ROUTES);
+        if(sequences.stream().anyMatch(s->s.terminator() instanceof Operations.LocalBoundary x&&x.resumeKey().isPresent())) {
+            caps.add(Capabilities.LOCAL_BOUNDARY_ROUTES);
+            if(!caps.contains(Capabilities.LOCAL_RESUME_ROUTES))caps.add(Capabilities.LOCAL_RESUME_ROUTES);
+        }
         if(sequences.stream().anyMatch(s->s.terminator() instanceof Operations.LocalUnwind x&&x.all()))caps.add(Capabilities.LOCAL_UNWIND_ALL);
         var pub=new Publication(P,SemanticVersion.AIR_2_0_0,new Capabilities.Manifest(caps,List.of()),List.of(),List.of(unit),List.of(),List.of(),List.of(),List.of(new Origins.Unavailable(O,"independent fixture")),coverage(new Scopes.PublicationScope(P)),List.of(),List.of());
         var built=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).build(pub,BuildOptions.defaults());
@@ -73,6 +77,19 @@ class LocalControlTest {
         var s=session(seqs,"a","boundary-a");
         assertEquals(List.of("a","b","boundary-a","boundary-b","resume-outer","done"),trace(s.context(new EntryId(U,"a"))));
         assertEquals(List.of("boundary-a","boundary-b","bad"),trace(s.context(new EntryId(U,"boundary-a"))));
+    }
+    @Test void selectedBoundaryUsesOnlyMatchingTopFrameRouteAndDefaultsOtherwise() {
+        var outer=seq("outer",new Operations.LocalInvoke(h("outer"),label("inner"),List.of(A),label("bad"),fallback(),Optional.empty(),List.of(new Operations.ResumeRoute("state",label("done")))));
+        var inner=seq("inner",new Operations.LocalInvoke(h("inner"),label("boundary-a"),List.of(B),label("bad"),fallback(),Optional.empty(),List.of(new Operations.ResumeRoute("state",label("after-inner")))));
+        var boundaryA=seq("boundary-a",new Operations.LocalBoundary(h("boundary-a"),A,label("boundary-b"),fallback(),Optional.of("missing")));
+        var boundaryB=seq("boundary-b",new Operations.LocalBoundary(h("boundary-b"),B,label("ordinary"),fallback(),Optional.of("state")));
+        var finish=seq("after-inner",new Operations.LocalBoundary(h("after-inner"),A,label("ordinary"),fallback(),Optional.of("state")));
+        var s=session(List.of(outer,inner,boundaryA,boundaryB,finish,ret("done"),ret("ordinary"),ret("bad")),"outer","boundary-a");
+        assertEquals(List.of("outer","inner","boundary-a","boundary-b","after-inner","done"),trace(s.context(new EntryId(U,"outer"))));
+        assertEquals(List.of("boundary-a","boundary-b","ordinary"),trace(s.context(new EntryId(U,"boundary-a"))));
+        var bad=seq("boundary-b",new Operations.LocalBoundary(h("boundary-b"),B,label("ordinary"),fallback(),Optional.of("missing")));
+        var invalid=session(List.of(outer,inner,boundaryA,bad,finish,ret("done"),ret("ordinary"),ret("bad")),"outer");
+        assertEquals(List.of("outer","inner","boundary-a","boundary-b","invalid_local_return"),trace(invalid.contexts().iterator().next()));
     }
     @Test void emptyResumeAndExcessiveUnwindAreExceptional() {
         var s=session(List.of(resume("empty"),unwind("huge",BigInteger.ONE.shiftLeft(100),"bad"),ret("bad")),"empty","huge");

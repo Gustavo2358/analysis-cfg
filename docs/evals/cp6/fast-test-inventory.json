@@ -314,6 +314,9 @@
       "unknownCollatingCharacterAndUnicodeRemainExplicit",
       "unknownModelCopyCannotKillAnObservedName",
       "unknownTableWriteAndPredicateRetainPossibleElements"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.SourceCertificateTest": [
+      "groundingPreservesAndOrCyclesAndHashCollisions"
     ]
   },
   "analysis-kernel": {

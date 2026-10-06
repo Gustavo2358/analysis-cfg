@@ -111,3 +111,19 @@ de existir abaixo, liberação de guardas, pilha vazia, ausência de bypass e va
 observados após retorno. O transporte e seu interpretador independente exercitam
 as mesmas formas. O solver continua enumerando contextos: esta mudança não
 resolve seu custo combinatório em grafos com muitas pilhas realizáveis.
+
+### Conclusão por porta com rota selecionada
+
+`control.local.boundary_routes@1` compõe a verificação de porta do topo com
+`control.local.resume_routes@1`. A regra consulta a chave somente quando a porta
+pertence ao topo. Porta diferente ou pilha vazia segue o default sem alterar a
+pilha. Porta correspondente seleciona a rota exata desse frame e remove um frame;
+chave ausente gera `invalid_local_return` e descarta o controle local. Não há
+consulta a ancestrais, leitura de memória ou fallback para retorno ordinário.
+
+A projeção conserva os destinos como referências; não cria arestas de bypass.
+Execução concreta e tabulação simbólica usam a mesma regra tipada. O lookup é
+finito no mapa de rotas do frame; não amplia o domínio de BooleanConditions nem
+introduz ciclos além dos já declarados. O oracle LOCAL-BOUNDARY-ROUTE-01 contém
+retornos distintos para uma chave igual, porta presente só no ancestral, pilha
+vazia e chave ausente no topo. O JSON antigo sem chave permanece inalterado.

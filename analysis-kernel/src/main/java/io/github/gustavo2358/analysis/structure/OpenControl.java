@@ -19,7 +19,7 @@ final class OpenControl {
         return opaque.envelope().control().known().stream().allMatch(a -> a instanceof Control.JumpAlternative || a instanceof Control.Normal || a instanceof Control.ReturnAlternative || a instanceof Control.Exceptional || a instanceof Control.AnyException || a instanceof Control.HaltAlternative);
     }
     static java.util.List<Control.ControlAlternative> alternatives(io.github.gustavo2358.air.model.Terminator t) {
-        if(t instanceof Operations.LocalResume)return java.util.List.of(new Control.Exceptional("invalid_local_return",Control.Propagate.INSTANCE));
+        if(t instanceof Operations.LocalResume || t instanceof Operations.LocalBoundary b&&b.resumeKey().isPresent())return java.util.List.of(new Control.Exceptional("invalid_local_return",Control.Propagate.INSTANCE));
         if(t instanceof Operations.LocalUnwind)return java.util.List.of(new Control.Exceptional("invalid_local_unwind",Control.Propagate.INSTANCE));
         return t instanceof Operations.Invoke i?new java.util.ArrayList<>(i.outcomes().known()):t instanceof Operations.Opaque o?o.envelope().control().known():java.util.List.of();
     }

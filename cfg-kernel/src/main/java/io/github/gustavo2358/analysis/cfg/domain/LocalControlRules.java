@@ -33,7 +33,10 @@ public final class LocalControlRules {
             this(source,operation,entry,ports,resume,Optional.empty(),Map.of());
         }
     }
-    public record Boundary(CfgNodeId source,OperationId operation,CompletionPortId port,CfgNodeId defaultDestination) implements Rule { }
+    public record Boundary(CfgNodeId source,OperationId operation,CompletionPortId port,CfgNodeId defaultDestination,Optional<String> resumeKey,CfgNodeId invalidExit) implements Rule {
+        public Boundary {resumeKey=Objects.requireNonNull(resumeKey);if(resumeKey.isPresent())Objects.requireNonNull(invalidExit);}
+        public Boundary(CfgNodeId source,OperationId operation,CompletionPortId port,CfgNodeId defaultDestination) {this(source,operation,port,defaultDestination,Optional.empty(),null);}
+    }
     public record Resume(CfgNodeId source,OperationId operation,CfgNodeId invalidExit,Optional<String> resumeKey) implements Rule {
         public Resume {resumeKey=Objects.requireNonNull(resumeKey);}
         public Resume(CfgNodeId source,OperationId operation,CfgNodeId invalidExit){this(source,operation,invalidExit,Optional.empty());}
@@ -46,7 +49,7 @@ public final class LocalControlRules {
             || term instanceof Operations.LocalResume || term instanceof Operations.LocalUnwind;
     }
     public static Control.Exceptional invalid(Terminator term) {
-        return term instanceof Operations.LocalResume ? new Control.Exceptional("invalid_local_return",Control.Propagate.INSTANCE)
+        return term instanceof Operations.LocalResume || term instanceof Operations.LocalBoundary b&&b.resumeKey().isPresent() ? new Control.Exceptional("invalid_local_return",Control.Propagate.INSTANCE)
             : term instanceof Operations.LocalUnwind ? new Control.Exceptional("invalid_local_unwind",Control.Propagate.INSTANCE) : null;
     }
     // Constructed only from the graph's inventoried AIR nodes and typed label identities.
@@ -62,7 +65,7 @@ public final class LocalControlRules {
             Rule rule=switch(t) {
                 case Operations.LocalInvoke i -> new Invoke(s.id(),id,required(labels.get(i.entry())),i.completionPorts(),required(labels.get(i.resume())),
                     i.reentryGuard().map(g->new ReentryGuard(g.activationKey(),required(labels.get(g.destination())))),resumeRoutes(i,labels));
-                case Operations.LocalBoundary b -> new Boundary(s.id(),id,b.port(),required(labels.get(b.defaultDestination())));
+                case Operations.LocalBoundary b -> new Boundary(s.id(),id,b.port(),required(labels.get(b.defaultDestination())),b.resumeKey(),b.resumeKey().isPresent()?required(invalid.get(id)):null);
                 case Operations.LocalResume r -> new Resume(s.id(),id,required(invalid.get(id)),r.resumeKey());
                 case Operations.LocalUnwind u -> new Unwind(s.id(),id,u.count(),required(labels.get(u.destination())),required(invalid.get(id)),u.all());
                 default -> null;
@@ -123,8 +126,11 @@ public final class LocalControlRules {
         Objects.requireNonNull(rule);Objects.requireNonNull(stack);
         return switch(rule) {
             case Invoke i -> stack.guarded(i) ? new Step(i.reentryGuard().orElseThrow().destination(),stack) : new Step(i.entry(),stack.push(i));
-            case Boundary b -> stack.top!=null&&stack.top.ports().contains(b.port())
-                ? new Step(stack.top.resume(),stack.parent):new Step(b.defaultDestination(),stack);
+            case Boundary b -> {
+                if(stack.top==null||!stack.top.ports().contains(b.port()))yield new Step(b.defaultDestination(),stack);
+                var destination=b.resumeKey().isEmpty()?stack.top.resume():stack.top.resumeRoutes().get(b.resumeKey().orElseThrow());
+                yield destination==null?new Step(b.invalidExit(),Stack.EMPTY):new Step(destination,stack.parent);
+            }
             case Resume r -> {
                 if(stack.top==null)yield new Step(r.invalidExit(),Stack.EMPTY);
                 var destination=r.resumeKey().isEmpty()?stack.top.resume():stack.top.resumeRoutes().get(r.resumeKey().orElseThrow());

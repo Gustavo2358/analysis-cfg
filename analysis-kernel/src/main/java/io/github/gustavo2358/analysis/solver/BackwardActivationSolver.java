@@ -27,7 +27,7 @@ final class BackwardActivationSolver<S> {
             entry.boundaries.computeIfAbsent(location.frame(),f->new IdentityHashMap<>()).merge(boundary.node(),boundary.state(),(a,b)->definition.joinInto(a,b,work).state());joins++;
         }
         for(var entry:entries)entry.start();
-        while(!pending.isEmpty()){var slot=pending.removeFirst();slot.queued=false;pops++;process(slot);}
+        while(!pending.isEmpty()){var slot=pending.removeFirst();slot.queued=false;pops++;process(slot);collectConditions(slot.region.entry);}
         var lookup=new IdentityHashMap<ContextView,IdentityHashMap<ProgramIndex.Node,List<AnalysisPoint>>>();
         var ins=new ArrayList<S>();var outs=new ArrayList<S>();long edgeCount=0;
         for(var entry:entries) {
@@ -41,6 +41,23 @@ final class BackwardActivationSolver<S> {
         }
         var metrics=new SolverMetrics(ins.size(),edgeCount,joins,nextPoint,attempts,pushes,pops,duplicates,maxSize,transfers,work.operations(),ins.size(),changes,unchanged,deliveries,deliveries,changes,unchanged,0,0,work.joinEntries(),work.compareEntries());
         return new DataflowResult<>(lookup,ins.toArray(),outs.toArray(),metrics);
+    }
+    private void collectConditions(EntryRun entry) {
+        if(!entry.bdd.collectionDue())return;
+        entry.bdd.collect(root->{
+            entry.model.visitConditions(root);
+            var owners=Collections.newSetFromMap(new IdentityHashMap<Object,Boolean>());
+            for(var region:entry.regions) {
+                owners.add(region);region.incoming.values().forEach(root::accept);
+                for(var slot:region.slots.values()) {
+                    slot.children.values().forEach(root::accept);
+                    for(var piece:slot.in.pieces)root.accept(piece.condition);
+                    for(var piece:slot.out.pieces)root.accept(piece.condition);
+                }
+            }
+            for(var key:feasibleCache.keySet())if(owners.contains(key.region))root.accept(key.condition);
+            for(var key:deferredCache.keySet())if(owners.contains(key.region))root.accept(key.condition);
+        });
     }
     private final class Signature {
         final int depth;
@@ -306,7 +323,7 @@ final class BackwardActivationSolver<S> {
             }
             if(valid&&region.entry.bdd.test(condition,active)){feasibleCache.put(key,true);return true;}
         }
-        var b=region.entry.bdd;int checkpoint=b.size();
+        var b=region.entry.bdd;int checkpoint=b.checkpoint();
         try {
             var wanted=new IdentityHashMap<Region,Integer>();var waiting=new IdentityHashMap<Region,Integer>();var queue=new ArrayDeque<Region>();
             wanted.put(region,condition);waiting.put(region,condition);queue.add(region);boolean found=false;

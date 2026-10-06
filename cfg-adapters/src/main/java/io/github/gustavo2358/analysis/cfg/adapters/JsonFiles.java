@@ -19,7 +19,8 @@ public final class JsonFiles {
             boolean frame = magic.length == 4 && magic[0] == 0x28 && magic[1] == (byte)0xb5
                 && magic[2] == 0x2f && magic[3] == (byte)0xfd;
             if (compressed(path) && !frame) throw new IOException("Expected Zstandard frame: " + path);
-            return frame ? new ZstdInputStream(raw) : raw;
+            if(frame)return new ZstdInputStream(raw);
+            return raw;
         } catch (IOException | RuntimeException | Error failure) {
             try { raw.close(); } catch (IOException cleanup) { failure.addSuppressed(cleanup); }
             throw failure;

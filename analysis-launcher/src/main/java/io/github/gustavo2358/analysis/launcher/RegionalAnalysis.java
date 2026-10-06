@@ -43,7 +43,9 @@ public final class RegionalAnalysis {
         try {
             var unit=new UnitId(publication.id(),args[5]);var entry=new EntryId(unit,args[7]);var operation=new OperationId(unit,args[9]);
             var point=switch(args[8]){case "--before"->ProgramPoint.before(entry,operation);case "--after"->ProgramPoint.after(entry,operation);case "--outcome-normal"->new ProgramPoint(entry,ProgramPoint.Kind.OUTCOME,operation,Control.NormalOutcome.INSTANCE);default->ProgramPoint.entry(entry);};
-            StorageSubject subject=args.length==12?new StorageSubject.NamedObject(new ObjectId(unit,args[11])):new StorageSubject.PhysicalRange(new StorageId(publication.id(),args[11]),range,codec);
+            StorageSubject subject;
+            if(args.length==12)subject=new StorageSubject.NamedObject(new ObjectId(unit,args[11]));
+            else subject=new StorageSubject.PhysicalRange(new StorageId(publication.id(),args[11]),range,codec);
             var analysis=new io.github.gustavo2358.analysis.dataflow.RegionalAnalysis(physical?StorageAnalysisMode.EXPERIMENTAL_PHYSICAL:StorageAnalysisMode.LOGICAL_ONLY);
             result=read.checked().isPresent()?analysis.preparePartialChecked(read.checked().get(),args[3],List.of(new PointQuery<>(point,subject)))
                 :analysis.preparePartial(publication,args[3],List.of(new PointQuery<>(point,subject)));
