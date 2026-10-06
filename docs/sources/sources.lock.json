@@ -1,20 +1,12 @@
 {
   "schema_version": 1,
-  "observed_on": "2026-10-04",
+  "observed_on": "2026-10-05",
   "analysis_ir": {
     "repository": "Gustavo2358/analysis-ir",
-    "commit": "09dd8ea1d5deb2ef4b1d16115ea953585752cfdf",
+    "commit": "4f09e8b1b496bf8de2e0fb62532e7aa0b97b9c6e",
     "semantic_version": "2.0.0",
     "role": "normative",
-    "canonical_ref": "main",
-    "upstream_review": {
-      "pull_request": 10,
-      "state": "merged",
-      "draft": false,
-      "head_commit": "84d3de37299a9582eb83f2d360e17c86615b29bd",
-      "scope": "Priority 2 numeric conversion and symbolic text contract; approved and merged.",
-      "merge_commit": "09dd8ea1d5deb2ef4b1d16115ea953585752cfdf"
-    },
+    "canonical_ref": "fix/general-memory-20261005",
     "json_binding": {
       "owner": "Gustavo2358/analysis-ir",
       "identifier": "Analysis IR JSON Binding",
@@ -24,7 +16,7 @@
       "targets_air_version": "2.0.0",
       "path": "bindings/json-v1.md",
       "review_path": "bindings/revisao-json-v1.md",
-      "checked_commit": "09dd8ea1d5deb2ef4b1d16115ea953585752cfdf",
+      "checked_commit": "4f09e8b1b496bf8de2e0fb62532e7aa0b97b9c6e",
       "implemented_in_analysis_cfg": false
     },
     "files": [
@@ -38,7 +30,7 @@
       },
       {
         "path": "bindings/json-v1.md",
-        "git_blob_sha1": "236ad380eb52fd6c435df8dac6c5bc6428656ef3"
+        "git_blob_sha1": "1e5412bf6b0d606d4168ce575f79de2d4069f7e4"
       },
       {
         "path": "bindings/revisao-json-v1.md",
@@ -50,7 +42,7 @@
       },
       {
         "path": "conformidade/02-oraculos.md",
-        "git_blob_sha1": "3e39e8d493c2414b46aebe15da77d86cc64153cb"
+        "git_blob_sha1": "0886ea2462f8e6d801902230c27e749f72fba931"
       },
       {
         "path": "especificacao/00-escopo-e-convencoes.md",
@@ -74,7 +66,7 @@
       },
       {
         "path": "especificacao/05-controle-e-invocacoes.md",
-        "git_blob_sha1": "69dec37c1399a5794b872475bb4b77499663fa08"
+        "git_blob_sha1": "c949da39f4946512d7d311ab87d16dfe106c9548"
       },
       {
         "path": "especificacao/06-incompletude-e-proveniencia.md",
@@ -90,7 +82,7 @@
       },
       {
         "path": "especificacao/09-extensibilidade-e-compatibilidade.md",
-        "git_blob_sha1": "c20e01a2ce65ab56c379d2664f9b366d76bcff2f"
+        "git_blob_sha1": "f1943a93fc268a791bfd16fa109c0d96206cb85c"
       },
       {
         "path": "especificacao/10-perfis-de-conformidade.md",
@@ -141,17 +133,30 @@
     "observed_on": "2026-10-04",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "evidence_level": "Priority2 canonical MOVE and numeric/text expressions; local producer FAST passed. Consumer and final frozen73 qualification recorded in docs/work/numeric-text-values.md. Earlier named evidence remains historical.",
-    "status": "MERGED / VALIDATED"
+    "status": "MERGED / VALIDATED",
+    "previous_upstream_review": {
+      "pull_request": 10,
+      "state": "merged",
+      "draft": false,
+      "head_commit": "84d3de37299a9582eb83f2d360e17c86615b29bd",
+      "scope": "Priority 2 numeric conversion and symbolic text contract; approved and merged.",
+      "merge_commit": "09dd8ea1d5deb2ef4b1d16115ea953585752cfdf"
+    },
+    "upstream_review": {
+      "state": "local_checkpoint_pending_human_review",
+      "head_commit": "4f09e8b1b496bf8de2e0fb62532e7aa0b97b9c6e",
+      "scope": "General memory implementation: selected completion boundary routes"
+    }
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "b00e90d2fb9f38f7b0c8773fe432f9c6d6f88e23",
-    "canonical_ref": "main",
+    "commit": "c2f80b59b7c38fa6efb9a20f0fa79644c697d8a4",
+    "canonical_ref": "fix/general-memory-20261005",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
     "analysis_ir": {
       "semantic_version": "2.0.0",
-      "commit": "09dd8ea1d5deb2ef4b1d16115ea953585752cfdf"
+      "commit": "4f09e8b1b496bf8de2e0fb62532e7aa0b97b9c6e"
     },
     "maven": {
       "group_id": "io.github.gustavo2358",
@@ -193,7 +198,7 @@
       "air-model/src/main/java/io/github/gustavo2358/air/model/MemoryCodecs.java",
       "air-json/src/test/resources/regional.canonical.json"
     ],
-    "observed_on": "2026-10-04",
+    "observed_on": "2026-10-06",
     "modules": {
       "parent": {
         "path": "pom.xml",
@@ -215,8 +220,13 @@
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "logical_text_w2": "Local producer FAST PASS; fixed logical ranges and expression transport. Selected source E2E qualification in docs/product/logical-text-w2.md.",
-    "evidence_level": "Priority2 canonical MOVE and numeric/text expressions; local producer FAST passed. Consumer and final frozen73 qualification recorded in docs/work/numeric-text-values.md. Earlier named evidence remains historical.",
-    "status": "MERGED / VALIDATED"
+    "evidence_level": "General memory model/codec implementation: local FAST and complete local qualification, with final documentation-only commit proven bytecode identical. Remote CI not dispatched; human review pending.",
+    "status": "LOCAL_CHECKPOINT / HUMAN_REVIEW_PENDING",
+    "ci": {
+      "checked_commit": "c2f80b59b7c38fa6efb9a20f0fa79644c697d8a4",
+      "status": "NOT_RUN",
+      "context": "local qualification only"
+    }
   },
   "proleap_poc": {
     "repository": "Gustavo2358/proleap-poc",
@@ -301,7 +311,7 @@
     ],
     "semantic_product_version": "2.67.0",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
-    "commit": "3bb653a62161626f804aa7ae90f5c9c24f2d581c",
+    "commit": "35f9c732ab8a44d644077acad771e322ebc5def6",
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "perform_basic_validation": "docs/work/active/WORK-CFG-036.md",
     "multi_call_validation": "docs/work/active/WORK-CFG-037.md",
@@ -312,8 +322,8 @@
       "scope": "local unconditional paragraph identity and explicit entry; G1-G5 and 1/2/5/40"
     },
     "storage_contract_version": "1.11.0",
-    "canonical_ref": "main",
-    "observed_on": "2026-10-04",
+    "canonical_ref": "fix/general-memory-20261005",
+    "observed_on": "2026-10-06",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "fd_w1_validation": "docs/work/active/FD-W1.yaml",
@@ -322,7 +332,7 @@
     "fd_w4_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED producers, manual outcomes/USE and 28 real CLI sources twice; file-dependencies/w4-implementation.md",
     "fd_w5_validation": "QUALIFIED_LOCAL: focal/FAST, producer Q-SHARED with bounded final reuse, manual local AIR/wire and44 real CLI sources twice; file-dependencies/w5-implementation.md",
     "fd_w6_validation": "QUALIFIED_LOCAL: focal/FAST/Q-SHARED,19 B-SP fixtures,15 manual AIR tests and33 real CLI sources twice; file-dependencies/w6-implementation.md",
-    "status": "MERGED / VALIDATED; checkpoint3 PRs #88/#89; CP1/CP2 preserved",
+    "status": "LOCAL_CHECKPOINT / HUMAN_REVIEW_PENDING",
     "fd_w8_validation": "QUALIFIED_LOCAL: producer FAST/Q-SHARED, B-SP33, CFG FAST502/Q547, manual/wire and38CICS+33native source cases twice; docs/product/file-dependencies/w8-implementation.md",
     "fd_w9_validation": "QUALIFIED_LOCAL: producer focal/FAST/Q, consumer manual/FAST/reader, 8 scope + 33 native + 38 CICS real CLI sources twice, deterministic four products; docs/product/file-dependencies/w9-implementation.md",
     "logical_text_w1": "Source E2E A-D twice deterministic; scale 10/100/1000; no physical profile. Corporate rerun not required by revised user acceptance.",
@@ -335,14 +345,14 @@
       "contract": "SP 2.62 / NOMINAL_TEXT_SOURCE_V4; modelAssumed remains unavailable as physical storage, runtime VALUE or kill proof",
       "qualification": "docs/work/carddemo-values-control.md"
     },
-    "evidence_level": "Priority2 canonical MOVE and numeric/text expressions; local producer FAST passed. Consumer and final frozen73 qualification recorded in docs/work/numeric-text-values.md. Earlier named evidence remains historical.",
+    "evidence_level": "General memory implementation: local producer FAST and complete local qualification at this immutable checkpoint; final CFG W2D consumes these exact clean pins. Previous named baseline evidence remains historical; no remote CI or merge claim.",
     "json_artifact_transport": "Zstandard .json.zst; logical JSON hashes and semantic contracts unchanged",
     "checkpoint3_predicates": "Shared scalar predicates merged; source facts and executable frontiers kept distinct; no AP engine."
   },
   "cobol_lower": {
     "repository": "Gustavo2358/cobol-lower",
-    "status": "MERGED / VALIDATED; checkpoint3 PRs #60/#61; BOOL fix and CP1/CP2 preserved",
-    "commit": "c4d48991b88ef6d13eef659859b23d801684093b",
+    "status": "LOCAL_CHECKPOINT / HUMAN_REVIEW_PENDING",
+    "commit": "d88a424246d94082f1c6b9943f8795699377034e",
     "api": "io.github.gustavo2358.lower.adapters.cli.CobolLower",
     "role": "semantic_product_to_air_publication",
     "w2d_validation": "docs/work/history/WORK-CFG-034.md",
@@ -354,8 +364,8 @@
     "goto_validation": {
       "scope": "existing AIR Jump; no fallthrough; conservative open control and disjoint BASIC body"
     },
-    "canonical_ref": "main",
-    "observed_on": "2026-10-04",
+    "canonical_ref": "fix/general-memory-20261005",
+    "observed_on": "2026-10-06",
     "ep_w1_evidence": "Nine selected source/SP/AIR/RD/RV/DependencySite/JSON verticals passed; only upstream contract/producer changes since consumer FAST03. No solver change in this pin update.",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "fd_w1_validation": "docs/work/active/FD-W1.yaml",
@@ -386,7 +396,7 @@
       "producer_api": "io.github.gustavo2358.lower.adapters.cli.CobolDependencyInput",
       "schema_sha256": "5f751464dee36a993d9238a32e25d68d396ce8ca3fa2e0198f29b4e6a7f505c0"
     },
-    "evidence_level": "Priority2 canonical MOVE and numeric/text expressions; local producer FAST passed. Consumer and final frozen73 qualification recorded in docs/work/numeric-text-values.md. Earlier named evidence remains historical.",
+    "evidence_level": "General memory implementation: local producer FAST and complete local qualification at this immutable checkpoint; final CFG W2D consumes these exact clean pins. Previous named baseline evidence remains historical; no remote CI or merge claim.",
     "perform_completion": "Scoped exits, SECTION boundaries, typed VARYING levels; Integration authorized; qualified original 39/39 and adversaries 25/25. See docs/domain/perform-control-completion.md.",
     "logical_alias_move": "Logical family translation precedes scalar shortcuts; 14/14 adversaries, PERFORM 39/39, reviewed chaos 48/48 with six explicit abstraction-policy cases; see docs/product/logical-alias-move.md.",
     "synthetic_model_assumptions": {

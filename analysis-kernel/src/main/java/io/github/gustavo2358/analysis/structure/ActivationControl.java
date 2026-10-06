@@ -29,6 +29,46 @@ public final class ActivationControl {
     public Object operation(Frame frame){return frame.invoke.source();}
     public Frame frame(Object operation){return frames.get(operation);}
     public int variables(){return variables.size();}
+    /** A structural superset, computed without constructing Boolean guards.
+     * Continuations are scheduling bounds here, not executable bypass edges. */
+    public Map<Frame,BitSet> possibleAncestors() {
+        var parents=new IdentityHashMap<Frame,Set<Frame>>();
+        var remaining=new LinkedHashSet<ProgramIndex.Node>();var roots=new LinkedHashSet<ProgramIndex.Node>();
+        for(var rule:index.localRules.values())if(rule instanceof LocalControlRules.Unwind unwind
+                &&unwind.operation().unit().equals(context.entry().id().unit())) {
+            if(unwind.all())roots.add(index.node(unwind.destination()));
+            else if(unwind.count().signum()>0&&unwind.count().compareTo(BigInteger.valueOf(frames.size()))<=0)
+                remaining.add(index.node(unwind.destination()));
+        }
+        var tops=new ArrayList<>(frames.values());tops.add(null);
+        for(var top:tops) {
+            var visited=Collections.newSetFromMap(new IdentityHashMap<ProgramIndex.Node,Boolean>());
+            var pending=new ArrayDeque<ProgramIndex.Node>();pending.add(entry(top));pending.addAll(remaining);
+            if(top==null)pending.addAll(roots);
+            while(!pending.isEmpty()) {
+                var node=pending.removeFirst();if(!visited.add(node))continue;
+                for(var move:moves(node,top)) {
+                    if(move.action()==Action.NEXT)pending.addLast(move.destination());
+                    else if(move.action()==Action.CALL) {
+                        parents.computeIfAbsent(move.frame(),f->Collections.newSetFromMap(new IdentityHashMap<>())).add(top);
+                        var invoke=move.frame().invoke;pending.addLast(index.node(invoke.resume()));
+                        for(var destination:invoke.resumeRoutes().values())pending.addLast(index.node(destination));
+                    }
+                }
+            }
+        }
+        var ordered=new ArrayList<>(frames.values());var ordinals=new IdentityHashMap<Frame,Integer>();
+        for(int i=0;i<ordered.size();i++)ordinals.put(ordered.get(i),i);
+        int[] keys=new int[ordered.size()];int[][] incoming=new int[ordered.size()][];
+        for(int i=0;i<ordered.size();i++) {
+            var frame=ordered.get(i);keys[i]=frame.variable();
+            incoming[i]=parents.getOrDefault(frame,Set.of()).stream().filter(Objects::nonNull).mapToInt(ordinals::get).toArray();
+        }
+        var closure=CallerSupport.compute(keys,incoming);
+        var possible=new IdentityHashMap<Frame,BitSet>();possible.put(null,new BitSet());
+        for(int i=0;i<ordered.size();i++)possible.put(ordered.get(i),closure[i]);
+        return possible;
+    }
     public boolean isLocal(){return !index.localRules.isEmpty();}
     public ProgramIndex.Node entry(Frame frame){return frame==null?context.entryNode():index.node(frame.invoke.entry());}
     public boolean rootDestination(ProgramIndex.Node node){return !(node.source() instanceof CfgNode.SequenceNode);}
@@ -46,9 +86,12 @@ public final class ActivationControl {
                 var failNode=i.reentryGuard().isPresent()?index.node(i.reentryGuard().orElseThrow().destination()):node;
                 yield List.of(move(Action.CALL,node,index.node(i.entry()),f,f.variable,false,0,null),move(failure,node,failNode,null,f.variable,true,0,null));
             }
-            case LocalControlRules.Boundary b -> active!=null&&active.invoke.ports().contains(b.port())
-                ? List.of(move(Action.POP,node,index.node(active.invoke.resume()),null,-1,false,1,null))
-                : List.of(move(Action.NEXT,node,index.node(b.defaultDestination()),null,-1,false,0,null));
+            case LocalControlRules.Boundary b -> {
+                if(active==null||!active.invoke.ports().contains(b.port()))
+                    yield List.of(move(Action.NEXT,node,index.node(b.defaultDestination()),null,-1,false,0,null));
+                var target=b.resumeKey().isEmpty()?active.invoke.resume():active.invoke.resumeRoutes().get(b.resumeKey().orElseThrow());
+                yield List.of(move(target==null?Action.ROOT:Action.POP,node,index.node(target==null?b.invalidExit():target),null,-1,false,1,null));
+            }
             case LocalControlRules.Resume r -> {
                 var target=active==null?null:r.resumeKey().isEmpty()?active.invoke.resume():active.invoke.resumeRoutes().get(r.resumeKey().orElseThrow());
                 yield List.of(move(target==null?Action.ROOT:Action.POP,node,index.node(target==null?r.invalidExit():target),null,-1,false,1,null));

@@ -39,8 +39,10 @@ def verify_local(doc):
                   'LOCAL_RESUME': {'invalidExit'}, 'LOCAL_UNWIND': {'count', 'destination', 'invalidExit'}}[kind]
         if 'reentryGuard' in rule and kind=='LOCAL_INVOKE' and doc['schemaVersion'] in {'6.0.0','7.0.0'}: fields=fields | {'reentryGuard'}
         if doc['schemaVersion']=='7.0.0':
-            optional={'LOCAL_INVOKE':{'resumeRoutes'},'LOCAL_RESUME':{'resumeKey'},'LOCAL_UNWIND':{'all'}}.get(kind,set())
+            optional={'LOCAL_INVOKE':{'resumeRoutes'},'LOCAL_BOUNDARY':{'resumeKey','invalidExit'},'LOCAL_RESUME':{'resumeKey'},'LOCAL_UNWIND':{'all'}}.get(kind,set())
             fields=fields | (optional & set(rule))
+        if kind=='LOCAL_BOUNDARY' and (('resumeKey' in rule)!=('invalidExit' in rule)):
+            raise ValueError('selected boundary requires key and invalid exit together')
         if set(rule) != fields | {'source', 'operation', 'kind'}: raise ValueError('local rule fields')
         if 'reentryGuard' in fields:
             guard=rule['reentryGuard']
@@ -68,7 +70,7 @@ def verify_local(doc):
             target = nodes.get(identity(rule[field]))
             if target is None: raise ValueError('missing local rule target')
             if field == 'invalidExit':
-                tag = 'invalid_local_return' if kind == 'LOCAL_RESUME' else 'invalid_local_unwind'
+                tag = 'invalid_local_return' if kind in {'LOCAL_RESUME','LOCAL_BOUNDARY'} else 'invalid_local_unwind'
                 if target.get('kind') != 'OUTCOME_EXIT' or target.get('tag') != tag or target.get('operation') != rule['operation']:
                     raise ValueError('invalid local exception target')
             elif target.get('kind') != 'SEQUENCE': raise ValueError('invalid local sequence target')

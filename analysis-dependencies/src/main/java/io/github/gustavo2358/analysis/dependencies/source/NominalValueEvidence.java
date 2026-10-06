@@ -26,8 +26,8 @@ public record NominalValueEvidence(NominalValues facts,List<Declaration> declara
     public void validate(List<Statement> statements,List<Occurrence> occurrences,List<Node> nodes,List<Derivation> derivations) {
         var ss=new HashSet<String>();statements.forEach(s->ss.add(s.id().handle()));
         facts.validate(declarations.stream().map(Declaration::node).collect(java.util.stream.Collectors.toSet()),ss);
-        var ds=new HashMap<String,Derivation>();derivations.forEach(d->ds.put(d.id(),d));
-        var ns=new HashMap<String,Node>();nodes.forEach(n->ns.put(n.id(),n));
+        var ds=new HashMap<String,Derivation>();var ns=new HashMap<String,Node>();
+        if(!branches.isEmpty()){derivations.forEach(d->ds.put(d.id(),d));nodes.forEach(n->ns.put(n.id(),n));}
         var predicates=new HashSet<String>();facts.conditions().forEach(c->predicates.add(c.statement()));
         for(var b:branches){var d=ds.get(b.derivation());require(d!=null&&d.source().size()==1&&d.selection().isEmpty()&&d.callerPremise().isEmpty(),"nominal branch derivation");require(predicates.contains(ns.get(d.source().get(0)).location()),"nominal branch predicate owner");}
         var queries=new HashMap<String,Occurrence>();occurrences.forEach(o->queries.put(o.id().handle(),o));

@@ -242,6 +242,7 @@ public record QualifiedSourceDependencies(String schema, String version, String 
         }
         public UnitEvidence {
             nativeFiles=List.copyOf(nativeFiles);
+            if(!nativeFiles.isEmpty()) {
             var sourceStatements=unique(statements,Statement::id);var sourceNodes=unique(nodes,Node::id);var uses=new HashSet<String>();
             for(var f:nativeFiles) {
                 require(f.statement().unit().equals(unit)&&sourceStatements.containsKey(f.statement()),"native file statement");
@@ -250,14 +251,15 @@ public record QualifiedSourceDependencies(String schema, String version, String 
                 require(new HashSet<>(f.qualifications()).equals(nodes.stream().filter(n->n.location().equals(f.controlLocation())).map(Node::id).collect(java.util.stream.Collectors.toSet())),"complete native file alternatives");
                 require(controlAvailable||f.qualifications().isEmpty(),"native file control availability");
             }
+            }
             Objects.requireNonNull(nominalValues);
             if(nominalValues.isPresent())nominalValues.get().validate(statements,occurrences,nodes,derivations);
             Objects.requireNonNull(unit);
             statements=List.copyOf(statements);
             occurrences=List.copyOf(occurrences);
             targets=List.copyOf(targets);
-            nodes=List.copyOf(nodes);
-            derivations=List.copyOf(derivations);
+            nodes=SourceInventories.copyNodes(nodes);
+            derivations=SourceInventories.copyDerivations(derivations);
             selections=List.copyOf(selections);
             events=List.copyOf(events);
             guards=List.copyOf(guards);
@@ -313,7 +315,9 @@ public record QualifiedSourceDependencies(String schema, String version, String 
         }
         // Validate the finite certificate (not handler transfer semantics). Multiple
         // incoming derivations remain OR; each source/caller pair remains AND.
-        var pending=new HashMap<String,Integer>();var waiting=new HashMap<String,List<Derivation>>();var ready=new ArrayDeque<String>();var reached=new HashSet<String>();
+        var pending=new byte[derivations.size()];var heads=new int[nodes.size()];Arrays.fill(heads,-1);
+        var sourceNext=new int[derivations.size()];var callerNext=new int[derivations.size()];
+        var destinations=new int[derivations.size()];var ready=new int[nodes.size()];var reached=new BitSet(nodes.size());int read=0,write=0,ordinal=0;
         for(var d:derivations){refs(d.source(),ns);refs(d.callerPremise(),ns);refs(d.selection(),sels);refs(d.proofs(),ps);require(ns.containsKey(d.destination()),"derivation destination");
             if(d.source().isEmpty())require(d.callerPremise().isEmpty() && d.selection().isEmpty() && Set.of("PRIMARY_ENTRY","ALTERNATE_ENTRY").contains(d.authority()),"ordinary root authority");
             if(d.source().isEmpty()&&d.authority().equals("ALTERNATE_ENTRY")) {
@@ -321,14 +325,24 @@ public record QualifiedSourceDependencies(String schema, String version, String 
                 require(ns.get(d.destination()).context().startsWith("ENTRY/"),"alternate root context");
             }
             if(!d.selection().isEmpty()) {var s=sels.get(d.selection().getFirst());require(d.source().equals(List.of(s.source())) && d.callerPremise().isEmpty() && s.localEntry().equals(List.of(d.destination())) && d.proofs().equals(s.proofs()),"selection derivation correlation");}
-            var premises=new HashSet<String>(d.source());premises.addAll(d.callerPremise());pending.put(d.id(),premises.size());
-            if(premises.isEmpty())ready.add(d.destination());for(var p:premises)waiting.computeIfAbsent(p,k->new ArrayList<>()).add(d);
+            int destination=ns.ordinal(d.destination());destinations[ordinal]=destination;
+            int source=d.source().isEmpty()?-1:ns.ordinal(d.source().getFirst());
+            int caller=d.callerPremise().isEmpty()?-1:ns.ordinal(d.callerPremise().getFirst());
+            if(source>=0){sourceNext[ordinal]=heads[source];heads[source]=Math.multiplyExact(ordinal,2);pending[ordinal]++;}
+            if(caller>=0&&caller!=source){callerNext[ordinal]=heads[caller];heads[caller]=Math.addExact(Math.multiplyExact(ordinal,2),1);pending[ordinal]++;}
+            if(pending[ordinal]==0&&!reached.get(destination)){reached.set(destination);ready[write++]=destination;}
+            ordinal++;
         }
-        while(!ready.isEmpty()){var id=ready.removeFirst();if(!reached.add(id))continue;for(var d:waiting.getOrDefault(id,List.of()))if(pending.merge(d.id(),-1,Integer::sum)==0)ready.add(d.destination());}
-        require(reached.size()==nodes.size(),"ungrounded qualification node");
+        while(read<write)for(int link=heads[ready[read++]];link>=0;) {
+            int index=link>>>1;int next=(link&1)==0?sourceNext[index]:callerNext[index];
+            if(--pending[index]==0){int destination=destinations[index];if(!reached.get(destination)){reached.set(destination);ready[write++]=destination;}}
+            link=next;
+        }
+        require(reached.cardinality()==nodes.size(),"ungrounded qualification node");
         var selected=new HashSet<String>();for(var d:derivations)selected.addAll(d.selection());
         for(var s:selections)if(!s.localEntry().isEmpty())require(selected.contains(s.id()),"missing selection derivation");
-        var atLocation=new HashMap<String,Set<String>>();for(var n:nodes)atLocation.computeIfAbsent(n.location(),k->new HashSet<>()).add(n.id());
+        var observed=new HashSet<String>();occurrences.forEach(o->observed.add(o.id().handle()));
+        var atLocation=new HashMap<String,Set<String>>();for(var n:nodes)if(observed.contains(n.location()))atLocation.computeIfAbsent(n.location(),k->new HashSet<>()).add(n.id());
         for(var o:occurrences){require(ss.containsKey(o.id()),"occurrence identity");refs(o.qualifications(),ns);require(new HashSet<>(o.qualifications()).equals(atLocation.getOrDefault(o.id().handle(),Set.of())),"complete occurrence alternatives");
             for(var ref:o.qualifications())require(ns.get(ref).location().equals(o.id().handle()),"occurrence node correlation");}
         for(var f:frontiers){require(ns.containsKey(f.source()),"frontier source");refs(f.proofs(),ps);}
@@ -342,7 +356,41 @@ public record QualifiedSourceDependencies(String schema, String version, String 
         refs(s.target(),targets);refs(s.activation(),statements);
         if(!s.target().isEmpty())require(targets.get(s.target().getFirst()).registrations().stream().anyMatch(r->r.statement().equals(s.activation().getFirst())),"support activation/target");
     }
-    private static <T,K> Map<K,T> unique(List<T> xs,Function<T,K> key){var result=new HashMap<K,T>();for(var x:xs)require(result.put(key.apply(x),x)==null,"duplicate identity");return result;}
+    /** Immutable chained index into the owned inventory; exact equality resolves collisions. */
+    private static final class CompactIndex<K,T> extends AbstractMap<K,T> {
+        private final List<T> values;private final Function<T,K> key;private final int[] heads,next;
+        private final Map<Integer,Map<K,Integer>> overflow=new HashMap<>();
+        CompactIndex(List<T> values,Function<T,K> key) {
+            this.values=values;this.key=key;int capacity=1;while(capacity<values.size())capacity=Math.multiplyExact(capacity,2);
+            heads=new int[capacity];Arrays.fill(heads,-1);next=new int[values.size()];
+            for(int i=0;i<values.size();i++) {
+                K id=key.apply(values.get(i));require(ordinal(id)<0,"duplicate identity");
+                int bucket=bucket(id);var crowded=overflow.get(bucket);
+                if(crowded!=null){crowded.put(id,i);continue;}
+                int count=0;for(int at=heads[bucket];at>=0;at=next[at])count++;
+                if(count>=8){crowded=new HashMap<>(64);for(int at=heads[bucket];at>=0;at=next[at])crowded.put(key.apply(values.get(at)),at);crowded.put(id,i);overflow.put(bucket,crowded);}
+                else {next[i]=heads[bucket];heads[bucket]=i;}
+            }
+        }
+        private int bucket(Object id){int hash=id.hashCode();return (hash^(hash>>>16))&(heads.length-1);}
+        int ordinal(Object id){
+            if(id==null)return -1;int bucket=bucket(id);
+            if(!overflow.isEmpty()){var crowded=overflow.get(bucket);if(crowded!=null)return crowded.getOrDefault(id,-1);}
+            for(int at=heads[bucket];at>=0;at=next[at])if(id.equals(key.apply(values.get(at))))return at;return -1;
+        }
+        @Override public T get(Object id){int at=ordinal(id);return at<0?null:values.get(at);}
+        @Override public boolean containsKey(Object id){return ordinal(id)>=0;}
+        @Override public int size(){return values.size();}
+        @Override public Set<Map.Entry<K,T>> entrySet(){return new AbstractSet<>() {
+            @Override public int size(){return values.size();}
+            @Override public Iterator<Map.Entry<K,T>> iterator(){return new Iterator<>() {
+                int at;
+                public boolean hasNext(){return at<values.size();}
+                public Map.Entry<K,T> next(){if(!hasNext())throw new NoSuchElementException();T value=values.get(at++);return Map.entry(key.apply(value),value);}
+            };}
+        };}
+    }
+    private static <T,K> CompactIndex<K,T> unique(List<T> xs,Function<T,K> key){return new CompactIndex<>(xs,key);}
     private static <T> void refs(List<T> refs,Map<T,?> index){var seen=new HashSet<T>();for(var r:refs)require(index.containsKey(r) && seen.add(r),"invalid/duplicate reference");}
     private static void one(List<?> xs){require(xs.size()<=1,"optional cardinality");}
     private static void text(String s){require(s!=null && !s.isBlank(),"empty identity/descriptor");}

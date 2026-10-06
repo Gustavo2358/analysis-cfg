@@ -12,6 +12,7 @@ MODULES=['analysis-dataflow','analysis-adapters','analysis-launcher']
 NAMES={'analysis-dataflow':['AnalysisDataflow','DefaultValuePlan','ObservedValueFact','PreparedDataflowResult','RegionalAnalysis','RegionalAnalysisResult'],
        'analysis-adapters':['JsonFiles','DataflowAirReader','DeliveryReceipt','JsonOutput','LocalResultWriter','ReceiptJson','ResultJson','WireIds','RegionalResultJson'],
        'analysis-launcher':['AnalysisDataflow','RegionalAnalysis']}
+PIPELINE='analysis-launcher/src/main/java/io/github/gustavo2358/analysis/launcher/AnalysisPipeline.java'
 SOURCES={m+'/src/main/java/io/github/gustavo2358/analysis/'+m.removeprefix('analysis-').replace('launcher','launcher')+'/'+n+'.java' for m,names in NAMES.items() for n in names}
 TESTS={
  'analysis-dataflow':{'CompositionTest':set('genericOverwriteUsesRealPipelineAndLastProducer noWritesProducesCompleteWithoutInventedStableRun everyTerminatorAndOrphanAreObservedBefore resourcePreflightNeverProducesSemanticResultAndRecovers incompleteAndLegacyPreparationFailuresRemainDistinct'.split())},
@@ -24,6 +25,15 @@ TESTS['analysis-launcher']['RegionalCliTest']=set(['missingInputAndBadQueryNever
 TESTS['analysis-adapters']['LogicalEntryWireTest']={'sourcePossibilityRoundtripsWithoutPhysicalStorage'}
 TESTS['analysis-launcher']['LogicalChoiceTargetTest']={'equivalentFormsAndMixedAlternativesRetainLogicalSupportInMemoryAndCli'}
 TESTS['analysis-launcher']['PhysicalChoiceTargetTest']={'physicalAlternativesSurviveMemoryAndCliWithoutResurrectingMustValues'}
+# Shared-admission composition brings the real CFG adapter into the Maven reactor.
+# Select and verify its independent literal writer oracle; keep strict no-test failure.
+TESTS['cfg-adapters']={'TransportTest':{'writerMatchesIndependentGoldenBytesAndIsDeterministic'}}
+TESTS['analysis-launcher']['PipelineCliTest']={
+ 'oneReadAndCompleteProductsEqualIndependentSeparateRoutes',
+ 'invalidIncompleteDigestAndAliasesRejectBeforeAnyDestination',
+ 'fullCorrelatedSourceAndDigestMismatchPreserveProducts',
+ 'explicitCodecLimitNeverStartsExportOrPublishesFallback',
+ 'writerFailuresKeepCompletedProductsAndCleanStaging'}
 DENIED=('java.lang.reflect','java.util.ServiceLoader','cobolexplorer','org.antlr','lower.adapters','CallResolver','FileResolver','Db2Resolver','CicsResolver','GrbeResolver','ProgramDependency','CfgJsonWriter','CfgJsonBytes')
 POM_ADDITION=b'    <module>analysis-dataflow</module>\n    <module>analysis-adapters</module>\n    <module>analysis-launcher</module>\n'
 def original_pom(data):
@@ -33,12 +43,14 @@ def original_pom(data):
 def verify_sources(root):
     actual={p.relative_to(root).as_posix() for m in MODULES for p in (root/m/'src/main/java').rglob('*.java')}
     from w1d_scope import NEW_W5
-    if actual!=SOURCES|NEW_W5:raise Failure('W5 exact production source inventory')
+    if actual!=SOURCES|NEW_W5|{PIPELINE}:raise Failure('W5 exact production source inventory')
     for path in SOURCES:
         s=(root/path).read_text()
         if any(x in s for x in DENIED):raise Failure('W5 forbidden dependency: '+path)
         if any(x in s for x in ('"PROGA"','"WS-PGM"','maximumDocumentBytes','maximumBytes','maxQueries','maxFacts','maxConsumers','maxCandidates')):raise Failure('W5 fixture/capacity policy: '+path)
         if path.startswith('analysis-dataflow/') and any(x in s for x in ('java.io','java.nio.file','analysis.adapters','analysis.launcher','air.json')):raise Failure('W5 inner composition knows transport')
+    composition=(root/PIPELINE).read_text()
+    if any(x in composition for x in DENIED if x!='CfgJsonWriter'):raise Failure('shared composition forbidden dependency')
     from check_analysis_architecture import check_direct_air
     if check_direct_air(root):raise Failure('W5 direct AIR Maven dependency')
 
@@ -63,10 +75,10 @@ def architecture(root,update=False):
         edges=dependencies_from_jdeps(capture(root,['jdeps','--multi-release','21','-filter:none','-verbose:class','-cp',cp,str(classes)]))
         for source,targets in edges.items():
             for target in targets:
-                if any(x in target for x in DENIED):raise Failure('W5 compiled forbidden dependency: '+target)
+                if any(x in target for x in DENIED if not (x=='CfgJsonWriter' and source=='io.github.gustavo2358.analysis.launcher.AnalysisPipeline')):raise Failure('W5 compiled forbidden dependency: '+target)
                 if module=='analysis-dataflow' and any(x in target for x in ('java.io','java.nio.file','analysis.adapters','analysis.launcher','air.json')):raise Failure('W5 compiled inner boundary: '+target)
         descriptors={p:capture(root,['javap','-classpath',str(classes)+os.pathsep+cp,'-public','-s',p[:-6].replace('/','.')]) for p in paths}
-        actual[module]=dict(sources=sorted(p for p in SOURCES if p.startswith(module+'/')),classfiles=paths,jdeps_edges={k:sorted(v) for k,v in sorted(edges.items())},javap_descriptors=descriptors,effective_maven=sorted(parse_tgf(root/module/'target/architecture-dependencies.tgf')))
+        actual[module]=dict(sources=sorted(p for p in SOURCES|{PIPELINE} if p.startswith(module+'/')),classfiles=paths,jdeps_edges={k:sorted(v) for k,v in sorted(edges.items())},javap_descriptors=descriptors,effective_maven=sorted(parse_tgf(root/module/'target/architecture-dependencies.tgf')))
     # Inner artifacts must have no compiled dependency on the new outer layers.
     for module in ('cfg-kernel','analysis-kernel','analysis-values'):
         cp=(root/module/'target/architecture-classpath.txt').read_text().strip()
@@ -80,7 +92,7 @@ def load(path):return json.loads(Path(path).read_text())
 def test_inventory(category):return {m:{k:v for k,v in suites.items() if category=='performance' or k!='WideResultTest'} for m,suites in TESTS.items()}
 def verify_reports(root,expected):
     for module,suites in expected.items():
-        prefix='io.github.gustavo2358.analysis.'+module.removeprefix('analysis-')+'.';paths=list((root/module/'target/surefire-reports').glob('TEST-*.xml'))
+        prefix='io.github.gustavo2358.analysis.cfg.adapters.' if module=='cfg-adapters' else 'io.github.gustavo2358.analysis.'+module.removeprefix('analysis-')+'.';paths=list((root/module/'target/surefire-reports').glob('TEST-*.xml'))
         if {p.name for p in paths}!={'TEST-'+prefix+s+'.xml' for s in suites}:raise Failure('W5 nominal report inventory mismatch: '+module)
         for p in paths:
             doc=ET.parse(p).getroot();name=doc.attrib['name'].removeprefix(prefix);cases=doc.findall('testcase')
@@ -106,7 +118,7 @@ def run(root,category,update=False):
     verify_sources(root)
     if category=='architecture':
         command(root,['mvn','-B','-ntp','-DskipTests','package','org.apache.maven.plugins:maven-dependency-plugin:3.8.1:tree','-Dscope=compile','-DoutputType=tgf','-DoutputFile=target/architecture-dependencies.tgf','org.apache.maven.plugins:maven-dependency-plugin:3.8.1:build-classpath','-DincludeScope=compile','-Dmdep.outputFile=target/architecture-classpath.txt']);architecture(root,update);return
-    expected=test_inventory(category);selector=','.join(['BuildCfgContractTest','StructureTest','ValuesTest','NameInterpreterTest',*(t for suites in expected.values() for t in suites)])
+    expected=test_inventory(category);selector=','.join(['BuildCfgContractTest','StructureTest','ValuesTest','NameInterpreterTest',*(t+'#'+'+'.join(sorted(methods)) if module=='cfg-adapters' else t for module,suites in expected.items() for t,methods in suites.items())])
     output=command(root,['mvn','-B','-ntp','-pl','analysis-launcher','-am','clean','package','-Dtest='+selector,'org.apache.maven.plugins:maven-dependency-plugin:3.8.1:build-classpath','-DincludeScope=runtime','-Dmdep.outputFile=target/runtime-classpath.txt']);verify_reports(root,expected)
     command(root,[sys.executable,'-B','scripts/project/test_result_wire.py'])
     command(root,[sys.executable,'-B','scripts/project/test_regional_result_wire.py'])

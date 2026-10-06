@@ -30,9 +30,12 @@ public final class DependencyInputJson {
         var base=path.toAbsolutePath().getParent();var air=root.get("air");keys(air,"path","sha256");
         var read=reader.read(base.resolve(text(air,"path")));
         if(!read.sha256().equals(text(air,"sha256")))throw new IllegalArgumentException("AIR digest mismatch");
-        var source=root.get("qualifiedSource");keys(source,"path","sha256");var bytes=JsonFiles.read(base.resolve(text(source,"path")));
-        if(!sha(bytes).equals(text(source,"sha256")))throw new IllegalArgumentException("source evidence digest mismatch");
-        var evidence=new QualifiedSourceJson().decode(bytes);
+        var source=root.get("qualifiedSource");keys(source,"path","sha256");
+        var digest=sha256();io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies evidence;
+        try(var input=new DigestInputStream(JsonFiles.input(base.resolve(text(source,"path"))),digest)) {
+            evidence=new QualifiedSourceJson().decode(input);
+        }
+        if(!HexFormat.of().formatHex(digest.digest()).equals(text(source,"sha256")))throw new IllegalArgumentException("source evidence digest mismatch");
         if(!evidence.source().sha256().equals(text(root,"sourceSha256"))||evidence.air().size()!=1||!evidence.air().getFirst().sha256().equals(read.sha256()))throw new IllegalArgumentException("source/AIR snapshot mismatch");
         var list=root.get("correlations");if(!list.isArray())throw new IllegalArgumentException("correlations array required");
         var links=new ArrayList<DependencyInput.StatementCorrelation>();
@@ -48,5 +51,5 @@ public final class DependencyInputJson {
     private static void id(JsonNode n,String domain,boolean unit){if(unit)keys(n,"domain","publication","unit","localId");else keys(n,"domain","publication","localId");if(!text(n,"domain").equals(domain))throw new IllegalArgumentException("identity domain");}
     private static String text(JsonNode n,String key){var v=n.get(key);if(v==null||!v.isTextual()||v.textValue().isBlank())throw new IllegalArgumentException("text required: "+key);return v.textValue();}
     private static void keys(JsonNode n,String... fields){if(n==null||!n.isObject())throw new IllegalArgumentException("object required");var actual=new HashSet<String>();n.fieldNames().forEachRemaining(actual::add);if(!actual.equals(Set.of(fields)))throw new IllegalArgumentException("closed dependency input fields");}
-    private static String sha(byte[] bytes){try{return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(bytes));}catch(NoSuchAlgorithmException ex){throw new IllegalStateException(ex);}}
+    private static MessageDigest sha256(){try{return MessageDigest.getInstance("SHA-256");}catch(NoSuchAlgorithmException ex){throw new IllegalStateException(ex);}}
 }

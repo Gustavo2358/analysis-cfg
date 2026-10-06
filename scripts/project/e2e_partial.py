@@ -41,6 +41,7 @@ def source_calls(sp):
 
 
 def oracle(name, sp, air, result, cfg):
+    from e2e_perform_basic import require_body_completion
     locked_sp(sp)
     p = air['publication']; unit = p['units'][0]
     operations = {op['header']['id']['localId']: op for seq in unit['sequences'] for op in seq['instructions'] + [seq['terminator']]}
@@ -72,7 +73,7 @@ def oracle(name, sp, air, result, cfg):
         vertices={json.dumps(dict(n['label'],domain='label'),sort_keys=True):vertex(n['id']) for n in cfg['nodes'] if 'label' in n}
         guards={json.dumps(o['reentryGuard']['destination'],sort_keys=True) for o in activations}
         opaque={k for k,s in sequences.items() if s['terminator']['kind']=='opaque'}
-        require(opaque<=guards and all(vertices[k] not in reached for k in opaque),'supported execution cannot reach an opaque operation; reentry guards remain explicit')
+        require(guards<=opaque and all(vertices[k] not in reached for k in opaque),'supported execution cannot reach guards or unmatched lexical completion frontiers')
     by_op = {s['operation']['localId']: s for s in result['sites']}
     calls = source_calls(sp)
     # A contextual PERFORM may publish an inactive lexical shadow alongside the
@@ -85,16 +86,25 @@ def oracle(name, sp, air, result, cfg):
             require(not ids, 'post-DISPLAY CALL remains source inventory beyond an unproved completion')
             continue
         auxiliaries = ids - by_op.keys()
-        require(len(auxiliaries) <= 1, 'at most one shared body completion per source CALL')
+        require(len(auxiliaries) <= 2, 'at most one shared completion and one inactive lexical CALL frontier')
+        auxiliary_kinds = []
         for auxiliary in auxiliaries:
             completion = next(s for s in unit['sequences']
                               if s['terminator']['header']['id']['localId'] == auxiliary)
-            require(not completion['instructions'] and completion['terminator']['kind'] == 'local.resume'
-                    and any(operations[i]['kind'] == 'invoke'
-                            and operations[i]['outcomes'] == {'known': [{'kind': 'normal', 'label': completion['label']}],
-                                                              'remainder': {'kind': 'none'}}
-                            for i in ids & by_op.keys()),
-                    'extra CALL coverage is its closed shared body completion')
+            term = completion['terminator']; auxiliary_kinds.append(term['kind'])
+            require(not completion['instructions'], 'CALL auxiliaries contain no value-producing instructions')
+            if term['kind'] == 'opaque':
+                from cfg_local_paths import Paths, vertex
+                reached = Paths(cfg).reachable([vertex(n['id']) for n in cfg['nodes'] if n['kind'] == 'ENTRY'])
+                node = next(n for n in cfg['nodes'] if 'label' in n and dict(n['label'], domain='label') == completion['label'])
+                require(term['header']['coverage'] == 'UNSUPPORTED' and vertex(node['id']) not in reached,
+                        'source-linked lexical CALL frontier is explicit and unreachable with matched frames')
+            else:
+                require(term['kind'] == 'local.boundary' and any(operations[i]['kind'] == 'invoke'
+                        and operations[i]['outcomes'] == {'known': [{'kind': 'normal', 'label': completion['label']}],
+                                                        'remainder': {'kind': 'none'}}
+                        for i in ids & by_op.keys()), 'extra CALL coverage is its closed shared body completion')
+        require(len(set(auxiliary_kinds)) == len(auxiliary_kinds), 'no duplicate auxiliary completion or frontier')
         ids -= auxiliaries
         require(ids and ids <= by_op.keys(), 'every projected CALL invocation has a dependency site')
         linked.update(ids)
@@ -139,8 +149,7 @@ def oracle(name, sp, air, result, cfg):
                 and outcomes['remainder'] == {'kind': 'none'},
                 'body CALL has one closed normal continuation')
         completion = sequence(outcomes['known'][0]['label'])
-        require(not completion['instructions'] and completion['terminator']['kind'] == 'local.resume',
-                'body CALL returns through the active caller frame')
+        require_body_completion(completion,body_frame(activations[0]))
     if name in EXPECTED:
         require(len(sites) == len(EXPECTED[name]), 'independent source site count')
         for site, values in zip(sites, EXPECTED[name]):
@@ -205,8 +214,7 @@ def oracle(name, sp, air, result, cfg):
                 and body['terminator']['kind'] == 'jump',
                 'both supports identify the assignment inside the invoked body')
         completion = sequence(body['terminator']['destination'])
-        require(not completion['instructions'] and completion['terminator']['kind'] == 'local.resume',
-                'the producer completes through the caller frame without a cross-return edge')
+        require_body_completion(completion,body_frame(activations[0]))
         only_unreachable_guards()
     precise = name.startswith('perform-') or name in ('if-nested', 'stress')
     if precise:

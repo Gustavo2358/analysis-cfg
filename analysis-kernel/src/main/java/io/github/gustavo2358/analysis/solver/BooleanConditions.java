@@ -8,7 +8,19 @@ final class BooleanConditions {
     private record Node(int variable,int low,int high) { }
     private record Pair(int first,int second) { }
     private final List<Node> nodes=new ArrayList<>();
-    private final Map<Node,Integer> unique=new HashMap<>();
+    private Map<Node,Integer> unique=new HashMap<>();
+    private int[] recycled=new int[0];
+    private int recycledSize;
+    private long allocationsSinceCollection,collectionThreshold=65536;
+    private boolean scratch;
+    private int scratchFloor;
+    private long scratchAllocations;
+    private final BitSet scratchDirty=new BitSet();
+    private int[] scratchSlots=new int[0];
+    private int scratchSlotCount;
+    private long scratchCacheVisits;
+    long scratchCacheVisits(){return scratchCacheVisits;}
+
     // Direct-mapped computed table: collisions only evict memoized work. They never
     // identify semantic nodes or truncate conditions. Memory is fixed per manager.
     private final int[] cacheA,cacheB,cacheOperation,cacheResult;
@@ -21,13 +33,24 @@ final class BooleanConditions {
     }
     private int cacheSlot(int a,int b,int operation){int hash=a*0x9e3779b9+b*0x85ebca6b+operation;hash^=hash>>>16;return hash&(cacheA.length-1);}
     private int cached(int a,int b,int operation){int slot=cacheSlot(a,b,operation);return cacheA[slot]==a&&cacheB[slot]==b&&cacheOperation[slot]==operation?cacheResult[slot]:-1;}
-    private int remember(int a,int b,int operation,int result){int slot=cacheSlot(a,b,operation);cacheA[slot]=a;cacheB[slot]=b;cacheOperation[slot]=operation;cacheResult[slot]=result;return result;}
+    private int remember(int a,int b,int operation,int result){
+        int slot=cacheSlot(a,b,operation);cacheA[slot]=a;cacheB[slot]=b;cacheOperation[slot]=operation;cacheResult[slot]=result;
+        if(scratch&&(a>=scratchFloor||result>=scratchFloor||operation<2&&b>=scratchFloor)&&!scratchDirty.get(slot)) {
+            scratchDirty.set(slot);
+            if(scratchSlotCount==scratchSlots.length)scratchSlots=Arrays.copyOf(scratchSlots,Math.min(cacheA.length,Math.max(16,scratchSlots.length*2)));
+            scratchSlots[scratchSlotCount++]=slot;
+        }
+        return result;
+    }
     int variable(int variable){return node(variable,FALSE,TRUE);}
     int node(int variable,int low,int high) {
         if(low==high)return low;
         var key=new Node(variable,low,high);
         var old=unique.get(key);if(old!=null)return old;
-        int id=nodes.size();nodes.add(key);unique.put(key,id);return id;
+        int id;
+        if(!scratch&&recycledSize>0){id=recycled[--recycledSize];nodes.set(id,key);}
+        else {id=nodes.size();nodes.add(key);}
+        allocationsSinceCollection++;unique.put(key,id);return id;
     }
     int and(int a,int b){return apply(a,b,false);}
     int or(int a,int b){return apply(a,b,true);}
@@ -96,11 +119,63 @@ final class BooleanConditions {
      * No condition created in that scope may escape. Surviving IDs stay stable. */
     void discardAfter(int checkpoint) {
         if(checkpoint<2||checkpoint>nodes.size())throw new IllegalArgumentException("invalid BDD checkpoint");
-        if(checkpoint==nodes.size())return;
+        if(scratch&&checkpoint!=scratchFloor)throw new IllegalArgumentException("foreign BDD scratch checkpoint");
+        int removed=nodes.size()-checkpoint;
         for(int id=nodes.size()-1;id>=checkpoint;id--)unique.remove(nodes.remove(id));
         // IDs can be reused. Invalidate every computed entry referring to scratch
         // operands/results, while retaining all computations on surviving nodes.
-        for(int i=0;i<cacheOperation.length;i++)if(cacheA[i]>=checkpoint||cacheResult[i]>=checkpoint||cacheOperation[i]<2&&cacheB[i]>=checkpoint)cacheOperation[i]=-1;
+        if(scratch) {
+            for(int j=0;j<scratchSlotCount;j++) {
+                int i=scratchSlots[j];scratchCacheVisits++;
+                if(cacheA[i]>=checkpoint||cacheResult[i]>=checkpoint||cacheOperation[i]<2&&cacheB[i]>=checkpoint)cacheOperation[i]=-1;
+                scratchDirty.clear(i);
+            }
+            scratchSlotCount=0;
+        } else if(removed>0) {
+            // Retain the unmanaged test/diagnostic seam, whose writes had no journal.
+            for(int i=0;i<cacheOperation.length;i++) {
+                scratchCacheVisits++;
+                if(cacheA[i]>=checkpoint||cacheResult[i]>=checkpoint||cacheOperation[i]<2&&cacheB[i]>=checkpoint)cacheOperation[i]=-1;
+            }
+        }
+        allocationsSinceCollection=scratch?scratchAllocations:Math.max(0,allocationsSinceCollection-removed);scratch=false;
+    }
+    /** Scratch allocations append; they cannot reuse an older collected slot. */
+    int checkpoint() {
+        if(scratch)throw new IllegalStateException("nested BDD scratch scope");
+        scratch=true;scratchFloor=nodes.size();scratchAllocations=allocationsSinceCollection;return scratchFloor;
+    }
+    boolean collectionDue(){return !scratch&&allocationsSinceCollection>=collectionThreshold;}
+    int retainedNodes(){return unique.size()+2;}
+    /** Called only between processing steps. The visitor supplies every persistent root. */
+    int collect(java.util.function.Consumer<java.util.function.IntConsumer> roots) {
+        if(scratch)throw new IllegalStateException("BDD collection during scratch scope");
+        var marked=new BitSet(nodes.size());var pending=new ArrayDeque<Integer>();
+        java.util.function.IntConsumer mark=root->{
+            if(root<2)return;
+            if(root>=nodes.size()||nodes.get(root)==null)throw new IllegalStateException("unowned BDD root");
+            pending.push(root);
+            while(!pending.isEmpty()) {
+                int id=pending.pop();if(id<2||marked.get(id))continue;
+                marked.set(id);var node=nodes.get(id);pending.push(node.low);pending.push(node.high);
+            }
+        };
+        roots.accept(mark);int before=retainedNodes();
+        for(int id=2;id<nodes.size();id++)if(!marked.get(id))nodes.set(id,null);
+        while(nodes.size()>2&&nodes.getLast()==null)nodes.removeLast();
+        // Rebuild the unique table as well: an oversized HashMap bucket array
+        // must not retain the historical allocation peak after its keys die.
+        unique.clear();unique=new HashMap<>();recycledSize=0;
+        for(int id=2;id<nodes.size();id++) {
+            var node=nodes.get(id);
+            if(node!=null)unique.put(node,id);
+            else {
+                if(recycledSize==recycled.length)recycled=Arrays.copyOf(recycled,Math.max(16,recycled.length*2));
+                recycled[recycledSize++]=id;
+            }
+        }
+        Arrays.fill(cacheOperation,-1);allocationsSinceCollection=0;
+        collectionThreshold=Math.max(65536,2L*retainedNodes());return before-retainedNodes();
     }
     int size(){return nodes.size();}
 }

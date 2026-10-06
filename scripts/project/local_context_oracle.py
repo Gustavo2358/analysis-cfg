@@ -55,6 +55,13 @@ def evaluate(air,source_name):
                         if any(f[0]==op for f in stack):raise ValueError('recursive local oracle activation')
                         next_stack=stack+((op,key(term['resume']),tuple(key(x) for x in term['completionPorts']),tuple(lines(term['header']['origin'])),activation,tuple((x['key'],key(x['destination'])) for x in term.get('resumeRoutes',[]))),)
                         destinations=[key(term['entry'])]
+                elif kind=='local.boundary':
+                    if not stack or key(term['port']) not in stack[-1][2]:
+                        destinations=[key(term['defaultDestination'])]
+                    else:
+                        destination=dict(stack[-1][5]).get(term['resumeKey']) if 'resumeKey' in term else stack[-1][1]
+                        if destination is None:raise ValueError('invalid selected boundary return in oracle')
+                        destinations=[destination];next_stack=stack[:-1]
                 elif kind=='local.resume':
                     if not stack:raise ValueError('invalid local return in oracle')
                     destination=dict(stack[-1][5]).get(term['resumeKey']) if 'resumeKey' in term else stack[-1][1]

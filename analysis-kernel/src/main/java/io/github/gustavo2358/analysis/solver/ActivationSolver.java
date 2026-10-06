@@ -45,7 +45,28 @@ final class ActivationSolver<S> {
         while(!pending.isEmpty()) {
             var slot=pending.removeFirst();slot.queued=false;pops++;transfers++;
             process(slot);
+            collectConditions(slot.region.entry);
         }
+    }
+    private void collectConditions(EntryRun entry) {
+        if(!entry.bdd.collectionDue())return;
+        entry.bdd.collect(root->{
+            root.accept(entry.empty);entry.environments.values().forEach(root::accept);
+            if(entry.model!=null)entry.model.visitConditions(root);
+            var owners=Collections.newSetFromMap(new IdentityHashMap<Object,Boolean>());
+            for(var region:entry.regions) {
+                owners.add(region);root.accept(region.environment);
+                region.incoming.values().forEach(root::accept);region.recursive.values().forEach(root::accept);
+                for(var partition:region.exits.values())for(var piece:partition.pieces)root.accept(piece.condition);
+                for(var slot:region.slots.values()) {
+                    slot.children.values().forEach(root::accept);
+                    for(var piece:slot.anchors.pieces)root.accept(piece.condition);
+                    for(var piece:slot.outputs.pieces)root.accept(piece.condition);
+                }
+            }
+            for(var key:feasibleCache.keySet())if(owners.contains(key.region))root.accept(key.condition);
+            for(var key:deferredCache.keySet())if(owners.contains(key.region))root.accept(key.condition);
+        });
     }
     private DataflowResult<S> result() {
         var lookup=new IdentityHashMap<ContextView,IdentityHashMap<ProgramIndex.Node,List<AnalysisPoint>>>();
@@ -184,7 +205,7 @@ final class ActivationSolver<S> {
             }
             if(valid&&region.entry.bdd.test(condition,active)){feasibleCache.put(key,true);return true;}
         }
-        var b=region.entry.bdd;int checkpoint=b.size();
+        var b=region.entry.bdd;int checkpoint=b.checkpoint();
         try {
             var wanted=new IdentityHashMap<Region,Integer>();var waiting=new IdentityHashMap<Region,Integer>();var queue=new ArrayDeque<Region>();
             wanted.put(region,condition);waiting.put(region,condition);queue.add(region);boolean found=false;
@@ -208,6 +229,7 @@ final class ActivationSolver<S> {
     }
     private final class EntryRun {
         final ContextView context;
+        final ActivationModel model;
         final ActivationControl control;
         final BooleanConditions bdd;
         final Map<ActivationControl.Frame,Integer> environments;
@@ -215,7 +237,15 @@ final class ActivationSolver<S> {
         final IdentityHashMap<ActivationControl.Frame,List<Region>> byFrame=new IdentityHashMap<>();
         final Map<ActivationControl.Frame,Map<ProgramIndex.Node,S>> boundaries=new IdentityHashMap<>();
         Region root;int empty;
-        EntryRun(ContextView context,ActivationModel model){this.context=context;control=model==null?new ActivationControl(session,context):model.control();bdd=model==null?new BooleanConditions():model.conditions();environments=model==null?new IdentityHashMap<>():model.environments();}
+        EntryRun(ContextView context,ActivationModel model){
+            this.context=context;this.model=model;control=model==null?new ActivationControl(session,context):model.control();
+            bdd=model==null?new BooleanConditions():model.conditions();environments=model==null?new IdentityHashMap<>():model.environments();
+            if(model==null)for(var support:control.possibleAncestors().entrySet()) {
+                int environment=1;
+                for(int v=control.variables()-1;v>=0;v--)if(!support.getValue().get(v))environment=bdd.node(v,environment,0);
+                environments.put(support.getKey(),environment);
+            }
+        }
         void start() {
             empty=1;for(int i=control.variables()-1;i>=0;i--)empty=bdd.node(i,empty,0);
             root=new Region(this,null,bottom);regions.add(root);root.accept(empty);

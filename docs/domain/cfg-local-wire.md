@@ -53,6 +53,15 @@ anterior; versões anteriores rejeitam os campos novos.
   Chaves não vazias são únicas por regra; destinos pertencem à mesma Unit.
 - LOCAL_RESUME admite `resumeKey: string`. Seleciona a rota do topo, desempilha
   e segue o destino. Chave ausente ou pilha vazia seguem `invalidExit`.
+- LOCAL_BOUNDARY selecionada admite o par `resumeKey: string` e
+  `invalidExit: CfgNodeId`; a presença da chave exige 7.0.0 independentemente
+  de rotas em LOCAL_INVOKE. Primeiro verifica a porta somente no frame do topo:
+  pilha vazia ou porta incompatível seguem `defaultDestination`, mantendo a
+  pilha inteira e ignorando a chave. Porta compatível seleciona a chave exata
+  nesse frame e remove um frame. Chave inexistente segue `invalidExit`
+  (`invalid_local_return` da mesma operação), encerrando a ativação; nunca
+  consulta ancestrais. Os dois campos são publicados juntos e omitidos juntos
+  na forma legada, que mantém pop/resume do topo. Versões 1–6 rejeitam o par.
 - LOCAL_UNWIND admite `all: true`, somente com `count: "0"`. Remove todos os
   frames e segue `destination`; pilha vazia também é válida.
 

@@ -451,9 +451,9 @@ def verify_project_shape(root: Path) -> None:
     from check_w2 import SOURCES as SOLVER_SOURCES, verify_sources as verify_solver_sources
     from check_w3 import QUERY_SOURCES, VALUE_SOURCES, verify_sources as verify_value_sources
     from check_w4 import SOURCES as PLANNING_SOURCES, verify_sources as verify_planning_sources
-    from check_w5 import SOURCES as COMPOSITION_SOURCES, verify_sources as verify_composition_sources
+    from check_w5 import SOURCES as COMPOSITION_SOURCES, PIPELINE, verify_sources as verify_composition_sources
     verify_composition_sources(root)
-    analysis_sources = COMPOSITION_SOURCES | source_inventory(root) | SOLVER_SOURCES | QUERY_SOURCES | VALUE_SOURCES | PLANNING_SOURCES
+    analysis_sources = COMPOSITION_SOURCES | {PIPELINE} | source_inventory(root) | SOLVER_SOURCES | QUERY_SOURCES | VALUE_SOURCES | PLANNING_SOURCES
     from check_storage import SOURCES as STORAGE_SOURCES, verify_sources as verify_storage_sources
     verify_storage_sources(root)
     analysis_sources |= STORAGE_SOURCES

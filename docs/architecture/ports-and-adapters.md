@@ -184,3 +184,17 @@ futuro de EVAL-CFG-008 nem a qualificação de perfil AIR.
 
 A [taxonomia operacional atual](resource-limit-preflight.md) preserva RESOURCE_LIMIT
 por diagnóstico tipado e contagens totais, sem produzir grafo ou resultado semântico.
+
+## Full file pipeline composition
+
+`analysis-pipeline <AIR> <CFG> <dependencies> [--source-evidence <source>]`
+is an outer launcher with direct cfg-kernel/cfg-adapters dependencies. It admits
+one strict immutable AIR snapshot and the complete digest-bound source evidence
+before exporting. CFG uses conservative defaults; dependencies retain their
+partial-analysis projection. Export graph ownership ends before analysis begins.
+Each destination uses its existing atomic writer. If dependency delivery later
+fails, the completed CFG remains, matching the sequential file pipeline. Exit
+status remains nonzero; workers cannot certify the program as complete.
+Distinct input/destination paths and aliases are required. Compressed transports
+are supported through the existing adapters; bundles and incomplete AIR remain
+on the separate dependency CLI. No process-global snapshot or execution cache.

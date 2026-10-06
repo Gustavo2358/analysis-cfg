@@ -4,6 +4,81 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class BooleanConditionsTest {
+    @Test void managedScratchRollbackVisitsOnlyTransientMemoSlots() {
+        var b=new BooleanConditions(); int x=b.variable(0),y=b.variable(1);
+        long start=b.scratchCacheVisits(); int empty=b.checkpoint();
+        assertEquals(x,b.and(x,BooleanConditions.TRUE)); b.discardAfter(empty);
+        assertEquals(start,b.scratchCacheVisits(),"empty scratch cannot scan the fixed table");
+        int checkpoint=b.checkpoint(); int temporary=b.and(x,y);
+        for(int bits=0;bits<4;bits++) assertEquals(bits==3,b.test(temporary,java.util.BitSet.valueOf(new long[]{bits})));
+        b.discardAfter(checkpoint);
+        assertTrue(b.scratchCacheVisits()-start<16,"sparse scratch cannot scan unrelated memo slots");
+        int reused=b.or(x,y);
+        for(int bits=0;bits<4;bits++) assertEquals(bits!=0,b.test(reused,java.util.BitSet.valueOf(new long[]{bits})));
+        int rebuilt=b.and(x,y);
+        for(int bits=0;bits<4;bits++) assertEquals(bits==3,b.test(rebuilt,java.util.BitSet.valueOf(new long[]{bits})));
+    }
+
+    @Test void managedScratchCollisionsAndReusedIdsMatchIndependentTruthTables() {
+        for(int slots:new int[]{1,2,8,64}) {
+            var b=new BooleanConditions(slots);var variables=new java.util.ArrayList<Integer>();var masks=new java.util.ArrayList<Long>();
+            for(int v=0;v<6;v++){variables.add(b.variable(v));long mask=0;for(int bits=0;bits<64;bits++)if((bits&(1<<v))!=0)mask|=1L<<bits;masks.add(mask);}
+            var random=new java.util.Random(97213+slots);
+            for(int round=0;round<40;round++) {
+                long visits=b.scratchCacheVisits();int checkpoint=b.checkpoint();
+                var forms=new java.util.ArrayList<>(variables);var truths=new java.util.ArrayList<>(masks);
+                for(int step=0;step<100;step++) {
+                    int a=random.nextInt(forms.size()),c=random.nextInt(forms.size());boolean union=random.nextBoolean();
+                    int f=union?b.or(forms.get(a),forms.get(c)):b.and(forms.get(a),forms.get(c));
+                    long truth=union?truths.get(a)|truths.get(c):truths.get(a)&truths.get(c);
+                    if(random.nextBoolean()){f=b.not(f);truth=~truth;}
+                    forms.add(f);truths.add(truth);
+                    for(int bits=0;bits<64;bits++)assertEquals(((truth>>>bits)&1)!=0,b.test(f,java.util.BitSet.valueOf(new long[]{bits})));
+                }
+                b.discardAfter(checkpoint);assertEquals(checkpoint,b.size());
+                assertTrue(b.scratchCacheVisits()-visits<=slots,"each dirty slot visited at most once");
+                int permanent=b.and(variables.get(0),variables.get(1));
+                for(int bits=0;bits<64;bits++)assertEquals((bits&3)==3,b.test(permanent,java.util.BitSet.valueOf(new long[]{bits})));
+            }
+        }
+    }
+
+    @Test void rootedCollectionKeepsTruthAndCanonicalIdsAcrossReusedSlots() {
+        var b=new BooleanConditions(8);var variables=new java.util.ArrayList<Integer>();
+        var masks=new java.util.ArrayList<Long>();
+        for(int v=0;v<6;v++){variables.add(b.variable(v));long mask=0;for(int bits=0;bits<64;bits++)if((bits&(1<<v))!=0)mask|=1L<<bits;masks.add(mask);}
+        int kept=b.or(b.and(variables.get(0),variables.get(1)),b.and(b.not(variables.get(0)),variables.get(2)));
+        long expected=(masks.get(0)&masks.get(1))|(~masks.get(0)&masks.get(2));
+        var random=new java.util.Random(20841);
+        for(int round=0;round<8;round++) {
+            var forms=new java.util.ArrayList<>(variables);var truths=new java.util.ArrayList<>(masks);
+            for(int step=0;step<500;step++) {
+                int a=random.nextInt(forms.size()),c=random.nextInt(forms.size());boolean union=random.nextBoolean();
+                int f=union?b.or(forms.get(a),forms.get(c)):b.and(forms.get(a),forms.get(c));
+                long truth=union?truths.get(a)|truths.get(c):truths.get(a)&truths.get(c);
+                if(random.nextBoolean()){f=b.not(f);truth=~truth;}
+                forms.add(f);truths.add(truth);
+                for(int bits=0;bits<64;bits++)assertEquals(((truth>>>bits)&1)!=0,b.test(f,java.util.BitSet.valueOf(new long[]{bits})));
+            }
+            int retained=b.retainedNodes();
+            int released=b.collect(mark->{for(int v:variables)mark.accept(v);mark.accept(kept);});
+            assertTrue(released>0);assertEquals(retained-released,b.retainedNodes());
+            assertTrue(b.retainedNodes()<40,"only the rooted functions survive");
+            assertEquals(kept,b.or(b.and(variables.get(0),variables.get(1)),b.and(b.not(variables.get(0)),variables.get(2))));
+            for(int bits=0;bits<64;bits++)assertEquals(((expected>>>bits)&1)!=0,b.test(kept,java.util.BitSet.valueOf(new long[]{bits})));
+        }
+    }
+    @Test void feasibilityScratchDoesNotReuseCollectedSlotsOrEscapeRollback() {
+        var b=new BooleanConditions(4);int x=b.variable(0),y=b.variable(1),z=b.variable(2);
+        b.or(b.and(x,y),b.and(b.not(x),z));
+        assertTrue(b.collect(mark->{mark.accept(x);mark.accept(y);mark.accept(z);})>0);
+        int before=b.size(),checkpoint=b.checkpoint();
+        int scratch=b.and(x,y);assertTrue(scratch>=checkpoint);
+        assertThrows(IllegalStateException.class,()->b.collect(mark->mark.accept(x)));
+        b.discardAfter(checkpoint);assertEquals(before,b.size());
+        int normal=b.and(x,y);for(int bits=0;bits<8;bits++)assertEquals((bits&3)==3,b.test(normal,java.util.BitSet.valueOf(new long[]{bits})));
+        assertEquals(normal,b.and(y,x));
+    }
     @Test void operationsMatchIndependentTruthTablesAndCanonicalize() {
         var b=new BooleanConditions();int x=b.variable(0),y=b.variable(1),z=b.variable(2);
         int f=b.or(b.and(x,y),b.and(b.not(x),z));

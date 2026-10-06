@@ -83,7 +83,8 @@ final class RegionalAlternatives<T> {
     }
     private Label<T> label(T value) {
         var image=images.apply(value);var shape=shape(image);
-        return shape==null?new Concrete<>(value):new Unknown<>(shape,Events.of(image.parts().getFirst().producer()));
+        if(shape==null)return new Concrete<>(value);
+        return new Unknown<>(shape,Events.of(image.parts().getFirst().producer()));
     }
     private Node<T> node(int level,Collection<Edge<T>> input) {
         var groups=new HashMap<Group<T>,Label<T>>();

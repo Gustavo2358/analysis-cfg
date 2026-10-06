@@ -48,6 +48,31 @@ class SourceValuesProviderTest {
         assertEquals("😀   ",io.github.gustavo2358.analysis.values.TextPredicate.fit("😀",4));
     }
 
+    @Test void unobservedRootedTailDoesNotRetainStatesOrChangeCompleteSupports() {
+        var base=fixture(List.of(new NominalValues.Assignment("s0","P",read("Q"))),List.of(),List.of());
+        var nodes=new ArrayList<>(base.nodes());var derivations=new ArrayList<>(base.derivations());
+        for(int i=0;i<2000;i++) {
+            nodes.add(new Node("tail"+i,"ROOT","s0",base.nodes().getFirst().support()));
+            derivations.add(new Derivation("tail-edge"+i,List.of(i==0?"n2":"tail"+(i-1)),"tail"+i,List.of(),"unobserved-flow",List.of("p"),List.of()));
+        }
+        var larger=new UnitEvidence(base.unit(),base.controlAvailable(),base.statements(),base.occurrences(),base.targets(),nodes,derivations,base.selections(),base.events(),base.guards(),base.proofs(),base.frontiers(),base.nominalValues());
+        var expected=new SourceValuesProvider(base,Set.of("s2"));var actual=new SourceValuesProvider(larger,Set.of("s2"));
+        assertEquals(expected.candidates("s2"),actual.candidates("s2"));
+        assertEquals(expected.workItems(),actual.workItems());
+        assertEquals(0,new SourceValuesProvider(larger,Set.of()).workItems());
+    }
+
+    @Test void noRequestedObservationRetainsNoPrivateControlOrStatementIndex() throws Exception {
+        var base=fixture(List.of(),List.of(),List.of());
+        var provider=new SourceValuesProvider(base,Set.of());
+        assertEquals(List.of(),provider.candidates("s2"));assertEquals(0,provider.workItems());
+        for(String name:List.of("controlAffected","statements","nodes","waiting","before")) {
+            var field=SourceValuesProvider.class.getDeclaredField(name);field.setAccessible(true);var value=field.get(provider);
+            assertTrue(value instanceof Map<?,?> map?map.isEmpty():((Set<?>)value).isEmpty(),"unobserved private index retained: "+name);
+        }
+        assertEquals(3,base.statements().size());assertEquals(3,base.nodes().size());assertEquals(1,base.proofs().size());
+    }
+
     static UnitEvidence model(UnitEvidence u, String symbol, int extent) {
         var old=u.nominalValues().orElseThrow();var f=old.facts();
         var symbols=f.symbols().stream().map(s->new NominalValues.Symbol(s.node(),s.node().equals(symbol)?extent:s.extent(),s.node().equals(symbol))).toList();

@@ -63,6 +63,7 @@ def source_oracle(sp, case):
 
 
 def air_oracle(air, sp, semantic):
+    from e2e_perform_basic import require_body_completion
     facts, calls = semantic; p = air['publication']; unit = p['units'][0]
     require(air['airVersion'] == '2.0.0' and air['bindingVersion'] == '1.0.0', 'unchanged AIR wire')
     operations = {}
@@ -92,7 +93,10 @@ def air_oracle(air, sp, semantic):
                 require(seq['terminator']['kind']=='jump','MOVE has explicit completion')
                 if fact['normalContinuation']['statement'] is None:
                     completion=labels[seq['terminator']['destination']['localId']]
-                    require(not completion['instructions'] and completion['terminator']['kind']=='local.resume','body MOVE completes through matched return')
+                    activation=links[owner['header']['id']][2]
+                    phase=labels[activation['entry']['localId']]
+                    frame=labels[phase['terminator']['destination']['localId']]['terminator']
+                    require_body_completion(completion,frame)
                     activation=links[owner['header']['id']][2]
                     require(activation['resume']==target_seq['label'],'MOVE returns through its activation to its actual caller')
                 else:require(seq['terminator']['destination']==target_seq['label'],'MOVE arm explicit completion')
@@ -112,7 +116,8 @@ def air_oracle(air, sp, semantic):
             require(op['resume']==links[fact['normalContinuation']['statement']][0]['label'],'PERFORM exact caller continuation')
             require(all(links[s][2]['kind'] == 'assign' for s in fact['targetStatements']), 'entire target body represented')
             body = links[fact['targetExit']][0]
-            require(body['terminator']['kind']=='jump' and labels[body['terminator']['destination']['localId']]['terminator']['kind']=='local.resume','PERFORM completes by popping its frame')
+            require(body['terminator']['kind']=='jump','body has a precise completion transfer')
+            require_body_completion(labels[body['terminator']['destination']['localId']],wrapper['terminator'])
     require(sum(s['terminator']['kind'] == 'invoke' for s in unit['sequences']) == len(calls), 'all CALLs and no synthetic dependency sites')
     return unit, links
 

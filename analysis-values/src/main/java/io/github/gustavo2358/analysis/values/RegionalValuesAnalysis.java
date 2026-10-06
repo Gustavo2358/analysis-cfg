@@ -117,7 +117,8 @@ public final class RegionalValuesAnalysis {
                 boolean possible=condition.value() instanceof Entries.PossibleLiterals;
                 if(condition.value() instanceof Entries.PossibleLiterals p)
                     p.candidates().forEach(l->sources.add(new StatementEffects.ExpressionSource(l)));
-                else sources.add(condition.value() instanceof Entries.LiteralInitial l?new StatementEffects.ExpressionSource(l.value()):new StatementEffects.UnknownSource("ENTRY_CONTENT_NOT_LITERAL"));
+                else if(condition.value() instanceof Entries.LiteralInitial l)sources.add(new StatementEffects.ExpressionSource(l.value()));
+                else sources.add(new StatementEffects.UnknownSource("ENTRY_CONTENT_NOT_LITERAL"));
                 var strength=fact.strength();
                 for(var source:sources) {
                     boolean logical=possible&&condition.place() instanceof Places.ObjectPlace&&!resolution.exact();
@@ -223,8 +224,8 @@ public final class RegionalValuesAnalysis {
     private static final State BOTTOM=new State(null,new SegmentMap<>(),Map.of(),Set.of(),new int[0]);
     private Content unknown(StorageIndex.Location location,String reason) {return unknown(location,reason,-1);}
     private Content unknown(StorageIndex.Location location,String reason,int event) {
-        return location.range().isPresent()?new Bytes(ByteImage.unknown(location.range().get().end().map(e->e.subtract(location.range().get().start())),reason,event))
-            :new Scalar(Optional.empty(),Set.of(),Set.of(reason),Set.of(),List.of(new Trace(location,Optional.empty(),event,Optional.empty(),Map.of(),Set.of(),Set.of(reason))));
+        if(location.range().isPresent())return new Bytes(ByteImage.unknown(location.range().get().end().map(e->e.subtract(location.range().get().start())),reason,event));
+        return new Scalar(Optional.empty(),Set.of(),Set.of(reason),Set.of(),List.of(new Trace(location,Optional.empty(),event,Optional.empty(),Map.of(),Set.of(),Set.of(reason))));
     }
     final class Engine implements AnalysisDefinition<State> {
         long contentReads,contentUpdates,alternativeVisits,physicalGroupsApplied,physicalWritesApplied,maxLogicalCells,maxLogicalValues;

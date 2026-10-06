@@ -143,7 +143,7 @@ def statement_operation(publication, operations, identity, kind):
         phase=labels[op['entry']['localId']]
         require(frontier[2]['kind']=='opaque' and phase[2]['kind']=='jump','explicit reentry frontier and body phase')
         body=labels[phase[2]['destination']['localId']]
-        require(body[2]['kind']=='local.invoke' and not body[2]['completionPorts'],'explicit body frame')
+        require(body[2]['kind']=='local.invoke' and bool(body[2]['completionPorts']),'explicit body frame')
         completion=labels[body[2]['resume']['localId']]
         require(completion[2]['kind']=='local.resume','body returns to activation completion')
         require(len(linked)==5 and {id(r) for r in linked}=={id(r) for r in (principal[0],frontier,phase,body,completion)},'exact activation control inventory')
@@ -154,6 +154,17 @@ def statement_operation(publication, operations, identity, kind):
     extras = [record for record in linked if record is not principal[0]]
     # Stage 5 may additionally correlate the body's single completion operation
     # with its first source fact, or the PERFORM's wrapper with its source jump.
+    boundary = [r for r in extras if kind == 'assign' and r[2]['kind'] == 'local.boundary']
+    if boundary:
+        require(len(boundary) == 1 and not boundary[0][0]['instructions']
+                and seq['terminator']['kind'] == 'jump'
+                and seq['terminator']['destination'] == boundary[0][0]['label'],
+                'shared MOVE completes at its own explicit boundary')
+        frontier = [r for r in extras if r[0].get('label') == boundary[0][2]['defaultDestination']]
+        require(len(frontier) == 1 and not frontier[0][0]['instructions']
+                and frontier[0][2]['kind'] == 'opaque' and frontier[0][2]['header']['coverage'] == 'UNSUPPORTED',
+                'unmatched MOVE boundary has one source-linked unsupported frontier')
+        extras = [r for r in extras if r not in boundary + frontier]
     local=[r for r in extras if (kind=='assign' and r[2]['kind']=='local.resume')
            or (kind=='jump' and r[2]['kind']=='local.invoke')]
     require(len(local)<=1 and all(not r[0]['instructions'] and r[2] is r[0]['terminator'] for r in local),

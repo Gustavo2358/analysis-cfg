@@ -11,13 +11,118 @@ import io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDepende
 /** Closed v1 codec with explicit field mapping; no polymorphic/bean deserialization. */
 public final class QualifiedSourceJson {
     private final ObjectMapper mapper=JsonMapper.builder(JsonFactory.builder().enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION).build()).enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS).build();
+    private final ObjectReader elementReader=mapper.reader().without(DeserializationFeature.FAIL_ON_TRAILING_TOKENS);
     public QualifiedSourceDependencies decode(byte[] bytes) throws IOException {
-        var n=mapper.readTree(bytes);
-        if(n==null || !n.path("schema").asText().equals("qualified-source-dependencies") || !Set.of("1.0.0","1.1.0","1.2.0","1.3.0","1.4.0","1.5.0","1.6.0").contains(n.path("version").asText()))throw new IllegalArgumentException("unsupported source contract");
-        return readQualifiedSourceDependencies(n);
+        return decode(new ByteArrayInputStream(bytes));
+    }
+    /** One inventory element at a time; the input belongs to the caller. */
+    public QualifiedSourceDependencies decode(InputStream input) throws IOException {
+        try(var parser=mapper.getFactory().createParser(Objects.requireNonNull(input))) {
+            parser.disable(JsonParser.Feature.AUTO_CLOSE_SOURCE);
+            if(parser.nextToken()!=JsonToken.START_OBJECT)throw new IllegalArgumentException("object required");
+            var result=readSourceStream(parser);
+            if(parser.nextToken()!=null)throw new IllegalArgumentException("trailing source content");
+            return result;
+        }
+    }
+    @FunctionalInterface private interface Element<T> {T read(JsonParser parser)throws IOException;}
+    private <T> List<T> array(JsonParser parser,Element<T> element)throws IOException {
+        if(parser.currentToken()!=JsonToken.START_ARRAY)throw new IllegalArgumentException("array required");
+        var result=new ArrayList<T>();
+        while(parser.nextToken()!=JsonToken.END_ARRAY) {
+            if(parser.currentToken()==null)throw new EOFException("unfinished source inventory");
+            result.add(element.read(parser));
+        }
+        return List.copyOf(result);
+    }
+    private <T> void rows(JsonParser parser,Element<T> element,java.util.function.Consumer<T> append)throws IOException {
+        if(parser.currentToken()!=JsonToken.START_ARRAY)throw new IllegalArgumentException("array required");
+        while(parser.nextToken()!=JsonToken.END_ARRAY) {
+            if(parser.currentToken()==null)throw new EOFException("unfinished source inventory");
+            append.accept(element.read(parser));
+        }
+    }
+    private JsonNode tree(JsonParser parser)throws IOException {
+        return elementReader.readTree(parser);
+    }
+    private QualifiedSourceDependencies readSourceStream(JsonParser parser)throws IOException {
+        String schema=null,version=null,producer=null;Document source=null;
+        List<AirCorrelation> air=null;List<UnitEvidence> units=null;var fields=new HashSet<String>();
+        while(parser.nextToken()!=JsonToken.END_OBJECT) {
+            if(parser.currentToken()!=JsonToken.FIELD_NAME)throw new IllegalArgumentException("source field required");
+            var name=parser.currentName();if(!fields.add(name))throw new IllegalArgumentException("duplicate source field");
+            if(parser.nextToken()==null)throw new EOFException("missing source value");
+            switch(name) {
+                case "schema" -> schema=text(tree(parser));
+                case "version" -> version=text(tree(parser));
+                case "producer" -> producer=text(tree(parser));
+                case "source" -> source=readDocument(tree(parser));
+                case "air" -> air=array(parser,p->readAirCorrelation(tree(p)));
+                case "units" -> units=array(parser,this::readUnitStream);
+                default -> throw new IllegalArgumentException("closed source evidence fields");
+            }
+        }
+        if(!fields.equals(Set.of("schema","version","producer","source","air","units")))throw new IllegalArgumentException("closed source evidence fields");
+        if(!"qualified-source-dependencies".equals(schema)||!Set.of("1.0.0","1.1.0","1.2.0","1.3.0","1.4.0","1.5.0","1.6.0").contains(version))throw new IllegalArgumentException("unsupported source contract");
+        return new QualifiedSourceDependencies(schema,version,producer,source,air,units);
+    }
+    private UnitEvidence readUnitStream(JsonParser parser)throws IOException {
+        if(parser.currentToken()!=JsonToken.START_OBJECT)throw new IllegalArgumentException("unit object required");
+        UnitId unit=null;Boolean controlAvailable=null;
+        Optional<NominalValueEvidence> nominalValues=Optional.empty();List<NativeFileUse> nativeFiles=List.of();
+        List<Statement> statements=null;
+        List<Occurrence> occurrences=null;
+        List<Target> targets=null;
+        var inventory=new io.github.gustavo2358.analysis.dependencies.source.SourceInventories.Builder();
+
+        List<Selection> selections=null;
+        List<Event> events=null;
+        List<Guard> guards=null;
+        List<Proof> proofs=null;
+        List<Frontier> frontiers=null;
+        var fields=new HashSet<String>();
+        while(parser.nextToken()!=JsonToken.END_OBJECT) {
+            if(parser.currentToken()!=JsonToken.FIELD_NAME)throw new IllegalArgumentException("unit field required");
+            var name=parser.currentName();if(!fields.add(name))throw new IllegalArgumentException("duplicate unit field");
+            if(parser.nextToken()==null)throw new EOFException("missing unit value");
+            switch(name) {
+                case "unit" -> unit=readUnitId(tree(parser));
+                case "controlAvailable" -> controlAvailable=bool(tree(parser));
+                case "nominalValues" -> nominalValues=Optional.of(readNominalValueEvidence(tree(parser)));
+                case "nativeFiles" -> nativeFiles=array(parser,p->readNativeFile(tree(p)));
+                case "statements" -> statements=array(parser,p->readStatement(tree(p)));
+                case "occurrences" -> occurrences=array(parser,p->readOccurrence(tree(p)));
+                case "targets" -> targets=array(parser,p->readTarget(tree(p)));
+                case "nodes" -> rows(parser,p->readNode(tree(p)),inventory::addNode);
+                case "derivations" -> rows(parser,p->readDerivation(tree(p)),inventory::addDerivation);
+                case "selections" -> selections=array(parser,p->readSelection(tree(p)));
+                case "events" -> events=array(parser,p->readEvent(tree(p)));
+                case "guards" -> guards=array(parser,p->readGuard(tree(p)));
+                case "proofs" -> proofs=array(parser,p->readProof(tree(p)));
+                case "frontiers" -> frontiers=array(parser,p->readFrontier(tree(p)));
+                default -> throw new IllegalArgumentException("closed source evidence fields");
+            }
+        }
+        fields.removeAll(Set.of("nominalValues","nativeFiles"));
+        if(!fields.equals(Set.of("unit","controlAvailable","statements","occurrences","targets","nodes","derivations","selections","events","guards","proofs","frontiers")))throw new IllegalArgumentException("closed source evidence fields");
+        var owned=inventory.build();
+        return new UnitEvidence(unit,controlAvailable,statements,occurrences,targets,owned.nodes(),owned.derivations(),selections,events,guards,proofs,frontiers,nominalValues,nativeFiles);
     }
     public byte[] encode(QualifiedSourceDependencies value) throws IOException {return mapper.writeValueAsBytes(value(value));}
-    public static Map<String,Object> value(QualifiedSourceDependencies v) {return object("schema", v.schema(), "version", v.version(), "producer", v.producer(), "source", value(v.source()), "air", v.air().stream().map(QualifiedSourceJson::value).toList(), "units", v.units().stream().map(QualifiedSourceJson::value).toList());}
+    /** Stream exactly the legacy mapping; the caller retains output ownership. */
+    public void write(QualifiedSourceDependencies value,OutputStream output) throws IOException {
+        try(var generator=mapper.getFactory().createGenerator(Objects.requireNonNull(output))) {
+            generator.disable(JsonGenerator.Feature.AUTO_CLOSE_TARGET);
+            mapper.writeValue(generator,value(value));
+        }
+    }
+    private static <T,R> List<R> mapped(List<T> source,java.util.function.Function<T,R> mapping) {
+        return new AbstractList<>() {
+            @Override public R get(int index){return mapping.apply(source.get(index));}
+            @Override public int size(){return source.size();}
+        };
+    }
+    public static Map<String,Object> value(QualifiedSourceDependencies v) {return object("schema", v.schema(), "version", v.version(), "producer", v.producer(), "source", value(v.source()), "air", mapped(v.air(),QualifiedSourceJson::value), "units", mapped(v.units(),QualifiedSourceJson::value));}
     private static QualifiedSourceDependencies readQualifiedSourceDependencies(JsonNode n) {keys(n, "schema", "version", "producer", "source", "air", "units");return new QualifiedSourceDependencies(text(n.get("schema")), text(n.get("version")), text(n.get("producer")), readDocument(n.get("source")), list(n.get("air"), QualifiedSourceJson::readAirCorrelation), list(n.get("units"), QualifiedSourceJson::readUnitEvidence));}
     public static Map<String,Object> value(Document v) {return object("schema", v.schema(), "version", v.version(), "sha256", v.sha256());}
     private static Document readDocument(JsonNode n) {keys(n, "schema", "version", "sha256");return new Document(text(n.get("schema")), text(n.get("version")), text(n.get("sha256")));}
@@ -64,8 +169,8 @@ public final class QualifiedSourceJson {
     private static Derivation readDerivation(JsonNode n) {keys(n, "id", "source", "destination", "callerPremise", "authority", "proofs", "selection");return new Derivation(text(n.get("id")), list(n.get("source"), QualifiedSourceJson::text), text(n.get("destination")), list(n.get("callerPremise"), QualifiedSourceJson::text), text(n.get("authority")), list(n.get("proofs"), QualifiedSourceJson::text), list(n.get("selection"), QualifiedSourceJson::text));}
     public static Map<String,Object> value(Frontier v) {return object("source", v.source(), "authority", v.authority(), "reference", v.reference(), "proofs", v.proofs());}
     private static Frontier readFrontier(JsonNode n) {keys(n, "source", "authority", "reference", "proofs");return new Frontier(text(n.get("source")), text(n.get("authority")), text(n.get("reference")), list(n.get("proofs"), QualifiedSourceJson::text));}
-    public static Map<String,Object> value(UnitEvidence v) {var out=object("unit", value(v.unit()), "controlAvailable", v.controlAvailable(), "statements", v.statements().stream().map(QualifiedSourceJson::value).toList(), "occurrences", v.occurrences().stream().map(QualifiedSourceJson::value).toList(), "targets", v.targets().stream().map(QualifiedSourceJson::value).toList(), "nodes", v.nodes().stream().map(QualifiedSourceJson::value).toList(), "derivations", v.derivations().stream().map(QualifiedSourceJson::value).toList(), "selections", v.selections().stream().map(QualifiedSourceJson::value).toList(), "events", v.events().stream().map(QualifiedSourceJson::value).toList(), "guards", v.guards().stream().map(QualifiedSourceJson::value).toList(), "proofs", v.proofs().stream().map(QualifiedSourceJson::value).toList(), "frontiers", v.frontiers().stream().map(QualifiedSourceJson::value).toList());v.nominalValues().ifPresent(n->out.put("nominalValues",value(n)));if(!v.nativeFiles().isEmpty())out.put("nativeFiles",v.nativeFiles().stream().map(QualifiedSourceJson::value).toList());return out;}
-    private static UnitEvidence readUnitEvidence(JsonNode n) {var legacy=n.deepCopy();((com.fasterxml.jackson.databind.node.ObjectNode)legacy).remove(List.of("nominalValues","nativeFiles"));keys(legacy, "unit", "controlAvailable", "statements", "occurrences", "targets", "nodes", "derivations", "selections", "events", "guards", "proofs", "frontiers");return new UnitEvidence(readUnitId(n.get("unit")), bool(n.get("controlAvailable")), list(n.get("statements"), QualifiedSourceJson::readStatement), list(n.get("occurrences"), QualifiedSourceJson::readOccurrence), list(n.get("targets"), QualifiedSourceJson::readTarget), list(n.get("nodes"), QualifiedSourceJson::readNode), list(n.get("derivations"), QualifiedSourceJson::readDerivation), list(n.get("selections"), QualifiedSourceJson::readSelection), list(n.get("events"), QualifiedSourceJson::readEvent), list(n.get("guards"), QualifiedSourceJson::readGuard), list(n.get("proofs"), QualifiedSourceJson::readProof), list(n.get("frontiers"), QualifiedSourceJson::readFrontier),n.has("nominalValues")?Optional.of(readNominalValueEvidence(n.get("nominalValues"))):Optional.empty(),n.has("nativeFiles")?list(n.get("nativeFiles"),QualifiedSourceJson::readNativeFile):List.of());}
+    public static Map<String,Object> value(UnitEvidence v) {var out=object("unit", value(v.unit()), "controlAvailable", v.controlAvailable(), "statements", mapped(v.statements(),QualifiedSourceJson::value), "occurrences", mapped(v.occurrences(),QualifiedSourceJson::value), "targets", mapped(v.targets(),QualifiedSourceJson::value), "nodes", mapped(v.nodes(),QualifiedSourceJson::value), "derivations", mapped(v.derivations(),QualifiedSourceJson::value), "selections", mapped(v.selections(),QualifiedSourceJson::value), "events", mapped(v.events(),QualifiedSourceJson::value), "guards", mapped(v.guards(),QualifiedSourceJson::value), "proofs", mapped(v.proofs(),QualifiedSourceJson::value), "frontiers", mapped(v.frontiers(),QualifiedSourceJson::value));v.nominalValues().ifPresent(n->out.put("nominalValues",value(n)));if(!v.nativeFiles().isEmpty())out.put("nativeFiles",mapped(v.nativeFiles(),QualifiedSourceJson::value));return out;}
+    private static UnitEvidence readUnitEvidence(JsonNode n) {var expected=new ArrayList<>(List.of("unit","controlAvailable","statements","occurrences","targets","nodes","derivations","selections","events","guards","proofs","frontiers"));for(String optional:List.of("nominalValues","nativeFiles"))if(n.has(optional))expected.add(optional);keys(n,expected.toArray(String[]::new));return new UnitEvidence(readUnitId(n.get("unit")), bool(n.get("controlAvailable")), list(n.get("statements"), QualifiedSourceJson::readStatement), list(n.get("occurrences"), QualifiedSourceJson::readOccurrence), list(n.get("targets"), QualifiedSourceJson::readTarget), list(n.get("nodes"), QualifiedSourceJson::readNode), list(n.get("derivations"), QualifiedSourceJson::readDerivation), list(n.get("selections"), QualifiedSourceJson::readSelection), list(n.get("events"), QualifiedSourceJson::readEvent), list(n.get("guards"), QualifiedSourceJson::readGuard), list(n.get("proofs"), QualifiedSourceJson::readProof), list(n.get("frontiers"), QualifiedSourceJson::readFrontier),n.has("nominalValues")?Optional.of(readNominalValueEvidence(n.get("nominalValues"))):Optional.empty(),n.has("nativeFiles")?list(n.get("nativeFiles"),QualifiedSourceJson::readNativeFile):List.of());}
 
     public static Object value(NativeFileName v){return object("declaration",v.declaration(),"owner",value(v.owner()),"logicalFile",v.logicalFile(),"rawValue",v.rawValue(),"declarationOrigins",v.declarationOrigins().stream().map(QualifiedSourceJson::value).toList());}
     public static Object value(NativeFileUse v){return object("statement",value(v.statement()),"ordinal",v.ordinal(),"controlLocation",v.controlLocation(),"command",v.command(),"local",v.local(),"names",v.names().stream().map(QualifiedSourceJson::value).toList(),"provenance",value(v.provenance()),"qualifications",v.qualifications(),"gaps",v.gaps());}

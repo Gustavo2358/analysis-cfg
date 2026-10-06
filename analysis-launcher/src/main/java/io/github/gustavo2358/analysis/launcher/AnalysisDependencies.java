@@ -35,7 +35,8 @@ public final class AnalysisDependencies {
                 var read=reader.read(input);
                 var evidence=java.util.Optional.<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies>empty();
                 if(source!=null) {
-                    var value=new QualifiedSourceJson().decode(JsonFiles.read(source));
+                    io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies value;
+                    try(var stream=JsonFiles.input(source)){value=new QualifiedSourceJson().decode(stream);}
                     if(value.air().size()!=1||!value.air().getFirst().sha256().equals(read.sha256()))throw new IllegalArgumentException("AIR digest mismatch");
                     evidence=java.util.Optional.of(value);
                 }
