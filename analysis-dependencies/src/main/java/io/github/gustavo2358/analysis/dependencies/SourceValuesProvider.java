@@ -21,6 +21,14 @@ public final class SourceValuesProvider {
         Values {var copy=new TreeMap<String,Set<String>>();candidates.forEach((k,v)->copy.put(k,Set.copyOf(v)));candidates=Collections.unmodifiableMap(copy);}
         Values join(Values other){var out=new TreeMap<>(candidates);other.candidates.forEach((k,v)->out.merge(k,v,SourceValuesProvider::union));return new Values(out,open||other.open,modelAssumed||other.modelAssumed,tableAssumed||other.tableAssumed);}
     }
+    private static final class State extends AbstractMap<String,Values> {
+        private final Map<String,Values> owned;
+        State(Map<String,Values> source){owned=Collections.unmodifiableMap(new TreeMap<>(source));}
+        @Override public Set<Entry<String,Values>> entrySet(){return owned.entrySet();}
+        @Override public Values get(Object key){return owned.get(key);}
+    }
+    private static Map<String,Values> freeze(Map<String,Values> source){return source instanceof State?source:new State(source);}
+    private final Map<String,List<String>> observedNodes=new HashMap<>();
     private final Set<String> controlAffected;
     private final UnitEvidence unit;
     private final NominalValueEvidence source;
@@ -43,8 +51,14 @@ public final class SourceValuesProvider {
 
     public SourceValuesProvider(UnitEvidence unit,Set<String> requested) {
         this.unit=unit;source=unit.nominalValues().orElseThrow();controlAffected=SourceControlEvidence.affected(unit);
-        unit.nodes().forEach(n->nodes.put(n.id(),n));unit.statements().forEach(s->statements.put(s.id().handle(),s));
+        unit.statements().forEach(s->statements.put(s.id().handle(),s));
         source.facts().queries().stream().filter(q->requested.contains(q.statement())).forEach(q->queries.put(q.statement(),q.node()));
+        if(queries.isEmpty())return;
+        var needed=neededNodes(unit,queries.keySet());
+        for(var node:unit.nodes())if(needed.contains(node.id())) {
+            nodes.put(node.id(),node);
+            if(queries.containsKey(node.location()))observedNodes.computeIfAbsent(node.location(),k->new ArrayList<>()).add(node.id());
+        }
         var demand=new HashSet<>(queries.values());boolean changed;
         do {
             changed=false;
@@ -72,9 +86,10 @@ public final class SourceValuesProvider {
             String key="table-seed/"+field.node()+"/"+seed.origin();evidence.put(key,new Evidence("DECLARATION_VALUE",seed.origin(),origins.get(seed.origin())));
             initial.merge(field.node(),new Values(Map.of(TextPredicate.fit(seed.value(),extents.get(field.node())),Set.of(key)),true,false,true),Values::join);
         }
-        for(var d:unit.derivations()) {
+        var seedState=freeze(initial);
+        for(var d:unit.derivations())if(needed.contains(d.destination())) {
             var premises=new TreeSet<>(d.source());premises.addAll(d.callerPremise());
-            if(premises.isEmpty())join(d.destination(),initial);
+            if(premises.isEmpty())join(d.destination(),seedState);
             else for(var premise:premises)waiting.computeIfAbsent(premise,k->new ArrayList<>()).add(d);
         }
         // No path enumeration. Each finite value/support fact only grows at a join.
@@ -90,15 +105,15 @@ public final class SourceValuesProvider {
     public List<Candidate> candidates(String statement) {
         String query=queries.get(statement);if(query==null)return List.of();
         Values values=null;
-        for(var n:unit.nodes())if(n.location().equals(statement)&&before.containsKey(n.id())) {
-            var v=before.get(n.id()).getOrDefault(query,Values.UNKNOWN);values=values==null?v:values.join(v);
+        for(var id:observedNodes.getOrDefault(statement,List.of()))if(before.containsKey(id)) {
+            var v=before.get(id).getOrDefault(query,Values.UNKNOWN);values=values==null?v:values.join(v);
         }
         if(values==null)return List.of();
         var out=new ArrayList<Candidate>();
         for(var value:values.candidates().entrySet()) {
             var supports=value.getValue().stream().sorted().map(evidence::get).filter(Objects::nonNull).distinct().toList();
             var assumptions=new ArrayList<>(List.of("NOMINAL_DECLARATIONS_PRESERVE_MEANING","NO_UNMODELED_STORAGE_INTERFERENCE"));
-            if(unit.nodes().stream().anyMatch(n->n.location().equals(statement)&&controlAffected.contains(n.id())))assumptions.add("UNKNOWN_CONTROL_CAN_COMPLETE");
+            if(observedNodes.getOrDefault(statement,List.of()).stream().anyMatch(controlAffected::contains))assumptions.add("UNKNOWN_CONTROL_CAN_COMPLETE");
             if(values.tableAssumed()||summarySymbols.contains(query))assumptions.add("TABLE_INDEX_NOT_REFINED");
             if(values.modelAssumed())assumptions.add("SYNTHETIC_MODEL_IS_NOT_KILL_PROOF");
             if(supports.stream().anyMatch(e->e.kind().equals("DECLARATION_VALUE")))assumptions.add("DECLARATIVE_INITIAL_VALUES_APPLY");
@@ -110,11 +125,11 @@ public final class SourceValuesProvider {
         if(d.source().isEmpty()||!before.containsKey(d.source().getFirst())||d.callerPremise().stream().anyMatch(p->!before.containsKey(p)))return;
         String location=nodes.get(d.source().getFirst()).location();var state=before.get(d.source().getFirst());
         if(branches.containsKey(d.id())){state=filter(state,predicates.get(location),branches.get(d.id()));if(state==null)return;}
-        if(d.selection().isEmpty()) {
+        if(d.selection().isEmpty()&&!assignments.getOrDefault(location,List.of()).isEmpty()) {
             var changed=new TreeMap<>(state);
             // All origins read the predecessor snapshot before any receiver update.
             for(var a:assignments.getOrDefault(location,List.of()))changed.put(a.target(),assigned(a,state));
-            state=changed;
+            state=freeze(changed);
         }
         join(d.destination(),state);
     }
@@ -172,7 +187,7 @@ public final class SourceValuesProvider {
             if(kept.isEmpty()&&!old.open())return null;
             result.put(symbol,new Values(kept,old.open(),old.modelAssumed(),old.tableAssumed()));
         }
-        return result;
+        return freeze(result);
     }
     private int truth(NominalValues.Predicate p,Map<String,Values> state) {
         if(p.kind().equals("NOT"))return TextPredicate.negate(truth(p.children().getFirst(),state));
@@ -186,9 +201,24 @@ public final class SourceValuesProvider {
         return TextPredicate.sourceEquality(left.candidates().keySet(),left.open(),right.candidates().keySet(),right.open());
     }
     private void join(String node,Map<String,Values> incoming) {
-        var previous=before.get(node);var joined=new TreeMap<>(incoming);
-        if(previous!=null)previous.forEach((k,v)->joined.merge(k,v,Values::join));
-        if(!joined.equals(previous)){before.put(node,Collections.unmodifiableMap(joined));if(queued.add(node))work.addLast(node);}
+        var previous=before.get(node);if(incoming.equals(previous))return;
+        Map<String,Values> joined=incoming;
+        if(previous!=null){var merge=new TreeMap<>(incoming);previous.forEach((k,v)->merge.merge(k,v,Values::join));joined=merge;}
+        if(!joined.equals(previous)){before.put(node,freeze(joined));if(queued.add(node))work.addLast(node);}
+    }
+    /** Incoming ordinal links include every source/caller premise of every alternative. */
+    private static Set<String> neededNodes(UnitEvidence unit,Set<String> requested) {
+        int n=unit.nodes().size(),d=unit.derivations().size();var ordinal=new HashMap<String,Integer>();
+        int[] heads=new int[n],next=new int[d];Arrays.fill(heads,-1);
+        var pending=new ArrayDeque<Integer>();var needed=new BitSet(n);
+        for(int i=0;i<n;i++){var node=unit.nodes().get(i);ordinal.put(node.id(),i);if(requested.contains(node.location())){needed.set(i);pending.add(i);}}
+        for(int i=0;i<d;i++){int destination=ordinal.get(unit.derivations().get(i).destination());next[i]=heads[destination];heads[destination]=i;}
+        while(!pending.isEmpty())for(int i=heads[pending.removeFirst()];i>=0;i=next[i]) {
+            var step=unit.derivations().get(i);
+            for(var premise:step.source()){int id=ordinal.get(premise);if(!needed.get(id)){needed.set(id);pending.add(id);}}
+            for(var premise:step.callerPremise()){int id=ordinal.get(premise);if(!needed.get(id)){needed.set(id);pending.add(id);}}
+        }
+        var result=new HashSet<String>();for(int i=needed.nextSetBit(0);i>=0;i=needed.nextSetBit(i+1))result.add(unit.nodes().get(i).id());return result;
     }
     private static Set<String> reads(NominalValues.Predicate p) {
         var out=new HashSet<String>();var todo=new ArrayDeque<NominalValues.Predicate>();todo.add(p);

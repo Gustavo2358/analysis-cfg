@@ -1,7 +1,7 @@
 # Activation memory: support and ownership
 
 Authority: AIR 2.0 control.local, reentry_guard, resume_routes and unwind_all at
-`09dd8ea1d5deb2ef4b1d16115ea953585752cfdf`. Local frames have matched continuations;
+`4f09e8b1b496bf8de2e0fb62532e7aa0b97b9c6e`. Local frames have matched continuations;
 an ancestor key can be present only on a transitive caller path. A jump preserves
 the stack, and an unwind/root transfer may change the active frame.
 
@@ -60,3 +60,20 @@ returns and unwind. Scale families measure work/product growth; heap/RSS and
 repeated timing comparisons supplement these counters. ACTAND/ACTOR production
 CLI runs and the corpus compare candidates, supports and all remainders. No final
 query optimization or one fixture-specific path substitutes for these laws.
+
+## Condensed caller support
+
+The finite caller relation is oriented parent to child. Iterative Kosaraju computes
+its SCCs without Java recursion; all vertices in one component have the same
+transitive ancestor components. Seed each component with the exact variables of
+its member frames, then propagate bitsets once along the condensation DAG in
+topological order. Root has no variable and does not become a caller vertex.
+This computes exactly the previous transitive closure, not a new approximation.
+Duplicate edges are idempotent; equal activation keys remain equal bits.
+Time is O(F+P+(C+Pc)*ceil(K/word)), where P caller edges, C components, Pc
+condensed edges, K activation variables. Space is O(F+P+C*ceil(K/word)); output
+arrays share read-only component bitsets until returned frame snapshots are made.
+Finite DFS stacks and decreasing DAG indegrees establish termination.
+Independent seeded random graphs use scalar Floyd reachability as the oracle;
+cycles, disconnected vertices, duplicate edges and shared variables are covered.
+Typed traversal and unwind support laws are unchanged.

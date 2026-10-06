@@ -43,7 +43,8 @@ def source_oracle(sp, case):
     data = {d['canonicalName']: d['id'] for d in sp['dataDeclarations']}
     require(set(data) == ({'WS-A', 'WS-PGM'} if case == 'copy' else {'WS-PGM'}), 'actual scalar declarations')
     require(body[0]['source']['variant'] == 'LITERAL' and body[0]['source']['logicalValue']['value'] == 'PROGA'
-            and body[0]['textAdjustment']['result']['value'] == 'PROGA   ', 'original literal and padding')
+            and body[0]['textAdjustment']['rule'] == 'RIGHT_FIT_SPACE'
+            and body[0]['textAdjustment']['receiverExtent'] == 8, 'original literal and explicit padding rule')
     reference(body[0]['target'], 'WRITE', data['WS-A' if case == 'copy' else 'WS-PGM'])
     if case == 'copy':
         require(body[1]['source']['variant'] == 'DATA', 'typed MOVE-to-MOVE composition')
@@ -52,12 +53,23 @@ def source_oracle(sp, case):
     return p, data, body
 
 
+def require_body_completion(completion, frame):
+    """Independent top-frame port/route rule; no lexical or CFG inference."""
+    term = completion['terminator']
+    require(not completion['instructions'] and term['kind'] == 'local.boundary',
+            'shared body completion has an explicit boundary')
+    require(term['port'] in frame['completionPorts'], 'completion matches the active body frame, without ancestor search')
+    if 'resumeKey' in term:
+        routes = [r for r in frame.get('resumeRoutes', []) if r['key'] == term['resumeKey']]
+        require(len(routes) == 1 and routes[0]['destination'] == frame['resume'],
+                'selected completion returns to this body caller')
+
+
 def air_oracle(air, semantic, case, source):
     perform, data, source_body = semantic
     require(air['airVersion'] == '2.0.0' and air['bindingVersion'] == '1.0.0', 'unchanged AIR contracts')
     p = air['publication']; require(len(p['units']) == 1, 'one unit')
     unit = p['units'][0]; seq = unit['sequences']
-    require(len(seq)==len(source_body)+8+(case=='overwrite'),'source sequences plus guarded activation, body frame, two resumes and reentry frontier')
     labels={s['label']['localId']:s for s in seq}
     main=labels[unit['entries'][0]['initialLabel']['localId']]
     if case=='overwrite':
@@ -72,15 +84,18 @@ def air_oracle(air, semantic, case, source):
     phase=labels[wrapper['terminator']['entry']['localId']]
     require(not phase['instructions'] and phase['terminator']['kind']=='jump','activation enters its published body phase')
     body_frame=labels[phase['terminator']['destination']['localId']]
-    require(not body_frame['instructions'] and body_frame['terminator']['kind']=='local.invoke' and not body_frame['terminator']['completionPorts'],'body pushes its own return frame')
+    require(not body_frame['instructions'] and body_frame['terminator']['kind']=='local.invoke' and body_frame['terminator']['completionPorts'],'body pushes its own port-qualified return frame')
     target=labels[body_frame['terminator']['entry']['localId']]; current=target; assigns=[]
     for fact in source_body:
         require(len(current['instructions'])==1 and current['terminator']['kind']=='jump','each intrinsic body MOVE has a precise continuation')
         assigns.extend(current['instructions']); last=current; current=labels[current['terminator']['destination']['localId']]
-    require(not current['instructions'] and current['terminator']['kind']=='local.resume','body completion pops its caller frame')
+    require_body_completion(current, body_frame['terminator'])
     activation_resume=labels[body_frame['terminator']['resume']['localId']]
     require(not activation_resume['instructions'] and activation_resume['terminator']['kind']=='local.resume','body returns to activation completion, which pops the original caller frame')
-    require(sum(s['terminator']['kind']=='local.invoke' for s in seq)==2 and sum(s['terminator']['kind']=='local.resume' for s in seq)==2,'exact activation/body control inventory')
+    require(sum(s['terminator']['kind']=='local.invoke' for s in seq)==2 and sum(s['terminator']['kind']=='local.resume' for s in seq)==1 and sum(s['terminator']['kind']=='local.boundary' for s in seq)==1,'exact activation/body matched control inventory')
+    require(len(seq)==len(source_body)+9+(case=='overwrite'),'one shared source sequence per body MOVE plus exact control and closed fallback inventory')
+    fallback=labels[current['terminator']['defaultDestination']['localId']]
+    require(not fallback['instructions'] and fallback['terminator']['kind']=='opaque','unmatched lexical completion retains an explicit unsupported frontier')
     call=labels[wrapper['terminator']['resume']['localId']]
     require(call['terminator']['kind']=='invoke' and not call['instructions'],'activation resumes at CALL')
     returns=[s for s in seq if s['terminator']['kind']=='return'];require(len(returns)==1,'GOBACK Return')
@@ -100,7 +115,7 @@ def air_oracle(air, semantic, case, source):
     for assign, fact in zip(assigns, source_body):
         spans = source_spans(p, {'origin': assign['header']['origin']}, source)
         require(all(int(s['span']['start']['line']) == fact['header']['provenance']['original']['startLine'] for s in spans), 'body origins preserved')
-    control_spans = source_spans(p, {'origin': last['terminator']['header']['origin']}, source)
+    control_spans = [span for operation in (wrapper['terminator'], body_frame['terminator'], last['terminator'], current['terminator'], activation_resume['terminator']) for span in source_spans(p, {'origin': operation['header']['origin']}, source)]
     required_lines = {perform['header']['provenance']['original']['startLine'], perform['target']['paragraphOrigin']['original']['startLine'], source_body[-1]['header']['provenance']['original']['startLine']}
     require(required_lines <= {int(s['span']['start']['line']) for s in control_spans}, 'topology return preserves callsite/paragraph/body completion proofs')
     return unit, call, assigns, objects['WS-PGM']

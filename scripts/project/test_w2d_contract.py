@@ -127,13 +127,35 @@ class SourceCoverageOracleTest(unittest.TestCase):
                                       'statement:0', 'jump')
 
 
+    def test_shared_move_requires_exact_own_boundary_and_source_frontier(self):
+        assign = {'kind': 'assign'}
+        jump = {'kind': 'jump', 'destination': {'localId': 'boundary'}}
+        boundary = {'kind': 'local.boundary', 'defaultDestination': {'localId': 'frontier'}}
+        frontier = {'kind': 'opaque', 'header': {'coverage': 'UNSUPPORTED'}}
+        seq = {'label': {'localId': 'body'}, 'instructions': [assign], 'terminator': jump}
+        operations = {'assign': (seq, 0, assign), 'jump': (seq, 1, jump)}
+        for name, term in [('boundary', boundary), ('frontier', frontier)]:
+            operations[name] = ({'label': {'localId': name}, 'instructions': [], 'terminator': term}, 0, term)
+        pub = {'coverage': {'items': [{'sourceKey': 'body/statement:0',
+               'outputs': [{'domain': 'operation', 'localId': name} for name in operations]}]}}
+        self.assertEqual(operations['assign'], e2e_w2d.statement_operation(pub, operations, 'statement:0', 'assign'))
+        import copy
+        for mutation in ('other-boundary', 'foreign-frontier', 'write', 'modeled-frontier'):
+            ops = copy.deepcopy(operations)
+            if mutation == 'other-boundary': ops['jump'][2]['destination']['localId'] = 'other'
+            elif mutation == 'foreign-frontier': ops['boundary'][2]['defaultDestination']['localId'] = 'other'
+            elif mutation == 'write': ops['boundary'][0]['instructions'].append({'kind': 'assign'})
+            else: ops['frontier'][2]['header']['coverage'] = 'MODELED'
+            with self.subTest(mutation=mutation), self.assertRaises(ValueError):
+                e2e_w2d.statement_operation(pub, ops, 'statement:0', 'assign')
+
     def test_guarded_perform_requires_complete_activation_and_return(self):
         def model():
             op = {'kind': 'local.invoke', 'entry': {'localId': 'phase'},
                   'reentryGuard': {'activationKey': 'binding', 'destination': {'localId': 'frontier'}}}
             terms = {'activation': op, 'frontier': {'kind': 'opaque'},
                      'phase': {'kind': 'jump', 'destination': {'localId': 'body'}},
-                     'body': {'kind': 'local.invoke', 'completionPorts': [], 'resume': {'localId': 'resume'}},
+                     'body': {'kind': 'local.invoke', 'completionPorts': [{'localId': 'body-port'}], 'resume': {'localId': 'resume'}},
                      'resume': {'kind': 'local.resume'}}
             operations = {name: ({'label': {'localId': name}, 'instructions': [], 'terminator': term}, 0, term)
                           for name, term in terms.items()}
@@ -142,10 +164,11 @@ class SourceCoverageOracleTest(unittest.TestCase):
             return publication, operations
         pub, ops = model()
         self.assertEqual(ops['activation'], e2e_w2d.statement_operation(pub, ops, 'statement:0', 'local.invoke'))
-        for mutation in ('guard', 'body', 'return', 'extra', 'missing', 'entry'):
+        for mutation in ('guard', 'body', 'ports', 'return', 'extra', 'missing', 'entry'):
             pub, ops = model()
             if mutation == 'guard': del ops['activation'][2]['reentryGuard']
             elif mutation == 'body': ops['body'][2]['kind'] = 'jump'
+            elif mutation == 'ports': ops['body'][2]['completionPorts'] = []
             elif mutation == 'return': ops['body'][2]['resume']['localId'] = 'phase'
             elif mutation == 'extra': ops['phase'][0]['instructions'].append({'kind': 'assign'})
             elif mutation == 'missing': pub['coverage']['items'].pop()
@@ -153,6 +176,49 @@ class SourceCoverageOracleTest(unittest.TestCase):
             with self.subTest(mutation=mutation), self.assertRaises((ValueError, KeyError)):
                 e2e_w2d.statement_operation(pub, ops, 'statement:0', 'local.invoke')
 
+
+
+class SharedCompletionContractTest(unittest.TestCase):
+    def test_boundary_requires_this_top_port_and_exact_selected_route(self):
+        from e2e_perform_basic import require_body_completion
+        frame = {'completionPorts': [{'localId': 'port-A'}], 'resume': {'localId': 'caller-A'},
+                 'resumeRoutes': [{'key': 'state-A', 'destination': {'localId': 'caller-A'}}]}
+        completion = {'instructions': [], 'terminator': {'kind': 'local.boundary',
+                      'port': {'localId': 'port-A'}, 'resumeKey': 'state-A'}}
+        require_body_completion(completion, frame)
+        import copy
+        for mutation in ('wrong-port', 'missing-key', 'other-caller', 'extra-write'):
+            c, f = copy.deepcopy(completion), copy.deepcopy(frame)
+            if mutation == 'wrong-port': c['terminator']['port']['localId'] = 'port-B'
+            elif mutation == 'missing-key': c['terminator']['resumeKey'] = 'state-B'
+            elif mutation == 'other-caller': f['resumeRoutes'][0]['destination']['localId'] = 'caller-B'
+            else: c['instructions'].append({'kind': 'assign'})
+            with self.subTest(mutation=mutation), self.assertRaises(ValueError):
+                require_body_completion(c, f)
+        del completion['terminator']['resumeKey']
+        require_body_completion(completion, frame)
+
+
+    def test_cfg_boundary_selects_only_matching_top_frame(self):
+        from cfg_local_paths import Paths, vertex, key
+        source = {'publication': 'p', 'ordinal': '0'}
+        default = {'publication': 'p', 'ordinal': '1'}
+        ordinary = {'publication': 'p', 'ordinal': '2'}
+        selected = {'publication': 'p', 'ordinal': '3'}
+        invalid = {'publication': 'p', 'ordinal': '4'}
+        port = {'domain': 'completion_port', 'publication': 'p', 'unit': 'u', 'localId': 'A'}
+        rule = {'source': source, 'kind': 'LOCAL_BOUNDARY', 'port': port, 'resumeKey': 'state-A',
+                'defaultDestination': default, 'invalidExit': invalid}
+        paths = Paths({'nodes': [], 'transitions': [], 'localControl': [rule]})
+        frame = ('invoke-A', vertex(ordinary), (key(port),), None, (('state-A', vertex(selected)),))
+        self.assertEqual([(vertex(selected), ())], paths.successors(vertex(source), (frame,)))
+        self.assertEqual([(vertex(default), ())], paths.successors(vertex(source), ()))
+        shadow = ('invoke-B', vertex(ordinary), ('other-port',), None, ())
+        self.assertEqual([(vertex(default), (frame, shadow))], paths.successors(vertex(source), (frame, shadow)))
+        missing = frame[:4] + ((),)
+        self.assertEqual([(vertex(invalid), ())], paths.successors(vertex(source), (frame, missing)))
+        del rule['resumeKey']
+        self.assertEqual([(vertex(ordinary), ())], paths.successors(vertex(source), (frame,)))
 
 if __name__ == '__main__':
     unittest.main()

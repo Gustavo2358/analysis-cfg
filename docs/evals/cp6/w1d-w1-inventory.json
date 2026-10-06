@@ -2,6 +2,7 @@
   "sources": [
     "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/ActivationControl.java",
     "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/AnalysisSession.java",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/CallerSupport.java",
     "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/ContextView.java",
     "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexBuilder.java",
     "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/IndexMetrics.java",
@@ -18,6 +19,7 @@
     "io/github/gustavo2358/analysis/structure/AnalysisSession$Admission.class",
     "io/github/gustavo2358/analysis/structure/AnalysisSession$Status.class",
     "io/github/gustavo2358/analysis/structure/AnalysisSession.class",
+    "io/github/gustavo2358/analysis/structure/CallerSupport.class",
     "io/github/gustavo2358/analysis/structure/ContextView$EdgeCursor.class",
     "io/github/gustavo2358/analysis/structure/ContextView$Point.class",
     "io/github/gustavo2358/analysis/structure/ContextView$Successors.class",
@@ -61,6 +63,7 @@
       "io.github.gustavo2358.analysis.structure.ActivationControl$Guard",
       "io.github.gustavo2358.analysis.structure.ActivationControl$Move",
       "io.github.gustavo2358.analysis.structure.AnalysisSession",
+      "io.github.gustavo2358.analysis.structure.CallerSupport",
       "io.github.gustavo2358.analysis.structure.ContextView",
       "io.github.gustavo2358.analysis.structure.ContextView$EdgeCursor",
       "io.github.gustavo2358.analysis.structure.ProgramIndex",
@@ -93,7 +96,11 @@
       "java.util.Objects",
       "java.util.Optional",
       "java.util.Set",
-      "java.util.function.Function"
+      "java.util.function.Function",
+      "java.util.function.Predicate",
+      "java.util.function.ToIntFunction",
+      "java.util.stream.IntStream",
+      "java.util.stream.Stream"
     ],
     "io.github.gustavo2358.analysis.structure.ActivationControl$Action": [
       "io.github.gustavo2358.analysis.structure.ActivationControl",
@@ -195,6 +202,18 @@
       "java.lang.Enum",
       "java.lang.Object",
       "java.lang.String"
+    ],
+    "io.github.gustavo2358.analysis.structure.CallerSupport": [
+      "java.lang.Integer",
+      "java.lang.Object",
+      "java.util.ArrayDeque",
+      "java.util.ArrayList",
+      "java.util.Arrays",
+      "java.util.BitSet",
+      "java.util.HashSet",
+      "java.util.Iterator",
+      "java.util.List",
+      "java.util.Set"
     ],
     "io.github.gustavo2358.analysis.structure.ContextView": [
       "io.github.gustavo2358.air.model.Entries",
@@ -645,6 +664,7 @@
     "io.github.gustavo2358.analysis.structure.AnalysisSession$Admission": "Compiled from \"AnalysisSession.java\"\npublic final class io.github.gustavo2358.analysis.structure.AnalysisSession$Admission extends java.lang.Record {\n  public io.github.gustavo2358.analysis.structure.AnalysisSession$Admission(io.github.gustavo2358.analysis.structure.AnalysisSession$Status, java.lang.String, java.util.Optional<io.github.gustavo2358.analysis.structure.AnalysisSession>);\n    descriptor: (Lio/github/gustavo2358/analysis/structure/AnalysisSession$Status;Ljava/lang/String;Ljava/util/Optional;)V\n\n  public final java.lang.String toString();\n    descriptor: ()Ljava/lang/String;\n\n  public final int hashCode();\n    descriptor: ()I\n\n  public final boolean equals(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)Z\n\n  public io.github.gustavo2358.analysis.structure.AnalysisSession$Status status();\n    descriptor: ()Lio/github/gustavo2358/analysis/structure/AnalysisSession$Status;\n\n  public java.lang.String reason();\n    descriptor: ()Ljava/lang/String;\n\n  public java.util.Optional<io.github.gustavo2358.analysis.structure.AnalysisSession> session();\n    descriptor: ()Ljava/util/Optional;\n}\n",
     "io.github.gustavo2358.analysis.structure.AnalysisSession$Status": "Compiled from \"AnalysisSession.java\"\npublic final class io.github.gustavo2358.analysis.structure.AnalysisSession$Status extends java.lang.Enum<io.github.gustavo2358.analysis.structure.AnalysisSession$Status> {\n  public static final io.github.gustavo2358.analysis.structure.AnalysisSession$Status ACCEPTED;\n    descriptor: Lio/github/gustavo2358/analysis/structure/AnalysisSession$Status;\n  public static final io.github.gustavo2358.analysis.structure.AnalysisSession$Status INVALID_INPUT;\n    descriptor: Lio/github/gustavo2358/analysis/structure/AnalysisSession$Status;\n  public static final io.github.gustavo2358.analysis.structure.AnalysisSession$Status UNSUPPORTED;\n    descriptor: Lio/github/gustavo2358/analysis/structure/AnalysisSession$Status;\n  public static io.github.gustavo2358.analysis.structure.AnalysisSession$Status[] values();\n    descriptor: ()[Lio/github/gustavo2358/analysis/structure/AnalysisSession$Status;\n\n  public static io.github.gustavo2358.analysis.structure.AnalysisSession$Status valueOf(java.lang.String);\n    descriptor: (Ljava/lang/String;)Lio/github/gustavo2358/analysis/structure/AnalysisSession$Status;\n}\n",
     "io.github.gustavo2358.analysis.structure.AnalysisSession": "Compiled from \"AnalysisSession.java\"\npublic final class io.github.gustavo2358.analysis.structure.AnalysisSession {\n  public boolean hasLocalControl();\n    descriptor: ()Z\n\n  public io.github.gustavo2358.analysis.structure.ProgramIndex index();\n    descriptor: ()Lio/github/gustavo2358/analysis/structure/ProgramIndex;\n\n  public io.github.gustavo2358.analysis.structure.ContextView context(io.github.gustavo2358.air.model.Ids$EntryId);\n    descriptor: (Lio/github/gustavo2358/air/model/Ids$EntryId;)Lio/github/gustavo2358/analysis/structure/ContextView;\n\n  public java.util.Collection<io.github.gustavo2358.analysis.structure.ContextView> contexts();\n    descriptor: ()Ljava/util/Collection;\n\n  public io.github.gustavo2358.analysis.structure.AnalysisSession selectEntries(java.util.Collection<io.github.gustavo2358.air.model.Ids$EntryId>);\n    descriptor: (Ljava/util/Collection;)Lio/github/gustavo2358/analysis/structure/AnalysisSession;\n\n  public static io.github.gustavo2358.analysis.structure.AnalysisSession$Admission open(io.github.gustavo2358.analysis.cfg.application.CfgBuildResult, io.github.gustavo2358.air.model.Publication, io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy, java.util.Collection<io.github.gustavo2358.air.model.Entries$Entry>);\n    descriptor: (Lio/github/gustavo2358/analysis/cfg/application/CfgBuildResult;Lio/github/gustavo2358/air/model/Publication;Lio/github/gustavo2358/analysis/cfg/domain/ProjectionPolicy;Ljava/util/Collection;)Lio/github/gustavo2358/analysis/structure/AnalysisSession$Admission;\n}\n",
+    "io.github.gustavo2358.analysis.structure.CallerSupport": "Compiled from \"CallerSupport.java\"\nfinal class io.github.gustavo2358.analysis.structure.CallerSupport {\n}\n",
     "io.github.gustavo2358.analysis.structure.ContextView$EdgeCursor": "Compiled from \"ContextView.java\"\npublic final class io.github.gustavo2358.analysis.structure.ContextView$EdgeCursor {\n  public boolean advance();\n    descriptor: ()Z\n\n  public io.github.gustavo2358.analysis.cfg.domain.CfgTransition transition();\n    descriptor: ()Lio/github/gustavo2358/analysis/cfg/domain/CfgTransition;\n\n  public io.github.gustavo2358.analysis.structure.ProgramIndex$Node source();\n    descriptor: ()Lio/github/gustavo2358/analysis/structure/ProgramIndex$Node;\n\n  public io.github.gustavo2358.analysis.structure.ProgramIndex$Node target();\n    descriptor: ()Lio/github/gustavo2358/analysis/structure/ProgramIndex$Node;\n\n  public long edgesVisited();\n    descriptor: ()J\n}\n",
     "io.github.gustavo2358.analysis.structure.ContextView$Point": "Compiled from \"ContextView.java\"\npublic final class io.github.gustavo2358.analysis.structure.ContextView$Point extends java.lang.Record {\n  public io.github.gustavo2358.analysis.structure.ContextView$Point(io.github.gustavo2358.analysis.structure.ProgramIndex$Node, io.github.gustavo2358.analysis.cfg.domain.LocalControlRules$Stack, io.github.gustavo2358.air.model.Ids$EntryId);\n    descriptor: (Lio/github/gustavo2358/analysis/structure/ProgramIndex$Node;Lio/github/gustavo2358/analysis/cfg/domain/LocalControlRules$Stack;Lio/github/gustavo2358/air/model/Ids$EntryId;)V\n\n  public final java.lang.String toString();\n    descriptor: ()Ljava/lang/String;\n\n  public final int hashCode();\n    descriptor: ()I\n\n  public final boolean equals(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)Z\n\n  public io.github.gustavo2358.analysis.structure.ProgramIndex$Node node();\n    descriptor: ()Lio/github/gustavo2358/analysis/structure/ProgramIndex$Node;\n\n  public io.github.gustavo2358.analysis.cfg.domain.LocalControlRules$Stack stack();\n    descriptor: ()Lio/github/gustavo2358/analysis/cfg/domain/LocalControlRules$Stack;\n\n  public io.github.gustavo2358.air.model.Ids$EntryId activation();\n    descriptor: ()Lio/github/gustavo2358/air/model/Ids$EntryId;\n}\n",
     "io.github.gustavo2358.analysis.structure.ContextView$Successors": "Compiled from \"ContextView.java\"\npublic final class io.github.gustavo2358.analysis.structure.ContextView$Successors {\n  public boolean advance();\n    descriptor: ()Z\n\n  public io.github.gustavo2358.analysis.structure.ContextView$Point target();\n    descriptor: ()Lio/github/gustavo2358/analysis/structure/ContextView$Point;\n\n  public io.github.gustavo2358.analysis.cfg.domain.CfgTransition transition();\n    descriptor: ()Lio/github/gustavo2358/analysis/cfg/domain/CfgTransition;\n}\n",

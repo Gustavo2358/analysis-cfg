@@ -57,14 +57,16 @@ public final class ActivationControl {
                 }
             }
         }
-        var possible=new IdentityHashMap<Frame,BitSet>();possible.put(null,new BitSet());
-        for(var frame:frames.values()) {
-            var seen=Collections.newSetFromMap(new IdentityHashMap<Frame,Boolean>());
-            var pending=new ArrayDeque<Frame>();pending.add(frame);var keys=new BitSet();keys.set(frame.variable());
-            while(!pending.isEmpty())for(var parent:parents.getOrDefault(pending.removeFirst(),Set.of()))
-                if(parent!=null&&seen.add(parent)){keys.set(parent.variable());pending.addLast(parent);}
-            possible.put(frame,keys);
+        var ordered=new ArrayList<>(frames.values());var ordinals=new IdentityHashMap<Frame,Integer>();
+        for(int i=0;i<ordered.size();i++)ordinals.put(ordered.get(i),i);
+        int[] keys=new int[ordered.size()];int[][] incoming=new int[ordered.size()][];
+        for(int i=0;i<ordered.size();i++) {
+            var frame=ordered.get(i);keys[i]=frame.variable();
+            incoming[i]=parents.getOrDefault(frame,Set.of()).stream().filter(Objects::nonNull).mapToInt(ordinals::get).toArray();
         }
+        var closure=CallerSupport.compute(keys,incoming);
+        var possible=new IdentityHashMap<Frame,BitSet>();possible.put(null,new BitSet());
+        for(int i=0;i<ordered.size();i++)possible.put(ordered.get(i),closure[i]);
         return possible;
     }
     public boolean isLocal(){return !index.localRules.isEmpty();}

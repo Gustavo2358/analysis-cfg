@@ -63,3 +63,23 @@ premises to manually authored records, reject ungrounded/foreign references as
 before, mutate input lists after freeze, attempt view mutation and builder reuse,
 and compare every legacy transport byte and result. Large profiles use identical
 logical inventories and observations, not a smaller graph.
+
+## Observation-closed value execution
+
+For requested nominal queries, seed all source graph nodes at their statement
+locations. Walk incoming derivations backwards, including both source and caller
+premises of every OR alternative. The resulting set is predecessor-closed. Every
+retained destination therefore keeps every derivation and AND premise; an omitted
+node cannot influence a requested node. Certificate validation and control uncertainty
+still inspect the complete supplied publication, including unobserved facts. Only
+private value worklists/states are projected. This is exact fixed-point restriction
+for the existing monotone transfer rules, not path pruning or context merging.
+An ordinal incoming index costs O(N+D) scratch/work; query expansion is unchanged.
+
+Private immutable value-state owners share unchanged predecessor snapshots. State
+construction copies arbitrary maps; only the private final owner can be reused.
+Transfers with no demanded assignment pass the identical immutable state, and
+joins allocate only for a changed result. Complete value/support equality remains
+the join law. No historical interning cache is retained. Independent source oracles
+cover branch filtering, caller prerequisites, cyclic ancestors, evidence and all
+uncertainties; an irrelevant rooted tail cannot add work or change the query.

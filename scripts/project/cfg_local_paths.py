@@ -21,7 +21,10 @@ class Paths:
                 if any(f[3]==activation for f in stack):return [(vertex(guard['destination']),stack)]
             if any(f[0]==ident for f in stack):raise ValueError('recursive test traversal requires another oracle')
             return [(vertex(r['entry']),stack+((ident,vertex(r['resume']),tuple(key(p) for p in r['ports']),activation,tuple((x['key'],vertex(x['destination'])) for x in r.get('resumeRoutes',[]))),))]
-        if kind=='LOCAL_BOUNDARY':return [(stack[-1][1],stack[:-1])] if stack and key(r['port']) in stack[-1][2] else [(vertex(r['defaultDestination']),stack)]
+        if kind=='LOCAL_BOUNDARY':
+            if not stack or key(r['port']) not in stack[-1][2]:return [(vertex(r['defaultDestination']),stack)]
+            destination=dict(stack[-1][4]).get(r['resumeKey']) if 'resumeKey' in r else stack[-1][1]
+            return [(destination,stack[:-1])] if destination is not None else [(vertex(r['invalidExit']),())]
         if kind=='LOCAL_RESUME':
             if not stack:return [(vertex(r['invalidExit']),())]
             destination=dict(stack[-1][4]).get(r['resumeKey']) if 'resumeKey' in r else stack[-1][1]

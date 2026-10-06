@@ -313,7 +313,8 @@
       "trimOnlyRemovesTheSpaceCharacter",
       "unknownCollatingCharacterAndUnicodeRemainExplicit",
       "unknownModelCopyCannotKillAnObservedName",
-      "unknownTableWriteAndPredicateRetainPossibleElements"
+      "unknownTableWriteAndPredicateRetainPossibleElements",
+      "unobservedRootedTailDoesNotRetainStatesOrChangeCompleteSupports"
     ],
     "io.github.gustavo2358.analysis.dependencies.SourceCertificateTest": [
       "groundingPreservesAndOrCyclesAndHashCollisions"
@@ -482,6 +483,9 @@
       "unknownValueKeepsCauseAndMustOverwriteAcrossSequentialReceivers",
       "unknownValueAtAlternativeDestinationCannotKillEitherOldDefinition",
       "unknownTransformPreservesIndexReadSeparatelyFromValueRead"
+    ],
+    "io.github.gustavo2358.analysis.structure.CallerSupportTest": [
+      "condensedSupportEqualsIndependentScalarReachability"
     ]
   },
   "analysis-launcher": {
