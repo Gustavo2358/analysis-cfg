@@ -37,7 +37,9 @@ def source_oracle(sp, case, version):
             require(move['copySemantics'] == 'FULL_IDENTITY' and move['textAdjustment'] is None, 'full equal-extent data copy')
         else:
             require(move['source']['logicalValue']['value'] == value, 'literal source retained')
-            require(move['textAdjustment']['result']['value'] == value.ljust(8), 'existing literal fitting retained')
+            adjustment = move['textAdjustment']
+            require(adjustment['rule'] == 'RIGHT_FIT_SPACE' and adjustment['receiverExtent'] == 8,
+                    'existing literal fitting rule and extent retained')
     return data, moves
 
 

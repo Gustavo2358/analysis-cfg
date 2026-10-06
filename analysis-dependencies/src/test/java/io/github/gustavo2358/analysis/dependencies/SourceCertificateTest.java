@@ -15,6 +15,17 @@ public final class SourceCertificateTest {
     private static void rejected(Runnable operation){try{operation.run();throw new AssertionError("invalid certificate admitted");}catch(IllegalArgumentException expected){}}
     @org.junit.jupiter.api.Test void groundingPreservesAndOrCyclesAndHashCollisions() {
         String[] args=new String[0];
+        var originalNodes=new ArrayList<>(List.of(node("Aa"),node("BB"),new Node("caller","OTHER_CONTEXT","statement",SUPPORT)));
+        var originalSteps=new ArrayList<>(List.of(step("r",null,"Aa",null),step("b","Aa","BB",null),step("j","BB","caller","Aa")));
+        var builder=new io.github.gustavo2358.analysis.dependencies.source.SourceInventories.Builder();
+        originalNodes.forEach(builder::addNode);originalSteps.forEach(builder::addDerivation);
+        var owned=builder.build();
+        if(!owned.nodes().equals(originalNodes)||!owned.derivations().equals(originalSteps))throw new AssertionError("lossless tuple expansion");
+        originalNodes.clear();originalSteps.clear();
+        if(owned.nodes().size()!=3||owned.derivations().size()!=3)throw new AssertionError("builder aliases escaped");
+        try{owned.nodes().clear();throw new AssertionError("mutable owned nodes");}catch(UnsupportedOperationException expected){}
+        try{builder.addNode(node("late"));throw new AssertionError("builder reused");}catch(IllegalStateException expected){}
+        certificate(owned.nodes(),owned.derivations());
         // Aa and BB deliberately collide under String.hashCode.
         var nodes=List.of(node("Aa"),node("BB"),node("join"));
         certificate(nodes,List.of(step("root",null,"Aa",null),step("b","Aa","BB",null),step("j","Aa","join","BB"),step("cycle","join","Aa",null)));

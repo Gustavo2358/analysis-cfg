@@ -113,7 +113,14 @@
     "io/github/gustavo2358/analysis/dependencies/source/QualifiedSourceDependencies$UnitEvidence.class",
     "io/github/gustavo2358/analysis/dependencies/source/QualifiedSourceDependencies$UnitId.class",
     "io/github/gustavo2358/analysis/dependencies/source/QualifiedSourceDependencies$Value.class",
-    "io/github/gustavo2358/analysis/dependencies/source/QualifiedSourceDependencies.class"
+    "io/github/gustavo2358/analysis/dependencies/source/QualifiedSourceDependencies.class",
+    "io/github/gustavo2358/analysis/dependencies/source/SourceInventories$Builder.class",
+    "io/github/gustavo2358/analysis/dependencies/source/SourceInventories$Nodes.class",
+    "io/github/gustavo2358/analysis/dependencies/source/SourceInventories$Pool.class",
+    "io/github/gustavo2358/analysis/dependencies/source/SourceInventories$Rows.class",
+    "io/github/gustavo2358/analysis/dependencies/source/SourceInventories$Snapshot.class",
+    "io/github/gustavo2358/analysis/dependencies/source/SourceInventories$Steps.class",
+    "io/github/gustavo2358/analysis/dependencies/source/SourceInventories.class"
   ],
   "jdeps": {
     "io.github.gustavo2358.analysis.dependencies.CallDependencyConsumer": [
@@ -2790,6 +2797,7 @@
       "io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$StatementId",
       "io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Target",
       "io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$UnitId",
+      "io.github.gustavo2358.analysis.dependencies.source.SourceInventories",
       "java.lang.Class",
       "java.lang.Object",
       "java.lang.Record",
@@ -2848,6 +2856,100 @@
       "java.lang.invoke.TypeDescriptor",
       "java.lang.runtime.ObjectMethods",
       "java.util.Objects"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.source.SourceInventories": [
+      "io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies",
+      "io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Derivation",
+      "io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Node",
+      "io.github.gustavo2358.analysis.dependencies.source.SourceInventories$Builder",
+      "io.github.gustavo2358.analysis.dependencies.source.SourceInventories$Nodes",
+      "io.github.gustavo2358.analysis.dependencies.source.SourceInventories$Pool",
+      "io.github.gustavo2358.analysis.dependencies.source.SourceInventories$Rows",
+      "io.github.gustavo2358.analysis.dependencies.source.SourceInventories$Snapshot",
+      "io.github.gustavo2358.analysis.dependencies.source.SourceInventories$Steps",
+      "java.lang.Object",
+      "java.util.Collection",
+      "java.util.List"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.source.SourceInventories$Builder": [
+      "io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies",
+      "io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Derivation",
+      "io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Node",
+      "io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Support",
+      "io.github.gustavo2358.analysis.dependencies.source.SourceInventories",
+      "io.github.gustavo2358.analysis.dependencies.source.SourceInventories$Nodes",
+      "io.github.gustavo2358.analysis.dependencies.source.SourceInventories$Pool",
+      "io.github.gustavo2358.analysis.dependencies.source.SourceInventories$Rows",
+      "io.github.gustavo2358.analysis.dependencies.source.SourceInventories$Snapshot",
+      "io.github.gustavo2358.analysis.dependencies.source.SourceInventories$Steps",
+      "java.lang.IllegalStateException",
+      "java.lang.Object",
+      "java.lang.String",
+      "java.lang.invoke.CallSite",
+      "java.lang.invoke.LambdaMetafactory",
+      "java.lang.invoke.MethodHandle",
+      "java.lang.invoke.MethodHandles",
+      "java.lang.invoke.MethodHandles$Lookup",
+      "java.lang.invoke.MethodType",
+      "java.util.List",
+      "java.util.Objects",
+      "java.util.function.IntFunction"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.source.SourceInventories$Nodes": [
+      "io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies",
+      "io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Node",
+      "io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Support",
+      "io.github.gustavo2358.analysis.dependencies.source.SourceInventories",
+      "java.lang.Object",
+      "java.lang.String",
+      "java.util.AbstractList",
+      "java.util.Objects",
+      "java.util.RandomAccess"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.source.SourceInventories$Pool": [
+      "io.github.gustavo2358.analysis.dependencies.source.SourceInventories",
+      "java.lang.Integer",
+      "java.lang.Object",
+      "java.util.ArrayList",
+      "java.util.Collection",
+      "java.util.HashMap",
+      "java.util.List",
+      "java.util.Map"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.source.SourceInventories$Rows": [
+      "io.github.gustavo2358.analysis.dependencies.source.SourceInventories",
+      "java.lang.IllegalArgumentException",
+      "java.lang.Math",
+      "java.lang.Object",
+      "java.lang.String",
+      "java.util.Arrays"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.source.SourceInventories$Snapshot": [
+      "io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies",
+      "io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Derivation",
+      "io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Node",
+      "io.github.gustavo2358.analysis.dependencies.source.SourceInventories",
+      "java.lang.Class",
+      "java.lang.Object",
+      "java.lang.Record",
+      "java.lang.String",
+      "java.lang.invoke.MethodHandle",
+      "java.lang.invoke.MethodHandles",
+      "java.lang.invoke.MethodHandles$Lookup",
+      "java.lang.invoke.TypeDescriptor",
+      "java.lang.runtime.ObjectMethods",
+      "java.util.List"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.source.SourceInventories$Steps": [
+      "io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies",
+      "io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Derivation",
+      "io.github.gustavo2358.analysis.dependencies.source.SourceInventories",
+      "java.lang.Object",
+      "java.lang.String",
+      "java.util.AbstractList",
+      "java.util.List",
+      "java.util.Objects",
+      "java.util.RandomAccess"
     ]
   },
   "publicDescriptors": {
@@ -2964,6 +3066,13 @@
     "io/github/gustavo2358/analysis/dependencies/source/QualifiedSourceDependencies$UnitEvidence.class": "Compiled from \"QualifiedSourceDependencies.java\"\npublic final class io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$UnitEvidence extends java.lang.Record {\n  public io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$UnitEvidence(io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$UnitId, boolean, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Statement>, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Occurrence>, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Target>, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Node>, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Derivation>, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Selection>, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Event>, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Guard>, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Proof>, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Frontier>, java.util.Optional<io.github.gustavo2358.analysis.dependencies.source.NominalValueEvidence>);\n    descriptor: (Lio/github/gustavo2358/analysis/dependencies/source/QualifiedSourceDependencies$UnitId;ZLjava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/Optional;)V\n\n  public io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$UnitEvidence(io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$UnitId, boolean, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Statement>, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Occurrence>, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Target>, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Node>, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Derivation>, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Selection>, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Event>, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Guard>, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Proof>, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Frontier>);\n    descriptor: (Lio/github/gustavo2358/analysis/dependencies/source/QualifiedSourceDependencies$UnitId;ZLjava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;)V\n\n  public io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$UnitEvidence(io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$UnitId, boolean, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Statement>, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Occurrence>, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Target>, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Node>, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Derivation>, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Selection>, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Event>, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Guard>, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Proof>, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Frontier>, java.util.Optional<io.github.gustavo2358.analysis.dependencies.source.NominalValueEvidence>, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$NativeFileUse>);\n    descriptor: (Lio/github/gustavo2358/analysis/dependencies/source/QualifiedSourceDependencies$UnitId;ZLjava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/Optional;Ljava/util/List;)V\n\n  public final java.lang.String toString();\n    descriptor: ()Ljava/lang/String;\n\n  public final int hashCode();\n    descriptor: ()I\n\n  public final boolean equals(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)Z\n\n  public io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$UnitId unit();\n    descriptor: ()Lio/github/gustavo2358/analysis/dependencies/source/QualifiedSourceDependencies$UnitId;\n\n  public boolean controlAvailable();\n    descriptor: ()Z\n\n  public java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Statement> statements();\n    descriptor: ()Ljava/util/List;\n\n  public java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Occurrence> occurrences();\n    descriptor: ()Ljava/util/List;\n\n  public java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Target> targets();\n    descriptor: ()Ljava/util/List;\n\n  public java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Node> nodes();\n    descriptor: ()Ljava/util/List;\n\n  public java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Derivation> derivations();\n    descriptor: ()Ljava/util/List;\n\n  public java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Selection> selections();\n    descriptor: ()Ljava/util/List;\n\n  public java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Event> events();\n    descriptor: ()Ljava/util/List;\n\n  public java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Guard> guards();\n    descriptor: ()Ljava/util/List;\n\n  public java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Proof> proofs();\n    descriptor: ()Ljava/util/List;\n\n  public java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Frontier> frontiers();\n    descriptor: ()Ljava/util/List;\n\n  public java.util.Optional<io.github.gustavo2358.analysis.dependencies.source.NominalValueEvidence> nominalValues();\n    descriptor: ()Ljava/util/Optional;\n\n  public java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$NativeFileUse> nativeFiles();\n    descriptor: ()Ljava/util/List;\n}\n",
     "io/github/gustavo2358/analysis/dependencies/source/QualifiedSourceDependencies$UnitId.class": "Compiled from \"QualifiedSourceDependencies.java\"\npublic final class io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$UnitId extends java.lang.Record {\n  public io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$UnitId(java.lang.String, java.util.List<java.lang.Integer>, java.lang.String);\n    descriptor: (Ljava/lang/String;Ljava/util/List;Ljava/lang/String;)V\n\n  public final java.lang.String toString();\n    descriptor: ()Ljava/lang/String;\n\n  public final int hashCode();\n    descriptor: ()I\n\n  public final boolean equals(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)Z\n\n  public java.lang.String compilationUnitId();\n    descriptor: ()Ljava/lang/String;\n\n  public java.util.List<java.lang.Integer> structuralPath();\n    descriptor: ()Ljava/util/List;\n\n  public java.lang.String canonicalProgramName();\n    descriptor: ()Ljava/lang/String;\n}\n",
     "io/github/gustavo2358/analysis/dependencies/source/QualifiedSourceDependencies$Value.class": "Compiled from \"QualifiedSourceDependencies.java\"\npublic final class io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Value extends java.lang.Record {\n  public io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Value(java.lang.String, java.lang.String, int);\n    descriptor: (Ljava/lang/String;Ljava/lang/String;I)V\n\n  public final java.lang.String toString();\n    descriptor: ()Ljava/lang/String;\n\n  public final int hashCode();\n    descriptor: ()I\n\n  public final boolean equals(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)Z\n\n  public java.lang.String logicalDomain();\n    descriptor: ()Ljava/lang/String;\n\n  public java.lang.String value();\n    descriptor: ()Ljava/lang/String;\n\n  public int logicalExtent();\n    descriptor: ()I\n}\n",
-    "io/github/gustavo2358/analysis/dependencies/source/QualifiedSourceDependencies.class": "Compiled from \"QualifiedSourceDependencies.java\"\npublic final class io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies extends java.lang.Record {\n  public io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies(java.lang.String, java.lang.String, java.lang.String, io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Document, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$AirCorrelation>, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$UnitEvidence>);\n    descriptor: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lio/github/gustavo2358/analysis/dependencies/source/QualifiedSourceDependencies$Document;Ljava/util/List;Ljava/util/List;)V\n\n  public final java.lang.String toString();\n    descriptor: ()Ljava/lang/String;\n\n  public final int hashCode();\n    descriptor: ()I\n\n  public final boolean equals(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)Z\n\n  public java.lang.String schema();\n    descriptor: ()Ljava/lang/String;\n\n  public java.lang.String version();\n    descriptor: ()Ljava/lang/String;\n\n  public java.lang.String producer();\n    descriptor: ()Ljava/lang/String;\n\n  public io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Document source();\n    descriptor: ()Lio/github/gustavo2358/analysis/dependencies/source/QualifiedSourceDependencies$Document;\n\n  public java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$AirCorrelation> air();\n    descriptor: ()Ljava/util/List;\n\n  public java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$UnitEvidence> units();\n    descriptor: ()Ljava/util/List;\n}\n"
+    "io/github/gustavo2358/analysis/dependencies/source/QualifiedSourceDependencies.class": "Compiled from \"QualifiedSourceDependencies.java\"\npublic final class io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies extends java.lang.Record {\n  public io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies(java.lang.String, java.lang.String, java.lang.String, io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Document, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$AirCorrelation>, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$UnitEvidence>);\n    descriptor: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lio/github/gustavo2358/analysis/dependencies/source/QualifiedSourceDependencies$Document;Ljava/util/List;Ljava/util/List;)V\n\n  public final java.lang.String toString();\n    descriptor: ()Ljava/lang/String;\n\n  public final int hashCode();\n    descriptor: ()I\n\n  public final boolean equals(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)Z\n\n  public java.lang.String schema();\n    descriptor: ()Ljava/lang/String;\n\n  public java.lang.String version();\n    descriptor: ()Ljava/lang/String;\n\n  public java.lang.String producer();\n    descriptor: ()Ljava/lang/String;\n\n  public io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Document source();\n    descriptor: ()Lio/github/gustavo2358/analysis/dependencies/source/QualifiedSourceDependencies$Document;\n\n  public java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$AirCorrelation> air();\n    descriptor: ()Ljava/util/List;\n\n  public java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$UnitEvidence> units();\n    descriptor: ()Ljava/util/List;\n}\n",
+    "io/github/gustavo2358/analysis/dependencies/source/SourceInventories$Builder.class": "Compiled from \"SourceInventories.java\"\npublic final class io.github.gustavo2358.analysis.dependencies.source.SourceInventories$Builder {\n  public io.github.gustavo2358.analysis.dependencies.source.SourceInventories$Builder();\n    descriptor: ()V\n\n  public int nodeCount();\n    descriptor: ()I\n\n  public int derivationCount();\n    descriptor: ()I\n\n  public void addNode(io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Node);\n    descriptor: (Lio/github/gustavo2358/analysis/dependencies/source/QualifiedSourceDependencies$Node;)V\n\n  public void addDerivation(io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Derivation);\n    descriptor: (Lio/github/gustavo2358/analysis/dependencies/source/QualifiedSourceDependencies$Derivation;)V\n\n  public io.github.gustavo2358.analysis.dependencies.source.SourceInventories$Snapshot build();\n    descriptor: ()Lio/github/gustavo2358/analysis/dependencies/source/SourceInventories$Snapshot;\n}\n",
+    "io/github/gustavo2358/analysis/dependencies/source/SourceInventories$Nodes.class": "Compiled from \"SourceInventories.java\"\nfinal class io.github.gustavo2358.analysis.dependencies.source.SourceInventories$Nodes extends java.util.AbstractList<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Node> implements java.util.RandomAccess {\n  public int size();\n    descriptor: ()I\n\n  public io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Node get(int);\n    descriptor: (I)Lio/github/gustavo2358/analysis/dependencies/source/QualifiedSourceDependencies$Node;\n\n  public java.lang.Object get(int);\n    descriptor: (I)Ljava/lang/Object;\n}\n",
+    "io/github/gustavo2358/analysis/dependencies/source/SourceInventories$Pool.class": "Compiled from \"SourceInventories.java\"\nfinal class io.github.gustavo2358.analysis.dependencies.source.SourceInventories$Pool<T> {\n}\n",
+    "io/github/gustavo2358/analysis/dependencies/source/SourceInventories$Rows.class": "Compiled from \"SourceInventories.java\"\nfinal class io.github.gustavo2358.analysis.dependencies.source.SourceInventories$Rows {\n}\n",
+    "io/github/gustavo2358/analysis/dependencies/source/SourceInventories$Snapshot.class": "Compiled from \"SourceInventories.java\"\npublic final class io.github.gustavo2358.analysis.dependencies.source.SourceInventories$Snapshot extends java.lang.Record {\n  public io.github.gustavo2358.analysis.dependencies.source.SourceInventories$Snapshot(java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Node>, java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Derivation>);\n    descriptor: (Ljava/util/List;Ljava/util/List;)V\n\n  public final java.lang.String toString();\n    descriptor: ()Ljava/lang/String;\n\n  public final int hashCode();\n    descriptor: ()I\n\n  public final boolean equals(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)Z\n\n  public java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Node> nodes();\n    descriptor: ()Ljava/util/List;\n\n  public java.util.List<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Derivation> derivations();\n    descriptor: ()Ljava/util/List;\n}\n",
+    "io/github/gustavo2358/analysis/dependencies/source/SourceInventories$Steps.class": "Compiled from \"SourceInventories.java\"\nfinal class io.github.gustavo2358.analysis.dependencies.source.SourceInventories$Steps extends java.util.AbstractList<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Derivation> implements java.util.RandomAccess {\n  public int size();\n    descriptor: ()I\n\n  public io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies$Derivation get(int);\n    descriptor: (I)Lio/github/gustavo2358/analysis/dependencies/source/QualifiedSourceDependencies$Derivation;\n\n  public java.lang.Object get(int);\n    descriptor: (I)Ljava/lang/Object;\n}\n",
+    "io/github/gustavo2358/analysis/dependencies/source/SourceInventories.class": "Compiled from \"SourceInventories.java\"\npublic final class io.github.gustavo2358.analysis.dependencies.source.SourceInventories {\n}\n"
   }
 }

@@ -20,6 +20,11 @@ class QualifiedSourceContractTest {
     @Test void producerRoundtripAndCandidateOccurrenceSelectionCorrelation()throws Exception {
         for(var name:List.of("ordinary","explicit","conditional","canceled","gap","alter","replacement","deactivated","computed","alternatives","registration")) {
             var evidence=read(name);assertEquals(evidence,codec.decode(codec.encode(evidence)));
+            var input=new ByteArrayInputStream(codec.encode(evidence)) {public void close(){throw new AssertionError("caller input closed");}};
+            assertEquals(evidence,codec.decode(input));
+            var output=new ByteArrayOutputStream(){public void close(){throw new AssertionError("caller output closed");}};
+            codec.write(evidence,output);assertArrayEquals(codec.encode(evidence),output.toByteArray());
+            assertThrows(Exception.class,()->codec.decode(new ByteArrayInputStream((new String(codec.encode(evidence),java.nio.charset.StandardCharsets.UTF_8)+"{}").getBytes(java.nio.charset.StandardCharsets.UTF_8))));
             assertArrayEquals(codec.encode(evidence),codec.encode(codec.decode(codec.encode(evidence))));
             var result=SourceQualifiedDependencyResult.admit(evidence,evidence.air().getFirst().publication());
             var occurrences=evidence.units().getFirst().occurrences();

@@ -258,8 +258,8 @@ public record QualifiedSourceDependencies(String schema, String version, String 
             statements=List.copyOf(statements);
             occurrences=List.copyOf(occurrences);
             targets=List.copyOf(targets);
-            nodes=List.copyOf(nodes);
-            derivations=List.copyOf(derivations);
+            nodes=SourceInventories.copyNodes(nodes);
+            derivations=SourceInventories.copyDerivations(derivations);
             selections=List.copyOf(selections);
             events=List.copyOf(events);
             guards=List.copyOf(guards);
