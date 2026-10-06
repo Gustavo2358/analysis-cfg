@@ -124,6 +124,66 @@ class CfgWireContractTest(unittest.TestCase):
                 if rule['kind']=='LOCAL_UNWIND':rule['count']=value
             with self.assertRaisesRegex(ValueError,'count'):verify(json.dumps(d))
 
+    def test_selected_boundary_product_preserves_top_port_and_key_semantics(self):
+        self.check_selected_boundary_products(ROOT/'cfg-adapters/target/local-control-wire')
+
+    def check_selected_boundary_products(self,folder):
+        from cfg_local_paths import Paths,vertex
+        import copy
+        documents={name:json.loads((folder/('boundary-'+name+'.json')).read_bytes())
+                   for name in ('A','B','missing','legacy','key-only')}
+        def shared(doc):
+            node=next(n for n in doc['nodes'] if n.get('label',{}).get('localId')=='shared')
+            return next(r for r in doc['localControl'] if r['source']==node['id'])
+        a,b=documents['A'],documents['B']
+        stripped=copy.deepcopy(b);shared(stripped)['resumeKey']='A'
+        self.assertEqual(a,stripped,'only the key changes in the complete product')
+        self.assertNotEqual(a,b)
+        for name,doc in documents.items():
+            self.assertEqual('7.0.0',verify(json.dumps(doc))['schemaVersion'])
+            paths=Paths(doc);boundary=shared(doc)
+            call=next(r for r in doc['localControl'] if r['kind']=='LOCAL_INVOKE' and r['operation']['localId']=='call-a')
+            _,stack=paths.successors(vertex(call['source']),())[0]
+            at=vertex(boundary['source']);result=paths.successors(at,stack)[0]
+            if name in ('missing','key-only'):
+                self.assertEqual((vertex(boundary['invalidExit']),()),result)
+            elif name=='legacy':
+                self.assertNotIn('resumeKey',boundary);self.assertNotIn('invalidExit',boundary)
+                self.assertEqual((vertex(call['resume']),()),result)
+            else:
+                label='ordinary' if name=='A' else 'resume'
+                destination=next(n['id'] for n in doc['nodes'] if n.get('label',{}).get('localId')==label)
+                self.assertEqual((vertex(destination),()),result)
+            # A matching ancestor may not supply a missing key on the top frame.
+            if name=='missing':
+                ancestor=stack[0][:4]+((('missing',vertex(call['resume'])),),)
+                self.assertEqual((vertex(boundary['invalidExit']),()),paths.successors(at,(ancestor,)+stack)[0])
+            default=vertex(boundary['defaultDestination'])
+            self.assertEqual((default,()),paths.successors(at,())[0])
+            other=copy.deepcopy(call);other['ports']=[]
+            paths.rules[vertex(call['source'])]=other
+            _,mismatch=paths.successors(vertex(call['source']),())[0]
+            nested=stack+mismatch
+            self.assertEqual((default,nested),paths.successors(at,nested)[0],'incompatible top port leaves all frames unchanged')
+
+    def test_selected_boundary_contract_rejects_missing_or_foreign_invalid_exit(self):
+        import copy
+        doc=self.local_document();doc['schemaVersion']='7.0.0'
+        boundary=doc['localControl'][1];boundary.update(kind='LOCAL_BOUNDARY',port=dict(publication='p',unit='u',localId='end'),
+            defaultDestination=doc['nodes'][2]['id'],resumeKey='A')
+        doc['nodes'][1]['terminator']['kind']='LOCAL_BOUNDARY'
+        self.assertEqual('7.0.0',verify(json.dumps(doc))['schemaVersion'])
+        for mutation in ('version','missing-exit','missing-key','blank','foreign','tag','operation'):
+            bad=copy.deepcopy(doc);r=bad['localControl'][1]
+            if mutation=='version':bad['schemaVersion']='6.0.0'
+            elif mutation=='missing-exit':del r['invalidExit']
+            elif mutation=='missing-key':del r['resumeKey']
+            elif mutation=='blank':r['resumeKey']=' '
+            elif mutation=='foreign':r['invalidExit']['publication']='foreign'
+            elif mutation=='tag':bad['nodes'][3]['tag']='invalid_local_unwind'
+            else:bad['nodes'][3]['operation']['localId']='other'
+            with self.assertRaises(ValueError,msg=mutation):verify(json.dumps(bad))
+
     def test_rejects_unknown_versions_tokens_and_unnecessary_upgrade(self):
         for version, term, edge in (('1.1.0', 'INVOKE', 'INVOKE_NORMAL'), ('2.0.0', 'CALL', 'INVOKE_NORMAL'),
                                     ('2.0.0', 'INVOKE', 'CALL'), ('2.0.0', 'RETURN', 'RETURN')):

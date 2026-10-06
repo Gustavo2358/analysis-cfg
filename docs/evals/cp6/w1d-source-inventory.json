@@ -322,9 +322,9 @@
     "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/AirJsonFileReader.java": "8e71b45f8208a9798043ee1d91604668ebe41031a21cab316766bd1c8af1d2fb",
     "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonBytes.java": "579254467d367c6a067845c16f2a1c1b82558fcc707830bf7adc16e49997f7c6",
     "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonException.java": "f0be54101b6d29f3e17a7f6972e20621c7e81c837cb16f77ab387d032a85bfdf",
-    "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter.java": "191d51557eff2af08b45e20b10d7ca588fc138aa8b5b875c0a198813a0f53c37",
+    "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter.java": "0eb6a621aef98da357162686a40f1dcccaed1755e4ae85293916a2bcb95dc589",
     "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/JsonFiles.java": "eeb83fed4351c34b21047e87fe4e0a7e445f45cb1ad7c4ee0cbea427db5e8500",
-    "cfg-adapters/src/test/java/io/github/gustavo2358/analysis/cfg/adapters/LocalControlWireTest.java": "bfd73b77e0e15932dd3599441a51d55b6e82e18a5f2e306567b70c85b0906f6e",
+    "cfg-adapters/src/test/java/io/github/gustavo2358/analysis/cfg/adapters/LocalControlWireTest.java": "67156a0f062b5213ce40c5abd529ca57d8745bb5e48b2bb08c750307573a90a3",
     "cfg-adapters/src/test/java/io/github/gustavo2358/analysis/cfg/adapters/MemoryFacts.java": "36cad106bd39bd7fc6b0954fa7ab4370a2fa0c89e54a3a2c05ae43158d3fafa9",
     "cfg-adapters/src/test/java/io/github/gustavo2358/analysis/cfg/adapters/ScalarAssignTest.java": "abaff760591132b11ce5dcf69b8e9a4e5d6a718f7cc364fdd17f2213a0e7b3f5",
     "cfg-adapters/src/test/java/io/github/gustavo2358/analysis/cfg/adapters/TransportTest.java": "063040dacb864af29caddb2fa37f6aa0cfdbc47bd03996b59f4bbdb42186b6dc",
@@ -377,7 +377,7 @@
     "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesAnalysis.java": "1b393347fe8bd2dda0eb51222d95918c93d8f671d43dad8f0d1684c8ea7a5956",
     "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesProvider.java": "b86561778c332d468e4958a642004507d38f0729350bff0339672a8b39576f22",
     "analysis-values/src/main/java/io/github/gustavo2358/analysis/values/TextProfile.java": "8c35392bf7fa8b2fba8292998d28d48dd17020c25358455f3444353827ba5fb6",
-    "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter.java": "191d51557eff2af08b45e20b10d7ca588fc138aa8b5b875c0a198813a0f53c37",
+    "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter.java": "0eb6a621aef98da357162686a40f1dcccaed1755e4ae85293916a2bcb95dc589",
     "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CfgGraph.java": "4a34f80ad318fc0c80ca0da6fec034f87d14e5b6673b9c5054f82b0d1f98f746",
     "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CfgTransition.java": "b57a3b51bf6ec1b8b4ac3026e07e9a1b0d345ed62b951f0794f9ac427f4f9574",
     "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CoreCfgProjection.java": "6fbc8f57be4f1bead1a425334844f039259910aec5718c41cbec592cd84df17b",
@@ -413,6 +413,7 @@
       "676e65ce19ff8f7ae3aad7d97a67484212598462d99899ff9713d0b082dc619f"
     ],
     "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter.java": [
+      "191d51557eff2af08b45e20b10d7ca588fc138aa8b5b875c0a198813a0f53c37",
       "ce11d494154f40302d17f266f86ce2dde604ddd9739cc291fb81949663e6db3a"
     ],
     "cfg-kernel/src/main/java/io/github/gustavo2358/analysis/cfg/domain/CfgGraph.java": [

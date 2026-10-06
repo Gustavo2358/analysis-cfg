@@ -11,6 +11,39 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 final class LocalControlWireTest {
+    @Test void selectedBoundaryAloneRequiresV7AndKeepsDistinctKeys() throws Exception {
+        var codec=new AirJson();var base=codec.decode(getClass().getResourceAsStream("/air/local-control.canonical.json").readAllBytes());
+        var unit=base.units().getFirst();
+        var outputs=new ArrayList<byte[]>();
+        var folder=Path.of("target/local-control-wire");Files.createDirectories(folder);
+        for(String key:List.of("A","B","missing","legacy","key-only")) {
+            var sequences=new ArrayList<Sequence>();
+            for(var old:unit.sequences()) {
+                Terminator term=old.terminator();
+                if(term instanceof Operations.LocalInvoke call && !key.equals("key-only"))
+                    term=new Operations.LocalInvoke(call.header(),call.entry(),call.completionPorts(),call.resume(),call.fallback(),
+                        call.reentryGuard(),List.of(new Operations.ResumeRoute("A",new Ids.LabelId(unit.id(),"ordinary")),
+                            new Operations.ResumeRoute("B",new Ids.LabelId(unit.id(),"resume"))));
+                if(term instanceof Operations.LocalBoundary boundary && old.label().localId().equals("shared"))
+                    term=new Operations.LocalBoundary(boundary.header(),boundary.port(),boundary.defaultDestination(),boundary.fallback(),
+                        key.equals("legacy")?Optional.empty():Optional.of(key.equals("key-only")?"A":key));
+                sequences.add(new Sequence(old.label(),old.instructions(),term,old.origin()));
+            }
+            var changed=new Unit(unit.id(),unit.containingUnit(),unit.objects(),unit.visibleObjects(),unit.entries(),sequences,unit.completionPorts(),unit.body(),unit.bodyUnavailable(),unit.coverage(),unit.origin());
+            var caps=key.equals("legacy")?List.of(Capabilities.LOCAL_CONTROL,Capabilities.LOCAL_RESUME_ROUTES):
+                key.equals("key-only")?List.of(Capabilities.LOCAL_CONTROL,Capabilities.LOCAL_RESUME_ROUTES,Capabilities.LOCAL_BOUNDARY_ROUTES):
+                List.of(Capabilities.LOCAL_CONTROL,Capabilities.LOCAL_RESUME_ROUTES,Capabilities.LOCAL_BOUNDARY_ROUTES);
+            var p=new Publication(base.id(),base.airVersion(),new Capabilities.Manifest(caps,caps),base.artifacts(),List.of(changed),base.storage(),base.resources(),base.artifactRelations(),base.origins(),base.coverage(),base.uncertainties(),base.premises());
+            var result=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).build(p,BuildOptions.defaults());
+            assertEquals(CfgBuildResult.Status.CFG_BUILT,result.status(),key+": "+result);
+            var bytes=new CfgJsonWriter().encode(result);outputs.add(bytes);
+            Files.write(folder.resolve("boundary-"+key+".json"),bytes);
+            Files.write(folder.resolve("boundary-"+key+".air.json"),codec.encode(p));
+            assertArrayEquals(bytes,new CfgJsonWriter().encode(result));
+        }
+        assertFalse(Arrays.equals(outputs.get(0),outputs.get(1)),"changing only the selected key must change the wire");
+        assertTrue(new String(outputs.get(4),StandardCharsets.UTF_8).contains("\"schemaVersion\":\"7.0.0\""),"boundary alone requires v7");
+    }
     @Test void guardedRulesRequireV6AndKeepGuardIdentity() throws Exception {
         var codec=new AirJson();var base=codec.decode(getClass().getResourceAsStream("/air/local-control.canonical.json").readAllBytes());
         var unit=base.units().getFirst();var sequences=new ArrayList<>(unit.sequences());var first=sequences.getFirst();

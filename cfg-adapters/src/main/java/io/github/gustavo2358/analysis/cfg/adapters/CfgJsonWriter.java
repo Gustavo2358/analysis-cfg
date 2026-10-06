@@ -41,6 +41,7 @@ public final class CfgJsonWriter {
         // Token mappings carry their contract requirement. Inspect the product, not its source text.
         boolean requiresV5=!graph.localRules().isEmpty();
         boolean requiresV7=graph.localRules().values().stream().anyMatch(r->r instanceof LocalControlRules.Invoke i&&!i.resumeRoutes().isEmpty()
+            ||r instanceof LocalControlRules.Boundary b&&b.resumeKey().isPresent()
             ||r instanceof LocalControlRules.Resume x&&x.resumeKey().isPresent()||r instanceof LocalControlRules.Unwind u&&u.all());
         boolean requiresV6=graph.localRules().values().stream().anyMatch(r->r instanceof LocalControlRules.Invoke i&&i.reentryGuard().isPresent());
         boolean requiresV4=graph.nodes().stream().anyMatch(CfgNode.OutcomeExit.class::isInstance)
@@ -180,6 +181,10 @@ public final class CfgJsonWriter {
             case LocalControlRules.Boundary b -> {
                 out.raw(",\"kind\":\"LOCAL_BOUNDARY\",\"port\":");airId(out,b.port());
                 out.raw(",\"defaultDestination\":");cfgId(out,b.defaultDestination());
+                if(b.resumeKey().isPresent()) {
+                    out.raw(",\"resumeKey\":");out.string(b.resumeKey().orElseThrow());
+                    out.raw(",\"invalidExit\":");cfgId(out,b.invalidExit());
+                }
             }
             case LocalControlRules.Resume r -> {
                 out.raw(",\"kind\":\"LOCAL_RESUME\",\"invalidExit\":");cfgId(out,r.invalidExit());

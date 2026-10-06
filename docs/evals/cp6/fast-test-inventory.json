@@ -871,7 +871,8 @@
     "io.github.gustavo2358.analysis.cfg.adapters.LocalControlWireTest": [
       "symbolicRulesRequireV5AndKeepOperationIdentity",
       "guardedRulesRequireV6AndKeepGuardIdentity",
-      "selectedReturnsAndUnwindAllRequireV7"
+      "selectedReturnsAndUnwindAllRequireV7",
+      "selectedBoundaryAloneRequiresV7AndKeepsDistinctKeys"
     ],
     "io.github.gustavo2358.analysis.cfg.adapters.ZstdCfgTest": [
       "realAirToCfgPreservesCanonicalBytesAndRejectsBrokenFrames"
