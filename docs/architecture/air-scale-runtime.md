@@ -846,3 +846,35 @@ tests. This is a foundation, not an adopted replacement of BooleanConditions.
 Queries still assign/copy the whole admitted formula; a circuit adapter must limit
 its formula to the exact queried fanin cones. SAT can require exponential search;
 neither watched propagation nor paging proves a general linear-time solver.
+
+### Shared circuit/query foundation (AS-W04/W09, not integrated)
+
+PagedBooleanCircuit stores immutable complete primitive tuples for primary inputs
+and shared AND gates with complemented edges. Raw handles express structural
+identity; functional equality is a separate exact decision. Construction performs
+constant/equal/complement/direct-absorption laws and never expands ordered truth
+residuals. The six-field arena traces both unsigned child handles, retains distinct
+root tokens, retires unrooted logic and never reuses collected handles.
+
+Evaluation, simultaneous substitution and clause encoding use paged iterative
+postorder memo/frontiers. Every SAT query admits only its exact fanin cone; equality
+admits both cones and checks both differing output polarities. Each AND gate uses
+three exact defining clauses. An acyclic gate definition has a unique output
+extension for every assignment of its free primary inputs, so omitted unrelated
+gate definitions cannot affect this query. This argument applies to circuit
+definitions, not to arbitrary CNF slicing. The query's decision owner, memo and
+frontier close before returning; learned query history is released.
+
+Eight kernel component tests pass exhaustive independent expressions/valuations,
+partial and complete substitutions, satisfiability, distributive/De Morgan equality,
+distinct large primary keys, queried-cone counts, 4096-input nonrecursive operations,
+root lifetimes, seven heap quotas and35 injected traversal/decision/collection I/O
+boundaries. Both mixed relations retain at most8N circuit rows at8/32/128/512 pairs.
+Two adapter tests pass through actual one-page eviction and preserve constant
+resident capacity at16/64/256 inputs including the admitted decision formula.
+
+This component is not a replacement BooleanConditions manager. It does not yet
+provide functional class IDs, memoized cross-query decisions or solver convergence.
+Repeated cone encoding remains a debt of the independent query bridge. The existing
+integrated ROOT16N/mixed64N growth REDs remain required and unchanged. No complete
+qualification, linear general SAT complexity or global managed pipeline is claimed.

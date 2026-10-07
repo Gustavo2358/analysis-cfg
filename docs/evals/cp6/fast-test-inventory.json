@@ -359,6 +359,10 @@
       "learnedQueriesAndModelsAgreeWhenEveryOtherPageIsEvicted",
       "variableCardinalityIncreasesDiskPayloadWithConstantResidentCapacity",
       "diskDenialIsOperationalFailureAndNeverASemanticUnsatResult"
+    ],
+    "io.github.gustavo2358.analysis.solver.PagedBooleanCircuitStorageTest": [
+      "exactMixedCircuitQueriesAndCollectionSurviveOnePageEviction",
+      "CircuitAndDecisionCardinalitySpillWithConstantResidentCapacity"
     ]
   },
   "analysis-dataflow": {
@@ -759,6 +763,16 @@
       "denseNonunitFormulasAndLearnedClausesAgreeWithIndependentEnumeration",
       "constructorAndGrowthDenialsAbortWithoutLeakingBorrowedPages",
       "storageInterruptionsDuringInsertionSearchAndModelCopyAbortAndReleaseAllPages"
+    ],
+    "io.github.gustavo2358.analysis.solver.PagedBooleanCircuitTest": [
+      "constructionValuationsRestrictionsSatAndEqualityAgreeWithIndependentExpressions",
+      "exactFunctionalLawsAreSeparateFromRawCircuitIdentity",
+      "mixedRelationsRetainLinearSharedSyntaxAfterRootedCollection",
+      "decisionQueriesEncodeOnlyTheExactRequestedFaninCones",
+      "deepPostorderSubstitutionAndEvaluationNeverUseJavaCallStack",
+      "rootedSharedChildrenSurviveCollectionAndStaleHandlesAreRejected",
+      "quotaDenialAbortsEvenTerminalQueriesAndReleasesBorrowedPages",
+      "interruptedTraversalDecisionsAndCollectionReleaseQueryAndCircuitOwners"
     ]
   },
   "analysis-launcher": {
