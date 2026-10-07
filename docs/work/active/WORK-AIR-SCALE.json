@@ -1,0 +1,15 @@
+{
+  "id": "WORK-AIR-SCALE",
+  "title": "Bounded-memory shared analysis runtime for large AIR publications",
+  "status": "IN_PROGRESS",
+  "scope": [
+    "official paged AIR access and producer/consumer contract",
+    "shared indexed program and contextual local-control saturation",
+    "incremental domain equations, canonical summaries and live roots",
+    "persistent values, relational operations and evidence",
+    "joint CALL/FILE planning and indexed source evidence",
+    "paged stores, resource accounting and cursor-based dependency delivery",
+    "semantic and adversarial qualification"
+  ],
+  "notes": "AS-W00 through AS-W10. Completion requires semantic equivalence without dependency loss, removal of avoidable growth, end-to-end managed CLI and qualification; checkpoint commits do not mark the work complete."
+}
