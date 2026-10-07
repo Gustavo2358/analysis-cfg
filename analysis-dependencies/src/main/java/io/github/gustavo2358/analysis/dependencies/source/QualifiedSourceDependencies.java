@@ -244,11 +244,14 @@ public record QualifiedSourceDependencies(String schema, String version, String 
             nativeFiles=List.copyOf(nativeFiles);
             if(!nativeFiles.isEmpty()) {
             var sourceStatements=unique(statements,Statement::id);var sourceNodes=unique(nodes,Node::id);var uses=new HashSet<String>();
+            // Exact alternative sets shared by all uses at a location; no files × nodes scan.
+            var nodesByLocation=new HashMap<String,Set<String>>();
+            for(var node:nodes)nodesByLocation.computeIfAbsent(node.location(),ignored->new HashSet<>()).add(node.id());
             for(var f:nativeFiles) {
                 require(f.statement().unit().equals(unit)&&sourceStatements.containsKey(f.statement()),"native file statement");
                 require(uses.add(f.statement().handle()+"/"+f.ordinal()),"duplicate native file use");refs(f.qualifications(),sourceNodes);
                 for(var q:f.qualifications())require(sourceNodes.get(q).location().equals(f.controlLocation()),"native file qualification owner");
-                require(new HashSet<>(f.qualifications()).equals(nodes.stream().filter(n->n.location().equals(f.controlLocation())).map(Node::id).collect(java.util.stream.Collectors.toSet())),"complete native file alternatives");
+                require(new HashSet<>(f.qualifications()).equals(nodesByLocation.getOrDefault(f.controlLocation(),Set.of())),"complete native file alternatives");
                 require(controlAvailable||f.qualifications().isEmpty(),"native file control availability");
             }
             }

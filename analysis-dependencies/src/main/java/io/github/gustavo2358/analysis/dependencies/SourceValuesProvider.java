@@ -46,6 +46,9 @@ public final class SourceValuesProvider {
     private final Map<String,Map<String,Values>> before=new HashMap<>();
     private final ArrayDeque<String> work=new ArrayDeque<>();
     private final Set<String> queued=new HashSet<>();
+    public record DemandStatistics(long nodeVisits,long edgeVisits,long indexedEdges) { }
+    private DemandStatistics demandStatistics=new DemandStatistics(0,0,0);
+    public DemandStatistics demandStatistics(){return demandStatistics;}
     private long workItems;
     private boolean limited;
 
@@ -60,12 +63,10 @@ public final class SourceValuesProvider {
             nodes.put(node.id(),node);
             if(queries.containsKey(node.location()))observedNodes.computeIfAbsent(node.location(),k->new ArrayList<>()).add(node.id());
         }
-        var demand=new HashSet<>(queries.values());boolean changed;
-        do {
-            changed=false;
-            for(var a:source.facts().assignments())if(demand.contains(a.target()))changed|=demand.addAll(reads(a.source()));
-            for(var c:source.facts().conditions()){var reads=reads(c.predicate());if(reads.stream().anyMatch(demand::contains))changed|=demand.addAll(reads);}
-        }while(changed);
+        var demandIndex=new NominalDemandIndex(source.facts());
+        var closure=demandIndex.closure(new HashSet<>(queries.values()));
+        var demand=closure.symbols();
+        demandStatistics=new DemandStatistics(closure.nodeVisits(),closure.edgeVisits(),demandIndex.edgeCount());
         source.facts().symbols().stream().filter(s->demand.contains(s.node())).forEach(s->{
             extents.put(s.node(),s.extent());if(s.modelAssumed())modelSymbols.add(s.node());
         });

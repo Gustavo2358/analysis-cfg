@@ -209,3 +209,36 @@ The shared ledger funds all column directories and appender capacities. The larg
 typed-payload tests exceed managed heap quota through exact file pages, but their
 input starts as a test-owned Publication. Official incremental decode and complete
 paged Validator migration still precede production CLI integration.
+
+
+## Indexed source demand and native-file admission
+
+The resident source API now builds one directed `NominalDemandIndex` per supplied
+nominal facts set instead of repeatedly scanning all assignments/conditions until
+stability. Assignment receiver nodes point to their expression DAG; READ nodes
+point to symbols. Condition expressions occupy a separate bidirectional incidence
+layer: demanding any participating symbol demands all reads of the condition.
+Separating the layers prevents shared assignment/condition ASTs from demanding
+receivers that only read a symbol. A condition with K reads stores O(K) incidence,
+not K² pairs. Iterative construction memoizes each AST identity once per layer.
+
+A primitive fair traversal enqueues each reached vertex once and examines each
+outgoing stored edge once. Cost is O(indexed input + demanded graph), independent
+of assignment inventory order. Candidate/support/outcome evaluation is unchanged;
+this graph computes demand only, never proves a candidate or discharges a premise.
+`DemandStatistics` exposes actual reached node/edge visits and stored edges.
+The small independent set-fixpoint oracle, reversed 131,072-edge chain, condition
+incidence and shared-DAG/directedness countercases exercise the structural claim.
+
+Native-file structural admission builds exact location → node-ID sets once, then
+compares every supplied qualification set against the matching group. Namespace,
+owner, references, complete alternatives and availability checks are preserved.
+The node inventory is not rescanned once per file. A counted-list test falsifies
+the previous product, and independent missing/wrong/dangling qualification cases
+retain their rule-specific rejection.
+
+These source changes are used by production callers of the resident APIs. They
+are not the complete source rewrite: state/proof persistence, preparation lifetime,
+full source correlation and managed paging remain open. Resident String/ordinal
+indexes and primitive int arrays have explicit resident ownership; they do not gain
+a spill guarantee by using the paged runtime elsewhere.

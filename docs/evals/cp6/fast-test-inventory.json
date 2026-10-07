@@ -375,6 +375,17 @@
     ],
     "io.github.gustavo2358.analysis.dependencies.SourceCertificateTest": [
       "groundingPreservesAndOrCyclesAndHashCollisions"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.NominalDemandIndexTest": [
+      "indexedClosureAgreesWithIndependentFixpointAcrossPermutationsAndCycles",
+      "reversedChainVisitsEachIndexedNodeAndEdgeOnce",
+      "conditionReadsUseLinearIncidenceRatherThanPairwiseEdges",
+      "assignmentAndConditionExpressionSharingDoesNotInventReceiverDemand",
+      "sharedExpressionDagIsIndexedByIdentityWithoutExpandingOccurrences"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.SourceCorrelationIndexTest": [
+      "nativeFileAdmissionIndexesNodesOnceInsteadOfScanningPerUse",
+      "completeAlternativeSetsAndQualificationOwnershipRemainMandatory"
     ]
   },
   "analysis-kernel": {
