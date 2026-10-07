@@ -55,4 +55,18 @@ class GuardedStatesTest {
             assertTrue(b.peakNodes()<=8L*128,"unused pointwise intersection product="+b.peakNodes());
         }
     }
+    @Test void managedValueClassesOwnAllPublishedGuardsAndReleaseOldVersions(){
+        try(var b=new BooleanConditions(64)){
+            b.enableOwnership();var states=new GuardedStates<Integer>(b,definition(),new DomainWork());states.add(1,0);b.publishCreated();
+            for(int key=0;key<256;key++){
+                b.beginMutation();
+                try{assertTrue(states.add(b.variable(key),1));}finally{b.endMutation();}
+                assertEquals(2,states.pieces.size());assertTrue(b.retainedNodes()<=8,"only published guards survive="+b.retainedNodes());
+                var word=new BitSet();word.set(key);
+                for(var piece:states.pieces)if(b.test(piece.condition,word))assertEquals(1,piece.state);
+            }
+            states.clear();assertEquals(2,b.retainedNodes());
+        }
+    }
+
 }

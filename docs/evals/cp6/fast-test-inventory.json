@@ -375,6 +375,14 @@
     "io.github.gustavo2358.analysis.solver.BooleanCircuitScopeStorageTest": [
       "retainedScopedDefinitionsSpillWithConstantResidentCapacityAndOnePageEviction",
       "interruptedInitialAndExtendedScopesAbortAndReleaseEveryBorrowedPage"
+    ],
+    "io.github.gustavo2358.analysis.solver.PagedDagOwnershipStorageTest": [
+      "rootsEdgesAndConstructionJournalSpillWithOneResidentPage",
+      "interruptedDeclarationAndRootReplacementAbortAndReleaseBorrowedPages",
+      "managedConditionVersionsUseOnePageAndReleaseEveryBorrowedPayload",
+      "insufficientFixedManagerCapacityAbortsAndReleasesItsPartialHandoff",
+      "interruptedManagedHandoffAndCreationAbortTerminalShortcuts",
+      "interruptedLiteralCollectionAfterPublicationAbortsTheWholeManagedOwner"
     ]
   },
   "analysis-dataflow": {
@@ -736,7 +744,8 @@
       "rawSupportMatchesIndependentSearchAfterFourThousandBindingMutations",
       "allocationFailuresReleaseOwnedRootsAndAllReservedCapacity",
       "disjunctivePredicatesUseAnIndividualIndexedWordWithoutJoiningAlternatives",
-      "growingDisjunctionHintsDoNotRewalkThePrimaryWordForEveryAlternative"
+      "growingDisjunctionHintsDoNotRewalkThePrimaryWordForEveryAlternative",
+      "managedArcConditionsOwnReplacementsAndReleaseOnCertificateClose"
     ],
     "io.github.gustavo2358.analysis.structure.ConditionalFeasibilityTest": [
       "sharedRecursiveDispatchDoesNotSearchAllCallersForEachGuard"
@@ -752,7 +761,8 @@
     "io.github.gustavo2358.analysis.solver.GuardedStatesTest": [
       "pointwiseJoinsAndDisjointValueClassesMatchIndependentTables",
       "equalValueUnionDoesNotConstructDisjointTransientDifferences",
-      "initializedValueClassesJoinWithoutCreatingOldAndNewGuardProducts"
+      "initializedValueClassesJoinWithoutCreatingOldAndNewGuardProducts",
+      "managedValueClassesOwnAllPublishedGuardsAndReleaseOldVersions"
     ],
     "io.github.gustavo2358.analysis.structure.RootResetRelationsTest": [
       "sharedGuardedRootResetsDoNotAccumulateCallerPrefixPredicates",
@@ -824,6 +834,25 @@
     "io.github.gustavo2358.analysis.solver.PagedLongArrayOwnershipTest": [
       "interruptedPruningAndRootCollapseNeverLeaveReleasedPagesInTheOwnershipTree",
       "indexOwnershipIsDenseEvenWhenBorrowedPageHandlesAreWidelyScattered"
+    ],
+    "io.github.gustavo2358.analysis.solver.PagedDagOwnershipTest": [
+      "duplicateEdgesAndRootReplacementMatchIndependentReachability",
+      "replacedIndependentVersionsRetireImmediatelyWithoutScanningHistory",
+      "sharedDagRootsAndUpdatesMatchAnIndependentTraversalOracle",
+      "retiredIdsHaveNewGenerationsAndOldConstructionRecordsCannotReleaseThem",
+      "nestedConstructionPublicationReleasesOnlyItsOwnUnpublishedNodes",
+      "rootTokensRejectForeignOwnersWithoutAffectingEitherGraph",
+      "retirementCallbackFailureAbortsRootReadsAndFutureBindings",
+      "deepRetirementIsIterativeAndTwoPassImportDoesNotAssumeNumericTopologicalIds"
+    ],
+    "io.github.gustavo2358.analysis.solver.BooleanConditionsOwnershipTest": [
+      "rootsKeepExactMixedFunctionsAndReleaseIndependentVersions",
+      "computedCacheCannotAliasRecycledFunctionIds",
+      "appendOnlyDecisionScopeDoesNotReuseRetiredMeanings"
+    ],
+    "io.github.gustavo2358.analysis.solver.ConditionBindingsTest": [
+      "mapUpdatesAcquireNewRootsBeforeReleasingOldOnes",
+      "explicitBorrowKeepsPreviousMapVersionAliveAcrossMutation"
     ]
   },
   "analysis-launcher": {

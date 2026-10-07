@@ -102,6 +102,12 @@ final class BooleanNodeStore implements AutoCloseable {
     void retire(int id) {
         retire(id,true);
     }
+    /** A scope retired this row without recycling its meaning. Call exactly
+     * once after all scope-local decision caches have closed. */
+    void recycleRetired(int id){
+        open();if(id<2||id>=span||field(id,0)!=0||field(id,8)!=0)throw new IllegalArgumentException("invalid deferred retirement");
+        write(id,8,freeHead);freeHead=id;
+    }
     void retire(int id,boolean recycle) {
         open();liveField(id,0);
         try {

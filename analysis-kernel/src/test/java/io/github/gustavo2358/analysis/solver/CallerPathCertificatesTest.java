@@ -186,4 +186,16 @@ class CallerPathCertificatesTest {
         }
     }
 
+    @Test void managedArcConditionsOwnReplacementsAndReleaseOnCertificateClose(){
+        try(var b=new BooleanConditions(64)){
+            b.enableOwnership();var graph=new CallerPathCertificates(b,resources(),null);
+            try{
+                var root=graph.node(true);var child=graph.node(false);
+                var arc=graph.add(root,child,4,b.not(b.variable(3)));b.publishCreated();assertEquals(3,b.retainedNodes());
+                graph.update(arc,b.not(b.variable(5)));b.publishCreated();assertEquals(3,b.retainedNodes());assertTrue(graph.matches(child,1));
+            }finally{graph.close();}
+            assertEquals(2,b.retainedNodes());
+        }
+    }
+
 }

@@ -39,9 +39,9 @@ final class CallerPathCertificates implements AutoCloseable {
         int condition;
         final AnalysisResources.Reservation lease;
         Arc previousIn,nextIn,previousOut,nextOut,previousKey,nextKey;
-        long word,token;
+        long word,token,conditionRoot;
         boolean valid,removed;
-        Arc(Node from,Node to,int variable,int condition,AnalysisResources.Reservation lease){this.from=from;this.to=to;this.variable=variable;this.condition=condition;this.lease=lease;}
+        Arc(Node from,Node to,int variable,int condition,AnalysisResources.Reservation lease){this.from=from;this.to=to;this.variable=variable;this.condition=condition;this.lease=lease;if(conditions.ownershipEnabled())conditionRoot=conditions.retainRoot(condition);}
     }
     CallerPathCertificates(BooleanConditions conditions,AnalysisResources resources,PageStore storage) {
         this.conditions=conditions;this.resources=resources;ownsPages=storage==null;
@@ -96,7 +96,7 @@ final class CallerPathCertificates implements AutoCloseable {
             if(arc.nextOut!=null)arc.nextOut.previousOut=arc.previousOut;
             if(arc.previousIn==null)arc.to.incoming=arc.nextIn;else arc.previousIn.nextIn=arc.nextIn;
             if(arc.nextIn!=null)arc.nextIn.previousIn=arc.previousIn;
-            arc.removed=true;release(arc);arc.lease.close();arc.to.index.remove(arc);
+            arc.removed=true;if(arc.conditionRoot!=0){conditions.releaseRoot(arc.conditionRoot);arc.conditionRoot=0;}release(arc);arc.lease.close();arc.to.index.remove(arc);
             if(arc.to.rawProof==arc)repairRaw(arc.to);
             if(arc.to.proof==arc)repair(arc.to);
             collect();
@@ -106,7 +106,7 @@ final class CallerPathCertificates implements AutoCloseable {
         open();if(arc==null||arc.owner!=this||arc.removed)throw new IllegalArgumentException("missing caller binding");
         if(arc.condition==condition)return;
         try {
-            int previous=arc.condition;arc.condition=condition;
+            int previous=arc.condition;if(arc.conditionRoot!=0)conditions.bindRoot(arc.conditionRoot,condition);arc.condition=condition;
             if(condition==0&&arc.to.rawProof==arc)repairRaw(arc.to);
             else if(previous==0&&condition!=0)growRaw(arc);
             refresh(arc);
@@ -274,12 +274,17 @@ final class CallerPathCertificates implements AutoCloseable {
     }
     @Override public void close() {
         if(closed)return;closed=true;
+        RuntimeException rootFailure=null;
         try {
             for(var node=first;node!=null;node=node.next) {
-                for(var arc=node.outgoing;arc!=null;arc=arc.nextOut)arc.lease.close();
+                for(var arc=node.outgoing;arc!=null;arc=arc.nextOut){
+                    try{if(arc.conditionRoot!=0)conditions.releaseRoot(arc.conditionRoot);}
+                    catch(RuntimeException failure){if(rootFailure==null)rootFailure=failure;else rootFailure.addSuppressed(failure);}
+                    finally{arc.conditionRoot=0;arc.lease.close();}
+                }
                 node.index.close();node.lease.close();
             }
-            first=null;
+            first=null;if(rootFailure!=null)throw rootFailure;
         }finally {try{if(sets!=null)sets.close();}finally{try{if(arena!=null)arena.close();}finally{try{if(ownsPages&&pages!=null)pages.close();}finally{if(metadata!=null)metadata.close();}}}}
     }
 }

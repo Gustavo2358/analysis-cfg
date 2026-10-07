@@ -22,7 +22,7 @@ final class ActivationBoundaries {
         return new Location(owner,node);
     }
     private static List<ActivationControl.Frame> find(ActivationModel model,ActivationControl.Frame frame,int condition,List<ActivationControl.Frame> excluded) {
-        var b=model.conditions();int checkpoint=b.size();
+        var b=model.conditions();int checkpoint=b.checkpoint();
         try {
         var seen=new HashMap<Key,Integer>();var pending=new ArrayDeque<Visit>();
         int prefix=excluded==null?-1:0;

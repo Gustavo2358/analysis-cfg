@@ -17,6 +17,12 @@ final class BooleanConditions implements AutoCloseable {
     private BooleanNodeStore nodes;
     private BooleanFunctionIndex functions;
     private BooleanCircuitDecisions decisions;
+    private PagedDagOwnership ownership;
+    private PagedWorklist deferredRetirements;
+    private int mutationDepth;
+    private AnalysisResources.Reservation ownershipCacheCapacity;
+    private long[] cacheGenerationA,cacheGenerationB,cacheGenerationResult;
+    private long scratchBirths;
     private final AnalysisResources.Reservation controls;
     private long[] stagedSamples;
     private long markEpoch,literalCollectionThreshold=65536;
@@ -47,15 +53,81 @@ final class BooleanConditions implements AutoCloseable {
         }catch(RuntimeException|Error failure){controls.close();throw failure;}
     }
     private int cacheSlot(int a,int b,int operation){int hash=a*0x9e3779b9+b*0x85ebca6b+operation;hash^=hash>>>16;return hash&(cacheA.length-1);}
-    private int cached(int a,int b,int operation){int slot=cacheSlot(a,b,operation);return cacheA[slot]==a&&cacheB[slot]==b&&cacheOperation[slot]==operation?cacheResult[slot]:-1;}
+    private int cached(int a,int b,int operation){int slot=cacheSlot(a,b,operation);if(cacheA[slot]!=a||cacheB[slot]!=b||cacheOperation[slot]!=operation)return -1;
+        if(ownership!=null&&(cacheGenerationA[slot]!=generation(a)
+                ||operation<2&&cacheGenerationB[slot]!=generation(b)
+                ||operation<6&&cacheGenerationResult[slot]!=generation(cacheResult[slot])))return -1;
+        return cacheResult[slot];}
     private int remember(int a,int b,int operation,int result){
         int slot=cacheSlot(a,b,operation);cacheA[slot]=a;cacheB[slot]=b;cacheOperation[slot]=operation;cacheResult[slot]=result;
+        if(ownership!=null){cacheGenerationA[slot]=generation(a);cacheGenerationB[slot]=operation<2?generation(b):0;cacheGenerationResult[slot]=operation<6?generation(result):0;}
         if(scratch&&(a>=scratchFloor||result>=scratchFloor||operation<2&&b>=scratchFloor)&&!scratchDirty[slot]) {
             scratchDirty[slot]=true;scratchSlots[scratchSlotCount++]=slot;
         }
         return result;
     }
-    private void open(){if(closed||failed)throw new IllegalStateException("condition manager closed or aborted");}
+    private void open(){if(closed||failed)throw new IllegalStateException("condition manager closed or aborted");if(ownership!=null)ownership.checkOpen();}
+    /** Handoff the existing acyclic catalog. Callers must retain every published
+     * model/container root before publishing the initial construction journal. */
+    void enableOwnership(){
+        open();if(ownership!=null)return;if(scratch)throw new IllegalStateException("ownership handoff during decision scope");
+        try{
+            nodeStorage();
+            ownershipCacheCapacity=resources.reserve(AnalysisResources.Pool.RESIDENT,24L*cacheA.length,AnalysisResources.Phase.CONTROL);
+            cacheGenerationA=new long[cacheA.length];cacheGenerationB=new long[cacheA.length];cacheGenerationResult=new long[cacheA.length];
+            Arrays.fill(cacheOperation,-1);
+            deferredRetirements=new PagedWorklist(literalPages,resources,AnalysisResources.Phase.CONTROL);
+            ownership=new PagedDagOwnership(literalPages,resources,AnalysisResources.Phase.CONTROL,new PagedDagOwnership.Graph(){
+                public void children(long node,java.util.function.LongConsumer accept){
+                    int id=Math.toIntExact(node),kind=nodes.junction(id);
+                    if(kind>=3){accept.accept(nodes.low(id));if(kind!=NOT)accept.accept(nodes.high(id));}
+                }
+                public void retire(long node){
+                    int id=Math.toIntExact(node);releaseLiteral(id);nodes.retire(id,!scratch);
+                    if(scratch)deferredRetirements.add(id);
+                }
+            });
+            for(int id=2;id<nodes.size();id++)if(nodes.live(id))ownership.declare(id);
+            for(int id=2;id<nodes.size();id++)if(nodes.live(id))ownership.linkDeclared(id);
+        }catch(RuntimeException|Error error){failed=true;throw error;}
+    }
+    boolean ownershipEnabled(){open();return ownership!=null;}
+    private long generation(int id){return id<2?0:ownership.generation(id);}
+    long retainRoot(int value){open();if(ownership==null)throw new IllegalStateException("condition ownership disabled");return ownership.root(value);}
+    long rootValue(long token){open();return ownership.value(token);}
+    void bindRoot(long token,int value){
+        open();try{
+            long old=ownership.value(token);if(old==value)return;
+            ownership.bind(token,value);
+        }catch(AnalysisResources.Exhausted|PageStore.Failure error){failed=true;throw error;}
+    }
+    void releaseRoot(long token){
+        open();try{ownership.closeRoot(token);}
+        catch(AnalysisResources.Exhausted|PageStore.Failure error){failed=true;throw error;}
+    }
+    void beginMutation(){open();if(ownership==null)throw new IllegalStateException("condition ownership disabled");if(mutationDepth==Integer.MAX_VALUE)throw new IllegalStateException("mutation nesting exhausted");mutationDepth++;}
+    void endMutation(){
+        open();if(mutationDepth<=0||scratch)throw new IllegalStateException("invalid mutation publication");
+        try{if(--mutationDepth==0){ownership.commitCreated();maybeCollectLiterals();}}catch(AnalysisResources.Exhausted|PageStore.Failure error){failed=true;throw error;}
+    }
+    long constructionMark(){open();if(scratch)throw new IllegalStateException("construction mark during decision scope");return ownership.constructionSize();}
+    void publishSince(long mark){
+        open();if(scratch)throw new IllegalStateException("publication during decision scope");
+        try{ownership.commitCreatedSince(mark);maybeCollectLiterals();}
+        catch(AnalysisResources.Exhausted|PageStore.Failure error){failed=true;throw error;}
+    }
+    long generationOf(int value){open();return ownership==null?0:generation(value);}
+    void retainPermanentRoot(int value){
+        open();if(value<2)return;
+        try{if(nodes.mark(value)!=Long.MAX_VALUE){ownership.root(value);nodes.mark(value,Long.MAX_VALUE);}}
+        catch(AnalysisResources.Exhausted|PageStore.Failure error){failed=true;throw error;}
+    }
+    void publishCreated(){publishSince(0);}
+    private void finishOwnedScope(){
+        if(decisions!=null)decisions.endScope();ownership.commitCreatedSince(scratchBirths);
+        while(deferredRetirements.size()!=0)nodes.recycleRetired(Math.toIntExact(deferredRetirements.remove()));
+        scratch=false;scratchSlotCount=0;Arrays.fill(scratchDirty,false);maybeCollectLiterals();
+    }
     private void pageStorage(){open();if(literalPages==null)literalPages=suppliedStore==null?new ResidentPageStore(4096,resources,AnalysisResources.Phase.CONTROL):suppliedStore;}
     private void nodeStorage(){
         pageStorage();if(nodes==null)nodes=new BooleanNodeStore(literalPages,resources,64);
@@ -141,6 +213,7 @@ final class BooleanConditions implements AutoCloseable {
         catch(RuntimeException|Error failure){if(token!=0)try{literalArena.release(token);}catch(RuntimeException cleanup){failure.addSuppressed(cleanup);}throw failure;}
         allocationsSinceCollection++;peakNodes=Math.max(peakNodes,nodes.retainedNodes());
         functions.prepare(id,stagedSamples,support,supportToken);
+        if(ownership!=null)ownership.created(id);
         if(!nativeInput&&support==0) {
             boolean maybeFalse=true,maybeTrue=true;
             for(long word:stagedSamples){maybeFalse&=word==0;maybeTrue&=word== -1;}
@@ -154,7 +227,9 @@ final class BooleanConditions implements AutoCloseable {
                 long alias=token==0?0:literalArena.retain(literalRoot>>>1);
                 retireProvisional(id);
                 functions.bindNative(equal,variable,low,high,literalRoot,kind,alias);
+                int oldKind=nodes.junction(equal),oldLow=nodes.low(equal),oldHigh=nodes.high(equal);
                 long previous=nodes.replace(equal,variable,low,high,literalRoot,kind,0);
+                if(ownership!=null&&oldKind>=3)ownership.replacedByLeaf(equal,oldLow,oldKind==NOT?0:oldHigh);
                 if(previous!=0)literalArena.release(previous);
             }else retireProvisional(id);
             return equal;
@@ -186,6 +261,7 @@ final class BooleanConditions implements AutoCloseable {
         catch(AnalysisResources.Exhausted|PageStore.Failure failure){failed=true;throw failure;}
     }
     private void retireProvisional(int id){
+        if(ownership!=null){ownership.abandonCreated(id);return;}
         releaseLiteral(id);boolean tail=!scratch&&id==nodes.size()-1;
         nodes.retire(id,!scratch&&!tail);if(tail)nodes.trimUnlinkedTail();
     }
@@ -395,6 +471,7 @@ final class BooleanConditions implements AutoCloseable {
         catch(AnalysisResources.Exhausted|PageStore.Failure failure){failed=true;throw failure;}
     }
     private void discardAfterUnchecked(int checkpoint) {
+        if(ownership!=null){if(!scratch||checkpoint!=scratchFloor)throw new IllegalArgumentException("foreign operation checkpoint");finishOwnedScope();return;}
         int end=size();if(checkpoint<2||checkpoint>end)throw new IllegalArgumentException("invalid BDD checkpoint");
         if(scratch&&checkpoint!=scratchFloor)throw new IllegalArgumentException("foreign BDD scratch checkpoint");
         if(scratch&&decisions!=null)decisions.endScope();
@@ -443,6 +520,7 @@ final class BooleanConditions implements AutoCloseable {
     }
     private void commitAfterUnchecked(int checkpoint,java.util.function.Consumer<java.util.function.IntConsumer> roots) {
         if(!scratch||checkpoint!=scratchFloor)throw new IllegalArgumentException("foreign operation checkpoint");
+        if(ownership!=null){finishOwnedScope();return;}
         if(decisions!=null)decisions.endScope();
         pageStorage();long epoch=epoch();int end=size(),kept=0,last=checkpoint;
         try(var pending=new PagedLongArray(literalPages,Long.MAX_VALUE,resources,AnalysisResources.Phase.CONTROL)) {
@@ -464,16 +542,17 @@ final class BooleanConditions implements AutoCloseable {
     int checkpoint() {
         open();if(scratch)throw new IllegalStateException("nested BDD scratch scope");
         scratch=true;scratchFloor=size();scratchAllocations=allocationsSinceCollection;
+        if(ownership!=null)scratchBirths=ownership.constructionSize();
         if(decisions!=null)decisions.beginScope();return scratchFloor;
     }
-    boolean collectionDue(){return !scratch&&allocationsSinceCollection>=collectionThreshold;}
+    boolean collectionDue(){return ownership==null&&!scratch&&allocationsSinceCollection>=collectionThreshold;}
     int retainedNodes(){open();return nodes==null?2:nodes.retainedNodes();}
     int collect(java.util.function.Consumer<java.util.function.IntConsumer> roots) {
         open();try{return collectUnchecked(roots);}
         catch(AnalysisResources.Exhausted|PageStore.Failure failure){failed=true;throw failure;}
     }
     private int collectUnchecked(java.util.function.Consumer<java.util.function.IntConsumer> roots) {
-        open();if(scratch)throw new IllegalStateException("BDD collection during scratch scope");
+        open();if(ownership!=null)throw new IllegalStateException("owned conditions retire by explicit roots");if(scratch)throw new IllegalStateException("BDD collection during scratch scope");
         pageStorage();long epoch=epoch();int before=retainedNodes(),end=size(),last=2;
         try(var pending=new PagedLongArray(literalPages,Long.MAX_VALUE,resources,AnalysisResources.Phase.CONTROL)) {
             roots.accept(root->trace(root,2,epoch,pending));
@@ -491,14 +570,18 @@ final class BooleanConditions implements AutoCloseable {
         if(alias!=0)literalArena.release(alias);if(support!=0)literalArena.release(support);
         long token=nodes.token(id);if(token!=0)literalArena.release(token);
     }
+    private void maybeCollectLiterals(){if(literalArena!=null&&literalArena.size()>=literalCollectionThreshold)collectLiterals();}
     private void collectLiterals(){literalArena.collect();literalCollectionThreshold=Math.max(65536,2L*literalArena.size());}
     @Override public void close() {
         if(closed)return;closed=true;
         RuntimeException failure=ActivationSolver.closeResource(decisions,null);
+        failure=ActivationSolver.closeResource(ownership,failure);failure=ActivationSolver.closeResource(deferredRetirements,failure);
+        failure=ActivationSolver.closeResource(ownershipCacheCapacity,failure);
         failure=ActivationSolver.closeResource(functions,failure);failure=ActivationSolver.closeResource(nodes,failure);
         failure=ActivationSolver.closeResource(literals,failure);failure=ActivationSolver.closeResource(literalArena,failure);
         if(suppliedStore==null)failure=ActivationSolver.closeResource(literalPages,failure);
         controls.close();cacheA=cacheB=cacheOperation=cacheResult=scratchSlots=null;scratchDirty=null;
+        cacheGenerationA=cacheGenerationB=cacheGenerationResult=null;ownership=null;deferredRetirements=null;ownershipCacheCapacity=null;
         stagedSamples=null;functions=null;decisions=null;nodes=null;literalArena=null;literals=null;literalPages=null;if(failure!=null)throw failure;
     }
     int size(){open();return nodes==null?2:nodes.size();}

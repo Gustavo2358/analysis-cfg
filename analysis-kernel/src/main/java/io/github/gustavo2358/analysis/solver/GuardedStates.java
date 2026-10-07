@@ -8,13 +8,14 @@ import java.util.List;
  * use the same pointwise join; missing environments remain uninitialized, even at bottom. */
 class GuardedStates<S> {
     static final class Piece<S> {
-        final int condition;final S state;
+        final int condition;final S state;long root;
         Piece(int condition,S state){this.condition=condition;this.state=state;}
     }
     private final BooleanConditions conditions;
     private final AnalysisDefinition<S> definition;
     private final DomainWork work;
     private int domain;
+    private long domainRoot;
     List<Piece<S>> pieces=List.of();
     GuardedStates(BooleanConditions conditions,AnalysisDefinition<S> definition,DomainWork work) {
         this.conditions=conditions;this.definition=definition;this.work=work;
@@ -22,7 +23,13 @@ class GuardedStates<S> {
     boolean add(int condition,S contribution) {
         if(condition==0)return false;
         int checkpoint=conditions.checkpoint();boolean committed=false;
-        try {boolean changed=merge(condition,contribution);conditions.commitAfter(checkpoint,this::visitConditions);committed=true;return changed;}
+        try {var previous=pieces;boolean changed=merge(condition,contribution);
+            if(changed&&conditions.ownershipEnabled()){
+                for(var piece:pieces)if(piece.root==0)piece.root=conditions.retainRoot(piece.condition);
+                if(domainRoot==0)domainRoot=conditions.retainRoot(domain);else conditions.bindRoot(domainRoot,domain);
+                for(var piece:previous)if(piece.root!=0)conditions.releaseRoot(piece.root);
+            }
+            conditions.commitAfter(checkpoint,this::visitConditions);committed=true;return changed;}
         finally {if(!committed)conditions.discardAfter(checkpoint);}
     }
     private boolean merge(int condition,S contribution) {
@@ -49,6 +56,11 @@ class GuardedStates<S> {
         }
         put(next,conditions.difference(condition,excluded),contribution);
         if(modified){pieces=List.copyOf(next);domain=combinedDomain;}return modified;
+    }
+    void clear(){
+        if(domainRoot!=0){conditions.releaseRoot(domainRoot);domainRoot=0;}
+        for(var piece:pieces)if(piece.root!=0)conditions.releaseRoot(piece.root);
+        pieces=List.of();domain=0;
     }
     void visitConditions(java.util.function.IntConsumer root) {
         root.accept(domain);for(var piece:pieces)root.accept(piece.condition);

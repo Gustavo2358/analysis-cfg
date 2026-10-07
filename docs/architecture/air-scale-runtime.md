@@ -1011,3 +1011,63 @@ A prefix law isolates repeated cone encoding: fresh queries read1313280 definiti
 at512 prefixes, whereas scoped encoding satisfies the unchanged32N read bound.
 This bounds repeated definition traversal for that law, not arbitrary SAT search,
 number of contextual configurations or the entire dependencies application.
+
+### Explicit expression lifetimes (AS-W04/W05, integration in progress)
+
+`PagedDagOwnership` manages the acyclic expression graph with strong root and
+edge references, separate construction holds, and an iterative retirement queue.
+A replaced binding acquires its new root before releasing its old one. Duplicate
+edges count separately. A two-pass handoff supports graph IDs that are not in
+numeric topological order. Root tokens are owner-bound and never reused; reused
+node IDs receive a new generation. Construction journals, roots, reference metadata
+and retirement queues use the borrowed page backend, including disk spill.
+This algorithm does not collect program or equation cycles: those remain under
+`SummaryCollector`. Its DAG precondition is guaranteed by expression construction,
+not inferred from the fixtures. Work is proportional to created/retired edges and
+root updates, with bounded radix addressing; it never rescans the graph history
+for a binding update. Live function representation and SAT retain their separate
+complexity limits.
+
+The backward solver now registers every immutable model sharing a manager before
+initial publication. Guarded value classes, incoming/child maps and caller arcs
+own their condition roots. Previous child maps remain owned until reconciliation.
+An external borrow across mutation requires an explicit root. Backward partition
+reads and deliveries use distinct IN/OUT containers. Feasibility and deferred
+query keys include condition generations; optional cache entries do not retain
+expression history. The forward solver has not adopted this lifetime protocol.
+
+Decision scopes remain append-only: retired IDs enter a paged queue and become
+recyclable only after the scope's CNF engine closes. Computed caches validate operand
+and function-result generations; variable keys and scalar hint results are distinct
+roles. Proven replacement by a native leaf keeps the function ID/meaning and drops
+its former child references. Quota/I/O interruption aborts the owner, including
+terminal shortcuts; teardown closes ownership metadata before graph stores and
+leaves a borrowed backend usable. Persistent corruption/interrupted release are
+not qualified by the current synthetic fault tests.
+
+Independent laws cover shared/duplicate edges, reverse-ID chains of 20,000 nodes,
+root replacement, nested construction publication, generations, borrowed roots,
+truth tables and guarded-state ownership. One-page file tests use a fixed 40,000
+byte resident quota and 64/256/1024-node chains; declaration/replacement fault laws
+inject 64 I/O failures. These qualify the new ownership primitive, not global heap
+bounds: solver maps, models, semantic domains, decoding and delivery remain separate
+pending work. Original ROOT16N still fails after integration. At an intermediate
+1024-node peak, a temporary independent root trace reached 1018–1021 nonconstants;
+current shared-function syntax is another remaining mechanism. The fixture and
+its original envelope were not changed.
+
+The actual manager additionally passes a separate 256,000-byte, one-page envelope
+at16/64/256 independent versions with identical accounted resident peaks and at most
+12 live condition nodes. A60,000-byte attempt fails while allocating fixed owner
+controls, before input growth: it is retained as a quota-denial/cleanup law and its
+raw initial failure is preserved. It is not a passing growth envelope. Initial
+handoff/creation inject another64 I/O faults in the actual manager and verify that
+terminal shortcuts abort and partial pages close. The original40,000-byte standalone
+DAG envelope and originalROOT16N constraints remain unchanged.
+
+A separate RED fault law empties the construction journal, then interrupts literal
+collection during publication. The manager previously allowed terminal shortcuts
+after that failure. Publication now shares the guarded suffix-publication path;
+initial storage admission and permanent-root marking also poison the whole owner
+on operational failure. This changes failure propagation, without changing Boolean
+functions, public/wire contracts, sample channels or the original growth envelopes.
