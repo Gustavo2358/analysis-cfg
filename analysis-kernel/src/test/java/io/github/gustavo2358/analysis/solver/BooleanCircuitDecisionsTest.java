@@ -25,6 +25,65 @@ class BooleanCircuitDecisionsTest {
             return result^((root&1)!=0);
         }
     }
+    @Test void scopedIncrementalQueriesEncodeSharedFaninsOnceInsteadOfPerPrefix() {
+        var memory=resources();var graph=new Graph();long[] reads={0};
+        BooleanCircuitView counted=new BooleanCircuitView(){
+            public long normalize(long root){return root;}
+            public int primary(long handle){reads[0]++;return graph.primary(handle);}
+            public long left(long handle){reads[0]++;return graph.left(handle);}
+            public long right(long handle){reads[0]++;return graph.right(handle);}
+        };
+        try(var pages=new ResidentPageStore(4096,memory,AnalysisResources.Phase.CONTROL)) {
+            try(var decisions=new BooleanCircuitDecisions(pages,memory,counted)) {
+                decisions.beginScope();long root=1;int count=512;
+                for(int key=0;key<count;key++) {
+                    root=graph.and(root,graph.variable(key));
+                    assertTrue(decisions.equivalent(root,graph.or(root,0)));
+                }
+                assertTrue(reads[0]<=32L*count,"shared definition reads="+reads[0]);
+                decisions.endScope();assertEquals(0,pages.statistics().livePages());
+                assertTrue(decisions.equivalent(root,root));
+            }
+            assertEquals(0,pages.statistics().livePages());
+        }
+        assertEquals(0,memory.heapUsed());
+    }
+    @Test void scopedLearningAndFormulaExtensionPreserveIndependentAssignmentOracles() {
+        var memory=resources();var graph=new Graph();var roots=new ArrayList<Long>();
+        for(int key=0;key<4;key++)roots.add(graph.variable(key));
+        var random=new Random(842719);
+        try(var pages=new ResidentPageStore(4096,memory,AnalysisResources.Phase.CONTROL);
+            var decisions=new BooleanCircuitDecisions(pages,memory,graph)) {
+            decisions.beginScope();assertThrows(IllegalStateException.class,decisions::beginScope);
+            for(int step=0;step<16;step++) {
+                long a=roots.get(random.nextInt(roots.size())),b=roots.get(random.nextInt(roots.size()));
+                long root=random.nextBoolean()?graph.and(a,b):graph.or(a,b);
+                if(random.nextBoolean())root^=1;roots.add(root);
+                for(int bits=0;bits<16;bits++) {
+                    long cube=1;
+                    for(int key=0;key<4;key++){long literal=graph.variable(key);cube=graph.and(cube,literal^((bits&(1<<key))==0?1:0));}
+                    assertEquals(graph.test(root,bits),decisions.satisfiable(graph.and(root,cube)),"step="+step+" bits="+bits);
+                }
+            }
+            decisions.endScope();assertEquals(0,pages.statistics().livePages());
+            decisions.beginScope();assertTrue(decisions.equivalent(roots.get(0),graph.variable(0)));decisions.endScope();
+        }
+        assertEquals(0,memory.heapUsed());
+    }
+    @Test void scopeEndDropsAllDefinitionsBeforeBorrowedHandlesAreReused() {
+        var memory=resources();var graph=new Graph();
+        try(var pages=new ResidentPageStore(128,memory,AnalysisResources.Phase.CONTROL);
+            var decisions=new BooleanCircuitDecisions(pages,memory,graph)) {
+            long x=graph.variable(0),y=graph.variable(1),old=graph.and(x,y);
+            decisions.beginScope();assertFalse(decisions.equivalent(old,x));decisions.endScope();
+            assertEquals(0,pages.statistics().livePages());
+            graph.nodes.clear();x=graph.variable(2);y=graph.variable(2);long fresh=graph.and(x,y);
+            assertEquals(old,fresh,"must reuse the same borrowed graph handle");
+            decisions.beginScope();assertTrue(decisions.equivalent(fresh,x));decisions.endScope();
+            assertEquals(0,pages.statistics().livePages());
+        }
+        assertEquals(0,memory.heapUsed());
+    }
     @Test void genericConeDecisionsPreserveRepeatedPrimaryKeysAndIndependentTruthTables() {
         var memory=resources();var graph=new Graph();var random=new Random(3968521);var roots=new ArrayList<Long>();
         for(int key=0;key<6;key++){roots.add(graph.variable(key));roots.add(graph.variable(key));}

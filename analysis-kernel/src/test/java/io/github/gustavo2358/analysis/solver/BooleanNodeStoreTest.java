@@ -6,6 +6,39 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class BooleanNodeStoreTest {
     private static AnalysisResources resources(){return new AnalysisResources(new AnalysisResources.Limits(4_000_000,100_000,0,0,0,500_000_000,0));}
+    @Test void provedRepresentativeReplacementPreservesIdAndMarksButRetiresTheOldStructuralKey() {
+        var memory=resources();
+        try(var pages=new ResidentPageStore(128,memory,AnalysisResources.Phase.CONTROL);
+            var nodes=new BooleanNodeStore(pages,memory,1)) {
+            int id=nodes.create(-1,17,23,0,3,0,false);nodes.mark(id,731);
+            assertEquals(0,nodes.replace(id,91,0,0,194,2,833));
+            assertEquals(-1,nodes.find(-1,17,23,0,3));assertEquals(id,nodes.find(91,0,0,194,2));
+            assertEquals(731,nodes.mark(id));assertEquals(833,nodes.token(id));assertEquals(3,nodes.retainedNodes());
+            int other=nodes.create(92,0,1,0,0,0,false);
+            assertThrows(IllegalArgumentException.class,()->nodes.replace(id,92,0,1,0,0,0));
+            assertEquals(id,nodes.find(91,0,0,194,2));assertEquals(other,nodes.find(92,0,1,0,0));
+            assertEquals(833,nodes.replace(id,93,1,0,0,0,0));assertEquals(731,nodes.mark(id));
+            nodes.retire(id);int reused=nodes.create(94,0,1,0,0,0,false);assertEquals(id,reused);
+            assertEquals(-1,nodes.find(93,1,0,0,0));
+        }
+        assertEquals(0,memory.heapUsed());
+    }
+
+    @Test void interruptedRepresentativeChangesAbortAndCloseWithoutIntactUniqueLinks() {
+        for(int boundary:new int[]{1,2,4,16,64,256,1024}) {
+            var memory=resources();
+            try(var backend=new ResidentPageStore(128,memory,AnalysisResources.Phase.CONTROL)) {
+                var pages=new InterruptiblePages(backend);var nodes=new BooleanNodeStore(pages,memory,1);
+                int[] ids=new int[64];for(int i=0;i<ids.length;i++)ids[i]=nodes.create(-1,i+100,i+200,0,3,0,false);
+                pages.remaining=boundary;
+                assertThrows(PageStore.Failure.class,()->{for(int i=0;i<ids.length;i++)nodes.replace(ids[i],i,0,1,0,0,0);});
+                assertThrows(IllegalStateException.class,()->nodes.find(0,0,1,0,0));pages.remaining=-1;nodes.close();
+                assertEquals(0,backend.statistics().livePages());long page=backend.allocate();backend.release(page);
+            }
+            assertEquals(0,memory.heapUsed());
+        }
+    }
+
     @Test void constructorAndGrowthDenialReleaseEveryOwnedPage() {
         for(long quota:new long[]{512,4096,8192,12000,20000,50000}) {
             var memory=new AnalysisResources(new AnalysisResources.Limits(quota,100000,0,0,0,500000000,0));

@@ -103,20 +103,25 @@ public final class PagedLongArray implements AutoCloseable {
 
     private void prune(int depth) {
         while (true) {
-            store.release(pathPages[depth]);
-            if (depth == 0) { root = 0; height = 0; return; }
+            long retired=provisional=pathPages[depth];
+            if(depth==0) {
+                root=0;height=0;store.release(retired);provisional=0;return;
+            }
             depth--;
-            long parent = pathPages[depth];
-            writeWord(parent, pathSlots[depth], 0);
-            long remaining = readWord(parent, 0) - 1;
-            writeWord(parent, 0, remaining);
-            if (remaining != 0) break;
+            long parent=pathPages[depth];
+            // Detach before release. On an interrupted unlink the provisional page
+            // is either still reachable (close recognizes it) or independently owned.
+            writeWord(parent,pathSlots[depth],0);
+            long remaining=readWord(parent,0)-1;
+            writeWord(parent,0,remaining);
+            store.release(retired);provisional=0;
+            if(remaining!=0)break;
         }
-        // An all-low single-child prefix no longer distinguishes any live index.
-        while (height > 0 && readWord(root, 0) == 1) {
-            long child = readWord(root, 1);
-            if (child == 0) break;
-            store.release(root); root = child; height--;
+        // Transfer the root before releasing its obsolete all-low wrapper.
+        while(height>0&&readWord(root,0)==1) {
+            long child=readWord(root,1);if(child==0)break;
+            long retired=provisional=root;root=child;height--;
+            store.release(retired);provisional=0;
         }
     }
 

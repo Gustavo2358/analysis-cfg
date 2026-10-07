@@ -1,15 +1,18 @@
 package io.github.gustavo2358.analysis.solver;
 
-/** Exact query-local decisions over a borrowed immutable circuit view. Required
- * node memo, primary-key index, formula and traversal state spill. No old query
- * formula or learned clauses remain after a result. An interrupted owner aborts. */
+/** Exact decisions over a borrowed circuit view. Required memo, primary-key index,
+ * formula and traversal state spill. Optional explicit scopes share definitions and
+ * entailed clauses while handles preserve their Boolean meaning; endScope releases
+ * all query state before handle reuse. Outside a scope every query is independent.
+ * An operational interruption aborts the owner, never produces a Boolean result. */
 final class BooleanCircuitDecisions implements AutoCloseable {
     private final PageStore pages;
     private final AnalysisResources resources;
     private final BooleanCircuitView view;
     private final AnalysisResources.Reservation controls;
     private int variables;
-    private boolean closed,failed;
+    private boolean closed,failed,scoped;
+    private Session retained;
     BooleanCircuitDecisions(PageStore pages,AnalysisResources resources,BooleanCircuitView view) {
         this.pages=pages;this.resources=resources;this.view=view;
         controls=resources.reserve(AnalysisResources.Pool.RESIDENT,512,AnalysisResources.Phase.CONTROL);
@@ -24,18 +27,45 @@ final class BooleanCircuitDecisions implements AutoCloseable {
     int lastDecisionVariables(){open();return variables;}
     boolean satisfiable(long root){return query(root,0,false);}
     boolean equivalent(long a,long b){return query(a,b,true);}
+    /** Caller retains all encountered handle meanings until endScope. New graph
+     * definitions may be appended; replacing a definition requires a proof that
+     * its Boolean meaning is unchanged. Recycled handles require a new scope. */
+    void beginScope(){open();if(scoped)throw new IllegalStateException("nested circuit decision scope");scoped=true;}
+    void endScope(){
+        if(!scoped)throw new IllegalStateException("missing circuit decision scope");
+        scoped=false;Session old=retained;retained=null;
+        if(old!=null)try{old.close();}catch(RuntimeException error){failed=true;throw error;}
+    }
+    private final class Session implements AutoCloseable {
+        PagedBooleanDecisions decisions;
+        PagedLongArray memo,pending;
+        PagedLongIndex primaries;
+        Session(){
+            try{decisions=new PagedBooleanDecisions(pages,resources);memo=array();pending=array();primaries=new PagedLongIndex(pages,resources,AnalysisResources.Phase.CONTROL);}
+            catch(RuntimeException|Error error){try{close();}catch(RuntimeException cleanup){error.addSuppressed(cleanup);}throw error;}
+        }
+        public void close(){
+            RuntimeException failure=null;
+            failure=ActivationSolver.closeResource(primaries,failure);primaries=null;
+            failure=ActivationSolver.closeResource(pending,failure);pending=null;
+            failure=ActivationSolver.closeResource(memo,failure);memo=null;
+            failure=ActivationSolver.closeResource(decisions,failure);decisions=null;
+            if(failure!=null)throw failure;
+        }
+    }
+    private Session session(){if(retained==null)retained=new Session();return retained;}
     private boolean query(long a,long b,boolean equality) {
         open();variables=0;
         try {
             a=normalized(a);if(equality)b=normalized(b);
             if(equality&&a==b)return true;if(equality&&a==(b^1))return false;
             if(!equality&&a<2)return a==1;
-            try(var decisions=new PagedBooleanDecisions(pages,resources);var memo=array();var pending=array();
-                var primaries=new PagedLongIndex(pages,resources,AnalysisResources.Phase.CONTROL)) {
-                long left=encode(a,decisions,memo,pending,primaries);
-                if(!equality)return sat(decisions,left);
-                long right=encode(b,decisions,memo,pending,primaries);
-                return !satBoth(decisions,left,right^1)&&!satBoth(decisions,left^1,right);
+            try(var local=scoped?null:new Session()) {
+                Session current=scoped?session():local;
+                long left=encode(a,current.decisions,current.memo,current.pending,current.primaries);
+                if(!equality)return sat(current.decisions,left);
+                long right=encode(b,current.decisions,current.memo,current.pending,current.primaries);
+                return !satBoth(current.decisions,left,right^1)&&!satBoth(current.decisions,left^1,right);
             }
         }catch(AnalysisResources.Exhausted|PageStore.Failure failure){failed=true;throw failure;}
     }
@@ -82,5 +112,9 @@ final class BooleanCircuitDecisions implements AutoCloseable {
         }
         return encodedChild(memo,root);
     }
-    @Override public void close(){if(closed)return;closed=true;controls.close();}
+    @Override public void close(){
+        if(closed)return;closed=true;scoped=false;
+        RuntimeException failure=ActivationSolver.closeResource(retained,null);retained=null;
+        controls.close();if(failure!=null)throw failure;
+    }
 }

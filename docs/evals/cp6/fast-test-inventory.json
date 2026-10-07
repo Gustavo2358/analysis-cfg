@@ -371,6 +371,10 @@
     ],
     "io.github.gustavo2358.analysis.solver.SignedLiteralSamplesStorageTest": [
       "bothConjunctionSamplePolaritiesFollowTheOwningArenaThroughEvictionAndCollection"
+    ],
+    "io.github.gustavo2358.analysis.solver.BooleanCircuitScopeStorageTest": [
+      "retainedScopedDefinitionsSpillWithConstantResidentCapacityAndOnePageEviction",
+      "interruptedInitialAndExtendedScopesAbortAndReleaseEveryBorrowedPage"
     ]
   },
   "analysis-dataflow": {
@@ -632,7 +636,11 @@
       "computedTableCollisionsPreserveEveryTruthAssignment",
       "scratchQueriesReleaseNodesWithoutReusingStaleComputedEntries",
       "requiredPresentIsNecessaryForEverySatisfyingAssignment",
-      "deepGuardConditionsDoNotUseTheJavaCallStack"
+      "deepGuardConditionsDoNotUseTheJavaCallStack",
+      "everySmallFunctionHasOneIdAcrossDnfCnfAndComplementConstruction",
+      "everyCertifiedSupportMatchesIndependentEssentialVariableTruthTables",
+      "disjointMixedPrefixesDoNotRescanEveryPreviouslyAdmittedFunction",
+      "optionalPositiveWitnessHintsSurviveMixedOrAndComplementRepresentatives"
     ],
     "io.github.gustavo2358.analysis.solver.CallerWitnessesTest": [
       "separateWitnessesNeverInventACombinedCaller",
@@ -755,7 +763,9 @@
       "interruptedWritesAbortCatalogAndCanBeClosedWithoutClosingBorrowedStore",
       "interruptedRetirementMergesAndTrimDoNotDependOnValidTreeLinksForCleanup",
       "completePrimitiveKeysAndMetadataMatchIndependentCanonicalMaps",
-      "appendOnlyScopesAndFreeLinksDoNotReuseOlderRetiredSlots"
+      "appendOnlyScopesAndFreeLinksDoNotReuseOlderRetiredSlots",
+      "provedRepresentativeReplacementPreservesIdAndMarksButRetiresTheOldStructuralKey",
+      "interruptedRepresentativeChangesAbortAndCloseWithoutIntactUniqueLinks"
     ],
     "io.github.gustavo2358.analysis.solver.MixedConditionRelationsTest": [
       "mixedRelationsAgreeWithIndependentAllValuationsAndRestrictions",
@@ -787,7 +797,10 @@
     "io.github.gustavo2358.analysis.solver.BooleanCircuitDecisionsTest": [
       "genericConeDecisionsPreserveRepeatedPrimaryKeysAndIndependentTruthTables",
       "constantsInsideDefinitionsAndAliasesPreserveTheirMeaning",
-      "unrelatedGraphNodesAreNeverReadAndCyclesAreOperationalFailure"
+      "unrelatedGraphNodesAreNeverReadAndCyclesAreOperationalFailure",
+      "scopedIncrementalQueriesEncodeSharedFaninsOnceInsteadOfPerPrefix",
+      "scopedLearningAndFormulaExtensionPreserveIndependentAssignmentOracles",
+      "scopeEndDropsAllDefinitionsBeforeBorrowedHandlesAreReused"
     ],
     "io.github.gustavo2358.analysis.solver.SignedLiteralSamplesTest": [
       "sampledConjunctionDisjunctionAndComplementedSignsMatchIndependentLiteralValuations",
@@ -799,7 +812,18 @@
       "nativeKeysAvoidScanningAllEarlierPurePrefixesAndCanBindMixedClasses",
       "oldestFirstRetirementHasConstantLinkWorkAndReusedIdsHaveNoStaleMeaning",
       "constructorAndGrowthQuotaDenialsReleaseEveryOwnedPage",
-      "interruptedPublicationBindingAndRetirementAbortWithoutDependingOnIntactLinks"
+      "interruptedPublicationBindingAndRetirementAbortWithoutDependingOnIntactLinks",
+      "certifiedSupportsAvoidAllPrefixScansWithoutSkippingUnknownEquivalentFunctions",
+      "independentTruthTablesCertifySupportForEveryKnownUnknownRegistrationOrder",
+      "interruptedSupportCertificationAbortsAndReleasesBothNominationPartitions"
+    ],
+    "io.github.gustavo2358.analysis.solver.SignedLiteralSupportTest": [
+      "unsignedSupportIsCanonicalAcrossAllPolaritiesAndRetiresWithItsOwner",
+      "aGrowingMixedSetStoresUnsignedSupportWithBoundedCopiedPathWork"
+    ],
+    "io.github.gustavo2358.analysis.solver.PagedLongArrayOwnershipTest": [
+      "interruptedPruningAndRootCollapseNeverLeaveReleasedPagesInTheOwnershipTree",
+      "indexOwnershipIsDenseEvenWhenBorrowedPageHandlesAreWidelyScattered"
     ]
   },
   "analysis-launcher": {

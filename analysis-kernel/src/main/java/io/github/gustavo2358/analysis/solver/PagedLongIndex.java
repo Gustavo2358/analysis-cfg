@@ -17,13 +17,13 @@ public final class PagedLongIndex implements AutoCloseable {
     private final AnalysisResources.Phase phase;
     private final AnalysisResources.Reservation resident;
     private final Order order;
-    private final PagedLongArray ownedPages;
+    private PagedLongArray ownedPages;
     private final int degree, maximum, pairBase;
     private byte[] word;
     private long[] teardownPages;
     private int[] teardownNext;
     private int[] teardownLimits;
-    private long root, size, version, provisional;
+    private long root, size, version, provisional, pageTokens;
     private Cursor cursors;
     private boolean closed, failed;
 
@@ -41,7 +41,10 @@ public final class PagedLongIndex implements AutoCloseable {
             ownedPages=new PagedLongArray(store,Long.MAX_VALUE,resources,phase);
             word = new byte[Long.BYTES]; teardownPages = new long[64]; teardownNext = new int[64];
             teardownLimits = new int[64];
-        }catch(RuntimeException|Error failure){resident.close();throw failure;}
+        }catch(RuntimeException|Error failure){
+            if(ownedPages!=null)try{ownedPages.close();}catch(RuntimeException cleanup){failure.addSuppressed(cleanup);}
+            resident.close();throw failure;
+        }
     }
 
     public synchronized long size() { open(); return size; }
@@ -213,12 +216,17 @@ public final class PagedLongIndex implements AutoCloseable {
     }
     private int compare(long first, long second) { resources.work(1, phase); return order.compare(first, second); }
     private long node(boolean leaf) {
-        long page=provisional=store.allocate();
-        ownedPages.set(page,page);provisional=0;
-        write(page,1,leaf?1:0);return page;
+        if(pageTokens==Long.MAX_VALUE/2)throw new PageStore.Failure(PageStore.Reason.INVALID_HANDLE,"index page-token space exhausted");
+        long token=++pageTokens,page=provisional=store.allocate();
+        // Opaque handles are payload, never column addresses. The local ordinal
+        // keeps the ownership directory dense regardless of backend generations.
+        ownedPages.set(token,page);provisional=0;
+        write(page,1,(token<<1)|(leaf?1:0));return page;
     }
     private void release(long page) {
-        provisional=page;ownedPages.set(page,0);store.release(page);provisional=0;
+        long token=read(page,1)>>>1;
+        if(token==0||ownedPages.get(token)!=page)throw new PageStore.Failure(PageStore.Reason.CORRUPT,"index ownership token mismatch");
+        provisional=page;ownedPages.set(token,0);store.release(page);provisional=0;
     }
     private int count(long page) {
         long result = read(page, 0);
@@ -228,8 +236,8 @@ public final class PagedLongIndex implements AutoCloseable {
     private void count(long page, int count) { write(page, 0, count); }
     private boolean leaf(long page) {
         long result = read(page, 1);
-        if (result != 0 && result != 1) throw new PageStore.Failure(PageStore.Reason.CORRUPT, "invalid index node kind");
-        return result == 1;
+        if(result<2)throw new PageStore.Failure(PageStore.Reason.CORRUPT,"invalid index ownership/kind header");
+        return (result&1)!=0;
     }
     private long child(long page, int at) { return read(page, 2 + at); }
     private void child(long page, int at, long value) { write(page, 2 + at, value); }

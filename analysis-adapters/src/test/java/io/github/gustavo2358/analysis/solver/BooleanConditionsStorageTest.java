@@ -91,7 +91,11 @@ class BooleanConditionsStorageTest {
                 try(var conditions=new BooleanConditions(2,memory,pages);
                     var arena=new CanonicalTupleArena(pages,memory,AnalysisResources.Phase.CONTROL,6,new int[]{2,4,5});
                     var assignment=new PersistentLongMap(arena,memory,AnalysisResources.Phase.CONTROL)) {
-                int root=1;for(int key=0;key<128;key++)root=conditions.and(root,conditions.variable(key));
+                int root=1;for(int key=0;key<128;key++) {
+                    root=conditions.and(root,conditions.variable(key));
+                    // This read probe owns the current condition, not historical prefixes.
+                    if((key&15)==15){int current=root;conditions.collect(mark->mark.accept(current));}
+                }
                 pages.interrupt=true;
                 int condition=root,read=operation;
                 assertThrows(PageStore.Failure.class,()->{

@@ -85,6 +85,20 @@ final class BooleanNodeStore implements AutoCloseable {
             if(unique.intern(id,id)!=id)throw new IllegalStateException("condition identity disagreement");return id;
         }catch(RuntimeException|Error error){failed=true;throw error;}
     }
+    /** Caller must prove functional equivalence. The same ID now owns a new
+     * complete representative key; marks survive, former child references do not.
+     * Return the old token for the enclosing owner to release. */
+    long replace(int id,int variable,int low,int high,long literals,int junction,long token) {
+        open();liveField(id,0);int duplicate=find(variable,low,high,literals,junction);
+        if(duplicate>=0&&duplicate!=id)throw new IllegalArgumentException("duplicate replacement representative");
+        try {
+            long previous=field(id,6);
+            if(!unique.remove(id))throw new IllegalStateException("missing replacement identity");
+            write(id,1,variable);write(id,2,low);write(id,3,high);write(id,4,literals);write(id,5,junction);write(id,6,token);
+            if(unique.intern(id,id)!=id)throw new IllegalStateException("replacement identity disagreement");
+            return previous;
+        }catch(RuntimeException|Error failure){failed=true;throw failure;}
+    }
     void retire(int id) {
         retire(id,true);
     }

@@ -4,6 +4,88 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class BooleanConditionsTest {
+    @Test void optionalPositiveWitnessHintsSurviveMixedOrAndComplementRepresentatives() {
+        try(var b=new BooleanConditions(2)) {
+            int left=b.and(b.variable(0),b.variable(1));
+            int right=b.and(b.variable(2),b.variable(3));
+            int root=b.or(left,right);
+            assertEquals(-1,b.requiredPresent(root));
+            int hint=b.possiblePresent(root);assertTrue(hint>=0&&hint<4);
+            var witness=new java.util.BitSet();if(hint<2){witness.set(0);witness.set(1);}else{witness.set(2);witness.set(3);}
+            assertTrue(b.test(root,witness));
+            int complement=b.not(b.or(b.not(left),b.not(right)));
+            assertTrue(b.possiblePresent(complement)>=0);
+            assertEquals(-1,b.possiblePresent(b.not(root)));
+        }
+    }
+
+    @Test void everySmallFunctionHasOneIdAcrossDnfCnfAndComplementConstruction() {
+        try(var b=new BooleanConditions(2)) {
+            int[] dnf=new int[256];
+            for(int truth=0;truth<256;truth++) {
+                int sum=0;
+                for(int bits=0;bits<8;bits++)if((truth&(1<<bits))!=0) {
+                    int product=1;
+                    for(int key=0;key<3;key++)product=b.and(product,(bits&(1<<key))==0?b.not(b.variable(key)):b.variable(key));
+                    sum=b.or(sum,product);
+                }
+                dnf[truth]=sum;
+                for(int bits=0;bits<8;bits++)assertEquals((truth&(1<<bits))!=0,b.test(sum,java.util.BitSet.valueOf(new long[]{bits})));
+            }
+            for(int truth=0;truth<256;truth++) {
+                int product=1;
+                for(int bits=7;bits>=0;bits--)if((truth&(1<<bits))==0) {
+                    int sum=0;
+                    for(int key=2;key>=0;key--)sum=b.or(sum,(bits&(1<<key))==0?b.variable(key):b.not(b.variable(key)));
+                    product=b.and(product,sum);
+                }
+                assertEquals(dnf[truth],product,"independent DNF/CNF construction truth="+truth);
+                assertEquals(dnf[truth^255],b.not(product));
+                for(int other=0;other<truth;other++)assertNotEquals(dnf[other],product);
+            }
+        }
+    }
+
+    @Test void everyCertifiedSupportMatchesIndependentEssentialVariableTruthTables() {
+        try(var b=new BooleanConditions(2)) {
+            var forms=new java.util.ArrayList<Integer>();var truths=new java.util.ArrayList<Long>();
+            for(int key=0;key<6;key++) {
+                forms.add(b.variable(key));long truth=0;
+                for(int bits=0;bits<64;bits++)if((bits&(1<<key))!=0)truth|=1L<<bits;truths.add(truth);
+            }
+            var random=new java.util.Random(592371);int known=0;
+            for(int step=0;step<300;step++) {
+                int left=random.nextInt(forms.size()),right=random.nextInt(forms.size());boolean union=random.nextBoolean();
+                int root=union?b.or(forms.get(left),forms.get(right)):b.and(forms.get(left),forms.get(right));
+                long truth=union?truths.get(left)|truths.get(right):truths.get(left)&truths.get(right);
+                if(random.nextBoolean()){root=b.not(root);truth=~truth;}
+                for(int key=0;key<6;key++) {
+                    int certificate=b.certifiedSupportContains(root,key);if(certificate<0)continue;known++;
+                    boolean essential=false;
+                    for(int bits=0;bits<64;bits++)essential|=((truth>>>bits)&1)!=((truth>>>(bits^(1<<key)))&1);
+                    assertEquals(essential?1:0,certificate,"step="+step+" key="+key);
+                }
+                forms.add(root);truths.add(truth);
+            }
+            assertTrue(known>36,"must exercise certificates beyond seed primaries");
+        }
+    }
+    @Test void disjointMixedPrefixesDoNotRescanEveryPreviouslyAdmittedFunction() {
+        for(boolean equality:new boolean[]{false,true})try(var b=new BooleanConditions(2)) {
+            int count=512,root=equality?1:0;
+            for(int key=0;key<count;key++) {
+                int x=b.variable(key),y=b.variable(count+key),term=b.and(x,y);
+                if(equality)term=b.or(term,b.and(b.not(x),b.not(y)));
+                root=equality?b.and(root,term):b.or(root,term);
+                assertEquals(1,b.certifiedSupportContains(root,key));
+                assertEquals(1,b.certifiedSupportContains(root,count+key));
+                assertEquals(0,b.certifiedSupportContains(root,2*count));
+            }
+            assertTrue(b.equivalenceComparisons()<=16L*count,"nomination work cannot scan all previously distinguishable prefix supports="+b.equivalenceComparisons());
+            int escaped=root;b.collect(mark->mark.accept(escaped));assertTrue(b.retainedNodes()<=16L*count);
+        }
+    }
+
     @Test void committedOperationRetainsOnlyEscapingConditionsAndInvalidatesRetiredIds() {
         for(int slots:new int[]{1,2,8})try(var b=new BooleanConditions(slots)) {
             int x=b.variable(0),y=b.variable(1),z=b.variable(2);

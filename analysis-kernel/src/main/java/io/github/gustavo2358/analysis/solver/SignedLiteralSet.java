@@ -3,13 +3,14 @@ package io.github.gustavo2358.analysis.solver;
 /** Canonical Patricia sets of signed nonnegative int keys. Root parity complements
  * every literal; branch parity is normalized to its first child. Zero is empty.
  * Union returns -1 for opposing literals. The caller retains underlying root >>> 1.
- * Storage and root ownership belong to the borrowed six-field arena. */
+ * Storage and root ownership belong to the borrowed arena: six structural fields,
+ * optional56 sampled words and an optional unsigned-support reference. */
 final class SignedLiteralSet implements AutoCloseable {
     private static final long LEAF=4,BRANCH=5;
     private final CanonicalTupleArena arena;
     private final AnalysisResources resources;
     private final AnalysisResources.Reservation metadata;
-    private final boolean sampled;
+    private final boolean sampled,supported;
     private long[] tuple,path,joinA,joinB,firstResult,otherA,otherB;
     private byte[] sides,joinState;
     private int[] joinBit;
@@ -18,9 +19,9 @@ final class SignedLiteralSet implements AutoCloseable {
     private boolean closed,failed;
 
     SignedLiteralSet(CanonicalTupleArena arena,AnalysisResources resources) {
-        int arity=arena.arity();sampled=arity==6+2*PagedBooleanCircuit.SAMPLE_WORDS;
+        int arity=arena.arity();supported=arity==63;sampled=arity==62||supported;
         if(arity!=6&&!sampled)throw new IllegalArgumentException("literal set needs six structural fields and optional complete sample pair");
-        for(int n=0;n<arity;n++)if(arena.referenceColumn(n)!=(n==2||n==4||n==5))throw new IllegalArgumentException("literal reference schema mismatch");
+        for(int n=0;n<arity;n++)if(arena.referenceColumn(n)!=(n==2||n==4||n==5||supported&&n==62))throw new IllegalArgumentException("literal reference schema mismatch");
         this.arena=arena;this.resources=resources;metadata=resources.reserve(AnalysisResources.Pool.RESIDENT,4096+8L*(arity-6),AnalysisResources.Phase.CONTROL);
         try {
             tuple=new long[arity];path=new long[64];sides=new byte[64];
@@ -41,6 +42,15 @@ final class SignedLiteralSet implements AutoCloseable {
         if(word<0||word>=PagedBooleanCircuit.SAMPLE_WORDS)throw new IllegalArgumentException("foreign sample channel");
         try{return union?~conjunctionSample(root,true,word):conjunctionSample(root,false,word);}
         catch(AnalysisResources.Exhausted|PageStore.Failure failure){failed=true;throw failure;}
+    }
+    /** Canonical all-positive keys. This is exact support of every proper literal
+     * junction, independent of signs; it is not syntactic support of arbitrary logic. */
+    long unsigned(long root) {
+        open();if(!supported)throw new IllegalStateException("literal arena has no unsigned support metadata");
+        try {
+            if(root==0)return 0;long normalized=root&~1L;
+            return positiveCount(normalized)==size(normalized)?normalized:field(normalized,62)<<1;
+        }catch(AnalysisResources.Exhausted|PageStore.Failure failure){failed=true;throw failure;}
     }
     private long field(long root,int column){visits++;return arena.field(root>>>1,column);}
     private boolean leaf(long root){return (field(root,0)&255)==LEAF;}
@@ -71,7 +81,7 @@ final class SignedLiteralSet implements AutoCloseable {
         return (handle<<1)|flip;
     }
     private long leaf(int key,boolean negative) {
-        tuple[0]=(1L<<8)|LEAF;tuple[1]=((long)key<<6)|32;tuple[2]=0;tuple[3]=2;tuple[4]=0;tuple[5]=0;
+        tuple[0]=(1L<<8)|LEAF;tuple[1]=((long)key<<6)|32;tuple[2]=0;tuple[3]=2;tuple[4]=0;tuple[5]=0;if(supported)tuple[62]=0;
         if(sampled) {
             PagedBooleanCircuit.writePrimarySamples(key,tuple,6);
             for(int word=0;word<PagedBooleanCircuit.SAMPLE_WORDS;word++)tuple[6+PagedBooleanCircuit.SAMPLE_WORDS+word]=~tuple[6+word];
@@ -82,8 +92,11 @@ final class SignedLiteralSet implements AutoCloseable {
     private long branch(int bit,long left,long right) {
         long count=Math.addExact(size(left),size(right));long flip=left&1;
         long positive=Math.addExact(positiveCount(left^flip),positiveCount(right^flip));
+        // At most one nested call: its children are all-positive, so it creates no
+        // further support skeleton. Compute before writing the shared staging tuple.
+        long support=supported&&positive!=count?branch(bit,unsigned(left),unsigned(right)):0;
         tuple[0]=(positive<<8)|BRANCH;tuple[1]=((long)firstKey(left)<<6)|bit;tuple[2]=left>>>1;
-        tuple[3]=(count<<1)|((right&1)^flip);tuple[4]=right>>>1;tuple[5]=0;
+        tuple[3]=(count<<1)|((right&1)^flip);tuple[4]=right>>>1;tuple[5]=0;if(supported)tuple[62]=support>>>1;
         if(sampled) {
             for(int word=0;word<PagedBooleanCircuit.SAMPLE_WORDS;word++) {
                 tuple[6+word]=conjunctionSample(left^flip,false,word)&conjunctionSample(right^flip,false,word);

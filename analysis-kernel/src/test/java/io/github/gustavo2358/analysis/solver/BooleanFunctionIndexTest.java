@@ -8,6 +8,59 @@ import static org.junit.jupiter.api.Assertions.*;
 class BooleanFunctionIndexTest {
     private static AnalysisResources resources(){return new AnalysisResources(new AnalysisResources.Limits(16000000,100000,0,0,0,1000000000,0));}
     private static long[] samples(int truth){long[] values=new long[PagedBooleanCircuit.SAMPLE_WORDS];for(int word=0;word<values.length;word++)values[word]=truth;return values;}
+    @Test void certifiedSupportsAvoidAllPrefixScansWithoutSkippingUnknownEquivalentFunctions() {
+        var memory=resources();var meanings=new int[1024];
+        try(var pages=new ResidentPageStore(128,memory,AnalysisResources.Phase.CONTROL);
+            var index=new BooleanFunctionIndex(pages,memory,0,(a,b)->meanings[a]==meanings[b])) {
+            for(int id=2;id<258;id++) {
+                meanings[id]=id;index.prepare(id,samples(id),id,0);
+                assertEquals(-1,index.candidate(id,false));index.insertMixed(id);
+            }
+            assertEquals(0,index.equivalenceCalls(),"different certified essential supports disprove equality before SAT");
+            meanings[300]=91;index.prepare(300,samples(91));assertEquals(91,index.candidate(300,false));index.remove(300);
+            meanings[301]=1000;index.prepare(301,samples(1000));index.insertMixed(301);
+            meanings[302]=1000;index.prepare(302,samples(1000),567,0);
+            assertEquals(301,index.candidate(302,false),"known support still considers every unknown nominee");
+            index.certify(301,567,0);assertEquals(301,index.candidate(302,false));index.remove(302);
+            for(int id=2;id<258;id++)index.remove(id);index.remove(301);assertEquals(0,index.size());
+        }
+        assertEquals(0,memory.heapUsed());
+    }
+    @Test void independentTruthTablesCertifySupportForEveryKnownUnknownRegistrationOrder() {
+        var memory=resources();var meanings=new int[1024];var expected=new HashMap<Integer,Integer>();
+        try(var pages=new ResidentPageStore(128,memory,AnalysisResources.Phase.CONTROL);
+            var index=new BooleanFunctionIndex(pages,memory,0,(a,b)->meanings[a]==meanings[b])) {
+            for(int pass=0;pass<3;pass++)for(int truth=1;truth<255;truth++) {
+                int id=2+pass*254+truth-1;meanings[id]=truth;int support=0;
+                for(int key=0;key<3;key++)for(int bits=0;bits<8;bits++)
+                    if(((truth>>>bits)&1)!=((truth>>>(bits^(1<<key)))&1))support|=1<<key;
+                index.prepare(id,samples(truth),(pass+truth)%3==0?0:support,0);
+                int found=index.candidate(id,truth%5==0);
+                // Complete native keys are assumed checked first for native inputs;
+                // here all admitted originals are mixed so that path is also covered.
+                assertEquals(expected.getOrDefault(truth,-1).intValue(),found);
+                if(found<0){index.insertMixed(id);expected.put(truth,id);}else index.remove(id);
+            }
+            for(var id:expected.values())index.remove(id);assertEquals(0,index.size());
+        }
+        assertEquals(0,memory.heapUsed());
+    }
+
+    @Test void interruptedSupportCertificationAbortsAndReleasesBothNominationPartitions() {
+        for(int boundary:new int[]{1,2,4,16,64,256,1024}) {
+            var memory=resources();
+            try(var backend=new ResidentPageStore(128,memory,AnalysisResources.Phase.CONTROL)) {
+                var pages=new InterruptiblePages(backend);var index=new BooleanFunctionIndex(pages,memory,0,(a,b)->a==b);
+                for(int id=2;id<66;id++){index.prepare(id,samples(id));index.insertMixed(id);}
+                pages.remaining=boundary;
+                assertThrows(PageStore.Failure.class,()->{for(int id=2;id<66;id++)index.certify(id,id,0);});
+                assertThrows(IllegalStateException.class,()->index.candidate(2,false));pages.remaining=-1;index.close();
+                assertEquals(0,backend.statistics().livePages());long page=backend.allocate();backend.release(page);
+            }
+            assertEquals(0,memory.heapUsed());
+        }
+    }
+
     @Test void forcedNominationCollisionsNeverMergeIndependentUnequalFunctions() {
         var memory=resources();var meanings=new int[1024];var expected=new HashMap<Integer,Integer>();var random=new Random(362719);
         try(var pages=new ResidentPageStore(128,memory,AnalysisResources.Phase.CONTROL);

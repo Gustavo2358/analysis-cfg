@@ -937,3 +937,77 @@ references held by the closed owner. Read-abort tests close through try-with-res
 and verify zero pages and resource reservations; this is not a physical heap-size
 measurement. Literal/native-class components remain independent, with no manager
 adoption or resolution of the two integrated growth REDs in this checkpoint.
+
+### Functional shared conditions — integrated, qualification remains incomplete
+
+BooleanConditions now keeps function IDs over shared binary AND/OR and NOT rows,
+with native signed literal junctions. General Apply does not enumerate Shannon
+residuals. An immutable borrowed view translates OR and native disjunctions to exact
+AND/complement definitions only for the queried cone. Nomination uses actual stored
+valuations; exact SAT miters establish every functional merge, including constants.
+Independent DNF/CNF/complement constructions of all256 three-input functions have
+one ID each. The previous manager failed this identity law (truth1, IDs9/262).
+This identifies a canonicality defect, not a measured lost public dependency.
+
+The existing catalog still owns IDs, scopes, marks and retirement. A class proved
+equivalent to a native descriptor can replace its representative: remove the old
+structural key before publishing the new one, preserve the function ID and marks,
+and release obsolete child dependencies through collection. No new class references
+enter an older representative. Native/support tokens are separately owned and
+released exactly once. Cofactors use paged postorder memo and the fixed computed
+table keyed by function/variable/binding; absent bindings retain caller-owned memo.
+Empty-root evaluation uses an actual valuation bit, not simulation equivalence.
+
+The63-field literal schema adds a canonical unsigned-key reference to the sampled
+schema. Signed trees share their unsigned skeleton; one branch creates at most one
+additional all-positive branch. Legacy6 and sampled62 schemas retain their laws.
+Proper native junctions certify exact essential support; NOT preserves it. AND/OR
+of nonconstant functions on disjoint exact supports certifies the union. Opposing
+full junctions on at least two keys describe all-equal/not-all-equal, with every key
+essential. Other functions remain uncertified. Known support partitions skip only
+provably different supports; unknown candidates compare against all nominated
+known/unknown classes. Native/mixed group tags and support/unknown partitions share
+three exact paged indices with four intrusive links per class. No all-prefix scan
+is needed for certified disjoint prefixes; general equivalence remains SAT-hard.
+
+Fault testing found a shared radix ownership defect: releasing a leaf before
+unlinking its parent left a released generation reachable after an interrupted
+write. Retirement now detaches/transfers the root before releasing and retains a
+provisional page through interruption. A second defect used opaque page handles as
+ownership-column addresses. Index ownership now uses local dense ordinals, packed
+with the leaf flag in the existing header word, with opaque handles only as values.
+A bijective renaming to widely scattered positive handles reproduces the old quota
+failure and passes after the change, preserving96-byte minimum index pages. These
+are internal temporary records; no AIR/CFG/dependencies wire format changes.
+
+The original40KiB index and1MiB128-literal read-probe budgets pass. The read probe
+now declares its current root during construction and releases unowned prefix
+history; its cardinality, fault paths and quotas are unchanged. One-page indexed
+capacity at16/64/256 remains constant. Shared retirement, binding, certification,
+representative replacement and read interruptions close with zero owned pages.
+ROOT16N backward remains required and failing. Eager collection was only a diagnostic,
+terminated before completion, and is not adopted. Current root registration/history,
+repeated query-cone encoding, resident absent-binding memo, admitted Scalar relation
+and the rest of the managed pipeline remain debts; this is not global qualification.
+
+
+The mixed manager also preserves optional positive caller-witness nomination.
+An iterative paged traversal visits each `(condition ID, polarity)` at most once
+per uncached query; a fixed owner-local memo includes the operation and full root.
+Occurrence is only a hint: caller words are tested individually and failed hints
+retain exact feasibility. Independent OR/complement cases reproduce the previous
+missing-hint regression. Dispatcher timing passed two executions after correction;
+the unchanged ROOT 16N envelope remains an integration gap. No qualification is
+implied for AIR decoding, all domain joins, delivery or global memory bounds.
+
+
+Circuit decisions can now share a required paged formula within an explicit
+operation scope. Node encodings and entailed learned clauses persist across
+queries within that scope; assumptions do not. Ending a scope releases the engine,
+node memo, frontier and primary index before the manager reuses any row ID.
+The manager uses this only during its append-only scratch lifetime; literal-arena
+handles are never reused. Proved native replacement preserves Boolean meaning.
+A prefix law isolates repeated cone encoding: fresh queries read1313280 definitions
+at512 prefixes, whereas scoped encoding satisfies the unchanged32N read bound.
+This bounds repeated definition traversal for that law, not arbitrary SAT search,
+number of contextual configurations or the entire dependencies application.
