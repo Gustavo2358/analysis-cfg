@@ -181,6 +181,23 @@ working set beyond that resident quota. The same primitive execution transcript
 and independent ordered-map oracle run on it and the forced-eviction file backend.
 Neither backend can revive an obsolete page generation.
 
+`CanonicalTupleArena` stores immutable fixed-shape primitive keys and their declared
+references in paged rows. Its ordered unique table compares every field, including
+reference identities. Separate arenas bind different schemas/profiles. Root tokens
+belong to individual callers and are never reused; releasing one token does not
+release another caller's retention. An explicit iterative trace visits all current
+roots and referenced records before a paged retirement sweep. The sweep enumerates
+current records instead of issued history, and releases empty row/index pages.
+The fixed staging key never retains a caller buffer. Constructor/collection failures
+release reservations or abort access; the shared store remains the final cleanup
+owner. No individual record/root adds a heap object.
+
+These immutable references form a DAG (children exist before parents). This arena
+does not collect mutable summary cycles, infer domain subsumption, or authorize
+retirement of scalar versions whose laws remain unproved. Active observations,
+pending work and bindings must explicitly retain their storage roots. A handle's
+identity includes the owning arena; numeric handles are not global model IDs.
+
 These primitives are not yet wired into production analysis. Passing their tests
 does not establish bounded residency for AIR decoding, summaries, proofs, queues,
 unique indexes or serialization. Those integration obligations remain open.

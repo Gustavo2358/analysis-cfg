@@ -305,6 +305,14 @@
       "memoryAndForcedFileBackendsProduceTheSamePrimitiveExecutionTranscript",
       "metadataGrowthReservesTheOldPlusNewPeakBeforeAllocatingAndKeepsOldPagesExact",
       "staleGenerationsNeverReviveAndReusedPayloadIsZeroWithFixedCapacity"
+    ],
+    "io.github.gustavo2358.analysis.adapters.CanonicalTupleArenaTest": [
+      "completePrimitiveKeysCanonicalizeWithoutRetainingCallerBuffers",
+      "rootsPreserveSharedChildrenUntilTheLastCallerReleasesThem",
+      "deepProofDagCollectsIterativelyUnderForcedSpillAndFixedResidency",
+      "randomSharedDagAndRootChurnMatchIndependentGraphTracing",
+      "collectionQuotaFailureAbortsTheArenaInsteadOfExposingPartiallyRetiredFacts",
+      "rejectedSchemaAndConstructorQuotaReleaseAllPartiallyBuiltOwners"
     ]
   },
   "analysis-dataflow": {
