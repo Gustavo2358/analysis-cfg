@@ -53,7 +53,12 @@ final class PagedAirStorageTest {
                     assertEquals(expected.substring(offset, offset + count), new String(block, 0, count));
                 }
                 long units = snapshot.field(root, AirShape.PUBLICATION, 4);
-                long unit = snapshot.element(units, AirShape.UNIT, 0);
+                long unit;
+                long scratch = resources.used(AnalysisResources.Pool.SCRATCH);
+                try (var cursor = snapshot.elements(units, AirShape.UNIT)) {
+                    assertTrue(cursor.advance()); unit = cursor.value(); assertFalse(cursor.advance()); assertFalse(cursor.advance());
+                }
+                assertEquals(scratch, resources.used(AnalysisResources.Pool.SCRATCH));
                 long id = snapshot.field(unit, AirShape.UNIT, 0);
                 long idText = snapshot.field(id, AirShape.IDS_UNIT_ID, 1);
                 assertEquals(1, snapshot.readCharacters(idText, 0, block, 0, block.length)); assertEquals('u', block[0]);

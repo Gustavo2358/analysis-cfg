@@ -150,7 +150,7 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "fd1ab664e19e7a5b0140f87503eebc6302f634c1",
+    "commit": "3bb2d55e7912ff34ee5185a2be51ab71a1a20b56",
     "canonical_ref": "feat/paged-air-snapshot",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
@@ -229,7 +229,7 @@
     "evidence_level": "Additive typed AIR access/builder checkpoint: producer FAST 197 model + 143 transport checks and boundaries PASS; index mutation rejected and exact original restored. Page-backed bridge, complete paged Validator and codec pending; human review pending.",
     "status": "LOCAL_CHECKPOINT / HUMAN_REVIEW_PENDING",
     "ci": {
-      "checked_commit": "fd1ab664e19e7a5b0140f87503eebc6302f634c1",
+      "checked_commit": "3bb2d55e7912ff34ee5185a2be51ab71a1a20b56",
       "status": "NOT_RUN",
       "context": "local producer FAST only; draft PR 30"
     },
@@ -240,7 +240,7 @@
       "api_impact": "COMPATIBLE",
       "old_production_files_unchanged": 51,
       "all_three_poms_unchanged": true,
-      "validation": "197 model + 143 transport checks; producer FAST 24.945s; explicit storage freeze prevents post-transfer writes",
+      "validation": "197 model + 143 transport checks; producer FAST 25.008s; leased linear collection cursors; denied scratch leaves facts intact",
       "limits": "Typed builder/storage access only; no complete paged validation/JSON/CLI claim."
     }
   },

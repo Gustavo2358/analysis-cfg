@@ -1,7 +1,7 @@
 # Typed AIR access checkpoint pin
 
 WORK-AIR-SCALE is implementing the complete managed analysis architecture. The
-current producer pin is `fd1ab664e19e7a5b0140f87503eebc6302f634c1`, on
+current producer pin is `3bb2d55e7912ff34ee5185a2be51ab71a1a20b56`, on
 [AIR PR 30](https://github.com/Gustavo2358/air-java/pull/30), pending human review.
 No upstream merge or remote CI success is inferred. The lock and CI checkout use
 the same immutable SHA; library coordinates, Java release and normative AIR pin
@@ -15,7 +15,7 @@ Validator and codec signatures/semantics are unchanged. The unmerged builder
 prototype was corrected in place to require explicit write-port sealing.
 
 Producer FAST passed 197 model and 143 transport checks plus module/boundary checks
-in 24.945 seconds. The array-position mutation was rejected and the original bytes
+in 25.008 seconds. The array-position mutation was rejected and the original bytes
 restored. The freeze RED demonstrated that ownership transfer had not yet rejected
 retained write-port use; the port is now sealed before transfer. Those are producer
 checks, separate from the consumer's bridge/backend and full FAST results.

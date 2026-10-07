@@ -50,6 +50,11 @@ public final class PagedAirStorage implements AirSnapshotBuilder.Storage {
         var capacity = resources.reserve(AnalysisResources.Pool.RESIDENT, bytes, phase);
         return capacity::close;
     }
+    @Override public synchronized AirSnapshotBuilder.Lease readLease(long bytes) {
+        open();
+        var capacity = resources.reserve(AnalysisResources.Pool.SCRATCH, bytes, phase);
+        return capacity::close;
+    }
     @Override public synchronized void freeze() { open(); frozen = true; }
     private void open() { if (closed || failed) throw new IllegalStateException("AIR paged storage is closed or aborted"); }
     private void writable() { open(); if (frozen) throw new IllegalStateException("AIR paged storage is frozen"); }
