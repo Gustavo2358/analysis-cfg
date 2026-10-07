@@ -124,3 +124,26 @@ the investigated `fb61e25d674dce236f9951c87fc498a58b18d82c`; consumed AIR source
 Implementation remains incomplete until the managed CLI, semantic oracles, structural
 counters, forced-spill cases and required repository gates all pass. Checkpoints record
 partial progress and preserve failed evidence.
+
+## Managed page foundations
+
+`AnalysisResources` reserves coarse capacities before allocation and distinguishes
+resident/scratch heap, direct buffers, temporary disk, descriptors, work and output.
+`PageStore` is an exact core port. The adapter `FilePageStore` uses positional
+FileChannel I/O, a fixed primitive cache directory, and checksums for payloads,
+identities and the disk free list. Cache deletion closes probe clusters instead of
+accumulating tombstones. A released physical slot is reusable; its new handle has
+a new generation, so an old root cannot silently become another fact. The format
+allows 2^32-1 physical slots and 2^31 generations per slot; exhausted generations
+are retired rather than wrapped. Offset overflow is rejected before allocation.
+There is no crash recovery or cross-session reopening of this temporary format.
+
+`PagedLongArray` provides sparse 64-bit primitive indexing through a page-backed
+radix directory. Its resident control state is fixed; directory height follows
+the highest written index, bounded by 63 levels. Zero/unwritten ranges allocate
+no pages. Teardown has a fixed stack and releases only the array's own pages.
+The shared store must still close after an operational failure interrupts cleanup.
+
+These primitives are not yet wired into production analysis. Passing their tests
+does not establish bounded residency for AIR decoding, summaries, proofs, queues,
+unique indexes or serialization. Those integration obligations remain open.

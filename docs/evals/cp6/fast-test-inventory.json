@@ -261,6 +261,26 @@
     "io.github.gustavo2358.analysis.adapters.ZstdDataflowTest": [
       "airDigestRemainsLogicalAndCorruptionCannotPassAdmission",
       "compressedDeliveryHashesPhysicalBytesAndPreservesExistingOnFailure"
+    ],
+    "io.github.gustavo2358.analysis.adapters.FilePageStoreTest": [
+      "manyPagesExceedResidentCacheAndRemainExactAfterDirtyEviction",
+      "newPagesAreZeroAndPartialWritesPreserveOtherBytes",
+      "releasedHandlesNeverAliasNewPagesAndRejectZeroLengthReads",
+      "corruptColdPayloadIsRejectedBeforeItCanBecomeAValidFact",
+      "quotasFailBeforeCacheAllocationAndCloseCleansTheTemporaryFile",
+      "invalidRangesDoNotChangePageContentsOrEmitIo",
+      "closedStoreDetachesCacheAndDirectoryEvenWhenTheAdapterRemainsReferenced",
+      "churnRetainsEmptyBucketsAndExactLookupAcrossWrappedProbeClusters",
+      "physicalReuseBoundsDiskByPeakLivePagesWithoutRevivingOldHandles",
+      "corruptFreeListCannotOverwriteLiveFactsOrBecomeAnAllocation"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedLongArrayTest": [
+      "spilledDirectoriesAndValuesMatchAnIndependentRandomAccessOracle",
+      "sparseIndexesBeyondIntegerRangeAndAllSignedValuesRemainExact",
+      "emptyAndUnwrittenZerosAllocateNoPages",
+      "arraysShareBackendButNeverShareRootsOrReleaseAnotherArraysPages",
+      "invalidIndexesAndInvalidConstructionCannotAllocatePages",
+      "clearingExistingCellPreservesNeighborsAcrossDirectoryGrowth"
     ]
   },
   "analysis-dataflow": {
