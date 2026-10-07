@@ -6,8 +6,10 @@ import java.util.Arrays;
 final class SupportSet {
     static final SupportSet EMPTY=new SupportSet(-1,null);
     private final int singleton;
+    private final long fingerprint;
     private final int[] many;
-    private SupportSet(int singleton,int[] many){this.singleton=singleton;this.many=many;}
+    private SupportSet(int singleton,int[] many){this.singleton=singleton;this.many=many;fingerprint=31L*singleton+Arrays.hashCode(many);}
+    long fingerprint(){return fingerprint;}
     static SupportSet singleton(int producer,ValuesWork work) {
         if(producer<0)throw new IllegalArgumentException("negative producer ordinal");
         work.support(1);return new SupportSet(producer,null);

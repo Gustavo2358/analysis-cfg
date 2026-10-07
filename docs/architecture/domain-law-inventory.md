@@ -53,6 +53,42 @@ fixed destination width.
 
 ## Qualification still required
 
+### Congruent lookup fingerprints
+
+`AnalysisDefinition.stateFingerprint` is a solve-scoped immutable-root key law:
+`equivalent(a,b)` implies equal fingerprints. The converse is deliberately false;
+`StateIndex` checks equivalence on collisions and uses primitive open addressing.
+The constant compatibility default preserves opaque user domains without assuming
+their Java equals/hashCode. Expected constant-time lookup requires a registered
+well-distributed key; adversarial collisions can still make lookup linear. A key
+is not an order, codec, distributivity proof or permission to retire an old input.
+
+Scalar keys include reachedness, bindings, candidates, openness and support ordinals.
+AVL subtree fingerprints combine commutatively so equal maps built in different
+orders have equal keys. Support/candidate hashes are cached; path copies update
+the cached subtree contribution. RD keys include Entry, segment event sets and
+logical sets. Regional keys include Entry, canonical relation nodes, logical values
+and closed objects, matching the existing engine equivalence. Keys containing
+canonical node identities are scoped to that engine and are never wire authority.
+
+Backward continuation maps treat missing nodes as bottom. Each explicit pair adds
+`mix(nodeHash ^ stateKey) - mix(nodeHash ^ bottomKey)`; an explicit bottom therefore
+adds zero, map iteration order is irrelevant, and hash collisions still consult
+the full existing signature equivalence. Depth and ordered ancestor positions are
+included. Fingerprinting does not remove the current continuation-map copies.
+
+The former linear lookup fails the4,096-input witness with16,777,216 comparisons.
+Index tests cover aliases with different Java equality, forced hash collisions,
+constant keys, capacity rejection and lease cleanup. Scalar map-shape/support laws,
+SegmentMap shape/collision laws and repeated Regional solves within the same engine
+pass.160generated indexed/colliding forward/backward solves match the independent
+exact-stack oracle. The full177-method kernel passes. Root/history retirement and
+lawful multi-read scalar transfers remain separate uncompleted obligations.
+
+FAST856required methods and all compiled/source/transport boundaries pass in142.956s.
+The first FAST selected all856methods successfully but rejected a stale W1D descriptor;
+the refresh/recheck was sequential after preserving the earlier harness read/clean race.
+
 The control relation's soundness/completeness proof, per-operation distributivity
 classification, regional/source laws, canonical codec tests, live-binding
 retirement and all new semantic counterexamples remain open. The page/index

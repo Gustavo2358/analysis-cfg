@@ -33,6 +33,7 @@ public final class PossibleValuesAnalysis implements AnalysisDefinition<Possible
                 refusal.getMessage().contains("STORAGE")?1:0,refusal.getMessage().contains("EFFECT")?1:0);
         }
     }
+    @Override public long stateFingerprint(PossibleValuesState state){return state.fingerprint();}
     @Override public Direction direction(){return Direction.FORWARD;}
     @Override public PossibleValuesState bottom(){return PossibleValuesState.unreachable();}
     @Override public Iterable<Boundary<PossibleValuesState>> boundaries(AnalysisSession session) {

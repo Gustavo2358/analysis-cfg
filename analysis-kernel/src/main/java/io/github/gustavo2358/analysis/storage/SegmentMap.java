@@ -8,12 +8,16 @@ public final class SegmentMap<V> {
     private final Node<V> root;
     public SegmentMap(){this(null);}
     private SegmentMap(Node<V> root){this.root=root;}
-    private record Node<V>(int key,V value,Node<V> left,Node<V> right,int height,int size) { }
+    private record Node<V>(int key,V value,Node<V> left,Node<V> right,int height,int size,long fingerprint) { }
     private static int height(Node<?> n){return n==null?0:n.height;}
     private static int size(Node<?> n){return n==null?0:n.size;}
     private static <V> Node<V> node(int key,V value,Node<V> left,Node<V> right) {
-        return new Node<>(key,value,left,right,Math.incrementExact(Math.max(height(left),height(right))),Math.incrementExact(Math.addExact(size(left),size(right))));
+        return new Node<>(key,value,left,right,Math.incrementExact(Math.max(height(left),height(right))),Math.incrementExact(Math.addExact(size(left),size(right))),fingerprint(left)+fingerprint(right)+mix(((long)key<<32)^(value.hashCode()&0xffffffffL)));
     }
+    private static long mix(long value){value=(value^(value>>>30))*0xbf58476d1ce4e5b9L;value=(value^(value>>>27))*0x94d049bb133111ebL;return value^(value>>>31);}
+    private static long fingerprint(Node<?> n){return n==null?0:n.fingerprint;}
+    /** Shape-independent cached hash; values obey the Java equals/hashCode contract. */
+    public long fingerprint(){return fingerprint(root);}
     public int size(){return size(root);}
     public V get(int key){var n=root;while(n!=null){if(n.key==key)return n.value;n=key<n.key?n.left:n.right;}return null;}
     public SegmentMap<V> put(int key,V value) { var next=put(root,key,Objects.requireNonNull(value));return next==root?this:new SegmentMap<>(next); }

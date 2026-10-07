@@ -9,6 +9,8 @@ final class ActivationSolver<S> {
     private final AnalysisSession session;
     private final AnalysisDefinition<S> definition;
     private final DomainWork work=new DomainWork();
+    // Resident compatibility route; the index accepts managed resources at its port.
+    private final AnalysisResources indexResources=new AnalysisResources(new AnalysisResources.Limits(Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE));
     private final List<EntryRun> entries=new ArrayList<>();
     private final ArrayDeque<Slot> pending=new ArrayDeque<>();
     private final S bottom;
@@ -23,9 +25,9 @@ final class ActivationSolver<S> {
         this.session=session;this.definition=definition;bottom=Objects.requireNonNull(definition.bottom());
     }
     DataflowResult<S> solve() {
-        execute();
-        return result();
+        try {execute();return result();}finally{closeIndexes();}
     }
+    private void closeIndexes(){for(var entry:entries){for(var index:entry.byFrame.values())index.close();entry.byFrame.clear();}}
     private void execute() {
         var models=structural?List.<ActivationModel>of():structure(session);
         for(var context:session.contexts())entries.add(new EntryRun(context,models.stream().filter(m->m.context()==context).findFirst().orElse(null)));
@@ -98,11 +100,13 @@ final class ActivationSolver<S> {
             public Boolean bottom(){return false;}
             public Iterable<Boundary<Boolean>> boundaries(AnalysisSession ignored){return session.contexts().stream().map(c->new Boundary<>(c,c.entryNode(),true)).toList();}
             public Join<Boolean> joinInto(Boolean a,Boolean b,DomainWork work){return new Join<>(a||b,!a&&b);}
+            public long stateFingerprint(Boolean state){return state?1:0;}
             public boolean equivalent(Boolean a,Boolean b,DomainWork work){return a.equals(b);}
             public Boolean transferBlock(AnalysisPoint point,Boolean state,DomainWork work){return state;}
             public Boolean transferEdge(AnalysisPoint point,CfgTransition edge,Boolean state,DomainWork work){return state;}
         };
-        var engine=new ActivationSolver<Boolean>(session,reach);engine.structural=true;engine.execute();engine.checkRecursion();var models=new ArrayList<ActivationModel>();
+        var engine=new ActivationSolver<Boolean>(session,reach);engine.structural=true;
+        try {engine.execute();engine.checkRecursion();var models=new ArrayList<ActivationModel>();
         for(var entry:engine.entries) {
             var shapes=new IdentityHashMap<ActivationControl.Frame,ActivationModel.Shape>();
             var parents=new IdentityHashMap<ActivationControl.Frame,Map<ActivationControl.Frame,Integer>>();
@@ -126,6 +130,7 @@ final class ActivationSolver<S> {
             models.add(new ActivationModel(entry.context,entry.control,entry.bdd,shapes,parents,List.copyOf(roots),List.copyOf(unwind),depth));
         }
         return models;
+        }finally{engine.closeIndexes();}
     }
     /** Reduce impossible tested guards using a shared persistent SCC support relation. */
     private static void refineShapes(BooleanConditions b,Map<ActivationControl.Frame,ActivationModel.Shape> shapes,
@@ -254,7 +259,7 @@ final class ActivationSolver<S> {
         final ActivationControl control;
         final BooleanConditions bdd;
         final List<Region> regions=new ArrayList<>();
-        final IdentityHashMap<ActivationControl.Frame,List<Region>> byFrame=new IdentityHashMap<>();
+        final IdentityHashMap<ActivationControl.Frame,StateIndex<S,Region>> byFrame=new IdentityHashMap<>();
         final Map<ActivationControl.Frame,Map<ProgramIndex.Node,S>> boundaries=new IdentityHashMap<>();
         Region root;
         EntryRun(ContextView context,ActivationModel model){
@@ -265,10 +270,11 @@ final class ActivationSolver<S> {
             root=new Region(this,null,bottom);regions.add(root);root.accept(1);
         }
         Region region(ActivationControl.Frame frame,S input,Slot caller,int condition) {
-            var candidates=byFrame.computeIfAbsent(frame,f->new ArrayList<>());
-            for(var r:candidates)if(definition.equivalent(r.input,input,work))return r;
+            var candidates=byFrame.get(frame);
+            if(candidates!=null){var known=candidates.get(input);if(known!=null)return known;}
             if(!structural&&!feasible(caller.region,condition,caller))return null;
-            var result=new Region(this,frame,input);candidates.add(result);regions.add(result);return result;
+            if(candidates==null){candidates=new StateIndex<>(indexResources,structural?AnalysisResources.Phase.CONTROL:AnalysisResources.Phase.DOMAIN,definition::stateFingerprint,(a,b)->definition.equivalent(a,b,work));byFrame.put(frame,candidates);}
+            var result=new Region(this,frame,input);candidates.putIfAbsent(input,result);regions.add(result);return result;
         }
     }
     private final class Region {

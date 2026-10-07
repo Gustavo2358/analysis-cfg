@@ -639,6 +639,15 @@
     "io.github.gustavo2358.analysis.solver.PersistentCallerSupportTest": [
       "condensedPersistentSupportsMatchIndependentCallerWalks",
       "chainSupportsShareSearchPathsInsteadOfCopyingAllAncestors"
+    ],
+    "io.github.gustavo2358.analysis.solver.StateIndexTest": [
+      "distinctInputsDoNotRequirePairwiseSemanticComparisons",
+      "fingerprintCollisionsAndDifferentObjectEqualityNeverMergeSemanticInputs",
+      "unregisteredConstantFingerprintRemainsSemanticallyExact",
+      "rejectedCapacityGrowthPreservesExistingInputsAndClosesEveryLease"
+    ],
+    "io.github.gustavo2358.analysis.structure.StateIndexSolverTest": [
+      "registeredAndCollidingFingerprintsPreserveGeneratedExactStacksInBothDirections"
     ]
   },
   "analysis-launcher": {
@@ -988,6 +997,11 @@
       "sourceEqualityReadsEachCandidateOnceInsteadOfComparingEveryPair",
       "indexedTruthImageMatchesIndependentUnicodePaddingOracle",
       "spacePaddedEquivalenceClassesPreserveDuplicatesEmptyUnicodeAndNonSpaceDifferences"
+    ],
+    "io.github.gustavo2358.analysis.values.StateFingerprintTest": [
+      "scalarKeysAreCongruentAcrossMapShapesAndIncludeSupportsAndUnknownness",
+      "regionalFingerprintsAgreeWithRealEngineEquivalenceInRepeatedExecution",
+      "segmentKeysIgnoreAvlShapeAndAgreeWithValueEquality"
     ]
   },
   "cfg-adapters": {

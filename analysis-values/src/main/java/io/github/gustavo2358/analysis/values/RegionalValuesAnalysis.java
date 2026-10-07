@@ -208,7 +208,8 @@ public final class RegionalValuesAnalysis {
         private final Map<ObjectId,Set<LogicalValue>> logical;
         private final Set<ObjectId> closed;
         private final int[] groupSizes;
-        private State(EntryId entry,SegmentMap<RegionalAlternatives.Node<Content>> bindings,Map<ObjectId,Set<LogicalValue>> logical,Set<ObjectId> closed,int[] groupSizes){this.entry=entry;this.bindings=bindings;this.logical=Map.copyOf(logical);this.closed=Set.copyOf(closed);this.groupSizes=groupSizes;}
+        private final long fingerprint;
+        private State(EntryId entry,SegmentMap<RegionalAlternatives.Node<Content>> bindings,Map<ObjectId,Set<LogicalValue>> logical,Set<ObjectId> closed,int[] groupSizes){this.entry=entry;this.bindings=bindings;this.logical=Map.copyOf(logical);this.closed=Set.copyOf(closed);this.groupSizes=groupSizes;fingerprint=Objects.hashCode(entry)+Long.rotateLeft(bindings.fingerprint(),13)+Long.rotateLeft(this.logical.hashCode(),29)+Long.rotateLeft(this.closed.hashCode(),47);}
         private RegionalAlternatives.Size size(){var roots=new ArrayList<RegionalAlternatives.Node<Content>>();bindings.forEach((g,node)->roots.add(node));return RegionalAlternatives.size(roots);}
         /** Encoded structural edges (one compact edge may carry multiple events), not worlds. */
         public long materializedAlternatives(){return size().alternatives();}
@@ -305,6 +306,7 @@ public final class RegionalValuesAnalysis {
             var closed=new HashSet<>(a.closed);closed.retainAll(b.closed);
             return acc.root==a.bindings&&logical.equals(a.logical)&&closed.equals(a.closed)?new Join<>(a,false):new Join<>(track(new State(a.entry,acc.root,logical,closed,groupSizes)),true);
         }
+        @Override public long stateFingerprint(State state){return state.fingerprint;}
         @Override public boolean equivalent(State a,State b,DomainWork work) {
             if(a==b)return true;if(!Objects.equals(a.entry,b.entry)||a.bindings.size()!=b.bindings.size()||!a.logical.equals(b.logical)||!a.closed.equals(b.closed))return false;
             var same=new boolean[]{true};a.bindings.forEach((key,v)->{work.stateCompareEntry();if(!v.equals(b.bindings.get(key)))same[0]=false;});return same[0];

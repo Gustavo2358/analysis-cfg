@@ -46,6 +46,7 @@ public final class ReachabilityProvider implements AnalysisProvider<LabelId,Reac
                     public Integer bottom(){return 0;}
                     public Iterable<Boundary<Integer>> boundaries(AnalysisSession ignored){return List.of(new Boundary<>(selectedContext,selectedContext.entryNode(),1));}
                     public Join<Integer> joinInto(Integer a,Integer b,DomainWork work){int union=a|b;return new Join<>(union,union!=a);}
+                    public long stateFingerprint(Integer state){return state.longValue();}
                     public boolean equivalent(Integer a,Integer b,DomainWork work){return a.equals(b);}
                     public Integer transferBlock(AnalysisPoint point,Integer state,DomainWork work){return state;}
                     public Integer transferEdge(AnalysisPoint point,io.github.gustavo2358.analysis.cfg.domain.CfgTransition edge,Integer state,DomainWork work) {

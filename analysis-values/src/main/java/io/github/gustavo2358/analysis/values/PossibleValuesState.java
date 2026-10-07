@@ -11,6 +11,7 @@ public final class PossibleValuesState {
     private PossibleValuesState(boolean reached,PersistentBindings.Node root) { this.reached=reached;this.root=root; }
     static PossibleValuesState unreachable() { return BOTTOM; }
     static PossibleValuesState reached() { return UNKNOWN; }
+    long fingerprint(){return PersistentBindings.fingerprint(root)+(reached?0x9e3779b97f4a7c15L:0);}
     public boolean isReached() { return reached; }
     public int explicitBindings() { return PersistentBindings.size(root); }
     Candidates value(int cell,ValuesWork w) {

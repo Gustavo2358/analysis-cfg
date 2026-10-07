@@ -9,6 +9,7 @@ final class BackwardActivationSolver<S> {
     private final AnalysisSession session;
     private final AnalysisDefinition<S> definition;
     private final DomainWork work=new DomainWork();
+    private final AnalysisResources indexResources=new AnalysisResources(new AnalysisResources.Limits(Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE));
     private final S bottom;
     private final List<EntryRun> entries=new ArrayList<>();
     private final ArrayDeque<Slot> pending=new ArrayDeque<>();
@@ -20,6 +21,9 @@ final class BackwardActivationSolver<S> {
     private final Map<Need,Deferred> deferredCache=new LinkedHashMap<>();
     BackwardActivationSolver(AnalysisSession session,AnalysisDefinition<S> definition){this.session=session;this.definition=definition;bottom=Objects.requireNonNull(definition.bottom());}
     DataflowResult<S> solve() {
+        try {return execute();}finally{for(var entry:entries){for(var index:entry.byFrame.values())index.close();entry.byFrame.clear();}}
+    }
+    private DataflowResult<S> execute() {
         for(var model:ActivationSolver.structure(session))entries.add(new EntryRun(model));
         for(var boundary:definition.boundaries(session)) {
             var entry=entries.stream().filter(e->e.model.context()==boundary.context()).findFirst().orElseThrow(()->new IllegalArgumentException("foreign boundary"));
@@ -61,15 +65,27 @@ final class BackwardActivationSolver<S> {
     }
     private final class Signature {
         final int depth;
+        final long fingerprint;
         final Map<ProgramIndex.Node,S> returns,roots;
         final List<Map<ProgramIndex.Node,S>> ancestors;
         Signature(int depth,Map<ProgramIndex.Node,S> returns,Map<ProgramIndex.Node,S> roots,List<Map<ProgramIndex.Node,S>> ancestors) {
             this.depth=depth;this.returns=Map.copyOf(returns);this.roots=Map.copyOf(roots);this.ancestors=List.copyOf(ancestors);
+            long hash=31L*(31L*depth+mapFingerprint(this.returns))+mapFingerprint(this.roots);
+            for(var ancestor:this.ancestors)hash=31*hash+mapFingerprint(ancestor);
+            fingerprint=31*hash+this.ancestors.size();
         }
         boolean same(Signature other) {
             if(depth!=other.depth||!sameMap(returns,other.returns)||!sameMap(roots,other.roots)||ancestors.size()!=other.ancestors.size())return false;
             for(int i=0;i<ancestors.size();i++)if(!sameMap(ancestors.get(i),other.ancestors.get(i)))return false;return true;
         }
+    }
+    private long mapFingerprint(Map<ProgramIndex.Node,S> states) {
+        long result=0,empty=definition.stateFingerprint(bottom);
+        for(var entry:states.entrySet()) {
+            long node=System.identityHashCode(entry.getKey());
+            result+=StateIndex.mix(node^definition.stateFingerprint(entry.getValue()))-StateIndex.mix(node^empty);
+        }
+        return result;
     }
     private boolean sameMap(Map<ProgramIndex.Node,S> a,Map<ProgramIndex.Node,S> b) {
         var keys=new HashSet<>(a.keySet());keys.addAll(b.keySet());
@@ -78,7 +94,7 @@ final class BackwardActivationSolver<S> {
     private final class EntryRun {
         final ActivationModel model;final BooleanConditions bdd;
         final List<Region> regions=new ArrayList<>();
-        final IdentityHashMap<ActivationControl.Frame,List<Region>> byFrame=new IdentityHashMap<>();
+        final IdentityHashMap<ActivationControl.Frame,StateIndex<Signature,Region>> byFrame=new IdentityHashMap<>();
         final Map<ActivationControl.Frame,Map<ProgramIndex.Node,S>> boundaries=new IdentityHashMap<>();
         final Set<Slot> calls=Collections.newSetFromMap(new IdentityHashMap<>());
         Region root;
@@ -87,10 +103,11 @@ final class BackwardActivationSolver<S> {
             root=new Region(this,null,new Signature(0,Map.of(),Map.of(),Collections.nCopies(model.maxUnwind(),Map.of())));regions.add(root);root.initialize();
         }
         Region region(ActivationControl.Frame frame,Signature input,Slot caller,int condition) {
-            var candidates=byFrame.computeIfAbsent(frame,k->new ArrayList<>());
-            for(var r:candidates)if(r.input.same(input))return r;
+            var candidates=byFrame.get(frame);
+            if(candidates!=null){var known=candidates.get(input);if(known!=null)return known;}
             if(!feasible(caller.region,condition,caller))return null;
-            var r=new Region(this,frame,input);candidates.add(r);regions.add(r);r.initialize();return r;
+            if(candidates==null){candidates=new StateIndex<>(indexResources,AnalysisResources.Phase.DOMAIN,a->a.fingerprint,Signature::same);byFrame.put(frame,candidates);}
+            var r=new Region(this,frame,input);candidates.putIfAbsent(input,r);regions.add(r);r.initialize();return r;
         }
         Map<ProgramIndex.Node,S> roots() {
             var values=new IdentityHashMap<ProgramIndex.Node,S>();

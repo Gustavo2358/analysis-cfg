@@ -23,7 +23,8 @@
     "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/PersistentLongMap.java",
     "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/ResidentPageStore.java",
     "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/SolverMetrics.java",
-    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/SolverTopology.java"
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/SolverTopology.java",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/StateIndex.java"
   ],
   "classfiles": [
     "io/github/gustavo2358/analysis/solver/ActivationBoundaries$Key.class",
@@ -97,7 +98,8 @@
     "io/github/gustavo2358/analysis/solver/PersistentLongMap.class",
     "io/github/gustavo2358/analysis/solver/ResidentPageStore.class",
     "io/github/gustavo2358/analysis/solver/SolverMetrics.class",
-    "io/github/gustavo2358/analysis/solver/SolverTopology.class"
+    "io/github/gustavo2358/analysis/solver/SolverTopology.class",
+    "io/github/gustavo2358/analysis/solver/StateIndex.class"
   ],
   "jdeps_edges": {
     "io.github.gustavo2358.analysis.solver.ActivationBoundaries": [
@@ -267,6 +269,7 @@
       "io.github.gustavo2358.analysis.solver.PersistentGraphClosure",
       "io.github.gustavo2358.analysis.solver.ResidentPageStore",
       "io.github.gustavo2358.analysis.solver.SolverMetrics",
+      "io.github.gustavo2358.analysis.solver.StateIndex",
       "io.github.gustavo2358.analysis.structure.ActivationControl",
       "io.github.gustavo2358.analysis.structure.ActivationControl$Action",
       "io.github.gustavo2358.analysis.structure.ActivationControl$Frame",
@@ -372,8 +375,11 @@
       "io.github.gustavo2358.analysis.solver.ActivationSolver$Region",
       "io.github.gustavo2358.analysis.solver.ActivationSolver$Slot",
       "io.github.gustavo2358.analysis.solver.AnalysisDefinition",
+      "io.github.gustavo2358.analysis.solver.AnalysisResources",
+      "io.github.gustavo2358.analysis.solver.AnalysisResources$Phase",
       "io.github.gustavo2358.analysis.solver.BooleanConditions",
       "io.github.gustavo2358.analysis.solver.DomainWork",
+      "io.github.gustavo2358.analysis.solver.StateIndex",
       "io.github.gustavo2358.analysis.structure.ActivationControl",
       "io.github.gustavo2358.analysis.structure.ActivationControl$Frame",
       "io.github.gustavo2358.analysis.structure.AnalysisSession",
@@ -390,10 +396,11 @@
       "java.lang.invoke.MethodType",
       "java.util.ArrayList",
       "java.util.IdentityHashMap",
-      "java.util.Iterator",
       "java.util.List",
       "java.util.Map",
-      "java.util.function.Function"
+      "java.util.Objects",
+      "java.util.function.BiPredicate",
+      "java.util.function.ToLongFunction"
     ],
     "io.github.gustavo2358.analysis.solver.ActivationSolver$ExitKey": [
       "io.github.gustavo2358.analysis.cfg.domain.CfgTransition",
@@ -634,6 +641,8 @@
       "io.github.gustavo2358.analysis.solver.AnalysisDefinition$Boundary",
       "io.github.gustavo2358.analysis.solver.AnalysisDefinition$Join",
       "io.github.gustavo2358.analysis.solver.AnalysisPoint",
+      "io.github.gustavo2358.analysis.solver.AnalysisResources",
+      "io.github.gustavo2358.analysis.solver.AnalysisResources$Limits",
       "io.github.gustavo2358.analysis.solver.BackwardActivationSolver$1",
       "io.github.gustavo2358.analysis.solver.BackwardActivationSolver$Choice",
       "io.github.gustavo2358.analysis.solver.BackwardActivationSolver$Deferred",
@@ -651,6 +660,7 @@
       "io.github.gustavo2358.analysis.solver.DataflowResult",
       "io.github.gustavo2358.analysis.solver.DomainWork",
       "io.github.gustavo2358.analysis.solver.SolverMetrics",
+      "io.github.gustavo2358.analysis.solver.StateIndex",
       "io.github.gustavo2358.analysis.structure.ActivationControl",
       "io.github.gustavo2358.analysis.structure.ActivationControl$Action",
       "io.github.gustavo2358.analysis.structure.ActivationControl$Frame",
@@ -663,9 +673,11 @@
       "java.lang.IllegalArgumentException",
       "java.lang.Integer",
       "java.lang.Iterable",
+      "java.lang.Long",
       "java.lang.Math",
       "java.lang.Object",
       "java.lang.String",
+      "java.lang.System",
       "java.lang.Throwable",
       "java.lang.invoke.CallSite",
       "java.lang.invoke.LambdaMetafactory",
@@ -731,6 +743,8 @@
       "io.github.gustavo2358.analysis.solver.ActivationModel",
       "io.github.gustavo2358.analysis.solver.AnalysisDefinition",
       "io.github.gustavo2358.analysis.solver.AnalysisDefinition$Join",
+      "io.github.gustavo2358.analysis.solver.AnalysisResources",
+      "io.github.gustavo2358.analysis.solver.AnalysisResources$Phase",
       "io.github.gustavo2358.analysis.solver.BackwardActivationSolver",
       "io.github.gustavo2358.analysis.solver.BackwardActivationSolver$Partition",
       "io.github.gustavo2358.analysis.solver.BackwardActivationSolver$Piece",
@@ -739,6 +753,7 @@
       "io.github.gustavo2358.analysis.solver.BackwardActivationSolver$Slot",
       "io.github.gustavo2358.analysis.solver.BooleanConditions",
       "io.github.gustavo2358.analysis.solver.DomainWork",
+      "io.github.gustavo2358.analysis.solver.StateIndex",
       "io.github.gustavo2358.analysis.structure.ActivationControl",
       "io.github.gustavo2358.analysis.structure.ActivationControl$Frame",
       "io.github.gustavo2358.analysis.structure.ProgramIndex",
@@ -758,7 +773,8 @@
       "java.util.List",
       "java.util.Map",
       "java.util.Set",
-      "java.util.function.Function"
+      "java.util.function.BiPredicate",
+      "java.util.function.ToLongFunction"
     ],
     "io.github.gustavo2358.analysis.solver.BackwardActivationSolver$Need": [
       "io.github.gustavo2358.analysis.solver.BackwardActivationSolver",
@@ -834,6 +850,7 @@
       "io.github.gustavo2358.analysis.structure.ProgramIndex$Node",
       "java.lang.Object",
       "java.util.Collection",
+      "java.util.Iterator",
       "java.util.List",
       "java.util.Map"
     ],
@@ -1349,6 +1366,23 @@
       "java.util.Map",
       "java.util.function.Function",
       "java.util.function.IntFunction"
+    ],
+    "io.github.gustavo2358.analysis.solver.StateIndex": [
+      "io.github.gustavo2358.analysis.solver.AnalysisResources",
+      "io.github.gustavo2358.analysis.solver.AnalysisResources$Phase",
+      "io.github.gustavo2358.analysis.solver.AnalysisResources$Pool",
+      "io.github.gustavo2358.analysis.solver.AnalysisResources$Reservation",
+      "java.lang.AutoCloseable",
+      "java.lang.Error",
+      "java.lang.IllegalStateException",
+      "java.lang.Math",
+      "java.lang.Object",
+      "java.lang.RuntimeException",
+      "java.lang.String",
+      "java.lang.Throwable",
+      "java.util.Objects",
+      "java.util.function.BiPredicate",
+      "java.util.function.ToLongFunction"
     ]
   },
   "javap_descriptors": {
@@ -1359,7 +1393,7 @@
     "io.github.gustavo2358.analysis.solver.ActivationModel$Point": "Compiled from \"ActivationModel.java\"\nfinal class io.github.gustavo2358.analysis.solver.ActivationModel$Point extends java.lang.Record {\n  public final java.lang.String toString();\n    descriptor: ()Ljava/lang/String;\n\n  public final int hashCode();\n    descriptor: ()I\n\n  public final boolean equals(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)Z\n\n  public int condition();\n    descriptor: ()I\n\n  public java.util.List<io.github.gustavo2358.analysis.structure.ActivationControl$Move> moves();\n    descriptor: ()Ljava/util/List;\n}\n",
     "io.github.gustavo2358.analysis.solver.ActivationModel$Shape": "Compiled from \"ActivationModel.java\"\nfinal class io.github.gustavo2358.analysis.solver.ActivationModel$Shape extends java.lang.Record {\n  public final java.lang.String toString();\n    descriptor: ()Ljava/lang/String;\n\n  public final int hashCode();\n    descriptor: ()I\n\n  public final boolean equals(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)Z\n\n  public io.github.gustavo2358.analysis.structure.ActivationControl$Frame frame();\n    descriptor: ()Lio/github/gustavo2358/analysis/structure/ActivationControl$Frame;\n\n  public java.util.Map<io.github.gustavo2358.analysis.structure.ProgramIndex$Node, io.github.gustavo2358.analysis.solver.ActivationModel$Point> points();\n    descriptor: ()Ljava/util/Map;\n}\n",
     "io.github.gustavo2358.analysis.solver.ActivationModel": "Compiled from \"ActivationModel.java\"\nfinal class io.github.gustavo2358.analysis.solver.ActivationModel extends java.lang.Record {\n  public final java.lang.String toString();\n    descriptor: ()Ljava/lang/String;\n\n  public final int hashCode();\n    descriptor: ()I\n\n  public final boolean equals(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)Z\n\n  public io.github.gustavo2358.analysis.structure.ContextView context();\n    descriptor: ()Lio/github/gustavo2358/analysis/structure/ContextView;\n\n  public io.github.gustavo2358.analysis.structure.ActivationControl control();\n    descriptor: ()Lio/github/gustavo2358/analysis/structure/ActivationControl;\n\n  public io.github.gustavo2358.analysis.solver.BooleanConditions conditions();\n    descriptor: ()Lio/github/gustavo2358/analysis/solver/BooleanConditions;\n\n  public java.util.Map<io.github.gustavo2358.analysis.structure.ActivationControl$Frame, io.github.gustavo2358.analysis.solver.ActivationModel$Shape> shapes();\n    descriptor: ()Ljava/util/Map;\n\n  public java.util.Map<io.github.gustavo2358.analysis.structure.ActivationControl$Frame, java.util.Map<io.github.gustavo2358.analysis.structure.ActivationControl$Frame, java.lang.Integer>> parents();\n    descriptor: ()Ljava/util/Map;\n\n  public java.util.List<io.github.gustavo2358.analysis.structure.ProgramIndex$Node> rootTargets();\n    descriptor: ()Ljava/util/List;\n\n  public java.util.List<io.github.gustavo2358.analysis.structure.ProgramIndex$Node> unwindTargets();\n    descriptor: ()Ljava/util/List;\n\n  public int maxUnwind();\n    descriptor: ()I\n}\n",
-    "io.github.gustavo2358.analysis.solver.ActivationSolver$1": "Compiled from \"ActivationSolver.java\"\nclass io.github.gustavo2358.analysis.solver.ActivationSolver$1 implements io.github.gustavo2358.analysis.solver.AnalysisDefinition<java.lang.Boolean> {\n  public io.github.gustavo2358.analysis.solver.Direction direction();\n    descriptor: ()Lio/github/gustavo2358/analysis/solver/Direction;\n\n  public java.lang.Boolean bottom();\n    descriptor: ()Ljava/lang/Boolean;\n\n  public java.lang.Iterable<io.github.gustavo2358.analysis.solver.AnalysisDefinition$Boundary<java.lang.Boolean>> boundaries(io.github.gustavo2358.analysis.structure.AnalysisSession);\n    descriptor: (Lio/github/gustavo2358/analysis/structure/AnalysisSession;)Ljava/lang/Iterable;\n\n  public io.github.gustavo2358.analysis.solver.AnalysisDefinition$Join<java.lang.Boolean> joinInto(java.lang.Boolean, java.lang.Boolean, io.github.gustavo2358.analysis.solver.DomainWork);\n    descriptor: (Ljava/lang/Boolean;Ljava/lang/Boolean;Lio/github/gustavo2358/analysis/solver/DomainWork;)Lio/github/gustavo2358/analysis/solver/AnalysisDefinition$Join;\n\n  public boolean equivalent(java.lang.Boolean, java.lang.Boolean, io.github.gustavo2358.analysis.solver.DomainWork);\n    descriptor: (Ljava/lang/Boolean;Ljava/lang/Boolean;Lio/github/gustavo2358/analysis/solver/DomainWork;)Z\n\n  public java.lang.Boolean transferBlock(io.github.gustavo2358.analysis.solver.AnalysisPoint, java.lang.Boolean, io.github.gustavo2358.analysis.solver.DomainWork);\n    descriptor: (Lio/github/gustavo2358/analysis/solver/AnalysisPoint;Ljava/lang/Boolean;Lio/github/gustavo2358/analysis/solver/DomainWork;)Ljava/lang/Boolean;\n\n  public java.lang.Boolean transferEdge(io.github.gustavo2358.analysis.solver.AnalysisPoint, io.github.gustavo2358.analysis.cfg.domain.CfgTransition, java.lang.Boolean, io.github.gustavo2358.analysis.solver.DomainWork);\n    descriptor: (Lio/github/gustavo2358/analysis/solver/AnalysisPoint;Lio/github/gustavo2358/analysis/cfg/domain/CfgTransition;Ljava/lang/Boolean;Lio/github/gustavo2358/analysis/solver/DomainWork;)Ljava/lang/Boolean;\n\n  public java.lang.Object transferEdge(io.github.gustavo2358.analysis.solver.AnalysisPoint, io.github.gustavo2358.analysis.cfg.domain.CfgTransition, java.lang.Object, io.github.gustavo2358.analysis.solver.DomainWork);\n    descriptor: (Lio/github/gustavo2358/analysis/solver/AnalysisPoint;Lio/github/gustavo2358/analysis/cfg/domain/CfgTransition;Ljava/lang/Object;Lio/github/gustavo2358/analysis/solver/DomainWork;)Ljava/lang/Object;\n\n  public java.lang.Object transferBlock(io.github.gustavo2358.analysis.solver.AnalysisPoint, java.lang.Object, io.github.gustavo2358.analysis.solver.DomainWork);\n    descriptor: (Lio/github/gustavo2358/analysis/solver/AnalysisPoint;Ljava/lang/Object;Lio/github/gustavo2358/analysis/solver/DomainWork;)Ljava/lang/Object;\n\n  public boolean equivalent(java.lang.Object, java.lang.Object, io.github.gustavo2358.analysis.solver.DomainWork);\n    descriptor: (Ljava/lang/Object;Ljava/lang/Object;Lio/github/gustavo2358/analysis/solver/DomainWork;)Z\n\n  public io.github.gustavo2358.analysis.solver.AnalysisDefinition$Join joinInto(java.lang.Object, java.lang.Object, io.github.gustavo2358.analysis.solver.DomainWork);\n    descriptor: (Ljava/lang/Object;Ljava/lang/Object;Lio/github/gustavo2358/analysis/solver/DomainWork;)Lio/github/gustavo2358/analysis/solver/AnalysisDefinition$Join;\n\n  public java.lang.Object bottom();\n    descriptor: ()Ljava/lang/Object;\n}\n",
+    "io.github.gustavo2358.analysis.solver.ActivationSolver$1": "Compiled from \"ActivationSolver.java\"\nclass io.github.gustavo2358.analysis.solver.ActivationSolver$1 implements io.github.gustavo2358.analysis.solver.AnalysisDefinition<java.lang.Boolean> {\n  public io.github.gustavo2358.analysis.solver.Direction direction();\n    descriptor: ()Lio/github/gustavo2358/analysis/solver/Direction;\n\n  public java.lang.Boolean bottom();\n    descriptor: ()Ljava/lang/Boolean;\n\n  public java.lang.Iterable<io.github.gustavo2358.analysis.solver.AnalysisDefinition$Boundary<java.lang.Boolean>> boundaries(io.github.gustavo2358.analysis.structure.AnalysisSession);\n    descriptor: (Lio/github/gustavo2358/analysis/structure/AnalysisSession;)Ljava/lang/Iterable;\n\n  public io.github.gustavo2358.analysis.solver.AnalysisDefinition$Join<java.lang.Boolean> joinInto(java.lang.Boolean, java.lang.Boolean, io.github.gustavo2358.analysis.solver.DomainWork);\n    descriptor: (Ljava/lang/Boolean;Ljava/lang/Boolean;Lio/github/gustavo2358/analysis/solver/DomainWork;)Lio/github/gustavo2358/analysis/solver/AnalysisDefinition$Join;\n\n  public long stateFingerprint(java.lang.Boolean);\n    descriptor: (Ljava/lang/Boolean;)J\n\n  public boolean equivalent(java.lang.Boolean, java.lang.Boolean, io.github.gustavo2358.analysis.solver.DomainWork);\n    descriptor: (Ljava/lang/Boolean;Ljava/lang/Boolean;Lio/github/gustavo2358/analysis/solver/DomainWork;)Z\n\n  public java.lang.Boolean transferBlock(io.github.gustavo2358.analysis.solver.AnalysisPoint, java.lang.Boolean, io.github.gustavo2358.analysis.solver.DomainWork);\n    descriptor: (Lio/github/gustavo2358/analysis/solver/AnalysisPoint;Ljava/lang/Boolean;Lio/github/gustavo2358/analysis/solver/DomainWork;)Ljava/lang/Boolean;\n\n  public java.lang.Boolean transferEdge(io.github.gustavo2358.analysis.solver.AnalysisPoint, io.github.gustavo2358.analysis.cfg.domain.CfgTransition, java.lang.Boolean, io.github.gustavo2358.analysis.solver.DomainWork);\n    descriptor: (Lio/github/gustavo2358/analysis/solver/AnalysisPoint;Lio/github/gustavo2358/analysis/cfg/domain/CfgTransition;Ljava/lang/Boolean;Lio/github/gustavo2358/analysis/solver/DomainWork;)Ljava/lang/Boolean;\n\n  public java.lang.Object transferEdge(io.github.gustavo2358.analysis.solver.AnalysisPoint, io.github.gustavo2358.analysis.cfg.domain.CfgTransition, java.lang.Object, io.github.gustavo2358.analysis.solver.DomainWork);\n    descriptor: (Lio/github/gustavo2358/analysis/solver/AnalysisPoint;Lio/github/gustavo2358/analysis/cfg/domain/CfgTransition;Ljava/lang/Object;Lio/github/gustavo2358/analysis/solver/DomainWork;)Ljava/lang/Object;\n\n  public java.lang.Object transferBlock(io.github.gustavo2358.analysis.solver.AnalysisPoint, java.lang.Object, io.github.gustavo2358.analysis.solver.DomainWork);\n    descriptor: (Lio/github/gustavo2358/analysis/solver/AnalysisPoint;Ljava/lang/Object;Lio/github/gustavo2358/analysis/solver/DomainWork;)Ljava/lang/Object;\n\n  public long stateFingerprint(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)J\n\n  public boolean equivalent(java.lang.Object, java.lang.Object, io.github.gustavo2358.analysis.solver.DomainWork);\n    descriptor: (Ljava/lang/Object;Ljava/lang/Object;Lio/github/gustavo2358/analysis/solver/DomainWork;)Z\n\n  public io.github.gustavo2358.analysis.solver.AnalysisDefinition$Join joinInto(java.lang.Object, java.lang.Object, io.github.gustavo2358.analysis.solver.DomainWork);\n    descriptor: (Ljava/lang/Object;Ljava/lang/Object;Lio/github/gustavo2358/analysis/solver/DomainWork;)Lio/github/gustavo2358/analysis/solver/AnalysisDefinition$Join;\n\n  public java.lang.Object bottom();\n    descriptor: ()Ljava/lang/Object;\n}\n",
     "io.github.gustavo2358.analysis.solver.ActivationSolver$2": "Compiled from \"ActivationSolver.java\"\nclass io.github.gustavo2358.analysis.solver.ActivationSolver$2 {\n}\n",
     "io.github.gustavo2358.analysis.solver.ActivationSolver$Deferred": "Compiled from \"ActivationSolver.java\"\nfinal class io.github.gustavo2358.analysis.solver.ActivationSolver$Deferred {\n}\n",
     "io.github.gustavo2358.analysis.solver.ActivationSolver$EntryRun": "Compiled from \"ActivationSolver.java\"\nfinal class io.github.gustavo2358.analysis.solver.ActivationSolver$EntryRun {\n}\n",
@@ -1373,7 +1407,7 @@
     "io.github.gustavo2358.analysis.solver.ActivationSolver": "Compiled from \"ActivationSolver.java\"\nfinal class io.github.gustavo2358.analysis.solver.ActivationSolver<S> {\n}\n",
     "io.github.gustavo2358.analysis.solver.AnalysisDefinition$Boundary": "Compiled from \"AnalysisDefinition.java\"\npublic final class io.github.gustavo2358.analysis.solver.AnalysisDefinition$Boundary<S> extends java.lang.Record {\n  public io.github.gustavo2358.analysis.solver.AnalysisDefinition$Boundary(io.github.gustavo2358.analysis.structure.ContextView, io.github.gustavo2358.analysis.structure.ProgramIndex$Node, S);\n    descriptor: (Lio/github/gustavo2358/analysis/structure/ContextView;Lio/github/gustavo2358/analysis/structure/ProgramIndex$Node;Ljava/lang/Object;)V\n\n  public final java.lang.String toString();\n    descriptor: ()Ljava/lang/String;\n\n  public final int hashCode();\n    descriptor: ()I\n\n  public final boolean equals(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)Z\n\n  public io.github.gustavo2358.analysis.structure.ContextView context();\n    descriptor: ()Lio/github/gustavo2358/analysis/structure/ContextView;\n\n  public io.github.gustavo2358.analysis.structure.ProgramIndex$Node node();\n    descriptor: ()Lio/github/gustavo2358/analysis/structure/ProgramIndex$Node;\n\n  public S state();\n    descriptor: ()Ljava/lang/Object;\n}\n",
     "io.github.gustavo2358.analysis.solver.AnalysisDefinition$Join": "Compiled from \"AnalysisDefinition.java\"\npublic final class io.github.gustavo2358.analysis.solver.AnalysisDefinition$Join<S> extends java.lang.Record {\n  public io.github.gustavo2358.analysis.solver.AnalysisDefinition$Join(S, boolean);\n    descriptor: (Ljava/lang/Object;Z)V\n\n  public final java.lang.String toString();\n    descriptor: ()Ljava/lang/String;\n\n  public final int hashCode();\n    descriptor: ()I\n\n  public final boolean equals(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)Z\n\n  public S state();\n    descriptor: ()Ljava/lang/Object;\n\n  public boolean changed();\n    descriptor: ()Z\n}\n",
-    "io.github.gustavo2358.analysis.solver.AnalysisDefinition": "Compiled from \"AnalysisDefinition.java\"\npublic interface io.github.gustavo2358.analysis.solver.AnalysisDefinition<S> {\n  public abstract io.github.gustavo2358.analysis.solver.Direction direction();\n    descriptor: ()Lio/github/gustavo2358/analysis/solver/Direction;\n\n  public abstract S bottom();\n    descriptor: ()Ljava/lang/Object;\n\n  public abstract java.lang.Iterable<io.github.gustavo2358.analysis.solver.AnalysisDefinition$Boundary<S>> boundaries(io.github.gustavo2358.analysis.structure.AnalysisSession);\n    descriptor: (Lio/github/gustavo2358/analysis/structure/AnalysisSession;)Ljava/lang/Iterable;\n\n  public abstract io.github.gustavo2358.analysis.solver.AnalysisDefinition$Join<S> joinInto(S, S, io.github.gustavo2358.analysis.solver.DomainWork);\n    descriptor: (Ljava/lang/Object;Ljava/lang/Object;Lio/github/gustavo2358/analysis/solver/DomainWork;)Lio/github/gustavo2358/analysis/solver/AnalysisDefinition$Join;\n\n  public abstract boolean equivalent(S, S, io.github.gustavo2358.analysis.solver.DomainWork);\n    descriptor: (Ljava/lang/Object;Ljava/lang/Object;Lio/github/gustavo2358/analysis/solver/DomainWork;)Z\n\n  public abstract S transferBlock(io.github.gustavo2358.analysis.solver.AnalysisPoint, S, io.github.gustavo2358.analysis.solver.DomainWork);\n    descriptor: (Lio/github/gustavo2358/analysis/solver/AnalysisPoint;Ljava/lang/Object;Lio/github/gustavo2358/analysis/solver/DomainWork;)Ljava/lang/Object;\n\n  public abstract S transferEdge(io.github.gustavo2358.analysis.solver.AnalysisPoint, io.github.gustavo2358.analysis.cfg.domain.CfgTransition, S, io.github.gustavo2358.analysis.solver.DomainWork);\n    descriptor: (Lio/github/gustavo2358/analysis/solver/AnalysisPoint;Lio/github/gustavo2358/analysis/cfg/domain/CfgTransition;Ljava/lang/Object;Lio/github/gustavo2358/analysis/solver/DomainWork;)Ljava/lang/Object;\n}\n",
+    "io.github.gustavo2358.analysis.solver.AnalysisDefinition": "Compiled from \"AnalysisDefinition.java\"\npublic interface io.github.gustavo2358.analysis.solver.AnalysisDefinition<S> {\n  public abstract io.github.gustavo2358.analysis.solver.Direction direction();\n    descriptor: ()Lio/github/gustavo2358/analysis/solver/Direction;\n\n  public abstract S bottom();\n    descriptor: ()Ljava/lang/Object;\n\n  public abstract java.lang.Iterable<io.github.gustavo2358.analysis.solver.AnalysisDefinition$Boundary<S>> boundaries(io.github.gustavo2358.analysis.structure.AnalysisSession);\n    descriptor: (Lio/github/gustavo2358/analysis/structure/AnalysisSession;)Ljava/lang/Iterable;\n\n  public abstract io.github.gustavo2358.analysis.solver.AnalysisDefinition$Join<S> joinInto(S, S, io.github.gustavo2358.analysis.solver.DomainWork);\n    descriptor: (Ljava/lang/Object;Ljava/lang/Object;Lio/github/gustavo2358/analysis/solver/DomainWork;)Lio/github/gustavo2358/analysis/solver/AnalysisDefinition$Join;\n\n  public abstract boolean equivalent(S, S, io.github.gustavo2358.analysis.solver.DomainWork);\n    descriptor: (Ljava/lang/Object;Ljava/lang/Object;Lio/github/gustavo2358/analysis/solver/DomainWork;)Z\n\n  public default long stateFingerprint(S);\n    descriptor: (Ljava/lang/Object;)J\n\n  public abstract S transferBlock(io.github.gustavo2358.analysis.solver.AnalysisPoint, S, io.github.gustavo2358.analysis.solver.DomainWork);\n    descriptor: (Lio/github/gustavo2358/analysis/solver/AnalysisPoint;Ljava/lang/Object;Lio/github/gustavo2358/analysis/solver/DomainWork;)Ljava/lang/Object;\n\n  public abstract S transferEdge(io.github.gustavo2358.analysis.solver.AnalysisPoint, io.github.gustavo2358.analysis.cfg.domain.CfgTransition, S, io.github.gustavo2358.analysis.solver.DomainWork);\n    descriptor: (Lio/github/gustavo2358/analysis/solver/AnalysisPoint;Lio/github/gustavo2358/analysis/cfg/domain/CfgTransition;Ljava/lang/Object;Lio/github/gustavo2358/analysis/solver/DomainWork;)Ljava/lang/Object;\n}\n",
     "io.github.gustavo2358.analysis.solver.AnalysisPoint": "Compiled from \"AnalysisPoint.java\"\npublic final class io.github.gustavo2358.analysis.solver.AnalysisPoint {\n  public java.util.Optional<io.github.gustavo2358.analysis.structure.ContextView$Point> concreteTraversal();\n    descriptor: ()Ljava/util/Optional;\n\n  public io.github.gustavo2358.analysis.structure.ContextView$Point traversal();\n    descriptor: ()Lio/github/gustavo2358/analysis/structure/ContextView$Point;\n\n  public io.github.gustavo2358.analysis.structure.ContextView context();\n    descriptor: ()Lio/github/gustavo2358/analysis/structure/ContextView;\n\n  public io.github.gustavo2358.analysis.structure.ProgramIndex$Node node();\n    descriptor: ()Lio/github/gustavo2358/analysis/structure/ProgramIndex$Node;\n}\n",
     "io.github.gustavo2358.analysis.solver.AnalysisResources$Exhausted": "Compiled from \"AnalysisResources.java\"\npublic final class io.github.gustavo2358.analysis.solver.AnalysisResources$Exhausted extends java.lang.RuntimeException {\n  public io.github.gustavo2358.analysis.solver.AnalysisResources$Resource resource();\n    descriptor: ()Lio/github/gustavo2358/analysis/solver/AnalysisResources$Resource;\n\n  public io.github.gustavo2358.analysis.solver.AnalysisResources$Phase phase();\n    descriptor: ()Lio/github/gustavo2358/analysis/solver/AnalysisResources$Phase;\n\n  public long limit();\n    descriptor: ()J\n\n  public long used();\n    descriptor: ()J\n\n  public long requested();\n    descriptor: ()J\n}\n",
     "io.github.gustavo2358.analysis.solver.AnalysisResources$Limits": "Compiled from \"AnalysisResources.java\"\npublic final class io.github.gustavo2358.analysis.solver.AnalysisResources$Limits extends java.lang.Record {\n  public io.github.gustavo2358.analysis.solver.AnalysisResources$Limits(long, long, long, long, long, long, long);\n    descriptor: (JJJJJJJ)V\n\n  public final java.lang.String toString();\n    descriptor: ()Ljava/lang/String;\n\n  public final int hashCode();\n    descriptor: ()I\n\n  public final boolean equals(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)Z\n\n  public long heapBytes();\n    descriptor: ()J\n\n  public long scratchBytes();\n    descriptor: ()J\n\n  public long directBytes();\n    descriptor: ()J\n\n  public long temporaryBytes();\n    descriptor: ()J\n\n  public long openFiles();\n    descriptor: ()J\n\n  public long workUnits();\n    descriptor: ()J\n\n  public long outputBytes();\n    descriptor: ()J\n}\n",
@@ -1423,7 +1457,8 @@
     "io.github.gustavo2358.analysis.solver.PersistentLongMap": "Compiled from \"PersistentLongMap.java\"\npublic final class io.github.gustavo2358.analysis.solver.PersistentLongMap implements java.lang.AutoCloseable {\n  public io.github.gustavo2358.analysis.solver.PersistentLongMap(io.github.gustavo2358.analysis.solver.CanonicalTupleArena, io.github.gustavo2358.analysis.solver.AnalysisResources, io.github.gustavo2358.analysis.solver.AnalysisResources$Phase);\n    descriptor: (Lio/github/gustavo2358/analysis/solver/CanonicalTupleArena;Lio/github/gustavo2358/analysis/solver/AnalysisResources;Lio/github/gustavo2358/analysis/solver/AnalysisResources$Phase;)V\n\n  public synchronized long nodeVisits();\n    descriptor: ()J\n\n  public synchronized long pathCopies();\n    descriptor: ()J\n\n  public synchronized long size(long);\n    descriptor: (J)J\n\n  public synchronized long get(long, long);\n    descriptor: (JJ)J\n\n  public synchronized boolean contains(long, long);\n    descriptor: (JJ)Z\n\n  public synchronized boolean reference(long, long);\n    descriptor: (JJ)Z\n\n  public synchronized long put(long, long, long);\n    descriptor: (JJJ)J\n\n  public synchronized long putReference(long, long, long);\n    descriptor: (JJJ)J\n\n  public synchronized long remove(long, long);\n    descriptor: (JJ)J\n\n  public synchronized long join(long, long, boolean, java.util.function.LongBinaryOperator);\n    descriptor: (JJZLjava/util/function/LongBinaryOperator;)J\n\n  public synchronized long join(long, long, boolean, java.util.function.LongBinaryOperator, java.util.function.LongUnaryOperator);\n    descriptor: (JJZLjava/util/function/LongBinaryOperator;Ljava/util/function/LongUnaryOperator;)J\n\n  public synchronized long mapValues(long, boolean, java.util.function.LongUnaryOperator);\n    descriptor: (JZLjava/util/function/LongUnaryOperator;)J\n\n  public synchronized io.github.gustavo2358.analysis.solver.PersistentLongMap$Cursor cursor(long);\n    descriptor: (J)Lio/github/gustavo2358/analysis/solver/PersistentLongMap$Cursor;\n\n  public synchronized void close();\n    descriptor: ()V\n}\n",
     "io.github.gustavo2358.analysis.solver.ResidentPageStore": "Compiled from \"ResidentPageStore.java\"\npublic final class io.github.gustavo2358.analysis.solver.ResidentPageStore implements io.github.gustavo2358.analysis.solver.PageStore {\n  public io.github.gustavo2358.analysis.solver.ResidentPageStore(int, io.github.gustavo2358.analysis.solver.AnalysisResources);\n    descriptor: (ILio/github/gustavo2358/analysis/solver/AnalysisResources;)V\n\n  public io.github.gustavo2358.analysis.solver.ResidentPageStore(int, io.github.gustavo2358.analysis.solver.AnalysisResources, io.github.gustavo2358.analysis.solver.AnalysisResources$Phase);\n    descriptor: (ILio/github/gustavo2358/analysis/solver/AnalysisResources;Lio/github/gustavo2358/analysis/solver/AnalysisResources$Phase;)V\n\n  public int pageBytes();\n    descriptor: ()I\n\n  public synchronized long allocate();\n    descriptor: ()J\n\n  public synchronized void read(long, int, byte[], int, int);\n    descriptor: (JI[BII)V\n\n  public synchronized void write(long, int, byte[], int, int);\n    descriptor: (JI[BII)V\n\n  public synchronized void release(long);\n    descriptor: (J)V\n\n  public synchronized void flush();\n    descriptor: ()V\n\n  public synchronized io.github.gustavo2358.analysis.solver.PageStore$Statistics statistics();\n    descriptor: ()Lio/github/gustavo2358/analysis/solver/PageStore$Statistics;\n\n  public synchronized void close();\n    descriptor: ()V\n}\n",
     "io.github.gustavo2358.analysis.solver.SolverMetrics": "Compiled from \"SolverMetrics.java\"\npublic final class io.github.gustavo2358.analysis.solver.SolverMetrics extends java.lang.Record {\n  public io.github.gustavo2358.analysis.solver.SolverMetrics(long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long);\n    descriptor: (JJJJJJJJJJJJJJJJJJJJJJ)V\n\n  public final java.lang.String toString();\n    descriptor: ()Ljava/lang/String;\n\n  public final int hashCode();\n    descriptor: ()I\n\n  public final boolean equals(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)Z\n\n  public long analysisPoints();\n    descriptor: ()J\n\n  public long contextualEdges();\n    descriptor: ()J\n\n  public long boundaryJoins();\n    descriptor: ()J\n\n  public long initializationAttempts();\n    descriptor: ()J\n\n  public long worklistAttempts();\n    descriptor: ()J\n\n  public long worklistPushes();\n    descriptor: ()J\n\n  public long nodesPopped();\n    descriptor: ()J\n\n  public long duplicatePushesSuppressed();\n    descriptor: ()J\n\n  public long maxWorklistSize();\n    descriptor: ()J\n\n  public long nodesTransferred();\n    descriptor: ()J\n\n  public long operationsTransferred();\n    descriptor: ()J\n\n  public long firstPublications();\n    descriptor: ()J\n\n  public long publishedStatesChanged();\n    descriptor: ()J\n\n  public long publishedStatesUnchanged();\n    descriptor: ()J\n\n  public long edgeTransferInvocations();\n    descriptor: ()J\n\n  public long edgeContributionJoins();\n    descriptor: ()J\n\n  public long accumulatorStatesChanged();\n    descriptor: ()J\n\n  public long accumulatorStatesUnchanged();\n    descriptor: ()J\n\n  public long predecessorContributionReads();\n    descriptor: ()J\n\n  public long successorContributionReads();\n    descriptor: ()J\n\n  public long joinEntriesVisited();\n    descriptor: ()J\n\n  public long stateCompareEntries();\n    descriptor: ()J\n}\n",
-    "io.github.gustavo2358.analysis.solver.SolverTopology": "Compiled from \"SolverTopology.java\"\nfinal class io.github.gustavo2358.analysis.solver.SolverTopology {\n}\n"
+    "io.github.gustavo2358.analysis.solver.SolverTopology": "Compiled from \"SolverTopology.java\"\nfinal class io.github.gustavo2358.analysis.solver.SolverTopology {\n}\n",
+    "io.github.gustavo2358.analysis.solver.StateIndex": "Compiled from \"StateIndex.java\"\nfinal class io.github.gustavo2358.analysis.solver.StateIndex<S, V> implements java.lang.AutoCloseable {\n  public void close();\n    descriptor: ()V\n}\n"
   },
   "effective_maven": [
     "io.github.gustavo2358.analysis:analysis-kernel:jar:0.1.0-SNAPSHOT",

@@ -87,7 +87,8 @@ public final class ReachingDefinitions {
         private final EntryId entry;
         private final SegmentMap<Set<EventHandle>> bindings;
         private final Map<ObjectId,Set<EventHandle>> logical;
-        private State(EntryId entry,SegmentMap<Set<EventHandle>> bindings,Map<ObjectId,Set<EventHandle>> logical){this.entry=entry;this.bindings=bindings;this.logical=Map.copyOf(logical);}
+        private final long fingerprint;
+        private State(EntryId entry,SegmentMap<Set<EventHandle>> bindings,Map<ObjectId,Set<EventHandle>> logical){this.entry=entry;this.bindings=bindings;this.logical=Map.copyOf(logical);fingerprint=Objects.hashCode(entry)+Long.rotateLeft(bindings.fingerprint(),13)+Long.rotateLeft(this.logical.hashCode(),29);}
         public boolean reached(){return entry!=null;}
         public int explicitSegments(){return bindings.size();}
     }
@@ -150,6 +151,7 @@ public final class ReachingDefinitions {
             var logical=new HashMap<>(a.logical);b.logical.forEach((key,events)->{work.joinEntryVisited();logical.merge(key,events,this::union);});
             return result.root==a.bindings&&logical.equals(a.logical)?new Join<>(a,false):new Join<>(new State(a.entry,result.root,logical),true);
         }
+        @Override public long stateFingerprint(State state){return state.fingerprint;}
         @Override public boolean equivalent(State a,State b,DomainWork work) {
             if(a==b)return true;if(!Objects.equals(a.entry,b.entry)||a.bindings.size()!=b.bindings.size()||!a.logical.equals(b.logical))return false;
             var equal=new boolean[]{true};a.bindings.forEach((key,value)->{work.stateCompareEntry();if(!value.equals(b.bindings.get(key)))equal[0]=false;});return equal[0];

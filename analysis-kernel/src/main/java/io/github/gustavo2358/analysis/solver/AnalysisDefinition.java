@@ -26,6 +26,14 @@ public interface AnalysisDefinition<S> {
     Iterable<Boundary<S>> boundaries(AnalysisSession session);
     Join<S> joinInto(S current, S contribution, DomainWork work);
     boolean equivalent(S first, S second, DomainWork work);
+    /** Stable fingerprint of an immutable root, scoped to this definition/solve. Equivalent
+     * roots MUST have identical fingerprints; collisions between different states are legal
+     * and are checked with equivalent(). Include every value/support component that changes
+     * equivalence. Never infer this contract from the Java state's equals/hashCode.
+     * The constant compatibility default preserves arbitrary existing equivalence callbacks;
+     * expected constant-time lookup requires a registered well-distributed fingerprint.
+     * This key does not prove monotonicity, subsumption or permission to retire old versions. */
+    default long stateFingerprint(S state) { return 0; }
     /** FORWARD: IN -> OUT; BACKWARD: OUT -> IN using reverse block semantics. */
     S transferBlock(AnalysisPoint point, S anchor, DomainWork work);
     /** Original program edge in both directions; published is OUT forward, IN backward. */
