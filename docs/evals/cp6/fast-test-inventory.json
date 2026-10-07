@@ -342,6 +342,9 @@
       "admittedInputRetainsOneSourceCertificateAndImmutableCorrelatedInventory",
       "indexedCorrelationsRetainEverySortedSiteAndRejectForeignCertificates",
       "deepSharedOriginsPreserveEveryCorrelatedSiteAndRejectASibling"
+    ],
+    "io.github.gustavo2358.analysis.solver.CallerPathStorageTest": [
+      "guardedProofRepairAndRetirementHaveEqualResidentAndForcedSpillSemantics"
     ]
   },
   "analysis-dataflow": {
@@ -683,6 +686,21 @@
     "io.github.gustavo2358.analysis.solver.CallerConnectivityTest": [
       "changingLinksMatchesIndependentRootSearchIncludingDisconnectedCycles",
       "removingTheLastExternalCallerDisconnectsAnEntireCycleThenReattachesIt"
+    ],
+    "io.github.gustavo2358.analysis.solver.CallerPathCertificatesTest": [
+      "differentIncomingWordsNeverBecomeOneJointWitness",
+      "replacingParallelBindingsChangesTheirActualKeys",
+      "guardedAlternativeIsTestedOnItsOwnParentAndDoesNotRootADisconnectedCycle",
+      "repairingAnAncestorUpdatesAllDependentWordsAndBorrowedPagesStayUsable",
+      "everyPositiveHintBelongsToAnIndependentConcreteWordAfterMutations",
+      "sparseDeepCertificatesSharePrimitiveWordsInsteadOfDenseUniverseVectors",
+      "guardReplacementPreservesStillValidProofsAndRepairsInvalidatedDescendants",
+      "disconnectedCallerCyclesHaveAnExactNegativeSupportAndWakeOnReconnection",
+      "rawSupportMatchesIndependentSearchAfterFourThousandBindingMutations",
+      "allocationFailuresReleaseOwnedRootsAndAllReservedCapacity"
+    ],
+    "io.github.gustavo2358.analysis.structure.ConditionalFeasibilityTest": [
+      "sharedRecursiveDispatchDoesNotSearchAllCallersForEachGuard"
     ]
   },
   "analysis-launcher": {

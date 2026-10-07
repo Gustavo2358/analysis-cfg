@@ -9,7 +9,10 @@ final class BackwardActivationSolver<S> {
     private final AnalysisSession session;
     private final AnalysisDefinition<S> definition;
     private long callerPathEdgesRead;
-    private long callerProofEdgesRead(){long total=callerPathEdgesRead;for(var entry:entries)total+=entry.connectivity.edgesRead();return total;}
+    private long callerProofEdgesRead(){long total=callerPathEdgesRead;for(var entry:entries)if(entry.paths!=null)total+=entry.paths.edgesRead();return total;}
+    private long certificateEdgesRead(){long count=0;for(var entry:entries)if(entry.paths!=null)count+=entry.paths.edgesRead();return count;}
+    private long valuationVisits(){long count=0;for(var entry:entries)if(entry.paths!=null)count+=entry.paths.valuationNodeVisits();return count;}
+    private long hintIndexProbes(){long count=0;for(var entry:entries)if(entry.paths!=null)count+=entry.paths.indexProbes();return count;}
     private long conditionPeak(){long peak=0;for(var entry:entries)peak=Math.max(peak,entry.bdd.peakNodes());return peak;}
     private final DomainWork work=new DomainWork();
     private final AnalysisResources indexResources=new AnalysisResources(new AnalysisResources.Limits(Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE));
@@ -50,6 +53,7 @@ final class BackwardActivationSolver<S> {
             for(var watched:slot.watches)watched.waiters.remove(slot);
             slot.children.clear();slot.watches.clear();slot.in.pieces=List.of();slot.out.pieces=List.of();
         }
+        if(region.entry.paths!=null){region.entry.paths.retire(region.path);region.certifiedIncoming.clear();}
         region.slots.clear();region.incoming.clear();region.callers.clear();region.waiters.clear();for(var call:region.calls)region.entry.calls.remove(call);region.calls.clear();region.predecessors.clear();
     }
     private long transfers,deliveries,joins,pushes,pops,attempts,duplicates,maxSize,changes,unchanged;
@@ -60,7 +64,7 @@ final class BackwardActivationSolver<S> {
     private final Map<Need,Deferred> deferredCache=new LinkedHashMap<>();
     BackwardActivationSolver(AnalysisSession session,AnalysisDefinition<S> definition){this.session=session;this.definition=definition;bottom=Objects.requireNonNull(definition.bottom());}
     DataflowResult<S> solve() {
-        try {return execute();}finally{closeWitnesses();for(var entry:entries){for(var index:entry.byFrame.values())index.close();entry.byFrame.clear();}if(collector!=null)collector.close();}
+        try {return execute();}finally{closeWitnesses();for(var entry:entries){for(var index:entry.byFrame.values())index.close();entry.byFrame.clear();entry.paths.close();}if(collector!=null)collector.close();}
     }
     private DataflowResult<S> execute() {
         for(var model:ActivationSolver.structure(session))entries.add(new EntryRun(model));
@@ -84,7 +88,7 @@ final class BackwardActivationSolver<S> {
             }
         }
         long indexProbes=closedIndexProbes;for(var entry:entries)for(var index:entry.byFrame.values())indexProbes+=index.probes();
-        var metrics=new SolverMetrics(ins.size(),edgeCount,joins,nextPoint,attempts,pushes,pops,duplicates,maxSize,transfers,work.operations(),ins.size(),changes,unchanged,deliveries,deliveries,changes,unchanged,0,0,work.joinEntries(),work.compareEntries(),summaryCreated,summaryRetired,summaryLive,summaryPeak,summaryCollections,indexProbes,returnSourceReads,callerProofEdgesRead(),conditionPeak());
+        var metrics=new SolverMetrics(ins.size(),edgeCount,joins,nextPoint,attempts,pushes,pops,duplicates,maxSize,transfers,work.operations(),ins.size(),changes,unchanged,deliveries,deliveries,changes,unchanged,0,0,work.joinEntries(),work.compareEntries(),summaryCreated,summaryRetired,summaryLive,summaryPeak,summaryCollections,indexProbes,returnSourceReads,callerProofEdgesRead(),conditionPeak(),certificateEdgesRead(),valuationVisits(),hintIndexProbes());
         return new DataflowResult<>(lookup,ins.toArray(),outs.toArray(),metrics);
     }
     private void collectConditions(EntryRun entry) {
@@ -133,14 +137,14 @@ final class BackwardActivationSolver<S> {
         for(var key:keys)if(!definition.equivalent(a.getOrDefault(key,bottom),b.getOrDefault(key,bottom),work))return false;return true;
     }
     private final class EntryRun {
-        final CallerConnectivity connectivity=new CallerConnectivity();
+        final CallerPathCertificates paths;
         final ActivationModel model;final BooleanConditions bdd;
         final List<Region> regions=new ArrayList<>();
         final IdentityHashMap<ActivationControl.Frame,StateIndex<Signature,Region>> byFrame=new IdentityHashMap<>();
         final Map<ActivationControl.Frame,Map<ProgramIndex.Node,S>> boundaries=new IdentityHashMap<>();
         final Set<Slot> calls=Collections.newSetFromMap(new IdentityHashMap<>());
         Region root;
-        EntryRun(ActivationModel model){this.model=model;bdd=model.conditions();}
+        EntryRun(ActivationModel model){this.model=model;bdd=model.conditions();paths=new CallerPathCertificates(bdd,indexResources,null);}
         void start() {
             root=new Region(this,null,new Signature(0,Map.of(),Map.of(),Collections.nCopies(model.maxUnwind(),Map.of())));regions.add(root);summaryCreated();feasibleCache.put(new Need(root,1),true);root.initialize();
         }
@@ -170,9 +174,10 @@ final class BackwardActivationSolver<S> {
         final Set<Slot> waiters=Collections.newSetFromMap(new IdentityHashMap<>());
         final Map<Slot,Integer> incoming=new IdentityHashMap<>();
         long incomingVersion,mark;
-        final CallerConnectivity.Node rooted;
+        final CallerPathCertificates.Node path;
+        final Map<Slot,CallerPathCertificates.Arc> certifiedIncoming;
         final List<Slot> calls=new ArrayList<>();
-        Region(EntryRun entry,ActivationControl.Frame frame,Signature input){this.entry=entry;this.frame=frame;this.input=input;rooted=entry.connectivity.node(frame==null);}
+        Region(EntryRun entry,ActivationControl.Frame frame,Signature input){this.entry=entry;this.frame=frame;this.input=input;path=entry.paths==null?null:entry.paths.node(frame==null,gain->{incomingVersion++;if(gain!=0)for(var waiting:waiters)enqueue(waiting);});certifiedIncoming=entry.paths==null?null:new IdentityHashMap<>();}
         void initialize() {
             var shape=entry.model.shapes().get(frame);
             for(var point:shape.points().entrySet())slots.put(point.getKey(),new Slot(this,point.getKey(),point.getValue()));
@@ -303,15 +308,20 @@ final class BackwardActivationSolver<S> {
     private void replaceIncoming(Slot caller,Region child,int condition) {
         int old=child.incoming.getOrDefault(caller,0);
         if(old==condition)return;
-        if(old==1)child.entry.connectivity.remove(caller.region.rooted,child.rooted);
         if(condition==0)child.incoming.remove(caller);else child.incoming.put(caller,condition);
-        if(condition==1)child.entry.connectivity.add(caller.region.rooted,child.rooted);
+        if(child.entry.paths!=null) {
+            var arc=child.certifiedIncoming.get(caller);
+            if(condition==0) {
+                child.certifiedIncoming.remove(caller);if(arc!=null&&!arc.removed)child.entry.paths.remove(arc);
+            }else if(arc!=null&&!arc.removed)child.entry.paths.update(arc,condition);
+            else child.certifiedIncoming.put(caller,child.entry.paths.add(caller.region.path,child.path,child.entry.model.control().frameAt(caller.node).variable(),condition));
+        }
         child.incomingVersion++;
         if(condition!=0)for(var waiting:child.waiters)enqueue(waiting);
     }
     private void reconcile(Slot caller,Map<Region,Integer> previous) {
         // Nontrivial predicate witnesses still depend on the exact current links.
-        // Unconditional rooted certificates are repaired locally, not globally cleared.
+        // Individual path certificates repair dependent words; still-valid proofs survive.
         for(var old:previous.entrySet())if(!Objects.equals(caller.children.get(old.getKey()),old.getValue())){feasibleCache.clear();break;}
         for(var child:previous.keySet())if(!caller.children.containsKey(child)){child.callers.remove(caller);replaceIncoming(caller,child,0);}
         for(var link:caller.children.entrySet())replaceIncoming(caller,link.getKey(),link.getValue());
@@ -383,7 +393,15 @@ final class BackwardActivationSolver<S> {
     }
     private boolean feasible(Region region,int condition) {return feasible(region,condition,null);}
     private boolean feasible(Region region,int condition,Slot subscriber) {
-        if(condition==0)return false;if(condition==1&&region.rooted.reached())return true;var key=new Need(region,condition);var known=feasibleCache.get(key);if(known!=null)return known;
+        if(condition==0)return false;var key=new Need(region,condition);
+        if(region.entry.paths!=null&&!region.entry.paths.rawReached(region.path)) {
+            var disconnected=deferredCache.get(key);
+            if(disconnected!=null&&disconnected.valid())disconnected.subscribe(subscriber);
+            else defer(key,List.of(region),subscriber);
+            return false;
+        }
+        var known=feasibleCache.get(key);if(known!=null)return known;
+        if(region.entry.paths!=null&&region.entry.paths.matches(region.path,condition)){feasibleCache.put(key,true);return true;}
         if(subscriber==null&&finalWitnesses.computeIfAbsent(region.entry,this::finalWitnesses).matches(region,condition))
             {feasibleCache.put(key,true);return true;}
         var deferred=deferredCache.get(key);

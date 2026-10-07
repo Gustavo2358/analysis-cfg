@@ -643,3 +643,60 @@ source/compiled/transport boundaries pass with zero failures/errors/skips in217.
 The counted deep-prefix curve is32/64/128/256/512 forward proof-edge reads and
 255/510/1022/2046/4094 backward, including forest maintenance. Large original
 contextual fixtures and public CLI products are being measured separately.
+
+### Exact-binding caller certificates (AS-W04/W05 bridge)
+
+`CallerPathCertificates` supersedes the unconditional forest in solver execution.
+Every guarded proof edge retains the actual invocation binding, pushed key and
+predicate. A primary word and per-binding alternative words share primitive
+persistent sets. An alternative certifies only its own parent word; keys from
+unrelated alternatives are never unioned. Sparse key buckets nominate candidates
+for a required-present key, and the entire query predicate is then tested on the
+individual word. A missed hint retains the exact guarded caller search.
+
+A second intrusive forest uses the SAME adjacency and every nonzero guard as an
+unguarded scheduling superset. A raw-unreachable vertex has no caller word, so it
+can answer FALSE without another ancestor search. A raw-reachable vertex cannot
+answer a guarded query TRUE. Deleting a selected binding detaches the affected
+subtree, then regrows from still-rooted external predecessors; cycles cannot root
+themselves. Repair suppresses transient reach-change callbacks. Only final changes
+notify watchers. A disconnected query watches its own region's version; a later
+ancestor reconnection increments that version and schedules its subscribers even
+when its direct incoming links remain unchanged. Root-connected guarded misses
+retain their existing exact-search subscriptions.
+
+Changing a nonzero predicate leaves raw topology intact. If the primary individual
+word still satisfies its changed guard, descendants remain valid without repair.
+An invalid primary proof repairs dependent words synchronously. Alternative binding
+identity remains exact under parallel callers. Retirement detaches arcs, primitive
+indices, root tokens and metadata leases. The backend is borrowed when supplied;
+closing this owner leaves it usable. Old-plus-new growth is reserved before array
+allocation. No resource interruption certifies a stable semantic result.
+
+Soundness follows induction on the rooted individual-word forest, plus ordinary
+root reachability over a superset for the negative decision. The unguarded repair
+uses the same spanning-forest invariant cited above, rather than assuming its result
+proves guarded reachability. There is no completeness claim for positive hints or
+optimal bound for arbitrary dynamic deletions. BDD construction remains a separate
+architectural debt; resident adjacency and detached result arrays remain bridges
+until the managed program and observation route replaces them.
+
+Focused tests include independently enumerated concrete words under add/remove/
+guard-update operations, 4000 binding mutations against ordinary BFS, disconnected
+cycles and reconnection callbacks, parallel actual keys, sparse deep key inventories,
+a 512-descendant still-valid guard update, ten heap-quota interruptions and full
+root/capacity cleanup. A one-page file backend forces eviction and preserves every
+queried predicate and raw-support answer through repair and retirement. Small shared
+recursive dispatch compares every IN/OUT state with the explicit-stack oracle;
+geometric forward/backward sizes4–512 retain an unchanged64N total edge-read bound,
+including certificate maintenance. These are structural regressions, not universal
+linear-complexity or whole-CLI qualification claims.
+
+SolverMetrics separates callerCertificateEdgesRead, callerValuationNodesVisited and
+callerHintIndexProbes while callerPathEdgesRead continues to include all proof/search
+edge reads. The published31argument constructor and older forms stay available.
+
+Checkpoint validation: full kernel211 methods PASS with no failures/errors/skips.
+FAST893 required methods and all exact architecture/transport boundaries PASS in
+309.175s. Original frozen family curves and full public CLI comparison remain
+separate pending checks; the global architecture work is still IN_PROGRESS.
