@@ -106,7 +106,7 @@ public final class CoreCfgProjection {
 
     public static CfgGraph project(Publication publication, ProjectionPolicy policy) {
         List<CfgNode> nodes = new ArrayList<>();
-        List<CfgTransition> transitions = new ArrayList<>();
+        var table=new CfgTransitionTable.Builder(publication);
         for (Unit unit : orderedUnits(publication)) {
             Map<LabelId, CfgNode.SequenceNode> sequences = new HashMap<>();
             Map<LabelId, CfgNode.HaltExit> halts = new HashMap<>();
@@ -132,17 +132,18 @@ public final class CoreCfgProjection {
             }
             List<Entries.Entry> entries = unit.entries().stream()
                     .sorted(Comparator.comparing(entry -> entry.id().localId())).toList();
+            var entryEdges=new ArrayList<CfgTransition>();var normalExits=new ArrayList<CfgNodeId>();
+            Entries.Entry representative=null;
             for (Entries.Entry entry : entries) {
                 if (entry.initialLabel().isEmpty() && policy == ProjectionPolicy.PARTIAL_ANALYSIS) continue;
-                CfgNode.EntryNode entryNode = new CfgNode.EntryNode(
-                        new CfgNodeId(publication.id(), nodes.size()), entry);
-                nodes.add(entryNode);
-                CfgNode.NormalExit exit = new CfgNode.NormalExit(
-                        new CfgNodeId(publication.id(), nodes.size()), publication.id(), unit.id(), entry.id());
-                nodes.add(exit);
-                transitions.add(new CfgTransition(entryNode.id(),
-                        sequences.get(entry.initialLabel().orElseThrow()).id(),
-                        CfgTransition.Kind.ENTRY, entry.id()));
+                CfgNode.EntryNode entryNode = new CfgNode.EntryNode(new CfgNodeId(publication.id(), nodes.size()), entry);nodes.add(entryNode);
+                CfgNode.NormalExit exit = new CfgNode.NormalExit(new CfgNodeId(publication.id(), nodes.size()), publication.id(), unit.id(), entry.id());nodes.add(exit);
+                entryEdges.add(new CfgTransition(entryNode.id(),sequences.get(entry.initialLabel().orElseThrow()).id(),CfgTransition.Kind.ENTRY,entry.id()));
+                normalExits.add(exit.id());if(representative==null)representative=entry;
+            }
+            var transitions=new ArrayList<CfgTransition>();
+            if(representative!=null) {
+                var entry=representative;var normalExit=normalExits.getFirst();
                 for (Sequence sequence : orderedSequences) {
                     CfgNodeId from = sequences.get(sequence.label()).id();
                     var exceptionalLabels=new java.util.HashSet<LabelId>();
@@ -153,7 +154,7 @@ public final class CoreCfgProjection {
                     if(!LocalControlRules.local(sequence.terminator()))for(var end:outsideNodes.get(sequence.label()))transitions.add(new CfgTransition(from,end.id(),CfgTransition.Kind.CONTROL_EXIT,entry.id()));
                     // Contextual rules include orphans; they do not assert reachability from this Entry.
                     if (sequence.terminator() instanceof Operations.Return) {
-                        transitions.add(new CfgTransition(from, exit.id(), CfgTransition.Kind.RETURN, entry.id()));
+                        transitions.add(new CfgTransition(from, normalExit, CfgTransition.Kind.RETURN, entry.id()));
                     } else if (sequence.terminator() instanceof Operations.Jump jump) {
                         transitions.add(new CfgTransition(from, sequences.get(jump.destination()).id(),
                                 CfgTransition.Kind.JUMP, entry.id()));
@@ -168,7 +169,7 @@ public final class CoreCfgProjection {
                         for (var alternative : opaque.envelope().control().known()) {
                             var target = alternativeLabel(alternative);
                             if (target != null && destinations.add(target)) transitions.add(new CfgTransition(from, sequences.get(target).id(), CfgTransition.Kind.OPAQUE_JUMP, entry.id()));
-                            else if (alternative instanceof Control.ReturnAlternative) transitions.add(new CfgTransition(from, exit.id(), CfgTransition.Kind.OPAQUE_RETURN, entry.id()));
+                            else if (alternative instanceof Control.ReturnAlternative) transitions.add(new CfgTransition(from, normalExit, CfgTransition.Kind.OPAQUE_RETURN, entry.id()));
                         }
                     } else if (sequence.terminator() instanceof Operations.Halt) {
                         transitions.add(new CfgTransition(from, halts.get(sequence.label()).id(),
@@ -184,8 +185,9 @@ public final class CoreCfgProjection {
                     }
                 }
             }
+            table.add(unit.id(),entryEdges,normalExits,transitions);
         }
-        return new CfgGraph(publication, nodes, transitions);
+        return new CfgGraph(publication, nodes, table.build());
     }
 
     private static List<Unit> orderedUnits(Publication publication) {

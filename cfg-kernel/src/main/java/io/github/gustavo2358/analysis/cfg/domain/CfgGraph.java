@@ -29,7 +29,9 @@ public final class CfgGraph {
     public CfgGraph(Publication publication, List<CfgNode> nodes, List<CfgTransition> transitions) {
         this.publication = Objects.requireNonNull(publication, "publication");
         this.nodes = List.copyOf(nodes);
-        this.transitions = List.copyOf(transitions);
+        this.transitions = transitions instanceof CfgTransitionTable table ? table : List.copyOf(transitions);
+        if(this.transitions instanceof CfgTransitionTable table&&table.publication()!=publication)
+            throw new IllegalArgumentException("foreign factored projection owner");
         List<CfgNode.EntryNode> entryNodes = new ArrayList<>();
         List<CfgNode.NormalExit> exitNodes = new ArrayList<>();
         List<CfgNode.HaltExit> haltNodes = new ArrayList<>();
@@ -57,10 +59,17 @@ public final class CfgGraph {
         haltExits = List.copyOf(haltNodes);
         preciseControlCapabilities = publication.capabilities().required().stream()
                 .filter(CoreCfgProjection::supportsControlCapability).distinct().toList();
-        if (new HashSet<>(this.transitions).size() != this.transitions.size()) {
+        var stored=this.transitions instanceof CfgTransitionTable table?table.stored():this.transitions;
+        if(this.transitions instanceof CfgTransitionTable table)for(int g=0;g<table.groups();g++)for(int e=0;e<table.entries(g);e++) {
+            var binding=table.entry(g,e);var exit=indexed.get(table.normalExit(g,e));
+            if(!binding.activationEntry().unit().equals(table.unit(g))||!(exit instanceof CfgNode.NormalExit normal)
+                    ||!normal.entryId().equals(binding.activationEntry())||!normal.unitId().equals(table.unit(g)))
+                throw new IllegalArgumentException("factored entry/normal-exit correlation");
+        }
+        if (new HashSet<>(stored).size() != stored.size()) {
             throw new IllegalArgumentException("duplicate CFG transition");
         }
-        for (CfgTransition transition : this.transitions) {
+        for (CfgTransition transition : stored) {
             CfgNode from = indexed.get(transition.from());
             CfgNode to = indexed.get(transition.to());
             if (!activationEntries.containsKey(transition.activationEntry())) {
@@ -135,6 +144,9 @@ public final class CfgGraph {
     public List<CfgNode> nodes() {
         return nodes;
     }
+
+    /** Actual retained transition rows; bindings may expose additional logical contextual edges. */
+    public int storedTransitionCount(){return transitions instanceof CfgTransitionTable table?table.stored().size():transitions.size();}
 
     public List<CfgTransition> transitions() {
         return transitions;

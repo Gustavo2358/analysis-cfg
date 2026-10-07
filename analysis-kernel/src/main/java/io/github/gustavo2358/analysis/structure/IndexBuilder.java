@@ -33,6 +33,8 @@ final class IndexBuilder {
     final Map<OperandId, Memory.ObjectDeclaration> objectReferences = new HashMap<>();
     final LongIntDirectory forwardHeads = new LongIntDirectory(), backwardHeads = new LongIntDirectory();
     ProgramIndex.Node[] nodes;
+    boolean factored;
+    final Map<UnitId,ProgramIndex.Node> returnRepresentatives=new HashMap<>();
     CfgTransition[] edges;
     int[] from, to, edgeEntry, forwardNext, backwardNext;
     private final CfgBuildResult result;
@@ -272,13 +274,19 @@ final class IndexBuilder {
     }
 
     private void edges(CfgGraph graph) {
-        int length = graph.transitions().size();
+        factored=graph.transitions() instanceof CfgTransitionTable;
+        var rows=factored?((CfgTransitionTable)graph.transitions()).stored():graph.transitions();
+        if(factored) {
+            var table=(CfgTransitionTable)graph.transitions();
+            for(int group=0;group<table.groups();group++)returnRepresentatives.put(table.unit(group),nodeIds.get(table.normalExit(group,0)));
+        }
+        int length = rows.size();
         edges = new CfgTransition[length];
         from = new int[length]; to = new int[length]; edgeEntry = new int[length];
         forwardNext = new int[length]; backwardNext = new int[length];
         LongIntDirectory seenRoles = new LongIntDirectory();
         int ordinal = 0;
-        for (CfgTransition edge : graph.transitions()) {
+        for (CfgTransition edge : rows) {
             count.visit("cfg.transitions");
             ProgramIndex.Node source = nodeIds.get(edge.from()), target = nodeIds.get(edge.to());
             Entries.Entry activation = entries.get(edge.activationEntry());
@@ -293,10 +301,11 @@ final class IndexBuilder {
             int bit = 1 << edge.kind().ordinal();
             valid(edge.kind() == CfgTransition.Kind.OPAQUE_JUMP || edge.kind()==CfgTransition.Kind.EXCEPTION || edge.kind()==CfgTransition.Kind.CONTROL_EXIT || (roles & bit) == 0, "duplicate semantic contextual edge");
             seenRoles.put(key, roles | bit);
-            edges[ordinal] = edge; from[ordinal] = source.ordinal; to[ordinal] = target.ordinal; edgeEntry[ordinal] = context;
+            edges[ordinal] = edge; from[ordinal] = source.ordinal; to[ordinal] = target.ordinal; edgeEntry[ordinal] = factored&&edge.kind()!=CfgTransition.Kind.ENTRY?-1:context;
             ordinal = Math.incrementExact(ordinal);
             count.edges = Math.incrementExact(count.edges);
         }
+        if(factored)count.edges=graph.transitions().size();
         valid(count.edges == expectedEdges, "missing required contextual edge");
         // Linked edge columns preserve input order and require only nonempty (Entry, node) rows.
         for (int edge = length - 1; edge >= 0; edge--) {

@@ -17,6 +17,8 @@ public final class ProgramIndex {
     final Object identity;
     final ProjectionPolicy policy;
     final Node[] nodes;
+    final boolean factored;
+    final Map<UnitId,Node> returnRepresentatives;
     final CfgTransition[] edges;
     final int[] from, to, entry, forwardNext, backwardNext;
     final LongIntDirectory forwardHeads, backwardHeads;
@@ -56,6 +58,7 @@ public final class ProgramIndex {
         }
         partialControlUnits=Set.copyOf(partialUnits);
         unitNodes.replaceAll((u, list) -> List.copyOf(list)); openSources.replaceAll((u, list) -> List.copyOf(list));
+        factored=b.factored;returnRepresentatives=b.returnRepresentatives;
         edges = b.edges;
         from = b.from; to = b.to; entry = b.edgeEntry;
         forwardNext = b.forwardNext; backwardNext = b.backwardNext;

@@ -614,6 +614,12 @@
       "zeroScratchQuotaIsIndependentFromHeapQuota",
       "stagedCapacityTransfersWithoutRechargingOrPrematurelyReleasingBytes",
       "capacityTransferRejectsForeignPoolOwnerSelfAndClosedReservationsAtomically"
+    ],
+    "io.github.gustavo2358.analysis.structure.SharedTopologyTest": [
+      "projectionAndIndexStoreEntryBindingsWithoutCopyingEveryBody",
+      "denseAndFactoredGraphsHaveSameEveryEntryForwardBackwardAndListHash",
+      "unitAndEntryExitBindingsStaySeparateWithEqualTargetBranchesAndDifferentRoots",
+      "retentionAuditCountsPhysicalRowsAndStillDetectsAnExtraRetainedTransition"
     ]
   },
   "analysis-launcher": {

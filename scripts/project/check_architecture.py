@@ -144,6 +144,10 @@ EXPECTED_PRODUCTION_IMPORTS.update({
         "java.util.Objects",
     },
 })
+EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CfgTransitionTable.java"] = {
+    PUBLICATION, "io.github.gustavo2358.air.model.Ids.UnitId", "java.util.AbstractList", "java.util.ArrayList",
+    "java.util.Arrays", "java.util.List", "java.util.Objects", "java.util.RandomAccess",
+}
 EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CfgNode.java"].add(
     "io.github.gustavo2358.air.model.Operations")
 EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CfgGraph.java"].update({
@@ -164,7 +168,7 @@ CFG_CLASS_NAMES = {
     "LocalControlRules", "LocalControlRules$ReentryGuard", "LocalControlRules$Rule", "LocalControlRules$Invoke", "LocalControlRules$Boundary",
     "LocalControlRules$Resume", "LocalControlRules$Unwind", "LocalControlRules$Stack", "LocalControlRules$Step", "LocalControlRules$RecursiveActivation",
     "CfgNodeId", "CfgNode", "CfgNode$EntryNode", "CfgNode$SequenceNode", "CfgNode$NormalExit", "CfgNode$HaltExit", "CfgNode$OutcomeExit",
-    "CfgTransition", "CfgTransition$Kind", "CfgGraph", "CfgGraph$1",
+    "CfgTransitionTable", "CfgTransitionTable$Builder", "CfgTransitionTable$Group", "CfgTransition", "CfgTransition$Kind", "CfgGraph", "CfgGraph$1",
     "CfgProjectionIssue", "CfgProjectionIssue$Code", "CoreCfgProjection", "ProjectionPolicy",
 }
 EXPECTED_CLASSFILES = {

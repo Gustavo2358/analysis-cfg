@@ -440,3 +440,38 @@ certificate across execution, 512 correlated sites with reversed physical/link o
 sites and foreign-certificate rejection. The old native implementation fails the reuse oracle
 because each read constructs a new interpretation. These changes do not address scalar CONCAT,
 contextual frame saturation or full paged AIR validation/transport.
+
+
+### Shared ordinary flow and explicit Entry bindings
+
+Core projection now builds each unit's ordinary body transitions once, together with one
+entry-edge/normal-exit binding per active Entry. `CfgTransitionTable` is an immutable logical
+List view owned by the exact Publication; only its package-private builder constructs tables.
+Known return destinations bind to the selected Entry's normal exit. All other typed outcomes,
+including equal-target true/false arms, retain their identities and order. Group prefix sums
+support random access by binary search. The list-compatible polynomial hash factors common
+body contributions rather than enumerating every contextual row. Equality with explicit
+lists remains standard List equality; table-to-table equality compares immutable groups.
+
+`CfgGraph` validates physical representative rows and every entry/normal-exit correlation.
+Its explicit-list constructor still verifies every supplied transition. `IndexBuilder` admits
+the complete logical cardinality but stores/links the physical rows. Specific entry heads and
+shared body heads use distinct primitive keys. Context cursors combine them in established
+order, bind return exits and activation identity, and never expose another unit/Entry's edges.
+Explicit externally supplied dense graphs remain strictly admitted through the same path.
+This is representation substitution, not skipped validation of dead AIR or a reachability claim.
+
+`edgesIndexed` retains its logical coverage meaning; collection visit counters now report
+actual physical indexing/link work. The independent arithmetic construction ledger follows
+body rows + entry bindings. Retention auditing walks actual table fields rather than enumerating
+virtual transient transitions, and an extra retained CFG transition still fails that audit.
+The 256-sequence/128-entry witness changes retained/indexed rows from 32,896 to 384 while
+preserving the full logical inventory. Dense/factored cursors, full List hash semantics, two
+units, distinct roots, equal branch targets, malformed dense graphs and exact return exits
+are directly compared. All cfg/analysis kernel tests pass at the focused checkpoint.
+
+These resident arrays remove the Entry × ordinary-body storage/construction product. They do
+not yet provide the paged ProgramStore, managed resource budget, factored open relations or
+formal local-continuation summaries required to complete AS-W03/W04. Traversing/delivering the
+full logical CFG still enumerates its requested contextual edges. Per-analysis Entry state
+sharing and dependency output cursor integration remain later substitutions.

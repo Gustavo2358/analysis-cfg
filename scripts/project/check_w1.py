@@ -74,7 +74,7 @@ def verify_metrics(output:str)->list[dict]:
         s,i,d,k,selected=(r[x] for x in ['sequences','instructions','objects','entries','selected'])
         c=int(d>0); v=s+2*k; e=k*(s+1); buckets=(2 if s>1 else 1)+int(i>0)
         checks={'nodesIndexed':v,'edgesIndexed':e,'operationsIndexed':s+i,'objectsIndexed':d,'locationsIndexed':c,
-                'referencesResolved':c+d+k+(i if d else 0),'structuralVisits':3+3*d+2*c+2*s+(4 if d else 1)*i+2*k+v+2*e+buckets,
+                'referencesResolved':c+d+k+(i if d else 0),'structuralVisits':3+3*d+2*c+2*s+(4 if d else 1)*i+2*k+v+2*(s+k)+buckets,
                 'queryEdgeReads':2*selected*(s+1),'retainedNodeHandles':v,'retainedSiteHandles':s+i,'additionalAirCfgPayloads':0}
         for field,value in checks.items():
             if r.get(field)!=value: raise Failure('W1 ledger/retention mismatch: '+field)
