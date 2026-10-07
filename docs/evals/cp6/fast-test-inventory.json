@@ -280,7 +280,23 @@
       "emptyAndUnwrittenZerosAllocateNoPages",
       "arraysShareBackendButNeverShareRootsOrReleaseAnotherArraysPages",
       "invalidIndexesAndInvalidConstructionCannotAllocatePages",
-      "clearingExistingCellPreservesNeighborsAcrossDirectoryGrowth"
+      "clearingExistingCellPreservesNeighborsAcrossDirectoryGrowth",
+      "clearingSparseHistoryReclaimsEmptyLeavesAndDirectoryPathsImmediately"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedWorklistTest": [
+      "forcedSpillPreservesFairFifoAndDuplicateSuppressionAgainstIndependentOracle",
+      "removedMembershipClearsBeforeSelfLoopCanEnqueueAgain",
+      "pendingLongIdsRemainDistinctAndCloseOnlyReleasesOwnedPages",
+      "invalidPointsAndEmptyRemovalDoNotMutatePendingSet",
+      "operationalFailureAbortsSchedulingAndCleanupReleasesReservations"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedLongIndexTest": [
+      "forcedSpillLookupInsertionAndDeletionMatchIndependentOrderedMap",
+      "sortedReverseAndSignedBoundaryKeysKeepTheirOriginalCanonicalValues",
+      "exactExternalKeyComparisonSeparatesCollisionsAndUnifiesOnlyEqualKeys",
+      "repeatedRetirementReleasesPagesAndBoundsDiskByLiveIndexSize",
+      "closingOneIndexKeepsOtherOwnersAndRejectsUseAfterClose",
+      "comparatorFailureCannotExposeAnIndexAsStableOrReturnPartialLookup"
     ]
   },
   "analysis-dataflow": {

@@ -102,4 +102,18 @@ final class PagedLongArrayTest {
             array.set(4096, 13); assertEquals(11, array.get(1)); assertEquals(13, array.get(4096));
         }
     }
+
+    @Test void clearingSparseHistoryReclaimsEmptyLeavesAndDirectoryPathsImmediately() {
+        var resources = resources();
+        try (var store = new FilePageStore(directory, 64, 2, resources);
+             var array = new PagedLongArray(store, Long.MAX_VALUE, resources, AnalysisResources.Phase.INDEX)) {
+            for (int n = 0; n < 128; n++) {
+                long index = (1L << 48) + n * 8192L;
+                array.set(index, 7); assertTrue(store.statistics().livePages() > 0);
+                array.set(index, 0); assertEquals(0, array.get(index));
+                assertEquals(0, store.statistics().livePages(), "cleared history retains radix pages");
+            }
+            assertTrue(resources.used(AnalysisResources.Pool.TEMPORARY) < 8192);
+        }
+    }
 }

@@ -127,6 +127,11 @@ partial progress and preserve failed evidence.
 
 ## Managed page foundations
 
+The [domain law inventory](domain-law-inventory.md) records which algebraic
+assumptions need proof before domain admission and version retirement. Its scalar
+CONCAT witness rejects blind replacement of old known outputs by latest-input
+outputs. Storage correctness alone does not establish those transfer laws.
+
 `AnalysisResources` reserves coarse capacities before allocation and distinguishes
 resident/scratch heap, direct buffers, temporary disk, descriptors, work and output.
 `PageStore` is an exact core port. The adapter `FilePageStore` uses positional
@@ -141,8 +146,26 @@ There is no crash recovery or cross-session reopening of this temporary format.
 `PagedLongArray` provides sparse 64-bit primitive indexing through a page-backed
 radix directory. Its resident control state is fixed; directory height follows
 the highest written index, bounded by 63 levels. Zero/unwritten ranges allocate
-no pages. Teardown has a fixed stack and releases only the array's own pages.
+no pages. Nonzero counts release empty pages and directory paths as soon as cells
+are cleared, and collapse unnecessary all-low prefixes. Teardown has a fixed
+stack and releases only the array's own pages.
 The shared store must still close after an operational failure interrupts cleanup.
+
+`PagedWorklist` owns a FIFO of primitive points and a paged pending bitmap. Arrival
+deduplication does not discard new abstract-state contributions: its consumer must
+join those contributions before scheduling. Removal clears membership before
+returning the point, so self-loops can enqueue it again. Consumed queue pages and
+zero bitmap pages are released; scheduling failure aborts further use.
+
+`PagedLongIndex` is an ordered B-tree for required canonical state, with binary
+search within nodes, split/rotation/merge, physical page retirement on deletion
+and a fixed teardown stack. It avoids a resident HashMap or rehash peak. Positive
+values are canonical handles; zero means absent. Natural signed-long order is
+the default. Custom order must compare complete immutable keys behind stable
+handles; hash equality alone is insufficient. It must be transitive, deterministic
+and bound to the owning arena/profile. The index owns no external key payload:
+callers retain/release those keys with their graph roots. Comparator failure aborts
+the index instead of certifying partial lookup or stable state.
 
 These primitives are not yet wired into production analysis. Passing their tests
 does not establish bounded residency for AIR decoding, summaries, proofs, queues,
