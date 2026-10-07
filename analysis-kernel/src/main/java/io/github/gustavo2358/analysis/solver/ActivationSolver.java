@@ -18,6 +18,7 @@ final class ActivationSolver<S> {
     // Resident compatibility route; the index accepts managed resources at its port.
     private final AnalysisResources indexResources=new AnalysisResources(new AnalysisResources.Limits(Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE));
     private final List<EntryRun> entries=new ArrayList<>();
+    private final Set<BooleanConditions> ownedConditions=Collections.newSetFromMap(new IdentityHashMap<>());
     private final ArrayDeque<Slot> pending=new ArrayDeque<>();
     private final S bottom;
     private long joins,initializations,attempts,pushes,pops,duplicates,maxSize,transfers,edgeTransfers,edgeJoins,changed,unchanged;
@@ -67,11 +68,30 @@ final class ActivationSolver<S> {
         this.session=session;this.definition=definition;bottom=Objects.requireNonNull(definition.bottom());
     }
     DataflowResult<S> solve() {
-        try {execute();return result();}finally{closeIndexes();}
+        try {execute();return result();}finally{closeIndexes(true);}
     }
-    private void closeIndexes(){closeWitnesses();for(var entry:entries){for(var index:entry.byFrame.values())index.close();entry.byFrame.clear();if(entry.preliminary!=null)entry.preliminary.close();if(entry.paths!=null)entry.paths.close();}if(collector!=null)collector.close();}
+    private void closeIndexes(boolean closeConditions) {
+        RuntimeException failure=null;
+        for(var witness:finalWitnesses.values())failure=closeResource(witness,failure);finalWitnesses.clear();
+        for(var entry:entries) {
+            for(var index:entry.byFrame.values())failure=closeResource(index,failure);entry.byFrame.clear();
+            failure=closeResource(entry.preliminary,failure);failure=closeResource(entry.paths,failure);
+        }
+        failure=closeResource(collector,failure);
+        if(closeConditions)for(var conditions:ownedConditions)failure=closeResource(conditions,failure);
+        ownedConditions.clear();if(failure!=null)throw failure;
+    }
+    static RuntimeException closeResource(AutoCloseable resource,RuntimeException failure) {
+        if(resource==null)return failure;
+        try{resource.close();}catch(Exception error) {
+            RuntimeException next=error instanceof RuntimeException runtime?runtime:new IllegalStateException(error);
+            if(failure==null)return next;failure.addSuppressed(next);
+        }
+        return failure;
+    }
     private void execute() {
         var models=structural?List.<ActivationModel>of():structure(session);
+        for(var model:models)ownedConditions.add(model.conditions());
         for(var context:session.contexts())entries.add(new EntryRun(context,models.stream().filter(m->m.context()==context).findFirst().orElse(null)));
         var boundaries=new ArrayList<AnalysisDefinition.Boundary<S>>();definition.boundaries(session).forEach(boundaries::add);
 
@@ -105,8 +125,8 @@ final class ActivationSolver<S> {
                 for(var partition:region.exits.values())for(var piece:partition.pieces)root.accept(piece.condition);
                 for(var slot:region.slots.values()) {
                     slot.children.values().forEach(root::accept);
-                    for(var piece:slot.anchors.pieces)root.accept(piece.condition);
-                    for(var piece:slot.outputs.pieces)root.accept(piece.condition);
+                    slot.anchors.visitConditions(root);
+                    slot.outputs.visitConditions(root);
                 }
             }
             for(var key:feasibleCache.keySet())if(owners.contains(key.region))root.accept(key.condition);
@@ -150,7 +170,7 @@ final class ActivationSolver<S> {
             public Boolean transferBlock(AnalysisPoint point,Boolean state,DomainWork work){return state;}
             public Boolean transferEdge(AnalysisPoint point,CfgTransition edge,Boolean state,DomainWork work){return state;}
         };
-        var engine=new ActivationSolver<Boolean>(session,reach);engine.structural=true;
+        var engine=new ActivationSolver<Boolean>(session,reach);engine.structural=true;boolean transferred=false;
         try {engine.execute();engine.checkRecursion();var models=new ArrayList<ActivationModel>();
         for(var entry:engine.entries) {
             var shapes=new IdentityHashMap<ActivationControl.Frame,ActivationModel.Shape>();
@@ -174,8 +194,8 @@ final class ActivationSolver<S> {
             refineShapes(entry.bdd,shapes,parents);
             models.add(new ActivationModel(entry.context,entry.control,entry.bdd,shapes,parents,List.copyOf(roots),List.copyOf(unwind),depth));
         }
-        return models;
-        }finally{engine.closeIndexes();}
+        transferred=true;return models;
+        }finally{engine.closeIndexes(!transferred);}
     }
     /** Reduce impossible tested guards using a shared persistent SCC support relation. */
     private static void refineShapes(BooleanConditions b,Map<ActivationControl.Frame,ActivationModel.Shape> shapes,
@@ -327,7 +347,7 @@ final class ActivationSolver<S> {
         PreliminaryCallerSupport preliminary;
         EntryRun(ContextView context,ActivationModel model){
             this.context=context;this.model=model;control=model==null?new ActivationControl(session,context):model.control();
-            bdd=model==null?new BooleanConditions():model.conditions();paths=structural?null:new CallerPathCertificates(bdd,indexResources,null);
+            bdd=model==null?new BooleanConditions():model.conditions();ownedConditions.add(bdd);paths=new CallerPathCertificates(bdd,indexResources,null);
         }
         void start() {
             if(structural)preliminary=new PreliminaryCallerSupport(control,indexResources);
@@ -382,45 +402,8 @@ final class ActivationSolver<S> {
             anchors=new Partition(region.entry);outputs=new Partition(region.entry);moves=region.entry.model==null?region.entry.control.moves(node,region.frame):region.entry.model.shapes().get(region.frame).points().get(node).moves();initializations++;recordsSinceSweep++;
         }
     }
-    private final class Piece {
-        final int condition;final S state;
-        Piece(int condition,S state){this.condition=condition;this.state=state;}
-    }
-    /** Disjoint conditions; joins never mix values from different guard environments. */
-    private final class Partition {
-        final EntryRun entry;
-        List<Piece> pieces=List.of();
-        Partition(EntryRun entry){this.entry=entry;}
-        boolean add(int condition,S contribution) {
-            if(condition==0)return false;
-            var b=entry.bdd;
-            // Equal states require only union of their guards. Computing C \ P first
-            // can build a large intermediate BDD that the union immediately discards.
-            if(pieces.size()==1 && definition.equivalent(pieces.getFirst().state,contribution,work)) {
-                var old=pieces.getFirst();int combined=b.or(old.condition,condition);
-                if(combined==old.condition)return false;
-                pieces=List.of(new Piece(combined,old.state));return true;
-            }
-            var next=new ArrayList<Piece>();int remaining=condition;boolean modified=false;
-            for(var piece:pieces) {
-                int overlap=b.and(piece.condition,condition);
-                if(overlap==0){put(next,piece.condition,piece.state);continue;}
-                remaining=b.difference(remaining,piece.condition);
-                var joined=definition.joinInto(piece.state,contribution,work);
-                if(!joined.changed()){put(next,piece.condition,piece.state);continue;}
-                modified=true;put(next,b.difference(piece.condition,condition),piece.state);put(next,overlap,joined.state());
-            }
-            if(remaining!=0){modified=true;put(next,remaining,contribution);}
-            if(modified)pieces=List.copyOf(next);
-            return modified;
-        }
-        private void put(List<Piece> result,int condition,S value) {
-            if(condition==0)return;
-            for(int i=0;i<result.size();i++)if(definition.equivalent(result.get(i).state,value,work)) {
-                result.set(i,new Piece(entry.bdd.or(result.get(i).condition,condition),value));return;
-            }
-            result.add(new Piece(condition,value));
-        }
+    private final class Partition extends GuardedStates<S> {
+        Partition(EntryRun entry){super(entry.bdd,definition,work);}
     }
     private void enqueue(Slot slot) {
         attempts++;if(slot.queued){duplicates++;return;}slot.queued=true;pending.addLast(slot);pushes++;maxSize=Math.max(maxSize,pending.size());
@@ -508,7 +491,15 @@ final class ActivationSolver<S> {
                         }
                     }
                     case RECURSIVE -> region.recursive.merge(slot.node,condition,b::or);
-                    case POP,UNWIND,ROOT -> {
+                    case ROOT -> {
+                        // The action discards the entire local word. Only its existence
+                        // is observable at the empty-root destination, never its prefixes.
+                        if(feasible(region,condition,slot)) {
+                            var key=new ExitKey(slot.node,move.destination(),move.action(),move.count(),move.invalid(),move.edge());
+                            finishAtRoot(slot,e.root,key,1,output);
+                        }
+                    }
+                    case POP,UNWIND -> {
                         var key=new ExitKey(slot.node,move.destination(),move.action(),move.count(),move.invalid(),move.edge());
                         if(region.frame==null)finishAtRoot(slot,region,key,condition,output);
                         else region.emit(key,condition,output);

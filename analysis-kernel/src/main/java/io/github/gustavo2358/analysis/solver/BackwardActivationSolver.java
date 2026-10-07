@@ -18,6 +18,7 @@ final class BackwardActivationSolver<S> {
     private final AnalysisResources indexResources=new AnalysisResources(new AnalysisResources.Limits(Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE));
     private final S bottom;
     private final List<EntryRun> entries=new ArrayList<>();
+    private final Set<BooleanConditions> ownedConditions=Collections.newSetFromMap(new IdentityHashMap<>());
     private final ArrayDeque<Slot> pending=new ArrayDeque<>();
     private int nextPoint;
     private long summaryCreated,summaryLive,summaryPeak;
@@ -54,7 +55,8 @@ final class BackwardActivationSolver<S> {
             slot.children.clear();slot.watches.clear();slot.in.pieces=List.of();slot.out.pieces=List.of();
         }
         if(region.entry.paths!=null){region.entry.paths.retire(region.path);region.certifiedIncoming.clear();}
-        region.slots.clear();region.incoming.clear();region.callers.clear();region.waiters.clear();for(var call:region.calls)region.entry.calls.remove(call);region.calls.clear();region.predecessors.clear();
+        for(var slot:region.slots.values())detachRootReads(slot);
+        region.slots.clear();region.incoming.clear();region.callers.clear();region.waiters.clear();region.predecessors.clear();
     }
     private long transfers,deliveries,joins,pushes,pops,attempts,duplicates,maxSize,changes,unchanged;
     private long returnSourceReads;
@@ -64,10 +66,23 @@ final class BackwardActivationSolver<S> {
     private final Map<Need,Deferred> deferredCache=new LinkedHashMap<>();
     BackwardActivationSolver(AnalysisSession session,AnalysisDefinition<S> definition){this.session=session;this.definition=definition;bottom=Objects.requireNonNull(definition.bottom());}
     DataflowResult<S> solve() {
-        try {return execute();}finally{closeWitnesses();for(var entry:entries){for(var index:entry.byFrame.values())index.close();entry.byFrame.clear();entry.paths.close();}if(collector!=null)collector.close();}
+        try {return execute();}finally{closeOwners();}
+    }
+    private void closeOwners() {
+        RuntimeException failure=null;
+        for(var witness:finalWitnesses.values())failure=ActivationSolver.closeResource(witness,failure);finalWitnesses.clear();
+        for(var entry:entries) {
+            for(var index:entry.byFrame.values())failure=ActivationSolver.closeResource(index,failure);entry.byFrame.clear();
+            failure=ActivationSolver.closeResource(entry.paths,failure);
+        }
+        failure=ActivationSolver.closeResource(collector,failure);
+        for(var conditions:ownedConditions)failure=ActivationSolver.closeResource(conditions,failure);
+        ownedConditions.clear();if(failure!=null)throw failure;
     }
     private DataflowResult<S> execute() {
-        for(var model:ActivationSolver.structure(session))entries.add(new EntryRun(model));
+        var models=ActivationSolver.structure(session);
+        for(var model:models)ownedConditions.add(model.conditions());
+        for(var model:models)entries.add(new EntryRun(model));
         for(var boundary:definition.boundaries(session)) {
             var entry=entries.stream().filter(e->e.model.context()==boundary.context()).findFirst().orElseThrow(()->new IllegalArgumentException("foreign boundary"));
             var location=ActivationBoundaries.require(entry.model,boundary.node());
@@ -100,8 +115,8 @@ final class BackwardActivationSolver<S> {
                 owners.add(region);region.incoming.values().forEach(root::accept);
                 for(var slot:region.slots.values()) {
                     slot.children.values().forEach(root::accept);
-                    for(var piece:slot.in.pieces)root.accept(piece.condition);
-                    for(var piece:slot.out.pieces)root.accept(piece.condition);
+                    slot.in.visitConditions(root);
+                    slot.out.visitConditions(root);
                 }
             }
             for(var key:feasibleCache.keySet())if(owners.contains(key.region))root.accept(key.condition);
@@ -111,16 +126,16 @@ final class BackwardActivationSolver<S> {
     private final class Signature {
         final int depth;
         final long fingerprint;
-        final Map<ProgramIndex.Node,S> returns,roots;
+        final Map<ProgramIndex.Node,S> returns;
         final List<Map<ProgramIndex.Node,S>> ancestors;
-        Signature(int depth,Map<ProgramIndex.Node,S> returns,Map<ProgramIndex.Node,S> roots,List<Map<ProgramIndex.Node,S>> ancestors) {
-            this.depth=depth;this.returns=Map.copyOf(returns);this.roots=Map.copyOf(roots);this.ancestors=List.copyOf(ancestors);
-            long hash=31L*(31L*depth+mapFingerprint(this.returns))+mapFingerprint(this.roots);
+        Signature(int depth,Map<ProgramIndex.Node,S> returns,List<Map<ProgramIndex.Node,S>> ancestors) {
+            this.depth=depth;this.returns=Map.copyOf(returns);this.ancestors=List.copyOf(ancestors);
+            long hash=31L*depth+mapFingerprint(this.returns);
             for(var ancestor:this.ancestors)hash=31*hash+mapFingerprint(ancestor);
             fingerprint=31*hash+this.ancestors.size();
         }
         boolean same(Signature other) {
-            if(depth!=other.depth||!sameMap(returns,other.returns)||!sameMap(roots,other.roots)||ancestors.size()!=other.ancestors.size())return false;
+            if(depth!=other.depth||!sameMap(returns,other.returns)||ancestors.size()!=other.ancestors.size())return false;
             for(int i=0;i<ancestors.size();i++)if(!sameMap(ancestors.get(i),other.ancestors.get(i)))return false;return true;
         }
     }
@@ -142,11 +157,10 @@ final class BackwardActivationSolver<S> {
         final List<Region> regions=new ArrayList<>();
         final IdentityHashMap<ActivationControl.Frame,StateIndex<Signature,Region>> byFrame=new IdentityHashMap<>();
         final Map<ActivationControl.Frame,Map<ProgramIndex.Node,S>> boundaries=new IdentityHashMap<>();
-        final Set<Slot> calls=Collections.newSetFromMap(new IdentityHashMap<>());
         Region root;
         EntryRun(ActivationModel model){this.model=model;bdd=model.conditions();paths=new CallerPathCertificates(bdd,indexResources,null);}
         void start() {
-            root=new Region(this,null,new Signature(0,Map.of(),Map.of(),Collections.nCopies(model.maxUnwind(),Map.of())));regions.add(root);summaryCreated();feasibleCache.put(new Need(root,1),true);root.initialize();
+            root=new Region(this,null,new Signature(0,Map.of(),Collections.nCopies(model.maxUnwind(),Map.of())));regions.add(root);summaryCreated();feasibleCache.put(new Need(root,1),true);root.initialize();
         }
         Region region(ActivationControl.Frame frame,Signature input,Slot caller,int condition) {
             frame=model.control().body(frame);
@@ -155,15 +169,6 @@ final class BackwardActivationSolver<S> {
             if(!feasible(caller.region,condition,caller))return null;
             if(candidates==null){candidates=new StateIndex<>(indexResources,AnalysisResources.Phase.DOMAIN,a->a.fingerprint,Signature::same);byFrame.put(frame,candidates);}
             var r=new Region(this,frame,input);candidates.putIfAbsent(input,r);regions.add(r);summaryCreated();r.initialize();return r;
-        }
-        Map<ProgramIndex.Node,S> roots() {
-            var values=new IdentityHashMap<ProgramIndex.Node,S>();
-            for(var node:model.rootTargets()) {
-                var slot=root.slots.get(node);S state=bottom;
-                if(slot!=null)for(var piece:slot.in.pieces)state=definition.joinInto(state,piece.state,work).state();
-                values.put(node,state);
-            }
-            return values;
         }
     }
     private final class Region {
@@ -176,13 +181,11 @@ final class BackwardActivationSolver<S> {
         long incomingVersion,mark;
         final CallerPathCertificates.Node path;
         final Map<Slot,CallerPathCertificates.Arc> certifiedIncoming;
-        final List<Slot> calls=new ArrayList<>();
         Region(EntryRun entry,ActivationControl.Frame frame,Signature input){this.entry=entry;this.frame=frame;this.input=input;path=entry.paths==null?null:entry.paths.node(frame==null,gain->{incomingVersion++;if(gain!=0)for(var waiting:waiters)enqueue(waiting);});certifiedIncoming=entry.paths==null?null:new IdentityHashMap<>();}
         void initialize() {
             var shape=entry.model.shapes().get(frame);
             for(var point:shape.points().entrySet())slots.put(point.getKey(),new Slot(this,point.getKey(),point.getValue()));
             for(var slot:slots.values()) {
-                boolean call=false;
                 for(var move:slot.shape.moves()) {
                     if(move.action()==ActivationControl.Action.NEXT||frame==null&&move.action()==ActivationControl.Action.ROOT)
                         predecessors.computeIfAbsent(move.destination(),n->new ArrayList<>()).add(slot);
@@ -191,14 +194,13 @@ final class BackwardActivationSolver<S> {
                         // A symbolic CALL move can be impossible under its source
                         // predicate and thus have no reached child shape. It reads nothing.
                         if(childShape==null)continue;
-                        call=true;var targets=new LinkedHashSet<>(entry.model.unwindTargets());
+                        var targets=new LinkedHashSet<>(entry.model.unwindTargets());
                         for(var source:childShape.returnSources()) {
                             returnSourceReads++;targets.add(entry.model.control().returnDestination(source,move.frame()));
                         }
                         for(var target:targets)predecessors.computeIfAbsent(target,n->new ArrayList<>()).add(slot);
                     }
                 }
-                if(call){calls.add(slot);entry.calls.add(slot);}
                 slot.out.add(slot.shape.condition(),bottom);enqueue(slot);
             }
         }
@@ -206,6 +208,8 @@ final class BackwardActivationSolver<S> {
     private final class Slot {
         final Region region;final ProgramIndex.Node node;final ActivationModel.Point shape;
         final AnalysisPoint point;final Partition in,out;boolean queued;
+        final Set<Slot> rootReads=Collections.newSetFromMap(new IdentityHashMap<>());
+        final Set<Slot> rootReaders=Collections.newSetFromMap(new IdentityHashMap<>());
         Map<Region,Integer> children=new IdentityHashMap<>();
         final Set<Region> watches=Collections.newSetFromMap(new IdentityHashMap<>());
         Slot(Region region,ProgramIndex.Node node,ActivationModel.Point shape) {recordsSinceSweep++;
@@ -213,28 +217,8 @@ final class BackwardActivationSolver<S> {
             in=new Partition(region.entry);out=new Partition(region.entry);
         }
     }
-    private final class Piece {
-        final int condition;final S state;Piece(int condition,S state){this.condition=condition;this.state=state;}
-    }
-    private final class Partition {
-        final EntryRun entry;List<Piece> pieces=List.of();Partition(EntryRun entry){this.entry=entry;}
-        boolean add(int condition,S state) {
-            if(condition==0)return false;var next=new ArrayList<Piece>();int remaining=condition;boolean modified=false;var b=entry.bdd;
-            for(var piece:pieces) {
-                int overlap=b.and(piece.condition,condition);
-                if(overlap==0){put(next,piece.condition,piece.state);continue;}
-                remaining=b.difference(remaining,piece.condition);var joined=definition.joinInto(piece.state,state,work);
-                if(!joined.changed()){put(next,piece.condition,piece.state);continue;}
-                modified=true;put(next,b.difference(piece.condition,condition),piece.state);put(next,overlap,joined.state());
-            }
-            if(remaining!=0){modified=true;put(next,remaining,state);}
-            if(modified)pieces=List.copyOf(next);return modified;
-        }
-        void put(List<Piece> result,int condition,S value) {
-            if(condition==0)return;
-            for(int i=0;i<result.size();i++)if(definition.equivalent(result.get(i).state,value,work)) {result.set(i,new Piece(entry.bdd.or(result.get(i).condition,condition),value));return;}
-            result.add(new Piece(condition,value));
-        }
+    private final class Partition extends GuardedStates<S> {
+        Partition(EntryRun entry){super(entry.bdd,definition,work);}
     }
     private void enqueue(Slot slot){attempts++;if(slot.queued){duplicates++;return;}slot.queued=true;pending.addLast(slot);pushes++;maxSize=Math.max(maxSize,pending.size());}
     private void contribute(Slot source,int condition,ProgramIndex.Node destination,CfgTransition edge,S state) {
@@ -242,6 +226,16 @@ final class BackwardActivationSolver<S> {
         var target=new AnalysisPoint(-1,source.region.entry.model.context(),destination);
         S contribution=Objects.requireNonNull(definition.transferEdge(target,edge,state,work));
         if(definition.equivalent(contribution,state,work)||feasible(source.region,condition,source))source.out.add(condition,contribution);
+    }
+    private void detachRootReads(Slot source) {
+        for(var target:source.rootReads)target.rootReaders.remove(source);source.rootReads.clear();
+    }
+    /** Successor guard is over an empty word, independently of the source word. */
+    private void readRoot(Slot source,ProgramIndex.Node destination,int condition,CfgTransition edge) {
+        var target=source.region.entry.root.slots.get(destination);if(target==null)return;
+        source.rootReads.add(target);target.rootReaders.add(source);
+        for(var piece:target.in.pieces)if(source.region.entry.bdd.atEmpty(piece.condition)!=0)
+            contribute(source,condition,destination,edge,piece.state);
     }
     private void read(Slot source,Slot target,int condition,CfgTransition edge) {
         if(target==null)return;
@@ -255,7 +249,7 @@ final class BackwardActivationSolver<S> {
         var parent=caller.region;
         List<Choice> choices=List.of(new Choice(condition,Map.of()));var b=parent.entry.bdd;
         for(var target:targets) {
-            var slot=parent.slots.get(target);var options=slot==null?List.<Piece>of():slot.in.pieces;var next=new ArrayList<Choice>();
+            var slot=parent.slots.get(target);var options=slot==null?List.<GuardedStates.Piece<S>>of():slot.in.pieces;var next=new ArrayList<Choice>();
             for(var choice:choices) {
                 int remainder=choice.condition;
                 for(var value:options) {
@@ -287,7 +281,7 @@ final class BackwardActivationSolver<S> {
                 var first=new IdentityHashMap<ProgramIndex.Node,S>();for(var node:e.model.unwindTargets())first.put(node,choice.values.getOrDefault(node,bottom));ancestors.add(Map.copyOf(first));
                 for(int i=1;i<e.model.maxUnwind();i++)ancestors.add(parent.input.ancestors.get(i-1));
             }
-            var input=new Signature(Math.min(parent.input.depth+1,e.model.maxUnwind()),returnValues,e.roots(),ancestors);
+            var input=new Signature(Math.min(parent.input.depth+1,e.model.maxUnwind()),returnValues,ancestors);
             var child=e.region(move.frame(),input,source,choice.condition);if(child==null)continue;subscribe(source,child,choice.condition);
             var entry=child.slots.get(e.model.control().entry(move.frame()));
             for(var value:entry.in.pieces) {
@@ -327,6 +321,7 @@ final class BackwardActivationSolver<S> {
         for(var link:caller.children.entrySet())replaceIncoming(caller,link.getKey(),link.getValue());
     }
     private void process(Slot slot) {
+        detachRootReads(slot);
         var previous=slot.children;slot.children=new IdentityHashMap<>();
         for(var watched:slot.watches)watched.waiters.remove(slot);slot.watches.clear();
         transfers++;var region=slot.region;var entry=region.entry;var b=entry.bdd;
@@ -345,14 +340,11 @@ final class BackwardActivationSolver<S> {
                 case POP -> slot.out.add(condition,region.input.returns.getOrDefault(slot.node,bottom));
                 case UNWIND -> {
                     boolean valid=move.count()<=region.input.depth;var destination=valid?move.destination():move.invalid();
-                    S value=valid?region.input.ancestors.get(move.count()-1).getOrDefault(destination,bottom):region.frame==null?bottom:region.input.roots.getOrDefault(destination,bottom);
                     var edge=valid?move.edge():entry.model.control().edge(slot.node,destination);
-                    if(region.frame==null)read(slot,entry.root.slots.get(destination),condition,edge);else contribute(slot,condition,destination,edge,value);
+                    if(valid)contribute(slot,condition,destination,edge,region.input.ancestors.get(move.count()-1).getOrDefault(destination,bottom));
+                    else readRoot(slot,destination,condition,edge);
                 }
-                case ROOT -> {
-                    if(region.frame==null)read(slot,entry.root.slots.get(move.destination()),condition,move.edge());
-                    else contribute(slot,condition,move.destination(),move.edge(),region.input.roots.getOrDefault(move.destination(),bottom));
-                }
+                case ROOT -> readRoot(slot,move.destination(),condition,move.edge());
                 case RECURSIVE -> { /* Refusal is checked only for a feasible caller predicate below. */ }
             }
         }
@@ -365,7 +357,7 @@ final class BackwardActivationSolver<S> {
         if(changed) {
             changes++;for(var predecessor:region.predecessors.getOrDefault(slot.node,List.of()))enqueue(predecessor);
             if(slot.node==entry.model.control().entry(region.frame))for(var caller:region.callers)enqueue(caller);
-            if(region.frame==null&&entry.model.rootTargets().contains(slot.node))for(var call:entry.calls)enqueue(call);
+            for(var reader:slot.rootReaders)enqueue(reader);
         } else unchanged++;
         reconcile(slot,previous);
     }

@@ -164,4 +164,26 @@ class CallerPathCertificatesTest {
         assertEquals(10,failures,"every selected quota must exercise interruption and cleanup");
     }
 
+    @Test void disjunctivePredicatesUseAnIndividualIndexedWordWithoutJoiningAlternatives() {
+        var b=new BooleanConditions();
+        try(var graph=new CallerPathCertificates(b,resources(),null)) {
+            var root=graph.node(true);var child=graph.node(false);graph.add(root,child,5,1);
+            graph.add(child,child,2,b.not(b.variable(2)));graph.add(child,child,3,b.not(b.variable(3)));
+            assertTrue(graph.matches(child,b.or(b.variable(2),b.variable(3))),"either actual individual binding word is sufficient");
+            assertFalse(graph.matches(child,b.and(b.variable(2),b.variable(3))),"indexed alternatives must never turn into one joint word");
+            assertFalse(graph.matches(child,b.and(b.or(b.variable(2),b.variable(3)),b.not(b.variable(5)))),"the whole predicate must still hold on that word");
+        }
+    }
+
+    @Test void growingDisjunctionHintsDoNotRewalkThePrimaryWordForEveryAlternative() {
+        int count=128;var b=new BooleanConditions();
+        try(var graph=new CallerPathCertificates(b,resources(),null)) {
+            var root=graph.node(true);var child=graph.node(false);graph.add(root,child,1000000,1);
+            for(int key=0;key<count;key++)graph.add(child,child,key,b.not(b.variable(key)));
+            long before=graph.valuationNodeVisits();int predicate=0;
+            for(int key=0;key<count;key++){predicate=b.or(predicate,b.variable(key));assertTrue(graph.matches(child,predicate));}
+            assertTrue(graph.valuationNodeVisits()-before<=32L*count,"primary-prefix valuation visits="+(graph.valuationNodeVisits()-before));
+        }
+    }
+
 }

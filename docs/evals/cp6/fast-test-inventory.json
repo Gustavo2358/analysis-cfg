@@ -345,6 +345,10 @@
     ],
     "io.github.gustavo2358.analysis.solver.CallerPathStorageTest": [
       "guardedProofRepairAndRetirementHaveEqualResidentAndForcedSpillSemantics"
+    ],
+    "io.github.gustavo2358.analysis.solver.BooleanConditionsStorageTest": [
+      "literalJunctionsGeneralDecisionsAndRootLifetimesAgreeWithOnePageSpill",
+      "deniedLiteralAllocationReleasesOwnerAndLeavesBorrowedBackendUsable"
     ]
   },
   "analysis-dataflow": {
@@ -593,17 +597,20 @@
       "equalStatesAcrossSharedFailureExitsPreserveEveryContext"
     ],
     "io.github.gustavo2358.analysis.solver.BooleanConditionsTest": [
-      "operationsMatchIndependentTruthTablesAndCanonicalize",
-      "computedTableCollisionsPreserveEveryTruthAssignment",
-      "deepGuardConditionsDoNotUseTheJavaCallStack",
-      "scratchQueriesReleaseNodesWithoutReusingStaleComputedEntries",
-      "requiredPresentIsNecessaryForEverySatisfyingAssignment",
+      "committedOperationRetainsOnlyEscapingConditionsAndInvalidatesRetiredIds",
+      "literalImplicationsDoNotUnfoldEveryGrowingDecisionPrefix",
+      "growingLiteralJunctionsDoNotRebuildAllOrderedDecisionPrefixes",
       "sparseAbsentRestrictionMatchesIndependentTruthTables",
       "emptyRootBindingMatchesIndependentTruthTablesAcrossReusedIds",
       "managedScratchRollbackVisitsOnlyTransientMemoSlots",
       "managedScratchCollisionsAndReusedIdsMatchIndependentTruthTables",
       "rootedCollectionKeepsTruthAndCanonicalIdsAcrossReusedSlots",
-      "feasibilityScratchDoesNotReuseCollectedSlotsOrEscapeRollback"
+      "feasibilityScratchDoesNotReuseCollectedSlotsOrEscapeRollback",
+      "operationsMatchIndependentTruthTablesAndCanonicalize",
+      "computedTableCollisionsPreserveEveryTruthAssignment",
+      "scratchQueriesReleaseNodesWithoutReusingStaleComputedEntries",
+      "requiredPresentIsNecessaryForEverySatisfyingAssignment",
+      "deepGuardConditionsDoNotUseTheJavaCallStack"
     ],
     "io.github.gustavo2358.analysis.solver.CallerWitnessesTest": [
       "separateWitnessesNeverInventACombinedCaller",
@@ -697,10 +704,29 @@
       "guardReplacementPreservesStillValidProofsAndRepairsInvalidatedDescendants",
       "disconnectedCallerCyclesHaveAnExactNegativeSupportAndWakeOnReconnection",
       "rawSupportMatchesIndependentSearchAfterFourThousandBindingMutations",
-      "allocationFailuresReleaseOwnedRootsAndAllReservedCapacity"
+      "allocationFailuresReleaseOwnedRootsAndAllReservedCapacity",
+      "disjunctivePredicatesUseAnIndividualIndexedWordWithoutJoiningAlternatives",
+      "growingDisjunctionHintsDoNotRewalkThePrimaryWordForEveryAlternative"
     ],
     "io.github.gustavo2358.analysis.structure.ConditionalFeasibilityTest": [
       "sharedRecursiveDispatchDoesNotSearchAllCallersForEachGuard"
+    ],
+    "io.github.gustavo2358.analysis.solver.SignedLiteralSetTest": [
+      "signedInclusionAndIntersectionMatchIndependentMapsWithoutUnfoldingSharedTrees",
+      "signedLiteralUpdatesAndComplementsMatchIndependentSortedMaps",
+      "structuralUnionDetectsContradictionsAndSharesEquivalentPermutations",
+      "polarityCountsAndFirstSignedKeysSurviveComplementAndRemoval",
+      "absentRestrictionsMatchIndependentLiteralTruthAndCanonicalKeptKeys",
+      "growingPrefixesSharePayloadAndComplementDoesNotCopyTheLiteralProduct"
+    ],
+    "io.github.gustavo2358.analysis.solver.GuardedStatesTest": [
+      "pointwiseJoinsAndDisjointValueClassesMatchIndependentTables",
+      "equalValueUnionDoesNotConstructDisjointTransientDifferences",
+      "initializedValueClassesJoinWithoutCreatingOldAndNewGuardProducts"
+    ],
+    "io.github.gustavo2358.analysis.structure.RootResetRelationsTest": [
+      "sharedGuardedRootResetsDoNotAccumulateCallerPrefixPredicates",
+      "resetProjectionPreservesEveryContextAndNonDistributiveEdgeSensitiveMemory"
     ]
   },
   "analysis-launcher": {

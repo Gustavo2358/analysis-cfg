@@ -700,3 +700,77 @@ Checkpoint validation: full kernel211 methods PASS with no failures/errors/skips
 FAST893 required methods and all exact architecture/transport boundaries PASS in
 309.175s. Original frozen family curves and full public CLI comparison remain
 separate pending checks; the global architecture work is still IN_PROGRESS.
+
+### Literal predicate algebra and empty-root equations (AS-W04/W05, unqualified checkpoint)
+
+Maximal AND/OR chains of signed literals use a canonical Patricia set over nonnegative
+32-bit keys. The first literal's polarity normalizes every subtree; a root parity bit
+complements all signs without copying payload. Branches preserve prefix separation,
+size and positive count. Native union detects opposing literals, inclusion and signed
+intersection skip identical subtrees, and pure absent-key restriction traverses only
+the literal tree. Each insertion copies at most the key-width path. The representation
+uses the six-column primitive canonical arena with reference columns2/4/5; page and
+root-token ownership follows that arena's existing resident/file ports. Patricia prefix
+separation follows the already cited Midtgaard treatment of canonical radix trees;
+the signed normalization and Boolean fold rules are proved below, not imported as a
+new complexity claim for arbitrary Boolean functions.
+
+BooleanConditions normalizes every ordered decision that is itself a literal junction
+into the same signed-set identity. Empty/singleton junctions use terminals/literal
+nodes. Other ordered decisions keep Shannon semantics. NOT swaps AND/OR and flips
+sign parity; native subset/intersection proves exact absorption, contradiction and
+tautology before demanded Shannon cofactors unfold. Equivalent functions retain
+canonical IDs under this maximal-junction normalization. Required-present hints on
+AND and possible-present hints on either fold use sign counts/search; every nominated
+caller word is still tested against the complete predicate. A hint miss preserves the
+exact word decision. Indexed alternative words are tested before the primary word.
+
+Soundness: OR of a signed set and AND of that same set are their literal folds.
+Normalization factors only literal branches followed by the same fold and preserves
+variable order. Duplicate opposite literals collapse to the fold's absorbing value.
+For mixed folds, a shared signed literal makes AND imply OR; signed containment in a
+complement proves contradiction/tautology. General decisions continue to use their
+exact low/high cofactors. A Patricia subtree's parity flips every descendant sign,
+and normalized first polarity makes its identity independent of insertion order.
+No arbitrary-function linearity or bounded whole-CLI claim follows from these rules.
+
+GuardedStates is the common pointwise state-function algebra in both solver directions.
+Disjoint environments with equivalent states share one guard. A join class equal to
+the incoming value is covered by the incoming guard, so its intermediate intersection
+is unnecessary. Only a genuinely different joined value needs a split. Missing
+environments remain uninitialized even when the supplied value is bottom. The covered
+domain is cached and visited as a persistent condition root. This uses the declared
+associative/commutative/idempotent upper-bound join and equivalence laws; it does not
+assume distributive block/edge transfers.
+
+Each pointwise composition opens an append-only condition allocation scope, keeps
+its escaping state guards/domain, and retires unused new conditions. Earlier immutable
+nodes cannot reference those append-only IDs. The dirty computed-table journal
+invalidates retired operands/results before ID reuse. Group root tokens are released
+on rollback, commit, collection and close. The literal backend is borrowed when
+provided; closing the condition manager leaves it usable. Both solvers close their
+condition managers after witnesses/path owners. Structural model construction transfers
+ownership on success and closes it on failure. Legacy decision catalogs and operation
+memo frontiers remain resident bridges; this is not complete managed-condition storage.
+
+Forward ROOT discards the local word by delivering the original source value/edge
+directly to the Entry's empty-root destination after exact guarded existence. POP and
+positive-count UNWIND retain their matching rules. Backward ROOT reads the current
+empty-root IN equation directly, interpreting its destination guards at the empty
+word and preserving the source guard separately. Root-value changes schedule explicit
+current readers. Readers detach/rebuild subscriptions on processing and retirement;
+reverse links do not make dead summaries collection roots. Underflow reads its existing
+invalid root destination, while valid unwind keeps exact ancestor arguments. Return
+arguments remain caller-specific. Arbitrary state transfers keep their original edge
+and Entry/node identity; no caller blocks are replayed or omitted by reset projection.
+
+The independent literal-map, truth-table, cache/ID reuse, guarded-state table and
+one-page spill/denial tests pass. Three real RED cases are preserved:128 accumulating
+literal junctions16514 nodes;128 implication prefixes16514;128 initialized two-value
+joins32644. Their original bounds now pass.8192 signed prefixes verify primitive
+payload path sharing and rooted collection, rather than only compressed handle counts.
+The full kernel executes227 tests:226 pass, with one newly added ROOT growth test
+still RED at all12 backward combinations. Small reset IN/OUT, multiple Entry,
+non-distributive edge-sensitive memory oracles pass. Forward reset sizes4..512 meet
+the original16N bound; backward does not. This checkpoint is IN_PROGRESS/UNQUALIFIED;
+no final semantic/performance qualification or completion is claimed.

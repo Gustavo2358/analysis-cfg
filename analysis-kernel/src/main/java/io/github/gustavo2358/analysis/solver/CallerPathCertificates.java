@@ -82,12 +82,12 @@ final class CallerPathCertificates implements AutoCloseable {
     }
     boolean matches(Node node,int condition) {
         owned(node);if(node.retired||condition==0)return false;
-        if(node.reached&&conditions.test(condition,sets,node.word))return true;
         int required=conditions.requiredPresent(condition);
+        if(required<0)required=conditions.possiblePresent(condition);
         if(required>=0)for(var arc=node.index.get(required);arc!=null;arc=arc.nextKey) {
             edgesRead++;if(arc.valid&&conditions.test(condition,sets,arc.word))return true;
         }
-        return false;
+        return node.reached&&conditions.test(condition,sets,node.word);
     }
     void remove(Arc arc) {
         open();if(arc==null||arc.owner!=this||arc.removed)throw new IllegalArgumentException("missing caller binding");

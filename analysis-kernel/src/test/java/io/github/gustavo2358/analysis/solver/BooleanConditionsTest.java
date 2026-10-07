@@ -4,6 +4,46 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class BooleanConditionsTest {
+    @Test void committedOperationRetainsOnlyEscapingConditionsAndInvalidatesRetiredIds() {
+        for(int slots:new int[]{1,2,8})try(var b=new BooleanConditions(slots)) {
+            int x=b.variable(0),y=b.variable(1),z=b.variable(2);
+            for(int round=0;round<30;round++) {
+                int cp=b.checkpoint(),kept=b.and(x,y),temporary=b.or(kept,z);
+                assertNotEquals(kept,temporary);b.commitAfter(cp,mark->mark.accept(kept));
+                assertEquals(kept,b.and(y,x));
+                int rebuilt=b.or(kept,z);
+                for(int bits=0;bits<8;bits++)assertEquals((bits&3)==3||(bits&4)!=0,b.test(rebuilt,java.util.BitSet.valueOf(new long[]{bits})));
+                b.collect(mark->{mark.accept(x);mark.accept(y);mark.accept(z);});
+            }
+        }
+    }
+    @Test void literalImplicationsDoNotUnfoldEveryGrowingDecisionPrefix() {
+        try(var b=new BooleanConditions()) {
+            int union=0,intersection=1;
+            for(int key=0;key<128;key++) {
+                int literal=b.variable(key);union=b.or(union,literal);intersection=b.and(intersection,b.not(literal));
+                assertEquals(literal,b.and(union,literal));assertEquals(b.not(literal),b.or(intersection,b.not(literal)));
+                assertEquals(0,b.and(union,intersection));assertEquals(1,b.or(union,intersection));
+            }
+            assertTrue(b.peakNodes()<=8L*128,"unused implication cofactors="+b.peakNodes());
+        }
+    }
+    @Test void growingLiteralJunctionsDoNotRebuildAllOrderedDecisionPrefixes() {
+        int count=128;var b=new BooleanConditions();int union=0,complement=1;var literals=new int[count];
+        for(int i=0;i<count;i++) {
+            int literal=b.variable(i*257);if((i&1)!=0)literal=b.not(literal);literals[i]=literal;
+            union=b.or(union,literal);complement=b.and(complement,b.not(literal));
+            assertEquals(complement,b.not(union),"canonical De Morgan identity at prefix="+i);
+        }
+        int reversed=0;for(int i=count-1;i>=0;i--)reversed=b.or(reversed,literals[i]);assertEquals(union,reversed);
+        var random=new java.util.Random(904199);
+        for(int sample=0;sample<100;sample++) {
+            var word=new java.util.BitSet();boolean expected=false;
+            for(int i=0;i<count;i++){boolean present=random.nextBoolean();if(present)word.set(i*257);expected|=present!=((i&1)!=0);}
+            assertEquals(expected,b.test(union,word));assertEquals(!expected,b.test(complement,word));
+        }
+        assertTrue(b.peakNodes()<=16L*count,"avoidable decision-prefix nodes="+b.peakNodes());
+    }
     @Test void sparseAbsentRestrictionMatchesIndependentTruthTables() {
         var b=new BooleanConditions(2);var forms=new java.util.ArrayList<Integer>();var truths=new java.util.ArrayList<Long>();
         for(int v=0;v<6;v++){forms.add(b.variable(v));long mask=0;for(int bits=0;bits<64;bits++)if((bits&(1<<v))!=0)mask|=1L<<bits;truths.add(mask);}
