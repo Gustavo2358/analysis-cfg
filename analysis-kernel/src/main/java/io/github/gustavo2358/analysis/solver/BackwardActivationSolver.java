@@ -5,7 +5,7 @@ import io.github.gustavo2358.analysis.structure.*;
 import java.util.*;
 
 /** Dual tabulation: an activation is keyed by values at its possible continuations. */
-final class BackwardActivationSolver<S> {
+final class BackwardActivationSolver<S> implements AutoCloseable {
     private final AnalysisSession session;
     private final AnalysisDefinition<S> definition;
     private long callerPathEdgesRead;
@@ -67,8 +67,9 @@ final class BackwardActivationSolver<S> {
     private final Map<Need,Deferred> deferredCache=new LinkedHashMap<>();
     BackwardActivationSolver(AnalysisSession session,AnalysisDefinition<S> definition){this.session=session;this.definition=definition;bottom=Objects.requireNonNull(definition.bottom());}
     DataflowResult<S> solve() {
-        try {return execute();}finally{closeOwners();}
+        try(var run=this){return run.execute();}
     }
+    @Override public void close(){closeOwners();}
     private void closeOwners() {
         RuntimeException failure=null;
         for(var witness:finalWitnesses.values())failure=ActivationSolver.closeResource(witness,failure);finalWitnesses.clear();

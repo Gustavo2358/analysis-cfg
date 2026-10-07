@@ -383,6 +383,10 @@
       "insufficientFixedManagerCapacityAbortsAndReleasesItsPartialHandoff",
       "interruptedManagedHandoffAndCreationAbortTerminalShortcuts",
       "interruptedLiteralCollectionAfterPublicationAbortsTheWholeManagedOwner"
+    ],
+    "io.github.gustavo2358.analysis.solver.PagedCleanupStorageTest": [
+      "spentWorkCannotPreventSpilledArrayFromReleasingBorrowedPages",
+      "closingTemporaryBackendDoesNotRequireWritingDiscardedDirtyPayload"
     ]
   },
   "analysis-dataflow": {
@@ -678,7 +682,8 @@
       "hugeAmountsCannotWrapAroundAndNegativeChargesAreInvalid",
       "zeroScratchQuotaIsIndependentFromHeapQuota",
       "stagedCapacityTransfersWithoutRechargingOrPrematurelyReleasingBytes",
-      "capacityTransferRejectsForeignPoolOwnerSelfAndClosedReservationsAtomically"
+      "capacityTransferRejectsForeignPoolOwnerSelfAndClosedReservationsAtomically",
+      "cleanupAccountingCannotResetAnalysisQuotaAndReportsCounterSaturation"
     ],
     "io.github.gustavo2358.analysis.structure.SharedTopologyTest": [
       "projectionAndIndexStoreEntryBindingsWithoutCopyingEveryBody",
@@ -867,6 +872,13 @@
       "positiveAndNegativeRootsShareOneRequiredFunctionRecord",
       "mixedComplementSharesStorageWhileBindingsPreserveBothPolarities",
       "nativePromotionDuringRestrictionKeepsSignedRootsAndDecisionMeanings"
+    ],
+    "io.github.gustavo2358.analysis.solver.PagedCleanupTest": [
+      "spentWorkCannotPreventArrayFromReleasingBorrowedResidentPages",
+      "spentWorkCannotPreventIndexFromReleasingPayloadAndOwnershipPages"
+    ],
+    "io.github.gustavo2358.analysis.structure.SolverFailureScopeTest": [
+      "domainFailureSurvivesTeardownOfTheExhaustedActualSolver"
     ]
   },
   "analysis-launcher": {

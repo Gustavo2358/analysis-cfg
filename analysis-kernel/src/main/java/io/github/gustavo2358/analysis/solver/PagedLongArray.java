@@ -132,9 +132,10 @@ public final class PagedLongArray implements AutoCloseable {
     }
     private int digit(long index, int level) { return (int) (index >>> (level * bits)) & mask; }
 
-    private long readWord(long page, int slot) {
-        resources.work(1, phase);
-        store.read(page, slot * Long.BYTES, word, 0, Long.BYTES);
+    private long readWord(long page, int slot) {return readWord(page,slot,false);}
+    private long readWord(long page, int slot, boolean cleanup) {
+        if(cleanup){resources.cleanupWork(1,phase);store.readForCleanup(page,slot*Long.BYTES,word,0,Long.BYTES);}
+        else{resources.work(1,phase);store.read(page,slot*Long.BYTES,word,0,Long.BYTES);}
         long value = 0;
         for (int i = 0; i < Long.BYTES; i++) value |= (word[i] & 255L) << (i * 8);
         return value;
@@ -158,7 +159,7 @@ public final class PagedLongArray implements AutoCloseable {
         while(depth>=0) {
             if(teardownNext[depth]==fanout){depth--;continue;}
             int slot=teardownNext[depth]++;
-            long value=readWord(teardownPages[depth],slot+1);
+            long value=readWord(teardownPages[depth],slot+1,true);
             if(value==0)continue;
             if(depth==height)visitor.accept(value);
             else {depth++;teardownPages[depth]=value;teardownNext[depth]=0;}
@@ -173,17 +174,17 @@ public final class PagedLongArray implements AutoCloseable {
             teardownPages[0] = root; teardownNext[0] = 0;
             while (depth >= 0) {
                 if (depth == height || teardownNext[depth] == fanout) {
-                    long page=teardownPages[depth];store.release(page);
+                    long page=teardownPages[depth];store.releaseForCleanup(page);
                     if(provisional==page)provisional=0;depth--;
                 } else {
-                    long child = readWord(teardownPages[depth], teardownNext[depth]++ + 1);
+                    long child = readWord(teardownPages[depth], teardownNext[depth]++ + 1,true);
                     if (child != 0) {
                         depth++; teardownPages[depth] = child; teardownNext[depth] = 0;
                     }
                 }
             }
         } finally {
-            try {if(provisional!=0)store.release(provisional);}
+            try {if(provisional!=0)store.releaseForCleanup(provisional);}
             finally {
             closed = true; root = 0;
             provisional=0;

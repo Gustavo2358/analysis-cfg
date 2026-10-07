@@ -1112,3 +1112,33 @@ and64N certificate bound under a temporary diagnostic work quota, now removed.
 Final FAST and public CLI parity remain pending. New shared representation does
 not qualify all AS-W00–W10 work: forward ownership, correlated Scalar semantics,
 managed admission/program/output and whole-pipeline resource bounds remain open.
+### Quota-independent page teardown (AS-W01/W09, partial checkpoint)
+
+Page ownership cannot require remaining analysis WORK to release its storage.
+`PageStore.readForCleanup` and `releaseForCleanup` are explicit teardown operations;
+they preserve address/generation validation and genuine backend failures, and cannot
+admit new analysis allocations. Resident and file backends and all local decorators
+implement this contract. Ordinary reads, writes, releases and reservations keep their
+existing quotas. There is no thread-local bypass or reset of the analysis budget.
+
+`AnalysisResources.cleanupWork` records teardown separately. Its observational
+counter saturates with an explicit flag instead of interrupting cleanup. The paged
+array traverses allocated ownership metadata with its existing fixed stack; the
+index releases its separate ownership ledger. Borrowed stores remain usable after
+successful cleanup. A permanently failed backend still requires closing its outer
+owner; this protocol does not certify recovery from corrupt metadata.
+
+The disposable file owner closes/deletes its arena without flushing payload that
+would be discarded. It retains the disk charge if deletion fails. Cache payload
+buffers are allocated and accounted once at construction and reused for I/O,
+including eviction during teardown. Both actual activation solvers use language
+resource scopes, preserving a primary domain failure and suppressing later cleanup
+failures instead of replacing its phase/reason. Successful results cannot escape a
+failed final close.
+
+New laws exhaust WORK before releasing arrays/indexes, require zero live pages on
+borrowed resident and one-page file backends, preserve ordinary WORK exhaustion,
+and verify the exact primary exception and zero heap reservations for both solver
+directions. These laws do not yet qualify every logical root/cursor lifetime,
+cancellation/deadline behavior, permanent I/O failure, or zero-progress transfers.
+Global runtime/CLI migration remains in progress.

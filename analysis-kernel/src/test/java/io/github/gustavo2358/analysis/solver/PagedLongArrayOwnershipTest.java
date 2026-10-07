@@ -41,8 +41,10 @@ class PagedLongArrayOwnershipTest {
         public int pageBytes(){return delegate.pageBytes();}
         public long allocate(){return (delegate.allocate()*FACTOR)&Long.MAX_VALUE;}
         public void read(long page,int offset,byte[] target,int start,int length){delegate.read(original(page),offset,target,start,length);}
+        public void readForCleanup(long page,int offset,byte[] target,int start,int length){delegate.readForCleanup(original(page),offset,target,start,length);}
         public void write(long page,int offset,byte[] source,int start,int length){delegate.write(original(page),offset,source,start,length);}
         public void release(long page){delegate.release(original(page));}
+        public void releaseForCleanup(long page){delegate.releaseForCleanup(original(page));}
         public void flush(){delegate.flush();}
         public Statistics statistics(){return delegate.statistics();}
         public void close(){delegate.close();}
@@ -54,8 +56,10 @@ class PagedLongArrayOwnershipTest {
         public int pageBytes(){return delegate.pageBytes();}
         public long allocate(){return delegate.allocate();}
         public void read(long page,int offset,byte[] target,int start,int length){step();delegate.read(page,offset,target,start,length);}
+        public void readForCleanup(long page,int offset,byte[] target,int start,int length){step();delegate.readForCleanup(page,offset,target,start,length);}
         public void write(long page,int offset,byte[] source,int start,int length){step();delegate.write(page,offset,source,start,length);}
         public void release(long page){delegate.release(page);}
+        public void releaseForCleanup(long page){delegate.releaseForCleanup(page);}
         public void flush(){delegate.flush();}
         public Statistics statistics(){return delegate.statistics();}
         public void close(){delegate.close();}

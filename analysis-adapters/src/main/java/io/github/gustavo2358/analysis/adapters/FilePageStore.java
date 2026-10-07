@@ -32,6 +32,7 @@ public final class FilePageStore implements PageStore {
     private final AnalysisResources resources;
     private final AnalysisResources.Phase phase;
     private byte[][] pages;
+    private ByteBuffer[] payloadBuffers;
     private long[] handles;
     private boolean[] dirty, referenced;
     private long[] directoryKeys;
@@ -44,6 +45,7 @@ public final class FilePageStore implements PageStore {
     private FileChannel channel;
     private int clock, freeCount;
     private long issued, physical, freeHead, live, hits, misses, evictions, bytesRead, bytesWritten;
+    private boolean cleaning;
     private boolean closed, failed;
     private Reason failedReason;
 
@@ -65,12 +67,14 @@ public final class FilePageStore implements PageStore {
         mask = slots - 1;
         // Conservative capacity including arrays, per-page headers, cache directory and control state.
         long capacity = Math.addExact(512, Math.addExact(Math.multiplyExact((long) cachePages,
-                (long) pageBytes + 64), Math.multiplyExact((long) slots, 16)));
+                (long) pageBytes + 128), Math.multiplyExact((long) slots, 16)));
         try {
             resident = resources.reserve(AnalysisResources.Pool.RESIDENT, capacity, phase);
             descriptor = resources.reserve(AnalysisResources.Pool.OPEN_FILES, 1, phase);
             temporary = resources.reserve(AnalysisResources.Pool.TEMPORARY, FILE_HEADER_BYTES, phase);
             pages = new byte[cachePages][pageBytes];
+            payloadBuffers = new ByteBuffer[cachePages];
+            for(int slot=0;slot<cachePages;slot++)payloadBuffers[slot]=ByteBuffer.wrap(pages[slot]);
             handles = new long[cachePages];
             dirty = new boolean[cachePages]; referenced = new boolean[cachePages];
             directoryKeys = new long[slots]; directorySlots = new int[slots];
@@ -117,6 +121,14 @@ public final class FilePageStore implements PageStore {
         issued++; live++;
         return page;
     }
+
+    @Override public synchronized void readForCleanup(long page,int offset,byte[] target,int start,int length){
+        boolean previous=cleaning;cleaning=true;try{read(page,offset,target,start,length);}finally{cleaning=previous;}
+    }
+    @Override public synchronized void releaseForCleanup(long page){
+        boolean previous=cleaning;cleaning=true;try{release(page);}finally{cleaning=previous;}
+    }
+    private void transferWork(){if(cleaning)resources.cleanupWork(1,phase);else resources.work(1,phase);}
 
     @Override public synchronized void read(long page, int offset, byte[] target, int targetOffset, int length) {
         open();
@@ -183,7 +195,7 @@ public final class FilePageStore implements PageStore {
             if (header.getLong(0) != page || header.getInt(12) != LIVE)
                 throw new Failure(Reason.INVALID_HANDLE, "released or obsolete page handle");
             int slot = replacement();
-            readFully(ByteBuffer.wrap(pages[slot]), position + PAGE_HEADER_BYTES);
+            readFully(payloadBuffers[slot].clear(), position + PAGE_HEADER_BYTES);
             if (crc(pages[slot]) != expected) throw corruption("page checksum mismatch");
             handles[slot] = page; referenced[slot] = true; dirty[slot] = false;
             insert(page, slot);
@@ -204,7 +216,7 @@ public final class FilePageStore implements PageStore {
         if (!dirty[slot] || handles[slot] == 0) return;
         try {
             long position = position(handles[slot]);
-            writeFully(ByteBuffer.wrap(pages[slot]), position + PAGE_HEADER_BYTES);
+            writeFully(payloadBuffers[slot].clear(), position + PAGE_HEADER_BYTES);
             writeHeader(handles[slot], crc(pages[slot]), LIVE, 0);
             dirty[slot] = false; // Only after both successful writes.
         } catch (IOException io) { throw ioFailure(io); }
@@ -253,7 +265,7 @@ public final class FilePageStore implements PageStore {
 
     private void readFully(ByteBuffer buffer, long position) throws IOException {
         while (buffer.hasRemaining()) {
-            resources.work(1, phase);
+            transferWork();
             int count = channel.read(buffer, position);
             if (count < 0) throw corruption("truncated page");
             position += count; bytesRead += count;
@@ -262,7 +274,7 @@ public final class FilePageStore implements PageStore {
 
     private void writeFully(ByteBuffer buffer, long position) throws IOException {
         while (buffer.hasRemaining()) {
-            resources.work(1, phase);
+            transferWork();
             int count = channel.write(buffer, position);
             position += count; bytesWritten += count;
         }
@@ -333,7 +345,8 @@ public final class FilePageStore implements PageStore {
     @Override public synchronized void close() {
         if (closed) return;
         RuntimeException error = null;
-        try { if (!failed) flush(); } catch (RuntimeException exception) { error = exception; }
+        // This file is temporary and deleted below. Flushing discarded payload
+        // would spend analysis quota and create avoidable failure during teardown.
         closed = true;
         try { channel.close(); } catch (IOException exception) {
             if (error == null) error = ioFailure(exception); else error.addSuppressed(exception);
@@ -344,7 +357,7 @@ public final class FilePageStore implements PageStore {
         }
         resident.close(); descriptor.close();
         // Closing transfers no page graph to the caller; even a retained closed adapter is small.
-        pages = null; handles = null; dirty = null; referenced = null;
+        pages = null; payloadBuffers = null; handles = null; dirty = null; referenced = null;live=0;
         directoryKeys = null; directorySlots = null; freeSlots = null;
         header = null; checksum = null;
         if (deleted) temporary.close(); // Failed cleanup must not pretend that disk was reclaimed.

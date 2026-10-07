@@ -58,11 +58,13 @@ public final class ResidentPageStore implements PageStore {
         return (generations[slot] << 32) | ((long) slot + 1);
     }
 
-    @Override public synchronized void read(long page, int offset, byte[] target, int targetOffset, int length) {
+    @Override public synchronized void read(long page, int offset, byte[] target, int targetOffset, int length) {read(page,offset,target,targetOffset,length,false);}
+    @Override public synchronized void readForCleanup(long page,int offset,byte[] target,int targetOffset,int length){read(page,offset,target,targetOffset,length,true);}
+    private void read(long page,int offset,byte[] target,int targetOffset,int length,boolean cleanup){
         open();
         Objects.checkFromIndexSize(offset, length, pageBytes);
         Objects.checkFromIndexSize(targetOffset, length, Objects.requireNonNull(target).length);
-        int slot = slot(page); resources.work(1, phase);
+        int slot = slot(page); if(cleanup)resources.cleanupWork(1,phase);else resources.work(1,phase);
         System.arraycopy(pages[slot], offset, target, targetOffset, length); hits++; bytesRead += length;
     }
     @Override public synchronized void write(long page, int offset, byte[] source, int sourceOffset, int length) {
@@ -72,9 +74,11 @@ public final class ResidentPageStore implements PageStore {
         int slot = slot(page); resources.work(1, phase);
         System.arraycopy(source, sourceOffset, pages[slot], offset, length); hits++; bytesWritten += length;
     }
-    @Override public synchronized void release(long page) {
+    @Override public synchronized void release(long page) {release(page,false);}
+    @Override public synchronized void releaseForCleanup(long page){release(page,true);}
+    private void release(long page,boolean cleanup){
         open();
-        int slot = slot(page); resources.work(1, phase);
+        int slot = slot(page); if(cleanup)resources.cleanupWork(1,phase);else resources.work(1,phase);
         live[slot] = false; liveCount--;
         if (generations[slot] != Integer.MAX_VALUE) {
             freeNext[slot] = freeHead; freeHead = slot;

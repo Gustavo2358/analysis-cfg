@@ -376,9 +376,9 @@ public final class PagedLongIndex implements AutoCloseable {
         try {
             // Ownership is independent of an interrupted split/merge's tree shape.
             // Never follow possibly duplicated or detached child links during teardown.
-            ownedPages.visitAllocatedValues(page->{if(page!=provisional)store.release(page);});
+            ownedPages.visitAllocatedValues(page->{if(page!=provisional)store.releaseForCleanup(page);});
         } finally {
-            try {if(provisional!=0)store.release(provisional);}
+            try {if(provisional!=0)store.releaseForCleanup(provisional);}
             finally {
                 try {ownedPages.close();}
                 finally {

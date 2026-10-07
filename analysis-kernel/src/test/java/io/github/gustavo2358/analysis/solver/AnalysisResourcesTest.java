@@ -4,6 +4,17 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 final class AnalysisResourcesTest {
+    @Test void cleanupAccountingCannotResetAnalysisQuotaAndReportsCounterSaturation(){
+        var resources=new AnalysisResources(new AnalysisResources.Limits(0,0,0,0,0,1,0));
+        resources.work(1,AnalysisResources.Phase.CONTROL);resources.cleanupWork(7,AnalysisResources.Phase.CONTROL);
+        assertEquals(1,resources.workUsed());assertEquals(7,resources.cleanupWorkUsed());
+        assertThrows(AnalysisResources.Exhausted.class,()->resources.work(1,AnalysisResources.Phase.CONTROL));
+        resources.cleanupWork(Long.MAX_VALUE-7,AnalysisResources.Phase.CONTROL);
+        assertEquals(Long.MAX_VALUE,resources.cleanupWorkUsed());assertFalse(resources.cleanupWorkSaturated());
+        resources.cleanupWork(1,AnalysisResources.Phase.CONTROL);assertTrue(resources.cleanupWorkSaturated());
+        assertEquals(Long.MAX_VALUE,resources.cleanupWorkUsed());assertEquals(1,resources.workUsed());
+        assertThrows(IllegalArgumentException.class,()->resources.cleanupWork(-1,AnalysisResources.Phase.CONTROL));
+    }
     private static AnalysisResources resources(long heap, long scratch) {
         return new AnalysisResources(new AnalysisResources.Limits(heap, scratch, 64, 128, 2, 10, 100));
     }

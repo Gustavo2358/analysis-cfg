@@ -5,7 +5,7 @@ import io.github.gustavo2358.analysis.structure.*;
 import java.util.*;
 
 /** Input-value tabulation with symbolic ancestor guards and matched caller subscriptions. */
-final class ActivationSolver<S> {
+final class ActivationSolver<S> implements AutoCloseable {
     private final AnalysisSession session;
     private final AnalysisDefinition<S> definition;
     private long callerPathEdgesRead;
@@ -68,8 +68,9 @@ final class ActivationSolver<S> {
         this.session=session;this.definition=definition;bottom=Objects.requireNonNull(definition.bottom());
     }
     DataflowResult<S> solve() {
-        try {execute();return result();}finally{closeIndexes(true);}
+        try(var run=this){run.execute();return run.result();}
     }
+    @Override public void close(){closeIndexes(true);}
     private void closeIndexes(boolean closeConditions) {
         RuntimeException failure=null;
         for(var witness:finalWitnesses.values())failure=closeResource(witness,failure);finalWitnesses.clear();

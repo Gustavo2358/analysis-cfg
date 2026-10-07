@@ -123,8 +123,13 @@ class BooleanConditionsStorageTest {
             if(interrupt){interrupt=false;throw new Failure(Reason.IO,"synthetic condition read interruption");}
             delegate.read(page,offset,target,start,length);
         }
+        public void readForCleanup(long page,int offset,byte[] target,int start,int length){
+            if(interrupt){interrupt=false;throw new Failure(Reason.IO,"synthetic condition read interruption");}
+            delegate.readForCleanup(page,offset,target,start,length);
+        }
         public void write(long page,int offset,byte[] source,int start,int length){delegate.write(page,offset,source,start,length);}
         public void release(long page){delegate.release(page);}
+        public void releaseForCleanup(long page){delegate.releaseForCleanup(page);}
         public void flush(){delegate.flush();}
         public Statistics statistics(){return delegate.statistics();}
         public void close(){delegate.close();}

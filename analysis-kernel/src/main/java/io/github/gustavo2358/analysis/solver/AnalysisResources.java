@@ -82,6 +82,8 @@ public final class AnalysisResources {
     private final long[] used = new long[Pool.values().length];
     private final long[] peak = new long[Pool.values().length];
     private long heapUsed, heapPeak, workUsed, outputUsed;
+    private long cleanupWorkUsed;
+    private boolean cleanupWorkSaturated;
 
     public AnalysisResources(Limits limits) { this.limits = Objects.requireNonNull(limits); }
     public Limits limits() { return limits; }
@@ -108,6 +110,18 @@ public final class AnalysisResources {
         require(Resource.WORK, phase, limits.workUnits(), workUsed, units);
         workUsed += units;
     }
+
+    /** Work to dismantle already-owned storage, never to compute an analysis
+     * result. Keep it observable without requiring remaining analysis quota or
+     * allocating another reservation after exhaustion. */
+    public synchronized void cleanupWork(long units, Phase phase) {
+        Objects.requireNonNull(phase); nonnegative(units);
+        if (units > Long.MAX_VALUE-cleanupWorkUsed) {
+            cleanupWorkUsed=Long.MAX_VALUE;cleanupWorkSaturated=true;
+        } else cleanupWorkUsed+=units;
+    }
+    public synchronized long cleanupWorkUsed(){return cleanupWorkUsed;}
+    public synchronized boolean cleanupWorkSaturated(){return cleanupWorkSaturated;}
 
     public synchronized void output(long bytes, Phase phase) {
         Objects.requireNonNull(phase); nonnegative(bytes);

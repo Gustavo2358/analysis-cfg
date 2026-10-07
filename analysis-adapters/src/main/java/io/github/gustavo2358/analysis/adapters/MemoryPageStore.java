@@ -16,8 +16,10 @@ public final class MemoryPageStore implements PageStore {
     @Override public int pageBytes() { return pages.pageBytes(); }
     @Override public long allocate() { return pages.allocate(); }
     @Override public void read(long page, int offset, byte[] target, int start, int length) { pages.read(page, offset, target, start, length); }
+    @Override public void readForCleanup(long page, int offset, byte[] target, int start, int length) { pages.readForCleanup(page, offset, target, start, length); }
     @Override public void write(long page, int offset, byte[] source, int start, int length) { pages.write(page, offset, source, start, length); }
     @Override public void release(long page) { pages.release(page); }
+    @Override public void releaseForCleanup(long page) { pages.releaseForCleanup(page); }
     @Override public void flush() { pages.flush(); }
     @Override public Statistics statistics() { return pages.statistics(); }
     @Override public void close() { pages.close(); }
