@@ -25,6 +25,7 @@ public final class ActivationControl {
     private final Map<ProgramIndex.Node,Interface> interfaces=new IdentityHashMap<>();
     private final Map<BodyKey,Frame> bodies=new HashMap<>();
     private final List<ProgramIndex.Node> unwindStarts=new ArrayList<>();
+    private final List<ProgramIndex.Node> resetStarts=new ArrayList<>();
     private Interface unwindInterface;
     public ActivationControl(AnalysisSession session,ContextView context) {
         this.index=session.index();this.context=context;
@@ -32,8 +33,17 @@ public final class ActivationControl {
             Object key=invoke.reentryGuard().<Object>map(g->new Guard(invoke.operation().unit(),g.activationKey())).orElse(invoke.operation());
             frames.put(invoke.source(),new Frame(invoke,variables.computeIfAbsent(key,k->variables.size())));
         }
-        for(var rule:index.localRules.values())if(rule instanceof LocalControlRules.Unwind unwind&&unwind.operation().unit().equals(context.entry().id().unit())
-                &&!unwind.all()&&unwind.count().signum()>0&&unwind.count().compareTo(BigInteger.valueOf(frames.size()))<=0)unwindStarts.add(index.node(unwind.destination()));
+        for(var rule:index.localRules.values())if(rule instanceof LocalControlRules.Unwind unwind&&unwind.operation().unit().equals(context.entry().id().unit())) {
+            if(unwind.all())resetStarts.add(index.node(unwind.destination()));
+            else if(unwind.count().signum()>0&&unwind.count().compareTo(BigInteger.valueOf(frames.size()))<=0)unwindStarts.add(index.node(unwind.destination()));
+        }
+    }
+    /** Conservative scheduling suffixes; these never create executable bypass edges. */
+    public List<ProgramIndex.Node> positiveUnwindLandings(){return List.copyOf(unwindStarts);}
+    public List<ProgramIndex.Node> resetLandings(){return List.copyOf(resetStarts);}
+    public List<ProgramIndex.Node> continuations(Frame symbol) {
+        var destinations=new LinkedHashSet<ProgramIndex.Node>();destinations.add(index.node(symbol.invoke.resume()));
+        for(var target:symbol.invoke.resumeRoutes().values())destinations.add(index.node(target));return List.copyOf(destinations);
     }
     public Object operation(Frame frame){return frame.invoke.source();}
     public Frame frame(Object operation){return frames.get(operation);}

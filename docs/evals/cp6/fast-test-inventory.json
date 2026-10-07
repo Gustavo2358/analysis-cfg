@@ -675,6 +675,14 @@
       "unwindLandingsObserveTheRemainingTopInterfaceOutsideItsNormalEntryWalk",
       "backwardWakeupsFollowReadContinuationsInsteadOfEveryCallInTheRegion",
       "impossibleCallsHaveNoReadInterfaceAndKeepTheirGuardRejection"
+    ],
+    "io.github.gustavo2358.analysis.structure.FeasibilityPrefixesTest": [
+      "nestedCallsDoNotRewalkEveryCallerPrefixToCheckTheNextGuard",
+      "ordinaryDiamondsDoNotAccumulateImpossibleReentryPredicates"
+    ],
+    "io.github.gustavo2358.analysis.solver.CallerConnectivityTest": [
+      "changingLinksMatchesIndependentRootSearchIncludingDisconnectedCycles",
+      "removingTheLastExternalCallerDisconnectsAnEntireCycleThenReattachesIt"
     ]
   },
   "analysis-launcher": {

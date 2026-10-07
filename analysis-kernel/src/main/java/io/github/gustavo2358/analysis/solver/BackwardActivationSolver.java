@@ -8,6 +8,9 @@ import java.util.*;
 final class BackwardActivationSolver<S> {
     private final AnalysisSession session;
     private final AnalysisDefinition<S> definition;
+    private long callerPathEdgesRead;
+    private long callerProofEdgesRead(){long total=callerPathEdgesRead;for(var entry:entries)total+=entry.connectivity.edgesRead();return total;}
+    private long conditionPeak(){long peak=0;for(var entry:entries)peak=Math.max(peak,entry.bdd.peakNodes());return peak;}
     private final DomainWork work=new DomainWork();
     private final AnalysisResources indexResources=new AnalysisResources(new AnalysisResources.Limits(Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE));
     private final S bottom;
@@ -30,7 +33,7 @@ final class BackwardActivationSolver<S> {
                 for(var watched:slot.watches)visit.accept(watched);
             }
         });
-        feasibleCache.clear();deferredCache.clear();closeWitnesses();
+        feasibleCache.clear();for(var entry:entries)feasibleCache.put(new Need(entry.root,1),true);deferredCache.clear();closeWitnesses();
         for(var entry:entries) {
             long removed=collector.retain(entry.regions,this::retireSummary);summaryRetired+=removed;summaryLive-=removed;
             var iterator=entry.byFrame.entrySet().iterator();
@@ -43,7 +46,7 @@ final class BackwardActivationSolver<S> {
     }
     private void retireSummary(Region region) {
         for(var slot:region.slots.values()) {
-            for(var child:slot.children.keySet()){child.callers.remove(slot);if(child.incoming.remove(slot)!=null)child.incomingVersion++;}
+            for(var child:slot.children.keySet()){child.callers.remove(slot);replaceIncoming(slot,child,0);}
             for(var watched:slot.watches)watched.waiters.remove(slot);
             slot.children.clear();slot.watches.clear();slot.in.pieces=List.of();slot.out.pieces=List.of();
         }
@@ -81,7 +84,7 @@ final class BackwardActivationSolver<S> {
             }
         }
         long indexProbes=closedIndexProbes;for(var entry:entries)for(var index:entry.byFrame.values())indexProbes+=index.probes();
-        var metrics=new SolverMetrics(ins.size(),edgeCount,joins,nextPoint,attempts,pushes,pops,duplicates,maxSize,transfers,work.operations(),ins.size(),changes,unchanged,deliveries,deliveries,changes,unchanged,0,0,work.joinEntries(),work.compareEntries(),summaryCreated,summaryRetired,summaryLive,summaryPeak,summaryCollections,indexProbes,returnSourceReads);
+        var metrics=new SolverMetrics(ins.size(),edgeCount,joins,nextPoint,attempts,pushes,pops,duplicates,maxSize,transfers,work.operations(),ins.size(),changes,unchanged,deliveries,deliveries,changes,unchanged,0,0,work.joinEntries(),work.compareEntries(),summaryCreated,summaryRetired,summaryLive,summaryPeak,summaryCollections,indexProbes,returnSourceReads,callerProofEdgesRead(),conditionPeak());
         return new DataflowResult<>(lookup,ins.toArray(),outs.toArray(),metrics);
     }
     private void collectConditions(EntryRun entry) {
@@ -130,6 +133,7 @@ final class BackwardActivationSolver<S> {
         for(var key:keys)if(!definition.equivalent(a.getOrDefault(key,bottom),b.getOrDefault(key,bottom),work))return false;return true;
     }
     private final class EntryRun {
+        final CallerConnectivity connectivity=new CallerConnectivity();
         final ActivationModel model;final BooleanConditions bdd;
         final List<Region> regions=new ArrayList<>();
         final IdentityHashMap<ActivationControl.Frame,StateIndex<Signature,Region>> byFrame=new IdentityHashMap<>();
@@ -138,7 +142,7 @@ final class BackwardActivationSolver<S> {
         Region root;
         EntryRun(ActivationModel model){this.model=model;bdd=model.conditions();}
         void start() {
-            root=new Region(this,null,new Signature(0,Map.of(),Map.of(),Collections.nCopies(model.maxUnwind(),Map.of())));regions.add(root);summaryCreated();root.initialize();
+            root=new Region(this,null,new Signature(0,Map.of(),Map.of(),Collections.nCopies(model.maxUnwind(),Map.of())));regions.add(root);summaryCreated();feasibleCache.put(new Need(root,1),true);root.initialize();
         }
         Region region(ActivationControl.Frame frame,Signature input,Slot caller,int condition) {
             frame=model.control().body(frame);
@@ -166,8 +170,9 @@ final class BackwardActivationSolver<S> {
         final Set<Slot> waiters=Collections.newSetFromMap(new IdentityHashMap<>());
         final Map<Slot,Integer> incoming=new IdentityHashMap<>();
         long incomingVersion,mark;
+        final CallerConnectivity.Node rooted;
         final List<Slot> calls=new ArrayList<>();
-        Region(EntryRun entry,ActivationControl.Frame frame,Signature input){this.entry=entry;this.frame=frame;this.input=input;}
+        Region(EntryRun entry,ActivationControl.Frame frame,Signature input){this.entry=entry;this.frame=frame;this.input=input;rooted=entry.connectivity.node(frame==null);}
         void initialize() {
             var shape=entry.model.shapes().get(frame);
             for(var point:shape.points().entrySet())slots.put(point.getKey(),new Slot(this,point.getKey(),point.getValue()));
@@ -260,6 +265,7 @@ final class BackwardActivationSolver<S> {
     }
     private void call(Slot source,ActivationControl.Move move,int condition) {
         var parent=source.region;var e=parent.entry;var b=e.bdd;
+        if(!feasible(parent,condition,source))return;
         var needed=new LinkedHashSet<>(e.model.unwindTargets());var returns=new IdentityHashMap<ProgramIndex.Node,ProgramIndex.Node>();
         for(var point:e.model.shapes().get(e.model.control().body(move.frame())).returnSources()) {
             returnSourceReads++;returns.put(point,e.model.control().returnDestination(point,move.frame()));
@@ -287,17 +293,28 @@ final class BackwardActivationSolver<S> {
     }
     private void subscribe(Slot caller,Region child,int condition) {
         var b=child.entry.bdd;caller.children.merge(child,condition,b::or);child.callers.add(caller);
+        if(Boolean.TRUE.equals(feasibleCache.get(new Need(caller.region,condition))))
+            feasibleCache.put(new Need(child,1),true);
         int old=child.incoming.getOrDefault(caller,0),combined=b.or(old,condition);
         if(combined!=old) {
-            child.incoming.put(caller,combined);child.incomingVersion++;
-            for(var waiting:child.waiters)enqueue(waiting);
+            replaceIncoming(caller,child,combined);
         }
     }
+    private void replaceIncoming(Slot caller,Region child,int condition) {
+        int old=child.incoming.getOrDefault(caller,0);
+        if(old==condition)return;
+        if(old==1)child.entry.connectivity.remove(caller.region.rooted,child.rooted);
+        if(condition==0)child.incoming.remove(caller);else child.incoming.put(caller,condition);
+        if(condition==1)child.entry.connectivity.add(caller.region.rooted,child.rooted);
+        child.incomingVersion++;
+        if(condition!=0)for(var waiting:child.waiters)enqueue(waiting);
+    }
     private void reconcile(Slot caller,Map<Region,Integer> previous) {
-        // Positive witnesses survive added links, but not removal/replacement.
+        // Nontrivial predicate witnesses still depend on the exact current links.
+        // Unconditional rooted certificates are repaired locally, not globally cleared.
         for(var old:previous.entrySet())if(!Objects.equals(caller.children.get(old.getKey()),old.getValue())){feasibleCache.clear();break;}
-        for(var child:previous.keySet())if(!caller.children.containsKey(child)){child.callers.remove(caller);child.incoming.remove(caller);}
-        caller.children.forEach((child,condition)->child.incoming.put(caller,condition));
+        for(var child:previous.keySet())if(!caller.children.containsKey(child)){child.callers.remove(caller);replaceIncoming(caller,child,0);}
+        for(var link:caller.children.entrySet())replaceIncoming(caller,link.getKey(),link.getValue());
     }
     private void process(Slot slot) {
         var previous=slot.children;slot.children=new IdentityHashMap<>();
@@ -366,7 +383,7 @@ final class BackwardActivationSolver<S> {
     }
     private boolean feasible(Region region,int condition) {return feasible(region,condition,null);}
     private boolean feasible(Region region,int condition,Slot subscriber) {
-        if(condition==0)return false;var key=new Need(region,condition);var known=feasibleCache.get(key);if(known!=null)return known;
+        if(condition==0)return false;if(condition==1&&region.rooted.reached())return true;var key=new Need(region,condition);var known=feasibleCache.get(key);if(known!=null)return known;
         if(subscriber==null&&finalWitnesses.computeIfAbsent(region.entry,this::finalWitnesses).matches(region,condition))
             {feasibleCache.put(key,true);return true;}
         var deferred=deferredCache.get(key);
@@ -384,6 +401,7 @@ final class BackwardActivationSolver<S> {
                 var current=coarse.removeFirst();
                 if(current.region.frame==null&&current.requiredSeen){root=current;break;}
                 for(var link:current.region.incoming.entrySet()) {
+                    callerPathEdgesRead++;
                     var parent=link.getKey().region;boolean requiredSeen=current.requiredSeen||region.entry.model.control().frameAt(link.getKey().node).variable()==required;
                     if(visited.add(new Need(parent,requiredSeen?1:0))) {
                         seen.add(parent);coarse.addLast(new Witness(parent,link.getValue(),current,requiredSeen,region.entry.model.control().frameAt(link.getKey().node).variable()));
@@ -392,10 +410,12 @@ final class BackwardActivationSolver<S> {
             }
             if(root==null){defer(key,seen,subscriber);return false;}
             var active=new BitSet();var path=root;boolean valid=true;
+            feasibleCache.put(new Need(path.region,1),true);
             while(path.child!=null) {
+                callerPathEdgesRead++;
                 if(!region.entry.bdd.test(path.condition,active)){valid=false;break;}
                 active.set(path.pushedVariable);
-                path=path.child;
+                path=path.child;feasibleCache.put(new Need(path.region,1),true);
             }
             if(valid&&region.entry.bdd.test(condition,active)){feasibleCache.put(key,true);return true;}
         }
@@ -407,6 +427,7 @@ final class BackwardActivationSolver<S> {
                 var current=queue.removeFirst();int need=waiting.remove(current);
                 if(current.frame==null){found=b.atEmpty(need)!=0;continue;}
                 for(var link:current.incoming.entrySet()) {
+                    callerPathEdgesRead++;
                     var parent=link.getKey().region;int before=b.restrict(need,region.entry.model.control().frameAt(link.getKey().node).variable(),true);
                     before=b.and(before,link.getValue());if(before==0)continue;
                     int old=wanted.getOrDefault(parent,0),extra=b.difference(before,old);if(extra==0)continue;

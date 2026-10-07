@@ -18,6 +18,8 @@ final class BooleanConditions {
     private final BitSet scratchDirty=new BitSet();
     private int[] scratchSlots=new int[0];
     private int scratchSlotCount;
+    private long peakNodes=2;
+    long peakNodes(){return peakNodes;}
     private long scratchCacheVisits;
     long scratchCacheVisits(){return scratchCacheVisits;}
 
@@ -50,7 +52,7 @@ final class BooleanConditions {
         int id;
         if(!scratch&&recycledSize>0){id=recycled[--recycledSize];nodes.set(id,key);}
         else {id=nodes.size();nodes.add(key);}
-        allocationsSinceCollection++;unique.put(key,id);return id;
+        allocationsSinceCollection++;peakNodes=Math.max(peakNodes,unique.size()+3L);unique.put(key,id);return id;
     }
     int and(int a,int b){return apply(a,b,false);}
     int or(int a,int b){return apply(a,b,true);}

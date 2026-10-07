@@ -8,6 +8,9 @@ import java.util.*;
 final class ActivationSolver<S> {
     private final AnalysisSession session;
     private final AnalysisDefinition<S> definition;
+    private long callerPathEdgesRead;
+    private long callerProofEdgesRead(){long total=callerPathEdgesRead;for(var entry:entries)total+=entry.connectivity.edgesRead();return total;}
+    private long conditionPeak(){long peak=0;for(var entry:entries)peak=Math.max(peak,entry.bdd.peakNodes());return peak;}
     private final DomainWork work=new DomainWork();
     // Resident compatibility route; the index accepts managed resources at its port.
     private final AnalysisResources indexResources=new AnalysisResources(new AnalysisResources.Limits(Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE));
@@ -32,7 +35,7 @@ final class ActivationSolver<S> {
                 for(var watched:slot.watches)visit.accept(watched);
             }
         });
-        feasibleCache.clear();deferredCache.clear();closeWitnesses();
+        feasibleCache.clear();for(var entry:entries)feasibleCache.put(new Need(entry.root,1),true);deferredCache.clear();closeWitnesses();
         for(var entry:entries) {
             long removed=collector.retain(entry.regions,this::retireSummary);summaryRetired+=removed;summaryLive-=removed;
             var iterator=entry.byFrame.entrySet().iterator();
@@ -45,7 +48,7 @@ final class ActivationSolver<S> {
     }
     private void retireSummary(Region region) {
         for(var slot:region.slots.values()) {
-            for(var child:slot.children.keySet()){child.callers.remove(slot);if(child.incoming.remove(slot)!=null)child.incomingVersion++;}
+            for(var child:slot.children.keySet()){child.callers.remove(slot);replaceIncoming(slot,child,0);}
             for(var watched:slot.watches)watched.waiters.remove(slot);
             slot.children.clear();slot.watches.clear();slot.anchors.pieces=List.of();slot.outputs.pieces=List.of();
         }
@@ -62,7 +65,7 @@ final class ActivationSolver<S> {
     DataflowResult<S> solve() {
         try {execute();return result();}finally{closeIndexes();}
     }
-    private void closeIndexes(){closeWitnesses();for(var entry:entries){for(var index:entry.byFrame.values())index.close();entry.byFrame.clear();}if(collector!=null)collector.close();}
+    private void closeIndexes(){closeWitnesses();for(var entry:entries){for(var index:entry.byFrame.values())index.close();entry.byFrame.clear();if(entry.preliminary!=null)entry.preliminary.close();}if(collector!=null)collector.close();}
     private void execute() {
         var models=structural?List.<ActivationModel>of():structure(session);
         for(var context:session.contexts())entries.add(new EntryRun(context,models.stream().filter(m->m.context()==context).findFirst().orElse(null)));
@@ -125,7 +128,7 @@ final class ActivationSolver<S> {
         checkRecursion();
         long indexProbes=closedIndexProbes;for(var entry:entries)for(var index:entry.byFrame.values())indexProbes+=index.probes();
         var metrics=new SolverMetrics(ins.size(),edgeCount,joins,initializations,attempts,pushes,pops,duplicates,maxSize,
-            transfers,work.operations(),ins.size(),changed,unchanged,edgeTransfers,edgeJoins,changed,unchanged,0,0,work.joinEntries(),work.compareEntries(),summaryCreated,summaryRetired,summaryLive,summaryPeak,summaryCollections,indexProbes);
+            transfers,work.operations(),ins.size(),changed,unchanged,edgeTransfers,edgeJoins,changed,unchanged,0,0,work.joinEntries(),work.compareEntries(),summaryCreated,summaryRetired,summaryLive,summaryPeak,summaryCollections,indexProbes,0,callerProofEdgesRead(),conditionPeak());
         return new DataflowResult<>(lookup,ins.toArray(),outs.toArray(),metrics);
     }
     private void checkRecursion() {
@@ -240,6 +243,7 @@ final class ActivationSolver<S> {
     private boolean feasible(Region region,int condition) {return feasible(region,condition,null);}
     private boolean feasible(Region region,int condition,Slot subscriber) {
         if(condition==0)return false;
+        if(condition==1&&region.rooted.reached())return true;
         var key=new Need(region,condition);var known=feasibleCache.get(key);if(known!=null)return known;
         if(subscriber==null&&finalWitnesses.computeIfAbsent(region.entry,this::finalWitnesses).matches(region,condition))
             {feasibleCache.put(key,true);return true;}
@@ -258,6 +262,7 @@ final class ActivationSolver<S> {
                 var current=coarse.removeFirst();
                 if(current.region.frame==null&&current.requiredSeen){root=current;break;}
                 for(var link:current.region.incoming.entrySet()) {
+                    callerPathEdgesRead++;
                     var parent=link.getKey().region;boolean requiredSeen=current.requiredSeen||region.entry.control.frameAt(link.getKey().node).variable()==required;
                     if(visited.add(new Need(parent,requiredSeen?1:0))) {
                         seen.add(parent);coarse.addLast(new Witness(parent,link.getValue(),current,requiredSeen,region.entry.control.frameAt(link.getKey().node).variable()));
@@ -266,10 +271,12 @@ final class ActivationSolver<S> {
             }
             if(root==null){defer(key,seen,subscriber);return false;}
             var active=new BitSet();var path=root;boolean valid=true;
+            feasibleCache.put(new Need(path.region,1),true);
             while(path.child!=null) {
+                callerPathEdgesRead++;
                 if(!region.entry.bdd.test(path.condition,active)){valid=false;break;}
                 active.set(path.pushedVariable);
-                path=path.child;
+                path=path.child;feasibleCache.put(new Need(path.region,1),true);
             }
             if(valid&&region.entry.bdd.test(condition,active)){feasibleCache.put(key,true);return true;}
         }
@@ -281,6 +288,7 @@ final class ActivationSolver<S> {
                 var current=queue.removeFirst();int need=waiting.remove(current);
                 if(current.frame==null){found=b.atEmpty(need)!=0;continue;}
                 for(var link:current.incoming.entrySet()) {
+                    callerPathEdgesRead++;
                     var parent=link.getKey().region;int before=b.restrict(need,region.entry.control.frameAt(link.getKey().node).variable(),true);
                     before=b.and(before,link.getValue());if(before==0)continue;
                     int old=wanted.getOrDefault(parent,0),extra=b.difference(before,old);if(extra==0)continue;
@@ -296,6 +304,7 @@ final class ActivationSolver<S> {
 
     }
     private final class EntryRun {
+        final CallerConnectivity connectivity=new CallerConnectivity();
         final ContextView context;
         final ActivationModel model;
         final ActivationControl control;
@@ -304,12 +313,14 @@ final class ActivationSolver<S> {
         final IdentityHashMap<ActivationControl.Frame,StateIndex<S,Region>> byFrame=new IdentityHashMap<>();
         final Map<ActivationControl.Frame,Map<ProgramIndex.Node,S>> boundaries=new IdentityHashMap<>();
         Region root;
+        PreliminaryCallerSupport preliminary;
         EntryRun(ContextView context,ActivationModel model){
             this.context=context;this.model=model;control=model==null?new ActivationControl(session,context):model.control();
             bdd=model==null?new BooleanConditions():model.conditions();
         }
         void start() {
-            root=new Region(this,null,bottom);regions.add(root);summaryCreated();root.accept(1);
+            if(structural)preliminary=new PreliminaryCallerSupport(control,indexResources);
+            root=new Region(this,null,bottom);regions.add(root);summaryCreated();feasibleCache.put(new Need(root,1),true);root.accept(1);
         }
         Region region(ActivationControl.Frame frame,S input,Slot caller,int condition) {
             frame=control.body(frame);
@@ -330,9 +341,10 @@ final class ActivationSolver<S> {
         final Set<Slot> waiters=Collections.newSetFromMap(new IdentityHashMap<>());
         final Map<Slot,Integer> incoming=new IdentityHashMap<>();
         long incomingVersion,mark;
+        final CallerConnectivity.Node rooted;
         final Map<ProgramIndex.Node,Integer> recursive=new IdentityHashMap<>();
         int environment;
-        Region(EntryRun entry,ActivationControl.Frame frame,S input){this.entry=entry;this.frame=frame;this.input=input;}
+        Region(EntryRun entry,ActivationControl.Frame frame,S input){this.entry=entry;this.frame=frame;this.input=input;rooted=entry.connectivity.node(frame==null);}
         Slot slot(ProgramIndex.Node node){return slots.computeIfAbsent(node,n->new Slot(this,n));}
         void accept(int condition) {
             int extra=entry.bdd.difference(condition,environment);if(extra==0)return;
@@ -419,17 +431,28 @@ final class ActivationSolver<S> {
     }
     private void subscribe(Slot caller,Region child,int condition) {
         var b=child.entry.bdd;caller.children.merge(child,condition,b::or);child.callers.add(caller);
+        if(Boolean.TRUE.equals(feasibleCache.get(new Need(caller.region,condition))))
+            feasibleCache.put(new Need(child,1),true);
         int old=child.incoming.getOrDefault(caller,0),combined=b.or(old,condition);
         if(combined!=old) {
-            child.incoming.put(caller,combined);child.incomingVersion++;
-            for(var waiting:child.waiters)enqueue(waiting);
+            replaceIncoming(caller,child,combined);
         }
     }
+    private void replaceIncoming(Slot caller,Region child,int condition) {
+        int old=child.incoming.getOrDefault(caller,0);
+        if(old==condition)return;
+        if(old==1)child.entry.connectivity.remove(caller.region.rooted,child.rooted);
+        if(condition==0)child.incoming.remove(caller);else child.incoming.put(caller,condition);
+        if(condition==1)child.entry.connectivity.add(caller.region.rooted,child.rooted);
+        child.incomingVersion++;
+        if(condition!=0)for(var waiting:child.waiters)enqueue(waiting);
+    }
     private void reconcile(Slot caller,Map<Region,Integer> previous) {
-        // Positive witnesses survive added links, but not removal/replacement.
+        // Nontrivial predicate witnesses still depend on the exact current links.
+        // Unconditional rooted certificates are repaired locally, not globally cleared.
         for(var old:previous.entrySet())if(!Objects.equals(caller.children.get(old.getKey()),old.getValue())){feasibleCache.clear();break;}
-        for(var child:previous.keySet())if(!caller.children.containsKey(child)){child.callers.remove(caller);child.incoming.remove(caller);}
-        caller.children.forEach((child,condition)->child.incoming.put(caller,condition));
+        for(var child:previous.keySet())if(!caller.children.containsKey(child)){child.callers.remove(caller);replaceIncoming(caller,child,0);}
+        for(var link:caller.children.entrySet())replaceIncoming(caller,link.getKey(),link.getValue());
     }
     private void process(Slot slot) {
         // A subscription represents the current input, not every intermediate input
@@ -448,13 +471,14 @@ final class ActivationSolver<S> {
             for(var move:slot.moves) {
                 int condition=piece.condition;
                 if(move.variable()>=0) {
-                    int active=region.frame==null?0:b.variable(move.variable());
+                    int active=region.frame==null||structural&&!e.preliminary.mayContain(region.frame,move.variable())?0:b.variable(move.variable());
                     condition=b.and(condition,move.present()?active:b.not(active));
                 }
                 if(condition==0)continue;
                 switch(move.action()) {
                     case NEXT -> arriveEdge(slot,region,move.destination(),slot.point,move.edge(),condition,output);
                     case CALL -> {
+                        if(!structural&&!feasible(region,condition,slot))continue;
                         S input=edge(slot.point,move.edge(),output);var child=e.region(move.frame(),input,slot,condition);if(child==null)continue;
                         subscribe(slot,child,condition);
                         // A summary is a function of ancestor guards, not their enumerated valuations.

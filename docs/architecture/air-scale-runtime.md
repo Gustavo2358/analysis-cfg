@@ -606,3 +606,40 @@ uncompleted AS-W04/W09 obligations.
 Checkpoint gate: FAST864required methods and all source/compiled/transport boundaries
 passed with zero failures/errors/skips in143.070s. This gate includes the additional
 convergence oracle and preserves all prior required methods and forbidden edges.
+
+### Caller support before guard saturation (AS-W04/W05 bridge)
+
+A conservative typed caller graph is compiled before symbolic structural solving.
+It includes actual invocation continuations and legal unwind/reset landing suffixes,
+but creates no executable bypass. Body vertices and actual activation-key bindings
+are separate. Shared SCC label sets prove only absence: a guard key outside the
+body's caller support becomes FALSE before conjunction. Possible presence retains
+its exact Boolean predicate. This avoids constructing impossible reentry predicates
+through ordinary diamonds before the old post-saturation refinement can run.
+
+Unconditional caller links also maintain a rooted proof forest. A TRUE feasibility
+query can use that actual finite root path without searching every ancestor again.
+Parallel links are counted. Removing a proof link detaches its subtree and regrows
+it from rooted external predecessors; disconnected cycles cannot certify themselves.
+Guarded paths remain individually tested, and TRUE never answers a nontrivial guard.
+This follows the spanning-tree invariant in Swamy/Brayton/Singhal,
+[Incremental Methods for FSM Traversal, §4.2](https://is.ifmo.ru/research/_incremental_methods_for_fsm_traversal.pdf).
+Link changes and summary retirement repair certificates synchronously. Metadata is
+still resident; this does not finish managed end-to-end execution or promise an
+optimal bound for arbitrary repeated dynamic edge deletions.
+
+The new callerPathEdgesRead counter includes shortest/exact caller searches and
+proof-forest maintenance. peakBooleanNodes records peak interned conditions,
+including transient construction. Older22/28/29argument metrics constructors stay
+available. Independent dynamic BFS covers4000 graph mutations, parallel links and
+unrooted cycles. Small nested/diamond cases compare every IN/OUT value against the
+explicit-stack oracle in both directions. Unchanged geometric bounds cover32–512
+nested frames and4–16 diamond levels. Full-kernel and original large-fixture/CLI
+qualification are separate evidence; these regressions alone do not finish the
+architecture plan.
+
+Checkpoint gates:200 kernel methods pass; FAST881 required methods and all exact
+source/compiled/transport boundaries pass with zero failures/errors/skips in217.415s.
+The counted deep-prefix curve is32/64/128/256/512 forward proof-edge reads and
+255/510/1022/2046/4094 backward, including forest maintenance. Large original
+contextual fixtures and public CLI products are being measured separately.
