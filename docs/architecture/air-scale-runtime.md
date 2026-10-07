@@ -201,3 +201,11 @@ identity includes the owning arena; numeric handles are not global model IDs.
 These primitives are not yet wired into production analysis. Passing their tests
 does not establish bounded residency for AIR decoding, summaries, proofs, queues,
 unique indexes or serialization. Those integration obligations remain open.
+
+The [typed AIR producer repin](../sources/air-scale-access-repin.md) fixes the official
+access/builder at `fd1ab664e19e7a5b0140f87503eebc6302f634c1`. `PagedAirStorage` bridges
+its four primitive columns to this runtime without implementing a second codec.
+The shared ledger funds all column directories and appender capacities. The large
+typed-payload tests exceed managed heap quota through exact file pages, but their
+input starts as a test-owned Publication. Official incremental decode and complete
+paged Validator migration still precede production CLI integration.

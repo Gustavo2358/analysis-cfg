@@ -313,6 +313,11 @@
       "randomSharedDagAndRootChurnMatchIndependentGraphTracing",
       "collectionQuotaFailureAbortsTheArenaInsteadOfExposingPartiallyRetiredFacts",
       "rejectedSchemaAndConstructorQuotaReleaseAllPartiallyBuiltOwners"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedAirStorageTest": [
+      "typedAirPayloadLargerThanManagedHeapMatchesBothBackendsAndIndependentUnicodeFacts",
+      "failedColumnConstructionReleasesEveryPreviouslyReservedOwner",
+      "operationalWriteFailureAbortsTypedConstructionAndFinalOwnerCleansDisk"
     ]
   },
   "analysis-dataflow": {

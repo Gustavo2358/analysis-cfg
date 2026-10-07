@@ -150,8 +150,8 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "c2f80b59b7c38fa6efb9a20f0fa79644c697d8a4",
-    "canonical_ref": "fix/general-memory-20261005",
+    "commit": "fd1ab664e19e7a5b0140f87503eebc6302f634c1",
+    "canonical_ref": "feat/paged-air-snapshot",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
     "analysis_ir": {
@@ -196,7 +196,13 @@
       "air-model/src/main/java/io/github/gustavo2358/air/model/Values.java",
       "air-json/src/test/resources/scalar-assign.canonical.json",
       "air-model/src/main/java/io/github/gustavo2358/air/model/MemoryCodecs.java",
-      "air-json/src/test/resources/regional.canonical.json"
+      "air-json/src/test/resources/regional.canonical.json",
+      "air-model/src/main/java/io/github/gustavo2358/air/model/AirShape.java",
+      "air-model/src/main/java/io/github/gustavo2358/air/model/AirSnapshot.java",
+      "air-model/src/main/java/io/github/gustavo2358/air/model/AirSnapshotBuilder.java",
+      "air-model/src/main/java/io/github/gustavo2358/air/model/PublicationProjection.java",
+      "air-model/src/main/java/io/github/gustavo2358/air/model/PublicationSource.java",
+      "docs/architecture/paged-snapshot.md"
     ],
     "observed_on": "2026-10-06",
     "modules": {
@@ -220,12 +226,22 @@
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "logical_text_w2": "Local producer FAST PASS; fixed logical ranges and expression transport. Selected source E2E qualification in docs/product/logical-text-w2.md.",
-    "evidence_level": "General memory model/codec implementation: local FAST and complete local qualification, with final documentation-only commit proven bytecode identical. Remote CI not dispatched; human review pending.",
+    "evidence_level": "Additive typed AIR access/builder checkpoint: producer FAST 197 model + 143 transport checks and boundaries PASS; index mutation rejected and exact original restored. Page-backed bridge, complete paged Validator and codec pending; human review pending.",
     "status": "LOCAL_CHECKPOINT / HUMAN_REVIEW_PENDING",
     "ci": {
-      "checked_commit": "c2f80b59b7c38fa6efb9a20f0fa79644c697d8a4",
+      "checked_commit": "fd1ab664e19e7a5b0140f87503eebc6302f634c1",
       "status": "NOT_RUN",
-      "context": "local qualification only"
+      "context": "local producer FAST only; draft PR 30"
+    },
+    "air_scale_access": {
+      "previous_commit": "c2f80b59b7c38fa6efb9a20f0fa79644c697d8a4",
+      "previous_evidence_level": "General memory model/codec implementation: local FAST and complete local qualification, with final documentation-only commit proven bytecode identical. Remote CI not dispatched; human review pending.",
+      "producer_pr": "https://github.com/Gustavo2358/air-java/pull/30",
+      "api_impact": "COMPATIBLE",
+      "old_production_files_unchanged": 51,
+      "all_three_poms_unchanged": true,
+      "validation": "197 model + 143 transport checks; producer FAST 24.945s; explicit storage freeze prevents post-transfer writes",
+      "limits": "Typed builder/storage access only; no complete paged validation/JSON/CLI claim."
     }
   },
   "proleap_poc": {
