@@ -487,10 +487,15 @@ following low branches, using the existing fixed computed table and creating no
 Boolean nodes. Forward/backward feasibility and unique-boundary searches apply the
 same closure. Caller subscriptions preserve matched return and unwind behavior.
 
-The removed transitive caller restrictions were sound pruning, not necessary for
-semantic truth. Their removal still requires the existing infeasible value-cycle
-regressions, generated explicit-stack IN/OUT oracle and consumers to pass; it is
-not justified by a faster dead-frame fixture alone. The independent sparse test
+The old global absence environments were sound pruning. Removing all pruning
+passed the small oracles but regressed a public CardDemo input to480s. The correction
+computes positive caller-key sets on reached structural shapes by iterative SCC
+condensation and canonical persistent tries. Equal components share roots and
+chain extensions share search paths. Only variables present in actual predicates
+are cofactored; impossible guard moves become constant or disappear. No global
+absence diagram or per-frame copied BitSet exists. Forward return delivery intersects
+the structural conditional point before transfer; backward uses the same refined
+shapes. The preparation-owned arena closes before domain evaluation. The independent sparse test
 was RED:64 inaccessible keys retained2146nodes. Two terminals suffice after the
 substitution. `possibleAncestors()` remains a diagnostic API; it is outside the
 production execution route. This does not yet eliminate body×frame summaries or
@@ -504,5 +509,15 @@ polynomial complexity is not claimed for arbitrary formulas or domains.
 Sparse-condition checkpoint validation: complete CFG/analysis-kernel reactor passed
 169 analysis-kernel tests, including the generated exact-stack oracle in both
 directions and all infeasible-changing-input regressions. Repository FAST passed
-with zero failures/errors/skips in145.234s. Original-scale dead-frame curves and
-selected public CardDemo comparisons are next; this is not global completion.
+with zero failures/errors/skips in145.234s before the support correction. All60
+original dead-frame curves passed:6400dead keys about0.402s and32768dead frames with
+32768body nodes about1.12s, both directions,4reachable points/3edges. The first
+CardDemo check exposed the480s regression and is preserved. Corrected kernel passed
+172methods;3public fixed input comparisons against729 then passed every semantic
+field except the two execution-counter objects, with candidate1.168/1.769/1.605s.
+The correction still requires FAST and committed curves. No global completion.
+
+Corrected checkpoint gate: FAST845required methods, zero failures/errors/skips,
+143.278s. The exact CI inventory now includes every Boolean condition law test,
+the two sparse dead-frame tests and the two persistent caller-support tests.
+Existing required methods and forbidden dependency rules remain intact.

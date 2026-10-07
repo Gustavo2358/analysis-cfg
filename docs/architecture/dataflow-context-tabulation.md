@@ -38,14 +38,20 @@ conditions mention only guards encountered in reachable execution; own-key tests
 are TRUE locally. A matched child return substitutes its parent's active key TRUE.
 Binding at the root evaluates the all-false ancestor valuation without constructing
 a conjunction over publication keys. Feasibility and unique boundary searches use
-the same closure in both directions. No all-frame caller-support pass or global
-absence environment runs during execution.
+the same closure in both directions. Reached frame shapes are condensed into SCCs;
+positive caller-key closures use canonical persistent sets. Only encountered
+predicate variables are cofactored and impossible guard moves are removed. No
+publication-wide frame-support traversal or global absence environment is built.
 
 This removes the publication frame×key product for dead keys. The matched caller
-relation still decides which formal predicates are realizable. Regression bounds
-for infeasible changing-input cycles remain mandatory: absence environments formerly
-suppressed their impossible intermediate work, so representation equivalence alone
-is insufficient as a performance acceptance argument.
+relation still decides which formal predicates are realizable. Forward deliveries
+also intersect the refined structural conditional point; this prevents an impossible
+return from creating a value slot. Regression bounds for infeasible changing-input
+cycles remain mandatory. Public CardDemo qualification falsified the prototype
+without positive support pruning at480s; persistent support/cofactoring restores
+three selected cases to roughly1–2s while preserving all semantic product fields.
+Preparation uses an explicit resident page compatibility backend. Full session
+budgeting, formal continuation sharing and managed diagram storage remain open.
 
 ## Demand and feasibility
 

@@ -4,6 +4,24 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class BooleanConditionsTest {
+    @Test void sparseAbsentRestrictionMatchesIndependentTruthTables() {
+        var b=new BooleanConditions(2);var forms=new java.util.ArrayList<Integer>();var truths=new java.util.ArrayList<Long>();
+        for(int v=0;v<6;v++){forms.add(b.variable(v));long mask=0;for(int bits=0;bits<64;bits++)if((bits&(1<<v))!=0)mask|=1L<<bits;truths.add(mask);}
+        var random=new java.util.Random(91833);
+        for(int step=0;step<300;step++) {
+            int a=random.nextInt(forms.size()),c=random.nextInt(forms.size());boolean union=random.nextBoolean();
+            int f=union?b.or(forms.get(a),forms.get(c)):b.and(forms.get(a),forms.get(c));long truth=union?truths.get(a)|truths.get(c):truths.get(a)&truths.get(c);
+            if(random.nextBoolean()){f=b.not(f);truth=~truth;}forms.add(f);truths.add(truth);
+        }
+        for(int allowedMask=0;allowedMask<64;allowedMask++) {
+            final int mask=allowedMask;var memo=new java.util.HashMap<Integer,Integer>();
+            for(int f=0;f<forms.size();f++) {
+                int restricted=b.restrictAbsent(forms.get(f),key->(mask&(1<<key))!=0,memo);
+                for(int bits=0;bits<64;bits++)assertEquals(((truths.get(f) >>> (bits&mask))&1)!=0,b.test(restricted,java.util.BitSet.valueOf(new long[]{bits})));
+            }
+        }
+    }
+
     @Test void emptyRootBindingMatchesIndependentTruthTablesAcrossReusedIds() {
         for(int slots:new int[]{1,2,8}) {
             var b=new BooleanConditions(slots);var forms=new java.util.ArrayList<Integer>();

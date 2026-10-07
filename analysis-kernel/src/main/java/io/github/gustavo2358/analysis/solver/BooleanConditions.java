@@ -111,6 +111,21 @@ final class BooleanConditions {
         }
         return -1;
     }
+    /** Cofactor only encountered absent variables. The memo belongs to one immutable binding. */
+    int restrictAbsent(int root,java.util.function.IntPredicate allowed,Map<Integer,Integer> memo) {
+        if(root<2)return root;
+        var pending=new ArrayDeque<Integer>();pending.push(root);
+        while(!pending.isEmpty()) {
+            int id=pending.peek();if(memo.containsKey(id)){pending.pop();continue;}
+            if(id<2){memo.put(id,id);pending.pop();continue;}
+            var n=nodes.get(id);
+            if(!memo.containsKey(n.low)){pending.push(n.low);continue;}
+            if(!allowed.test(n.variable)){memo.put(id,memo.get(n.low));pending.pop();continue;}
+            if(!memo.containsKey(n.high)){pending.push(n.high);continue;}
+            memo.put(id,node(n.variable,memo.get(n.low),memo.get(n.high)));pending.pop();
+        }
+        return memo.get(root);
+    }
     /** Bind the formal ancestor parameters at the empty root without an absence vector. */
     int atEmpty(int value) {
         if(value<2)return value;

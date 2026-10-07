@@ -587,7 +587,13 @@
       "computedTableCollisionsPreserveEveryTruthAssignment",
       "deepGuardConditionsDoNotUseTheJavaCallStack",
       "scratchQueriesReleaseNodesWithoutReusingStaleComputedEntries",
-      "requiredPresentIsNecessaryForEverySatisfyingAssignment"
+      "requiredPresentIsNecessaryForEverySatisfyingAssignment",
+      "sparseAbsentRestrictionMatchesIndependentTruthTables",
+      "emptyRootBindingMatchesIndependentTruthTablesAcrossReusedIds",
+      "managedScratchRollbackVisitsOnlyTransientMemoSlots",
+      "managedScratchCollisionsAndReusedIdsMatchIndependentTruthTables",
+      "rootedCollectionKeepsTruthAndCanonicalIdsAcrossReusedSlots",
+      "feasibilityScratchDoesNotReuseCollectedSlotsOrEscapeRollback"
     ],
     "io.github.gustavo2358.analysis.solver.CallerWitnessesTest": [
       "separateWitnessesNeverInventACombinedCaller",
@@ -620,6 +626,14 @@
       "denseAndFactoredGraphsHaveSameEveryEntryForwardBackwardAndListHash",
       "unitAndEntryExitBindingsStaySeparateWithEqualTargetBranchesAndDifferentRoots",
       "retentionAuditCountsPhysicalRowsAndStillDetectsAnExtraRetainedTransition"
+    ],
+    "io.github.gustavo2358.analysis.solver.SparseActivationConditionsTest": [
+      "unreachableFramesAllocateNoAncestorConditions",
+      "rootClosesOnlyEncounteredGuardsWithoutAbsenceVectors"
+    ],
+    "io.github.gustavo2358.analysis.solver.PersistentCallerSupportTest": [
+      "condensedPersistentSupportsMatchIndependentCallerWalks",
+      "chainSupportsShareSearchPathsInsteadOfCopyingAllAncestors"
     ]
   },
   "analysis-launcher": {

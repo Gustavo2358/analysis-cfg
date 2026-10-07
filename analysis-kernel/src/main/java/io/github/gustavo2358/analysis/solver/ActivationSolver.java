@@ -122,9 +122,51 @@ final class ActivationSolver<S> {
                 for(var link:region.incoming.entrySet())links.merge(link.getKey().region.frame,link.getValue(),entry.bdd::or);
                 parents.put(region.frame,links);
             }
+            refineShapes(entry.bdd,shapes,parents);
             models.add(new ActivationModel(entry.context,entry.control,entry.bdd,shapes,parents,List.copyOf(roots),List.copyOf(unwind),depth));
         }
         return models;
+    }
+    /** Reduce impossible tested guards using a shared persistent SCC support relation. */
+    private static void refineShapes(BooleanConditions b,Map<ActivationControl.Frame,ActivationModel.Shape> shapes,
+            Map<ActivationControl.Frame,Map<ActivationControl.Frame,Integer>> parents) {
+        var frames=new ArrayList<ActivationControl.Frame>();var ordinals=new IdentityHashMap<ActivationControl.Frame,Integer>();
+        for(var frame:shapes.keySet())if(frame!=null){ordinals.put(frame,frames.size());frames.add(frame);}
+        if(frames.isEmpty())return;
+        int[] variables=new int[frames.size()];int[][] incoming=new int[frames.size()][];
+        for(int i=0;i<frames.size();i++) {
+            var frame=frames.get(i);variables[i]=frame.variable();var links=parents.getOrDefault(frame,Map.of());
+            int count=0;for(var parent:links.keySet())if(parent!=null)count++;
+            incoming[i]=new int[count];int slot=0;for(var parent:links.keySet())if(parent!=null)incoming[i][slot++]=ordinals.get(parent);
+        }
+        // Explicit resident compatibility backend; managed session injection is a later wave.
+        var resources=new AnalysisResources(new AnalysisResources.Limits(Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE));
+        try(var store=new ResidentPageStore(4096,resources,AnalysisResources.Phase.CONTROL);
+                var support=new PersistentCallerSupport(store,resources,variables,incoming)) {
+            var memos=new HashMap<Long,Map<Integer,Integer>>();
+            for(int i=0;i<frames.size();i++) {
+                final int ordinal=i;var frame=frames.get(i);var shape=shapes.get(frame);
+                var memo=memos.computeIfAbsent(support.root(i),root->new HashMap<>());
+                java.util.function.IntPredicate allowed=key->support.contains(ordinal,key);
+                var points=new LinkedHashMap<ProgramIndex.Node,ActivationModel.Point>();
+                for(var point:shape.points().entrySet()) {
+                    int condition=b.restrictAbsent(point.getValue().condition(),allowed,memo);if(condition==0)continue;
+                    var moves=new ArrayList<ActivationControl.Move>();
+                    for(var move:point.getValue().moves()) {
+                        if(move.variable()<0||allowed.test(move.variable()))moves.add(move);
+                        else if(!move.present())moves.add(new ActivationControl.Move(move.action(),move.destination(),move.frame(),-1,false,move.count(),move.invalid(),move.edge()));
+                    }
+                    points.put(point.getKey(),new ActivationModel.Point(condition,List.copyOf(moves)));
+                }
+                shapes.put(frame,new ActivationModel.Shape(frame,points));
+                var links=parents.get(frame);var refined=new IdentityHashMap<ActivationControl.Frame,Integer>();
+                for(var link:links.entrySet()) {
+                    int condition=link.getKey()==null?b.atEmpty(link.getValue()):link.getValue();
+                    if(condition!=0)refined.put(link.getKey(),condition);
+                }
+                parents.put(frame,refined);
+            }
+        }
     }
     /** Backward reachability of a guard predicate through caller subscriptions, without stack strings. */
     private final class Deferred {
@@ -264,7 +306,7 @@ final class ActivationSolver<S> {
         boolean queued;
         Slot(Region region,ProgramIndex.Node node) {
             this.region=region;this.node=node;point=new AnalysisPoint(nextPoint++,region.entry.context,node);
-            anchors=new Partition(region.entry);outputs=new Partition(region.entry);moves=region.entry.control.moves(node,region.frame);initializations++;
+            anchors=new Partition(region.entry);outputs=new Partition(region.entry);moves=region.entry.model==null?region.entry.control.moves(node,region.frame):region.entry.model.shapes().get(region.frame).points().get(node).moves();initializations++;
         }
     }
     private final class Piece {
@@ -318,6 +360,11 @@ final class ActivationSolver<S> {
         edgeTransfers++;return Objects.requireNonNull(definition.transferEdge(source,transition,value,work));
     }
     private void arriveEdge(Slot caller,Region target,ProgramIndex.Node destination,AnalysisPoint source,CfgTransition transition,int condition,S value) {
+        if(target.entry.model!=null) {
+            var shape=target.entry.model.shapes().get(target.frame);var point=shape.points().get(destination);
+            if(point==null)return;
+            condition=target.entry.bdd.and(condition,point.condition());if(condition==0)return;
+        }
         S contribution=edge(source,transition,value);
         if(structural||definition.equivalent(contribution,value,work)||feasible(target,condition,caller))arrive(target.slot(destination),condition,contribution);
     }
