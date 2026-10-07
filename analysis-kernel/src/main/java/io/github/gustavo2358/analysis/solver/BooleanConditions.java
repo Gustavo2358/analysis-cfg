@@ -111,6 +111,17 @@ final class BooleanConditions {
         }
         return -1;
     }
+    /** Bind the formal ancestor parameters at the empty root without an absence vector. */
+    int atEmpty(int value) {
+        if(value<2)return value;
+        int hit=cached(value,-1,5);if(hit>=0)return hit;
+        int root=value;
+        while(value>=2) {
+            hit=cached(value,-1,5);if(hit>=0){value=hit;break;}
+            value=nodes.get(value).low;
+        }
+        return remember(root,-1,5,value);
+    }
     boolean test(int value,BitSet assignment) {
         while(value>=2){var n=nodes.get(value);value=assignment.get(n.variable)?n.high:n.low;}
         return value==TRUE;

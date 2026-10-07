@@ -51,7 +51,6 @@ final class ActivationSolver<S> {
     private void collectConditions(EntryRun entry) {
         if(!entry.bdd.collectionDue())return;
         entry.bdd.collect(root->{
-            root.accept(entry.empty);entry.environments.values().forEach(root::accept);
             if(entry.model!=null)entry.model.visitConditions(root);
             var owners=Collections.newSetFromMap(new IdentityHashMap<Object,Boolean>());
             for(var region:entry.regions) {
@@ -123,27 +122,7 @@ final class ActivationSolver<S> {
                 for(var link:region.incoming.entrySet())links.merge(link.getKey().region.frame,link.getValue(),entry.bdd::or);
                 parents.put(region.frame,links);
             }
-            // Guards outside the transitive caller set can never be active. This is a
-            // polynomial overapproximation, not enumeration of reachable ancestor sets.
-            var environments=new IdentityHashMap<ActivationControl.Frame,Integer>();
-            for(var frame:shapes.keySet()) {
-                if(frame==null){environments.put(null,entry.empty);continue;}
-                var ancestors=Collections.newSetFromMap(new IdentityHashMap<ActivationControl.Frame,Boolean>());
-                var pending=new ArrayDeque<ActivationControl.Frame>();pending.add(frame);var possible=new BitSet();
-                while(!pending.isEmpty())for(var parent:parents.getOrDefault(pending.removeFirst(),Map.of()).keySet())
-                    if(parent!=null&&ancestors.add(parent)){possible.set(parent.variable());pending.addLast(parent);}
-                // The current key is shadowed by this frame (always active locally).
-                // Its formal ancestor variable is irrelevant, so do not constrain it.
-                possible.set(frame.variable());int environment=1;
-                for(int v=entry.control.variables()-1;v>=0;v--)if(!possible.get(v))environment=entry.bdd.node(v,environment,0);
-                environments.put(frame,environment);
-            }
-            for(var shape:new ArrayList<>(shapes.values())) {
-                var points=new LinkedHashMap<ProgramIndex.Node,ActivationModel.Point>();
-                for(var point:shape.points().entrySet())points.put(point.getKey(),new ActivationModel.Point(entry.bdd.and(point.getValue().condition(),environments.get(shape.frame())),point.getValue().moves()));
-                shapes.put(shape.frame(),new ActivationModel.Shape(shape.frame(),points));
-            }
-            models.add(new ActivationModel(entry.context,entry.control,entry.bdd,entry.empty,shapes,parents,environments,List.copyOf(roots),List.copyOf(unwind),depth));
+            models.add(new ActivationModel(entry.context,entry.control,entry.bdd,shapes,parents,List.copyOf(roots),List.copyOf(unwind),depth));
         }
         return models;
     }
@@ -211,9 +190,9 @@ final class ActivationSolver<S> {
             wanted.put(region,condition);waiting.put(region,condition);queue.add(region);boolean found=false;
             while(!queue.isEmpty()&&!found) {
                 var current=queue.removeFirst();int need=waiting.remove(current);
-                if(current.frame==null){found=b.and(need,current.entry.empty)!=0;continue;}
+                if(current.frame==null){found=b.atEmpty(need)!=0;continue;}
                 for(var link:current.incoming.entrySet()) {
-                    var parent=link.getKey().region;int before=parent.frame==null?need:b.restrict(need,parent.frame.variable(),true);
+                    var parent=link.getKey().region;int before=parent.frame==null?b.atEmpty(need):b.restrict(need,parent.frame.variable(),true);
                     before=b.and(before,link.getValue());if(before==0)continue;
                     int old=wanted.getOrDefault(parent,0),extra=b.difference(before,old);if(extra==0)continue;
                     wanted.put(parent,b.or(old,extra));
@@ -232,23 +211,16 @@ final class ActivationSolver<S> {
         final ActivationModel model;
         final ActivationControl control;
         final BooleanConditions bdd;
-        final Map<ActivationControl.Frame,Integer> environments;
         final List<Region> regions=new ArrayList<>();
         final IdentityHashMap<ActivationControl.Frame,List<Region>> byFrame=new IdentityHashMap<>();
         final Map<ActivationControl.Frame,Map<ProgramIndex.Node,S>> boundaries=new IdentityHashMap<>();
-        Region root;int empty;
+        Region root;
         EntryRun(ContextView context,ActivationModel model){
             this.context=context;this.model=model;control=model==null?new ActivationControl(session,context):model.control();
-            bdd=model==null?new BooleanConditions():model.conditions();environments=model==null?new IdentityHashMap<>():model.environments();
-            if(model==null)for(var support:control.possibleAncestors().entrySet()) {
-                int environment=1;
-                for(int v=control.variables()-1;v>=0;v--)if(!support.getValue().get(v))environment=bdd.node(v,environment,0);
-                environments.put(support.getKey(),environment);
-            }
+            bdd=model==null?new BooleanConditions():model.conditions();
         }
         void start() {
-            empty=1;for(int i=control.variables()-1;i>=0;i--)empty=bdd.node(i,empty,0);
-            root=new Region(this,null,bottom);regions.add(root);root.accept(empty);
+            root=new Region(this,null,bottom);regions.add(root);root.accept(1);
         }
         Region region(ActivationControl.Frame frame,S input,Slot caller,int condition) {
             var candidates=byFrame.computeIfAbsent(frame,f->new ArrayList<>());
@@ -272,7 +244,6 @@ final class ActivationSolver<S> {
         Region(EntryRun entry,ActivationControl.Frame frame,S input){this.entry=entry;this.frame=frame;this.input=input;}
         Slot slot(ProgramIndex.Node node){return slots.computeIfAbsent(node,n->new Slot(this,n));}
         void accept(int condition) {
-            condition=entry.bdd.and(condition,entry.environments.getOrDefault(frame,1));
             int extra=entry.bdd.difference(condition,environment);if(extra==0)return;
             environment=entry.bdd.or(environment,condition);arrive(slot(entry.control.entry(frame)),extra,input);
         }
@@ -381,7 +352,7 @@ final class ActivationSolver<S> {
             for(var move:slot.moves) {
                 int condition=piece.condition;
                 if(move.variable()>=0) {
-                    int active=region.frame!=null&&region.frame.variable()==move.variable()?1:b.variable(move.variable());
+                    int active=region.frame==null?0:region.frame.variable()==move.variable()?1:b.variable(move.variable());
                     condition=b.and(condition,move.present()?active:b.not(active));
                 }
                 if(condition==0)continue;
@@ -394,7 +365,7 @@ final class ActivationSolver<S> {
                         child.accept(1);
                         // Snapshot: a self-call may discover an additional summary while delivering one.
                         for(var summary:new ArrayList<>(child.exits.entrySet()))for(var returned:summary.getValue().pieces) {
-                            int valid=region.frame==null?returned.condition:b.restrict(returned.condition,region.frame.variable(),true);
+                            int valid=region.frame==null?b.atEmpty(returned.condition):b.restrict(returned.condition,region.frame.variable(),true);
                             valid=b.and(condition,valid);if(valid==0)continue;
                             receive(slot,region,summary.getKey(),valid,returned.state);
                         }

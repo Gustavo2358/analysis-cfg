@@ -475,3 +475,34 @@ not yet provide the paged ProgramStore, managed resource budget, factored open r
 formal local-continuation summaries required to complete AS-W03/W04. Traversing/delivering the
 full logical CFG still enumerates its requested contextual edges. Per-analysis Entry state
 sharing and dependency output cursor integration remain later substitutions.
+
+## Sparse formal ancestor conditions (AS-W04 checkpoint in progress)
+
+Execution no longer calls `ActivationControl.possibleAncestors()` over all publication
+frames and never builds a global absence conjunction. The root starts under TRUE;
+its own guard tests are FALSE because its stack is empty. Child formulas retain
+only encountered ancestor guards, with own-key tests TRUE. A matched return binds
+the parent's active key TRUE; a root binding evaluates the all-false valuation by
+following low branches, using the existing fixed computed table and creating no
+Boolean nodes. Forward/backward feasibility and unique-boundary searches apply the
+same closure. Caller subscriptions preserve matched return and unwind behavior.
+
+The removed transitive caller restrictions were sound pruning, not necessary for
+semantic truth. Their removal still requires the existing infeasible value-cycle
+regressions, generated explicit-stack IN/OUT oracle and consumers to pass; it is
+not justified by a faster dead-frame fixture alone. The independent sparse test
+was RED:64 inaccessible keys retained2146nodes. Two terminals suffice after the
+substitution. `possibleAncestors()` remains a diagnostic API; it is outside the
+production execution route. This does not yet eliminate body×frame summaries or
+CallerWitnesses whole-route residency, and managed BDD storage remains pending.
+
+The Boolean operation follows exact restriction in
+[Bryant1986, section4.4](https://www.cs.cmu.edu/~bryant/pubdir/ieeetc86.pdf).
+The AIR-specific proof is by induction over matched caller bindings; universal
+polynomial complexity is not claimed for arbitrary formulas or domains.
+
+Sparse-condition checkpoint validation: complete CFG/analysis-kernel reactor passed
+169 analysis-kernel tests, including the generated exact-stack oracle in both
+directions and all infeasible-changing-input regressions. Repository FAST passed
+with zero failures/errors/skips in145.234s. Original-scale dead-frame curves and
+selected public CardDemo comparisons are next; this is not global completion.

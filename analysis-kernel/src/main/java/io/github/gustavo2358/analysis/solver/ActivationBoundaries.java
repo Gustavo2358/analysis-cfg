@@ -30,14 +30,14 @@ final class ActivationBoundaries {
         while(!pending.isEmpty()) {
             var visit=pending.removeFirst();var current=visit.key.frame();int position=visit.key.prefix();
             if(current==null) {
-                if(b.and(visit.condition,model.empty())==0||excluded!=null&&position==excluded.size())continue;
+                if(b.atEmpty(visit.condition)==0||excluded!=null&&position==excluded.size())continue;
                 var result=new ArrayList<ActivationControl.Frame>();
                 for(var v=visit.previous;v!=null;v=v.previous)result.add(v.key.frame());
                 Collections.reverse(result);return List.copyOf(result);
             }
             int nextPosition=position>=0&&position<excluded.size()&&excluded.get(position)==current?position+1:-1;
             for(var link:model.parents().getOrDefault(current,Map.of()).entrySet()) {
-                var parent=link.getKey();int need=parent==null?visit.condition:b.restrict(visit.condition,parent.variable(),true);
+                var parent=link.getKey();int need=parent==null?b.atEmpty(visit.condition):b.restrict(visit.condition,parent.variable(),true);
                 need=b.and(need,link.getValue());var key=new Key(parent,nextPosition);
                 int old=seen.getOrDefault(key,0),extra=b.difference(need,old);if(extra==0)continue;
                 seen.put(key,b.or(old,extra));pending.addLast(new Visit(key,extra,visit));

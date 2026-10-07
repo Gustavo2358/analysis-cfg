@@ -4,6 +4,33 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class BooleanConditionsTest {
+    @Test void emptyRootBindingMatchesIndependentTruthTablesAcrossReusedIds() {
+        for(int slots:new int[]{1,2,8}) {
+            var b=new BooleanConditions(slots);var forms=new java.util.ArrayList<Integer>();
+            var truths=new java.util.ArrayList<Long>();
+            for(int v=0;v<6;v++) {
+                forms.add(b.variable(v));long mask=0;
+                for(int bits=0;bits<64;bits++)if((bits&(1<<v))!=0)mask|=1L<<bits;
+                truths.add(mask);
+            }
+            var random=new java.util.Random(95173+slots);
+            for(int round=0;round<30;round++) {
+                int checkpoint=b.checkpoint();var values=new java.util.ArrayList<>(forms);var expected=new java.util.ArrayList<>(truths);
+                for(int step=0;step<100;step++) {
+                    int a=random.nextInt(values.size()),c=random.nextInt(values.size());boolean union=random.nextBoolean();
+                    int f=union?b.or(values.get(a),values.get(c)):b.and(values.get(a),values.get(c));
+                    long truth=union?expected.get(a)|expected.get(c):expected.get(a)&expected.get(c);
+                    if(random.nextBoolean()){f=b.not(f);truth=~truth;}
+                    int before=b.size();assertEquals((int)(truth&1),b.atEmpty(f));assertEquals(before,b.size());
+                    assertEquals((int)(truth&1),b.atEmpty(f));values.add(f);expected.add(truth);
+                }
+                b.discardAfter(checkpoint);
+                assertEquals(0,b.atEmpty(forms.get(0)));assertEquals(1,b.atEmpty(b.not(forms.get(0))));
+                b.collect(mark->{for(int root:forms)mark.accept(root);});
+            }
+        }
+    }
+
     @Test void managedScratchRollbackVisitsOnlyTransientMemoSlots() {
         var b=new BooleanConditions(); int x=b.variable(0),y=b.variable(1);
         long start=b.scratchCacheVisits(); int empty=b.checkpoint();

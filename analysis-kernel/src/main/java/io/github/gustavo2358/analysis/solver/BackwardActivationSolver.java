@@ -204,7 +204,7 @@ final class BackwardActivationSolver<S> {
             var child=e.region(move.frame(),input,source,choice.condition);if(child==null)continue;subscribe(source,child,choice.condition);
             var entry=child.slots.get(e.model.control().entry(move.frame()));
             for(var value:entry.in.pieces) {
-                int pre=parent.frame==null?value.condition:b.restrict(value.condition,parent.frame.variable(),true);
+                int pre=parent.frame==null?b.atEmpty(value.condition):b.restrict(value.condition,parent.frame.variable(),true);
                 contribute(source,b.and(choice.condition,pre),entry.node,move.edge(),value.state);
             }
         }
@@ -232,7 +232,7 @@ final class BackwardActivationSolver<S> {
         for(var move:slot.shape.moves()) {
             int condition=slot.shape.condition();
             if(move.variable()>=0) {
-                int active=region.frame!=null&&region.frame.variable()==move.variable()?1:b.variable(move.variable());
+                int active=region.frame==null?0:region.frame.variable()==move.variable()?1:b.variable(move.variable());
                 condition=b.and(condition,move.present()?active:b.not(active));
             }
             if(condition==0)continue;
@@ -329,9 +329,9 @@ final class BackwardActivationSolver<S> {
             wanted.put(region,condition);waiting.put(region,condition);queue.add(region);boolean found=false;
             while(!queue.isEmpty()&&!found) {
                 var current=queue.removeFirst();int need=waiting.remove(current);
-                if(current.frame==null){found=b.and(need,current.entry.model.empty())!=0;continue;}
+                if(current.frame==null){found=b.atEmpty(need)!=0;continue;}
                 for(var link:current.incoming.entrySet()) {
-                    var parent=link.getKey().region;int before=parent.frame==null?need:b.restrict(need,parent.frame.variable(),true);
+                    var parent=link.getKey().region;int before=parent.frame==null?b.atEmpty(need):b.restrict(need,parent.frame.variable(),true);
                     before=b.and(before,link.getValue());if(before==0)continue;
                     int old=wanted.getOrDefault(parent,0),extra=b.difference(before,old);if(extra==0)continue;
                     wanted.put(parent,b.or(old,extra));
