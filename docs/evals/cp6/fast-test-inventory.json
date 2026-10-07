@@ -772,7 +772,14 @@
       "deepPostorderSubstitutionAndEvaluationNeverUseJavaCallStack",
       "rootedSharedChildrenSurviveCollectionAndStaleHandlesAreRejected",
       "quotaDenialAbortsEvenTerminalQueriesAndReleasesBorrowedPages",
-      "interruptedTraversalDecisionsAndCollectionReleaseQueryAndCircuitOwners"
+      "interruptedTraversalDecisionsAndCollectionReleaseQueryAndCircuitOwners",
+      "storedSimulationWordsAreActualValuationsAndRespectFunctionalLaws",
+      "simulationConstructionProcessesEachNewSharedNodeOnceInsteadOfItsWholeCone"
+    ],
+    "io.github.gustavo2358.analysis.solver.BooleanCircuitDecisionsTest": [
+      "genericConeDecisionsPreserveRepeatedPrimaryKeysAndIndependentTruthTables",
+      "constantsInsideDefinitionsAndAliasesPreserveTheirMeaning",
+      "unrelatedGraphNodesAreNeverReadAndCyclesAreOperationalFailure"
     ]
   },
   "analysis-launcher": {

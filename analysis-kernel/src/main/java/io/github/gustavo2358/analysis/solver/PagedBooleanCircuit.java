@@ -8,22 +8,38 @@ import java.util.function.IntUnaryOperator;
  * All cardinality-dependent storage is paged; the supplied backend is borrowed.
  * A query owns and releases its decision formula. No decision cutoff is semantic. */
 final class PagedBooleanCircuit implements AutoCloseable {
-    private static final int INPUT=1,AND=2,EVALUATE=0,SUBSTITUTE=1,ENCODE=2;
+    private static final int INPUT=1,AND=2,EVALUATE=0,SUBSTITUTE=1;
+    // Fixed actual valuations, including dense/sparse complements. Samples only
+    // nominate exact comparisons: agreeing samples can never establish equality.
+    private static final int[] SAMPLE_DEPTHS={1,2,3,4,6,8,10,12,16,20,24,28,32};
+    static final int SAMPLE_WORDS=2+2*SAMPLE_DEPTHS.length;
     private final PageStore pages;
     private final AnalysisResources resources;
     private final AnalysisResources.Reservation controls;
     private CanonicalTupleArena nodes;
+    private BooleanCircuitDecisions decisions;
+    private BooleanCircuitView decisionView;
     private long[] tuple;
     private int decisionVariables;
+    private long sampleWords;
     private boolean closed,failed;
 
     PagedBooleanCircuit(PageStore pages,AnalysisResources resources) {
         this.pages=pages;this.resources=resources;
-        controls=resources.reserve(AnalysisResources.Pool.RESIDENT,512,AnalysisResources.Phase.CONTROL);
+        controls=resources.reserve(AnalysisResources.Pool.RESIDENT,1536,AnalysisResources.Phase.CONTROL);
         try {
-            tuple=new long[6];
-            nodes=new CanonicalTupleArena(pages,resources,AnalysisResources.Phase.CONTROL,6,new int[]{2,4});
-        }catch(RuntimeException|Error failure){controls.close();throw failure;}
+            tuple=new long[6+SAMPLE_WORDS];
+            nodes=new CanonicalTupleArena(pages,resources,AnalysisResources.Phase.CONTROL,tuple.length,new int[]{2,4});
+            decisionView=new BooleanCircuitView() {
+                public long normalize(long root){open();valid(root);return root;}
+                public int primary(long handle){return nodes.field(handle,0)==INPUT?(int)nodes.field(handle,1):-1;}
+                public long left(long handle){return child(handle,0);}
+                public long right(long handle){return child(handle,1);}
+            };
+        }catch(RuntimeException|Error failure){
+            try{if(nodes!=null)nodes.close();}catch(RuntimeException cleanup){failure.addSuppressed(cleanup);}
+            controls.close();throw failure;
+        }
     }
     private void open(){if(closed||failed)throw new IllegalStateException("Boolean circuit closed or aborted");}
     private void valid(long root){if(root<0)throw new IllegalArgumentException("negative circuit root");if(root>=2)nodes.field(root>>>1,0);}
@@ -32,6 +48,15 @@ final class PagedBooleanCircuit implements AutoCloseable {
         open();if(key<0)throw new IllegalArgumentException("negative primary key");
         try {
             tuple[0]=INPUT;tuple[1]=key;tuple[2]=tuple[3]=tuple[4]=tuple[5]=0;
+            tuple[6]=0;tuple[7]=-1;long low=-1;int channel=0;
+            for(int depth=1;depth<=32;depth++) {
+                low&=sampleBits(key,depth);
+                if(depth==SAMPLE_DEPTHS[channel]) {
+                    tuple[8+2*channel]=low;tuple[9+2*channel]=~low;
+                    if(++channel==SAMPLE_DEPTHS.length)break;
+                }
+            }
+            sampleWords+=SAMPLE_WORDS;
             return nodes.intern(tuple)<<1;
         }catch(AnalysisResources.Exhausted|PageStore.Failure failure){failed=true;throw failure;}
     }
@@ -56,15 +81,38 @@ final class PagedBooleanCircuit implements AutoCloseable {
             absorbed=absorb(b,a);if(absorbed>=0)return absorbed;
             if(a>b){long swap=a;a=b;b=swap;}
             tuple[0]=AND;tuple[1]=0;tuple[2]=a>>>1;tuple[3]=a&1;tuple[4]=b>>>1;tuple[5]=b&1;
+            for(int word=0;word<SAMPLE_WORDS;word++)tuple[6+word]=sample(a,word)&sample(b,word);
+            sampleWords+=SAMPLE_WORDS;
             return nodes.intern(tuple)<<1;
         }catch(AnalysisResources.Exhausted|PageStore.Failure failure){failed=true;throw failure;}
     }
     long or(long a,long b){open();return not(and(not(a),not(b)));}
+    private static long sampleBits(int key,int depth) {
+        long bits=((long)key*0x9e3779b97f4a7c15L)^((long)depth*0xd1b54a32d192ed03L);
+        bits=(bits^(bits>>>30))*0xbf58476d1ce4e5b9L;
+        bits=(bits^(bits>>>27))*0x94d049bb133111ebL;
+        return bits^(bits>>>31);
+    }
+    static long primarySample(int key,int word) {
+        if(key<0||word<0||word>=SAMPLE_WORDS)throw new IllegalArgumentException("foreign sample key/channel");
+        if(word<2)return word==0?0:-1;
+        int depth=SAMPLE_DEPTHS[(word-2)/2];long bits=-1;
+        for(int level=1;level<=depth;level++)bits&=sampleBits(key,level);
+        return (word&1)==0?bits:~bits;
+    }
+    long sample(long root,int word) {
+        open();if(word<0||word>=SAMPLE_WORDS)throw new IllegalArgumentException("foreign sample channel");
+        try {
+            valid(root);if(root<2)return root==0?0:-1;
+            long bits=nodes.field(root>>>1,6+word);return (root&1)==0?bits:~bits;
+        }catch(AnalysisResources.Exhausted|PageStore.Failure failure){failed=true;throw failure;}
+    }
+    long sampleWordsCalculated(){open();return sampleWords;}
     boolean test(long root,IntPredicate valuation) {
         open();try {
             valid(root);if(root<2)return root==1;
             try(var memo=array();var pending=array()) {
-                return walk(root,EVALUATE,valuation,null,null,memo,pending)==1;
+                return walk(root,EVALUATE,valuation,null,memo,pending)==1;
             }
         }catch(AnalysisResources.Exhausted|PageStore.Failure failure){failed=true;throw failure;}
     }
@@ -73,14 +121,14 @@ final class PagedBooleanCircuit implements AutoCloseable {
         open();try {
             valid(root);if(root<2)return root;
             try(var memo=array();var pending=array()) {
-                return walk(root,SUBSTITUTE,null,bindings,null,memo,pending);
+                return walk(root,SUBSTITUTE,null,bindings,memo,pending);
             }
         }catch(AnalysisResources.Exhausted|PageStore.Failure failure){failed=true;throw failure;}
     }
     long restrict(long root,int key,boolean value){return restrict(root,k->k==key?(value?1:0):-1);}
     /** Memo stores the result for the positive underlying handle, plus one for zero. */
     private long walk(long root,int mode,IntPredicate valuation,IntUnaryOperator bindings,
-                      PagedBooleanDecisions decisions,PagedLongArray memo,PagedLongArray pending) {
+                      PagedLongArray memo,PagedLongArray pending) {
         long top=1;pending.set(0,root>>>1);
         while(top>0) {
             long handle=pending.get(top-1);
@@ -89,7 +137,6 @@ final class PagedBooleanCircuit implements AutoCloseable {
             if(nodes.field(handle,0)==INPUT) {
                 int key=(int)nodes.field(handle,1);
                 if(mode==EVALUATE)result=valuation.test(key)?1:0;
-                else if(mode==ENCODE){result=(long)decisions.newVariable()<<1;decisionVariables++;}
                 else {
                     int binding=bindings.applyAsInt(key);
                     if(binding< -1||binding>1)throw new IllegalArgumentException("binding must be -1,0,1");
@@ -101,37 +148,24 @@ final class PagedBooleanCircuit implements AutoCloseable {
                 if(right==0){pending.set(top++,b>>>1);continue;}
                 left=(left-1)^(a&1);right=(right-1)^(b&1);
                 if(mode==EVALUATE)result=left&right;
-                else if(mode==SUBSTITUTE)result=and(left,right);
-                else {
-                    result=(long)decisions.newVariable()<<1;decisionVariables++;
-                    decisions.addClause(result^1,left);decisions.addClause(result^1,right);
-                    decisions.addClause(result,left^1,right^1);
-                }
+                else result=and(left,right);
             }
             memo.set(handle,result+1);pending.set(--top,0);
         }
         return (memo.get(root>>>1)-1)^(root&1);
     }
     int lastDecisionVariables(){open();return decisionVariables;}
+    private void decisionStorage(){if(decisions==null)decisions=new BooleanCircuitDecisions(pages,resources,decisionView);}
     boolean satisfiable(long root) {
         open();try {
             valid(root);decisionVariables=0;if(root<2)return root==1;
-            try(var decisions=new PagedBooleanDecisions(pages,resources);var memo=array();var pending=array()) {
-                long literal=walk(root,ENCODE,null,null,decisions,memo,pending);
-                return decisions.satisfiable(literal);
-            }
+            decisionStorage();boolean result=decisions.satisfiable(root);decisionVariables=decisions.lastDecisionVariables();return result;
         }catch(AnalysisResources.Exhausted|PageStore.Failure failure){failed=true;throw failure;}
     }
     boolean equivalent(long a,long b) {
         open();try {
             valid(a);valid(b);decisionVariables=0;if(a==b)return true;if(a==(b^1))return false;
-            if(a<2)return !satisfiable(b^(a==1?1:0));
-            if(b<2)return !satisfiable(a^(b==1?1:0));
-            try(var decisions=new PagedBooleanDecisions(pages,resources);var memo=array();var pending=array()) {
-                long left=walk(a,ENCODE,null,null,decisions,memo,pending);
-                long right=walk(b,ENCODE,null,null,decisions,memo,pending);
-                return !decisions.satisfiable(left,right^1)&&!decisions.satisfiable(left^1,right);
-            }
+            decisionStorage();boolean result=decisions.equivalent(a,b);decisionVariables=decisions.lastDecisionVariables();return result;
         }catch(AnalysisResources.Exhausted|PageStore.Failure failure){failed=true;throw failure;}
     }
     long retain(long root) {
@@ -149,6 +183,8 @@ final class PagedBooleanCircuit implements AutoCloseable {
     long retainedNodes(){open();return nodes.size();}
     @Override public void close() {
         if(closed)return;closed=true;
-        try{if(nodes!=null)nodes.close();}finally{nodes=null;tuple=null;controls.close();}
+        RuntimeException failure=ActivationSolver.closeResource(decisions,null);
+        failure=ActivationSolver.closeResource(nodes,failure);
+        nodes=null;decisions=null;decisionView=null;tuple=null;controls.close();if(failure!=null)throw failure;
     }
 }

@@ -178,4 +178,40 @@ class PagedBooleanCircuitTest {
         public Statistics statistics(){return delegate.statistics();}
         public void close(){delegate.close();}
     }
+    @Test void storedSimulationWordsAreActualValuationsAndRespectFunctionalLaws() {
+        var memory=resources();
+        try(var pages=new ResidentPageStore(4096,memory,AnalysisResources.Phase.CONTROL);
+            var b=new PagedBooleanCircuit(pages,memory)) {
+            long x=b.variable(17),y=b.variable(91),z=b.variable(Integer.MAX_VALUE);
+            long left=b.and(x,b.or(y,z)),right=b.or(b.and(x,y),b.and(x,z));
+            for(int word=0;word<PagedBooleanCircuit.SAMPLE_WORDS;word++) {
+                int channel=word;long expected=0;
+                for(int bit=0;bit<64;bit++) {
+                    int position=bit;
+                    if(b.test(left,key->((PagedBooleanCircuit.primarySample(key,channel)>>>position)&1)!=0))expected|=1L<<bit;
+                }
+                assertEquals(expected,b.sample(left,word));assertEquals(expected,b.sample(right,word));
+                assertEquals(~expected,b.sample(left^1,word));
+                assertEquals(0,b.sample(0,word));assertEquals(-1L,b.sample(1,word));
+            }
+            // Identical samples are deliberately not a proof. An unsampled primary
+            // valuation can distinguish functions; every merge still needs an exact query.
+            assertTrue(b.equivalent(left,right));assertFalse(b.equivalent(x,y));
+        }
+        assertEquals(0,memory.heapUsed());
+    }
+    @Test void simulationConstructionProcessesEachNewSharedNodeOnceInsteadOfItsWholeCone() {
+        var memory=resources();int count=4096;
+        try(var pages=new ResidentPageStore(4096,memory,AnalysisResources.Phase.CONTROL);
+            var b=new PagedBooleanCircuit(pages,memory)) {
+            long root=1;for(int key=0;key<count;key++)root=b.and(root,b.variable(key));
+            assertEquals((2L*count-1)*PagedBooleanCircuit.SAMPLE_WORDS,b.sampleWordsCalculated());
+            long before=b.sampleWordsCalculated();
+            assertEquals(root,b.and(root,root));assertEquals(root,b.and(root,1));
+            assertEquals(before,b.sampleWordsCalculated());
+            for(int word=0;word<PagedBooleanCircuit.SAMPLE_WORDS;word++)b.sample(root,word);
+            assertEquals(before,b.sampleWordsCalculated(),"reading a sample cannot reevaluate a cone");
+        }
+        assertEquals(0,memory.heapUsed());
+    }
 }

@@ -878,3 +878,23 @@ provide functional class IDs, memoized cross-query decisions or solver convergen
 Repeated cone encoding remains a debt of the independent query bridge. The existing
 integrated ROOT16N/mixed64N growth REDs remain required and unchanged. No complete
 qualification, linear general SAT complexity or global managed pipeline is claimed.
+
+### Congruent nomination and borrowed graph decisions (not a manager adoption)
+
+The circuit foundation now stores28 fixed words of actual primary valuations per
+immutable record, including all-zero/all-one assignments and sparse/dense complement
+channels. AND combines child words; negation complements them. Independent tests
+check every sample bit against direct evaluation, distributive equivalence and counted
+linear construction work on4096 inputs. Equal samples never prove equivalence.
+Channel densities only schedule comparisons; they do not narrow semantic behavior.
+
+BooleanCircuitDecisions accepts a borrowed BooleanCircuitView of acyclic shared
+logic. It normalizes exact aliases and indexes primary keys separately from node
+handles, preserving correlation when several handles mean the same primary key.
+Paged postorder admits only the queried cones, uses exact defining clauses and
+releases each formula/model/reason/memo/primary index before returning. Invalid
+cycles are operational CORRUPT failures and abort later terminal queries. The circuit
+foundation now uses this shared decision implementation; no BooleanConditions
+consumer is integrated. Three additional independent view methods and existing
+one-page circuit tests pass. General SAT cost and repeated cross-query encoding
+remain explicit debts; native exact-key dispatch is required before manager adoption.
