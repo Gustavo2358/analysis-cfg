@@ -6,7 +6,9 @@ import java.util.function.ToIntFunction;
 /** Verified caller paths used only to answer positive feasibility queries.
  * A miss requires the exact symbolic search. Build after subscriptions stabilize. */
 final class CallerWitnesses<R> {
-    record Edge<R>(R child,int condition) { }
+    record Edge<R>(R child,int condition,int pushedVariable) {
+        Edge(R child,int condition){this(child,condition,Integer.MIN_VALUE);}
+    }
     private record Candidate<R>(R region,BitSet active) { }
     private final BooleanConditions conditions;
     private final Map<R,List<BitSet>> witnesses=new IdentityHashMap<>();
@@ -28,9 +30,10 @@ final class CallerWitnesses<R> {
             witnesses.computeIfAbsent(parent,r->new ArrayList<>()).add(incoming);
             present.computeIfAbsent(parent,r->new BitSet()).or(newPresent);
             absent.computeIfAbsent(parent,r->new BitSet()).or(newAbsent);
-            var active=(BitSet)incoming.clone();int key=variable.applyAsInt(parent);if(key>=0)active.set(key);
-            for(var edge:successors.getOrDefault(parent,List.of()))if(conditions.test(edge.condition(),incoming))
+            for(var edge:successors.getOrDefault(parent,List.of()))if(conditions.test(edge.condition(),incoming)) {
+                var active=(BitSet)incoming.clone();int key=edge.pushedVariable()==Integer.MIN_VALUE?variable.applyAsInt(parent):edge.pushedVariable();if(key>=0)active.set(key);
                 pending.addLast(new Candidate<>(edge.child(),active));
+            }
         }
     }
     boolean matches(R region,int condition) {

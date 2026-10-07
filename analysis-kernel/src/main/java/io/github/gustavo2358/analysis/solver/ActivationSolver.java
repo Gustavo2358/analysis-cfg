@@ -74,7 +74,7 @@ final class ActivationSolver<S> {
             if(!models.isEmpty()) {
                 var model=models.stream().filter(m->m.context()==entry.context).findFirst().orElseThrow();
                 var location=ActivationBoundaries.require(model,boundary.node());
-                frame=location.frame()==null?null:entry.control.frame(model.control().operation(location.frame()));
+                frame=location.frame();
             }
             entry.boundaries.computeIfAbsent(frame,f->new IdentityHashMap<>()).merge(boundary.node(),boundary.state(),(a,b)->definition.joinInto(a,b,work).state());joins++;
         }
@@ -147,7 +147,7 @@ final class ActivationSolver<S> {
         try {engine.execute();engine.checkRecursion();var models=new ArrayList<ActivationModel>();
         for(var entry:engine.entries) {
             var shapes=new IdentityHashMap<ActivationControl.Frame,ActivationModel.Shape>();
-            var parents=new IdentityHashMap<ActivationControl.Frame,Map<ActivationControl.Frame,Integer>>();
+            var parents=new IdentityHashMap<ActivationControl.Frame,List<ActivationModel.Push>>();
             var roots=new LinkedHashSet<ProgramIndex.Node>();var unwind=new LinkedHashSet<ProgramIndex.Node>();int depth=0;
             for(var region:entry.regions) {
                 var points=new LinkedHashMap<ProgramIndex.Node,ActivationModel.Point>();
@@ -160,9 +160,9 @@ final class ActivationSolver<S> {
                     }
                 }
                 shapes.put(region.frame,new ActivationModel.Shape(region.frame,points));
-                var links=new IdentityHashMap<ActivationControl.Frame,Integer>();
-                for(var link:region.incoming.entrySet())links.merge(link.getKey().region.frame,link.getValue(),entry.bdd::or);
-                parents.put(region.frame,links);
+                var links=new ArrayList<ActivationModel.Push>();
+                for(var link:region.incoming.entrySet())links.add(new ActivationModel.Push(link.getKey().region.frame,entry.control.frameAt(link.getKey().node),link.getValue()));
+                parents.put(region.frame,List.copyOf(links));
             }
             refineShapes(entry.bdd,shapes,parents);
             models.add(new ActivationModel(entry.context,entry.control,entry.bdd,shapes,parents,List.copyOf(roots),List.copyOf(unwind),depth));
@@ -172,15 +172,18 @@ final class ActivationSolver<S> {
     }
     /** Reduce impossible tested guards using a shared persistent SCC support relation. */
     private static void refineShapes(BooleanConditions b,Map<ActivationControl.Frame,ActivationModel.Shape> shapes,
-            Map<ActivationControl.Frame,Map<ActivationControl.Frame,Integer>> parents) {
+            Map<ActivationControl.Frame,List<ActivationModel.Push>> parents) {
         var frames=new ArrayList<ActivationControl.Frame>();var ordinals=new IdentityHashMap<ActivationControl.Frame,Integer>();
         for(var frame:shapes.keySet())if(frame!=null){ordinals.put(frame,frames.size());frames.add(frame);}
         if(frames.isEmpty())return;
-        int[] variables=new int[frames.size()];int[][] incoming=new int[frames.size()][];
+        int bindings=0;for(var links:parents.values())bindings+=links.size();
+        int[] variables=new int[frames.size()+bindings];Arrays.fill(variables,-1);int[][] incoming=new int[variables.length][];int binding=frames.size();
         for(int i=0;i<frames.size();i++) {
-            var frame=frames.get(i);variables[i]=frame.variable();var links=parents.getOrDefault(frame,Map.of());
-            int count=0;for(var parent:links.keySet())if(parent!=null)count++;
-            incoming[i]=new int[count];int slot=0;for(var parent:links.keySet())if(parent!=null)incoming[i][slot++]=ordinals.get(parent);
+            var links=parents.getOrDefault(frames.get(i),List.of());incoming[i]=new int[links.size()];
+            for(int slot=0;slot<links.size();slot++) {
+                var link=links.get(slot);incoming[i][slot]=binding;variables[binding]=link.symbol().variable();
+                incoming[binding++]=link.parent()==null?new int[0]:new int[]{ordinals.get(link.parent())};
+            }
         }
         // Explicit resident compatibility backend; managed session injection is a later wave.
         var resources=new AnalysisResources(new AnalysisResources.Limits(Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE));
@@ -202,12 +205,12 @@ final class ActivationSolver<S> {
                     points.put(point.getKey(),new ActivationModel.Point(condition,List.copyOf(moves)));
                 }
                 shapes.put(frame,new ActivationModel.Shape(frame,points));
-                var links=parents.get(frame);var refined=new IdentityHashMap<ActivationControl.Frame,Integer>();
-                for(var link:links.entrySet()) {
-                    int condition=link.getKey()==null?b.atEmpty(link.getValue()):link.getValue();
-                    if(condition!=0)refined.put(link.getKey(),condition);
+                var links=parents.get(frame);var refined=new ArrayList<ActivationModel.Push>();
+                for(var link:links) {
+                    int condition=link.parent()==null?b.atEmpty(link.condition()):link.condition();
+                    if(condition!=0)refined.add(new ActivationModel.Push(link.parent(),link.symbol(),condition));
                 }
-                parents.put(frame,refined);
+                parents.put(frame,List.copyOf(refined));
             }
         }
     }
@@ -223,14 +226,14 @@ final class ActivationSolver<S> {
         if(deferredCache.size()>1024)deferredCache.remove(deferredCache.keySet().iterator().next());
     }
     private final class Witness {
-        final Region region;final int condition;final Witness child;final boolean requiredSeen;
-        Witness(Region region,int condition,Witness child,boolean requiredSeen){this.region=region;this.condition=condition;this.child=child;this.requiredSeen=requiredSeen;}
+        final Region region;final int condition,pushedVariable;final Witness child;final boolean requiredSeen;
+        Witness(Region region,int condition,Witness child,boolean requiredSeen,int pushedVariable){this.region=region;this.condition=condition;this.child=child;this.requiredSeen=requiredSeen;this.pushedVariable=pushedVariable;}
     }
     private final Map<EntryRun,CallerWitnesses<Region>> finalWitnesses=new IdentityHashMap<>();
     private CallerWitnesses<Region> finalWitnesses(EntryRun entry) {
         var successors=new IdentityHashMap<Region,List<CallerWitnesses.Edge<Region>>>();
         for(var child:entry.regions)for(var link:child.incoming.entrySet())
-            successors.computeIfAbsent(link.getKey().region,r->new ArrayList<>()).add(new CallerWitnesses.Edge<>(child,link.getValue()));
+            successors.computeIfAbsent(link.getKey().region,r->new ArrayList<>()).add(new CallerWitnesses.Edge<>(child,link.getValue(),entry.control.frameAt(link.getKey().node).variable()));
         return new CallerWitnesses<>(entry.bdd,entry.control.variables(),entry.root,successors,r->r.frame==null?-1:r.frame.variable());
     }
     private boolean feasible(Region region,int condition) {return feasible(region,condition,null);}
@@ -249,14 +252,14 @@ final class ActivationSolver<S> {
             var seen=Collections.newSetFromMap(new IdentityHashMap<Region,Boolean>());
             int required=region.entry.bdd.requiredPresent(condition);
             var visited=new HashSet<Need>();visited.add(new Need(region,required<0?1:0));
-            var coarse=new ArrayDeque<Witness>();coarse.add(new Witness(region,1,null,required<0));seen.add(region);Witness root=null;
+            var coarse=new ArrayDeque<Witness>();coarse.add(new Witness(region,1,null,required<0,-1));seen.add(region);Witness root=null;
             while(!coarse.isEmpty()) {
                 var current=coarse.removeFirst();
                 if(current.region.frame==null&&current.requiredSeen){root=current;break;}
                 for(var link:current.region.incoming.entrySet()) {
-                    var parent=link.getKey().region;boolean requiredSeen=current.requiredSeen||parent.frame!=null&&parent.frame.variable()==required;
+                    var parent=link.getKey().region;boolean requiredSeen=current.requiredSeen||region.entry.control.frameAt(link.getKey().node).variable()==required;
                     if(visited.add(new Need(parent,requiredSeen?1:0))) {
-                        seen.add(parent);coarse.addLast(new Witness(parent,link.getValue(),current,requiredSeen));
+                        seen.add(parent);coarse.addLast(new Witness(parent,link.getValue(),current,requiredSeen,region.entry.control.frameAt(link.getKey().node).variable()));
                     }
                 }
             }
@@ -264,7 +267,7 @@ final class ActivationSolver<S> {
             var active=new BitSet();var path=root;boolean valid=true;
             while(path.child!=null) {
                 if(!region.entry.bdd.test(path.condition,active)){valid=false;break;}
-                if(path.region.frame!=null)active.set(path.region.frame.variable());
+                active.set(path.pushedVariable);
                 path=path.child;
             }
             if(valid&&region.entry.bdd.test(condition,active)){feasibleCache.put(key,true);return true;}
@@ -277,7 +280,7 @@ final class ActivationSolver<S> {
                 var current=queue.removeFirst();int need=waiting.remove(current);
                 if(current.frame==null){found=b.atEmpty(need)!=0;continue;}
                 for(var link:current.incoming.entrySet()) {
-                    var parent=link.getKey().region;int before=parent.frame==null?b.atEmpty(need):b.restrict(need,parent.frame.variable(),true);
+                    var parent=link.getKey().region;int before=b.restrict(need,region.entry.control.frameAt(link.getKey().node).variable(),true);
                     before=b.and(before,link.getValue());if(before==0)continue;
                     int old=wanted.getOrDefault(parent,0),extra=b.difference(before,old);if(extra==0)continue;
                     wanted.put(parent,b.or(old,extra));
@@ -308,6 +311,7 @@ final class ActivationSolver<S> {
             root=new Region(this,null,bottom);regions.add(root);summaryCreated();root.accept(1);
         }
         Region region(ActivationControl.Frame frame,S input,Slot caller,int condition) {
+            frame=control.body(frame);
             var candidates=byFrame.get(frame);
             if(candidates!=null){var known=candidates.get(input);if(known!=null)return known;}
             if(!structural&&!feasible(caller.region,condition,caller))return null;
@@ -443,7 +447,7 @@ final class ActivationSolver<S> {
             for(var move:slot.moves) {
                 int condition=piece.condition;
                 if(move.variable()>=0) {
-                    int active=region.frame==null?0:region.frame.variable()==move.variable()?1:b.variable(move.variable());
+                    int active=region.frame==null?0:b.variable(move.variable());
                     condition=b.and(condition,move.present()?active:b.not(active));
                 }
                 if(condition==0)continue;
@@ -456,7 +460,7 @@ final class ActivationSolver<S> {
                         child.accept(1);
                         // Snapshot: a self-call may discover an additional summary while delivering one.
                         for(var summary:new ArrayList<>(child.exits.entrySet()))for(var returned:summary.getValue().pieces) {
-                            int valid=region.frame==null?b.atEmpty(returned.condition):b.restrict(returned.condition,region.frame.variable(),true);
+                            int valid=b.restrict(returned.condition,move.frame().variable(),true);if(region.frame==null)valid=b.atEmpty(valid);
                             valid=b.and(condition,valid);if(valid==0)continue;
                             receive(slot,region,summary.getKey(),valid,returned.state);
                         }
@@ -476,7 +480,8 @@ final class ActivationSolver<S> {
     private void receive(Slot caller,Region parent,ExitKey exit,int condition,S value) {
         if(exit.action==ActivationControl.Action.POP||exit.action==ActivationControl.Action.UNWIND&&exit.count==1) {
             var point=new AnalysisPoint(-1,parent.entry.context,exit.source);
-            arriveEdge(caller,parent,exit.destination,point,exit.edge,condition,value);return;
+            var destination=exit.action==ActivationControl.Action.POP?parent.entry.control.returnDestination(exit.source,parent.entry.control.frameAt(caller.node)):exit.destination;
+            arriveEdge(caller,parent,destination,point,parent.entry.control.edge(exit.source,destination),condition,value);return;
         }
         var next=exit.action==ActivationControl.Action.UNWIND
             ? new ExitKey(exit.source,exit.destination,exit.action,exit.count-1,exit.invalid,exit.edge):exit;

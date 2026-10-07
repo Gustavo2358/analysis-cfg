@@ -6,7 +6,7 @@ import java.util.*;
 /** Decide unique boundary stacks by predicate reachability and a word-exclusion automaton. */
 final class ActivationBoundaries {
     record Key(ActivationControl.Frame frame,int prefix) { }
-    private record Visit(Key key,int condition,Visit previous) { }
+    private record Visit(Key key,int condition,Visit previous,ActivationControl.Frame symbol) { }
     record Location(ActivationControl.Frame frame,ProgramIndex.Node node) { }
     static Location require(ActivationModel model,ProgramIndex.Node node) {
         List<ActivationControl.Frame> witness=null;ActivationControl.Frame owner=null;
@@ -26,21 +26,21 @@ final class ActivationBoundaries {
         try {
         var seen=new HashMap<Key,Integer>();var pending=new ArrayDeque<Visit>();
         int prefix=excluded==null?-1:0;
-        var start=new Key(frame,prefix);seen.put(start,condition);pending.add(new Visit(start,condition,null));
+        var start=new Key(frame,prefix);seen.put(start,condition);pending.add(new Visit(start,condition,null,null));
         while(!pending.isEmpty()) {
             var visit=pending.removeFirst();var current=visit.key.frame();int position=visit.key.prefix();
             if(current==null) {
                 if(b.atEmpty(visit.condition)==0||excluded!=null&&position==excluded.size())continue;
                 var result=new ArrayList<ActivationControl.Frame>();
-                for(var v=visit.previous;v!=null;v=v.previous)result.add(v.key.frame());
+                for(var v=visit;v.previous!=null;v=v.previous)result.add(v.symbol);
                 Collections.reverse(result);return List.copyOf(result);
             }
-            int nextPosition=position>=0&&position<excluded.size()&&excluded.get(position)==current?position+1:-1;
-            for(var link:model.parents().getOrDefault(current,Map.of()).entrySet()) {
-                var parent=link.getKey();int need=parent==null?b.atEmpty(visit.condition):b.restrict(visit.condition,parent.variable(),true);
-                need=b.and(need,link.getValue());var key=new Key(parent,nextPosition);
+            for(var link:model.parents().getOrDefault(current,List.of())) {
+                int nextPosition=position>=0&&position<excluded.size()&&excluded.get(position)==link.symbol()?position+1:-1;
+                var parent=link.parent();int need=b.restrict(visit.condition,link.symbol().variable(),true);
+                need=b.and(need,link.condition());var key=new Key(parent,nextPosition);
                 int old=seen.getOrDefault(key,0),extra=b.difference(need,old);if(extra==0)continue;
-                seen.put(key,b.or(old,extra));pending.addLast(new Visit(key,extra,visit));
+                seen.put(key,b.or(old,extra));pending.addLast(new Visit(key,extra,visit,link.symbol()));
             }
         }
         return null;

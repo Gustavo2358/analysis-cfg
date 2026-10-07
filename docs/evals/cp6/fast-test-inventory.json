@@ -660,6 +660,13 @@
       "oneCallerRetainsLiveVersionsInsteadOfEveryHistoricalInputInBothDirections",
       "aCallerThatKeepsItsOldInputSurvivesAnotherCallersVersionChurn",
       "nestedSharedInputsAndDeferredWaitersDoNotRootEveryExpiredParent"
+    ],
+    "io.github.gustavo2358.analysis.structure.FormalBodiesTest": [
+      "identicalArgumentsShareBodyEquationsButKeepEveryMatchedContinuation",
+      "routeDestinationsStayInBindingsAndOnlyObservedTopPortsSplitBodies",
+      "edgeSensitiveBackwardArgumentsAndNonDistributiveBlocksMatchEveryConcreteStack",
+      "distinctSymbolsStillMakeBodyBoundariesAmbiguousButDeadBindingsDoNot",
+      "unwindLandingsObserveTheRemainingTopInterfaceOutsideItsNormalEntryWalk"
     ]
   },
   "analysis-launcher": {
