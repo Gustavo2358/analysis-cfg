@@ -486,6 +486,14 @@
     ],
     "io.github.gustavo2358.analysis.structure.CallerSupportTest": [
       "condensedSupportEqualsIndependentScalarReachability"
+    ],
+    "io.github.gustavo2358.analysis.solver.AnalysisResourcesTest": [
+      "scratchAndResidentShareHeapAndFailedReservationDoesNotChangeAccounting",
+      "reservationGrowthIsAtomicAndDoubleCloseDoesNotFreeAnotherOwnersBytes",
+      "directDiskAndDescriptorsHaveIndependentQuotas",
+      "workAndOutputAreCumulativeRatherThanEvictableAllocations",
+      "hugeAmountsCannotWrapAroundAndNegativeChargesAreInvalid",
+      "zeroScratchQuotaIsIndependentFromHeapQuota"
     ]
   },
   "analysis-launcher": {
