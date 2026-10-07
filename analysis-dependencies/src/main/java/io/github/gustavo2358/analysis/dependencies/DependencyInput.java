@@ -46,6 +46,8 @@ public final class DependencyInput {
         var origins=new HashMap<OriginId,Origins.Origin>();publication.origins().forEach(o->origins.put(o.id(),o));
         var seen=new HashSet<StatementCorrelation>();var owners=new HashMap<OperationId,QualifiedSourceDependencies.StatementId>();
         var bySource=new HashMap<QualifiedSourceDependencies.StatementId,Set<OperationId>>();
+        var expectedOrigins=new HashSet<OriginId>();for(var link:this.correlations)expectedOrigins.add(link.origin());
+        try(var ancestry=this.correlations.isEmpty()?null:new OriginAncestryIndex(origins,expectedOrigins)) {
         for(var link:this.correlations) {
             if(!seen.add(link))throw new IllegalArgumentException("duplicate source/AIR correlation");
             var occurrence=occurrences.get(link.source());var operation=operations.get(link.operation());
@@ -53,7 +55,7 @@ public final class DependencyInput {
                 throw new IllegalArgumentException("source/AIR correlation ownership");
             var previous=owners.putIfAbsent(link.operation(),link.source());
             if(previous!=null&&!previous.equals(link.source()))throw new IllegalArgumentException("conflicting source/AIR correlation");
-            if(!derivedFrom(operation.header().origin(),link.origin(),origins))throw new IllegalArgumentException("source/AIR origin correlation");
+            if(!ancestry.derivedFrom(operation.header().origin(),link.origin()))throw new IllegalArgumentException("source/AIR origin correlation");
             if(operation instanceof Operations.Invoke invoke) {
                 if(!CallDependencyPlan.selected(invoke))throw new IllegalArgumentException("source/AIR target category");
                 boolean literal=invoke.target() instanceof Interactions.LiteralTarget;
@@ -65,15 +67,9 @@ public final class DependencyInput {
             }
             bySource.computeIfAbsent(link.source(),ignored->new HashSet<>()).add(link.operation());
         }
+        }
         preparedSource=source.map(evidence->SourceQualifiedDependencyResult.admit(evidence,publication.id().localId()));
         this.occurrences=prepareOccurrences(bySource);
-    }
-    private static boolean derivedFrom(OriginId actual,OriginId expected,Map<OriginId,Origins.Origin> origins) {
-        if(!origins.containsKey(expected))return false;
-        var pending=new ArrayDeque<OriginId>();pending.add(actual);var seen=new HashSet<OriginId>();
-        while(!pending.isEmpty()) {var id=pending.removeFirst();if(id.equals(expected))return true;if(!seen.add(id))continue;
-            if(origins.get(id) instanceof Origins.Derived d)pending.addAll(d.inputs());}
-        return false;
     }
     /** Qualification and canonical correlation happen before any target query executes. */
     public List<QualifiedDependencyOccurrence> occurrences(){return occurrences;}

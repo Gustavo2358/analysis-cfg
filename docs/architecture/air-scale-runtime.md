@@ -430,8 +430,8 @@ Correlation admission groups operation IDs by full typed source StatementId. Inv
 visits those groups directly, deduplicates sites, preserves the established lexical operation
 order and keeps uncorrelated executable occurrences. It removes occurrences × all-correlations
 scans. Validation still checks duplicate/conflicting owners, exact labels, target kind/technology,
-literals and source/AIR origin ancestry before preparation. Origin ancestry is still queried by
-per-link traversal and remains an explicit architectural gap; the retained input/certificate
+literals and source/AIR origin ancestry before preparation. Origin ancestry is prepared once
+using the shared labeled graph closure described below; the retained input/certificate
 indexes and detached outputs are resident bridges, not a claim of bounded whole-route memory.
 
 Independent regressions cover all qualified-source fixture families, unknown-control native
@@ -521,3 +521,29 @@ Corrected checkpoint gate: FAST845required methods, zero failures/errors/skips,
 143.278s. The exact CI inventory now includes every Boolean condition law test,
 the two sparse dead-frame tests and the two persistent caller-support tests.
 Existing required methods and forbidden dependency rules remain intact.
+
+### Shared requested-origin ancestry
+
+`PersistentGraphClosure` generalizes the reached-caller support implementation. Iterative
+SCC condensation propagates canonical persistent label sets along explicit typed edges.
+Vertices may be unlabeled; equal sets retain one arena root. The graph arrays are borrowed
+only during construction, while owned leases and pages are released at preparation close.
+
+`OriginAncestryIndex` labels only origins requested by source correlations. Each origin and
+its Derived inputs are indexed once; membership queries no longer repeat a graph walk for
+every link. Full typed OriginIds distinguish publications. Missing inputs add no edge;
+cycles are handled exactly by SCCs. Rule names and locations have no semantic role.
+Duplicate/ownership/category/literal validation and uncorrelated occurrences remain intact.
+
+The unchanged former BFS fails a counted regression with1,049,600 reads for1,024 links
+sharing1,024 ancestors. The replacement passes that witness and independent BFS oracles
+over50 cyclic graphs, missing inputs and foreign IDs. A512-site production admission fixture
+adds a1,024-origin shared chain, reverses correlation order and rejects an unrelated origin.
+The generalized control kernel passes all172 existing tests. This is a resident preparation
+bridge: sparse label sharing removes repeated traversal but arbitrary distinct reachable
+label relations may still grow. It does not claim complete managed-route memory or solve
+formal active-frame summaries, scalar-domain laws or paged AIR admission/transport.
+
+Repository FAST now selects848required methods including all three ancestry/admission
+regressions and passes with zero skips in142.484s. Exact architecture inventories retain
+their forbidden dependency checks. This gate qualifies this checkpoint, not AS-W00–W10.

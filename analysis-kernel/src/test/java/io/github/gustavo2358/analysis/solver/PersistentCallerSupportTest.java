@@ -16,7 +16,7 @@ class PersistentCallerSupportTest {
                 parents[i]=list.stream().mapToInt(Integer::intValue).toArray();
             }
             var resources=resources();
-            try(var store=new ResidentPageStore(4096,resources);var support=new PersistentCallerSupport(store,resources,variables,parents)) {
+            try(var store=new ResidentPageStore(4096,resources);var support=new PersistentGraphClosure(store,resources,AnalysisResources.Phase.CONTROL,variables,parents)) {
                 for(int from=0;from<n;from++) {
                     var expected=new BitSet();var seen=new BitSet();var queue=new ArrayDeque<Integer>();queue.add(from);
                     while(!queue.isEmpty()){int v=queue.removeFirst();if(seen.get(v))continue;seen.set(v);expected.set(variables[v]);for(int p:parents[v])queue.addLast(p);}
@@ -30,7 +30,7 @@ class PersistentCallerSupportTest {
         int n=2048;int[] variables=new int[n];int[][] parents=new int[n][];
         for(int i=0;i<n;i++){variables[i]=i;parents[i]=i==0?new int[0]:new int[]{i-1};}
         var resources=resources();
-        try(var store=new ResidentPageStore(4096,resources);var support=new PersistentCallerSupport(store,resources,variables,parents)) {
+        try(var store=new ResidentPageStore(4096,resources);var support=new PersistentGraphClosure(store,resources,AnalysisResources.Phase.CONTROL,variables,parents)) {
             assertTrue(support.records()<32L*n,"persistent record count="+support.records());
             for(int i=0;i<n;i++){assertTrue(support.contains(i,0));assertTrue(support.contains(i,i));assertFalse(support.contains(i,i+1));}
         }

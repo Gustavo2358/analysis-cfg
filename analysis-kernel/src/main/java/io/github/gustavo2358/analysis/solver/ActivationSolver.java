@@ -142,7 +142,7 @@ final class ActivationSolver<S> {
         // Explicit resident compatibility backend; managed session injection is a later wave.
         var resources=new AnalysisResources(new AnalysisResources.Limits(Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE));
         try(var store=new ResidentPageStore(4096,resources,AnalysisResources.Phase.CONTROL);
-                var support=new PersistentCallerSupport(store,resources,variables,incoming)) {
+                var support=new PersistentGraphClosure(store,resources,AnalysisResources.Phase.CONTROL,variables,incoming)) {
             var memos=new HashMap<Long,Map<Integer,Integer>>();
             for(int i=0;i<frames.size();i++) {
                 final int ordinal=i;var frame=frames.get(i);var shape=shapes.get(frame);

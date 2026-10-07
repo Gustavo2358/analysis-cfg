@@ -3,8 +3,11 @@ package io.github.gustavo2358.analysis.solver;
 import java.util.Arrays;
 import java.util.Objects;
 
-/** SCC caller closure with shared canonical sets; no frame-wide absence vectors. */
-final class PersistentCallerSupport implements AutoCloseable {
+/** Exact labeled ancestor closure via SCC condensation and shared canonical sets.
+ * Labels are nonnegative; -1 marks an unlabeled vertex. The input graph is borrowed
+ * for preparation only. Query handles belong to this instance and expire at close.
+ * The page store is borrowed; metadata and all owned map/arena leases are closed here. */
+public final class PersistentGraphClosure implements AutoCloseable {
     private final AnalysisResources.Reservation metadata;
     private CanonicalTupleArena arena;
     private PersistentLongMap sets;
@@ -12,19 +15,19 @@ final class PersistentCallerSupport implements AutoCloseable {
     private long[] roots;
     private boolean closed;
 
-    PersistentCallerSupport(PageStore store,AnalysisResources resources,int[] variables,int[][] parents) {
-        Objects.requireNonNull(variables);Objects.requireNonNull(parents);
-        if(parents.length!=variables.length)throw new IllegalArgumentException("caller graph dimensions");
+    public PersistentGraphClosure(PageStore store,AnalysisResources resources,AnalysisResources.Phase phase,int[] variables,int[][] parents) {
+        Objects.requireNonNull(variables);Objects.requireNonNull(parents);Objects.requireNonNull(phase);
+        if(parents.length!=variables.length)throw new IllegalArgumentException("ancestor graph dimensions");
         int n=variables.length,edges=0;
         for(int i=0;i<n;i++) {
-            if(variables[i]<0)throw new IllegalArgumentException("negative activation key");
-            for(int parent:parents[i])if(parent<0||parent>=n)throw new IllegalArgumentException("foreign caller ordinal");
+            if(variables[i]<-1)throw new IllegalArgumentException("invalid vertex label");
+            for(int parent:parents[i])if(parent<0||parent>=n)throw new IllegalArgumentException("foreign ancestor ordinal");
             edges=Math.addExact(edges,parents[i].length);
         }
-        metadata=resources.reserve(AnalysisResources.Pool.RESIDENT,4096L+128L*n+16L*edges,AnalysisResources.Phase.CONTROL);
+        metadata=resources.reserve(AnalysisResources.Pool.RESIDENT,4096L+128L*n+16L*edges,phase);
         try {
-            arena=new CanonicalTupleArena(store,resources,AnalysisResources.Phase.CONTROL,6,new int[]{2,4,5});
-            sets=new PersistentLongMap(arena,resources,AnalysisResources.Phase.CONTROL);
+            arena=new CanonicalTupleArena(store,resources,phase,6,new int[]{2,4,5});
+            sets=new PersistentLongMap(arena,resources,phase);
             int[] starts=new int[n+1];
             for(int[] incoming:parents)for(int parent:incoming)starts[parent+1]++;
             for(int i=0;i<n;i++)starts[i+1]+=starts[i];
@@ -49,7 +52,7 @@ final class PersistentCallerSupport implements AutoCloseable {
             }
             roots=new long[count];int[] heads=new int[count],next=new int[edges],targets=new int[edges],indegrees=new int[count];Arrays.fill(heads,-1);int size=0;
             for(int child=0;child<n;child++) {
-                int to=components[child];roots[to]=sets.put(roots[to],variables[child],1);
+                int to=components[child];if(variables[child]>=0)roots[to]=sets.put(roots[to],variables[child],1);
                 for(int parent:parents[child]) {
                     int from=components[parent];if(from==to)continue;
                     targets[size]=to;next[size]=heads[from];heads[from]=size++;indegrees[to]++;
@@ -64,14 +67,15 @@ final class PersistentCallerSupport implements AutoCloseable {
                     if(--indegrees[to]==0)pending[last++]=to;
                 }
             }
-            if(last!=count)throw new IllegalStateException("cyclic caller condensation");
-            for(long root:roots)if(root!=0)arena.retain(root);
+            if(last!=count)throw new IllegalStateException("cyclic ancestor condensation");
+            long[] retained=roots.clone();Arrays.sort(retained);long previous=0;
+            for(long root:retained)if(root!=0&&root!=previous){arena.retain(root);previous=root;}
         }catch(RuntimeException|Error failure){closeSuppressed(sets,failure);closeSuppressed(arena,failure);metadata.close();throw failure;}
     }
-    long root(int frame){open();return roots[components[frame]];}
-    boolean contains(int frame,int key){open();return sets.contains(root(frame),key);}
-    long records(){open();return arena.size();}
-    private void open(){if(closed)throw new IllegalStateException("caller support closed");}
+    public long root(int vertex){open();return roots[components[vertex]];}
+    public boolean contains(int vertex,int key){open();return sets.contains(root(vertex),key);}
+    public long records(){open();return arena.size();}
+    private void open(){if(closed)throw new IllegalStateException("graph closure closed");}
     private static void closeSuppressed(AutoCloseable value,Throwable failure) {
         if(value!=null)try{value.close();}catch(Exception|Error closing){failure.addSuppressed(closing);}
     }

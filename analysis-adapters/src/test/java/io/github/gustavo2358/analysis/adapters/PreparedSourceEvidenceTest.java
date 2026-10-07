@@ -70,4 +70,42 @@ final class PreparedSourceEvidenceTest {
         var foreign=new QualifiedSourceDependencies(evidence.schema(),evidence.version(),evidence.producer(),evidence.source(),List.of(new QualifiedSourceDependencies.AirCorrelation("foreign","0".repeat(64))),evidence.units());
         assertThrows(IllegalArgumentException.class,()->result.withSourceEvidence(SourceQualifiedDependencyResult.admit(foreign)));
     }
+    @Test void deepSharedOriginsPreserveEveryCorrelatedSiteAndRejectASibling()throws Exception {
+        int depth=1024,n=512;
+        var base=W1dModelTest.model(1,u->{
+            var sequences=new ArrayList<io.github.gustavo2358.air.model.Sequence>();
+            for(int i=0;i<n;i++) {
+                var invoke=W1dModelTest.call(u,"deep-call-"+i,"end",new io.github.gustavo2358.air.model.Ids.ObjectId(u,"object-0"),false);
+                sequences.add(new io.github.gustavo2358.air.model.Sequence(new io.github.gustavo2358.air.model.Ids.LabelId(u,i==0?"start":"deep-s"+i),List.of(),invoke,ResultFixtures.origin(u.publication())));
+            }
+            sequences.add(ResultFixtures.returning(u,"end",List.of()));return sequences;
+        });
+        var origins=new ArrayList<>(base.origins());var anchor=ResultFixtures.origin(base.id());var previous=anchor;
+        for(int i=1;i<=depth;i++) {
+            var id=new io.github.gustavo2358.air.model.Ids.OriginId(base.id(),"derived-"+i);
+            origins.add(new io.github.gustavo2358.air.model.Origins.Derived(id,List.of(previous),"synthetic-step"));previous=id;
+        }
+        var sibling=new io.github.gustavo2358.air.model.Ids.OriginId(base.id(),"sibling");origins.add(new io.github.gustavo2358.air.model.Origins.Unavailable(sibling,"independent negative"));
+        var unit=base.units().getFirst();var sequences=new ArrayList<io.github.gustavo2358.air.model.Sequence>();
+        for(var sequence:unit.sequences()) {
+            if(sequence.terminator() instanceof io.github.gustavo2358.air.model.Operations.Invoke invoke) {
+                var h=invoke.header();var header=new io.github.gustavo2358.air.model.Operations.Header(h.id(),previous,h.coverage(),h.precision(),h.uncertainties());
+                var derived=new io.github.gustavo2358.air.model.Operations.Invoke(header,invoke.action(),invoke.target(),invoke.arguments(),invoke.results(),invoke.signature(),invoke.effectOperands(),invoke.effectBound(),invoke.outcomes(),invoke.contract());
+                sequences.add(new io.github.gustavo2358.air.model.Sequence(sequence.label(),sequence.instructions(),derived,previous));
+            }else sequences.add(sequence);
+        }
+        var derivedUnit=new io.github.gustavo2358.air.model.Unit(unit.id(),unit.containingUnit(),unit.objects(),unit.visibleObjects(),unit.entries(),sequences,unit.completionPorts(),unit.body(),unit.bodyUnavailable(),unit.coverage(),unit.origin());
+        var publication=new io.github.gustavo2358.air.model.Publication(base.id(),base.airVersion(),base.capabilities(),base.artifacts(),List.of(derivedUnit),base.storage(),base.resources(),base.artifactRelations(),origins,base.coverage(),base.uncertainties(),base.premises());
+        assertEquals(io.github.gustavo2358.analysis.cfg.application.CfgBuildResult.Status.CFG_BUILT,W1dBoundaryTest.build(publication).status());
+        var original=read("/qualified-source-r9/computed.source.json");
+        var evidence=new QualifiedSourceDependencies(original.schema(),original.version(),original.producer(),original.source(),List.of(new QualifiedSourceDependencies.AirCorrelation(publication.id().localId(),"0".repeat(64))),original.units());
+        var statement=evidence.units().getFirst().occurrences().getFirst().id();var links=new ArrayList<DependencyInput.StatementCorrelation>();
+        for(var sequence:publication.units().getFirst().sequences())if(sequence.terminator() instanceof io.github.gustavo2358.air.model.Operations.Invoke invoke)
+            links.add(new DependencyInput.StatementCorrelation(statement,invoke.header().id(),sequence.label(),anchor));
+        var input=new DependencyInput(publication,Optional.of(evidence),links);assertEquals(n,input.occurrences().getFirst().executableOperations().size());
+        Collections.reverse(links);assertEquals(input.occurrences(),new DependencyInput(publication,Optional.of(evidence),links).occurrences());
+        var first=links.getFirst();links.set(0,new DependencyInput.StatementCorrelation(first.source(),first.operation(),first.label(),sibling));
+        assertThrows(IllegalArgumentException.class,()->new DependencyInput(publication,Optional.of(evidence),links));
+    }
+
 }

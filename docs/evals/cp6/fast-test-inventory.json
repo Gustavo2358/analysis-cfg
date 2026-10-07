@@ -338,7 +338,8 @@
     "io.github.gustavo2358.analysis.adapters.PreparedSourceEvidenceTest": [
       "preparedNativeAndProgramFactsKeepAuthorityAndAreReusableWithoutReinterpretation",
       "admittedInputRetainsOneSourceCertificateAndImmutableCorrelatedInventory",
-      "indexedCorrelationsRetainEverySortedSiteAndRejectForeignCertificates"
+      "indexedCorrelationsRetainEverySortedSiteAndRejectForeignCertificates",
+      "deepSharedOriginsPreserveEveryCorrelatedSiteAndRejectASibling"
     ]
   },
   "analysis-dataflow": {
@@ -436,6 +437,10 @@
     "io.github.gustavo2358.analysis.dependencies.SourceExpressionAlgebraTest": [
       "composedTransformsAndTheirDistributionPreserveIndependentUnicodeImagesAndCompleteEvidence",
       "distributionKeepsEveryProducerWhenDifferentInputsMergeIntoOneTransformedCandidate"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.OriginAncestryIndexTest": [
+      "sharedDeepAncestryIsPreparedOnceForEveryCorrelation",
+      "requestedOriginsMatchIndependentTypedGraphWalksIncludingCyclesAndMissingInputs"
     ]
   },
   "analysis-kernel": {
