@@ -748,7 +748,8 @@
       "managedArcConditionsOwnReplacementsAndReleaseOnCertificateClose"
     ],
     "io.github.gustavo2358.analysis.structure.ConditionalFeasibilityTest": [
-      "sharedRecursiveDispatchDoesNotSearchAllCallersForEachGuard"
+      "sharedRecursiveDispatchDoesNotSearchAllCallersForEachGuard",
+      "dispatchSequencePermutationsKeepReachabilityAndLinearCertificates"
     ],
     "io.github.gustavo2358.analysis.solver.SignedLiteralSetTest": [
       "signedInclusionAndIntersectionMatchIndependentMapsWithoutUnfoldingSharedTrees",
@@ -843,7 +844,8 @@
       "nestedConstructionPublicationReleasesOnlyItsOwnUnpublishedNodes",
       "rootTokensRejectForeignOwnersWithoutAffectingEitherGraph",
       "retirementCallbackFailureAbortsRootReadsAndFutureBindings",
-      "deepRetirementIsIterativeAndTwoPassImportDoesNotAssumeNumericTopologicalIds"
+      "deepRetirementIsIterativeAndTwoPassImportDoesNotAssumeNumericTopologicalIds",
+      "signedRootValuesAndEdgesShareCanonicalOwnershipAndGeneration"
     ],
     "io.github.gustavo2358.analysis.solver.BooleanConditionsOwnershipTest": [
       "rootsKeepExactMixedFunctionsAndReleaseIndependentVersions",
@@ -853,6 +855,18 @@
     "io.github.gustavo2358.analysis.solver.ConditionBindingsTest": [
       "mapUpdatesAcquireNewRootsBeforeReleasingOldOnes",
       "explicitBorrowKeepsPreviousMapVersionAliveAcrossMutation"
+    ],
+    "io.github.gustavo2358.analysis.solver.BooleanFactorizationTest": [
+      "commonNativeFactorsAndTheirDualDoNotRetainExpandedPrefixes",
+      "partialSignedFactorsPreserveEveryFourKeyAssignment"
+    ],
+    "io.github.gustavo2358.analysis.solver.SignedLiteralPartitionTest": [
+      "commonAndResidualSignedSetsMatchIndependentMaps"
+    ],
+    "io.github.gustavo2358.analysis.solver.SignedConditionHandlesTest": [
+      "positiveAndNegativeRootsShareOneRequiredFunctionRecord",
+      "mixedComplementSharesStorageWhileBindingsPreserveBothPolarities",
+      "nativePromotionDuringRestrictionKeepsSignedRootsAndDecisionMeanings"
     ]
   },
   "analysis-launcher": {

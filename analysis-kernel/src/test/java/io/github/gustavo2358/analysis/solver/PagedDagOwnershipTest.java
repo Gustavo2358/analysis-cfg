@@ -144,4 +144,23 @@ class PagedDagOwnershipTest {
         }
         assertEquals(0,memory.heapUsed());
     }
+    @Test void signedRootValuesAndEdgesShareCanonicalOwnershipAndGeneration(){
+        var memory=memory();var graph=new Graph();
+        PagedDagOwnership.Graph signed=new PagedDagOwnership.Graph(){
+            public long canonical(long node){return node&~1L;}
+            public void children(long node,LongConsumer accept){graph.children(node,accept);}
+            public void retire(long node){graph.retire(node);}
+        };
+        try(var pages=new ResidentPageStore(128,memory,AnalysisResources.Phase.CONTROL);
+            var ownership=new PagedDagOwnership(pages,memory,AnalysisResources.Phase.CONTROL,signed)){
+            graph.put(2);ownership.created(2);graph.put(4,2,3);ownership.created(4);
+            long positive=ownership.root(4),negative=ownership.root(5);ownership.commitCreated();
+            assertEquals(4,ownership.value(positive));assertEquals(5,ownership.value(negative));assertEquals(ownership.generation(4),ownership.generation(5));
+            ownership.bind(positive,5);assertEquals(5,ownership.value(positive));ownership.closeRoot(negative);
+            assertEquals(Set.of(2L,4L),graph.alive);ownership.bind(positive,3);assertEquals(Set.of(2L),graph.alive);
+            ownership.closeRoot(positive);assertTrue(graph.alive.isEmpty());
+        }
+        assertEquals(0,memory.heapUsed());
+    }
+
 }

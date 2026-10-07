@@ -940,7 +940,7 @@ adoption or resolution of the two integrated growth REDs in this checkpoint.
 
 ### Functional shared conditions — integrated, qualification remains incomplete
 
-BooleanConditions now keeps function IDs over shared binary AND/OR and NOT rows,
+BooleanConditions keeps signed function handles over shared binary AND/OR rows,
 with native signed literal junctions. General Apply does not enumerate Shannon
 residuals. An immutable borrowed view translates OR and native disjunctions to exact
 AND/complement definitions only for the queried cone. Nomination uses actual stored
@@ -961,7 +961,7 @@ Empty-root evaluation uses an actual valuation bit, not simulation equivalence.
 The63-field literal schema adds a canonical unsigned-key reference to the sampled
 schema. Signed trees share their unsigned skeleton; one branch creates at most one
 additional all-positive branch. Legacy6 and sampled62 schemas retain their laws.
-Proper native junctions certify exact essential support; NOT preserves it. AND/OR
+Proper native junctions certify exact essential support; complement preserves it. AND/OR
 of nonconstant functions on disjoint exact supports certifies the union. Opposing
 full junctions on at least two keys describe all-equal/not-all-equal, with every key
 essential. Other functions remain uncertified. Known support partitions skip only
@@ -1051,7 +1051,7 @@ truth tables and guarded-state ownership. One-page file tests use a fixed 40,000
 byte resident quota and 64/256/1024-node chains; declaration/replacement fault laws
 inject 64 I/O failures. These qualify the new ownership primitive, not global heap
 bounds: solver maps, models, semantic domains, decoding and delivery remain separate
-pending work. Original ROOT16N still fails after integration. At an intermediate
+pending work. Ownership alone still failed original ROOT16N. At an intermediate
 1024-node peak, a temporary independent root trace reached 1018–1021 nonconstants;
 current shared-function syntax is another remaining mechanism. The fixture and
 its original envelope were not changed.
@@ -1071,3 +1071,44 @@ after that failure. Publication now shares the guarded suffix-publication path;
 initial storage admission and permanent-root marking also poison the whole owner
 on operational failure. This changes failure propagation, without changing Boolean
 functions, public/wire contracts, sample channels or the original growth envelopes.
+
+
+### Signed functional classes and native factor algebra (checkpoint in progress)
+
+The public nonconstant condition handle is `2*(record-1)+phase`; terminals remain
+0/1. Every stored representative is false at the all-absent assignment. This
+orientation uses an actual valuation bit, never sample agreement as an equivalence
+proof. Complement flips phase in O(1), sharing all required records, essential
+support and generation with its positive representative. Native AND/OR junctions
+also normalize kind and signed literals through De Morgan. SAT receives physical
+record identities plus edge polarity; checkpoints and catalog offsets remain
+physical. Handles have a checked operational address limit, not a semantic cap.
+
+`PagedDagOwnership.Graph.canonical` is a pure, idempotent identity mapping. Signed
+roots retain their actual value while counts and retirement use the shared record.
+Duplicate edges in opposite phases each own one reference. Binding between phases
+acquires before release. Weak caches validate shared generation; query scopes defer
+recycling until their CNF closes. A native representative proved equivalent during
+restriction preserves both rooted phases and the generation while dropping old
+edges. The added law checks all truth assignments and both discard/commit paths.
+
+Signed Patricia intersection/difference skip identical subtrees and use a frontier
+bounded by key width. Native factorization uses exact distributivity without cube
+expansion. Extracting a native child of a mixed junction requires certified,
+disjoint essential support from the other child: this proves an independent
+component. Residual construction bypasses recursive factoring. Unknown/overlapping
+supports remain in the exact circuit. This does not promise minimal representation
+or polynomial SAT for every Boolean function. The representation follows edge
+inversion described in [ABC section3.3](https://people.eecs.berkeley.edu/~alanmi/publications/2010/cav10_abc.pdf)
+and its [AIG implementation](https://raw.githubusercontent.com/berkeley-abc/abc/master/src/aig/aig.h),
+without importing bounded cuts or heuristic semantic merges.
+
+Current focused ROOT16N and factor laws pass with their original fixtures/envelopes.
+A broad run with JFR passed302 kernel methods plus112 CFG methods. Earlier full
+runs without profiling timed out or were interrupted in recursive dispatch; these
+are preserved, unexplained evidence rather than relabeled PASS. Eight sequence
+permutations at4/128 callers additionally preserve the independent small oracle
+and64N certificate bound under a temporary diagnostic work quota, now removed.
+Final FAST and public CLI parity remain pending. New shared representation does
+not qualify all AS-W00–W10 work: forward ownership, correlated Scalar semantics,
+managed admission/program/output and whole-pipeline resource bounds remain open.

@@ -181,6 +181,53 @@ final class SignedLiteralSet implements AutoCloseable {
             return result;
         }catch(RuntimeException|Error error){failed=true;throw error;}
     }
+    /** Signed set intersection/difference, independent of Boolean truth binding.
+     * Shared Patricia subtrees are accepted/rejected without enumerating keys.
+     * The fixed frontier is bounded by the nonnegative-int key width. */
+    long intersection(long left,long right){return partition(left,right,false);}
+    long without(long left,long right){return partition(left,right,true);}
+    private long combinePartition(long original,int split,long left,long right){
+        if(left==0)return right;if(right==0)return left;
+        if(left==child(original,0)&&right==child(original,1))return original;
+        return branch(split,left,right);
+    }
+    private long partition(long left,long right,boolean subtract){
+        open();int top=0;joinA[0]=left;joinB[0]=right;joinState[0]=0;long result=0;boolean returned=false;
+        try{
+            while(top>=0){
+                if(returned){
+                    byte state=joinState[top];
+                    if(state==1){
+                        firstResult[top]=result;joinState[top]=2;
+                        long a=otherA[top],b=otherB[top];top++;joinA[top]=a;joinB[top]=b;joinState[top]=0;returned=false;continue;
+                    }
+                    result=state==2?combinePartition(joinA[top],joinBit[top],firstResult[top],result)
+                        :state==3?combinePartition(joinA[top],joinBit[top],result,otherA[top])
+                        :combinePartition(joinA[top],joinBit[top],otherA[top],result);
+                    top--;continue;
+                }
+                long a=joinA[top],b=joinB[top];visits++;
+                if(a==0||a==b){result=subtract?0:a;top--;returned=true;continue;}
+                if(b==0||(a>>>1)==(b>>>1)){result=subtract?a:0;top--;returned=true;continue;}
+                if(leaf(a)){
+                    boolean same=polarity(b,firstKey(a))==(int)(a&1)+1;
+                    result=same!=subtract?a:0;top--;returned=true;continue;
+                }
+                int aBit=bit(a),bBit=bit(b),difference=Integer.numberOfLeadingZeros(firstKey(a)^firstKey(b));
+                if(difference<Math.min(aBit,bBit)){result=subtract?a:0;top--;returned=true;continue;}
+                if(aBit>bBit){joinB[top]=child(b,(firstKey(a)>>>(31-bBit))&1);continue;}
+                joinBit[top]=aBit;
+                if(aBit==bBit){
+                    joinState[top]=1;otherA[top]=child(a,1);otherB[top]=child(b,1);
+                    long firstA=child(a,0),firstB=child(b,0);top++;joinA[top]=firstA;joinB[top]=firstB;joinState[top]=0;
+                }else{
+                    int side=(firstKey(b)>>>(31-aBit))&1;joinState[top]=(byte)(side==0?3:4);otherA[top]=subtract?child(a,1-side):0;
+                    long first=child(a,side);top++;joinA[top]=first;joinB[top]=b;joinState[top]=0;
+                }
+            }
+            return result;
+        }catch(RuntimeException|Error error){failed=true;throw error;}
+    }
     /** Signed containment skips identical subtrees and rejects incompatible prefixes. */
     boolean includes(long whole,long part) {
         open();int top=0;joinA[0]=whole;joinB[0]=part;

@@ -12,7 +12,12 @@ import java.util.function.LongConsumer;
  * a non-reused owner31/local32 identity; capacity exhaustion is operational failure.
  * Cyclic equations use the separate SummaryCollector. */
 final class PagedDagOwnership implements AutoCloseable {
-    interface Graph {void children(long node,LongConsumer accept);void retire(long node);}
+    interface Graph {
+        /** Pure idempotent identity mapping; constants map below2. Root values
+         * keep their original identity/polarity, edge counts use the canonical node. */
+        default long canonical(long node){return node;}
+        void children(long node,LongConsumer accept);void retire(long node);
+    }
     private static final int LIVE=1,LINKED=2,BORN=4;
     private static final long ROOT_MASK=0xffffffffL,MAX_NODE=(Long.MAX_VALUE-3)/3;
     private static final AtomicLong OWNERS=new AtomicLong();
@@ -40,15 +45,16 @@ final class PagedDagOwnership implements AutoCloseable {
     private void open(){if(closed||failed)throw new IllegalStateException("DAG ownership closed or aborted");if(busy)throw new IllegalStateException("reentrant DAG ownership callback");}
     void checkOpen(){open();}
     private static void node(long node){if(node<0||node>MAX_NODE)throw new IllegalArgumentException("DAG node outside metadata address space");}
+    private long canonical(long value){node(value);long result=graph.canonical(value);node(result);return result;}
     private long field(long node,int column){return rows.get(node*3+column);}
     private void field(long node,int column,long value){rows.set(node*3+column,value);}
     private void active(long node){if(node>=2&&(field(node,1)&LIVE)==0)throw invalid("inactive DAG node");}
     private void retain(long node){
-        node(node);if(node<2)return;active(node);if(node==linking)throw invalid("self-referencing expression DAG");
+        node=canonical(node);if(node<2)return;active(node);if(node==linking)throw invalid("self-referencing expression DAG");
         long count=field(node,0);if(count==Long.MAX_VALUE)throw invalid("DAG reference count exhausted");field(node,0,count+1);
     }
     private void release(long node){
-        node(node);if(node<2)return;active(node);long count=field(node,0);
+        node=canonical(node);if(node<2)return;active(node);long count=field(node,0);
         if(count<=0)throw invalid("DAG reference underflow");field(node,0,count-1);if(count==1)pending.add(node);
     }
     private void declareUnchecked(long node){
@@ -63,14 +69,14 @@ final class PagedDagOwnership implements AutoCloseable {
         field(node,1,field(node,1)|LINKED);
     }
     void created(long node){
-        open();node(node);busy=true;
+        open();node=canonical(node);busy=true;
         try{declareUnchecked(node);linkUnchecked(node);}catch(RuntimeException error){failed=true;throw error;}finally{busy=false;}
     }
     /** Two-pass import declares every existing live node before linking edges.
      * The graph must already be acyclic; numeric IDs need not be topological. */
-    void declare(long node){open();node(node);try{declareUnchecked(node);}catch(RuntimeException error){failed=true;throw error;}}
+    void declare(long node){open();node=canonical(node);try{declareUnchecked(node);}catch(RuntimeException error){failed=true;throw error;}}
     void linkDeclared(long node){
-        open();node(node);busy=true;try{linkUnchecked(node);}catch(RuntimeException error){failed=true;throw error;}finally{busy=false;}
+        open();node=canonical(node);busy=true;try{linkUnchecked(node);}catch(RuntimeException error){failed=true;throw error;}finally{busy=false;}
     }
     private void drain(){
         while(pending.size()!=0){
@@ -96,14 +102,14 @@ final class PagedDagOwnership implements AutoCloseable {
         }catch(RuntimeException error){failed=true;throw error;}finally{busy=false;}
     }
     void abandonCreated(long node){
-        open();node(node);busy=true;
+        open();node=canonical(node);busy=true;
         try{active(node);if((field(node,1)&BORN)==0)throw invalid("DAG node has no construction hold");field(node,1,field(node,1)&~BORN);release(node);drain();}
         catch(RuntimeException error){failed=true;throw error;}finally{busy=false;}
     }
     /** The caller has already replaced this parent's representation by a leaf
      * with the same meaning. Only its former owned edges are dropped. */
     void replacedByLeaf(long parent,long first,long second){
-        open();node(parent);node(first);node(second);busy=true;
+        open();parent=canonical(parent);node(first);node(second);busy=true;
         try{active(parent);if((field(parent,1)&LINKED)==0)throw invalid("unlinked replacement parent");release(first);release(second);drain();}
         catch(RuntimeException error){failed=true;throw error;}finally{busy=false;}
     }
@@ -133,7 +139,7 @@ final class PagedDagOwnership implements AutoCloseable {
         catch(RuntimeException error){failed=true;throw error;}finally{busy=false;}
     }
     long generation(long node){
-        open();node(node);if(node<2)return 0;
+        open();node=canonical(node);if(node<2)return 0;
         try{return (field(node,1)&LIVE)==0?0:field(node,2);}catch(AnalysisResources.Exhausted|PageStore.Failure error){failed=true;throw error;}
     }
     @Override public void close(){

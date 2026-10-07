@@ -3,7 +3,9 @@ package io.github.gustavo2358.analysis.solver;
 import java.util.*;
 import java.util.function.IntPredicate;
 
-/** Functional condition IDs over shared AND/OR/complement logic and native literal sets.
+/** Signed functional handles over shared AND/OR logic and native literal sets.
+ * Each stored representative is false at the all-absent assignment; the handle
+ * phase bit complements it without allocating a second record. Terminals are0/1.
  * Samples disprove equality or nominate exact decisions; they never merge functions.
  * Current rows, aliases and query scratch share the borrowed paged backend. */
 final class BooleanConditions implements AutoCloseable {
@@ -61,7 +63,7 @@ final class BooleanConditions implements AutoCloseable {
     private int remember(int a,int b,int operation,int result){
         int slot=cacheSlot(a,b,operation);cacheA[slot]=a;cacheB[slot]=b;cacheOperation[slot]=operation;cacheResult[slot]=result;
         if(ownership!=null){cacheGenerationA[slot]=generation(a);cacheGenerationB[slot]=operation<2?generation(b):0;cacheGenerationResult[slot]=operation<6?generation(result):0;}
-        if(scratch&&(a>=scratchFloor||result>=scratchFloor||operation<2&&b>=scratchFloor)&&!scratchDirty[slot]) {
+        if(scratch&&(record(a)>=scratchFloor||operation<6&&record(result)>=scratchFloor||operation<2&&record(b)>=scratchFloor)&&!scratchDirty[slot]) {
             scratchDirty[slot]=true;scratchSlots[scratchSlotCount++]=slot;
         }
         return result;
@@ -78,17 +80,18 @@ final class BooleanConditions implements AutoCloseable {
             Arrays.fill(cacheOperation,-1);
             deferredRetirements=new PagedWorklist(literalPages,resources,AnalysisResources.Phase.CONTROL);
             ownership=new PagedDagOwnership(literalPages,resources,AnalysisResources.Phase.CONTROL,new PagedDagOwnership.Graph(){
+                public long canonical(long node){return node&~1L;}
                 public void children(long node,java.util.function.LongConsumer accept){
-                    int id=Math.toIntExact(node),kind=nodes.junction(id);
+                    int id=record(Math.toIntExact(node)),kind=nodes.junction(id);
                     if(kind>=3){accept.accept(nodes.low(id));if(kind!=NOT)accept.accept(nodes.high(id));}
                 }
                 public void retire(long node){
-                    int id=Math.toIntExact(node);releaseLiteral(id);nodes.retire(id,!scratch);
+                    int id=record(Math.toIntExact(node));releaseLiteral(id);nodes.retire(id,!scratch);
                     if(scratch)deferredRetirements.add(id);
                 }
             });
-            for(int id=2;id<nodes.size();id++)if(nodes.live(id))ownership.declare(id);
-            for(int id=2;id<nodes.size();id++)if(nodes.live(id))ownership.linkDeclared(id);
+            for(int id=2;id<nodes.size();id++)if(nodes.live(id))ownership.declare(handle(id));
+            for(int id=2;id<nodes.size();id++)if(nodes.live(id))ownership.linkDeclared(handle(id));
         }catch(RuntimeException|Error error){failed=true;throw error;}
     }
     boolean ownershipEnabled(){open();return ownership!=null;}
@@ -119,7 +122,7 @@ final class BooleanConditions implements AutoCloseable {
     long generationOf(int value){open();return ownership==null?0:generation(value);}
     void retainPermanentRoot(int value){
         open();if(value<2)return;
-        try{if(nodes.mark(value)!=Long.MAX_VALUE){ownership.root(value);nodes.mark(value,Long.MAX_VALUE);}}
+        try{if(nodes.mark(record(value))!=Long.MAX_VALUE){ownership.root(value);nodes.mark(record(value),Long.MAX_VALUE);}}
         catch(AnalysisResources.Exhausted|PageStore.Failure error){failed=true;throw error;}
     }
     void publishCreated(){publishSince(0);}
@@ -132,7 +135,7 @@ final class BooleanConditions implements AutoCloseable {
     private void nodeStorage(){
         pageStorage();if(nodes==null)nodes=new BooleanNodeStore(literalPages,resources,64);
         if(functions==null)functions=new BooleanFunctionIndex(literalPages,resources,PagedBooleanCircuit.SAMPLE_WORDS,
-                (a,b)->decisionStorage().equivalent(graph(a),graph(b)));
+                (a,b)->decisionStorage().equivalent(graphRecord(a),graphRecord(b)));
     }
     private void literalStorage(){
         open();if(literals!=null)return;pageStorage();
@@ -144,7 +147,19 @@ final class BooleanConditions implements AutoCloseable {
             literalArena=null;throw failure;
         }
     }
-    private static long graph(int id){return id<2?id:(long)id<<3;}
+    private static int record(int value){return value<2?value:(value>>>1)+1;}
+    private static int handle(int record){
+        if(record<2)return record;
+        if(record>(Integer.MAX_VALUE>>>1)+1)throw new PageStore.Failure(PageStore.Reason.INVALID_HANDLE,"condition handle space exhausted");
+        return (record-1)<<1;
+    }
+    private static long graphRecord(int record){return record<2?record:(long)record<<3;}
+    private static long graph(int value){return value<2?value:graphRecord(record(value))|(value&1);}
+    private int nodeKind(int value){int kind=nodes.junction(record(value));return (value&1)!=0?(kind==AND?OR:kind==OR?AND:kind):kind;}
+    private int lowOf(int value){return nodes.low(record(value))^(value&1);}
+    private int highOf(int value){return nodes.high(record(value))^(value&1);}
+    private long supportOf(int value){return value<2?0:functions.support(record(value));}
+    private long nativeRoot(int value){return functions.descriptorField(record(value),3)^(value&1);}
     private static long primaryGraph(int key,boolean negative){return ((long)key<<3)|4|(negative?1:0);}
     private long literalGraph(long root){
         if(root==0)return TRUE;
@@ -195,11 +210,20 @@ final class BooleanConditions implements AutoCloseable {
             return or(and(not(key),low),and(key,high));
         }catch(AnalysisResources.Exhausted|PageStore.Failure failure){failed=true;throw failure;}
     }
-    private long sample(int id,int word){return id<2?id==0?0:-1:functions.sample(id,word);}
+    private long sample(int id,int word){if(id<2)return id==0?0:-1;long value=functions.sample(record(id),word);return (id&1)==0?value:~value;}
     private int intern(int variable,int low,int high,long literalRoot,int kind){
-        nodeStorage();boolean nativeInput=kind<3;
+        nodeStorage();if(kind==NOT)return low^1;
+        int phase=kind==0?low:kind<3?(int)(literals.sample(literalRoot,kind==1,0)&1)
+            :(int)((kind==AND?sample(low,0)&sample(high,0):sample(low,0)|sample(high,0))&1);
+        if(phase!=0){
+            if(kind==0){low^=1;high^=1;}
+            else if(kind<3){kind=kind==1?2:1;literalRoot^=1;}
+            else{kind=kind==AND?OR:AND;low^=1;high^=1;}
+        }
+        if(kind>=3&&low>high){int swap=low;low=high;high=swap;}
+        boolean nativeInput=kind<3;
         int old=nativeInput?functions.nativeClass(variable,low,high,literalRoot,kind):nodes.find(variable,low,high,literalRoot,kind);
-        if(old>=0)return old;
+        if(old>=0)return handle(old)^phase;
         if(kind==0) {
             PagedBooleanCircuit.writePrimarySamples(variable,stagedSamples,0);
             if(low==TRUE)for(int word=0;word<stagedSamples.length;word++)stagedSamples[word]=~stagedSamples[word];
@@ -213,12 +237,12 @@ final class BooleanConditions implements AutoCloseable {
         catch(RuntimeException|Error failure){if(token!=0)try{literalArena.release(token);}catch(RuntimeException cleanup){failure.addSuppressed(cleanup);}throw failure;}
         allocationsSinceCollection++;peakNodes=Math.max(peakNodes,nodes.retainedNodes());
         functions.prepare(id,stagedSamples,support,supportToken);
-        if(ownership!=null)ownership.created(id);
+        if(ownership!=null)ownership.created(handle(id));
         if(!nativeInput&&support==0) {
             boolean maybeFalse=true,maybeTrue=true;
             for(long word:stagedSamples){maybeFalse&=word==0;maybeTrue&=word== -1;}
-            if(maybeFalse&&!decisionStorage().satisfiable(graph(id))){retireProvisional(id);return FALSE;}
-            if(maybeTrue&&decisionStorage().equivalent(graph(id),TRUE)){retireProvisional(id);return TRUE;}
+            if(maybeFalse&&!decisionStorage().satisfiable(graphRecord(id))){retireProvisional(id);return phase;}
+            if(maybeTrue&&decisionStorage().equivalent(graphRecord(id),TRUE)){retireProvisional(id);return TRUE^phase;}
         }
         int equal=functions.candidate(id,nativeInput);
         if(equal>=0) {
@@ -229,13 +253,13 @@ final class BooleanConditions implements AutoCloseable {
                 functions.bindNative(equal,variable,low,high,literalRoot,kind,alias);
                 int oldKind=nodes.junction(equal),oldLow=nodes.low(equal),oldHigh=nodes.high(equal);
                 long previous=nodes.replace(equal,variable,low,high,literalRoot,kind,0);
-                if(ownership!=null&&oldKind>=3)ownership.replacedByLeaf(equal,oldLow,oldKind==NOT?0:oldHigh);
+                if(ownership!=null&&oldKind>=3)ownership.replacedByLeaf(handle(equal),oldLow,oldKind==NOT?0:oldHigh);
                 if(previous!=0)literalArena.release(previous);
             }else retireProvisional(id);
-            return equal;
+            return handle(equal)^phase;
         }
         if(nativeInput)functions.insertNative(id,variable,low,high,literalRoot,kind,0);else functions.insertMixed(id);
-        return id;
+        return handle(id)^phase;
     }
     /** Every admitted nonconstant native junction depends on all its keys. NOT
      * preserves essential support. AND/OR of nonconstant functions with disjoint
@@ -246,33 +270,33 @@ final class BooleanConditions implements AutoCloseable {
         literalStorage();
         if(kind==0)return literals.put(0,variable,false);
         if(kind<3)return literals.unsigned(root);
-        long left=functions.support(low);if(kind==NOT)return left;
-        long right=functions.support(high);
+        long left=supportOf(low);if(kind==NOT)return left;
+        long right=supportOf(high);
         if(left!=0&&right!=0&&!literals.intersectsSame(left,right))return literals.union(left,right);
         int a=nativeKind(low),b=nativeKind(high);
         if((kind==OR&&a==2&&b==2||kind==AND&&a==1&&b==1)
-                &&functions.descriptorField(low,3)==(functions.descriptorField(high,3)^1))return left;
+                &&nativeRoot(low)==(nativeRoot(high)^1))return left;
         return 0;
     }
     long equivalenceComparisons(){open();return functions==null?0:functions.equivalenceCalls();}
     /** -1 unknown; otherwise exact membership. Constants have empty support. */
     int certifiedSupportContains(int value,int key){
-        open();try{if(value<2)return 0;long support=functions.support(value);return support==0?-1:literals.polarity(support,key);}
+        open();try{if(value<2)return 0;long support=supportOf(value);return support==0?-1:literals.polarity(support,key);}
         catch(AnalysisResources.Exhausted|PageStore.Failure failure){failed=true;throw failure;}
     }
     private void retireProvisional(int id){
-        if(ownership!=null){ownership.abandonCreated(id);return;}
+        if(ownership!=null){ownership.abandonCreated(handle(id));return;}
         releaseLiteral(id);boolean tail=!scratch&&id==nodes.size()-1;
         nodes.retire(id,!scratch&&!tail);if(tail)nodes.trimUnlinkedTail();
     }
-    private int nativeKind(int id){return functions.nativeKind(id);}
-    private int nativeVariable(int id){return (int)functions.descriptorField(id,0);}
-    private int nativeLow(int id){return (int)functions.descriptorField(id,1);}
+    private int nativeKind(int id){int kind=functions.nativeKind(record(id));return (id&1)!=0?(kind==1?2:kind==2?1:kind):kind;}
+    private int nativeVariable(int id){return (int)functions.descriptorField(record(id),0);}
+    private int nativeLow(int id){return (int)functions.descriptorField(record(id),1)^(id&1);}
     private long junctionRoot(int value,boolean union){
         if(value<2){if(value!=(union?FALSE:TRUE))return -1;literalStorage();return 0;}
         int kind=nativeKind(value);
         if(kind<0)return -1;
-        if(kind!=0)return kind==(union?1:2)?functions.descriptorField(value,3):-1;
+        if(kind!=0)return kind==(union?1:2)?nativeRoot(value):-1;
         literalStorage();return literals.put(0,nativeVariable(value),nativeLow(value)==TRUE);
     }
     private int junction(long root,boolean union){
@@ -299,31 +323,57 @@ final class BooleanConditions implements AutoCloseable {
     int and(int a,int b){open();try{return apply(a,b,false);}catch(AnalysisResources.Exhausted|PageStore.Failure failure){failed=true;throw failure;}}
     int or(int a,int b){open();try{return apply(a,b,true);}catch(AnalysisResources.Exhausted|PageStore.Failure failure){failed=true;throw failure;}}
     private int terminal(int a,int b,boolean union){
-        if(a==b)return a;
+        if(a==b)return a;if((a^1)==b)return union?TRUE:FALSE;
         if(union){if(a==TRUE||b==TRUE)return TRUE;if(a==FALSE)return b;}
         else {if(a==FALSE)return FALSE;if(a==TRUE)return b;}
         return -1;
     }
-    private int apply(int first,int second,boolean union){
+    /** Pull common signed literals out of products, and dually out of sums.
+     * Distributivity is exact for arbitrary Boolean environments. Residual
+     * construction bypasses this rewrite, so factoring cannot recurse on DAG
+     * depth or cause distributive expansion. Native set operations skip shared
+     * Patricia subtrees; no cube Cartesian product is materialized. */
+    private int factorChild(int value,boolean union){
+        int kind=nativeKind(value),nativeFactor=union?2:1;
+        if(kind==0||kind==nativeFactor)return value;
+        if(kind>=0||nodeKind(value)!=(union?AND:OR))return -1;
+        int left=lowOf(value),right=highOf(value),kindLeft=nativeKind(left),kindRight=nativeKind(right);
+        if((kindLeft==0||kindLeft==nativeFactor)&&independent(left,right))return left;
+        return (kindRight==0||kindRight==nativeFactor)&&independent(right,left)?right:-1;
+    }
+    /** A mixed factor is a separate component only with certified disjoint
+     * essential supports. Overlapping or unknown supports stay in the exact
+     * circuit; rewriting those does not provide independent decomposition. */
+    private boolean independent(int left,int right){
+        long a=supportOf(left),b=supportOf(right);
+        return a!=0&&b!=0&&!literals.intersectsSame(a,b);
+    }
+    private int residual(int value,int factor,long common,boolean union){
+        int remaining=junction(literals.without(junctionRoot(factor,!union),common),!union);
+        if(value==factor)return remaining;
+        int other=lowOf(value)==factor?highOf(value):lowOf(value);
+        return apply(remaining,other,!union,false);
+    }
+    private int factor(int left,int right,boolean union){
+        int a=factorChild(left,union),b=factorChild(right,union);if(a<0||b<0)return -1;
+        long common=literals.intersection(junctionRoot(a,!union),junctionRoot(b,!union));if(common==0)return -1;
+        int remainder=apply(residual(left,a,common,union),residual(right,b,common,union),union,false);
+        return apply(junction(common,!union),remainder,!union,false);
+    }
+    private int apply(int first,int second,boolean union){return apply(first,second,union,true);}
+    private int apply(int first,int second,boolean union,boolean factoring){
         int a=Math.min(first,second),b=Math.max(first,second),simple=terminal(a,b,union);
         if(simple>=0)return simple;
         int operation=union?1:0,hit=cached(a,b,operation);if(hit>=0)return hit;
         int compressed=junctionApply(a,b,union);
         if(compressed>=0)return remember(a,b,operation,compressed);
+        if(factoring){int factored=factor(a,b,union);if(factored>=0)return remember(a,b,operation,factored);}
         int result=intern(-1,a,b,0,union?OR:AND);
         return remember(a,b,operation,result);
     }
     int not(int value){
-        open();try {
-            if(value<2)return 1-value;
-            int hit=cached(value,-1,2);if(hit>=0)return hit;
-            int kind=nativeKind(value),result;
-            if(kind==0)result=intern(nativeVariable(value),1-nativeLow(value),nativeLow(value),0,0);
-            else if(kind>0)result=junction(functions.descriptorField(value,3)^1,kind==2);
-            else if(nodes.junction(value)==NOT)result=nodes.low(value);
-            else result=intern(-1,value,0,0,NOT);
-            remember(value,-1,2,result);remember(result,-1,2,value);return result;
-        }catch(AnalysisResources.Exhausted|PageStore.Failure failure){failed=true;throw failure;}
+        open();try{if(value>=2)functions.sample(record(value),0);return value^1;}
+        catch(AnalysisResources.Exhausted|PageStore.Failure failure){failed=true;throw failure;}
     }
     int difference(int a,int b){return and(a,not(b));}
     int setPresent(int value,int variable){return and(or(restrict(value,variable,false),restrict(value,variable,true)),variable(variable));}
@@ -356,7 +406,7 @@ final class BooleanConditions implements AutoCloseable {
                         int key=nativeVariable(id);boolean bound=allowed==null?key==variable:!allowed.test(key);
                         result=bound?((allowed==null&&present)!=(nativeLow(id)==TRUE)?TRUE:FALSE):id;
                     }else {
-                        boolean union=kind==1;long literalsRoot=functions.descriptorField(id,3),changed;
+                        boolean union=kind==1;long literalsRoot=nativeRoot(id),changed;
                         if(allowed!=null)changed=literals.restrict(literalsRoot,union,allowed);
                         else {
                             int polarity=literals.polarity(literalsRoot,variable);
@@ -368,7 +418,7 @@ final class BooleanConditions implements AutoCloseable {
                     }
                 }
                 if(result<0) {
-                    kind=nodes.junction(id);int low=nodes.low(id),high=nodes.high(id);
+                    kind=nodeKind(id);int low=lowOf(id),high=highOf(id);
                     long left=memo.get(low);if(left==0){pending.set(top++,low);continue;}
                     if(kind==NOT)result=not((int)(left-1));
                     else {
@@ -394,8 +444,8 @@ final class BooleanConditions implements AutoCloseable {
                     int id=(int)pending.get(--top);pending.set(top,0);if(id<2||seen.get(id)!=0)continue;seen.set(id,1);
                     int kind=nativeKind(id);
                     if(kind==0){if(nativeLow(id)==FALSE)found=nativeVariable(id);}
-                    else if(kind==2)found=literals.firstPolarity(functions.descriptorField(id,3),false);
-                    else if(kind<0&&nodes.junction(id)==AND){pending.set(top++,nodes.high(id));pending.set(top++,nodes.low(id));}
+                    else if(kind==2)found=literals.firstPolarity(nativeRoot(id),false);
+                    else if(kind<0&&nodeKind(id)==AND){pending.set(top++,highOf(id));pending.set(top++,lowOf(id));}
                 }
             }
             remember(value,-1,6,found+1);return found;
@@ -417,13 +467,13 @@ final class BooleanConditions implements AutoCloseable {
                     if(id<2||seen.get(root)!=0)continue;seen.set(root,1);
                     int kind=nativeKind(id);
                     if(kind==0){if((nativeLow(id)==FALSE)!=negative)found=nativeVariable(id);}
-                    else if(kind>0)found=literals.firstPolarity(functions.descriptorField(id,3),negative);
+                    else if(kind>0)found=literals.firstPolarity(nativeRoot(id),negative);
                     else {
-                        kind=nodes.junction(id);
-                        if(kind==NOT)pending.set(top++,((long)nodes.low(id)<<1)|(negative?0:1));
+                        kind=nodeKind(id);
+                        if(kind==NOT)pending.set(top++,((long)lowOf(id)<<1)|(negative?0:1));
                         else {
-                            pending.set(top++,((long)nodes.high(id)<<1)|(negative?1:0));
-                            pending.set(top++,((long)nodes.low(id)<<1)|(negative?1:0));
+                            pending.set(top++,((long)highOf(id)<<1)|(negative?1:0));
+                            pending.set(top++,((long)lowOf(id)<<1)|(negative?1:0));
                         }
                     }
                 }
@@ -448,7 +498,7 @@ final class BooleanConditions implements AutoCloseable {
                     int kind=nativeKind(id);
                     if(kind>=0)result=evaluateNative(id,kind,bits,word,assignment)?2:1;
                     else {
-                        kind=nodes.junction(id);int low=nodes.low(id),high=nodes.high(id);
+                        kind=nodeKind(id);int low=lowOf(id),high=highOf(id);
                         long left=memo.get(low);if(left==0){pending.set(top++,low);continue;}
                         if(kind==NOT)result=3-left;
                         else if(kind==AND&&left==1||kind==OR&&left==2)result=left;
@@ -462,7 +512,7 @@ final class BooleanConditions implements AutoCloseable {
     }
     private boolean evaluateNative(int id,int kind,BitSet bits,PersistentLongMap word,long assignment){
         if(kind==0){boolean present=bits!=null?bits.get(nativeVariable(id)):word.contains(assignment,nativeVariable(id));return present!=(nativeLow(id)==TRUE);}
-        return bits!=null?literals.test(functions.descriptorField(id,3),kind==1,bits):literals.test(functions.descriptorField(id,3),kind==1,word,assignment);
+        return bits!=null?literals.test(nativeRoot(id),kind==1,bits):literals.test(nativeRoot(id),kind==1,word,assignment);
     }
     /** Drop only scratch nodes allocated by a read-only query after its checkpoint.
      * No condition created in that scope may escape. Surviving IDs stay stable. */
@@ -482,14 +532,14 @@ final class BooleanConditions implements AutoCloseable {
         if(scratch) {
             for(int j=0;j<scratchSlotCount;j++) {
                 int i=scratchSlots[j];scratchCacheVisits++;
-                if(cacheA[i]>=checkpoint||cacheResult[i]>=checkpoint||cacheOperation[i]<2&&cacheB[i]>=checkpoint)cacheOperation[i]=-1;
+                if(record(cacheA[i])>=checkpoint||cacheOperation[i]<6&&record(cacheResult[i])>=checkpoint||cacheOperation[i]<2&&record(cacheB[i])>=checkpoint)cacheOperation[i]=-1;
                 scratchDirty[i]=false;
             }
             scratchSlotCount=0;
         }else if(removed>0) {
             for(int i=0;i<cacheOperation.length;i++) {
                 scratchCacheVisits++;
-                if(cacheA[i]>=checkpoint||cacheResult[i]>=checkpoint||cacheOperation[i]<2&&cacheB[i]>=checkpoint)cacheOperation[i]=-1;
+                if(record(cacheA[i])>=checkpoint||cacheOperation[i]<6&&record(cacheResult[i])>=checkpoint||cacheOperation[i]<2&&record(cacheB[i])>=checkpoint)cacheOperation[i]=-1;
             }
         }
         allocationsSinceCollection=scratch?scratchAllocations:Math.max(0,allocationsSinceCollection-removed);scratch=false;
@@ -499,17 +549,15 @@ final class BooleanConditions implements AutoCloseable {
         return ++markEpoch;
     }
     private void trace(int root,int floor,long epoch,PagedLongArray pending) {
-        if(root<floor)return;
-        if(nodes==null||!nodes.live(root))throw new IllegalStateException("unowned condition root");
-        long top=0;pending.set(top++,root);
-        while(top>0) {
-            int id=(int)pending.get(--top);pending.set(top,0);
-            if(id<floor||nodes.mark(id)==epoch)continue;
-            nodes.mark(id,epoch);
-            if(nodes.junction(id)==AND||nodes.junction(id)==NOT||nodes.junction(id)==OR) {
-                int low=nodes.low(id),high=nodes.high(id);
-                if(low>=floor)pending.set(top++,low);
-                if(high>=floor)pending.set(top++,high);
+        int start=record(root);if(start<floor)return;
+        if(nodes==null||!nodes.live(start))throw new IllegalStateException("unowned condition root");
+        long top=0;pending.set(top++,start);
+        while(top>0){
+            int id=(int)pending.get(--top);pending.set(top,0);if(id<floor||nodes.mark(id)==epoch)continue;
+            nodes.mark(id,epoch);int kind=nodes.junction(id);
+            if(kind==AND||kind==OR||kind==NOT){
+                int low=record(nodes.low(id)),high=record(nodes.high(id));
+                if(low>=floor)pending.set(top++,low);if(high>=floor)pending.set(top++,high);
             }
         }
     }
@@ -531,14 +579,14 @@ final class BooleanConditions implements AutoCloseable {
         if(nodes!=null)nodes.trimUnlinkedTail();
         for(int j=0;j<scratchSlotCount;j++) {
             int slot=scratchSlots[j];scratchCacheVisits++;
-            if(retired(cacheA[slot],checkpoint)||retired(cacheResult[slot],checkpoint)
+            if(retired(cacheA[slot],checkpoint)||cacheOperation[slot]<6&&retired(cacheResult[slot],checkpoint)
                 ||cacheOperation[slot]<2&&retired(cacheB[slot],checkpoint))cacheOperation[slot]=-1;
             scratchDirty[slot]=false;
         }
         scratchSlotCount=0;allocationsSinceCollection=scratchAllocations+kept;scratch=false;
         if(literalArena!=null&&literalArena.size()>=literalCollectionThreshold)collectLiterals();
     }
-    private boolean retired(int id,int checkpoint){return id>=checkpoint&&(nodes==null||!nodes.live(id));}
+    private boolean retired(int value,int checkpoint){int id=record(value);return id>=checkpoint&&(nodes==null||!nodes.live(id));}
     int checkpoint() {
         open();if(scratch)throw new IllegalStateException("nested BDD scratch scope");
         scratch=true;scratchFloor=size();scratchAllocations=allocationsSinceCollection;
