@@ -122,4 +122,42 @@ final class SourceValueStoreTest {
         assertEquals(0,resources.heapUsed());
     }
 
+    private static int paddedTruth(List<String> a,List<String> b,boolean ao,boolean bo) {
+        if(ao||bo||a.isEmpty()||b.isEmpty())return 3;int result=0;
+        for(String x:a)for(String y:b) {
+            int xc=x.codePointCount(0,x.length()),yc=y.codePointCount(0,y.length()),length=Math.max(xc,yc);
+            result|=(x+" ".repeat(length-xc)).equals(y+" ".repeat(length-yc))?2:1;
+        }
+        return result;
+    }
+    private static int figurativeTruth(List<String> texts,boolean open) {
+        if(open||texts.isEmpty())return 3;int result=0;
+        for(String text:texts) {
+            if(text.isEmpty()){result|=3;continue;}
+            int first=text.codePointAt(0);boolean uniform=true;
+            for(int at=0;at<text.length();) {int scalar=text.codePointAt(at);if(scalar!=first)uniform=false;at+=Character.charCount(scalar);}
+            result|=uniform?3:1;
+        }
+        return result;
+    }
+    @Test void primitiveTruthClassesMatchIndependentPaddingAndFigurativeOraclesAfterSupportUpdates() {
+        var resources=resources();var random=new Random(55882);
+        var alphabet=List.of(""," ","A","A ","AA","AB","😀","😀😀","😀 ","A\t","é","  A");
+        try(var pages=new ResidentPageStore(512,resources);var values=new SourceValueStore(pages,resources)) {
+            for(int round=0;round<200;round++) {
+                var a=new ArrayList<String>();var b=new ArrayList<String>();int af=random.nextInt(8),bf=random.nextInt(8);
+                long left=values.emptyValue(af),right=values.emptyValue(bf);
+                for(int i=random.nextInt(10);i>0;i--){String text=alphabet.get(random.nextInt(alphabet.size()));a.add(text);left=values.join(left,values.literal(text,0,1));}
+                for(int i=random.nextInt(10);i>0;i--){String text=alphabet.get(random.nextInt(alphabet.size()));b.add(text);right=values.join(right,values.literal(text,0,2));}
+                int expected=paddedTruth(a,b,(af&1)!=0,(bf&1)!=0);
+                assertEquals(expected,values.equality(left,right));assertEquals(expected,values.equality(right,left));
+                assertEquals(expected,values.equality(values.addSupport(left,3),values.addSupport(right,4)));
+                assertEquals(figurativeTruth(a,(af&1)!=0),values.figurativeEquality(left));
+                assertEquals(figurativeTruth(b,(bf&1)!=0),values.figurativeEquality(right));
+                values.collect();assertEquals(0,values.records());
+            }
+        }
+        assertEquals(0,resources.heapUsed());
+    }
+
 }

@@ -365,3 +365,46 @@ materialization; each side is traversed once, with string processing proportiona
 input payload plus indexed lookup cost. A counted collection falsifies the former
 256 ×256 scan; independent scalar-padding/random Unicode oracles validate equivalence.
 This is not a repair of the distinct unresolved scalar CONCAT join law.
+
+
+## Shared source expression program and primitive truth summaries
+
+Production source values carry a persistent normalized-class set and a raw-text
+figurative truth mask alongside their complete candidate/support maps. These fields
+are computed when candidates change, reused when proofs/flags change, joined by the
+same persistent set primitives, and traced by arena roots. Equality checks canonical
+class-root equality first and otherwise probes the smaller class set. Singleton
+refinement therefore consults a shared index rather than rebuilding every unaffected
+candidate inventory. Figurative equality consults the raw uniform-scalar image;
+trimming equivalence classes cannot turn a non-uniform padded string into uniform text.
+Physical sharing of equal primitive integer sets does not establish semantic identity
+between proof/text namespaces; owning value fields and dictionaries bind interpretation.
+
+`SourceExpressions` compiles the source term DAG once into primitive runtime rows and
+argument vectors. ASCII upper and leading/trailing U+0020 trim commute, are idempotent,
+and distribute over candidate/support/flag union. Their composition uses three bits,
+so syntax identities specialize in at most eight transform contexts, not one per path.
+CHOICE pushes these transforms into its children; canonical integer child vectors
+share identical bodies and remove duplicate alternatives under proven idempotent union.
+Literals/reads compare complete kind, transform mask and payload, never hash equality
+or recursive AST record equality. This law is specific to the supported nominal unary
+operations; it does not imply distributivity of scalar CONCAT or arbitrary domains.
+
+Each predecessor evaluator uses a leased sparse primitive memo and iterative runtime
+stack sized by touched program nodes, not the whole compiled program on every query.
+A refinement evaluator borrows baseline transformed-read outputs only after exact
+full input-value/root equality, including supports and flags. Changed leaves recompute;
+unchanged alternatives remain shared even under unary-over-CHOICE expressions. Active
+baseline memo state survives the complete refinement operation; it cannot be evicted
+and rebuilt once per candidate. No memo roots remain after the operation's safepoint.
+Program metadata currently uses explicitly resident syntax/String indexes under a
+conservative capacity reservation. Paged input/program/dictionary migration remains
+part of the global external-storage obligations.
+
+A complete-refinement RED oracle (128 candidates) observed16,640/33,280 transformed
+candidate visits after isolated equality optimization, proving the remaining product.
+The shared program passes ordinary equality, unchanged transform and mixed-CHOICE
+oracles with bounded class/transform visits and every original candidate/support.
+Random Unicode composition/padding/figurative oracles and a three-producer merge
+challenge the algebra independently; existing model/table/kill/filter tests and the
+64 KiB forced-spill state transcript remain required.

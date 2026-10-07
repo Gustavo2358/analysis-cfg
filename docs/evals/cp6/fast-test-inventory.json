@@ -412,7 +412,8 @@
       "successiveAssignmentsShareGrowingSupportInsteadOfCopyingAllPriorSets",
       "supportAndFlagChangesKeepOldValuesAndCallerRootsIndependent",
       "sparseReachableStatesJoinMissingValuesWithDefaultsWithoutInventingKnownFacts",
-      "randomSparseJoinsMatchIndependentDenseDefaultStatesIncludingModelsAndTables"
+      "randomSparseJoinsMatchIndependentDenseDefaultStatesIncludingModelsAndTables",
+      "primitiveTruthClassesMatchIndependentPaddingAndFigurativeOraclesAfterSupportUpdates"
     ],
     "io.github.gustavo2358.analysis.dependencies.SourceNominalAdmissionTest": [
       "deepTermAndPredicateAdmissionUsesNoJavaCallStack",
@@ -421,6 +422,15 @@
       "extendedExpressionsStillRequireTheirPublishedAuthority",
       "sharedChoiceAndPredicateDagsReachProductionCandidatesWithOneCompleteAssignmentProof",
       "deepProductionTransformsAndPredicateTruthPreserveTheirSelectedBranch"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.SourcePredicateReuseTest": [
+      "ordinaryEqualityRefinementUsesSharedPrimitiveClassFacts",
+      "unchangedTransformOperandIsPreparedOnceAcrossEveryCandidate",
+      "transformsDistributeOverMixedChoicesWithoutRepeatingTheirUnchangedSide"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.SourceExpressionAlgebraTest": [
+      "composedTransformsAndTheirDistributionPreserveIndependentUnicodeImagesAndCompleteEvidence",
+      "distributionKeepsEveryProducerWhenDifferentInputsMergeIntoOneTransformedCandidate"
     ]
   },
   "analysis-kernel": {

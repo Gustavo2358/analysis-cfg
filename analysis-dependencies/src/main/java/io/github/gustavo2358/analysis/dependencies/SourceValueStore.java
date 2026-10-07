@@ -1,6 +1,7 @@
 package io.github.gustavo2358.analysis.dependencies;
 
 import io.github.gustavo2358.analysis.solver.*;
+import io.github.gustavo2358.analysis.values.TextPredicate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +26,7 @@ final class SourceValueStore implements AutoCloseable {
     private ArrayList<String> texts;
     private final LongBinaryOperator supportUnion, valueUnion;
     private boolean closed;
+    private long predicateClassVisits;
     private final long[] joinLeft,joinRight,joinResult;
 
     SourceValueStore(PageStore pages, AnalysisResources resources) {
@@ -44,7 +46,7 @@ final class SourceValueStore implements AutoCloseable {
         valueUnion = this::join;
     }
 
-    long unknown(boolean model) { return value(OPEN | (model ? MODEL : 0), 0); }
+    long unknown(boolean model) { return value(OPEN | (model ? MODEL : 0), 0, 0, 0); }
     int flags(long value) {
         open(); requireValue(value); return (int) arena.field(value, 1);
     }
@@ -53,16 +55,18 @@ final class SourceValueStore implements AutoCloseable {
         open(); checkFlags(flags);
         if (evidence < 0) throw new IllegalArgumentException("nonnegative source evidence atom required");
         long support = evidence == 0 ? 0 : maps.put(0, evidence, 1);
-        return value(flags, maps.putReference(0, textId(text), support));
+        long key=textId(text),classes=maps.put(0,textId(normalized(text)),1);
+        return value(flags,maps.putReference(0,key,support),figure(text),classes);
     }
     long join(long left, long right) {
         open(); requireValue(left); requireValue(right);
         if (left == right) return left;
-        return value(flags(left) | flags(right), maps.join(candidatesRoot(left), candidatesRoot(right), true, supportUnion));
+        return value(flags(left)|flags(right),maps.join(candidatesRoot(left),candidatesRoot(right),true,supportUnion),
+            (int)(arena.field(left,3)|arena.field(right,3)),maps.join(arena.field(left,4),arena.field(right,4),false,Math::max));
     }
     long withFlags(long source, int flags) {
         open(); checkFlags(flags); requireValue(source);
-        return flags(source) == flags ? source : value(flags, candidatesRoot(source));
+        return flags(source) == flags ? source : value(flags,candidatesRoot(source),(int)arena.field(source,3),arena.field(source,4));
     }
     long addSupport(long source, long evidence) {
         open(); requireValue(source);
@@ -71,7 +75,7 @@ final class SourceValueStore implements AutoCloseable {
         try (var cursor = maps.cursor(candidatesRoot(source))) {
             while (cursor.advance()) result = maps.putReference(result, cursor.key(), maps.put(cursor.value(), evidence, 1));
         }
-        return value(flags(source), result);
+        return value(flags(source),result,(int)arena.field(source,3),arena.field(source,4));
     }
     long emptyState() { open(); return state(0); }
     private long state(long entries) { return arena.intern(STATE, 0, entries, 0, 0, 0); }
@@ -97,14 +101,16 @@ final class SourceValueStore implements AutoCloseable {
             value -> withFlags(value, flags(value) | OPEN)));
         joinLeft[slot]=left;joinRight[slot]=right;joinResult[slot]=result;return result;
     }
-    long emptyValue(int flags) { return value(flags, 0); }
+    long emptyValue(int flags) { return value(flags,0,0,0); }
     long addCandidate(long source, String text, long support) {
         open(); long key = textId(text), root = candidatesRoot(source), previous = maps.get(root, key);
         long combined = maps.contains(root, key) ? supportUnion.applyAsLong(previous, support) : support;
-        return value(flags(source), maps.putReference(root, key, combined));
+        return value(flags(source),maps.putReference(root,key,combined),(int)arena.field(source,3)|figure(text),
+            maps.put(arena.field(source,4),textId(normalized(text)),1));
     }
     long oneCandidate(long source, long text, long support) {
-        return value(flags(source) & ~OPEN, maps.putReference(0, text, support));
+        String raw=text(text);
+        return value(flags(source)&~OPEN,maps.putReference(0,text,support),figure(raw),maps.put(0,textId(normalized(raw)),1));
     }
     PersistentLongMap.Cursor candidates(long value) { open(); return maps.cursor(candidatesRoot(value)); }
     PersistentLongMap.Cursor supports(long root) { open(); return maps.cursor(root); }
@@ -122,8 +128,37 @@ final class SourceValueStore implements AutoCloseable {
     long pathCopies() { open(); return maps.pathCopies(); }
     long nodeVisits() { open(); return maps.nodeVisits(); }
 
-    private long value(int flags, long candidates) {
-        open(); checkFlags(flags); return arena.intern(VALUE, flags, candidates, 0, 0, 0);
+    private long value(int flags,long candidates,int figurative,long classes) {
+        open();checkFlags(flags);return arena.intern(VALUE,flags,candidates,figurative,classes,0);
+    }
+    long predicateClassVisits(){return predicateClassVisits;}
+    int figurativeEquality(long source) {
+        if((flags(source)&OPEN)!=0||candidatesRoot(source)==0)return TextPredicate.BOTH;
+        return (int)arena.field(source,3);
+    }
+    int equality(long left,long right) {
+        if(((flags(left)|flags(right))&OPEN)!=0)return TextPredicate.BOTH;
+        long a=arena.field(left,4),b=arena.field(right,4);if(a==0||b==0)return TextPredicate.BOTH;
+        long ac=maps.size(a),bc=maps.size(b);
+        if(a==b)return ac==1?TextPredicate.TRUE:TextPredicate.BOTH;
+        if(ac==1&&bc==1)return TextPredicate.FALSE;
+        if(ac>bc){long temporary=a;a=b;b=temporary;}
+        try(var cursor=maps.cursor(a)) {
+            while(cursor.advance()){predicateClassVisits++;if(maps.contains(b,cursor.key()))return TextPredicate.BOTH;}
+        }
+        return TextPredicate.FALSE;
+    }
+    private static String normalized(String text) {
+        int end=text.length();while(end>0&&text.charAt(end-1)==' ')end--;
+        return end==text.length()?text:text.substring(0,end);
+    }
+    private static int figure(String text) {
+        if(text.isEmpty())return TextPredicate.BOTH;
+        int scalar=text.codePointAt(0);
+        for(int at=Character.charCount(scalar);at<text.length();) {
+            int next=text.codePointAt(at);if(next!=scalar)return TextPredicate.FALSE;at+=Character.charCount(next);
+        }
+        return TextPredicate.BOTH;
     }
     private long textId(String text) {
         Objects.requireNonNull(text); Long old = textIds.get(text); if (old != null) return old;

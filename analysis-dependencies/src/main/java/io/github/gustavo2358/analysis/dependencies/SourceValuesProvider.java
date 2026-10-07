@@ -43,6 +43,7 @@ public final class SourceValuesProvider {
     private final Map<String,List<Candidate>> projected=new HashMap<>();
     private final IdentityHashMap<NominalValues.Predicate,Set<String>> predicateReads=new IdentityHashMap<>();
     private SourceValueStore values;
+    private SourceExpressions expressions;
     private PagedLongArray stateRoots,stateTokens;
     private PagedWorklist work;
     private String[] nodeIds;
@@ -50,9 +51,9 @@ public final class SourceValuesProvider {
     private long[] transferRoots,transferResults;
     private String[] transferLocations;
     private byte[] transferModes;
-    private long transferEvaluations;
-    public record StateStatistics(long records,long mapNodeVisits,long pathCopies,long managedHeapPeak,long transferEvaluations) { }
-    private StateStatistics stateStatistics=new StateStatistics(0,0,0,0,0);
+    private long transferEvaluations,transformedCandidates;
+    public record StateStatistics(long records,long mapNodeVisits,long pathCopies,long managedHeapPeak,long transferEvaluations,long predicateClassVisits,long transformedCandidates) { }
+    private StateStatistics stateStatistics=new StateStatistics(0,0,0,0,0,0,0);
     public StateStatistics stateStatistics(){return stateStatistics;}
     public record DemandStatistics(long nodeVisits,long edgeVisits,long indexedEdges) { }
     private DemandStatistics demandStatistics=new DemandStatistics(0,0,0);
@@ -96,12 +97,13 @@ public final class SourceValuesProvider {
         try(var cache=resources.reserve(AnalysisResources.Pool.RESIDENT,4096,AnalysisResources.Phase.DOMAIN);
             var owned=pages==null?new ResidentPageStore(4096,resources):null;
             var store=new SourceValueStore(pages==null?owned:pages,resources);
+            var program=new SourceExpressions(resources);
             var roots=new PagedLongArray(pages==null?owned:pages,before.size(),resources,AnalysisResources.Phase.DOMAIN);
             var tokens=new PagedLongArray(pages==null?owned:pages,before.size(),resources,AnalysisResources.Phase.DOMAIN);
             var pending=new PagedWorklist(pages==null?owned:pages,resources,AnalysisResources.Phase.DOMAIN)) {
             if(cache.amount()!=4096)throw new IllegalStateException("transfer cache reservation mismatch");
             transferRoots=new long[64];transferResults=new long[64];transferLocations=new String[64];transferModes=new byte[64];
-            values=store;stateRoots=roots;stateTokens=tokens;work=pending;
+            values=store;expressions=program;stateRoots=roots;stateTokens=tokens;work=pending;
             long initial=values.emptyState();
             for(var seed:source.seeds())if(demand.contains(seed.node())&&!modelSymbols.contains(seed.node())) {
                 long atom=proof(new ProofKey(0,seed.node(),""),new Evidence("DECLARATION_VALUE",seed.node(),seed.provenance()));
@@ -130,8 +132,8 @@ public final class SourceValuesProvider {
                 }
             }
             for(var statement:queries.keySet())projected.put(statement,project(statement));
-            stateStatistics=new StateStatistics(values.records(),values.nodeVisits(),values.pathCopies(),resources.heapPeak(),transferEvaluations);
-        } finally {values=null;stateRoots=null;stateTokens=null;work=null;resources=null;transferRoots=null;transferResults=null;transferLocations=null;transferModes=null;}
+            stateStatistics=new StateStatistics(values.records(),values.nodeVisits(),values.pathCopies(),resources.heapPeak(),transferEvaluations,values.predicateClassVisits(),transformedCandidates);
+        } finally {values=null;expressions=null;stateRoots=null;stateTokens=null;work=null;resources=null;transferRoots=null;transferResults=null;transferLocations=null;transferModes=null;}
     }
     public long workItems(){return workItems;}
     /** Successful construction always completes; exhausted resources throw and publish no partial result. */
@@ -221,48 +223,88 @@ public final class SourceValuesProvider {
     }
     private final class Evaluator implements AutoCloseable {
         private final long state;
-        private final IdentityHashMap<NominalValues.Term,Long> terms=new IdentityHashMap<>();
-        private final IdentityHashMap<NominalValues.Predicate,Integer> predicates=new IdentityHashMap<>();
+        private final Evaluator parent;
+        private final IdentityHashMap<NominalValues.Predicate,Integer> predicates;
         private final AnalysisResources.Reservation scratch;
-        Evaluator(long state){this.state=state;scratch=resources.reserve(AnalysisResources.Pool.SCRATCH,512,AnalysisResources.Phase.DOMAIN);}
-        private final class TermFrame {final NominalValues.Term term;int next;TermFrame(NominalValues.Term term){this.term=term;}}
-        long term(NominalValues.Term root) {
-            Long cached=terms.get(root);if(cached!=null)return cached;
-            var todo=new ArrayDeque<TermFrame>();scratch.grow(192,AnalysisResources.Phase.DOMAIN);todo.push(new TermFrame(root));
-            while(!todo.isEmpty()) {
-                var frame=todo.peek();var t=frame.term;
-                if(frame.next<t.arguments().size()) {
-                    var arg=t.arguments().get(frame.next++);if(!terms.containsKey(arg)){scratch.grow(192,AnalysisResources.Phase.DOMAIN);todo.push(new TermFrame(arg));}continue;
-                }
-                long result;
-                if(t.kind().equals("CHOICE")) {
-                    result=0;for(var arg:t.arguments()){long value=terms.get(arg);result=result==0?value:values.join(result,value);}
-                } else if(t.extended())result=transform(t,terms.get(t.arguments().getFirst()));
-                else result=switch(t.kind()) {
-                    case "READ"->get(state,t.value());
-                    case "LITERAL"->values.literal(t.value(),0,0);
-                    case "SPACES"->values.literal(" ",0,0);
-                    default->values.unknown(false);
-                };
-                terms.put(t,result);todo.pop();
-            }
-            return terms.get(root);
+        private int[] keys,nodes,next;
+        private long[] outputs,inputs,accumulated;
+        private int used;
+        Evaluator(long state){this(state,null);}
+        Evaluator(long state,Evaluator parent) {
+            this.state=state;this.parent=parent;
+            scratch=resources.reserve(AnalysisResources.Pool.SCRATCH,1024,AnalysisResources.Phase.DOMAIN);
+            try {
+                predicates=new IdentityHashMap<>();keys=new int[8];outputs=new long[8];inputs=new long[8];
+                nodes=new int[8];next=new int[8];accumulated=new long[8];
+            } catch(RuntimeException|Error failure){scratch.close();throw failure;}
         }
-        private long transform(NominalValues.Term t,long input) {
+        private int slot(int node) {
+            int slot=(node*0x9e3779b9)&(keys.length-1);
+            while(keys[slot]!=0&&keys[slot]!=node)slot=(slot+1)&(keys.length-1);return slot;
+        }
+        private void put(int node,long output,long input) {
+            if(used+1>keys.length/2) {
+                int capacity=Math.multiplyExact(keys.length,2);scratch.grow(32L*capacity,AnalysisResources.Phase.DOMAIN);
+                int[] previousKeys=keys;long[] previousOutputs=outputs,previousInputs=inputs;
+                keys=new int[capacity];outputs=new long[capacity];inputs=new long[capacity];
+                for(int i=0;i<previousKeys.length;i++)if(previousKeys[i]!=0) {
+                    int s=slot(previousKeys[i]);keys[s]=previousKeys[i];outputs[s]=previousOutputs[i];inputs[s]=previousInputs[i];
+                }
+            }
+            int s=slot(node);if(keys[s]==0){keys[s]=node;used++;}outputs[s]=output;inputs[s]=input;
+        }
+        private long leaf(int node) {
+            long input=switch(expressions.kind(node)) {
+                case SourceExpressions.READ->get(state,expressions.payload(node));
+                case SourceExpressions.LITERAL->values.literal(expressions.payload(node),0,0);
+                default->values.unknown(false);
+            };
+            long output;
+            if(parent!=null) {
+                int s=parent.slot(node);
+                if(parent.keys[s]==node&&parent.inputs[s]==input){output=parent.outputs[s];put(node,output,input);return output;}
+            }
+            output=expressions.transforms(node)==0?input:transform(expressions.transforms(node),input);
+            put(node,output,input);return output;
+        }
+        long term(NominalValues.Term term) {
+            int root=expressions.compile(term),s=slot(root);if(keys[s]!=0)return outputs[s];
+            if(expressions.kind(root)!=SourceExpressions.CHOICE)return leaf(root);
+            int top=0;nodes[0]=root;next[0]=0;accumulated[0]=0;long result=0;
+            while(top>=0) {
+                int node=nodes[top];
+                if(next[top]<expressions.count(node)) {
+                    int child=expressions.argument(node,next[top]);s=slot(child);
+                    long value=keys[s]==child?outputs[s]:expressions.kind(child)!=SourceExpressions.CHOICE?leaf(child):0;
+                    if(value!=0) {
+                        accumulated[top]=accumulated[top]==0?value:values.join(accumulated[top],value);next[top]++;continue;
+                    }
+                    if(top+1==nodes.length) {
+                        int capacity=Math.multiplyExact(nodes.length,2);scratch.grow(24L*capacity,AnalysisResources.Phase.DOMAIN);
+                        nodes=Arrays.copyOf(nodes,capacity);next=Arrays.copyOf(next,capacity);accumulated=Arrays.copyOf(accumulated,capacity);
+                    }
+                    nodes[++top]=child;next[top]=0;accumulated[top]=0;
+                } else {
+                    result=accumulated[top];put(node,result,0);top--;
+                    if(top>=0){accumulated[top]=accumulated[top]==0?result:values.join(accumulated[top],result);next[top]++;}
+                }
+            }
+            return result;
+        }
+        private long transform(int mask,long input) {
             int flags=values.flags(input);long result=values.emptyValue(flags);
             try(var candidates=values.candidates(input)) {
                 while(candidates.advance()) {
-                    String text=values.text(candidates.key()),transformed;
-                    if(t.kind().equals("UPPER_ASCII")) {
-                        boolean ascii=true;for(int i=0;i<text.length();i++)if(text.charAt(i)>127){ascii=false;break;}
+                    transformedCandidates++;String text=values.text(candidates.key());
+                    int start=0,end=text.length();
+                    if((mask&SourceExpressions.LEADING)!=0)while(start<end&&text.charAt(start)==' ')start++;
+                    if((mask&SourceExpressions.TRAILING)!=0)while(end>start&&text.charAt(end-1)==' ')end--;
+                    String transformed=text.substring(start,end);
+                    if((mask&SourceExpressions.UPPER)!=0) {
+                        boolean ascii=true;for(int i=0;i<transformed.length();i++)if(transformed.charAt(i)>127){ascii=false;break;}
                         if(!ascii){flags|=SourceValueStore.OPEN;continue;}
-                        var builder=new StringBuilder(text.length());
-                        for(int i=0;i<text.length();i++){char c=text.charAt(i);builder.append(c>='a'&&c<='z'?(char)(c-'a'+'A'):c);}transformed=builder.toString();
-                    } else {
-                        int start=0,end=text.length();
-                        if(!t.kind().equals("TRIM_TRAILING_SPACES"))while(start<end&&text.charAt(start)==' ')start++;
-                        if(!t.kind().equals("TRIM_LEADING_SPACES"))while(end>start&&text.charAt(end-1)==' ')end--;
-                        transformed=text.substring(start,end);
+                        var builder=new StringBuilder(transformed.length());
+                        for(int i=0;i<transformed.length();i++){char c=transformed.charAt(i);builder.append(c>='a'&&c<='z'?(char)(c-'a'+'A'):c);}transformed=builder.toString();
                     }
                     result=values.addCandidate(result,transformed,candidates.value());
                 }
@@ -286,42 +328,41 @@ public final class SourceValuesProvider {
                 } else {
                     long left=term(p.terms().get(0)),right=term(p.terms().get(1));
                     boolean leftFigure=figurative(p.terms().get(0)),rightFigure=figurative(p.terms().get(1));
-                    if(rightFigure)result=TextPredicate.sourceFigurativeEquality(texts(left),(values.flags(left)&SourceValueStore.OPEN)!=0);
-                    else if(leftFigure)result=TextPredicate.sourceFigurativeEquality(texts(right),(values.flags(right)&SourceValueStore.OPEN)!=0);
-                    else result=TextPredicate.sourceEquality(texts(left),(values.flags(left)&SourceValueStore.OPEN)!=0,texts(right),(values.flags(right)&SourceValueStore.OPEN)!=0);
+                    if(rightFigure)result=values.figurativeEquality(left);
+                    else if(leftFigure)result=values.figurativeEquality(right);
+                    else result=values.equality(left,right);
                 }
                 predicates.put(p,result);todo.pop();
             }
             return predicates.get(root);
         }
-        @Override public void close(){terms.clear();predicates.clear();scratch.close();}
+        @Override public void close(){predicates.clear();keys=null;outputs=null;inputs=null;nodes=null;next=null;accumulated=null;scratch.close();}
     }
     private static boolean figurative(NominalValues.Term term){return term.kind().equals("LOW_VALUES")||term.kind().equals("HIGH_VALUES");}
-    private List<String> texts(long value) {
-        var result=new ArrayList<String>();try(var cursor=values.candidates(value)){while(cursor.advance())result.add(values.text(cursor.key()));}return result;
-    }
     private long filter(long state,NominalValues.Predicate predicate,boolean whenTrue) {
         if(predicate==null)return state;
         var reads=predicateReads.computeIfAbsent(predicate,SourceValuesProvider::reads);
         for(var symbol:reads)if(summarySymbols.contains(symbol)||(values.flags(get(state,symbol))&SourceValueStore.MODEL)!=0)return state;
         int wanted=whenTrue?TextPredicate.TRUE:TextPredicate.FALSE;
-        try(var evaluator=new Evaluator(state)){if((evaluator.truth(predicate)&wanted)==0)return 0;}
-        long result=state;
-        for(var symbol:reads) {
-            if(!symbols.containsKey(symbol))continue;
-            long old=get(state,symbol),kept=values.emptyValue(values.flags(old));boolean any=false;
-            try(var candidates=values.candidates(old)) {
-                while(candidates.advance()) {
-                    long snapshot=put(state,symbol,values.oneCandidate(old,candidates.key(),candidates.value()));
-                    try(var evaluator=new Evaluator(snapshot)) {
-                        if((evaluator.truth(predicate)&wanted)!=0){kept=values.addCandidate(kept,values.text(candidates.key()),candidates.value());any=true;}
+        try(var baseline=new Evaluator(state)) {
+            if((baseline.truth(predicate)&wanted)==0)return 0;
+            long result=state;
+            for(var symbol:reads) {
+                if(!symbols.containsKey(symbol))continue;
+                long old=get(state,symbol),kept=values.emptyValue(values.flags(old));boolean any=false;
+                try(var candidates=values.candidates(old)) {
+                    while(candidates.advance()) {
+                        long snapshot=put(state,symbol,values.oneCandidate(old,candidates.key(),candidates.value()));
+                        boolean allowed=snapshot==state;
+                        if(!allowed)try(var evaluator=new Evaluator(snapshot,baseline)){allowed=(evaluator.truth(predicate)&wanted)!=0;}
+                        if(allowed){kept=values.addCandidate(kept,values.text(candidates.key()),candidates.value());any=true;}
                     }
                 }
+                if(!any&&(values.flags(old)&SourceValueStore.OPEN)==0)return 0;
+                result=put(result,symbol,kept);
             }
-            if(!any&&(values.flags(old)&SourceValueStore.OPEN)==0)return 0;
-            result=put(result,symbol,kept);
+            return result;
         }
-        return result;
     }
     private void join(String node,long incoming) {
         int ordinal=before.get(node);long previous=stateRoots.get(ordinal);
