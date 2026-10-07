@@ -817,3 +817,32 @@ B residual; the ordered representation must encode those distinct residuals. Thi
 proves that catalog paging alone cannot resolve the algorithmic debt. The production
 engine must change its represented relations, while preserving exact functional
 equality and convergence. Neither growth assertion nor peakBooleanNodes is weakened.
+
+### Paged exact Boolean decision foundation (AS-W04/W09, not integrated)
+
+PagedBooleanDecisions is an incremental clausal decision engine with watched
+propagation and first-UIP resolution/backjumping, following the complete
+[Eén/Sörensson SAT2003 paper](https://lara.epfl.ch/w/_media/projects/minisat-anextensiblesatsolver.pdf).
+Variable ordering uses conflict recency solely to schedule search. It cannot change
+the accepted assignments. Permanent clauses and temporary query assumptions are
+distinct: assumption UNSAT cannot invalidate a satisfiable permanent formula.
+Only consequences resolved from actual implication reasons are learned. Learned
+units are installed at the permanent base after undoing temporary decisions.
+
+Variables, heap positions, assignments, models, clauses, literals, intrusive watch
+links, trail, levels and pending learned units occupy primitive paged tables. The
+engine borrows its backend. Fixed two/three-literal overloads reuse staging buffers
+for circuit clauses and queries. Quota/storage interruption aborts the owner rather
+than returning a semantic Boolean result. Learned clauses remain until close; their
+disk growth is quota-controlled, not yet subject to bounded optional retention.
+
+Nine independent kernel tests cover incremental exhaustive CNF/models/assumptions,
+dense nonunit formulas, actual learned conflicts that skip irrelevant decisions,
+pigeonhole UNSAT, 4096 implication steps, quota denial and 24 insertion/query I/O
+boundaries. Three adapter tests cover identical models through one-page eviction,
+constant resident capacity at16/64/256 variables and five disk quotas. Owners close
+with zero live pages and zero final heap/temporary/open-file reservations in these
+tests. This is a foundation, not an adopted replacement of BooleanConditions.
+Queries still assign/copy the whole admitted formula; a circuit adapter must limit
+its formula to the exact queried fanin cones. SAT can require exponential search;
+neither watched propagation nor paging proves a general linear-time solver.

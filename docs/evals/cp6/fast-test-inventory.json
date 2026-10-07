@@ -354,6 +354,11 @@
     ],
     "io.github.gustavo2358.analysis.solver.BooleanNodeStoreStorageTest": [
       "exactIdentityRetirementAndReuseAgreeAcrossResidentAndOnePageBackends"
+    ],
+    "io.github.gustavo2358.analysis.solver.PagedBooleanDecisionsStorageTest": [
+      "learnedQueriesAndModelsAgreeWhenEveryOtherPageIsEvicted",
+      "variableCardinalityIncreasesDiskPayloadWithConstantResidentCapacity",
+      "diskDenialIsOperationalFailureAndNeverASemanticUnsatResult"
     ]
   },
   "analysis-dataflow": {
@@ -743,6 +748,17 @@
     "io.github.gustavo2358.analysis.solver.MixedConditionRelationsTest": [
       "mixedRelationsAgreeWithIndependentAllValuationsAndRestrictions",
       "compactMixedRelationsMustNotExpandIntoEveryBooleanAssignment"
+    ],
+    "io.github.gustavo2358.analysis.solver.PagedBooleanDecisionsTest": [
+      "incrementalClausesQueriesAndModelsAgreeWithIndependentExhaustiveCnf",
+      "contradictoryAssumptionsNeverBecomePermanentUnsatOrLeakIntoNextQuery",
+      "emptyTautologicalDuplicateAndUnitClausesRetainTheirExactMeaning",
+      "deepImplicationPropagationVisitsAffectedWatchesInsteadOfRescanningFormula",
+      "firstUipLearningSkipsIrrelevantDecisionAndPreservesEveryLaterAssumption",
+      "pigeonholeContradictionsRequireSearchAndPreserveIncrementalQueries",
+      "denseNonunitFormulasAndLearnedClausesAgreeWithIndependentEnumeration",
+      "constructorAndGrowthDenialsAbortWithoutLeakingBorrowedPages",
+      "storageInterruptionsDuringInsertionSearchAndModelCopyAbortAndReleaseAllPages"
     ]
   },
   "analysis-launcher": {
