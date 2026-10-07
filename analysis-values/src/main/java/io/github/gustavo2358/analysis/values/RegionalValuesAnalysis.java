@@ -4,7 +4,6 @@ import io.github.gustavo2358.air.model.*;
 import io.github.gustavo2358.air.model.Ids.*;
 import io.github.gustavo2358.analysis.cfg.domain.*;
 import io.github.gustavo2358.analysis.query.*;
-import io.github.gustavo2358.analysis.rd.ReachingDefinitions;
 import io.github.gustavo2358.analysis.rd.DefinitionEvent;
 import io.github.gustavo2358.analysis.solver.*;
 import io.github.gustavo2358.analysis.storage.*;
@@ -78,11 +77,8 @@ public final class RegionalValuesAnalysis {
     public static Admission prepare(AnalysisSession session,StorageAnalysisMode mode) {
         Objects.requireNonNull(mode);
         var effects=new StatementEffects(new StorageIndex(session));
-        // Share validated original entry facts; operational alias impacts never decide admission.
-        var admission=ReachingDefinitions.prepare(effects);
-        if(admission.status()!=ReachingDefinitions.Status.ACCEPTED)
-            return new Admission(admission.status()==ReachingDefinitions.Status.INVALID_INPUT?Status.INVALID_INPUT:Status.UNSUPPORTED,admission.reason(),Optional.empty());
-        return new Admission(Status.ACCEPTED,null,Optional.of(new RegionalValuesAnalysis(effects,admission.analysis().orElseThrow().partition(),mode)));
+        // Partition is structural preparation; do not compile a discarded RD engine to obtain it.
+        return new Admission(Status.ACCEPTED,null,Optional.of(new RegionalValuesAnalysis(effects,new StoragePartition(effects),mode)));
     }
     private RegionalValuesAnalysis(StatementEffects effects,StoragePartition partition,StorageAnalysisMode mode) {
         this.mode=mode;

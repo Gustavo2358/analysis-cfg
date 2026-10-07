@@ -547,3 +547,17 @@ formal active-frame summaries, scalar-domain laws or paged AIR admission/transpo
 Repository FAST now selects848required methods including all three ancestry/admission
 regressions and passes with zero skips in142.484s. Exact architecture inventories retain
 their forbidden dependency checks. This gate qualifies this checkpoint, not AS-W00–W10.
+
+### Structural Regional preparation
+
+Regional values constructs `StoragePartition` directly from admitted `StatementEffects`.
+It no longer constructs/discards `ReachingDefinitions` merely to read its partition.
+The discarded constructor compiled every statement's definition plans, outcome maps,
+control-open flags and Entry seeds; none of those roots was a Regional input. Partition
+construction and Regional's own typed EntryFacts admission remain unchanged. Reaching
+definitions still constructs the same structural partition for its own real analysis.
+The source and compiled W3 boundary checks now reject a Regional dependency on the
+discarded analysis. The new check was RED on the old preparation;63focused value methods,
+including independent concrete/structural Regional oracles, pass after substitution.
+Repository FAST848required methods and all boundaries pass in141.649s; the discarded
+stage was preparation only, never a previously executed RD solve.
