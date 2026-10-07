@@ -898,3 +898,42 @@ foundation now uses this shared decision implementation; no BooleanConditions
 consumer is integrated. Three additional independent view methods and existing
 one-page circuit tests pass. General SAT cost and repeated cross-query encoding
 remain explicit debts; native exact-key dispatch is required before manager adoption.
+
+### Native sampled sets and current-class nomination index (not adopted)
+
+SignedLiteralSet optionally accepts a62-field arena: the original six structural
+fields/reference columns retain their meaning;56 derived words store conjunctions
+of each normalized literal polarity. Global literal sign inversion swaps the pair;
+OR complements the all-false conjunction. Each copied Patricia branch combines
+already stored child words, with no whole-prefix rescan. The increased staging
+tuple is reserved before allocation. Six-field clients retain their schema and
+behavior. Metadata is part of the same immutable arena and retires with its record.
+
+BooleanFunctionIndex stores complete native aliases, derived sample vectors and
+live mixed/native nomination lists in paged primitive columns and exact indices.
+New native descriptors search only mixed nominees; complete native keys handle
+pure prefixes directly. Every nomination match uses a supplied primitive exact
+equivalence callback. Separate intrusive previous/next links remove a class in
+constant list work, even when all samples collide and retirement starts at the tail.
+Required payload/indices have fixed resident controls. Alias tokens are metadata
+belonging to the enclosing literal arena: normal removal returns them for release;
+the enclosing owner closes that arena after index teardown on failure.
+
+Five index and three native-sample kernel methods pass independent collision/value,
+complete-key, reuse, polarity/evaluation, copied-path work and retirement laws.
+Six constructor/growth quotas and21 publication/binding/retirement I/O boundaries
+abort and close with zero owned pages. Two index and one sampled-set adapter methods
+pass one-page eviction, native/mixed transitions and arena collection;16/64/256
+indexed classes retain constant resident capacity. These components are not yet
+wired into BooleanConditions; global functional convergence and original integrated
+growth failures remain unresolved. No global qualification is claimed.
+
+Read interruption is an operational failure of the complete condition owner. Five
+independent injected read paths (bit-set and persistent-map evaluation, empty-root
+binding, required/potential primary hints) now abort subsequent terminal shortcuts.
+Previously an interrupted internal store could leave the enclosing owner apparently
+usable. The fixed computed buffers are also released by close, including Java
+references held by the closed owner. Read-abort tests close through try-with-resources
+and verify zero pages and resource reservations; this is not a physical heap-size
+measurement. Literal/native-class components remain independent, with no manager
+adoption or resolution of the two integrated growth REDs in this checkpoint.

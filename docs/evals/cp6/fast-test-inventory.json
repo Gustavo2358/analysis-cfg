@@ -350,7 +350,8 @@
       "deniedConditionPayloadAbortsEvenTerminalShortcutsAndReleasesOwnership",
       "fixedComputedAndNodeCachesAreReservedBeforeTheirArraysAreCreated",
       "literalJunctionsGeneralDecisionsAndRootLifetimesAgreeWithOnePageSpill",
-      "deniedLiteralAllocationReleasesOwnerAndLeavesBorrowedBackendUsable"
+      "deniedLiteralAllocationReleasesOwnerAndLeavesBorrowedBackendUsable",
+      "interruptedReadsAbortTheWholeConditionOwnerIncludingTerminalQueries"
     ],
     "io.github.gustavo2358.analysis.solver.BooleanNodeStoreStorageTest": [
       "exactIdentityRetirementAndReuseAgreeAcrossResidentAndOnePageBackends"
@@ -363,6 +364,13 @@
     "io.github.gustavo2358.analysis.solver.PagedBooleanCircuitStorageTest": [
       "exactMixedCircuitQueriesAndCollectionSurviveOnePageEviction",
       "CircuitAndDecisionCardinalitySpillWithConstantResidentCapacity"
+    ],
+    "io.github.gustavo2358.analysis.solver.BooleanFunctionIndexStorageTest": [
+      "forcedCollisionLinksAliasesBindingAndReusedIdsSurviveOnePageEviction",
+      "samplesNativeAndNominationIndicesHaveConstantResidentCapacity"
+    ],
+    "io.github.gustavo2358.analysis.solver.SignedLiteralSamplesStorageTest": [
+      "bothConjunctionSamplePolaritiesFollowTheOwningArenaThroughEvictionAndCollection"
     ]
   },
   "analysis-dataflow": {
@@ -780,6 +788,18 @@
       "genericConeDecisionsPreserveRepeatedPrimaryKeysAndIndependentTruthTables",
       "constantsInsideDefinitionsAndAliasesPreserveTheirMeaning",
       "unrelatedGraphNodesAreNeverReadAndCyclesAreOperationalFailure"
+    ],
+    "io.github.gustavo2358.analysis.solver.SignedLiteralSamplesTest": [
+      "sampledConjunctionDisjunctionAndComplementedSignsMatchIndependentLiteralValuations",
+      "prefixMetadataUsesCopiedPathsAndRetiresWithItsOwningLiteralRecords",
+      "sixFieldClientsKeepTheirOriginalSchemaAndMeaning"
+    ],
+    "io.github.gustavo2358.analysis.solver.BooleanFunctionIndexTest": [
+      "forcedNominationCollisionsNeverMergeIndependentUnequalFunctions",
+      "nativeKeysAvoidScanningAllEarlierPurePrefixesAndCanBindMixedClasses",
+      "oldestFirstRetirementHasConstantLinkWorkAndReusedIdsHaveNoStaleMeaning",
+      "constructorAndGrowthQuotaDenialsReleaseEveryOwnedPage",
+      "interruptedPublicationBindingAndRetirementAbortWithoutDependingOnIntactLinks"
     ]
   },
   "analysis-launcher": {

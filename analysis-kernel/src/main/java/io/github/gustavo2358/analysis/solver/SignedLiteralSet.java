@@ -9,25 +9,39 @@ final class SignedLiteralSet implements AutoCloseable {
     private final CanonicalTupleArena arena;
     private final AnalysisResources resources;
     private final AnalysisResources.Reservation metadata;
+    private final boolean sampled;
     private long[] tuple,path,joinA,joinB,firstResult,otherA,otherB;
     private byte[] sides,joinState;
     private int[] joinBit;
     private int depth;
-    private long visits,copies;
+    private long visits,copies,sampleWords;
     private boolean closed,failed;
 
     SignedLiteralSet(CanonicalTupleArena arena,AnalysisResources resources) {
-        if(arena.arity()!=6)throw new IllegalArgumentException("literal set needs six-field arena");
-        for(int n=0;n<6;n++)if(arena.referenceColumn(n)!=(n==2||n==4||n==5))throw new IllegalArgumentException("literal reference schema mismatch");
-        this.arena=arena;this.resources=resources;metadata=resources.reserve(AnalysisResources.Pool.RESIDENT,4096,AnalysisResources.Phase.CONTROL);
+        int arity=arena.arity();sampled=arity==6+2*PagedBooleanCircuit.SAMPLE_WORDS;
+        if(arity!=6&&!sampled)throw new IllegalArgumentException("literal set needs six structural fields and optional complete sample pair");
+        for(int n=0;n<arity;n++)if(arena.referenceColumn(n)!=(n==2||n==4||n==5))throw new IllegalArgumentException("literal reference schema mismatch");
+        this.arena=arena;this.resources=resources;metadata=resources.reserve(AnalysisResources.Pool.RESIDENT,4096+8L*(arity-6),AnalysisResources.Phase.CONTROL);
         try {
-            tuple=new long[6];path=new long[64];sides=new byte[64];
+            tuple=new long[arity];path=new long[64];sides=new byte[64];
             joinA=new long[64];joinB=new long[64];firstResult=new long[64];otherA=new long[64];otherB=new long[64];joinState=new byte[64];joinBit=new int[64];
         }catch(RuntimeException|Error error){metadata.close();throw error;}
     }
     private void open(){if(closed||failed)throw new IllegalStateException("literal set unavailable");}
     long visits(){return visits;}
     long copies(){return copies;}
+    long sampleWordsCalculated(){open();return sampleWords;}
+    private long conjunctionSample(long root,boolean inverted,int word) {
+        if(root==0)return -1;
+        int variant=(int)(root&1)^(inverted?1:0);
+        return field(root,6+variant*PagedBooleanCircuit.SAMPLE_WORDS+word);
+    }
+    long sample(long root,boolean union,int word) {
+        open();if(!sampled)throw new IllegalStateException("literal arena has no sample metadata");
+        if(word<0||word>=PagedBooleanCircuit.SAMPLE_WORDS)throw new IllegalArgumentException("foreign sample channel");
+        try{return union?~conjunctionSample(root,true,word):conjunctionSample(root,false,word);}
+        catch(AnalysisResources.Exhausted|PageStore.Failure failure){failed=true;throw failure;}
+    }
     private long field(long root,int column){visits++;return arena.field(root>>>1,column);}
     private boolean leaf(long root){return (field(root,0)&255)==LEAF;}
     private int bit(long root){return (int)(field(root,1)&63);}
@@ -40,7 +54,7 @@ final class SignedLiteralSet implements AutoCloseable {
         return firstKey(root);
     }
     private long count(long root,boolean negative){long positive=positiveCount(root);return negative?size(root)-positive:positive;}
-    private long child(long root,int side) {
+    long child(long root,int side) {
         long flip=root&1;
         if(side==1)flip^=field(root,3)&1;
         return (field(root,side==0?2:4)<<1)|flip;
@@ -58,6 +72,11 @@ final class SignedLiteralSet implements AutoCloseable {
     }
     private long leaf(int key,boolean negative) {
         tuple[0]=(1L<<8)|LEAF;tuple[1]=((long)key<<6)|32;tuple[2]=0;tuple[3]=2;tuple[4]=0;tuple[5]=0;
+        if(sampled) {
+            PagedBooleanCircuit.writePrimarySamples(key,tuple,6);
+            for(int word=0;word<PagedBooleanCircuit.SAMPLE_WORDS;word++)tuple[6+PagedBooleanCircuit.SAMPLE_WORDS+word]=~tuple[6+word];
+            sampleWords+=2L*PagedBooleanCircuit.SAMPLE_WORDS;
+        }
         return encoded(arena.intern(tuple),negative?1:0);
     }
     private long branch(int bit,long left,long right) {
@@ -65,6 +84,13 @@ final class SignedLiteralSet implements AutoCloseable {
         long positive=Math.addExact(positiveCount(left^flip),positiveCount(right^flip));
         tuple[0]=(positive<<8)|BRANCH;tuple[1]=((long)firstKey(left)<<6)|bit;tuple[2]=left>>>1;
         tuple[3]=(count<<1)|((right&1)^flip);tuple[4]=right>>>1;tuple[5]=0;
+        if(sampled) {
+            for(int word=0;word<PagedBooleanCircuit.SAMPLE_WORDS;word++) {
+                tuple[6+word]=conjunctionSample(left^flip,false,word)&conjunctionSample(right^flip,false,word);
+                tuple[6+PagedBooleanCircuit.SAMPLE_WORDS+word]=conjunctionSample(left^flip,true,word)&conjunctionSample(right^flip,true,word);
+            }
+            sampleWords+=2L*PagedBooleanCircuit.SAMPLE_WORDS;
+        }
         copies++;return encoded(arena.intern(tuple),flip);
     }
     private long descend(long root,int key) {

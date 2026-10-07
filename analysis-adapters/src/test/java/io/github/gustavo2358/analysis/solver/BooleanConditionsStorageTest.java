@@ -83,4 +83,46 @@ class BooleanConditionsStorageTest {
             assertEquals(0,memory.heapUsed(),"quota="+quota);
         }
     }
+    @Test void interruptedReadsAbortTheWholeConditionOwnerIncludingTerminalQueries() {
+        for(int operation=0;operation<5;operation++) {
+            var memory=memory(1000000);
+            try(var backend=new ResidentPageStore(128,memory,AnalysisResources.Phase.CONTROL)) {
+                var pages=new ReadInterruptedPages(backend);
+                try(var conditions=new BooleanConditions(2,memory,pages);
+                    var arena=new CanonicalTupleArena(pages,memory,AnalysisResources.Phase.CONTROL,6,new int[]{2,4,5});
+                    var assignment=new PersistentLongMap(arena,memory,AnalysisResources.Phase.CONTROL)) {
+                int root=1;for(int key=0;key<128;key++)root=conditions.and(root,conditions.variable(key));
+                pages.interrupt=true;
+                int condition=root,read=operation;
+                assertThrows(PageStore.Failure.class,()->{
+                    if(read==0)conditions.test(condition,new BitSet());
+                    else if(read==1)conditions.atEmpty(condition);
+                    else if(read==2)conditions.requiredPresent(condition);
+                    else if(read==3)conditions.possiblePresent(condition);
+                    else conditions.test(condition,assignment,0);
+                });
+                assertThrows(IllegalStateException.class,()->conditions.test(1,new BitSet()),"operation="+operation);
+                assertThrows(IllegalStateException.class,()->conditions.or(0,1),"operation="+operation);
+                pages.interrupt=false;
+                }
+                assertEquals(0,backend.statistics().livePages());
+            }
+            assertEquals(0,memory.heapUsed());
+        }
+    }
+    private static final class ReadInterruptedPages implements PageStore {
+        final PageStore delegate;boolean interrupt;
+        ReadInterruptedPages(PageStore delegate){this.delegate=delegate;}
+        public int pageBytes(){return delegate.pageBytes();}
+        public long allocate(){return delegate.allocate();}
+        public void read(long page,int offset,byte[] target,int start,int length){
+            if(interrupt){interrupt=false;throw new Failure(Reason.IO,"synthetic condition read interruption");}
+            delegate.read(page,offset,target,start,length);
+        }
+        public void write(long page,int offset,byte[] source,int start,int length){delegate.write(page,offset,source,start,length);}
+        public void release(long page){delegate.release(page);}
+        public void flush(){delegate.flush();}
+        public Statistics statistics(){return delegate.statistics();}
+        public void close(){delegate.close();}
+    }
 }

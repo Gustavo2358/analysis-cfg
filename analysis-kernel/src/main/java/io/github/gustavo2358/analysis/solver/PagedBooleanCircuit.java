@@ -48,14 +48,7 @@ final class PagedBooleanCircuit implements AutoCloseable {
         open();if(key<0)throw new IllegalArgumentException("negative primary key");
         try {
             tuple[0]=INPUT;tuple[1]=key;tuple[2]=tuple[3]=tuple[4]=tuple[5]=0;
-            tuple[6]=0;tuple[7]=-1;long low=-1;int channel=0;
-            for(int depth=1;depth<=32;depth++) {
-                low&=sampleBits(key,depth);
-                if(depth==SAMPLE_DEPTHS[channel]) {
-                    tuple[8+2*channel]=low;tuple[9+2*channel]=~low;
-                    if(++channel==SAMPLE_DEPTHS.length)break;
-                }
-            }
+            writePrimarySamples(key,tuple,6);
             sampleWords+=SAMPLE_WORDS;
             return nodes.intern(tuple)<<1;
         }catch(AnalysisResources.Exhausted|PageStore.Failure failure){failed=true;throw failure;}
@@ -99,6 +92,16 @@ final class PagedBooleanCircuit implements AutoCloseable {
         int depth=SAMPLE_DEPTHS[(word-2)/2];long bits=-1;
         for(int level=1;level<=depth;level++)bits&=sampleBits(key,level);
         return (word&1)==0?bits:~bits;
+    }
+    static void writePrimarySamples(int key,long[] target,int offset) {
+        target[offset]=0;target[offset+1]=-1;long low=-1;int channel=0;
+        for(int depth=1;depth<=32;depth++) {
+            low&=sampleBits(key,depth);
+            if(depth==SAMPLE_DEPTHS[channel]) {
+                target[offset+2+2*channel]=low;target[offset+3+2*channel]=~low;
+                if(++channel==SAMPLE_DEPTHS.length)break;
+            }
+        }
     }
     long sample(long root,int word) {
         open();if(word<0||word>=SAMPLE_WORDS)throw new IllegalArgumentException("foreign sample channel");

@@ -22,8 +22,8 @@ final class BooleanConditions implements AutoCloseable {
     private boolean scratch;
     private int scratchFloor;
     private long scratchAllocations;
-    private final boolean[] scratchDirty;
-    private final int[] scratchSlots;
+    private boolean[] scratchDirty;
+    private int[] scratchSlots;
     private int scratchSlotCount;
     private long peakNodes=2;
     long peakNodes(){return peakNodes;}
@@ -32,7 +32,7 @@ final class BooleanConditions implements AutoCloseable {
 
     // Direct-mapped computed table: collisions only evict memoized work. They never
     // identify semantic nodes or truncate conditions. Memory is fixed per manager.
-    private final int[] cacheA,cacheB,cacheOperation,cacheResult;
+    private int[] cacheA,cacheB,cacheOperation,cacheResult;
     // Four int arrays: a fixed 1 MiB computed table per execution manager.
     BooleanConditions(){this(65536);}
     BooleanConditions(int cacheSlots){this(cacheSlots,null,null);}
@@ -237,6 +237,10 @@ final class BooleanConditions implements AutoCloseable {
     }
     /** One necessarily present key from the forced prefix, or -1 if none exists. */
     int requiredPresent(int value) {
+        open();try{return requiredPresentUnchecked(value);}
+        catch(AnalysisResources.Exhausted|PageStore.Failure failure){failed=true;throw failure;}
+    }
+    private int requiredPresentUnchecked(int value) {
         open();while(value>=2) {
             int kind=nodes.junction(value);
             if(kind!=0)return kind==2?literals.firstPolarity(nodes.literals(value),false):-1;
@@ -247,6 +251,10 @@ final class BooleanConditions implements AutoCloseable {
     }
     /** A potentially present key for an individual-word hint, not a required key. */
     int possiblePresent(int value) {
+        open();try{return possiblePresentUnchecked(value);}
+        catch(AnalysisResources.Exhausted|PageStore.Failure failure){failed=true;throw failure;}
+    }
+    private int possiblePresentUnchecked(int value) {
         open();while(value>=2) {
             if(nodes.junction(value)!=0)return literals.firstPolarity(nodes.literals(value),false);
             if(nodes.high(value)!=FALSE)return nodes.variable(value);value=nodes.low(value);
@@ -282,6 +290,10 @@ final class BooleanConditions implements AutoCloseable {
     }
     /** Bind the formal ancestor parameters at the empty root without an absence vector. */
     int atEmpty(int value) {
+        open();try{return atEmptyUnchecked(value);}
+        catch(AnalysisResources.Exhausted|PageStore.Failure failure){failed=true;throw failure;}
+    }
+    private int atEmptyUnchecked(int value) {
         open();if(value<2)return value;
         int hit=cached(value,-1,5);if(hit>=0)return hit;int root=value;
         while(value>=2) {
@@ -296,6 +308,10 @@ final class BooleanConditions implements AutoCloseable {
         return remember(root,-1,5,value);
     }
     boolean test(int value,BitSet assignment) {
+        open();try{return testUnchecked(value,assignment);}
+        catch(AnalysisResources.Exhausted|PageStore.Failure failure){failed=true;throw failure;}
+    }
+    private boolean testUnchecked(int value,BitSet assignment) {
         open();while(value>=2) {
             int kind=nodes.junction(value);
             if(kind!=0)return literals.test(nodes.literals(value),kind==1,assignment);
@@ -304,6 +320,10 @@ final class BooleanConditions implements AutoCloseable {
         return value==TRUE;
     }
     boolean test(int value,PersistentLongMap assignment,long root) {
+        open();try{return testUnchecked(value,assignment,root);}
+        catch(AnalysisResources.Exhausted|PageStore.Failure failure){failed=true;throw failure;}
+    }
+    private boolean testUnchecked(int value,PersistentLongMap assignment,long root) {
         open();while(value>=2) {
             int kind=nodes.junction(value);
             if(kind!=0)return literals.test(nodes.literals(value),kind==1,assignment,root);
@@ -413,7 +433,8 @@ final class BooleanConditions implements AutoCloseable {
         RuntimeException failure=ActivationSolver.closeResource(nodes,null);
         failure=ActivationSolver.closeResource(literals,failure);failure=ActivationSolver.closeResource(literalArena,failure);
         if(suppliedStore==null)failure=ActivationSolver.closeResource(literalPages,failure);
-        controls.close();nodes=null;literalArena=null;literals=null;literalPages=null;if(failure!=null)throw failure;
+        controls.close();cacheA=cacheB=cacheOperation=cacheResult=scratchSlots=null;scratchDirty=null;
+        nodes=null;literalArena=null;literals=null;literalPages=null;if(failure!=null)throw failure;
     }
     int size(){open();return nodes==null?2:nodes.size();}
 }
