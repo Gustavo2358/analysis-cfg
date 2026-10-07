@@ -18,6 +18,27 @@ class StateIndexTest {
         }
         assertEquals(0,budget.heapUsed());
     }
+    @Test void liveFilteringCompactsCapacityAndNeverRecomputesFingerprints() {
+        var budget=resources(Long.MAX_VALUE);long[] hashes={0};int n=32768;
+        try(var index=new StateIndex<Integer,Integer>(budget,AnalysisResources.Phase.DOMAIN,a->{hashes[0]++;return a.longValue();},Integer::equals)) {
+            for(int i=0;i<n;i++)index.putIfAbsent(i,i);
+            assertEquals(n-3,index.retainEntries(a->a>=n-3));assertEquals(n,hashes[0]);assertEquals(3,index.size());
+            assertTrue(budget.heapUsed()<512,"old capacity retained="+budget.heapUsed());
+            for(int i=n-3;i<n;i++)assertEquals(i,index.get(i));assertNull(index.get(n-4));
+            assertEquals(3,index.retainEntries(a->false));assertEquals(0,index.size());
+            assertEquals(7,index.putIfAbsent(7,7));assertEquals(7,index.get(7));
+        }
+        assertEquals(0,budget.heapUsed());
+    }
+    @Test void rejectedLiveFilteringDoesNotLoseAnyOldInput() {
+        var budget=resources(500);
+        try(var index=new StateIndex<Integer,Integer>(budget,AnalysisResources.Phase.DOMAIN,Integer::longValue,Integer::equals)) {
+            index.putIfAbsent(1,1);index.putIfAbsent(2,2);
+            assertThrows(AnalysisResources.Exhausted.class,()->index.retainEntries(a->a==1));
+            assertEquals(2,index.size());assertEquals(1,index.get(1));assertEquals(2,index.get(2));
+        }
+        assertEquals(0,budget.heapUsed());
+    }
     record Input(int value,int presentation) { }
     @Test void fingerprintCollisionsAndDifferentObjectEqualityNeverMergeSemanticInputs() {
         var budget=resources(Long.MAX_VALUE);

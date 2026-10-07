@@ -3,6 +3,7 @@ package io.github.gustavo2358.analysis.solver;
 import java.util.Objects;
 import java.util.function.BiPredicate;
 import java.util.function.ToLongFunction;
+import java.util.function.Predicate;
 
 /** Solve-owned equivalence index. Fingerprints must be congruent with supplied equivalence;
  * collisions always consult that equivalence, never Object.equals. Primitive open addressing
@@ -63,6 +64,24 @@ final class StateIndex<S,V> implements AutoCloseable {
         }catch(RuntimeException|Error failure){staged.close();throw failure;}
     }
     int size(){open();return size;}long probes(){open();return probes;}
+    /** Pure live-value predicate. Cached keys are reused; rejection before publication
+     * preserves the entire prior table. Index membership is not itself a semantic root. */
+    @SuppressWarnings("unchecked") int retainEntries(Predicate<? super V> live) {
+        open();Objects.requireNonNull(live);if(size==0)return 0;
+        int retained=0;for(int i=0;i<keys.length;i++)if(keys[i]!=null&&live.test((V)values[i]))retained++;
+        int removed=size-retained;if(removed==0)return 0;
+        if(retained==0){keys=null;values=null;fingerprints=null;size=0;capacity.close();capacity=null;return removed;}
+        int length=4;while(retained>length/2)length=Math.multiplyExact(length,2);
+        var staged=resources.reserve(AnalysisResources.Pool.RESIDENT,64L+24L*length,phase);
+        try {
+            Object[] newKeys=new Object[length],newValues=new Object[length];long[] newHashes=new long[length];int mask=length-1;
+            for(int i=0;i<keys.length;i++)if(keys[i]!=null&&live.test((V)values[i])) {
+                int slot=(int)mix(fingerprints[i])&mask;while(newKeys[slot]!=null){probes++;slot=(slot+1)&mask;}
+                newKeys[slot]=keys[i];newValues[slot]=values[i];newHashes[slot]=fingerprints[i];
+            }
+            keys=newKeys;values=newValues;fingerprints=newHashes;size=retained;capacity.close();capacity=staged;return removed;
+        }catch(RuntimeException|Error failure){staged.close();throw failure;}
+    }
     private void open(){if(closed)throw new IllegalStateException("state index closed");}
     @Override public void close(){if(closed)return;closed=true;keys=null;values=null;fingerprints=null;if(capacity!=null)capacity.close();metadata.close();}
 }

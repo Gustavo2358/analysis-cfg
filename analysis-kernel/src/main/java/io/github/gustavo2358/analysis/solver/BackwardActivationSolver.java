@@ -14,6 +14,41 @@ final class BackwardActivationSolver<S> {
     private final List<EntryRun> entries=new ArrayList<>();
     private final ArrayDeque<Slot> pending=new ArrayDeque<>();
     private int nextPoint;
+    private long summaryCreated,summaryLive,summaryPeak;
+    private void summaryCreated(){summaryCreated++;summaryLive++;recordsSinceSweep++;summaryPeak=Math.max(summaryPeak,summaryLive);}
+    private long summaryRetired,summaryCollections,recordsSinceSweep,sweepThreshold=64,closedIndexProbes;
+    private SummaryCollector<Region> collector;
+    private void collectSummaries(boolean force) {
+        if(!force&&recordsSinceSweep<sweepThreshold)return;
+        if(collector==null)collector=new SummaryCollector<>(indexResources,AnalysisResources.Phase.DOMAIN,r->r.mark,(r,token)->r.mark=token);
+        long[] units={entries.size()+pending.size()};
+        collector.mark(visit->{for(var entry:entries)visit.accept(entry.root);for(var slot:pending)visit.accept(slot.region);},(region,visit)->{
+            units[0]+=1+region.slots.size();indexResources.work(1+region.slots.size(),AnalysisResources.Phase.DOMAIN);
+            for(var slot:region.slots.values()) {
+                units[0]+=slot.children.size()+slot.watches.size();
+                for(var child:slot.children.keySet())visit.accept(child);
+                for(var watched:slot.watches)visit.accept(watched);
+            }
+        });
+        feasibleCache.clear();deferredCache.clear();finalWitnesses.clear();
+        for(var entry:entries) {
+            long removed=collector.retain(entry.regions,this::retireSummary);summaryRetired+=removed;summaryLive-=removed;
+            var iterator=entry.byFrame.entrySet().iterator();
+            while(iterator.hasNext()) {
+                var index=iterator.next().getValue();index.retainEntries(collector::isMarked);
+                if(index.size()==0){closedIndexProbes+=index.probes();index.close();iterator.remove();}
+            }
+        }
+        summaryCollections++;recordsSinceSweep=0;sweepThreshold=Math.max(64,units[0]);
+    }
+    private void retireSummary(Region region) {
+        for(var slot:region.slots.values()) {
+            for(var child:slot.children.keySet()){child.callers.remove(slot);if(child.incoming.remove(slot)!=null)child.incomingVersion++;}
+            for(var watched:slot.watches)watched.waiters.remove(slot);
+            slot.children.clear();slot.watches.clear();slot.in.pieces=List.of();slot.out.pieces=List.of();
+        }
+        region.slots.clear();region.incoming.clear();region.callers.clear();region.waiters.clear();for(var call:region.calls)region.entry.calls.remove(call);region.calls.clear();region.predecessors.clear();
+    }
     private long transfers,deliveries,joins,pushes,pops,attempts,duplicates,maxSize,changes,unchanged;
     private record Need(Object region,int condition) { }
     private final Map<Need,Boolean> feasibleCache=new HashMap<>();
@@ -21,7 +56,7 @@ final class BackwardActivationSolver<S> {
     private final Map<Need,Deferred> deferredCache=new LinkedHashMap<>();
     BackwardActivationSolver(AnalysisSession session,AnalysisDefinition<S> definition){this.session=session;this.definition=definition;bottom=Objects.requireNonNull(definition.bottom());}
     DataflowResult<S> solve() {
-        try {return execute();}finally{for(var entry:entries){for(var index:entry.byFrame.values())index.close();entry.byFrame.clear();}}
+        try {return execute();}finally{for(var entry:entries){for(var index:entry.byFrame.values())index.close();entry.byFrame.clear();}if(collector!=null)collector.close();}
     }
     private DataflowResult<S> execute() {
         for(var model:ActivationSolver.structure(session))entries.add(new EntryRun(model));
@@ -31,7 +66,8 @@ final class BackwardActivationSolver<S> {
             entry.boundaries.computeIfAbsent(location.frame(),f->new IdentityHashMap<>()).merge(boundary.node(),boundary.state(),(a,b)->definition.joinInto(a,b,work).state());joins++;
         }
         for(var entry:entries)entry.start();
-        while(!pending.isEmpty()){var slot=pending.removeFirst();slot.queued=false;pops++;process(slot);collectConditions(slot.region.entry);}
+        while(!pending.isEmpty()){var slot=pending.removeFirst();slot.queued=false;pops++;process(slot);collectSummaries(false);collectConditions(slot.region.entry);}
+        collectSummaries(true);
         var lookup=new IdentityHashMap<ContextView,IdentityHashMap<ProgramIndex.Node,List<AnalysisPoint>>>();
         var ins=new ArrayList<S>();var outs=new ArrayList<S>();long edgeCount=0;
         for(var entry:entries) {
@@ -43,7 +79,8 @@ final class BackwardActivationSolver<S> {
                 }
             }
         }
-        var metrics=new SolverMetrics(ins.size(),edgeCount,joins,nextPoint,attempts,pushes,pops,duplicates,maxSize,transfers,work.operations(),ins.size(),changes,unchanged,deliveries,deliveries,changes,unchanged,0,0,work.joinEntries(),work.compareEntries());
+        long indexProbes=closedIndexProbes;for(var entry:entries)for(var index:entry.byFrame.values())indexProbes+=index.probes();
+        var metrics=new SolverMetrics(ins.size(),edgeCount,joins,nextPoint,attempts,pushes,pops,duplicates,maxSize,transfers,work.operations(),ins.size(),changes,unchanged,deliveries,deliveries,changes,unchanged,0,0,work.joinEntries(),work.compareEntries(),summaryCreated,summaryRetired,summaryLive,summaryPeak,summaryCollections,indexProbes);
         return new DataflowResult<>(lookup,ins.toArray(),outs.toArray(),metrics);
     }
     private void collectConditions(EntryRun entry) {
@@ -100,14 +137,14 @@ final class BackwardActivationSolver<S> {
         Region root;
         EntryRun(ActivationModel model){this.model=model;bdd=model.conditions();}
         void start() {
-            root=new Region(this,null,new Signature(0,Map.of(),Map.of(),Collections.nCopies(model.maxUnwind(),Map.of())));regions.add(root);root.initialize();
+            root=new Region(this,null,new Signature(0,Map.of(),Map.of(),Collections.nCopies(model.maxUnwind(),Map.of())));regions.add(root);summaryCreated();root.initialize();
         }
         Region region(ActivationControl.Frame frame,Signature input,Slot caller,int condition) {
             var candidates=byFrame.get(frame);
             if(candidates!=null){var known=candidates.get(input);if(known!=null)return known;}
             if(!feasible(caller.region,condition,caller))return null;
             if(candidates==null){candidates=new StateIndex<>(indexResources,AnalysisResources.Phase.DOMAIN,a->a.fingerprint,Signature::same);byFrame.put(frame,candidates);}
-            var r=new Region(this,frame,input);candidates.putIfAbsent(input,r);regions.add(r);r.initialize();return r;
+            var r=new Region(this,frame,input);candidates.putIfAbsent(input,r);regions.add(r);summaryCreated();r.initialize();return r;
         }
         Map<ProgramIndex.Node,S> roots() {
             var values=new IdentityHashMap<ProgramIndex.Node,S>();
@@ -126,7 +163,7 @@ final class BackwardActivationSolver<S> {
         final Set<Slot> callers=Collections.newSetFromMap(new IdentityHashMap<>());
         final Set<Slot> waiters=Collections.newSetFromMap(new IdentityHashMap<>());
         final Map<Slot,Integer> incoming=new IdentityHashMap<>();
-        long incomingVersion;
+        long incomingVersion,mark;
         final List<Slot> calls=new ArrayList<>();
         Region(EntryRun entry,ActivationControl.Frame frame,Signature input){this.entry=entry;this.frame=frame;this.input=input;}
         void initialize() {
@@ -145,7 +182,7 @@ final class BackwardActivationSolver<S> {
         final AnalysisPoint point;final Partition in,out;boolean queued;
         Map<Region,Integer> children=new IdentityHashMap<>();
         final Set<Region> watches=Collections.newSetFromMap(new IdentityHashMap<>());
-        Slot(Region region,ProgramIndex.Node node,ActivationModel.Point shape) {
+        Slot(Region region,ProgramIndex.Node node,ActivationModel.Point shape) {recordsSinceSweep++;
             this.region=region;this.node=node;this.shape=shape;point=new AnalysisPoint(nextPoint++,region.entry.model.context(),node);
             in=new Partition(region.entry);out=new Partition(region.entry);
         }

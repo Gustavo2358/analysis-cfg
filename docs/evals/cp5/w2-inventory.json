@@ -24,7 +24,8 @@
     "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/ResidentPageStore.java",
     "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/SolverMetrics.java",
     "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/SolverTopology.java",
-    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/StateIndex.java"
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/StateIndex.java",
+    "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/SummaryCollector.java"
   ],
   "classfiles": [
     "io/github/gustavo2358/analysis/solver/ActivationBoundaries$Key.class",
@@ -99,7 +100,8 @@
     "io/github/gustavo2358/analysis/solver/ResidentPageStore.class",
     "io/github/gustavo2358/analysis/solver/SolverMetrics.class",
     "io/github/gustavo2358/analysis/solver/SolverTopology.class",
-    "io/github/gustavo2358/analysis/solver/StateIndex.class"
+    "io/github/gustavo2358/analysis/solver/StateIndex.class",
+    "io/github/gustavo2358/analysis/solver/SummaryCollector.class"
   ],
   "jdeps_edges": {
     "io.github.gustavo2358.analysis.solver.ActivationBoundaries": [
@@ -270,6 +272,7 @@
       "io.github.gustavo2358.analysis.solver.ResidentPageStore",
       "io.github.gustavo2358.analysis.solver.SolverMetrics",
       "io.github.gustavo2358.analysis.solver.StateIndex",
+      "io.github.gustavo2358.analysis.solver.SummaryCollector",
       "io.github.gustavo2358.analysis.structure.ActivationControl",
       "io.github.gustavo2358.analysis.structure.ActivationControl$Action",
       "io.github.gustavo2358.analysis.structure.ActivationControl$Frame",
@@ -316,9 +319,11 @@
       "java.util.function.Function",
       "java.util.function.IntConsumer",
       "java.util.function.IntPredicate",
+      "java.util.function.ObjLongConsumer",
       "java.util.function.Predicate",
       "java.util.function.Supplier",
       "java.util.function.ToIntFunction",
+      "java.util.function.ToLongFunction",
       "java.util.stream.Stream"
     ],
     "io.github.gustavo2358.analysis.solver.ActivationSolver$1": [
@@ -643,6 +648,7 @@
       "io.github.gustavo2358.analysis.solver.AnalysisPoint",
       "io.github.gustavo2358.analysis.solver.AnalysisResources",
       "io.github.gustavo2358.analysis.solver.AnalysisResources$Limits",
+      "io.github.gustavo2358.analysis.solver.AnalysisResources$Phase",
       "io.github.gustavo2358.analysis.solver.BackwardActivationSolver$1",
       "io.github.gustavo2358.analysis.solver.BackwardActivationSolver$Choice",
       "io.github.gustavo2358.analysis.solver.BackwardActivationSolver$Deferred",
@@ -661,6 +667,7 @@
       "io.github.gustavo2358.analysis.solver.DomainWork",
       "io.github.gustavo2358.analysis.solver.SolverMetrics",
       "io.github.gustavo2358.analysis.solver.StateIndex",
+      "io.github.gustavo2358.analysis.solver.SummaryCollector",
       "io.github.gustavo2358.analysis.structure.ActivationControl",
       "io.github.gustavo2358.analysis.structure.ActivationControl$Action",
       "io.github.gustavo2358.analysis.structure.ActivationControl$Frame",
@@ -707,9 +714,11 @@
       "java.util.function.Consumer",
       "java.util.function.Function",
       "java.util.function.IntConsumer",
+      "java.util.function.ObjLongConsumer",
       "java.util.function.Predicate",
       "java.util.function.Supplier",
       "java.util.function.ToIntFunction",
+      "java.util.function.ToLongFunction",
       "java.util.stream.Stream"
     ],
     "io.github.gustavo2358.analysis.solver.BackwardActivationSolver$1": [
@@ -1382,6 +1391,35 @@
       "java.lang.Throwable",
       "java.util.Objects",
       "java.util.function.BiPredicate",
+      "java.util.function.Predicate",
+      "java.util.function.ToLongFunction"
+    ],
+    "io.github.gustavo2358.analysis.solver.SummaryCollector": [
+      "io.github.gustavo2358.analysis.solver.AnalysisResources",
+      "io.github.gustavo2358.analysis.solver.AnalysisResources$Phase",
+      "io.github.gustavo2358.analysis.solver.AnalysisResources$Pool",
+      "io.github.gustavo2358.analysis.solver.AnalysisResources$Reservation",
+      "java.lang.AutoCloseable",
+      "java.lang.Error",
+      "java.lang.IllegalStateException",
+      "java.lang.Long",
+      "java.lang.Math",
+      "java.lang.Object",
+      "java.lang.RuntimeException",
+      "java.lang.String",
+      "java.lang.Throwable",
+      "java.lang.invoke.CallSite",
+      "java.lang.invoke.LambdaMetafactory",
+      "java.lang.invoke.MethodHandle",
+      "java.lang.invoke.MethodHandles",
+      "java.lang.invoke.MethodHandles$Lookup",
+      "java.lang.invoke.MethodType",
+      "java.util.Arrays",
+      "java.util.List",
+      "java.util.Objects",
+      "java.util.function.BiConsumer",
+      "java.util.function.Consumer",
+      "java.util.function.ObjLongConsumer",
       "java.util.function.ToLongFunction"
     ]
   },
@@ -1456,9 +1494,10 @@
     "io.github.gustavo2358.analysis.solver.PersistentLongMap$Cursor": "Compiled from \"PersistentLongMap.java\"\npublic final class io.github.gustavo2358.analysis.solver.PersistentLongMap$Cursor implements java.lang.AutoCloseable {\n  public boolean advance();\n    descriptor: ()Z\n\n  public long key();\n    descriptor: ()J\n\n  public long value();\n    descriptor: ()J\n\n  public boolean reference();\n    descriptor: ()Z\n\n  public void close();\n    descriptor: ()V\n}\n",
     "io.github.gustavo2358.analysis.solver.PersistentLongMap": "Compiled from \"PersistentLongMap.java\"\npublic final class io.github.gustavo2358.analysis.solver.PersistentLongMap implements java.lang.AutoCloseable {\n  public io.github.gustavo2358.analysis.solver.PersistentLongMap(io.github.gustavo2358.analysis.solver.CanonicalTupleArena, io.github.gustavo2358.analysis.solver.AnalysisResources, io.github.gustavo2358.analysis.solver.AnalysisResources$Phase);\n    descriptor: (Lio/github/gustavo2358/analysis/solver/CanonicalTupleArena;Lio/github/gustavo2358/analysis/solver/AnalysisResources;Lio/github/gustavo2358/analysis/solver/AnalysisResources$Phase;)V\n\n  public synchronized long nodeVisits();\n    descriptor: ()J\n\n  public synchronized long pathCopies();\n    descriptor: ()J\n\n  public synchronized long size(long);\n    descriptor: (J)J\n\n  public synchronized long get(long, long);\n    descriptor: (JJ)J\n\n  public synchronized boolean contains(long, long);\n    descriptor: (JJ)Z\n\n  public synchronized boolean reference(long, long);\n    descriptor: (JJ)Z\n\n  public synchronized long put(long, long, long);\n    descriptor: (JJJ)J\n\n  public synchronized long putReference(long, long, long);\n    descriptor: (JJJ)J\n\n  public synchronized long remove(long, long);\n    descriptor: (JJ)J\n\n  public synchronized long join(long, long, boolean, java.util.function.LongBinaryOperator);\n    descriptor: (JJZLjava/util/function/LongBinaryOperator;)J\n\n  public synchronized long join(long, long, boolean, java.util.function.LongBinaryOperator, java.util.function.LongUnaryOperator);\n    descriptor: (JJZLjava/util/function/LongBinaryOperator;Ljava/util/function/LongUnaryOperator;)J\n\n  public synchronized long mapValues(long, boolean, java.util.function.LongUnaryOperator);\n    descriptor: (JZLjava/util/function/LongUnaryOperator;)J\n\n  public synchronized io.github.gustavo2358.analysis.solver.PersistentLongMap$Cursor cursor(long);\n    descriptor: (J)Lio/github/gustavo2358/analysis/solver/PersistentLongMap$Cursor;\n\n  public synchronized void close();\n    descriptor: ()V\n}\n",
     "io.github.gustavo2358.analysis.solver.ResidentPageStore": "Compiled from \"ResidentPageStore.java\"\npublic final class io.github.gustavo2358.analysis.solver.ResidentPageStore implements io.github.gustavo2358.analysis.solver.PageStore {\n  public io.github.gustavo2358.analysis.solver.ResidentPageStore(int, io.github.gustavo2358.analysis.solver.AnalysisResources);\n    descriptor: (ILio/github/gustavo2358/analysis/solver/AnalysisResources;)V\n\n  public io.github.gustavo2358.analysis.solver.ResidentPageStore(int, io.github.gustavo2358.analysis.solver.AnalysisResources, io.github.gustavo2358.analysis.solver.AnalysisResources$Phase);\n    descriptor: (ILio/github/gustavo2358/analysis/solver/AnalysisResources;Lio/github/gustavo2358/analysis/solver/AnalysisResources$Phase;)V\n\n  public int pageBytes();\n    descriptor: ()I\n\n  public synchronized long allocate();\n    descriptor: ()J\n\n  public synchronized void read(long, int, byte[], int, int);\n    descriptor: (JI[BII)V\n\n  public synchronized void write(long, int, byte[], int, int);\n    descriptor: (JI[BII)V\n\n  public synchronized void release(long);\n    descriptor: (J)V\n\n  public synchronized void flush();\n    descriptor: ()V\n\n  public synchronized io.github.gustavo2358.analysis.solver.PageStore$Statistics statistics();\n    descriptor: ()Lio/github/gustavo2358/analysis/solver/PageStore$Statistics;\n\n  public synchronized void close();\n    descriptor: ()V\n}\n",
-    "io.github.gustavo2358.analysis.solver.SolverMetrics": "Compiled from \"SolverMetrics.java\"\npublic final class io.github.gustavo2358.analysis.solver.SolverMetrics extends java.lang.Record {\n  public io.github.gustavo2358.analysis.solver.SolverMetrics(long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long);\n    descriptor: (JJJJJJJJJJJJJJJJJJJJJJ)V\n\n  public final java.lang.String toString();\n    descriptor: ()Ljava/lang/String;\n\n  public final int hashCode();\n    descriptor: ()I\n\n  public final boolean equals(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)Z\n\n  public long analysisPoints();\n    descriptor: ()J\n\n  public long contextualEdges();\n    descriptor: ()J\n\n  public long boundaryJoins();\n    descriptor: ()J\n\n  public long initializationAttempts();\n    descriptor: ()J\n\n  public long worklistAttempts();\n    descriptor: ()J\n\n  public long worklistPushes();\n    descriptor: ()J\n\n  public long nodesPopped();\n    descriptor: ()J\n\n  public long duplicatePushesSuppressed();\n    descriptor: ()J\n\n  public long maxWorklistSize();\n    descriptor: ()J\n\n  public long nodesTransferred();\n    descriptor: ()J\n\n  public long operationsTransferred();\n    descriptor: ()J\n\n  public long firstPublications();\n    descriptor: ()J\n\n  public long publishedStatesChanged();\n    descriptor: ()J\n\n  public long publishedStatesUnchanged();\n    descriptor: ()J\n\n  public long edgeTransferInvocations();\n    descriptor: ()J\n\n  public long edgeContributionJoins();\n    descriptor: ()J\n\n  public long accumulatorStatesChanged();\n    descriptor: ()J\n\n  public long accumulatorStatesUnchanged();\n    descriptor: ()J\n\n  public long predecessorContributionReads();\n    descriptor: ()J\n\n  public long successorContributionReads();\n    descriptor: ()J\n\n  public long joinEntriesVisited();\n    descriptor: ()J\n\n  public long stateCompareEntries();\n    descriptor: ()J\n}\n",
+    "io.github.gustavo2358.analysis.solver.SolverMetrics": "Compiled from \"SolverMetrics.java\"\npublic final class io.github.gustavo2358.analysis.solver.SolverMetrics extends java.lang.Record {\n  public io.github.gustavo2358.analysis.solver.SolverMetrics(long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long);\n    descriptor: (JJJJJJJJJJJJJJJJJJJJJJ)V\n\n  public io.github.gustavo2358.analysis.solver.SolverMetrics(long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long);\n    descriptor: (JJJJJJJJJJJJJJJJJJJJJJJJJJJJ)V\n\n  public final java.lang.String toString();\n    descriptor: ()Ljava/lang/String;\n\n  public final int hashCode();\n    descriptor: ()I\n\n  public final boolean equals(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)Z\n\n  public long analysisPoints();\n    descriptor: ()J\n\n  public long contextualEdges();\n    descriptor: ()J\n\n  public long boundaryJoins();\n    descriptor: ()J\n\n  public long initializationAttempts();\n    descriptor: ()J\n\n  public long worklistAttempts();\n    descriptor: ()J\n\n  public long worklistPushes();\n    descriptor: ()J\n\n  public long nodesPopped();\n    descriptor: ()J\n\n  public long duplicatePushesSuppressed();\n    descriptor: ()J\n\n  public long maxWorklistSize();\n    descriptor: ()J\n\n  public long nodesTransferred();\n    descriptor: ()J\n\n  public long operationsTransferred();\n    descriptor: ()J\n\n  public long firstPublications();\n    descriptor: ()J\n\n  public long publishedStatesChanged();\n    descriptor: ()J\n\n  public long publishedStatesUnchanged();\n    descriptor: ()J\n\n  public long edgeTransferInvocations();\n    descriptor: ()J\n\n  public long edgeContributionJoins();\n    descriptor: ()J\n\n  public long accumulatorStatesChanged();\n    descriptor: ()J\n\n  public long accumulatorStatesUnchanged();\n    descriptor: ()J\n\n  public long predecessorContributionReads();\n    descriptor: ()J\n\n  public long successorContributionReads();\n    descriptor: ()J\n\n  public long joinEntriesVisited();\n    descriptor: ()J\n\n  public long stateCompareEntries();\n    descriptor: ()J\n\n  public long summaryVersionsCreated();\n    descriptor: ()J\n\n  public long summaryVersionsRetired();\n    descriptor: ()J\n\n  public long liveSummaryVersions();\n    descriptor: ()J\n\n  public long peakLiveSummaryVersions();\n    descriptor: ()J\n\n  public long summaryCollections();\n    descriptor: ()J\n\n  public long summaryIndexProbes();\n    descriptor: ()J\n}\n",
     "io.github.gustavo2358.analysis.solver.SolverTopology": "Compiled from \"SolverTopology.java\"\nfinal class io.github.gustavo2358.analysis.solver.SolverTopology {\n}\n",
-    "io.github.gustavo2358.analysis.solver.StateIndex": "Compiled from \"StateIndex.java\"\nfinal class io.github.gustavo2358.analysis.solver.StateIndex<S, V> implements java.lang.AutoCloseable {\n  public void close();\n    descriptor: ()V\n}\n"
+    "io.github.gustavo2358.analysis.solver.StateIndex": "Compiled from \"StateIndex.java\"\nfinal class io.github.gustavo2358.analysis.solver.StateIndex<S, V> implements java.lang.AutoCloseable {\n  public void close();\n    descriptor: ()V\n}\n",
+    "io.github.gustavo2358.analysis.solver.SummaryCollector": "Compiled from \"SummaryCollector.java\"\nfinal class io.github.gustavo2358.analysis.solver.SummaryCollector<N> implements java.lang.AutoCloseable {\n  public void close();\n    descriptor: ()V\n}\n"
   },
   "effective_maven": [
     "io.github.gustavo2358.analysis:analysis-kernel:jar:0.1.0-SNAPSHOT",

@@ -16,6 +16,41 @@ final class ActivationSolver<S> {
     private final S bottom;
     private long joins,initializations,attempts,pushes,pops,duplicates,maxSize,transfers,edgeTransfers,edgeJoins,changed,unchanged;
     private int nextPoint;
+    private long summaryCreated,summaryLive,summaryPeak;
+    private void summaryCreated(){summaryCreated++;summaryLive++;recordsSinceSweep++;summaryPeak=Math.max(summaryPeak,summaryLive);}
+    private long summaryRetired,summaryCollections,recordsSinceSweep,sweepThreshold=64,closedIndexProbes;
+    private SummaryCollector<Region> collector;
+    private void collectSummaries(boolean force) {
+        if(!force&&recordsSinceSweep<sweepThreshold)return;
+        if(collector==null)collector=new SummaryCollector<>(indexResources,AnalysisResources.Phase.DOMAIN,r->r.mark,(r,token)->r.mark=token);
+        long[] units={entries.size()+pending.size()};
+        collector.mark(visit->{for(var entry:entries)visit.accept(entry.root);for(var slot:pending)visit.accept(slot.region);},(region,visit)->{
+            units[0]+=1+region.slots.size();indexResources.work(1+region.slots.size(),AnalysisResources.Phase.DOMAIN);
+            for(var slot:region.slots.values()) {
+                units[0]+=slot.children.size()+slot.watches.size();
+                for(var child:slot.children.keySet())visit.accept(child);
+                for(var watched:slot.watches)visit.accept(watched);
+            }
+        });
+        feasibleCache.clear();deferredCache.clear();finalWitnesses.clear();
+        for(var entry:entries) {
+            long removed=collector.retain(entry.regions,this::retireSummary);summaryRetired+=removed;summaryLive-=removed;
+            var iterator=entry.byFrame.entrySet().iterator();
+            while(iterator.hasNext()) {
+                var index=iterator.next().getValue();index.retainEntries(collector::isMarked);
+                if(index.size()==0){closedIndexProbes+=index.probes();index.close();iterator.remove();}
+            }
+        }
+        summaryCollections++;recordsSinceSweep=0;sweepThreshold=Math.max(64,units[0]);
+    }
+    private void retireSummary(Region region) {
+        for(var slot:region.slots.values()) {
+            for(var child:slot.children.keySet()){child.callers.remove(slot);if(child.incoming.remove(slot)!=null)child.incomingVersion++;}
+            for(var watched:slot.watches)watched.waiters.remove(slot);
+            slot.children.clear();slot.watches.clear();slot.anchors.pieces=List.of();slot.outputs.pieces=List.of();
+        }
+        region.slots.clear();region.incoming.clear();region.callers.clear();region.waiters.clear();region.exits.clear();region.recursive.clear();region.environment=0;
+    }
     private boolean structural;
     private record Need(Object region,int condition) { }
     private final Map<Need,Boolean> feasibleCache=new HashMap<>();
@@ -27,7 +62,7 @@ final class ActivationSolver<S> {
     DataflowResult<S> solve() {
         try {execute();return result();}finally{closeIndexes();}
     }
-    private void closeIndexes(){for(var entry:entries){for(var index:entry.byFrame.values())index.close();entry.byFrame.clear();}}
+    private void closeIndexes(){for(var entry:entries){for(var index:entry.byFrame.values())index.close();entry.byFrame.clear();}if(collector!=null)collector.close();}
     private void execute() {
         var models=structural?List.<ActivationModel>of():structure(session);
         for(var context:session.contexts())entries.add(new EntryRun(context,models.stream().filter(m->m.context()==context).findFirst().orElse(null)));
@@ -47,8 +82,10 @@ final class ActivationSolver<S> {
         while(!pending.isEmpty()) {
             var slot=pending.removeFirst();slot.queued=false;pops++;transfers++;
             process(slot);
+            if(!structural)collectSummaries(false);
             collectConditions(slot.region.entry);
         }
+        if(!structural)collectSummaries(true);
     }
     private void collectConditions(EntryRun entry) {
         if(!entry.bdd.collectionDue())return;
@@ -86,8 +123,9 @@ final class ActivationSolver<S> {
             }
         }
         checkRecursion();
+        long indexProbes=closedIndexProbes;for(var entry:entries)for(var index:entry.byFrame.values())indexProbes+=index.probes();
         var metrics=new SolverMetrics(ins.size(),edgeCount,joins,initializations,attempts,pushes,pops,duplicates,maxSize,
-            transfers,work.operations(),ins.size(),changed,unchanged,edgeTransfers,edgeJoins,changed,unchanged,0,0,work.joinEntries(),work.compareEntries());
+            transfers,work.operations(),ins.size(),changed,unchanged,edgeTransfers,edgeJoins,changed,unchanged,0,0,work.joinEntries(),work.compareEntries(),summaryCreated,summaryRetired,summaryLive,summaryPeak,summaryCollections,indexProbes);
         return new DataflowResult<>(lookup,ins.toArray(),outs.toArray(),metrics);
     }
     private void checkRecursion() {
@@ -267,14 +305,14 @@ final class ActivationSolver<S> {
             bdd=model==null?new BooleanConditions():model.conditions();
         }
         void start() {
-            root=new Region(this,null,bottom);regions.add(root);root.accept(1);
+            root=new Region(this,null,bottom);regions.add(root);summaryCreated();root.accept(1);
         }
         Region region(ActivationControl.Frame frame,S input,Slot caller,int condition) {
             var candidates=byFrame.get(frame);
             if(candidates!=null){var known=candidates.get(input);if(known!=null)return known;}
             if(!structural&&!feasible(caller.region,condition,caller))return null;
             if(candidates==null){candidates=new StateIndex<>(indexResources,structural?AnalysisResources.Phase.CONTROL:AnalysisResources.Phase.DOMAIN,definition::stateFingerprint,(a,b)->definition.equivalent(a,b,work));byFrame.put(frame,candidates);}
-            var result=new Region(this,frame,input);candidates.putIfAbsent(input,result);regions.add(result);return result;
+            var result=new Region(this,frame,input);candidates.putIfAbsent(input,result);regions.add(result);summaryCreated();return result;
         }
     }
     private final class Region {
@@ -286,7 +324,7 @@ final class ActivationSolver<S> {
         final Set<Slot> callers=Collections.newSetFromMap(new IdentityHashMap<>());
         final Set<Slot> waiters=Collections.newSetFromMap(new IdentityHashMap<>());
         final Map<Slot,Integer> incoming=new IdentityHashMap<>();
-        long incomingVersion;
+        long incomingVersion,mark;
         final Map<ProgramIndex.Node,Integer> recursive=new IdentityHashMap<>();
         int environment;
         Region(EntryRun entry,ActivationControl.Frame frame,S input){this.entry=entry;this.frame=frame;this.input=input;}
@@ -312,7 +350,7 @@ final class ActivationSolver<S> {
         boolean queued;
         Slot(Region region,ProgramIndex.Node node) {
             this.region=region;this.node=node;point=new AnalysisPoint(nextPoint++,region.entry.context,node);
-            anchors=new Partition(region.entry);outputs=new Partition(region.entry);moves=region.entry.model==null?region.entry.control.moves(node,region.frame):region.entry.model.shapes().get(region.frame).points().get(node).moves();initializations++;
+            anchors=new Partition(region.entry);outputs=new Partition(region.entry);moves=region.entry.model==null?region.entry.control.moves(node,region.frame):region.entry.model.shapes().get(region.frame).points().get(node).moves();initializations++;recordsSinceSweep++;
         }
     }
     private final class Piece {

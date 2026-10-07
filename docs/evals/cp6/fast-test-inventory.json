@@ -644,10 +644,22 @@
       "distinctInputsDoNotRequirePairwiseSemanticComparisons",
       "fingerprintCollisionsAndDifferentObjectEqualityNeverMergeSemanticInputs",
       "unregisteredConstantFingerprintRemainsSemanticallyExact",
-      "rejectedCapacityGrowthPreservesExistingInputsAndClosesEveryLease"
+      "rejectedCapacityGrowthPreservesExistingInputsAndClosesEveryLease",
+      "liveFilteringCompactsCapacityAndNeverRecomputesFingerprints",
+      "rejectedLiveFilteringDoesNotLoseAnyOldInput"
     ],
     "io.github.gustavo2358.analysis.structure.StateIndexSolverTest": [
       "registeredAndCollidingFingerprintsPreserveGeneratedExactStacksInBothDirections"
+    ],
+    "io.github.gustavo2358.analysis.solver.SummaryCollectorTest": [
+      "rootedSccsAndSharedTargetsSurviveWhileUnrootedCyclesAreRetired",
+      "freshCollectorsCannotConfuseOldMarksAndFailedScratchAdmissionPreservesInventory"
+    ],
+    "io.github.gustavo2358.analysis.structure.LiveSummaryVersionsTest": [
+      "collectionsDuringConvergencePreserveEveryExactStackInAndOut",
+      "oneCallerRetainsLiveVersionsInsteadOfEveryHistoricalInputInBothDirections",
+      "aCallerThatKeepsItsOldInputSurvivesAnotherCallersVersionChurn",
+      "nestedSharedInputsAndDeferredWaitersDoNotRootEveryExpiredParent"
     ]
   },
   "analysis-launcher": {

@@ -561,3 +561,48 @@ discarded analysis. The new check was RED on the old preparation;63focused value
 including independent concrete/structural Regional oracles, pass after substitution.
 Repository FAST848required methods and all boundaries pass in141.649s; the discarded
 stage was preparation only, never a previously executed RD solve.
+
+### Live summary versions (AS-W05 resident bridge)
+
+Activation summaries are no longer rooted solely by having been indexed once.
+`SummaryCollector` marks Entry roots, pending work and the current child/wait
+relations at a safepoint after process/reconcile. Incoming/callers/waiters backlinks,
+lookup indices and feasibility hints do not independently root a summary. Marking
+is iterative, uses intrusive primitive tokens and a leased scratch queue, and
+collects unrooted SCCs as well as isolated historical inputs. Retirement detaches
+backlinks and cached indices; a future demand may evaluate the exact input again.
+Backward return-call inventories are detached with their retired owner.
+
+Published partitions belonging to live slots remain intact. This is reachability
+collection, not a state-order substitution, widening or permission to discard an
+old Scalar candidate/support. In particular it does not assume the unresolved
+multi-read law. Pending work and waiter relations remain conservative strong roots;
+this bridge does not yet prove a minimal live closure for arbitrary reactive graphs.
+The Boolean structural pass keeps its inventory until model compilation.
+
+Collection frequency follows work created since the preceding pass and the last
+live slot/link count. Thus a growing live graph is not globally rescanned after
+every new input. At convergence a final pass precedes result replay. Index filtering
+uses cached fingerprints, checks exact live values and compacts capacity with a
+staged reservation; quota rejection preserves the old lookup table. A failed mark
+cannot authorize retirement, and every scratch lease closes on failure.
+
+Tests cover rooted/unrooted SCCs against independent BFS, mark-token reuse, scratch
+and staged-index rejection, old-input callers alongside version churn, nested shared
+inputs/waiters, and collection during convergence against every IN/OUT state of an
+independent explicit-stack oracle in both directions. The initial4096input lifetime
+witness failed on the unchanged solver. The full184method kernel passed before the
+additional convergence-oracle method; FAST now selects all eight added lifetime,
+collector and index-filter methods. Large original inputs curves remain separate
+qualification, not implied by these small tests.
+
+The six new SolverMetrics fields record created/retired/final/peak versions,
+collection passes and index probes. The existing22argument metrics constructor is
+retained. The resident compatibility resource scope still uses an unlimited budget;
+borrowed opaque domain objects and all solver graph metadata are not yet fully
+paged/accounted. Managed end-to-end execution and formal continuation sharing remain
+uncompleted AS-W04/W09 obligations.
+
+Checkpoint gate: FAST864required methods and all source/compiled/transport boundaries
+passed with zero failures/errors/skips in143.070s. This gate includes the additional
+convergence oracle and preserves all prior required methods and forbidden edges.
