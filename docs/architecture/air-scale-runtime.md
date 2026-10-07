@@ -134,6 +134,8 @@ outputs. Storage correctness alone does not establish those transfer laws.
 
 `AnalysisResources` reserves coarse capacities before allocation and distinguishes
 resident/scratch heap, direct buffers, temporary disk, descriptors, work and output.
+Staged capacity can transfer to a same-pool owner without recharging or briefly
+releasing bytes. Cross-ledger, cross-pool, self and closed transfers are rejected.
 `PageStore` is an exact core port. The adapter `FilePageStore` uses positional
 FileChannel I/O, a fixed primitive cache directory, and checksums for payloads,
 identities and the disk free list. Cache deletion closes probe clusters instead of
@@ -166,6 +168,18 @@ handles; hash equality alone is insufficient. It must be transitive, determinist
 and bound to the owning arena/profile. The index owns no external key payload:
 callers retain/release those keys with their graph roots. Comparator failure aborts
 the index instead of certifying partial lookup or stable state.
+
+Its ordered cursor leases a fixed traversal stack under the scratch quota, visits
+records without materializing them, and checks the owning index version. Mutation
+attempts invalidate active cursors; owner close releases all cursor reservations.
+Closing or exhausting a cursor detaches its owner and traversal buffers.
+
+`MemoryPageStore` is an explicit resident backend for the same port. It retains
+reusable payload capacity under heap quota and reserves the old-plus-new metadata
+growth peak together with the next payload before allocation. It claims no bounded
+working set beyond that resident quota. The same primitive execution transcript
+and independent ordered-map oracle run on it and the forced-eviction file backend.
+Neither backend can revive an obsolete page generation.
 
 These primitives are not yet wired into production analysis. Passing their tests
 does not establish bounded residency for AIR decoding, summaries, proofs, queues,

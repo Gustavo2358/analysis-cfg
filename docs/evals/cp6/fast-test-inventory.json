@@ -296,7 +296,15 @@
       "exactExternalKeyComparisonSeparatesCollisionsAndUnifiesOnlyEqualKeys",
       "repeatedRetirementReleasesPagesAndBoundsDiskByLiveIndexSize",
       "closingOneIndexKeepsOtherOwnersAndRejectsUseAfterClose",
-      "comparatorFailureCannotExposeAnIndexAsStableOrReturnPartialLookup"
+      "comparatorFailureCannotExposeAnIndexAsStableOrReturnPartialLookup",
+      "orderedCursorEnumeratesEveryCanonicalRecordUnderForcedSpill",
+      "mutationAndOwnerCloseInvalidateCursorLeasesWithoutLeakingScratch",
+      "emptyCursorAndDeniedScratchNeverMaterializeTheIndexOrLoseFacts"
+    ],
+    "io.github.gustavo2358.analysis.adapters.MemoryPageStoreTest": [
+      "memoryAndForcedFileBackendsProduceTheSamePrimitiveExecutionTranscript",
+      "metadataGrowthReservesTheOldPlusNewPeakBeforeAllocatingAndKeepsOldPagesExact",
+      "staleGenerationsNeverReviveAndReusedPayloadIsZeroWithFixedCapacity"
     ]
   },
   "analysis-dataflow": {
@@ -529,7 +537,9 @@
       "directDiskAndDescriptorsHaveIndependentQuotas",
       "workAndOutputAreCumulativeRatherThanEvictableAllocations",
       "hugeAmountsCannotWrapAroundAndNegativeChargesAreInvalid",
-      "zeroScratchQuotaIsIndependentFromHeapQuota"
+      "zeroScratchQuotaIsIndependentFromHeapQuota",
+      "stagedCapacityTransfersWithoutRechargingOrPrematurelyReleasingBytes",
+      "capacityTransferRejectsForeignPoolOwnerSelfAndClosedReservationsAtomically"
     ]
   },
   "analysis-launcher": {

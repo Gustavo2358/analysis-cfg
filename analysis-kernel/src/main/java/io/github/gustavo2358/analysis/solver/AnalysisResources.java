@@ -48,6 +48,18 @@ public final class AnalysisResources {
         private boolean closed;
         private Reservation(Pool pool, long amount) { this.pool = pool; this.amount = amount; }
         public long amount() { synchronized (AnalysisResources.this) { return amount; } }
+        private AnalysisResources owner() { return AnalysisResources.this; }
+        /** Commit staged capacity into this owner without double-charging or releasing live bytes. */
+        public void absorb(Reservation staged) {
+            Objects.requireNonNull(staged);
+            synchronized (AnalysisResources.this) {
+                if (staged == this || staged.owner() != AnalysisResources.this || staged.pool != pool)
+                    throw new IllegalArgumentException("capacity transfer requires distinct reservations of the same owner and pool");
+                if (closed || staged.closed) throw new IllegalStateException("reservation is closed");
+                amount += staged.amount; // Both capacities are already in the same bounded pool total.
+                staged.amount = 0; staged.closed = true;
+            }
+        }
         public void grow(long additional, Phase phase) {
             synchronized (AnalysisResources.this) {
                 if (closed) throw new IllegalStateException("reservation is closed");

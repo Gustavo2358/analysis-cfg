@@ -101,4 +101,32 @@ final class AnalysisResourcesTest {
         assertEquals(AnalysisResources.Resource.SCRATCH, exhausted.resource());
         assertEquals(0, resources.heapUsed());
     }
+
+    @Test void stagedCapacityTransfersWithoutRechargingOrPrematurelyReleasingBytes() {
+        var resources = resources(100, 100);
+        var staged = resources.reserve(AnalysisResources.Pool.RESIDENT, 30, AnalysisResources.Phase.INDEX);
+        try (var owner = resources.reserve(AnalysisResources.Pool.RESIDENT, 70, AnalysisResources.Phase.INDEX)) {
+            owner.absorb(staged);
+            assertEquals(100, owner.amount()); assertEquals(0, staged.amount());
+            assertEquals(100, resources.heapUsed()); assertEquals(100, resources.heapPeak());
+            staged.close(); assertEquals(100, resources.heapUsed());
+            assertThrows(IllegalStateException.class, () -> staged.grow(1, AnalysisResources.Phase.INDEX));
+        } finally { staged.close(); }
+        assertEquals(0, resources.heapUsed());
+    }
+
+    @Test void capacityTransferRejectsForeignPoolOwnerSelfAndClosedReservationsAtomically() {
+        var resources = resources(100, 100); var foreign = resources(100, 100);
+        try (var owner = resources.reserve(AnalysisResources.Pool.RESIDENT, 10, AnalysisResources.Phase.DOMAIN);
+             var scratch = resources.reserve(AnalysisResources.Pool.SCRATCH, 20, AnalysisResources.Phase.DOMAIN);
+             var other = foreign.reserve(AnalysisResources.Pool.RESIDENT, 30, AnalysisResources.Phase.DOMAIN)) {
+            assertThrows(IllegalArgumentException.class, () -> owner.absorb(owner));
+            assertThrows(IllegalArgumentException.class, () -> owner.absorb(scratch));
+            assertThrows(IllegalArgumentException.class, () -> owner.absorb(other));
+            var released = resources.reserve(AnalysisResources.Pool.RESIDENT, 1, AnalysisResources.Phase.DOMAIN);
+            released.close(); assertThrows(IllegalStateException.class, () -> owner.absorb(released));
+            assertEquals(10, owner.amount()); assertEquals(30, resources.heapUsed()); assertEquals(30, foreign.heapUsed());
+        }
+        assertEquals(0, resources.heapUsed()); assertEquals(0, foreign.heapUsed());
+    }
 }

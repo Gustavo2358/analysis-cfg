@@ -111,4 +111,53 @@ final class PagedLongIndexTest {
             index.close(); assertEquals(0, store.statistics().livePages());
         }
     }
+
+    @Test void orderedCursorEnumeratesEveryCanonicalRecordUnderForcedSpill() {
+        var resources = resources();
+        try (var store = new FilePageStore(directory, 128, 1, resources);
+             var index = new PagedLongIndex(store, resources, AnalysisResources.Phase.SORT)) {
+            for (long key = 1023; key >= 0; key--) index.intern(key, key + 1);
+            long baseline = resources.heapUsed();
+            try (var cursor = index.cursor()) {
+                for (long key = 0; key < 1024; key++) {
+                    assertTrue(cursor.advance()); assertEquals(key, cursor.key()); assertEquals(key + 1, cursor.value());
+                }
+                assertFalse(cursor.advance()); assertFalse(cursor.advance());
+                assertThrows(java.util.NoSuchElementException.class, cursor::key);
+            }
+            assertEquals(baseline, resources.heapUsed());
+            assertEquals(0, resources.used(AnalysisResources.Pool.SCRATCH));
+        }
+    }
+
+    @Test void mutationAndOwnerCloseInvalidateCursorLeasesWithoutLeakingScratch() {
+        var resources = resources();
+        try (var store = new FilePageStore(directory, 128, 1, resources)) {
+            var index = new PagedLongIndex(store, resources, AnalysisResources.Phase.DOMAIN);
+            index.intern(1, 11);
+            var first = index.cursor(); var second = index.cursor();
+            assertTrue(first.advance()); index.intern(2, 12);
+            assertThrows(IllegalStateException.class, first::advance);
+            assertThrows(IllegalStateException.class, second::advance);
+            first.close(); second.close();
+            var remaining = index.cursor(); assertTrue(remaining.advance());
+            index.close(); assertThrows(IllegalStateException.class, remaining::value);
+            remaining.close(); assertEquals(0, resources.used(AnalysisResources.Pool.SCRATCH));
+            assertEquals(0, store.statistics().livePages());
+        }
+        assertEquals(0, resources.heapUsed());
+    }
+
+    @Test void emptyCursorAndDeniedScratchNeverMaterializeTheIndexOrLoseFacts() {
+        var resources = new AnalysisResources(new AnalysisResources.Limits(16_384, 0, 0,
+                16_000_000, 2, 1_000_000, 1_000_000));
+        try (var store = new FilePageStore(directory, 128, 1, resources);
+             var index = new PagedLongIndex(store, resources, AnalysisResources.Phase.REPLAY)) {
+            try (var empty = index.cursor()) { assertFalse(empty.advance()); }
+            index.intern(0, 9);
+            assertEquals(AnalysisResources.Resource.SCRATCH, assertThrows(AnalysisResources.Exhausted.class,
+                    index::cursor).resource());
+            assertEquals(9, index.find(0)); assertEquals(1, index.size());
+        }
+    }
 }

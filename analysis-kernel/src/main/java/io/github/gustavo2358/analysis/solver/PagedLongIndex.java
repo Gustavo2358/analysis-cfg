@@ -22,7 +22,8 @@ public final class PagedLongIndex implements AutoCloseable {
     private long[] teardownPages;
     private int[] teardownNext;
     private int[] teardownLimits;
-    private long root, size;
+    private long root, size, version;
+    private Cursor cursors;
     private boolean closed, failed;
 
     public PagedLongIndex(PageStore store, AnalysisResources resources, AnalysisResources.Phase phase) {
@@ -40,6 +41,16 @@ public final class PagedLongIndex implements AutoCloseable {
     }
 
     public synchronized long size() { open(); return size; }
+
+    /** Exact ordered view; mutation attempts invalidate it, and owner close releases its scratch. */
+    public synchronized Cursor cursor() {
+        open();
+        Cursor cursor = new Cursor(this);
+        cursor.next = cursors;
+        if (cursors != null) cursors.previous = cursor;
+        cursors = cursor;
+        return cursor;
+    }
 
     public synchronized long find(long key) {
         open();
@@ -59,6 +70,7 @@ public final class PagedLongIndex implements AutoCloseable {
     public synchronized long intern(long key, long value) {
         open();
         if (value <= 0) throw new IllegalArgumentException("canonical values must be positive handles");
+        mutate();
         try {
             if (root == 0) root = node(true);
             if (count(root) == maximum) {
@@ -92,6 +104,7 @@ public final class PagedLongIndex implements AutoCloseable {
 
     public synchronized boolean remove(long key) {
         open();
+        mutate();
         try {
             boolean removed = delete(key);
             if (root != 0 && count(root) == 0) {
@@ -229,9 +242,118 @@ public final class PagedLongIndex implements AutoCloseable {
         store.write(page, slot * Long.BYTES, word, 0, Long.BYTES);
     }
     private void open() { if (closed || failed) throw new IllegalStateException("index is closed or aborted"); }
+    private void mutate() {
+        if (version == Long.MAX_VALUE) throw new IllegalStateException("index version space exhausted");
+        version++;
+    }
+
+    /** Fixed-size leased traversal state; no row objects or whole-index materialization. */
+    public static final class Cursor implements AutoCloseable {
+        private volatile PagedLongIndex owner;
+        private final long version;
+        private final AnalysisResources.Reservation reservation;
+        private Cursor previous, next;
+        private long[] pages;
+        private int[] events, counts;
+        private boolean[] leaves;
+        private int depth = -1;
+        private long key, value;
+        private volatile boolean closed, exhausted;
+        private boolean positioned;
+
+        private Cursor(PagedLongIndex owner) {
+            this.owner = owner; version = owner.version;
+            boolean empty = owner.root == 0;
+            reservation = owner.resources.reserve(empty ? AnalysisResources.Pool.RESIDENT : AnalysisResources.Pool.SCRATCH,
+                    empty ? 256 : 2048, owner.phase);
+            try {
+                if (!empty) {
+                    pages = new long[64]; events = new int[64]; counts = new int[64]; leaves = new boolean[64];
+                    push(owner, owner.root);
+                }
+            } catch (RuntimeException exception) {
+                reservation.close(); this.owner = null;
+                if (exception instanceof PageStore.Failure) owner.failed = true;
+                throw exception;
+            }
+        }
+        private void push(PagedLongIndex owner, long page) {
+            depth++;
+            if (depth == pages.length) throw new PageStore.Failure(PageStore.Reason.CORRUPT, "cursor depth exceeds 64-bit representability");
+            pages[depth] = page; events[depth] = 0;
+            leaves[depth] = owner.leaf(page); counts[depth] = owner.count(page);
+        }
+        public boolean advance() {
+            if (closed) throw new IllegalStateException("cursor is closed");
+            if (exhausted) return false;
+            PagedLongIndex current = owner;
+            if (current == null) throw new IllegalStateException("cursor has no live owner");
+            synchronized (current) {
+                requireVersion(current); positioned = false;
+                try {
+                    while (depth >= 0) {
+                        int event = events[depth], n = counts[depth];
+                        long page = pages[depth];
+                        if (leaves[depth]) {
+                            if (event == n) { depth--; continue; }
+                            events[depth]++; key = current.key(page, event); value = current.value(page, event);
+                            positioned = true; return true;
+                        }
+                        if (event > n * 2) { depth--; continue; }
+                        events[depth]++;
+                        if ((event & 1) == 0) push(current, current.child(page, event / 2));
+                        else {
+                            int at = event / 2;
+                            key = current.key(page, at); value = current.value(page, at);
+                            positioned = true; return true;
+                        }
+                    }
+                    exhausted = true; detach(current); return false;
+                } catch (RuntimeException exception) {
+                    current.failed = true; closed = true; detach(current); throw exception;
+                }
+            }
+        }
+        public long key() { return selected(true); }
+        public long value() { return selected(false); }
+        private long selected(boolean keyRequested) {
+            if (closed) throw new IllegalStateException("cursor is closed");
+            PagedLongIndex current = owner;
+            if (current == null) throw new java.util.NoSuchElementException("cursor has no current record");
+            synchronized (current) {
+                requireVersion(current);
+                if (!positioned) throw new java.util.NoSuchElementException("cursor has no current record");
+                return keyRequested ? key : value;
+            }
+        }
+        private void requireVersion(PagedLongIndex current) {
+            if (closed) throw new IllegalStateException("cursor is closed");
+            current.open();
+            if (version != current.version) {
+                closed = true; detach(current);
+                throw new IllegalStateException("index mutation invalidated cursor");
+            }
+        }
+        private void detach(PagedLongIndex current) {
+            if (previous == null) current.cursors = next; else previous.next = next;
+            if (next != null) next.previous = previous;
+            previous = next = null; positioned = false; key = value = 0;
+            pages = null; events = null; counts = null; leaves = null;
+            reservation.close(); owner = null;
+        }
+        @Override public void close() {
+            PagedLongIndex current = owner;
+            if (current == null) { closed = true; return; }
+            synchronized (current) {
+                if (owner == null) { closed = true; return; }
+                closed = true; detach(current);
+            }
+        }
+    }
 
     @Override public synchronized void close() {
         if (closed) return;
+        while (cursors != null) cursors.close();
         try {
             if (root == 0) return;
             int depth = 0; teardownPages[0] = root; teardownNext[0] = 0;
