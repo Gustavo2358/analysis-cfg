@@ -408,3 +408,35 @@ oracles with bounded class/transform visits and every original candidate/support
 Random Unicode composition/padding/figurative oracles and a three-producer merge
 challenge the algebra independently; existing model/table/kill/filter tests and the
 64 KiB forced-spill state transcript remain required.
+
+
+### Input-owned source qualification and correlation inventory
+
+`DependencyInput` now owns one immutable source certificate and one occurrence inventory.
+`SourceQualifiedDependencyResult` prepares affected-control sets once per exact UnitEvidence
+identity and constructs program/native-file facts in that pass. Factory admission no longer
+interprets twice; public detached construction still compares every proposed occurrence against
+a fresh interpretation. Native-file reads, result `partial()` and JSON delivery reuse immutable
+facts. The certificate cannot be supplied to the input constructor. `DependencyResult` checks
+publication identity when retaining a prepared certificate, including the new reuse overload.
+
+Both former records are final immutable classes with the same public constructors, accessors,
+value equality, component hash order and textual component presentation. Their computed fields
+are not equality inputs and are never wire authority. Existing explicit JSON writers keep the
+published shape. This changes Java record reflection metadata; no reflective product consumer
+is part of this repository's contract. No public mutable index or global cache is introduced.
+
+Correlation admission groups operation IDs by full typed source StatementId. Inventory building
+visits those groups directly, deduplicates sites, preserves the established lexical operation
+order and keeps uncorrelated executable occurrences. It removes occurrences × all-correlations
+scans. Validation still checks duplicate/conflicting owners, exact labels, target kind/technology,
+literals and source/AIR origin ancestry before preparation. Origin ancestry is still queried by
+per-link traversal and remains an explicit architectural gap; the retained input/certificate
+indexes and detached outputs are resident bridges, not a claim of bounded whole-route memory.
+
+Independent regressions cover all qualified-source fixture families, unknown-control native
+candidates/remainders, repeated immutable reads, factory/public-constructor equality, one
+certificate across execution, 512 correlated sites with reversed physical/link order, orphan
+sites and foreign-certificate rejection. The old native implementation fails the reuse oracle
+because each read constructs a new interpretation. These changes do not address scalar CONCAT,
+contextual frame saturation or full paged AIR validation/transport.

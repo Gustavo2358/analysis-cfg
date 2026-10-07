@@ -23,7 +23,11 @@ public record DependencyResult(PublicationId publication,SemanticVersion airVers
         this(publication,airVersion,sites,edges,metrics,publicationInventory,origins,artifacts,sourceUncertaintyRefs,analysisReasons,fileDependencies,sourceDependencies,Optional.empty());
     }
     public DependencyResult withSourceEvidence(io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies evidence) {
-        var source=SourceQualifiedDependencyResult.admit(evidence,publication.localId());
+        return withSourceEvidence(SourceQualifiedDependencyResult.admit(evidence,publication.localId()));
+    }
+    /** Reuse a certificate already admitted by the input port; result construction rechecks AIR identity. */
+    public DependencyResult withSourceEvidence(SourceQualifiedDependencyResult source) {
+        Objects.requireNonNull(source);
         var reasons=new TreeSet<>(analysisReasons);
         if(source.nativeFiles().stream().anyMatch(SourceQualifiedDependencyResult.NativeFileResult::remainder))reasons.add("SOURCE_NATIVE_FILE_REMAINDER");
         return new DependencyResult(publication,airVersion,sites,edges,metrics,publicationInventory,origins,artifacts,sourceUncertaintyRefs,List.copyOf(reasons),fileDependencies,sourceDependencies,Optional.of(source),programDependencies);

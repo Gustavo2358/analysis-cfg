@@ -334,6 +334,11 @@
     "io.github.gustavo2358.analysis.adapters.SourcePagedProviderTest": [
       "forcedSpillMatchesAllResidentProofsWithSmallManagedWorkingSetAndBorrowedStoreOwnership",
       "absentObservationsAllocateNoPagesAndDeniedCapacityCannotReturnSemanticPartial"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PreparedSourceEvidenceTest": [
+      "preparedNativeAndProgramFactsKeepAuthorityAndAreReusableWithoutReinterpretation",
+      "admittedInputRetainsOneSourceCertificateAndImmutableCorrelatedInventory",
+      "indexedCorrelationsRetainEverySortedSiteAndRejectForeignCertificates"
     ]
   },
   "analysis-dataflow": {

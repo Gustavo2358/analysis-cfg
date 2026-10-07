@@ -26,7 +26,7 @@ public final class DependencyAnalysis {
     public DependencyResult prepare(DependencyInput input) {
         var occurrences=input.occurrences();
         var result=prepareExecutable(input);
-        if(input.source().isPresent())result=result.withSourceEvidence(input.source().get());
+        if(input.preparedSource().isPresent())result=result.withSourceEvidence(input.preparedSource().get());
         var byOperation=new HashMap<OperationId,List<DependencySiteFact>>();
         for(var site:result.sites())byOperation.computeIfAbsent(site.operation(),ignored->new ArrayList<>()).add(site);
         var sourceValues=new HashMap<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies.StatementId,List<SourceValuesProvider.Candidate>>();
