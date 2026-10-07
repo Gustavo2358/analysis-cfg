@@ -343,3 +343,25 @@ proof identities, empty observation zero-page admission, controlled quota failur
 and exact resident/forced-spill equivalence under a 64 KiB managed working set. The
 original source-state discovery family must also pass at its original heap envelope;
 these tests alone do not qualify all dependencies paths or the corporate incident.
+
+
+Source admission now traverses term/predicate DAG identities with iterative queues
+and constructor-scoped memoization shared across all assignment/condition roots.
+Reference, authority, CHOICE and duplicate checks remain separate obligations, with
+the same rule messages; shared subtrees do not expand into their exponentially many
+paths and deep unary input does not consume the Java call stack. These remain resident
+source-model indexes; physical AIR/JSON validation is a separate open obligation.
+Independent tests include 12,000-level terms/predicates, 30-level shared DAGs, hidden
+invalid leaves and production candidate/branch evaluation.
+
+Nominal source equality computes the same existential TRUE/FALSE image by indexing
+classes modulo trailing U+0020 spaces. Space-padding a pair to the larger logical
+scalar width is equal exactly when those classes match. TRUE requires an intersection;
+FALSE is absent only when both candidate inventories contain the same single class.
+Duplicate raw values/widths do not imply inequality. Tabs, leading spaces, non-space
+whitespace and Unicode remain distinct. Open/empty operands preserve BOTH immediately.
+This removes the candidate-left × candidate-right comparison and repeated fitted-text
+materialization; each side is traversed once, with string processing proportional to
+input payload plus indexed lookup cost. A counted collection falsifies the former
+256 ×256 scan; independent scalar-padding/random Unicode oracles validate equivalence.
+This is not a repair of the distinct unresolved scalar CONCAT join law.

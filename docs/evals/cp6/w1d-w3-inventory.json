@@ -2432,7 +2432,6 @@
         "io.github.gustavo2358.analysis.values.TextPredicate$Text",
         "java.lang.ArithmeticException",
         "java.lang.Boolean",
-        "java.lang.Math",
         "java.lang.Object",
         "java.lang.String",
         "java.lang.invoke.CallSite",

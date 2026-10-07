@@ -67,10 +67,10 @@ public final class SourceValuesProvider {
     public SourceValuesProvider(UnitEvidence unit,Set<String> requested,PageStore pages,AnalysisResources limits) {
         if((pages==null)!=(limits==null))throw new IllegalArgumentException("page store and resources must be supplied together");
         this.unit=unit;source=unit.nominalValues().orElseThrow();
-        source.facts().queries().stream().filter(q->requested.contains(q.statement())).forEach(q->queries.put(q.statement(),q.node()));
+        for(var query:source.facts().queries())if(requested.contains(query.statement()))queries.put(query.statement(),query.node());
         if(queries.isEmpty()){controlAffected=Set.of();return;}
         controlAffected=SourceControlEvidence.affected(unit);
-        unit.statements().forEach(s->statements.put(s.id().handle(),s));
+        for(var statement:unit.statements())statements.put(statement.id().handle(),statement);
         var needed=neededNodes(unit,queries.keySet());
         for(var node:unit.nodes())if(needed.contains(node.id())) {
             before.put(node.id(),before.size());nodes.put(node.id(),node);
@@ -80,16 +80,16 @@ public final class SourceValuesProvider {
         var closure=demandIndex.closure(new HashSet<>(queries.values()));
         var demand=closure.symbols();
         demandStatistics=new DemandStatistics(closure.nodeVisits(),closure.edgeVisits(),demandIndex.edgeCount());
-        source.facts().symbols().stream().filter(s->demand.contains(s.node())).forEach(s->{
-            extents.put(s.node(),s.extent());if(s.modelAssumed())modelSymbols.add(s.node());
-        });
+        for(var symbol:source.facts().symbols())if(demand.contains(symbol.node())) {
+            extents.put(symbol.node(),symbol.extent());if(symbol.modelAssumed())modelSymbols.add(symbol.node());
+        }
         for(var a:source.facts().assignments())if(demand.contains(a.target())) {
             assignments.computeIfAbsent(a.statement(),k->new ArrayList<>()).add(a);
             writeProofs.put(a,proof(new ProofKey(2,a.statement(),a.target()),new Evidence("ASSIGNMENT",a.statement(),statements.get(a.statement()).provenance())));
         }
-        source.facts().tableFields().forEach(f->summarySymbols.add(f.node()));
-        source.facts().conditions().forEach(c->predicates.put(c.statement(),c.predicate()));
-        source.branches().forEach(b->branches.put(b.derivation(),b.whenTrue()));
+        for(var field:source.facts().tableFields())summarySymbols.add(field.node());
+        for(var condition:source.facts().conditions())predicates.put(condition.statement(),condition.predicate());
+        for(var branch:source.branches())branches.put(branch.derivation(),branch.whenTrue());
         for(var symbol:extents.keySet())symbols.put(symbol,symbols.size()+1L);
         nodeIds=new String[before.size()];for(var entry:before.entrySet())nodeIds[entry.getValue()]=entry.getKey();
         resources=limits==null?new AnalysisResources(new AnalysisResources.Limits(Long.MAX_VALUE,Long.MAX_VALUE,0,0,0,Long.MAX_VALUE,Long.MAX_VALUE)):limits;

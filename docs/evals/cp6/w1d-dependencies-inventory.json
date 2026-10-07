@@ -2057,10 +2057,7 @@
       "java.util.Optional",
       "java.util.Set",
       "java.util.TreeMap",
-      "java.util.function.Consumer",
-      "java.util.function.Function",
-      "java.util.function.Predicate",
-      "java.util.stream.Stream"
+      "java.util.function.Function"
     ],
     "io.github.gustavo2358.analysis.dependencies.SourceValuesProvider$Candidate": [
       "io.github.gustavo2358.analysis.dependencies.SourceValuesProvider",
@@ -2370,28 +2367,24 @@
       "io.github.gustavo2358.analysis.dependencies.source.NominalValues$Symbol",
       "io.github.gustavo2358.analysis.dependencies.source.NominalValues$TableField",
       "io.github.gustavo2358.analysis.dependencies.source.NominalValues$Term",
+      "java.lang.Boolean",
       "java.lang.Class",
       "java.lang.IllegalArgumentException",
       "java.lang.Object",
       "java.lang.Record",
       "java.lang.String",
-      "java.lang.invoke.CallSite",
-      "java.lang.invoke.LambdaMetafactory",
       "java.lang.invoke.MethodHandle",
       "java.lang.invoke.MethodHandles",
       "java.lang.invoke.MethodHandles$Lookup",
-      "java.lang.invoke.MethodType",
       "java.lang.invoke.TypeDescriptor",
       "java.lang.runtime.ObjectMethods",
       "java.util.ArrayDeque",
       "java.util.Collection",
       "java.util.HashSet",
+      "java.util.IdentityHashMap",
       "java.util.Iterator",
       "java.util.List",
-      "java.util.Set",
-      "java.util.function.Consumer",
-      "java.util.function.Predicate",
-      "java.util.stream.Stream"
+      "java.util.Set"
     ],
     "io.github.gustavo2358.analysis.dependencies.source.NominalValues$1WriteIdentity": [
       "io.github.gustavo2358.analysis.dependencies.source.NominalValues",

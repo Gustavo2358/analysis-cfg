@@ -413,6 +413,14 @@
       "supportAndFlagChangesKeepOldValuesAndCallerRootsIndependent",
       "sparseReachableStatesJoinMissingValuesWithDefaultsWithoutInventingKnownFacts",
       "randomSparseJoinsMatchIndependentDenseDefaultStatesIncludingModelsAndTables"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.SourceNominalAdmissionTest": [
+      "deepTermAndPredicateAdmissionUsesNoJavaCallStack",
+      "sharedTermAndPredicateDagsAreAdmittedWithoutEnumeratingTheirPaths",
+      "deepAndSharedInvalidLeavesRetainTheirSpecificAdmissionFailures",
+      "extendedExpressionsStillRequireTheirPublishedAuthority",
+      "sharedChoiceAndPredicateDagsReachProductionCandidatesWithOneCompleteAssignmentProof",
+      "deepProductionTransformsAndPredicateTruthPreserveTheirSelectedBranch"
     ]
   },
   "analysis-kernel": {
@@ -935,6 +943,11 @@
       "anOpenPredecessorSurvivesAJoinWithAClosedPredecessor",
       "predicateImagesRespectBooleanCompositionUnicodeAndRepresentableExtents",
       "exactScalarConstantsCanPruneButUnknownNumericReadsCannot"
+    ],
+    "io.github.gustavo2358.analysis.values.TextPredicateSourceEqualityTest": [
+      "sourceEqualityReadsEachCandidateOnceInsteadOfComparingEveryPair",
+      "indexedTruthImageMatchesIndependentUnicodePaddingOracle",
+      "spacePaddedEquivalenceClassesPreserveDuplicatesEmptyUnicodeAndNonSpaceDifferences"
     ]
   },
   "cfg-adapters": {
