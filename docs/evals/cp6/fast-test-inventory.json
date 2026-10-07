@@ -318,6 +318,17 @@
       "typedAirPayloadLargerThanManagedHeapMatchesBothBackendsAndIndependentUnicodeFacts",
       "failedColumnConstructionReleasesEveryPreviouslyReservedOwner",
       "operationalWriteFailureAbortsTypedConstructionAndFinalOwnerCleansDisk"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PersistentLongMapTest": [
+      "residentAndForcedSpillVersionsMatchIndependentOrderedMaps",
+      "fullSignedKeysZeroValuesAndInsertionOrderHaveCanonicalRoots",
+      "referenceValuesAndCursorLeasesRetainExactlyTheirTransitiveRecords",
+      "manySingleWriteSnapshotsShareUnchangedPathsAndRetireAfterRootRelease",
+      "cursorDenialAndSchemaMismatchCannotAlterPreviouslyBuiltFacts",
+      "ownerCloseReleasesActiveCursorRootsAndScratchWithoutClosingBorrowedArena",
+      "controlReservationDenialLeavesBorrowedStorageAndArenaUsable",
+      "joinsSkipSharedSubtreesAndAgreeWithIndependentPointwiseUnion",
+      "referenceValueJoinsCanReenterIndependentPrimitiveJoinsAndRemainCollectable"
     ]
   },
   "analysis-dataflow": {

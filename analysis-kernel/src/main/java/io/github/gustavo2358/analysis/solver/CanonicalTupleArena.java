@@ -58,6 +58,12 @@ public final class CanonicalTupleArena implements AutoCloseable {
     }
 
     public synchronized long size() { open(); return unique.size(); }
+    public synchronized int arity() { open(); return arity; }
+    public synchronized boolean referenceColumn(int column) {
+        open();
+        if (column < 0 || column >= arity) throw new IndexOutOfBoundsException("tuple column " + column);
+        return Arrays.binarySearch(references, column) >= 0;
+    }
 
     /** Callers own the supplied buffer; the arena copies only the fixed staging key. */
     public synchronized long intern(long... tuple) {

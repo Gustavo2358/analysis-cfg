@@ -242,3 +242,53 @@ are not the complete source rewrite: state/proof persistence, preparation lifeti
 full source correlation and managed paging remain open. Resident String/ordinal
 indexes and primitive int arrays have explicit resident ownership; they do not gain
 a spill guarantee by using the paged runtime elsewhere.
+
+
+## Primitive persistent state/proof maps
+
+`PersistentLongMap` represents immutable versions in a compressed binary trie over
+complete signed 64-bit keys. A write creates the changed leaf and copies only its
+search path, at most 64 branches; unchanged subtrees are shared. Deletion collapses
+the now-redundant parent. Canonical arena keys make equal contents independent of
+insertion order. Present zero differs from absence. Primitive values and referenced
+value/proof roots have distinct kinds; references are traced by arena collection.
+
+The shared six-field arena schema reserves references at columns 2,4,5; the view
+checks that schema before claiming its own capacity. It may share that arena with
+other domain record kinds. Roots are snapshot/arena-local handles, never external
+AIR/source IDs. The view does not infer equivalence between domains or retire any
+solver version. Callers retain all active state/proof roots explicitly.
+
+The view claims 4,096 resident bytes before allocating fixed path/staging/cache
+buffers. A bounded 32-slot exact `(root,key)` cache memoizes lookup without rooting
+old versions; each hit first checks root liveness. A same-value write returns the
+original root without rebuilding its path. Ordered cursors claim 2,048 scratch
+bytes (256 when empty), retain their root, walk each tree node once and release
+both leases at exhaustion/close. View close closes active cursors but does not close
+the borrowed arena/store. Stale handles cannot revive collected facts.
+
+Map path work is independent of full state size; canonical interning still pays
+the arena's full-tuple ordered-index cost. This is no universal O(1) solver claim.
+The current primitive is not yet used by source/scalar/regional domain states.
+The migration must replace state/support copying and preserve their joins, weak
+writes, model assumptions, outcomes, candidates and proof fields before qualification.
+Tests compare old/live versions against independent TreeMaps across resident and
+forced-spill stores, signed extremes, zero, reference rooting, quotas, cursor lifetime
+and many single-write versions with bounded shared-record growth.
+
+
+Pointwise map join aligns trie prefixes and skips equal immutable subtrees. It
+preserves unmatched entries and delegates collisions to the supplied associative,
+commutative, idempotent value join; those laws remain the domain owner's obligation.
+A 1,024-key version with one changed value invokes the value join once. Primitive
+max-union tests challenge disjoint, overlapping, signed/random keys and canonical
+commutativity/idempotence against an independent TreeMap oracle.
+
+Each active join claims 4,096 scratch bytes before allocating its fixed 65-frame
+iterative buffers. Reentrant joins receive separate scratch, so state → candidate
+→ proof joins cannot corrupt an enclosing traversal. A fixed representative-key
+cache avoids repeating trie prefix walks without retaining obsolete roots. Branch
+leaf counts provide constant field access to cardinality. Referenced value join
+and collection tests check nested maps, callback reentry and lease release. This
+checkpoint establishes the primitive's behavior, not the unresolved scalar domain
+join law or production state migration.
