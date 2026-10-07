@@ -774,3 +774,46 @@ still RED at all12 backward combinations. Small reset IN/OUT, multiple Entry,
 non-distributive edge-sensitive memory oracles pass. Forward reset sizes4..512 meet
 the original16N bound; backward does not. This checkpoint is IN_PROGRESS/UNQUALIFIED;
 no final semantic/performance qualification or completion is claimed.
+
+### Exact paged condition catalog (AS-W01/W04/W09, unqualified checkpoint)
+
+BooleanNodeStore replaces the full-cardinality resident decision catalog with paged
+primitive rows and an exact complete-key index. Variable, low/high IDs, signed
+literal root and fold kind determine identity; mark epoch, literal-retention token
+and free link are metadata. A fixed leased primitive row cache never proves equality.
+Group tokens retain the signed arena exactly once. Append-only scratch scopes cannot
+reuse older holes; commit keeps escaping new roots and retires other new nodes, with
+computed entries invalidated before ID reuse. All tracing frontiers and collection
+marks use page storage. The externally supplied absent-binding memo in structural
+model refinement remains a resident compatibility debt.
+
+General AND/OR and unary operation memo tables/frontiers now spill through the same
+backend; no per-diagram HashMap, ArrayDeque or node snapshot is used. Computed-table
+and dirty-journal arrays remain fixed and are reserved before allocation. Quota or
+storage failure aborts the owner even when a later request could return a terminal
+shortcut. Supplied backends remain borrowed; owner close does not close them.
+
+New independent constructor/growth denial and I/O interruption tests exposed unlinked
+page leaks. PagedLongArray retains its provisional allocation. PagedLongIndex tracks
+all owned pages in a separate exact paged ledger: teardown does not depend on the
+validity of a split/merge interrupted halfway through its child updates. Ordinary
+retirement removes ledger entries and releases empty ledger pages. The unchanged
+index tests retain constant resident capacity under one-page file eviction and zero
+final pages. Injected insertion/retirement interruptions also finish with zero pages.
+A permanently failed backend or exhausted work during teardown still requires closing
+the shared backend; temporary stores have no crash recovery contract.
+
+The focused truth/canonical-ID/scratch/collection/domain/transport tests pass; the
+full kernel runs234 methods,232 PASS and two growth methods FAIL with no errors or
+skips. Required FAST likewise fails the unchanged ROOT16N backward bound and new
+mixed64N relation bound (202 selected kernel methods, two failures). Exact W1/W2/W3/
+W4/W5/W1D source and compiled boundaries pass. This checkpoint remains UNQUALIFIED.
+
+The new mixed counterexample constructs OR_i(A_i AND B_i) and AND_i(A_i iff B_i)
+with separated A/B variable order, independent of AIR/control scheduling. Complete
+small truth/restriction oracles pass. Twelve pairs retain8191/8193 Boolean nodes even
+after every unrooted row is collected. Each A assignment selects a distinct remaining
+B residual; the ordered representation must encode those distinct residuals. This
+proves that catalog paging alone cannot resolve the algorithmic debt. The production
+engine must change its represented relations, while preserving exact functional
+equality and convergence. Neither growth assertion nor peakBooleanNodes is weakened.

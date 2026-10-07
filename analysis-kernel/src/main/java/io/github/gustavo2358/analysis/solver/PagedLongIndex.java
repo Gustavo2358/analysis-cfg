@@ -17,12 +17,13 @@ public final class PagedLongIndex implements AutoCloseable {
     private final AnalysisResources.Phase phase;
     private final AnalysisResources.Reservation resident;
     private final Order order;
+    private final PagedLongArray ownedPages;
     private final int degree, maximum, pairBase;
     private byte[] word;
     private long[] teardownPages;
     private int[] teardownNext;
     private int[] teardownLimits;
-    private long root, size, version;
+    private long root, size, version, provisional;
     private Cursor cursors;
     private boolean closed, failed;
 
@@ -36,8 +37,11 @@ public final class PagedLongIndex implements AutoCloseable {
         if (degree < 2) throw new IllegalArgumentException("index pages need at least 96 bytes");
         maximum = degree * 2 - 1; pairBase = 2 + degree * 2;
         resident = resources.reserve(AnalysisResources.Pool.RESIDENT, 2048, phase);
-        word = new byte[Long.BYTES]; teardownPages = new long[64]; teardownNext = new int[64];
-        teardownLimits = new int[64];
+        try {
+            ownedPages=new PagedLongArray(store,Long.MAX_VALUE,resources,phase);
+            word = new byte[Long.BYTES]; teardownPages = new long[64]; teardownNext = new int[64];
+            teardownLimits = new int[64];
+        }catch(RuntimeException|Error failure){resident.close();throw failure;}
     }
 
     public synchronized long size() { open(); return size; }
@@ -110,7 +114,7 @@ public final class PagedLongIndex implements AutoCloseable {
             if (root != 0 && count(root) == 0) {
                 long previous = root;
                 root = leaf(previous) ? 0 : child(previous, 0);
-                store.release(previous);
+                release(previous);
             }
             return removed;
         } catch (RuntimeException exception) { failed = true; throw exception; }
@@ -194,7 +198,7 @@ public final class PagedLongIndex implements AutoCloseable {
         count(left, n + m + 1);
         for (int i = at; i + 1 < p; i++) copy(parent, i + 1, parent, i);
         for (int i = at + 1; i < p; i++) child(parent, i, child(parent, i + 1));
-        count(parent, p - 1); store.release(right);
+        count(parent, p - 1); release(right);
         return left;
     }
 
@@ -208,7 +212,14 @@ public final class PagedLongIndex implements AutoCloseable {
         return low;
     }
     private int compare(long first, long second) { resources.work(1, phase); return order.compare(first, second); }
-    private long node(boolean leaf) { long page = store.allocate(); write(page, 1, leaf ? 1 : 0); return page; }
+    private long node(boolean leaf) {
+        long page=provisional=store.allocate();
+        ownedPages.set(page,page);provisional=0;
+        write(page,1,leaf?1:0);return page;
+    }
+    private void release(long page) {
+        provisional=page;ownedPages.set(page,0);store.release(page);provisional=0;
+    }
     private int count(long page) {
         long result = read(page, 0);
         if (result < 0 || result > maximum) throw new PageStore.Failure(PageStore.Reason.CORRUPT, "invalid index node count");
@@ -355,23 +366,18 @@ public final class PagedLongIndex implements AutoCloseable {
         if (closed) return;
         while (cursors != null) cursors.close();
         try {
-            if (root == 0) return;
-            int depth = 0; teardownPages[0] = root; teardownNext[0] = 0;
-            teardownLimits[0] = leaf(root) ? 0 : count(root) + 1;
-            while (depth >= 0) {
-                long page = teardownPages[depth];
-                if (teardownNext[depth] == teardownLimits[depth]) { store.release(page); depth--; }
-                else {
-                    long next = child(page, teardownNext[depth]++);
-                    depth++;
-                    if (depth == teardownPages.length) throw new PageStore.Failure(PageStore.Reason.CORRUPT, "index depth exceeds 64-bit representability");
-                    teardownPages[depth] = next; teardownNext[depth] = 0;
-                    teardownLimits[depth] = leaf(next) ? 0 : count(next) + 1;
+            // Ownership is independent of an interrupted split/merge's tree shape.
+            // Never follow possibly duplicated or detached child links during teardown.
+            ownedPages.visitAllocatedValues(page->{if(page!=provisional)store.release(page);});
+        } finally {
+            try {if(provisional!=0)store.release(provisional);}
+            finally {
+                try {ownedPages.close();}
+                finally {
+                    closed = true; root = size = provisional = 0;
+                    word = null; teardownPages = null; teardownNext = null; teardownLimits = null; resident.close();
                 }
             }
-        } finally {
-            closed = true; root = size = 0;
-            word = null; teardownPages = null; teardownNext = null; teardownLimits = null; resident.close();
         }
     }
 }

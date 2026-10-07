@@ -10,6 +10,27 @@ import static org.junit.jupiter.api.Assertions.*;
 class BooleanConditionsStorageTest {
     @TempDir Path directory;
     private static AnalysisResources memory(long heap){return new AnalysisResources(new AnalysisResources.Limits(heap,100_000,0,64_000_000,2,500_000_000,1_000_000));}
+    @Test void deniedConditionPayloadAbortsEvenTerminalShortcutsAndReleasesOwnership() {
+        var memory=memory(20000);
+        try(var pages=new ResidentPageStore(128,memory,AnalysisResources.Phase.CONTROL)) {
+            var conditions=new BooleanConditions(2,memory,pages);
+            assertThrows(AnalysisResources.Exhausted.class,()->{for(int key=0;key<1024;key++)conditions.variable(key);});
+            assertThrows(IllegalStateException.class,()->conditions.or(0,1),"an interrupted owner cannot expose a stable shortcut");
+            assertThrows(IllegalStateException.class,()->conditions.atEmpty(1));
+            conditions.close();assertEquals(0,pages.statistics().livePages());long page=pages.allocate();pages.release(page);
+        }
+        assertEquals(0,memory.heapUsed());
+    }
+    @Test void fixedComputedAndNodeCachesAreReservedBeforeTheirArraysAreCreated() {
+        var memory=memory(8192);
+        try(var pages=new ResidentPageStore(128,memory,AnalysisResources.Phase.CONTROL)) {
+            long before=memory.heapUsed();
+            assertEquals(AnalysisResources.Resource.HEAP,assertThrows(AnalysisResources.Exhausted.class,
+                    ()->new BooleanConditions(65536,memory,pages)).resource());
+            assertEquals(before,memory.heapUsed());assertEquals(0,pages.statistics().livePages());
+        }
+        assertEquals(0,memory.heapUsed());
+    }
     @Test void literalJunctionsGeneralDecisionsAndRootLifetimesAgreeWithOnePageSpill() {
         var memory=memory(1_000_000);
         try(var pages=new FilePageStore(directory,128,1,memory,AnalysisResources.Phase.CONTROL)) {

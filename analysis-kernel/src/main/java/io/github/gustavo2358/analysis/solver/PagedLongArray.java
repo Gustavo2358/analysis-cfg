@@ -22,7 +22,7 @@ public final class PagedLongArray implements AutoCloseable {
     private int[] teardownNext;
     private long[] pathPages;
     private int[] pathSlots;
-    private long root;
+    private long root, provisional;
     private int height;
     private boolean closed, failed;
 
@@ -71,9 +71,9 @@ public final class PagedLongArray implements AutoCloseable {
         if (value == 0 && (root == 0 || required > height)) return;
         if (root == 0) { root = store.allocate(); height = required; }
         while (height < required) {
-            long replacement = store.allocate();
+            long replacement = provisional = store.allocate();
             writeWord(replacement, 1, root); writeWord(replacement, 0, 1);
-            root = replacement; height++;
+            root = replacement; height++; provisional = 0;
         }
         long page = root;
         for (int level = height; level > 0; level--) {
@@ -82,7 +82,8 @@ public final class PagedLongArray implements AutoCloseable {
             long child = readWord(page, slot);
             if (child == 0) {
                 if (value == 0) return;
-                child = store.allocate(); writeWord(page, slot, child);
+                child = provisional = store.allocate(); writeWord(page, slot, child);
+                provisional = 0;
                 writeWord(page, 0, readWord(page, 0) + 1);
             }
             page = child;
@@ -143,6 +144,22 @@ public final class PagedLongArray implements AutoCloseable {
         if (index < 0 || index >= length) throw new IndexOutOfBoundsException("primitive array index " + index);
     }
 
+    /** Teardown view of allocated nonzero payloads, including an aborted owner's ledger.
+     * The callback must not mutate this array. Control storage stays fixed at 64 levels. */
+    synchronized void visitAllocatedValues(java.util.function.LongConsumer visitor) {
+        if(closed)throw new IllegalStateException("primitive array is closed");
+        if(root==0)return;
+        int depth=0;teardownPages[0]=root;teardownNext[0]=0;
+        while(depth>=0) {
+            if(teardownNext[depth]==fanout){depth--;continue;}
+            int slot=teardownNext[depth]++;
+            long value=readWord(teardownPages[depth],slot+1);
+            if(value==0)continue;
+            if(depth==height)visitor.accept(value);
+            else {depth++;teardownPages[depth]=value;teardownNext[depth]=0;}
+        }
+    }
+
     @Override public synchronized void close() {
         if (closed) return;
         try {
@@ -151,7 +168,8 @@ public final class PagedLongArray implements AutoCloseable {
             teardownPages[0] = root; teardownNext[0] = 0;
             while (depth >= 0) {
                 if (depth == height || teardownNext[depth] == fanout) {
-                    store.release(teardownPages[depth]); depth--;
+                    long page=teardownPages[depth];store.release(page);
+                    if(provisional==page)provisional=0;depth--;
                 } else {
                     long child = readWord(teardownPages[depth], teardownNext[depth]++ + 1);
                     if (child != 0) {
@@ -160,10 +178,14 @@ public final class PagedLongArray implements AutoCloseable {
                 }
             }
         } finally {
+            try {if(provisional!=0)store.release(provisional);}
+            finally {
             closed = true; root = 0;
+            provisional=0;
             word = null; teardownPages = null; teardownNext = null;
             pathPages = null; pathSlots = null;
             resident.close();
+            }
         }
     }
 }

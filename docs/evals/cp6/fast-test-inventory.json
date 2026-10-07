@@ -347,8 +347,13 @@
       "guardedProofRepairAndRetirementHaveEqualResidentAndForcedSpillSemantics"
     ],
     "io.github.gustavo2358.analysis.solver.BooleanConditionsStorageTest": [
+      "deniedConditionPayloadAbortsEvenTerminalShortcutsAndReleasesOwnership",
+      "fixedComputedAndNodeCachesAreReservedBeforeTheirArraysAreCreated",
       "literalJunctionsGeneralDecisionsAndRootLifetimesAgreeWithOnePageSpill",
       "deniedLiteralAllocationReleasesOwnerAndLeavesBorrowedBackendUsable"
+    ],
+    "io.github.gustavo2358.analysis.solver.BooleanNodeStoreStorageTest": [
+      "exactIdentityRetirementAndReuseAgreeAcrossResidentAndOnePageBackends"
     ]
   },
   "analysis-dataflow": {
@@ -727,6 +732,17 @@
     "io.github.gustavo2358.analysis.structure.RootResetRelationsTest": [
       "sharedGuardedRootResetsDoNotAccumulateCallerPrefixPredicates",
       "resetProjectionPreservesEveryContextAndNonDistributiveEdgeSensitiveMemory"
+    ],
+    "io.github.gustavo2358.analysis.solver.BooleanNodeStoreTest": [
+      "constructorAndGrowthDenialReleaseEveryOwnedPage",
+      "interruptedWritesAbortCatalogAndCanBeClosedWithoutClosingBorrowedStore",
+      "interruptedRetirementMergesAndTrimDoNotDependOnValidTreeLinksForCleanup",
+      "completePrimitiveKeysAndMetadataMatchIndependentCanonicalMaps",
+      "appendOnlyScopesAndFreeLinksDoNotReuseOlderRetiredSlots"
+    ],
+    "io.github.gustavo2358.analysis.solver.MixedConditionRelationsTest": [
+      "mixedRelationsAgreeWithIndependentAllValuationsAndRestrictions",
+      "compactMixedRelationsMustNotExpandIntoEveryBooleanAssignment"
     ]
   },
   "analysis-launcher": {
