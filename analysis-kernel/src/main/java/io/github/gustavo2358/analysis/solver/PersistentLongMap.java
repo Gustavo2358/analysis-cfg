@@ -3,6 +3,7 @@ package io.github.gustavo2358.analysis.solver;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.function.LongBinaryOperator;
+import java.util.function.LongUnaryOperator;
 
 /**
  * Immutable canonical compressed binary trie over complete signed long keys. One write copies
@@ -124,12 +125,18 @@ public final class PersistentLongMap implements AutoCloseable {
      * active join owns an independent leased fixed iterative stack. No whole-state flattening.
      */
     public synchronized long join(long left, long right, boolean referenceValues, LongBinaryOperator values) {
+        return join(left, right, referenceValues, values, null);
+    }
+    /** As above, but unmatched entries are joined with the domain's implicit default. */
+    public synchronized long join(long left, long right, boolean referenceValues, LongBinaryOperator values,
+                                  LongUnaryOperator unmatched) {
         open(); Objects.requireNonNull(values);
         if (left < 0 || right < 0) throw new IllegalArgumentException("nonnegative arena roots required");
         try {
             if (left != 0) kind(left); if (right != 0 && right != left) kind(right);
-            if (left == right || right == 0) return left;
-            if (left == 0) return right;
+            if (left == right) return left;
+            if (right == 0) return mapped(left, referenceValues, unmatched);
+            if (left == 0) return mapped(right, referenceValues, unmatched);
             try (var scratch = resources.reserve(AnalysisResources.Pool.SCRATCH, 4096, phase)) {
                 if (scratch.amount() != 4096) throw new IllegalStateException("join scratch reservation mismatch");
                 long[] a = new long[65], b = new long[65], first = new long[65], other = new long[65];
@@ -138,14 +145,16 @@ public final class PersistentLongMap implements AutoCloseable {
                 while (top >= 0) {
                     if (stage[top] == 0) {
                         long x = a[top], y = b[top];
-                        if (x == y || y == 0) { result = x; top--; continue; }
-                        if (x == 0) { result = y; top--; continue; }
+                        if (x == y) { result = x; top--; continue; }
+                        if (y == 0) { result = mapped(x, referenceValues, unmatched); top--; continue; }
+                        if (x == 0) { result = mapped(y, referenceValues, unmatched); top--; continue; }
                         long xKind = kind(x), yKind = kind(y);
                         int xBit = xKind == BRANCH ? bit(x, -1) : 64, yBit = yKind == BRANCH ? bit(y, -1) : 64;
                         long xKey = representative(x), yKey = representative(y);
                         int different = Long.numberOfLeadingZeros(xKey ^ yKey);
                         if (different < Math.min(xBit, yBit)) {
-                            result = direction(xKey, different) == 0 ? branch(different, x, y) : branch(different, y, x);
+                            long xx = mapped(x, referenceValues, unmatched), yy = mapped(y, referenceValues, unmatched);
+                            result = direction(xKey, different) == 0 ? branch(different, xx, yy) : branch(different, yy, xx);
                             top--; continue;
                         }
                         if (xBit == 64 && yBit == 64) {
@@ -159,11 +168,11 @@ public final class PersistentLongMap implements AutoCloseable {
                             mode[top] = 0; a[top + 1] = arena.field(x, 4); b[top + 1] = arena.field(y, 4);
                         } else if (xBit < yBit) {
                             byte side = direction(yKey, xBit); mode[top] = (byte) (side + 1);
-                            other[top] = arena.field(x, side == 0 ? 5 : 4);
+                            other[top] = mapped(arena.field(x, side == 0 ? 5 : 4), referenceValues, unmatched);
                             a[top + 1] = arena.field(x, side == 0 ? 4 : 5); b[top + 1] = y;
                         } else {
                             byte side = direction(xKey, yBit); mode[top] = (byte) (side + 1);
-                            other[top] = arena.field(y, side == 0 ? 5 : 4);
+                            other[top] = mapped(arena.field(y, side == 0 ? 5 : 4), referenceValues, unmatched);
                             a[top + 1] = x; b[top + 1] = arena.field(y, side == 0 ? 4 : 5);
                         }
                         stage[++top] = 0;
@@ -179,6 +188,37 @@ public final class PersistentLongMap implements AutoCloseable {
                 return result;
             }
         } catch (AnalysisResources.Exhausted | PageStore.Failure exception) { failed = true; throw exception; }
+    }
+    /** Iterative structural value transform. Identity transforms preserve canonical subtree roots. */
+    public synchronized long mapValues(long root, boolean referenceValues, LongUnaryOperator values) {
+        open(); Objects.requireNonNull(values);
+        if (root < 0) throw new IllegalArgumentException("nonnegative arena root required");
+        try { return mapped(root, referenceValues, values); }
+        catch (AnalysisResources.Exhausted | PageStore.Failure exception) { failed = true; throw exception; }
+    }
+    private long mapped(long root, boolean referenceValues, LongUnaryOperator values) {
+        if (root == 0 || values == null) return root;
+        try (var scratch = resources.reserve(AnalysisResources.Pool.SCRATCH, 2048, phase)) {
+            if (scratch.amount() != 2048) throw new IllegalStateException("transform scratch reservation mismatch");
+            long[] nodes = new long[65], first = new long[65]; byte[] stage = new byte[65];
+            nodes[0] = root; int top = 0; long result = 0;
+            while (top >= 0) {
+                long node = nodes[top];
+                if (stage[top] == 0) {
+                    long nodeKind = kind(node);
+                    if (nodeKind != BRANCH) {
+                        if (nodeKind != (referenceValues ? REFERENCE : PRIMITIVE))
+                            throw new IllegalArgumentException("transform value kind mismatch");
+                        result = leaf(arena.field(node, 1), values.applyAsLong(value(node)), referenceValues); top--; continue;
+                    }
+                    if (top == 64) throw new IllegalArgumentException("transform path exceeds key width");
+                    stage[top] = 1; nodes[top + 1] = arena.field(node, 4); stage[++top] = 0;
+                } else if (stage[top] == 1) {
+                    first[top] = result; stage[top] = 2; nodes[top + 1] = arena.field(node, 5); stage[++top] = 0;
+                } else { result = branch(bit(node, -1), first[top], result); top--; }
+            }
+            return result;
+        }
     }
     private long representative(long root) {
         int slot = (int) (root ^ (root >>> 32)) & 31;

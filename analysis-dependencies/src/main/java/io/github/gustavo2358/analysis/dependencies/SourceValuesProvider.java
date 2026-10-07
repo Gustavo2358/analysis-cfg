@@ -1,6 +1,7 @@
 package io.github.gustavo2358.analysis.dependencies;
 
 import java.util.*;
+import io.github.gustavo2358.analysis.solver.*;
 import io.github.gustavo2358.analysis.dependencies.source.*;
 import io.github.gustavo2358.analysis.values.TextPredicate;
 import static io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies.*;
@@ -13,21 +14,6 @@ public final class SourceValuesProvider {
         public Support {evidence=List.copyOf(evidence);assumptions=List.copyOf(assumptions);uncertainties=List.copyOf(uncertainties);}
     }
     public record Candidate(String rawValue,Support support) { }
-    private record Values(Map<String,Set<String>> candidates,boolean open,boolean modelAssumed,boolean tableAssumed) {
-        Values(Map<String,Set<String>> candidates,boolean open,boolean modelAssumed){this(candidates,open,modelAssumed,false);}
-        Values(Map<String,Set<String>> candidates,boolean open){this(candidates,open,false);}
-        static final Values MODEL_UNKNOWN=new Values(Map.of(),true,true);
-        static final Values UNKNOWN=new Values(Map.of(),true);
-        Values {var copy=new TreeMap<String,Set<String>>();candidates.forEach((k,v)->copy.put(k,Set.copyOf(v)));candidates=Collections.unmodifiableMap(copy);}
-        Values join(Values other){var out=new TreeMap<>(candidates);other.candidates.forEach((k,v)->out.merge(k,v,SourceValuesProvider::union));return new Values(out,open||other.open,modelAssumed||other.modelAssumed,tableAssumed||other.tableAssumed);}
-    }
-    private static final class State extends AbstractMap<String,Values> {
-        private final Map<String,Values> owned;
-        State(Map<String,Values> source){owned=Collections.unmodifiableMap(new TreeMap<>(source));}
-        @Override public Set<Entry<String,Values>> entrySet(){return owned.entrySet();}
-        @Override public Values get(Object key){return owned.get(key);}
-    }
-    private static Map<String,Values> freeze(Map<String,Values> source){return source instanceof State?source:new State(source);}
     private final Map<String,List<String>> observedNodes=new HashMap<>();
     private final Set<String> controlAffected;
     private final UnitEvidence unit;
@@ -42,17 +28,44 @@ public final class SourceValuesProvider {
     private final Set<String> modelSymbols=new HashSet<>();
     private final Set<String> summarySymbols=new HashSet<>();
     private final Map<String,String> queries=new HashMap<>();
-    private final Map<String,Evidence> evidence=new HashMap<>();
-    private final Map<String,Map<String,Values>> before=new HashMap<>();
-    private final ArrayDeque<String> work=new ArrayDeque<>();
-    private final Set<String> queued=new HashSet<>();
+    private record ProofKey(int kind,String owner,String detail) implements Comparable<ProofKey> {
+        @Override public int compareTo(ProofKey other) {
+            int c=Integer.compare(kind,other.kind);if(c==0)c=owner.compareTo(other.owner);return c==0?detail.compareTo(other.detail):c;
+        }
+    }
+    private final Map<ProofKey,Long> proofIds=new HashMap<>();
+    private final List<ProofKey> proofKeys=new ArrayList<>();
+    private final List<Evidence> evidence=new ArrayList<>();
+    private final IdentityHashMap<NominalValues.Assignment,Long> writeProofs=new IdentityHashMap<>();
+    // Resident source input handle index; variable-sized state payloads reside in page columns.
+    private final Map<String,Integer> before=new HashMap<>();
+    private final Map<String,Long> symbols=new HashMap<>();
+    private final Map<String,List<Candidate>> projected=new HashMap<>();
+    private final IdentityHashMap<NominalValues.Predicate,Set<String>> predicateReads=new IdentityHashMap<>();
+    private SourceValueStore values;
+    private PagedLongArray stateRoots,stateTokens;
+    private PagedWorklist work;
+    private String[] nodeIds;
+    private AnalysisResources resources;
+    private long[] transferRoots,transferResults;
+    private String[] transferLocations;
+    private byte[] transferModes;
+    private long transferEvaluations;
+    public record StateStatistics(long records,long mapNodeVisits,long pathCopies,long managedHeapPeak,long transferEvaluations) { }
+    private StateStatistics stateStatistics=new StateStatistics(0,0,0,0,0);
+    public StateStatistics stateStatistics(){return stateStatistics;}
     public record DemandStatistics(long nodeVisits,long edgeVisits,long indexedEdges) { }
     private DemandStatistics demandStatistics=new DemandStatistics(0,0,0);
     public DemandStatistics demandStatistics(){return demandStatistics;}
     private long workItems;
-    private boolean limited;
+
 
     public SourceValuesProvider(UnitEvidence unit,Set<String> requested) {
+        this(unit,requested,null,null);
+    }
+    /** Borrowed paged storage; all temporary analysis owners close before resident candidates return. */
+    public SourceValuesProvider(UnitEvidence unit,Set<String> requested,PageStore pages,AnalysisResources limits) {
+        if((pages==null)!=(limits==null))throw new IllegalArgumentException("page store and resources must be supplied together");
         this.unit=unit;source=unit.nominalValues().orElseThrow();
         source.facts().queries().stream().filter(q->requested.contains(q.statement())).forEach(q->queries.put(q.statement(),q.node()));
         if(queries.isEmpty()){controlAffected=Set.of();return;}
@@ -60,7 +73,7 @@ public final class SourceValuesProvider {
         unit.statements().forEach(s->statements.put(s.id().handle(),s));
         var needed=neededNodes(unit,queries.keySet());
         for(var node:unit.nodes())if(needed.contains(node.id())) {
-            nodes.put(node.id(),node);
+            before.put(node.id(),before.size());nodes.put(node.id(),node);
             if(queries.containsKey(node.location()))observedNodes.computeIfAbsent(node.location(),k->new ArrayList<>()).add(node.id());
         }
         var demandIndex=new NominalDemandIndex(source.facts());
@@ -72,141 +85,250 @@ public final class SourceValuesProvider {
         });
         for(var a:source.facts().assignments())if(demand.contains(a.target())) {
             assignments.computeIfAbsent(a.statement(),k->new ArrayList<>()).add(a);
-            evidence.put(writeKey(a),new Evidence("ASSIGNMENT",a.statement(),statements.get(a.statement()).provenance()));
+            writeProofs.put(a,proof(new ProofKey(2,a.statement(),a.target()),new Evidence("ASSIGNMENT",a.statement(),statements.get(a.statement()).provenance())));
         }
         source.facts().tableFields().forEach(f->summarySymbols.add(f.node()));
         source.facts().conditions().forEach(c->predicates.put(c.statement(),c.predicate()));
         source.branches().forEach(b->branches.put(b.derivation(),b.whenTrue()));
-        var initial=new TreeMap<String,Values>();extents.keySet().forEach(k->initial.put(k,modelSymbols.contains(k)?Values.MODEL_UNKNOWN:Values.UNKNOWN));
-        for(var seed:source.seeds())if(demand.contains(seed.node())&&!modelSymbols.contains(seed.node())) {
-            String key="seed/"+seed.node();evidence.put(key,new Evidence("DECLARATION_VALUE",seed.node(),seed.provenance()));
-            initial.put(seed.node(),new Values(Map.of(TextPredicate.fit(seed.value(),extents.get(seed.node())),Set.of(key)),false));
-        }
-        var origins=new HashMap<String,Provenance>();source.declarations().forEach(d->origins.put(d.node(),d.provenance()));
-        var assumed=new HashSet<String>();source.facts().symbols().stream().filter(NominalValues.Symbol::modelAssumed).forEach(s->assumed.add(s.node()));
-        for(var field:source.facts().tableFields())if(demand.contains(field.node())&&!modelSymbols.contains(field.node()))for(var seed:field.initial())if(!assumed.contains(seed.origin())) {
-            String key="table-seed/"+field.node()+"/"+seed.origin();evidence.put(key,new Evidence("DECLARATION_VALUE",seed.origin(),origins.get(seed.origin())));
-            initial.merge(field.node(),new Values(Map.of(TextPredicate.fit(seed.value(),extents.get(field.node())),Set.of(key)),true,false,true),Values::join);
-        }
-        var seedState=freeze(initial);
-        for(var d:unit.derivations())if(needed.contains(d.destination())) {
-            var premises=new TreeSet<>(d.source());premises.addAll(d.callerPremise());
-            if(premises.isEmpty())join(d.destination(),seedState);
-            else for(var premise:premises)waiting.computeIfAbsent(premise,k->new ArrayList<>()).add(d);
-        }
-        // No path enumeration. Each finite value/support fact only grows at a join.
-        // The explicit bound limits resources, never licenses an empty/complete answer.
-        while(!work.isEmpty()) {
-            if(++workItems>1_000_000){limited=true;break;}
-            String id=work.removeFirst();queued.remove(id);
-            for(var d:waiting.getOrDefault(id,List.of()))propagate(d);
-        }
+        for(var symbol:extents.keySet())symbols.put(symbol,symbols.size()+1L);
+        nodeIds=new String[before.size()];for(var entry:before.entrySet())nodeIds[entry.getValue()]=entry.getKey();
+        resources=limits==null?new AnalysisResources(new AnalysisResources.Limits(Long.MAX_VALUE,Long.MAX_VALUE,0,0,0,Long.MAX_VALUE,Long.MAX_VALUE)):limits;
+        try(var cache=resources.reserve(AnalysisResources.Pool.RESIDENT,4096,AnalysisResources.Phase.DOMAIN);
+            var owned=pages==null?new ResidentPageStore(4096,resources):null;
+            var store=new SourceValueStore(pages==null?owned:pages,resources);
+            var roots=new PagedLongArray(pages==null?owned:pages,before.size(),resources,AnalysisResources.Phase.DOMAIN);
+            var tokens=new PagedLongArray(pages==null?owned:pages,before.size(),resources,AnalysisResources.Phase.DOMAIN);
+            var pending=new PagedWorklist(pages==null?owned:pages,resources,AnalysisResources.Phase.DOMAIN)) {
+            if(cache.amount()!=4096)throw new IllegalStateException("transfer cache reservation mismatch");
+            transferRoots=new long[64];transferResults=new long[64];transferLocations=new String[64];transferModes=new byte[64];
+            values=store;stateRoots=roots;stateTokens=tokens;work=pending;
+            long initial=values.emptyState();
+            for(var seed:source.seeds())if(demand.contains(seed.node())&&!modelSymbols.contains(seed.node())) {
+                long atom=proof(new ProofKey(0,seed.node(),""),new Evidence("DECLARATION_VALUE",seed.node(),seed.provenance()));
+                initial=put(initial,seed.node(),values.literal(TextPredicate.fit(seed.value(),extents.get(seed.node())),0,atom));
+            }
+            var origins=new HashMap<String,Provenance>();for(var d:source.declarations())origins.put(d.node(),d.provenance());
+            var assumed=new HashSet<String>();for(var symbol:source.facts().symbols())if(symbol.modelAssumed())assumed.add(symbol.node());
+            for(var field:source.facts().tableFields())if(demand.contains(field.node())&&!modelSymbols.contains(field.node()))for(var seed:field.initial())if(!assumed.contains(seed.origin())) {
+                long atom=proof(new ProofKey(1,field.node(),seed.origin()),new Evidence("DECLARATION_VALUE",seed.origin(),origins.get(seed.origin())));
+                initial=put(initial,field.node(),values.join(get(initial,field.node()),values.literal(TextPredicate.fit(seed.value(),extents.get(field.node())),SourceValueStore.OPEN|SourceValueStore.TABLE,atom)));
+            }
+            for(var d:unit.derivations())if(needed.contains(d.destination())) {
+                var premises=new HashSet<>(d.source());premises.addAll(d.callerPremise());
+                if(premises.isEmpty())join(d.destination(),initial);
+                else for(var premise:premises)waiting.computeIfAbsent(premise,k->new ArrayList<>()).add(d);
+            }
+            long collectAt=4096;
+            while(work.size()!=0) {
+                resources.work(1,AnalysisResources.Phase.DOMAIN);workItems++;
+                String id=nodeIds[(int)work.remove()];
+                for(var d:waiting.getOrDefault(id,List.of()))propagate(d);
+                // Amortized safepoint: no transient unrooted transfer/evaluator is active here.
+                if(values.records()>collectAt) {
+                    Arrays.fill(transferRoots,0);Arrays.fill(transferResults,0);Arrays.fill(transferLocations,null);
+                    values.collect();collectAt=Math.max(4096,Math.multiplyExact(values.records(),2));
+                }
+            }
+            for(var statement:queries.keySet())projected.put(statement,project(statement));
+            stateStatistics=new StateStatistics(values.records(),values.nodeVisits(),values.pathCopies(),resources.heapPeak(),transferEvaluations);
+        } finally {values=null;stateRoots=null;stateTokens=null;work=null;resources=null;transferRoots=null;transferResults=null;transferLocations=null;transferModes=null;}
     }
     public long workItems(){return workItems;}
-    public boolean limited(){return limited;}
-    public List<Candidate> candidates(String statement) {
-        String query=queries.get(statement);if(query==null)return List.of();
-        Values values=null;
-        for(var id:observedNodes.getOrDefault(statement,List.of()))if(before.containsKey(id)) {
-            var v=before.get(id).getOrDefault(query,Values.UNKNOWN);values=values==null?v:values.join(v);
+    /** Successful construction always completes; exhausted resources throw and publish no partial result. */
+    public boolean limited(){return false;}
+    public List<Candidate> candidates(String statement) {return projected.getOrDefault(statement,List.of());}
+    private List<Candidate> project(String statement) {
+        String query=queries.get(statement);long combined=0;
+        var observations=observedNodes.getOrDefault(statement,List.of());boolean affected=false;
+        for(var id:observations) {
+            affected|=controlAffected.contains(id);long state=stateRoots.get(before.get(id));
+            if(state!=0){long value=get(state,query);combined=combined==0?value:values.join(combined,value);}
         }
-        if(values==null)return List.of();
-        var out=new ArrayList<Candidate>();
-        for(var value:values.candidates().entrySet()) {
-            var supports=value.getValue().stream().sorted().map(evidence::get).filter(Objects::nonNull).distinct().toList();
-            var assumptions=new ArrayList<>(List.of("NOMINAL_DECLARATIONS_PRESERVE_MEANING","NO_UNMODELED_STORAGE_INTERFERENCE"));
-            if(observedNodes.getOrDefault(statement,List.of()).stream().anyMatch(controlAffected::contains))assumptions.add("UNKNOWN_CONTROL_CAN_COMPLETE");
-            if(values.tableAssumed()||summarySymbols.contains(query))assumptions.add("TABLE_INDEX_NOT_REFINED");
-            if(values.modelAssumed())assumptions.add("SYNTHETIC_MODEL_IS_NOT_KILL_PROOF");
-            if(supports.stream().anyMatch(e->e.kind().equals("DECLARATION_VALUE")))assumptions.add("DECLARATIVE_INITIAL_VALUES_APPLY");
-            out.add(new Candidate(value.getKey(),new Support(PROFILE,supports,assumptions,source.uncertainties())));
+        if(combined==0)return List.of();
+        var out=new ArrayList<Candidate>();int flags=values.flags(combined);
+        try(var candidates=values.candidates(combined)) {
+            while(candidates.advance()) {
+                var atoms=new ArrayList<Long>();
+                try(var proofs=values.supports(candidates.value())){while(proofs.advance())atoms.add(proofs.key());}
+                atoms.sort((a,b)->proofKeys.get((int)(a-1)).compareTo(proofKeys.get((int)(b-1))));
+                var distinct=new LinkedHashSet<Evidence>();for(long atom:atoms)distinct.add(evidence.get((int)(atom-1)));
+                var supports=List.copyOf(distinct);
+                var assumptions=new ArrayList<>(List.of("NOMINAL_DECLARATIONS_PRESERVE_MEANING","NO_UNMODELED_STORAGE_INTERFERENCE"));
+                if(affected)assumptions.add("UNKNOWN_CONTROL_CAN_COMPLETE");
+                if((flags&SourceValueStore.TABLE)!=0||summarySymbols.contains(query))assumptions.add("TABLE_INDEX_NOT_REFINED");
+                if((flags&SourceValueStore.MODEL)!=0)assumptions.add("SYNTHETIC_MODEL_IS_NOT_KILL_PROOF");
+                for(var support:supports)if(support.kind().equals("DECLARATION_VALUE")){assumptions.add("DECLARATIVE_INITIAL_VALUES_APPLY");break;}
+                out.add(new Candidate(values.text(candidates.key()),new Support(PROFILE,supports,assumptions,source.uncertainties())));
+            }
         }
-        return List.copyOf(out);
+        out.sort(Comparator.comparing(Candidate::rawValue));return List.copyOf(out);
+    }
+    private long proof(ProofKey key,Evidence fact) {
+        Long old=proofIds.get(key);if(old!=null)return old;
+        long id=proofKeys.size()+1L;proofKeys.add(key);evidence.add(fact);proofIds.put(key,id);return id;
+    }
+    private long get(long state,String symbol) {
+        Long id=symbols.get(symbol);return id==null?values.unknown(false):values.get(state,id,modelSymbols.contains(symbol));
+    }
+    private long put(long state,String symbol,long value) {
+        long id=symbols.get(symbol);
+        return value==values.unknown(modelSymbols.contains(symbol))?values.remove(state,id):values.put(state,id,value);
     }
     private void propagate(Derivation d) {
-        if(d.source().isEmpty()||!before.containsKey(d.source().getFirst())||d.callerPremise().stream().anyMatch(p->!before.containsKey(p)))return;
-        String location=nodes.get(d.source().getFirst()).location();var state=before.get(d.source().getFirst());
-        if(branches.containsKey(d.id())){state=filter(state,predicates.get(location),branches.get(d.id()));if(state==null)return;}
-        if(d.selection().isEmpty()&&!assignments.getOrDefault(location,List.of()).isEmpty()) {
-            var changed=new TreeMap<>(state);
-            // All origins read the predecessor snapshot before any receiver update.
-            for(var a:assignments.getOrDefault(location,List.of()))changed.put(a.target(),assigned(a,state));
-            state=freeze(changed);
+        if(d.source().isEmpty())return;
+        long state=stateRoots.get(before.get(d.source().getFirst()));if(state==0)return;
+        for(var premise:d.callerPremise())if(stateRoots.get(before.get(premise))==0)return;
+        String location=nodes.get(d.source().getFirst()).location();
+        byte mode=(byte)((branches.containsKey(d.id())?(branches.get(d.id())?2:1):0)+(d.selection().isEmpty()?4:0));
+        long hash=state*0x9e3779b97f4a7c15L+location.hashCode()*31L+mode;hash^=hash>>>33;
+        int slot=(int)hash&63;
+        long result;
+        if(transferRoots[slot]==state&&location.equals(transferLocations[slot])&&transferModes[slot]==mode)result=transferResults[slot];
+        else {
+            result=transfer(state,location,mode);
+            transferRoots[slot]=state;transferLocations[slot]=location;transferModes[slot]=mode;transferResults[slot]=result;
         }
-        join(d.destination(),state);
+        if(result!=0)join(d.destination(),result);
     }
-    private Values assigned(NominalValues.Assignment a,Map<String,Values> state) {
-        var input=term(a.source(),state);var out=new TreeMap<String,Set<String>>();
-        boolean model=modelSymbols.contains(a.target())||input.modelAssumed();
-        for(var value:input.candidates().entrySet()) {
-            var support=union(value.getValue(),Set.of(writeKey(a)));
-            out.merge(TextPredicate.fit(value.getKey(),extents.get(a.target())),support,SourceValuesProvider::union);
-            // A model's width cannot disprove a name explicitly observed in the program.
-            if(model)out.merge(value.getKey(),support,SourceValuesProvider::union);
+    private long transfer(long state,String location,byte mode) {
+        int branch=mode&3;
+        if(branch!=0){transferEvaluations++;state=filter(state,predicates.get(location),branch==2);if(state==0)return 0;}
+        var writes=assignments.getOrDefault(location,List.of());
+        if((mode&4)!=0&&!writes.isEmpty()) {
+            transferEvaluations++;long changed=state;
+            // One immutable predecessor/evaluator for all simultaneous receiver updates.
+            try(var evaluator=new Evaluator(state)) {
+                for(var a:writes)changed=put(changed,a.target(),assigned(a,state,evaluator));
+            }
+            state=changed;
         }
-        var assigned=new Values(out,input.open()||model,model,input.tableAssumed()||summarySymbols.contains(a.target()));
-        // Model assumptions supply possibilities, never a strong-update/kill proof.
-        return model||summarySymbols.contains(a.target())?state.getOrDefault(a.target(),Values.UNKNOWN).join(assigned):assigned;
+        return state;
     }
-    private static String writeKey(NominalValues.Assignment a){return "write/"+a.statement()+"/"+a.target();}
-    private Values term(NominalValues.Term t,Map<String,Values> state) {
-        if(t.kind().equals("CHOICE")){Values result=null;for(var arg:t.arguments()){var value=term(arg,state);result=result==null?value:result.join(value);}return result;}
-        if(t.extended()) {
-            var input=term(t.arguments().getFirst(),state);var values=new TreeMap<String,Set<String>>();boolean open=input.open();
-            for(var value:input.candidates().entrySet()) {
-                String text=value.getKey(),result;
-                if(t.kind().equals("UPPER_ASCII")) {
-                    if(text.codePoints().anyMatch(c->c>127)){open=true;continue;}
-                    var transformed=new StringBuilder(text.length());
-                    for(int i=0;i<text.length();i++){char c=text.charAt(i);transformed.append(c>='a'&&c<='z'?(char)(c-'a'+'A'):c);}result=transformed.toString();
-                } else {
-                    int start=0,end=text.length();
-                    if(!t.kind().equals("TRIM_TRAILING_SPACES"))while(start<end&&text.charAt(start)==' ')start++;
-                    if(!t.kind().equals("TRIM_LEADING_SPACES"))while(end>start&&text.charAt(end-1)==' ')end--;
-                    result=text.substring(start,end);
+    private long assigned(NominalValues.Assignment a,long state,Evaluator evaluator) {
+        long input=values.addSupport(evaluator.term(a.source()),writeProofs.get(a));int flags=values.flags(input);
+        boolean model=modelSymbols.contains(a.target())||(flags&SourceValueStore.MODEL)!=0;
+        if(model)flags|=SourceValueStore.OPEN|SourceValueStore.MODEL;
+        if(summarySymbols.contains(a.target()))flags|=SourceValueStore.TABLE;
+        long assigned=values.emptyValue(flags);
+        try(var candidates=values.candidates(input)) {
+            while(candidates.advance()) {
+                String text=values.text(candidates.key());long support=candidates.value();
+                assigned=values.addCandidate(assigned,TextPredicate.fit(text,extents.get(a.target())),support);
+                if(model)assigned=values.addCandidate(assigned,text,support);
+            }
+        }
+        return model||summarySymbols.contains(a.target())?values.join(get(state,a.target()),assigned):assigned;
+    }
+    private final class Evaluator implements AutoCloseable {
+        private final long state;
+        private final IdentityHashMap<NominalValues.Term,Long> terms=new IdentityHashMap<>();
+        private final IdentityHashMap<NominalValues.Predicate,Integer> predicates=new IdentityHashMap<>();
+        private final AnalysisResources.Reservation scratch;
+        Evaluator(long state){this.state=state;scratch=resources.reserve(AnalysisResources.Pool.SCRATCH,512,AnalysisResources.Phase.DOMAIN);}
+        private final class TermFrame {final NominalValues.Term term;int next;TermFrame(NominalValues.Term term){this.term=term;}}
+        long term(NominalValues.Term root) {
+            Long cached=terms.get(root);if(cached!=null)return cached;
+            var todo=new ArrayDeque<TermFrame>();scratch.grow(192,AnalysisResources.Phase.DOMAIN);todo.push(new TermFrame(root));
+            while(!todo.isEmpty()) {
+                var frame=todo.peek();var t=frame.term;
+                if(frame.next<t.arguments().size()) {
+                    var arg=t.arguments().get(frame.next++);if(!terms.containsKey(arg)){scratch.grow(192,AnalysisResources.Phase.DOMAIN);todo.push(new TermFrame(arg));}continue;
                 }
-                values.merge(result,value.getValue(),SourceValuesProvider::union);
+                long result;
+                if(t.kind().equals("CHOICE")) {
+                    result=0;for(var arg:t.arguments()){long value=terms.get(arg);result=result==0?value:values.join(result,value);}
+                } else if(t.extended())result=transform(t,terms.get(t.arguments().getFirst()));
+                else result=switch(t.kind()) {
+                    case "READ"->get(state,t.value());
+                    case "LITERAL"->values.literal(t.value(),0,0);
+                    case "SPACES"->values.literal(" ",0,0);
+                    default->values.unknown(false);
+                };
+                terms.put(t,result);todo.pop();
             }
-            return new Values(values,open,input.modelAssumed(),input.tableAssumed());
+            return terms.get(root);
         }
-        return switch(t.kind()) {
-            case "READ"->state.getOrDefault(t.value(),Values.UNKNOWN);
-            case "LITERAL"->new Values(Map.of(t.value(),Set.of()),false);
-            case "SPACES"->new Values(Map.of(" ",Set.of()),false);
-            default->Values.UNKNOWN; // LOW/HIGH retain unknown collating sequence.
-        };
-    }
-    private Map<String,Values> filter(Map<String,Values> state,NominalValues.Predicate p,boolean whenTrue) {
-        if(p==null||reads(p).stream().anyMatch(summarySymbols::contains)||reads(p).stream().anyMatch(s->state.getOrDefault(s,Values.UNKNOWN).modelAssumed()))return state;int wanted=whenTrue?TextPredicate.TRUE:TextPredicate.FALSE;
-        if((truth(p,state)&wanted)==0)return null;
-        var result=new TreeMap<>(state);
-        for(var symbol:reads(p)) {
-            var old=state.get(symbol);if(old==null)continue;var kept=new TreeMap<String,Set<String>>();
-            for(var value:old.candidates().entrySet()) {
-                var snapshot=new TreeMap<>(state);snapshot.put(symbol,new Values(Map.of(value.getKey(),value.getValue()),false));
-                if((truth(p,snapshot)&wanted)!=0)kept.put(value.getKey(),value.getValue());
+        private long transform(NominalValues.Term t,long input) {
+            int flags=values.flags(input);long result=values.emptyValue(flags);
+            try(var candidates=values.candidates(input)) {
+                while(candidates.advance()) {
+                    String text=values.text(candidates.key()),transformed;
+                    if(t.kind().equals("UPPER_ASCII")) {
+                        boolean ascii=true;for(int i=0;i<text.length();i++)if(text.charAt(i)>127){ascii=false;break;}
+                        if(!ascii){flags|=SourceValueStore.OPEN;continue;}
+                        var builder=new StringBuilder(text.length());
+                        for(int i=0;i<text.length();i++){char c=text.charAt(i);builder.append(c>='a'&&c<='z'?(char)(c-'a'+'A'):c);}transformed=builder.toString();
+                    } else {
+                        int start=0,end=text.length();
+                        if(!t.kind().equals("TRIM_TRAILING_SPACES"))while(start<end&&text.charAt(start)==' ')start++;
+                        if(!t.kind().equals("TRIM_LEADING_SPACES"))while(end>start&&text.charAt(end-1)==' ')end--;
+                        transformed=text.substring(start,end);
+                    }
+                    result=values.addCandidate(result,transformed,candidates.value());
+                }
             }
-            if(kept.isEmpty()&&!old.open())return null;
-            result.put(symbol,new Values(kept,old.open(),old.modelAssumed(),old.tableAssumed()));
+            return values.withFlags(result,flags);
         }
-        return freeze(result);
-    }
-    private int truth(NominalValues.Predicate p,Map<String,Values> state) {
-        if(p.kind().equals("NOT"))return TextPredicate.negate(truth(p.children().getFirst(),state));
-        if(p.kind().equals("AND")||p.kind().equals("OR")) {
-            boolean and=p.kind().equals("AND");int result=and?TextPredicate.TRUE:TextPredicate.FALSE;
-            for(var child:p.children())result=TextPredicate.combine(and,result,truth(child,state));return result;
+        private final class PredicateFrame {final NominalValues.Predicate predicate;int next;PredicateFrame(NominalValues.Predicate p){predicate=p;}}
+        int truth(NominalValues.Predicate root) {
+            Integer cached=predicates.get(root);if(cached!=null)return cached;
+            var todo=new ArrayDeque<PredicateFrame>();scratch.grow(192,AnalysisResources.Phase.DOMAIN);todo.push(new PredicateFrame(root));
+            while(!todo.isEmpty()) {
+                var frame=todo.peek();var p=frame.predicate;
+                if(frame.next<p.children().size()) {
+                    var child=p.children().get(frame.next++);if(!predicates.containsKey(child)){scratch.grow(192,AnalysisResources.Phase.DOMAIN);todo.push(new PredicateFrame(child));}continue;
+                }
+                int result;
+                if(p.kind().equals("NOT"))result=TextPredicate.negate(predicates.get(p.children().getFirst()));
+                else if(p.kind().equals("AND")||p.kind().equals("OR")) {
+                    boolean and=p.kind().equals("AND");result=and?TextPredicate.TRUE:TextPredicate.FALSE;
+                    for(var child:p.children())result=TextPredicate.combine(and,result,predicates.get(child));
+                } else {
+                    long left=term(p.terms().get(0)),right=term(p.terms().get(1));
+                    boolean leftFigure=figurative(p.terms().get(0)),rightFigure=figurative(p.terms().get(1));
+                    if(rightFigure)result=TextPredicate.sourceFigurativeEquality(texts(left),(values.flags(left)&SourceValueStore.OPEN)!=0);
+                    else if(leftFigure)result=TextPredicate.sourceFigurativeEquality(texts(right),(values.flags(right)&SourceValueStore.OPEN)!=0);
+                    else result=TextPredicate.sourceEquality(texts(left),(values.flags(left)&SourceValueStore.OPEN)!=0,texts(right),(values.flags(right)&SourceValueStore.OPEN)!=0);
+                }
+                predicates.put(p,result);todo.pop();
+            }
+            return predicates.get(root);
         }
-        var left=term(p.terms().get(0),state);var right=term(p.terms().get(1),state);
-        if(Set.of("LOW_VALUES","HIGH_VALUES").contains(p.terms().get(1).kind()))return TextPredicate.sourceFigurativeEquality(left.candidates().keySet(),left.open());
-        if(Set.of("LOW_VALUES","HIGH_VALUES").contains(p.terms().get(0).kind()))return TextPredicate.sourceFigurativeEquality(right.candidates().keySet(),right.open());
-        return TextPredicate.sourceEquality(left.candidates().keySet(),left.open(),right.candidates().keySet(),right.open());
+        @Override public void close(){terms.clear();predicates.clear();scratch.close();}
     }
-    private void join(String node,Map<String,Values> incoming) {
-        var previous=before.get(node);if(incoming.equals(previous))return;
-        Map<String,Values> joined=incoming;
-        if(previous!=null){var merge=new TreeMap<>(incoming);previous.forEach((k,v)->merge.merge(k,v,Values::join));joined=merge;}
-        if(!joined.equals(previous)){before.put(node,freeze(joined));if(queued.add(node))work.addLast(node);}
+    private static boolean figurative(NominalValues.Term term){return term.kind().equals("LOW_VALUES")||term.kind().equals("HIGH_VALUES");}
+    private List<String> texts(long value) {
+        var result=new ArrayList<String>();try(var cursor=values.candidates(value)){while(cursor.advance())result.add(values.text(cursor.key()));}return result;
+    }
+    private long filter(long state,NominalValues.Predicate predicate,boolean whenTrue) {
+        if(predicate==null)return state;
+        var reads=predicateReads.computeIfAbsent(predicate,SourceValuesProvider::reads);
+        for(var symbol:reads)if(summarySymbols.contains(symbol)||(values.flags(get(state,symbol))&SourceValueStore.MODEL)!=0)return state;
+        int wanted=whenTrue?TextPredicate.TRUE:TextPredicate.FALSE;
+        try(var evaluator=new Evaluator(state)){if((evaluator.truth(predicate)&wanted)==0)return 0;}
+        long result=state;
+        for(var symbol:reads) {
+            if(!symbols.containsKey(symbol))continue;
+            long old=get(state,symbol),kept=values.emptyValue(values.flags(old));boolean any=false;
+            try(var candidates=values.candidates(old)) {
+                while(candidates.advance()) {
+                    long snapshot=put(state,symbol,values.oneCandidate(old,candidates.key(),candidates.value()));
+                    try(var evaluator=new Evaluator(snapshot)) {
+                        if((evaluator.truth(predicate)&wanted)!=0){kept=values.addCandidate(kept,values.text(candidates.key()),candidates.value());any=true;}
+                    }
+                }
+            }
+            if(!any&&(values.flags(old)&SourceValueStore.OPEN)==0)return 0;
+            result=put(result,symbol,kept);
+        }
+        return result;
+    }
+    private void join(String node,long incoming) {
+        int ordinal=before.get(node);long previous=stateRoots.get(ordinal);
+        long joined=previous==0?incoming:values.joinStates(previous,incoming);if(joined==previous)return;
+        long token=values.retain(joined),old=stateTokens.get(ordinal);
+        stateRoots.set(ordinal,joined);stateTokens.set(ordinal,token);if(old!=0)values.release(old);
+        work.add(ordinal);
     }
     /** Incoming ordinal links include every source/caller premise of every alternative. */
     private static Set<String> neededNodes(UnitEvidence unit,Set<String> requested) {
@@ -222,13 +344,18 @@ public final class SourceValuesProvider {
         }
         var result=new HashSet<String>();for(int i=needed.nextSetBit(0);i>=0;i=needed.nextSetBit(i+1))result.add(unit.nodes().get(i).id());return result;
     }
-    private static Set<String> reads(NominalValues.Predicate p) {
-        var out=new HashSet<String>();var todo=new ArrayDeque<NominalValues.Predicate>();todo.add(p);
-        while(!todo.isEmpty()){var next=todo.removeFirst();for(var t:next.terms())out.addAll(reads(t));todo.addAll(next.children());}return out;
+    private static Set<String> reads(NominalValues.Predicate root) {
+        var out=new HashSet<String>();var predicates=new ArrayDeque<NominalValues.Predicate>();predicates.add(root);
+        var seenPredicates=new IdentityHashMap<NominalValues.Predicate,Boolean>();
+        var seenTerms=new IdentityHashMap<NominalValues.Term,Boolean>();var terms=new ArrayDeque<NominalValues.Term>();
+        while(!predicates.isEmpty()) {
+            var p=predicates.removeFirst();if(seenPredicates.put(p,Boolean.TRUE)!=null)continue;
+            terms.addAll(p.terms());predicates.addAll(p.children());
+        }
+        while(!terms.isEmpty()) {
+            var term=terms.removeFirst();if(seenTerms.put(term,Boolean.TRUE)!=null)continue;
+            if(term.kind().equals("READ"))out.add(term.value());terms.addAll(term.arguments());
+        }
+        return Set.copyOf(out);
     }
-    private static Set<String> reads(NominalValues.Term root) {
-        var out=new HashSet<String>();var todo=new ArrayDeque<NominalValues.Term>();todo.add(root);
-        while(!todo.isEmpty()){var t=todo.removeFirst();if(t.kind().equals("READ"))out.add(t.value());todo.addAll(t.arguments());}return out;
-    }
-    private static <T> Set<T> union(Set<T> a,Set<T> b){var out=new HashSet<>(a);out.addAll(b);return Set.copyOf(out);}
 }

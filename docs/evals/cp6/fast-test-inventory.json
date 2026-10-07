@@ -304,7 +304,8 @@
     "io.github.gustavo2358.analysis.adapters.MemoryPageStoreTest": [
       "memoryAndForcedFileBackendsProduceTheSamePrimitiveExecutionTranscript",
       "metadataGrowthReservesTheOldPlusNewPeakBeforeAllocatingAndKeepsOldPagesExact",
-      "staleGenerationsNeverReviveAndReusedPayloadIsZeroWithFixedCapacity"
+      "staleGenerationsNeverReviveAndReusedPayloadIsZeroWithFixedCapacity",
+      "residentKernelPortAndOuterAdapterShareExactExecutionAndCleanup"
     ],
     "io.github.gustavo2358.analysis.adapters.CanonicalTupleArenaTest": [
       "completePrimitiveKeysCanonicalizeWithoutRetainingCallerBuffers",
@@ -329,6 +330,10 @@
       "controlReservationDenialLeavesBorrowedStorageAndArenaUsable",
       "joinsSkipSharedSubtreesAndAgreeWithIndependentPointwiseUnion",
       "referenceValueJoinsCanReenterIndependentPrimitiveJoinsAndRemainCollectable"
+    ],
+    "io.github.gustavo2358.analysis.adapters.SourcePagedProviderTest": [
+      "forcedSpillMatchesAllResidentProofsWithSmallManagedWorkingSetAndBorrowedStoreOwnership",
+      "absentObservationsAllocateNoPagesAndDeniedCapacityCannotReturnSemanticPartial"
     ]
   },
   "analysis-dataflow": {
@@ -382,7 +387,10 @@
       "unknownCollatingCharacterAndUnicodeRemainExplicit",
       "unknownModelCopyCannotKillAnObservedName",
       "unknownTableWriteAndPredicateRetainPossibleElements",
-      "unobservedRootedTailDoesNotRetainStatesOrChangeCompleteSupports"
+      "unobservedRootedTailDoesNotRetainStatesOrChangeCompleteSupports",
+      "growingAssignmentHistoryKeepsAllProofsWithSharedPrimitiveVersions",
+      "sharedPredecessorEvaluatesOneTransferForEveryOutgoingAlternative",
+      "typedProofIdentityCannotAliasStatementsAndSymbolsContainingSeparators"
     ],
     "io.github.gustavo2358.analysis.dependencies.SourceCertificateTest": [
       "groundingPreservesAndOrCyclesAndHashCollisions"
@@ -397,6 +405,14 @@
     "io.github.gustavo2358.analysis.dependencies.SourceCorrelationIndexTest": [
       "nativeFileAdmissionIndexesNodesOnceInsteadOfScanningPerUse",
       "completeAlternativeSetsAndQualificationOwnershipRemainMandatory"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.SourceValueStoreTest": [
+      "valueJoinsPreserveEveryCandidateSupportAndAllOpenModelTableFlags",
+      "emptySupportIsKnownCandidateAndUnknownJoinDoesNotEraseKnownFacts",
+      "successiveAssignmentsShareGrowingSupportInsteadOfCopyingAllPriorSets",
+      "supportAndFlagChangesKeepOldValuesAndCallerRootsIndependent",
+      "sparseReachableStatesJoinMissingValuesWithDefaultsWithoutInventingKnownFacts",
+      "randomSparseJoinsMatchIndependentDenseDefaultStatesIncludingModelsAndTables"
     ]
   },
   "analysis-kernel": {

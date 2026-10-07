@@ -55,6 +55,16 @@ final class MemoryPageStoreTest {
         }
         assertEquals(0, memoryResources.heapUsed()); assertEquals(0, fileResources.heapUsed());
     }
+    @Test void residentKernelPortAndOuterAdapterShareExactExecutionAndCleanup() {
+        var innerResources = resources(1_000_000); var outerResources = resources(1_000_000);
+        try (var inner = new ResidentPageStore(128, innerResources);
+             var outer = new MemoryPageStore(128, outerResources)) {
+            assertEquals(transcript(inner, innerResources), transcript(outer, outerResources));
+            assertEquals(inner.statistics(), outer.statistics());
+            assertEquals(innerResources.heapUsed(), outerResources.heapUsed());
+        }
+        assertEquals(0, innerResources.heapUsed()); assertEquals(0, outerResources.heapUsed());
+    }
 
     @Test void metadataGrowthReservesTheOldPlusNewPeakBeforeAllocatingAndKeepsOldPagesExact() {
         var resources = resources(1100);

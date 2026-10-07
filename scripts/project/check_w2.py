@@ -13,7 +13,7 @@ from check_w1 import ROOT, Failure, command
 
 PREFIX='io.github.gustavo2358.analysis.solver.'
 INVENTORY='docs/evals/cp5/w2-inventory.json'
-NAMES=['ActivationBoundaries','ActivationModel','ActivationSolver','BackwardActivationSolver','BooleanConditions','CallerWitnesses','Direction','AnalysisPoint','AnalysisDefinition','DomainWork','SolverMetrics','DataflowResult','SolverTopology','DataflowSolver','IntWorklist','AnalysisResources','PageStore','PagedLongArray','PagedWorklist','PagedLongIndex','CanonicalTupleArena','PersistentLongMap']
+NAMES=['ActivationBoundaries','ActivationModel','ActivationSolver','BackwardActivationSolver','BooleanConditions','CallerWitnesses','Direction','AnalysisPoint','AnalysisDefinition','DomainWork','SolverMetrics','DataflowResult','SolverTopology','DataflowSolver','IntWorklist','AnalysisResources','PageStore','PagedLongArray','PagedWorklist','PagedLongIndex','CanonicalTupleArena','PersistentLongMap','ResidentPageStore']
 SOURCES={f'analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/{name}.java' for name in NAMES}
 TESTS={
  'SolverTest':set('forwardBoundaryBlockAndEdgeHaveProgramOrderMeaning'.split()),

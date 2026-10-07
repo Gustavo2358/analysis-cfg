@@ -174,7 +174,8 @@ records without materializing them, and checks the owning index version. Mutatio
 attempts invalidate active cursors; owner close releases all cursor reservations.
 Closing or exhausting a cursor detaches its owner and traversal buffers.
 
-`MemoryPageStore` is an explicit resident backend for the same port. It retains
+The kernel `ResidentPageStore` is an explicit resident backend for the same port;
+`MemoryPageStore` delegates to it without a second implementation. It retains
 reusable payload capacity under heap quota and reserves the old-plus-new metadata
 growth peak together with the next payload before allocation. It claims no bounded
 working set beyond that resident quota. The same primitive execution transcript
@@ -198,9 +199,10 @@ retirement of scalar versions whose laws remain unproved. Active observations,
 pending work and bindings must explicitly retain their storage roots. A handle's
 identity includes the owning arena; numeric handles are not global model IDs.
 
-These primitives are not yet wired into production analysis. Passing their tests
-does not establish bounded residency for AIR decoding, summaries, proofs, queues,
-unique indexes or serialization. Those integration obligations remain open.
+Source state/support execution now uses these primitives through production callers.
+Passing storage tests alone does not establish bounded residency for AIR decoding,
+activation summaries, scalar/regional states, source dictionaries or serialization.
+Those integration obligations remain open.
 
 The [typed AIR producer repin](../sources/air-scale-access-repin.md) fixes the official
 access/builder at `3bb2d55e7912ff34ee5185a2be51ab71a1a20b56`. `PagedAirStorage` bridges
@@ -224,8 +226,7 @@ not K² pairs. Iterative construction memoizes each AST identity once per layer.
 
 A primitive fair traversal enqueues each reached vertex once and examines each
 outgoing stored edge once. Cost is O(indexed input + demanded graph), independent
-of assignment inventory order. Candidate/support/outcome evaluation is unchanged;
-this graph computes demand only, never proves a candidate or discharges a premise.
+of assignment inventory order. This graph computes demand only, never proves a candidate or discharges a premise.
 `DemandStatistics` exposes actual reached node/edge visits and stored edges.
 The small independent set-fixpoint oracle, reversed 131,072-edge chain, condition
 incidence and shared-DAG/directedness countercases exercise the structural claim.
@@ -238,8 +239,8 @@ the previous product, and independent missing/wrong/dangling qualification cases
 retain their rule-specific rejection.
 
 These source changes are used by production callers of the resident APIs. They
-are not the complete source rewrite: state/proof persistence, preparation lifetime,
-full source correlation and managed paging remain open. Resident String/ordinal
+are not the complete source rewrite: shared preparation lifetime, full source
+correlation, input/dictionary paging and managed output remain open. Resident String/ordinal
 indexes and primitive int arrays have explicit resident ownership; they do not gain
 a spill guarantee by using the paged runtime elsewhere.
 
@@ -269,8 +270,8 @@ the borrowed arena/store. Stale handles cannot revive collected facts.
 
 Map path work is independent of full state size; canonical interning still pays
 the arena's full-tuple ordered-index cost. This is no universal O(1) solver claim.
-The current primitive is not yet used by source/scalar/regional domain states.
-The migration must replace state/support copying and preserve their joins, weak
+Source now uses this primitive for states, candidate maps and proof sets. Scalar and
+regional domain migrations remain open. Every integration must preserve joins, weak
 writes, model assumptions, outcomes, candidates and proof fields before qualification.
 Tests compare old/live versions against independent TreeMaps across resident and
 forced-spill stores, signed extremes, zero, reference rooting, quotas, cursor lifetime
@@ -291,4 +292,54 @@ cache avoids repeating trie prefix walks without retaining obsolete roots. Branc
 leaf counts provide constant field access to cardinality. Referenced value join
 and collection tests check nested maps, callback reentry and lease release. This
 checkpoint establishes the primitive's behavior, not the unresolved scalar domain
-join law or production state migration.
+join law or complete cross-domain migration.
+
+
+## Persistent source states and complete proof sets
+
+`SourceValuesProvider` stores each reachable before-state as a positive canonical
+state record, referencing a primitive persistent map of symbol overrides. Unreachable
+bottom is zero. Ordinary UNKNOWN and model UNKNOWN defaults are implicit, so large
+demand inventories do not create a full initial state. First arrival at bottom copies
+its incoming root; joins between reachable states align trie branches. An unmatched
+override joins its missing counterpart's default by adding OPEN, preserving every
+candidate/support and existing model/table flag. Model-symbol overrides always carry
+MODEL: model declarations never seed a candidate, model writes are weak, and model
+predicate reads bypass refinement. Independent dense-default random oracles challenge
+this invariant, including disjoint states and model/table flags.
+
+Candidate maps reference persistent support sets in the same arena. A declaration
+or assignment is a typed proof atom, identified by complete kind/owner/detail fields;
+delimited display text is not identity. An assignment adds its atom through a bounded
+trie path rather than copying all prior proofs. State writes likewise share unchanged
+branches. Simultaneous receivers evaluate against one immutable predecessor; ordinary
+known writes retain strong kills, while model/table writes union with previous values.
+ASCII upper, space-only trim, Unicode scalar fits, candidate refinement and all source
+assumptions/uncertainties retain their published meaning.
+
+Term/predicate evaluation uses iterative identity-memoized DAG traversal scoped to a
+predecessor. Fixed exact transfer and state-join caches memoize complete keys, do not
+retain roots and are cleared before collection. Before roots/retention tokens use
+page columns; pending work uses the paged FIFO. Each state replacement releases only
+its former slot token. Safepoints collect outside transient construction and occur
+only after record growth exceeds twice the last live size (with a fixed initial
+threshold), avoiding a full sweep on every assignment. No historical cache entry is
+a GC root. The previous one-million-work semantic cutoff is removed: configured
+resource exhaustion throws operational failure instead of returning PARTIAL facts.
+`limited()` remains a compatibility accessor and is false after successful construction.
+
+The existing resident API detaches all requested candidates once after solving and
+closes its temporary arena/columns/worklist/store. The additive borrowed PageStore +
+AnalysisResources constructor closes its own owners and leaves the shared store open.
+The original constructor is explicitly resident and uses no implicit process-derived
+memory quota; applications wanting managed capacity supply the ledger/store. Source
+input handle indexes, typed proof/text dictionaries and detached List output remain
+resident bridges, not a whole-route bounded-memory claim. Complete external input,
+dictionaries and output cursors are still required by AS-W02/08/09.
+
+Tests include full proof preservation across 1,024 assignments with bounded shared
+record growth, shared-predecessor fanout with one transfer evaluation, separator-safe
+proof identities, empty observation zero-page admission, controlled quota failure,
+and exact resident/forced-spill equivalence under a 64 KiB managed working set. The
+original source-state discovery family must also pass at its original heap envelope;
+these tests alone do not qualify all dependencies paths or the corporate incident.
