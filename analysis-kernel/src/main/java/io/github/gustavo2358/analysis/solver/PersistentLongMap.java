@@ -189,6 +189,56 @@ public final class PersistentLongMap implements AutoCloseable {
             }
         } catch (AnalysisResources.Exhausted | PageStore.Failure exception) { failed = true; throw exception; }
     }
+    /**
+     * Keep exactly the left entries whose keys occur in right, preserving left values/kinds.
+     * Prefix-disjoint and identical subtrees need no leaf enumeration. One-sided overlap
+     * descends directly; matched branches use a leased stack bounded by the key width.
+     */
+    public synchronized long intersectKeys(long left, long right) {
+        open();
+        if (left < 0 || right < 0) throw new IllegalArgumentException("nonnegative arena roots required");
+        try {
+            if (left != 0) kind(left); if (right != 0 && right != left) kind(right);
+            if (left == right) return left;
+            if (left == 0 || right == 0) return 0;
+            try (var scratch = resources.reserve(AnalysisResources.Pool.SCRATCH, 2048, phase)) {
+                if (scratch.amount() != 2048) throw new IllegalStateException("intersection scratch reservation mismatch");
+                long[] a = new long[65], b = new long[65], first = new long[65];
+                byte[] stage = new byte[65];
+                a[0] = left; b[0] = right; int top = 0; long result = 0;
+                while (top >= 0) {
+                    if (stage[top] == 0) {
+                        long x = a[top], y = b[top];
+                        if (x == y) { result = x; top--; continue; }
+                        if (x == 0 || y == 0) { result = 0; top--; continue; }
+                        long xKind = kind(x), yKind = kind(y);
+                        if (xKind != BRANCH) { result = lookup(y, arena.field(x, 1)) != 0 ? x : 0; top--; continue; }
+                        if (yKind != BRANCH) { result = lookup(x, arena.field(y, 1)); top--; continue; }
+                        int xBit = bit(x, -1), yBit = bit(y, -1);
+                        long xKey = representative(x), yKey = representative(y);
+                        if (Long.numberOfLeadingZeros(xKey ^ yKey) < Math.min(xBit, yBit)) {
+                            result = 0; top--; continue;
+                        }
+                        if (xBit < yBit) {
+                            a[top] = arena.field(x, direction(yKey, xBit) == 0 ? 4 : 5); continue;
+                        }
+                        if (yBit < xBit) {
+                            b[top] = arena.field(y, direction(xKey, yBit) == 0 ? 4 : 5); continue;
+                        }
+                        if (top == 64) throw new IllegalArgumentException("intersection path exceeds key width");
+                        stage[top] = 1; a[top + 1] = arena.field(x, 4); b[top + 1] = arena.field(y, 4); stage[++top] = 0;
+                    } else if (stage[top] == 1) {
+                        first[top] = result; stage[top] = 2;
+                        a[top + 1] = arena.field(a[top], 5); b[top + 1] = arena.field(b[top], 5); stage[++top] = 0;
+                    } else {
+                        result = first[top] == 0 ? result : result == 0 ? first[top] : branch(bit(a[top], -1), first[top], result);
+                        top--;
+                    }
+                }
+                return result;
+            }
+        } catch (AnalysisResources.Exhausted | PageStore.Failure exception) { failed = true; throw exception; }
+    }
     /** Iterative structural value transform. Identity transforms preserve canonical subtree roots. */
     public synchronized long mapValues(long root, boolean referenceValues, LongUnaryOperator values) {
         open(); Objects.requireNonNull(values);

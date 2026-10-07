@@ -15,6 +15,58 @@ final class PersistentLongMapTest {
     private static CanonicalTupleArena arena(PageStore pages, AnalysisResources resources) {
         return new CanonicalTupleArena(pages, resources, AnalysisResources.Phase.DOMAIN, 6, new int[]{2, 4, 5});
     }
+    @Test void keyIntersectionsPreserveLeftPayloadsAndMatchIndependentOrderedMaps() {
+        for(boolean disk:new boolean[]{false,true}) {
+            var resources=resources();
+            try(PageStore pages=disk?new FilePageStore(directory,512,4,resources):new MemoryPageStore(512,resources);
+                var arena=arena(pages,resources);var maps=new PersistentLongMap(arena,resources,AnalysisResources.Phase.DOMAIN)) {
+                {
+                long proof=arena.intern(9,713,0,0,0,0);
+                long left=maps.putReference(maps.put(0,-1,0),Long.MIN_VALUE,proof);
+                long right=maps.put(maps.put(0,Long.MIN_VALUE,42),Long.MAX_VALUE,0);
+                long intersection=maps.intersectKeys(left,right);
+                assertTrue(maps.reference(intersection,Long.MIN_VALUE));assertEquals(proof,maps.get(intersection,Long.MIN_VALUE));
+                try(var cursor=maps.cursor(intersection)) {
+                    assertTrue(cursor.advance());arena.collect();assertEquals(713,arena.field(proof,1));
+                }
+                }
+                var random=new Random(238547);
+                long[] corners={Long.MIN_VALUE,Long.MAX_VALUE,-1,0,1};
+                for(int sample=0;sample<40;sample++) {
+                    var expected=new TreeMap<Long,Long>();var rightKeys=new HashSet<Long>();long left=0,right=0;
+                    for(int i=0;i<100;i++) {
+                        long key=i<corners.length?corners[i]:i%2==0?random.nextInt(70)-35:random.nextLong();
+                        long value=random.nextInt(21)-10;left=maps.put(left,key,value);expected.put(key,value);
+                        if(random.nextBoolean()){right=maps.put(right,key,999);rightKeys.add(key);}
+                        key=random.nextLong();right=maps.put(right,key,-777);rightKeys.add(key);
+                    }
+                    expected.keySet().retainAll(rightKeys);long intersection=maps.intersectKeys(left,right);
+                    assertMap(maps,intersection,expected);assertEquals(left,maps.intersectKeys(left,left));
+                    assertEquals(0,maps.intersectKeys(left,0));assertEquals(0,maps.intersectKeys(0,right));
+                    long rebuilt=0;for(var entry:expected.entrySet())rebuilt=maps.put(rebuilt,entry.getKey(),entry.getValue());
+                    assertEquals(rebuilt,intersection,"intersection must preserve canonical left values");
+                }
+
+            }
+            assertEquals(0,resources.heapUsed());assertEquals(0,resources.used(AnalysisResources.Pool.TEMPORARY));
+        }
+    }
+    @Test void keyIntersectionsSkipSharedSubtreesAndHandleSignedPrefixCorners() {
+        var resources=resources();
+        try(var pages=new MemoryPageStore(512,resources);var arena=arena(pages,resources);
+            var maps=new PersistentLongMap(arena,resources,AnalysisResources.Phase.DOMAIN)) {
+            long common=0;for(int i=0;i<4096;i++)common=maps.put(common,i,1);
+            long changed=maps.remove(maps.put(common,Long.MIN_VALUE,2),2177),before=maps.nodeVisits();
+            long intersection=maps.intersectKeys(common,changed);
+            assertTrue(maps.nodeVisits()-before<512,"shared prefixes were flattened");
+            assertEquals(maps.remove(common,2177),intersection);
+            long left=maps.put(maps.put(0,Long.MIN_VALUE,17),0,3);
+            long right=maps.put(maps.put(0,Long.MIN_VALUE,99),1,4);
+            assertEquals(maps.put(0,Long.MIN_VALUE,17),maps.intersectKeys(left,right));
+            assertEquals(0,maps.intersectKeys(maps.put(0,-2,1),maps.put(0,2,1)));
+        }
+        assertEquals(0,resources.heapUsed());
+    }
     @Test void residentAndForcedSpillVersionsMatchIndependentOrderedMaps() {
         for (boolean disk : new boolean[]{false, true}) {
             var resources = resources();

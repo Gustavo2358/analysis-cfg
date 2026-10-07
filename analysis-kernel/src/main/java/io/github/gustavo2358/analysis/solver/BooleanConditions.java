@@ -141,6 +141,10 @@ final class BooleanConditions {
         while(value>=2){var n=nodes.get(value);value=assignment.get(n.variable)?n.high:n.low;}
         return value==TRUE;
     }
+    boolean test(int value,PersistentLongMap assignment,long root) {
+        while(value>=2){var n=nodes.get(value);value=assignment.contains(root,n.variable)?n.high:n.low;}
+        return value==TRUE;
+    }
     /** Drop only scratch nodes allocated by a read-only query after its checkpoint.
      * No condition created in that scope may escape. Surviving IDs stay stable. */
     void discardAfter(int checkpoint) {

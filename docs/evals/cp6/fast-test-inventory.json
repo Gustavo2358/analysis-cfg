@@ -329,7 +329,9 @@
       "ownerCloseReleasesActiveCursorRootsAndScratchWithoutClosingBorrowedArena",
       "controlReservationDenialLeavesBorrowedStorageAndArenaUsable",
       "joinsSkipSharedSubtreesAndAgreeWithIndependentPointwiseUnion",
-      "referenceValueJoinsCanReenterIndependentPrimitiveJoinsAndRemainCollectable"
+      "referenceValueJoinsCanReenterIndependentPrimitiveJoinsAndRemainCollectable",
+      "keyIntersectionsPreserveLeftPayloadsAndMatchIndependentOrderedMaps",
+      "keyIntersectionsSkipSharedSubtreesAndHandleSignedPrefixCorners"
     ],
     "io.github.gustavo2358.analysis.adapters.SourcePagedProviderTest": [
       "forcedSpillMatchesAllResidentProofsWithSmallManagedWorkingSetAndBorrowedStoreOwnership",
@@ -602,7 +604,11 @@
     ],
     "io.github.gustavo2358.analysis.solver.CallerWitnessesTest": [
       "separateWitnessesNeverInventACombinedCaller",
-      "cachedValuationsHaveExplicitPathsAndStayBoundedInCyclicGraphs"
+      "cachedValuationsHaveExplicitPathsAndStayBoundedInCyclicGraphs",
+      "sparseDeepPrefixesShareStorageInsteadOfCopyingTheKeyUniverse",
+      "ownersReleaseRetentionsAndQuotaFailureLeavesBorrowedPagesUsable",
+      "queuedPathsAndSeparateWitnessesSurviveCollectionOfOldLiteralSummaries",
+      "queueGrowthDenialReleasesAllPrivatePagesWithoutClosingBorrowedStore"
     ],
     "io.github.gustavo2358.analysis.storage.NumericExpressionEffectsTest": [
       "explicitParseRetainsTextAndInvalidFallbackReads",

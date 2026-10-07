@@ -30,7 +30,7 @@ final class BackwardActivationSolver<S> {
                 for(var watched:slot.watches)visit.accept(watched);
             }
         });
-        feasibleCache.clear();deferredCache.clear();finalWitnesses.clear();
+        feasibleCache.clear();deferredCache.clear();closeWitnesses();
         for(var entry:entries) {
             long removed=collector.retain(entry.regions,this::retireSummary);summaryRetired+=removed;summaryLive-=removed;
             var iterator=entry.byFrame.entrySet().iterator();
@@ -57,7 +57,7 @@ final class BackwardActivationSolver<S> {
     private final Map<Need,Deferred> deferredCache=new LinkedHashMap<>();
     BackwardActivationSolver(AnalysisSession session,AnalysisDefinition<S> definition){this.session=session;this.definition=definition;bottom=Objects.requireNonNull(definition.bottom());}
     DataflowResult<S> solve() {
-        try {return execute();}finally{for(var entry:entries){for(var index:entry.byFrame.values())index.close();entry.byFrame.clear();}if(collector!=null)collector.close();}
+        try {return execute();}finally{closeWitnesses();for(var entry:entries){for(var index:entry.byFrame.values())index.close();entry.byFrame.clear();}if(collector!=null)collector.close();}
     }
     private DataflowResult<S> execute() {
         for(var model:ActivationSolver.structure(session))entries.add(new EntryRun(model));
@@ -356,12 +356,13 @@ final class BackwardActivationSolver<S> {
         final Region region;final int condition,pushedVariable;final Witness child;final boolean requiredSeen;
         Witness(Region region,int condition,Witness child,boolean requiredSeen,int pushedVariable){this.region=region;this.condition=condition;this.child=child;this.requiredSeen=requiredSeen;this.pushedVariable=pushedVariable;}
     }
+    private void closeWitnesses(){for(var witness:finalWitnesses.values())witness.close();finalWitnesses.clear();}
     private final Map<EntryRun,CallerWitnesses<Region>> finalWitnesses=new IdentityHashMap<>();
     private CallerWitnesses<Region> finalWitnesses(EntryRun entry) {
         var successors=new IdentityHashMap<Region,List<CallerWitnesses.Edge<Region>>>();
         for(var child:entry.regions)for(var link:child.incoming.entrySet())
             successors.computeIfAbsent(link.getKey().region,r->new ArrayList<>()).add(new CallerWitnesses.Edge<>(child,link.getValue(),entry.model.control().frameAt(link.getKey().node).variable()));
-        return new CallerWitnesses<>(entry.bdd,entry.model.control().variables(),entry.root,successors,r->r.frame==null?-1:r.frame.variable());
+        return new CallerWitnesses<>(entry.bdd,entry.model.control().variables(),entry.root,successors,r->r.frame==null?-1:r.frame.variable(),indexResources,null);
     }
     private boolean feasible(Region region,int condition) {return feasible(region,condition,null);}
     private boolean feasible(Region region,int condition,Slot subscriber) {

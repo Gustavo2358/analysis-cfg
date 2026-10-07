@@ -138,3 +138,42 @@ The geometric serial-call test was RED at32 callers with1,107 transfers; its
 unchanged bound requires at most16*(callers+body nodes) transfers and formal
 return-source reads. The complete192-method kernel now passes, including every
 IN/OUT comparison with independently interpreted concrete stacks.
+
+## Shared positive witness valuations
+
+CallerWitnesses stores each verified path as an immutable canonical Patricia-map
+root. Push adds the actual key; equal prefixes share subtries. Separate roots
+remain separate witnesses. A BDD query follows exact membership in one root,
+never the union of several callers. A miss still invokes exact feasibility.
+
+Literal novelty uses the union of all observed present keys and intersection of
+all observed path keys. A fresh path supplies a new positive literal outside the
+union or a new negative literal outside the previous intersection. This is exactly
+the previous novelty relation, with at most2*K+1paths per region, without a dense
+complement over K. The first path is retained even if its valuation is empty.
+
+Each witness, novelty summary and queued valuation has an arena root retention.
+Superseded novelty roots are released; collection occurs at geometric arena-growth
+safepoints and after construction. Primitive parallel frontier columns and catalog
+root/token arrays reserve old-plus-new capacity before growth. The owner closes
+its private arena/map and optionally owned PageStore; a borrowed store stays open.
+Both solvers close all witness owners before discarding their final caches and
+on exit. Quota interruption never publishes a partial feasibility cache.
+
+Independent checks include80 concrete-mask cyclic graphs, separate callers that
+cannot witness a combined conjunction, pending paths during old novelty-root
+collection, queue-growth denial and owner lifetime. A64-step sparse-key prefix
+fixture was RED at4,129,280retained bytes; the unchanged500,000byte bound passes
+after replacement. IntersectKeys preserves left payload/reference kinds and
+canonical roots against independent ordered maps, with resident and forced-spill
+backends, signed extrema, shared prefixes and disjoint subtrees.
+
+The trie foundation and model-testing counterexamples are described by
+[Midtgaard, sections2–3 and3.7](https://www.cs.tufts.edu/comp/150FP/archive/jan-midtgaard/qc-patricia.pdf).
+Bit ordinals0..63 avoid comparing signed branching masks; signed/prefix
+countercases are explicitly tested. This source does not prove AIR semantics.
+
+Remaining limits: dynamic shortest caller-path scans still construct temporary
+BitSets; immutable backward ancestor maps and opaque domain payloads still use
+resident objects. Distinct concrete valuations and required individual witnesses
+can inherently grow; no universal linear bound or whole-CLI spill claim is made.
