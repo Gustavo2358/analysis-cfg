@@ -9,6 +9,31 @@ import static org.junit.jupiter.api.Assertions.*;
 import static io.github.gustavo2358.analysis.structure.LocalControlTest.*;
 
 class FormalBodiesTest {
+    @Test void impossibleCallsHaveNoReadInterfaceAndKeepTheirGuardRejection() {
+        var owner=session(List.of(GuardedLocalControlTest.guarded("outer","probe","done","key","bad"),
+            GuardedLocalControlTest.guarded("probe","dead-first","bad","key","latent"),
+            GuardedLocalControlTest.guarded("latent","dead-second","bad","key","finish"),resume("finish"),resume("dead-first"),resume("dead-second"),ret("done"),ret("bad")),"outer");
+        var context=owner.contexts().iterator().next();
+        for(var direction:Direction.values()) {
+            var definition=identity(owner,direction,context.entryNode(),false);var expected=ExplicitActivationOracle.solve(owner,definition);var actual=DataflowSolver.solve(owner,definition);
+            for(var node:owner.index().nodes)for(boolean in:new boolean[]{true,false}) {
+                var values=new HashSet<Integer>();for(var state:expected)if(state.node()==node)values.add(in?state.in():state.out());
+                assertEquals(values,new HashSet<>(actual.states(context,node,in)),direction+" "+node.source().id()+" IN="+in);
+            }
+        }
+    }
+    @Test void backwardWakeupsFollowReadContinuationsInsteadOfEveryCallInTheRegion() {
+        for(int n:new int[]{32,64,128,256,512}) {
+            int m=32;var sequences=new ArrayList<Sequence>();
+            for(int i=0;i<n;i++)sequences.add(call("call-"+i,"body-0",i+1<n?"call-"+(i+1):"done"));
+            for(int i=0;i<m;i++)sequences.add(i+1<m?jump("body-"+i,"body-"+(i+1)):resume("body-"+i));sequences.add(ret("done"));
+            var owner=session(sequences,"call-0");var context=owner.contexts().iterator().next();
+            var result=DataflowSolver.solve(owner,identity(owner,Direction.BACKWARD,context.entryNode(),false));
+            assertEquals(1,result.in(context,context.entryNode()));
+            assertTrue(result.metrics().nodesTransferred()<=16L*(n+m),"global call wakeups="+result.metrics().nodesTransferred()+" callers="+n);
+            assertTrue(result.metrics().formalReturnSourceReads()<=16L*(n+m),"repeated full-shape pop discovery="+result.metrics().formalReturnSourceReads());
+        }
+    }
     @Test void identicalArgumentsShareBodyEquationsButKeepEveryMatchedContinuation() {
         int n=128,m=128;var sequences=new ArrayList<io.github.gustavo2358.air.model.Sequence>();
         for(int i=0;i<n;i++)sequences.add(call("call-"+i,"body-0",i+1<n?"call-"+(i+1):"done",i%2==0?A:B));

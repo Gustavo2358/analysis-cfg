@@ -113,3 +113,28 @@ boundary pass with zero failures/errors/skips in142.175s. The W2 checker initial
 rejected a new solver dependency on CfgNode; invocation lookup was moved into the
 existing structural control port, preserving the forbidden edges. Large original
 shared-body families and public CLI comparisons are still separate obligations.
+
+## Backward equation read dependencies
+
+Backward calls read their bound formal-pop continuations and declared unwind
+landings. These read edges are compiled into each region's predecessor relation;
+a continuation change enqueues its readers rather than every call in the body.
+A child entry change still notifies its matched callers. Global root signature
+changes retain their existing conservative notification until signature projection
+is separately justified. Formal-pop source lists are compiled once per Shape,
+so binding does not rescan the complete ordinary body for every caller.
+
+An impossible symbolic CALL can have no reached child Shape. Its empty read
+interface is skipped, without admitting the rejected call or changing guard
+semantics. This case was found by two independent generated stack oracles and
+has an additional explicit guarded-call regression.
+
+The scheduling argument is dependency completeness: an equation is initially
+evaluated, every mutable input it reads has a notification edge, and changes
+reschedule those readers. Ordinary predecessors, formal-pop continuations,
+unwind destinations, child entries and global root signatures remain covered.
+No domain distributivity, convergence cap or caller-order heuristic is added.
+The geometric serial-call test was RED at32 callers with1,107 transfers; its
+unchanged bound requires at most16*(callers+body nodes) transfers and formal
+return-source reads. The complete192-method kernel now passes, including every
+IN/OUT comparison with independently interpreted concrete stacks.

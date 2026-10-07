@@ -50,6 +50,7 @@ final class BackwardActivationSolver<S> {
         region.slots.clear();region.incoming.clear();region.callers.clear();region.waiters.clear();for(var call:region.calls)region.entry.calls.remove(call);region.calls.clear();region.predecessors.clear();
     }
     private long transfers,deliveries,joins,pushes,pops,attempts,duplicates,maxSize,changes,unchanged;
+    private long returnSourceReads;
     private record Need(Object region,int condition) { }
     private final Map<Need,Boolean> feasibleCache=new HashMap<>();
     // Bounded memoization only: eviction recomputes a query, never drops work.
@@ -80,7 +81,7 @@ final class BackwardActivationSolver<S> {
             }
         }
         long indexProbes=closedIndexProbes;for(var entry:entries)for(var index:entry.byFrame.values())indexProbes+=index.probes();
-        var metrics=new SolverMetrics(ins.size(),edgeCount,joins,nextPoint,attempts,pushes,pops,duplicates,maxSize,transfers,work.operations(),ins.size(),changes,unchanged,deliveries,deliveries,changes,unchanged,0,0,work.joinEntries(),work.compareEntries(),summaryCreated,summaryRetired,summaryLive,summaryPeak,summaryCollections,indexProbes);
+        var metrics=new SolverMetrics(ins.size(),edgeCount,joins,nextPoint,attempts,pushes,pops,duplicates,maxSize,transfers,work.operations(),ins.size(),changes,unchanged,deliveries,deliveries,changes,unchanged,0,0,work.joinEntries(),work.compareEntries(),summaryCreated,summaryRetired,summaryLive,summaryPeak,summaryCollections,indexProbes,returnSourceReads);
         return new DataflowResult<>(lookup,ins.toArray(),outs.toArray(),metrics);
     }
     private void collectConditions(EntryRun entry) {
@@ -171,9 +172,23 @@ final class BackwardActivationSolver<S> {
             var shape=entry.model.shapes().get(frame);
             for(var point:shape.points().entrySet())slots.put(point.getKey(),new Slot(this,point.getKey(),point.getValue()));
             for(var slot:slots.values()) {
-                for(var move:slot.shape.moves())if(move.action()==ActivationControl.Action.NEXT||frame==null&&move.action()==ActivationControl.Action.ROOT)
-                    predecessors.computeIfAbsent(move.destination(),n->new ArrayList<>()).add(slot);
-                if(slot.shape.moves().stream().anyMatch(m->m.action()==ActivationControl.Action.CALL)){calls.add(slot);entry.calls.add(slot);}
+                boolean call=false;
+                for(var move:slot.shape.moves()) {
+                    if(move.action()==ActivationControl.Action.NEXT||frame==null&&move.action()==ActivationControl.Action.ROOT)
+                        predecessors.computeIfAbsent(move.destination(),n->new ArrayList<>()).add(slot);
+                    if(move.action()==ActivationControl.Action.CALL) {
+                        var childShape=entry.model.shapes().get(entry.model.control().body(move.frame()));
+                        // A symbolic CALL move can be impossible under its source
+                        // predicate and thus have no reached child shape. It reads nothing.
+                        if(childShape==null)continue;
+                        call=true;var targets=new LinkedHashSet<>(entry.model.unwindTargets());
+                        for(var source:childShape.returnSources()) {
+                            returnSourceReads++;targets.add(entry.model.control().returnDestination(source,move.frame()));
+                        }
+                        for(var target:targets)predecessors.computeIfAbsent(target,n->new ArrayList<>()).add(slot);
+                    }
+                }
+                if(call){calls.add(slot);entry.calls.add(slot);}
                 slot.out.add(slot.shape.condition(),bottom);enqueue(slot);
             }
         }
@@ -246,8 +261,9 @@ final class BackwardActivationSolver<S> {
     private void call(Slot source,ActivationControl.Move move,int condition) {
         var parent=source.region;var e=parent.entry;var b=e.bdd;
         var needed=new LinkedHashSet<>(e.model.unwindTargets());var returns=new IdentityHashMap<ProgramIndex.Node,ProgramIndex.Node>();
-        for(var point:e.model.shapes().get(e.model.control().body(move.frame())).points().entrySet())for(var exit:point.getValue().moves())if(exit.action()==ActivationControl.Action.POP)
-            returns.put(point.getKey(),e.model.control().returnDestination(point.getKey(),move.frame()));
+        for(var point:e.model.shapes().get(e.model.control().body(move.frame())).returnSources()) {
+            returnSourceReads++;returns.put(point,e.model.control().returnDestination(point,move.frame()));
+        }
         needed.addAll(returns.values());
         for(var choice:arguments(source,needed,condition)) {
             var returnValues=new IdentityHashMap<ProgramIndex.Node,S>();
@@ -321,7 +337,6 @@ final class BackwardActivationSolver<S> {
         }
         if(changed) {
             changes++;for(var predecessor:region.predecessors.getOrDefault(slot.node,List.of()))enqueue(predecessor);
-            for(var call:region.calls)enqueue(call);
             if(slot.node==entry.model.control().entry(region.frame))for(var caller:region.callers)enqueue(caller);
             if(region.frame==null&&entry.model.rootTargets().contains(slot.node))for(var call:entry.calls)enqueue(call);
         } else unchanged++;

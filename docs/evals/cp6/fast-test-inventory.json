@@ -666,7 +666,9 @@
       "routeDestinationsStayInBindingsAndOnlyObservedTopPortsSplitBodies",
       "edgeSensitiveBackwardArgumentsAndNonDistributiveBlocksMatchEveryConcreteStack",
       "distinctSymbolsStillMakeBodyBoundariesAmbiguousButDeadBindingsDoNot",
-      "unwindLandingsObserveTheRemainingTopInterfaceOutsideItsNormalEntryWalk"
+      "unwindLandingsObserveTheRemainingTopInterfaceOutsideItsNormalEntryWalk",
+      "backwardWakeupsFollowReadContinuationsInsteadOfEveryCallInTheRegion",
+      "impossibleCallsHaveNoReadInterfaceAndKeepTheirGuardRejection"
     ]
   },
   "analysis-launcher": {

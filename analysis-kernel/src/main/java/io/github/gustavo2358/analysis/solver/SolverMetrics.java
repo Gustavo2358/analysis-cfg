@@ -9,7 +9,18 @@ public record SolverMetrics(long analysisPoints, long contextualEdges, long boun
         long accumulatorStatesChanged, long accumulatorStatesUnchanged,
         long predecessorContributionReads, long successorContributionReads,
         long joinEntriesVisited, long stateCompareEntries,
+        long summaryVersionsCreated,long summaryVersionsRetired,long liveSummaryVersions,long peakLiveSummaryVersions,long summaryCollections,long summaryIndexProbes,long formalReturnSourceReads) {
+    public SolverMetrics(long analysisPoints, long contextualEdges, long boundaryJoins,
+        long initializationAttempts, long worklistAttempts, long worklistPushes, long nodesPopped,
+        long duplicatePushesSuppressed, long maxWorklistSize, long nodesTransferred,
+        long operationsTransferred, long firstPublications, long publishedStatesChanged,
+        long publishedStatesUnchanged, long edgeTransferInvocations, long edgeContributionJoins,
+        long accumulatorStatesChanged, long accumulatorStatesUnchanged,
+        long predecessorContributionReads, long successorContributionReads,
+        long joinEntriesVisited, long stateCompareEntries,
         long summaryVersionsCreated,long summaryVersionsRetired,long liveSummaryVersions,long peakLiveSummaryVersions,long summaryCollections,long summaryIndexProbes) {
+        this(analysisPoints,contextualEdges,boundaryJoins,initializationAttempts,worklistAttempts,worklistPushes,nodesPopped,duplicatePushesSuppressed,maxWorklistSize,nodesTransferred,operationsTransferred,firstPublications,publishedStatesChanged,publishedStatesUnchanged,edgeTransferInvocations,edgeContributionJoins,accumulatorStatesChanged,accumulatorStatesUnchanged,predecessorContributionReads,successorContributionReads,joinEntriesVisited,stateCompareEntries,summaryVersionsCreated,summaryVersionsRetired,liveSummaryVersions,peakLiveSummaryVersions,summaryCollections,summaryIndexProbes,0);
+    }
     public SolverMetrics(long analysisPoints, long contextualEdges, long boundaryJoins,
         long initializationAttempts, long worklistAttempts, long worklistPushes, long nodesPopped,
         long duplicatePushesSuppressed, long maxWorklistSize, long nodesTransferred,
@@ -18,6 +29,6 @@ public record SolverMetrics(long analysisPoints, long contextualEdges, long boun
         long accumulatorStatesChanged, long accumulatorStatesUnchanged,
         long predecessorContributionReads, long successorContributionReads,
         long joinEntriesVisited, long stateCompareEntries) {
-        this(analysisPoints,contextualEdges,boundaryJoins,initializationAttempts,worklistAttempts,worklistPushes,nodesPopped,duplicatePushesSuppressed,maxWorklistSize,nodesTransferred,operationsTransferred,firstPublications,publishedStatesChanged,publishedStatesUnchanged,edgeTransferInvocations,edgeContributionJoins,accumulatorStatesChanged,accumulatorStatesUnchanged,predecessorContributionReads,successorContributionReads,joinEntriesVisited,stateCompareEntries,0,0,0,0,0,0);
+        this(analysisPoints,contextualEdges,boundaryJoins,initializationAttempts,worklistAttempts,worklistPushes,nodesPopped,duplicatePushesSuppressed,maxWorklistSize,nodesTransferred,operationsTransferred,firstPublications,publishedStatesChanged,publishedStatesUnchanged,edgeTransferInvocations,edgeContributionJoins,accumulatorStatesChanged,accumulatorStatesUnchanged,predecessorContributionReads,successorContributionReads,joinEntriesVisited,stateCompareEntries,0,0,0,0,0,0,0);
     }
 }
