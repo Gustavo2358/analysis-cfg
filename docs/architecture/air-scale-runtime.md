@@ -1180,3 +1180,5 @@ retire. Page admission includes the old-plus-new peak; failure aborts the owner.
 Variable identity exhaustion bounds the table address arithmetic; the hash is only
 an index, never an equality oracle. Encoded equal/complement handles answer equality
 before SAT search. The unchanged40KB one-page law remains intact.
+
+Condition canonicalization now has a focused [partial-assignment reduction design](air-scale-condition-reduction.md). Its local laws do not complete WORK-AIR-SCALE.

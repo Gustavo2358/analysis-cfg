@@ -69,6 +69,9 @@ final class BooleanConditions implements AutoCloseable {
         return result;
     }
     private void open(){if(closed||failed)throw new IllegalStateException("condition manager closed or aborted");if(ownership!=null)ownership.checkOpen();}
+    /** Teardown status only: failed registries are discarded by their owner's
+     * close, never serviced repeatedly through semantic root operations. */
+    boolean acceptsRootRelease(){return !closed&&!failed&&(ownership==null||ownership.acceptsRootRelease());}
     /** Handoff the existing acyclic catalog. Callers must retain every published
      * model/container root before publishing the initial construction journal. */
     void enableOwnership(){
@@ -318,6 +321,11 @@ final class BooleanConditions implements AutoCloseable {
         long conjunction=leftKind==2?left:right,disjunction=leftKind==1?left:right;
         if(literals.intersectsSame(conjunction,disjunction))return union?(leftKind==1?a:b):(leftKind==2?a:b);
         if(union?literals.includes(disjunction^1,conjunction):literals.includes(conjunction^1,disjunction))return union?TRUE:FALSE;
+        long residual=union?literals.without(conjunction,disjunction^1):literals.without(disjunction,conjunction^1);
+        if(residual!=(union?conjunction:disjunction)){
+            int unchanged=union?(leftKind==1?a:b):(leftKind==2?a:b);
+            return apply(unchanged,junction(residual,!union),union,false);
+        }
         return -1;
     }
     int and(int a,int b){open();try{return apply(a,b,false);}catch(AnalysisResources.Exhausted|PageStore.Failure failure){failed=true;throw failure;}}
@@ -361,15 +369,54 @@ final class BooleanConditions implements AutoCloseable {
         return apply(junction(common,!union),remainder,!union,false);
     }
     private int apply(int first,int second,boolean union){return apply(first,second,union,true);}
+    /** The outer operand supplies an exact premise: true under AND, false
+     * under OR. Reducing an opposite junction returns only a strict child or
+     * a constant, never expands a circuit or enumerates assignments. */
+    private int cofactorOperand(int premise,int value,boolean union){
+        if(value<2||nativeKind(value)>=0||nodeKind(value)!=(union?AND:OR))return value;
+        int left=lowOf(value),right=highOf(value);
+        int x=knownUnder(premise,left,union),y=knownUnder(premise,right,union),absorbing=union?FALSE:TRUE;
+        if(x==absorbing||y==absorbing)return absorbing;
+        if(x>=0)return right;
+        if(y>=0)return left;
+        return value;
+    }
+    /** Signed native cubes describe true assignments; false native clauses
+     * describe their dual. Unknown is retained. Membership/subset checks are
+     * proofs over complete signed sets, not samples or support heuristics. */
+    private int knownUnder(int premise,int value,boolean union){
+        if(value==premise)return union?FALSE:TRUE;
+        if(value==(premise^1))return union?TRUE:FALSE;
+        int premiseKind=nativeKind(premise),valueKind=nativeKind(value);
+        if(premiseKind<0||(premiseKind!=(union?1:2)&&premiseKind!=0)||valueKind<0)return -1;
+        long assigned=junctionRoot(premise,union)^(union?1:0),tested=junctionRoot(value,valueKind==1);
+        if(valueKind==1){
+            if(literals.intersectsSame(assigned,tested))return TRUE;
+            if(literals.includes(assigned,tested^1))return FALSE;
+        }else{
+            if(literals.includes(assigned,tested))return TRUE;
+            if(literals.intersectsSame(assigned,tested^1))return FALSE;
+        }
+        return -1;
+    }
     private int apply(int first,int second,boolean union,boolean factoring){
         int a=Math.min(first,second),b=Math.max(first,second),simple=terminal(a,b,union);
         if(simple>=0)return simple;
         int operation=union?1:0,hit=cached(a,b,operation);if(hit>=0)return hit;
+        int originalA=a,originalB=b;
+        while(true){
+            int reduced=cofactorOperand(a,b,union);
+            if(reduced!=b)b=reduced;
+            else {reduced=cofactorOperand(b,a,union);if(reduced==a)break;a=reduced;}
+            if(a>b){int swap=a;a=b;b=swap;}
+            simple=terminal(a,b,union);
+            if(simple>=0)return remember(originalA,originalB,operation,simple);
+        }
         int compressed=junctionApply(a,b,union);
-        if(compressed>=0)return remember(a,b,operation,compressed);
-        if(factoring){int factored=factor(a,b,union);if(factored>=0)return remember(a,b,operation,factored);}
+        if(compressed>=0)return remember(originalA,originalB,operation,compressed);
+        if(factoring){int factored=factor(a,b,union);if(factored>=0)return remember(originalA,originalB,operation,factored);}
         int result=intern(-1,a,b,0,union?OR:AND);
-        return remember(a,b,operation,result);
+        return remember(originalA,originalB,operation,result);
     }
     int not(int value){
         open();try{if(value>=2)functions.sample(record(value),0);return value^1;}

@@ -331,7 +331,8 @@
       "joinsSkipSharedSubtreesAndAgreeWithIndependentPointwiseUnion",
       "referenceValueJoinsCanReenterIndependentPrimitiveJoinsAndRemainCollectable",
       "keyIntersectionsPreserveLeftPayloadsAndMatchIndependentOrderedMaps",
-      "keyIntersectionsSkipSharedSubtreesAndHandleSignedPrefixCorners"
+      "keyIntersectionsSkipSharedSubtreesAndHandleSignedPrefixCorners",
+      "exhaustedCursorTeardownHasBoundedFailuresInResidentAndOnePageStores"
     ],
     "io.github.gustavo2358.analysis.adapters.SourcePagedProviderTest": [
       "forcedSpillMatchesAllResidentProofsWithSmallManagedWorkingSetAndBorrowedStoreOwnership",
@@ -750,7 +751,8 @@
       "allocationFailuresReleaseOwnedRootsAndAllReservedCapacity",
       "disjunctivePredicatesUseAnIndividualIndexedWordWithoutJoiningAlternatives",
       "growingDisjunctionHintsDoNotRewalkThePrimaryWordForEveryAlternative",
-      "managedArcConditionsOwnReplacementsAndReleaseOnCertificateClose"
+      "managedArcConditionsOwnReplacementsAndReleaseOnCertificateClose",
+      "exhaustedRootTeardownCannotAllocateOneFailurePerCaller"
     ],
     "io.github.gustavo2358.analysis.structure.ConditionalFeasibilityTest": [
       "sharedRecursiveDispatchDoesNotSearchAllCallersForEachGuard",
@@ -867,7 +869,9 @@
     ],
     "io.github.gustavo2358.analysis.solver.BooleanFactorizationTest": [
       "commonNativeFactorsAndTheirDualDoNotRetainExpandedPrefixes",
-      "partialSignedFactorsPreserveEveryFourKeyAssignment"
+      "partialSignedFactorsPreserveEveryFourKeyAssignment",
+      "nestedDifferencesDoNotObscureCommonFactors",
+      "nativePremisesPreserveAllAssignmentsInMixedSignedJunctions"
     ],
     "io.github.gustavo2358.analysis.solver.SignedLiteralPartitionTest": [
       "commonAndResidualSignedSetsMatchIndependentMaps"

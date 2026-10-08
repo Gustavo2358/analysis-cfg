@@ -5,6 +5,35 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CallerPathCertificatesTest {
+    @Test void exhaustedRootTeardownCannotAllocateOneFailurePerCaller() {
+        for(int count:new int[]{256,1024})for(boolean alreadyAborted:new boolean[]{false,true}){
+            var memory=new AnalysisResources(new AnalysisResources.Limits(32000000,0,0,0,0,100000000,0));
+            try(var pages=new ResidentPageStore(128,memory,AnalysisResources.Phase.CONTROL);
+                var conditions=new BooleanConditions(16,memory,pages)){
+                int guard=conditions.variable(7);conditions.enableOwnership();
+                var graph=new CallerPathCertificates(conditions,memory,pages);
+                var parent=graph.node(false);var child=graph.node(false);
+                var arcs=new ArrayList<CallerPathCertificates.Arc>();
+                try{
+                    for(int i=0;i<count;i++)arcs.add(graph.add(parent,child,0,guard));
+                    memory.work(memory.limits().workUnits()-memory.workUsed(),AnalysisResources.Phase.CONTROL);
+                    if(alreadyAborted){
+                        assertThrows(AnalysisResources.Exhausted.class,()->conditions.rootValue(arcs.getFirst().conditionRoot));
+                        assertDoesNotThrow(graph::close,"an aborted parent cannot service any later semantic release");
+                    }else{
+                        var failure=assertThrows(AnalysisResources.Exhausted.class,graph::close);
+                        assertEquals(0,failure.getSuppressed().length,"teardown failure graph must not grow with callers N="+count);
+                    }
+                    for(var arc:arcs){assertEquals(0,arc.lease.amount());assertEquals(0,arc.conditionRoot);}
+                    assertEquals(0,parent.lease.amount());assertEquals(0,child.lease.amount());
+                    assertEquals(memory.limits().workUnits(),memory.workUsed());
+                    assertThrows(IllegalStateException.class,()->conditions.variable(8));
+                    assertDoesNotThrow(graph::close);
+                }finally{graph.close();}
+            }
+            assertEquals(0,memory.heapUsed());
+        }
+    }
     private static AnalysisResources resources(){return new AnalysisResources(new AnalysisResources.Limits(Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE));}
     @Test void differentIncomingWordsNeverBecomeOneJointWitness() {
         var b=new BooleanConditions();var memory=resources();

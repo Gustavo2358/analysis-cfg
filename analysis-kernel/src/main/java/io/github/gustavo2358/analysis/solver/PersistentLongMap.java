@@ -394,7 +394,10 @@ public final class PersistentLongMap implements AutoCloseable {
                 long retained = token; var capacity = scratch;
                 owner = null; token = 0; scratch = null; rights = null; rightBits = null;
                 previous = null; next = null; pending = 0; current = 0;
-                try { if (retained != 0) map.arena.release(retained); } finally { capacity.close(); }
+                // A failed parent owns discarding its registry at destruction.
+                // Do not manufacture another failure for each remaining cursor.
+                try { if (retained != 0 && map.arena.acceptsRootRelease()) map.arena.release(retained); }
+                finally { capacity.close(); }
             }
         }
     }

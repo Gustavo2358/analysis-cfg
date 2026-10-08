@@ -278,7 +278,9 @@ final class CallerPathCertificates implements AutoCloseable {
         try {
             for(var node=first;node!=null;node=node.next) {
                 for(var arc=node.outgoing;arc!=null;arc=arc.nextOut){
-                    try{if(arc.conditionRoot!=0)conditions.releaseRoot(arc.conditionRoot);}
+                    // Healthy borrowed parents must release every root. After
+                    // abort, parent destruction discards the unusable registry.
+                    try{if(arc.conditionRoot!=0&&conditions.acceptsRootRelease())conditions.releaseRoot(arc.conditionRoot);}
                     catch(RuntimeException failure){if(rootFailure==null)rootFailure=failure;else rootFailure.addSuppressed(failure);}
                     finally{arc.conditionRoot=0;arc.lease.close();}
                 }

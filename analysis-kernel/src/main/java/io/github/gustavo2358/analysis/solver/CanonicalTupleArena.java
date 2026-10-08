@@ -162,6 +162,7 @@ public final class CanonicalTupleArena implements AutoCloseable {
             throw new IllegalArgumentException("unknown or retired arena handle");
     }
     private void open() { if (closed || failed) throw new IllegalStateException("canonical arena is closed or aborted"); }
+    synchronized boolean acceptsRootRelease() { return !closed && !failed; }
 
     @Override public synchronized void close() {
         if (closed) return;

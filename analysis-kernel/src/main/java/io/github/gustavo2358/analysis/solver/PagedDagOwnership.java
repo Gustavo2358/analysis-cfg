@@ -43,6 +43,7 @@ final class PagedDagOwnership implements AutoCloseable {
     }
     private static PageStore.Failure invalid(String message){return new PageStore.Failure(PageStore.Reason.INVALID_HANDLE,message);}
     private void open(){if(closed||failed)throw new IllegalStateException("DAG ownership closed or aborted");if(busy)throw new IllegalStateException("reentrant DAG ownership callback");}
+    boolean acceptsRootRelease(){return !closed&&!failed;}
     void checkOpen(){open();}
     private static void node(long node){if(node<0||node>MAX_NODE)throw new IllegalArgumentException("DAG node outside metadata address space");}
     private long canonical(long value){node(value);long result=graph.canonical(value);node(result);return result;}

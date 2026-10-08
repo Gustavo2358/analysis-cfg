@@ -9,6 +9,41 @@ import static org.junit.jupiter.api.Assertions.*;
 
 final class PersistentLongMapTest {
     @TempDir Path directory;
+    @Test void exhaustedCursorTeardownHasBoundedFailuresInResidentAndOnePageStores() {
+        for(boolean disk:new boolean[]{false,true})for(int count:new int[]{256,1024})
+            for(boolean alreadyAborted:new boolean[]{false,true}){
+                // Each live nonempty cursor owns2048 scratch bytes before the
+                // deliberate WORK denial; reserve that declared fixture demand.
+                var resources=new AnalysisResources(new AnalysisResources.Limits(32000000,2048L*count+8192,0,128000000,2,1000000000,1000000));
+                try(PageStore pages=disk?new FilePageStore(directory,128,1,resources):new MemoryPageStore(128,resources);
+                    var arena=arena(pages,resources)){
+                    var maps=new PersistentLongMap(arena,resources,AnalysisResources.Phase.DOMAIN);
+                    var cursors=new ArrayList<PersistentLongMap.Cursor>();
+                    try{
+                        long root=maps.put(0,7,13);
+                        for(int i=0;i<count;i++)cursors.add(maps.cursor(root));
+                        resources.work(resources.limits().workUnits()-resources.workUsed(),AnalysisResources.Phase.DOMAIN);
+                        if(alreadyAborted){
+                            assertThrows(AnalysisResources.Exhausted.class,()->arena.field(root,0));
+                            assertDoesNotThrow(maps::close);
+                        }else{
+                            var failure=assertThrows(AnalysisResources.Exhausted.class,maps::close);
+                            assertEquals(0,failure.getSuppressed().length,"cursor failure graph grew N="+count+" disk="+disk);
+                        }
+                        for(var cursor:cursors){
+                            assertThrows(IllegalStateException.class,cursor::advance);
+                            assertDoesNotThrow(cursor::close);
+                        }
+                        assertEquals(resources.limits().workUnits(),resources.workUsed());
+                        assertThrows(IllegalStateException.class,()->arena.field(root,0));
+                        assertDoesNotThrow(maps::close);
+                    }finally{maps.close();}
+                }
+                assertEquals(0,resources.heapUsed());
+                assertEquals(0,resources.used(AnalysisResources.Pool.TEMPORARY));
+                assertEquals(0,resources.used(AnalysisResources.Pool.OPEN_FILES));
+            }
+    }
     private static AnalysisResources resources() {
         return new AnalysisResources(new AnalysisResources.Limits(32_000_000, 8192, 0, 128_000_000, 2, 1_000_000_000, 1_000_000));
     }
