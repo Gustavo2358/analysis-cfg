@@ -38,7 +38,9 @@ final class SnapshotDependencyAnalysisTest {
                     assertFalse(store instanceof ProgramStore.Structural,
                             "paged dependency store must not claim resident structural payload");
                 }
-                var result=new SnapshotDependencyAnalysis().analyze(checked,new PagedSnapshotIdentityStorage(pages,ledger),new PagedSnapshotDependencyStorage(pages,ledger));
+                var result=new SnapshotDependencyAnalysis().analyze(
+                        new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger)),
+                        new PagedSnapshotDependencyStorage(pages,ledger));
                 assertEquals(publication.id(),result.publication());assertEquals(Evidence.InventoryStatus.COMPLETE,result.coverage());
                 assertEquals(publication.origins(),result.origins());assertEquals(publication.artifacts(),result.artifacts());
                 var site=result.sites().getFirst();assertEquals("caller",site.caller().localId());assertEquals("entry",site.entry().localId());assertEquals("start",site.sequence().localId());assertEquals("invoke",site.operation().localId());

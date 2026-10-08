@@ -9,7 +9,7 @@ import java.util.*;
 /** Dependency analysis over the admitted snapshot program view. */
 public final class SnapshotDependencyAnalysis {
     public interface Storage extends AutoCloseable {
-        void add(long objectKey,String rawText,List<SnapshotProgram.Producer> producers);
+        void add(long objectKey,String rawText,List<DependencyProgramStore.Producer> producers);
         void select(long objectKey);boolean advance();String rawText();int producerCount();long producer(int index);long origin(int index);
         AirSnapshotBuilder.Lease claim(long bytes);@Override void close();
     }
@@ -17,7 +17,18 @@ public final class SnapshotDependencyAnalysis {
     public DirectDependencyResult analyze(SnapshotValidator.CheckedSnapshot checked,
             SnapshotIdentityKeys.Storage identityStorage,Storage storage) {
         Objects.requireNonNull(checked);Objects.requireNonNull(identityStorage);Objects.requireNonNull(storage);
-        try(storage;var program=new SnapshotProgram(checked,identityStorage);var lease=storage.claim(512)) {
+        DependencyProgramStore program;
+        try { program=new SnapshotProgram(checked,identityStorage); }
+        catch (RuntimeException failure) {
+            storage.close();
+            throw failure;
+        }
+        return analyze(program,storage);
+    }
+
+    public DirectDependencyResult analyze(DependencyProgramStore program,Storage storage) {
+        Objects.requireNonNull(program);Objects.requireNonNull(storage);
+        try(storage;program;var lease=storage.claim(512)) {
             ProgramStore metadata=program;
             Objects.requireNonNull(lease,"storage returned a null analysis lease");
             program.definitions(definition->{try(var materialized=storage.claim(program.materializationBytes(definition))){Objects.requireNonNull(materialized);storage.add(definition.objectKey(),program.materialize(definition),definition.producers());}});

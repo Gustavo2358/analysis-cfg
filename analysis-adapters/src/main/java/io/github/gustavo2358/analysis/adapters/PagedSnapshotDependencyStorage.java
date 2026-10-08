@@ -2,7 +2,7 @@ package io.github.gustavo2358.analysis.adapters;
 
 import io.github.gustavo2358.air.model.AirSnapshotBuilder;
 import io.github.gustavo2358.analysis.dependencies.SnapshotDependencyAnalysis;
-import io.github.gustavo2358.analysis.dependencies.SnapshotProgram;
+import io.github.gustavo2358.analysis.dependencies.DependencyProgramStore;
 import io.github.gustavo2358.analysis.solver.*;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -25,7 +25,7 @@ public final class PagedSnapshotDependencyStorage implements SnapshotDependencyA
         catch(RuntimeException|Error failure){closeSuppressed(failure);throw failure;}
     }
 
-    public synchronized void add(long object,String text,List<SnapshotProgram.Producer> producers) {
+    public synchronized void add(long object,String text,List<DependencyProgramStore.Producer> producers) {
         open();Objects.requireNonNull(text);Objects.requireNonNull(producers);if(producers.isEmpty())throw new IllegalArgumentException("candidate requires a producer");
         try {
             long objectOrdinal=objects.find(object);if(objectOrdinal==0){if(objectCount==Long.MAX_VALUE)throw new IllegalStateException("dependency object cardinality exceeds signed 64-bit range");objectOrdinal=++objectCount;objects.intern(object,objectOrdinal);}

@@ -14,16 +14,7 @@ import static io.github.gustavo2358.air.model.AirShape.*;
  * Consumers see program events and detached evidence rather than wire shapes;
  * the snapshot and its paged identity index remain owned by the caller.
  */
-public final class SnapshotProgram implements ProgramStore, AutoCloseable {
-    public record Producer(long operation,long origin) { }
-    public record Definition(long objectKey,long firstText,long secondText,int fitLength,String pad,List<Producer> producers) {
-        public Definition {if(firstText<=0||secondText<0||fitLength<0)throw new IllegalArgumentException("invalid definition text recipe");Objects.requireNonNull(pad);producers=List.copyOf(producers);if(producers.isEmpty())throw new IllegalArgumentException("definition requires a producer");}
-        boolean direct(){return secondText==0;}
-    }
-    public record ComputedCall(long objectKey,UnitId caller,EntryId entry,LabelId sequence,OperationId operation,
-            OriginId siteOrigin,OriginId targetOrigin,Evidence.CoverageStatus coverage,String namespace,ObjectId subject) {
-        public ComputedCall {Objects.requireNonNull(caller);Objects.requireNonNull(entry);Objects.requireNonNull(sequence);Objects.requireNonNull(operation);Objects.requireNonNull(siteOrigin);Objects.requireNonNull(targetOrigin);Objects.requireNonNull(coverage);Objects.requireNonNull(namespace);Objects.requireNonNull(subject);}
-    }
+public final class SnapshotProgram implements DependencyProgramStore {
 
     private final AirSnapshot snapshot;
     private final SnapshotIdentityKeys keys;
@@ -40,10 +31,10 @@ public final class SnapshotProgram implements ProgramStore, AutoCloseable {
     @Override public PublicationId publicationId(){return publication();}
     @Override public Evidence.InventoryStatus inventory(){return coverage();}
     public String textValue(long handle){open();return text(handle);}
-    public OperationId operationId(long handle){open();return (OperationId)id(handle);}
-    public OriginId originId(long handle){open();return (OriginId)id(handle);}
+    @Override public OperationId operationId(long handle){open();return (OperationId)id(handle);}
+    @Override public OriginId originId(long handle){open();return (OriginId)id(handle);}
 
-    public void definitions(Consumer<Definition> consumer) {
+    @Override public void definitions(Consumer<Definition> consumer) {
         open();Objects.requireNonNull(consumer);
         try(var units=snapshot.elements(snapshot.field(snapshot.root(),PUBLICATION,4),UNIT)) {
             while(units.advance())try(var sequences=snapshot.elements(snapshot.field(units.value(),UNIT,5),SEQUENCE)) {
@@ -97,8 +88,8 @@ public final class SnapshotProgram implements ProgramStore, AutoCloseable {
     private Literal literal(Arm arm,long object){return arm.values().stream().filter(value->value.object()==object).findFirst().orElseThrow(()->new IllegalStateException("admitted correlated source is missing"));}
     private long readObject(long expression){return keys.key(snapshot.field(snapshot.field(expression,EXPRESSIONS_READ,1),PLACES_OBJECT_PLACE,1));}
     private long sequence(long sequences,long label){try(var rows=snapshot.elements(sequences,SEQUENCE)){while(rows.advance()){long sequence=rows.value();if(keys.key(snapshot.field(sequence,SEQUENCE,0))==label)return sequence;}}return 0;}
-    public long materializationBytes(Definition definition) {open();return definition.direct()?Math.multiplyExact(snapshot.characterCount(definition.firstText()),Character.BYTES):Math.multiplyExact((long)definition.fitLength(),2L*Character.BYTES);}
-    public String materialize(Definition definition) {open();return definition.direct()?text(definition.firstText()):fitConcat(definition.firstText(),definition.secondText(),definition.fitLength(),definition.pad());}
+    @Override public long materializationBytes(Definition definition) {open();return definition.direct()?Math.multiplyExact(snapshot.characterCount(definition.firstText()),Character.BYTES):Math.multiplyExact((long)definition.fitLength(),2L*Character.BYTES);}
+    @Override public String materialize(Definition definition) {open();return definition.direct()?text(definition.firstText()):fitConcat(definition.firstText(),definition.secondText(),definition.fitLength(),definition.pad());}
     private String fitConcat(long first,long second,int length,String pad) {
         if(length<0)throw new IllegalArgumentException("negative text fit length");var result=new StringBuilder();
         int count=appendPrefix(result,first,length);count+=appendPrefix(result,second,length-count);
@@ -118,7 +109,7 @@ public final class SnapshotProgram implements ProgramStore, AutoCloseable {
         return appended;
     }
 
-    public void computedCalls(Consumer<ComputedCall> consumer) {
+    @Override public void computedCalls(Consumer<ComputedCall> consumer) {
         open();Objects.requireNonNull(consumer);
         try(var units=snapshot.elements(snapshot.field(snapshot.root(),PUBLICATION,4),UNIT)) {
             while(units.advance()) {
