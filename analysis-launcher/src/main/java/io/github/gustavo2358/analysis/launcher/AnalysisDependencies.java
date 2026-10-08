@@ -1,56 +1,31 @@
 package io.github.gustavo2358.analysis.launcher;
 
 import io.github.gustavo2358.air.json.AirJsonException;
+import io.github.gustavo2358.air.validation.ValidationResult;
 import io.github.gustavo2358.analysis.adapters.*;
-import io.github.gustavo2358.analysis.dependencies.*;
+import io.github.gustavo2358.analysis.dependencies.SnapshotDependencyAnalysis;
+import io.github.gustavo2358.analysis.solver.AnalysisResources;
 import java.io.*;
-import io.github.gustavo2358.analysis.values.StorageAnalysisMode;
 import java.nio.file.*;
+import java.time.Duration;
 
-/** Separate dependency CLI. Failure never publishes a partial destination. */
+/** AIR JSON -> typed/validated snapshot -> direct dependency result. */
 public final class AnalysisDependencies {
     private AnalysisDependencies(){ }
     public static void main(String[] args){System.exit(run(args,System.err));}
-    public static int run(String[] args,PrintStream err) {
-        return run(args,err,DataflowAirReader.forPartialAnalysis());
-    }
+    public static int run(String[] args,PrintStream err){return run(args,err,new DataflowAirReader());}
     static int run(String[] args,PrintStream err,DataflowAirReader reader) {
-        if(args.length<2||args[0].isBlank()||args[1].isBlank()){err.println("usage: analysis-dependencies <dependency-input.json|input.air.json> <output.dependencies.json> [--experimental-physical] [--source-evidence <source.json>]");return 2;}
-        Path input,output,source=null;boolean physical=false;
-        try{
-            input=Path.of(args[0]);output=Path.of(args[1]);
-            for(int n=2;n<args.length;n++) {
-                if(args[n].equals("--experimental-physical")&&!physical)physical=true;
-                else if(args[n].equals("--source-evidence")&&source==null&&n+1<args.length)source=Path.of(args[++n]);
-                else {err.println("INVALID_OPTIONS");return 2;}
-            }
-        }catch(InvalidPathException failure){err.println("INVALID_PATH");return 2;}
-        DependencyInput admitted;
-        try {
-            var codec=new DependencyInputJson();
-            if(codec.isBundle(input)) {
-                if(source!=null)throw new IllegalArgumentException("bundle already supplies source evidence");
-                admitted=codec.read(input,reader);
-            } else {
-                var read=reader.read(input);
-                var evidence=java.util.Optional.<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies>empty();
-                if(source!=null) {
-                    io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies value;
-                    try(var stream=JsonFiles.input(source)){value=new QualifiedSourceJson().decode(stream);}
-                    if(value.air().size()!=1||!value.air().getFirst().sha256().equals(read.sha256()))throw new IllegalArgumentException("AIR digest mismatch");
-                    evidence=java.util.Optional.of(value);
-                }
-                admitted=new DependencyInput(read.publication(),evidence,java.util.List.of(),read.checked());
-            }
-        }
-        catch(io.github.gustavo2358.analysis.solver.AnalysisResources.Exhausted failure){err.println("INPUT_RESOURCE_LIMIT: "+failure.getMessage());return 7;}
+        if(args.length!=2||args[0].isBlank()||args[1].isBlank()){err.println("usage: analysis-dependencies <input.air.json> <output.dependencies.json>");return 2;}
+        Path input,output;try{input=Path.of(args[0]);output=Path.of(args[1]);}catch(InvalidPathException failure){err.println("INVALID_PATH");return 2;}
+        var resources=AnalysisResources.withDeadline(new AnalysisResources.Limits(64L*1024*1024,16L*1024*1024,0,16L*1024*1024*1024,8,Long.MAX_VALUE,4L*1024*1024*1024),Duration.ofMinutes(8));
+        try(var read=reader.readSnapshot(input,resources)) {
+            var validation=read.checked().result();
+            if(validation.status()!=ValidationResult.Status.STRUCTURALLY_VALID){err.println("INPUT_VALIDATION: "+validation.status());return validation.status()==ValidationResult.Status.INVALID_IR?3:7;}
+            var result=new SnapshotDependencyAnalysis().analyze(read.checked(),read.newIdentityStorage(),read.newDependencyStorage());
+            try{new SnapshotDependencyFileWriter().write(result,output,resources);}catch(IOException|IllegalArgumentException failure){err.println("OUTPUT_FAILURE: "+failure.getMessage());return 6;}return 0;
+        }catch(AnalysisResources.Exhausted failure){err.println((failure.resource()==AnalysisResources.Resource.TIME?"ANALYSIS_TIME_LIMIT: ":"ANALYSIS_RESOURCE_LIMIT: ")+failure.getMessage());return 7;}
         catch(AirJsonException failure){err.println("INPUT_CODEC: "+failure.code());return failure.code()==AirJsonException.Code.RESOURCE_LIMIT?7:3;}
         catch(IOException|IllegalArgumentException failure){err.println("DEPENDENCY_INPUT_INVALID: "+failure.getMessage());return 3;}
-        DependencyResult result;
-        try{result=new DependencyAnalysis(physical?StorageAnalysisMode.EXPERIMENTAL_PHYSICAL:StorageAnalysisMode.LOGICAL_ONLY).prepare(admitted);}
-        catch(DependencyAnalysis.Failure failure){err.println(failure.getMessage());return switch(failure.kind()){case INVALID_INPUT,INPUT_INCOMPLETE->3;case CFG_UNSUPPORTED->4;case ANALYSIS_UNSUPPORTED->5;case RESOURCE_LIMIT->7;case CONSUMER_FAILURE->8;};}
-        try{new DependencyFileWriter().write(result,output);}
-        catch(IOException|IllegalArgumentException failure){err.println("OUTPUT_FAILURE");return 6;}
-        return 0;
+        catch(RuntimeException failure){err.println("ANALYSIS_EXECUTION_FAILED: "+failure.getClass().getSimpleName());return 5;}
     }
 }

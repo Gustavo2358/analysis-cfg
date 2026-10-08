@@ -22,7 +22,7 @@ final class PipelineCliTest {
         var expectedCfg=dir.resolve("expected.cfg");var expectedDependencies=dir.resolve("expected.dependencies");
         var independent=new DataflowAirReader().read(fixture());
         new CfgJsonWriter().write(new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).buildChecked(independent.checked().orElseThrow(),BuildOptions.defaults()),expectedCfg);
-        assertEquals(0,AnalysisDependencies.run(new String[]{fixture().toString(),expectedDependencies.toString()},errors()));
+        new DependencyFileWriter().write(new DependencyAnalysis().prepare(independent.publication()),expectedDependencies);
         var cfg=dir.resolve("cfg");var dependencies=dir.resolve("dependencies");var count=new AtomicInteger();
         for(int n=1;n<=2;n++) {
             assertEquals(0,AnalysisPipeline.run(args(fixture(),cfg,dependencies),errors(),path->{count.incrementAndGet();return new DataflowAirReader().read(path);}));
@@ -48,7 +48,6 @@ final class PipelineCliTest {
         try(var stream=getClass().getResourceAsStream("/qualified-source-r9/conditional.source.json")){Files.write(source,stream.readAllBytes());}
         var arguments=new String[]{air.toString(),cfg.toString(),dependencies.toString(),"--source-evidence",source.toString()};
         assertEquals(0,AnalysisPipeline.run(arguments,errors()));var originalCfg=Files.readAllBytes(cfg);var originalDependencies=Files.readAllBytes(dependencies);
-        var separate=dir.resolve("separate.dependencies");assertEquals(0,AnalysisDependencies.run(new String[]{air.toString(),separate.toString(),"--source-evidence",source.toString()},errors()));assertArrayEquals(Files.readAllBytes(separate),originalDependencies);
         Files.writeString(air,Files.readString(air)+" ");assertEquals(3,AnalysisPipeline.run(arguments,errors()));assertArrayEquals(originalCfg,Files.readAllBytes(cfg));assertArrayEquals(originalDependencies,Files.readAllBytes(dependencies));
     }
     @Test void explicitCodecLimitNeverStartsExportOrPublishesFallback() throws Exception {

@@ -1,6 +1,8 @@
 package io.github.gustavo2358.analysis.solver;
 
 import java.util.Objects;
+import java.time.Duration;
+import java.util.function.LongSupplier;
 
 /**
  * Session-owned capacity accounting. Reserve before growing stores, including capacity and scratch,
@@ -10,7 +12,7 @@ import java.util.Objects;
 public final class AnalysisResources {
     public enum Phase { DECODE, VALIDATION, INDEX, DEMAND, CONTROL, DOMAIN, REPLAY, SORT, ENCODE }
     public enum Pool { RESIDENT, SCRATCH, DIRECT, TEMPORARY, OPEN_FILES }
-    public enum Resource { HEAP, SCRATCH, DIRECT, TEMPORARY, OPEN_FILES, WORK, OUTPUT }
+    public enum Resource { HEAP, SCRATCH, DIRECT, TEMPORARY, OPEN_FILES, WORK, OUTPUT, TIME }
 
     /** Byte limits except openFiles/workUnits. Zero is a real quota, never an unlimited sentinel. */
     public record Limits(long heapBytes, long scratchBytes, long directBytes, long temporaryBytes,
@@ -79,13 +81,25 @@ public final class AnalysisResources {
     }
 
     private final Limits limits;
+    private final LongSupplier clock;
+    private final long startedNanos,timeoutNanos;
     private final long[] used = new long[Pool.values().length];
     private final long[] peak = new long[Pool.values().length];
     private long heapUsed, heapPeak, workUsed, outputUsed;
     private long cleanupWorkUsed;
     private boolean cleanupWorkSaturated;
 
-    public AnalysisResources(Limits limits) { this.limits = Objects.requireNonNull(limits); }
+    public AnalysisResources(Limits limits) { this(limits,0,()->0); }
+    /** One wall-clock budget shared by decode, validation, analysis and output. */
+    public static AnalysisResources withDeadline(Limits limits,Duration timeout) {
+        Objects.requireNonNull(timeout);long nanos;
+        try{nanos=timeout.toNanos();}catch(ArithmeticException overflow){throw new IllegalArgumentException("analysis timeout exceeds nanosecond range",overflow);}
+        if(nanos<=0)throw new IllegalArgumentException("analysis timeout must be positive");
+        return new AnalysisResources(limits,nanos,System::nanoTime);
+    }
+    AnalysisResources(Limits limits,long timeoutNanos,LongSupplier clock) {
+        this.limits=Objects.requireNonNull(limits);if(timeoutNanos<0)throw new IllegalArgumentException("analysis timeout must be nonnegative");this.timeoutNanos=timeoutNanos;this.clock=Objects.requireNonNull(clock);startedNanos=clock.getAsLong();
+    }
     public Limits limits() { return limits; }
 
     public synchronized Reservation reserve(Pool pool, long amount, Phase phase) {
@@ -95,6 +109,7 @@ public final class AnalysisResources {
 
     private void charge(Pool pool, long amount, Phase phase) {
         Objects.requireNonNull(pool); Objects.requireNonNull(phase);
+        time(phase);
         nonnegative(amount);
         int p = pool.ordinal();
         if (pool != Pool.RESIDENT) require(poolResource(pool), phase, limit(pool), used[p], amount);
@@ -107,6 +122,7 @@ public final class AnalysisResources {
 
     public synchronized void work(long units, Phase phase) {
         Objects.requireNonNull(phase); nonnegative(units);
+        time(phase);
         require(Resource.WORK, phase, limits.workUnits(), workUsed, units);
         workUsed += units;
     }
@@ -125,6 +141,7 @@ public final class AnalysisResources {
 
     public synchronized void output(long bytes, Phase phase) {
         Objects.requireNonNull(phase); nonnegative(bytes);
+        time(phase);
         require(Resource.OUTPUT, phase, limits.outputBytes(), outputUsed, bytes);
         outputUsed += bytes;
     }
@@ -135,6 +152,11 @@ public final class AnalysisResources {
     public synchronized long heapPeak() { return heapPeak; }
     public synchronized long workUsed() { return workUsed; }
     public synchronized long outputUsed() { return outputUsed; }
+
+    private void time(Phase phase) {
+        if(timeoutNanos==0)return;long elapsed=clock.getAsLong()-startedNanos;if(elapsed<0)elapsed=0;
+        if(elapsed>=timeoutNanos)throw new Exhausted(Resource.TIME,phase,timeoutNanos,elapsed,0);
+    }
 
     private static boolean isHeap(Pool pool) { return pool == Pool.RESIDENT || pool == Pool.SCRATCH; }
     private long limit(Pool pool) {

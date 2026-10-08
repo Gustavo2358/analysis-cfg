@@ -4,6 +4,16 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 final class AnalysisResourcesTest {
+    @Test void oneDeadlineCoversEveryProductivePhaseButNeverBlocksCleanup(){
+        long[] now={100};var resources=new AnalysisResources(new AnalysisResources.Limits(10,10,0,0,0,10,10),5,()->now[0]);
+        try(var reservation=resources.reserve(AnalysisResources.Pool.RESIDENT,1,AnalysisResources.Phase.DECODE)){
+            assertEquals(1,reservation.amount());
+            now[0]=104;resources.work(1,AnalysisResources.Phase.VALIDATION);resources.output(1,AnalysisResources.Phase.ENCODE);
+            now[0]=105;var failure=assertThrows(AnalysisResources.Exhausted.class,()->resources.work(1,AnalysisResources.Phase.DOMAIN));
+            assertEquals(AnalysisResources.Resource.TIME,failure.resource());assertEquals(AnalysisResources.Phase.DOMAIN,failure.phase());assertEquals(5,failure.limit());assertEquals(5,failure.used());
+            resources.cleanupWork(1,AnalysisResources.Phase.DOMAIN);assertEquals(1,resources.cleanupWorkUsed());
+        }
+    }
     @Test void cleanupAccountingCannotResetAnalysisQuotaAndReportsCounterSaturation(){
         var resources=new AnalysisResources(new AnalysisResources.Limits(0,0,0,0,0,1,0));
         resources.work(1,AnalysisResources.Phase.CONTROL);resources.cleanupWork(7,AnalysisResources.Phase.CONTROL);

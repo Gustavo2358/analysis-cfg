@@ -458,6 +458,13 @@
       "officialReaderUsesColdPagesAndPreservesFullAdmissionAndDigest",
       "everyPrimitiveWorkFailureReleasesTransferredStorage",
       "deniedConstructionUnknownChildrenAndRepeatedOrdinalsFailClosed"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedSnapshotValidationStorageTest": [
+      "validTypedSnapshotHasIdenticalManagedAdmissionPrefixAcrossBackends"
+    ],
+    "io.github.gustavo2358.analysis.adapters.SnapshotDependencyAnalysisTest": [
+      "validatedPagedSnapshotPreservesVariableCallEvidenceWithoutPublicationMaterialization",
+      "incompleteAdmissionCannotProduceDependencies"
     ]
   },
   "analysis-dataflow": {
@@ -754,7 +761,8 @@
       "zeroScratchQuotaIsIndependentFromHeapQuota",
       "stagedCapacityTransfersWithoutRechargingOrPrematurelyReleasingBytes",
       "capacityTransferRejectsForeignPoolOwnerSelfAndClosedReservationsAtomically",
-      "cleanupAccountingCannotResetAnalysisQuotaAndReportsCounterSaturation"
+      "cleanupAccountingCannotResetAnalysisQuotaAndReportsCounterSaturation",
+      "oneDeadlineCoversEveryProductivePhaseButNeverBlocksCleanup"
     ],
     "io.github.gustavo2358.analysis.structure.SharedTopologyTest": [
       "projectionAndIndexStoreEntryBindingsWithoutCopyingEveryBody",
@@ -969,12 +977,9 @@
       "realCodecResourceLimitStopsBeforeDeliveryAndRecovers"
     ],
     "io.github.gustavo2358.analysis.launcher.DependencyCliTest": [
-      "successReplacesExistingFileAndMatchesMemoryExactly",
-      "inputAndOutputFailuresPreserveDestinationAndCleanupTemporaryFile",
-      "realCodecOperationalLimitIsSevenAndProducesNoPartialResult",
-      "semanticLimitsPublishExplicitPartialOutputWithoutExitFive",
-      "scopedPreconditionSurvivesRealCodecCliAndStructuralInvalidityStillRejects",
-      "explicitPhysicalOperationalFailureNeverPublishesLogicalFallback"
+      "realAirFileUsesValidatedSnapshotChainAndPublishesEvidenceAtomically",
+      "malformedIncompleteAndOutputFailuresNeverReplaceDestination",
+      "codecBudgetFailureAndRemovedLegacyOptionsAreExplicit"
     ],
     "io.github.gustavo2358.analysis.launcher.RegionalCliTest": [
       "missingInputAndBadQueryNeverReplaceOutput",
@@ -984,7 +989,7 @@
     "io.github.gustavo2358.analysis.launcher.InvocationIndependenceTest": [
       "memoryTenShapesPreserveTargetAndRemainder",
       "normalResultKillsOldValueButUnknownDestinationOnlyWidens",
-      "jsonCliTenShapesRetainOperandsAndEqualMemory"
+      "jsonRoundTripRetainsTenShapesAndSnapshotCliFailsClosedUntilCertified"
     ],
     "io.github.gustavo2358.analysis.launcher.PhysicalChoiceTargetTest": [
       "physicalAlternativesSurviveMemoryAndCliWithoutResurrectingMustValues"
@@ -993,11 +998,10 @@
       "equivalentFormsAndMixedAlternativesRetainLogicalSupportInMemoryAndCli"
     ],
     "io.github.gustavo2358.analysis.launcher.QualifiedSourceCliTest": [
-      "correlatedSourcePublishesAndInvalidInputsPreserveDestination"
+      "removedQualifiedSourceOptionIsRejectedWithoutReplacingDestination"
     ],
     "io.github.gustavo2358.analysis.launcher.DependencyInputCliTest": [
-      "normalEntryPointUsesSourceAndExecutableEvidenceWithoutFlags",
-      "corruptBundleCannotReplaceDestination"
+      "removedResidentBundleRouteFailsClosedAndPreservesDestination"
     ],
     "io.github.gustavo2358.analysis.launcher.PipelineCliTest": [
       "oneReadAndCompleteProductsEqualIndependentSeparateRoutes",
