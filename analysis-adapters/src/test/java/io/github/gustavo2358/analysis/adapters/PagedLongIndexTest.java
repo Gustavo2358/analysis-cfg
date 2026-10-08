@@ -148,6 +148,18 @@ final class PagedLongIndexTest {
         assertEquals(0, resources.heapUsed());
     }
 
+    @Test void lowerBoundCursorStartsAtExactOrFollowingCanonicalKey() {
+        var resources=resources();
+        try(var store=new FilePageStore(directory,128,1,resources);var index=new PagedLongIndex(store,resources,AnalysisResources.Phase.SORT)) {
+            for(long key:new long[]{90,10,70,30,50})index.intern(key,key+1);
+            try(var exact=index.cursor(50)){assertTrue(exact.advance());assertEquals(50,exact.key());assertTrue(exact.advance());assertEquals(70,exact.key());}
+            try(var between=index.cursor(51)){assertTrue(between.advance());assertEquals(70,between.key());}
+            try(var before=index.cursor(Long.MIN_VALUE)){assertTrue(before.advance());assertEquals(10,before.key());}
+            try(var after=index.cursor(91)){assertFalse(after.advance());}
+        }
+        assertEquals(0,resources.heapUsed());
+    }
+
     @Test void emptyCursorAndDeniedScratchNeverMaterializeTheIndexOrLoseFacts() {
         var resources = new AnalysisResources(new AnalysisResources.Limits(16_384, 0, 0,
                 16_000_000, 2, 1_000_000, 1_000_000));

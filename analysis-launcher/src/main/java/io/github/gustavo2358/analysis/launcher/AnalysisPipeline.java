@@ -95,9 +95,10 @@ public final class AnalysisPipeline {
                 try {new CfgJsonWriter().write(built,cfg);}
                 catch(CfgJsonException failure){err.println("CFG_OUTPUT_SERIALIZATION");return 5;}
                 catch(IOException failure){err.println("CFG_OUTPUT_IO");return 6;}
-                var result=new SnapshotDependencyAnalysis().analyze(program,read.newDependencyStorage());
-                try {new SnapshotDependencyFileWriter().write(result,dependencies,resources);}
-                catch(IOException|IllegalArgumentException failure){err.println("DEPENDENCY_OUTPUT_FAILURE");return 6;}
+                try(var result=new SnapshotDependencyAnalysis().open(program,read.newDependencyStorage())) {
+                    try {new SnapshotDependencyFileWriter().write(result,dependencies,resources);}
+                    catch(IOException|IllegalArgumentException failure){err.println("DEPENDENCY_OUTPUT_FAILURE");return 6;}
+                }
             }
             return 0;
         } catch(AnalysisResources.Exhausted failure){err.println("INPUT_RESOURCE_LIMIT: "+failure.getMessage());return 7;}

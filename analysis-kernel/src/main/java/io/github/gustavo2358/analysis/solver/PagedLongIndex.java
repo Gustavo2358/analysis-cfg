@@ -52,7 +52,17 @@ public final class PagedLongIndex implements AutoCloseable {
     /** Exact ordered view; mutation attempts invalidate it, and owner close releases its scratch. */
     public synchronized Cursor cursor() {
         open();
-        Cursor cursor = new Cursor(this);
+        Cursor cursor = new Cursor(this, null);
+        cursor.next = cursors;
+        if (cursors != null) cursors.previous = cursor;
+        cursors = cursor;
+        return cursor;
+    }
+
+    /** Exact ordered view beginning at the first key greater than or equal to the lower bound. */
+    public synchronized Cursor cursor(long lowerBound) {
+        open();
+        Cursor cursor = new Cursor(this, lowerBound);
         cursor.next = cursors;
         if (cursors != null) cursors.previous = cursor;
         cursors = cursor;
@@ -280,7 +290,7 @@ public final class PagedLongIndex implements AutoCloseable {
         private volatile boolean closed, exhausted;
         private boolean positioned;
 
-        private Cursor(PagedLongIndex owner) {
+        private Cursor(PagedLongIndex owner, Long lowerBound) {
             this.owner = owner; version = owner.version;
             boolean empty = owner.root == 0;
             reservation = owner.resources.reserve(empty ? AnalysisResources.Pool.RESIDENT : AnalysisResources.Pool.SCRATCH,
@@ -288,12 +298,22 @@ public final class PagedLongIndex implements AutoCloseable {
             try {
                 if (!empty) {
                     pages = new long[64]; events = new int[64]; counts = new int[64]; leaves = new boolean[64];
-                    push(owner, owner.root);
+                    if(lowerBound==null)push(owner, owner.root);else lower(owner,lowerBound);
                 }
             } catch (RuntimeException exception) {
                 reservation.close(); this.owner = null;
                 if (exception instanceof PageStore.Failure) owner.failed = true;
                 throw exception;
+            }
+        }
+        private void lower(PagedLongIndex owner,long lowerBound) {
+            long page=owner.root;
+            while(true) {
+                push(owner,page);int found=owner.search(page,counts[depth],lowerBound),at=found<0?~found:found;
+                if(leaves[depth]){events[depth]=at;return;}
+                events[depth]=at*2+1;
+                if(found<0)return;
+                page=owner.child(page,at);
             }
         }
         private void push(PagedLongIndex owner, long page) {

@@ -123,6 +123,22 @@ final class SnapshotDependencyAnalysisTest {
         assertEquals(0,ledger.heapUsed());
     }
 
+    @Test void leasedCursorWireMatchesExplicitMaterialization() throws Exception {
+        var publication=correlatedCall();var ledger=resources();
+        try(var pages=new MemoryPageStore(128,ledger);var source=AirSnapshot.fromPublication(publication);
+            var builder=new AirSnapshotBuilder(new PagedAirStorage(pages,ledger,AnalysisResources.Phase.DECODE))) {
+            long root=PagedAirStorageTest.copy(source,source.root(),null,builder);
+            try(var checked=SnapshotValidator.check(builder.finish(root),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger));
+                var cursor=new SnapshotDependencyAnalysis().open(checked,new PagedSnapshotIdentityStorage(pages,ledger),new PagedSnapshotDependencyStorage(pages,ledger))) {
+                assertEquals(new io.github.gustavo2358.analysis.dependencies.SnapshotDependencyCursorResult.Metrics(1,2),cursor.metrics());
+                var expected=new ByteArrayOutputStream();new SnapshotDependencyJson().write(cursor.materialize(),expected);
+                var actual=new ByteArrayOutputStream();new SnapshotDependencyJson().write(cursor,actual);
+                assertArrayEquals(expected.toByteArray(),actual.toByteArray());
+            }
+        }
+        assertEquals(0,ledger.heapUsed());
+    }
+
     private static Publication directCall() {
         var publication=new PublicationId("snapshot-direct");var unit=new UnitId(publication,"caller");var cell=new StorageId(publication,"program-name-cell");var object=new ObjectId(unit,"program-name");var origin=ResultFixtures.origin(publication);
         var declaration=new Memory.ObjectDeclaration(object,Optional.of("PROGRAM-NAME"),new Types.Known(Types.Builtin.TEXT),new Memory.CellBinding(cell),Memory.Visibility.PRIVATE,origin,Evidence.CoverageStatus.MODELED,ResultFixtures.header(unit,"metadata").precision());

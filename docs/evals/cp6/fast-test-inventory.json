@@ -299,6 +299,7 @@
       "comparatorFailureCannotExposeAnIndexAsStableOrReturnPartialLookup",
       "orderedCursorEnumeratesEveryCanonicalRecordUnderForcedSpill",
       "mutationAndOwnerCloseInvalidateCursorLeasesWithoutLeakingScratch",
+      "lowerBoundCursorStartsAtExactOrFollowingCanonicalKey",
       "emptyCursorAndDeniedScratchNeverMaterializeTheIndexOrLoseFacts"
     ],
     "io.github.gustavo2358.analysis.adapters.MemoryPageStoreTest": [
@@ -464,7 +465,12 @@
     ],
     "io.github.gustavo2358.analysis.adapters.SnapshotDependencyAnalysisTest": [
       "validatedPagedSnapshotPreservesVariableCallEvidenceWithoutPublicationMaterialization",
-      "incompleteAdmissionCannotProduceDependencies"
+      "incompleteAdmissionCannotProduceDependencies",
+      "leasedCursorWireMatchesExplicitMaterialization"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedSnapshotDependencyStorageTest": [
+      "callCursorOrdersPageBackedSitesWithBoundedManagedHeap",
+      "candidateLowerBoundReadsOnlyOneObjectsSortedPayload"
     ]
   },
   "analysis-dataflow": {

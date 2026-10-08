@@ -11,10 +11,19 @@ public final class SnapshotDependencyAnalysis {
     public interface Storage extends AutoCloseable {
         void add(long objectKey,String rawText,List<DependencyProgramStore.Producer> producers);
         void select(long objectKey);boolean advance();String rawText();int producerCount();long producer(int index);long origin(int index);
+        void addCall(DependencyProgramStore.ComputedCall call);
+        void selectCalls();boolean advanceCall();long callObjectKey();String callCaller();String callEntry();String callSequence();
+        String callOperation();String callSiteOrigin();String callTargetOrigin();Evidence.CoverageStatus callCoverage();
+        String callNamespace();String callSubject();long callCount();
         AirSnapshotBuilder.Lease claim(long bytes);@Override void close();
     }
 
     public DirectDependencyResult analyze(SnapshotValidator.CheckedSnapshot checked,
+            SnapshotIdentityKeys.Storage identityStorage,Storage storage) {
+        try(var result=open(checked,identityStorage,storage)){return result.materialize();}
+    }
+
+    public SnapshotDependencyCursorResult open(SnapshotValidator.CheckedSnapshot checked,
             SnapshotIdentityKeys.Storage identityStorage,Storage storage) {
         Objects.requireNonNull(checked);Objects.requireNonNull(identityStorage);Objects.requireNonNull(storage);
         DependencyProgramStore program;
@@ -23,30 +32,25 @@ public final class SnapshotDependencyAnalysis {
             storage.close();
             throw failure;
         }
-        return analyze(program,storage);
+        return open(program,storage);
     }
 
     public DirectDependencyResult analyze(DependencyProgramStore program,Storage storage) {
+        try(var result=open(program,storage)){return result.materialize();}
+    }
+
+    public SnapshotDependencyCursorResult open(DependencyProgramStore program,Storage storage) {
         Objects.requireNonNull(program);Objects.requireNonNull(storage);
-        try(storage;program;var lease=storage.claim(512)) {
+        try(var lease=storage.claim(512)) {
             ProgramStore metadata=program;
             Objects.requireNonNull(lease,"storage returned a null analysis lease");
             program.definitions(definition->{try(var materialized=storage.claim(program.materializationBytes(definition))){Objects.requireNonNull(materialized);storage.add(definition.objectKey(),program.materialize(definition),definition.producers());}});
-            var sites=new ArrayList<DirectDependencyResult.Site>();
-            boolean publicationOpen=metadata.inventory()!=Evidence.InventoryStatus.COMPLETE;
-            program.computedCalls(call->{
-                var candidates=new TreeMap<String,LinkedHashMap<DirectDependencyResult.Support,DirectDependencyResult.Support>>();storage.select(call.objectKey());
-                while(storage.advance()) {
-                    String raw=storage.rawText();var supports=candidates.computeIfAbsent(raw,ignored->new LinkedHashMap<>());
-                    for(int i=0;i<storage.producerCount();i++) {var support=new DirectDependencyResult.Support(program.operationId(storage.producer(i)),program.originId(storage.origin(i)),List.of());supports.put(support,support);}
-                }
-                var materialized=new ArrayList<DirectDependencyResult.Candidate>();
-                candidates.forEach((raw,supports)->materialized.add(new DirectDependencyResult.Candidate(raw.stripTrailing(),raw,List.copyOf(supports.values()))));
-                sites.add(new DirectDependencyResult.Site(call.caller(),call.entry(),call.sequence(),call.operation(),call.siteOrigin(),call.targetOrigin(),
-                    call.coverage(),call.namespace(),call.subject(),materialized,
-                    publicationOpen||call.coverage()!=Evidence.CoverageStatus.MODELED||materialized.isEmpty()));
-            });
-            return new DirectDependencyResult(metadata.publicationId(),metadata.inventory(),metadata.origins(),metadata.artifacts(),sites);
+            program.computedCalls(storage::addCall);
+            return new SnapshotDependencyCursorResult(metadata.publicationId(),metadata.inventory(),metadata.origins(),metadata.artifacts(),program,storage);
+        } catch(RuntimeException|Error failure) {
+            try{storage.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}
+            try{program.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}
+            throw failure;
         }
     }
 }

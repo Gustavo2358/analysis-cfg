@@ -21,8 +21,10 @@ public final class AnalysisDependencies {
         try(var read=reader.readSnapshot(input,resources)) {
             var validation=read.checked().result();
             if(validation.status()!=ValidationResult.Status.STRUCTURALLY_VALID){err.println("INPUT_VALIDATION: "+validation.status());return validation.status()==ValidationResult.Status.INVALID_IR?3:7;}
-            var result=new SnapshotDependencyAnalysis().analyze(read.checked(),read.newIdentityStorage(),read.newDependencyStorage());
-            try{new SnapshotDependencyFileWriter().write(result,output,resources);}catch(IOException|IllegalArgumentException failure){err.println("OUTPUT_FAILURE: "+failure.getMessage());return 6;}return 0;
+            try(var result=new SnapshotDependencyAnalysis().open(read.checked(),read.newIdentityStorage(),read.newDependencyStorage())) {
+                try{new SnapshotDependencyFileWriter().write(result,output,resources);}catch(IOException|IllegalArgumentException failure){err.println("OUTPUT_FAILURE: "+failure.getMessage());return 6;}
+            }
+            return 0;
         }catch(AnalysisResources.Exhausted failure){err.println((failure.resource()==AnalysisResources.Resource.TIME?"ANALYSIS_TIME_LIMIT: ":"ANALYSIS_RESOURCE_LIMIT: ")+failure.getMessage());return 7;}
         catch(AirJsonException failure){err.println("INPUT_CODEC: "+failure.code());return failure.code()==AirJsonException.Code.RESOURCE_LIMIT?7:3;}
         catch(IOException|IllegalArgumentException failure){err.println("DEPENDENCY_INPUT_INVALID: "+failure.getMessage());return 3;}
