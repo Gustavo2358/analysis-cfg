@@ -2,16 +2,12 @@ package io.github.gustavo2358.analysis.cfg.domain;
 
 import io.github.gustavo2358.air.model.Capabilities;
 import io.github.gustavo2358.air.model.Control;
-import io.github.gustavo2358.air.model.Entries;
 import io.github.gustavo2358.air.model.Ids.LabelId;
 import io.github.gustavo2358.air.model.Operations;
 import io.github.gustavo2358.air.model.Publication;
-import io.github.gustavo2358.air.model.Sequence;
 import io.github.gustavo2358.air.model.Scopes;
-import io.github.gustavo2358.air.model.Unit;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,53 +25,82 @@ public final class CoreCfgProjection {
 
     /** Default admission of the known subset; requires the same preflight as explicit policy admission. */
     public static List<CfgProjectionIssue> unsupported(Publication publication) {
-        return unsupported(publication, ProjectionPolicy.KNOWN_SUBSET);
+        return unsupported(CfgProgram.resident(publication), ProjectionPolicy.KNOWN_SUBSET);
     }
 
     /** Enumerates every rejection; inventory policy never supplies missing semantic interpretation. */
     public static List<CfgProjectionIssue> unsupported(Publication publication, ProjectionPolicy policy) {
+        return unsupported(CfgProgram.resident(publication), policy);
+    }
+
+    /** Same admission rules for resident and snapshot-backed programs. */
+    public static List<CfgProjectionIssue> unsupported(CfgProgram program, ProjectionPolicy policy) {
+        Objects.requireNonNull(program, "program");
         Objects.requireNonNull(policy, "policy");
         List<CfgProjectionIssue> issues = new ArrayList<>();
-        var namePolicies = io.github.gustavo2358.air.model.NamePolicies.extensions(publication);
-        if (publication.capabilities().required().stream().anyMatch(c -> !supportsControlCapability(c) && !namePolicies.contains(c))) {
+        if (program.requiredCapabilities().stream().anyMatch(c -> !supportsControlCapability(c)
+                && !program.namePolicyExtensions().contains(c))) {
             issues.add(new CfgProjectionIssue(CfgProjectionIssue.Code.EXTENSION_SEMANTICS_OUTSIDE_SLICE,
-                    publication.id()));
+                    program.source().publicationId()));
         }
-        if (!policy.acceptsInventory(publication.coverage().inventory())) {
-            issues.add(new CfgProjectionIssue(CfgProjectionIssue.Code.INCOMPLETE_INVENTORY, publication.id()));
+        if (!policy.acceptsInventory(program.source().publicationInventory())) {
+            issues.add(new CfgProjectionIssue(CfgProjectionIssue.Code.INCOMPLETE_INVENTORY,
+                    program.source().publicationId()));
         }
-        for (Unit unit : orderedUnits(publication)) {
-            if (unit.body() != Unit.BodyAvailability.AVAILABLE && policy != ProjectionPolicy.PARTIAL_ANALYSIS) {
+        program.units(unit -> {
+            if (unit.body() != io.github.gustavo2358.air.model.Unit.BodyAvailability.AVAILABLE
+                    && policy != ProjectionPolicy.PARTIAL_ANALYSIS) {
                 issues.add(new CfgProjectionIssue(CfgProjectionIssue.Code.BODY_UNAVAILABLE, unit.id()));
             }
-            if (!policy.acceptsInventory(unit.coverage().inventory())) {
+            if (!policy.acceptsInventory(unit.inventory())) {
                 issues.add(new CfgProjectionIssue(CfgProjectionIssue.Code.INCOMPLETE_INVENTORY, unit.id()));
             }
-            for (Sequence sequence : orderedSequences(unit)) {
+            unit.sequences(sequence -> {
                 // All five sealed AIR Instruction variants continue inside their Sequence.
-                // Retaining the original Sequence preserves every occurrence and its explicit order.
-                if (!(sequence.terminator() instanceof Operations.Return)
-                        && !(sequence.terminator() instanceof Operations.Jump)
-                        && !(sequence.terminator() instanceof Operations.Branch)
-                        && !(sequence.terminator() instanceof Operations.Invoke invoke && supportsInvoke(invoke))
-                        && !(sequence.terminator() instanceof Operations.Opaque opaque && supportsOpaque(opaque))
-                        && !LocalControlRules.local(sequence.terminator())
-                        && !(sequence.terminator() instanceof Operations.Halt) && policy != ProjectionPolicy.PARTIAL_ANALYSIS) {
+                // Operation identities preserve every occurrence and their explicit order.
+                if (!supports(sequence.control()) && policy != ProjectionPolicy.PARTIAL_ANALYSIS) {
                     issues.add(new CfgProjectionIssue(CfgProjectionIssue.Code.UNSUPPORTED_TERMINATOR,
-                            sequence.terminator().header().id()));
+                            sequence.control().operation()));
                 }
-            }
-        }
+            });
+        });
         return List.copyOf(issues);
+    }
+
+    private static boolean supports(CfgControl control) {
+        return control instanceof CfgControl.Return || control instanceof CfgControl.Jump
+                || control instanceof CfgControl.Branch || control instanceof CfgControl.Halt
+                || control instanceof CfgControl.Invoke invoke && supportsInvoke(invoke)
+                || control instanceof CfgControl.Opaque opaque && supportsOpaque(opaque)
+                || LocalControlRules.local(control);
+    }
+
+    private static boolean supportsInvoke(CfgControl.Invoke invoke) {
+        return invoke.alternatives().stream().allMatch(a -> a instanceof Control.Normal
+                || a instanceof Control.Exceptional || a instanceof Control.AnyException
+                || a instanceof Control.HaltAlternative)
+                && supportedRemainder(invoke.remainder());
+    }
+
+    private static boolean supportsOpaque(CfgControl.Opaque opaque) {
+        return opaque.alternatives().stream().allMatch(a -> a instanceof Control.JumpAlternative
+                || a instanceof Control.Normal || a instanceof Control.ReturnAlternative
+                || a instanceof Control.Exceptional || a instanceof Control.AnyException
+                || a instanceof Control.HaltAlternative);
+    }
+
+    private static boolean supportedRemainder(Scopes.ControlBound remainder) {
+        return remainder instanceof Scopes.NoControl
+                || remainder instanceof Scopes.WithinControl bound
+                && (bound.scope() instanceof Scopes.AllControl || bound.scope() instanceof Scopes.UnitControl
+                || bound.scope() instanceof Scopes.LabelsControl || bound.scope() instanceof Scopes.ControlUnion);
     }
 
     /** Explicit normal/exceptional/halt alternatives with closed or bounded open control.
      * Open remainder remains on the original AIR; this projection enumerates known control only. */
     public static boolean supportsInvoke(Operations.Invoke invoke) {
         return invoke.outcomes().known().stream().allMatch(a->a instanceof Control.Normal||a instanceof Control.Exceptional||a instanceof Control.AnyException||a instanceof Control.HaltAlternative)
-                && (invoke.outcomes().remainder() instanceof Scopes.NoControl
-                    || invoke.outcomes().remainder() instanceof Scopes.WithinControl bound
-                        && (bound.scope() instanceof Scopes.AllControl || bound.scope() instanceof Scopes.UnitControl || bound.scope() instanceof Scopes.LabelsControl || bound.scope() instanceof Scopes.ControlUnion));
+                && supportedRemainder(invoke.outcomes().remainder());
     }
 
     public static boolean supportsOpaque(Operations.Opaque opaque) {
@@ -104,98 +129,108 @@ public final class CoreCfgProjection {
     /** Requires successful AirValidator preflight and an empty unsupported inventory. */
     public static CfgGraph project(Publication publication) { return project(publication, ProjectionPolicy.KNOWN_SUBSET); }
 
+    public static CfgGraph project(CfgProgram program) { return project(program, ProjectionPolicy.KNOWN_SUBSET); }
+
     public static CfgGraph project(Publication publication, ProjectionPolicy policy) {
+        return project(CfgProgram.resident(publication), policy);
+    }
+
+    /** The single CFG semantics for both resident and snapshot-backed programs. */
+    public static CfgGraph project(CfgProgram program, ProjectionPolicy policy) {
+        Objects.requireNonNull(program, "program");
+        Objects.requireNonNull(policy, "policy");
         List<CfgNode> nodes = new ArrayList<>();
-        var source=CfgSource.from(publication);
+        var source=program.source();
         var table=new CfgTransitionTable.Builder(source);
-        for (Unit unit : orderedUnits(publication)) {
+        program.units(unit -> {
             Map<LabelId, CfgNode.SequenceNode> sequences = new HashMap<>();
             Map<LabelId, CfgNode.HaltExit> halts = new HashMap<>();
             var outsideNodes=new HashMap<LabelId,java.util.List<CfgNode.OutcomeExit>>();
-            List<Sequence> orderedSequences = orderedSequences(unit);
-            for (Sequence sequence : orderedSequences) {
+            var orderedSequences=new ArrayList<CfgNode.SequenceNode>();
+            unit.sequences(sequence -> {
                 CfgNode.SequenceNode node = new CfgNode.SequenceNode(
-                        new CfgNodeId(publication.id(), nodes.size()), sequence);
+                        new CfgNodeId(source.publicationId(), nodes.size()), sequence.label(),
+                        sequence.operations(), sequence.control());
                 sequences.put(sequence.label(), node);
+                orderedSequences.add(node);
                 nodes.add(node);
                 var exits=new ArrayList<CfgNode.OutcomeExit>();
-                for(var alternative:alternatives(sequence.terminator()).stream().filter(CoreCfgProjection::outside).distinct().toList()) {
-                    var end=new CfgNode.OutcomeExit(new CfgNodeId(publication.id(),nodes.size()),node.control(),(Control.InvocationAlternative)alternative);
+                for(var alternative:CfgControl.alternatives(node.control()).stream()
+                        .filter(CoreCfgProjection::outside).distinct().toList()) {
+                    var end=new CfgNode.OutcomeExit(new CfgNodeId(source.publicationId(),nodes.size()),
+                            node.control(),(Control.InvocationAlternative)alternative);
                     nodes.add(end);exits.add(end);
                 }
                 outsideNodes.put(sequence.label(),exits);
-                if (sequence.terminator() instanceof Operations.Halt halt) {
+                if (node.control() instanceof CfgControl.Halt halt) {
                     CfgNode.HaltExit termination = new CfgNode.HaltExit(
-                            new CfgNodeId(publication.id(), nodes.size()), halt);
+                            new CfgNodeId(source.publicationId(), nodes.size()), halt.operation(), halt.haltKind());
                     nodes.add(termination);
                     halts.put(sequence.label(), termination);
                 }
-            }
-            List<Entries.Entry> entries = unit.entries().stream()
-                    .sorted(Comparator.comparing(entry -> entry.id().localId())).toList();
+            });
             var entryEdges=new ArrayList<CfgTransition>();var normalExits=new ArrayList<CfgNodeId>();
-            Entries.Entry representative=null;
-            for (Entries.Entry entry : entries) {
-                if (entry.initialLabel().isEmpty() && policy == ProjectionPolicy.PARTIAL_ANALYSIS) continue;
-                CfgNode.EntryNode entryNode = new CfgNode.EntryNode(new CfgNodeId(publication.id(), nodes.size()), entry);nodes.add(entryNode);
-                CfgNode.NormalExit exit = new CfgNode.NormalExit(new CfgNodeId(publication.id(), nodes.size()), publication.id(), unit.id(), entry.id());nodes.add(exit);
+            var representative=new io.github.gustavo2358.air.model.Ids.EntryId[1];
+            unit.entries(entry -> {
+                if (entry.initialLabel().isEmpty() && policy == ProjectionPolicy.PARTIAL_ANALYSIS) return;
+                CfgNode.EntryNode entryNode = new CfgNode.EntryNode(
+                        new CfgNodeId(source.publicationId(), nodes.size()), entry.id(), entry.initialLabel());
+                nodes.add(entryNode);
+                CfgNode.NormalExit exit = new CfgNode.NormalExit(
+                        new CfgNodeId(source.publicationId(), nodes.size()), source.publicationId(), unit.id(), entry.id());
+                nodes.add(exit);
                 entryEdges.add(new CfgTransition(entryNode.id(),sequences.get(entry.initialLabel().orElseThrow()).id(),CfgTransition.Kind.ENTRY,entry.id()));
-                normalExits.add(exit.id());if(representative==null)representative=entry;
-            }
+                normalExits.add(exit.id());if(representative[0]==null)representative[0]=entry.id();
+            });
             var transitions=new ArrayList<CfgTransition>();
-            if(representative!=null) {
-                var entry=representative;var normalExit=normalExits.getFirst();
-                for (Sequence sequence : orderedSequences) {
-                    CfgNodeId from = sequences.get(sequence.label()).id();
+            if(representative[0]!=null) {
+                var entry=representative[0];var normalExit=normalExits.getFirst();
+                for (CfgNode.SequenceNode sequence : orderedSequences) {
+                    CfgNodeId from = sequence.id();var control=sequence.control();
                     var exceptionalLabels=new java.util.HashSet<LabelId>();
-                    for(var alternative:alternatives(sequence.terminator())) {
+                    for(var alternative:CfgControl.alternatives(control)) {
                         var handler=exceptionLabel(alternative);
-                        if(handler!=null&&exceptionalLabels.add(handler))transitions.add(new CfgTransition(from,sequences.get(handler).id(),CfgTransition.Kind.EXCEPTION,entry.id()));
+                        if(handler!=null&&exceptionalLabels.add(handler))transitions.add(new CfgTransition(from,sequences.get(handler).id(),CfgTransition.Kind.EXCEPTION,entry));
                     }
-                    if(!LocalControlRules.local(sequence.terminator()))for(var end:outsideNodes.get(sequence.label()))transitions.add(new CfgTransition(from,end.id(),CfgTransition.Kind.CONTROL_EXIT,entry.id()));
+                    if(!LocalControlRules.local(control))for(var end:outsideNodes.get(sequence.label()))
+                        transitions.add(new CfgTransition(from,end.id(),CfgTransition.Kind.CONTROL_EXIT,entry));
                     // Contextual rules include orphans; they do not assert reachability from this Entry.
-                    if (sequence.terminator() instanceof Operations.Return) {
-                        transitions.add(new CfgTransition(from, normalExit, CfgTransition.Kind.RETURN, entry.id()));
-                    } else if (sequence.terminator() instanceof Operations.Jump jump) {
+                    if (control instanceof CfgControl.Return) {
+                        transitions.add(new CfgTransition(from, normalExit, CfgTransition.Kind.RETURN, entry));
+                    } else if (control instanceof CfgControl.Jump jump) {
                         transitions.add(new CfgTransition(from, sequences.get(jump.destination()).id(),
-                                CfgTransition.Kind.JUMP, entry.id()));
-                    } else if (sequence.terminator() instanceof Operations.Invoke invoke) {
-                        for (var outcome : invoke.outcomes().known()) {
+                                CfgTransition.Kind.JUMP, entry));
+                    } else if (control instanceof CfgControl.Invoke invoke) {
+                        for (var outcome : invoke.alternatives()) {
                         if (!(outcome instanceof Control.Normal normal)) continue;
                         transitions.add(new CfgTransition(from, sequences.get(normal.label()).id(),
-                                CfgTransition.Kind.INVOKE_NORMAL, entry.id()));
+                                CfgTransition.Kind.INVOKE_NORMAL, entry));
                         }
-                    } else if (sequence.terminator() instanceof Operations.Opaque opaque) {
+                    } else if (control instanceof CfgControl.Opaque opaque) {
                         var destinations = new java.util.HashSet<LabelId>();
-                        for (var alternative : opaque.envelope().control().known()) {
+                        for (var alternative : opaque.alternatives()) {
                             var target = alternativeLabel(alternative);
-                            if (target != null && destinations.add(target)) transitions.add(new CfgTransition(from, sequences.get(target).id(), CfgTransition.Kind.OPAQUE_JUMP, entry.id()));
-                            else if (alternative instanceof Control.ReturnAlternative) transitions.add(new CfgTransition(from, normalExit, CfgTransition.Kind.OPAQUE_RETURN, entry.id()));
+                            if (target != null && destinations.add(target)) transitions.add(new CfgTransition(from, sequences.get(target).id(), CfgTransition.Kind.OPAQUE_JUMP, entry));
+                            else if (alternative instanceof Control.ReturnAlternative) transitions.add(new CfgTransition(from, normalExit, CfgTransition.Kind.OPAQUE_RETURN, entry));
                         }
-                    } else if (sequence.terminator() instanceof Operations.Halt) {
+                    } else if (control instanceof CfgControl.Halt) {
                         transitions.add(new CfgTransition(from, halts.get(sequence.label()).id(),
-                                CfgTransition.Kind.HALT, entry.id()));
-                    } else if (sequence.terminator() instanceof Operations.Branch branch) {
+                                CfgTransition.Kind.HALT, entry));
+                    } else if (control instanceof CfgControl.Branch branch) {
                         // Structural alternatives remain distinct, including equal targets and literal predicates.
                         transitions.add(new CfgTransition(from, sequences.get(branch.trueDestination()).id(),
-                                CfgTransition.Kind.BRANCH_TRUE, entry.id()));
+                                CfgTransition.Kind.BRANCH_TRUE, entry));
                         transitions.add(new CfgTransition(from, sequences.get(branch.falseDestination()).id(),
-                                CfgTransition.Kind.BRANCH_FALSE, entry.id()));
-                    } else if (!LocalControlRules.local(sequence.terminator()) && policy != ProjectionPolicy.PARTIAL_ANALYSIS) {
+                                CfgTransition.Kind.BRANCH_FALSE, entry));
+                    } else if (!LocalControlRules.local(control) && policy != ProjectionPolicy.PARTIAL_ANALYSIS) {
                         throw new IllegalArgumentException("projection requires a supported terminator");
                     }
                 }
             }
             table.add(unit.id(),entryEdges,normalExits,transitions);
-        }
-        return new CfgGraph(publication, source, nodes, table.build());
-    }
-
-    private static List<Unit> orderedUnits(Publication publication) {
-        return publication.units().stream().sorted(Comparator.comparing(unit -> unit.id().localId())).toList();
-    }
-
-    private static List<Sequence> orderedSequences(Unit unit) {
-        return unit.sequences().stream().sorted(Comparator.comparing(sequence -> sequence.label().localId())).toList();
+        });
+        return program instanceof CfgProgram.Resident resident
+                ? new CfgGraph(resident.publication(), source, nodes, table.build())
+                : new CfgGraph(source, nodes, table.build());
     }
 }

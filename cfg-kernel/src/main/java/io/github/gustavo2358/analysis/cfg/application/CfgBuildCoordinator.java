@@ -6,6 +6,7 @@ import io.github.gustavo2358.air.validation.ValidationIssue;
 import io.github.gustavo2358.air.validation.ValidationResult;
 import io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection;
 import io.github.gustavo2358.analysis.cfg.domain.CfgGraph;
+import io.github.gustavo2358.analysis.cfg.domain.CfgProgram;
 import io.github.gustavo2358.analysis.cfg.domain.CfgProjectionIssue;
 import io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry;
 
@@ -32,7 +33,7 @@ public final class CfgBuildCoordinator implements BuildCfg {
         Objects.requireNonNull(options, "options");
 
         ValidationResult preflight = CfgPreflight.validate(publication, options.validation());
-        return buildAfterPreflight(publication, options, preflight);
+        return buildAfterPreflight(CfgProgram.resident(publication), options, preflight);
     }
 
     /** Reuse only a validator-owned run with identical options; changed budgets run preflight again. */
@@ -42,15 +43,33 @@ public final class CfgBuildCoordinator implements BuildCfg {
         Objects.requireNonNull(checked, "checked");
         Objects.requireNonNull(options, "options");
         return checked.options().equals(options.validation())
-                ? buildAfterPreflight(checked.publication(), options, checked.result())
+                ? buildAfterPreflight(CfgProgram.resident(checked.publication()), options, checked.result())
                 : build(checked.publication(), options);
+    }
+
+    /** Builds from the exact admitted snapshot port; snapshot options cannot be changed post-admission. */
+    public CfgBuildResult buildChecked(CfgProgram program,
+            io.github.gustavo2358.air.validation.SnapshotValidator.CheckedSnapshot checked,
+            BuildOptions options) {
+        Objects.requireNonNull(program, "program");
+        Objects.requireNonNull(checked, "checked");
+        Objects.requireNonNull(options, "options");
+        if (!checked.options().equals(options.validation())) {
+            throw new IllegalArgumentException("snapshot validation options differ from CFG build options");
+        }
+        return buildAfterPreflight(program, options, checked.result());
     }
 
     // Package seam for upstream outcomes without a natural Publication fixture.
     CfgBuildResult buildAfterPreflight(Publication publication, BuildOptions options,
                                        ValidationResult preflight) {
-        var namePolicies = io.github.gustavo2358.air.model.NamePolicies.extensions(publication);
-        List<Capabilities.Capability> unsupported = publication.capabilities().required().stream()
+        return buildAfterPreflight(CfgProgram.resident(publication), options, preflight);
+    }
+
+    CfgBuildResult buildAfterPreflight(CfgProgram program, BuildOptions options,
+                                       ValidationResult preflight) {
+        var namePolicies = program.namePolicyExtensions();
+        List<Capabilities.Capability> unsupported = program.requiredCapabilities().stream()
                 .filter(capability -> !CoreCfgProjection.supportsControlCapability(capability)
                         && !namePolicies.contains(capability) && interpreters.find(capability).isEmpty())
                 .distinct()
@@ -73,15 +92,15 @@ public final class CfgBuildCoordinator implements BuildCfg {
         } else if (preflight.status() == ValidationResult.Status.INCOMPLETE_VALIDATION && !partialPreconditions) {
             status = CfgBuildResult.Status.INCOMPLETE_VALIDATION;
         } else {
-            issues = CoreCfgProjection.unsupported(publication, options.projectionPolicy());
+            issues = CoreCfgProjection.unsupported(program, options.projectionPolicy());
             if (issues.isEmpty()) {
-                graph = Optional.of(CoreCfgProjection.project(publication, options.projectionPolicy()));
+                graph = Optional.of(CoreCfgProjection.project(program, options.projectionPolicy()));
                 status = CfgBuildResult.Status.CFG_BUILT;
             } else {
                 status = CfgBuildResult.Status.UNSUPPORTED_INPUT;
             }
         }
-        return new CfgBuildResult(status, publication.id(), publication.airVersion(),
+        return new CfgBuildResult(status, program.source().publicationId(), program.source().airVersion(),
                 options, preflight, unsupported, issues, graph);
     }
 

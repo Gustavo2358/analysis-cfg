@@ -99,6 +99,31 @@ class EvalCfg025Test {
     }
 
     @Test
+    void detachedProgramPortUsesTheResidentProjectionSemantics() {
+        Publication publication = minimal();
+        CfgProgram resident = CfgProgram.resident(publication);
+        CfgProgram detached = new CfgProgram() {
+            @Override public CfgSource source() { return resident.source(); }
+            @Override public List<Capabilities.Capability> requiredCapabilities() {
+                return resident.requiredCapabilities();
+            }
+            @Override public Set<Capabilities.Capability> namePolicyExtensions() {
+                return resident.namePolicyExtensions();
+            }
+            @Override public void units(java.util.function.Consumer<UnitView> consumer) {
+                resident.units(consumer);
+            }
+        };
+        CfgGraph expected = CoreCfgProjection.project(publication);
+        CfgGraph actual = CoreCfgProjection.project(detached, ProjectionPolicy.KNOWN_SUBSET);
+        assertEquals(expected, actual);
+        assertEquals(minimalExpected(), observe(actual));
+        assertTrue(CoreCfgProjection.unsupported(detached, ProjectionPolicy.KNOWN_SUBSET).isEmpty());
+        assertTrue(expected.wasProjectedFrom(publication));
+        assertFalse(actual.wasProjectedFrom(publication));
+    }
+
+    @Test
     void missingInitialLabelIsInvalidIrAndIsNotRepaired() {
         Publication publication = publication(List.of(unit(U,
                 List.of(entry(E, new LabelId(U, "missing"))), List.of(returning(L)))));

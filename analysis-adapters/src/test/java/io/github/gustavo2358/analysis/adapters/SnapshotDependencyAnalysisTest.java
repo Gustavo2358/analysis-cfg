@@ -7,6 +7,9 @@ import io.github.gustavo2358.air.json.AirJson;
 import io.github.gustavo2358.analysis.dependencies.SnapshotDependencyAnalysis;
 import io.github.gustavo2358.analysis.dependencies.SnapshotProgram;
 import io.github.gustavo2358.analysis.dependencies.DirectDependencyResult;
+import io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection;
+import io.github.gustavo2358.analysis.cfg.application.*;
+import io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry;
 import io.github.gustavo2358.analysis.solver.*;
 import io.github.gustavo2358.analysis.structure.ProgramStore;
 import java.io.ByteArrayOutputStream;
@@ -37,6 +40,11 @@ final class SnapshotDependencyAnalysisTest {
                     assertEquals(publication.origins(),store.origins());
                     assertFalse(store instanceof ProgramStore.Structural,
                             "paged dependency store must not claim resident structural payload");
+                    assertEquals(CoreCfgProjection.project(publication),CoreCfgProjection.project(snapshotProgram));
+                    var built=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).buildChecked(
+                            snapshotProgram,checked,BuildOptions.defaults());
+                    assertEquals(CfgBuildResult.Status.CFG_BUILT,built.status());
+                    assertEquals(CoreCfgProjection.project(publication),built.graph().orElseThrow());
                 }
                 var result=new SnapshotDependencyAnalysis().analyze(
                         new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger)),
@@ -69,6 +77,9 @@ final class SnapshotDependencyAnalysisTest {
             long root=PagedAirStorageTest.copy(source,source.root(),null,builder);
             try(var checked=SnapshotValidator.check(builder.finish(root),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger))) {
                 assertEquals(ValidationResult.Status.STRUCTURALLY_VALID,checked.result().status(),checked.result().toString());
+                try(var snapshotProgram=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger))) {
+                    assertEquals(CoreCfgProjection.project(publication),CoreCfgProjection.project(snapshotProgram));
+                }
                 var result=new SnapshotDependencyAnalysis().analyze(checked,new PagedSnapshotIdentityStorage(pages,ledger),new PagedSnapshotDependencyStorage(pages,ledger));
                 var site=result.sites().getFirst();assertFalse(site.unknownRemainder());
                 assertEquals(List.of("AX","BY"),site.candidates().stream().map(DirectDependencyResult.Candidate::referenceName).toList());

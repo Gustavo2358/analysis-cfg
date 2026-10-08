@@ -1005,6 +1005,7 @@
     ],
     "io.github.gustavo2358.analysis.launcher.PipelineCliTest": [
       "oneReadAndCompleteProductsEqualIndependentSeparateRoutes",
+      "defaultRoutePublishesCfgAndDependenciesFromTheValidatedSnapshot",
       "invalidIncompleteDigestAndAliasesRejectBeforeAnyDestination",
       "fullCorrelatedSourceAndDigestMismatchPreserveProducts",
       "writerFailuresKeepCompletedProductsAndCleanStaging",
@@ -1394,6 +1395,7 @@
     ],
     "io.github.gustavo2358.analysis.cfg.domain.EvalCfg025Test": [
       "entryReturnAndNormalExitMatchIndependentOracle",
+      "detachedProgramPortUsesTheResidentProjectionSemantics",
       "missingInitialLabelIsInvalidIrAndIsNotRepaired",
       "sequenceCannotBeConstructedWithoutTerminator",
       "returnNeverFallsThroughToPhysicalNextSequence",

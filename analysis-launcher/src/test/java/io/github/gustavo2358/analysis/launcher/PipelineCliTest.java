@@ -29,6 +29,14 @@ final class PipelineCliTest {
             assertEquals(n,count.get());assertArrayEquals(Files.readAllBytes(expectedCfg),Files.readAllBytes(cfg));assertArrayEquals(Files.readAllBytes(expectedDependencies),Files.readAllBytes(dependencies));
         }
     }
+    @Test void defaultRoutePublishesCfgAndDependenciesFromTheValidatedSnapshot() throws Exception {
+        var cfg=dir.resolve("snapshot.cfg");var dependencies=dir.resolve("snapshot.dependencies");
+        assertEquals(0,AnalysisPipeline.run(args(fixture(),cfg,dependencies),errors()));
+        assertTrue(Files.readString(cfg).contains("\"schema\":\"analysis-cfg-json\""));
+        var json=Files.readString(dependencies);
+        assertTrue(json.contains("\"modelScope\":\"VALIDATED_SNAPSHOT_DEPENDENCY\""));
+        assertTrue(json.contains("\"version\":\"3.0.0\""));
+    }
     @Test void invalidIncompleteDigestAndAliasesRejectBeforeAnyDestination() throws Exception {
         var input=dir.resolve("input");var cfg=dir.resolve("cfg");var dependencies=dir.resolve("dependencies");Files.writeString(cfg,"cfg sentinel");Files.writeString(dependencies,"dependencies sentinel");
         Files.writeString(input,"{");assertEquals(3,AnalysisPipeline.run(args(input,cfg,dependencies),errors()));

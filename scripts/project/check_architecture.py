@@ -110,7 +110,7 @@ EXPECTED_PRODUCTION_IMPORTS = {
 }
 # Deliberately enumerated core CFG additions; never discover/allow arbitrary sources.
 EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "application/CfgBuildCoordinator.java"].update({
-    DOMAIN_CLASS + "CoreCfgProjection", DOMAIN_CLASS + "CfgGraph", DOMAIN_CLASS + "CfgProjectionIssue",
+    DOMAIN_CLASS + "CoreCfgProjection", DOMAIN_CLASS + "CfgGraph", DOMAIN_CLASS + "CfgProgram", DOMAIN_CLASS + "CfgProjectionIssue",
     "java.util.Optional",
 })
 EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "application/CfgBuildResult.java"].update({
@@ -154,11 +154,17 @@ EXPECTED_PRODUCTION_IMPORTS.update({
     },
     SOURCE_ROOT + "domain/ProjectionPolicy.java": {"io.github.gustavo2358.air.model.Evidence"},
     SOURCE_ROOT + "domain/CoreCfgProjection.java": {
-        "io.github.gustavo2358.air.model.Entries",
         "io.github.gustavo2358.air.model.Ids.LabelId", "io.github.gustavo2358.air.model.Operations",
-        PUBLICATION, "io.github.gustavo2358.air.model.Sequence", "io.github.gustavo2358.air.model.Unit",
-        "java.util.ArrayList", "java.util.Comparator", "java.util.HashMap", "java.util.List", "java.util.Map",
+        PUBLICATION, "java.util.ArrayList", "java.util.HashMap", "java.util.List", "java.util.Map",
         "java.util.Objects",
+    },
+    SOURCE_ROOT + "domain/CfgProgram.java": {
+        "io.github.gustavo2358.air.model.Capabilities", "io.github.gustavo2358.air.model.Evidence",
+        "io.github.gustavo2358.air.model.Ids.EntryId", "io.github.gustavo2358.air.model.Ids.LabelId",
+        "io.github.gustavo2358.air.model.Ids.OperationId", "io.github.gustavo2358.air.model.Ids.UnitId",
+        "io.github.gustavo2358.air.model.NamePolicies", PUBLICATION,
+        "io.github.gustavo2358.air.model.Unit", "java.util.Comparator", "java.util.List",
+        "java.util.Objects", "java.util.Set", "java.util.function.Consumer",
     },
 })
 EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CfgTransitionTable.java"] = {
@@ -181,6 +187,8 @@ EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/LocalControlRules.java"] = {
     "java.util.Optional",
 }
 CFG_CLASS_NAMES = {
+    "CfgProgram", "CfgProgram$UnitView", "CfgProgram$EntryView", "CfgProgram$SequenceView",
+    "CfgProgram$Resident", "CfgProgram$ResidentUnit",
     "CfgControl", "CfgControl$Jump", "CfgControl$Branch", "CfgControl$Return", "CfgControl$Halt",
     "CfgControl$Invoke", "CfgControl$Opaque", "CfgControl$ReentryGuard", "CfgControl$ResumeRoute",
     "CfgControl$LocalInvoke", "CfgControl$LocalBoundary", "CfgControl$LocalResume",
@@ -210,7 +218,7 @@ EXPECTED_TEST_CASES = {
     "io.github.gustavo2358.analysis.cfg.application.CheckedPreflightTest": 3,
     "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistryTest": 4,
     DOMAIN_CLASS + "LocalControlProjectionTest": 1,
-    DOMAIN_CLASS + "EvalCfg025Test": 17,
+    DOMAIN_CLASS + "EvalCfg025Test": 18,
     DOMAIN_CLASS + "EvalCfg028Test": 22,
     DOMAIN_CLASS + "EvalCfg029Test": 25,
     DOMAIN_CLASS + "EvalCfg030Test": 20,

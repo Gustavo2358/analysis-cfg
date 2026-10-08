@@ -3,6 +3,10 @@ package io.github.gustavo2358.analysis.dependencies;
 import io.github.gustavo2358.air.model.*;
 import io.github.gustavo2358.air.model.Ids.*;
 import io.github.gustavo2358.air.validation.*;
+import io.github.gustavo2358.analysis.cfg.domain.CfgControl;
+import io.github.gustavo2358.analysis.cfg.domain.CfgProgram;
+import io.github.gustavo2358.analysis.cfg.domain.CfgSource;
+import io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection;
 import io.github.gustavo2358.analysis.structure.ProgramStore;
 import java.math.BigInteger;
 import java.util.*;
@@ -14,25 +18,205 @@ import static io.github.gustavo2358.air.model.AirShape.*;
  * Consumers see program events and detached evidence rather than wire shapes;
  * the snapshot and its paged identity index remain owned by the caller.
  */
-public final class SnapshotProgram implements DependencyProgramStore {
+public final class SnapshotProgram implements DependencyProgramStore, CfgProgram {
 
     private final AirSnapshot snapshot;
     private final SnapshotIdentityKeys keys;
+    private final CfgSource source;
+    private final List<Capabilities.Capability> requiredCapabilities;
+    private final Set<Capabilities.Capability> namePolicyExtensions;
     private boolean closed;
 
     public SnapshotProgram(SnapshotValidator.CheckedSnapshot checked,SnapshotIdentityKeys.Storage identityStorage) {
         Objects.requireNonNull(checked);snapshot=checked.snapshot();var owned=Objects.requireNonNull(identityStorage);
         if(checked.result().status()!=ValidationResult.Status.STRUCTURALLY_VALID){owned.close();throw new IllegalArgumentException("complete snapshot validation required");}
         keys=new SnapshotIdentityKeys(snapshot,owned);
+        try {
+            requiredCapabilities=capabilities();
+            namePolicyExtensions=namePolicyExtensionsFromSnapshot();
+            source=cfgSource();
+        } catch(RuntimeException|Error failure) {
+            keys.close();
+            throw failure;
+        }
     }
 
     public PublicationId publication(){open();return (PublicationId)id(snapshot.field(snapshot.root(),PUBLICATION,0));}
     public Evidence.InventoryStatus coverage(){open();long coverage=snapshot.field(snapshot.root(),PUBLICATION,9);return Evidence.InventoryStatus.values()[(int)snapshot.scalar(snapshot.field(coverage,EVIDENCE_COVERAGE,0))];}
     @Override public PublicationId publicationId(){return publication();}
     @Override public Evidence.InventoryStatus inventory(){return coverage();}
+    @Override public CfgSource source(){open();return source;}
+    @Override public List<Capabilities.Capability> requiredCapabilities(){open();return requiredCapabilities;}
+    @Override public Set<Capabilities.Capability> namePolicyExtensions(){open();return namePolicyExtensions;}
     public String textValue(long handle){open();return text(handle);}
     @Override public OperationId operationId(long handle){open();return (OperationId)id(handle);}
     @Override public OriginId originId(long handle){open();return (OriginId)id(handle);}
+
+    private List<Capabilities.Capability> capabilities() {
+        long manifest=snapshot.field(snapshot.root(),PUBLICATION,2),required=snapshot.field(manifest,CAPABILITIES_MANIFEST,0);
+        var result=new ArrayList<Capabilities.Capability>();
+        try(var rows=snapshot.elements(required,CAPABILITIES_CAPABILITY)) {
+            while(rows.advance()) {long row=rows.value();result.add(new Capabilities.Capability(
+                    text(snapshot.field(row,CAPABILITIES_CAPABILITY,0)),text(snapshot.field(row,CAPABILITIES_CAPABILITY,1))));}
+        }
+        return List.copyOf(result);
+    }
+
+    private Set<Capabilities.Capability> namePolicyExtensionsFromSnapshot() {
+        var result=new HashSet<Capabilities.Capability>();
+        try(var units=snapshot.elements(snapshot.field(snapshot.root(),PUBLICATION,4),UNIT)) {
+            while(units.advance())try(var sequences=snapshot.elements(snapshot.field(units.value(),UNIT,5),SEQUENCE)) {
+                while(sequences.advance()) {
+                    long terminator=snapshot.field(sequences.value(),SEQUENCE,2);
+                    if(snapshot.shape(terminator)==OPERATIONS_INVOKE)addNamePolicy(result,snapshot.field(terminator,OPERATIONS_INVOKE,2));
+                }
+            }
+        }
+        try(var resources=snapshot.elements(snapshot.field(snapshot.root(),PUBLICATION,6),INTERACTIONS_RESOURCE)) {
+            while(resources.advance())addNamePolicy(result,snapshot.field(resources.value(),INTERACTIONS_RESOURCE,1));
+        }
+        return Set.copyOf(result);
+    }
+
+    private void addNamePolicy(Set<Capabilities.Capability> result,long target) {
+        AirShape shape=snapshot.shape(target);long policy;
+        if(shape==INTERACTIONS_LITERAL_TARGET||shape==INTERACTIONS_COMPUTED_TARGET)policy=snapshot.field(target,shape,3);
+        else if(shape==INTERACTIONS_COMPUTED_RESOURCE)policy=snapshot.field(target,shape,3);
+        else return;
+        if(snapshot.shape(policy)==INTERACTIONS_EXTENSION_NAME)result.add(new Capabilities.Capability(
+                text(snapshot.field(policy,INTERACTIONS_EXTENSION_NAME,0)),text(snapshot.field(policy,INTERACTIONS_EXTENSION_NAME,1))));
+    }
+
+    private CfgSource cfgSource() {
+        long root=snapshot.root(),version=snapshot.field(root,PUBLICATION,1);
+        var units=new ArrayList<CfgSource.UnitInventory>();
+        try(var rows=snapshot.elements(snapshot.field(root,PUBLICATION,4),UNIT)) {
+            while(rows.advance()) {long unit=rows.value(),coverage=snapshot.field(unit,UNIT,9);units.add(new CfgSource.UnitInventory(
+                    (UnitId)id(snapshot.field(unit,UNIT,0)),inventory(coverage)));}
+        }
+        units.sort(Comparator.comparing(unit->unit.id().localId()));
+        return new CfgSource(publication(),new SemanticVersion(integer(snapshot.field(version,SEMANTIC_VERSION,0)),
+                integer(snapshot.field(version,SEMANTIC_VERSION,1)),integer(snapshot.field(version,SEMANTIC_VERSION,2))),
+                coverage(),units,requiredCapabilities.stream().filter(CoreCfgProjection::supportsControlCapability).distinct().toList());
+    }
+
+    private Evidence.InventoryStatus inventory(long coverage) {
+        return Evidence.InventoryStatus.values()[(int)snapshot.scalar(snapshot.field(coverage,EVIDENCE_COVERAGE,0))];
+    }
+
+    @Override public void units(Consumer<CfgProgram.UnitView> consumer) {
+        open();Objects.requireNonNull(consumer);
+        var units=new ArrayList<SnapshotUnit>();
+        try(var rows=snapshot.elements(snapshot.field(snapshot.root(),PUBLICATION,4),UNIT)) {
+            while(rows.advance())units.add(new SnapshotUnit(rows.value()));
+        }
+        units.sort(Comparator.comparing(unit->unit.id().localId()));units.forEach(consumer);
+    }
+
+    private final class SnapshotUnit implements CfgProgram.UnitView {
+        private final long handle;
+        private SnapshotUnit(long handle){this.handle=handle;}
+        @Override public UnitId id(){return (UnitId)SnapshotProgram.this.id(snapshot.field(handle,UNIT,0));}
+        @Override public Unit.BodyAvailability body(){return Unit.BodyAvailability.values()[(int)snapshot.scalar(snapshot.field(handle,UNIT,7))];}
+        @Override public Evidence.InventoryStatus inventory(){return SnapshotProgram.this.inventory(snapshot.field(handle,UNIT,9));}
+        @Override public void entries(Consumer<CfgProgram.EntryView> consumer) {
+            open();Objects.requireNonNull(consumer);var entries=new ArrayList<CfgProgram.EntryView>();
+            try(var rows=snapshot.elements(snapshot.field(handle,UNIT,4),ENTRIES_ENTRY)) {
+                while(rows.advance()) {long entry=rows.value(),initial=snapshot.field(entry,ENTRIES_ENTRY,1);entries.add(new CfgProgram.EntryView(
+                        (EntryId)SnapshotProgram.this.id(snapshot.field(entry,ENTRIES_ENTRY,0)),snapshot.size(initial)==0?Optional.empty():
+                        Optional.of((LabelId)SnapshotProgram.this.id(snapshot.element(initial,IDS_LABEL_ID,0)))));}
+            }
+            entries.sort(Comparator.comparing(entry->entry.id().localId()));entries.forEach(consumer);
+        }
+        @Override public void sequences(Consumer<CfgProgram.SequenceView> consumer) {
+            open();Objects.requireNonNull(consumer);var sequences=new ArrayList<CfgProgram.SequenceView>();
+            try(var rows=snapshot.elements(snapshot.field(handle,UNIT,5),SEQUENCE)) {
+                while(rows.advance()) {long sequence=rows.value();var operations=new ArrayList<OperationId>();
+                    try(var instructions=snapshot.elements(snapshot.field(sequence,SEQUENCE,1),INSTRUCTION)) {
+                        while(instructions.advance()) {long instruction=instructions.value(),header=snapshot.field(instruction,snapshot.shape(instruction),0);
+                            operations.add((OperationId)SnapshotProgram.this.id(snapshot.field(header,OPERATIONS_HEADER,0)));}
+                    }
+                    sequences.add(new CfgProgram.SequenceView((LabelId)SnapshotProgram.this.id(snapshot.field(sequence,SEQUENCE,0)),
+                            operations,control(snapshot.field(sequence,SEQUENCE,2))));
+                }
+            }
+            sequences.sort(Comparator.comparing(sequence->sequence.label().localId()));sequences.forEach(consumer);
+        }
+    }
+
+    private CfgControl control(long terminator) {
+        AirShape shape=snapshot.shape(terminator);long header=snapshot.field(terminator,shape,0);
+        OperationId operation=(OperationId)id(snapshot.field(header,OPERATIONS_HEADER,0));
+        return switch(shape) {
+            case OPERATIONS_JUMP -> new CfgControl.Jump(operation,(LabelId)id(snapshot.field(terminator,shape,1)));
+            case OPERATIONS_BRANCH -> new CfgControl.Branch(operation,(LabelId)id(snapshot.field(terminator,shape,2)),(LabelId)id(snapshot.field(terminator,shape,3)));
+            case OPERATIONS_RETURN -> new CfgControl.Return(operation);
+            case OPERATIONS_HALT -> new CfgControl.Halt(operation,Operations.HaltKind.values()[(int)snapshot.scalar(snapshot.field(terminator,shape,1))]);
+            case OPERATIONS_INVOKE -> {long outcomes=snapshot.field(terminator,shape,8);yield new CfgControl.Invoke(operation,invocationAlternatives(snapshot.field(outcomes,CONTROL_INVOCATION_OUTCOMES,0)),controlBound(snapshot.field(outcomes,CONTROL_INVOCATION_OUTCOMES,1)));}
+            case OPERATIONS_OPAQUE -> {long envelope=snapshot.field(terminator,shape,4),control=snapshot.field(envelope,ENVELOPES_ENVELOPE,1);yield new CfgControl.Opaque(operation,controlAlternatives(snapshot.field(control,CONTROL_CONTROL_ENVELOPE,0)),controlBound(snapshot.field(control,CONTROL_CONTROL_ENVELOPE,1)));}
+            case OPERATIONS_LOCAL_INVOKE -> new CfgControl.LocalInvoke(operation,(LabelId)id(snapshot.field(terminator,shape,1)),completionPorts(snapshot.field(terminator,shape,2)),
+                    (LabelId)id(snapshot.field(terminator,shape,3)),reentryGuard(snapshot.field(terminator,shape,5)),resumeRoutes(snapshot.field(terminator,shape,6)));
+            case OPERATIONS_LOCAL_BOUNDARY -> new CfgControl.LocalBoundary(operation,(CompletionPortId)id(snapshot.field(terminator,shape,1)),
+                    (LabelId)id(snapshot.field(terminator,shape,2)),optionalText(snapshot.field(terminator,shape,4)));
+            case OPERATIONS_LOCAL_RESUME -> new CfgControl.LocalResume(operation,optionalText(snapshot.field(terminator,shape,2)));
+            case OPERATIONS_LOCAL_UNWIND -> new CfgControl.LocalUnwind(operation,integer(snapshot.field(terminator,shape,1)),
+                    (LabelId)id(snapshot.field(terminator,shape,2)),snapshot.scalar(snapshot.field(terminator,shape,4))!=0);
+            default -> new CfgControl.Unsupported(operation);
+        };
+    }
+
+    private List<Control.InvocationAlternative> invocationAlternatives(long list) {
+        var result=new ArrayList<Control.InvocationAlternative>();
+        try(var rows=snapshot.elements(list,CONTROL_INVOCATION_ALTERNATIVE)){while(rows.advance())result.add((Control.InvocationAlternative)controlAlternative(rows.value()));}
+        return List.copyOf(result);
+    }
+    private List<Control.ControlAlternative> controlAlternatives(long list) {
+        var result=new ArrayList<Control.ControlAlternative>();
+        try(var rows=snapshot.elements(list,CONTROL_CONTROL_ALTERNATIVE)){while(rows.advance())result.add(controlAlternative(rows.value()));}
+        return List.copyOf(result);
+    }
+    private Control.ControlAlternative controlAlternative(long alternative) {
+        return switch(snapshot.shape(alternative)) {
+            case CONTROL_NORMAL -> new Control.Normal((LabelId)id(snapshot.field(alternative,CONTROL_NORMAL,0)));
+            case CONTROL_JUMP_ALTERNATIVE -> new Control.JumpAlternative((LabelId)id(snapshot.field(alternative,CONTROL_JUMP_ALTERNATIVE,0)));
+            case CONTROL_EXCEPTIONAL -> new Control.Exceptional(text(snapshot.field(alternative,CONTROL_EXCEPTIONAL,0)),exceptionDestination(snapshot.field(alternative,CONTROL_EXCEPTIONAL,1)));
+            case CONTROL_ANY_EXCEPTION -> new Control.AnyException(exceptionDestination(snapshot.field(alternative,CONTROL_ANY_EXCEPTION,0)));
+            case CONTROL_HALT_ALTERNATIVE -> Control.HaltAlternative.INSTANCE;
+            case CONTROL_DIVERGE -> Control.Diverge.INSTANCE;
+            case CONTROL_RETURN_ALTERNATIVE -> Control.ReturnAlternative.INSTANCE;
+            case CONTROL_CONTINUE_ALTERNATIVE -> Control.ContinueAlternative.INSTANCE;
+            default -> throw new IllegalStateException("unsupported admitted control alternative "+snapshot.shape(alternative));
+        };
+    }
+    private Control.ExceptionDestination exceptionDestination(long destination) {
+        return switch(snapshot.shape(destination)) {
+            case CONTROL_HANDLER -> new Control.Handler((LabelId)id(snapshot.field(destination,CONTROL_HANDLER,0)));
+            case CONTROL_PROPAGATE -> Control.Propagate.INSTANCE;
+            default -> throw new IllegalStateException("unsupported admitted exception destination "+snapshot.shape(destination));
+        };
+    }
+    private Scopes.ControlBound controlBound(long bound) {
+        return switch(snapshot.shape(bound)) {
+            case SCOPES_NO_CONTROL -> Scopes.NoControl.INSTANCE;
+            case SCOPES_WITHIN_CONTROL -> new Scopes.WithinControl(controlScope(snapshot.field(bound,SCOPES_WITHIN_CONTROL,0)));
+            default -> throw new IllegalStateException("unsupported admitted control bound "+snapshot.shape(bound));
+        };
+    }
+    private Scopes.ControlScope controlScope(long scope) {
+        return switch(snapshot.shape(scope)) {
+            case SCOPES_ALL_CONTROL -> new Scopes.AllControl((PublicationId)id(snapshot.field(scope,SCOPES_ALL_CONTROL,0)));
+            case SCOPES_LABELS_CONTROL -> new Scopes.LabelsControl(labelIds(snapshot.field(scope,SCOPES_LABELS_CONTROL,0)));
+            case SCOPES_UNIT_CONTROL -> new Scopes.UnitControl((UnitId)id(snapshot.field(scope,SCOPES_UNIT_CONTROL,0)),bool(scope,1),bool(scope,2),bool(scope,3),bool(scope,4),bool(scope,5),bool(scope,6));
+            case SCOPES_CONTROL_UNION -> {var members=new ArrayList<Scopes.ControlScope>();try(var rows=snapshot.elements(snapshot.field(scope,SCOPES_CONTROL_UNION,0),SCOPES_CONTROL_SCOPE)){while(rows.advance())members.add(controlScope(rows.value()));}yield new Scopes.ControlUnion(members);}
+            default -> throw new IllegalStateException("unsupported admitted control scope "+snapshot.shape(scope));
+        };
+    }
+    private boolean bool(long record,int slot){return snapshot.scalar(snapshot.field(record,snapshot.shape(record),slot))!=0;}
+    private List<LabelId> labelIds(long list){var result=new ArrayList<LabelId>();try(var rows=snapshot.elements(list,IDS_LABEL_ID)){while(rows.advance())result.add((LabelId)id(rows.value()));}return List.copyOf(result);}
+    private List<CompletionPortId> completionPorts(long list){var result=new ArrayList<CompletionPortId>();try(var rows=snapshot.elements(list,IDS_COMPLETION_PORT_ID)){while(rows.advance())result.add((CompletionPortId)id(rows.value()));}return List.copyOf(result);}
+    private Optional<CfgControl.ReentryGuard> reentryGuard(long optional){if(snapshot.size(optional)==0)return Optional.empty();long value=snapshot.element(optional,OPERATIONS_REENTRY_GUARD,0);return Optional.of(new CfgControl.ReentryGuard(text(snapshot.field(value,OPERATIONS_REENTRY_GUARD,0)),(LabelId)id(snapshot.field(value,OPERATIONS_REENTRY_GUARD,1))));}
+    private List<CfgControl.ResumeRoute> resumeRoutes(long list){var result=new ArrayList<CfgControl.ResumeRoute>();try(var rows=snapshot.elements(list,OPERATIONS_RESUME_ROUTE)){while(rows.advance()){long value=rows.value();result.add(new CfgControl.ResumeRoute(text(snapshot.field(value,OPERATIONS_RESUME_ROUTE,0)),(LabelId)id(snapshot.field(value,OPERATIONS_RESUME_ROUTE,1))));}}return List.copyOf(result);}
+    private Optional<String> optionalText(long optional){return snapshot.size(optional)==0?Optional.empty():Optional.of(text(snapshot.element(optional,TEXT,0)));}
 
     @Override public void definitions(Consumer<Definition> consumer) {
         open();Objects.requireNonNull(consumer);
@@ -179,7 +363,7 @@ public final class SnapshotProgram implements DependencyProgramStore {
     private List<OriginId> originIds(long list){var result=new ArrayList<OriginId>();try(var rows=snapshot.elements(list,IDS_ORIGIN_ID)){while(rows.advance())result.add((OriginId)id(rows.value()));}return List.copyOf(result);}
     private BigInteger integer(long source){return new BigInteger(text(source));}
     private long firstEntry(long unit){long entries=snapshot.field(unit,UNIT,4);if(snapshot.size(entries)==0)throw new IllegalStateException("direct dependency profile requires an entry");return snapshot.element(entries,ENTRIES_ENTRY,0);}
-    private Id id(long source){AirShape shape=snapshot.shape(source);return switch(shape){case IDS_PUBLICATION_ID->new PublicationId(text(snapshot.field(source,shape,0)));case IDS_UNIT_ID->new UnitId((PublicationId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));case IDS_ENTRY_ID->new EntryId((UnitId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));case IDS_LABEL_ID->new LabelId((UnitId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));case IDS_OPERATION_ID->new OperationId((UnitId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));case IDS_OBJECT_ID->new ObjectId((UnitId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));case IDS_ORIGIN_ID->new OriginId((PublicationId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));case IDS_ARTIFACT_ID->new ArtifactId((PublicationId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));default->throw new IllegalArgumentException("unsupported program id "+shape);};}
+    private Id id(long source){AirShape shape=snapshot.shape(source);return switch(shape){case IDS_PUBLICATION_ID->new PublicationId(text(snapshot.field(source,shape,0)));case IDS_UNIT_ID->new UnitId((PublicationId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));case IDS_ENTRY_ID->new EntryId((UnitId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));case IDS_LABEL_ID->new LabelId((UnitId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));case IDS_OPERATION_ID->new OperationId((UnitId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));case IDS_COMPLETION_PORT_ID->new CompletionPortId((UnitId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));case IDS_OBJECT_ID->new ObjectId((UnitId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));case IDS_ORIGIN_ID->new OriginId((PublicationId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));case IDS_ARTIFACT_ID->new ArtifactId((PublicationId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));default->throw new IllegalArgumentException("unsupported program id "+shape);};}
     private String text(long source){long length=snapshot.characterCount(source);if(length>Integer.MAX_VALUE)throw new IllegalStateException("program text too large");char[] result=new char[(int)length],block=new char[Math.min(1024,Math.max(1,result.length))];long offset=0;while(offset<length){int count=snapshot.readCharacters(source,offset,block,0,(int)Math.min(block.length,length-offset));System.arraycopy(block,0,result,(int)offset,count);offset+=count;}return new String(result);}
     private void open(){if(closed)throw new IllegalStateException("snapshot program is closed");}
     @Override public void close(){if(closed)return;closed=true;keys.close();}
