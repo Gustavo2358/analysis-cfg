@@ -11,19 +11,21 @@ import java.util.Objects;
 /** Managed object-to-candidate relation; text and complete producer chains are paged payload. */
 public final class PagedSnapshotDependencyStorage implements SnapshotDependencyAnalysis.Storage {
     private static final AnalysisResources.Phase PHASE=AnalysisResources.Phase.DOMAIN;
-    private static final int FIELDS=3,SUPPORT_FIELDS=12,CALL_FIELDS=18;
+    private static final int FIELDS=3,SUPPORT_FIELDS=12,CALL_FIELDS=19;
+    private final PageStore pages;
     private final AnalysisResources resources;
     private final AnalysisResources.Reservation resident;
     private PagedLongIndex candidateOrder,supportOrder,supportInsertionOrder,callOrder;
     private PagedLongArray rows,characters,supportRows,supportCharacters,callRows,callCharacters;
+    private PagedHandleOrder artifactOrder,originOrder;
     private PagedLongIndex.Cursor candidateCursor,supportCursor,callCursor;
     private long count,characterCount,supportCount,supportCharacterCount,selectedObject,currentCandidate,textStart,textLength;
     private long selectedCandidate,currentSupport;
-    private long callRowsCount,callCharacterCount,currentCall;
+    private long callRowsCount,callCharacterCount,currentCall,candidateCount,unknownRemainderCount;
     private boolean closed,failed;
 
     public PagedSnapshotDependencyStorage(PageStore pages,AnalysisResources resources) {
-        Objects.requireNonNull(pages);this.resources=Objects.requireNonNull(resources);resident=resources.reserve(AnalysisResources.Pool.RESIDENT,256,PHASE);
+        this.pages=Objects.requireNonNull(pages);this.resources=Objects.requireNonNull(resources);resident=resources.reserve(AnalysisResources.Pool.RESIDENT,256,PHASE);
         try{rows=new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);characters=new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);candidateOrder=new PagedLongIndex(pages,resources,PHASE,this::compareCandidates);
             supportRows=new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);supportCharacters=new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);supportOrder=new PagedLongIndex(pages,resources,PHASE,this::compareSupports);supportInsertionOrder=new PagedLongIndex(pages,resources,PHASE,this::compareSupportInsertion);
             callRows=new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);callCharacters=new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);callOrder=new PagedLongIndex(pages,resources,PHASE,this::compareCalls);clearCurrent();}
@@ -74,11 +76,19 @@ public final class PagedSnapshotDependencyStorage implements SnapshotDependencyA
         open();Objects.requireNonNull(call);
         try {
             if(callRowsCount==Long.MAX_VALUE/CALL_FIELDS)throw new IllegalStateException("dependency call cardinality exceeds paged row space");
+            long candidates=candidateCount(call.objectKey());
             long row=++callRowsCount,at=(row-1)*CALL_FIELDS;callRows.set(at,call.objectKey());callRows.set(at+1,call.coverage().ordinal());
             putCallText(at+2,call.caller().localId());putCallText(at+4,call.entry().localId());putCallText(at+6,call.sequence().localId());
             putCallText(at+8,call.operation().localId());putCallText(at+10,call.siteOrigin().localId());putCallText(at+12,call.targetOrigin().localId());
-            putCallText(at+14,call.namespace());putCallText(at+16,call.subject().localId());callOrder.intern(row,row);
+            putCallText(at+14,call.namespace());putCallText(at+16,call.subject().localId());callRows.set(at+18,candidates);callOrder.intern(row,row);
+            candidateCount=Math.addExact(candidateCount,candidates);
+            if(call.coverage()!=io.github.gustavo2358.air.model.Evidence.CoverageStatus.MODELED||candidates==0)unknownRemainderCount=Math.addExact(unknownRemainderCount,1);
         } catch(RuntimeException|Error failure){failed=true;throw failure;}
+    }
+    private long candidateCount(long object) {
+        closeCandidateCursor();long query=1,at=0;rows.set(at,0);rows.set(at+1,0);rows.set(at+2,object);long result=0;
+        try(var cursor=candidateOrder.cursor(query)){while(cursor.advance()){long candidate=cursor.value();if(rows.get((candidate-1)*FIELDS+2)!=object)break;result=Math.addExact(result,1);}}
+        return result;
     }
     private void putCallText(long field,String text) {
         Objects.requireNonNull(text);if(callCharacterCount>Long.MAX_VALUE-text.length())throw new IllegalStateException("dependency call text exceeds paged row space");
@@ -107,7 +117,18 @@ public final class PagedSnapshotDependencyStorage implements SnapshotDependencyA
     @Override public synchronized io.github.gustavo2358.air.model.Evidence.CoverageStatus callCoverage(){return io.github.gustavo2358.air.model.Evidence.CoverageStatus.values()[(int)callField(1)];}
     @Override public synchronized String callNamespace(){return callText(14);}
     @Override public synchronized String callSubject(){return callText(16);}
+    @Override public synchronized long callCandidateCount(){return callField(18);}
     @Override public synchronized long callCount(){open();return callRowsCount;}
+    @Override public synchronized long candidateCount(){open();return candidateCount;}
+    @Override public synchronized long unknownRemainderCount(){open();return unknownRemainderCount;}
+    @Override public synchronized void addArtifact(long handle,String localId){open();try{if(artifactOrder==null)artifactOrder=new PagedHandleOrder(pages);artifactOrder.add(handle,localId);}catch(RuntimeException|Error failure){failed=true;throw failure;}}
+    @Override public synchronized void selectArtifacts(){open();if(artifactOrder!=null)artifactOrder.select();}
+    @Override public synchronized boolean advanceArtifact(){open();return artifactOrder!=null&&artifactOrder.advance();}
+    @Override public synchronized long artifactHandle(){open();if(artifactOrder==null)throw new NoSuchElementException("no current dependency artifact");return artifactOrder.handle();}
+    @Override public synchronized void addOrigin(long handle,String localId){open();try{if(originOrder==null)originOrder=new PagedHandleOrder(pages);originOrder.add(handle,localId);}catch(RuntimeException|Error failure){failed=true;throw failure;}}
+    @Override public synchronized void selectOrigins(){open();if(originOrder!=null)originOrder.select();}
+    @Override public synchronized boolean advanceOrigin(){open();return originOrder!=null&&originOrder.advance();}
+    @Override public synchronized long originHandle(){open();if(originOrder==null)throw new NoSuchElementException("no current dependency origin");return originOrder.handle();}
     private long callField(int field){currentCall();return callRows.get((currentCall-1)*CALL_FIELDS+field);}
     private String callText(int field){currentCall();long at=(currentCall-1)*CALL_FIELDS,start=callRows.get(at+field),length=callRows.get(at+field+1);if(length>Integer.MAX_VALUE)throw new IllegalStateException("dependency call text is not representable");char[] text=new char[(int)length];for(int i=0;i<text.length;i++)text[i]=(char)callCharacters.get(start+i);return new String(text);}
     private void currentCall(){open();if(currentCall==0)throw new NoSuchElementException("no current dependency call");}
@@ -118,5 +139,19 @@ public final class PagedSnapshotDependencyStorage implements SnapshotDependencyA
     public synchronized AirSnapshotBuilder.Lease claim(long bytes){open();try{var lease=resources.reserve(AnalysisResources.Pool.RESIDENT,bytes,PHASE);return lease::close;}catch(RuntimeException|Error failure){failed=true;throw failure;}}
     private void open(){if(closed||failed)throw new IllegalStateException("paged dependency definitions are closed or aborted");}
     private void closeSuppressed(Throwable failure){try{close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}}
-    @Override public synchronized void close(){if(closed)return;closed=true;Throwable failure=null;try{closeCallCursor();closeSupportCursor();closeCandidateCursor();}catch(RuntimeException|Error cleanup){failure=cleanup;}for(var owner:new AutoCloseable[]{candidateOrder,supportOrder,supportInsertionOrder,rows,characters,supportRows,supportCharacters,callOrder,callRows,callCharacters})try{if(owner!=null)owner.close();}catch(Exception|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}candidateOrder=supportOrder=supportInsertionOrder=callOrder=null;rows=characters=supportRows=supportCharacters=callRows=callCharacters=null;count=characterCount=supportCount=supportCharacterCount=selectedObject=selectedCandidate=currentSupport=callRowsCount=callCharacterCount=currentCall=0;clearCurrent();resident.close();if(failure instanceof RuntimeException error)throw error;if(failure instanceof Error error)throw error;if(failure!=null)throw new IllegalStateException(failure);}
+    @Override public synchronized void close(){if(closed)return;closed=true;Throwable failure=null;try{closeCallCursor();closeSupportCursor();closeCandidateCursor();}catch(RuntimeException|Error cleanup){failure=cleanup;}for(var owner:new AutoCloseable[]{candidateOrder,supportOrder,supportInsertionOrder,rows,characters,supportRows,supportCharacters,callOrder,callRows,callCharacters,artifactOrder,originOrder})try{if(owner!=null)owner.close();}catch(Exception|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}candidateOrder=supportOrder=supportInsertionOrder=callOrder=null;rows=characters=supportRows=supportCharacters=callRows=callCharacters=null;artifactOrder=originOrder=null;count=characterCount=supportCount=supportCharacterCount=selectedObject=selectedCandidate=currentSupport=callRowsCount=callCharacterCount=currentCall=candidateCount=unknownRemainderCount=0;clearCurrent();resident.close();if(failure instanceof RuntimeException error)throw error;if(failure instanceof Error error)throw error;if(failure!=null)throw new IllegalStateException(failure);}
+
+    private final class PagedHandleOrder implements AutoCloseable {
+        private static final int HANDLE_FIELDS=3;
+        private PagedLongArray handleRows,handleCharacters;private PagedLongIndex order;private PagedLongIndex.Cursor cursor;
+        private long rowCount,characterCount,current;
+        private PagedHandleOrder(PageStore pages){handleRows=new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);handleCharacters=new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);order=new PagedLongIndex(pages,resources,PHASE,this::compare);}
+        private void add(long handle,String localId){Objects.requireNonNull(localId);if(handle<=0)throw new IllegalArgumentException("metadata handle must be positive");closeCursor();if(rowCount==Long.MAX_VALUE/HANDLE_FIELDS||characterCount>Long.MAX_VALUE-localId.length())throw new IllegalStateException("dependency metadata exceeds paged row space");long row=++rowCount,at=(row-1)*HANDLE_FIELDS,start=characterCount;handleRows.set(at,handle);for(int i=0;i<localId.length();i++)handleCharacters.set(characterCount++,localId.charAt(i));handleRows.set(at+1,start);handleRows.set(at+2,localId.length());order.intern(row,row);}
+        private int compare(long first,long second){long a=(first-1)*HANDLE_FIELDS,b=(second-1)*HANDLE_FIELDS,an=handleRows.get(a+2),bn=handleRows.get(b+2),limit=Math.min(an,bn);for(long i=0;i<limit;i++){int comparison=Long.compare(handleCharacters.get(handleRows.get(a+1)+i),handleCharacters.get(handleRows.get(b+1)+i));if(comparison!=0)return comparison;}int comparison=Long.compare(an,bn);return comparison!=0?comparison:Long.compare(handleRows.get(a),handleRows.get(b));}
+        private void select(){closeCursor();cursor=order.cursor();current=0;}
+        private boolean advance(){if(cursor==null)throw new IllegalStateException("dependency metadata cursor is not selected");if(!cursor.advance()){closeCursor();return false;}current=cursor.value();return true;}
+        private long handle(){if(current==0)throw new NoSuchElementException("no current dependency metadata");return handleRows.get((current-1)*HANDLE_FIELDS);}
+        private void closeCursor(){if(cursor!=null)cursor.close();cursor=null;current=0;}
+        @Override public void close(){closeCursor();Throwable failure=null;for(var owner:new AutoCloseable[]{order,handleRows,handleCharacters})try{if(owner!=null)owner.close();}catch(Exception|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}order=null;handleRows=handleCharacters=null;if(failure instanceof RuntimeException runtime)throw runtime;if(failure instanceof Error error)throw error;if(failure!=null)throw new IllegalStateException(failure);}
+    }
 }

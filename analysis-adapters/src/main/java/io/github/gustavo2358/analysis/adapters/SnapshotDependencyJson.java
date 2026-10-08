@@ -18,8 +18,8 @@ public final class SnapshotDependencyJson {
             "publication",id(result.publication()),"analysisStatus",partial?"PARTIAL":"COMPLETE","analysisBoundary","COBOL_SOURCE_ONLY",
             "modelScope","VALIDATED_SNAPSHOT_DEPENDENCY","valuesProfile","snapshot-text-relations@2","publicationInventory",result.coverage().name(),
             "sites",mapped(result.cursorSites(),SnapshotDependencyJson::site),"edges",cursorEdges(result.cursorSites()),
-            "origins",result.origins().stream().sorted(Comparator.comparing(o->o.id().localId())).map(SnapshotDependencyJson::origin),
-            "artifacts",result.artifacts().stream().sorted(Comparator.comparing(a->a.id().localId())).map(a->object("id",id(a.id()),"logicalName",a.logicalName(),"contentDigest",a.contentDigest().orElse(null))),
+            "origins",mapped(result.cursorOrigins(),SnapshotDependencyJson::origin),
+            "artifacts",mapped(result.cursorArtifacts(),a->object("id",id(a.id()),"logicalName",a.logicalName(),"contentDigest",a.contentDigest().orElse(null))),
             "metrics",object("sites",metrics.sites(),"candidates",metrics.candidates())));
         out.finish();
     }
@@ -42,7 +42,7 @@ public final class SnapshotDependencyJson {
         "candidates",site.candidates().stream().sorted(Comparator.comparing(DirectDependencyResult.Candidate::referenceName).thenComparing(DirectDependencyResult.Candidate::rawValue)).map(SnapshotDependencyJson::candidate));}
     private static Fields site(SnapshotDependencyCursorResult.CursorSite site){return object("caller",id(site.caller()),"entry",id(site.entry()),"sequence",id(site.sequence()),"operation",id(site.operation()),
         "siteOrigin",id(site.siteOrigin()),"targetOrigin",id(site.targetOrigin()),"coverage",site.coverage().name(),"technology","COBOL","command","CALL","namespace",site.namespace(),"targetKind","COMPUTED","subject",id(site.subject()),
-        "targetStatus",site.unknownRemainder()&&!site.candidates().iterator().hasNext()?"OPEN_TARGET":"RESOLVED_CANDIDATES","modelValueRemainder",site.unknownRemainder(),"effectiveUnknownRemainder",site.unknownRemainder(),"analysisStatus",site.unknownRemainder()?"PARTIAL":"COMPLETE",
+        "targetStatus",site.unknownRemainder()&&!site.hasCandidates()?"OPEN_TARGET":"RESOLVED_CANDIDATES","modelValueRemainder",site.unknownRemainder(),"effectiveUnknownRemainder",site.unknownRemainder(),"analysisStatus",site.unknownRemainder()?"PARTIAL":"COMPLETE",
         "candidates",mapped(site.candidates(),SnapshotDependencyJson::candidate));}
     private static Fields candidate(DirectDependencyResult.Candidate candidate){return object("referenceName",candidate.referenceName(),"rawValue",candidate.rawValue(),"supports",candidate.supports().stream().sorted(Comparator.comparing(s->s.producer().localId())).map(s->object("kind","VALUE_PRODUCER","producer",id(s.producer()),"origin",id(s.origin()),"premises",s.premises().stream().sorted(WireIds.ORDER).map(SnapshotDependencyJson::id))));}
     private static Fields candidate(SnapshotDependencyCursorResult.CursorCandidate candidate){return object("referenceName",candidate.referenceName(),"rawValue",candidate.rawValue(),"supports",mapped(candidate.orderedSupports(),s->object("kind","VALUE_PRODUCER","producer",id(s.producer()),"origin",id(s.origin()),"premises",s.premises().stream().sorted(WireIds.ORDER).map(SnapshotDependencyJson::id))));}

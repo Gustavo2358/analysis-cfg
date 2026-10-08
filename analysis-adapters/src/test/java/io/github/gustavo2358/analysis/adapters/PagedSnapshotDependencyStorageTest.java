@@ -9,11 +9,25 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 final class PagedSnapshotDependencyStorageTest {
+    @Test void metadataHandlesArePageBackedAndOrderedWithoutMaterializingCollections() throws Exception {
+        var resources=new AnalysisResources(new AnalysisResources.Limits(65_536,65_536,0,64_000_000,4,1_000_000_000,1_000_000));
+        var directory=Files.createTempDirectory("snapshot-dependency-metadata-");
+        try(var pages=new FilePageStore(directory,128,1,resources);var storage=new PagedSnapshotDependencyStorage(pages,resources)) {
+            for(int i=1023;i>=0;i--){String suffix=String.format("%04d",i);storage.addOrigin(i+1,"origin-"+suffix);storage.addArtifact(i+2049,"artifact-"+suffix);}
+            storage.selectOrigins();long origin=1;while(storage.advanceOrigin())assertEquals(origin++,storage.originHandle());assertEquals(1025,origin);
+            storage.selectArtifacts();long artifact=2049;while(storage.advanceArtifact())assertEquals(artifact++,storage.artifactHandle());assertEquals(3073,artifact);
+            assertTrue(resources.heapPeak()<=65_536);assertTrue(pages.statistics().evictions()>1000);
+            System.out.println("SNAPSHOT_DEPENDENCY_METADATA_CURSOR_METRICS heap="+resources.heapPeak()+" temporary="+resources.used(AnalysisResources.Pool.TEMPORARY)+" records=2048 evictions="+pages.statistics().evictions());
+        } finally {Files.deleteIfExists(directory);}
+        assertEquals(0,resources.heapUsed());
+    }
+
     @Test void callCursorOrdersPageBackedSitesWithBoundedManagedHeap() throws Exception {
         var resources=new AnalysisResources(new AnalysisResources.Limits(65_536,65_536,0,64_000_000,4,1_000_000_000,1_000_000));
         var directory=Files.createTempDirectory("snapshot-dependency-sites-");
         try(var pages=new FilePageStore(directory,128,1,resources);var storage=new PagedSnapshotDependencyStorage(pages,resources)) {
             var publication=new PublicationId("cursor-sites");var unit=new UnitId(publication,"caller");
+            storage.add(1,"TARGET-A");storage.add(1,"TARGET-B");
             for(int i=1023;i>=0;i--) {
                 String suffix=String.format("%04d",i);
                 storage.addCall(new DependencyProgramStore.ComputedCall(1,unit,new EntryId(unit,"entry-"+suffix),
@@ -22,8 +36,8 @@ final class PagedSnapshotDependencyStorageTest {
                     Evidence.CoverageStatus.MODELED,"cobol.program",new ObjectId(unit,"subject-"+suffix)));
             }
             storage.selectCalls();long count=0;
-            while(storage.advanceCall())assertEquals("entry-"+String.format("%04d",count++),storage.callEntry());
-            assertEquals(1024,count);assertEquals(1024,storage.callCount());
+            while(storage.advanceCall()){assertEquals("entry-"+String.format("%04d",count++),storage.callEntry());assertEquals(2,storage.callCandidateCount());}
+            assertEquals(1024,count);assertEquals(1024,storage.callCount());assertEquals(2048,storage.candidateCount());assertEquals(0,storage.unknownRemainderCount());
             assertTrue(resources.heapPeak()<=65_536);assertTrue(pages.statistics().evictions()>1000);
             System.out.println("SNAPSHOT_DEPENDENCY_CURSOR_METRICS heap="+resources.heapPeak()+" temporary="+resources.used(AnalysisResources.Pool.TEMPORARY)+" sites="+count+" evictions="+pages.statistics().evictions());
         } finally {Files.deleteIfExists(directory);}

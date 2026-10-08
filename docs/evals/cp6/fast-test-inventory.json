@@ -471,7 +471,11 @@
     "io.github.gustavo2358.analysis.adapters.PagedSnapshotDependencyStorageTest": [
       "callCursorOrdersPageBackedSitesWithBoundedManagedHeap",
       "candidateLowerBoundReadsOnlyOneObjectsSortedPayload",
-      "supportCursorDeduplicatesAndOrdersOneCandidatesSpilledProofs"
+      "supportCursorDeduplicatesAndOrdersOneCandidatesSpilledProofs",
+      "metadataHandlesArePageBackedAndOrderedWithoutMaterializingCollections"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.SnapshotDependencyOutputScaleTest": [
+      "cursorPublishesOutputLargerThanManagedHeapAndFailureIsAtomic"
     ]
   },
   "analysis-dataflow": {

@@ -317,27 +317,41 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
     }
 
     public List<Origins.Artifact> artifacts() {
-        open();var result=new ArrayList<Origins.Artifact>();
+        open();var result=new ArrayList<Origins.Artifact>();artifactHandles((handle,ignored)->result.add(materializeArtifact(handle)));return List.copyOf(result);
+    }
+
+    @Override public void artifactHandles(MetadataHandleConsumer consumer) {
+        open();Objects.requireNonNull(consumer);
         try(var rows=snapshot.elements(snapshot.field(snapshot.root(),PUBLICATION,3),ORIGINS_ARTIFACT)) {
-            while(rows.advance()) {long row=rows.value(),digest=snapshot.field(row,ORIGINS_ARTIFACT,2);result.add(new Origins.Artifact(
-                (ArtifactId)id(snapshot.field(row,ORIGINS_ARTIFACT,0)),text(snapshot.field(row,ORIGINS_ARTIFACT,1)),
-                snapshot.size(digest)==0?Optional.empty():Optional.of(text(snapshot.element(digest,TEXT,0)))));}
+            while(rows.advance()){long row=rows.value();consumer.accept(row,localId(snapshot.field(row,ORIGINS_ARTIFACT,0)));}
         }
-        return List.copyOf(result);
+    }
+
+    @Override public Origins.Artifact materializeArtifact(long row) {
+        open();long digest=snapshot.field(row,ORIGINS_ARTIFACT,2);return new Origins.Artifact(
+            (ArtifactId)id(snapshot.field(row,ORIGINS_ARTIFACT,0)),text(snapshot.field(row,ORIGINS_ARTIFACT,1)),
+            snapshot.size(digest)==0?Optional.empty():Optional.of(text(snapshot.element(digest,TEXT,0))));
     }
 
     public List<Origins.Origin> origins() {
-        open();var result=new ArrayList<Origins.Origin>();
+        open();var result=new ArrayList<Origins.Origin>();originHandles((handle,ignored)->result.add(materializeOrigin(handle)));return List.copyOf(result);
+    }
+
+    @Override public void originHandles(MetadataHandleConsumer consumer) {
+        open();Objects.requireNonNull(consumer);
         try(var rows=snapshot.elements(snapshot.field(snapshot.root(),PUBLICATION,8),ORIGINS_ORIGIN)) {
-            while(rows.advance()) {long row=rows.value();result.add(switch(snapshot.shape(row)) {
-                case ORIGINS_UNAVAILABLE -> new Origins.Unavailable((OriginId)id(snapshot.field(row,ORIGINS_UNAVAILABLE,0)),text(snapshot.field(row,ORIGINS_UNAVAILABLE,1)));
-                case ORIGINS_CONTRACTUAL -> new Origins.Contractual((OriginId)id(snapshot.field(row,ORIGINS_CONTRACTUAL,0)),text(snapshot.field(row,ORIGINS_CONTRACTUAL,1)),text(snapshot.field(row,ORIGINS_CONTRACTUAL,2)));
-                case ORIGINS_DERIVED -> new Origins.Derived((OriginId)id(snapshot.field(row,ORIGINS_DERIVED,0)),originIds(snapshot.field(row,ORIGINS_DERIVED,1)),text(snapshot.field(row,ORIGINS_DERIVED,2)));
-                case ORIGINS_WRITTEN -> written(row);
-                default -> throw new IllegalStateException("unsupported origin shape "+snapshot.shape(row));
-            });}
+            while(rows.advance()){long row=rows.value(),shapeId=snapshot.field(row,snapshot.shape(row),0);consumer.accept(row,localId(shapeId));}
         }
-        return List.copyOf(result);
+    }
+
+    @Override public Origins.Origin materializeOrigin(long row) {
+        open();return switch(snapshot.shape(row)) {
+            case ORIGINS_UNAVAILABLE -> new Origins.Unavailable((OriginId)id(snapshot.field(row,ORIGINS_UNAVAILABLE,0)),text(snapshot.field(row,ORIGINS_UNAVAILABLE,1)));
+            case ORIGINS_CONTRACTUAL -> new Origins.Contractual((OriginId)id(snapshot.field(row,ORIGINS_CONTRACTUAL,0)),text(snapshot.field(row,ORIGINS_CONTRACTUAL,1)),text(snapshot.field(row,ORIGINS_CONTRACTUAL,2)));
+            case ORIGINS_DERIVED -> new Origins.Derived((OriginId)id(snapshot.field(row,ORIGINS_DERIVED,0)),originIds(snapshot.field(row,ORIGINS_DERIVED,1)),text(snapshot.field(row,ORIGINS_DERIVED,2)));
+            case ORIGINS_WRITTEN -> written(row);
+            default -> throw new IllegalStateException("unsupported origin shape "+snapshot.shape(row));
+        };
     }
 
     private Origins.Written written(long row) {
@@ -361,6 +375,7 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
     }
 
     private List<OriginId> originIds(long list){var result=new ArrayList<OriginId>();try(var rows=snapshot.elements(list,IDS_ORIGIN_ID)){while(rows.advance())result.add((OriginId)id(rows.value()));}return List.copyOf(result);}
+    private String localId(long id){return text(snapshot.field(id,snapshot.shape(id),1));}
     private BigInteger integer(long source){return new BigInteger(text(source));}
     private long firstEntry(long unit){long entries=snapshot.field(unit,UNIT,4);if(snapshot.size(entries)==0)throw new IllegalStateException("direct dependency profile requires an entry");return snapshot.element(entries,ENTRIES_ENTRY,0);}
     private Id id(long source){AirShape shape=snapshot.shape(source);return switch(shape){case IDS_PUBLICATION_ID->new PublicationId(text(snapshot.field(source,shape,0)));case IDS_UNIT_ID->new UnitId((PublicationId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));case IDS_ENTRY_ID->new EntryId((UnitId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));case IDS_LABEL_ID->new LabelId((UnitId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));case IDS_OPERATION_ID->new OperationId((UnitId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));case IDS_COMPLETION_PORT_ID->new CompletionPortId((UnitId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));case IDS_OBJECT_ID->new ObjectId((UnitId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));case IDS_ORIGIN_ID->new OriginId((PublicationId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));case IDS_ARTIFACT_ID->new ArtifactId((PublicationId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));default->throw new IllegalArgumentException("unsupported program id "+shape);};}

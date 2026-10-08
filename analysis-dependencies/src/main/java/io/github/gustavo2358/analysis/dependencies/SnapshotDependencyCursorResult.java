@@ -17,28 +17,30 @@ public final class SnapshotDependencyCursorResult implements AutoCloseable {
     }
     public record CursorSite(UnitId caller,EntryId entry,LabelId sequence,OperationId operation,OriginId siteOrigin,
             OriginId targetOrigin,Evidence.CoverageStatus coverage,String namespace,ObjectId subject,
-            Iterable<CursorCandidate> candidates,boolean unknownRemainder) { }
+            Iterable<CursorCandidate> candidates,boolean hasCandidates,boolean unknownRemainder) { }
 
     private final PublicationId publication;
     private final Evidence.InventoryStatus coverage;
-    private final List<Origins.Origin> origins;
-    private final List<Origins.Artifact> artifacts;
     private DependencyProgramStore program;
     private SnapshotDependencyAnalysis.Storage storage;
     private boolean closed;
 
     SnapshotDependencyCursorResult(PublicationId publication,Evidence.InventoryStatus coverage,
-            List<Origins.Origin> origins,List<Origins.Artifact> artifacts,
             DependencyProgramStore program,SnapshotDependencyAnalysis.Storage storage) {
         this.publication=Objects.requireNonNull(publication);this.coverage=Objects.requireNonNull(coverage);
-        this.origins=List.copyOf(origins);this.artifacts=List.copyOf(artifacts);
         this.program=Objects.requireNonNull(program);this.storage=Objects.requireNonNull(storage);
     }
 
     public PublicationId publication(){open();return publication;}
     public Evidence.InventoryStatus coverage(){open();return coverage;}
-    public List<Origins.Origin> origins(){open();return origins;}
-    public List<Origins.Artifact> artifacts(){open();return artifacts;}
+    public Iterable<Origins.Origin> cursorOrigins(){open();return ()->{open();storage.selectOrigins();return new Iterator<>(){
+        private boolean prepared,available;public boolean hasNext(){open();if(!prepared){available=storage.advanceOrigin();prepared=true;}return available;}
+        public Origins.Origin next(){if(!hasNext())throw new NoSuchElementException();prepared=false;return program.materializeOrigin(storage.originHandle());}
+    };};}
+    public Iterable<Origins.Artifact> cursorArtifacts(){open();return ()->{open();storage.selectArtifacts();return new Iterator<>(){
+        private boolean prepared,available;public boolean hasNext(){open();if(!prepared){available=storage.advanceArtifact();prepared=true;}return available;}
+        public Origins.Artifact next(){if(!hasNext())throw new NoSuchElementException();prepared=false;return program.materializeArtifact(storage.artifactHandle());}
+    };};}
 
     /** Each iterator owns the store's current site cursor; iterators must not be interleaved. */
     public Iterable<CursorSite> cursorSites() {
@@ -62,32 +64,30 @@ public final class SnapshotDependencyCursorResult implements AutoCloseable {
 
     public boolean partial() {
         open();
-        if(coverage!=Evidence.InventoryStatus.COMPLETE)return true;
-        for(var site:cursorSites())if(site.unknownRemainder())return true;
-        return false;
+        return coverage!=Evidence.InventoryStatus.COMPLETE||storage.unknownRemainderCount()!=0;
     }
 
     public Metrics metrics() {
-        open();long candidates=0;
-        for(var site:cursorSites())for(var ignored:site.candidates())candidates=Math.addExact(candidates,1);
-        return new Metrics(storage.callCount(),candidates);
+        open();return new Metrics(storage.callCount(),storage.candidateCount());
     }
 
     public DirectDependencyResult materialize() {
         open();var sites=new ArrayList<DirectDependencyResult.Site>();for(var site:sites())sites.add(site);
+        var origins=new ArrayList<Origins.Origin>();for(var origin:cursorOrigins())origins.add(origin);
+        var artifacts=new ArrayList<Origins.Artifact>();for(var artifact:cursorArtifacts())artifacts.add(artifact);
         return new DirectDependencyResult(publication,coverage,origins,artifacts,sites);
     }
 
     private CursorSite currentCursorSite() {
-        long object=storage.callObjectKey();var candidates=candidates(object);boolean empty=!candidates.iterator().hasNext();
+        long object=storage.callObjectKey(),candidateCount=storage.callCandidateCount();var candidates=candidates(object);
         var caller=new UnitId(publication,storage.callCaller());
         var entry=new EntryId(caller,storage.callEntry());
         var siteCoverage=storage.callCoverage();
         return new CursorSite(caller,entry,new LabelId(caller,storage.callSequence()),
             new OperationId(caller,storage.callOperation()),new OriginId(publication,storage.callSiteOrigin()),
             new OriginId(publication,storage.callTargetOrigin()),siteCoverage,storage.callNamespace(),
-            new ObjectId(caller,storage.callSubject()),candidates,
-            coverage!=Evidence.InventoryStatus.COMPLETE||siteCoverage!=Evidence.CoverageStatus.MODELED||empty);
+            new ObjectId(caller,storage.callSubject()),candidates,candidateCount!=0,
+            coverage!=Evidence.InventoryStatus.COMPLETE||siteCoverage!=Evidence.CoverageStatus.MODELED||candidateCount==0);
     }
 
     private Iterable<CursorCandidate> candidates(long object){return ()->new Iterator<>(){
