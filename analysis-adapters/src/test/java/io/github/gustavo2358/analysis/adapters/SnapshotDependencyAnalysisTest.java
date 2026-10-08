@@ -7,6 +7,8 @@ import io.github.gustavo2358.air.json.AirJson;
 import io.github.gustavo2358.analysis.dependencies.SnapshotDependencyAnalysis;
 import io.github.gustavo2358.analysis.dependencies.DirectDependencyResult;
 import io.github.gustavo2358.analysis.solver.*;
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.math.BigInteger;
@@ -72,6 +74,11 @@ final class SnapshotDependencyAnalysisTest {
                 assertEquals(ValidationResult.Status.STRUCTURALLY_VALID,read.checked().result().status());
                 var result=new SnapshotDependencyAnalysis().analyze(read.checked(),read.newIdentityStorage(),read.newDependencyStorage());
                 assertEquals(List.of("AX","BY"),result.sites().getFirst().candidates().stream().map(DirectDependencyResult.Candidate::referenceName).toList());
+                var wire=new ByteArrayOutputStream();new SnapshotDependencyJson().write(result,wire);var json=wire.toString(StandardCharsets.UTF_8);
+                assertTrue(json.contains("\"modelScope\":\"VALIDATED_SNAPSHOT_DEPENDENCY\""));
+                assertTrue(json.contains("\"valuesProfile\":\"snapshot-text-relations@2\""));
+                assertTrue(json.contains("\"referenceName\":\"AX\""));assertTrue(json.contains("\"referenceName\":\"BY\""));
+                assertFalse(json.contains("\"referenceName\":\"AY\""));assertFalse(json.contains("\"referenceName\":\"BX\""));
             }
         } finally {Files.deleteIfExists(input);}
         assertEquals(0,ledger.heapUsed());

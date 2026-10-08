@@ -13,7 +13,7 @@ public final class SnapshotDependencyJson {
         var out=new JsonOutput(stream);boolean partial=result.coverage()!=io.github.gustavo2358.air.model.Evidence.InventoryStatus.COMPLETE||result.sites().stream().anyMatch(DirectDependencyResult.Site::unknownRemainder);
         out.value(object("schema","analysis-dependency-result","version","3.0.0","airVersion","2.0.0",
             "publication",id(result.publication()),"analysisStatus",partial?"PARTIAL":"COMPLETE","analysisBoundary","COBOL_SOURCE_ONLY",
-            "modelScope","VALIDATED_DIRECT_ENTRY","valuesProfile","snapshot-direct-text@1","publicationInventory",result.coverage().name(),
+            "modelScope","VALIDATED_SNAPSHOT_DEPENDENCY","valuesProfile","snapshot-text-relations@2","publicationInventory",result.coverage().name(),
             "sites",result.sites().stream().sorted(Comparator.comparing(DirectDependencyResult.Site::entry,io.github.gustavo2358.analysis.plan.AnalysisKey.ENTRY_ORDER).thenComparing(s->s.operation().localId())).map(SnapshotDependencyJson::site),
             "edges",result.sites().stream().sorted(Comparator.comparing(DirectDependencyResult.Site::entry,io.github.gustavo2358.analysis.plan.AnalysisKey.ENTRY_ORDER).thenComparing(s->s.operation().localId())).flatMap(s->s.candidates().stream().sorted(Comparator.comparing(DirectDependencyResult.Candidate::referenceName).thenComparing(DirectDependencyResult.Candidate::rawValue)).map(c->edge(s,c))),
             "origins",result.origins().stream().sorted(Comparator.comparing(o->o.id().localId())).map(SnapshotDependencyJson::origin),
