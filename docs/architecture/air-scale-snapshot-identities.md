@@ -51,3 +51,30 @@ Identity storage is unchanged from the preceding checkpoint; the producer adds
 and exact frozen cursor cardinality. A traversal-only 64-root fixture runs through
 both resident and one-page backends, preserving order and releasing scratch on a
 callback failure. It does not establish complete structural admission.
+
+## Fused atom summaries
+
+The consumer pins producer `546e774dfb3d207f4b7403099967e5a3e723a9c3`.
+The same managed canonical arena now exposes immutable tuple columns for exact
+TEXT/INTEGER content summaries: character length, Unicode scalar count, canonical
+integer sign and magnitude modulo eight. The producer fuses these facts with
+identity interning in one bounded character scan; subsequent property requests
+read cached primitive words. No proportional String/BigInteger is reconstructed.
+
+Two additional adapter laws exercise memory/file parity, a pair split across
+1024-character blocks, a 100003-character integer written in bounded blocks,
+repeated cached queries, and an operational metadata-read failure. The scalar
+fixture has a legal Publication root but unattached atom nodes; it qualifies
+scalar/index storage, not full structural admission. Its file run observed a
+37088-byte managed heap peak and 631552 temporary bytes under a 65536-byte
+quota. Repeating 320 fact queries charged 19392 work units with no page growth.
+The empty borrowed page store survives owner cleanup; all run leases return to
+zero on final closure. One-page-cache pressure is not a throughput claim.
+
+Focused adapter laws (18 methods) and selected reactor neighbors passed. The W5
+compiled descriptor inventory adds only the owned storage's `word(long,int)`
+method; boundary deny rules are unchanged. Complete local graph/field constraints,
+full Validator, codec and managed CLI admission remain required.
+
+Final atom checkpoint FAST: 1032 methods, zero failures/errors/skips,307.611s,
+including producer resolution, wire oracles and compiled boundaries.

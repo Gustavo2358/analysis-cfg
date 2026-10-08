@@ -68,6 +68,71 @@ final class PagedSnapshotIdentityStorageTest {
         }
         assertEquals(0,ledger.heapUsed());assertEquals(0,ledger.used(AnalysisResources.Pool.TEMPORARY));
     }
+    @Test void streamedAtomSummariesMatchAcrossBackendsAndSurvivePayloadLargerThanResidency() {
+        var resident=resources(8_000_000);var spilled=resources(65536);
+        try(var memory=new MemoryPageStore(128,resident);var file=new FilePageStore(directory,128,1,spilled)) {
+            assertArrayEquals(atomSummaries(memory,resident),atomSummaries(file,spilled));
+            assertTrue(spilled.heapPeak()<=65536);assertTrue(file.statistics().evictions()>0);
+        }
+        assertEquals(0,resident.heapUsed());assertEquals(0,spilled.heapUsed());
+        assertEquals(0,spilled.used(AnalysisResources.Pool.TEMPORARY));
+        assertEquals(0,spilled.used(AnalysisResources.Pool.OPEN_FILES));
+    }
+    private static long[] atomSummaries(PageStore pages,AnalysisResources ledger) {
+        long[] result=new long[6];
+        // Scalar-storage laws; this is not a certificate for unreachable atoms or a full Validator.
+        try(var original=AirSnapshot.fromPublication(publication("P"));
+            var builder=new AirSnapshotBuilder(new PagedAirStorage(pages,ledger,AnalysisResources.Phase.DECODE))) {
+            long text;
+            try(var out=builder.text(AirShape.TEXT)) {
+                char[] block=new char[1024];java.util.Arrays.fill(block,'x');block[1023]='\uD83D';
+                out.append(block,0,block.length);out.append(new char[]{'\uDE00'},0,1);text=out.finish();
+            }
+            long integer;
+            try(var out=builder.text(AirShape.INTEGER)) {
+                out.append(new char[]{'-','1'},0,2);char[] zeros=new char[1024];java.util.Arrays.fill(zeros,'0');
+                for(int n=0;n<100_000;n+=zeros.length)out.append(zeros,0,Math.min(zeros.length,100_000-n));
+                out.append(new char[]{'7'},0,1);integer=out.finish();
+            }
+            long root=PagedAirStorageTest.copy(original,original.root(),null,builder);
+            try(var snapshot=builder.finish(root);var keys=new SnapshotIdentityKeys(snapshot,new PagedSnapshotIdentityStorage(pages,ledger))) {
+                var facts=SnapshotIdentityKeys.AtomFact.values();
+                result[0]=keys.atomFact(text,facts[0]);result[1]=keys.atomFact(text,facts[1]);
+                for(int n=0;n<4;n++)result[n+2]=keys.atomFact(integer,facts[n]);
+                assertArrayEquals(new long[]{1025,1024,100003,100003,-1,7},result);
+                long before=pages.statistics().livePages(),work=ledger.workUsed();
+                for(int repeat=0;repeat<64;repeat++) {
+                    assertEquals(1024,keys.atomFact(text,SnapshotIdentityKeys.AtomFact.UNICODE_SCALARS));
+                    for(int n=0;n<4;n++)assertEquals(result[n+2],keys.atomFact(integer,facts[n]));
+                }
+                assertEquals(before,pages.statistics().livePages());
+                assertTrue(ledger.workUsed()-work<64L*5*256,"memo hit scanned or reinterned a huge atom");
+                if(pages instanceof FilePageStore) {
+                    assertTrue(ledger.used(AnalysisResources.Pool.TEMPORARY)>65536);
+                    System.out.println("SNAPSHOT_ATOM_STORAGE_METRICS {\"managedHeapPeak\":"+ledger.heapPeak()+",\"temporaryBytes\":"+ledger.used(AnalysisResources.Pool.TEMPORARY)+",\"memoWork\":"+(ledger.workUsed()-work)+"}");
+                }
+            }
+        }
+        assertEquals(0,pages.statistics().livePages());return result;
+    }
+    @Test void tupleMetadataReadFailureAbortsPortAndKeepsBorrowedSnapshotAvailable() {
+        var ledger=resources(32768);
+        try(var pages=new FilePageStore(directory,128,1,ledger);var snapshot=AirSnapshot.fromPublication(publication("P"))) {
+            long initial=ledger.heapUsed();var port=new PagedSnapshotIdentityStorage(pages,ledger);
+            var keys=new SnapshotIdentityKeys(snapshot,port);
+            try {
+                long id=field(snapshot,snapshot.root(),"id"),text=field(snapshot,id,"localId");
+                long key=keys.atomKey(text);
+                ledger.work(ledger.limits().workUnits()-ledger.workUsed(),AnalysisResources.Phase.VALIDATION);
+                var failure=assertThrows(AnalysisResources.Exhausted.class,()->port.word(key,3));
+                assertEquals(AnalysisResources.Resource.WORK,failure.resource());assertEquals(AnalysisResources.Phase.VALIDATION,failure.phase());
+                assertThrows(IllegalStateException.class,()->port.word(key,3));
+                assertEquals(AirShape.PUBLICATION,snapshot.shape(snapshot.root()));
+            } finally {keys.close();}
+            assertEquals(initial,ledger.heapUsed());assertEquals(0,pages.statistics().livePages());
+        }
+        assertEquals(0,ledger.heapUsed());assertEquals(0,ledger.used(AnalysisResources.Pool.TEMPORARY));
+    }
     private static long[] check(Publication publication,PageStore pages,AnalysisResources ledger,boolean pressure) {
         long initial=ledger.heapUsed();var handles=new ArrayList<Long>();var expected=new ArrayList<Object>();long[] result;
         try(var snapshot=AirSnapshot.fromPublication(publication);var keys=new SnapshotIdentityKeys(snapshot,new PagedSnapshotIdentityStorage(pages,ledger))) {

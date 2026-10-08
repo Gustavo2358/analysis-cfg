@@ -51,6 +51,10 @@ public final class PagedSnapshotIdentityStorage implements SnapshotIdentityKeys.
             return tuples.intern(staged);
         } catch(RuntimeException|Error failure){failed=true;throw failure;}
     }
+    @Override public synchronized long word(long key,int column) {
+        open();
+        try{return tuples.field(key,column);}catch(RuntimeException|Error failure){failed=true;throw failure;}
+    }
     @Override public synchronized AirSnapshotBuilder.Lease claim(long bytes) {
         open();
         try {var capacity=resources.reserve(AnalysisResources.Pool.RESIDENT,bytes,PHASE);return capacity::close;}
