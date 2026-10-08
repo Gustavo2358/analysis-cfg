@@ -470,7 +470,8 @@
     ],
     "io.github.gustavo2358.analysis.adapters.PagedSnapshotDependencyStorageTest": [
       "callCursorOrdersPageBackedSitesWithBoundedManagedHeap",
-      "candidateLowerBoundReadsOnlyOneObjectsSortedPayload"
+      "candidateLowerBoundReadsOnlyOneObjectsSortedPayload",
+      "supportCursorDeduplicatesAndOrdersOneCandidatesSpilledProofs"
     ]
   },
   "analysis-dataflow": {

@@ -2,6 +2,7 @@ package io.github.gustavo2358.analysis.dependencies;
 
 import io.github.gustavo2358.air.model.AirSnapshotBuilder;
 import io.github.gustavo2358.air.model.Evidence;
+import io.github.gustavo2358.air.model.Ids.*;
 import io.github.gustavo2358.air.validation.*;
 import io.github.gustavo2358.analysis.structure.ProgramStore;
 import java.util.*;
@@ -9,8 +10,10 @@ import java.util.*;
 /** Dependency analysis over the admitted snapshot program view. */
 public final class SnapshotDependencyAnalysis {
     public interface Storage extends AutoCloseable {
-        void add(long objectKey,String rawText,List<DependencyProgramStore.Producer> producers);
-        void select(long objectKey);boolean advance();String rawText();int producerCount();long producer(int index);long origin(int index);
+        long add(long objectKey,String rawText);
+        void addSupport(long candidate,OperationId producer,OriginId origin);
+        void select(long objectKey);boolean advance();long candidate();String rawText();
+        void selectSupports(long candidate);void selectOrderedSupports(long candidate);boolean advanceSupport();OperationId supportProducer();OriginId supportOrigin();
         void addCall(DependencyProgramStore.ComputedCall call);
         void selectCalls();boolean advanceCall();long callObjectKey();String callCaller();String callEntry();String callSequence();
         String callOperation();String callSiteOrigin();String callTargetOrigin();Evidence.CoverageStatus callCoverage();
@@ -44,7 +47,8 @@ public final class SnapshotDependencyAnalysis {
         try(var lease=storage.claim(512)) {
             ProgramStore metadata=program;
             Objects.requireNonNull(lease,"storage returned a null analysis lease");
-            program.definitions(definition->{try(var materialized=storage.claim(program.materializationBytes(definition))){Objects.requireNonNull(materialized);storage.add(definition.objectKey(),program.materialize(definition),definition.producers());}});
+            program.definitions(definition->{try(var materialized=storage.claim(program.materializationBytes(definition))){Objects.requireNonNull(materialized);long candidate=storage.add(definition.objectKey(),program.materialize(definition));
+                for(var producer:definition.producers())storage.addSupport(candidate,program.operationId(producer.operation()),program.originId(producer.origin()));}});
             program.computedCalls(storage::addCall);
             return new SnapshotDependencyCursorResult(metadata.publicationId(),metadata.inventory(),metadata.origins(),metadata.artifacts(),program,storage);
         } catch(RuntimeException|Error failure) {

@@ -11,8 +11,9 @@ import java.util.*;
  */
 public final class SnapshotDependencyCursorResult implements AutoCloseable {
     public record Metrics(long sites,long candidates) { }
-    public record CursorCandidate(String referenceName,String rawValue,List<DirectDependencyResult.Support> supports) {
-        public CursorCandidate{Objects.requireNonNull(referenceName);Objects.requireNonNull(rawValue);supports=List.copyOf(supports);}
+    public record CursorCandidate(String referenceName,String rawValue,Iterable<DirectDependencyResult.Support> supports,
+            Iterable<DirectDependencyResult.Support> orderedSupports) {
+        public CursorCandidate{Objects.requireNonNull(referenceName);Objects.requireNonNull(rawValue);Objects.requireNonNull(supports);Objects.requireNonNull(orderedSupports);}
     }
     public record CursorSite(UnitId caller,EntryId entry,LabelId sequence,OperationId operation,OriginId siteOrigin,
             OriginId targetOrigin,Evidence.CoverageStatus coverage,String namespace,ObjectId subject,
@@ -90,18 +91,18 @@ public final class SnapshotDependencyCursorResult implements AutoCloseable {
     }
 
     private Iterable<CursorCandidate> candidates(long object){return ()->new Iterator<>(){
-        private Row pending;private boolean prepared,available;
+        private boolean prepared,available;
         {storage.select(object);}
-        public boolean hasNext(){open();if(!prepared){pending=read();available=pending!=null;prepared=true;}return available;}
-        public CursorCandidate next(){if(!hasNext())throw new NoSuchElementException();String raw=pending.raw();var supports=new LinkedHashMap<DirectDependencyResult.Support,DirectDependencyResult.Support>();
-            add(supports,pending.supports());pending=null;
-            while(true){var row=read();if(row==null){available=false;break;}if(!row.raw().equals(raw)){pending=row;available=true;break;}add(supports,row.supports());}
-            prepared=true;return new CursorCandidate(raw.stripTrailing(),raw,List.copyOf(supports.values()));}
+        public boolean hasNext(){open();if(!prepared){available=storage.advance();prepared=true;}return available;}
+        public CursorCandidate next(){if(!hasNext())throw new NoSuchElementException();prepared=false;long candidate=storage.candidate();String raw=storage.rawText();return new CursorCandidate(raw.stripTrailing(),raw,supports(candidate,false),supports(candidate,true));}
     };}
-    private Row read(){if(!storage.advance())return null;var supports=new ArrayList<DirectDependencyResult.Support>(storage.producerCount());for(int i=0;i<storage.producerCount();i++)supports.add(new DirectDependencyResult.Support(program.operationId(storage.producer(i)),program.originId(storage.origin(i)),List.of()));return new Row(storage.rawText(),supports);}
-    private static void add(Map<DirectDependencyResult.Support,DirectDependencyResult.Support> target,List<DirectDependencyResult.Support> supports){for(var support:supports)target.put(support,support);}
-    private static DirectDependencyResult.Candidate materialize(CursorCandidate candidate){return new DirectDependencyResult.Candidate(candidate.referenceName(),candidate.rawValue(),candidate.supports());}
-    private record Row(String raw,List<DirectDependencyResult.Support> supports) { }
+    private Iterable<DirectDependencyResult.Support> supports(long candidate,boolean ordered){return ()->new Iterator<>(){
+        private boolean prepared,available;
+        {if(ordered)storage.selectOrderedSupports(candidate);else storage.selectSupports(candidate);}
+        public boolean hasNext(){open();if(!prepared){available=storage.advanceSupport();prepared=true;}return available;}
+        public DirectDependencyResult.Support next(){if(!hasNext())throw new NoSuchElementException();prepared=false;return new DirectDependencyResult.Support(storage.supportProducer(),storage.supportOrigin(),List.of());}
+    };}
+    private static DirectDependencyResult.Candidate materialize(CursorCandidate candidate){var supports=new ArrayList<DirectDependencyResult.Support>();for(var support:candidate.supports())supports.add(support);return new DirectDependencyResult.Candidate(candidate.referenceName(),candidate.rawValue(),supports);}
 
     private void open(){if(closed)throw new IllegalStateException("snapshot dependency cursor result is closed");}
     @Override public void close() {
