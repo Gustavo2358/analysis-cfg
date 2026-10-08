@@ -413,6 +413,12 @@
       "exactMembershipAndFactKindsSpillAndMissesNeverGrowRequiredState",
       "builderWrittenSharedLabelUniverseMatchesBothBackendsAndWholeLocalGrammar",
       "constructionAndSpentWorkAbortOwnedLocalStateAndKeepBorrowedInput"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedSnapshotCycleStorageTest": [
+      "reverseOccurrencesAndDenseQueueSpillWithExactRepeatedDegrees",
+      "completeOriginResidualsMatchAcrossResidentAndPagedInput",
+      "deniedConstructionAndInterruptedMutationPreserveBorrowedStore",
+      "invalidProtocolNeverChangesCompleteKeyAssociationOrUnderflowsDegree"
     ]
   },
   "analysis-dataflow": {

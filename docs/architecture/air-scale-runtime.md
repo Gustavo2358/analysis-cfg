@@ -1196,3 +1196,6 @@ frontier/ancestry/context memo owners; complete structural admission remains pen
 
 [Constructor-local snapshot predicates](air-scale-local-constraints.md) share the
 managed runtime and exact read-only tuple lookups. Full admission remains pending.
+
+[Exact nominal cycle relations](air-scale-nominal-cycles.md) provide a managed
+degree/reverse-occurrence/FIFO pass; complete reference admission remains pending.
