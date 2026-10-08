@@ -11,25 +11,30 @@ import java.util.Objects;
  */
 public interface ProgramStore {
     PublicationId publicationId();
-    SemanticVersion airVersion();
-    Capabilities.Manifest capabilities();
+    Evidence.InventoryStatus inventory();
     List<Origins.Artifact> artifacts();
-    List<Unit> units();
-    List<Memory.Storage> storage();
     List<Origins.Origin> origins();
-    Evidence.Coverage coverage();
-    List<Evidence.Uncertainty> uncertainties();
-    List<Proofs.Premise> premises();
 
-    static ProgramStore resident(Publication publication) {
+    interface Structural extends ProgramStore {
+        SemanticVersion airVersion();
+        Capabilities.Manifest capabilities();
+        List<Unit> units();
+        List<Memory.Storage> storage();
+        Evidence.Coverage coverage();
+        List<Evidence.Uncertainty> uncertainties();
+        List<Proofs.Premise> premises();
+    }
+
+    static Structural resident(Publication publication) {
         return new Resident(Objects.requireNonNull(publication, "publication"));
     }
 
     /** Explicit resident adapter used while the paged implementation is introduced. */
-    final class Resident implements ProgramStore {
+    final class Resident implements Structural {
         private final Publication publication;
         private Resident(Publication publication) { this.publication = publication; }
         @Override public PublicationId publicationId() { return publication.id(); }
+        @Override public Evidence.InventoryStatus inventory() { return publication.coverage().inventory(); }
         @Override public SemanticVersion airVersion() { return publication.airVersion(); }
         @Override public Capabilities.Manifest capabilities() { return publication.capabilities(); }
         @Override public List<Origins.Artifact> artifacts() { return publication.artifacts(); }

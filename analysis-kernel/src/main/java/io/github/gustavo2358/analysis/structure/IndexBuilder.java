@@ -11,7 +11,7 @@ final class IndexBuilder {
     Map<CfgNodeId,LocalControlRules.Rule> localRules;
     final Object identity = new Object();
     final Publication snapshot;
-    final ProgramStore store;
+    final ProgramStore.Structural store;
     final IndexMetrics.Counter count = new IndexMetrics.Counter();
     final Map<UnitId, Unit> units = new HashMap<>();
     final Map<LabelId, Sequence> sequences = new HashMap<>();
@@ -44,7 +44,7 @@ final class IndexBuilder {
     private final Set<OperandId> operandIds = new HashSet<>();
     private long expectedEdges, expectedHalts, expectedActiveEntries;
 
-    IndexBuilder(CfgBuildResult result, Publication snapshot, ProgramStore store, ProjectionPolicy policy) {
+    IndexBuilder(CfgBuildResult result, Publication snapshot, ProgramStore.Structural store, ProjectionPolicy policy) {
         this.result = result; this.snapshot = snapshot; this.store = store; this.policy = policy;
         unprovedPreconditions=result.preflight().unprovedOperationPreconditions().orElse(Set.of());
     }

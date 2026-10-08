@@ -5,8 +5,10 @@ import io.github.gustavo2358.air.model.Ids.*;
 import io.github.gustavo2358.air.validation.*;
 import io.github.gustavo2358.air.json.AirJson;
 import io.github.gustavo2358.analysis.dependencies.SnapshotDependencyAnalysis;
+import io.github.gustavo2358.analysis.dependencies.SnapshotProgram;
 import io.github.gustavo2358.analysis.dependencies.DirectDependencyResult;
 import io.github.gustavo2358.analysis.solver.*;
+import io.github.gustavo2358.analysis.structure.ProgramStore;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -27,6 +29,15 @@ final class SnapshotDependencyAnalysisTest {
             long root=PagedAirStorageTest.copy(source,source.root(),null,builder);
             try(var checked=SnapshotValidator.check(builder.finish(root),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger))) {
                 assertEquals(ValidationResult.Status.STRUCTURALLY_VALID,checked.result().status(),checked.result().toString());
+                try(var snapshotProgram=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger))) {
+                    ProgramStore store=snapshotProgram;
+                    assertEquals(publication.id(),store.publicationId());
+                    assertEquals(Evidence.InventoryStatus.COMPLETE,store.inventory());
+                    assertEquals(publication.artifacts(),store.artifacts());
+                    assertEquals(publication.origins(),store.origins());
+                    assertFalse(store instanceof ProgramStore.Structural,
+                            "paged dependency store must not claim resident structural payload");
+                }
                 var result=new SnapshotDependencyAnalysis().analyze(checked,new PagedSnapshotIdentityStorage(pages,ledger),new PagedSnapshotDependencyStorage(pages,ledger));
                 assertEquals(publication.id(),result.publication());assertEquals(Evidence.InventoryStatus.COMPLETE,result.coverage());
                 assertEquals(publication.origins(),result.origins());assertEquals(publication.artifacts(),result.artifacts());

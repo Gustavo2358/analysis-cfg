@@ -3,6 +3,7 @@ package io.github.gustavo2358.analysis.dependencies;
 import io.github.gustavo2358.air.model.*;
 import io.github.gustavo2358.air.model.Ids.*;
 import io.github.gustavo2358.air.validation.*;
+import io.github.gustavo2358.analysis.structure.ProgramStore;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.function.Consumer;
@@ -13,7 +14,7 @@ import static io.github.gustavo2358.air.model.AirShape.*;
  * Consumers see program events and detached evidence rather than wire shapes;
  * the snapshot and its paged identity index remain owned by the caller.
  */
-public final class SnapshotProgram implements AutoCloseable {
+public final class SnapshotProgram implements ProgramStore, AutoCloseable {
     public record Producer(long operation,long origin) { }
     public record Definition(long objectKey,long firstText,long secondText,int fitLength,String pad,List<Producer> producers) {
         public Definition {if(firstText<=0||secondText<0||fitLength<0)throw new IllegalArgumentException("invalid definition text recipe");Objects.requireNonNull(pad);producers=List.copyOf(producers);if(producers.isEmpty())throw new IllegalArgumentException("definition requires a producer");}
@@ -36,6 +37,8 @@ public final class SnapshotProgram implements AutoCloseable {
 
     public PublicationId publication(){open();return (PublicationId)id(snapshot.field(snapshot.root(),PUBLICATION,0));}
     public Evidence.InventoryStatus coverage(){open();long coverage=snapshot.field(snapshot.root(),PUBLICATION,9);return Evidence.InventoryStatus.values()[(int)snapshot.scalar(snapshot.field(coverage,EVIDENCE_COVERAGE,0))];}
+    @Override public PublicationId publicationId(){return publication();}
+    @Override public Evidence.InventoryStatus inventory(){return coverage();}
     public String textValue(long handle){open();return text(handle);}
     public OperationId operationId(long handle){open();return (OperationId)id(handle);}
     public OriginId originId(long handle){open();return (OriginId)id(handle);}
