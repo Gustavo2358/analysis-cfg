@@ -419,6 +419,12 @@
       "completeOriginResidualsMatchAcrossResidentAndPagedInput",
       "deniedConstructionAndInterruptedMutationPreserveBorrowedStore",
       "invalidProtocolNeverChangesCompleteKeyAssociationOrUnderflowsDegree"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedSnapshotGroundingStorageTest": [
+      "seededAndUnseededColdCyclesFreezeToOnlyReusableTruthFacts",
+      "typedGroundedAlternativeAndCyclicNegativesMatchBothInputBackends",
+      "everyPrimitiveWorkInterruptionAndDeniedConstructorClosesTransferredState",
+      "linkedRowsMustExpandAndUncollectedQueriesNeverCreateFalseFacts"
     ]
   },
   "analysis-dataflow": {

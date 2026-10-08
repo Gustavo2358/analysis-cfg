@@ -1199,3 +1199,6 @@ managed runtime and exact read-only tuple lookups. Full admission remains pendin
 
 [Exact nominal cycle relations](air-scale-nominal-cycles.md) provide a managed
 degree/reverse-occurrence/FIFO pass; complete reference admission remains pending.
+
+[Shared location grounding](air-scale-grounding.md) collects and saturates managed
+Boolean equations once, then retires topology and preserves reusable truth facts.
