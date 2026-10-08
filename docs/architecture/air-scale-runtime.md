@@ -1214,3 +1214,5 @@ and select lazy diagnostic complements without replaying each label list per con
 
 [Shared actual reference roots](air-scale-reference-lists.md) cache successful empty
 results and build ordered missing occurrences with a primitive carry forest.
+
+[Incremental physical input on the application route](air-scale-managed-input.md) removes whole input-byte/tape retention; resident model and full managed pipeline remain pending.

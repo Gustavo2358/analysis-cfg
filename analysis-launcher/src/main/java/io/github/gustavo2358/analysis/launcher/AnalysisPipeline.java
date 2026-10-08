@@ -51,7 +51,8 @@ public final class AnalysisPipeline {
             }
             if(read.checked().isEmpty())throw new IllegalArgumentException("checked publication required");
             admitted=new DependencyInput(read.publication(),evidence,List.of(),read.checked());
-        } catch(AirJsonException failure){err.println("INPUT_CODEC: "+failure.code());return failure.code()==AirJsonException.Code.RESOURCE_LIMIT?7:3;}
+        } catch(io.github.gustavo2358.analysis.solver.AnalysisResources.Exhausted failure){err.println("INPUT_RESOURCE_LIMIT: "+failure.getMessage());return 7;}
+        catch(AirJsonException failure){err.println("INPUT_CODEC: "+failure.code());return failure.code()==AirJsonException.Code.RESOURCE_LIMIT?7:3;}
           catch(IOException|IllegalArgumentException failure){err.println("PIPELINE_INPUT_INVALID");return 3;}
         // The export result has no owner in the dependency phase after this call returns.
         int exported=export(admitted,cfg,err);if(exported!=0)return exported;

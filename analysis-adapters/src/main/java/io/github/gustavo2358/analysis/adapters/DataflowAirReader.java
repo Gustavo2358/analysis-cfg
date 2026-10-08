@@ -25,11 +25,32 @@ public final class DataflowAirReader {
         }
         public Read(Publication publication,long airReads,long airBytesObserved){this(publication,airReads,airBytesObserved,"");}
     }
+    /** Default route pages physical input; model admission/Publication remain resident for now. */
     public Read read(Path path) throws IOException {
-        byte[] bytes;
-        try(var input=JsonFiles.input(path)) {bytes=input.readAllBytes();}
-        var checked=partialAnalysis?codec.decodeCheckedForPartialAnalysis(bytes):codec.decodeChecked(bytes);
-        return new Read(checked.publication(),1,bytes.length,sha(bytes),java.util.Optional.of(checked));
+        var resources=new io.github.gustavo2358.analysis.solver.AnalysisResources(new io.github.gustavo2358.analysis.solver.AnalysisResources.Limits(64L*1024*1024,16L*1024*1024,0,Long.MAX_VALUE,4,Long.MAX_VALUE,0));
+        return read(path,resources);
     }
-    private static String sha(byte[] bytes){try{return java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(bytes));}catch(java.security.NoSuchAlgorithmException ex){throw new IllegalStateException(ex);}}
+    /** Resources cover physical decode staging, not the returned resident Publication. */
+    public Read read(Path path,io.github.gustavo2358.analysis.solver.AnalysisResources resources)throws IOException {
+        java.util.Objects.requireNonNull(resources);Path directory=Files.createTempDirectory("analysis-air-decode-");
+        Throwable primary=null;
+        try {
+            var digest=digest();
+            try(var pages=new FilePageStore(directory,4096,4,resources,io.github.gustavo2358.analysis.solver.AnalysisResources.Phase.DECODE);
+                var input=new CountedInput(JsonFiles.input(path),digest)) {
+                var staging=new PagedJsonInputStorage(pages,resources);
+                var checked=partialAnalysis?codec.decodeCheckedForPartialAnalysis(input,staging):codec.decodeChecked(input,staging);
+                return new Read(checked.publication(),1,input.bytes,java.util.HexFormat.of().formatHex(digest.digest()),java.util.Optional.of(checked));
+            }
+        }catch(io.github.gustavo2358.analysis.solver.PageStore.Failure failure){var io=new IOException("paged AIR input storage failure: "+failure.reason(),failure);primary=io;throw io;}
+        catch(IOException|RuntimeException|Error failure){primary=failure;throw failure;}
+        finally{try{Files.deleteIfExists(directory);}catch(IOException cleanup){if(primary!=null)primary.addSuppressed(cleanup);else throw cleanup;}}
+    }
+    private static java.security.MessageDigest digest(){try{return java.security.MessageDigest.getInstance("SHA-256");}catch(java.security.NoSuchAlgorithmException failure){throw new IllegalStateException(failure);}}
+    private static final class CountedInput extends java.security.DigestInputStream {
+        long bytes;
+        CountedInput(InputStream input,java.security.MessageDigest digest){super(input,digest);}
+        @Override public int read()throws IOException {int value=super.read();if(value>=0)bytes=Math.incrementExact(bytes);return value;}
+        @Override public int read(byte[] value,int offset,int length)throws IOException {int count=super.read(value,offset,length);if(count>0)bytes=Math.addExact(bytes,count);return count;}
+    }
 }

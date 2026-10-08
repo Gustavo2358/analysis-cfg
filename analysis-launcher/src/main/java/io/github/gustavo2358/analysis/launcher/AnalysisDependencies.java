@@ -43,6 +43,7 @@ public final class AnalysisDependencies {
                 admitted=new DependencyInput(read.publication(),evidence,java.util.List.of(),read.checked());
             }
         }
+        catch(io.github.gustavo2358.analysis.solver.AnalysisResources.Exhausted failure){err.println("INPUT_RESOURCE_LIMIT: "+failure.getMessage());return 7;}
         catch(AirJsonException failure){err.println("INPUT_CODEC: "+failure.code());return failure.code()==AirJsonException.Code.RESOURCE_LIMIT?7:3;}
         catch(IOException|IllegalArgumentException failure){err.println("DEPENDENCY_INPUT_INVALID: "+failure.getMessage());return 3;}
         DependencyResult result;

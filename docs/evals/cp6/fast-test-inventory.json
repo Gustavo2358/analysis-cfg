@@ -452,6 +452,12 @@
       "everyPrimitiveWorkFailureAbortsTheMemoAndReleasesPages",
       "unfinishedReuseAndDoubleFinishNeverBecomeSuccessfulEmptyEvidence",
       "deniedConstructionReturnsEveryTransferredLease"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedJsonInputStorageTest": [
+      "coldOrdinalsAndDecodedNameEqualityAreExactWithoutQueryInsertion",
+      "officialReaderUsesColdPagesAndPreservesFullAdmissionAndDigest",
+      "everyPrimitiveWorkFailureReleasesTransferredStorage",
+      "deniedConstructionUnknownChildrenAndRepeatedOrdinalsFailClosed"
     ]
   },
   "analysis-dataflow": {
