@@ -1205,3 +1205,6 @@ Boolean equations once, then retires topology and preserves reusable truth facts
 
 [Shared signature positions and membership](air-scale-signatures.md) reuse invalid
 list counts and mode-specific diagnostic prefixes under the same managed ledger.
+
+[Balanced shared diagnostic occurrences](air-scale-diagnostic-templates.md) retain
+exact kind totals and bounded prefix cursors; complete admission remains pending.

@@ -432,6 +432,11 @@
       "sharedInvalidSignatureCountsAndMembershipMatchBothInputBackends",
       "everyWorkInterruptionAndDeniedConstructorReleasesTransferredPages",
       "unfinishedTablesWrongOrderAndFrozenWritesNeverPublishFacts"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedSnapshotDiagnosticStorageTest": [
+      "coldBalancedSequencesPreserveKindsAnchorsAndRepeatedPrefixResidence",
+      "enormousSharedMultiplicityEmitsOnlyRequestedAnchorsAndRejectsOverflow",
+      "everyWorkInterruptionAndDeniedControlClosesTransferredTupleState"
     ]
   },
   "analysis-dataflow": {
