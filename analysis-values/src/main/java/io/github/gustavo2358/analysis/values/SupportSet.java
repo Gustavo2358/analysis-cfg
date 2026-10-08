@@ -17,6 +17,8 @@ final class SupportSet {
     int size(){return many!=null?many.length:singleton<0?0:1;}
     int at(int index){return many==null?singleton:many[index];}
     boolean equivalent(SupportSet other){return this==other||singleton==other.singleton&&Arrays.equals(many,other.many);}
+    @Override public int hashCode(){return 31*singleton+Arrays.hashCode(many);}
+    @Override public boolean equals(Object other){return this==other||other instanceof SupportSet set&&equivalent(set);}
     SupportSet join(SupportSet other,ValuesWork work) {
         if(this==other||other.size()==0)return this;
         if(size()==0)return other;

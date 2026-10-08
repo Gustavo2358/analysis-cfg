@@ -16,6 +16,22 @@ class LogicalExpressionsTest {
  }
  private static PossibleValuesAnalysis.Execution logicalRun(Publication p){return PossibleValuesAnalysis.prepare(partialSession(p)).analysis().orElseThrow().execute();}
 
+ private static Publication correlatedFanIn(int leaves,boolean reverse) {
+  int join=2*leaves-1;var targets=new int[join+1][];var writes=new String[join+1];
+  for(int i=0;i<leaves-1;i++)targets[i]=reverse?new int[]{2*i+2,2*i+1}:new int[]{2*i+1,2*i+2};
+  for(int i=leaves-1;i<join;i++)targets[i]=new int[]{join};targets[join]=new int[]{};
+  var p=graph(writes,targets,4,true,true);var u=p.units().getFirst();var x=u.objects().get(0).id();var y=u.objects().get(1).id();var z=u.objects().get(2).id();var output=u.objects().get(3).id();
+  var sequences=new ArrayList<>(u.sequences());
+  for(int leaf=0;leaf<leaves;leaf++) {
+   int index=leaves-1+leaf;var sequence=sequences.get(index);String suffix=String.format(Locale.ROOT,"%02d",leaf);
+   sequences.set(index,new Sequence(sequence.label(),List.of(assign(u.id(),"seed-a-"+suffix,x,"A"+suffix),assign(u.id(),"seed-x-"+suffix,y,"X"+suffix)),sequence.terminator(),sequence.origin()));
+  }
+  var sequence=sequences.get(join);var expression=new E(u.id(),"fan-in-concat");var copy=new E(u.id(),"fan-in-copy");
+  var directCopy=new Operations.Assign(copy.h,new Places.ObjectPlace(operand(copy.h.id(),"dst",Operand.Role.VALUE_WRITE),output),copy.read(z));
+  sequences.set(join,new Sequence(sequence.label(),List.of(expression.set(z,expression.concat(expression.read(x),expression.read(y)),6),directCopy),sequence.terminator(),sequence.origin()));
+  return replace(p,List.of(unit(u.id(),u.entries(),sequences,u.objects())),p.coverage(),p.uncertainties(),p.premises());
+ }
+
  private static class E {
   final Operations.Header h;int n;E(UnitId u,String key){h=header(u,key);}
   Operand.Header next(){return operand(h.id(),"e"+(n++),Operand.Role.VALUE_READ);}
@@ -82,5 +98,55 @@ class LogicalExpressionsTest {
   var s=sequences.get(3);var e=new E(u.id(),"join");sequences.set(3,new Sequence(s.label(),List.of(e.set(dest,e.concat(e.slice(e.read(root),0,4),e.slice(e.read(root),4,4)),8)),s.terminator(),s.origin()));
   var q=replace(p,List.of(unit(u.id(),u.entries(),sequences,u.objects())),p.coverage(),p.uncertainties(),p.premises());
   expected(fact(logicalRun(q),before(q,3,1)),false,"MODU0002","PROG0001");
+ }
+ @Test void admittedConcatPreservesWholeBranchStoresAndCandidateSupports(){
+  var p=graph(new String[]{null,null,null,null},new int[][]{{1,2},{3},{3},{}},3,true,true);
+  var u=p.units().getFirst();var x=u.objects().get(0).id();var y=u.objects().get(1).id();var z=u.objects().get(2).id();
+  var sequences=new ArrayList<>(u.sequences());
+  for(int i=1;i<=2;i++){
+   var s=sequences.get(i);
+   sequences.set(i,new Sequence(s.label(),List.of(assign(u.id(),i==1?"seed-A":"seed-B",x,i==1?"A":"B"),assign(u.id(),i==1?"seed-X":"seed-Y",y,i==1?"X":"Y")),s.terminator(),s.origin()));
+  }
+  var expression=new E(u.id(),"fit-concat");var s=sequences.get(3);
+  sequences.set(3,new Sequence(s.label(),List.of(expression.set(z,expression.concat(expression.read(x),expression.read(y)),2)),s.terminator(),s.origin()));
+  var q=replace(p,List.of(unit(u.id(),u.entries(),sequences,u.objects())),p.coverage(),p.uncertainties(),p.premises());
+  var observed=fact(logicalRun(q),before(q,3,2));expected(observed,false,"AX","BY");
+  var supports=new HashMap<String,Set<String>>();
+  for(var candidate:observed.candidateSupports())supports.put(candidate.candidate().value(),candidate.producers().stream().map(xp->xp.evidence().localId()).collect(java.util.stream.Collectors.toSet()));
+  assertEquals(Map.of("AX",Set.of("seed-A","seed-X","fit-concat"),"BY",Set.of("seed-B","seed-Y","fit-concat")),supports);
+  assertFalse(observed.candidates().stream().map(Values.TextValue::value).anyMatch(Set.of("AY","BX")::contains));
+ }
+ @Test void openBranchRetainsKnownCorrelatedImageWithoutInventingPairs(){
+  var p=graph(new String[]{null,null,null,null},new int[][]{{2,1},{3},{3},{}},3,true,true);
+  var u=p.units().getFirst();var x=u.objects().get(0).id();var y=u.objects().get(1).id();var z=u.objects().get(2).id();
+  var sequences=new ArrayList<>(u.sequences());var left=sequences.get(1);var right=sequences.get(2);
+  sequences.set(1,new Sequence(left.label(),List.of(assign(u.id(),"seed-A",x,"A"),assign(u.id(),"seed-X",y,"X")),left.terminator(),left.origin()));
+  sequences.set(2,new Sequence(right.label(),List.of(assign(u.id(),"seed-B",x,"B")),right.terminator(),right.origin()));
+  var expression=new E(u.id(),"open-fit-concat");var join=sequences.get(3);
+  sequences.set(3,new Sequence(join.label(),List.of(expression.set(z,expression.concat(expression.read(x),expression.read(y)),2)),join.terminator(),join.origin()));
+  var q=replace(p,List.of(unit(u.id(),u.entries(),sequences,u.objects())),p.coverage(),p.uncertainties(),p.premises());
+  var observed=fact(logicalRun(q),before(q,3,2));expected(observed,true,"AX");
+  assertFalse(observed.candidates().stream().map(Values.TextValue::value).anyMatch(Set.of("AY","BX","BY")::contains));
+  assertEquals(Set.of("seed-A","seed-X","open-fit-concat"),observed.candidateSupports().getFirst().producers().stream().map(xp->xp.evidence().localId()).collect(java.util.stream.Collectors.toSet()));
+ }
+ @Test void finiteFanInStaysDiagonalThroughExpressionAndCopyWithoutCartesianProjection(){
+  for(int leaves:List.of(4,8,16,32)) {
+   Set<String> expected=new TreeSet<>();for(int leaf=0;leaf<leaves;leaf++){String suffix=String.format(Locale.ROOT,"%02d",leaf);expected.add("A"+suffix+"X"+suffix);}
+   Map<String,Long> baseline=null;
+   for(boolean reverse:List.of(false,true)) {
+    var p=correlatedFanIn(leaves,reverse);int join=2*leaves-1;var run=logicalRun(p);var observed=fact(run,before(p,join,3));
+    assertEquals(expected,observed.candidates().stream().map(Values.TextValue::value).collect(java.util.stream.Collectors.toCollection(TreeSet::new)));
+    assertFalse(observed.modelValueRemainder());assertEquals(leaves,observed.candidateSupports().size());
+    for(var candidate:observed.candidateSupports()) {
+     String suffix=candidate.candidate().value().substring(1,3);
+     assertEquals(Set.of("seed-a-"+suffix,"seed-x-"+suffix,"fan-in-concat"),candidate.producers().stream().map(producer->producer.evidence().localId()).collect(java.util.stream.Collectors.toSet()));
+    }
+    var metrics=run.solveMetrics();assertEquals(1L,metrics.get("scalarRelationGroups"));assertEquals(4L,metrics.get("scalarRelationCells"));assertEquals(4L,metrics.get("scalarRelationMaxWidth"));
+    assertEquals(2L*leaves,metrics.get("scalarRelationProjectedRows"),"expression and copy each visit only the actual diagonal rows");
+    var stable=Map.of("rows",metrics.get("scalarRelationProjectedRows"),"nodes",metrics.get("scalarRelationInternedNodes"),"edges",metrics.get("scalarRelationInternedEdges"));
+    if(baseline==null)baseline=stable;else assertEquals(baseline,stable,"physical successor order must not change relation work");
+   }
+   System.out.println("SCALAR_RELATIONS_SCALE leaves="+leaves+" "+baseline);
+  }
  }
 }

@@ -39,6 +39,8 @@ final class Candidates {
         w.candidate(0);return new Candidates(singleton,many,true,supports,valuesFingerprint);
     }
     boolean equivalent(Candidates b) { return this==b||(open==b.open&&singleton==b.singleton&&Arrays.equals(many,b.many)&&supports.equivalent(b.supports)); }
+    @Override public int hashCode(){return Long.hashCode(fingerprint);}
+    @Override public boolean equals(Object other){return this==other||other instanceof Candidates candidates&&equivalent(candidates);}
     Candidates join(Candidates b,ValuesWork w) {
         if(this==b)return this;
         var support=supports.join(b.supports,w);

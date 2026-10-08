@@ -77,7 +77,9 @@ public final class PossibleValuesAnalysis implements AnalysisDefinition<Possible
     public Execution execute() {
         var definition=new PossibleValuesAnalysis(profile);
         var result=DataflowSolver.solve(profile.session,definition);
-        return new Execution(profile,result,definition.work.snapshot());
+        var metrics=new LinkedHashMap<>(definition.work.snapshot());
+        metrics.putAll(profile.relations.metrics());
+        return new Execution(profile,result,Map.copyOf(metrics));
     }
     public static final class Execution {
         private final TextProfile profile;

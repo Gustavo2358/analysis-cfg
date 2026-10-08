@@ -1283,7 +1283,10 @@
     ],
     "io.github.gustavo2358.analysis.values.LogicalExpressionsTest": [
       "partialRootSnapshotAndDemand",
-      "branchAlternativesStayWholeThroughRepeatedRootReads"
+      "branchAlternativesStayWholeThroughRepeatedRootReads",
+      "admittedConcatPreservesWholeBranchStoresAndCandidateSupports",
+      "openBranchRetainsKnownCorrelatedImageWithoutInventingPairs",
+      "finiteFanInStaysDiagonalThroughExpressionAndCopyWithoutCartesianProjection"
     ],
     "io.github.gustavo2358.analysis.values.LogicalTextTest": [
       "unknownSiblingDoesNotEraseKnownProjection",

@@ -17,6 +17,7 @@ final class TextProfile {
     final Map<ObjectId,Location> subjects=new HashMap<>();
     private final Set<ObjectId> textSubjects=new HashSet<>();
     final IdentityHashMap<Operation,Write> writes=new IdentityHashMap<>();
+    private final List<Write> preparedWrites=new ArrayList<>();
     private final IdentityHashMap<Operation,KillAuthority.Permit> overwrites=new IdentityHashMap<>();
     private final IdentityHashMap<Operation,ForeignEffectTransfer> effects=new IdentityHashMap<>();
     private final IdentityHashMap<Operation,ConservativeEffectTransfer> conservative=new IdentityHashMap<>();
@@ -34,6 +35,7 @@ final class TextProfile {
     final ValueUniverse universe=new ValueUniverse();
     final List<PremiseId> premises=new ArrayList<>();
     final ValuesWork preparation=new ValuesWork();
+    final ScalarRelations relations;
     private final Set<Operation> admitted=Collections.newSetFromMap(new IdentityHashMap<>());
     TextProfile(AnalysisSession session,boolean effectAware) {this(session,effectAware,null);}
     TextProfile(AnalysisSession session,boolean effectAware,Set<ObjectId> demand) {
@@ -101,6 +103,7 @@ final class TextProfile {
             }
             sourceOpen.put(unit.id(),open);visible.put(unit.id(),Set.copyOf(unit.visibleObjects()));
         }
+        relations=ScalarRelations.create(this.selected,preparedWrites,subjects);
         for(var context:session.contexts()) {
             if(!context.entry().state().uncertainties().isEmpty())sourceOpenEntries.add(context.entry().id());
             var seed=PossibleValuesState.reached();var initial=new HashMap<Integer,Values.TextValue>();var initialized=new HashSet<Integer>();
@@ -131,6 +134,7 @@ final class TextProfile {
             }
             boundaries.put(context,seed);
         }
+        if(relations.active())boundaries.replaceAll((context,state)->state.attach(relations,preparation));
     }
     private static boolean text(Types.TypeRef type) { return type instanceof Types.Known k&&k.type()==Types.Builtin.TEXT; }
     // Auxiliary integer cells participate in alias/effect bounds, without numeric
@@ -165,7 +169,7 @@ final class TextProfile {
         if(session.index().unprovedPreconditions(operation.header().id()))
             throw new Refusal(false,"UNPROVED_SCALAR_OPERATION_PRECONDITION");
         var write=writes.get(operation);
-        if(write!=null)overwrites.put(operation,KillAuthority.exactCell(session,operation,write.location().cell()).orElseThrow(()->new Refusal(false,"UNPROVED_STRONG_OVERWRITE")));
+        if(write!=null){preparedWrites.add(write);overwrites.put(operation,KillAuthority.exactCell(session,operation,write.location().cell()).orElseThrow(()->new Refusal(false,"UNPROVED_STRONG_OVERWRITE")));}
         admitted.add(operation);
     }
     PossibleValuesState transferOperation(PossibleValuesState state,Operation operation,ValuesWork work) {
@@ -180,6 +184,9 @@ final class TextProfile {
         work.strongAssignments=Math.incrementExact(work.strongAssignments);
         // Capture the immutable source value before the strong update, preserving
         // its open remainder and candidate supports without creating an alias.
+        ScalarRelations.Assignment relational=write instanceof CopyWrite copy?relations.copy(state,write.location().ordinal(),copy.source().ordinal(),work)
+            :write instanceof ExpressionWrite expression?relations.expression(state,write.location().ordinal(),expression.operation(),subjects,universe,work):null;
+        if(relational!=null){var value=KillAuthority.strongOverwrite(overwrites.get(operation),relational.projection());return state.relationalOverwrite(write.location().ordinal(),value,relational.roots(),work);}
         var value=write instanceof LiteralWrite literal ? literal.value()
             : write instanceof CopyWrite copy ? state.value(copy.source().ordinal(),work)
             : TextExpressions.evaluate(((ExpressionWrite)write).operation(),state,subjects,universe,work);

@@ -11,7 +11,12 @@ final class FactorizedAlternatives<T> {
     static final class Node<T> {
         final int level;
         final Map<T,Node<T>> edges;
-        private Node(int level,Map<T,Node<T>> edges){this.level=level;this.edges=Map.copyOf(edges);}
+        final long fingerprint;
+        private Node(int level,Map<T,Node<T>> edges){
+            this.level=level;this.edges=Map.copyOf(edges);long unordered=0;
+            for(var edge:this.edges.entrySet())unordered+=Long.rotateLeft(0x9e3779b97f4a7c15L*Objects.hashCode(edge.getKey())+edge.getValue().fingerprint,17);
+            fingerprint=0x517cc1b727220a95L*level+unordered;
+        }
         boolean terminal(){return level==Integer.MAX_VALUE;}
     }
     record Size(long nodes,long alternatives,long maxComponent) { }
@@ -162,4 +167,5 @@ final class FactorizedAlternatives<T> {
         return new Size(visited.size(),edges,components.values().stream().mapToLong(Set::size).max().orElse(0));
     }
     Map<String,Long> metrics(){return Map.of("internedNodes",(long)interned.size(),"internedAlternatives",internedEdges,"relationUnionPairs",unionPairs,"projectedAlternatives",projectedAlternatives);}
+    long fingerprint(Node<T> root){return root==null?0:root.fingerprint;}
 }
