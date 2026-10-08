@@ -26,6 +26,7 @@
         "io.github.gustavo2358.analysis.cfg.domain.CfgNode",
         "io.github.gustavo2358.analysis.cfg.domain.CfgNodeId",
         "io.github.gustavo2358.analysis.cfg.domain.CfgTransition",
+        "io.github.gustavo2358.analysis.cfg.domain.LocalControlRules",
         "io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy",
         "java.io.IOException",
         "java.nio.file.AtomicMoveNotSupportedException",
@@ -33,8 +34,7 @@
         "java.nio.file.Files",
         "java.nio.file.Path",
         "java.nio.file.StandardCopyOption",
-        "java.util.Objects",
-        "io.github.gustavo2358.analysis.cfg.domain.LocalControlRules"
+        "java.util.Objects"
       ],
       "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/JsonFiles.java": [
         "com.github.luben.zstd.ZstdInputStream",
@@ -107,8 +107,6 @@
         "io.github.gustavo2358.air.model.Control$HaltAlternative",
         "io.github.gustavo2358.air.model.Control$InvocationAlternative",
         "io.github.gustavo2358.air.model.Control$InvocationOutcomes",
-        "io.github.gustavo2358.air.model.Entries",
-        "io.github.gustavo2358.air.model.Entries$Entry",
         "io.github.gustavo2358.air.model.Envelopes",
         "io.github.gustavo2358.air.model.Envelopes$Envelope",
         "io.github.gustavo2358.air.model.Evidence",
@@ -138,7 +136,6 @@
         "io.github.gustavo2358.air.model.Scopes$ControlBound",
         "io.github.gustavo2358.air.model.Scopes$WithinControl",
         "io.github.gustavo2358.air.model.SemanticVersion",
-        "io.github.gustavo2358.air.model.Sequence",
         "io.github.gustavo2358.air.model.Terminator",
         "io.github.gustavo2358.analysis.cfg.adapters.CfgJsonBytes",
         "io.github.gustavo2358.analysis.cfg.adapters.CfgJsonException",

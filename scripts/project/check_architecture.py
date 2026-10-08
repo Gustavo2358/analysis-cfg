@@ -122,8 +122,9 @@ EXPECTED_PRODUCTION_IMPORTS.update({
     },
     SOURCE_ROOT + "domain/CfgNode.java": {
         "io.github.gustavo2358.air.model.Entries", "io.github.gustavo2358.air.model.Ids.EntryId",
+        "io.github.gustavo2358.air.model.Ids.LabelId", "io.github.gustavo2358.air.model.Ids.OperationId",
         "io.github.gustavo2358.air.model.Ids.PublicationId", "io.github.gustavo2358.air.model.Ids.UnitId",
-        "io.github.gustavo2358.air.model.Sequence", "java.util.Objects",
+        "io.github.gustavo2358.air.model.Sequence", "java.util.List", "java.util.Objects", "java.util.Optional",
     },
     SOURCE_ROOT + "domain/CfgTransition.java": {
         "io.github.gustavo2358.air.model.Ids.EntryId", "java.util.Objects",
@@ -716,17 +717,33 @@ def verify_javap(javap: str, root: Path, classes: Path, air_jar: Path) -> None:
     if "java.util.Optional<" + DOMAIN_CLASS + "CfgGraph> graph()" not in result:
         raise GateFailure("CfgBuildResult must expose the real typed optional CFG product")
 
+    entry = run(
+        [javap, "-classpath", classpath, "-p", "-s", DOMAIN_CLASS + "CfgNode$EntryNode"],
+        root, capture=True,
+    ).stdout or ""
+    require_descriptor(entry, "()Lio/github/gustavo2358/air/model/Ids$EntryId;", "EntryNode.entry")
+    require_descriptor(entry, "()Ljava/util/Optional;", "EntryNode.initialLabel")
+
+    sequence = run(
+        [javap, "-classpath", classpath, "-p", "-s", DOMAIN_CLASS + "CfgNode$SequenceNode"],
+        root, capture=True,
+    ).stdout or ""
+    require_descriptor(sequence, "()Lio/github/gustavo2358/air/model/Ids$LabelId;", "SequenceNode.label")
+    require_descriptor(sequence, "()Ljava/util/List;", "SequenceNode.operations")
+    require_descriptor(sequence, "()Lio/github/gustavo2358/air/model/Terminator;", "SequenceNode.terminator")
+
     halt = run(
         [javap, "-classpath", classpath, "-p", "-s", DOMAIN_CLASS + "CfgNode$HaltExit"],
         root, capture=True,
     ).stdout or ""
-    require_descriptor(halt, "()Lio/github/gustavo2358/air/model/Operations$Halt;", "HaltExit.source")
+    require_descriptor(halt, "()Lio/github/gustavo2358/air/model/Ids$OperationId;", "HaltExit.operation")
+    require_descriptor(halt, "()Lio/github/gustavo2358/air/model/Operations$HaltKind;", "HaltExit.haltKind")
 
     outside = run(
         [javap, "-classpath", classpath, "-p", "-s", DOMAIN_CLASS + "CfgNode$OutcomeExit"],
         root, capture=True,
     ).stdout or ""
-    require_descriptor(outside, "()Lio/github/gustavo2358/air/model/Terminator;", "OutcomeExit.source")
+    require_descriptor(outside, "()Lio/github/gustavo2358/air/model/Ids$OperationId;", "OutcomeExit.operation")
     require_descriptor(outside, "()Lio/github/gustavo2358/air/model/Control$InvocationAlternative;", "OutcomeExit.outcome")
 
     graph = run(

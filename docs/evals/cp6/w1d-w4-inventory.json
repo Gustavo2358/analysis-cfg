@@ -219,7 +219,6 @@
       "io.github.gustavo2358.analysis.application.PlanningExecution": [
         "io.github.gustavo2358.air.model.Ids",
         "io.github.gustavo2358.air.model.Ids$PublicationId",
-        "io.github.gustavo2358.air.model.Publication",
         "io.github.gustavo2358.analysis.application.AnalysisProvider",
         "io.github.gustavo2358.analysis.application.AnalysisProvider$Prepared",
         "io.github.gustavo2358.analysis.application.AnalysisProvider$Run",
@@ -255,6 +254,8 @@
         "io.github.gustavo2358.analysis.query.PointQuery",
         "io.github.gustavo2358.analysis.structure.AnalysisSession",
         "io.github.gustavo2358.analysis.structure.ProgramIndex",
+        "io.github.gustavo2358.analysis.structure.ProgramStore",
+        "io.github.gustavo2358.analysis.structure.ProgramStore$Structural",
         "java.lang.AutoCloseable",
         "java.lang.Class",
         "java.lang.IllegalArgumentException",
