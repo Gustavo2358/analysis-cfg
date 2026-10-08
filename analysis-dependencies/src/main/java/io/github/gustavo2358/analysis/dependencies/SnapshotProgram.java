@@ -14,7 +14,11 @@ import static io.github.gustavo2358.air.model.AirShape.*;
  * the snapshot and its paged identity index remain owned by the caller.
  */
 public final class SnapshotProgram implements AutoCloseable {
-    public record Definition(long objectKey,long rawText,long producer,long origin) { }
+    public record Producer(long operation,long origin) { }
+    public record Definition(long objectKey,long firstText,long secondText,int fitLength,String pad,List<Producer> producers) {
+        public Definition {if(firstText<=0||secondText<0||fitLength<0)throw new IllegalArgumentException("invalid definition text recipe");Objects.requireNonNull(pad);producers=List.copyOf(producers);if(producers.isEmpty())throw new IllegalArgumentException("definition requires a producer");}
+        boolean direct(){return secondText==0;}
+    }
     public record ComputedCall(long objectKey,UnitId caller,EntryId entry,LabelId sequence,OperationId operation,
             OriginId siteOrigin,OriginId targetOrigin,Evidence.CoverageStatus coverage,String namespace,ObjectId subject) {
         public ComputedCall {Objects.requireNonNull(caller);Objects.requireNonNull(entry);Objects.requireNonNull(sequence);Objects.requireNonNull(operation);Objects.requireNonNull(siteOrigin);Objects.requireNonNull(targetOrigin);Objects.requireNonNull(coverage);Objects.requireNonNull(namespace);Objects.requireNonNull(subject);}
@@ -48,12 +52,67 @@ public final class SnapshotProgram implements AutoCloseable {
                         long literal=snapshot.field(value,EXPRESSIONS_LITERAL,1);if(snapshot.shape(literal)!=VALUES_TEXT_VALUE)continue;
                         long header=snapshot.field(operation,OPERATIONS_ASSIGN,0);
                         consumer.accept(new Definition(keys.key(snapshot.field(destination,PLACES_OBJECT_PLACE,1)),
-                            snapshot.field(literal,VALUES_TEXT_VALUE,0),snapshot.field(header,OPERATIONS_HEADER,0),
-                            snapshot.field(header,OPERATIONS_HEADER,1)));
+                            snapshot.field(literal,VALUES_TEXT_VALUE,0),0,0,"",List.of(new Producer(snapshot.field(header,OPERATIONS_HEADER,0),
+                            snapshot.field(header,OPERATIONS_HEADER,1)))));
                     }
                 }
             }
         }
+        correlatedDefinitions(consumer);
+    }
+
+    private record Literal(long object,long raw,long producer,long origin) { }
+    private record Arm(List<Literal> values,long join) { }
+    private void correlatedDefinitions(Consumer<Definition> consumer) {
+        long unit=snapshot.element(snapshot.field(snapshot.root(),PUBLICATION,4),UNIT,0),entry=firstEntry(unit),initials=snapshot.field(entry,ENTRIES_ENTRY,1);
+        if(snapshot.size(initials)!=1)return;
+        long sequences=snapshot.field(unit,UNIT,5),head=sequence(sequences,keys.key(snapshot.element(initials,IDS_LABEL_ID,0)));
+        if(head==0)return;long branch=snapshot.field(head,SEQUENCE,2);if(snapshot.shape(branch)!=OPERATIONS_BRANCH)return;
+        var left=arm(sequence(sequences,keys.key(snapshot.field(branch,OPERATIONS_BRANCH,2))));
+        var right=arm(sequence(sequences,keys.key(snapshot.field(branch,OPERATIONS_BRANCH,3))));
+        if(left==null||right==null||left.join()!=right.join())throw new IllegalStateException("admitted correlated diamond is malformed");
+        long join=sequence(sequences,left.join()),instructions=snapshot.field(join,SEQUENCE,1),assignment=snapshot.element(instructions,INSTRUCTION,0);
+        long destination=snapshot.field(assignment,OPERATIONS_ASSIGN,1),fit=snapshot.field(assignment,OPERATIONS_ASSIGN,2),binary=snapshot.field(fit,EXPRESSIONS_FIT_TEXT,1);
+        long first=readObject(snapshot.field(binary,EXPRESSIONS_BINARY,2)),second=readObject(snapshot.field(binary,EXPRESSIONS_BINARY,3));
+        int length=new BigInteger(text(snapshot.field(fit,EXPRESSIONS_FIT_TEXT,2))).intValueExact();String pad=text(snapshot.field(fit,EXPRESSIONS_FIT_TEXT,3));
+        long header=snapshot.field(assignment,OPERATIONS_ASSIGN,0),object=keys.key(snapshot.field(destination,PLACES_OBJECT_PLACE,1));
+        for(var alternative:List.of(left,right)) {
+            var a=literal(alternative,first);var b=literal(alternative,second);
+            var producers=List.of(new Producer(a.producer(),a.origin()),new Producer(b.producer(),b.origin()),
+                new Producer(snapshot.field(header,OPERATIONS_HEADER,0),snapshot.field(header,OPERATIONS_HEADER,1)));
+            consumer.accept(new Definition(object,a.raw(),b.raw(),length,pad,producers));
+        }
+    }
+    private Arm arm(long sequence) {
+        if(sequence==0)return null;long instructions=snapshot.field(sequence,SEQUENCE,1);var values=new ArrayList<Literal>();
+        try(var rows=snapshot.elements(instructions,INSTRUCTION)){while(rows.advance()){
+            long assignment=rows.value(),destination=snapshot.field(assignment,OPERATIONS_ASSIGN,1),expression=snapshot.field(assignment,OPERATIONS_ASSIGN,2),literal=snapshot.field(expression,EXPRESSIONS_LITERAL,1),header=snapshot.field(assignment,OPERATIONS_ASSIGN,0);
+            values.add(new Literal(keys.key(snapshot.field(destination,PLACES_OBJECT_PLACE,1)),snapshot.field(literal,VALUES_TEXT_VALUE,0),snapshot.field(header,OPERATIONS_HEADER,0),snapshot.field(header,OPERATIONS_HEADER,1)));
+        }}
+        long jump=snapshot.field(sequence,SEQUENCE,2);return new Arm(List.copyOf(values),keys.key(snapshot.field(jump,OPERATIONS_JUMP,1)));
+    }
+    private Literal literal(Arm arm,long object){return arm.values().stream().filter(value->value.object()==object).findFirst().orElseThrow(()->new IllegalStateException("admitted correlated source is missing"));}
+    private long readObject(long expression){return keys.key(snapshot.field(snapshot.field(expression,EXPRESSIONS_READ,1),PLACES_OBJECT_PLACE,1));}
+    private long sequence(long sequences,long label){try(var rows=snapshot.elements(sequences,SEQUENCE)){while(rows.advance()){long sequence=rows.value();if(keys.key(snapshot.field(sequence,SEQUENCE,0))==label)return sequence;}}return 0;}
+    public long materializationBytes(Definition definition) {open();return definition.direct()?Math.multiplyExact(snapshot.characterCount(definition.firstText()),Character.BYTES):Math.multiplyExact((long)definition.fitLength(),2L*Character.BYTES);}
+    public String materialize(Definition definition) {open();return definition.direct()?text(definition.firstText()):fitConcat(definition.firstText(),definition.secondText(),definition.fitLength(),definition.pad());}
+    private String fitConcat(long first,long second,int length,String pad) {
+        if(length<0)throw new IllegalArgumentException("negative text fit length");var result=new StringBuilder();
+        int count=appendPrefix(result,first,length);count+=appendPrefix(result,second,length-count);
+        int padding=pad.codePointAt(0);for(int i=count;i<length;i++)result.appendCodePoint(padding);return result.toString();
+    }
+    private int appendPrefix(StringBuilder target,long source,int limit) {
+        long length=snapshot.characterCount(source),offset=0;int appended=0;char[] block=new char[1024];
+        while(offset<length&&appended<limit) {
+            int count=snapshot.readCharacters(source,offset,block,0,(int)Math.min(block.length,length-offset)),at=0;
+            while(at<count&&appended<limit) {
+                if(Character.isHighSurrogate(block[at])&&at+1==count&&offset+count<length)break;
+                int scalar=Character.codePointAt(block,at,count);target.appendCodePoint(scalar);at+=Character.charCount(scalar);appended++;
+            }
+            if(at==0) {count=snapshot.readCharacters(source,offset,block,0,2);int scalar=Character.codePointAt(block,0,count);target.appendCodePoint(scalar);at=Character.charCount(scalar);appended++;}
+            offset+=at;
+        }
+        return appended;
     }
 
     public void computedCalls(Consumer<ComputedCall> consumer) {

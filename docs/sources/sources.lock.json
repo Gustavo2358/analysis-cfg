@@ -150,7 +150,7 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "d4f499064ee3e07b7e3e2e4461eefbd3c57a5452",
+    "commit": "d7faad9bb85ed784d0516868353b60fe90b5804f",
     "canonical_ref": "feat/paged-air-snapshot",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
@@ -228,10 +228,10 @@
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "logical_text_w2": "Local producer FAST PASS; fixed logical ranges and expression transport. Selected source E2E qualification in docs/product/logical-text-w2.md.",
-    "evidence_level": "Producer FAST267model/144transport/44architecture PASS28.373s; managed physical InputStream staging and complete narrow direct-dependency snapshot admission",
+    "evidence_level": "Producer FAST268model/144transport/44architecture PASS28.710s; managed physical InputStream staging and complete narrow direct plus correlated concat-diamond snapshot admission",
     "status": "LOCAL_CHECKPOINT / HUMAN_REVIEW_PENDING",
     "ci": {
-      "checked_commit": "d4f499064ee3e07b7e3e2e4461eefbd3c57a5452",
+      "checked_commit": "d7faad9bb85ed784d0516868353b60fe90b5804f",
       "status": "NOT_RUN",
       "context": "local producer FAST only; draft PR 30"
     },
