@@ -393,7 +393,9 @@
     "io.github.gustavo2358.analysis.adapters.PagedSnapshotIdentityStorageTest": [
       "completeTypedNamespacesAndUnicodeAgreeAcrossResidentAndOnePageStores",
       "exactIdentityPayloadExceedsManagedResidencyAndMemoizationAvoidsRepeatedWork",
-      "failedConstructionAndSpentWorkReleaseOwnedIndexesWithoutClosingBorrowedInput"
+      "failedConstructionAndSpentWorkReleaseOwnedIndexesWithoutClosingBorrowedInput",
+      "streamedAtomSummariesMatchAcrossBackendsAndSurvivePayloadLargerThanResidency",
+      "tupleMetadataReadFailureAbortsPortAndKeepsBorrowedSnapshotAvailable"
     ],
     "io.github.gustavo2358.analysis.adapters.PagedSnapshotDeclarationsStorageTest": [
       "declarationPayloadAndEveryFrontierOccurrenceSpillWithoutChangingPrimitiveFacts",

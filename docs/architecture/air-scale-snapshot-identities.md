@@ -76,5 +76,8 @@ compiled descriptor inventory adds only the owned storage's `word(long,int)`
 method; boundary deny rules are unchanged. Complete local graph/field constraints,
 full Validator, codec and managed CLI admission remain required.
 
-Final atom checkpoint FAST: 1032 methods, zero failures/errors/skips,307.611s,
-including producer resolution, wire oracles and compiled boundaries.
+Initial atom checkpoint FAST: 1030 methods, zero failures/errors/skips,307.611s,
+including producer resolution, wire oracles and compiled boundaries. The two new
+atom methods passed in the focused run and are now explicitly added to the fixed
+FAST selection. Final expanded FAST passed1032 methods, zero failures/errors/skips,
+312.514s, with the same semantic oracles and boundary deny rules.
