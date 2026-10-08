@@ -1190,3 +1190,6 @@ index storage; complete paged Validator/streamed admission remains pending.
 The [paged declaration bridge](air-scale-snapshot-declarations.md) stores all
 declaration rows and occurrence frontiers in the shared runtime, releasing consumed
 rows and sealing the catalogue before read-only queries. Complete admission is pending.
+
+The [managed ordered graph grammar](air-scale-snapshot-grammar.md) shares paged
+frontier/ancestry/context memo owners; complete structural admission remains pending.

@@ -401,6 +401,11 @@
       "declarationPayloadAndEveryFrontierOccurrenceSpillWithoutChangingPrimitiveFacts",
       "completeDeclarationInventoryMatchesIndependentFactsAcrossBorrowedResidentAndPagedInputs",
       "deniedConstructionAndSpentWorkAbortCleanlyWithoutClosingBorrowedPageStore"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedSnapshotGraphStorageTest": [
+      "orderedPrimitiveFrontierAndExactContextMemoSpillWithoutHistoricalStackGrowth",
+      "completeTypedGrammarUsesManagedDeepFramesAndLeavesBorrowedInputAvailable",
+      "constructionAndOperationalFailureCloseEveryOwnedIndexAndKeepBorrowedRunStore"
     ]
   },
   "analysis-dataflow": {
