@@ -150,7 +150,7 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "8624faf764dedb2f6106bc0e9029387d2362c0cf",
+    "commit": "8fcfc37af28498d428db525215e922e845f3f0fa",
     "canonical_ref": "feat/paged-air-snapshot",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
@@ -228,10 +228,10 @@
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "logical_text_w2": "Local producer FAST PASS; fixed logical ranges and expression transport. Selected source E2E qualification in docs/product/logical-text-w2.md.",
-    "evidence_level": "Exact paged access/identity/atom/declaration/graph/local/nominal/grounding/signature and balanced diagnostic-template foundation; producer FAST240model/143transport and boundaries PASS. Complete paged Validator/codec and managed CLI pending.",
+    "evidence_level": "Exact paged access/identity/atom/declaration/grammar/local/nominal/grounding/signature, literal/projected diagnostics and contextual local-label relation foundation; producer FAST247model/143transport/boundaries PASS. Full paged Validator/codec and managed CLI pending.",
     "status": "LOCAL_CHECKPOINT / HUMAN_REVIEW_PENDING",
     "ci": {
-      "checked_commit": "8624faf764dedb2f6106bc0e9029387d2362c0cf",
+      "checked_commit": "8fcfc37af28498d428db525215e922e845f3f0fa",
       "status": "NOT_RUN",
       "context": "local producer FAST only; draft PR 30"
     },

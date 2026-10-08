@@ -46,6 +46,40 @@ final class PagedSnapshotDiagnosticStorageTest {
         }
         assertEquals(0,resources.heapUsed());assertEquals(0,resources.used(AnalysisResources.Pool.TEMPORARY));
     }
+    @Test void borrowedProjectedContextsPreserveMixedOrderWithoutExpandingOccurrences() {
+        var memoryResources=resources(32_000_000,1_000_000_000);var fileResources=resources(65536,1_000_000_000);
+        try(var memory=new MemoryPageStore(128,memoryResources);var file=new FilePageStore(directory,128,1,fileResources)) {
+            assertProjected(memory,memoryResources);assertProjected(file,fileResources);
+        }
+        assertEquals(0,memoryResources.heapUsed());assertEquals(0,fileResources.heapUsed());
+    }
+    private static void assertProjected(PageStore pages,AnalysisResources resources) {
+        final long[] calls={0};long trillion=1_000_000_000_000L;
+        SnapshotDiagnosticTemplates.Projection relation=(recipe,table,context,ordinal,out)->{
+            assertEquals(41,recipe);assertEquals(1L<<48,table);assertTrue(context==11||context==12);calls[0]++;
+            out[0]=(ordinal+context)%5;out[1]=200+context;out[2]=source((int)ordinal);out[3]=-1;out[4]=context;
+        };
+        try(var tape=new SnapshotDiagnosticTemplates(new PagedSnapshotDiagnosticStorage(pages,resources),relation)) {
+            long[] counts={trillion/5,trillion/5,trillion/5,trillion/5,trillion/5};
+            long a=tape.projected(41,1L<<48,11,counts),b=tape.projected(41,1L<<48,12,counts);counts[0]=0;
+            long root=tape.concat(a,b);assertEquals(2*trillion,tape.size(root));
+            long live=pages.statistics().livePages(),temporary=resources.used(AnalysisResources.Pool.TEMPORARY);
+            for(int q=0;q<1024;q++) {
+                var empty=new Report(0);tape.emit(root,source(q),empty);assertEquals(2*trillion,empty.total());
+                for(long count:empty.counts)assertEquals(2*trillion/5,count);
+            }
+            assertEquals(0,calls[0]);
+            for(long context:new long[]{11,12,11}) {
+                var report=new Report(3);tape.emit(context==11?a:b,source(99),report);assertEquals(trillion,report.total());
+                for(int n=0;n<3;n++)assertEquals(new Item(KINDS[(int)((n+context)%5)],(int)(200+context),source(n),-1,context),report.items.get(n));
+                assertEquals(source(99),report.owner);
+            }
+            assertEquals(9,calls[0]);assertEquals(live,pages.statistics().livePages());assertEquals(temporary,resources.used(AnalysisResources.Pool.TEMPORARY));
+            assertTrue(resources.heapPeak()<=32_000_000);
+            System.out.println("SNAPSHOT_PROJECTED_STORAGE_METRICS heap="+resources.heapPeak()+" temporary="+temporary+" occurrences="+(2*trillion)+" reads="+calls[0]);
+        }
+        assertEquals(0,pages.statistics().livePages());long borrowed=pages.allocate();pages.release(borrowed);
+    }
     @Test void everyWorkInterruptionAndDeniedControlClosesTransferredTupleState() {
         for(long heap:new long[]{1000,3000,5000,7000}) {
             var resources=resources(heap,1_000_000);

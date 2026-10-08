@@ -38,3 +38,11 @@ Reference/context recipes, indexed contextual complements, lazy projected chunks
 all remaining Validator rules, checked issuance, incremental JSON/managed production
 CLI and global AS-W00–W10 qualification are pending. No certificate/validity or
 whole-pipeline memory bound is inferred from these partial sequence facts.
+
+The compatible projected-chunk SPI from producer14756d6 is now exercised by a
+fourth adapter law: two contexts represent2e12 mixed-kind occurrences,1024 zero
+retention reads project nothing, and three retained-prefix uses read exactly9
+occurrences. Fixed literal recipe/relation/context words retain no borrowed owner.
+[Local-label relations](air-scale-local-labels.md) provide the first indexed context
+projection. Historical33-law/FAST1056/CLI evidence above remains tied to d3c7e6;
+this newer boundary has its own qualification, not a relabel of that run.

@@ -1208,3 +1208,6 @@ list counts and mode-specific diagnostic prefixes under the same managed ledger.
 
 [Balanced shared diagnostic occurrences](air-scale-diagnostic-templates.md) retain
 exact kind totals and bounded prefix cursors; complete admission remains pending.
+
+[Contextual local-label references](air-scale-local-labels.md) share Unit postings
+and select lazy diagnostic complements without replaying each label list per context.

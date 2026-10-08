@@ -435,8 +435,16 @@
     ],
     "io.github.gustavo2358.analysis.adapters.PagedSnapshotDiagnosticStorageTest": [
       "coldBalancedSequencesPreserveKindsAnchorsAndRepeatedPrefixResidence",
+      "borrowedProjectedContextsPreserveMixedOrderWithoutExpandingOccurrences",
       "enormousSharedMultiplicityEmitsOnlyRequestedAnchorsAndRejectsOverflow",
       "everyWorkInterruptionAndDeniedControlClosesTransferredTupleState"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedSnapshotLabelStorageTest": [
+      "coldSortedPostingsAndComplementsPreserveDuplicateRowsWithoutQueryHistory",
+      "thousandsOfUnitBucketsUseSharedPagesAndLateForeignSelectsByRank",
+      "typedSharedLocalScopesAndProjectedErrorsMatchBothInputBackends",
+      "everyWorkInterruptionAndUnfinishedMutationFailsClosedAndReleasesPages",
+      "deniedConstructionAndEmptyOrdinalQueriesNeverLeakOrPublishPartialTables"
     ]
   },
   "analysis-dataflow": {
