@@ -66,6 +66,17 @@ public final class CanonicalTupleArena implements AutoCloseable {
     }
 
     /** Callers own the supplied buffer; the arena copies only the fixed staging key. */
+    public synchronized long find(long... tuple) {
+        open();Objects.requireNonNull(tuple);
+        if(tuple.length!=arity)throw new IllegalArgumentException("wrong tuple arity");
+        try {
+            System.arraycopy(tuple,0,staged,0,arity);
+            for(int column:references)if(staged[column]!=0)requireHandle(staged[column]);
+            return unique.find(0);
+        } catch(AnalysisResources.Exhausted|PageStore.Failure exception){failed=true;throw exception;}
+    }
+
+    /** Interns on a miss; read-only callers should use find to avoid retaining query history. */
     public synchronized long intern(long... tuple) {
         open(); Objects.requireNonNull(tuple);
         if (tuple.length != arity) throw new IllegalArgumentException("wrong tuple arity");

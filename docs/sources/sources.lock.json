@@ -150,7 +150,7 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "24dd192258ce7410661fae971380965478e03bb4",
+    "commit": "7e66aebd2a4c9bcd21d1dd3c0c75c1ef51a929a0",
     "canonical_ref": "feat/paged-air-snapshot",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
@@ -231,7 +231,7 @@
     "evidence_level": "Exact primitive declaration/occurrence inventory over complete identity keys; producer FAST 206 model and 143 transport checks plus boundaries PASS. Complete paged Validator/codec and managed CLI remain pending.",
     "status": "LOCAL_CHECKPOINT / HUMAN_REVIEW_PENDING",
     "ci": {
-      "checked_commit": "24dd192258ce7410661fae971380965478e03bb4",
+      "checked_commit": "7e66aebd2a4c9bcd21d1dd3c0c75c1ef51a929a0",
       "status": "NOT_RUN",
       "context": "local producer FAST only; draft PR 30"
     },

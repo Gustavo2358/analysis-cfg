@@ -10,7 +10,7 @@ from resource_limit_scope import allows_change, boundaries
 ROOT=Path(__file__).resolve().parents[2]
 MODULES=['analysis-dataflow','analysis-adapters','analysis-launcher']
 NAMES={'analysis-dataflow':['AnalysisDataflow','DefaultValuePlan','ObservedValueFact','PreparedDataflowResult','RegionalAnalysis','RegionalAnalysisResult'],
-       'analysis-adapters':['JsonFiles','DataflowAirReader','DeliveryReceipt','JsonOutput','LocalResultWriter','ReceiptJson','ResultJson','WireIds','RegionalResultJson','FilePageStore','MemoryPageStore','PagedAirStorage','PagedSnapshotIdentityStorage','PagedSnapshotDeclarationsStorage','PagedSnapshotGraphStorage'],
+       'analysis-adapters':['JsonFiles','DataflowAirReader','DeliveryReceipt','JsonOutput','LocalResultWriter','ReceiptJson','ResultJson','WireIds','RegionalResultJson','FilePageStore','MemoryPageStore','PagedAirStorage','PagedSnapshotIdentityStorage','PagedSnapshotDeclarationsStorage','PagedSnapshotGraphStorage','PagedSnapshotLocalStorage'],
        'analysis-launcher':['AnalysisDataflow','RegionalAnalysis']}
 PIPELINE='analysis-launcher/src/main/java/io/github/gustavo2358/analysis/launcher/AnalysisPipeline.java'
 SOURCES={m+'/src/main/java/io/github/gustavo2358/analysis/'+m.removeprefix('analysis-').replace('launcher','launcher')+'/'+n+'.java' for m,names in NAMES.items() for n in names}

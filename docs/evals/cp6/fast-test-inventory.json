@@ -309,6 +309,7 @@
     ],
     "io.github.gustavo2358.analysis.adapters.CanonicalTupleArenaTest": [
       "completePrimitiveKeysCanonicalizeWithoutRetainingCallerBuffers",
+      "lookupDoesNotInternMissesOrRetainHistoricalQueryPayload",
       "rootsPreserveSharedChildrenUntilTheLastCallerReleasesThem",
       "deepProofDagCollectsIterativelyUnderForcedSpillAndFixedResidency",
       "randomSharedDagAndRootChurnMatchIndependentGraphTracing",
@@ -407,6 +408,11 @@
       "orderedPrimitiveFrontierAndExactContextMemoSpillWithoutHistoricalStackGrowth",
       "completeTypedGrammarUsesManagedDeepFramesAndLeavesBorrowedInputAvailable",
       "constructionAndOperationalFailureCloseEveryOwnedIndexAndKeepBorrowedRunStore"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedSnapshotLocalStorageTest": [
+      "exactMembershipAndFactKindsSpillAndMissesNeverGrowRequiredState",
+      "builderWrittenSharedLabelUniverseMatchesBothBackendsAndWholeLocalGrammar",
+      "constructionAndSpentWorkAbortOwnedLocalStateAndKeepBorrowedInput"
     ]
   },
   "analysis-dataflow": {

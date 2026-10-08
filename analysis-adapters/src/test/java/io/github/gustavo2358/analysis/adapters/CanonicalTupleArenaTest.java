@@ -37,6 +37,25 @@ final class CanonicalTupleArenaTest {
         assertEquals(0, resources.heapUsed());
     }
 
+    @Test void lookupDoesNotInternMissesOrRetainHistoricalQueryPayload() {
+        var resources=resources();
+        try(var pages=new FilePageStore(directory,128,1,resources);
+            var arena=new CanonicalTupleArena(pages,resources,AnalysisResources.Phase.VALIDATION,3,new int[]{1})) {
+            long child=arena.intern(7,0,Long.MAX_VALUE),first=arena.intern(Long.MIN_VALUE,child,41);
+            long[] probe={Long.MIN_VALUE,child,41};assertEquals(first,arena.find(probe));probe[2]=42;assertEquals(0,arena.find(probe));
+            long live=pages.statistics().livePages(),temporary=resources.used(AnalysisResources.Pool.TEMPORARY),heap=resources.heapUsed();
+            for(int query=0;query<16_384;query++){probe[2]=42+query;assertEquals(0,arena.find(probe));}
+            assertEquals(2,arena.size());assertEquals(live,pages.statistics().livePages());assertEquals(temporary,resources.used(AnalysisResources.Pool.TEMPORARY));assertEquals(heap,resources.heapUsed());
+            assertEquals(first,arena.find(Long.MIN_VALUE,child,41));assertThrows(IllegalArgumentException.class,()->arena.find(1,child));
+            assertThrows(IllegalArgumentException.class,()->arena.find(1,child+100,0));
+            long root=arena.retain(first);assertEquals(0,arena.collect());arena.release(root);assertEquals(2,arena.collect());
+            assertEquals(0,arena.find(7,0,Long.MAX_VALUE));assertThrows(IllegalArgumentException.class,()->arena.find(1,child,0));
+            long replacement=arena.intern(8,0,1);resources.work(resources.limits().workUnits()-resources.workUsed(),AnalysisResources.Phase.VALIDATION);
+            assertThrows(AnalysisResources.Exhausted.class,()->arena.find(8,0,1));assertThrows(IllegalStateException.class,()->arena.field(replacement,0));
+        }
+        assertEquals(0,resources.heapUsed());assertEquals(0,resources.used(AnalysisResources.Pool.TEMPORARY));
+    }
+
     @Test void rootsPreserveSharedChildrenUntilTheLastCallerReleasesThem() {
         var resources = resources();
         try (var store = new FilePageStore(directory, 128, 1, resources);

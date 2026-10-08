@@ -1193,3 +1193,6 @@ rows and sealing the catalogue before read-only queries. Complete admission is p
 
 The [managed ordered graph grammar](air-scale-snapshot-grammar.md) shares paged
 frontier/ancestry/context memo owners; complete structural admission remains pending.
+
+[Constructor-local snapshot predicates](air-scale-local-constraints.md) share the
+managed runtime and exact read-only tuple lookups. Full admission remains pending.
