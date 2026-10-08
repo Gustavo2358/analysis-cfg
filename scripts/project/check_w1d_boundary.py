@@ -5,6 +5,12 @@ from pathlib import Path
 from check_transport_architecture import dependencies_from_jdeps
 ROOT=Path(__file__).resolve().parents[2]
 INVENTORY='docs/evals/cp6/w1d-dependencies-inventory.json'
+def stable_dependencies(output):
+    dependencies=dependencies_from_jdeps(output)
+    # JDK 25 reports Record for SnapshotProgram because it mentions nested
+    # records; JDK 21 does not. The class itself is not a record.
+    dependencies.get('io.github.gustavo2358.analysis.dependencies.SnapshotProgram',set()).discard('java.lang.Record')
+    return dependencies
 def source_boundaries(root):
     # The source check protects absence of program-name semantics in the generic effect interpreter.
     effect=(root/'analysis-values/src/main/java/io/github/gustavo2358/analysis/values/ForeignEffectTransfer.java').read_text()
@@ -20,7 +26,7 @@ def check(root=ROOT,refresh=False):
     cp=cpfile.read_text().strip();paths=sorted(p.relative_to(classes).as_posix() for p in classes.rglob('*.class'))
     if not paths:raise ValueError('W1D compiled artifacts missing')
     def capture(args):return subprocess.check_output(args,cwd=root,text=True,stderr=subprocess.PIPE)
-    edges=dependencies_from_jdeps(capture(['jdeps','--multi-release','21','-filter:none','-verbose:class','-cp',cp,str(classes)]))
+    edges=stable_dependencies(capture(['jdeps','--multi-release','21','-filter:none','-verbose:class','-cp',cp,str(classes)]))
     denied=('java.io.','java.nio.file.','java.net.','java.lang.reflect.','analysis.adapters.','analysis.launcher.','air.json.','cobolexplorer','org.antlr','lower.')
     consumer_denied=('analysis.structure.','analysis.solver.','analysis.application.','analysis.query.BatchReplayer','analysis.values.PossibleValues','analysis.values.RegionalValuesAnalysis','analysis.values.RegionalValuesProvider','analysis.values.StorageValuesProvider','analysis.values.RegionalProviderSupport','analysis.cfg.','air.model.Publication','air.model.Unit','air.model.Sequence')
     for source,targets in edges.items():

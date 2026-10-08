@@ -10,6 +10,16 @@ from unittest.mock import patch
 import check_w1d_boundary
 ROOT = Path(__file__).resolve().parents[2]
 class PlanBoundary(unittest.TestCase):
+    def test_w1d_jdeps_ignores_jdk_dependent_record_edge(self):
+        output = '''
+   io.github.gustavo2358.analysis.dependencies.SnapshotProgram -> java.lang.Object java.base
+   io.github.gustavo2358.analysis.dependencies.SnapshotProgram -> java.lang.Record java.base
+'''
+        self.assertEqual(
+            {'io.github.gustavo2358.analysis.dependencies.SnapshotProgram': {'java.lang.Object'}},
+            check_w1d_boundary.stable_dependencies(output),
+        )
+
     def test_generic_plan_cannot_acquire_call_semantics(self):
         import check_w1d_boundary
         original = Path.read_text
