@@ -86,4 +86,17 @@ class FactorizedAlternativesTest {
         assertEquals(new FactorizedAlternatives.Size(2,4,2),domain.componentSize(diamond));
     }
 
+    @Test void retainingStableRootsReclaimsOnlySupersededCanonicalHistory() {
+        var domain=new FactorizedAlternatives<Integer>();var root=domain.singleton(new TreeMap<>(Map.of(0,0,1,0)));
+        var retained=root;
+        for(int value=1;value<=32;value++)root=domain.union(root,domain.singleton(new TreeMap<>(Map.of(0,value,1,value))));
+        var expected=new HashSet<>(domain.selections(root));var before=domain.metrics();
+        domain.retain(List.of(root,retained));var after=domain.metrics();
+        assertEquals(expected,new HashSet<>(domain.selections(root)));assertEquals(Set.of(Map.of(0,0,1,0)),new HashSet<>(domain.selections(retained)));
+        assertTrue(after.get("internedNodes")<before.get("internedNodes"));assertTrue(after.get("internedAlternatives")<before.get("internedAlternatives"));
+        assertEquals(before.get("allocatedNodes"),after.get("allocatedNodes"));assertEquals(before.get("allocatedAlternatives"),after.get("allocatedAlternatives"));
+        assertEquals(before.get("internedNodes"),after.get("internedNodes")+after.get("retiredNodes"));
+        assertEquals(before.get("internedAlternatives"),after.get("internedAlternatives")+after.get("retiredAlternatives"));
+    }
+
 }

@@ -3,6 +3,7 @@ package io.github.gustavo2358.analysis.values;
 import io.github.gustavo2358.air.model.Expressions;
 import io.github.gustavo2358.air.model.Ids.ObjectId;
 import io.github.gustavo2358.air.model.Operations;
+import io.github.gustavo2358.analysis.solver.DataflowResult;
 import java.util.*;
 import java.util.function.Function;
 
@@ -12,9 +13,31 @@ import java.util.function.Function;
  * actually coexist at control-flow joins so expression transfer cannot invent a product.
  */
 final class ScalarRelations {
+    /**
+     * Binary-carry union forest. Incremental fan-in combines equally sized
+     * chunks instead of copying the growing top-level edge map for every new
+     * predecessor. Materialization is exact and cached only when an operation
+     * must inspect or transform the relation.
+     */
+    private static final class Relation {
+        final List<FactorizedAlternatives.Node<Candidates>> bins;
+        FactorizedAlternatives.Node<Candidates> materialized;
+        Relation(FactorizedAlternatives.Node<Candidates> root){bins=List.of(root);materialized=root;}
+        Relation(List<FactorizedAlternatives.Node<Candidates>> bins){this.bins=Collections.unmodifiableList(new ArrayList<>(bins));}
+        FactorizedAlternatives.Node<Candidates> materialize(FactorizedAlternatives<Candidates> domain) {
+            if(materialized!=null)return materialized;
+            FactorizedAlternatives.Node<Candidates> result=null;
+            for(int rank=bins.size()-1;rank>=0;rank--)if(bins.get(rank)!=null)result=domain.union(result,bins.get(rank));
+            if(result==null)throw new IllegalStateException("empty scalar relation forest");
+            return materialized=result;
+        }
+        void roots(Collection<FactorizedAlternatives.Node<Candidates>> target) {
+            for(var root:bins)if(root!=null)target.add(root);if(materialized!=null)target.add(materialized);
+        }
+    }
     static final class Roots {
-        final List<FactorizedAlternatives.Node<Candidates>> values;
-        Roots(List<FactorizedAlternatives.Node<Candidates>> values){this.values=List.copyOf(values);}
+        final List<Relation> values;
+        Roots(List<Relation> values){this.values=List.copyOf(values);}
     }
     record Assignment(Candidates projection,Roots roots) { }
     private final FactorizedAlternatives<Candidates> domain=new FactorizedAlternatives<>();
@@ -63,15 +86,26 @@ final class ScalarRelations {
         var factorized=domain.metrics();
         result.put("scalarRelationInternedNodes",factorized.get("internedNodes"));
         result.put("scalarRelationInternedEdges",factorized.get("internedAlternatives"));
+        result.put("scalarRelationAllocatedNodes",factorized.get("allocatedNodes"));
+        result.put("scalarRelationAllocatedEdges",factorized.get("allocatedAlternatives"));
+        result.put("scalarRelationRetiredNodes",factorized.get("retiredNodes"));
+        result.put("scalarRelationRetiredEdges",factorized.get("retiredAlternatives"));
         result.put("scalarRelationUnionPairs",factorized.get("relationUnionPairs"));
         result.put("scalarRelationProjectedRows",factorized.get("projectedAlternatives"));
         return Map.copyOf(result);
     }
+    void retain(DataflowResult<PossibleValuesState> result) {
+        var roots=new ArrayList<FactorizedAlternatives.Node<Candidates>>();
+        result.forEachRetainedState(state->{
+            if(state.relations==this&&state.relational!=null)state.relational.values.forEach(relation->relation.roots(roots));
+        });
+        domain.retain(roots);
+    }
     Roots attach(PossibleValuesState state,ValuesWork work) {
-        var roots=new ArrayList<FactorizedAlternatives.Node<Candidates>>(cells.size());
+        var roots=new ArrayList<Relation>(cells.size());
         for(var group:cells) {
             var tuple=new TreeMap<Integer,Candidates>();for(int cell:group)tuple.put(cell,state.value(cell,work));
-            roots.add(domain.singleton(tuple));
+            roots.add(new Relation(domain.singleton(tuple)));
         }
         return new Roots(roots);
     }
@@ -80,19 +114,35 @@ final class ScalarRelations {
     Roots widen(Roots roots,int cell,ValuesWork work){return update(roots,cell,current->current.withOpen(work),false);}
     private Roots update(Roots roots,int cell,java.util.function.UnaryOperator<Candidates> change,boolean retainOld) {
         int group=group(cell);if(group<0)return roots;var old=roots.values.get(group);
-        var changed=domain.update(old,Map.of(cell,change));if(retainOld)changed=domain.union(old,changed);
+        var original=old.materialize(domain);var changed=domain.update(original,Map.of(cell,change));if(retainOld)changed=domain.union(original,changed);
         return replace(roots,group,changed);
     }
     Roots join(Roots left,Roots right) {
-        var joined=new ArrayList<FactorizedAlternatives.Node<Candidates>>(cells.size());
-        for(int i=0;i<cells.size();i++)joined.add(domain.union(left.values.get(i),right.values.get(i)));
+        var joined=new ArrayList<Relation>(cells.size());
+        for(int i=0;i<cells.size();i++)joined.add(union(left.values.get(i),right.values.get(i)));
         return new Roots(joined);
     }
+    private Relation union(Relation left,Relation right) {
+        if(left==right)return left;
+        if(left.materialized!=null&&left.materialized==right.materialized)return left;
+        var bins=new ArrayList<FactorizedAlternatives.Node<Candidates>>(left.bins);FactorizedAlternatives.Node<Candidates> carry;
+        for(int rank=0;rank<right.bins.size();rank++) {
+            carry=right.bins.get(rank);if(carry==null)continue;int slot=rank;
+            while(true) {
+                while(bins.size()<=slot)bins.add(null);
+                var existing=bins.get(slot);
+                if(existing==null){bins.set(slot,carry);break;}
+                bins.set(slot,null);carry=domain.union(existing,carry);slot++;
+            }
+        }
+        while(bins.size()>1&&bins.getLast()==null)bins.removeLast();
+        return new Relation(bins);
+    }
     boolean equivalent(Roots left,Roots right) {
-        if(left==right)return true;for(int i=0;i<cells.size();i++)if(left.values.get(i)!=right.values.get(i))return false;return true;
+        if(left==right)return true;for(int i=0;i<cells.size();i++)if(left.values.get(i).materialize(domain)!=right.values.get(i).materialize(domain))return false;return true;
     }
     long fingerprint(Roots roots) {
-        long result=0x6a09e667f3bcc909L;for(var root:roots.values)result=Long.rotateLeft(result,11)^domain.fingerprint(root);return result;
+        long result=0x6a09e667f3bcc909L;for(var root:roots.values)result=Long.rotateLeft(result,11)^domain.fingerprint(root.materialize(domain));return result;
     }
     Assignment copy(PossibleValuesState state,int target,int source,ValuesWork work) {
         return image(state,target,Set.of(source),row->{var value=row.get(source);if(value==null)throw new IllegalStateException("missing correlated copy source");return value;},work);
@@ -107,18 +157,19 @@ final class ScalarRelations {
             Function<Map<Integer,Candidates>,Candidates> transfer,ValuesWork work) {
         int group=group(target);if(group<0)return null;
         for(int source:selected)if(group(source)!=group)throw new IllegalStateException("correlated scalar source split across groups");
-        var original=state.relational.values.get(group);var projected=domain.project(original,selected);
-        FactorizedAlternatives.Node<Candidates> result=null;Candidates pointwise=null;
+        var original=state.relational.values.get(group).materialize(domain);var projected=domain.project(original,selected);
+        Relation result=null;Candidates pointwise=null;
         for(var row:domain.selections(projected)) {
             var supplied=transfer.apply(row);pointwise=pointwise==null?supplied:pointwise.join(supplied,work);
             var restricted=domain.restrict(original,row);
-            result=domain.union(result,domain.update(restricted,Map.of(target,ignored->supplied)));
+            var contribution=new Relation(domain.update(restricted,Map.of(target,ignored->supplied)));
+            result=result==null?contribution:union(result,contribution);
         }
         if(result==null||pointwise==null)throw new IllegalStateException("reached scalar relation has no alternatives");
-        return new Assignment(pointwise,replace(state.relational,group,result));
+        return new Assignment(pointwise,replace(state.relational,group,result.materialize(domain)));
     }
     private Roots replace(Roots roots,int group,FactorizedAlternatives.Node<Candidates> value) {
-        if(roots.values.get(group)==value)return roots;var copy=new ArrayList<>(roots.values);copy.set(group,value);return new Roots(copy);
+        if(roots.values.get(group).materialized==value)return roots;var copy=new ArrayList<>(roots.values);copy.set(group,new Relation(value));return new Roots(copy);
     }
     private int group(int cell){return cell>=0&&cell<groupOf.length?groupOf[cell]:-1;}
     private static int find(int[] parent,int value){int root=value;while(parent[root]!=root)root=parent[root];while(parent[value]!=value){int next=parent[value];parent[value]=root;value=next;}return root;}

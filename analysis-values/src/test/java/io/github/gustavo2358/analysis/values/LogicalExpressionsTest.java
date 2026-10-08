@@ -130,7 +130,7 @@ class LogicalExpressionsTest {
   assertEquals(Set.of("seed-A","seed-X","open-fit-concat"),observed.candidateSupports().getFirst().producers().stream().map(xp->xp.evidence().localId()).collect(java.util.stream.Collectors.toSet()));
  }
  @Test void finiteFanInStaysDiagonalThroughExpressionAndCopyWithoutCartesianProjection(){
-  for(int leaves:List.of(4,8,16,32)) {
+  for(int leaves:List.of(4,8,16,32,64)) {
    Set<String> expected=new TreeSet<>();for(int leaf=0;leaf<leaves;leaf++){String suffix=String.format(Locale.ROOT,"%02d",leaf);expected.add("A"+suffix+"X"+suffix);}
    Map<String,Long> baseline=null;
    for(boolean reverse:List.of(false,true)) {
@@ -143,7 +143,12 @@ class LogicalExpressionsTest {
     }
     var metrics=run.solveMetrics();assertEquals(1L,metrics.get("scalarRelationGroups"));assertEquals(4L,metrics.get("scalarRelationCells"));assertEquals(4L,metrics.get("scalarRelationMaxWidth"));
     assertEquals(2L*leaves,metrics.get("scalarRelationProjectedRows"),"expression and copy each visit only the actual diagonal rows");
-    var stable=Map.of("rows",metrics.get("scalarRelationProjectedRows"),"nodes",metrics.get("scalarRelationInternedNodes"),"edges",metrics.get("scalarRelationInternedEdges"));
+    assertTrue(metrics.get("scalarRelationInternedNodes")<=20L*leaves,"stable result retains only linear relation nodes");
+    assertTrue(metrics.get("scalarRelationInternedEdges")<=32L*leaves,"stable result retains only linear relation edges");
+    assertTrue(metrics.get("scalarRelationAllocatedEdges")<=8L*leaves*(1+Integer.numberOfTrailingZeros(leaves)),"balanced unions keep cumulative edge allocation within N log N for geometric fan-in");
+    assertEquals(metrics.get("scalarRelationAllocatedNodes")-metrics.get("scalarRelationInternedNodes"),metrics.get("scalarRelationRetiredNodes"));
+    assertEquals(metrics.get("scalarRelationAllocatedEdges")-metrics.get("scalarRelationInternedEdges"),metrics.get("scalarRelationRetiredEdges"));
+    var stable=Map.of("rows",metrics.get("scalarRelationProjectedRows"),"liveNodes",metrics.get("scalarRelationInternedNodes"),"liveEdges",metrics.get("scalarRelationInternedEdges"),"allocatedEdges",metrics.get("scalarRelationAllocatedEdges"));
     if(baseline==null)baseline=stable;else assertEquals(baseline,stable,"physical successor order must not change relation work");
    }
    System.out.println("SCALAR_RELATIONS_SCALE leaves="+leaves+" "+baseline);

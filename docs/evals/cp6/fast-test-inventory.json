@@ -1222,7 +1222,8 @@
       "independentWeakChoicesShareSuffixesWithoutWorlds",
       "localImagesRestrictionsAndUnionMatchIndependentFiniteRelations",
       "thousandFiniteRelationsPreserveAlgebraAndCanonicality",
-      "cachedComponentSizesMatchFullDagTraversalWithoutLosingSharedSuffixes"
+      "cachedComponentSizesMatchFullDagTraversalWithoutLosingSharedSuffixes",
+      "retainingStableRootsReclaimsOnlySupersededCanonicalHistory"
     ],
     "io.github.gustavo2358.analysis.values.EpR2TransferTest": [
       "mayBeforeAndAfterExactWriteCannotEraseItsSupportedValue",
