@@ -17,13 +17,13 @@ final class PagedJsonInputStorageTest {
     @Test void coldOrdinalsAndDecodedNameEqualityAreExactWithoutQueryInsertion() {
         var r=resources(Long.MAX_VALUE);
         try(var pages=new FilePageStore(directory,4096,4,r,AnalysisResources.Phase.DECODE);var storage=new PagedJsonInputStorage(pages,r)) {
-            for(int i=0;i<4096;i++)storage.child(1,i,100000L+i);
+            for(int i=0;i<16384;i++)storage.child(1,i,100000L+i);
             text(storage,2,0,"é");text(storage,3,1,"é");text(storage,4,2,"é");
             assertTrue(storage.firstField(1,2));assertFalse(storage.firstField(1,3));assertTrue(storage.firstField(1,4));assertTrue(storage.firstField(2,3));
             long heap=r.heapUsed(),temporary=r.used(AnalysisResources.Pool.TEMPORARY),pagesIssued=pages.statistics().pagesIssued();
-            for(int q=0;q<8192;q++){int at=(q*2731)&4095;assertEquals(100000L+at,storage.child(1,at));}
+            for(int q=0;q<32768;q++){int at=(q*2731)&16383;assertEquals(100000L+at,storage.child(1,at));}
             assertEquals(heap,r.heapUsed());assertEquals(temporary,r.used(AnalysisResources.Pool.TEMPORARY));assertEquals(pagesIssued,pages.statistics().pagesIssued());assertTrue(temporary>65536);assertTrue(r.heapPeak()<=65536);
-            System.out.println("PAGED_JSON_INDEX heap="+r.heapPeak()+" temporary="+temporary+" rows=4096 reads=8192");
+            System.out.println("PAGED_JSON_INDEX heap="+r.heapPeak()+" temporary="+temporary+" rows=16384 reads=32768");
         }
         zero(r);
     }
@@ -61,6 +61,51 @@ final class PagedJsonInputStorageTest {
             }
             zero(r);
         }
+    }
+    @Test void fixedContainerQueriesHaveOnlyBoundedColumnAddressingCost() {
+        for(int n:new int[]{1,16,64,256,1024,4096}) {
+            var r=resources(Long.MAX_VALUE);
+            try(var pages=new FilePageStore(directory,4096,4,r,AnalysisResources.Phase.DECODE)) {
+                var observed=new CountingPages(pages);
+                try(var storage=new PagedJsonInputStorage(observed,r)) {
+                    storage.child(1,0,777);
+                    for(int i=0;i<n;i++)storage.child(i+2,0,10000L+i);
+                    for(int q=0;q<8;q++)assertEquals(777,storage.child(1,0));
+                    long before=r.workUsed(),reads=observed.reads;
+                    for(int q=0;q<64;q++)assertEquals(777,storage.child(1,0));
+                    long queryWork=r.workUsed()-before,queryReads=observed.reads-reads;
+                    // Four primitive words: count, root, height and selected child. Sparse
+                    // columns here need at most two directory levels (address <2^24).
+                    // Count logical page reads, independently of backend checksum/I/O WORK.
+                    assertTrue(queryReads<=64L*4*3,"fixed lookup has at most four leaf paths of three pages N="+n+" reads="+queryReads);
+                    System.out.println("PAGED_JSON_LOCAL_QUERY unrelated="+n+" logicalReads="+queryReads+" totalWork="+queryWork);
+                }
+            }
+            zero(r);
+        }
+    }
+    private static final class CountingPages implements PageStore {
+        final PageStore delegate;long reads;
+        CountingPages(PageStore delegate){this.delegate=delegate;}
+        public int pageBytes(){return delegate.pageBytes();}public long allocate(){return delegate.allocate();}
+        public void read(long page,int offset,byte[] value,int start,int size){reads++;delegate.read(page,offset,value,start,size);}
+        public void write(long page,int offset,byte[] value,int start,int size){delegate.write(page,offset,value,start,size);}
+        public void release(long page){delegate.release(page);}public void flush(){delegate.flush();}
+        public void readForCleanup(long page,int offset,byte[] value,int start,int size){delegate.readForCleanup(page,offset,value,start,size);}
+        public void releaseForCleanup(long page){delegate.releaseForCleanup(page);}public Statistics statistics(){return delegate.statistics();}public void close(){delegate.close();}
+    }
+    @Test void interleavedContainersAndGrowingExactNameSetsPreserveIndependentOccurrences() {
+        var r=resources(Long.MAX_VALUE);
+        try(var pages=new FilePageStore(directory,4096,4,r,AnalysisResources.Phase.DECODE);var storage=new PagedJsonInputStorage(pages,r)) {
+            long start=0;
+            for(int i=0;i<1024;i++) {
+                storage.child(1,i,10000L+i);storage.child(2,i,20000L+i);
+                String name="f"+i;long token=1000L+i;text(storage,token,start,name);start+=name.length();
+                assertTrue(storage.firstField(1,token));assertTrue(storage.firstField(2,token));
+            }
+            for(int q=0;q<2048;q++){int at=(q*2731)&1023;assertEquals(10000L+at,storage.child(1,at));assertEquals(20000L+at,storage.child(2,at));assertFalse(storage.firstField(1,1000L+at));assertFalse(storage.firstField(2,1000L+at));}
+        }
+        zero(r);
     }
     private static void sequence(PagedJsonInputStorage storage){text(storage,1,0,"a");text(storage,2,1,"a");storage.child(10,0,1);assertEquals(1,storage.child(10,0));assertTrue(storage.firstField(10,1));assertFalse(storage.firstField(10,2));}
     private static void text(PagedJsonInputStorage storage,long token,long start,String value){long base=(token-1)*8;storage.set(AirJson.InputStorage.Column.NODES,base,2);storage.set(AirJson.InputStorage.Column.NODES,base+4,start);storage.set(AirJson.InputStorage.Column.NODES,base+5,value.length());for(int i=0;i<value.length();i++){long at=start+i,word=at>>>2,shift=(at&3)*16,old=storage.get(AirJson.InputStorage.Column.CHARACTERS,word);storage.set(AirJson.InputStorage.Column.CHARACTERS,word,(old&~(65535L<<shift))|((long)value.charAt(i)<<shift));}}

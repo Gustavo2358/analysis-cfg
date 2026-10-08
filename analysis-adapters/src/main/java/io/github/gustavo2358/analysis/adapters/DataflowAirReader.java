@@ -36,7 +36,7 @@ public final class DataflowAirReader {
         Throwable primary=null;
         try {
             var digest=digest();
-            try(var pages=new FilePageStore(directory,4096,4,resources,io.github.gustavo2358.analysis.solver.AnalysisResources.Phase.DECODE);
+            try(var pages=new FilePageStore(directory,4096,decodeCachePages(resources),resources,io.github.gustavo2358.analysis.solver.AnalysisResources.Phase.DECODE);
                 var input=new CountedInput(JsonFiles.input(path),digest)) {
                 var staging=new PagedJsonInputStorage(pages,resources);
                 var checked=partialAnalysis?codec.decodeCheckedForPartialAnalysis(input,staging):codec.decodeChecked(input,staging);
@@ -45,6 +45,13 @@ public final class DataflowAirReader {
         }catch(io.github.gustavo2358.analysis.solver.PageStore.Failure failure){var io=new IOException("paged AIR input storage failure: "+failure.reason(),failure);primary=io;throw io;}
         catch(IOException|RuntimeException|Error failure){primary=failure;throw failure;}
         finally{try{Files.deleteIfExists(directory);}catch(IOException cleanup){if(primary!=null)primary.addSuppressed(cleanup);else throw cleanup;}}
+    }
+    /** Fixed cache chosen from the available staging budget, independently of document size. */
+    private static int decodeCachePages(io.github.gustavo2358.analysis.solver.AnalysisResources resources){
+        long available=resources.limits().heapBytes()-resources.heapUsed();
+        long capacity=Math.max(1,(available/3-512)/4256);int pages=1;
+        while(pages<4096&&(long)pages*2<=capacity)pages*=2;
+        return pages;
     }
     private static java.security.MessageDigest digest(){try{return java.security.MessageDigest.getInstance("SHA-256");}catch(java.security.NoSuchAlgorithmException failure){throw new IllegalStateException(failure);}}
     private static final class CountedInput extends java.security.DigestInputStream {
