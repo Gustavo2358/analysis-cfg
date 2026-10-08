@@ -47,6 +47,12 @@ final class PagedSnapshotLabelStorageTest {
         assertEquals(0,resources.heapUsed());assertEquals(0,resources.used(AnalysisResources.Pool.TEMPORARY));
     }
     @Test void typedSharedLocalScopesAndProjectedErrorsMatchBothInputBackends() {
+        Publication p=sharedScopePublication();
+        var memoryResources=resources(32_000_000,1_000_000_000);var fileResources=resources(131072,1_000_000_000);
+        try(var memory=new MemoryPageStore(128,memoryResources);var file=new FilePageStore(directory,128,1,fileResources)){assertTyped(p,memory,memoryResources,false);assertTyped(p,file,fileResources,true);}
+        assertEquals(0,memoryResources.heapUsed());assertEquals(0,fileResources.heapUsed());
+    }
+    static Publication sharedScopePublication() {
         Publication p=PagedAirStorageTest.publication("local labels");Unit body=p.units().get(0);var labels=new ArrayList<Ids.LabelId>();
         var foreign=new Ids.UnitId(new Ids.PublicationId("other"),body.id().localId());
         for(int n=0;n<512;n++)labels.add(n%4==0?new Ids.LabelId(foreign,"missing"):body.sequences().get(0).label());
@@ -56,9 +62,7 @@ final class PagedSnapshotLabelStorageTest {
         var sequence=new Sequence(seed.label(),List.of(),op,body.origin());
         var unit=new Unit(body.id(),body.containingUnit(),body.objects(),body.visibleObjects(),body.entries(),List.of(sequence),body.completionPorts(),body.body(),body.bodyUnavailable(),body.coverage(),body.origin());
         p=new Publication(p.id(),p.airVersion(),p.capabilities(),p.artifacts(),List.of(unit),p.storage(),p.resources(),p.artifactRelations(),p.origins(),p.coverage(),p.uncertainties(),p.premises());
-        var memoryResources=resources(32_000_000,1_000_000_000);var fileResources=resources(131072,1_000_000_000);
-        try(var memory=new MemoryPageStore(128,memoryResources);var file=new FilePageStore(directory,128,1,fileResources)){assertTyped(p,memory,memoryResources,false);assertTyped(p,file,fileResources,true);}
-        assertEquals(0,memoryResources.heapUsed());assertEquals(0,fileResources.heapUsed());
+        return p;
     }
     private static void assertTyped(Publication p,PageStore pages,AnalysisResources resources,boolean paged) {
         try(var resident=AirSnapshot.fromPublication(p);var builder=new AirSnapshotBuilder(new PagedAirStorage(pages,resources,AnalysisResources.Phase.DECODE))) {

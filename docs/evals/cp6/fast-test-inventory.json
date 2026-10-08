@@ -445,6 +445,13 @@
       "typedSharedLocalScopesAndProjectedErrorsMatchBothInputBackends",
       "everyWorkInterruptionAndUnfinishedMutationFailsClosedAndReleasesPages",
       "deniedConstructionAndEmptyOrdinalQueriesNeverLeakOrPublishPartialTables"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedSnapshotReferenceStorageTest": [
+      "coldSuccessfulAndInvalidRootsHaveExactRecipeKeysAndReadonlyMisses",
+      "typedReferenceRootsAndCarryAssemblyPreserveBothInputBackends",
+      "everyPrimitiveWorkFailureAbortsTheMemoAndReleasesPages",
+      "unfinishedReuseAndDoubleFinishNeverBecomeSuccessfulEmptyEvidence",
+      "deniedConstructionReturnsEveryTransferredLease"
     ]
   },
   "analysis-dataflow": {

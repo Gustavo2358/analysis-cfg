@@ -1211,3 +1211,6 @@ exact kind totals and bounded prefix cursors; complete admission remains pending
 
 [Contextual local-label references](air-scale-local-labels.md) share Unit postings
 and select lazy diagnostic complements without replaying each label list per context.
+
+[Shared actual reference roots](air-scale-reference-lists.md) cache successful empty
+results and build ordered missing occurrences with a primitive carry forest.
