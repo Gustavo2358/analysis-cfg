@@ -388,6 +388,11 @@
     "io.github.gustavo2358.analysis.solver.PagedCleanupStorageTest": [
       "spentWorkCannotPreventSpilledArrayFromReleasingBorrowedPages",
       "closingTemporaryBackendDoesNotRequireWritingDiscardedDirtyPayload"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedSnapshotIdentityStorageTest": [
+      "completeTypedNamespacesAndUnicodeAgreeAcrossResidentAndOnePageStores",
+      "exactIdentityPayloadExceedsManagedResidencyAndMemoizationAvoidsRepeatedWork",
+      "failedConstructionAndSpentWorkReleaseOwnedIndexesWithoutClosingBorrowedInput"
     ]
   },
   "analysis-dataflow": {

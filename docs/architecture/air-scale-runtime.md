@@ -1182,3 +1182,7 @@ an index, never an equality oracle. Encoded equal/complement handles answer equa
 before SAT search. The unchanged40KB one-page law remains intact.
 
 Condition canonicalization now has a focused [partial-assignment reduction design](air-scale-condition-reduction.md). Its local laws do not complete WORK-AIR-SCALE.
+
+The [paged AIR identity-key bridge](air-scale-snapshot-identities.md) shares this
+ledger/page runtime with official snapshot access. It qualifies exact bounded
+index storage; complete paged Validator/streamed admission remains pending.

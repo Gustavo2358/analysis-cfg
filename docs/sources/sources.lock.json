@@ -150,7 +150,7 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "3bb2d55e7912ff34ee5185a2be51ab71a1a20b56",
+    "commit": "5c41a64a9838bb934218f918fe7bd8d0f4325c7a",
     "canonical_ref": "feat/paged-air-snapshot",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
@@ -202,9 +202,11 @@
       "air-model/src/main/java/io/github/gustavo2358/air/model/AirSnapshotBuilder.java",
       "air-model/src/main/java/io/github/gustavo2358/air/model/PublicationProjection.java",
       "air-model/src/main/java/io/github/gustavo2358/air/model/PublicationSource.java",
-      "docs/architecture/paged-snapshot.md"
+      "docs/architecture/paged-snapshot.md",
+      "air-model/src/main/java/io/github/gustavo2358/air/validation/SnapshotIdentityKeys.java",
+      "docs/architecture/paged-identity-keys.md"
     ],
-    "observed_on": "2026-10-06",
+    "observed_on": "2026-10-07",
     "modules": {
       "parent": {
         "path": "pom.xml",
@@ -226,10 +228,10 @@
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "logical_text_w2": "Local producer FAST PASS; fixed logical ranges and expression transport. Selected source E2E qualification in docs/product/logical-text-w2.md.",
-    "evidence_level": "Additive typed AIR access/builder checkpoint: producer FAST 197 model + 143 transport checks and boundaries PASS; index mutation rejected and exact original restored. Page-backed bridge, complete paged Validator and codec pending; human review pending.",
+    "evidence_level": "Additive exact paged snapshot identity keys; producer FAST 199 model and 143 transport checks plus boundaries PASS. Complete paged Validator/codec and managed CLI remain pending.",
     "status": "LOCAL_CHECKPOINT / HUMAN_REVIEW_PENDING",
     "ci": {
-      "checked_commit": "3bb2d55e7912ff34ee5185a2be51ab71a1a20b56",
+      "checked_commit": "5c41a64a9838bb934218f918fe7bd8d0f4325c7a",
       "status": "NOT_RUN",
       "context": "local producer FAST only; draft PR 30"
     },
@@ -240,8 +242,8 @@
       "api_impact": "COMPATIBLE",
       "old_production_files_unchanged": 51,
       "all_three_poms_unchanged": true,
-      "validation": "197 model + 143 transport checks; producer FAST 25.008s; leased linear collection cursors; denied scratch leaves facts intact",
-      "limits": "Typed builder/storage access only; no complete paged validation/JSON/CLI claim."
+      "validation": "199 model and 143 transport checks; final producer FAST 28.916s. Independent complete namespace/collision/Unicode/shared-prefix/failure laws PASS.",
+      "limits": "Official snapshot access/builder and complete identity-key foundation only; no complete paged validation/JSON/CLI claim."
     }
   },
   "proleap_poc": {
