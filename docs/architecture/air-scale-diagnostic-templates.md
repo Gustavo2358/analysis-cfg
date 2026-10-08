@@ -25,7 +25,9 @@ queryWork1165824 and no live-page/temp/heap growth during queries.
 
 33adapter laws and selected reactor neighbors passed55.341s (raw harness elapsed
 in artifacts); mandatory consumer FAST1056methods/zero failures/errors/skips passed385.130s.
-Clean committed CLI parity remains pending. Producer
+Clean compiled checkpointd3c7e6834cedb2095329d13f68e8c17ddfaf7ca9 then passed
+3public products/6actual CLI executions with full dependency/support semantic parity
+versus the preserved frozen729baseline; only two old work-counter maps are excluded. Producer
 mandatory FAST240model/143transport/43policy passed36.000s. Isolated compiled
 reversed-child reads lose the independent literal issue order; treating a source
 anchor as a tuple reference rejects the valid64-bit anchor. Original passes again.
