@@ -44,3 +44,10 @@ The first consumer FAST stopped at missing adapter inventory registration; the
 second had two exact CLI stderr failures from JAVA_TOOL_OPTIONS startup banners.
 Both are preserved. Explicit tool/Maven/fork limits replaced the environment banner
 without changing test assertions, deny rules, quotas or algorithm inputs.
+
+The consumer now pins producer `94a3fb0bdfa36c2240891c996b8f2df1e0b67949`.
+Identity storage is unchanged from the preceding checkpoint; the producer adds
+[direct typed occurrence traversal](https://github.com/Gustavo2358/air-java/blob/94a3fb0bdfa36c2240891c996b8f2df1e0b67949/docs/architecture/paged-operand-traversal.md)
+and exact frozen cursor cardinality. A traversal-only 64-root fixture runs through
+both resident and one-page backends, preserving order and releasing scratch on a
+callback failure. It does not establish complete structural admission.

@@ -74,6 +74,55 @@ final class PagedAirStorageTest {
         assertEquals(0, pages.statistics().livePages());
     }
 
+    @Test void primitiveOccurrenceTraversalPreservesOrderAndReleasesCursorOnCallbackFailureAcrossBackends() {
+        var p = publication("small synthetic traversal input"); var body = p.units().get(0);
+        var originalSequence = body.sequences().get(0); var operationHeader = originalSequence.terminator().header();
+        var values = new java.util.ArrayList<Expression>();
+        for (int n=0;n<64;n++) values.add(new Expressions.Literal(
+            new Operand.Header(new Ids.OperandId(new Ids.OperationOwner(operationHeader.id()),"value-"+n),Operand.Role.VALUE_READ,body.origin()),
+            new Values.TextValue("v"+n)));
+        var sequence = new Sequence(originalSequence.label(),List.of(),new Operations.Return(operationHeader,values),body.origin());
+        var unit = new Unit(body.id(),body.containingUnit(),body.objects(),body.visibleObjects(),body.entries(),List.of(sequence),body.completionPorts(),
+            body.body(),body.bodyUnavailable(),body.coverage(),body.origin());
+        // A traversal-only fixture, not an admission certificate: signature/type rules are separate.
+        p = new Publication(p.id(),p.airVersion(),p.capabilities(),p.artifacts(),List.of(unit),p.storage(),p.resources(),p.artifactRelations(),p.origins(),p.coverage(),p.uncertainties(),p.premises());
+        var memoryResources = resources(32_000_000); var fileResources = resources(32768);
+        try (var memory = new MemoryPageStore(128,memoryResources);
+             var file = new FilePageStore(directory,128,1,fileResources)) {
+            assertTraversal(p,memory,memoryResources); assertTraversal(p,file,fileResources);
+            assertTrue(file.statistics().evictions()>0); assertTrue(fileResources.heapPeak()<=32768);
+        }
+        assertEquals(0,memoryResources.heapUsed()); assertEquals(0,fileResources.heapUsed());
+    }
+    private static void assertTraversal(Publication p,PageStore pages,AnalysisResources resources) {
+        try (var original = AirSnapshot.fromPublication(p);
+             var builder = new AirSnapshotBuilder(new PagedAirStorage(pages,resources,AnalysisResources.Phase.DECODE))) {
+            long root = copy(original,original.root(),null,builder);
+            try (var snapshot = builder.finish(root)) {
+                long unit = snapshot.element(snapshot.field(root,AirShape.PUBLICATION,4),AirShape.UNIT,0);
+                long sequence = snapshot.element(snapshot.field(unit,AirShape.UNIT,5),AirShape.SEQUENCE,0);
+                long operation = snapshot.field(sequence,AirShape.SEQUENCE,2);
+                long scratch = resources.used(AnalysisResources.Pool.SCRATCH); int[] seen = {0};
+                SnapshotOperands.roots(snapshot,operation,value -> {
+                    assertEquals(AirShape.EXPRESSIONS_LITERAL,snapshot.shape(value));
+                    long header = snapshot.field(value,AirShape.EXPRESSIONS_LITERAL,0);
+                    long id = snapshot.field(header,AirShape.OPERAND_HEADER,0);
+                    long local = snapshot.field(id,AirShape.IDS_OPERAND_ID,1); char[] text = new char[16];
+                    int count = snapshot.readCharacters(local,0,text,0,text.length);
+                    assertEquals("value-"+seen[0]++,new String(text,0,count));
+                    SnapshotOperands.children(snapshot,value,child -> fail("literal has no operand children"));
+                });
+                assertEquals(64,seen[0]); assertEquals(scratch,resources.used(AnalysisResources.Pool.SCRATCH));
+                var failure = new IllegalStateException("injected callback failure");
+                assertSame(failure,assertThrows(IllegalStateException.class,() ->
+                    SnapshotOperands.roots(snapshot,operation,value -> { throw failure; })));
+                assertEquals(scratch,resources.used(AnalysisResources.Pool.SCRATCH));
+                assertEquals(AirShape.PUBLICATION,snapshot.shape(root));
+            }
+        }
+        assertEquals(0,pages.statistics().livePages());
+    }
+
     @Test void failedColumnConstructionReleasesEveryPreviouslyReservedOwner() {
         var resources = resources(6000);
         try (var pages = new FilePageStore(directory, 128, 1, resources)) {

@@ -318,7 +318,8 @@
     "io.github.gustavo2358.analysis.adapters.PagedAirStorageTest": [
       "typedAirPayloadLargerThanManagedHeapMatchesBothBackendsAndIndependentUnicodeFacts",
       "failedColumnConstructionReleasesEveryPreviouslyReservedOwner",
-      "operationalWriteFailureAbortsTypedConstructionAndFinalOwnerCleansDisk"
+      "operationalWriteFailureAbortsTypedConstructionAndFinalOwnerCleansDisk",
+      "primitiveOccurrenceTraversalPreservesOrderAndReleasesCursorOnCallbackFailureAcrossBackends"
     ],
     "io.github.gustavo2358.analysis.adapters.PersistentLongMapTest": [
       "residentAndForcedSpillVersionsMatchIndependentOrderedMaps",
