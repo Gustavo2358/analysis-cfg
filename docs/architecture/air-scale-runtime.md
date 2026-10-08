@@ -1186,3 +1186,7 @@ Condition canonicalization now has a focused [partial-assignment reduction desig
 The [paged AIR identity-key bridge](air-scale-snapshot-identities.md) shares this
 ledger/page runtime with official snapshot access. It qualifies exact bounded
 index storage; complete paged Validator/streamed admission remains pending.
+
+The [paged declaration bridge](air-scale-snapshot-declarations.md) stores all
+declaration rows and occurrence frontiers in the shared runtime, releasing consumed
+rows and sealing the catalogue before read-only queries. Complete admission is pending.

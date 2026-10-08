@@ -151,7 +151,7 @@ final class PagedAirStorageTest {
         assertEquals(0, resources.used(AnalysisResources.Pool.OPEN_FILES));
     }
 
-    private static Publication publication(String reason) {
+    static Publication publication(String reason) {
         var pub = new Ids.PublicationId("paged"); var unit = new Ids.UnitId(pub, "u");
         var origin = new Ids.OriginId(pub, "o"); var label = new Ids.LabelId(unit, "start");
         var scope = new Scopes.UnitScope(unit);
@@ -173,7 +173,7 @@ final class PagedAirStorageTest {
                 new Evidence.Coverage(Evidence.InventoryStatus.COMPLETE, new Scopes.PublicationScope(pub), List.of(), List.of()), List.of(), List.of());
     }
     // Test-only shallow model adapter. Production large-input decode must not construct Publication.
-    private static long copy(AirSnapshot source, long node, AirShape element, AirSnapshotBuilder target) {
+    static long copy(AirSnapshot source, long node, AirShape element, AirSnapshotBuilder target) {
         AirShape shape = source.shape(node);
         return switch (shape.form()) {
             case RECORD -> {

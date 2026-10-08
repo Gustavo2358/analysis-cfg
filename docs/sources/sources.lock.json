@@ -150,7 +150,7 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "94a3fb0bdfa36c2240891c996b8f2df1e0b67949",
+    "commit": "2c69580a7165203446fefb94602738e6d55ad771",
     "canonical_ref": "feat/paged-air-snapshot",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
@@ -228,10 +228,10 @@
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "logical_text_w2": "Local producer FAST PASS; fixed logical ranges and expression transport. Selected source E2E qualification in docs/product/logical-text-w2.md.",
-    "evidence_level": "Exact primitive operand occurrence traversal and cursor cardinality; producer FAST 202 model and 143 transport checks plus boundaries PASS. Complete paged Validator/codec and managed CLI remain pending.",
+    "evidence_level": "Exact primitive declaration/occurrence inventory over complete identity keys; producer FAST 206 model and 143 transport checks plus boundaries PASS. Complete paged Validator/codec and managed CLI remain pending.",
     "status": "LOCAL_CHECKPOINT / HUMAN_REVIEW_PENDING",
     "ci": {
-      "checked_commit": "94a3fb0bdfa36c2240891c996b8f2df1e0b67949",
+      "checked_commit": "2c69580a7165203446fefb94602738e6d55ad771",
       "status": "NOT_RUN",
       "context": "local producer FAST only; draft PR 30"
     },
@@ -242,7 +242,7 @@
       "api_impact": "COMPATIBLE",
       "old_production_files_unchanged": 51,
       "all_three_poms_unchanged": true,
-      "validation": "202 model and 143 transport checks; producer FAST 26.311s. Complete 18 operand/18 operation order oracles, 100000-edge sequential traversal, 64-bit lengths and callback/cardinality cleanup PASS.",
+      "validation": "206 model and 143 transport checks; final producer FAST 29.665s. Declaration/entry-seed/duplicate/owner/deep/wide/failure laws plus actual missing-freeze RED/GREEN PASS.",
       "limits": "Official snapshot access/builder and complete identity-key foundation only; no complete paged validation/JSON/CLI claim."
     }
   },
