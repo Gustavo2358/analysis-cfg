@@ -425,6 +425,13 @@
       "typedGroundedAlternativeAndCyclicNegativesMatchBothInputBackends",
       "everyPrimitiveWorkInterruptionAndDeniedConstructorClosesTransferredState",
       "linkedRowsMustExpandAndUncollectedQueriesNeverCreateFalseFacts"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedSnapshotSignatureStorageTest": [
+      "coldBadRowsHaveSeparateModePrefixesAndReadonlyQueries",
+      "manyDistinctListsKeepLiteralKeysDensePayloadsAndEmptyContextsSeparate",
+      "sharedInvalidSignatureCountsAndMembershipMatchBothInputBackends",
+      "everyWorkInterruptionAndDeniedConstructorReleasesTransferredPages",
+      "unfinishedTablesWrongOrderAndFrozenWritesNeverPublishFacts"
     ]
   },
   "analysis-dataflow": {

@@ -1202,3 +1202,6 @@ degree/reverse-occurrence/FIFO pass; complete reference admission remains pendin
 
 [Shared location grounding](air-scale-grounding.md) collects and saturates managed
 Boolean equations once, then retires topology and preserves reusable truth facts.
+
+[Shared signature positions and membership](air-scale-signatures.md) reuse invalid
+list counts and mode-specific diagnostic prefixes under the same managed ledger.
