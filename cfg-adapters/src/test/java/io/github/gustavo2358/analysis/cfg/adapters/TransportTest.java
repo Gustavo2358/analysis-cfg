@@ -109,7 +109,7 @@ class TransportTest {
         assertEquals(e, exit.entryId());
         assertEquals(List.of(new CfgTransition(entry.id(), sequence.id(), CfgTransition.Kind.ENTRY, e),
                 new CfgTransition(sequence.id(), exit.id(), CfgTransition.Kind.RETURN, e)), graph.transitions());
-        assertEquals(Evidence.InventoryStatus.PARTIAL, graph.publication().coverage().inventory());
+        assertEquals(Evidence.InventoryStatus.PARTIAL, graph.source().publicationInventory());
     }
     @Test void writerMatchesIndependentGoldenBytesAndIsDeterministic() throws Exception {
         byte[] golden = getClass().getResourceAsStream("/cfg/goback.manual.json").readAllBytes();

@@ -149,9 +149,7 @@ class EvalCfg028Test {
             assertSame(instructions.get(i).header(), actual.get(i).header());
         }
         assertSame(initial.instructions(), actual);
-        assertSame(input, graph.publication());
-        assertSame(input.uncertainties(), graph.publication().uncertainties());
-        assertSame(input.origins(), graph.publication().origins());
+        assertEquals(CfgSource.from(input), graph.source());
         assertEquals(List.of(GAP), actual.get(2).header().uncertainties());
         assertEquals(Evidence.PrecisionStatus.OPEN, actual.get(2).header().precision().values().status());
         assertEquals(inputHash, input.hashCode());
@@ -249,9 +247,7 @@ class EvalCfg028Test {
                 base.uncertainties(), base.premises());
         var graph = graph(variant);
         assertEquals(observe(graph(base)), observe(graph));
-        assertSame(displayed, graph.publication().units().getFirst().objects().getFirst());
-        assertSame(variant.origins(), graph.publication().origins());
-        assertNotEquals(base.origins(), graph.publication().origins());
+        assertEquals(CfgSource.from(base), graph.source());
     }
 
     @Test
@@ -453,7 +449,7 @@ class EvalCfg028Test {
         assertSame(graph.entries(), graph.entries());
         assertSame(graph.normalExits(), graph.normalExits());
         assertThrows(UnsupportedOperationException.class, () -> exits.clear());
-        var copied = new CfgGraph(graph.publication(), new ArrayList<>(graph.nodes()), new ArrayList<>(graph.transitions()));
+        var copied = new CfgGraph(graph.source(), new ArrayList<>(graph.nodes()), new ArrayList<>(graph.transitions()));
         assertEquals(graph, copied);
         assertEquals(graph.hashCode(), copied.hashCode());
         assertEquals(exits, copied.haltExits());

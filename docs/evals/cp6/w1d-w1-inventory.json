@@ -423,6 +423,7 @@
       "io.github.gustavo2358.analysis.cfg.domain.CfgNode$OutcomeExit",
       "io.github.gustavo2358.analysis.cfg.domain.CfgNode$SequenceNode",
       "io.github.gustavo2358.analysis.cfg.domain.CfgNodeId",
+      "io.github.gustavo2358.analysis.cfg.domain.CfgSource",
       "io.github.gustavo2358.analysis.cfg.domain.CfgTransition",
       "io.github.gustavo2358.analysis.cfg.domain.CfgTransition$Kind",
       "io.github.gustavo2358.analysis.cfg.domain.CfgTransitionTable",

@@ -39,8 +39,7 @@ class ScalarAssignTest {
         var original = unit.sequences().getFirst();
         var graph = build(publication).graph().orElseThrow();
         var source = assertInstanceOf(CfgNode.SequenceNode.class, graph.nodes().getFirst()).source();
-        assertSame(publication, graph.publication());
-        assertSame(unit, graph.publication().units().getFirst());
+        assertEquals(CfgSource.from(publication), graph.source());
         assertSame(original, source);
         assertEquals(1, source.instructions().size());
         var assign = assertInstanceOf(Operations.Assign.class, source.instructions().getFirst());
@@ -61,13 +60,11 @@ class ScalarAssignTest {
         var object = unit.objects().getFirst();
         // ObjectPlace carries a full ObjectId, not a Java pointer to a declaration.
         assertEquals(object.id(), destination.object());
-        assertSame(object, graph.publication().units().getFirst().objects().getFirst());
         var binding = assertInstanceOf(Memory.CellBinding.class, object.storage());
         assertEquals(new Ids.StorageId(p, "backing-cell"), binding.storage());
         assertEquals(1, publication.storage().size());
         var cell = assertInstanceOf(Memory.Cell.class, publication.storage().getFirst());
         assertEquals(binding.storage(), cell.header().id());
-        assertSame(cell, graph.publication().storage().getFirst());
         var returned = assertInstanceOf(Operations.Return.class, source.terminator());
         assertSame(original.terminator(), returned);
         assertEquals(new Ids.OperationId(u, "leave"), returned.header().id());
@@ -89,14 +86,11 @@ class ScalarAssignTest {
         assertEquals(e, exit.entryId());
         assertEquals(List.of(new CfgTransition(entry.id(), sequence.id(), CfgTransition.Kind.ENTRY, e),
                 new CfgTransition(sequence.id(), exit.id(), CfgTransition.Kind.RETURN, e)), graph.transitions());
-        assertEquals(Evidence.InventoryStatus.PARTIAL, graph.publication().coverage().inventory());
-        assertEquals(Evidence.InventoryStatus.PARTIAL, graph.publication().units().getFirst().coverage().inventory());
-        assertSame(publication.coverage(), graph.publication().coverage());
-        assertSame(publication.units().getFirst().coverage(), graph.publication().units().getFirst().coverage());
+        assertEquals(Evidence.InventoryStatus.PARTIAL, graph.source().publicationInventory());
+        assertEquals(Evidence.InventoryStatus.PARTIAL, graph.source().units().getFirst().inventory());
         assertFalse(publication.uncertainties().isEmpty());
-        assertSame(publication.uncertainties(), graph.publication().uncertainties());
-        assertSame(publication.origins(), graph.publication().origins());
-        assertSame(publication.premises(), graph.publication().premises());
+        assertEquals(publication.id(),graph.source().publicationId());
+        assertEquals(publication.airVersion(),graph.source().airVersion());
     }
 
     @Test void manualCfgGoldenRemainsTopologyOnlyAndDeterministic() throws Exception {
@@ -154,11 +148,9 @@ class ScalarAssignTest {
         assertEquals(2, graph.transitions().size());
         assertEquals(1, graph.nodes().stream().filter(CfgNode.SequenceNode.class::isInstance).count());
         var retained = ((CfgNode.SequenceNode) graph.nodes().getFirst()).source();
-        assertSame(expanded, graph.publication());
+        assertEquals(CfgSource.from(expanded), graph.source());
         assertSame(sequence, retained);
         assertEquals(4096, retained.instructions().size());
         for (int i = 0; i < instructions.size(); i++) assertSame(instructions.get(i), retained.instructions().get(i));
-        assertSame(unit.objects().getFirst(), graph.publication().units().getFirst().objects().getFirst());
-        assertSame(publication.storage().getFirst(), graph.publication().storage().getFirst());
     }
 }

@@ -5,6 +5,7 @@ import io.github.gustavo2358.air.model.Ids.EntryId;
 import io.github.gustavo2358.air.model.Operations;
 import io.github.gustavo2358.air.model.Publication;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,12 +14,13 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Immutable inventory of projected known control. The original AIR snapshot retains coverage, premises,
- * provenance, operands and gaps. Missing nodes/edges do not prove absence when that inventory is partial.
+ * Immutable inventory of projected known control. Source knowledge is detached from the original AIR
+ * publication. Missing nodes/edges do not prove absence when that inventory is partial.
  */
 public final class CfgGraph {
     private final Map<CfgNodeId,LocalControlRules.Rule> localRules;
-    private final Publication publication;
+    private final CfgSource source;
+    private final WeakReference<Publication> sourceWitness;
     private final List<CfgNode> nodes;
     private final List<CfgTransition> transitions;
     private final List<CfgNode.EntryNode> entries;
@@ -27,10 +29,26 @@ public final class CfgGraph {
     private final List<Capabilities.Capability> preciseControlCapabilities;
 
     public CfgGraph(Publication publication, List<CfgNode> nodes, List<CfgTransition> transitions) {
-        this.publication = Objects.requireNonNull(publication, "publication");
+        this(publication, CfgSource.from(publication), nodes, transitions);
+    }
+
+    public CfgGraph(CfgSource source, List<CfgNode> nodes, List<CfgTransition> transitions) {
+        this(source, nodes, transitions, new WeakReference<>(null));
+    }
+
+    CfgGraph(Publication publication, CfgSource source, List<CfgNode> nodes,
+             List<CfgTransition> transitions) {
+        this(source, nodes, transitions,
+                new WeakReference<>(Objects.requireNonNull(publication, "publication")));
+    }
+
+    private CfgGraph(CfgSource source, List<CfgNode> nodes, List<CfgTransition> transitions,
+                     WeakReference<Publication> sourceWitness) {
+        this.source = Objects.requireNonNull(source, "source");
+        this.sourceWitness = sourceWitness;
         this.nodes = List.copyOf(nodes);
         this.transitions = transitions instanceof CfgTransitionTable table ? table : List.copyOf(transitions);
-        if(this.transitions instanceof CfgTransitionTable table&&table.publication()!=publication)
+        if(this.transitions instanceof CfgTransitionTable table&&!table.source().equals(source))
             throw new IllegalArgumentException("foreign factored projection owner");
         List<CfgNode.EntryNode> entryNodes = new ArrayList<>();
         List<CfgNode.NormalExit> exitNodes = new ArrayList<>();
@@ -38,7 +56,7 @@ public final class CfgGraph {
         Map<EntryId, CfgNode.EntryNode> activationEntries = new HashMap<>();
         Map<CfgNodeId, CfgNode> indexed = new HashMap<>();
         for (CfgNode node : this.nodes) {
-            if (!node.id().publicationId().equals(publication.id())
+            if (!node.id().publicationId().equals(source.publicationId())
                     || indexed.putIfAbsent(node.id(), node) != null) {
                 throw new IllegalArgumentException("duplicate or foreign CFG node ID");
             }
@@ -57,8 +75,7 @@ public final class CfgGraph {
         entries = List.copyOf(entryNodes);
         normalExits = List.copyOf(exitNodes);
         haltExits = List.copyOf(haltNodes);
-        preciseControlCapabilities = publication.capabilities().required().stream()
-                .filter(CoreCfgProjection::supportsControlCapability).distinct().toList();
+        preciseControlCapabilities = source.preciseControlCapabilities();
         var stored=this.transitions instanceof CfgTransitionTable table?table.stored():this.transitions;
         if(this.transitions instanceof CfgTransitionTable table)for(int g=0;g<table.groups();g++)for(int e=0;e<table.entries(g);e++) {
             var binding=table.entry(g,e);var exit=indexed.get(table.normalExit(g,e));
@@ -137,8 +154,13 @@ public final class CfgGraph {
 
     public Map<CfgNodeId,LocalControlRules.Rule> localRules() { return localRules; }
 
-    public Publication publication() {
-        return publication;
+    public CfgSource source() {
+        return source;
+    }
+
+    /** Exact, non-owning admission witness; the graph never keeps the AIR publication alive. */
+    public boolean wasProjectedFrom(Publication publication) {
+        return sourceWitness.get() == publication;
     }
 
     public List<CfgNode> nodes() {
@@ -175,18 +197,18 @@ public final class CfgGraph {
     @Override
     public boolean equals(Object other) {
         return this == other || other instanceof CfgGraph graph
-                && publication.equals(graph.publication)
+                && source.equals(graph.source)
                 && nodes.equals(graph.nodes)
                 && transitions.equals(graph.transitions);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(publication, nodes, transitions);
+        return Objects.hash(source, nodes, transitions);
     }
 
     @Override
     public String toString() {
-        return "CfgGraph[publication=" + publication + ", nodes=" + nodes + ", transitions=" + transitions + "]";
+        return "CfgGraph[source=" + source + ", nodes=" + nodes + ", transitions=" + transitions + "]";
     }
 }

@@ -106,7 +106,8 @@ public final class CoreCfgProjection {
 
     public static CfgGraph project(Publication publication, ProjectionPolicy policy) {
         List<CfgNode> nodes = new ArrayList<>();
-        var table=new CfgTransitionTable.Builder(publication);
+        var source=CfgSource.from(publication);
+        var table=new CfgTransitionTable.Builder(source);
         for (Unit unit : orderedUnits(publication)) {
             Map<LabelId, CfgNode.SequenceNode> sequences = new HashMap<>();
             Map<LabelId, CfgNode.HaltExit> halts = new HashMap<>();
@@ -187,7 +188,7 @@ public final class CoreCfgProjection {
             }
             table.add(unit.id(),entryEdges,normalExits,transitions);
         }
-        return new CfgGraph(publication, nodes, table.build());
+        return new CfgGraph(publication, source, nodes, table.build());
     }
 
     private static List<Unit> orderedUnits(Publication publication) {

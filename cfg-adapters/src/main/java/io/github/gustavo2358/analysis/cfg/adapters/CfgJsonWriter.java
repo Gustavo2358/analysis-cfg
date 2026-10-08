@@ -62,13 +62,13 @@ public final class CfgJsonWriter {
         out.raw(",\"publication\":"); airId(out, result.publicationId());
         out.raw(",\"buildStatus\":\"CFG_BUILT\",\"projectionPolicy\":"); out.string(policy(result.options().projectionPolicy()));
         out.raw(",\"sourceKnowledge\":{\"publicationInventory\":");
-        out.string(inventory(graph.publication().coverage().inventory()));
+        out.string(inventory(graph.source().publicationInventory()));
         out.raw(",\"units\":[");
         boolean comma = false;
-        for (var unit : graph.publication().units()) {
+        for (var unit : graph.source().units()) {
             if (comma) out.raw(","); comma = true;
             out.raw("{\"unit\":"); airId(out, unit.id());
-            out.raw(",\"inventory\":"); out.string(inventory(unit.coverage().inventory())); out.raw("}");
+            out.raw(",\"inventory\":"); out.string(inventory(unit.inventory())); out.raw("}");
         }
         out.raw("]},\"nodes\":["); comma = false;
         for (var node : graph.nodes()) {

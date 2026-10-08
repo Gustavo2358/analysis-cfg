@@ -68,7 +68,9 @@ final class IndexBuilder {
         valid(result.status() != CfgBuildResult.Status.INVALID_IR, "invalid AIR build");
         supported(result.status() == CfgBuildResult.Status.CFG_BUILT, "unsupported CFG build profile");
         CfgGraph graph = result.graph().orElseThrow();
-        valid(graph.publication() == snapshot, "foreign Publication instance");
+        valid(graph.wasProjectedFrom(snapshot)
+                && graph.source().publicationId().equals(snapshot.id())
+                && graph.source().airVersion().equals(snapshot.airVersion()), "foreign CFG source");
         supported(snapshot.airVersion().equals(SemanticVersion.AIR_2_0_0), "unsupported AIR version");
         var namePolicies = NamePolicies.extensions(snapshot);
         for (var capability : snapshot.capabilities().required()) {

@@ -215,7 +215,7 @@ class EvalCfg025Test {
         Sequence originalSequence = originalSequences.getFirst();
         Entries.Entry originalEntry = originalUnit.entries().getFirst();
         CfgGraph graph = graph(publication);
-        assertSame(publication, graph.publication());
+        assertEquals(CfgSource.from(publication), graph.source());
         assertSame(originalUnits, publication.units());
         assertSame(originalUnit, publication.units().getFirst());
         assertSame(originalSequences, originalUnit.sequences());

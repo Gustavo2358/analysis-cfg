@@ -129,8 +129,13 @@ EXPECTED_PRODUCTION_IMPORTS.update({
         "io.github.gustavo2358.air.model.Ids.EntryId", "java.util.Objects",
     },
     SOURCE_ROOT + "domain/CfgGraph.java": {
-        "io.github.gustavo2358.air.model.Operations", PUBLICATION, "java.util.HashMap",
+        "io.github.gustavo2358.air.model.Operations", PUBLICATION, "java.lang.ref.WeakReference", "java.util.HashMap",
         "java.util.HashSet", "java.util.List", "java.util.Map", "java.util.Objects", "java.util.ArrayList",
+    },
+    SOURCE_ROOT + "domain/CfgSource.java": {
+        "io.github.gustavo2358.air.model.Capabilities", "io.github.gustavo2358.air.model.Evidence",
+        "io.github.gustavo2358.air.model.Ids.PublicationId", "io.github.gustavo2358.air.model.Ids.UnitId",
+        PUBLICATION, "io.github.gustavo2358.air.model.SemanticVersion", "java.util.List", "java.util.Objects",
     },
     SOURCE_ROOT + "domain/CfgProjectionIssue.java": {
         "io.github.gustavo2358.air.model.Ids.Id", "java.util.Objects",
@@ -145,7 +150,7 @@ EXPECTED_PRODUCTION_IMPORTS.update({
     },
 })
 EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CfgTransitionTable.java"] = {
-    PUBLICATION, "io.github.gustavo2358.air.model.Ids.UnitId", "java.util.AbstractList", "java.util.ArrayList",
+    "io.github.gustavo2358.air.model.Ids.UnitId", "java.util.AbstractList", "java.util.ArrayList",
     "java.util.Arrays", "java.util.List", "java.util.Objects", "java.util.RandomAccess",
 }
 EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CfgNode.java"].add(
@@ -169,6 +174,7 @@ CFG_CLASS_NAMES = {
     "LocalControlRules$Resume", "LocalControlRules$Unwind", "LocalControlRules$Stack", "LocalControlRules$Step", "LocalControlRules$RecursiveActivation",
     "CfgNodeId", "CfgNode", "CfgNode$EntryNode", "CfgNode$SequenceNode", "CfgNode$NormalExit", "CfgNode$HaltExit", "CfgNode$OutcomeExit",
     "CfgTransitionTable", "CfgTransitionTable$Builder", "CfgTransitionTable$Group", "CfgTransition", "CfgTransition$Kind", "CfgGraph", "CfgGraph$1",
+    "CfgSource", "CfgSource$UnitInventory",
     "CfgProjectionIssue", "CfgProjectionIssue$Code", "CoreCfgProjection", "ProjectionPolicy",
 }
 EXPECTED_CLASSFILES = {
@@ -732,6 +738,10 @@ def verify_javap(javap: str, root: Path, classes: Path, air_jar: Path) -> None:
             raise GateFailure("CfgGraph must expose its typed " + method + " inventory")
     if "java.util.List<io.github.gustavo2358.air.model.Capabilities$Capability> preciseControlCapabilities()" not in graph:
         raise GateFailure("CfgGraph must declare capability consumption scoped to precise control")
+    require_descriptor(graph, "()Lio/github/gustavo2358/analysis/cfg/domain/CfgSource;", "CfgGraph.source")
+    require_descriptor(graph, "(Lio/github/gustavo2358/air/model/Publication;)Z", "CfgGraph.wasProjectedFrom")
+    if "io.github.gustavo2358.air.model.Publication publication" in graph:
+        raise GateFailure("CfgGraph must not retain the full AIR Publication")
 
     preflight = run(
         [javap, "-classpath", classpath, "-verbose", "-c", "-p", "-s", PREFLIGHT_CLASS],

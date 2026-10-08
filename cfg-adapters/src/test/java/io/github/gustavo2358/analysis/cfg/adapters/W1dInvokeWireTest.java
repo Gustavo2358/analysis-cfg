@@ -80,6 +80,6 @@ final class W1dInvokeWireTest {
     private static CfgBuildResult withNodes(CfgBuildResult full, List<CfgNode> nodes) {
         return new CfgBuildResult(full.status(), full.publicationId(), full.airVersion(), full.options(), full.preflight(),
                 full.unsupportedCapabilities(), full.projectionIssues(),
-                Optional.of(new CfgGraph(full.graph().orElseThrow().publication(), nodes, List.of())));
+                Optional.of(new CfgGraph(full.graph().orElseThrow().source(), nodes, List.of())));
     }
 }

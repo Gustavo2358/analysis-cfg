@@ -1,6 +1,5 @@
 package io.github.gustavo2358.analysis.cfg.domain;
 
-import io.github.gustavo2358.air.model.Publication;
 import io.github.gustavo2358.air.model.Ids.UnitId;
 import java.util.AbstractList;
 import java.util.ArrayList;
@@ -15,22 +14,22 @@ public final class CfgTransitionTable extends AbstractList<CfgTransition> implem
         Group {entries=List.copyOf(entries);exits=List.copyOf(exits);body=List.copyOf(body);}
     }
     static final class Builder {
-        private final Publication publication;
+        private final CfgSource source;
         private final List<Group> groups=new ArrayList<>();
-        Builder(Publication publication){this.publication=publication;}
+        Builder(CfgSource source){this.source=source;}
         void add(UnitId unit,List<CfgTransition> entries,List<CfgNodeId> exits,List<CfgTransition> body) {
             if(entries.size()!=exits.size())throw new IllegalArgumentException("entry/normal-exit bindings");
             if(!entries.isEmpty())groups.add(new Group(unit,entries,exits,body));
         }
-        CfgTransitionTable build(){return new CfgTransitionTable(publication,groups);}
+        CfgTransitionTable build(){return new CfgTransitionTable(source,groups);}
     }
-    private final Publication publication;
+    private final CfgSource source;
     private final Group[] groups;
     private final int[] ends;
     private final List<CfgTransition> stored;
     private final int size;
-    private CfgTransitionTable(Publication publication,List<Group> groups) {
-        this.publication=publication;this.groups=groups.toArray(Group[]::new);ends=new int[groups.size()];
+    private CfgTransitionTable(CfgSource source,List<Group> groups) {
+        this.source=source;this.groups=groups.toArray(Group[]::new);ends=new int[groups.size()];
         long total=0;var rows=new ArrayList<CfgTransition>();
         for(int i=0;i<this.groups.length;i++) {
             var group=this.groups[i];total=Math.addExact(total,Math.multiplyExact((long)group.entries().size(),Math.addExact(1L,group.body().size())));
@@ -45,7 +44,7 @@ public final class CfgTransitionTable extends AbstractList<CfgTransition> implem
     public int entries(int group){return groups[group].entries().size();}
     public CfgTransition entry(int group,int entry){return groups[group].entries().get(entry);}
     public CfgNodeId normalExit(int group,int entry){return groups[group].exits().get(entry);}
-    Publication publication(){return publication;}
+    CfgSource source(){return source;}
     @Override public int size(){return size;}
     @Override public CfgTransition get(int index) {
         Objects.checkIndex(index,size);int low=0,high=ends.length;

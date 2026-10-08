@@ -96,7 +96,7 @@ class EvalCfg030Test {
         assertEquals(ValidationResult.Status.STRUCTURALLY_VALID, result.preflight().status());
         assertEquals(CfgBuildResult.Status.CFG_BUILT, result.status(), () -> result.toString());
         assertTrue(result.projectionIssues().isEmpty());
-        assertSame(p, result.graph().orElseThrow().publication());
+        assertEquals(CfgSource.from(p), result.graph().orElseThrow().source());
         return result.graph().orElseThrow();
     }
     private static BuildOptions options(ProjectionPolicy policy) {
@@ -182,7 +182,7 @@ class EvalCfg030Test {
         Publication p = inventory(publication(List.of()), PARTIAL, COMPLETE);
         CfgGraph graph = built(p, BuildOptions.defaults());
         assertEquals(new Observation(Set.of(), Set.of()), observe(graph));
-        assertEquals(PARTIAL, graph.publication().coverage().inventory());
+        assertEquals(PARTIAL, graph.source().publicationInventory());
         inventoryIssue(p, ProjectionPolicy.STRICT, P);
         inventoryIssue(inventory(publication(List.of()), UNAVAILABLE, COMPLETE), ProjectionPolicy.KNOWN_SUBSET, P);
     }
@@ -320,13 +320,8 @@ class EvalCfg030Test {
         int hash = p.hashCode();
         var graph = built(p, BuildOptions.defaults());
         assertEquals(minimalExpected(), observe(graph));
-        assertSame(p.coverage(), graph.publication().coverage());
-        assertSame(p.units().getFirst().coverage(), graph.publication().units().getFirst().coverage());
-        assertEquals(PARTIAL, graph.publication().units().getFirst().coverage().inventory());
-        assertSame(p.uncertainties(), graph.publication().uncertainties());
-        assertSame(p.origins(), graph.publication().origins());
-        assertSame(p.premises(), graph.publication().premises());
-        assertSame(premise, graph.publication().premises().getFirst());
+        assertEquals(CfgSource.from(p), graph.source());
+        assertEquals(PARTIAL, graph.source().units().getFirst().inventory());
         var seen = graph.nodes().stream().filter(CfgNode.SequenceNode.class::isInstance)
                 .map(CfgNode.SequenceNode.class::cast).findFirst().orElseThrow().source();
         assertSame(sequence, seen);
