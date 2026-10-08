@@ -133,6 +133,44 @@ final class PagedSnapshotIdentityStorageTest {
         }
         assertEquals(0,ledger.heapUsed());assertEquals(0,ledger.used(AnalysisResources.Pool.TEMPORARY));
     }
+    @Test void hugeIntegerOrderAndWhitespaceFactsAgreeAcrossBackendsWithoutPayloadReplay() {
+        var resident=resources(8_000_000);var spilled=resources(65536);
+        try(var memory=new MemoryPageStore(128,resident);var file=new FilePageStore(directory,128,1,spilled)) {
+            assertArrayEquals(integerOrder(memory,resident),integerOrder(file,spilled));assertTrue(spilled.heapPeak()<=65536);
+        }
+        assertEquals(0,resident.heapUsed());assertEquals(0,spilled.heapUsed());
+        assertEquals(0,spilled.used(AnalysisResources.Pool.TEMPORARY));
+    }
+    private static long[] integerOrder(PageStore pages,AnalysisResources ledger) {
+        try(var original=AirSnapshot.fromPublication(publication("P"));
+            var builder=new AirSnapshotBuilder(new PagedAirStorage(pages,ledger,AnalysisResources.Phase.DECODE))) {
+            long first=integer(builder,'7'),second=integer(builder,'8'),blank,nonblank;
+            try(var out=builder.text(AirShape.TEXT)){out.append(new char[]{' ','\t','\n','\u2003'},0,4);blank=out.finish();}
+            try(var out=builder.text(AirShape.TEXT)){out.append(new char[]{'\u00A0'},0,1);nonblank=out.finish();}
+            long root=PagedAirStorageTest.copy(original,original.root(),null,builder);
+            try(var snapshot=builder.finish(root);var keys=new SnapshotIdentityKeys(snapshot,new PagedSnapshotIdentityStorage(pages,ledger))) {
+                long[] result={keys.compareIntegers(first,second),keys.compareIntegers(second,first),keys.compareIntegers(first,first),
+                    keys.atomFact(blank,SnapshotIdentityKeys.AtomFact.NONBLANK),keys.atomFact(nonblank,SnapshotIdentityKeys.AtomFact.NONBLANK)};
+                assertArrayEquals(new long[]{1,-1,0,0,1},result);
+                long work=ledger.workUsed(),live=pages.statistics().livePages();
+                for(int n=0;n<128;n++)assertEquals(1,keys.compareIntegers(first,second));
+                assertEquals(live,pages.statistics().livePages());
+                assertTrue(ledger.workUsed()-work<128L*16384,"comparison replayed a huge integer payload");
+                if(pages instanceof FilePageStore) {
+                    assertTrue(ledger.used(AnalysisResources.Pool.TEMPORARY)>65536);
+                    System.out.println("SNAPSHOT_INTEGER_ORDER_STORAGE_METRICS {\"managedHeapPeak\":"+ledger.heapPeak()+",\"temporaryBytes\":"+ledger.used(AnalysisResources.Pool.TEMPORARY)+",\"queries\":128,\"work\":"+(ledger.workUsed()-work)+"}");
+                }
+                return result;
+            }
+        } finally {assertEquals(0,pages.statistics().livePages());}
+    }
+    private static long integer(AirSnapshotBuilder builder,char last) {
+        try(var out=builder.text(AirShape.INTEGER)) {
+            out.append(new char[]{'-','1'},0,2);char[] zeroes=new char[1024];java.util.Arrays.fill(zeroes,'0');
+            for(int n=0;n<32766;n+=zeroes.length)out.append(zeroes,0,Math.min(zeroes.length,32766-n));
+            out.append(new char[]{last},0,1);return out.finish();
+        }
+    }
     private static long[] check(Publication publication,PageStore pages,AnalysisResources ledger,boolean pressure) {
         long initial=ledger.heapUsed();var handles=new ArrayList<Long>();var expected=new ArrayList<Object>();long[] result;
         try(var snapshot=AirSnapshot.fromPublication(publication);var keys=new SnapshotIdentityKeys(snapshot,new PagedSnapshotIdentityStorage(pages,ledger))) {

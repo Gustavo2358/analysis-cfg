@@ -395,7 +395,8 @@
       "exactIdentityPayloadExceedsManagedResidencyAndMemoizationAvoidsRepeatedWork",
       "failedConstructionAndSpentWorkReleaseOwnedIndexesWithoutClosingBorrowedInput",
       "streamedAtomSummariesMatchAcrossBackendsAndSurvivePayloadLargerThanResidency",
-      "tupleMetadataReadFailureAbortsPortAndKeepsBorrowedSnapshotAvailable"
+      "tupleMetadataReadFailureAbortsPortAndKeepsBorrowedSnapshotAvailable",
+      "hugeIntegerOrderAndWhitespaceFactsAgreeAcrossBackendsWithoutPayloadReplay"
     ],
     "io.github.gustavo2358.analysis.adapters.PagedSnapshotDeclarationsStorageTest": [
       "declarationPayloadAndEveryFrontierOccurrenceSpillWithoutChangingPrimitiveFacts",

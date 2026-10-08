@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: Gustavo2358/air-java
-          ref: ff49c9a3d444b8d7292c8cb3cc30dfc5781d0537
+          ref: 24dd192258ce7410661fae971380965478e03bb4
           token: ${{ secrets.AIR_JAVA_READ_TOKEN }}
           path: .harness-results/build/air-java
           persist-credentials: false

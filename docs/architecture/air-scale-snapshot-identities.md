@@ -81,3 +81,20 @@ including producer resolution, wire oracles and compiled boundaries. The two new
 atom methods passed in the focused run and are now explicitly added to the fixed
 FAST selection. Final expanded FAST passed1032 methods, zero failures/errors/skips,
 312.514s, with the same semantic oracles and boundary deny rules.
+
+The exact producer pin now advances to24dd192258ce7410661fae971380965478e03bb4.
+Cached Java21 blankness extends TEXT facts; cached sign/length and first unequal
+canonical subtree implement exact signed integer order. This does not reparse
+Source characters or reconstruct BigInteger. No unbounded pair-result cache is
+introduced; immutable canonical subtrees and the bounded page cache provide reuse.
+
+The additional backend law compares32769-character signed integers with a shared
+prefix and checks whitespace versus NBSP. Memory/one-page transcripts agree,128
+repeated comparisons allocate no new pages, and file metrics are37088B managed
+peak/423392B temporary/51840work. Focused22 adapter laws and reactor neighbors
+passed27.322s. The new law is explicitly registered in FAST. These fixtures use
+unreachable scalar nodes plus a legal Publication root and qualify scalar/index
+storage, not complete constructor/reference/domain admission or a managed decoder.
+
+Expanded FAST passed1036 methods with zero failures/errors/skips in314.013s,
+including immutable producer resolution, wire oracles and compiled boundaries.
