@@ -200,10 +200,10 @@ class EvalCfg028Test {
         assertEquals(Set.of(en(E), seq(L), seq(TAIL), normal(E)), observe(renamed).nodes().stream()
                 .map(n -> new Node(n.role(), correlation.get(n.correlation())))
                 .collect(java.util.stream.Collectors.toSet()));
-        assertEquals(correlation.get(sequence(renamed, a).terminator().header().id()),
-                sequence(original, L).terminator().header().id());
-        assertEquals(correlation.get(sequence(renamed, b).terminator().header().id()),
-                sequence(original, TAIL).terminator().header().id());
+        assertEquals(correlation.get(sequence(renamed, a).control().operation()),
+                sequence(original, L).control().operation());
+        assertEquals(correlation.get(sequence(renamed, b).control().operation()),
+                sequence(original, TAIL).control().operation());
     }
 
     @Test
@@ -220,8 +220,8 @@ class EvalCfg028Test {
         assertEquals(List.of(first.header().id(),second.header().id()),sequence(whole,L).operations());
         assertEquals(List.of(first.header().id()),sequence(split,L).operations());
         assertEquals(List.of(second.header().id()),sequence(split,TAIL).operations());
-        assertSame(returned, sequence(whole, L).terminator());
-        assertSame(returned, sequence(split, TAIL).terminator());
+        assertEquals(CfgControl.from(returned), sequence(whole, L).control());
+        assertEquals(CfgControl.from(returned), sequence(split, TAIL).control());
         assertEquals(Map.of(L, List.of(first.header().id()), TAIL, List.of(second.header().id())),
                 observe(split).instructions());
         assertEquals(2, split.nodes().stream().filter(CfgNode.SequenceNode.class::isInstance).count());

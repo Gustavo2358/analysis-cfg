@@ -137,16 +137,17 @@ class EvalCfg029Test {
         var predicate = unknown(L, new Types.Known(Types.Builtin.BOOL));
         Publication input = diamond(predicate);
         var original = (Operations.Branch) input.units().getFirst().sequences().getFirst().terminator();
+        var originalPredicate = (Expressions.Unknown) original.predicate();
         int hash = input.hashCode();
         CfgGraph g = graph(input);
-        var seen = (Operations.Branch) sequence(g, L).terminator();
+        var seen = (CfgControl.Branch) sequence(g, L).control();
         assertEquals(diamondExpected(), observe(g));
         assertEquals(CfgSource.from(input), g.source());
-        assertSame(original, seen);
-        assertSame(predicate, seen.predicate());
-        assertSame(predicate.typeRef(), ((Expressions.Unknown) seen.predicate()).typeRef());
-        assertSame(predicate.dependencies(), ((Expressions.Unknown) seen.predicate()).dependencies());
-        assertSame(predicate.dependencies().getFirst(), ((Expressions.Unknown) seen.predicate()).dependencies().getFirst());
+        assertEquals(CfgControl.from(original), seen);
+        assertSame(predicate, originalPredicate);
+        assertSame(predicate.typeRef(), originalPredicate.typeRef());
+        assertSame(predicate.dependencies(), originalPredicate.dependencies());
+        assertSame(predicate.dependencies().getFirst(), originalPredicate.dependencies().getFirst());
         assertSame(Scopes.NoMemory.INSTANCE, predicate.remainingReads());
         assertEquals(GAP, predicate.reason());
         assertEquals(Operand.Role.PREDICATE, predicate.header().role());
@@ -257,7 +258,7 @@ class EvalCfg029Test {
                 Set.of(enter(E, L), edge(L, JOIN, Arm.TRUE, E), edge(L, JOIN, Arm.FALSE, E), ret(JOIN, E)));
         var g = graph(input);
         assertEquals(expected, observe(g));
-        assertSame(predicate, ((Operations.Branch) sequence(g, L).terminator()).predicate());
+        assertEquals(new CfgControl.Branch(branchId(L), JOIN, JOIN), sequence(g, L).control());
         assertEquals(2, g.transitions().stream().filter(t -> t.from().equals(sequence(g, L).id())).count());
     }
 
@@ -282,8 +283,9 @@ class EvalCfg029Test {
         UnitId v = new UnitId(P, "renamed-unit");
         EntryId f = new EntryId(v, "renamed-entry");
         LabelId source = new LabelId(v, "z-source"), yes = new LabelId(v, "a-true"), no = new LabelId(v, "m-false");
-        var renamed = graph(publication(List.of(unit(v, List.of(entry(f, source)),
-                List.of(returning(no), branch(source, bool(source, true), yes, no), returning(yes))))));
+        var renamedInput=publication(List.of(unit(v, List.of(entry(f, source)),
+                List.of(returning(no), branch(source, bool(source, true), yes, no), returning(yes)))));
+        var renamed = graph(renamedInput);
         Map<Id, Id> correlation = Map.of(v, U, f, E, source, L, yes, YES, no, NO,
                 branchId(source), branchId(L), new OperationId(v, "return-a-true"), new OperationId(U, "return-yes"),
                 new OperationId(v, "return-m-false"), new OperationId(U, "return-no"),
@@ -298,10 +300,10 @@ class EvalCfg029Test {
         for (var pair : Map.of(source, L, yes, YES, no, NO).entrySet()) {
             var before = sequence(original, pair.getValue());
             var after = sequence(renamed, pair.getKey());
-            assertEquals(before.terminator().header().id(), correlation.get(after.terminator().header().id()));
-            assertEquals(before.terminator().header().origin(), after.terminator().header().origin());
+            assertEquals(before.control().operation(), correlation.get(after.control().operation()));
         }
-        var p = ((Operations.Branch) sequence(renamed, source).terminator()).predicate();
+        var p = ((Operations.Branch) renamedInput.units().getFirst().sequences().stream()
+                .filter(sequence -> sequence.label().equals(source)).findFirst().orElseThrow().terminator()).predicate();
         assertEquals(bool(L, true).header().id(), correlation.get(p.header().id()));
         assertEquals(ORIGIN, p.header().origin());
         assertEquals(new Values.BoolValue(true), ((Expressions.Literal) p).value());
@@ -322,7 +324,7 @@ class EvalCfg029Test {
         var g = graph(input);
         assertEquals(diamondExpected(), observe(g));
         assertEquals(CfgSource.from(base), g.source(), "presentation-only AIR is not retained by CFG");
-        assertSame(base.units().getFirst().sequences().getFirst().terminator(), sequence(g, L).terminator());
+        assertEquals(CfgControl.from(base.units().getFirst().sequences().getFirst().terminator()), sequence(g, L).control());
     }
 
     @Test
@@ -343,10 +345,8 @@ class EvalCfg029Test {
         assertEquals(List.of(first.header().id(),second.header().id()),sequence(whole,L).operations());
         assertEquals(List.of(first.header().id()),sequence(split,L).operations());
         assertEquals(List.of(second.header().id()),sequence(split,JOIN).operations());
-        assertSame(branch, sequence(whole, L).terminator());
-        assertSame(branch, sequence(split, JOIN).terminator());
-        assertSame(((Operations.Branch) branch).predicate(),
-                ((Operations.Branch) sequence(split, JOIN).terminator()).predicate());
+        assertEquals(CfgControl.from(branch), sequence(whole, L).control());
+        assertEquals(CfgControl.from(branch), sequence(split, JOIN).control());
     }
 
     @Test

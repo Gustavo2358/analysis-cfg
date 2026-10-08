@@ -185,7 +185,9 @@ public final class ReachingDefinitions {
             work.operationTransferred();return operation(state,sequence.terminator());
         }
         @Override public State transferEdge(AnalysisPoint point,CfgTransition edge,State state,DomainWork work) {
-            if(!(point.node().source() instanceof CfgNode.SequenceNode node)||!(node.terminator() instanceof Operations.Invoke invoke))return state;
+            if(!(point.node().source() instanceof CfgNode.SequenceNode))return state;
+            var terminator=owner.session.index().sequence(point.node()).terminator();
+            if(!(terminator instanceof Operations.Invoke invoke))return state;
             if(edge.kind()==CfgTransition.Kind.INVOKE_NORMAL)return apply(state,owner.outcomes.get(invoke).get(Control.NormalOutcome.INSTANCE),false);
             // Open control does not identify the completed outcome. Preserve every possible old definition.
             state=apply(state,owner.otherwise.get(invoke),true);

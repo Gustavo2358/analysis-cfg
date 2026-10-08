@@ -120,7 +120,7 @@ public final class CoreCfgProjection {
                 nodes.add(node);
                 var exits=new ArrayList<CfgNode.OutcomeExit>();
                 for(var alternative:alternatives(sequence.terminator()).stream().filter(CoreCfgProjection::outside).distinct().toList()) {
-                    var end=new CfgNode.OutcomeExit(new CfgNodeId(publication.id(),nodes.size()),sequence.terminator(),(Control.InvocationAlternative)alternative);
+                    var end=new CfgNode.OutcomeExit(new CfgNodeId(publication.id(),nodes.size()),node.control(),(Control.InvocationAlternative)alternative);
                     nodes.add(end);exits.add(end);
                 }
                 outsideNodes.put(sequence.label(),exits);

@@ -323,9 +323,9 @@ class EvalCfg030Test {
         assertEquals(CfgSource.from(p), graph.source());
         assertEquals(PARTIAL, graph.source().units().getFirst().inventory());
         var seen = graph.nodes().stream().filter(CfgNode.SequenceNode.class::isInstance)
-                .map(CfgNode.SequenceNode.class::cast).findFirst().orElseThrow().terminator();
-        assertSame(sequence.terminator(), seen);
-        assertSame(precision, seen.header().precision());
+                .map(CfgNode.SequenceNode.class::cast).findFirst().orElseThrow().control();
+        assertEquals(CfgControl.from(sequence.terminator()), seen);
+        assertSame(precision, sequence.terminator().header().precision());
         assertEquals(hash, p.hashCode());
     }
 

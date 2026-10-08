@@ -247,7 +247,7 @@ final class IndexBuilder {
             switch (source) {
                 case CfgNode.SequenceNode n -> {
                     var sequence=sequences.get(n.label());
-                    valid(sequence != null && sequence.terminator() == n.terminator()
+                    valid(sequence != null && CfgControl.from(sequence.terminator()).equals(n.control())
                             && n.operations().equals(sequence.instructions().stream()
                                     .map(operation -> operation.header().id()).toList()),
                             "foreign/replaced Sequence source");
@@ -334,24 +334,24 @@ final class IndexBuilder {
         }
         if (!(source.source() instanceof CfgNode.SequenceNode node)) return null;
         if(kind==CfgTransition.Kind.EXCEPTION&&target.source() instanceof CfgNode.SequenceNode destination)
-            return OpenControl.alternatives(node.terminator()).stream().anyMatch(a->destination.label().equals(OpenControl.exceptionLabel(a)))?target:null;
-        if(kind==CfgTransition.Kind.CONTROL_EXIT&&!LocalControlRules.local(node.terminator())&&target.source() instanceof CfgNode.OutcomeExit outside)
-            return outside.operation().equals(node.terminator().header().id())&&OpenControl.outside(outside.outcome())
-                &&OpenControl.alternatives(node.terminator()).contains(outside.outcome())?target:null;
-        return switch (node.terminator()) {
-            case Operations.Opaque opaque -> kind == CfgTransition.Kind.OPAQUE_RETURN && opaque.envelope().control().known().contains(Control.ReturnAlternative.INSTANCE)
+            return CfgControl.alternatives(node.control()).stream().anyMatch(a->destination.label().equals(OpenControl.exceptionLabel(a)))?target:null;
+        if(kind==CfgTransition.Kind.CONTROL_EXIT&&!LocalControlRules.local(node.control())&&target.source() instanceof CfgNode.OutcomeExit outside)
+            return outside.operation().equals(node.control().operation())&&OpenControl.outside(outside.outcome())
+                &&CfgControl.alternatives(node.control()).contains(outside.outcome())?target:null;
+        return switch (node.control()) {
+            case CfgControl.Opaque opaque -> kind == CfgTransition.Kind.OPAQUE_RETURN && opaque.alternatives().contains(Control.ReturnAlternative.INSTANCE)
                 ? normalExits.get(activation.id()) : kind == CfgTransition.Kind.OPAQUE_JUMP && target.source() instanceof CfgNode.SequenceNode seq
-                    && OpenControl.opaqueDestination(opaque, seq.label()) ? target : null;
-            case Operations.Jump jump -> kind == CfgTransition.Kind.JUMP ? sequenceNodes.get(jump.destination()) : null;
-            case Operations.Invoke invoke -> kind == CfgTransition.Kind.INVOKE_NORMAL && target.source() instanceof CfgNode.SequenceNode s
-                    && invoke.outcomes().known().stream().anyMatch(o -> o instanceof Control.Normal n && n.label().equals(s.label())) ? target : null;
-            case Operations.Branch branch -> switch (kind) {
+                    && opaque.alternatives().stream().anyMatch(a -> seq.label().equals(OpenControl.alternativeLabel(a))) ? target : null;
+            case CfgControl.Jump jump -> kind == CfgTransition.Kind.JUMP ? sequenceNodes.get(jump.destination()) : null;
+            case CfgControl.Invoke invoke -> kind == CfgTransition.Kind.INVOKE_NORMAL && target.source() instanceof CfgNode.SequenceNode s
+                    && invoke.alternatives().stream().anyMatch(o -> o instanceof Control.Normal n && n.label().equals(s.label())) ? target : null;
+            case CfgControl.Branch branch -> switch (kind) {
                 case BRANCH_TRUE -> sequenceNodes.get(branch.trueDestination());
                 case BRANCH_FALSE -> sequenceNodes.get(branch.falseDestination());
                 default -> null;
             };
-            case Operations.Return ignored -> kind == CfgTransition.Kind.RETURN ? normalExits.get(activation.id()) : null;
-            case Operations.Halt halt -> kind == CfgTransition.Kind.HALT ? haltExits.get(halt.header().id()) : null;
+            case CfgControl.Return ignored -> kind == CfgTransition.Kind.RETURN ? normalExits.get(activation.id()) : null;
+            case CfgControl.Halt halt -> kind == CfgTransition.Kind.HALT ? haltExits.get(halt.operation()) : null;
             default -> throw new IllegalStateException("admitted unsupported terminator");
         };
     }

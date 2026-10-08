@@ -3,8 +3,8 @@ package io.github.gustavo2358.analysis.cfg.adapters;
 import io.github.gustavo2358.air.model.Evidence;
 import io.github.gustavo2358.air.model.Ids;
 import io.github.gustavo2358.air.model.Operations;
-import io.github.gustavo2358.air.model.Terminator;
 import io.github.gustavo2358.analysis.cfg.application.CfgBuildResult;
+import io.github.gustavo2358.analysis.cfg.domain.CfgControl;
 import io.github.gustavo2358.analysis.cfg.domain.CfgNode;
 import io.github.gustavo2358.analysis.cfg.domain.LocalControlRules;
 import io.github.gustavo2358.analysis.cfg.domain.CfgNodeId;
@@ -47,10 +47,10 @@ public final class CfgJsonWriter {
         boolean requiresV4=graph.nodes().stream().anyMatch(CfgNode.OutcomeExit.class::isInstance)
             ||graph.transitions().stream().anyMatch(t->t.kind()==CfgTransition.Kind.EXCEPTION);
         boolean requiresV2 = false;
-        boolean requiresV3 = graph.nodes().stream().anyMatch(n -> n instanceof CfgNode.SequenceNode q && q.terminator() instanceof Operations.Opaque);
+        boolean requiresV3 = graph.nodes().stream().anyMatch(n -> n instanceof CfgNode.SequenceNode q && q.control() instanceof CfgControl.Opaque);
         for (var node : graph.nodes()) {
             if (node instanceof CfgNode.SequenceNode sequence)
-                requiresV2 |= terminatorKind(sequence.terminator()).requiresV2;
+                requiresV2 |= terminatorKind(sequence.control()).requiresV2;
         }
         for (var transition : graph.transitions())
             requiresV2 |= transitionKind(transition.kind()).requiresV2;
@@ -130,11 +130,10 @@ public final class CfgJsonWriter {
             }
             case CfgNode.SequenceNode sequence -> {
                 out.raw(",\"kind\":\"SEQUENCE\",\"label\":"); airId(out, sequence.label());
-                out.raw(",\"terminator\":{\"kind\":"); out.string(terminatorKind(sequence.terminator()).token);
-                out.raw(",\"operation\":"); airId(out, sequence.terminator().header().id());
+                out.raw(",\"terminator\":{\"kind\":"); out.string(terminatorKind(sequence.control()).token);
+                out.raw(",\"operation\":"); airId(out, sequence.control().operation());
                 if(v3) {
-                    boolean open=sequence.terminator() instanceof Operations.Opaque o && o.envelope().control().remainder() instanceof io.github.gustavo2358.air.model.Scopes.WithinControl
-                        || sequence.terminator() instanceof Operations.Invoke i && i.outcomes().remainder() instanceof io.github.gustavo2358.air.model.Scopes.WithinControl;
+                    boolean open=CfgControl.remainder(sequence.control()) instanceof io.github.gustavo2358.air.model.Scopes.WithinControl;
                     out.raw(",\"openControlRemainder\":"+(open?"true":"false"));
                 }
                 out.raw("}");
@@ -264,18 +263,18 @@ public final class CfgJsonWriter {
             case OPAQUE_UNKNOWN, LOCAL -> throw new IllegalArgumentException("symbolic control is retained on AIR");
         };
     }
-    private static WireKind terminatorKind(Terminator terminator) throws CfgJsonException {
-        return switch (terminator) {
-            case Operations.LocalInvoke ignored -> WireKind.LOCAL_INVOKE;
-            case Operations.LocalBoundary ignored -> WireKind.LOCAL_BOUNDARY;
-            case Operations.LocalResume ignored -> WireKind.LOCAL_RESUME;
-            case Operations.LocalUnwind ignored -> WireKind.LOCAL_UNWIND;
-            case Operations.Opaque ignored -> WireKind.OPAQUE;
-            case Operations.Jump ignored -> WireKind.JUMP;
-            case Operations.Branch ignored -> WireKind.BRANCH;
-            case Operations.Return ignored -> WireKind.RETURN;
-            case Operations.Halt ignored -> WireKind.HALT;
-            case Operations.Invoke ignored -> WireKind.INVOKE;
+    private static WireKind terminatorKind(CfgControl control) throws CfgJsonException {
+        return switch (control) {
+            case CfgControl.LocalInvoke ignored -> WireKind.LOCAL_INVOKE;
+            case CfgControl.LocalBoundary ignored -> WireKind.LOCAL_BOUNDARY;
+            case CfgControl.LocalResume ignored -> WireKind.LOCAL_RESUME;
+            case CfgControl.LocalUnwind ignored -> WireKind.LOCAL_UNWIND;
+            case CfgControl.Opaque ignored -> WireKind.OPAQUE;
+            case CfgControl.Jump ignored -> WireKind.JUMP;
+            case CfgControl.Branch ignored -> WireKind.BRANCH;
+            case CfgControl.Return ignored -> WireKind.RETURN;
+            case CfgControl.Halt ignored -> WireKind.HALT;
+            case CfgControl.Invoke ignored -> WireKind.INVOKE;
             default -> throw new CfgJsonException("terminator outside supported CFG JSON contracts");
         };
     }

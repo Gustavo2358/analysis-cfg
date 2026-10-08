@@ -67,9 +67,9 @@ class ScalarAssignTest {
         assertEquals(1, publication.storage().size());
         var cell = assertInstanceOf(Memory.Cell.class, publication.storage().getFirst());
         assertEquals(binding.storage(), cell.header().id());
-        var returned = assertInstanceOf(Operations.Return.class, source.terminator());
-        assertSame(original.terminator(), returned);
-        assertEquals(new Ids.OperationId(u, "leave"), returned.header().id());
+        var returned = assertInstanceOf(Operations.Return.class, original.terminator());
+        assertEquals(CfgControl.from(returned), source.control());
+        assertEquals(new Ids.OperationId(u, "leave"), source.control().operation());
     }
 
     @Test void topologyIsExactlyEntrySequenceReturnAndPartialKnowledgeIsPreserved() throws Exception {
@@ -152,8 +152,9 @@ class ScalarAssignTest {
         var retained = (CfgNode.SequenceNode) graph.nodes().getFirst();
         assertEquals(CfgSource.from(expanded), graph.source());
         assertEquals(sequence.label(), retained.label());
-        assertSame(sequence.terminator(), retained.terminator());
+        assertEquals(CfgControl.from(sequence.terminator()), retained.control());
         assertFalse(java.util.Arrays.stream(CfgNode.SequenceNode.class.getRecordComponents())
-                .anyMatch(component -> component.getType().equals(Sequence.class)));
+                .anyMatch(component -> component.getType().equals(Sequence.class)
+                        || component.getType().equals(Terminator.class)));
     }
 }

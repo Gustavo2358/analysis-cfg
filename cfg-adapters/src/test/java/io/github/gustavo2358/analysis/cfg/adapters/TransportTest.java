@@ -12,6 +12,7 @@ import io.github.gustavo2358.analysis.cfg.application.BuildOptions;
 import io.github.gustavo2358.analysis.cfg.application.CfgBuildCoordinator;
 import io.github.gustavo2358.analysis.cfg.application.CfgBuildResult;
 import io.github.gustavo2358.analysis.cfg.domain.CfgNode;
+import io.github.gustavo2358.analysis.cfg.domain.CfgControl;
 import io.github.gustavo2358.analysis.cfg.domain.CfgTransition;
 import io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy;
 import io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry;
@@ -60,7 +61,7 @@ class TransportTest {
         var body=graph.nodes().stream().filter(n->n instanceof CfgNode.SequenceNode q && q.label().equals(s.label()))
                 .map(n->(CfgNode.SequenceNode)n).findFirst().orElseThrow();
         assertEquals(s.label(),body.label());assertInstanceOf(Operations.CopyBytes.class,restored.units().getFirst().sequences().getFirst().instructions().get(1));
-        assertEquals(call,body.terminator());
+        assertEquals(CfgControl.from(call),body.control());
         assertEquals(List.of(Capabilities.MEMORY_REGIONS,Capabilities.IBM1047),graph.preciseControlCapabilities());
         assertFalse(io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection.supportsControlCapability(new Capabilities.Capability("text.ebcdic.ibm1047","2")));
         assertFalse(io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection.supportsControlCapability(new Capabilities.Capability("text.unknown","1")));
@@ -103,8 +104,8 @@ class TransportTest {
         var e = new Ids.EntryId(u, "primary-entry");
         assertEquals(e, entry.entry());
         assertEquals(new Ids.LabelId(u, "sequence"), sequence.label());
-        assertEquals(new Ids.OperationId(u, "return"), sequence.terminator().header().id());
-        assertInstanceOf(Operations.Return.class, sequence.terminator());
+        assertEquals(new Ids.OperationId(u, "return"), sequence.control().operation());
+        assertInstanceOf(CfgControl.Return.class, sequence.control());
         assertEquals(u, exit.unitId());
         assertEquals(e, exit.entryId());
         assertEquals(List.of(new CfgTransition(entry.id(), sequence.id(), CfgTransition.Kind.ENTRY, e),

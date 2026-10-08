@@ -26,7 +26,7 @@ class ReplayTest {
             long state=anchor;
             if(point.node().source() instanceof CfgNode.SequenceNode node) {
                 var sequence=session.index().sequence(point.node());
-                state=operation(state,node.terminator());
+                state=operation(state,sequence.terminator());
                 for(int i=sequence.instructions().size()-1;i>=0;i--)state=operation(state,sequence.instructions().get(i));
             }
             return state;

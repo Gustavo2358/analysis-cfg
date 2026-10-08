@@ -4,6 +4,7 @@ import io.github.gustavo2358.air.model.*;
 import io.github.gustavo2358.air.model.Ids.*;
 import io.github.gustavo2358.analysis.application.AnalysisProvider;
 import io.github.gustavo2358.analysis.cfg.domain.CfgNode;
+import io.github.gustavo2358.analysis.cfg.domain.CfgControl;
 import io.github.gustavo2358.analysis.plan.*;
 import io.github.gustavo2358.analysis.query.*;
 import io.github.gustavo2358.analysis.solver.*;
@@ -52,8 +53,8 @@ public final class ReachabilityProvider implements AnalysisProvider<LabelId,Reac
                     public Integer transferEdge(AnalysisPoint point,io.github.gustavo2358.analysis.cfg.domain.CfgTransition edge,Integer state,DomainWork work) {
                         if(state==0)return 0;
                         boolean unknown=point.node().source() instanceof CfgNode.SequenceNode sequence
-                            && sequence.terminator() instanceof Operations.Opaque opaque
-                            && opaque.envelope().control().remainder() instanceof Scopes.WithinControl
+                            && sequence.control() instanceof CfgControl.Opaque opaque
+                            && opaque.remainder() instanceof Scopes.WithinControl
                             ||edge.kind()==io.github.gustavo2358.analysis.cfg.domain.CfgTransition.Kind.OPAQUE_UNKNOWN;
                         return unknown?state|2:state;
                     }

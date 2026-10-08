@@ -60,8 +60,9 @@ public final class PossibleValuesAnalysis implements AnalysisDefinition<Possible
         domainWork.operationTransferred();return profile.transferOperation(state,sequence.terminator(),work);
     }
     @Override public PossibleValuesState transferEdge(AnalysisPoint point,CfgTransition edge,PossibleValuesState state,DomainWork domainWork){
-        if(!state.isReached()||!(point.node().source() instanceof CfgNode.SequenceNode node)
-                ||!(node.terminator() instanceof Operations.Branch branch))return state;
+        if(!state.isReached()||!(point.node().source() instanceof CfgNode.SequenceNode))return state;
+        var terminator=profile.session.index().sequence(point.node()).terminator();
+        if(!(terminator instanceof Operations.Branch branch))return state;
         int requested=edge.kind()==CfgTransition.Kind.BRANCH_TRUE?TextPredicate.TRUE:edge.kind()==CfgTransition.Kind.BRANCH_FALSE?TextPredicate.FALSE:TextPredicate.BOTH;
         int possible=TextPredicate.truth(branch.predicate(),place->{
             if(!(place instanceof Places.ObjectPlace named))return TextPredicate.Text.unknown();

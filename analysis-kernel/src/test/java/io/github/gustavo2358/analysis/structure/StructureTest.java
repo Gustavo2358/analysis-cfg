@@ -82,7 +82,7 @@ class StructureTest {
         Map<CfgNodeId,CfgNodeId> ids=new HashMap<>(); long next=Long.MAX_VALUE;
         for(var n:g.nodes()) { ids.put(n.id(),new CfgNodeId(p.id(),next)); next-=1000003; }
         List<CfgNode> nodes=g.nodes().stream().map(n->switch(n) {
-            case CfgNode.SequenceNode q -> (CfgNode)new CfgNode.SequenceNode(ids.get(n.id()),q.label(),q.operations(),q.terminator());
+            case CfgNode.SequenceNode q -> (CfgNode)new CfgNode.SequenceNode(ids.get(n.id()),q.label(),q.operations(),q.control());
             case CfgNode.EntryNode e -> new CfgNode.EntryNode(ids.get(n.id()),e.entry(),e.initialLabel());
             case CfgNode.NormalExit e -> new CfgNode.NormalExit(ids.get(n.id()),e.publicationId(),e.unitId(),e.entryId());
             case CfgNode.OutcomeExit e -> new CfgNode.OutcomeExit(ids.get(n.id()),e.operation(),e.outcome());

@@ -126,11 +126,22 @@ EXPECTED_PRODUCTION_IMPORTS.update({
         "io.github.gustavo2358.air.model.Ids.PublicationId", "io.github.gustavo2358.air.model.Ids.UnitId",
         "io.github.gustavo2358.air.model.Sequence", "java.util.List", "java.util.Objects", "java.util.Optional",
     },
+    SOURCE_ROOT + "domain/CfgControl.java": {
+        "io.github.gustavo2358.air.model.Control",
+        "io.github.gustavo2358.air.model.Ids.CompletionPortId",
+        "io.github.gustavo2358.air.model.Ids.LabelId",
+        "io.github.gustavo2358.air.model.Ids.OperationId",
+        "io.github.gustavo2358.air.model.Operations",
+        "io.github.gustavo2358.air.model.Scopes",
+        "io.github.gustavo2358.air.model.Terminator",
+        "java.math.BigInteger", "java.util.ArrayList", "java.util.List", "java.util.Objects",
+        "java.util.Optional",
+    },
     SOURCE_ROOT + "domain/CfgTransition.java": {
         "io.github.gustavo2358.air.model.Ids.EntryId", "java.util.Objects",
     },
     SOURCE_ROOT + "domain/CfgGraph.java": {
-        "io.github.gustavo2358.air.model.Operations", PUBLICATION, "java.lang.ref.WeakReference", "java.util.HashMap",
+        PUBLICATION, "java.lang.ref.WeakReference", "java.util.HashMap",
         "java.util.HashSet", "java.util.List", "java.util.Map", "java.util.Objects", "java.util.ArrayList",
     },
     SOURCE_ROOT + "domain/CfgSource.java": {
@@ -163,14 +174,17 @@ EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CoreCfgProjection.java"].add(
     "io.github.gustavo2358.air.model.Capabilities")
 EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CoreCfgProjection.java"].update({"io.github.gustavo2358.air.model.Control", "io.github.gustavo2358.air.model.Scopes"})
 EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/LocalControlRules.java"] = {
-    "io.github.gustavo2358.air.model.Control", "io.github.gustavo2358.air.model.Operations",
-    "io.github.gustavo2358.air.model.Terminator", "io.github.gustavo2358.air.model.Ids.OperationId",
+    "io.github.gustavo2358.air.model.Control", "io.github.gustavo2358.air.model.Ids.OperationId",
     "io.github.gustavo2358.air.model.Ids.LabelId", "io.github.gustavo2358.air.model.Ids.CompletionPortId",
     "java.math.BigInteger", "java.util.Collections", "java.util.HashMap", "java.util.LinkedHashMap",
     "java.util.List", "java.util.Map", "java.util.Objects",
     "java.util.Optional",
 }
 CFG_CLASS_NAMES = {
+    "CfgControl", "CfgControl$Jump", "CfgControl$Branch", "CfgControl$Return", "CfgControl$Halt",
+    "CfgControl$Invoke", "CfgControl$Opaque", "CfgControl$ReentryGuard", "CfgControl$ResumeRoute",
+    "CfgControl$LocalInvoke", "CfgControl$LocalBoundary", "CfgControl$LocalResume",
+    "CfgControl$LocalUnwind", "CfgControl$Unsupported",
     "LocalControlRules", "LocalControlRules$ReentryGuard", "LocalControlRules$Rule", "LocalControlRules$Invoke", "LocalControlRules$Boundary",
     "LocalControlRules$Resume", "LocalControlRules$Unwind", "LocalControlRules$Stack", "LocalControlRules$Step", "LocalControlRules$RecursiveActivation",
     "CfgNodeId", "CfgNode", "CfgNode$EntryNode", "CfgNode$SequenceNode", "CfgNode$NormalExit", "CfgNode$HaltExit", "CfgNode$OutcomeExit",
@@ -730,7 +744,7 @@ def verify_javap(javap: str, root: Path, classes: Path, air_jar: Path) -> None:
     ).stdout or ""
     require_descriptor(sequence, "()Lio/github/gustavo2358/air/model/Ids$LabelId;", "SequenceNode.label")
     require_descriptor(sequence, "()Ljava/util/List;", "SequenceNode.operations")
-    require_descriptor(sequence, "()Lio/github/gustavo2358/air/model/Terminator;", "SequenceNode.terminator")
+    require_descriptor(sequence, "()Lio/github/gustavo2358/analysis/cfg/domain/CfgControl;", "SequenceNode.control")
 
     halt = run(
         [javap, "-classpath", classpath, "-p", "-s", DOMAIN_CLASS + "CfgNode$HaltExit"],

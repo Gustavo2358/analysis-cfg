@@ -28,9 +28,9 @@ class AdmissionTest {
         var cut=new CfgGraph(p,g.nodes().stream().filter(n->n!=orphan).toList(),g.transitions().stream().filter(t->!t.from().equals(orphan.id())).toList());
         assertEquals(AnalysisSession.Status.INVALID_INPUT,AnalysisSession.open(withGraph(b,cut),p,ProjectionPolicy.KNOWN_SUBSET,u.entries()).status());
     }
-    @Test void equalLookingReplacementSequenceIsInvalid() {
+    @Test void replacedCompactControlIsInvalid() {
         var p=linear(1,2,1,1); var b=build(p); var g=b.graph().orElseThrow();
-        var nodes=g.nodes().stream().map(n->{ if(n instanceof CfgNode.SequenceNode s) { var q=(Operations.Return)s.terminator(); return (CfgNode)new CfgNode.SequenceNode(s.id(),s.label(),s.operations(),new Operations.Return(q.header(),q.values())); } return n; }).toList();
+        var nodes=g.nodes().stream().map(n->{ if(n instanceof CfgNode.SequenceNode s) return (CfgNode)new CfgNode.SequenceNode(s.id(),s.label(),s.operations(),new CfgControl.Return(new OperationId(s.label().unit(),"replacement"))); return n; }).toList();
         assertEquals(AnalysisSession.Status.INVALID_INPUT,AnalysisSession.open(withGraph(b,new CfgGraph(p,nodes,g.transitions())),p,ProjectionPolicy.KNOWN_SUBSET,p.units().getFirst().entries()).status());
     }
     @Test void equalLookingForeignSnapshotIsInvalid() {

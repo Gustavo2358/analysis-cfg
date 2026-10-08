@@ -33,26 +33,26 @@ public sealed interface CfgNode {
     }
 
     record SequenceNode(CfgNodeId id, LabelId label, List<OperationId> operations,
-            io.github.gustavo2358.air.model.Terminator terminator)
+            CfgControl control)
             implements CfgNode {
         public SequenceNode {
             Objects.requireNonNull(id, "id");
             Objects.requireNonNull(label, "label");
             operations = List.copyOf(operations);
-            Objects.requireNonNull(terminator, "terminator");
+            Objects.requireNonNull(control, "control");
             if (!id.publicationId().equals(label.publication())
-                    || !terminator.header().id().unit().equals(label.unit())) {
+                    || !control.operation().unit().equals(label.unit())) {
                 throw new IllegalArgumentException("sequence publication differs from CFG node");
             }
         }
         public SequenceNode(CfgNodeId id, Sequence source) {
             this(id, Objects.requireNonNull(source, "source").label(),
                     source.instructions().stream().map(operation -> operation.header().id()).toList(),
-                    source.terminator());
+                    CfgControl.from(source.terminator()));
         }
         public SequenceNode(CfgNodeId id, LabelId label,
                 io.github.gustavo2358.air.model.Terminator terminator) {
-            this(id, label, List.of(), terminator);
+            this(id, label, List.of(), CfgControl.from(terminator));
         }
     }
 
@@ -79,10 +79,10 @@ public sealed interface CfgNode {
             if(!id.publicationId().equals(operation.publication())||!CoreCfgProjection.outside(outcome))
                 throw new IllegalArgumentException("outside outcome requires a matching AIR namespace");
         }
-        public OutcomeExit(CfgNodeId id, io.github.gustavo2358.air.model.Terminator source,
+        public OutcomeExit(CfgNodeId id, CfgControl source,
                 io.github.gustavo2358.air.model.Control.InvocationAlternative outcome) {
-            this(id, Objects.requireNonNull(source, "source").header().id(), outcome);
-            if(!CoreCfgProjection.alternatives(source).contains(outcome))
+            this(id, Objects.requireNonNull(source, "source").operation(), outcome);
+            if(!CfgControl.alternatives(source).contains(outcome))
                 throw new IllegalArgumentException("outside outcome requires its actual AIR occurrence");
         }
     }

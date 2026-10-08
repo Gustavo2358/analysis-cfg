@@ -145,14 +145,15 @@ filesystem. Nenhuma falha anterior à Publication vira UNSUPPORTED_INPUT do kern
 
 ## Lifetime e retenção
 
-`Publication` é snapshot imutável compartilhado. O CFG não faz deep copy O(N) por
-padrão; pode reter referências/IDs AIR e manter índices derivados próprios.
+`Publication` é um snapshot imutável no adapter residente. O CFG não faz deep copy
+O(N) nem retém esse snapshot; conserva IDs AIR e fatos estruturais compactos.
 `CfgBuildResult` já registra `PublicationId`, versão/revisão, opções e preflight.
-`CfgGraph` retém exatamente a Publication original; EntryNode/SequenceNode
-retêm os objetos AIR originais, incluindo IDs, operands, origins e metadata.
+`CfgGraph` retém `CfgSource` e uma testemunha fraca somente para admissão residente;
+EntryNode/SequenceNode não retêm objetos AIR completos. Operands, origins e metadata
+permanecem sob a porta `ProgramStore`.
 NormalExit sintético registra PublicationId/UnitId/EntryId sem fabricar origem.
-HaltExit retém Operations.Halt original por ocorrência; activationEntry fica na
-transição. Instructions e ordem pertencem à Sequence original, sem deep copy.
+HaltExit retém OperationId/HaltKind por ocorrência; activationEntry fica na
+transição. SequenceNode conserva a ordem pelos OperationIds, sem payload AIR.
 `preciseControlCapabilities()` registra o consumo de memory.regions@1 apenas para
 controle; registry/preflight de extensões continuam explícitos.
 Nenhum índice muda a AIR. Não há consulta lazy ao produtor nem

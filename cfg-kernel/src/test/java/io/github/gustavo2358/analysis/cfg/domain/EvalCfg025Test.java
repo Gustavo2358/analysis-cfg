@@ -225,8 +225,10 @@ class EvalCfg025Test {
         CfgNode.SequenceNode node = graph.nodes().stream().filter(CfgNode.SequenceNode.class::isInstance)
                 .map(CfgNode.SequenceNode.class::cast).findFirst().orElseThrow();
         assertEquals(originalSequence.label(), node.label());
-        assertSame(originalSequence.terminator(), node.terminator());
-        assertFalse(CfgNode.SequenceNode.class.getRecordComponents()[1].getType().equals(Sequence.class));
+        assertEquals(CfgControl.from(originalSequence.terminator()), node.control());
+        assertFalse(java.util.Arrays.stream(CfgNode.SequenceNode.class.getRecordComponents())
+                .anyMatch(component -> component.getType().equals(Sequence.class)
+                        || component.getType().equals(Terminator.class)));
         assertThrows(UnsupportedOperationException.class, () -> graph.nodes().clear());
         assertThrows(UnsupportedOperationException.class, () -> graph.transitions().clear());
         assertThrows(UnsupportedOperationException.class, () -> graph.entries().clear());
@@ -290,9 +292,10 @@ class EvalCfg025Test {
                 signature, entry(E, L).state(), ORIGIN)), List.of(new Sequence(L, List.of(), terminator, ORIGIN))))));
         CfgNode.SequenceNode sequence = graph.nodes().stream().filter(CfgNode.SequenceNode.class::isInstance)
                 .map(CfgNode.SequenceNode.class::cast).findFirst().orElseThrow();
-        assertSame(terminator, sequence.terminator());
-        assertSame(terminator.values(), ((Operations.Return) sequence.terminator()).values());
-        assertEquals(values, ((Operations.Return) sequence.terminator()).values());
+        assertEquals(new CfgControl.Return(terminator.header().id()), sequence.control());
+        assertSame(terminator.values(), values);
+        assertFalse(java.util.Arrays.stream(CfgNode.SequenceNode.class.getRecordComponents())
+                .anyMatch(component -> Terminator.class.isAssignableFrom(component.getType())));
         assertEquals(minimalExpected(), observe(graph));
     }
 
