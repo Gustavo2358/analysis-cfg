@@ -426,14 +426,21 @@ final class BackwardActivationSolver<S> implements AutoCloseable {
             int required=region.entry.bdd.requiredPresent(condition);
             var visited=new HashSet<Need>();visited.add(need(region,required<0?1:0));
             var coarse=new ArrayDeque<Witness>();coarse.add(new Witness(region,1,null,required<0,-1));seen.add(region);Witness root=null;
-            while(!coarse.isEmpty()) {
+            while(!coarse.isEmpty()&&root==null) {
                 var current=coarse.removeFirst();
                 if(current.region.frame==null&&current.requiredSeen){root=current;break;}
                 for(var link:current.region.incoming.entrySet()) {
                     callerPathEdgesRead++;
                     var parent=link.getKey().region;boolean requiredSeen=current.requiredSeen||region.entry.model.control().frameAt(link.getKey().node).variable()==required;
                     if(visited.add(need(parent,requiredSeen?1:0))) {
-                        seen.add(parent);coarse.addLast(new Witness(parent,link.getValue(),current,requiredSeen,region.entry.model.control().frameAt(link.getKey().node).variable()));
+                        seen.add(parent);
+                        var witness=new Witness(parent,link.getValue(),current,requiredSeen,region.entry.model.control().frameAt(link.getKey().node).variable());
+                        // A root discovered from the current breadth layer is already
+                        // a shortest caller witness. Returning it immediately avoids
+                        // scanning unrelated peers whose insertion order depends on
+                        // the physical order of otherwise equivalent sequences.
+                        if(parent.frame==null&&requiredSeen){root=witness;break;}
+                        coarse.addLast(witness);
                     }
                 }
             }

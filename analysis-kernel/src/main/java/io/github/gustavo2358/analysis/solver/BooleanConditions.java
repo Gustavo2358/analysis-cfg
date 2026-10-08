@@ -356,16 +356,22 @@ final class BooleanConditions implements AutoCloseable {
         long a=supportOf(left),b=supportOf(right);
         return a!=0&&b!=0&&!literals.intersectsSame(a,b);
     }
-    private int residual(int value,int factor,long common,boolean union){
-        int remaining=junction(literals.without(junctionRoot(factor,!union),common),!union);
+    private int residual(int value,int factor,long factorRoot,long common,boolean union){
+        int remaining=junction(literals.without(factorRoot,common),!union);
         if(value==factor)return remaining;
         int other=lowOf(value)==factor?highOf(value):lowOf(value);
         return apply(remaining,other,!union,false);
     }
     private int factor(int left,int right,boolean union){
         int a=factorChild(left,union),b=factorChild(right,union);if(a<0||b<0)return -1;
-        long common=literals.intersection(junctionRoot(a,!union),junctionRoot(b,!union));if(common==0)return -1;
-        int remainder=apply(residual(left,a,common,union),residual(right,b,common,union),union,false);
+        long rootA=junctionRoot(a,!union),rootB=junctionRoot(b,!union);
+        // Canonical representatives may be rebound from a native junction to
+        // an equivalent mixed circuit. Factoring is optional; a non-native
+        // representative must stay in the exact circuit instead of leaking
+        // the -1 "not a junction" sentinel into the literal-set arena.
+        if(rootA<0||rootB<0)return -1;
+        long common=literals.intersection(rootA,rootB);if(common==0)return -1;
+        int remainder=apply(residual(left,a,rootA,common,union),residual(right,b,rootB,common,union),union,false);
         return apply(junction(common,!union),remainder,!union,false);
     }
     private int apply(int first,int second,boolean union){return apply(first,second,union,true);}
