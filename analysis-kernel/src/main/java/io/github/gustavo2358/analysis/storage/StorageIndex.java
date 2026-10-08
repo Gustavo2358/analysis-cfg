@@ -39,11 +39,11 @@ public final class StorageIndex {
     private long bindingVisits,premiseMembers;
     public StorageIndex(AnalysisSession session) {
         this.session=Objects.requireNonNull(session);
-        var publication=session.index().publication();
-        publication.uncertainties().forEach(u->uncertaintyIds.add(u.id()));
-        for(var base:publication.storage())bases.put(base.header().id(),base);
-        for(var unit:publication.units())for(var object:unit.objects())declarations.put(object.id(),object);
-        for(var premise:publication.premises())if(premise.assertion() instanceof Proofs.DisjointStorage d)
+        var store=session.index().store();
+        store.uncertainties().forEach(u->uncertaintyIds.add(u.id()));
+        for(var base:store.storage())bases.put(base.header().id(),base);
+        for(var unit:store.units())for(var object:unit.objects())declarations.put(object.id(),object);
+        for(var premise:store.premises())if(premise.assertion() instanceof Proofs.DisjointStorage d)
             for(var id:d.storage()) { separation.computeIfAbsent(id,ignored->new HashSet<>()).add(premise.id());premiseMembers++; }
         // Explicit DFS avoids call-stack depth proportional to an exact-alias chain.
         var dependencies=aliasDependencies;

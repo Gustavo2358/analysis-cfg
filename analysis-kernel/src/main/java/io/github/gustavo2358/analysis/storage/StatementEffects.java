@@ -56,7 +56,7 @@ public final class StatementEffects {
             for(var location:locations)byBase.computeIfAbsent(location.base().id(),ignored->new ArrayList<>()).add(new OpenLocation(object.id(),location));
         }
         byBase.replaceAll((id,values)->List.copyOf(values));openByBase=Map.copyOf(byBase);
-        for(var unit:storage.session().index().publication().units())for(var sequence:unit.sequences()) {
+        for(var unit:storage.session().index().store().units())for(var sequence:unit.sequences()) {
             for(var operation:sequence.instructions())statements.put(operation.header().id(),prepare(operation));
             var operation=sequence.terminator();statements.put(operation.header().id(),prepare(operation));
         }

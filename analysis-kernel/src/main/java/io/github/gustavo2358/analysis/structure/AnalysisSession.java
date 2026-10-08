@@ -60,7 +60,7 @@ public final class AnalysisSession {
                 || result.status() == CfgBuildResult.Status.INCOMPLETE_VALIDATION)
             throw new IllegalStateException("a successful complete CFG build is required; upstream validation did not complete");
         try {
-            var builder = new IndexBuilder(result, snapshot, policy);
+            var builder = new IndexBuilder(result, snapshot, ProgramStore.resident(snapshot), policy);
             ProgramIndex index = builder.build();
             List<Entries.Entry> selected = new ArrayList<>();
             for (Entries.Entry entry : selectedEntries) {

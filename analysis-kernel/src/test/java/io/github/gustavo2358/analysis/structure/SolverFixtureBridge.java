@@ -27,6 +27,6 @@ public final class SolverFixtureBridge {
                 entries.subList(0, selected)).session().orElseThrow();
     }
     public static ProgramIndex.Node node(AnalysisSession session, int n) {
-        return session.index().sequence(new LabelId(new UnitId(session.index().publication().id(), "unit"), "n" + n));
+        return session.index().sequence(new LabelId(new UnitId(session.index().store().publicationId(), "unit"), "n" + n));
     }
 }

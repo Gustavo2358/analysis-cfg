@@ -102,7 +102,7 @@ public final class RegionalValuesAnalysis {
                 controlOpen.add(op.header().id().unit());
         }
         // Coverage describes the projection, never a write, target, or propagated image.
-        for(var unit:session.index().publication().units())if(session.index().partialControl(unit.id()) || session.index().unprovedPreconditions(unit.id()))controlOpen.add(unit.id());
+        for(var unit:session.index().store().units())if(session.index().partialControl(unit.id()) || session.index().unprovedPreconditions(unit.id()))controlOpen.add(unit.id());
         for(var context:session.contexts()) {
             var seeds=new ArrayList<Plan>();int slot=0;var seededLocations=new HashSet<StorageIndex.Location>();
             // Simultaneous strong facts initialize first; possible support and open entry
@@ -724,8 +724,8 @@ public final class RegionalValuesAnalysis {
         }
     }
     private boolean sourceOpen(PointQuery<StorageSubject> query) {
-        var p=session.index().publication();var unit=session.index().unit(query.point().entry().unit());
-        return p.coverage().inventory()!=Evidence.InventoryStatus.COMPLETE||!p.coverage().uncertainties().isEmpty()
+        var store=session.index().store();var unit=session.index().unit(query.point().entry().unit());
+        return store.coverage().inventory()!=Evidence.InventoryStatus.COMPLETE||!store.coverage().uncertainties().isEmpty()
             ||unit.coverage().inventory()!=Evidence.InventoryStatus.COMPLETE||!unit.coverage().uncertainties().isEmpty()||controlOpen.contains(unit.id())
             ||!session.context(query.point().entry()).entry().state().uncertainties().isEmpty()
             ||effects.storage().explicitObjects(query.subject()).stream().map(session.index()::object)

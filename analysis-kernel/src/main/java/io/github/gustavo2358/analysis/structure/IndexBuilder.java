@@ -11,6 +11,7 @@ final class IndexBuilder {
     Map<CfgNodeId,LocalControlRules.Rule> localRules;
     final Object identity = new Object();
     final Publication snapshot;
+    final ProgramStore store;
     final IndexMetrics.Counter count = new IndexMetrics.Counter();
     final Map<UnitId, Unit> units = new HashMap<>();
     final Map<LabelId, Sequence> sequences = new HashMap<>();
@@ -43,8 +44,8 @@ final class IndexBuilder {
     private final Set<OperandId> operandIds = new HashSet<>();
     private long expectedEdges, expectedHalts, expectedActiveEntries;
 
-    IndexBuilder(CfgBuildResult result, Publication snapshot, ProjectionPolicy policy) {
-        this.result = result; this.snapshot = snapshot; this.policy = policy;
+    IndexBuilder(CfgBuildResult result, Publication snapshot, ProgramStore store, ProjectionPolicy policy) {
+        this.result = result; this.snapshot = snapshot; this.store = store; this.policy = policy;
         unprovedPreconditions=result.preflight().unprovedOperationPreconditions().orElse(Set.of());
     }
     static final class Rejection extends RuntimeException {
@@ -64,6 +65,8 @@ final class IndexBuilder {
 
     ProgramIndex build() {
         valid(result.publicationId().equals(snapshot.id()) && result.airVersion().equals(snapshot.airVersion()), "result/snapshot metadata mismatch");
+        valid(store.publicationId().equals(snapshot.id()) && store.airVersion().equals(snapshot.airVersion())
+                && store instanceof ProgramStore.Resident resident && resident.owns(snapshot), "foreign program store");
         valid(result.options().projectionPolicy() == policy, "projection policy mismatch");
         valid(result.status() != CfgBuildResult.Status.INVALID_IR, "invalid AIR build");
         supported(result.status() == CfgBuildResult.Status.CFG_BUILT, "unsupported CFG build profile");

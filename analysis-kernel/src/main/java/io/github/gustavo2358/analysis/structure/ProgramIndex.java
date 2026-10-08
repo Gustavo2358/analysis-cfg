@@ -24,7 +24,7 @@ public final class ProgramIndex {
     final LongIntDirectory forwardHeads, backwardHeads;
     final Map<EntryId, Integer> entryOrdinals;
     final Map<EntryId, Node> entryNodes, normalExits;
-    private final Publication publication;
+    private final ProgramStore store;
     private final Map<CfgNodeId, Node> nodeIds;
     private final Map<UnitId, Unit> units;
     private final Map<LabelId, Node> sequences;
@@ -47,7 +47,7 @@ public final class ProgramIndex {
         policy = b.policy;
         unprovedPreconditions=b.unprovedPreconditions;
         unprovedPreconditionUnits=unprovedPreconditions.stream().map(OperationId::unit).collect(java.util.stream.Collectors.toUnmodifiableSet());
-        publication = b.snapshot;
+        store = b.store;
         nodes = b.nodes;
         var partialUnits=new HashSet<UnitId>();
         for (var node : nodes) {
@@ -90,7 +90,7 @@ public final class ProgramIndex {
     public boolean unprovedPreconditions(UnitId unit) { return unprovedPreconditionUnits.contains(unit); }
     public boolean hasUnprovedPreconditions() { return !unprovedPreconditions.isEmpty(); }
     public boolean partialControl(UnitId unit) { return partialControlUnits.contains(unit); }
-    public Publication publication() { return publication; }
+    public ProgramStore store() { return store; }
     public IndexMetrics metrics() { return metrics; }
     /** Null means ID absent from this snapshot; IDs always include their owners. */
     public Node node(CfgNodeId id) { return nodeIds.get(id); }

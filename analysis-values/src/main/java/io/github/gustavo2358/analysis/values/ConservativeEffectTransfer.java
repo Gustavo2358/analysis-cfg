@@ -44,7 +44,7 @@ final class ConservativeEffectTransfer {
                 if(objects.objects().stream().anyMatch(o->!p.subjects.containsKey(o)))throw new TextProfile.Refusal(false,"UNSUPPORTED_EFFECT_PLACE");
             } else if(current instanceof Scopes.VisibleMemory visible) {
                 var unit=p.session.index().unit(visible.unit());
-                for(var owner:p.session.index().publication().units())for(var object:owner.objects()) {
+                for(var owner:p.session.index().store().units())for(var object:owner.objects()) {
                     boolean included=owner.id().equals(visible.unit())||unit.visibleObjects().contains(object.id())
                         ||visible.includingExternal()&&object.visibility()!=Memory.Visibility.PRIVATE;
                     if(included&&!p.subjects.containsKey(object.id()))throw new TextProfile.Refusal(false,"UNSUPPORTED_EFFECT_PLACE");

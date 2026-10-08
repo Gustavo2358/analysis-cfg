@@ -23,7 +23,12 @@ class StructureTest {
     @Test void offsetsBucketsAndPayloadAreCanonical() {
         var p=linear(1,3,2,1); var u=p.units().getFirst(); var q=u.sequences().getFirst();
         var s=session(p); var idx=s.index();
-        assertSame(p,idx.publication()); assertSame(u,idx.unit(u.id()));
+        assertEquals(p.id(),idx.store().publicationId()); assertSame(u,idx.unit(u.id()));
+        assertEquals(p.airVersion(),idx.store().airVersion());
+        assertSame(p.coverage(),idx.store().coverage());
+        assertFalse(Arrays.stream(ProgramStore.class.getMethods())
+                .anyMatch(method -> method.getReturnType().equals(Publication.class)),
+                "shared store must not expose the resident Publication aggregate");
         var node=idx.sequence(q.label()); assertSame(q,idx.sequence(node));
         for(int offset=0;offset<4;offset++) {
             Operation op=offset==3?q.terminator():q.instructions().get(offset);

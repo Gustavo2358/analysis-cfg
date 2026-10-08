@@ -28,7 +28,7 @@ public final class ReachabilityProvider implements AnalysisProvider<LabelId,Reac
     public Prepared<LabelId,Fact> prepare(AnalysisSession session,AnalysisKey key) {
         if(!supports(key)||session.context(key.entry())==null)throw new IllegalArgumentException("reachability key/context");
         var context=session.context(key.entry());var unit=session.index().unit(key.entry().unit());
-        boolean open=open(session.index().publication().coverage())||open(unit.coverage())||!context.entry().state().uncertainties().isEmpty();
+        boolean open=open(session.index().store().coverage())||open(unit.coverage())||!context.entry().state().uncertainties().isEmpty();
         for(var sequence:unit.sequences()) {
             for(var instruction:sequence.instructions())if(!(instruction instanceof Operations.HavocMust||instruction instanceof Operations.HavocMay))open|=open(instruction.header());
             if(!(sequence.terminator() instanceof Operations.Opaque))open|=open(sequence.terminator().header());

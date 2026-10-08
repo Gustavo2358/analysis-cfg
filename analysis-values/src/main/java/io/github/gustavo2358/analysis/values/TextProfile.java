@@ -39,10 +39,10 @@ final class TextProfile {
     TextProfile(AnalysisSession session,boolean effectAware,Set<ObjectId> demand) {
         this.effectAware=effectAware;
         this.session=Objects.requireNonNull(session);
-        var index=session.index();var publication=index.publication();
+        var index=session.index();var store=index.store();
         var entryUnits=session.contexts().stream().map(c->c.entry().id().unit()).collect(java.util.stream.Collectors.toSet());
         var cells=new HashMap<StorageId,Location>();
-        for(var unit:publication.units())for(var object:unit.objects()) {
+        for(var unit:store.units())for(var object:unit.objects()) {
             var cell=index.directCell(object.id());
             if(!(object.storage() instanceof Memory.CellBinding)||cell==null||!cellDomain(object.typeRef())||!cellDomain(cell.typeRef())) {
                 // A declaration alone has no transfer effect. Demand closure and every
@@ -90,9 +90,9 @@ final class TextProfile {
         requestedObjects=demand==null?subjects.size():demand.size();
         this.selected=Set.copyOf(selected);
         modeledCells=selected.stream().sorted(Comparator.comparingInt(Location::ordinal)).toList();
-        for(var unit:publication.units()) {
+        for(var unit:store.units()) {
             if(!entryUnits.contains(unit.id()))continue;
-            boolean open=open(publication.coverage())||open(unit.coverage());
+            boolean open=open(store.coverage())||open(unit.coverage());
             for(var sequence:unit.sequences()) {
                 for(var instruction:sequence.instructions()){prepare(instruction);open|=!(instruction instanceof Operations.HavocMust||instruction instanceof Operations.HavocMay)&&open(instruction.header());}
                 prepare(sequence.terminator());open|=!(sequence.terminator() instanceof Operations.Opaque)&&open(sequence.terminator().header());

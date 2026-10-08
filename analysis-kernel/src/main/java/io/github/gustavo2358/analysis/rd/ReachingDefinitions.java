@@ -33,7 +33,7 @@ public final class ReachingDefinitions {
     }
     public ReachingDefinitions(StatementEffects effects) {
         this.effects=Objects.requireNonNull(effects);session=effects.storage().session();partition=new StoragePartition(effects);
-        for(var unit:session.index().publication().units()) {
+        for(var unit:session.index().store().units()) {
             boolean open=effects.storage().session().index().partialControl(unit.id()) || effects.storage().session().index().unprovedPreconditions(unit.id());
             for(var sequence:unit.sequences()) {
                 var terminator=sequence.terminator();
@@ -254,8 +254,8 @@ public final class ReachingDefinitions {
             return new DefinitionFact(query.point(),state.reached()?DefinitionFact.Reachability.REACHABLE:DefinitionFact.Reachability.UNREACHABLE_IN_MODEL,output,state.reached()?unknown:null,!(resolution.remainder() instanceof Scopes.NoMemory),source,evidenceOrder(premises),evidenceOrder(origins),evidenceOrder(uncertainties));
         }
         private boolean sourceOpen(PointQuery<StorageSubject> query) {
-            var publication=owner.session.index().publication();var unit=owner.session.index().unit(query.point().entry().unit());
-            return publication.coverage().inventory()!=Evidence.InventoryStatus.COMPLETE||!publication.coverage().uncertainties().isEmpty()
+            var store=owner.session.index().store();var unit=owner.session.index().unit(query.point().entry().unit());
+            return store.coverage().inventory()!=Evidence.InventoryStatus.COMPLETE||!store.coverage().uncertainties().isEmpty()
                 ||unit.coverage().inventory()!=Evidence.InventoryStatus.COMPLETE||!unit.coverage().uncertainties().isEmpty()
                 ||owner.controlOpen.getOrDefault(unit.id(),false)
                 ||!owner.session.context(query.point().entry()).entry().state().uncertainties().isEmpty()
