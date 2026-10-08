@@ -39,7 +39,9 @@ These are managed ledger/fixture results, not JVM retained-heap or global bounds
 Compiled gap-boundary and omitted-context mutations fail the exact independent
 relation; query interning fails the read-only miss contract. Original passes.
 Mandatory consumer FAST1062tests/zero failures/errors/skips passed418.296s.
-Clean committed CLI dependency/support equivalence is being qualified separately. The unchanged legacy CLI still
+Clean compiled0e228b93e60eff0f0764f6fab7e4d9a673b4695d passed3public products/
+6actual CLI executions with full dependency/support semantic parity versus the
+preserved frozen729baseline, excluding only two historical work-counter maps. The unchanged legacy CLI still
 uses resident admission: its parity cannot certify managed admission integration.
 Complete type/domain/premise/capability/operation rules, CheckedSnapshot issuance,
 incremental official JSON, root retirement and AS-W03-W10 remain required.
