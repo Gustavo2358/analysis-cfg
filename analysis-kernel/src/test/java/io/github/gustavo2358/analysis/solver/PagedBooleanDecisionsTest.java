@@ -7,6 +7,58 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PagedBooleanDecisionsTest {
+    @Test void repeatedAndCommutedDefinitionsShareOneGateWithoutMixingSigns(){
+        var memory=resources();
+        try(var pages=new ResidentPageStore(128,memory,AnalysisResources.Phase.CONTROL);
+            var decisions=new PagedBooleanDecisions(pages,memory)){
+            long a=(long)decisions.newVariable()<<1,b=(long)decisions.newVariable()<<1;
+            long positive=decisions.conjunction(a,b),negative=decisions.conjunction(a,b^1);
+            assertNotEquals(positive,negative);
+            for(int alias=0;alias<1024;alias++){
+                assertEquals(positive,decisions.conjunction(b,a));
+                assertEquals(negative,decisions.conjunction(b^1,a));
+            }
+            assertTrue(decisions.satisfiable(positive));assertFalse(decisions.satisfiable(positive,negative));
+            assertTrue(decisions.satisfiable(negative));assertTrue(decisions.value((int)(a>>>1)));
+            assertFalse(decisions.value((int)(b>>>1)));
+        }
+        assertEquals(0,memory.heapUsed());
+    }
+    @Test void derivedModelsAndLaterArbitraryConstraintsMatchIndependentTruthMasks(){
+        var memory=resources();var random=new Random(183579);
+        long[] roots=new long[28],truth=new long[28];int size=4;long allowed=0xffff;
+        try(var pages=new ResidentPageStore(128,memory,AnalysisResources.Phase.CONTROL);
+            var decisions=new PagedBooleanDecisions(pages,memory)){
+            for(int key=0;key<4;key++){
+                roots[key]=(long)decisions.newVariable()<<1;
+                for(int bits=0;bits<16;bits++)if((bits&(1<<key))!=0)truth[key]|=1L<<bits;
+            }
+            for(int step=0;step<24;step++){
+                int a=random.nextInt(size),b=random.nextInt(size),pa=random.nextInt(2),pb=random.nextInt(2);
+                long mask=(truth[a]^(pa==0?0:0xffff))&(truth[b]^(pb==0?0:0xffff));
+                long root=decisions.conjunction(roots[a]^pa,roots[b]^pb);
+                if(root<2)assertEquals(root==0?0:0xffff,mask);
+                else{roots[size]=root;truth[size++]=mask;}
+                if(step%4==3){
+                    a=random.nextInt(size);b=random.nextInt(size);
+                    decisions.addClause(roots[a],roots[b]);allowed&=truth[a]|truth[b];
+                }
+                for(int query=0;query<12;query++){
+                    a=random.nextInt(size);b=random.nextInt(size);pa=random.nextInt(2);pb=random.nextInt(2);
+                    long accepted=allowed&(truth[a]^(pa==0?0:0xffff))&(truth[b]^(pb==0?0:0xffff));
+                    boolean actual=decisions.satisfiable(roots[a]^pa,roots[b]^pb);
+                    assertEquals(accepted!=0,actual,"step="+step+" query="+query);
+                    if(actual){
+                        int bits=0;for(int key=0;key<4;key++)if(decisions.value(key+1))bits|=1<<key;
+                        assertTrue((accepted&(1L<<bits))!=0);
+                        for(int i=0;i<size;i++)assertEquals((truth[i]&(1L<<bits))!=0,
+                            decisions.value((int)(roots[i]>>>1))^((roots[i]&1)!=0),"derived model entry="+i);
+                    }
+                }
+            }
+        }
+        assertEquals(0,memory.heapUsed());
+    }
     private static AnalysisResources resources(){return new AnalysisResources(new AnalysisResources.Limits(16000000,100000,0,0,0,2000000000L,0));}
     private static long literal(int variable,boolean positive){return ((long)variable<<1)|(positive?0:1);}
     private static boolean satisfied(long[] clause,int bits) {

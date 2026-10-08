@@ -5,12 +5,17 @@ package io.github.gustavo2358.analysis.solver;
  * All cardinality-dependent state spills. Operational interruptions never return UNSAT.
  * The backend is borrowed. Learned clauses remain owned until this engine closes. */
 final class PagedBooleanDecisions implements AutoCloseable {
-    private static final int VW=9,CW=8;
+    private static final int VW=11,CW=8;
     private static final int VALUE=0,LEVEL=1,REASON=2,SEEN=3,MODEL=4,ACTIVITY=5,POSITION=6;
+    private static final long DERIVED=-1;
+    private static final int LEFT=9,RIGHT=10;
     private static final int LENGTH=0,BASE=1,NEXT0=2,PREV0=3,NEXT1=4,PREV1=5,LEARNED=6,LOCKED=7;
     private final AnalysisResources.Reservation controls;
     private long[] clauseInput,assumptionInput;
     private PagedLongArray variables,clauses,literals,trail,levels,heap,buffer,deferredUnits;
+    // Independent heap addresses are below Integer.MAX_VALUE. The disjoint
+    // paged suffix holds the required definition directory, not a resident cache.
+    private long gateBase=1L<<32,gateCapacity=16,gateCount;
     private int variableCount,heapSize,levelCount,bufferSize;
     private long clauseCount,literalCount,trailSize,propagationHead,epoch,activityEpoch,deferredSize;
     private long watchedVisits,learnedCount;
@@ -39,10 +44,64 @@ final class PagedBooleanDecisions implements AutoCloseable {
     }
     private long nextEpoch(){if(epoch==Long.MAX_VALUE/2)throw new PageStore.Failure(PageStore.Reason.INVALID_HANDLE,"decision mark space exhausted");return ++epoch;}
     int newVariable() {
+        return variable(true);
+    }
+    int allocatedVariables(){open();return variableCount;}
+    private int variable(boolean independent) {
         open();try {
             if(variableCount==Integer.MAX_VALUE)throw new PageStore.Failure(PageStore.Reason.INVALID_HANDLE,"decision variable space exhausted");
-            hasModel=false;int variable=++variableCount;insertHeap(variable);return variable;
+            hasModel=false;int variable=++variableCount;
+            if(independent)insertHeap(variable);else v(variable,POSITION,DERIVED);
+            return variable;
         }catch(AnalysisResources.Exhausted|PageStore.Failure failure){failed=true;throw failure;}
+    }
+    /** A fresh exact acyclic definition, never a free search dimension. Both
+     * inputs precede the output; assigning all independent atoms therefore
+     * determines every gate through propagation. Arbitrary CNF callers retain
+     * newVariable(), rather than an unchecked non-decision-variable API. */
+    long conjunction(long left,long right) {
+        open();if(left>=2)valid(left);else if(left<0)throw new IllegalArgumentException("foreign Boolean literal");
+        if(right>=2)valid(right);else if(right<0)throw new IllegalArgumentException("foreign Boolean literal");
+        if(left==0||right==0||left==(right^1))return 0;
+        if(left==1||left==right)return right;if(right==1)return left;
+        try{
+            long a=Math.min(left,right),b=Math.max(left,right),slot=gateSlot(gateBase,gateCapacity,a,b);
+            long known=heap.get(gateBase+slot);if(known!=0)return known<<1;
+            if(4*(gateCount+1)>3*gateCapacity){growGates();slot=gateSlot(gateBase,gateCapacity,a,b);}
+            int output=variable(false);long result=(long)output<<1;
+            v(output,LEFT,a);v(output,RIGHT,b);
+            addClause(result^1,left);addClause(result^1,right);addClause(result,left^1,right^1);
+            heap.set(gateBase+slot,output);gateCount++;
+            return result;
+        }catch(AnalysisResources.Exhausted|PageStore.Failure failure){failed=true;throw failure;}
+    }
+    private static long gateHash(long a,long b){
+        long key=a*0x9e3779b97f4a7c15L+Long.rotateLeft(b,31);
+        key^=key>>>33;key*=0xff51afd7ed558ccdL;key^=key>>>33;key*=0xc4ceb9fe1a85ec53L;
+        return key^(key>>>33);
+    }
+    private long gateSlot(long base,long capacity,long a,long b){
+        long slot=gateHash(a,b)&(capacity-1);
+        for(long probes=0;probes<capacity;probes++){
+            long stored=heap.get(base+slot);
+            if(stored==0||v((int)stored,LEFT)==a&&v((int)stored,RIGHT)==b)return slot;
+            slot=(slot+1)&(capacity-1);
+        }
+        throw new IllegalStateException("full conjunction directory");
+    }
+    private void growGates(){
+        // At most Integer.MAX_VALUE variables exist: capacity<=2^32, and the
+        // sum of all table address ranges fits well below the array's limit.
+        long oldBase=gateBase,oldCapacity=gateCapacity,newBase=oldBase+oldCapacity,newCapacity=oldCapacity*2;
+        for(long slot=0;slot<oldCapacity;slot++){
+            int output=(int)heap.get(oldBase+slot);if(output==0)continue;
+            long a=v(output,LEFT),b=v(output,RIGHT),target=gateSlot(newBase,newCapacity,a,b);
+            heap.set(newBase+target,output);
+        }
+        gateBase=newBase;gateCapacity=newCapacity;
+        // Zeroing retires old radix payload/directory pages. No historical table
+        // survives; page allocation admits the old-plus-new peak before growth.
+        for(long slot=0;slot<oldCapacity;slot++)heap.set(oldBase+slot,0);
     }
     long watchedClausesVisited(){open();return watchedVisits;}
     long learnedClauses(){open();return learnedCount;}
@@ -207,7 +266,11 @@ final class PagedBooleanDecisions implements AutoCloseable {
                 }else if(heapSize==0)break;
                 else assume((long)(int)heap.get(0)<<1);
             }
-            if(result)for(int index=0;index<variableCount;index++){int variable=index+1;v(variable,MODEL,v(variable,VALUE));}
+            if(result)for(int index=0;index<variableCount;index++){
+                int variable=index+1;long value=v(variable,VALUE);
+                if(value==0)throw new IllegalStateException("incomplete Boolean model");
+                v(variable,MODEL,value);
+            }
             cancelUntil(0);
             for(long i=0;i<deferredSize;i++) {
                 long literal=deferredUnits.get(i);deferredUnits.set(i,0);
@@ -235,8 +298,9 @@ final class PagedBooleanDecisions implements AutoCloseable {
         }
         heapAt(at,variable);
     }
-    private void insertHeap(int variable){if(v(variable,POSITION)!=0)throw new IllegalStateException("duplicate decision variable");heapAt(heapSize++,variable);up(heapSize-1);}
+    private void insertHeap(int variable){long position=v(variable,POSITION);if(position==DERIVED)return;if(position!=0)throw new IllegalStateException("duplicate decision variable");heapAt(heapSize++,variable);up(heapSize-1);}
     private void removeHeap(int variable) {
+        if(v(variable,POSITION)==DERIVED)return;
         int at=(int)v(variable,POSITION)-1;if(at<0)throw new IllegalStateException("missing unassigned variable");
         int last=(int)heap.get(--heapSize);heap.set(heapSize,0);v(variable,POSITION,0);
         if(at<heapSize){heapAt(at,last);if(at>0&&better(last,(int)heap.get((at-1)>>>1)))up(at);else down(at);}

@@ -65,6 +65,7 @@ final class BooleanCircuitDecisions implements AutoCloseable {
                 long left=encode(a,current.decisions,current.memo,current.pending,current.primaries);
                 if(!equality)return sat(current.decisions,left);
                 long right=encode(b,current.decisions,current.memo,current.pending,current.primaries);
+                if(left==right)return true;if(left==(right^1))return false;
                 return !satBoth(current.decisions,left,right^1)&&!satBoth(current.decisions,left^1,right);
             }
         }catch(AnalysisResources.Exhausted|PageStore.Failure failure){failed=true;throw failure;}
@@ -103,9 +104,9 @@ final class BooleanCircuitDecisions implements AutoCloseable {
                 else if(left==1||left==right)result=right;
                 else if(right==1)result=left;
                 else {
-                    result=(long)decisions.newVariable()<<1;variables++;
-                    decisions.addClause(result^1,left);decisions.addClause(result^1,right);
-                    decisions.addClause(result,left^1,right^1);
+                    int before=decisions.allocatedVariables();
+                    result=decisions.conjunction(left,right);
+                    variables+=decisions.allocatedVariables()-before;
                 }
             }
             memo.set(handle,result+1);pending.set(--top,0);

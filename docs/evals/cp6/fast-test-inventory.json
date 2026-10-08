@@ -796,7 +796,9 @@
       "pigeonholeContradictionsRequireSearchAndPreserveIncrementalQueries",
       "denseNonunitFormulasAndLearnedClausesAgreeWithIndependentEnumeration",
       "constructorAndGrowthDenialsAbortWithoutLeakingBorrowedPages",
-      "storageInterruptionsDuringInsertionSearchAndModelCopyAbortAndReleaseAllPages"
+      "storageInterruptionsDuringInsertionSearchAndModelCopyAbortAndReleaseAllPages",
+      "derivedModelsAndLaterArbitraryConstraintsMatchIndependentTruthMasks",
+      "repeatedAndCommutedDefinitionsShareOneGateWithoutMixingSigns"
     ],
     "io.github.gustavo2358.analysis.solver.PagedBooleanCircuitTest": [
       "constructionValuationsRestrictionsSatAndEqualityAgreeWithIndependentExpressions",
@@ -816,7 +818,9 @@
       "unrelatedGraphNodesAreNeverReadAndCyclesAreOperationalFailure",
       "scopedIncrementalQueriesEncodeSharedFaninsOnceInsteadOfPerPrefix",
       "scopedLearningAndFormulaExtensionPreserveIndependentAssignmentOracles",
-      "scopeEndDropsAllDefinitionsBeforeBorrowedHandlesAreReused"
+      "scopeEndDropsAllDefinitionsBeforeBorrowedHandlesAreReused",
+      "formulaDefinitionsCannotMultiplyIndependentBranchingDimension",
+      "distinctGraphAliasesReuseDefinitionsAndCountOnlyNewVariables"
     ],
     "io.github.gustavo2358.analysis.solver.SignedLiteralSamplesTest": [
       "sampledConjunctionDisjunctionAndComplementedSignsMatchIndependentLiteralValuations",

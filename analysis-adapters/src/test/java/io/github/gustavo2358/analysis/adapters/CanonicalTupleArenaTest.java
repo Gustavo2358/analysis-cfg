@@ -125,10 +125,13 @@ final class CanonicalTupleArenaTest {
             assertThrows(AnalysisResources.Exhausted.class, arena::collect);
             assertThrows(IllegalStateException.class, arena::size);
             assertThrows(IllegalStateException.class, () -> arena.field(first, 0));
-            // The session store remains the final owner if work quota prevents traversal during close.
-            assertThrows(AnalysisResources.Exhausted.class, arena::close);
+            // Analysis remains aborted, but teardown uses its separate protocol
+            // and must release all borrowed pages without resetting WORK.
+            assertDoesNotThrow(arena::close);
+            assertEquals(0,store.statistics().livePages());
+            assertEquals(100_000_000,resources.workUsed());assertTrue(resources.cleanupWorkUsed()>0);
             arena.close();
-        } finally { assertThrows(AnalysisResources.Exhausted.class, store::close); }
+        } finally { assertDoesNotThrow(store::close); }
         assertEquals(0, resources.heapUsed()); assertEquals(0, resources.used(AnalysisResources.Pool.TEMPORARY));
     }
 

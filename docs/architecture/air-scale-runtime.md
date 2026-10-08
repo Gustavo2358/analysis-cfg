@@ -1142,3 +1142,41 @@ and verify the exact primary exception and zero heap reservations for both solve
 directions. These laws do not yet qualify every logical root/cursor lifetime,
 cancellation/deadline behavior, permanent I/O failure, or zero-progress transfers.
 Global runtime/CLI migration remains in progress.
+
+### Independent circuit search dimensions (AS-W04, partial checkpoint)
+
+Circuit encoding distinguishes original atoms from exact acyclic AND definitions.
+The clausal engine's ordinary `newVariable` still creates an independent choice
+for arbitrary CNF. Its `conjunction` operation creates a fresh derived output with
+the full three-clause equivalence and references only existing inputs. Only original
+atoms enter the branching heap; derived outputs keep propagation, implication
+reasons, learning, assumptions and model values. The existing paged heap-position
+column has a reserved negative marker for these outputs; no object/array per gate
+or extra resident directory is introduced.
+
+With every independent atom assigned, propagation of full acyclic definitions
+determines all gate outputs. Model publication checks that every variable is
+assigned. Thus removing auxiliary choices preserves all independent valuations;
+it does not approximate clauses, drop dependencies, or publish partial models.
+SAT may still require exponential work in necessary independent atoms.
+
+The cost law counts the actual restored independent heap for chains of32/128/512
+atoms, rather than counting only source graph nodes. A separate exhaustive four-atom
+truth-mask oracle checks derived models, both signs, interleaved assumptions and
+later arbitrary constraints. Existing generic CNF, circuit scope/equivalence,
+ROOT16N, recursive dispatch, one-page spill and failure laws remain unchanged.
+Recursive dispatch timing and schedule-sensitive certificate work still require
+qualification; this representation change alone is not a global completion claim.
+
+The exact compiled definition directory belongs to the clausal scope. Full signed
+operand pairs are sorted and collision-checked, so aliases and commuted operands
+reuse one derived variable and clause triple. Input keys occupy two additional
+primitive columns in the existing variable store. The required open-addressed
+directory occupies a disjoint high-address region of the existing paged heap store;
+independent priority-heap addresses stay below Integer.MAX_VALUE. This adds no
+cardinality-sized resident directory or per-definition object. Growth copies into
+fresh paged addresses before publication, then clears old slots so radix pages
+retire. Page admission includes the old-plus-new peak; failure aborts the owner.
+Variable identity exhaustion bounds the table address arithmetic; the hash is only
+an index, never an equality oracle. Encoded equal/complement handles answer equality
+before SAT search. The unchanged40KB one-page law remains intact.

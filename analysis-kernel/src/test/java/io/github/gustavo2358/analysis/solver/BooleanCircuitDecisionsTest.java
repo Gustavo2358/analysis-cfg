@@ -7,6 +7,38 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class BooleanCircuitDecisionsTest {
+    @Test void distinctGraphAliasesReuseDefinitionsAndCountOnlyNewVariables(){
+        var memory=resources();var graph=new Graph();long a=graph.variable(0),b=graph.variable(1),root=graph.and(a,b);
+        try(var pages=new ResidentPageStore(128,memory,AnalysisResources.Phase.CONTROL);
+            var decisions=new BooleanCircuitDecisions(pages,memory,graph)){
+            decisions.beginScope();assertTrue(decisions.satisfiable(root));assertEquals(3,decisions.lastDecisionVariables());
+            for(int alias=0;alias<32;alias++){
+                assertTrue(decisions.equivalent(root,graph.and(b,a)));
+                assertEquals(0,decisions.lastDecisionVariables(),"aliases must not report phantom variable allocations");
+            }
+            decisions.endScope();assertEquals(0,pages.statistics().livePages());
+        }
+        assertEquals(0,memory.heapUsed());
+    }
+    @Test void formulaDefinitionsCannotMultiplyIndependentBranchingDimension() throws Exception {
+        // The circuit has N independent atoms. Derived gate values are uniquely
+        // determined by those atoms, regardless of the number of graph records.
+        for(int count:new int[]{32,128,512}){
+            var memory=resources();var graph=new Graph();long root=1;
+            for(int key=0;key<count;key++)root=graph.and(root,graph.variable(key));
+            try(var pages=new ResidentPageStore(4096,memory,AnalysisResources.Phase.CONTROL);
+                var decisions=new BooleanCircuitDecisions(pages,memory,graph)){
+                decisions.beginScope();assertTrue(decisions.satisfiable(root));
+                Object formula=field(field(decisions,"retained"),"decisions");
+                assertEquals(count,field(formula,"heapSize"),"only original atoms are independent search choices N="+count);
+                decisions.endScope();assertEquals(0,pages.statistics().livePages());
+            }
+            assertEquals(0,memory.heapUsed());
+        }
+    }
+    private static Object field(Object owner,String name) throws ReflectiveOperationException {
+        var field=owner.getClass().getDeclaredField(name);field.setAccessible(true);return field.get(owner);
+    }
     private static AnalysisResources resources(){return new AnalysisResources(new AnalysisResources.Limits(8000000,100000,0,0,0,500000000,0));}
     private record Node(int key,long left,long right) { }
     private static final class Graph implements BooleanCircuitView {
