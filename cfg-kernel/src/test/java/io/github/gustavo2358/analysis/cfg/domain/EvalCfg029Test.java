@@ -65,11 +65,11 @@ class EvalCfg029Test {
         Map<CfgNodeId, Node> nodes = new HashMap<>();
         for (CfgNode node : graph.nodes()) {
             Node seen = switch (node) {
-                case CfgNode.EntryNode n -> en(n.source().id());
-                case CfgNode.SequenceNode n -> seq(n.source().label());
+                case CfgNode.EntryNode n -> en(n.entry());
+                case CfgNode.SequenceNode n -> seq(n.label());
                 case CfgNode.NormalExit n -> normal(n.entryId());
                 case CfgNode.OutcomeExit ignored -> throw new AssertionError("outside outcomes belong to exceptional control tests");
-                case CfgNode.HaltExit n -> stopped(n.source().header().id());
+                case CfgNode.HaltExit n -> stopped(n.operation());
             };
             assertNull(nodes.put(node.id(), seen));
         }
@@ -95,7 +95,7 @@ class EvalCfg029Test {
     }
     private static CfgNode.SequenceNode sequence(CfgGraph graph, LabelId label) {
         return graph.nodes().stream().filter(CfgNode.SequenceNode.class::isInstance)
-                .map(CfgNode.SequenceNode.class::cast).filter(n -> n.source().label().equals(label))
+                .map(CfgNode.SequenceNode.class::cast).filter(n -> n.label().equals(label))
                 .findFirst().orElseThrow();
     }
     private static void invalid(Publication p) {
@@ -117,11 +117,9 @@ class EvalCfg029Test {
                 e.from().equals(seq(YES)) && e.to().equals(seq(NO))
                 || e.from().equals(seq(NO)) && e.to().equals(seq(YES))
                 || e.from().equals(seq(L)) && e.to().equals(seq(JOIN))));
-        assertEquals(List.of(new OperationId(U, "opY")), sequence(g, YES).source().instructions().stream()
-                .map(i -> i.header().id()).toList());
-        assertEquals(List.of(new OperationId(U, "opN")), sequence(g, NO).source().instructions().stream()
-                .map(i -> i.header().id()).toList());
-        for (Sequence s : input.units().getFirst().sequences()) assertSame(s, sequence(g, s.label()).source());
+        assertEquals(List.of(new OperationId(U, "opY")), sequence(g, YES).operations());
+        assertEquals(List.of(new OperationId(U, "opN")), sequence(g, NO).operations());
+        for (Sequence s : input.units().getFirst().sequences()) assertEquals(s.label(), sequence(g, s.label()).label());
     }
 
     @Test
@@ -141,7 +139,7 @@ class EvalCfg029Test {
         var original = (Operations.Branch) input.units().getFirst().sequences().getFirst().terminator();
         int hash = input.hashCode();
         CfgGraph g = graph(input);
-        var seen = (Operations.Branch) sequence(g, L).source().terminator();
+        var seen = (Operations.Branch) sequence(g, L).terminator();
         assertEquals(diamondExpected(), observe(g));
         assertEquals(CfgSource.from(input), g.source());
         assertSame(original, seen);
@@ -205,9 +203,9 @@ class EvalCfg029Test {
         var g = graph(withData(List.of(branch(L, bool(L, true), YES, JOIN),
                 jump(YES, JOIN, List.of(assign("opY", "Y"))), returning(JOIN)), false));
         assertEquals(expected, observe(g));
-        assertTrue(sequence(g, L).source().instructions().isEmpty());
-        assertTrue(sequence(g, JOIN).source().instructions().isEmpty());
-        assertEquals(1, sequence(g, YES).source().instructions().size());
+        assertTrue(sequence(g, L).operations().isEmpty());
+        assertTrue(sequence(g, JOIN).operations().isEmpty());
+        assertEquals(1, sequence(g, YES).operations().size());
     }
 
     @Test
@@ -259,7 +257,7 @@ class EvalCfg029Test {
                 Set.of(enter(E, L), edge(L, JOIN, Arm.TRUE, E), edge(L, JOIN, Arm.FALSE, E), ret(JOIN, E)));
         var g = graph(input);
         assertEquals(expected, observe(g));
-        assertSame(predicate, ((Operations.Branch) sequence(g, L).source().terminator()).predicate());
+        assertSame(predicate, ((Operations.Branch) sequence(g, L).terminator()).predicate());
         assertEquals(2, g.transitions().stream().filter(t -> t.from().equals(sequence(g, L).id())).count());
     }
 
@@ -298,13 +296,12 @@ class EvalCfg029Test {
         assertEquals(observe(original).nodes(), observe(renamed).nodes().stream()
                 .map(n -> new Node(n.role(), correlation.get(n.identity()))).collect(Collectors.toSet()));
         for (var pair : Map.of(source, L, yes, YES, no, NO).entrySet()) {
-            var before = sequence(original, pair.getValue()).source();
-            var after = sequence(renamed, pair.getKey()).source();
+            var before = sequence(original, pair.getValue());
+            var after = sequence(renamed, pair.getKey());
             assertEquals(before.terminator().header().id(), correlation.get(after.terminator().header().id()));
-            assertEquals(before.origin(), after.origin());
             assertEquals(before.terminator().header().origin(), after.terminator().header().origin());
         }
-        var p = ((Operations.Branch) sequence(renamed, source).source().terminator()).predicate();
+        var p = ((Operations.Branch) sequence(renamed, source).terminator()).predicate();
         assertEquals(bool(L, true).header().id(), correlation.get(p.header().id()));
         assertEquals(ORIGIN, p.header().origin());
         assertEquals(new Values.BoolValue(true), ((Expressions.Literal) p).value());
@@ -325,7 +322,7 @@ class EvalCfg029Test {
         var g = graph(input);
         assertEquals(diamondExpected(), observe(g));
         assertEquals(CfgSource.from(base), g.source(), "presentation-only AIR is not retained by CFG");
-        assertSame(base.units().getFirst().sequences().getFirst().terminator(), sequence(g, L).source().terminator());
+        assertSame(base.units().getFirst().sequences().getFirst().terminator(), sequence(g, L).terminator());
     }
 
     @Test
@@ -343,14 +340,13 @@ class EvalCfg029Test {
                 Set.of(enter(E, L), edge(L, JOIN, Arm.JUMP, E), edge(JOIN, YES, Arm.TRUE, E),
                         edge(JOIN, NO, Arm.FALSE, E), ret(YES, E), ret(NO, E))), observe(split));
         // Explicit original point correspondence: L[0,1,terminator] -> L[0], join[0,terminator].
-        assertSame(first, sequence(whole, L).source().instructions().get(0));
-        assertSame(first, sequence(split, L).source().instructions().get(0));
-        assertSame(second, sequence(whole, L).source().instructions().get(1));
-        assertSame(second, sequence(split, JOIN).source().instructions().get(0));
-        assertSame(branch, sequence(whole, L).source().terminator());
-        assertSame(branch, sequence(split, JOIN).source().terminator());
+        assertEquals(List.of(first.header().id(),second.header().id()),sequence(whole,L).operations());
+        assertEquals(List.of(first.header().id()),sequence(split,L).operations());
+        assertEquals(List.of(second.header().id()),sequence(split,JOIN).operations());
+        assertSame(branch, sequence(whole, L).terminator());
+        assertSame(branch, sequence(split, JOIN).terminator());
         assertSame(((Operations.Branch) branch).predicate(),
-                ((Operations.Branch) sequence(split, JOIN).source().terminator()).predicate());
+                ((Operations.Branch) sequence(split, JOIN).terminator()).predicate());
     }
 
     @Test
@@ -374,7 +370,7 @@ class EvalCfg029Test {
                 Set.of(enter(E, L), ret(L, E), edge(NO, L, Arm.TRUE, E), edge(NO, JOIN, Arm.FALSE, E), ret(JOIN, E)));
         var g = graph(plain(List.of(returning(L), orphan, returning(JOIN))));
         assertEquals(expected, observe(g));
-        assertSame(orphan, sequence(g, NO).source());
+        assertEquals(orphan.label(), sequence(g, NO).label());
         assertTrue(g.transitions().stream().noneMatch(t -> t.to().equals(sequence(g, NO).id())));
     }
 
@@ -409,7 +405,7 @@ class EvalCfg029Test {
         var g = graph(plain(sequences.reversed()));
         assertEquals(new Observation(Set.copyOf(nodes), Set.copyOf(edges)), observe(g));
         assertEquals(518, g.transitions().size());
-        for (Sequence s : sequences) assertSame(s, sequence(g, s.label()).source());
+        for (Sequence s : sequences) assertEquals(s.label(), sequence(g, s.label()).label());
     }
 
     @Test

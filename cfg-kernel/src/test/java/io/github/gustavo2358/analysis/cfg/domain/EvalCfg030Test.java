@@ -45,11 +45,11 @@ class EvalCfg030Test {
         Map<CfgNodeId, Node> nodes = new HashMap<>();
         for (CfgNode n : graph.nodes()) {
             Node seen = switch (n) {
-                case CfgNode.EntryNode v -> en(v.source().id());
-                case CfgNode.SequenceNode v -> seq(v.source().label());
+                case CfgNode.EntryNode v -> en(v.entry());
+                case CfgNode.SequenceNode v -> seq(v.label());
                 case CfgNode.NormalExit v -> exit(v.entryId());
                 case CfgNode.OutcomeExit ignored -> throw new AssertionError("outside outcomes belong to exceptional control tests");
-                case CfgNode.HaltExit v -> haltExit(v.source().header().id());
+                case CfgNode.HaltExit v -> haltExit(v.operation());
             };
             assertNull(nodes.put(n.id(), seen));
         }
@@ -323,9 +323,9 @@ class EvalCfg030Test {
         assertEquals(CfgSource.from(p), graph.source());
         assertEquals(PARTIAL, graph.source().units().getFirst().inventory());
         var seen = graph.nodes().stream().filter(CfgNode.SequenceNode.class::isInstance)
-                .map(CfgNode.SequenceNode.class::cast).findFirst().orElseThrow().source();
-        assertSame(sequence, seen);
-        assertSame(precision, seen.terminator().header().precision());
+                .map(CfgNode.SequenceNode.class::cast).findFirst().orElseThrow().terminator();
+        assertSame(sequence.terminator(), seen);
+        assertSame(precision, seen.header().precision());
         assertEquals(hash, p.hashCode());
     }
 

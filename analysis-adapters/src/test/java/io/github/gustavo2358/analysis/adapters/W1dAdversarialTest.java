@@ -68,10 +68,10 @@ final class W1dAdversarialTest {
         all.add(new Sequence(label,List.of(),new Operations.Return(h,List.of()),i.header().origin()));
         var changed=sequences(p,all,u.entries());var cfg=build(changed);assertEquals(CfgBuildResult.Status.CFG_BUILT,cfg.status());
         var index=session(changed).index();var call=index.sequence(index.site(i.header().id()).sequence().label());
-        var graph=cfg.graph().orElseThrow();var node=graph.nodes().stream().filter(n->n instanceof io.github.gustavo2358.analysis.cfg.domain.CfgNode.SequenceNode s&&s.source().terminator()==i).findFirst().orElseThrow();
+        var graph=cfg.graph().orElseThrow();var node=graph.nodes().stream().filter(n->n instanceof io.github.gustavo2358.analysis.cfg.domain.CfgNode.SequenceNode s&&s.terminator()==i).findFirst().orElseThrow();
         var edge=graph.transitions().stream().filter(e->e.from().equals(node.id())).findFirst().orElseThrow();
         var dest=graph.nodes().stream().filter(n->n.id().equals(edge.to())).findFirst().orElseThrow();
-        assertEquals(((Control.Normal)i.outcomes().known().getFirst()).label(),((io.github.gustavo2358.analysis.cfg.domain.CfgNode.SequenceNode)dest).source().label());
+        assertEquals(((Control.Normal)i.outcomes().known().getFirst()).label(),((io.github.gustavo2358.analysis.cfg.domain.CfgNode.SequenceNode)dest).label());
         assertNotNull(call);
     }
     @Test void sharedAndRepeatedQueriesExecuteOneValuesRun() throws Exception {

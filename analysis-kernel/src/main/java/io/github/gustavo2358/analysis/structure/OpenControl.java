@@ -41,15 +41,15 @@ final class OpenControl {
     private OpenControl() { }
     static boolean partial(ProgramIndex.Node node, ProjectionPolicy policy) {
         if (policy != ProjectionPolicy.PARTIAL_ANALYSIS || !(node.source() instanceof CfgNode.SequenceNode s)) return false;
-        var term=s.source().terminator();
+        var term=s.terminator();
         return !(LocalControlRules.local(term) || term instanceof Operations.Return || term instanceof Operations.Jump || term instanceof Operations.Branch || term instanceof Operations.Halt
             || term instanceof Operations.Invoke i && supportsInvoke(i) || term instanceof Operations.Opaque o && supportsOpaque(o));
     }
     static Scopes.ControlBound bound(ProgramIndex.Node node, ProjectionPolicy policy) {
         if (partial(node,policy)) return new Scopes.WithinControl(new Scopes.UnitControl(node.owner().id(),true,true,true,true,true,true));
         if(node.source() instanceof CfgNode.SequenceNode s) {
-            if(s.source().terminator() instanceof Operations.Opaque o)return o.envelope().control().remainder();
-            if(s.source().terminator() instanceof Operations.Invoke i)return i.outcomes().remainder();
+            if(s.terminator() instanceof Operations.Opaque o)return o.envelope().control().remainder();
+            if(s.terminator() instanceof Operations.Invoke i)return i.outcomes().remainder();
         }
         return Scopes.NoControl.INSTANCE;
     }
@@ -61,7 +61,7 @@ final class OpenControl {
         if(target.source() instanceof CfgNode.EntryNode)return false;
         if(target.source() instanceof CfgNode.NormalExit exit&&!exit.entryId().equals(entry.id()))return false;
         if(scope instanceof Scopes.AllControl)return true;
-        if(scope instanceof Scopes.LabelsControl labels)return target.source() instanceof CfgNode.SequenceNode s&&labels.labels().contains(s.source().label());
+        if(scope instanceof Scopes.LabelsControl labels)return target.source() instanceof CfgNode.SequenceNode s&&labels.labels().contains(s.label());
         if(scope instanceof Scopes.UnitControl u)return u.unit().equals(target.owner().id())
             &&(target.source() instanceof CfgNode.SequenceNode&&u.labels()||target.source() instanceof CfgNode.NormalExit&&u.normalExit()
                 ||target.source() instanceof CfgNode.HaltExit&&u.halt()

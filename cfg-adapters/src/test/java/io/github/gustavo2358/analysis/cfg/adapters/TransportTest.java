@@ -57,10 +57,10 @@ class TransportTest {
         assertArrayEquals(new CfgJsonWriter().encode(memory),new CfgJsonWriter().encode(file));
         var graph=file.graph().orElseThrow();assertEquals(4,graph.nodes().size());assertEquals(3,graph.transitions().size());
         assertEquals(1,graph.transitions().stream().filter(t->t.kind()==CfgTransition.Kind.INVOKE_NORMAL).count());
-        var body=graph.nodes().stream().filter(n->n instanceof CfgNode.SequenceNode q && q.source().label().equals(s.label()))
+        var body=graph.nodes().stream().filter(n->n instanceof CfgNode.SequenceNode q && q.label().equals(s.label()))
                 .map(n->(CfgNode.SequenceNode)n).findFirst().orElseThrow();
-        assertEquals(s.instructions(),body.source().instructions());assertInstanceOf(Operations.CopyBytes.class,body.source().instructions().get(1));
-        assertEquals(call,body.source().terminator());
+        assertEquals(s.label(),body.label());assertInstanceOf(Operations.CopyBytes.class,restored.units().getFirst().sequences().getFirst().instructions().get(1));
+        assertEquals(call,body.terminator());
         assertEquals(List.of(Capabilities.MEMORY_REGIONS,Capabilities.IBM1047),graph.preciseControlCapabilities());
         assertFalse(io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection.supportsControlCapability(new Capabilities.Capability("text.ebcdic.ibm1047","2")));
         assertFalse(io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection.supportsControlCapability(new Capabilities.Capability("text.unknown","1")));
@@ -101,10 +101,10 @@ class TransportTest {
         var p = new Ids.PublicationId("goback-0b-manual");
         var u = new Ids.UnitId(p, "unit");
         var e = new Ids.EntryId(u, "primary-entry");
-        assertEquals(e, entry.source().id());
-        assertEquals(new Ids.LabelId(u, "sequence"), sequence.source().label());
-        assertEquals(new Ids.OperationId(u, "return"), sequence.source().terminator().header().id());
-        assertInstanceOf(Operations.Return.class, sequence.source().terminator());
+        assertEquals(e, entry.entry());
+        assertEquals(new Ids.LabelId(u, "sequence"), sequence.label());
+        assertEquals(new Ids.OperationId(u, "return"), sequence.terminator().header().id());
+        assertInstanceOf(Operations.Return.class, sequence.terminator());
         assertEquals(u, exit.unitId());
         assertEquals(e, exit.entryId());
         assertEquals(List.of(new CfgTransition(entry.id(), sequence.id(), CfgTransition.Kind.ENTRY, e),

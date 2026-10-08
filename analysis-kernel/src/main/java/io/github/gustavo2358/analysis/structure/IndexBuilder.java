@@ -228,26 +228,32 @@ final class IndexBuilder {
             count.visit("cfg.nodes");
             valid(source.id().publicationId().equals(snapshot.id()), "foreign CFG node publication");
             UnitId owner = switch (source) {
-                case CfgNode.SequenceNode n -> n.source().label().unit();
-                case CfgNode.EntryNode n -> n.source().id().unit();
+                case CfgNode.SequenceNode n -> n.label().unit();
+                case CfgNode.EntryNode n -> n.entry().unit();
                 case CfgNode.NormalExit n -> n.unitId();
-                case CfgNode.HaltExit n -> n.source().header().id().unit();
-                case CfgNode.OutcomeExit n -> n.source().header().id().unit();
+                case CfgNode.HaltExit n -> n.operation().unit();
+                case CfgNode.OutcomeExit n -> n.operation().unit();
             };
             Unit unit = units.get(owner);
             valid(unit != null, "foreign CFG node Unit");
-            var node = new ProgramIndex.Node(identity, ordinal, source, unit);
+            var node = new ProgramIndex.Node(identity, ordinal, source, unit,
+                    source instanceof CfgNode.SequenceNode sequence ? sequences.get(sequence.label()) : null);
             nodes[ordinal] = node;
             ordinal = Math.incrementExact(ordinal);
             unique(nodeIds, source.id(), node, "duplicate CFG node ID");
             switch (source) {
                 case CfgNode.SequenceNode n -> {
-                    valid(sequences.get(n.source().label()) == n.source(), "foreign/replaced Sequence source");
-                    unique(sequenceNodes, n.source().label(), node, "duplicate SequenceNode");
+                    var sequence=sequences.get(n.label());
+                    valid(sequence != null && sequence.terminator() == n.terminator()
+                            && n.operations().equals(sequence.instructions().stream()
+                                    .map(operation -> operation.header().id()).toList()),
+                            "foreign/replaced Sequence source");
+                    unique(sequenceNodes, n.label(), node, "duplicate SequenceNode");
                 }
                 case CfgNode.EntryNode n -> {
-                    valid(entries.get(n.source().id()) == n.source(), "foreign/replaced Entry source");
-                    unique(entryNodes, n.source().id(), node, "duplicate EntryNode");
+                    var entry=entries.get(n.entry());
+                    valid(entry != null && entry.initialLabel().equals(n.initialLabel()), "foreign/replaced Entry source");
+                    unique(entryNodes, n.entry(), node, "duplicate EntryNode");
                 }
                 case CfgNode.NormalExit n -> {
                     valid(entries.containsKey(n.entryId()) && n.entryId().unit().equals(n.unitId())
@@ -255,15 +261,16 @@ final class IndexBuilder {
                     unique(normalExits, n.entryId(), node, "duplicate NormalExit");
                 }
                 case CfgNode.OutcomeExit n -> {
-                    ProgramIndex.Site site=operations.get(n.source().header().id());
-                    valid(site!=null&&site.isTerminator()&&site.operation()==n.source(),"foreign/replaced outside outcome occurrence");
-                    valid(OpenControl.outside(n.outcome())&&OpenControl.alternatives(n.source()).contains(n.outcome()),"unpublished outside outcome");
-                    unique(outcomeExits,new OutsideKey(n.source().header().id(),n.outcome()),node,"duplicate outside outcome");
+                    ProgramIndex.Site site=operations.get(n.operation());
+                    valid(site!=null&&site.isTerminator(),"foreign/replaced outside outcome occurrence");
+                    valid(OpenControl.outside(n.outcome())&&OpenControl.alternatives((Terminator)site.operation()).contains(n.outcome()),"unpublished outside outcome");
+                    unique(outcomeExits,new OutsideKey(n.operation(),n.outcome()),node,"duplicate outside outcome");
                 }
                 case CfgNode.HaltExit n -> {
-                    ProgramIndex.Site site = operations.get(n.source().header().id());
-                    valid(site != null && site.isTerminator() && site.operation() == n.source(), "foreign/replaced Halt occurrence");
-                    unique(haltExits, n.source().header().id(), node, "duplicate HaltExit");
+                    ProgramIndex.Site site = operations.get(n.operation());
+                    valid(site != null && site.isTerminator() && site.operation() instanceof Operations.Halt halt
+                            && halt.haltKind() == n.haltKind(), "foreign/replaced Halt occurrence");
+                    unique(haltExits, n.operation(), node, "duplicate HaltExit");
                 }
             }
             count.nodes = Math.incrementExact(count.nodes);
@@ -319,22 +326,22 @@ final class IndexBuilder {
 
     private ProgramIndex.Node expectedTarget(ProgramIndex.Node source, Entries.Entry activation, CfgTransition.Kind kind, ProgramIndex.Node target) {
         if (source.source() instanceof CfgNode.EntryNode entry) {
-            return kind == CfgTransition.Kind.ENTRY && entry.source() == activation
+            return kind == CfgTransition.Kind.ENTRY && entry.entry().equals(activation.id())
                     ? sequenceNodes.get(activation.initialLabel().orElseThrow()) : null;
         }
         if (!(source.source() instanceof CfgNode.SequenceNode node)) return null;
         if(kind==CfgTransition.Kind.EXCEPTION&&target.source() instanceof CfgNode.SequenceNode destination)
-            return OpenControl.alternatives(node.source().terminator()).stream().anyMatch(a->destination.source().label().equals(OpenControl.exceptionLabel(a)))?target:null;
-        if(kind==CfgTransition.Kind.CONTROL_EXIT&&!LocalControlRules.local(node.source().terminator())&&target.source() instanceof CfgNode.OutcomeExit outside)
-            return outside.source()==node.source().terminator()&&OpenControl.outside(outside.outcome())
-                &&OpenControl.alternatives(outside.source()).contains(outside.outcome())?target:null;
-        return switch (node.source().terminator()) {
+            return OpenControl.alternatives(node.terminator()).stream().anyMatch(a->destination.label().equals(OpenControl.exceptionLabel(a)))?target:null;
+        if(kind==CfgTransition.Kind.CONTROL_EXIT&&!LocalControlRules.local(node.terminator())&&target.source() instanceof CfgNode.OutcomeExit outside)
+            return outside.operation().equals(node.terminator().header().id())&&OpenControl.outside(outside.outcome())
+                &&OpenControl.alternatives(node.terminator()).contains(outside.outcome())?target:null;
+        return switch (node.terminator()) {
             case Operations.Opaque opaque -> kind == CfgTransition.Kind.OPAQUE_RETURN && opaque.envelope().control().known().contains(Control.ReturnAlternative.INSTANCE)
                 ? normalExits.get(activation.id()) : kind == CfgTransition.Kind.OPAQUE_JUMP && target.source() instanceof CfgNode.SequenceNode seq
-                    && OpenControl.opaqueDestination(opaque, seq.source().label()) ? target : null;
+                    && OpenControl.opaqueDestination(opaque, seq.label()) ? target : null;
             case Operations.Jump jump -> kind == CfgTransition.Kind.JUMP ? sequenceNodes.get(jump.destination()) : null;
             case Operations.Invoke invoke -> kind == CfgTransition.Kind.INVOKE_NORMAL && target.source() instanceof CfgNode.SequenceNode s
-                    && invoke.outcomes().known().stream().anyMatch(o -> o instanceof Control.Normal n && n.label().equals(s.source().label())) ? target : null;
+                    && invoke.outcomes().known().stream().anyMatch(o -> o instanceof Control.Normal n && n.label().equals(s.label())) ? target : null;
             case Operations.Branch branch -> switch (kind) {
                 case BRANCH_TRUE -> sequenceNodes.get(branch.trueDestination());
                 case BRANCH_FALSE -> sequenceNodes.get(branch.falseDestination());

@@ -180,11 +180,12 @@ public final class ReachingDefinitions {
         }
         @Override public State transferBlock(AnalysisPoint point,State anchor,DomainWork work) {
             if(!(point.node().source() instanceof CfgNode.SequenceNode node))return anchor;
-            var state=anchor;for(var operation:node.source().instructions()){work.operationTransferred();state=operation(state,operation);}
-            work.operationTransferred();return operation(state,node.source().terminator());
+            var sequence=owner.session.index().sequence(point.node());
+            var state=anchor;for(var operation:sequence.instructions()){work.operationTransferred();state=operation(state,operation);}
+            work.operationTransferred();return operation(state,sequence.terminator());
         }
         @Override public State transferEdge(AnalysisPoint point,CfgTransition edge,State state,DomainWork work) {
-            if(!(point.node().source() instanceof CfgNode.SequenceNode node)||!(node.source().terminator() instanceof Operations.Invoke invoke))return state;
+            if(!(point.node().source() instanceof CfgNode.SequenceNode node)||!(node.terminator() instanceof Operations.Invoke invoke))return state;
             if(edge.kind()==CfgTransition.Kind.INVOKE_NORMAL)return apply(state,owner.outcomes.get(invoke).get(Control.NormalOutcome.INSTANCE),false);
             // Open control does not identify the completed outcome. Preserve every possible old definition.
             state=apply(state,owner.otherwise.get(invoke),true);

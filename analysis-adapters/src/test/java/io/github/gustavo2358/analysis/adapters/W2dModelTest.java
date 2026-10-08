@@ -93,7 +93,7 @@ final class W2dModelTest {
             assertEquals(io.github.gustavo2358.analysis.cfg.application.CfgBuildResult.Status.CFG_BUILT,built.status());
             var g=built.graph().orElseThrow();
             var labels=new HashMap<CfgNodeId,String>();
-            for(var n:g.nodes())labels.put(n.id(),n instanceof CfgNode.SequenceNode s?s.source().label().localId():
+            for(var n:g.nodes())labels.put(n.id(),n instanceof CfgNode.SequenceNode s?s.label().localId():
                 n instanceof CfgNode.EntryNode?"ENTRY":"EXIT");
             var actual=g.transitions().stream().map(t->labels.get(t.from())+" "+t.kind()+" "+labels.get(t.to())).collect(java.util.stream.Collectors.toSet());
             var expected=new HashSet<>(List.of("ENTRY ENTRY start","start BRANCH_TRUE then",

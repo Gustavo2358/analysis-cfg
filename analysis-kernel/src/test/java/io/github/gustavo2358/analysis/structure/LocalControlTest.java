@@ -59,7 +59,7 @@ class LocalControlTest {
     static List<String> trace(ContextView context) {
         var result=new ArrayList<String>();var point=context.initialPoint();var seen=new HashSet<ContextView.Point>();
         while(seen.add(point)) {
-            if(point.node().source() instanceof CfgNode.SequenceNode n)result.add(n.source().label().localId());
+            if(point.node().source() instanceof CfgNode.SequenceNode n)result.add(n.label().localId());
             else if(point.node().source() instanceof CfgNode.OutcomeExit n)result.add(((Control.Exceptional)n.outcome()).tag());
             var edges=context.successors(point);if(!edges.advance())break;
             point=edges.target();assertFalse(edges.advance(),"this oracle describes deterministic programs");

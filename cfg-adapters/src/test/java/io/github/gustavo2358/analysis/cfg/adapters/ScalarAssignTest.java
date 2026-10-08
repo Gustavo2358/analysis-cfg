@@ -38,11 +38,13 @@ class ScalarAssignTest {
         var unit = publication.units().getFirst();
         var original = unit.sequences().getFirst();
         var graph = build(publication).graph().orElseThrow();
-        var source = assertInstanceOf(CfgNode.SequenceNode.class, graph.nodes().getFirst()).source();
+        var source = assertInstanceOf(CfgNode.SequenceNode.class, graph.nodes().getFirst());
         assertEquals(CfgSource.from(publication), graph.source());
-        assertSame(original, source);
-        assertEquals(1, source.instructions().size());
-        var assign = assertInstanceOf(Operations.Assign.class, source.instructions().getFirst());
+        assertEquals(original.label(), source.label());
+        assertFalse(java.util.Arrays.stream(CfgNode.SequenceNode.class.getRecordComponents())
+                .anyMatch(component -> component.getType().equals(Sequence.class)));
+        assertEquals(1, original.instructions().size());
+        var assign = assertInstanceOf(Operations.Assign.class, original.instructions().getFirst());
         assertSame(original.instructions().getFirst(), assign);
         var destination = assertInstanceOf(Places.ObjectPlace.class, assign.destination());
         var literal = assertInstanceOf(Expressions.Literal.class, assign.value());
@@ -80,8 +82,8 @@ class ScalarAssignTest {
         var p = new Ids.PublicationId("cp4b-scalar-manual");
         var u = new Ids.UnitId(p, "alpha");
         var e = new Ids.EntryId(u, "start");
-        assertEquals(e, entry.source().id());
-        assertEquals(new Ids.LabelId(u, "body"), sequence.source().label());
+        assertEquals(e, entry.entry());
+        assertEquals(new Ids.LabelId(u, "body"), sequence.label());
         assertEquals(u, exit.unitId());
         assertEquals(e, exit.entryId());
         assertEquals(List.of(new CfgTransition(entry.id(), sequence.id(), CfgTransition.Kind.ENTRY, e),
@@ -147,10 +149,11 @@ class ScalarAssignTest {
         assertEquals(3, graph.nodes().size());
         assertEquals(2, graph.transitions().size());
         assertEquals(1, graph.nodes().stream().filter(CfgNode.SequenceNode.class::isInstance).count());
-        var retained = ((CfgNode.SequenceNode) graph.nodes().getFirst()).source();
+        var retained = (CfgNode.SequenceNode) graph.nodes().getFirst();
         assertEquals(CfgSource.from(expanded), graph.source());
-        assertSame(sequence, retained);
-        assertEquals(4096, retained.instructions().size());
-        for (int i = 0; i < instructions.size(); i++) assertSame(instructions.get(i), retained.instructions().get(i));
+        assertEquals(sequence.label(), retained.label());
+        assertSame(sequence.terminator(), retained.terminator());
+        assertFalse(java.util.Arrays.stream(CfgNode.SequenceNode.class.getRecordComponents())
+                .anyMatch(component -> component.getType().equals(Sequence.class)));
     }
 }

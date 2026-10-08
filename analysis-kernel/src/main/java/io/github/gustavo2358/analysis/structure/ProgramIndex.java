@@ -106,6 +106,11 @@ public final class ProgramIndex {
     public Place place(OperandId occurrence){return places.get(occurrence);}
     /** Pre-resolved ObjectPlace occurrence, including nested operands and Entry initial conditions. */
     public Memory.ObjectDeclaration referencedObject(OperandId occurrence) { return objectReferences.get(occurrence); }
+    /** Resident bridge while analyses migrate to the shared program store. */
+    public Sequence sequence(Node node) {
+        if (node.identity != identity) throw new IllegalArgumentException("foreign node");
+        return node.sequence;
+    }
 
     /** Opaque index handle. Its private ordinal never becomes an AIR/CFG identity or public result. */
     public static final class Node {
@@ -113,8 +118,10 @@ public final class ProgramIndex {
         final int ordinal;
         private final CfgNode source;
         private final Unit owner;
-        Node(Object identity, int ordinal, CfgNode source, Unit owner) {
+        private final Sequence sequence;
+        Node(Object identity, int ordinal, CfgNode source, Unit owner, Sequence sequence) {
             this.identity = identity; this.ordinal = ordinal; this.source = source; this.owner = owner;
+            this.sequence = sequence;
         }
         public CfgNode source() { return source; }
         public Unit owner() { return owner; }

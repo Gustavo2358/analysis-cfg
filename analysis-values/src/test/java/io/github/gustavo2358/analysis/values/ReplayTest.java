@@ -14,7 +14,8 @@ import static io.github.gustavo2358.analysis.values.ValuesFixtures.*;
 class ReplayTest {
     private static final class Backward implements AnalysisDefinition<Long> {
         private final IdentityHashMap<Operation,Integer> codes;
-        Backward(IdentityHashMap<Operation,Integer> codes){this.codes=codes;}
+        private final AnalysisSession session;
+        Backward(IdentityHashMap<Operation,Integer> codes,AnalysisSession session){this.codes=codes;this.session=session;}
         long operation(long state,Operation operation){return switch(codes.getOrDefault(operation,0)){case 1->state|2L;case 2->state&~1L;case 3->state|1L;default->state;};}
         public Direction direction(){return Direction.BACKWARD;}public Long bottom(){return 0L;}
         public Iterable<Boundary<Long>> boundaries(AnalysisSession session){return List.of();}
@@ -24,8 +25,9 @@ class ReplayTest {
         public Long transferBlock(AnalysisPoint point,Long anchor,DomainWork work) {
             long state=anchor;
             if(point.node().source() instanceof CfgNode.SequenceNode node) {
-                state=operation(state,node.source().terminator());
-                for(int i=node.source().instructions().size()-1;i>=0;i--)state=operation(state,node.source().instructions().get(i));
+                var sequence=session.index().sequence(point.node());
+                state=operation(state,node.terminator());
+                for(int i=sequence.instructions().size()-1;i>=0;i--)state=operation(state,sequence.instructions().get(i));
             }
             return state;
         }
@@ -37,7 +39,7 @@ class ReplayTest {
             for(int i=start;i<3;i++){var op=new Operations.Nop(header(u.id(),"op"+i));operations.add(op);codes.put(op,i+1);}
             var seq=returning(u.id(),"s0",operations);
             p=replace(p,List.of(unit(u.id(),u.entries(),List.of(seq),u.objects())),p.coverage(),p.uncertainties(),p.premises());
-            var session=session(p);var def=new Backward(codes);var result=DataflowSolver.solve(session,def);var context=session.contexts().iterator().next();var node=session.index().sequence(seq.label());
+            var session=session(p);var def=new Backward(codes,session);var result=DataflowSolver.solve(session,def);var context=session.contexts().iterator().next();var node=session.index().sequence(seq.label());
             assertEquals(start==0?2L:0L,result.in(context,node));assertEquals(0L,result.out(context,node));
             var queries=new ArrayList<PointQuery<Integer>>();var expected=new HashMap<PointQuery<Integer>,Long>();
             long[] before={2,0,1},after={0,1,0};

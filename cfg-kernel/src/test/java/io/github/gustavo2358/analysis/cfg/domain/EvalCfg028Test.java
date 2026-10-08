@@ -62,20 +62,19 @@ class EvalCfg028Test {
         Map<OperationId, Termination> halts = new HashMap<>();
         for (CfgNode node : graph.nodes()) {
             Node seen = switch (node) {
-                case CfgNode.EntryNode n -> en(n.source().id());
+                case CfgNode.EntryNode n -> en(n.entry());
                 case CfgNode.SequenceNode n -> {
-                    assertNull(instructions.put(n.source().label(), n.source().instructions().stream()
-                            .map(i -> i.header().id()).toList()));
-                    yield seq(n.source().label());
+                    assertNull(instructions.put(n.label(), n.operations()));
+                    yield seq(n.label());
                 }
                 case CfgNode.NormalExit n -> normal(n.entryId());
                 case CfgNode.OutcomeExit ignored -> throw new AssertionError("outside outcomes belong to exceptional control tests");
                 case CfgNode.HaltExit n -> {
-                    assertNull(halts.put(n.source().header().id(), switch (n.source().haltKind()) {
+                    assertNull(halts.put(n.operation(), switch (n.haltKind()) {
                         case NORMAL -> Termination.NORMAL;
                         case ABNORMAL -> Termination.ABNORMAL;
                     }));
-                    yield stopped(n.source().header().id());
+                    yield stopped(n.operation());
                 }
             };
             assertNull(nodes.put(node.id(), seen));
@@ -101,7 +100,7 @@ class EvalCfg028Test {
     }
     private static CfgNode.SequenceNode sequence(CfgGraph graph, LabelId label) {
         return graph.nodes().stream().filter(CfgNode.SequenceNode.class::isInstance)
-                .map(CfgNode.SequenceNode.class::cast).filter(n -> n.source().label().equals(label))
+                .map(CfgNode.SequenceNode.class::cast).filter(n -> n.label().equals(label))
                 .findFirst().orElseThrow();
     }
     private static Publication withSequences(List<Sequence> sequences) {
@@ -123,9 +122,8 @@ class EvalCfg028Test {
         Publication input = withData(List.of(initial, returning(TAIL)), false);
         CfgGraph graph = graph(input);
         assertEquals(expected, observe(graph));
-        assertSame(initial, sequence(graph, L).source());
-        assertSame(first, sequence(graph, L).source().instructions().get(0));
-        assertSame(second, sequence(graph, L).source().instructions().get(1));
+        assertEquals(initial.label(), sequence(graph, L).label());
+        assertEquals(List.of(first.header().id(),second.header().id()), sequence(graph, L).operations());
         assertEquals(new Values.TextValue("A"), ((Expressions.Literal) first.value()).value());
         assertEquals(new Values.TextValue("B"), ((Expressions.Literal) second.value()).value());
         assertEquals(OBJECT, ((Places.ObjectPlace) first.destination()).object());
@@ -139,19 +137,17 @@ class EvalCfg028Test {
         Publication input = withData(List.of(initial, returning(TAIL)), true);
         int inputHash = input.hashCode();
         CfgGraph graph = graph(input);
-        List<Instruction> actual = sequence(graph, L).source().instructions();
+        List<OperationId> actual = sequence(graph, L).operations();
         assertEquals(List.of(new OperationId(U, "z-first"), new OperationId(U, "a-second"),
                 new OperationId(U, "havoc-must"), new OperationId(U, "havoc-may"),
                 new OperationId(U, "nop"), new OperationId(U, "copy")),
-                actual.stream().map(i -> i.header().id()).toList());
+                actual);
         for (int i = 0; i < instructions.size(); i++) {
-            assertSame(instructions.get(i), actual.get(i), "entire occurrence, including operands");
-            assertSame(instructions.get(i).header(), actual.get(i).header());
+            assertEquals(instructions.get(i).header().id(), actual.get(i), "ordered operation identity");
         }
-        assertSame(initial.instructions(), actual);
         assertEquals(CfgSource.from(input), graph.source());
-        assertEquals(List.of(GAP), actual.get(2).header().uncertainties());
-        assertEquals(Evidence.PrecisionStatus.OPEN, actual.get(2).header().precision().values().status());
+        assertEquals(List.of(GAP), instructions.get(2).header().uncertainties());
+        assertEquals(Evidence.PrecisionStatus.OPEN, instructions.get(2).header().precision().values().status());
         assertEquals(inputHash, input.hashCode());
         assertEquals(Set.of(enter(E, L), jumpEdge(L, TAIL, E), ret(TAIL, E)), observe(graph).edges());
         assertThrows(UnsupportedOperationException.class, () -> actual.clear());
@@ -199,15 +195,15 @@ class EvalCfg028Test {
                     (EntryId) correlation.get(edge.activation())));
         }
         assertEquals(observe(original).edges(), mapped);
-        assertEquals(List.of(originalOp), sequence(renamed, a).source().instructions().stream()
-                .map(i -> correlation.get(i.header().id())).toList());
+        assertEquals(List.of(originalOp), sequence(renamed, a).operations().stream()
+                .map(correlation::get).toList());
         assertEquals(Set.of(en(E), seq(L), seq(TAIL), normal(E)), observe(renamed).nodes().stream()
                 .map(n -> new Node(n.role(), correlation.get(n.correlation())))
                 .collect(java.util.stream.Collectors.toSet()));
-        assertEquals(correlation.get(sequence(renamed, a).source().terminator().header().id()),
-                sequence(original, L).source().terminator().header().id());
-        assertEquals(correlation.get(sequence(renamed, b).source().terminator().header().id()),
-                sequence(original, TAIL).source().terminator().header().id());
+        assertEquals(correlation.get(sequence(renamed, a).terminator().header().id()),
+                sequence(original, L).terminator().header().id());
+        assertEquals(correlation.get(sequence(renamed, b).terminator().header().id()),
+                sequence(original, TAIL).terminator().header().id());
     }
 
     @Test
@@ -221,12 +217,11 @@ class EvalCfg028Test {
         assertEquals(Set.of(enter(E, L), ret(L, E)), observe(whole).edges());
         assertEquals(Set.of(enter(E, L), jumpEdge(L, TAIL, E), ret(TAIL, E)), observe(split).edges());
         // Explicit correspondence of original points: whole[L,0/1/terminator] -> split[L,0;tail,0/terminator].
-        assertSame(first, sequence(whole, L).source().instructions().get(0));
-        assertSame(first, sequence(split, L).source().instructions().get(0));
-        assertSame(second, sequence(whole, L).source().instructions().get(1));
-        assertSame(second, sequence(split, TAIL).source().instructions().get(0));
-        assertSame(returned, sequence(whole, L).source().terminator());
-        assertSame(returned, sequence(split, TAIL).source().terminator());
+        assertEquals(List.of(first.header().id(),second.header().id()),sequence(whole,L).operations());
+        assertEquals(List.of(first.header().id()),sequence(split,L).operations());
+        assertEquals(List.of(second.header().id()),sequence(split,TAIL).operations());
+        assertSame(returned, sequence(whole, L).terminator());
+        assertSame(returned, sequence(split, TAIL).terminator());
         assertEquals(Map.of(L, List.of(first.header().id()), TAIL, List.of(second.header().id())),
                 observe(split).instructions());
         assertEquals(2, split.nodes().stream().filter(CfgNode.SequenceNode.class::isInstance).count());
@@ -274,7 +269,7 @@ class EvalCfg028Test {
         assertEquals(new Observation(Set.of(en(E), seq(L), seq(TAIL), normal(E)),
                 Set.of(enter(E, L), ret(L, E), jumpEdge(TAIL, L, E)),
                 Map.of(L, List.of(), TAIL, List.of(new OperationId(U, "orphan-op"))), Map.of()), observe(graph));
-        assertSame(orphan, sequence(graph, TAIL).source());
+        assertEquals(orphan.label(), sequence(graph, TAIL).label());
         assertTrue(graph.transitions().stream().noneMatch(t -> t.to().equals(sequence(graph, TAIL).id())));
     }
 
@@ -301,8 +296,8 @@ class EvalCfg028Test {
         assertEquals(new Observation(Set.of(en(E), seq(L), seq(TAIL), normal(E), stopped(one), stopped(two)),
                 Set.of(enter(E, L), stop(L, one, E), stop(TAIL, two, E)),
                 Map.of(L, List.of(), TAIL, List.of()), Map.of(one, Termination.NORMAL, two, Termination.ABNORMAL)), observe(graph));
-        assertSame(first.terminator(), graph.haltExits().get(0).source());
-        assertSame(other.terminator(), graph.haltExits().get(1).source());
+        assertEquals(first.terminator().header().id(), graph.haltExits().get(0).operation());
+        assertEquals(other.terminator().header().id(), graph.haltExits().get(1).operation());
         assertTrue(graph.transitions().stream().noneMatch(t -> t.to().equals(sequence(graph, TAIL).id())));
     }
 
@@ -391,9 +386,9 @@ class EvalCfg028Test {
         List<Instruction> input = new ArrayList<>();
         for (int i = 257; i >= 0; i--) input.add(new Operations.Nop(header(new OperationId(U, "op-" + i))));
         var graph = graph(withSequences(List.of(new Sequence(L, input, returning(L).terminator(), ORIGIN))));
-        List<Instruction> actual = sequence(graph, L).source().instructions();
+        List<OperationId> actual = sequence(graph, L).operations();
         assertEquals(258, actual.size());
-        for (int i = 0; i < input.size(); i++) assertSame(input.get(i), actual.get(i));
+        for (int i = 0; i < input.size(); i++) assertEquals(input.get(i).header().id(), actual.get(i));
         assertEquals(Set.of(enter(E, L), ret(L, E)), observe(graph).edges());
     }
 
@@ -404,8 +399,7 @@ class EvalCfg028Test {
         assertEquals(List.of(Capabilities.MEMORY_REGIONS), graph.preciseControlCapabilities());
         assertSame(graph.preciseControlCapabilities(), graph.preciseControlCapabilities());
         assertThrows(UnsupportedOperationException.class, () -> graph.preciseControlCapabilities().clear());
-        assertSame(copy, sequence(graph, L).source().instructions().getFirst());
-        assertSame(copy.fallback(), ((Operations.CopyBytes) sequence(graph, L).source().instructions().getFirst()).fallback());
+        assertEquals(copy.header().id(), sequence(graph, L).operations().getFirst());
         assertEquals(Set.of(enter(E, L), ret(L, E)), observe(graph).edges());
         assertTrue(SemanticInterpreterRegistry.empty().find(Capabilities.MEMORY_REGIONS).isEmpty());
     }

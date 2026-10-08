@@ -54,13 +54,14 @@ public final class PossibleValuesAnalysis implements AnalysisDefinition<Possible
     }
     @Override public PossibleValuesState transferBlock(AnalysisPoint point,PossibleValuesState anchor,DomainWork domainWork) {
         if(!(point.node().source() instanceof CfgNode.SequenceNode node))return anchor;
+        var sequence=profile.session.index().sequence(point.node());
         var state=anchor;
-        for(var operation:node.source().instructions()){domainWork.operationTransferred();state=profile.transferOperation(state,operation,work);}
-        domainWork.operationTransferred();return profile.transferOperation(state,node.source().terminator(),work);
+        for(var operation:sequence.instructions()){domainWork.operationTransferred();state=profile.transferOperation(state,operation,work);}
+        domainWork.operationTransferred();return profile.transferOperation(state,sequence.terminator(),work);
     }
     @Override public PossibleValuesState transferEdge(AnalysisPoint point,CfgTransition edge,PossibleValuesState state,DomainWork domainWork){
         if(!state.isReached()||!(point.node().source() instanceof CfgNode.SequenceNode node)
-                ||!(node.source().terminator() instanceof Operations.Branch branch))return state;
+                ||!(node.terminator() instanceof Operations.Branch branch))return state;
         int requested=edge.kind()==CfgTransition.Kind.BRANCH_TRUE?TextPredicate.TRUE:edge.kind()==CfgTransition.Kind.BRANCH_FALSE?TextPredicate.FALSE:TextPredicate.BOTH;
         int possible=TextPredicate.truth(branch.predicate(),place->{
             if(!(place instanceof Places.ObjectPlace named))return TextPredicate.Text.unknown();

@@ -62,7 +62,7 @@ public final class CfgGraph {
             }
             if (node instanceof CfgNode.EntryNode entry) {
                 entryNodes.add(entry);
-                if (activationEntries.putIfAbsent(entry.source().id(), entry) != null) {
+                if (activationEntries.putIfAbsent(entry.entry(), entry) != null) {
                     throw new IllegalArgumentException("duplicate activation Entry");
                 }
             } else if (node instanceof CfgNode.NormalExit exit) {
@@ -95,55 +95,56 @@ public final class CfgGraph {
             boolean valid = switch (transition.kind()) {
                 case EXCEPTION -> from instanceof CfgNode.SequenceNode sequence
                     &&to instanceof CfgNode.SequenceNode target
-                    &&sequence.source().label().unit().equals(transition.activationEntry().unit())
-                    &&target.source().label().unit().equals(transition.activationEntry().unit())
-                    &&CoreCfgProjection.alternatives(sequence.source().terminator()).stream()
-                        .anyMatch(a->target.source().label().equals(CoreCfgProjection.exceptionLabel(a)));
+                    &&sequence.label().unit().equals(transition.activationEntry().unit())
+                    &&target.label().unit().equals(transition.activationEntry().unit())
+                    &&CoreCfgProjection.alternatives(sequence.terminator()).stream()
+                        .anyMatch(a->target.label().equals(CoreCfgProjection.exceptionLabel(a)));
                 case CONTROL_EXIT -> from instanceof CfgNode.SequenceNode sequence
-                    &&to instanceof CfgNode.OutcomeExit exit&&sequence.source().terminator().equals(exit.source())
-                    &&sequence.source().label().unit().equals(transition.activationEntry().unit());
+                    &&to instanceof CfgNode.OutcomeExit exit&&sequence.terminator().header().id().equals(exit.operation())
+                    &&CoreCfgProjection.alternatives(sequence.terminator()).contains(exit.outcome())
+                    &&sequence.label().unit().equals(transition.activationEntry().unit());
                 case ENTRY -> from instanceof CfgNode.EntryNode entry
                         && to instanceof CfgNode.SequenceNode sequence
-                        && entry.source().id().equals(transition.activationEntry())
-                        && entry.source().initialLabel().filter(sequence.source().label()::equals).isPresent();
+                        && entry.entry().equals(transition.activationEntry())
+                        && entry.initialLabel().filter(sequence.label()::equals).isPresent();
                 case JUMP -> from instanceof CfgNode.SequenceNode sequence
-                        && sequence.source().terminator() instanceof Operations.Jump jump
+                        && sequence.terminator() instanceof Operations.Jump jump
                         && to instanceof CfgNode.SequenceNode target
-                        && jump.destination().equals(target.source().label())
-                        && sequence.source().label().unit().equals(transition.activationEntry().unit())
-                        && target.source().label().unit().equals(transition.activationEntry().unit());
+                        && jump.destination().equals(target.label())
+                        && sequence.label().unit().equals(transition.activationEntry().unit())
+                        && target.label().unit().equals(transition.activationEntry().unit());
                 case OPAQUE_JUMP -> from instanceof CfgNode.SequenceNode sequence
-                        && sequence.source().terminator() instanceof Operations.Opaque opaque
+                        && sequence.terminator() instanceof Operations.Opaque opaque
                         && to instanceof CfgNode.SequenceNode target
-                        && CoreCfgProjection.opaqueDestination(opaque, target.source().label())
-                        && sequence.source().label().unit().equals(transition.activationEntry().unit());
+                        && CoreCfgProjection.opaqueDestination(opaque, target.label())
+                        && sequence.label().unit().equals(transition.activationEntry().unit());
                 case OPAQUE_RETURN -> from instanceof CfgNode.SequenceNode sequence
-                        && sequence.source().terminator() instanceof Operations.Opaque opaque
+                        && sequence.terminator() instanceof Operations.Opaque opaque
                         && opaque.envelope().control().known().contains(io.github.gustavo2358.air.model.Control.ReturnAlternative.INSTANCE)
                         && to instanceof CfgNode.NormalExit exit && exit.entryId().equals(transition.activationEntry());
                 case OPAQUE_UNKNOWN, LOCAL -> false; // symbolic transitions exist only in the contextual cursor
                 case INVOKE_NORMAL -> from instanceof CfgNode.SequenceNode sequence
-                        && sequence.source().terminator() instanceof Operations.Invoke invoke
+                        && sequence.terminator() instanceof Operations.Invoke invoke
                         && to instanceof CfgNode.SequenceNode target
-                        && invoke.outcomes().known().stream().anyMatch(o -> o instanceof io.github.gustavo2358.air.model.Control.Normal n && n.label().equals(target.source().label()))
-                        && sequence.source().label().unit().equals(transition.activationEntry().unit())
-                        && target.source().label().unit().equals(transition.activationEntry().unit());
+                        && invoke.outcomes().known().stream().anyMatch(o -> o instanceof io.github.gustavo2358.air.model.Control.Normal n && n.label().equals(target.label()))
+                        && sequence.label().unit().equals(transition.activationEntry().unit())
+                        && target.label().unit().equals(transition.activationEntry().unit());
                 case BRANCH_TRUE, BRANCH_FALSE -> from instanceof CfgNode.SequenceNode sequence
-                        && sequence.source().terminator() instanceof Operations.Branch branch
+                        && sequence.terminator() instanceof Operations.Branch branch
                         && to instanceof CfgNode.SequenceNode target
                         && (transition.kind() == CfgTransition.Kind.BRANCH_TRUE
-                            ? branch.trueDestination() : branch.falseDestination()).equals(target.source().label())
-                        && sequence.source().label().unit().equals(transition.activationEntry().unit())
-                        && target.source().label().unit().equals(transition.activationEntry().unit());
+                            ? branch.trueDestination() : branch.falseDestination()).equals(target.label())
+                        && sequence.label().unit().equals(transition.activationEntry().unit())
+                        && target.label().unit().equals(transition.activationEntry().unit());
                 case HALT -> from instanceof CfgNode.SequenceNode sequence
-                        && sequence.source().terminator() instanceof Operations.Halt halt
+                        && sequence.terminator() instanceof Operations.Halt halt
                         && to instanceof CfgNode.HaltExit exit
-                        && halt.equals(exit.source())
-                        && sequence.source().label().unit().equals(transition.activationEntry().unit());
+                        && halt.header().id().equals(exit.operation())
+                        && sequence.label().unit().equals(transition.activationEntry().unit());
                 case RETURN -> from instanceof CfgNode.SequenceNode sequence
-                        && sequence.source().terminator() instanceof Operations.Return
+                        && sequence.terminator() instanceof Operations.Return
                         && to instanceof CfgNode.NormalExit exit
-                        && sequence.source().label().unit().equals(exit.unitId())
+                        && sequence.label().unit().equals(exit.unitId())
                         && exit.entryId().equals(transition.activationEntry());
             };
             if (!valid) {

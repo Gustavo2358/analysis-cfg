@@ -24,13 +24,13 @@ class AdmissionTest {
         var p0=linear(1,0,0,1); var u=p0.units().getFirst();
         var p=publication(p0.id(),List.of(unit(u.id(),u.entries(),List.of(returning(u.id(),"seq-0",List.of()),returning(u.id(),"orphan",List.of())),List.of())),List.of());
         var b=build(p); var g=b.graph().orElseThrow();
-        var orphan=g.nodes().stream().filter(n->n instanceof CfgNode.SequenceNode s && s.source().label().localId().equals("orphan")).findFirst().orElseThrow();
+        var orphan=g.nodes().stream().filter(n->n instanceof CfgNode.SequenceNode s && s.label().localId().equals("orphan")).findFirst().orElseThrow();
         var cut=new CfgGraph(p,g.nodes().stream().filter(n->n!=orphan).toList(),g.transitions().stream().filter(t->!t.from().equals(orphan.id())).toList());
         assertEquals(AnalysisSession.Status.INVALID_INPUT,AnalysisSession.open(withGraph(b,cut),p,ProjectionPolicy.KNOWN_SUBSET,u.entries()).status());
     }
     @Test void equalLookingReplacementSequenceIsInvalid() {
         var p=linear(1,2,1,1); var b=build(p); var g=b.graph().orElseThrow();
-        var nodes=g.nodes().stream().map(n->{ if(n instanceof CfgNode.SequenceNode s) { var q=s.source(); return (CfgNode)new CfgNode.SequenceNode(s.id(),new Sequence(q.label(),q.instructions(),q.terminator(),q.origin())); } return n; }).toList();
+        var nodes=g.nodes().stream().map(n->{ if(n instanceof CfgNode.SequenceNode s) { var q=(Operations.Return)s.terminator(); return (CfgNode)new CfgNode.SequenceNode(s.id(),s.label(),s.operations(),new Operations.Return(q.header(),q.values())); } return n; }).toList();
         assertEquals(AnalysisSession.Status.INVALID_INPUT,AnalysisSession.open(withGraph(b,new CfgGraph(p,nodes,g.transitions())),p,ProjectionPolicy.KNOWN_SUBSET,p.units().getFirst().entries()).status());
     }
     @Test void equalLookingForeignSnapshotIsInvalid() {
@@ -69,7 +69,7 @@ class AdmissionTest {
             if(mode==0) nodes.removeIf(CfgNode.EntryNode.class::isInstance);
             if(mode==1) nodes.removeIf(CfgNode.NormalExit.class::isInstance);
             if(mode==2) nodes.removeIf(CfgNode.HaltExit.class::isInstance);
-            if(mode==3) nodes.replaceAll(n->n instanceof CfgNode.HaltExit h ? new CfgNode.HaltExit(h.id(),new Operations.Halt(halt.header(),halt.haltKind())) : n);
+            if(mode==3) nodes.replaceAll(n->n instanceof CfgNode.HaltExit h ? new CfgNode.HaltExit(h.id(),h.operation(),Operations.HaltKind.ABNORMAL) : n);
             corrupt(g,"nodes",List.copyOf(nodes));
             assertEquals(AnalysisSession.Status.INVALID_INPUT,AnalysisSession.open(b,p,ProjectionPolicy.KNOWN_SUBSET,u.entries()).status());
         }
@@ -77,7 +77,7 @@ class AdmissionTest {
     @Test void foreignEntryNodeAndDuplicateSequenceRoleAreInvalid() throws Exception {
         for(boolean foreign:List.of(true,false)) {
             var p=linear(1,0,0,1); var b=build(p); var g=b.graph().orElseThrow(); var nodes=new ArrayList<>(g.nodes());
-            if(foreign) nodes.replaceAll(n->n instanceof CfgNode.EntryNode e ? new CfgNode.EntryNode(e.id(),entry(e.source().id().unit(),e.source().id().localId(),"seq-0")) : n);
+            if(foreign) nodes.replaceAll(n->n instanceof CfgNode.EntryNode e ? new CfgNode.EntryNode(e.id(),e.entry(),Optional.of(new LabelId(e.entry().unit(),"missing"))) : n);
             else { var q=p.units().getFirst().sequences().getFirst(); nodes.add(new CfgNode.SequenceNode(new CfgNodeId(p.id(),900),q)); }
             corrupt(g,"nodes",List.copyOf(nodes));
             assertEquals(AnalysisSession.Status.INVALID_INPUT,AnalysisSession.open(b,p,ProjectionPolicy.KNOWN_SUBSET,p.units().getFirst().entries()).status());

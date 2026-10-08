@@ -537,18 +537,19 @@ public final class RegionalValuesAnalysis {
         }
         @Override public State transferBlock(AnalysisPoint point,State anchor,DomainWork work) {
             if(!(point.node().source() instanceof CfgNode.SequenceNode node))return anchor;
-            var state=anchor;for(var op:node.source().instructions()){work.operationTransferred();state=operation(state,op);}
-            work.operationTransferred();return operation(state,node.source().terminator());
+            var sequence=session.index().sequence(point.node());
+            var state=anchor;for(var op:sequence.instructions()){work.operationTransferred();state=operation(state,op);}
+            work.operationTransferred();return operation(state,sequence.terminator());
         }
         @Override public State transferEdge(AnalysisPoint point,CfgTransition edge,State state,DomainWork work) {
             if(!state.reached()||!(point.node().source() instanceof CfgNode.SequenceNode node))return state;
-            if(node.source().terminator() instanceof Operations.Branch branch) {
+            if(node.terminator() instanceof Operations.Branch branch) {
                 if(session.index().unprovedPreconditions(branch.header().id()))return state;
                 int requested=edge.kind()==CfgTransition.Kind.BRANCH_TRUE?TextPredicate.TRUE:edge.kind()==CfgTransition.Kind.BRANCH_FALSE?TextPredicate.FALSE:TextPredicate.BOTH;
                 var at=state;int possible=TextPredicate.truth(branch.predicate(),place->predicateRead(at,place));
                 return (possible&requested)==0?BOTTOM:state;
             }
-            if(!(node.source().terminator() instanceof Operations.Invoke invoke))return state;
+            if(!(node.terminator() instanceof Operations.Invoke invoke))return state;
             if(edge.kind()==CfgTransition.Kind.INVOKE_NORMAL)return apply(state,outcomes.get(invoke).get(Control.NormalOutcome.INSTANCE),false);
             state=apply(state,otherwise.get(invoke),true);for(var plans:outcomes.get(invoke).values())state=apply(state,plans,true);return state;
         }

@@ -24,7 +24,7 @@ class StructureTest {
         var p=linear(1,3,2,1); var u=p.units().getFirst(); var q=u.sequences().getFirst();
         var s=session(p); var idx=s.index();
         assertSame(p,idx.publication()); assertSame(u,idx.unit(u.id()));
-        var node=idx.sequence(q.label()); assertSame(q,((CfgNode.SequenceNode)node.source()).source());
+        var node=idx.sequence(q.label()); assertSame(q,idx.sequence(node));
         for(int offset=0;offset<4;offset++) {
             Operation op=offset==3?q.terminator():q.instructions().get(offset);
             var site=idx.site(op.header().id());
@@ -77,11 +77,11 @@ class StructureTest {
         Map<CfgNodeId,CfgNodeId> ids=new HashMap<>(); long next=Long.MAX_VALUE;
         for(var n:g.nodes()) { ids.put(n.id(),new CfgNodeId(p.id(),next)); next-=1000003; }
         List<CfgNode> nodes=g.nodes().stream().map(n->switch(n) {
-            case CfgNode.SequenceNode q -> (CfgNode)new CfgNode.SequenceNode(ids.get(n.id()),q.source());
-            case CfgNode.EntryNode e -> new CfgNode.EntryNode(ids.get(n.id()),e.source());
+            case CfgNode.SequenceNode q -> (CfgNode)new CfgNode.SequenceNode(ids.get(n.id()),q.label(),q.operations(),q.terminator());
+            case CfgNode.EntryNode e -> new CfgNode.EntryNode(ids.get(n.id()),e.entry(),e.initialLabel());
             case CfgNode.NormalExit e -> new CfgNode.NormalExit(ids.get(n.id()),e.publicationId(),e.unitId(),e.entryId());
-            case CfgNode.OutcomeExit e -> new CfgNode.OutcomeExit(ids.get(n.id()),e.source(),e.outcome());
-            case CfgNode.HaltExit h -> new CfgNode.HaltExit(ids.get(n.id()),h.source());
+            case CfgNode.OutcomeExit e -> new CfgNode.OutcomeExit(ids.get(n.id()),e.operation(),e.outcome());
+            case CfgNode.HaltExit h -> new CfgNode.HaltExit(ids.get(n.id()),h.operation(),h.haltKind());
         }).toList();
         var graph=new CfgGraph(p,nodes,g.transitions().stream().map(e->new CfgTransition(ids.get(e.from()),ids.get(e.to()),e.kind(),e.activationEntry())).toList());
         var s=AnalysisSession.open(withGraph(b,graph),p,ProjectionPolicy.KNOWN_SUBSET,p.units().getFirst().entries()).session().orElseThrow();

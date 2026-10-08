@@ -56,12 +56,12 @@ public final class LocalControlRules {
     static Map<CfgNodeId,Rule> project(List<CfgNode> nodes) {
         var labels=new HashMap<LabelId,CfgNodeId>(); var invalid=new HashMap<OperationId,CfgNodeId>();
         for(var n:nodes) {
-            if(n instanceof CfgNode.SequenceNode s) labels.put(s.source().label(),s.id());
-            if(n instanceof CfgNode.OutcomeExit e && local(e.source())) invalid.put(e.source().header().id(),e.id());
+            if(n instanceof CfgNode.SequenceNode s) labels.put(s.label(),s.id());
+            if(n instanceof CfgNode.OutcomeExit e) invalid.put(e.operation(),e.id());
         }
         var result=new LinkedHashMap<CfgNodeId,Rule>();
         for(var n:nodes) if(n instanceof CfgNode.SequenceNode s) {
-            var t=s.source().terminator(); var id=t.header().id();
+            var t=s.terminator(); var id=t.header().id();
             Rule rule=switch(t) {
                 case Operations.LocalInvoke i -> new Invoke(s.id(),id,required(labels.get(i.entry())),i.completionPorts(),required(labels.get(i.resume())),
                     i.reentryGuard().map(g->new ReentryGuard(g.activationKey(),required(labels.get(g.destination())))),resumeRoutes(i,labels));

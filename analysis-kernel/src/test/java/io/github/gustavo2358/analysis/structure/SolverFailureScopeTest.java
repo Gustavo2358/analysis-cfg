@@ -38,11 +38,11 @@ class SolverFailureScopeTest {
                 public Join<Integer> joinInto(Integer a,Integer b,DomainWork work){return new Join<>(a|b,(a|b)!=a);}
                 public boolean equivalent(Integer a,Integer b,DomainWork work){return a.equals(b);}
                 public Integer transferEdge(AnalysisPoint point,CfgTransition edge,Integer value,DomainWork work){
-                    if(!fromBlock&&primary[0]==null&&point.node().source() instanceof CfgNode.SequenceNode node&&node.source().label().equals(label("main")))interrupt();
+                    if(!fromBlock&&primary[0]==null&&point.node().source() instanceof CfgNode.SequenceNode node&&node.label().equals(label("main")))interrupt();
                     return value;
                 }
                 public Integer transferBlock(AnalysisPoint point,Integer value,DomainWork work){
-                    if(fromBlock&&primary[0]==null&&point.node().source() instanceof CfgNode.SequenceNode node&&node.source().label().equals(label("body")))interrupt();
+                    if(fromBlock&&primary[0]==null&&point.node().source() instanceof CfgNode.SequenceNode node&&node.label().equals(label("body")))interrupt();
                     return value;
                 }
                 private void interrupt(){

@@ -47,10 +47,10 @@ public final class CfgJsonWriter {
         boolean requiresV4=graph.nodes().stream().anyMatch(CfgNode.OutcomeExit.class::isInstance)
             ||graph.transitions().stream().anyMatch(t->t.kind()==CfgTransition.Kind.EXCEPTION);
         boolean requiresV2 = false;
-        boolean requiresV3 = graph.nodes().stream().anyMatch(n -> n instanceof CfgNode.SequenceNode q && q.source().terminator() instanceof Operations.Opaque);
+        boolean requiresV3 = graph.nodes().stream().anyMatch(n -> n instanceof CfgNode.SequenceNode q && q.terminator() instanceof Operations.Opaque);
         for (var node : graph.nodes()) {
             if (node instanceof CfgNode.SequenceNode sequence)
-                requiresV2 |= terminatorKind(sequence.source().terminator()).requiresV2;
+                requiresV2 |= terminatorKind(sequence.terminator()).requiresV2;
         }
         for (var transition : graph.transitions())
             requiresV2 |= transitionKind(transition.kind()).requiresV2;
@@ -126,15 +126,15 @@ public final class CfgJsonWriter {
         out.raw("{\"id\":"); cfgId(out, node.id());
         switch (node) {
             case CfgNode.EntryNode entry -> {
-                out.raw(",\"kind\":\"ENTRY\",\"entry\":"); airId(out, entry.source().id());
+                out.raw(",\"kind\":\"ENTRY\",\"entry\":"); airId(out, entry.entry());
             }
             case CfgNode.SequenceNode sequence -> {
-                out.raw(",\"kind\":\"SEQUENCE\",\"label\":"); airId(out, sequence.source().label());
-                out.raw(",\"terminator\":{\"kind\":"); out.string(terminatorKind(sequence.source().terminator()).token);
-                out.raw(",\"operation\":"); airId(out, sequence.source().terminator().header().id());
+                out.raw(",\"kind\":\"SEQUENCE\",\"label\":"); airId(out, sequence.label());
+                out.raw(",\"terminator\":{\"kind\":"); out.string(terminatorKind(sequence.terminator()).token);
+                out.raw(",\"operation\":"); airId(out, sequence.terminator().header().id());
                 if(v3) {
-                    boolean open=sequence.source().terminator() instanceof Operations.Opaque o && o.envelope().control().remainder() instanceof io.github.gustavo2358.air.model.Scopes.WithinControl
-                        || sequence.source().terminator() instanceof Operations.Invoke i && i.outcomes().remainder() instanceof io.github.gustavo2358.air.model.Scopes.WithinControl;
+                    boolean open=sequence.terminator() instanceof Operations.Opaque o && o.envelope().control().remainder() instanceof io.github.gustavo2358.air.model.Scopes.WithinControl
+                        || sequence.terminator() instanceof Operations.Invoke i && i.outcomes().remainder() instanceof io.github.gustavo2358.air.model.Scopes.WithinControl;
                     out.raw(",\"openControlRemainder\":"+(open?"true":"false"));
                 }
                 out.raw("}");
@@ -144,14 +144,14 @@ public final class CfgJsonWriter {
                 out.raw(",\"entry\":"); airId(out, exit.entryId());
             }
             case CfgNode.OutcomeExit exit -> {
-                out.raw(",\"kind\":\"OUTCOME_EXIT\",\"operation\":");airId(out,exit.source().header().id());
+                out.raw(",\"kind\":\"OUTCOME_EXIT\",\"operation\":");airId(out,exit.operation());
                 out.raw(",\"outcome\":");
                 out.string(exit.outcome() instanceof io.github.gustavo2358.air.model.Control.HaltAlternative?"HALT":exit.outcome() instanceof io.github.gustavo2358.air.model.Control.Exceptional?"EXCEPTION":"ANY_EXCEPTION");
                 if(exit.outcome() instanceof io.github.gustavo2358.air.model.Control.Exceptional e){out.raw(",\"tag\":");out.string(e.tag());}
             }
             case CfgNode.HaltExit exit -> {
-                out.raw(",\"kind\":\"HALT_EXIT\",\"operation\":"); airId(out, exit.source().header().id());
-                out.raw(",\"haltKind\":"); out.string(haltKind(exit.source().haltKind()));
+                out.raw(",\"kind\":\"HALT_EXIT\",\"operation\":"); airId(out, exit.operation());
+                out.raw(",\"haltKind\":"); out.string(haltKind(exit.haltKind()));
             }
         }
         out.raw("}");

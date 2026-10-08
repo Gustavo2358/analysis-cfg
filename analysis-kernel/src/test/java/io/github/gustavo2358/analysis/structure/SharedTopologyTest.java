@@ -53,9 +53,9 @@ final class SharedTopologyTest {
         for(var context:session.contexts())for(var node:session.index().nodes) {
             var outgoing=read(context,node,true);var incoming=read(context,node,false);
             if(!node.owner().id().equals(context.entry().id().unit())){assertTrue(outgoing.isEmpty());assertTrue(incoming.isEmpty());continue;}
-            if(node.source() instanceof CfgNode.EntryNode entryNode)assertEquals(entryNode.source().id().equals(context.entry().id())?1:0,outgoing.size());
+            if(node.source() instanceof CfgNode.EntryNode entryNode)assertEquals(entryNode.entry().equals(context.entry().id())?1:0,outgoing.size());
             if(node.source() instanceof CfgNode.SequenceNode sequence) {
-                if(sequence.source().terminator() instanceof Operations.Return) {
+                if(sequence.terminator() instanceof Operations.Return) {
                     assertEquals(1,outgoing.size());assertEquals(context.normalExit().source().id(),outgoing.getFirst().to());
                 } else {
                     assertEquals(2,outgoing.size());assertEquals(outgoing.getFirst().to(),outgoing.getLast().to());

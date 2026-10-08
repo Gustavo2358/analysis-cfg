@@ -68,7 +68,7 @@ public final class BatchReplayer {
             }
             boolean forward=direction==Direction.FORWARD;
             for(var group:groups.entrySet()) {
-                var context=group.getKey().context();var sequence=((io.github.gustavo2358.analysis.cfg.domain.CfgNode.SequenceNode)group.getKey().node().source()).source();
+                var context=group.getKey().context();var sequence=session.index().sequence(group.getKey().node());
                 ProgramIndex.Node node=session.index().sequence(sequence.label());
                 var selected=group.getValue();selected.sort(Comparator.comparingInt(Selected<T>::boundary));
                 if(!forward)Collections.reverse(selected);
