@@ -41,6 +41,9 @@ raised and no assertion removed. Source raw handles are64-bit, never AIR identit
 membership and merged-mode-prefix mutations fail independent assertions, followed by
 untouched GREEN. Producer mandatory FAST236model/143transport/43policy passed35.554s.
 Consumer mandatory FAST1053methods/zero failures/errors/skips passed379.321s.
-Selected clean CLI dependency/support parity is pending for the committed checkpoint. Complete reference/type/domain/capability checks, diagnostic
+Clean checkpoint f455212b83c87888265b027fe7c0a588f94b0993 then passed
+three public products/six actual CLI executions with full dependency/support semantic
+parity versus the unchanged frozen729baseline. Only two old work-counter maps are
+excluded by the established oracle; no dependency/support field is excluded. Complete reference/type/domain/capability checks, diagnostic
 binding, CheckedSnapshot, incremental JSON, managed CLI and global qualification
 remain pending; this partial fact inspector issues no admission certificate.
