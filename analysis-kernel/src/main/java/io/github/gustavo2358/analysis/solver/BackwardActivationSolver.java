@@ -96,7 +96,9 @@ final class BackwardActivationSolver<S> implements AutoCloseable {
         for(var entry:entries)entry.start();
         while(!pending.isEmpty()){
             var slot=pending.removeFirst();slot.queued=false;pops++;var b=slot.region.entry.bdd;b.beginMutation();
-            try{process(slot);collectSummaries(false);}finally{b.endMutation();}
+            // Failed executions leave their journal to run-owner destruction;
+            // publishing through an aborted manager would replace the cause.
+            process(slot);collectSummaries(false);b.endMutation();
         }
         collectSummaries(true);
         var lookup=new IdentityHashMap<ContextView,IdentityHashMap<ProgramIndex.Node,List<AnalysisPoint>>>();
@@ -105,9 +107,9 @@ final class BackwardActivationSolver<S> implements AutoCloseable {
             var nodes=new IdentityHashMap<ProgramIndex.Node,List<AnalysisPoint>>();lookup.put(entry.model.context(),nodes);
             for(var region:entry.regions)for(var slot:region.slots.values()) {
                 edgeCount+=slot.shape.moves().size();entry.bdd.beginMutation();
-                try{for(var in:slot.in.pieces)for(var out:slot.out.pieces)if(feasible(region,entry.bdd.and(in.condition,out.condition))) {
+                for(var in:slot.in.pieces)for(var out:slot.out.pieces)if(feasible(region,entry.bdd.and(in.condition,out.condition))) {
                     int id=ins.size();nodes.computeIfAbsent(slot.node,n->new ArrayList<>()).add(new AnalysisPoint(id,entry.model.context(),slot.node));ins.add(in.state);outs.add(out.state);
-                }}finally{entry.bdd.endMutation();}
+                }entry.bdd.endMutation();
             }
         }
         long indexProbes=closedIndexProbes;for(var entry:entries)for(var index:entry.byFrame.values())indexProbes+=index.probes();
@@ -250,7 +252,7 @@ final class BackwardActivationSolver<S> implements AutoCloseable {
         var b=source.region.entry.bdd;
         for(var piece:target.in.pieces){
             long mark=b.constructionMark();
-            try{contribute(source,b.and(condition,piece.condition),target.node,edge,piece.state);}finally{b.publishSince(mark);}
+            contribute(source,b.and(condition,piece.condition),target.node,edge,piece.state);b.publishSince(mark);
         }
     }
     private final class Choice {
@@ -283,7 +285,7 @@ final class BackwardActivationSolver<S> implements AutoCloseable {
         }
         needed.addAll(returns.values());
         for(var choice:arguments(source,needed,condition)) {
-            long mark=b.constructionMark();try{
+            long mark=b.constructionMark();
             var returnValues=new IdentityHashMap<ProgramIndex.Node,S>();
             for(var binding:returns.entrySet()) {
                 deliveries++;var target=new AnalysisPoint(-1,e.model.context(),binding.getValue());
@@ -295,13 +297,14 @@ final class BackwardActivationSolver<S> implements AutoCloseable {
                 for(int i=1;i<e.model.maxUnwind();i++)ancestors.add(parent.input.ancestors.get(i-1));
             }
             var input=new Signature(Math.min(parent.input.depth+1,e.model.maxUnwind()),returnValues,ancestors);
-            var child=e.region(move.frame(),input,source,choice.condition);if(child==null)continue;subscribe(source,child,choice.condition);
+            var child=e.region(move.frame(),input,source,choice.condition);
+            if(child==null){b.publishSince(mark);continue;}subscribe(source,child,choice.condition);
             var entry=child.slots.get(e.model.control().entry(move.frame()));
             for(var value:entry.in.pieces) {
                 int pre=b.restrict(value.condition,move.frame().variable(),true);if(parent.frame==null)pre=b.atEmpty(pre);
                 contribute(source,b.and(choice.condition,pre),entry.node,move.edge(),value.state);
             }
-            }finally{b.publishSince(mark);}
+            b.publishSince(mark);
         }
     }
     private void subscribe(Slot caller,Region child,int condition) {
@@ -342,13 +345,13 @@ final class BackwardActivationSolver<S> implements AutoCloseable {
         var boundary=entry.boundaries.getOrDefault(region.frame,Map.of()).get(slot.node);
         if(boundary!=null)slot.out.add(slot.shape.condition(),boundary);
         for(var move:slot.shape.moves()) {
-            long mark=b.constructionMark();try{
+            long mark=b.constructionMark();
             int condition=slot.shape.condition();
             if(move.variable()>=0) {
                 int active=region.frame==null?0:b.variable(move.variable());
                 condition=b.and(condition,move.present()?active:b.not(active));
             }
-            if(condition==0)continue;
+            if(condition==0){b.publishSince(mark);continue;}
             switch(move.action()) {
                 case NEXT -> read(slot,region.slots.get(move.destination()),condition,move.edge());
                 case CALL -> call(slot,move,condition);
@@ -362,7 +365,7 @@ final class BackwardActivationSolver<S> implements AutoCloseable {
                 case ROOT -> readRoot(slot,move.destination(),condition,move.edge());
                 case RECURSIVE -> { /* Refusal is checked only for a feasible caller predicate below. */ }
             }
-            }finally{b.publishSince(mark);}
+            b.publishSince(mark);
         }
         boolean changed=false;
         for(var piece:slot.out.pieces) {
@@ -445,7 +448,9 @@ final class BackwardActivationSolver<S> implements AutoCloseable {
             }
             if(valid&&region.entry.bdd.test(condition,active)){feasibleCache.put(key,true);return true;}
         }
-        var b=region.entry.bdd;int checkpoint=b.checkpoint();
+        // Only a successful query restores its semantic scratch scope. A failed
+        // query is discarded with the enclosing run and must preserve its cause.
+        var b=region.entry.bdd;int checkpoint=b.checkpoint();boolean successful=false;
         try {
             var wanted=new IdentityHashMap<Region,Integer>();var waiting=new IdentityHashMap<Region,Integer>();var queue=new ArrayDeque<Region>();
             wanted.put(region,condition);waiting.put(region,condition);queue.add(region);boolean found=false;
@@ -464,8 +469,8 @@ final class BackwardActivationSolver<S> implements AutoCloseable {
             }
             if(found||subscriber==null)feasibleCache.put(key,found);
             else defer(key,wanted.keySet(),subscriber);
-            return found;
-        } finally {b.discardAfter(checkpoint);}
+            successful=true;return found;
+        } finally {if(successful)b.discardAfter(checkpoint);}
 
     }
 }

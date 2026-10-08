@@ -312,7 +312,9 @@ final class ActivationSolver<S> implements AutoCloseable {
             }
             if(valid&&region.entry.bdd.test(condition,active)){feasibleCache.put(key,true);return true;}
         }
-        var b=region.entry.bdd;int checkpoint=b.checkpoint();
+        // Only a successful query restores its semantic scratch scope. A failed
+        // query is discarded with the enclosing run and must preserve its cause.
+        var b=region.entry.bdd;int checkpoint=b.checkpoint();boolean successful=false;
         try {
             var wanted=new IdentityHashMap<Region,Integer>();var waiting=new IdentityHashMap<Region,Integer>();var queue=new ArrayDeque<Region>();
             wanted.put(region,condition);waiting.put(region,condition);queue.add(region);boolean found=false;
@@ -331,8 +333,8 @@ final class ActivationSolver<S> implements AutoCloseable {
             }
             if(found||subscriber==null)feasibleCache.put(key,found);
             else defer(key,wanted.keySet(),subscriber);
-            return found;
-        } finally {b.discardAfter(checkpoint);}
+            successful=true;return found;
+        } finally {if(successful)b.discardAfter(checkpoint);}
 
     }
     private final class EntryRun {
