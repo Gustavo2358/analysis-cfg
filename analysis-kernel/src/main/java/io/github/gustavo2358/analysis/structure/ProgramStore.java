@@ -4,6 +4,7 @@ import io.github.gustavo2358.air.model.*;
 import io.github.gustavo2358.air.model.Ids.PublicationId;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Read-only program boundary shared by structural and semantic analyses.
@@ -18,6 +19,7 @@ public interface ProgramStore {
     interface Structural extends ProgramStore {
         SemanticVersion airVersion();
         Capabilities.Manifest capabilities();
+        Set<Capabilities.Capability> namePolicyExtensions();
         List<Unit> units();
         List<Memory.Storage> storage();
         Evidence.Coverage coverage();
@@ -32,11 +34,16 @@ public interface ProgramStore {
     /** Explicit resident adapter used while the paged implementation is introduced. */
     final class Resident implements Structural {
         private final Publication publication;
-        private Resident(Publication publication) { this.publication = publication; }
+        private final Set<Capabilities.Capability> namePolicyExtensions;
+        private Resident(Publication publication) {
+            this.publication = publication;
+            namePolicyExtensions = NamePolicies.extensions(publication);
+        }
         @Override public PublicationId publicationId() { return publication.id(); }
         @Override public Evidence.InventoryStatus inventory() { return publication.coverage().inventory(); }
         @Override public SemanticVersion airVersion() { return publication.airVersion(); }
         @Override public Capabilities.Manifest capabilities() { return publication.capabilities(); }
+        @Override public Set<Capabilities.Capability> namePolicyExtensions() { return namePolicyExtensions; }
         @Override public List<Origins.Artifact> artifacts() { return publication.artifacts(); }
         @Override public List<Unit> units() { return publication.units(); }
         @Override public List<Memory.Storage> storage() { return publication.storage(); }
@@ -44,6 +51,5 @@ public interface ProgramStore {
         @Override public Evidence.Coverage coverage() { return publication.coverage(); }
         @Override public List<Evidence.Uncertainty> uncertainties() { return publication.uncertainties(); }
         @Override public List<Proofs.Premise> premises() { return publication.premises(); }
-        boolean owns(Publication candidate) { return publication == candidate; }
     }
 }

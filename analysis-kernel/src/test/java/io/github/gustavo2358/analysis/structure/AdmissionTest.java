@@ -13,6 +13,28 @@ class AdmissionTest {
         var p=linear(3,2,2,2);
         assertEquals(AnalysisSession.Status.ACCEPTED,AnalysisSession.open(build(p),p,ProjectionPolicy.KNOWN_SUBSET,p.units().getFirst().entries()).status());
     }
+    @Test void detachedStructuralStoreIsAcceptedWithoutPublicationAggregate() {
+        var p=linear(3,2,2,2);
+        var resident=ProgramStore.resident(p);
+        ProgramStore.Structural detached=new ProgramStore.Structural() {
+            @Override public PublicationId publicationId(){return resident.publicationId();}
+            @Override public Evidence.InventoryStatus inventory(){return resident.inventory();}
+            @Override public SemanticVersion airVersion(){return resident.airVersion();}
+            @Override public Capabilities.Manifest capabilities(){return resident.capabilities();}
+            @Override public Set<Capabilities.Capability> namePolicyExtensions(){return resident.namePolicyExtensions();}
+            @Override public List<Origins.Artifact> artifacts(){return resident.artifacts();}
+            @Override public List<Unit> units(){return resident.units();}
+            @Override public List<Memory.Storage> storage(){return resident.storage();}
+            @Override public List<Origins.Origin> origins(){return resident.origins();}
+            @Override public Evidence.Coverage coverage(){return resident.coverage();}
+            @Override public List<Evidence.Uncertainty> uncertainties(){return resident.uncertainties();}
+            @Override public List<Proofs.Premise> premises(){return resident.premises();}
+        };
+        var selected=p.units().getFirst().entries().stream().map(Entries.Entry::id).toList();
+        var admission=AnalysisSession.open(build(p),detached,ProjectionPolicy.KNOWN_SUBSET,selected);
+        assertEquals(AnalysisSession.Status.ACCEPTED,admission.status());
+        assertSame(detached,admission.session().orElseThrow().index().store());
+    }
     @Test void missingBranchEdgeIsInvalid() {
         var p0=linear(1,0,0,1); var u=p0.units().getFirst();
         var p=publication(p0.id(),List.of(unit(u.id(),u.entries(),List.of(branch(u.id(),"seq-0","tail","tail"),returning(u.id(),"tail",List.of())),List.of())),List.of());

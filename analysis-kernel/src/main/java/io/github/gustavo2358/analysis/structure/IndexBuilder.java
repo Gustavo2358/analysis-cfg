@@ -10,7 +10,6 @@ import java.util.*;
 final class IndexBuilder {
     Map<CfgNodeId,LocalControlRules.Rule> localRules;
     final Object identity = new Object();
-    final Publication snapshot;
     final ProgramStore.Structural store;
     final IndexMetrics.Counter count = new IndexMetrics.Counter();
     final Map<UnitId, Unit> units = new HashMap<>();
@@ -44,8 +43,8 @@ final class IndexBuilder {
     private final Set<OperandId> operandIds = new HashSet<>();
     private long expectedEdges, expectedHalts, expectedActiveEntries;
 
-    IndexBuilder(CfgBuildResult result, Publication snapshot, ProgramStore.Structural store, ProjectionPolicy policy) {
-        this.result = result; this.snapshot = snapshot; this.store = store; this.policy = policy;
+    IndexBuilder(CfgBuildResult result, ProgramStore.Structural store, ProjectionPolicy policy) {
+        this.result = result; this.store = store; this.policy = policy;
         unprovedPreconditions=result.preflight().unprovedOperationPreconditions().orElse(Set.of());
     }
     static final class Rejection extends RuntimeException {
@@ -64,23 +63,21 @@ final class IndexBuilder {
     }
 
     ProgramIndex build() {
-        valid(result.publicationId().equals(snapshot.id()) && result.airVersion().equals(snapshot.airVersion()), "result/snapshot metadata mismatch");
-        valid(store.publicationId().equals(snapshot.id()) && store.airVersion().equals(snapshot.airVersion())
-                && store instanceof ProgramStore.Resident resident && resident.owns(snapshot), "foreign program store");
+        valid(result.publicationId().equals(store.publicationId())
+                && result.airVersion().equals(store.airVersion()), "result/program metadata mismatch");
         valid(result.options().projectionPolicy() == policy, "projection policy mismatch");
         valid(result.status() != CfgBuildResult.Status.INVALID_IR, "invalid AIR build");
         supported(result.status() == CfgBuildResult.Status.CFG_BUILT, "unsupported CFG build profile");
         CfgGraph graph = result.graph().orElseThrow();
-        valid(graph.wasProjectedFrom(snapshot)
-                && graph.source().publicationId().equals(snapshot.id())
-                && graph.source().airVersion().equals(snapshot.airVersion()), "foreign CFG source");
-        supported(snapshot.airVersion().equals(SemanticVersion.AIR_2_0_0), "unsupported AIR version");
-        var namePolicies = NamePolicies.extensions(snapshot);
-        for (var capability : snapshot.capabilities().required()) {
+        valid(graph.source().publicationId().equals(store.publicationId())
+                && graph.source().airVersion().equals(store.airVersion()), "foreign CFG source");
+        supported(store.airVersion().equals(SemanticVersion.AIR_2_0_0), "unsupported AIR version");
+        var namePolicies = store.namePolicyExtensions();
+        for (var capability : store.capabilities().required()) {
             count.visit("requiredCapabilities");
             supported(capability.equals(Capabilities.LOCAL_CONTROL) || capability.equals(Capabilities.LOCAL_REENTRY_GUARD) || capability.equals(Capabilities.LOCAL_RESUME_ROUTES) || capability.equals(Capabilities.LOCAL_BOUNDARY_ROUTES) || capability.equals(Capabilities.LOCAL_UNWIND_ALL) || capability.equals(Capabilities.RESOURCE_BINDINGS) || capability.equals(Capabilities.TARGET_POSSIBILITIES) || capability.equals(Capabilities.MEMORY_REGIONS) || capability.equals(Capabilities.IBM1047) || capability.equals(Capabilities.ENTRY_POSSIBILITIES_V2) || capability.equals(Capabilities.ENTRY_POSSIBILITIES) || namePolicies.contains(capability), "unsupported control capability");
         }
-        supported(policy.acceptsInventory(snapshot.coverage().inventory()), "unsupported publication inventory policy");
+        supported(policy.acceptsInventory(store.coverage().inventory()), "unsupported publication inventory policy");
         declarations();
         payload();
         nodes(graph);
@@ -90,9 +87,9 @@ final class IndexBuilder {
     }
 
     private void declarations() {
-        for (Unit unit : snapshot.units()) {
+        for (Unit unit : store.units()) {
             count.visit("units.declarations");
-            valid(unit.id().publication().equals(snapshot.id()), "foreign Unit owner");
+            valid(unit.id().publication().equals(store.publicationId()), "foreign Unit owner");
             unique(units, unit.id(), unit, "duplicate Unit");
             supported((unit.body() == Unit.BodyAvailability.AVAILABLE || policy == ProjectionPolicy.PARTIAL_ANALYSIS) && policy.acceptsInventory(unit.coverage().inventory()), "unsupported Unit body/inventory");
             for (Memory.ObjectDeclaration object : unit.objects()) {
@@ -102,9 +99,9 @@ final class IndexBuilder {
                 count.objects = Math.incrementExact(count.objects);
             }
         }
-        for (Memory.Storage item : snapshot.storage()) {
+        for (Memory.Storage item : store.storage()) {
             count.visit("storage");
-            valid(item.header().id().publication().equals(snapshot.id()), "foreign Storage owner");
+            valid(item.header().id().publication().equals(store.publicationId()), "foreign Storage owner");
             if (item.header().owner().isPresent()) {
                 count.reference("storage.owner");
                 valid(units.containsKey(item.header().owner().orElseThrow()), "missing Storage Unit");
@@ -112,7 +109,7 @@ final class IndexBuilder {
             unique(storage, item.header().id(), item, "duplicate Storage");
             if (item instanceof Memory.Cell) count.locations = Math.incrementExact(count.locations);
         }
-        for (Unit unit : snapshot.units()) {
+        for (Unit unit : store.units()) {
             count.visit("units.references");
             if (unit.containingUnit().isPresent()) {
                 count.reference("unit.containing");
@@ -136,7 +133,7 @@ final class IndexBuilder {
     }
 
     private void payload() {
-        for (Unit unit : snapshot.units()) {
+        for (Unit unit : store.units()) {
             count.visit("units.payload");
             long arity = 0;
             for (Sequence sequence : unit.sequences()) {
@@ -229,7 +226,7 @@ final class IndexBuilder {
         int ordinal = 0;
         for (CfgNode source : graph.nodes()) {
             count.visit("cfg.nodes");
-            valid(source.id().publicationId().equals(snapshot.id()), "foreign CFG node publication");
+            valid(source.id().publicationId().equals(store.publicationId()), "foreign CFG node publication");
             UnitId owner = switch (source) {
                 case CfgNode.SequenceNode n -> n.label().unit();
                 case CfgNode.EntryNode n -> n.entry().unit();
@@ -260,7 +257,7 @@ final class IndexBuilder {
                 }
                 case CfgNode.NormalExit n -> {
                     valid(entries.containsKey(n.entryId()) && n.entryId().unit().equals(n.unitId())
-                            && n.publicationId().equals(snapshot.id()), "foreign NormalExit");
+                            && n.publicationId().equals(store.publicationId()), "foreign NormalExit");
                     unique(normalExits, n.entryId(), node, "duplicate NormalExit");
                 }
                 case CfgNode.OutcomeExit n -> {

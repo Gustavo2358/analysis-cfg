@@ -601,7 +601,8 @@
       "missingEntryExitHaltAndReplacedHaltAreInvalid",
       "foreignEntryNodeAndDuplicateSequenceRoleAreInvalid",
       "unsupportedProfileAndPolicyMismatchHaveDistinctTaxonomy",
-      "incompleteUpstreamValidationDoesNotBecomeSemanticSizeOutcome"
+      "incompleteUpstreamValidationDoesNotBecomeSemanticSizeOutcome",
+      "detachedStructuralStoreIsAcceptedWithoutPublicationAggregate"
     ],
     "io.github.gustavo2358.analysis.structure.StructureTest": [
       "offsetsBucketsAndPayloadAreCanonical",
