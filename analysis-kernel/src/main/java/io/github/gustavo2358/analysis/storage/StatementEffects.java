@@ -2,6 +2,7 @@ package io.github.gustavo2358.analysis.storage;
 
 import io.github.gustavo2358.air.model.*;
 import io.github.gustavo2358.air.model.Ids.*;
+import io.github.gustavo2358.analysis.structure.ProgramStore;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -36,15 +37,26 @@ public final class StatementEffects {
         public Statement { reads=List.copyOf(reads);writes=List.copyOf(writes);outcomes=Map.copyOf(outcomes);otherwise=List.copyOf(otherwise); }
     }
     private final StorageIndex storage;
-    private record OpenLocation(ObjectId object,StorageIndex.Location location) { }
+    private record OpenLocation(int declarationOrdinal,ObjectId object,StorageIndex.Location location) { }
     private final Map<StorageId,List<OpenLocation>> openByBase;
+    private final WholeAliases wholeAliases;
     private final Map<OperationId,Statement> statements=new LinkedHashMap<>();
     private long operandVisits,targetsPrepared,directTargetsPrepared,boundTargetsPrepared,explicitBroadTargetsPrepared,baseComparisons;
     public StatementEffects(StorageIndex storage) {
         this.storage=Objects.requireNonNull(storage);
         var byBase=new HashMap<StorageId,List<OpenLocation>>();
+        var store=storage.session().index().store();
+        var declarations=store.declarationInventory();var inventory=store.storageInventory();
+        WholeAliases broad=null;int declarationOrdinal=0;
+        try {
         for(var object:storage.declarations()) {
+            int ordinal=declarationOrdinal++;
             var resolution=storage.object(object.id());if(resolution.exact())continue;
+            if(declarations.isPresent()&&inventory.isPresent()&&resolution.candidates().isEmpty()
+                    &&resolution.remainder() instanceof Scopes.WithinMemory within&&within.scope() instanceof Scopes.AllMemory){
+                if(broad==null)broad=new WholeAliases(declarations.orElseThrow(),inventory.orElseThrow());
+                broad.add(ordinal);continue;
+            }
             var locations=new LinkedHashSet<StorageIndex.Location>();
             resolution.candidates().forEach(c->locations.add(c.location()));
             if(resolution.remainder() instanceof Scopes.WithinMemory w) {
@@ -53,13 +65,32 @@ public final class StatementEffects {
                     // Admission checks executable uses; a nominal, unused cycle has no indexable scope.
                 }
             }
-            for(var location:locations)byBase.computeIfAbsent(location.base().id(),ignored->new ArrayList<>()).add(new OpenLocation(object.id(),location));
+            for(var location:locations)byBase.computeIfAbsent(location.base().id(),ignored->new ArrayList<>()).add(new OpenLocation(ordinal,object.id(),location));
         }
         byBase.replaceAll((id,values)->List.copyOf(values));openByBase=Map.copyOf(byBase);
+        wholeAliases=broad;
         for(var unit:storage.session().index().store().units())for(var sequence:unit.sequences()) {
             for(var operation:sequence.instructions())statements.put(operation.header().id(),prepare(operation));
             var operation=sequence.terminator();statements.put(operation.header().id(),prepare(operation));
         }
+        }catch(RuntimeException|Error failure){
+            if(broad!=null)try{broad.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}
+            throw failure;
+        }
+    }
+    /** One shared whole-catalogue relation, not one header for each object/base pair. */
+    private static final class WholeAliases implements AutoCloseable {
+        private final ProgramStore.DeclarationInventory declarations;
+        private final ProgramStore.OrdinalColumn positions;
+        private int count;
+        WholeAliases(ProgramStore.DeclarationInventory declarations,ProgramStore.StorageInventory inventory){
+            this.declarations=declarations;positions=inventory.column(declarations.size());
+        }
+        void add(int ordinal){positions.set(count,ordinal+1L);count=Math.incrementExact(count);}
+        int size(){declarations.size();return count;}
+        int ordinal(int at){Objects.checkIndex(at,size());return Math.toIntExact(positions.get(at)-1);}
+        ObjectId identity(int at){return declarations.identity(ordinal(at));}
+        @Override public void close(){positions.close();}
     }
     public StorageIndex storage() { return storage; }
     public Collection<Statement> statements() { return Collections.unmodifiableCollection(statements.values()); }
@@ -155,6 +186,9 @@ public final class StatementEffects {
         if(destination.remainder() instanceof Scopes.NoMemory
                 ||destination.remainder() instanceof Scopes.WithinMemory within&&within.scope() instanceof Scopes.AllMemory){
             var direct=StorageIndex.nonEmptyWholeCandidates(destination);
+            if(direct==null&&destination.candidates().isEmpty()
+                    &&destination.remainder() instanceof Scopes.WithinMemory within&&within.scope() instanceof Scopes.AllMemory
+                    &&storage.session().index().store().storageInventory().isPresent())direct=List.of();
             if(direct!=null){
                 var remainder=destination.remainder() instanceof Scopes.WithinMemory within
                     ?storage.select(within.scope()).candidates():List.<StorageIndex.Candidate>of();
@@ -201,9 +235,37 @@ public final class StatementEffects {
             var explicit=place==null?List.<ObjectId>of():storage.explicitObjects(place);
             var result=new LinkedHashMap<ObjectId,Boolean>();
             for(var id:explicit)if(!storage.object(id).exact())result.put(id,true);
-            if(!openByBase.isEmpty())for(var target:targets)for(var open:openByBase.getOrDefault(target.location().base().id(),List.of()))
-                if(!storage.disjoint(target.location(),open.location()))result.putIfAbsent(open.object(),false);
+            if(openByBase.isEmpty()){
+                if(wholeAliases!=null&&nonEmpty(targets))for(int at=0;at<wholeAliases.size();at++)result.putIfAbsent(wholeAliases.identity(at),false);
+            }else{
+                boolean pendingBroad=wholeAliases!=null;
+                for(var target:targets){
+                    var location=target.location();var narrow=openByBase.getOrDefault(location.base().id(),List.of());
+                    if(pendingBroad&&location.range().filter(StorageRange::empty).isEmpty()){
+                        int at=0;
+                        for(int broad=0;broad<wholeAliases.size();broad++){
+                            int ordinal=wholeAliases.ordinal(broad);
+                            while(at<narrow.size()&&narrow.get(at).declarationOrdinal()<ordinal){
+                                var open=narrow.get(at++);if(!storage.disjoint(location,open.location()))result.putIfAbsent(open.object(),false);
+                            }
+                            result.putIfAbsent(wholeAliases.identity(broad),false);
+                        }
+                        while(at<narrow.size()){var open=narrow.get(at++);if(!storage.disjoint(location,open.location()))result.putIfAbsent(open.object(),false);}
+                        pendingBroad=false;
+                    }else for(var open:narrow)if(!storage.disjoint(location,open.location()))result.putIfAbsent(open.object(),false);
+                }
+            }
             return result.entrySet().stream().map(e->new LogicalTarget(e.getKey(),e.getValue())).toList();
+        }
+        boolean nonEmpty(List<Target> targets){
+            if(targets instanceof WholeTargets whole){
+                if(!whole.direct.isEmpty())return true;
+                if(whole.remainder.isEmpty())return false;
+                var owner=StorageIndex.address(whole.remainder,0).orElseThrow().owner();
+                return !owner.nonEmptyStorage().isEmpty();
+            }
+            for(var target:targets)if(target.location().range().filter(StorageRange::empty).isEmpty())return true;
+            return false;
         }
         void scopeWrite(List<Write> out,Scopes.MemoryScope scope,String reason) {
             var destination=storage.select(scope);

@@ -372,3 +372,47 @@ An additional unused UnknownBinding(AllMemory) object has a focused RED:16
 private Regions with4096-character IDs retain16 complete cold StorageIds in
 StatementEffects.openByBase. Admission succeeds; this is the next demonstrated
 retention gap, not a reason to relabel the preceding finite pressure result.
+
+## Native whole-memory aliases
+
+An admitted open binding with no direct candidates and an AllMemory remainder
+now borrows a single whole-catalogue relation. Its object source positions live
+in a managed ordinal column; complete ObjectIds are decoded when a logical
+target is actually emitted, without decoding display payloads. Interleaved
+narrow aliases keep their original first-target/first-declaration order. Explicit
+named destinations retain source applicability and their first occurrence;
+empty Region ranges do not invent an overlap. Resident compatibility keeps its
+original index. Narrow native indexes are not yet claimed as fully spilled.
+
+Unknown named destinations with no direct candidates likewise borrow their
+whole remainder targets, including empty environment targets. Complete public
+records, MAY strength and reasons remain unchanged. A manual native test first
+retained80 unused storage identities across three aliases and two destinations;
+it now retains zero. Every Statement/Candidate/Target/Write and finite Segment
+matches the resident reference, alongside independent ordered logical-target
+expectations. A real nonzero column-write failure preserves its original
+exception, releases partial pages/leases immediately and leaves input owners
+usable. Kernel26, dependencies10, Regional40 and native consumer7 methods pass.
+
+The fresh real-CLI fixture preserves the original executable seed and83 origins,
+adding one unused open object/uncertainty and2048 private Regions with65536-char
+IDs:135,233,275 bytes, SHA256
+`d4a2c047ca35baa973c133c6074ba5069cd0f29c1243e134aa955a5c27950258`.
+Java21/Xmx128m, unchanged application quotas and eight-minute deadline, no
+sampling:109.25s, CPU111.77+3.64s, RSS300760KiB, exit0. The independent frozen
+modified-seed oracle preserves21 semantic fields,83 complete origins and CFG.
+Sources frozen before execution and1232 classfiles hashed during/after it stay
+identical. The initial old-path manifest missed the one new WholeAliases class;
+it is preserved separately, never described as a complete runtime freeze.
+
+Open AlternativesBinding is not covered by these admitted witnesses: the JSON
+profile refuses it, and complete snapshot admission reports
+VALIDATION_LIMIT/ASSOCIATION_DOMAIN_BOUND. Neither boundary was weakened.
+Complete FAST for this additional wave passes1162 required methods with zero
+failures/errors/skips, architecture boundaries and post-checks in780.571s.
+All frozen inputs and1232 production classfiles match after the clean rebuild;
+the109.25s physical qualification applies to this stabilized runtime.
+Both remote FAST jobs of published
+99db6808 were canceled at the existing15-minute job limit; local1160 FAST
+and the preceding physical qualification remain green, not remote success.
+Group arrays, states and other cardinality indexes remain AS-W09/W10 PARTIAL.

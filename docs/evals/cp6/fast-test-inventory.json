@@ -482,6 +482,8 @@
       "nativeDeclarationIndexesBorrowColdPayloadsAndPreserveEveryIdentity",
       "nativeFinitePartitionPreservesArbitraryCutsAndUnknownTail",
       "failedNativePartitionColumnWriteReleasesAllOwnersAndPreservesPrimary",
+      "nativeOpenAllMemoryAliasesPreserveLogicalOrderWithoutColdStorageCopies",
+      "failedNativeWholeAliasColumnWritePreservesInputAndReleasesOwners",
       "generalMetadataUsesOrderedBorrowedPagesWithoutReadingUnusedPayloads",
       "exhaustedNativeMetadataOrderReleasesPartialPagesWithoutClosingInput",
       "nativeGeneralPlannerPreservesAllUnitsColdOperationsAndCorrelatedCallFacts",

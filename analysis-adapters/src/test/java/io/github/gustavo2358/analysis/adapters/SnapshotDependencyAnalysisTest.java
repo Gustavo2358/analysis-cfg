@@ -56,6 +56,7 @@ final class SnapshotDependencyAnalysisTest {
         var allTargets=new java.util.ArrayList<List<io.github.gustavo2358.analysis.storage.StatementEffects.Target>>();
         List<io.github.gustavo2358.analysis.storage.StoragePartition.Segment> borrowedSegments;
         List<io.github.gustavo2358.analysis.storage.StorageIndex.Location> borrowedRegionalBases;
+        ProgramStore.DeclarationInventory borrowedDeclarations;
         try(var pages=new FilePageStore(directory,4096,32,ledger);var original=AirSnapshot.fromPublication(publication)) {
             var storage=new PagedAirStorage(pages,ledger,AnalysisResources.Phase.DECODE);
             var tracked=new AirSnapshotBuilder.Storage() {
@@ -104,6 +105,14 @@ final class SnapshotDependencyAnalysisTest {
                         assertNull(borrowed.object(new ObjectId(new UnitId(new PublicationId("foreign"),unit.id().localId()),objects.getLast().id().localId())));
                         assertThrows(UnsupportedOperationException.class,()->borrowed.objects().clear());
                         var catalog=borrowed.objectDeclarations();
+                        var nativeDeclarations=program.declarationInventory().orElseThrow();
+                        borrowedDeclarations=nativeDeclarations;
+                        for(int ordinal=0;ordinal<objects.size();ordinal++){
+                            reads[0]=0;assertEquals(objects.get(ordinal).id(),nativeDeclarations.identity(ordinal));
+                            assertEquals(0,reads[0],"nominal identity projection must not decode cold display payloads");
+                        }
+                        assertThrows(IndexOutOfBoundsException.class,()->nativeDeclarations.identity(-1));
+                        assertThrows(IndexOutOfBoundsException.class,()->nativeDeclarations.identity(objects.size()));
                         assertThrows(UnsupportedOperationException.class,()->catalog.put(objects.getLast().id(),objects.getLast()));
                         assertThrows(UnsupportedOperationException.class,catalog::clear);
                         assertThrows(UnsupportedOperationException.class,()->catalog.keySet().clear());
@@ -246,6 +255,7 @@ final class SnapshotDependencyAnalysisTest {
                     assertThrows(IllegalStateException.class,()->borrowed.storage(storages.getLast().header().id()));
                     assertThrows(IllegalStateException.class,()->borrowed.storageDeclarations().size());
                     assertThrows(IllegalStateException.class,()->borrowed.objectDeclarations().size());
+                    assertThrows(IllegalStateException.class,()->borrowedDeclarations.identity(0));
                     assertThrows(IllegalStateException.class,borrowedSegments::size);
                     assertThrows(IllegalStateException.class,borrowedSegments::getFirst);
                     assertThrows(IllegalStateException.class,borrowedRegionalBases::size);
@@ -347,6 +357,114 @@ final class SnapshotDependencyAnalysisTest {
                 assertEquals(originalHeap,ledger.heapUsed());assertEquals(originalPages,pages.statistics().livePages());
                 assertSame(checked.snapshot(),program.admission().snapshot(),"partition failure must not close borrowed AIR");
                 assertEquals(publication.storage().size(),program.storageInventory().orElseThrow().size());
+            }
+        }
+        for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
+    }
+
+    @Test void nativeOpenAllMemoryAliasesPreserveLogicalOrderWithoutColdStorageCopies() throws Exception {
+        var seed=directCall();var unit=seed.units().getFirst();var origin=seed.origins().getFirst().id();
+        var reason=new UncertaintyId(seed.id(),"open-whole-alias");
+        var scope=new Scopes.AllMemory(seed.id(),false);
+        var region=new Memory.Region(new Memory.StorageHeader(new StorageId(seed.id(),"partial-view-base"),Optional.of(unit.id()),Memory.Lifetime.PERSISTENT,Memory.Visibility.PRIVATE,origin),Optional.of(BigInteger.valueOf(8)),Optional.empty());
+        var zero=new Memory.Region(new Memory.StorageHeader(new StorageId(seed.id(),"empty-bound-base"),Optional.of(unit.id()),Memory.Lifetime.PERSISTENT,Memory.Visibility.PRIVATE,origin),Optional.of(BigInteger.ZERO),Optional.empty());
+        var storages=new java.util.ArrayList<>(seed.storage());storages.add(region);storages.add(zero);
+        for(int i=0;i<16;i++)storages.add(new Memory.Region(new Memory.StorageHeader(new StorageId(seed.id(),"unused-storage-"+"!".repeat(4096)+"/"+i),Optional.of(unit.id()),Memory.Lifetime.PERSISTENT,Memory.Visibility.PRIVATE,origin),Optional.of(BigInteger.valueOf(i%2==0?0:8)),Optional.empty()));
+        var a=new ObjectId(unit.id(),"whole-A");var narrow=new ObjectId(unit.id(),"narrow");var b=new ObjectId(unit.id(),"whole-B");var mixed=new ObjectId(unit.id(),"mixed");var empty=new ObjectId(unit.id(),"empty-only");
+        var claim=new Evidence.Claim(new Scopes.UnitScope(unit.id()),Evidence.PrecisionStatus.OPEN,List.of(reason));
+        var precision=new Evidence.Precision(claim,claim,claim,claim,claim);
+        java.util.function.BiFunction<ObjectId,Memory.Binding,Memory.ObjectDeclaration> declaration=(id,binding)->new Memory.ObjectDeclaration(id,Optional.empty(),Types.known(Types.Builtin.TEXT),binding,Memory.Visibility.PRIVATE,origin,Evidence.CoverageStatus.MODELED,precision);
+        var objects=new java.util.ArrayList<Memory.ObjectDeclaration>();
+        objects.add(declaration.apply(a,new Memory.UnknownBinding(scope,reason)));
+        objects.add(declaration.apply(narrow,new Memory.UnknownBinding(new Scopes.StorageMemory(List.of(seed.storage().getFirst().header().id())),reason)));
+        objects.addAll(unit.objects());
+        objects.add(declaration.apply(b,new Memory.UnknownBinding(new Scopes.AllMemory(seed.id(),true),reason)));
+        objects.add(declaration.apply(mixed,new Memory.UnknownBinding(scope,reason)));
+        objects.add(declaration.apply(empty,new Memory.UnknownBinding(new Scopes.StorageMemory(List.of(zero.header().id())),reason)));
+        var broad=new Operations.HavocMay(ResultFixtures.header(unit.id(),"broad-write"),scope,reason);
+        var bHeader=ResultFixtures.header(unit.id(),"write-whole-B");
+        var toB=new Operations.HavocMust(bHeader,new Places.ObjectPlace(ResultFixtures.operand(bHeader.id(),"destination",Operand.Role.VALUE_WRITE),b),reason);
+        var mixedHeader=ResultFixtures.header(unit.id(),"write-mixed");
+        var toMixed=new Operations.HavocMust(mixedHeader,new Places.ObjectPlace(ResultFixtures.operand(mixedHeader.id(),"destination",Operand.Role.VALUE_WRITE),mixed),reason);
+        var first=unit.sequences().getFirst();var instructions=new java.util.ArrayList<>(first.instructions());instructions.addAll(List.of(broad,toB,toMixed));
+        var sequences=new java.util.ArrayList<>(unit.sequences());sequences.set(0,new Sequence(first.label(),instructions,first.terminator(),first.origin()));
+        var changed=new Unit(unit.id(),unit.containingUnit(),objects,unit.visibleObjects(),unit.entries(),sequences,unit.completionPorts(),unit.body(),unit.bodyUnavailable(),unit.coverage(),unit.origin());
+        var uncertainties=new java.util.ArrayList<>(seed.uncertainties());uncertainties.add(new Evidence.Uncertainty(reason,"UNPROVED",List.of(Evidence.Dimension.CONTROL,Evidence.Dimension.STORAGE,Evidence.Dimension.EFFECTS,Evidence.Dimension.VALUES,Evidence.Dimension.DEPENDENCIES),new Scopes.UnitScope(unit.id()),"open nominal bindings",origin));
+        var required=new java.util.ArrayList<>(seed.capabilities().required());required.add(Capabilities.MEMORY_REGIONS);
+        var publication=new Publication(seed.id(),seed.airVersion(),new Capabilities.Manifest(required,seed.capabilities().provided()),seed.artifacts(),List.of(changed),storages,seed.resources(),seed.artifactRelations(),seed.origins(),seed.coverage(),uncertainties,seed.premises());
+        var ledger=resources();
+        // The native owner borrows the complete checked typed publication.
+        try(var pages=new FilePageStore(directory,4096,32,ledger);var source=AirSnapshot.fromPublication(publication);
+            var builder=new AirSnapshotBuilder(new PagedAirStorage(pages,ledger,AnalysisResources.Phase.DECODE))) {
+            long root=PagedAirStorageTest.copy(source,source.root(),null,builder);
+            try(var checked=SnapshotValidator.check(builder.finish(root),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger))) {
+            assertTrue(checked.result().isStructurallyValid(),checked.result().toString());
+            try(var program=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),new PagedSnapshotOrderStorage(pages,ledger),ledger)) {
+            var cfg=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).buildChecked(program,checked,BuildOptions.defaults());
+            var opened=io.github.gustavo2358.analysis.structure.AnalysisSession.open(cfg,program,cfg.options().projectionPolicy(),unit.entries().stream().map(Entries.Entry::id).toList());
+            assertEquals(io.github.gustavo2358.analysis.structure.AnalysisSession.Status.ACCEPTED,opened.status(),opened.reason());
+            var effects=new io.github.gustavo2358.analysis.storage.StatementEffects(new io.github.gustavo2358.analysis.storage.StorageIndex(opened.session().orElseThrow()));
+            var broadWrite=effects.statement(broad.header().id()).writes().getFirst();
+            var bWrite=effects.statement(toB.header().id()).writes().getFirst();
+            var mixedWrite=effects.statement(toMixed.header().id()).writes().getFirst();
+            assertEquals(List.of(a,narrow,b,mixed).stream().map(id->new io.github.gustavo2358.analysis.storage.StatementEffects.LogicalTarget(id,false)).toList(),broadWrite.logicalTargets(),"original declaration order, including broad/narrow interleaving");
+            assertEquals(List.of(new io.github.gustavo2358.analysis.storage.StatementEffects.LogicalTarget(b,true),new io.github.gustavo2358.analysis.storage.StatementEffects.LogicalTarget(a,false),new io.github.gustavo2358.analysis.storage.StatementEffects.LogicalTarget(narrow,false),new io.github.gustavo2358.analysis.storage.StatementEffects.LogicalTarget(mixed,false)),bWrite.logicalTargets(),"explicit source applicability wins without moving its first occurrence");
+            assertEquals(List.of(new io.github.gustavo2358.analysis.storage.StatementEffects.LogicalTarget(mixed,true),new io.github.gustavo2358.analysis.storage.StatementEffects.LogicalTarget(a,false),new io.github.gustavo2358.analysis.storage.StatementEffects.LogicalTarget(narrow,false),new io.github.gustavo2358.analysis.storage.StatementEffects.LogicalTarget(b,false)),mixedWrite.logicalTargets(),"explicit aliases precede their whole-memory remainder");
+            assertEquals(0,retainedUnusedStorageIds(effects),"open aliases and unknown destinations must not own another cold storage catalogue");
+            var residentCfg=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).build(publication,BuildOptions.defaults());
+            var resident=io.github.gustavo2358.analysis.structure.AnalysisSession.open(residentCfg,publication,residentCfg.options().projectionPolicy(),unit.entries());
+            assertEquals(io.github.gustavo2358.analysis.structure.AnalysisSession.Status.ACCEPTED,resident.status(),resident.reason());
+            var reference=new io.github.gustavo2358.analysis.storage.StatementEffects(new io.github.gustavo2358.analysis.storage.StorageIndex(resident.session().orElseThrow()));
+            assertEquals(List.copyOf(reference.statements()),List.copyOf(effects.statements()),"every full Candidate/Target/Write field, including empty environment targets, must remain unchanged");
+            var partition=new io.github.gustavo2358.analysis.storage.StoragePartition(effects);
+            assertEquals(new io.github.gustavo2358.analysis.storage.StoragePartition(reference).segments(),partition.segments());
+            assertEquals(0,retainedUnusedStorageIds(partition));
+            }
+            }
+        }
+        for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
+    }
+
+    @Test void failedNativeWholeAliasColumnWritePreservesInputAndReleasesOwners() {
+        var seed=directCall();var unit=seed.units().getFirst();var origin=seed.origins().getFirst().id();
+        var reason=new UncertaintyId(seed.id(),"whole-alias-fault");var alias=new ObjectId(unit.id(),"whole-alias");
+        var objects=new java.util.ArrayList<>(unit.objects());
+        objects.add(new Memory.ObjectDeclaration(alias,Optional.empty(),Types.known(Types.Builtin.TEXT),new Memory.UnknownBinding(new Scopes.AllMemory(seed.id(),false),reason),Memory.Visibility.PRIVATE,origin,Evidence.CoverageStatus.MODELED,objects.getFirst().precision()));
+        var changed=new Unit(unit.id(),unit.containingUnit(),objects,unit.visibleObjects(),unit.entries(),unit.sequences(),unit.completionPorts(),unit.body(),unit.bodyUnavailable(),unit.coverage(),unit.origin());
+        var uncertainties=new java.util.ArrayList<>(seed.uncertainties());uncertainties.add(new Evidence.Uncertainty(reason,"UNPROVED",List.of(Evidence.Dimension.STORAGE),new Scopes.UnitScope(unit.id()),"whole alias",origin));
+        var publication=new Publication(seed.id(),seed.airVersion(),seed.capabilities(),seed.artifacts(),List.of(changed),seed.storage(),seed.resources(),seed.artifactRelations(),seed.origins(),seed.coverage(),uncertainties,seed.premises());
+        var ledger=resources();var primary=new IllegalStateException("after a real whole-alias column write");int[] writes={0};
+        try(var pages=new FilePageStore(directory,4096,32,ledger);var source=AirSnapshot.fromPublication(publication);
+            var builder=new AirSnapshotBuilder(new PagedAirStorage(pages,ledger,AnalysisResources.Phase.DECODE))) {
+            long root=PagedAirStorageTest.copy(source,source.root(),null,builder);
+            try(var checked=SnapshotValidator.check(builder.finish(root),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger))) {
+                assertTrue(checked.result().isStructurallyValid(),checked.result().toString());
+                var delegate=new PagedSnapshotOrderStorage(pages,ledger);
+                var failing=new io.github.gustavo2358.analysis.dependencies.SnapshotOrderStorage(){
+                    @Override public Tape tape(){return delegate.tape();}
+                    @Override public Index open(Order order){return delegate.open(order);}
+                    @Override public ProgramStore.OrdinalColumn column(long length){
+                        var column=delegate.column(length);
+                        return new ProgramStore.OrdinalColumn(){
+                            @Override public long get(long at){return column.get(at);}
+                            @Override public void set(long at,long value){column.set(at,value);if(value!=0){writes[0]++;throw primary;}}
+                            @Override public void close(){column.close();}
+                        };
+                    }
+                    @Override public void close(){delegate.close();}
+                };
+                try(var program=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),failing,ledger)) {
+                    var cfg=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).buildChecked(program,checked,BuildOptions.defaults());
+                    var opened=io.github.gustavo2358.analysis.structure.AnalysisSession.open(cfg,program,cfg.options().projectionPolicy(),unit.entries().stream().map(Entries.Entry::id).toList());
+                    assertEquals(io.github.gustavo2358.analysis.structure.AnalysisSession.Status.ACCEPTED,opened.status(),opened.reason());
+                    var storage=new io.github.gustavo2358.analysis.storage.StorageIndex(opened.session().orElseThrow());
+                    long heap=ledger.heapUsed(),livePages=pages.statistics().livePages();
+                    assertSame(primary,assertThrows(IllegalStateException.class,()->new io.github.gustavo2358.analysis.storage.StatementEffects(storage)));
+                    assertEquals(1,writes[0]);assertEquals(heap,ledger.heapUsed());assertEquals(livePages,pages.statistics().livePages());
+                    assertSame(checked.snapshot(),program.admission().snapshot());
+                    assertEquals(alias,program.declarationInventory().orElseThrow().identity(objects.size()-1));
+                    assertEquals(seed.storage().size(),program.storageInventory().orElseThrow().size());
+                }
             }
         }
         for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());

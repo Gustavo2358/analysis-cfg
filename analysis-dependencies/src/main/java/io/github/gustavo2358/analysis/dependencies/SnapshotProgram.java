@@ -193,6 +193,9 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
         private void available(){borrowedOpen();if(ended)throw new IllegalStateException("native declaration inventory is closed");}
         private long objectKey(long source){return keys.key(field(source,0));}
         private ObjectId identity(long source){return occurrence(field(source,0),ObjectId.class);}
+        @Override public ObjectId identity(int ordinal){
+            available();Objects.checkIndex(ordinal,size());return identity(sourceOrder.handle(ordinal));
+        }
         @Override public int size(){available();return Math.toIntExact(sourceOrder.size());}
         @Override public boolean identityAt(int ordinal,ObjectId identity){
             available();Objects.requireNonNull(identity);

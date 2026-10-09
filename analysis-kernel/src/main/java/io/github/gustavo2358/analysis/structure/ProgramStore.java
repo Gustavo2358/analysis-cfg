@@ -43,6 +43,11 @@ public interface ProgramStore {
      * identityAt checks the complete identity, never position alone. */
     interface DeclarationInventory extends Map<ObjectId,Memory.ObjectDeclaration> {
         boolean identityAt(int ordinal,ObjectId identity);
+        /** Complete nominal identity at an owner-local source position. */
+        default ObjectId identity(int ordinal){
+            Objects.checkIndex(ordinal,size());var rows=keySet().iterator();
+            for(int at=0;at<ordinal;at++)rows.next();return rows.next();
+        }
     }
     /** Original AIR order and exact nominal lookup without retaining every storage body. */
     interface StorageInventory extends Map<StorageId,Memory.Storage> {
