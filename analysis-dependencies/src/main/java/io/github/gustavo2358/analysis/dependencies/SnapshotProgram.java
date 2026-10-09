@@ -533,19 +533,25 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
         open();Objects.requireNonNull(consumer);
         try(var units=snapshot.elements(snapshot.field(snapshot.root(),PUBLICATION,4),UNIT)) {
             while(units.advance()) {
-                long unit=units.value(),entry=firstEntry(unit);
+                long unit=units.value();
                 try(var sequences=snapshot.elements(snapshot.field(unit,UNIT,5),SEQUENCE)) {
                     while(sequences.advance()) {
                         long sequence=sequences.value(),operation=snapshot.field(sequence,SEQUENCE,2);
                         if(snapshot.shape(operation)!=OPERATIONS_INVOKE)continue;
                         long target=snapshot.field(operation,OPERATIONS_INVOKE,2);if(snapshot.shape(target)!=INTERACTIONS_COMPUTED_TARGET)continue;
                         long read=snapshot.field(target,INTERACTIONS_COMPUTED_TARGET,2),place=snapshot.field(read,EXPRESSIONS_READ,1),object=snapshot.field(place,PLACES_OBJECT_PLACE,1),header=snapshot.field(operation,OPERATIONS_INVOKE,0);
-                        consumer.accept(new ComputedCall(keys.key(object),(UnitId)id(snapshot.field(unit,UNIT,0)),
-                            (EntryId)id(snapshot.field(entry,ENTRIES_ENTRY,0)),(LabelId)id(snapshot.field(sequence,SEQUENCE,0)),
-                            (OperationId)id(snapshot.field(header,OPERATIONS_HEADER,0)),(OriginId)id(snapshot.field(header,OPERATIONS_HEADER,1)),
-                            (OriginId)id(snapshot.field(target,INTERACTIONS_COMPUTED_TARGET,4)),
-                            Evidence.CoverageStatus.values()[(int)snapshot.scalar(snapshot.field(header,OPERATIONS_HEADER,2))],
-                            text(snapshot.field(target,INTERACTIONS_COMPUTED_TARGET,1)),(ObjectId)id(object)));
+                        // Admission proves every direct Entry shares this initial label and has
+                        // an empty seed/signature. Evaluate body facts once; enumerate only the
+                        // required output contexts. The correlated profile still has one Entry.
+                        long objectKey=keys.key(object);var caller=(UnitId)id(snapshot.field(unit,UNIT,0));
+                        var label=(LabelId)id(snapshot.field(sequence,SEQUENCE,0));var operationId=(OperationId)id(snapshot.field(header,OPERATIONS_HEADER,0));
+                        var siteOrigin=(OriginId)id(snapshot.field(header,OPERATIONS_HEADER,1));var targetOrigin=(OriginId)id(snapshot.field(target,INTERACTIONS_COMPUTED_TARGET,4));
+                        var coverage=Evidence.CoverageStatus.values()[(int)snapshot.scalar(snapshot.field(header,OPERATIONS_HEADER,2))];
+                        var namespace=text(snapshot.field(target,INTERACTIONS_COMPUTED_TARGET,1));var subject=(ObjectId)id(object);
+                        try(var entries=snapshot.elements(snapshot.field(unit,UNIT,4),ENTRIES_ENTRY)) {
+                            while(entries.advance())consumer.accept(new ComputedCall(objectKey,caller,(EntryId)id(snapshot.field(entries.value(),ENTRIES_ENTRY,0)),
+                                    label,operationId,siteOrigin,targetOrigin,coverage,namespace,subject));
+                        }
                     }
                 }
             }

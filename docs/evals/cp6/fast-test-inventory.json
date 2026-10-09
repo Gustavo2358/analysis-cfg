@@ -472,6 +472,7 @@
       "validTypedSnapshotHasIdenticalManagedAdmissionPrefixAcrossBackends"
     ],
     "io.github.gustavo2358.analysis.adapters.SnapshotDependencyAnalysisTest": [
+      "sharedLabelEntriesKeepEveryDependencyContextAndColdReturnBinding",
       "snapshotCfgPhysicalTransitionsStayFactoredColdAndExpireWithProjection",
       "pagedPhysicalTupleStorageRejectsDuplicatesAndForeignOrMissingBindings",
       "sourceUnitInventoryBorrowsCanonicalPagesAndExpiresWithProgram",
@@ -1043,6 +1044,7 @@
       "removedResidentBundleRouteFailsClosedAndPreservesDestination"
     ],
     "io.github.gustavo2358.analysis.launcher.PipelineCliTest": [
+      "sharedLabelEntriesReachEverySiteThroughTheRealSnapshotPipeline",
       "oneReadAndCompleteProductsEqualIndependentSeparateRoutes",
       "defaultRoutePublishesCfgAndDependenciesFromTheValidatedSnapshot",
       "invalidIncompleteDigestAndAliasesRejectBeforeAnyDestination",

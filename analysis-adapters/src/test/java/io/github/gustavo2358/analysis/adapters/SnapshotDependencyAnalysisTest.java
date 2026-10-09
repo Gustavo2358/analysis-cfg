@@ -325,6 +325,42 @@ final class SnapshotDependencyAnalysisTest {
         }
     }
 
+    @Test void sharedLabelEntriesKeepEveryDependencyContextAndColdReturnBinding() {
+        for(int count:new int[]{1,4,16,64}) {
+            var base=directCall();var unit=base.units().getFirst();
+            var entries=java.util.stream.IntStream.range(0,count).mapToObj(i->ResultFixtures.entry(unit.id(),String.format("entry-%04d",i),"start")).toList().reversed();
+            var changed=ResultFixtures.unit(unit.id(),entries,unit.sequences().reversed(),unit.objects());
+            var publication=new Publication(base.id(),base.airVersion(),base.capabilities(),base.artifacts(),List.of(changed),base.storage(),base.resources(),base.artifactRelations(),base.origins(),base.coverage(),base.uncertainties(),base.premises());
+            var ledger=resources();
+            try(var pages=new FilePageStore(directory,512,16,ledger);
+                var checked=SnapshotValidator.check(AirSnapshot.fromPublication(publication),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger));
+                var program=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),new PagedSnapshotOrderStorage(pages,ledger))) {
+                assertEquals(ValidationResult.Status.STRUCTURALLY_VALID,checked.result().status());
+                var graph=CoreCfgProjection.project(program);var table=assertInstanceOf(io.github.gustavo2358.analysis.cfg.domain.CfgTransitionTable.class,graph.transitions());
+                assertEquals(count+2,table.stored().size());assertEquals(3*count,table.size());
+                assertEquals(CoreCfgProjection.project(publication),graph);assertEquals(new java.util.ArrayList<>(table).hashCode(),table.hashCode());
+                for(int i=0;i<count;i++) {
+                    var binding=table.entry(0,i);var returned=table.get(3*i+1);
+                    assertEquals(String.format("entry-%04d",i),binding.activationEntry().localId());
+                    assertEquals(binding.activationEntry(),returned.activationEntry());assertEquals(table.normalExit(0,i),returned.to());
+                }
+                int[] definitions={0};program.definitions(ignored->definitions[0]++);assertEquals(1,definitions[0],"the shared body must not be evaluated once per Entry");
+                program.releaseCfgProjection(io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy.KNOWN_SUBSET);
+                var result=new SnapshotDependencyAnalysis().analyze(program,new PagedSnapshotDependencyStorage(pages,ledger));
+                assertEquals(count,result.sites().size(),"every Entry context must reach delivery");
+                for(int i=0;i<count;i++) {
+                    var site=result.sites().get(i);assertEquals(String.format("entry-%04d",i),site.entry().localId());
+                    assertEquals("invoke",site.operation().localId());assertEquals("start",site.sequence().localId());
+                    assertEquals(1,site.candidates().size());var candidate=site.candidates().getFirst();
+                    assertEquals("PROGA",candidate.referenceName());assertEquals("PROGA   ",candidate.rawValue());
+                    assertEquals("seed",candidate.supports().getFirst().producer().localId());assertEquals(unit.origin(),candidate.supports().getFirst().origin());
+                }
+                System.out.println("SHARED_ENTRY_DELIVERY_METRICS entries="+count+" physical="+(count+2)+" logical="+(3*count)+" definitions="+definitions[0]+" sites="+result.sites().size());
+            }
+            for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
+        }
+    }
+
     @Test void pagedPhysicalTupleStorageRejectsDuplicatesAndForeignOrMissingBindings() {
         for(int mutation=0;mutation<5;mutation++) {
             var ledger=resources();

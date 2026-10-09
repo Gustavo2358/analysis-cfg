@@ -150,7 +150,7 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "8f600b034b451c5b43fb5f24c5f3318dba5008c4",
+    "commit": "a7e2b6c90621997eb25b2c175f1f770137f1c406",
     "canonical_ref": "feat/paged-air-snapshot",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
@@ -206,7 +206,7 @@
       "air-model/src/main/java/io/github/gustavo2358/air/validation/SnapshotIdentityKeys.java",
       "docs/architecture/paged-identity-keys.md"
     ],
-    "observed_on": "2026-10-07",
+    "observed_on": "2026-10-09",
     "modules": {
       "parent": {
         "path": "pom.xml",
@@ -228,12 +228,12 @@
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "logical_text_w2": "Local producer FAST PASS; fixed logical ranges and expression transport. Selected source E2E qualification in docs/product/logical-text-w2.md.",
-    "evidence_level": "Producer FAST269model/144transport/44architecture PASS31.036s; managed physical InputStream staging, complete narrow direct plus correlated concat-diamond snapshot admission, explicitly restricted to COBOL name semantics",
+    "evidence_level": "Producer FAST271model/144transport/44harness PASS28.924s; final additional Entry adversaries reran model/codec/compiled boundaries with unchanged harness explicitly reused. Direct shared-label empty-state/closed-empty-signature Entries are individually admitted; correlated concat remains narrow; COBOL name semantics only. Global snapshot admission remains incomplete.",
     "status": "LOCAL_CHECKPOINT / HUMAN_REVIEW_PENDING",
     "ci": {
-      "checked_commit": "8f600b034b451c5b43fb5f24c5f3318dba5008c4",
-      "status": "NOT_RUN",
-      "context": "local producer FAST only; PR 30"
+      "checked_commit": "a7e2b6c90621997eb25b2c175f1f770137f1c406",
+      "status": "PASS",
+      "context": "PR 30; remote FAST runs 37886794927 and 37886799922 both success; human review pending"
     },
     "air_scale_access": {
       "previous_commit": "c2f80b59b7c38fa6efb9a20f0fa79644c697d8a4",

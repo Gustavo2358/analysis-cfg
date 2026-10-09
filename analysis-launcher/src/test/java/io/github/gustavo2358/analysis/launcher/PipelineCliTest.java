@@ -44,6 +44,41 @@ final class PipelineCliTest {
         assertTrue(json.contains("\"kind\":\"VALUE_PRODUCER\""));
         assertTrue(json.contains("\"analysisStatus\":\"PARTIAL\""));
     }
+    @Test void sharedLabelEntriesReachEverySiteThroughTheRealSnapshotPipeline() throws Exception {
+        var codec=new io.github.gustavo2358.air.json.AirJson();var base=codec.decode(Files.readAllBytes(fixture()));
+        var unit=base.units().getFirst();var first=unit.entries().getFirst();
+        // Preserve the original Entry: existing coverage may refer to its full identity.
+        var entries=java.util.stream.IntStream.range(0,4).mapToObj(i->i==0?first:new io.github.gustavo2358.air.model.Entries.Entry(
+                new io.github.gustavo2358.air.model.Ids.EntryId(unit.id(),"entry-"+i),first.initialLabel(),first.signature(),first.state(),first.origin())).toList().reversed();
+        var changed=new io.github.gustavo2358.air.model.Unit(unit.id(),unit.containingUnit(),unit.objects(),unit.visibleObjects(),entries,
+                unit.sequences().reversed(),unit.completionPorts(),unit.body(),unit.bodyUnavailable(),unit.coverage(),unit.origin());
+        var publication=new io.github.gustavo2358.air.model.Publication(base.id(),base.airVersion(),base.capabilities(),base.artifacts(),java.util.List.of(changed),
+                base.storage(),base.resources(),base.artifactRelations(),base.origins(),base.coverage(),base.uncertainties(),base.premises());
+        var input=dir.resolve("shared.air.json");Files.write(input,codec.encode(publication));
+        var cfg=dir.resolve("shared.cfg");var dependencies=dir.resolve("shared.dependencies");var diagnostic=new ByteArrayOutputStream();
+        assertEquals(0,AnalysisPipeline.run(args(input,cfg,dependencies),new PrintStream(diagnostic)),diagnostic.toString());
+        var expected=dir.resolve("resident.cfg");var reference=new DataflowAirReader().read(input);
+        new CfgJsonWriter().write(new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).buildChecked(reference.checked().orElseThrow(),BuildOptions.defaults()),expected);
+        assertArrayEquals(Files.readAllBytes(expected),Files.readAllBytes(cfg));
+        var json=Files.readString(dependencies);assertTrue(json.contains("\"metrics\":{\"candidates\":4,\"sites\":4}"),json);
+        for(var entry:entries)assertTrue(json.contains("\"localId\":\""+entry.id().localId()+"\""),json);
+        assertEquals(8,json.split("\\\"referenceName\\\":\\\"PROGA\\\"",-1).length-1,"each site and edge must retain its candidate");
+        assertTrue(json.contains("\"rawValue\":\"PROGA   \""));assertTrue(json.contains("\"kind\":\"VALUE_PRODUCER\""));assertTrue(json.contains("\"analysisStatus\":\"PARTIAL\""));
+        var separate=dir.resolve("standalone.dependencies");
+        assertEquals(0,AnalysisDependencies.run(new String[]{input.toString(),separate.toString()},new PrintStream(diagnostic)),diagnostic.toString());
+        assertArrayEquals(Files.readAllBytes(dependencies),Files.readAllBytes(separate));
+        var completedCfg=Files.readAllBytes(cfg);var completedDependencies=Files.readAllBytes(dependencies);
+        var different=new java.util.ArrayList<>(entries);var later=different.getLast();
+        different.set(different.size()-1,new io.github.gustavo2358.air.model.Entries.Entry(later.id(),java.util.Optional.of(unit.sequences().getLast().label()),later.signature(),later.state(),later.origin()));
+        var unprovedUnit=new io.github.gustavo2358.air.model.Unit(unit.id(),unit.containingUnit(),unit.objects(),unit.visibleObjects(),different,
+                unit.sequences(),unit.completionPorts(),unit.body(),unit.bodyUnavailable(),unit.coverage(),unit.origin());
+        var unproved=new io.github.gustavo2358.air.model.Publication(base.id(),base.airVersion(),base.capabilities(),base.artifacts(),java.util.List.of(unprovedUnit),
+                base.storage(),base.resources(),base.artifactRelations(),base.origins(),base.coverage(),base.uncertainties(),base.premises());
+        Files.write(input,codec.encode(unproved));
+        assertEquals(3,AnalysisPipeline.run(args(input,cfg,dependencies),new PrintStream(diagnostic)),diagnostic.toString());
+        assertEquals(7,AnalysisDependencies.run(new String[]{input.toString(),separate.toString()},new PrintStream(diagnostic)),diagnostic.toString());
+        assertArrayEquals(completedCfg,Files.readAllBytes(cfg));assertArrayEquals(completedDependencies,Files.readAllBytes(dependencies));assertArrayEquals(completedDependencies,Files.readAllBytes(separate));
+    }
     @Test void invalidIncompleteDigestAndAliasesRejectBeforeAnyDestination() throws Exception {
         var input=dir.resolve("input");var cfg=dir.resolve("cfg");var dependencies=dir.resolve("dependencies");Files.writeString(cfg,"cfg sentinel");Files.writeString(dependencies,"dependencies sentinel");
         Files.writeString(input,"{");assertEquals(3,AnalysisPipeline.run(args(input,cfg,dependencies),errors()));

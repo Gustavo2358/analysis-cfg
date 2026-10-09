@@ -60,6 +60,16 @@ them after successful CFG export, before dependencies consume the same AIR.
 Resident adapters retain their compatibility storage. Per-Unit projection maps
 and temporary typed lists remain resident; this is not a whole-CFG memory bound.
 
+The direct snapshot dependency slice admits multiple Entries only when each has
+the same initial label, closed empty signature and empty seed. The official
+validator checks every Entry before issuing the certificate. Dependency discovery
+reads the shared definitions/call metadata once and enumerates every admitted
+Entry as a separate delivered site; paged output sorts complete identities.
+Return bindings remain Entry-specific in the factored CFG. Distinct labels,
+seeds or signatures do not borrow this proof and remain incomplete; there is no
+resident fallback in the default pipeline. The narrow correlated diamond retains
+its existing single-Entry proof. This is not general snapshot admission.
+
 `CfgBuildResult` registra `PublicationId`, versão AIR, options, o
 `ValidationResult` integral, capabilities requeridas sem intérprete, issues tipados
 da projeção e `Optional<CfgGraph>`. `CFG_BUILT` exige produto presente;
