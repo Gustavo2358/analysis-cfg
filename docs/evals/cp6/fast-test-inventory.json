@@ -392,6 +392,10 @@
       "spentWorkCannotPreventSpilledArrayFromReleasingBorrowedPages",
       "closingTemporaryBackendDoesNotRequireWritingDiscardedDirtyPayload"
     ],
+    "io.github.gustavo2358.analysis.adapters.PagedSnapshotOrderStorageTest": [
+      "reverseCanonicalInputSpillsWithoutInputCardinalityHeapMetadata",
+      "comparatorFailureAbortsFactoryAndClosingOwnerReleasesEveryPage"
+    ],
     "io.github.gustavo2358.analysis.adapters.PagedSnapshotIdentityStorageTest": [
       "completeTypedNamespacesAndUnicodeAgreeAcrossResidentAndOnePageStores",
       "exactIdentityPayloadExceedsManagedResidencyAndMemoizationAvoidsRepeatedWork",
@@ -464,6 +468,8 @@
       "validTypedSnapshotHasIdenticalManagedAdmissionPrefixAcrossBackends"
     ],
     "io.github.gustavo2358.analysis.adapters.SnapshotDependencyAnalysisTest": [
+      "cfgProjectionDoesNotReadEveryInstructionIdentityBeforeAQuery",
+      "operationViewConstructorsDoNotCopyAndExpiredOwnersRejectQueries",
       "validatedPagedSnapshotPreservesVariableCallEvidenceWithoutPublicationMaterialization",
       "incompleteAdmissionCannotProduceDependencies",
       "leasedCursorWireMatchesExplicitMaterialization"
@@ -1364,6 +1370,9 @@
       "onlyProjectedDomainSelectsVersionAndWriterHasNoStickyState"
     ],
     "io.github.gustavo2358.analysis.cfg.adapters.WriterDomainTest": [
+      "productionEncoderStreamsTheExactCompatibilityWire",
+      "atomicProductionWriterMetersTheLogicalWire",
+      "interruptedStreamingWritePreservesDestinationAndCleansTemporary",
       "partialAnalysisRequiresExplicitPartialResultWire",
       "memoryAndFileHaveEquivalentControlCoverageWire",
       "writerCoversEveryCurrentKindWithExactContextualTransitions",

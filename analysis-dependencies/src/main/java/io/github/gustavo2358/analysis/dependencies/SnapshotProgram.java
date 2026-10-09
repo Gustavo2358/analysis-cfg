@@ -22,15 +22,22 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
 
     private final AirSnapshot snapshot;
     private final SnapshotIdentityKeys keys;
+    private final SnapshotOrderStorage orderStorage;
+    private final char[] orderLeft=new char[64],orderRight=new char[64];
     private CfgSource source;
     private List<Capabilities.Capability> requiredCapabilities;
     private Set<Capabilities.Capability> namePolicyExtensions;
     private boolean closed;
 
     public SnapshotProgram(SnapshotValidator.CheckedSnapshot checked,SnapshotIdentityKeys.Storage identityStorage) {
+        this(checked,identityStorage,SnapshotOrderStorage.resident());
+    }
+    public SnapshotProgram(SnapshotValidator.CheckedSnapshot checked,SnapshotIdentityKeys.Storage identityStorage,SnapshotOrderStorage orderStorage) {
         Objects.requireNonNull(checked);snapshot=checked.snapshot();var owned=Objects.requireNonNull(identityStorage);
-        if(checked.result().status()!=ValidationResult.Status.STRUCTURALLY_VALID){owned.close();throw new IllegalArgumentException("complete snapshot validation required");}
-        keys=new SnapshotIdentityKeys(snapshot,owned);
+        this.orderStorage=Objects.requireNonNull(orderStorage);
+        if(checked.result().status()!=ValidationResult.Status.STRUCTURALLY_VALID){owned.close();this.orderStorage.close();throw new IllegalArgumentException("complete snapshot validation required");}
+        try{keys=new SnapshotIdentityKeys(snapshot,owned);}
+        catch(RuntimeException|Error failure){this.orderStorage.close();throw failure;}
     }
 
     public PublicationId publication(){open();return (PublicationId)id(snapshot.field(snapshot.root(),PUBLICATION,0));}
@@ -82,11 +89,7 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
     private CfgSource cfgSource() {
         long root=snapshot.root(),version=snapshot.field(root,PUBLICATION,1);
         var units=new ArrayList<CfgSource.UnitInventory>();
-        try(var rows=snapshot.elements(snapshot.field(root,PUBLICATION,4),UNIT)) {
-            while(rows.advance()) {long unit=rows.value(),coverage=snapshot.field(unit,UNIT,9);units.add(new CfgSource.UnitInventory(
-                    (UnitId)id(snapshot.field(unit,UNIT,0)),inventory(coverage)));}
-        }
-        units.sort(Comparator.comparing(unit->unit.id().localId()));
+        units(unit->units.add(new CfgSource.UnitInventory(unit.id(),unit.inventory())));
         return new CfgSource(publication(),new SemanticVersion(integer(snapshot.field(version,SEMANTIC_VERSION,0)),
                 integer(snapshot.field(version,SEMANTIC_VERSION,1)),integer(snapshot.field(version,SEMANTIC_VERSION,2))),
                 coverage(),units,requiredCapabilities().stream().filter(CoreCfgProjection::supportsControlCapability).distinct().toList());
@@ -98,11 +101,8 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
 
     @Override public void units(Consumer<CfgProgram.UnitView> consumer) {
         open();Objects.requireNonNull(consumer);
-        var units=new ArrayList<SnapshotUnit>();
-        try(var rows=snapshot.elements(snapshot.field(snapshot.root(),PUBLICATION,4),UNIT)) {
-            while(rows.advance())units.add(new SnapshotUnit(rows.value()));
-        }
-        units.sort(Comparator.comparing(unit->unit.id().localId()));units.forEach(consumer);
+        long values=snapshot.field(snapshot.root(),PUBLICATION,4);
+        ordered(values,UNIT,(a,b)->compareLocalIds(a,UNIT,0,b,UNIT,0),handle->consumer.accept(new SnapshotUnit(handle)));
     }
 
     private final class SnapshotUnit implements CfgProgram.UnitView {
@@ -112,28 +112,45 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
         @Override public Unit.BodyAvailability body(){return Unit.BodyAvailability.values()[(int)snapshot.scalar(snapshot.field(handle,UNIT,7))];}
         @Override public Evidence.InventoryStatus inventory(){return SnapshotProgram.this.inventory(snapshot.field(handle,UNIT,9));}
         @Override public void entries(Consumer<CfgProgram.EntryView> consumer) {
-            open();Objects.requireNonNull(consumer);var entries=new ArrayList<CfgProgram.EntryView>();
-            try(var rows=snapshot.elements(snapshot.field(handle,UNIT,4),ENTRIES_ENTRY)) {
-                while(rows.advance()) {long entry=rows.value(),initial=snapshot.field(entry,ENTRIES_ENTRY,1);entries.add(new CfgProgram.EntryView(
-                        (EntryId)SnapshotProgram.this.id(snapshot.field(entry,ENTRIES_ENTRY,0)),snapshot.size(initial)==0?Optional.empty():
-                        Optional.of((LabelId)SnapshotProgram.this.id(snapshot.element(initial,IDS_LABEL_ID,0)))));}
-            }
-            entries.sort(Comparator.comparing(entry->entry.id().localId()));entries.forEach(consumer);
+            open();Objects.requireNonNull(consumer);long values=snapshot.field(handle,UNIT,4);
+            ordered(values,ENTRIES_ENTRY,(a,b)->compareLocalIds(a,ENTRIES_ENTRY,0,b,ENTRIES_ENTRY,0),entry->{long initial=snapshot.field(entry,ENTRIES_ENTRY,1);consumer.accept(new CfgProgram.EntryView(
+                    (EntryId)SnapshotProgram.this.id(snapshot.field(entry,ENTRIES_ENTRY,0)),snapshot.size(initial)==0?Optional.empty():
+                    Optional.of((LabelId)SnapshotProgram.this.id(snapshot.element(initial,IDS_LABEL_ID,0)))));});
         }
         @Override public void sequences(Consumer<CfgProgram.SequenceView> consumer) {
-            open();Objects.requireNonNull(consumer);var sequences=new ArrayList<CfgProgram.SequenceView>();
-            try(var rows=snapshot.elements(snapshot.field(handle,UNIT,5),SEQUENCE)) {
-                while(rows.advance()) {long sequence=rows.value();var operations=new ArrayList<OperationId>();
-                    try(var instructions=snapshot.elements(snapshot.field(sequence,SEQUENCE,1),INSTRUCTION)) {
-                        while(instructions.advance()) {long instruction=instructions.value(),header=snapshot.field(instruction,snapshot.shape(instruction),0);
-                            operations.add((OperationId)SnapshotProgram.this.id(snapshot.field(header,OPERATIONS_HEADER,0)));}
-                    }
-                    sequences.add(new CfgProgram.SequenceView((LabelId)SnapshotProgram.this.id(snapshot.field(sequence,SEQUENCE,0)),
+            open();Objects.requireNonNull(consumer);long values=snapshot.field(handle,UNIT,5);
+            ordered(values,SEQUENCE,(a,b)->compareLocalIds(a,SEQUENCE,0,b,SEQUENCE,0),sequence->{
+                    long instructions=snapshot.field(sequence,SEQUENCE,1);
+                    var operations=new CfgProgram.OperationIds(Math.toIntExact(snapshot.size(instructions)),ordinal->{
+                        long instruction=snapshot.element(instructions,INSTRUCTION,ordinal),header=snapshot.field(instruction,snapshot.shape(instruction),0);
+                        return (OperationId)SnapshotProgram.this.id(snapshot.field(header,OPERATIONS_HEADER,0));
+                    },()->{SnapshotProgram.this.open();snapshot.shape(instructions);});
+                    consumer.accept(new CfgProgram.SequenceView((LabelId)SnapshotProgram.this.id(snapshot.field(sequence,SEQUENCE,0)),
                             operations,control(snapshot.field(sequence,SEQUENCE,2))));
-                }
-            }
-            sequences.sort(Comparator.comparing(sequence->sequence.label().localId()));sequences.forEach(consumer);
+            });
         }
+    }
+
+    private void ordered(long values,AirShape shape,SnapshotOrderStorage.Order order,java.util.function.LongConsumer consumer) {
+        try(var index=orderStorage.open(order)) {
+            try(var rows=snapshot.elements(values,shape)){while(rows.advance())index.add(rows.value());}
+            try(var cursor=index.cursor()){while(cursor.advance())consumer.accept(cursor.handle());}
+        }
+    }
+    private int compareLocalIds(long first,AirShape firstShape,int firstId,long second,AirShape secondShape,int secondId) {
+        long firstValue=snapshot.field(first,firstShape,firstId),secondValue=snapshot.field(second,secondShape,secondId);
+        return compareText(snapshot.field(firstValue,snapshot.shape(firstValue),1),snapshot.field(secondValue,snapshot.shape(secondValue),1));
+    }
+    private synchronized int compareText(long first,long second) {
+        long firstLength=snapshot.characterCount(first),secondLength=snapshot.characterCount(second),limit=Math.min(firstLength,secondLength),offset=0;
+        while(offset<limit) {
+            int width=(int)Math.min(orderLeft.length,limit-offset);
+            int left=snapshot.readCharacters(first,offset,orderLeft,0,width),right=snapshot.readCharacters(second,offset,orderRight,0,width);
+            if(left<=0||right<=0||left!=right)throw new IllegalStateException("snapshot local-ID comparison made invalid progress");
+            for(int i=0;i<left;i++)if(orderLeft[i]!=orderRight[i])return Character.compare(orderLeft[i],orderRight[i]);
+            offset+=left;
+        }
+        return Long.compare(firstLength,secondLength);
     }
 
     private CfgControl control(long terminator) {
@@ -431,5 +448,5 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
     private Id id(long source){AirShape shape=snapshot.shape(source);return switch(shape){case IDS_PUBLICATION_ID->new PublicationId(text(snapshot.field(source,shape,0)));case IDS_UNIT_ID->new UnitId((PublicationId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));case IDS_ENTRY_ID->new EntryId((UnitId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));case IDS_LABEL_ID->new LabelId((UnitId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));case IDS_OPERATION_ID->new OperationId((UnitId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));case IDS_COMPLETION_PORT_ID->new CompletionPortId((UnitId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));case IDS_OBJECT_ID->new ObjectId((UnitId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));case IDS_ORIGIN_ID->new OriginId((PublicationId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));case IDS_ARTIFACT_ID->new ArtifactId((PublicationId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));default->throw new IllegalArgumentException("unsupported program id "+shape);};}
     private String text(long source){long length=snapshot.characterCount(source);if(length>Integer.MAX_VALUE)throw new IllegalStateException("program text too large");char[] result=new char[(int)length],block=new char[Math.min(1024,Math.max(1,result.length))];long offset=0;while(offset<length){int count=snapshot.readCharacters(source,offset,block,0,(int)Math.min(block.length,length-offset));System.arraycopy(block,0,result,(int)offset,count);offset+=count;}return new String(result);}
     private void open(){if(closed)throw new IllegalStateException("snapshot program is closed");}
-    @Override public void close(){if(closed)return;closed=true;keys.close();}
+    @Override public void close(){if(closed)return;closed=true;Throwable failure=null;try{keys.close();}catch(RuntimeException|Error cleanup){failure=cleanup;}try{orderStorage.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}if(failure instanceof RuntimeException exception)throw exception;if(failure instanceof Error error)throw error;}
 }

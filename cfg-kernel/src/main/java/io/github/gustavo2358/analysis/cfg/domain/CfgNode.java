@@ -38,7 +38,7 @@ public sealed interface CfgNode {
         public SequenceNode {
             Objects.requireNonNull(id, "id");
             Objects.requireNonNull(label, "label");
-            operations = List.copyOf(operations);
+            operations = CfgProgram.immutableOperations(operations);
             Objects.requireNonNull(control, "control");
             if (!id.publicationId().equals(label.publication())
                     || !control.operation().unit().equals(label.unit())) {

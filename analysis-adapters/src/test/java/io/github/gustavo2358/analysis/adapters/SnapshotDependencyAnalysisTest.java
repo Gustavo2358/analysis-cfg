@@ -19,11 +19,76 @@ import java.util.Optional;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import static org.junit.jupiter.api.Assertions.*;
 
 /** Executable proof of the first validated snapshot-to-dependency production slice. */
 final class SnapshotDependencyAnalysisTest {
+    @TempDir java.nio.file.Path directory;
     private static AnalysisResources resources(){return new AnalysisResources(new AnalysisResources.Limits(64_000_000,64_000_000,0,256_000_000,4,1_000_000_000,1_000_000));}
+
+    @Test void cfgProjectionDoesNotReadEveryInstructionIdentityBeforeAQuery() {
+        long baseline=-1;
+        for(int count:new int[]{16,64,256,1024,4096}) {
+            var publication=directCallWithNops(count);var ledger=resources();
+            try(var pages=new FilePageStore(directory,512,16,ledger);var original=AirSnapshot.fromPublication(publication);
+                var builder=new AirSnapshotBuilder(new PagedAirStorage(pages,ledger,AnalysisResources.Phase.DECODE))) {
+                long root=PagedAirStorageTest.copy(original,original.root(),null,builder);
+                try(var checked=SnapshotValidator.check(builder.finish(root),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger))) {
+                    assertEquals(ValidationResult.Status.STRUCTURALLY_VALID,checked.result().status(),checked.result().toString());
+                    List<OperationId> borrowed;
+                    try(var program=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),new PagedSnapshotOrderStorage(pages,ledger))) {
+                        long before=ledger.workUsed();
+                        var graph=CoreCfgProjection.project(program);
+                        long work=ledger.workUsed()-before;
+                        if(baseline<0)baseline=work;
+                        assertTrue(work<=2*baseline+1024,"CFG eagerly read instruction inventory: count="+count+" work="+work+" baseline="+baseline);
+                        var sequence=graph.nodes().stream().filter(node->node instanceof io.github.gustavo2358.analysis.cfg.domain.CfgNode.SequenceNode s&&s.label().localId().equals("start"))
+                                .map(io.github.gustavo2358.analysis.cfg.domain.CfgNode.SequenceNode.class::cast).findFirst().orElseThrow();
+                        borrowed=sequence.operations();
+                        assertEquals(count+1,sequence.operations().size());
+                        assertEquals("seed",sequence.operations().getFirst().localId());
+                        assertEquals("nop-"+(count-1),sequence.operations().getLast().localId());
+                        for(int scan=0;scan<2;scan++) {
+                            int ordinal=0;
+                            for(var operation:sequence.operations()) {
+                                assertEquals(ordinal==0?"seed":"nop-"+(ordinal-1),operation.localId());ordinal++;
+                            }
+                            assertEquals(count+1,ordinal);
+                        }
+                        assertThrows(UnsupportedOperationException.class,()->sequence.operations().clear());
+                        System.out.println("SNAPSHOT_CFG_OPERATION_VIEW_METRICS instructions="+(count+1)+" preparationWork="+work);
+                    }
+                    assertThrows(IllegalStateException.class,borrowed::size);
+                    assertThrows(IllegalStateException.class,borrowed::getFirst);
+                }
+            }
+            assertEquals(0,ledger.heapUsed());
+        }
+    }
+
+    @Test void operationViewConstructorsDoNotCopyAndExpiredOwnersRejectQueries() {
+        var publication=new PublicationId("operation-view");var unit=new UnitId(publication,"unit");
+        var control=new io.github.gustavo2358.analysis.cfg.domain.CfgControl.Return(new OperationId(unit,"return"));
+        int[] reads={0};boolean[] alive={true};
+        var operations=new io.github.gustavo2358.analysis.cfg.domain.CfgProgram.OperationIds(Integer.MAX_VALUE,
+                ordinal->{reads[0]++;return new OperationId(unit,"operation-"+ordinal);},
+                ()->{if(!alive[0])throw new IllegalStateException("expired synthetic owner");});
+        var view=new io.github.gustavo2358.analysis.cfg.domain.CfgProgram.SequenceView(new LabelId(unit,"sequence"),operations,control);
+        var node=new io.github.gustavo2358.analysis.cfg.domain.CfgNode.SequenceNode(
+                new io.github.gustavo2358.analysis.cfg.domain.CfgNodeId(publication,0),view.label(),view.operations(),view.control());
+        assertSame(operations,view.operations());assertSame(operations,node.operations());assertEquals(0,reads[0]);
+        assertEquals("operation-2147483646",node.operations().getLast().localId());assertEquals(1,reads[0]);
+        assertThrows(IndexOutOfBoundsException.class,()->operations.get(-1));
+        assertThrows(IndexOutOfBoundsException.class,()->operations.get(Integer.MAX_VALUE));
+        assertThrows(UnsupportedOperationException.class,()->operations.set(0,new OperationId(unit,"replacement")));
+        assertThrows(UnsupportedOperationException.class,()->operations.add(new OperationId(unit,"extra")));
+        alive[0]=false;
+        assertThrows(IllegalStateException.class,operations::size);
+        assertThrows(IllegalStateException.class,operations::getFirst);
+        assertThrows(IllegalStateException.class,()->operations.iterator().hasNext());
+        assertEquals(1,reads[0]);
+    }
 
     @Test void dependencyProgramConstructionDoesNotPrepareInputSizedCfgMetadata() {
         long fixed=-1;
@@ -50,7 +115,7 @@ final class SnapshotDependencyAnalysisTest {
             long root=PagedAirStorageTest.copy(source,source.root(),null,builder);
             try(var checked=SnapshotValidator.check(builder.finish(root),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger))) {
                 assertEquals(ValidationResult.Status.STRUCTURALLY_VALID,checked.result().status(),checked.result().toString());
-                try(var snapshotProgram=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger))) {
+                try(var snapshotProgram=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),new PagedSnapshotOrderStorage(pages,ledger))) {
                     ProgramStore store=snapshotProgram;
                     assertEquals(publication.id(),store.publicationId());
                     assertEquals(Evidence.InventoryStatus.COMPLETE,store.inventory());
@@ -65,7 +130,7 @@ final class SnapshotDependencyAnalysisTest {
                     assertEquals(CoreCfgProjection.project(publication),built.graph().orElseThrow());
                 }
                 var result=new SnapshotDependencyAnalysis().analyze(
-                        new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger)),
+                        new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),new PagedSnapshotOrderStorage(pages,ledger)),
                         new PagedSnapshotDependencyStorage(pages,ledger));
                 assertEquals(publication.id(),result.publication());assertEquals(Evidence.InventoryStatus.COMPLETE,result.coverage());
                 assertEquals(publication.origins(),result.origins());assertEquals(publication.artifacts(),result.artifacts());
@@ -95,7 +160,7 @@ final class SnapshotDependencyAnalysisTest {
             long root=PagedAirStorageTest.copy(source,source.root(),null,builder);
             try(var checked=SnapshotValidator.check(builder.finish(root),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger))) {
                 assertEquals(ValidationResult.Status.STRUCTURALLY_VALID,checked.result().status(),checked.result().toString());
-                try(var snapshotProgram=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger))) {
+                try(var snapshotProgram=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),new PagedSnapshotOrderStorage(pages,ledger))) {
                     assertEquals(CoreCfgProjection.project(publication),CoreCfgProjection.project(snapshotProgram));
                 }
                 var result=new SnapshotDependencyAnalysis().analyze(checked,new PagedSnapshotIdentityStorage(pages,ledger),new PagedSnapshotDependencyStorage(pages,ledger));
@@ -159,6 +224,15 @@ final class SnapshotDependencyAnalysisTest {
 
     private static Publication directCall() {
         return directCalls(1);
+    }
+
+    private static Publication directCallWithNops(int count) {
+        var base=directCall();var unit=base.units().getFirst();var start=unit.sequences().getFirst();
+        var instructions=new java.util.ArrayList<Instruction>(start.instructions());
+        for(int i=0;i<count;i++)instructions.add(new Operations.Nop(ResultFixtures.header(unit.id(),"nop-"+i)));
+        var replacement=new Sequence(start.label(),instructions,start.terminator(),start.origin());
+        var changed=ResultFixtures.unit(unit.id(),unit.entries(),List.of(replacement,unit.sequences().getLast()),unit.objects());
+        return new Publication(base.id(),base.airVersion(),base.capabilities(),base.artifacts(),List.of(changed),base.storage(),base.resources(),base.artifactRelations(),base.origins(),base.coverage(),base.uncertainties(),base.premises());
     }
 
     private static Publication directCalls(int count) {

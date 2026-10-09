@@ -164,7 +164,7 @@ EXPECTED_PRODUCTION_IMPORTS.update({
         "io.github.gustavo2358.air.model.Ids.OperationId", "io.github.gustavo2358.air.model.Ids.UnitId",
         "io.github.gustavo2358.air.model.NamePolicies", PUBLICATION,
         "io.github.gustavo2358.air.model.Unit", "java.util.Comparator", "java.util.List",
-        "java.util.Objects", "java.util.Set", "java.util.function.Consumer",
+        "java.util.Objects", "java.util.Set", "java.util.function.Consumer", "java.util.function.IntFunction",
     },
 })
 EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CfgTransitionTable.java"] = {
@@ -188,7 +188,7 @@ EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/LocalControlRules.java"] = {
 }
 CFG_CLASS_NAMES = {
     "CfgProgram", "CfgProgram$UnitView", "CfgProgram$EntryView", "CfgProgram$SequenceView",
-    "CfgProgram$Resident", "CfgProgram$ResidentUnit",
+    "CfgProgram$Resident", "CfgProgram$ResidentUnit", "CfgProgram$OperationIds",
     "CfgControl", "CfgControl$Jump", "CfgControl$Branch", "CfgControl$Return", "CfgControl$Halt",
     "CfgControl$Invoke", "CfgControl$Opaque", "CfgControl$ReentryGuard", "CfgControl$ResumeRoute",
     "CfgControl$LocalInvoke", "CfgControl$LocalBoundary", "CfgControl$LocalResume",

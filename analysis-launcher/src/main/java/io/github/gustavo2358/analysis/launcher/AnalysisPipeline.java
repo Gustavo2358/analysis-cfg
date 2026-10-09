@@ -89,7 +89,7 @@ public final class AnalysisPipeline {
             if(validation.status()!=ValidationResult.Status.STRUCTURALLY_VALID) {
                 err.println("PIPELINE_INPUT_INVALID");return 3;
             }
-            try(var program=new SnapshotProgram(read.checked(),read.newIdentityStorage())) {
+            try(var program=new SnapshotProgram(read.checked(),read.newIdentityStorage(),read.newOrderStorage())) {
                 var built=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).buildChecked(program,read.checked(),BuildOptions.defaults());
                 if(built.status()!=CfgBuildResult.Status.CFG_BUILT){err.println("CFG "+built.status());return 4;}
                 try {new CfgJsonWriter(resources.limits().outputBytes()).write(built,cfg,

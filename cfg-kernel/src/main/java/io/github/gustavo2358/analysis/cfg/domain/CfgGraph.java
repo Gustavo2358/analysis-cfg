@@ -15,6 +15,8 @@ import java.util.Objects;
 /**
  * Immutable inventory of projected known control. Source knowledge is detached from the original AIR
  * publication. Missing nodes/edges do not prove absence when that inventory is partial.
+ * Snapshot-backed operation inventories borrow the program owner and must be consumed before it
+ * closes; resident operation inventories remain detached immutable lists.
  */
 public final class CfgGraph {
     private final Map<CfgNodeId,LocalControlRules.Rule> localRules;

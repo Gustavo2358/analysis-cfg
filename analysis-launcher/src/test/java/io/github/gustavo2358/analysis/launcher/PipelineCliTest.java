@@ -32,10 +32,17 @@ final class PipelineCliTest {
     @Test void defaultRoutePublishesCfgAndDependenciesFromTheValidatedSnapshot() throws Exception {
         var cfg=dir.resolve("snapshot.cfg");var dependencies=dir.resolve("snapshot.dependencies");
         assertEquals(0,AnalysisPipeline.run(args(fixture(),cfg,dependencies),errors()));
-        assertTrue(Files.readString(cfg).contains("\"schema\":\"analysis-cfg-json\""));
+        var expectedCfg=dir.resolve("resident-reference.cfg");var reference=new DataflowAirReader().read(fixture());
+        new CfgJsonWriter().write(new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).buildChecked(
+                reference.checked().orElseThrow(),BuildOptions.defaults()),expectedCfg);
+        assertArrayEquals(Files.readAllBytes(expectedCfg),Files.readAllBytes(cfg));
         var json=Files.readString(dependencies);
         assertTrue(json.contains("\"modelScope\":\"VALIDATED_SNAPSHOT_DEPENDENCY\""));
         assertTrue(json.contains("\"version\":\"3.0.0\""));
+        assertTrue(json.contains("\"referenceName\":\"PROGA\""));
+        assertTrue(json.contains("\"rawValue\":\"PROGA   \""));
+        assertTrue(json.contains("\"kind\":\"VALUE_PRODUCER\""));
+        assertTrue(json.contains("\"analysisStatus\":\"PARTIAL\""));
     }
     @Test void invalidIncompleteDigestAndAliasesRejectBeforeAnyDestination() throws Exception {
         var input=dir.resolve("input");var cfg=dir.resolve("cfg");var dependencies=dir.resolve("dependencies");Files.writeString(cfg,"cfg sentinel");Files.writeString(dependencies,"dependencies sentinel");

@@ -35,6 +35,7 @@ public final class DataflowAirReader {
         private SnapshotRead(SnapshotValidator.CheckedSnapshot checked,PageStore pages,AnalysisResources resources,Path directory,long bytes,String sha256){this.checked=checked;this.pages=pages;this.resources=resources;this.directory=directory;this.airReads=1;this.airBytesObserved=bytes;this.sha256=sha256;}
         public synchronized SnapshotValidator.CheckedSnapshot checked(){open();return checked;}
         public synchronized SnapshotIdentityKeys.Storage newIdentityStorage(){open();return new PagedSnapshotIdentityStorage(pages,resources);}
+        public synchronized io.github.gustavo2358.analysis.dependencies.SnapshotOrderStorage newOrderStorage(){open();return new PagedSnapshotOrderStorage(pages,resources);}
         public synchronized io.github.gustavo2358.analysis.dependencies.SnapshotDependencyAnalysis.Storage newDependencyStorage(){open();return new PagedSnapshotDependencyStorage(pages,resources);}
         public AnalysisResources resources(){return resources;}public long airReads(){return airReads;}public long airBytesObserved(){return airBytesObserved;}public String sha256(){return sha256;}
         private void open(){if(checked==null)throw new IllegalStateException("snapshot read is closed");}

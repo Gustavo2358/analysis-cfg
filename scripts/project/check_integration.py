@@ -42,6 +42,8 @@ SUITES = {
             "memoryAndFileHaveEquivalentControlCoverageWire", "writerCoversEveryCurrentKindWithExactContextualTransitions",
             "utf8EscapingAndByteLimitAreExact", "invalidUnicodeIsRejectedByOutputPrimitiveAndAirModel",
             "nonAtomicFallbackIsExplicitAndMovesCompleteBytes", "failedMoveCleansTemporaryAndDoesNotReportSuccess",
+            "productionEncoderStreamsTheExactCompatibilityWire", "atomicProductionWriterMetersTheLogicalWire",
+            "interruptedStreamingWritePreservesDestinationAndCleansTemporary",
         },
     },
     "cfg-launcher": {

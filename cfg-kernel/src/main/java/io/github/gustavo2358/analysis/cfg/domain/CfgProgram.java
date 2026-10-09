@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.IntFunction;
 
 /**
  * Read-only control program consumed by the one core CFG projection. Implementations may be
@@ -45,12 +46,38 @@ public interface CfgProgram {
     record SequenceView(LabelId label, List<OperationId> operations, CfgControl control) {
         public SequenceView {
             Objects.requireNonNull(label, "label");
-            operations = List.copyOf(operations);
+            operations = immutableOperations(operations);
             Objects.requireNonNull(control, "control");
             if (!control.operation().unit().equals(label.unit())) {
                 throw new IllegalArgumentException("sequence control belongs to another Unit");
             }
         }
+    }
+
+    /**
+     * Immutable operation inventory backed by caller-owned program storage. The access function
+     * must return the same identity for each ordinal for the lifetime checked by {@code owner}.
+     * No identity is read or cached at construction. Borrowed inventories expire with their owner;
+     * consumers needing a detached list must explicitly materialize it while that owner is open.
+     */
+    final class OperationIds extends java.util.AbstractList<OperationId> implements java.util.RandomAccess {
+        private final int count;
+        private final IntFunction<OperationId> access;
+        private final Runnable owner;
+
+        public OperationIds(int count, IntFunction<OperationId> access, Runnable owner) {
+            if(count<0)throw new IllegalArgumentException("negative operation inventory size");
+            this.count=count;this.access=Objects.requireNonNull(access);this.owner=Objects.requireNonNull(owner);
+            owner.run();
+        }
+        @Override public int size(){owner.run();return count;}
+        @Override public OperationId get(int index){owner.run();Objects.checkIndex(index,count);return Objects.requireNonNull(access.apply(index));}
+        @Override public void clear(){throw new UnsupportedOperationException("immutable operation inventory");}
+    }
+
+    static List<OperationId> immutableOperations(List<OperationId> operations) {
+        Objects.requireNonNull(operations,"operations");
+        return operations instanceof OperationIds ? operations : List.copyOf(operations);
     }
 
     static CfgProgram resident(Publication publication) {
