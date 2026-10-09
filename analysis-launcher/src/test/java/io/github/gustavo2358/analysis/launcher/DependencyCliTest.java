@@ -37,4 +37,44 @@ final class DependencyCliTest {
         assertEquals(7,AnalysisDependencies.run(new String[]{fixture().toString(),output.toString()},err(diagnostics),new DataflowAirReader(codec)));assertEquals("sentinel",Files.readString(output));
         assertEquals(2,AnalysisDependencies.run(new String[]{fixture().toString(),output.toString(),"--experimental-physical"},err(diagnostics)));assertEquals("sentinel",Files.readString(output));
     }
+
+    @Test void invocationContradictionsAreRejectedBeforeEitherCliPublishes() throws Exception {
+        var mapper=new com.fasterxml.jackson.databind.ObjectMapper();
+        Path input=dir.resolve("contradiction.air.json"),cfg=dir.resolve("cfg.json"),output=dir.resolve("dependencies.json");
+        for(int mutation=0;mutation<4;mutation++) {
+            var document=mapper.readTree(Files.readAllBytes(fixture()));
+            var call=document.path("publication").path("units").get(0).path("sequences").get(0).path("terminator");
+            var known=(com.fasterxml.jackson.databind.node.ArrayNode)call.path("outcomes").path("known");
+            if(mutation==0)known.add(known.get(0).deepCopy());
+            else if(mutation==1||mutation==2) {
+                var alternative=mapper.createObjectNode();alternative.put("kind",mutation==1?"exception":"any_exception");
+                if(mutation==1)alternative.put("tag","synthetic-tag");
+                alternative.set("destination",mapper.createObjectNode().put("kind","propagate"));
+                known.add(alternative);known.add(alternative.deepCopy());
+            } else {
+                var parameter=mapper.createObjectNode();parameter.put("position","0");
+                parameter.set("mode",mapper.createObjectNode().put("kind","known").put("mode","VALUE"));
+                var type=mapper.createObjectNode().put("kind","known");type.set("type",mapper.createObjectNode().put("kind","text"));parameter.set("typeRef",type);
+                parameter.set("objectBinding",mapper.createObjectNode().put("kind","external"));
+                parameter.set("origin",call.path("header").path("origin").deepCopy());
+                ((com.fasterxml.jackson.databind.node.ArrayNode)call.path("signature").path("signature").path("parameters").path("known")).add(parameter);
+            }
+            Files.write(input,mapper.writeValueAsBytes(document));
+            // Independent resident validation proves the malformed obligation, not a codec shape failure.
+            var resident=assertThrows(AirJsonException.class,()->new AirJson().decode(Files.readAllBytes(input)));
+            String rule=mutation==3?"I-08":"I-60";
+            assertEquals(AirJsonException.Code.INVALID_IR,resident.code());
+            assertTrue(resident.issues().stream().anyMatch(issue->issue.rule().equals(rule)),resident.toString());
+            Files.writeString(cfg,"cfg sentinel");Files.writeString(output,"dependency sentinel");
+            var diagnostics=new ByteArrayOutputStream();
+            assertEquals(3,AnalysisDependencies.run(new String[]{input.toString(),output.toString()},err(diagnostics)),diagnostics.toString());
+            assertTrue(diagnostics.toString().contains("INPUT_VALIDATION: INVALID_IR"),diagnostics.toString());
+            assertEquals("dependency sentinel",Files.readString(output));
+            diagnostics.reset();
+            assertEquals(3,AnalysisPipeline.run(new String[]{input.toString(),cfg.toString(),output.toString()},err(diagnostics)),diagnostics.toString());
+            assertTrue(diagnostics.toString().contains("PIPELINE_INPUT_INVALID"),diagnostics.toString());
+            assertEquals("cfg sentinel",Files.readString(cfg));assertEquals("dependency sentinel",Files.readString(output));
+        }
+        try(var files=Files.list(dir)){assertEquals(3,files.count());}
+    }
 }

@@ -1021,7 +1021,8 @@
     "io.github.gustavo2358.analysis.launcher.DependencyCliTest": [
       "realAirFileUsesValidatedSnapshotChainAndPublishesEvidenceAtomically",
       "malformedIncompleteAndOutputFailuresNeverReplaceDestination",
-      "codecBudgetFailureAndRemovedLegacyOptionsAreExplicit"
+      "codecBudgetFailureAndRemovedLegacyOptionsAreExplicit",
+      "invocationContradictionsAreRejectedBeforeEitherCliPublishes"
     ],
     "io.github.gustavo2358.analysis.launcher.RegionalCliTest": [
       "missingInputAndBadQueryNeverReplaceOutput",
