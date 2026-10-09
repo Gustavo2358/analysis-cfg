@@ -193,13 +193,19 @@ final class PagedSnapshotIdentityStorageTest {
             for(int epoch=0;epoch<3;epoch++)for(int n=0;n<result.length;n++)assertEquals(result[n],keys.key(handles.get(n)));
             assertEquals(tuples,pages.statistics().livePages());
             assertTrue(ledger.workUsed()-work<handles.size()*3L*512,"memo hit reconstructed full text namespace");
+            long memoWork=ledger.workUsed()-work;
+            // Caller-owned typed identities must resolve to the exact same managed canonical
+            // tuples, including a giant shared publication namespace, without retaining copies.
+            for(int n=0;n<result.length;n++)assertEquals(result[n],keys.key((Ids.Id)expected.get(n)));
+            assertEquals(tuples,pages.statistics().livePages(),"known typed identity lookup allocated a second catalogue");
             if(pressure) {
                 assertTrue(ledger.used(AnalysisResources.Pool.TEMPORARY)>ledger.limits().heapBytes());
                 System.out.println("SNAPSHOT_IDENTITY_STORAGE_METRICS {\"managedHeapPeak\":"+ledger.heapPeak()
                         +",\"temporaryBytes\":"+ledger.used(AnalysisResources.Pool.TEMPORARY)
                         +",\"livePages\":"+pages.statistics().livePages()
                         +",\"evictions\":"+pages.statistics().evictions()
-                        +",\"memoChecks\":"+(handles.size()*3)+",\"memoWork\":"+(ledger.workUsed()-work)+"}");
+                        +",\"memoChecks\":"+(handles.size()*3)+",\"memoWork\":"+memoWork
+                        +",\"typedLookupWork\":"+(ledger.workUsed()-work-memoWork)+"}");
             }
         }
         assertEquals(0,pages.statistics().livePages());

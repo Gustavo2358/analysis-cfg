@@ -150,7 +150,7 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "6ce36df8751b0caec7dd3739481256ec9dffae1c",
+    "commit": "8d9090fb498e876822be423471a8e972083b5192",
     "canonical_ref": "feat/paged-air-snapshot",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
@@ -228,12 +228,12 @@
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "logical_text_w2": "Local producer FAST PASS; fixed logical ranges and expression transport. Selected source E2E qualification in docs/product/logical-text-w2.md.",
-    "evidence_level": "Producer local FAST PASS:277 model/145 transport, compiled boundaries and harness. Outside prior direct/correlated profiles, snapshot admission runs all existing mandatory AirValidator rules through borrowed typed views and address indexes, without aggregate Publication/Unit/Sequence/Coverage reconstruction. Name policies require declarations; target.possibilities admits only unknown target domains. Unknown sameDomain without proof and genuinely undecided obligations remain rejected/incomplete. ID/address metadata, proof caches and per-occurrence materialization remain resident: global heap/spill qualification PARTIAL.",
+    "evidence_level": "Producer local FAST PASS:278 model/145 transport,481 classfiles/7711 dependencies, compiled boundaries and harness; clean normal Maven install PASS. General admission borrows sealed primitive canonical declaration rows for typed identity membership/maps/operation-sequence lookup; it does not reconstruct a global typed ID/address catalogue or already-verified nominal-cycle graphs. All remaining mandatory AirValidator rules still run over borrowed typed bodies, without aggregate Publication/Unit/Sequence/Coverage reconstruction. Complete CLI input134872925 bytes under-Xmx128m finished163328ms and emitted134845854 bytes; independent oracle preserves87 original origins/2048 full giant identities/all other semantic fields/CFG. Unknown sameDomain without proof, negative cycles, undeclared capabilities and genuinely undecided obligations retain their classifications. Per-occurrence typed bodies, general proof/visibility caches and consumer index metadata remain resident: global heap/spill qualification PARTIAL.",
     "status": "LOCAL_CHECKPOINT / HUMAN_REVIEW_PENDING",
     "ci": {
-      "checked_commit": "6ce36df8751b0caec7dd3739481256ec9dffae1c",
+      "checked_commit": "8d9090fb498e876822be423471a8e972083b5192",
       "status": "PASS",
-      "context": "PR 30; remote FAST runs37914234022/37914227277 both SUCCESS at pinned6ce36df; human review pending; no merge"
+      "context": "PR30 exact producer8d9090f; remote FAST runs37934084409/37934074804 both SUCCESS; local FAST and complete real CLI pressure oracle PASS; human review pending; no merge"
     },
     "air_scale_access": {
       "previous_commit": "c2f80b59b7c38fa6efb9a20f0fa79644c697d8a4",

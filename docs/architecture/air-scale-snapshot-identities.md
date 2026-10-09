@@ -98,3 +98,16 @@ storage, not complete constructor/reference/domain admission or a managed decode
 
 Expanded FAST passed1036 methods with zero failures/errors/skips in314.013s,
 including immutable producer resolution, wire oracles and compiled boundaries.
+
+## Integrated general identity lookup (2026-10-09)
+
+Producer8d9090fb498e876822be423471a8e972083b5192 adds key(Ids.Id) into this same
+exact tuple catalogue. Closed namespaces/operand owners and every UTF-16 character
+use the original canonical tree; no normalization, hash-only equality or retained
+typed-ID/String query cache. Typed queries cost their own text length plus bounded
+namespace work and managed index lookups; they do not claim source-memo O(1).
+SnapshotDeclarations.fact(Id,Fact) uses these keys directly. Internal general
+admission borrows its sealed rows/cardinalities instead of building resident
+ID maps/sets. It reuses the mandatory primitive cycle pass only after successful
+admission; every remaining general rule still executes. Official int collection
+views and resident visibility/domain-proof caches remain explicit limitations.
