@@ -79,6 +79,36 @@ final class PipelineCliTest {
         assertEquals(7,AnalysisDependencies.run(new String[]{input.toString(),separate.toString()},new PrintStream(diagnostic)),diagnostic.toString());
         assertArrayEquals(completedCfg,Files.readAllBytes(cfg));assertArrayEquals(completedDependencies,Files.readAllBytes(dependencies));assertArrayEquals(completedDependencies,Files.readAllBytes(separate));
     }
+    @Test void largerUnitKeepsOrphanReturnHaltAndDependencyThroughTheRealPipeline() throws Exception {
+        var codec=new io.github.gustavo2358.air.json.AirJson();var base=codec.decode(Files.readAllBytes(fixture()));
+        var unit=base.units().getFirst();var original=unit.sequences().getFirst().terminator().header();
+        var sequences=new java.util.ArrayList<>(unit.sequences());
+        for(int i=0;i<64;i++) {
+            var header=new io.github.gustavo2358.air.model.Operations.Header(new io.github.gustavo2358.air.model.Ids.OperationId(unit.id(),"orphan-control-"+i),original.origin(),original.coverage(),original.precision(),original.uncertainties());
+            io.github.gustavo2358.air.model.Terminator control=i%2==0?new io.github.gustavo2358.air.model.Operations.Return(header,java.util.List.of()):new io.github.gustavo2358.air.model.Operations.Halt(header,io.github.gustavo2358.air.model.Operations.HaltKind.ABNORMAL);
+            sequences.add(new io.github.gustavo2358.air.model.Sequence(new io.github.gustavo2358.air.model.Ids.LabelId(unit.id(),String.format("orphan-%04d",i)),java.util.List.of(),control,unit.origin()));
+        }
+        java.util.Collections.reverse(sequences);
+        var changed=new io.github.gustavo2358.air.model.Unit(unit.id(),unit.containingUnit(),unit.objects(),unit.visibleObjects(),unit.entries(),sequences,unit.completionPorts(),unit.body(),unit.bodyUnavailable(),unit.coverage(),unit.origin());
+        var publication=new io.github.gustavo2358.air.model.Publication(base.id(),base.airVersion(),base.capabilities(),base.artifacts(),java.util.List.of(changed),base.storage(),base.resources(),base.artifactRelations(),base.origins(),base.coverage(),base.uncertainties(),base.premises());
+        var input=dir.resolve("larger-unit.air.json");Files.write(input,codec.encode(publication));
+        var cfg=dir.resolve("larger-unit.cfg");var dependencies=dir.resolve("larger-unit.dependencies");var diagnostic=new ByteArrayOutputStream();
+        assertEquals(0,AnalysisPipeline.run(args(input,cfg,dependencies),new PrintStream(diagnostic)),diagnostic.toString());
+        var reference=new DataflowAirReader().read(input);var expected=dir.resolve("larger-unit.resident.cfg");
+        new CfgJsonWriter().write(new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).buildChecked(reference.checked().orElseThrow(),BuildOptions.defaults()),expected);
+        assertArrayEquals(Files.readAllBytes(expected),Files.readAllBytes(cfg));
+        int halts=0,returns=0;
+        for(var transition:new com.fasterxml.jackson.databind.ObjectMapper().readTree(Files.readAllBytes(cfg)).get("transitions")) {
+            if(transition.get("kind").asText().equals("HALT"))halts++;
+            if(transition.get("kind").asText().equals("RETURN"))returns++;
+        }
+        assertEquals(32,halts);assertEquals(33,returns);
+        var json=Files.readString(dependencies);assertTrue(json.contains("\"metrics\":{\"candidates\":1,\"sites\":1}"),json);
+        assertTrue(json.contains("\"referenceName\":\"PROGA\""));assertTrue(json.contains("\"rawValue\":\"PROGA   \""));assertTrue(json.contains("\"kind\":\"VALUE_PRODUCER\""));assertTrue(json.contains("\"analysisStatus\":\"PARTIAL\""));
+        var standalone=dir.resolve("larger-unit.standalone.dependencies");assertEquals(0,AnalysisDependencies.run(new String[]{input.toString(),standalone.toString()},new PrintStream(diagnostic)),diagnostic.toString());
+        assertArrayEquals(Files.readAllBytes(dependencies),Files.readAllBytes(standalone));
+    }
+
     @Test void invalidIncompleteDigestAndAliasesRejectBeforeAnyDestination() throws Exception {
         var input=dir.resolve("input");var cfg=dir.resolve("cfg");var dependencies=dir.resolve("dependencies");Files.writeString(cfg,"cfg sentinel");Files.writeString(dependencies,"dependencies sentinel");
         Files.writeString(input,"{");assertEquals(3,AnalysisPipeline.run(args(input,cfg,dependencies),errors()));

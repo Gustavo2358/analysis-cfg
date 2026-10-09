@@ -150,7 +150,7 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "a7e2b6c90621997eb25b2c175f1f770137f1c406",
+    "commit": "37b5792978382205d83ed99e6347e4cb13e37286",
     "canonical_ref": "feat/paged-air-snapshot",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
@@ -228,12 +228,12 @@
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "logical_text_w2": "Local producer FAST PASS; fixed logical ranges and expression transport. Selected source E2E qualification in docs/product/logical-text-w2.md.",
-    "evidence_level": "Producer FAST271model/144transport/44harness PASS28.924s; final additional Entry adversaries reran model/codec/compiled boundaries with unchanged harness explicitly reused. Direct shared-label empty-state/closed-empty-signature Entries are individually admitted; correlated concat remains narrow; COBOL name semantics only. Global snapshot admission remains incomplete.",
+    "evidence_level": "Producer FAST271model/145transport/44harness PASS28.110s, no JVM reuse. Normative NORMAL/ABNORMAL Halt transport now preserves both resident and native snapshot facts, with literal wire oracle and 1/4/16/64/256 occurrences. Shared-label empty-state/closed-empty-signature Entries remain individually admitted; correlated concat remains narrow; COBOL name semantics only. Global snapshot admission remains incomplete.",
     "status": "LOCAL_CHECKPOINT / HUMAN_REVIEW_PENDING",
     "ci": {
-      "checked_commit": "a7e2b6c90621997eb25b2c175f1f770137f1c406",
+      "checked_commit": "37b5792978382205d83ed99e6347e4cb13e37286",
       "status": "PASS",
-      "context": "PR 30; remote FAST runs 37886794927 and 37886799922 both success; human review pending"
+      "context": "PR 30; remote FAST runs 37890157859 and 37890162870 both success; human review pending"
     },
     "air_scale_access": {
       "previous_commit": "c2f80b59b7c38fa6efb9a20f0fa79644c697d8a4",

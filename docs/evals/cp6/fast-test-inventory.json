@@ -472,6 +472,8 @@
       "validTypedSnapshotHasIdenticalManagedAdmissionPrefixAcrossBackends"
     ],
     "io.github.gustavo2358.analysis.adapters.SnapshotDependencyAnalysisTest": [
+      "pagedUnitRoutingIsColdExactAndOwnedByTheProjection",
+      "deniedUnitRoutingConstructionAbortsAndReleasesNativeDescriptors",
       "sharedLabelEntriesKeepEveryDependencyContextAndColdReturnBinding",
       "snapshotCfgPhysicalTransitionsStayFactoredColdAndExpireWithProjection",
       "pagedPhysicalTupleStorageRejectsDuplicatesAndForeignOrMissingBindings",
@@ -1045,6 +1047,7 @@
     ],
     "io.github.gustavo2358.analysis.launcher.PipelineCliTest": [
       "sharedLabelEntriesReachEverySiteThroughTheRealSnapshotPipeline",
+      "largerUnitKeepsOrphanReturnHaltAndDependencyThroughTheRealPipeline",
       "oneReadAndCompleteProductsEqualIndependentSeparateRoutes",
       "defaultRoutePublishesCfgAndDependenciesFromTheValidatedSnapshot",
       "invalidIncompleteDigestAndAliasesRejectBeforeAnyDestination",
@@ -1566,6 +1569,7 @@
       "malformedUtf8IsTypedAirFailureWithoutOutput",
       "wrongBindingVersionPreservesCodecPath",
       "unsupportedCodecFormNeverBecomesCfgUnsupportedInput",
+      "bothNormativeHaltKindsReachRealCliWithoutReturnOrFallthrough",
       "unavailableInventoryReachesRealKernelAndIsRejected",
       "allNonBuiltStatusesReturnFourWithoutOutput",
       "outputFilesystemFailureIsSixAndCleansTemp",

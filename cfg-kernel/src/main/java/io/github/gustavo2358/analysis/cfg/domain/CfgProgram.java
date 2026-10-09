@@ -33,10 +33,41 @@ public interface CfgProgram {
     interface NodeStore {
         /** Optional cold factored-flow writer sharing this projection's owner. */
         default CfgTransitionTable.Storage transitions(){return null;}
+        /** Per-Unit destination index, owned only during projection of this Unit. */
+        default Routing routing(UnitId unit,int first,int end){return new ResidentRouting(this,unit,first,end);}
         int size();
         CfgNode get(int ordinal);
         void append(CfgNode node,long sourceHandle,int variant);
         List<CfgNode> seal();
+    }
+    interface Routing extends AutoCloseable {
+        CfgNodeId sequence(LabelId label);
+        CfgNodeId halt(CfgNode.SequenceNode sequence);
+        void outside(CfgNode.SequenceNode sequence,Consumer<CfgNodeId> consumer);
+        @Override void close();
+    }
+    /** Explicit resident compatibility index; native writers replace it with cold ordinals. */
+    final class ResidentRouting implements Routing {
+        private final UnitId unit;
+        private final java.util.Map<LabelId,CfgNodeId> sequences=new java.util.HashMap<>();
+        private final java.util.Map<LabelId,CfgNodeId> halts=new java.util.HashMap<>();
+        private final java.util.Map<LabelId,java.util.List<CfgNodeId>> outside=new java.util.HashMap<>();
+        private boolean closed;
+        private ResidentRouting(NodeStore nodes,UnitId unit,int first,int end) {
+            this.unit=Objects.requireNonNull(unit);LabelId current=null;
+            for(int i=first;i<end;i++) {
+                var node=nodes.get(i);
+                if(node instanceof CfgNode.SequenceNode sequence){current=sequence.label();if(!current.unit().equals(unit)||sequences.put(current,node.id())!=null)throw new IllegalArgumentException("invalid Unit sequence index");}
+                else if(node instanceof CfgNode.HaltExit){halts.put(Objects.requireNonNull(current),node.id());}
+                else if(node instanceof CfgNode.OutcomeExit){outside.computeIfAbsent(Objects.requireNonNull(current),ignored->new java.util.ArrayList<>()).add(node.id());}
+                else throw new IllegalArgumentException("unexpected Unit sequence role");
+            }
+        }
+        private void open(){if(closed)throw new IllegalStateException("closed Unit routing");}
+        @Override public CfgNodeId sequence(LabelId label){open();if(!label.unit().equals(unit))throw new IllegalArgumentException("foreign Unit label");return Objects.requireNonNull(sequences.get(label),"missing CFG label");}
+        @Override public CfgNodeId halt(CfgNode.SequenceNode sequence){open();return Objects.requireNonNull(halts.get(sequence.label()),"missing CFG Halt exit");}
+        @Override public void outside(CfgNode.SequenceNode sequence,Consumer<CfgNodeId> consumer){open();outside.getOrDefault(sequence.label(),List.of()).forEach(consumer);}
+        @Override public void close(){if(closed)return;closed=true;sequences.clear();halts.clear();outside.clear();}
     }
     final class ResidentNodes implements NodeStore {
         private final java.util.ArrayList<CfgNode> nodes=new java.util.ArrayList<>();

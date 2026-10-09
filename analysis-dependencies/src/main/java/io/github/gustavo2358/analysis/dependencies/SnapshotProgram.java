@@ -169,6 +169,7 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
     private final class SnapshotNodes implements AutoCloseable {
         private final SnapshotOrderStorage.Tape[] tapes=new SnapshotOrderStorage.Tape[7];
         private CfgNodeInventory view;
+        private UnitRouting activeRouting;
         private boolean ended,failed;
         private SnapshotNodes() {
             try{for(int i=0;i<tapes.length;i++)tapes[i]=orderStorage.tape();}
@@ -210,6 +211,7 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
                 private int at;private boolean sealed;
                 private void active(){available();if(sealed)throw new IllegalStateException("sealed CFG descriptor writer");}
                 @Override public CfgTransitionTable.Storage transitions(){active();return transitionWriter();}
+                @Override public CfgProgram.Routing routing(UnitId unit,int first,int end){active();if(end>at)throw new IllegalArgumentException("unwritten Unit sequence range");if(activeRouting!=null)throw new IllegalStateException("Unit routing remains open");activeRouting=new UnitRouting(unit,first,end);return activeRouting;}
                 @Override public int size(){active();return at;}
                 @Override public CfgNode get(int ordinal){active();Objects.checkIndex(ordinal,at);return read(ordinal);}
                 @Override public void append(CfgNode node,long handle,int variant) {
@@ -239,6 +241,83 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
                 }
             };
         }
+        /** Canonical sequence ordinals only; no retained labels, operations or typed node map. */
+        private final class UnitRouting implements CfgProgram.Routing {
+            private final UnitId unit;
+            private final int first,end;
+            private final SnapshotOrderStorage.Tape ordinals;
+            private boolean closed;
+            private UnitRouting(UnitId unit,int first,int end) {
+                this.unit=Objects.requireNonNull(unit);this.first=first;this.end=end;
+                if(first<0||end<first||end>count())throw new IllegalArgumentException("invalid Unit sequence range");
+                ordinals=orderStorage.tape();
+                try {
+                    long previous=0;
+                    for(int at=first;at<end;at++) {
+                        long base=3L*at,role=tapes[0].handle(base),handle=tapes[0].handle(base+1);
+                        if(role==NodeKind.SEQUENCE.ordinal()+1L) {
+                            var label=(LabelId)id(snapshot.field(handle,SEQUENCE,0));
+                            if(!label.unit().equals(unit)||previous!=0&&compareLocalIds(previous,SEQUENCE,0,handle,SEQUENCE,0)>=0)
+                                throw new IllegalArgumentException("noncanonical Unit sequence index");
+                            ordinals.append(at+1L);previous=handle;
+                        } else if(previous==0||handle!=previous||role!=NodeKind.HALT_EXIT.ordinal()+1L&&role!=NodeKind.OUTCOME_EXIT.ordinal()+1L)
+                            throw new IllegalArgumentException("invalid derived Unit sequence role");
+                    }
+                } catch(RuntimeException|Error failure){failed=true;try{ordinals.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;}
+            }
+            private void open(){available();if(closed)throw new IllegalStateException("closed Unit routing");ordinals.size();}
+            @Override public CfgNodeId sequence(LabelId label) {
+                open();Objects.requireNonNull(label);if(!label.unit().equals(unit))throw new IllegalArgumentException("foreign Unit label");
+                long low=0,high=ordinals.size();
+                while(low<high) {
+                    long middle=(low+high)>>>1;int at=Math.toIntExact(ordinals.handle(middle)-1);
+                    int order=compareLabel(tapes[0].handle(3L*at+1),label.localId());
+                    if(order<0)low=middle+1;else high=middle;
+                }
+                if(low==ordinals.size())throw new IllegalArgumentException("missing CFG label");
+                int at=Math.toIntExact(ordinals.handle(low)-1);
+                if(compareLabel(tapes[0].handle(3L*at+1),label.localId())!=0)throw new IllegalArgumentException("missing CFG label");
+                return nodeId(at);
+            }
+            private int compareLabel(long sequence,String query) {
+                synchronized(SnapshotProgram.this) {
+                long label=snapshot.field(sequence,SEQUENCE,0),text=snapshot.field(label,IDS_LABEL_ID,1);
+                long length=snapshot.characterCount(text),limit=Math.min(length,query.length()),offset=0;
+                while(offset<limit) {
+                    int count=snapshot.readCharacters(text,offset,orderLeft,0,(int)Math.min(orderLeft.length,limit-offset));
+                    if(count<=0)throw new IllegalStateException("Unit label comparison made no progress");
+                    for(int i=0;i<count;i++){int order=Character.compare(orderLeft[i],query.charAt(Math.toIntExact(offset+i)));if(order!=0)return order;}
+                    offset+=count;
+                }
+                return Long.compare(length,query.length());
+                }
+            }
+            private int ordinal(CfgNode.SequenceNode sequence) {
+                open();int at=nodeOrdinal(sequence.id());
+                if(at<first||at>=end||tapes[0].handle(3L*at)!=NodeKind.SEQUENCE.ordinal()+1L||!sequence.label().unit().equals(unit)
+                        ||compareLabel(tapes[0].handle(3L*at+1),sequence.label().localId())!=0)
+                    throw new IllegalArgumentException("foreign Unit sequence");
+                return at;
+            }
+            @Override public CfgNodeId halt(CfgNode.SequenceNode sequence) {
+                int at=ordinal(sequence);
+                for(int i=at+1;i<end;i++) {
+                    long role=tapes[0].handle(3L*i);
+                    if(role==NodeKind.SEQUENCE.ordinal()+1L)break;
+                    if(role==NodeKind.HALT_EXIT.ordinal()+1L)return nodeId(i);
+                }
+                throw new IllegalArgumentException("missing CFG Halt exit");
+            }
+            @Override public void outside(CfgNode.SequenceNode sequence,Consumer<CfgNodeId> consumer) {
+                int at=ordinal(sequence);Objects.requireNonNull(consumer);
+                for(int i=at+1;i<end;i++) {
+                    long role=tapes[0].handle(3L*i);
+                    if(role==NodeKind.SEQUENCE.ordinal()+1L)break;
+                    if(role==NodeKind.OUTCOME_EXIT.ordinal()+1L)consumer.accept(nodeId(i));
+                }
+            }
+            @Override public void close(){if(closed)return;closed=true;if(activeRouting==this)activeRouting=null;ordinals.close();}
+        }
         private EntryId entryId(int ordinal) {
             Objects.checkIndex(ordinal,count());long base=3L*ordinal;
             if(tapes[0].handle(base)!=NodeKind.ENTRY.ordinal()+1L)throw new IllegalArgumentException("activation requires an Entry node");
@@ -266,7 +345,7 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
             available();boolean repeated=view!=null;
             return new CfgTransitionTable.Storage() {
                 private int atGroup,atRow,atExit,logical;
-                private boolean sealed;
+                private boolean sealed,groupOpen;
                 private void active(){available();if(sealed)throw new IllegalStateException("sealed CFG transition writer");}
                 private void readable(){available();if(!sealed)throw new IllegalStateException("unsealed CFG transitions");}
                 private void word(int tape,long ordinal,long value) {
@@ -279,25 +358,52 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
                     word(4,base,from+1L);word(4,base+1,to+1L);word(4,base+2,row.kind().ordinal()+1L);word(4,base+3,activation+1L);
                     atRow=Math.addExact(atRow,1);
                 }
+                @Override public CfgTransitionTable.GroupWriter begin(UnitId unit) {
+                    active();Objects.requireNonNull(unit);if(groupOpen)throw new IllegalStateException("unfinished CFG group");groupOpen=true;
+                    return new CfgTransitionTable.GroupWriter() {
+                        private final int start=atRow,exitStart=atExit;
+                        private int entries,body,representative=-1;
+                        private boolean ended,bodyStarted;
+                        private void writable(){active();if(ended)throw new IllegalStateException("ended CFG group");}
+                        @Override public void binding(CfgTransition binding,CfgNodeId exit) {
+                            writable();
+                            try {
+                                if(bodyStarted)throw new IllegalStateException("Entry after body");
+                                int activation=nodeOrdinal(binding.from());
+                                if(binding.kind()!=CfgTransition.Kind.ENTRY||!entryId(activation).unit().equals(unit))throw new IllegalArgumentException("factored CFG Unit/Entry mismatch");
+                                row(binding,activation);word(6,atExit,nodeOrdinal(exit)+1L);atExit=Math.addExact(atExit,1);
+                                if(representative<0)representative=activation;entries=Math.addExact(entries,1);
+                            } catch(RuntimeException|Error failure){failed=true;throw failure;}
+                        }
+                        @Override public void body(CfgTransition transition) {
+                            writable();
+                            try{if(entries==0)throw new IllegalStateException("body without Entry");bodyStarted=true;row(transition,representative);body=Math.addExact(body,1);}
+                            catch(RuntimeException|Error failure){failed=true;throw failure;}
+                        }
+                        @Override public void end() {
+                            writable();
+                            try {
+                                if(entries!=0) {
+                                    logical=Math.toIntExact(Math.addExact((long)logical,Math.multiplyExact((long)entries,Math.addExact(1L,body))));
+                                    long base=6L*atGroup;
+                                    word(5,base,start+1L);word(5,base+1,entries+1L);word(5,base+2,body+1L);
+                                    word(5,base+3,logical+1L);word(5,base+4,atRow+1L);word(5,base+5,exitStart+1L);atGroup=Math.addExact(atGroup,1);
+                                }
+                                ended=true;groupOpen=false;
+                            } catch(RuntimeException|Error failure){failed=true;throw failure;}
+                        }
+                    };
+                }
                 @Override public void add(UnitId unit,List<CfgTransition> entries,List<CfgNodeId> exits,List<CfgTransition> body) {
                     active();Objects.requireNonNull(unit);
                     if(entries.isEmpty()||entries.size()!=exits.size())throw new IllegalArgumentException("entry/normal-exit bindings");
                     try {
-                        int start=atRow,exitStart=atExit,representative=nodeOrdinal(entries.getFirst().from());
-                        for(int e=0;e<entries.size();e++) {
-                            var binding=entries.get(e);int activation=nodeOrdinal(binding.from());
-                            if(binding.kind()!=CfgTransition.Kind.ENTRY||!entryId(activation).unit().equals(unit))throw new IllegalArgumentException("factored CFG Unit/Entry mismatch");
-                            row(binding,activation);word(6,atExit,nodeOrdinal(exits.get(e))+1L);atExit=Math.addExact(atExit,1);
-                        }
-                        for(var row:body)row(row,representative);
-                        logical=Math.toIntExact(Math.addExact((long)logical,Math.multiplyExact((long)entries.size(),Math.addExact(1L,body.size()))));
-                        long base=6L*atGroup;
-                        word(5,base,start+1L);word(5,base+1,entries.size()+1L);word(5,base+2,body.size()+1L);
-                        word(5,base+3,logical+1L);word(5,base+4,atRow+1L);word(5,base+5,exitStart+1L);atGroup=Math.addExact(atGroup,1);
+                        var group=begin(unit);for(int e=0;e<entries.size();e++)group.binding(entries.get(e),exits.get(e));
+                        for(var transition:body)group.body(transition);group.end();
                     } catch(RuntimeException|Error failure){failed=true;throw failure;}
                 }
                 @Override public void seal() {
-                    active();if(atGroup!=groupCount()||atRow!=physicalCount()||atExit!=tapes[6].size())throw new IllegalArgumentException("incomplete repeated CFG flow projection");
+                    active();if(groupOpen||atGroup!=groupCount()||atRow!=physicalCount()||atExit!=tapes[6].size()){failed=true;throw new IllegalArgumentException("incomplete repeated CFG flow projection");}
                     sealed=true;
                 }
                 @Override public int groups(){readable();return groupCount();}
@@ -324,6 +430,7 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
         }
         @Override public void close() {
             if(ended)return;ended=true;Throwable failure=null;
+            if(activeRouting!=null)try{activeRouting.close();}catch(RuntimeException|Error cleanup){failure=cleanup;}
             for(var tape:tapes)if(tape!=null)try{tape.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
             if(failure instanceof RuntimeException exception)throw exception;if(failure instanceof Error error)throw error;
         }

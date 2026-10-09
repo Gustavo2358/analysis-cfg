@@ -12,6 +12,8 @@ import java.util.RandomAccess;
 public final class CfgTransitionTable extends AbstractList<CfgTransition> implements RandomAccess {
     /** Typed physical storage port. Borrowed stores must check their owner on every query. */
     public interface Storage {
+        /** Bindings first, then ordinary body rows, with no requirement to retain a Unit batch. */
+        default GroupWriter begin(UnitId unit){return new ResidentGroup(this,unit);}
         void add(UnitId unit,List<CfgTransition> entries,List<CfgNodeId> exits,List<CfgTransition> body);
         void seal();
         int groups();
@@ -27,6 +29,22 @@ public final class CfgTransitionTable extends AbstractList<CfgTransition> implem
         /** Exact duplicate proof over physical rows, not a trusted uniqueness flag. */
         void validateUnique();
     }
+    public interface GroupWriter {
+        void binding(CfgTransition entry,CfgNodeId normalExit);
+        void body(CfgTransition row);
+        void end();
+    }
+    private static final class ResidentGroup implements GroupWriter {
+        private final Storage storage;private final UnitId unit;
+        private final List<CfgTransition> entries=new ArrayList<>(),body=new ArrayList<>();
+        private final List<CfgNodeId> exits=new ArrayList<>();
+        private boolean ended,bodyStarted;
+        private ResidentGroup(Storage storage,UnitId unit){this.storage=storage;this.unit=Objects.requireNonNull(unit);}
+        private void active(){if(ended)throw new IllegalStateException("ended CFG group");}
+        @Override public void binding(CfgTransition entry,CfgNodeId exit){active();if(bodyStarted)throw new IllegalStateException("Entry after body");entries.add(Objects.requireNonNull(entry));exits.add(Objects.requireNonNull(exit));}
+        @Override public void body(CfgTransition row){active();if(entries.isEmpty())throw new IllegalStateException("body without Entry");bodyStarted=true;body.add(Objects.requireNonNull(row));}
+        @Override public void end(){active();ended=true;if(!entries.isEmpty())storage.add(unit,entries,exits,body);entries.clear();exits.clear();body.clear();}
+    }
     private record Group(UnitId unit,List<CfgTransition> entries,List<CfgNodeId> exits,List<CfgTransition> body) {
         Group {entries=List.copyOf(entries);exits=List.copyOf(exits);body=List.copyOf(body);}
     }
@@ -35,6 +53,7 @@ public final class CfgTransitionTable extends AbstractList<CfgTransition> implem
         private final Storage storage;
         Builder(CfgSource source){this(source,null);}
         Builder(CfgSource source,Storage storage){this.source=source;this.storage=storage==null?new ResidentStorage():storage;}
+        GroupWriter begin(UnitId unit){return storage.begin(unit);}
         void add(UnitId unit,List<CfgTransition> entries,List<CfgNodeId> exits,List<CfgTransition> body) {
             if(entries.size()!=exits.size())throw new IllegalArgumentException("entry/normal-exit bindings");
             if(!entries.isEmpty())storage.add(unit,entries,exits,body);

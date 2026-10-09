@@ -8,9 +8,7 @@ import io.github.gustavo2358.air.model.Publication;
 import io.github.gustavo2358.air.model.Scopes;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /** Exact Entry/Jump/Branch/Return/Halt rules for preflight-validated AIR, without reachability or physical fallthrough. */
@@ -143,35 +141,30 @@ public final class CoreCfgProjection {
         var source=program.source();
         var table=new CfgTransitionTable.Builder(source,nodes.transitions());
         program.units(unit -> {
-            Map<LabelId, CfgNode.SequenceNode> sequences = new HashMap<>();
-            Map<LabelId, CfgNode.HaltExit> halts = new HashMap<>();
-            var outsideNodes=new HashMap<LabelId,java.util.List<CfgNode.OutcomeExit>>();
             int firstSequence=nodes.size();
             unit.sequences(sequence -> {
                 CfgNode.SequenceNode node = new CfgNode.SequenceNode(
                         new CfgNodeId(source.publicationId(), nodes.size()), sequence.label(),
                         sequence.operations(), sequence.control());
-                sequences.put(sequence.label(), node);
                 nodes.append(node,sequence.sourceHandle(),0);
-                var exits=new ArrayList<CfgNode.OutcomeExit>();
                 int variant=0;
                 for(var alternative:CfgControl.alternatives(node.control()).stream()
                         .filter(CoreCfgProjection::outside).distinct().toList()) {
                     var end=new CfgNode.OutcomeExit(new CfgNodeId(source.publicationId(),nodes.size()),
                             node.control(),(Control.InvocationAlternative)alternative);
-                    nodes.append(end,sequence.sourceHandle(),variant++);exits.add(end);
+                    nodes.append(end,sequence.sourceHandle(),variant++);
                 }
-                if(!exits.isEmpty())outsideNodes.put(sequence.label(),exits);
                 if (node.control() instanceof CfgControl.Halt halt) {
                     CfgNode.HaltExit termination = new CfgNode.HaltExit(
                             new CfgNodeId(source.publicationId(), nodes.size()), halt.operation(), halt.haltKind());
                     nodes.append(termination,sequence.sourceHandle(),0);
-                    halts.put(sequence.label(), termination);
                 }
             });
             int sequenceEnd=nodes.size();
-            var entryEdges=new ArrayList<CfgTransition>();var normalExits=new ArrayList<CfgNodeId>();
+            try(var routing=nodes.routing(unit.id(),firstSequence,sequenceEnd)) {
+            var group=table.begin(unit.id());
             var representative=new io.github.gustavo2358.air.model.Ids.EntryId[1];
+            var representativeExit=new CfgNodeId[1];
             unit.entries(entry -> {
                 if (entry.initialLabel().isEmpty() && policy == ProjectionPolicy.PARTIAL_ANALYSIS) return;
                 CfgNode.EntryNode entryNode = new CfgNode.EntryNode(
@@ -180,56 +173,56 @@ public final class CoreCfgProjection {
                 CfgNode.NormalExit exit = new CfgNode.NormalExit(
                         new CfgNodeId(source.publicationId(), nodes.size()), source.publicationId(), unit.id(), entry.id());
                 nodes.append(exit,entry.sourceHandle(),0);
-                entryEdges.add(new CfgTransition(entryNode.id(),sequences.get(entry.initialLabel().orElseThrow()).id(),CfgTransition.Kind.ENTRY,entry.id()));
-                normalExits.add(exit.id());if(representative[0]==null)representative[0]=entry.id();
+                group.binding(new CfgTransition(entryNode.id(),routing.sequence(entry.initialLabel().orElseThrow()),CfgTransition.Kind.ENTRY,entry.id()),exit.id());
+                if(representative[0]==null){representative[0]=entry.id();representativeExit[0]=exit.id();}
             });
-            var transitions=new ArrayList<CfgTransition>();
             if(representative[0]!=null) {
-                var entry=representative[0];var normalExit=normalExits.getFirst();
+                var entry=representative[0];var normalExit=representativeExit[0];
                 for (int ordinal=firstSequence;ordinal<sequenceEnd;ordinal++) {
                     if(!(nodes.get(ordinal) instanceof CfgNode.SequenceNode sequence))continue;
                     CfgNodeId from = sequence.id();var control=sequence.control();
                     var exceptionalLabels=new java.util.HashSet<LabelId>();
                     for(var alternative:CfgControl.alternatives(control)) {
                         var handler=exceptionLabel(alternative);
-                        if(handler!=null&&exceptionalLabels.add(handler))transitions.add(new CfgTransition(from,sequences.get(handler).id(),CfgTransition.Kind.EXCEPTION,entry));
+                        if(handler!=null&&exceptionalLabels.add(handler))group.body(new CfgTransition(from,routing.sequence(handler),CfgTransition.Kind.EXCEPTION,entry));
                     }
-                    if(!LocalControlRules.local(control))for(var end:outsideNodes.getOrDefault(sequence.label(),List.of()))
-                        transitions.add(new CfgTransition(from,end.id(),CfgTransition.Kind.CONTROL_EXIT,entry));
+                    if(!LocalControlRules.local(control))routing.outside(sequence,end ->
+                        group.body(new CfgTransition(from,end,CfgTransition.Kind.CONTROL_EXIT,entry)));
                     // Contextual rules include orphans; they do not assert reachability from this Entry.
                     if (control instanceof CfgControl.Return) {
-                        transitions.add(new CfgTransition(from, normalExit, CfgTransition.Kind.RETURN, entry));
+                        group.body(new CfgTransition(from, normalExit, CfgTransition.Kind.RETURN, entry));
                     } else if (control instanceof CfgControl.Jump jump) {
-                        transitions.add(new CfgTransition(from, sequences.get(jump.destination()).id(),
+                        group.body(new CfgTransition(from, routing.sequence(jump.destination()),
                                 CfgTransition.Kind.JUMP, entry));
                     } else if (control instanceof CfgControl.Invoke invoke) {
                         for (var outcome : invoke.alternatives()) {
                         if (!(outcome instanceof Control.Normal normal)) continue;
-                        transitions.add(new CfgTransition(from, sequences.get(normal.label()).id(),
+                        group.body(new CfgTransition(from, routing.sequence(normal.label()),
                                 CfgTransition.Kind.INVOKE_NORMAL, entry));
                         }
                     } else if (control instanceof CfgControl.Opaque opaque) {
                         var destinations = new java.util.HashSet<LabelId>();
                         for (var alternative : opaque.alternatives()) {
                             var target = alternativeLabel(alternative);
-                            if (target != null && destinations.add(target)) transitions.add(new CfgTransition(from, sequences.get(target).id(), CfgTransition.Kind.OPAQUE_JUMP, entry));
-                            else if (alternative instanceof Control.ReturnAlternative) transitions.add(new CfgTransition(from, normalExit, CfgTransition.Kind.OPAQUE_RETURN, entry));
+                            if (target != null && destinations.add(target)) group.body(new CfgTransition(from, routing.sequence(target), CfgTransition.Kind.OPAQUE_JUMP, entry));
+                            else if (alternative instanceof Control.ReturnAlternative) group.body(new CfgTransition(from, normalExit, CfgTransition.Kind.OPAQUE_RETURN, entry));
                         }
                     } else if (control instanceof CfgControl.Halt) {
-                        transitions.add(new CfgTransition(from, halts.get(sequence.label()).id(),
+                        group.body(new CfgTransition(from, routing.halt(sequence),
                                 CfgTransition.Kind.HALT, entry));
                     } else if (control instanceof CfgControl.Branch branch) {
                         // Structural alternatives remain distinct, including equal targets and literal predicates.
-                        transitions.add(new CfgTransition(from, sequences.get(branch.trueDestination()).id(),
+                        group.body(new CfgTransition(from, routing.sequence(branch.trueDestination()),
                                 CfgTransition.Kind.BRANCH_TRUE, entry));
-                        transitions.add(new CfgTransition(from, sequences.get(branch.falseDestination()).id(),
+                        group.body(new CfgTransition(from, routing.sequence(branch.falseDestination()),
                                 CfgTransition.Kind.BRANCH_FALSE, entry));
                     } else if (!LocalControlRules.local(control) && policy != ProjectionPolicy.PARTIAL_ANALYSIS) {
                         throw new IllegalArgumentException("projection requires a supported terminator");
                     }
                 }
             }
-            table.add(unit.id(),entryEdges,normalExits,transitions);
+            group.end();
+            }
         });
         var inventory=nodes.seal();
         return program instanceof CfgProgram.Resident resident

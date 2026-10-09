@@ -361,8 +361,62 @@ final class SnapshotDependencyAnalysisTest {
         }
     }
 
+    @Test void pagedUnitRoutingIsColdExactAndOwnedByTheProjection() {
+        for(int count:new int[]{1,4,16,64,256}) {
+            var publication=directOrphans(count);var unit=publication.units().getFirst();var ledger=resources();
+            try(var pages=new FilePageStore(directory,512,16,ledger);
+                var checked=SnapshotValidator.check(AirSnapshot.fromPublication(publication),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger));
+                var program=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),new PagedSnapshotOrderStorage(pages,ledger))) {
+                assertEquals(ValidationResult.Status.STRUCTURALLY_VALID,checked.result().status());program.source();long original=ledger.heapUsed();
+                var writer=program.nodes(io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy.KNOWN_SUBSET);
+                program.units(view->view.sequences(sequence->{
+                    writer.append(new io.github.gustavo2358.analysis.cfg.domain.CfgNode.SequenceNode(new io.github.gustavo2358.analysis.cfg.domain.CfgNodeId(publication.id(),writer.size()),sequence.label(),sequence.operations(),sequence.control()),sequence.sourceHandle(),0);
+                    if(sequence.control() instanceof io.github.gustavo2358.analysis.cfg.domain.CfgControl.Halt halt)
+                        writer.append(new io.github.gustavo2358.analysis.cfg.domain.CfgNode.HaltExit(new io.github.gustavo2358.analysis.cfg.domain.CfgNodeId(publication.id(),writer.size()),halt.operation(),halt.haltKind()),sequence.sourceHandle(),0);
+                }));
+                long before=ledger.heapUsed();var routing=writer.routing(unit.id(),0,writer.size());
+                assertEquals(3072,ledger.heapUsed()-before,"one native ordinal tape, independent of Unit cardinality");
+                int ordinal=0;
+                for(var sequence:unit.sequences().stream().sorted(java.util.Comparator.comparing(s->s.label().localId())).toList()) {
+                    var destination=routing.sequence(sequence.label());assertEquals(ordinal,destination.ordinal());
+                    var node=(io.github.gustavo2358.analysis.cfg.domain.CfgNode.SequenceNode)writer.get(ordinal);
+                    var outside=new java.util.ArrayList<io.github.gustavo2358.analysis.cfg.domain.CfgNodeId>();routing.outside(node,outside::add);assertTrue(outside.isEmpty());
+                    if(node.control() instanceof io.github.gustavo2358.analysis.cfg.domain.CfgControl.Halt){assertEquals(ordinal+1,routing.halt(node).ordinal());ordinal++;}
+                    else assertThrows(IllegalArgumentException.class,()->routing.halt(node));
+                    ordinal++;
+                }
+                assertThrows(IllegalArgumentException.class,()->routing.sequence(new LabelId(new UnitId(new PublicationId("foreign-routing"),unit.id().localId()),"start")));
+                assertThrows(IllegalArgumentException.class,()->routing.sequence(new LabelId(unit.id(),"absent")));
+                assertThrows(IllegalStateException.class,()->writer.routing(unit.id(),0,writer.size()));
+                System.out.println("SNAPSHOT_UNIT_ROUTING_METRICS sequences="+unit.sequences().size()+" fixedHeap="+(ledger.heapUsed()-before)+" nodes="+writer.size());
+                routing.close();assertEquals(before,ledger.heapUsed());assertThrows(IllegalStateException.class,()->routing.sequence(unit.sequences().getFirst().label()));
+                var borrowed=writer.routing(unit.id(),0,writer.size());
+                program.releaseCfgProjection(io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy.KNOWN_SUBSET);
+                assertEquals(original,ledger.heapUsed());assertThrows(IllegalStateException.class,()->borrowed.sequence(unit.sequences().getFirst().label()));borrowed.close();
+            }
+            for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
+        }
+    }
+
+    @Test void deniedUnitRoutingConstructionAbortsAndReleasesNativeDescriptors() {
+        var publication=directCall();var ledger=resources();
+        try(var pages=new FilePageStore(directory,512,16,ledger);
+            var checked=SnapshotValidator.check(AirSnapshot.fromPublication(publication),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger));
+            var program=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),new PagedSnapshotOrderStorage(pages,ledger))) {
+            program.source();var writer=program.nodes(io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy.KNOWN_SUBSET);
+            program.units(unit->unit.sequences(sequence->writer.append(new io.github.gustavo2358.analysis.cfg.domain.CfgNode.SequenceNode(new io.github.gustavo2358.analysis.cfg.domain.CfgNodeId(publication.id(),writer.size()),sequence.label(),sequence.operations(),sequence.control()),sequence.sourceHandle(),0)));
+            int end=writer.size();
+            try(var pressure=ledger.reserve(AnalysisResources.Pool.RESIDENT,ledger.limits().heapBytes()-ledger.heapUsed()-2500,AnalysisResources.Phase.CONTROL)) {
+                assertTrue(pressure.amount()>0);long before=ledger.heapUsed();
+                assertThrows(AnalysisResources.Exhausted.class,()->writer.routing(publication.units().getFirst().id(),0,end));assertEquals(before,ledger.heapUsed());
+                assertThrows(IllegalStateException.class,writer::seal);
+            }
+        }
+        for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
+    }
+
     @Test void pagedPhysicalTupleStorageRejectsDuplicatesAndForeignOrMissingBindings() {
-        for(int mutation=0;mutation<5;mutation++) {
+        for(int mutation=0;mutation<8;mutation++) {
             var ledger=resources();
             try(var pages=new FilePageStore(directory,512,16,ledger);
                 var checked=SnapshotValidator.check(AirSnapshot.fromPublication(directCall()),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger));
@@ -380,7 +434,16 @@ final class SnapshotDependencyAnalysisTest {
                 var inventory=writer.seal();var entry=(io.github.gustavo2358.analysis.cfg.domain.CfgNode.EntryNode)inventory.get(2);
                 var binding=new io.github.gustavo2358.analysis.cfg.domain.CfgTransition(entry.id(),inventory.get(1).id(),io.github.gustavo2358.analysis.cfg.domain.CfgTransition.Kind.ENTRY,entry.entry());
                 var returned=new io.github.gustavo2358.analysis.cfg.domain.CfgTransition(inventory.getFirst().id(),inventory.get(3).id(),io.github.gustavo2358.analysis.cfg.domain.CfgTransition.Kind.RETURN,entry.entry());
-                if(mutation==0) {
+                if(mutation>=5) {
+                    var group=storage.begin(entry.entry().unit());
+                    if(mutation==5)assertThrows(IllegalStateException.class,()->group.body(returned));
+                    else {
+                        group.binding(binding,inventory.get(3).id());
+                        if(mutation==6){group.body(returned);assertThrows(IllegalStateException.class,()->group.binding(binding,inventory.get(3).id()));}
+                        else assertThrows(IllegalArgumentException.class,storage::seal);
+                    }
+                    assertThrows(IllegalStateException.class,storage::seal);
+                } else if(mutation==0) {
                     storage.add(entry.entry().unit(),List.of(binding),List.of(inventory.get(3).id()),List.of(returned,returned));storage.seal();
                     var failure=assertThrows(IllegalArgumentException.class,storage::validateUnique);assertEquals("duplicate CFG transition",failure.getMessage());
                     assertThrows(IllegalStateException.class,storage::storedSize);
@@ -663,6 +726,19 @@ final class SnapshotDependencyAnalysisTest {
             }
         }
         assertEquals(0,ledger.heapUsed());
+    }
+
+    private static Publication directOrphans(int count) {
+        var base=directCall();var unit=base.units().getFirst();var sequences=new java.util.ArrayList<>(unit.sequences());
+        for(int i=0;i<count;i++) {
+            String name=String.format("orphan-%04d",i);
+            sequences.add(i%2==0?ResultFixtures.returning(unit.id(),name,List.of()):new Sequence(new LabelId(unit.id(),name),List.of(),new Operations.Halt(ResultFixtures.header(unit.id(),"halt-"+i),Operations.HaltKind.ABNORMAL),unit.origin()));
+        }
+        sequences.add(ResultFixtures.returning(unit.id(),"Aa",List.of()));sequences.add(ResultFixtures.returning(unit.id(),"BB",List.of()));
+        sequences.add(ResultFixtures.returning(unit.id(),"long-"+"a".repeat(1030)+"😀",List.of()));
+        java.util.Collections.reverse(sequences);
+        var changed=ResultFixtures.unit(unit.id(),unit.entries(),sequences,unit.objects());
+        return new Publication(base.id(),base.airVersion(),base.capabilities(),base.artifacts(),List.of(changed),base.storage(),base.resources(),base.artifactRelations(),base.origins(),base.coverage(),base.uncertainties(),base.premises());
     }
 
     private static Publication directCall() {

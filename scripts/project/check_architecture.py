@@ -155,7 +155,7 @@ EXPECTED_PRODUCTION_IMPORTS.update({
     SOURCE_ROOT + "domain/ProjectionPolicy.java": {"io.github.gustavo2358.air.model.Evidence"},
     SOURCE_ROOT + "domain/CoreCfgProjection.java": {
         "io.github.gustavo2358.air.model.Ids.LabelId", "io.github.gustavo2358.air.model.Operations",
-        PUBLICATION, "java.util.ArrayList", "java.util.HashMap", "java.util.List", "java.util.Map",
+        PUBLICATION, "java.util.ArrayList", "java.util.List",
         "java.util.Objects",
     },
     SOURCE_ROOT + "domain/CfgProgram.java": {
@@ -194,6 +194,7 @@ CFG_CLASS_NAMES = {
     "CfgProgram", "CfgProgram$AdmittedSnapshot", "CfgProgram$UnitView", "CfgProgram$EntryView", "CfgProgram$SequenceView",
     "CfgProgram$Resident", "CfgProgram$ResidentUnit", "CfgProgram$OperationIds",
     "CfgProgram$NodeStore", "CfgProgram$ResidentNodes", "CfgNodeInventory", "CfgNodeInventory$Roles",
+    "CfgProgram$Routing", "CfgProgram$ResidentRouting",
     "CfgControl", "CfgControl$Jump", "CfgControl$Branch", "CfgControl$Return", "CfgControl$Halt",
     "CfgControl$Invoke", "CfgControl$Opaque", "CfgControl$ReentryGuard", "CfgControl$ResumeRoute",
     "CfgControl$LocalInvoke", "CfgControl$LocalBoundary", "CfgControl$LocalResume",
@@ -203,6 +204,7 @@ CFG_CLASS_NAMES = {
     "CfgNodeId", "CfgNode", "CfgNode$EntryNode", "CfgNode$SequenceNode", "CfgNode$NormalExit", "CfgNode$HaltExit", "CfgNode$OutcomeExit",
     "CfgTransitionTable", "CfgTransitionTable$Builder", "CfgTransitionTable$Group",
     "CfgTransitionTable$Storage", "CfgTransitionTable$ResidentStorage", "CfgTransitionTable$PhysicalRows",
+    "CfgTransitionTable$GroupWriter", "CfgTransitionTable$ResidentGroup",
     "CfgTransition", "CfgTransition$Kind", "CfgGraph", "CfgGraph$1",
     "CfgSource", "CfgSource$UnitInventory", "CfgSource$UnitInventories",
     "CfgProjectionIssue", "CfgProjectionIssue$Code", "CoreCfgProjection", "ProjectionPolicy",

@@ -55,6 +55,7 @@ SUITES = {
             "fileThroughRealCliMatchesManualGolden", "twoIndependentExecutionsProduceIdenticalBytes",
             "missingAirFileCannotPublish", "bomIsTypedAirFailureWithoutOutput", "malformedUtf8IsTypedAirFailureWithoutOutput",
             "wrongBindingVersionPreservesCodecPath", "unsupportedCodecFormNeverBecomesCfgUnsupportedInput",
+            "bothNormativeHaltKindsReachRealCliWithoutReturnOrFallthrough",
             "unavailableInventoryReachesRealKernelAndIsRejected", "allNonBuiltStatusesReturnFourWithoutOutput",
             "outputFilesystemFailureIsSixAndCleansTemp", "missingOutputParentIsSix",
             "serializationFailureIsFiveAndPreservesDestination", "usageNeverCallsBuild", "unexpectedBuildBugPropagatesUnchanged",

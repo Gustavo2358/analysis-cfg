@@ -57,8 +57,22 @@ and factored equality inspect physical rows and bindings, not that product.
 bindings, four for nodes/roles), including an external exact-tuple duplicate index.
 All borrowed rows/groups expire with the projection. `AnalysisPipeline` retires
 them after successful CFG export, before dependencies consume the same AIR.
-Resident adapters retain their compatibility storage. Per-Unit projection maps
-and temporary typed lists remain resident; this is not a whole-CFG memory bound.
+Resident adapters retain their explicit compatibility storage. The same core uses
+`NodeStore.routing(UnitId, first, end)` only while projecting one Unit, closing it
+before the next Unit. The native index stores canonical sequence ordinals on one
+temporary tape; exact full Unit identity and streamed UTF-16 label comparison
+govern binary lookup. Derived Halt/Outcome exits use the projection's own descriptor
+layout, never AIR physical fallthrough. Closing the routing or projection expires
+the index; a second concurrently open Unit index is rejected.
+
+`Storage.begin(UnitId)` receives Entry/normal-exit bindings followed by body rows
+through `GroupWriter`, without per-Unit transition or binding lists. Native writers
+record each row immediately, validate stages and reject sealing an unfinished group.
+Failures abort the owner; the exact duplicate proof remains mandatory. The default
+resident compatibility writer explicitly materializes a group. The native route
+retains neither per-Unit node maps nor typed transition lists. Per-Sequence
+alternatives, transient typed IDs and other analysis stores remain separate
+obligations; this is not a whole-application heap bound or general admission proof.
 
 The direct snapshot dependency slice admits multiple Entries only when each has
 the same initial label, closed empty signature and empty seed. The official
