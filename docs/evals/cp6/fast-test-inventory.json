@@ -275,6 +275,8 @@
       "corruptFreeListCannotOverwriteLiveFactsOrBecomeAnAllocation"
     ],
     "io.github.gustavo2358.analysis.adapters.PagedLongArrayTest": [
+      "sequentialInterleavedReadsDoNotReplayEveryColumnDirectoryForEveryWord",
+      "readRoutesInvalidateAfterMissingLeavesWritesPruningAndRootGrowth",
       "spilledDirectoriesAndValuesMatchAnIndependentRandomAccessOracle",
       "sparseIndexesBeyondIntegerRangeAndAllSignedValuesRemainExact",
       "emptyAndUnwrittenZerosAllocateNoPages",
@@ -946,6 +948,7 @@
       "aGrowingMixedSetStoresUnsignedSupportWithBoundedCopiedPathWork"
     ],
     "io.github.gustavo2358.analysis.solver.PagedLongArrayOwnershipTest": [
+      "repeatedLeafReadsStillPropagatePayloadFailureAndPoisonTheOwner",
       "interruptedPruningAndRootCollapseNeverLeaveReleasedPagesInTheOwnershipTree",
       "indexOwnershipIsDenseEvenWhenBorrowedPageHandlesAreWidelyScattered"
     ],

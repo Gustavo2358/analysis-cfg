@@ -153,6 +153,15 @@ are cleared, and collapse unnecessary all-low prefixes. Teardown has a fixed
 stack and releases only the array's own pages.
 The shared store must still close after an operational failure interrupts cleanup.
 
+Each primitive column retains one owner-local leaf route keyed by its exact page number,
+including an absent leaf. It caches no payload and allocates no additional page buffer or
+cardinality-sized directory. Every write invalidates the route before root/directory mutation
+or pruning; closure clears it. Reads still check the column owner and deadline/work budget,
+and actual payload access still goes through PageStore generation/integrity/I/O checks.
+Sequential interleaved columns therefore traverse a radix path per changed leaf, not per
+word; arbitrary/random page changes retain their bounded radix traversal cost. The metadata
+fits the existing fixed control reservation, with no larger page cache or resource quota.
+
 `PagedWorklist` owns a FIFO of primitive points and a paged pending bitmap. Arrival
 deduplication does not discard new abstract-state contributions: its consumer must
 join those contributions before scheduling. Removal clears membership before

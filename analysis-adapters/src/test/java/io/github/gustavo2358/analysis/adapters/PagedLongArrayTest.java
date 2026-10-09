@@ -16,6 +16,51 @@ final class PagedLongArrayTest {
                 16_000_000, 2, 10_000_000, 1_000_000));
     }
 
+    @Test void sequentialInterleavedReadsDoNotReplayEveryColumnDirectoryForEveryWord() {
+        long base=1L<<40;
+        for(int count:new int[]{16,64,256,1024,4096}) {
+            var memory=new AnalysisResources(new AnalysisResources.Limits(64000,64000,0,64000000,1,1000000000,1000000));
+            try(var store=new FilePageStore(directory,512,16,memory);
+                var a=new PagedLongArray(store,Long.MAX_VALUE,memory,AnalysisResources.Phase.INDEX);
+                var b=new PagedLongArray(store,Long.MAX_VALUE,memory,AnalysisResources.Phase.INDEX);
+                var c=new PagedLongArray(store,Long.MAX_VALUE,memory,AnalysisResources.Phase.INDEX);
+                var d=new PagedLongArray(store,Long.MAX_VALUE,memory,AnalysisResources.Phase.INDEX)) {
+                var columns=new PagedLongArray[]{a,b,c,d};
+                for(int row=0;row<count;row++)for(int column=0;column<columns.length;column++)columns[column].set(base+row,100L*row+column+1);
+                long resident=memory.heapUsed(),work=memory.workUsed();var before=store.statistics();
+                for(int scan=0;scan<2;scan++)for(int row=0;row<count;row++)for(int column=0;column<columns.length;column++)
+                    assertEquals(100L*row+column+1,columns[column].get(base+row));
+                long visits=8L*count,leafRoutes=8L*((count+31)/32);
+                // 32 payload slots per leaf; the high base requires eight radix levels.
+                // One route per changed leaf, plus bounded page/header reloads, not per word.
+                long evictions=store.statistics().evictions()-before.evictions();
+                assertTrue(evictions<=16+12*leafRoutes,"directory replay amplified paged reads: rows="+count+" evictions="+evictions);
+                assertTrue(memory.workUsed()-work<=4*visits+36*leafRoutes+64,"directory traversal repeated per payload word");
+                assertEquals(resident,memory.heapUsed(),"route metadata must not grow with column cardinality");
+                System.out.println("PAGED_COLUMN_ROUTE_METRICS rows="+count+" work="+(memory.workUsed()-work)+" evictions="+evictions+" heap="+resident);
+            }
+            assertEquals(0,memory.heapUsed());
+        }
+    }
+
+    @Test void readRoutesInvalidateAfterMissingLeavesWritesPruningAndRootGrowth() {
+        var memory=resources();
+        try(var store=new FilePageStore(directory,64,1,memory);
+            var array=new PagedLongArray(store,Long.MAX_VALUE,memory,AnalysisResources.Phase.INDEX)) {
+            long high=1L<<40;
+            assertEquals(0,array.get(high));assertEquals(0,array.get(high+1));
+            array.set(high,17);assertEquals(17,array.get(high));assertEquals(0,array.get(high+1));
+            array.set(high+1,-9);assertEquals(-9,array.get(high+1));
+            array.set(high,0);assertEquals(0,array.get(high));assertEquals(-9,array.get(high+1));
+            array.set(high+1,0);assertEquals(0,array.get(high));assertEquals(0,store.statistics().livePages());
+            array.set(0,31);assertEquals(31,array.get(0));
+            array.set(Long.MAX_VALUE-1,Long.MIN_VALUE);assertEquals(Long.MIN_VALUE,array.get(Long.MAX_VALUE-1));
+            assertEquals(31,array.get(0));array.set(Long.MAX_VALUE-1,0);
+            assertEquals(31,array.get(0));assertEquals(0,array.get(Long.MAX_VALUE-1));
+        }
+        assertEquals(0,memory.heapUsed());
+    }
+
     @Test void spilledDirectoriesAndValuesMatchAnIndependentRandomAccessOracle() {
         var resources = resources();
         try (var store = new FilePageStore(directory, 128, 3, resources)) {

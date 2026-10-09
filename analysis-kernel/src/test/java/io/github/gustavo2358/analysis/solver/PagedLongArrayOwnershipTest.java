@@ -4,6 +4,22 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PagedLongArrayOwnershipTest {
+    @Test void repeatedLeafReadsStillPropagatePayloadFailureAndPoisonTheOwner() {
+        var memory=new AnalysisResources(new AnalysisResources.Limits(100000,10000,0,0,0,1000000,0));
+        try(var backend=new ResidentPageStore(128,memory,AnalysisResources.Phase.CONTROL)) {
+            var pages=new InterruptedPages(backend);
+            var array=new PagedLongArray(pages,Long.MAX_VALUE,memory,AnalysisResources.Phase.CONTROL);
+            array.set(1L<<40,91);assertEquals(91,array.get(1L<<40));
+            pages.remaining=1;
+            assertThrows(PageStore.Failure.class,()->array.get((1L<<40)+1));
+            assertThrows(IllegalStateException.class,()->array.get(1L<<40));
+            pages.remaining=-1;array.close();array.close();
+            assertThrows(IllegalStateException.class,()->array.get(1L<<40));
+            assertEquals(0,backend.statistics().livePages());
+        }
+        assertEquals(0,memory.heapUsed());
+    }
+
     @Test void interruptedPruningAndRootCollapseNeverLeaveReleasedPagesInTheOwnershipTree() {
         int failures=0;
         for(boolean neighbor:new boolean[]{false,true})for(int boundary=1;boundary<=64;boundary++) {

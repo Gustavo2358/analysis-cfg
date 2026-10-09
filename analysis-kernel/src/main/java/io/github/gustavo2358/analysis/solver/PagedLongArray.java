@@ -23,6 +23,7 @@ public final class PagedLongArray implements AutoCloseable {
     private long[] pathPages;
     private int[] pathSlots;
     private long root, provisional;
+    private long cachedPageNumber=-1,cachedLeaf;
     private int height;
     private boolean closed, failed;
 
@@ -49,18 +50,26 @@ public final class PagedLongArray implements AutoCloseable {
         check(index);
         try {
             resources.work(1, phase);
-            if (root == 0 || requiredHeight(index) > height) return 0;
-            long page = root;
-            for (int level = height; level > 0; level--) {
-                page = readWord(page, digit(index, level) + 1);
-                if (page == 0) return 0;
+            long pageNumber=index>>>bits;
+            if(cachedPageNumber!=pageNumber) {
+                long page=root;
+                if(page!=0&&requiredHeight(index)<=height) {
+                    for(int level=height;level>0;level--) {
+                        page=readWord(page,digit(index,level)+1);
+                        if(page==0)break;
+                    }
+                } else page=0;
+                // Only an owner-local address is retained, never payload or a page buffer.
+                // Writes invalidate it before any directory/root mutation can retire pages.
+                cachedLeaf=page;cachedPageNumber=pageNumber;
             }
-            return readWord(page, digit(index, 0) + 1);
+            return cachedLeaf==0?0:readWord(cachedLeaf,digit(index,0)+1);
         } catch (AnalysisResources.Exhausted | PageStore.Failure exception) { failed = true; throw exception; }
     }
 
     public synchronized void set(long index, long value) {
         check(index);
+        cachedPageNumber=-1;cachedLeaf=0;
         try { setValue(index, value); }
         catch (AnalysisResources.Exhausted | PageStore.Failure exception) { failed = true; throw exception; }
     }
@@ -186,7 +195,7 @@ public final class PagedLongArray implements AutoCloseable {
         } finally {
             try {if(provisional!=0)store.releaseForCleanup(provisional);}
             finally {
-            closed = true; root = 0;
+            closed = true; root = 0;cachedPageNumber=-1;cachedLeaf=0;
             provisional=0;
             word = null; teardownPages = null; teardownNext = null;
             pathPages = null; pathSlots = null;
