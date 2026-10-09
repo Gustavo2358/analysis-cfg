@@ -150,7 +150,7 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "8d9090fb498e876822be423471a8e972083b5192",
+    "commit": "6d85657230f4e5c0e4504bd17f9a93c13ee94610",
     "canonical_ref": "feat/paged-air-snapshot",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
@@ -228,12 +228,12 @@
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "logical_text_w2": "Local producer FAST PASS; fixed logical ranges and expression transport. Selected source E2E qualification in docs/product/logical-text-w2.md.",
-    "evidence_level": "Producer local FAST PASS:278 model/145 transport,481 classfiles/7711 dependencies, compiled boundaries and harness; clean normal Maven install PASS. General admission borrows sealed primitive canonical declaration rows for typed identity membership/maps/operation-sequence lookup; it does not reconstruct a global typed ID/address catalogue or already-verified nominal-cycle graphs. All remaining mandatory AirValidator rules still run over borrowed typed bodies, without aggregate Publication/Unit/Sequence/Coverage reconstruction. Complete CLI input134872925 bytes under-Xmx128m finished163328ms and emitted134845854 bytes; independent oracle preserves87 original origins/2048 full giant identities/all other semantic fields/CFG. Unknown sameDomain without proof, negative cycles, undeclared capabilities and genuinely undecided obligations retain their classifications. Per-occurrence typed bodies, general proof/visibility caches and consumer index metadata remain resident: global heap/spill qualification PARTIAL.",
+    "evidence_level": "Producer local FAST PASS:281 model/145 transport,481 classfiles/7715 dependencies and original compiled boundaries; normal clean Maven install281 PASS. Native general visibility borrows the admitted canonical UnitId/ObjectId pairs rather than rebuilding a typed-ID set. Object/Cell/operand proof subjects register through relations, premises and queries; every reference/type scan and binding/premise remains checked, known type roots remain stable for scoped overlays, and shared unknown types never unify subjects. Canonical packed-leaf reuse uses five fixed primitive words without retaining text or skipping character validation. Complete public CLI input407529903 bytes under-Xmx128m finished373204ms and emitted49652 bytes; the unchanged independent oracle checks21 fields/all87 original origins/all semantic sections/CFG against the frozen baseline, work metrics separately. Earlier134MB giant-Origin output qualification belongs to producer8d9090f and is not a new execution here. Signature indexes, connected/scoped proof graphs, consumer index identities and remaining results still have resident/int limitations: global AS-W08/W09/W10 qualification PARTIAL.",
     "status": "LOCAL_CHECKPOINT / HUMAN_REVIEW_PENDING",
     "ci": {
-      "checked_commit": "8d9090fb498e876822be423471a8e972083b5192",
+      "checked_commit": "6d85657230f4e5c0e4504bd17f9a93c13ee94610",
       "status": "PASS",
-      "context": "PR30 exact producer8d9090f; remote FAST runs37934084409/37934074804 both SUCCESS; local FAST and complete real CLI pressure oracle PASS; human review pending; no merge"
+      "context": "PR30 exact producer6d85657; remote FAST runs37941353939/37941345341 both SUCCESS; local FAST281/145 and complete407MB real CLI semantic oracle PASS; human review pending; no merge"
     },
     "air_scale_access": {
       "previous_commit": "c2f80b59b7c38fa6efb9a20f0fa79644c697d8a4",

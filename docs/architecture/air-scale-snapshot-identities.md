@@ -111,3 +111,23 @@ admission borrows its sealed rows/cardinalities instead of building resident
 ID maps/sets. It reuses the mandatory primitive cycle pass only after successful
 admission; every remaining general rule still executes. Official int collection
 views and resident visibility/domain-proof caches remain explicit limitations.
+
+## Native visibility and demand-driven proof subjects (6d85657)
+
+The current pin6d85657230f4e5c0e4504bd17f9a93c13ee94610 shares the admitted
+canonical visibility pairs with the general validator. Exact typed membership
+uses the same complete identity keys; the owner remains open until those rules
+finish. No second UnitId/ObjectId visibility set is retained in the native route.
+Object/Cell/operand proof subjects enter through required relations, premises and
+queries, while full reference/type scans and all binding/premise edges remain.
+Scoped overlays preserve their existing global roots when a later known subject
+joins its type component. Unknown type reasons never become domain keys.
+
+Canonical text construction also reuses its last exact packed leaf in five fixed
+primitive words within the existing4096B control lease. Every character, namespace,
+Unicode/integer summary and final length is still checked; hashes never replace
+tuple equality and no String/Id history is cached. The real407MB private-ObjectId
+input finished with the public pipeline under128MiB heap and the original eight-
+minute deadline. This is input-specific evidence, not complete managed residency:
+signature indexes, connected proof/scoped caches and consumer identity maps remain
+resident. Earlier benchmark/FAST paragraphs above describe their stated checkpoints.

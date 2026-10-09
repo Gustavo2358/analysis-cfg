@@ -2,6 +2,29 @@
 
 ## Current integrated producer checkpoint (2026-10-09)
 
+The lock and CI checkout pin `6d85657230f4e5c0e4504bd17f9a93c13ee94610`.
+Producer FAST281 model/145 transport and original compiled boundaries PASS;
+normal clean Maven install281 PASS. Native general visibility reuses admitted
+canonical pairs. Object/Cell/operand proof subjects are registered by relations,
+premises and queries, not by a second inventory of unused identities. Full
+reference/type scans, binding links, premises, choice remainders and scoped
+authority remain checked. Known-type roots stay stable for later scoped queries;
+shared unknown_type is not a unification key. Fixed packed-leaf reuse retains
+five primitive words and still inspects every character and complete namespace.
+
+The public pipeline completed a407,529,903-byte input containing2048 private
+large ObjectIds with unchanged precision dimensions under128MiB JVM heap in
+373.204s, inside the unchanged eight-minute application deadline. Its49,652-byte
+product preserves all21 wire fields (work metrics separately),87 original origins,
+semantic sections and CFG against the frozen reference. Producer remote FAST
+37941353939/37941345341 both SUCCESS at this exact SHA. Consumer focused boundary17,
+preservation11 and CLI22 PASS; final consumer FAST and final-build repeat pending
+at this record. No global spill/64-bit result claim: signature indexes, connected
+proof graphs, consumer identities and remaining result sections still have
+resident/int limitations. AS-W08/W09/W10 remain in progress; no merge.
+
+## Previous integrated identity checkpoint (8d9090f)
+
 The lock and CI checkout now pin `8d9090fb498e876822be423471a8e972083b5192`.
 Producer FAST278 model/145 transport and compiled boundaries PASS. General native
 admission shares the sealed primitive declaration catalogue and exact full typed-ID
