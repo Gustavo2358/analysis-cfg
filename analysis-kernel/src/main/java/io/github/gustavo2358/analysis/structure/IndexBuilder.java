@@ -110,6 +110,7 @@ final class IndexBuilder {
             unique(storage, item.header().id(), item, "duplicate Storage");
             if (item instanceof Memory.Cell) count.locations = Math.incrementExact(count.locations);
         }
+        var objectIdentities=objects.keySet().iterator();
         for (var unit : store.units()) {
             count.visit("units.references");
             if (unit.containingUnit().isPresent()) {
@@ -122,15 +123,21 @@ final class IndexBuilder {
             }
             for (Memory.ObjectDeclaration object : unit.objects()) {
                 count.visit("objects.bindings");
+                // Cold bodies reconstruct IDs. Borrow the established key only after
+                // checking the complete identity; position alone never substitutes an ID.
+                valid(objectIdentities.hasNext(),"changed Object inventory");
+                var identity=objectIdentities.next();
+                valid(identity.equals(object.id()),"changed indexed Object identity");
                 if (object.storage() instanceof Memory.CellBinding binding) {
                     count.reference("bindings.cell");
                     Memory.Storage item = storage.get(binding.storage());
                     valid(item instanceof Memory.Cell, "CellBinding requires canonical Cell");
-                    directCells.put(object.id(), (Memory.Cell) item);
+                    directCells.put(identity, (Memory.Cell) item);
                 }
                 // Other binding forms remain original AIR, without alias/effect interpretation.
             }
         }
+        valid(!objectIdentities.hasNext(),"changed Object inventory");
     }
 
     private void payload() {

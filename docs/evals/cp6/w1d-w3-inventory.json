@@ -2727,6 +2727,7 @@
         "java.util.LinkedHashSet",
         "java.util.List",
         "java.util.Map",
+        "java.util.Map$Entry",
         "java.util.Objects",
         "java.util.Optional",
         "java.util.Set",

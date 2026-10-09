@@ -69,13 +69,36 @@ final class SnapshotDependencyAnalysisTest {
                         assertThrows(UnsupportedOperationException.class,catalog::clear);
                         assertThrows(UnsupportedOperationException.class,()->catalog.keySet().clear());
                         assertThrows(UnsupportedOperationException.class,()->catalog.entrySet().iterator().next().setValue(objects.getLast()));
+                        var canonicalKeys=new java.util.HashMap<ObjectId,ObjectId>();
+                        catalog.keySet().forEach(id->canonicalKeys.put(id,id));
+                        var cellField=borrowed.getClass().getDeclaredField("directCells");cellField.setAccessible(true);
+                        var directCells=(java.util.Map<?,?>)cellField.get(borrowed);
+                        assertEquals(objects.stream().filter(value->value.storage() instanceof Memory.CellBinding).count(),
+                            (long)directCells.size());
+                        for(var key:directCells.keySet())assertSame(canonicalKeys.get(key),key,
+                            "direct Cell associations reconstructed an already indexed complete ObjectId");
+                        var scalar=io.github.gustavo2358.analysis.values.PossibleValuesAnalysis.prepare(
+                            opened.session().orElseThrow(),io.github.gustavo2358.analysis.values.PossibleValuesAnalysis.EFFECTS_PROFILE,
+                            java.util.Set.of(template.id()));
+                        assertEquals(io.github.gustavo2358.analysis.values.PossibleValuesAnalysis.Status.ACCEPTED,
+                            scalar.status(),scalar.reason());
+                        var analysis=scalar.analysis().orElseThrow();
+                        var profileField=analysis.getClass().getDeclaredField("profile");profileField.setAccessible(true);
+                        var profile=profileField.get(analysis);
+                        var subjectsField=profile.getClass().getDeclaredField("subjects");subjectsField.setAccessible(true);
+                        var scalarSubjects=(java.util.Map<?,?>)subjectsField.get(profile);
+                        assertEquals(objects.size(),scalarSubjects.size());
+                        for(var key:scalarSubjects.keySet())assertSame(canonicalKeys.get(key),key,
+                            "scalar locations reconstructed an already indexed complete ObjectId");
+                        var textField=profile.getClass().getDeclaredField("textSubjects");textField.setAccessible(true);
+                        var textSubjects=(java.util.Set<?>)textField.get(profile);
+                        for(var key:textSubjects)assertSame(canonicalKeys.get(key),key,
+                            "scalar text eligibility reconstructed an already indexed complete ObjectId");
                         var physical=new io.github.gustavo2358.analysis.storage.StorageIndex(opened.session().orElseThrow());reads[0]=0;
                         assertEquals(objects,List.copyOf(physical.declarations()));
                         assertTrue(reads[0]>0,"physical declarations must share cold addresses rather than copy all bodies");
                         // Equal reconstructed IDs can retain another complete copy of every cold
                         // identity. Required physical edges must borrow the existing canonical keys.
-                        var canonicalKeys=new java.util.HashMap<ObjectId,ObjectId>();
-                        catalog.keySet().forEach(id->canonicalKeys.put(id,id));
                         var dependencies=physical.getClass().getDeclaredField("aliasDependencies");
                         dependencies.setAccessible(true);
                         var retained=(java.util.Map<?,?>)dependencies.get(physical);

@@ -157,3 +157,35 @@ These two large runtime measurements used Java25.0.4, with Java21 bytecode;
 they do not replace the campaign's final Java21 runtime qualification.
 Canonical identity maps, physical dependency edges and resolutions remain resident:
 this targeted duplication fix does not complete AS-W09 managed spill.
+
+## Cell and scalar keys share the same complete declaration identities
+
+IndexBuilder still scans every Unit reference and Object binding in its original
+order. Its direct Cell associations borrow the first declaration scan's key only
+after checking complete ObjectId equality; position alone never identifies an
+Object. TextProfile likewise reads every cold declaration and preserves all
+storage/type admission, precision, demand closure and effect checks, but its
+subject locations and text eligibility use the immutable declaration entry's key.
+No new identity map, retained body cache or public inspection API is introduced.
+
+The existing cold-declaration law observed separate RED failures for direct Cells
+and scalar subjects; test-only reflection checks exact canonical-key sharing while
+retaining its cold reads, full namespace, immutable view and owner-lifetime checks.
+Focused kernel38, values52, adapters12 and public CLI19 methods passed without
+skips. The same406,942,781-byte Cell-bound computed-CALL input first exhausted
+128MiB in IndexBuilder, then in TextProfile after only the Cell correction.
+With both associations sharing keys, the public pipeline completed in268.34s on
+Java21.0.12+1.1 under the unchanged eight-minute deadline and128MiB heap. The
+unchanged independent oracle preserves21 wire fields, all46 original origins,
+every other semantic section and CFG; work metrics are evaluated separately.
+The stable-build repeat completed in282.31s on the same Java21 runtime and
+envelope; its complete dependencies/CFG bytes equal the first green run.
+The local FAST executed1158 required methods with zero skips, then failed because
+W3's exact compiled inventory lacked TextProfile's new java.util.Map$Entry edge.
+Only that edge was added; no public descriptor or deny rule changed. W3 and all
+subsequent architecture boundaries and the eleven original post-checks then
+passed against the unchanged executable sources. This is reused test evidence
+plus newly executed repaired boundaries, not a new complete local FAST PASS.
+The final commit's complete remote FAST remains required.
+Canonical identity maps and the location/eligibility associations remain resident:
+this removes duplicate identity payloads, not the AS-W09 external-index obligation.

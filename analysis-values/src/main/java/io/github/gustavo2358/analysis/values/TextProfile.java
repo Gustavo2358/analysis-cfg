@@ -44,9 +44,10 @@ final class TextProfile {
         var index=session.index();var store=index.store();
         var entryUnits=session.contexts().stream().map(c->c.entry().id().unit()).collect(java.util.stream.Collectors.toCollection(LinkedHashSet::new));
         var cells=new HashMap<StorageId,Location>();
-        for(var object:index.objects()) {
+        for(var declaration:index.objectDeclarations().entrySet()) {
+            var object=declaration.getValue();
             store.progress(ProgramStore.ExecutionPhase.DEMAND);
-            var cell=index.directCell(object.id());
+            var cell=index.directCell(declaration.getKey());
             if(!(object.storage() instanceof Memory.CellBinding)||cell==null||!cellDomain(object.typeRef())||!cellDomain(cell.typeRef())) {
                 // A declaration alone has no transfer effect. Demand closure and every
                 // actual effect below still require supported storage; none is discarded.
@@ -55,8 +56,10 @@ final class TextProfile {
             }
             var location=cells.get(cell.header().id());
             if(location==null){int ordinal=cells.size();Math.incrementExact(ordinal);location=new Location(ordinal,cell);cells.put(cell.header().id(),location);}
-            subjects.put(object.id(),location);
-            if(text(object.typeRef()))textSubjects.add(object.id());
+            // Cold bodies reconstruct equal IDs. These persistent associations
+            // borrow the complete identity already owned by the declaration index.
+            subjects.put(declaration.getKey(),location);
+            if(text(object.typeRef()))textSubjects.add(declaration.getKey());
             if(object.coverage()!=Evidence.CoverageStatus.MODELED||open(object.precision().storage())||open(object.precision().values()))
                 sourceOpenCells.add(location.ordinal());
         }
