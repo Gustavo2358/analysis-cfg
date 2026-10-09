@@ -47,14 +47,16 @@ public final class StorageIndex {
             for(var id:d.storage()) { separation.computeIfAbsent(id,ignored->new HashSet<>()).add(premise.id());premiseMembers++; }
         // Explicit DFS avoids call-stack depth proportional to an exact-alias chain.
         var dependencies=aliasDependencies;
-        for(var object:declarations.values()) {
+        for(var declaration:declarations.entrySet()) {
+            var object=declaration.getValue();
             var refs=new ArrayList<ObjectId>();var pending=new ArrayDeque<Memory.Binding>();pending.push(object.storage());
             while(!pending.isEmpty()) {
                 var b=pending.pop();bindingVisits++;
                 if(b instanceof Memory.AliasBinding a)refs.add(a.object());
                 else if(b instanceof Memory.AlternativesBinding a)for(var child:a.alternatives())pending.push(child);
             }
-            dependencies.put(object.id(),List.copyOf(refs));
+            // Borrow the canonical key: native bodies reconstruct complete IDs on each read.
+            dependencies.put(declaration.getKey(),List.copyOf(refs));
         }
         var active=new HashSet<ObjectId>();
         record Frame(ObjectId id,Iterator<ObjectId> dependencies) { }

@@ -72,6 +72,16 @@ final class SnapshotDependencyAnalysisTest {
                         var physical=new io.github.gustavo2358.analysis.storage.StorageIndex(opened.session().orElseThrow());reads[0]=0;
                         assertEquals(objects,List.copyOf(physical.declarations()));
                         assertTrue(reads[0]>0,"physical declarations must share cold addresses rather than copy all bodies");
+                        // Equal reconstructed IDs can retain another complete copy of every cold
+                        // identity. Required physical edges must borrow the existing canonical keys.
+                        var canonicalKeys=new java.util.HashMap<ObjectId,ObjectId>();
+                        catalog.keySet().forEach(id->canonicalKeys.put(id,id));
+                        var dependencies=physical.getClass().getDeclaredField("aliasDependencies");
+                        dependencies.setAccessible(true);
+                        var retained=(java.util.Map<?,?>)dependencies.get(physical);
+                        assertEquals(catalog.size(),retained.size());
+                        for(var key:retained.keySet())assertSame(canonicalKeys.get(key),key,
+                            "physical alias inventory reconstructed an already indexed complete ObjectId");
                     }
                     assertThrows(IllegalStateException.class,()->borrowed.object(objects.getLast().id()));
                 }

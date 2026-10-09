@@ -131,3 +131,29 @@ input finished with the public pipeline under128MiB heap and the original eight-
 minute deadline. This is input-specific evidence, not complete managed residency:
 signature indexes, connected proof/scoped caches and consumer identity maps remain
 resident. Earlier benchmark/FAST paragraphs above describe their stated checkpoints.
+
+## Physical declaration keys borrow the canonical inventory
+
+Native declaration values reconstruct their complete typed ObjectId on every cold
+read. StorageIndex now takes the physical alias-inventory key from the existing
+immutable declaration entry, not from that reconstructed body. Every declaration
+and nested binding is still scanned in original order; aliases, resolutions,
+origins and full nominal equality are unchanged. This removes one retained copy
+of all identity text, not the necessary physical dependency edges or resolutions.
+
+The existing cold-declaration law first failed because equal physical keys were
+different instances from the canonical inventory; it passes with shared keys.
+Focused storage/effects/definition laws34, adapter/region laws19, values17 and
+public CLI16 passed with the current producer6d85657. The unchanged407,297,668-byte
+physical input previously exhausted128MiB heap in StorageIndex preparation;
+its same-envelope public rerun completed in448.71s under the original eight-minute
+deadline. The unchanged independent oracle preserves all21 semantic wire fields,
+all83 origins and CFG, including PROGA/PROGB candidates, supports and remainders;
+work metrics separately confirm2052 objects resolved and10 physical plans. Final
+FAST passed1158 required methods with zero skips and the original compiled
+boundaries in742.710s. The stable-build public repeat completed in448.77s with
+byte-identical dependencies/CFG and the same independent semantic oracle PASS.
+These two large runtime measurements used Java25.0.4, with Java21 bytecode;
+they do not replace the campaign's final Java21 runtime qualification.
+Canonical identity maps, physical dependency edges and resolutions remain resident:
+this targeted duplication fix does not complete AS-W09 managed spill.
