@@ -217,7 +217,15 @@ final class SnapshotDependencyAnalysisTest {
                                 new io.github.gustavo2358.analysis.storage.StorageIndex.Location(base.header(),range)));
                         }
                         assertEquals(expectedSegments,partition.segments(),"preserve every finite Cell/Region segment and its AIR ordinal");
-                        for(var segment:expectedSegments)assertEquals(segment.location().range(),partition.range(segment.ordinal()));
+                        for(var segment:expectedSegments){
+                            assertEquals(segment.location().range(),partition.range(segment.ordinal()));
+                            reads[0]=0;var address=partition.address(segment.ordinal()).orElseThrow();
+                            assertSame(nativeStorage,address.owner());
+                            assertEquals(segment.location().base().id(),storages.get(address.ordinal()).header().id());
+                            assertEquals(0,reads[0],"segment source addresses must not decode cold storage headers");
+                        }
+                        assertThrows(IndexOutOfBoundsException.class,()->partition.address(-1));
+                        assertThrows(IndexOutOfBoundsException.class,()->partition.address(expectedSegments.size()));
                         assertEquals(0,retainedUnusedStorageIds(partition),"native partition retained complete cold storage identities");
                         assertThrows(UnsupportedOperationException.class,borrowedSegments::clear);
                         for(var base:storages){
@@ -363,6 +371,48 @@ final class SnapshotDependencyAnalysisTest {
                 assertSame(checked.snapshot(),program.admission().snapshot());
                 assertEquals(publication.storage().size(),program.storageInventory().orElseThrow().size());
                 assertEquals(publication.storage().getFirst(),program.storageInventory().orElseThrow().at(0));
+            }
+        }
+        for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
+    }
+
+    @Test void nativeRegionalExecutionBorrowsColdCellTraceLocationsAndPreservesPublicEvidence() throws Exception {
+        var seed=directCall();var unit=seed.units().getFirst();var origin=seed.origins().getFirst().id();
+        var storage=new java.util.ArrayList<>(seed.storage());var template=(Memory.Cell)storage.getFirst();
+        for(int at=0;at<16;at++)storage.add(new Memory.Cell(new Memory.StorageHeader(new StorageId(seed.id(),"unused-storage-identity-"+"!".repeat(4096)+"/"+at),template.header().owner(),template.header().lifetime(),template.header().visibility(),origin),template.typeRef()));
+        var sequences=new java.util.ArrayList<>(unit.sequences());var start=sequences.getFirst();
+        sequences.set(0,new Sequence(start.label(),start.instructions(),W1dModelTest.call(unit.id(),"invoke","end",unit.objects().getFirst().id(),true),start.origin()));
+        var replacement=ResultFixtures.unit(unit.id(),unit.entries(),sequences,unit.objects());
+        var artifact=new ArtifactId(seed.id(),"source");
+        var publication=new Publication(seed.id(),seed.airVersion(),seed.capabilities(),List.of(new Origins.Artifact(artifact,"native-regional-cells.synthetic",Optional.empty())),List.of(replacement),storage,seed.resources(),seed.artifactRelations(),
+            List.of(new Origins.Written(origin,artifact,Optional.empty(),List.of(),true)),seed.coverage(),seed.uncertainties(),seed.premises());
+        var coordinator=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty());
+        var residentCfg=coordinator.build(publication,BuildOptions.defaults());
+        var residentSession=io.github.gustavo2358.analysis.structure.AnalysisSession.open(residentCfg,publication,residentCfg.options().projectionPolicy(),unit.entries()).session().orElseThrow();
+        var residentPartition=new io.github.gustavo2358.analysis.storage.StoragePartition(new io.github.gustavo2358.analysis.storage.StatementEffects(new io.github.gustavo2358.analysis.storage.StorageIndex(residentSession)));
+        assertTrue(residentPartition.address(0).isEmpty(),"resident compatibility does not invent a native owner");
+        var resident=io.github.gustavo2358.analysis.values.RegionalValuesAnalysis.prepare(residentSession,io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).analysis().orElseThrow().execute();
+        var point=io.github.gustavo2358.analysis.query.ProgramPoint.before(unit.entries().getFirst().id(),new OperationId(unit.id(),"return-end"));
+        var query=new io.github.gustavo2358.analysis.query.PointQuery<io.github.gustavo2358.analysis.storage.StorageSubject>(point,new io.github.gustavo2358.analysis.storage.StorageSubject.NamedObject(unit.objects().getFirst().id()));
+        var expected=resident.observeStorage(List.of(query)).observations().getFirst().value();
+        assertEquals(List.of(new Values.TextValue("PROGA   ")),expected.candidates());assertTrue(expected.modelValueRemainder());
+        assertTrue(expected.alternatives().stream().flatMap(alternative->alternative.fragments().stream()).anyMatch(fragment->fragment.unknownWriter().flatMap(io.github.gustavo2358.analysis.rd.DefinitionEvent::operation).filter(new OperationId(unit.id(),"invoke")::equals).isPresent()));
+        var ledger=resources();
+        var input=directory.resolve("native-regional-cold-cells.air.json");Files.write(input,new AirJson().encode(publication));
+        try(var read=new DataflowAirReader().readSnapshot(input,ledger)){
+            assertTrue(read.checked().result().isStructurallyValid(),read.checked().result().toString());
+            try(var program=new SnapshotProgram(read.checked(),read.newIdentityStorage(),read.newOrderStorage(),ledger)){
+                var cfg=coordinator.buildChecked(program,read.checked(),BuildOptions.defaults());
+                var opened=io.github.gustavo2358.analysis.structure.AnalysisSession.open(cfg,program,cfg.options().projectionPolicy(),unit.entries().stream().map(Entries.Entry::id).toList());
+                assertEquals(io.github.gustavo2358.analysis.structure.AnalysisSession.Status.ACCEPTED,opened.status(),opened.reason());
+                var prepared=io.github.gustavo2358.analysis.values.RegionalValuesAnalysis.prepare(opened.session().orElseThrow(),io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).analysis().orElseThrow();
+                assertEquals(0,retainedUnusedStorageIds(prepared),()->retainedStoragePaths(prepared).toString());
+                var execution=prepared.execute();
+                assertEquals(0,retainedUnusedStorageIds(execution),"solver traces must borrow owner-local locations instead of cold complete IDs");
+                var observed=execution.observeStorage(List.of(query));
+                assertEquals(io.github.gustavo2358.analysis.query.ObservationBatch.Status.COMPLETE,observed.status());
+                assertEquals(expected,observed.observations().getFirst().value(),"complete public fragments, writers, producers, supports, remainders and locations survive borrowed internal traces");
+                assertEquals(0,retainedUnusedStorageIds(execution));
             }
         }
         for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
@@ -565,6 +615,34 @@ final class SnapshotDependencyAnalysisTest {
 
     /** Walk stored fields, not custom lazy Map/List projections. Counts are actual
      * identity-deduplicated objects, never reported as measured heap bytes. */
+    private static List<String> retainedStoragePaths(Object root) {
+        record Row(Object value,String path) { }
+        var seen=java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<Object,Boolean>());
+        var pending=new java.util.ArrayDeque<Row>();pending.add(new Row(root,"root"));var paths=new java.util.ArrayList<String>();
+        try{
+            while(!pending.isEmpty()&&paths.size()<4){
+                var row=pending.removeFirst();var value=row.value();if(!seen.add(value))continue;
+                if(value instanceof StorageId id&&id.localId().startsWith("unused-")){paths.add(row.path());continue;}
+                var type=value.getClass();var name=type.getName();
+                if(value instanceof Optional<?> optional){optional.ifPresent(item->pending.addLast(new Row(item,row.path()+".optional")));continue;}
+                if(type.isArray()){
+                    if(!type.componentType().isPrimitive())for(var item:(Object[])value)if(item!=null)pending.addLast(new Row(item,row.path()+".array"));continue;
+                }
+                if(name.startsWith("java.util.")&&!name.contains("$Unmodifiable")){
+                    if(value instanceof java.util.Map<?,?> map){for(var entry:map.entrySet()){
+                        if(entry.getKey()!=null)pending.addLast(new Row(entry.getKey(),row.path()+".key"));
+                        if(entry.getValue()!=null)pending.addLast(new Row(entry.getValue(),row.path()+".value"));
+                    }continue;}
+                    if(value instanceof Iterable<?> items){for(var item:items)if(item!=null)pending.addLast(new Row(item,row.path()+".item"));continue;}
+                }
+                for(var owner=type;owner!=null&&owner.getName().startsWith("io.github.gustavo2358.");owner=owner.getSuperclass())for(var field:owner.getDeclaredFields())
+                    if(!java.lang.reflect.Modifier.isStatic(field.getModifiers())&&!field.getType().isPrimitive()){
+                        field.setAccessible(true);var item=field.get(value);if(item!=null)pending.addLast(new Row(item,row.path()+"."+field.getName()));
+                    }
+            }
+        }catch(ReflectiveOperationException failure){throw new AssertionError(failure);}
+        return List.copyOf(paths);
+    }
     private static int retainedUnusedObjectIds(Object root) throws ReflectiveOperationException {
         return retainedUnusedIdentities(root,ObjectId.class);
     }

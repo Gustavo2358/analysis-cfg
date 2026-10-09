@@ -63,10 +63,39 @@ public final class RegionalValuesAnalysis {
     private sealed interface Content permits Bytes,Scalar { }
     private record Bytes(ByteImage image) implements Content { }
     private record ReadCapture(Map<Integer,Content> contents,Map<StatementEffects.Write,Integer> choices) { }
-    private record CapturedRead(StorageIndex.Location sourceRange,StorageIndex.Location sourceContribution,StorageIndex.Location destinationContribution) { }
-    private record Trace(StorageIndex.Location observed,Optional<Values.BytesValue> bytes,int producer,Optional<StorageIndex.Location> original,
+    /** A private evidence address, not another owning copy of an AIR header. */
+    private static final class LocationRef {
+        private final ProgramStore.StorageInventory owner;
+        private final int ordinal;
+        private final Optional<StorageRange> range;
+        private final StorageIndex.Location resident;
+        LocationRef(StorageIndex.Location resident){this.resident=Objects.requireNonNull(resident);owner=null;ordinal=-1;range=resident.range();}
+        LocationRef(StorageIndex.BaseAddress address,Optional<StorageRange> range){owner=address.owner();ordinal=address.ordinal();this.range=Objects.requireNonNull(range);resident=null;}
+        LocationRef borrow(StorageIndex.Location location){
+            if(owner==null)return new LocationRef(location);
+            int at=owner.ordinal(location.base().id());if(at<0)throw new IllegalArgumentException("foreign trace location");
+            return new LocationRef(new StorageIndex.BaseAddress(owner,at),location.range());
+        }
+        StorageIndex.Location value(){return owner==null?resident:new StorageIndex.Location(owner.at(ordinal).header(),range);}
+        Optional<StorageRange> range(){return range;}
+        StorageIndex.ContextualLocation in(EntryId entry){return value().in(entry);}
+        @Override public boolean equals(Object other){
+            return this==other||other instanceof LocationRef reference&&owner==reference.owner
+                &&(owner==null?resident.equals(reference.resident):ordinal==reference.ordinal&&range.equals(reference.range));
+        }
+        // Never hash the inventory: Map.hashCode would decode every cold header.
+        // Omitting owner from the hash is legal; equality still checks owner identity.
+        @Override public int hashCode(){return owner==null?resident.hashCode():31*(31+ordinal)+range.hashCode();}
+    }
+    private LocationRef reference(StorageIndex.Location location){
+        if(nativeMetadata==null)return new LocationRef(location);
+        int source=nativeMetadata.inventory.ordinal(location.base().id());if(source<0)throw new IllegalArgumentException("foreign trace location");
+        return new LocationRef(new StorageIndex.BaseAddress(nativeMetadata.inventory,source),location.range());
+    }
+    private record CapturedRead(LocationRef sourceRange,LocationRef sourceContribution,LocationRef destinationContribution) { }
+    private record Trace(LocationRef observed,Optional<Values.BytesValue> bytes,int producer,Optional<LocationRef> original,
                          Map<Integer,Set<CapturedRead>> captures,Set<Integer> gaps,Set<String> reasons,Set<ByteImage.LogicalSupport> logicalSupports) {
-        Trace(StorageIndex.Location observed,Optional<Values.BytesValue> bytes,int producer,Optional<StorageIndex.Location> original,Map<Integer,Set<CapturedRead>> captures,Set<Integer> gaps,Set<String> reasons){this(observed,bytes,producer,original,captures,gaps,reasons,Set.of());}
+        Trace(LocationRef observed,Optional<Values.BytesValue> bytes,int producer,Optional<LocationRef> original,Map<Integer,Set<CapturedRead>> captures,Set<Integer> gaps,Set<String> reasons){this(observed,bytes,producer,original,captures,gaps,reasons,Set.of());}
         Trace {
             logicalSupports=Set.copyOf(logicalSupports);
             var immutable=new HashMap<Integer,Set<CapturedRead>>();captures.forEach((key,value)->immutable.put(key,Set.copyOf(value)));captures=Map.copyOf(immutable);gaps=Set.copyOf(gaps);reasons=Set.copyOf(reasons);
@@ -74,8 +103,9 @@ public final class RegionalValuesAnalysis {
         Trace withGap(int gap){var next=new HashSet<>(gaps);next.add(gap);return new Trace(observed,bytes,producer,original,captures,next,reasons,logicalSupports);}
         Trace captured(int event,StorageIndex.Location source,StorageIndex.Location destination) {
             var next=new HashMap<>(captures);var contributions=new HashSet<>(next.getOrDefault(event,Set.of()));
-            contributions.add(new CapturedRead(source,observed,destination));next.put(event,Set.copyOf(contributions));
-            return new Trace(destination,bytes,producer,original,next,gaps,reasons,logicalSupports);
+            var target=observed.borrow(destination);
+            contributions.add(new CapturedRead(observed.borrow(source),observed,target));next.put(event,Set.copyOf(contributions));
+            return new Trace(target,bytes,producer,original,next,gaps,reasons,logicalSupports);
         }
     }
     private record Scalar(Optional<LogicalText> text,Set<Integer> producers,Set<String> reasons,Set<Integer> sourceGaps,List<Trace> traces) implements Content {
@@ -359,11 +389,15 @@ public final class RegionalValuesAnalysis {
     private Content unknown(StorageIndex.Location location,String reason) {return unknown(location,reason,-1);}
     private Content unknown(StorageIndex.Location location,String reason,int event) {
         if(location.range().isPresent())return new Bytes(ByteImage.unknown(location.range().get().end().map(e->e.subtract(location.range().get().start())),reason,event));
+        return unknown(reference(location),reason,event);
+    }
+    private Content unknown(LocationRef location,String reason,int event) {
         return new Scalar(Optional.empty(),Set.of(),Set.of(reason),Set.of(),List.of(new Trace(location,Optional.empty(),event,Optional.empty(),Map.of(),Set.of(),Set.of(reason))));
     }
     private Content unknownSegment(int ordinal,String reason){
         var range=partition.range(ordinal);
         if(range.isPresent()){var selected=range.orElseThrow();return new Bytes(ByteImage.unknown(selected.end().map(end->end.subtract(selected.start())),reason,-1));}
+        var address=partition.address(ordinal);if(address.isPresent())return unknown(new LocationRef(address.orElseThrow(),range),reason,-1);
         return unknown(partition.segments().get(ordinal).location(),reason);
     }
     final class Engine implements AnalysisDefinition<State> {
@@ -650,7 +684,7 @@ public final class RegionalValuesAnalysis {
             if(expression instanceof Expressions.Literal literal) {
                 var v=literal.value();
                 if(target.range().isEmpty())return Set.of(v instanceof Values.TextValue t
-                    ?new Scalar(Optional.of(LogicalText.of(t.value())),Set.of(plan.event),Set.of(),Set.of(),List.of(new Trace(target,Optional.empty(),plan.event,Optional.of(target),Map.of(),Set.of(),Set.of())))
+                    ?new Scalar(Optional.of(LogicalText.of(t.value())),Set.of(plan.event),Set.of(),Set.of(),List.of(new Trace(reference(target),Optional.empty(),plan.event,Optional.of(reference(target)),Map.of(),Set.of(),Set.of())))
                     :unknown(target,"NON_TEXT_LOGICAL_VALUE",plan.event));
                 var range=target.range().get();var extent=range.end().map(e->e.subtract(range.start()));
                 if(v instanceof Values.BytesValue bytes&&extent.equals(Optional.of(BigInteger.valueOf(bytes.octets().size()))))
@@ -669,7 +703,7 @@ public final class RegionalValuesAnalysis {
                 if(!(resolution.remainder() instanceof Scopes.NoMemory))result.add(unknown(target,"READ_LOCATION_REMAINDER",plan.event));
                 for(var object:effects.storage().explicitObjects(read.place()))for(var value:logicalInputs.getOrDefault(object,Set.of()))
                     result.add(new Scalar(Optional.of(value.text()),Set.copyOf(List.of(value.event(),plan.event)),Set.of(),Set.of(),
-                        List.of(new Trace(target,Optional.empty(),plan.event,Optional.of(target),Map.of(),Set.of(),Set.of(),Set.of(new ByteImage.LogicalSupport(object,value.event()))))));
+                        List.of(new Trace(reference(target),Optional.empty(),plan.event,Optional.of(reference(target)),Map.of(),Set.of(),Set.of(),Set.of(new ByteImage.LogicalSupport(object,value.event()))))));
 
                 for(int i=0;i<resolution.candidates().size();i++) {
                     if(captured.choices().get(plan.write)!=i)continue;
@@ -729,10 +763,10 @@ public final class RegionalValuesAnalysis {
         var observed=new StorageIndex.Location(selected.base(),Optional.of(new StorageRange(readStart.add(part.range().start()),part.range().end().map(e->e.add(readStart)))));
         var length=part.range().end().map(e->e.subtract(part.range().start()));
         var bytes=part.materialize();
-        Optional<StorageIndex.Location> original=Optional.empty();
+        Optional<LocationRef> original=Optional.empty();
         if(bytes.isPresent()) {
             var written=eventDetails.get(part.producer()).target().location();
-            original=Optional.of(new StorageIndex.Location(written.base(),Optional.of(StorageRange.exact(written.range().orElseThrow().start().add(part.producerOffset()),length.orElseThrow()))));
+            original=Optional.of(reference(new StorageIndex.Location(written.base(),Optional.of(StorageRange.exact(written.range().orElseThrow().start().add(part.producerOffset()),length.orElseThrow())))));
         }
         var captures=new HashMap<Integer,Set<CapturedRead>>();
         for(var entry:part.capturedOffsets().entrySet()) {
@@ -742,11 +776,11 @@ public final class RegionalValuesAnalysis {
                 var source=sources.get(position.alternative()).location();var offset=position.offset();
                 var src=new StorageIndex.Location(source.base(),Optional.of(StorageRange.exact(offset,length.orElseThrow())));
                 var dst=new StorageIndex.Location(destination.base(),Optional.of(StorageRange.exact(destination.range().orElseThrow().start().add(offset.subtract(source.range().orElseThrow().start())),length.orElseThrow())));
-                portions.add(new CapturedRead(source,src,dst));
+                portions.add(new CapturedRead(reference(source),reference(src),reference(dst)));
             }
             captures.put(entry.getKey(),Set.copyOf(portions));
         }
-        return new Trace(observed,bytes,part.producer(),original,captures,part.sourceGaps(),part.reasons(),part.logicalSupports());
+        return new Trace(reference(observed),bytes,part.producer(),original,captures,part.sourceGaps(),part.reasons(),part.logicalSupports());
     }
     public Execution execute(){var engine=new Engine();return new Execution(engine,DataflowSolver.solve(session,engine));}
     public final class Execution {

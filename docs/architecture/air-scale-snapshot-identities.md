@@ -454,3 +454,40 @@ This does not complete AS-W09/W10: plans, states, relations and narrow indexes
 still require coverage. A subsequent executed16-Cell countercase additionally
 retains80 cold identities in Regional traces despite zero during preparation;
 that RED is preserved separately and is the next integrated blocker.
+
+## Borrowed regional evidence locations
+
+Private Regional traces now keep inventory-owned base ordinals and exact ranges
+for observations, original producers and capture contributions. They reconstruct
+complete headers only at the public evidence boundary. Owner identity is checked
+in equality; hashing never hashes the inventory Map or reads all its cold rows.
+The resident compatibility path still owns its explicit Location records.
+StoragePartition.address exposes a header-free segment-to-base projection with
+checked bounds and source lifetime, without inventing an owner for resident data.
+
+The admitted real paged16-Cell countercase changes80 retained complete identities
+after execution to zero. A separate minimal CALL/AllMemory test changes48 to zero
+and compares complete public facts to a resident reference, independently fixing
+the preserved PROGA candidate, open remainder and Invoke unknown-writer evidence.
+Segment addresses also preserve every complete ID/source ordinal without cold
+header reads. Kernel26, Regional47, dependencies10 and focused consumer3 pass.
+Initial test scaffolding errors remain preserved: a resident snapshot legitimately
+owned16 original IDs; the resident overload requires Entries, and Origin.unavailable
+is outside the JSON profile. The final test uses actual paged input and a supported
+synthetic Written origin. No validator, fixture dimension or assertion was weakened.
+
+The fresh AIR preserves all original executables/origins, adding2048 private TEXT
+Cells with65536-char IDs:135,250,994 bytes, SHA256
+`a778779e5ec1cc22d3a3c1a7d64006122eae321ec9bb7a895dab977b486e8d87`.
+The real Java21/Xmx128m physical CLI, unchanged quotas/eight-minute deadline and
+workspace-disk temporary directory, completes in206.39s, CPU207.43+6.26s,
+RSS281620KiB, exit0. The independent pre-fix frozen16-Cell product confirms all21
+semantic fields,83 complete origins and CFG parity; dependencies59668 bytes.
+Twelve inputs and1234 runtime classfiles were frozen before execution and match
+afterwards. The generator's separate768MiB JVM creates the fixture only; it is not
+the application run or a changed product budget. Original-environment FAST for
+this delta PASS:1165 required methods,zero failures/errors/skips,architecture and
+post-checks,741.779s. Seven frozen inputs and1234 runtime classfiles match after
+the clean rebuild, linking the physical CLI result to the same executable content.
+Plans, relation stores, states and other input-cardinality metadata still prevent
+AS-W09/W10 completion. No global qualification or fully spilled engine is claimed.

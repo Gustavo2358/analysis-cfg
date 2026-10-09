@@ -482,6 +482,7 @@
       "nativeDeclarationIndexesBorrowColdPayloadsAndPreserveEveryIdentity",
       "nativeRegionalGroupsBorrowPagedDirectoriesAndPreserveTransitiveCanonicalOrder",
       "failedNativeRegionalGroupWriteClosesPartialColumnsAndPreservesPrimary",
+      "nativeRegionalExecutionBorrowsColdCellTraceLocationsAndPreservesPublicEvidence",
       "nativeFinitePartitionPreservesArbitraryCutsAndUnknownTail",
       "failedNativePartitionColumnWriteReleasesAllOwnersAndPreservesPrimary",
       "nativeOpenAllMemoryAliasesPreserveLogicalOrderWithoutColdStorageCopies",

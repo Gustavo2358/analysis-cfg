@@ -66,6 +66,13 @@ public final class StoragePartition {
     public Optional<StorageRange> range(int ordinal){
         Objects.checkIndex(ordinal,segments.size());return nativePartition==null?segments.get(ordinal).location().range():nativePartition.range(ordinal);
     }
+    /** Native AIR base address for a segment, without decoding its header. Resident
+     * compatibility has no owned address; the returned owner must remain open. */
+    public Optional<StorageIndex.BaseAddress> address(int ordinal){
+        Objects.checkIndex(ordinal,segments.size());
+        return nativePartition==null?Optional.empty():Optional.of(new StorageIndex.BaseAddress(
+            nativePartition.inventory,Math.toIntExact(nativePartition.segmentBases.get(ordinal))));
+    }
     public List<Segment> intersecting(StorageIndex.Location location) {
         if(nativePartition!=null)return nativePartition.intersecting(location);
         var group=byBase.get(location.base().id());if(group==null)throw new IllegalArgumentException("foreign base");
