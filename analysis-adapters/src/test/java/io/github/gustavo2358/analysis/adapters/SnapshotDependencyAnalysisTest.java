@@ -34,13 +34,18 @@ final class SnapshotDependencyAnalysisTest {
         var objects=new java.util.ArrayList<>(unit.objects());
         for(int i=0;i<128;i++)objects.add(new Memory.ObjectDeclaration(new ObjectId(unit.id(),"unused-"+i),
             Optional.of("!".repeat(4096)+"/"+i),template.typeRef(),template.storage(),template.visibility(),template.origin(),template.coverage(),template.precision()));
+        var storages=new java.util.ArrayList<>(seed.storage());
+        var cell=(Memory.Cell)seed.storage().getFirst();var header=cell.header();
+        for(int i=0;i<128;i++)storages.add(new Memory.Cell(new Memory.StorageHeader(
+            new StorageId(seed.id(),"unused-storage-"+"!".repeat(4096)+"/"+i),
+            header.owner(),header.lifetime(),header.visibility(),header.origin()),cell.typeRef()));
         var auditId=objects.getLast().id();var auditRoots=new java.util.HashMap<ObjectId,ObjectId>();
         auditRoots.put(auditId,new ObjectId(auditId.unit(),auditId.localId()));
         assertEquals(2,retainedUnusedObjectIds(auditRoots),"the audit must count distinct stored instances, not equal logical IDs");
         assertEquals(0,retainedUnusedObjectIds(java.util.Map.of(template.id(),template)));
         var replacement=new Unit(unit.id(),unit.containingUnit(),objects,unit.visibleObjects(),unit.entries(),unit.sequences(),unit.completionPorts(),unit.body(),unit.bodyUnavailable(),unit.coverage(),unit.origin());
         var units=new java.util.ArrayList<>(seed.units());units.set(0,replacement);
-        var publication=new Publication(seed.id(),seed.airVersion(),seed.capabilities(),seed.artifacts(),units,seed.storage(),seed.resources(),seed.artifactRelations(),seed.origins(),seed.coverage(),seed.uncertainties(),seed.premises());
+        var publication=new Publication(seed.id(),seed.airVersion(),seed.capabilities(),seed.artifacts(),units,storages,seed.resources(),seed.artifactRelations(),seed.origins(),seed.coverage(),seed.uncertainties(),seed.premises());
         var ledger=resources();long[] reads={0};io.github.gustavo2358.analysis.structure.ProgramIndex borrowed;
         try(var pages=new FilePageStore(directory,4096,32,ledger);var original=AirSnapshot.fromPublication(publication)) {
             var storage=new PagedAirStorage(pages,ledger,AnalysisResources.Phase.DECODE);
@@ -61,6 +66,19 @@ final class SnapshotDependencyAnalysisTest {
                         var opened=io.github.gustavo2358.analysis.structure.AnalysisSession.open(cfg,program,cfg.options().projectionPolicy(),program.units().stream().flatMap(u->u.entries().stream()).map(Entries.Entry::id).toList());
                         assertEquals(io.github.gustavo2358.analysis.structure.AnalysisSession.Status.ACCEPTED,opened.status(),opened.reason());
                         borrowed=opened.session().orElseThrow().index();reads[0]=0;
+                        assertEquals(storages.getLast(),borrowed.storage(storages.getLast().header().id()));
+                        assertTrue(reads[0]>0,"structural storage lookup retained a complete decoded identity payload");
+                        reads[0]=0;assertEquals(storages.getLast(),borrowed.storage(storages.getLast().header().id()));
+                        assertTrue(reads[0]>0,"repeated storage lookup must read its cold canonical occurrence");
+                        assertNull(borrowed.storage(new StorageId(new PublicationId("foreign"),storages.getLast().header().id().localId())));
+                        var storageCatalog=borrowed.storageDeclarations();
+                        assertEquals(storages,List.copyOf(storageCatalog.values()),"storage must preserve original AIR order");
+                        assertThrows(UnsupportedOperationException.class,()->storageCatalog.put(storages.getLast().header().id(),storages.getLast()));
+                        assertThrows(UnsupportedOperationException.class,storageCatalog::clear);
+                        assertThrows(UnsupportedOperationException.class,()->storageCatalog.keySet().clear());
+                        assertThrows(UnsupportedOperationException.class,()->storageCatalog.entrySet().iterator().next().setValue(storages.getLast()));
+                        assertEquals(0,retainedUnusedStorageIds(borrowed),"native structural storage retained input-cardinality typed identity payloads");
+                        reads[0]=0;
                         assertEquals(objects.getLast(),borrowed.object(objects.getLast().id()));
                         assertTrue(reads[0]>0,"structural declaration lookup retained a decoded display payload");
                         reads[0]=0;assertEquals(objects.getLast(),borrowed.object(objects.getLast().id()));
@@ -103,6 +121,11 @@ final class SnapshotDependencyAnalysisTest {
                         assertEquals(objects.stream().filter(value->value.typeRef() instanceof Types.Known known
                             &&known.type()==Types.Builtin.TEXT).count(),(long)textSubjects.size());
                         var physical=new io.github.gustavo2358.analysis.storage.StorageIndex(opened.session().orElseThrow());reads[0]=0;
+                        assertEquals(storages,List.copyOf(physical.bases()));
+                        assertTrue(reads[0]>0,"physical bases retained another complete decoded storage inventory");
+                        assertThrows(UnsupportedOperationException.class,()->physical.bases().clear());
+                        assertEquals(0,retainedUnusedStorageIds(physical),"native physical bases retained unused storage identity payloads");
+                        reads[0]=0;
                         assertEquals(objects,List.copyOf(physical.declarations()));
                         assertTrue(reads[0]>0,"physical declarations must share cold addresses rather than copy all bodies");
                         // Equal reconstructed IDs can retain another complete copy of every cold
@@ -117,6 +140,8 @@ final class SnapshotDependencyAnalysisTest {
                     }
                     assertThrows(IllegalStateException.class,()->borrowed.object(objects.getLast().id()));
                     assertThrows(IllegalStateException.class,()->borrowed.directCell(objects.getLast().id()));
+                    assertThrows(IllegalStateException.class,()->borrowed.storage(storages.getLast().header().id()));
+                    assertThrows(IllegalStateException.class,()->borrowed.storageDeclarations().size());
                     assertThrows(IllegalStateException.class,()->borrowed.objectDeclarations().size());
                 }
             }
@@ -128,11 +153,22 @@ final class SnapshotDependencyAnalysisTest {
     /** Walk stored fields, not custom lazy Map/List projections. Counts are actual
      * identity-deduplicated objects, never reported as measured heap bytes. */
     private static int retainedUnusedObjectIds(Object root) throws ReflectiveOperationException {
+        return retainedUnusedIdentities(root,ObjectId.class);
+    }
+    private static int retainedUnusedStorageIds(Object root) throws ReflectiveOperationException {
+        return retainedUnusedIdentities(root,StorageId.class);
+    }
+    private static int retainedUnusedIdentities(Object root,Class<?> identityType) throws ReflectiveOperationException {
         var seen=java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<Object,Boolean>());
         var pending=new java.util.ArrayDeque<Object>();pending.add(root);int count=0;
         while(!pending.isEmpty()) {
             var value=pending.removeFirst();if(!seen.add(value))continue;
-            if(value instanceof ObjectId id&&id.localId().startsWith("unused-")){count++;continue;}
+            if(value instanceof ObjectId id&&id.localId().startsWith("unused-")){
+                if(identityType==ObjectId.class)count++;continue;
+            }
+            if(value instanceof StorageId id&&id.localId().startsWith("unused-")){
+                if(identityType==StorageId.class)count++;continue;
+            }
             var type=value.getClass();var name=type.getName();
             if(value instanceof java.util.Optional<?> optional){optional.ifPresent(pending::addLast);continue;}
             if(type.isArray()){
@@ -631,18 +667,19 @@ final class SnapshotDependencyAnalysisTest {
         }
         for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
 
+        for(boolean storageCatalogue:new boolean[]{false,true}) {
         var catalogLedger=resources();
         try(var pages=new FilePageStore(directory,512,16,catalogLedger);
             var checked=SnapshotValidator.check(AirSnapshot.fromPublication(publication),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,catalogLedger))) {
             long originalPages=pages.statistics().livePages(),originalHeap=catalogLedger.heapUsed();
             var delegate=new PagedSnapshotOrderStorage(pages,catalogLedger);
-            var primary=new IllegalStateException("injected failure after native declaration lookup append");
+            var primary=new IllegalStateException("injected failure after native catalogue lookup append");
             int[] tapes={0},written={0};
             var failing=new io.github.gustavo2358.analysis.dependencies.SnapshotOrderStorage() {
                 @Override public Index open(Order order){return delegate.open(order);}
                 @Override public Tape tape(){
                     var tape=delegate.tape();
-                    if(++tapes[0]!=2)return tape;
+                    if(++tapes[0]!=(storageCatalogue?3:2))return tape;
                     return new Tape(){
                         @Override public void append(long handle){tape.append(handle);written[0]++;throw primary;}
                         @Override public long size(){return tape.size();}
@@ -653,14 +690,17 @@ final class SnapshotDependencyAnalysisTest {
                 @Override public void close(){delegate.close();}
             };
             try(var program=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,catalogLedger),failing,catalogLedger)) {
-                assertSame(primary,assertThrows(IllegalStateException.class,program::declarationInventory));
+                assertSame(primary,assertThrows(IllegalStateException.class,()->{
+                    if(storageCatalogue)program.storageInventory();else program.declarationInventory();
+                }));
                 assertEquals(1,written[0],"failure must occur after a real paged lookup write");
                 assertSame(checked.snapshot(),program.admission().snapshot(),"partial catalogue cleanup must not close the AIR owner");
             }
-            assertEquals(originalPages,pages.statistics().livePages(),"partial declaration tapes or temporary index leaked pages");
-            assertEquals(originalHeap,catalogLedger.heapUsed(),"partial declaration catalogue leaked reservations");
+            assertEquals(originalPages,pages.statistics().livePages(),"partial catalogue tapes or temporary index leaked pages");
+            assertEquals(originalHeap,catalogLedger.heapUsed(),"partial catalogue leaked reservations");
         }
         for(var pool:AnalysisResources.Pool.values())assertEquals(0,catalogLedger.used(pool),pool.toString());
+        }
     }
 
     @Test void pagedPhysicalTupleStorageRejectsDuplicatesAndForeignOrMissingBindings() {

@@ -53,6 +53,13 @@ final class ScalarRelations {
     static ScalarRelations create(Collection<TextProfile.Location> selected,Collection<TextProfile.Write> writes,
             Map<ObjectId,TextProfile.Location> subjects,Runnable progress) {
         int count=subjects.values().stream().mapToInt(TextProfile.Location::ordinal).max().orElse(-1)+1;
+        return create(selected,writes,subjects,count,progress);
+    }
+    /** The owning preparation has already assigned all canonical Cell ordinals.
+     * Do not enumerate cold aliases again merely to recover that cardinality. */
+    static ScalarRelations create(Collection<TextProfile.Location> selected,Collection<TextProfile.Write> writes,
+            Map<ObjectId,TextProfile.Location> subjects,int count,Runnable progress) {
+        if(count<0)throw new IllegalArgumentException("negative Cell cardinality");
         int[] parent=new int[count];boolean[] included=new boolean[count];
         Arrays.setAll(parent,i->i);for(var location:selected)included[location.ordinal()]=true;
         var seeds=new HashSet<Integer>();

@@ -39,6 +39,7 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
     private final EnumMap<AirShape,SnapshotOrderStorage.Tape> metadataOrders=new EnumMap<>(AirShape.class);
     private List<Capabilities.Capability> requiredCapabilities;
     private NativeDeclarations declarationInventory;
+    private NativeStorages storageInventory;
     private Set<Capabilities.Capability> namePolicyExtensions;
     private final EnumMap<ProjectionPolicy,SnapshotNodes> nodeStores=new EnumMap<>(ProjectionPolicy.class);
     private boolean closed;
@@ -240,6 +241,80 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
             if(sourceOrder!=null)try{sourceOrder.close();}catch(RuntimeException|Error cleanup){failure=cleanup;}
             if(lookupOrder!=null)try{lookupOrder.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
             sourceOrder=lookupOrder=null;
+            if(failure instanceof RuntimeException exception)throw exception;if(failure instanceof Error error)throw error;
+        }
+    }
+    @Override public Optional<ProgramStore.StorageInventory> storageInventory(){
+        borrowedOpen();if(storageInventory==null)storageInventory=new NativeStorages();return Optional.of(storageInventory);
+    }
+    /** Source addresses, exact canonical keys and sorted ordinals are all paged.
+     * Sort/lookup compare primitive keys, not repeated cold full-text projections. */
+    private final class NativeStorages extends AbstractMap<StorageId,Memory.Storage>
+            implements ProgramStore.StorageInventory,AutoCloseable {
+        private SnapshotOrderStorage.Tape sourceOrder,sourceKeys,lookupOrder;
+        private boolean ended;
+        NativeStorages(){
+            try {
+                sourceOrder=orderStorage.tape();sourceKeys=orderStorage.tape();
+                try(var index=orderStorage.open((a,b)->Long.compare(sourceKeys.handle(a-1),sourceKeys.handle(b-1)))) {
+                    long values=field(snapshot.root(),5);
+                    for(long at=0;at<snapshot.size(values);at++){
+                        long value=snapshot.element(values,MEMORY_STORAGE,at);
+                        sourceOrder.append(value);sourceKeys.append(keys.key(field(field(value,0),0)));index.add(at+1);
+                    }
+                    lookupOrder=orderStorage.tape();
+                    try(var rows=index.cursor()){
+                        long previous=0;
+                        while(rows.advance()){
+                            long ordinal=rows.handle(),key=sourceKeys.handle(ordinal-1);
+                            if(key<=previous)throw new IllegalArgumentException("duplicate canonical Storage identity");
+                            lookupOrder.append(ordinal);previous=key;
+                        }
+                    }
+                    if(sourceKeys.size()!=sourceOrder.size()||lookupOrder.size()!=sourceOrder.size())
+                        throw new IllegalArgumentException("duplicate Storage occurrence");
+                }
+            }catch(RuntimeException|Error failure){try{close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;}
+        }
+        private void available(){borrowedOpen();if(ended)throw new IllegalStateException("native storage inventory is closed");}
+        @Override public int size(){available();return Math.toIntExact(sourceOrder.size());}
+        @Override public boolean identityAt(int ordinal,StorageId identity){
+            available();Objects.requireNonNull(identity);
+            return ordinal>=0&&ordinal<sourceOrder.size()&&keys.key(identity)==sourceKeys.handle(ordinal);
+        }
+        private long source(Object key){
+            available();if(!(key instanceof StorageId identity))return 0;
+            long wanted=keys.key(identity),low=0,high=lookupOrder.size();
+            while(low<high){
+                long middle=low+(high-low)/2,ordinal=lookupOrder.handle(middle)-1,found=sourceKeys.handle(ordinal);
+                if(found<wanted)low=middle+1;else if(found>wanted)high=middle;else return sourceOrder.handle(ordinal);
+            }
+            return 0;
+        }
+        @Override public boolean containsKey(Object key){return source(key)!=0;}
+        @Override public Memory.Storage get(Object key){
+            long source=source(key);if(source==0)return null;var value=occurrence(source,Memory.Storage.class);
+            if(!value.header().id().equals(key))throw new IllegalStateException("changed indexed Storage identity");return value;
+        }
+        @Override public Set<Entry<StorageId,Memory.Storage>> entrySet(){
+            available();return Collections.unmodifiableSet(new AbstractSet<>() {
+                @Override public int size(){return NativeStorages.this.size();}
+                @Override public Iterator<Entry<StorageId,Memory.Storage>> iterator(){available();return new Iterator<>() {
+                    private long ordinal;
+                    @Override public boolean hasNext(){available();return ordinal<sourceOrder.size();}
+                    @Override public Entry<StorageId,Memory.Storage> next(){
+                        if(!hasNext())throw new NoSuchElementException();
+                        var value=occurrence(sourceOrder.handle(ordinal++),Memory.Storage.class);
+                        return new SimpleImmutableEntry<>(value.header().id(),value);
+                    }
+                };}
+            });
+        }
+        @Override public void close(){
+            if(ended)return;ended=true;Throwable failure=null;
+            for(var tape:new SnapshotOrderStorage.Tape[]{sourceOrder,sourceKeys,lookupOrder})if(tape!=null)
+                try{tape.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
+            sourceOrder=sourceKeys=lookupOrder=null;
             if(failure instanceof RuntimeException exception)throw exception;if(failure instanceof Error error)throw error;
         }
     }
@@ -970,6 +1045,7 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
     private void open(){if(closed)throw new IllegalStateException("snapshot program is closed");}
     @Override public void close(){if(closed)return;closed=true;Throwable failure=null;
         try{if(declarationInventory!=null)declarationInventory.close();}catch(RuntimeException|Error cleanup){failure=cleanup;}
+        try{if(storageInventory!=null)storageInventory.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
         for(var nodes:nodeStores.values())try{nodes.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
         try{if(unitOrder!=null)unitOrder.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
         for(var tape:metadataOrders.values())try{tape.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}

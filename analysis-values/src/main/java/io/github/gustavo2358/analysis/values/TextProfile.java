@@ -45,8 +45,8 @@ final class TextProfile {
         var entryUnits=session.contexts().stream().map(c->c.entry().id().unit()).collect(java.util.stream.Collectors.toCollection(LinkedHashSet::new));
         var cells=new HashMap<StorageId,Location>();
         var nativeSubjects=store.declarationInventory().isPresent()?new NativeSubjects(index,cells):null;
-        subjects=nativeSubjects==null?new HashMap<>():nativeSubjects;
-        textSubjects=nativeSubjects==null?new HashSet<>():nativeSubjects.texts();
+        if(nativeSubjects==null){subjects=new HashMap<>();textSubjects=new HashSet<>();}
+        else {subjects=nativeSubjects;textSubjects=nativeSubjects.texts();}
         for(var declaration:index.objectDeclarations().entrySet()) {
             var object=declaration.getValue();
             store.progress(ProgramStore.ExecutionPhase.DEMAND);
@@ -116,7 +116,7 @@ final class TextProfile {
             }
             sourceOpen.put(unit.id(),open);visible.put(unit.id(),Set.copyOf(unit.visibleObjects()));
         }
-        relations=ScalarRelations.create(this.selected,preparedWrites,subjects,()->store.progress(ProgramStore.ExecutionPhase.DOMAIN));
+        relations=ScalarRelations.create(this.selected,preparedWrites,subjects,cells.size(),()->store.progress(ProgramStore.ExecutionPhase.DOMAIN));
         for(var context:session.contexts()) {
             if(!context.entry().state().uncertainties().isEmpty())sourceOpenEntries.add(context.entry().id());
             var seed=PossibleValuesState.reached();var initial=new HashMap<Integer,Values.TextValue>();var initialized=new HashSet<Integer>();
@@ -170,8 +170,10 @@ final class TextProfile {
         void include(boolean text){count=Math.incrementExact(count);if(text)textCount=Math.incrementExact(textCount);}
         private Location location(Memory.ObjectDeclaration object){
             if(object==null||!(object.storage() instanceof Memory.CellBinding binding)||!cellDomain(object.typeRef()))return null;
-            var base=index.storage(binding.storage());
-            return base instanceof Memory.Cell cell&&cellDomain(cell.typeRef())?cells.get(binding.storage()):null;
+            // The complete admission scan above inserts only supported Cells;
+            // immutable bindings can borrow that association without decoding
+            // and checking the same storage body for every alias query.
+            return cells.get(binding.storage());
         }
         @Override public int size(){index.objectDeclarations().size();return count;}
         @Override public Location get(Object key){return key instanceof ObjectId id?location(index.object(id)):null;}

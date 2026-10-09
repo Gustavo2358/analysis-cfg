@@ -27,7 +27,7 @@ final class IndexBuilder {
     final Map<OperationId, ProgramIndex.Site> operations = new HashMap<>();
     final Map<Class<? extends Operation>, List<ProgramIndex.Site>> buckets = new HashMap<>();
     final ProgramIndex.Declarations objects = new ProgramIndex.Declarations();
-    final Map<StorageId, Memory.Storage> storage = new HashMap<>();
+    final ProgramIndex.Storages storage = new ProgramIndex.Storages();
     Map<ObjectId, Memory.Cell> directCells = new HashMap<>();
     final Map<OperandId, Place> places = new HashMap<>();
     final Map<OperandId, ObjectId> objectReferences = new HashMap<>();
@@ -102,6 +102,7 @@ final class IndexBuilder {
                 count.objects = Math.incrementExact(count.objects);
             }
         }
+        storage.connect(store.storageInventory());
         for (Memory.Storage item : store.storage()) {
             count.visit("storage");
             valid(item.header().id().publication().equals(store.publicationId()), "foreign Storage owner");
@@ -109,7 +110,7 @@ final class IndexBuilder {
                 count.reference("storage.owner");
                 valid(units.containsKey(item.header().owner().orElseThrow()), "missing Storage Unit");
             }
-            unique(storage, item.header().id(), item, "duplicate Storage");
+            valid(storage.append(item.header().id(),item),"duplicate Storage");
             if (item instanceof Memory.Cell) count.locations = Math.incrementExact(count.locations);
         }
         var objectIdentities=objects.keySet().iterator();

@@ -30,7 +30,7 @@ public final class StorageIndex {
         public boolean exact() { return remainder instanceof Scopes.NoMemory && candidates.stream().map(Candidate::location).distinct().count()==1; }
     }
     private final AnalysisSession session;
-    private final Map<StorageId,Memory.Storage> bases=new LinkedHashMap<>();
+    private final Map<StorageId,Memory.Storage> bases;
     private final Map<ObjectId,Memory.ObjectDeclaration> declarations;
     private final Map<ObjectId,Resolution> objects=new HashMap<>();
     private final Map<StorageId,Set<PremiseId>> separation=new HashMap<>();
@@ -41,7 +41,11 @@ public final class StorageIndex {
         this.session=Objects.requireNonNull(session);
         var store=session.index().store();
         store.uncertainties().forEach(u->uncertaintyIds.add(u.id()));
-        for(var base:store.storage())bases.put(base.header().id(),base);
+        if(store.storageInventory().isPresent())bases=session.index().storageDeclarations();
+        else {
+            bases=new LinkedHashMap<>();
+            for(var base:store.storage())bases.put(base.header().id(),base);
+        }
         declarations=session.index().objectDeclarations();
         for(var premise:store.premises())if(premise.assertion() instanceof Proofs.DisjointStorage d)
             for(var id:d.storage()) { separation.computeIfAbsent(id,ignored->new HashSet<>()).add(premise.id());premiseMembers++; }

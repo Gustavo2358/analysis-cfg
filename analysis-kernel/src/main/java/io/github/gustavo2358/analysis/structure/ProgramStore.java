@@ -29,6 +29,8 @@ public interface ProgramStore {
         /** Complete immutable declaration catalogue supplied by an admitted owner.
          * Empty selects the explicit resident compatibility inventory. */
         default Optional<DeclarationInventory> declarationInventory(){return Optional.empty();}
+        /** Complete storage catalogue; absent selects caller-managed resident compatibility. */
+        default Optional<StorageInventory> storageInventory(){return Optional.empty();}
         /** Exact identity lookup. Native implementations can resolve a cold address without
          * retaining every Origin body. The resident compatibility default remains explicit. */
         default Origins.Origin origin(OriginId id) {
@@ -40,6 +42,10 @@ public interface ProgramStore {
      * identityAt checks the complete identity, never position alone. */
     interface DeclarationInventory extends Map<ObjectId,Memory.ObjectDeclaration> {
         boolean identityAt(int ordinal,ObjectId identity);
+    }
+    /** Original AIR order and exact nominal lookup without retaining every storage body. */
+    interface StorageInventory extends Map<StorageId,Memory.Storage> {
+        boolean identityAt(int ordinal,StorageId identity);
     }
 
     /** Metadata/body addresses, not an owning Unit containing the complete executable payload. */

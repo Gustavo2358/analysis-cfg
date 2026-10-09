@@ -254,3 +254,61 @@ were verified unchanged after execution. These are individual finite runs, not
 three-repeat medians or universal throughput bounds. The earlier physical TIME
 and inventory FAIL remain historical evidence; consumer remote FAST still needs
 the final commit. Original quotas/oracles are unchanged; AS-W09/W10 remain PARTIAL.
+
+## Native storage catalogue and remaining broad physical effects
+
+The structural storage catalogue now borrows source addresses, canonical keys and
+lookup ordinals from three paged tapes. Keys are read once for sorting; binary
+lookup compares complete canonical identities before decoding one cold body.
+Every original ownership, duplicate and CellBinding check still executes in AIR
+order. Physical StorageIndex bases share this immutable catalogue instead of
+retaining another decoded inventory. The resident route remains explicit.
+
+The existing nominal law retains its128 Object/display cases and adds128 private
+Cells with4096-character identities. It checks repeated cold reads, full namespace,
+AIR order, immutable views, zero stored unused StorageIds and closed-owner rejection.
+A real third-tape append failure preserves the primary error and releases all
+partial pages/reservations without closing AIR. Focused kernel24, dependencies10,
+backend13 and order/cleanup2 methods passed without skips.
+
+A new135,205,355-byte input with2048 private Cell storages and65536-character
+identities exhausted128MiB in IndexBuilder on the frozen90c0375/650a546 build.
+The native catalogue completes that unchanged public Java21 CLI case in39.36s
+under the original eight-minute deadline. The independent oracle preserves all21
+semantic fields,46 origins and CFG; whole bytes equal the original seed product.
+The experimental-physical option also completes in39.71s but selects Scalar, not
+Region; it is not a physical Region qualification.
+
+The corresponding135,230,514-byte Region input reaches later physical preparation,
+then exhausts heap in StorageIndex.select/StatementEffects while expanding broad
+AllMemory effects into full candidate headers. That47.57s OOM is still a delivery
+blocker, with no product published; neither quotas nor effects were narrowed.
+Alias/resolution, broad effects, partition/domain and other variable stores remain
+resident. These finite Cell results do not close AS-W09/W10.
+
+Remote90c0375 had W3 inventory drift and a separate cancellation, not PASS.
+Isolated Java21/25 compilation with equal release/debug options identifies only
+an AbstractMap StackMap edge from TextProfile's constructor ternary. An equivalent
+if avoids the edge; both compiler dependency sets now match, and21 logical family
+methods passed. No deny rule or compiler-normalization exemption was introduced.
+The first coherent storage/compatibility FAST failed at the unchanged256-Unit
+general planner fixture: redundant cold alias/storage reads exhausted the original
+one-billion WORK quota. Its failure is preserved, not relabeled as qualification.
+Scalar relation preparation now receives the canonical Cell cardinality already
+computed by its owner; native alias lookup borrows the admitted Cell association
+without decoding the same immutable base again. Every original declaration and
+storage-domain check still runs. The existing sparse-demand law rejects catalogue
+enumeration during this preparation (focused RED), then passes with the fix.
+The21 logical family methods and three native integration/cleanup methods pass;
+the unchanged256-Unit case preserves candidates/supports with727,420,314 WORK.
+
+The stabilized Java21 public Cell pressure case completes in39.62s at128MiB,
+with all21 semantic fields,46 origins and CFG independently preserved. Its entire
+outputs match the frozen seed reference. Runtime classes and changed inputs remain
+identical before/after that execution. The corrected complete FAST passes all1158
+methods without failures/errors/skips, architectural boundaries and post-checks
+in746.582s. The frozen13 inputs are unchanged after the gate. All producer/consumer
+runtime class bytes also match the pre-CLI manifest after the clean rebuild, so
+the finite public CLI qualification applies to the actual stabilized FAST build.
+Remote CI for the new commit is still pending;90c0375 is not a remote PASS.
+The broad Region OOM remains unresolved; this is not AS-W09/W10 completion.

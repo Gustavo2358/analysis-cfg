@@ -88,6 +88,13 @@ class LogicalExpressionsTest {
   var run=admission.analysis().orElseThrow().execute();expected(fact(run,before(q,0,1)),false,"PROGA   ");assertEquals(2L,run.preparationMetrics().get("demandCellsPrepared"));
   var supports=fact(run,before(q,0,1)).candidateSupports().getFirst().producers().stream().map(x->x.evidence().localId()).toList();
   assertEquals(List.of("capture","partial"),supports,"retain the actual expression chain; later overwrite is not a producer");
+  // Structural preparation already knows the canonical Cell cardinality. A
+  // demanded relation must not enumerate every cold alias to rediscover it.
+  var sparse=new TextProfile.Location(19,(Memory.Cell)p.storage().get(19));
+  var lookupOnly=new AbstractMap<ObjectId,TextProfile.Location>() {
+   @Override public Set<Entry<ObjectId,TextProfile.Location>> entrySet(){throw new AssertionError("relation preparation rescanned the complete nominal catalogue");}
+  };
+  assertFalse(ScalarRelations.create(List.of(sparse),List.of(),lookupOnly,20,()->{}).active());
  }
  @Test void branchAlternativesStayWholeThroughRepeatedRootReads(){
   var p=graph(new String[]{null,null,null,null},new int[][]{{1,2},{3},{3},{}},2,true,true);var u=p.units().getFirst();var root=u.objects().get(0).id();var dest=u.objects().get(1).id();var sequences=new ArrayList<>(u.sequences());

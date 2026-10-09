@@ -74,7 +74,7 @@ public final class ProgramIndex {
                         .sorted(Comparator.comparingInt(n -> n.ordinal)).toList());
             }
         }
-        operations = b.operations; b.objects.freeze();objects = b.objects; storage = b.storage;
+        operations = b.operations; b.objects.freeze();objects = b.objects; b.storage.freeze();storage = b.storage;
         if(b.directCells instanceof CellAssociations cells)cells.freeze();
         directCells = b.directCells; objectReferences = b.objectReferences;places=b.places;
         entries = b.entries; entryOrdinals = b.entryOrdinals;
@@ -126,6 +126,8 @@ public final class ProgramIndex {
     /** Same immutable declaration addresses, not another catalog of decoded AIR bodies. */
     public Map<ObjectId,Memory.ObjectDeclaration> objectDeclarations(){return Collections.unmodifiableMap(objects);}
     public Memory.Storage storage(StorageId id) { return storage.get(id); }
+    /** Same complete immutable catalogue used during structural admission. */
+    public Map<StorageId,Memory.Storage> storageDeclarations(){return Collections.unmodifiableMap(storage);}
     /** Direct whole Cell association only; null does not assert absence of indirect storage. */
     public Memory.Cell directCell(ObjectId id) { return directCells.get(id); }
     public Place place(OperandId occurrence){return places.get(occurrence);}
@@ -135,6 +137,30 @@ public final class ProgramIndex {
     public ProgramStore.SequenceView sequence(Node node) {
         if (node.identity != identity) throw new IllegalArgumentException("foreign node");
         return node.sequence;
+    }
+
+    /** Native storage borrows the admitted directory; resident callers keep their original bodies. */
+    static final class Storages extends AbstractMap<StorageId,Memory.Storage> {
+        private final Map<StorageId,Memory.Storage> resident=new HashMap<>();
+        private ProgramStore.StorageInventory inventory;
+        private int registered;private boolean frozen;
+        void connect(Optional<ProgramStore.StorageInventory> inventory){
+            if(frozen||registered!=0||!resident.isEmpty())throw new IllegalStateException("storage inventory already started");
+            this.inventory=Objects.requireNonNull(inventory).orElse(null);
+        }
+        boolean append(StorageId id,Memory.Storage value){
+            if(frozen)throw new IllegalStateException("storage inventory is frozen");
+            if(inventory!=null){
+                if(!inventory.identityAt(registered,Objects.requireNonNull(id)))return false;
+                registered=Math.incrementExact(registered);return true;
+            }
+            return resident.putIfAbsent(Objects.requireNonNull(id),Objects.requireNonNull(value))==null;
+        }
+        void freeze(){if(inventory!=null&&registered!=inventory.size())throw new IllegalStateException("changed Storage inventory");frozen=true;}
+        @Override public int size(){return inventory==null?resident.size():inventory.size();}
+        @Override public Memory.Storage get(Object key){return inventory==null?resident.get(key):inventory.get(key);}
+        @Override public boolean containsKey(Object key){return inventory==null?resident.containsKey(key):inventory.containsKey(key);}
+        @Override public Set<Entry<StorageId,Memory.Storage>> entrySet(){return Collections.unmodifiableSet(inventory==null?resident.entrySet():inventory.entrySet());}
     }
 
     /** Identity inventory owns only immutable list addresses. Native payloads remain cold;
