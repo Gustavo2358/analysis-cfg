@@ -44,8 +44,12 @@ final class SnapshotDependencyOutputScaleTest {
         @Override public void computedCalls(Consumer<ComputedCall> consumer){for(int i=1023;i>=0;i--){String suffix=String.format("%04d",i);consumer.accept(new ComputedCall(7,UNIT,new EntryId(UNIT,"entry-"+suffix),new LabelId(UNIT,"sequence-"+suffix),new OperationId(UNIT,"operation-"+suffix),new OriginId(PUBLICATION,"site-"+suffix),new OriginId(PUBLICATION,"target-"+suffix),Evidence.CoverageStatus.MODELED,"cobol.program",new ObjectId(UNIT,"subject-"+suffix)));}}
         @Override public void artifactHandles(MetadataHandleConsumer consumer){for(int i=1023;i>=0;i--)consumer.accept(i+1,"artifact-"+String.format("%04d",i));}
         @Override public void originHandles(MetadataHandleConsumer consumer){for(int i=1023;i>=0;i--)consumer.accept(i+1,"origin-"+String.format("%04d",i));}
+        @Override public void originInputHandles(long originHandle,MetadataHandleConsumer consumer){if(originHandle==1)for(int i=4095;i>=0;i--)consumer.accept(i+5000,"input-"+String.format("%04d",i));}
         @Override public Origins.Artifact materializeArtifact(long handle){String suffix=String.format("%04d",handle-1);return new Origins.Artifact(new ArtifactId(PUBLICATION,"artifact-"+suffix),"source-"+suffix+".cbl",java.util.Optional.empty());}
         @Override public Origins.Origin materializeOrigin(long handle){String suffix=String.format("%04d",handle-1);return new Origins.Unavailable(new OriginId(PUBLICATION,"origin-"+suffix),"scale evidence "+suffix);}
+        @Override public OriginView originView(long handle){String suffix=String.format("%04d",handle-1);return handle==1?new OriginView.Derived(new OriginId(PUBLICATION,"origin-"+suffix),"scale-derived"):new OriginView.Unavailable(new OriginId(PUBLICATION,"origin-"+suffix),"scale evidence "+suffix);}
+        @Override public OriginId materializeOriginInput(long handle){return new OriginId(PUBLICATION,"input-"+String.format("%04d",handle-5000));}
+        @Override public Iterable<Origins.IncludeFrame> cursorOriginIncludes(long originHandle){return List.of();}
         @Override public long materializationBytes(Definition definition){return 16;}
         @Override public String materialize(Definition definition){return "TARGET  ";}
         @Override public OperationId operationId(long handle){return new OperationId(UNIT,"producer");}

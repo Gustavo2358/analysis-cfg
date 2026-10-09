@@ -344,6 +344,35 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
         }
     }
 
+    @Override public void originInputHandles(long row,MetadataHandleConsumer consumer) {
+        open();Objects.requireNonNull(consumer);if(snapshot.shape(row)!=ORIGINS_DERIVED)return;
+        try(var inputs=snapshot.elements(snapshot.field(row,ORIGINS_DERIVED,1),IDS_ORIGIN_ID)) {
+            while(inputs.advance()){long input=inputs.value();consumer.accept(input,localId(input));}
+        }
+    }
+
+    @Override public OriginView originView(long row) {
+        open();return switch(snapshot.shape(row)) {
+            case ORIGINS_UNAVAILABLE -> new OriginView.Unavailable((OriginId)id(snapshot.field(row,ORIGINS_UNAVAILABLE,0)),text(snapshot.field(row,ORIGINS_UNAVAILABLE,1)));
+            case ORIGINS_CONTRACTUAL -> new OriginView.Contractual((OriginId)id(snapshot.field(row,ORIGINS_CONTRACTUAL,0)),text(snapshot.field(row,ORIGINS_CONTRACTUAL,1)),text(snapshot.field(row,ORIGINS_CONTRACTUAL,2)));
+            case ORIGINS_DERIVED -> new OriginView.Derived((OriginId)id(snapshot.field(row,ORIGINS_DERIVED,0)),text(snapshot.field(row,ORIGINS_DERIVED,2)));
+            case ORIGINS_WRITTEN -> {long at=snapshot.field(row,ORIGINS_WRITTEN,2);yield new OriginView.Written((OriginId)id(snapshot.field(row,ORIGINS_WRITTEN,0)),(ArtifactId)id(snapshot.field(row,ORIGINS_WRITTEN,1)),snapshot.size(at)==0?Optional.empty():Optional.of(location(snapshot.element(at,ORIGINS_LOCATION,0))),snapshot.scalar(snapshot.field(row,ORIGINS_WRITTEN,4))!=0);}
+            default -> throw new IllegalStateException("unsupported origin shape "+snapshot.shape(row));
+        };
+    }
+
+    @Override public OriginId materializeOriginInput(long handle){open();return (OriginId)id(handle);}
+
+    @Override public Iterable<Origins.IncludeFrame> cursorOriginIncludes(long row) {
+        open();if(snapshot.shape(row)!=ORIGINS_WRITTEN)return List.of();long includes=snapshot.field(row,ORIGINS_WRITTEN,3);
+        return ()->{open();var values=snapshot.elements(includes,ORIGINS_INCLUDE_FRAME);return new Iterator<>(){
+            private boolean prepared,available,closed;public boolean hasNext(){open();if(closed)return false;if(!prepared){available=values.advance();prepared=true;if(!available){values.close();closed=true;}}return available;}
+            public Origins.IncludeFrame next(){if(!hasNext())throw new NoSuchElementException();prepared=false;long value=values.value(),site=snapshot.field(value,ORIGINS_INCLUDE_FRAME,3);return new Origins.IncludeFrame(
+                (ArtifactId)id(snapshot.field(value,ORIGINS_INCLUDE_FRAME,0)),(ArtifactId)id(snapshot.field(value,ORIGINS_INCLUDE_FRAME,1)),
+                text(snapshot.field(value,ORIGINS_INCLUDE_FRAME,2)),snapshot.size(site)==0?Optional.empty():Optional.of(location(snapshot.element(site,ORIGINS_LOCATION,0))));}
+        };};
+    }
+
     @Override public Origins.Origin materializeOrigin(long row) {
         open();return switch(snapshot.shape(row)) {
             case ORIGINS_UNAVAILABLE -> new Origins.Unavailable((OriginId)id(snapshot.field(row,ORIGINS_UNAVAILABLE,0)),text(snapshot.field(row,ORIGINS_UNAVAILABLE,1)));

@@ -20,6 +20,7 @@ public final class SnapshotDependencyAnalysis {
         long candidateCount();long unknownRemainderCount();
         void addArtifact(long handle,String localId);void selectArtifacts();boolean advanceArtifact();long artifactHandle();
         void addOrigin(long handle,String localId);void selectOrigins();boolean advanceOrigin();long originHandle();
+        void addOriginInput(long originHandle,long inputHandle,String localId);void selectOriginInputs(long originHandle);boolean advanceOriginInput();long originInputHandle();
         AirSnapshotBuilder.Lease claim(long bytes);@Override void close();
     }
 
@@ -51,7 +52,8 @@ public final class SnapshotDependencyAnalysis {
             program.definitions(definition->{try(var materialized=storage.claim(program.materializationBytes(definition))){Objects.requireNonNull(materialized);long candidate=storage.add(definition.objectKey(),program.materialize(definition));
                 for(var producer:definition.producers())storage.addSupport(candidate,program.operationId(producer.operation()),program.originId(producer.origin()));}});
             program.computedCalls(storage::addCall);
-            program.originHandles(storage::addOrigin);program.artifactHandles(storage::addArtifact);
+            program.originHandles((handle,localId)->{storage.addOrigin(handle,localId);program.originInputHandles(handle,(input,inputId)->storage.addOriginInput(handle,input,inputId));});
+            program.artifactHandles(storage::addArtifact);
             return new SnapshotDependencyCursorResult(program.publicationId(),program.inventory(),program,storage);
         } catch(RuntimeException|Error failure) {
             try{storage.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}

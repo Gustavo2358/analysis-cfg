@@ -18,6 +18,13 @@ public final class SnapshotDependencyCursorResult implements AutoCloseable {
     public record CursorSite(UnitId caller,EntryId entry,LabelId sequence,OperationId operation,OriginId siteOrigin,
             OriginId targetOrigin,Evidence.CoverageStatus coverage,String namespace,ObjectId subject,
             Iterable<CursorCandidate> candidates,boolean hasCandidates,boolean unknownRemainder) { }
+    public sealed interface CursorOrigin {
+        OriginId id();
+        record Unavailable(OriginId id,String reason) implements CursorOrigin { }
+        record Derived(OriginId id,Iterable<OriginId> inputs,String rule) implements CursorOrigin { }
+        record Contractual(OriginId id,String authority,String version) implements CursorOrigin { }
+        record Written(OriginId id,ArtifactId artifact,Optional<Origins.Location> location,Iterable<Origins.IncludeFrame> includes,boolean exact) implements CursorOrigin { }
+    }
 
     private final PublicationId publication;
     private final Evidence.InventoryStatus coverage;
@@ -33,9 +40,9 @@ public final class SnapshotDependencyCursorResult implements AutoCloseable {
 
     public PublicationId publication(){open();return publication;}
     public Evidence.InventoryStatus coverage(){open();return coverage;}
-    public Iterable<Origins.Origin> cursorOrigins(){open();return ()->{open();storage.selectOrigins();return new Iterator<>(){
+    public Iterable<CursorOrigin> cursorOrigins(){open();return ()->{open();storage.selectOrigins();return new Iterator<>(){
         private boolean prepared,available;public boolean hasNext(){open();if(!prepared){available=storage.advanceOrigin();prepared=true;}return available;}
-        public Origins.Origin next(){if(!hasNext())throw new NoSuchElementException();prepared=false;return program.materializeOrigin(storage.originHandle());}
+        public CursorOrigin next(){if(!hasNext())throw new NoSuchElementException();prepared=false;long handle=storage.originHandle();return cursorOrigin(handle,program.originView(handle));}
     };};}
     public Iterable<Origins.Artifact> cursorArtifacts(){open();return ()->{open();storage.selectArtifacts();return new Iterator<>(){
         private boolean prepared,available;public boolean hasNext(){open();if(!prepared){available=storage.advanceArtifact();prepared=true;}return available;}
@@ -73,7 +80,7 @@ public final class SnapshotDependencyCursorResult implements AutoCloseable {
 
     public DirectDependencyResult materialize() {
         open();var sites=new ArrayList<DirectDependencyResult.Site>();for(var site:sites())sites.add(site);
-        var origins=new ArrayList<Origins.Origin>();for(var origin:cursorOrigins())origins.add(origin);
+        var origins=new ArrayList<Origins.Origin>();storage.selectOrigins();while(storage.advanceOrigin())origins.add(program.materializeOrigin(storage.originHandle()));
         var artifacts=new ArrayList<Origins.Artifact>();for(var artifact:cursorArtifacts())artifacts.add(artifact);
         return new DirectDependencyResult(publication,coverage,origins,artifacts,sites);
     }
@@ -89,6 +96,20 @@ public final class SnapshotDependencyCursorResult implements AutoCloseable {
             new ObjectId(caller,storage.callSubject()),candidates,candidateCount!=0,
             coverage!=Evidence.InventoryStatus.COMPLETE||siteCoverage!=Evidence.CoverageStatus.MODELED||candidateCount==0);
     }
+
+    private CursorOrigin cursorOrigin(long handle,DependencyProgramStore.OriginView view) {
+        return switch(view) {
+            case DependencyProgramStore.OriginView.Unavailable value -> new CursorOrigin.Unavailable(value.id(),value.reason());
+            case DependencyProgramStore.OriginView.Derived value -> new CursorOrigin.Derived(value.id(),originInputs(handle),value.rule());
+            case DependencyProgramStore.OriginView.Contractual value -> new CursorOrigin.Contractual(value.id(),value.authority(),value.version());
+            case DependencyProgramStore.OriginView.Written value -> new CursorOrigin.Written(value.id(),value.artifact(),value.location(),program.cursorOriginIncludes(handle),value.exact());
+        };
+    }
+
+    private Iterable<OriginId> originInputs(long originHandle){return ()->{open();storage.selectOriginInputs(originHandle);return new Iterator<>(){
+        private boolean prepared,available;public boolean hasNext(){open();if(!prepared){available=storage.advanceOriginInput();prepared=true;}return available;}
+        public OriginId next(){if(!hasNext())throw new NoSuchElementException();prepared=false;return program.materializeOriginInput(storage.originInputHandle());}
+    };};}
 
     private Iterable<CursorCandidate> candidates(long object){return ()->new Iterator<>(){
         private boolean prepared,available;

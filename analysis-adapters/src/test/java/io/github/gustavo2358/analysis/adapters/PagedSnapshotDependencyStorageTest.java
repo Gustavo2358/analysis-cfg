@@ -10,14 +10,17 @@ import static org.junit.jupiter.api.Assertions.*;
 
 final class PagedSnapshotDependencyStorageTest {
     @Test void metadataHandlesArePageBackedAndOrderedWithoutMaterializingCollections() throws Exception {
-        var resources=new AnalysisResources(new AnalysisResources.Limits(65_536,65_536,0,64_000_000,4,1_000_000_000,1_000_000));
+        var resources=new AnalysisResources(new AnalysisResources.Limits(131_072,131_072,0,64_000_000,4,1_000_000_000,1_000_000));
         var directory=Files.createTempDirectory("snapshot-dependency-metadata-");
         try(var pages=new FilePageStore(directory,128,1,resources);var storage=new PagedSnapshotDependencyStorage(pages,resources)) {
             for(int i=1023;i>=0;i--){String suffix=String.format("%04d",i);storage.addOrigin(i+1,"origin-"+suffix);storage.addArtifact(i+2049,"artifact-"+suffix);}
+            for(int i=4095;i>=0;i--)storage.addOriginInput(1,i+4097,"input-"+String.format("%04d",i));
             storage.selectOrigins();long origin=1;while(storage.advanceOrigin())assertEquals(origin++,storage.originHandle());assertEquals(1025,origin);
             storage.selectArtifacts();long artifact=2049;while(storage.advanceArtifact())assertEquals(artifact++,storage.artifactHandle());assertEquals(3073,artifact);
-            assertTrue(resources.heapPeak()<=65_536);assertTrue(pages.statistics().evictions()>1000);
-            System.out.println("SNAPSHOT_DEPENDENCY_METADATA_CURSOR_METRICS heap="+resources.heapPeak()+" temporary="+resources.used(AnalysisResources.Pool.TEMPORARY)+" records=2048 evictions="+pages.statistics().evictions());
+            storage.selectOriginInputs(1);long input=4097;while(storage.advanceOriginInput())assertEquals(input++,storage.originInputHandle());assertEquals(8193,input);
+            storage.selectOriginInputs(2);assertFalse(storage.advanceOriginInput());
+            assertTrue(resources.heapPeak()<=131_072);assertTrue(pages.statistics().evictions()>1000);
+            System.out.println("SNAPSHOT_DEPENDENCY_METADATA_CURSOR_METRICS heap="+resources.heapPeak()+" temporary="+resources.used(AnalysisResources.Pool.TEMPORARY)+" records=6144 evictions="+pages.statistics().evictions());
         } finally {Files.deleteIfExists(directory);}
         assertEquals(0,resources.heapUsed());
     }

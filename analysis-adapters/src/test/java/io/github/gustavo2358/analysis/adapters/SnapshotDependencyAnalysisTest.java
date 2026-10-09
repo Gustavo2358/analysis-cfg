@@ -170,7 +170,9 @@ final class SnapshotDependencyAnalysisTest {
         var entry=ResultFixtures.entry(unit,"entry","start");var initialPlace=new Places.ObjectPlace(new Operand.Header(new OperandId(new EntryOwner(entry.id()),"condition"),Operand.Role.VALUE_WRITE,origin),conditionObject);
         entry=new Entries.Entry(entry.id(),entry.initialLabel(),entry.signature(),new Entries.EntryState(List.of(new Entries.InitialCondition(initialPlace,new Entries.ExternalUnknown(reason),origin,List.of())),List.of(reason)),entry.origin());
         var base=ResultFixtures.publication(publication,List.of(ResultFixtures.unit(unit,List.of(entry),List.of(start,left,right,join,end),objects)),storage);
-        var artifact=new ArtifactId(publication,"source");return new Publication(base.id(),base.airVersion(),base.capabilities(),List.of(new Origins.Artifact(artifact,"SnapshotDependencyAnalysisTest.java",Optional.empty())),base.units(),base.storage(),base.resources(),base.artifactRelations(),List.of(new Origins.Written(origin,artifact,Optional.empty(),List.of(),true)),base.coverage(),
+        var artifact=new ArtifactId(publication,"source");var included=new ArtifactId(publication,"included");var derived=new OriginId(publication,"derived");
+        return new Publication(base.id(),base.airVersion(),base.capabilities(),List.of(new Origins.Artifact(artifact,"SnapshotDependencyAnalysisTest.java",Optional.empty()),new Origins.Artifact(included,"included.copy",Optional.empty())),base.units(),base.storage(),base.resources(),base.artifactRelations(),
+            List.of(new Origins.Written(origin,artifact,Optional.empty(),List.of(new Origins.IncludeFrame(artifact,included,"included.copy",Optional.empty())),true),new Origins.Derived(derived,List.of(origin),"test-derivation")),base.coverage(),
             List.of(new Evidence.Uncertainty(reason,"VALUE_UNKNOWN",List.of(Evidence.Dimension.VALUES),new Scopes.UnitScope(unit),"branch input",origin)),base.premises());
     }
 }

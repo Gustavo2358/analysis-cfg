@@ -64,6 +64,12 @@ public final class SnapshotDependencyJson {
         case Origins.Contractual value->object("id",id(value.id()),"kind","CONTRACTUAL","authority",value.authority(),"version",value.version());
         case Origins.Written value->object("id",id(value.id()),"kind","WRITTEN","artifact",id(value.artifact()),"location",value.location().map(SnapshotDependencyJson::location).orElse(null),"exact",value.exact(),"includes",value.includes().stream().map(i->object("including",id(i.including()),"included",id(i.included()),"requestedName",i.requestedName(),"site",i.site().map(SnapshotDependencyJson::location).orElse(null))));
     };}
+    private static Fields origin(SnapshotDependencyCursorResult.CursorOrigin origin){return switch(origin){
+        case SnapshotDependencyCursorResult.CursorOrigin.Unavailable value->object("id",id(value.id()),"kind","UNAVAILABLE","reason",value.reason());
+        case SnapshotDependencyCursorResult.CursorOrigin.Derived value->object("id",id(value.id()),"kind","DERIVED","inputs",mapped(value.inputs(),SnapshotDependencyJson::id),"rule",value.rule());
+        case SnapshotDependencyCursorResult.CursorOrigin.Contractual value->object("id",id(value.id()),"kind","CONTRACTUAL","authority",value.authority(),"version",value.version());
+        case SnapshotDependencyCursorResult.CursorOrigin.Written value->object("id",id(value.id()),"kind","WRITTEN","artifact",id(value.artifact()),"location",value.location().map(SnapshotDependencyJson::location).orElse(null),"exact",value.exact(),"includes",mapped(value.includes(),i->object("including",id(i.including()),"included",id(i.included()),"requestedName",i.requestedName(),"site",i.site().map(SnapshotDependencyJson::location).orElse(null))));
+    };}
     private static Object id(Id value){return value instanceof ArtifactId artifact?object("domain","artifact","localId",artifact.localId(),"publication",artifact.publication().localId()):WireIds.id(value);}
     private static Fields location(Origins.Location location){return switch(location){
         case Origins.Offsets value->object("kind","OFFSETS","start",value.start().toString(),"end",value.end().toString(),"unit",value.unit(),"endExclusive",value.endExclusive());
