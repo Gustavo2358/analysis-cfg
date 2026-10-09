@@ -480,6 +480,8 @@
     ],
     "io.github.gustavo2358.analysis.adapters.SnapshotDependencyAnalysisTest": [
       "nativeDeclarationIndexesBorrowColdPayloadsAndPreserveEveryIdentity",
+      "nativeFinitePartitionPreservesArbitraryCutsAndUnknownTail",
+      "failedNativePartitionColumnWriteReleasesAllOwnersAndPreservesPrimary",
       "generalMetadataUsesOrderedBorrowedPagesWithoutReadingUnusedPayloads",
       "exhaustedNativeMetadataOrderReleasesPartialPagesWithoutClosingInput",
       "nativeGeneralPlannerPreservesAllUnitsColdOperationsAndCorrelatedCallFacts",

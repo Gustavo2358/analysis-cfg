@@ -312,3 +312,63 @@ runtime class bytes also match the pre-CLI manifest after the clean rebuild, so
 the finite public CLI qualification applies to the actual stabilized FAST build.
 Remote CI for the new commit is still pending;90c0375 is not a remote PASS.
 The broad Region OOM remains unresolved; this is not AS-W09/W10 completion.
+
+## Broad storage effects and native finite partitions
+
+The subsequent wave keeps admitted AllMemory selections and write targets cold.
+Their complete AIR-order views reconstruct the original public records on access;
+only the private admitted views bypass defensive copying. Direct targets exclude
+proved-empty Regions, while environment remainder targets still include every
+base. MAY strength, source applicability, reasons and distinct direct/remainder
+occurrences are unchanged. Narrow and general scopes retain their existing route.
+
+An owner-local target descriptor links the same immutable storage inventory to
+its checked source position. It is not a published AIR ID or a substitute for full
+nominal identity. A descriptor from another inventory is rejected even when both
+programmes borrow the same AIR. Complete identity lookup remains available at
+public boundaries; internal broad updates need not decode/reintern long IDs.
+
+Finite partition cuts, source positions, segment membership and canonical ranks
+use managed primitive columns on the existing page runtime. Arbitrary BigInteger
+cuts retain exact order and values; empty Regions and unknown tails keep their
+original semantics. Public Segment/Location records still provide complete
+headers. Physical plans and events retain write+target ordinal references, not
+another header per target. Canonical ordering compares complete local-ID text,
+never canonical-key numbers. Private occurrence maps preserve first-seen Write
+order without repeatedly hashing the complete cold target inventory.
+
+The original partition RED retained288 cold StorageId objects. Focused GREEN
+asserts zero retained unused identity copies, exact complete candidates/targets/
+segments, owner expiry and no cold identity-text reads for address/ordinal
+projection. Additional manual tests cover257-bit finite cuts, adjacency, empty
+Regions, an unknown tail and cleanup after a real nonzero partition-column write.
+Kernel26, dependencies10, Regional40 and native consumer5 methods passed.
+
+The unchanged135,230,514-byte Region pressure input (2048 private Regions with
+65536-character IDs) previously failed in AllMemory and then StoragePartition.
+An intermediate cold-plan run exhausted the original eight-minute budget and
+returned7 without publishing products; that failure is preserved. Owner-bound
+target addresses subsequently completed the physical CLI in210.80s with one
+diagnostic thread dump. The final segment-projection run used Java21/Xmx128m,
+no sampling and unchanged application quotas:112.35s, CPU114.75+3.52s,
+RSS259524KiB, exit0. The independent frozen-reference oracle preserves all21
+semantic fields,83 origins and CFG; both products are byte-identical to the
+preceding green run. All eight runtime class trees and nine changed source files
+were hash-checked after the run. The first coherent FAST passed1158 selected
+methods but failed at a stale W5 compiled inventory; that failure is preserved.
+The original W5 helper refreshed and verified the inventory without changing
+its deny rules. The two new manual methods now belong to the explicit FAST
+selection. Final complete FAST passes1160 methods without failures/errors/skips,
+all architecture boundaries and post-checks in754.887s. All15 frozen inputs
+remain unchanged, and all eight production class trees still match the final
+112.35s physical CLI manifest after the clean rebuild. Thus that qualification
+applies to the actual stabilized FAST runtime, not an earlier source version.
+
+The published610891fe checkpoint has both remote FAST checks successful. The
+producer/workflow pin remains650a5466f497c27399b06e803e203b6da9a3cf13.
+Group arrays, physical relations/states and other resident indexes still require
+AS-W09 coverage. These finite physical results do not complete AS-W09/W10.
+An additional unused UnknownBinding(AllMemory) object has a focused RED:16
+private Regions with4096-character IDs retain16 complete cold StorageIds in
+StatementEffects.openByBase. Admission succeeds; this is the next demonstrated
+retention gap, not a reason to relabel the preceding finite pressure result.

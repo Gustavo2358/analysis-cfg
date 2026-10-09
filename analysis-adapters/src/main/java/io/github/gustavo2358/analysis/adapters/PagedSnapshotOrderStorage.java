@@ -6,6 +6,7 @@ import io.github.gustavo2358.analysis.solver.PageStore;
 import io.github.gustavo2358.analysis.solver.PagedLongIndex;
 import io.github.gustavo2358.analysis.solver.PagedLongArray;
 import java.util.Objects;
+import io.github.gustavo2358.analysis.structure.ProgramStore;
 
 /** Spillable canonical-order indexes over the snapshot session's borrowed pages. */
 public final class PagedSnapshotOrderStorage implements SnapshotOrderStorage {
@@ -29,6 +30,25 @@ public final class PagedSnapshotOrderStorage implements SnapshotOrderStorage {
         available();
         try{var values=new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);owners++;return new PagedTape(values);}
         catch(RuntimeException|Error failure){failed=true;throw failure;}
+    }
+    @Override public synchronized ProgramStore.OrdinalColumn column(long length){
+        available();
+        try{var values=new PagedLongArray(pages,length,resources,PHASE);owners++;return new PagedColumn(values);}
+        catch(RuntimeException|Error failure){failed=true;throw failure;}
+    }
+    private final class PagedColumn implements ProgramStore.OrdinalColumn {
+        private PagedLongArray values;private boolean columnFailed;
+        PagedColumn(PagedLongArray values){this.values=values;}
+        private void open(){available();if(values==null||columnFailed)throw new IllegalStateException("snapshot ordinal column is closed or aborted");}
+        @Override public synchronized long get(long ordinal){
+            open();try{return values.get(ordinal);}catch(RuntimeException|Error failure){columnFailed=true;PagedSnapshotOrderStorage.this.failed=true;throw failure;}
+        }
+        @Override public synchronized void set(long ordinal,long value){
+            open();try{values.set(ordinal,value);}catch(RuntimeException|Error failure){columnFailed=true;PagedSnapshotOrderStorage.this.failed=true;throw failure;}
+        }
+        @Override public synchronized void close(){
+            if(values==null)return;try{values.close();}finally{values=null;synchronized(PagedSnapshotOrderStorage.this){owners--;}}
+        }
     }
     private void available(){if(closed||failed)throw new IllegalStateException("paged snapshot order storage is closed or aborted");}
     @Override public synchronized void close() {

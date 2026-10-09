@@ -23,7 +23,7 @@ public final class StatementEffects {
     public record LogicalTarget(ObjectId object,boolean sourceApplicable) { }
     public record Write(int slot,Optional<OperandId> occurrence,StorageIndex.Resolution destination,Source source,List<Target> targets,
                         Selection selection,Strength occurrenceStrength,List<LogicalTarget> logicalTargets) {
-        public Write { logicalTargets=List.copyOf(logicalTargets);targets=List.copyOf(targets);Objects.requireNonNull(selection);Objects.requireNonNull(occurrenceStrength); }
+        public Write { logicalTargets=List.copyOf(logicalTargets);if(!(targets instanceof WholeTargets))targets=List.copyOf(targets);Objects.requireNonNull(selection);Objects.requireNonNull(occurrenceStrength); }
         public Write(int slot,Optional<OperandId> occurrence,StorageIndex.Resolution destination,Source source,List<Target> targets,Selection selection,Strength occurrenceStrength) {
             this(slot,occurrence,destination,source,targets,selection,occurrenceStrength,List.of());
         }
@@ -121,7 +121,49 @@ public final class StatementEffects {
     public List<Target> targets(StorageIndex.Resolution destination,Strength requested) {
         return targets(destination,requested,false,false);
     }
+    /** Each admitted catalogue has unique bases. Source applicability separates
+     * direct targets from remainder targets, even for equal whole locations. */
+    private static final class WholeTargets extends AbstractList<Target> implements RandomAccess {
+        private final List<StorageIndex.Candidate> direct,remainder;
+        private final Strength strength;
+        private final List<String> reasons;
+        WholeTargets(List<StorageIndex.Candidate> direct,List<StorageIndex.Candidate> remainder,Strength strength,List<String> reasons){
+            this.direct=direct;this.remainder=remainder;this.strength=strength;this.reasons=List.copyOf(reasons);
+        }
+        @Override public int size(){return Math.addExact(direct.size(),remainder.size());}
+        @Override public Target get(int ordinal){
+            Objects.checkIndex(ordinal,size());int count=direct.size();boolean source=ordinal<count;
+            var candidate=source?direct.get(ordinal):remainder.get(ordinal-count);
+            return new Target(candidate.location(),source?strength:Strength.MAY,source,List.of(),reasons);
+        }
+        @Override public void clear(){throw new UnsupportedOperationException("immutable borrowed whole storage targets");}
+    }
+    static boolean wholeTargets(List<Target> targets){return targets instanceof WholeTargets;}
+    public static Optional<StorageIndex.BaseAddress> address(Write write,int ordinal){
+        Objects.checkIndex(ordinal,write.targets().size());
+        if(!(write.targets() instanceof WholeTargets whole))return Optional.empty();
+        int count=whole.direct.size();return StorageIndex.address(ordinal<count?whole.direct:whole.remainder,ordinal<count?ordinal:ordinal-count);
+    }
+    public static boolean sourceApplicable(Write write,int ordinal){
+        Objects.checkIndex(ordinal,write.targets().size());
+        return write.targets() instanceof WholeTargets whole?ordinal<whole.direct.size():write.targets().get(ordinal).sourceApplicable();
+    }
+    public static List<PremiseId> targetPremises(Write write,int ordinal){
+        Objects.checkIndex(ordinal,write.targets().size());return write.targets() instanceof WholeTargets?List.of():write.targets().get(ordinal).premises();
+    }
     private List<Target> targets(StorageIndex.Resolution destination,Strength requested,boolean scoped,boolean broad) {
+        if(destination.remainder() instanceof Scopes.NoMemory
+                ||destination.remainder() instanceof Scopes.WithinMemory within&&within.scope() instanceof Scopes.AllMemory){
+            var direct=StorageIndex.nonEmptyWholeCandidates(destination);
+            if(direct!=null){
+                var remainder=destination.remainder() instanceof Scopes.WithinMemory within
+                    ?storage.select(within.scope()).candidates():List.<StorageIndex.Candidate>of();
+                var result=new WholeTargets(direct,remainder,requested==Strength.MUST&&destination.exact()?Strength.MUST:Strength.MAY,destination.reasons());
+                int count=direct.size();
+                if(broad)explicitBroadTargetsPrepared+=count;else if(scoped)boundTargetsPrepared+=count;else directTargetsPrepared+=count;
+                explicitBroadTargetsPrepared+=remainder.size();targetsPrepared+=result.size();return result;
+            }
+        }
         var result=new LinkedHashSet<Target>();var direct=new ArrayList<StorageIndex.Candidate>(destination.candidates());
         for(var candidate:direct) {
             var location=candidate.location();if(location.range().isPresent()&&location.range().get().empty())continue;
@@ -159,7 +201,7 @@ public final class StatementEffects {
             var explicit=place==null?List.<ObjectId>of():storage.explicitObjects(place);
             var result=new LinkedHashMap<ObjectId,Boolean>();
             for(var id:explicit)if(!storage.object(id).exact())result.put(id,true);
-            for(var target:targets)for(var open:openByBase.getOrDefault(target.location().base().id(),List.of()))
+            if(!openByBase.isEmpty())for(var target:targets)for(var open:openByBase.getOrDefault(target.location().base().id(),List.of()))
                 if(!storage.disjoint(target.location(),open.location()))result.putIfAbsent(open.object(),false);
             return result.entrySet().stream().map(e->new LogicalTarget(e.getKey(),e.getValue())).toList();
         }

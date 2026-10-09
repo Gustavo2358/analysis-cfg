@@ -2,6 +2,7 @@ package io.github.gustavo2358.analysis.dependencies;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import io.github.gustavo2358.analysis.structure.ProgramStore;
 
 /** External-order port for canonical snapshot scans. Production adapters must bound residency. */
 public interface SnapshotOrderStorage extends AutoCloseable {
@@ -25,6 +26,8 @@ public interface SnapshotOrderStorage extends AutoCloseable {
     }
     Index open(Order order);
     Tape tape();
+    /** No silent resident fallback for an external-order adapter. */
+    default ProgramStore.OrdinalColumn column(long length){throw new UnsupportedOperationException("ordinal working columns are not implemented");}
     @Override void close();
 
     /** Explicit compatibility backend for small in-memory callers. */
@@ -32,6 +35,9 @@ public interface SnapshotOrderStorage extends AutoCloseable {
 
     final class Resident implements SnapshotOrderStorage {
         private boolean closed;
+        @Override public ProgramStore.OrdinalColumn column(long length){
+            if(closed)throw new IllegalStateException("snapshot order storage is closed");return ProgramStore.residentColumn(length);
+        }
         @Override public Tape tape() {
             if(closed)throw new IllegalStateException("snapshot order storage is closed");
             return new Tape(){private ArrayList<Long> values=new ArrayList<>();

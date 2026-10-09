@@ -39,14 +39,23 @@ final class SnapshotDependencyAnalysisTest {
         for(int i=0;i<128;i++)storages.add(new Memory.Cell(new Memory.StorageHeader(
             new StorageId(seed.id(),"unused-storage-"+"!".repeat(4096)+"/"+i),
             header.owner(),header.lifetime(),header.visibility(),header.origin()),cell.typeRef()));
+        for(int i=0;i<32;i++)storages.add(new Memory.Region(new Memory.StorageHeader(
+            new StorageId(seed.id(),"unused-region-storage-"+"!".repeat(4096)+"/"+i),
+            header.owner(),header.lifetime(),header.visibility(),header.origin()),
+            Optional.of(BigInteger.valueOf(i%2==0?0:8)),Optional.empty()));
         var auditId=objects.getLast().id();var auditRoots=new java.util.HashMap<ObjectId,ObjectId>();
         auditRoots.put(auditId,new ObjectId(auditId.unit(),auditId.localId()));
         assertEquals(2,retainedUnusedObjectIds(auditRoots),"the audit must count distinct stored instances, not equal logical IDs");
         assertEquals(0,retainedUnusedObjectIds(java.util.Map.of(template.id(),template)));
         var replacement=new Unit(unit.id(),unit.containingUnit(),objects,unit.visibleObjects(),unit.entries(),unit.sequences(),unit.completionPorts(),unit.body(),unit.bodyUnavailable(),unit.coverage(),unit.origin());
         var units=new java.util.ArrayList<>(seed.units());units.set(0,replacement);
-        var publication=new Publication(seed.id(),seed.airVersion(),seed.capabilities(),seed.artifacts(),units,storages,seed.resources(),seed.artifactRelations(),seed.origins(),seed.coverage(),seed.uncertainties(),seed.premises());
+        var required=new java.util.ArrayList<>(seed.capabilities().required());required.add(Capabilities.MEMORY_REGIONS);
+        var publication=new Publication(seed.id(),seed.airVersion(),new Capabilities.Manifest(required,seed.capabilities().provided()),seed.artifacts(),units,storages,seed.resources(),seed.artifactRelations(),seed.origins(),seed.coverage(),seed.uncertainties(),seed.premises());
         var ledger=resources();long[] reads={0};io.github.gustavo2358.analysis.structure.ProgramIndex borrowed;
+        var allSelections=new java.util.ArrayList<io.github.gustavo2358.analysis.storage.StorageIndex.Resolution>();
+        var allTargets=new java.util.ArrayList<List<io.github.gustavo2358.analysis.storage.StatementEffects.Target>>();
+        List<io.github.gustavo2358.analysis.storage.StoragePartition.Segment> borrowedSegments;
+        List<io.github.gustavo2358.analysis.storage.StorageIndex.Location> borrowedRegionalBases;
         try(var pages=new FilePageStore(directory,4096,32,ledger);var original=AirSnapshot.fromPublication(publication)) {
             var storage=new PagedAirStorage(pages,ledger,AnalysisResources.Phase.DECODE);
             var tracked=new AirSnapshotBuilder.Storage() {
@@ -72,6 +81,14 @@ final class SnapshotDependencyAnalysisTest {
                         assertTrue(reads[0]>0,"repeated storage lookup must read its cold canonical occurrence");
                         assertNull(borrowed.storage(new StorageId(new PublicationId("foreign"),storages.getLast().header().id().localId())));
                         var storageCatalog=borrowed.storageDeclarations();
+                        var nativeStorage=program.storageInventory().orElseThrow();
+                        for(int ordinal=0;ordinal<storages.size();ordinal++){
+                            var base=storages.get(ordinal);assertEquals(ordinal,nativeStorage.ordinal(base.header().id()));
+                            assertEquals(base,nativeStorage.at(ordinal));assertEquals(base instanceof Memory.Region,nativeStorage.regionAt(ordinal));
+                            if(base instanceof Memory.Region region)assertEquals(region.extent(),nativeStorage.extentAt(ordinal));
+                            else {int at=ordinal;assertThrows(IllegalArgumentException.class,()->nativeStorage.extentAt(at));}
+                        }
+                        assertEquals(-1,nativeStorage.ordinal(new StorageId(new PublicationId("foreign"),storages.getLast().header().id().localId())));
                         assertEquals(storages,List.copyOf(storageCatalog.values()),"storage must preserve original AIR order");
                         assertThrows(UnsupportedOperationException.class,()->storageCatalog.put(storages.getLast().header().id(),storages.getLast()));
                         assertThrows(UnsupportedOperationException.class,storageCatalog::clear);
@@ -137,17 +154,202 @@ final class SnapshotDependencyAnalysisTest {
                         assertEquals(catalog.keySet(),retained.keySet(),"every full physical identity must survive projection");
                         assertEquals(128,retainedUnusedObjectIds(physical),
                             "physical preparation retained a second typed identity copy beside its canonical edges");
+                        var effects=new io.github.gustavo2358.analysis.storage.StatementEffects(physical);
+                        for(boolean environment:List.of(false,true)) {
+                            var scope=new Scopes.AllMemory(seed.id(),environment);reads[0]=0;
+                            var selection=physical.select(scope);
+                            allSelections.add(selection);
+                            assertEquals(storages.size(),selection.candidates().size());
+                            assertEquals(storages.stream().map(value->new io.github.gustavo2358.analysis.storage.StorageIndex.Candidate(
+                                new io.github.gustavo2358.analysis.storage.StorageIndex.Location(value.header(),
+                                    value instanceof Memory.Region region?Optional.of(new io.github.gustavo2358.analysis.storage.StorageRange(BigInteger.ZERO,region.extent())):Optional.empty()),
+                                Optional.empty(),List.of(value.header().origin()))).toList(),selection.candidates(),
+                                "AllMemory must retain every complete header and its original AIR order");
+                            assertEquals(environment?new Scopes.WithinMemory(scope):Scopes.NoMemory.INSTANCE,selection.remainder());
+                            assertEquals(environment?List.of("ENVIRONMENT_STORAGE"):List.of(),selection.reasons());
+                            assertFalse(selection.exact());
+                            assertThrows(UnsupportedOperationException.class,()->selection.candidates().clear());
+                            assertEquals(0,retainedUnusedStorageIds(selection),
+                                "AllMemory retained complete cold storage identities instead of an owned catalogue view");
+                            var targets=effects.targets(selection,io.github.gustavo2358.analysis.storage.StatementEffects.Strength.MUST);
+                            allTargets.add(targets);
+                            var expectedTargets=new java.util.ArrayList<io.github.gustavo2358.analysis.storage.StatementEffects.Target>();
+                            for(boolean direct:environment?List.of(true,false):List.of(true))for(var base:storages) {
+                                var range=base instanceof Memory.Region region?Optional.of(new io.github.gustavo2358.analysis.storage.StorageRange(BigInteger.ZERO,region.extent())):Optional.<io.github.gustavo2358.analysis.storage.StorageRange>empty();
+                                if(direct&&range.filter(io.github.gustavo2358.analysis.storage.StorageRange::empty).isPresent())continue;
+                                expectedTargets.add(new io.github.gustavo2358.analysis.storage.StatementEffects.Target(
+                                    new io.github.gustavo2358.analysis.storage.StorageIndex.Location(base.header(),range),
+                                    io.github.gustavo2358.analysis.storage.StatementEffects.Strength.MAY,direct,List.of(),selection.reasons()));
+                            }
+                            assertEquals(expectedTargets,targets,"preserve zero-range filtering, MAY strength, source applicability and environment expansion");
+                            reads[0]=0;
+                            for(int targetOrdinal=0;targetOrdinal<targets.size();targetOrdinal++){
+                                var write=new io.github.gustavo2358.analysis.storage.StatementEffects.Write(0,Optional.empty(),selection,
+                                    new io.github.gustavo2358.analysis.storage.StatementEffects.UnknownSource("owned-address-test"),targets,
+                                    io.github.gustavo2358.analysis.storage.StatementEffects.Selection.MAY_SET,
+                                    io.github.gustavo2358.analysis.storage.StatementEffects.Strength.MAY);
+                                var address=io.github.gustavo2358.analysis.storage.StatementEffects.address(write,targetOrdinal).orElseThrow();
+                                assertSame(nativeStorage,address.owner());
+                                assertEquals(expectedTargets.get(targetOrdinal).location().base().id(),storages.get(address.ordinal()).header().id());
+                                assertEquals(expectedTargets.get(targetOrdinal).sourceApplicable(),io.github.gustavo2358.analysis.storage.StatementEffects.sourceApplicable(write,targetOrdinal));
+                                assertEquals(expectedTargets.get(targetOrdinal).premises(),io.github.gustavo2358.analysis.storage.StatementEffects.targetPremises(write,targetOrdinal));
+                            }
+                            assertEquals(0,reads[0],"owned target addresses must not decode full cold identity text");
+                            assertThrows(UnsupportedOperationException.class,targets::clear);
+                            assertEquals(0,retainedUnusedStorageIds(targets),"AllMemory targets retained cold storage headers");
+                        }
+                        var partition=new io.github.gustavo2358.analysis.storage.StoragePartition(effects);
+                        borrowedSegments=partition.segments();
+                        var expectedSegments=new java.util.ArrayList<io.github.gustavo2358.analysis.storage.StoragePartition.Segment>();
+                        for(var base:storages){
+                            var range=base instanceof Memory.Region region?Optional.of(new io.github.gustavo2358.analysis.storage.StorageRange(BigInteger.ZERO,region.extent())):Optional.<io.github.gustavo2358.analysis.storage.StorageRange>empty();
+                            if(range.filter(io.github.gustavo2358.analysis.storage.StorageRange::empty).isPresent())continue;
+                            expectedSegments.add(new io.github.gustavo2358.analysis.storage.StoragePartition.Segment(expectedSegments.size(),
+                                new io.github.gustavo2358.analysis.storage.StorageIndex.Location(base.header(),range)));
+                        }
+                        assertEquals(expectedSegments,partition.segments(),"preserve every finite Cell/Region segment and its AIR ordinal");
+                        for(var segment:expectedSegments)assertEquals(segment.location().range(),partition.range(segment.ordinal()));
+                        assertEquals(0,retainedUnusedStorageIds(partition),"native partition retained complete cold storage identities");
+                        assertThrows(UnsupportedOperationException.class,borrowedSegments::clear);
+                        for(var base:storages){
+                            var whole=new io.github.gustavo2358.analysis.storage.StorageIndex.Location(base.header(),
+                                base instanceof Memory.Region region?Optional.of(new io.github.gustavo2358.analysis.storage.StorageRange(BigInteger.ZERO,region.extent())):Optional.empty());
+                            assertEquals(expectedSegments.stream().filter(segment->segment.location().base().id().equals(base.header().id())).toList(),partition.intersecting(whole));
+                            assertEquals(partition.intersecting(whole),partition.intersecting(new io.github.gustavo2358.analysis.storage.StorageIndex.BaseAddress(nativeStorage,storages.indexOf(base)),whole.range()));
+                            reads[0]=0;
+                            assertEquals(expectedSegments.stream().filter(segment->segment.location().base().id().equals(base.header().id()))
+                                .map(io.github.gustavo2358.analysis.storage.StoragePartition.Segment::ordinal).toList(),
+                                partition.ordinals(new io.github.gustavo2358.analysis.storage.StorageIndex.BaseAddress(nativeStorage,storages.indexOf(base)),whole.range()));
+                            assertEquals(0,reads[0],"segment ordinal projection must not decode cold storage headers");
+                        }
+                        try(var other=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),new PagedSnapshotOrderStorage(pages,ledger),ledger)){
+                            var foreignOwner=other.storageInventory().orElseThrow();
+                            assertThrows(IllegalArgumentException.class,()->partition.intersecting(new io.github.gustavo2358.analysis.storage.StorageIndex.BaseAddress(foreignOwner,0),Optional.empty()),
+                                "matching nominal AIR IDs do not authorize a descriptor from another inventory owner");
+                            assertThrows(IllegalArgumentException.class,()->partition.ordinals(new io.github.gustavo2358.analysis.storage.StorageIndex.BaseAddress(foreignOwner,0),Optional.empty()));
+                        }
+                        var regional=io.github.gustavo2358.analysis.values.RegionalValuesAnalysis.prepare(opened.session().orElseThrow(),
+                            io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL);
+                        assertEquals(io.github.gustavo2358.analysis.values.RegionalValuesAnalysis.Status.ACCEPTED,regional.status(),regional.reason());
+                        var preparedRegional=regional.analysis().orElseThrow();
+                        assertEquals(0,retainedUnusedStorageIds(preparedRegional),"native physical plans retained full cold storage headers");
+                        var regionalBases=preparedRegional.getClass().getDeclaredField("bases");regionalBases.setAccessible(true);
+                        @SuppressWarnings("unchecked") var borrowedBases=(List<io.github.gustavo2358.analysis.storage.StorageIndex.Location>)regionalBases.get(preparedRegional);
+                        borrowedRegionalBases=borrowedBases;
+                        assertEquals(storages.stream().sorted(java.util.Comparator.comparing(base->base.header().id().localId()))
+                            .map(base->new io.github.gustavo2358.analysis.storage.StorageIndex.Location(base.header(),base instanceof Memory.Region region
+                                ?Optional.of(new io.github.gustavo2358.analysis.storage.StorageRange(BigInteger.ZERO,region.extent())):Optional.empty())).toList(),borrowedRegionalBases,
+                            "DAG order must preserve complete canonical local IDs, not numeric intern order");
                     }
                     assertThrows(IllegalStateException.class,()->borrowed.object(objects.getLast().id()));
                     assertThrows(IllegalStateException.class,()->borrowed.directCell(objects.getLast().id()));
                     assertThrows(IllegalStateException.class,()->borrowed.storage(storages.getLast().header().id()));
                     assertThrows(IllegalStateException.class,()->borrowed.storageDeclarations().size());
                     assertThrows(IllegalStateException.class,()->borrowed.objectDeclarations().size());
+                    assertThrows(IllegalStateException.class,borrowedSegments::size);
+                    assertThrows(IllegalStateException.class,borrowedSegments::getFirst);
+                    assertThrows(IllegalStateException.class,borrowedRegionalBases::size);
+                    assertThrows(IllegalStateException.class,borrowedRegionalBases::getFirst);
+                    for(var selection:allSelections){
+                        assertThrows(IllegalStateException.class,()->selection.candidates().size());
+                        assertThrows(IllegalStateException.class,()->selection.candidates().getFirst());
+                    }
+                    for(var targets:allTargets){
+                        assertThrows(IllegalStateException.class,targets::size);
+                        assertThrows(IllegalStateException.class,targets::getFirst);
+                    }
                 }
             }
             assertEquals(0,pages.statistics().livePages());
         }
         assertEquals(0,ledger.heapUsed());
+    }
+
+    @Test void nativeFinitePartitionPreservesArbitraryCutsAndUnknownTail() {
+        var seed=directCall();var unit=seed.units().getFirst();var origin=seed.origins().getFirst().id();
+        var huge=BigInteger.ONE.shiftLeft(256).add(BigInteger.valueOf(7));
+        var unknownId=new UncertaintyId(seed.id(),"native-unknown-tail");
+        var known=new Memory.Region(new Memory.StorageHeader(new StorageId(seed.id(),"native-large-cuts"),Optional.of(unit.id()),Memory.Lifetime.PERSISTENT,Memory.Visibility.PRIVATE,origin),Optional.of(huge),Optional.empty());
+        var unknown=new Memory.Region(new Memory.StorageHeader(new StorageId(seed.id(),"native-open-cuts"),Optional.of(unit.id()),Memory.Lifetime.EXTERNAL,Memory.Visibility.PRIVATE,origin),Optional.empty(),Optional.of(unknownId));
+        var empty=new Memory.Region(new Memory.StorageHeader(new StorageId(seed.id(),"native-empty"),Optional.of(unit.id()),Memory.Lifetime.PERSISTENT,Memory.Visibility.PRIVATE,origin),Optional.of(BigInteger.ZERO),Optional.empty());
+        var objects=new java.util.ArrayList<>(unit.objects());var precision=objects.getFirst().precision();
+        objects.add(new Memory.ObjectDeclaration(new ObjectId(unit.id(),"native-left"),Optional.empty(),Types.known(Types.Builtin.BYTES),new Memory.ViewBinding(known.header().id(),BigInteger.ZERO,BigInteger.valueOf(4),Memory.IdentityBytes.INSTANCE),Memory.Visibility.PRIVATE,origin,Evidence.CoverageStatus.MODELED,precision));
+        objects.add(new Memory.ObjectDeclaration(new ObjectId(unit.id(),"native-right"),Optional.empty(),Types.known(Types.Builtin.BYTES),new Memory.ViewBinding(known.header().id(),huge.subtract(BigInteger.valueOf(3)),BigInteger.TWO,Memory.IdentityBytes.INSTANCE),Memory.Visibility.PRIVATE,origin,Evidence.CoverageStatus.MODELED,precision));
+        objects.add(new Memory.ObjectDeclaration(new ObjectId(unit.id(),"native-tail"),Optional.empty(),Types.known(Types.Builtin.BYTES),new Memory.ViewBinding(unknown.header().id(),BigInteger.TWO,BigInteger.valueOf(3),Memory.IdentityBytes.INSTANCE),Memory.Visibility.PRIVATE,origin,Evidence.CoverageStatus.MODELED,precision));
+        var replacement=new Unit(unit.id(),unit.containingUnit(),objects,unit.visibleObjects(),unit.entries(),unit.sequences(),unit.completionPorts(),unit.body(),unit.bodyUnavailable(),unit.coverage(),unit.origin());
+        var storages=new java.util.ArrayList<>(seed.storage());storages.addAll(List.of(known,unknown,empty));
+        var uncertainties=new java.util.ArrayList<>(seed.uncertainties());uncertainties.add(new Evidence.Uncertainty(unknownId,"UNPROVED",List.of(Evidence.Dimension.STORAGE),new Scopes.PublicationScope(seed.id()),"unknown native extent",origin));
+        var required=new java.util.ArrayList<>(seed.capabilities().required());required.add(Capabilities.MEMORY_REGIONS);
+        var publication=new Publication(seed.id(),seed.airVersion(),new Capabilities.Manifest(required,seed.capabilities().provided()),seed.artifacts(),List.of(replacement),storages,seed.resources(),seed.artifactRelations(),seed.origins(),seed.coverage(),uncertainties,seed.premises());
+        var expected=new java.util.ArrayList<io.github.gustavo2358.analysis.storage.StoragePartition.Segment>();
+        for(var base:seed.storage()){
+            assertInstanceOf(Memory.Cell.class,base);
+            expected.add(new io.github.gustavo2358.analysis.storage.StoragePartition.Segment(expected.size(),new io.github.gustavo2358.analysis.storage.StorageIndex.Location(base.header(),Optional.empty())));
+        }
+        var knownPoints=List.of(BigInteger.ZERO,BigInteger.valueOf(4),huge.subtract(BigInteger.valueOf(3)),huge.subtract(BigInteger.ONE),huge);
+        for(int at=1;at<knownPoints.size();at++)expected.add(new io.github.gustavo2358.analysis.storage.StoragePartition.Segment(expected.size(),new io.github.gustavo2358.analysis.storage.StorageIndex.Location(known.header(),Optional.of(new io.github.gustavo2358.analysis.storage.StorageRange(knownPoints.get(at-1),Optional.of(knownPoints.get(at)))))));
+        var unknownPoints=List.of(BigInteger.ZERO,BigInteger.TWO,BigInteger.valueOf(5));
+        for(int at=1;at<unknownPoints.size();at++)expected.add(new io.github.gustavo2358.analysis.storage.StoragePartition.Segment(expected.size(),new io.github.gustavo2358.analysis.storage.StorageIndex.Location(unknown.header(),Optional.of(new io.github.gustavo2358.analysis.storage.StorageRange(unknownPoints.get(at-1),Optional.of(unknownPoints.get(at)))))));
+        expected.add(new io.github.gustavo2358.analysis.storage.StoragePartition.Segment(expected.size(),new io.github.gustavo2358.analysis.storage.StorageIndex.Location(unknown.header(),Optional.of(new io.github.gustavo2358.analysis.storage.StorageRange(BigInteger.valueOf(5),Optional.empty())))));
+        var ledger=resources();List<Integer> borrowed;
+        try(var pages=new FilePageStore(directory,512,16,ledger);
+            var checked=SnapshotValidator.check(AirSnapshot.fromPublication(publication),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger))) {
+            assertTrue(checked.result().isStructurallyValid(),checked.result().toString());
+            try(var program=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),new PagedSnapshotOrderStorage(pages,ledger),ledger)){
+                var cfg=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).buildChecked(program,checked,BuildOptions.defaults());
+                var opened=io.github.gustavo2358.analysis.structure.AnalysisSession.open(cfg,program,cfg.options().projectionPolicy(),unit.entries().stream().map(Entries.Entry::id).toList());
+                assertEquals(io.github.gustavo2358.analysis.structure.AnalysisSession.Status.ACCEPTED,opened.status(),opened.reason());
+                var partition=new io.github.gustavo2358.analysis.storage.StoragePartition(new io.github.gustavo2358.analysis.storage.StatementEffects(new io.github.gustavo2358.analysis.storage.StorageIndex(opened.session().orElseThrow())));
+                assertEquals(expected,partition.segments(),"arbitrary cuts, adjacent ranges and unbounded tail must survive spill without octet expansion");
+                var inventory=program.storageInventory().orElseThrow();
+                var knownAddress=new io.github.gustavo2358.analysis.storage.StorageIndex.BaseAddress(inventory,seed.storage().size());
+                var unknownAddress=new io.github.gustavo2358.analysis.storage.StorageIndex.BaseAddress(inventory,seed.storage().size()+1);
+                borrowed=partition.ordinals(knownAddress,Optional.of(new io.github.gustavo2358.analysis.storage.StorageRange(BigInteger.valueOf(4),Optional.of(huge.subtract(BigInteger.valueOf(3))))));
+                assertEquals(List.of(seed.storage().size()+1),borrowed,"adjacency must not include either neighboring segment");
+                assertEquals(List.of(seed.storage().size()+5,seed.storage().size()+6),partition.ordinals(unknownAddress,Optional.of(new io.github.gustavo2358.analysis.storage.StorageRange(BigInteger.valueOf(4),Optional.empty()))));
+                assertTrue(partition.ordinals(knownAddress,Optional.of(new io.github.gustavo2358.analysis.storage.StorageRange(BigInteger.valueOf(4),Optional.of(BigInteger.valueOf(4))))).isEmpty());
+                for(var segment:expected)assertEquals(segment.location().range(),partition.range(segment.ordinal()));
+                assertThrows(IndexOutOfBoundsException.class,()->partition.range(-1));
+                assertThrows(IndexOutOfBoundsException.class,()->partition.range(expected.size()));
+            }
+            assertThrows(IllegalStateException.class,borrowed::size);assertThrows(IllegalStateException.class,borrowed::getFirst);
+        }
+        for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
+    }
+
+    @Test void failedNativePartitionColumnWriteReleasesAllOwnersAndPreservesPrimary() {
+        var publication=directCall();var ledger=resources();var primary=new IllegalStateException("injected failure after native partition column write");
+        int[] columns={0},written={0};
+        try(var pages=new FilePageStore(directory,512,16,ledger);
+            var checked=SnapshotValidator.check(AirSnapshot.fromPublication(publication),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger))){
+            var delegate=new PagedSnapshotOrderStorage(pages,ledger);
+            var failing=new io.github.gustavo2358.analysis.dependencies.SnapshotOrderStorage(){
+                @Override public Index open(Order order){return delegate.open(order);}
+                @Override public Tape tape(){return delegate.tape();}
+                @Override public ProgramStore.OrdinalColumn column(long length){
+                    var column=delegate.column(length);if(++columns[0]!=4)return column;
+                    return new ProgramStore.OrdinalColumn(){
+                        @Override public long get(long ordinal){return column.get(ordinal);}
+                        @Override public void set(long ordinal,long value){column.set(ordinal,value);if(value!=0){written[0]++;throw primary;}}
+                        @Override public void close(){column.close();}
+                    };
+                }
+                @Override public void close(){delegate.close();}
+            };
+            try(var program=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),failing,ledger)){
+                var cfg=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).buildChecked(program,checked,BuildOptions.defaults());
+                var opened=io.github.gustavo2358.analysis.structure.AnalysisSession.open(cfg,program,cfg.options().projectionPolicy(),publication.units().getFirst().entries().stream().map(Entries.Entry::id).toList());
+                assertEquals(io.github.gustavo2358.analysis.structure.AnalysisSession.Status.ACCEPTED,opened.status(),opened.reason());
+                var effects=new io.github.gustavo2358.analysis.storage.StatementEffects(new io.github.gustavo2358.analysis.storage.StorageIndex(opened.session().orElseThrow()));
+                long originalHeap=ledger.heapUsed(),originalPages=pages.statistics().livePages();
+                assertSame(primary,assertThrows(IllegalStateException.class,()->new io.github.gustavo2358.analysis.storage.StoragePartition(effects)));
+                assertEquals(1,written[0],"fault must follow a real nonzero paged column write");
+                assertEquals(originalHeap,ledger.heapUsed());assertEquals(originalPages,pages.statistics().livePages());
+                assertSame(checked.snapshot(),program.admission().snapshot(),"partition failure must not close borrowed AIR");
+                assertEquals(publication.storage().size(),program.storageInventory().orElseThrow().size());
+            }
+        }
+        for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
     }
 
     /** Walk stored fields, not custom lazy Map/List projections. Counts are actual
@@ -222,6 +424,7 @@ final class SnapshotDependencyAnalysisTest {
                     var trackedOrders=new io.github.gustavo2358.analysis.dependencies.SnapshotOrderStorage() {
                         @Override public Index open(Order order){sorts[0]++;return ordered.open(order);}
                         @Override public Tape tape(){return ordered.tape();}
+                        @Override public io.github.gustavo2358.analysis.structure.ProgramStore.OrdinalColumn column(long length){return ordered.column(length);}
                         @Override public void close(){ordered.close();}
                     };
                     try(var program=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),trackedOrders,ledger)) {
@@ -293,6 +496,7 @@ final class SnapshotDependencyAnalysisTest {
                 var tracked=new io.github.gustavo2358.analysis.dependencies.SnapshotOrderStorage() {
                     @Override public Index open(Order order){sorts[0]++;return ordered.open(order);}
                     @Override public Tape tape(){return ordered.tape();}
+                    @Override public io.github.gustavo2358.analysis.structure.ProgramStore.OrdinalColumn column(long length){return ordered.column(length);}
                     @Override public void close(){ordered.close();}
                 };
                 try(var program=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),tracked)) {
@@ -667,7 +871,7 @@ final class SnapshotDependencyAnalysisTest {
         }
         for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
 
-        for(boolean storageCatalogue:new boolean[]{false,true}) {
+        for(int targetTape:new int[]{2,3,4}) {
         var catalogLedger=resources();
         try(var pages=new FilePageStore(directory,512,16,catalogLedger);
             var checked=SnapshotValidator.check(AirSnapshot.fromPublication(publication),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,catalogLedger))) {
@@ -677,9 +881,10 @@ final class SnapshotDependencyAnalysisTest {
             int[] tapes={0},written={0};
             var failing=new io.github.gustavo2358.analysis.dependencies.SnapshotOrderStorage() {
                 @Override public Index open(Order order){return delegate.open(order);}
+                @Override public io.github.gustavo2358.analysis.structure.ProgramStore.OrdinalColumn column(long length){return delegate.column(length);}
                 @Override public Tape tape(){
                     var tape=delegate.tape();
-                    if(++tapes[0]!=(storageCatalogue?3:2))return tape;
+                    if(++tapes[0]!=targetTape)return tape;
                     return new Tape(){
                         @Override public void append(long handle){tape.append(handle);written[0]++;throw primary;}
                         @Override public long size(){return tape.size();}
@@ -691,7 +896,11 @@ final class SnapshotDependencyAnalysisTest {
             };
             try(var program=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,catalogLedger),failing,catalogLedger)) {
                 assertSame(primary,assertThrows(IllegalStateException.class,()->{
-                    if(storageCatalogue)program.storageInventory();else program.declarationInventory();
+                    if(targetTape==2)program.declarationInventory();
+                    else {
+                        var catalogue=program.storageInventory().orElseThrow();
+                        if(targetTape==4)catalogue.nonEmptyStorage();
+                    }
                 }));
                 assertEquals(1,written[0],"failure must occur after a real paged lookup write");
                 assertSame(checked.snapshot(),program.admission().snapshot(),"partial catalogue cleanup must not close the AIR owner");

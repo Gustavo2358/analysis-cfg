@@ -251,7 +251,8 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
      * Sort/lookup compare primitive keys, not repeated cold full-text projections. */
     private final class NativeStorages extends AbstractMap<StorageId,Memory.Storage>
             implements ProgramStore.StorageInventory,AutoCloseable {
-        private SnapshotOrderStorage.Tape sourceOrder,sourceKeys,lookupOrder;
+        private SnapshotOrderStorage.Tape sourceOrder,sourceKeys,lookupOrder,nonEmptyOrder;
+        private final Set<ProgramStore.OrdinalColumn> columns=Collections.newSetFromMap(new IdentityHashMap<>());
         private boolean ended;
         NativeStorages(){
             try {
@@ -282,15 +283,71 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
             available();Objects.requireNonNull(identity);
             return ordinal>=0&&ordinal<sourceOrder.size()&&keys.key(identity)==sourceKeys.handle(ordinal);
         }
-        private long source(Object key){
+        @Override public int ordinal(StorageId identity){Objects.requireNonNull(identity);return Math.toIntExact(position(identity)-1);}
+        @Override public Memory.Storage at(int ordinal){available();Objects.checkIndex(ordinal,size());return occurrence(sourceOrder.handle(ordinal),Memory.Storage.class);}
+        @Override public boolean regionAt(int ordinal){available();Objects.checkIndex(ordinal,size());return snapshot.shape(sourceOrder.handle(ordinal))==MEMORY_REGION;}
+        @Override public Optional<BigInteger> extentAt(int ordinal){
+            if(!regionAt(ordinal))throw new IllegalArgumentException("not a Region");
+            long extent=field(sourceOrder.handle(ordinal),1);
+            return snapshot.size(extent)==0?Optional.empty():Optional.of(integer(snapshot.element(extent,INTEGER,0)));
+        }
+        @Override public ProgramStore.OrdinalColumn column(long length){
+            available();var delegate=orderStorage.column(length);
+            var owned=new ProgramStore.OrdinalColumn(){
+                private boolean closed;
+                private void open(){available();if(closed)throw new IllegalStateException("native ordinal column is closed");}
+                @Override public long get(long ordinal){open();return delegate.get(ordinal);}
+                @Override public void set(long ordinal,long value){open();delegate.set(ordinal,value);}
+                @Override public void close(){if(closed)return;closed=true;columns.remove(this);delegate.close();}
+            };
+            columns.add(owned);return owned;
+        }
+        @Override public ProgramStore.OrdinalColumn order(long length,ProgramStore.OrdinalOrder comparison){
+            available();Objects.requireNonNull(comparison);var result=column(length);
+            try(var index=orderStorage.open((a,b)->{int compared=comparison.compare(a-1,b-1);return compared!=0?compared:Long.compare(a,b);})){
+                for(long at=0;at<length;at++)index.add(at+1);
+                try(var cursor=index.cursor()){long at=0;while(cursor.advance())result.set(at++,cursor.handle()-1);}
+                return result;
+            }catch(RuntimeException|Error failure){try{result.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;}
+        }
+        @Override public ProgramStore.OrdinalColumn canonicalOrder(){
+            return order(size(),(a,b)->compareText(field(field(field(sourceOrder.handle(a),0),0),1),field(field(field(sourceOrder.handle(b),0),0),1)));
+        }
+        @Override public List<Memory.Storage> nonEmptyStorage(){
+            available();
+            if(nonEmptyOrder==null){
+                var filtered=orderStorage.tape();
+                try {
+                    for(long at=0;at<sourceOrder.size();at++){
+                        long base=sourceOrder.handle(at);boolean empty=false;
+                        if(snapshot.shape(base)==MEMORY_REGION){
+                            long extent=field(base,1);
+                            empty=snapshot.size(extent)!=0&&integer(snapshot.element(extent,INTEGER,0)).signum()==0;
+                        }
+                        if(!empty)filtered.append(at+1);
+                    }
+                    nonEmptyOrder=filtered;
+                }catch(RuntimeException|Error failure){
+                    try{filtered.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;
+                }
+            }
+            var rows=nonEmptyOrder;
+            return new ProgramStore.BorrowedList<>(Math.toIntExact(rows.size()),
+                at->occurrence(sourceOrder.handle(rows.handle(at)-1),Memory.Storage.class),this::available);
+        }
+        @Override public int nonEmptyOrdinal(int ordinal){
+            nonEmptyStorage();Objects.checkIndex(ordinal,Math.toIntExact(nonEmptyOrder.size()));return Math.toIntExact(nonEmptyOrder.handle(ordinal)-1);
+        }
+        private long position(Object key){
             available();if(!(key instanceof StorageId identity))return 0;
             long wanted=keys.key(identity),low=0,high=lookupOrder.size();
             while(low<high){
                 long middle=low+(high-low)/2,ordinal=lookupOrder.handle(middle)-1,found=sourceKeys.handle(ordinal);
-                if(found<wanted)low=middle+1;else if(found>wanted)high=middle;else return sourceOrder.handle(ordinal);
+                if(found<wanted)low=middle+1;else if(found>wanted)high=middle;else return ordinal+1;
             }
             return 0;
         }
+        private long source(Object key){long position=position(key);return position==0?0:sourceOrder.handle(position-1);}
         @Override public boolean containsKey(Object key){return source(key)!=0;}
         @Override public Memory.Storage get(Object key){
             long source=source(key);if(source==0)return null;var value=occurrence(source,Memory.Storage.class);
@@ -312,9 +369,10 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
         }
         @Override public void close(){
             if(ended)return;ended=true;Throwable failure=null;
-            for(var tape:new SnapshotOrderStorage.Tape[]{sourceOrder,sourceKeys,lookupOrder})if(tape!=null)
+            while(!columns.isEmpty())try{columns.iterator().next().close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
+            for(var tape:new SnapshotOrderStorage.Tape[]{sourceOrder,sourceKeys,lookupOrder,nonEmptyOrder})if(tape!=null)
                 try{tape.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
-            sourceOrder=sourceKeys=lookupOrder=null;
+            sourceOrder=sourceKeys=lookupOrder=nonEmptyOrder=null;
             if(failure instanceof RuntimeException exception)throw exception;if(failure instanceof Error error)throw error;
         }
     }

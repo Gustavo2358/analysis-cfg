@@ -4,6 +4,7 @@ import io.github.gustavo2358.air.model.*;
 import io.github.gustavo2358.air.model.Ids.*;
 import java.util.*;
 import java.util.function.IntFunction;
+import java.math.BigInteger;
 
 /** Read-only program boundary; structural consumers never require AIR aggregates. */
 public interface ProgramStore {
@@ -46,6 +47,59 @@ public interface ProgramStore {
     /** Original AIR order and exact nominal lookup without retaining every storage body. */
     interface StorageInventory extends Map<StorageId,Memory.Storage> {
         boolean identityAt(int ordinal,StorageId identity);
+        /** Owner-local position resolved through the complete nominal identity; -1 if absent. */
+        default int ordinal(StorageId identity){
+            Objects.requireNonNull(identity);int ordinal=0;
+            for(var base:values()){if(base.header().id().equals(identity))return ordinal;ordinal=Math.incrementExact(ordinal);}return -1;
+        }
+        default Memory.Storage at(int ordinal){
+            Objects.checkIndex(ordinal,size());var rows=values().iterator();
+            for(int at=0;at<ordinal;at++)rows.next();return rows.next();
+        }
+        /** Structural projection without requiring a decoded header catalogue. */
+        default boolean regionAt(int ordinal){return at(ordinal) instanceof Memory.Region;}
+        default Optional<BigInteger> extentAt(int ordinal){
+            var base=at(ordinal);if(!(base instanceof Memory.Region region))throw new IllegalArgumentException("not a Region");return region.extent();
+        }
+        /** Working metadata, not a mutation of AIR. Default is explicit resident compatibility. */
+        default OrdinalColumn column(long length){return residentColumn(length);}
+        /** Frozen permutation of all input positions, ordered by the supplied full comparison.
+         * Equal values retain original ordinal order. The caller closes the permutation. */
+        default OrdinalColumn order(long length,OrdinalOrder comparison){
+            Objects.requireNonNull(comparison);var rows=new Long[Math.toIntExact(length)];
+            for(int i=0;i<rows.length;i++)rows[i]=(long)i;
+            Arrays.sort(rows,(a,b)->{int result=comparison.compare(a,b);return result!=0?result:Long.compare(a,b);});
+            var result=column(length);try{for(int i=0;i<rows.length;i++)result.set(i,rows[i]);return result;}
+            catch(RuntimeException|Error failure){try{result.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;}
+        }
+        /** Canonical local-ID order within this publication; complete text comparison. */
+        default OrdinalColumn canonicalOrder(){return order(size(),(a,b)->at(Math.toIntExact(a)).header().id().localId().compareTo(at(Math.toIntExact(b)).header().id().localId()));}
+        /** Whole logical Cells and Regions not proved empty, in original AIR order.
+         * Native owners must borrow cold rows; this default is resident compatibility. */
+        default List<Memory.Storage> nonEmptyStorage(){
+            return values().stream().filter(base->!(base instanceof Memory.Region region
+                &&region.extent().filter(n->n.signum()==0).isPresent())).toList();
+        }
+        default int nonEmptyOrdinal(int ordinal){return ordinal(nonEmptyStorage().get(ordinal).header().id());}
+    }
+
+    /** Primitive working column owned by an admitted programme's lifetime. */
+    interface OrdinalColumn extends AutoCloseable {
+        long get(long ordinal);
+        void set(long ordinal,long value);
+        @Override void close();
+    }
+    @FunctionalInterface interface OrdinalOrder {int compare(long first,long second);}
+    /** Caller-managed small compatibility backend, without a paging/residency promise. */
+    static OrdinalColumn residentColumn(long length){
+        if(length<0)throw new IllegalArgumentException("negative ordinal column length");
+        return new OrdinalColumn(){
+            private long[] values=new long[Math.toIntExact(length)];
+            private void available(){if(values==null)throw new IllegalStateException("ordinal column is closed");}
+            @Override public long get(long ordinal){available();Objects.checkIndex(ordinal,length);return values[Math.toIntExact(ordinal)];}
+            @Override public void set(long ordinal,long value){available();Objects.checkIndex(ordinal,length);values[Math.toIntExact(ordinal)]=value;}
+            @Override public void close(){values=null;}
+        };
     }
 
     /** Metadata/body addresses, not an owning Unit containing the complete executable payload. */

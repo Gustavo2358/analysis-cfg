@@ -3,6 +3,7 @@ package io.github.gustavo2358.analysis.storage;
 import io.github.gustavo2358.air.model.*;
 import io.github.gustavo2358.air.model.Ids.*;
 import io.github.gustavo2358.analysis.structure.AnalysisSession;
+import io.github.gustavo2358.analysis.structure.ProgramStore;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -25,10 +26,43 @@ public final class StorageIndex {
         public Candidate { Objects.requireNonNull(location); Objects.requireNonNull(codec); origins=List.copyOf(origins); }
     }
     public record Resolution(List<Candidate> candidates, Scopes.MemoryBound remainder, List<String> reasons,List<UncertaintyId> uncertainties) {
-        public Resolution { candidates=List.copyOf(candidates);Objects.requireNonNull(remainder);reasons=List.copyOf(reasons);uncertainties=List.copyOf(uncertainties); }
+        public Resolution { if(!(candidates instanceof WholeCandidates))candidates=List.copyOf(candidates);Objects.requireNonNull(remainder);reasons=List.copyOf(reasons);uncertainties=List.copyOf(uncertainties); }
         public Resolution(List<Candidate> candidates,Scopes.MemoryBound remainder,List<String> reasons) { this(candidates,remainder,reasons,List.of()); }
-        public boolean exact() { return remainder instanceof Scopes.NoMemory && candidates.stream().map(Candidate::location).distinct().count()==1; }
+        public boolean exact() { return remainder instanceof Scopes.NoMemory && (candidates instanceof WholeCandidates?candidates.size()==1:candidates.stream().map(Candidate::location).distinct().count()==1); }
     }
+    /** Complete admitted inventory: one unique base per ordinal, no copied headers.
+     * Materialization is a caller operation; the borrowed owner checks lifetime
+     * on every size/access. Only this private immutable view bypasses copyOf. */
+    private static final class WholeCandidates extends AbstractList<Candidate> implements RandomAccess {
+        private final List<Memory.Storage> source;
+        private final ProgramStore.StorageInventory inventory;
+        private final boolean filtered;
+        WholeCandidates(List<Memory.Storage> source,ProgramStore.StorageInventory inventory){this(source,inventory,false);}
+        WholeCandidates(List<Memory.Storage> source,ProgramStore.StorageInventory inventory,boolean filtered){this.source=Objects.requireNonNull(source);this.inventory=Objects.requireNonNull(inventory);this.filtered=filtered;}
+        @Override public int size(){return source.size();}
+        @Override public Candidate get(int ordinal){
+            var base=source.get(ordinal);
+            var range=base instanceof Memory.Region region?Optional.of(new StorageRange(BigInteger.ZERO,region.extent())):Optional.<StorageRange>empty();
+            return new Candidate(new Location(base.header(),range),Optional.empty(),List.of(base.header().origin()));
+        }
+        @Override public void clear(){throw new UnsupportedOperationException("immutable borrowed whole storage scope");}
+        BaseAddress address(int ordinal){Objects.checkIndex(ordinal,size());return new BaseAddress(inventory,filtered?inventory.nonEmptyOrdinal(ordinal):ordinal);}
+    }
+    /** Owner-local descriptor obtained from an admitted immutable catalogue view.
+     * It is not an AIR ID; consumers must check the same inventory owner. */
+    public record BaseAddress(ProgramStore.StorageInventory owner,int ordinal){
+        public BaseAddress{Objects.requireNonNull(owner);Objects.checkIndex(ordinal,owner.size());}
+    }
+    public static Optional<BaseAddress> address(List<Candidate> candidates,int ordinal){
+        Objects.checkIndex(ordinal,candidates.size());return candidates instanceof WholeCandidates whole?Optional.of(whole.address(ordinal)):Optional.empty();
+    }
+    /** Null means the general candidate/dedup route is required. */
+    static List<Candidate> nonEmptyWholeCandidates(Resolution resolution){
+        return resolution.candidates() instanceof WholeCandidates whole
+            ?new WholeCandidates(whole.inventory.nonEmptyStorage(),whole.inventory,true):null;
+    }
+    /** Only the private admitted view proves all boundaries are already whole bases. */
+    static boolean wholeCandidates(List<Candidate> candidates){return candidates instanceof WholeCandidates;}
     private final AnalysisSession session;
     private final Map<StorageId,Memory.Storage> bases;
     private final Map<ObjectId,Memory.ObjectDeclaration> declarations;
@@ -232,6 +266,10 @@ public final class StorageIndex {
         return true; // Distinct StorageIds are independent state bases in the supported model.
     }
     public Resolution select(Scopes.MemoryScope scope) {
+        if(scope instanceof Scopes.AllMemory all&&session.index().store().storageInventory().isPresent())
+            return new Resolution(new WholeCandidates(session.index().store().storage(),session.index().store().storageInventory().orElseThrow()),
+                all.includingEnvironment()?new Scopes.WithinMemory(all):Scopes.NoMemory.INSTANCE,
+                all.includingEnvironment()?List.of("ENVIRONMENT_STORAGE"):List.of());
         var result=new Accumulator();
         record Frame(Scopes.MemoryScope scope,boolean exit) { }
         var pending=new ArrayDeque<Frame>();var visiting=new HashSet<Scopes.MemoryScope>();var resolved=new HashSet<Scopes.MemoryScope>();
