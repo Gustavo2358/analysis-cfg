@@ -273,6 +273,45 @@ final class SnapshotDependencyAnalysisTest {
         assertEquals(0,ledger.heapUsed());
     }
 
+    @Test void cfgBuildCannotReuseAdmissionForAnotherProgramWithTheSamePublicationId() {
+        var one=directCalls(1);var two=directCalls(2);var ledger=resources();
+        assertEquals(one.id(),two.id());assertNotEquals(one.units(),two.units());
+        var coordinator=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty());
+        try(var pages=new MemoryPageStore(128,ledger);
+            var first=SnapshotValidator.check(AirSnapshot.fromPublication(one),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger));
+            var second=SnapshotValidator.check(AirSnapshot.fromPublication(two),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger));
+            var firstProgram=new SnapshotProgram(first,new PagedSnapshotIdentityStorage(pages,ledger));
+            var secondProgram=new SnapshotProgram(second,new PagedSnapshotIdentityStorage(pages,ledger))) {
+            assertEquals(ValidationResult.Status.STRUCTURALLY_VALID,first.result().status());
+            assertEquals(ValidationResult.Status.STRUCTURALLY_VALID,second.result().status());
+            assertThrows(IllegalArgumentException.class,()->coordinator.buildChecked(secondProgram,first,BuildOptions.defaults()));
+            assertThrows(IllegalArgumentException.class,()->coordinator.buildChecked(firstProgram,second,BuildOptions.defaults()));
+            assertThrows(IllegalArgumentException.class,()->coordinator.buildChecked(
+                    io.github.gustavo2358.analysis.cfg.domain.CfgProgram.resident(one),first,BuildOptions.defaults()));
+            var original=first.options();
+            var changed=new BuildOptions(new ValidationOptions(original.maximumNesting(),original.maximumEntities(),original.maximumIssues()+1));
+            assertThrows(IllegalArgumentException.class,()->coordinator.buildChecked(firstProgram,first,changed));
+            assertEquals(CoreCfgProjection.project(one),coordinator.buildChecked(firstProgram,first,BuildOptions.defaults()).graph().orElseThrow());
+            assertEquals(CoreCfgProjection.project(two),coordinator.buildChecked(secondProgram,second,BuildOptions.defaults()).graph().orElseThrow());
+        }
+        assertEquals(0,ledger.heapUsed());
+    }
+
+    @SuppressWarnings("try") // Explicit closure is the lifetime counterexample under test.
+    @Test void cfgBuildCannotReuseClosedSnapshotAdmissionOrProgram() {
+        var ledger=resources();var coordinator=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty());
+        try(var pages=new MemoryPageStore(128,ledger);
+            var checked=SnapshotValidator.check(AirSnapshot.fromPublication(directCall()),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger));
+            var program=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger))) {
+            assertEquals(CfgBuildResult.Status.CFG_BUILT,coordinator.buildChecked(program,checked,BuildOptions.defaults()).status());
+            checked.close();
+            assertThrows(IllegalStateException.class,()->coordinator.buildChecked(program,checked,BuildOptions.defaults()));
+            program.close();
+            assertThrows(IllegalStateException.class,()->coordinator.buildChecked(program,checked,BuildOptions.defaults()));
+        }
+        assertEquals(0,ledger.heapUsed());
+    }
+
     @Test void admittedDiamondPreservesWholeConcatAlternativesAndTheirSupports() {
         var publication=correlatedCall();var ledger=resources();
         try(var pages=new MemoryPageStore(128,ledger);var source=AirSnapshot.fromPublication(publication);

@@ -484,6 +484,11 @@ I-03 ownership. No instruction inventory is copied eagerly. Borrowed operation a
 inventories expire with the program/snapshot; callers must explicitly materialize any detached
 copy while the owner is open. Foreign instruction owners still fail complete AIR admission.
 
+Snapshot CFG admission reuses only the exact validator-owned `CheckedSnapshot` witness
+retained by the typed `CfgProgram.AdmittedSnapshot` adapter. Both lifetimes and identical
+validation options are checked before projection; matching PublicationId is insufficient.
+This binds the run to its input, not a proof of arbitrary adapter implementation correctness.
+
 `edgesIndexed` retains its logical coverage meaning; collection visit counters now report
 actual physical indexing/link work. The independent arithmetic construction ledger follows
 body rows + entry bindings. Retention auditing walks actual table fields rather than enumerating

@@ -54,6 +54,11 @@ public final class CfgBuildCoordinator implements BuildCfg {
         Objects.requireNonNull(program, "program");
         Objects.requireNonNull(checked, "checked");
         Objects.requireNonNull(options, "options");
+        if (!(program instanceof CfgProgram.AdmittedSnapshot admitted)
+                || admitted.admission() != checked) {
+            throw new IllegalArgumentException("CFG program is not bound to this snapshot admission");
+        }
+        checked.snapshot(); // Even metadata from a completed run cannot revive a closed owner.
         if (!checked.options().equals(options.validation())) {
             throw new IllegalArgumentException("snapshot validation options differ from CFG build options");
         }

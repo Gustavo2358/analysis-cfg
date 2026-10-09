@@ -28,6 +28,15 @@ revalidação. O wrapper é criado pelo próprio `AirValidator` e retém também
 resultados inválidos/incompletos; capability negotiation e admissão do consumidor
 continuam obrigatórias. [Qualificação e limites](../work/air-codec-latency.md).
 
+O caminho paginado do coordenador recebe `CfgProgram.AdmittedSnapshot` e o
+`SnapshotValidator.CheckedSnapshot` exato retido pelo adapter. A identidade do
+witness (não somente PublicationId, bytes ou resultado de validação) deve ser a
+mesma, com ambos os owners abertos e opções idênticas. Um programa residente ou
+certificado de outra entrada é recusado antes da projeção, inclusive se os IDs
+de publicação coincidirem. O adapter continua responsável por mapear fielmente
+os fatos do snapshot; a testemunha não certifica uma implementação arbitrária
+da porta. `SnapshotProgram` é o adapter de produção e não reconstrói Publication.
+
 `CfgBuildResult` registra `PublicationId`, versão AIR, options, o
 `ValidationResult` integral, capabilities requeridas sem intérprete, issues tipados
 da projeção e `Optional<CfgGraph>`. `CFG_BUILT` exige produto presente;

@@ -480,6 +480,8 @@
       "operationViewConstructorsDoNotCopyAndExpiredOwnersRejectQueries",
       "validatedPagedSnapshotPreservesVariableCallEvidenceWithoutPublicationMaterialization",
       "incompleteAdmissionCannotProduceDependencies",
+      "cfgBuildCannotReuseAdmissionForAnotherProgramWithTheSamePublicationId",
+      "cfgBuildCannotReuseClosedSnapshotAdmissionOrProgram",
       "leasedCursorWireMatchesExplicitMaterialization"
     ],
     "io.github.gustavo2358.analysis.adapters.PagedSnapshotDependencyStorageTest": [

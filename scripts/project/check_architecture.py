@@ -187,7 +187,7 @@ EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/LocalControlRules.java"] = {
     "java.util.Optional",
 }
 CFG_CLASS_NAMES = {
-    "CfgProgram", "CfgProgram$UnitView", "CfgProgram$EntryView", "CfgProgram$SequenceView",
+    "CfgProgram", "CfgProgram$AdmittedSnapshot", "CfgProgram$UnitView", "CfgProgram$EntryView", "CfgProgram$SequenceView",
     "CfgProgram$Resident", "CfgProgram$ResidentUnit", "CfgProgram$OperationIds",
     "CfgControl", "CfgControl$Jump", "CfgControl$Branch", "CfgControl$Return", "CfgControl$Halt",
     "CfgControl$Invoke", "CfgControl$Opaque", "CfgControl$ReentryGuard", "CfgControl$ResumeRoute",

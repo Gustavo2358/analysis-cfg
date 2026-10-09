@@ -28,6 +28,16 @@ public interface CfgProgram {
     Set<Capabilities.Capability> namePolicyExtensions();
     void units(Consumer<UnitView> consumer);
 
+    /**
+     * Typed adapter boundary for an admitted snapshot, not a claim based on PublicationId.
+     * All views must come from this exact validator-owned input and expire with it. The adapter
+     * remains responsible for faithfully mapping AIR facts, as with every program port.
+     * Returning the witness must check both the adapter and admission owner's lifetime.
+     */
+    interface AdmittedSnapshot extends CfgProgram {
+        io.github.gustavo2358.air.validation.SnapshotValidator.CheckedSnapshot admission();
+    }
+
     interface UnitView {
         UnitId id();
         Unit.BodyAvailability body();

@@ -18,8 +18,9 @@ import static io.github.gustavo2358.air.model.AirShape.*;
  * Consumers see program events and detached evidence rather than wire shapes;
  * the snapshot and its paged identity index remain owned by the caller.
  */
-public final class SnapshotProgram implements DependencyProgramStore, CfgProgram {
+public final class SnapshotProgram implements DependencyProgramStore, CfgProgram.AdmittedSnapshot {
 
+    private final SnapshotValidator.CheckedSnapshot admission;
     private final AirSnapshot snapshot;
     private final SnapshotIdentityKeys keys;
     private final SnapshotOrderStorage orderStorage;
@@ -34,13 +35,14 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
         this(checked,identityStorage,SnapshotOrderStorage.resident());
     }
     public SnapshotProgram(SnapshotValidator.CheckedSnapshot checked,SnapshotIdentityKeys.Storage identityStorage,SnapshotOrderStorage orderStorage) {
-        Objects.requireNonNull(checked);snapshot=checked.snapshot();var owned=Objects.requireNonNull(identityStorage);
+        admission=Objects.requireNonNull(checked);snapshot=checked.snapshot();var owned=Objects.requireNonNull(identityStorage);
         this.orderStorage=Objects.requireNonNull(orderStorage);
         if(checked.result().status()!=ValidationResult.Status.STRUCTURALLY_VALID){owned.close();this.orderStorage.close();throw new IllegalArgumentException("complete snapshot validation required");}
         try{keys=new SnapshotIdentityKeys(snapshot,owned);}
         catch(RuntimeException|Error failure){this.orderStorage.close();throw failure;}
     }
 
+    @Override public SnapshotValidator.CheckedSnapshot admission(){open();admission.snapshot();return admission;}
     public PublicationId publication(){open();return (PublicationId)id(snapshot.field(snapshot.root(),PUBLICATION,0));}
     public Evidence.InventoryStatus coverage(){open();long coverage=snapshot.field(snapshot.root(),PUBLICATION,9);return Evidence.InventoryStatus.values()[(int)snapshot.scalar(snapshot.field(coverage,EVIDENCE_COVERAGE,0))];}
     @Override public PublicationId publicationId(){return publication();}
