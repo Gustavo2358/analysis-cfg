@@ -13,8 +13,6 @@ public final class SourceDependencyAnalysis {
         return prepare(io.github.gustavo2358.analysis.structure.ProgramStore.resident(publication));
     }
     public SourceDependencyResult prepare(io.github.gustavo2358.analysis.structure.ProgramStore.Structural publication) {
-        var origins=new HashMap<OriginId,Origins.Origin>();
-        publication.origins().forEach(o->origins.put(o.id(),o));
         var groups=new LinkedHashMap<Key,List<Support>>();var gaps=new TreeSet<String>();
         var inventories=new HashSet<UnitId>();boolean available=false;long occurrences=0;
         for(var resource:publication.resources()) {
@@ -51,8 +49,8 @@ public final class SourceDependencyAnalysis {
             String authority=kind==Kind.DB2_TABLE?"STATIC_SQL_TABLE_POSITION":switch(declaration.nameSource()){case "source.COPY_SYNTAX@1"->"COPY_SYNTAX";case "source.CONFIGURED_DCLGEN@1"->"CONFIGURED_DCLGEN";case "source.CONFIGURED_SQL_INCLUDE@1"->"CONFIGURED_SQL_INCLUDE";case "source.BUILTIN_SQL_INCLUDE@1"->"BUILTIN_SQL_INCLUDE";case "source.UNKNOWN@1"->"UNKNOWN";default->throw new IllegalArgumentException("Unknown source authority");};
             if((kind==Kind.DCLGEN)!=authority.equals("CONFIGURED_DCLGEN")||kind==Kind.DCLGEN&&Set.of("SQLCA","SQLDA").contains(target.name())||(kind==Kind.COPYBOOK)!=authority.equals("COPY_SYNTAX"))throw new IllegalArgumentException("Source classification lacks authority");
             if(!target.name().equals(target.name().toUpperCase(Locale.ROOT))||target.name().isBlank())throw new IllegalArgumentException("Noncanonical source name");
-            var origin=origins.get(resource.origin());
-            if(origin instanceof Origins.Derived derived&&derived.rule().equals("sp-provenance/original-expanded@1")&&derived.inputs().size()==2)origin=origins.get(derived.inputs().getFirst());
+            var origin=publication.origin(resource.origin());
+            if(origin instanceof Origins.Derived derived&&derived.rule().equals("sp-provenance/original-expanded@1")&&derived.inputs().size()==2)origin=publication.origin(derived.inputs().getFirst());
             if(!(origin instanceof Origins.Written written)||written.location().isEmpty())throw new IllegalArgumentException("Source occurrence requires original written evidence");
             var key=new Key(declaration.owner(),kind,target.name(),target.namespace().equals("source-member")?"":target.namespace());
             groups.computeIfAbsent(key,unused->new ArrayList<>()).add(new Support(resource.id(),resource.origin(),written.artifact(),!written.includes().isEmpty(),resolution,resolution==Resolution.RESOLVED?declaration.name():"",authority,operation,access));

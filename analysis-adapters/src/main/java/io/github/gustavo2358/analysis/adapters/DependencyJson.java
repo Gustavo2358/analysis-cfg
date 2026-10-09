@@ -36,8 +36,8 @@ public final class DependencyJson {
                 var value=site(s,true);if(snapshot)value.put("coverage",Objects.requireNonNull(coverage.get(s.operation()),"missing original site coverage").name());return value;
             }),
             "edges",result.edges().stream().sorted(Comparator.comparing(DependencyResult.Edge::entry,io.github.gustavo2358.analysis.plan.AnalysisKey.ENTRY_ORDER).thenComparing(e->e.site().localId()).thenComparing(e->e.candidate().referenceName()).thenComparing(e->e.candidate().rawValue())).map(e->object("caller",id(e.caller()),"entry",id(e.entry()),"site",id(e.site()),"candidate",candidate(e.candidate()),"openSite",e.openSite())),
-            "metrics",result.metrics(),"origins",result.origins().stream().sorted(Comparator.comparing(o->o.id().localId())).map(DependencyJson::origin),
-            "artifacts",result.artifacts().stream().sorted(Comparator.comparing(a->a.id().localId())).map(a->object("id",id(a.id()),"logicalName",a.logicalName(),"contentDigest",a.contentDigest().orElse(null))),
+            "metrics",result.metrics(),"origins",orderedMetadata(result.origins(),Comparator.comparing(o->o.id().localId())).map(DependencyJson::origin),
+            "artifacts",orderedMetadata(result.artifacts(),Comparator.comparing(a->a.id().localId())).map(a->object("id",id(a.id()),"logicalName",a.logicalName(),"contentDigest",a.contentDigest().orElse(null))),
             "sourceUncertaintyRefs",ids(result.sourceUncertaintyRefs()));
         document.put("analysisStatus",result.partial()?"PARTIAL":"COMPLETE");document.put("analysisReasons",result.analysisReasons().stream().distinct().sorted());
         if(snapshot) {
@@ -94,7 +94,10 @@ public final class DependencyJson {
     }
     private static Object candidate(Candidate c){return object("referenceName",c.referenceName(),"rawValue",c.rawValue(),"supports",supports(c.supports()));}
     private static Object supports(List<Support> supports){return supports.stream().sorted(Comparator.comparing(Support::producer,WireIds.ORDER).thenComparing(Support::origin,WireIds.ORDER)).map(s->object("kind",switch(s.kind()){case VALUE_PRODUCER->"VALUE_PRODUCER";case CALL_LITERAL->"CALL_LITERAL";case CICS_LITERAL->"CICS_LITERAL";},"producer",id(s.producer()),"origin",id(s.origin()),"premises",ids(s.premises())));}
-    private static Object ids(List<? extends Id> ids){return ids.stream().sorted(WireIds.ORDER).map(DependencyJson::id);}
+    private static Object ids(List<? extends Id> ids){return orderedMetadata(ids,WireIds.ORDER).map(DependencyJson::id);}
+    private static <T> java.util.stream.Stream<T> orderedMetadata(List<T> values,Comparator<? super T> order){
+        return DependencyResult.isBorrowedMetadata(values)?values.stream():values.stream().sorted(order);
+    }
     private static Object id(Id id){return id instanceof ArtifactId a?object("domain","artifact","localId",a.localId(),"publication",a.publication().localId()):WireIds.id(id);}
     private static String version(SemanticVersion v){return v.major()+"."+v.minor()+"."+v.patch();}
     private static String inventory(Evidence.InventoryStatus s){return switch(s){case COMPLETE->"COMPLETE";case PARTIAL->"PARTIAL";case UNAVAILABLE->"UNAVAILABLE";};}

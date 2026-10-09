@@ -27,6 +27,96 @@ final class SnapshotDependencyAnalysisTest {
     @TempDir java.nio.file.Path directory;
     private static AnalysisResources resources(){return new AnalysisResources(new AnalysisResources.Limits(64_000_000,64_000_000,0,256_000_000,4,1_000_000_000,1_000_000));}
 
+    @Test void generalMetadataUsesOrderedBorrowedPagesWithoutReadingUnusedPayloads() throws Exception {
+        Publication seed;
+        try(var input=getClass().getResourceAsStream("/cp6/dynamic-x8.air.json")){seed=new AirJson().decode(input.readAllBytes());}
+        var origins=new java.util.ArrayList<>(seed.origins());
+        for(int i=127;i>=0;i--)origins.add(new Origins.Derived(new OriginId(seed.id(),"unused-"+i),
+            List.of(seed.origins().getFirst().id()),"!".repeat(4096)+"/"+i));
+        var publication=new Publication(seed.id(),seed.airVersion(),seed.capabilities(),seed.artifacts().reversed(),
+            seed.units(),seed.storage(),seed.resources(),seed.artifactRelations(),origins,seed.coverage(),seed.uncertainties(),seed.premises());
+        var ledger=resources();long[] payloadReads={0};List<Origins.Origin> borrowed;
+        try(var pages=new FilePageStore(directory,4096,32,ledger);var original=AirSnapshot.fromPublication(publication)) {
+            var storage=new PagedAirStorage(pages,ledger,AnalysisResources.Phase.DECODE);
+            var tracked=new AirSnapshotBuilder.Storage() {
+                @Override public long get(AirSnapshotBuilder.Column column,long index) {
+                    long value=storage.get(column,index);
+                    // The official snapshot packs four UTF-16 characters into one word.
+                    if(column==AirSnapshotBuilder.Column.CHARACTERS&&value==0x0021002100210021L)payloadReads[0]++;
+                    return value;
+                }
+                @Override public void set(AirSnapshotBuilder.Column column,long index,long value){storage.set(column,index,value);}
+                @Override public AirSnapshotBuilder.Lease claim(long bytes){return storage.claim(bytes);}
+                @Override public AirSnapshotBuilder.Lease readLease(long bytes){return storage.readLease(bytes);}
+                @Override public void freeze(){storage.freeze();}
+                @Override public void close(){storage.close();}
+            };
+            try(var builder=new AirSnapshotBuilder(tracked)) {
+                long root=PagedAirStorageTest.copy(original,original.root(),null,builder);
+                try(var checked=SnapshotValidator.check(builder.finish(root),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger))) {
+                    assertTrue(checked.result().isStructurallyValid(),checked.result().toString());
+                    var ordered=new PagedSnapshotOrderStorage(pages,ledger);int[] sorts={0};
+                    var trackedOrders=new io.github.gustavo2358.analysis.dependencies.SnapshotOrderStorage() {
+                        @Override public Index open(Order order){sorts[0]++;return ordered.open(order);}
+                        @Override public Tape tape(){return ordered.tape();}
+                        @Override public void close(){ordered.close();}
+                    };
+                    try(var program=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),trackedOrders,ledger)) {
+                        var cfg=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).buildChecked(program,checked,BuildOptions.defaults());
+                        assertEquals(CfgBuildResult.Status.CFG_BUILT,cfg.status());payloadReads[0]=0;
+                        program.origins().getLast();assertTrue(payloadReads[0]>0,"payload instrumentation must observe a real cold read");payloadReads[0]=0;
+                        var result=new io.github.gustavo2358.analysis.dependencies.DependencyAnalysis().prepareLeased(program,cfg);
+                        assertEquals(0,payloadReads[0],"preparation retained unused Origin bodies instead of borrowed addresses");
+                        borrowed=result.origins();assertEquals(origins.size(),borrowed.size());
+                        int preparedSorts=sorts[0];
+                        assertSame(borrowed,result.withProgramInventory(result.programDependencies(),result.metrics()).origins());
+                        assertEquals(seed.origins().getFirst(),program.origin(seed.origins().getFirst().id()));
+                        assertNull(program.origin(new OriginId(seed.id(),"missing")));
+                        assertNull(program.origin(new OriginId(new PublicationId("foreign"),seed.origins().getFirst().id().localId())));
+                        assertEquals(origins.getLast(),program.origin(origins.getLast().id()));
+                        assertEquals(preparedSorts,sorts[0],"origin lookup must reuse the canonical address order");
+                        var expectedOrigins=origins.stream().sorted(java.util.Comparator.comparing(o->o.id().localId())).toList();
+                        for(int i=0;i<expectedOrigins.size();i++)assertEquals(expectedOrigins.get(i),borrowed.get(i),"ordered Origin ordinal "+i);
+                        assertEquals(seed.artifacts().stream()
+                            .sorted(java.util.Comparator.comparing(a->a.id().localId())).toList(),result.artifacts());
+                        var out=new ByteArrayOutputStream();new DependencyJson().writeSnapshot(result,program,out);
+                        var detached=new io.github.gustavo2358.analysis.dependencies.DependencyAnalysis().prepare(publication);
+                        var reference=new ByteArrayOutputStream();new DependencyJson().writeSnapshot(detached,program,reference);
+                        var mapper=new com.fasterxml.jackson.databind.ObjectMapper();
+                        var expected=mapper.readTree(reference.toByteArray());var actual=mapper.readTree(out.toByteArray());
+                        for(var field:List.of("sites","edges","origins","artifacts","sourceUncertaintyRefs","fileDependencies",
+                            "sourceDependencies","sourceQualifiedDependencies","dependencies","version","modelScope","metrics"))
+                            assertEquals(expected.get(field),actual.get(field),"complete metadata-leased result section: "+field);
+                        var repeated=new ByteArrayOutputStream();new DependencyJson().writeSnapshot(result,program,repeated);
+                        assertArrayEquals(out.toByteArray(),repeated.toByteArray(),"native canonical output must be byte deterministic");
+                        assertThrows(UnsupportedOperationException.class,borrowed::clear);
+                    }
+                    assertThrows(IllegalStateException.class,borrowed::size);
+                    assertThrows(IllegalStateException.class,borrowed::getFirst);
+                }
+            }
+            assertEquals(0,pages.statistics().livePages());
+        }
+        assertEquals(0,ledger.heapUsed());
+    }
+
+    @Test void exhaustedNativeMetadataOrderReleasesPartialPagesWithoutClosingInput() {
+        for(int remaining:new int[]{0,1}) {
+        var publication=directCall();var ledger=resources();
+        try(var pages=new FilePageStore(directory,512,16,ledger);var snapshot=AirSnapshot.fromPublication(publication);
+            var checked=SnapshotValidator.check(snapshot,ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger));
+            var program=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),new PagedSnapshotOrderStorage(pages,ledger),ledger)) {
+            long before=ledger.heapUsed(),live=pages.statistics().livePages();
+            ledger.work(ledger.limits().workUnits()-ledger.workUsed()-remaining,AnalysisResources.Phase.INDEX);
+            var failure=assertThrows(AnalysisResources.Exhausted.class,program::orderedOrigins);
+            assertEquals(remaining==0?AnalysisResources.Phase.INDEX:AnalysisResources.Phase.DOMAIN,failure.phase());
+            assertEquals(before,ledger.heapUsed());assertEquals(live,pages.statistics().livePages());
+            assertSame(snapshot,checked.snapshot());assertEquals(publication.id(),program.publicationId());
+        }
+        for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
+        }
+    }
+
     @Test void sourceUnitInventoryBorrowsCanonicalPagesAndExpiresWithProgram() {
         for(int count:new int[]{1,16,64}) {
             var reference=directCalls(count);var ledger=resources();

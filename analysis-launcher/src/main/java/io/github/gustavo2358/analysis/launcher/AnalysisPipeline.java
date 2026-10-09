@@ -120,7 +120,7 @@ public final class AnalysisPipeline {
                 if(built.status()!=CfgBuildResult.Status.CFG_BUILT){err.println("CFG "+built.status());return 4;}
                 // Complete analysis preparation before replacing either existing product.
                 var analysis=new DependencyAnalysis(physical?StorageAnalysisMode.EXPERIMENTAL_PHYSICAL:StorageAnalysisMode.LOGICAL_ONLY);
-                var result=evidence==null?analysis.prepare(program,built):analysis.prepare(program,built,evidence,List.of(),read.borrowedPages(),resources);
+                var result=evidence==null?analysis.prepareLeased(program,built):analysis.prepareLeased(program,built,evidence,List.of(),read.borrowedPages(),resources);
                 try {new CfgJsonWriter(resources.limits().outputBytes()).write(built,cfg,
                         bytes->resources.output(bytes,AnalysisResources.Phase.ENCODE));}
                 catch(CfgJsonException failure){err.println("CFG_OUTPUT_SERIALIZATION");return 5;}

@@ -86,6 +86,13 @@ public final class DependencyAnalysis {
         var qualification=DependencyInput.qualify(program,Optional.empty(),List.of());
         return enrich(prepareExecutable(program,cfg),Optional.empty(),qualification.preparedSource(),qualification.occurrences(),program,null,null);
     }
+    /** Native application result whose metadata borrows the checked program's lifetime. */
+    public DependencyResult prepareLeased(SnapshotProgram program,CfgBuildResult cfg) {
+        Objects.requireNonNull(program);Objects.requireNonNull(cfg);program.admission();
+        if(cfg.status()!=CfgBuildResult.Status.CFG_BUILT)throw new Failure(Kind.CFG_UNSUPPORTED,"CFG_UNSUPPORTED");
+        var qualification=DependencyInput.qualify(program,Optional.empty(),List.of());
+        return enrich(prepareExecutable(program,cfg,program),Optional.empty(),qualification.preparedSource(),qualification.occurrences(),program,null,null);
+    }
     /** Explicit source authority composes with the same native executable analysis and shared page owner. */
     public DependencyResult prepare(SnapshotProgram program,CfgBuildResult cfg,QualifiedSourceDependencies source,
             List<DependencyInput.StatementCorrelation> correlations,PageStore pages,AnalysisResources resources) {
@@ -95,10 +102,22 @@ public final class DependencyAnalysis {
         var qualification=DependencyInput.qualify(program,Optional.of(source),correlations);
         return enrich(prepareExecutable(program,cfg),Optional.of(source),qualification.preparedSource(),qualification.occurrences(),program,pages,resources);
     }
+    /** Full source/physical semantics, with canonical metadata borrowed until publication finishes. */
+    public DependencyResult prepareLeased(SnapshotProgram program,CfgBuildResult cfg,QualifiedSourceDependencies source,
+            List<DependencyInput.StatementCorrelation> correlations,PageStore pages,AnalysisResources resources) {
+        Objects.requireNonNull(program);Objects.requireNonNull(cfg);Objects.requireNonNull(source);
+        Objects.requireNonNull(pages);Objects.requireNonNull(resources);program.admission();
+        if(cfg.status()!=CfgBuildResult.Status.CFG_BUILT)throw new Failure(Kind.CFG_UNSUPPORTED,"CFG_UNSUPPORTED");
+        var qualification=DependencyInput.qualify(program,Optional.of(source),correlations);
+        return enrich(prepareExecutable(program,cfg,program),Optional.of(source),qualification.preparedSource(),qualification.occurrences(),program,pages,resources);
+    }
     private DependencyResult prepareExecutable(ProgramStore.Structural publication,CfgBuildResult cfg) {
+        return prepareExecutable(publication,cfg,null);
+    }
+    private DependencyResult prepareExecutable(ProgramStore.Structural publication,CfgBuildResult cfg,SnapshotProgram metadataOwner) {
         var opened=AnalysisSession.open(cfg,publication,cfg.options().projectionPolicy(),publication.units().stream()
             .flatMap(u->u.entries().stream()).filter(e->e.initialLabel().isPresent()).map(Entries.Entry::id).toList());
-        if(opened.status()!=AnalysisSession.Status.ACCEPTED)return partialInventory(publication,opened.reason());
+        if(opened.status()!=AnalysisSession.Status.ACCEPTED)return partialInventory(publication,opened.reason(),metadataOwner);
         var session=opened.session().orElseThrow();
         try(var execution=new PlanningExecution(session,new AnalysisRegistry(List.of(new PossibleValuesProvider(),new RegionalValuesProvider(),new StorageValuesProvider(),new ReachabilityProvider())))) {
             var selection=CallDependencyPlan.choose(session,"call",false,mode);
@@ -155,7 +174,10 @@ public final class DependencyAnalysis {
                     .filter(e->e.getKey().endsWith("prepare_"+counter)).mapToLong(Map.Entry::getValue).sum();
                 metrics.put(counter,count);
             }
-            return new DependencyResult(publication.publicationId(),publication.airVersion(),sites,edges,metrics,publication.coverage().inventory(),publication.origins(),publication.artifacts(),publication.uncertainties().stream().map(Evidence.Uncertainty::id).toList(),List.copyOf(reasons),fileResult,sourceResult);
+            return new DependencyResult(publication.publicationId(),publication.airVersion(),sites,edges,metrics,publication.coverage().inventory(),
+                metadataOwner==null?publication.origins():metadataOwner.orderedOrigins(),
+                metadataOwner==null?publication.artifacts():metadataOwner.orderedArtifacts(),
+                metadataOwner==null?publication.uncertainties().stream().map(Evidence.Uncertainty::id).toList():metadataOwner.orderedUncertaintyRefs(),List.copyOf(reasons),fileResult,sourceResult);
         }
     }
     private Set<CallDependencyPlan.SiteKey> physicalDemands(AnalysisSession session,CallDependencyPlan.Selection selection) {
@@ -192,13 +214,18 @@ public final class DependencyAnalysis {
         return partialInventory(ProgramStore.resident(publication),reason);
     }
     private DependencyResult partialInventory(ProgramStore.Structural publication,String reason) {
+        return partialInventory(publication,reason,null);
+    }
+    private DependencyResult partialInventory(ProgramStore.Structural publication,String reason,SnapshotProgram metadataOwner) {
         var sites=inventory(publication).stream().map(s->CallDependencyConsumer.partial(s,Optional.empty(),List.of(reason)))
             .sorted(Comparator.comparing(DependencySiteFact::entry,AnalysisKey.ENTRY_ORDER).thenComparing(f->f.operation().localId())).toList();
         var edges=new ArrayList<DependencyResult.Edge>();
         for(var site:sites)for(var candidate:site.candidates())edges.add(new DependencyResult.Edge(site.caller(),site.entry(),site.operation(),candidate,true));
         return new DependencyResult(publication.publicationId(),publication.airVersion(),sites,edges,
             Map.of("possibleValuesPreparations",0L,"possibleValuesRuns",0L,"reachabilityRuns",0L,"partialSites",(long)sites.size(),"logicalOnlyMode",mode.physical()?0L:1L,"experimentalPhysicalMode",mode.physical()?1L:0L,"physicalGroupsApplied",0L,"physicalWritesApplied",0L),
-            publication.coverage().inventory(),publication.origins(),publication.artifacts(),publication.uncertainties().stream().map(Evidence.Uncertainty::id).toList(),List.of(reason),FileDependencyAnalysis.prepare(publication,null,null,reason,mode),new SourceDependencyAnalysis().prepare(publication));
+            publication.coverage().inventory(),metadataOwner==null?publication.origins():metadataOwner.orderedOrigins(),
+            metadataOwner==null?publication.artifacts():metadataOwner.orderedArtifacts(),
+            metadataOwner==null?publication.uncertainties().stream().map(Evidence.Uncertainty::id).toList():metadataOwner.orderedUncertaintyRefs(),List.of(reason),FileDependencyAnalysis.prepare(publication,null,null,reason,mode),new SourceDependencyAnalysis().prepare(publication));
     }
     public enum Kind { INVALID_INPUT,INPUT_INCOMPLETE,CFG_UNSUPPORTED,ANALYSIS_UNSUPPORTED,RESOURCE_LIMIT,CONSUMER_FAILURE }
     public static final class Failure extends RuntimeException {

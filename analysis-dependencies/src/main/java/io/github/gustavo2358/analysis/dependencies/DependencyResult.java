@@ -4,7 +4,8 @@ import io.github.gustavo2358.air.model.*;
 import io.github.gustavo2358.air.model.Ids.*;
 import java.util.*;
 
-/** Detached dependency facts; 1.2.0 additionally represents semantic preparation limits. */
+/** Detached dependency facts; an explicit native lease may borrow canonical metadata.
+ * Such metadata expires with its checked SnapshotProgram. Ordinary callers still receive copies. */
 public record DependencyResult(PublicationId publication,SemanticVersion airVersion,List<DependencySiteFact> sites,
         List<Edge> edges,Map<String,Long> metrics,Evidence.InventoryStatus publicationInventory,
         List<Origins.Origin> origins,List<Origins.Artifact> artifacts,List<UncertaintyId> sourceUncertaintyRefs,List<String> analysisReasons,FileDependencyResult fileDependencies,SourceDependencyResult sourceDependencies,Optional<SourceQualifiedDependencyResult> sourceQualifiedDependencies,List<TargetResolver.Resolution> programDependencies) {
@@ -52,6 +53,22 @@ public record DependencyResult(PublicationId publication,SemanticVersion airVers
         Objects.requireNonNull(sourceQualifiedDependencies);sourceQualifiedDependencies.ifPresent(s->{if(s.evidence().air().size()!=1 || !s.evidence().air().getFirst().publication().equals(publication.localId()))throw new IllegalArgumentException("source/AIR identity mismatch");});
         Objects.requireNonNull(sourceDependencies);Objects.requireNonNull(fileDependencies);analysisReasons=List.copyOf(analysisReasons);if(analysisReasons.stream().anyMatch(String::isBlank))throw new IllegalArgumentException("empty analysis reason");
         Objects.requireNonNull(publication);Objects.requireNonNull(airVersion);sites=List.copyOf(sites);edges=List.copyOf(edges);
-        metrics=Map.copyOf(metrics);Objects.requireNonNull(publicationInventory);origins=List.copyOf(origins);artifacts=List.copyOf(artifacts);sourceUncertaintyRefs=List.copyOf(sourceUncertaintyRefs);
+        metrics=Map.copyOf(metrics);Objects.requireNonNull(publicationInventory);origins=metadataCopy(origins);artifacts=metadataCopy(artifacts);sourceUncertaintyRefs=metadataCopy(sourceUncertaintyRefs);
+    }
+    /** True only for the package's canonical, immutable native metadata lease. */
+    public static boolean isBorrowedMetadata(List<?> values){return values instanceof MetadataList<?>;}
+    private static <T> List<T> metadataCopy(List<T> values){return isBorrowedMetadata(values)?values:List.copyOf(values);}
+    static <T> List<T> borrowedMetadata(long count,java.util.function.IntFunction<T> access,Runnable owner){
+        return new MetadataList<>(Math.toIntExact(count),access,owner);
+    }
+    private static final class MetadataList<T> extends AbstractList<T> implements RandomAccess {
+        private final int count;private final java.util.function.IntFunction<T> access;private final Runnable owner;
+        MetadataList(int count,java.util.function.IntFunction<T> access,Runnable owner){
+            if(count<0)throw new IllegalArgumentException("negative metadata inventory");
+            this.count=count;this.access=Objects.requireNonNull(access);this.owner=Objects.requireNonNull(owner);owner.run();
+        }
+        @Override public int size(){owner.run();return count;}
+        @Override public T get(int ordinal){owner.run();Objects.checkIndex(ordinal,count);return Objects.requireNonNull(access.apply(ordinal));}
+        @Override public void clear(){throw new UnsupportedOperationException("immutable borrowed metadata");}
     }
 }

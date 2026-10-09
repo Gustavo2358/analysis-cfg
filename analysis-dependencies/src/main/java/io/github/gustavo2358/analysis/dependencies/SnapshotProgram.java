@@ -36,6 +36,7 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
     private final char[] orderLeft=new char[64],orderRight=new char[64];
     private CfgSource source;
     private SnapshotOrderStorage.Tape unitOrder;
+    private final EnumMap<AirShape,SnapshotOrderStorage.Tape> metadataOrders=new EnumMap<>(AirShape.class);
     private List<Capabilities.Capability> requiredCapabilities;
     private Set<Capabilities.Capability> namePolicyExtensions;
     private final EnumMap<ProjectionPolicy,SnapshotNodes> nodeStores=new EnumMap<>(ProjectionPolicy.class);
@@ -745,6 +746,47 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
     }
 
     public List<Origins.Artifact> artifacts() {return borrowed(field(snapshot.root(),3),ORIGINS_ARTIFACT,Origins.Artifact.class);}
+    /** Canonical metadata addresses share the checked program's paged lifetime. */
+    public List<Origins.Artifact> orderedArtifacts(){return metadata(3,ORIGINS_ARTIFACT,Origins.Artifact.class);}
+    public List<Origins.Origin> orderedOrigins(){return metadata(8,ORIGINS_ORIGIN,Origins.Origin.class);}
+    public List<UncertaintyId> orderedUncertaintyRefs(){
+        var tape=metadataOrder(10,EVIDENCE_UNCERTAINTY);
+        return DependencyResult.borrowedMetadata(tape.size(),ordinal->{long row=tape.handle(ordinal);
+            return occurrence(snapshot.field(row,snapshot.shape(row),0),UncertaintyId.class);},this::borrowedOpen);
+    }
+    private <T> List<T> metadata(int field,AirShape shape,Class<T> type){
+        var tape=metadataOrder(field,shape);
+        return DependencyResult.borrowedMetadata(tape.size(),ordinal->occurrence(tape.handle(ordinal),type),this::borrowedOpen);
+    }
+    private SnapshotOrderStorage.Tape metadataOrder(int field,AirShape shape){
+        borrowedOpen();var known=metadataOrders.get(shape);if(known!=null)return known;
+        progress(ProgramStore.ExecutionPhase.INDEX);
+        var tape=orderStorage.tape();
+        try {
+            ordered(snapshot.field(snapshot.root(),PUBLICATION,field),shape,
+                (a,b)->compareLocalIds(a,snapshot.shape(a),0,b,snapshot.shape(b),0),tape::append);
+            metadataOrders.put(shape,tape);return tape;
+        }catch(RuntimeException|Error failure){try{tape.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;}
+    }
+    @Override public Origins.Origin origin(OriginId id){
+        borrowedOpen();Objects.requireNonNull(id);if(!id.publication().equals(publicationId()))return null;
+        var tape=metadataOrder(8,ORIGINS_ORIGIN);long low=0,high=tape.size()-1;
+        while(low<=high){progress(ProgramStore.ExecutionPhase.INDEX);long middle=low+((high-low)>>>1),row=tape.handle(middle);
+            long identity=snapshot.field(row,snapshot.shape(row),0);
+            int order=compareTextToString(snapshot.field(identity,IDS_ORIGIN_ID,1),id.localId());
+            if(order==0)return materializeOrigin(row);if(order<0)low=middle+1;else high=middle-1;
+        }
+        return null;
+    }
+    private int compareTextToString(long text,String value){
+        long length=snapshot.characterCount(text),limit=Math.min(length,value.length()),offset=0;
+        char[] block=new char[64];
+        while(offset<limit){int width=(int)Math.min(block.length,limit-offset),read=snapshot.readCharacters(text,offset,block,0,width);
+            if(read<=0)throw new IllegalStateException("metadata identity comparison made no progress");
+            for(int i=0;i<read;i++){int order=Character.compare(block[i],value.charAt(Math.toIntExact(offset+i)));if(order!=0)return order;}offset+=read;
+        }
+        return Long.compare(length,value.length());
+    }
 
     @Override public void artifactHandles(MetadataHandleConsumer consumer) {
         open();Objects.requireNonNull(consumer);
@@ -837,6 +879,8 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
     @Override public void close(){if(closed)return;closed=true;Throwable failure=null;
         for(var nodes:nodeStores.values())try{nodes.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
         try{if(unitOrder!=null)unitOrder.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
+        for(var tape:metadataOrders.values())try{tape.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
+        metadataOrders.clear();
         try{keys.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
         try{orderStorage.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
         if(failure instanceof RuntimeException exception)throw exception;if(failure instanceof Error error)throw error;}

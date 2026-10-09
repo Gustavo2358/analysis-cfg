@@ -26,6 +26,11 @@ public interface ProgramStore {
         CoverageView coverage();
         List<Evidence.Uncertainty> uncertainties();
         List<Proofs.Premise> premises();
+        /** Exact identity lookup. Native implementations can resolve a cold address without
+         * retaining every Origin body. The resident compatibility default remains explicit. */
+        default Origins.Origin origin(OriginId id) {
+            Objects.requireNonNull(id);return origins().stream().filter(value->value.id().equals(id)).findFirst().orElse(null);
+        }
     }
 
     /** Metadata/body addresses, not an owning Unit containing the complete executable payload. */
@@ -84,6 +89,7 @@ public interface ProgramStore {
         private final Publication publication;
         private final Set<Capabilities.Capability> namePolicyExtensions;
         private final List<UnitView> units;
+        private Map<OriginId,Origins.Origin> originIndex;
         private Resident(Publication publication) {
             this.publication=publication;namePolicyExtensions=NamePolicies.extensions(publication);
             units=publication.units().stream().map(ProgramStore::residentUnit).toList();
@@ -98,6 +104,11 @@ public interface ProgramStore {
         @Override public List<Memory.Storage> storage(){return publication.storage();}
         @Override public List<Interactions.Resource> resources(){return publication.resources();}
         @Override public List<Origins.Origin> origins(){return publication.origins();}
+        @Override public Origins.Origin origin(OriginId id){
+            Objects.requireNonNull(id);
+            if(originIndex==null){originIndex=new HashMap<>();for(var value:publication.origins())originIndex.put(value.id(),value);}
+            return originIndex.get(id);
+        }
         @Override public CoverageView coverage(){return residentCoverage(publication.coverage());}
         @Override public List<Evidence.Uncertainty> uncertainties(){return publication.uncertainties();}
         @Override public List<Proofs.Premise> premises(){return publication.premises();}
