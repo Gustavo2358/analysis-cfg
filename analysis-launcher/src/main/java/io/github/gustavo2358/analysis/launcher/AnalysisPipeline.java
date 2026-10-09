@@ -106,8 +106,12 @@ public final class AnalysisPipeline {
             }
             QualifiedSourceDependencies evidence=null;
             if(source!=null) {
-                try(var stream=JsonFiles.input(source)){evidence=new QualifiedSourceJson().decode(stream);}
                 resources.work(1,AnalysisResources.Phase.DECODE);
+                var sourceHandle=resources.reserve(AnalysisResources.Pool.OPEN_FILES,1,AnalysisResources.Phase.DECODE);
+                try(var stream=JsonFiles.input(source)) {
+                    evidence=new QualifiedSourceJson().decode(stream,()->resources.work(1,AnalysisResources.Phase.DECODE),
+                            ()->resources.work(1,AnalysisResources.Phase.VALIDATION));
+                } finally {sourceHandle.close();}
                 if(evidence.air().size()!=1||!evidence.air().getFirst().sha256().equals(read.sha256()))
                     throw new IllegalArgumentException("AIR digest mismatch");
             }

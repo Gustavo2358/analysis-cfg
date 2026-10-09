@@ -49,6 +49,57 @@ final class SourceNominalAdmissionTest {
         for(var authority:List.of("NOMINAL_TEXT_SOURCE_V1","NOMINAL_TEXT_SOURCE_V2"))
             assertEquals("expression requires V3",assertThrows(IllegalArgumentException.class,()->facts(authority,extended,List.of())).getMessage());
     }
+    @Test void constructionProgressStopsInsideDeepAdmissionWithoutBecomingModelState() {
+        var term=unary(read("P"),12000);
+        var symbols=List.of(new NominalValues.Symbol("P",8));
+        var assignments=List.of(new NominalValues.Assignment("write","P",term));
+        var queries=List.of(new NominalValues.Query("query","P"));
+        int[] steps={0};var stopped=new IllegalStateException("construction budget");
+        assertSame(stopped,assertThrows(IllegalStateException.class,()->new NominalValues(
+            "NOMINAL_TEXT_SOURCE_V3",symbols,assignments,List.of(),queries,List.of(),
+            ()->{if(++steps[0]==100)throw stopped;})));
+        assertEquals(100,steps[0]);
+        int[] completed={0};var admitted=new NominalValues("NOMINAL_TEXT_SOURCE_V3",symbols,assignments,
+            List.of(),queries,List.of(),()->completed[0]++);
+        assertTrue(completed[0]>12000);assertSame(term,admitted.assignments().getFirst().source());
+        int before=completed[0];admitted.symbols().getFirst();admitted.assignments().getFirst();
+        admitted.validate(Set.of("P"),Set.of("write","query"));assertEquals(before,completed[0]);
+        var ordinary=facts("NOMINAL_TEXT_SOURCE_V3",read("P"),List.of());
+        var checked=new NominalValues(ordinary.authority(),ordinary.symbols(),ordinary.assignments(),
+            ordinary.conditions(),ordinary.queries(),ordinary.tableFields(),()->completed[0]++);
+        assertEquals(ordinary,checked);assertEquals(ordinary.hashCode(),checked.hashCode());
+        assertEquals(ordinary.toString(),checked.toString());
+    }
+    private static UnitEvidence readmit(UnitEvidence base,Runnable progress) {
+        return new UnitEvidence(base.unit(),base.controlAvailable(),base.statements(),base.occurrences(),
+            base.targets(),base.nodes(),base.derivations(),base.selections(),base.events(),base.guards(),
+            base.proofs(),base.frontiers(),base.nominalValues(),base.nativeFiles(),progress);
+    }
+    @Test void unitAndDocumentAdmissionShareProgressAndRetainOnlyImmutableEvidence() {
+        var base=SourceValuesProviderTest.fixture(List.of(),List.of(),List.of());
+        var nominal=base.nominalValues().orElseThrow();int[] steps={0};
+        var checkedNominal=new NominalValueEvidence(nominal.facts(),nominal.declarations(),nominal.seeds(),
+            nominal.branches(),nominal.uncertainties(),()->steps[0]++);
+        assertEquals(nominal,checkedNominal);assertTrue(steps[0]>5);
+        var admitted=readmit(base,()->steps[0]++);assertEquals(base,admitted);
+        int total=steps[0];int stopAt=total/2;steps[0]=0;
+        var stopped=new IllegalStateException("unit construction budget");
+        assertSame(stopped,assertThrows(IllegalStateException.class,()->readmit(base,()->{
+            if(++steps[0]==stopAt)throw stopped;
+        })));assertEquals(stopAt,steps[0]);
+        var document=new Document("cobol-semantic-product","1.0.0","0".repeat(64));
+        var air=List.of(new AirCorrelation("publication","1".repeat(64)));
+        for(var version:List.of("1.0.0","1.1.0","1.2.0","1.3.0","1.4.0","1.5.0","1.6.0")) {
+            var ordinary=new io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies(
+                "qualified-source-dependencies",version,"synthetic",document,air,List.of(base));
+            var checked=new io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies(
+                ordinary.schema(),version,ordinary.producer(),document,air,List.of(admitted),()->steps[0]++);
+            int completed=steps[0];assertEquals(ordinary,checked);assertEquals(ordinary.hashCode(),checked.hashCode());
+            assertEquals(ordinary.toString(),checked.toString());assertEquals(completed,steps[0]);
+        }
+        int completed=steps[0];assertEquals(base.hashCode(),admitted.hashCode());assertEquals(base.toString(),admitted.toString());
+        assertEquals(completed,steps[0]);assertThrows(UnsupportedOperationException.class,()->admitted.nodes().clear());
+    }
     private static UnitEvidence executable(NominalValues.Term term,NominalValues.Predicate predicate) {
         var base=SourceValuesProviderTest.fixture(List.of(),List.of(),List.of());var old=base.nominalValues().orElseThrow();
         var conditions=predicate==null?List.<NominalValues.Condition>of():List.of(new NominalValues.Condition("s1",predicate));

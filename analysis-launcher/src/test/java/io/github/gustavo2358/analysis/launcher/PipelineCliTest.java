@@ -40,6 +40,57 @@ final class PipelineCliTest {
     Path fixture(){return resource("cp6/dynamic-x8.air.json");}
     PrintStream errors(){return new PrintStream(new ByteArrayOutputStream());}
     String[] args(Path input,Path cfg,Path dependencies){return new String[]{input.toString(),cfg.toString(),dependencies.toString()};}
+    @Test void exhaustedCommonBudgetStopsBeforeSourceParsingAndPreservesProducts() throws Exception {
+        var limits=new io.github.gustavo2358.analysis.solver.AnalysisResources.Limits(
+                64_000_000,64_000_000,0,256_000_000,4,Long.MAX_VALUE,64_000_000);
+        var measured=new io.github.gustavo2358.analysis.solver.AnalysisResources(limits);
+        try(var admitted=new DataflowAirReader().readSnapshot(fixture(),measured)) {
+            assertTrue(admitted.checked().result().isStructurallyValid());
+        }
+        var budget=new io.github.gustavo2358.analysis.solver.AnalysisResources(
+                new io.github.gustavo2358.analysis.solver.AnalysisResources.Limits(
+                        limits.heapBytes(),limits.scratchBytes(),limits.directBytes(),limits.temporaryBytes(),
+                        limits.openFiles(),measured.workUsed(),limits.outputBytes()));
+        var source=dir.resolve("unfinished.source.json");Files.writeString(source,"{");
+        var cfg=dir.resolve("budget.cfg");var dependencies=dir.resolve("budget.dependencies");
+        Files.writeString(cfg,"cfg-sentinel");Files.writeString(dependencies,"dependencies-sentinel");
+        var errors=new ByteArrayOutputStream();
+        assertEquals(7,AnalysisPipeline.runSnapshot(new String[]{fixture().toString(),cfg.toString(),dependencies.toString(),
+                "--source-evidence",source.toString()},new PrintStream(errors),new DataflowAirReader(),budget),errors.toString());
+        assertTrue(errors.toString().contains("WORK phase=DECODE"),errors.toString());
+        assertEquals("cfg-sentinel",Files.readString(cfg));assertEquals("dependencies-sentinel",Files.readString(dependencies));
+        assertEquals(0,budget.heapUsed());assertEquals(0,budget.used(io.github.gustavo2358.analysis.solver.AnalysisResources.Pool.TEMPORARY));
+        assertEquals(0,budget.used(io.github.gustavo2358.analysis.solver.AnalysisResources.Pool.OPEN_FILES));
+    }
+    @Test void exhaustedCommonBudgetStopsSourceValidationAndPreservesProducts() throws Exception {
+        var input=dir.resolve("validation.air.json");var source=dir.resolve("validation.source.json");
+        try(var stream=getClass().getResourceAsStream("/qualified-source-r9/conditional.air.json")){Files.write(input,stream.readAllBytes());}
+        try(var stream=getClass().getResourceAsStream("/qualified-source-r9/conditional.source.json")){Files.write(source,stream.readAllBytes());}
+        var limits=new io.github.gustavo2358.analysis.solver.AnalysisResources.Limits(
+            64_000_000,64_000_000,0,256_000_000,4,Long.MAX_VALUE,64_000_000);
+        var measured=new io.github.gustavo2358.analysis.solver.AnalysisResources(limits);
+        try(var admitted=new DataflowAirReader().readSnapshot(input,measured)) {
+            assertTrue(admitted.checked().result().isStructurallyValid());
+        }
+        long[] decoded={0};var boundary=new IllegalStateException("source validation boundary");
+        try(var stream=JsonFiles.input(source)) {
+            assertSame(boundary,assertThrows(IllegalStateException.class,
+                ()->new QualifiedSourceJson().decode(stream,()->decoded[0]++,()->{throw boundary;})));
+        }
+        var budget=new io.github.gustavo2358.analysis.solver.AnalysisResources(
+            new io.github.gustavo2358.analysis.solver.AnalysisResources.Limits(
+                limits.heapBytes(),limits.scratchBytes(),limits.directBytes(),limits.temporaryBytes(),
+                limits.openFiles(),Math.addExact(measured.workUsed(),Math.addExact(1,decoded[0])),limits.outputBytes()));
+        var cfg=dir.resolve("validation.cfg");var dependencies=dir.resolve("validation.dependencies");
+        Files.writeString(cfg,"cfg-sentinel");Files.writeString(dependencies,"dependencies-sentinel");
+        var errors=new ByteArrayOutputStream();
+        assertEquals(7,AnalysisPipeline.runSnapshot(new String[]{input.toString(),cfg.toString(),dependencies.toString(),
+            "--source-evidence",source.toString()},new PrintStream(errors),new DataflowAirReader(),budget),errors.toString());
+        assertTrue(errors.toString().contains("WORK phase=VALIDATION"),errors.toString());
+        assertEquals("cfg-sentinel",Files.readString(cfg));assertEquals("dependencies-sentinel",Files.readString(dependencies));
+        assertEquals(0,budget.heapUsed());assertEquals(0,budget.used(io.github.gustavo2358.analysis.solver.AnalysisResources.Pool.TEMPORARY));
+        assertEquals(0,budget.used(io.github.gustavo2358.analysis.solver.AnalysisResources.Pool.OPEN_FILES));
+    }
     @Test void oneReadAndCompleteProductsEqualIndependentSeparateRoutes() throws Exception {
         var expectedCfg=dir.resolve("expected.cfg");var expectedDependencies=dir.resolve("expected.dependencies");
         var independent=new DataflowAirReader().read(fixture());
