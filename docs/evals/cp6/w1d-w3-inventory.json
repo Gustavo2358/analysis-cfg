@@ -1462,6 +1462,7 @@
         "io.github.gustavo2358.analysis.storage.StorageSubject",
         "io.github.gustavo2358.analysis.structure.AnalysisSession",
         "io.github.gustavo2358.analysis.structure.ContextView",
+        "io.github.gustavo2358.analysis.structure.OperationTable",
         "io.github.gustavo2358.analysis.structure.ProgramIndex",
         "io.github.gustavo2358.analysis.structure.ProgramStore",
         "io.github.gustavo2358.analysis.structure.ProgramStore$CoverageView",

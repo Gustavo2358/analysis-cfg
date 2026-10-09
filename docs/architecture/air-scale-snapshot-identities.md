@@ -532,3 +532,53 @@ and post-checks,743.400s. Ten frozen consumer inputs,thirteen physical material
 inputs and1235 runtime classfiles match after the clean rebuild. Global
 maps/plans/states/relations still
 prevent AS-W09/W10 completion.
+
+## Native complete operation identities
+
+The next independent admitted counterexample appends16 unreachable Nops with
+complete4096-character OperationIds. Stored-instance audit RED:16 identities in
+ProgramIndex,32 through StatementEffects and48 through Regional preparation
+(nested roots,not three counts to sum). A real native reader,not resident AIR,
+is used. Code bodies remained borrowed; resident keyed maps regained the texts.
+
+Structural operationDirectory now scans every instruction and terminator in
+original Unit/Sequence/occurrence order. Source-ID handles,exact canonical keys
+and lookup ordinals use the existing paged identity/order owner. Full nominal
+namespace and exact tuple equality determine lookup,never hashes or display text.
+OperationTable borrows this directory for canonical Sites,effects,RD and Regional
+plans. Iterating values does not decode and discard every key. Explicit key
+projection reconstructs identities without a cache. Owner closure invalidates
+lookup and iteration. Resident compatibility remains explicit.
+
+Admission validates complete identities at source positions and final cardinality;
+AIR/CFG sequence correlation compares every identity in order without a second
+bulk identity list. Existing canonical Site allocation identity is preserved.
+The independent counterexample is GREEN0/0/0. Consumer laws cover full namespace,
+equal Java hashes,different owners,all cold code,changed same-ID payload rejection,
+positive append failure,primary/suppressed cleanup exceptions and zero pool leaks.
+Focused kernel41,Regional47,dependencies10 and consumer4 PASS.
+
+Working values/sites/plans are still resident: this is removal of the demonstrated
+full-ID payload duplication,not a complete spill claim. Operand-owner IDs,events,
+solver states and input-cardinality value arrays still require AS-W09 coverage.
+Global AS-W09/W10 remain PARTIAL. The64-occurrence4096-character public reference
+was produced by the physical CLI on baba8135 before this implementation; no
+expected product was regenerated. The same64 Nops with only ID width changed
+to2200000 produce141360729bytes of completely admitted AIR,131 operations,
+401 entities and140 operands (only the two historical I-56 obligations).
+Production physical CLI Java21/Xmx128m/original8min quotas PASS83.54s,
+CPU79.66+5.19s,RSS277828KiB,exit0. Independent pre-fix oracle preserves21 wire
+fields (excluding generalAnalysisMetrics),83 complete origins,zero additions and
+exact CFG parity,dependencies59615bytes. All13 frozen material inputs and1241
+runtime classfiles match afterwards. The wire CFG does not serialize individual
+instruction IDs in either baseline or new product; full identity/order/payload
+checks are additionally asserted on the typed program boundary. Generator heap
+768MiB is separate from the unchanged128MiB application heap. Coherent original
+FAST PASS1171 required methods,zero skips,architecture and post-checks,
+748.722s. Fifteen frozen consumer inputs,thirteen physical inputs and1241 runtime
+classfiles (including the complete rebuilt path set) match afterwards. First
+FAST stopped before technical tests at the missing explicit W1 source registration
+for OperationTable. Registration and compiled inventory were updated without
+changing denied dependencies,DAG,tests,dimensions or quotas; that failure remains
+preserved. Operand-owner identity retention is a separate demonstrated next RED;
+the admitted Nop counterexample remains GREEN and AS-W09/W10 remain PARTIAL.

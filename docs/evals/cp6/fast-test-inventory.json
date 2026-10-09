@@ -484,6 +484,8 @@
       "failedNativeRegionalGroupWriteClosesPartialColumnsAndPreservesPrimary",
       "nativeRegionalExecutionBorrowsColdCellTraceLocationsAndPreservesPublicEvidence",
       "nativeEffectsAndDomainPlansBorrowLiteralBodiesAndPreserveReachedEvidence",
+      "nativeOperationLookupBorrowsCompleteColdIdentitiesAndCanonicalSites",
+      "failedNativeOperationDirectoryWritePreservesPrimaryAndClosesTapes",
       "nativeFileFallbackReadsOneTypedOperationWithoutBulkBodyCopies",
       "nativeFinitePartitionPreservesArbitraryCutsAndUnknownTail",
       "failedNativePartitionColumnWriteReleasesAllOwnersAndPreservesPrimary",
@@ -673,6 +675,10 @@
       "unsupportedProfileAndPolicyMismatchHaveDistinctTaxonomy",
       "incompleteUpstreamValidationDoesNotBecomeSemanticSizeOutcome",
       "detachedStructuralStoreIsAcceptedWithoutPublicationAggregate"
+    ],
+    "io.github.gustavo2358.analysis.structure.OperationTableTest": [
+      "nativeValuesNeverDecodeKeysAndLookupIncludesTheFullOwner",
+      "residentCompatibilityRetainsOrdinaryMapSemantics"
     ],
     "io.github.gustavo2358.analysis.structure.StructureTest": [
       "offsetsBucketsAndPayloadAreCanonical",

@@ -31,9 +31,9 @@ public final class RegionalValuesAnalysis {
     // Each compiled batch retains all writes, including scoped writes without logical candidates.
     private final Map<List<Plan>,List<StatementEffects.Write>> batchWrites=new IdentityHashMap<>();
     private final Map<StatementEffects.Write,Set<ObjectId>> closureImpacts=new IdentityHashMap<>();
-    private final Map<OperationId,List<Plan>> operations=new HashMap<>();
-    private final Map<OperationId,Map<Control.OutcomeKey,List<Plan>>> outcomes=new HashMap<>();
-    private final Map<OperationId,List<Plan>> otherwise=new HashMap<>();
+    private final Map<OperationId,List<Plan>> operations;
+    private final Map<OperationId,Map<Control.OutcomeKey,List<Plan>>> outcomes;
+    private final Map<OperationId,List<Plan>> otherwise;
     private final Map<EntryId,List<Plan>> initial=new HashMap<>();
     private final List<ValueFact.Support> events=new ArrayList<>();
     private final List<PreparedEvent> eventDetails=new ArrayList<>();
@@ -128,6 +128,7 @@ public final class RegionalValuesAnalysis {
     private RegionalValuesAnalysis(StatementEffects effects,StoragePartition partition,StorageAnalysisMode mode) {
         this.mode=mode;
         this.effects=effects;this.partition=partition;session=effects.storage().session();
+        operations=new OperationTable<>(session.index().store());outcomes=new OperationTable<>(session.index().store());otherwise=new OperationTable<>(session.index().store());
         logicalCellAliases=effects.storage().declarations().stream().filter(o->o.storage() instanceof Memory.CellBinding)
             .collect(java.util.stream.Collectors.groupingBy(o->((Memory.CellBinding)o.storage()).storage(),
                 java.util.stream.Collectors.mapping(Memory.ObjectDeclaration::id,java.util.stream.Collectors.toList())));

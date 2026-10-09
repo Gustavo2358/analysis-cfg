@@ -24,7 +24,8 @@ final class IndexBuilder {
     private record OutsideKey(OperationId operation,Control.InvocationAlternative outcome) { }
     private final Map<OutsideKey,ProgramIndex.Node> outcomeExits=new HashMap<>();
     private long expectedOutside;
-    final Map<OperationId, ProgramIndex.Site> operations = new HashMap<>();
+    Map<OperationId, ProgramIndex.Site> operations;
+    private ProgramStore.OperationDirectory operationDirectory;
     final Map<Class<? extends Operation>, List<ProgramIndex.Site>> buckets = new HashMap<>();
     final ProgramIndex.Declarations objects = new ProgramIndex.Declarations();
     final ProgramIndex.Storages storage = new ProgramIndex.Storages();
@@ -79,12 +80,18 @@ final class IndexBuilder {
         }
         supported(policy.acceptsInventory(store.coverage().inventory()), "unsupported publication inventory policy");
         declarations();
+        // No native directory construction before metadata admission. The table
+        // transfers directly; it never captures this construction lifetime.
+        operations=new OperationTable<>(store);
+        operationDirectory=store.operationDirectory().orElse(null);
         payload();
+        store.operationDirectory().ifPresent(directory->valid(operations.size()==directory.size(),"changed Operation inventory"));
         nodes(graph);
         edges(graph);
         localRules=graph.localRules();
         return new ProgramIndex(this);
     }
+
 
     private void declarations() {
         objects.connect(store.declarationInventory());
@@ -204,6 +211,7 @@ final class IndexBuilder {
     private void operation(ProgramStore.SequenceView sequence, ProgramStore.UnitView owner, int offset, Operation operation) {
         count.visit("operations");
         valid(operation.header().id().unit().equals(owner.id()), "foreign Operation owner");
+        if(operationDirectory!=null)valid(operationDirectory.identityAt(Math.toIntExact(count.operations),operation.header().id()),"changed indexed Operation identity");
         var site = new ProgramIndex.Site(sequence, owner, offset);
         unique(operations, operation.header().id(), site, "duplicate Operation");
         buckets.computeIfAbsent(operation.getClass(), ignored -> new ArrayList<>()).add(site);
@@ -257,8 +265,7 @@ final class IndexBuilder {
                 case CfgNode.SequenceNode n -> {
                     var sequence=sequences.get(n.label());
                     valid(sequence != null && CfgControl.from(sequence.terminator()).equals(n.control())
-                            && n.operations().equals(sequence.instructions().stream()
-                                    .map(operation -> operation.header().id()).toList()),
+                            && sameOperations(n.operations(),sequence.instructions()),
                             "foreign/replaced Sequence source");
                     unique(sequenceNodes, n.label(), node, "duplicate SequenceNode");
                 }
@@ -292,6 +299,13 @@ final class IndexBuilder {
         valid(normalExits.size() == expectedActiveEntries, "missing required NormalExit");
         valid(outcomeExits.size()==expectedOutside,"missing required outside outcome");
         valid(haltExits.size() == expectedHalts, "missing required HaltExit");
+    }
+
+    /** Preserve exact occurrence order without materializing another full-ID body list. */
+    private static boolean sameOperations(List<OperationId> identities,List<Instruction> instructions){
+        if(identities.size()!=instructions.size())return false;
+        for(int at=0;at<identities.size();at++)if(!identities.get(at).equals(instructions.get(at).header().id()))return false;
+        return true;
     }
 
     private void edges(CfgGraph graph) {

@@ -487,6 +487,102 @@ final class SnapshotDependencyAnalysisTest {
         }
     }
 
+    @Test void nativeOperationLookupBorrowsCompleteColdIdentitiesAndCanonicalSites() throws Exception {
+        var seed=directCall();var unit=seed.units().getFirst();var origin=unit.origin();
+        var template=unit.sequences().getFirst().terminator().header();
+        var instructions=new java.util.ArrayList<Instruction>();
+        // Equal Java hashes are not equal complete AIR identities.
+        for(int at=0;at<16;at++)instructions.add(new Operations.Nop(new Operations.Header(
+            new OperationId(unit.id(),"cold-operation-identity-"+"x".repeat(4096)+"/"+at),origin,template.coverage(),template.precision(),List.of())));
+        var collisionA=new OperationId(unit.id(),"Aa");var collisionB=new OperationId(unit.id(),"BB");
+        assertEquals(collisionA.hashCode(),collisionB.hashCode());
+        instructions.add(new Operations.Nop(new Operations.Header(collisionA,origin,template.coverage(),template.precision(),List.of())));
+        instructions.add(new Operations.Nop(new Operations.Header(collisionB,origin,template.coverage(),template.precision(),List.of())));
+        var terminal=new Operations.Return(new Operations.Header(new OperationId(unit.id(),"cold-operation-return"),origin,template.coverage(),template.precision(),List.of()),List.of());
+        var cold=new Sequence(new LabelId(unit.id(),"cold-operation-body"),instructions,terminal,origin);
+        var sequences=new java.util.ArrayList<>(unit.sequences());sequences.add(cold);
+        var changed=new Unit(unit.id(),unit.containingUnit(),unit.objects(),unit.visibleObjects(),unit.entries(),sequences,unit.completionPorts(),unit.body(),unit.bodyUnavailable(),unit.coverage(),origin);
+        var artifact=new ArtifactId(seed.id(),"source");
+        var publication=new Publication(seed.id(),seed.airVersion(),seed.capabilities(),List.of(new Origins.Artifact(artifact,"cold-operation-identities.synthetic",Optional.empty())),List.of(changed),seed.storage(),seed.resources(),seed.artifactRelations(),
+            List.of(new Origins.Written(origin,artifact,Optional.empty(),List.of(),true)),seed.coverage(),seed.uncertainties(),seed.premises());
+        var ledger=resources();var input=directory.resolve("cold-operation-identities.air.json");Files.write(input,new AirJson().encode(publication));
+        io.github.gustavo2358.analysis.structure.ProgramIndex borrowed;
+        try(var read=new DataflowAirReader().readSnapshot(input,ledger);
+            var program=new SnapshotProgram(read.checked(),read.newIdentityStorage(),read.newOrderStorage(),ledger)){
+            assertTrue(read.checked().result().isStructurallyValid(),read.checked().result().toString());
+            var cfg=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).buildChecked(program,read.checked(),BuildOptions.defaults());
+            var session=io.github.gustavo2358.analysis.structure.AnalysisSession.open(cfg,program,cfg.options().projectionPolicy(),unit.entries().stream().map(Entries.Entry::id).toList()).session().orElseThrow();
+            borrowed=session.index();
+            var directory=program.operationDirectory().orElseThrow();int ordinal=0;
+            for(var sequence:sequences){
+                var rows=new java.util.ArrayList<Operation>(sequence.instructions());rows.add(sequence.terminator());
+                for(var operation:rows){
+                    var identity=operation.header().id();assertEquals(identity,directory.identity(ordinal));
+                    assertEquals(ordinal,directory.ordinal(identity));assertTrue(directory.identityAt(ordinal,identity));ordinal++;
+                }
+            }
+            assertEquals(ordinal,directory.size());
+            assertThrows(IndexOutOfBoundsException.class,()->directory.identity(-1));
+            assertThrows(IndexOutOfBoundsException.class,()->directory.identity(directory.size()));
+            assertEquals(0,retainedUnusedIdentities(borrowed,OperationId.class),"the native structural index must not own another complete cold OperationId directory");
+            for(int at=0;at<instructions.size();at++){
+                var operation=instructions.get(at);var site=borrowed.site(operation.header().id());
+                assertNotNull(site);assertSame(site,borrowed.site(operation.header().id()));
+                assertEquals(at,site.offset());assertEquals(operation,site.operation());
+                assertSame(site,borrowed.sites(Operations.Nop.class).get(at));
+                assertDoesNotThrow(()->session.index().requireOperation(operation));
+            }
+            assertNotSame(borrowed.site(collisionA),borrowed.site(collisionB));
+            var id=instructions.getFirst().header().id();
+            assertNull(borrowed.site(new OperationId(new UnitId(seed.id(),"foreign-unit"),id.localId())));
+            assertNull(borrowed.site(new OperationId(new UnitId(new PublicationId("foreign-publication"),unit.id().localId()),id.localId())));
+            var header=instructions.getFirst().header();
+            var forged=new Operations.Nop(new Operations.Header(id,new OriginId(seed.id(),"replaced-origin"),header.coverage(),header.precision(),header.uncertainties()));
+            assertThrows(IllegalArgumentException.class,()->session.index().requireOperation(forged));
+            var effects=new io.github.gustavo2358.analysis.storage.StatementEffects(new io.github.gustavo2358.analysis.storage.StorageIndex(session));
+            assertEquals(sequences.stream().mapToInt(sequence->sequence.instructions().size()+1).sum(),effects.statements().size());
+            assertEquals(0,retainedUnusedIdentities(effects,OperationId.class));
+            var rd=io.github.gustavo2358.analysis.rd.ReachingDefinitions.prepare(effects).analysis().orElseThrow();
+            assertEquals(0,retainedUnusedIdentities(rd,OperationId.class));
+            var regional=io.github.gustavo2358.analysis.values.RegionalValuesAnalysis.prepare(session,io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).analysis().orElseThrow();
+            assertEquals(0,retainedUnusedIdentities(regional,OperationId.class));
+            assertEquals(0,retainedUnusedIdentities(borrowed,OperationId.class),"lookup must not install a decoded identity cache");
+        }
+        var expired=borrowed;assertThrows(IllegalStateException.class,()->expired.site(instructions.getFirst().header().id()));
+        for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
+    }
+
+    @Test void failedNativeOperationDirectoryWritePreservesPrimaryAndClosesTapes() throws Exception {
+        var publication=directCall();var ledger=resources();
+        var primary=new IllegalStateException("injected operation directory append failure");
+        var cleanup=new IllegalStateException("injected operation directory cleanup failure");
+        int[] written={0},closed={0},opened={0};
+        try(var pages=new FilePageStore(directory,512,16,ledger);
+            var checked=SnapshotValidator.check(AirSnapshot.fromPublication(publication),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger))){
+            var delegate=new PagedSnapshotOrderStorage(pages,ledger);
+            var failing=new io.github.gustavo2358.analysis.dependencies.SnapshotOrderStorage(){
+                @Override public Index open(Order order){return delegate.open(order);}
+                @Override public Tape tape(){
+                    int number=++opened[0];var tape=delegate.tape();
+                    return new Tape(){
+                        private boolean ended;
+                        @Override public void append(long handle){tape.append(handle);written[0]++;if(number==1)throw primary;}
+                        @Override public long size(){return tape.size();}
+                        @Override public long handle(long ordinal){return tape.handle(ordinal);}
+                        @Override public void close(){if(ended)return;ended=true;tape.close();closed[0]++;if(number==1)throw cleanup;}
+                    };
+                }
+                @Override public void close(){delegate.close();}
+            };
+            try(var program=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),failing,ledger)){
+                assertSame(primary,assertThrows(IllegalStateException.class,program::operationDirectory));
+                assertEquals(1,written[0],"failure occurs after a real positive append, not before allocation");
+                assertEquals(opened[0],closed[0]);assertEquals(List.of(cleanup),List.of(primary.getSuppressed()));
+            }
+        }
+        for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
+    }
+
     @Test void nativeFileFallbackReadsOneTypedOperationWithoutBulkBodyCopies() throws Exception {
         var seed=directCall();var unit=seed.units().getFirst();var origin=unit.origin();
         var sequences=new java.util.ArrayList<>(unit.sequences());var start=sequences.getFirst();
@@ -758,6 +854,9 @@ final class SnapshotDependencyAnalysisTest {
             }
             if(value instanceof StorageId id&&id.localId().startsWith("unused-")){
                 if(identityType==StorageId.class)count++;continue;
+            }
+            if(value instanceof OperationId id&&id.localId().startsWith("cold-operation-identity-")){
+                if(identityType==OperationId.class)count++;continue;
             }
             var type=value.getClass();var name=type.getName();
             if(value instanceof java.util.Optional<?> optional){optional.ifPresent(pending::addLast);continue;}

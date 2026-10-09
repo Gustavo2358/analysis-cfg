@@ -32,11 +32,23 @@ public interface ProgramStore {
         default Optional<DeclarationInventory> declarationInventory(){return Optional.empty();}
         /** Complete storage catalogue; absent selects caller-managed resident compatibility. */
         default Optional<StorageInventory> storageInventory(){return Optional.empty();}
+        /** Complete code identities in original AIR occurrence order; no reachability filtering.
+         * Absence selects explicit caller-managed resident compatibility. */
+        default Optional<OperationDirectory> operationDirectory(){return Optional.empty();}
         /** Exact identity lookup. Native implementations can resolve a cold address without
          * retaining every Origin body. The resident compatibility default remains explicit. */
         default Origins.Origin origin(OriginId id) {
             Objects.requireNonNull(id);return origins().stream().filter(value->value.id().equals(id)).findFirst().orElse(null);
         }
+    }
+
+    /** Owner-local code positions, never substitutes for a full nominal identity.
+     * Every method checks the lifetime of the admitted owner. */
+    interface OperationDirectory {
+        int size();
+        OperationId identity(int ordinal);
+        int ordinal(OperationId identity);
+        boolean identityAt(int ordinal,OperationId identity);
     }
 
     /** Original AIR order plus full nominal lookup, without requiring resident keys.

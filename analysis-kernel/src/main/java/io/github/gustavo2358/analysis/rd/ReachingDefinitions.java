@@ -16,9 +16,9 @@ public final class ReachingDefinitions {
     private final StatementEffects effects;
     private final StoragePartition partition;
     private final AnalysisSession session;
-    private final Map<OperationId,List<Plan>> operations=new HashMap<>();
-    private final Map<OperationId,Map<Control.OutcomeKey,List<Plan>>> outcomes=new HashMap<>();
-    private final Map<OperationId,List<Plan>> otherwise=new HashMap<>();
+    private final Map<OperationId,List<Plan>> operations;
+    private final Map<OperationId,Map<Control.OutcomeKey,List<Plan>>> outcomes;
+    private final Map<OperationId,List<Plan>> otherwise;
     private final Map<EntryId,List<Initial>> initial=new HashMap<>();
     private final Map<EntryId,List<LogicalInitial>> logicalInitial=new HashMap<>();
     private record LogicalInitial(int slot,Entries.InitialCondition condition,ObjectId object,StorageIndex.Resolution resolution) { }
@@ -33,6 +33,7 @@ public final class ReachingDefinitions {
     }
     public ReachingDefinitions(StatementEffects effects) {
         this.effects=Objects.requireNonNull(effects);session=effects.storage().session();partition=new StoragePartition(effects);
+        operations=new OperationTable<>(session.index().store());outcomes=new OperationTable<>(session.index().store());otherwise=new OperationTable<>(session.index().store());
         for(var unit:session.index().store().units()) {
             boolean open=effects.storage().session().index().partialControl(unit.id()) || effects.storage().session().index().unprovedPreconditions(unit.id());
             for(var sequence:unit.sequences()) {

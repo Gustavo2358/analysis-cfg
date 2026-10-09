@@ -4,6 +4,7 @@ import io.github.gustavo2358.air.model.*;
 import io.github.gustavo2358.air.model.Ids.*;
 import io.github.gustavo2358.analysis.structure.ProgramStore;
 import io.github.gustavo2358.analysis.structure.ProgramIndex;
+import io.github.gustavo2358.analysis.structure.OperationTable;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -67,12 +68,13 @@ public final class StatementEffects {
     private record OpenLocation(int declarationOrdinal,ObjectId object,StorageIndex.Location location) { }
     private final Map<StorageId,List<OpenLocation>> openByBase;
     private final WholeAliases wholeAliases;
-    private final Map<OperationId,Statement> statements=new LinkedHashMap<>();
+    private final Map<OperationId,Statement> statements;
     private long operandVisits,targetsPrepared,directTargetsPrepared,boundTargetsPrepared,explicitBroadTargetsPrepared,baseComparisons;
     public StatementEffects(StorageIndex storage) {
         this.storage=Objects.requireNonNull(storage);
         var byBase=new HashMap<StorageId,List<OpenLocation>>();
         var store=storage.session().index().store();
+        statements=new OperationTable<>(store);
         var declarations=store.declarationInventory();var inventory=store.storageInventory();
         WholeAliases broad=null;int declarationOrdinal=0;
         try {
