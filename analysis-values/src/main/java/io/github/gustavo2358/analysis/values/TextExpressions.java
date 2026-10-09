@@ -53,6 +53,36 @@ final class TextExpressions {
         }
         return result==null?Candidates.UNKNOWN:result;
     }
+    /** Evaluate one exact coexisting relation row. Alternatives inside an individual
+     * label remain explicit; different rows are never combined into a Cartesian product. */
+    static Candidates evaluateTuple(Operations.Assign operation,Map<Integer,Candidates> row,
+            Map<ObjectId,TextProfile.Location> subjects,ValueUniverse universe,ValuesWork work) {
+        var inputs=new LinkedHashMap<TextProfile.Location,Candidates>();
+        for(var object:reads(operation.value())) {
+            var location=subjects.get(object);var candidates=row.get(location.ordinal());
+            if(candidates==null)throw new IllegalStateException("missing scalar relation input");inputs.putIfAbsent(location,candidates);
+        }
+        var snapshots=new ArrayList<Map<TextProfile.Location,LogicalText>>();snapshots.add(Map.of());
+        for(var input:inputs.entrySet()) {
+            var alternatives=new ArrayList<LogicalText>();var candidates=input.getValue();
+            for(int i=0;i<candidates.size();i++)alternatives.add(universe.value(candidates.at(i)));
+            if(candidates.open()||alternatives.isEmpty())alternatives.add(null);
+            var expanded=new ArrayList<Map<TextProfile.Location,LogicalText>>();
+            for(var snapshot:snapshots)for(var alternative:alternatives) {
+                var next=new HashMap<>(snapshot);next.put(input.getKey(),alternative);expanded.add(next);
+            }
+            snapshots=expanded;
+        }
+        Candidates result=null;
+        for(var snapshot:snapshots) {
+            var value=evaluate(operation.value(),object->snapshot.get(subjects.get(object)));
+            var candidate=value==null?Candidates.UNKNOWN:universe.supported(value,operation.header().id(),operation.header().origin(),List.of(),work);
+            if(value!=null)for(var input:snapshot.entrySet())if(input.getValue()!=null)
+                candidate=universe.derived(candidate,value,input.getValue(),inputs.get(input.getKey()),work);
+            result=result==null?candidate:result.join(candidate,work);
+        }
+        return result==null?Candidates.UNKNOWN:result;
+    }
     private record Frame(Expression expression,boolean expanded) { }
     private static LogicalText evaluate(Expression expression,java.util.function.Function<ObjectId,LogicalText> input){
         var pending=new ArrayDeque<Frame>();var values=new IdentityHashMap<Expression,LogicalText>();pending.push(new Frame(expression,false));

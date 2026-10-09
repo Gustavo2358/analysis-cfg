@@ -5,6 +5,25 @@ from pathlib import Path
 from check_transport_architecture import dependencies_from_jdeps
 ROOT=Path(__file__).resolve().parents[2]
 INVENTORY='docs/evals/cp6/w1d-dependencies-inventory.json'
+def stable_dependencies(output):
+    dependencies=dependencies_from_jdeps(output)
+    # javac 25 can use Record in a switch StackMapTable over nested records;
+    # javac 21 uses Object. Neither outer class extends Record. Normalize only
+    # this proven compiler-generated JDK-base edge, never semantic targets.
+    for name in ('SnapshotProgram','SnapshotDependencyCursorResult'):
+        dependencies.get('io.github.gustavo2358.analysis.dependencies.'+name,set()).discard('java.lang.Record')
+    return dependencies
+def detector_self_test():
+    prefix='io.github.gustavo2358.analysis.dependencies.'
+    output='\n'.join((prefix+'SnapshotDependencyCursorResult -> java.lang.Record java.base',
+                     prefix+'SnapshotDependencyCursorResult -> java.lang.reflect.Method java.base',
+                     prefix+'SnapshotProgram -> java.lang.Record java.base',
+                     prefix+'SnapshotProgram -> io.github.gustavo2358.air.model.Publication air-java',
+                     prefix+'DirectDependencyResult -> java.lang.Record java.base'))
+    edges=stable_dependencies('\n'.join('   '+line for line in output.splitlines()))
+    assert edges[prefix+'SnapshotDependencyCursorResult']=={'java.lang.reflect.Method'}
+    assert edges[prefix+'SnapshotProgram']=={'io.github.gustavo2358.air.model.Publication'}
+    assert edges[prefix+'DirectDependencyResult']=={'java.lang.Record'}
 def source_boundaries(root):
     # The source check protects absence of program-name semantics in the generic effect interpreter.
     effect=(root/'analysis-values/src/main/java/io/github/gustavo2358/analysis/values/ForeignEffectTransfer.java').read_text()
@@ -14,20 +33,22 @@ def source_boundaries(root):
         raise ValueError('DefaultValuePlan acquired CALL target semantics')
 
 def check(root=ROOT,refresh=False):
+    detector_self_test()
     source_boundaries(root)
     classes=root/'analysis-dependencies/target/classes';cpfile=root/'analysis-dependencies/target/architecture-classpath.txt'
     if not cpfile.exists():cpfile=root/'analysis-dependencies/target/runtime-classpath.txt'
     cp=cpfile.read_text().strip();paths=sorted(p.relative_to(classes).as_posix() for p in classes.rglob('*.class'))
     if not paths:raise ValueError('W1D compiled artifacts missing')
     def capture(args):return subprocess.check_output(args,cwd=root,text=True,stderr=subprocess.PIPE)
-    edges=dependencies_from_jdeps(capture(['jdeps','--multi-release','21','-filter:none','-verbose:class','-cp',cp,str(classes)]))
+    edges=stable_dependencies(capture(['jdeps','--multi-release','21','-filter:none','-verbose:class','-cp',cp,str(classes)]))
     denied=('java.io.','java.nio.file.','java.net.','java.lang.reflect.','analysis.adapters.','analysis.launcher.','air.json.','cobolexplorer','org.antlr','lower.')
     consumer_denied=('analysis.structure.','analysis.solver.','analysis.application.','analysis.query.BatchReplayer','analysis.values.PossibleValues','analysis.values.RegionalValuesAnalysis','analysis.values.RegionalValuesProvider','analysis.values.StorageValuesProvider','analysis.values.RegionalProviderSupport','analysis.cfg.','air.model.Publication','air.model.Unit','air.model.Sequence')
     for source,targets in edges.items():
         for target in targets:
             if any(x in target for x in denied):raise ValueError('W1D core outward dependency: '+source+' -> '+target)
             if source.endswith(('CallDependencyConsumer','FileDependencyConsumer')) and any(x in target for x in consumer_denied):raise ValueError('W1D consumer acquired execution capability: '+target)
-    actual=dict(classfiles=paths,jdeps={k:sorted(v) for k,v in sorted(edges.items())},publicDescriptors={p:capture(['javap','-classpath',str(classes)+os.pathsep+cp,'-public','-s',p[:-6].replace('/','.')]) for p in paths})
+    from compiled_descriptors import public_descriptors
+    actual=dict(classfiles=paths,jdeps={k:sorted(v) for k,v in sorted(edges.items())},publicDescriptors=public_descriptors(paths,str(classes)+os.pathsep+cp,capture))
     if refresh:(root/INVENTORY).write_text(json.dumps(actual,indent=2)+'\n')
     elif json.loads((root/INVENTORY).read_text())!=actual:raise ValueError('W1D compiled module inventory drift')
     print('PASS: compiled W1D module/consumer capabilities; generic effects; architectural dependencies preserved')

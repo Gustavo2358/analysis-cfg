@@ -33,14 +33,25 @@ Caller subscriptions preserve the concrete frame's return/selected routes. Escap
 carry their destination and remaining pop count back across activation boundaries.
 An activation exit and full unwind return to the root activation.
 
-The root has no active keys. A Boolean structural pass first builds frame shapes
-and a conservative caller graph. A frame cannot have an ancestor outside the
-transitive caller set. Variables for such ancestors are fixed false before
-tabulating values. The current frame's
-own key is always treated as active locally; its formal ancestor variable is
-irrelevant and stays unconstrained. This prevents impossible
-guard combinations from multiplying whole stores even in a straight-line routine.
-The remaining guard variables stay symbolic; no reachable-set enumeration is used.
+The root has no active keys. Root guards are evaluated FALSE directly. Child
+conditions mention only guards encountered in reachable execution; own-key tests
+are TRUE locally. A matched child return substitutes its parent's active key TRUE.
+Binding at the root evaluates the all-false ancestor valuation without constructing
+a conjunction over publication keys. Feasibility and unique boundary searches use
+the same closure in both directions. Reached frame shapes are condensed into SCCs;
+positive caller-key closures use canonical persistent sets. Only encountered
+predicate variables are cofactored and impossible guard moves are removed. No
+publication-wide frame-support traversal or global absence environment is built.
+
+This removes the publication frame×key product for dead keys. The matched caller
+relation still decides which formal predicates are realizable. Forward deliveries
+also intersect the refined structural conditional point; this prevents an impossible
+return from creating a value slot. Regression bounds for infeasible changing-input
+cycles remain mandatory. Public CardDemo qualification falsified the prototype
+without positive support pruning at480s; persistent support/cofactoring restores
+three selected cases to roughly1–2s while preserving all semantic product fields.
+Preparation uses an explicit resident page compatibility backend. Full session
+budgeting, formal continuation sharing and managed diagram storage remain open.
 
 ## Demand and feasibility
 
@@ -176,7 +187,7 @@ Ordinary graph counters and worklist scheduling are unchanged.
 
 The first universal-guard prototype passed the small explicit-stack oracle but
 caused CardDemo value analysis to exceed five minutes. The caller-set restriction
-above removed that infeasible work. A synthetic outer routine with ten sequential
+in the historical implementation removed that infeasible work. A synthetic outer routine with ten sequential
 value-producing guarded calls now tests the condition independently of CardDemo:
 its 1,114 transfers in the failed prototype violate the regression bound. No
 boundary, dependency output or expected semantic value was weakened to pass it.

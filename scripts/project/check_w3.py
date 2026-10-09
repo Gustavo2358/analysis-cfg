@@ -8,7 +8,7 @@ from check_w1 import ROOT, Failure, command
 
 PREFIX='io.github.gustavo2358.analysis.values.'
 QUERY_PREFIX='io.github.gustavo2358.analysis.query.'
-VALUE_NAMES='Candidates SupportSet PersistentBindings PossibleValuesState ValuesWork ValueUniverse LogicalText LogicalTextEncoding TextExpressions TextPredicate TextProfile ForeignEffectTransfer ConservativeEffectTransfer ValueFact PossibleValuesAnalysis ByteImage TextValueFact RegionalValueFact RegionalValuesAnalysis RegionalAlternatives FactorizedAlternatives StorageValueFact StorageValueOrder StorageAnalysisMode'.split()
+VALUE_NAMES='Candidates SupportSet PersistentBindings PossibleValuesState ValuesWork ValueUniverse LogicalText LogicalTextEncoding TextExpressions TextPredicate TextProfile ForeignEffectTransfer ConservativeEffectTransfer ScalarRelations ValueFact PossibleValuesAnalysis ByteImage TextValueFact RegionalValueFact RegionalValuesAnalysis RegionalAlternatives FactorizedAlternatives StorageValueFact StorageValueOrder StorageAnalysisMode'.split()
 QUERY_NAMES='ProgramPoint PointQuery ObservationBatch BatchReplayer'.split()
 VALUE_SOURCES={f'analysis-values/src/main/java/io/github/gustavo2358/analysis/values/{n}.java' for n in VALUE_NAMES}
 QUERY_SOURCES={f'analysis-kernel/src/main/java/io/github/gustavo2358/analysis/query/{n}.java' for n in QUERY_NAMES}
@@ -39,6 +39,7 @@ def verify_sources(root:Path)->None:
         if path in QUERY_SOURCES and 'analysis.values' in source:raise Failure('generic query cannot depend on values')
         if path in QUERY_SOURCES and 'DataflowSolver' in source:raise Failure('W3 replay cannot rerun solver')
         if path.endswith('PossibleValuesAnalysis.java') and 'DataflowSolver' in source[source.index('public static final class Execution'):]:raise Failure('W3 observation cannot rerun solver')
+        if path.endswith('RegionalValuesAnalysis.java') and 'ReachingDefinitions' in source:raise Failure('Regional preparation cannot construct a discarded reaching-definitions analysis')
 
 def verify_reports(root:Path,names:set[str])->None:
     reports=list((root/'analysis-values/target/surefire-reports').glob('TEST-*.xml'))
@@ -96,9 +97,11 @@ def architecture(root:Path,update:bool=False)->None:
         for source,targets in edges.items():
             for target in targets:
                 if ('BatchReplayer' in source or 'PossibleValuesAnalysis$Execution' in source or 'RegionalValuesAnalysis$Execution' in source) and 'DataflowSolver' in target:raise Failure('W3 observation cannot rerun solver')
+                if source==PREFIX+'RegionalValuesAnalysis' and target=='io.github.gustavo2358.analysis.rd.ReachingDefinitions':raise Failure('Regional preparation cannot depend on discarded reaching-definitions analysis')
                 if any(d in target for d in DENIED) or (module=='analysis-kernel' and target.startswith(PREFIX)):raise Failure('W3 forbidden bytecode dependency: '+target)
                 if not target.startswith(('java.',prefix,'io.github.gustavo2358.air.model.','io.github.gustavo2358.analysis.structure.','io.github.gustavo2358.analysis.solver.','io.github.gustavo2358.analysis.query.','io.github.gustavo2358.analysis.cfg.domain.','io.github.gustavo2358.analysis.storage.','io.github.gustavo2358.analysis.rd.ReachingDefinitions','io.github.gustavo2358.analysis.rd.DefinitionEvent')):raise Failure('W3 DAG: '+target)
-        descriptors={p[:-6].replace('/','.'):command(root,['javap','-classpath',str(classes)+os.pathsep+cp,'-public','-s',p[:-6].replace('/','.')]) for p in paths}
+        from compiled_descriptors import public_descriptors
+        descriptors={p[:-6].replace('/','.'):value for p,value in public_descriptors(paths,str(classes)+os.pathsep+cp,lambda args:command(root,args)).items()}
         actual[module]={'sources':sorted(sources),'classfiles':paths,'jdeps_edges':dict(sorted(edges.items())),'javap_descriptors':descriptors,'effective_maven':sorted(parse_tgf(root/module/'target/architecture-dependencies.tgf'))}
     if update:(root/INVENTORY).write_text(json.dumps(actual,indent=2)+'\n')
     elif json.loads((root/INVENTORY).read_text())!=actual:raise Failure('W3 compiled inventory drift')

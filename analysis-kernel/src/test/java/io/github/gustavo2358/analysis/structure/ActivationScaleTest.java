@@ -68,8 +68,8 @@ class ActivationScaleTest {
             public Join<Integer> joinInto(Integer a,Integer b,DomainWork w){return new Join<>(a|b,(a|b)!=a);}
             public boolean equivalent(Integer a,Integer b,DomainWork w){return a.equals(b);}
             public Integer transferBlock(AnalysisPoint p,Integer a,DomainWork w){
-                if(p.node().source() instanceof io.github.gustavo2358.analysis.cfg.domain.CfgNode.SequenceNode node&&node.source().label().localId().startsWith("write-"))
-                    return a|1<<Integer.parseInt(node.source().label().localId().substring(6));
+                if(p.node().source() instanceof io.github.gustavo2358.analysis.cfg.domain.CfgNode.SequenceNode node&&node.label().localId().startsWith("write-"))
+                    return a|1<<Integer.parseInt(node.label().localId().substring(6));
                 return a;
             }
             public Integer transferEdge(AnalysisPoint p,CfgTransition edge,Integer a,DomainWork w){return a;}

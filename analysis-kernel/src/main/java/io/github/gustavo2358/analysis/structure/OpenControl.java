@@ -3,6 +3,7 @@ package io.github.gustavo2358.analysis.structure;
 import io.github.gustavo2358.air.model.*;
 import io.github.gustavo2358.air.model.Ids.LabelId;
 import io.github.gustavo2358.analysis.cfg.domain.CfgNode;
+import io.github.gustavo2358.analysis.cfg.domain.CfgControl;
 import io.github.gustavo2358.analysis.cfg.domain.LocalControlRules;
 import io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy;
 
@@ -41,15 +42,23 @@ final class OpenControl {
     private OpenControl() { }
     static boolean partial(ProgramIndex.Node node, ProjectionPolicy policy) {
         if (policy != ProjectionPolicy.PARTIAL_ANALYSIS || !(node.source() instanceof CfgNode.SequenceNode s)) return false;
-        var term=s.source().terminator();
-        return !(LocalControlRules.local(term) || term instanceof Operations.Return || term instanceof Operations.Jump || term instanceof Operations.Branch || term instanceof Operations.Halt
-            || term instanceof Operations.Invoke i && supportsInvoke(i) || term instanceof Operations.Opaque o && supportsOpaque(o));
+        return s.control() instanceof CfgControl.Unsupported
+            || s.control() instanceof CfgControl.Invoke invoke && !(invoke.alternatives().stream().allMatch(a -> a instanceof Control.Normal
+                    || a instanceof Control.Exceptional || a instanceof Control.AnyException || a instanceof Control.HaltAlternative)
+                && supported(invoke.remainder()))
+            || s.control() instanceof CfgControl.Opaque opaque && !opaque.alternatives().stream().allMatch(a -> a instanceof Control.JumpAlternative
+                    || a instanceof Control.Normal || a instanceof Control.ReturnAlternative || a instanceof Control.Exceptional
+                    || a instanceof Control.AnyException || a instanceof Control.HaltAlternative);
+    }
+    private static boolean supported(Scopes.ControlBound bound) {
+        return bound instanceof Scopes.NoControl || bound instanceof Scopes.WithinControl within
+            && (within.scope() instanceof Scopes.AllControl || within.scope() instanceof Scopes.UnitControl
+                || within.scope() instanceof Scopes.LabelsControl || within.scope() instanceof Scopes.ControlUnion);
     }
     static Scopes.ControlBound bound(ProgramIndex.Node node, ProjectionPolicy policy) {
         if (partial(node,policy)) return new Scopes.WithinControl(new Scopes.UnitControl(node.owner().id(),true,true,true,true,true,true));
         if(node.source() instanceof CfgNode.SequenceNode s) {
-            if(s.source().terminator() instanceof Operations.Opaque o)return o.envelope().control().remainder();
-            if(s.source().terminator() instanceof Operations.Invoke i)return i.outcomes().remainder();
+            return CfgControl.remainder(s.control());
         }
         return Scopes.NoControl.INSTANCE;
     }
@@ -61,7 +70,7 @@ final class OpenControl {
         if(target.source() instanceof CfgNode.EntryNode)return false;
         if(target.source() instanceof CfgNode.NormalExit exit&&!exit.entryId().equals(entry.id()))return false;
         if(scope instanceof Scopes.AllControl)return true;
-        if(scope instanceof Scopes.LabelsControl labels)return target.source() instanceof CfgNode.SequenceNode s&&labels.labels().contains(s.source().label());
+        if(scope instanceof Scopes.LabelsControl labels)return target.source() instanceof CfgNode.SequenceNode s&&labels.labels().contains(s.label());
         if(scope instanceof Scopes.UnitControl u)return u.unit().equals(target.owner().id())
             &&(target.source() instanceof CfgNode.SequenceNode&&u.labels()||target.source() instanceof CfgNode.NormalExit&&u.normalExit()
                 ||target.source() instanceof CfgNode.HaltExit&&u.halt()

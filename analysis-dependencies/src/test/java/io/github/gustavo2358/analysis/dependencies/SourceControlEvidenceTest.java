@@ -6,6 +6,28 @@ import static org.junit.jupiter.api.Assertions.*;
 import static io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies.*;
 
 class SourceControlEvidenceTest {
+    @Test void sharedProgressRemainsActiveThroughProofAndNodePropagation() {
+        int count=64;var proofs=new ArrayList<Proof>();
+        for(int i=count-1;i>=0;i--)proofs.add(proof("p"+i,i==0,i==0?List.of():List.of("p"+(i-1))));
+        // Past the two proof scans and dependency index: stop inside the propagation queue.
+        int stopAt=2*count+(count-1)+17;int[] visits={0};
+        var stopped=new IllegalStateException("shared owner stopped");
+        assertSame(stopped,assertThrows(IllegalStateException.class,()->SourceControlEvidence.hypotheticalProofs(proofs,()->{
+            if(++visits[0]==stopAt)throw stopped;
+        })));
+        assertEquals(stopAt,visits[0]);
+        assertEquals(scalar(proofs),SourceControlEvidence.hypotheticalProofs(proofs,()->{}).ids());
+        var base=SourceValuesProviderTest.fixture(List.of(),List.of(),List.of());
+        var unit=new UnitEvidence(base.unit(),base.controlAvailable(),base.statements(),base.occurrences(),base.targets(),
+            base.nodes(),base.derivations(),base.selections(),base.events(),base.guards(),
+            List.of(proof("p",true,List.of())),base.frontiers(),base.nominalValues());
+        assertEquals(Set.of("n0","n1","n2"),SourceControlEvidence.affected(unit,()->{}));
+        visits[0]=0;
+        assertSame(stopped,assertThrows(IllegalStateException.class,()->SourceControlEvidence.affected(unit,()->{
+            if(++visits[0]==9)throw stopped;
+        })));
+        assertEquals(9,visits[0]);
+    }
     private static Proof proof(String id,boolean seed,List<String> dependencies) {
         return new Proof(id,seed?"CONTROL_POSSIBILITY":"LOCAL_GRAMMAR","independent",SourceValuesProviderTest.ORIGIN,dependencies);
     }

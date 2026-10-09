@@ -22,8 +22,15 @@ MUTABLE = {
     'docs/sources/sources.lock.json',
 }
 NEW_VALUES = 'analysis-values/src/main/java/io/github/gustavo2358/analysis/values/ForeignEffectTransfer.java'
-NEW_W5 = {'analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/'+n+'.java' for n in ('DependencyJson','DependencyFileWriter','FileDependencyJson','SourceDependencyJson','QualifiedSourceJson','DependencyInputJson')} | {'analysis-launcher/src/main/java/io/github/gustavo2358/analysis/launcher/AnalysisDependencies.java'}
+NEW_W5 = {'analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/'+n+'.java' for n in (
+    'DependencyJson','DependencyFileWriter','FileDependencyJson','SourceDependencyJson','QualifiedSourceJson','DependencyInputJson',
+    'PagedSnapshotAnnotationStorage','PagedSnapshotCapabilityStorage','PagedSnapshotContextStorage',
+    'PagedSnapshotDependencyStorage','PagedSnapshotDistinctStorage','PagedSnapshotTypeStorage',
+    'PagedSnapshotValidationStorage','PagedSnapshotVisibleStorage','SnapshotDependencyFileWriter','SnapshotDependencyJson')}
+NEW_W5.add('analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/PagedSnapshotOrderStorage.java')
+NEW_W5 |= {'analysis-launcher/src/main/java/io/github/gustavo2358/analysis/launcher/AnalysisDependencies.java'}
 NEW_CFG_TEST = 'cfg-adapters/src/test/java/io/github/gustavo2358/analysis/cfg/adapters/W1dInvokeWireTest.java'
+NEW_ORDER_TEST = 'analysis-adapters/src/test/java/io/github/gustavo2358/analysis/adapters/PagedSnapshotOrderStorageTest.java'
 
 
 def digest(data): return hashlib.sha256(data).hexdigest()
@@ -61,7 +68,7 @@ def protections(root):
                 raise ValueError('W1D changed protected source: '+path)
     for path in files(root):
         if path not in baseline and (path.endswith('.java') or path.endswith('pom.xml')):
-            if path not in NEW_W5|{NEW_VALUES,NEW_CFG_TEST} and not path.startswith(('analysis-dependencies/','analysis-adapters/src/test/java/io/github/gustavo2358/analysis/adapters/W1d','analysis-launcher/src/test/java/io/github/gustavo2358/analysis/launcher/DependencyCliTest')):
+            if path not in NEW_W5|{NEW_VALUES,NEW_CFG_TEST,NEW_ORDER_TEST} and not path.startswith(('analysis-dependencies/','analysis-adapters/src/test/java/io/github/gustavo2358/analysis/adapters/W1d','analysis-launcher/src/test/java/io/github/gustavo2358/analysis/launcher/DependencyCliTest')):
                 raise ValueError('unregistered W1D source: '+path)
     protected=['docs/work/evidence/WORK-CFG-028','docs/work/evidence/WORK-CFG-029','docs/work/evidence/WORK-CFG-030','docs/work/evidence/WORK-CFG-031','docs/work/evidence/WORK-CFG-032','docs/evals/cp5','docs/work/cp5-lifecycle.json','analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/ResultJson.java','analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver']
     changed=git(root,'diff','--name-only',BASE,'--',*protected).decode().splitlines()

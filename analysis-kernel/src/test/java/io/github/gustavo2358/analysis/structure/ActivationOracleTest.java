@@ -38,7 +38,7 @@ class ActivationOracleTest {
             public boolean equivalent(Integer a,Integer b,DomainWork work){return a.equals(b);}
             public Integer transferBlock(AnalysisPoint point,Integer state,DomainWork work) {
                 if(!(point.node().source() instanceof CfgNode.SequenceNode node))return state;
-                int n=Integer.parseInt(node.source().label().localId().substring(1));
+                int n=Integer.parseInt(node.label().localId().substring(1));
                 int keep=15^((seed+n)%3==0?1:0);int gen=(seed+n)%4==0?2:0;
                 int result=(state&keep)|gen;
                 // Monotone, finite and deliberately non-distributive.

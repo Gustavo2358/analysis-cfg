@@ -1,0 +1,231 @@
+package io.github.gustavo2358.analysis.structure;
+
+import io.github.gustavo2358.air.model.*;
+import io.github.gustavo2358.air.model.Ids.*;
+import java.util.*;
+import java.util.function.IntFunction;
+import java.math.BigInteger;
+
+/** Read-only program boundary; structural consumers never require AIR aggregates. */
+public interface ProgramStore {
+    /** Operational safepoints, never a semantic cutoff or a reduced answer.
+     * The resident compatibility route has no managed execution owner. */
+    enum ExecutionPhase { INDEX, DEMAND, CONTROL, DOMAIN, REPLAY, SORT, ENCODE }
+    default void progress(ExecutionPhase phase) { Objects.requireNonNull(phase); }
+    PublicationId publicationId();
+    Evidence.InventoryStatus inventory();
+    List<Origins.Artifact> artifacts();
+    List<Origins.Origin> origins();
+
+    interface Structural extends ProgramStore {
+        SemanticVersion airVersion();
+        Capabilities.Manifest capabilities();
+        Set<Capabilities.Capability> namePolicyExtensions();
+        List<UnitView> units();
+        List<Memory.Storage> storage();
+        List<Interactions.Resource> resources();
+        CoverageView coverage();
+        List<Evidence.Uncertainty> uncertainties();
+        List<Proofs.Premise> premises();
+        /** Complete immutable declaration catalogue supplied by an admitted owner.
+         * Empty selects the explicit resident compatibility inventory. */
+        default Optional<DeclarationInventory> declarationInventory(){return Optional.empty();}
+        /** Complete storage catalogue; absent selects caller-managed resident compatibility. */
+        default Optional<StorageInventory> storageInventory(){return Optional.empty();}
+        /** Complete code identities in original AIR occurrence order; no reachability filtering.
+         * Absence selects explicit caller-managed resident compatibility. */
+        default Optional<OperationDirectory> operationDirectory(){return Optional.empty();}
+        /** Exact identity lookup. Native implementations can resolve a cold address without
+         * retaining every Origin body. The resident compatibility default remains explicit. */
+        default Origins.Origin origin(OriginId id) {
+            Objects.requireNonNull(id);return origins().stream().filter(value->value.id().equals(id)).findFirst().orElse(null);
+        }
+    }
+
+    /** Owner-local code positions, never substitutes for a full nominal identity.
+     * Every method checks the lifetime of the admitted owner. */
+    interface OperationDirectory {
+        int size();
+        OperationId identity(int ordinal);
+        int ordinal(OperationId identity);
+        boolean identityAt(int ordinal,OperationId identity);
+    }
+
+    /** Original AIR order plus full nominal lookup, without requiring resident keys.
+     * identityAt checks the complete identity, never position alone. */
+    interface DeclarationInventory extends Map<ObjectId,Memory.ObjectDeclaration> {
+        boolean identityAt(int ordinal,ObjectId identity);
+        /** Complete nominal identity at an owner-local source position. */
+        default ObjectId identity(int ordinal){
+            Objects.checkIndex(ordinal,size());var rows=keySet().iterator();
+            for(int at=0;at<ordinal;at++)rows.next();return rows.next();
+        }
+    }
+    /** Original AIR order and exact nominal lookup without retaining every storage body. */
+    interface StorageInventory extends Map<StorageId,Memory.Storage> {
+        boolean identityAt(int ordinal,StorageId identity);
+        /** Owner-local position resolved through the complete nominal identity; -1 if absent. */
+        default int ordinal(StorageId identity){
+            Objects.requireNonNull(identity);int ordinal=0;
+            for(var base:values()){if(base.header().id().equals(identity))return ordinal;ordinal=Math.incrementExact(ordinal);}return -1;
+        }
+        default Memory.Storage at(int ordinal){
+            Objects.checkIndex(ordinal,size());var rows=values().iterator();
+            for(int at=0;at<ordinal;at++)rows.next();return rows.next();
+        }
+        /** Structural projection without requiring a decoded header catalogue. */
+        default boolean regionAt(int ordinal){return at(ordinal) instanceof Memory.Region;}
+        default Optional<BigInteger> extentAt(int ordinal){
+            var base=at(ordinal);if(!(base instanceof Memory.Region region))throw new IllegalArgumentException("not a Region");return region.extent();
+        }
+        /** Working metadata, not a mutation of AIR. Default is explicit resident compatibility. */
+        default OrdinalColumn column(long length){return residentColumn(length);}
+        /** Frozen permutation of all input positions, ordered by the supplied full comparison.
+         * Equal values retain original ordinal order. The caller closes the permutation. */
+        default OrdinalColumn order(long length,OrdinalOrder comparison){
+            Objects.requireNonNull(comparison);var rows=new Long[Math.toIntExact(length)];
+            for(int i=0;i<rows.length;i++)rows[i]=(long)i;
+            Arrays.sort(rows,(a,b)->{int result=comparison.compare(a,b);return result!=0?result:Long.compare(a,b);});
+            var result=column(length);try{for(int i=0;i<rows.length;i++)result.set(i,rows[i]);return result;}
+            catch(RuntimeException|Error failure){try{result.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;}
+        }
+        /** Canonical local-ID order within this publication; complete text comparison. */
+        default OrdinalColumn canonicalOrder(){return order(size(),(a,b)->at(Math.toIntExact(a)).header().id().localId().compareTo(at(Math.toIntExact(b)).header().id().localId()));}
+        /** Whole logical Cells and Regions not proved empty, in original AIR order.
+         * Native owners must borrow cold rows; this default is resident compatibility. */
+        default List<Memory.Storage> nonEmptyStorage(){
+            return values().stream().filter(base->!(base instanceof Memory.Region region
+                &&region.extent().filter(n->n.signum()==0).isPresent())).toList();
+        }
+        default int nonEmptyOrdinal(int ordinal){return ordinal(nonEmptyStorage().get(ordinal).header().id());}
+    }
+
+    /** Primitive working column owned by an admitted programme's lifetime. */
+    interface OrdinalColumn extends AutoCloseable {
+        long get(long ordinal);
+        void set(long ordinal,long value);
+        @Override void close();
+    }
+    @FunctionalInterface interface OrdinalOrder {int compare(long first,long second);}
+    /** Caller-managed small compatibility backend, without a paging/residency promise. */
+    static OrdinalColumn residentColumn(long length){
+        if(length<0)throw new IllegalArgumentException("negative ordinal column length");
+        return new OrdinalColumn(){
+            private long[] values=new long[Math.toIntExact(length)];
+            private void available(){if(values==null)throw new IllegalStateException("ordinal column is closed");}
+            @Override public long get(long ordinal){available();Objects.checkIndex(ordinal,length);return values[Math.toIntExact(ordinal)];}
+            @Override public void set(long ordinal,long value){available();Objects.checkIndex(ordinal,length);values[Math.toIntExact(ordinal)]=value;}
+            @Override public void close(){values=null;}
+        };
+    }
+
+    /** Metadata/body addresses, not an owning Unit containing the complete executable payload. */
+    interface UnitView {
+        UnitId id();
+        Optional<UnitId> containingUnit();
+        List<Memory.ObjectDeclaration> objects();
+        List<ObjectId> visibleObjects();
+        List<Entries.Entry> entries();
+        List<SequenceView> sequences();
+        List<Entries.CompletionPort> completionPorts();
+        Unit.BodyAvailability body();
+        Optional<UncertaintyId> bodyUnavailable();
+        CoverageView coverage();
+        OriginId origin();
+    }
+
+    /** Operation access may reconstruct one occurrence. Java object identity is not an AIR ID. */
+    interface SequenceView {
+        LabelId label();
+        List<Instruction> instructions();
+        Terminator terminator();
+        OriginId origin();
+    }
+
+    /** Reading inventory/uncertainties does not materialize every coverage output. */
+    interface CoverageView {
+        Evidence.InventoryStatus inventory();
+        Scopes.FactScope scope();
+        List<Evidence.CoverageItem> items();
+        List<UncertaintyId> uncertainties();
+    }
+
+    /** Frozen ordinal inventory borrowing its owner's storage, without a decoded-value cache. */
+    final class BorrowedList<T> extends AbstractList<T> implements RandomAccess {
+        private final int count;
+        private final IntFunction<T> access;
+        private final Runnable owner;
+        public BorrowedList(int count,IntFunction<T> access,Runnable owner) {
+            if(count<0)throw new IllegalArgumentException("negative borrowed inventory size");
+            this.count=count;this.access=Objects.requireNonNull(access);this.owner=Objects.requireNonNull(owner);
+            owner.run();
+        }
+        @Override public int size(){owner.run();return count;}
+        @Override public T get(int ordinal){owner.run();Objects.checkIndex(ordinal,count);return Objects.requireNonNull(access.apply(ordinal));}
+        @Override public void clear(){throw new UnsupportedOperationException("immutable borrowed inventory");}
+    }
+
+    static Structural resident(Publication publication) {return new Resident(Objects.requireNonNull(publication));}
+    static UnitView residentUnit(Unit unit) {return new ResidentUnit(Objects.requireNonNull(unit));}
+    static SequenceView residentSequence(Sequence sequence) {return new ResidentSequence(Objects.requireNonNull(sequence));}
+    static CoverageView residentCoverage(Evidence.Coverage coverage) {return new ResidentCoverage(Objects.requireNonNull(coverage));}
+
+    /** Explicit compatibility route. Its Publication and AIR payload are caller-managed. */
+    final class Resident implements Structural {
+        private final Publication publication;
+        private final Set<Capabilities.Capability> namePolicyExtensions;
+        private final List<UnitView> units;
+        private Map<OriginId,Origins.Origin> originIndex;
+        private Resident(Publication publication) {
+            this.publication=publication;namePolicyExtensions=NamePolicies.extensions(publication);
+            units=publication.units().stream().map(ProgramStore::residentUnit).toList();
+        }
+        @Override public PublicationId publicationId(){return publication.id();}
+        @Override public Evidence.InventoryStatus inventory(){return publication.coverage().inventory();}
+        @Override public SemanticVersion airVersion(){return publication.airVersion();}
+        @Override public Capabilities.Manifest capabilities(){return publication.capabilities();}
+        @Override public Set<Capabilities.Capability> namePolicyExtensions(){return namePolicyExtensions;}
+        @Override public List<Origins.Artifact> artifacts(){return publication.artifacts();}
+        @Override public List<UnitView> units(){return units;}
+        @Override public List<Memory.Storage> storage(){return publication.storage();}
+        @Override public List<Interactions.Resource> resources(){return publication.resources();}
+        @Override public List<Origins.Origin> origins(){return publication.origins();}
+        @Override public Origins.Origin origin(OriginId id){
+            Objects.requireNonNull(id);
+            if(originIndex==null){originIndex=new HashMap<>();for(var value:publication.origins())originIndex.put(value.id(),value);}
+            return originIndex.get(id);
+        }
+        @Override public CoverageView coverage(){return residentCoverage(publication.coverage());}
+        @Override public List<Evidence.Uncertainty> uncertainties(){return publication.uncertainties();}
+        @Override public List<Proofs.Premise> premises(){return publication.premises();}
+    }
+
+    record ResidentUnit(Unit source) implements UnitView {
+        public ResidentUnit{Objects.requireNonNull(source);}
+        @Override public UnitId id(){return source.id();}
+        @Override public Optional<UnitId> containingUnit(){return source.containingUnit();}
+        @Override public List<Memory.ObjectDeclaration> objects(){return source.objects();}
+        @Override public List<ObjectId> visibleObjects(){return source.visibleObjects();}
+        @Override public List<Entries.Entry> entries(){return source.entries();}
+        @Override public List<SequenceView> sequences(){return source.sequences().stream().map(ProgramStore::residentSequence).toList();}
+        @Override public List<Entries.CompletionPort> completionPorts(){return source.completionPorts();}
+        @Override public Unit.BodyAvailability body(){return source.body();}
+        @Override public Optional<UncertaintyId> bodyUnavailable(){return source.bodyUnavailable();}
+        @Override public CoverageView coverage(){return residentCoverage(source.coverage());}
+        @Override public OriginId origin(){return source.origin();}
+    }
+    record ResidentSequence(Sequence source) implements SequenceView {
+        public ResidentSequence{Objects.requireNonNull(source);}
+        @Override public LabelId label(){return source.label();}
+        @Override public List<Instruction> instructions(){return source.instructions();}
+        @Override public Terminator terminator(){return source.terminator();}
+        @Override public OriginId origin(){return source.origin();}
+    }
+    record ResidentCoverage(Evidence.Coverage source) implements CoverageView {
+        public ResidentCoverage{Objects.requireNonNull(source);}
+        @Override public Evidence.InventoryStatus inventory(){return source.inventory();}
+        @Override public Scopes.FactScope scope(){return source.scope();}
+        @Override public List<Evidence.CoverageItem> items(){return source.items();}
+        @Override public List<UncertaintyId> uncertainties(){return source.uncertainties();}
+    }
+}

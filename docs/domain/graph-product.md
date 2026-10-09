@@ -18,7 +18,7 @@ Conceitos do produto completo (Entry, instructions lineares, Jump, Branch, Retur
 
 No package `io.github.gustavo2358.analysis.cfg.domain`:
 
-- `CfgGraph`: classe final com referência à Publication original e inventário de
+- `CfgGraph`: classe final com `CfgSource` destacado e inventário de
   nós/transições imutáveis. Materializa entries, normal exits e halt exits uma vez;
   `entries()`, `normalExits()` e `haltExits()` retornam as mesmas listas em O(1),
   sem percorrer nós ou alocar novamente. `preciseControlCapabilities()` também
@@ -27,13 +27,13 @@ No package `io.github.gustavo2358.analysis.cfg.domain`:
 - `CfgNodeId(PublicationId, ordinal)`: identidade do CFG, distinta de qualquer ID
   AIR. Ordinais são atribuídos deterministicamente por namespace/ID e papel; não
   têm estabilidade prometida entre publicações/revisões diferentes;
-- `CfgNode.EntryNode`: ID CFG e referência à `Entries.Entry` original;
-- `CfgNode.SequenceNode`: ID CFG e referência à `Sequence` original, preservando
-  instructions na ordem original, terminador, headers/operandos/origins e gaps.
-  Uma Sequence origina exatamente um nó;
+- `CfgNode.EntryNode`: ID CFG, EntryId e LabelId inicial opcional;
+- `CfgNode.SequenceNode`: ID CFG, LabelId, IDs das instructions em ordem e um
+  `CfgControl` compacto. Predicados, operandos, efeitos, fallbacks, origins e gaps
+  continuam pertencendo ao `ProgramStore`; uma Sequence origina exatamente um nó;
 - `CfgNode.NormalExit`: ID CFG, PublicationId, UnitId e EntryId. É sintético e
   não tem source span/origin inventado;
-- `CfgNode.HaltExit`: ID CFG e Operations.Halt original. Uma saída por ocorrência,
+- `CfgNode.HaltExit`: ID CFG, OperationId e HaltKind. Uma saída por ocorrência,
   sem singleton global e sem fabricar source span. HaltKind NORMAL/ABNORMAL é retido;
 - `CfgTransition(from, to, kind, activationEntry)`: ENTRY estabelece a Entry;
   JUMP a conserva e usa somente LabelId explícito; BRANCH_TRUE/BRANCH_FALSE
@@ -52,15 +52,15 @@ Branch, Return e Halt continuam materializadas por Entry, sem afirmar alcançabi
 HaltExit é compartilhado por ocorrência; as transições preservam cada activationEntry.
 NormalExits são inventário por Entry, inclusive quando nenhum Return os utiliza. O grafo verifica unicidade
 de IDs, fechamento e compatibilidade tipada das transições; seus containers são
-copiados, mas nenhuma Publication, Unit, Entry, Sequence ou lista AIR é deep-copiada.
-A referência à Publication mantém coverage, precisão, gaps, premises e todas as
-origens resolvíveis, sem cache mutável ou callback.
+copiados. O grafo não retém Publication, Unit, Entry, Sequence nem Terminator; a
+testemunha fraca da Publication serve somente à admissão do caminho residente.
+Coverage, precisão, gaps, premises e origins permanecem no `ProgramStore` pareado.
 
 `CfgProjectionIssue` identifica recusa de formas fora do slice; falhas não têm
-produto parcial/fake. O predicate de Branch permanece integralmente em
-SequenceNode.source().terminator(), pelo mesmo objeto AIR, incluindo TypeRef,
-dependencies, remainingReads, reason, operand owner e origin. Não há storage
-adicional nem string de condição. Literal true/false não elimina alternativa.
+produto parcial/fake. O predicate de Branch permanece integralmente no
+`ProgramStore`, incluindo TypeRef, dependencies, remainingReads, reason, operand
+owner e origin. O SequenceNode retém somente OperationId e os dois LabelIds
+estruturais. Literal true/false não elimina alternativa.
 CfgGraph valida endpoints de Branch e distingue os braços no equals/hash de
 CfgTransition; destinos iguais são válidos, duplicata exata não. Invoke outcomes,
 open control, frames e indirect targets permanecem futuros.
@@ -82,9 +82,9 @@ permitido só preservando a escolha de Entry e seu escopo, sem fundir inicializa
 
 ## Retenção e ciclo de vida
 
-O resultado pode reter referências ao modelo `air-java` imutável e copiar somente
-fatos próprios/mínimos. Não deep-copiar toda a Publication por padrão nem manter
-acesso preguiçoso a serviço/produtor para completar semântica. Registrar sempre
+O resultado copia somente fatos estruturais próprios/mínimos e não mantém o AIR
+residente vivo. O `ProgramStore` pode reter ou paginar o modelo conforme sua
+implementação. Não deep-copiar toda a Publication por padrão. Registrar sempre
 PublicationId, revisão/versão e correlações utilizadas. Índices derivados pertencem
 ao CFG e não alteram a AIR. Publicação grande exige medir memória; a API de navegação
 não força cópia O(N) a cada chamada.
@@ -98,10 +98,10 @@ de console nem layout de renderização. Relatórios sempre distinguem `INVALID_
 
 ## Pontos correlacionados no slice linear
 
-SequenceNode.source e o índice explícito na lista imutável instructions bastam
-para identificar as posições antes/depois de cada ocorrência e antes do terminador.
-Por exemplo, a segunda instruction é source.instructions().get(1), com OperationId
-próprio e operandos/origins intactos. O nó CFG é a Sequence, não a instruction.
+SequenceNode.operations e CfgControl.operation bastam para identificar as posições
+antes/depois de cada ocorrência e antes do terminador. O payload correspondente é
+resolvido pelo `ProgramStore`, com OperationId, operandos e origins intactos. O nó
+CFG é a Sequence, não a instruction.
 Não existe uma classe ProgramPoint adicional neste slice nem identidade CFG disfarçada
 de OperationId. AIR §08.2 exige correlação observável, não uma API física específica.
 

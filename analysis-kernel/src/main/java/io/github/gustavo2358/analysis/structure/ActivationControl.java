@@ -11,6 +11,7 @@ public final class ActivationControl {
     public static final class Frame {
         private final LocalControlRules.Invoke invoke;
         private final int variable;
+        private Frame body;
         private Frame(LocalControlRules.Invoke invoke,int variable){this.invoke=invoke;this.variable=variable;}
         public int variable(){return variable;}
     }
@@ -19,15 +20,79 @@ public final class ActivationControl {
     private final ContextView context;
     private final Map<CfgNodeId,Frame> frames=new HashMap<>();
     private final Map<Object,Integer> variables=new LinkedHashMap<>();
+    private record Interface(Set<Object> ports,Set<String> routes) { }
+    private record BodyKey(ProgramIndex.Node entry,Set<Object> ports,Set<String> routes) { }
+    private final Map<ProgramIndex.Node,Interface> interfaces=new IdentityHashMap<>();
+    private final Map<BodyKey,Frame> bodies=new HashMap<>();
+    private final List<ProgramIndex.Node> unwindStarts=new ArrayList<>();
+    private final List<ProgramIndex.Node> resetStarts=new ArrayList<>();
+    private Interface unwindInterface;
     public ActivationControl(AnalysisSession session,ContextView context) {
         this.index=session.index();this.context=context;
         for(var rule:index.localRules.values())if(rule instanceof LocalControlRules.Invoke invoke&&invoke.operation().unit().equals(context.entry().id().unit())) {
             Object key=invoke.reentryGuard().<Object>map(g->new Guard(invoke.operation().unit(),g.activationKey())).orElse(invoke.operation());
             frames.put(invoke.source(),new Frame(invoke,variables.computeIfAbsent(key,k->variables.size())));
         }
+        for(var rule:index.localRules.values())if(rule instanceof LocalControlRules.Unwind unwind&&unwind.operation().unit().equals(context.entry().id().unit())) {
+            if(unwind.all())resetStarts.add(index.node(unwind.destination()));
+            else if(unwind.count().signum()>0&&unwind.count().compareTo(BigInteger.valueOf(frames.size()))<=0)unwindStarts.add(index.node(unwind.destination()));
+        }
+    }
+    /** Conservative scheduling suffixes; these never create executable bypass edges. */
+    public List<ProgramIndex.Node> positiveUnwindLandings(){return List.copyOf(unwindStarts);}
+    public List<ProgramIndex.Node> resetLandings(){return List.copyOf(resetStarts);}
+    public List<ProgramIndex.Node> continuations(Frame symbol) {
+        var destinations=new LinkedHashSet<ProgramIndex.Node>();destinations.add(index.node(symbol.invoke.resume()));
+        for(var target:symbol.invoke.resumeRoutes().values())destinations.add(index.node(target));return List.copyOf(destinations);
     }
     public Object operation(Frame frame){return frame.invoke.source();}
     public Frame frame(Object operation){return frames.get(operation);}
+    public Frame frameAt(ProgramIndex.Node node){return frames.get(node.source().id());}
+    /** Body equivalence projects only top ports/route availability that the body can
+     * inspect. Concrete activation keys and return destinations stay in push bindings.
+     * Discovery follows explicit parent continuations; nested bodies have their own interface. */
+    public Frame body(Frame frame) {
+        if(frame==null)return null;if(frame.body!=null)return frame.body;
+        var entry=index.node(frame.invoke.entry());var observed=interfaces.computeIfAbsent(entry,this::interfaceAt);
+        var ports=new HashSet<Object>();for(var port:frame.invoke.ports())if(observed.ports.contains(port))ports.add(port);
+        var routes=new HashSet<String>();for(var route:frame.invoke.resumeRoutes().keySet())if(observed.routes.contains(route))routes.add(route);
+        var key=new BodyKey(entry,Set.copyOf(ports),Set.copyOf(routes));
+        var canonical=bodies.putIfAbsent(key,frame);frame.body=canonical==null?frame:canonical;return frame.body;
+    }
+    private Interface interfaceAt(ProgramIndex.Node entry) {
+        var own=discoverInterface(List.of(entry));if(unwindStarts.isEmpty())return own;
+        // A positive unwind can enter an ancestor at an arbitrary typed label,
+        // outside its entry/continuation walk. Share this conservative suffix scan.
+        if(unwindInterface==null)unwindInterface=discoverInterface(unwindStarts);
+        var ports=new HashSet<>(own.ports);ports.addAll(unwindInterface.ports);
+        var routes=new HashSet<>(own.routes);routes.addAll(unwindInterface.routes);return new Interface(Set.copyOf(ports),Set.copyOf(routes));
+    }
+    private Interface discoverInterface(List<ProgramIndex.Node> starts) {
+        var ports=new HashSet<Object>();var routes=new HashSet<String>();
+        var seen=Collections.newSetFromMap(new IdentityHashMap<ProgramIndex.Node,Boolean>());var pending=new ArrayDeque<ProgramIndex.Node>(starts);
+        while(!pending.isEmpty()) {
+            var node=pending.removeFirst();if(!seen.add(node))continue;
+            var rule=index.localRules.get(node.source().id());
+            if(rule==null){var cursor=context.ordinarySuccessors(node);while(cursor.advance())pending.addLast(cursor.target());continue;}
+            switch(rule) {
+                case LocalControlRules.Invoke invoke -> {
+                    pending.addLast(index.node(invoke.resume()));for(var destination:invoke.resumeRoutes().values())pending.addLast(index.node(destination));
+                    if(invoke.reentryGuard().isPresent())pending.addLast(index.node(invoke.reentryGuard().orElseThrow().destination()));
+                }
+                case LocalControlRules.Boundary boundary -> {ports.add(boundary.port());boundary.resumeKey().ifPresent(routes::add);pending.addLast(index.node(boundary.defaultDestination()));}
+                case LocalControlRules.Resume resume -> resume.resumeKey().ifPresent(routes::add);
+                case LocalControlRules.Unwind unwind -> {if(!unwind.all()&&unwind.count().signum()==0)pending.addLast(index.node(unwind.destination()));}
+            }
+        }
+        return new Interface(Set.copyOf(ports),Set.copyOf(routes));
+    }
+    /** Resolve a formal pop event using its actual matched invocation. */
+    public ProgramIndex.Node returnDestination(ProgramIndex.Node source,Frame binding) {
+        Objects.requireNonNull(binding);var rule=index.localRules.get(source.source().id());
+        Optional<String> route=switch(rule){case LocalControlRules.Resume resume->resume.resumeKey();case LocalControlRules.Boundary boundary->boundary.resumeKey();default->throw new IllegalArgumentException("not a pop event");};
+        var target=route.isEmpty()?binding.invoke.resume():binding.invoke.resumeRoutes().get(route.orElseThrow());
+        if(target==null)throw new IllegalArgumentException("formal pop requires an available route");return index.node(target);
+    }
     public int variables(){return variables.size();}
     /** A structural superset, computed without constructing Boolean guards.
      * Continuations are scheduling bounds here, not executable bypass edges. */

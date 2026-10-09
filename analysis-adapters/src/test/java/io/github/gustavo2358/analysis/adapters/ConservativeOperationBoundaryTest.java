@@ -137,7 +137,7 @@ final class ConservativeOperationBoundaryTest {
                 while(cursor.advance())if(cursor.transition().kind()==io.github.gustavo2358.analysis.cfg.domain.CfgTransition.Kind.OPAQUE_UNKNOWN) {
                     var source=(io.github.gustavo2358.analysis.cfg.domain.CfgNode.SequenceNode)cursor.source().source();
                     var target=(io.github.gustavo2358.analysis.cfg.domain.CfgNode.SequenceNode)cursor.target().source();
-                    (direction?forward:backward).add(source.source().label().localId()+"->"+target.source().label().localId());
+                    (direction?forward:backward).add(source.label().localId()+"->"+target.label().localId());
                 }
             }
         }

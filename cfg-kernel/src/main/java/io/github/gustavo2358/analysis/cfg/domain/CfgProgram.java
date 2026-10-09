@@ -1,0 +1,197 @@
+package io.github.gustavo2358.analysis.cfg.domain;
+
+import io.github.gustavo2358.air.model.Capabilities;
+import io.github.gustavo2358.air.model.Evidence;
+import io.github.gustavo2358.air.model.Ids.EntryId;
+import io.github.gustavo2358.air.model.Ids.LabelId;
+import io.github.gustavo2358.air.model.Ids.OperationId;
+import io.github.gustavo2358.air.model.Ids.UnitId;
+import io.github.gustavo2358.air.model.NamePolicies;
+import io.github.gustavo2358.air.model.Publication;
+import io.github.gustavo2358.air.model.Unit;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.IntFunction;
+
+/**
+ * Read-only control program consumed by the one core CFG projection. Implementations may be
+ * Publication-backed or snapshot-backed; a scan never transfers ownership of the underlying AIR.
+ * Unit, Entry and Sequence scans are repeatable and use canonical local-ID order.
+ */
+public interface CfgProgram {
+    CfgSource source();
+    List<Capabilities.Capability> requiredCapabilities();
+    Set<Capabilities.Capability> namePolicyExtensions();
+    void units(Consumer<UnitView> consumer);
+
+    /** Fresh projection writer; snapshot adapters may reuse sealed descriptors for the same policy. */
+    default NodeStore nodes(ProjectionPolicy policy){Objects.requireNonNull(policy);return new ResidentNodes();}
+    interface NodeStore {
+        /** Optional cold factored-flow writer sharing this projection's owner. */
+        default CfgTransitionTable.Storage transitions(){return null;}
+        /** Per-Unit destination index, owned only during projection of this Unit. */
+        default Routing routing(UnitId unit,int first,int end){return new ResidentRouting(this,unit,first,end);}
+        int size();
+        CfgNode get(int ordinal);
+        void append(CfgNode node,long sourceHandle,int variant);
+        List<CfgNode> seal();
+    }
+    interface Routing extends AutoCloseable {
+        CfgNodeId sequence(LabelId label);
+        CfgNodeId halt(CfgNode.SequenceNode sequence);
+        void outside(CfgNode.SequenceNode sequence,Consumer<CfgNodeId> consumer);
+        @Override void close();
+    }
+    /** Explicit resident compatibility index; native writers replace it with cold ordinals. */
+    final class ResidentRouting implements Routing {
+        private final UnitId unit;
+        private final java.util.Map<LabelId,CfgNodeId> sequences=new java.util.HashMap<>();
+        private final java.util.Map<LabelId,CfgNodeId> halts=new java.util.HashMap<>();
+        private final java.util.Map<LabelId,java.util.List<CfgNodeId>> outside=new java.util.HashMap<>();
+        private boolean closed;
+        private ResidentRouting(NodeStore nodes,UnitId unit,int first,int end) {
+            this.unit=Objects.requireNonNull(unit);LabelId current=null;
+            for(int i=first;i<end;i++) {
+                var node=nodes.get(i);
+                if(node instanceof CfgNode.SequenceNode sequence){current=sequence.label();if(!current.unit().equals(unit)||sequences.put(current,node.id())!=null)throw new IllegalArgumentException("invalid Unit sequence index");}
+                else if(node instanceof CfgNode.HaltExit){halts.put(Objects.requireNonNull(current),node.id());}
+                else if(node instanceof CfgNode.OutcomeExit){outside.computeIfAbsent(Objects.requireNonNull(current),ignored->new java.util.ArrayList<>()).add(node.id());}
+                else throw new IllegalArgumentException("unexpected Unit sequence role");
+            }
+        }
+        private void open(){if(closed)throw new IllegalStateException("closed Unit routing");}
+        @Override public CfgNodeId sequence(LabelId label){open();if(!label.unit().equals(unit))throw new IllegalArgumentException("foreign Unit label");return Objects.requireNonNull(sequences.get(label),"missing CFG label");}
+        @Override public CfgNodeId halt(CfgNode.SequenceNode sequence){open();return Objects.requireNonNull(halts.get(sequence.label()),"missing CFG Halt exit");}
+        @Override public void outside(CfgNode.SequenceNode sequence,Consumer<CfgNodeId> consumer){open();outside.getOrDefault(sequence.label(),List.of()).forEach(consumer);}
+        @Override public void close(){if(closed)return;closed=true;sequences.clear();halts.clear();outside.clear();}
+    }
+    final class ResidentNodes implements NodeStore {
+        private final java.util.ArrayList<CfgNode> nodes=new java.util.ArrayList<>();
+        private boolean sealed;
+        @Override public int size(){return nodes.size();}
+        @Override public CfgNode get(int ordinal){return nodes.get(ordinal);}
+        @Override public void append(CfgNode node,long sourceHandle,int variant){if(sealed)throw new IllegalStateException("sealed nodes");nodes.add(Objects.requireNonNull(node));}
+        @Override public List<CfgNode> seal(){sealed=true;return List.copyOf(nodes);}
+    }
+
+    /**
+     * Typed adapter boundary for an admitted snapshot, not a claim based on PublicationId.
+     * All views must come from this exact validator-owned input and expire with it. The adapter
+     * remains responsible for faithfully mapping AIR facts, as with every program port.
+     * Returning the witness must check both the adapter and admission owner's lifetime.
+     */
+    interface AdmittedSnapshot extends CfgProgram {
+        io.github.gustavo2358.air.validation.SnapshotValidator.CheckedSnapshot admission();
+    }
+
+    interface UnitView {
+        UnitId id();
+        Unit.BodyAvailability body();
+        Evidence.InventoryStatus inventory();
+        void entries(Consumer<EntryView> consumer);
+        void sequences(Consumer<SequenceView> consumer);
+    }
+
+    record EntryView(EntryId id, java.util.Optional<LabelId> initialLabel,long sourceHandle) {
+        public EntryView(EntryId id,java.util.Optional<LabelId> initialLabel){this(id,initialLabel,0);}
+        public EntryView {
+            Objects.requireNonNull(id, "id");
+            initialLabel = Objects.requireNonNull(initialLabel, "initialLabel");
+            if(sourceHandle<0)throw new IllegalArgumentException("negative program source handle");
+        }
+    }
+
+    record SequenceView(LabelId label, List<OperationId> operations, CfgControl control,long sourceHandle) {
+        public SequenceView(LabelId label,List<OperationId> operations,CfgControl control){this(label,operations,control,0);}
+        public SequenceView {
+            Objects.requireNonNull(label, "label");
+            operations = immutableOperations(operations);
+            Objects.requireNonNull(control, "control");
+            if(sourceHandle<0)throw new IllegalArgumentException("negative program source handle");
+            if (!control.operation().unit().equals(label.unit())) {
+                throw new IllegalArgumentException("sequence control belongs to another Unit");
+            }
+        }
+    }
+
+    /**
+     * Immutable operation inventory backed by caller-owned program storage. The access function
+     * must return the same identity for each ordinal for the lifetime checked by {@code owner}.
+     * No identity is read or cached at construction. Borrowed inventories expire with their owner;
+     * consumers needing a detached list must explicitly materialize it while that owner is open.
+     */
+    final class OperationIds extends java.util.AbstractList<OperationId> implements java.util.RandomAccess {
+        private final int count;
+        private final IntFunction<OperationId> access;
+        private final Runnable owner;
+
+        public OperationIds(int count, IntFunction<OperationId> access, Runnable owner) {
+            if(count<0)throw new IllegalArgumentException("negative operation inventory size");
+            this.count=count;this.access=Objects.requireNonNull(access);this.owner=Objects.requireNonNull(owner);
+            owner.run();
+        }
+        @Override public int size(){owner.run();return count;}
+        @Override public OperationId get(int index){owner.run();Objects.checkIndex(index,count);return Objects.requireNonNull(access.apply(index));}
+        @Override public void clear(){throw new UnsupportedOperationException("immutable operation inventory");}
+    }
+
+    static List<OperationId> immutableOperations(List<OperationId> operations) {
+        Objects.requireNonNull(operations,"operations");
+        return operations instanceof OperationIds ? operations : List.copyOf(operations);
+    }
+
+    static CfgProgram resident(Publication publication) {
+        return new Resident(Objects.requireNonNull(publication, "publication"));
+    }
+
+    /** Compatibility adapter. It intentionally retains its caller-owned Publication. */
+    final class Resident implements CfgProgram {
+        private final Publication publication;
+        private final CfgSource source;
+        private final Set<Capabilities.Capability> namePolicies;
+
+        private Resident(Publication publication) {
+            this.publication = publication;
+            source = CfgSource.from(publication);
+            namePolicies = NamePolicies.extensions(publication);
+        }
+
+        Publication publication() { return publication; }
+        @Override public CfgSource source() { return source; }
+        @Override public List<Capabilities.Capability> requiredCapabilities() {
+            return publication.capabilities().required();
+        }
+        @Override public Set<Capabilities.Capability> namePolicyExtensions() { return namePolicies; }
+        @Override public void units(Consumer<UnitView> consumer) {
+            Objects.requireNonNull(consumer, "consumer");
+            publication.units().stream().sorted(Comparator.comparing(unit -> unit.id().localId()))
+                    .forEach(unit -> consumer.accept(new ResidentUnit(unit)));
+        }
+    }
+
+    final class ResidentUnit implements UnitView {
+        private final Unit unit;
+        private ResidentUnit(Unit unit) { this.unit = unit; }
+        @Override public UnitId id() { return unit.id(); }
+        @Override public Unit.BodyAvailability body() { return unit.body(); }
+        @Override public Evidence.InventoryStatus inventory() { return unit.coverage().inventory(); }
+        @Override public void entries(Consumer<EntryView> consumer) {
+            Objects.requireNonNull(consumer, "consumer");
+            unit.entries().stream().sorted(Comparator.comparing(entry -> entry.id().localId()))
+                    .map(entry -> new EntryView(entry.id(), entry.initialLabel()))
+                    .forEach(consumer);
+        }
+        @Override public void sequences(Consumer<SequenceView> consumer) {
+            Objects.requireNonNull(consumer, "consumer");
+            unit.sequences().stream().sorted(Comparator.comparing(sequence -> sequence.label().localId()))
+                    .map(sequence -> new SequenceView(sequence.label(),
+                            sequence.instructions().stream().map(operation -> operation.header().id()).toList(),
+                            CfgControl.from(sequence.terminator())))
+                    .forEach(consumer);
+        }
+    }
+}

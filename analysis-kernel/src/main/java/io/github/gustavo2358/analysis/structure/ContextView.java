@@ -80,14 +80,22 @@ public final class ContextView {
         if (node.identity != index.identity) throw new IllegalArgumentException("node from another index");
         long key = LongIntDirectory.key(ordinal, node.ordinal);
         int head = (forward ? index.forwardHeads : index.backwardHeads).get(key);
-        return new EdgeCursor(index, forward ? index.forwardNext : index.backwardNext, head, node, entry, forward);
+        int shared=-1;
+        if(index.factored&&node.owner().id().equals(entry.id().unit())) {
+            var anchor=node;
+            if(!forward&&node.source() instanceof CfgNode.NormalExit exit) {
+                anchor=exit.entryId().equals(entry.id())?index.returnRepresentatives.get(entry.id().unit()):null;
+            }
+            if(anchor!=null)shared=(forward?index.forwardHeads:index.backwardHeads).get(LongIntDirectory.key(-1,anchor.ordinal));
+        }
+        return new EdgeCursor(index, forward ? index.forwardNext : index.backwardNext, head, shared, node, entry, forward);
     }
 
     /** Stored edges retain identity; bounded unknown edges are transient views over original nodes. */
     public static final class EdgeCursor {
         private final ProgramIndex index;
         private final int[] next;
-        private int position;
+        private int position, sharedPosition;
         private int current = -1;
         private long edgesVisited;
         private final ProgramIndex.Node anchor;
@@ -96,9 +104,9 @@ public final class ContextView {
         private final boolean exactLabels;
         private final java.util.Iterator<ProgramIndex.Node> candidates;
         private ProgramIndex.Node symbolicSource, symbolicTarget;
-        private CfgTransition symbolicEdge;
-        EdgeCursor(ProgramIndex index, int[] next, int position, ProgramIndex.Node anchor, Entries.Entry entry, boolean forward) {
-            this.index = index; this.next = next; this.position = position; this.anchor = anchor; this.entry = entry; this.forward = forward;
+        private CfgTransition symbolicEdge,boundEdge;
+        EdgeCursor(ProgramIndex index, int[] next, int position,int sharedPosition, ProgramIndex.Node anchor, Entries.Entry entry, boolean forward) {
+            this.index = index; this.next = next; this.position = position;this.sharedPosition=sharedPosition; this.anchor = anchor; this.entry = entry; this.forward = forward;
             var sources = index.openSources.getOrDefault(entry.id().unit(), java.util.List.of());
             var labels=forward ? index.labelTargets.get(anchor) : null;
             exactLabels=labels!=null;
@@ -108,7 +116,9 @@ public final class ContextView {
                     ? java.util.List.<ProgramIndex.Node>of() : forward ? index.unitNodes.get(entry.id().unit()) : sources).iterator();
         }
         public boolean advance() {
-            symbolicEdge = null; current = position;
+            symbolicEdge = null;boundEdge=null;
+            if(position==-1){position=sharedPosition;sharedPosition=-1;}
+            current = position;
             if (current != -1) { position = next[current]; edgesVisited = Math.incrementExact(edgesVisited); return true; }
             while (candidates.hasNext()) {
                 var candidate = candidates.next(); var source = forward ? anchor : candidate; var target = forward ? candidate : anchor;
@@ -120,9 +130,19 @@ public final class ContextView {
             return false;
         }
         private void requireCurrent() { if (current == -1 && symbolicEdge == null) throw new NoSuchElementException("cursor has no current edge"); }
-        public CfgTransition transition() { requireCurrent(); return symbolicEdge != null ? symbolicEdge : index.edges[current]; }
+        public CfgTransition transition() {
+            requireCurrent();if(symbolicEdge!=null)return symbolicEdge;
+            var row=index.edges[current];
+            if(index.entry[current]>=0||row.activationEntry().equals(entry.id()))return row;
+            if(boundEdge==null)boundEdge=new CfgTransition(row.from(),target().source().id(),row.kind(),entry.id());
+            return boundEdge;
+        }
         public ProgramIndex.Node source() { requireCurrent(); return symbolicEdge != null ? symbolicSource : index.nodes[index.from[current]]; }
-        public ProgramIndex.Node target() { requireCurrent(); return symbolicEdge != null ? symbolicTarget : index.nodes[index.to[current]]; }
+        public ProgramIndex.Node target() {
+            requireCurrent();if(symbolicEdge!=null)return symbolicTarget;
+            var kind=index.edges[current].kind();
+            return index.entry[current]<0&&(kind==CfgTransition.Kind.RETURN||kind==CfgTransition.Kind.OPAQUE_RETURN)?index.normalExits.get(entry.id()):index.nodes[index.to[current]];
+        }
         /** Actual cursor edge reads, independent of index-construction counters. */
         public long edgesVisited() { return edgesVisited; }
     }

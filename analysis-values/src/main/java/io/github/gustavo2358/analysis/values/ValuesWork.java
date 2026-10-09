@@ -22,8 +22,8 @@ final class ValuesWork {
         m.put("candidateSetsCreated",candidateSets);m.put("candidateElementsAllocated",candidateElements);m.put("candidateUnionEntriesVisited",unionEntries);
         m.put("strongAssignments",strongAssignments);m.put("unknownDefaultLookups",unknownDefaults);m.put("candidateCardinality",maxCandidates);
         m.put("supportSetsCreated",supportSets);m.put("supportElementsAllocated",supportElements);m.put("supportUnionEntriesVisited",supportUnionEntries);m.put("maxSupportCardinality",maxSupports);
-        m.put("supportBytesAllocatedEstimate",Math.addExact(Math.multiplyExact(24L,supportSets),supportArrayBytes));
-        m.put("stateBytesAllocatedEstimate",Math.addExact(Math.addExact(Math.multiplyExact(24L,roots),Math.multiplyExact(40L,stateNodes)),Math.addExact(Math.addExact(Math.multiplyExact(32L,candidateSets),candidateArrayBytes),m.get("supportBytesAllocatedEstimate"))));
+        m.put("supportBytesAllocatedEstimate",Math.addExact(Math.multiplyExact(32L,supportSets),supportArrayBytes));
+        m.put("stateBytesAllocatedEstimate",Math.addExact(Math.addExact(Math.multiplyExact(24L,roots),Math.multiplyExact(48L,stateNodes)),Math.addExact(Math.addExact(Math.multiplyExact(48L,candidateSets),candidateArrayBytes),m.get("supportBytesAllocatedEstimate"))));
         return Map.copyOf(m);
     }
 }

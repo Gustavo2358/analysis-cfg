@@ -10,6 +10,42 @@ import io.github.gustavo2358.analysis.dependencies.*;
 import io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies;
 
 class QualifiedSourceContractTest {
+    @Test void sharedSourceDecodeProgressChecksTokensAndKeepsCallerInputOwnership() throws Exception {
+        var evidence=read("ordinary");var bytes=codec.encode(evidence);int[] reads={0};
+        var input=new ByteArrayInputStream(bytes) {
+            @Override public int read(byte[] buffer,int offset,int length){reads[0]++;return super.read(buffer,offset,length);}
+            @Override public void close(){fail("source decoder closed caller input");}
+        };
+        var budget=new io.github.gustavo2358.analysis.solver.AnalysisResources(
+                new io.github.gustavo2358.analysis.solver.AnalysisResources.Limits(1_000_000,1_000_000,0,0,0,0,1_000_000));
+        var exhausted=assertThrows(io.github.gustavo2358.analysis.solver.AnalysisResources.Exhausted.class,
+                ()->codec.decode(input,()->budget.work(1,io.github.gustavo2358.analysis.solver.AnalysisResources.Phase.DECODE)));
+        assertEquals(io.github.gustavo2358.analysis.solver.AnalysisResources.Resource.WORK,exhausted.resource());
+        assertEquals(io.github.gustavo2358.analysis.solver.AnalysisResources.Phase.DECODE,exhausted.phase());assertEquals(0,reads[0]);
+        int[] progress={0};var stopped=new IllegalStateException("shared owner stopped");
+        assertSame(stopped,assertThrows(IllegalStateException.class,()->codec.decode(input,()->{if(++progress[0]==19)throw stopped;})));
+        assertEquals(19,progress[0]);assertTrue(reads[0]>0);
+        progress[0]=0;
+        var complete=codec.decode(new ByteArrayInputStream(bytes),()->progress[0]++);
+        assertTrue(progress[0]>19);assertEquals(evidence,complete);assertArrayEquals(bytes,codec.encode(complete));
+    }
+    @Test void sharedSourceValidationProgressStopsInsideAdmissionAndIsNotRetained() throws Exception {
+        var evidence=read("conditional");var bytes=codec.encode(evidence);int[] decode={0},validation={0};
+        var complete=codec.decode(new ByteArrayInputStream(bytes),()->decode[0]++,()->validation[0]++);
+        assertTrue(decode[0]>100);assertTrue(validation[0]>100);assertEquals(evidence,complete);
+        int completed=validation[0];assertArrayEquals(bytes,codec.encode(complete));assertEquals(completed,validation[0]);
+        int stopAt=completed/2;validation[0]=0;var stopped=new IllegalStateException("validation budget");
+        var input=new ByteArrayInputStream(bytes){@Override public void close(){fail("source admission closed caller input");}};
+        assertSame(stopped,assertThrows(IllegalStateException.class,()->codec.decode(input,()->{},()->{
+            if(++validation[0]==stopAt)throw stopped;
+        })));assertEquals(stopAt,validation[0]);
+        var budget=new io.github.gustavo2358.analysis.solver.AnalysisResources(
+            new io.github.gustavo2358.analysis.solver.AnalysisResources.Limits(1_000_000,1_000_000,0,0,0,0,1_000_000));
+        var exhausted=assertThrows(io.github.gustavo2358.analysis.solver.AnalysisResources.Exhausted.class,
+            ()->codec.decode(new ByteArrayInputStream(bytes),()->{},
+                ()->budget.work(1,io.github.gustavo2358.analysis.solver.AnalysisResources.Phase.VALIDATION)));
+        assertEquals(io.github.gustavo2358.analysis.solver.AnalysisResources.Phase.VALIDATION,exhausted.phase());
+    }
     private final ObjectMapper json=new ObjectMapper();
     private final QualifiedSourceJson codec=new QualifiedSourceJson();
     private ObjectNode wire(String name)throws Exception {try(var in=getClass().getResourceAsStream("/qualified-source-r9/"+name+".source.json")){return (ObjectNode)json.readTree(Objects.requireNonNull(in));}}

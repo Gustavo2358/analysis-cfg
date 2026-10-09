@@ -5,6 +5,21 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FactorizedAlternativesTest {
+    @Test void productiveRelationLoopsObserveOwnerFailureWithoutDroppingAlternatives() {
+        int[] remaining={Integer.MAX_VALUE};var failure=new IllegalStateException("execution deadline");
+        var domain=new FactorizedAlternatives<Integer>(()->{if(--remaining[0]==0)throw failure;});
+        var tuple=new TreeMap<Integer,Integer>();for(int cell=0;cell<128;cell++)tuple.put(cell,0);
+        var left=domain.singleton(tuple);tuple.put(127,1);var right=domain.singleton(tuple);
+        remaining[0]=10;assertSame(failure,assertThrows(IllegalStateException.class,()->domain.union(left,right)));
+        remaining[0]=Integer.MAX_VALUE;var joined=domain.union(left,right);
+        assertEquals(2,domain.selections(joined).size());
+        for(var action:List.<Runnable>of(()->domain.project(joined,Set.of(127)),()->domain.restrict(joined,Map.of(127,0)),
+                ()->domain.selections(joined),()->domain.update(joined,Map.of(127,value->2)),()->domain.retain(List.of(left)))) {
+            remaining[0]=10;assertSame(failure,assertThrows(IllegalStateException.class,action::run));
+        }
+        remaining[0]=Integer.MAX_VALUE;
+        assertEquals(Set.of(Map.of(127,0),Map.of(127,1)),new HashSet<>(domain.selections(domain.project(joined,Set.of(127)))));
+    }
     /** Independent collecting relation oracle, with empty relations and skipped levels. */
     @Test void thousandFiniteRelationsPreserveAlgebraAndCanonicality() {
         var random=new Random(20260916);
@@ -84,6 +99,19 @@ class FactorizedAlternativesTest {
         var suffix=domain.node(3,Map.of(10,domain.terminal,20,domain.terminal));
         var diamond=domain.node(1,Map.of(1,suffix,2,suffix));
         assertEquals(new FactorizedAlternatives.Size(2,4,2),domain.componentSize(diamond));
+    }
+
+    @Test void retainingStableRootsReclaimsOnlySupersededCanonicalHistory() {
+        var domain=new FactorizedAlternatives<Integer>();var root=domain.singleton(new TreeMap<>(Map.of(0,0,1,0)));
+        var retained=root;
+        for(int value=1;value<=32;value++)root=domain.union(root,domain.singleton(new TreeMap<>(Map.of(0,value,1,value))));
+        var expected=new HashSet<>(domain.selections(root));var before=domain.metrics();
+        domain.retain(List.of(root,retained));var after=domain.metrics();
+        assertEquals(expected,new HashSet<>(domain.selections(root)));assertEquals(Set.of(Map.of(0,0,1,0)),new HashSet<>(domain.selections(retained)));
+        assertTrue(after.get("internedNodes")<before.get("internedNodes"));assertTrue(after.get("internedAlternatives")<before.get("internedAlternatives"));
+        assertEquals(before.get("allocatedNodes"),after.get("allocatedNodes"));assertEquals(before.get("allocatedAlternatives"),after.get("allocatedAlternatives"));
+        assertEquals(before.get("internedNodes"),after.get("internedNodes")+after.get("retiredNodes"));
+        assertEquals(before.get("internedAlternatives"),after.get("internedAlternatives")+after.get("retiredAlternatives"));
     }
 
 }

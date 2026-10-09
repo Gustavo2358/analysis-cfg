@@ -4,6 +4,7 @@ import io.github.gustavo2358.air.model.*;
 import io.github.gustavo2358.air.model.Ids.*;
 import io.github.gustavo2358.analysis.application.AnalysisProvider;
 import io.github.gustavo2358.analysis.cfg.domain.CfgNode;
+import io.github.gustavo2358.analysis.cfg.domain.CfgControl;
 import io.github.gustavo2358.analysis.plan.*;
 import io.github.gustavo2358.analysis.query.*;
 import io.github.gustavo2358.analysis.solver.*;
@@ -28,7 +29,7 @@ public final class ReachabilityProvider implements AnalysisProvider<LabelId,Reac
     public Prepared<LabelId,Fact> prepare(AnalysisSession session,AnalysisKey key) {
         if(!supports(key)||session.context(key.entry())==null)throw new IllegalArgumentException("reachability key/context");
         var context=session.context(key.entry());var unit=session.index().unit(key.entry().unit());
-        boolean open=open(session.index().publication().coverage())||open(unit.coverage())||!context.entry().state().uncertainties().isEmpty();
+        boolean open=open(session.index().store().coverage())||open(unit.coverage())||!context.entry().state().uncertainties().isEmpty();
         for(var sequence:unit.sequences()) {
             for(var instruction:sequence.instructions())if(!(instruction instanceof Operations.HavocMust||instruction instanceof Operations.HavocMay))open|=open(instruction.header());
             if(!(sequence.terminator() instanceof Operations.Opaque))open|=open(sequence.terminator().header());
@@ -46,13 +47,14 @@ public final class ReachabilityProvider implements AnalysisProvider<LabelId,Reac
                     public Integer bottom(){return 0;}
                     public Iterable<Boundary<Integer>> boundaries(AnalysisSession ignored){return List.of(new Boundary<>(selectedContext,selectedContext.entryNode(),1));}
                     public Join<Integer> joinInto(Integer a,Integer b,DomainWork work){int union=a|b;return new Join<>(union,union!=a);}
+                    public long stateFingerprint(Integer state){return state.longValue();}
                     public boolean equivalent(Integer a,Integer b,DomainWork work){return a.equals(b);}
                     public Integer transferBlock(AnalysisPoint point,Integer state,DomainWork work){return state;}
                     public Integer transferEdge(AnalysisPoint point,io.github.gustavo2358.analysis.cfg.domain.CfgTransition edge,Integer state,DomainWork work) {
                         if(state==0)return 0;
                         boolean unknown=point.node().source() instanceof CfgNode.SequenceNode sequence
-                            && sequence.source().terminator() instanceof Operations.Opaque opaque
-                            && opaque.envelope().control().remainder() instanceof Scopes.WithinControl
+                            && sequence.control() instanceof CfgControl.Opaque opaque
+                            && opaque.remainder() instanceof Scopes.WithinControl
                             ||edge.kind()==io.github.gustavo2358.analysis.cfg.domain.CfgTransition.Kind.OPAQUE_UNKNOWN;
                         return unknown?state|2:state;
                     }
@@ -81,7 +83,7 @@ public final class ReachabilityProvider implements AnalysisProvider<LabelId,Reac
             }
         };
     }
-    private static boolean open(Evidence.Coverage c){return c.inventory()!=Evidence.InventoryStatus.COMPLETE||!c.uncertainties().isEmpty();}
+    private static boolean open(ProgramStore.CoverageView c){return c.inventory()!=Evidence.InventoryStatus.COMPLETE||!c.uncertainties().isEmpty();}
     private static boolean open(Evidence.Claim c){return c.status()!=Evidence.PrecisionStatus.EXACT&&c.status()!=Evidence.PrecisionStatus.NOT_APPLICABLE;}
     private static boolean open(Operations.Header h){return h.coverage()!=Evidence.CoverageStatus.MODELED||open(h.precision().control())||open(h.precision().effects())||open(h.precision().storage())||open(h.precision().values());}
 }

@@ -42,6 +42,9 @@ SUITES = {
             "memoryAndFileHaveEquivalentControlCoverageWire", "writerCoversEveryCurrentKindWithExactContextualTransitions",
             "utf8EscapingAndByteLimitAreExact", "invalidUnicodeIsRejectedByOutputPrimitiveAndAirModel",
             "nonAtomicFallbackIsExplicitAndMovesCompleteBytes", "failedMoveCleansTemporaryAndDoesNotReportSuccess",
+            "productionEncoderStreamsTheExactCompatibilityWire", "atomicProductionWriterMetersTheLogicalWire",
+            "interruptedStreamingWritePreservesDestinationAndCleansTemporary",
+            "schemaSelectionDoesNotAllocateTheEntryTimesBodyProductBeforeFirstByte",
         },
     },
     "cfg-launcher": {
@@ -52,6 +55,7 @@ SUITES = {
             "fileThroughRealCliMatchesManualGolden", "twoIndependentExecutionsProduceIdenticalBytes",
             "missingAirFileCannotPublish", "bomIsTypedAirFailureWithoutOutput", "malformedUtf8IsTypedAirFailureWithoutOutput",
             "wrongBindingVersionPreservesCodecPath", "unsupportedCodecFormNeverBecomesCfgUnsupportedInput",
+            "bothNormativeHaltKindsReachRealCliWithoutReturnOrFallthrough",
             "unavailableInventoryReachesRealKernelAndIsRejected", "allNonBuiltStatusesReturnFourWithoutOutput",
             "outputFilesystemFailureIsSixAndCleansTemp", "missingOutputParentIsSix",
             "serializationFailureIsFiveAndPreservesDestination", "usageNeverCallsBuild", "unexpectedBuildBugPropagatesUnchanged",

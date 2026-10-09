@@ -197,6 +197,7 @@
       "nominalCicsCallAndFileConsumersKeepCandidatesWithOpenCompleteness"
     ],
     "io.github.gustavo2358.analysis.adapters.SourceDependencyTest": [
+      "checkedNativeOriginLookupPreservesOriginalExpandedSupports",
       "deduplicatesWithoutDiscardingOriginalOwnersAndSupports",
       "retainsNominalUnresolvedAndUnknownSqlIncludes",
       "requiresPositiveDclgenAuthorityAndClosedProfile",
@@ -218,6 +219,8 @@
       "cicsChoiceCannotBorrowProofFromOnlyOneAlternative"
     ],
     "io.github.gustavo2358.analysis.adapters.QualifiedSourceContractTest": [
+      "sharedSourceDecodeProgressChecksTokensAndKeepsCallerInputOwnership",
+      "sharedSourceValidationProgressStopsInsideAdmissionAndIsNotRetained",
       "producerRoundtripAndCandidateOccurrenceSelectionCorrelation",
       "ordinaryAndConditionalAlternativesKeepGuardsSeparate",
       "inactiveDeactivatedAndComputedRemainBounded",
@@ -261,6 +264,269 @@
     "io.github.gustavo2358.analysis.adapters.ZstdDataflowTest": [
       "airDigestRemainsLogicalAndCorruptionCannotPassAdmission",
       "compressedDeliveryHashesPhysicalBytesAndPreservesExistingOnFailure"
+    ],
+    "io.github.gustavo2358.analysis.adapters.FilePageStoreTest": [
+      "manyPagesExceedResidentCacheAndRemainExactAfterDirtyEviction",
+      "newPagesAreZeroAndPartialWritesPreserveOtherBytes",
+      "releasedHandlesNeverAliasNewPagesAndRejectZeroLengthReads",
+      "corruptColdPayloadIsRejectedBeforeItCanBecomeAValidFact",
+      "quotasFailBeforeCacheAllocationAndCloseCleansTheTemporaryFile",
+      "invalidRangesDoNotChangePageContentsOrEmitIo",
+      "closedStoreDetachesCacheAndDirectoryEvenWhenTheAdapterRemainsReferenced",
+      "churnRetainsEmptyBucketsAndExactLookupAcrossWrappedProbeClusters",
+      "physicalReuseBoundsDiskByPeakLivePagesWithoutRevivingOldHandles",
+      "corruptFreeListCannotOverwriteLiveFactsOrBecomeAnAllocation"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedLongArrayTest": [
+      "sequentialInterleavedReadsDoNotReplayEveryColumnDirectoryForEveryWord",
+      "readRoutesInvalidateAfterMissingLeavesWritesPruningAndRootGrowth",
+      "spilledDirectoriesAndValuesMatchAnIndependentRandomAccessOracle",
+      "sparseIndexesBeyondIntegerRangeAndAllSignedValuesRemainExact",
+      "emptyAndUnwrittenZerosAllocateNoPages",
+      "arraysShareBackendButNeverShareRootsOrReleaseAnotherArraysPages",
+      "invalidIndexesAndInvalidConstructionCannotAllocatePages",
+      "clearingExistingCellPreservesNeighborsAcrossDirectoryGrowth",
+      "clearingSparseHistoryReclaimsEmptyLeavesAndDirectoryPathsImmediately"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedWorklistTest": [
+      "forcedSpillPreservesFairFifoAndDuplicateSuppressionAgainstIndependentOracle",
+      "removedMembershipClearsBeforeSelfLoopCanEnqueueAgain",
+      "pendingLongIdsRemainDistinctAndCloseOnlyReleasesOwnedPages",
+      "invalidPointsAndEmptyRemovalDoNotMutatePendingSet",
+      "operationalFailureAbortsSchedulingAndCleanupReleasesReservations"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedLongIndexTest": [
+      "forcedSpillLookupInsertionAndDeletionMatchIndependentOrderedMap",
+      "sortedReverseAndSignedBoundaryKeysKeepTheirOriginalCanonicalValues",
+      "exactExternalKeyComparisonSeparatesCollisionsAndUnifiesOnlyEqualKeys",
+      "repeatedRetirementReleasesPagesAndBoundsDiskByLiveIndexSize",
+      "closingOneIndexKeepsOtherOwnersAndRejectsUseAfterClose",
+      "comparatorFailureCannotExposeAnIndexAsStableOrReturnPartialLookup",
+      "orderedCursorEnumeratesEveryCanonicalRecordUnderForcedSpill",
+      "mutationAndOwnerCloseInvalidateCursorLeasesWithoutLeakingScratch",
+      "lowerBoundCursorStartsAtExactOrFollowingCanonicalKey",
+      "emptyCursorAndDeniedScratchNeverMaterializeTheIndexOrLoseFacts"
+    ],
+    "io.github.gustavo2358.analysis.adapters.MemoryPageStoreTest": [
+      "memoryAndForcedFileBackendsProduceTheSamePrimitiveExecutionTranscript",
+      "metadataGrowthReservesTheOldPlusNewPeakBeforeAllocatingAndKeepsOldPagesExact",
+      "staleGenerationsNeverReviveAndReusedPayloadIsZeroWithFixedCapacity",
+      "residentKernelPortAndOuterAdapterShareExactExecutionAndCleanup"
+    ],
+    "io.github.gustavo2358.analysis.adapters.CanonicalTupleArenaTest": [
+      "completePrimitiveKeysCanonicalizeWithoutRetainingCallerBuffers",
+      "lookupDoesNotInternMissesOrRetainHistoricalQueryPayload",
+      "rootsPreserveSharedChildrenUntilTheLastCallerReleasesThem",
+      "deepProofDagCollectsIterativelyUnderForcedSpillAndFixedResidency",
+      "randomSharedDagAndRootChurnMatchIndependentGraphTracing",
+      "collectionQuotaFailureAbortsTheArenaInsteadOfExposingPartiallyRetiredFacts",
+      "rejectedSchemaAndConstructorQuotaReleaseAllPartiallyBuiltOwners"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedAirStorageTest": [
+      "typedAirPayloadLargerThanManagedHeapMatchesBothBackendsAndIndependentUnicodeFacts",
+      "failedColumnConstructionReleasesEveryPreviouslyReservedOwner",
+      "operationalWriteFailureAbortsTypedConstructionAndFinalOwnerCleansDisk",
+      "primitiveOccurrenceTraversalPreservesOrderAndReleasesCursorOnCallbackFailureAcrossBackends"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PersistentLongMapTest": [
+      "residentAndForcedSpillVersionsMatchIndependentOrderedMaps",
+      "fullSignedKeysZeroValuesAndInsertionOrderHaveCanonicalRoots",
+      "referenceValuesAndCursorLeasesRetainExactlyTheirTransitiveRecords",
+      "manySingleWriteSnapshotsShareUnchangedPathsAndRetireAfterRootRelease",
+      "cursorDenialAndSchemaMismatchCannotAlterPreviouslyBuiltFacts",
+      "ownerCloseReleasesActiveCursorRootsAndScratchWithoutClosingBorrowedArena",
+      "controlReservationDenialLeavesBorrowedStorageAndArenaUsable",
+      "joinsSkipSharedSubtreesAndAgreeWithIndependentPointwiseUnion",
+      "referenceValueJoinsCanReenterIndependentPrimitiveJoinsAndRemainCollectable",
+      "keyIntersectionsPreserveLeftPayloadsAndMatchIndependentOrderedMaps",
+      "keyIntersectionsSkipSharedSubtreesAndHandleSignedPrefixCorners",
+      "exhaustedCursorTeardownHasBoundedFailuresInResidentAndOnePageStores"
+    ],
+    "io.github.gustavo2358.analysis.adapters.SourcePagedProviderTest": [
+      "forcedSpillMatchesAllResidentProofsWithSmallManagedWorkingSetAndBorrowedStoreOwnership",
+      "absentObservationsAllocateNoPagesAndDeniedCapacityCannotReturnSemanticPartial"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PreparedSourceEvidenceTest": [
+      "preparedNativeAndProgramFactsKeepAuthorityAndAreReusableWithoutReinterpretation",
+      "admittedInputRetainsOneSourceCertificateAndImmutableCorrelatedInventory",
+      "indexedCorrelationsRetainEverySortedSiteAndRejectForeignCertificates",
+      "deepSharedOriginsPreserveEveryCorrelatedSiteAndRejectASibling"
+    ],
+    "io.github.gustavo2358.analysis.solver.CallerPathStorageTest": [
+      "guardedProofRepairAndRetirementHaveEqualResidentAndForcedSpillSemantics"
+    ],
+    "io.github.gustavo2358.analysis.solver.BooleanConditionsStorageTest": [
+      "deniedConditionPayloadAbortsEvenTerminalShortcutsAndReleasesOwnership",
+      "fixedComputedAndNodeCachesAreReservedBeforeTheirArraysAreCreated",
+      "literalJunctionsGeneralDecisionsAndRootLifetimesAgreeWithOnePageSpill",
+      "deniedLiteralAllocationReleasesOwnerAndLeavesBorrowedBackendUsable",
+      "interruptedReadsAbortTheWholeConditionOwnerIncludingTerminalQueries"
+    ],
+    "io.github.gustavo2358.analysis.solver.BooleanNodeStoreStorageTest": [
+      "exactIdentityRetirementAndReuseAgreeAcrossResidentAndOnePageBackends"
+    ],
+    "io.github.gustavo2358.analysis.solver.PagedBooleanDecisionsStorageTest": [
+      "learnedQueriesAndModelsAgreeWhenEveryOtherPageIsEvicted",
+      "variableCardinalityIncreasesDiskPayloadWithConstantResidentCapacity",
+      "diskDenialIsOperationalFailureAndNeverASemanticUnsatResult"
+    ],
+    "io.github.gustavo2358.analysis.solver.PagedBooleanCircuitStorageTest": [
+      "exactMixedCircuitQueriesAndCollectionSurviveOnePageEviction",
+      "CircuitAndDecisionCardinalitySpillWithConstantResidentCapacity"
+    ],
+    "io.github.gustavo2358.analysis.solver.BooleanFunctionIndexStorageTest": [
+      "forcedCollisionLinksAliasesBindingAndReusedIdsSurviveOnePageEviction",
+      "samplesNativeAndNominationIndicesHaveConstantResidentCapacity"
+    ],
+    "io.github.gustavo2358.analysis.solver.SignedLiteralSamplesStorageTest": [
+      "bothConjunctionSamplePolaritiesFollowTheOwningArenaThroughEvictionAndCollection"
+    ],
+    "io.github.gustavo2358.analysis.solver.BooleanCircuitScopeStorageTest": [
+      "retainedScopedDefinitionsSpillWithConstantResidentCapacityAndOnePageEviction",
+      "interruptedInitialAndExtendedScopesAbortAndReleaseEveryBorrowedPage"
+    ],
+    "io.github.gustavo2358.analysis.solver.PagedDagOwnershipStorageTest": [
+      "rootsEdgesAndConstructionJournalSpillWithOneResidentPage",
+      "interruptedDeclarationAndRootReplacementAbortAndReleaseBorrowedPages",
+      "managedConditionVersionsUseOnePageAndReleaseEveryBorrowedPayload",
+      "insufficientFixedManagerCapacityAbortsAndReleasesItsPartialHandoff",
+      "interruptedManagedHandoffAndCreationAbortTerminalShortcuts",
+      "interruptedLiteralCollectionAfterPublicationAbortsTheWholeManagedOwner"
+    ],
+    "io.github.gustavo2358.analysis.solver.PagedCleanupStorageTest": [
+      "spentWorkCannotPreventSpilledArrayFromReleasingBorrowedPages",
+      "closingTemporaryBackendDoesNotRequireWritingDiscardedDirtyPayload"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedSnapshotOrderStorageTest": [
+      "canonicalTapePayloadExceedsResidencyAndRetainsNoOrdinalDirectoryInHeap",
+      "exhaustedCanonicalTapeAbortsFactoryAndStillReleasesOwnedPages",
+      "reverseCanonicalInputSpillsWithoutInputCardinalityHeapMetadata",
+      "comparatorFailureAbortsFactoryAndClosingOwnerReleasesEveryPage"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedSnapshotIdentityStorageTest": [
+      "completeTypedNamespacesAndUnicodeAgreeAcrossResidentAndOnePageStores",
+      "exactIdentityPayloadExceedsManagedResidencyAndMemoizationAvoidsRepeatedWork",
+      "failedConstructionAndSpentWorkReleaseOwnedIndexesWithoutClosingBorrowedInput",
+      "streamedAtomSummariesMatchAcrossBackendsAndSurvivePayloadLargerThanResidency",
+      "tupleMetadataReadFailureAbortsPortAndKeepsBorrowedSnapshotAvailable",
+      "hugeIntegerOrderAndWhitespaceFactsAgreeAcrossBackendsWithoutPayloadReplay"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedSnapshotDeclarationsStorageTest": [
+      "declarationPayloadAndEveryFrontierOccurrenceSpillWithoutChangingPrimitiveFacts",
+      "completeDeclarationInventoryMatchesIndependentFactsAcrossBorrowedResidentAndPagedInputs",
+      "deniedConstructionAndSpentWorkAbortCleanlyWithoutClosingBorrowedPageStore"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedSnapshotGraphStorageTest": [
+      "orderedPrimitiveFrontierAndExactContextMemoSpillWithoutHistoricalStackGrowth",
+      "completeTypedGrammarUsesManagedDeepFramesAndLeavesBorrowedInputAvailable",
+      "constructionAndOperationalFailureCloseEveryOwnedIndexAndKeepBorrowedRunStore"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedSnapshotLocalStorageTest": [
+      "exactMembershipAndFactKindsSpillAndMissesNeverGrowRequiredState",
+      "builderWrittenSharedLabelUniverseMatchesBothBackendsAndWholeLocalGrammar",
+      "constructionAndSpentWorkAbortOwnedLocalStateAndKeepBorrowedInput"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedSnapshotCycleStorageTest": [
+      "reverseOccurrencesAndDenseQueueSpillWithExactRepeatedDegrees",
+      "completeOriginResidualsMatchAcrossResidentAndPagedInput",
+      "deniedConstructionAndInterruptedMutationPreserveBorrowedStore",
+      "invalidProtocolNeverChangesCompleteKeyAssociationOrUnderflowsDegree"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedSnapshotGroundingStorageTest": [
+      "seededAndUnseededColdCyclesFreezeToOnlyReusableTruthFacts",
+      "typedGroundedAlternativeAndCyclicNegativesMatchBothInputBackends",
+      "everyPrimitiveWorkInterruptionAndDeniedConstructorClosesTransferredState",
+      "linkedRowsMustExpandAndUncollectedQueriesNeverCreateFalseFacts"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedSnapshotSignatureStorageTest": [
+      "coldBadRowsHaveSeparateModePrefixesAndReadonlyQueries",
+      "manyDistinctListsKeepLiteralKeysDensePayloadsAndEmptyContextsSeparate",
+      "sharedInvalidSignatureCountsAndMembershipMatchBothInputBackends",
+      "everyWorkInterruptionAndDeniedConstructorReleasesTransferredPages",
+      "unfinishedTablesWrongOrderAndFrozenWritesNeverPublishFacts"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedSnapshotDiagnosticStorageTest": [
+      "coldBalancedSequencesPreserveKindsAnchorsAndRepeatedPrefixResidence",
+      "borrowedProjectedContextsPreserveMixedOrderWithoutExpandingOccurrences",
+      "enormousSharedMultiplicityEmitsOnlyRequestedAnchorsAndRejectsOverflow",
+      "everyWorkInterruptionAndDeniedControlClosesTransferredTupleState"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedSnapshotLabelStorageTest": [
+      "coldSortedPostingsAndComplementsPreserveDuplicateRowsWithoutQueryHistory",
+      "thousandsOfUnitBucketsUseSharedPagesAndLateForeignSelectsByRank",
+      "typedSharedLocalScopesAndProjectedErrorsMatchBothInputBackends",
+      "everyWorkInterruptionAndUnfinishedMutationFailsClosedAndReleasesPages",
+      "deniedConstructionAndEmptyOrdinalQueriesNeverLeakOrPublishPartialTables"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedSnapshotReferenceStorageTest": [
+      "coldSuccessfulAndInvalidRootsHaveExactRecipeKeysAndReadonlyMisses",
+      "typedReferenceRootsAndCarryAssemblyPreserveBothInputBackends",
+      "everyPrimitiveWorkFailureAbortsTheMemoAndReleasesPages",
+      "unfinishedReuseAndDoubleFinishNeverBecomeSuccessfulEmptyEvidence",
+      "deniedConstructionReturnsEveryTransferredLease"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedJsonInputStorageTest": [
+      "coldOrdinalsAndDecodedNameEqualityAreExactWithoutQueryInsertion",
+      "officialReaderUsesColdPagesAndPreservesFullAdmissionAndDigest",
+      "everyPrimitiveWorkFailureReleasesTransferredStorage",
+      "deniedConstructionUnknownChildrenAndRepeatedOrdinalsFailClosed"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedSnapshotValidationStorageTest": [
+      "validTypedSnapshotHasIdenticalManagedAdmissionPrefixAcrossBackends"
+    ],
+    "io.github.gustavo2358.analysis.solver.NativeExecutionDeadlineTest": [
+      "expiryInsideNativeObservationTransferCannotPublishACompleteBatch",
+      "expiryInsideTransferNeverPublishesEitherDirectionAndReleasesInput"
+    ],
+    "io.github.gustavo2358.analysis.adapters.SnapshotDependencyAnalysisTest": [
+      "nativeDeclarationIndexesBorrowColdPayloadsAndPreserveEveryIdentity",
+      "nativeRegionalGroupsBorrowPagedDirectoriesAndPreserveTransitiveCanonicalOrder",
+      "failedNativeRegionalGroupWriteClosesPartialColumnsAndPreservesPrimary",
+      "nativeRegionalExecutionBorrowsColdCellTraceLocationsAndPreservesPublicEvidence",
+      "nativeEffectsAndDomainPlansBorrowLiteralBodiesAndPreserveReachedEvidence",
+      "nativeOperationLookupBorrowsCompleteColdIdentitiesAndCanonicalSites",
+      "failedNativeOperationDirectoryWritePreservesPrimaryAndClosesTapes",
+      "nativeFileFallbackReadsOneTypedOperationWithoutBulkBodyCopies",
+      "nativeFinitePartitionPreservesArbitraryCutsAndUnknownTail",
+      "failedNativePartitionColumnWriteReleasesAllOwnersAndPreservesPrimary",
+      "nativeOpenAllMemoryAliasesPreserveLogicalOrderWithoutColdStorageCopies",
+      "failedNativeWholeAliasColumnWritePreservesInputAndReleasesOwners",
+      "generalMetadataUsesOrderedBorrowedPagesWithoutReadingUnusedPayloads",
+      "exhaustedNativeMetadataOrderReleasesPartialPagesWithoutClosingInput",
+      "nativeGeneralPlannerPreservesAllUnitsColdOperationsAndCorrelatedCallFacts",
+      "pagedUnitRoutingIsColdExactAndOwnedByTheProjection",
+      "deniedUnitRoutingConstructionAbortsAndReleasesNativeDescriptors",
+      "sharedLabelEntriesKeepEveryDependencyContextAndColdReturnBinding",
+      "snapshotCfgPhysicalTransitionsStayFactoredColdAndExpireWithProjection",
+      "pagedPhysicalTupleStorageRejectsDuplicatesAndForeignOrMissingBindings",
+      "sourceUnitInventoryBorrowsCanonicalPagesAndExpiresWithProgram",
+      "borrowedSourceInventoryKeepsCanonicalAndForeignIdentityChecks",
+      "cfgProjectionDoesNotReadEveryInstructionIdentityBeforeAQuery",
+      "instructionQueriesReadLocalIdentityWithoutRepeatingValidatedNamespaces",
+      "instructionOwnerMismatchCannotEnterTheBorrowedCfgView",
+      "operationViewConstructorsDoNotCopyAndExpiredOwnersRejectQueries",
+      "validatedPagedSnapshotPreservesVariableCallEvidenceWithoutPublicationMaterialization",
+      "incompleteAdmissionCannotProduceDependencies",
+      "cfgBuildCannotReuseAdmissionForAnotherProgramWithTheSamePublicationId",
+      "cfgBuildCannotReuseClosedSnapshotAdmissionOrProgram",
+      "snapshotCfgNodesAndRoleInventoriesBorrowColdDescriptorsAndExpireWithTheirOwner",
+      "deniedCfgDescriptorConstructionReleasesEveryPartialTape",
+      "exportedCfgDescriptorsCanRetireBeforeDependenciesUseTheSameAir",
+      "pagedHaltRoleKeepsItsActualOccurrenceAndExactEndpoint",
+      "pagedOutsideOutcomeKeepsItsActualInvokeAndExactEndpoint",
+      "snapshotReaderCloseFailureAfterAdmissionDoesNotLeakAnUnreturnedSession",
+      "snapshotReaderPreservesPrimaryCodecFailureWhenInputCloseAlsoFails",
+      "snapshotReaderTransfersOwnershipOnlyAfterInputCloseSucceeds",
+      "leasedCursorWireMatchesExplicitMaterialization"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedSnapshotDependencyStorageTest": [
+      "callCursorOrdersPageBackedSitesWithBoundedManagedHeap",
+      "candidateLowerBoundReadsOnlyOneObjectsSortedPayload",
+      "supportCursorDeduplicatesAndOrdersOneCandidatesSpilledProofs",
+      "metadataHandlesArePageBackedAndOrderedWithoutMaterializingCollections"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.SnapshotDependencyOutputScaleTest": [
+      "cursorPublishesOutputLargerThanManagedHeapAndFailureIsAtomic"
     ]
   },
   "analysis-dataflow": {
@@ -293,6 +559,8 @@
       "existingRejectionsAndLiteralPaddingRemainOpen"
     ],
     "io.github.gustavo2358.analysis.dependencies.SourceValuesProviderTest": [
+      "sharedBudgetStopsSourceIndexPreparationBeforeStateAllocation",
+      "noRequestedObservationRetainsNoPrivateControlOrStatementIndex",
       "branchExcludesKnownNameWithOpenStoragePremises",
       "choiceKeepsEveryAlternativeAndRejectsOldAuthority",
       "copyCapturesSnapshot",
@@ -314,10 +582,62 @@
       "unknownCollatingCharacterAndUnicodeRemainExplicit",
       "unknownModelCopyCannotKillAnObservedName",
       "unknownTableWriteAndPredicateRetainPossibleElements",
-      "unobservedRootedTailDoesNotRetainStatesOrChangeCompleteSupports"
+      "unobservedRootedTailDoesNotRetainStatesOrChangeCompleteSupports",
+      "growingAssignmentHistoryKeepsAllProofsWithSharedPrimitiveVersions",
+      "sharedPredecessorEvaluatesOneTransferForEveryOutgoingAlternative",
+      "typedProofIdentityCannotAliasStatementsAndSymbolsContainingSeparators"
     ],
     "io.github.gustavo2358.analysis.dependencies.SourceCertificateTest": [
       "groundingPreservesAndOrCyclesAndHashCollisions"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.NominalDemandIndexTest": [
+      "sharedProgressChecksIndexConstructionAndClosureWithoutChangingDemand",
+      "indexedClosureAgreesWithIndependentFixpointAcrossPermutationsAndCycles",
+      "reversedChainVisitsEachIndexedNodeAndEdgeOnce",
+      "conditionReadsUseLinearIncidenceRatherThanPairwiseEdges",
+      "assignmentAndConditionExpressionSharingDoesNotInventReceiverDemand",
+      "sharedExpressionDagIsIndexedByIdentityWithoutExpandingOccurrences"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.SourceControlEvidenceTest": [
+      "sharedProgressRemainsActiveThroughProofAndNodePropagation",
+      "proofClosureMatchesIndependentScalarCyclesCollisionsAndPermutations",
+      "reverseOrderedProofChainHasLinearWorkAndNoSeedBuildsNoIndex"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.SourceCorrelationIndexTest": [
+      "nativeFileAdmissionIndexesNodesOnceInsteadOfScanningPerUse",
+      "completeAlternativeSetsAndQualificationOwnershipRemainMandatory"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.SourceValueStoreTest": [
+      "valueJoinsPreserveEveryCandidateSupportAndAllOpenModelTableFlags",
+      "emptySupportIsKnownCandidateAndUnknownJoinDoesNotEraseKnownFacts",
+      "successiveAssignmentsShareGrowingSupportInsteadOfCopyingAllPriorSets",
+      "supportAndFlagChangesKeepOldValuesAndCallerRootsIndependent",
+      "sparseReachableStatesJoinMissingValuesWithDefaultsWithoutInventingKnownFacts",
+      "randomSparseJoinsMatchIndependentDenseDefaultStatesIncludingModelsAndTables",
+      "primitiveTruthClassesMatchIndependentPaddingAndFigurativeOraclesAfterSupportUpdates"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.SourceNominalAdmissionTest": [
+      "constructionProgressStopsInsideDeepAdmissionWithoutBecomingModelState",
+      "unitAndDocumentAdmissionShareProgressAndRetainOnlyImmutableEvidence",
+      "deepTermAndPredicateAdmissionUsesNoJavaCallStack",
+      "sharedTermAndPredicateDagsAreAdmittedWithoutEnumeratingTheirPaths",
+      "deepAndSharedInvalidLeavesRetainTheirSpecificAdmissionFailures",
+      "extendedExpressionsStillRequireTheirPublishedAuthority",
+      "sharedChoiceAndPredicateDagsReachProductionCandidatesWithOneCompleteAssignmentProof",
+      "deepProductionTransformsAndPredicateTruthPreserveTheirSelectedBranch"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.SourcePredicateReuseTest": [
+      "ordinaryEqualityRefinementUsesSharedPrimitiveClassFacts",
+      "unchangedTransformOperandIsPreparedOnceAcrossEveryCandidate",
+      "transformsDistributeOverMixedChoicesWithoutRepeatingTheirUnchangedSide"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.SourceExpressionAlgebraTest": [
+      "composedTransformsAndTheirDistributionPreserveIndependentUnicodeImagesAndCompleteEvidence",
+      "distributionKeepsEveryProducerWhenDifferentInputsMergeIntoOneTransformedCandidate"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.OriginAncestryIndexTest": [
+      "sharedDeepAncestryIsPreparedOnceForEveryCorrelation",
+      "requestedOriginsMatchIndependentTypedGraphWalksIncludingCyclesAndMissingInputs"
     ]
   },
   "analysis-kernel": {
@@ -346,14 +666,19 @@
       "realBuildIsAccepted",
       "missingBranchEdgeIsInvalid",
       "missingOrphanIsInvalid",
-      "equalLookingReplacementSequenceIsInvalid",
+      "replacedCompactControlIsInvalid",
       "equalLookingForeignSnapshotIsInvalid",
       "equalLookingForeignEntrySelectionIsInvalid",
       "duplicateAndWrongContextEdgesAreInvalid",
       "missingEntryExitHaltAndReplacedHaltAreInvalid",
       "foreignEntryNodeAndDuplicateSequenceRoleAreInvalid",
       "unsupportedProfileAndPolicyMismatchHaveDistinctTaxonomy",
-      "incompleteUpstreamValidationDoesNotBecomeSemanticSizeOutcome"
+      "incompleteUpstreamValidationDoesNotBecomeSemanticSizeOutcome",
+      "detachedStructuralStoreIsAcceptedWithoutPublicationAggregate"
+    ],
+    "io.github.gustavo2358.analysis.structure.OperationTableTest": [
+      "nativeValuesNeverDecodeKeysAndLookupIncludesTheFullOwner",
+      "residentCompatibilityRetainsOrdinaryMapSemantics"
     ],
     "io.github.gustavo2358.analysis.structure.StructureTest": [
       "offsetsBucketsAndPayloadAreCanonical",
@@ -465,15 +790,33 @@
       "equalStatesAcrossSharedFailureExitsPreserveEveryContext"
     ],
     "io.github.gustavo2358.analysis.solver.BooleanConditionsTest": [
+      "ownedResidentDecisionsObserveBorrowedDeadlineInsideConstructionAndStillClose",
+      "committedOperationRetainsOnlyEscapingConditionsAndInvalidatesRetiredIds",
+      "literalImplicationsDoNotUnfoldEveryGrowingDecisionPrefix",
+      "growingLiteralJunctionsDoNotRebuildAllOrderedDecisionPrefixes",
+      "sparseAbsentRestrictionMatchesIndependentTruthTables",
+      "emptyRootBindingMatchesIndependentTruthTablesAcrossReusedIds",
+      "managedScratchRollbackVisitsOnlyTransientMemoSlots",
+      "managedScratchCollisionsAndReusedIdsMatchIndependentTruthTables",
+      "rootedCollectionKeepsTruthAndCanonicalIdsAcrossReusedSlots",
+      "feasibilityScratchDoesNotReuseCollectedSlotsOrEscapeRollback",
       "operationsMatchIndependentTruthTablesAndCanonicalize",
       "computedTableCollisionsPreserveEveryTruthAssignment",
-      "deepGuardConditionsDoNotUseTheJavaCallStack",
       "scratchQueriesReleaseNodesWithoutReusingStaleComputedEntries",
-      "requiredPresentIsNecessaryForEverySatisfyingAssignment"
+      "requiredPresentIsNecessaryForEverySatisfyingAssignment",
+      "deepGuardConditionsDoNotUseTheJavaCallStack",
+      "everySmallFunctionHasOneIdAcrossDnfCnfAndComplementConstruction",
+      "everyCertifiedSupportMatchesIndependentEssentialVariableTruthTables",
+      "disjointMixedPrefixesDoNotRescanEveryPreviouslyAdmittedFunction",
+      "optionalPositiveWitnessHintsSurviveMixedOrAndComplementRepresentatives"
     ],
     "io.github.gustavo2358.analysis.solver.CallerWitnessesTest": [
       "separateWitnessesNeverInventACombinedCaller",
-      "cachedValuationsHaveExplicitPathsAndStayBoundedInCyclicGraphs"
+      "cachedValuationsHaveExplicitPathsAndStayBoundedInCyclicGraphs",
+      "sparseDeepPrefixesShareStorageInsteadOfCopyingTheKeyUniverse",
+      "ownersReleaseRetentionsAndQuotaFailureLeavesBorrowedPagesUsable",
+      "queuedPathsAndSeparateWitnessesSurviveCollectionOfOldLiteralSummaries",
+      "queueGrowthDenialReleasesAllPrivatePagesWithoutClosingBorrowedStore"
     ],
     "io.github.gustavo2358.analysis.storage.NumericExpressionEffectsTest": [
       "explicitParseRetainsTextAndInvalidFallbackReads",
@@ -486,6 +829,229 @@
     ],
     "io.github.gustavo2358.analysis.structure.CallerSupportTest": [
       "condensedSupportEqualsIndependentScalarReachability"
+    ],
+    "io.github.gustavo2358.analysis.solver.AnalysisResourcesTest": [
+      "scratchAndResidentShareHeapAndFailedReservationDoesNotChangeAccounting",
+      "reservationGrowthIsAtomicAndDoubleCloseDoesNotFreeAnotherOwnersBytes",
+      "directDiskAndDescriptorsHaveIndependentQuotas",
+      "workAndOutputAreCumulativeRatherThanEvictableAllocations",
+      "hugeAmountsCannotWrapAroundAndNegativeChargesAreInvalid",
+      "zeroScratchQuotaIsIndependentFromHeapQuota",
+      "stagedCapacityTransfersWithoutRechargingOrPrematurelyReleasingBytes",
+      "capacityTransferRejectsForeignPoolOwnerSelfAndClosedReservationsAtomically",
+      "cleanupAccountingCannotResetAnalysisQuotaAndReportsCounterSaturation",
+      "oneDeadlineCoversEveryProductivePhaseButNeverBlocksCleanup"
+    ],
+    "io.github.gustavo2358.analysis.structure.SharedTopologyTest": [
+      "projectionAndIndexStoreEntryBindingsWithoutCopyingEveryBody",
+      "denseAndFactoredGraphsHaveSameEveryEntryForwardBackwardAndListHash",
+      "unitAndEntryExitBindingsStaySeparateWithEqualTargetBranchesAndDifferentRoots",
+      "retentionAuditCountsPhysicalRowsAndStillDetectsAnExtraRetainedTransition"
+    ],
+    "io.github.gustavo2358.analysis.solver.SparseActivationConditionsTest": [
+      "contextualExecutionObservesExpiryInsideBothDirectionalTransfers",
+      "unreachableFramesAllocateNoAncestorConditions",
+      "rootClosesOnlyEncounteredGuardsWithoutAbsenceVectors"
+    ],
+    "io.github.gustavo2358.analysis.solver.PersistentCallerSupportTest": [
+      "condensedPersistentSupportsMatchIndependentCallerWalks",
+      "chainSupportsShareSearchPathsInsteadOfCopyingAllAncestors"
+    ],
+    "io.github.gustavo2358.analysis.solver.StateIndexTest": [
+      "distinctInputsDoNotRequirePairwiseSemanticComparisons",
+      "fingerprintCollisionsAndDifferentObjectEqualityNeverMergeSemanticInputs",
+      "unregisteredConstantFingerprintRemainsSemanticallyExact",
+      "rejectedCapacityGrowthPreservesExistingInputsAndClosesEveryLease",
+      "liveFilteringCompactsCapacityAndNeverRecomputesFingerprints",
+      "rejectedLiveFilteringDoesNotLoseAnyOldInput"
+    ],
+    "io.github.gustavo2358.analysis.structure.StateIndexSolverTest": [
+      "registeredAndCollidingFingerprintsPreserveGeneratedExactStacksInBothDirections"
+    ],
+    "io.github.gustavo2358.analysis.solver.SummaryCollectorTest": [
+      "rootedSccsAndSharedTargetsSurviveWhileUnrootedCyclesAreRetired",
+      "freshCollectorsCannotConfuseOldMarksAndFailedScratchAdmissionPreservesInventory"
+    ],
+    "io.github.gustavo2358.analysis.structure.LiveSummaryVersionsTest": [
+      "collectionsDuringConvergencePreserveEveryExactStackInAndOut",
+      "oneCallerRetainsLiveVersionsInsteadOfEveryHistoricalInputInBothDirections",
+      "aCallerThatKeepsItsOldInputSurvivesAnotherCallersVersionChurn",
+      "nestedSharedInputsAndDeferredWaitersDoNotRootEveryExpiredParent"
+    ],
+    "io.github.gustavo2358.analysis.structure.FormalBodiesTest": [
+      "identicalArgumentsShareBodyEquationsButKeepEveryMatchedContinuation",
+      "routeDestinationsStayInBindingsAndOnlyObservedTopPortsSplitBodies",
+      "edgeSensitiveBackwardArgumentsAndNonDistributiveBlocksMatchEveryConcreteStack",
+      "distinctSymbolsStillMakeBodyBoundariesAmbiguousButDeadBindingsDoNot",
+      "unwindLandingsObserveTheRemainingTopInterfaceOutsideItsNormalEntryWalk",
+      "backwardWakeupsFollowReadContinuationsInsteadOfEveryCallInTheRegion",
+      "impossibleCallsHaveNoReadInterfaceAndKeepTheirGuardRejection"
+    ],
+    "io.github.gustavo2358.analysis.structure.FeasibilityPrefixesTest": [
+      "nestedCallsDoNotRewalkEveryCallerPrefixToCheckTheNextGuard",
+      "ordinaryDiamondsDoNotAccumulateImpossibleReentryPredicates"
+    ],
+    "io.github.gustavo2358.analysis.solver.CallerConnectivityTest": [
+      "changingLinksMatchesIndependentRootSearchIncludingDisconnectedCycles",
+      "removingTheLastExternalCallerDisconnectsAnEntireCycleThenReattachesIt"
+    ],
+    "io.github.gustavo2358.analysis.solver.CallerPathCertificatesTest": [
+      "repairingAParallelEntryWitnessDoesNotSearchDisconnectedCallers",
+      "indexedEntryCandidatesStillTestTheirGuardsAndReleaseLiveLinks",
+      "repairedProofForestRefreshesEachDependentBindingOnlyOnce",
+      "disconnectedCachedAlternativesReleaseTheirWordsBeforeRepairReturns",
+      "differentIncomingWordsNeverBecomeOneJointWitness",
+      "replacingParallelBindingsChangesTheirActualKeys",
+      "guardedAlternativeIsTestedOnItsOwnParentAndDoesNotRootADisconnectedCycle",
+      "repairingAnAncestorUpdatesAllDependentWordsAndBorrowedPagesStayUsable",
+      "everyPositiveHintBelongsToAnIndependentConcreteWordAfterMutations",
+      "sparseDeepCertificatesSharePrimitiveWordsInsteadOfDenseUniverseVectors",
+      "guardReplacementPreservesStillValidProofsAndRepairsInvalidatedDescendants",
+      "disconnectedCallerCyclesHaveAnExactNegativeSupportAndWakeOnReconnection",
+      "rawSupportMatchesIndependentSearchAfterFourThousandBindingMutations",
+      "allocationFailuresReleaseOwnedRootsAndAllReservedCapacity",
+      "disjunctivePredicatesUseAnIndividualIndexedWordWithoutJoiningAlternatives",
+      "growingDisjunctionHintsDoNotRewalkThePrimaryWordForEveryAlternative",
+      "managedArcConditionsOwnReplacementsAndReleaseOnCertificateClose",
+      "exhaustedRootTeardownCannotAllocateOneFailurePerCaller"
+    ],
+    "io.github.gustavo2358.analysis.structure.ConditionalFeasibilityTest": [
+      "sharedRecursiveDispatchDoesNotSearchAllCallersForEachGuard",
+      "dispatchSequencePermutationsKeepReachabilityAndLinearCertificates"
+    ],
+    "io.github.gustavo2358.analysis.solver.SignedLiteralSetTest": [
+      "signedInclusionAndIntersectionMatchIndependentMapsWithoutUnfoldingSharedTrees",
+      "signedLiteralUpdatesAndComplementsMatchIndependentSortedMaps",
+      "structuralUnionDetectsContradictionsAndSharesEquivalentPermutations",
+      "polarityCountsAndFirstSignedKeysSurviveComplementAndRemoval",
+      "absentRestrictionsMatchIndependentLiteralTruthAndCanonicalKeptKeys",
+      "growingPrefixesSharePayloadAndComplementDoesNotCopyTheLiteralProduct"
+    ],
+    "io.github.gustavo2358.analysis.solver.GuardedStatesTest": [
+      "failedConstructionDoesNotMaskBudgetFailureDuringScratchRollback",
+      "pointwiseJoinsAndDisjointValueClassesMatchIndependentTables",
+      "equalValueUnionDoesNotConstructDisjointTransientDifferences",
+      "initializedValueClassesJoinWithoutCreatingOldAndNewGuardProducts",
+      "managedValueClassesOwnAllPublishedGuardsAndReleaseOldVersions"
+    ],
+    "io.github.gustavo2358.analysis.structure.RootResetRelationsTest": [
+      "sharedGuardedRootResetsDoNotAccumulateCallerPrefixPredicates",
+      "resetProjectionPreservesEveryContextAndNonDistributiveEdgeSensitiveMemory"
+    ],
+    "io.github.gustavo2358.analysis.solver.BooleanNodeStoreTest": [
+      "constructorAndGrowthDenialReleaseEveryOwnedPage",
+      "interruptedWritesAbortCatalogAndCanBeClosedWithoutClosingBorrowedStore",
+      "interruptedRetirementMergesAndTrimDoNotDependOnValidTreeLinksForCleanup",
+      "completePrimitiveKeysAndMetadataMatchIndependentCanonicalMaps",
+      "appendOnlyScopesAndFreeLinksDoNotReuseOlderRetiredSlots",
+      "provedRepresentativeReplacementPreservesIdAndMarksButRetiresTheOldStructuralKey",
+      "interruptedRepresentativeChangesAbortAndCloseWithoutIntactUniqueLinks"
+    ],
+    "io.github.gustavo2358.analysis.solver.MixedConditionRelationsTest": [
+      "mixedRelationsAgreeWithIndependentAllValuationsAndRestrictions",
+      "compactMixedRelationsMustNotExpandIntoEveryBooleanAssignment"
+    ],
+    "io.github.gustavo2358.analysis.solver.PagedBooleanDecisionsTest": [
+      "incrementalClausesQueriesAndModelsAgreeWithIndependentExhaustiveCnf",
+      "contradictoryAssumptionsNeverBecomePermanentUnsatOrLeakIntoNextQuery",
+      "emptyTautologicalDuplicateAndUnitClausesRetainTheirExactMeaning",
+      "deepImplicationPropagationVisitsAffectedWatchesInsteadOfRescanningFormula",
+      "firstUipLearningSkipsIrrelevantDecisionAndPreservesEveryLaterAssumption",
+      "pigeonholeContradictionsRequireSearchAndPreserveIncrementalQueries",
+      "denseNonunitFormulasAndLearnedClausesAgreeWithIndependentEnumeration",
+      "constructorAndGrowthDenialsAbortWithoutLeakingBorrowedPages",
+      "storageInterruptionsDuringInsertionSearchAndModelCopyAbortAndReleaseAllPages",
+      "derivedModelsAndLaterArbitraryConstraintsMatchIndependentTruthMasks",
+      "repeatedAndCommutedDefinitionsShareOneGateWithoutMixingSigns"
+    ],
+    "io.github.gustavo2358.analysis.solver.PagedBooleanCircuitTest": [
+      "constructionValuationsRestrictionsSatAndEqualityAgreeWithIndependentExpressions",
+      "exactFunctionalLawsAreSeparateFromRawCircuitIdentity",
+      "mixedRelationsRetainLinearSharedSyntaxAfterRootedCollection",
+      "decisionQueriesEncodeOnlyTheExactRequestedFaninCones",
+      "deepPostorderSubstitutionAndEvaluationNeverUseJavaCallStack",
+      "rootedSharedChildrenSurviveCollectionAndStaleHandlesAreRejected",
+      "quotaDenialAbortsEvenTerminalQueriesAndReleasesBorrowedPages",
+      "interruptedTraversalDecisionsAndCollectionReleaseQueryAndCircuitOwners",
+      "storedSimulationWordsAreActualValuationsAndRespectFunctionalLaws",
+      "simulationConstructionProcessesEachNewSharedNodeOnceInsteadOfItsWholeCone"
+    ],
+    "io.github.gustavo2358.analysis.solver.BooleanCircuitDecisionsTest": [
+      "genericConeDecisionsPreserveRepeatedPrimaryKeysAndIndependentTruthTables",
+      "constantsInsideDefinitionsAndAliasesPreserveTheirMeaning",
+      "unrelatedGraphNodesAreNeverReadAndCyclesAreOperationalFailure",
+      "scopedIncrementalQueriesEncodeSharedFaninsOnceInsteadOfPerPrefix",
+      "scopedLearningAndFormulaExtensionPreserveIndependentAssignmentOracles",
+      "scopeEndDropsAllDefinitionsBeforeBorrowedHandlesAreReused",
+      "formulaDefinitionsCannotMultiplyIndependentBranchingDimension",
+      "distinctGraphAliasesReuseDefinitionsAndCountOnlyNewVariables"
+    ],
+    "io.github.gustavo2358.analysis.solver.SignedLiteralSamplesTest": [
+      "sampledConjunctionDisjunctionAndComplementedSignsMatchIndependentLiteralValuations",
+      "prefixMetadataUsesCopiedPathsAndRetiresWithItsOwningLiteralRecords",
+      "sixFieldClientsKeepTheirOriginalSchemaAndMeaning"
+    ],
+    "io.github.gustavo2358.analysis.solver.BooleanFunctionIndexTest": [
+      "forcedNominationCollisionsNeverMergeIndependentUnequalFunctions",
+      "nativeKeysAvoidScanningAllEarlierPurePrefixesAndCanBindMixedClasses",
+      "oldestFirstRetirementHasConstantLinkWorkAndReusedIdsHaveNoStaleMeaning",
+      "constructorAndGrowthQuotaDenialsReleaseEveryOwnedPage",
+      "interruptedPublicationBindingAndRetirementAbortWithoutDependingOnIntactLinks",
+      "certifiedSupportsAvoidAllPrefixScansWithoutSkippingUnknownEquivalentFunctions",
+      "independentTruthTablesCertifySupportForEveryKnownUnknownRegistrationOrder",
+      "interruptedSupportCertificationAbortsAndReleasesBothNominationPartitions"
+    ],
+    "io.github.gustavo2358.analysis.solver.SignedLiteralSupportTest": [
+      "unsignedSupportIsCanonicalAcrossAllPolaritiesAndRetiresWithItsOwner",
+      "aGrowingMixedSetStoresUnsignedSupportWithBoundedCopiedPathWork"
+    ],
+    "io.github.gustavo2358.analysis.solver.PagedLongArrayOwnershipTest": [
+      "repeatedLeafReadsStillPropagatePayloadFailureAndPoisonTheOwner",
+      "interruptedPruningAndRootCollapseNeverLeaveReleasedPagesInTheOwnershipTree",
+      "indexOwnershipIsDenseEvenWhenBorrowedPageHandlesAreWidelyScattered"
+    ],
+    "io.github.gustavo2358.analysis.solver.PagedDagOwnershipTest": [
+      "duplicateEdgesAndRootReplacementMatchIndependentReachability",
+      "replacedIndependentVersionsRetireImmediatelyWithoutScanningHistory",
+      "sharedDagRootsAndUpdatesMatchAnIndependentTraversalOracle",
+      "retiredIdsHaveNewGenerationsAndOldConstructionRecordsCannotReleaseThem",
+      "nestedConstructionPublicationReleasesOnlyItsOwnUnpublishedNodes",
+      "rootTokensRejectForeignOwnersWithoutAffectingEitherGraph",
+      "retirementCallbackFailureAbortsRootReadsAndFutureBindings",
+      "deepRetirementIsIterativeAndTwoPassImportDoesNotAssumeNumericTopologicalIds",
+      "signedRootValuesAndEdgesShareCanonicalOwnershipAndGeneration"
+    ],
+    "io.github.gustavo2358.analysis.solver.BooleanConditionsOwnershipTest": [
+      "rootsKeepExactMixedFunctionsAndReleaseIndependentVersions",
+      "computedCacheCannotAliasRecycledFunctionIds",
+      "appendOnlyDecisionScopeDoesNotReuseRetiredMeanings"
+    ],
+    "io.github.gustavo2358.analysis.solver.ConditionBindingsTest": [
+      "mapUpdatesAcquireNewRootsBeforeReleasingOldOnes",
+      "explicitBorrowKeepsPreviousMapVersionAliveAcrossMutation"
+    ],
+    "io.github.gustavo2358.analysis.solver.BooleanFactorizationTest": [
+      "commonNativeFactorsAndTheirDualDoNotRetainExpandedPrefixes",
+      "partialSignedFactorsPreserveEveryFourKeyAssignment",
+      "nestedDifferencesDoNotObscureCommonFactors",
+      "nativePremisesPreserveAllAssignmentsInMixedSignedJunctions"
+    ],
+    "io.github.gustavo2358.analysis.solver.SignedLiteralPartitionTest": [
+      "commonAndResidualSignedSetsMatchIndependentMaps"
+    ],
+    "io.github.gustavo2358.analysis.solver.SignedConditionHandlesTest": [
+      "positiveAndNegativeRootsShareOneRequiredFunctionRecord",
+      "mixedComplementSharesStorageWhileBindingsPreserveBothPolarities",
+      "nativePromotionDuringRestrictionKeepsSignedRootsAndDecisionMeanings"
+    ],
+    "io.github.gustavo2358.analysis.solver.PagedCleanupTest": [
+      "spentWorkCannotPreventArrayFromReleasingBorrowedResidentPages",
+      "spentWorkCannotPreventIndexFromReleasingPayloadAndOwnershipPages"
+    ],
+    "io.github.gustavo2358.analysis.structure.SolverFailureScopeTest": [
+      "domainFailureSurvivesTeardownOfTheExhaustedActualSolver",
+      "conditionFailureSurvivesTheActualSolverPublicationScopes",
+      "conditionFailureInEdgeContributionsSurvivesNestedPublicationScopes"
     ]
   },
   "analysis-launcher": {
@@ -496,12 +1062,11 @@
       "realCodecResourceLimitStopsBeforeDeliveryAndRecovers"
     ],
     "io.github.gustavo2358.analysis.launcher.DependencyCliTest": [
-      "successReplacesExistingFileAndMatchesMemoryExactly",
-      "inputAndOutputFailuresPreserveDestinationAndCleanupTemporaryFile",
-      "realCodecOperationalLimitIsSevenAndProducesNoPartialResult",
-      "semanticLimitsPublishExplicitPartialOutputWithoutExitFive",
-      "scopedPreconditionSurvivesRealCodecCliAndStructuralInvalidityStillRejects",
-      "explicitPhysicalOperationalFailureNeverPublishesLogicalFallback"
+      "sharedDeadlineExpiringAfterAdmissionPreservesBothCliDestinationsAndCleansStores",
+      "realAirFileUsesValidatedSnapshotChainAndPublishesEvidenceAtomically",
+      "malformedIncompleteAndOutputFailuresNeverReplaceDestination",
+      "codecBudgetFailureAndRemovedLegacyOptionsAreExplicit",
+      "invocationContradictionsAreRejectedBeforeEitherCliPublishes"
     ],
     "io.github.gustavo2358.analysis.launcher.RegionalCliTest": [
       "missingInputAndBadQueryNeverReplaceOutput",
@@ -511,7 +1076,7 @@
     "io.github.gustavo2358.analysis.launcher.InvocationIndependenceTest": [
       "memoryTenShapesPreserveTargetAndRemainder",
       "normalResultKillsOldValueButUnknownDestinationOnlyWidens",
-      "jsonCliTenShapesRetainOperandsAndEqualMemory"
+      "jsonRoundTripRetainsTenShapesAndSnapshotCliPreservesEverySection"
     ],
     "io.github.gustavo2358.analysis.launcher.PhysicalChoiceTargetTest": [
       "physicalAlternativesSurviveMemoryAndCliWithoutResurrectingMustValues"
@@ -520,16 +1085,22 @@
       "equivalentFormsAndMixedAlternativesRetainLogicalSupportInMemoryAndCli"
     ],
     "io.github.gustavo2358.analysis.launcher.QualifiedSourceCliTest": [
-      "correlatedSourcePublishesAndInvalidInputsPreserveDestination"
+      "removedQualifiedSourceOptionIsRejectedWithoutReplacingDestination"
     ],
     "io.github.gustavo2358.analysis.launcher.DependencyInputCliTest": [
-      "normalEntryPointUsesSourceAndExecutableEvidenceWithoutFlags",
-      "corruptBundleCannotReplaceDestination"
+      "removedResidentBundleRouteFailsClosedAndPreservesDestination"
     ],
     "io.github.gustavo2358.analysis.launcher.PipelineCliTest": [
+      "exhaustedCommonBudgetStopsBeforeSourceParsingAndPreservesProducts",
+      "exhaustedCommonBudgetStopsSourceValidationAndPreservesProducts",
+      "sharedLabelEntriesReachEverySiteThroughTheRealSnapshotPipeline",
+      "largerUnitKeepsOrphanReturnHaltAndDependencyThroughTheRealPipeline",
       "oneReadAndCompleteProductsEqualIndependentSeparateRoutes",
+      "defaultRoutePublishesCfgAndDependenciesFromTheValidatedSnapshot",
       "invalidIncompleteDigestAndAliasesRejectBeforeAnyDestination",
       "fullCorrelatedSourceAndDigestMismatchPreserveProducts",
+      "explicitSourceEvidenceUsesOneCheckedSnapshotAndPreservesEverySection",
+      "experimentalPhysicalPipelineUsesNativeValuesWithoutDroppingChoiceSupports",
       "writerFailuresKeepCompletedProductsAndCleanStaging",
       "explicitCodecLimitNeverStartsExportOrPublishesFallback"
     ]
@@ -601,6 +1172,7 @@
       "diamondsMissingPathsStrongUpdatesAndOtherCells",
       "sameCellAliasesAndIndependentBasesAreSemanticAdmission",
       "directReadIsCopyWhileOtherEffectsAndIndirectStorageRemainUnsupported",
+      "scalarDemandReusesAlreadyIndexedDeclarationsWithoutReopeningTheStore",
       "entrySeedsContextsUnreachableAndUnicodeKeepTheirIdentity"
     ],
     "io.github.gustavo2358.analysis.values.MoveCopyTest": [
@@ -740,10 +1312,12 @@
       "connectedCopiesAndScaledJoinsPreserveRecall"
     ],
     "io.github.gustavo2358.analysis.values.FactorizedAlternativesTest": [
+      "productiveRelationLoopsObserveOwnerFailureWithoutDroppingAlternatives",
       "independentWeakChoicesShareSuffixesWithoutWorlds",
       "localImagesRestrictionsAndUnionMatchIndependentFiniteRelations",
       "thousandFiniteRelationsPreserveAlgebraAndCanonicality",
-      "cachedComponentSizesMatchFullDagTraversalWithoutLosingSharedSuffixes"
+      "cachedComponentSizesMatchFullDagTraversalWithoutLosingSharedSuffixes",
+      "retainingStableRootsReclaimsOnlySupersededCanonicalHistory"
     ],
     "io.github.gustavo2358.analysis.values.EpR2TransferTest": [
       "mayBeforeAndAfterExactWriteCannotEraseItsSupportedValue",
@@ -804,7 +1378,11 @@
     ],
     "io.github.gustavo2358.analysis.values.LogicalExpressionsTest": [
       "partialRootSnapshotAndDemand",
-      "branchAlternativesStayWholeThroughRepeatedRootReads"
+      "branchAlternativesStayWholeThroughRepeatedRootReads",
+      "admittedConcatPreservesWholeBranchStoresAndCandidateSupports",
+      "unknownIndependentBooleanInitialStateDoesNotDiscardCorrelatedTextDemand",
+      "openBranchRetainsKnownCorrelatedImageWithoutInventingPairs",
+      "finiteFanInStaysDiagonalThroughExpressionAndCopyWithoutCartesianProjection"
     ],
     "io.github.gustavo2358.analysis.values.LogicalTextTest": [
       "unknownSiblingDoesNotEraseKnownProjection",
@@ -830,6 +1408,16 @@
       "anOpenPredecessorSurvivesAJoinWithAClosedPredecessor",
       "predicateImagesRespectBooleanCompositionUnicodeAndRepresentableExtents",
       "exactScalarConstantsCanPruneButUnknownNumericReadsCannot"
+    ],
+    "io.github.gustavo2358.analysis.values.TextPredicateSourceEqualityTest": [
+      "sourceEqualityReadsEachCandidateOnceInsteadOfComparingEveryPair",
+      "indexedTruthImageMatchesIndependentUnicodePaddingOracle",
+      "spacePaddedEquivalenceClassesPreserveDuplicatesEmptyUnicodeAndNonSpaceDifferences"
+    ],
+    "io.github.gustavo2358.analysis.values.StateFingerprintTest": [
+      "scalarKeysAreCongruentAcrossMapShapesAndIncludeSupportsAndUnknownness",
+      "regionalFingerprintsAgreeWithRealEngineEquivalenceInRepeatedExecution",
+      "segmentKeysIgnoreAvlShapeAndAgreeWithValueEquality"
     ]
   },
   "cfg-adapters": {
@@ -860,6 +1448,10 @@
       "onlyProjectedDomainSelectsVersionAndWriterHasNoStickyState"
     ],
     "io.github.gustavo2358.analysis.cfg.adapters.WriterDomainTest": [
+      "schemaSelectionDoesNotAllocateTheEntryTimesBodyProductBeforeFirstByte",
+      "productionEncoderStreamsTheExactCompatibilityWire",
+      "atomicProductionWriterMetersTheLogicalWire",
+      "interruptedStreamingWritePreservesDestinationAndCleansTemporary",
       "partialAnalysisRequiresExplicitPartialResultWire",
       "memoryAndFileHaveEquivalentControlCoverageWire",
       "writerCoversEveryCurrentKindWithExactContextualTransitions",
@@ -907,6 +1499,7 @@
     ],
     "io.github.gustavo2358.analysis.cfg.domain.EvalCfg025Test": [
       "entryReturnAndNormalExitMatchIndependentOracle",
+      "detachedProgramPortUsesTheResidentProjectionSemantics",
       "missingInitialLabelIsInvalidIrAndIsNotRepaired",
       "sequenceCannotBeConstructedWithoutTerminator",
       "returnNeverFallsThroughToPhysicalNextSequence",
@@ -1004,7 +1597,14 @@
       "missingCapabilityIsNotResolvedAsANop"
     ],
     "io.github.gustavo2358.analysis.cfg.domain.LocalControlProjectionTest": [
+      "ordinaryControlDoesNotAllocateASecondProgramSizedLabelIndex",
       "sharedBodyIsProjectedOnceWithoutUnconditionalReturns"
+    ],
+    "io.github.gustavo2358.analysis.cfg.domain.CfgGraphRetentionTest": [
+      "borrowedNodesKeepExactRoleValidationAndExpireWithoutCopying",
+      "canonicalProjectionRejectsOrdinalNamespaceEntryAndEndpointContradictions",
+      "generalConstructorsKeepArbitraryValidOrdinalsAndEntryOrder",
+      "canonicalProjectionValidatesEndpointsWithoutProgramSizedIdentityMaps"
     ],
     "io.github.gustavo2358.analysis.cfg.application.CheckedPreflightTest": [
       "preservesSuccessfulInvalidUnsupportedAndLimitedRuns",
@@ -1021,6 +1621,7 @@
       "malformedUtf8IsTypedAirFailureWithoutOutput",
       "wrongBindingVersionPreservesCodecPath",
       "unsupportedCodecFormNeverBecomesCfgUnsupportedInput",
+      "bothNormativeHaltKindsReachRealCliWithoutReturnOrFallthrough",
       "unavailableInventoryReachesRealKernelAndIsRejected",
       "allNonBuiltStatusesReturnFourWithoutOutput",
       "outputFilesystemFailureIsSixAndCleansTemp",

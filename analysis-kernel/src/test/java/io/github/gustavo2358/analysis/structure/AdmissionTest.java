@@ -13,6 +13,29 @@ class AdmissionTest {
         var p=linear(3,2,2,2);
         assertEquals(AnalysisSession.Status.ACCEPTED,AnalysisSession.open(build(p),p,ProjectionPolicy.KNOWN_SUBSET,p.units().getFirst().entries()).status());
     }
+    @Test void detachedStructuralStoreIsAcceptedWithoutPublicationAggregate() {
+        var p=linear(3,2,2,2);
+        var resident=ProgramStore.resident(p);
+        ProgramStore.Structural detached=new ProgramStore.Structural() {
+            @Override public PublicationId publicationId(){return resident.publicationId();}
+            @Override public Evidence.InventoryStatus inventory(){return resident.inventory();}
+            @Override public SemanticVersion airVersion(){return resident.airVersion();}
+            @Override public Capabilities.Manifest capabilities(){return resident.capabilities();}
+            @Override public Set<Capabilities.Capability> namePolicyExtensions(){return resident.namePolicyExtensions();}
+            @Override public List<Origins.Artifact> artifacts(){return resident.artifacts();}
+            @Override public List<ProgramStore.UnitView> units(){return resident.units();}
+            @Override public List<Memory.Storage> storage(){return resident.storage();}
+            @Override public List<Interactions.Resource> resources(){return resident.resources();}
+            @Override public List<Origins.Origin> origins(){return resident.origins();}
+            @Override public ProgramStore.CoverageView coverage(){return resident.coverage();}
+            @Override public List<Evidence.Uncertainty> uncertainties(){return resident.uncertainties();}
+            @Override public List<Proofs.Premise> premises(){return resident.premises();}
+        };
+        var selected=p.units().getFirst().entries().stream().map(Entries.Entry::id).toList();
+        var admission=AnalysisSession.open(build(p),detached,ProjectionPolicy.KNOWN_SUBSET,selected);
+        assertEquals(AnalysisSession.Status.ACCEPTED,admission.status());
+        assertSame(detached,admission.session().orElseThrow().index().store());
+    }
     @Test void missingBranchEdgeIsInvalid() {
         var p0=linear(1,0,0,1); var u=p0.units().getFirst();
         var p=publication(p0.id(),List.of(unit(u.id(),u.entries(),List.of(branch(u.id(),"seq-0","tail","tail"),returning(u.id(),"tail",List.of())),List.of())),List.of());
@@ -24,13 +47,13 @@ class AdmissionTest {
         var p0=linear(1,0,0,1); var u=p0.units().getFirst();
         var p=publication(p0.id(),List.of(unit(u.id(),u.entries(),List.of(returning(u.id(),"seq-0",List.of()),returning(u.id(),"orphan",List.of())),List.of())),List.of());
         var b=build(p); var g=b.graph().orElseThrow();
-        var orphan=g.nodes().stream().filter(n->n instanceof CfgNode.SequenceNode s && s.source().label().localId().equals("orphan")).findFirst().orElseThrow();
+        var orphan=g.nodes().stream().filter(n->n instanceof CfgNode.SequenceNode s && s.label().localId().equals("orphan")).findFirst().orElseThrow();
         var cut=new CfgGraph(p,g.nodes().stream().filter(n->n!=orphan).toList(),g.transitions().stream().filter(t->!t.from().equals(orphan.id())).toList());
         assertEquals(AnalysisSession.Status.INVALID_INPUT,AnalysisSession.open(withGraph(b,cut),p,ProjectionPolicy.KNOWN_SUBSET,u.entries()).status());
     }
-    @Test void equalLookingReplacementSequenceIsInvalid() {
+    @Test void replacedCompactControlIsInvalid() {
         var p=linear(1,2,1,1); var b=build(p); var g=b.graph().orElseThrow();
-        var nodes=g.nodes().stream().map(n->{ if(n instanceof CfgNode.SequenceNode s) { var q=s.source(); return (CfgNode)new CfgNode.SequenceNode(s.id(),new Sequence(q.label(),q.instructions(),q.terminator(),q.origin())); } return n; }).toList();
+        var nodes=g.nodes().stream().map(n->{ if(n instanceof CfgNode.SequenceNode s) return (CfgNode)new CfgNode.SequenceNode(s.id(),s.label(),s.operations(),new CfgControl.Return(new OperationId(s.label().unit(),"replacement"))); return n; }).toList();
         assertEquals(AnalysisSession.Status.INVALID_INPUT,AnalysisSession.open(withGraph(b,new CfgGraph(p,nodes,g.transitions())),p,ProjectionPolicy.KNOWN_SUBSET,p.units().getFirst().entries()).status());
     }
     @Test void equalLookingForeignSnapshotIsInvalid() {
@@ -69,7 +92,7 @@ class AdmissionTest {
             if(mode==0) nodes.removeIf(CfgNode.EntryNode.class::isInstance);
             if(mode==1) nodes.removeIf(CfgNode.NormalExit.class::isInstance);
             if(mode==2) nodes.removeIf(CfgNode.HaltExit.class::isInstance);
-            if(mode==3) nodes.replaceAll(n->n instanceof CfgNode.HaltExit h ? new CfgNode.HaltExit(h.id(),new Operations.Halt(halt.header(),halt.haltKind())) : n);
+            if(mode==3) nodes.replaceAll(n->n instanceof CfgNode.HaltExit h ? new CfgNode.HaltExit(h.id(),h.operation(),Operations.HaltKind.ABNORMAL) : n);
             corrupt(g,"nodes",List.copyOf(nodes));
             assertEquals(AnalysisSession.Status.INVALID_INPUT,AnalysisSession.open(b,p,ProjectionPolicy.KNOWN_SUBSET,u.entries()).status());
         }
@@ -77,7 +100,7 @@ class AdmissionTest {
     @Test void foreignEntryNodeAndDuplicateSequenceRoleAreInvalid() throws Exception {
         for(boolean foreign:List.of(true,false)) {
             var p=linear(1,0,0,1); var b=build(p); var g=b.graph().orElseThrow(); var nodes=new ArrayList<>(g.nodes());
-            if(foreign) nodes.replaceAll(n->n instanceof CfgNode.EntryNode e ? new CfgNode.EntryNode(e.id(),entry(e.source().id().unit(),e.source().id().localId(),"seq-0")) : n);
+            if(foreign) nodes.replaceAll(n->n instanceof CfgNode.EntryNode e ? new CfgNode.EntryNode(e.id(),e.entry(),Optional.of(new LabelId(e.entry().unit(),"missing"))) : n);
             else { var q=p.units().getFirst().sequences().getFirst(); nodes.add(new CfgNode.SequenceNode(new CfgNodeId(p.id(),900),q)); }
             corrupt(g,"nodes",List.copyOf(nodes));
             assertEquals(AnalysisSession.Status.INVALID_INPUT,AnalysisSession.open(b,p,ProjectionPolicy.KNOWN_SUBSET,p.units().getFirst().entries()).status());

@@ -5,21 +5,47 @@ import io.github.gustavo2358.air.model.Ids.*;
 import io.github.gustavo2358.analysis.dependencies.*;
 import java.io.*;
 import java.util.*;
+import io.github.gustavo2358.analysis.structure.ProgramStore;
 import static io.github.gustavo2358.analysis.dependencies.DependencySiteFact.*;
 
 /** Explicit, deterministic dependency-result mapping. No bean, enum-name or AIR parsing shortcuts. */
 public final class DependencyJson {
     public void write(DependencyResult result,OutputStream stream) throws IOException {
+        write(result,stream,null);
+    }
+    /** Native input uses the complete existing fact projection, never the direct-profile lossy projection. */
+    public void writeSnapshot(DependencyResult result,ProgramStore.Structural source,OutputStream stream) throws IOException {
+        Objects.requireNonNull(source);
+        if(!source.publicationId().equals(result.publication()))throw new IllegalArgumentException("foreign snapshot result source");
+        write(result,stream,source);
+    }
+    private void write(DependencyResult result,OutputStream stream,ProgramStore.Structural programSource) throws IOException {
+        boolean snapshot=programSource!=null;
+        // Coverage is required by the existing native v3 contract. One header scan, not
+        // a per-site program rescan; no Unit/Sequence/operation aggregate is retained.
+        var coverage=new HashMap<OperationId,Evidence.CoverageStatus>();
+        if(snapshot)for(var unit:programSource.units())for(var sequence:unit.sequences()) {
+            var terminator=sequence.terminator();
+            if(terminator instanceof Operations.Invoke)coverage.put(terminator.header().id(),terminator.header().coverage());
+        }
         var out=new JsonOutput(stream);
         var document=object("schema","analysis-dependency-result","version",result.sourceQualifiedDependencies().map(s->Set.of("1.1.0","1.2.0","1.3.0","1.4.0","1.5.0","1.6.0").contains(s.evidence().version())?"2.7.0":"2.6.0").orElse("2.5.0"),"airVersion",version(result.airVersion()),
             "publication",id(result.publication()),"interpretationProfile","per-site","valuesProfile","scalar-text-effects@1",
             "modelScope",result.structuralScope()?"STRUCTURAL_AIR_OCCURRENCES":"KNOWN_GRAPH_ENTRY","publicationInventory",inventory(result.publicationInventory()),
-            "sites",result.sites().stream().sorted(Comparator.comparing(DependencySiteFact::entry,io.github.gustavo2358.analysis.plan.AnalysisKey.ENTRY_ORDER).thenComparing(f->f.operation().localId())).map(s->site(s,true)),
+            "sites",result.sites().stream().sorted(Comparator.comparing(DependencySiteFact::entry,io.github.gustavo2358.analysis.plan.AnalysisKey.ENTRY_ORDER).thenComparing(f->f.operation().localId())).map(s->{
+                var value=site(s,true);if(snapshot)value.put("coverage",Objects.requireNonNull(coverage.get(s.operation()),"missing original site coverage").name());return value;
+            }),
             "edges",result.edges().stream().sorted(Comparator.comparing(DependencyResult.Edge::entry,io.github.gustavo2358.analysis.plan.AnalysisKey.ENTRY_ORDER).thenComparing(e->e.site().localId()).thenComparing(e->e.candidate().referenceName()).thenComparing(e->e.candidate().rawValue())).map(e->object("caller",id(e.caller()),"entry",id(e.entry()),"site",id(e.site()),"candidate",candidate(e.candidate()),"openSite",e.openSite())),
-            "metrics",result.metrics(),"origins",result.origins().stream().sorted(Comparator.comparing(o->o.id().localId())).map(DependencyJson::origin),
-            "artifacts",result.artifacts().stream().sorted(Comparator.comparing(a->a.id().localId())).map(a->object("id",id(a.id()),"logicalName",a.logicalName(),"contentDigest",a.contentDigest().orElse(null))),
+            "metrics",result.metrics(),"origins",orderedMetadata(result.origins(),Comparator.comparing(o->o.id().localId())).map(DependencyJson::origin),
+            "artifacts",orderedMetadata(result.artifacts(),Comparator.comparing(a->a.id().localId())).map(a->object("id",id(a.id()),"logicalName",a.logicalName(),"contentDigest",a.contentDigest().orElse(null))),
             "sourceUncertaintyRefs",ids(result.sourceUncertaintyRefs()));
         document.put("analysisStatus",result.partial()?"PARTIAL":"COMPLETE");document.put("analysisReasons",result.analysisReasons().stream().distinct().sorted());
+        if(snapshot) {
+            document.put("version","3.0.0");document.put("modelScope","VALIDATED_SNAPSHOT_DEPENDENCY");
+            document.put("analysisStatus",result.partial()||result.publicationInventory()!=Evidence.InventoryStatus.COMPLETE?"PARTIAL":"COMPLETE");
+            document.put("generalAnalysisMetrics",result.metrics());
+            document.put("metrics",object("sites",(long)result.sites().size(),"candidates",result.sites().stream().mapToLong(s->s.candidates().size()).sum()));
+        }
         document.put("analysisBoundary","COBOL_SOURCE_ONLY");document.put("fileDependencies",FileDependencyJson.value(result.fileDependencies()));
         document.put("sourceDependencies",SourceDependencyJson.value(result.sourceDependencies()));
         result.sourceQualifiedDependencies().ifPresent(source->document.put("sourceQualifiedDependencies",object(
@@ -52,7 +78,7 @@ public final class DependencyJson {
             "uncertainties",s.uncertainties().stream().map(u->object("id",u.id(),"kind",u.kind(),"provenance",QualifiedSourceJson.value(u.provenance()))))));
         return out;
     }
-    private static Object site(DependencySiteFact f,boolean extended) {
+    private static JsonOutput.Fields site(DependencySiteFact f,boolean extended) {
         var value=object("caller",id(f.caller()),"entry",id(f.entry()),"sequence",id(f.sequence()),"operation",id(f.operation()),"offset",f.offset(),
             "technology",f.technology(),"command",f.command(),"namespace",f.namespace(),"nameProfile",f.nameProfile(),
             "siteOrigin",id(f.siteOrigin()),"targetOrigin",id(f.targetOrigin()),"targetKind",switch(f.targetKind()){case LITERAL->"LITERAL";case COMPUTED->"COMPUTED";},
@@ -68,7 +94,10 @@ public final class DependencyJson {
     }
     private static Object candidate(Candidate c){return object("referenceName",c.referenceName(),"rawValue",c.rawValue(),"supports",supports(c.supports()));}
     private static Object supports(List<Support> supports){return supports.stream().sorted(Comparator.comparing(Support::producer,WireIds.ORDER).thenComparing(Support::origin,WireIds.ORDER)).map(s->object("kind",switch(s.kind()){case VALUE_PRODUCER->"VALUE_PRODUCER";case CALL_LITERAL->"CALL_LITERAL";case CICS_LITERAL->"CICS_LITERAL";},"producer",id(s.producer()),"origin",id(s.origin()),"premises",ids(s.premises())));}
-    private static Object ids(List<? extends Id> ids){return ids.stream().sorted(WireIds.ORDER).map(DependencyJson::id);}
+    private static Object ids(List<? extends Id> ids){return orderedMetadata(ids,WireIds.ORDER).map(DependencyJson::id);}
+    private static <T> java.util.stream.Stream<T> orderedMetadata(List<T> values,Comparator<? super T> order){
+        return DependencyResult.isBorrowedMetadata(values)?values.stream():values.stream().sorted(order);
+    }
     private static Object id(Id id){return id instanceof ArtifactId a?object("domain","artifact","localId",a.localId(),"publication",a.publication().localId()):WireIds.id(id);}
     private static String version(SemanticVersion v){return v.major()+"."+v.minor()+"."+v.patch();}
     private static String inventory(Evidence.InventoryStatus s){return switch(s){case COMPLETE->"COMPLETE";case PARTIAL->"PARTIAL";case UNAVAILABLE->"UNAVAILABLE";};}

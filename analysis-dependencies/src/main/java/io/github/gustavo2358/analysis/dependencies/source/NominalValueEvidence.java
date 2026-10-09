@@ -5,6 +5,7 @@ import static io.github.gustavo2358.analysis.dependencies.source.QualifiedSource
 /** Source-only value evidence; no AIR object, operation or executable memory claim. */
 public record NominalValueEvidence(NominalValues facts,List<Declaration> declarations,List<Seed> seeds,
         List<Branch> branches,List<Uncertainty> uncertainties) {
+    public NominalValueEvidence(NominalValues facts,List<Declaration> declarations,List<Seed> seeds,List<Branch> branches,List<Uncertainty> uncertainties,Runnable progress){this(facts,SourceAdmission.input(declarations,progress),seeds,branches,uncertainties);}
     public record Declaration(String node,Provenance provenance) {
         public Declaration {text(node);Objects.requireNonNull(provenance);}
     }
@@ -16,22 +17,31 @@ public record NominalValueEvidence(NominalValues facts,List<Declaration> declara
         public Uncertainty {text(id);require(Set.of("MISSING_COPY","MODEL_STORAGE","OPAQUE_INCLUDE","UNLOCATED_INPUT").contains(kind),"source uncertainty kind");Objects.requireNonNull(provenance);}
     }
     public NominalValueEvidence {
-        Objects.requireNonNull(facts);declarations=List.copyOf(declarations);seeds=List.copyOf(seeds);branches=List.copyOf(branches);uncertainties=List.copyOf(uncertainties);
-        var nodes=new HashSet<String>();for(var s:facts.symbols())nodes.add(s.node());
+        var progress=SourceAdmission.progress(declarations);progress.run();
+        Objects.requireNonNull(facts);declarations=SourceAdmission.input(List.copyOf(declarations),progress);
+        seeds=SourceAdmission.input(List.copyOf(SourceAdmission.input(seeds,progress)),progress);
+        branches=SourceAdmission.input(List.copyOf(SourceAdmission.input(branches,progress)),progress);
+        uncertainties=SourceAdmission.input(List.copyOf(SourceAdmission.input(uncertainties,progress)),progress);
+        var nodes=new HashSet<String>();for(var s:facts.symbols()){progress.run();nodes.add(s.node());}
         var declared=new HashSet<String>();for(var d:declarations)require(nodes.contains(d.node())&&declared.add(d.node()),"nominal declaration identity");require(declared.equals(nodes),"complete nominal declaration provenance");
         var seedNodes=new HashSet<String>();for(var s:seeds)require(nodes.contains(s.node())&&seedNodes.add(s.node()),"nominal initial value identity");
         var roles=new HashSet<String>();for(var branch:branches)require(roles.add(branch.derivation()),"duplicate nominal branch role");
         var missing=new HashSet<String>();for(var u:uncertainties)require(missing.add(u.id()),"duplicate nominal uncertainty");
+        declarations=SourceAdmission.owned(declarations);seeds=SourceAdmission.owned(seeds);
+        branches=SourceAdmission.owned(branches);uncertainties=SourceAdmission.owned(uncertainties);
     }
     public void validate(List<Statement> statements,List<Occurrence> occurrences,List<Node> nodes,List<Derivation> derivations) {
-        var ss=new HashSet<String>();statements.forEach(s->ss.add(s.id().handle()));
-        facts.validate(declarations.stream().map(Declaration::node).collect(java.util.stream.Collectors.toSet()),ss);
+        validate(statements,occurrences,nodes,derivations,()->{});
+    }
+    void validate(List<Statement> statements,List<Occurrence> occurrences,List<Node> nodes,List<Derivation> derivations,Runnable progress) {
+        progress.run();var ss=new HashSet<String>();statements.forEach(s->{progress.run();ss.add(s.id().handle());});
+        facts.validate(declarations.stream().peek(d->progress.run()).map(Declaration::node).collect(java.util.stream.Collectors.toSet()),ss,progress);
         var ds=new HashMap<String,Derivation>();var ns=new HashMap<String,Node>();
-        if(!branches.isEmpty()){derivations.forEach(d->ds.put(d.id(),d));nodes.forEach(n->ns.put(n.id(),n));}
-        var predicates=new HashSet<String>();facts.conditions().forEach(c->predicates.add(c.statement()));
-        for(var b:branches){var d=ds.get(b.derivation());require(d!=null&&d.source().size()==1&&d.selection().isEmpty()&&d.callerPremise().isEmpty(),"nominal branch derivation");require(predicates.contains(ns.get(d.source().get(0)).location()),"nominal branch predicate owner");}
-        var queries=new HashMap<String,Occurrence>();occurrences.forEach(o->queries.put(o.id().handle(),o));
-        for(var q:facts.queries())require(queries.containsKey(q.statement())&&queries.get(q.statement()).targetKind().equals("COMPUTED"),"nominal query computed occurrence");
+        if(!branches.isEmpty()){derivations.forEach(d->{progress.run();ds.put(d.id(),d);});nodes.forEach(n->{progress.run();ns.put(n.id(),n);});}
+        var predicates=new HashSet<String>();facts.conditions().forEach(c->{progress.run();predicates.add(c.statement());});
+        for(var b:branches){progress.run();var d=ds.get(b.derivation());require(d!=null&&d.source().size()==1&&d.selection().isEmpty()&&d.callerPremise().isEmpty(),"nominal branch derivation");require(predicates.contains(ns.get(d.source().get(0)).location()),"nominal branch predicate owner");}
+        var queries=new HashMap<String,Occurrence>();occurrences.forEach(o->{progress.run();queries.put(o.id().handle(),o);});
+        for(var q:facts.queries()){progress.run();require(queries.containsKey(q.statement())&&queries.get(q.statement()).targetKind().equals("COMPUTED"),"nominal query computed occurrence");}
     }
     private static void text(String x){require(x!=null&&!x.isBlank(),"source nominal identity");}
     private static void require(boolean ok,String message){if(!ok)throw new IllegalArgumentException(message);}

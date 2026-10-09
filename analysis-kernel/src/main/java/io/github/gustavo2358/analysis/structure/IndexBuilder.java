@@ -10,10 +10,10 @@ import java.util.*;
 final class IndexBuilder {
     Map<CfgNodeId,LocalControlRules.Rule> localRules;
     final Object identity = new Object();
-    final Publication snapshot;
+    final ProgramStore.Structural store;
     final IndexMetrics.Counter count = new IndexMetrics.Counter();
-    final Map<UnitId, Unit> units = new HashMap<>();
-    final Map<LabelId, Sequence> sequences = new HashMap<>();
+    final Map<UnitId, ProgramStore.UnitView> units = new HashMap<>();
+    final Map<LabelId, ProgramStore.SequenceView> sequences = new HashMap<>();
     final Map<EntryId, Entries.Entry> entries = new HashMap<>();
     final Map<EntryId, Integer> entryOrdinals = new HashMap<>();
     final Map<CfgNodeId, ProgramIndex.Node> nodeIds = new HashMap<>();
@@ -24,15 +24,18 @@ final class IndexBuilder {
     private record OutsideKey(OperationId operation,Control.InvocationAlternative outcome) { }
     private final Map<OutsideKey,ProgramIndex.Node> outcomeExits=new HashMap<>();
     private long expectedOutside;
-    final Map<OperationId, ProgramIndex.Site> operations = new HashMap<>();
+    Map<OperationId, ProgramIndex.Site> operations;
+    private ProgramStore.OperationDirectory operationDirectory;
     final Map<Class<? extends Operation>, List<ProgramIndex.Site>> buckets = new HashMap<>();
-    final Map<ObjectId, Memory.ObjectDeclaration> objects = new HashMap<>();
-    final Map<StorageId, Memory.Storage> storage = new HashMap<>();
-    final Map<ObjectId, Memory.Cell> directCells = new HashMap<>();
+    final ProgramIndex.Declarations objects = new ProgramIndex.Declarations();
+    final ProgramIndex.Storages storage = new ProgramIndex.Storages();
+    Map<ObjectId, Memory.Cell> directCells = new HashMap<>();
     final Map<OperandId, Place> places = new HashMap<>();
-    final Map<OperandId, Memory.ObjectDeclaration> objectReferences = new HashMap<>();
+    final Map<OperandId, ObjectId> objectReferences = new HashMap<>();
     final LongIntDirectory forwardHeads = new LongIntDirectory(), backwardHeads = new LongIntDirectory();
     ProgramIndex.Node[] nodes;
+    boolean factored;
+    final Map<UnitId,ProgramIndex.Node> returnRepresentatives=new HashMap<>();
     CfgTransition[] edges;
     int[] from, to, edgeEntry, forwardNext, backwardNext;
     private final CfgBuildResult result;
@@ -41,8 +44,8 @@ final class IndexBuilder {
     private final Set<OperandId> operandIds = new HashSet<>();
     private long expectedEdges, expectedHalts, expectedActiveEntries;
 
-    IndexBuilder(CfgBuildResult result, Publication snapshot, ProjectionPolicy policy) {
-        this.result = result; this.snapshot = snapshot; this.policy = policy;
+    IndexBuilder(CfgBuildResult result, ProgramStore.Structural store, ProjectionPolicy policy) {
+        this.result = result; this.store = store; this.policy = policy;
         unprovedPreconditions=result.preflight().unprovedOperationPreconditions().orElse(Set.of());
     }
     static final class Rejection extends RuntimeException {
@@ -61,51 +64,64 @@ final class IndexBuilder {
     }
 
     ProgramIndex build() {
-        valid(result.publicationId().equals(snapshot.id()) && result.airVersion().equals(snapshot.airVersion()), "result/snapshot metadata mismatch");
+        valid(result.publicationId().equals(store.publicationId())
+                && result.airVersion().equals(store.airVersion()), "result/program metadata mismatch");
         valid(result.options().projectionPolicy() == policy, "projection policy mismatch");
         valid(result.status() != CfgBuildResult.Status.INVALID_IR, "invalid AIR build");
         supported(result.status() == CfgBuildResult.Status.CFG_BUILT, "unsupported CFG build profile");
         CfgGraph graph = result.graph().orElseThrow();
-        valid(graph.publication() == snapshot, "foreign Publication instance");
-        supported(snapshot.airVersion().equals(SemanticVersion.AIR_2_0_0), "unsupported AIR version");
-        var namePolicies = NamePolicies.extensions(snapshot);
-        for (var capability : snapshot.capabilities().required()) {
+        valid(graph.source().publicationId().equals(store.publicationId())
+                && graph.source().airVersion().equals(store.airVersion()), "foreign CFG source");
+        supported(store.airVersion().equals(SemanticVersion.AIR_2_0_0), "unsupported AIR version");
+        var namePolicies = store.namePolicyExtensions();
+        for (var capability : store.capabilities().required()) {
             count.visit("requiredCapabilities");
             supported(capability.equals(Capabilities.LOCAL_CONTROL) || capability.equals(Capabilities.LOCAL_REENTRY_GUARD) || capability.equals(Capabilities.LOCAL_RESUME_ROUTES) || capability.equals(Capabilities.LOCAL_BOUNDARY_ROUTES) || capability.equals(Capabilities.LOCAL_UNWIND_ALL) || capability.equals(Capabilities.RESOURCE_BINDINGS) || capability.equals(Capabilities.TARGET_POSSIBILITIES) || capability.equals(Capabilities.MEMORY_REGIONS) || capability.equals(Capabilities.IBM1047) || capability.equals(Capabilities.ENTRY_POSSIBILITIES_V2) || capability.equals(Capabilities.ENTRY_POSSIBILITIES) || namePolicies.contains(capability), "unsupported control capability");
         }
-        supported(policy.acceptsInventory(snapshot.coverage().inventory()), "unsupported publication inventory policy");
+        supported(policy.acceptsInventory(store.coverage().inventory()), "unsupported publication inventory policy");
         declarations();
+        // No native directory construction before metadata admission. The table
+        // transfers directly; it never captures this construction lifetime.
+        operations=new OperationTable<>(store);
+        operationDirectory=store.operationDirectory().orElse(null);
         payload();
+        store.operationDirectory().ifPresent(directory->valid(operations.size()==directory.size(),"changed Operation inventory"));
         nodes(graph);
         edges(graph);
         localRules=graph.localRules();
         return new ProgramIndex(this);
     }
 
+
     private void declarations() {
-        for (Unit unit : snapshot.units()) {
+        objects.connect(store.declarationInventory());
+        if(objects.nativeBacked())directCells=new ProgramIndex.CellAssociations(objects,storage);
+        for (var unit : store.units()) {
             count.visit("units.declarations");
-            valid(unit.id().publication().equals(snapshot.id()), "foreign Unit owner");
+            valid(unit.id().publication().equals(store.publicationId()), "foreign Unit owner");
             unique(units, unit.id(), unit, "duplicate Unit");
             supported((unit.body() == Unit.BodyAvailability.AVAILABLE || policy == ProjectionPolicy.PARTIAL_ANALYSIS) && policy.acceptsInventory(unit.coverage().inventory()), "unsupported Unit body/inventory");
-            for (Memory.ObjectDeclaration object : unit.objects()) {
+            var declarations=unit.objects();int objectOrdinal=0;
+            for (Memory.ObjectDeclaration object : declarations) {
                 count.visit("objects");
                 valid(object.id().unit().equals(unit.id()), "foreign Object owner");
-                unique(objects, object.id(), object, "duplicate Object");
+                valid(objects.append(object.id(),declarations,objectOrdinal++),"duplicate Object");
                 count.objects = Math.incrementExact(count.objects);
             }
         }
-        for (Memory.Storage item : snapshot.storage()) {
+        storage.connect(store.storageInventory());
+        for (Memory.Storage item : store.storage()) {
             count.visit("storage");
-            valid(item.header().id().publication().equals(snapshot.id()), "foreign Storage owner");
+            valid(item.header().id().publication().equals(store.publicationId()), "foreign Storage owner");
             if (item.header().owner().isPresent()) {
                 count.reference("storage.owner");
                 valid(units.containsKey(item.header().owner().orElseThrow()), "missing Storage Unit");
             }
-            unique(storage, item.header().id(), item, "duplicate Storage");
+            valid(storage.append(item.header().id(),item),"duplicate Storage");
             if (item instanceof Memory.Cell) count.locations = Math.incrementExact(count.locations);
         }
-        for (Unit unit : snapshot.units()) {
+        var objectIdentities=objects.keySet().iterator();
+        for (var unit : store.units()) {
             count.visit("units.references");
             if (unit.containingUnit().isPresent()) {
                 count.reference("unit.containing");
@@ -117,22 +133,30 @@ final class IndexBuilder {
             }
             for (Memory.ObjectDeclaration object : unit.objects()) {
                 count.visit("objects.bindings");
+                // Cold bodies reconstruct IDs. Borrow the established key only after
+                // checking the complete identity; position alone never substitutes an ID.
+                valid(objectIdentities.hasNext(),"changed Object inventory");
+                var identity=objectIdentities.next();
+                valid(identity.equals(object.id()),"changed indexed Object identity");
                 if (object.storage() instanceof Memory.CellBinding binding) {
                     count.reference("bindings.cell");
                     Memory.Storage item = storage.get(binding.storage());
                     valid(item instanceof Memory.Cell, "CellBinding requires canonical Cell");
-                    directCells.put(object.id(), (Memory.Cell) item);
+                    if(directCells instanceof ProgramIndex.CellAssociations cells)cells.include();
+                    else directCells.put(identity, (Memory.Cell) item);
                 }
                 // Other binding forms remain original AIR, without alias/effect interpretation.
             }
         }
+        valid(!objectIdentities.hasNext(),"changed Object inventory");
     }
 
     private void payload() {
-        for (Unit unit : snapshot.units()) {
+        for (var declared : store.units()) {
+            var unit=units.get(declared.id());
             count.visit("units.payload");
             long arity = 0;
-            for (Sequence sequence : unit.sequences()) {
+            for (var sequence : unit.sequences()) {
                 count.visit("sequences");
                 valid(sequence.label().unit().equals(unit.id()), "foreign Sequence owner");
                 unique(sequences, sequence.label(), sequence, "duplicate Sequence label");
@@ -184,9 +208,10 @@ final class IndexBuilder {
         }
     }
 
-    private void operation(Sequence sequence, Unit owner, int offset, Operation operation) {
+    private void operation(ProgramStore.SequenceView sequence, ProgramStore.UnitView owner, int offset, Operation operation) {
         count.visit("operations");
         valid(operation.header().id().unit().equals(owner.id()), "foreign Operation owner");
+        if(operationDirectory!=null)valid(operationDirectory.identityAt(Math.toIntExact(count.operations),operation.header().id()),"changed indexed Operation identity");
         var site = new ProgramIndex.Site(sequence, owner, offset);
         unique(operations, operation.header().id(), site, "duplicate Operation");
         buckets.computeIfAbsent(operation.getClass(), ignored -> new ArrayList<>()).add(site);
@@ -204,17 +229,16 @@ final class IndexBuilder {
             valid(operandIds.add(operand.header().id()), "duplicate Operand occurrence");
             if(operand instanceof Place place)places.put(place.header().id(),place);
             if (operand instanceof Places.ObjectPlace place) {
-                Memory.ObjectDeclaration declaration = resolveObject(place.object());
+                ObjectId declaration = resolveObject(place.object());
                 objectReferences.put(place.header().id(), declaration);
             }
             pending.addAll(Operands.children(operand));
         }
     }
-    private Memory.ObjectDeclaration resolveObject(ObjectId id) {
+    private ObjectId resolveObject(ObjectId id) {
         count.reference("operands.object");
-        Memory.ObjectDeclaration declaration = objects.get(id);
-        valid(declaration != null, "missing Object reference");
-        return declaration;
+        valid(objects.containsKey(id), "missing Object reference");
+        return id;
     }
 
     private void nodes(CfgGraph graph) {
@@ -222,44 +246,50 @@ final class IndexBuilder {
         int ordinal = 0;
         for (CfgNode source : graph.nodes()) {
             count.visit("cfg.nodes");
-            valid(source.id().publicationId().equals(snapshot.id()), "foreign CFG node publication");
+            valid(source.id().publicationId().equals(store.publicationId()), "foreign CFG node publication");
             UnitId owner = switch (source) {
-                case CfgNode.SequenceNode n -> n.source().label().unit();
-                case CfgNode.EntryNode n -> n.source().id().unit();
+                case CfgNode.SequenceNode n -> n.label().unit();
+                case CfgNode.EntryNode n -> n.entry().unit();
                 case CfgNode.NormalExit n -> n.unitId();
-                case CfgNode.HaltExit n -> n.source().header().id().unit();
-                case CfgNode.OutcomeExit n -> n.source().header().id().unit();
+                case CfgNode.HaltExit n -> n.operation().unit();
+                case CfgNode.OutcomeExit n -> n.operation().unit();
             };
-            Unit unit = units.get(owner);
+            var unit = units.get(owner);
             valid(unit != null, "foreign CFG node Unit");
-            var node = new ProgramIndex.Node(identity, ordinal, source, unit);
+            var node = new ProgramIndex.Node(identity, ordinal, source, unit,
+                    source instanceof CfgNode.SequenceNode sequence ? sequences.get(sequence.label()) : null);
             nodes[ordinal] = node;
             ordinal = Math.incrementExact(ordinal);
             unique(nodeIds, source.id(), node, "duplicate CFG node ID");
             switch (source) {
                 case CfgNode.SequenceNode n -> {
-                    valid(sequences.get(n.source().label()) == n.source(), "foreign/replaced Sequence source");
-                    unique(sequenceNodes, n.source().label(), node, "duplicate SequenceNode");
+                    var sequence=sequences.get(n.label());
+                    valid(sequence != null && CfgControl.from(sequence.terminator()).equals(n.control())
+                            && sameOperations(n.operations(),sequence.instructions()),
+                            "foreign/replaced Sequence source");
+                    unique(sequenceNodes, n.label(), node, "duplicate SequenceNode");
                 }
                 case CfgNode.EntryNode n -> {
-                    valid(entries.get(n.source().id()) == n.source(), "foreign/replaced Entry source");
-                    unique(entryNodes, n.source().id(), node, "duplicate EntryNode");
+                    var entry=entries.get(n.entry());
+                    valid(entry != null && entry.initialLabel().equals(n.initialLabel()), "foreign/replaced Entry source");
+                    unique(entryNodes, n.entry(), node, "duplicate EntryNode");
                 }
                 case CfgNode.NormalExit n -> {
                     valid(entries.containsKey(n.entryId()) && n.entryId().unit().equals(n.unitId())
-                            && n.publicationId().equals(snapshot.id()), "foreign NormalExit");
+                            && n.publicationId().equals(store.publicationId()), "foreign NormalExit");
                     unique(normalExits, n.entryId(), node, "duplicate NormalExit");
                 }
                 case CfgNode.OutcomeExit n -> {
-                    ProgramIndex.Site site=operations.get(n.source().header().id());
-                    valid(site!=null&&site.isTerminator()&&site.operation()==n.source(),"foreign/replaced outside outcome occurrence");
-                    valid(OpenControl.outside(n.outcome())&&OpenControl.alternatives(n.source()).contains(n.outcome()),"unpublished outside outcome");
-                    unique(outcomeExits,new OutsideKey(n.source().header().id(),n.outcome()),node,"duplicate outside outcome");
+                    ProgramIndex.Site site=operations.get(n.operation());
+                    valid(site!=null&&site.isTerminator(),"foreign/replaced outside outcome occurrence");
+                    valid(OpenControl.outside(n.outcome())&&OpenControl.alternatives((Terminator)site.operation()).contains(n.outcome()),"unpublished outside outcome");
+                    unique(outcomeExits,new OutsideKey(n.operation(),n.outcome()),node,"duplicate outside outcome");
                 }
                 case CfgNode.HaltExit n -> {
-                    ProgramIndex.Site site = operations.get(n.source().header().id());
-                    valid(site != null && site.isTerminator() && site.operation() == n.source(), "foreign/replaced Halt occurrence");
-                    unique(haltExits, n.source().header().id(), node, "duplicate HaltExit");
+                    ProgramIndex.Site site = operations.get(n.operation());
+                    valid(site != null && site.isTerminator() && site.operation() instanceof Operations.Halt halt
+                            && halt.haltKind() == n.haltKind(), "foreign/replaced Halt occurrence");
+                    unique(haltExits, n.operation(), node, "duplicate HaltExit");
                 }
             }
             count.nodes = Math.incrementExact(count.nodes);
@@ -271,14 +301,27 @@ final class IndexBuilder {
         valid(haltExits.size() == expectedHalts, "missing required HaltExit");
     }
 
+    /** Preserve exact occurrence order without materializing another full-ID body list. */
+    private static boolean sameOperations(List<OperationId> identities,List<Instruction> instructions){
+        if(identities.size()!=instructions.size())return false;
+        for(int at=0;at<identities.size();at++)if(!identities.get(at).equals(instructions.get(at).header().id()))return false;
+        return true;
+    }
+
     private void edges(CfgGraph graph) {
-        int length = graph.transitions().size();
+        factored=graph.transitions() instanceof CfgTransitionTable;
+        var rows=factored?((CfgTransitionTable)graph.transitions()).stored():graph.transitions();
+        if(factored) {
+            var table=(CfgTransitionTable)graph.transitions();
+            for(int group=0;group<table.groups();group++)returnRepresentatives.put(table.unit(group),nodeIds.get(table.normalExit(group,0)));
+        }
+        int length = rows.size();
         edges = new CfgTransition[length];
         from = new int[length]; to = new int[length]; edgeEntry = new int[length];
         forwardNext = new int[length]; backwardNext = new int[length];
         LongIntDirectory seenRoles = new LongIntDirectory();
         int ordinal = 0;
-        for (CfgTransition edge : graph.transitions()) {
+        for (CfgTransition edge : rows) {
             count.visit("cfg.transitions");
             ProgramIndex.Node source = nodeIds.get(edge.from()), target = nodeIds.get(edge.to());
             Entries.Entry activation = entries.get(edge.activationEntry());
@@ -293,10 +336,11 @@ final class IndexBuilder {
             int bit = 1 << edge.kind().ordinal();
             valid(edge.kind() == CfgTransition.Kind.OPAQUE_JUMP || edge.kind()==CfgTransition.Kind.EXCEPTION || edge.kind()==CfgTransition.Kind.CONTROL_EXIT || (roles & bit) == 0, "duplicate semantic contextual edge");
             seenRoles.put(key, roles | bit);
-            edges[ordinal] = edge; from[ordinal] = source.ordinal; to[ordinal] = target.ordinal; edgeEntry[ordinal] = context;
+            edges[ordinal] = edge; from[ordinal] = source.ordinal; to[ordinal] = target.ordinal; edgeEntry[ordinal] = factored&&edge.kind()!=CfgTransition.Kind.ENTRY?-1:context;
             ordinal = Math.incrementExact(ordinal);
             count.edges = Math.incrementExact(count.edges);
         }
+        if(factored)count.edges=graph.transitions().size();
         valid(count.edges == expectedEdges, "missing required contextual edge");
         // Linked edge columns preserve input order and require only nonempty (Entry, node) rows.
         for (int edge = length - 1; edge >= 0; edge--) {
@@ -308,29 +352,29 @@ final class IndexBuilder {
 
     private ProgramIndex.Node expectedTarget(ProgramIndex.Node source, Entries.Entry activation, CfgTransition.Kind kind, ProgramIndex.Node target) {
         if (source.source() instanceof CfgNode.EntryNode entry) {
-            return kind == CfgTransition.Kind.ENTRY && entry.source() == activation
+            return kind == CfgTransition.Kind.ENTRY && entry.entry().equals(activation.id())
                     ? sequenceNodes.get(activation.initialLabel().orElseThrow()) : null;
         }
         if (!(source.source() instanceof CfgNode.SequenceNode node)) return null;
         if(kind==CfgTransition.Kind.EXCEPTION&&target.source() instanceof CfgNode.SequenceNode destination)
-            return OpenControl.alternatives(node.source().terminator()).stream().anyMatch(a->destination.source().label().equals(OpenControl.exceptionLabel(a)))?target:null;
-        if(kind==CfgTransition.Kind.CONTROL_EXIT&&!LocalControlRules.local(node.source().terminator())&&target.source() instanceof CfgNode.OutcomeExit outside)
-            return outside.source()==node.source().terminator()&&OpenControl.outside(outside.outcome())
-                &&OpenControl.alternatives(outside.source()).contains(outside.outcome())?target:null;
-        return switch (node.source().terminator()) {
-            case Operations.Opaque opaque -> kind == CfgTransition.Kind.OPAQUE_RETURN && opaque.envelope().control().known().contains(Control.ReturnAlternative.INSTANCE)
+            return CfgControl.alternatives(node.control()).stream().anyMatch(a->destination.label().equals(OpenControl.exceptionLabel(a)))?target:null;
+        if(kind==CfgTransition.Kind.CONTROL_EXIT&&!LocalControlRules.local(node.control())&&target.source() instanceof CfgNode.OutcomeExit outside)
+            return outside.operation().equals(node.control().operation())&&OpenControl.outside(outside.outcome())
+                &&CfgControl.alternatives(node.control()).contains(outside.outcome())?target:null;
+        return switch (node.control()) {
+            case CfgControl.Opaque opaque -> kind == CfgTransition.Kind.OPAQUE_RETURN && opaque.alternatives().contains(Control.ReturnAlternative.INSTANCE)
                 ? normalExits.get(activation.id()) : kind == CfgTransition.Kind.OPAQUE_JUMP && target.source() instanceof CfgNode.SequenceNode seq
-                    && OpenControl.opaqueDestination(opaque, seq.source().label()) ? target : null;
-            case Operations.Jump jump -> kind == CfgTransition.Kind.JUMP ? sequenceNodes.get(jump.destination()) : null;
-            case Operations.Invoke invoke -> kind == CfgTransition.Kind.INVOKE_NORMAL && target.source() instanceof CfgNode.SequenceNode s
-                    && invoke.outcomes().known().stream().anyMatch(o -> o instanceof Control.Normal n && n.label().equals(s.source().label())) ? target : null;
-            case Operations.Branch branch -> switch (kind) {
+                    && opaque.alternatives().stream().anyMatch(a -> seq.label().equals(OpenControl.alternativeLabel(a))) ? target : null;
+            case CfgControl.Jump jump -> kind == CfgTransition.Kind.JUMP ? sequenceNodes.get(jump.destination()) : null;
+            case CfgControl.Invoke invoke -> kind == CfgTransition.Kind.INVOKE_NORMAL && target.source() instanceof CfgNode.SequenceNode s
+                    && invoke.alternatives().stream().anyMatch(o -> o instanceof Control.Normal n && n.label().equals(s.label())) ? target : null;
+            case CfgControl.Branch branch -> switch (kind) {
                 case BRANCH_TRUE -> sequenceNodes.get(branch.trueDestination());
                 case BRANCH_FALSE -> sequenceNodes.get(branch.falseDestination());
                 default -> null;
             };
-            case Operations.Return ignored -> kind == CfgTransition.Kind.RETURN ? normalExits.get(activation.id()) : null;
-            case Operations.Halt halt -> kind == CfgTransition.Kind.HALT ? haltExits.get(halt.header().id()) : null;
+            case CfgControl.Return ignored -> kind == CfgTransition.Kind.RETURN ? normalExits.get(activation.id()) : null;
+            case CfgControl.Halt halt -> kind == CfgTransition.Kind.HALT ? haltExits.get(halt.operation()) : null;
             default -> throw new IllegalStateException("admitted unsupported terminator");
         };
     }

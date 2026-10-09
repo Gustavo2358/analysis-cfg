@@ -47,7 +47,8 @@ def prepare(root):
 
 def technical_fast(root):
     prepare(root)
-    for command in ([sys.executable, '-B', 'scripts/project/check_architecture.py', '--test-profile', 'fast'],
+    for command in ([sys.executable, '-B', 'scripts/project/test_compiled_descriptors.py'],
+                    [sys.executable, '-B', 'scripts/project/check_architecture.py', '--test-profile', 'fast'],
                     [sys.executable, '-B', 'scripts/project/test_local_control_oracles.py'],
                     [sys.executable, '-B', 'scripts/project/test_cfg_wire_contract.py'],
                     [sys.executable, '-B', 'scripts/project/test_w2d_contract.py'],

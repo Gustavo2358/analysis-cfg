@@ -31,24 +31,30 @@ public final class TargetResolver {
         return resolve(occurrence,sites,List.of());
     }
     public static Resolution resolve(QualifiedDependencyOccurrence occurrence,List<DependencySiteFact> sites,List<SourceValuesProvider.Candidate> conditional) {
+        return resolve(occurrence,sites,conditional,()->{});
+    }
+    static Resolution resolve(QualifiedDependencyOccurrence occurrence,List<DependencySiteFact> sites,List<SourceValuesProvider.Candidate> conditional,Runnable progress) {
+        Objects.requireNonNull(progress).run();
         var authorities=new ArrayList<String>();var candidates=new TreeMap<String,Candidate>();var reasons=new TreeSet<String>();
         boolean qualified=!occurrence.qualifications().isEmpty();
         if(qualified)authorities.add(occurrence.sourceControlRemainder()?"SOURCE_CONTROL_POSSIBLE":"SOURCE_QUALIFIED");
         if(occurrence.sourceControlRemainder())reasons.add("SOURCE_CONTROL_UNAVAILABLE");
         boolean observed=false,valueOpen=false,interpretationOpen=false;
         for(var site:sites) {
+            progress.run();
             reasons.addAll(site.analysisReasons());
             if(site.reachability()==DependencySiteFact.Reachability.UNREACHABLE_IN_MODEL)continue;
             String authority=site.reachability()==DependencySiteFact.Reachability.REACHABLE?"EXECUTABLE_FLOW":"EXECUTABLE_OCCURRENCE";
             if(!authorities.contains(authority))authorities.add(authority);
             observed=true;valueOpen|=site.modelValueRemainder()==null||site.modelValueRemainder()||site.sourceValueRemainder();
             interpretationOpen|=site.interpretationUnknownRemainder();
-            for(var candidate:site.candidates())add(candidates,new Candidate(candidate.referenceName(),candidate.rawValue(),candidate.supports(),qualified?occurrence.qualifications():List.of()));
+            for(var candidate:site.candidates()){progress.run();add(candidates,new Candidate(candidate.referenceName(),candidate.rawValue(),candidate.supports(),qualified?occurrence.qualifications():List.of()));}
         }
         if(qualified&&occurrence.targetKind().equals("LITERAL")) {
             boolean cics=occurrence.technology().equals("CICS");
             boolean supportedProfile=occurrence.nameProfile().equals(cics?CicsNameInterpreter.PROFILE:CallNameInterpreter.PROFILE);
             for(var raw:occurrence.literals()) {
+                progress.run();
                 if(!supportedProfile){interpretationOpen=true;continue;}
                 var interpreted=interpret(cics,raw,false,cics?new Interactions.ExtensionName("cics-ts.program","1"):Interactions.ExactName.INSTANCE);
                 interpretationOpen|=interpreted.unknownRemainder()||!cics;
@@ -60,6 +66,7 @@ public final class TargetResolver {
             boolean supportedProfile=occurrence.nameProfile().equals(cics?CicsNameInterpreter.PROFILE:CallNameInterpreter.PROFILE);
             valueOpen=true;authorities.add("CONDITIONAL_SOURCE_VALUES");reasons.add("CONDITIONAL_NOMINAL_VALUE_EVIDENCE");
             for(var candidate:conditional) {
+                progress.run();
                 if(!supportedProfile){interpretationOpen=true;continue;}
                 var interpreted=interpret(cics,candidate.rawValue(),true,cics?new Interactions.ExtensionName("cics-ts.program","1"):Interactions.ExactName.INSTANCE);
                 interpretationOpen|=interpreted.unknownRemainder()||!cics;

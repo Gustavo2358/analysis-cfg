@@ -10,7 +10,7 @@ from resource_limit_scope import allows_change, boundaries
 ROOT=Path(__file__).resolve().parents[2]
 MODULES=['analysis-dataflow','analysis-adapters','analysis-launcher']
 NAMES={'analysis-dataflow':['AnalysisDataflow','DefaultValuePlan','ObservedValueFact','PreparedDataflowResult','RegionalAnalysis','RegionalAnalysisResult'],
-       'analysis-adapters':['JsonFiles','DataflowAirReader','DeliveryReceipt','JsonOutput','LocalResultWriter','ReceiptJson','ResultJson','WireIds','RegionalResultJson'],
+       'analysis-adapters':['JsonFiles','DataflowAirReader','DeliveryReceipt','JsonOutput','LocalResultWriter','ReceiptJson','ResultJson','WireIds','RegionalResultJson','FilePageStore','MemoryPageStore','PagedAirStorage','PagedSnapshotIdentityStorage','PagedSnapshotDeclarationsStorage','PagedSnapshotGraphStorage','PagedSnapshotLocalStorage','PagedSnapshotCycleStorage','PagedSnapshotGroundingStorage','PagedSnapshotSignatureStorage','PagedSnapshotDiagnosticStorage','PagedSnapshotLabelStorage','PagedSnapshotReferenceStorage','PagedJsonInputStorage'],
        'analysis-launcher':['AnalysisDataflow','RegionalAnalysis']}
 PIPELINE='analysis-launcher/src/main/java/io/github/gustavo2358/analysis/launcher/AnalysisPipeline.java'
 SOURCES={m+'/src/main/java/io/github/gustavo2358/analysis/'+m.removeprefix('analysis-').replace('launcher','launcher')+'/'+n+'.java' for m,names in NAMES.items() for n in names}
@@ -77,7 +77,8 @@ def architecture(root,update=False):
             for target in targets:
                 if any(x in target for x in DENIED if not (x=='CfgJsonWriter' and source=='io.github.gustavo2358.analysis.launcher.AnalysisPipeline')):raise Failure('W5 compiled forbidden dependency: '+target)
                 if module=='analysis-dataflow' and any(x in target for x in ('java.io','java.nio.file','analysis.adapters','analysis.launcher','air.json')):raise Failure('W5 compiled inner boundary: '+target)
-        descriptors={p:capture(root,['javap','-classpath',str(classes)+os.pathsep+cp,'-public','-s',p[:-6].replace('/','.')]) for p in paths}
+        from compiled_descriptors import public_descriptors
+        descriptors=public_descriptors(paths,str(classes)+os.pathsep+cp,lambda args:capture(root,args))
         actual[module]=dict(sources=sorted(p for p in SOURCES|{PIPELINE} if p.startswith(module+'/')),classfiles=paths,jdeps_edges={k:sorted(v) for k,v in sorted(edges.items())},javap_descriptors=descriptors,effective_maven=sorted(parse_tgf(root/module/'target/architecture-dependencies.tgf')))
     # Inner artifacts must have no compiled dependency on the new outer layers.
     for module in ('cfg-kernel','analysis-kernel','analysis-values'):

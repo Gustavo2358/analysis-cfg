@@ -14,12 +14,13 @@ final class TextProfile {
     record CopyWrite(Location location,Location source) implements Write { }
     record ExpressionWrite(Location location,Operations.Assign operation) implements Write { }
     final AnalysisSession session;
-    final Map<ObjectId,Location> subjects=new HashMap<>();
-    private final Set<ObjectId> textSubjects=new HashSet<>();
-    final IdentityHashMap<Operation,Write> writes=new IdentityHashMap<>();
-    private final IdentityHashMap<Operation,KillAuthority.Permit> overwrites=new IdentityHashMap<>();
-    private final IdentityHashMap<Operation,ForeignEffectTransfer> effects=new IdentityHashMap<>();
-    private final IdentityHashMap<Operation,ConservativeEffectTransfer> conservative=new IdentityHashMap<>();
+    final Map<ObjectId,Location> subjects;
+    private final Set<ObjectId> textSubjects;
+    final Map<OperationId,Write> writes=new HashMap<>();
+    private final List<Write> preparedWrites=new ArrayList<>();
+    private final Map<OperationId,KillAuthority.Permit> overwrites=new HashMap<>();
+    private final Map<OperationId,ForeignEffectTransfer> effects=new HashMap<>();
+    private final Map<OperationId,ConservativeEffectTransfer> conservative=new HashMap<>();
     private final boolean effectAware;
     private final List<Location> modeledCells;
     private final Set<Location> selected;
@@ -34,16 +35,26 @@ final class TextProfile {
     final ValueUniverse universe=new ValueUniverse();
     final List<PremiseId> premises=new ArrayList<>();
     final ValuesWork preparation=new ValuesWork();
-    private final Set<Operation> admitted=Collections.newSetFromMap(new IdentityHashMap<>());
+    final ScalarRelations relations;
+    private final Set<OperationId> admitted=new HashSet<>();
     TextProfile(AnalysisSession session,boolean effectAware) {this(session,effectAware,null);}
     TextProfile(AnalysisSession session,boolean effectAware,Set<ObjectId> demand) {
         this.effectAware=effectAware;
         this.session=Objects.requireNonNull(session);
-        var index=session.index();var publication=index.publication();
-        var entryUnits=session.contexts().stream().map(c->c.entry().id().unit()).collect(java.util.stream.Collectors.toSet());
+        var index=session.index();var store=index.store();
+        var entryUnits=session.contexts().stream().map(c->c.entry().id().unit()).collect(java.util.stream.Collectors.toCollection(LinkedHashSet::new));
         var cells=new HashMap<StorageId,Location>();
-        for(var unit:publication.units())for(var object:unit.objects()) {
-            var cell=index.directCell(object.id());
+        var nativeSubjects=store.declarationInventory().isPresent()?new NativeSubjects(index,cells):null;
+        if(nativeSubjects==null){subjects=new HashMap<>();textSubjects=new HashSet<>();}
+        else {subjects=nativeSubjects;textSubjects=nativeSubjects.texts();}
+        for(var declaration:index.objectDeclarations().entrySet()) {
+            var object=declaration.getValue();
+            store.progress(ProgramStore.ExecutionPhase.DEMAND);
+            Memory.Cell cell;
+            if(nativeSubjects!=null){
+                var base=object.storage() instanceof Memory.CellBinding binding?index.storage(binding.storage()):null;
+                cell=base instanceof Memory.Cell value?value:null;
+            } else cell=index.directCell(declaration.getKey());
             if(!(object.storage() instanceof Memory.CellBinding)||cell==null||!cellDomain(object.typeRef())||!cellDomain(cell.typeRef())) {
                 // A declaration alone has no transfer effect. Demand closure and every
                 // actual effect below still require supported storage; none is discarded.
@@ -52,8 +63,13 @@ final class TextProfile {
             }
             var location=cells.get(cell.header().id());
             if(location==null){int ordinal=cells.size();Math.incrementExact(ordinal);location=new Location(ordinal,cell);cells.put(cell.header().id(),location);}
-            subjects.put(object.id(),location);
-            if(text(object.typeRef()))textSubjects.add(object.id());
+            // Cold bodies reconstruct equal IDs. These persistent associations
+            // borrow the complete identity already owned by the declaration index.
+            if(nativeSubjects!=null)nativeSubjects.include(text(object.typeRef()));
+            else {
+                subjects.put(declaration.getKey(),location);
+                if(text(object.typeRef()))textSubjects.add(declaration.getKey());
+            }
             if(object.coverage()!=Evidence.CoverageStatus.MODELED||open(object.precision().storage())||open(object.precision().values()))
                 sourceOpenCells.add(location.ordinal());
         }
@@ -65,15 +81,14 @@ final class TextProfile {
             for(var object:demand) {
                 var location=subjects.get(object);if(location==null)throw new Refusal(false,"UNSUPPORTED_DEMAND_STORAGE");selected.add(location);
             }
-            for(var site:index.sites(Operations.Branch.class))if(entryUnits.contains(site.owner().id()))
+            for(var unitId:entryUnits)for(var site:index.sites(Operations.Branch.class,unitId))
                 for(var object:TextPredicate.reads(((Operations.Branch)site.operation()).predicate())) {
                     var location=subjects.get(object);if(location!=null)selected.add(location);
                 }
             // Backwards closure of possible reaching copies. No control/path pruning;
             // every write to a selected cell is retained, including MAY/unknown effects.
             var sources=new HashMap<Location,Set<Location>>();
-            for(var site:index.sites(Operations.Assign.class)) {
-                if(!entryUnits.contains(site.owner().id()))continue;
+            for(var unitId:entryUnits)for(var site:index.sites(Operations.Assign.class,unitId)) {
                 var assign=(Operations.Assign)site.operation();
                 if(assign.destination() instanceof Places.ObjectPlace to) {
                     // Only relevant expressions require admission; unrelated unsupported effects still use existing guards.
@@ -90,9 +105,9 @@ final class TextProfile {
         requestedObjects=demand==null?subjects.size():demand.size();
         this.selected=Set.copyOf(selected);
         modeledCells=selected.stream().sorted(Comparator.comparingInt(Location::ordinal)).toList();
-        for(var unit:publication.units()) {
-            if(!entryUnits.contains(unit.id()))continue;
-            boolean open=open(publication.coverage())||open(unit.coverage());
+        for(var unitId:entryUnits) {
+            var unit=index.unit(unitId);
+            boolean open=open(store.coverage())||open(unit.coverage());
             for(var sequence:unit.sequences()) {
                 for(var instruction:sequence.instructions()){prepare(instruction);open|=!(instruction instanceof Operations.HavocMust||instruction instanceof Operations.HavocMay)&&open(instruction.header());}
                 prepare(sequence.terminator());open|=!(sequence.terminator() instanceof Operations.Opaque)&&open(sequence.terminator().header());
@@ -101,12 +116,23 @@ final class TextProfile {
             }
             sourceOpen.put(unit.id(),open);visible.put(unit.id(),Set.copyOf(unit.visibleObjects()));
         }
+        relations=ScalarRelations.create(this.selected,preparedWrites,subjects,cells.size(),()->store.progress(ProgramStore.ExecutionPhase.DOMAIN));
         for(var context:session.contexts()) {
             if(!context.entry().state().uncertainties().isEmpty())sourceOpenEntries.add(context.entry().id());
             var seed=PossibleValuesState.reached();var initial=new HashMap<Integer,Values.TextValue>();var initialized=new HashSet<Integer>();
             for(var condition:context.entry().state().conditions().stream().sorted(Comparator.comparingInt(c->c.value() instanceof Entries.LiteralInitial?0:1)).toList()) {
                 if(!(condition.place() instanceof Places.ObjectPlace object))throw new Refusal(false,"UNSUPPORTED_INITIAL_PLACE");
                 var location=subjects.get(object.object());
+                // A nominal BOOL Cell cannot alias the admitted TEXT/INT Cells
+                // (the validated binding has the same known domain). External
+                // unknown contributes no initial text value; Boolean reads keep
+                // the existing conservative BOTH image and entry uncertainty.
+                // Do not extend this to known values, regions or unknown domains.
+                if(location==null&&demand!=null&&condition.value() instanceof Entries.ExternalUnknown) {
+                    var declaration=index.object(object.object());var cell=index.directCell(object.object());
+                    if(declaration!=null&&declaration.storage() instanceof Memory.CellBinding&&cell!=null
+                        &&bool(declaration.typeRef())&&bool(cell.typeRef()))continue;
+                }
                 if(location==null)throw new Refusal(false,"UNSUPPORTED_INITIAL_STORAGE");
                 if(!selected(location))continue;
                 if(condition.value() instanceof Entries.LiteralInitial literal) {
@@ -131,8 +157,70 @@ final class TextProfile {
             }
             boundaries.put(context,seed);
         }
+        if(relations.active())boundaries.replaceAll((context,state)->state.attach(relations,preparation));
+    }
+    /** Native aliases project the canonical Cell location on demand. Complete
+     * declarations still undergo the preparation scan; no per-Object typed keys
+     * are retained in either locations or text eligibility. */
+    private static final class NativeSubjects extends AbstractMap<ObjectId,Location> {
+        private final ProgramIndex index;
+        private final Map<StorageId,Location> cells;
+        private int count,textCount;
+        NativeSubjects(ProgramIndex index,Map<StorageId,Location> cells){this.index=index;this.cells=cells;}
+        void include(boolean text){count=Math.incrementExact(count);if(text)textCount=Math.incrementExact(textCount);}
+        private Location location(Memory.ObjectDeclaration object){
+            if(object==null||!(object.storage() instanceof Memory.CellBinding binding)||!cellDomain(object.typeRef()))return null;
+            // The complete admission scan above inserts only supported Cells;
+            // immutable bindings can borrow that association without decoding
+            // and checking the same storage body for every alias query.
+            return cells.get(binding.storage());
+        }
+        @Override public int size(){index.objectDeclarations().size();return count;}
+        @Override public Location get(Object key){return key instanceof ObjectId id?location(index.object(id)):null;}
+        @Override public boolean containsKey(Object key){return get(key)!=null;}
+        @Override public Set<Entry<ObjectId,Location>> entrySet(){return Collections.unmodifiableSet(new AbstractSet<>() {
+            @Override public int size(){return NativeSubjects.this.size();}
+            @Override public Iterator<Entry<ObjectId,Location>> iterator(){
+                var declarations=index.objectDeclarations().entrySet().iterator();return new Iterator<>() {
+                    private Entry<ObjectId,Location> next;
+                    @Override public boolean hasNext(){
+                        index.objectDeclarations().size();
+                        while(next==null&&declarations.hasNext()){
+                            var declaration=declarations.next();var location=location(declaration.getValue());
+                            if(location!=null)next=new SimpleImmutableEntry<>(declaration.getKey(),location);
+                        }
+                        return next!=null;
+                    }
+                    @Override public Entry<ObjectId,Location> next(){
+                        if(!hasNext())throw new NoSuchElementException();var value=next;next=null;return value;
+                    }
+                };
+            }
+        });}
+        Set<ObjectId> texts(){return Collections.unmodifiableSet(new AbstractSet<>() {
+            @Override public int size(){index.objectDeclarations().size();return textCount;}
+            @Override public boolean contains(Object key){
+                if(!(key instanceof ObjectId id))return false;var object=index.object(id);
+                return object!=null&&text(object.typeRef())&&location(object)!=null;
+            }
+            @Override public Iterator<ObjectId> iterator(){
+                var declarations=index.objectDeclarations().entrySet().iterator();return new Iterator<>() {
+                    private ObjectId next;
+                    @Override public boolean hasNext(){
+                        index.objectDeclarations().size();
+                        while(next==null&&declarations.hasNext()){
+                            var declaration=declarations.next();var object=declaration.getValue();
+                            if(text(object.typeRef())&&location(object)!=null)next=declaration.getKey();
+                        }
+                        return next!=null;
+                    }
+                    @Override public ObjectId next(){if(!hasNext())throw new NoSuchElementException();var value=next;next=null;return value;}
+                };
+            }
+        });}
     }
     private static boolean text(Types.TypeRef type) { return type instanceof Types.Known k&&k.type()==Types.Builtin.TEXT; }
+    private static boolean bool(Types.TypeRef type) { return type instanceof Types.Known k&&k.type()==Types.Builtin.BOOL; }
     // Auxiliary integer cells participate in alias/effect bounds, without numeric
     // evaluation or candidate queries. Their open value uses the existing top.
     private static boolean cellDomain(Types.TypeRef type) {
@@ -144,46 +232,50 @@ final class TextProfile {
                 throw new Refusal(false,"UNSUPPORTED_EFFECT_PROFILE");
             var location=subjects.get(destination.object());
             if(location==null)throw new Refusal(false,"UNSUPPORTED_STORAGE_PROFILE");
-            if(!selected(location)){admitted.add(operation);return;}
+            if(!selected(location)){admitted.add(operation.header().id());return;}
             if(assign.value() instanceof Expressions.Literal literal && literal.value() instanceof Values.TextValue text)
-                writes.put(operation,new LiteralWrite(location,universe.supported(text,assign.header().id(),assign.header().origin(),List.of(),preparation)));
+                writes.put(operation.header().id(),new LiteralWrite(location,universe.supported(text,assign.header().id(),assign.header().origin(),List.of(),preparation)));
             else if(assign.value() instanceof Expressions.Read read && read.place() instanceof Places.ObjectPlace source) {
                 var sourceLocation=subjects.get(source.object());
                 if(sourceLocation==null)throw new Refusal(false,"UNSUPPORTED_STORAGE_PROFILE");
-                writes.put(operation,new CopyWrite(location,sourceLocation));
+                writes.put(operation.header().id(),new CopyWrite(location,sourceLocation));
             } else if(assign.value() instanceof Expressions.FitText||assign.value() instanceof Expressions.SliceText) {
                 for(var source:TextExpressions.reads(assign.value()))if(!subjects.containsKey(source))throw new Refusal(false,"UNSUPPORTED_STORAGE_PROFILE");
-                writes.put(operation,new ExpressionWrite(location,assign));
+                writes.put(operation.header().id(),new ExpressionWrite(location,assign));
             } else throw new Refusal(false,"UNSUPPORTED_EFFECT_PROFILE");
         } else if(operation instanceof Operations.HavocMust || operation instanceof Operations.HavocMay || operation instanceof Operations.Opaque) {
-            conservative.put(operation,ConservativeEffectTransfer.prepare(operation,this));
+            conservative.put(operation.header().id(),ConservativeEffectTransfer.prepare(operation,this));
         } else if(effectAware && operation instanceof Operations.Invoke invoke) {
             if(!invoke.results().isEmpty())throw new Refusal(false,"UNSUPPORTED_EFFECT_PROFILE");
-            effects.put(operation,ForeignEffectTransfer.prepare(invoke.effectBound(),modeledCells,subjects));
+            effects.put(operation.header().id(),ForeignEffectTransfer.prepare(invoke.effectBound(),modeledCells,subjects));
         } else if(!(operation instanceof Operations.LocalInvoke||operation instanceof Operations.LocalBoundary||operation instanceof Operations.LocalResume||operation instanceof Operations.LocalUnwind||operation instanceof Operations.Nop||operation instanceof Operations.Return||operation instanceof Operations.Jump||operation instanceof Operations.Branch||operation instanceof Operations.Halt))
             throw new Refusal(false,"UNSUPPORTED_EFFECT_PROFILE");
         if(session.index().unprovedPreconditions(operation.header().id()))
             throw new Refusal(false,"UNPROVED_SCALAR_OPERATION_PRECONDITION");
-        var write=writes.get(operation);
-        if(write!=null)overwrites.put(operation,KillAuthority.exactCell(session,operation,write.location().cell()).orElseThrow(()->new Refusal(false,"UNPROVED_STRONG_OVERWRITE")));
-        admitted.add(operation);
+        var write=writes.get(operation.header().id());
+        if(write!=null){preparedWrites.add(write);overwrites.put(operation.header().id(),KillAuthority.exactCell(session,operation,write.location().cell()).orElseThrow(()->new Refusal(false,"UNPROVED_STRONG_OVERWRITE")));}
+        admitted.add(operation.header().id());
     }
     PossibleValuesState transferOperation(PossibleValuesState state,Operation operation,ValuesWork work) {
-        if(!admitted.contains(operation))throw new IllegalArgumentException("operation outside prepared snapshot");
+        session.index().requireOperation(operation);
+        if(!admitted.contains(operation.header().id()))throw new IllegalArgumentException("operation outside prepared snapshot");
         if(!state.isReached())return state;
-        var partial=conservative.get(operation);
+        var partial=conservative.get(operation.header().id());
         if(partial!=null)return partial.apply(state,work);
-        var effect=effects.get(operation);
+        var effect=effects.get(operation.header().id());
         if(effect!=null)return effect.apply(state,work);
-        var write=writes.get(operation);
+        var write=writes.get(operation.header().id());
         if(write==null)return state;
         work.strongAssignments=Math.incrementExact(work.strongAssignments);
         // Capture the immutable source value before the strong update, preserving
         // its open remainder and candidate supports without creating an alias.
+        ScalarRelations.Assignment relational=write instanceof CopyWrite copy?relations.copy(state,write.location().ordinal(),copy.source().ordinal(),work)
+            :write instanceof ExpressionWrite expression?relations.expression(state,write.location().ordinal(),expression.operation(),subjects,universe,work):null;
+        if(relational!=null){var value=KillAuthority.strongOverwrite(overwrites.get(operation.header().id()),relational.projection());return state.relationalOverwrite(write.location().ordinal(),value,relational.roots(),work);}
         var value=write instanceof LiteralWrite literal ? literal.value()
             : write instanceof CopyWrite copy ? state.value(copy.source().ordinal(),work)
             : TextExpressions.evaluate(((ExpressionWrite)write).operation(),state,subjects,universe,work);
-        return state.strongOverwrite(write.location().ordinal(),value,overwrites.get(operation),work);
+        return state.strongOverwrite(write.location().ordinal(),value,overwrites.get(operation.header().id()),work);
     }
     boolean supports(ObjectId subject,EntryId entry) {
         if(!textSubjects.contains(subject)||!selected(subjects.get(subject)))return false;
@@ -193,7 +285,7 @@ final class TextProfile {
         return sourceOpen.get(entry.unit())||sourceOpenEntries.contains(entry)
                 ||sourceOpenCells.contains(subjects.get(subject).ordinal());
     }
-    private static boolean open(Evidence.Coverage coverage) { return coverage.inventory()!=Evidence.InventoryStatus.COMPLETE||!coverage.uncertainties().isEmpty(); }
+    private static boolean open(ProgramStore.CoverageView coverage) { return coverage.inventory()!=Evidence.InventoryStatus.COMPLETE||!coverage.uncertainties().isEmpty(); }
     private static boolean open(Evidence.Claim claim) { return claim.status()!=Evidence.PrecisionStatus.EXACT&&claim.status()!=Evidence.PrecisionStatus.NOT_APPLICABLE; }
     private static boolean open(Operations.Header header) {
         return header.coverage()!=Evidence.CoverageStatus.MODELED||open(header.precision().control())||open(header.precision().storage())||open(header.precision().effects())||open(header.precision().values());

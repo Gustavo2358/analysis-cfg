@@ -11,6 +11,27 @@ import static io.github.gustavo2358.analysis.cfg.testing.CfgFirstPublications.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class LocalControlProjectionTest {
+    @Test void ordinaryControlDoesNotAllocateASecondProgramSizedLabelIndex() {
+        var bean=java.lang.management.ManagementFactory.getThreadMXBean();
+        assertInstanceOf(com.sun.management.ThreadMXBean.class,bean);
+        var allocations=(com.sun.management.ThreadMXBean)bean;
+        assertTrue(allocations.isThreadAllocatedMemorySupported());
+        if(!allocations.isThreadAllocatedMemoryEnabled())allocations.setThreadAllocatedMemoryEnabled(true);
+        long thread=Thread.currentThread().threadId();
+        for(int count:new int[]{16,256,4096,65536}) {
+            var nodes=new ArrayList<CfgNode>();
+            var returned=new CfgControl.Return(new OperationId(U,"return"));
+            for(int i=0;i<count;i++)nodes.add(new CfgNode.SequenceNode(new CfgNodeId(P,i),new LabelId(U,"ordinary-"+i),List.of(),returned));
+            for(int warmup=0;warmup<3;warmup++)assertEquals(Map.of(),LocalControlRules.project(nodes));
+            long before=allocations.getThreadAllocatedBytes(thread);
+            var rules=LocalControlRules.project(nodes);
+            long allocated=allocations.getThreadAllocatedBytes(thread)-before;
+            assertEquals(Map.of(),rules);
+            assertTrue(allocated<=131072,"ordinary control allocated an unused label index: nodes="+count+" bytes="+allocated);
+            System.out.println("CFG_LOCAL_RULES_NO_LOCAL_METRICS nodes="+count+" allocatedBytes="+allocated);
+        }
+    }
+
     @Test void sharedBodyIsProjectedOnceWithoutUnconditionalReturns() {
         var body = new LabelId(U,"body"); var end = new LabelId(U,"end");
         var fallback = new Envelopes.Envelope(

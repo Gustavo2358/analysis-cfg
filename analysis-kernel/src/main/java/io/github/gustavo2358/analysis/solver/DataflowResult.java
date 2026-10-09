@@ -3,6 +3,7 @@ package io.github.gustavo2358.analysis.solver;
 import io.github.gustavo2358.analysis.structure.ContextView;
 import io.github.gustavo2358.analysis.structure.ProgramIndex;
 import java.util.*;
+import java.util.function.Consumer;
 
 /** Constructed only after convergence. Roots obey the definition's isolation contract. */
 public final class DataflowResult<S> {
@@ -32,6 +33,17 @@ public final class DataflowResult<S> {
         var roots=new ArrayList<S>(points.size());
         for(var point:points)roots.add((S)(atIn?in:out)[point.ordinal]);
         return List.copyOf(roots);
+    }
+    /**
+     * Visits every root retained by the stable result. Domains with their own
+     * canonical stores use this boundary to retire superseded solve history
+     * without guessing which roots a later replay can still observe.
+     */
+    @SuppressWarnings("unchecked")
+    public void forEachRetainedState(Consumer<? super S> consumer) {
+        Objects.requireNonNull(consumer,"consumer");
+        var seen=Collections.newSetFromMap(new IdentityHashMap<Object,Boolean>());
+        for(var states:List.of(in,out))for(var state:states)if(seen.add(state))consumer.accept((S)state);
     }
     private AnalysisPoint find(ContextView context, ProgramIndex.Node node) {
         var nodes = lookup.get(context);var points=nodes==null?null:nodes.get(node);

@@ -72,13 +72,28 @@ class EvalCfg031Test {
     }
     @Test void unsupportedCodecFormNeverBecomesCfgUnsupportedInput() throws Exception {
         Path source = input();
-        // NORMAL Halt is valid AIR, outside the pinned codec's Return-only transport coverage.
-        Files.writeString(source, Files.readString(source).replace("\"kind\":\"return\",\"values\":[]", "\"kind\":\"halt\",\"haltKind\":\"NORMAL\""));
+        // Raise remains outside the pinned codec's transport coverage; Halt is now supported.
+        Files.writeString(source, Files.readString(source).replace("\"kind\":\"return\",\"values\":[]", "\"kind\":\"raise\",\"tag\":\"synthetic-exception\",\"values\":[]"));
         var codec = assertThrows(AirJsonException.class, () -> new AirJson().decode(Files.readAllBytes(source)));
         assertEquals(AirJsonException.Code.IMPLEMENTATION_LIMIT, codec.code());
         failsWithoutPublishing(source, "IMPLEMENTATION_LIMIT");
         assertTrue(diagnostic().contains(codec.path()), diagnostic());
         assertFalse(diagnostic().contains("UNSUPPORTED_INPUT"));
+    }
+    @Test void bothNormativeHaltKindsReachRealCliWithoutReturnOrFallthrough() throws Exception {
+        // Handwritten topology: Sequence(0), HaltExit(1), Entry(2), NormalExit(3).
+        // The normal exit remains in the inventory but has no incoming transition.
+        String expected = """
+                {"schema":"analysis-cfg-json","schemaVersion":"1.0.0","airVersion":"2.0.0","publication":{"localId":"goback-0b-manual"},"buildStatus":"CFG_BUILT","projectionPolicy":"KNOWN_SUBSET","sourceKnowledge":{"publicationInventory":"PARTIAL","units":[{"unit":{"publication":"goback-0b-manual","localId":"unit"},"inventory":"PARTIAL"}]},"nodes":[{"id":{"publication":"goback-0b-manual","ordinal":"0"},"kind":"SEQUENCE","label":{"publication":"goback-0b-manual","unit":"unit","localId":"sequence"},"terminator":{"kind":"HALT","operation":{"publication":"goback-0b-manual","unit":"unit","localId":"return"}}},{"id":{"publication":"goback-0b-manual","ordinal":"1"},"kind":"HALT_EXIT","operation":{"publication":"goback-0b-manual","unit":"unit","localId":"return"},"haltKind":"%s"},{"id":{"publication":"goback-0b-manual","ordinal":"2"},"kind":"ENTRY","entry":{"publication":"goback-0b-manual","unit":"unit","localId":"primary-entry"}},{"id":{"publication":"goback-0b-manual","ordinal":"3"},"kind":"NORMAL_EXIT","unit":{"publication":"goback-0b-manual","localId":"unit"},"entry":{"publication":"goback-0b-manual","unit":"unit","localId":"primary-entry"}}],"transitions":[{"kind":"ENTRY","from":{"publication":"goback-0b-manual","ordinal":"2"},"to":{"publication":"goback-0b-manual","ordinal":"0"},"activationEntry":{"publication":"goback-0b-manual","unit":"unit","localId":"primary-entry"}},{"kind":"HALT","from":{"publication":"goback-0b-manual","ordinal":"0"},"to":{"publication":"goback-0b-manual","ordinal":"1"},"activationEntry":{"publication":"goback-0b-manual","unit":"unit","localId":"primary-entry"}}]}
+                """.strip();
+        for (String kind : new String[]{"NORMAL", "ABNORMAL"}) {
+            Path source = input();
+            Files.writeString(source, Files.readString(source).replace("\"kind\":\"return\",\"values\":[]",
+                    "\"kind\":\"halt\",\"haltKind\":\"" + kind + "\""));
+            assertEquals(0, run(source), diagnostic());
+            assertArrayEquals(expected.formatted(kind).getBytes(StandardCharsets.UTF_8), Files.readAllBytes(output()));
+            assertEquals("", diagnostic());
+        }
     }
     @Test void unavailableInventoryReachesRealKernelAndIsRejected() throws Exception {
         Path source = input();

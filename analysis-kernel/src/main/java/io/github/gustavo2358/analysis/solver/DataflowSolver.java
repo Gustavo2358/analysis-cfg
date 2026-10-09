@@ -1,6 +1,7 @@
 package io.github.gustavo2358.analysis.solver;
 
 import io.github.gustavo2358.analysis.structure.AnalysisSession;
+import io.github.gustavo2358.analysis.structure.ProgramStore;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.Function;
@@ -19,6 +20,7 @@ public final class DataflowSolver {
     static <S> DataflowResult<S> solve(AnalysisSession session, AnalysisDefinition<S> definition,
                                      Function<SolverTopology, IntWorklist> schedule) {
         Objects.requireNonNull(session, "session"); Objects.requireNonNull(definition, "definition");
+        session.index().store().progress(ProgramStore.ExecutionPhase.CONTROL);
         var direction=Objects.requireNonNull(definition.direction(), "direction");
         if(session.hasLocalControl())return direction==Direction.FORWARD
             ?new ActivationSolver<>(session,definition).solve():new BackwardActivationSolver<>(session,definition).solve();
@@ -27,6 +29,7 @@ public final class DataflowSolver {
         DomainWork work = new DomainWork();
         Run<S> run = new Run<>(graph, definition, schedule.apply(graph), forward, work);
         for (var boundary : definition.boundaries(session)) {
+            session.index().store().progress(ProgramStore.ExecutionPhase.CONTROL);
             int p = graph.require(boundary.context(), boundary.node()).ordinal;
             run.boundaryJoins = Math.incrementExact(run.boundaryJoins);
             var joined = definition.joinInto(run.anchor(p), boundary.state(), work);
@@ -34,6 +37,7 @@ public final class DataflowSolver {
         }
         // All program-reachable points must publish once, including bottom in an exitless SCC.
         for (int p = 0; p < graph.points.length; p++) {
+            session.index().store().progress(ProgramStore.ExecutionPhase.CONTROL);
             run.initializationAttempts = Math.incrementExact(run.initializationAttempts);
             run.enqueueIfAbsent(p);
         }
@@ -41,11 +45,13 @@ public final class DataflowSolver {
         int[] next = forward ? graph.forwardNext : graph.backwardNext;
         int[] destinations = forward ? graph.to : graph.from;
         while (run.queue.size() != 0) {
+            session.index().store().progress(ProgramStore.ExecutionPhase.CONTROL);
             int p = run.queue.remove();
             run.pops = Math.incrementExact(run.pops);
             run.queued[p] = false;
             run.transfers = Math.incrementExact(run.transfers);
             S candidate = Objects.requireNonNull(definition.transferBlock(graph.points[p], run.anchor(p), work), "block root");
+            session.index().store().progress(ProgramStore.ExecutionPhase.DOMAIN);
             boolean first = !run.published[p];
             if (!first && definition.equivalent(run.publication(p, false), candidate, work)) {
                 run.unchanged = Math.incrementExact(run.unchanged);
@@ -56,6 +62,7 @@ public final class DataflowSolver {
             if (first) run.first = Math.incrementExact(run.first);
             else run.changed = Math.incrementExact(run.changed);
             for (int e = heads[p]; e != -1; e = next[e]) {
+                session.index().store().progress(ProgramStore.ExecutionPhase.CONTROL);
                 int destination = destinations[e];
                 run.edgeTransfers = Math.incrementExact(run.edgeTransfers);
                 S contribution = Objects.requireNonNull(definition.transferEdge(graph.points[p], graph.edges[e], candidate, work), "edge root");
@@ -71,6 +78,7 @@ public final class DataflowSolver {
             }
         }
         // Ownership transfer only after the worklist is empty. Failures above expose no result.
+        session.index().store().progress(ProgramStore.ExecutionPhase.DOMAIN);
         return new DataflowResult<>(graph, forward ? run.anchors : run.publications,
                 forward ? run.publications : run.anchors, run.snapshot());
     }

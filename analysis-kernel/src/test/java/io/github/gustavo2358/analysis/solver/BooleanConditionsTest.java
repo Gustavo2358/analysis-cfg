@@ -4,6 +4,193 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class BooleanConditionsTest {
+    @Test void ownedResidentDecisionsObserveBorrowedDeadlineInsideConstructionAndStillClose() {
+        long[] now={0};int[] probes={0};boolean[] armed={false};
+        var shared=new AnalysisResources(new AnalysisResources.Limits(Long.MAX_VALUE,Long.MAX_VALUE,0,0,0,Long.MAX_VALUE,Long.MAX_VALUE),5,()->now[0]);
+        var program=(io.github.gustavo2358.analysis.structure.ProgramStore)java.lang.reflect.Proxy.newProxyInstance(
+            getClass().getClassLoader(),new Class<?>[]{io.github.gustavo2358.analysis.structure.ProgramStore.class},(proxy,method,args)->{
+                if(!method.getName().equals("progress"))throw new AssertionError(method);
+                if(armed[0]&&++probes[0]==10)now[0]=5;
+                shared.work(1,AnalysisResources.Phase.CONTROL);return null;
+            });
+        var resources=AnalysisResources.executionFor(program);
+        try(var b=new BooleanConditions(2,resources)) {
+            int left=1,right=1;
+            for(int key=0;key<256;key++){left=b.and(left,b.variable(2*key));right=b.and(right,b.variable(2*key+1));}
+            final int a=left,c=right;armed[0]=true;
+            var failure=assertThrows(AnalysisResources.Exhausted.class,()->b.and(a,c));
+            assertEquals(AnalysisResources.Resource.TIME,failure.resource());assertEquals(AnalysisResources.Phase.CONTROL,failure.phase());
+            assertEquals(10,probes[0],"expiry must occur inside the decision, not its entry");
+        }
+        assertEquals(0,resources.heapUsed());assertEquals(0,shared.heapUsed());
+    }
+    @Test void optionalPositiveWitnessHintsSurviveMixedOrAndComplementRepresentatives() {
+        try(var b=new BooleanConditions(2)) {
+            int left=b.and(b.variable(0),b.variable(1));
+            int right=b.and(b.variable(2),b.variable(3));
+            int root=b.or(left,right);
+            assertEquals(-1,b.requiredPresent(root));
+            int hint=b.possiblePresent(root);assertTrue(hint>=0&&hint<4);
+            var witness=new java.util.BitSet();if(hint<2){witness.set(0);witness.set(1);}else{witness.set(2);witness.set(3);}
+            assertTrue(b.test(root,witness));
+            int complement=b.not(b.or(b.not(left),b.not(right)));
+            assertTrue(b.possiblePresent(complement)>=0);
+            assertEquals(-1,b.possiblePresent(b.not(root)));
+        }
+    }
+
+    @Test void everySmallFunctionHasOneIdAcrossDnfCnfAndComplementConstruction() {
+        try(var b=new BooleanConditions(2)) {
+            int[] dnf=new int[256];
+            for(int truth=0;truth<256;truth++) {
+                int sum=0;
+                for(int bits=0;bits<8;bits++)if((truth&(1<<bits))!=0) {
+                    int product=1;
+                    for(int key=0;key<3;key++)product=b.and(product,(bits&(1<<key))==0?b.not(b.variable(key)):b.variable(key));
+                    sum=b.or(sum,product);
+                }
+                dnf[truth]=sum;
+                for(int bits=0;bits<8;bits++)assertEquals((truth&(1<<bits))!=0,b.test(sum,java.util.BitSet.valueOf(new long[]{bits})));
+            }
+            for(int truth=0;truth<256;truth++) {
+                int product=1;
+                for(int bits=7;bits>=0;bits--)if((truth&(1<<bits))==0) {
+                    int sum=0;
+                    for(int key=2;key>=0;key--)sum=b.or(sum,(bits&(1<<key))==0?b.variable(key):b.not(b.variable(key)));
+                    product=b.and(product,sum);
+                }
+                assertEquals(dnf[truth],product,"independent DNF/CNF construction truth="+truth);
+                assertEquals(dnf[truth^255],b.not(product));
+                for(int other=0;other<truth;other++)assertNotEquals(dnf[other],product);
+            }
+        }
+    }
+
+    @Test void everyCertifiedSupportMatchesIndependentEssentialVariableTruthTables() {
+        try(var b=new BooleanConditions(2)) {
+            var forms=new java.util.ArrayList<Integer>();var truths=new java.util.ArrayList<Long>();
+            for(int key=0;key<6;key++) {
+                forms.add(b.variable(key));long truth=0;
+                for(int bits=0;bits<64;bits++)if((bits&(1<<key))!=0)truth|=1L<<bits;truths.add(truth);
+            }
+            var random=new java.util.Random(592371);int known=0;
+            for(int step=0;step<300;step++) {
+                int left=random.nextInt(forms.size()),right=random.nextInt(forms.size());boolean union=random.nextBoolean();
+                int root=union?b.or(forms.get(left),forms.get(right)):b.and(forms.get(left),forms.get(right));
+                long truth=union?truths.get(left)|truths.get(right):truths.get(left)&truths.get(right);
+                if(random.nextBoolean()){root=b.not(root);truth=~truth;}
+                for(int key=0;key<6;key++) {
+                    int certificate=b.certifiedSupportContains(root,key);if(certificate<0)continue;known++;
+                    boolean essential=false;
+                    for(int bits=0;bits<64;bits++)essential|=((truth>>>bits)&1)!=((truth>>>(bits^(1<<key)))&1);
+                    assertEquals(essential?1:0,certificate,"step="+step+" key="+key);
+                }
+                forms.add(root);truths.add(truth);
+            }
+            assertTrue(known>36,"must exercise certificates beyond seed primaries");
+        }
+    }
+    @Test void disjointMixedPrefixesDoNotRescanEveryPreviouslyAdmittedFunction() {
+        for(boolean equality:new boolean[]{false,true})try(var b=new BooleanConditions(2)) {
+            int count=512,root=equality?1:0;
+            for(int key=0;key<count;key++) {
+                int x=b.variable(key),y=b.variable(count+key),term=b.and(x,y);
+                if(equality)term=b.or(term,b.and(b.not(x),b.not(y)));
+                root=equality?b.and(root,term):b.or(root,term);
+                assertEquals(1,b.certifiedSupportContains(root,key));
+                assertEquals(1,b.certifiedSupportContains(root,count+key));
+                assertEquals(0,b.certifiedSupportContains(root,2*count));
+            }
+            assertTrue(b.equivalenceComparisons()<=16L*count,"nomination work cannot scan all previously distinguishable prefix supports="+b.equivalenceComparisons());
+            int escaped=root;b.collect(mark->mark.accept(escaped));assertTrue(b.retainedNodes()<=16L*count);
+        }
+    }
+
+    @Test void committedOperationRetainsOnlyEscapingConditionsAndInvalidatesRetiredIds() {
+        for(int slots:new int[]{1,2,8})try(var b=new BooleanConditions(slots)) {
+            int x=b.variable(0),y=b.variable(1),z=b.variable(2);
+            for(int round=0;round<30;round++) {
+                int cp=b.checkpoint(),kept=b.and(x,y),temporary=b.or(kept,z);
+                assertNotEquals(kept,temporary);b.commitAfter(cp,mark->mark.accept(kept));
+                assertEquals(kept,b.and(y,x));
+                int rebuilt=b.or(kept,z);
+                for(int bits=0;bits<8;bits++)assertEquals((bits&3)==3||(bits&4)!=0,b.test(rebuilt,java.util.BitSet.valueOf(new long[]{bits})));
+                b.collect(mark->{mark.accept(x);mark.accept(y);mark.accept(z);});
+            }
+        }
+    }
+    @Test void literalImplicationsDoNotUnfoldEveryGrowingDecisionPrefix() {
+        try(var b=new BooleanConditions()) {
+            int union=0,intersection=1;
+            for(int key=0;key<128;key++) {
+                int literal=b.variable(key);union=b.or(union,literal);intersection=b.and(intersection,b.not(literal));
+                assertEquals(literal,b.and(union,literal));assertEquals(b.not(literal),b.or(intersection,b.not(literal)));
+                assertEquals(0,b.and(union,intersection));assertEquals(1,b.or(union,intersection));
+            }
+            assertTrue(b.peakNodes()<=8L*128,"unused implication cofactors="+b.peakNodes());
+        }
+    }
+    @Test void growingLiteralJunctionsDoNotRebuildAllOrderedDecisionPrefixes() {
+        int count=128;var b=new BooleanConditions();int union=0,complement=1;var literals=new int[count];
+        for(int i=0;i<count;i++) {
+            int literal=b.variable(i*257);if((i&1)!=0)literal=b.not(literal);literals[i]=literal;
+            union=b.or(union,literal);complement=b.and(complement,b.not(literal));
+            assertEquals(complement,b.not(union),"canonical De Morgan identity at prefix="+i);
+        }
+        int reversed=0;for(int i=count-1;i>=0;i--)reversed=b.or(reversed,literals[i]);assertEquals(union,reversed);
+        var random=new java.util.Random(904199);
+        for(int sample=0;sample<100;sample++) {
+            var word=new java.util.BitSet();boolean expected=false;
+            for(int i=0;i<count;i++){boolean present=random.nextBoolean();if(present)word.set(i*257);expected|=present!=((i&1)!=0);}
+            assertEquals(expected,b.test(union,word));assertEquals(!expected,b.test(complement,word));
+        }
+        assertTrue(b.peakNodes()<=16L*count,"avoidable decision-prefix nodes="+b.peakNodes());
+    }
+    @Test void sparseAbsentRestrictionMatchesIndependentTruthTables() {
+        var b=new BooleanConditions(2);var forms=new java.util.ArrayList<Integer>();var truths=new java.util.ArrayList<Long>();
+        for(int v=0;v<6;v++){forms.add(b.variable(v));long mask=0;for(int bits=0;bits<64;bits++)if((bits&(1<<v))!=0)mask|=1L<<bits;truths.add(mask);}
+        var random=new java.util.Random(91833);
+        for(int step=0;step<300;step++) {
+            int a=random.nextInt(forms.size()),c=random.nextInt(forms.size());boolean union=random.nextBoolean();
+            int f=union?b.or(forms.get(a),forms.get(c)):b.and(forms.get(a),forms.get(c));long truth=union?truths.get(a)|truths.get(c):truths.get(a)&truths.get(c);
+            if(random.nextBoolean()){f=b.not(f);truth=~truth;}forms.add(f);truths.add(truth);
+        }
+        for(int allowedMask=0;allowedMask<64;allowedMask++) {
+            final int mask=allowedMask;var memo=new java.util.HashMap<Integer,Integer>();
+            for(int f=0;f<forms.size();f++) {
+                int restricted=b.restrictAbsent(forms.get(f),key->(mask&(1<<key))!=0,memo);
+                for(int bits=0;bits<64;bits++)assertEquals(((truths.get(f) >>> (bits&mask))&1)!=0,b.test(restricted,java.util.BitSet.valueOf(new long[]{bits})));
+            }
+        }
+    }
+
+    @Test void emptyRootBindingMatchesIndependentTruthTablesAcrossReusedIds() {
+        for(int slots:new int[]{1,2,8}) {
+            var b=new BooleanConditions(slots);var forms=new java.util.ArrayList<Integer>();
+            var truths=new java.util.ArrayList<Long>();
+            for(int v=0;v<6;v++) {
+                forms.add(b.variable(v));long mask=0;
+                for(int bits=0;bits<64;bits++)if((bits&(1<<v))!=0)mask|=1L<<bits;
+                truths.add(mask);
+            }
+            var random=new java.util.Random(95173+slots);
+            for(int round=0;round<30;round++) {
+                int checkpoint=b.checkpoint();var values=new java.util.ArrayList<>(forms);var expected=new java.util.ArrayList<>(truths);
+                for(int step=0;step<100;step++) {
+                    int a=random.nextInt(values.size()),c=random.nextInt(values.size());boolean union=random.nextBoolean();
+                    int f=union?b.or(values.get(a),values.get(c)):b.and(values.get(a),values.get(c));
+                    long truth=union?expected.get(a)|expected.get(c):expected.get(a)&expected.get(c);
+                    if(random.nextBoolean()){f=b.not(f);truth=~truth;}
+                    int before=b.size();assertEquals((int)(truth&1),b.atEmpty(f));assertEquals(before,b.size());
+                    assertEquals((int)(truth&1),b.atEmpty(f));values.add(f);expected.add(truth);
+                }
+                b.discardAfter(checkpoint);
+                assertEquals(0,b.atEmpty(forms.get(0)));assertEquals(1,b.atEmpty(b.not(forms.get(0))));
+                b.collect(mark->{for(int root:forms)mark.accept(root);});
+            }
+        }
+    }
+
     @Test void managedScratchRollbackVisitsOnlyTransientMemoSlots() {
         var b=new BooleanConditions(); int x=b.variable(0),y=b.variable(1);
         long start=b.scratchCacheVisits(); int empty=b.checkpoint();

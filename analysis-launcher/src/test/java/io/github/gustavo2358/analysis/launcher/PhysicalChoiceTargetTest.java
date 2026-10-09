@@ -26,9 +26,9 @@ class PhysicalChoiceTargetTest {
    assertTrue(p.uncertainties().stream().filter(g->g.code().equals("TYPE_UNKNOWN")).anyMatch(g->site.uncertaintyRefs().contains(g.id())));
    assertEquals(ProgramPoint.Kind.BEFORE,site.valuePoint().kind());
    assertTrue(site.candidates().stream().allMatch(candidate->!candidate.supports().isEmpty()));
-   var path=dir.resolve(name+".json");var output=dir.resolve(name+"-dependencies.json");Files.write(path,bytes);
-   var errors=new ByteArrayOutputStream();assertEquals(0,AnalysisDependencies.run(new String[]{path.toString(),output.toString(),"--experimental-physical"},new PrintStream(errors)),errors.toString());
-   var memory=new ByteArrayOutputStream();new DependencyJson().write(result,memory);assertArrayEquals(memory.toByteArray(),Files.readAllBytes(output));
+   var path=dir.resolve(name+".json");var output=dir.resolve(name+"-dependencies.json");Files.write(path,bytes);Files.writeString(output,"sentinel");
+   var errors=new ByteArrayOutputStream();assertEquals(2,AnalysisDependencies.run(new String[]{path.toString(),output.toString(),"--experimental-physical"},new PrintStream(errors)),errors.toString());
+   assertEquals("sentinel",Files.readString(output));assertTrue(errors.toString().contains("usage:"));
    if(name.equals("ambiguous")) {
     var invoke=(Operations.Invoke)p.units().getFirst().sequences().stream().map(Sequence::terminator).filter(Operations.Invoke.class::isInstance).findFirst().orElseThrow();
     var place=((Expressions.Read)((Interactions.ComputedTarget)invoke.target()).name()).place();

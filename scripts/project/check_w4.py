@@ -97,7 +97,8 @@ def architecture(root:Path,update:bool=False)->None:
         if not paths:raise Failure('W4 classfiles missing')
         for path in paths:
             if struct.unpack('>IHH',(classes/path).read_bytes()[:8])!=(0xcafebabe,0,65):raise Failure('W4 requires Java 21 without preview')
-        descriptors={p[:-6].replace('/','.'):command(root,['javap','-classpath',str(classes)+os.pathsep+cp,'-public','-s',p[:-6].replace('/','.')]) for p in paths}
+        from compiled_descriptors import public_descriptors
+        descriptors={p[:-6].replace('/','.'):value for p,value in public_descriptors(paths,str(classes)+os.pathsep+cp,lambda args:command(root,args)).items()}
         actual[module]={'sources':sorted(KERNEL_SOURCES if module=='analysis-kernel' else PROVIDERS),'classfiles':paths,
             'jdeps_edges':{k:v for k,v in edges.items() if (role(k)=='provider')==(module=='analysis-values')},'javap_descriptors':descriptors,
             'effective_maven':sorted(parse_tgf(root/module/'target/architecture-dependencies.tgf'))}

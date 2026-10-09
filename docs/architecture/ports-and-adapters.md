@@ -28,6 +28,62 @@ revalidação. O wrapper é criado pelo próprio `AirValidator` e retém também
 resultados inválidos/incompletos; capability negotiation e admissão do consumidor
 continuam obrigatórias. [Qualificação e limites](../work/air-codec-latency.md).
 
+O caminho paginado do coordenador recebe `CfgProgram.AdmittedSnapshot` e o
+`SnapshotValidator.CheckedSnapshot` exato retido pelo adapter. A identidade do
+witness (não somente PublicationId, bytes ou resultado de validação) deve ser a
+mesma, com ambos os owners abertos e opções idênticas. Um programa residente ou
+certificado de outra entrada é recusado antes da projeção, inclusive se os IDs
+de publicação coincidirem. O adapter continua responsável por mapear fielmente
+os fatos do snapshot; a testemunha não certifica uma implementação arbitrária
+da porta. `SnapshotProgram` é o adapter de produção e não reconstrói Publication.
+
+`CfgProgram.NodeStore` is the projection's append/seal port. Entry/Sequence views carry
+optional opaque source handles (zero for resident callers), never wire offsets interpreted
+by the core. A snapshot backend may retain compact descriptors and role ordinal tapes,
+returning `CfgNodeInventory` views over the exact immutable input. Their count and all
+ordinal-to-node mappings remain invariant after seal. Repeated projection cannot mutate
+an existing inventory. The program owns these descriptors; the graph only borrows them.
+Graph admission validates the role indexes against the complete node scan, including
+wrong kinds, omissions, duplicate positions and out-of-range ordinals.
+
+`NodeStore.transitions()` may supply a `CfgTransitionTable.Storage` sharing that
+projection owner. The single core still produces the same typed physical rows and
+Entry/normal-exit bindings. A cold backend records dense endpoint and activation
+Entry-node ordinals, with paged group boundaries; it must preserve namespace,
+physical order, contextual Return rebinding and exact duplicate validation. The
+logical Entry × body relation is expanded only by ordinal queries/export. Hashing
+and factored equality inspect physical rows and bindings, not that product.
+`SnapshotProgram` uses seven primitive tapes per policy (three for rows/groups/exit
+bindings, four for nodes/roles), including an external exact-tuple duplicate index.
+All borrowed rows/groups expire with the projection. `AnalysisPipeline` retires
+them after successful CFG export, before dependencies consume the same AIR.
+Resident adapters retain their explicit compatibility storage. The same core uses
+`NodeStore.routing(UnitId, first, end)` only while projecting one Unit, closing it
+before the next Unit. The native index stores canonical sequence ordinals on one
+temporary tape; exact full Unit identity and streamed UTF-16 label comparison
+govern binary lookup. Derived Halt/Outcome exits use the projection's own descriptor
+layout, never AIR physical fallthrough. Closing the routing or projection expires
+the index; a second concurrently open Unit index is rejected.
+
+`Storage.begin(UnitId)` receives Entry/normal-exit bindings followed by body rows
+through `GroupWriter`, without per-Unit transition or binding lists. Native writers
+record each row immediately, validate stages and reject sealing an unfinished group.
+Failures abort the owner; the exact duplicate proof remains mandatory. The default
+resident compatibility writer explicitly materializes a group. The native route
+retains neither per-Unit node maps nor typed transition lists. Per-Sequence
+alternatives, transient typed IDs and other analysis stores remain separate
+obligations; this is not a whole-application heap bound or general admission proof.
+
+The direct snapshot dependency slice admits multiple Entries only when each has
+the same initial label, closed empty signature and empty seed. The official
+validator checks every Entry before issuing the certificate. Dependency discovery
+reads the shared definitions/call metadata once and enumerates every admitted
+Entry as a separate delivered site; paged output sorts complete identities.
+Return bindings remain Entry-specific in the factored CFG. Distinct labels,
+seeds or signatures do not borrow this proof and remain incomplete; there is no
+resident fallback in the default pipeline. The narrow correlated diamond retains
+its existing single-Entry proof. This is not general snapshot admission.
+
 `CfgBuildResult` registra `PublicationId`, versão AIR, options, o
 `ValidationResult` integral, capabilities requeridas sem intérprete, issues tipados
 da projeção e `Optional<CfgGraph>`. `CFG_BUILT` exige produto presente;
@@ -145,14 +201,15 @@ filesystem. Nenhuma falha anterior à Publication vira UNSUPPORTED_INPUT do kern
 
 ## Lifetime e retenção
 
-`Publication` é snapshot imutável compartilhado. O CFG não faz deep copy O(N) por
-padrão; pode reter referências/IDs AIR e manter índices derivados próprios.
+`Publication` é um snapshot imutável no adapter residente. O CFG não faz deep copy
+O(N) nem retém esse snapshot; conserva IDs AIR e fatos estruturais compactos.
 `CfgBuildResult` já registra `PublicationId`, versão/revisão, opções e preflight.
-`CfgGraph` retém exatamente a Publication original; EntryNode/SequenceNode
-retêm os objetos AIR originais, incluindo IDs, operands, origins e metadata.
+`CfgGraph` retém `CfgSource` e uma testemunha fraca somente para admissão residente;
+EntryNode/SequenceNode não retêm objetos AIR completos. Operands, origins e metadata
+permanecem sob a porta `ProgramStore`.
 NormalExit sintético registra PublicationId/UnitId/EntryId sem fabricar origem.
-HaltExit retém Operations.Halt original por ocorrência; activationEntry fica na
-transição. Instructions e ordem pertencem à Sequence original, sem deep copy.
+HaltExit retém OperationId/HaltKind por ocorrência; activationEntry fica na
+transição. SequenceNode conserva a ordem pelos OperationIds, sem payload AIR.
 `preciseControlCapabilities()` registra o consumo de memory.regions@1 apenas para
 controle; registry/preflight de extensões continuam explícitos.
 Nenhum índice muda a AIR. Não há consulta lazy ao produtor nem
@@ -187,14 +244,34 @@ por diagnóstico tipado e contagens totais, sem produzir grafo ou resultado sem�
 
 ## Full file pipeline composition
 
-`analysis-pipeline <AIR> <CFG> <dependencies> [--source-evidence <source>]`
+`analysis-pipeline <AIR> <CFG> <dependencies> [--source-evidence <source>] [--experimental-physical]`
 is an outer launcher with direct cfg-kernel/cfg-adapters dependencies. It admits
 one strict immutable AIR snapshot and the complete digest-bound source evidence
 before exporting. CFG uses conservative defaults; dependencies retain their
-partial-analysis projection. Export graph ownership ends before analysis begins.
+partial-analysis projection. All public modes now use one checked typed paged
+snapshot, the existing general session/planner and shared target qualification.
+There is no resident Publication fallback. Full mandatory AIR rules run through
+the official producer's borrowed views outside its earlier proven slices; actual
+undecided obligations still reject complete dependency production.
+
+Executable and source analysis finish before either destination is replaced. The
+CFG projection can retire after its export, before dependency encoding. Source
+values borrow the input's PageStore and resource owner, without closing the owner.
+The explicit resident route is retained only as a package-level differential
+reference. Native v3 preserves sites, edges, origins, artifacts, uncertainties,
+CALL/FILE/source evidence and unified dependency programs, including physical
+choice candidates and their supports. A digest mismatch rejects before export.
 Each destination uses its existing atomic writer. If dependency delivery later
 fails, the completed CFG remains, matching the sequential file pipeline. Exit
 status remains nonzero; workers cannot certify the program as complete.
 Distinct input/destination paths and aliases are required. Compressed transports
 are supported through the existing adapters; bundles and incomplete AIR remain
 on the separate dependency CLI. No process-global snapshot or execution cache.
+
+PARTIAL: result lists, qualification indexes and general validation ID/proof caches
+remain resident. Borrowed pages and metered output do not establish global heap or
+spill bounds. Source demand indexes, proof/node closure, native qualification and
+target-resolution loops now observe the common owner's productive INDEX/DOMAIN
+safepoints. Source decoding and owning-model constructor validation still need
+internal safepoints; the configured shared eight-minute deadline is not yet a
+whole-phase qualification.

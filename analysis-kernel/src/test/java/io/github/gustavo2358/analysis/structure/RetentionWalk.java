@@ -13,7 +13,7 @@ final class RetentionWalk {
             Object value=pending.removeLast(); if(!seen.add(value)) continue;
             if(value instanceof Map<?,?> map) {
                 map.forEach((k,v)->{if(k!=null)pending.add(k);if(v!=null)pending.add(v);});
-            } else if(value instanceof Collection<?> collection) {
+            } else if(value instanceof Collection<?> collection && !(value instanceof io.github.gustavo2358.analysis.cfg.domain.CfgTransitionTable)) {
                 for(Object child:collection) if(child!=null) pending.add(child);
             } else if(value instanceof Optional<?> optional) {
                 optional.ifPresent(pending::add);

@@ -33,6 +33,7 @@ public final class PossibleValuesAnalysis implements AnalysisDefinition<Possible
                 refusal.getMessage().contains("STORAGE")?1:0,refusal.getMessage().contains("EFFECT")?1:0);
         }
     }
+    @Override public long stateFingerprint(PossibleValuesState state){return state.fingerprint();}
     @Override public Direction direction(){return Direction.FORWARD;}
     @Override public PossibleValuesState bottom(){return PossibleValuesState.unreachable();}
     @Override public Iterable<Boundary<PossibleValuesState>> boundaries(AnalysisSession session) {
@@ -53,13 +54,15 @@ public final class PossibleValuesAnalysis implements AnalysisDefinition<Possible
     }
     @Override public PossibleValuesState transferBlock(AnalysisPoint point,PossibleValuesState anchor,DomainWork domainWork) {
         if(!(point.node().source() instanceof CfgNode.SequenceNode node))return anchor;
+        var sequence=profile.session.index().sequence(point.node());
         var state=anchor;
-        for(var operation:node.source().instructions()){domainWork.operationTransferred();state=profile.transferOperation(state,operation,work);}
-        domainWork.operationTransferred();return profile.transferOperation(state,node.source().terminator(),work);
+        for(var operation:sequence.instructions()){domainWork.operationTransferred();state=profile.transferOperation(state,operation,work);}
+        domainWork.operationTransferred();return profile.transferOperation(state,sequence.terminator(),work);
     }
     @Override public PossibleValuesState transferEdge(AnalysisPoint point,CfgTransition edge,PossibleValuesState state,DomainWork domainWork){
-        if(!state.isReached()||!(point.node().source() instanceof CfgNode.SequenceNode node)
-                ||!(node.source().terminator() instanceof Operations.Branch branch))return state;
+        if(!state.isReached()||!(point.node().source() instanceof CfgNode.SequenceNode))return state;
+        var terminator=profile.session.index().sequence(point.node()).terminator();
+        if(!(terminator instanceof Operations.Branch branch))return state;
         int requested=edge.kind()==CfgTransition.Kind.BRANCH_TRUE?TextPredicate.TRUE:edge.kind()==CfgTransition.Kind.BRANCH_FALSE?TextPredicate.FALSE:TextPredicate.BOTH;
         int possible=TextPredicate.truth(branch.predicate(),place->{
             if(!(place instanceof Places.ObjectPlace named))return TextPredicate.Text.unknown();
@@ -74,7 +77,10 @@ public final class PossibleValuesAnalysis implements AnalysisDefinition<Possible
     public Execution execute() {
         var definition=new PossibleValuesAnalysis(profile);
         var result=DataflowSolver.solve(profile.session,definition);
-        return new Execution(profile,result,definition.work.snapshot());
+        profile.relations.retain(result);
+        var metrics=new LinkedHashMap<>(definition.work.snapshot());
+        metrics.putAll(profile.relations.metrics());
+        return new Execution(profile,result,Map.copyOf(metrics));
     }
     public static final class Execution {
         private final TextProfile profile;

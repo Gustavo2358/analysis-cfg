@@ -4,7 +4,9 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/** Observations of successful index construction, never admission thresholds. */
+/** Observations of successful index construction, never admission thresholds.
+ * edgesIndexed is logical contextual coverage; cfg.transitions/adjacency.transitions visits
+ * count physical rows processed, which are smaller for a factored projection. */
 public record IndexMetrics(long nodesIndexed, long edgesIndexed, long operationsIndexed,
                            long referencesResolved, long objectsIndexed, long locationsIndexed,
                            long structuralVisits, Map<String, Long> visitsByCollection) {

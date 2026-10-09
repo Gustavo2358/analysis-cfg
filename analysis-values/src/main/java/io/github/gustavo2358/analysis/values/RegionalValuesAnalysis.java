@@ -4,7 +4,6 @@ import io.github.gustavo2358.air.model.*;
 import io.github.gustavo2358.air.model.Ids.*;
 import io.github.gustavo2358.analysis.cfg.domain.*;
 import io.github.gustavo2358.analysis.query.*;
-import io.github.gustavo2358.analysis.rd.ReachingDefinitions;
 import io.github.gustavo2358.analysis.rd.DefinitionEvent;
 import io.github.gustavo2358.analysis.solver.*;
 import io.github.gustavo2358.analysis.storage.*;
@@ -22,39 +21,83 @@ public final class RegionalValuesAnalysis {
     private final StatementEffects effects;
     private final StoragePartition partition;
     private final List<StorageIndex.Location> bases;
-    private final Map<StorageId,Integer> ordinals=new HashMap<>();
+    private final Map<StorageId,Integer> residentOrdinals=new HashMap<>();
+    private final NativeMetadata nativeMetadata;
     private final List<List<Integer>> groups;
-    private final int[] groupOf,groupSizes;
-    private final List<List<StoragePartition.Segment>> groupSegments;
-    private final Map<StoragePartition.Segment,Integer> levels=new HashMap<>();
+    private final List<Integer> groupOf,groupSizes;
+    private final List<List<Integer>> groupSegments;
+    private final Map<StoragePartition.Segment,Integer> residentLevels=new HashMap<>();
     private final Map<StatementEffects.Write,StorageIndex.Resolution> preparedReads=new IdentityHashMap<>();
     // Each compiled batch retains all writes, including scoped writes without logical candidates.
     private final Map<List<Plan>,List<StatementEffects.Write>> batchWrites=new IdentityHashMap<>();
     private final Map<StatementEffects.Write,Set<ObjectId>> closureImpacts=new IdentityHashMap<>();
-    private final Map<Operation,List<Plan>> operations=new IdentityHashMap<>();
-    private final Map<Operation,Map<Control.OutcomeKey,List<Plan>>> outcomes=new IdentityHashMap<>();
-    private final Map<Operation,List<Plan>> otherwise=new IdentityHashMap<>();
+    private final Map<OperationId,List<Plan>> operations;
+    private final Map<OperationId,Map<Control.OutcomeKey,List<Plan>>> outcomes;
+    private final Map<OperationId,List<Plan>> otherwise;
     private final Map<EntryId,List<Plan>> initial=new HashMap<>();
     private final List<ValueFact.Support> events=new ArrayList<>();
     private final List<PreparedEvent> eventDetails=new ArrayList<>();
     private final Set<UnitId> controlOpen=new HashSet<>();
-    private record Plan(StatementEffects.Write write,StatementEffects.Target target,int event,StatementEffects.LogicalTarget logical) { }
+    private record TargetRef(StatementEffects.Write write,int ordinal,StatementEffects.Target replacement) {
+        StatementEffects.Target value(){return replacement!=null?replacement:write.targets().get(ordinal);}
+        Optional<StorageIndex.BaseAddress> address(){return replacement!=null?Optional.empty():StatementEffects.address(write,ordinal);}
+        boolean sourceApplicable(){return replacement!=null?replacement.sourceApplicable():StatementEffects.sourceApplicable(write,ordinal);}
+        Optional<StorageRange> range(){
+            var address=address();if(address.isEmpty())return value().location().range();var source=address.orElseThrow();
+            return source.owner().regionAt(source.ordinal())?Optional.of(new StorageRange(BigInteger.ZERO,source.owner().extentAt(source.ordinal()))):Optional.empty();
+        }
+    }
+    private record Plan(StatementEffects.Write write,TargetRef reference,int event,StatementEffects.LogicalTarget logical) {
+        StatementEffects.Target target(){return reference==null?null:reference.value();}
+    }
     private record LogicalValue(LogicalText text,int event) {
         LogicalValue(Values.TextValue text,int event){this(LogicalText.of(text.value()),event);}
     }
-    private record PreparedEvent(Operation operation,Entries.InitialCondition initial,StatementEffects.Write write,StatementEffects.Target target,Optional<Control.OutcomeKey> outcome,StatementEffects.LogicalTarget logical) {
+    private record PreparedEvent(StatementEffects.OperationRef occurrence,Entries.InitialCondition initial,StatementEffects.Write write,TargetRef reference,Optional<Control.OutcomeKey> outcome,StatementEffects.LogicalTarget logical) {
+        StatementEffects.Target target(){return reference==null?null:reference.value();}
+        Operation operation(){return occurrence==null?null:occurrence.value();}
         DefinitionEvent definition(EntryId entry) {
+            var operation=operation();
             if(logical!=null)return operation==null?DefinitionEvent.logicalInitial(entry,initial,write.slot(),logical.object(),write.destination()):DefinitionEvent.logicalWrite(entry,operation,write,logical,outcome);
-            return operation==null?DefinitionEvent.initial(entry,initial,write.slot(),target,write.destination()):DefinitionEvent.write(entry,operation,write,target,outcome);
+            return operation==null?DefinitionEvent.initial(entry,initial,write.slot(),target(),write.destination()):DefinitionEvent.write(entry,operation,write,target(),outcome);
         }
     }
     private sealed interface Content permits Bytes,Scalar { }
     private record Bytes(ByteImage image) implements Content { }
     private record ReadCapture(Map<Integer,Content> contents,Map<StatementEffects.Write,Integer> choices) { }
-    private record CapturedRead(StorageIndex.Location sourceRange,StorageIndex.Location sourceContribution,StorageIndex.Location destinationContribution) { }
-    private record Trace(StorageIndex.Location observed,Optional<Values.BytesValue> bytes,int producer,Optional<StorageIndex.Location> original,
+    /** A private evidence address, not another owning copy of an AIR header. */
+    private static final class LocationRef {
+        private final ProgramStore.StorageInventory owner;
+        private final int ordinal;
+        private final Optional<StorageRange> range;
+        private final StorageIndex.Location resident;
+        LocationRef(StorageIndex.Location resident){this.resident=Objects.requireNonNull(resident);owner=null;ordinal=-1;range=resident.range();}
+        LocationRef(StorageIndex.BaseAddress address,Optional<StorageRange> range){owner=address.owner();ordinal=address.ordinal();this.range=Objects.requireNonNull(range);resident=null;}
+        LocationRef borrow(StorageIndex.Location location){
+            if(owner==null)return new LocationRef(location);
+            int at=owner.ordinal(location.base().id());if(at<0)throw new IllegalArgumentException("foreign trace location");
+            return new LocationRef(new StorageIndex.BaseAddress(owner,at),location.range());
+        }
+        StorageIndex.Location value(){return owner==null?resident:new StorageIndex.Location(owner.at(ordinal).header(),range);}
+        Optional<StorageRange> range(){return range;}
+        StorageIndex.ContextualLocation in(EntryId entry){return value().in(entry);}
+        @Override public boolean equals(Object other){
+            return this==other||other instanceof LocationRef reference&&owner==reference.owner
+                &&(owner==null?resident.equals(reference.resident):ordinal==reference.ordinal&&range.equals(reference.range));
+        }
+        // Never hash the inventory: Map.hashCode would decode every cold header.
+        // Omitting owner from the hash is legal; equality still checks owner identity.
+        @Override public int hashCode(){return owner==null?resident.hashCode():31*(31+ordinal)+range.hashCode();}
+    }
+    private LocationRef reference(StorageIndex.Location location){
+        if(nativeMetadata==null)return new LocationRef(location);
+        int source=nativeMetadata.inventory.ordinal(location.base().id());if(source<0)throw new IllegalArgumentException("foreign trace location");
+        return new LocationRef(new StorageIndex.BaseAddress(nativeMetadata.inventory,source),location.range());
+    }
+    private record CapturedRead(LocationRef sourceRange,LocationRef sourceContribution,LocationRef destinationContribution) { }
+    private record Trace(LocationRef observed,Optional<Values.BytesValue> bytes,int producer,Optional<LocationRef> original,
                          Map<Integer,Set<CapturedRead>> captures,Set<Integer> gaps,Set<String> reasons,Set<ByteImage.LogicalSupport> logicalSupports) {
-        Trace(StorageIndex.Location observed,Optional<Values.BytesValue> bytes,int producer,Optional<StorageIndex.Location> original,Map<Integer,Set<CapturedRead>> captures,Set<Integer> gaps,Set<String> reasons){this(observed,bytes,producer,original,captures,gaps,reasons,Set.of());}
+        Trace(LocationRef observed,Optional<Values.BytesValue> bytes,int producer,Optional<LocationRef> original,Map<Integer,Set<CapturedRead>> captures,Set<Integer> gaps,Set<String> reasons){this(observed,bytes,producer,original,captures,gaps,reasons,Set.of());}
         Trace {
             logicalSupports=Set.copyOf(logicalSupports);
             var immutable=new HashMap<Integer,Set<CapturedRead>>();captures.forEach((key,value)->immutable.put(key,Set.copyOf(value)));captures=Map.copyOf(immutable);gaps=Set.copyOf(gaps);reasons=Set.copyOf(reasons);
@@ -62,8 +105,9 @@ public final class RegionalValuesAnalysis {
         Trace withGap(int gap){var next=new HashSet<>(gaps);next.add(gap);return new Trace(observed,bytes,producer,original,captures,next,reasons,logicalSupports);}
         Trace captured(int event,StorageIndex.Location source,StorageIndex.Location destination) {
             var next=new HashMap<>(captures);var contributions=new HashSet<>(next.getOrDefault(event,Set.of()));
-            contributions.add(new CapturedRead(source,observed,destination));next.put(event,Set.copyOf(contributions));
-            return new Trace(destination,bytes,producer,original,next,gaps,reasons,logicalSupports);
+            var target=observed.borrow(destination);
+            contributions.add(new CapturedRead(observed.borrow(source),observed,target));next.put(event,Set.copyOf(contributions));
+            return new Trace(target,bytes,producer,original,next,gaps,reasons,logicalSupports);
         }
     }
     private record Scalar(Optional<LogicalText> text,Set<Integer> producers,Set<String> reasons,Set<Integer> sourceGaps,List<Trace> traces) implements Content {
@@ -78,35 +122,35 @@ public final class RegionalValuesAnalysis {
     public static Admission prepare(AnalysisSession session,StorageAnalysisMode mode) {
         Objects.requireNonNull(mode);
         var effects=new StatementEffects(new StorageIndex(session));
-        // Share validated original entry facts; operational alias impacts never decide admission.
-        var admission=ReachingDefinitions.prepare(effects);
-        if(admission.status()!=ReachingDefinitions.Status.ACCEPTED)
-            return new Admission(admission.status()==ReachingDefinitions.Status.INVALID_INPUT?Status.INVALID_INPUT:Status.UNSUPPORTED,admission.reason(),Optional.empty());
-        return new Admission(Status.ACCEPTED,null,Optional.of(new RegionalValuesAnalysis(effects,admission.analysis().orElseThrow().partition(),mode)));
+        // Partition is structural preparation; do not compile a discarded RD engine to obtain it.
+        return new Admission(Status.ACCEPTED,null,Optional.of(new RegionalValuesAnalysis(effects,new StoragePartition(effects),mode)));
     }
     private RegionalValuesAnalysis(StatementEffects effects,StoragePartition partition,StorageAnalysisMode mode) {
         this.mode=mode;
         this.effects=effects;this.partition=partition;session=effects.storage().session();
+        operations=new OperationTable<>(session.index().store());outcomes=new OperationTable<>(session.index().store());otherwise=new OperationTable<>(session.index().store());
         logicalCellAliases=effects.storage().declarations().stream().filter(o->o.storage() instanceof Memory.CellBinding)
             .collect(java.util.stream.Collectors.groupingBy(o->((Memory.CellBinding)o.storage()).storage(),
                 java.util.stream.Collectors.mapping(Memory.ObjectDeclaration::id,java.util.stream.Collectors.toList())));
-        bases=mode.physical()?effects.storage().bases().stream().map(b->effects.storage().whole(b.header().id()))
+        var inventory=mode.physical()?session.index().store().storageInventory():Optional.<ProgramStore.StorageInventory>empty();
+        nativeMetadata=inventory.isPresent()?new NativeMetadata(inventory.orElseThrow(),partition):null;
+        bases=nativeMetadata!=null?nativeMetadata.bases:mode.physical()?effects.storage().bases().stream().map(b->effects.storage().whole(b.header().id()))
             .sorted(Comparator.comparing((StorageIndex.Location l)->l.base().id().localId())).toList():List.of();
-        for(int i=0;i<bases.size();i++)ordinals.put(bases.get(i).base().id(),i);
+        if(nativeMetadata==null)for(int i=0;i<bases.size();i++)residentOrdinals.put(bases.get(i).base().id(),i);
         // Partition ordinals follow the AIR storage inventory. DAG variable order must
         // instead be canonical, including allocation/work metrics in the public wire.
-        for(var base:bases)for(var segment:partition.intersecting(base))levels.put(segment,levels.size());
+        if(nativeMetadata==null)for(var base:bases)for(var segment:partition.intersecting(base))residentLevels.put(segment,residentLevels.size());
         for(var statement:effects.statements()) {
-            var op=statement.operation();operations.put(op,compile(statement.writes(),op.header().id(),op.header().origin(),List.of(),op,null,Optional.of(Control.NormalOutcome.INSTANCE)));
-            otherwise.put(op,compile(statement.otherwise(),op.header().id(),op.header().origin(),List.of(),op,null,Optional.empty()));
+            var op=statement.operation();operations.put(op.header().id(),compile(statement.writes(),op.header().id(),op.header().origin(),List.of(),statement.reference(),null,Optional.of(Control.NormalOutcome.INSTANCE)));
+            otherwise.put(op.header().id(),compile(statement.otherwise(),op.header().id(),op.header().origin(),List.of(),statement.reference(),null,Optional.empty()));
             var choices=new HashMap<Control.OutcomeKey,List<Plan>>();
-            statement.outcomes().forEach((key,writes)->choices.put(key,compile(writes,op.header().id(),op.header().origin(),List.of(),op,null,Optional.of(key))));
-            outcomes.put(op,Map.copyOf(choices));
+            statement.outcomes().forEach((key,writes)->choices.put(key,compile(writes,op.header().id(),op.header().origin(),List.of(),statement.reference(),null,Optional.of(key))));
+            outcomes.put(op.header().id(),Map.copyOf(choices));
             if(op instanceof Operations.Invoke i&&i.outcomes().remainder() instanceof Scopes.WithinControl)
                 controlOpen.add(op.header().id().unit());
         }
         // Coverage describes the projection, never a write, target, or propagated image.
-        for(var unit:session.index().publication().units())if(session.index().partialControl(unit.id()) || session.index().unprovedPreconditions(unit.id()))controlOpen.add(unit.id());
+        for(var unit:session.index().store().units())if(session.index().partialControl(unit.id()) || session.index().unprovedPreconditions(unit.id()))controlOpen.add(unit.id());
         for(var context:session.contexts()) {
             var seeds=new ArrayList<Plan>();int slot=0;var seededLocations=new HashSet<StorageIndex.Location>();
             // Simultaneous strong facts initialize first; possible support and open entry
@@ -127,39 +171,159 @@ public final class RegionalValuesAnalysis {
                     for(var plan:compile(List.of(write),condition.place().header().id(),condition.origin(),condition.premises(),null,condition,Optional.empty())) {
                         if(plan.logical()!=null){seeds.add(plan);continue;}
                         var target=plan.target();
+                        var reference=plan.reference();
                         // Equal simultaneous strong literals retain both supports; a possible
                         // entry uses MAY from the outset, preserving unspecified entry content.
                         var selectedWrite=plan.write();
                         if(target.location().range().isEmpty()&&target.strength()==StatementEffects.Strength.MUST&&!seededLocations.add(target.location())) {
                             target=new StatementEffects.Target(target.location(),StatementEffects.Strength.MAY,target.sourceApplicable(),target.premises(),target.reasons());
                             selectedWrite=new StatementEffects.Write(selectedWrite.slot(),selectedWrite.occurrence(),selectedWrite.destination(),selectedWrite.source(),selectedWrite.targets(),selectedWrite.selection(),StatementEffects.Strength.MAY);
+                            reference=new TargetRef(selectedWrite,reference.ordinal(),target);
                         }
-                        seeds.add(new Plan(selectedWrite,target,plan.event(),null));
+                        seeds.add(new Plan(selectedWrite,reference,plan.event(),null));
                     }
                 }
             }
             var batch=Collections.unmodifiableList(new ArrayList<>(seeds));
-            batchWrites.put(batch,seeds.stream().map(Plan::write).distinct().toList());
+            var seedWrites=new OccurrenceMap<Boolean>();for(var plan:seeds)seedWrites.put(plan.write(),Boolean.TRUE);
+            batchWrites.put(batch,List.copyOf(seedWrites.keySet()));
             initial.put(context.entry().id(),batch);
         }
         // Static read/write connectivity preserves branch correlations before the first copy executes.
-        int[] parent=new int[bases.size()];for(int i=0;i<parent.length;i++)parent[i]=i;
-        var allPlans=new ArrayList<Plan>();operations.values().forEach(allPlans::addAll);otherwise.values().forEach(allPlans::addAll);
-        outcomes.values().forEach(m->m.values().forEach(allPlans::addAll));initial.values().forEach(allPlans::addAll);
-        for(var plan:allPlans)if(plan.logical==null&&plan.target.sourceApplicable()) {
+        try(var parent=nativeMetadata!=null?nativeMetadata.column(bases.size()):ProgramStore.residentColumn(bases.size())){
+            for(int i=0;i<bases.size();i++)parent.set(i,i);
+            for(var batch:operations.values())connect(parent,batch);
+            for(var batch:otherwise.values())connect(parent,batch);
+            for(var choices:outcomes.values())for(var batch:choices.values())connect(parent,batch);
+            for(var batch:initial.values())connect(parent,batch);
+            GroupDirectory directory;
+            if(nativeMetadata!=null)directory=nativeMetadata.groupDirectory(parent);
+            else{
+                var components=new TreeMap<Integer,List<Integer>>();
+                for(int i=0;i<bases.size();i++)components.computeIfAbsent(representative(parent,i),ignored->new ArrayList<>()).add(i);
+                var rows=components.values().stream().map(List::copyOf).toList();
+                var owners=new ArrayList<Integer>(Collections.nCopies(bases.size(),0));
+                for(int group=0;group<rows.size();group++)for(int rank:rows.get(group))owners.set(rank,group);
+                directory=new GroupDirectory(rows,List.copyOf(owners),rows.stream().map(List::size).toList());
+            }
+            groups=directory.groups();groupOf=directory.owners();groupSizes=directory.sizes();
+            groupSegments=nativeMetadata!=null?nativeMetadata.groupSegments(groups):groups.stream().map(group->group.stream().flatMap(i->partition.intersecting(bases.get(i)).stream())
+                .sorted(Comparator.comparingInt(this::level)).map(StoragePartition.Segment::ordinal).toList()).toList();
+        }catch(RuntimeException|Error failure){if(nativeMetadata!=null)nativeMetadata.release(failure);throw failure;}
+    }
+    private record GroupDirectory(List<List<Integer>> groups,List<Integer> owners,List<Integer> sizes) { }
+    private void connect(ProgramStore.OrdinalColumn parent,List<Plan> plans){
+        for(var plan:plans)if(plan.logical==null&&plan.reference.sourceApplicable()) {
             var reads=readSource(plan.write);
             if(reads!=null)for(var source:reads.candidates()) {
-                int a=representative(parent,ordinals.get(source.location().base().id()));
-                int b=representative(parent,ordinals.get(plan.target.location().base().id()));
-                parent[Math.max(a,b)]=Math.min(a,b);
+                int a=representative(parent,ordinal(source.location().base().id()));
+                int b=representative(parent,ordinal(plan));parent.set(Math.max(a,b),Math.min(a,b));
             }
         }
-        var components=new TreeMap<Integer,List<Integer>>();
-        for(int i=0;i<bases.size();i++)components.computeIfAbsent(representative(parent,i),ignored->new ArrayList<>()).add(i);
-        groups=components.values().stream().map(List::copyOf).toList();groupOf=new int[bases.size()];groupSizes=groups.stream().mapToInt(List::size).toArray();
-        for(int g=0;g<groups.size();g++)for(int ordinal:groups.get(g))groupOf[ordinal]=g;
-        groupSegments=groups.stream().map(group->group.stream().flatMap(i->partition.intersecting(bases.get(i)).stream())
-            .sorted(Comparator.comparingInt(levels::get)).toList()).toList();
+    }
+    private int ordinal(StorageId identity){
+        if(nativeMetadata!=null)return nativeMetadata.ordinal(identity);
+        return Objects.requireNonNull(residentOrdinals.get(identity),"foreign storage base");
+    }
+    private int ordinal(Plan plan){
+        if(nativeMetadata!=null){var address=plan.reference.address();if(address.isPresent())return nativeMetadata.ordinal(address.orElseThrow());}
+        return ordinal(plan.target().location().base().id());
+    }
+    private List<Integer> segmentOrdinals(Plan plan){
+        if(nativeMetadata!=null){var address=plan.reference.address();if(address.isPresent())return partition.ordinals(address.orElseThrow(),plan.reference.range());}
+        return partition.intersecting(plan.target().location()).stream().map(StoragePartition.Segment::ordinal).toList();
+    }
+    /** The compiler's canonical Write occurrence is reused across its target plans.
+     * Preserve first-seen occurrence order without hashing all cold targets per plan. */
+    private static final class OccurrenceMap<V> extends AbstractMap<StatementEffects.Write,V> {
+        private final IdentityHashMap<StatementEffects.Write,V> values=new IdentityHashMap<>();
+        private final List<StatementEffects.Write> order=new ArrayList<>();
+        @Override public V get(Object key){return values.get(key);}
+        @Override public boolean containsKey(Object key){return values.containsKey(key);}
+        @Override public V put(StatementEffects.Write key,V value){if(!values.containsKey(key))order.add(key);return values.put(key,value);}
+        @Override public int size(){return order.size();}
+        @Override public Set<Entry<StatementEffects.Write,V>> entrySet(){return new AbstractSet<>(){
+            @Override public int size(){return order.size();}
+            @Override public Iterator<Entry<StatementEffects.Write,V>> iterator(){var rows=order.iterator();return new Iterator<>(){
+                @Override public boolean hasNext(){return rows.hasNext();}
+                @Override public Entry<StatementEffects.Write,V> next(){var key=rows.next();return new SimpleImmutableEntry<>(key,values.get(key));}
+            };}
+        };}
+    }
+    private int level(StoragePartition.Segment segment){
+        if(nativeMetadata!=null)return level(segment.ordinal());
+        return Objects.requireNonNull(residentLevels.get(segment),"foreign storage segment");
+    }
+    private int level(int ordinal){
+        if(nativeMetadata!=null)return Math.toIntExact(nativeMetadata.segmentLevels.get(ordinal));
+        return Objects.requireNonNull(residentLevels.get(partition.segments().get(ordinal)),"foreign storage segment");
+    }
+    /** Canonical base/segment order is working metadata owned by the admitted source.
+     * No full StorageId, header or Segment is cached by these private columns. */
+    private static final class NativeMetadata {
+        private final ProgramStore.StorageInventory inventory;
+        private final StoragePartition partition;
+        private final List<ProgramStore.OrdinalColumn> owned=new ArrayList<>();
+        private ProgramStore.OrdinalColumn sourceOrder,ranks,segmentLevels;
+        private final List<StorageIndex.Location> bases;
+        NativeMetadata(ProgramStore.StorageInventory inventory,StoragePartition partition){
+            this.inventory=inventory;this.partition=partition;
+            try{
+                sourceOrder=inventory.canonicalOrder();owned.add(sourceOrder);ranks=column(inventory.size());
+                segmentLevels=column(partition.segments().size());
+                for(int rank=0;rank<inventory.size();rank++)ranks.set(sourceOrder.get(rank),rank);
+                bases=new ProgramStore.BorrowedList<>(inventory.size(),rank->{
+                    var base=inventory.at(Math.toIntExact(sourceOrder.get(rank)));
+                    return new StorageIndex.Location(base.header(),base instanceof Memory.Region region
+                        ?Optional.of(new StorageRange(BigInteger.ZERO,region.extent())):Optional.empty());
+                },()->inventory.size());
+                int level=0;
+                for(int rank=0;rank<inventory.size();rank++)for(var segment:segments(rank)){
+                    segmentLevels.set(segment,level++);
+                }
+            }catch(RuntimeException|Error failure){release(failure);throw failure;}
+        }
+        private ProgramStore.OrdinalColumn column(long length){var result=inventory.column(length);owned.add(result);return result;}
+        private void release(Throwable failure){for(var column:owned)try{column.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}}
+        int ordinal(StorageId identity){int source=inventory.ordinal(identity);if(source<0)throw new IllegalArgumentException("foreign storage base");return Math.toIntExact(ranks.get(source));}
+        int ordinal(StorageIndex.BaseAddress address){if(address.owner()!=inventory)throw new IllegalArgumentException("foreign storage descriptor owner");return Math.toIntExact(ranks.get(address.ordinal()));}
+        private List<Integer> segments(int rank){return partition.ordinals(new StorageIndex.BaseAddress(inventory,Math.toIntExact(sourceOrder.get(rank))),Optional.empty());}
+        GroupDirectory groupDirectory(ProgramStore.OrdinalColumn parent){
+            // Compress before sorting: comparison is immutable and ties retain canonical rank.
+            int count=inventory.size();for(int rank=0;rank<count;rank++)parent.set(rank,representative(parent,rank));
+            try(var order=inventory.order(count,(a,b)->Long.compare(parent.get(a),parent.get(b)))){
+                var members=column(count);var offsets=column(count+1L);var owners=column(count);var sizes=column(count);
+                int groups=0;long previous=-1,start=0;
+                for(int at=0;at<count;at++){
+                    int rank=Math.toIntExact(order.get(at));long root=parent.get(rank);
+                    if(root!=previous){
+                        if(groups>0)sizes.set(groups-1,at-start);
+                        offsets.set(groups++,at);start=at;previous=root;
+                    }
+                    members.set(at,rank);owners.set(rank,groups-1);
+                }
+                if(groups>0)sizes.set(groups-1,count-start);offsets.set(groups,count);
+                return new GroupDirectory(new ProgramStore.BorrowedList<>(groups,group->{
+                    long from=offsets.get(group),to=offsets.get(group+1L);
+                    return new ProgramStore.BorrowedList<>(Math.toIntExact(to-from),at->Math.toIntExact(members.get(from+at)),()->inventory.size());
+                },()->inventory.size()),new ProgramStore.BorrowedList<>(count,rank->Math.toIntExact(owners.get(rank)),()->inventory.size()),
+                    new ProgramStore.BorrowedList<>(groups,group->Math.toIntExact(sizes.get(group)),()->inventory.size()));
+            }
+        }
+        List<List<Integer>> groupSegments(List<List<Integer>> groups){
+            try{
+                var offsets=column(groups.size()+1L);var members=column(partition.segments().size());long at=0;
+                for(int group=0;group<groups.size();group++){
+                    offsets.set(group,at);
+                    for(var rank:groups.get(group))for(var segment:segments(rank))members.set(at++,segment);
+                }
+                offsets.set(groups.size(),at);
+                return new ProgramStore.BorrowedList<>(groups.size(),group->{
+                    long start=offsets.get(group),end=offsets.get(group+1L);
+                    return new ProgramStore.BorrowedList<>(Math.toIntExact(end-start),ordinal->Math.toIntExact(members.get(start+ordinal)),()->inventory.size());
+                },()->inventory.size());
+            }catch(RuntimeException|Error failure){release(failure);throw failure;}
+        }
     }
     private StorageIndex.Resolution readSource(StatementEffects.Write write) {
         if(write.source() instanceof StatementEffects.CapturedBytes copy)return copy.source();
@@ -169,22 +333,24 @@ public final class RegionalValuesAnalysis {
             return value instanceof Expressions.Read read?effects.storage().resolve(read.place()):null;
         });
     }
-    private static int representative(int[] parent,int member) {
-        int root=member;while(parent[root]!=root)root=parent[root];
-        while(parent[member]!=member){int next=parent[member];parent[member]=root;member=next;}return root;
+    private static int representative(ProgramStore.OrdinalColumn parent,int member) {
+        int root=member;while(parent.get(root)!=root)root=Math.toIntExact(parent.get(root));
+        while(parent.get(member)!=member){int next=Math.toIntExact(parent.get(member));parent.set(member,root);member=next;}return root;
     }
-    private List<Plan> compile(List<StatementEffects.Write> writes,Id evidence,OriginId origin,List<PremiseId> initialPremises,Operation operation,Entries.InitialCondition initial,Optional<Control.OutcomeKey> outcome) {
+    private List<Plan> compile(List<StatementEffects.Write> writes,Id evidence,OriginId origin,List<PremiseId> initialPremises,StatementEffects.OperationRef operation,Entries.InitialCondition initial,Optional<Control.OutcomeKey> outcome) {
         var result=new ArrayList<Plan>();
         for(var write:writes)closureImpacts.computeIfAbsent(write,w->{
             var impacted=new HashSet<ObjectId>();
+            if(logicalCellAliases.isEmpty())return Set.of();
             for(var target:w.targets())impacted.addAll(logicalCellAliases.getOrDefault(target.location().base().id(),List.of()));
             return Set.copyOf(impacted);
         });
-        if(mode.physical())for(var write:writes)for(var target:write.targets()) {
-            var premises=new LinkedHashSet<>(initialPremises);premises.addAll(target.premises());
+        if(mode.physical())for(var write:writes)for(int ordinal=0;ordinal<write.targets().size();ordinal++) {
+            var reference=new TargetRef(write,ordinal,null);
+            var premises=new LinkedHashSet<>(initialPremises);premises.addAll(StatementEffects.targetPremises(write,ordinal));
             var event=events.size();events.add(new ValueFact.Support(evidence,origin,ordered(premises)));
-            eventDetails.add(new PreparedEvent(operation,initial,write,target,outcome,null));
-            result.add(new Plan(write,target,event,null));
+            eventDetails.add(new PreparedEvent(operation,initial,write,reference,outcome,null));
+            result.add(new Plan(write,reference,event,null));
         }
         for(var write:writes)for(var logical:logicalTargets(write)) {
             int event=events.size();events.add(new ValueFact.Support(evidence,origin,ordered(initialPremises)));
@@ -211,21 +377,31 @@ public final class RegionalValuesAnalysis {
         private final SegmentMap<RegionalAlternatives.Node<Content>> bindings;
         private final Map<ObjectId,Set<LogicalValue>> logical;
         private final Set<ObjectId> closed;
-        private final int[] groupSizes;
-        private State(EntryId entry,SegmentMap<RegionalAlternatives.Node<Content>> bindings,Map<ObjectId,Set<LogicalValue>> logical,Set<ObjectId> closed,int[] groupSizes){this.entry=entry;this.bindings=bindings;this.logical=Map.copyOf(logical);this.closed=Set.copyOf(closed);this.groupSizes=groupSizes;}
+        private final List<Integer> groupSizes;
+        private final long fingerprint;
+        private State(EntryId entry,SegmentMap<RegionalAlternatives.Node<Content>> bindings,Map<ObjectId,Set<LogicalValue>> logical,Set<ObjectId> closed,List<Integer> groupSizes){this.entry=entry;this.bindings=bindings;this.logical=Map.copyOf(logical);this.closed=Set.copyOf(closed);this.groupSizes=groupSizes;fingerprint=Objects.hashCode(entry)+Long.rotateLeft(bindings.fingerprint(),13)+Long.rotateLeft(this.logical.hashCode(),29)+Long.rotateLeft(this.closed.hashCode(),47);}
         private RegionalAlternatives.Size size(){var roots=new ArrayList<RegionalAlternatives.Node<Content>>();bindings.forEach((g,node)->roots.add(node));return RegionalAlternatives.size(roots);}
         /** Encoded structural edges (one compact edge may carry multiple events), not worlds. */
         public long materializedAlternatives(){return size().alternatives();}
         public long decisionNodes(){return size().nodes();}
         public long maxComponentCardinality(){return size().maxComponent();}
         public boolean reached(){return entry!=null;}
-        public int explicitBases(){int[] count={0};bindings.forEach((g,node)->count[0]+=groupSizes[g]);return count[0];}
+        public int explicitBases(){int[] count={0};bindings.forEach((g,node)->count[0]+=groupSizes.get(g));return count[0];}
     }
-    private static final State BOTTOM=new State(null,new SegmentMap<>(),Map.of(),Set.of(),new int[0]);
+    private static final State BOTTOM=new State(null,new SegmentMap<>(),Map.of(),Set.of(),List.of());
     private Content unknown(StorageIndex.Location location,String reason) {return unknown(location,reason,-1);}
     private Content unknown(StorageIndex.Location location,String reason,int event) {
         if(location.range().isPresent())return new Bytes(ByteImage.unknown(location.range().get().end().map(e->e.subtract(location.range().get().start())),reason,event));
+        return unknown(reference(location),reason,event);
+    }
+    private Content unknown(LocationRef location,String reason,int event) {
         return new Scalar(Optional.empty(),Set.of(),Set.of(reason),Set.of(),List.of(new Trace(location,Optional.empty(),event,Optional.empty(),Map.of(),Set.of(),Set.of(reason))));
+    }
+    private Content unknownSegment(int ordinal,String reason){
+        var range=partition.range(ordinal);
+        if(range.isPresent()){var selected=range.orElseThrow();return new Bytes(ByteImage.unknown(selected.end().map(end->end.subtract(selected.start())),reason,-1));}
+        var address=partition.address(ordinal);if(address.isPresent())return unknown(new LocationRef(address.orElseThrow(),range),reason,-1);
+        return unknown(partition.segments().get(ordinal).location(),reason);
     }
     final class Engine implements AnalysisDefinition<State> {
         long contentReads,contentUpdates,alternativeVisits,physicalGroupsApplied,physicalWritesApplied,maxLogicalCells,maxLogicalValues;
@@ -250,7 +426,7 @@ public final class RegionalValuesAnalysis {
         private RegionalAlternatives.Node<Content> value(State state,int group) {
             contentReads++;var present=state.bindings.get(group);
             return present!=null?present:defaults.computeIfAbsent(group,g->{
-                var values=new TreeMap<Integer,Content>();for(var segment:groupSegments.get(g))values.put(levels.get(segment),unknown(segment.location(),"UNSPECIFIED_ENTRY_CONTENT"));
+                var values=new TreeMap<Integer,Content>();for(var segment:groupSegments.get(g))values.put(level(segment),unknownSegment(segment,"UNSPECIFIED_ENTRY_CONTENT"));
                 return relations.singleton(values);
             });
         }
@@ -258,7 +434,7 @@ public final class RegionalValuesAnalysis {
         private Content content(Map<Integer,Content> selected,int ordinal) {
             var location=bases.get(ordinal);Content result=unknown(location,"UNSPECIFIED_ENTRY_CONTENT");
             for(var segment:partition.intersecting(location)) {
-                var piece=selected.get(levels.get(segment));if(piece==null)continue;
+                var piece=selected.get(level(segment));if(piece==null)continue;
                 result=result instanceof Bytes bytes?new Bytes(bytes.image().write(segment.location().range().orElseThrow(),((Bytes)piece).image())):piece;
             }
             return result;
@@ -266,13 +442,13 @@ public final class RegionalValuesAnalysis {
         private List<Map<StatementEffects.Write,Integer>> sourceSelections(List<Plan> plans) {
             // An alternative place reads ONE candidate. Combining all candidates' components
             // would enumerate unrelated worlds even though the expression is a choice.
-            var writes=new LinkedHashSet<StatementEffects.Write>();
-            for(var plan:plans)if(plan.logical==null&&plan.target.sourceApplicable()&&readSource(plan.write)!=null)writes.add(plan.write);
+            var writes=new OccurrenceMap<Boolean>();
+            for(var plan:plans)if(plan.logical==null&&plan.reference.sourceApplicable()&&readSource(plan.write)!=null)writes.put(plan.write,Boolean.TRUE);
             List<Map<StatementEffects.Write,Integer>> selections=List.of(Map.of());
-            for(var write:writes) {
+            for(var write:writes.keySet()) {
                 var next=new ArrayList<Map<StatementEffects.Write,Integer>>();int count=readSource(write).candidates().size();
                 for(var prior:selections)for(int i=0;i<Math.max(1,count);i++) {
-                    var choice=new HashMap<>(prior);choice.put(write,count==0?-1:i);next.add(Map.copyOf(choice));
+                    var choice=new OccurrenceMap<Integer>();choice.putAll(prior);choice.put(write,count==0?-1:i);next.add(Collections.unmodifiableMap(choice));
                 }
                 selections=List.copyOf(next);
             }
@@ -280,13 +456,13 @@ public final class RegionalValuesAnalysis {
         }
         private Set<Integer> readSegments(Map<StatementEffects.Write,Integer> choices) {
             var selected=new HashSet<Integer>();
-            choices.forEach((write,i)->{if(i>=0)for(var segment:partition.intersecting(readSource(write).candidates().get(i).location()))selected.add(levels.get(segment));});
+            choices.forEach((write,i)->{if(i>=0)for(var segment:partition.intersecting(readSource(write).candidates().get(i).location()))selected.add(level(segment));});
             return Set.copyOf(selected);
         }
         private List<Content> contents(State state,StorageIndex.Location location) {
-            int ordinal=ordinals.get(location.base().id());var selected=new HashSet<Integer>();
-            for(var segment:partition.intersecting(location))selected.add(levels.get(segment));
-            return relations.selections(relations.project(value(state,groupOf[ordinal]),selected)).stream().map(c->content(c,ordinal)).toList();
+            int ordinal=ordinal(location.base().id());var selected=new HashSet<Integer>();
+            for(var segment:partition.intersecting(location))selected.add(level(segment));
+            return relations.selections(relations.project(value(state,groupOf.get(ordinal)),selected)).stream().map(c->content(c,ordinal)).toList();
         }
         @Override public Iterable<Boundary<State>> boundaries(AnalysisSession selected) {
             if(session!=selected)throw new IllegalArgumentException("foreign session");
@@ -309,6 +485,7 @@ public final class RegionalValuesAnalysis {
             var closed=new HashSet<>(a.closed);closed.retainAll(b.closed);
             return acc.root==a.bindings&&logical.equals(a.logical)&&closed.equals(a.closed)?new Join<>(a,false):new Join<>(track(new State(a.entry,acc.root,logical,closed,groupSizes)),true);
         }
+        @Override public long stateFingerprint(State state){return state.fingerprint;}
         @Override public boolean equivalent(State a,State b,DomainWork work) {
             if(a==b)return true;if(!Objects.equals(a.entry,b.entry)||a.bindings.size()!=b.bindings.size()||!a.logical.equals(b.logical)||!a.closed.equals(b.closed))return false;
             var same=new boolean[]{true};a.bindings.forEach((key,v)->{work.stateCompareEntry();if(!v.equals(b.bindings.get(key)))same[0]=false;});return same[0];
@@ -318,8 +495,8 @@ public final class RegionalValuesAnalysis {
             var writes=batchWrites.getOrDefault(plans,List.of());
             if(plans.isEmpty()&&writes.isEmpty())return before;
             // Preserve write occurrence grouping; each source is captured in the same pre-operation store.
-            var grouped=new LinkedHashMap<Integer,LinkedHashMap<StatementEffects.Write,List<Plan>>>();
-            for(var plan:plans)if(plan.logical==null)grouped.computeIfAbsent(groupOf[ordinals.get(plan.target.location().base().id())],ignored->new LinkedHashMap<>())
+            var grouped=new LinkedHashMap<Integer,OccurrenceMap<List<Plan>>>();
+            for(var plan:plans)if(plan.logical==null)grouped.computeIfAbsent(groupOf.get(ordinal(plan)),ignored->new OccurrenceMap<>())
                 .computeIfAbsent(plan.write,ignored->new ArrayList<>()).add(plan);
             var root=before.bindings;
             if(mode.physical())for(var entry:grouped.entrySet()) {
@@ -400,7 +577,7 @@ public final class RegionalValuesAnalysis {
                 var result=new HashSet<LogicalValue>();
                 for(var object:effects.storage().explicitObjects(read.place()))result.addAll(captured.logical.getOrDefault(object,Set.of()));
                 if(mode.physical())for(var candidate:effects.storage().resolve(read.place()).candidates()) {
-                    int ordinal=ordinals.get(candidate.location().base().id());
+                    int ordinal=ordinal(candidate.location().base().id());
                     for(var contents:contents(captured,candidate.location())) {
                         var value=RegionalValuesAnalysis.this.project(contents,candidate);
                         if(value.text().isPresent())for(int event:value.producers())result.add(new LogicalValue(value.text().get(),event));
@@ -418,13 +595,13 @@ public final class RegionalValuesAnalysis {
             RegionalAlternatives.Node<Content> next=null;
             var execution=forceMay?KillAuthority.Execution.POSSIBLE:KillAuthority.Execution.REQUIRED;
             if(!KillAuthority.exhaustive(write,plans.stream().map(Plan::target).toList(),execution))next=current;
-            for(var plan:plans)if(plan.target.sourceApplicable()) {
-                var replacement=replace(current,captured,plan,logicalInputs);var authority=KillAuthority.selected(write,plan.target,execution);
+            for(var plan:plans)if(plan.reference.sourceApplicable()) {
+                var replacement=replace(current,captured,plan,logicalInputs);var authority=KillAuthority.selected(write,plan.target(),execution);
                 next=relations.union(next,authority.isPresent()?KillAuthority.strongOverwrite(authority.get(),replacement):weakUnion(current,replacement));
             }
             if(next==null)next=current;
             current=next;
-            for(var plan:plans)if(!plan.target.sourceApplicable())current=weak(current,captured,plan,logicalInputs);
+            for(var plan:plans)if(!plan.reference.sourceApplicable())current=weak(current,captured,plan,logicalInputs);
             return current;
         }
         private RegionalAlternatives.Node<Content> weakUnion(RegionalAlternatives.Node<Content> old,RegionalAlternatives.Node<Content> supplied) {
@@ -438,15 +615,15 @@ public final class RegionalValuesAnalysis {
             RegionalAlternatives.Node<Content> result=null;
             for(var replacement:replacements(plan,captured,logicalInputs)) {
                 alternativeVisits++;var suppliedValues=new HashMap<Integer,Content>();var updates=new HashMap<Integer,java.util.function.UnaryOperator<Content>>();
-                for(var segment:partition.intersecting(plan.target.location())) {
+                for(var segment:segmentOrdinals(plan)) {
                     Content piece=replacement;
                     if(replacement instanceof Bytes bytes) {
-                        var range=segment.location().range().orElseThrow();var destination=plan.target.location().range().orElseThrow();
+                        var range=partition.range(segment).orElseThrow();var destination=plan.reference.range().orElseThrow();
                         var relative=new StorageRange(range.start().subtract(destination.start()),range.end().map(e->e.subtract(destination.start())));
                         piece=new Bytes(bytes.image().slice(relative));
                     }
-                    var supplied=piece;suppliedValues.put(levels.get(segment),supplied);
-                    updates.put(levels.get(segment),prior->{
+                    var supplied=piece;suppliedValues.put(level(segment),supplied);
+                    updates.put(level(segment),prior->{
                         if(prior instanceof Bytes bytes&&eventDetails.get(plan.event).initial()!=null&&eventDetails.get(plan.event).initial().value() instanceof Entries.LiteralInitial)
                             return new Bytes(bytes.image().initialize(new StorageRange(BigInteger.ZERO,bytes.image().extent()),((Bytes)supplied).image()));
                         return supplied;
@@ -458,11 +635,17 @@ public final class RegionalValuesAnalysis {
             return result;
         }
         private Set<Content> replacements(Plan plan,ReadCapture captured,Map<ObjectId,Set<LogicalValue>> logicalInputs) {
-            var target=plan.target.location();
-            if(!plan.target.sourceApplicable())return Set.of(unknown(target,"UNPROVEN_WRITE_DESTINATION",plan.event));
+            var targetRange=plan.reference.range();
+            // Whole Region unknown content needs its exact range/event, not a decoded header.
+            if(targetRange.isPresent()&&(!plan.reference.sourceApplicable()||plan.write.source() instanceof StatementEffects.UnknownSource)){
+                var range=targetRange.orElseThrow();String reason=!plan.reference.sourceApplicable()?"UNPROVEN_WRITE_DESTINATION":((StatementEffects.UnknownSource)plan.write.source()).reason();
+                return Set.of(new Bytes(ByteImage.unknown(range.end().map(end->end.subtract(range.start())),reason,plan.event)));
+            }
+            var target=plan.target().location();
+            if(!plan.reference.sourceApplicable())return Set.of(unknown(target,"UNPROVEN_WRITE_DESTINATION",plan.event));
             var source=plan.write.source();
             if(source instanceof StatementEffects.CapturedBytes copy) {
-                var c=copy.source().candidates().getFirst();int ordinal=ordinals.get(c.location().base().id());
+                var c=copy.source().candidates().getFirst();int ordinal=ordinal(c.location().base().id());
                 var sourceRange=c.location().range().orElseThrow();
                 return Set.of(new Bytes(((Bytes)capture(content(captured.contents(),ordinal),c.location())).image().slice(sourceRange).copied(plan.event,sourceRange.start())));
             }
@@ -484,7 +667,7 @@ public final class RegionalValuesAnalysis {
                             &&range.isPresent()&&range.get().end().isPresent()&&candidate.codec().filter(MemoryCodecs::isIbm1047).isPresent()) {
                         var pad=MemoryCodecs.encodeText(codecs.getFirst().orElseThrow(),new Values.TextValue(fit.pad()),BigInteger.ONE);
                         if(pad.status()==MemoryCodecs.Status.EXACT) {
-                            int ordinal=ordinals.get(candidate.location().base().id());
+                            int ordinal=ordinal(candidate.location().base().id());
                             var image=((Bytes)capture(content(captured.contents(),ordinal),candidate.location())).image().slice(range.get()).copied(plan.event,range.get().start(),i);
                             result.add(new Bytes(image.fit(fit.length(),pad.value().orElseThrow().octets().getFirst(),plan.event)));continue;
                         }
@@ -504,7 +687,7 @@ public final class RegionalValuesAnalysis {
             if(expression instanceof Expressions.Literal literal) {
                 var v=literal.value();
                 if(target.range().isEmpty())return Set.of(v instanceof Values.TextValue t
-                    ?new Scalar(Optional.of(LogicalText.of(t.value())),Set.of(plan.event),Set.of(),Set.of(),List.of(new Trace(target,Optional.empty(),plan.event,Optional.of(target),Map.of(),Set.of(),Set.of())))
+                    ?new Scalar(Optional.of(LogicalText.of(t.value())),Set.of(plan.event),Set.of(),Set.of(),List.of(new Trace(reference(target),Optional.empty(),plan.event,Optional.of(reference(target)),Map.of(),Set.of(),Set.of())))
                     :unknown(target,"NON_TEXT_LOGICAL_VALUE",plan.event));
                 var range=target.range().get();var extent=range.end().map(e->e.subtract(range.start()));
                 if(v instanceof Values.BytesValue bytes&&extent.equals(Optional.of(BigInteger.valueOf(bytes.octets().size()))))
@@ -523,11 +706,11 @@ public final class RegionalValuesAnalysis {
                 if(!(resolution.remainder() instanceof Scopes.NoMemory))result.add(unknown(target,"READ_LOCATION_REMAINDER",plan.event));
                 for(var object:effects.storage().explicitObjects(read.place()))for(var value:logicalInputs.getOrDefault(object,Set.of()))
                     result.add(new Scalar(Optional.of(value.text()),Set.copyOf(List.of(value.event(),plan.event)),Set.of(),Set.of(),
-                        List.of(new Trace(target,Optional.empty(),plan.event,Optional.of(target),Map.of(),Set.of(),Set.of(),Set.of(new ByteImage.LogicalSupport(object,value.event()))))));
+                        List.of(new Trace(reference(target),Optional.empty(),plan.event,Optional.of(reference(target)),Map.of(),Set.of(),Set.of(),Set.of(new ByteImage.LogicalSupport(object,value.event()))))));
 
                 for(int i=0;i<resolution.candidates().size();i++) {
                     if(captured.choices().get(plan.write)!=i)continue;
-                    var candidate=resolution.candidates().get(i);int ordinal=ordinals.get(candidate.location().base().id());
+                    var candidate=resolution.candidates().get(i);int ordinal=ordinal(candidate.location().base().id());
                     result.add(project(capture(content(captured.contents(),ordinal),candidate.location()),candidate).captured(plan.event,candidate.location(),target));
                 }
                 if(!result.isEmpty())return Set.copyOf(result);
@@ -535,24 +718,27 @@ public final class RegionalValuesAnalysis {
             return Set.of(unknown(target,"UNINTERPRETED_VALUE_EXPRESSION",plan.event));
         }
         State operation(State state,Operation operation) {
-            var plans=operations.get(operation);if(plans==null)throw new IllegalArgumentException("foreign operation");return apply(state,plans,false);
+            session.index().requireOperation(operation);
+            var plans=operations.get(operation.header().id());if(plans==null)throw new IllegalArgumentException("foreign operation");return apply(state,plans,false);
         }
         @Override public State transferBlock(AnalysisPoint point,State anchor,DomainWork work) {
             if(!(point.node().source() instanceof CfgNode.SequenceNode node))return anchor;
-            var state=anchor;for(var op:node.source().instructions()){work.operationTransferred();state=operation(state,op);}
-            work.operationTransferred();return operation(state,node.source().terminator());
+            var sequence=session.index().sequence(point.node());
+            var state=anchor;for(var op:sequence.instructions()){work.operationTransferred();state=operation(state,op);}
+            work.operationTransferred();return operation(state,sequence.terminator());
         }
         @Override public State transferEdge(AnalysisPoint point,CfgTransition edge,State state,DomainWork work) {
-            if(!state.reached()||!(point.node().source() instanceof CfgNode.SequenceNode node))return state;
-            if(node.source().terminator() instanceof Operations.Branch branch) {
+            if(!state.reached()||!(point.node().source() instanceof CfgNode.SequenceNode))return state;
+            var terminator=session.index().sequence(point.node()).terminator();
+            if(terminator instanceof Operations.Branch branch) {
                 if(session.index().unprovedPreconditions(branch.header().id()))return state;
                 int requested=edge.kind()==CfgTransition.Kind.BRANCH_TRUE?TextPredicate.TRUE:edge.kind()==CfgTransition.Kind.BRANCH_FALSE?TextPredicate.FALSE:TextPredicate.BOTH;
                 var at=state;int possible=TextPredicate.truth(branch.predicate(),place->predicateRead(at,place));
                 return (possible&requested)==0?BOTTOM:state;
             }
-            if(!(node.source().terminator() instanceof Operations.Invoke invoke))return state;
-            if(edge.kind()==CfgTransition.Kind.INVOKE_NORMAL)return apply(state,outcomes.get(invoke).get(Control.NormalOutcome.INSTANCE),false);
-            state=apply(state,otherwise.get(invoke),true);for(var plans:outcomes.get(invoke).values())state=apply(state,plans,true);return state;
+            if(!(terminator instanceof Operations.Invoke invoke))return state;
+            if(edge.kind()==CfgTransition.Kind.INVOKE_NORMAL)return apply(state,outcomes.get(invoke.header().id()).get(Control.NormalOutcome.INSTANCE),false);
+            state=apply(state,otherwise.get(invoke.header().id()),true);for(var plans:outcomes.get(invoke.header().id()).values())state=apply(state,plans,true);return state;
         }
         private Map<String,Long> metrics(){var result=new TreeMap<>(relations.metrics());result.put("maxLogicalCells",maxLogicalCells);result.put("maxLogicalValues",maxLogicalValues);result.put("physicalGroupsApplied",physicalGroupsApplied);result.put("physicalWritesApplied",physicalWritesApplied);result.put("logicalOnlyMode",mode.physical()?0L:1L);result.put("contentReads",contentReads);result.put("contentUpdates",contentUpdates);result.put("alternativeVisits",alternativeVisits);result.put("maxStateAlternatives",maxStateAlternatives);result.put("maxDecisionNodes",maxDecisionNodes);result.put("maxComponentCardinality",maxComponentCardinality);result.put("boundaryAlternatives",boundaryAlternatives);result.put("maxProvenanceRows",maxProvenanceRows);result.put("maxExpandedAlternatives",maxExpandedAlternatives);return Map.copyOf(result);}
     }
@@ -580,10 +766,10 @@ public final class RegionalValuesAnalysis {
         var observed=new StorageIndex.Location(selected.base(),Optional.of(new StorageRange(readStart.add(part.range().start()),part.range().end().map(e->e.add(readStart)))));
         var length=part.range().end().map(e->e.subtract(part.range().start()));
         var bytes=part.materialize();
-        Optional<StorageIndex.Location> original=Optional.empty();
+        Optional<LocationRef> original=Optional.empty();
         if(bytes.isPresent()) {
             var written=eventDetails.get(part.producer()).target().location();
-            original=Optional.of(new StorageIndex.Location(written.base(),Optional.of(StorageRange.exact(written.range().orElseThrow().start().add(part.producerOffset()),length.orElseThrow()))));
+            original=Optional.of(reference(new StorageIndex.Location(written.base(),Optional.of(StorageRange.exact(written.range().orElseThrow().start().add(part.producerOffset()),length.orElseThrow())))));
         }
         var captures=new HashMap<Integer,Set<CapturedRead>>();
         for(var entry:part.capturedOffsets().entrySet()) {
@@ -593,11 +779,11 @@ public final class RegionalValuesAnalysis {
                 var source=sources.get(position.alternative()).location();var offset=position.offset();
                 var src=new StorageIndex.Location(source.base(),Optional.of(StorageRange.exact(offset,length.orElseThrow())));
                 var dst=new StorageIndex.Location(destination.base(),Optional.of(StorageRange.exact(destination.range().orElseThrow().start().add(offset.subtract(source.range().orElseThrow().start())),length.orElseThrow())));
-                portions.add(new CapturedRead(source,src,dst));
+                portions.add(new CapturedRead(reference(source),reference(src),reference(dst)));
             }
             captures.put(entry.getKey(),Set.copyOf(portions));
         }
-        return new Trace(observed,bytes,part.producer(),original,captures,part.sourceGaps(),part.reasons(),part.logicalSupports());
+        return new Trace(reference(observed),bytes,part.producer(),original,captures,part.sourceGaps(),part.reasons(),part.logicalSupports());
     }
     public Execution execute(){var engine=new Engine();return new Execution(engine,DataflowSolver.solve(session,engine));}
     public final class Execution {
@@ -628,7 +814,7 @@ public final class RegionalValuesAnalysis {
                     var site=session.index().site(query.point().operation());return site!=null&&site.operation() instanceof Operations.Invoke invoke
                         &&query.point().outcome()==Control.NormalOutcome.INSTANCE&&invoke.outcomes().known().stream().anyMatch(Control.Normal.class::isInstance);
                 }
-                @Override public State transferOutcome(PointQuery<T> query,State before){return engine.apply(before,outcomes.get(session.index().site(query.point().operation()).operation()).get(query.point().outcome()),false);}
+                @Override public State transferOutcome(PointQuery<T> query,State before){return engine.apply(before,outcomes.get(query.point().operation()).get(query.point().outcome()),false);}
             });
         }
         private StorageValueFact fact(PointQuery<StorageSubject> query,State state) {
@@ -640,7 +826,7 @@ public final class RegionalValuesAnalysis {
             if(!mode.physical()){model=true;reasons.add("PHYSICAL_PROPAGATION_DISABLED");}
             if(mode.physical()&&state.reached())for(var candidate:resolution.candidates()) {
                 origins.addAll(candidate.origins());
-                int ordinal=ordinals.get(candidate.location().base().id());
+                int ordinal=ordinal(candidate.location().base().id());
                 for(var contents:engine.contents(state,candidate.location())) {
                     var value=RegionalValuesAnalysis.this.project(contents,candidate);
                     if(value.text().isEmpty()){model=true;reasons.addAll(value.reasons());}
@@ -725,8 +911,8 @@ public final class RegionalValuesAnalysis {
         }
     }
     private boolean sourceOpen(PointQuery<StorageSubject> query) {
-        var p=session.index().publication();var unit=session.index().unit(query.point().entry().unit());
-        return p.coverage().inventory()!=Evidence.InventoryStatus.COMPLETE||!p.coverage().uncertainties().isEmpty()
+        var store=session.index().store();var unit=session.index().unit(query.point().entry().unit());
+        return store.coverage().inventory()!=Evidence.InventoryStatus.COMPLETE||!store.coverage().uncertainties().isEmpty()
             ||unit.coverage().inventory()!=Evidence.InventoryStatus.COMPLETE||!unit.coverage().uncertainties().isEmpty()||controlOpen.contains(unit.id())
             ||!session.context(query.point().entry()).entry().state().uncertainties().isEmpty()
             ||effects.storage().explicitObjects(query.subject()).stream().map(session.index()::object)

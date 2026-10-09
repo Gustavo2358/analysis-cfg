@@ -66,16 +66,18 @@ public final class CallDependencyPlan {
         var providers=new HashMap<SiteKey,Provider>();var metrics=new TreeMap<String,Long>();
         for(var key:List.of("qualifiedComputedOccurrences","targetResolutionRequests","scalarAdmissionAttempts",
                 "scalarAdmissionAccepted","scalarAdmissionRefused","regionalAdmissionAttempts","regionalSelections",
-                "scalarSelections","possibleValuesQueries","deduplicatedValueQueries","sourceQualifiedResolvedByExistingQuery"))metrics.put(key,0L);
-        var invokes=session.index().sites(Operations.Invoke.class).stream().filter(s->selected((Operations.Invoke)s.operation())).toList();
+                "scalarSelections","possibleValuesQueries","deduplicatedValueQueries","sourceQualifiedResolvedByExistingQuery","entryCallCandidatesVisited"))metrics.put(key,0L);
+        var invokes=new HashMap<UnitId,List<io.github.gustavo2358.analysis.structure.ProgramIndex.Site>>();
+        for(var site:session.index().sites(Operations.Invoke.class))if(selected((Operations.Invoke)site.operation()))
+            invokes.computeIfAbsent(site.owner().id(),ignored->new ArrayList<>()).add(site);
         for(var context:session.contexts()) {
             var entry=context.entry().id();String id=part(entry.publication().localId())+part(entry.unit().localId())+part(entry.localId());
             var admission=new HashMap<ObjectId,Boolean>();var demand=new HashSet<ObjectId>();
             var selected=new EnumMap<Provider,Set<OperationId>>(Provider.class);
             var queries=new HashSet<PointQuery<ObjectId>>();
             var scoped=session.selectEntries(List.of(entry));
-            for(var indexed:invokes) {
-                if(!indexed.owner().id().equals(entry.unit()))continue;
+            for(var indexed:invokes.getOrDefault(entry.unit(),List.of())) {
+                metrics.merge("entryCallCandidatesVisited",1L,Math::addExact);
                 var invoke=(Operations.Invoke)indexed.operation();Provider provider;
                 metrics.merge("targetResolutionRequests",1L,Long::sum);
                 if(invoke.target() instanceof Interactions.LiteralTarget)provider=Provider.LITERAL;

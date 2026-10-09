@@ -2,6 +2,9 @@ package io.github.gustavo2358.analysis.storage;
 
 import io.github.gustavo2358.air.model.*;
 import io.github.gustavo2358.air.model.Ids.*;
+import io.github.gustavo2358.analysis.structure.ProgramStore;
+import io.github.gustavo2358.analysis.structure.ProgramIndex;
+import io.github.gustavo2358.analysis.structure.OperationTable;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -12,7 +15,27 @@ public final class StatementEffects {
     public enum Selection { SINGLE_DESTINATION, MAY_SET }
     public enum ReadKind { VALUE, ADDRESS, TARGET, FOREIGN }
     public sealed interface Source permits ExpressionSource, CapturedBytes, UnknownSource { }
-    public record ExpressionSource(Expression value) implements Source { }
+    /** Explicit resident values or a borrowed canonical assignment occurrence.
+     * Access reconstructs one expression; it never installs a decoded-value cache. */
+    public static final class ExpressionSource implements Source {
+        private final Expression resident;
+        private final OperationRef occurrence;
+        public ExpressionSource(Expression value){resident=Objects.requireNonNull(value);occurrence=null;}
+        private ExpressionSource(OperationRef occurrence){this.occurrence=Objects.requireNonNull(occurrence);resident=null;}
+        public Expression value(){return occurrence==null?resident:((Operations.Assign)occurrence.value()).value();}
+        @Override public boolean equals(Object other){return this==other||other instanceof ExpressionSource source&&value().equals(source.value());}
+        @Override public int hashCode(){return value().hashCode();}
+        @Override public String toString(){return "ExpressionSource[value="+value()+"]";}
+    }
+    /** Owner-local typed code address, shared by effect and domain preparation.
+     * Resident compatibility keeps the caller's operation explicitly. */
+    public static final class OperationRef {
+        private final ProgramIndex.Site site;
+        private final Operation resident;
+        private OperationRef(Operation operation){resident=Objects.requireNonNull(operation);site=null;}
+        private OperationRef(ProgramIndex.Site site){this.site=Objects.requireNonNull(site);resident=null;}
+        public Operation value(){return site==null?resident:site.operation();}
+    }
     public record CapturedBytes(StorageIndex.Resolution source, BigInteger length) implements Source { }
     public record UnknownSource(String reason) implements Source { }
     public record Read(Optional<OperandId> occurrence,ReadKind kind,StorageIndex.Resolution location) { }
@@ -23,7 +46,7 @@ public final class StatementEffects {
     public record LogicalTarget(ObjectId object,boolean sourceApplicable) { }
     public record Write(int slot,Optional<OperandId> occurrence,StorageIndex.Resolution destination,Source source,List<Target> targets,
                         Selection selection,Strength occurrenceStrength,List<LogicalTarget> logicalTargets) {
-        public Write { logicalTargets=List.copyOf(logicalTargets);targets=List.copyOf(targets);Objects.requireNonNull(selection);Objects.requireNonNull(occurrenceStrength); }
+        public Write { logicalTargets=List.copyOf(logicalTargets);if(!(targets instanceof WholeTargets))targets=List.copyOf(targets);Objects.requireNonNull(selection);Objects.requireNonNull(occurrenceStrength); }
         public Write(int slot,Optional<OperandId> occurrence,StorageIndex.Resolution destination,Source source,List<Target> targets,Selection selection,Strength occurrenceStrength) {
             this(slot,occurrence,destination,source,targets,selection,occurrenceStrength,List.of());
         }
@@ -31,20 +54,38 @@ public final class StatementEffects {
             this(slot,occurrence,destination,source,targets,Selection.SINGLE_DESTINATION,Strength.MUST);
         }
     }
-    public record Statement(Operation operation,List<Read> reads,List<Write> writes,
+    public record Statement(OperationRef reference,List<Read> reads,List<Write> writes,
                             Map<Control.OutcomeKey,List<Write>> outcomes,List<Write> otherwise) {
-        public Statement { reads=List.copyOf(reads);writes=List.copyOf(writes);outcomes=Map.copyOf(outcomes);otherwise=List.copyOf(otherwise); }
+        public Statement { Objects.requireNonNull(reference);reads=List.copyOf(reads);writes=List.copyOf(writes);outcomes=Map.copyOf(outcomes);otherwise=List.copyOf(otherwise); }
+        public Statement(Operation operation,List<Read> reads,List<Write> writes,Map<Control.OutcomeKey,List<Write>> outcomes,List<Write> otherwise){
+            this(new OperationRef(operation),reads,writes,outcomes,otherwise);
+        }
+        public Operation operation(){return reference.value();}
+        @Override public boolean equals(Object other){return this==other||other instanceof Statement statement&&operation().equals(statement.operation())&&reads.equals(statement.reads)&&writes.equals(statement.writes)&&outcomes.equals(statement.outcomes)&&otherwise.equals(statement.otherwise);}
+        @Override public int hashCode(){return Objects.hash(operation(),reads,writes,outcomes,otherwise);}
     }
     private final StorageIndex storage;
-    private record OpenLocation(ObjectId object,StorageIndex.Location location) { }
+    private record OpenLocation(int declarationOrdinal,ObjectId object,StorageIndex.Location location) { }
     private final Map<StorageId,List<OpenLocation>> openByBase;
-    private final Map<OperationId,Statement> statements=new LinkedHashMap<>();
+    private final WholeAliases wholeAliases;
+    private final Map<OperationId,Statement> statements;
     private long operandVisits,targetsPrepared,directTargetsPrepared,boundTargetsPrepared,explicitBroadTargetsPrepared,baseComparisons;
     public StatementEffects(StorageIndex storage) {
         this.storage=Objects.requireNonNull(storage);
         var byBase=new HashMap<StorageId,List<OpenLocation>>();
+        var store=storage.session().index().store();
+        statements=new OperationTable<>(store);
+        var declarations=store.declarationInventory();var inventory=store.storageInventory();
+        WholeAliases broad=null;int declarationOrdinal=0;
+        try {
         for(var object:storage.declarations()) {
+            int ordinal=declarationOrdinal++;
             var resolution=storage.object(object.id());if(resolution.exact())continue;
+            if(declarations.isPresent()&&inventory.isPresent()&&resolution.candidates().isEmpty()
+                    &&resolution.remainder() instanceof Scopes.WithinMemory within&&within.scope() instanceof Scopes.AllMemory){
+                if(broad==null)broad=new WholeAliases(declarations.orElseThrow(),inventory.orElseThrow());
+                broad.add(ordinal);continue;
+            }
             var locations=new LinkedHashSet<StorageIndex.Location>();
             resolution.candidates().forEach(c->locations.add(c.location()));
             if(resolution.remainder() instanceof Scopes.WithinMemory w) {
@@ -53,13 +94,32 @@ public final class StatementEffects {
                     // Admission checks executable uses; a nominal, unused cycle has no indexable scope.
                 }
             }
-            for(var location:locations)byBase.computeIfAbsent(location.base().id(),ignored->new ArrayList<>()).add(new OpenLocation(object.id(),location));
+            for(var location:locations)byBase.computeIfAbsent(location.base().id(),ignored->new ArrayList<>()).add(new OpenLocation(ordinal,object.id(),location));
         }
         byBase.replaceAll((id,values)->List.copyOf(values));openByBase=Map.copyOf(byBase);
-        for(var unit:storage.session().index().publication().units())for(var sequence:unit.sequences()) {
+        wholeAliases=broad;
+        for(var unit:storage.session().index().store().units())for(var sequence:unit.sequences()) {
             for(var operation:sequence.instructions())statements.put(operation.header().id(),prepare(operation));
             var operation=sequence.terminator();statements.put(operation.header().id(),prepare(operation));
         }
+        }catch(RuntimeException|Error failure){
+            if(broad!=null)try{broad.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}
+            throw failure;
+        }
+    }
+    /** One shared whole-catalogue relation, not one header for each object/base pair. */
+    private static final class WholeAliases implements AutoCloseable {
+        private final ProgramStore.DeclarationInventory declarations;
+        private final ProgramStore.OrdinalColumn positions;
+        private int count;
+        WholeAliases(ProgramStore.DeclarationInventory declarations,ProgramStore.StorageInventory inventory){
+            this.declarations=declarations;positions=inventory.column(declarations.size());
+        }
+        void add(int ordinal){positions.set(count,ordinal+1L);count=Math.incrementExact(count);}
+        int size(){declarations.size();return count;}
+        int ordinal(int at){Objects.checkIndex(at,size());return Math.toIntExact(positions.get(at)-1);}
+        ObjectId identity(int at){return declarations.identity(ordinal(at));}
+        @Override public void close(){positions.close();}
     }
     public StorageIndex storage() { return storage; }
     public Collection<Statement> statements() { return Collections.unmodifiableCollection(statements.values()); }
@@ -70,10 +130,12 @@ public final class StatementEffects {
         var result=statements.get(operation);if(result==null)throw new IllegalArgumentException("operation outside prepared snapshot");return result;
     }
     private Statement prepare(Operation operation) {
+        var reference=storage.session().index().store().storageInventory().isPresent()
+            ?new OperationRef(storage.session().index().site(operation.header().id())):new OperationRef(operation);
         var b=new Builder(operation);
         if(operation instanceof Operations.Assign a) {
             b.visit(a.value(),ReadKind.VALUE);b.visit(a.destination(),ReadKind.ADDRESS);
-            b.write(b.writes,Optional.of(a.destination().header().id()),storage.resolve(a.destination()),Strength.MUST,new ExpressionSource(a.value()));
+            b.write(b.writes,Optional.of(a.destination().header().id()),storage.resolve(a.destination()),Strength.MUST,reference.site==null?new ExpressionSource(a.value()):new ExpressionSource(reference));
         } else if(operation instanceof Operations.HavocMust h) {
             b.visit(h.destination(),ReadKind.ADDRESS);b.write(b.writes,Optional.of(h.destination().header().id()),storage.resolve(h.destination()),Strength.MUST,new UnknownSource("HAVOC_MUST"));
         } else if(operation instanceof Operations.HavocMay h)b.scopeWrite(b.writes,h.scope(),"HAVOC_MAY");
@@ -115,13 +177,58 @@ public final class StatementEffects {
         else if(!(operation instanceof Operations.LocalInvoke||operation instanceof Operations.LocalBoundary||operation instanceof Operations.LocalResume||operation instanceof Operations.LocalUnwind||operation instanceof Operations.Nop||operation instanceof Operations.Jump||operation instanceof Operations.Halt))
             throw new IllegalArgumentException("unsupported operation effect");
         b.outcomes.replaceAll((key,value)->List.copyOf(value));
-        return new Statement(operation,b.reads,b.writes,b.outcomes,b.otherwise);
+        return new Statement(reference,b.reads,b.writes,b.outcomes,b.otherwise);
     }
     /** Normalized finite targets; only a proved singleton can replace old contributors. */
     public List<Target> targets(StorageIndex.Resolution destination,Strength requested) {
         return targets(destination,requested,false,false);
     }
+    /** Each admitted catalogue has unique bases. Source applicability separates
+     * direct targets from remainder targets, even for equal whole locations. */
+    private static final class WholeTargets extends AbstractList<Target> implements RandomAccess {
+        private final List<StorageIndex.Candidate> direct,remainder;
+        private final Strength strength;
+        private final List<String> reasons;
+        WholeTargets(List<StorageIndex.Candidate> direct,List<StorageIndex.Candidate> remainder,Strength strength,List<String> reasons){
+            this.direct=direct;this.remainder=remainder;this.strength=strength;this.reasons=List.copyOf(reasons);
+        }
+        @Override public int size(){return Math.addExact(direct.size(),remainder.size());}
+        @Override public Target get(int ordinal){
+            Objects.checkIndex(ordinal,size());int count=direct.size();boolean source=ordinal<count;
+            var candidate=source?direct.get(ordinal):remainder.get(ordinal-count);
+            return new Target(candidate.location(),source?strength:Strength.MAY,source,List.of(),reasons);
+        }
+        @Override public void clear(){throw new UnsupportedOperationException("immutable borrowed whole storage targets");}
+    }
+    static boolean wholeTargets(List<Target> targets){return targets instanceof WholeTargets;}
+    public static Optional<StorageIndex.BaseAddress> address(Write write,int ordinal){
+        Objects.checkIndex(ordinal,write.targets().size());
+        if(!(write.targets() instanceof WholeTargets whole))return Optional.empty();
+        int count=whole.direct.size();return StorageIndex.address(ordinal<count?whole.direct:whole.remainder,ordinal<count?ordinal:ordinal-count);
+    }
+    public static boolean sourceApplicable(Write write,int ordinal){
+        Objects.checkIndex(ordinal,write.targets().size());
+        return write.targets() instanceof WholeTargets whole?ordinal<whole.direct.size():write.targets().get(ordinal).sourceApplicable();
+    }
+    public static List<PremiseId> targetPremises(Write write,int ordinal){
+        Objects.checkIndex(ordinal,write.targets().size());return write.targets() instanceof WholeTargets?List.of():write.targets().get(ordinal).premises();
+    }
     private List<Target> targets(StorageIndex.Resolution destination,Strength requested,boolean scoped,boolean broad) {
+        if(destination.remainder() instanceof Scopes.NoMemory
+                ||destination.remainder() instanceof Scopes.WithinMemory within&&within.scope() instanceof Scopes.AllMemory){
+            var direct=StorageIndex.nonEmptyWholeCandidates(destination);
+            if(direct==null&&destination.candidates().isEmpty()
+                    &&destination.remainder() instanceof Scopes.WithinMemory within&&within.scope() instanceof Scopes.AllMemory
+                    &&storage.session().index().store().storageInventory().isPresent())direct=List.of();
+            if(direct!=null){
+                var remainder=destination.remainder() instanceof Scopes.WithinMemory within
+                    ?storage.select(within.scope()).candidates():List.<StorageIndex.Candidate>of();
+                var result=new WholeTargets(direct,remainder,requested==Strength.MUST&&destination.exact()?Strength.MUST:Strength.MAY,destination.reasons());
+                int count=direct.size();
+                if(broad)explicitBroadTargetsPrepared+=count;else if(scoped)boundTargetsPrepared+=count;else directTargetsPrepared+=count;
+                explicitBroadTargetsPrepared+=remainder.size();targetsPrepared+=result.size();return result;
+            }
+        }
         var result=new LinkedHashSet<Target>();var direct=new ArrayList<StorageIndex.Candidate>(destination.candidates());
         for(var candidate:direct) {
             var location=candidate.location();if(location.range().isPresent()&&location.range().get().empty())continue;
@@ -159,9 +266,37 @@ public final class StatementEffects {
             var explicit=place==null?List.<ObjectId>of():storage.explicitObjects(place);
             var result=new LinkedHashMap<ObjectId,Boolean>();
             for(var id:explicit)if(!storage.object(id).exact())result.put(id,true);
-            for(var target:targets)for(var open:openByBase.getOrDefault(target.location().base().id(),List.of()))
-                if(!storage.disjoint(target.location(),open.location()))result.putIfAbsent(open.object(),false);
+            if(openByBase.isEmpty()){
+                if(wholeAliases!=null&&nonEmpty(targets))for(int at=0;at<wholeAliases.size();at++)result.putIfAbsent(wholeAliases.identity(at),false);
+            }else{
+                boolean pendingBroad=wholeAliases!=null;
+                for(var target:targets){
+                    var location=target.location();var narrow=openByBase.getOrDefault(location.base().id(),List.of());
+                    if(pendingBroad&&location.range().filter(StorageRange::empty).isEmpty()){
+                        int at=0;
+                        for(int broad=0;broad<wholeAliases.size();broad++){
+                            int ordinal=wholeAliases.ordinal(broad);
+                            while(at<narrow.size()&&narrow.get(at).declarationOrdinal()<ordinal){
+                                var open=narrow.get(at++);if(!storage.disjoint(location,open.location()))result.putIfAbsent(open.object(),false);
+                            }
+                            result.putIfAbsent(wholeAliases.identity(broad),false);
+                        }
+                        while(at<narrow.size()){var open=narrow.get(at++);if(!storage.disjoint(location,open.location()))result.putIfAbsent(open.object(),false);}
+                        pendingBroad=false;
+                    }else for(var open:narrow)if(!storage.disjoint(location,open.location()))result.putIfAbsent(open.object(),false);
+                }
+            }
             return result.entrySet().stream().map(e->new LogicalTarget(e.getKey(),e.getValue())).toList();
+        }
+        boolean nonEmpty(List<Target> targets){
+            if(targets instanceof WholeTargets whole){
+                if(!whole.direct.isEmpty())return true;
+                if(whole.remainder.isEmpty())return false;
+                var owner=StorageIndex.address(whole.remainder,0).orElseThrow().owner();
+                return !owner.nonEmptyStorage().isEmpty();
+            }
+            for(var target:targets)if(target.location().range().filter(StorageRange::empty).isEmpty())return true;
+            return false;
         }
         void scopeWrite(List<Write> out,Scopes.MemoryScope scope,String reason) {
             var destination=storage.select(scope);

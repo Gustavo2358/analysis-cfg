@@ -5,6 +5,8 @@ import java.util.*;
 public record NominalValues(String authority,List<Symbol> symbols,List<Assignment> assignments,
         List<Condition> conditions,List<Query> queries,List<TableField> tableFields) {
     public NominalValues(String authority,List<Symbol> symbols,List<Assignment> assignments,List<Condition> conditions,List<Query> queries){this(authority,symbols,assignments,conditions,queries,List.of());}
+    /** The callback applies to this construction only, never subsequent model access. */
+    public NominalValues(String authority,List<Symbol> symbols,List<Assignment> assignments,List<Condition> conditions,List<Query> queries,List<TableField> tableFields,Runnable progress){this(authority,SourceAdmission.input(symbols,progress),assignments,conditions,queries,tableFields);}
     public record Initial(String origin,String value){public Initial{text(origin);Objects.requireNonNull(value);}}
     public record TableField(String node,List<Initial> initial){public TableField{text(node);initial=List.copyOf(initial);require(new HashSet<>(initial).size()==initial.size(),"duplicate table initializer");}}
     public record Symbol(String node,int extent,boolean modelAssumed) {
@@ -38,29 +40,81 @@ public record NominalValues(String authority,List<Symbol> symbols,List<Assignmen
         public Query {text(statement);text(node);}
     }
     public NominalValues {
+        var progress=SourceAdmission.progress(symbols);progress.run();
+        symbols=SourceAdmission.input(List.copyOf(symbols),progress);
+        assignments=SourceAdmission.input(List.copyOf(SourceAdmission.input(assignments,progress)),progress);
+        conditions=SourceAdmission.input(List.copyOf(SourceAdmission.input(conditions,progress)),progress);
+        queries=SourceAdmission.input(List.copyOf(SourceAdmission.input(queries,progress)),progress);
+        tableFields=SourceAdmission.input(tableFields==null?List.of():List.copyOf(SourceAdmission.input(tableFields,progress)),progress);
         require(Set.of("NOMINAL_TEXT_SOURCE_V1","NOMINAL_TEXT_SOURCE_V2","NOMINAL_TEXT_SOURCE_V3","NOMINAL_TEXT_SOURCE_V4").contains(authority),"nominal value authority");
-        require(!authority.equals("NOMINAL_TEXT_SOURCE_V1")||symbols.stream().noneMatch(Symbol::modelAssumed),"model marker requires V2");
-        symbols=List.copyOf(symbols);assignments=List.copyOf(assignments);conditions=List.copyOf(conditions);queries=List.copyOf(queries);tableFields=tableFields==null?List.of():List.copyOf(tableFields);
+        if(authority.equals("NOMINAL_TEXT_SOURCE_V1"))for(var symbol:symbols)require(!symbol.modelAssumed(),"model marker requires V2");
         require(authority.equals("NOMINAL_TEXT_SOURCE_V4")||tableFields.isEmpty(),"table fields require V4");
         var nodes=new HashSet<String>();for(var s:symbols)require(nodes.add(s.node()),"duplicate nominal symbol");
-        var tables=new HashSet<String>();for(var f:tableFields){require(nodes.contains(f.node())&&tables.add(f.node()),"table field identity");for(var i:f.initial())require(nodes.contains(i.origin()),"table initializer origin");}
-        if(!authority.equals("NOMINAL_TEXT_SOURCE_V4")){for(var a:assignments)noChoice(a.source());var pending=new ArrayDeque<Predicate>();conditions.forEach(c->pending.add(c.predicate()));while(!pending.isEmpty()){var p=pending.removeFirst();p.terms().forEach(NominalValues::noChoice);pending.addAll(p.children());}}
-        var writes=new HashSet<String>();for(var a:assignments){require(nodes.contains(a.target()),"nominal receiver reference");term(a.source(),nodes);require(Set.of("NOMINAL_TEXT_SOURCE_V3","NOMINAL_TEXT_SOURCE_V4").contains(authority)||!a.source().extended(),"expression requires V3");require(writes.add(a.statement()+"/"+a.target()),"duplicate nominal assignment");}
-        var branches=new HashSet<String>();for(var c:conditions){require(branches.add(c.statement()),"duplicate nominal condition");var todo=new ArrayDeque<Predicate>();todo.add(c.predicate());while(!todo.isEmpty()){var p=todo.removeFirst();p.terms().forEach(t->{term(t,nodes);require(Set.of("NOMINAL_TEXT_SOURCE_V3","NOMINAL_TEXT_SOURCE_V4").contains(authority)||!t.extended(),"expression requires V3");});todo.addAll(p.children());}}
+        var tables=new HashSet<String>();for(var f:tableFields){require(nodes.contains(f.node())&&tables.add(f.node()),"table field identity");for(var i:f.initial()){progress.run();require(nodes.contains(i.origin()),"table initializer origin");}}
+        // Identity, not record equality/hash: shared AST subgraphs may have exponentially many
+        // paths and deeply nested record hashCode/recursive walkers are not a traversal algorithm.
+        if(!authority.equals("NOMINAL_TEXT_SOURCE_V4")) {
+            var checkedTerms=new IdentityHashMap<Term,Boolean>();
+            for(var assignment:assignments)noChoice(assignment.source(),checkedTerms,progress);
+            var checkedPredicates=new IdentityHashMap<Predicate,Boolean>();var pending=new ArrayDeque<Predicate>();
+            for(var condition:conditions) {
+                if(checkedPredicates.put(condition.predicate(),Boolean.TRUE)==null)pending.add(condition.predicate());
+                while(!pending.isEmpty()) {
+                    progress.run();var predicate=pending.removeFirst();for(var term:predicate.terms())noChoice(term,checkedTerms,progress);
+                    for(var child:predicate.children()){progress.run();if(checkedPredicates.put(child,Boolean.TRUE)==null)pending.addLast(child);}
+                }
+            }
+        }
+        record WriteIdentity(String statement,String target) { }
+        var writes=new HashSet<WriteIdentity>();var checkedTerms=new IdentityHashMap<Term,Boolean>();
+        boolean expressions=authority.equals("NOMINAL_TEXT_SOURCE_V3")||authority.equals("NOMINAL_TEXT_SOURCE_V4");
+        for(var assignment:assignments) {
+            require(nodes.contains(assignment.target()),"nominal receiver reference");term(assignment.source(),nodes,checkedTerms,progress);
+            require(expressions||!assignment.source().extended(),"expression requires V3");
+            require(writes.add(new WriteIdentity(assignment.statement(),assignment.target())),"duplicate nominal assignment");
+        }
+        var branches=new HashSet<String>();var checkedPredicates=new IdentityHashMap<Predicate,Boolean>();
+        for(var condition:conditions) {
+            require(branches.add(condition.statement()),"duplicate nominal condition");var pending=new ArrayDeque<Predicate>();
+            if(checkedPredicates.put(condition.predicate(),Boolean.TRUE)==null)pending.add(condition.predicate());
+            while(!pending.isEmpty()) {
+                progress.run();var predicate=pending.removeFirst();
+                for(var operand:predicate.terms()){term(operand,nodes,checkedTerms,progress);require(expressions||!operand.extended(),"expression requires V3");}
+                for(var child:predicate.children()){progress.run();if(checkedPredicates.put(child,Boolean.TRUE)==null)pending.addLast(child);}
+            }
+        }
         var sinks=new HashSet<String>();for(var q:queries)require(nodes.contains(q.node())&&sinks.add(q.statement()),"nominal query reference/identity");
+        symbols=SourceAdmission.owned(symbols);assignments=SourceAdmission.owned(assignments);
+        conditions=SourceAdmission.owned(conditions);queries=SourceAdmission.owned(queries);tableFields=SourceAdmission.owned(tableFields);
     }
     /** Validate references in every typed consumer, including the in-memory port. */
     public void validate(Set<String> nodes,Set<String> statements) {
-        for(var s:symbols)require(nodes.contains(s.node()),"nominal symbol belongs to source storage inventory");
-        for(var a:assignments)require(statements.contains(a.statement()),"nominal assignment owner");
-        for(var c:conditions)require(statements.contains(c.statement()),"nominal condition owner");
-        for(var q:queries)require(statements.contains(q.statement()),"nominal query owner");
+        validate(nodes,statements,()->{});
     }
-    private static void term(Term root,Set<String> nodes){
+    void validate(Set<String> nodes,Set<String> statements,Runnable progress) {
+        for(var s:symbols){progress.run();require(nodes.contains(s.node()),"nominal symbol belongs to source storage inventory");}
+        for(var a:assignments){progress.run();require(statements.contains(a.statement()),"nominal assignment owner");}
+        for(var c:conditions){progress.run();require(statements.contains(c.statement()),"nominal condition owner");}
+        for(var q:queries){progress.run();require(statements.contains(q.statement()),"nominal query owner");}
+    }
+    private static void term(Term root,Set<String> nodes,IdentityHashMap<Term,Boolean> checked,Runnable progress) {
+        progress.run();
+        if(checked.put(root,Boolean.TRUE)!=null)return;
         var pending=new ArrayDeque<Term>();pending.add(root);
-        while(!pending.isEmpty()){var t=pending.removeFirst();if(t.kind().equals("READ"))require(nodes.contains(t.value()),"nominal read reference");pending.addAll(t.arguments());}
+        while(!pending.isEmpty()) {
+            progress.run();var term=pending.removeFirst();if(term.kind().equals("READ"))require(nodes.contains(term.value()),"nominal read reference");
+            for(var child:term.arguments()){progress.run();if(checked.put(child,Boolean.TRUE)==null)pending.addLast(child);}
+        }
     }
-    private static void noChoice(Term t){require(!t.kind().equals("CHOICE"),"choice requires V4");t.arguments().forEach(NominalValues::noChoice);}
+    private static void noChoice(Term root,IdentityHashMap<Term,Boolean> checked,Runnable progress) {
+        progress.run();
+        if(checked.put(root,Boolean.TRUE)!=null)return;
+        var pending=new ArrayDeque<Term>();pending.add(root);
+        while(!pending.isEmpty()) {
+            progress.run();var term=pending.removeFirst();require(!term.kind().equals("CHOICE"),"choice requires V4");
+            for(var child:term.arguments()){progress.run();if(checked.put(child,Boolean.TRUE)==null)pending.addLast(child);}
+        }
+    }
     private static void text(String x){require(x!=null&&!x.isBlank(),"nominal identity");}
     private static void require(boolean yes,String message){if(!yes)throw new IllegalArgumentException(message);}
 }

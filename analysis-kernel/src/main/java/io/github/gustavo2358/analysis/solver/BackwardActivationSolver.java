@@ -5,41 +5,120 @@ import io.github.gustavo2358.analysis.structure.*;
 import java.util.*;
 
 /** Dual tabulation: an activation is keyed by values at its possible continuations. */
-final class BackwardActivationSolver<S> {
+final class BackwardActivationSolver<S> implements AutoCloseable {
     private final AnalysisSession session;
     private final AnalysisDefinition<S> definition;
+    private long callerPathEdgesRead;
+    private long callerProofEdgesRead(){long total=callerPathEdgesRead;for(var entry:entries)if(entry.paths!=null)total+=entry.paths.edgesRead();return total;}
+    private long certificateEdgesRead(){long count=0;for(var entry:entries)if(entry.paths!=null)count+=entry.paths.edgesRead();return count;}
+    private long valuationVisits(){long count=0;for(var entry:entries)if(entry.paths!=null)count+=entry.paths.valuationNodeVisits();return count;}
+    private long hintIndexProbes(){long count=0;for(var entry:entries)if(entry.paths!=null)count+=entry.paths.indexProbes();return count;}
+    private long conditionPeak(){long peak=0;for(var entry:entries)peak=Math.max(peak,entry.bdd.peakNodes());return peak;}
     private final DomainWork work=new DomainWork();
+    private final AnalysisResources indexResources;
     private final S bottom;
     private final List<EntryRun> entries=new ArrayList<>();
+    private final Set<BooleanConditions> ownedConditions=Collections.newSetFromMap(new IdentityHashMap<>());
     private final ArrayDeque<Slot> pending=new ArrayDeque<>();
     private int nextPoint;
+    private long summaryCreated,summaryLive,summaryPeak;
+    private void summaryCreated(){summaryCreated++;summaryLive++;recordsSinceSweep++;summaryPeak=Math.max(summaryPeak,summaryLive);}
+    private long summaryRetired,summaryCollections,recordsSinceSweep,sweepThreshold=64,closedIndexProbes;
+    private SummaryCollector<Region> collector;
+    private void collectSummaries(boolean force) {
+        if(!force&&recordsSinceSweep<sweepThreshold)return;
+        if(collector==null)collector=new SummaryCollector<>(indexResources,AnalysisResources.Phase.DOMAIN,r->r.mark,(r,token)->r.mark=token);
+        long[] units={entries.size()+pending.size()};
+        collector.mark(visit->{for(var entry:entries)visit.accept(entry.root);for(var slot:pending)visit.accept(slot.region);},(region,visit)->{
+            units[0]+=1+region.slots.size();indexResources.work(1+region.slots.size(),AnalysisResources.Phase.DOMAIN);
+            for(var slot:region.slots.values()) {
+                units[0]+=slot.children.size()+slot.watches.size();
+                for(var child:slot.children.keySet())visit.accept(child);
+                for(var watched:slot.watches)visit.accept(watched);
+            }
+        });
+        feasibleCache.clear();for(var entry:entries)feasibleCache.put(need(entry.root,1),true);deferredCache.clear();closeWitnesses();
+        for(var entry:entries) {
+            long removed=collector.retain(entry.regions,this::retireSummary);summaryRetired+=removed;summaryLive-=removed;
+            var iterator=entry.byFrame.entrySet().iterator();
+            while(iterator.hasNext()) {
+                var index=iterator.next().getValue();index.retainEntries(collector::isMarked);
+                if(index.size()==0){closedIndexProbes+=index.probes();index.close();iterator.remove();}
+            }
+        }
+        summaryCollections++;recordsSinceSweep=0;sweepThreshold=Math.max(64,units[0]);
+    }
+    private void retireSummary(Region region) {
+        for(var slot:region.slots.values()) {
+            for(var child:slot.children.keySet()){child.callers.remove(slot);replaceIncoming(slot,child,0);}
+            for(var watched:slot.watches)watched.waiters.remove(slot);
+            slot.children.clear();slot.watches.clear();slot.in.clear();slot.out.clear();
+        }
+        if(region.entry.paths!=null){region.entry.paths.retire(region.path);region.certifiedIncoming.clear();}
+        for(var slot:region.slots.values())detachRootReads(slot);
+        region.slots.clear();region.incoming.clear();region.callers.clear();region.waiters.clear();region.predecessors.clear();
+    }
     private long transfers,deliveries,joins,pushes,pops,attempts,duplicates,maxSize,changes,unchanged;
-    private record Need(Object region,int condition) { }
+    private long returnSourceReads;
+    private record Need(Object region,int condition,long generation) { }
+    private Need need(Region region,int condition){return new Need(region,condition,region.entry.bdd.generationOf(condition));}
     private final Map<Need,Boolean> feasibleCache=new HashMap<>();
     // Bounded memoization only: eviction recomputes a query, never drops work.
     private final Map<Need,Deferred> deferredCache=new LinkedHashMap<>();
-    BackwardActivationSolver(AnalysisSession session,AnalysisDefinition<S> definition){this.session=session;this.definition=definition;bottom=Objects.requireNonNull(definition.bottom());}
+    BackwardActivationSolver(AnalysisSession session,AnalysisDefinition<S> definition){this.session=session;this.definition=definition;indexResources=AnalysisResources.executionFor(session.index().store());bottom=Objects.requireNonNull(definition.bottom());}
     DataflowResult<S> solve() {
-        for(var model:ActivationSolver.structure(session))entries.add(new EntryRun(model));
+        try(var run=this){return run.execute();}
+    }
+    @Override public void close(){closeOwners();}
+    private void closeOwners() {
+        RuntimeException failure=null;
+        for(var witness:finalWitnesses.values())failure=ActivationSolver.closeResource(witness,failure);finalWitnesses.clear();
+        for(var entry:entries) {
+            for(var index:entry.byFrame.values())failure=ActivationSolver.closeResource(index,failure);entry.byFrame.clear();
+            failure=ActivationSolver.closeResource(entry.paths,failure);
+        }
+        failure=ActivationSolver.closeResource(collector,failure);
+        for(var conditions:ownedConditions)failure=ActivationSolver.closeResource(conditions,failure);
+        ownedConditions.clear();if(failure!=null)throw failure;
+    }
+    private DataflowResult<S> execute() {
+        session.index().store().progress(ProgramStore.ExecutionPhase.CONTROL);
+        var models=ActivationSolver.structure(session);
+        for(var model:models)ownedConditions.add(model.conditions());
+        for(var conditions:ownedConditions)conditions.enableOwnership();
+        for(var model:models)model.visitConditions(model.conditions()::retainPermanentRoot);
+        for(var model:models)entries.add(new EntryRun(model));
+        for(var conditions:ownedConditions)conditions.publishCreated();
         for(var boundary:definition.boundaries(session)) {
+            session.index().store().progress(ProgramStore.ExecutionPhase.CONTROL);
             var entry=entries.stream().filter(e->e.model.context()==boundary.context()).findFirst().orElseThrow(()->new IllegalArgumentException("foreign boundary"));
             var location=ActivationBoundaries.require(entry.model,boundary.node());
             entry.boundaries.computeIfAbsent(location.frame(),f->new IdentityHashMap<>()).merge(boundary.node(),boundary.state(),(a,b)->definition.joinInto(a,b,work).state());joins++;
         }
         for(var entry:entries)entry.start();
-        while(!pending.isEmpty()){var slot=pending.removeFirst();slot.queued=false;pops++;process(slot);collectConditions(slot.region.entry);}
+        while(!pending.isEmpty()){
+            session.index().store().progress(ProgramStore.ExecutionPhase.CONTROL);
+            var slot=pending.removeFirst();slot.queued=false;pops++;var b=slot.region.entry.bdd;b.beginMutation();
+            // Failed executions leave their journal to run-owner destruction;
+            // publishing through an aborted manager would replace the cause.
+            process(slot);collectSummaries(false);b.endMutation();
+            session.index().store().progress(ProgramStore.ExecutionPhase.DOMAIN);
+        }
+        collectSummaries(true);
         var lookup=new IdentityHashMap<ContextView,IdentityHashMap<ProgramIndex.Node,List<AnalysisPoint>>>();
         var ins=new ArrayList<S>();var outs=new ArrayList<S>();long edgeCount=0;
         for(var entry:entries) {
             var nodes=new IdentityHashMap<ProgramIndex.Node,List<AnalysisPoint>>();lookup.put(entry.model.context(),nodes);
             for(var region:entry.regions)for(var slot:region.slots.values()) {
-                edgeCount+=slot.shape.moves().size();
+                session.index().store().progress(ProgramStore.ExecutionPhase.DOMAIN);
+                edgeCount+=slot.shape.moves().size();entry.bdd.beginMutation();
                 for(var in:slot.in.pieces)for(var out:slot.out.pieces)if(feasible(region,entry.bdd.and(in.condition,out.condition))) {
                     int id=ins.size();nodes.computeIfAbsent(slot.node,n->new ArrayList<>()).add(new AnalysisPoint(id,entry.model.context(),slot.node));ins.add(in.state);outs.add(out.state);
-                }
+                }entry.bdd.endMutation();
             }
         }
-        var metrics=new SolverMetrics(ins.size(),edgeCount,joins,nextPoint,attempts,pushes,pops,duplicates,maxSize,transfers,work.operations(),ins.size(),changes,unchanged,deliveries,deliveries,changes,unchanged,0,0,work.joinEntries(),work.compareEntries());
+        long indexProbes=closedIndexProbes;for(var entry:entries)for(var index:entry.byFrame.values())indexProbes+=index.probes();
+        var metrics=new SolverMetrics(ins.size(),edgeCount,joins,nextPoint,attempts,pushes,pops,duplicates,maxSize,transfers,work.operations(),ins.size(),changes,unchanged,deliveries,deliveries,changes,unchanged,0,0,work.joinEntries(),work.compareEntries(),summaryCreated,summaryRetired,summaryLive,summaryPeak,summaryCollections,indexProbes,returnSourceReads,callerProofEdgesRead(),conditionPeak(),certificateEdgesRead(),valuationVisits(),hintIndexProbes());
         return new DataflowResult<>(lookup,ins.toArray(),outs.toArray(),metrics);
     }
     private void collectConditions(EntryRun entry) {
@@ -51,8 +130,8 @@ final class BackwardActivationSolver<S> {
                 owners.add(region);region.incoming.values().forEach(root::accept);
                 for(var slot:region.slots.values()) {
                     slot.children.values().forEach(root::accept);
-                    for(var piece:slot.in.pieces)root.accept(piece.condition);
-                    for(var piece:slot.out.pieces)root.accept(piece.condition);
+                    slot.in.visitConditions(root);
+                    slot.out.visitConditions(root);
                 }
             }
             for(var key:feasibleCache.keySet())if(owners.contains(key.region))root.accept(key.condition);
@@ -61,45 +140,50 @@ final class BackwardActivationSolver<S> {
     }
     private final class Signature {
         final int depth;
-        final Map<ProgramIndex.Node,S> returns,roots;
+        final long fingerprint;
+        final Map<ProgramIndex.Node,S> returns;
         final List<Map<ProgramIndex.Node,S>> ancestors;
-        Signature(int depth,Map<ProgramIndex.Node,S> returns,Map<ProgramIndex.Node,S> roots,List<Map<ProgramIndex.Node,S>> ancestors) {
-            this.depth=depth;this.returns=Map.copyOf(returns);this.roots=Map.copyOf(roots);this.ancestors=List.copyOf(ancestors);
+        Signature(int depth,Map<ProgramIndex.Node,S> returns,List<Map<ProgramIndex.Node,S>> ancestors) {
+            this.depth=depth;this.returns=Map.copyOf(returns);this.ancestors=List.copyOf(ancestors);
+            long hash=31L*depth+mapFingerprint(this.returns);
+            for(var ancestor:this.ancestors)hash=31*hash+mapFingerprint(ancestor);
+            fingerprint=31*hash+this.ancestors.size();
         }
         boolean same(Signature other) {
-            if(depth!=other.depth||!sameMap(returns,other.returns)||!sameMap(roots,other.roots)||ancestors.size()!=other.ancestors.size())return false;
+            if(depth!=other.depth||!sameMap(returns,other.returns)||ancestors.size()!=other.ancestors.size())return false;
             for(int i=0;i<ancestors.size();i++)if(!sameMap(ancestors.get(i),other.ancestors.get(i)))return false;return true;
         }
+    }
+    private long mapFingerprint(Map<ProgramIndex.Node,S> states) {
+        long result=0,empty=definition.stateFingerprint(bottom);
+        for(var entry:states.entrySet()) {
+            long node=System.identityHashCode(entry.getKey());
+            result+=StateIndex.mix(node^definition.stateFingerprint(entry.getValue()))-StateIndex.mix(node^empty);
+        }
+        return result;
     }
     private boolean sameMap(Map<ProgramIndex.Node,S> a,Map<ProgramIndex.Node,S> b) {
         var keys=new HashSet<>(a.keySet());keys.addAll(b.keySet());
         for(var key:keys)if(!definition.equivalent(a.getOrDefault(key,bottom),b.getOrDefault(key,bottom),work))return false;return true;
     }
     private final class EntryRun {
+        final CallerPathCertificates paths;
         final ActivationModel model;final BooleanConditions bdd;
         final List<Region> regions=new ArrayList<>();
-        final IdentityHashMap<ActivationControl.Frame,List<Region>> byFrame=new IdentityHashMap<>();
+        final IdentityHashMap<ActivationControl.Frame,StateIndex<Signature,Region>> byFrame=new IdentityHashMap<>();
         final Map<ActivationControl.Frame,Map<ProgramIndex.Node,S>> boundaries=new IdentityHashMap<>();
-        final Set<Slot> calls=Collections.newSetFromMap(new IdentityHashMap<>());
         Region root;
-        EntryRun(ActivationModel model){this.model=model;bdd=model.conditions();}
+        EntryRun(ActivationModel model){this.model=model;bdd=model.conditions();paths=new CallerPathCertificates(bdd,indexResources,null);}
         void start() {
-            root=new Region(this,null,new Signature(0,Map.of(),Map.of(),Collections.nCopies(model.maxUnwind(),Map.of())));regions.add(root);root.initialize();
+            root=new Region(this,null,new Signature(0,Map.of(),Collections.nCopies(model.maxUnwind(),Map.of())));regions.add(root);summaryCreated();feasibleCache.put(need(root,1),true);root.initialize();
         }
         Region region(ActivationControl.Frame frame,Signature input,Slot caller,int condition) {
-            var candidates=byFrame.computeIfAbsent(frame,k->new ArrayList<>());
-            for(var r:candidates)if(r.input.same(input))return r;
+            frame=model.control().body(frame);
+            var candidates=byFrame.get(frame);
+            if(candidates!=null){var known=candidates.get(input);if(known!=null)return known;}
             if(!feasible(caller.region,condition,caller))return null;
-            var r=new Region(this,frame,input);candidates.add(r);regions.add(r);r.initialize();return r;
-        }
-        Map<ProgramIndex.Node,S> roots() {
-            var values=new IdentityHashMap<ProgramIndex.Node,S>();
-            for(var node:model.rootTargets()) {
-                var slot=root.slots.get(node);S state=bottom;
-                if(slot!=null)for(var piece:slot.in.pieces)state=definition.joinInto(state,piece.state,work).state();
-                values.put(node,state);
-            }
-            return values;
+            if(candidates==null){candidates=new StateIndex<>(indexResources,AnalysisResources.Phase.DOMAIN,a->a.fingerprint,Signature::same);byFrame.put(frame,candidates);}
+            var r=new Region(this,frame,input);candidates.putIfAbsent(input,r);regions.add(r);summaryCreated();r.initialize();return r;
         }
     }
     private final class Region {
@@ -108,17 +192,30 @@ final class BackwardActivationSolver<S> {
         final Map<ProgramIndex.Node,List<Slot>> predecessors=new IdentityHashMap<>();
         final Set<Slot> callers=Collections.newSetFromMap(new IdentityHashMap<>());
         final Set<Slot> waiters=Collections.newSetFromMap(new IdentityHashMap<>());
-        final Map<Slot,Integer> incoming=new IdentityHashMap<>();
-        long incomingVersion;
-        final List<Slot> calls=new ArrayList<>();
-        Region(EntryRun entry,ActivationControl.Frame frame,Signature input){this.entry=entry;this.frame=frame;this.input=input;}
+        final Map<Slot,Integer> incoming;
+        long incomingVersion,mark;
+        final CallerPathCertificates.Node path;
+        final Map<Slot,CallerPathCertificates.Arc> certifiedIncoming;
+        Region(EntryRun entry,ActivationControl.Frame frame,Signature input){this.entry=entry;this.frame=frame;this.input=input;incoming=new ConditionBindings<>(entry.bdd);path=entry.paths==null?null:entry.paths.node(frame==null,gain->{incomingVersion++;if(gain!=0)for(var waiting:waiters)enqueue(waiting);});certifiedIncoming=entry.paths==null?null:new IdentityHashMap<>();}
         void initialize() {
             var shape=entry.model.shapes().get(frame);
             for(var point:shape.points().entrySet())slots.put(point.getKey(),new Slot(this,point.getKey(),point.getValue()));
             for(var slot:slots.values()) {
-                for(var move:slot.shape.moves())if(move.action()==ActivationControl.Action.NEXT||frame==null&&move.action()==ActivationControl.Action.ROOT)
-                    predecessors.computeIfAbsent(move.destination(),n->new ArrayList<>()).add(slot);
-                if(slot.shape.moves().stream().anyMatch(m->m.action()==ActivationControl.Action.CALL)){calls.add(slot);entry.calls.add(slot);}
+                for(var move:slot.shape.moves()) {
+                    if(move.action()==ActivationControl.Action.NEXT||frame==null&&move.action()==ActivationControl.Action.ROOT)
+                        predecessors.computeIfAbsent(move.destination(),n->new ArrayList<>()).add(slot);
+                    if(move.action()==ActivationControl.Action.CALL) {
+                        var childShape=entry.model.shapes().get(entry.model.control().body(move.frame()));
+                        // A symbolic CALL move can be impossible under its source
+                        // predicate and thus have no reached child shape. It reads nothing.
+                        if(childShape==null)continue;
+                        var targets=new LinkedHashSet<>(entry.model.unwindTargets());
+                        for(var source:childShape.returnSources()) {
+                            returnSourceReads++;targets.add(entry.model.control().returnDestination(source,move.frame()));
+                        }
+                        for(var target:targets)predecessors.computeIfAbsent(target,n->new ArrayList<>()).add(slot);
+                    }
+                }
                 slot.out.add(slot.shape.condition(),bottom);enqueue(slot);
             }
         }
@@ -126,46 +223,43 @@ final class BackwardActivationSolver<S> {
     private final class Slot {
         final Region region;final ProgramIndex.Node node;final ActivationModel.Point shape;
         final AnalysisPoint point;final Partition in,out;boolean queued;
-        Map<Region,Integer> children=new IdentityHashMap<>();
+        final Set<Slot> rootReads=Collections.newSetFromMap(new IdentityHashMap<>());
+        final Set<Slot> rootReaders=Collections.newSetFromMap(new IdentityHashMap<>());
+        Map<Region,Integer> children;
         final Set<Region> watches=Collections.newSetFromMap(new IdentityHashMap<>());
-        Slot(Region region,ProgramIndex.Node node,ActivationModel.Point shape) {
-            this.region=region;this.node=node;this.shape=shape;point=new AnalysisPoint(nextPoint++,region.entry.model.context(),node);
+        Slot(Region region,ProgramIndex.Node node,ActivationModel.Point shape) {recordsSinceSweep++;
+            this.region=region;this.node=node;this.shape=shape;children=new ConditionBindings<>(region.entry.bdd);point=new AnalysisPoint(nextPoint++,region.entry.model.context(),node);
             in=new Partition(region.entry);out=new Partition(region.entry);
         }
     }
-    private final class Piece {
-        final int condition;final S state;Piece(int condition,S state){this.condition=condition;this.state=state;}
-    }
-    private final class Partition {
-        final EntryRun entry;List<Piece> pieces=List.of();Partition(EntryRun entry){this.entry=entry;}
-        boolean add(int condition,S state) {
-            if(condition==0)return false;var next=new ArrayList<Piece>();int remaining=condition;boolean modified=false;var b=entry.bdd;
-            for(var piece:pieces) {
-                int overlap=b.and(piece.condition,condition);
-                if(overlap==0){put(next,piece.condition,piece.state);continue;}
-                remaining=b.difference(remaining,piece.condition);var joined=definition.joinInto(piece.state,state,work);
-                if(!joined.changed()){put(next,piece.condition,piece.state);continue;}
-                modified=true;put(next,b.difference(piece.condition,condition),piece.state);put(next,overlap,joined.state());
-            }
-            if(remaining!=0){modified=true;put(next,remaining,state);}
-            if(modified)pieces=List.copyOf(next);return modified;
-        }
-        void put(List<Piece> result,int condition,S value) {
-            if(condition==0)return;
-            for(int i=0;i<result.size();i++)if(definition.equivalent(result.get(i).state,value,work)) {result.set(i,new Piece(entry.bdd.or(result.get(i).condition,condition),value));return;}
-            result.add(new Piece(condition,value));
-        }
+    private final class Partition extends GuardedStates<S> {
+        Partition(EntryRun entry){super(entry.bdd,definition,work);}
     }
     private void enqueue(Slot slot){attempts++;if(slot.queued){duplicates++;return;}slot.queued=true;pending.addLast(slot);pushes++;maxSize=Math.max(maxSize,pending.size());}
     private void contribute(Slot source,int condition,ProgramIndex.Node destination,CfgTransition edge,S state) {
         if(condition==0)return;deliveries++;
         var target=new AnalysisPoint(-1,source.region.entry.model.context(),destination);
         S contribution=Objects.requireNonNull(definition.transferEdge(target,edge,state,work));
+        session.index().store().progress(ProgramStore.ExecutionPhase.DOMAIN);
         if(definition.equivalent(contribution,state,work)||feasible(source.region,condition,source))source.out.add(condition,contribution);
+    }
+    private void detachRootReads(Slot source) {
+        for(var target:source.rootReads)target.rootReaders.remove(source);source.rootReads.clear();
+    }
+    /** Successor guard is over an empty word, independently of the source word. */
+    private void readRoot(Slot source,ProgramIndex.Node destination,int condition,CfgTransition edge) {
+        var target=source.region.entry.root.slots.get(destination);if(target==null)return;
+        source.rootReads.add(target);target.rootReaders.add(source);
+        for(var piece:target.in.pieces)if(source.region.entry.bdd.atEmpty(piece.condition)!=0)
+            contribute(source,condition,destination,edge,piece.state);
     }
     private void read(Slot source,Slot target,int condition,CfgTransition edge) {
         if(target==null)return;
-        for(var piece:target.in.pieces)contribute(source,source.region.entry.bdd.and(condition,piece.condition),target.node,edge,piece.state);
+        var b=source.region.entry.bdd;
+        for(var piece:target.in.pieces){
+            long mark=b.constructionMark();
+            contribute(source,b.and(condition,piece.condition),target.node,edge,piece.state);b.publishSince(mark);
+        }
     }
     private final class Choice {
         final int condition;final Map<ProgramIndex.Node,S> values;
@@ -175,7 +269,7 @@ final class BackwardActivationSolver<S> {
         var parent=caller.region;
         List<Choice> choices=List.of(new Choice(condition,Map.of()));var b=parent.entry.bdd;
         for(var target:targets) {
-            var slot=parent.slots.get(target);var options=slot==null?List.<Piece>of():slot.in.pieces;var next=new ArrayList<Choice>();
+            var slot=parent.slots.get(target);var options=slot==null?List.<GuardedStates.Piece<S>>of():slot.in.pieces;var next=new ArrayList<Choice>();
             for(var choice:choices) {
                 int remainder=choice.condition;
                 for(var value:options) {
@@ -190,82 +284,109 @@ final class BackwardActivationSolver<S> {
     }
     private void call(Slot source,ActivationControl.Move move,int condition) {
         var parent=source.region;var e=parent.entry;var b=e.bdd;
-        var needed=new LinkedHashSet<>(e.model.unwindTargets());var returns=new LinkedHashSet<ProgramIndex.Node>();
-        for(var point:e.model.shapes().get(move.frame()).points().values())for(var exit:point.moves())if(exit.action()==ActivationControl.Action.POP)returns.add(exit.destination());
-        needed.addAll(returns);
+        if(!feasible(parent,condition,source))return;
+        var needed=new LinkedHashSet<>(e.model.unwindTargets());var returns=new IdentityHashMap<ProgramIndex.Node,ProgramIndex.Node>();
+        for(var point:e.model.shapes().get(e.model.control().body(move.frame())).returnSources()) {
+            returnSourceReads++;returns.put(point,e.model.control().returnDestination(point,move.frame()));
+        }
+        needed.addAll(returns.values());
         for(var choice:arguments(source,needed,condition)) {
-            var returnValues=new IdentityHashMap<ProgramIndex.Node,S>();for(var node:returns)returnValues.put(node,choice.values.getOrDefault(node,bottom));
+            long mark=b.constructionMark();
+            var returnValues=new IdentityHashMap<ProgramIndex.Node,S>();
+            for(var binding:returns.entrySet()) {
+                deliveries++;var target=new AnalysisPoint(-1,e.model.context(),binding.getValue());
+                returnValues.put(binding.getKey(),Objects.requireNonNull(definition.transferEdge(target,e.model.control().edge(binding.getKey(),binding.getValue()),choice.values.getOrDefault(binding.getValue(),bottom),work)));
+                session.index().store().progress(ProgramStore.ExecutionPhase.DOMAIN);
+            }
             var ancestors=new ArrayList<Map<ProgramIndex.Node,S>>();
             if(e.model.maxUnwind()>0) {
                 var first=new IdentityHashMap<ProgramIndex.Node,S>();for(var node:e.model.unwindTargets())first.put(node,choice.values.getOrDefault(node,bottom));ancestors.add(Map.copyOf(first));
                 for(int i=1;i<e.model.maxUnwind();i++)ancestors.add(parent.input.ancestors.get(i-1));
             }
-            var input=new Signature(Math.min(parent.input.depth+1,e.model.maxUnwind()),returnValues,e.roots(),ancestors);
-            var child=e.region(move.frame(),input,source,choice.condition);if(child==null)continue;subscribe(source,child,choice.condition);
+            var input=new Signature(Math.min(parent.input.depth+1,e.model.maxUnwind()),returnValues,ancestors);
+            var child=e.region(move.frame(),input,source,choice.condition);
+            if(child==null){b.publishSince(mark);continue;}subscribe(source,child,choice.condition);
             var entry=child.slots.get(e.model.control().entry(move.frame()));
             for(var value:entry.in.pieces) {
-                int pre=parent.frame==null?value.condition:b.restrict(value.condition,parent.frame.variable(),true);
+                int pre=b.restrict(value.condition,move.frame().variable(),true);if(parent.frame==null)pre=b.atEmpty(pre);
                 contribute(source,b.and(choice.condition,pre),entry.node,move.edge(),value.state);
             }
+            b.publishSince(mark);
         }
     }
     private void subscribe(Slot caller,Region child,int condition) {
         var b=child.entry.bdd;caller.children.merge(child,condition,b::or);child.callers.add(caller);
+        if(Boolean.TRUE.equals(feasibleCache.get(need(caller.region,condition))))
+            feasibleCache.put(need(child,1),true);
         int old=child.incoming.getOrDefault(caller,0),combined=b.or(old,condition);
         if(combined!=old) {
-            child.incoming.put(caller,combined);child.incomingVersion++;
-            for(var waiting:child.waiters)enqueue(waiting);
+            replaceIncoming(caller,child,combined);
         }
     }
+    private void replaceIncoming(Slot caller,Region child,int condition) {
+        int old=child.incoming.getOrDefault(caller,0);
+        if(old==condition)return;
+        if(condition==0)child.incoming.remove(caller);else child.incoming.put(caller,condition);
+        if(child.entry.paths!=null) {
+            var arc=child.certifiedIncoming.get(caller);
+            if(condition==0) {
+                child.certifiedIncoming.remove(caller);if(arc!=null&&!arc.removed)child.entry.paths.remove(arc);
+            }else if(arc!=null&&!arc.removed)child.entry.paths.update(arc,condition);
+            else child.certifiedIncoming.put(caller,child.entry.paths.add(caller.region.path,child.path,child.entry.model.control().frameAt(caller.node).variable(),condition));
+        }
+        child.incomingVersion++;
+        if(condition!=0)for(var waiting:child.waiters)enqueue(waiting);
+    }
     private void reconcile(Slot caller,Map<Region,Integer> previous) {
-        // Positive witnesses survive added links, but not removal/replacement.
+        // Nontrivial predicate witnesses still depend on the exact current links.
+        // Individual path certificates repair dependent words; still-valid proofs survive.
         for(var old:previous.entrySet())if(!Objects.equals(caller.children.get(old.getKey()),old.getValue())){feasibleCache.clear();break;}
-        for(var child:previous.keySet())if(!caller.children.containsKey(child)){child.callers.remove(caller);child.incoming.remove(caller);}
-        caller.children.forEach((child,condition)->child.incoming.put(caller,condition));
+        for(var child:previous.keySet())if(!caller.children.containsKey(child)){child.callers.remove(caller);replaceIncoming(caller,child,0);}
+        for(var link:caller.children.entrySet())replaceIncoming(caller,link.getKey(),link.getValue());
     }
     private void process(Slot slot) {
-        var previous=slot.children;slot.children=new IdentityHashMap<>();
+        detachRootReads(slot);
+        var previous=slot.children;slot.children=new ConditionBindings<>(slot.region.entry.bdd);
         for(var watched:slot.watches)watched.waiters.remove(slot);slot.watches.clear();
         transfers++;var region=slot.region;var entry=region.entry;var b=entry.bdd;
         var boundary=entry.boundaries.getOrDefault(region.frame,Map.of()).get(slot.node);
         if(boundary!=null)slot.out.add(slot.shape.condition(),boundary);
         for(var move:slot.shape.moves()) {
+            long mark=b.constructionMark();
             int condition=slot.shape.condition();
             if(move.variable()>=0) {
-                int active=region.frame!=null&&region.frame.variable()==move.variable()?1:b.variable(move.variable());
+                int active=region.frame==null?0:b.variable(move.variable());
                 condition=b.and(condition,move.present()?active:b.not(active));
             }
-            if(condition==0)continue;
+            if(condition==0){b.publishSince(mark);continue;}
             switch(move.action()) {
                 case NEXT -> read(slot,region.slots.get(move.destination()),condition,move.edge());
                 case CALL -> call(slot,move,condition);
-                case POP -> contribute(slot,condition,move.destination(),move.edge(),region.input.returns.getOrDefault(move.destination(),bottom));
+                case POP -> slot.out.add(condition,region.input.returns.getOrDefault(slot.node,bottom));
                 case UNWIND -> {
                     boolean valid=move.count()<=region.input.depth;var destination=valid?move.destination():move.invalid();
-                    S value=valid?region.input.ancestors.get(move.count()-1).getOrDefault(destination,bottom):region.frame==null?bottom:region.input.roots.getOrDefault(destination,bottom);
                     var edge=valid?move.edge():entry.model.control().edge(slot.node,destination);
-                    if(region.frame==null)read(slot,entry.root.slots.get(destination),condition,edge);else contribute(slot,condition,destination,edge,value);
+                    if(valid)contribute(slot,condition,destination,edge,region.input.ancestors.get(move.count()-1).getOrDefault(destination,bottom));
+                    else readRoot(slot,destination,condition,edge);
                 }
-                case ROOT -> {
-                    if(region.frame==null)read(slot,entry.root.slots.get(move.destination()),condition,move.edge());
-                    else contribute(slot,condition,move.destination(),move.edge(),region.input.roots.getOrDefault(move.destination(),bottom));
-                }
+                case ROOT -> readRoot(slot,move.destination(),condition,move.edge());
                 case RECURSIVE -> { /* Refusal is checked only for a feasible caller predicate below. */ }
             }
+            b.publishSince(mark);
         }
         boolean changed=false;
         for(var piece:slot.out.pieces) {
             S value=Objects.requireNonNull(definition.transferBlock(slot.point,piece.state,work));
+            session.index().store().progress(ProgramStore.ExecutionPhase.DOMAIN);
             // Identity propagation cannot generate fresh values around a cycle.
             if(definition.equivalent(value,piece.state,work)||feasible(region,piece.condition,slot))changed|=slot.in.add(piece.condition,value);
         }
         if(changed) {
             changes++;for(var predecessor:region.predecessors.getOrDefault(slot.node,List.of()))enqueue(predecessor);
-            for(var call:region.calls)enqueue(call);
             if(slot.node==entry.model.control().entry(region.frame))for(var caller:region.callers)enqueue(caller);
-            if(region.frame==null&&entry.model.rootTargets().contains(slot.node))for(var call:entry.calls)enqueue(call);
+            for(var reader:slot.rootReaders)enqueue(reader);
         } else unchanged++;
-        reconcile(slot,previous);
+        reconcile(slot,previous);previous.clear();
     }
     private final class Deferred {
         final Map<Region,Long> versions=new IdentityHashMap<>();
@@ -278,19 +399,28 @@ final class BackwardActivationSolver<S> {
         if(deferredCache.size()>1024)deferredCache.remove(deferredCache.keySet().iterator().next());
     }
     private final class Witness {
-        final Region region;final int condition;final Witness child;final boolean requiredSeen;
-        Witness(Region region,int condition,Witness child,boolean requiredSeen){this.region=region;this.condition=condition;this.child=child;this.requiredSeen=requiredSeen;}
+        final Region region;final int condition,pushedVariable;final Witness child;final boolean requiredSeen;
+        Witness(Region region,int condition,Witness child,boolean requiredSeen,int pushedVariable){this.region=region;this.condition=condition;this.child=child;this.requiredSeen=requiredSeen;this.pushedVariable=pushedVariable;}
     }
+    private void closeWitnesses(){for(var witness:finalWitnesses.values())witness.close();finalWitnesses.clear();}
     private final Map<EntryRun,CallerWitnesses<Region>> finalWitnesses=new IdentityHashMap<>();
     private CallerWitnesses<Region> finalWitnesses(EntryRun entry) {
         var successors=new IdentityHashMap<Region,List<CallerWitnesses.Edge<Region>>>();
         for(var child:entry.regions)for(var link:child.incoming.entrySet())
-            successors.computeIfAbsent(link.getKey().region,r->new ArrayList<>()).add(new CallerWitnesses.Edge<>(child,link.getValue()));
-        return new CallerWitnesses<>(entry.bdd,entry.model.control().variables(),entry.root,successors,r->r.frame==null?-1:r.frame.variable());
+            successors.computeIfAbsent(link.getKey().region,r->new ArrayList<>()).add(new CallerWitnesses.Edge<>(child,link.getValue(),entry.model.control().frameAt(link.getKey().node).variable()));
+        return new CallerWitnesses<>(entry.bdd,entry.model.control().variables(),entry.root,successors,r->r.frame==null?-1:r.frame.variable(),indexResources,null);
     }
     private boolean feasible(Region region,int condition) {return feasible(region,condition,null);}
     private boolean feasible(Region region,int condition,Slot subscriber) {
-        if(condition==0)return false;var key=new Need(region,condition);var known=feasibleCache.get(key);if(known!=null)return known;
+        if(condition==0)return false;var key=need(region,condition);
+        if(region.entry.paths!=null&&!region.entry.paths.rawReached(region.path)) {
+            var disconnected=deferredCache.get(key);
+            if(disconnected!=null&&disconnected.valid())disconnected.subscribe(subscriber);
+            else defer(key,List.of(region),subscriber);
+            return false;
+        }
+        var known=feasibleCache.get(key);if(known!=null)return known;
+        if(region.entry.paths!=null&&region.entry.paths.matches(region.path,condition)){feasibleCache.put(key,true);return true;}
         if(subscriber==null&&finalWitnesses.computeIfAbsent(region.entry,this::finalWitnesses).matches(region,condition))
             {feasibleCache.put(key,true);return true;}
         var deferred=deferredCache.get(key);
@@ -302,36 +432,49 @@ final class BackwardActivationSolver<S> {
         {
             var seen=Collections.newSetFromMap(new IdentityHashMap<Region,Boolean>());
             int required=region.entry.bdd.requiredPresent(condition);
-            var visited=new HashSet<Need>();visited.add(new Need(region,required<0?1:0));
-            var coarse=new ArrayDeque<Witness>();coarse.add(new Witness(region,1,null,required<0));seen.add(region);Witness root=null;
-            while(!coarse.isEmpty()) {
+            var visited=new HashSet<Need>();visited.add(need(region,required<0?1:0));
+            var coarse=new ArrayDeque<Witness>();coarse.add(new Witness(region,1,null,required<0,-1));seen.add(region);Witness root=null;
+            while(!coarse.isEmpty()&&root==null) {
                 var current=coarse.removeFirst();
                 if(current.region.frame==null&&current.requiredSeen){root=current;break;}
                 for(var link:current.region.incoming.entrySet()) {
-                    var parent=link.getKey().region;boolean requiredSeen=current.requiredSeen||parent.frame!=null&&parent.frame.variable()==required;
-                    if(visited.add(new Need(parent,requiredSeen?1:0))) {
-                        seen.add(parent);coarse.addLast(new Witness(parent,link.getValue(),current,requiredSeen));
+                    callerPathEdgesRead++;
+                    var parent=link.getKey().region;boolean requiredSeen=current.requiredSeen||region.entry.model.control().frameAt(link.getKey().node).variable()==required;
+                    if(visited.add(need(parent,requiredSeen?1:0))) {
+                        seen.add(parent);
+                        var witness=new Witness(parent,link.getValue(),current,requiredSeen,region.entry.model.control().frameAt(link.getKey().node).variable());
+                        // A root discovered from the current breadth layer is already
+                        // a shortest caller witness. Returning it immediately avoids
+                        // scanning unrelated peers whose insertion order depends on
+                        // the physical order of otherwise equivalent sequences.
+                        if(parent.frame==null&&requiredSeen){root=witness;break;}
+                        coarse.addLast(witness);
                     }
                 }
             }
             if(root==null){defer(key,seen,subscriber);return false;}
             var active=new BitSet();var path=root;boolean valid=true;
+            feasibleCache.put(need(path.region,1),true);
             while(path.child!=null) {
+                callerPathEdgesRead++;
                 if(!region.entry.bdd.test(path.condition,active)){valid=false;break;}
-                if(path.region.frame!=null)active.set(path.region.frame.variable());
-                path=path.child;
+                active.set(path.pushedVariable);
+                path=path.child;feasibleCache.put(need(path.region,1),true);
             }
             if(valid&&region.entry.bdd.test(condition,active)){feasibleCache.put(key,true);return true;}
         }
-        var b=region.entry.bdd;int checkpoint=b.checkpoint();
+        // Only a successful query restores its semantic scratch scope. A failed
+        // query is discarded with the enclosing run and must preserve its cause.
+        var b=region.entry.bdd;int checkpoint=b.checkpoint();boolean successful=false;
         try {
             var wanted=new IdentityHashMap<Region,Integer>();var waiting=new IdentityHashMap<Region,Integer>();var queue=new ArrayDeque<Region>();
             wanted.put(region,condition);waiting.put(region,condition);queue.add(region);boolean found=false;
             while(!queue.isEmpty()&&!found) {
                 var current=queue.removeFirst();int need=waiting.remove(current);
-                if(current.frame==null){found=b.and(need,current.entry.model.empty())!=0;continue;}
+                if(current.frame==null){found=b.atEmpty(need)!=0;continue;}
                 for(var link:current.incoming.entrySet()) {
-                    var parent=link.getKey().region;int before=parent.frame==null?need:b.restrict(need,parent.frame.variable(),true);
+                    callerPathEdgesRead++;
+                    var parent=link.getKey().region;int before=b.restrict(need,region.entry.model.control().frameAt(link.getKey().node).variable(),true);
                     before=b.and(before,link.getValue());if(before==0)continue;
                     int old=wanted.getOrDefault(parent,0),extra=b.difference(before,old);if(extra==0)continue;
                     wanted.put(parent,b.or(old,extra));
@@ -341,8 +484,8 @@ final class BackwardActivationSolver<S> {
             }
             if(found||subscriber==null)feasibleCache.put(key,found);
             else defer(key,wanted.keySet(),subscriber);
-            return found;
-        } finally {b.discardAfter(checkpoint);}
+            successful=true;return found;
+        } finally {if(successful)b.discardAfter(checkpoint);}
 
     }
 }

@@ -13,7 +13,7 @@ from check_w1 import ROOT, Failure, command
 
 PREFIX='io.github.gustavo2358.analysis.solver.'
 INVENTORY='docs/evals/cp5/w2-inventory.json'
-NAMES=['ActivationBoundaries','ActivationModel','ActivationSolver','BackwardActivationSolver','BooleanConditions','CallerWitnesses','Direction','AnalysisPoint','AnalysisDefinition','DomainWork','SolverMetrics','DataflowResult','SolverTopology','DataflowSolver','IntWorklist']
+NAMES=['ActivationBoundaries','ActivationModel','ActivationSolver','BackwardActivationSolver','BooleanConditions','ConditionBindings','PagedDagOwnership','BooleanNodeStore','PagedBooleanDecisions','PagedBooleanCircuit','BooleanCircuitView','BooleanCircuitDecisions','BooleanFunctionIndex','SignedLiteralSet','GuardedStates','CallerWitnesses','CallerConnectivity','CallerPathCertificates','PreliminaryCallerSupport','Direction','AnalysisPoint','AnalysisDefinition','DomainWork','SolverMetrics','DataflowResult','SolverTopology','DataflowSolver','IntWorklist','AnalysisResources','PageStore','PagedLongArray','PagedWorklist','PagedLongIndex','CanonicalTupleArena','PersistentLongMap','ResidentPageStore','PersistentGraphClosure','StateIndex','SummaryCollector']
 SOURCES={f'analysis-kernel/src/main/java/io/github/gustavo2358/analysis/solver/{name}.java' for name in NAMES}
 TESTS={
  'SolverTest':set('forwardBoundaryBlockAndEdgeHaveProgramOrderMeaning'.split()),
@@ -81,9 +81,8 @@ def architecture(root:Path,update:bool=False)->None:
         for target in targets:
             if any(d in target for d in DENIED): raise Failure('W2 forbidden solver/SPI bytecode dependency: '+source+' -> '+target)
             if not target.startswith(('java.',PREFIX,'io.github.gustavo2358.analysis.structure.','io.github.gustavo2358.analysis.cfg.domain.CfgTransition')): raise Failure('W2 dependency outside solver DAG: '+target)
-    descriptors={}
-    for path in paths:
-        cls=path[:-6].replace('/','.'); descriptors[cls]=command(root,['javap','-classpath',str(classes)+os.pathsep+cp,'-public','-s',cls])
+    from compiled_descriptors import public_descriptors
+    descriptors={p[:-6].replace('/','.'):value for p,value in public_descriptors(paths,str(classes)+os.pathsep+cp,lambda args:command(root,args)).items()}
     actual={'sources':sorted(SOURCES),'classfiles':paths,'jdeps_edges':{k:sorted(v) for k,v in sorted(edges.items())},'javap_descriptors':descriptors,'effective_maven':sorted(parse_tgf(root/'analysis-kernel/target/architecture-dependencies.tgf'))}
     if update: (root/INVENTORY).write_text(json.dumps(actual,indent=2)+'\n')
     elif json.loads((root/INVENTORY).read_text())!=actual: raise Failure('W2 compiled architecture inventory drift')

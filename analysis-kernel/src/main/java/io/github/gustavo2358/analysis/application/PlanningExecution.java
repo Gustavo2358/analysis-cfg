@@ -88,7 +88,7 @@ public final class PlanningExecution implements AutoCloseable {
         boolean complete = outcomes.values().stream().allMatch(r -> r.status() == AnalysisOutcome.Status.STABLE)
             && batches.values().stream().allMatch(b -> b.status() == BatchStatus.COMPLETE)
             && completed.stream().allMatch(c -> c.status() == ConsumerStatus.COMPLETE);
-        return new PreparedAnalysisResult<>(resultId,session.index().publication().id(),plan.epoch,List.copyOf(outcomes.values()),List.copyOf(batches.values()),
+        return new PreparedAnalysisResult<>(resultId,session.index().store().publicationId(),plan.epoch,List.copyOf(outcomes.values()),List.copyOf(batches.values()),
             plan.consumers(),completed,complete ? PreparationStatus.COMPLETE : PreparationStatus.INCOMPLETE,
             Map.of("planning",plan.metrics,"analysis",analysis.snapshot(),"observation",observations.snapshot(),"consumer",consumers.snapshot()));
     }

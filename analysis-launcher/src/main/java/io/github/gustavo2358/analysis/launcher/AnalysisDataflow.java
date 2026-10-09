@@ -22,6 +22,7 @@ public final class AnalysisDataflow {
         try{input=Path.of(args[0]);output=Path.of(args[1]);}catch(InvalidPathException failure){err.println("USAGE: invalid path");return 2;}
         DataflowAirReader.Read read;
         try {read=reader.read(input);}
+        catch(io.github.gustavo2358.analysis.solver.AnalysisResources.Exhausted failure){err.println("INPUT_RESOURCE_LIMIT: "+failure.getMessage());return 7;}
         catch(AirJsonException failure) {
             int code=switch(failure.code()){case INPUT_ERROR,VERSION_MISMATCH->3;case INVALID_IR,UNSUPPORTED_CAPABILITY->4;case IMPLEMENTATION_LIMIT,INCOMPLETE_VALIDATION,RESOURCE_LIMIT->7;};
             String category=switch(failure.code()){case INPUT_ERROR->"INPUT_TRANSPORT";case VERSION_MISMATCH->"INPUT_VERSION";case INVALID_IR->"INVALID_INPUT";case UNSUPPORTED_CAPABILITY->"UNSUPPORTED_PROFILE";case IMPLEMENTATION_LIMIT->"EXTERNAL SIZE-CAP DEBT";case INCOMPLETE_VALIDATION->"UPSTREAM_VALIDATION_INCOMPLETE";case RESOURCE_LIMIT->"EXTERNAL_RESOURCE_LIMIT";};

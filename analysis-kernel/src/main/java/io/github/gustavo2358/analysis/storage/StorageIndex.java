@@ -3,6 +3,7 @@ package io.github.gustavo2358.analysis.storage;
 import io.github.gustavo2358.air.model.*;
 import io.github.gustavo2358.air.model.Ids.*;
 import io.github.gustavo2358.analysis.structure.AnalysisSession;
+import io.github.gustavo2358.analysis.structure.ProgramStore;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -25,40 +26,81 @@ public final class StorageIndex {
         public Candidate { Objects.requireNonNull(location); Objects.requireNonNull(codec); origins=List.copyOf(origins); }
     }
     public record Resolution(List<Candidate> candidates, Scopes.MemoryBound remainder, List<String> reasons,List<UncertaintyId> uncertainties) {
-        public Resolution { candidates=List.copyOf(candidates);Objects.requireNonNull(remainder);reasons=List.copyOf(reasons);uncertainties=List.copyOf(uncertainties); }
+        public Resolution { if(!(candidates instanceof WholeCandidates))candidates=List.copyOf(candidates);Objects.requireNonNull(remainder);reasons=List.copyOf(reasons);uncertainties=List.copyOf(uncertainties); }
         public Resolution(List<Candidate> candidates,Scopes.MemoryBound remainder,List<String> reasons) { this(candidates,remainder,reasons,List.of()); }
-        public boolean exact() { return remainder instanceof Scopes.NoMemory && candidates.stream().map(Candidate::location).distinct().count()==1; }
+        public boolean exact() { return remainder instanceof Scopes.NoMemory && (candidates instanceof WholeCandidates?candidates.size()==1:candidates.stream().map(Candidate::location).distinct().count()==1); }
     }
+    /** Complete admitted inventory: one unique base per ordinal, no copied headers.
+     * Materialization is a caller operation; the borrowed owner checks lifetime
+     * on every size/access. Only this private immutable view bypasses copyOf. */
+    private static final class WholeCandidates extends AbstractList<Candidate> implements RandomAccess {
+        private final List<Memory.Storage> source;
+        private final ProgramStore.StorageInventory inventory;
+        private final boolean filtered;
+        WholeCandidates(List<Memory.Storage> source,ProgramStore.StorageInventory inventory){this(source,inventory,false);}
+        WholeCandidates(List<Memory.Storage> source,ProgramStore.StorageInventory inventory,boolean filtered){this.source=Objects.requireNonNull(source);this.inventory=Objects.requireNonNull(inventory);this.filtered=filtered;}
+        @Override public int size(){return source.size();}
+        @Override public Candidate get(int ordinal){
+            var base=source.get(ordinal);
+            var range=base instanceof Memory.Region region?Optional.of(new StorageRange(BigInteger.ZERO,region.extent())):Optional.<StorageRange>empty();
+            return new Candidate(new Location(base.header(),range),Optional.empty(),List.of(base.header().origin()));
+        }
+        @Override public void clear(){throw new UnsupportedOperationException("immutable borrowed whole storage scope");}
+        BaseAddress address(int ordinal){Objects.checkIndex(ordinal,size());return new BaseAddress(inventory,filtered?inventory.nonEmptyOrdinal(ordinal):ordinal);}
+    }
+    /** Owner-local descriptor obtained from an admitted immutable catalogue view.
+     * It is not an AIR ID; consumers must check the same inventory owner. */
+    public record BaseAddress(ProgramStore.StorageInventory owner,int ordinal){
+        public BaseAddress{Objects.requireNonNull(owner);Objects.checkIndex(ordinal,owner.size());}
+    }
+    public static Optional<BaseAddress> address(List<Candidate> candidates,int ordinal){
+        Objects.checkIndex(ordinal,candidates.size());return candidates instanceof WholeCandidates whole?Optional.of(whole.address(ordinal)):Optional.empty();
+    }
+    /** Null means the general candidate/dedup route is required. */
+    static List<Candidate> nonEmptyWholeCandidates(Resolution resolution){
+        return resolution.candidates() instanceof WholeCandidates whole
+            ?new WholeCandidates(whole.inventory.nonEmptyStorage(),whole.inventory,true):null;
+    }
+    /** Only the private admitted view proves all boundaries are already whole bases. */
+    static boolean wholeCandidates(List<Candidate> candidates){return candidates instanceof WholeCandidates;}
     private final AnalysisSession session;
-    private final Map<StorageId,Memory.Storage> bases=new LinkedHashMap<>();
-    private final Map<ObjectId,Memory.ObjectDeclaration> declarations=new LinkedHashMap<>();
+    private final Map<StorageId,Memory.Storage> bases;
+    private final Map<ObjectId,Memory.ObjectDeclaration> declarations;
     private final Map<ObjectId,Resolution> objects=new HashMap<>();
     private final Map<StorageId,Set<PremiseId>> separation=new HashMap<>();
-    private final Map<ObjectId,List<ObjectId>> aliasDependencies=new HashMap<>();
+    private final Map<ObjectId,List<ObjectId>> aliasDependencies=new LinkedHashMap<>();
     private final Set<UncertaintyId> uncertaintyIds=new HashSet<>();
     private long bindingVisits,premiseMembers;
     public StorageIndex(AnalysisSession session) {
         this.session=Objects.requireNonNull(session);
-        var publication=session.index().publication();
-        publication.uncertainties().forEach(u->uncertaintyIds.add(u.id()));
-        for(var base:publication.storage())bases.put(base.header().id(),base);
-        for(var unit:publication.units())for(var object:unit.objects())declarations.put(object.id(),object);
-        for(var premise:publication.premises())if(premise.assertion() instanceof Proofs.DisjointStorage d)
+        var store=session.index().store();
+        store.uncertainties().forEach(u->uncertaintyIds.add(u.id()));
+        if(store.storageInventory().isPresent())bases=session.index().storageDeclarations();
+        else {
+            bases=new LinkedHashMap<>();
+            for(var base:store.storage())bases.put(base.header().id(),base);
+        }
+        declarations=session.index().objectDeclarations();
+        for(var premise:store.premises())if(premise.assertion() instanceof Proofs.DisjointStorage d)
             for(var id:d.storage()) { separation.computeIfAbsent(id,ignored->new HashSet<>()).add(premise.id());premiseMembers++; }
         // Explicit DFS avoids call-stack depth proportional to an exact-alias chain.
         var dependencies=aliasDependencies;
-        for(var object:declarations.values()) {
+        for(var declaration:declarations.entrySet()) {
+            var object=declaration.getValue();
             var refs=new ArrayList<ObjectId>();var pending=new ArrayDeque<Memory.Binding>();pending.push(object.storage());
             while(!pending.isEmpty()) {
                 var b=pending.pop();bindingVisits++;
                 if(b instanceof Memory.AliasBinding a)refs.add(a.object());
                 else if(b instanceof Memory.AlternativesBinding a)for(var child:a.alternatives())pending.push(child);
             }
-            dependencies.put(object.id(),List.copyOf(refs));
+            // Borrow the canonical key: native bodies reconstruct complete IDs on each read.
+            dependencies.put(declaration.getKey(),List.copyOf(refs));
         }
         var active=new HashSet<ObjectId>();
         record Frame(ObjectId id,Iterator<ObjectId> dependencies) { }
-        for(var root:declarations.keySet()) {
+        // Preserve declaration insertion order while borrowing the identities
+        // already owned by the required edges, not another cold projection.
+        for(var root:dependencies.keySet()) {
             if(objects.containsKey(root))continue;
             var stack=new ArrayDeque<Frame>();stack.push(new Frame(root,dependencies.get(root).iterator()));active.add(root);
             while(!stack.isEmpty()) {
@@ -224,6 +266,10 @@ public final class StorageIndex {
         return true; // Distinct StorageIds are independent state bases in the supported model.
     }
     public Resolution select(Scopes.MemoryScope scope) {
+        if(scope instanceof Scopes.AllMemory all&&session.index().store().storageInventory().isPresent())
+            return new Resolution(new WholeCandidates(session.index().store().storage(),session.index().store().storageInventory().orElseThrow()),
+                all.includingEnvironment()?new Scopes.WithinMemory(all):Scopes.NoMemory.INSTANCE,
+                all.includingEnvironment()?List.of("ENVIRONMENT_STORAGE"):List.of());
         var result=new Accumulator();
         record Frame(Scopes.MemoryScope scope,boolean exit) { }
         var pending=new ArrayDeque<Frame>();var visiting=new HashSet<Scopes.MemoryScope>();var resolved=new HashSet<Scopes.MemoryScope>();

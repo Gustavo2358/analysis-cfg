@@ -7,11 +7,13 @@ import io.github.gustavo2358.air.model.*;
 import io.github.gustavo2358.air.model.Ids.*;
 import io.github.gustavo2358.air.json.AirJson;
 import io.github.gustavo2358.analysis.dependencies.*;
+import io.github.gustavo2358.analysis.solver.AnalysisResources;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /** Independent AIR oracle; source aggregation has no graph/dataflow inputs. */
 final class SourceDependencyTest {
+    @org.junit.jupiter.api.io.TempDir java.nio.file.Path directory;
     private static Publication publication(String kind,String authority,String resolution,int count,boolean nested) {
         var p=ResourceBindingOracle.publication("A1");var uid=p.units().getFirst().id();
         var artifacts=new ArrayList<>(p.artifacts());var owner=new ArtifactId(p.id(),"source-owner");var outer=new ArtifactId(p.id(),"outer");
@@ -44,6 +46,29 @@ final class SourceDependencyTest {
         var result=new SourceDependencyAnalysis().prepare(publication("source-sql_include","source.UNKNOWN@1","source.UNRESOLVED",1,false));
         assertTrue(result.partial());assertEquals(SourceDependencyResult.Kind.SQL_INCLUDE,result.dependencies().getFirst().kind());assertEquals("MEMBER",result.dependencies().getFirst().name());
         assertTrue(result.gapCodes().contains("SQL_INCLUDE_CLASSIFICATION_UNKNOWN"));
+    }
+    @Test void checkedNativeOriginLookupPreservesOriginalExpandedSupports() {
+        var p=publication("source-copybook","source.COPY_SYNTAX@1","source.RESOLVED",2,true);
+        var origins=new ArrayList<>(p.origins());var resources=new ArrayList<>(p.resources());
+        for(int i=0;i<resources.size();i++) {
+            var resource=resources.get(i);
+            if(!(resource.description() instanceof Interactions.LiteralTarget target)||!target.category().equals("source-copybook"))continue;
+            var derived=new OriginId(p.id(),"derived-"+resource.id().localId());
+            origins.add(new Origins.Derived(derived,List.of(resource.origin(),p.origins().getFirst().id()),"sp-provenance/original-expanded@1"));
+            resources.set(i,new Interactions.Resource(resource.id(),new Interactions.LiteralTarget(target.category(),target.namespace(),target.name(),target.namePolicy(),derived),derived,resource.declaration()));
+        }
+        var changed=new Publication(p.id(),p.airVersion(),p.capabilities(),p.artifacts(),p.units(),p.storage(),resources,p.artifactRelations(),origins.reversed(),p.coverage(),p.uncertainties(),p.premises());
+        var reference=new SourceDependencyAnalysis().prepare(changed);
+        var ledger=new AnalysisResources(new AnalysisResources.Limits(64_000_000,64_000_000,0,256_000_000,4,1_000_000_000,1_000_000));
+        try(var pages=new FilePageStore(directory,512,16,ledger);var snapshot=AirSnapshot.fromPublication(changed);
+            var checked=io.github.gustavo2358.air.validation.SnapshotValidator.check(snapshot,io.github.gustavo2358.air.validation.ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger));
+            var program=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),new PagedSnapshotOrderStorage(pages,ledger),ledger)) {
+            assertTrue(checked.result().isStructurallyValid(),checked.result().toString());
+            assertEquals(reference,new SourceDependencyAnalysis().prepare(program));
+            assertEquals(2,reference.occurrences());assertFalse(reference.partial());
+            assertTrue(reference.dependencies().getFirst().supports().stream().allMatch(s->s.transitive()&&s.sourceOwner().localId().equals("source-owner")&&s.origin().localId().startsWith("derived-")));
+        }
+        assertEquals(0,ledger.heapUsed());
     }
     @Test void requiresPositiveDclgenAuthorityAndClosedProfile() {
         var valid=new SourceDependencyAnalysis().prepare(publication("source-dclgen","source.CONFIGURED_DCLGEN@1","source.RESOLVED",1,false));
