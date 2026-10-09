@@ -37,6 +37,8 @@ public final class DataflowAirReader {
         public synchronized SnapshotIdentityKeys.Storage newIdentityStorage(){open();return new PagedSnapshotIdentityStorage(pages,resources);}
         public synchronized io.github.gustavo2358.analysis.dependencies.SnapshotOrderStorage newOrderStorage(){open();return new PagedSnapshotOrderStorage(pages,resources);}
         public synchronized io.github.gustavo2358.analysis.dependencies.SnapshotDependencyAnalysis.Storage newDependencyStorage(){open();return new PagedSnapshotDependencyStorage(pages,resources);}
+        /** Borrowed execution storage. Consumers release their pages, never this store or input owner. */
+        public synchronized PageStore borrowedPages(){open();return pages;}
         public AnalysisResources resources(){return resources;}public long airReads(){return airReads;}public long airBytesObserved(){return airBytesObserved;}public String sha256(){return sha256;}
         private void open(){if(checked==null)throw new IllegalStateException("snapshot read is closed");}
         @Override public synchronized void close(){if(checked==null)return;Throwable failure=null;try{checked.close();}catch(RuntimeException|Error cleanup){failure=cleanup;}checked=null;try{if(pages!=null)pages.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}pages=null;try{if(directory!=null)Files.deleteIfExists(directory);}catch(IOException cleanup){if(failure==null)failure=cleanup;else failure.addSuppressed(cleanup);}directory=null;if(failure instanceof RuntimeException error)throw error;if(failure instanceof Error error)throw error;if(failure!=null)throw new IllegalStateException("snapshot input cleanup",failure);}

@@ -244,14 +244,34 @@ por diagn√≥stico tipado e contagens totais, sem produzir grafo ou resultado sem√
 
 ## Full file pipeline composition
 
-`analysis-pipeline <AIR> <CFG> <dependencies> [--source-evidence <source>]`
+`analysis-pipeline <AIR> <CFG> <dependencies> [--source-evidence <source>] [--experimental-physical]`
 is an outer launcher with direct cfg-kernel/cfg-adapters dependencies. It admits
 one strict immutable AIR snapshot and the complete digest-bound source evidence
 before exporting. CFG uses conservative defaults; dependencies retain their
-partial-analysis projection. Export graph ownership ends before analysis begins.
+partial-analysis projection. All public modes now use one checked typed paged
+snapshot, the existing general session/planner and shared target qualification.
+There is no resident Publication fallback. Full mandatory AIR rules run through
+the official producer's borrowed views outside its earlier proven slices; actual
+undecided obligations still reject complete dependency production.
+
+Executable and source analysis finish before either destination is replaced. The
+CFG projection can retire after its export, before dependency encoding. Source
+values borrow the input's PageStore and resource owner, without closing the owner.
+The explicit resident route is retained only as a package-level differential
+reference. Native v3 preserves sites, edges, origins, artifacts, uncertainties,
+CALL/FILE/source evidence and unified dependency programs, including physical
+choice candidates and their supports. A digest mismatch rejects before export.
 Each destination uses its existing atomic writer. If dependency delivery later
 fails, the completed CFG remains, matching the sequential file pipeline. Exit
 status remains nonzero; workers cannot certify the program as complete.
 Distinct input/destination paths and aliases are required. Compressed transports
 are supported through the existing adapters; bundles and incomplete AIR remain
 on the separate dependency CLI. No process-global snapshot or execution cache.
+
+PARTIAL: result lists, qualification indexes and general validation ID/proof caches
+remain resident. Borrowed pages and metered output do not establish global heap or
+spill bounds. Source demand indexes, proof/node closure, native qualification and
+target-resolution loops now observe the common owner's productive INDEX/DOMAIN
+safepoints. Source decoding and owning-model constructor validation still need
+internal safepoints; the configured shared eight-minute deadline is not yet a
+whole-phase qualification.

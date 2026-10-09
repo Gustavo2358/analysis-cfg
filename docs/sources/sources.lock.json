@@ -150,7 +150,7 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "761baef0b4c6dcd6e2b30c64abf9c58e74582577",
+    "commit": "6ce36df8751b0caec7dd3739481256ec9dffae1c",
     "canonical_ref": "feat/paged-air-snapshot",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
@@ -228,12 +228,12 @@
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "logical_text_w2": "Local producer FAST PASS; fixed logical ranges and expression transport. Selected source E2E qualification in docs/product/logical-text-w2.md.",
-    "evidence_level": "Producer FAST274model/145transport/44harness PASS28.687s, no JVM reuse. Snapshot admission rejects contradictory invocation outcomes, signature cardinalities, roles, modes and known types. Independent typed operands with open, unmaterialized signatures retain their prior admission; known-position domain transmission and per-outcome/mustOverwrite obligations remain uncertified. Halt transport is identical to 37b5792. Shared-label empty-state/closed-empty-signature Entries remain individually admitted; correlated concat remains narrow; COBOL name semantics only. Global snapshot admission remains incomplete.",
+    "evidence_level": "Producer local FAST PASS:277 model/145 transport, compiled boundaries and harness. Outside prior direct/correlated profiles, snapshot admission runs all existing mandatory AirValidator rules through borrowed typed views and address indexes, without aggregate Publication/Unit/Sequence/Coverage reconstruction. Name policies require declarations; target.possibilities admits only unknown target domains. Unknown sameDomain without proof and genuinely undecided obligations remain rejected/incomplete. ID/address metadata, proof caches and per-occurrence materialization remain resident: global heap/spill qualification PARTIAL.",
     "status": "LOCAL_CHECKPOINT / HUMAN_REVIEW_PENDING",
     "ci": {
-      "checked_commit": "761baef0b4c6dcd6e2b30c64abf9c58e74582577",
+      "checked_commit": "6ce36df8751b0caec7dd3739481256ec9dffae1c",
       "status": "PASS",
-      "context": "PR 30; remote FAST runs 37893939546 and 37893943512 both success; human review pending"
+      "context": "PR 30; remote FAST runs37914234022/37914227277 both SUCCESS at pinned6ce36df; human review pending; no merge"
     },
     "air_scale_access": {
       "previous_commit": "c2f80b59b7c38fa6efb9a20f0fa79644c697d8a4",

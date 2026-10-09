@@ -66,8 +66,8 @@ class LogicalChoiceTargetTest {
             assertEquals(expected,site.candidates().stream().map(DependencySiteFact.Candidate::referenceName).toList());assertEquals(point,site.valuePoint());assertTrue(site.effectiveUnknownRemainder());
             assertTrue(site.candidates().stream().allMatch(c->!c.supports().isEmpty()));
             var input=dir.resolve(variant+".air.json");var output=dir.resolve(variant+".dependencies.json");Files.write(input,bytes);Files.writeString(output,"sentinel");
-            var errors=new ByteArrayOutputStream();assertEquals(7,AnalysisDependencies.run(new String[]{input.toString(),output.toString()},new PrintStream(errors)),errors.toString());
-            assertEquals("sentinel",Files.readString(output));assertTrue(errors.toString().contains("INCOMPLETE_VALIDATION"));
+            var errors=new ByteArrayOutputStream();assertEquals(0,AnalysisDependencies.run(new String[]{input.toString(),output.toString()},new PrintStream(errors)),errors.toString());
+            PipelineCliTest.assertCompleteDependencySections(p,dependencies,output);
             var out=Path.of("target/ep-representation");Files.createDirectories(out);Files.write(out.resolve(variant+".air.json"),bytes);
             try(var stream=Files.newOutputStream(out.resolve(variant+".regional.json"))){new RegionalResultJson().write(regional,stream);}
         }

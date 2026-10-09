@@ -542,6 +542,8 @@
       "existingRejectionsAndLiteralPaddingRemainOpen"
     ],
     "io.github.gustavo2358.analysis.dependencies.SourceValuesProviderTest": [
+      "sharedBudgetStopsSourceIndexPreparationBeforeStateAllocation",
+      "noRequestedObservationRetainsNoPrivateControlOrStatementIndex",
       "branchExcludesKnownNameWithOpenStoragePremises",
       "choiceKeepsEveryAlternativeAndRejectsOldAuthority",
       "copyCapturesSnapshot",
@@ -572,11 +574,17 @@
       "groundingPreservesAndOrCyclesAndHashCollisions"
     ],
     "io.github.gustavo2358.analysis.dependencies.NominalDemandIndexTest": [
+      "sharedProgressChecksIndexConstructionAndClosureWithoutChangingDemand",
       "indexedClosureAgreesWithIndependentFixpointAcrossPermutationsAndCycles",
       "reversedChainVisitsEachIndexedNodeAndEdgeOnce",
       "conditionReadsUseLinearIncidenceRatherThanPairwiseEdges",
       "assignmentAndConditionExpressionSharingDoesNotInventReceiverDemand",
       "sharedExpressionDagIsIndexedByIdentityWithoutExpandingOccurrences"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.SourceControlEvidenceTest": [
+      "sharedProgressRemainsActiveThroughProofAndNodePropagation",
+      "proofClosureMatchesIndependentScalarCyclesCollisionsAndPermutations",
+      "reverseOrderedProofChainHasLinearWorkAndNoSeedBuildsNoIndex"
     ],
     "io.github.gustavo2358.analysis.dependencies.SourceCorrelationIndexTest": [
       "nativeFileAdmissionIndexesNodesOnceInsteadOfScanningPerUse",
@@ -1045,7 +1053,7 @@
     "io.github.gustavo2358.analysis.launcher.InvocationIndependenceTest": [
       "memoryTenShapesPreserveTargetAndRemainder",
       "normalResultKillsOldValueButUnknownDestinationOnlyWidens",
-      "jsonRoundTripRetainsTenShapesAndSnapshotCliFailsClosedUntilCertified"
+      "jsonRoundTripRetainsTenShapesAndSnapshotCliPreservesEverySection"
     ],
     "io.github.gustavo2358.analysis.launcher.PhysicalChoiceTargetTest": [
       "physicalAlternativesSurviveMemoryAndCliWithoutResurrectingMustValues"
@@ -1066,6 +1074,8 @@
       "defaultRoutePublishesCfgAndDependenciesFromTheValidatedSnapshot",
       "invalidIncompleteDigestAndAliasesRejectBeforeAnyDestination",
       "fullCorrelatedSourceAndDigestMismatchPreserveProducts",
+      "explicitSourceEvidenceUsesOneCheckedSnapshotAndPreservesEverySection",
+      "experimentalPhysicalPipelineUsesNativeValuesWithoutDroppingChoiceSupports",
       "writerFailuresKeepCompletedProductsAndCleanStaging",
       "explicitCodecLimitNeverStartsExportOrPublishesFallback"
     ]

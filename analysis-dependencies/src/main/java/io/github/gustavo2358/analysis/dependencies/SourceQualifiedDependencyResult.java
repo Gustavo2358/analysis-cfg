@@ -48,8 +48,12 @@ public final class SourceQualifiedDependencyResult {
         public NativeFileResult {Objects.requireNonNull(source);Objects.requireNonNull(status);candidates=List.copyOf(candidates);}
     }
     public static SourceQualifiedDependencyResult admit(QualifiedSourceDependencies evidence,String publication) {
+        return admit(evidence,publication,()->{});
+    }
+    static SourceQualifiedDependencyResult admit(QualifiedSourceDependencies evidence,String publication,Runnable progress) {
+        Objects.requireNonNull(progress).run();
         if(evidence.air().size()!=1 || !evidence.air().getFirst().publication().equals(publication))throw new IllegalArgumentException("AIR publication mismatch");
-        return new SourceQualifiedDependencyResult(evidence,prepare(Objects.requireNonNull(evidence)));
+        return new SourceQualifiedDependencyResult(evidence,prepare(Objects.requireNonNull(evidence),progress));
     }
     /** Standalone source admission has no executable AIR identity requirement. */
     public static SourceQualifiedDependencyResult admit(QualifiedSourceDependencies evidence) {return new SourceQualifiedDependencyResult(evidence,prepare(Objects.requireNonNull(evidence)));}
@@ -57,27 +61,34 @@ public final class SourceQualifiedDependencyResult {
         var result=new ArrayList<String>(values.size());for(var value:values)result.add(value.value());return result;
     }
     private static Prepared prepare(QualifiedSourceDependencies evidence) {
+        return prepare(evidence,()->{});
+    }
+    private static Prepared prepare(QualifiedSourceDependencies evidence,Runnable progress) {
         var results=new ArrayList<OccurrenceResult>();var files=new ArrayList<NativeFileResult>();
         var affected=new IdentityHashMap<UnitEvidence,Set<String>>();
-        for(var u:evidence.units()) {var assumed=SourceControlEvidence.affected(u);affected.put(u,assumed);
+        for(var u:evidence.units()) {progress.run();var assumed=SourceControlEvidence.affected(u,progress);affected.put(u,assumed);
             for(var f:u.nativeFiles()) {
+                progress.run();
                 var status=!u.controlAvailable()?Status.CONTROL_UNAVAILABLE:f.qualifications().isEmpty()?Status.NOT_QUALIFIED_IN_SOURCE_MODEL:
                     intersects(f.qualifications(),assumed)?Status.POSSIBLE_UNDER_UNKNOWN_CONTROL:Status.QUALIFIED_POSSIBLE;
                 var candidates=new ArrayList<Candidate>();boolean remainder=!f.local()&&f.names().isEmpty()||!f.gaps().isEmpty()||status==Status.POSSIBLE_UNDER_UNKNOWN_CONTROL;
                 if(!f.qualifications().isEmpty())for(var value:f.names()) {
+                    progress.run();
                     var name=FileNamePolicy.name("cobol.external-file-name",value.rawValue(),false,Interactions.ExactName.INSTANCE);
                     if(name==null)remainder=true;else candidates.add(new Candidate(name,value.rawValue(),f.statement(),f.qualifications()));
                 }
                 files.add(new NativeFileResult(f,status,candidates,remainder));
             }
             for(var o:u.occurrences()) {
+            progress.run();
             var candidates=new ArrayList<Candidate>();boolean open=false;
             var status=!u.controlAvailable()?Status.CONTROL_UNAVAILABLE:o.qualifications().isEmpty()?Status.NOT_QUALIFIED_IN_SOURCE_MODEL:intersects(o.qualifications(),assumed)?Status.POSSIBLE_UNDER_UNKNOWN_CONTROL:Status.QUALIFIED_POSSIBLE;
             if(o.namespace().equals("PROGRAM")) {
                 var occurrence=new QualifiedDependencyOccurrence(Optional.of(o.id()),o.id().unit().canonicalProgramName(),o.technology(),o.nameProfile(),o.targetKind(),texts(o.values()),u.controlAvailable()?o.qualifications():List.of(),List.of(),o.valueRemainder(),status==Status.POSSIBLE_UNDER_UNKNOWN_CONTROL);
-                var resolved=TargetResolver.resolve(occurrence,List.of());open=resolved.interpretationRemainder();
-                for(var candidate:resolved.candidates())candidates.add(new Candidate(candidate.referenceName(),candidate.rawValue(),o.id(),candidate.sourceQualifications()));
+                var resolved=TargetResolver.resolve(occurrence,List.of(),List.of(),progress);open=resolved.interpretationRemainder();
+                for(var candidate:resolved.candidates()){progress.run();candidates.add(new Candidate(candidate.referenceName(),candidate.rawValue(),o.id(),candidate.sourceQualifications()));}
             } else if(status==Status.QUALIFIED_POSSIBLE||status==Status.POSSIBLE_UNDER_UNKNOWN_CONTROL)for(var value:o.values()) {
+                progress.run();
                 String name=null;
                 if(o.namespace().equals("FILE") && o.nameProfile().equals("cics-ts.file@1")) {
                     name=FileNamePolicy.name("cics.file",value.value(),false,new Interactions.ExtensionName("cics-ts.file","1"));open|=name==null;

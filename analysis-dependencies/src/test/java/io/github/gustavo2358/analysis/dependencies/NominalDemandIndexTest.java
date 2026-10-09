@@ -6,6 +6,24 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class NominalDemandIndexTest {
+    @Test void sharedProgressChecksIndexConstructionAndClosureWithoutChangingDemand() {
+        var assignments=new ArrayList<NominalValues.Assignment>();
+        for(int i=0;i<64;i++)assignments.add(new NominalValues.Assignment("s"+i,"v"+i,read(i+1)));
+        var facts=facts(65,assignments,List.of());
+        var stopped=new IllegalStateException("shared owner stopped");
+        int[] visits={0};
+        assertSame(stopped,assertThrows(IllegalStateException.class,()->new NominalDemandIndex(facts,()->{
+            if(++visits[0]==17)throw stopped;
+        })));
+        assertEquals(17,visits[0]);
+        boolean[] stopClosure={false};visits[0]=0;
+        var index=new NominalDemandIndex(facts,()->{if(stopClosure[0]&&++visits[0]==17)throw stopped;});
+        stopClosure[0]=true;
+        assertSame(stopped,assertThrows(IllegalStateException.class,()->index.closure(Set.of("v0"))));
+        assertEquals(17,visits[0]);
+        stopClosure[0]=false;
+        assertEquals(oracle(facts,Set.of("v0")),index.closure(Set.of("v0")).symbols());
+    }
     private static NominalValues.Term read(int id) { return new NominalValues.Term("READ", "v" + id); }
     private static NominalValues facts(int n, List<NominalValues.Assignment> assignments, List<NominalValues.Condition> conditions) {
         var symbols = new ArrayList<NominalValues.Symbol>();

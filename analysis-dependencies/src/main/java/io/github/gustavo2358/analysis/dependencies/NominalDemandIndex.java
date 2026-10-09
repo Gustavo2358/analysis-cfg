@@ -15,10 +15,15 @@ final class NominalDemandIndex {
     private final Map<String, Integer> symbols;
     private final String[] names;
     private final int[] heads, next, targets;
+    private final Runnable progress;
 
     NominalDemandIndex(NominalValues facts) {
+        this(facts,()->{});
+    }
+    NominalDemandIndex(NominalValues facts,Runnable progress) {
         Objects.requireNonNull(facts);
-        var builder = new Builder();
+        this.progress=Objects.requireNonNull(progress);
+        var builder = new Builder(progress);
         names = new String[facts.symbols().size()];
         for (int i = 0; i < names.length; i++) {
             names[i] = facts.symbols().get(i).node();
@@ -42,25 +47,32 @@ final class NominalDemandIndex {
         var seen = new BitSet(heads.length); var pending = new int[heads.length];
         int first = 0, last = 0; long edgeVisits = 0;
         for (var name : requested) {
+            progress.run();
             Integer node = symbols.get(name);
             if (node == null) throw new IllegalArgumentException("undeclared nominal demand symbol");
             if (!seen.get(node)) { seen.set(node); pending[last++] = node; }
         }
         while (first < last) {
+            progress.run();
             int node = pending[first++];
             for (int edge = heads[node]; edge != -1; edge = next[edge]) {
+                progress.run();
                 edgeVisits++;
                 int destination = targets[edge];
                 if (!seen.get(destination)) { seen.set(destination); pending[last++] = destination; }
             }
         }
         var result = new HashSet<String>();
-        for (int node = seen.nextSetBit(0); node >= 0 && node < names.length; node = seen.nextSetBit(node + 1))
+        for (int node = seen.nextSetBit(0); node >= 0 && node < names.length; node = seen.nextSetBit(node + 1)) {
+            progress.run();
             result.add(names[node]);
+        }
         return new Closure(Collections.unmodifiableSet(result), last, edgeVisits);
     }
 
     private static final class Builder {
+        private final Runnable progress;
+        Builder(Runnable progress){this.progress=progress;}
         final Map<String, Integer> symbols = new HashMap<>();
         final IdentityHashMap<NominalValues.Term, Integer> assignmentTerms = new IdentityHashMap<>();
         final IdentityHashMap<NominalValues.Term, Integer> conditionTerms = new IdentityHashMap<>();
@@ -71,11 +83,13 @@ final class NominalDemandIndex {
         int[] heads = new int[16], next = new int[16], targets = new int[16];
         int nodes, edges;
         int node() {
+            progress.run();
             int count = Math.addExact(nodes, 1);
             if (count > heads.length) heads = Arrays.copyOf(heads, capacity(heads.length, count));
             heads[nodes] = -1; return nodes++;
         }
         void edge(int source, int destination) {
+            progress.run();
             int count = Math.addExact(edges, 1);
             if (count > next.length) {
                 int capacity = capacity(next.length, count);
@@ -103,6 +117,7 @@ final class NominalDemandIndex {
         }
         void expand() {
             while (!predicatePending.isEmpty()) {
+                progress.run();
                 var value = predicatePending.removeFirst(); int source = predicates.get(value);
                 for (var child : value.children()) incidence(source, predicate(child));
                 for (var term : value.terms()) incidence(source, term(term, true));
@@ -113,6 +128,7 @@ final class NominalDemandIndex {
             var pending = condition ? conditionPending : assignmentPending;
             var index = condition ? conditionTerms : assignmentTerms;
             while (!pending.isEmpty()) {
+                progress.run();
                 var value = pending.removeFirst(); int source = index.get(value);
                 if (value.kind().equals("READ")) {
                     if (condition) incidence(source, symbol(value.value())); else edge(source, symbol(value.value()));

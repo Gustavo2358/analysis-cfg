@@ -21,9 +21,7 @@ public final class AnalysisPipeline {
     private AnalysisPipeline() { }
     public static void main(String[] args) { System.exit(run(args,System.err)); }
     public static int run(String[] args,PrintStream err) {
-        return Arrays.stream(args).anyMatch(argument->argument.equals("--source-evidence")||argument.equals("--experimental-physical"))
-                ? run(args,err,new DataflowAirReader()::read)
-                : runSnapshot(args,err,new DataflowAirReader());
+        return runSnapshot(args,err,new DataflowAirReader());
     }
     @FunctionalInterface interface AirRead { DataflowAirReader.Read read(Path path) throws IOException; }
     static int run(String[] args,PrintStream err,AirRead reader) {
@@ -69,34 +67,56 @@ public final class AnalysisPipeline {
         return 0;
     }
 
-    /** Default production route: one checked paged snapshot owns CFG and the shared general analysis. */
+    /** All production modes share one checked paged snapshot and the general analysis. */
     static int runSnapshot(String[] args,PrintStream err,DataflowAirReader reader) {
+        return runSnapshot(args,err,reader::readSnapshot);
+    }
+    @FunctionalInterface interface SnapshotAirRead {
+        DataflowAirReader.SnapshotRead read(Path input,AnalysisResources resources)throws IOException;
+    }
+    static int runSnapshot(String[] args,PrintStream err,SnapshotAirRead reader) {
         return runSnapshot(args,err,reader,AnalysisResources.withDeadline(new AnalysisResources.Limits(
                 64L*1024*1024,16L*1024*1024,0,16L*1024*1024*1024,8,Long.MAX_VALUE,4L*1024*1024*1024),Duration.ofMinutes(8)));
     }
     /** The production budget is injectable only within the outer composition package. */
     static int runSnapshot(String[] args,PrintStream err,DataflowAirReader reader,AnalysisResources resources) {
-        if(args.length!=3)return usage(err);
-        Path input,cfg,dependencies;
+        return runSnapshot(args,err,reader::readSnapshot,resources);
+    }
+    static int runSnapshot(String[] args,PrintStream err,SnapshotAirRead reader,AnalysisResources resources) {
+        if(args.length<3)return usage(err);
+        Path input,cfg,dependencies,source=null;boolean physical=false;
         try {
             input=Path.of(args[0]);cfg=Path.of(args[1]);dependencies=Path.of(args[2]);
             if(args[0].isBlank()||args[1].isBlank()||args[2].isBlank())return usage(err);
-            var paths=List.of(input,cfg,dependencies);
+            for(int n=3;n<args.length;n++) {
+                if(args[n].equals("--source-evidence")&&source==null&&n+1<args.length)source=Path.of(args[++n]);
+                else if(args[n].equals("--experimental-physical")&&!physical)physical=true;
+                else return usage(err);
+            }
+            var paths=new ArrayList<>(List.of(input,cfg,dependencies));if(source!=null)paths.add(source);
             for(int a=0;a<paths.size();a++)for(int b=0;b<a;b++)
                 if(identity(paths.get(a)).equals(identity(paths.get(b)))
                     ||(Files.exists(paths.get(a))&&Files.exists(paths.get(b))&&Files.isSameFile(paths.get(a),paths.get(b))))return usage(err);
         } catch(InvalidPathException failure){return usage(err);}
           catch(IOException failure){err.println("PATH_IO");return 3;}
-        try(var read=reader.readSnapshot(input,resources)) {
+        try(var read=reader.read(input,resources)) {
             var validation=read.checked().result();
             if(validation.status()!=ValidationResult.Status.STRUCTURALLY_VALID) {
                 err.println("PIPELINE_INPUT_INVALID");return 3;
+            }
+            QualifiedSourceDependencies evidence=null;
+            if(source!=null) {
+                try(var stream=JsonFiles.input(source)){evidence=new QualifiedSourceJson().decode(stream);}
+                resources.work(1,AnalysisResources.Phase.DECODE);
+                if(evidence.air().size()!=1||!evidence.air().getFirst().sha256().equals(read.sha256()))
+                    throw new IllegalArgumentException("AIR digest mismatch");
             }
             try(var program=new SnapshotProgram(read.checked(),read.newIdentityStorage(),read.newOrderStorage(),resources)) {
                 var built=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).buildChecked(program,read.checked(),BuildOptions.defaults());
                 if(built.status()!=CfgBuildResult.Status.CFG_BUILT){err.println("CFG "+built.status());return 4;}
                 // Complete analysis preparation before replacing either existing product.
-                var result=new DependencyAnalysis().prepare(program,built);
+                var analysis=new DependencyAnalysis(physical?StorageAnalysisMode.EXPERIMENTAL_PHYSICAL:StorageAnalysisMode.LOGICAL_ONLY);
+                var result=evidence==null?analysis.prepare(program,built):analysis.prepare(program,built,evidence,List.of(),read.borrowedPages(),resources);
                 try {new CfgJsonWriter(resources.limits().outputBytes()).write(built,cfg,
                         bytes->resources.output(bytes,AnalysisResources.Phase.ENCODE));}
                 catch(CfgJsonException failure){err.println("CFG_OUTPUT_SERIALIZATION");return 5;}

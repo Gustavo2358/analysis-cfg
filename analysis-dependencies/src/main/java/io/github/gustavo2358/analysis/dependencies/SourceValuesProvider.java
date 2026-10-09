@@ -68,32 +68,37 @@ public final class SourceValuesProvider {
     public SourceValuesProvider(UnitEvidence unit,Set<String> requested,PageStore pages,AnalysisResources limits) {
         if((pages==null)!=(limits==null))throw new IllegalArgumentException("page store and resources must be supplied together");
         this.unit=unit;source=unit.nominalValues().orElseThrow();
-        for(var query:source.facts().queries())if(requested.contains(query.statement()))queries.put(query.statement(),query.node());
-        if(queries.isEmpty()){controlAffected=Set.of();return;}
-        controlAffected=SourceControlEvidence.affected(unit);
-        for(var statement:unit.statements())statements.put(statement.id().handle(),statement);
+        resources=limits==null?new AnalysisResources(new AnalysisResources.Limits(Long.MAX_VALUE,Long.MAX_VALUE,0,0,0,Long.MAX_VALUE,Long.MAX_VALUE)):limits;
+        resources.work(0,AnalysisResources.Phase.INDEX);
+        if(requested.isEmpty()){controlAffected=Set.of();resources=null;return;}
+        for(var query:source.facts().queries()){preparation();if(requested.contains(query.statement()))queries.put(query.statement(),query.node());}
+        if(queries.isEmpty()){controlAffected=Set.of();resources=null;return;}
+        controlAffected=SourceControlEvidence.affected(unit,this::preparation);
+        for(var statement:unit.statements()){preparation();statements.put(statement.id().handle(),statement);}
         var needed=neededNodes(unit,queries.keySet());
         for(var node:unit.nodes())if(needed.contains(node.id())) {
+            preparation();
             before.put(node.id(),before.size());nodes.put(node.id(),node);
             if(queries.containsKey(node.location()))observedNodes.computeIfAbsent(node.location(),k->new ArrayList<>()).add(node.id());
         }
-        var demandIndex=new NominalDemandIndex(source.facts());
+        var demandIndex=new NominalDemandIndex(source.facts(),this::preparation);
         var closure=demandIndex.closure(new HashSet<>(queries.values()));
         var demand=closure.symbols();
         demandStatistics=new DemandStatistics(closure.nodeVisits(),closure.edgeVisits(),demandIndex.edgeCount());
         for(var symbol:source.facts().symbols())if(demand.contains(symbol.node())) {
+            preparation();
             extents.put(symbol.node(),symbol.extent());if(symbol.modelAssumed())modelSymbols.add(symbol.node());
         }
         for(var a:source.facts().assignments())if(demand.contains(a.target())) {
+            preparation();
             assignments.computeIfAbsent(a.statement(),k->new ArrayList<>()).add(a);
             writeProofs.put(a,proof(new ProofKey(2,a.statement(),a.target()),new Evidence("ASSIGNMENT",a.statement(),statements.get(a.statement()).provenance())));
         }
-        for(var field:source.facts().tableFields())summarySymbols.add(field.node());
-        for(var condition:source.facts().conditions())predicates.put(condition.statement(),condition.predicate());
-        for(var branch:source.branches())branches.put(branch.derivation(),branch.whenTrue());
-        for(var symbol:extents.keySet())symbols.put(symbol,symbols.size()+1L);
-        nodeIds=new String[before.size()];for(var entry:before.entrySet())nodeIds[entry.getValue()]=entry.getKey();
-        resources=limits==null?new AnalysisResources(new AnalysisResources.Limits(Long.MAX_VALUE,Long.MAX_VALUE,0,0,0,Long.MAX_VALUE,Long.MAX_VALUE)):limits;
+        for(var field:source.facts().tableFields()){preparation();summarySymbols.add(field.node());}
+        for(var condition:source.facts().conditions()){preparation();predicates.put(condition.statement(),condition.predicate());}
+        for(var branch:source.branches()){preparation();branches.put(branch.derivation(),branch.whenTrue());}
+        for(var symbol:extents.keySet()){preparation();symbols.put(symbol,symbols.size()+1L);}
+        nodeIds=new String[before.size()];for(var entry:before.entrySet()){preparation();nodeIds[entry.getValue()]=entry.getKey();}
         try(var cache=resources.reserve(AnalysisResources.Pool.RESIDENT,4096,AnalysisResources.Phase.DOMAIN);
             var owned=pages==null?new ResidentPageStore(4096,resources):null;
             var store=new SourceValueStore(pages==null?owned:pages,resources);
@@ -372,18 +377,20 @@ public final class SourceValuesProvider {
         work.add(ordinal);
     }
     /** Incoming ordinal links include every source/caller premise of every alternative. */
-    private static Set<String> neededNodes(UnitEvidence unit,Set<String> requested) {
+    private void preparation(){resources.work(1,AnalysisResources.Phase.INDEX);}
+    private Set<String> neededNodes(UnitEvidence unit,Set<String> requested) {
         int n=unit.nodes().size(),d=unit.derivations().size();var ordinal=new HashMap<String,Integer>();
         int[] heads=new int[n],next=new int[d];Arrays.fill(heads,-1);
         var pending=new ArrayDeque<Integer>();var needed=new BitSet(n);
-        for(int i=0;i<n;i++){var node=unit.nodes().get(i);ordinal.put(node.id(),i);if(requested.contains(node.location())){needed.set(i);pending.add(i);}}
-        for(int i=0;i<d;i++){int destination=ordinal.get(unit.derivations().get(i).destination());next[i]=heads[destination];heads[destination]=i;}
+        for(int i=0;i<n;i++){preparation();var node=unit.nodes().get(i);ordinal.put(node.id(),i);if(requested.contains(node.location())){needed.set(i);pending.add(i);}}
+        for(int i=0;i<d;i++){preparation();int destination=ordinal.get(unit.derivations().get(i).destination());next[i]=heads[destination];heads[destination]=i;}
         while(!pending.isEmpty())for(int i=heads[pending.removeFirst()];i>=0;i=next[i]) {
+            preparation();
             var step=unit.derivations().get(i);
-            for(var premise:step.source()){int id=ordinal.get(premise);if(!needed.get(id)){needed.set(id);pending.add(id);}}
-            for(var premise:step.callerPremise()){int id=ordinal.get(premise);if(!needed.get(id)){needed.set(id);pending.add(id);}}
+            for(var premise:step.source()){preparation();int id=ordinal.get(premise);if(!needed.get(id)){needed.set(id);pending.add(id);}}
+            for(var premise:step.callerPremise()){preparation();int id=ordinal.get(premise);if(!needed.get(id)){needed.set(id);pending.add(id);}}
         }
-        var result=new HashSet<String>();for(int i=needed.nextSetBit(0);i>=0;i=needed.nextSetBit(i+1))result.add(unit.nodes().get(i).id());return result;
+        var result=new HashSet<String>();for(int i=needed.nextSetBit(0);i>=0;i=needed.nextSetBit(i+1)){preparation();result.add(unit.nodes().get(i).id());}return result;
     }
     private static Set<String> reads(NominalValues.Predicate root) {
         var out=new HashSet<String>();var predicates=new ArrayDeque<NominalValues.Predicate>();predicates.add(root);

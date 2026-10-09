@@ -3,6 +3,7 @@ package io.github.gustavo2358.analysis.dependencies;
 import io.github.gustavo2358.air.model.*;
 import io.github.gustavo2358.air.model.Ids.*;
 import io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies;
+import io.github.gustavo2358.analysis.structure.ProgramStore;
 import java.util.*;
 
 /** Explicit memory port. Physical adapters verify the snapshot digests before construction. */
@@ -35,20 +36,29 @@ public final class DependencyInput {
         this.publication=Objects.requireNonNull(publication);this.source=Objects.requireNonNull(source);this.correlations=List.copyOf(correlations);
         this.checked=Objects.requireNonNull(checked);
         checked.ifPresent(c -> { if (c.publication() != publication) throw new IllegalArgumentException("validation snapshot mismatch"); });
-        source.ifPresent(s->{if(s.air().size()!=1||!s.air().getFirst().publication().equals(publication.id().localId()))throw new IllegalArgumentException("AIR publication mismatch");});
+        var qualification=qualify(ProgramStore.resident(publication),source,this.correlations);
+        preparedSource=qualification.preparedSource();this.occurrences=qualification.occurrences();
+    }
+    /** Shared qualification over typed structural facts; never creates an owning AIR body. */
+    record Qualification(Optional<SourceQualifiedDependencyResult> preparedSource,List<QualifiedDependencyOccurrence> occurrences) { }
+    static Qualification qualify(ProgramStore.Structural publication,Optional<QualifiedSourceDependencies> source,List<StatementCorrelation> correlations) {
+        Objects.requireNonNull(publication);Objects.requireNonNull(source);correlations=List.copyOf(correlations);
+        source.ifPresent(s->{if(s.air().size()!=1||!s.air().getFirst().publication().equals(publication.publicationId().localId()))throw new IllegalArgumentException("AIR publication mismatch");});
         var occurrences=new HashMap<QualifiedSourceDependencies.StatementId,QualifiedSourceDependencies.Occurrence>();
-        source.ifPresent(s->s.units().forEach(u->u.occurrences().forEach(o->occurrences.put(o.id(),o))));
+        source.ifPresent(s->s.units().forEach(u->u.occurrences().forEach(o->{publication.progress(ProgramStore.ExecutionPhase.INDEX);occurrences.put(o.id(),o);})));
         var operations=new HashMap<OperationId,Operation>();var labels=new HashMap<OperationId,LabelId>();
-        for(var unit:publication.units())for(var sequence:unit.sequences()) {
-            for(var instruction:sequence.instructions()){operations.put(instruction.header().id(),instruction);labels.put(instruction.header().id(),sequence.label());}
+        if(!correlations.isEmpty())for(var unit:publication.units())for(var sequence:unit.sequences()) {
+            publication.progress(ProgramStore.ExecutionPhase.INDEX);
+            for(var instruction:sequence.instructions()){publication.progress(ProgramStore.ExecutionPhase.INDEX);operations.put(instruction.header().id(),instruction);labels.put(instruction.header().id(),sequence.label());}
             operations.put(sequence.terminator().header().id(),sequence.terminator());labels.put(sequence.terminator().header().id(),sequence.label());
         }
-        var origins=new HashMap<OriginId,Origins.Origin>();publication.origins().forEach(o->origins.put(o.id(),o));
+        var origins=new HashMap<OriginId,Origins.Origin>();if(!correlations.isEmpty())publication.origins().forEach(o->{publication.progress(ProgramStore.ExecutionPhase.INDEX);origins.put(o.id(),o);});
         var seen=new HashSet<StatementCorrelation>();var owners=new HashMap<OperationId,QualifiedSourceDependencies.StatementId>();
         var bySource=new HashMap<QualifiedSourceDependencies.StatementId,Set<OperationId>>();
-        var expectedOrigins=new HashSet<OriginId>();for(var link:this.correlations)expectedOrigins.add(link.origin());
-        try(var ancestry=this.correlations.isEmpty()?null:new OriginAncestryIndex(origins,expectedOrigins)) {
-        for(var link:this.correlations) {
+        var expectedOrigins=new HashSet<OriginId>();for(var link:correlations)expectedOrigins.add(link.origin());
+        try(var ancestry=correlations.isEmpty()?null:new OriginAncestryIndex(origins,expectedOrigins)) {
+        for(var link:correlations) {
+            publication.progress(ProgramStore.ExecutionPhase.INDEX);
             if(!seen.add(link))throw new IllegalArgumentException("duplicate source/AIR correlation");
             var occurrence=occurrences.get(link.source());var operation=operations.get(link.operation());
             if(occurrence==null||!occurrence.namespace().equals("PROGRAM")||operation==null||!link.label().equals(labels.get(link.operation())))
@@ -68,27 +78,32 @@ public final class DependencyInput {
             bySource.computeIfAbsent(link.source(),ignored->new HashSet<>()).add(link.operation());
         }
         }
-        preparedSource=source.map(evidence->SourceQualifiedDependencyResult.admit(evidence,publication.id().localId()));
-        this.occurrences=prepareOccurrences(bySource);
+        var prepared=source.map(evidence->SourceQualifiedDependencyResult.admit(evidence,publication.publicationId().localId(),()->publication.progress(ProgramStore.ExecutionPhase.INDEX)));
+        return new Qualification(prepared,prepareOccurrences(publication,source,prepared,bySource));
     }
     /** Qualification and canonical correlation happen before any target query executes. */
     public List<QualifiedDependencyOccurrence> occurrences(){return occurrences;}
-    private List<QualifiedDependencyOccurrence> prepareOccurrences(Map<QualifiedSourceDependencies.StatementId,Set<OperationId>> bySource) {
+    private static List<QualifiedDependencyOccurrence> prepareOccurrences(ProgramStore.Structural publication,Optional<QualifiedSourceDependencies> source,
+            Optional<SourceQualifiedDependencyResult> preparedSource,Map<QualifiedSourceDependencies.StatementId,Set<OperationId>> bySource) {
         var invokes=new LinkedHashMap<OperationId,Operations.Invoke>();
-        for(var unit:publication.units())for(var sequence:unit.sequences())if(sequence.terminator() instanceof Operations.Invoke i&&CallDependencyPlan.selected(i))invokes.put(i.header().id(),i);
+        for(var unit:publication.units())for(var sequence:unit.sequences()) {
+            publication.progress(ProgramStore.ExecutionPhase.INDEX);
+            if(sequence.terminator() instanceof Operations.Invoke i&&CallDependencyPlan.selected(i))invokes.put(i.header().id(),i);
+        }
         var mapped=new HashSet<OperationId>();var result=new ArrayList<QualifiedDependencyOccurrence>();
         if(source.isPresent())for(var u:source.get().units()) {
             var assumed=preparedSource.orElseThrow().affected(u);
             for(var o:u.occurrences())if(o.namespace().equals("PROGRAM")) {
+                publication.progress(ProgramStore.ExecutionPhase.INDEX);
                 var sites=new ArrayList<OperationId>();
                 for(var operation:bySource.getOrDefault(o.id(),Set.of()))if(invokes.containsKey(operation))sites.add(operation);
                 sites.sort(Comparator.comparing(OperationId::localId));mapped.addAll(sites);
-                var values=new ArrayList<String>(o.values().size());for(var value:o.values())values.add(value.value());
+                var values=new ArrayList<String>(o.values().size());for(var value:o.values()){publication.progress(ProgramStore.ExecutionPhase.INDEX);values.add(value.value());}
                 boolean assumedControl=false;for(var qualification:o.qualifications())if(assumed.contains(qualification)){assumedControl=true;break;}
                 result.add(new QualifiedDependencyOccurrence(Optional.of(o.id()),o.id().unit().canonicalProgramName(),o.technology(),o.nameProfile(),o.targetKind(),values,u.controlAvailable()?o.qualifications():List.of(),sites,o.valueRemainder(),assumedControl));
             }
         }
-        invokes.forEach((id,i)->{if(!mapped.contains(id)) {
+        invokes.forEach((id,i)->{publication.progress(ProgramStore.ExecutionPhase.INDEX);if(!mapped.contains(id)) {
             boolean literal=i.target() instanceof Interactions.LiteralTarget;
             var namespace=literal?((Interactions.LiteralTarget)i.target()).namespace():((Interactions.ComputedTarget)i.target()).namespace();
             boolean cics=namespace.equals("cics.program");

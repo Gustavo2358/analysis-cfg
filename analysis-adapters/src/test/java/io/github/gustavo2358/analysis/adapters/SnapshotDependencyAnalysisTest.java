@@ -595,9 +595,15 @@ final class SnapshotDependencyAnalysisTest {
         assertEquals(0,ledger.heapUsed());
     }
 
-    @Test void incompleteAdmissionCannotProduceDependencies() {
+    @Test void incompleteAdmissionCannotProduceDependencies() throws Exception {
+        Publication publication;
+        try(var input=getClass().getResourceAsStream("/ep/unproved-codec.air.json")) {
+            publication=new AirJson().decodeForPartialAnalysis(java.util.Objects.requireNonNull(input).readAllBytes()).publication();
+        }
+        assertEquals(ValidationResult.Status.INCOMPLETE_VALIDATION,AirValidator.validate(publication).status(),
+                "a genuinely undecided mandatory obligation, not an unsupported old snapshot slice");
         var ledger=resources();
-        try(var pages=new MemoryPageStore(128,ledger);var snapshot=AirSnapshot.fromPublication(PagedAirStorageTest.publication("no direct call"));
+        try(var pages=new MemoryPageStore(128,ledger);var snapshot=AirSnapshot.fromPublication(publication);
             var checked=SnapshotValidator.check(snapshot,ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger))) {
             assertEquals(ValidationResult.Status.INCOMPLETE_VALIDATION,checked.result().status());
             assertThrows(IllegalArgumentException.class,()->new SnapshotDependencyAnalysis().analyze(checked,new PagedSnapshotIdentityStorage(pages,ledger),new PagedSnapshotDependencyStorage(pages,ledger)));

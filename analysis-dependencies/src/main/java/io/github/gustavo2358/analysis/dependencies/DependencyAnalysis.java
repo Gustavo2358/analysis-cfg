@@ -15,6 +15,9 @@ import io.github.gustavo2358.analysis.values.RegionalValuesProvider;
 import io.github.gustavo2358.analysis.values.StorageValuesProvider;
 import java.util.*;
 import io.github.gustavo2358.analysis.values.StorageAnalysisMode;
+import io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies;
+import io.github.gustavo2358.analysis.solver.AnalysisResources;
+import io.github.gustavo2358.analysis.solver.PageStore;
 
 /** CP6 W1D application boundary. */
 public final class DependencyAnalysis {
@@ -25,29 +28,35 @@ public final class DependencyAnalysis {
         return prepare(new DependencyInput(publication,Optional.empty(),List.of()));
     }
     public DependencyResult prepare(DependencyInput input) {
-        var occurrences=input.occurrences();
-        var result=prepareExecutable(input);
-        if(input.preparedSource().isPresent())result=result.withSourceEvidence(input.preparedSource().get());
+        return enrich(prepareExecutable(input),input.source(),input.preparedSource(),input.occurrences(),null,null,null);
+    }
+    private DependencyResult enrich(DependencyResult result,Optional<QualifiedSourceDependencies> source,
+            Optional<SourceQualifiedDependencyResult> preparedSource,List<QualifiedDependencyOccurrence> occurrences,
+            ProgramStore.Structural program,PageStore pages,AnalysisResources resources) {
+        if(preparedSource.isPresent())result=result.withSourceEvidence(preparedSource.get());
         var byOperation=new HashMap<OperationId,List<DependencySiteFact>>();
-        for(var site:result.sites())byOperation.computeIfAbsent(site.operation(),ignored->new ArrayList<>()).add(site);
+        for(var site:result.sites()){if(program!=null)program.progress(ProgramStore.ExecutionPhase.DEMAND);byOperation.computeIfAbsent(site.operation(),ignored->new ArrayList<>()).add(site);}
         var sourceValues=new HashMap<io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies.StatementId,List<SourceValuesProvider.Candidate>>();
         long conditionalRuns=0,conditionalQueries=0,conditionalWork=0,conditionalLimited=0;
-        if(input.source().isPresent())for(var unit:input.source().get().units())if(unit.nominalValues().isPresent()) {
+        if(source.isPresent())for(var unit:source.get().units())if(unit.nominalValues().isPresent()) {
+            if(program!=null)program.progress(ProgramStore.ExecutionPhase.DEMAND);
             var requested=new TreeSet<String>();
             for(var occurrence:occurrences)if(occurrence.source().filter(s->s.unit().equals(unit.unit())).isPresent()) {
+                if(program!=null)program.progress(ProgramStore.ExecutionPhase.DEMAND);
                 var sites=occurrence.executableOperations().stream().flatMap(op->byOperation.getOrDefault(op,List.of()).stream()).toList();
                 if(TargetResolver.requiresSourceValues(occurrence,sites))requested.add(occurrence.source().orElseThrow().handle());
             }
             requested.retainAll(unit.nominalValues().get().facts().queries().stream().map(q->q.statement()).collect(java.util.stream.Collectors.toSet()));
             if(!requested.isEmpty()) {
-                var provider=new SourceValuesProvider(unit,requested);conditionalRuns++;conditionalQueries+=requested.size();conditionalWork+=provider.workItems();if(provider.limited())conditionalLimited++;
+                var provider=new SourceValuesProvider(unit,requested,pages,resources);conditionalRuns++;conditionalQueries+=requested.size();conditionalWork+=provider.workItems();if(provider.limited())conditionalLimited++;
                 for(var statement:requested)sourceValues.put(new io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies.StatementId(unit.unit(),statement),provider.candidates(statement));
             }
         }
         var inventory=new ArrayList<TargetResolver.Resolution>();long reused=0;
         for(var occurrence:occurrences) {
+            if(program!=null)program.progress(ProgramStore.ExecutionPhase.DOMAIN);
             var sites=occurrence.executableOperations().stream().flatMap(op->byOperation.getOrDefault(op,List.of()).stream()).toList();
-            var resolved=TargetResolver.resolve(occurrence,sites,occurrence.source().map(s->sourceValues.getOrDefault(s,List.of())).orElse(List.of()));inventory.add(resolved);
+            var resolved=TargetResolver.resolve(occurrence,sites,occurrence.source().map(s->sourceValues.getOrDefault(s,List.of())).orElse(List.of()),()->{if(program!=null)program.progress(ProgramStore.ExecutionPhase.DOMAIN);});inventory.add(resolved);
             if(occurrence.source().isPresent()&&!occurrence.qualifications().isEmpty()&&occurrence.targetKind().equals("COMPUTED")&&resolved.candidates().stream().anyMatch(c->!c.executableSupports().isEmpty()))reused++;
         }
         var metrics=new TreeMap<>(result.metrics());metrics.put("sourceQualifiedResolvedByExistingQuery",reused);
@@ -74,7 +83,17 @@ public final class DependencyAnalysis {
     public DependencyResult prepare(SnapshotProgram program,CfgBuildResult cfg) {
         Objects.requireNonNull(program);Objects.requireNonNull(cfg);program.admission();
         if(cfg.status()!=CfgBuildResult.Status.CFG_BUILT)throw new Failure(Kind.CFG_UNSUPPORTED,"CFG_UNSUPPORTED");
-        return prepareExecutable(program,cfg);
+        var qualification=DependencyInput.qualify(program,Optional.empty(),List.of());
+        return enrich(prepareExecutable(program,cfg),Optional.empty(),qualification.preparedSource(),qualification.occurrences(),program,null,null);
+    }
+    /** Explicit source authority composes with the same native executable analysis and shared page owner. */
+    public DependencyResult prepare(SnapshotProgram program,CfgBuildResult cfg,QualifiedSourceDependencies source,
+            List<DependencyInput.StatementCorrelation> correlations,PageStore pages,AnalysisResources resources) {
+        Objects.requireNonNull(program);Objects.requireNonNull(cfg);Objects.requireNonNull(source);
+        Objects.requireNonNull(pages);Objects.requireNonNull(resources);program.admission();
+        if(cfg.status()!=CfgBuildResult.Status.CFG_BUILT)throw new Failure(Kind.CFG_UNSUPPORTED,"CFG_UNSUPPORTED");
+        var qualification=DependencyInput.qualify(program,Optional.of(source),correlations);
+        return enrich(prepareExecutable(program,cfg),Optional.of(source),qualification.preparedSource(),qualification.occurrences(),program,pages,resources);
     }
     private DependencyResult prepareExecutable(ProgramStore.Structural publication,CfgBuildResult cfg) {
         var opened=AnalysisSession.open(cfg,publication,cfg.options().projectionPolicy(),publication.units().stream()

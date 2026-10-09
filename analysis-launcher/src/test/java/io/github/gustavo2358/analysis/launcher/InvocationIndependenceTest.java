@@ -81,18 +81,14 @@ final class InvocationIndependenceTest {
             assertEquals(before.candidates(),joined.candidates());assertTrue(joined.modelValueRemainder());
         }
     }
-    @Test void jsonRoundTripRetainsTenShapesAndSnapshotCliFailsClosedUntilCertified() throws Exception {
+    @Test void jsonRoundTripRetainsTenShapesAndSnapshotCliPreservesEverySection() throws Exception {
         for(boolean computed:List.of(false,true))for(String shape:List.of("none","argument","result","unknown-result","unknown-argument")) {
             var p=fixture(computed,shape);var result=assertTarget(p,computed+":"+shape);
             var wire=new AirJson().encode(p);assertEquals(p,new AirJson().decode(wire));
             var input=dir.resolve("input");var output=dir.resolve("dependencies.json");Files.write(input,wire);Files.writeString(output,"sentinel");
             var errors=new ByteArrayOutputStream();var status=AnalysisDependencies.run(new String[]{input.toString(),output.toString()},new PrintStream(errors));
-            if(computed&&!shape.equals("unknown-result")) {
-                assertEquals(0,status,computed+":"+shape+" "+errors);var json=Files.readString(output);
-                assertTrue(json.contains("\"referenceName\":\"PROGA\""));assertTrue(json.contains("\"rawValue\":\"PROGA   \""));
-            } else {
-                assertEquals(7,status,computed+":"+shape+" "+errors);assertEquals("sentinel",Files.readString(output));assertTrue(errors.toString().contains("INCOMPLETE_VALIDATION"));
-            }
+            assertEquals(0,status,computed+":"+shape+" "+errors);
+            PipelineCliTest.assertCompleteDependencySections(p,result,output);
         }
     }
 }

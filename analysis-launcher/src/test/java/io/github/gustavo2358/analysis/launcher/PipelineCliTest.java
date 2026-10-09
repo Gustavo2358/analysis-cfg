@@ -13,6 +13,28 @@ import org.junit.jupiter.api.io.TempDir;
 import static org.junit.jupiter.api.Assertions.*;
 
 final class PipelineCliTest {
+    /** Differential reference keeps its historical wrapper coverage; native facts retain the actual AIR header. */
+    static void assertCompleteDependencySections(io.github.gustavo2358.air.model.Publication publication,
+            DependencyResult expected,Path output) throws Exception {
+        var mapper=new com.fasterxml.jackson.databind.ObjectMapper();var bytes=new ByteArrayOutputStream();
+        new DependencyJson().write(expected,bytes);
+        var resident=mapper.readTree(bytes.toByteArray());var actual=mapper.readTree(Files.readAllBytes(output));
+        for(var site:resident.path("sites")) {
+            var id=site.path("operation");
+            var header=publication.units().stream().flatMap(u->u.sequences().stream())
+                .flatMap(s->java.util.stream.Stream.<io.github.gustavo2358.air.model.Operation>concat(s.instructions().stream(),java.util.stream.Stream.of(s.terminator())))
+                .map(io.github.gustavo2358.air.model.Operation::header)
+                .filter(h->h.id().localId().equals(id.path("localId").asText())
+                    &&h.id().unit().localId().equals(id.path("unit").asText())
+                    &&h.id().publication().localId().equals(id.path("publication").asText())).findFirst().orElseThrow();
+            ((com.fasterxml.jackson.databind.node.ObjectNode)site).put("coverage",header.coverage().name());
+        }
+        for(String field:java.util.List.of("sites","edges","origins","artifacts","sourceUncertaintyRefs",
+                "fileDependencies","sourceDependencies","sourceQualifiedDependencies","dependencies"))
+            assertEquals(resident.get(field),actual.get(field),"complete dependency section: "+field);
+        assertEquals("VALIDATED_SNAPSHOT_DEPENDENCY",actual.path("modelScope").asText());
+        assertEquals("3.0.0",actual.path("version").asText());
+    }
     @TempDir Path dir;
     Path resource(String path){var root=Files.isDirectory(Path.of("analysis-adapters"))?Path.of("."):Path.of("..");return root.resolve("analysis-adapters/src/test/resources").resolve(path);}
     Path fixture(){return resource("cp6/dynamic-x8.air.json");}
@@ -92,22 +114,33 @@ final class PipelineCliTest {
         assertArrayEquals(Files.readAllBytes(expected),Files.readAllBytes(cfg));
         var json=Files.readString(dependencies);assertTrue(json.contains("\"metrics\":{\"candidates\":4,\"sites\":4}"),json);
         for(var entry:entries)assertTrue(json.contains("\"localId\":\""+entry.id().localId()+"\""),json);
-        assertEquals(8,json.split("\\\"referenceName\\\":\\\"PROGA\\\"",-1).length-1,"each site and edge must retain its candidate");
+        var product=new com.fasterxml.jackson.databind.ObjectMapper().readTree(json);
+        assertEquals(4,product.get("sites").size());assertEquals(4,product.get("edges").size());
+        for(var site:product.get("sites")) {
+            assertEquals(1,site.get("candidates").size());
+            assertEquals("PROGA",site.get("candidates").get(0).get("referenceName").asText());
+        }
+        for(var edge:product.get("edges"))assertEquals("PROGA",edge.get("candidate").get("referenceName").asText());
+        assertEquals(1,product.get("dependencies").get("programs").size());
         assertTrue(json.contains("\"rawValue\":\"PROGA   \""));assertTrue(json.contains("\"kind\":\"VALUE_PRODUCER\""));assertTrue(json.contains("\"analysisStatus\":\"PARTIAL\""));
         var separate=dir.resolve("standalone.dependencies");
         assertEquals(0,AnalysisDependencies.run(new String[]{input.toString(),separate.toString()},new PrintStream(diagnostic)),diagnostic.toString());
         assertArrayEquals(Files.readAllBytes(dependencies),Files.readAllBytes(separate));
-        var completedCfg=Files.readAllBytes(cfg);var completedDependencies=Files.readAllBytes(dependencies);
         var different=new java.util.ArrayList<>(entries);var later=different.getLast();
         different.set(different.size()-1,new io.github.gustavo2358.air.model.Entries.Entry(later.id(),java.util.Optional.of(unit.sequences().getLast().label()),later.signature(),later.state(),later.origin()));
-        var unprovedUnit=new io.github.gustavo2358.air.model.Unit(unit.id(),unit.containingUnit(),unit.objects(),unit.visibleObjects(),different,
+        var differentUnit=new io.github.gustavo2358.air.model.Unit(unit.id(),unit.containingUnit(),unit.objects(),unit.visibleObjects(),different,
                 unit.sequences(),unit.completionPorts(),unit.body(),unit.bodyUnavailable(),unit.coverage(),unit.origin());
-        var unproved=new io.github.gustavo2358.air.model.Publication(base.id(),base.airVersion(),base.capabilities(),base.artifacts(),java.util.List.of(unprovedUnit),
+        var distinctEntry=new io.github.gustavo2358.air.model.Publication(base.id(),base.airVersion(),base.capabilities(),base.artifacts(),java.util.List.of(differentUnit),
                 base.storage(),base.resources(),base.artifactRelations(),base.origins(),base.coverage(),base.uncertainties(),base.premises());
-        Files.write(input,codec.encode(unproved));
-        assertEquals(3,AnalysisPipeline.run(args(input,cfg,dependencies),new PrintStream(diagnostic)),diagnostic.toString());
-        assertEquals(7,AnalysisDependencies.run(new String[]{input.toString(),separate.toString()},new PrintStream(diagnostic)),diagnostic.toString());
-        assertArrayEquals(completedCfg,Files.readAllBytes(cfg));assertArrayEquals(completedDependencies,Files.readAllBytes(dependencies));assertArrayEquals(completedDependencies,Files.readAllBytes(separate));
+        // Distinct entry labels are valid AIR; full mandatory validation now admits this shape.
+        Files.write(input,codec.encode(distinctEntry));
+        var residentDependencies=dir.resolve("distinct-entry.resident.dependencies");
+        assertEquals(0,AnalysisPipeline.run(args(input,expected,residentDependencies),new PrintStream(diagnostic),new DataflowAirReader()::read),diagnostic.toString());
+        assertEquals(0,AnalysisPipeline.run(args(input,cfg,dependencies),new PrintStream(diagnostic)),diagnostic.toString());
+        sameNativeSections(Files.readAllBytes(residentDependencies),Files.readAllBytes(dependencies),distinctEntry);
+        assertArrayEquals(Files.readAllBytes(expected),Files.readAllBytes(cfg));
+        assertEquals(0,AnalysisDependencies.run(new String[]{input.toString(),separate.toString()},new PrintStream(diagnostic)),diagnostic.toString());
+        assertArrayEquals(Files.readAllBytes(dependencies),Files.readAllBytes(separate));
     }
     @Test void largerUnitKeepsOrphanReturnHaltAndDependencyThroughTheRealPipeline() throws Exception {
         var codec=new io.github.gustavo2358.air.json.AirJson();var base=codec.decode(Files.readAllBytes(fixture()));
@@ -159,6 +192,69 @@ final class PipelineCliTest {
         var arguments=new String[]{air.toString(),cfg.toString(),dependencies.toString(),"--source-evidence",source.toString()};
         assertEquals(0,AnalysisPipeline.run(arguments,errors()));var originalCfg=Files.readAllBytes(cfg);var originalDependencies=Files.readAllBytes(dependencies);
         Files.writeString(air,Files.readString(air)+" ");assertEquals(3,AnalysisPipeline.run(arguments,errors()));assertArrayEquals(originalCfg,Files.readAllBytes(cfg));assertArrayEquals(originalDependencies,Files.readAllBytes(dependencies));
+    }
+    private AnalysisPipeline.SnapshotAirRead nativeOnly(AtomicInteger reads) {
+        return (path,resources)-> {
+            reads.incrementAndGet();return new DataflowAirReader().readSnapshot(path,resources);
+        };
+    }
+    private void sameNativeSections(byte[] reference,byte[] actual,io.github.gustavo2358.air.model.Publication publication)throws IOException {
+        var mapper=new com.fasterxml.jackson.databind.ObjectMapper();var expected=mapper.readTree(reference);var observed=mapper.readTree(actual);
+        for(var site:expected.get("sites")) {
+            var operation=site.get("operation").get("localId").asText();
+            var header=publication.units().stream().flatMap(u->u.sequences().stream()).map(s->s.terminator().header())
+                .filter(h->h.id().localId().equals(operation)).findFirst().orElseThrow();
+            ((com.fasterxml.jackson.databind.node.ObjectNode)site).put("coverage",header.coverage().name());
+        }
+        for(var field:java.util.List.of("sites","edges","origins","artifacts","sourceUncertaintyRefs","fileDependencies","sourceDependencies","sourceQualifiedDependencies","dependencies"))
+            assertEquals(expected.get(field),observed.get(field),"complete native optional-mode section: "+field);
+        assertEquals("3.0.0",observed.path("version").asText());
+        assertEquals("VALIDATED_SNAPSHOT_DEPENDENCY",observed.path("modelScope").asText());
+    }
+    @Test void explicitSourceEvidenceUsesOneCheckedSnapshotAndPreservesEverySection()throws Exception {
+        var input=dir.resolve("source.air.json");var source=dir.resolve("source.json");
+        try(var stream=getClass().getResourceAsStream("/qualified-source-r9/conditional.air.json")){Files.write(input,stream.readAllBytes());}
+        try(var stream=getClass().getResourceAsStream("/qualified-source-r9/conditional.source.json")){Files.write(source,stream.readAllBytes());}
+        var resident=new DataflowAirReader().read(input);var reads=new AtomicInteger();
+        for(boolean physical:new boolean[]{false,true}) {
+            var suffix=physical?"both":"source";var cfg=dir.resolve(suffix+".cfg");var dependencies=dir.resolve(suffix+".dependencies");
+            var expectedCfg=dir.resolve(suffix+".resident.cfg");var expectedDependencies=dir.resolve(suffix+".resident.dependencies");
+            var invocation=new java.util.ArrayList<>(java.util.List.of(input.toString(),cfg.toString(),dependencies.toString(),"--source-evidence",source.toString()));
+            if(physical)invocation.add("--experimental-physical");
+            var independent=new java.util.ArrayList<>(invocation);independent.set(1,expectedCfg.toString());independent.set(2,expectedDependencies.toString());
+            assertEquals(0,AnalysisPipeline.run(independent.toArray(String[]::new),errors(),new DataflowAirReader()::read));
+            int before=reads.get();var diagnostic=new ByteArrayOutputStream();
+            assertEquals(0,AnalysisPipeline.runSnapshot(invocation.toArray(String[]::new),new PrintStream(diagnostic),nativeOnly(reads)),diagnostic.toString());
+            assertEquals(before+1,reads.get());assertArrayEquals(Files.readAllBytes(expectedCfg),Files.readAllBytes(cfg));
+            sameNativeSections(Files.readAllBytes(expectedDependencies),Files.readAllBytes(dependencies),resident.publication());
+            var originalCfg=Files.readAllBytes(cfg);var originalDependencies=Files.readAllBytes(dependencies);var originalInput=Files.readAllBytes(input);
+            Files.writeString(input,Files.readString(input)+" ");
+            assertEquals(3,AnalysisPipeline.runSnapshot(invocation.toArray(String[]::new),errors(),nativeOnly(reads)));
+            assertArrayEquals(originalCfg,Files.readAllBytes(cfg));assertArrayEquals(originalDependencies,Files.readAllBytes(dependencies));
+            Files.write(input,originalInput);
+        }
+    }
+    @Test void experimentalPhysicalPipelineUsesNativeValuesWithoutDroppingChoiceSupports()throws Exception {
+        var expectedNames=java.util.Map.of("ambiguous",java.util.List.of("PROGA","PROGB"),"ambiguous-must",java.util.List.of("PROGC"),"ambiguous-mixed",java.util.List.of("PROGA"));
+        var reads=new AtomicInteger();
+        for(var name:java.util.List.of("ambiguous","ambiguous-must","ambiguous-mixed")) {
+            var input=dir.resolve(name+".air.json");
+            try(var stream=getClass().getResourceAsStream("/recall/"+name+".air.json")){Files.write(input,stream.readAllBytes());}
+            var cfg=dir.resolve(name+".cfg");var dependencies=dir.resolve(name+".dependencies");
+            var expectedCfg=dir.resolve(name+".resident.cfg");var expectedDependencies=dir.resolve(name+".resident.dependencies");
+            var invocation=new String[]{input.toString(),cfg.toString(),dependencies.toString(),"--experimental-physical"};
+            assertEquals(0,AnalysisPipeline.run(new String[]{input.toString(),expectedCfg.toString(),expectedDependencies.toString(),"--experimental-physical"},errors(),new DataflowAirReader()::read));
+            int before=reads.get();var diagnostic=new ByteArrayOutputStream();
+            assertEquals(0,AnalysisPipeline.runSnapshot(invocation,new PrintStream(diagnostic),nativeOnly(reads)),diagnostic.toString());
+            assertEquals(before+1,reads.get());assertArrayEquals(Files.readAllBytes(expectedCfg),Files.readAllBytes(cfg));
+            sameNativeSections(Files.readAllBytes(expectedDependencies),Files.readAllBytes(dependencies),new DataflowAirReader().read(input).publication());
+            var json=new com.fasterxml.jackson.databind.ObjectMapper().readTree(Files.readAllBytes(dependencies));
+            assertEquals(1,json.path("generalAnalysisMetrics").path("experimentalPhysicalMode").asLong());
+            var site=json.path("sites").get(0);var names=new java.util.ArrayList<String>();
+            for(var candidate:site.path("candidates")){names.add(candidate.path("referenceName").asText());assertFalse(candidate.path("supports").isEmpty());}
+            assertEquals(expectedNames.get(name),names);assertEquals("BEFORE",site.path("valuePoint").path("position").asText());
+            assertTrue(site.path("effectiveUnknownRemainder").asBoolean());
+        }
     }
     @Test void explicitCodecLimitNeverStartsExportOrPublishesFallback() throws Exception {
         var cfg=dir.resolve("cfg");var dependencies=dir.resolve("dependencies");Files.writeString(cfg,"cfg sentinel");Files.writeString(dependencies,"dependencies sentinel");

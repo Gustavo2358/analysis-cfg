@@ -6,6 +6,21 @@ import io.github.gustavo2358.analysis.dependencies.source.*;
 import static io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies.*;
 
 class SourceValuesProviderTest {
+    @Test void sharedBudgetStopsSourceIndexPreparationBeforeStateAllocation() {
+        var unit=fixture(List.of(new NominalValues.Assignment("s0","P",read("Q"))),List.of(),List.of());
+        var resources=new io.github.gustavo2358.analysis.solver.AnalysisResources(
+                new io.github.gustavo2358.analysis.solver.AnalysisResources.Limits(64_000_000,64_000_000,0,256_000_000,4,0,1_000_000));
+        try(var pages=new io.github.gustavo2358.analysis.solver.ResidentPageStore(4096,resources)) {
+            long borrowedHeap=resources.heapUsed();
+            var failure=assertThrows(io.github.gustavo2358.analysis.solver.AnalysisResources.Exhausted.class,
+                    ()->new SourceValuesProvider(unit,Set.of("s2"),pages,resources));
+            assertEquals(io.github.gustavo2358.analysis.solver.AnalysisResources.Resource.WORK,failure.resource());
+            assertEquals(io.github.gustavo2358.analysis.solver.AnalysisResources.Phase.INDEX,failure.phase());
+            assertEquals(0,pages.statistics().livePages());assertEquals(borrowedHeap,resources.heapUsed());
+            assertDoesNotThrow(pages::flush,"failure cannot close its borrowed page owner");
+        }
+        assertEquals(0,resources.heapUsed());
+    }
     static final Location LOCATION=new Location("synthetic.cbl",1,0,1,10);
     static final Provenance ORIGIN=new Provenance(LOCATION,LOCATION,List.of(),true);
     static final UnitId UNIT=new UnitId("synthetic",List.of(0),"SAMPLE");
