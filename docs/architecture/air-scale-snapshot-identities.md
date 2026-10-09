@@ -416,3 +416,41 @@ Both remote FAST jobs of published
 99db6808 were canceled at the existing15-minute job limit; local1160 FAST
 and the preceding physical qualification remain green, not remote success.
 Group arrays, states and other cardinality indexes remain AS-W09/W10 PARTIAL.
+
+## Native regional correlation group directories
+
+Native physical preparation now uses the inventory's owned primitive columns
+for union-find, group members, offsets, base-to-group lookup and group sizes.
+Compressed roots are externally sorted with stable canonical-rank ties, preserving
+the previous minimum-root/component order. Each nested row is an immutable,
+owner-checked borrowed view. States borrow group sizes rather than copying them.
+The resident compatibility path remains explicit and unchanged semantically.
+Connectivity visits existing batches directly, without copying all plans again.
+
+A new RED/GREEN test specifies transitive a/b/c connectivity, UTF-16 canonical
+ordering, empty Regions, original AIR segment ordinals and expired owner access.
+Another injects failure after a real positive group offset write and a cleanup
+failure: partial directory columns close, the original exception remains primary,
+the checked input stays usable, and all resource pools return to zero on teardown.
+Regional family47 and final focused consumer4 pass. A514-base native countercase
+now retains no group arrays; all three directories are BorrowedList. This is a
+structural retention assertion, not a measurement of the complete JVM heap.
+
+The unchanged135,233,275-byte physical AIR completes through the real public
+Java21/Xmx128m CLI in115.81s, CPU118.38+3.72s, RSS298760KiB, exit0. The independent
+frozen modified-seed oracle confirms21 semantic fields,83 full origins and CFG
+parity. All source/input and1233-class runtime hashes were frozen before execution
+and match afterwards. The first attempt failed while decoding with Disk quota
+exceeded in/tmp; its exit3 and diagnostic remain preserved, never counted as PASS.
+The successful attempt uses a fresh workspace-disk java.io.tmpdir only; original
+application quotas and the eight-minute deadline are unchanged. Original-environment
+FAST passes1164 required methods, architecture and all post-checks in733.661s,
+with zero failures/errors/skips. All frozen inputs and1233 runtime classfiles match
+after its clean rebuild. A preceding JAVA_TOOL_OPTIONS run failed two empty-stderr
+CLI contracts because the JVM prints that variable's value; it remains a failed
+environmental attempt, and the tests were not relaxed for the successful rerun.
+
+This does not complete AS-W09/W10: plans, states, relations and narrow indexes
+still require coverage. A subsequent executed16-Cell countercase additionally
+retains80 cold identities in Regional traces despite zero during preparation;
+that RED is preserved separately and is the next integrated blocker.

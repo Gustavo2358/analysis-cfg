@@ -24,7 +24,7 @@ public final class RegionalValuesAnalysis {
     private final Map<StorageId,Integer> residentOrdinals=new HashMap<>();
     private final NativeMetadata nativeMetadata;
     private final List<List<Integer>> groups;
-    private final int[] groupOf,groupSizes;
+    private final List<Integer> groupOf,groupSizes;
     private final List<List<Integer>> groupSegments;
     private final Map<StoragePartition.Segment,Integer> residentLevels=new HashMap<>();
     private final Map<StatementEffects.Write,StorageIndex.Resolution> preparedReads=new IdentityHashMap<>();
@@ -157,23 +157,36 @@ public final class RegionalValuesAnalysis {
             initial.put(context.entry().id(),batch);
         }
         // Static read/write connectivity preserves branch correlations before the first copy executes.
-        int[] parent=new int[bases.size()];for(int i=0;i<parent.length;i++)parent[i]=i;
-        var allPlans=new ArrayList<Plan>();operations.values().forEach(allPlans::addAll);otherwise.values().forEach(allPlans::addAll);
-        outcomes.values().forEach(m->m.values().forEach(allPlans::addAll));initial.values().forEach(allPlans::addAll);
-        for(var plan:allPlans)if(plan.logical==null&&plan.reference.sourceApplicable()) {
+        try(var parent=nativeMetadata!=null?nativeMetadata.column(bases.size()):ProgramStore.residentColumn(bases.size())){
+            for(int i=0;i<bases.size();i++)parent.set(i,i);
+            for(var batch:operations.values())connect(parent,batch);
+            for(var batch:otherwise.values())connect(parent,batch);
+            for(var choices:outcomes.values())for(var batch:choices.values())connect(parent,batch);
+            for(var batch:initial.values())connect(parent,batch);
+            GroupDirectory directory;
+            if(nativeMetadata!=null)directory=nativeMetadata.groupDirectory(parent);
+            else{
+                var components=new TreeMap<Integer,List<Integer>>();
+                for(int i=0;i<bases.size();i++)components.computeIfAbsent(representative(parent,i),ignored->new ArrayList<>()).add(i);
+                var rows=components.values().stream().map(List::copyOf).toList();
+                var owners=new ArrayList<Integer>(Collections.nCopies(bases.size(),0));
+                for(int group=0;group<rows.size();group++)for(int rank:rows.get(group))owners.set(rank,group);
+                directory=new GroupDirectory(rows,List.copyOf(owners),rows.stream().map(List::size).toList());
+            }
+            groups=directory.groups();groupOf=directory.owners();groupSizes=directory.sizes();
+            groupSegments=nativeMetadata!=null?nativeMetadata.groupSegments(groups):groups.stream().map(group->group.stream().flatMap(i->partition.intersecting(bases.get(i)).stream())
+                .sorted(Comparator.comparingInt(this::level)).map(StoragePartition.Segment::ordinal).toList()).toList();
+        }catch(RuntimeException|Error failure){if(nativeMetadata!=null)nativeMetadata.release(failure);throw failure;}
+    }
+    private record GroupDirectory(List<List<Integer>> groups,List<Integer> owners,List<Integer> sizes) { }
+    private void connect(ProgramStore.OrdinalColumn parent,List<Plan> plans){
+        for(var plan:plans)if(plan.logical==null&&plan.reference.sourceApplicable()) {
             var reads=readSource(plan.write);
             if(reads!=null)for(var source:reads.candidates()) {
                 int a=representative(parent,ordinal(source.location().base().id()));
-                int b=representative(parent,ordinal(plan));
-                parent[Math.max(a,b)]=Math.min(a,b);
+                int b=representative(parent,ordinal(plan));parent.set(Math.max(a,b),Math.min(a,b));
             }
         }
-        var components=new TreeMap<Integer,List<Integer>>();
-        for(int i=0;i<bases.size();i++)components.computeIfAbsent(representative(parent,i),ignored->new ArrayList<>()).add(i);
-        groups=components.values().stream().map(List::copyOf).toList();groupOf=new int[bases.size()];groupSizes=groups.stream().mapToInt(List::size).toArray();
-        for(int g=0;g<groups.size();g++)for(int ordinal:groups.get(g))groupOf[ordinal]=g;
-        groupSegments=nativeMetadata!=null?nativeMetadata.groupSegments(groups):groups.stream().map(group->group.stream().flatMap(i->partition.intersecting(bases.get(i)).stream())
-            .sorted(Comparator.comparingInt(this::level)).map(StoragePartition.Segment::ordinal).toList()).toList();
     }
     private int ordinal(StorageId identity){
         if(nativeMetadata!=null)return nativeMetadata.ordinal(identity);
@@ -242,6 +255,28 @@ public final class RegionalValuesAnalysis {
         int ordinal(StorageId identity){int source=inventory.ordinal(identity);if(source<0)throw new IllegalArgumentException("foreign storage base");return Math.toIntExact(ranks.get(source));}
         int ordinal(StorageIndex.BaseAddress address){if(address.owner()!=inventory)throw new IllegalArgumentException("foreign storage descriptor owner");return Math.toIntExact(ranks.get(address.ordinal()));}
         private List<Integer> segments(int rank){return partition.ordinals(new StorageIndex.BaseAddress(inventory,Math.toIntExact(sourceOrder.get(rank))),Optional.empty());}
+        GroupDirectory groupDirectory(ProgramStore.OrdinalColumn parent){
+            // Compress before sorting: comparison is immutable and ties retain canonical rank.
+            int count=inventory.size();for(int rank=0;rank<count;rank++)parent.set(rank,representative(parent,rank));
+            try(var order=inventory.order(count,(a,b)->Long.compare(parent.get(a),parent.get(b)))){
+                var members=column(count);var offsets=column(count+1L);var owners=column(count);var sizes=column(count);
+                int groups=0;long previous=-1,start=0;
+                for(int at=0;at<count;at++){
+                    int rank=Math.toIntExact(order.get(at));long root=parent.get(rank);
+                    if(root!=previous){
+                        if(groups>0)sizes.set(groups-1,at-start);
+                        offsets.set(groups++,at);start=at;previous=root;
+                    }
+                    members.set(at,rank);owners.set(rank,groups-1);
+                }
+                if(groups>0)sizes.set(groups-1,count-start);offsets.set(groups,count);
+                return new GroupDirectory(new ProgramStore.BorrowedList<>(groups,group->{
+                    long from=offsets.get(group),to=offsets.get(group+1L);
+                    return new ProgramStore.BorrowedList<>(Math.toIntExact(to-from),at->Math.toIntExact(members.get(from+at)),()->inventory.size());
+                },()->inventory.size()),new ProgramStore.BorrowedList<>(count,rank->Math.toIntExact(owners.get(rank)),()->inventory.size()),
+                    new ProgramStore.BorrowedList<>(groups,group->Math.toIntExact(sizes.get(group)),()->inventory.size()));
+            }
+        }
         List<List<Integer>> groupSegments(List<List<Integer>> groups){
             try{
                 var offsets=column(groups.size()+1L);var members=column(partition.segments().size());long at=0;
@@ -265,9 +300,9 @@ public final class RegionalValuesAnalysis {
             return value instanceof Expressions.Read read?effects.storage().resolve(read.place()):null;
         });
     }
-    private static int representative(int[] parent,int member) {
-        int root=member;while(parent[root]!=root)root=parent[root];
-        while(parent[member]!=member){int next=parent[member];parent[member]=root;member=next;}return root;
+    private static int representative(ProgramStore.OrdinalColumn parent,int member) {
+        int root=member;while(parent.get(root)!=root)root=Math.toIntExact(parent.get(root));
+        while(parent.get(member)!=member){int next=Math.toIntExact(parent.get(member));parent.set(member,root);member=next;}return root;
     }
     private List<Plan> compile(List<StatementEffects.Write> writes,Id evidence,OriginId origin,List<PremiseId> initialPremises,Operation operation,Entries.InitialCondition initial,Optional<Control.OutcomeKey> outcome) {
         var result=new ArrayList<Plan>();
@@ -309,18 +344,18 @@ public final class RegionalValuesAnalysis {
         private final SegmentMap<RegionalAlternatives.Node<Content>> bindings;
         private final Map<ObjectId,Set<LogicalValue>> logical;
         private final Set<ObjectId> closed;
-        private final int[] groupSizes;
+        private final List<Integer> groupSizes;
         private final long fingerprint;
-        private State(EntryId entry,SegmentMap<RegionalAlternatives.Node<Content>> bindings,Map<ObjectId,Set<LogicalValue>> logical,Set<ObjectId> closed,int[] groupSizes){this.entry=entry;this.bindings=bindings;this.logical=Map.copyOf(logical);this.closed=Set.copyOf(closed);this.groupSizes=groupSizes;fingerprint=Objects.hashCode(entry)+Long.rotateLeft(bindings.fingerprint(),13)+Long.rotateLeft(this.logical.hashCode(),29)+Long.rotateLeft(this.closed.hashCode(),47);}
+        private State(EntryId entry,SegmentMap<RegionalAlternatives.Node<Content>> bindings,Map<ObjectId,Set<LogicalValue>> logical,Set<ObjectId> closed,List<Integer> groupSizes){this.entry=entry;this.bindings=bindings;this.logical=Map.copyOf(logical);this.closed=Set.copyOf(closed);this.groupSizes=groupSizes;fingerprint=Objects.hashCode(entry)+Long.rotateLeft(bindings.fingerprint(),13)+Long.rotateLeft(this.logical.hashCode(),29)+Long.rotateLeft(this.closed.hashCode(),47);}
         private RegionalAlternatives.Size size(){var roots=new ArrayList<RegionalAlternatives.Node<Content>>();bindings.forEach((g,node)->roots.add(node));return RegionalAlternatives.size(roots);}
         /** Encoded structural edges (one compact edge may carry multiple events), not worlds. */
         public long materializedAlternatives(){return size().alternatives();}
         public long decisionNodes(){return size().nodes();}
         public long maxComponentCardinality(){return size().maxComponent();}
         public boolean reached(){return entry!=null;}
-        public int explicitBases(){int[] count={0};bindings.forEach((g,node)->count[0]+=groupSizes[g]);return count[0];}
+        public int explicitBases(){int[] count={0};bindings.forEach((g,node)->count[0]+=groupSizes.get(g));return count[0];}
     }
-    private static final State BOTTOM=new State(null,new SegmentMap<>(),Map.of(),Set.of(),new int[0]);
+    private static final State BOTTOM=new State(null,new SegmentMap<>(),Map.of(),Set.of(),List.of());
     private Content unknown(StorageIndex.Location location,String reason) {return unknown(location,reason,-1);}
     private Content unknown(StorageIndex.Location location,String reason,int event) {
         if(location.range().isPresent())return new Bytes(ByteImage.unknown(location.range().get().end().map(e->e.subtract(location.range().get().start())),reason,event));
@@ -390,7 +425,7 @@ public final class RegionalValuesAnalysis {
         private List<Content> contents(State state,StorageIndex.Location location) {
             int ordinal=ordinal(location.base().id());var selected=new HashSet<Integer>();
             for(var segment:partition.intersecting(location))selected.add(level(segment));
-            return relations.selections(relations.project(value(state,groupOf[ordinal]),selected)).stream().map(c->content(c,ordinal)).toList();
+            return relations.selections(relations.project(value(state,groupOf.get(ordinal)),selected)).stream().map(c->content(c,ordinal)).toList();
         }
         @Override public Iterable<Boundary<State>> boundaries(AnalysisSession selected) {
             if(session!=selected)throw new IllegalArgumentException("foreign session");
@@ -424,7 +459,7 @@ public final class RegionalValuesAnalysis {
             if(plans.isEmpty()&&writes.isEmpty())return before;
             // Preserve write occurrence grouping; each source is captured in the same pre-operation store.
             var grouped=new LinkedHashMap<Integer,OccurrenceMap<List<Plan>>>();
-            for(var plan:plans)if(plan.logical==null)grouped.computeIfAbsent(groupOf[ordinal(plan)],ignored->new OccurrenceMap<>())
+            for(var plan:plans)if(plan.logical==null)grouped.computeIfAbsent(groupOf.get(ordinal(plan)),ignored->new OccurrenceMap<>())
                 .computeIfAbsent(plan.write,ignored->new ArrayList<>()).add(plan);
             var root=before.bindings;
             if(mode.physical())for(var entry:grouped.entrySet()) {

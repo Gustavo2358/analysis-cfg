@@ -275,6 +275,99 @@ final class SnapshotDependencyAnalysisTest {
         assertEquals(0,ledger.heapUsed());
     }
 
+    @Test void nativeRegionalGroupsBorrowPagedDirectoriesAndPreserveTransitiveCanonicalOrder() throws Exception {
+        var seed=directCall();var unit=seed.units().getFirst();var origin=seed.origins().getFirst().id();
+        var storage=new java.util.ArrayList<>(seed.storage());var objects=new java.util.ArrayList<>(unit.objects());
+        for(String name:List.of("c","a","b","\uD800\uDC00","\uE000")){
+            var id=new StorageId(seed.id(),name);var type=Types.known(Types.Builtin.TEXT);
+            storage.add(new Memory.Cell(new Memory.StorageHeader(id,Optional.of(unit.id()),Memory.Lifetime.ACTIVATION,Memory.Visibility.PRIVATE,origin),type));
+            objects.add(new Memory.ObjectDeclaration(new ObjectId(unit.id(),name),Optional.empty(),type,new Memory.CellBinding(id),Memory.Visibility.PRIVATE,origin,Evidence.CoverageStatus.MODELED,unit.objects().getFirst().precision()));
+        }
+        for(int i=31;i>=0;i--)storage.add(new Memory.Region(new Memory.StorageHeader(new StorageId(seed.id(),"zz-empty-"+i),Optional.of(unit.id()),Memory.Lifetime.PERSISTENT,Memory.Visibility.PRIVATE,origin),Optional.of(BigInteger.ZERO),Optional.empty()));
+        var instructions=new java.util.ArrayList<>(unit.sequences().getFirst().instructions());
+        for(String source:List.of("b","a")){
+            var header=ResultFixtures.header(unit.id(),"read-"+source);
+            instructions.add(new Operations.Assign(header,new Places.ObjectPlace(ResultFixtures.operand(header.id(),"destination",Operand.Role.VALUE_WRITE),new ObjectId(unit.id(),"c")),
+                new Expressions.Read(ResultFixtures.operand(header.id(),"read",Operand.Role.VALUE_READ),new Places.ObjectPlace(ResultFixtures.operand(header.id(),"source",Operand.Role.VALUE_READ),new ObjectId(unit.id(),source)))));
+        }
+        var start=unit.sequences().getFirst();var sequences=new java.util.ArrayList<>(unit.sequences());
+        sequences.set(0,new Sequence(start.label(),instructions,start.terminator(),start.origin()));
+        var replacement=ResultFixtures.unit(unit.id(),unit.entries(),sequences,objects);
+        var publication=new Publication(seed.id(),seed.airVersion(),new Capabilities.Manifest(List.of(Capabilities.MEMORY_REGIONS),seed.capabilities().provided()),seed.artifacts(),List.of(replacement),storage,seed.resources(),seed.artifactRelations(),seed.origins(),seed.coverage(),seed.uncertainties(),seed.premises());
+        var canonical=storage.stream().sorted(java.util.Comparator.comparing(base->base.header().id().localId())).toList();
+        var expectedGroups=new java.util.ArrayList<List<Integer>>();expectedGroups.add(List.of(0,1,2));
+        for(int rank=3;rank<canonical.size();rank++)expectedGroups.add(List.of(rank));
+        var expectedOf=new java.util.ArrayList<Integer>();var expectedSizes=new java.util.ArrayList<Integer>();
+        for(int rank=0;rank<canonical.size();rank++)expectedOf.add(rank<3?0:rank-2);
+        for(var group:expectedGroups)expectedSizes.add(group.size());
+        var expectedSegments=expectedGroups.stream().map(group->group.stream().filter(rank->canonical.get(rank) instanceof Memory.Cell)
+            .map(rank->storage.indexOf(canonical.get(rank))).toList()).toList();
+        var ledger=resources();var borrowed=new java.util.ArrayList<List<?>>();
+        try(var pages=new FilePageStore(directory,512,16,ledger);
+            var checked=SnapshotValidator.check(AirSnapshot.fromPublication(publication),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger))){
+            assertTrue(checked.result().isStructurallyValid(),checked.result().toString());
+            try(var program=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),new PagedSnapshotOrderStorage(pages,ledger),ledger)){
+                var cfg=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).buildChecked(program,checked,BuildOptions.defaults());
+                var opened=io.github.gustavo2358.analysis.structure.AnalysisSession.open(cfg,program,cfg.options().projectionPolicy(),unit.entries().stream().map(Entries.Entry::id).toList());
+                assertEquals(io.github.gustavo2358.analysis.structure.AnalysisSession.Status.ACCEPTED,opened.status(),opened.reason());
+                var admission=io.github.gustavo2358.analysis.values.RegionalValuesAnalysis.prepare(opened.session().orElseThrow(),io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL);
+                assertEquals(io.github.gustavo2358.analysis.values.RegionalValuesAnalysis.Status.ACCEPTED,admission.status(),admission.reason());
+                var analysis=admission.analysis().orElseThrow();
+                var names=List.of("groups","groupOf","groupSizes","groupSegments");var expected=List.of(expectedGroups,expectedOf,expectedSizes,expectedSegments);
+                for(int at=0;at<names.size();at++){
+                    var field=analysis.getClass().getDeclaredField(names.get(at));field.setAccessible(true);
+                    var view=assertInstanceOf(ProgramStore.BorrowedList.class,field.get(analysis),"native group metadata must use the page owner: "+names.get(at));
+                    assertEquals(expected.get(at),view,names.get(at)+" preserves canonical rank, transitive connectivity and AIR segment ordinals");
+                    assertThrows(UnsupportedOperationException.class,view::clear);borrowed.add(view);
+                    if(names.get(at).equals("groups")||names.get(at).equals("groupSegments"))for(var row:view)borrowed.add((List<?>)row);
+                }
+            }
+            for(var view:borrowed){assertThrows(IllegalStateException.class,view::size);assertThrows(IllegalStateException.class,()->view.get(0));}
+        }
+        for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
+    }
+
+    @Test void failedNativeRegionalGroupWriteClosesPartialColumnsAndPreservesPrimary() {
+        var publication=directCalls(2);var ledger=resources();
+        var primary=new IllegalStateException("injected regional group offset write");
+        var cleanup=new IllegalStateException("injected regional group close");
+        var closed=new java.util.ArrayList<boolean[]>();int[] faultColumn={-1},writes={0};
+        try(var pages=new FilePageStore(directory,512,16,ledger);
+            var checked=SnapshotValidator.check(AirSnapshot.fromPublication(publication),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger))){
+            var delegate=new PagedSnapshotOrderStorage(pages,ledger);
+            var failing=new io.github.gustavo2358.analysis.dependencies.SnapshotOrderStorage(){
+                @Override public Index open(Order order){return delegate.open(order);}
+                @Override public Tape tape(){return delegate.tape();}
+                @Override public ProgramStore.OrdinalColumn column(long length){
+                    var column=delegate.column(length);int ordinal=closed.size();var state=new boolean[]{false};closed.add(state);
+                    boolean fault=length==publication.storage().size()+1L&&faultColumn[0]<0;
+                    if(fault)faultColumn[0]=ordinal;
+                    return new ProgramStore.OrdinalColumn(){
+                        @Override public long get(long at){return column.get(at);}
+                        @Override public void set(long at,long value){column.set(at,value);if(fault&&value>0){writes[0]++;throw primary;}}
+                        @Override public void close(){if(state[0])return;column.close();state[0]=true;if(fault)throw cleanup;}
+                    };
+                }
+                @Override public void close(){delegate.close();}
+            };
+            try(var program=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),failing,ledger)){
+                var cfg=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).buildChecked(program,checked,BuildOptions.defaults());
+                var opened=io.github.gustavo2358.analysis.structure.AnalysisSession.open(cfg,program,cfg.options().projectionPolicy(),publication.units().stream().flatMap(unit->unit.entries().stream()).map(Entries.Entry::id).toList());
+                assertEquals(io.github.gustavo2358.analysis.structure.AnalysisSession.Status.ACCEPTED,opened.status(),opened.reason());
+                assertSame(primary,assertThrows(IllegalStateException.class,()->io.github.gustavo2358.analysis.values.RegionalValuesAnalysis.prepare(opened.session().orElseThrow(),io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL)));
+                assertEquals(1,writes[0],"failure must follow a real positive group offset write");
+                assertTrue(List.of(primary.getSuppressed()).contains(cleanup),"cleanup must not replace the original failure");
+                assertTrue(faultColumn[0]>0);
+                // Members precede offsets; owners and sizes follow. Every partial directory is released now.
+                for(int at=faultColumn[0]-1;at<closed.size();at++)assertTrue(closed.get(at)[0],"partial group column "+at);
+                assertSame(checked.snapshot(),program.admission().snapshot());
+                assertEquals(publication.storage().size(),program.storageInventory().orElseThrow().size());
+                assertEquals(publication.storage().getFirst(),program.storageInventory().orElseThrow().at(0));
+            }
+        }
+        for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
+    }
+
     @Test void nativeFinitePartitionPreservesArbitraryCutsAndUnknownTail() {
         var seed=directCall();var unit=seed.units().getFirst();var origin=seed.origins().getFirst().id();
         var huge=BigInteger.ONE.shiftLeft(256).add(BigInteger.valueOf(7));
