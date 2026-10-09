@@ -28,7 +28,7 @@ final class IndexBuilder {
     final Map<Class<? extends Operation>, List<ProgramIndex.Site>> buckets = new HashMap<>();
     final ProgramIndex.Declarations objects = new ProgramIndex.Declarations();
     final Map<StorageId, Memory.Storage> storage = new HashMap<>();
-    final Map<ObjectId, Memory.Cell> directCells = new HashMap<>();
+    Map<ObjectId, Memory.Cell> directCells = new HashMap<>();
     final Map<OperandId, Place> places = new HashMap<>();
     final Map<OperandId, ObjectId> objectReferences = new HashMap<>();
     final LongIntDirectory forwardHeads = new LongIntDirectory(), backwardHeads = new LongIntDirectory();
@@ -87,6 +87,8 @@ final class IndexBuilder {
     }
 
     private void declarations() {
+        objects.connect(store.declarationInventory());
+        if(objects.nativeBacked())directCells=new ProgramIndex.CellAssociations(objects,storage);
         for (var unit : store.units()) {
             count.visit("units.declarations");
             valid(unit.id().publication().equals(store.publicationId()), "foreign Unit owner");
@@ -132,7 +134,8 @@ final class IndexBuilder {
                     count.reference("bindings.cell");
                     Memory.Storage item = storage.get(binding.storage());
                     valid(item instanceof Memory.Cell, "CellBinding requires canonical Cell");
-                    directCells.put(identity, (Memory.Cell) item);
+                    if(directCells instanceof ProgramIndex.CellAssociations cells)cells.include();
+                    else directCells.put(identity, (Memory.Cell) item);
                 }
                 // Other binding forms remain original AIR, without alias/effect interpretation.
             }

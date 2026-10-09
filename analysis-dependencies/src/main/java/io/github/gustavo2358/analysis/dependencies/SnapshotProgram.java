@@ -38,6 +38,7 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
     private SnapshotOrderStorage.Tape unitOrder;
     private final EnumMap<AirShape,SnapshotOrderStorage.Tape> metadataOrders=new EnumMap<>(AirShape.class);
     private List<Capabilities.Capability> requiredCapabilities;
+    private NativeDeclarations declarationInventory;
     private Set<Capabilities.Capability> namePolicyExtensions;
     private final EnumMap<ProjectionPolicy,SnapshotNodes> nodeStores=new EnumMap<>(ProjectionPolicy.class);
     private boolean closed;
@@ -151,6 +152,97 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
     @Override public List<Interactions.Resource> resources(){return borrowed(field(snapshot.root(),6),INTERACTIONS_RESOURCE,Interactions.Resource.class);}
     @Override public List<Evidence.Uncertainty> uncertainties(){return borrowed(field(snapshot.root(),10),EVIDENCE_UNCERTAINTY,Evidence.Uncertainty.class);}
     @Override public List<Proofs.Premise> premises(){return borrowed(field(snapshot.root(),11),PROOFS_PREMISE,Proofs.Premise.class);}
+    @Override public Optional<ProgramStore.DeclarationInventory> declarationInventory(){
+        borrowedOpen();if(declarationInventory==null)declarationInventory=new NativeDeclarations();
+        return Optional.of(declarationInventory);
+    }
+    /** Both ordinal and nominal directories use the existing page owner. No typed
+     * identity/address rows survive a cold read; collection projections are explicit. */
+    private final class NativeDeclarations extends AbstractMap<ObjectId,Memory.ObjectDeclaration>
+            implements ProgramStore.DeclarationInventory,AutoCloseable {
+        private SnapshotOrderStorage.Tape sourceOrder,lookupOrder;
+        private boolean ended;
+        NativeDeclarations(){
+            try {
+                sourceOrder=orderStorage.tape();
+                try(var index=orderStorage.open((a,b)->Long.compare(objectKey(a),objectKey(b)))) {
+                    long units=field(snapshot.root(),4);
+                    for(long u=0;u<snapshot.size(units);u++) {
+                        long objects=field(snapshot.element(units,UNIT,u),2);
+                        for(long o=0;o<snapshot.size(objects);o++) {
+                            long object=snapshot.element(objects,MEMORY_OBJECT_DECLARATION,o);
+                            index.add(object);sourceOrder.append(object);
+                        }
+                    }
+                    lookupOrder=orderStorage.tape();
+                    try(var rows=index.cursor()){
+                        long previous=0;
+                        while(rows.advance()){
+                            long handle=rows.handle(),key=objectKey(handle);
+                            if(key<=previous)throw new IllegalArgumentException("duplicate canonical Object identity");
+                            lookupOrder.append(handle);previous=key;
+                        }
+                    }
+                    if(lookupOrder.size()!=sourceOrder.size())throw new IllegalArgumentException("duplicate Object occurrence");
+                }
+            } catch(RuntimeException|Error failure){
+                try{close();}catch(RuntimeException|Error cleanup){failure.addSuppressed(cleanup);}throw failure;
+            }
+        }
+        private void available(){borrowedOpen();if(ended)throw new IllegalStateException("native declaration inventory is closed");}
+        private long objectKey(long source){return keys.key(field(source,0));}
+        private ObjectId identity(long source){return occurrence(field(source,0),ObjectId.class);}
+        @Override public int size(){available();return Math.toIntExact(sourceOrder.size());}
+        @Override public boolean identityAt(int ordinal,ObjectId identity){
+            available();Objects.requireNonNull(identity);
+            return ordinal>=0&&ordinal<sourceOrder.size()
+                &&keys.key(identity)==objectKey(sourceOrder.handle(ordinal));
+        }
+        private long source(Object key){
+            available();if(!(key instanceof ObjectId identity))return 0;
+            long wanted=keys.key(identity),low=0,high=lookupOrder.size();
+            while(low<high){long middle=low+(high-low)/2,handle=lookupOrder.handle(middle),found=objectKey(handle);
+                if(found<wanted)low=middle+1;else if(found>wanted)high=middle;else return handle;}
+            return 0;
+        }
+        @Override public boolean containsKey(Object key){return source(key)!=0;}
+        @Override public Memory.ObjectDeclaration get(Object key){
+            long source=source(key);if(source==0)return null;
+            var value=occurrence(source,Memory.ObjectDeclaration.class);
+            if(!value.id().equals(key))throw new IllegalStateException("changed indexed Object identity");return value;
+        }
+        @Override public Set<ObjectId> keySet(){
+            available();return Collections.unmodifiableSet(new AbstractSet<>() {
+                @Override public int size(){return NativeDeclarations.this.size();}
+                @Override public Iterator<ObjectId> iterator(){available();return new Iterator<>() {
+                    private long ordinal;
+                    @Override public boolean hasNext(){available();return ordinal<sourceOrder.size();}
+                    @Override public ObjectId next(){if(!hasNext())throw new NoSuchElementException();return identity(sourceOrder.handle(ordinal++));}
+                };}
+            });
+        }
+        @Override public Set<Entry<ObjectId,Memory.ObjectDeclaration>> entrySet(){
+            available();return Collections.unmodifiableSet(new AbstractSet<>() {
+                @Override public int size(){return NativeDeclarations.this.size();}
+                @Override public Iterator<Entry<ObjectId,Memory.ObjectDeclaration>> iterator(){available();return new Iterator<>() {
+                    private long ordinal;
+                    @Override public boolean hasNext(){available();return ordinal<sourceOrder.size();}
+                    @Override public Entry<ObjectId,Memory.ObjectDeclaration> next(){
+                        if(!hasNext())throw new NoSuchElementException();
+                        var value=occurrence(sourceOrder.handle(ordinal++),Memory.ObjectDeclaration.class);
+                        return new SimpleImmutableEntry<>(value.id(),value);
+                    }
+                };}
+            });
+        }
+        @Override public void close(){
+            if(ended)return;ended=true;Throwable failure=null;
+            if(sourceOrder!=null)try{sourceOrder.close();}catch(RuntimeException|Error cleanup){failure=cleanup;}
+            if(lookupOrder!=null)try{lookupOrder.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
+            sourceOrder=lookupOrder=null;
+            if(failure instanceof RuntimeException exception)throw exception;if(failure instanceof Error error)throw error;
+        }
+    }
     @Override public List<ProgramStore.UnitView> units(){
         long list=field(snapshot.root(),4);
         return new ProgramStore.BorrowedList<>(Math.toIntExact(snapshot.size(list)),
@@ -877,6 +969,7 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
     private String text(long source){long length=snapshot.characterCount(source);if(length>Integer.MAX_VALUE)throw new IllegalStateException("program text too large");char[] result=new char[(int)length],block=new char[Math.min(1024,Math.max(1,result.length))];long offset=0;while(offset<length){int count=snapshot.readCharacters(source,offset,block,0,(int)Math.min(block.length,length-offset));System.arraycopy(block,0,result,(int)offset,count);offset+=count;}return new String(result);}
     private void open(){if(closed)throw new IllegalStateException("snapshot program is closed");}
     @Override public void close(){if(closed)return;closed=true;Throwable failure=null;
+        try{if(declarationInventory!=null)declarationInventory.close();}catch(RuntimeException|Error cleanup){failure=cleanup;}
         for(var nodes:nodeStores.values())try{nodes.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
         try{if(unitOrder!=null)unitOrder.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
         for(var tape:metadataOrders.values())try{tape.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}

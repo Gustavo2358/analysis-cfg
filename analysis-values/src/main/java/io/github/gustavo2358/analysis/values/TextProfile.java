@@ -14,8 +14,8 @@ final class TextProfile {
     record CopyWrite(Location location,Location source) implements Write { }
     record ExpressionWrite(Location location,Operations.Assign operation) implements Write { }
     final AnalysisSession session;
-    final Map<ObjectId,Location> subjects=new HashMap<>();
-    private final Set<ObjectId> textSubjects=new HashSet<>();
+    final Map<ObjectId,Location> subjects;
+    private final Set<ObjectId> textSubjects;
     final Map<OperationId,Write> writes=new HashMap<>();
     private final List<Write> preparedWrites=new ArrayList<>();
     private final Map<OperationId,KillAuthority.Permit> overwrites=new HashMap<>();
@@ -44,10 +44,17 @@ final class TextProfile {
         var index=session.index();var store=index.store();
         var entryUnits=session.contexts().stream().map(c->c.entry().id().unit()).collect(java.util.stream.Collectors.toCollection(LinkedHashSet::new));
         var cells=new HashMap<StorageId,Location>();
+        var nativeSubjects=store.declarationInventory().isPresent()?new NativeSubjects(index,cells):null;
+        subjects=nativeSubjects==null?new HashMap<>():nativeSubjects;
+        textSubjects=nativeSubjects==null?new HashSet<>():nativeSubjects.texts();
         for(var declaration:index.objectDeclarations().entrySet()) {
             var object=declaration.getValue();
             store.progress(ProgramStore.ExecutionPhase.DEMAND);
-            var cell=index.directCell(declaration.getKey());
+            Memory.Cell cell;
+            if(nativeSubjects!=null){
+                var base=object.storage() instanceof Memory.CellBinding binding?index.storage(binding.storage()):null;
+                cell=base instanceof Memory.Cell value?value:null;
+            } else cell=index.directCell(declaration.getKey());
             if(!(object.storage() instanceof Memory.CellBinding)||cell==null||!cellDomain(object.typeRef())||!cellDomain(cell.typeRef())) {
                 // A declaration alone has no transfer effect. Demand closure and every
                 // actual effect below still require supported storage; none is discarded.
@@ -58,8 +65,11 @@ final class TextProfile {
             if(location==null){int ordinal=cells.size();Math.incrementExact(ordinal);location=new Location(ordinal,cell);cells.put(cell.header().id(),location);}
             // Cold bodies reconstruct equal IDs. These persistent associations
             // borrow the complete identity already owned by the declaration index.
-            subjects.put(declaration.getKey(),location);
-            if(text(object.typeRef()))textSubjects.add(declaration.getKey());
+            if(nativeSubjects!=null)nativeSubjects.include(text(object.typeRef()));
+            else {
+                subjects.put(declaration.getKey(),location);
+                if(text(object.typeRef()))textSubjects.add(declaration.getKey());
+            }
             if(object.coverage()!=Evidence.CoverageStatus.MODELED||open(object.precision().storage())||open(object.precision().values()))
                 sourceOpenCells.add(location.ordinal());
         }
@@ -148,6 +158,64 @@ final class TextProfile {
             boundaries.put(context,seed);
         }
         if(relations.active())boundaries.replaceAll((context,state)->state.attach(relations,preparation));
+    }
+    /** Native aliases project the canonical Cell location on demand. Complete
+     * declarations still undergo the preparation scan; no per-Object typed keys
+     * are retained in either locations or text eligibility. */
+    private static final class NativeSubjects extends AbstractMap<ObjectId,Location> {
+        private final ProgramIndex index;
+        private final Map<StorageId,Location> cells;
+        private int count,textCount;
+        NativeSubjects(ProgramIndex index,Map<StorageId,Location> cells){this.index=index;this.cells=cells;}
+        void include(boolean text){count=Math.incrementExact(count);if(text)textCount=Math.incrementExact(textCount);}
+        private Location location(Memory.ObjectDeclaration object){
+            if(object==null||!(object.storage() instanceof Memory.CellBinding binding)||!cellDomain(object.typeRef()))return null;
+            var base=index.storage(binding.storage());
+            return base instanceof Memory.Cell cell&&cellDomain(cell.typeRef())?cells.get(binding.storage()):null;
+        }
+        @Override public int size(){index.objectDeclarations().size();return count;}
+        @Override public Location get(Object key){return key instanceof ObjectId id?location(index.object(id)):null;}
+        @Override public boolean containsKey(Object key){return get(key)!=null;}
+        @Override public Set<Entry<ObjectId,Location>> entrySet(){return Collections.unmodifiableSet(new AbstractSet<>() {
+            @Override public int size(){return NativeSubjects.this.size();}
+            @Override public Iterator<Entry<ObjectId,Location>> iterator(){
+                var declarations=index.objectDeclarations().entrySet().iterator();return new Iterator<>() {
+                    private Entry<ObjectId,Location> next;
+                    @Override public boolean hasNext(){
+                        index.objectDeclarations().size();
+                        while(next==null&&declarations.hasNext()){
+                            var declaration=declarations.next();var location=location(declaration.getValue());
+                            if(location!=null)next=new SimpleImmutableEntry<>(declaration.getKey(),location);
+                        }
+                        return next!=null;
+                    }
+                    @Override public Entry<ObjectId,Location> next(){
+                        if(!hasNext())throw new NoSuchElementException();var value=next;next=null;return value;
+                    }
+                };
+            }
+        });}
+        Set<ObjectId> texts(){return Collections.unmodifiableSet(new AbstractSet<>() {
+            @Override public int size(){index.objectDeclarations().size();return textCount;}
+            @Override public boolean contains(Object key){
+                if(!(key instanceof ObjectId id))return false;var object=index.object(id);
+                return object!=null&&text(object.typeRef())&&location(object)!=null;
+            }
+            @Override public Iterator<ObjectId> iterator(){
+                var declarations=index.objectDeclarations().entrySet().iterator();return new Iterator<>() {
+                    private ObjectId next;
+                    @Override public boolean hasNext(){
+                        index.objectDeclarations().size();
+                        while(next==null&&declarations.hasNext()){
+                            var declaration=declarations.next();var object=declaration.getValue();
+                            if(text(object.typeRef())&&location(object)!=null)next=declaration.getKey();
+                        }
+                        return next!=null;
+                    }
+                    @Override public ObjectId next(){if(!hasNext())throw new NoSuchElementException();var value=next;next=null;return value;}
+                };
+            }
+        });}
     }
     private static boolean text(Types.TypeRef type) { return type instanceof Types.Known k&&k.type()==Types.Builtin.TEXT; }
     private static boolean bool(Types.TypeRef type) { return type instanceof Types.Known k&&k.type()==Types.Builtin.BOOL; }

@@ -34,7 +34,7 @@ public final class StorageIndex {
     private final Map<ObjectId,Memory.ObjectDeclaration> declarations;
     private final Map<ObjectId,Resolution> objects=new HashMap<>();
     private final Map<StorageId,Set<PremiseId>> separation=new HashMap<>();
-    private final Map<ObjectId,List<ObjectId>> aliasDependencies=new HashMap<>();
+    private final Map<ObjectId,List<ObjectId>> aliasDependencies=new LinkedHashMap<>();
     private final Set<UncertaintyId> uncertaintyIds=new HashSet<>();
     private long bindingVisits,premiseMembers;
     public StorageIndex(AnalysisSession session) {
@@ -60,7 +60,9 @@ public final class StorageIndex {
         }
         var active=new HashSet<ObjectId>();
         record Frame(ObjectId id,Iterator<ObjectId> dependencies) { }
-        for(var root:declarations.keySet()) {
+        // Preserve declaration insertion order while borrowing the identities
+        // already owned by the required edges, not another cold projection.
+        for(var root:dependencies.keySet()) {
             if(objects.containsKey(root))continue;
             var stack=new ArrayDeque<Frame>();stack.push(new Frame(root,dependencies.get(root).iterator()));active.add(root);
             while(!stack.isEmpty()) {

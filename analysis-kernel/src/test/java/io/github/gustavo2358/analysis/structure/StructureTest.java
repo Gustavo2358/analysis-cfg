@@ -142,6 +142,18 @@ class StructureTest {
         assertTrue(empty.contexts().isEmpty());
         var s=session(p); var v=s.context(p.units().getFirst().entries().getFirst().id());
         assertThrows(IllegalArgumentException.class,()->v.successors(empty.index().sequence(p.units().getFirst().sequences().getFirst().label())));
+        boolean[] catalogRequested={false};var original=ProgramStore.resident(p);
+        var observed=(ProgramStore.Structural)java.lang.reflect.Proxy.newProxyInstance(
+            ProgramStore.class.getClassLoader(),new Class<?>[]{ProgramStore.Structural.class},(proxy,method,arguments)->{
+                if(method.getName().equals("declarationInventory"))catalogRequested[0]=true;
+                return method.invoke(original,arguments);
+            });
+        var otherPolicy=build.options().projectionPolicy()==ProjectionPolicy.KNOWN_SUBSET
+            ?ProjectionPolicy.PARTIAL_ANALYSIS:ProjectionPolicy.KNOWN_SUBSET;
+        var refused=AnalysisSession.open(build,observed,otherPolicy,List.of());
+        assertEquals(AnalysisSession.Status.INVALID_INPUT,refused.status());
+        assertEquals("projection policy mismatch",refused.reason());
+        assertFalse(catalogRequested[0],"rejected structural metadata must not construct a native declaration catalogue");
     }
     @Test void cycleAndSelfLoopKeepLiteralControl() {
         var b=linear(1,0,0,1); var u=b.units().getFirst();

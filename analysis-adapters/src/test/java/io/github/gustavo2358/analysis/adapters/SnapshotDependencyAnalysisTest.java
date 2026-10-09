@@ -34,6 +34,10 @@ final class SnapshotDependencyAnalysisTest {
         var objects=new java.util.ArrayList<>(unit.objects());
         for(int i=0;i<128;i++)objects.add(new Memory.ObjectDeclaration(new ObjectId(unit.id(),"unused-"+i),
             Optional.of("!".repeat(4096)+"/"+i),template.typeRef(),template.storage(),template.visibility(),template.origin(),template.coverage(),template.precision()));
+        var auditId=objects.getLast().id();var auditRoots=new java.util.HashMap<ObjectId,ObjectId>();
+        auditRoots.put(auditId,new ObjectId(auditId.unit(),auditId.localId()));
+        assertEquals(2,retainedUnusedObjectIds(auditRoots),"the audit must count distinct stored instances, not equal logical IDs");
+        assertEquals(0,retainedUnusedObjectIds(java.util.Map.of(template.id(),template)));
         var replacement=new Unit(unit.id(),unit.containingUnit(),objects,unit.visibleObjects(),unit.entries(),unit.sequences(),unit.completionPorts(),unit.body(),unit.bodyUnavailable(),unit.coverage(),unit.origin());
         var units=new java.util.ArrayList<>(seed.units());units.set(0,replacement);
         var publication=new Publication(seed.id(),seed.airVersion(),seed.capabilities(),seed.artifacts(),units,seed.storage(),seed.resources(),seed.artifactRelations(),seed.origins(),seed.coverage(),seed.uncertainties(),seed.premises());
@@ -69,14 +73,18 @@ final class SnapshotDependencyAnalysisTest {
                         assertThrows(UnsupportedOperationException.class,catalog::clear);
                         assertThrows(UnsupportedOperationException.class,()->catalog.keySet().clear());
                         assertThrows(UnsupportedOperationException.class,()->catalog.entrySet().iterator().next().setValue(objects.getLast()));
-                        var canonicalKeys=new java.util.HashMap<ObjectId,ObjectId>();
-                        catalog.keySet().forEach(id->canonicalKeys.put(id,id));
+                        var inventoryField=borrowed.getClass().getDeclaredField("objects");inventoryField.setAccessible(true);
+                        var inventory=inventoryField.get(borrowed);
+                        var addressesField=inventory.getClass().getDeclaredField("addresses");addressesField.setAccessible(true);
+                        var residentAddresses=(java.util.Map<?,?>)addressesField.get(inventory);
+                        assertEquals(0,residentAddresses.size(),
+                            "native declaration addresses must use the page owner, not an input-cardinality heap map");
                         var cellField=borrowed.getClass().getDeclaredField("directCells");cellField.setAccessible(true);
                         var directCells=(java.util.Map<?,?>)cellField.get(borrowed);
                         assertEquals(objects.stream().filter(value->value.storage() instanceof Memory.CellBinding).count(),
                             (long)directCells.size());
-                        for(var key:directCells.keySet())assertSame(canonicalKeys.get(key),key,
-                            "direct Cell associations reconstructed an already indexed complete ObjectId");
+                        assertEquals(0,retainedUnusedObjectIds(borrowed),
+                            "native structural associations retained input-cardinality typed identity payloads");
                         var scalar=io.github.gustavo2358.analysis.values.PossibleValuesAnalysis.prepare(
                             opened.session().orElseThrow(),io.github.gustavo2358.analysis.values.PossibleValuesAnalysis.EFFECTS_PROFILE,
                             java.util.Set.of(template.id()));
@@ -88,12 +96,12 @@ final class SnapshotDependencyAnalysisTest {
                         var subjectsField=profile.getClass().getDeclaredField("subjects");subjectsField.setAccessible(true);
                         var scalarSubjects=(java.util.Map<?,?>)subjectsField.get(profile);
                         assertEquals(objects.size(),scalarSubjects.size());
-                        for(var key:scalarSubjects.keySet())assertSame(canonicalKeys.get(key),key,
-                            "scalar locations reconstructed an already indexed complete ObjectId");
+                        assertEquals(0,retainedUnusedObjectIds(analysis),
+                            "native scalar associations retained input-cardinality typed identity payloads");
                         var textField=profile.getClass().getDeclaredField("textSubjects");textField.setAccessible(true);
                         var textSubjects=(java.util.Set<?>)textField.get(profile);
-                        for(var key:textSubjects)assertSame(canonicalKeys.get(key),key,
-                            "scalar text eligibility reconstructed an already indexed complete ObjectId");
+                        assertEquals(objects.stream().filter(value->value.typeRef() instanceof Types.Known known
+                            &&known.type()==Types.Builtin.TEXT).count(),(long)textSubjects.size());
                         var physical=new io.github.gustavo2358.analysis.storage.StorageIndex(opened.session().orElseThrow());reads[0]=0;
                         assertEquals(objects,List.copyOf(physical.declarations()));
                         assertTrue(reads[0]>0,"physical declarations must share cold addresses rather than copy all bodies");
@@ -103,15 +111,47 @@ final class SnapshotDependencyAnalysisTest {
                         dependencies.setAccessible(true);
                         var retained=(java.util.Map<?,?>)dependencies.get(physical);
                         assertEquals(catalog.size(),retained.size());
-                        for(var key:retained.keySet())assertSame(canonicalKeys.get(key),key,
-                            "physical alias inventory reconstructed an already indexed complete ObjectId");
+                        assertEquals(catalog.keySet(),retained.keySet(),"every full physical identity must survive projection");
+                        assertEquals(128,retainedUnusedObjectIds(physical),
+                            "physical preparation retained a second typed identity copy beside its canonical edges");
                     }
                     assertThrows(IllegalStateException.class,()->borrowed.object(objects.getLast().id()));
+                    assertThrows(IllegalStateException.class,()->borrowed.directCell(objects.getLast().id()));
+                    assertThrows(IllegalStateException.class,()->borrowed.objectDeclarations().size());
                 }
             }
             assertEquals(0,pages.statistics().livePages());
         }
         assertEquals(0,ledger.heapUsed());
+    }
+
+    /** Walk stored fields, not custom lazy Map/List projections. Counts are actual
+     * identity-deduplicated objects, never reported as measured heap bytes. */
+    private static int retainedUnusedObjectIds(Object root) throws ReflectiveOperationException {
+        var seen=java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<Object,Boolean>());
+        var pending=new java.util.ArrayDeque<Object>();pending.add(root);int count=0;
+        while(!pending.isEmpty()) {
+            var value=pending.removeFirst();if(!seen.add(value))continue;
+            if(value instanceof ObjectId id&&id.localId().startsWith("unused-")){count++;continue;}
+            var type=value.getClass();var name=type.getName();
+            if(value instanceof java.util.Optional<?> optional){optional.ifPresent(pending::addLast);continue;}
+            if(type.isArray()){
+                if(!type.componentType().isPrimitive())for(var item:(Object[])value)if(item!=null)pending.addLast(item);
+                continue;
+            }
+            if(name.startsWith("java.util.")&&!name.contains("$Unmodifiable")) {
+                if(value instanceof java.util.Map<?,?> map){for(var entry:map.entrySet()){
+                    if(entry.getKey()!=null)pending.addLast(entry.getKey());if(entry.getValue()!=null)pending.addLast(entry.getValue());
+                }continue;}
+                if(value instanceof Iterable<?> items){for(var item:items)if(item!=null)pending.addLast(item);continue;}
+            }
+            for(var owner=type;owner!=null&&owner.getName().startsWith("io.github.gustavo2358.");owner=owner.getSuperclass())
+                for(var field:owner.getDeclaredFields())if(!java.lang.reflect.Modifier.isStatic(field.getModifiers())
+                    &&!field.getType().isPrimitive()){
+                    field.setAccessible(true);var item=field.get(value);if(item!=null)pending.addLast(item);
+                }
+        }
+        return count;
     }
 
     @Test void generalMetadataUsesOrderedBorrowedPagesWithoutReadingUnusedPayloads() throws Exception {
@@ -590,6 +630,37 @@ final class SnapshotDependencyAnalysisTest {
             }
         }
         for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
+
+        var catalogLedger=resources();
+        try(var pages=new FilePageStore(directory,512,16,catalogLedger);
+            var checked=SnapshotValidator.check(AirSnapshot.fromPublication(publication),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,catalogLedger))) {
+            long originalPages=pages.statistics().livePages(),originalHeap=catalogLedger.heapUsed();
+            var delegate=new PagedSnapshotOrderStorage(pages,catalogLedger);
+            var primary=new IllegalStateException("injected failure after native declaration lookup append");
+            int[] tapes={0},written={0};
+            var failing=new io.github.gustavo2358.analysis.dependencies.SnapshotOrderStorage() {
+                @Override public Index open(Order order){return delegate.open(order);}
+                @Override public Tape tape(){
+                    var tape=delegate.tape();
+                    if(++tapes[0]!=2)return tape;
+                    return new Tape(){
+                        @Override public void append(long handle){tape.append(handle);written[0]++;throw primary;}
+                        @Override public long size(){return tape.size();}
+                        @Override public long handle(long ordinal){return tape.handle(ordinal);}
+                        @Override public void close(){tape.close();}
+                    };
+                }
+                @Override public void close(){delegate.close();}
+            };
+            try(var program=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,catalogLedger),failing,catalogLedger)) {
+                assertSame(primary,assertThrows(IllegalStateException.class,program::declarationInventory));
+                assertEquals(1,written[0],"failure must occur after a real paged lookup write");
+                assertSame(checked.snapshot(),program.admission().snapshot(),"partial catalogue cleanup must not close the AIR owner");
+            }
+            assertEquals(originalPages,pages.statistics().livePages(),"partial declaration tapes or temporary index leaked pages");
+            assertEquals(originalHeap,catalogLedger.heapUsed(),"partial declaration catalogue leaked reservations");
+        }
+        for(var pool:AnalysisResources.Pool.values())assertEquals(0,catalogLedger.used(pool),pool.toString());
     }
 
     @Test void pagedPhysicalTupleStorageRejectsDuplicatesAndForeignOrMissingBindings() {

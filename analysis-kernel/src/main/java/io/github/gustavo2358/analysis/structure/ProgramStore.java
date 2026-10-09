@@ -26,11 +26,20 @@ public interface ProgramStore {
         CoverageView coverage();
         List<Evidence.Uncertainty> uncertainties();
         List<Proofs.Premise> premises();
+        /** Complete immutable declaration catalogue supplied by an admitted owner.
+         * Empty selects the explicit resident compatibility inventory. */
+        default Optional<DeclarationInventory> declarationInventory(){return Optional.empty();}
         /** Exact identity lookup. Native implementations can resolve a cold address without
          * retaining every Origin body. The resident compatibility default remains explicit. */
         default Origins.Origin origin(OriginId id) {
             Objects.requireNonNull(id);return origins().stream().filter(value->value.id().equals(id)).findFirst().orElse(null);
         }
+    }
+
+    /** Original AIR order plus full nominal lookup, without requiring resident keys.
+     * identityAt checks the complete identity, never position alone. */
+    interface DeclarationInventory extends Map<ObjectId,Memory.ObjectDeclaration> {
+        boolean identityAt(int ordinal,ObjectId identity);
     }
 
     /** Metadata/body addresses, not an owning Unit containing the complete executable payload. */

@@ -75,6 +75,7 @@ public final class ProgramIndex {
             }
         }
         operations = b.operations; b.objects.freeze();objects = b.objects; storage = b.storage;
+        if(b.directCells instanceof CellAssociations cells)cells.freeze();
         directCells = b.directCells; objectReferences = b.objectReferences;places=b.places;
         entries = b.entries; entryOrdinals = b.entryOrdinals;
         entryNodes = b.entryNodes; normalExits = b.normalExits;
@@ -141,22 +142,37 @@ public final class ProgramIndex {
     static final class Declarations extends AbstractMap<ObjectId,Memory.ObjectDeclaration> {
         private record Address(List<Memory.ObjectDeclaration> values,int ordinal) { }
         private final Map<ObjectId,Address> addresses=new LinkedHashMap<>();
+        private ProgramStore.DeclarationInventory inventory;
+        private int registered;
         private boolean frozen;
+        Declarations(){this(Optional.empty());}
+        Declarations(Optional<ProgramStore.DeclarationInventory> inventory){this.inventory=inventory.orElse(null);}
+        void connect(Optional<ProgramStore.DeclarationInventory> inventory){
+            if(frozen||registered!=0||!addresses.isEmpty())throw new IllegalStateException("declaration inventory already started");
+            this.inventory=Objects.requireNonNull(inventory).orElse(null);
+        }
+        boolean nativeBacked(){return inventory!=null;}
         boolean append(ObjectId id,List<Memory.ObjectDeclaration> values,int ordinal) {
             if(frozen)throw new IllegalStateException("declaration inventory is frozen");
+            if(inventory!=null){
+                if(!inventory.identityAt(registered,Objects.requireNonNull(id)))return false;
+                registered=Math.incrementExact(registered);return true;
+            }
             return addresses.putIfAbsent(Objects.requireNonNull(id),new Address(values,ordinal))==null;
         }
-        void freeze(){frozen=true;}
-        @Override public int size(){return addresses.size();}
-        @Override public boolean containsKey(Object key){return addresses.containsKey(key);}
-        @Override public Set<ObjectId> keySet(){return Collections.unmodifiableSet(addresses.keySet());}
+        void freeze(){if(inventory!=null&&registered!=inventory.size())throw new IllegalStateException("changed Object inventory");frozen=true;}
+        @Override public int size(){return inventory==null?addresses.size():inventory.size();}
+        @Override public boolean containsKey(Object key){return inventory==null?addresses.containsKey(key):inventory.containsKey(key);}
+        @Override public Set<ObjectId> keySet(){return Collections.unmodifiableSet(inventory==null?addresses.keySet():inventory.keySet());}
         @Override public Memory.ObjectDeclaration get(Object key) {
+            if(inventory!=null)return inventory.get(key);
             var address=addresses.get(key);if(address==null)return null;
             var value=address.values().get(address.ordinal());
             if(!value.id().equals(key))throw new IllegalStateException("changed indexed Object identity");
             return value;
         }
         @Override public Set<Entry<ObjectId,Memory.ObjectDeclaration>> entrySet() {
+            if(inventory!=null)return Collections.unmodifiableSet(inventory.entrySet());
             return Collections.unmodifiableSet(new AbstractSet<>() {
                 @Override public int size(){return addresses.size();}
                 @Override public Iterator<Entry<ObjectId,Memory.ObjectDeclaration>> iterator() {
@@ -168,6 +184,44 @@ public final class ProgramIndex {
                 }
             });
         }
+    }
+
+    /** Native Cell associations are derived from the immutable cold declaration;
+     * no second per-Object identity inventory is needed. Required checks/counts
+     * still execute in IndexBuilder before ownership transfers. */
+    static final class CellAssociations extends AbstractMap<ObjectId,Memory.Cell> {
+        private final Declarations declarations;
+        private final Map<StorageId,Memory.Storage> storage;
+        private int count;private boolean frozen;
+        CellAssociations(Declarations declarations,Map<StorageId,Memory.Storage> storage){this.declarations=declarations;this.storage=storage;}
+        void include(){if(frozen)throw new IllegalStateException("Cell associations are frozen");count=Math.incrementExact(count);}
+        void freeze(){frozen=true;}
+        private Memory.Cell cell(Memory.ObjectDeclaration object){
+            if(object==null||!(object.storage() instanceof Memory.CellBinding binding))return null;
+            var value=storage.get(binding.storage());return value instanceof Memory.Cell cell?cell:null;
+        }
+        @Override public int size(){declarations.size();return count;}
+        @Override public Memory.Cell get(Object key){return cell(declarations.get(key));}
+        @Override public boolean containsKey(Object key){return get(key)!=null;}
+        @Override public Set<Entry<ObjectId,Memory.Cell>> entrySet(){return Collections.unmodifiableSet(new AbstractSet<>() {
+            @Override public int size(){return CellAssociations.this.size();}
+            @Override public Iterator<Entry<ObjectId,Memory.Cell>> iterator(){
+                var source=declarations.entrySet().iterator();return new Iterator<>() {
+                    private Entry<ObjectId,Memory.Cell> next;
+                    @Override public boolean hasNext(){
+                        declarations.size();
+                        while(next==null&&source.hasNext()){
+                            var declaration=source.next();var cell=cell(declaration.getValue());
+                            if(cell!=null)next=new SimpleImmutableEntry<>(declaration.getKey(),cell);
+                        }
+                        return next!=null;
+                    }
+                    @Override public Entry<ObjectId,Memory.Cell> next(){
+                        if(!hasNext())throw new NoSuchElementException();var value=next;next=null;return value;
+                    }
+                };
+            }
+        });}
     }
 
     /** Opaque index handle. Its private ordinal never becomes an AIR/CFG identity or public result. */

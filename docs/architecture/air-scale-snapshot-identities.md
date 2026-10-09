@@ -189,3 +189,68 @@ plus newly executed repaired boundaries, not a new complete local FAST PASS.
 The final commit's complete remote FAST remains required.
 Canonical identity maps and the location/eligibility associations remain resident:
 this removes duplicate identity payloads, not the AS-W09 external-index obligation.
+
+## Native declaration directory and cold nominal associations
+
+The native route now owns two paged ordinal tapes: original AIR declaration
+order and complete canonical-key lookup order. Its temporary ordered index closes
+after construction. No per-Object typed ID, address record or decoded body is
+retained in the structural declaration directory. Typed lookup compares complete
+canonical identities, not a hash, display name or ordinal; values remain cold.
+The backend-neutral DeclarationInventory port keeps the resident compatibility
+path explicit. Construction begins only after the original initial CFG/policy
+checks, preserving rejection precedence.
+
+Direct Cell associations and scalar subject/text membership are cold views of
+that directory. Existing Cell/Location data remain shared, and all original
+declaration, binding, precision, demand and effect checks still execute. Physical
+root traversal reuses the required alias keys in AIR insertion order instead of
+projecting another complete identity collection. The physical alias graph and
+resolutions are still resident: this does not complete AS-W09.
+
+The nominal cold-read law now checks actual stored references rather than requiring
+instance identity between two lazy projections. Its audit distinguishes equal
+but distinct IDs and does not enumerate cold custom views: structural/scalar roots
+retain zero unused typed ObjectIds; physical roots retain one instance per alias.
+Full bodies, identity equality, original order, immutable views and closed-owner
+rejection remain asserted. An injected failure after a real lookup-tape append
+preserves the primary error, leaves AIR open and releases partial pages/reservations
+on program closure. No partial catalogue is published.
+
+Focused kernel38, values52, dependencies18, adapters17 and CLI27 methods passed
+with zero skips. The unchanged406,942,781-byte Cell case completed on Java21 with
+128MiB heap and the original eight-minute deadline in314.40s. The independent
+oracle preserves all21 fields,46 original origins and CFG; the entire output also
+matches the previous qualified bytes, including metrics. This finite run does
+not establish universal throughput or complete managed residency. These runtime
+results used producer6d85657, not the subsequent producer650a546.
+
+The first complete FAST executed1158 required methods without skips, then failed
+at the exact W1D compiled inventory for the new native directory. The original
+refresh helper repaired only inventory metadata; unchanged deny rules, W1D,
+storage and the eleven original post-checks subsequently passed. This is not a
+second complete FAST PASS. The same407,297,668-byte physical case on Java21
+then reached the original eight-minute application TIME limit, exit7, wall487.25s
+including cleanup; neither output was published. The DECODE resource label also
+covers later cold reads and does not identify the initial decoder as the cause.
+
+Separate sampling identified repeated immutable canonical TEXT_PAIR probes.
+Producer650a546 reuses16 fixed slots only when both complete child keys match,
+within its unchanged4096-byte control claim. It retains no String or typed-ID
+history and skips no source characters or namespace checks. Its complete local
+FAST and both remote checks passed; consumer backend/admission/regional23 methods
+passed. A fresh complete consumer FAST passed1158 required methods with zero
+skips, all compiled inventories and the eleven original post-checks in755.266s.
+The unchanged407,297,668-byte physical public CLI case completed on Java21 in
+214.09s; its independent oracle preserves21 fields,83 origins and CFG. The two
+metric differences from the small seed reference are2052 objects resolved and
+4104 binding visits, reflecting all2048 additional declarations. Entire outputs
+match the previous qualified large physical product, including metrics.
+The unchanged406,942,781-byte Cell public case completed in199.56s; its oracle
+preserves21 fields,46 origins and CFG, and entire outputs match the earlier large
+Cell product. Both use128MiB heap, the original eight-minute application deadline
+and no profiling. Producer/consumer runtime classes and all14 changed inputs
+were verified unchanged after execution. These are individual finite runs, not
+three-repeat medians or universal throughput bounds. The earlier physical TIME
+and inventory FAIL remain historical evidence; consumer remote FAST still needs
+the final commit. Original quotas/oracles are unchanged; AS-W09/W10 remain PARTIAL.
