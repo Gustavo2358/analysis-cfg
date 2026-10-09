@@ -3,6 +3,8 @@ package io.github.gustavo2358.analysis.solver;
 import java.util.Objects;
 import java.time.Duration;
 import java.util.function.LongSupplier;
+import java.util.function.Consumer;
+import io.github.gustavo2358.analysis.structure.ProgramStore;
 
 /**
  * Session-owned capacity accounting. Reserve before growing stores, including capacity and scratch,
@@ -82,6 +84,7 @@ public final class AnalysisResources {
 
     private final Limits limits;
     private final LongSupplier clock;
+    private final Consumer<Phase> executionProgress;
     private final long startedNanos,timeoutNanos;
     private final long[] used = new long[Pool.values().length];
     private final long[] peak = new long[Pool.values().length];
@@ -98,7 +101,27 @@ public final class AnalysisResources {
         return new AnalysisResources(limits,nanos,System::nanoTime);
     }
     AnalysisResources(Limits limits,long timeoutNanos,LongSupplier clock) {
+        this(limits,timeoutNanos,clock,null);
+    }
+    private AnalysisResources(Limits limits,long timeoutNanos,LongSupplier clock,Consumer<Phase> executionProgress) {
+        this.executionProgress=executionProgress;
         this.limits=Objects.requireNonNull(limits);if(timeoutNanos<0)throw new IllegalArgumentException("analysis timeout must be nonnegative");this.timeoutNanos=timeoutNanos;this.clock=Objects.requireNonNull(clock);startedNanos=clock.getAsLong();
+    }
+    /** Resident stores retain local capacity accounting, but productive work
+     * observes the admitted program's budget even inside symbolic decisions.
+     * Their capacities have not thereby joined the managed heap. */
+    static AnalysisResources executionFor(ProgramStore program) {
+        Objects.requireNonNull(program);
+        return new AnalysisResources(new Limits(Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE),0,()->0,
+            phase->program.progress(switch(phase){
+                case DECODE,VALIDATION,INDEX->ProgramStore.ExecutionPhase.INDEX;
+                case DEMAND->ProgramStore.ExecutionPhase.DEMAND;
+                case CONTROL->ProgramStore.ExecutionPhase.CONTROL;
+                case DOMAIN->ProgramStore.ExecutionPhase.DOMAIN;
+                case REPLAY->ProgramStore.ExecutionPhase.REPLAY;
+                case SORT->ProgramStore.ExecutionPhase.SORT;
+                case ENCODE->ProgramStore.ExecutionPhase.ENCODE;
+            }));
     }
     public Limits limits() { return limits; }
 
@@ -154,6 +177,7 @@ public final class AnalysisResources {
     public synchronized long outputUsed() { return outputUsed; }
 
     private void time(Phase phase) {
+        if(executionProgress!=null)executionProgress.accept(phase);
         if(timeoutNanos==0)return;long elapsed=clock.getAsLong()-startedNanos;if(elapsed<0)elapsed=0;
         if(elapsed>=timeoutNanos)throw new Exhausted(Resource.TIME,phase,timeoutNanos,elapsed,0);
     }

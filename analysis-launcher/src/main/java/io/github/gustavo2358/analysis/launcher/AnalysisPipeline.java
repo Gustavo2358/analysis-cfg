@@ -71,6 +71,11 @@ public final class AnalysisPipeline {
 
     /** Default production route: one checked paged snapshot owns CFG and the shared general analysis. */
     static int runSnapshot(String[] args,PrintStream err,DataflowAirReader reader) {
+        return runSnapshot(args,err,reader,AnalysisResources.withDeadline(new AnalysisResources.Limits(
+                64L*1024*1024,16L*1024*1024,0,16L*1024*1024*1024,8,Long.MAX_VALUE,4L*1024*1024*1024),Duration.ofMinutes(8)));
+    }
+    /** The production budget is injectable only within the outer composition package. */
+    static int runSnapshot(String[] args,PrintStream err,DataflowAirReader reader,AnalysisResources resources) {
         if(args.length!=3)return usage(err);
         Path input,cfg,dependencies;
         try {
@@ -82,14 +87,12 @@ public final class AnalysisPipeline {
                     ||(Files.exists(paths.get(a))&&Files.exists(paths.get(b))&&Files.isSameFile(paths.get(a),paths.get(b))))return usage(err);
         } catch(InvalidPathException failure){return usage(err);}
           catch(IOException failure){err.println("PATH_IO");return 3;}
-        var resources=AnalysisResources.withDeadline(new AnalysisResources.Limits(
-                64L*1024*1024,16L*1024*1024,0,16L*1024*1024*1024,8,Long.MAX_VALUE,4L*1024*1024*1024),Duration.ofMinutes(8));
         try(var read=reader.readSnapshot(input,resources)) {
             var validation=read.checked().result();
             if(validation.status()!=ValidationResult.Status.STRUCTURALLY_VALID) {
                 err.println("PIPELINE_INPUT_INVALID");return 3;
             }
-            try(var program=new SnapshotProgram(read.checked(),read.newIdentityStorage(),read.newOrderStorage())) {
+            try(var program=new SnapshotProgram(read.checked(),read.newIdentityStorage(),read.newOrderStorage(),resources)) {
                 var built=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).buildChecked(program,read.checked(),BuildOptions.defaults());
                 if(built.status()!=CfgBuildResult.Status.CFG_BUILT){err.println("CFG "+built.status());return 4;}
                 // Complete analysis preparation before replacing either existing product.

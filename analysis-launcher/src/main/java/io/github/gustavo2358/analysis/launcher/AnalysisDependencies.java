@@ -18,13 +18,16 @@ public final class AnalysisDependencies {
     public static void main(String[] args){System.exit(run(args,System.err));}
     public static int run(String[] args,PrintStream err){return run(args,err,new DataflowAirReader());}
     static int run(String[] args,PrintStream err,DataflowAirReader reader) {
+        return run(args,err,reader,AnalysisResources.withDeadline(new AnalysisResources.Limits(64L*1024*1024,16L*1024*1024,0,16L*1024*1024*1024,8,Long.MAX_VALUE,4L*1024*1024*1024),Duration.ofMinutes(8)));
+    }
+    /** Package seam for deterministic exhaustion of the same production owner. */
+    static int run(String[] args,PrintStream err,DataflowAirReader reader,AnalysisResources resources) {
         if(args.length!=2||args[0].isBlank()||args[1].isBlank()){err.println("usage: analysis-dependencies <input.air.json> <output.dependencies.json>");return 2;}
         Path input,output;try{input=Path.of(args[0]);output=Path.of(args[1]);}catch(InvalidPathException failure){err.println("INVALID_PATH");return 2;}
-        var resources=AnalysisResources.withDeadline(new AnalysisResources.Limits(64L*1024*1024,16L*1024*1024,0,16L*1024*1024*1024,8,Long.MAX_VALUE,4L*1024*1024*1024),Duration.ofMinutes(8));
         try(var read=reader.readSnapshot(input,resources)) {
             var validation=read.checked().result();
             if(validation.status()!=ValidationResult.Status.STRUCTURALLY_VALID){err.println("INPUT_VALIDATION: "+validation.status());return validation.status()==ValidationResult.Status.INVALID_IR?3:7;}
-            try(var program=new SnapshotProgram(read.checked(),read.newIdentityStorage(),read.newOrderStorage())) {
+            try(var program=new SnapshotProgram(read.checked(),read.newIdentityStorage(),read.newOrderStorage(),resources)) {
                 var cfg=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).buildChecked(program,read.checked(),BuildOptions.defaults());
                 var result=new DependencyAnalysis().prepare(program,cfg);
                 try{new SnapshotDependencyFileWriter().write(result,program,output,resources);}catch(IOException|IllegalArgumentException failure){err.println("OUTPUT_FAILURE: "+failure.getMessage());return 6;}

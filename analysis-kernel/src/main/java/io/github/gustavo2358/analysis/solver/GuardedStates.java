@@ -22,7 +22,7 @@ class GuardedStates<S> {
     }
     boolean add(int condition,S contribution) {
         if(condition==0)return false;
-        int checkpoint=conditions.checkpoint();boolean committed=false;
+        int checkpoint=conditions.checkpoint();boolean committed=false;Throwable primary=null;
         try {var previous=pieces;boolean changed=merge(condition,contribution);
             if(changed&&conditions.ownershipEnabled()){
                 for(var piece:pieces)if(piece.root==0)piece.root=conditions.retainRoot(piece.condition);
@@ -30,7 +30,13 @@ class GuardedStates<S> {
                 for(var piece:previous)if(piece.root!=0)conditions.releaseRoot(piece.root);
             }
             conditions.commitAfter(checkpoint,this::visitConditions);committed=true;return changed;}
-        finally {if(!committed)conditions.discardAfter(checkpoint);}
+        catch(RuntimeException|Error failure){primary=failure;throw failure;}
+        finally {
+            // An aborted registry belongs to run-owner teardown. Re-entering
+            // its semantic scratch API would replace the operational cause.
+            if(!committed&&conditions.acceptsRootRelease())try{conditions.discardAfter(checkpoint);}
+            catch(RuntimeException|Error cleanup){if(primary==null)throw cleanup;if(cleanup!=primary)primary.addSuppressed(cleanup);}
+        }
     }
     private boolean merge(int condition,S contribution) {
         // Joining equal values is union of their domains. Partitioning that union

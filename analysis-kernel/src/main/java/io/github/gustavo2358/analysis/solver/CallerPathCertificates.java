@@ -26,7 +26,7 @@ final class CallerPathCertificates implements AutoCloseable {
         boolean reached,retired;
         boolean rawReached;
         long word,token;
-        Arc incoming,outgoing,proof;
+        Arc incoming,outgoing,proof,basisIncoming;
         Node previous,next,children,previousSibling,nextSibling;
         Arc rawProof;
         Node rawChildren,rawPreviousSibling,rawNextSibling;
@@ -38,7 +38,7 @@ final class CallerPathCertificates implements AutoCloseable {
         final int variable;
         int condition;
         final AnalysisResources.Reservation lease;
-        Arc previousIn,nextIn,previousOut,nextOut,previousKey,nextKey;
+        Arc previousIn,nextIn,previousOut,nextOut,previousKey,nextKey,previousBasis,nextBasis;
         long word,token,conditionRoot;
         boolean valid,removed;
         Arc(Node from,Node to,int variable,int condition,AnalysisResources.Reservation lease){this.from=from;this.to=to;this.variable=variable;this.condition=condition;this.lease=lease;if(conditions.ownershipEnabled())conditionRoot=conditions.retainRoot(condition);}
@@ -61,7 +61,7 @@ final class CallerPathCertificates implements AutoCloseable {
         return node(basis,null);
     }
     Node node(boolean basis,IntConsumer rawChange) {
-        open();var lease=resources.reserve(AnalysisResources.Pool.RESIDENT,384,PHASE);
+        open();var lease=resources.reserve(AnalysisResources.Pool.RESIDENT,392,PHASE);
         Node node;
         try{node=new Node(basis,lease,rawChange);}catch(RuntimeException|Error error){lease.close();throw error;}
         node.next=first;if(first!=null)first.previous=node;first=node;return node;
@@ -69,10 +69,14 @@ final class CallerPathCertificates implements AutoCloseable {
     boolean rawReached(Node node){owned(node);return !node.retired&&node.rawReached;}
     Arc add(Node from,Node to,int variable,int condition) {
         owned(from);owned(to);if(from.retired||to.retired||variable<0)throw new IllegalArgumentException("invalid caller binding");
-        var lease=resources.reserve(AnalysisResources.Pool.RESIDENT,128,PHASE);Arc arc;
+        var lease=resources.reserve(AnalysisResources.Pool.RESIDENT,144,PHASE);Arc arc;
         try{arc=new Arc(from,to,variable,condition,lease);to.index.prepare(variable);}catch(RuntimeException|Error error){lease.close();throw error;}
         arc.nextOut=from.outgoing;if(arc.nextOut!=null)arc.nextOut.previousOut=arc;from.outgoing=arc;
         arc.nextIn=to.incoming;if(arc.nextIn!=null)arc.nextIn.previousIn=arc;to.incoming=arc;to.index.insert(arc);
+        // Borrow the same live binding, not a second predicate/word. Entry
+        // bases have no ancestor proof to reconstruct; test these roots before
+        // searching incoming edges of arbitrarily many disconnected callers.
+        if(from.basis){arc.nextBasis=to.basisIncoming;if(arc.nextBasis!=null)arc.nextBasis.previousBasis=arc;to.basisIncoming=arc;}
         try {
             growRaw(arc);
             refresh(arc);
@@ -96,6 +100,11 @@ final class CallerPathCertificates implements AutoCloseable {
             if(arc.nextOut!=null)arc.nextOut.previousOut=arc.previousOut;
             if(arc.previousIn==null)arc.to.incoming=arc.nextIn;else arc.previousIn.nextIn=arc.nextIn;
             if(arc.nextIn!=null)arc.nextIn.previousIn=arc.previousIn;
+            if(arc.from.basis){
+                if(arc.previousBasis==null)arc.to.basisIncoming=arc.nextBasis;else arc.previousBasis.nextBasis=arc.nextBasis;
+                if(arc.nextBasis!=null)arc.nextBasis.previousBasis=arc.previousBasis;
+                arc.previousBasis=null;arc.nextBasis=null;
+            }
             arc.removed=true;if(arc.conditionRoot!=0){conditions.releaseRoot(arc.conditionRoot);arc.conditionRoot=0;}release(arc);arc.lease.close();arc.to.index.remove(arc);
             if(arc.to.rawProof==arc)repairRaw(arc.to);
             if(arc.to.proof==arc)repair(arc.to);
@@ -154,18 +163,28 @@ final class CallerPathCertificates implements AutoCloseable {
                 node.children=null;node.proof=null;node.reached=false;node.word=0;
                 if(node.token!=0)arena.release(node.token);node.token=0;
             }
-            for(int i=0;i<affected.size;i++)for(var arc=affected.get(i).outgoing;arc!=null;arc=arc.nextOut)refresh(arc);
             for(int i=0;i<affected.size;i++) {
                 var node=affected.get(i);if(node.reached)continue;
-                for(var arc=node.incoming;arc!=null;arc=arc.nextIn) {
+                for(var arc=node.basisIncoming;arc!=null;arc=arc.nextBasis) {
                     refresh(arc);if(arc.valid){attach(arc);queue.add(node);break;}
                 }
+                if(!node.reached)for(var arc=node.incoming;arc!=null;arc=arc.nextIn) {
+                    if(arc.from.basis)continue; // already tested on its actual parent word
+                    refresh(arc);if(arc.valid){attach(arc);queue.add(node);break;}
+                }
+                // A repaired ancestor reconstructs its reachable descendants
+                // now; do not independently repair them and then replay the
+                // same outgoing bindings a second time.
+                expand(queue);
             }
-            expand(queue);
+            // Still-disconnected parents cannot retain positive stale words.
+            // Reachable parents already refreshed every outgoing arc in expand.
+            for(int i=0;i<affected.size;i++)if(!affected.get(i).reached)
+                for(var arc=affected.get(i).outgoing;arc!=null;arc=arc.nextOut){edgesRead++;release(arc);}
         }
     }
     private void expand(Nodes queue) {
-        for(int i=0;i<queue.size;i++)for(var arc=queue.get(i).outgoing;arc!=null;arc=arc.nextOut) {
+        while(queue.cursor<queue.size)for(var arc=queue.get(queue.cursor++).outgoing;arc!=null;arc=arc.nextOut) {
             refresh(arc);if(arc.valid&&!arc.to.reached){attach(arc);queue.add(arc.to);}
         }
     }
@@ -181,7 +200,7 @@ final class CallerPathCertificates implements AutoCloseable {
         try(var queue=new Nodes()){attachRaw(arc,true);queue.add(arc.to);expandRaw(queue,true);}
     }
     private void expandRaw(Nodes queue,boolean notify) {
-        for(int i=0;i<queue.size;i++)for(var arc=queue.get(i).outgoing;arc!=null;arc=arc.nextOut) {
+        while(queue.cursor<queue.size)for(var arc=queue.get(queue.cursor++).outgoing;arc!=null;arc=arc.nextOut) {
             edgesRead++;
             if(arc.condition!=0&&!arc.to.rawReached){attachRaw(arc,notify);queue.add(arc.to);}
         }
@@ -202,12 +221,17 @@ final class CallerPathCertificates implements AutoCloseable {
             }
             for(int i=0;i<affected.size;i++) {
                 var node=affected.get(i);if(node.rawReached)continue;
-                for(var arc=node.incoming;arc!=null;arc=arc.nextIn) {
+                for(var arc=node.basisIncoming;arc!=null;arc=arc.nextBasis) {
+                    edgesRead++;
+                    if(arc.condition!=0){attachRaw(arc,false);queue.add(node);break;}
+                }
+                if(!node.rawReached)for(var arc=node.incoming;arc!=null;arc=arc.nextIn) {
+                    if(arc.from.basis)continue;
                     edgesRead++;
                     if(arc.condition!=0&&arc.from.rawReached){attachRaw(arc,false);queue.add(node);break;}
                 }
+                expandRaw(queue,false);
             }
-            expandRaw(queue,false);
             for(int i=0;i<affected.size;i++) {
                 var node=affected.get(i);if(!node.rawReached&&node.rawChange!=null)node.rawChange.accept(0);
             }
@@ -215,7 +239,7 @@ final class CallerPathCertificates implements AutoCloseable {
     }
     private void collect(){if(arena.size()>=nextCollection){arena.collect();nextCollection=Math.max(64,Math.multiplyExact(2,arena.size()));}}
     private final class Nodes implements AutoCloseable {
-        Object[] values;int size;AnalysisResources.Reservation capacity;
+        Object[] values;int size,cursor;AnalysisResources.Reservation capacity;
         Nodes(){capacity=resources.reserve(AnalysisResources.Pool.SCRATCH,192,PHASE);try{values=new Object[8];}catch(RuntimeException|Error error){capacity.close();throw error;}}
         void add(Node node) {
             if(size==values.length) {
@@ -282,9 +306,9 @@ final class CallerPathCertificates implements AutoCloseable {
                     // abort, parent destruction discards the unusable registry.
                     try{if(arc.conditionRoot!=0&&conditions.acceptsRootRelease())conditions.releaseRoot(arc.conditionRoot);}
                     catch(RuntimeException failure){if(rootFailure==null)rootFailure=failure;else rootFailure.addSuppressed(failure);}
-                    finally{arc.conditionRoot=0;arc.lease.close();}
+                    finally{arc.conditionRoot=0;arc.previousBasis=null;arc.nextBasis=null;arc.lease.close();}
                 }
-                node.index.close();node.lease.close();
+                node.basisIncoming=null;node.index.close();node.lease.close();
             }
             first=null;if(rootFailure!=null)throw rootFailure;
         }finally {try{if(sets!=null)sets.close();}finally{try{if(arena!=null)arena.close();}finally{try{if(ownsPages&&pages!=null)pages.close();}finally{if(metadata!=null)metadata.close();}}}}

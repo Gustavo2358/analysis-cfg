@@ -15,7 +15,7 @@ final class BackwardActivationSolver<S> implements AutoCloseable {
     private long hintIndexProbes(){long count=0;for(var entry:entries)if(entry.paths!=null)count+=entry.paths.indexProbes();return count;}
     private long conditionPeak(){long peak=0;for(var entry:entries)peak=Math.max(peak,entry.bdd.peakNodes());return peak;}
     private final DomainWork work=new DomainWork();
-    private final AnalysisResources indexResources=new AnalysisResources(new AnalysisResources.Limits(Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE));
+    private final AnalysisResources indexResources;
     private final S bottom;
     private final List<EntryRun> entries=new ArrayList<>();
     private final Set<BooleanConditions> ownedConditions=Collections.newSetFromMap(new IdentityHashMap<>());
@@ -65,7 +65,7 @@ final class BackwardActivationSolver<S> implements AutoCloseable {
     private final Map<Need,Boolean> feasibleCache=new HashMap<>();
     // Bounded memoization only: eviction recomputes a query, never drops work.
     private final Map<Need,Deferred> deferredCache=new LinkedHashMap<>();
-    BackwardActivationSolver(AnalysisSession session,AnalysisDefinition<S> definition){this.session=session;this.definition=definition;bottom=Objects.requireNonNull(definition.bottom());}
+    BackwardActivationSolver(AnalysisSession session,AnalysisDefinition<S> definition){this.session=session;this.definition=definition;indexResources=AnalysisResources.executionFor(session.index().store());bottom=Objects.requireNonNull(definition.bottom());}
     DataflowResult<S> solve() {
         try(var run=this){return run.execute();}
     }
@@ -82,6 +82,7 @@ final class BackwardActivationSolver<S> implements AutoCloseable {
         ownedConditions.clear();if(failure!=null)throw failure;
     }
     private DataflowResult<S> execute() {
+        session.index().store().progress(ProgramStore.ExecutionPhase.CONTROL);
         var models=ActivationSolver.structure(session);
         for(var model:models)ownedConditions.add(model.conditions());
         for(var conditions:ownedConditions)conditions.enableOwnership();
@@ -89,16 +90,19 @@ final class BackwardActivationSolver<S> implements AutoCloseable {
         for(var model:models)entries.add(new EntryRun(model));
         for(var conditions:ownedConditions)conditions.publishCreated();
         for(var boundary:definition.boundaries(session)) {
+            session.index().store().progress(ProgramStore.ExecutionPhase.CONTROL);
             var entry=entries.stream().filter(e->e.model.context()==boundary.context()).findFirst().orElseThrow(()->new IllegalArgumentException("foreign boundary"));
             var location=ActivationBoundaries.require(entry.model,boundary.node());
             entry.boundaries.computeIfAbsent(location.frame(),f->new IdentityHashMap<>()).merge(boundary.node(),boundary.state(),(a,b)->definition.joinInto(a,b,work).state());joins++;
         }
         for(var entry:entries)entry.start();
         while(!pending.isEmpty()){
+            session.index().store().progress(ProgramStore.ExecutionPhase.CONTROL);
             var slot=pending.removeFirst();slot.queued=false;pops++;var b=slot.region.entry.bdd;b.beginMutation();
             // Failed executions leave their journal to run-owner destruction;
             // publishing through an aborted manager would replace the cause.
             process(slot);collectSummaries(false);b.endMutation();
+            session.index().store().progress(ProgramStore.ExecutionPhase.DOMAIN);
         }
         collectSummaries(true);
         var lookup=new IdentityHashMap<ContextView,IdentityHashMap<ProgramIndex.Node,List<AnalysisPoint>>>();
@@ -106,6 +110,7 @@ final class BackwardActivationSolver<S> implements AutoCloseable {
         for(var entry:entries) {
             var nodes=new IdentityHashMap<ProgramIndex.Node,List<AnalysisPoint>>();lookup.put(entry.model.context(),nodes);
             for(var region:entry.regions)for(var slot:region.slots.values()) {
+                session.index().store().progress(ProgramStore.ExecutionPhase.DOMAIN);
                 edgeCount+=slot.shape.moves().size();entry.bdd.beginMutation();
                 for(var in:slot.in.pieces)for(var out:slot.out.pieces)if(feasible(region,entry.bdd.and(in.condition,out.condition))) {
                     int id=ins.size();nodes.computeIfAbsent(slot.node,n->new ArrayList<>()).add(new AnalysisPoint(id,entry.model.context(),slot.node));ins.add(in.state);outs.add(out.state);
@@ -235,6 +240,7 @@ final class BackwardActivationSolver<S> implements AutoCloseable {
         if(condition==0)return;deliveries++;
         var target=new AnalysisPoint(-1,source.region.entry.model.context(),destination);
         S contribution=Objects.requireNonNull(definition.transferEdge(target,edge,state,work));
+        session.index().store().progress(ProgramStore.ExecutionPhase.DOMAIN);
         if(definition.equivalent(contribution,state,work)||feasible(source.region,condition,source))source.out.add(condition,contribution);
     }
     private void detachRootReads(Slot source) {
@@ -290,6 +296,7 @@ final class BackwardActivationSolver<S> implements AutoCloseable {
             for(var binding:returns.entrySet()) {
                 deliveries++;var target=new AnalysisPoint(-1,e.model.context(),binding.getValue());
                 returnValues.put(binding.getKey(),Objects.requireNonNull(definition.transferEdge(target,e.model.control().edge(binding.getKey(),binding.getValue()),choice.values.getOrDefault(binding.getValue(),bottom),work)));
+                session.index().store().progress(ProgramStore.ExecutionPhase.DOMAIN);
             }
             var ancestors=new ArrayList<Map<ProgramIndex.Node,S>>();
             if(e.model.maxUnwind()>0) {
@@ -370,6 +377,7 @@ final class BackwardActivationSolver<S> implements AutoCloseable {
         boolean changed=false;
         for(var piece:slot.out.pieces) {
             S value=Objects.requireNonNull(definition.transferBlock(slot.point,piece.state,work));
+            session.index().store().progress(ProgramStore.ExecutionPhase.DOMAIN);
             // Identity propagation cannot generate fresh values around a cycle.
             if(definition.equivalent(value,piece.state,work)||feasible(region,piece.condition,slot))changed|=slot.in.add(piece.condition,value);
         }

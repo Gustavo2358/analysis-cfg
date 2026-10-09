@@ -40,19 +40,24 @@ final class ScalarRelations {
         Roots(List<Relation> values){this.values=List.copyOf(values);}
     }
     record Assignment(Candidates projection,Roots roots) { }
-    private final FactorizedAlternatives<Candidates> domain=new FactorizedAlternatives<>();
+    private final FactorizedAlternatives<Candidates> domain;
     private final int[] groupOf;
     private final List<int[]> cells;
 
-    private ScalarRelations(int[] groupOf,List<int[]> cells){this.groupOf=groupOf;this.cells=List.copyOf(cells);}
+    private ScalarRelations(int[] groupOf,List<int[]> cells,Runnable progress){this.groupOf=groupOf;this.cells=List.copyOf(cells);domain=new FactorizedAlternatives<>(progress);}
 
     static ScalarRelations create(Collection<TextProfile.Location> selected,Collection<TextProfile.Write> writes,
             Map<ObjectId,TextProfile.Location> subjects) {
+        return create(selected,writes,subjects,()->{});
+    }
+    static ScalarRelations create(Collection<TextProfile.Location> selected,Collection<TextProfile.Write> writes,
+            Map<ObjectId,TextProfile.Location> subjects,Runnable progress) {
         int count=subjects.values().stream().mapToInt(TextProfile.Location::ordinal).max().orElse(-1)+1;
         int[] parent=new int[count];boolean[] included=new boolean[count];
         Arrays.setAll(parent,i->i);for(var location:selected)included[location.ordinal()]=true;
         var seeds=new HashSet<Integer>();
         for(var write:writes) {
+            progress.run();
             int target=write.location().ordinal();if(!included[target])continue;
             var sourceSet=new LinkedHashSet<Integer>();
             if(write instanceof TextProfile.CopyWrite copy)sourceSet.add(copy.source().ordinal());
@@ -74,7 +79,7 @@ final class ScalarRelations {
             int[] members=ordered.get(group).stream().mapToInt(Integer::intValue).sorted().toArray();groups.add(members);
             for(int member:members)groupOf[member]=group;
         }
-        return new ScalarRelations(groupOf,groups);
+        return new ScalarRelations(groupOf,groups,progress);
     }
 
     boolean active(){return !cells.isEmpty();}

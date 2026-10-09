@@ -4,6 +4,7 @@ import io.github.gustavo2358.analysis.cfg.domain.CfgTransition;
 import io.github.gustavo2358.analysis.structure.AnalysisSession;
 import io.github.gustavo2358.analysis.structure.ContextView;
 import io.github.gustavo2358.analysis.structure.ProgramIndex;
+import io.github.gustavo2358.analysis.structure.ProgramStore;
 import java.util.*;
 
 /** Dense execution directory derived once from W1 cursors; no semantic graph reconstruction. */
@@ -19,6 +20,7 @@ final class SolverTopology {
         List<CfgTransition> es = new ArrayList<>();
         List<Integer> sources = new ArrayList<>(), targets = new ArrayList<>();
         for (ContextView context : session.contexts()) {
+            session.index().store().progress(ProgramStore.ExecutionPhase.CONTROL);
             var nodes = new IdentityHashMap<ProgramIndex.Node, List<AnalysisPoint>>();
             var traversals = new HashMap<ContextView.Point,AnalysisPoint>();
             lookup.put(context, nodes);
@@ -26,9 +28,11 @@ final class SolverTopology {
             add(ps, nodes, traversals, context, context.initialPoint());
             // Reachability is always program-forward, including for a backward analysis.
             for (int p = begin; p < ps.size(); p++) {
+                session.index().store().progress(ProgramStore.ExecutionPhase.CONTROL);
                 AnalysisPoint point = ps.get(p);
                 var cursor = context.successors(point.traversal());
                 while (cursor.advance()) {
+                    session.index().store().progress(ProgramStore.ExecutionPhase.CONTROL);
                     AnalysisPoint target = add(ps, nodes, traversals, context, cursor.target());
                     Math.incrementExact(es.size());
                     es.add(cursor.transition()); sources.add(point.ordinal); targets.add(target.ordinal);
@@ -41,6 +45,7 @@ final class SolverTopology {
         forwardHead = new int[points.length]; backwardHead = new int[points.length];
         Arrays.fill(forwardHead, -1); Arrays.fill(backwardHead, -1);
         for (int e = edges.length - 1; e >= 0; e--) {
+            session.index().store().progress(ProgramStore.ExecutionPhase.CONTROL);
             from[e] = sources.get(e); to[e] = targets.get(e);
             forwardNext[e] = forwardHead[from[e]]; forwardHead[from[e]] = e;
             backwardNext[e] = backwardHead[to[e]]; backwardHead[to[e]] = e;

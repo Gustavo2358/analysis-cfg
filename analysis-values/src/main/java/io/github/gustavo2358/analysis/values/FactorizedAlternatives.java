@@ -26,9 +26,13 @@ final class FactorizedAlternatives<T> {
     private final Map<Key<T>,Node<T>> interned=new HashMap<>();
     private long internedEdges,allocatedNodes,allocatedEdges,retiredNodes,retiredEdges,unionPairs,projectedAlternatives;
     private final Map<Node<T>,Size> componentSizes=new IdentityHashMap<>();
+    private final Runnable progress;
+    FactorizedAlternatives(){this(()->{});}
+    FactorizedAlternatives(Runnable progress){this.progress=Objects.requireNonNull(progress);}
 
     Node<T> node(int level,Map<T,Node<T>> edges) {
-        var live=new HashMap<T,Node<T>>();edges.forEach((value,next)->{if(next!=null)live.put(value,next);});
+        progress.run();
+        var live=new HashMap<T,Node<T>>();edges.forEach((value,next)->{progress.run();if(next!=null)live.put(value,next);});
         if(live.isEmpty())return null;
         if(live.values().stream().anyMatch(n->n.level<=level))throw new IllegalArgumentException("unordered factor");
         var key=new Key<>(level,Map.copyOf(live));var known=interned.get(key);if(known!=null)return known;
@@ -61,6 +65,7 @@ final class FactorizedAlternatives<T> {
         var memo=new HashMap<Pair<T>,Node<T>>();var pending=new ArrayDeque<UnionFrame<T>>();
         var first=new UnionFrame<>(a,b);pending.push(first);unionPairs++;
         while(!pending.isEmpty()) {
+            progress.run();
             var frame=pending.peek();
             if(frame.current==null&&frame.remaining.hasNext())frame.current=frame.remaining.next();
             if(frame.current==null) {
@@ -83,6 +88,7 @@ final class FactorizedAlternatives<T> {
     Node<T> unionAll(Iterable<Node<T>> values) {
         var bins=new ArrayList<Node<T>>();
         for(var value:values) {
+            progress.run();
             if(value==null)continue;var carry=value;int rank=0;
             while(true) {
                 while(bins.size()<=rank)bins.add(null);
@@ -103,6 +109,7 @@ final class FactorizedAlternatives<T> {
         var done=new IdentityHashMap<Node<T>,Node<T>>();var pending=new ArrayDeque<Frame<T>>();
         pending.push(new Frame<>(root));
         while(!pending.isEmpty()) {
+            progress.run();
             var frame=pending.peek();
             if(frame.remaining.hasNext()) {
                 var edge=frame.remaining.next();if(!include.test(frame.node,edge.getKey()))continue;
@@ -120,6 +127,7 @@ final class FactorizedAlternatives<T> {
         return rewrite(root,(n,v)->true,(n,done)->{
             var edges=new HashMap<T,Node<T>>();var fn=updates.get(n.level);
             n.edges.forEach((value,next)->{
+                progress.run();
                 var changed=fn==null?value:fn.apply(value);
                 edges.put(changed,union(edges.get(changed),done.get(next)));
             });
@@ -130,7 +138,7 @@ final class FactorizedAlternatives<T> {
     Node<T> project(Node<T> root,Set<Integer> selected) {
         return rewrite(root,(n,v)->true,(n,done)->{
             if(selected.contains(n.level)) {
-                var edges=new HashMap<T,Node<T>>();n.edges.forEach((v,next)->edges.put(v,done.get(next)));
+                var edges=new HashMap<T,Node<T>>();n.edges.forEach((v,next)->{progress.run();edges.put(v,done.get(next));});
                 return node(n.level,edges);
             }
             var children=new ArrayList<Node<T>>(n.edges.size());for(var next:n.edges.values())children.add(done.get(next));
@@ -143,6 +151,7 @@ final class FactorizedAlternatives<T> {
         var done=new IdentityHashMap<Node<T>,Node<T>>();var pending=new ArrayDeque<Frame<T>>();
         pending.push(restrictionFrame(root,selected));
         while(!pending.isEmpty()) {
+            progress.run();
             var frame=pending.peek();
             if(frame.remaining.hasNext()) {
                 var child=frame.remaining.next().getValue();
@@ -170,6 +179,7 @@ final class FactorizedAlternatives<T> {
             if(projected.terminal())result.add(Map.of());else pending.push(new Frame<>(projected));
         }
         while(!pending.isEmpty()) {
+            progress.run();
             var frame=pending.peek();
             if(!frame.remaining.hasNext()){path.remove(frame.node.level);pending.pop();continue;}
             var edge=frame.remaining.next();path.put(frame.node.level,edge.getKey());
@@ -187,13 +197,17 @@ final class FactorizedAlternatives<T> {
         return componentSizes.computeIfAbsent(root,node->{
             if(node.edges.values().stream().allMatch(Node::terminal))
                 return new Size(1,node.edges.size(),node.edges.size());
-            return size(List.of(node));
+            return size(List.of(node),progress);
         });
     }
     static Size size(Collection<? extends Node<?>> roots) {
+        return size(roots,()->{});
+    }
+    private static Size size(Collection<? extends Node<?>> roots,Runnable progress) {
         var visited=Collections.newSetFromMap(new IdentityHashMap<Node<?>,Boolean>());var pending=new ArrayDeque<Node<?>>();
         roots.forEach(n->{if(n!=null)pending.add(n);});long edges=0;var components=new HashMap<Integer,Set<Object>>();
         while(!pending.isEmpty()) {
+            progress.run();
             var node=pending.removeFirst();if(node.terminal()||!visited.add(node))continue;
             edges+=node.edges.size();components.computeIfAbsent(node.level,ignored->new HashSet<>()).addAll(node.edges.keySet());pending.addAll(node.edges.values());
         }
@@ -204,11 +218,13 @@ final class FactorizedAlternatives<T> {
         var live=Collections.newSetFromMap(new IdentityHashMap<Node<T>,Boolean>());var pending=new ArrayDeque<Node<T>>();
         roots.forEach(root->{if(root!=null&&!root.terminal())pending.add(root);});
         while(!pending.isEmpty()) {
+            progress.run();
             var node=pending.removeFirst();if(!live.add(node))continue;
             for(var next:node.edges.values())if(!next.terminal())pending.add(next);
         }
         var entries=interned.entrySet().iterator();
         while(entries.hasNext()) {
+            progress.run();
             var entry=entries.next();var node=entry.getValue();if(live.contains(node))continue;
             entries.remove();retiredNodes++;retiredEdges+=node.edges.size();internedEdges-=node.edges.size();componentSizes.remove(node);
         }

@@ -15,8 +15,7 @@ final class ActivationSolver<S> implements AutoCloseable {
     private long hintIndexProbes(){long count=0;for(var entry:entries)if(entry.paths!=null)count+=entry.paths.indexProbes();return count;}
     private long conditionPeak(){long peak=0;for(var entry:entries)peak=Math.max(peak,entry.bdd.peakNodes());return peak;}
     private final DomainWork work=new DomainWork();
-    // Resident compatibility route; the index accepts managed resources at its port.
-    private final AnalysisResources indexResources=new AnalysisResources(new AnalysisResources.Limits(Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE));
+    private final AnalysisResources indexResources;
     private final List<EntryRun> entries=new ArrayList<>();
     private final Set<BooleanConditions> ownedConditions=Collections.newSetFromMap(new IdentityHashMap<>());
     private final ArrayDeque<Slot> pending=new ArrayDeque<>();
@@ -65,7 +64,7 @@ final class ActivationSolver<S> implements AutoCloseable {
     // Bounded memoization only: eviction recomputes a query, never drops work.
     private final Map<Need,Deferred> deferredCache=new LinkedHashMap<>();
     ActivationSolver(AnalysisSession session,AnalysisDefinition<S> definition) {
-        this.session=session;this.definition=definition;bottom=Objects.requireNonNull(definition.bottom());
+        this.session=session;this.definition=definition;indexResources=AnalysisResources.executionFor(session.index().store());bottom=Objects.requireNonNull(definition.bottom());
     }
     DataflowResult<S> solve() {
         try(var run=this){run.execute();return run.result();}
@@ -91,12 +90,14 @@ final class ActivationSolver<S> implements AutoCloseable {
         return failure;
     }
     private void execute() {
+        session.index().store().progress(ProgramStore.ExecutionPhase.CONTROL);
         var models=structural?List.<ActivationModel>of():structure(session);
         for(var model:models)ownedConditions.add(model.conditions());
         for(var context:session.contexts())entries.add(new EntryRun(context,models.stream().filter(m->m.context()==context).findFirst().orElse(null)));
         var boundaries=new ArrayList<AnalysisDefinition.Boundary<S>>();definition.boundaries(session).forEach(boundaries::add);
 
         for(var boundary:boundaries) {
+            session.index().store().progress(ProgramStore.ExecutionPhase.CONTROL);
             var entry=entries.stream().filter(e->e.context==boundary.context()).findFirst().orElseThrow(()->new IllegalArgumentException("foreign boundary"));
             ActivationControl.Frame frame=null;
             if(!models.isEmpty()) {
@@ -108,12 +109,15 @@ final class ActivationSolver<S> implements AutoCloseable {
         }
         for(var entry:entries)entry.start();
         while(!pending.isEmpty()) {
+            session.index().store().progress(ProgramStore.ExecutionPhase.CONTROL);
             var slot=pending.removeFirst();slot.queued=false;pops++;transfers++;
             process(slot);
+            session.index().store().progress(ProgramStore.ExecutionPhase.DOMAIN);
             if(!structural)collectSummaries(false);
             collectConditions(slot.region.entry);
         }
         if(!structural)collectSummaries(true);
+        session.index().store().progress(ProgramStore.ExecutionPhase.DOMAIN);
     }
     private void collectConditions(EntryRun entry) {
         if(!entry.bdd.collectionDue())return;
@@ -135,11 +139,13 @@ final class ActivationSolver<S> implements AutoCloseable {
         });
     }
     private DataflowResult<S> result() {
+        session.index().store().progress(ProgramStore.ExecutionPhase.DOMAIN);
         var lookup=new IdentityHashMap<ContextView,IdentityHashMap<ProgramIndex.Node,List<AnalysisPoint>>>();
         var ins=new ArrayList<S>();var outs=new ArrayList<S>();long edgeCount=0;
         for(var entry:entries) {
             var nodes=new IdentityHashMap<ProgramIndex.Node,List<AnalysisPoint>>();lookup.put(entry.context,nodes);
             for(var region:entry.regions)for(var slot:region.slots.values()) {
+                session.index().store().progress(ProgramStore.ExecutionPhase.DOMAIN);
                 for(var anchor:slot.anchors.pieces) {
                     // The output is joined pointwise; keep roots separate until observation replay.
                     for(var output:slot.outputs.pieces)if(feasible(region,entry.bdd.and(anchor.condition,output.condition))) {
@@ -192,7 +198,7 @@ final class ActivationSolver<S> implements AutoCloseable {
                 for(var link:region.incoming.entrySet())links.add(new ActivationModel.Push(link.getKey().region.frame,entry.control.frameAt(link.getKey().node),link.getValue()));
                 parents.put(region.frame,List.copyOf(links));
             }
-            refineShapes(entry.bdd,shapes,parents);
+            refineShapes(entry.bdd,shapes,parents,engine.indexResources);
             models.add(new ActivationModel(entry.context,entry.control,entry.bdd,shapes,parents,List.copyOf(roots),List.copyOf(unwind),depth));
         }
         transferred=true;return models;
@@ -200,7 +206,7 @@ final class ActivationSolver<S> implements AutoCloseable {
     }
     /** Reduce impossible tested guards using a shared persistent SCC support relation. */
     private static void refineShapes(BooleanConditions b,Map<ActivationControl.Frame,ActivationModel.Shape> shapes,
-            Map<ActivationControl.Frame,List<ActivationModel.Push>> parents) {
+            Map<ActivationControl.Frame,List<ActivationModel.Push>> parents,AnalysisResources resources) {
         var frames=new ArrayList<ActivationControl.Frame>();var ordinals=new IdentityHashMap<ActivationControl.Frame,Integer>();
         for(var frame:shapes.keySet())if(frame!=null){ordinals.put(frame,frames.size());frames.add(frame);}
         if(frames.isEmpty())return;
@@ -213,8 +219,7 @@ final class ActivationSolver<S> implements AutoCloseable {
                 incoming[binding++]=link.parent()==null?new int[0]:new int[]{ordinals.get(link.parent())};
             }
         }
-        // Explicit resident compatibility backend; managed session injection is a later wave.
-        var resources=new AnalysisResources(new AnalysisResources.Limits(Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE));
+        // Resident capacities remain explicit; productive work shares the program deadline.
         try(var store=new ResidentPageStore(4096,resources,AnalysisResources.Phase.CONTROL);
                 var support=new PersistentGraphClosure(store,resources,AnalysisResources.Phase.CONTROL,variables,incoming)) {
             var memos=new HashMap<Long,Map<Integer,Integer>>();
@@ -350,7 +355,7 @@ final class ActivationSolver<S> implements AutoCloseable {
         PreliminaryCallerSupport preliminary;
         EntryRun(ContextView context,ActivationModel model){
             this.context=context;this.model=model;control=model==null?new ActivationControl(session,context):model.control();
-            bdd=model==null?new BooleanConditions():model.conditions();ownedConditions.add(bdd);paths=new CallerPathCertificates(bdd,indexResources,null);
+            bdd=model==null?new BooleanConditions(65536,indexResources):model.conditions();ownedConditions.add(bdd);paths=new CallerPathCertificates(bdd,indexResources,null);
         }
         void start() {
             if(structural)preliminary=new PreliminaryCallerSupport(control,indexResources);
@@ -416,7 +421,8 @@ final class ActivationSolver<S> implements AutoCloseable {
         if(slot.anchors.add(condition,value)){changed++;enqueue(slot);}else unchanged++;
     }
     private S edge(AnalysisPoint source,CfgTransition transition,S value) {
-        edgeTransfers++;return Objects.requireNonNull(definition.transferEdge(source,transition,value,work));
+        edgeTransfers++;var transferred=Objects.requireNonNull(definition.transferEdge(source,transition,value,work));
+        session.index().store().progress(ProgramStore.ExecutionPhase.DOMAIN);return transferred;
     }
     private void arriveEdge(Slot caller,Region target,ProgramIndex.Node destination,AnalysisPoint source,CfgTransition transition,int condition,S value) {
         if(target.entry.model!=null) {
@@ -468,6 +474,7 @@ final class ActivationSolver<S> implements AutoCloseable {
         if(boundary!=null)for(var piece:List.copyOf(slot.anchors.pieces))slot.anchors.add(piece.condition,boundary);
         for(var piece:slot.anchors.pieces) {
             S output=Objects.requireNonNull(definition.transferBlock(slot.point,piece.state,work));
+            session.index().store().progress(ProgramStore.ExecutionPhase.DOMAIN);
             // Identity propagation cannot generate fresh values around a cycle.
             if(!structural&&!definition.equivalent(output,piece.state,work)&&!feasible(region,piece.condition,slot))continue;
             slot.outputs.add(piece.condition,output);

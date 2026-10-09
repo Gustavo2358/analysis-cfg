@@ -5,6 +5,16 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class GuardedStatesTest {
+    @Test void failedConstructionDoesNotMaskBudgetFailureDuringScratchRollback() {
+        long[] now={0};var resources=new AnalysisResources(new AnalysisResources.Limits(Long.MAX_VALUE,Long.MAX_VALUE,0,0,0,Long.MAX_VALUE,Long.MAX_VALUE),5,()->now[0]);
+        try(var b=new BooleanConditions(2,resources)) {
+            int x=b.variable(0),y=b.variable(1);var states=new GuardedStates<Integer>(b,definition(),new DomainWork());
+            assertTrue(states.add(x,1));now[0]=5;
+            var failure=assertThrows(AnalysisResources.Exhausted.class,()->states.add(y,2));
+            assertEquals(AnalysisResources.Resource.TIME,failure.resource());assertEquals(5,failure.used());
+        }
+        assertEquals(0,resources.heapUsed());
+    }
     private static AnalysisDefinition<Integer> definition(){return new AnalysisDefinition<>() {
         public Direction direction(){return Direction.FORWARD;}
         public Integer bottom(){return 0;}

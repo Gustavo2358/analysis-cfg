@@ -35,6 +35,85 @@ class CallerPathCertificatesTest {
         }
     }
     private static AnalysisResources resources(){return new AnalysisResources(new AnalysisResources.Limits(Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE));}
+    @Test void repairingAParallelEntryWitnessDoesNotSearchDisconnectedCallers() {
+        for(int count:new int[]{1,4,16,64,256}) {
+            var memory=resources();
+            try(var b=new BooleanConditions();var graph=new CallerPathCertificates(b,memory,null)) {
+                var root=graph.node(true);var target=graph.node(false);
+                var primary=graph.add(root,target,0,1);graph.add(root,target,1,1);
+                for(int i=0;i<count;i++)graph.add(graph.node(false),target,2+i,1);
+                long before=graph.edgesRead();graph.remove(primary);
+                long repairReads=graph.edgesRead()-before;
+                assertTrue(graph.rawReached(target));
+                assertTrue(graph.matches(target,b.variable(1)));
+                assertFalse(graph.matches(target,b.variable(0)));
+                assertFalse(graph.matches(target,b.and(b.variable(1),b.variable(2))));
+                // A leaf with two Entry bindings needs only their repair work,
+                // independent of incoming edges from disconnected components.
+                assertTrue(repairReads<=8+4L*2,"N="+count+" repairReads="+repairReads);
+            }
+            assertEquals(0,memory.heapUsed());
+        }
+    }
+    @Test void indexedEntryCandidatesStillTestTheirGuardsAndReleaseLiveLinks() {
+        var memory=resources();
+        try(var b=new BooleanConditions()) {
+            var graph=new CallerPathCertificates(b,memory,null);
+            var root=graph.node(true);var parent=graph.node(false);var target=graph.node(false);
+            CallerPathCertificates.Arc guarded,disabled;
+            try {
+                graph.add(root,parent,7,1);
+                var primary=graph.add(parent,target,8,1);var alternative=graph.add(parent,target,9,1);
+                guarded=graph.add(root,target,5,b.variable(7));disabled=graph.add(root,target,6,0);
+                graph.remove(primary);
+                assertTrue(graph.matches(target,b.and(b.variable(7),b.variable(9))));
+                assertFalse(graph.matches(target,b.variable(5)),"guard must hold on the root's own empty word");
+                assertFalse(graph.matches(target,b.variable(6)));
+                graph.remove(alternative);assertTrue(graph.rawReached(target));assertFalse(graph.matches(target,1));
+                graph.update(guarded,1);assertTrue(graph.matches(target,b.variable(5)));
+                graph.remove(guarded);assertFalse(graph.rawReached(target));assertFalse(graph.matches(target,1));
+                assertNull(guarded.previousBasis);assertNull(guarded.nextBasis);
+                assertSame(disabled,target.basisIncoming);
+            }finally{graph.close();}
+            assertNull(target.basisIncoming);assertNull(disabled.previousBasis);assertNull(disabled.nextBasis);
+        }
+        assertEquals(0,memory.heapUsed());
+    }
+    @Test void repairedProofForestRefreshesEachDependentBindingOnlyOnce() {
+        for(int count:new int[]{1,4,16,64,256}) {
+            var memory=resources();
+            try(var b=new BooleanConditions();var graph=new CallerPathCertificates(b,memory,null)) {
+                var root=graph.node(true);var parent=graph.node(false);
+                var primary=graph.add(root,parent,0,1);graph.add(root,parent,1,1);
+                var leaves=new ArrayList<CallerPathCertificates.Node>();
+                for(int i=0;i<count;i++){var leaf=graph.node(false);leaves.add(leaf);graph.add(parent,leaf,2+i,1);}
+                long before=graph.edgesRead();graph.update(primary,0);
+                long repairReads=graph.edgesRead()-before;
+                for(int i=0;i<count;i++) {
+                    var leaf=leaves.get(i);assertTrue(graph.rawReached(leaf));
+                    assertTrue(graph.matches(leaf,b.and(b.variable(1),b.variable(2+i))));
+                    assertFalse(graph.matches(leaf,b.variable(0)));
+                }
+                // Two forests visit their N descendants; each repaired edge
+                // needs one semantic refresh, not eager invalidation + replay.
+                assertTrue(repairReads<=4L*count+8,"N="+count+" repairReads="+repairReads);
+            }
+            assertEquals(0,memory.heapUsed());
+        }
+    }
+    @Test void disconnectedCachedAlternativesReleaseTheirWordsBeforeRepairReturns() {
+        var memory=resources();
+        try(var b=new BooleanConditions();var graph=new CallerPathCertificates(b,memory,null)) {
+            var root=graph.node(true);var parent=graph.node(false);var child=graph.node(false);
+            var entry=graph.add(root,parent,0,1);var old=graph.add(parent,child,1,1);graph.add(root,child,2,1);
+            assertTrue(graph.matches(child,b.variable(1)));
+            graph.update(entry,0);
+            assertFalse(graph.rawReached(parent));assertTrue(graph.rawReached(child));
+            assertFalse(graph.matches(child,b.variable(1)));assertTrue(graph.matches(child,b.variable(2)));
+            assertFalse(old.valid);assertEquals(0,old.word);assertEquals(0,old.token);
+        }
+        assertEquals(0,memory.heapUsed());
+    }
     @Test void differentIncomingWordsNeverBecomeOneJointWitness() {
         var b=new BooleanConditions();var memory=resources();
         try(var graph=new CallerPathCertificates(b,memory,null)) {

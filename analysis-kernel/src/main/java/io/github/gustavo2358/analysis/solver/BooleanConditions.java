@@ -43,7 +43,12 @@ final class BooleanConditions implements AutoCloseable {
     BooleanConditions(){this(65536);}
     BooleanConditions(int cacheSlots){this(cacheSlots,null,null);}
     BooleanConditions(int cacheSlots,AnalysisResources resources,PageStore store){
-        if((resources==null)!=(store==null))throw new IllegalArgumentException("store and resources must be supplied together");
+        this(cacheSlots,resources,store,true);
+    }
+    /** Own the resident pages while borrowing the execution/accounting owner. */
+    BooleanConditions(int cacheSlots,AnalysisResources resources){this(cacheSlots,Objects.requireNonNull(resources),null,false);}
+    private BooleanConditions(int cacheSlots,AnalysisResources resources,PageStore store,boolean borrowedPair){
+        if(borrowedPair&&(resources==null)!=(store==null))throw new IllegalArgumentException("store and resources must be supplied together");
         this.resources=resources==null?new AnalysisResources(new AnalysisResources.Limits(Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE)):resources;
         suppliedStore=store;
         if(cacheSlots<1||Integer.bitCount(cacheSlots)!=1)throw new IllegalArgumentException("cache size must be a power of two");

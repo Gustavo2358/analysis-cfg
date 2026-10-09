@@ -14,6 +14,32 @@ final class DependencyCliTest {
     Path fixture(){return Path.of("../analysis-adapters/src/test/resources/cp6/dynamic-x8.air.json");}
     PrintStream err(ByteArrayOutputStream bytes){return new PrintStream(bytes);}
 
+    @Test void sharedDeadlineExpiringAfterAdmissionPreservesBothCliDestinationsAndCleansStores() throws Exception {
+        var output=dir.resolve("dependencies.json");var cfg=dir.resolve("cfg.json");
+        for(boolean pipeline:new boolean[]{false,true}) {
+            Files.writeString(output,"dependency sentinel");Files.writeString(cfg,"cfg sentinel");
+            boolean[] expired={false};
+            java.util.function.LongSupplier clock=()->expired[0]?5:0;
+            // Physical read and validation use DECODE/VALIDATION; CFG/index use
+            // their own phases. Advance only at actual productive CONTROL work.
+            java.util.function.Consumer<io.github.gustavo2358.analysis.solver.AnalysisResources.Phase> progress=
+                phase->{if(phase==io.github.gustavo2358.analysis.solver.AnalysisResources.Phase.CONTROL)expired[0]=true;};
+            var constructor=io.github.gustavo2358.analysis.solver.AnalysisResources.class.getDeclaredConstructor(
+                io.github.gustavo2358.analysis.solver.AnalysisResources.Limits.class,long.class,java.util.function.LongSupplier.class,java.util.function.Consumer.class);
+            constructor.setAccessible(true);
+            var resources=constructor.newInstance(new io.github.gustavo2358.analysis.solver.AnalysisResources.Limits(
+                64L*1024*1024,16L*1024*1024,0,256L*1024*1024,8,Long.MAX_VALUE,Long.MAX_VALUE),5L,clock,progress);
+            var diagnostics=new ByteArrayOutputStream();
+            int status=pipeline?AnalysisPipeline.runSnapshot(new String[]{fixture().toString(),cfg.toString(),output.toString()},err(diagnostics),new DataflowAirReader(),resources)
+                :AnalysisDependencies.run(new String[]{fixture().toString(),output.toString()},err(diagnostics),new DataflowAirReader(),resources);
+            assertTrue(expired[0],"clock must expire in actual native analysis, not decode");
+            assertEquals(7,status,diagnostics.toString());assertTrue(diagnostics.toString().contains("TIME phase=CONTROL"),diagnostics.toString());
+            assertEquals("dependency sentinel",Files.readString(output));assertEquals("cfg sentinel",Files.readString(cfg));
+            for(var pool:io.github.gustavo2358.analysis.solver.AnalysisResources.Pool.values())assertEquals(0,resources.used(pool),pool.toString());
+            try(var files=Files.list(dir)){assertEquals(2,files.count(),"no staged output survives failed execution");}
+        }
+    }
+
     @Test void realAirFileUsesValidatedSnapshotChainAndPublishesEvidenceAtomically() throws Exception {
         var output=dir.resolve("dependencies.json");Files.writeString(output,"old bytes");var diagnostics=new ByteArrayOutputStream();
         assertEquals(0,AnalysisDependencies.run(new String[]{fixture().toString(),output.toString()},err(diagnostics)),diagnostics.toString());

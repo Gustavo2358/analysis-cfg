@@ -7,6 +7,10 @@ import java.util.function.IntFunction;
 
 /** Read-only program boundary; structural consumers never require AIR aggregates. */
 public interface ProgramStore {
+    /** Operational safepoints, never a semantic cutoff or a reduced answer.
+     * The resident compatibility route has no managed execution owner. */
+    enum ExecutionPhase { INDEX, DEMAND, CONTROL, DOMAIN, REPLAY, SORT, ENCODE }
+    default void progress(ExecutionPhase phase) { Objects.requireNonNull(phase); }
     PublicationId publicationId();
     Evidence.InventoryStatus inventory();
     List<Origins.Artifact> artifacts();

@@ -45,6 +45,7 @@ final class TextProfile {
         var entryUnits=session.contexts().stream().map(c->c.entry().id().unit()).collect(java.util.stream.Collectors.toCollection(LinkedHashSet::new));
         var cells=new HashMap<StorageId,Location>();
         for(var object:index.objects()) {
+            store.progress(ProgramStore.ExecutionPhase.DEMAND);
             var cell=index.directCell(object.id());
             if(!(object.storage() instanceof Memory.CellBinding)||cell==null||!cellDomain(object.typeRef())||!cellDomain(cell.typeRef())) {
                 // A declaration alone has no transfer effect. Demand closure and every
@@ -102,7 +103,7 @@ final class TextProfile {
             }
             sourceOpen.put(unit.id(),open);visible.put(unit.id(),Set.copyOf(unit.visibleObjects()));
         }
-        relations=ScalarRelations.create(this.selected,preparedWrites,subjects);
+        relations=ScalarRelations.create(this.selected,preparedWrites,subjects,()->store.progress(ProgramStore.ExecutionPhase.DOMAIN));
         for(var context:session.contexts()) {
             if(!context.entry().state().uncertainties().isEmpty())sourceOpenEntries.add(context.entry().id());
             var seed=PossibleValuesState.reached();var initial=new HashMap<Integer,Values.TextValue>();var initialized=new HashSet<Integer>();

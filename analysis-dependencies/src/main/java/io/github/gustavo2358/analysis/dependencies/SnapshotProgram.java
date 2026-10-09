@@ -14,6 +14,7 @@ import io.github.gustavo2358.analysis.cfg.domain.CfgTransition;
 import io.github.gustavo2358.analysis.cfg.domain.CfgTransitionTable;
 import io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy;
 import io.github.gustavo2358.analysis.structure.ProgramStore;
+import io.github.gustavo2358.analysis.solver.AnalysisResources;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.function.Consumer;
@@ -31,6 +32,7 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
     private final SnapshotIdentityKeys keys;
     private final SnapshotOrderStorage orderStorage;
     private final SnapshotOccurrenceReader occurrences;
+    private final AnalysisResources runtime;
     private final char[] orderLeft=new char[64],orderRight=new char[64];
     private CfgSource source;
     private SnapshotOrderStorage.Tape unitOrder;
@@ -43,6 +45,11 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
         this(checked,identityStorage,SnapshotOrderStorage.resident());
     }
     public SnapshotProgram(SnapshotValidator.CheckedSnapshot checked,SnapshotIdentityKeys.Storage identityStorage,SnapshotOrderStorage orderStorage) {
+        this(checked,identityStorage,orderStorage,null);
+    }
+    /** Explicit common runtime of the production input, analysis and output lifetime. */
+    public SnapshotProgram(SnapshotValidator.CheckedSnapshot checked,SnapshotIdentityKeys.Storage identityStorage,SnapshotOrderStorage orderStorage,AnalysisResources runtime) {
+        this.runtime=runtime;
         admission=Objects.requireNonNull(checked);snapshot=checked.snapshot();var owned=Objects.requireNonNull(identityStorage);
         occurrences=new SnapshotOccurrenceReader(snapshot,this::borrowedOpen);
         this.orderStorage=Objects.requireNonNull(orderStorage);
@@ -118,6 +125,19 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
     }
 
     private void borrowedOpen(){open();admission.snapshot();}
+    @Override public void progress(ProgramStore.ExecutionPhase phase) {
+        borrowedOpen();Objects.requireNonNull(phase);
+        // Older explicitly assembled native stores still check the borrowed
+        // backing owner's deadline. Production supplies its common runtime so
+        // the actual productive phase is reported, without a physical read.
+        if(runtime==null){snapshot.shape(snapshot.root());return;}
+        runtime.work(1,switch(phase) {
+            case INDEX->AnalysisResources.Phase.INDEX;case DEMAND->AnalysisResources.Phase.DEMAND;
+            case CONTROL->AnalysisResources.Phase.CONTROL;case DOMAIN->AnalysisResources.Phase.DOMAIN;
+            case REPLAY->AnalysisResources.Phase.REPLAY;case SORT->AnalysisResources.Phase.SORT;
+            case ENCODE->AnalysisResources.Phase.ENCODE;
+        });
+    }
     private long field(long handle,int ordinal){borrowedOpen();return snapshot.field(handle,snapshot.shape(handle),ordinal);}
     private <T> T occurrence(long handle,Class<T> type){return occurrences.read(handle,type);}
     private <T> List<T> borrowed(long list,AirShape type,Class<T> result){
@@ -146,7 +166,7 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
         @Override public List<ProgramStore.SequenceView> sequences(){
             long list=field(handle,5);
             return new ProgramStore.BorrowedList<>(Math.toIntExact(snapshot.size(list)),
-                ordinal->new StructuralSequence(snapshot.element(list,SEQUENCE,ordinal)),SnapshotProgram.this::borrowedOpen);
+                ordinal->new StructuralSequence(snapshot.element(list,SEQUENCE,ordinal)),()->SnapshotProgram.this.borrowedOpen());
         }
         @Override public List<Entries.CompletionPort> completionPorts(){return borrowed(field(handle,6),ENTRIES_COMPLETION_PORT,Entries.CompletionPort.class);}
         @Override public Unit.BodyAvailability body(){return occurrence(field(handle,7),Unit.BodyAvailability.class);}

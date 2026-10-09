@@ -40,6 +40,9 @@ class SparseActivationConditionsTest {
     static Sequence unwind(String name,BigInteger count,String next){return seq(name,new Operations.LocalUnwind(h(name),count,label(next),fallback()));}
     static Evidence.Coverage coverage(Scopes.FactScope scope){return new Evidence.Coverage(Evidence.InventoryStatus.COMPLETE,scope,List.of(),List.of());}
     static AnalysisSession session(List<Sequence> sequences,String...starts) {
+        return sessionWithExecutionProgress(sequences,null,starts);
+    }
+    static AnalysisSession sessionWithExecutionProgress(List<Sequence> sequences,java.util.function.Consumer<ProgramStore.ExecutionPhase> progress,String...starts) {
         var entries=new ArrayList<Entries.Entry>();
         for(String start:starts)entries.add(new Entries.Entry(new EntryId(U,start),Optional.of(label(start)),
             new Interactions.Signature(new Interactions.ParameterInventory(List.of(),Interactions.NoRemainder.INSTANCE),new Interactions.ResultInventory(List.of(),Interactions.NoRemainder.INSTANCE),O),new Entries.EntryState(List.of(),List.of()),O));
@@ -55,12 +58,38 @@ class SparseActivationConditionsTest {
         var pub=new Publication(P,SemanticVersion.AIR_2_0_0,new Capabilities.Manifest(caps,List.of()),List.of(),List.of(unit),List.of(),List.of(),List.of(),List.of(new Origins.Unavailable(O,"independent fixture")),coverage(new Scopes.PublicationScope(P)),List.of(),List.of());
         var built=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).build(pub,BuildOptions.defaults());
         assertEquals(CfgBuildResult.Status.CFG_BUILT,built.status(),built.toString());
-        var admission=AnalysisSession.open(built,pub,ProjectionPolicy.KNOWN_SUBSET,entries);
+        var resident=ProgramStore.resident(pub);var store=resident;
+        if(progress!=null)store=(ProgramStore.Structural)java.lang.reflect.Proxy.newProxyInstance(
+            SparseActivationConditionsTest.class.getClassLoader(),new Class<?>[]{ProgramStore.Structural.class},(proxy,method,args)->{
+                if(method.getName().equals("progress")){progress.accept((ProgramStore.ExecutionPhase)args[0]);return null;}
+                try{return method.invoke(resident,args);}catch(java.lang.reflect.InvocationTargetException failure){throw failure.getCause();}
+            });
+        var admission=AnalysisSession.open(built,store,ProjectionPolicy.KNOWN_SUBSET,entries.stream().map(Entries.Entry::id).toList());
         assertEquals(AnalysisSession.Status.ACCEPTED,admission.status(),admission.reason());return admission.session().orElseThrow();
     }
     static Sequence guarded(String name,String body,String resume,String key,String rejected) {
         return seq(name,new Operations.LocalInvoke(h(name),label(body),List.of(),label(resume),fallback(),
             Optional.of(new Operations.ReentryGuard(key,label(rejected)))));
+    }
+    @Test void contextualExecutionObservesExpiryInsideBothDirectionalTransfers() {
+        for(var direction:Direction.values()) {
+            long[] now={0};var resources=new AnalysisResources(new AnalysisResources.Limits(Long.MAX_VALUE,Long.MAX_VALUE,0,0,0,Long.MAX_VALUE,Long.MAX_VALUE),5,()->now[0]);
+            var session=sessionWithExecutionProgress(List.of(call("main","body","done"),resume("body"),ret("done")),
+                phase->resources.work(1,AnalysisResources.Phase.valueOf(phase.name())),"main");
+            assertTrue(session.hasLocalControl());var context=session.contexts().iterator().next();
+            var definition=new AnalysisDefinition<Integer>() {
+                public Direction direction(){return direction;}
+                public Integer bottom(){return 0;}
+                public long stateFingerprint(Integer value){return value;}
+                public Iterable<Boundary<Integer>> boundaries(AnalysisSession ignored){return List.of(new Boundary<>(context,direction==Direction.FORWARD?context.entryNode():context.normalExit(),1));}
+                public Join<Integer> joinInto(Integer a,Integer b,DomainWork work){int joined=a|b;return new Join<>(joined,joined!=a);}
+                public boolean equivalent(Integer a,Integer b,DomainWork work){return a.equals(b);}
+                public Integer transferBlock(AnalysisPoint point,Integer value,DomainWork work){now[0]=5;return value;}
+                public Integer transferEdge(AnalysisPoint point,io.github.gustavo2358.analysis.cfg.domain.CfgTransition edge,Integer value,DomainWork work){return value;}
+            };
+            var failure=assertThrows(AnalysisResources.Exhausted.class,()->DataflowSolver.solve(session,definition));
+            assertEquals(AnalysisResources.Resource.TIME,failure.resource());assertEquals(5,failure.used());assertEquals(0,resources.heapUsed());
+        }
     }
     @Test void unreachableFramesAllocateNoAncestorConditions() {
         for(int n:new int[]{64,128,256,512}) {

@@ -5,6 +5,21 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FactorizedAlternativesTest {
+    @Test void productiveRelationLoopsObserveOwnerFailureWithoutDroppingAlternatives() {
+        int[] remaining={Integer.MAX_VALUE};var failure=new IllegalStateException("execution deadline");
+        var domain=new FactorizedAlternatives<Integer>(()->{if(--remaining[0]==0)throw failure;});
+        var tuple=new TreeMap<Integer,Integer>();for(int cell=0;cell<128;cell++)tuple.put(cell,0);
+        var left=domain.singleton(tuple);tuple.put(127,1);var right=domain.singleton(tuple);
+        remaining[0]=10;assertSame(failure,assertThrows(IllegalStateException.class,()->domain.union(left,right)));
+        remaining[0]=Integer.MAX_VALUE;var joined=domain.union(left,right);
+        assertEquals(2,domain.selections(joined).size());
+        for(var action:List.<Runnable>of(()->domain.project(joined,Set.of(127)),()->domain.restrict(joined,Map.of(127,0)),
+                ()->domain.selections(joined),()->domain.update(joined,Map.of(127,value->2)),()->domain.retain(List.of(left)))) {
+            remaining[0]=10;assertSame(failure,assertThrows(IllegalStateException.class,action::run));
+        }
+        remaining[0]=Integer.MAX_VALUE;
+        assertEquals(Set.of(Map.of(127,0),Map.of(127,1)),new HashSet<>(domain.selections(domain.project(joined,Set.of(127)))));
+    }
     /** Independent collecting relation oracle, with empty relations and skipped levels. */
     @Test void thousandFiniteRelationsPreserveAlgebraAndCanonicality() {
         var random=new Random(20260916);

@@ -4,6 +4,26 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class BooleanConditionsTest {
+    @Test void ownedResidentDecisionsObserveBorrowedDeadlineInsideConstructionAndStillClose() {
+        long[] now={0};int[] probes={0};boolean[] armed={false};
+        var shared=new AnalysisResources(new AnalysisResources.Limits(Long.MAX_VALUE,Long.MAX_VALUE,0,0,0,Long.MAX_VALUE,Long.MAX_VALUE),5,()->now[0]);
+        var program=(io.github.gustavo2358.analysis.structure.ProgramStore)java.lang.reflect.Proxy.newProxyInstance(
+            getClass().getClassLoader(),new Class<?>[]{io.github.gustavo2358.analysis.structure.ProgramStore.class},(proxy,method,args)->{
+                if(!method.getName().equals("progress"))throw new AssertionError(method);
+                if(armed[0]&&++probes[0]==10)now[0]=5;
+                shared.work(1,AnalysisResources.Phase.CONTROL);return null;
+            });
+        var resources=AnalysisResources.executionFor(program);
+        try(var b=new BooleanConditions(2,resources)) {
+            int left=1,right=1;
+            for(int key=0;key<256;key++){left=b.and(left,b.variable(2*key));right=b.and(right,b.variable(2*key+1));}
+            final int a=left,c=right;armed[0]=true;
+            var failure=assertThrows(AnalysisResources.Exhausted.class,()->b.and(a,c));
+            assertEquals(AnalysisResources.Resource.TIME,failure.resource());assertEquals(AnalysisResources.Phase.CONTROL,failure.phase());
+            assertEquals(10,probes[0],"expiry must occur inside the decision, not its entry");
+        }
+        assertEquals(0,resources.heapUsed());assertEquals(0,shared.heapUsed());
+    }
     @Test void optionalPositiveWitnessHintsSurviveMixedOrAndComplementRepresentatives() {
         try(var b=new BooleanConditions(2)) {
             int left=b.and(b.variable(0),b.variable(1));
