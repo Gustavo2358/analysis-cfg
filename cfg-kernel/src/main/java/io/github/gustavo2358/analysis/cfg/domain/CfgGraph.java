@@ -30,21 +30,26 @@ public final class CfgGraph {
     private final List<Capabilities.Capability> preciseControlCapabilities;
 
     public CfgGraph(Publication publication, List<CfgNode> nodes, List<CfgTransition> transitions) {
-        this(publication, CfgSource.from(publication), nodes, transitions);
+        this(CfgSource.from(publication), nodes, transitions,
+                new WeakReference<>(Objects.requireNonNull(publication,"publication")),false);
     }
 
     public CfgGraph(CfgSource source, List<CfgNode> nodes, List<CfgTransition> transitions) {
-        this(source, nodes, transitions, new WeakReference<>(null));
+        this(source, nodes, transitions, new WeakReference<>(null),false);
     }
 
     CfgGraph(Publication publication, CfgSource source, List<CfgNode> nodes,
              List<CfgTransition> transitions) {
         this(source, nodes, transitions,
-                new WeakReference<>(Objects.requireNonNull(publication, "publication")));
+                new WeakReference<>(Objects.requireNonNull(publication, "publication")),true);
+    }
+
+    static CfgGraph projected(CfgSource source,List<CfgNode> nodes,List<CfgTransition> transitions) {
+        return new CfgGraph(source,nodes,transitions,new WeakReference<>(null),true);
     }
 
     private CfgGraph(CfgSource source, List<CfgNode> nodes, List<CfgTransition> transitions,
-                     WeakReference<Publication> sourceWitness) {
+                     WeakReference<Publication> sourceWitness,boolean canonicalNodes) {
         this.source = Objects.requireNonNull(source, "source");
         this.sourceWitness = sourceWitness;
         this.nodes = List.copyOf(nodes);
@@ -56,16 +61,20 @@ public final class CfgGraph {
         List<CfgNode.HaltExit> haltNodes = new ArrayList<>();
         Map<EntryId, CfgNode.EntryNode> activationEntries = new HashMap<>();
         Map<CfgNodeId, CfgNode> indexed = new HashMap<>();
+        int ordinal=0;EntryId previousEntry=null;
         for (CfgNode node : this.nodes) {
             if (!node.id().publicationId().equals(source.publicationId())
-                    || indexed.putIfAbsent(node.id(), node) != null) {
+                    || (canonicalNodes ? node.id().ordinal()!=ordinal : indexed.putIfAbsent(node.id(), node) != null)) {
                 throw new IllegalArgumentException("duplicate or foreign CFG node ID");
             }
+            ordinal++;
             if (node instanceof CfgNode.EntryNode entry) {
                 entryNodes.add(entry);
-                if (activationEntries.putIfAbsent(entry.entry(), entry) != null) {
+                if (canonicalNodes ? previousEntry!=null&&compareEntries(previousEntry,entry.entry())>=0
+                        : activationEntries.putIfAbsent(entry.entry(), entry) != null) {
                     throw new IllegalArgumentException("duplicate activation Entry");
                 }
+                previousEntry=entry.entry();
             } else if (node instanceof CfgNode.NormalExit exit) {
                 exitNodes.add(exit);
             } else if (node instanceof CfgNode.HaltExit halt) {
@@ -79,7 +88,7 @@ public final class CfgGraph {
         preciseControlCapabilities = source.preciseControlCapabilities();
         var stored=this.transitions instanceof CfgTransitionTable table?table.stored():this.transitions;
         if(this.transitions instanceof CfgTransitionTable table)for(int g=0;g<table.groups();g++)for(int e=0;e<table.entries(g);e++) {
-            var binding=table.entry(g,e);var exit=indexed.get(table.normalExit(g,e));
+            var binding=table.entry(g,e);var exit=canonicalNodes?ordinalNode(table.normalExit(g,e)):indexed.get(table.normalExit(g,e));
             if(!binding.activationEntry().unit().equals(table.unit(g))||!(exit instanceof CfgNode.NormalExit normal)
                     ||!normal.entryId().equals(binding.activationEntry())||!normal.unitId().equals(table.unit(g)))
                 throw new IllegalArgumentException("factored entry/normal-exit correlation");
@@ -88,9 +97,9 @@ public final class CfgGraph {
             throw new IllegalArgumentException("duplicate CFG transition");
         }
         for (CfgTransition transition : stored) {
-            CfgNode from = indexed.get(transition.from());
-            CfgNode to = indexed.get(transition.to());
-            if (!activationEntries.containsKey(transition.activationEntry())) {
+            CfgNode from = canonicalNodes?ordinalNode(transition.from()):indexed.get(transition.from());
+            CfgNode to = canonicalNodes?ordinalNode(transition.to()):indexed.get(transition.to());
+            if (!(canonicalNodes?hasActivation(transition.activationEntry()):activationEntries.containsKey(transition.activationEntry()))) {
                 throw new IllegalArgumentException("transition requires an inventoried activation Entry");
             }
             boolean valid = switch (transition.kind()) {
@@ -152,6 +161,26 @@ public final class CfgGraph {
                 throw new IllegalArgumentException("CFG transition disagrees with its typed endpoints/correlation");
             }
         }
+    }
+
+    // Core projection publishes dense ordinals and canonical Unit/Entry order. Both are
+    // checked above; public arbitrary-order graphs retain their general validation indexes.
+    private CfgNode ordinalNode(CfgNodeId id) {
+        return id.publicationId().equals(source.publicationId())&&id.ordinal()<nodes.size()
+                ? nodes.get((int)id.ordinal()) : null;
+    }
+    private static int compareEntries(EntryId first,EntryId second) {
+        int unit=first.unit().localId().compareTo(second.unit().localId());
+        return unit!=0?unit:first.localId().compareTo(second.localId());
+    }
+    private boolean hasActivation(EntryId id) {
+        if(!id.publication().equals(source.publicationId()))return false;
+        int low=0,high=entries.size();
+        while(low<high) {
+            int middle=(low+high)>>>1;int order=compareEntries(entries.get(middle).entry(),id);
+            if(order<0)low=middle+1;else high=middle;
+        }
+        return low<entries.size()&&entries.get(low).entry().equals(id);
     }
 
     public Map<CfgNodeId,LocalControlRules.Rule> localRules() { return localRules; }

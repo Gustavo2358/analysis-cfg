@@ -125,6 +125,68 @@ final class SnapshotDependencyAnalysisTest {
         }
     }
 
+    @Test void instructionQueriesReadLocalIdentityWithoutRepeatingValidatedNamespaces() {
+        var publication=directCallWithNops(16);var ledger=resources();long[] characterReads={0};
+        try(var pages=new MemoryPageStore(128,ledger);var original=AirSnapshot.fromPublication(publication)) {
+            var storage=new PagedAirStorage(pages,ledger,AnalysisResources.Phase.DECODE);
+            var tracked=new AirSnapshotBuilder.Storage() {
+                @Override public long get(AirSnapshotBuilder.Column column,long index) {
+                    if(column==AirSnapshotBuilder.Column.CHARACTERS)characterReads[0]++;
+                    return storage.get(column,index);
+                }
+                @Override public void set(AirSnapshotBuilder.Column column,long index,long value){storage.set(column,index,value);}
+                @Override public AirSnapshotBuilder.Lease claim(long bytes){return storage.claim(bytes);}
+                @Override public AirSnapshotBuilder.Lease readLease(long bytes){return storage.readLease(bytes);}
+                @Override public void freeze(){storage.freeze();}
+                @Override public void close(){storage.close();}
+            };
+            try(var builder=new AirSnapshotBuilder(tracked)) {
+                long root=PagedAirStorageTest.copy(original,original.root(),null,builder);
+                try(var checked=SnapshotValidator.check(builder.finish(root),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger))) {
+                    assertEquals(ValidationResult.Status.STRUCTURALLY_VALID,checked.result().status(),checked.result().toString());
+                    var snapshot=checked.snapshot();
+                    try(var program=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),new PagedSnapshotOrderStorage(pages,ledger))) {
+                        var graph=CoreCfgProjection.project(program);
+                        var sequence=graph.nodes().stream().filter(node->node instanceof io.github.gustavo2358.analysis.cfg.domain.CfgNode.SequenceNode s&&s.label().localId().equals("start"))
+                                .map(io.github.gustavo2358.analysis.cfg.domain.CfgNode.SequenceNode.class::cast).findFirst().orElseThrow();
+                        long unit=snapshot.element(snapshot.field(root,AirShape.PUBLICATION,4),AirShape.UNIT,0);
+                        long start=snapshot.element(snapshot.field(unit,AirShape.UNIT,5),AirShape.SEQUENCE,0);
+                        long instructions=snapshot.field(start,AirShape.SEQUENCE,1);
+                        for(int scan=0;scan<2;scan++)for(int ordinal=0;ordinal<sequence.operations().size();ordinal++) {
+                            long instruction=snapshot.element(instructions,AirShape.INSTRUCTION,ordinal);
+                            long header=snapshot.field(instruction,snapshot.shape(instruction),0);
+                            long id=snapshot.field(header,AirShape.OPERATIONS_HEADER,0);
+                            characterReads[0]=0;
+                            String expected=program.textValue(snapshot.field(id,AirShape.IDS_OPERATION_ID,1));
+                            long localReads=characterReads[0];characterReads[0]=0;
+                            var actual=sequence.operations().get(ordinal);
+                            assertEquals(new OperationId(publication.units().getFirst().id(),expected),actual);
+                            assertEquals(localReads,characterReads[0],"validated Unit/Publication namespaces must not be reread for each instruction");
+                        }
+                    }
+                }
+            }
+        }
+        assertEquals(0,ledger.heapUsed());
+    }
+
+    @Test void instructionOwnerMismatchCannotEnterTheBorrowedCfgView() {
+        var base=directCall();var unit=base.units().getFirst();var start=unit.sequences().getFirst();
+        var instructions=new java.util.ArrayList<Instruction>(start.instructions());
+        instructions.add(new Operations.Nop(ResultFixtures.header(new UnitId(base.id(),"foreign-unit"),"foreign-nop")));
+        var replacement=new Sequence(start.label(),instructions,start.terminator(),start.origin());
+        var changed=ResultFixtures.unit(unit.id(),unit.entries(),List.of(replacement,unit.sequences().getLast()),unit.objects());
+        var invalid=new Publication(base.id(),base.airVersion(),base.capabilities(),base.artifacts(),List.of(changed),base.storage(),base.resources(),base.artifactRelations(),base.origins(),base.coverage(),base.uncertainties(),base.premises());
+        var ledger=resources();
+        try(var pages=new MemoryPageStore(128,ledger);var snapshot=AirSnapshot.fromPublication(invalid);
+            var checked=SnapshotValidator.check(snapshot,ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger))) {
+            assertEquals(ValidationResult.Status.INVALID_IR,checked.result().status());
+            assertTrue(checked.result().issues().stream().anyMatch(issue->issue.rule().equals("I-03")),checked.result().toString());
+            assertThrows(IllegalArgumentException.class,()->new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),new PagedSnapshotOrderStorage(pages,ledger)));
+        }
+        assertEquals(0,ledger.heapUsed());
+    }
+
     @Test void operationViewConstructorsDoNotCopyAndExpiredOwnersRejectQueries() {
         var publication=new PublicationId("operation-view");var unit=new UnitId(publication,"unit");
         var control=new io.github.gustavo2358.analysis.cfg.domain.CfgControl.Return(new OperationId(unit,"return"));

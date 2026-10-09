@@ -57,6 +57,11 @@ public final class LocalControlRules {
     }
     // Constructed only from the graph's inventoried AIR nodes and typed label identities.
     static Map<CfgNodeId,Rule> project(List<CfgNode> nodes) {
+        boolean hasLocal=false;
+        for(var node:nodes)if(node instanceof CfgNode.SequenceNode sequence&&local(sequence.control())) {
+            hasLocal=true;break;
+        }
+        if(!hasLocal)return Map.of();
         var labels=new HashMap<LabelId,CfgNodeId>(); var invalid=new HashMap<OperationId,CfgNodeId>();
         for(var n:nodes) {
             if(n instanceof CfgNode.SequenceNode s) labels.put(s.label(),s.id());

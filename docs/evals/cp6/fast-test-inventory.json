@@ -473,6 +473,8 @@
       "sourceUnitInventoryBorrowsCanonicalPagesAndExpiresWithProgram",
       "borrowedSourceInventoryKeepsCanonicalAndForeignIdentityChecks",
       "cfgProjectionDoesNotReadEveryInstructionIdentityBeforeAQuery",
+      "instructionQueriesReadLocalIdentityWithoutRepeatingValidatedNamespaces",
+      "instructionOwnerMismatchCannotEnterTheBorrowedCfgView",
       "operationViewConstructorsDoNotCopyAndExpiredOwnersRejectQueries",
       "validatedPagedSnapshotPreservesVariableCallEvidenceWithoutPublicationMaterialization",
       "incompleteAdmissionCannotProduceDependencies",
@@ -1523,7 +1525,13 @@
       "missingCapabilityIsNotResolvedAsANop"
     ],
     "io.github.gustavo2358.analysis.cfg.domain.LocalControlProjectionTest": [
+      "ordinaryControlDoesNotAllocateASecondProgramSizedLabelIndex",
       "sharedBodyIsProjectedOnceWithoutUnconditionalReturns"
+    ],
+    "io.github.gustavo2358.analysis.cfg.domain.CfgGraphRetentionTest": [
+      "canonicalProjectionRejectsOrdinalNamespaceEntryAndEndpointContradictions",
+      "generalConstructorsKeepArbitraryValidOrdinalsAndEntryOrder",
+      "canonicalProjectionValidatesEndpointsWithoutProgramSizedIdentityMaps"
     ],
     "io.github.gustavo2358.analysis.cfg.application.CheckedPreflightTest": [
       "preservesSuccessfulInvalidUnsupportedAndLimitedRuns",

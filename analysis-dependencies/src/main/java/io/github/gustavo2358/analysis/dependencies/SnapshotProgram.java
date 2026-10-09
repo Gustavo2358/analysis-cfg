@@ -134,11 +134,15 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
         }
         @Override public void sequences(Consumer<CfgProgram.SequenceView> consumer) {
             open();Objects.requireNonNull(consumer);long values=snapshot.field(handle,UNIT,5);
+            // Complete admission (I-03) proves every instruction belongs to this Unit.
+            // Retain that namespace once per Unit scan, not reconstruct it for each query.
+            UnitId owner=id();
             ordered(values,SEQUENCE,(a,b)->compareLocalIds(a,SEQUENCE,0,b,SEQUENCE,0),sequence->{
                     long instructions=snapshot.field(sequence,SEQUENCE,1);
                     var operations=new CfgProgram.OperationIds(Math.toIntExact(snapshot.size(instructions)),ordinal->{
                         long instruction=snapshot.element(instructions,INSTRUCTION,ordinal),header=snapshot.field(instruction,snapshot.shape(instruction),0);
-                        return (OperationId)SnapshotProgram.this.id(snapshot.field(header,OPERATIONS_HEADER,0));
+                        long operation=snapshot.field(header,OPERATIONS_HEADER,0);
+                        return new OperationId(owner,text(snapshot.field(operation,IDS_OPERATION_ID,1)));
                     },()->{SnapshotProgram.this.open();snapshot.shape(instructions);});
                     consumer.accept(new CfgProgram.SequenceView((LabelId)SnapshotProgram.this.id(snapshot.field(sequence,SEQUENCE,0)),
                             operations,control(snapshot.field(sequence,SEQUENCE,2))));

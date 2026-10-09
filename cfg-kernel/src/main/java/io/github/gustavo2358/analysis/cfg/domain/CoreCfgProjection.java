@@ -146,13 +146,12 @@ public final class CoreCfgProjection {
             Map<LabelId, CfgNode.SequenceNode> sequences = new HashMap<>();
             Map<LabelId, CfgNode.HaltExit> halts = new HashMap<>();
             var outsideNodes=new HashMap<LabelId,java.util.List<CfgNode.OutcomeExit>>();
-            var orderedSequences=new ArrayList<CfgNode.SequenceNode>();
+            int firstSequence=nodes.size();
             unit.sequences(sequence -> {
                 CfgNode.SequenceNode node = new CfgNode.SequenceNode(
                         new CfgNodeId(source.publicationId(), nodes.size()), sequence.label(),
                         sequence.operations(), sequence.control());
                 sequences.put(sequence.label(), node);
-                orderedSequences.add(node);
                 nodes.add(node);
                 var exits=new ArrayList<CfgNode.OutcomeExit>();
                 for(var alternative:CfgControl.alternatives(node.control()).stream()
@@ -161,7 +160,7 @@ public final class CoreCfgProjection {
                             node.control(),(Control.InvocationAlternative)alternative);
                     nodes.add(end);exits.add(end);
                 }
-                outsideNodes.put(sequence.label(),exits);
+                if(!exits.isEmpty())outsideNodes.put(sequence.label(),exits);
                 if (node.control() instanceof CfgControl.Halt halt) {
                     CfgNode.HaltExit termination = new CfgNode.HaltExit(
                             new CfgNodeId(source.publicationId(), nodes.size()), halt.operation(), halt.haltKind());
@@ -169,6 +168,7 @@ public final class CoreCfgProjection {
                     halts.put(sequence.label(), termination);
                 }
             });
+            int sequenceEnd=nodes.size();
             var entryEdges=new ArrayList<CfgTransition>();var normalExits=new ArrayList<CfgNodeId>();
             var representative=new io.github.gustavo2358.air.model.Ids.EntryId[1];
             unit.entries(entry -> {
@@ -185,14 +185,15 @@ public final class CoreCfgProjection {
             var transitions=new ArrayList<CfgTransition>();
             if(representative[0]!=null) {
                 var entry=representative[0];var normalExit=normalExits.getFirst();
-                for (CfgNode.SequenceNode sequence : orderedSequences) {
+                for (int ordinal=firstSequence;ordinal<sequenceEnd;ordinal++) {
+                    if(!(nodes.get(ordinal) instanceof CfgNode.SequenceNode sequence))continue;
                     CfgNodeId from = sequence.id();var control=sequence.control();
                     var exceptionalLabels=new java.util.HashSet<LabelId>();
                     for(var alternative:CfgControl.alternatives(control)) {
                         var handler=exceptionLabel(alternative);
                         if(handler!=null&&exceptionalLabels.add(handler))transitions.add(new CfgTransition(from,sequences.get(handler).id(),CfgTransition.Kind.EXCEPTION,entry));
                     }
-                    if(!LocalControlRules.local(control))for(var end:outsideNodes.get(sequence.label()))
+                    if(!LocalControlRules.local(control))for(var end:outsideNodes.getOrDefault(sequence.label(),List.of()))
                         transitions.add(new CfgTransition(from,end.id(),CfgTransition.Kind.CONTROL_EXIT,entry));
                     // Contextual rules include orphans; they do not assert reachability from this Entry.
                     if (control instanceof CfgControl.Return) {
@@ -231,6 +232,6 @@ public final class CoreCfgProjection {
         });
         return program instanceof CfgProgram.Resident resident
                 ? new CfgGraph(resident.publication(), source, nodes, table.build())
-                : new CfgGraph(source, nodes, table.build());
+                : CfgGraph.projected(source, nodes, table.build());
     }
 }

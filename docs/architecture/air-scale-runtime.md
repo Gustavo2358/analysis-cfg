@@ -461,6 +461,20 @@ order, bind return exits and activation identity, and never expose another unit/
 Explicit externally supplied dense graphs remain strictly admitted through the same path.
 This is representation substitution, not skipped validation of dead AIR or a reachability claim.
 
+Canonical core projections now validate dense node ordinals and strict Unit/Entry ordering,
+then use those ordinals for endpoint access and binary search for activation membership.
+They do not rebuild program-sized node/Entry identity maps. General public graph constructors
+retain arbitrary valid ordinals and ordering, with their original strict map-based checks.
+Projection reuses the existing node range for its ordered Sequence pass and only stores actual
+outside exits; ordinary programs do not construct the unused local-control label index.
+Nodes, role inventories, per-Unit lookup maps and physical transition rows still remain resident.
+
+Snapshot-backed operation inventories reconstruct only the local instruction identity on query.
+The Unit namespace is shared across one Unit scan because complete admission has already proved
+I-03 ownership. No instruction inventory is copied eagerly. Borrowed operation and source-unit
+inventories expire with the program/snapshot; callers must explicitly materialize any detached
+copy while the owner is open. Foreign instruction owners still fail complete AIR admission.
+
 `edgesIndexed` retains its logical coverage meaning; collection visit counters now report
 actual physical indexing/link work. The independent arithmetic construction ledger follows
 body rows + entry bindings. Retention auditing walks actual table fields rather than enumerating
