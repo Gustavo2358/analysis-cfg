@@ -100,10 +100,8 @@ def architecture(root:Path, update:bool=False)->None:
             if any(d in target for d in DENIED): raise Failure('W1 forbidden bytecode dependency: '+source+' -> '+target)
             if not target.startswith(('java.',PREFIX,'io.github.gustavo2358.air.model.','io.github.gustavo2358.air.validation.ValidationOptions','io.github.gustavo2358.air.validation.ValidationResult','io.github.gustavo2358.analysis.cfg.')):
                 raise Failure('W1 dependency outside approved DAG: '+target)
-    descriptors={}
-    for path in paths:
-        cls=path[:-6].replace('/','.')
-        descriptors[cls]=command(root,['javap','-classpath',str(classes)+os.pathsep+cp,'-public','-s',cls])
+    from compiled_descriptors import public_descriptors
+    descriptors={p[:-6].replace('/','.'):value for p,value in public_descriptors(paths,str(classes)+os.pathsep+cp,lambda args:command(root,args)).items()}
     tree=(root/'analysis-kernel/target/architecture-dependencies.tgf').read_text()
     from check_architecture import parse_tgf
     coordinates=set(parse_tgf(root/'analysis-kernel/target/architecture-dependencies.tgf'))

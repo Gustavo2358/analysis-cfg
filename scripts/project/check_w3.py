@@ -100,7 +100,8 @@ def architecture(root:Path,update:bool=False)->None:
                 if source==PREFIX+'RegionalValuesAnalysis' and target=='io.github.gustavo2358.analysis.rd.ReachingDefinitions':raise Failure('Regional preparation cannot depend on discarded reaching-definitions analysis')
                 if any(d in target for d in DENIED) or (module=='analysis-kernel' and target.startswith(PREFIX)):raise Failure('W3 forbidden bytecode dependency: '+target)
                 if not target.startswith(('java.',prefix,'io.github.gustavo2358.air.model.','io.github.gustavo2358.analysis.structure.','io.github.gustavo2358.analysis.solver.','io.github.gustavo2358.analysis.query.','io.github.gustavo2358.analysis.cfg.domain.','io.github.gustavo2358.analysis.storage.','io.github.gustavo2358.analysis.rd.ReachingDefinitions','io.github.gustavo2358.analysis.rd.DefinitionEvent')):raise Failure('W3 DAG: '+target)
-        descriptors={p[:-6].replace('/','.'):command(root,['javap','-classpath',str(classes)+os.pathsep+cp,'-public','-s',p[:-6].replace('/','.')]) for p in paths}
+        from compiled_descriptors import public_descriptors
+        descriptors={p[:-6].replace('/','.'):value for p,value in public_descriptors(paths,str(classes)+os.pathsep+cp,lambda args:command(root,args)).items()}
         actual[module]={'sources':sorted(sources),'classfiles':paths,'jdeps_edges':dict(sorted(edges.items())),'javap_descriptors':descriptors,'effective_maven':sorted(parse_tgf(root/module/'target/architecture-dependencies.tgf'))}
     if update:(root/INVENTORY).write_text(json.dumps(actual,indent=2)+'\n')
     elif json.loads((root/INVENTORY).read_text())!=actual:raise Failure('W3 compiled inventory drift')
