@@ -11,33 +11,50 @@ import io.github.gustavo2358.analysis.cfg.domain.CfgNodeId;
 import io.github.gustavo2358.analysis.cfg.domain.CfgTransition;
 import io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy;
 import java.io.IOException;
+import java.io.BufferedOutputStream;
+import java.io.OutputStream;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Objects;
+import java.util.function.LongConsumer;
 
 /** Explicit analysis-cfg-json 1.0.0/2.0.0 mapping; the AIR input remains the source of full AIR facts. */
 public final class CfgJsonWriter {
     public static final int DEFAULT_MAXIMUM_BYTES = 64 * 1024 * 1024;
-    private final int maximumBytes;
+    private final long maximumBytes;
 
     public CfgJsonWriter() { this(DEFAULT_MAXIMUM_BYTES); }
 
     public CfgJsonWriter(int maximumBytes) {
+        this((long)maximumBytes);
+    }
+
+    public CfgJsonWriter(long maximumBytes) {
         if (maximumBytes < 1) throw new IllegalArgumentException("positive maximumBytes required");
         this.maximumBytes = maximumBytes;
     }
 
     public byte[] encode(CfgBuildResult result) throws CfgJsonException {
+        var out = new CfgJsonBytes(maximumBytes);
+        encode(result,out);
+        return out.bytes();
+    }
+
+    void encode(CfgBuildResult result,OutputStream output) throws CfgJsonException,IOException {
+        try { encode(result,new CfgJsonBytes(output,maximumBytes)); }
+        catch(CfgJsonBytes.OutputFailure failure){throw failure.failure();}
+    }
+
+    private void encode(CfgBuildResult result,CfgJsonBytes out) throws CfgJsonException {
         Objects.requireNonNull(result, "result");
         if (result.status() != CfgBuildResult.Status.CFG_BUILT)
             throw new CfgJsonException("only CFG_BUILT can be serialized");
         if (result.options().projectionPolicy() == ProjectionPolicy.PARTIAL_ANALYSIS)
             throw new CfgJsonException("PARTIAL_ANALYSIS requires the partial analysis result contract; legacy CFG JSON cannot encode contextual uncertainty");
         var graph = result.graph().orElseThrow();
-        var out = new CfgJsonBytes(maximumBytes);
         // Token mappings carry their contract requirement. Inspect the product, not its source text.
         boolean requiresV5=!graph.localRules().isEmpty();
         boolean requiresV7=graph.localRules().values().stream().anyMatch(r->r instanceof LocalControlRules.Invoke i&&!i.resumeRoutes().isEmpty()
@@ -92,12 +109,42 @@ public final class CfgJsonWriter {
             out.raw("]");
         }
         out.raw("}");
-        return out.bytes();
     }
 
     public void write(CfgBuildResult result, Path destination) throws CfgJsonException, IOException {
-        byte[] bytes = encode(result);
-        publish(bytes, destination, Files::move);
+        write(result,destination,ignored->{ });
+    }
+
+    /** Production path: incremental atomic output with caller-owned quota/deadline accounting. */
+    public void write(CfgBuildResult result,Path destination,LongConsumer outputMeter)throws CfgJsonException,IOException {
+        validate(result);
+        Objects.requireNonNull(outputMeter);
+        Path absolute = destination.toAbsolutePath();
+        Path parent = absolute.getParent();
+        if (parent == null) throw new IOException("destination must name a file");
+        Path temporary = Files.createTempFile(parent, ".analysis-cfg-", ".tmp");
+        try {
+            try(var encoded=JsonFiles.output(new BufferedOutputStream(Files.newOutputStream(temporary)),destination);
+                var output=new BufferedOutputStream(new MeteredOutput(encoded,outputMeter))) {
+                encode(result,output);
+            }
+            move(temporary,absolute,Files::move);
+        } finally {
+            Files.deleteIfExists(temporary);
+        }
+    }
+
+    private static final class MeteredOutput extends java.io.FilterOutputStream {
+        private final LongConsumer meter;
+        private MeteredOutput(OutputStream output,LongConsumer meter){super(output);this.meter=meter;}
+        @Override public void write(int value)throws IOException{meter.accept(1);out.write(value);}
+        @Override public void write(byte[] value,int offset,int length)throws IOException{meter.accept(length);out.write(value,offset,length);}
+    }
+
+    private static void validate(CfgBuildResult result)throws CfgJsonException {
+        Objects.requireNonNull(result, "result");
+        if(result.status()!=CfgBuildResult.Status.CFG_BUILT)throw new CfgJsonException("only CFG_BUILT can be serialized");
+        if(result.options().projectionPolicy()==ProjectionPolicy.PARTIAL_ANALYSIS)throw new CfgJsonException("PARTIAL_ANALYSIS requires the partial analysis result contract; legacy CFG JSON cannot encode contextual uncertainty");
     }
 
     @FunctionalInterface
@@ -111,14 +158,17 @@ public final class CfgJsonWriter {
         Path temporary = Files.createTempFile(parent, ".analysis-cfg-", ".tmp");
         try {
             JsonFiles.write(temporary,destination,bytes);
-            try {
-                mover.move(temporary, absolute, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
-            } catch (AtomicMoveNotSupportedException unsupported) {
-                // Explicit fallback: replacement here does NOT claim atomicity.
-                mover.move(temporary, absolute, StandardCopyOption.REPLACE_EXISTING);
-            }
+            move(temporary,absolute,mover);
         } finally {
             Files.deleteIfExists(temporary);
+        }
+    }
+
+    private static void move(Path temporary,Path absolute,MoveOperation mover)throws IOException {
+        try { mover.move(temporary,absolute,StandardCopyOption.ATOMIC_MOVE,StandardCopyOption.REPLACE_EXISTING); }
+        catch(AtomicMoveNotSupportedException unsupported) {
+            // Explicit fallback: replacement here does NOT claim atomicity.
+            mover.move(temporary,absolute,StandardCopyOption.REPLACE_EXISTING);
         }
     }
 

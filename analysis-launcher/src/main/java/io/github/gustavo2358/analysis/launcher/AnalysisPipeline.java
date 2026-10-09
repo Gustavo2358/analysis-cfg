@@ -92,7 +92,8 @@ public final class AnalysisPipeline {
             try(var program=new SnapshotProgram(read.checked(),read.newIdentityStorage())) {
                 var built=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).buildChecked(program,read.checked(),BuildOptions.defaults());
                 if(built.status()!=CfgBuildResult.Status.CFG_BUILT){err.println("CFG "+built.status());return 4;}
-                try {new CfgJsonWriter().write(built,cfg);}
+                try {new CfgJsonWriter(resources.limits().outputBytes()).write(built,cfg,
+                        bytes->resources.output(bytes,AnalysisResources.Phase.ENCODE));}
                 catch(CfgJsonException failure){err.println("CFG_OUTPUT_SERIALIZATION");return 5;}
                 catch(IOException failure){err.println("CFG_OUTPUT_IO");return 6;}
                 try(var result=new SnapshotDependencyAnalysis().open(program,read.newDependencyStorage())) {

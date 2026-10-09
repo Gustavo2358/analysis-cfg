@@ -10,6 +10,7 @@ import io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import java.io.IOException;
+import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
@@ -82,6 +83,29 @@ class WriterDomainTest {
         assertThrows(CfgJsonException.class, () -> new CfgJsonBytes(expected.length - 1).string("a\"\\\n\u0000\u001fá😀"));
         String json = new String(new CfgJsonWriter().encode(build(MemoryFacts.mixed("P\"\\\ná😀"), ProjectionPolicy.KNOWN_SUBSET)), StandardCharsets.UTF_8);
         assertTrue(json.contains("\"publication\":\"P\\\"\\\\\\u000aá😀\""));
+    }
+    @Test void productionEncoderStreamsTheExactCompatibilityWire() throws Exception {
+        var result=build(MemoryFacts.mixed("streamed"),ProjectionPolicy.KNOWN_SUBSET);
+        var writer=new CfgJsonWriter();byte[] expected=writer.encode(result);
+        var output=new ByteArrayOutputStream(){@Override public synchronized void write(byte[] value,int offset,int length){
+            fail("CFG production encoder must not submit a resident aggregate");
+        }};
+        writer.encode(result,output);
+        assertArrayEquals(expected,output.toByteArray());
+    }
+    @Test void atomicProductionWriterMetersTheLogicalWire() throws Exception {
+        var result=build(MemoryFacts.mixed("metered"),ProjectionPolicy.KNOWN_SUBSET);
+        var writer=new CfgJsonWriter();byte[] expected=writer.encode(result);long[] metered={0};
+        Path output=temporary.resolve("metered.json");writer.write(result,output,count->metered[0]+=count);
+        assertEquals(expected.length,metered[0]);assertArrayEquals(expected,Files.readAllBytes(output));
+    }
+    @Test void interruptedStreamingWritePreservesDestinationAndCleansTemporary() throws Exception {
+        var result=build(MemoryFacts.mixed("cancelled"),ProjectionPolicy.KNOWN_SUBSET);
+        Path output=temporary.resolve("cancelled.json");Files.writeString(output,"sentinel");
+        var failure=new RuntimeException("injected cancellation");
+        assertSame(failure,assertThrows(RuntimeException.class,()->new CfgJsonWriter().write(result,output,count->{throw failure;})));
+        assertEquals("sentinel",Files.readString(output));
+        try(var files=Files.list(temporary)){assertEquals(List.of(output),files.toList());}
     }
     @Test void invalidUnicodeIsRejectedByOutputPrimitiveAndAirModel() {
         for (String bad : List.of("P\ud800", "P\udc00", "P\ud800z")) {

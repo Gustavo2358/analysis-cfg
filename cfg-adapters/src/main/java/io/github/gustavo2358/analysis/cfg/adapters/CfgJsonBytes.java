@@ -1,22 +1,35 @@
 package io.github.gustavo2358.analysis.cfg.adapters;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 
 /** CFG-only output primitives. No parser, AIR mapping, reflection or generic object serialization. */
 final class CfgJsonBytes {
     private static final String HEX = "0123456789abcdef";
-    private final ByteArrayOutputStream output;
-    private final int maximumBytes;
+    private final OutputStream output;
+    private final ByteArrayOutputStream memory;
+    private final long maximumBytes;
+    private long bytes;
 
-    CfgJsonBytes(int maximumBytes) {
+    CfgJsonBytes(long maximumBytes) {
         if (maximumBytes < 1) throw new IllegalArgumentException("positive maximumBytes required");
         this.maximumBytes = maximumBytes;
-        output = new ByteArrayOutputStream(Math.min(maximumBytes, 8192));
+        memory = new ByteArrayOutputStream((int)Math.min(maximumBytes, 8192));
+        output = memory;
+    }
+
+    CfgJsonBytes(OutputStream output,long maximumBytes) {
+        if (maximumBytes < 1) throw new IllegalArgumentException("positive maximumBytes required");
+        this.output = java.util.Objects.requireNonNull(output);
+        this.maximumBytes = maximumBytes;
+        memory = null;
     }
 
     private void octet(int value) throws CfgJsonException {
-        if (output.size() == maximumBytes) throw new CfgJsonException("CFG JSON exceeds maximumBytes=" + maximumBytes);
-        output.write(value);
+        if (bytes == maximumBytes) throw new CfgJsonException("CFG JSON exceeds maximumBytes=" + maximumBytes);
+        try { output.write(value);bytes++; }
+        catch(IOException failure){throw new OutputFailure(failure);}
     }
 
     /** Only schema punctuation and fixed ASCII property names/tokens may use this method. */
@@ -56,5 +69,15 @@ final class CfgJsonBytes {
         octet('"');
     }
 
-    byte[] bytes() { return output.toByteArray(); }
+    byte[] bytes() {
+        if(memory==null)throw new IllegalStateException("streaming CFG JSON has no resident byte array");
+        return memory.toByteArray();
+    }
+
+    static final class OutputFailure extends RuntimeException {
+        private static final long serialVersionUID=1L;
+        private final IOException failure;
+        private OutputFailure(IOException failure){super(failure);this.failure=failure;}
+        IOException failure(){return failure;}
+    }
 }

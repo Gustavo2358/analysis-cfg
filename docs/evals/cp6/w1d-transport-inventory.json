@@ -14,7 +14,9 @@
         "java.util.Objects"
       ],
       "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonBytes.java": [
-        "java.io.ByteArrayOutputStream"
+        "java.io.ByteArrayOutputStream",
+        "java.io.IOException",
+        "java.io.OutputStream"
       ],
       "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonException.java": [],
       "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter.java": [
@@ -24,17 +26,20 @@
         "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult",
         "io.github.gustavo2358.analysis.cfg.domain.CfgControl",
         "io.github.gustavo2358.analysis.cfg.domain.CfgNode",
+        "io.github.gustavo2358.analysis.cfg.domain.LocalControlRules",
         "io.github.gustavo2358.analysis.cfg.domain.CfgNodeId",
         "io.github.gustavo2358.analysis.cfg.domain.CfgTransition",
-        "io.github.gustavo2358.analysis.cfg.domain.LocalControlRules",
         "io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy",
         "java.io.IOException",
+        "java.io.BufferedOutputStream",
+        "java.io.OutputStream",
         "java.nio.file.AtomicMoveNotSupportedException",
         "java.nio.file.CopyOption",
         "java.nio.file.Files",
         "java.nio.file.Path",
         "java.nio.file.StandardCopyOption",
-        "java.util.Objects"
+        "java.util.Objects",
+        "java.util.function.LongConsumer"
       ],
       "cfg-adapters/src/main/java/io/github/gustavo2358/analysis/cfg/adapters/JsonFiles.java": [
         "com.github.luben.zstd.ZstdInputStream",
@@ -46,9 +51,11 @@
     "classfiles": [
       "io/github/gustavo2358/analysis/cfg/adapters/AirInputLimitException.class",
       "io/github/gustavo2358/analysis/cfg/adapters/AirJsonFileReader.class",
+      "io/github/gustavo2358/analysis/cfg/adapters/CfgJsonBytes$OutputFailure.class",
       "io/github/gustavo2358/analysis/cfg/adapters/CfgJsonBytes.class",
       "io/github/gustavo2358/analysis/cfg/adapters/CfgJsonException.class",
       "io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter$1.class",
+      "io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter$MeteredOutput.class",
       "io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter$MoveOperation.class",
       "io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter$WireKind.class",
       "io/github/gustavo2358/analysis/cfg/adapters/CfgJsonWriter.class",
@@ -83,10 +90,14 @@
         "java.util.Objects"
       ],
       "io.github.gustavo2358.analysis.cfg.adapters.CfgJsonBytes": [
+        "io.github.gustavo2358.analysis.cfg.adapters.CfgJsonBytes$OutputFailure",
         "io.github.gustavo2358.analysis.cfg.adapters.CfgJsonException",
         "java.io.ByteArrayOutputStream",
+        "java.io.IOException",
+        "java.io.OutputStream",
         "java.lang.Character",
         "java.lang.IllegalArgumentException",
+        "java.lang.IllegalStateException",
         "java.lang.Math",
         "java.lang.Object",
         "java.lang.String",
@@ -94,7 +105,14 @@
         "java.lang.invoke.MethodHandles",
         "java.lang.invoke.MethodHandles$Lookup",
         "java.lang.invoke.MethodType",
-        "java.lang.invoke.StringConcatFactory"
+        "java.lang.invoke.StringConcatFactory",
+        "java.util.Objects"
+      ],
+      "io.github.gustavo2358.analysis.cfg.adapters.CfgJsonBytes$OutputFailure": [
+        "io.github.gustavo2358.analysis.cfg.adapters.CfgJsonBytes",
+        "java.io.IOException",
+        "java.lang.RuntimeException",
+        "java.lang.Throwable"
       ],
       "io.github.gustavo2358.analysis.cfg.adapters.CfgJsonException": [
         "java.lang.Exception",
@@ -122,8 +140,10 @@
         "io.github.gustavo2358.air.model.Scopes$WithinControl",
         "io.github.gustavo2358.air.model.SemanticVersion",
         "io.github.gustavo2358.analysis.cfg.adapters.CfgJsonBytes",
+        "io.github.gustavo2358.analysis.cfg.adapters.CfgJsonBytes$OutputFailure",
         "io.github.gustavo2358.analysis.cfg.adapters.CfgJsonException",
         "io.github.gustavo2358.analysis.cfg.adapters.CfgJsonWriter$1",
+        "io.github.gustavo2358.analysis.cfg.adapters.CfgJsonWriter$MeteredOutput",
         "io.github.gustavo2358.analysis.cfg.adapters.CfgJsonWriter$MoveOperation",
         "io.github.gustavo2358.analysis.cfg.adapters.CfgJsonWriter$WireKind",
         "io.github.gustavo2358.analysis.cfg.adapters.JsonFiles",
@@ -161,7 +181,9 @@
         "io.github.gustavo2358.analysis.cfg.domain.LocalControlRules$Rule",
         "io.github.gustavo2358.analysis.cfg.domain.LocalControlRules$Unwind",
         "io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy",
+        "java.io.BufferedOutputStream",
         "java.io.IOException",
+        "java.io.OutputStream",
         "java.lang.Class",
         "java.lang.IllegalArgumentException",
         "java.lang.Long",
@@ -181,6 +203,7 @@
         "java.nio.file.AtomicMoveNotSupportedException",
         "java.nio.file.CopyOption",
         "java.nio.file.Files",
+        "java.nio.file.OpenOption",
         "java.nio.file.Path",
         "java.nio.file.StandardCopyOption",
         "java.nio.file.attribute.FileAttribute",
@@ -193,6 +216,7 @@
         "java.util.Objects",
         "java.util.Optional",
         "java.util.Set",
+        "java.util.function.LongConsumer",
         "java.util.function.Predicate",
         "java.util.stream.Stream"
       ],
@@ -207,6 +231,13 @@
         "io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy",
         "java.lang.NoSuchFieldError",
         "java.lang.Object"
+      ],
+      "io.github.gustavo2358.analysis.cfg.adapters.CfgJsonWriter$MeteredOutput": [
+        "io.github.gustavo2358.analysis.cfg.adapters.CfgJsonWriter",
+        "java.io.FilterOutputStream",
+        "java.io.IOException",
+        "java.io.OutputStream",
+        "java.util.function.LongConsumer"
       ],
       "io.github.gustavo2358.analysis.cfg.adapters.CfgJsonWriter$MoveOperation": [
         "io.github.gustavo2358.analysis.cfg.adapters.CfgJsonWriter",

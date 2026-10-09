@@ -2690,6 +2690,7 @@
         "io.github.gustavo2358.analysis.solver.AnalysisResources",
         "io.github.gustavo2358.analysis.solver.AnalysisResources$Exhausted",
         "io.github.gustavo2358.analysis.solver.AnalysisResources$Limits",
+        "io.github.gustavo2358.analysis.solver.AnalysisResources$Phase",
         "io.github.gustavo2358.analysis.values.StorageAnalysisMode",
         "java.io.IOException",
         "java.io.InputStream",
@@ -2721,6 +2722,7 @@
         "java.util.Collection",
         "java.util.List",
         "java.util.Optional",
+        "java.util.function.LongConsumer",
         "java.util.function.Predicate",
         "java.util.stream.Stream"
       ],
