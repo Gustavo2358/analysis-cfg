@@ -2,6 +2,8 @@ package io.github.gustavo2358.analysis.adapters;
 
 import io.github.gustavo2358.analysis.dependencies.DirectDependencyResult;
 import io.github.gustavo2358.analysis.dependencies.SnapshotDependencyCursorResult;
+import io.github.gustavo2358.analysis.dependencies.DependencyResult;
+import io.github.gustavo2358.analysis.structure.ProgramStore;
 import io.github.gustavo2358.analysis.solver.AnalysisResources;
 import java.io.*;
 import java.nio.file.*;
@@ -9,6 +11,9 @@ import java.util.Objects;
 
 /** Atomic bounded publication of one complete snapshot-native dependency result. */
 public final class SnapshotDependencyFileWriter {
+    public void write(DependencyResult result,ProgramStore.Structural source,Path destination,AnalysisResources resources)throws IOException {
+        Objects.requireNonNull(result);Objects.requireNonNull(source);write(destination,resources,stream->new DependencyJson().writeSnapshot(result,source,stream));
+    }
     public void write(SnapshotDependencyCursorResult result,Path destination,AnalysisResources resources)throws IOException {
         Objects.requireNonNull(result);write(destination,resources,stream->new SnapshotDependencyJson().write(result,stream));
     }

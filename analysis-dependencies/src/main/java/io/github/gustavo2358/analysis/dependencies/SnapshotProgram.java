@@ -24,12 +24,13 @@ import static io.github.gustavo2358.air.model.AirShape.*;
  * Consumers see program events and detached evidence rather than wire shapes;
  * the snapshot and its paged identity index remain owned by the caller.
  */
-public final class SnapshotProgram implements DependencyProgramStore, CfgProgram.AdmittedSnapshot {
+public final class SnapshotProgram implements DependencyProgramStore, CfgProgram.AdmittedSnapshot, ProgramStore.Structural {
 
     private final SnapshotValidator.CheckedSnapshot admission;
     private final AirSnapshot snapshot;
     private final SnapshotIdentityKeys keys;
     private final SnapshotOrderStorage orderStorage;
+    private final SnapshotOccurrenceReader occurrences;
     private final char[] orderLeft=new char[64],orderRight=new char[64];
     private CfgSource source;
     private SnapshotOrderStorage.Tape unitOrder;
@@ -43,6 +44,7 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
     }
     public SnapshotProgram(SnapshotValidator.CheckedSnapshot checked,SnapshotIdentityKeys.Storage identityStorage,SnapshotOrderStorage orderStorage) {
         admission=Objects.requireNonNull(checked);snapshot=checked.snapshot();var owned=Objects.requireNonNull(identityStorage);
+        occurrences=new SnapshotOccurrenceReader(snapshot,this::borrowedOpen);
         this.orderStorage=Objects.requireNonNull(orderStorage);
         if(checked.result().status()!=ValidationResult.Status.STRUCTURALLY_VALID){owned.close();this.orderStorage.close();throw new IllegalArgumentException("complete snapshot validation required");}
         try{keys=new SnapshotIdentityKeys(snapshot,owned);}
@@ -54,17 +56,17 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
     /** Retire an exported projection without closing the shared AIR/dependency owner. */
     public void releaseCfgProjection(ProjectionPolicy policy){open();var nodes=nodeStores.remove(Objects.requireNonNull(policy));if(nodes!=null)nodes.close();}
     public PublicationId publication(){open();return (PublicationId)id(snapshot.field(snapshot.root(),PUBLICATION,0));}
-    public Evidence.InventoryStatus coverage(){open();long coverage=snapshot.field(snapshot.root(),PUBLICATION,9);return Evidence.InventoryStatus.values()[(int)snapshot.scalar(snapshot.field(coverage,EVIDENCE_COVERAGE,0))];}
+    @Override public ProgramStore.CoverageView coverage(){borrowedOpen();return new StructuralCoverage(snapshot.field(snapshot.root(),PUBLICATION,9));}
     @Override public PublicationId publicationId(){return publication();}
-    @Override public Evidence.InventoryStatus inventory(){return coverage();}
+    @Override public Evidence.InventoryStatus inventory(){borrowedOpen();return inventory(snapshot.field(snapshot.root(),PUBLICATION,9));}
     @Override public CfgSource source(){open();if(source==null)source=cfgSource();return source;}
-    @Override public List<Capabilities.Capability> requiredCapabilities(){open();if(requiredCapabilities==null)requiredCapabilities=capabilities();return requiredCapabilities;}
+    @Override public List<Capabilities.Capability> requiredCapabilities(){open();if(requiredCapabilities==null)requiredCapabilities=requiredCapabilityValues();return requiredCapabilities;}
     @Override public Set<Capabilities.Capability> namePolicyExtensions(){open();if(namePolicyExtensions==null)namePolicyExtensions=namePolicyExtensionsFromSnapshot();return namePolicyExtensions;}
     public String textValue(long handle){open();return text(handle);}
     @Override public OperationId operationId(long handle){open();return (OperationId)id(handle);}
     @Override public OriginId originId(long handle){open();return (OriginId)id(handle);}
 
-    private List<Capabilities.Capability> capabilities() {
+    private List<Capabilities.Capability> requiredCapabilityValues() {
         long manifest=snapshot.field(snapshot.root(),PUBLICATION,2),required=snapshot.field(manifest,CAPABILITIES_MANIFEST,0);
         var result=new ArrayList<Capabilities.Capability>();
         try(var rows=snapshot.elements(required,CAPABILITIES_CAPABILITY)) {
@@ -108,11 +110,68 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
         },()->{open();snapshot.shape(root);});
         return new CfgSource(publication(),new SemanticVersion(integer(snapshot.field(version,SEMANTIC_VERSION,0)),
                 integer(snapshot.field(version,SEMANTIC_VERSION,1)),integer(snapshot.field(version,SEMANTIC_VERSION,2))),
-                coverage(),units,requiredCapabilities().stream().filter(CoreCfgProjection::supportsControlCapability).distinct().toList());
+                inventory(),units,requiredCapabilities().stream().filter(CoreCfgProjection::supportsControlCapability).distinct().toList());
     }
 
     private Evidence.InventoryStatus inventory(long coverage) {
         return Evidence.InventoryStatus.values()[(int)snapshot.scalar(snapshot.field(coverage,EVIDENCE_COVERAGE,0))];
+    }
+
+    private void borrowedOpen(){open();admission.snapshot();}
+    private long field(long handle,int ordinal){borrowedOpen();return snapshot.field(handle,snapshot.shape(handle),ordinal);}
+    private <T> T occurrence(long handle,Class<T> type){return occurrences.read(handle,type);}
+    private <T> List<T> borrowed(long list,AirShape type,Class<T> result){
+        borrowedOpen();return new ProgramStore.BorrowedList<>(Math.toIntExact(snapshot.size(list)),
+            ordinal->occurrence(snapshot.element(list,type,ordinal),result),this::borrowedOpen);
+    }
+    @Override public SemanticVersion airVersion(){return occurrence(field(snapshot.root(),1),SemanticVersion.class);}
+    @Override public Capabilities.Manifest capabilities(){return occurrence(field(snapshot.root(),2),Capabilities.Manifest.class);}
+    @Override public List<Memory.Storage> storage(){return borrowed(field(snapshot.root(),5),MEMORY_STORAGE,Memory.Storage.class);}
+    @Override public List<Interactions.Resource> resources(){return borrowed(field(snapshot.root(),6),INTERACTIONS_RESOURCE,Interactions.Resource.class);}
+    @Override public List<Evidence.Uncertainty> uncertainties(){return borrowed(field(snapshot.root(),10),EVIDENCE_UNCERTAINTY,Evidence.Uncertainty.class);}
+    @Override public List<Proofs.Premise> premises(){return borrowed(field(snapshot.root(),11),PROOFS_PREMISE,Proofs.Premise.class);}
+    @Override public List<ProgramStore.UnitView> units(){
+        long list=field(snapshot.root(),4);
+        return new ProgramStore.BorrowedList<>(Math.toIntExact(snapshot.size(list)),
+            ordinal->new StructuralUnit(snapshot.element(list,UNIT,ordinal)),this::borrowedOpen);
+    }
+    private final class StructuralUnit implements ProgramStore.UnitView {
+        private final long handle;
+        StructuralUnit(long handle){this.handle=handle;}
+        @Override public UnitId id(){return occurrence(field(handle,0),UnitId.class);}
+        @Override public Optional<UnitId> containingUnit(){return optional(field(handle,1),IDS_UNIT_ID,UnitId.class);}
+        @Override public List<Memory.ObjectDeclaration> objects(){return borrowed(field(handle,2),MEMORY_OBJECT_DECLARATION,Memory.ObjectDeclaration.class);}
+        @Override public List<ObjectId> visibleObjects(){return borrowed(field(handle,3),IDS_OBJECT_ID,ObjectId.class);}
+        @Override public List<Entries.Entry> entries(){return borrowed(field(handle,4),ENTRIES_ENTRY,Entries.Entry.class);}
+        @Override public List<ProgramStore.SequenceView> sequences(){
+            long list=field(handle,5);
+            return new ProgramStore.BorrowedList<>(Math.toIntExact(snapshot.size(list)),
+                ordinal->new StructuralSequence(snapshot.element(list,SEQUENCE,ordinal)),SnapshotProgram.this::borrowedOpen);
+        }
+        @Override public List<Entries.CompletionPort> completionPorts(){return borrowed(field(handle,6),ENTRIES_COMPLETION_PORT,Entries.CompletionPort.class);}
+        @Override public Unit.BodyAvailability body(){return occurrence(field(handle,7),Unit.BodyAvailability.class);}
+        @Override public Optional<UncertaintyId> bodyUnavailable(){return optional(field(handle,8),IDS_UNCERTAINTY_ID,UncertaintyId.class);}
+        @Override public ProgramStore.CoverageView coverage(){return new StructuralCoverage(field(handle,9));}
+        @Override public OriginId origin(){return occurrence(field(handle,10),OriginId.class);}
+    }
+    private final class StructuralSequence implements ProgramStore.SequenceView {
+        private final long handle;
+        StructuralSequence(long handle){this.handle=handle;}
+        @Override public LabelId label(){return occurrence(field(handle,0),LabelId.class);}
+        @Override public List<Instruction> instructions(){return borrowed(field(handle,1),INSTRUCTION,Instruction.class);}
+        @Override public Terminator terminator(){return occurrence(field(handle,2),Terminator.class);}
+        @Override public OriginId origin(){return occurrence(field(handle,3),OriginId.class);}
+    }
+    private final class StructuralCoverage implements ProgramStore.CoverageView {
+        private final long handle;
+        StructuralCoverage(long handle){this.handle=handle;}
+        @Override public Evidence.InventoryStatus inventory(){return occurrence(field(handle,0),Evidence.InventoryStatus.class);}
+        @Override public Scopes.FactScope scope(){return occurrence(field(handle,1),Scopes.FactScope.class);}
+        @Override public List<Evidence.CoverageItem> items(){return borrowed(field(handle,2),EVIDENCE_COVERAGE_ITEM,Evidence.CoverageItem.class);}
+        @Override public List<UncertaintyId> uncertainties(){return borrowed(field(handle,3),IDS_UNCERTAINTY_ID,UncertaintyId.class);}
+    }
+    private <T> Optional<T> optional(long list,AirShape type,Class<T> result){
+        borrowedOpen();return snapshot.size(list)==0?Optional.empty():Optional.of(occurrence(snapshot.element(list,type,0),result));
     }
 
     @Override public void units(Consumer<CfgProgram.UnitView> consumer) {
@@ -665,9 +724,7 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
         }
     }
 
-    public List<Origins.Artifact> artifacts() {
-        open();var result=new ArrayList<Origins.Artifact>();artifactHandles((handle,ignored)->result.add(materializeArtifact(handle)));return List.copyOf(result);
-    }
+    public List<Origins.Artifact> artifacts() {return borrowed(field(snapshot.root(),3),ORIGINS_ARTIFACT,Origins.Artifact.class);}
 
     @Override public void artifactHandles(MetadataHandleConsumer consumer) {
         open();Objects.requireNonNull(consumer);
@@ -682,9 +739,7 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
             snapshot.size(digest)==0?Optional.empty():Optional.of(text(snapshot.element(digest,TEXT,0))));
     }
 
-    public List<Origins.Origin> origins() {
-        open();var result=new ArrayList<Origins.Origin>();originHandles((handle,ignored)->result.add(materializeOrigin(handle)));return List.copyOf(result);
-    }
+    public List<Origins.Origin> origins() {return borrowed(field(snapshot.root(),8),ORIGINS_ORIGIN,Origins.Origin.class);}
 
     @Override public void originHandles(MetadataHandleConsumer consumer) {
         open();Objects.requireNonNull(consumer);

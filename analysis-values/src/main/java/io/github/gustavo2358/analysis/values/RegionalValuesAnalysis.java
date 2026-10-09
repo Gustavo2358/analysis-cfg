@@ -30,9 +30,9 @@ public final class RegionalValuesAnalysis {
     // Each compiled batch retains all writes, including scoped writes without logical candidates.
     private final Map<List<Plan>,List<StatementEffects.Write>> batchWrites=new IdentityHashMap<>();
     private final Map<StatementEffects.Write,Set<ObjectId>> closureImpacts=new IdentityHashMap<>();
-    private final Map<Operation,List<Plan>> operations=new IdentityHashMap<>();
-    private final Map<Operation,Map<Control.OutcomeKey,List<Plan>>> outcomes=new IdentityHashMap<>();
-    private final Map<Operation,List<Plan>> otherwise=new IdentityHashMap<>();
+    private final Map<OperationId,List<Plan>> operations=new HashMap<>();
+    private final Map<OperationId,Map<Control.OutcomeKey,List<Plan>>> outcomes=new HashMap<>();
+    private final Map<OperationId,List<Plan>> otherwise=new HashMap<>();
     private final Map<EntryId,List<Plan>> initial=new HashMap<>();
     private final List<ValueFact.Support> events=new ArrayList<>();
     private final List<PreparedEvent> eventDetails=new ArrayList<>();
@@ -93,11 +93,11 @@ public final class RegionalValuesAnalysis {
         // instead be canonical, including allocation/work metrics in the public wire.
         for(var base:bases)for(var segment:partition.intersecting(base))levels.put(segment,levels.size());
         for(var statement:effects.statements()) {
-            var op=statement.operation();operations.put(op,compile(statement.writes(),op.header().id(),op.header().origin(),List.of(),op,null,Optional.of(Control.NormalOutcome.INSTANCE)));
-            otherwise.put(op,compile(statement.otherwise(),op.header().id(),op.header().origin(),List.of(),op,null,Optional.empty()));
+            var op=statement.operation();operations.put(op.header().id(),compile(statement.writes(),op.header().id(),op.header().origin(),List.of(),op,null,Optional.of(Control.NormalOutcome.INSTANCE)));
+            otherwise.put(op.header().id(),compile(statement.otherwise(),op.header().id(),op.header().origin(),List.of(),op,null,Optional.empty()));
             var choices=new HashMap<Control.OutcomeKey,List<Plan>>();
             statement.outcomes().forEach((key,writes)->choices.put(key,compile(writes,op.header().id(),op.header().origin(),List.of(),op,null,Optional.of(key))));
-            outcomes.put(op,Map.copyOf(choices));
+            outcomes.put(op.header().id(),Map.copyOf(choices));
             if(op instanceof Operations.Invoke i&&i.outcomes().remainder() instanceof Scopes.WithinControl)
                 controlOpen.add(op.header().id().unit());
         }
@@ -533,7 +533,8 @@ public final class RegionalValuesAnalysis {
             return Set.of(unknown(target,"UNINTERPRETED_VALUE_EXPRESSION",plan.event));
         }
         State operation(State state,Operation operation) {
-            var plans=operations.get(operation);if(plans==null)throw new IllegalArgumentException("foreign operation");return apply(state,plans,false);
+            session.index().requireOperation(operation);
+            var plans=operations.get(operation.header().id());if(plans==null)throw new IllegalArgumentException("foreign operation");return apply(state,plans,false);
         }
         @Override public State transferBlock(AnalysisPoint point,State anchor,DomainWork work) {
             if(!(point.node().source() instanceof CfgNode.SequenceNode node))return anchor;
@@ -551,8 +552,8 @@ public final class RegionalValuesAnalysis {
                 return (possible&requested)==0?BOTTOM:state;
             }
             if(!(terminator instanceof Operations.Invoke invoke))return state;
-            if(edge.kind()==CfgTransition.Kind.INVOKE_NORMAL)return apply(state,outcomes.get(invoke).get(Control.NormalOutcome.INSTANCE),false);
-            state=apply(state,otherwise.get(invoke),true);for(var plans:outcomes.get(invoke).values())state=apply(state,plans,true);return state;
+            if(edge.kind()==CfgTransition.Kind.INVOKE_NORMAL)return apply(state,outcomes.get(invoke.header().id()).get(Control.NormalOutcome.INSTANCE),false);
+            state=apply(state,otherwise.get(invoke.header().id()),true);for(var plans:outcomes.get(invoke.header().id()).values())state=apply(state,plans,true);return state;
         }
         private Map<String,Long> metrics(){var result=new TreeMap<>(relations.metrics());result.put("maxLogicalCells",maxLogicalCells);result.put("maxLogicalValues",maxLogicalValues);result.put("physicalGroupsApplied",physicalGroupsApplied);result.put("physicalWritesApplied",physicalWritesApplied);result.put("logicalOnlyMode",mode.physical()?0L:1L);result.put("contentReads",contentReads);result.put("contentUpdates",contentUpdates);result.put("alternativeVisits",alternativeVisits);result.put("maxStateAlternatives",maxStateAlternatives);result.put("maxDecisionNodes",maxDecisionNodes);result.put("maxComponentCardinality",maxComponentCardinality);result.put("boundaryAlternatives",boundaryAlternatives);result.put("maxProvenanceRows",maxProvenanceRows);result.put("maxExpandedAlternatives",maxExpandedAlternatives);return Map.copyOf(result);}
     }
@@ -628,7 +629,7 @@ public final class RegionalValuesAnalysis {
                     var site=session.index().site(query.point().operation());return site!=null&&site.operation() instanceof Operations.Invoke invoke
                         &&query.point().outcome()==Control.NormalOutcome.INSTANCE&&invoke.outcomes().known().stream().anyMatch(Control.Normal.class::isInstance);
                 }
-                @Override public State transferOutcome(PointQuery<T> query,State before){return engine.apply(before,outcomes.get(session.index().site(query.point().operation()).operation()).get(query.point().outcome()),false);}
+                @Override public State transferOutcome(PointQuery<T> query,State before){return engine.apply(before,outcomes.get(query.point().operation()).get(query.point().outcome()),false);}
             });
         }
         private StorageValueFact fact(PointQuery<StorageSubject> query,State state) {

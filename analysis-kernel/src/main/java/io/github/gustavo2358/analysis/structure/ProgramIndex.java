@@ -26,10 +26,11 @@ public final class ProgramIndex {
     final Map<EntryId, Node> entryNodes, normalExits;
     private final ProgramStore.Structural store;
     private final Map<CfgNodeId, Node> nodeIds;
-    private final Map<UnitId, Unit> units;
+    private final Map<UnitId, ProgramStore.UnitView> units;
     private final Map<LabelId, Node> sequences;
     private final Map<OperationId, Site> operations;
     private final Map<Class<? extends Operation>, List<Site>> buckets;
+    private final Map<Class<? extends Operation>,Map<UnitId,List<Site>>> unitBuckets=new HashMap<>();
     private final Map<ObjectId, Memory.ObjectDeclaration> objects;
     private final Map<StorageId, Memory.Storage> storage;
     private final Map<ObjectId, Memory.Cell> directCells;
@@ -83,6 +84,14 @@ public final class ProgramIndex {
             return Collections.unmodifiableList(sites);
         });
         buckets = b.buckets;
+        // Partition the canonical site handles once, without retaining another
+        // operation payload. Entry-scoped admission must not reopen every Unit.
+        for(var bucket:buckets.entrySet()) {
+            var owners=new HashMap<UnitId,List<Site>>();
+            for(var site:bucket.getValue())owners.computeIfAbsent(site.owner().id(),ignored->new ArrayList<>()).add(site);
+            owners.replaceAll((unit,sites)->Collections.unmodifiableList(sites));
+            unitBuckets.put(bucket.getKey(),owners);
+        }
         metrics = b.count.snapshot();
     }
 
@@ -95,19 +104,31 @@ public final class ProgramIndex {
     /** Null means ID absent from this snapshot; IDs always include their owners. */
     public Node node(CfgNodeId id) { return nodeIds.get(id); }
     public Node sequence(LabelId id) { return sequences.get(id); }
-    public Unit unit(UnitId id) { return units.get(id); }
+    public ProgramStore.UnitView unit(UnitId id) { return units.get(id); }
     public Entries.Entry entry(EntryId id) { return entries.get(id); }
     public Site site(OperationId id) { return operations.get(id); }
+    /** Immutable source occurrence, not Java allocation identity; rejects changed same-ID payloads. */
+    public void requireOperation(Operation operation) {
+        Objects.requireNonNull(operation);
+        var site=operations.get(operation.header().id());
+        if(site==null||!site.operation().equals(operation))throw new IllegalArgumentException("operation outside indexed snapshot");
+    }
     public List<Site> sites(Class<? extends Operation> kind) { return buckets.getOrDefault(kind, List.of()); }
+    /** Same shared handles and AIR order, partitioned by the full nominal owner ID. */
+    public List<Site> sites(Class<? extends Operation> kind,UnitId owner) {
+        return unitBuckets.getOrDefault(kind,Map.of()).getOrDefault(owner,List.of());
+    }
     public Memory.ObjectDeclaration object(ObjectId id) { return objects.get(id); }
+    /** Already correlated declarations in AIR inventory order; no store access or payload copy. */
+    public Collection<Memory.ObjectDeclaration> objects() { return Collections.unmodifiableCollection(objects.values()); }
     public Memory.Storage storage(StorageId id) { return storage.get(id); }
     /** Direct whole Cell association only; null does not assert absence of indirect storage. */
     public Memory.Cell directCell(ObjectId id) { return directCells.get(id); }
     public Place place(OperandId occurrence){return places.get(occurrence);}
     /** Pre-resolved ObjectPlace occurrence, including nested operands and Entry initial conditions. */
     public Memory.ObjectDeclaration referencedObject(OperandId occurrence) { return objectReferences.get(occurrence); }
-    /** Resident bridge while analyses migrate to the shared program store. */
-    public Sequence sequence(Node node) {
+    /** Owner-checked body address; no resident AIR Sequence is required. */
+    public ProgramStore.SequenceView sequence(Node node) {
         if (node.identity != identity) throw new IllegalArgumentException("foreign node");
         return node.sequence;
     }
@@ -117,26 +138,26 @@ public final class ProgramIndex {
         final Object identity;
         final int ordinal;
         private final CfgNode source;
-        private final Unit owner;
-        private final Sequence sequence;
-        Node(Object identity, int ordinal, CfgNode source, Unit owner, Sequence sequence) {
+        private final ProgramStore.UnitView owner;
+        private final ProgramStore.SequenceView sequence;
+        Node(Object identity, int ordinal, CfgNode source, ProgramStore.UnitView owner, ProgramStore.SequenceView sequence) {
             this.identity = identity; this.ordinal = ordinal; this.source = source; this.owner = owner;
             this.sequence = sequence;
         }
         public CfgNode source() { return source; }
-        public Unit owner() { return owner; }
+        public ProgramStore.UnitView owner() { return owner; }
     }
 
     /** One retained site per operation, reused by ID lookup and kind buckets; no per-query wrappers. */
     public static final class Site {
-        private final Sequence sequence;
-        private final Unit owner;
+        private final ProgramStore.SequenceView sequence;
+        private final ProgramStore.UnitView owner;
         private final int offset;
-        Site(Sequence sequence, Unit owner, int offset) {
+        Site(ProgramStore.SequenceView sequence, ProgramStore.UnitView owner, int offset) {
             this.sequence = sequence; this.owner = owner; this.offset = offset;
         }
-        public Sequence sequence() { return sequence; }
-        public Unit owner() { return owner; }
+        public ProgramStore.SequenceView sequence() { return sequence; }
+        public ProgramStore.UnitView owner() { return owner; }
         public int offset() { return offset; }
         public boolean isTerminator() { return offset == sequence.instructions().size(); }
         public Operation operation() { return isTerminator() ? sequence.terminator() : sequence.instructions().get(offset); }

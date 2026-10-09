@@ -532,20 +532,55 @@ final class SnapshotDependencyAnalysisTest {
             long root=PagedAirStorageTest.copy(source,source.root(),null,builder);
             try(var checked=SnapshotValidator.check(builder.finish(root),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger))) {
                 assertEquals(ValidationResult.Status.STRUCTURALLY_VALID,checked.result().status(),checked.result().toString());
+                ProgramStore.UnitView expiredUnit;
+                ProgramStore.SequenceView expiredSequence;
                 try(var snapshotProgram=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),new PagedSnapshotOrderStorage(pages,ledger))) {
                     ProgramStore store=snapshotProgram;
                     assertEquals(publication.id(),store.publicationId());
                     assertEquals(Evidence.InventoryStatus.COMPLETE,store.inventory());
                     assertEquals(publication.artifacts(),store.artifacts());
                     assertEquals(publication.origins(),store.origins());
-                    assertFalse(store instanceof ProgramStore.Structural,
-                            "paged dependency store must not claim resident structural payload");
+                    assertInstanceOf(ProgramStore.Structural.class,store);
+                    var structural=(ProgramStore.Structural)store;
+                    var borrowedUnit=structural.units().getFirst();
+                    expiredUnit=borrowedUnit;
+                    assertFalse(Unit.class.isInstance(borrowedUnit),"body remains a borrowed view, not a resident Unit");
+                    var expectedUnit=publication.units().getFirst();
+                    assertEquals(expectedUnit.id(),borrowedUnit.id());
+                    assertEquals(expectedUnit.containingUnit(),borrowedUnit.containingUnit());
+                    assertEquals(expectedUnit.objects(),borrowedUnit.objects());
+                    assertEquals(expectedUnit.visibleObjects(),borrowedUnit.visibleObjects());
+                    assertEquals(expectedUnit.entries(),borrowedUnit.entries());
+                    assertEquals(expectedUnit.completionPorts(),borrowedUnit.completionPorts());
+                    assertEquals(expectedUnit.body(),borrowedUnit.body());
+                    assertEquals(expectedUnit.bodyUnavailable(),borrowedUnit.bodyUnavailable());
+                    assertEquals(expectedUnit.coverage().scope(),borrowedUnit.coverage().scope());
+                    assertEquals(expectedUnit.coverage().items(),borrowedUnit.coverage().items());
+                    assertEquals(expectedUnit.coverage().uncertainties(),borrowedUnit.coverage().uncertainties());
+                    assertEquals(expectedUnit.origin(),borrowedUnit.origin());
+                    assertEquals(publication.storage(),structural.storage());
+                    assertEquals(publication.resources(),structural.resources());
+                    assertEquals(publication.uncertainties(),structural.uncertainties());
+                    assertEquals(publication.premises(),structural.premises());
+                    assertEquals(publication.capabilities(),structural.capabilities());
+                    var borrowedSequence=borrowedUnit.sequences().getFirst();
+                    expiredSequence=borrowedSequence;
+                    assertFalse(Sequence.class.isInstance(borrowedSequence));
+                    assertEquals(expectedUnit.sequences().getFirst().label(),borrowedSequence.label());
+                    assertEquals(expectedUnit.sequences().getFirst().instructions(),borrowedSequence.instructions());
+                    assertEquals(expectedUnit.sequences().getFirst().terminator(),borrowedSequence.terminator());
+                    assertEquals(expectedUnit.sequences().getFirst().origin(),borrowedSequence.origin());
+                    var first=borrowedSequence.instructions().getFirst();
+                    var second=borrowedSequence.instructions().getFirst();
+                    assertNotSame(first,second);assertEquals(first,second);
                     assertEquals(CoreCfgProjection.project(publication),CoreCfgProjection.project(snapshotProgram));
                     var built=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).buildChecked(
                             snapshotProgram,checked,BuildOptions.defaults());
                     assertEquals(CfgBuildResult.Status.CFG_BUILT,built.status());
                     assertEquals(CoreCfgProjection.project(publication),built.graph().orElseThrow());
                 }
+                assertThrows(IllegalStateException.class,()->expiredSequence.instructions().getFirst());
+                assertThrows(IllegalStateException.class,expiredUnit::entries);
                 var result=new SnapshotDependencyAnalysis().analyze(
                         new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),new PagedSnapshotOrderStorage(pages,ledger)),
                         new PagedSnapshotDependencyStorage(pages,ledger));
@@ -743,6 +778,57 @@ final class SnapshotDependencyAnalysisTest {
 
     private static Publication directCall() {
         return directCalls(1);
+    }
+
+    @Test void nativeGeneralPlannerPreservesAllUnitsColdOperationsAndCorrelatedCallFacts() throws Exception {
+        for(int count:new int[]{1,4,16,64,256}) {
+            var base=directCalls(count);var ledger=resources();
+            // Written evidence is supported by the pinned wire; IDs/expected facts stay exact.
+            var artifact=new ArtifactId(base.id(),"source");
+            var publication=new Publication(base.id(),base.airVersion(),base.capabilities(),
+                List.of(new Origins.Artifact(artifact,"native-general.synthetic",Optional.empty())),base.units(),base.storage(),
+                base.resources(),base.artifactRelations(),List.of(new Origins.Written(ResultFixtures.origin(base.id()),artifact,Optional.empty(),List.of(),true)),
+                base.coverage(),base.uncertainties(),base.premises());
+            var input=directory.resolve("general-"+count+".air.json");Files.write(input,new AirJson().encode(publication));
+            try(var read=new DataflowAirReader().readSnapshot(input,ledger);
+                var program=new SnapshotProgram(read.checked(),read.newIdentityStorage(),read.newOrderStorage())) {
+                var cfg=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).buildChecked(program,read.checked(),BuildOptions.defaults());
+                var result=new io.github.gustavo2358.analysis.dependencies.DependencyAnalysis().prepare(program,cfg);
+                assertEquals(count,result.sites().size());assertEquals(count,result.edges().size());
+                for(var site:result.sites()) {
+                    assertEquals(io.github.gustavo2358.analysis.dependencies.DependencySiteFact.Reachability.REACHABLE,site.reachability());
+                    assertEquals(List.of("PROGA"),site.candidates().stream().map(io.github.gustavo2358.analysis.dependencies.DependencySiteFact.Candidate::referenceName).toList());
+                    assertEquals("PROGA   ",site.candidates().getFirst().rawValue());
+                    var support=site.candidates().getFirst().supports().getFirst();
+                    assertEquals(new OperationId(site.caller(),"seed"),support.producer());
+                    assertEquals(ResultFixtures.origin(publication.id()),support.origin());
+                }
+                assertEquals(3L*count,result.metrics().get("indexedOperations"));
+                assertEquals((long)count,result.metrics().get("entryCallCandidatesVisited"),"one Entry per Unit must not revisit other Units' CALL sites");
+                System.out.println("NATIVE_GENERAL_GEOMETRY units="+count+" work="+ledger.workUsed()+" sites="+result.sites().size());
+            }
+            assertEquals(0,ledger.heapUsed());
+        }
+        var publication=correlatedCall();var ledger=resources();
+        var input=directory.resolve("general-correlated.air.json");Files.write(input,new AirJson().encode(publication));
+        try(var read=new DataflowAirReader().readSnapshot(input,ledger);
+            var program=new SnapshotProgram(read.checked(),read.newIdentityStorage(),read.newOrderStorage())) {
+            var cfg=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).buildChecked(program,read.checked(),BuildOptions.defaults());
+            var result=new io.github.gustavo2358.analysis.dependencies.DependencyAnalysis().prepare(program,cfg);
+            var site=result.sites().getFirst();
+            assertEquals(List.of("AX","BY"),site.candidates().stream().map(io.github.gustavo2358.analysis.dependencies.DependencySiteFact.Candidate::referenceName).toList());
+            assertEquals(List.of(List.of("fit-concat","seed-A","seed-X"),List.of("fit-concat","seed-B","seed-Y")),site.candidates().stream()
+                .map(candidate->candidate.supports().stream().map(support->support.producer().localId()).sorted().toList()).toList());
+            assertFalse(site.candidates().stream().anyMatch(candidate->List.of("AY","BX").contains(candidate.referenceName())));
+            var nativeOutput=new ByteArrayOutputStream();new DependencyJson().writeSnapshot(result,program,nativeOutput);
+            var referenceOutput=new ByteArrayOutputStream();new DependencyJson().write(new io.github.gustavo2358.analysis.dependencies.DependencyAnalysis().prepare(publication),referenceOutput);
+            var mapper=new com.fasterxml.jackson.databind.ObjectMapper();
+            var actual=mapper.readTree(nativeOutput.toByteArray());var reference=mapper.readTree(referenceOutput.toByteArray());
+            for(var expectedSite:reference.get("sites"))((com.fasterxml.jackson.databind.node.ObjectNode)expectedSite).put("coverage","MODELED");
+            for(var field:List.of("sites","edges","origins","artifacts","sourceUncertaintyRefs","fileDependencies","sourceDependencies"))
+                assertEquals(reference.get(field),actual.get(field),field);
+        }
+        assertEquals(0,ledger.heapUsed());
     }
 
     private static Publication directCallWithNops(int count) {

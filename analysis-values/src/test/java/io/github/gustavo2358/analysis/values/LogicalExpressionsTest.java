@@ -116,6 +116,35 @@ class LogicalExpressionsTest {
   assertEquals(Map.of("AX",Set.of("seed-A","seed-X","fit-concat"),"BY",Set.of("seed-B","seed-Y","fit-concat")),supports);
   assertFalse(observed.candidates().stream().map(Values.TextValue::value).anyMatch(Set.of("AY","BX")::contains));
  }
+ @Test void unknownIndependentBooleanInitialStateDoesNotDiscardCorrelatedTextDemand(){
+  var p=graph(new String[]{null,null,null,null},new int[][]{{1,2},{3},{3},{}},4,true,true);
+  var u=p.units().getFirst();var x=u.objects().get(0).id();var y=u.objects().get(1).id();var z=u.objects().get(2).id();var condition=u.objects().get(3);
+  var bool=Types.known(Types.Builtin.BOOL);var objects=new ArrayList<>(u.objects());
+  objects.set(3,new Memory.ObjectDeclaration(condition.id(),condition.displayName(),bool,condition.storage(),condition.visibility(),condition.origin(),condition.coverage(),condition.precision()));
+  var storage=new ArrayList<>(p.storage());var cell=(Memory.Cell)storage.get(3);storage.set(3,new Memory.Cell(cell.header(),bool));
+  var sequences=new ArrayList<>(u.sequences());var choose=(Operations.Branch)sequences.getFirst().terminator();
+  var predicate=new Expressions.Read(operand(choose.header().id(),"condition",Operand.Role.PREDICATE),new Places.ObjectPlace(operand(choose.header().id(),"condition-place",Operand.Role.VALUE_READ),condition.id()));
+  sequences.set(0,new Sequence(sequences.getFirst().label(),List.of(),new Operations.Branch(choose.header(),predicate,choose.trueDestination(),choose.falseDestination()),choose.header().origin()));
+  for(int i=1;i<=2;i++){var s=sequences.get(i);sequences.set(i,new Sequence(s.label(),List.of(assign(u.id(),i==1?"seed-A":"seed-B",x,i==1?"A":"B"),assign(u.id(),i==1?"seed-X":"seed-Y",y,i==1?"X":"Y")),s.terminator(),s.origin()));}
+  var expression=new E(u.id(),"fit-concat");var join=sequences.get(3);sequences.set(3,new Sequence(join.label(),List.of(expression.set(z,expression.concat(expression.read(x),expression.read(y)),2)),join.terminator(),join.origin()));
+  var entry=u.entries().getFirst();var place=new Places.ObjectPlace(new Operand.Header(new OperandId(new EntryOwner(entry.id()),"condition"),Operand.Role.VALUE_WRITE,entry.origin()),condition.id());
+  var reason=new UncertaintyId(p.id(),"external-condition");
+  var uncertainties=List.of(new Evidence.Uncertainty(reason,"VALUE_UNKNOWN",List.of(Evidence.Dimension.VALUES),new Scopes.UnitScope(u.id()),"external boolean",entry.origin()));
+  entry=new Entries.Entry(entry.id(),entry.initialLabel(),entry.signature(),new Entries.EntryState(List.of(new Entries.InitialCondition(place,new Entries.ExternalUnknown(reason),entry.origin(),List.of())),List.of(reason)),entry.origin());
+  var q=new Publication(p.id(),p.airVersion(),p.capabilities(),p.artifacts(),List.of(unit(u.id(),List.of(entry),sequences,objects)),storage,p.resources(),p.artifactRelations(),p.origins(),p.coverage(),uncertainties,p.premises());
+  var admission=PossibleValuesAnalysis.prepare(partialSession(q),PossibleValuesAnalysis.EFFECTS_PROFILE,Set.of(z));
+  assertEquals(PossibleValuesAnalysis.Status.ACCEPTED,admission.status(),admission.reason());
+  var observed=fact(admission.analysis().orElseThrow().execute(),before(q,3,2));expected(observed,false,"AX","BY");
+  assertTrue(observed.sourceUnknownRemainder());
+  for(var candidate:observed.candidateSupports())assertEquals(candidate.candidate().value().equals("AX")?Set.of("seed-A","seed-X","fit-concat"):Set.of("seed-B","seed-Y","fit-concat"),candidate.producers().stream().map(producer->producer.evidence().localId()).collect(java.util.stream.Collectors.toSet()));
+  // A known Boolean is not evaluated by this text profile: it must not silently
+  // become an unconstrained predicate under the new independent-unknown rule.
+  var literal=new Expressions.Literal(new Operand.Header(new OperandId(new EntryOwner(entry.id()),"known-condition-value"),Operand.Role.VALUE_READ,entry.origin()),new Values.BoolValue(false));
+  var knownEntry=new Entries.Entry(entry.id(),entry.initialLabel(),entry.signature(),new Entries.EntryState(List.of(new Entries.InitialCondition(place,new Entries.LiteralInitial(literal),entry.origin(),List.of())),List.of()),entry.origin());
+  var known=replace(q,List.of(unit(u.id(),List.of(knownEntry),sequences,objects)),q.coverage(),q.uncertainties(),q.premises());
+  var refused=PossibleValuesAnalysis.prepare(partialSession(known),PossibleValuesAnalysis.EFFECTS_PROFILE,Set.of(z));
+  assertEquals(PossibleValuesAnalysis.Status.UNSUPPORTED,refused.status());assertEquals("UNSUPPORTED_INITIAL_STORAGE",refused.reason());
+ }
  @Test void openBranchRetainsKnownCorrelatedImageWithoutInventingPairs(){
   var p=graph(new String[]{null,null,null,null},new int[][]{{2,1},{3},{3},{}},3,true,true);
   var u=p.units().getFirst();var x=u.objects().get(0).id();var y=u.objects().get(1).id();var z=u.objects().get(2).id();

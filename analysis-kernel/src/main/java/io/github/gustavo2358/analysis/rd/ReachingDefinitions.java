@@ -16,9 +16,9 @@ public final class ReachingDefinitions {
     private final StatementEffects effects;
     private final StoragePartition partition;
     private final AnalysisSession session;
-    private final Map<Operation,List<Plan>> operations=new IdentityHashMap<>();
-    private final Map<Operation,Map<Control.OutcomeKey,List<Plan>>> outcomes=new IdentityHashMap<>();
-    private final Map<Operation,List<Plan>> otherwise=new IdentityHashMap<>();
+    private final Map<OperationId,List<Plan>> operations=new HashMap<>();
+    private final Map<OperationId,Map<Control.OutcomeKey,List<Plan>>> outcomes=new HashMap<>();
+    private final Map<OperationId,List<Plan>> otherwise=new HashMap<>();
     private final Map<EntryId,List<Initial>> initial=new HashMap<>();
     private final Map<EntryId,List<LogicalInitial>> logicalInitial=new HashMap<>();
     private record LogicalInitial(int slot,Entries.InitialCondition condition,ObjectId object,StorageIndex.Resolution resolution) { }
@@ -44,11 +44,11 @@ public final class ReachingDefinitions {
         }
         for(var statement:effects.statements()) {
             var op=statement.operation();var normal=Optional.<Control.OutcomeKey>of(Control.NormalOutcome.INSTANCE);
-            operations.put(op,compile(op,statement.writes(),normal));
-            otherwise.put(op,compile(op,statement.otherwise(),Optional.empty()));
+            operations.put(op.header().id(),compile(op,statement.writes(),normal));
+            otherwise.put(op.header().id(),compile(op,statement.otherwise(),Optional.empty()));
             var choices=new HashMap<Control.OutcomeKey,List<Plan>>();
             statement.outcomes().forEach((key,writes)->choices.put(key,compile(op,writes,Optional.of(key))));
-            outcomes.put(op,Map.copyOf(choices));
+            outcomes.put(op.header().id(),Map.copyOf(choices));
         }
         for(var context:session.contexts()) {
             var seeds=new ArrayList<Initial>();var logicalSeeds=new ArrayList<LogicalInitial>();int slot=0;
@@ -174,7 +174,8 @@ public final class ReachingDefinitions {
             return root==state.bindings&&logical.equals(state.logical)?state:new State(state.entry,root,logical);
         }
         private State operation(State state,Operation operation) {
-            var plans=owner.operations.get(operation);
+            owner.session.index().requireOperation(operation);
+            var plans=owner.operations.get(operation.header().id());
             if(plans==null)throw new IllegalArgumentException("foreign operation snapshot");
             return apply(state,plans,false);
         }
@@ -188,10 +189,10 @@ public final class ReachingDefinitions {
             if(!(point.node().source() instanceof CfgNode.SequenceNode))return state;
             var terminator=owner.session.index().sequence(point.node()).terminator();
             if(!(terminator instanceof Operations.Invoke invoke))return state;
-            if(edge.kind()==CfgTransition.Kind.INVOKE_NORMAL)return apply(state,owner.outcomes.get(invoke).get(Control.NormalOutcome.INSTANCE),false);
+            if(edge.kind()==CfgTransition.Kind.INVOKE_NORMAL)return apply(state,owner.outcomes.get(invoke.header().id()).get(Control.NormalOutcome.INSTANCE),false);
             // Open control does not identify the completed outcome. Preserve every possible old definition.
-            state=apply(state,owner.otherwise.get(invoke),true);
-            for(var plans:owner.outcomes.get(invoke).values())state=apply(state,plans,true);return state;
+            state=apply(state,owner.otherwise.get(invoke.header().id()),true);
+            for(var plans:owner.outcomes.get(invoke.header().id()).values())state=apply(state,plans,true);return state;
         }
     }
     public static final class Execution {
@@ -226,7 +227,7 @@ public final class ReachingDefinitions {
                 }
                 @Override public State transferOutcome(PointQuery<T> query,State before) {
                     var operation=owner.session.index().site(query.point().operation()).operation();
-                    return engine.apply(before,owner.outcomes.get(operation).get(query.point().outcome()),false);
+                    return engine.apply(before,owner.outcomes.get(operation.header().id()).get(query.point().outcome()),false);
                 }
             });
         }

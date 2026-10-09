@@ -83,7 +83,7 @@ public final class ReachabilityProvider implements AnalysisProvider<LabelId,Reac
             }
         };
     }
-    private static boolean open(Evidence.Coverage c){return c.inventory()!=Evidence.InventoryStatus.COMPLETE||!c.uncertainties().isEmpty();}
+    private static boolean open(ProgramStore.CoverageView c){return c.inventory()!=Evidence.InventoryStatus.COMPLETE||!c.uncertainties().isEmpty();}
     private static boolean open(Evidence.Claim c){return c.status()!=Evidence.PrecisionStatus.EXACT&&c.status()!=Evidence.PrecisionStatus.NOT_APPLICABLE;}
     private static boolean open(Operations.Header h){return h.coverage()!=Evidence.CoverageStatus.MODELED||open(h.precision().control())||open(h.precision().effects())||open(h.precision().storage())||open(h.precision().values());}
 }

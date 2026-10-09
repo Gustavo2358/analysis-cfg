@@ -3,13 +3,16 @@ package io.github.gustavo2358.analysis.launcher;
 import io.github.gustavo2358.air.json.AirJsonException;
 import io.github.gustavo2358.air.validation.ValidationResult;
 import io.github.gustavo2358.analysis.adapters.*;
-import io.github.gustavo2358.analysis.dependencies.SnapshotDependencyAnalysis;
+import io.github.gustavo2358.analysis.dependencies.SnapshotProgram;
+import io.github.gustavo2358.analysis.dependencies.DependencyAnalysis;
+import io.github.gustavo2358.analysis.cfg.application.*;
+import io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry;
 import io.github.gustavo2358.analysis.solver.AnalysisResources;
 import java.io.*;
 import java.nio.file.*;
 import java.time.Duration;
 
-/** AIR JSON -> typed/validated snapshot -> direct dependency result. */
+/** AIR JSON -> typed/validated snapshot -> shared general dependency analysis/result. */
 public final class AnalysisDependencies {
     private AnalysisDependencies(){ }
     public static void main(String[] args){System.exit(run(args,System.err));}
@@ -21,11 +24,14 @@ public final class AnalysisDependencies {
         try(var read=reader.readSnapshot(input,resources)) {
             var validation=read.checked().result();
             if(validation.status()!=ValidationResult.Status.STRUCTURALLY_VALID){err.println("INPUT_VALIDATION: "+validation.status());return validation.status()==ValidationResult.Status.INVALID_IR?3:7;}
-            try(var result=new SnapshotDependencyAnalysis().open(read.checked(),read.newIdentityStorage(),read.newDependencyStorage())) {
-                try{new SnapshotDependencyFileWriter().write(result,output,resources);}catch(IOException|IllegalArgumentException failure){err.println("OUTPUT_FAILURE: "+failure.getMessage());return 6;}
+            try(var program=new SnapshotProgram(read.checked(),read.newIdentityStorage(),read.newOrderStorage())) {
+                var cfg=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).buildChecked(program,read.checked(),BuildOptions.defaults());
+                var result=new DependencyAnalysis().prepare(program,cfg);
+                try{new SnapshotDependencyFileWriter().write(result,program,output,resources);}catch(IOException|IllegalArgumentException failure){err.println("OUTPUT_FAILURE: "+failure.getMessage());return 6;}
             }
             return 0;
         }catch(AnalysisResources.Exhausted failure){err.println((failure.resource()==AnalysisResources.Resource.TIME?"ANALYSIS_TIME_LIMIT: ":"ANALYSIS_RESOURCE_LIMIT: ")+failure.getMessage());return 7;}
+        catch(DependencyAnalysis.Failure failure){err.println(failure.getMessage());return switch(failure.kind()){case INVALID_INPUT->3;case INPUT_INCOMPLETE,RESOURCE_LIMIT->7;case CFG_UNSUPPORTED->4;case ANALYSIS_UNSUPPORTED->5;case CONSUMER_FAILURE->8;};}
         catch(AirJsonException failure){err.println("INPUT_CODEC: "+failure.code());return failure.code()==AirJsonException.Code.RESOURCE_LIMIT?7:3;}
         catch(IOException|IllegalArgumentException failure){err.println("DEPENDENCY_INPUT_INVALID: "+failure.getMessage());return 3;}
         catch(RuntimeException failure){err.println("ANALYSIS_EXECUTION_FAILED: "+failure.getClass().getSimpleName());return 5;}

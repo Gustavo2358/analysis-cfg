@@ -23,27 +23,42 @@ class StructureTest {
     @Test void offsetsBucketsAndPayloadAreCanonical() {
         var p=linear(1,3,2,1); var u=p.units().getFirst(); var q=u.sequences().getFirst();
         var s=session(p); var idx=s.index();
-        assertEquals(p.id(),idx.store().publicationId()); assertSame(u,idx.unit(u.id()));
+        assertEquals(p.id(),idx.store().publicationId()); assertSame(u,((ProgramStore.ResidentUnit)idx.unit(u.id())).source());
         assertEquals(p.airVersion(),idx.store().airVersion());
-        assertSame(p.coverage(),idx.store().coverage());
+        assertSame(p.coverage(),((ProgramStore.ResidentCoverage)idx.store().coverage()).source());
         assertFalse(Arrays.stream(ProgramStore.class.getMethods())
                 .anyMatch(method -> method.getReturnType().equals(Publication.class)),
                 "shared store must not expose the resident Publication aggregate");
-        var node=idx.sequence(q.label()); assertSame(q,idx.sequence(node));
+        var node=idx.sequence(q.label()); assertSame(q,((ProgramStore.ResidentSequence)idx.sequence(node)).source());
         for(int offset=0;offset<4;offset++) {
             Operation op=offset==3?q.terminator():q.instructions().get(offset);
             var site=idx.site(op.header().id());
             assertSame(site,idx.site(op.header().id())); assertSame(op,site.operation());
-            assertSame(q,site.sequence()); assertSame(u,site.owner());
+            assertSame(idx.sequence(node),site.sequence()); assertSame(idx.unit(u.id()),site.owner());
             assertEquals(offset,site.offset()); assertEquals(offset==3,site.isTerminator());
         }
         assertEquals(3,idx.sites(Operations.Assign.class).size());
+        assertEquals(idx.sites(Operations.Assign.class),idx.sites(Operations.Assign.class,u.id()));
+        for(var site:idx.sites(Operations.Assign.class,u.id()))assertSame(site,idx.site(site.operation().header().id()));
+        assertTrue(idx.sites(Operations.Assign.class,new UnitId(p.id(),"absent-owner")).isEmpty());
+        assertThrows(UnsupportedOperationException.class,()->idx.sites(Operations.Assign.class,u.id()).clear());
+        assertEquals(u.objects(),List.copyOf(idx.objects()));
+        assertThrows(UnsupportedOperationException.class,()->idx.objects().clear());
         assertEquals(1,idx.sites(Operations.Return.class).size());
         assertTrue(idx.sites(Operations.Halt.class).isEmpty());
         assertThrows(UnsupportedOperationException.class,()->idx.sites(Operations.Assign.class).clear());
         for(var object:u.objects()) { assertSame(object,idx.object(object.id())); assertSame(p.storage().getFirst(),idx.directCell(object.id())); }
         var place=(Places.ObjectPlace)((Operations.Assign)q.instructions().getFirst()).destination();
         assertSame(u.objects().getFirst(),idx.referencedObject(place.header().id()));
+        var original=(Operations.Assign)q.instructions().getFirst();
+        var rehydrated=new Operations.Assign(original.header(),original.destination(),original.value());
+        assertNotSame(original,rehydrated);assertEquals(original,rehydrated);
+        assertDoesNotThrow(()->idx.requireOperation(rehydrated));
+        var literal=(Expressions.Literal)original.value();
+        var forged=new Operations.Assign(original.header(),original.destination(),
+            new Expressions.Literal(literal.header(),new Values.TextValue("MUTATED")));
+        assertThrows(IllegalArgumentException.class,()->idx.requireOperation(forged),
+            "same full AIR ID does not authorize a different immutable payload");
     }
     @Test void multipleEntriesKeepEntryReturnAndContextSeparate() {
         var p=linear(2,0,0,2); var u=p.units().getFirst(); var s=session(p); var idx=s.index();

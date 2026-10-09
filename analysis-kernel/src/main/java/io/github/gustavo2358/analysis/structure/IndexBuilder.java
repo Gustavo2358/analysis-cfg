@@ -12,8 +12,8 @@ final class IndexBuilder {
     final Object identity = new Object();
     final ProgramStore.Structural store;
     final IndexMetrics.Counter count = new IndexMetrics.Counter();
-    final Map<UnitId, Unit> units = new HashMap<>();
-    final Map<LabelId, Sequence> sequences = new HashMap<>();
+    final Map<UnitId, ProgramStore.UnitView> units = new HashMap<>();
+    final Map<LabelId, ProgramStore.SequenceView> sequences = new HashMap<>();
     final Map<EntryId, Entries.Entry> entries = new HashMap<>();
     final Map<EntryId, Integer> entryOrdinals = new HashMap<>();
     final Map<CfgNodeId, ProgramIndex.Node> nodeIds = new HashMap<>();
@@ -26,7 +26,7 @@ final class IndexBuilder {
     private long expectedOutside;
     final Map<OperationId, ProgramIndex.Site> operations = new HashMap<>();
     final Map<Class<? extends Operation>, List<ProgramIndex.Site>> buckets = new HashMap<>();
-    final Map<ObjectId, Memory.ObjectDeclaration> objects = new HashMap<>();
+    final Map<ObjectId, Memory.ObjectDeclaration> objects = new LinkedHashMap<>();
     final Map<StorageId, Memory.Storage> storage = new HashMap<>();
     final Map<ObjectId, Memory.Cell> directCells = new HashMap<>();
     final Map<OperandId, Place> places = new HashMap<>();
@@ -87,7 +87,7 @@ final class IndexBuilder {
     }
 
     private void declarations() {
-        for (Unit unit : store.units()) {
+        for (var unit : store.units()) {
             count.visit("units.declarations");
             valid(unit.id().publication().equals(store.publicationId()), "foreign Unit owner");
             unique(units, unit.id(), unit, "duplicate Unit");
@@ -109,7 +109,7 @@ final class IndexBuilder {
             unique(storage, item.header().id(), item, "duplicate Storage");
             if (item instanceof Memory.Cell) count.locations = Math.incrementExact(count.locations);
         }
-        for (Unit unit : store.units()) {
+        for (var unit : store.units()) {
             count.visit("units.references");
             if (unit.containingUnit().isPresent()) {
                 count.reference("unit.containing");
@@ -133,10 +133,11 @@ final class IndexBuilder {
     }
 
     private void payload() {
-        for (Unit unit : store.units()) {
+        for (var declared : store.units()) {
+            var unit=units.get(declared.id());
             count.visit("units.payload");
             long arity = 0;
-            for (Sequence sequence : unit.sequences()) {
+            for (var sequence : unit.sequences()) {
                 count.visit("sequences");
                 valid(sequence.label().unit().equals(unit.id()), "foreign Sequence owner");
                 unique(sequences, sequence.label(), sequence, "duplicate Sequence label");
@@ -188,7 +189,7 @@ final class IndexBuilder {
         }
     }
 
-    private void operation(Sequence sequence, Unit owner, int offset, Operation operation) {
+    private void operation(ProgramStore.SequenceView sequence, ProgramStore.UnitView owner, int offset, Operation operation) {
         count.visit("operations");
         valid(operation.header().id().unit().equals(owner.id()), "foreign Operation owner");
         var site = new ProgramIndex.Site(sequence, owner, offset);
@@ -234,7 +235,7 @@ final class IndexBuilder {
                 case CfgNode.HaltExit n -> n.operation().unit();
                 case CfgNode.OutcomeExit n -> n.operation().unit();
             };
-            Unit unit = units.get(owner);
+            var unit = units.get(owner);
             valid(unit != null, "foreign CFG node Unit");
             var node = new ProgramIndex.Node(identity, ordinal, source, unit,
                     source instanceof CfgNode.SequenceNode sequence ? sequences.get(sequence.label()) : null);

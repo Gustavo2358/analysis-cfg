@@ -50,6 +50,11 @@ final class SharedTopologyTest {
         }
         var p=publication(id,units,List.of());var built=build(p);var selected=new ArrayList<Entries.Entry>();for(var u:units)selected.addAll(u.entries());
         var session=AnalysisSession.open(built,p,ProjectionPolicy.KNOWN_SUBSET,selected).session().orElseThrow();
+        assertEquals(4,session.index().sites(Operations.Return.class).size());
+        for(var u:units) {
+            var owned=session.index().sites(Operations.Return.class,u.id());assertEquals(2,owned.size());
+            for(var site:owned) {assertEquals(u.id(),site.owner().id());assertSame(site,session.index().site(site.operation().header().id()));}
+        }
         for(var context:session.contexts())for(var node:session.index().nodes) {
             var outgoing=read(context,node,true);var incoming=read(context,node,false);
             if(!node.owner().id().equals(context.entry().id().unit())){assertTrue(outgoing.isEmpty());assertTrue(incoming.isEmpty());continue;}

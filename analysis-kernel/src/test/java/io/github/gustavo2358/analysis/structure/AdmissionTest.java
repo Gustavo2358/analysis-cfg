@@ -23,10 +23,11 @@ class AdmissionTest {
             @Override public Capabilities.Manifest capabilities(){return resident.capabilities();}
             @Override public Set<Capabilities.Capability> namePolicyExtensions(){return resident.namePolicyExtensions();}
             @Override public List<Origins.Artifact> artifacts(){return resident.artifacts();}
-            @Override public List<Unit> units(){return resident.units();}
+            @Override public List<ProgramStore.UnitView> units(){return resident.units();}
             @Override public List<Memory.Storage> storage(){return resident.storage();}
+            @Override public List<Interactions.Resource> resources(){return resident.resources();}
             @Override public List<Origins.Origin> origins(){return resident.origins();}
-            @Override public Evidence.Coverage coverage(){return resident.coverage();}
+            @Override public ProgramStore.CoverageView coverage(){return resident.coverage();}
             @Override public List<Evidence.Uncertainty> uncertainties(){return resident.uncertainties();}
             @Override public List<Proofs.Premise> premises(){return resident.premises();}
         };

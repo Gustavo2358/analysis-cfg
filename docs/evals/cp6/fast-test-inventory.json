@@ -472,6 +472,7 @@
       "validTypedSnapshotHasIdenticalManagedAdmissionPrefixAcrossBackends"
     ],
     "io.github.gustavo2358.analysis.adapters.SnapshotDependencyAnalysisTest": [
+      "nativeGeneralPlannerPreservesAllUnitsColdOperationsAndCorrelatedCallFacts",
       "pagedUnitRoutingIsColdExactAndOwnedByTheProjection",
       "deniedUnitRoutingConstructionAbortsAndReleasesNativeDescriptors",
       "sharedLabelEntriesKeepEveryDependencyContextAndColdReturnBinding",
@@ -1124,6 +1125,7 @@
       "diamondsMissingPathsStrongUpdatesAndOtherCells",
       "sameCellAliasesAndIndependentBasesAreSemanticAdmission",
       "directReadIsCopyWhileOtherEffectsAndIndirectStorageRemainUnsupported",
+      "scalarDemandReusesAlreadyIndexedDeclarationsWithoutReopeningTheStore",
       "entrySeedsContextsUnreachableAndUnicodeKeepTheirIdentity"
     ],
     "io.github.gustavo2358.analysis.values.MoveCopyTest": [
@@ -1330,6 +1332,7 @@
       "partialRootSnapshotAndDemand",
       "branchAlternativesStayWholeThroughRepeatedRootReads",
       "admittedConcatPreservesWholeBranchStoresAndCandidateSupports",
+      "unknownIndependentBooleanInitialStateDoesNotDiscardCorrelatedTextDemand",
       "openBranchRetainsKnownCorrelatedImageWithoutInventingPairs",
       "finiteFanInStaysDiagonalThroughExpressionAndCopyWithoutCartesianProjection"
     ],

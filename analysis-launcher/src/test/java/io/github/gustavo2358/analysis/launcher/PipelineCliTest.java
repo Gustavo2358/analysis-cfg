@@ -43,6 +43,36 @@ final class PipelineCliTest {
         assertTrue(json.contains("\"rawValue\":\"PROGA   \""));
         assertTrue(json.contains("\"kind\":\"VALUE_PRODUCER\""));
         assertTrue(json.contains("\"analysisStatus\":\"PARTIAL\""));
+        var mapper=new com.fasterxml.jackson.databind.ObjectMapper();
+        var residentOutput=new ByteArrayOutputStream();
+        new DependencyJson().write(new DependencyAnalysis().prepare(reference.publication()),residentOutput);
+        var resident=mapper.readTree(residentOutput.toByteArray());var nativeResult=mapper.readTree(json);
+        for(var expectedSite:resident.get("sites")) {
+            var operation=expectedSite.get("operation").get("localId").asText();
+            var header=reference.publication().units().stream().flatMap(u->u.sequences().stream()).map(s->s.terminator().header())
+                .filter(h->h.id().localId().equals(operation)).findFirst().orElseThrow();
+            ((com.fasterxml.jackson.databind.node.ObjectNode)expectedSite).put("coverage",header.coverage().name());
+        }
+        for(var field:java.util.List.of("sites","edges","origins","artifacts","sourceUncertaintyRefs","fileDependencies","sourceDependencies"))
+            assertEquals(resident.get(field),nativeResult.get(field),"native general engine must preserve complete fact contract: "+field);
+        var site=nativeResult.get("sites").get(0);
+        assertEquals("BEFORE",site.get("valuePoint").get("position").asText());
+        assertEquals("REACHABLE",site.get("reachability").asText());
+        assertFalse(site.get("modelValueRemainder").asBoolean());
+        assertTrue(site.get("sourceValueRemainder").asBoolean());
+        assertTrue(site.get("interpretationUnknownRemainder").asBoolean());
+        assertTrue(site.get("openControlRemainder").asBoolean());
+        assertEquals(1,site.get("candidates").size());
+        assertEquals("PROGA",site.get("candidates").get(0).get("referenceName").asText());
+        assertEquals("PROGA   ",site.get("candidates").get(0).get("rawValue").asText());
+        var assign=reference.publication().units().getFirst().sequences().stream().flatMap(s->s.instructions().stream())
+            .filter(io.github.gustavo2358.air.model.Operations.Assign.class::isInstance).findFirst().orElseThrow();
+        var support=site.get("candidates").get(0).get("supports").get(0);
+        assertEquals(assign.header().id().localId(),support.get("producer").get("localId").asText());
+        assertEquals(assign.header().origin().localId(),support.get("origin").get("localId").asText());
+        var standalone=dir.resolve("snapshot-standalone.dependencies");
+        assertEquals(0,AnalysisDependencies.run(new String[]{fixture().toString(),standalone.toString()},errors()));
+        assertArrayEquals(Files.readAllBytes(dependencies),Files.readAllBytes(standalone));
     }
     @Test void sharedLabelEntriesReachEverySiteThroughTheRealSnapshotPipeline() throws Exception {
         var codec=new io.github.gustavo2358.air.json.AirJson();var base=codec.decode(Files.readAllBytes(fixture()));

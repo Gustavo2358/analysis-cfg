@@ -10,6 +10,9 @@ import io.github.gustavo2358.analysis.dependencies.SourceDependencyResult.Operat
 public final class SourceDependencyAnalysis {
     private record Key(UnitId program,Kind kind,String name,String qualification) {}
     public SourceDependencyResult prepare(Publication publication) {
+        return prepare(io.github.gustavo2358.analysis.structure.ProgramStore.resident(publication));
+    }
+    public SourceDependencyResult prepare(io.github.gustavo2358.analysis.structure.ProgramStore.Structural publication) {
         var origins=new HashMap<OriginId,Origins.Origin>();
         publication.origins().forEach(o->origins.put(o.id(),o));
         var groups=new LinkedHashMap<Key,List<Support>>();var gaps=new TreeSet<String>();

@@ -17,6 +17,9 @@ final class FileDependencyAnalysis {
     private FileDependencyAnalysis() { }
     private record Key(EntryId entry,OperationId operation) { }
     static FileDependencyResult prepare(Publication p,AnalysisSession session,PlanningExecution execution,String unavailable,StorageAnalysisMode mode){
+        return prepare(io.github.gustavo2358.analysis.structure.ProgramStore.resident(p),session,execution,unavailable,mode);
+    }
+    static FileDependencyResult prepare(io.github.gustavo2358.analysis.structure.ProgramStore.Structural p,AnalysisSession session,PlanningExecution execution,String unavailable,StorageAnalysisMode mode){
         var bindings=new HashMap<OperationId,List<Binding>>();var declarations=new ArrayList<Declaration>();var locals=new HashSet<OperationId>();
         for(var r:p.resources()){
             if(!isFile(r.description()))continue;

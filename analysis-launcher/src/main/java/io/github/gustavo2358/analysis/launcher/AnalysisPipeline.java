@@ -69,7 +69,7 @@ public final class AnalysisPipeline {
         return 0;
     }
 
-    /** Default production route: one checked paged snapshot owns both CFG and dependency scans. */
+    /** Default production route: one checked paged snapshot owns CFG and the shared general analysis. */
     static int runSnapshot(String[] args,PrintStream err,DataflowAirReader reader) {
         if(args.length!=3)return usage(err);
         Path input,cfg,dependencies;
@@ -92,18 +92,19 @@ public final class AnalysisPipeline {
             try(var program=new SnapshotProgram(read.checked(),read.newIdentityStorage(),read.newOrderStorage())) {
                 var built=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).buildChecked(program,read.checked(),BuildOptions.defaults());
                 if(built.status()!=CfgBuildResult.Status.CFG_BUILT){err.println("CFG "+built.status());return 4;}
+                // Complete analysis preparation before replacing either existing product.
+                var result=new DependencyAnalysis().prepare(program,built);
                 try {new CfgJsonWriter(resources.limits().outputBytes()).write(built,cfg,
                         bytes->resources.output(bytes,AnalysisResources.Phase.ENCODE));}
                 catch(CfgJsonException failure){err.println("CFG_OUTPUT_SERIALIZATION");return 5;}
                 catch(IOException failure){err.println("CFG_OUTPUT_IO");return 6;}
                 program.releaseCfgProjection(built.options().projectionPolicy());
-                try(var result=new SnapshotDependencyAnalysis().open(program,read.newDependencyStorage())) {
-                    try {new SnapshotDependencyFileWriter().write(result,dependencies,resources);}
-                    catch(IOException|IllegalArgumentException failure){err.println("DEPENDENCY_OUTPUT_FAILURE");return 6;}
-                }
+                try {new SnapshotDependencyFileWriter().write(result,program,dependencies,resources);}
+                catch(IOException|IllegalArgumentException failure){err.println("DEPENDENCY_OUTPUT_FAILURE");return 6;}
             }
             return 0;
         } catch(AnalysisResources.Exhausted failure){err.println("INPUT_RESOURCE_LIMIT: "+failure.getMessage());return 7;}
+          catch(DependencyAnalysis.Failure failure){err.println(failure.getMessage());return switch(failure.kind()){case INVALID_INPUT,INPUT_INCOMPLETE->3;case RESOURCE_LIMIT->7;case CFG_UNSUPPORTED->4;case ANALYSIS_UNSUPPORTED->5;case CONSUMER_FAILURE->8;};}
           catch(AirJsonException failure){err.println("INPUT_CODEC: "+failure.code());return failure.code()==AirJsonException.Code.RESOURCE_LIMIT?7:3;}
           catch(IOException|IllegalArgumentException failure){err.println("PIPELINE_INPUT_INVALID");return 3;}
           catch(RuntimeException failure){err.println("ANALYSIS_EXECUTION_FAILED: "+failure.getClass().getSimpleName());return 5;}
