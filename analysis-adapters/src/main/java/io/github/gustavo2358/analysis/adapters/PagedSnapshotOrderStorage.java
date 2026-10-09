@@ -4,6 +4,7 @@ import io.github.gustavo2358.analysis.dependencies.SnapshotOrderStorage;
 import io.github.gustavo2358.analysis.solver.AnalysisResources;
 import io.github.gustavo2358.analysis.solver.PageStore;
 import io.github.gustavo2358.analysis.solver.PagedLongIndex;
+import io.github.gustavo2358.analysis.solver.PagedLongArray;
 import java.util.Objects;
 
 /** Spillable canonical-order indexes over the snapshot session's borrowed pages. */
@@ -24,10 +25,36 @@ public final class PagedSnapshotOrderStorage implements SnapshotOrderStorage {
         try {var index=new PagedLongIndex(pages,resources,PHASE,order::compare);owners++;return new PagedIndex(index);}
         catch(RuntimeException|Error failure){failed=true;throw failure;}
     }
+    @Override public synchronized Tape tape() {
+        available();
+        try{var values=new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);owners++;return new PagedTape(values);}
+        catch(RuntimeException|Error failure){failed=true;throw failure;}
+    }
     private void available(){if(closed||failed)throw new IllegalStateException("paged snapshot order storage is closed or aborted");}
     @Override public synchronized void close() {
         if(closed)return;if(owners!=0)throw new IllegalStateException("snapshot order indexes remain open");
         closed=true;resident.close();
+    }
+    private final class PagedTape implements Tape {
+        private PagedLongArray values;private long count;private boolean tapeFailed;
+        private PagedTape(PagedLongArray values){this.values=values;}
+        private void open(){available();if(values==null||tapeFailed)throw new IllegalStateException("snapshot order tape is closed or aborted");}
+        @Override public synchronized void append(long handle) {
+            open();if(handle<=0)throw new IllegalArgumentException("positive snapshot handle required");
+            try{values.set(count,handle);count=Math.addExact(count,1);}
+            catch(RuntimeException|Error failure){tapeFailed=true;PagedSnapshotOrderStorage.this.failed=true;throw failure;}
+        }
+        @Override public synchronized long size(){open();return count;}
+        @Override public synchronized long handle(long ordinal) {
+            open();Objects.checkIndex(ordinal,count);
+            try{return values.get(ordinal);}
+            catch(RuntimeException|Error failure){tapeFailed=true;PagedSnapshotOrderStorage.this.failed=true;throw failure;}
+        }
+        @Override public synchronized void close() {
+            if(values==null)return;
+            try{values.close();}
+            finally{values=null;synchronized(PagedSnapshotOrderStorage.this){owners--;}}
+        }
     }
     private final class PagedIndex implements Index {
         private PagedLongIndex index;private boolean indexFailed;

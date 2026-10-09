@@ -147,7 +147,7 @@ EXPECTED_PRODUCTION_IMPORTS.update({
     SOURCE_ROOT + "domain/CfgSource.java": {
         "io.github.gustavo2358.air.model.Capabilities", "io.github.gustavo2358.air.model.Evidence",
         "io.github.gustavo2358.air.model.Ids.PublicationId", "io.github.gustavo2358.air.model.Ids.UnitId",
-        PUBLICATION, "io.github.gustavo2358.air.model.SemanticVersion", "java.util.List", "java.util.Objects",
+        PUBLICATION, "io.github.gustavo2358.air.model.SemanticVersion", "java.util.List", "java.util.Objects", "java.util.function.IntFunction",
     },
     SOURCE_ROOT + "domain/CfgProjectionIssue.java": {
         "io.github.gustavo2358.air.model.Ids.Id", "java.util.Objects",
@@ -197,7 +197,7 @@ CFG_CLASS_NAMES = {
     "LocalControlRules$Resume", "LocalControlRules$Unwind", "LocalControlRules$Stack", "LocalControlRules$Step", "LocalControlRules$RecursiveActivation",
     "CfgNodeId", "CfgNode", "CfgNode$EntryNode", "CfgNode$SequenceNode", "CfgNode$NormalExit", "CfgNode$HaltExit", "CfgNode$OutcomeExit",
     "CfgTransitionTable", "CfgTransitionTable$Builder", "CfgTransitionTable$Group", "CfgTransition", "CfgTransition$Kind", "CfgGraph", "CfgGraph$1",
-    "CfgSource", "CfgSource$UnitInventory",
+    "CfgSource", "CfgSource$UnitInventory", "CfgSource$UnitInventories",
     "CfgProjectionIssue", "CfgProjectionIssue$Code", "CoreCfgProjection", "ProjectionPolicy",
 }
 EXPECTED_CLASSFILES = {

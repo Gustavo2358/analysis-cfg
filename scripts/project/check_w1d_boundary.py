@@ -7,10 +7,23 @@ ROOT=Path(__file__).resolve().parents[2]
 INVENTORY='docs/evals/cp6/w1d-dependencies-inventory.json'
 def stable_dependencies(output):
     dependencies=dependencies_from_jdeps(output)
-    # JDK 25 reports Record for SnapshotProgram because it mentions nested
-    # records; JDK 21 does not. The class itself is not a record.
-    dependencies.get('io.github.gustavo2358.analysis.dependencies.SnapshotProgram',set()).discard('java.lang.Record')
+    # javac 25 can use Record in a switch StackMapTable over nested records;
+    # javac 21 uses Object. Neither outer class extends Record. Normalize only
+    # this proven compiler-generated JDK-base edge, never semantic targets.
+    for name in ('SnapshotProgram','SnapshotDependencyCursorResult'):
+        dependencies.get('io.github.gustavo2358.analysis.dependencies.'+name,set()).discard('java.lang.Record')
     return dependencies
+def detector_self_test():
+    prefix='io.github.gustavo2358.analysis.dependencies.'
+    output='\n'.join((prefix+'SnapshotDependencyCursorResult -> java.lang.Record java.base',
+                     prefix+'SnapshotDependencyCursorResult -> java.lang.reflect.Method java.base',
+                     prefix+'SnapshotProgram -> java.lang.Record java.base',
+                     prefix+'SnapshotProgram -> io.github.gustavo2358.air.model.Publication air-java',
+                     prefix+'DirectDependencyResult -> java.lang.Record java.base'))
+    edges=stable_dependencies('\n'.join('   '+line for line in output.splitlines()))
+    assert edges[prefix+'SnapshotDependencyCursorResult']=={'java.lang.reflect.Method'}
+    assert edges[prefix+'SnapshotProgram']=={'io.github.gustavo2358.air.model.Publication'}
+    assert edges[prefix+'DirectDependencyResult']=={'java.lang.Record'}
 def source_boundaries(root):
     # The source check protects absence of program-name semantics in the generic effect interpreter.
     effect=(root/'analysis-values/src/main/java/io/github/gustavo2358/analysis/values/ForeignEffectTransfer.java').read_text()
@@ -20,6 +33,7 @@ def source_boundaries(root):
         raise ValueError('DefaultValuePlan acquired CALL target semantics')
 
 def check(root=ROOT,refresh=False):
+    detector_self_test()
     source_boundaries(root)
     classes=root/'analysis-dependencies/target/classes';cpfile=root/'analysis-dependencies/target/architecture-classpath.txt'
     if not cpfile.exists():cpfile=root/'analysis-dependencies/target/runtime-classpath.txt'

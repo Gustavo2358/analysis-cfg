@@ -52,4 +52,38 @@ final class PagedSnapshotOrderStorageTest {
         }
         assertEquals(0,resources.heapUsed());
     }
+
+    @Test void canonicalTapePayloadExceedsResidencyAndRetainsNoOrdinalDirectoryInHeap() {
+        var resources=resources();
+        try(var pages=new FilePageStore(directory,128,1,resources)) {
+            var storage=new PagedSnapshotOrderStorage(pages,resources);var tape=storage.tape();
+            long fixed=resources.heapUsed();
+            for(long ordinal=0;ordinal<16384;ordinal++)tape.append(ordinal+1);
+            assertEquals(16384,tape.size());assertEquals(fixed,resources.heapUsed());
+            assertTrue(16384L*Long.BYTES>65_536,"primitive payload must exceed managed residency");
+            for(long ordinal=16383;ordinal>=0;ordinal--)assertEquals(ordinal+1,tape.handle(ordinal));
+            assertThrows(IndexOutOfBoundsException.class,()->tape.handle(-1));
+            assertThrows(IndexOutOfBoundsException.class,()->tape.handle(16384));
+            assertThrows(IllegalArgumentException.class,()->tape.append(0));
+            assertEquals(16384,tape.size());assertThrows(IllegalStateException.class,storage::close);
+            tape.close();tape.close();
+            assertThrows(IllegalStateException.class,tape::size);
+            assertThrows(IllegalStateException.class,()->tape.handle(0));
+            assertEquals(0,pages.statistics().livePages());storage.close();
+            System.out.println("SNAPSHOT_UNIT_TAPE_METRICS rows=16384 heap="+resources.heapPeak()+" evictions="+pages.statistics().evictions());
+        }
+        assertEquals(0,resources.heapUsed());
+    }
+
+    @Test void exhaustedCanonicalTapeAbortsFactoryAndStillReleasesOwnedPages() {
+        var resources=new AnalysisResources(new AnalysisResources.Limits(65_536,65_536,0,64_000_000,2,10,1_000_000));
+        try(var pages=new FilePageStore(directory,128,1,resources)) {
+            var storage=new PagedSnapshotOrderStorage(pages,resources);var tape=storage.tape();
+            assertThrows(AnalysisResources.Exhausted.class,()->{for(int i=0;i<100;i++)tape.append(i+1);});
+            assertThrows(IllegalStateException.class,tape::size);
+            assertThrows(IllegalStateException.class,storage::tape);
+            tape.close();storage.close();assertEquals(0,pages.statistics().livePages());
+        }
+        assertEquals(0,resources.heapUsed());
+    }
 }

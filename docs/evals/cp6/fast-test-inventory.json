@@ -393,6 +393,8 @@
       "closingTemporaryBackendDoesNotRequireWritingDiscardedDirtyPayload"
     ],
     "io.github.gustavo2358.analysis.adapters.PagedSnapshotOrderStorageTest": [
+      "canonicalTapePayloadExceedsResidencyAndRetainsNoOrdinalDirectoryInHeap",
+      "exhaustedCanonicalTapeAbortsFactoryAndStillReleasesOwnedPages",
       "reverseCanonicalInputSpillsWithoutInputCardinalityHeapMetadata",
       "comparatorFailureAbortsFactoryAndClosingOwnerReleasesEveryPage"
     ],
@@ -468,6 +470,8 @@
       "validTypedSnapshotHasIdenticalManagedAdmissionPrefixAcrossBackends"
     ],
     "io.github.gustavo2358.analysis.adapters.SnapshotDependencyAnalysisTest": [
+      "sourceUnitInventoryBorrowsCanonicalPagesAndExpiresWithProgram",
+      "borrowedSourceInventoryKeepsCanonicalAndForeignIdentityChecks",
       "cfgProjectionDoesNotReadEveryInstructionIdentityBeforeAQuery",
       "operationViewConstructorsDoNotCopyAndExpiredOwnersRejectQueries",
       "validatedPagedSnapshotPreservesVariableCallEvidenceWithoutPublicationMaterialization",

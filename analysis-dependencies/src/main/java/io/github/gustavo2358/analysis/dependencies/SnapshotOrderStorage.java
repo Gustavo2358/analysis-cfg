@@ -16,7 +16,15 @@ public interface SnapshotOrderStorage extends AutoCloseable {
         long handle();
         @Override void close();
     }
+    /** Append-only canonical handles with ordinal access; payload remains owned by this tape. */
+    interface Tape extends AutoCloseable {
+        void append(long handle);
+        long size();
+        long handle(long ordinal);
+        @Override void close();
+    }
     Index open(Order order);
+    Tape tape();
     @Override void close();
 
     /** Explicit compatibility backend for small in-memory callers. */
@@ -24,6 +32,16 @@ public interface SnapshotOrderStorage extends AutoCloseable {
 
     final class Resident implements SnapshotOrderStorage {
         private boolean closed;
+        @Override public Tape tape() {
+            if(closed)throw new IllegalStateException("snapshot order storage is closed");
+            return new Tape(){private ArrayList<Long> values=new ArrayList<>();
+                private void open(){if(closed||values==null)throw new IllegalStateException("snapshot order tape is closed");}
+                @Override public void append(long handle){open();if(handle<=0)throw new IllegalArgumentException("positive snapshot handle required");values.add(handle);}
+                @Override public long size(){open();return values.size();}
+                @Override public long handle(long ordinal){open();return values.get(Math.toIntExact(ordinal));}
+                @Override public void close(){if(values==null)return;values.clear();values=null;}
+            };
+        }
         @Override public Index open(Order order) {
             if(closed)throw new IllegalStateException("snapshot order storage is closed");
             Objects.requireNonNull(order);

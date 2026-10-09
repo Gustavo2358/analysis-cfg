@@ -27,6 +27,64 @@ final class SnapshotDependencyAnalysisTest {
     @TempDir java.nio.file.Path directory;
     private static AnalysisResources resources(){return new AnalysisResources(new AnalysisResources.Limits(64_000_000,64_000_000,0,256_000_000,4,1_000_000_000,1_000_000));}
 
+    @Test void sourceUnitInventoryBorrowsCanonicalPagesAndExpiresWithProgram() {
+        for(int count:new int[]{1,16,64}) {
+            var reference=directCalls(count);var ledger=resources();
+            var publication=new Publication(reference.id(),reference.airVersion(),reference.capabilities(),reference.artifacts(),
+                    reference.units().reversed(),reference.storage(),reference.resources(),reference.artifactRelations(),reference.origins(),reference.coverage(),reference.uncertainties(),reference.premises());
+            try(var pages=new FilePageStore(directory,512,16,ledger);var snapshot=AirSnapshot.fromPublication(publication);
+                var checked=SnapshotValidator.check(snapshot,ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger))) {
+                assertEquals(ValidationResult.Status.STRUCTURALLY_VALID,checked.result().status(),checked.result().toString());
+                List<io.github.gustavo2358.analysis.cfg.domain.CfgSource.UnitInventory> borrowed;
+                var ordered=new PagedSnapshotOrderStorage(pages,ledger);int[] sorts={0};
+                var tracked=new io.github.gustavo2358.analysis.dependencies.SnapshotOrderStorage() {
+                    @Override public Index open(Order order){sorts[0]++;return ordered.open(order);}
+                    @Override public Tape tape(){return ordered.tape();}
+                    @Override public void close(){ordered.close();}
+                };
+                try(var program=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),tracked)) {
+                    var source=program.source();borrowed=source.units();
+                    assertInstanceOf(io.github.gustavo2358.analysis.cfg.domain.CfgSource.UnitInventories.class,borrowed);
+                    assertEquals(count,borrowed.size());
+                    assertEquals(io.github.gustavo2358.analysis.cfg.domain.CfgSource.from(reference),source);
+                    assertEquals(1,sorts[0]);
+                    long fixed=ledger.heapUsed();
+                    for(int scan=0;scan<3;scan++) {
+                        int[] ordinal={0};
+                        program.units(unit->assertEquals(borrowed.get(ordinal[0]++).id(),unit.id()));
+                        assertEquals(count,ordinal[0]);
+                    }
+                    assertEquals(fixed,ledger.heapUsed(),"repeated canonical scans must retain no additional metadata");
+                    assertEquals(1,sorts[0],"canonical Unit ordering must be reused, not rebuilt for every consumer");
+                    assertThrows(UnsupportedOperationException.class,borrowed::clear);
+                }
+                assertThrows(IllegalStateException.class,borrowed::size);
+                assertThrows(IllegalStateException.class,borrowed::getFirst);
+                assertEquals(0,pages.statistics().livePages());
+            }
+            assertEquals(0,ledger.heapUsed());
+        }
+    }
+
+    @Test void borrowedSourceInventoryKeepsCanonicalAndForeignIdentityChecks() {
+        var publication=new PublicationId("canonical-source");
+        var a=new io.github.gustavo2358.analysis.cfg.domain.CfgSource.UnitInventory(new UnitId(publication,"a"),Evidence.InventoryStatus.COMPLETE);
+        var b=new io.github.gustavo2358.analysis.cfg.domain.CfgSource.UnitInventory(new UnitId(publication,"b"),Evidence.InventoryStatus.UNAVAILABLE);
+        var foreign=new io.github.gustavo2358.analysis.cfg.domain.CfgSource.UnitInventory(new UnitId(new PublicationId("foreign"),"c"),Evidence.InventoryStatus.COMPLETE);
+        for(var invalid:List.of(List.of(a,a),List.of(b,a),List.of(a,foreign))) {
+            var units=new io.github.gustavo2358.analysis.cfg.domain.CfgSource.UnitInventories(invalid.size(),invalid::get,()->{});
+            assertThrows(IllegalArgumentException.class,()->new io.github.gustavo2358.analysis.cfg.domain.CfgSource(
+                    publication,new SemanticVersion(BigInteger.ONE,BigInteger.ZERO,BigInteger.ZERO),Evidence.InventoryStatus.COMPLETE,units,List.of()));
+        }
+        var ordered=List.of(a,b);boolean[] alive={true};
+        var units=new io.github.gustavo2358.analysis.cfg.domain.CfgSource.UnitInventories(2,ordered::get,
+                ()->{if(!alive[0])throw new IllegalStateException("expired source owner");});
+        var source=new io.github.gustavo2358.analysis.cfg.domain.CfgSource(publication,new SemanticVersion(BigInteger.ONE,BigInteger.ZERO,BigInteger.ZERO),Evidence.InventoryStatus.COMPLETE,units,List.of());
+        assertSame(units,source.units());assertEquals(ordered,source.units());
+        assertThrows(UnsupportedOperationException.class,()->units.set(0,b));
+        alive[0]=false;assertThrows(IllegalStateException.class,source.units()::size);
+    }
+
     @Test void cfgProjectionDoesNotReadEveryInstructionIdentityBeforeAQuery() {
         long baseline=-1;
         for(int count:new int[]{16,64,256,1024,4096}) {

@@ -25,6 +25,7 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
     private final SnapshotOrderStorage orderStorage;
     private final char[] orderLeft=new char[64],orderRight=new char[64];
     private CfgSource source;
+    private SnapshotOrderStorage.Tape unitOrder;
     private List<Capabilities.Capability> requiredCapabilities;
     private Set<Capabilities.Capability> namePolicyExtensions;
     private boolean closed;
@@ -88,8 +89,11 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
 
     private CfgSource cfgSource() {
         long root=snapshot.root(),version=snapshot.field(root,PUBLICATION,1);
-        var units=new ArrayList<CfgSource.UnitInventory>();
-        units(unit->units.add(new CfgSource.UnitInventory(unit.id(),unit.inventory())));
+        var handles=unitOrder();
+        var units=new CfgSource.UnitInventories(Math.toIntExact(handles.size()),ordinal->{
+            long unit=handles.handle(ordinal);
+            return new CfgSource.UnitInventory((UnitId)id(snapshot.field(unit,UNIT,0)),inventory(snapshot.field(unit,UNIT,9)));
+        },()->{open();snapshot.shape(root);});
         return new CfgSource(publication(),new SemanticVersion(integer(snapshot.field(version,SEMANTIC_VERSION,0)),
                 integer(snapshot.field(version,SEMANTIC_VERSION,1)),integer(snapshot.field(version,SEMANTIC_VERSION,2))),
                 coverage(),units,requiredCapabilities().stream().filter(CoreCfgProjection::supportsControlCapability).distinct().toList());
@@ -101,8 +105,19 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
 
     @Override public void units(Consumer<CfgProgram.UnitView> consumer) {
         open();Objects.requireNonNull(consumer);
-        long values=snapshot.field(snapshot.root(),PUBLICATION,4);
-        ordered(values,UNIT,(a,b)->compareLocalIds(a,UNIT,0,b,UNIT,0),handle->consumer.accept(new SnapshotUnit(handle)));
+        var handles=unitOrder();long count=handles.size();
+        for(long ordinal=0;ordinal<count;ordinal++)consumer.accept(new SnapshotUnit(handles.handle(ordinal)));
+    }
+    private SnapshotOrderStorage.Tape unitOrder() {
+        open();if(unitOrder!=null)return unitOrder;
+        var handles=orderStorage.tape();
+        try {
+            ordered(snapshot.field(snapshot.root(),PUBLICATION,4),UNIT,(a,b)->compareLocalIds(a,UNIT,0,b,UNIT,0),handles::append);
+            unitOrder=handles;return handles;
+        } catch(RuntimeException|Error failure) {
+            try{handles.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}
+            throw failure;
+        }
     }
 
     private final class SnapshotUnit implements CfgProgram.UnitView {
@@ -448,5 +463,9 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
     private Id id(long source){AirShape shape=snapshot.shape(source);return switch(shape){case IDS_PUBLICATION_ID->new PublicationId(text(snapshot.field(source,shape,0)));case IDS_UNIT_ID->new UnitId((PublicationId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));case IDS_ENTRY_ID->new EntryId((UnitId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));case IDS_LABEL_ID->new LabelId((UnitId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));case IDS_OPERATION_ID->new OperationId((UnitId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));case IDS_COMPLETION_PORT_ID->new CompletionPortId((UnitId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));case IDS_OBJECT_ID->new ObjectId((UnitId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));case IDS_ORIGIN_ID->new OriginId((PublicationId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));case IDS_ARTIFACT_ID->new ArtifactId((PublicationId)id(snapshot.field(source,shape,0)),text(snapshot.field(source,shape,1)));default->throw new IllegalArgumentException("unsupported program id "+shape);};}
     private String text(long source){long length=snapshot.characterCount(source);if(length>Integer.MAX_VALUE)throw new IllegalStateException("program text too large");char[] result=new char[(int)length],block=new char[Math.min(1024,Math.max(1,result.length))];long offset=0;while(offset<length){int count=snapshot.readCharacters(source,offset,block,0,(int)Math.min(block.length,length-offset));System.arraycopy(block,0,result,(int)offset,count);offset+=count;}return new String(result);}
     private void open(){if(closed)throw new IllegalStateException("snapshot program is closed");}
-    @Override public void close(){if(closed)return;closed=true;Throwable failure=null;try{keys.close();}catch(RuntimeException|Error cleanup){failure=cleanup;}try{orderStorage.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}if(failure instanceof RuntimeException exception)throw exception;if(failure instanceof Error error)throw error;}
+    @Override public void close(){if(closed)return;closed=true;Throwable failure=null;
+        try{if(unitOrder!=null)unitOrder.close();}catch(RuntimeException|Error cleanup){failure=cleanup;}
+        try{keys.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
+        try{orderStorage.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
+        if(failure instanceof RuntimeException exception)throw exception;if(failure instanceof Error error)throw error;}
 }
