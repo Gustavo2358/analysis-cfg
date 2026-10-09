@@ -26,11 +26,11 @@ final class IndexBuilder {
     private long expectedOutside;
     final Map<OperationId, ProgramIndex.Site> operations = new HashMap<>();
     final Map<Class<? extends Operation>, List<ProgramIndex.Site>> buckets = new HashMap<>();
-    final Map<ObjectId, Memory.ObjectDeclaration> objects = new LinkedHashMap<>();
+    final ProgramIndex.Declarations objects = new ProgramIndex.Declarations();
     final Map<StorageId, Memory.Storage> storage = new HashMap<>();
     final Map<ObjectId, Memory.Cell> directCells = new HashMap<>();
     final Map<OperandId, Place> places = new HashMap<>();
-    final Map<OperandId, Memory.ObjectDeclaration> objectReferences = new HashMap<>();
+    final Map<OperandId, ObjectId> objectReferences = new HashMap<>();
     final LongIntDirectory forwardHeads = new LongIntDirectory(), backwardHeads = new LongIntDirectory();
     ProgramIndex.Node[] nodes;
     boolean factored;
@@ -92,10 +92,11 @@ final class IndexBuilder {
             valid(unit.id().publication().equals(store.publicationId()), "foreign Unit owner");
             unique(units, unit.id(), unit, "duplicate Unit");
             supported((unit.body() == Unit.BodyAvailability.AVAILABLE || policy == ProjectionPolicy.PARTIAL_ANALYSIS) && policy.acceptsInventory(unit.coverage().inventory()), "unsupported Unit body/inventory");
-            for (Memory.ObjectDeclaration object : unit.objects()) {
+            var declarations=unit.objects();int objectOrdinal=0;
+            for (Memory.ObjectDeclaration object : declarations) {
                 count.visit("objects");
                 valid(object.id().unit().equals(unit.id()), "foreign Object owner");
-                unique(objects, object.id(), object, "duplicate Object");
+                valid(objects.append(object.id(),declarations,objectOrdinal++),"duplicate Object");
                 count.objects = Math.incrementExact(count.objects);
             }
         }
@@ -209,17 +210,16 @@ final class IndexBuilder {
             valid(operandIds.add(operand.header().id()), "duplicate Operand occurrence");
             if(operand instanceof Place place)places.put(place.header().id(),place);
             if (operand instanceof Places.ObjectPlace place) {
-                Memory.ObjectDeclaration declaration = resolveObject(place.object());
+                ObjectId declaration = resolveObject(place.object());
                 objectReferences.put(place.header().id(), declaration);
             }
             pending.addAll(Operands.children(operand));
         }
     }
-    private Memory.ObjectDeclaration resolveObject(ObjectId id) {
+    private ObjectId resolveObject(ObjectId id) {
         count.reference("operands.object");
-        Memory.ObjectDeclaration declaration = objects.get(id);
-        valid(declaration != null, "missing Object reference");
-        return declaration;
+        valid(objects.containsKey(id), "missing Object reference");
+        return id;
     }
 
     private void nodes(CfgGraph graph) {

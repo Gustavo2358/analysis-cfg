@@ -27,6 +27,60 @@ final class SnapshotDependencyAnalysisTest {
     @TempDir java.nio.file.Path directory;
     private static AnalysisResources resources(){return new AnalysisResources(new AnalysisResources.Limits(64_000_000,64_000_000,0,256_000_000,4,1_000_000_000,1_000_000));}
 
+    @Test void nativeDeclarationIndexesBorrowColdPayloadsAndPreserveEveryIdentity() throws Exception {
+        Publication seed;
+        try(var input=getClass().getResourceAsStream("/cp6/dynamic-x8.air.json")){seed=new AirJson().decode(input.readAllBytes());}
+        var unit=seed.units().getFirst();var template=unit.objects().getFirst();
+        var objects=new java.util.ArrayList<>(unit.objects());
+        for(int i=0;i<128;i++)objects.add(new Memory.ObjectDeclaration(new ObjectId(unit.id(),"unused-"+i),
+            Optional.of("!".repeat(4096)+"/"+i),template.typeRef(),template.storage(),template.visibility(),template.origin(),template.coverage(),template.precision()));
+        var replacement=new Unit(unit.id(),unit.containingUnit(),objects,unit.visibleObjects(),unit.entries(),unit.sequences(),unit.completionPorts(),unit.body(),unit.bodyUnavailable(),unit.coverage(),unit.origin());
+        var units=new java.util.ArrayList<>(seed.units());units.set(0,replacement);
+        var publication=new Publication(seed.id(),seed.airVersion(),seed.capabilities(),seed.artifacts(),units,seed.storage(),seed.resources(),seed.artifactRelations(),seed.origins(),seed.coverage(),seed.uncertainties(),seed.premises());
+        var ledger=resources();long[] reads={0};io.github.gustavo2358.analysis.structure.ProgramIndex borrowed;
+        try(var pages=new FilePageStore(directory,4096,32,ledger);var original=AirSnapshot.fromPublication(publication)) {
+            var storage=new PagedAirStorage(pages,ledger,AnalysisResources.Phase.DECODE);
+            var tracked=new AirSnapshotBuilder.Storage() {
+                @Override public long get(AirSnapshotBuilder.Column column,long index){long value=storage.get(column,index);if(column==AirSnapshotBuilder.Column.CHARACTERS&&value==0x0021002100210021L)reads[0]++;return value;}
+                @Override public void set(AirSnapshotBuilder.Column column,long index,long value){storage.set(column,index,value);}
+                @Override public AirSnapshotBuilder.Lease claim(long bytes){return storage.claim(bytes);}
+                @Override public AirSnapshotBuilder.Lease readLease(long bytes){return storage.readLease(bytes);}
+                @Override public void freeze(){storage.freeze();}
+                @Override public void close(){storage.close();}
+            };
+            try(var builder=new AirSnapshotBuilder(tracked)) {
+                long root=PagedAirStorageTest.copy(original,original.root(),null,builder);
+                try(var checked=SnapshotValidator.check(builder.finish(root),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger))) {
+                    assertTrue(checked.result().isStructurallyValid(),checked.result().toString());
+                    try(var program=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),new PagedSnapshotOrderStorage(pages,ledger),ledger)) {
+                        var cfg=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).buildChecked(program,checked,BuildOptions.defaults());
+                        var opened=io.github.gustavo2358.analysis.structure.AnalysisSession.open(cfg,program,cfg.options().projectionPolicy(),program.units().stream().flatMap(u->u.entries().stream()).map(Entries.Entry::id).toList());
+                        assertEquals(io.github.gustavo2358.analysis.structure.AnalysisSession.Status.ACCEPTED,opened.status(),opened.reason());
+                        borrowed=opened.session().orElseThrow().index();reads[0]=0;
+                        assertEquals(objects.getLast(),borrowed.object(objects.getLast().id()));
+                        assertTrue(reads[0]>0,"structural declaration lookup retained a decoded display payload");
+                        reads[0]=0;assertEquals(objects.getLast(),borrowed.object(objects.getLast().id()));
+                        assertTrue(reads[0]>0,"repeated lookup must borrow the same canonical cold occurrence");
+                        assertEquals(objects,List.copyOf(borrowed.objects()));
+                        assertNull(borrowed.object(new ObjectId(new UnitId(new PublicationId("foreign"),unit.id().localId()),objects.getLast().id().localId())));
+                        assertThrows(UnsupportedOperationException.class,()->borrowed.objects().clear());
+                        var catalog=borrowed.objectDeclarations();
+                        assertThrows(UnsupportedOperationException.class,()->catalog.put(objects.getLast().id(),objects.getLast()));
+                        assertThrows(UnsupportedOperationException.class,catalog::clear);
+                        assertThrows(UnsupportedOperationException.class,()->catalog.keySet().clear());
+                        assertThrows(UnsupportedOperationException.class,()->catalog.entrySet().iterator().next().setValue(objects.getLast()));
+                        var physical=new io.github.gustavo2358.analysis.storage.StorageIndex(opened.session().orElseThrow());reads[0]=0;
+                        assertEquals(objects,List.copyOf(physical.declarations()));
+                        assertTrue(reads[0]>0,"physical declarations must share cold addresses rather than copy all bodies");
+                    }
+                    assertThrows(IllegalStateException.class,()->borrowed.object(objects.getLast().id()));
+                }
+            }
+            assertEquals(0,pages.statistics().livePages());
+        }
+        assertEquals(0,ledger.heapUsed());
+    }
+
     @Test void generalMetadataUsesOrderedBorrowedPagesWithoutReadingUnusedPayloads() throws Exception {
         Publication seed;
         try(var input=getClass().getResourceAsStream("/cp6/dynamic-x8.air.json")){seed=new AirJson().decode(input.readAllBytes());}

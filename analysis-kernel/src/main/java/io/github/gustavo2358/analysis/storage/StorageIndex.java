@@ -31,7 +31,7 @@ public final class StorageIndex {
     }
     private final AnalysisSession session;
     private final Map<StorageId,Memory.Storage> bases=new LinkedHashMap<>();
-    private final Map<ObjectId,Memory.ObjectDeclaration> declarations=new LinkedHashMap<>();
+    private final Map<ObjectId,Memory.ObjectDeclaration> declarations;
     private final Map<ObjectId,Resolution> objects=new HashMap<>();
     private final Map<StorageId,Set<PremiseId>> separation=new HashMap<>();
     private final Map<ObjectId,List<ObjectId>> aliasDependencies=new HashMap<>();
@@ -42,7 +42,7 @@ public final class StorageIndex {
         var store=session.index().store();
         store.uncertainties().forEach(u->uncertaintyIds.add(u.id()));
         for(var base:store.storage())bases.put(base.header().id(),base);
-        for(var unit:store.units())for(var object:unit.objects())declarations.put(object.id(),object);
+        declarations=session.index().objectDeclarations();
         for(var premise:store.premises())if(premise.assertion() instanceof Proofs.DisjointStorage d)
             for(var id:d.storage()) { separation.computeIfAbsent(id,ignored->new HashSet<>()).add(premise.id());premiseMembers++; }
         // Explicit DFS avoids call-stack depth proportional to an exact-alias chain.

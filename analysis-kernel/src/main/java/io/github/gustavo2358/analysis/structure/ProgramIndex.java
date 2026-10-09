@@ -34,7 +34,7 @@ public final class ProgramIndex {
     private final Map<ObjectId, Memory.ObjectDeclaration> objects;
     private final Map<StorageId, Memory.Storage> storage;
     private final Map<ObjectId, Memory.Cell> directCells;
-    private final Map<OperandId, Memory.ObjectDeclaration> objectReferences;
+    private final Map<OperandId, ObjectId> objectReferences;
     private final Map<OperandId, Place> places;
     private final Map<EntryId, Entries.Entry> entries;
     private final IndexMetrics metrics;
@@ -74,7 +74,7 @@ public final class ProgramIndex {
                         .sorted(Comparator.comparingInt(n -> n.ordinal)).toList());
             }
         }
-        operations = b.operations; objects = b.objects; storage = b.storage;
+        operations = b.operations; b.objects.freeze();objects = b.objects; storage = b.storage;
         directCells = b.directCells; objectReferences = b.objectReferences;places=b.places;
         entries = b.entries; entryOrdinals = b.entryOrdinals;
         entryNodes = b.entryNodes; normalExits = b.normalExits;
@@ -119,18 +119,55 @@ public final class ProgramIndex {
         return unitBuckets.getOrDefault(kind,Map.of()).getOrDefault(owner,List.of());
     }
     public Memory.ObjectDeclaration object(ObjectId id) { return objects.get(id); }
-    /** Already correlated declarations in AIR inventory order; no store access or payload copy. */
+    /** Canonical AIR inventory order. Native access borrows one declaration from its owner;
+     * resident callers retain their original immutable instances. No owning body catalog. */
     public Collection<Memory.ObjectDeclaration> objects() { return Collections.unmodifiableCollection(objects.values()); }
+    /** Same immutable declaration addresses, not another catalog of decoded AIR bodies. */
+    public Map<ObjectId,Memory.ObjectDeclaration> objectDeclarations(){return Collections.unmodifiableMap(objects);}
     public Memory.Storage storage(StorageId id) { return storage.get(id); }
     /** Direct whole Cell association only; null does not assert absence of indirect storage. */
     public Memory.Cell directCell(ObjectId id) { return directCells.get(id); }
     public Place place(OperandId occurrence){return places.get(occurrence);}
     /** Pre-resolved ObjectPlace occurrence, including nested operands and Entry initial conditions. */
-    public Memory.ObjectDeclaration referencedObject(OperandId occurrence) { return objectReferences.get(occurrence); }
+    public Memory.ObjectDeclaration referencedObject(OperandId occurrence) { return objects.get(objectReferences.get(occurrence)); }
     /** Owner-checked body address; no resident AIR Sequence is required. */
     public ProgramStore.SequenceView sequence(Node node) {
         if (node.identity != identity) throw new IllegalArgumentException("foreign node");
         return node.sequence;
+    }
+
+    /** Identity inventory owns only immutable list addresses. Native payloads remain cold;
+     * explicit resident callers keep their original declaration instances and AIR order. */
+    static final class Declarations extends AbstractMap<ObjectId,Memory.ObjectDeclaration> {
+        private record Address(List<Memory.ObjectDeclaration> values,int ordinal) { }
+        private final Map<ObjectId,Address> addresses=new LinkedHashMap<>();
+        private boolean frozen;
+        boolean append(ObjectId id,List<Memory.ObjectDeclaration> values,int ordinal) {
+            if(frozen)throw new IllegalStateException("declaration inventory is frozen");
+            return addresses.putIfAbsent(Objects.requireNonNull(id),new Address(values,ordinal))==null;
+        }
+        void freeze(){frozen=true;}
+        @Override public int size(){return addresses.size();}
+        @Override public boolean containsKey(Object key){return addresses.containsKey(key);}
+        @Override public Set<ObjectId> keySet(){return Collections.unmodifiableSet(addresses.keySet());}
+        @Override public Memory.ObjectDeclaration get(Object key) {
+            var address=addresses.get(key);if(address==null)return null;
+            var value=address.values().get(address.ordinal());
+            if(!value.id().equals(key))throw new IllegalStateException("changed indexed Object identity");
+            return value;
+        }
+        @Override public Set<Entry<ObjectId,Memory.ObjectDeclaration>> entrySet() {
+            return Collections.unmodifiableSet(new AbstractSet<>() {
+                @Override public int size(){return addresses.size();}
+                @Override public Iterator<Entry<ObjectId,Memory.ObjectDeclaration>> iterator() {
+                    var keys=addresses.keySet().iterator();
+                    return new Iterator<>() {
+                        @Override public boolean hasNext(){return keys.hasNext();}
+                        @Override public Entry<ObjectId,Memory.ObjectDeclaration> next(){var key=keys.next();return new SimpleImmutableEntry<>(key,get(key));}
+                    };
+                }
+            });
+        }
     }
 
     /** Opaque index handle. Its private ordinal never becomes an AIR/CFG identity or public result. */
