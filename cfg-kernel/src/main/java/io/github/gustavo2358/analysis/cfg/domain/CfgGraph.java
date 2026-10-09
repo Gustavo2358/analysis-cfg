@@ -52,7 +52,7 @@ public final class CfgGraph {
                      WeakReference<Publication> sourceWitness,boolean canonicalNodes) {
         this.source = Objects.requireNonNull(source, "source");
         this.sourceWitness = sourceWitness;
-        this.nodes = List.copyOf(nodes);
+        this.nodes = nodes instanceof CfgNodeInventory ? nodes : List.copyOf(nodes);
         this.transitions = transitions instanceof CfgTransitionTable table ? table : List.copyOf(transitions);
         if(this.transitions instanceof CfgTransitionTable table&&!table.source().equals(source))
             throw new IllegalArgumentException("foreign factored projection owner");
@@ -61,7 +61,8 @@ public final class CfgGraph {
         List<CfgNode.HaltExit> haltNodes = new ArrayList<>();
         Map<EntryId, CfgNode.EntryNode> activationEntries = new HashMap<>();
         Map<CfgNodeId, CfgNode> indexed = new HashMap<>();
-        int ordinal=0;EntryId previousEntry=null;
+        var borrowed=this.nodes instanceof CfgNodeInventory inventory?inventory:null;
+        int ordinal=0,entryCount=0,normalCount=0,haltCount=0;EntryId previousEntry=null;
         for (CfgNode node : this.nodes) {
             if (!node.id().publicationId().equals(source.publicationId())
                     || (canonicalNodes ? node.id().ordinal()!=ordinal : indexed.putIfAbsent(node.id(), node) != null)) {
@@ -69,22 +70,30 @@ public final class CfgGraph {
             }
             ordinal++;
             if (node instanceof CfgNode.EntryNode entry) {
-                entryNodes.add(entry);
+                if(borrowed==null)entryNodes.add(entry);
+                else if(entryCount>=borrowed.entries().size()||!entry.equals(borrowed.entries().get(entryCount)))throw new IllegalArgumentException("CFG Entry role index disagrees with nodes");
+                entryCount++;
                 if (canonicalNodes ? previousEntry!=null&&compareEntries(previousEntry,entry.entry())>=0
                         : activationEntries.putIfAbsent(entry.entry(), entry) != null) {
                     throw new IllegalArgumentException("duplicate activation Entry");
                 }
                 previousEntry=entry.entry();
             } else if (node instanceof CfgNode.NormalExit exit) {
-                exitNodes.add(exit);
+                if(borrowed==null)exitNodes.add(exit);
+                else if(normalCount>=borrowed.normalExits().size()||!exit.equals(borrowed.normalExits().get(normalCount)))throw new IllegalArgumentException("CFG normal-exit role index disagrees with nodes");
+                normalCount++;
             } else if (node instanceof CfgNode.HaltExit halt) {
-                haltNodes.add(halt);
+                if(borrowed==null)haltNodes.add(halt);
+                else if(haltCount>=borrowed.haltExits().size()||!halt.equals(borrowed.haltExits().get(haltCount)))throw new IllegalArgumentException("CFG halt-exit role index disagrees with nodes");
+                haltCount++;
             }
         }
         localRules = LocalControlRules.project(this.nodes);
-        entries = List.copyOf(entryNodes);
-        normalExits = List.copyOf(exitNodes);
-        haltExits = List.copyOf(haltNodes);
+        if(borrowed!=null&&(entryCount!=borrowed.entries().size()||normalCount!=borrowed.normalExits().size()||haltCount!=borrowed.haltExits().size()))
+            throw new IllegalArgumentException("CFG role counts disagree with nodes");
+        entries = borrowed==null?List.copyOf(entryNodes):borrowed.entries();
+        normalExits = borrowed==null?List.copyOf(exitNodes):borrowed.normalExits();
+        haltExits = borrowed==null?List.copyOf(haltNodes):borrowed.haltExits();
         preciseControlCapabilities = source.preciseControlCapabilities();
         var stored=this.transitions instanceof CfgTransitionTable table?table.stored():this.transitions;
         if(this.transitions instanceof CfgTransitionTable table)for(int g=0;g<table.groups();g++)for(int e=0;e<table.entries(g);e++) {

@@ -171,6 +171,10 @@ EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CfgTransitionTable.java"] = {
     "io.github.gustavo2358.air.model.Ids.UnitId", "java.util.AbstractList", "java.util.ArrayList",
     "java.util.Arrays", "java.util.List", "java.util.Objects", "java.util.RandomAccess",
 }
+EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CfgNodeInventory.java"] = {
+    "java.util.AbstractList", "java.util.List", "java.util.Objects", "java.util.RandomAccess",
+    "java.util.function.IntFunction", "java.util.function.IntUnaryOperator",
+}
 EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CfgNode.java"].add(
     "io.github.gustavo2358.air.model.Operations")
 EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CfgGraph.java"].update({
@@ -189,6 +193,7 @@ EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/LocalControlRules.java"] = {
 CFG_CLASS_NAMES = {
     "CfgProgram", "CfgProgram$AdmittedSnapshot", "CfgProgram$UnitView", "CfgProgram$EntryView", "CfgProgram$SequenceView",
     "CfgProgram$Resident", "CfgProgram$ResidentUnit", "CfgProgram$OperationIds",
+    "CfgProgram$NodeStore", "CfgProgram$ResidentNodes", "CfgNodeInventory", "CfgNodeInventory$Roles",
     "CfgControl", "CfgControl$Jump", "CfgControl$Branch", "CfgControl$Return", "CfgControl$Halt",
     "CfgControl$Invoke", "CfgControl$Opaque", "CfgControl$ReentryGuard", "CfgControl$ResumeRoute",
     "CfgControl$LocalInvoke", "CfgControl$LocalBoundary", "CfgControl$LocalResume",
@@ -218,7 +223,7 @@ EXPECTED_TEST_CASES = {
     "io.github.gustavo2358.analysis.cfg.application.CheckedPreflightTest": 3,
     "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistryTest": 4,
     DOMAIN_CLASS + "LocalControlProjectionTest": 2,
-    DOMAIN_CLASS + "CfgGraphRetentionTest": 3,
+    DOMAIN_CLASS + "CfgGraphRetentionTest": 4,
     DOMAIN_CLASS + "EvalCfg025Test": 18,
     DOMAIN_CLASS + "EvalCfg028Test": 22,
     DOMAIN_CLASS + "EvalCfg029Test": 25,

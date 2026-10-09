@@ -10,6 +10,33 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /** Dense projection ordinals provide an index; validation must not duplicate it in maps. */
 class CfgGraphRetentionTest {
+    @Test void borrowedNodesKeepExactRoleValidationAndExpireWithoutCopying() {
+        var source=CfgSource.from(minimal());
+        var sequence=new CfgNode.SequenceNode(new CfgNodeId(P,0),L,List.of(),new CfgControl.Return(new OperationId(U,"return")));
+        var entry=new CfgNode.EntryNode(new CfgNodeId(P,1),E,Optional.of(L));
+        var exit=new CfgNode.NormalExit(new CfgNodeId(P,2),P,U,E);
+        var nodes=List.<CfgNode>of(sequence,entry,exit);boolean[] open={true};
+        Runnable owner=()->{if(!open[0])throw new IllegalStateException("expired descriptor owner");};
+        var borrowed=new CfgNodeInventory(3,nodes::get,owner,1,i->1,1,i->2,0,i->0);
+        var graph=CfgGraph.projected(source,borrowed,List.of(new CfgTransition(sequence.id(),exit.id(),CfgTransition.Kind.RETURN,E)));
+        assertSame(borrowed,graph.nodes());assertSame(borrowed.entries(),graph.entries());
+        assertSame(borrowed.normalExits(),graph.normalExits());assertEquals(List.of(entry),graph.entries());
+        for(int bad:new int[]{-1,0,2,3}) {
+            var wrong=new CfgNodeInventory(3,nodes::get,owner,1,i->bad,1,i->2,0,i->0);
+            assertThrows(IllegalArgumentException.class,()->CfgGraph.projected(source,wrong,List.of()));
+        }
+        for(int count:new int[]{0,2}) {
+            var wrong=new CfgNodeInventory(3,nodes::get,owner,count,i->1,1,i->2,0,i->0);
+            assertThrows(IllegalArgumentException.class,()->CfgGraph.projected(source,wrong,List.of()));
+        }
+        assertThrows(UnsupportedOperationException.class,graph.nodes()::clear);
+        assertThrows(UnsupportedOperationException.class,graph.entries()::clear);
+        open[0]=false;
+        assertThrows(IllegalStateException.class,graph.nodes()::size);
+        assertThrows(IllegalStateException.class,graph.nodes()::getFirst);
+        assertThrows(IllegalStateException.class,graph.entries()::size);
+        assertThrows(IllegalStateException.class,graph.normalExits()::getFirst);
+    }
     @Test void canonicalProjectionRejectsOrdinalNamespaceEntryAndEndpointContradictions() {
         var source=CfgSource.from(minimal());
         var sequence=new CfgNode.SequenceNode(new CfgNodeId(P,0),L,List.of(),new CfgControl.Return(new OperationId(U,"return")));

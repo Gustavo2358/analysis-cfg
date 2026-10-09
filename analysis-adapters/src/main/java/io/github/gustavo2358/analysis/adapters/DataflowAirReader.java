@@ -43,17 +43,26 @@ public final class DataflowAirReader {
     }
     /** New production path: JSON -> typed paged AIR -> one central admission certificate. */
     public SnapshotRead readSnapshot(Path path,AnalysisResources resources)throws IOException {
-        java.util.Objects.requireNonNull(path);java.util.Objects.requireNonNull(resources);Path directory=Files.createTempDirectory("analysis-air-snapshot-");FilePageStore pages=null;AirSnapshot snapshot=null;SnapshotValidator.CheckedSnapshot checked=null;Throwable primary=null;
+        java.util.Objects.requireNonNull(path);java.util.Objects.requireNonNull(resources);
+        return readSnapshot(path,resources,Files.createTempDirectory("analysis-air-snapshot-"),JsonFiles::input);
+    }
+    @FunctionalInterface interface SnapshotInput { InputStream open(Path path)throws IOException; }
+    /** Package seam for deterministic physical I/O failures; takes ownership of the fresh directory. */
+    SnapshotRead readSnapshot(Path path,AnalysisResources resources,Path directory,SnapshotInput source)throws IOException {
+        FilePageStore pages=null;AirSnapshot snapshot=null;SnapshotValidator.CheckedSnapshot checked=null;Throwable primary=null;boolean transferred=false;
         try {
             pages=new FilePageStore(directory,4096,decodeCachePages(resources),resources,AnalysisResources.Phase.DECODE);var digest=digest();
-            try(var input=new CountedInput(JsonFiles.input(path),digest)) {
+            SnapshotRead result;
+            try(var input=new CountedInput(source.open(path),digest)) {
                 snapshot=codec.decodeSnapshot(input,new PagedJsonInputStorage(pages,resources),new PagedAirStorage(pages,resources,AnalysisResources.Phase.DECODE));
                 checked=SnapshotValidator.check(snapshot,ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,resources));snapshot=null;
-                return new SnapshotRead(checked,pages,resources,directory,input.bytes,java.util.HexFormat.of().formatHex(digest.digest()));
+                result=new SnapshotRead(checked,pages,resources,directory,input.bytes,java.util.HexFormat.of().formatHex(digest.digest()));
             }
+            // Closing the physical input is part of admission. Transfer only after it succeeds.
+            transferred=true;return result;
         }catch(PageStore.Failure failure){var io=new IOException("paged AIR snapshot storage failure: "+failure.reason(),failure);primary=io;throw io;}
         catch(IOException|RuntimeException|Error failure){primary=failure;throw failure;}
-        finally {if(checked==null){try{if(snapshot!=null)snapshot.close();}catch(RuntimeException|Error cleanup){if(primary!=null)primary.addSuppressed(cleanup);else throw cleanup;}try{if(pages!=null)pages.close();}catch(RuntimeException|Error cleanup){if(primary!=null)primary.addSuppressed(cleanup);else throw cleanup;}try{Files.deleteIfExists(directory);}catch(IOException cleanup){if(primary!=null)primary.addSuppressed(cleanup);else throw cleanup;}}}
+        finally {if(!transferred){try{if(checked!=null)checked.close();else if(snapshot!=null)snapshot.close();}catch(RuntimeException|Error cleanup){if(primary!=null)primary.addSuppressed(cleanup);else throw cleanup;}try{if(pages!=null)pages.close();}catch(RuntimeException|Error cleanup){if(primary!=null)primary.addSuppressed(cleanup);else throw cleanup;}try{Files.deleteIfExists(directory);}catch(IOException cleanup){if(primary!=null)primary.addSuppressed(cleanup);else throw cleanup;}}}
     }
     /** Default route pages physical input; model admission/Publication remain resident for now. */
     public Read read(Path path) throws IOException {

@@ -37,6 +37,15 @@ de publicação coincidirem. O adapter continua responsável por mapear fielment
 os fatos do snapshot; a testemunha não certifica uma implementação arbitrária
 da porta. `SnapshotProgram` é o adapter de produção e não reconstrói Publication.
 
+`CfgProgram.NodeStore` is the projection's append/seal port. Entry/Sequence views carry
+optional opaque source handles (zero for resident callers), never wire offsets interpreted
+by the core. A snapshot backend may retain compact descriptors and role ordinal tapes,
+returning `CfgNodeInventory` views over the exact immutable input. Their count and all
+ordinal-to-node mappings remain invariant after seal. Repeated projection cannot mutate
+an existing inventory. The program owns these descriptors; the graph only borrows them.
+Graph admission validates the role indexes against the complete node scan, including
+wrong kinds, omissions, duplicate positions and out-of-range ordinals.
+
 `CfgBuildResult` registra `PublicationId`, versão AIR, options, o
 `ValidationResult` integral, capabilities requeridas sem intérprete, issues tipados
 da projeção e `Optional<CfgGraph>`. `CFG_BUILT` exige produto presente;

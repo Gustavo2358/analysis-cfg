@@ -28,6 +28,23 @@ public interface CfgProgram {
     Set<Capabilities.Capability> namePolicyExtensions();
     void units(Consumer<UnitView> consumer);
 
+    /** Fresh projection writer; snapshot adapters may reuse sealed descriptors for the same policy. */
+    default NodeStore nodes(ProjectionPolicy policy){Objects.requireNonNull(policy);return new ResidentNodes();}
+    interface NodeStore {
+        int size();
+        CfgNode get(int ordinal);
+        void append(CfgNode node,long sourceHandle,int variant);
+        List<CfgNode> seal();
+    }
+    final class ResidentNodes implements NodeStore {
+        private final java.util.ArrayList<CfgNode> nodes=new java.util.ArrayList<>();
+        private boolean sealed;
+        @Override public int size(){return nodes.size();}
+        @Override public CfgNode get(int ordinal){return nodes.get(ordinal);}
+        @Override public void append(CfgNode node,long sourceHandle,int variant){if(sealed)throw new IllegalStateException("sealed nodes");nodes.add(Objects.requireNonNull(node));}
+        @Override public List<CfgNode> seal(){sealed=true;return List.copyOf(nodes);}
+    }
+
     /**
      * Typed adapter boundary for an admitted snapshot, not a claim based on PublicationId.
      * All views must come from this exact validator-owned input and expire with it. The adapter
@@ -46,18 +63,22 @@ public interface CfgProgram {
         void sequences(Consumer<SequenceView> consumer);
     }
 
-    record EntryView(EntryId id, java.util.Optional<LabelId> initialLabel) {
+    record EntryView(EntryId id, java.util.Optional<LabelId> initialLabel,long sourceHandle) {
+        public EntryView(EntryId id,java.util.Optional<LabelId> initialLabel){this(id,initialLabel,0);}
         public EntryView {
             Objects.requireNonNull(id, "id");
             initialLabel = Objects.requireNonNull(initialLabel, "initialLabel");
+            if(sourceHandle<0)throw new IllegalArgumentException("negative program source handle");
         }
     }
 
-    record SequenceView(LabelId label, List<OperationId> operations, CfgControl control) {
+    record SequenceView(LabelId label, List<OperationId> operations, CfgControl control,long sourceHandle) {
+        public SequenceView(LabelId label,List<OperationId> operations,CfgControl control){this(label,operations,control,0);}
         public SequenceView {
             Objects.requireNonNull(label, "label");
             operations = immutableOperations(operations);
             Objects.requireNonNull(control, "control");
+            if(sourceHandle<0)throw new IllegalArgumentException("negative program source handle");
             if (!control.operation().unit().equals(label.unit())) {
                 throw new IllegalArgumentException("sequence control belongs to another Unit");
             }

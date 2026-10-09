@@ -228,6 +228,126 @@ final class SnapshotDependencyAnalysisTest {
         }
     }
 
+    @Test void snapshotCfgNodesAndRoleInventoriesBorrowColdDescriptorsAndExpireWithTheirOwner() {
+        long fixed=-1;
+        for(int count:new int[]{1,4,16,64,256}) {
+            var publication=directCalls(count);var ledger=resources();
+            try(var pages=new FilePageStore(directory,512,16,ledger);
+                var checked=SnapshotValidator.check(AirSnapshot.fromPublication(publication),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger))) {
+                List<io.github.gustavo2358.analysis.cfg.domain.CfgNode> borrowed;
+                List<io.github.gustavo2358.analysis.cfg.domain.CfgNode.EntryNode> entries;
+                try(var program=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),new PagedSnapshotOrderStorage(pages,ledger))) {
+                    program.source();long before=ledger.heapUsed();
+                    var graph=CoreCfgProjection.project(program);borrowed=graph.nodes();entries=graph.entries();
+                    assertEquals("CfgNodeInventory",borrowed.getClass().getSimpleName(),"snapshot nodes must not retain one resident object per node");
+                    long retained=ledger.heapUsed()-before;
+                    if(fixed<0)fixed=retained;else assertEquals(fixed,retained,"descriptor control metadata must not grow with Units");
+                    assertEquals(4*count,borrowed.size());assertEquals(count,entries.size());assertEquals(count,graph.normalExits().size());assertEquals(0,graph.haltExits().size());
+                    assertEquals(3*count,graph.transitions().size());
+                    for(int ordinal=0;ordinal<count;ordinal++) {
+                        var entry=entries.get(ordinal);assertEquals("entry",entry.entry().localId());assertEquals("start",entry.initialLabel().orElseThrow().localId());
+                        assertEquals(4L*ordinal+2,entry.id().ordinal());
+                        assertEquals(entry.entry(),graph.normalExits().get(ordinal).entryId());
+                        assertEquals(4L*ordinal+3,graph.normalExits().get(ordinal).id().ordinal());
+                        var end=assertInstanceOf(io.github.gustavo2358.analysis.cfg.domain.CfgNode.SequenceNode.class,borrowed.get(4*ordinal));
+                        assertEquals("end",end.label().localId());assertInstanceOf(io.github.gustavo2358.analysis.cfg.domain.CfgControl.Return.class,end.control());
+                        var start=assertInstanceOf(io.github.gustavo2358.analysis.cfg.domain.CfgNode.SequenceNode.class,borrowed.get(4*ordinal+1));
+                        assertEquals("start",start.label().localId());assertEquals(List.of("seed"),start.operations().stream().map(OperationId::localId).toList());
+                        assertInstanceOf(io.github.gustavo2358.analysis.cfg.domain.CfgControl.Invoke.class,start.control());
+                    }
+                    assertEquals(CoreCfgProjection.project(publication),graph);
+                    var repeated=CoreCfgProjection.project(program);assertEquals(graph,repeated);
+                    assertEquals(retained,ledger.heapUsed()-before,"repeat projection must reuse the immutable descriptor owner");
+                    assertThrows(UnsupportedOperationException.class,borrowed::clear);assertThrows(UnsupportedOperationException.class,entries::clear);
+                    System.out.println("SNAPSHOT_CFG_NODE_DESCRIPTOR_METRICS units="+count+" nodes="+borrowed.size()+" fixedHeap="+retained);
+                }
+                assertThrows(IllegalStateException.class,borrowed::size);assertThrows(IllegalStateException.class,borrowed::getFirst);
+                assertThrows(IllegalStateException.class,entries::size);assertThrows(IllegalStateException.class,entries::getFirst);
+                assertEquals(0,pages.statistics().livePages());
+            }
+            assertEquals(0,ledger.heapUsed());
+        }
+    }
+
+    @Test void deniedCfgDescriptorConstructionReleasesEveryPartialTape() {
+        for(int left:new int[]{3000,7000,10000}) {
+            var ledger=resources();
+            try(var pages=new FilePageStore(directory,512,16,ledger);
+                var checked=SnapshotValidator.check(AirSnapshot.fromPublication(directCall()),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger));
+                var program=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),new PagedSnapshotOrderStorage(pages,ledger))) {
+                program.source();
+                try(var pressure=ledger.reserve(AnalysisResources.Pool.RESIDENT,ledger.limits().heapBytes()-ledger.heapUsed()-left,AnalysisResources.Phase.CONTROL)) {
+                    assertTrue(pressure.amount()>0);long before=ledger.heapUsed();
+                    assertThrows(AnalysisResources.Exhausted.class,()->CoreCfgProjection.project(program));
+                    assertEquals(before,ledger.heapUsed(),"partially created descriptor tapes leaked their fixed reservations");
+                }
+            }
+            assertEquals(0,ledger.heapUsed());
+            for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
+        }
+    }
+
+    @Test void exportedCfgDescriptorsCanRetireBeforeDependenciesUseTheSameAir() {
+        var ledger=resources();
+        try(var pages=new FilePageStore(directory,512,16,ledger);
+            var checked=SnapshotValidator.check(AirSnapshot.fromPublication(directCall()),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger));
+            var program=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),new PagedSnapshotOrderStorage(pages,ledger))) {
+            program.source();long before=ledger.heapUsed();var graph=CoreCfgProjection.project(program);
+            assertTrue(ledger.heapUsed()>before);
+            program.releaseCfgProjection(io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy.KNOWN_SUBSET);
+            assertEquals(before,ledger.heapUsed());assertThrows(IllegalStateException.class,graph.nodes()::size);assertThrows(IllegalStateException.class,graph.entries()::getFirst);
+            assertDoesNotThrow(()->program.releaseCfgProjection(io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy.KNOWN_SUBSET));
+            var fresh=CoreCfgProjection.project(program);assertEquals(4,fresh.nodes().size());assertEquals("entry",fresh.entries().getFirst().entry().localId());
+            program.releaseCfgProjection(io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy.KNOWN_SUBSET);
+            assertEquals(before,ledger.heapUsed());
+            var result=new SnapshotDependencyAnalysis().analyze(program,new PagedSnapshotDependencyStorage(pages,ledger));
+            assertEquals("PROGA",result.sites().getFirst().candidates().getFirst().referenceName());
+            assertEquals("seed",result.sites().getFirst().candidates().getFirst().supports().getFirst().producer().localId());
+        }
+        assertEquals(0,ledger.heapUsed());
+        for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
+    }
+
+    @Test void pagedHaltRoleKeepsItsActualOccurrenceAndExactEndpoint() {
+        var base=directCall();var unit=base.units().getFirst();var end=unit.sequences().getLast();
+        var halted=new Sequence(end.label(),List.of(),new Operations.Halt(ResultFixtures.header(unit.id(),"stop"),Operations.HaltKind.ABNORMAL),end.origin());
+        var changed=ResultFixtures.unit(unit.id(),unit.entries(),List.of(unit.sequences().getFirst(),halted),unit.objects());
+        var publication=new Publication(base.id(),base.airVersion(),base.capabilities(),base.artifacts(),List.of(changed),base.storage(),base.resources(),base.artifactRelations(),base.origins(),base.coverage(),base.uncertainties(),base.premises());
+        var ledger=resources();
+        try(var pages=new FilePageStore(directory,512,16,ledger);
+            var checked=SnapshotValidator.check(AirSnapshot.fromPublication(publication),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger));
+            var program=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),new PagedSnapshotOrderStorage(pages,ledger))) {
+            assertEquals(ValidationResult.Status.STRUCTURALLY_VALID,checked.result().status());
+            var graph=CoreCfgProjection.project(program);assertEquals(5,graph.nodes().size());assertEquals(1,graph.haltExits().size());
+            var halt=graph.haltExits().getFirst();assertEquals(1,halt.id().ordinal());assertEquals("stop",halt.operation().localId());assertEquals(Operations.HaltKind.ABNORMAL,halt.haltKind());
+            var edge=graph.transitions().stream().filter(row->row.kind()==io.github.gustavo2358.analysis.cfg.domain.CfgTransition.Kind.HALT).findFirst().orElseThrow();
+            assertEquals(0,edge.from().ordinal());assertEquals(halt.id(),edge.to());assertEquals(unit.entries().getFirst().id(),edge.activationEntry());
+            assertEquals(CoreCfgProjection.project(publication),graph);
+        }
+        assertEquals(0,ledger.heapUsed());
+    }
+
+    @Test void pagedOutsideOutcomeKeepsItsActualInvokeAndExactEndpoint() {
+        var base=directCall();var unit=base.units().getFirst();var start=unit.sequences().getFirst();var invoke=(Operations.Invoke)start.terminator();
+        var outside=new Operations.Invoke(invoke.header(),invoke.action(),invoke.target(),invoke.arguments(),invoke.results(),invoke.signature(),invoke.effectOperands(),invoke.effectBound(),
+                new Control.InvocationOutcomes(List.of(invoke.outcomes().known().getFirst(),Control.HaltAlternative.INSTANCE),invoke.outcomes().remainder()),invoke.contract());
+        var changed=ResultFixtures.unit(unit.id(),unit.entries(),List.of(new Sequence(start.label(),start.instructions(),outside,start.origin()),unit.sequences().getLast()),unit.objects());
+        var publication=new Publication(base.id(),base.airVersion(),base.capabilities(),base.artifacts(),List.of(changed),base.storage(),base.resources(),base.artifactRelations(),base.origins(),base.coverage(),base.uncertainties(),base.premises());
+        var ledger=resources();var coordinator=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty());
+        try(var pages=new FilePageStore(directory,512,16,ledger);
+            var checked=SnapshotValidator.check(AirSnapshot.fromPublication(publication),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger));
+            var program=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),new PagedSnapshotOrderStorage(pages,ledger))) {
+            assertEquals(ValidationResult.Status.STRUCTURALLY_VALID,checked.result().status(),checked.result().toString());
+            var built=coordinator.buildChecked(program,checked,BuildOptions.defaults());var graph=built.graph().orElseThrow();
+            assertEquals(5,graph.nodes().size());var exit=assertInstanceOf(io.github.gustavo2358.analysis.cfg.domain.CfgNode.OutcomeExit.class,graph.nodes().get(2));
+            assertEquals(invoke.header().id(),exit.operation());assertEquals(Control.HaltAlternative.INSTANCE,exit.outcome());
+            var edge=graph.transitions().stream().filter(row->row.kind()==io.github.gustavo2358.analysis.cfg.domain.CfgTransition.Kind.CONTROL_EXIT).findFirst().orElseThrow();
+            assertEquals(1,edge.from().ordinal());assertEquals(exit.id(),edge.to());assertEquals(unit.entries().getFirst().id(),edge.activationEntry());
+            assertEquals(coordinator.build(publication,BuildOptions.defaults()).graph().orElseThrow(),graph);
+        }
+        assertEquals(0,ledger.heapUsed());
+    }
+
     @Test void validatedPagedSnapshotPreservesVariableCallEvidenceWithoutPublicationMaterialization() {
         var publication=directCall();var ledger=resources();
         try(var pages=new MemoryPageStore(128,ledger);var source=AirSnapshot.fromPublication(publication);
@@ -295,6 +415,56 @@ final class SnapshotDependencyAnalysisTest {
             assertEquals(CoreCfgProjection.project(two),coordinator.buildChecked(secondProgram,second,BuildOptions.defaults()).graph().orElseThrow());
         }
         assertEquals(0,ledger.heapUsed());
+    }
+
+    @Test void snapshotReaderCloseFailureAfterAdmissionDoesNotLeakAnUnreturnedSession()throws Exception {
+        var ledger=resources();byte[] raw=new AirJson().encode(correlatedCall());
+        var staging=Files.createDirectory(directory.resolve("close-failure"));
+        var failure=new java.io.IOException("synthetic stream close failure");int[] closes={0};
+        var reader=new DataflowAirReader();
+        var actual=assertThrows(java.io.IOException.class,()->reader.readSnapshot(staging.resolve("input.air.json"),ledger,staging,
+                path->new java.io.ByteArrayInputStream(raw) {
+                    @Override public void close()throws java.io.IOException {
+                        closes[0]++;assertTrue(ledger.used(AnalysisResources.Pool.TEMPORARY)>0,"input must reach owned snapshot before close fails");
+                        throw failure;
+                    }
+                }));
+        assertSame(failure,actual);assertEquals(1,closes[0]);
+        assertEquals(0,ledger.heapUsed(),"checked snapshot was never returned, so its owner must be released");
+        for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
+        assertFalse(Files.exists(staging),"failed transfer must remove its exact temporary directory");
+    }
+
+    @Test void snapshotReaderPreservesPrimaryCodecFailureWhenInputCloseAlsoFails()throws Exception {
+        var ledger=resources();var staging=Files.createDirectory(directory.resolve("codec-failure"));
+        var closeFailure=new java.io.IOException("synthetic cleanup failure");int[] closes={0};
+        var actual=assertThrows(io.github.gustavo2358.air.json.AirJsonException.class,()->new DataflowAirReader().readSnapshot(
+                staging.resolve("input.air.json"),ledger,staging,path->new java.io.ByteArrayInputStream("{".getBytes(StandardCharsets.UTF_8)) {
+                    @Override public void close()throws java.io.IOException{closes[0]++;throw closeFailure;}
+                }));
+        assertEquals(1,closes[0]);assertEquals(1,actual.getSuppressed().length);assertSame(closeFailure,actual.getSuppressed()[0]);
+        assertEquals(0,ledger.heapUsed());
+        for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
+        assertFalse(Files.exists(staging));
+    }
+
+    @Test void snapshotReaderTransfersOwnershipOnlyAfterInputCloseSucceeds()throws Exception {
+        var ledger=resources();byte[] raw=new AirJson().encode(correlatedCall());
+        var staging=Files.createDirectory(directory.resolve("successful-transfer"));int[] closes={0};
+        var read=new DataflowAirReader().readSnapshot(staging.resolve("input.air.json"),ledger,staging,
+                path->new java.io.ByteArrayInputStream(raw){@Override public void close(){closes[0]++;}});
+        try(read) {
+            assertEquals(1,closes[0]);assertTrue(ledger.heapUsed()>0);assertTrue(Files.exists(staging));
+            assertEquals(ValidationResult.Status.STRUCTURALLY_VALID,read.checked().result().status());
+            assertEquals(raw.length,read.airBytesObserved());assertEquals(1,read.airReads());
+            assertEquals(java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(raw)),read.sha256());
+            var result=new SnapshotDependencyAnalysis().analyze(read.checked(),read.newIdentityStorage(),read.newDependencyStorage());
+            assertEquals(List.of("AX","BY"),result.sites().getFirst().candidates().stream().map(DirectDependencyResult.Candidate::referenceName).toList());
+        }
+        assertEquals(1,closes[0]);assertThrows(IllegalStateException.class,read::checked);assertDoesNotThrow(read::close);
+        assertEquals(0,ledger.heapUsed());
+        for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
+        assertFalse(Files.exists(staging));
     }
 
     @SuppressWarnings("try") // Explicit closure is the lifetime counterexample under test.

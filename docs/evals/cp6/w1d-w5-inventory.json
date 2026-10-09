@@ -552,6 +552,7 @@
     "classfiles": [
       "io/github/gustavo2358/analysis/adapters/DataflowAirReader$CountedInput.class",
       "io/github/gustavo2358/analysis/adapters/DataflowAirReader$Read.class",
+      "io/github/gustavo2358/analysis/adapters/DataflowAirReader$SnapshotInput.class",
       "io/github/gustavo2358/analysis/adapters/DataflowAirReader$SnapshotRead.class",
       "io/github/gustavo2358/analysis/adapters/DataflowAirReader.class",
       "io/github/gustavo2358/analysis/adapters/DeliveryReceipt$Reason.class",
@@ -636,6 +637,7 @@
         "io.github.gustavo2358.air.validation.ValidationOptions",
         "io.github.gustavo2358.analysis.adapters.DataflowAirReader$CountedInput",
         "io.github.gustavo2358.analysis.adapters.DataflowAirReader$Read",
+        "io.github.gustavo2358.analysis.adapters.DataflowAirReader$SnapshotInput",
         "io.github.gustavo2358.analysis.adapters.DataflowAirReader$SnapshotRead",
         "io.github.gustavo2358.analysis.adapters.FilePageStore",
         "io.github.gustavo2358.analysis.adapters.JsonFiles",
@@ -659,6 +661,8 @@
         "java.lang.String",
         "java.lang.Throwable",
         "java.lang.invoke.CallSite",
+        "java.lang.invoke.LambdaMetafactory",
+        "java.lang.invoke.MethodHandle",
         "java.lang.invoke.MethodHandles",
         "java.lang.invoke.MethodHandles$Lookup",
         "java.lang.invoke.MethodType",
@@ -701,6 +705,14 @@
         "java.util.Objects",
         "java.util.Optional",
         "java.util.function.Consumer"
+      ],
+      "io.github.gustavo2358.analysis.adapters.DataflowAirReader$SnapshotInput": [
+        "io.github.gustavo2358.analysis.adapters.DataflowAirReader",
+        "java.io.IOException",
+        "java.io.InputStream",
+        "java.lang.FunctionalInterface",
+        "java.lang.Object",
+        "java.nio.file.Path"
       ],
       "io.github.gustavo2358.analysis.adapters.DataflowAirReader$SnapshotRead": [
         "io.github.gustavo2358.air.validation.SnapshotIdentityKeys",
@@ -2540,6 +2552,7 @@
     "javap_descriptors": {
       "io/github/gustavo2358/analysis/adapters/DataflowAirReader$CountedInput.class": "Compiled from \"DataflowAirReader.java\"\nfinal class io.github.gustavo2358.analysis.adapters.DataflowAirReader$CountedInput extends java.security.DigestInputStream {\n  public int read() throws java.io.IOException;\n    descriptor: ()I\n\n  public int read(byte[], int, int) throws java.io.IOException;\n    descriptor: ([BII)I\n}\n",
       "io/github/gustavo2358/analysis/adapters/DataflowAirReader$Read.class": "Compiled from \"DataflowAirReader.java\"\npublic final class io.github.gustavo2358.analysis.adapters.DataflowAirReader$Read extends java.lang.Record {\n  public io.github.gustavo2358.analysis.adapters.DataflowAirReader$Read(io.github.gustavo2358.air.model.Publication, long, long, java.lang.String, java.util.Optional<io.github.gustavo2358.air.validation.AirValidator$CheckedPublication>);\n    descriptor: (Lio/github/gustavo2358/air/model/Publication;JJLjava/lang/String;Ljava/util/Optional;)V\n\n  public io.github.gustavo2358.analysis.adapters.DataflowAirReader$Read(io.github.gustavo2358.air.model.Publication, long, long, java.lang.String);\n    descriptor: (Lio/github/gustavo2358/air/model/Publication;JJLjava/lang/String;)V\n\n  public io.github.gustavo2358.analysis.adapters.DataflowAirReader$Read(io.github.gustavo2358.air.model.Publication, long, long);\n    descriptor: (Lio/github/gustavo2358/air/model/Publication;JJ)V\n\n  public final java.lang.String toString();\n    descriptor: ()Ljava/lang/String;\n\n  public final int hashCode();\n    descriptor: ()I\n\n  public final boolean equals(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)Z\n\n  public io.github.gustavo2358.air.model.Publication publication();\n    descriptor: ()Lio/github/gustavo2358/air/model/Publication;\n\n  public long airReads();\n    descriptor: ()J\n\n  public long airBytesObserved();\n    descriptor: ()J\n\n  public java.lang.String sha256();\n    descriptor: ()Ljava/lang/String;\n\n  public java.util.Optional<io.github.gustavo2358.air.validation.AirValidator$CheckedPublication> checked();\n    descriptor: ()Ljava/util/Optional;\n}\n",
+      "io/github/gustavo2358/analysis/adapters/DataflowAirReader$SnapshotInput.class": "Compiled from \"DataflowAirReader.java\"\ninterface io.github.gustavo2358.analysis.adapters.DataflowAirReader$SnapshotInput {\n  public abstract java.io.InputStream open(java.nio.file.Path) throws java.io.IOException;\n    descriptor: (Ljava/nio/file/Path;)Ljava/io/InputStream;\n}\n",
       "io/github/gustavo2358/analysis/adapters/DataflowAirReader$SnapshotRead.class": "Compiled from \"DataflowAirReader.java\"\npublic final class io.github.gustavo2358.analysis.adapters.DataflowAirReader$SnapshotRead implements java.lang.AutoCloseable {\n  public synchronized io.github.gustavo2358.air.validation.SnapshotValidator$CheckedSnapshot checked();\n    descriptor: ()Lio/github/gustavo2358/air/validation/SnapshotValidator$CheckedSnapshot;\n\n  public synchronized io.github.gustavo2358.air.validation.SnapshotIdentityKeys$Storage newIdentityStorage();\n    descriptor: ()Lio/github/gustavo2358/air/validation/SnapshotIdentityKeys$Storage;\n\n  public synchronized io.github.gustavo2358.analysis.dependencies.SnapshotOrderStorage newOrderStorage();\n    descriptor: ()Lio/github/gustavo2358/analysis/dependencies/SnapshotOrderStorage;\n\n  public synchronized io.github.gustavo2358.analysis.dependencies.SnapshotDependencyAnalysis$Storage newDependencyStorage();\n    descriptor: ()Lio/github/gustavo2358/analysis/dependencies/SnapshotDependencyAnalysis$Storage;\n\n  public io.github.gustavo2358.analysis.solver.AnalysisResources resources();\n    descriptor: ()Lio/github/gustavo2358/analysis/solver/AnalysisResources;\n\n  public long airReads();\n    descriptor: ()J\n\n  public long airBytesObserved();\n    descriptor: ()J\n\n  public java.lang.String sha256();\n    descriptor: ()Ljava/lang/String;\n\n  public synchronized void close();\n    descriptor: ()V\n}\n",
       "io/github/gustavo2358/analysis/adapters/DataflowAirReader.class": "Compiled from \"DataflowAirReader.java\"\npublic final class io.github.gustavo2358.analysis.adapters.DataflowAirReader {\n  public io.github.gustavo2358.analysis.adapters.DataflowAirReader();\n    descriptor: ()V\n\n  public io.github.gustavo2358.analysis.adapters.DataflowAirReader(io.github.gustavo2358.air.json.AirJson);\n    descriptor: (Lio/github/gustavo2358/air/json/AirJson;)V\n\n  public static io.github.gustavo2358.analysis.adapters.DataflowAirReader forPartialAnalysis();\n    descriptor: ()Lio/github/gustavo2358/analysis/adapters/DataflowAirReader;\n\n  public io.github.gustavo2358.analysis.adapters.DataflowAirReader$SnapshotRead readSnapshot(java.nio.file.Path, io.github.gustavo2358.analysis.solver.AnalysisResources) throws java.io.IOException;\n    descriptor: (Ljava/nio/file/Path;Lio/github/gustavo2358/analysis/solver/AnalysisResources;)Lio/github/gustavo2358/analysis/adapters/DataflowAirReader$SnapshotRead;\n\n  public io.github.gustavo2358.analysis.adapters.DataflowAirReader$Read read(java.nio.file.Path) throws java.io.IOException;\n    descriptor: (Ljava/nio/file/Path;)Lio/github/gustavo2358/analysis/adapters/DataflowAirReader$Read;\n\n  public io.github.gustavo2358.analysis.adapters.DataflowAirReader$Read read(java.nio.file.Path, io.github.gustavo2358.analysis.solver.AnalysisResources) throws java.io.IOException;\n    descriptor: (Ljava/nio/file/Path;Lio/github/gustavo2358/analysis/solver/AnalysisResources;)Lio/github/gustavo2358/analysis/adapters/DataflowAirReader$Read;\n}\n",
       "io/github/gustavo2358/analysis/adapters/DeliveryReceipt$Reason.class": "Compiled from \"DeliveryReceipt.java\"\npublic final class io.github.gustavo2358.analysis.adapters.DeliveryReceipt$Reason extends java.lang.Enum<io.github.gustavo2358.analysis.adapters.DeliveryReceipt$Reason> {\n  public static final io.github.gustavo2358.analysis.adapters.DeliveryReceipt$Reason ENCODING_FAILED;\n    descriptor: Lio/github/gustavo2358/analysis/adapters/DeliveryReceipt$Reason;\n  public static final io.github.gustavo2358.analysis.adapters.DeliveryReceipt$Reason WRITE_FAILED;\n    descriptor: Lio/github/gustavo2358/analysis/adapters/DeliveryReceipt$Reason;\n  public static final io.github.gustavo2358.analysis.adapters.DeliveryReceipt$Reason FINALIZATION_FAILED;\n    descriptor: Lio/github/gustavo2358/analysis/adapters/DeliveryReceipt$Reason;\n  public static io.github.gustavo2358.analysis.adapters.DeliveryReceipt$Reason[] values();\n    descriptor: ()[Lio/github/gustavo2358/analysis/adapters/DeliveryReceipt$Reason;\n\n  public static io.github.gustavo2358.analysis.adapters.DeliveryReceipt$Reason valueOf(java.lang.String);\n    descriptor: (Ljava/lang/String;)Lio/github/gustavo2358/analysis/adapters/DeliveryReceipt$Reason;\n}\n",
@@ -2755,6 +2768,7 @@
         "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult",
         "io.github.gustavo2358.analysis.cfg.application.CfgBuildResult$Status",
         "io.github.gustavo2358.analysis.cfg.domain.CfgProgram",
+        "io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy",
         "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry",
         "io.github.gustavo2358.analysis.dependencies.DependencyAnalysis",
         "io.github.gustavo2358.analysis.dependencies.DependencyAnalysis$Failure",

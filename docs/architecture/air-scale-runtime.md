@@ -476,7 +476,22 @@ They do not rebuild program-sized node/Entry identity maps. General public graph
 retain arbitrary valid ordinals and ordering, with their original strict map-based checks.
 Projection reuses the existing node range for its ordered Sequence pass and only stores actual
 outside exits; ordinary programs do not construct the unused local-control label index.
-Nodes, role inventories, per-Unit lookup maps and physical transition rows still remain resident.
+Snapshot projections now retain node descriptors and role ordinals in four paged tapes:
+node kind + opaque official source handle + outside-outcome variant, plus Entry/normal/Halt
+ordinal indexes. The same core projection creates their IDs and transitions; the adapter
+rehydrates exact typed facts from the admitted snapshot, not a shadow AIR or JSON model.
+`CfgNodeInventory` preserves these immutable borrowed views without List.copyOf. Graph
+validation still checks every node, role index, endpoint, activation and correlation.
+One owner per projection policy (a fixed enum) is reused on repeated projections, with
+exact descriptor equality checks. Partial tape construction rolls back its reservations;
+all views expire with the program/admission owner. The production composition selects
+this backend through SnapshotProgram; resident callers retain their established backend.
+After successful CFG export the composition retires its descriptor owner before dependency
+analysis, preserving the shared AIR input and expiring only the old CFG views. Reprojection
+creates a fresh owner if later required; exported descriptors are not historical roots.
+Per-Unit lookup maps, physical transition rows and duplicate-row validation still remain
+resident. A large single Unit can therefore still exceed the managed envelope; this node
+substitution is not a claim that the entire graph or preparation is resource-bounded.
 
 Snapshot-backed operation inventories reconstruct only the local instruction identity on query.
 The Unit namespace is shared across one Unit scan because complete admission has already proved

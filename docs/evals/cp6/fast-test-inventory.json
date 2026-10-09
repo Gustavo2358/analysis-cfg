@@ -482,6 +482,14 @@
       "incompleteAdmissionCannotProduceDependencies",
       "cfgBuildCannotReuseAdmissionForAnotherProgramWithTheSamePublicationId",
       "cfgBuildCannotReuseClosedSnapshotAdmissionOrProgram",
+      "snapshotCfgNodesAndRoleInventoriesBorrowColdDescriptorsAndExpireWithTheirOwner",
+      "deniedCfgDescriptorConstructionReleasesEveryPartialTape",
+      "exportedCfgDescriptorsCanRetireBeforeDependenciesUseTheSameAir",
+      "pagedHaltRoleKeepsItsActualOccurrenceAndExactEndpoint",
+      "pagedOutsideOutcomeKeepsItsActualInvokeAndExactEndpoint",
+      "snapshotReaderCloseFailureAfterAdmissionDoesNotLeakAnUnreturnedSession",
+      "snapshotReaderPreservesPrimaryCodecFailureWhenInputCloseAlsoFails",
+      "snapshotReaderTransfersOwnershipOnlyAfterInputCloseSucceeds",
       "leasedCursorWireMatchesExplicitMaterialization"
     ],
     "io.github.gustavo2358.analysis.adapters.PagedSnapshotDependencyStorageTest": [
@@ -1534,6 +1542,7 @@
       "sharedBodyIsProjectedOnceWithoutUnconditionalReturns"
     ],
     "io.github.gustavo2358.analysis.cfg.domain.CfgGraphRetentionTest": [
+      "borrowedNodesKeepExactRoleValidationAndExpireWithoutCopying",
       "canonicalProjectionRejectsOrdinalNamespaceEntryAndEndpointContradictions",
       "generalConstructorsKeepArbitraryValidOrdinalsAndEntryOrder",
       "canonicalProjectionValidatesEndpointsWithoutProgramSizedIdentityMaps"

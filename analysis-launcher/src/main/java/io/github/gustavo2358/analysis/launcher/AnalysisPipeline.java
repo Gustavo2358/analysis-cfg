@@ -96,6 +96,7 @@ public final class AnalysisPipeline {
                         bytes->resources.output(bytes,AnalysisResources.Phase.ENCODE));}
                 catch(CfgJsonException failure){err.println("CFG_OUTPUT_SERIALIZATION");return 5;}
                 catch(IOException failure){err.println("CFG_OUTPUT_IO");return 6;}
+                program.releaseCfgProjection(built.options().projectionPolicy());
                 try(var result=new SnapshotDependencyAnalysis().open(program,read.newDependencyStorage())) {
                     try {new SnapshotDependencyFileWriter().write(result,dependencies,resources);}
                     catch(IOException|IllegalArgumentException failure){err.println("DEPENDENCY_OUTPUT_FAILURE");return 6;}

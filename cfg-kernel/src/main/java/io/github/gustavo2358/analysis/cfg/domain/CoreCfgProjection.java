@@ -139,7 +139,7 @@ public final class CoreCfgProjection {
     public static CfgGraph project(CfgProgram program, ProjectionPolicy policy) {
         Objects.requireNonNull(program, "program");
         Objects.requireNonNull(policy, "policy");
-        List<CfgNode> nodes = new ArrayList<>();
+        CfgProgram.NodeStore nodes = program.nodes(policy);
         var source=program.source();
         var table=new CfgTransitionTable.Builder(source);
         program.units(unit -> {
@@ -152,19 +152,20 @@ public final class CoreCfgProjection {
                         new CfgNodeId(source.publicationId(), nodes.size()), sequence.label(),
                         sequence.operations(), sequence.control());
                 sequences.put(sequence.label(), node);
-                nodes.add(node);
+                nodes.append(node,sequence.sourceHandle(),0);
                 var exits=new ArrayList<CfgNode.OutcomeExit>();
+                int variant=0;
                 for(var alternative:CfgControl.alternatives(node.control()).stream()
                         .filter(CoreCfgProjection::outside).distinct().toList()) {
                     var end=new CfgNode.OutcomeExit(new CfgNodeId(source.publicationId(),nodes.size()),
                             node.control(),(Control.InvocationAlternative)alternative);
-                    nodes.add(end);exits.add(end);
+                    nodes.append(end,sequence.sourceHandle(),variant++);exits.add(end);
                 }
                 if(!exits.isEmpty())outsideNodes.put(sequence.label(),exits);
                 if (node.control() instanceof CfgControl.Halt halt) {
                     CfgNode.HaltExit termination = new CfgNode.HaltExit(
                             new CfgNodeId(source.publicationId(), nodes.size()), halt.operation(), halt.haltKind());
-                    nodes.add(termination);
+                    nodes.append(termination,sequence.sourceHandle(),0);
                     halts.put(sequence.label(), termination);
                 }
             });
@@ -175,10 +176,10 @@ public final class CoreCfgProjection {
                 if (entry.initialLabel().isEmpty() && policy == ProjectionPolicy.PARTIAL_ANALYSIS) return;
                 CfgNode.EntryNode entryNode = new CfgNode.EntryNode(
                         new CfgNodeId(source.publicationId(), nodes.size()), entry.id(), entry.initialLabel());
-                nodes.add(entryNode);
+                nodes.append(entryNode,entry.sourceHandle(),0);
                 CfgNode.NormalExit exit = new CfgNode.NormalExit(
                         new CfgNodeId(source.publicationId(), nodes.size()), source.publicationId(), unit.id(), entry.id());
-                nodes.add(exit);
+                nodes.append(exit,entry.sourceHandle(),0);
                 entryEdges.add(new CfgTransition(entryNode.id(),sequences.get(entry.initialLabel().orElseThrow()).id(),CfgTransition.Kind.ENTRY,entry.id()));
                 normalExits.add(exit.id());if(representative[0]==null)representative[0]=entry.id();
             });
@@ -230,8 +231,9 @@ public final class CoreCfgProjection {
             }
             table.add(unit.id(),entryEdges,normalExits,transitions);
         });
+        var inventory=nodes.seal();
         return program instanceof CfgProgram.Resident resident
-                ? new CfgGraph(resident.publication(), source, nodes, table.build())
-                : CfgGraph.projected(source, nodes, table.build());
+                ? new CfgGraph(resident.publication(), source, inventory, table.build())
+                : CfgGraph.projected(source, inventory, table.build());
     }
 }

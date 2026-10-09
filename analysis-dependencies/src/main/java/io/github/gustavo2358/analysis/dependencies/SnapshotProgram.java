@@ -7,6 +7,10 @@ import io.github.gustavo2358.analysis.cfg.domain.CfgControl;
 import io.github.gustavo2358.analysis.cfg.domain.CfgProgram;
 import io.github.gustavo2358.analysis.cfg.domain.CfgSource;
 import io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection;
+import io.github.gustavo2358.analysis.cfg.domain.CfgNode;
+import io.github.gustavo2358.analysis.cfg.domain.CfgNodeId;
+import io.github.gustavo2358.analysis.cfg.domain.CfgNodeInventory;
+import io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy;
 import io.github.gustavo2358.analysis.structure.ProgramStore;
 import java.math.BigInteger;
 import java.util.*;
@@ -29,6 +33,7 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
     private SnapshotOrderStorage.Tape unitOrder;
     private List<Capabilities.Capability> requiredCapabilities;
     private Set<Capabilities.Capability> namePolicyExtensions;
+    private final EnumMap<ProjectionPolicy,SnapshotNodes> nodeStores=new EnumMap<>(ProjectionPolicy.class);
     private boolean closed;
 
     public SnapshotProgram(SnapshotValidator.CheckedSnapshot checked,SnapshotIdentityKeys.Storage identityStorage) {
@@ -43,6 +48,9 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
     }
 
     @Override public SnapshotValidator.CheckedSnapshot admission(){open();admission.snapshot();return admission;}
+    @Override public CfgProgram.NodeStore nodes(ProjectionPolicy policy){admission();return nodeStores.computeIfAbsent(Objects.requireNonNull(policy),ignored->new SnapshotNodes()).writer();}
+    /** Retire an exported projection without closing the shared AIR/dependency owner. */
+    public void releaseCfgProjection(ProjectionPolicy policy){open();var nodes=nodeStores.remove(Objects.requireNonNull(policy));if(nodes!=null)nodes.close();}
     public PublicationId publication(){open();return (PublicationId)id(snapshot.field(snapshot.root(),PUBLICATION,0));}
     public Evidence.InventoryStatus coverage(){open();long coverage=snapshot.field(snapshot.root(),PUBLICATION,9);return Evidence.InventoryStatus.values()[(int)snapshot.scalar(snapshot.field(coverage,EVIDENCE_COVERAGE,0))];}
     @Override public PublicationId publicationId(){return publication();}
@@ -132,7 +140,7 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
             open();Objects.requireNonNull(consumer);long values=snapshot.field(handle,UNIT,4);
             ordered(values,ENTRIES_ENTRY,(a,b)->compareLocalIds(a,ENTRIES_ENTRY,0,b,ENTRIES_ENTRY,0),entry->{long initial=snapshot.field(entry,ENTRIES_ENTRY,1);consumer.accept(new CfgProgram.EntryView(
                     (EntryId)SnapshotProgram.this.id(snapshot.field(entry,ENTRIES_ENTRY,0)),snapshot.size(initial)==0?Optional.empty():
-                    Optional.of((LabelId)SnapshotProgram.this.id(snapshot.element(initial,IDS_LABEL_ID,0)))));});
+                    Optional.of((LabelId)SnapshotProgram.this.id(snapshot.element(initial,IDS_LABEL_ID,0))),entry));});
         }
         @Override public void sequences(Consumer<CfgProgram.SequenceView> consumer) {
             open();Objects.requireNonNull(consumer);long values=snapshot.field(handle,UNIT,5);
@@ -140,15 +148,98 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
             // Retain that namespace once per Unit scan, not reconstruct it for each query.
             UnitId owner=id();
             ordered(values,SEQUENCE,(a,b)->compareLocalIds(a,SEQUENCE,0,b,SEQUENCE,0),sequence->{
-                    long instructions=snapshot.field(sequence,SEQUENCE,1);
-                    var operations=new CfgProgram.OperationIds(Math.toIntExact(snapshot.size(instructions)),ordinal->{
-                        long instruction=snapshot.element(instructions,INSTRUCTION,ordinal),header=snapshot.field(instruction,snapshot.shape(instruction),0);
-                        long operation=snapshot.field(header,OPERATIONS_HEADER,0);
-                        return new OperationId(owner,text(snapshot.field(operation,IDS_OPERATION_ID,1)));
-                    },()->{SnapshotProgram.this.open();snapshot.shape(instructions);});
-                    consumer.accept(new CfgProgram.SequenceView((LabelId)SnapshotProgram.this.id(snapshot.field(sequence,SEQUENCE,0)),
-                            operations,control(snapshot.field(sequence,SEQUENCE,2))));
+                    consumer.accept(sequenceView(sequence,owner));
             });
+        }
+    }
+
+    private CfgProgram.SequenceView sequenceView(long sequence,UnitId owner) {
+        long instructions=snapshot.field(sequence,SEQUENCE,1);
+        var operations=new CfgProgram.OperationIds(Math.toIntExact(snapshot.size(instructions)),ordinal->{
+            long instruction=snapshot.element(instructions,INSTRUCTION,ordinal),header=snapshot.field(instruction,snapshot.shape(instruction),0);
+            return new OperationId(owner,text(snapshot.field(snapshot.field(header,OPERATIONS_HEADER,0),IDS_OPERATION_ID,1)));
+        },()->{SnapshotProgram.this.open();snapshot.shape(instructions);});
+        return new CfgProgram.SequenceView((LabelId)id(snapshot.field(sequence,SEQUENCE,0)),operations,control(snapshot.field(sequence,SEQUENCE,2)),sequence);
+    }
+
+    private enum NodeKind { SEQUENCE,ENTRY,NORMAL_EXIT,HALT_EXIT,OUTCOME_EXIT }
+    /** Four native tapes per policy (the enum bounds the owner count), never a per-node callback map. */
+    private final class SnapshotNodes implements AutoCloseable {
+        private final SnapshotOrderStorage.Tape[] tapes=new SnapshotOrderStorage.Tape[4];
+        private CfgNodeInventory view;
+        private boolean ended,failed;
+        private SnapshotNodes() {
+            try{for(int i=0;i<tapes.length;i++)tapes[i]=orderStorage.tape();}
+            catch(RuntimeException|Error failure){try{close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;}
+        }
+        private void available(){admission();if(ended||failed)throw new IllegalStateException("snapshot CFG descriptors are closed or aborted");tapes[0].size();}
+        private int count(){available();return Math.toIntExact(tapes[0].size()/3);}
+        private NodeKind kind(CfgNode node) {
+            if(node instanceof CfgNode.SequenceNode)return NodeKind.SEQUENCE;
+            if(node instanceof CfgNode.EntryNode)return NodeKind.ENTRY;
+            if(node instanceof CfgNode.NormalExit)return NodeKind.NORMAL_EXIT;
+            if(node instanceof CfgNode.HaltExit)return NodeKind.HALT_EXIT;
+            if(node instanceof CfgNode.OutcomeExit)return NodeKind.OUTCOME_EXIT;
+            throw new IllegalArgumentException("unknown CFG node role");
+        }
+        private CfgNode read(int ordinal) {
+            Objects.checkIndex(ordinal,count());long base=3L*ordinal;
+            var role=NodeKind.values()[Math.toIntExact(tapes[0].handle(base)-1)];
+            long handle=tapes[0].handle(base+1);int variant=Math.toIntExact(tapes[0].handle(base+2)-1);
+            var nodeId=new CfgNodeId(publication(),ordinal);
+            if(role==NodeKind.ENTRY||role==NodeKind.NORMAL_EXIT) {
+                var entry=(EntryId)id(snapshot.field(handle,ENTRIES_ENTRY,0));
+                if(role==NodeKind.NORMAL_EXIT)return new CfgNode.NormalExit(nodeId,entry.publication(),entry.unit(),entry);
+                long initial=snapshot.field(handle,ENTRIES_ENTRY,1);
+                return new CfgNode.EntryNode(nodeId,entry,snapshot.size(initial)==0?Optional.empty():Optional.of((LabelId)id(snapshot.element(initial,IDS_LABEL_ID,0))));
+            }
+            if(role==NodeKind.SEQUENCE) {
+                var label=(LabelId)id(snapshot.field(handle,SEQUENCE,0));var sequence=sequenceView(handle,label.unit());
+                return new CfgNode.SequenceNode(nodeId,sequence.label(),sequence.operations(),sequence.control());
+            }
+            var control=control(snapshot.field(handle,SEQUENCE,2));
+            if(role==NodeKind.HALT_EXIT){var halt=(CfgControl.Halt)control;return new CfgNode.HaltExit(nodeId,halt.operation(),halt.haltKind());}
+            var outside=CfgControl.alternatives(control).stream().filter(CoreCfgProjection::outside).distinct().toList();
+            return new CfgNode.OutcomeExit(nodeId,control,(Control.InvocationAlternative)outside.get(variant));
+        }
+        private CfgProgram.NodeStore writer() {
+            available();
+            return new CfgProgram.NodeStore() {
+                private int at;private boolean sealed;
+                private void active(){available();if(sealed)throw new IllegalStateException("sealed CFG descriptor writer");}
+                @Override public int size(){active();return at;}
+                @Override public CfgNode get(int ordinal){active();Objects.checkIndex(ordinal,at);return read(ordinal);}
+                @Override public void append(CfgNode node,long handle,int variant) {
+                    active();Objects.requireNonNull(node);
+                    if(handle<=0||variant<0||node.id().ordinal()!=at||!node.id().publicationId().equals(publication()))throw new IllegalArgumentException("invalid CFG descriptor");
+                    long kind=kind(node).ordinal()+1L;
+                    try {
+                        if(view!=null) {
+                            Objects.checkIndex(at,view.size());long base=3L*at;
+                            if(tapes[0].handle(base)!=kind||tapes[0].handle(base+1)!=handle||tapes[0].handle(base+2)!=variant+1L)
+                                throw new IllegalArgumentException("repeated projection changed its immutable descriptor");
+                        } else {
+                            tapes[0].append(kind);tapes[0].append(handle);tapes[0].append(variant+1L);
+                            int role=node instanceof CfgNode.EntryNode?1:node instanceof CfgNode.NormalExit?2:node instanceof CfgNode.HaltExit?3:0;
+                            if(role!=0)tapes[role].append(at+1L);
+                        }
+                        at=Math.addExact(at,1);
+                    } catch(RuntimeException|Error failure){failed=true;throw failure;}
+                }
+                @Override public List<CfgNode> seal() {
+                    active();if(at!=count())throw new IllegalArgumentException("incomplete repeated CFG projection");
+                    if(view==null)view=new CfgNodeInventory(at,SnapshotNodes.this::read,SnapshotNodes.this::available,
+                            Math.toIntExact(tapes[1].size()),i->Math.toIntExact(tapes[1].handle(i)-1),
+                            Math.toIntExact(tapes[2].size()),i->Math.toIntExact(tapes[2].handle(i)-1),
+                            Math.toIntExact(tapes[3].size()),i->Math.toIntExact(tapes[3].handle(i)-1));
+                    sealed=true;return view;
+                }
+            };
+        }
+        @Override public void close() {
+            if(ended)return;ended=true;Throwable failure=null;
+            for(var tape:tapes)if(tape!=null)try{tape.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
+            if(failure instanceof RuntimeException exception)throw exception;if(failure instanceof Error error)throw error;
         }
     }
 
@@ -470,7 +561,8 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
     private String text(long source){long length=snapshot.characterCount(source);if(length>Integer.MAX_VALUE)throw new IllegalStateException("program text too large");char[] result=new char[(int)length],block=new char[Math.min(1024,Math.max(1,result.length))];long offset=0;while(offset<length){int count=snapshot.readCharacters(source,offset,block,0,(int)Math.min(block.length,length-offset));System.arraycopy(block,0,result,(int)offset,count);offset+=count;}return new String(result);}
     private void open(){if(closed)throw new IllegalStateException("snapshot program is closed");}
     @Override public void close(){if(closed)return;closed=true;Throwable failure=null;
-        try{if(unitOrder!=null)unitOrder.close();}catch(RuntimeException|Error cleanup){failure=cleanup;}
+        for(var nodes:nodeStores.values())try{nodes.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
+        try{if(unitOrder!=null)unitOrder.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
         try{keys.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
         try{orderStorage.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
         if(failure instanceof RuntimeException exception)throw exception;if(failure instanceof Error error)throw error;}
