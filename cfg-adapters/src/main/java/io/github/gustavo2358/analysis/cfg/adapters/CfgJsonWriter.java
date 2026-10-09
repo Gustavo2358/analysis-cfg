@@ -9,6 +9,7 @@ import io.github.gustavo2358.analysis.cfg.domain.CfgNode;
 import io.github.gustavo2358.analysis.cfg.domain.LocalControlRules;
 import io.github.gustavo2358.analysis.cfg.domain.CfgNodeId;
 import io.github.gustavo2358.analysis.cfg.domain.CfgTransition;
+import io.github.gustavo2358.analysis.cfg.domain.CfgTransitionTable;
 import io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy;
 import java.io.IOException;
 import java.io.BufferedOutputStream;
@@ -55,6 +56,9 @@ public final class CfgJsonWriter {
         if (result.options().projectionPolicy() == ProjectionPolicy.PARTIAL_ANALYSIS)
             throw new CfgJsonException("PARTIAL_ANALYSIS requires the partial analysis result contract; legacy CFG JSON cannot encode contextual uncertainty");
         var graph = result.graph().orElseThrow();
+        // Entry contextualization changes IDs, never wire kinds. Inspect each stored prototype
+        // once for schema admission; expand the logical product only when actually emitting it.
+        var schemaTransitions=graph.transitions() instanceof CfgTransitionTable table?table.stored():graph.transitions();
         // Token mappings carry their contract requirement. Inspect the product, not its source text.
         boolean requiresV5=!graph.localRules().isEmpty();
         boolean requiresV7=graph.localRules().values().stream().anyMatch(r->r instanceof LocalControlRules.Invoke i&&!i.resumeRoutes().isEmpty()
@@ -62,14 +66,14 @@ public final class CfgJsonWriter {
             ||r instanceof LocalControlRules.Resume x&&x.resumeKey().isPresent()||r instanceof LocalControlRules.Unwind u&&u.all());
         boolean requiresV6=graph.localRules().values().stream().anyMatch(r->r instanceof LocalControlRules.Invoke i&&i.reentryGuard().isPresent());
         boolean requiresV4=graph.nodes().stream().anyMatch(CfgNode.OutcomeExit.class::isInstance)
-            ||graph.transitions().stream().anyMatch(t->t.kind()==CfgTransition.Kind.EXCEPTION);
+            ||schemaTransitions.stream().anyMatch(t->t.kind()==CfgTransition.Kind.EXCEPTION);
         boolean requiresV2 = false;
         boolean requiresV3 = graph.nodes().stream().anyMatch(n -> n instanceof CfgNode.SequenceNode q && q.control() instanceof CfgControl.Opaque);
         for (var node : graph.nodes()) {
             if (node instanceof CfgNode.SequenceNode sequence)
                 requiresV2 |= terminatorKind(sequence.control()).requiresV2;
         }
-        for (var transition : graph.transitions())
+        for (var transition : schemaTransitions)
             requiresV2 |= transitionKind(transition.kind()).requiresV2;
         out.raw("{\"schema\":\"analysis-cfg-json\",\"schemaVersion\":");
         out.string(requiresV7 ? "7.0.0" : requiresV6 ? "6.0.0" : requiresV5 ? "5.0.0" : requiresV4 ? "4.0.0" : requiresV3 ? "3.0.0" : requiresV2 ? "2.0.0" : "1.0.0");

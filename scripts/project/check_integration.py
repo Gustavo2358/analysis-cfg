@@ -44,6 +44,7 @@ SUITES = {
             "nonAtomicFallbackIsExplicitAndMovesCompleteBytes", "failedMoveCleansTemporaryAndDoesNotReportSuccess",
             "productionEncoderStreamsTheExactCompatibilityWire", "atomicProductionWriterMetersTheLogicalWire",
             "interruptedStreamingWritePreservesDestinationAndCleansTemporary",
+            "schemaSelectionDoesNotAllocateTheEntryTimesBodyProductBeforeFirstByte",
         },
     },
     "cfg-launcher": {
