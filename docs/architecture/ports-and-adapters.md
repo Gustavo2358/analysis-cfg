@@ -46,6 +46,20 @@ an existing inventory. The program owns these descriptors; the graph only borrow
 Graph admission validates the role indexes against the complete node scan, including
 wrong kinds, omissions, duplicate positions and out-of-range ordinals.
 
+`NodeStore.transitions()` may supply a `CfgTransitionTable.Storage` sharing that
+projection owner. The single core still produces the same typed physical rows and
+Entry/normal-exit bindings. A cold backend records dense endpoint and activation
+Entry-node ordinals, with paged group boundaries; it must preserve namespace,
+physical order, contextual Return rebinding and exact duplicate validation. The
+logical Entry × body relation is expanded only by ordinal queries/export. Hashing
+and factored equality inspect physical rows and bindings, not that product.
+`SnapshotProgram` uses seven primitive tapes per policy (three for rows/groups/exit
+bindings, four for nodes/roles), including an external exact-tuple duplicate index.
+All borrowed rows/groups expire with the projection. `AnalysisPipeline` retires
+them after successful CFG export, before dependencies consume the same AIR.
+Resident adapters retain their compatibility storage. Per-Unit projection maps
+and temporary typed lists remain resident; this is not a whole-CFG memory bound.
+
 `CfgBuildResult` registra `PublicationId`, versão AIR, options, o
 `ValidationResult` integral, capabilities requeridas sem intérprete, issues tipados
 da projeção e `Optional<CfgGraph>`. `CFG_BUILT` exige produto presente;

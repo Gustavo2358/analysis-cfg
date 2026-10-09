@@ -472,6 +472,8 @@
       "validTypedSnapshotHasIdenticalManagedAdmissionPrefixAcrossBackends"
     ],
     "io.github.gustavo2358.analysis.adapters.SnapshotDependencyAnalysisTest": [
+      "snapshotCfgPhysicalTransitionsStayFactoredColdAndExpireWithProjection",
+      "pagedPhysicalTupleStorageRejectsDuplicatesAndForeignOrMissingBindings",
       "sourceUnitInventoryBorrowsCanonicalPagesAndExpiresWithProgram",
       "borrowedSourceInventoryKeepsCanonicalAndForeignIdentityChecks",
       "cfgProjectionDoesNotReadEveryInstructionIdentityBeforeAQuery",

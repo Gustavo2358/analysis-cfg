@@ -269,8 +269,46 @@ final class SnapshotDependencyAnalysisTest {
         }
     }
 
+    @Test void snapshotCfgPhysicalTransitionsStayFactoredColdAndExpireWithProjection() {
+        long fixed=-1;
+        for(int count:new int[]{1,4,16,64}) {
+            var publication=directCalls(count);
+            var ledger=resources();
+            try(var pages=new FilePageStore(directory,512,16,ledger);
+                var checked=SnapshotValidator.check(AirSnapshot.fromPublication(publication),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger))) {
+                assertEquals(ValidationResult.Status.STRUCTURALLY_VALID,checked.result().status(),checked.result().toString());
+                try(var program=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),new PagedSnapshotOrderStorage(pages,ledger))) {
+                program.source();long before=ledger.heapUsed();var graph=CoreCfgProjection.project(program);
+                var table=assertInstanceOf(io.github.gustavo2358.analysis.cfg.domain.CfgTransitionTable.class,graph.transitions());
+                var physical=table.stored();
+                assertEquals("PhysicalRows",physical.getClass().getSimpleName(),"no input-sized resident transition inventory");
+                assertEquals(count,table.groups());assertEquals(3*count,physical.size());assertEquals(3*count,table.size());
+                long retained=ledger.heapUsed()-before;if(fixed<0)fixed=retained;else assertEquals(fixed,retained);
+                for(int g=0;g<count;g++) {
+                    long offset=4L*g;var entry=table.entry(g,0);var activation=entry.activationEntry();
+                    assertEquals("entry",activation.localId());assertEquals(offset+2,entry.from().ordinal());assertEquals(offset+1,entry.to().ordinal());
+                    assertEquals(offset+3,table.normalExit(g,0).ordinal());
+                    var returned=table.get(3*g+1);assertEquals(io.github.gustavo2358.analysis.cfg.domain.CfgTransition.Kind.RETURN,returned.kind());
+                    assertEquals(offset,returned.from().ordinal());assertEquals(table.normalExit(g,0),returned.to());assertEquals(activation,returned.activationEntry());
+                    var called=table.get(3*g+2);assertEquals(io.github.gustavo2358.analysis.cfg.domain.CfgTransition.Kind.INVOKE_NORMAL,called.kind());
+                    assertEquals(offset+1,called.from().ordinal());assertEquals(offset,called.to().ordinal());assertEquals(activation,called.activationEntry());
+                }
+                var resident=CoreCfgProjection.project(publication);assertEquals(resident,graph);assertEquals(resident.hashCode(),graph.hashCode());
+                var dense=new java.util.ArrayList<>(table);assertEquals(dense.hashCode(),table.hashCode());assertEquals(dense,table);assertEquals(table,dense);
+                assertEquals(graph,CoreCfgProjection.project(program));assertEquals(retained,ledger.heapUsed()-before);
+                assertThrows(UnsupportedOperationException.class,physical::clear);
+                System.out.println("SNAPSHOT_CFG_TRANSITION_DESCRIPTOR_METRICS units="+count+" physical="+physical.size()+" logical="+table.size()+" fixedHeap="+retained);
+                program.releaseCfgProjection(io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy.KNOWN_SUBSET);
+                assertEquals(before,ledger.heapUsed());assertThrows(IllegalStateException.class,table::size);assertThrows(IllegalStateException.class,table::groups);
+                assertThrows(IllegalStateException.class,physical::size);assertThrows(IllegalStateException.class,physical::getFirst);
+                }
+            }
+            for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
+        }
+    }
+
     @Test void deniedCfgDescriptorConstructionReleasesEveryPartialTape() {
-        for(int left:new int[]{3000,7000,10000}) {
+        for(int left:new int[]{3000,7000,10000,14000,17000,20000}) {
             var ledger=resources();
             try(var pages=new FilePageStore(directory,512,16,ledger);
                 var checked=SnapshotValidator.check(AirSnapshot.fromPublication(directCall()),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger));
@@ -283,6 +321,46 @@ final class SnapshotDependencyAnalysisTest {
                 }
             }
             assertEquals(0,ledger.heapUsed());
+            for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
+        }
+    }
+
+    @Test void pagedPhysicalTupleStorageRejectsDuplicatesAndForeignOrMissingBindings() {
+        for(int mutation=0;mutation<5;mutation++) {
+            var ledger=resources();
+            try(var pages=new FilePageStore(directory,512,16,ledger);
+                var checked=SnapshotValidator.check(AirSnapshot.fromPublication(directCall()),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger));
+                var program=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),new PagedSnapshotOrderStorage(pages,ledger))) {
+                var writer=program.nodes(io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy.KNOWN_SUBSET);
+                var storage=writer.transitions();var publication=program.publication();
+                program.units(unit->{
+                    unit.sequences(sequence->writer.append(new io.github.gustavo2358.analysis.cfg.domain.CfgNode.SequenceNode(
+                            new io.github.gustavo2358.analysis.cfg.domain.CfgNodeId(publication,writer.size()),sequence.label(),sequence.operations(),sequence.control()),sequence.sourceHandle(),0));
+                    unit.entries(entry->{
+                        writer.append(new io.github.gustavo2358.analysis.cfg.domain.CfgNode.EntryNode(new io.github.gustavo2358.analysis.cfg.domain.CfgNodeId(publication,writer.size()),entry.id(),entry.initialLabel()),entry.sourceHandle(),0);
+                        writer.append(new io.github.gustavo2358.analysis.cfg.domain.CfgNode.NormalExit(new io.github.gustavo2358.analysis.cfg.domain.CfgNodeId(publication,writer.size()),publication,unit.id(),entry.id()),entry.sourceHandle(),0);
+                    });
+                });
+                var inventory=writer.seal();var entry=(io.github.gustavo2358.analysis.cfg.domain.CfgNode.EntryNode)inventory.get(2);
+                var binding=new io.github.gustavo2358.analysis.cfg.domain.CfgTransition(entry.id(),inventory.get(1).id(),io.github.gustavo2358.analysis.cfg.domain.CfgTransition.Kind.ENTRY,entry.entry());
+                var returned=new io.github.gustavo2358.analysis.cfg.domain.CfgTransition(inventory.getFirst().id(),inventory.get(3).id(),io.github.gustavo2358.analysis.cfg.domain.CfgTransition.Kind.RETURN,entry.entry());
+                if(mutation==0) {
+                    storage.add(entry.entry().unit(),List.of(binding),List.of(inventory.get(3).id()),List.of(returned,returned));storage.seal();
+                    var failure=assertThrows(IllegalArgumentException.class,storage::validateUnique);assertEquals("duplicate CFG transition",failure.getMessage());
+                    assertThrows(IllegalStateException.class,storage::storedSize);
+                } else {
+                    var foreign=new PublicationId("foreign-flow");var foreignUnit=new UnitId(foreign,"caller");
+                    var invalid=switch(mutation) {
+                        case 1->new io.github.gustavo2358.analysis.cfg.domain.CfgTransition(new io.github.gustavo2358.analysis.cfg.domain.CfgNodeId(foreign,2),new io.github.gustavo2358.analysis.cfg.domain.CfgNodeId(foreign,1),binding.kind(),new EntryId(foreignUnit,"entry"));
+                        case 2->new io.github.gustavo2358.analysis.cfg.domain.CfgTransition(new io.github.gustavo2358.analysis.cfg.domain.CfgNodeId(publication,99),binding.to(),binding.kind(),entry.entry());
+                        case 3->new io.github.gustavo2358.analysis.cfg.domain.CfgTransition(inventory.getFirst().id(),binding.to(),binding.kind(),entry.entry());
+                        default->new io.github.gustavo2358.analysis.cfg.domain.CfgTransition(binding.from(),binding.to(),binding.kind(),new EntryId(entry.entry().unit(),"absent-entry"));
+                    };
+                    Class<? extends RuntimeException> expected=mutation==2?IndexOutOfBoundsException.class:IllegalArgumentException.class;
+                    assertThrows(expected,()->storage.add(entry.entry().unit(),List.of(invalid),List.of(inventory.get(3).id()),List.of(returned)));
+                    assertThrows(IllegalStateException.class,storage::seal);
+                }
+            }
             for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
         }
     }

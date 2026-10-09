@@ -10,6 +10,8 @@ import io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection;
 import io.github.gustavo2358.analysis.cfg.domain.CfgNode;
 import io.github.gustavo2358.analysis.cfg.domain.CfgNodeId;
 import io.github.gustavo2358.analysis.cfg.domain.CfgNodeInventory;
+import io.github.gustavo2358.analysis.cfg.domain.CfgTransition;
+import io.github.gustavo2358.analysis.cfg.domain.CfgTransitionTable;
 import io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy;
 import io.github.gustavo2358.analysis.structure.ProgramStore;
 import java.math.BigInteger;
@@ -163,9 +165,9 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
     }
 
     private enum NodeKind { SEQUENCE,ENTRY,NORMAL_EXIT,HALT_EXIT,OUTCOME_EXIT }
-    /** Four native tapes per policy (the enum bounds the owner count), never a per-node callback map. */
+    /** Seven native tapes per policy; no per-node/row callback registry or resident group array. */
     private final class SnapshotNodes implements AutoCloseable {
-        private final SnapshotOrderStorage.Tape[] tapes=new SnapshotOrderStorage.Tape[4];
+        private final SnapshotOrderStorage.Tape[] tapes=new SnapshotOrderStorage.Tape[7];
         private CfgNodeInventory view;
         private boolean ended,failed;
         private SnapshotNodes() {
@@ -207,6 +209,7 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
             return new CfgProgram.NodeStore() {
                 private int at;private boolean sealed;
                 private void active(){available();if(sealed)throw new IllegalStateException("sealed CFG descriptor writer");}
+                @Override public CfgTransitionTable.Storage transitions(){active();return transitionWriter();}
                 @Override public int size(){active();return at;}
                 @Override public CfgNode get(int ordinal){active();Objects.checkIndex(ordinal,at);return read(ordinal);}
                 @Override public void append(CfgNode node,long handle,int variant) {
@@ -233,6 +236,89 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
                             Math.toIntExact(tapes[2].size()),i->Math.toIntExact(tapes[2].handle(i)-1),
                             Math.toIntExact(tapes[3].size()),i->Math.toIntExact(tapes[3].handle(i)-1));
                     sealed=true;return view;
+                }
+            };
+        }
+        private EntryId entryId(int ordinal) {
+            Objects.checkIndex(ordinal,count());long base=3L*ordinal;
+            if(tapes[0].handle(base)!=NodeKind.ENTRY.ordinal()+1L)throw new IllegalArgumentException("activation requires an Entry node");
+            return (EntryId)id(snapshot.field(tapes[0].handle(base+1),ENTRIES_ENTRY,0));
+        }
+        private CfgNodeId nodeId(int ordinal){Objects.checkIndex(ordinal,count());return new CfgNodeId(source().publicationId(),ordinal);}
+        private int nodeOrdinal(CfgNodeId node) {
+            if(!node.publicationId().equals(source().publicationId()))throw new IllegalArgumentException("foreign CFG transition node");
+            return Objects.checkIndex(Math.toIntExact(node.ordinal()),count());
+        }
+        private int physicalCount(){available();return Math.toIntExact(tapes[4].size()/4);}
+        private int groupCount(){available();return Math.toIntExact(tapes[5].size()/6);}
+        private int groupValue(int group,int field){Objects.checkIndex(group,groupCount());return Math.toIntExact(tapes[5].handle(6L*group+field)-1);}
+        private CfgTransition transition(int ordinal) {
+            Objects.checkIndex(ordinal,physicalCount());long base=4L*ordinal;
+            return new CfgTransition(nodeId(Math.toIntExact(tapes[4].handle(base)-1)),nodeId(Math.toIntExact(tapes[4].handle(base+1)-1)),
+                    CfgTransition.Kind.values()[Math.toIntExact(tapes[4].handle(base+2)-1)],entryId(Math.toIntExact(tapes[4].handle(base+3)-1)));
+        }
+        private int compareTransitions(long first,long second) {
+            long a=4*(first-1),b=4*(second-1);
+            for(int field=0;field<4;field++){int order=Long.compare(tapes[4].handle(a+field),tapes[4].handle(b+field));if(order!=0)return order;}
+            return 0;
+        }
+        private CfgTransitionTable.Storage transitionWriter() {
+            available();boolean repeated=view!=null;
+            return new CfgTransitionTable.Storage() {
+                private int atGroup,atRow,atExit,logical;
+                private boolean sealed;
+                private void active(){available();if(sealed)throw new IllegalStateException("sealed CFG transition writer");}
+                private void readable(){available();if(!sealed)throw new IllegalStateException("unsealed CFG transitions");}
+                private void word(int tape,long ordinal,long value) {
+                    if(repeated){if(tapes[tape].handle(ordinal)!=value)throw new IllegalArgumentException("repeated projection changed its immutable flow descriptor");}
+                    else {if(tapes[tape].size()!=ordinal)throw new IllegalStateException("noncontiguous CFG flow descriptor");tapes[tape].append(value);}
+                }
+                private void row(CfgTransition row,int activation) {
+                    if(!row.activationEntry().equals(entryId(activation)))throw new IllegalArgumentException("CFG representative Entry mismatch");
+                    int from=nodeOrdinal(row.from()),to=nodeOrdinal(row.to());long base=4L*atRow;
+                    word(4,base,from+1L);word(4,base+1,to+1L);word(4,base+2,row.kind().ordinal()+1L);word(4,base+3,activation+1L);
+                    atRow=Math.addExact(atRow,1);
+                }
+                @Override public void add(UnitId unit,List<CfgTransition> entries,List<CfgNodeId> exits,List<CfgTransition> body) {
+                    active();Objects.requireNonNull(unit);
+                    if(entries.isEmpty()||entries.size()!=exits.size())throw new IllegalArgumentException("entry/normal-exit bindings");
+                    try {
+                        int start=atRow,exitStart=atExit,representative=nodeOrdinal(entries.getFirst().from());
+                        for(int e=0;e<entries.size();e++) {
+                            var binding=entries.get(e);int activation=nodeOrdinal(binding.from());
+                            if(binding.kind()!=CfgTransition.Kind.ENTRY||!entryId(activation).unit().equals(unit))throw new IllegalArgumentException("factored CFG Unit/Entry mismatch");
+                            row(binding,activation);word(6,atExit,nodeOrdinal(exits.get(e))+1L);atExit=Math.addExact(atExit,1);
+                        }
+                        for(var row:body)row(row,representative);
+                        logical=Math.toIntExact(Math.addExact((long)logical,Math.multiplyExact((long)entries.size(),Math.addExact(1L,body.size()))));
+                        long base=6L*atGroup;
+                        word(5,base,start+1L);word(5,base+1,entries.size()+1L);word(5,base+2,body.size()+1L);
+                        word(5,base+3,logical+1L);word(5,base+4,atRow+1L);word(5,base+5,exitStart+1L);atGroup=Math.addExact(atGroup,1);
+                    } catch(RuntimeException|Error failure){failed=true;throw failure;}
+                }
+                @Override public void seal() {
+                    active();if(atGroup!=groupCount()||atRow!=physicalCount()||atExit!=tapes[6].size())throw new IllegalArgumentException("incomplete repeated CFG flow projection");
+                    sealed=true;
+                }
+                @Override public int groups(){readable();return groupCount();}
+                @Override public UnitId unit(int group){return entry(group,0).activationEntry().unit();}
+                @Override public int entries(int group){readable();return groupValue(group,1);}
+                @Override public CfgTransition entry(int group,int entry){readable();Objects.checkIndex(entry,entries(group));return transition(groupValue(group,0)+entry);}
+                @Override public CfgNodeId normalExit(int group,int entry){readable();Objects.checkIndex(entry,entries(group));return nodeId(Math.toIntExact(tapes[6].handle(groupValue(group,5)+entry)-1));}
+                @Override public int bodySize(int group){readable();return groupValue(group,2);}
+                @Override public CfgTransition body(int group,int row){readable();Objects.checkIndex(row,bodySize(group));return transition(groupValue(group,0)+entries(group)+row);}
+                @Override public int logicalEnd(int group){readable();return groupValue(group,3);}
+                @Override public int storedSize(){readable();return physicalCount();}
+                @Override public CfgTransition stored(int row){readable();return transition(row);}
+                @Override public void validateUnique() {
+                    readable();
+                    // Ordered exact primitive tuples: no resident HashSet or hash-collision assumption.
+                    try(var index=orderStorage.open(SnapshotNodes.this::compareTransitions)) {
+                        for(int row=0;row<physicalCount();row++) {
+                            try{index.add(row+1L);}
+                            catch(IllegalArgumentException duplicate){throw new IllegalArgumentException("duplicate CFG transition",duplicate);}
+                        }
+                    } catch(RuntimeException|Error failure){failed=true;throw failure;}
                 }
             };
         }

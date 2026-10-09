@@ -141,7 +141,7 @@ public final class CoreCfgProjection {
         Objects.requireNonNull(policy, "policy");
         CfgProgram.NodeStore nodes = program.nodes(policy);
         var source=program.source();
-        var table=new CfgTransitionTable.Builder(source);
+        var table=new CfgTransitionTable.Builder(source,nodes.transitions());
         program.units(unit -> {
             Map<LabelId, CfgNode.SequenceNode> sequences = new HashMap<>();
             Map<LabelId, CfgNode.HaltExit> halts = new HashMap<>();

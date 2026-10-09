@@ -31,6 +31,8 @@ public interface CfgProgram {
     /** Fresh projection writer; snapshot adapters may reuse sealed descriptors for the same policy. */
     default NodeStore nodes(ProjectionPolicy policy){Objects.requireNonNull(policy);return new ResidentNodes();}
     interface NodeStore {
+        /** Optional cold factored-flow writer sharing this projection's owner. */
+        default CfgTransitionTable.Storage transitions(){return null;}
         int size();
         CfgNode get(int ordinal);
         void append(CfgNode node,long sourceHandle,int variant);

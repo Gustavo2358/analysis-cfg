@@ -169,7 +169,7 @@ EXPECTED_PRODUCTION_IMPORTS.update({
 })
 EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CfgTransitionTable.java"] = {
     "io.github.gustavo2358.air.model.Ids.UnitId", "java.util.AbstractList", "java.util.ArrayList",
-    "java.util.Arrays", "java.util.List", "java.util.Objects", "java.util.RandomAccess",
+    "java.util.HashSet", "java.util.List", "java.util.Objects", "java.util.RandomAccess",
 }
 EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CfgNodeInventory.java"] = {
     "java.util.AbstractList", "java.util.List", "java.util.Objects", "java.util.RandomAccess",
@@ -201,7 +201,9 @@ CFG_CLASS_NAMES = {
     "LocalControlRules", "LocalControlRules$ReentryGuard", "LocalControlRules$Rule", "LocalControlRules$Invoke", "LocalControlRules$Boundary",
     "LocalControlRules$Resume", "LocalControlRules$Unwind", "LocalControlRules$Stack", "LocalControlRules$Step", "LocalControlRules$RecursiveActivation",
     "CfgNodeId", "CfgNode", "CfgNode$EntryNode", "CfgNode$SequenceNode", "CfgNode$NormalExit", "CfgNode$HaltExit", "CfgNode$OutcomeExit",
-    "CfgTransitionTable", "CfgTransitionTable$Builder", "CfgTransitionTable$Group", "CfgTransition", "CfgTransition$Kind", "CfgGraph", "CfgGraph$1",
+    "CfgTransitionTable", "CfgTransitionTable$Builder", "CfgTransitionTable$Group",
+    "CfgTransitionTable$Storage", "CfgTransitionTable$ResidentStorage", "CfgTransitionTable$PhysicalRows",
+    "CfgTransition", "CfgTransition$Kind", "CfgGraph", "CfgGraph$1",
     "CfgSource", "CfgSource$UnitInventory", "CfgSource$UnitInventories",
     "CfgProjectionIssue", "CfgProjectionIssue$Code", "CoreCfgProjection", "ProjectionPolicy",
 }

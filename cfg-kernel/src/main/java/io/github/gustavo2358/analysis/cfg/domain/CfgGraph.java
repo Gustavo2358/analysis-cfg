@@ -102,7 +102,8 @@ public final class CfgGraph {
                     ||!normal.entryId().equals(binding.activationEntry())||!normal.unitId().equals(table.unit(g)))
                 throw new IllegalArgumentException("factored entry/normal-exit correlation");
         }
-        if (new HashSet<>(stored).size() != stored.size()) {
+        if(this.transitions instanceof CfgTransitionTable table)table.validateUnique();
+        else if (new HashSet<>(stored).size() != stored.size()) {
             throw new IllegalArgumentException("duplicate CFG transition");
         }
         for (CfgTransition transition : stored) {
